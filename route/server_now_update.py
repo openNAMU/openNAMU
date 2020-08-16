@@ -11,10 +11,7 @@ def server_now_update_2(conn, r_ver):
 
         curs.execute(db_change('select data from other where name = "update"'))
         up_data = curs.fetchall()
-        if up_data:
-            up_data = up_data[0][0]
-        else:
-            up_data = 'stable'
+        up_data = up_data[0][0] if up_data and up_data[0][0] in ['stable', 'beta', 'dev'] else 'stable'
 
         print('----')
         print('Update')

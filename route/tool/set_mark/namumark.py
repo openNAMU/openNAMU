@@ -39,11 +39,11 @@ def link_fix(main_link, no_change = 0):
     main_link = main_link.replace("<link_comma>", "&#x27;")
     main_link = main_link.replace('\\#', '%23')
 
-    find_data = re.findall(r'<span id="(nowiki_[0-9]+)">', main_link)
+    find_data = re.findall(r'<span id="((?:include_(?:[0-9]+)_)?(?:nowiki_[0-9]+))">', main_link)
     for i in find_data:
         main_link = main_link.replace('<span id="' + i + '"></span>', end_data[i])
 
-    find_data = re.findall(r'<span id="(nowiki_[0-9]+)">', other_link)
+    find_data = re.findall(r'<span id="((?:include_(?:[0-9]+)_)?(?:nowiki_[0-9]+))">', other_link)
     for i in find_data:
         other_link = other_link.replace('<span id="' + i + '"></span>', end_data[i])
 
@@ -536,17 +536,22 @@ def namumark(conn, data, title, include_num):
 
     nowiki_num = 0
     data = '\n' + data + '\n'
-    include_name = include_num + '_' if include_num else ''
+    include_name = (include_num + '_') if include_num else ''
+    now_time = tool.get_time().split()[0]
     plus_data = ''
 
     backlink = []
     end_data = {}
 
-    data = re.sub(r'@([^=@]+)=(?P<in>[^=@]+)@', '\g<in>', data)
+    data = re.sub(r'@((?:(?!(?:=|{{{|}}}|\[\[|\]\]|@)).)+)=(?P<in>(?:(?!(?:=|{{{|}}}|\[\[|\]\]|@)).)+)@', '\g<in>', data)
     data = re.sub(r'<math>(?P<in>(?:(?!<\/math>).)+)<\/math>', '[math(\g<in>)]', data)
 
     data = html.escape(data)
     data = data.replace('\r\n', '\n')
+
+    # 테이블 앞에 공백 있는 경우 처리 필요
+    # 테이블 col 옵션 적용시 셀 병합 고려 필요
+    data = re.sub(r'\n +\|\|', '\n||', data)
 
     math_re = re.compile(r'\[math\(((?:(?!\)\]).)+)\)\]', re.I)
     while 1:
@@ -607,48 +612,51 @@ def namumark(conn, data, title, include_num):
             break
 
     include_re = re.compile(r'\[include\(((?:(?!\)\]).)+)\)\]', re.I)
-    i = 0
-    while 1:
-        i += 1
+    if include_name == '':
+        i = 0
+        while 1:
+            i += 1
 
-        include = include_re.search(data)
-        if include:
-            include = include.group(1)
+            include = include_re.search(data)
+            if include:
+                include = include.group(1)
 
-            include_data = re.search(r'^((?:(?!,).)+)', include)
-            if include_data:
-                include_data = include_data.group(1)
-            else:
-                include_data = 'Test'
-
-            include_link = include_data
-            backlink += [[title, include_link, 'include']]
-
-            data = include_re.sub('' + \
-                '<a id="' + include_name + 'include_link" class="include_' + str(i) + '" href="/w/' + tool.url_pas(include_link) + '">(' + include_link + ')</a>' + \
-                '<div id="' + include_name + 'include_' + str(i) + '"></div>' + \
-            '', data, 1)
-
-            include_plus_data = []
-            while 1:
-                include_plus = re.search(r', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
-                if include_plus:
-                    include_plus = include_plus.groups()
-
-                    include_data_set = include_plus[1]
-                    find_data = re.findall(r'<span id="(nowiki_[0-9]+)">', include_data_set)
-                    for j in find_data:
-                        include_data_set = include_data_set.replace('<span id="' + j + '"></span>', end_data[j])
-
-                    include_plus_data += [[include_plus[0], include_data_set]]
-
-                    include = re.sub(r', ?((?:(?!=).)+)=((?:(?!,).)+)', '', include, 1)
+                include_data = re.search(r'^((?:(?!,).)+)', include)
+                if include_data:
+                    include_data = include_data.group(1)
                 else:
-                    break
+                    include_data = 'Test'
 
-            plus_data += 'load_include("' + include_link + '", "' + include_name + 'include_' + str(i) + '", ' + str(include_plus_data) + ');\n'
-        else:
-            break
+                include_link = include_data
+                backlink += [[title, include_link, 'include']]
+
+                data = include_re.sub('' + \
+                    '<a id="' + include_name + 'include_link" class="include_' + str(i) + '" href="/w/' + tool.url_pas(include_link) + '">(' + include_link + ')</a>' + \
+                    '<div id="' + include_name + 'include_' + str(i) + '"></div>' + \
+                '', data, 1)
+
+                include_plus_data = []
+                while 1:
+                    include_plus = re.search(r', ?((?:(?!=).)+)=((?:(?!,).)+)', include)
+                    if include_plus:
+                        include_plus = include_plus.groups()
+
+                        include_data_set = include_plus[1]
+                        find_data = re.findall(r'<span id="((?:include_(?:[0-9]+)_)?(?:nowiki_[0-9]+))">', include_data_set)
+                        for j in find_data:
+                            include_data_set = include_data_set.replace('<span id="' + j + '"></span>', end_data[j])
+
+                        include_plus_data += [[include_plus[0], include_data_set]]
+
+                        include = re.sub(r', ?((?:(?!=).)+)=((?:(?!,).)+)', '', include, 1)
+                    else:
+                        break
+
+                plus_data += 'load_include("' + include_link + '", "' + include_name + 'include_' + str(i) + '", ' + str(include_plus_data) + ');\n'
+            else:
+                break
+    else:
+        data = include_re.sub('', data)
 
     data = data.replace('&amp;', '&')
     data = re.sub(r'\n##[^\n]+', '', data)
@@ -685,14 +693,15 @@ def namumark(conn, data, title, include_num):
         other_link = return_link[1]
 
         backlink += [[title, main_link, 'redirect']]
-
+        
         plus_data += '' + \
             'var get_link = window.location.search.match(/(?:\?|&)from=([^&]+)/);\n' + \
-            'if(!get_link) {\n' + \
-                'window.location.href = "/w/' + tool.url_pas(main_link) + other_link + '?from=' + tool.url_pas(title) + '";\n' + \
+            'var get_link_2 = window.location.pathname.match(/^\/w\//);' + \
+            'if(!get_link && get_link_2) {\n' + \
+                'window.location.href = "/w/' + tool.url_pas(main_link) + '?from=' + tool.url_pas(title) + other_link + '";\n' + \
             '}\n' + \
         ''
-        data = redirect_re.sub('', data, 1)
+        data = redirect_re.sub('\nredirect to ' + html.escape(main_link) + other_link, data, 1)
 
     no_toc_re = re.compile(r'\[(?:목차|toc)\((?:no)\)\]\n', re.I)
     toc_re = re.compile(r'\[(?:목차|toc)\]', re.I)
@@ -850,7 +859,7 @@ def namumark(conn, data, title, include_num):
             data = macro_re.sub(ruby_data, data, 1)
         elif macro_name == 'age' or macro_name == 'dday':
             try:
-                old = datetime.datetime.strptime(time, '%Y-%m-%d')
+                old = datetime.datetime.strptime(now_time, '%Y-%m-%d')
                 will = datetime.datetime.strptime(i[1], '%Y-%m-%d')
 
                 e_data = old - will
@@ -901,7 +910,7 @@ def namumark(conn, data, title, include_num):
             for i in sub_li:
                 li_end_data += '<li style="margin-left: ' + str(20 if len(i[0]) == 0 else (len(i[0]) * 20)) + 'px;">' + i[1] + '</li>'
 
-            data = li_re.sub('\n<ul>' + li_end_data + '</ul>\n', data, 1)
+            data = li_re.sub('\n\n<ul>' + li_end_data + '</ul>\n', data, 1)
         else:
             break
 
@@ -1017,25 +1026,26 @@ def namumark(conn, data, title, include_num):
                     1
                 )
             elif category_re.search(main_link):
-                if category == '':
-                    category += '<div id="cate_all"><div id="cate">Category : '
+                if include_name == '':
+                    if category == '':
+                        category += '<div id="cate_all"><div id="cate">Category : '
 
-                main_link = category_re.sub('category:', main_link)
-                link_id = ''
+                    main_link = category_re.sub('category:', main_link)
+                    link_id = ''
 
-                curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
-                if re.search(r'#blur', main_link):
-                    link_id = ' hidden_link'
-                    main_link = main_link.replace('#blur', '')
-                    see_link = see_link.replace('#blur', '')
+                    curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
+                    if re.search(r'#blur', main_link):
+                        link_id = ' hidden_link'
+                        main_link = main_link.replace('#blur', '')
+                        see_link = see_link.replace('#blur', '')
 
-                backlink += [[title, main_link, 'cat']]
-                category += '' + \
-                    '<a class="' + include_name + 'link_finder' + link_id + '" ' + \
-                        'href="/w/' + tool.url_pas(main_link) + '">' + \
-                        category_re.sub('', see_link) + \
-                    '</a> | ' + \
-                ''
+                    backlink += [[title, main_link, 'cat']]
+                    category += '' + \
+                        '<a class="' + include_name + 'link_finder' + link_id + '" ' + \
+                            'href="/w/' + tool.url_pas(main_link) + '">' + \
+                            category_re.sub('', see_link) + \
+                        '</a> | ' + \
+                    ''
 
                 data = link_re.sub('', data, 1)
             elif re.search(r'^inter:((?:(?!:).)+):', main_link):
@@ -1163,7 +1173,7 @@ def namumark(conn, data, title, include_num):
         plus_data += 'page_count();\n'
         data = re.sub(r'\[pagecount\]', '<span class="all_page_count"></span>', data, flags = re.I)
 
-    data = re.sub(r'\[date\]', tool.get_time().split()[0], data, flags = re.I)
+    data = re.sub(r'\[date\]', now_time, data, flags = re.I)
     data = re.sub(r'\[clearfix\]', '<div style="clear:both"></div>', data, flags = re.I)
     data = re.sub(r'\[br\]', '<br>', data, flags = re.I)
 
