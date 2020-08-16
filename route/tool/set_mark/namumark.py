@@ -693,14 +693,15 @@ def namumark(conn, data, title, include_num):
         other_link = return_link[1]
 
         backlink += [[title, main_link, 'redirect']]
-
+        
         plus_data += '' + \
             'var get_link = window.location.search.match(/(?:\?|&)from=([^&]+)/);\n' + \
-            'if(!get_link) {\n' + \
-                'window.location.href = "/w/' + tool.url_pas(main_link) + other_link + '?from=' + tool.url_pas(title) + '";\n' + \
+            'var get_link_2 = window.location.pathname.match(/^\/w\//);' + \
+            'if(!get_link && get_link_2) {\n' + \
+                'window.location.href = "/w/' + tool.url_pas(main_link) + '?from=' + tool.url_pas(title) + other_link + '";\n' + \
             '}\n' + \
         ''
-        data = redirect_re.sub('', data, 1)
+        data = redirect_re.sub('\nredirect to ' + html.escape(main_link) + other_link, data, 1)
 
     no_toc_re = re.compile(r'\[(?:목차|toc)\((?:no)\)\]\n', re.I)
     toc_re = re.compile(r'\[(?:목차|toc)\]', re.I)
