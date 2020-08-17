@@ -515,7 +515,7 @@ def next_fix(link, num, page, end = 50):
 
 def other2(data):
     global req_list
-    main_css_ver = '51'
+    main_css_ver = '52'
     data += ['' for _ in range(0, 3 - len(data))]
 
     if req_list == '':
