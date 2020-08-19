@@ -93,10 +93,8 @@ function main_css_skin_load() {
             var backup_category = get_category.innerHTML;
             var in_data = document.getElementById('in_data_0').innerHTML;
             get_category.innerHTML = '';
-
-            backup_category = backup_category.replace('<hr>', '') + '<hr>';
-
             document.getElementById('in_data_0').innerHTML = backup_category + in_data;
+            head_data.innerHTML += '<style>#cate { margin-top: 0px; margin-bottom: 20px; }</style>';
         }
     }
 }
