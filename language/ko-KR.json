@@ -392,5 +392,6 @@
     "on" : "켜기",
     "2fa" : "2차 인증",
     "2fa_password" : "2차 비밀번호",
-    "2fa_password_change" : "2차 비밀번호 변경"
+    "2fa_password_change" : "2차 비밀번호 변경",
+    "vote_acl" : "투표 ACL"
 }
