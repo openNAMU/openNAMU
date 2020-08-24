@@ -121,7 +121,7 @@ def view_read_2(conn, name):
 
         curs.execute(db_change('' + \
             'select ip, date, leng, send, id from history ' + \
-            'where title = ? and hide != "O" and type = "" order by cast(id as integer) desc limit 3' + \
+            'where title = ? and hide != "O" and type = "" order by id + 0 desc limit 3' + \
         ''), [name])
         sql_d = curs.fetchall()
         if sql_d:
