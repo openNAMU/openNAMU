@@ -6,9 +6,12 @@ def inter_wiki_plus_2(conn, tools, name):
     if flask.request.method == 'POST':
         if tools == 'plus_inter_wiki':
             if name:
-                curs.execute(db_change("delete from inter where title = ?"), [name])
+                curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki'"), [name])
 
-            curs.execute(db_change('insert into inter (title, link, icon) values (?, ?, ?)'), [
+            curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki'"), [
+                flask.request.form.get('title', 'test')
+            ])
+            curs.execute(db_change('insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, "inter_wiki")'), [
                 flask.request.form.get('title', 'test'),
                 flask.request.form.get('link', 'test'),
                 flask.request.form.get('icon', '')
@@ -16,7 +19,7 @@ def inter_wiki_plus_2(conn, tools, name):
 
             admin_check(None, 'inter_wiki_plus')
         elif tools == 'plus_edit_filter':
-            if admin_check(1, 'edit_filter edit') != 1:
+            if admin_check(None, 'edit_filter edit') != 1:
                 return re_error('/error/3')
 
             if flask.request.form.get('second', '0') == '0':
@@ -27,8 +30,8 @@ def inter_wiki_plus_2(conn, tools, name):
             try:
                 re.compile(flask.request.form.get('content', 'test'))
 
-                curs.execute(db_change("delete from filter where name = ?"), [name])
-                curs.execute(db_change("insert into filter (name, regex, sub) values (?, ?, ?)"), [
+                curs.execute(db_change("delete from html_filter where html = ? and kind = 'regex_filter'"), [name])
+                curs.execute(db_change("insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, 'regex_filter')"), [
                     name,
                     flask.request.form.get('content', 'test'),
                     end
@@ -91,14 +94,14 @@ def inter_wiki_plus_2(conn, tools, name):
         return redirect('/' + re.sub(r'^plus_', '', tools))
     else:
         get_sub = 0
-        if admin_check(1) != 1:
+        if admin_check() != 1:
             stat = 'disabled'
         else:
             stat = ''
 
         if tools == 'plus_inter_wiki':
             if name:
-                curs.execute(db_change("select title, link, icon from inter where title = ?"), [name])
+                curs.execute(db_change("select html, plus, plus_t from html_filter where html = ? and kind = 'inter_wiki'"), [name])
                 exist = curs.fetchall()
                 if exist:
                     value = exist[0]
@@ -122,7 +125,7 @@ def inter_wiki_plus_2(conn, tools, name):
                 <input value="''' + html.escape(value[2]) + '''" type="text" name="icon">
             '''
         elif tools == 'plus_edit_filter':
-            curs.execute(db_change("select regex, sub from filter where name = ?"), [name])
+            curs.execute(db_change("select plus, plus_t from html_filter where html = ? and kind = 'regex_filter'"), [name])
             exist = curs.fetchall()
             if exist:
                 textarea = exist[0][0]

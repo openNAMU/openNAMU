@@ -273,6 +273,23 @@ def update(ver_num, set_data):
     if ver_num < 3202500:
         curs.execute(db_change('delete from cache_data'))
 
+    if ver_num < 3202600:
+        curs.execute(db_change("select name, regex, sub from filter"))
+        for i in curs.fetchall():
+            curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'regex_filter', ?, ?)"), [
+                i[0], 
+                i[1],
+                i[2]
+            ])
+
+        curs.execute(db_change("select title, link, icon from inter"))
+        for i in curs.fetchall():
+            curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'inter_wiki', ?, ?)"), [
+                i[0], 
+                i[1],
+                i[2]
+            ])
+
     conn.commit()
 
     print('Update pass')
@@ -941,7 +958,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             num = 5
 
         acl_data = curs.fetchall()
-        if (not acl_data and i == (end - 1)) and get_ban == 1 and tool != 'render':
+        if  (i == (end - 1) and (not acl_data or acl_data[0][0] == '' or acl_data[0][0] == 'normal')) and \
+            get_ban == 1 and \
+            tool != 'render':
             return 1
         elif acl_data and acl_data[0][0] != 'normal' and acl_data[0][0] != '':
             if acl_data[0][0] != 'ban' and get_ban == 1 and tool != 'render':
@@ -1174,7 +1193,7 @@ def number_check(data):
 
 def edit_filter_do(data):
     if admin_check(1) != 1:
-        curs.execute(db_change("select regex, sub from filter where regex != ''"))
+        curs.execute(db_change("select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''"))
         for data_list in curs.fetchall():
             match = re.compile(data_list[0], re.I)
             if match.search(data):

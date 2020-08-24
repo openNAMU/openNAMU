@@ -1052,7 +1052,7 @@ def namumark(conn, data, title, include_num):
                 inter_data = re.search(r'^inter:((?:(?!:).)+):((?:(?!\]\]).)+)', main_link)
                 inter_data = inter_data.groups()
 
-                curs.execute(tool.db_change('select link, icon from inter where title = ?'), [inter_data[0]])
+                curs.execute(tool.db_change('select plus, plus_t from html_filter where html = ? and kind = "inter_wiki"'), [inter_data[0]])
                 inter = curs.fetchall()
                 if inter:
                     return_link = link_fix(inter_data[1], 1)
