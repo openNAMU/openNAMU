@@ -12,7 +12,7 @@ def inter_wiki_2(conn, tools):
         title = load_lang('interwiki_list')
         div = ''
 
-        curs.execute(db_change('select title, link from inter'))
+        curs.execute(db_change("select html, plus from html_filter where kind = 'inter_wiki'"))
     elif tools == 'email_filter':
         del_link = 'del_email_filter'
         plus_link = 'plus_email_filter'
@@ -29,11 +29,11 @@ def inter_wiki_2(conn, tools):
         curs.execute(db_change("select html from html_filter where kind = 'name'"))
     elif tools == 'edit_filter':
         del_link = 'del_edit_filter'
-        plus_link = 'manager/9'
+        plus_link = 'plus_edit_filter'
         title = load_lang('edit_filter_list')
         div = ''
 
-        curs.execute(db_change("select name from filter"))
+        curs.execute(db_change("select html from html_filter where kind = 'regex_filter'"))
     elif tools == 'file_filter':
         del_link = 'del_file_filter'
         plus_link = 'plus_file_filter'

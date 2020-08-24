@@ -5,9 +5,9 @@ def inter_wiki_del_2(conn, tools, name):
 
     if admin_check(None, tools) == 1:
         if tools == 'del_inter_wiki':
-            curs.execute(db_change("delete from inter where title = ?"), [name])
+            curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki'"), [name])
         elif tools == 'del_edit_filter':
-            curs.execute(db_change("delete from filter where name = ?"), [name])
+            curs.execute(db_change("delete from html_filter where html = ? and kind = 'regex_filter'"), [name])
         elif tools == 'del_name_filter':
             curs.execute(db_change("delete from html_filter where html = ? and kind = 'name'"), [name])
         elif tools == 'del_file_filter':

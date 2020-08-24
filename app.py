@@ -141,13 +141,10 @@ create_data['alist'] = ['name', 'acl']
 create_data['re_admin'] = ['who', 'what', 'time']
 create_data['alarm'] = ['name', 'data', 'date']
 create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
-create_data['filter'] = ['name', 'regex', 'sub']
 create_data['scan'] = ['user', 'title', 'type']
 create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
-create_data['inter'] = ['title', 'link', 'icon']
-create_data['html_filter'] = ['html', 'kind', 'plus']
+create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
 create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
-# create_data['oauth_conn'] = ['provider', 'wiki_id', 'sns_id', 'name', 'picture']
 for i in create_data:
     try:
         curs.execute(db_change('select test from ' + i + ' limit 1'))
