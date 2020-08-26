@@ -2,6 +2,9 @@ from .tool.func import *
 
 def main_views_2(conn, name):
     curs = conn.cursor()
+    
+    if re.search(r'[.][.]\/', name):
+        return re_error('/error/3')
 
     if re.search(r'\/', name):
         m = re.search(r'^(.*)\/(.*)$', name)
