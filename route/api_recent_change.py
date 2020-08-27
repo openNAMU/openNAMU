@@ -16,9 +16,12 @@ def api_recent_change_2(conn):
             get_title = i[1]
             curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where id = ? and title = ?'), i)
             get_data = curs.fetchall()
-            if get_data[0][6] == '' or admin == 1:
-                data_list += get_data
+            if get_data:
+                if get_data[0][6] == '' or admin == 1:
+                    data_list += get_data
+                else:
+                    data_list += [['', '', '', '', '', '', get_data[0][6]]]
             else:
-                data_list += [['', '', '', '', '', '', get_data[0][6]]]
+                data_list += [['', '', '', '', '', '', '']]
         
     return flask.jsonify(data_list if data_list else {}) 
