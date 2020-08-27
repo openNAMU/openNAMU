@@ -32,6 +32,8 @@ def ip_check(d_type = 0):
         for ip in ip_list:
             if not (ip == '::1' or ip == '127.0.0.1'):
                 ip = ip[0] if type(ip) == type([]) else ip.split(',')[0]
+                
+                break
 
     return ip
 
