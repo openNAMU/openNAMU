@@ -395,7 +395,7 @@
             "skin_error" : "This skin is not support settings.",
             "same_id_exist_error" : "There are users with the same username.",
             "long_id_error" : "Username must be shorter than 20 characters.",
-            "id_char_error" : "Only Korean letters, alphabets and spaces are allowed for Username.",
+            "id_char_error" : "Only Korean letters, alphabets are allowed for Username.",
             "file_exist_error" : "The file does not exist.",
             "password_error" : "The password is different.",
             "recaptcha_error" : "Go through the reCAPTCHA.",
