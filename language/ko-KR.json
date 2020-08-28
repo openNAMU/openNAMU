@@ -145,7 +145,7 @@
     "pinned": "고정",
     "edit_filter_add": "편집 필터 추가",
     "ban_authority": "차단 권한",
-    "file_extension_error": "지정된 확장자의 파일만 업로드 할 수 있습니다.",
+    "file_extension_error": "지정된 확장자의 파일만 올릴 수 있습니다.",
     "host": "호스트",
     "email_text": "이메일 내용",
     "recent": "최근",
@@ -309,7 +309,7 @@
     "many_delete": "문서 대량 삭제",
     "many_delete_help": "한 줄에 문서명을 한 개씩 적어주세요.",
     "content": "내용",
-    "upload_acl": "파일 업로드 ACL",
+    "upload_acl": "파일 올리기 ACL",
     "topic_delete": "토론 삭제",
     "edit_req": "편집 요청",
     "edit_req_check": "편집 요청 검사",
@@ -359,7 +359,7 @@
     "topic_acl": "토론 ACL",
     "main_skin_set": "기본 스킨 설정",
     "image_file_list": "이미지 파일 목록",
-    "many_upload_acl": "다중 파일 업로드 ACL",
+    "many_upload_acl": "다중 파일 올리기 ACL",
     "reset_backlink": "역링크 초기화",
     "link_in_this": "이 문서의 링크",
     "star_doc": "관심 문서",
@@ -393,5 +393,6 @@
     "2fa" : "2차 인증",
     "2fa_password" : "2차 비밀번호",
     "2fa_password_change" : "2차 비밀번호 변경",
-    "vote_acl" : "투표 ACL"
+    "vote_acl" : "투표 ACL",
+    "upload_help" : "파일 올리기 문구"
 }
