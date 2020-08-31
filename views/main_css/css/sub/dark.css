@@ -1,3 +1,5 @@
+html { background: black; color: white; }
+a { color: deepskyblue; }
 textarea, input, button, select { background: #1f2023; color: white; }
 input::placeholder, textarea::placeholder, select::placeholder { color: white; }
 #toc, #cate, #redirect { background: #1f2023; }
