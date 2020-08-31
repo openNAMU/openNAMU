@@ -358,7 +358,8 @@ def middle_parser(data):
                             1
                         )
                     elif re.search(r'^#!syntax', middle_data[0]):
-                        middle_data_2 = re.search(r'{{{#!syntax ((?:(?!\n|{{{).)+)\n?', data)
+                        syntax_re = re.compile(r'{{{#!syntax ?((?:(?!\n|{{{|}}}).)*)\n?')
+                        middle_data_2 = syntax_re.search(data)
                         if middle_data_2:
                             middle_data_2 = middle_data_2.groups()
                         else:
@@ -371,8 +372,7 @@ def middle_parser(data):
 
                         middle_list += ['pre']
 
-                        data = re.sub(
-                            r'{{{#!syntax ?((?:(?!\n|{{{).)*)\n?',
+                        data = syntax_re.sub(
                             '<pre id="syntax"><code class="' + middle_data_2[0] + '">',
                             data,
                             1
