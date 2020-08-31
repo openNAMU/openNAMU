@@ -116,35 +116,35 @@ def func_upload_2(conn, app_var):
 
         return redirect('/w/file:' + name)
     else:
-        license_list = '''
-            <option value="direct_input">''' + load_lang('direct_input') + '''</option>
-        '''
+        license_list = '<option value="direct_input">' + load_lang('direct_input') + '</option>'
 
         curs.execute(db_change("select html from html_filter where kind = 'image_license'"))
         db_data = curs.fetchall()
-        for i in db_data:
-            license_list += '''
-                <option value="''' + i[0] + '''">''' + i[0] + '''</option>
-            '''
+        license_list += ''.join(['<option value="' + i[0] + '">' + i[0] + '</option>' for i in db_data])
+
+        curs.execute(db_change("select data from other where name = 'upload_help'"))
+        db_data = curs.fetchall()
+        upload_help = ('<hr class="main_hr">' + db_data[0][0]) if db_data and db_data[0][0] != '' else ''
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('upload'), wiki_set(), custom(), other2([0, 0])],
             data = '''
                 <a href="/file_filter">(''' + load_lang('file_filter_list') + ''')</a>
-                <hr class=\"main_hr\">
+                ''' + upload_help + '''
+                <hr class="main_hr">
                 ''' + load_lang('max_file_size') + ''' : ''' + wiki_set(3) + '''MB
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
                 <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                     <input multiple="multiple" type="file" name="f_data[]">
-                    <hr class=\"main_hr\">
+                    <hr class="main_hr">
                     <input placeholder="''' + load_lang('file_name') + '''" name="f_name" value="''' + flask.request.args.get('name', '') + '''">
-                    <hr class=\"main_hr\">
+                    <hr class="main_hr">
                     <select name="f_lice_sel">
                         ''' + license_list + '''
                     </select>
-                    <hr class=\"main_hr\">
+                    <hr class="main_hr">
                     <textarea rows="10" placeholder="''' + load_lang('other') + '''" name="f_lice"></textarea>
-                    <hr class=\"main_hr\">
+                    <hr class="main_hr">
                     ''' + captcha_get() + '''
                     <button id="save" type="submit">''' + load_lang('save') + '''</button>
                 </form>

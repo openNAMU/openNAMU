@@ -1,0 +1,12 @@
+html { background: black; color: white; }
+textarea, input, button, select { background: #1f2023; color: white; }
+input::placeholder, textarea::placeholder, select::placeholder { color: white; }
+#toc, #cate, #redirect { background: #1f2023; }
+#toron_color_grey { background: #4a4a4a; }
+#toron_color_green { background: #2e4a2e; }
+#toron_color_red { background: #803737; }
+#toron_color_blue { background: #314c56; }
+pre#syntax, pre#syntax code { background: black; }
+.hljs, .hljs-subst { color: white; }
+blockquote { background-color: black; border-left: 5px solid #eee; }
+.spead_footnote { background-color: black; color: white; }

@@ -1,3 +1,4 @@
+# Load
 import os
 import re
 
@@ -8,7 +9,7 @@ for i_data in os.listdir("route"):
 
         exec("from route." + f_src + " import *")
 
-# DB
+# Version
 version_list = json.loads(open('version.json', encoding = 'utf8').read())
 
 print('Version : ' + version_list['beta']['r_ver'])
@@ -16,6 +17,7 @@ print('DB set version : ' + version_list['beta']['c_ver'])
 print('Skin set version : ' + version_list['beta']['s_ver'])
 print('----')
 
+# DB
 while 1:
     try:
         set_data = json.loads(open('data/set.json', encoding = 'utf8').read())
@@ -79,35 +81,39 @@ if set_data['db_type'] == 'mysql':
     try:
         set_data_mysql = json.loads(open('data/mysql.json', encoding = 'utf8').read())
     except:
-        new_json = ['', '', '']
+        new_json = {}
 
         while 1:
             print('DB user ID : ', end = '')
-            new_json[0] = str(input())
-            if new_json[0] != '':
+            new_json['user'] = str(input())
+            if new_json['user'] != '':
                 break
 
         while 1:
             print('DB password : ', end = '')
-            new_json[1] = str(input())
-            if new_json[1] != '':
+            new_json['password'] = str(input())
+            if new_json['password'] != '':
                 break
                 
         print('DB host (localhost) : ', end = '')
-        new_json[2] = str(input())
-        if new_json[2] == '':
-            new_json[2] == 'localhost'
+        new_json['host'] = str(input())
+        new_json['host'] = 'localhost' if new_json['host'] == '' else new_json['host']
+
+        print('DB port (3306) : ', end = '')
+        new_json['port'] = str(input())
+        new_json['port'] = '3306' if new_json['port'] == '' else new_json['port']
 
         with open('data/mysql.json', 'w', encoding = 'utf8') as f:
-            f.write('{ "user" : "' + new_json[0] + '", "password" : "' + new_json[1] + '", "host" : "' + new_json[2] + '" }')
+            f.write(json.dumps(new_json))
 
-        set_data_mysql = json.loads(open('data/mysql.json', encoding = 'utf8').read())
+        set_data_mysql = new_json
 
     conn = pymysql.connect(
         host = set_data_mysql['host'] if 'host' in set_data_mysql else 'localhost',
         user = set_data_mysql['user'],
         password = set_data_mysql['password'],
-        charset = 'utf8mb4'
+        charset = 'utf8mb4',
+        port = int(set_data_mysql['port']) if 'port' in set_data_mysql else 3306
     )
     curs = conn.cursor()
 
@@ -123,6 +129,7 @@ else:
 
 load_conn(conn)
 
+# DB init
 create_data = {}
 create_data['data'] = ['title', 'data']
 create_data['cache_data'] = ['title', 'data', 'id']

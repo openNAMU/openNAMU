@@ -169,7 +169,7 @@ def setting_2(conn, num, db_set):
                         </span>
                         <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class="main_hr">
-                        <select name="skin">''' + load_skin(d_list[5]) + '''</select>
+                        <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'marisa') + '''</select>
                         <hr class="main_hr">
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
                         <hr class="main_hr">
@@ -227,7 +227,8 @@ def setting_2(conn, num, db_set):
             'error_401',
             'error_404',
             'approval_question',
-            'edit_help'
+            'edit_help',
+            'upload_help'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
@@ -315,6 +316,10 @@ def setting_2(conn, num, db_set):
                         <span>''' + load_lang('edit_help') + '''</span>
                         <hr class="main_hr">
                         <textarea rows="3" name="''' + i_list[13] + '''">''' + html.escape(d_list[13]) + '''</textarea>
+                        <hr class="main_hr">
+                        <span>''' + load_lang('upload_help') + '''</span>
+                        <hr class="main_hr">
+                        <textarea rows="3" name="''' + i_list[14] + '''">''' + html.escape(d_list[14]) + '''</textarea>
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         <hr class="main_hr">
