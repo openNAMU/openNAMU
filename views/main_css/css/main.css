@@ -50,3 +50,4 @@ blockquote { background-image: url(/views/main_css/file/quote.png); background-p
 .topic_content { height: 200px; }
 .spead_footnote { background-color: #efefef; color: #555; border: 1px solid #cecece; }
 #footnote_data { border-top: 1px solid gainsboro; padding-top: 10px; }
+a { color: dodgerblue; }
