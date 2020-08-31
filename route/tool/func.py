@@ -537,10 +537,12 @@ def other2(data):
 
     if req_list == '':
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
-            req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + main_css_ver + '">'
+            if i_data != 'sub':
+                req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + main_css_ver + '">'
 
         for i_data in os.listdir(os.path.join("views", "main_css", "js")):
-            req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + main_css_ver + '"></script>'
+            if i_data != 'sub':
+                req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + main_css_ver + '"></script>'
 
     data = data[0:2] + ['', '''
         <link   rel="stylesheet"

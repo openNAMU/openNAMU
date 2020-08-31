@@ -15,7 +15,10 @@ function main_load() {
         cookies.match(regex_data('invert')) &&
         cookies.match(regex_data('invert'))[1] === '1'
     ) {
-        head_data.innerHTML += '<link rel="stylesheet" href="/views/marisa/css/dark.css?ver=6">';
+        head_data.innerHTML += '' +
+            '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=1">' +
+            '<link rel="stylesheet" href="/views/marisa/css/dark.css?ver=6">' +
+        '';
     }
 }
 
