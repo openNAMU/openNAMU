@@ -68,6 +68,7 @@ class link_render:
                 '<span  class="' + self.include_name + 'file_finder" ' + \
                         'under_alt="' + file_alt + '" ' + \
                         'under_src="' + file_src + '" ' + \
+                        'under_style="" ' + \
                         'under_href="' + ("out_link" if exist else '/upload?name=' + tool.url_pas(file_name)) + '">' + \
                 '</span>' + \
             ''
@@ -124,10 +125,12 @@ def markdown(conn, data, title, include_name):
     data = re.sub(link_r, link_do, data)
     plus_data = link_do.get_plus_data() + plus_data
 
-    data = re.sub(r'\*\*((?:(?!\*\*).)+)\*\*', '<b>\1</b>', data)
-    data = re.sub(r'__((?:(?!__).)+)__', '<i>\1</i>', data)
+    data = re.sub(r'\*\*(?P<A>(?:(?!\*\*).)+)\*\*', '<b>\g<A></b>', data)
+    data = re.sub(r'__(?P<A>(?:(?!__).)+)__', '<i>\g<A></i>', data)
 
     data = re.sub('^\n', '', data)
-    data = re.sub('\n', '<br>', data)
+    data = data.replace('\n', '<br>')
+
+    data = re.sub(r'(?P<A><\/h[0-6]>)<br>', '\g<A>', data)
     
     return [data, plus_data, backlink]
