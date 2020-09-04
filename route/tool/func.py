@@ -709,25 +709,14 @@ def ip_pas(raw_ip, type_d = 0):
                 curs.execute(db_change("select data from other where name = 'ip_view'"))
                 data = curs.fetchall()
                 if data and data[0][0] != '':
-                    if re.search(r'\.', raw_ip):
-                        ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
-                    else:
-                        ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
-
-                    if not admin_check(1):
-                        hide = 1
+                    ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip) if re.search(r'\.', raw_ip) else re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
+                    hide = 1 if not admin_check(1) else 0
                 else:
                     ip = raw_ip
             else:
                 if type_d == 0:
-                    curs.execute(db_change("select title from data where title = ?"), ['user:' + raw_ip])
-                    if curs.fetchall():
-                        ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
-                    else:
-                        ip = '<a id="not_thing" href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
-
-                    if admin_check('all', None, raw_ip) == 1:
-                        ip = '<b>' + ip + '</b>'
+                    ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+                    ip = '<b>' + ip + '</b>' if admin_check('all', None, raw_ip) == 1 else ip
                 else:
                     ip = raw_ip
 
@@ -735,21 +724,17 @@ def ip_pas(raw_ip, type_d = 0):
                 if ban_check(raw_ip) == 1:
                     ip = '<s>' + ip + '</s>'
 
-                if hide == 0:
-                    ip += ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
+                    if ban_check(raw_ip, 'login') == 1:
+                        ip = '<i>' + ip + '</i>'
+
+                ip = (ip + ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>') if hide == 0 else ip
         
             end_ip[raw_ip] = ip
 
     return ip if return_ip == 1 else end_ip
 
 def custom():
-    if 'head' in flask.session:
-        if len(re.findall('<', flask.session['head'])) % 2 != 1:
-            user_head = flask.session['head']
-        else:
-            user_head = ''
-    else:
-        user_head = ''
+    user_head = flask.session['head'] if 'head' in flask.session else ''
 
     ip = ip_check()
     if ip_or_user(ip) == 0:
@@ -770,20 +755,14 @@ def custom():
             for i in user_acl:
                 user_acl_list += [i[0]]
 
-            if user_acl != []:
-                user_acl_list = user_acl_list
-            else:
-                user_acl_list = '0'
+            user_acl_list = user_acl_list if user_acl != [] else '0'
         else:
             user_admin = '0'
             user_acl_list = '0'
 
         curs.execute(db_change("select count(*) from alarm where name = ?"), [ip])
         count = curs.fetchall()
-        if count:
-            user_notice = str(count[0][0])
-        else:
-            user_notice = '0'
+        user_notice = str(count[0][0]) if count else '0'
     else:
         user_icon = 0
         user_name = load_lang('user')
@@ -1039,8 +1018,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
     return 1
 
 def ban_check(ip = None, tool = None):
-    if not ip:
-        ip = ip_check()
+    ip = ip_check() if not ip else ip
 
     if admin_check(None, None, ip) == 1:
         return 0
@@ -1078,14 +1056,9 @@ def ban_check(ip = None, tool = None):
 
 def ban_insert(name, end, why, login, blocker, type_d = None):
     now_time = get_time()
-
-    if type_d:
-        band = type_d
-    else:
-        band = ''
+    band = type_d if type_d else ''
 
     curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [now_time])
-
     curs.execute(db_change("" + \
         "select block from rb where ((end > ? and end != '') or end = '') and block = ? and band = ? and ongoing = '1'" + \
     ""), [now_time, name, band])
@@ -1100,27 +1073,24 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
         ])
         curs.execute(db_change("update rb set ongoing = '' where block = ? and band = ? and ongoing = '1'"), [name, band])
     else:
-        if login != '':
-            login = 'O'
-        else:
-            login = ''
+        login = 'O' if login != '' else ''
 
         if end != '0':
             end = int(number_check(end))
-
             time = datetime.datetime.now()
             plus = datetime.timedelta(seconds = end)
             r_time = (time + plus).strftime("%Y-%m-%d %H:%M:%S")
         else:
             r_time = ''
 
-        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band, ongoing) values (?, ?, ?, ?, ?, ?, '1')"), [
+        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band, ongoing, login) values (?, ?, ?, ?, ?, ?, '1', ?)"), [
             name, 
             r_time, 
             now_time, 
             blocker, 
             why, 
-            band
+            band,
+            login
         ])
 
     conn.commit()
