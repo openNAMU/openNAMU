@@ -546,15 +546,15 @@ def other2(data):
 
     data = data[0:2] + ['', '''
         <link   rel="stylesheet"
-                href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/default.min.css">
+                href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.2/build/styles/default.min.css">
         <link   rel="stylesheet"
-                href="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.css"
-                integrity="sha384-dbVIfZGuN1Yq7/1Ocstc1lUEm+AT+/rCkibIcC/OmWo5f0EA48Vf8CytHzGrSwbQ"
+                href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css"
+                integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X"
                 crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js"
-                integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij"
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"
+                integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4"
                 crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.2/build/highlight.min.js"></script>
         <script>window.addEventListener('DOMContentLoaded', function() { main_css_skin_load(); });</script>
     ''' + req_list] + data[2:]
 
