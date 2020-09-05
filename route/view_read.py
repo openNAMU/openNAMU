@@ -11,9 +11,6 @@ def view_read_2(conn, name):
     num = flask.request.args.get('num', None)
     if num:
         num = int(number_check(num))
-    else:
-        if not flask.request.args.get('from', None):
-            run_redirect = '<script>not_from_exist();</script>'
 
     curs.execute(db_change("select sub from rd where title = ? and not stop = 'O' order by date desc"), [name])
     if curs.fetchall():
@@ -124,7 +121,7 @@ def view_read_2(conn, name):
 
         curs.execute(db_change('' + \
             'select ip, date, leng, send, id from history ' + \
-            'where title = ? and hide != "O" and type = "" order by id desc limit 3' + \
+            'where title = ? and hide != "O" and type = "" order by id + 0 desc limit 3' + \
         ''), [name])
         sql_d = curs.fetchall()
         if sql_d:

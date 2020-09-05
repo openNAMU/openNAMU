@@ -1,32 +1,30 @@
-오픈나무
-====
+[(en-US)](./readme-en.md) | [(ko-KR)](./readme.md)
+# 오픈나무
 [![Python 3.5 이상](https://img.shields.io/badge/python->=%203.5-blue.svg)](https://python.org)
 [![라이선스](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
-![](https://raw.githubusercontent.com/2du/openNAMU/master/.github/logo.png)
+![](https://raw.githubusercontent.com/2du/openNAMU/beta/.github/logo.png)
 
 오픈나무는 파이썬 기반의 위키 엔진입니다. 파이썬과 그 의존성 모듈만 설치하면 사용할 수 있으며, 코드를 직접 수정하여 좀 더 주제에 특화된 위키를 만들 수 있습니다.
 
- * [(README for english)](./readme-en.md)
 ### 목차
+ * [시작하기](#시작하기)
  * [클론](#클론)
  * [기여](#기여)
  * [라이선스](#라이선스)
- * [기여자 목록](#기여자-목록)
+ * [지원 문법](#지원-문법)
  * [기타](#기타)
 
 ## 시작하기
 오픈나무는 파이썬 환경에서 동작하는 파이썬 애플리케이션으로, 파이썬 환경을 필요로 합니다.
 
-쉬운 오픈나무 설치를 위해 오픈나무 가이드를 따로 생성해두었으며, [이곳](http://2du.pythonanywhere.com)에서 확인하실 수 있습니다.
+쉬운 오픈나무 설치를 위해 오픈나무 가이드를 따로 생성해두었으며, [이곳](https://2du.pythonanywhere.com/w/%EC%84%A4%EC%B9%98%EB%B2%95)에서 확인하실 수 있습니다.
 
 ## 클론
 아래 명령을 터미널(명령 프롬프트)에 입력하여 본 리포지토리를 클론할 수 있습니다.
-### 일반
  * `git clone -b stable https://github.com/2du/openNAMU.git`
-
-### 개발판
- * `git clone -b master https://github.com/2du/openNAMU.git`
+ * `git clone -b beta https://github.com/2du/openNAMU.git`
+ * `git clone -b dev https://github.com/2du/openNAMU.git`
 
 ## 기여
 오픈나무에는 검증되지 않은 몇가지 버그가 존재할 수 있습니다. 당신의 오픈나무 사용과 버그 발견은 오픈나무의 발전을 돕습니다. [(이슈 생성하기)](https://github.com/2du/openNAMU/issues/new)
@@ -42,11 +40,7 @@
  * Numerical expression - [MathJax](https://www.mathjax.org/)
  * Handling Keyboard Shortcuts [shortcut.js](http://www.openjs.com/scripts/events/keyboard_shortcuts/)
 
-## 지원 문법
- * 나무마크 (NamuMark)
- * 마크다운 (Markdown) (예정)
-
-## 기여자 목록
+### 기여자 목록
  * [참고](https://github.com/2DU/openNAMU/graphs/contributors)
 
 ### 도움을 주신 분들
@@ -54,6 +48,10 @@
  * Basix
  * Efrit
  * 기타 채팅방 사람들
+
+## 지원 문법
+ * 나무마크 (NamuMark)
+ * 마크다운 (Markdown) (예정)
 
 ## 기타
  * 첫 가입자에게 소유자 권한이 부여됩니다.

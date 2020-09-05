@@ -122,13 +122,13 @@ def setting_2(conn, num, db_set):
                 if d_list[acl_num]:
                     check_box_div[i] = 'checked="checked"'
 
-            branch_div =''
-            if d_list[12] == 'stable':
-                branch_div += '<option value="stable">stable</option>'
-                branch_div += '<option value="master">master</option>'
-            else:
-                branch_div += '<option value="master">master</option>'
-                branch_div += '<option value="stable">stable</option>'
+            branch_div = ''
+            branch_list = ['stable', 'dev', 'beta']
+            for i in branch_list:
+                if d_list[12] == i:
+                    branch_div = '<option value="' + i + '">' + i + '</option>' + branch_div
+                else:
+                    branch_div += '<option value="' + i + '">' + i + '</option>'
 
             if db_set != 'sqlite':
                 sqlite_only = 'style="display:none;"'
@@ -169,7 +169,7 @@ def setting_2(conn, num, db_set):
                         </span>
                         <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class="main_hr">
-                        <select name="skin">''' + load_skin(d_list[5]) + '''</select>
+                        <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'marisa') + '''</select>
                         <hr class="main_hr">
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
                         <hr class="main_hr">
@@ -227,7 +227,8 @@ def setting_2(conn, num, db_set):
             'error_401',
             'error_404',
             'approval_question',
-            'edit_help'
+            'edit_help',
+            'upload_help'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
@@ -315,6 +316,10 @@ def setting_2(conn, num, db_set):
                         <span>''' + load_lang('edit_help') + '''</span>
                         <hr class="main_hr">
                         <textarea rows="3" name="''' + i_list[13] + '''">''' + html.escape(d_list[13]) + '''</textarea>
+                        <hr class="main_hr">
+                        <span>''' + load_lang('upload_help') + '''</span>
+                        <hr class="main_hr">
+                        <textarea rows="3" name="''' + i_list[14] + '''">''' + html.escape(d_list[14]) + '''</textarea>
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         <hr class="main_hr">
@@ -573,7 +578,8 @@ def setting_2(conn, num, db_set):
             2 : 'discussion',
             3 : 'upload_acl',
             4 : 'all_view_acl',
-            5 : 'many_upload_acl'
+            5 : 'many_upload_acl',
+            6 : 'vote_acl'
         }
 
         if flask.request.method == 'POST':
@@ -648,6 +654,10 @@ def setting_2(conn, num, db_set):
                         <span>''' + load_lang('many_upload_acl') + '''</span>
                         <hr class="main_hr">
                         <select ''' + disable + ''' name="many_upload_acl">''' + acl_div[4] + '''</select>
+                        <hr class="main_hr">
+                        <span>''' + load_lang('vote_acl') + '''</span>
+                        <hr class="main_hr">
+                        <select ''' + disable + ''' name="vote_acl">''' + acl_div[5] + '''</select>
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>

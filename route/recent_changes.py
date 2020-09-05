@@ -13,7 +13,8 @@ def recent_changes_2(conn, name, tool):
         ban = ''
         select = ''
         sub = ''
-
+        admin_6 = admin_check(6)
+        admin = admin_check()
         div = '''
             <table id="main_table_set">
                 <tbody>
@@ -143,7 +144,7 @@ def recent_changes_2(conn, name, tool):
             date = data[2]
 
             if data[6] == 'O':
-                if admin_check(6) == 1:
+                if admin == 1:
                     style[0] = 'id="toron_color_grey"'
                     style[1] = 'id="toron_color_grey"'
 
@@ -162,7 +163,10 @@ def recent_changes_2(conn, name, tool):
                 title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">r' + data[0] + '</a> '
             else:
                 title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
-                title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
+                if int(data[0]) < 2:
+                    title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
+                else:
+                    title += '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + '">(r' + data[0] + ')</a> '
 
             div += '''
                 <tr ''' + style[0] + '''>
@@ -200,7 +204,7 @@ def recent_changes_2(conn, name, tool):
 
                     menu = [['w/' + url_pas(name), load_lang('return')]]
 
-                    if admin_check() == 1:
+                    if admin == 1:
                         menu += [['add_history/' + url_pas(name), load_lang('history_add')]]
                 else:
                     menu = [['history/' + url_pas(name), load_lang('return')]]

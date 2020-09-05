@@ -17,46 +17,19 @@ html, #main {
     color: white;
 }
 
-textarea, input, button, select {
-    background: #1f2023;
-    color: white;
-    border-color: #1f2023;
-}
-
 #mobile_search_input, #mobile_search_input::placeholder {
     background: gray;
     color: white;
-}
-
-#toron_color_grey {
-    background: #4a4a4a;
-}
-
-#toron_color_green {
-    background: #2e4a2e;
-}
-
-#toron_color_red {
-    background: #803737;
-}
-
-#toron_color_blue {
-    background: #314c56;
-}
-
-pre#syntax {
-    background: black;
 }
 
 a#titlt_a {
     color: white;
 }
 
-button#save {
-    background: #083808;
+textarea, input, button, select, #toc, #cate, #redirect { 
+    border-color: #1f2023; 
 }
 
-blockquote {
-    background-color: black;
-    border-left: 5px solid #eee;
+button#save {
+    background: #083808;
 }

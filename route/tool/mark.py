@@ -10,7 +10,6 @@ import sqlite3
 import asyncio
 import threading
 import urllib.parse
-import multiprocessing
 
 if os.path.exists('route/tool/set_mark/custom.py'):
     from .set_mark.custom import custom_mark

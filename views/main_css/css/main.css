@@ -18,7 +18,7 @@ input[type="checkbox"], input[type="radio"] { width: auto; }
 #toron_color_red { background: #fecabf; }
 #toron_color_grey { background: gainsboro; }
 #toron_color_not { display: none; }
-#cate { border: 1px solid; padding: 5px; }
+#cate { border: 1px solid; padding: 5px; margin-top: 20px; }
 blockquote { border: 1px solid; padding: 15px; margin: 0; margin-top: 10px; display: inline-block; }
 img, iframe { max-width: 100%; }
 pre { border: 1px solid; padding: 10px; white-space: pre-wrap; }
@@ -49,3 +49,5 @@ blockquote { background-image: url(/views/main_css/file/quote.png); background-p
 .content { height: 500px; }
 .topic_content { height: 200px; }
 .spead_footnote { background-color: #efefef; color: #555; border: 1px solid #cecece; }
+#footnote_data { border-top: 1px solid gainsboro; padding-top: 10px; }
+a { color: dodgerblue; }

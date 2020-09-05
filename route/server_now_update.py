@@ -11,10 +11,7 @@ def server_now_update_2(conn, r_ver):
 
         curs.execute(db_change('select data from other where name = "update"'))
         up_data = curs.fetchall()
-        if up_data:
-            up_data = up_data[0][0]
-        else:
-            up_data = 'stable'
+        up_data = up_data[0][0] if up_data and up_data[0][0] in ['stable', 'beta', 'dev'] else 'stable'
 
         print('----')
         print('Update')
@@ -53,7 +50,7 @@ def server_now_update_2(conn, r_ver):
                     <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
                     <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
                 </ul>
-                <a href="https://github.com/2du/openNAMU">(Master)</a> <a href="https://github.com/2du/openNAMU/tree/stable">(Stable)</a>
+                <a href="https://github.com/2du/openNAMU">(Beta)</a> <a href="https://github.com/2du/openNAMU/tree/stable">(Stable)</a>
                 <hr class=\"main_hr\">
                 <form method="post">
                     <button type="submit">''' + load_lang('update') + '''</button>

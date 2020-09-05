@@ -6,16 +6,17 @@ def user_custom_head_view_2(conn):
     ip = ip_check()
 
     if flask.request.method == 'POST':
+        get_data = flask.request.form.get('content', '')
         if ip_or_user(ip) == 0:
             curs.execute(db_change("select user from custom where user = ?"), [ip + ' (head)'])
             if curs.fetchall():
-                curs.execute(db_change("update custom set css = ? where user = ?"), [flask.request.form.get('content', None), ip + ' (head)'])
+                curs.execute(db_change("update custom set css = ? where user = ?"), [get_data, ip + ' (head)'])
             else:
-                curs.execute(db_change("insert into custom (user, css) values (?, ?)"), [ip + ' (head)', flask.request.form.get('content', None)])
+                curs.execute(db_change("insert into custom (user, css) values (?, ?)"), [ip + ' (head)', get_data])
 
             conn.commit()
 
-        flask.session['head'] = flask.request.form.get('content', None)
+        flask.session['head'] = get_data
 
         return redirect('/custom_head')
     else:

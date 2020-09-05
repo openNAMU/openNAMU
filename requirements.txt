@@ -1,6 +1,6 @@
-tornado
 flask
 flask-Reggie
+tornado
 requests
 pymysql
 diff-match-patch

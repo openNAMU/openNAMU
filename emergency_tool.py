@@ -1,18 +1,11 @@
+# Load
 import time
 from route.tool.func import *
 
-
 # DB
-version_list = json.loads(open('version.json', encoding='utf8').read())
-
-print('Version : ' + version_list['master']['r_ver'])
-print('DB set version : ' + version_list['master']['c_ver'])
-print('Skin set version : ' + version_list['master']['s_ver'])
-print('----')
-
 while 1:
     try:
-        set_data = json.loads(open('data/set.json', encoding='utf8').read())
+        set_data = json.loads(open('data/set.json', encoding = 'utf8').read())
         if not 'db_type' in set_data:
             try:
                 os.remove('data/set.json')
@@ -60,10 +53,10 @@ while 1:
             if new_json[1] == '':
                 new_json[1] = 'data'
 
-            with open('data/set.json', 'w', encoding='utf8') as f:
+            with open('data/set.json', 'w', encoding = 'utf8') as f:
                 f.write('{ "db" : "' + new_json[1] + '", "db_type" : "' + new_json[0] + '" }')
 
-            set_data = json.loads(open('data/set.json', encoding='utf8').read())
+            set_data = json.loads(open('data/set.json', encoding = 'utf8').read())
 
             break
 
@@ -71,37 +64,41 @@ db_data_get(set_data['db_type'])
 
 if set_data['db_type'] == 'mysql':
     try:
-        set_data_mysql = json.loads(open('data/mysql.json', encoding='utf8').read())
+        set_data_mysql = json.loads(open('data/mysql.json', encoding = 'utf8').read())
     except:
-        new_json = ['', '', '']
+        new_json = {}
 
         while 1:
             print('DB user ID : ', end = '')
-            new_json[0] = str(input())
-            if new_json[0] != '':
+            new_json['user'] = str(input())
+            if new_json['user'] != '':
                 break
 
         while 1:
             print('DB password : ', end = '')
-            new_json[1] = str(input())
-            if new_json[1] != '':
+            new_json['password'] = str(input())
+            if new_json['password'] != '':
                 break
                 
         print('DB host (localhost) : ', end = '')
-        new_json[2] = str(input())
-        if new_json[2] == '':
-            new_json[2] == 'localhost'
+        new_json['host'] = str(input())
+        new_json['host'] = 'localhost' if new_json['host'] == '' else new_json['host']
 
-        with open('data/mysql.json', 'w', encoding='utf8') as f:
-            f.write('{ "user" : "' + new_json[0] + '", "password" : "' + new_json[1] + '", "host" : "' + new_json[2] + '" }')
+        print('DB port (3306) : ', end = '')
+        new_json['port'] = str(input())
+        new_json['port'] = '3306' if new_json['port'] == '' else new_json['port']
 
-        set_data_mysql = json.loads(open('data/mysql.json', encoding='utf8').read())
+        with open('data/mysql.json', 'w', encoding = 'utf8') as f:
+            f.write(json.dumps(new_json))
+
+        set_data_mysql = new_json
 
     conn = pymysql.connect(
         host = set_data_mysql['host'] if 'host' in set_data_mysql else 'localhost',
         user = set_data_mysql['user'],
         password = set_data_mysql['password'],
-        charset = 'utf8mb4'
+        charset = 'utf8mb4',
+        port = int(set_data_mysql['port']) if 'port' in set_data_mysql else 3306
     )
     curs = conn.cursor()
 
@@ -134,6 +131,7 @@ print('12. All title count reset')
 print('13. Cache data reset')
 print('14. Delete Main <HEAD>')
 print('15. Give owner')
+print('16. Delete 2FA password')
 
 print('----')
 print('Select : ', end = '')
@@ -284,12 +282,20 @@ elif what_i_do == '13':
     curs.execute(db_change('delete from cache_data'))
 elif what_i_do == '14':
     curs.execute(db_change('delete from other where name = "head"'))
-else:
+elif what_i_do == '15':
     print('----')
     print('User name : ', end = '')
     user_name = input()
 
     curs.execute(db_change("update user set acl = 'owner' where id = ?"), [user_name])
+else:
+    print('----')
+    print('User name : ', end = '')
+    user_name = input()
+
+    curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [user_name])
+    if curs.fetchall():
+        curs.execute(db_change("update user_set set data = '' where name = '2fa' and id = ?"), [user_name])
 
 conn.commit()
 

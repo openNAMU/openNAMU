@@ -19,11 +19,12 @@ def give_user_ban_2(conn, name):
         return re_error('/ban')
 
     if flask.request.method == 'POST':
-        name = name if name else flask.request.form.get('name', 'test')
-
         end = flask.request.form.get('second', '0')
         end = end if end else '0'
+        name = name if name else flask.request.form.get('name', 'test')
         regex_get = flask.request.form.get('regex', None)
+        login = flask.request.form.get('login', '')
+        why = flask.request.form.get('why', '')
 
         if regex_get or band != '':
             type_d = 'regex' if regex_get else band
@@ -35,14 +36,18 @@ def give_user_ban_2(conn, name):
         else:
             type_d = None
 
-        if admin_check(1, 'ban' + (' ' + type_d if type_d else '') + ' (' + name + ')') != 1:
-            return re_error('/error/3')
+        if type_d:
+            if admin_check(None, 'ban' + (' ' + type_d if type_d else '') + ' (' + name + ')') != 1:
+                return re_error('/error/3')
+        else:
+            if admin_check(1, 'ban (' + name + ')') != 1:
+                return re_error('/error/3')
 
         ban_insert(
             name,
             end,
-            flask.request.form.get('why', ''),
-            flask.request.form.get('login', ''),
+            why,
+            login,
             ip_check(),
             type_d
         )

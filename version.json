@@ -1,11 +1,7 @@
 {
-    "master" : {
-        "r_ver" : "v3.2.0-stable-11",
-        "c_ver" : "3200900",
-        "s_ver" : "9"
-    }, "stable" : {
-        "r_ver" : "v3.2.0-stable-11",
-        "c_ver" : "3200900",
-        "s_ver" : "9"
+    "beta" : {
+        "r_ver" : "v3.2.0-stable-12 (beta-31) (dev-2020-09-04-01)",
+        "c_ver" : "3202600",
+        "s_ver" : "10"
     }
 }
