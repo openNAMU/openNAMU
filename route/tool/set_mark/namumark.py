@@ -746,7 +746,7 @@ def namumark(conn, data, title, include_num):
                 '<h' + toc_len_str + ' id="s-' + toc_level_str + '">' + \
                     '<a href="#toc">' + toc_level_str + '.</a> ' + toc[2] + ' ' + \
                     '<span style="font-size: 12px">' + \
-                        '<a href="/edit/' + tool.url_pas(title) + '?section=' + edit_num_str + '">(Edit)</a>' + \
+                        '<a id="edit_load_' + edit_num_str + '" href="/edit/' + tool.url_pas(title) + '?section=' + edit_num_str + '">(Edit)</a>' + \
                         ' ' + \
                         '<a href="javascript:void(0);" onclick="do_open_folding(\'in_data_' + edit_num_str + '\', this);">' + \
                             '(' + toc_fol + ')' + \
