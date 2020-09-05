@@ -116,7 +116,7 @@ def edit_2(conn, name):
         
         conn.commit()
         
-        return redirect('/w/' + url_pas(name))
+        return redirect('/w/' + url_pas(name) + (('#edit_load_' + str(section)) if section else ''))
     else:
         curs.execute(db_change("select data, id from history where title = ? order by id + 0 desc"), [name])
         old = curs.fetchall()
