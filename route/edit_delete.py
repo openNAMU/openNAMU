@@ -29,7 +29,8 @@ def edit_delete_2(conn, name, app_var):
                 ip,
                 flask.request.form.get('send', ''),
                 leng,
-                'delete'
+                t_check = 'delete',
+                mode = 'delete'
             )
 
             curs.execute(db_change("select title, link from back where title = ? and not type = 'cat' and not type = 'no'"), [name])

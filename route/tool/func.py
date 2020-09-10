@@ -1104,7 +1104,7 @@ def rd_plus(topic_num, date, name = None, sub = None):
 
     conn.commit()
 
-def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = '', mode = ''):
+def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
     if mode == 'add':
         curs.execute(db_change("select id from history where title = ? and type = '' order by id + 0 asc limit 1"), [title])
         id_data = curs.fetchall()
@@ -1114,14 +1114,13 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = '', m
         id_data = curs.fetchall()
         id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
         
-        mode = mode if mode != '' else 'edit'
-        mode = mode if not re.search('^user:', title) else 'user_page'
+        mode = mode if not re.search('^user:', title) else 'user'
 
     send = re.sub(r'\(|\)|<|>', '', send)
     send = send[:128] if len(send) > 128 else send
     send = send + ' (' + t_check + ')' if t_check != '' else send
 
-    if mode != 'add' and mode != 'user_page':
+    if mode != 'add' and mode != 'user':
         curs.execute(db_change("select count(*) from rc where type = 'normal'"))
         if curs.fetchall()[0][0] >= 200:
             curs.execute(db_change("select id, title from rc where type = 'normal' order by date asc limit 1"))
@@ -1144,9 +1143,10 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', d_type = '', m
             curs.execute(db_change("select id, title from rc where type = ? order by date asc limit 1"), [mode])
             rc_data = curs.fetchall()
             if rc_data:
-                curs.execute(db_change('delete from rc where id = ? and title = ? and type = "normal"'), [
+                curs.execute(db_change('delete from rc where id = ? and title = ? and type = ?'), [
                     rc_data[0][0],
-                    rc_data[0][1]
+                    rc_data[0][1],
+                    mode
                 ])
     
         curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [

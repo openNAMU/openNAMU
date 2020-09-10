@@ -106,7 +106,8 @@ def func_upload_2(conn, app_var):
                 ip,
                 ip,
                 '0',
-                'upload'
+                t_check = 'upload',
+                mode = 'upload'
             )
 
             if file_num:
