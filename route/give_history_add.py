@@ -21,6 +21,7 @@ def give_history_add_2(conn, name):
             'Add:' + flask.request.form.get('get_ip', ''),
             flask.request.form.get('send', ''),
             leng,
+            t_check = 'add',
             mode = 'add'
         )
 
