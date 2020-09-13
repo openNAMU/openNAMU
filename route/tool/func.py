@@ -290,9 +290,17 @@ def update(ver_num, set_data):
                 i[2]
             ])
 
+    if ver_num < 3203400:
+        curs.execute(db_change("select user, css from custom"))
+        for i in curs.fetchall():
+            curs.execute(db_change("insert into user_set (name, id, data) values ('custom_css', ?, ?)"), [
+                re.sub(r' \(head\)$', '', i[0]), 
+                i[1]
+            ])
+
     conn.commit()
 
-    print('Update pass')
+    print('Update completed')
 
 def set_init():
     # 초기값 설정 함수    
