@@ -142,7 +142,6 @@ create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'an
 create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
 create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
 create_data['back'] = ['title', 'link', 'type']
-create_data['custom'] = ['user', 'css']
 create_data['other'] = ['name', 'data', 'coverage']
 create_data['alist'] = ['name', 'acl']
 create_data['re_admin'] = ['who', 'what', 'time']
