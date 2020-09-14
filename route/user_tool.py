@@ -13,11 +13,8 @@ def user_tool_2(conn, name):
 
     if admin_check(1) == 1:
         curs.execute(db_change("select block from rb where block = ? and ongoing = '1'"), [name])
-        if curs.fetchall():
-            ban_name = load_lang('release')
-        else:
-            ban_name = load_lang('ban')
-
+        ban_name = load_lang('release') if curs.fetchall() else load_lang('ban')
+        
         data += '''
             <h2>''' + load_lang('admin') + '''</h2>
             <ul>
