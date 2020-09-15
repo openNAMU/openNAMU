@@ -75,19 +75,20 @@ def func_upload_2(conn, app_var):
                 file_d = '' + \
                     '[[file:' + name + ']]\n' + \
                     '{{{[[file:' + name + ']]}}}\n\n' + \
-                    (g_lice + '\n' if g_lice != '' else '') + \
                     flask.request.form.get('f_lice_sel', 'direct_input') + '\n' + \
                     (ip if ip_or_user(ip) != 0 else '[[user:' + ip + ']]') + '\n' + \
                     str(file_size) + ' Byte\n' + \
-                    '[[category:' + re.sub(r'\]', '_', flask.request.form.get('f_lice_sel', '')) + ']]' + \
+                    '[[category:' + re.sub(r'\]', '_', flask.request.form.get('f_lice_sel', '')) + ']]\n' + \
+                    (g_lice if g_lice != '' else '') + \
                 ''
             else:
                 file_d = '' + \
+                    'file:' + name + '\n' + \
                     '/image/' + e_data + '\n\n' + \
-                    (g_lice + '\n' if g_lice != '' else '') + \
                     flask.request.form.get('f_lice_sel', 'direct_input') + '\n' + \
                     ip + \
-                    str(file_size) + ' Byte\n' + \
+                    str(file_size) + ' Byte\n\n' + \
+                    (g_lice if g_lice != '' else '') + \
                 ''
 
             curs.execute(db_change("insert into data (title, data) values (?, ?)"), ['file:' + name, file_d])
@@ -118,6 +119,7 @@ def func_upload_2(conn, app_var):
         return redirect('/w/file:' + name)
     else:
         license_list = '<option value="direct_input">' + load_lang('direct_input') + '</option>'
+        file_name = flask.request.args.get('name', '')
 
         curs.execute(db_change("select html from html_filter where kind = 'image_license'"))
         db_data = curs.fetchall()
@@ -126,6 +128,10 @@ def func_upload_2(conn, app_var):
         curs.execute(db_change("select data from other where name = 'upload_help'"))
         db_data = curs.fetchall()
         upload_help = ('<hr class="main_hr">' + db_data[0][0]) if db_data and db_data[0][0] != '' else ''
+
+        curs.execute(db_change("select data from other where name = 'upload_default'"))
+        db_data = curs.fetchall()
+        upload_default = html.escape(db_data[0][0]) if db_data and db_data[0][0] != '' else ''
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('upload'), wiki_set(), custom(), other2([0, 0])],
@@ -138,13 +144,13 @@ def func_upload_2(conn, app_var):
                 <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                     <input multiple="multiple" type="file" name="f_data[]">
                     <hr class="main_hr">
-                    <input placeholder="''' + load_lang('file_name') + '''" name="f_name" value="''' + flask.request.args.get('name', '') + '''">
+                    <input placeholder="''' + load_lang('file_name') + '''" name="f_name" value="''' + file_name + '''">
                     <hr class="main_hr">
                     <select name="f_lice_sel">
                         ''' + license_list + '''
                     </select>
                     <hr class="main_hr">
-                    <textarea rows="10" placeholder="''' + load_lang('other') + '''" name="f_lice"></textarea>
+                    <textarea rows="10" placeholder="''' + load_lang('other') + '''" name="f_lice">''' + upload_default + '''</textarea>
                     <hr class="main_hr">
                     ''' + captcha_get() + '''
                     <button id="save" type="submit">''' + load_lang('save') + '''</button>
