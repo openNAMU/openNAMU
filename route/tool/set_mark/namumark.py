@@ -696,18 +696,17 @@ def namumark(conn, data, title, include_num):
         
         plus_data += '' + \
             'var get_link = window.location.search.match(/(?:\?|&)from=([^&]+)/);\n' + \
-            'var get_link_2 = window.location.pathname.match(/^\/w\//);' + \
+            'var get_link_2 = window.location.pathname.match(/^\/w\//);\n' + \
             'if(!get_link && get_link_2) {\n' + \
                 'window.location.href = "/w/' + tool.url_pas(main_link) + '?from=' + tool.url_pas(title) + other_link + '";\n' + \
             '}\n' + \
         ''
         data = redirect_re.sub('\nredirect to ' + html.escape(main_link) + other_link, data, 1)
 
-    no_toc_re = re.compile(r'\[(?:목차|toc)\((?:no)\)\]\n', re.I)
+    no_toc_re = re.compile(r'\[(?:목차|toc)\(no\)\]', re.I)
     toc_re = re.compile(r'\[(?:목차|toc)\]', re.I)
-    if not no_toc_re.search(data):
-        if not toc_re.search(data):
-            data = re.sub(r'(?P<in>\n(={1,6})(#)? ?((?:(?!(?: #=| =)).)+) ?#?(?:=+)\n)', '\n[toc]\g<in>', data, 1)
+    if not no_toc_re.search(data) and not toc_re.search(data):
+        data = re.sub(r'(?P<in>\n(={1,6})(#)? ?((?:(?!(?: #=| =)).)+) ?#?(?:=+)\n)', '\n[toc]\g<in>', data, 1)
     else:
         data = no_toc_re.sub('', data)
 
