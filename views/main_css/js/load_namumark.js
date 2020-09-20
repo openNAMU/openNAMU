@@ -95,8 +95,7 @@ function get_file_state(data, i = 0) {
                                     'onclick="load_image_link(this); this.onclick = \'\';" ' + 
                                     'under_style="' + get_class.getAttribute('under_style') + '" ' +
                                     'under_alt="' + get_class.getAttribute('under_alt') + '" ' +
-                                    'under_src="' + get_class.getAttribute('under_src') + '" ' +
-                                    'title="' + get_class.getAttribute('under_src') + '">' + 
+                                    'under_src="' + get_class.getAttribute('under_src') + '">' + 
                                     '(' + get_class.getAttribute('under_alt') + ' load)' +
                                 '</a>' +
                             '';
