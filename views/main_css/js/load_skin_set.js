@@ -189,7 +189,7 @@ function main_css_load_lang(name) {
         language = user_language;
     } else {
         if(server_language in set_language) {
-            language = language;
+            language = server_language;
         } else {
             language = 'en-US';
         }
