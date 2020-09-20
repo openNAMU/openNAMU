@@ -33,18 +33,17 @@ def login_2(conn):
         if pw_check_d != 1:
             return re_error('/error/10')
 
+        curs.execute(db_change("select data from user_set where id = ? and name = 'custom_css'"), [user_id])
+        css_data = curs.fetchall()
+
         curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [user_id])
         fa_data = curs.fetchall()
         if fa_data and fa_data[0][0] != '':
-            curs.execute(db_change("select css from custom where user = ?"), [user_id])
-            css_data = curs.fetchall()
             flask.session['b_head'] = css_data[0][0] if css_data else ''
             flask.session['b_id'] = user_id
 
             return redirect('/2fa_login')
         else:
-            curs.execute(db_change("select css from custom where user = ?"), [user_id])
-            css_data = curs.fetchall()
             flask.session['head'] = css_data[0][0] if css_data else ''
             flask.session['id'] = user_id
 
