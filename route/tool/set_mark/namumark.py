@@ -707,8 +707,10 @@ def namumark(conn, data, title, include_num):
     toc_re = re.compile(r'\[(?:목차|toc)\]', re.I)
     if not no_toc_re.search(data) and not toc_re.search(data):
         data = re.sub(r'(?P<in>\n(={1,6})(#)? ?((?:(?!(?: #=| =)).)+) ?#?(?:=+)\n)', '\n[toc]\g<in>', data, 1)
+        auto_toc = 1
     else:
         data = no_toc_re.sub('', data)
+        auto_toc = 0
 
     data = '<div class="all_in_data" id="in_data_0">' + data
 
@@ -772,7 +774,10 @@ def namumark(conn, data, title, include_num):
             break
 
     toc_data += '</div>'
-    data = toc_re.sub(toc_data, data)
+    if auto_toc == 1:
+        data = toc_re.sub('<div id="auto_toc">' + toc_data + '</div>', data, 1)
+    else:
+        data = toc_re.sub(toc_data, data)
     
     macro_re = re.compile(r'\[([^[(]+)\(((?:(?!\[|\)]).)+)\)\]')
     macro_data = macro_re.findall(data)
