@@ -45,7 +45,8 @@ def edit_move_2(conn, name):
                     ip_check(),
                     flask.request.form.get('send', ''),
                     '0',
-                    'merge <a>' + name + '</a> - <a>' + move_title + '</a> move'
+                    t_check = 'merge <a>' + name + '</a> - <a>' + move_title + '</a> move',
+                    mode = 'move'
                 )
 
                 curs.execute(db_change("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'"), [name])
@@ -112,7 +113,8 @@ def edit_move_2(conn, name):
                         ip_check(),
                         flask.request.form.get('send', ''),
                         '0',
-                        '<a>' + (title_name[0] if title_name[0] != 'test ' + str(i) else name) + '</a> - <a>' + title_name[1] + '</a> move'
+                        t_check = '<a>' + (title_name[0] if title_name[0] != 'test ' + str(i) else name) + '</a> - <a>' + title_name[1] + '</a> move',
+                        mode = 'move'
                     )
 
                     curs.execute(db_change("update history set title = ? where title = ?"), [title_name[1], title_name[0]])
@@ -140,7 +142,8 @@ def edit_move_2(conn, name):
                 ip_check(),
                 flask.request.form.get('send', ''),
                 '0',
-                '<a>' + name + '</a> - <a>' + move_title + '</a> move'
+                t_check = '<a>' + name + '</a> - <a>' + move_title + '</a> move',
+                mode = 'move'
             )
 
             curs.execute(db_change("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'"), [name])

@@ -34,29 +34,24 @@ def recent_changes_2(conn, name, tool):
                     <td id="main_table_width">''' + load_lang('time') + '''</td>
                 '''
 
-                tool_select = flask.request.args.get('tool', 'normal')
-                if tool_select == 'move':
-                    plus_sql = 'where (send like ? or send like ?) and type = "" '
-                    plus_list = ['%(<a>' + name +'</a>%', '%<a>' + name + '</a> move)', sql_num]
-                    sub += ' (' + load_lang('move') + ')'
-                elif tool_select == 'delete':
-                    plus_sql = 'where send like "%(delete)" and title = ? and type = "" '
-                    plus_list = [name, sql_num]
-                    sub += ' (' + load_lang('delete') + ')'
-                elif tool_select == 'revert':
-                    plus_sql = 'where send like ? and title = ? and type = "" '
-                    plus_list = ['%(r%)', name, sql_num]
-                    sub += ' (' + load_lang('revert') + ')'
-                else:
-                    plus_sql = 'where title = ? and type = "" '
-                    plus_list = [name, sql_num]
+                set_type = flask.request.args.get('set', 'normal')
+                set_type = '' if set_type == 'edit' else set_type
 
-                curs.execute(db_change('' + \
-                    'select id, title, date, ip, send, leng, hide from history ' + \
-                    plus_sql + \
-                    'order by id + 0 desc ' + \
-                    "limit ?, 50" + \
-                ''), plus_list)
+                if set_type != 'normal':
+                    curs.execute(db_change('' + \
+                        'select id, title, date, ip, send, leng, hide from history ' + \
+                        'where title = ? and type = ? ' + \
+                        'order by id + 0 desc ' + \
+                        "limit ?, 50" + \
+                    ''), [name, set_type, sql_num])
+                else:
+                    curs.execute(db_change('' + \
+                        'select id, title, date, ip, send, leng, hide from history ' + \
+                        'where title = ? ' + \
+                        'order by id + 0 desc ' + \
+                        "limit ?, 50" + \
+                    ''), [name, sql_num])
+
                 data_list = curs.fetchall()
             else:
                 div +=  '''
@@ -69,7 +64,7 @@ def recent_changes_2(conn, name, tool):
 
                 curs.execute(db_change('' + \
                     'select id, title, date, ip, send, leng, hide from history ' + \
-                    "where ip = ? and type = '' order by date desc limit ?, 50" + \
+                    "where ip = ? order by date desc limit ?, 50" + \
                 ''), [name, sql_num])
                 data_list = curs.fetchall()
         else:
@@ -80,41 +75,13 @@ def recent_changes_2(conn, name, tool):
             '''
             sub = ''
             set_type = flask.request.args.get('set', 'normal')
+            set_type = '' if set_type == 'edit' else set_type
 
-            if set_type != 'normal':
-                if set_type == 'move':
-                    plus_sql = 'where send like "%</a> move)" and '
-                    sub += ' (' + load_lang('move') + ')'
-                elif set_type == 'delete':
-                    plus_sql = 'where send like "%(delete)" and '
-                    sub += ' (' + load_lang('delete') + ')'
-                elif set_type == 'revert':
-                    plus_sql = 'where send like "%(r%)" and '
-                    sub += ' (' + load_lang('revert') + ')'
-                else:
-                    plus_sql = 'where '
-
-                plus_sql += 'type = "" '
-                
-                if set_type == 'user':
-                    plus_sql = 'where title like "user:%" '
-                    sub += ' (' + load_lang('user') + ')'
-                else:
-                    plus_sql += 'and not title like "user:%" '
-
-                curs.execute(db_change('' + \
-                    'select id, title, date, ip, send, leng, hide from history ' + \
-                    plus_sql + \
-                    'order by date desc ' + \
-                    'limit 50' + \
-                ''))
-                data_list = curs.fetchall()
-            else:
-                data_list = []
-                curs.execute(db_change('select id, title from rc order by date desc'))
-                for i in curs.fetchall():
-                    curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where id = ? and title = ?'), i)
-                    data_list += curs.fetchall()
+            data_list = []
+            curs.execute(db_change('select id, title from rc where type = ? order by date desc'), [set_type])
+            for i in curs.fetchall():
+                curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where id = ? and title = ?'), i)
+                data_list += curs.fetchall()
 
         div += '</tr>'
 
@@ -186,14 +153,17 @@ def recent_changes_2(conn, name, tool):
 
         if name:
             if tool == 'history':
-                if tool_select == 'normal':
-                    div = '' + \
-                        '<a href="?tool=move">(' + load_lang('move') + ')</a> ' + \
-                        '<a href="?tool=delete">(' + load_lang('delete') + ')</a> ' + \
-                        '<a href="?tool=revert">(' + load_lang('revert') + ')</a>' + \
-                        '<hr class="main_hr">' + div + \
-                    ''
-
+                div = '' + \
+                    '<a href="?set=normal">(' + load_lang('normal') + ')</a> ' + \
+                    '<a href="?set=edit">(' + load_lang('edit') + ')</a> ' + \
+                    '<a href="?set=move">(' + load_lang('move') + ')</a> ' + \
+                    '<a href="?set=delete">(' + load_lang('delete') + ')</a> ' + \
+                    '<a href="?set=revert">(' + load_lang('revert') + ')</a>' + \
+                    '<hr class="main_hr">' + div + \
+                ''
+                menu = [['w/' + url_pas(name), load_lang('return')]]
+                
+                if set_type == 'normal':
                     div = '''
                         <form method="post">
                             <select name="a">''' + select + '''</select> <select name="b">''' + select + '''</select>
@@ -202,15 +172,11 @@ def recent_changes_2(conn, name, tool):
                         <hr class=\"main_hr\">
                     ''' + div
 
-                    menu = [['w/' + url_pas(name), load_lang('return')]]
-
                     if admin == 1:
                         menu += [['add_history/' + url_pas(name), load_lang('history_add')]]
-                else:
-                    menu = [['history/' + url_pas(name), load_lang('return')]]
 
                 title = name
-                div += next_fix('/history/' + url_pas(name) + '?tool=' + tool_select + '&num=', num, data_list)
+                div += next_fix('/history/' + url_pas(name) + '?tool=' + set_type + '&num=', num, data_list)
             else:
                 title = load_lang('edit_record')
                 menu = [['other', load_lang('other')], ['user', load_lang('user')], ['count/' + url_pas(name), load_lang('count')]]
@@ -218,6 +184,7 @@ def recent_changes_2(conn, name, tool):
         else:
             div = '' + \
                 '<a href="?set=normal">(' + load_lang('normal') + ')</a> ' + \
+                '<a href="?set=edit">(' + load_lang('edit') + ')</a> ' + \
                 '<a href="?set=user">(' + load_lang('user_document') + ')</a> ' + \
                 '<a href="?set=move">(' + load_lang('move') + ')</a> ' + \
                 '<a href="?set=delete">(' + load_lang('delete') + ')</a> ' + \
