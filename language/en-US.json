@@ -282,6 +282,7 @@
                 "error_404" : "Missing document notice",
                 "edit_help" : "Editing textarea phrase",
                 "upload_help" : "File upload phrase",
+                "upload_default" : "File upload other Default",
             "_comment_2.2.4_" : "Google",
                 "recaptcha" : "reCAPTCHA",
                 "smtp_setting" : "Email SMTP setting",

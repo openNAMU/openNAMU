@@ -228,7 +228,8 @@ def setting_2(conn, num, db_set):
             'error_404',
             'approval_question',
             'edit_help',
-            'upload_help'
+            'upload_help',
+            'upload_default'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
@@ -317,9 +318,13 @@ def setting_2(conn, num, db_set):
                         <hr class="main_hr">
                         <textarea rows="3" name="''' + i_list[13] + '''">''' + html.escape(d_list[13]) + '''</textarea>
                         <hr class="main_hr">
-                        <span>''' + load_lang('upload_help') + '''</span>
+                        <span>''' + load_lang('upload_help') + ''' (HTML)</span>
                         <hr class="main_hr">
                         <textarea rows="3" name="''' + i_list[14] + '''">''' + html.escape(d_list[14]) + '''</textarea>
+                        <hr class="main_hr">
+                        <span>''' + load_lang('upload_default') + '''</span>
+                        <hr class="main_hr">
+                        <textarea rows="3" name="''' + i_list[15] + '''">''' + html.escape(d_list[15]) + '''</textarea>
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         <hr class="main_hr">

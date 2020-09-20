@@ -47,7 +47,8 @@ def edit_revert_2(conn, name):
                 ip_check(),
                 flask.request.form.get('send', ''),
                 leng,
-                'r' + str(num) + ''
+                t_check = 'r' + str(num),
+                mode = 'revert'
             )
 
             render_set(
