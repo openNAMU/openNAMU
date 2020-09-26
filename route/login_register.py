@@ -3,7 +3,7 @@ from .tool.func import *
 def login_register_2(conn):
     curs = conn.cursor()
 
-    if ban_check() == 1:
+    if ban_check(None, 'login') == 1:
         return re_error('/ban')
 
     ip = ip_check()

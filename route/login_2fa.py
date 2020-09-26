@@ -10,7 +10,7 @@ def login_2fa_2(conn):
     if ip_or_user(ip) == 0:
         return redirect('/user')
 
-    if ban_check(tool = 'login') == 1:
+    if ban_check(None, 'login') == 1:
         return re_error('/ban')
 
     if flask.request.method == 'POST':
