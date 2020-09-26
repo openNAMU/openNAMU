@@ -1114,11 +1114,11 @@ def rd_plus(topic_num, date, name = None, sub = None):
 
 def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
     if mode == 'add':
-        curs.execute(db_change("select id from history where title = ? and type = '' order by id + 0 asc limit 1"), [title])
+        curs.execute(db_change("select id from history where title = ? order by id + 0 asc limit 1"), [title])
         id_data = curs.fetchall()
         id_data = str(int(id_data[0][0]) - 1) if id_data else '0'
     else:
-        curs.execute(db_change("select id from history where title = ? and type = '' order by id + 0 desc limit 1"), [title])
+        curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [title])
         id_data = curs.fetchall()
         id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
         
