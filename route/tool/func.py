@@ -13,6 +13,8 @@ for i in range(0, 2):
         import tornado.wsgi
         import urllib.request
         import email.mime.text
+        import email.utils
+        import email.header
         import requests
         import sqlite3
         import pymysql
@@ -109,16 +111,21 @@ def send_email(who, title, data):
             elif smtp_security == 'starttls':
                 smtp = smtplib.SMTP(smtp_server, smtp_port)
                 smtp.starttls()
-            else: # if smtp_security == 'tls':
+            else:
+                # if smtp_security == 'tls':
                 smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
             
             smtp.login(smtp_email, smtp_pass)
         else:
             raise
 
+        domain = load_domain()
+
         msg = email.mime.text.MIMEText(data)
         msg['Subject'] = title
-        smtp.sendmail(smtp_email, who, msg.as_string())
+        msg['From'] = email.utils.formataddr((str(email.header.Header(wiki_set()[0], 'utf-8')), 'noreply@' + domain))
+        msg['To'] = who
+        smtp.sendmail('noreply@' + domain, who, msg.as_string())
 
         smtp.quit()
 
@@ -129,6 +136,13 @@ def send_email(who, title, data):
         print(e)
 
         return 0
+
+def load_domain():
+    curs.execute(db_change("select data from other where name = 'domain'"))
+    domain = curs.fetchall()
+    domain = domain[0][0] if domain and domain[0][0] != '' else flask.request.host_url
+
+    return domain
 
 def last_change(data):
     json_address = re.sub(r"(((?!\.|\/).)+)\.html$", "set.json", skin_check())
