@@ -8,13 +8,10 @@ def api_sitemap_2(conn):
             '<?xml version="1.0" encoding="UTF-8"?>\n' + \
             '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + \
         ''
+        domain = load_domain()
 
         curs.execute(db_change("select title from data"))
         all_data = curs.fetchall()
-
-        curs.execute(db_change("select data from other where name = 'domain'"))
-        domain = curs.fetchall()
-        domain = domain[0][0] if domain and domain[0][0] != '' else flask.request.host_url
 
         len_all_data = len(all_data)
         count = int(len_all_data / 30000)
