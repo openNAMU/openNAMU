@@ -103,6 +103,24 @@ class link_render:
     def get_plus_data(self):
         return self.plus_data
 
+class list_sub_render:
+    def __init__(self):
+        pass
+
+    def __call__(self, match):
+        return '<li style="margin-left: ' + str(len(match[1]) * 20) + 'px;">' + match[2] + '</li>'
+
+class list_render:
+    def __init__(self):
+        pass
+
+    def __call__(self, match):
+        list_sub_r = r'(?:\n( +)\* ([^\n]+))'
+        list_sub_do = list_sub_render()
+        list_data = re.sub(list_sub_r, list_sub_do, match[1])
+
+        return list_data
+
 def markdown(conn, data, title, include_name):
     backlink = []
     include_name = include_name + '_' if include_name else ''
@@ -120,6 +138,10 @@ def markdown(conn, data, title, include_name):
     data = re.sub(head_r, head_do, data)
     data = head_do.get_toc() + data
 
+    list_r = r'((?:\n(?: +)\* (?:[^\n]+))+)'
+    list_do = list_render()
+    data = re.sub(list_r, list_do, data)
+
     link_r = r'(!)?\[((?:(?!\]\().)+)\]\(([^\]]+)\)'
     link_do = link_render(plus_data, include_name)
     data = re.sub(link_r, link_do, data)
@@ -128,7 +150,8 @@ def markdown(conn, data, title, include_name):
     data = re.sub(r'\*\*(?P<A>(?:(?!\*\*).)+)\*\*', '<b>\g<A></b>', data)
     data = re.sub(r'__(?P<A>(?:(?!__).)+)__', '<i>\g<A></i>', data)
 
-    data = re.sub('^\n', '', data)
+    data = re.sub('^(\n| )+', '', data)
+    data = re.sub('(\n| )+$', '', data)
     data = data.replace('\n', '<br>')
 
     data = re.sub(r'(?P<A><\/h[0-6]>)<br>', '\g<A>', data)
