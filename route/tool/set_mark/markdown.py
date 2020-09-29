@@ -119,7 +119,7 @@ class list_render:
         list_sub_do = list_sub_render()
         list_data = re.sub(list_sub_r, list_sub_do, match[1])
 
-        return list_data
+        return '\n' + list_data
 
 def markdown(conn, data, title, include_name):
     backlink = []
