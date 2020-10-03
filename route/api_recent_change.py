@@ -10,7 +10,7 @@ def api_recent_change_2(conn):
     admin = admin_check(6)
     get_title = ''
 
-    curs.execute(db_change('select id, title from rc order by date desc'))
+    curs.execute(db_change('select id, title from rc where type = "" order by date desc'))
     for i in curs.fetchall():
         if repeat_ok == '1' or i[1] != get_title:
             get_title = i[1]
