@@ -144,6 +144,9 @@ def load_domain():
 
     return domain
 
+def load_random_key(long = 64):
+    return ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(long))
+
 def last_change(data):
     json_address = re.sub(r"(((?!\.|\/).)+)\.html$", "set.json", skin_check())
     try:
@@ -1314,6 +1317,10 @@ def re_error(data):
             data = load_lang('restart_fail_error')
         elif num == 34:
             data = load_lang("update_error") + ' <a href="https://github.com/2DU/opennamu">(Github)</a>'
+        elif num == 35:
+            data = load_lang('same_email_error')
+        elif num == 36:
+            data = load_lang('input_email_error')
         else:
             data = '???'
 
