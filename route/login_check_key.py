@@ -4,7 +4,7 @@ def login_check_key_2(conn, tool):
     curs = conn.cursor()
 
     # 난잡한 코드 정리 필요
-    if  flask.request.method == 'POST' or
+    if  flask.request.method == 'POST' or \
         ('c_key' in flask.session and flask.session['c_key'] == 'email_pass'):
         re_set_list = ['c_id', 'c_pw', 'c_ans', 'c_que', 'c_key', 'c_type', 'c_email']
         ip = ip_check()
@@ -12,8 +12,8 @@ def login_check_key_2(conn, tool):
         user_agent = flask.request.headers.get('User-Agent', '')
 
 
-        if  'c_type' in flask.session and 
-            flask.session['c_type'] == 'pass_find' and
+        if  'c_type' in flask.session and \
+            flask.session['c_type'] == 'pass_find' and \
             flask.session['c_key'] == input_key:
             curs.execute(db_change("update user set pw = ? where id = ?"), [pw_encode(flask.session['c_key']), flask.session['c_id']])
             conn.commit()
@@ -37,7 +37,7 @@ def login_check_key_2(conn, tool):
                 data = b_text + load_lang('id') + ' : ' + user_id + '<br>' + load_lang('password') + ' : ' + user_pw,
                 menu = [['user', load_lang('return')]]
             ))
-        elif    'c_type' in flask.session and 
+        elif    'c_type' in flask.session and \
                 (flask.session['c_key'] == input_key or flask.session['c_key'] == 'email_pass'):
             curs.execute(db_change('select data from other where name = "encode"'))
             db_data = curs.fetchall()
@@ -90,7 +90,7 @@ def login_check_key_2(conn, tool):
                         flask.session['c_id'],
                         flask.session['c_pw'],
                         get_time(),
-                        'user' if first == 0 else 'owner'
+                        'user' if first == 0 else 'owner',
                         db_data[0][0]
                     ])
 
