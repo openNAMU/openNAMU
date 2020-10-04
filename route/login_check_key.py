@@ -48,7 +48,6 @@ def login_check_key_2(conn, tool):
 
                 curs.execute(db_change("select id from user limit 1"))
                 first = 1 if not curs.fetchall() else 0
-                print(first)
 
                 curs.execute(db_change("select id from user where id = ?"), [flask.session['c_id']])
                 if curs.fetchall():
