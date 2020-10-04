@@ -43,9 +43,13 @@ def login_check_key_2(conn, tool):
             db_data = curs.fetchall()
 
             if flask.session['c_type'] == 'register':
+                if flask.session['c_key'] == 'email_pass':
+                    flask.session['c_email'] = ''
+
                 curs.execute(db_change("select id from user limit 1"))
                 first = 1 if not curs.fetchall() else 0
-            
+                print(first)
+
                 curs.execute(db_change("select id from user where id = ?"), [flask.session['c_id']])
                 if curs.fetchall():
                     for i in re_set_lire:
@@ -89,8 +93,8 @@ def login_check_key_2(conn, tool):
                     curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, ?, ?, ?)"), [
                         flask.session['c_id'],
                         flask.session['c_pw'],
-                        get_time(),
                         'user' if first == 0 else 'owner',
+                        get_time(),
                         db_data[0][0]
                     ])
 
