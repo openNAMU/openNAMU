@@ -675,6 +675,10 @@ def api_raw(name = ''):
 def api_version():
     return api_version_2(conn, version_list['beta']['r_ver'], version_list['beta']['c_ver'])
 
+@app.route('/api/v1/titles')
+def api_all_title():
+    return api_all_title_2(conn)
+
 @app.route('/api/skin_info')
 @app.route('/api/skin_info/<name>')
 def api_skin_info(name = ''):

@@ -19,10 +19,15 @@ def main_views_2(conn, name):
             '.png', 
             '.webp'
         ]
+        application_type = [
+            'wasm'
+        ]
         if mime_type:
             mime_type = mime_type.group(1).lower()
             if mime_type in image_type:
                 mime_type = 'image/' + mime_type
+            elif mime_type in application_type:
+                mime_type = 'application/' + mime_type
             else:
                 mime_type = 'text/' + mime_type
         else:

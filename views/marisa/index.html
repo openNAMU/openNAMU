@@ -11,7 +11,14 @@
         <link rel="stylesheet" href="/views/marisa/css/main.css?ver=16">
         <script src="/views/marisa/js/skin_set.js?ver=5"></script>
         <script src="/views/marisa/js/main.js?ver=3"></script>
+        <script src="https://cdn.jsdelivr.net/gh/golang/go@release-branch.go1.15/misc/wasm/wasm_exec.js" integrity="sha384-iGKTWUyURfdwlI1G/mHT1+UUALHfqR8A3JOpd8L5kgheTmvWLHKc61YtH59WGF96" crossorigin="anonymous"></script>
         <script>main_load(); window.addEventListener('DOMContentLoaded', function() { skin_set(); });</script>
+        <!--[if !IE]><!-->
+        <script>WebAssembly.instantiateStreaming||(WebAssembly.instantiateStreaming=(async(t,a)=>{const e=await(await t).arrayBuffer();return await WebAssembly.instantiate(e,a)}));const go=new Go;let mod,inst;WebAssembly.instantiateStreaming(fetch("/views/main_css/wasm/lib.wasm"),go.importObject).then(async t=>{mod=t.module,inst=t.instance,await go.run(inst)});</script>
+        <script>
+            window.addEventListener('DOMContentLoaded', function(){function WaitForWasm(){if("undefined"!=typeof WasmReady&&null!==WasmReady){var e=new XMLHttpRequest;e.onreadystatechange=function(){if(4==this.readyState&&200==this.status){var e=JSON.parse(this.responseText).datas;for(let a=0;a<e.length;a++){var t=e[a];AddItem(t,100)}}},e.open("GET","/api/v1/titles",!0),e.send()}else setTimeout(WaitForWasm,50)};WaitForWasm()});
+        </script>
+        <!--<![endif]-->
         <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
         <link rel="shortcut icon" href="/views/main_css/file/favicon.ico?ver=1">
         {{imp[1][5]|safe}}
@@ -111,7 +118,13 @@
                         </div>
                          
                         <form method="post" action="/search" id="search" role="search">
-                            <input id="search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
+                            <!--[if !IE]><!-->
+                            <input id="search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search"
+                            oninput="autocompletestring(document.querySelector('#search_input').value);" >
+                            <!--<![endif]-->
+                            <!--[if IE]>
+                            <input id="search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search" >
+                            <![endif]-->
                             |
                             <button type="submit" formaction="/goto">
                                 <span class="iconify" data-icon="ic:round-find-in-page" data-inline="true"></span>

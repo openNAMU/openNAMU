@@ -4,7 +4,7 @@ import platform
 
 for i in range(0, 2):
     try:
-        from diff_match_patch import diff_match_patch
+        #from diff_match_patch import diff_match_patch
         import werkzeug.routing
         import werkzeug.debug
         import flask_reggie
