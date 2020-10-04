@@ -82,7 +82,7 @@ def login_register_2(conn):
 
             return redirect('/need_email')
         else:
-            flask.session['c_key'] = 'email_pass
+            flask.session['c_key'] = 'email_pass'
 
             return redirect('/check_key')
     else:
