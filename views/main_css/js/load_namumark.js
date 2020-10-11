@@ -73,7 +73,7 @@ function get_file_state(data, i = 0) {
                         document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
                             '<a href="' + get_class.getAttribute('under_href') + '" ' + 
                                 'id="not_thing">' +
-                                + '(' + get_class.getAttribute('under_alt') + ')' +
+                                '(' + get_class.getAttribute('under_alt') + ')' +
                             '</a>' +
                         '';
                     } else {

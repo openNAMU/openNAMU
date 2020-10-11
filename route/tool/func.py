@@ -65,6 +65,8 @@ for i in range(0, 2):
 
 global_lang = {}
 req_list = ''
+conn = ''
+curs = ''
 
 def load_conn(data):
     global conn
@@ -143,6 +145,9 @@ def load_domain():
     domain = domain[0][0] if domain and domain[0][0] != '' else flask.request.host_url
 
     return domain
+
+def load_random_key(long = 64):
+    return ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(long))
 
 def last_change(data):
     json_address = re.sub(r"(((?!\.|\/).)+)\.html$", "set.json", skin_check())
@@ -554,7 +559,7 @@ def next_fix(link, num, page, end = 50):
 
 def other2(data):
     global req_list
-    main_css_ver = '55'
+    main_css_ver = '56'
     data += ['' for _ in range(0, 3 - len(data))]
 
     if req_list == '':
@@ -1314,6 +1319,10 @@ def re_error(data):
             data = load_lang('restart_fail_error')
         elif num == 34:
             data = load_lang("update_error") + ' <a href="https://github.com/2DU/opennamu">(Github)</a>'
+        elif num == 35:
+            data = load_lang('same_email_error')
+        elif num == 36:
+            data = load_lang('input_email_error')
         else:
             data = '???'
 
