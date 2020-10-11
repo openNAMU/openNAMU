@@ -48,6 +48,10 @@ def login_register_2(conn):
         curs.execute(db_change("select id from user where id = ?"), [user_id])
         if curs.fetchall():
             return re_error('/error/6')
+    
+        curs.execute(db_change("select id from user_application where id = ?"), [user_id])
+        if curs.fetchall():
+            return re_error('/error/6')
 
         hashed = pw_encode(user_pw)
         ans_q = flask.request.form.get('approval_question_answer', '')
@@ -63,66 +67,24 @@ def login_register_2(conn):
         else:
             approval_question = ''
 
+        # c_id, c_pw, c_ans, c_que, c_key, c_type
+        flask.session['c_id'] = user_id
+        flask.session['c_pw'] = hashed
+        flask.session['c_type'] = 'register'
+        if requires_approval:
+            flask.session['c_ans'] = flask.request.form.get('approval_question_answer', '')
+            flask.session['c_que'] = approval_question
+        
         curs.execute(db_change('select data from other where name = "email_have"'))
         sql_data = curs.fetchall()
         if sql_data and sql_data[0][0] != '' and admin != 1:
-            flask.session['c_id'] = user_id
-            flask.session['c_pw'] = hashed
-            flask.session['c_key'] = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(64))
-            if requires_approval:
-                flask.session['c_ans'] = flask.request.form.get('approval_question_answer', '')
-                flask.session['c_question'] = approval_question
+            flask.session['c_key'] = load_random_key(32)
 
             return redirect('/need_email')
         else:
-            curs.execute(db_change('select data from other where name = "encode"'))
-            db_data = curs.fetchall()
+            flask.session['c_key'] = 'email_pass'
 
-            curs.execute(db_change("select id from user limit 1"))
-            if not curs.fetchall():
-                curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'owner', ?, ?)"), [
-                    user_id, 
-                    hashed, 
-                    get_time(), 
-                    db_data[0][0]
-                ])
-
-                first = 1
-            else:
-                if requires_approval:
-                    application_token = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(60))
-                    curs.execute(db_change(
-                        "insert into user_application (id, pw, date, encode, question, answer, token, ip, ua, email) values (?, ?, ?, ?, ?, ?, ?, ?, ?, '')"
-                    ), [
-                        user_id, 
-                        hashed, 
-                        get_time(), 
-                        db_data[0][0], 
-                        approval_question, 
-                        ans_q, 
-                        application_token, 
-                        ip_check(), 
-                        flask.request.headers.get('User-Agent')
-                    ])
-                    conn.commit()
-                    
-                    return redirect('/application_submitted')
-                else:
-                    curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)"), [user_id, hashed, get_time(), db_data[0][0]])
-
-                first = 0
-
-            ip = ip_check()
-            agent = flask.request.headers.get('User-Agent')
-
-            curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [user_id, ip, agent, get_time()])
-
-            flask.session['id'] = user_id
-            flask.session['head'] = ''
-
-            conn.commit()
-
-            return redirect('/change') if first == 0 else redirect('/setting')
+            return redirect('/check_key')
     else:
         curs.execute(db_change('select data from other where name = "contract"'))
         data = curs.fetchall()

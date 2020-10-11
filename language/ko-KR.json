@@ -395,5 +395,7 @@
     "2fa_password_change" : "2차 비밀번호 변경",
     "vote_acl" : "투표 ACL",
     "upload_help" : "파일 올리기 문구",
-    "upload_default" : "파일 기타란 기본값"
+    "upload_default" : "파일 기타란 기본값",
+    "same_email_error" : "동일한 이메일을 사용하는 사용자가 있습니다.",
+    "input_email_error" : "입력 값에 문제가 있습니다."
 }
