@@ -11,6 +11,9 @@ import asyncio
 import threading
 import urllib.parse
 
+conn = ''
+curs = ''
+
 if os.path.exists('route/tool/set_mark/custom.py'):
     from .set_mark.custom import custom_mark
 else:

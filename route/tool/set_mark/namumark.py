@@ -4,6 +4,11 @@ import datetime
 import html
 import re
 
+end_data = ''
+plus_data = ''
+nowiki_num = ''
+include_name = ''
+
 def nowiki_js(data):
     data = data.replace('\\', '\\\\')
     data = data.replace('"', '\\"')
