@@ -420,5 +420,7 @@
             "watchlist_overflow_error": "You cannot add more than ten documents.",
             "copyright_disagreed" : "You have to agree copyright noticement to contribute",
             "email_send_error" : "Email transfer failed.",
-            "restart_fail_error" : "Restart failed. Please use manual restart."
+            "restart_fail_error" : "Restart failed. Please use manual restart.",
+            "same_email_error" : "There are users using the same email.",
+            "input_email_error" : "There is a problem with the input value."
 }
