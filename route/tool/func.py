@@ -92,34 +92,29 @@ def send_email(who, title, data):
         smtp_port = ''
         smtp = ''
 
-        if rep_data:
-            smtp_email = ''
-            smtp_pass = ''
-            for i in rep_data:
-                if i[0] == 'smtp_email':
-                    smtp_email = i[1]
-                elif i[0] == 'smtp_pass':
-                    smtp_pass = i[1]
-                elif i[0] == 'smtp_server':
-                    smtp_server = i[1]
-                elif i[0] == 'smtp_security':
-                    smtp_security = i[1]
-                elif i[0] == 'smtp_port':
-                    smtp_port = i[1]
-            
-            smtp_port = int(smtp_port)
-            if smtp_security == 'plain':
-                smtp = smtplib.SMTP(smtp_server, smtp_port)
-            elif smtp_security == 'starttls':
-                smtp = smtplib.SMTP(smtp_server, smtp_port)
-                smtp.starttls()
-            else:
-                # if smtp_security == 'tls':
-                smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
-            
-            smtp.login(smtp_email, smtp_pass)
+        for i in rep_data:
+            if i[0] == 'smtp_email':
+                smtp_email = i[1]
+            elif i[0] == 'smtp_pass':
+                smtp_pass = i[1]
+            elif i[0] == 'smtp_server':
+                smtp_server = i[1]
+            elif i[0] == 'smtp_security':
+                smtp_security = i[1]
+            elif i[0] == 'smtp_port':
+                smtp_port = i[1]
+        
+        smtp_port = int(smtp_port)
+        if smtp_security == 'plain':
+            smtp = smtplib.SMTP(smtp_server, smtp_port)
+        elif smtp_security == 'starttls':
+            smtp = smtplib.SMTP(smtp_server, smtp_port)
+            smtp.starttls()
         else:
-            raise
+            # if smtp_security == 'tls':
+            smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
+        
+        smtp.login(smtp_email, smtp_pass)
 
         domain = load_domain()
 
@@ -605,22 +600,16 @@ def cut_100(data):
 
 def wiki_set(num = 1):
     if num == 1:
-        data_list = []
         skin_name = skin_check(1)
+        data_list = []
 
         curs.execute(db_change('select data from other where name = ?'), ['name'])
         db_data = curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            data_list += [db_data[0][0]]
-        else:
-            data_list += ['Wiki']
+        data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['Wiki']
 
         curs.execute(db_change('select data from other where name = "license"'))
         db_data = curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            data_list += [db_data[0][0]]
-        else:
-            data_list += ['ARR']
+        data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['ARR']
 
         data_list += ['', '']
 
@@ -631,53 +620,37 @@ def wiki_set(num = 1):
         else:
             curs.execute(db_change('select data from other where name = "logo" and coverage = ""'))
             db_data = curs.fetchall()
-            if db_data and db_data[0][0] != '':
-                data_list += [db_data[0][0]]
-            else:
-                data_list += [data_list[0]]
+            data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else [data_list[0]]
 
         head_data = ''
 
         curs.execute(db_change("select data from other where name = 'head' and coverage = ''"))
         db_data = curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            head_data += db_data[0][0]
+        head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
 
         curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
         db_data = curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            head_data += db_data[0][0]
+        head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
             
         data_list += [head_data]
-
-        return data_list
-
-    if num == 2:
-        var_data = 'FrontPage'
-
+    elif num == 2:
         curs.execute(db_change('select data from other where name = "frontpage"'))
+        db_data = curs.fetchall()
+        data_list = db_data[0][0] if db_data and db_data[0][0] != '' else 'FrontPage'
     elif num == 3:
-        var_data = '2'
-
         curs.execute(db_change('select data from other where name = "upload"'))
+        db_data = curs.fetchall()
+        data_list = db_data[0][0] if db_data and db_data[0][0] != '' else '2'
 
-    db_data = curs.fetchall()
-    if db_data and db_data[0][0] != '':
-        return db_data[0][0]
-    else:
-        return var_data
+    return data_list
 
 def admin_check(num = None, what = None, name = ''):
-    if name == '':
-        ip = ip_check()
-    else:
-        ip = name
+    ip = ip_check() if name == '' else name
+    time_data = get_time()
 
     curs.execute(db_change("select acl from user where id = ?"), [ip])
     user = curs.fetchall()
     if user:
-        reset = 0
-
         back_num = num
         while 1:
             if num == 1:
@@ -700,7 +673,7 @@ def admin_check(num = None, what = None, name = ''):
             curs.execute(db_change('select name from alist where name = ? and acl = ?'), [user[0][0], check])
             if curs.fetchall():
                 if what:
-                    curs.execute(db_change("insert into re_admin (who, what, time) values (?, ?, ?)"), [ip, what, get_time()])
+                    curs.execute(db_change("insert into re_admin (who, what, time) values (?, ?, ?)"), [ip, what, time_data])
                     conn.commit()
 
                 return 1
@@ -881,12 +854,7 @@ def slow_edit_check():
 def acl_check(name = 'test', tool = '', topic_num = '1'):
     ip = ip_check()
     get_ban = ban_check()
-    
-    if name:
-        acl_c = re.search(r"^user:((?:(?!\/).)*)", name)
-    else:
-        acl_c = None
-
+    acl_c = re.search(r"^user:((?:(?!\/).)*)", name) if name else None
     if tool == '' and acl_c:
         acl_n = acl_c.groups()
 
@@ -956,6 +924,8 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 curs.execute(db_change('select acl from vote where id = ? and user = ""'), [topic_num])
             else:
                 curs.execute(db_change('select data from other where name = "vote_acl"'))
+
+            num = None
         else:
             # tool == 'render'
             if i == 0:
