@@ -301,6 +301,8 @@
             "all_document_list" : "All document(s) list",
             "watchlist" : "Watchlist",
             "image_file_list" : "Image file(s) list",
+            "short_page" : "Short page(s) list",
+            "long_page" : "Long page(s) list",
             "_comment_2.3.1_" : "ACL document list",
                 "acl_document_list" : "ACL document(s) list",
                 "acl_required" : "Required ACL",

@@ -131,7 +131,7 @@ load_conn(conn)
 
 # DB init
 create_data = {}
-create_data['data'] = ['title', 'data']
+create_data['data'] = ['title', 'data', 'type']
 create_data['cache_data'] = ['title', 'data', 'id']
 create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
 create_data['rc'] = ['id', 'title', 'date', 'type']
@@ -603,6 +603,10 @@ def func_upload():
 @app.route('/user')
 def user_info():
     return user_info_2(conn)
+
+@app.route('/<regex("long_page|short_page"):tool>')
+def list_long_page(tool = 'long_page'):
+    return list_long_page_2(conn, tool)
 
 @app.route('/<regex("watch_list|star_doc"):tool>')
 def watch_list(tool = 'star_doc'):
