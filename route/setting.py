@@ -328,7 +328,7 @@ def setting_2(conn, num, db_set):
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         <hr class="main_hr">
-                        <ul>
+                        <ul id="footnote_data">
                             <li><a href="#fn-1" id="rfn-1">(1)</a> <span>''' + load_lang('approval_question_visible_only_when_approval_on') + '''</span></li>
                         </ul>
                     </form>
