@@ -577,8 +577,7 @@ def other2(data):
                 integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4"
                 crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.2/build/highlight.min.js"></script>
-        <script>window.addEventListener('DOMContentLoaded', function() { main_css_skin_load(); });</script>
-    ''' + req_list] + data[2:]
+    ''' + req_list + '<script>window.addEventListener(\'DOMContentLoaded\', main_css_skin_load);</script>'] + data[2:]
 
     return data
 
