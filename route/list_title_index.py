@@ -20,7 +20,7 @@ def list_title_index_2(conn):
     curs.execute(db_change("select title from data order by title asc limit ?, ?"), [sql_num, num])
     title_list = curs.fetchall()
     if title_list:
-        data += '<hr class=\"main_hr\"><ul>'
+        data += '<hr class="main_hr"><ul>'
 
     for list_data in title_list:
         data += '<li>' + str(all_list) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'
