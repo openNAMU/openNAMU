@@ -5,10 +5,7 @@ def list_title_index_2(conn):
 
     page = int(number_check(flask.request.args.get('page', '1')))
     num = int(number_check(flask.request.args.get('num', '100')))
-    if page * num > 0:
-        sql_num = page * num - num
-    else:
-        sql_num = 0
+    sql_num = (page * num - num) if page * num > 0 else 0
 
     all_list = sql_num + 1
 
@@ -52,11 +49,11 @@ def list_title_index_2(conn):
 
             data += '''
                 </ul>
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
                 <ul>
                     <li>''' + load_lang('all') + ' : ' + str(count_end[0]) + '''</li>
                 </ul>
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
                 <ul>
                     <li>''' + load_lang('category') + ' : ' + str(count_end[1]) + '''</li>
                     <li>''' + load_lang('user_document') + ' : ' + str(count_end[2]) + '''</li>
@@ -66,7 +63,7 @@ def list_title_index_2(conn):
         else:
             data += '''
                 </ul>
-                <hr class=\"main_hr\">
+                <hr class="main_hr">
                 <ul>
                     <li>''' + load_lang('all') + ' : ' + all_title[0][0] + '''</li>
             '''
