@@ -3,7 +3,6 @@ from .tool.func import *
 def login_check_key_2(conn, tool):
     curs = conn.cursor()
 
-    # 난잡한 코드 정리 필요
     if  flask.request.method == 'POST' or \
         ('c_key' in flask.session and flask.session['c_key'] == 'email_pass'):
         re_set_list = ['c_id', 'c_pw', 'c_ans', 'c_que', 'c_key', 'c_type', 'c_email']

@@ -64,11 +64,7 @@ def topic_2(conn, topic_num):
                     y_check = 1
 
             if y_check == 1:
-                curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
-                    match.group(1),
-                    ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>',
-                    today
-                ])
+                add_alarm(match.group(1), ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>')
 
         cate_re = re.compile(r'\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
         data = cate_re.sub('[br]', flask.request.form.get('content', 'Test').replace('\r', ''))
@@ -77,11 +73,7 @@ def topic_2(conn, topic_num):
             curs.execute(db_change("select ip from topic where code = ? and id = ?"), [topic_num, rd_data])
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
-                curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
-                    ip_data[0][0],
-                    ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>',
-                    today
-                ])
+                add_alarm(ip_data[0][0], ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>')
 
         for rd_data in re.findall(r"(?: |\n|^)@((?:[^ ]+))(?: |\n|$)", data):
             curs.execute(db_change("select ip from history where ip = ? limit 1"), [rd_data])
@@ -91,11 +83,7 @@ def topic_2(conn, topic_num):
                 ip_data = curs.fetchall()
 
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
-                curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
-                    ip_data[0][0],
-                    ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>',
-                    today
-                ])
+                add_alarm(ip_data[0][0], ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>')
 
         data = re.sub(r"( |\n|^)(#(?:[0-9]+))( |\n|$)", '\g<1><topic_a>\g<2></topic_a>\g<3>', data)
         data = re.sub(r"( |\n|^)(@(?:[^ ]+))( |\n|$)", '\g<1><topic_call>\g<2></topic_call>\g<3>', data)
