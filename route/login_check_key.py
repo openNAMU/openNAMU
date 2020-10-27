@@ -51,14 +51,14 @@ def login_check_key_2(conn, tool):
 
                 curs.execute(db_change("select id from user where id = ?"), [flask.session['c_id']])
                 if curs.fetchall():
-                    for i in re_set_lire:
+                    for i in re_set_list:
                         flask.session.pop(i, None)
 
                     return re_error('/error/6')
             
                 curs.execute(db_change("select id from user_application where id = ?"), [flask.session['c_id']])
                 if curs.fetchall():
-                    for i in re_set_lire:
+                    for i in re_set_list:
                         flask.session.pop(i, None)
 
                     return re_error('/error/6')
