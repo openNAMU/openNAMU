@@ -370,6 +370,9 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
 
     return re_data
 
+def add_alarm(who, context):
+    curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [who, context, get_time()])
+
 def captcha_get():
     data = ''
 
