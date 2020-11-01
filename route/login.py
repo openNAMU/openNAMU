@@ -16,7 +16,7 @@ def login_2(conn):
         else:
             captcha_post('', 0)
 
-        agent = flask.request.headers.get('User-Agent')
+        user_agent = flask.request.headers.get('User-Agent', '')
         user_id = flask.request.form.get('id', '')
 
         curs.execute(db_change("select pw, encode from user where id = ?"), [user_id])
@@ -47,12 +47,7 @@ def login_2(conn):
             flask.session['head'] = css_data[0][0] if css_data else ''
             flask.session['id'] = user_id
 
-            curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [
-                user_id, 
-                ip, 
-                agent, 
-                get_time()
-            ])
+            ua_plus(user_id, ip, user_agent, get_time())
             conn.commit()
 
             return redirect('/user')

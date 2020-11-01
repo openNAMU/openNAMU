@@ -4,9 +4,8 @@ def applications_2(conn):
     curs = conn.cursor()
 
     div = ''
-    admin = admin_check()
 
-    if admin != 1:
+    if admin_check() != 1:
         return re_error('/ban')
 
     curs.execute(db_change('select data from other where name = "requires_approval"'))
@@ -26,10 +25,13 @@ def applications_2(conn):
                 email = application[5]
                 if not question:
                     question = ''
+
                 if not answer:
                     answer = ''
+                
                 if not email:
                     email = ''
+                
                 div += '''
                     <form method=\"post\">
                         <table>
@@ -41,7 +43,7 @@ def applications_2(conn):
                                     <td>''' + load_lang('application_time') + '''</td><td>''' + application[1] + '''</td>
                                 </tr>
                                 <tr>
-                                    <td>''' + load_lang('approval_question') + '''</td><td>''' + question + '''</td>
+                                    <td>''' + load_lang('approval_question') + '''</td><td>''' + html.escape(question) + '''</td>
                                 </tr>
                                 <tr>
                                     <td>''' + load_lang('answer') + '''</td><td>''' + html.escape(answer) + '''</td>
@@ -62,9 +64,17 @@ def applications_2(conn):
                 '''
         else:
             div += load_lang('no_applications_now')
+
+        return easy_minify(flask.render_template(skin_check(),
+            imp = [load_lang('application_list'), wiki_set(), custom(), other2([0, 0])],
+            data = div,
+            menu = [['other', load_lang('return')]]
+        ))
     else:
         if flask.request.form.get('approve', '') != '':
-            curs.execute(db_change('select id, pw, date, encode, question, answer, ip, ua, email from user_application where token = ?'), [flask.request.form.get('approve', '')])
+            curs.execute(db_change('select id, pw, date, encode, question, answer, ip, ua, email from user_application where token = ?'), [
+                flask.request.form.get('approve', '')
+            ])
             application = curs.fetchall()
             if not application:
                 return re_error('/error/26')
@@ -83,26 +93,14 @@ def applications_2(conn):
             ])
             curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question', ?, ?)"), [application[0], application[4]])
             curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question_answer', ?, ?)"), [application[0], application[5]])
-            curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [
-                application[0], 
-                application[6], 
-                application[7], 
-                application[2]
-            ])
+            ua_plus(application[0], application[6], application[7], application[2])
             if application[8] and application[8] != '':
                 curs.execute(db_change("insert into user_set (name, id, data) values ('email', ?, ?)"), [application[0], application[8]])
+            
             curs.execute(db_change('delete from user_application where token = ?'), [flask.request.form.get('approve', '')])
- 
-
             conn.commit()
         elif flask.request.form.get('decline', '') != '':
             curs.execute(db_change('delete from user_application where token = ?'), [flask.request.form.get('decline', '')])
             conn.commit()
 
         return redirect('/applications')
-
-    return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('application_list'), wiki_set(), custom(), other2([0, 0])],
-        data = div,
-        menu = [['other', load_lang('return')]]
-    ))
