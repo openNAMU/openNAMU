@@ -333,7 +333,7 @@ def set_init():
         for i in [['smtp_server', 'smtp.gmail.com'], ['smtp_port', '587'], ['smtp_security', 'starttls']]:
             curs.execute(db_change("insert into other (name, data) values (?, ?)"), [i[0], i[1]])
 
-def pw_encode(data, data2 = '', type_d = ''):
+def pw_encode(data, type_d = ''):
     if type_d == '':
         curs.execute(db_change('select data from other where name = "encode"'))
         set_data = curs.fetchall()
@@ -360,11 +360,7 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
     else:
         set_data = db_data[0][0]
 
-    if pw_encode(data = data, type_d = set_data) == data2:
-        re_data = 1
-    else:
-        re_data = 0
-
+    re_data = 1 if pw_encode(data, set_data) == data2 else 0
     if db_data[0][0] != set_data and re_data == 1 and id_d != '':
         curs.execute(db_change("update user set pw = ?, encode = ? where id = ?"), [pw_encode(data), db_data[0][0], id_d])
 
@@ -428,6 +424,14 @@ def captcha_post(re_data, num = 1):
             return 0
     else:
         pass
+
+def ua_plus(id, ip, ua, time):
+    curs.execute(db_change("select data from other where name = 'ua_get'"))
+    rep_data = curs.fetchall()
+    if rep_data and rep_data[0][0] != '':
+        pass
+    else:
+        curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [id, ip, ua, time])
 
 def load_lang(data, num = 2, safe = 0):
     global global_lang
@@ -643,6 +647,8 @@ def wiki_set(num = 1):
         curs.execute(db_change('select data from other where name = "upload"'))
         db_data = curs.fetchall()
         data_list = db_data[0][0] if db_data and db_data[0][0] != '' else '2'
+    else:
+        data_list = ''
 
     return data_list
 

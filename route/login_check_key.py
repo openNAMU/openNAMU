@@ -10,7 +10,6 @@ def login_check_key_2(conn, tool):
         input_key = flask.request.form.get('key', '')
         user_agent = flask.request.headers.get('User-Agent', '')
 
-
         if  'c_type' in flask.session and \
             flask.session['c_type'] == 'pass_find' and \
             flask.session['c_key'] == input_key:
@@ -100,12 +99,7 @@ def login_check_key_2(conn, tool):
                     flask.session['c_id'],
                     flask.session['c_email']
                 ])
-                curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [
-                    flask.session['c_id'],
-                    ip,
-                    user_agent,
-                    get_time()
-                ])
+                ua_plus(flask.session['c_id'], ip, user_agent, get_time())
 
                 flask.session['id'] = flask.session['c_id']
                 flask.session['head'] = ''
