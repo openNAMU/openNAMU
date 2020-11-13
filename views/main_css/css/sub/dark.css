@@ -1,9 +1,11 @@
 html, body {
-    background: black; color: white;
+    background: black;
+    color: white;
 }
 
 textarea, input, button, select {
-    background: #1f2023; color: white;
+    background: #1f2023;
+    color: white;
 }
 
 input::placeholder, textarea::placeholder, select::placeholder {
@@ -39,9 +41,11 @@ pre#syntax, pre#syntax code {
 }
 
 blockquote {
-    background-color: black; border-left: 5px solid #eee;
+    background-color: black;
+    border-left: 5px solid #eee;
 }
 
 .spead_footnote {
-    background-color: black; color: white;
+    background-color: black;
+    color: white;
 }
