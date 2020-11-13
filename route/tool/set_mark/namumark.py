@@ -1042,7 +1042,6 @@ def namumark(conn, data, title, include_num):
                     main_link = category_re.sub('category:', main_link)
                     link_id = ''
 
-                    curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
                     if re.search(r'#blur', main_link):
                         link_id = ' hidden_link'
                         main_link = main_link.replace('#blur', '')
