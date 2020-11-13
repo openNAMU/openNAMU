@@ -27,7 +27,7 @@ def main_manager_2(conn, num, r_ver):
             imp = [load_lang('admin_tool'), wiki_set(), custom(), other2([0, 0])],
             data = '''
                 <h2>''' + load_lang('admin') + '''</h2>
-                <ul>
+                <ul class="inside_ul">
                     <li><a href="/manager/2">''' + load_lang('acl_change') + '''</a></li>
                     <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
                     <li><a href="/ban">''' + load_lang('ban') + '''</a></li>
@@ -36,7 +36,7 @@ def main_manager_2(conn, num, r_ver):
                 </ul>
                 <br>
                 <h2>''' + load_lang('owner') + '''</h2>
-                <ul>
+                <ul class="inside_ul">
                     <li><a href="/give_log">''' + load_lang('admin_group_list') + '''</a></li>
                     <li><a href="/many_delete">''' + load_lang('many_delete') + '''</a></li>
                     <li><a href="/applications">''' + load_lang('application_list') + '''</a></li>
@@ -45,7 +45,7 @@ def main_manager_2(conn, num, r_ver):
                     <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
                 </ul>
                 <h3>''' + load_lang('filter') + '''</h3>
-                <ul>
+                <ul class="inside_ul">
                     <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
                     <li><a href="/inter_wiki">''' + load_lang('interwiki_list') + '''</a></li>
                     <li><a href="/edit_top">''' + load_lang('edit_tool_list') + '''</a></li>
@@ -57,13 +57,13 @@ def main_manager_2(conn, num, r_ver):
                 </ul>
                 <br>
                 <h2>''' + load_lang('server') + '''</h2>
-                <ul>
+                <ul class="inside_ul">
                     <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
                     <li><a href="/update">''' + load_lang('update') + '''</a></li>
                 </ul>
                 <br>
                 <h2>''' + load_lang('version') + '''</h2>
-                <ul>
+                <ul class="inside_ul">
                     <li><a href="/api/skin_info?all=true">''' + load_lang('skin_info') + '''</a></li>
                     <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
                     <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>

@@ -41,6 +41,10 @@ a {
     text-decoration: none;
 }
 
+.inside_ul li {
+    margin-left: 20px;
+}
+
 #not_thing {
     color: red;
 }

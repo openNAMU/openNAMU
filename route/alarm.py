@@ -9,7 +9,7 @@ def alarm_2(conn):
     else:
         sql_num = 0
 
-    data = '<ul>'
+    data = '<ul class="inside_ul">'
 
     curs.execute(db_change("select data, date from alarm where name = ? order by date desc limit ?, 50"), [ip_check(), sql_num])
     data_list = curs.fetchall()

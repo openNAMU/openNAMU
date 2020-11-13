@@ -127,7 +127,7 @@ def give_acl_2(conn, name):
                 </select>
                 <hr class="main_hr">
                 <h2 id="exp">''' + load_lang('explanation') + '''</h2>
-                <ul>
+                <ul class="inside_ul">
                     <li>normal : ''' + load_lang('unset') + '''</li>
                     <li>admin : ''' + load_lang('admin_acl') + '''</li>
                     <li>user : ''' + load_lang('member_acl') + '''</li>

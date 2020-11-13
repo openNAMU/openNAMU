@@ -46,7 +46,7 @@ def server_now_update_2(conn, r_ver):
             imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
             data = load_lang('update_warring') + '''
                 <hr class=\"main_hr\">
-                <ul>
+                <ul class="inside_ul">
                     <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
                     <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
                 </ul>

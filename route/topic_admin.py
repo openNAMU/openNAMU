@@ -13,13 +13,13 @@ def topic_admin_2(conn, topic_num, num):
 
     ban = '''
         <h2>''' + load_lang('state') + '''</h2>
-        <ul>
+        <ul class="inside_ul">
             <li>''' + load_lang('writer') + ' : ''' + ip_pas(data[0][1]) + '''</li>
             <li>''' + load_lang('time') + ' : ' + data[0][2] + '''</li>
         </ul>
         <br>
         <h2>''' + load_lang('other_tool') + '''</h2>
-        <ul>
+        <ul class="inside_ul">
             <li>
                 <a href="/thread/''' + topic_num + '/raw/' + num + '''">''' + load_lang('raw') + '''</a>
             </li>
@@ -36,7 +36,7 @@ def topic_admin_2(conn, topic_num, num):
         ban += '''
             <br>
             <h2>''' + load_lang('admin_tool') + '''</h2>
-            <ul>
+            <ul class="inside_ul">
                 <li>
                     <a href="/ban/''' + url_pas(data[0][1]) + '''">
                         ''' + (load_lang('release') if user_ban_d else load_lang('ban')) + '''
