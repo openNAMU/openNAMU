@@ -7,13 +7,13 @@ def main_other_2(conn):
         imp = [load_lang('other_tool'), wiki_set(), custom(), other2([0, 0])],
         data = '''
             <h2>''' + load_lang('record') + '''</h2>
-            <ul>
+            <ul class="inside_ul">
                 <li><a href="/manager/6">''' + load_lang('edit_record') + '''</a></li>
                 <li><a href="/manager/7">''' + load_lang('discussion_record') + '''</a></li>
             </ul>
             <br>
             <h2>''' + load_lang('list') + '''</h2>
-            <ul>
+            <ul class="inside_ul">
                 <li><a href="/recent_changes">''' + load_lang('recent_change') + '''</a></li>
                 <li><a href="/recent_discuss">''' + load_lang('recent_discussion') + '''</a></li>
                 <li><a href="/admin_list">''' + load_lang('admin_list') + '''</a></li>
@@ -32,13 +32,13 @@ def main_other_2(conn):
             </ul>
             <br>
             <h2>''' + load_lang('other') + '''</h2>
-            <ul>
+            <ul class="inside_ul">
                 <li><a href="/upload">''' + load_lang('upload') + '''</a></li>
                 <li><a href="/manager/10">''' + load_lang('search') + '''</a></li>
             </ul>
             <br>
             <h2>''' + load_lang('admin') + '''</h2>
-            <ul>
+            <ul class="inside_ul">
                 <li><a href="/manager/1">''' + load_lang('admin_tool') + '''</a></li>
             </ul>
         ''',

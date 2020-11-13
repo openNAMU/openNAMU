@@ -3,7 +3,7 @@ from .tool.func import *
 def list_admin_2(conn):
     curs = conn.cursor()
 
-    div = '<ul>'
+    div = '<ul class="inside_ul">'
 
     curs.execute(db_change("select id, acl, date from user where not acl = 'user' order by date desc"))
     for data in curs.fetchall():

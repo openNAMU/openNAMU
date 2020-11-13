@@ -10,7 +10,7 @@ def list_please_2(conn):
     if int(curs.fetchall()[0][0]) > 30000:
         return re_error('/error/25')
 
-    div = '<ul>'
+    div = '<ul class="inside_ul">'
 
     curs.execute(db_change("select distinct title from back where type = 'no' order by title asc limit ?, 50"), [sql_num])
     data_list = curs.fetchall()

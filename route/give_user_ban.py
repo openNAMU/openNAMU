@@ -66,9 +66,9 @@ def give_user_ban_2(conn, name):
             action = 'action="/ban/' + url_pas(name) + ('?type=' + band if band != '' else '') + '"'
 
             if end[0][0] == '':
-                data = '<ul><li>' + load_lang('limitless') + '</li>'
+                data = '<ul class="inside_ul"><li>' + load_lang('limitless') + '</li>'
             else:
-                data = '<ul><li>' + load_lang('period') + ' : ' + end[0][0] + '</li>'
+                data = '<ul class="inside_ul"><li>' + load_lang('period') + ' : ' + end[0][0] + '</li>'
 
             curs.execute(db_change("select block from rb where block = ? and login = 'O' and ongoing = '1'"), [name])
             if curs.fetchall():

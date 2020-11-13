@@ -3,7 +3,7 @@ from .tool.func import *
 def list_acl_2(conn):
     curs = conn.cursor()
 
-    div = '<ul>'
+    div = '<ul class="inside_ul">'
 
     curs.execute(db_change("select title, why from acl where decu != '' or dis != '' or view != '' order by title desc"))
     list_data = curs.fetchall()

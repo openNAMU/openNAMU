@@ -12,7 +12,7 @@ def search_deep_2(conn, name):
     else:
         sql_num = 0
 
-    div = '<ul>'
+    div = '<ul class="inside_ul">'
 
     div_plus = ''
     test = ''
@@ -24,13 +24,13 @@ def search_deep_2(conn, name):
         link_id = 'id="not_thing"'
 
     div = '''
-        <ul>
+        <ul class="inside_ul">
             <li>
                 <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + html.escape(name) + '''</a>
             </li>
         </ul>
         <hr class=\"main_hr\">
-        <ul>
+        <ul class="inside_ul">
     '''
 
     curs.execute(db_change('select data from other where name = "count_all_title"'))
@@ -48,7 +48,7 @@ def search_deep_2(conn, name):
 
             for data in all_list:
                 if data[1] != test:
-                    div_plus += '</ul><hr class=\"main_hr\"><ul>'
+                    div_plus += '</ul><hr class=\"main_hr\"><ul class="inside_ul">'
 
                     test = data[1]
 

@@ -7,7 +7,7 @@ def list_long_page_2(conn, tool):
     if int(curs.fetchall()[0][0]) > 30000:
         return re_error('/error/25')
 
-    div = '<ul>'
+    div = '<ul class="inside_ul">'
     select_data = 'desc' if tool == 'long_page' else 'asc'
     title = 'long_page' if tool == 'long_page' else 'short_page'
 

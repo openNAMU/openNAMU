@@ -28,7 +28,7 @@ def setting_2(conn, num, db_set):
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
-            data = '<h2>' + load_lang('list') + '</h2><ul>' + li_data + '</ul>',
+            data = '<h2>' + load_lang('list') + '</h2><ul class="inside_ul">' + li_data + '</ul>',
             menu = [['manager', load_lang('return')]]
         ))
     elif num == 1:
