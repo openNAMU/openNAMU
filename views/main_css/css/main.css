@@ -7,7 +7,8 @@ textarea {
 }
 
 input {
-    width: 100%; box-sizing: border-box;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 #last {
@@ -15,7 +16,12 @@ input {
 }
 
 #toc {
-    border: 1px solid; padding: 20px; width: fit-content; width: -moz-fit-content; clear: both; margin-top: 10px;
+    border: 1px solid;
+    padding: 20px;
+    width: fit-content;
+    width: -moz-fit-content;
+    clear: both;
+    margin-top: 10px;
 }
 
 #toc-name {
@@ -27,11 +33,16 @@ table {
 }
 
 td {
-    border: 1px solid; padding: 5px;
+    border: 1px solid;
+    padding: 5px;
 }
 
 a {
     text-decoration: none;
+}
+
+li {
+    margin-left: 20px;
 }
 
 #not_thing {
@@ -43,7 +54,10 @@ a {
 }
 
 #out_link::before {
-    background: green; color: white; content: "E";
+    background: green;
+    color: white;
+    content: "E";
+    margin-right: 2px;
 }
 
 input[type="checkbox"], input[type="radio"] {
@@ -79,7 +93,9 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 #cate {
-    border: 1px solid; padding: 5px; margin-top: 20px;
+    border: 1px solid;
+    padding: 5px;
+    margin-top: 20px;
 }
 
 img, iframe {
@@ -87,7 +103,9 @@ img, iframe {
 }
 
 pre {
-    border: 1px solid; padding: 10px; white-space: pre-wrap;
+    border: 1px solid;
+    padding: 10px;
+    white-space: pre-wrap;
 }
 
 #in {
@@ -103,11 +121,14 @@ s, strike, del {
 }
 
 s:hover, strike:hover, del:hover {
-    color: gray; background-color: gainsboro; text-decoration: none;
+    color: gray;
+    background-color: gainsboro;
+    text-decoration: none;
 }
 
 #main_table_set {
-    width: 100%; text-align: center;
+    width: 100%;
+    text-align: center;
 }
 
 #main_table_width {
@@ -123,15 +144,19 @@ s:hover, strike:hover, del:hover {
 }
 
 #redirect {
-    border: 1px solid; padding: 10px;
+    border: 1px solid;
+    padding: 10px;
 }
 
 body {
-    word-break: break-all; overflow: auto;
+    word-break: break-all;
+    overflow: auto;
 }
 
 .main_hr {
-    border: none; margin-top: 8px; margin-bottom: 8px;
+    border: none;
+    margin-top: 8px;
+    margin-bottom: 8px;
 }
 
 #include_link {
@@ -159,7 +184,9 @@ body {
 }
 
 .all_in_data {
-    display: block; width: 100%; white-space: pre-wrap;
+    display: block;
+    width: 100%;
+    white-space: pre-wrap;
 }
 
 .table_safe {
@@ -171,7 +198,10 @@ body {
 }
 
 #topic_scroll {
-    max-height: 500px; overflow: scroll; -ms-overflow-style: none; scrollbar-width: none;
+    max-height: 500px;
+    overflow: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 #topic_scroll::-webkit-scrollbar {
@@ -195,11 +225,14 @@ body {
 }
 
 .spead_footnote {
-    background-color: #efefef; color: #555; border: 1px solid #cecece;
+    background-color: #efefef;
+    color: #555;
+    border: 1px solid #cecece;
 }
 
 #footnote_data {
-    border-top: 1px solid gainsboro; padding-top: 10px;
+    border-top: 1px solid gainsboro;
+    padding-top: 10px;
 }
 
 a {
