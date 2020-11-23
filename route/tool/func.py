@@ -191,6 +191,8 @@ def render_set(title = '', data = '', num = 0, s_data = 0, include = None, acl =
         return data
     else:
         if data != None:
+            darkmode = flask.request.cookies.get('main_css_darkmode', '0')
+            
             return render_do(title, data, num, include)
         else:
             return 'HTTP Request 404'
