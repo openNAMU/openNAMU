@@ -3,77 +3,48 @@ from .tool.func import *
 def give_admin_groups_2(conn, name):
     curs = conn.cursor()
 
+    acl_name_list = ['ban', 'nothing', 'toron', 'check', 'acl', 'hidel', 'give', 'owner']
+    
     if flask.request.method == 'POST':
         if admin_check(None, 'admin_plus (' + name + ')') != 1:
             return re_error('/error/3')
 
         curs.execute(db_change("delete from alist where name = ?"), [name])
-
-        if flask.request.form.get('ban', 0) != 0:
-            curs.execute(db_change("insert into alist (name, acl) values (?, 'ban')"), [name])
-
-        if flask.request.form.get('toron', 0) != 0:
-            curs.execute(db_change("insert into alist (name, acl) values (?, 'toron')"), [name])
-
-        if flask.request.form.get('check', 0) != 0:
-            curs.execute(db_change("insert into alist (name, acl) values (?, 'check')"), [name])
-
-        if flask.request.form.get('acl', 0) != 0:
-            curs.execute(db_change("insert into alist (name, acl) values (?, 'acl')"), [name])
-
-        if flask.request.form.get('hidel', 0) != 0:
-            curs.execute(db_change("insert into alist (name, acl) values (?, 'hidel')"), [name])
-
-        if flask.request.form.get('give', 0) != 0:
-            curs.execute(db_change("insert into alist (name, acl) values (?, 'give')"), [name])
-
-        if flask.request.form.get('owner', 0) != 0:
-            curs.execute(db_change("insert into alist (name, acl) values (?, 'owner')"), [name])
+        for i in acl_name_list:
+            if flask.request.form.get(i, 0) != 0:
+                curs.execute(db_change("insert into alist (name, acl) values (?, ?)"), [name, i])
 
         conn.commit()
 
         return redirect('/admin_plus/' + url_pas(name))
     else:
-        data = '<ul class="inside_ul">'
-
+        data = ''
         exist_list = ['', '', '', '', '', '', '', '']
+        state = 'disabled' if admin_check() != 1 else ''
 
         curs.execute(db_change('select acl from alist where name = ?'), [name])
         acl_list = curs.fetchall()
         for go in acl_list:
-            if go[0] == 'ban':
-                exist_list[0] = 'checked="checked"'
-            elif go[0] == 'toron':
-                exist_list[2] = 'checked="checked"'
-            elif go[0] == 'check':
-                exist_list[3] = 'checked="checked"'
-            elif go[0] == 'acl':
-                exist_list[4] = 'checked="checked"'
-            elif go[0] == 'hidel':
-                exist_list[5] = 'checked="checked"'
-            elif go[0] == 'give':
-                exist_list[6] = 'checked="checked"'
-            elif go[0] == 'owner':
-                exist_list[7] = 'checked="checked"'
-
-        if admin_check() != 1:
-            state = 'disabled'
-        else:
-            state = ''
-
-        acl_name_list = ['ban', 'nothing', 'toron', 'check', 'acl', 'hidel', 'give', 'owner']
+            exist_list[acl_name_list.index(go[0])] = 'checked="checked"'
+            
         for i in range(0, 8):
             if i != 1:
-                data += '<li><input type="checkbox" ''' + state +  ' name="' + acl_name_list[i] + '" ' + exist_list[i] + '> ' + acl_name_list[i] + '</li>'
+                data += '' + \
+                    '<input type="checkbox" ' + \
+                            state + ' ' + \
+                            'name="' + acl_name_list[i] + '" ' + \
+                            exist_list[i] + '> ' + acl_name_list[i] + \
+                    '<hr class="main_hr">' + \
+                ''
 
-        data += '</ul>'
+        data += ''
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [name, wiki_set(), custom(), other2(['(' + load_lang('admin_group') + ')', 0])],
-            data =  '''
+            data = '''
                 <form method="post">
                     ''' + data + '''
-                    <hr class=\"main_hr\">
+                    <hr class="main_hr">
                     <h2>''' + load_lang('explanation') + '''</h2>
                     <ul class="inside_ul">
                         <li>ban : ''' + load_lang('ban_authority') + '''</li>
@@ -84,9 +55,9 @@ def give_admin_groups_2(conn, name):
                         <li>give : ''' + load_lang('authorization_authority') + '''</li>
                         <li>owner : ''' + load_lang('owner_authority') + '''</li>
                     </ul>
-                    <hr class=\"main_hr\">
+                    <hr class="main_hr">
                     <button ''' + state +  ''' type="submit">''' + load_lang('save') + '''</button>
                 </form>
             ''',
             menu = [['give_log', load_lang('return')]]
-        ))     
+        ))
