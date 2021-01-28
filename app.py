@@ -122,7 +122,7 @@ if set_data['db_type'] == 'mysql':
     except:
         pass
 
-    curs.execute(db_change('use ?'), set_data['db'])
+    conn.select_db(set_data['db'])
 else:
     conn = sqlite3.connect(set_data['db'] + '.db')
     curs = conn.cursor()
