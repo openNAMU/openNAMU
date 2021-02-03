@@ -118,11 +118,11 @@ if set_data['db_type'] == 'mysql':
     curs = conn.cursor()
 
     try:
-        curs.execute(db_change('create database ? default character set utf8mb4;')%pymysql.escape_string(set_data['db']))
+        curs.execute(db_change('create database ? default character set utf8mb4;'), set_data['db'])
     except:
         pass
 
-    curs.execute(db_change('use ?')%pymysql.escape_string(set_data['db']))
+    conn.select_db(set_data['db'])
 else:
     conn = sqlite3.connect(set_data['db'] + '.db')
     curs = conn.cursor()
