@@ -4,19 +4,10 @@ def give_user_ban_2(conn, name):
     curs = conn.cursor()
 
     band = flask.request.args.get('type', '')
-    if band == '':
-        if name and ip_or_user(name) == 0:
-            curs.execute(db_change("select acl from user where id = ?"), [name])
-            user = curs.fetchall()
-            if not user:
-                return re_error('/error/2')
-
-            if user and user[0][0] != 'user':
-                if admin_check() != 1:
-                    return re_error('/error/4')
-
-    if ban_check(ip = ip_check(), tool = 'login') == 1:
-        return re_error('/ban')
+    ip = ip_check()
+    if ban_check(ip = ip, tool = 'login') == 1:
+    	if ip_or_user(ip) == 1 or admin_check('all', None, ip) == 0:
+            return re_error('/ban')
 
     if flask.request.method == 'POST':
         end = flask.request.form.get('second', '0')
