@@ -13,30 +13,37 @@ function do_onmark_text_render(data) {
 function do_onmark_heading_render(data) {
     var heading_re = /<br>(={1,6}) ?([^=]+) ?={1,6}<br>/;
     var heading_level_all = [0, 0, 0, 0, 0, 0];
-    while(data.match(heading_re)) {
-        console.log(data.match(heading_re));
-        data = data.replace(heading_re, function(x, heading_level, heading_data) {
-            console.log(heading_level);
-            heading_level = heading_level.length;
-            heading_level_all[heading_level - 1] += 1;
+    while(1) {        
+        var heading_data = data.match(heading_re);
+        if(!heading_data) {
+            break;
+        }
+          
+        var heading_level = heading_data[1].length;
+        heading_level_all[heading_level - 1] += 1;
 
-            var i = 6;
-            while(i > heading_level - 1) {
-                heading_level_all[i] = 0;
+        var i = 6;
+        while(i > heading_level - 1) {
+            heading_level_all[i] = 0;
 
-                i -= 1;
+            i -= 1;
+        }
+
+        heading_level = String(heading_level);
+        var heading_level_string = '';
+        i = 0;
+        while(i < 6) {
+            if(heading_level_all[i] !== 0) {
+                heading_level_string += String(heading_level_all[i]) + '.';
             }
 
-            console.log(heading_level_all);
-            heading_level = String(heading_level);
-            heading_level_string = heading_level_all.join('.');
-            console.log(heading_level_string);
-            
-            return '<h' + heading_level + '>' + heading_data + '</h' + heading_level + '><br>';
-        });
+            i += 1;
+        }
+
+        data = data.replace(heading_re, '<h' + heading_level + '>' + heading_level_string + ' ' + heading_data[2] + '</h' + heading_level + '><br>');
     }
     
-    console.log(data.match(heading_re));
+    data = data.replace(/(<\/h[0-9]>)<br>/g, '$1');
     
     return data;
 }
@@ -47,6 +54,9 @@ function do_onmark_render(id_name) {
     
     data = do_onmark_text_render(data);
     data = do_onmark_heading_render(data);
+    
+    data = data.replace(/^(<br>| )+/, '');
+    data = data.replace(/(<br>| )+$/, '');
     
     document.getElementById(id_name).innerHTML = data;
 }
