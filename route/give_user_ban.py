@@ -10,7 +10,7 @@ def give_user_ban_2(conn, name):
             return re_error('/ban')
     else:
     	if admin_check(1, None, ip) !=1:
-    	    return re_error('/error/4')
+    	    return re_error('/error/3')
 
     if flask.request.method == 'POST':
         end = flask.request.form.get('second', '0')
