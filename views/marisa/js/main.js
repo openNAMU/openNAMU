@@ -23,13 +23,7 @@ function opening(data) {
 }
 
 document.onclick = function(event) {
-    for(var node = event.target; node != document.body; node = node.parentNode) {
-        if(save_data !== '' && open == 0) {
-            if(node.id === save_data) {
-                break;
-            } else {
-                document.getElementById(save_data).style.display = 'none';
-            }
-        }
+    if(save_data !== '' && open == 0) {
+        document.getElementById(save_data).style.display = 'none';
     }
 }
