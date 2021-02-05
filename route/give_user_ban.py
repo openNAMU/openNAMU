@@ -8,6 +8,9 @@ def give_user_ban_2(conn, name):
     if ban_check(ip = ip, tool = 'login') == 1:
     	if ip_or_user(ip) == 1 or admin_check('all', None, ip) == 0:
             return re_error('/ban')
+    else:
+    	if admin_check(1, None, ip) !=1:
+    	    return re_error('/error/4')
 
     if flask.request.method == 'POST':
         end = flask.request.form.get('second', '0')
@@ -31,8 +34,12 @@ def give_user_ban_2(conn, name):
             if admin_check(None, 'ban' + (' ' + type_d if type_d else '') + ' (' + name + ')') != 1:
                 return re_error('/error/3')
         else:
-            if admin_check(1, 'ban (' + name + ')') != 1:
-                return re_error('/error/3')
+            if name == ip:
+                if admin_check('all', 'ban (' + name + ')') != 1:
+                    return re_error('/error/3')
+            else:
+            	if admin_check(1, 'ban (' + name + ')') != 1:
+                    return re_error('/error/3')
 
         ban_insert(
             name,
@@ -45,9 +52,6 @@ def give_user_ban_2(conn, name):
 
         return redirect('/block_log')
     else:
-        if admin_check(1) != 1:
-            return re_error('/error/3')
-
         curs.execute(db_change("select end, why from rb where block = ? and ongoing = '1' and band = ?"), [name, band])
         end = curs.fetchall()
         if end:
