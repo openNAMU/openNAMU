@@ -57,7 +57,12 @@ def render_do(title, data, num, include):
     elif rep_data[0][0] == 'custom':
         data = custom_mark(conn, data, title, include)
     elif rep_data[0][0] == 'js_onmark':
-        data = ['<div id="raw_data_field">' + data + '</div>', 'do_onmark_render("raw_data_field");', []]
+        include = (include + '_') if include else ''
+        data = [
+            '<div id="' + include + 'render_contect">' + html.escape(data) + '</div>', 
+            'do_onmark_render("' + include + 'render_contect");',
+            []
+        ]
     elif rep_data[0][0] == 'raw':
         data = [data, '', []]
     else:
