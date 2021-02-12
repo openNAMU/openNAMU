@@ -3,7 +3,20 @@ function do_url_change(data) {
     return encodeURIComponent(data);
 }
 
-// Main
+function do_return_date() {
+    var today_data = new Date();
+
+    return '' +
+        String(today_data.getFullYear()) + '-' + 
+        ((today_data.getMonth() + 1) < 10 ? '0' : '') + String(today_data.getMonth() + 1) + '-' + 
+        (today_data.getDate() < 10 ? '0' : '') + String(today_data.getDate()) + ' ' + 
+        (today_data.getHours() < 10 ? '0' : '') + String(today_data.getHours()) + ':' + 
+        (today_data.getMinutes() < 10 ? '0' : '') + String(today_data.getMinutes()) + ':' + 
+        (today_data.getSeconds() < 10 ? '0' : '') + String(today_data.getSeconds()) +
+    '';
+}
+
+// Sub
 function do_onmark_text_render(data) {    
     data = data.replace(/'''((?:(?!''').)+)'''/g, '<b>$1</b>');
     data = data.replace(/''((?:(?!'').)+)''/g, '<i>$1</i>');
@@ -133,6 +146,129 @@ function do_onmark_link_render(data, data_js, name_doc, name_include) {
     return [data, data_js];
 }
 
+function do_onmark_footnote_render(data, name_include) {
+    var footnote_end_data = '';
+    var footnote_all_data = {};
+    var footnote_re = /(?:\[\*([^ \]]*)(?: ((?:(?!\n|\]).)+))?\]|\[(footnote|각주)\])/;
+    var i = 1;
+    while(1) {
+        var footnote_data = data.match(footnote_re);
+        if(!footnote_data) {
+            break;
+        }
+        
+        if(!footnote_data[3]) {
+            if(!footnote_data[2]) {
+                var footnote_line_data = '';
+            } else {
+                var footnote_line_data = footnote_data[2];
+            }
+            
+            if(!footnote_data[1]) {
+                var footnote_name = String(i);
+            } else {
+                var footnote_name = footnote_data[1];
+            }
+            
+            if(!footnote_all_data[footnote_name]) {
+                footnote_all_data[footnote_name] = footnote_line_data;
+            }
+
+            footnote_line_data = footnote_all_data[footnote_name];
+            
+            footnote_end_data += '' +
+                '<li>' +
+                    '<a href="javascript:do_open_foot(\'' + name_include + 'fn-' + String(i) + '\', 1);" ' +
+                        'id="' + name_include + 'cfn-' + String(i) + '">' +
+                        '(' + footnote_name + ')' +
+                    '</a> <span id="' + name_include + 'fn-' + String(i) + '">' + footnote_line_data + '</span>' +
+                '</li>' +
+            '';
+            data = data.replace(footnote_re, '' +
+                '<sup>' +
+                    '<a href="javascript:do_open_foot(\'' + name_include + 'fn-' + String(i) + '\', 0);" ' +
+                        'id="' + name_include + 'rfn-' + String(i) + '">' +
+                        '(' + footnote_name + ')' +
+                    '</a>' +
+                '</sup><span id="' + name_include + 'dfn-' + String(i) + '"></span>' +
+           '');
+            
+            i += 1;
+        } else {
+            if(footnote_end_data !== '') {
+                data = data.replace(footnote_re, '<ul id="footnote_data">' + footnote_end_data + '</ul>');    
+            }
+            
+            footnote_end_data = '';
+        }
+    }
+    
+    if(footnote_end_data !== '') {
+        data += '<ul id="footnote_data">' + footnote_end_data + '</ul>';
+    }
+    
+    return data;
+}
+
+function do_onmark_macro_render(data) {
+    data = data.replace(/\[([^[\](]+)\(((?:(?!\)\]).)+)\)\]/g, function(x, x_1, x_2) {
+        x_1 = x_1.toLowerCase();
+        console.log(x_1);
+        if(x_1 === 'youtube' || x_1 === 'kakaotv' || x_1 === 'nicovideo') {
+            var video_code = x_2.match(/^([^,]+)/);
+            video_code = video_code ? video_code[1] : '';
+            
+            var video_width = x_2.match(/,(?: *)width=([0-9]+)/);
+            video_width = video_width ? (video_width[1] + 'px') : '640px';
+            
+            var video_height = x_2.match(/,(?: *)height=([0-9]+)/);
+            video_height = video_height ? (video_height[1] + 'px') : '360px';
+            
+            if(x_1 === 'youtube') {
+                var video_start = x_2.match(/,(?: *)start=([0-9]+)/);
+                video_start = video_start ? ('?' + video_start[1]) : '';
+                
+                video_code = video_code.replace(/^https:\/\/www\.youtube\.com\/watch\?v=/, '');
+                video_code = video_code.replace(/^https:\/\/youtu\.be\//, '');
+                
+                var video_src = 'https://www.youtube.com/embed/' + video_code + video_start
+            } else if(x_1 === 'kakaotv') {
+                video_code = video_code.replace(/^https:\/\/tv\.kakao\.com\/channel\/9262\/cliplink\//, '');
+                video_code = video_code.replace(/^http:\/\/tv\.kakao\.com\/v\//, '');
+                
+                var video_src = 'https://tv.kakao.com/embed/player/cliplink/' + video_code +'?service=kakao_tv'
+            } else {
+                var video_src = 'https://embed.nicovideo.jp/watch/' + video_code
+            }
+            
+            return '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + '" frameborder="0" allowfullscreen></iframe>';
+        } else if(x_1 === 'anchor') {
+            return '<span id="' + x_2 + '"></span>';
+        } else {
+            return '<macro_start>' + x_1 + '(' + x_2 + ')<macro_end>';
+        }
+    });
+    
+    data = data.replace(/\[([^[*()\]]+)\]/g, function(x, x_1) {
+        x_1 = x_1.toLowerCase();
+        if(x_1 === 'date') {
+            return do_return_date();
+        } else if(x_1 === 'clearfix') {
+            return '<div style="clear:both"></div>';
+        } else if(x_1 === 'br') { 
+            return '<br>';
+        } else {
+            return '<macro_start>' + x_1 + '<macro_end>';
+        }
+    });
+    
+    data = data.replace(/<macro_start>/g, '[');
+    data = data.replace(/<macro_end>/g, ']');
+    
+    return data;
+}
+
+// Main
 function do_onmark_render(name_id, name_include = '', name_doc = '') {
     var data = document.getElementById(name_id).innerHTML;
     var data_js = '';
@@ -144,6 +280,9 @@ function do_onmark_render(name_id, name_include = '', name_doc = '') {
     var var_data = do_onmark_link_render(data, data_js, name_doc, name_include);
     data = var_data[0];
     data_js = var_data[1];
+    
+    data = do_onmark_macro_render(data);
+    data = do_onmark_footnote_render(data, name_include);
     
     data = data.replace(/^(<br>| )+/, '');
     data = data.replace(/(<br>| )+$/, '');
