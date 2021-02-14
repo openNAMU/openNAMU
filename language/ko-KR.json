@@ -271,7 +271,7 @@
     "other": "기타",
     "edit": "편집",
     "open_discussion_list": "열린 토론 목록",
-    "user_head_warring": "비로그인시 브라우저를 닫거나 로그인시 사용자가 지정한 <HEAD>는 삭제됩니다.",
+    "user_head_warring": "비로그인시 브라우저를 닫거나 로그인시 사용자가 지정한 정보는 삭제됩니다.",
     "email_required": "이메일 필요",
     "1_day": "1일",
     "regex_error": "정규표현식에 오류가 있습니다.",

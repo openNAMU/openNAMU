@@ -38,14 +38,12 @@ def login_2fa_2(conn):
             if pw_check_d != 1:
                 return re_error('/error/10')
 
-        flask.session['head'] = flask.session['b_head']
         flask.session['id'] = user_id
 
         ua_plus(user_id, ip, user_agent, get_time())
         conn.commit()
 
         flask.session.pop('b_id', None)
-        flask.session.pop('b_head', None)
 
         return redirect('/user')
     else:

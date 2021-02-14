@@ -42,18 +42,14 @@ def user_setting_2(conn, server_init):
         else:
             curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
             data = curs.fetchall()
-            if data:
-                email = data[0][0]
-            else:
-                email = '-'
+            email = data[0][0] if data else '-'
 
             div2 = load_skin('', 0, 1)
             div3 = ''
 
             curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip_check()])
             data = curs.fetchall()
-            if not data:
-                data = [['default']]
+            data = [['default']] if not data else data
 
             for lang_data in support_language:
                 see_data = lang_data if lang_data != 'default' else load_lang('default')
@@ -105,4 +101,50 @@ def user_setting_2(conn, server_init):
                 menu = [['user', load_lang('return')]]
             ))
     else:
-        return redirect('/login')
+        if flask.request.method == 'POST':
+            flask.session['skin'] = flask.request.form.get('skin', '')
+            flask.session['lang'] = flask.request.form.get('lang', '')
+            
+            return redirect('/change')
+        else:
+            div2 = load_skin(('' if not 'skin' in flask.session else flask.session['skin']), 0, 1)
+            div3 = ''
+
+            data = [['default']] if not 'lang' in flask.session else [[flask.session['lang']]]
+
+            for lang_data in support_language:
+                see_data = lang_data if lang_data != 'default' else load_lang('default')
+                
+                if data and data[0][0] == lang_data:
+                    div3 = '<option value="' + lang_data + '">' + see_data + '</option>' + div3
+                else:
+                    div3 += '<option value="' + lang_data + '">' + see_data + '</option>'
+                    
+            http_warring = '' + \
+                '<hr class="main_hr">' + \
+                '<span>' + load_lang('http_warring') + '</span>' + \
+                '<hr class="main_hr">' + \
+                '<span>' + load_lang('user_head_warring') + '</span>' + \
+            ''
+            
+            return easy_minify(flask.render_template(skin_check(),
+                imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
+                data = '''
+                    <form method="post">
+                        <span>''' + load_lang('id') + ''' : ''' + ip_pas(ip) + '''</span>
+                        <hr class="main_hr">
+                        <h2>''' + load_lang('main') + '''</h2>
+                        <span>''' + load_lang('skin') + '''</span>
+                        <hr class="main_hr">
+                        <select name="skin">''' + div2 + '''</select>
+                        <hr class="main_hr">
+                        <span>''' + load_lang('language') + '''</span>
+                        <hr class="main_hr">
+                        <select name="lang">''' + div3 + '''</select>
+                        <hr class="main_hr">
+                        <button type="submit">''' + load_lang('save') + '''</button>
+                        ''' + http_warring + '''
+                    </form>
+                ''',
+                menu = [['user', load_lang('return')]]
+            ))
