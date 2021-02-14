@@ -4,6 +4,8 @@ import hashlib
 import flask
 import re
 
+set_data = ''
+
 def get_time():
     return str(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
 

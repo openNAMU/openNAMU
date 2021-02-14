@@ -5,10 +5,7 @@ def list_title_index_2(conn):
 
     page = int(number_check(flask.request.args.get('page', '1')))
     num = int(number_check(flask.request.args.get('num', '100')))
-    if page * num > 0:
-        sql_num = page * num - num
-    else:
-        sql_num = 0
+    sql_num = (page * num - num) if page * num > 0 else 0
 
     all_list = sql_num + 1
 
@@ -20,7 +17,7 @@ def list_title_index_2(conn):
     curs.execute(db_change("select title from data order by title asc limit ?, ?"), [sql_num, num])
     title_list = curs.fetchall()
     if title_list:
-        data += '<hr class=\"main_hr\"><ul>'
+        data += '<hr class="main_hr"><ul class="inside_ul">'
 
     for list_data in title_list:
         data += '<li>' + str(all_list) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'
@@ -30,7 +27,8 @@ def list_title_index_2(conn):
         count_end = []
 
         curs.execute(db_change('select data from other where name = "count_all_title"'))
-        if int(curs.fetchall()[0][0]) < 30000:
+        all_title = curs.fetchall()
+        if int(all_title[0][0]) < 30000:
             curs.execute(db_change("select count(*) from data"))
             count = curs.fetchall()
             if count:
@@ -51,12 +49,12 @@ def list_title_index_2(conn):
 
             data += '''
                 </ul>
-                <hr class=\"main_hr\">
-                <ul>
+                <hr class="main_hr">
+                <ul class="inside_ul">
                     <li>''' + load_lang('all') + ' : ' + str(count_end[0]) + '''</li>
                 </ul>
-                <hr class=\"main_hr\">
-                <ul>
+                <hr class="main_hr">
+                <ul class="inside_ul">
                     <li>''' + load_lang('category') + ' : ' + str(count_end[1]) + '''</li>
                     <li>''' + load_lang('user_document') + ' : ' + str(count_end[2]) + '''</li>
                     <li>''' + load_lang('file') + ' : ' + str(count_end[3]) + '''</li>
@@ -65,8 +63,8 @@ def list_title_index_2(conn):
         else:
             data += '''
                 </ul>
-                <hr class=\"main_hr\">
-                <ul>
+                <hr class="main_hr">
+                <ul class="inside_ul">
                     <li>''' + load_lang('all') + ' : ' + all_title[0][0] + '''</li>
             '''
 

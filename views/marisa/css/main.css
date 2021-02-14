@@ -333,14 +333,6 @@ textarea, input {
     color: white;
 }
 
-blockquote {
-    padding: 1em calc(2em + 25px) 1em 1em;
-    margin: 1em 0em 0em;
-    background-color: #eeeeee;
-    border: 1px dashed #ccc;
-    border-left: 5px solid black;
-}
-
 #out_link::before {
     content: '🅴';
     font-weight: lighter;

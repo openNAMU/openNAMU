@@ -118,11 +118,11 @@ if set_data['db_type'] == 'mysql':
     curs = conn.cursor()
 
     try:
-        curs.execute(db_change('create database ? default character set utf8mb4;')%pymysql.escape_string(set_data['db']))
+        curs.execute(db_change('create database ? default character set utf8mb4;'), set_data['db'])
     except:
         pass
 
-    curs.execute(db_change('use ?')%pymysql.escape_string(set_data['db']))
+    conn.select_db(set_data['db'])
 else:
     conn = sqlite3.connect(set_data['db'] + '.db')
     curs = conn.cursor()
@@ -131,7 +131,7 @@ load_conn(conn)
 
 # DB init
 create_data = {}
-create_data['data'] = ['title', 'data']
+create_data['data'] = ['title', 'data', 'type']
 create_data['cache_data'] = ['title', 'data', 'id']
 create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
 create_data['rc'] = ['id', 'title', 'date', 'type']
@@ -603,6 +603,10 @@ def func_upload():
 @app.route('/user')
 def user_info():
     return user_info_2(conn)
+
+@app.route('/<regex("long_page|short_page"):tool>')
+def list_long_page(tool = 'long_page'):
+    return list_long_page_2(conn, tool)
 
 @app.route('/<regex("watch_list|star_doc"):tool>')
 def watch_list(tool = 'star_doc'):

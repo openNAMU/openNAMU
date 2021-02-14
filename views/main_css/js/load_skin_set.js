@@ -74,6 +74,13 @@ function main_css_get_post() {
         document.cookie = 'main_css_font_size=;';
     }
 
+    check = document.getElementById('main_css_monaco');
+    if(check.checked) {
+        document.cookie = 'main_css_monaco=1;';
+    } else {
+        document.cookie = 'main_css_monaco=0;';
+    }
+
     history.go(0);
 }
 
@@ -156,7 +163,13 @@ function main_css_load_lang(name) {
             "all_off" : "Always off",
             "set_font_size" : "Set font size",
             "change_to_link" : "Change to link",
-            "font_size" : "font size"
+            "font_size" : "font size",
+            "editor" : "Editor",
+            "main" : "Main",
+            "clipboard_upload" : "Clipboard upload",
+            "only_korean" : "Supported in korean only",
+            "except_ie" : "Not supported for Internet Explorer",
+            "use_monaco" : "Use monaco editor"
         }, "ko-KR" : {
             "default" : "기본값",
             "change_to_normal" : "일반 텍스트로 변경",
@@ -179,7 +192,13 @@ function main_css_load_lang(name) {
             "all_off" : "항상 끔",
             "set_font_size" : "글자 크기 설정",
             "change_to_link" : "링크로 변경",
-            "font_size" : "글자 크기"
+            "font_size" : "글자 크기",
+            "editor" : "편집기",
+            "main" : "메인",
+            "clipboard_upload" : "클립보드 파일 올리기",
+            "only_korean" : "한국어로만 지원됨",
+            "except_ie" : "인터넷 익스플로러에선 지원되지 않음",
+            "use_monaco" : "모나코 에디터 사용"
         }
     }
 
@@ -346,6 +365,15 @@ function main_css_skin_set() {
         set_data["font_size"] = '';
     }
 
+    if(
+        document.cookie.match(main_css_regex_data('main_css_monaco')) &&
+        document.cookie.match(main_css_regex_data('main_css_monaco'))[1] === '1'
+    ) {
+        set_data["monaco"] = "checked";
+    } else {
+        set_data["monaco"] = "";
+    }
+
     document.getElementById("main_skin_set").innerHTML = ' \
         <h2>1. ' + main_css_load_lang('renderer') + '</h2> \
         <h3>1.1. ' + main_css_load_lang('strike') + '</h3> \
@@ -370,15 +398,84 @@ function main_css_skin_set() {
         </select> \
         <h3>1.6. ' + main_css_load_lang('other') + '</h3> \
         <input ' + set_data["include"] + ' type="checkbox" id="main_css_include" value="include"> ' + main_css_load_lang('include_link') + ' \
-        <hr class="main_hr"> \
-        <input ' + set_data["image_paste"] + ' type="checkbox" id="main_css_image_paste" value="image_paste"> 클립보드 이미지 업로드 (ko-KR) \
         <h3>1.7. ' + main_css_load_lang('set_toc') + '</h3> \
         <select id="main_css_toc"> \
             ' + set_data["toc"] + ' \
         </select> \
         <h3>1.8. ' + main_css_load_lang('set_font_size') + '</h3> \
-        <input id="main_css_font_size" placeholder="' + main_css_load_lang('font_size') + '" value="' + set_data["font_size"] + '"> \
+        <input id="main_css_font_size" placeholder="' + main_css_load_lang('font_size') + ' (EX : 11)" value="' + set_data["font_size"] + '"> \
+        <h2>2. ' + main_css_load_lang('editor') + '</h2> \
+        <h3>2.1. ' + main_css_load_lang('main') + '</h3> \
+        <input ' + set_data["monaco"] + ' type="checkbox" id="main_css_monaco" value="monaco"> ' + main_css_load_lang('use_monaco') + '<sup>(1)</sup> \
+        <hr class="main_hr"> \
+        <input ' + set_data["image_paste"] + ' type="checkbox" id="main_css_image_paste" value="image_paste"> ' + 
+            main_css_load_lang('clipboard_upload') + '<sup>(ko-KR)</sup><sup>(1)</sup> \
         <hr class="main_hr"> \
         <button onclick="main_css_get_post();">' + main_css_load_lang('save') + '</button> \
+        <hr class="main_hr"> \
+        <ul id="footnote_data"> \
+            <li><a id="note_1_end" href="#note_1">(1)</a> ' + main_css_load_lang('except_ie') + '</li> \
+            <li><a href="#note_1_1">(1.1)</a></li> \
+            <li><a id="note_2_end" href="#note_2">(ko-KR)</a> ' + main_css_load_lang('only_korean') + '</li> \
+        </ul> \
     ';
+
+    // 목차 구현
+    var toc_all_data = '<div id="toc"><span id="toc_title">TOC</span><br>';
+    var skin_set_data = document.getElementById("main_skin_set").innerHTML;
+    var split_toc;
+    var toc_data;
+    i = 1;
+    while(1) {
+        toc_data = skin_set_data.match(/<h[1-6]>([^<>]+)<\/h[1-6]>/);
+        if(toc_data) {
+            split_toc = toc_data[1].match(/^([^ ]+)(.+)/);
+            toc_all_data += '' + 
+                '<br>' +
+                '<span style="margin-left: ' + String(((toc_data[1].match(/\./g) || []).length - 1) * 10) + 'px;">' +
+                    '<a href="#toc_' + String(i) + '">' + split_toc[1] + '</a>' + split_toc[2] +
+                '</span>' +
+            '';
+
+            skin_set_data = skin_set_data.replace(
+                /<(h[1-6])>([^<>]+)<\/h[1-6]>/, 
+                '<$1 id="toc_' + String(i) + '"><a href="#toc">' + split_toc[1] + '</a>' + split_toc[2] + '</$1>'
+            );
+            i += 1;
+        } else {
+            break;
+        }
+    }
+    document.getElementById("main_skin_set").innerHTML = toc_all_data + '</div>' + skin_set_data;
+
+    // 각주 구현
+    skin_set_data = document.getElementById("main_skin_set").innerHTML;
+    var note_list = {};
+    var plus_note;
+    i = 1;
+    while(1) {
+        toc_data = skin_set_data.match(/<sup>([^<>]+)<\/sup>/);
+        if(toc_data) {
+            if(!note_list[toc_data[1]]) {
+                note_list[toc_data[1]] = [String(i), 0];
+            } else {
+                note_list[toc_data[1]][1] += 1;
+            }
+
+            if(note_list[toc_data[1]][1] != 0) {
+                plus_note = '_' + String(note_list[toc_data[1]][1]);
+            } else {
+                plus_note = '';
+            }
+            
+            skin_set_data = skin_set_data.replace(
+                /<sup>([^<>]+)<\/sup>/, 
+                '<sup><a id="note_' + note_list[toc_data[1]][0] + plus_note + '" href="#note_' + note_list[toc_data[1]][0] + '_end">$1</a></sup>'
+            );
+            i += 1;
+        } else {
+            break;
+        }
+    }
+    document.getElementById("main_skin_set").innerHTML = skin_set_data;    
 }

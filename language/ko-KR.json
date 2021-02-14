@@ -271,7 +271,7 @@
     "other": "기타",
     "edit": "편집",
     "open_discussion_list": "열린 토론 목록",
-    "user_head_warring": "비로그인시 브라우저를 닫거나 로그인시 사용자가 지정한 <HEAD>는 삭제됩니다.",
+    "user_head_warring": "비로그인시 브라우저를 닫거나 로그인시 사용자가 지정한 정보는 삭제됩니다.",
     "email_required": "이메일 필요",
     "1_day": "1일",
     "regex_error": "정규표현식에 오류가 있습니다.",
@@ -397,5 +397,8 @@
     "upload_help" : "파일 올리기 문구",
     "upload_default" : "파일 기타란 기본값",
     "same_email_error" : "동일한 이메일을 사용하는 사용자가 있습니다.",
-    "input_email_error" : "입력 값에 문제가 있습니다."
+    "input_email_error" : "입력 값에 문제가 있습니다.",
+    "short_page" : "짧은 문서 목록",
+    "long_page" : "긴 문서 목록",
+    "ua_get_off" : "가입자 정보 수집 끄기"
 }

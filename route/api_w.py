@@ -15,7 +15,11 @@ def api_w_2(conn, name):
 
                 return flask.jsonify({ "title" : name, "data" : g_data[0], "js_data" : g_data[1] })
             else:
-                curs.execute(db_change("select data from data where title = ?"), [name])
+                rev = flask.request.args.get('num', '')
+                if rev != '':
+                    curs.execute(db_change("select data from history where title = ? and id = ?"), [name, rev])
+                else:
+                    curs.execute(db_change("select data from data where title = ?"), [name])
                 data = curs.fetchall()
                 if data:
                     json_data = data[0][0]

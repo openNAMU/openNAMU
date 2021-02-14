@@ -17,7 +17,7 @@ def view_xref_2(conn, name):
     else:
         div = '<a href="?change=1">(' + load_lang('normal') + ')</a><hr class="main_hr">'
 
-    div += '<ul>'
+    div += '<ul class="inside_ul">'
 
     if flask.request.args.get('change', '1') == '1':
         curs.execute(db_change("" + \

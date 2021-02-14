@@ -2,12 +2,8 @@ from .tool.func import *
 
 def api_skin_info_2(conn, name):
     curs = conn.cursor()
-
-    if name == '':
-        name = skin_check()
-    else:
-        name = './views/' + name + '/index.html'
-
+    name = skin_check() if name == '' else './views/' + name + '/index.html'
+    
     if not flask.request.args.get('all', None):
         json_address = re.sub(r"(((?!\.|\/).)+)\.html$", "info.json", name)
         try:
