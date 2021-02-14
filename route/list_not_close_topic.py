@@ -3,7 +3,7 @@ from .tool.func import *
 def list_not_close_topic_2(conn):
     curs = conn.cursor()
 
-    div = '<ul>'
+    div = '<ul class="inside_ul">'
 
     curs.execute(db_change('select title, sub, date, code from rd where stop != "O" order by date desc'))
     n_list = curs.fetchall()

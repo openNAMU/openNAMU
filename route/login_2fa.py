@@ -19,7 +19,7 @@ def login_2fa_2(conn):
         else:
             captcha_post('', 0)
 
-        agent = flask.request.headers.get('User-Agent')
+        user_agent = flask.request.headers.get('User-Agent', '')
         user_id = flask.session['b_id']
 
         curs.execute(db_change('select data from user_set where name = "2fa_pw" and id = ?'), [user_id])
@@ -38,19 +38,12 @@ def login_2fa_2(conn):
             if pw_check_d != 1:
                 return re_error('/error/10')
 
-        flask.session['head'] = flask.session['b_head']
         flask.session['id'] = user_id
 
-        curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [
-            user_id, 
-            ip, 
-            agent, 
-            get_time()
-        ])
+        ua_plus(user_id, ip, user_agent, get_time())
         conn.commit()
 
         flask.session.pop('b_id', None)
-        flask.session.pop('b_head', None)
 
         return redirect('/user')
     else:

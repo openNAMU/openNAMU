@@ -6,7 +6,7 @@ def list_user_2(conn):
     num = int(number_check(flask.request.args.get('num', '1')))
     sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
-    list_data = '<ul>'
+    list_data = '<ul class="inside_ul">'
 
     curs.execute(db_change("select id, date from user order by date desc limit ?, 50"), [sql_num])
     user_list = curs.fetchall()

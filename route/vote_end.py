@@ -28,7 +28,7 @@ def vote_end_2(conn, num):
     vote_data = re.findall(r'([^\n]+)', data_list[0][2].replace('\r\n', '\n'))
     for i in range(0, len(vote_data)):
         data += '<h2>' + vote_data[i] + '</h2>'
-        data += '<ul>'
+        data += '<ul class="inside_ul">'
         
         curs.execute(db_change('select user from vote where id = ? and user != "" and data = ?'), [num, str(i)])
         data_list_2 = curs.fetchall()

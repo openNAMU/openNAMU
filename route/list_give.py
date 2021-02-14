@@ -3,7 +3,7 @@ from .tool.func import *
 def list_give_2(conn):
     curs = conn.cursor()
 
-    list_data = '<ul>'
+    list_data = '<ul class="inside_ul">'
     back = ''
 
     curs.execute(db_change("select distinct name from alist order by name asc"))

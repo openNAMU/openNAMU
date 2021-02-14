@@ -13,7 +13,7 @@ def list_old_page_2(conn):
     if int(curs.fetchall()[0][0]) > 30000:
         return re_error('/error/25')
 
-    div = '<ul>'
+    div = '<ul class="inside_ul">'
 
     curs.execute(db_change('' + \
         'select title, date from history h ' + \

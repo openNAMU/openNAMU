@@ -9,7 +9,7 @@ def list_image_file_2(conn):
     else:
         sql_num = 0
 
-    list_data = '<ul>'
+    list_data = '<ul class="inside_ul">'
     back = ''
 
     curs.execute(db_change("select title from data where title like 'file:%' limit ?, 50"), [sql_num])

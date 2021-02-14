@@ -24,7 +24,10 @@ def main_views_2(conn, name):
             if mime_type in image_type:
                 mime_type = 'image/' + mime_type
             else:
-                mime_type = 'text/' + mime_type
+                if mime_type == 'js':
+                    mime_type = 'text/javascript'
+                else:
+                    mime_type = 'text/' + mime_type
         else:
             mime_type = 'text/plain'
 

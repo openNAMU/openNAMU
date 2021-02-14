@@ -28,7 +28,7 @@ def setting_2(conn, num, db_set):
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
-            data = '<h2>' + load_lang('list') + '</h2><ul>' + li_data + '</ul>',
+            data = '<h2>' + load_lang('list') + '</h2><ul class="inside_ul">' + li_data + '</ul>',
             menu = [['manager', load_lang('return')]]
         ))
     elif num == 1:
@@ -50,7 +50,8 @@ def setting_2(conn, num, db_set):
             19 : 'slow_edit',
             20 : 'requires_approval',
             21 : 'backup_where',
-            22 : 'domain'
+            22 : 'domain',
+            23 : 'ua_get'
         }
         n_list = {
             0 : 'Wiki',
@@ -70,7 +71,8 @@ def setting_2(conn, num, db_set):
             19 : '0',
             20 : '',
             21 : '',
-            22 : flask.request.host_url
+            22 : flask.request.host_url,
+            23 : ''
         }
 
         if flask.request.method == 'POST':
@@ -108,16 +110,18 @@ def setting_2(conn, num, db_set):
                 else:
                     acl_div[0] += '<option value="' + acl_data + '">' + acl_data + '</option>'
 
-            check_box_div = ['', '', '', '']
-            for i in range(0, 4):
+            check_box_div = ['', '', '', '', '']
+            for i in range(0, len(check_box_div)):
                 if i == 0:
                     acl_num = 7
                 elif i == 1:
                     acl_num = 8
                 elif i == 2:
                     acl_num = 13
-                else:
+                elif i == 3:
                     acl_num = 20
+                else:
+                    acl_num = 23
 
                 if d_list[acl_num]:
                     check_box_div[i] = 'checked="checked"'
@@ -130,10 +134,7 @@ def setting_2(conn, num, db_set):
                 else:
                     branch_div += '<option value="' + i + '">' + i + '</option>'
 
-            if db_set != 'sqlite':
-                sqlite_only = 'style="display:none;"'
-            else:
-                sqlite_only = ''
+            sqlite_only = 'style="display:none;"' if db_set != 'sqlite' else ''
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('main_setting'), wiki_set(), custom(), other2([0, 0])],
@@ -178,6 +179,8 @@ def setting_2(conn, num, db_set):
                         <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">(' + load_lang('smtp_setting_required') + ''')</a>
                         <hr class="main_hr">
                         <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + load_lang('requires_approval') + '''
+                        <hr class="main_hr">
+                        <input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + load_lang('ua_get_off') + '''
                         <hr class="main_hr">
                         <span>''' + load_lang('wiki_host') + '''</span>
                         <hr class="main_hr">
@@ -310,7 +313,7 @@ def setting_2(conn, num, db_set):
                         <hr class="main_hr">
                         <textarea rows="3" name="''' + i_list[11] + '''">''' + html.escape(d_list[11]) + '''</textarea>
                         <hr class="main_hr">
-                        <span>''' + load_lang('approval_question') + '''</span><sup><a href="#rfn-1" id="fn-1">(1)</a></sup>
+                        <span>''' + load_lang('approval_question') + '''</span><sup><a href="#note_1_end" id="note_1">(1)</a></sup>
                         <hr class="main_hr">
                         <textarea rows="3" name="''' + i_list[12] + '''">''' + html.escape(d_list[12]) + '''</textarea>
                         <hr class="main_hr">
@@ -328,8 +331,8 @@ def setting_2(conn, num, db_set):
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         <hr class="main_hr">
-                        <ul>
-                            <li><a href="#fn-1" id="rfn-1">(1)</a> <span>''' + load_lang('approval_question_visible_only_when_approval_on') + '''</span></li>
+                        <ul id="footnote_data">
+                            <li><a href="#note_1" id="note_1_end">(1)</a> <span>''' + load_lang('approval_question_visible_only_when_approval_on') + '''</span></li>
                         </ul>
                     </form>
                 ''',

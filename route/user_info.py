@@ -25,6 +25,7 @@ def user_info_2(conn):
         plus = '''
             <li><a href="/login">''' + load_lang('login') + '''</a></li>
             <li><a href="/register">''' + load_lang('register') + '''</a></li>
+            <li><a href="/change">''' + load_lang('user_setting') + '''</a></li>
         '''
         plus3 = ''
 
@@ -41,18 +42,18 @@ def user_info_2(conn):
             <script>load_user_info("''' + ip + '''");</script>
             <br>
             <h2>''' + load_lang('login') + '''</h2>
-            <ul>
+            <ul class="inside_ul">
                 ''' + plus + '''
             </ul>
             <br>
             <h2>''' + load_lang('tool') + '''</h2>
-            <ul>
+            <ul class="inside_ul">
                 ''' + plus3 + '''
                 <li><a href="/custom_head">''' + load_lang('user_head') + '''</a></li>
             </ul>
             <br>
             <h2>''' + load_lang('other') + '''</h2>
-            <ul>
+            <ul class="inside_ul">
             ''' + plus2 + '''
             <li>
                 <a href="/count">''' + load_lang('count') + '''</a>

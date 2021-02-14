@@ -3,7 +3,7 @@ from .tool.func import *
 def view_down_2(conn, name):
     curs = conn.cursor()
 
-    div = '<ul>'
+    div = '<ul class="inside_ul">'
 
     curs.execute(db_change("select title from data where title like ?"), [name + '/%'])
     for data in curs.fetchall():

@@ -50,9 +50,9 @@ def edit_delete_2(conn, name, app_var):
             )
             if os.path.exists(file_directory):
                 os.remove(file_directory)
-
-        curs.execute(db_change('select data from other where name = "count_all_title"'))
-        curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) - 1)])
+        else:
+            curs.execute(db_change('select data from other where name = "count_all_title"'))
+            curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) - 1)])
 
         return redirect('/w/' + url_pas(name))
     else:

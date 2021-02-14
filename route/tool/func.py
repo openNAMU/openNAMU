@@ -191,6 +191,8 @@ def render_set(title = '', data = '', num = 0, s_data = 0, include = None, acl =
         return data
     else:
         if data != None:
+            darkmode = flask.request.cookies.get('main_css_darkmode', '0')
+            
             return render_do(title, data, num, include)
         else:
             return 'HTTP Request 404'
@@ -333,7 +335,7 @@ def set_init():
         for i in [['smtp_server', 'smtp.gmail.com'], ['smtp_port', '587'], ['smtp_security', 'starttls']]:
             curs.execute(db_change("insert into other (name, data) values (?, ?)"), [i[0], i[1]])
 
-def pw_encode(data, data2 = '', type_d = ''):
+def pw_encode(data, type_d = ''):
     if type_d == '':
         curs.execute(db_change('select data from other where name = "encode"'))
         set_data = curs.fetchall()
@@ -360,15 +362,14 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
     else:
         set_data = db_data[0][0]
 
-    if pw_encode(data = data, type_d = set_data) == data2:
-        re_data = 1
-    else:
-        re_data = 0
-
+    re_data = 1 if pw_encode(data, set_data) == data2 else 0
     if db_data[0][0] != set_data and re_data == 1 and id_d != '':
         curs.execute(db_change("update user set pw = ?, encode = ? where id = ?"), [pw_encode(data), db_data[0][0], id_d])
 
     return re_data
+
+def add_alarm(who, context):
+    curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [who, context, get_time()])
 
 def captcha_get():
     data = ''
@@ -426,13 +427,33 @@ def captcha_post(re_data, num = 1):
     else:
         pass
 
+def ua_plus(id, ip, ua, time):
+    curs.execute(db_change("select data from other where name = 'ua_get'"))
+    rep_data = curs.fetchall()
+    if rep_data and rep_data[0][0] != '':
+        pass
+    else:
+        curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [id, ip, ua, time])
+
 def load_lang(data, num = 2, safe = 0):
     global global_lang
 
-    if num == 1:
-        curs.execute(db_change("select data from other where name = 'language'"))
-        rep_data = curs.fetchall()
-        if rep_data:
+    for i in range(0, 2):
+        if i == 0:
+            ip = ip_check()
+            if ip_or_user(ip) == 0:
+                curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip])
+                rep_data = curs.fetchall()
+            else:
+                if 'lang' in flask.session:
+                    rep_data = [[flask.session['lang']]]
+                else:
+                    continue
+        else:
+            curs.execute(db_change("select data from other where name = 'language'"))
+            rep_data = curs.fetchall()
+        
+        if rep_data and rep_data[0][0] != '' and rep_data[0][0] != 'default':
             try:
                 if not rep_data[0][0] in global_lang:
                     lang = json.loads(open(os.path.join('language', rep_data[0][0] + '.json'), encoding='utf8').read())
@@ -440,33 +461,16 @@ def load_lang(data, num = 2, safe = 0):
                 else:
                     lang = global_lang[rep_data[0][0]]
             except:
-                return html.escape(data + ' (' + rep_data[0][0] + ')')
+                continue
 
             if data in lang:
                 return lang[data] if safe == 1 else html.escape(lang[data])
             else:
-                return html.escape(data + ' (' + rep_data[0][0] + ')')
+                continue
         else:
-            return html.escape(data + ' (' + rep_data[0][0] + ')')
-    else:
-        curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip_check()])
-        rep_data = curs.fetchall()
-        if rep_data and rep_data != '' and rep_data != 'default':
-            try:
-                if not rep_data[0][0] in global_lang:
-                    lang = json.loads(open(os.path.join('language', rep_data[0][0] + '.json'), encoding='utf8').read())
-                    global_lang[rep_data[0][0]] = lang
-                else:
-                    lang = global_lang[rep_data[0][0]]
-            except:
-                return load_lang(data, 1, safe)
-
-            if data in lang:
-                return lang[data] if safe == 1 else html.escape(lang[data])
-            else:
-                return load_lang(data, 1, safe)
-        else:
-            return load_lang(data, 1, safe)
+            continue
+    
+    return html.escape(data + ' (' + rep_data[0][0] + ')')
 
 def ip_or_user(data = ''):
     if data == '':
@@ -515,18 +519,27 @@ def ip_warring():
 
 def skin_check(set_n = 0):
     skin_list = load_skin('marisa', 1)
-
-    curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip_check()])
-    skin_exist = curs.fetchall()
-    if skin_exist and skin_exist[0][0] != '' and skin_exist[0][0] in skin_list:
-        skin = skin_exist[0][0]
-    else:
-        curs.execute(db_change('select data from other where name = "skin"'))
+    skin = skin_list[0]
+    check_list = []
+    ip = ip_check()
+    
+    if ip_or_user(ip) == 0:
+        curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
         skin_exist = curs.fetchall()
-        if skin_exist and skin_exist[0][0] != '' and skin_exist[0][0] in skin_list:
-            skin = skin_exist[0][0]
-        else:
-            skin = skin_list[0]
+        check_list += skin_exist
+    else:
+        if 'skin' in flask.session:
+            check_list += [[flask.session['skin']]]
+            
+    curs.execute(db_change('select data from other where name = "skin"'))
+    skin_exist = curs.fetchall()
+    check_list += skin_exist
+    
+    for i in check_list:
+        if i[0] != '' and i[0] in skin_list:
+            skin = i[0]
+            
+            break
 
     return './views/' + skin + '/index.html' if set_n == 0 else skin
 
@@ -554,7 +567,7 @@ def next_fix(link, num, page, end = 50):
 
 def other2(data):
     global req_list
-    main_css_ver = '56'
+    main_css_ver = '59'
     data += ['' for _ in range(0, 3 - len(data))]
 
     if req_list == '':
@@ -577,8 +590,7 @@ def other2(data):
                 integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4"
                 crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.2/build/highlight.min.js"></script>
-        <script>window.addEventListener('DOMContentLoaded', function() { main_css_skin_load(); });</script>
-    ''' + req_list] + data[2:]
+    ''' + req_list + '<script>window.addEventListener(\'DOMContentLoaded\', main_css_skin_load);</script>'] + data[2:]
 
     return data
 
@@ -641,6 +653,8 @@ def wiki_set(num = 1):
         curs.execute(db_change('select data from other where name = "upload"'))
         db_data = curs.fetchall()
         data_list = db_data[0][0] if db_data and db_data[0][0] != '' else '2'
+    else:
+        data_list = ''
 
     return data_list
 
@@ -734,13 +748,15 @@ def ip_pas(raw_ip, type_d = 0):
     return ip if return_ip == 1 else end_ip
 
 def custom():
-    user_head = flask.session['head'] if 'head' in flask.session else ''
-
     ip = ip_check()
     if ip_or_user(ip) == 0:
         user_icon = 1
         user_name = ip
 
+        curs.execute(db_change("select data from user_set where id = ? and name = 'custom_css'"), [ip])
+        user_head = curs.fetchall()
+        user_head = user_head[0][0] if user_head else ''
+        
         curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
         email = curs.fetchall()
         email = email[0][0] if email else ''
@@ -770,6 +786,7 @@ def custom():
         user_admin = '0'
         user_acl_list = '0'
         user_notice = '0'
+        user_head = flask.session['head'] if 'head' in flask.session else ''
 
     curs.execute(db_change("select title from rd where title = ? and stop = ''"), ['user:' + ip])
     user_topic = '1' if curs.fetchall() else '0'
@@ -1200,7 +1217,7 @@ def edit_filter_do(data):
     return 0
 
 def redirect(data = '/'):
-    return flask.redirect(data)
+    return '<script>window.location.href = "' + data.replace('"', '\\"') + '";</script>'
 
 def get_acl_list(type_d = 'normal'):
     if type_d == 'user':
@@ -1215,7 +1232,7 @@ def re_error(data):
         if ban_check() == 1:
             end = '<div id="get_user_info"></div><script>load_user_info("' + ip_check() + '");</script>'
         else:
-            end = '<ul><li>' + load_lang('authority_error') + '</li></ul>'
+            end = '<ul class="inside_ul"><li>' + load_lang('authority_error') + '</li></ul>'
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
@@ -1304,7 +1321,7 @@ def re_error(data):
                 data = '' + \
                     '<div id="main_skin_set">' + \
                         '<h2>' + load_lang('error') + '</h2>' + \
-                        '<ul>' + \
+                        '<ul class="inside_ul">' + \
                             '<li>' + data + ' <a href="/main_skin_set">(' + load_lang('main_skin_set') + ')</a></li>' + \
                         '</ul>' + \
                     '</div>' + \
@@ -1314,6 +1331,6 @@ def re_error(data):
         else:
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('error'), wiki_set(1), custom(), other2([0, 0])],
-                data = '<h2>' + load_lang('error') + '</h2><ul><li>' + data + '</li></ul>',
+                data = '<h2>' + load_lang('error') + '</h2><ul class="inside_ul"><li>' + data + '</li></ul>',
                 menu = 0
             )), 400

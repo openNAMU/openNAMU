@@ -3,14 +3,12 @@ from .tool.func import *
 def login_check_key_2(conn, tool):
     curs = conn.cursor()
 
-    # 난잡한 코드 정리 필요
     if  flask.request.method == 'POST' or \
         ('c_key' in flask.session and flask.session['c_key'] == 'email_pass'):
         re_set_list = ['c_id', 'c_pw', 'c_ans', 'c_que', 'c_key', 'c_type', 'c_email']
         ip = ip_check()
         input_key = flask.request.form.get('key', '')
         user_agent = flask.request.headers.get('User-Agent', '')
-
 
         if  'c_type' in flask.session and \
             flask.session['c_type'] == 'pass_find' and \
@@ -51,14 +49,14 @@ def login_check_key_2(conn, tool):
 
                 curs.execute(db_change("select id from user where id = ?"), [flask.session['c_id']])
                 if curs.fetchall():
-                    for i in re_set_lire:
+                    for i in re_set_list:
                         flask.session.pop(i, None)
 
                     return re_error('/error/6')
             
                 curs.execute(db_change("select id from user_application where id = ?"), [flask.session['c_id']])
                 if curs.fetchall():
-                    for i in re_set_lire:
+                    for i in re_set_list:
                         flask.session.pop(i, None)
 
                     return re_error('/error/6')
@@ -101,12 +99,7 @@ def login_check_key_2(conn, tool):
                     flask.session['c_id'],
                     flask.session['c_email']
                 ])
-                curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [
-                    flask.session['c_id'],
-                    ip,
-                    user_agent,
-                    get_time()
-                ])
+                ua_plus(flask.session['c_id'], ip, user_agent, get_time())
 
                 flask.session['id'] = flask.session['c_id']
                 flask.session['head'] = ''

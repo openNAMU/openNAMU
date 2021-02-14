@@ -8,16 +8,20 @@ def delete_admin_group_2(conn, name):
     
     if flask.request.method == 'POST':
         admin_check(None, 'alist del ' + name)
+
         curs.execute(db_change("delete from alist where name = ?"), [name])
+        curs.execute(db_change("update user set acl = 'user' where acl = ?"), [name])
+
+        conn.commit()
 
         return redirect('/give_log')
-    
-    return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang("delete_admin_group"), wiki_set(), custom(), other2(['(' + name + ')', 0])],
-        data = '''
-            <form method=post>
-                <button type=submit>''' + load_lang('start') + '''</button>
-            </form>
-        ''',
-        menu = [['give_log', load_lang('return')]]
-    ))  
+    else:
+        return easy_minify(flask.render_template(skin_check(),
+            imp = [load_lang("delete_admin_group"), wiki_set(), custom(), other2(['(' + name + ')', 0])],
+            data = '''
+                <form method=post>
+                    <button type=submit>''' + load_lang('start') + '''</button>
+                </form>
+            ''',
+            menu = [['give_log', load_lang('return')]]
+        ))  

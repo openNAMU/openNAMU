@@ -401,17 +401,16 @@ def middle_parser(data):
                         ''
                         data = re.sub(
                             r'{{{#!folding ?((?:(?!\n).)*)\n?', '' + \
-                            '<div>' + \
-                                '<div style="display: inline-block;">' + \
-                                    '<b>' + \
-                                        '<a href="javascript:void(0);" ' + \
-                                            'onclick="do_open_folding(\'' + include_name + 'folding_' + str(folding_num) + '\');" ' + \
-                                            'id="get_' + include_name + 'folding_' + str(folding_num) + '">' + \
-                                        '</a>' + \
-                                    '</b>' + \
-                                '</div_2>' + \
-                                '<div id="' + include_name + 'folding_' + str(folding_num) + '" style="display: none;">' + \
-                                    '<div_1 style="">\n',
+                            '<div style="display: inline-block;">' + \
+                                '<b>' + \
+                                    '<a href="javascript:void(0);" ' + \
+                                        'onclick="do_open_folding(\'' + include_name + 'folding_' + str(folding_num) + '\');" ' + \
+                                        'id="get_' + include_name + 'folding_' + str(folding_num) + '">' + \
+                                    '</a>' + \
+                                '</b>' + \
+                            '</div_2>' + \
+                            '<div id="' + include_name + 'folding_' + str(folding_num) + '" style="display: none;">' + \
+                                '<div_1 style="">\n',
                             data,
                             1
                         )
@@ -449,7 +448,7 @@ def middle_parser(data):
                         middle_num -= 1
 
                     if middle_list[middle_num] == 'div_dd':
-                        data = middle_re.sub('</div_1></div_2></div_2>', data, 1)
+                        data = middle_re.sub('</div_1></div_2>', data, 1)
                     elif middle_list[middle_num] == 'pre':
                         data = middle_re.sub('</code></pre>', data, 1)
                     else:
@@ -470,8 +469,8 @@ def middle_parser(data):
                 if middle_num > 0:
                     middle_num -= 1
 
-                if middle_list[middle_num] == '2div':
-                    data += '</div_1></div_2></div_2>'
+                if middle_list[middle_num] == 'div_dd':
+                    data += '</div_1></div_2>'
                 elif middle_list[middle_num] == 'pre':
                     data += '</code></pre>'
                 else:
@@ -1042,7 +1041,6 @@ def namumark(conn, data, title, include_num):
                     main_link = category_re.sub('category:', main_link)
                     link_id = ''
 
-                    curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
                     if re.search(r'#blur', main_link):
                         link_id = ' hidden_link'
                         main_link = main_link.replace('#blur', '')
