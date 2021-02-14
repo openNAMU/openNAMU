@@ -25,6 +25,7 @@ def user_info_2(conn):
         plus = '''
             <li><a href="/login">''' + load_lang('login') + '''</a></li>
             <li><a href="/register">''' + load_lang('register') + '''</a></li>
+            <li><a href="/change">''' + load_lang('user_setting') + '''</a></li>
         '''
         plus3 = ''
 

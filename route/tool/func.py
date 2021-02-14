@@ -438,10 +438,22 @@ def ua_plus(id, ip, ua, time):
 def load_lang(data, num = 2, safe = 0):
     global global_lang
 
-    if num == 1:
-        curs.execute(db_change("select data from other where name = 'language'"))
-        rep_data = curs.fetchall()
-        if rep_data:
+    for i in range(0, 2):
+        if i == 0:
+            ip = ip_check()
+            if ip_or_user(ip) == 0:
+                curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip])
+                rep_data = curs.fetchall()
+            else:
+                if 'lang' in flask.session:
+                    rep_data = [[flask.session['lang']]]
+                else:
+                    continue
+        else:
+            curs.execute(db_change("select data from other where name = 'language'"))
+            rep_data = curs.fetchall()
+        
+        if rep_data and rep_data[0][0] != '' and rep_data[0][0] != 'default':
             try:
                 if not rep_data[0][0] in global_lang:
                     lang = json.loads(open(os.path.join('language', rep_data[0][0] + '.json'), encoding='utf8').read())
@@ -449,33 +461,16 @@ def load_lang(data, num = 2, safe = 0):
                 else:
                     lang = global_lang[rep_data[0][0]]
             except:
-                return html.escape(data + ' (' + rep_data[0][0] + ')')
+                continue
 
             if data in lang:
                 return lang[data] if safe == 1 else html.escape(lang[data])
             else:
-                return html.escape(data + ' (' + rep_data[0][0] + ')')
+                continue
         else:
-            return html.escape(data + ' (' + rep_data[0][0] + ')')
-    else:
-        curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip_check()])
-        rep_data = curs.fetchall()
-        if rep_data and rep_data != '' and rep_data != 'default':
-            try:
-                if not rep_data[0][0] in global_lang:
-                    lang = json.loads(open(os.path.join('language', rep_data[0][0] + '.json'), encoding='utf8').read())
-                    global_lang[rep_data[0][0]] = lang
-                else:
-                    lang = global_lang[rep_data[0][0]]
-            except:
-                return load_lang(data, 1, safe)
-
-            if data in lang:
-                return lang[data] if safe == 1 else html.escape(lang[data])
-            else:
-                return load_lang(data, 1, safe)
-        else:
-            return load_lang(data, 1, safe)
+            continue
+    
+    return html.escape(data + ' (' + rep_data[0][0] + ')')
 
 def ip_or_user(data = ''):
     if data == '':
@@ -524,18 +519,27 @@ def ip_warring():
 
 def skin_check(set_n = 0):
     skin_list = load_skin('marisa', 1)
-
-    curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip_check()])
-    skin_exist = curs.fetchall()
-    if skin_exist and skin_exist[0][0] != '' and skin_exist[0][0] in skin_list:
-        skin = skin_exist[0][0]
-    else:
-        curs.execute(db_change('select data from other where name = "skin"'))
+    skin = skin_list[0]
+    check_list = []
+    ip = ip_check()
+    
+    if ip_or_user(ip) == 0:
+        curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
         skin_exist = curs.fetchall()
-        if skin_exist and skin_exist[0][0] != '' and skin_exist[0][0] in skin_list:
-            skin = skin_exist[0][0]
-        else:
-            skin = skin_list[0]
+        check_list += skin_exist
+    else:
+        if 'skin' in flask.session:
+            check_list += [[flask.session['skin']]]
+            
+    curs.execute(db_change('select data from other where name = "skin"'))
+    skin_exist = curs.fetchall()
+    check_list += skin_exist
+    
+    for i in check_list:
+        if i[0] != '' and i[0] in skin_list:
+            skin = i[0]
+            
+            break
 
     return './views/' + skin + '/index.html' if set_n == 0 else skin
 
@@ -744,13 +748,15 @@ def ip_pas(raw_ip, type_d = 0):
     return ip if return_ip == 1 else end_ip
 
 def custom():
-    user_head = flask.session['head'] if 'head' in flask.session else ''
-
     ip = ip_check()
     if ip_or_user(ip) == 0:
         user_icon = 1
         user_name = ip
 
+        curs.execute(db_change("select data from user_set where id = ? and name = 'custom_css'"), [ip])
+        user_head = curs.fetchall()
+        user_head = user_head[0][0] if user_head else ''
+        
         curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
         email = curs.fetchall()
         email = email[0][0] if email else ''
@@ -780,6 +786,7 @@ def custom():
         user_admin = '0'
         user_acl_list = '0'
         user_notice = '0'
+        user_head = flask.session['head'] if 'head' in flask.session else ''
 
     curs.execute(db_change("select title from rd where title = ? and stop = ''"), ['user:' + ip])
     user_topic = '1' if curs.fetchall() else '0'
