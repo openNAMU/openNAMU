@@ -66,11 +66,6 @@ def user_setting_2(conn, server_init):
             curs.execute(db_change('select data from user_set where name = "2fa_pw" and id = ?'), [ip])
             fa_data_pw = curs.fetchall()
             fa_data_pw = load_lang('2fa_password_change') if fa_data_pw else load_lang('2fa_password')
-            
-            http_warring = '' + \
-                '<hr class="main_hr">' + \
-                '<span>' + load_lang('http_warring') + '</span>' + \
-            ''
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
@@ -95,7 +90,7 @@ def user_setting_2(conn, server_init):
                         <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
-                        ''' + http_warring + '''
+                        ''' + http_warring() + '''
                     </form>
                 ''',
                 menu = [['user', load_lang('return')]]
@@ -119,13 +114,6 @@ def user_setting_2(conn, server_init):
                     div3 = '<option value="' + lang_data + '">' + see_data + '</option>' + div3
                 else:
                     div3 += '<option value="' + lang_data + '">' + see_data + '</option>'
-                    
-            http_warring = '' + \
-                '<hr class="main_hr">' + \
-                '<span>' + load_lang('http_warring') + '</span>' + \
-                '<hr class="main_hr">' + \
-                '<span>' + load_lang('user_head_warring') + '</span>' + \
-            ''
             
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
@@ -143,7 +131,9 @@ def user_setting_2(conn, server_init):
                         <select name="lang">''' + div3 + '''</select>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
-                        ''' + http_warring + '''
+                        ''' + http_warring() + '''
+                        <hr class="main_hr">
+                        <span>''' + load_lang('user_head_warring') + '''</span>
                     </form>
                 ''',
                 menu = [['user', load_lang('return')]]

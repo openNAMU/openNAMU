@@ -90,7 +90,6 @@ def login_register_2(conn):
         data = curs.fetchall()
         contract = (data[0][0] + '<hr class="main_hr">') if data and data[0][0] != '' else ''
 
-        http_warring = '<hr class="main_hr"><span>' + load_lang('http_warring') + '</span>'
         approval_question = ''
         
         curs.execute(db_change('select data from other where name = "requires_approval"'))
@@ -123,7 +122,7 @@ def login_register_2(conn):
                     ''' + approval_question + '''
                     ''' + captcha_get() + '''
                     <button type="submit">''' + load_lang('save') + '''</button>
-                    ''' + http_warring + '''
+                    ''' + http_warrin() + '''
                 </form>
             ''',
             menu = [['user', load_lang('return')]]
