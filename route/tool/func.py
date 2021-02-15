@@ -77,6 +77,17 @@ def load_conn(data):
 
     load_conn2(data)
 
+def http_warring():
+    return '''
+        <div id="http_warring_text"></div>
+        <script>
+            if(window.location.protocol !== 'https:') {
+                document.getElementById('http_warring_text').innerHTML = "''' + load_lang('http_warring') + '''";
+                document.getElementById('http_warring_text').style.margin = "10px 0px 0px 0px";
+            }
+        </script>
+    '''
+    
 def send_email(who, title, data):
     try:
         curs.execute(db_change('' + \
