@@ -47,11 +47,6 @@ def login_2fa_2(conn):
 
         return redirect('/user')
     else:
-        http_warring = '' + \
-            '<hr class="main_hr">' + \
-            '<span>' + load_lang('http_warring') + '</span>' + \
-        ''
-
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
@@ -60,7 +55,7 @@ def login_2fa_2(conn):
                         <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>
-                        ''' + http_warring + '''
+                        ''' + http_warring() + '''
                     </form>
                     ''',
             menu = [['user', load_lang('return')]]
