@@ -173,14 +173,11 @@ body {
 
 @media (max-width: 768px) {
     table {
-    min-width: 100%;
-}
- .table_safe {
-    min-width: 100%;
-}
-}
-#origin {
-    display: none;
+        min-width: 100%;
+    }
+    .table_safe {
+        min-width: 100%;
+    }
 }
 
 .all_in_data {

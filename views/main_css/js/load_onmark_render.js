@@ -89,15 +89,35 @@ function do_onmark_heading_render(data) {
 
 function do_onmark_link_render(data, data_js, name_doc, name_include) {
     var link_num = 0;
+    var category_data = '';
+    var category_re = /^(분류|category):/i;
+    var file_re = /^(파일|file):/i;
     data = data.replace(/\[\[(((?!\]\]).)+)\]\]/g, function(x, x_1) {
         var link_split = x_1.split('|');
         var link_real = link_split[0];
         var link_out = link_split[1] ? link_split[1] : link_split[0];
+        var link_out_2 = link_split[1] ? link_split[1] : '';
         
         link_num += 1;
         var link_num_str = String(link_num - 1);
-        
-        if(link_real.match(/^http(s)?:\/\//)) {
+        if(link_real.match(file_re)) {
+            var file_name = link_real.replace(file_re, '');
+            console.log(file_name);
+            
+            return '';
+        } else if(link_real.match(category_re)) {
+            var category_link = link_real.replace(category_re, '');
+            
+            category_data = (category_data === '' ? '<div id="cate_all"><div id="cate">Category : ' : category_data);
+            category_data += '' +
+                '<a class="' + name_include + 'link_finder" ' +
+                    'href="/w/category:' + do_url_change(category_link) + '">' +
+                    category_link +
+                '</a> | ' +
+            ''
+            
+            return '';
+        } else if(link_real.match(/^http(s)?:\/\//)) {
             var i = 0;
             while(i < 2) {
                 if(i === 0) {
@@ -145,6 +165,8 @@ function do_onmark_link_render(data, data_js, name_doc, name_include) {
                         'href="">' + link_out + '</a>';
         }
     });
+    
+    data += (category_data === '' ? '' : (category_data.replace(/\| $/, '') + '</div></div>'))
     
     return [data, data_js];
 }
@@ -321,6 +343,8 @@ function do_onmark_middle_render(data, data_js, name_include) {
                 
                 data = data.replace(middle_re, '<span id="' + name_include + 'render_contect_' + String(html_n) + '">');
                 middle_stack.push('</span>');
+            } else if(middle_data[1] === '#!folding') {
+                                
             } else {
                 data = data.replace(middle_re, '<middle_start>' + middle_data[1]);   
             }
@@ -418,6 +442,7 @@ function do_onmark_render(test_mode = 1, name_id = '', name_include = '', name_d
         ).replace(/\n/g, '<br>') + '<br>';
     }
     var data_js = '';
+    var data_backlink = [];
     
     var var_data = do_onmark_nowiki_before_render(data, data_js, name_include);
     data = var_data[0];
