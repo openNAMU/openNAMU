@@ -372,8 +372,15 @@ function do_onmark_list_render(data) {
 }
 
 // Main
-function do_onmark_render(name_id, name_include = '', name_doc = '') {
-    var data = '<br>' + document.getElementById(name_id).innerHTML.replace(/\n/g, '<br>') + '<br>';
+function do_onmark_render(test_mode = 1, name_id = '', name_include = '', name_doc = '') {
+	if(test_mode === 0) {
+        var data = '<br>' + document.getElementById(name_id).innerHTML.replace(/\n/g, '<br>') + '<br>';
+    } else {
+    	var data = '<br>' + (
+            '== namu ==\n' +
+            'test'
+        ).replace(/\n/g, '<br>') + '<br>';
+    }
     var data_js = '';
     
     var var_data = do_onmark_nowiki_before_render(data, data_js, name_include);
@@ -406,6 +413,12 @@ function do_onmark_render(name_id, name_include = '', name_doc = '') {
     ''
     data_js = 'render_html("' + name_include + 'render_contect");\n' + data_js
     
-    document.getElementById(name_id).innerHTML = data;
-    eval(data_js);
+    if(test_mode === 0) {
+        document.getElementById(name_id).innerHTML = data;
+        eval(data_js);
+    } else {
+    	console.log([data, data_js]);
+    }
 }
+
+do_onmark_render();
