@@ -127,6 +127,7 @@ function load_include(title, name, p_data) {
     xhr.open("GET", url);
     xhr.send();
 
+    console.log(url);
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
             if(this.responseText === "{}\n") {

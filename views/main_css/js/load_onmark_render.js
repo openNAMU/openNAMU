@@ -3,6 +3,10 @@ function do_url_change(data) {
     return encodeURIComponent(data);
 }
 
+function do_js_safe_change(data) {
+    return data.replace(/"/g, '\\"');
+}
+
 function do_return_date() {
     var today_data = new Date();
 
@@ -78,7 +82,6 @@ function do_onmark_heading_render(data) {
        );
     }
     
-    data = data.replace(/(<\/h[0-9]>)<br>/g, '$1');
     data = data.replace(/\[(?:toc|목차)\]/g, toc_data + '</div>');
     
     return data;
@@ -105,7 +108,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include) {
                 
                 data_js += '' +
                     'document.getElementsByName("' + name_include + 'set_link_' + link_num_str + '")[0].' + var_link_type + ' = ' + 
-                        '"' + link_real.replace(/"/g, '\\"') + '";' +
+                        '"' + do_js_safe_change(link_real) + '";' +
                     '\n' +
                 '';
                 
@@ -124,7 +127,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include) {
                     var var_link_data = '/w/' + do_url_change(link_real);
                 } else {
                     var var_link_type = 'title';
-                    var var_link_data = link_real.replace(/"/g, '\\"');
+                    var var_link_data = do_js_safe_change(link_real);
                 }
                 
                 data_js += '' +
@@ -342,6 +345,12 @@ function do_onmark_last_render(data) {
     data = data.replace(/<div_wiki_start /g, '<div ');
     data = data.replace(/<div_wiki_end>/g, '</div>');
     
+    // heading_render 마지막 처리
+    data = data.replace(/(<\/h[0-9]>)<br>/g, '$1');
+    
+    // list_render 마지막 처리
+    data = data.replace(/(<\/ul>)<br>/g, '$1');
+    
     // br 마지막 처리
     data = data.replace(/^(<br>| )+/, '');
     data = data.replace(/(<br>| )+$/, '');
@@ -349,15 +358,23 @@ function do_onmark_last_render(data) {
     return data;
 }
 
-function do_onmark_include_render(data, data_js) {
-    var include_re = /\[include\((((?!\)\]).)+)\)\]/;
+function do_onmark_include_render(data, data_js, name_include) {
+    var include_re = /\[include\(((?:(?!\)\]).)+)\)\]/;
+    var i = 0;
     while(1) {
+        i += 1;
+        
         var include_data = data.match(include_re);
         if(!include_data) {
             break;
         }
         
-        data = data.replace(include_re, '');
+        data = data.replace(include_re,
+            '<a id="' + name_include + 'include_link" class="include_' + String(i) + '" href="/w/' + do_url_change(include_data[1]) + '">(' + include_data[1] + ')</a>' +
+            '<div id="' + name_include + 'include_' + String(i) + '"></div>'
+        );
+        
+        data_js += 'load_include("' + do_js_safe_change(include_data[1]) + '", "' + name_include + 'include_' + String(i) + '", []);\n'
     }
     
     return [data, data_js];
@@ -367,7 +384,26 @@ function do_onmark_nowiki_before_render(data, data_js) {
     return [data, data_js];
 }
 
+function do_onmark_table_render(data) {
+    return data;
+}
+
 function do_onmark_list_render(data) {
+    var list_re = /<br>((?:(?:(?: )+)\* (?:(?:(?!<br>).)+)<br>)+)/;
+    var list_short_re = /((?: )+)\* ((?:(?!<br>).)+)<br>/g;
+    while(1) {
+        var list_data = data.match(list_re);
+        if(!list_data) {
+            break;
+        }
+        
+        var list_end_data = '<ul>' + list_data[1].replace(list_short_re, function(x, x_1, x_2) {
+            return '<li style="margin-left: ' + String(x_1.length * 20) + 'px;">' + x_2 + '</li>';
+        }) + '</ul>';
+
+        data = data.replace(list_re, '<br>' + list_end_data + '</br>');
+    }
+    
     return data;
 }
 
@@ -397,6 +433,7 @@ function do_onmark_render(test_mode = 1, name_id = '', name_include = '', name_d
     
     data = do_onmark_text_render(data);
     data = do_onmark_heading_render(data);
+    data = do_onmark_table_render(data);
     
     var_data = do_onmark_link_render(data, data_js, name_doc, name_include);
     data = var_data[0];
