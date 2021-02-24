@@ -1,4 +1,4 @@
-#from .tool.func import *
+from .tool.func import *
 import hmac
 import hashlib
 import os
@@ -100,8 +100,8 @@ def dev_2fa_qrcode(provider,accountname,key):
     qr = segno.make_qr(qrstr, error="H")
     return qr.svg_data_uri(scale=2)
 
-if __name__ == "__main__":
-    key = dev_2fa_new_key()
-    print(key)
-    print(dev_2fa_qrcode("example.com 위키", "admin", key))
-    print(dev_2fa_totp(key))
+# if __name__ == "__main__":
+#     key = dev_2fa_new_key()
+#     print(key)
+#     print(dev_2fa_qrcode("example.com 위키", "admin", key))
+#     print(dev_2fa_totp(key))
