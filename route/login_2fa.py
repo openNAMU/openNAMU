@@ -39,7 +39,9 @@ def login_2fa_2(conn):
             user_2 = curs.fetchall()[0][0]
             pw_check_d = 0
             if (user_2 == "totp"):
-                pass
+                code = dev_2fa_totp(user_1)
+                if (code != flask.request.form.get('pw', '')):
+                    pw_check_d = 1
             else:
                 pw_check_d = pw_check(
                     flask.request.form.get('pw', ''),
