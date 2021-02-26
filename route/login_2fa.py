@@ -6,6 +6,7 @@ import time
 import math
 import base64
 import urllib.parse
+import random
 
 import segno
 
@@ -40,6 +41,7 @@ def login_2fa_2(conn):
             pw_check_d = 0
             if (user_2 == "totp"):
                 code = dev_2fa_totp(user_1)
+                time.sleep(random.random() * 0.5)
                 if (code != flask.request.form.get('pw', '')):
                     pw_check_d = 1
             else:
