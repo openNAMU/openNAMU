@@ -37,13 +37,16 @@ def login_2fa_2(conn):
             curs.execute(db_change('select data from user_set where name = "2fa_pw_encode" and id = ?'), [user_id])
             user_1 = user_1[0][0]
             user_2 = curs.fetchall()[0][0]
-
-            pw_check_d = pw_check(
-                flask.request.form.get('pw', ''),
-                user_1,
-                user_2,
-                user_id
-            )
+            pw_check_d = 0
+            if (user_2 == "totp"):
+                pass
+            else:
+                pw_check_d = pw_check(
+                    flask.request.form.get('pw', ''),
+                    user_1,
+                    user_2,
+                    user_id
+                )
             if pw_check_d != 1:
                 return re_error('/error/10')
 
