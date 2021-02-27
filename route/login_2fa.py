@@ -76,39 +76,3 @@ def login_2fa_2(conn):
                     ''',
             menu = [['user', load_lang('return')]]
         ))
-
-def dev_2fa_totp(key):
-    key = base64.b32decode(key)
-    counter = math.floor(time.time()/30)
-    b = counter.to_bytes(8, "big")
-    #print(list(b))
-    mac = hmac.new(key, digestmod=hashlib.sha1)
-    mac.update(b)
-    hmacResult = mac.digest()
-    offset = int(hmacResult[19] & 0xf)
-    bincode = int(
-		(int(hmacResult[offset]&0x7f))<<24 |
-		(int(hmacResult[offset+1]&0xff))<<16 |
-		(int(hmacResult[offset+2]&0xff))<<8 |
-		(int(hmacResult[offset+3] & 0xff)),
-	)
-    code = str(bincode%1000000)
-    return (6-len(code)) * "0" + code
-
-def dev_2fa_new_key():
-    secret = os.urandom(20)
-    key = base64.b32encode(secret)
-    return key.decode("utf-8")
-
-def dev_2fa_qrcode(provider,accountname,key):
-    urlstr = urllib.parse.urlencode({"secret":key, "issuer":provider, "algorithm": "SHA1", "digits": "6", "period": "30"})
-    #print(urlstr)
-    qrstr = "otpauth://totp/{}:{}?{}".format(urllib.parse.quote(provider), urllib.parse.quote(accountname), urlstr)
-    qr = segno.make_qr(qrstr, error="H")
-    return qr.svg_data_uri(scale=2)
-
-# if __name__ == "__main__":
-#     key = dev_2fa_new_key()
-#     print(key)
-#     print(dev_2fa_qrcode("example.com 위키", "admin", key))
-#     print(dev_2fa_totp(key))
