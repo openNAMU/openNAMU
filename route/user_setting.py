@@ -87,12 +87,15 @@ def user_setting_2(conn, server_init):
                         <hr class="main_hr">
                         <select name="lang">''' + div3 + '''</select>
                         <h2>''' + load_lang('2fa') + '''</h2>
-                        <input type="checkbox" name="2fa" value="on" ''' + fa_data + '''> ''' + load_lang('on') + '''
-                        <hr class="main_hr">
-                        <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
+                        <input type="checkbox" id="twofa_check_input" onclick="do_twofa_check(0);" name="2fa" value="on" ''' + fa_data + '''> ''' + load_lang('on') + '''
+                        <div id="fa_plus_content">
+                            <hr class="main_hr">
+                            <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
+                        </div>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
                         ''' + http_warring() + '''
+                        <script>do_twofa_check(1);</script>
                     </form>
                 ''',
                 menu = [['user', load_lang('return')]]
