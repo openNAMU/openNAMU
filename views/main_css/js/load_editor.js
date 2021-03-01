@@ -16,9 +16,17 @@ function do_insert_data(name, data) {
     }
 }
 
+function monaco_to_content() {
+    try {
+        document.getElementById('content').innerHTML = window.editor.getValue();
+    } catch(e) {}
+}
+
 function do_not_out() {
     window.addEventListener('DOMContentLoaded', function() {
         window.onbeforeunload = function() {
+            monaco_to_content();
+            
             data = document.getElementById('content').value;
             origin = document.getElementById('origin').value;
             if(data !== origin) {

@@ -184,25 +184,27 @@ def edit_2(conn, name):
                         href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
             '''
+            
+            if flask.request.cookies.get('main_css_darkmode', '0') == '1':
+                monaco_thema = 'vs-dark'
+            else:
+                monaco_thema = ''
+            
             add_script = '''
                 require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
                 require(["vs/editor/editor.main"], function () {
                     window.editor = monaco.editor.create(document.getElementById('monaco_editor'), {
                         value: document.getElementById('content').value,
                         language: 'plaintext',
-                        theme: 'vs-dark'
+                        theme: \'''' + monaco_thema + '''\'
                     });
                 });
-
-                function monaco_to_content() {
-                    document.getElementById('content').innerHTML = window.editor.getValue();
-                }
             '''
         else:
             editor_display = ''
             monaco_display = 'style="display: none;"'
             add_get_file = ''
-            add_script = 'function monaco_to_content() {}'
+            add_script = ''
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2(['(' + load_lang('edit') + ')', 0])],
@@ -224,7 +226,8 @@ def edit_2(conn, name):
                                 name="content">''' + html.escape(data) + '''</textarea>
                     <hr class="main_hr">
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                    <input id="origin" name="ver" value="''' + doc_ver + '''">
+                    <textarea style="display: none;" id="origin">''' + html.escape(data) + '''</textarea>
+                    <input style="display: none;" name="ver" value="''' + doc_ver + '''">
                     <hr class="main_hr">
                     ''' + captcha_get() + ip_warring() + cccb_text + '''
                     <button id="save"

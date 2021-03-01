@@ -127,10 +127,12 @@ function load_include(title, name, p_data) {
     xhr.open("GET", url);
     xhr.send();
 
+    console.log(url);
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
             if(this.responseText === "{}\n") {
                 document.getElementById(name).innerHTML = "";
+                document.getElementsByClassName(name)[0].href = "/w/" + do_url_change(title); 
                 document.getElementsByClassName(name)[0].id = "not_thing";
             } else {
                 var o_p_data = JSON.parse(this.responseText);

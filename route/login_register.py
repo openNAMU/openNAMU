@@ -122,7 +122,7 @@ def login_register_2(conn):
                     ''' + approval_question + '''
                     ''' + captcha_get() + '''
                     <button type="submit">''' + load_lang('save') + '''</button>
-                    ''' + http_warrin() + '''
+                    ''' + http_warring() + '''
                 </form>
             ''',
             menu = [['user', load_lang('return')]]

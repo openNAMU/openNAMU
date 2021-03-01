@@ -11,30 +11,32 @@ def user_setting_2(conn, server_init):
 
     if ip_or_user(ip) == 0:
         if flask.request.method == 'POST':
-            pass_list = ['2fa']
-            auto_list = ['skin', 'lang'] + pass_list + ['2fa_pw', '2fa_pw_encode']
-
-            for auto_data in auto_list:
-                if auto_data == '2fa_pw':
-                    if flask.request.form.get('2fa_pw', '') != '':
-                        get_data = pw_encode(flask.request.form.get(auto_data, ''))
-                    else:
-                        get_data = ''
-                elif auto_data == '2fa_pw_encode':
-                    if flask.request.form.get('2fa_pw', '') != '':
-                        curs.execute(db_change("select encode from user where id = ?"), [ip])
-                        get_data = curs.fetchall()[0][0]
-                    else:
-                        get_data = ''
+            auto_list = [
+                ['skin', flask.request.form.get('skin', '')], 
+                ['lang', flask.request.form.get('lang', '')]
+            ]
+                
+            twofa_turn_on = 0 
+            twofa_on = flask.request.form.get('2fa', '')
+            if twofa_on != '':
+                twofa_turn_on = 1
+                twofa_pw = flask.request.form.get('2fa_pw', '')
+                if twofa_pw != '':
+                    twofa_pw = pw_encode(twofa_pw)
+                    curs.execute(db_change("select encode from user where id = ?"), [ip])
+                    twofa_encode = curs.fetchall()[0][0]
+                    auto_list += [['2fa', 'on'], ['2fa_pw', twofa_pw], ['2fa_pw_encode', twofa_encode]]
                 else:
-                    get_data = flask.request.form.get(auto_data, '')
-
-                if auto_data in pass_list or get_data != '':
-                    curs.execute(db_change('select data from user_set where name = ? and id = ?'), [auto_data, ip])
-                    if curs.fetchall():
-                        curs.execute(db_change("update user_set set data = ? where name = ? and id = ?"), [get_data, auto_data, ip])
-                    else:
-                        curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), [auto_data, ip, get_data])
+                    auto_list += [['2fa', 'on']]
+            else:
+                auto_list += [['2fa', '']]
+                
+            for auto_data in auto_list:
+                curs.execute(db_change('select data from user_set where name = ? and id = ?'), [auto_data[0], ip])
+                if curs.fetchall():
+                    curs.execute(db_change("update user_set set data = ? where name = ? and id = ?"), [auto_data[1], auto_data[0], ip])
+                else:
+                    curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), [auto_data[0], ip, auto_data[1]])
 
             conn.commit()
 
@@ -85,12 +87,15 @@ def user_setting_2(conn, server_init):
                         <hr class="main_hr">
                         <select name="lang">''' + div3 + '''</select>
                         <h2>''' + load_lang('2fa') + '''</h2>
-                        <input type="checkbox" name="2fa" value="on" ''' + fa_data + '''> ''' + load_lang('on') + '''
-                        <hr class="main_hr">
-                        <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
+                        <input type="checkbox" id="twofa_check_input" onclick="do_twofa_check(0);" name="2fa" value="on" ''' + fa_data + '''> ''' + load_lang('on') + '''
+                        <div id="fa_plus_content">
+                            <hr class="main_hr">
+                            <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
+                        </div>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
                         ''' + http_warring() + '''
+                        <script>do_twofa_check(1);</script>
                     </form>
                 ''',
                 menu = [['user', load_lang('return')]]
