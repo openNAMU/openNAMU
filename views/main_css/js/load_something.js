@@ -24,3 +24,8 @@ function load_ver() {
         }
     }
 }
+
+function do_twofa_check(init = 0) {
+    var data_check = document.getElementById('twofa_check_input').checked;
+    document.getElementById('fa_plus_content').style.display = data_check === true ? "block" : "none";
+}
