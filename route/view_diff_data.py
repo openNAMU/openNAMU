@@ -15,50 +15,44 @@ def view_diff_data_2(conn, name):
 
     curs.execute(db_change("select data from history where id = ? and title = ?"), [first, name])
     first_raw_data = curs.fetchall()
-    if first_raw_data:
+        
+    curs.execute(db_change("select data from history where id = ? and title = ?"), [second, name])
+    second_raw_data = curs.fetchall()
+    if first_raw_data and second_raw_data:
         first_raw_data = first_raw_data[0][0].replace('\r', '')
+        second_raw_data = second_raw_data[0][0].replace('\r', '')
 
-        curs.execute(db_change("select data from history where id = ? and title = ?"), [second, name])
-        second_raw_data = curs.fetchall()
-        if second_raw_data:
-            second_raw_data = second_raw_data[0][0].replace('\r', '')
+        if first_raw_data == second_raw_data:
+            result = ''
+        else:
+            i = 1
+            change_count = 0
+            diff_data = diff_match_patch().diff_prettyHtml(
+                diff_match_patch().diff_main(first_raw_data, second_raw_data)
+            )
+            end_data = ''
 
-            if first == second:
-                result = ''
-            elif first_raw_data == second_raw_data:
-                result = ''
-            else:
-                i = 1
-                include_ins = 0
-                diff_data = diff_match_patch().diff_prettyHtml(diff_match_patch().diff_main(first_raw_data, second_raw_data))
-                end_data = ''
+            diff_data = diff_data.replace('&para;<br>', '\n')
+            diff_data = diff_data.replace('<span>', '')
+            diff_data = diff_data.replace('</span>', '')
+            
+            re_data = re.findall(r'(?:(?:(?:(?!\n).)*)(?:\n)|(?:(?:(?!\n).)+)$)', diff_data)
+            for re_in_data in re_data:
+                change_find_start = len(re.findall(r'<(?:del|ins) ', re_in_data))
+                change_find_end = len(re.findall(r'<\/(?:del|ins)>', re_in_data))
 
-                re_data = re.findall(r'(?:(?:(?:(?!&para;<br>).)*)(?:&para;<br>)|(?:(?:(?!&para;<br>).)+)$)', diff_data)
-                for re_in_data in re_data:
-                    re_in_data = re.sub(r'&para;<br>$', '', re_in_data)
-                    if re.search(r'<ins (((?!<\/ins>).)+)<\/ins>', re_in_data):
-                        end_data += str(i) + ' : ' + re_in_data + '\n'
-                        include_ins = 0
-                    elif re.search(r'(<ins |<del )', re_in_data) and re.search(r'(<\/ins>|<\/del>)', re_in_data):
-                        end_data += str(i) + ' : ' + re_in_data + '\n'
-                        include_ins = 1
-                    elif re.search(r'(<\/ins>|<\/del>)', re_in_data):
-                        end_data += str(i) + ' : ' + re_in_data + '\n'
-                        include_ins = 0
-                    elif re.search(r'(<ins |<del )', re_in_data) or include_ins == 1:
-                        end_data += str(i) + ' : ' + re_in_data + '\n'
-                        include_ins = 1
-                    else:
-                        include_ins = 0
+                change_count += (change_find_start - change_find_end)
+                if change_count != 0 or change_find_start != 0 or change_find_end != 0:
+                    end_data += str(i) + ' : ' + re_in_data
+                
+                i += 1
+                
+            result = '<pre>' + end_data + '</pre>'
 
-                    i += 1
-                    
-                result = '<pre>' + end_data + '</pre>'
-
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [name, wiki_set(), custom(), other2(['(' + load_lang('compare') + ')', 0])],
-                data = result,
-                menu = [['history/' + url_pas(name), load_lang('return')]]
-            ))
-
-    return redirect('/history/' + url_pas(name))
+        return easy_minify(flask.render_template(skin_check(),
+            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('compare') + ')', 0])],
+            data = result,
+            menu = [['history/' + url_pas(name), load_lang('return')]]
+        ))
+    else:
+        return redirect('/history/' + url_pas(name))

@@ -393,7 +393,8 @@ function do_onmark_middle_render(data, data_js, name_include) {
                 data = data.replace(middle_re, '<span id="' + name_include + 'render_contect_' + String(html_n) + '">');
                 middle_stack.push('</span>');
             } else if(middle_data[1] === '#!folding') {
-                                
+                data = data.replace(middle_re, '<div>');
+                middle_stack.push('</div>');
             } else {
                 data = data.replace(middle_re, '<middle_start>' + middle_data[1]);   
             }
@@ -508,8 +509,71 @@ function do_onmark_render(test_mode = 1, name_id = '', name_include = '', name_d
         var data = '\n' + document.getElementById(name_id).innerHTML.replace(/\r/g, '') + '\n';
     } else {
     	var data = '\n' + (
-            '== namu ==\n' +
-            'test'
+`[Include(틀:SCP)]
+
+||<-2><table align=center> {{{+2 [[객체 등급]]}}} [br] Safe (안전) ||
+|| 주소 || [[http://www.scp-wiki.net/object-classes|원문]], [[http://ko.scp-wiki.net/object-classes|한국어]] ||
+
+>안전 등급 SCP들은 변칙적이지만 쉽고 안전하게 격리가 가능하다. 이것은 주로 재단이 해당 SCP를 잘 충분히 연구하여 격리에 특별한 자원이 더 필요하지 않은 경지에 이르렀거나, 또는 변칙성이 특수한 작동기제에 의해서만 발현되는 경우에 해당한다. 하지만 SCP를 안전 등급으로 분류하는 것은, 그것을 다루거나 활성화시키는 것이 위협적이지 않다는 의미가 아니다.
+
+== 설명 ==
+[[SCP 재단]]의 SCP 분류 등급 중 하나. 일종의 최하위 등급으로, 여기에도 속하지 못한 SCP는 [[http://ko.scp-wiki.net/log-of-anomalous-items|변칙 개체]]로 취급받는다. [[유클리드 등급]]이나 [[케테르 등급]]과 비교하면 상대적으로 안전하지만, 이는 어디까지나 상대적으로 새로운 변칙성이나 위험성이 발견되면 유클리드나 케테르로 상향될 수 있다. 물론 반대로 유클리드 등급이나 케테르 등급이었던 SCP가 안전 등급이 되는 일도 있다.
+
+등급의 부여는 격리 난이도에 따라 결정되기에 위험성과는 별개지만, 특별히 재단을 잘 아는 사람이 아니라면 대부분은 안전은 안전, 유클리드는 좀 위험, 케테르는 매우 위험 정도로 이해하는 경우가 대부분이며, 실제로 특별한 경우가 아닌 이상 위험성과 격리 난이도는 정비례하기에 일부 예외를 제외한다면 큰 문제는 없다.
+
+== 목록 ==
+{{{#!folding 펼치기
+* [[SCP-005]]
+* [[SCP-006]]
+* [[SCP-010]]
+* [[SCP-011]]
+* [[SCP-013]]
+* [[SCP-014]]
+* [[SCP-021]]
+* [[SCP-025]]
+* [[SCP-028]]
+* [[SCP-030]]
+* [[SCP-031]]
+* [[SCP-034]]
+* [[SCP-036]]
+* [[SCP-038]]
+* [[SCP-041]]
+* [[SCP-042]]
+* [[SCP-043]]
+* [[SCP-044]]
+* [[SCP-045]]
+* [[SCP-051]]
+* [[SCP-054]]
+* [[SCP-057]]
+* [[SCP-061]]
+* [[SCP-063]]
+* [[SCP-064]]
+* [[SCP-067]]
+* [[SCP-068]]
+* [[SCP-069]]
+* [[SCP-070]]
+* [[SCP-072]]
+* [[SCP-085]]
+* [[SCP-086]]
+* [[SCP-088]]
+* [[SCP-091]]
+* [[SCP-092]]
+* [[SCP-095]]
+* [[SCP-098]]
+* [[SCP-099]]
+* [[SCP-105]]
+* [[SCP-107]]
+* [[SCP-108]]
+* [[SCP-111]]
+* [[SCP-113]]
+* [[SCP-115]]
+* [[SCP-120]]
+* [[SCP-127]]
+* [[SCP-131]]
+* [[SCP-132]]
+* [[SCP-133]]
+* [[SCP-134]]
+}}}`
         ) + '\n';
     }
     var data_js = '';
@@ -563,4 +627,4 @@ function do_onmark_render(test_mode = 1, name_id = '', name_include = '', name_d
     }
 }
 
-// do_onmark_render();
+do_onmark_render();
