@@ -66,7 +66,7 @@ def edit_delete_2(conn, name, app_var):
                 <form method="post">
                     ''' + ip_warring() + '''
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                    <hr class=\"main_hr\s>
+                    <hr class="main_hr">
                     ''' + captcha_get() + '''
                     <button type="submit">''' + load_lang('delete') + '''</button>
                 </form>
