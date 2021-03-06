@@ -118,10 +118,10 @@ if set_data['db_type'] == 'mysql':
     curs = conn.cursor()
 
     try:
-        curs.execute(db_change('create database ? default character set utf8mb4;'), set_data['db'])
+        curs.execute(db_change('create database ' + set_data['db'] + ' default character set utf8mb4;'))
     except:
         pass
-
+    
     conn.select_db(set_data['db'])
 else:
     conn = sqlite3.connect(set_data['db'] + '.db')
@@ -158,7 +158,7 @@ for i in create_data:
         try:
             curs.execute(db_change('create table ' + i + '(test longtext)'))
         except:
-            curs.execute(db_change("alter table " + i + " add test longtext default ''"))
+            curs.execute(db_change("alter table " + i + " add test longtext"))
 
 setup_tool = 0
 try:
@@ -178,7 +178,10 @@ if setup_tool != 0:
             try:
                 curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
             except:
-                curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
+                try:
+                    curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
+                except:
+                    curs.execute(db_change("alter table " + create_table + " add " + create + " longtext"))
 
     if setup_tool == 1:
         update(int(ver_set_data[0][0]), set_data)
@@ -536,6 +539,10 @@ def login_pw_change():
 @app.route('/check/<name>')
 def give_user_check(name = None):
     return give_user_check_2(conn, name)
+    
+@app.route('/check_delete', methods=['POST', 'GET'])
+def give_user_check_delete():
+    return give_user_check_delete_2(conn)
 
 @app.route('/register', methods=['POST', 'GET'])
 def login_register():
