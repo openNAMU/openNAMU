@@ -117,7 +117,16 @@ def give_user_check_2(conn, name):
 
                 div += '''
                     <tr>
-                        <td><a href="/check/''' + url_pas(data[0]) + '''">''' + data[0] + '''</a></td>
+                        <td>
+                            <a href="/check/''' + url_pas(data[0]) + '''">''' + data[0] + '''</a>
+                            <a  href="/check_delete''' + \
+                                '''?name=''' + url_pas(data[0]) + \
+                                '''&ip=''' + url_pas(data[1]) + \
+                                '''&time=''' + url_pas(data[3].replace(' ', '').replace(':', '').replace('-', '')) + \
+                                '''&return_type=''' + ('0' if ip_or_user(name) == 0 else '1') + '''">
+                                (''' + load_lang('delete') + ''')
+                            </a>
+                        </td>
                         <td><a href="/check/''' + url_pas(data[1]) + '''">''' + data[1] + '''</a></td>
                         <td>''' + data[3] + '''</td>
                     </tr>
@@ -130,9 +139,7 @@ def give_user_check_2(conn, name):
                     </tbody>
                 </table>
             '''
-        else:
-            return re_error('/error/2')
-
+            
         div += next_fix(
             '/check/' + url_pas(name) + ('?plus=' + plus_id + '&num=' if plus_id else '?num='), 
             num, 

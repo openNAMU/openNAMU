@@ -539,6 +539,10 @@ def login_pw_change():
 @app.route('/check/<name>')
 def give_user_check(name = None):
     return give_user_check_2(conn, name)
+    
+@app.route('/check_delete', methods=['POST', 'GET'])
+def give_user_check_delete():
+    return give_user_check_delete_2(conn)
 
 @app.route('/register', methods=['POST', 'GET'])
 def login_register():
