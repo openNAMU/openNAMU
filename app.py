@@ -148,7 +148,7 @@ create_data['re_admin'] = ['who', 'what', 'time']
 create_data['alarm'] = ['name', 'data', 'date']
 create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
 create_data['scan'] = ['user', 'title', 'type']
-create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
+create_data['acl'] = ['title', 'data', 'type']
 create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
 create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
 for i in create_data:
