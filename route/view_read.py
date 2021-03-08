@@ -9,28 +9,18 @@ def view_read_2(conn, name):
     run_redirect = ''
 
     num = flask.request.args.get('num', None)
-    if num:
-        num = int(number_check(num))
+    num = int(number_check(num)) if num else None
 
     curs.execute(db_change("select sub from rd where title = ? and not stop = 'O' order by date desc"), [name])
-    if curs.fetchall():
-        topic = 1
-    else:
-        topic = 0
+    topic = 1 if curs.fetchall() else 0
 
     curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
 
     curs.execute(db_change("select title from data where title like ?"), ['%' + name + '/%'])
-    if curs.fetchall():
-        down = 1
-    else:
-        down = 0
+    down = 1 if curs.fetchall() else 0
 
     m = re.search(r"^(.*)\/(.*)$", name)
-    if m:
-        uppage = m.group(1)
-    else:
-        uppage = 0
+    uppage = m.group(1) if m else 0
 
     if re.search(r'^category:', name):
         curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
@@ -146,10 +136,14 @@ def view_read_2(conn, name):
         acl = 0
         r_date = 0
     else:
-        curs.execute(db_change("select decu from acl where title = ?"), [name])
+        curs.execute(db_change("select title from acl where title = ?"), [name])
         acl = 1 if curs.fetchall() else 0
         menu_acl = 1 if acl_check(name) == 1 else 0
-        menu = [['edit/' + url_pas(name), load_lang('create'), menu_acl]] if response_data == 404 else [['edit/' + url_pas(name), load_lang('edit'), menu_acl]]
+        if response_data == 404:
+            menu = [['edit/' + url_pas(name), load_lang('create'), menu_acl]] 
+        else:
+            menu = [['edit/' + url_pas(name), load_lang('edit'), menu_acl]]
+            
         menu += [
             ['topic/' + url_pas(name), load_lang('discussion'), topic], 
             ['history/' + url_pas(name), load_lang('history')], 
