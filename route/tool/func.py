@@ -260,7 +260,6 @@ def update(ver_num, set_data):
                 i[0]
             ])
 
-    # set 1
     if ver_num < 3190201:
         today_time = get_time()
 
@@ -325,6 +324,14 @@ def update(ver_num, set_data):
                 i[1]
             ])
 
+    if ver_num < 3205500:
+        curs.execute(db_change("select title, decu, dis, view, why from acl"))
+        for i in curs.fetchall():
+            curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[1], 'decu'])
+            curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[2], 'dis'])
+            curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[3], 'view'])
+            curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[4], 'why'])
+            
     conn.commit()
 
     print('Update completed')
@@ -892,7 +899,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
         if admin_check(5) == 1:
             return 0
 
-        curs.execute(db_change("select decu from acl where title = ?"), ['user:' + acl_n[0]])
+        curs.execute(db_change("select data from acl where title = ? and type = 'decu'"), ['user:' + acl_n[0]])
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'all':
@@ -925,7 +932,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
     for i in range(0, end):
         if tool == '':
             if i == 0:
-                curs.execute(db_change("select decu from acl where title = ?"), [name])
+                curs.execute(db_change("select data from acl where title = ? and type = 'decu'"), [name])
             else:
                 curs.execute(db_change('select data from other where name = "edit"'))
 
@@ -934,7 +941,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             if i == 0 and topic_num:
                 curs.execute(db_change("select acl from rd where code = ?"), [topic_num])
             elif i == 1:
-                curs.execute(db_change("select dis from acl where title = ?"), [name])
+                curs.execute(db_change("select data from acl where title = ? and type = 'dis'"), [name])
             else:
                 curs.execute(db_change('select data from other where name = "discussion"'))
 
@@ -957,7 +964,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
         else:
             # tool == 'render'
             if i == 0:
-                curs.execute(db_change("select view from acl where title = ?"), [name])
+                curs.execute(db_change("select data from acl where title = ? and type = 'view'"), [name])
             else:
                 curs.execute(db_change("select data from other where name = 'all_view_acl'"))
 
