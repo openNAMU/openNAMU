@@ -61,7 +61,7 @@ function pasteListener(e) {
         let haveImageInClipboard = false;
         const formData = new FormData();
         for(let i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf("image") !== -1) {
+            if(items[i].type.indexOf("image") !== -1) {
                 const file = items[i].getAsFile();
                 const customName = prompt("파일 이름 (확장자 제외)");
                 
@@ -69,7 +69,8 @@ function pasteListener(e) {
                     return alert("파일 이름 없음");
                 }
                 
-                const customFile = new File([file], customName + ".png", { type: file.type });
+                var file_name = customName + ".png";
+                const customFile = new File([file], file_name, { type: file.type });
                 formData.append("f_data[]", customFile);
                 haveImageInClipboard = true;
                 e.preventDefault();
@@ -77,6 +78,7 @@ function pasteListener(e) {
                 break;
             }
         }
+
         if(!haveImageInClipboard) {
             return;
         }
@@ -90,7 +92,7 @@ function pasteListener(e) {
                 const url = res.url;
                 alert(
                     '업로드 완료 : ' +
-                    '[[' + decodeURIComponent(url.replace(/.*\/w\/file/, "file")) + ']]'
+                    '[[파일:' + file_name + ']]'
                 );
             } else {
                 console.error("[ERROR] PasteUpload Fail :", res.statusText);
