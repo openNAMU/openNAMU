@@ -24,6 +24,7 @@ for i in range(0, 2):
         import zipfile
         import shutil
         import threading
+        import PIL
         import logging
         import random
         import flask
