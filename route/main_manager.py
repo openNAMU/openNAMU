@@ -64,11 +64,14 @@ def main_manager_2(conn, num, r_ver):
                 <br>
                 <h2>''' + load_lang('version') + '''</h2>
                 <ul class="inside_ul">
-                    <li><a href="/api/skin_info?all=true">''' + load_lang('skin_info') + '''</a></li>
+                    <li>
+                        <a href="/api/skin_info?all=true">''' + load_lang('skin_info') + '''</a>
+                        <span id="need_skin_update"></span>
+                    </li>
                     <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
                     <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
                 </ul>
-                <script>load_ver();</script>
+                <script>load_ver(); do_skin_ver_check();</script>
             ''',
             menu = [['other', load_lang('return')]]
         ))
