@@ -46,7 +46,9 @@ function do_skin_ver_check() {
                 }
             }
             
-            document.getElementById('need_skin_update').innerHTML += ' (' + (all_need_update.join(', ')) + ')';
+            if(all_need_update.length !== 0) {
+                document.getElementById('need_skin_update').innerHTML += ' (' + (all_need_update.join(', ')) + ')';
+            }
         }
     }
 }
