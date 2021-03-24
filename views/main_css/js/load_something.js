@@ -57,3 +57,14 @@ function do_twofa_check(init = 0) {
     var data_check = document.getElementById('twofa_check_input').checked;
     document.getElementById('fa_plus_content').style.display = data_check === true ? "block" : "none";
 }
+
+function ie_end_support() {
+    if(document.currentScript === undefined) {
+        window.location = 'microsoft-edge:' + window.location;
+        setTimeout(function() {
+            window.location = 'https://go.microsoft.com/fwlink/?linkid=2135547';
+        }, 1);
+    }
+}
+
+ie_end_support();

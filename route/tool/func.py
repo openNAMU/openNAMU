@@ -1236,7 +1236,7 @@ def edit_filter_do(data):
     return 0
 
 def redirect(data = '/'):
-    return '<script>window.location.href = "' + data.replace('"', '\\"') + '";</script>'
+    return '<script>document.location.href = "' + data + '";</script>'
 
 def get_acl_list(type_d = 'normal'):
     if type_d == 'user':
