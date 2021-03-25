@@ -136,10 +136,10 @@ function new_topic_load(topic_num, con = 1, type_do = 0, some = '', where = 'top
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
             var data_t = JSON.parse(this.responseText);
-            var data_a = '';
             var start = 0;
             
             for(var key in data_t) {
+                var data_a = '';
                 if(start === 0) {
                     var admin = data_t['data_main']['admin'];
                     var ip_first = data_t['data_main']['ip_first'];
@@ -191,6 +191,7 @@ function new_topic_load(topic_num, con = 1, type_do = 0, some = '', where = 'top
                     color_t = 'toron_color';
                 }
                 
+                console.log(data_t[key])
                 data_a += '' + 
                     '<table id="toron">' + 
                         '<tr>' + 
@@ -202,15 +203,16 @@ function new_topic_load(topic_num, con = 1, type_do = 0, some = '', where = 'top
                         '</tr>' + 
                         '<tr>' + 
                             '<td id="' + color_b + '">' + 
-                                '<div id="topic_scroll">' + data_t[key]['data'] + '</div>' + 
+                                '<div id="topic_scroll">' + data_t[key]['data_pas'][0] + '</div>' + 
                             '</td>' + 
                         '</tr>' +
                     '</table>' + 
                     '<hr class="main_hr">' + 
                 ''
+
+                document.getElementById(where).innerHTML += data_a;
+                eval(data_t[key]['data_pas'][1]);
             }
-            
-            document.getElementById(where).innerHTML += data_a;
             
             if(con === 1) {
                 new_topic_load(topic_num, 0, type_do + 1, '', where);

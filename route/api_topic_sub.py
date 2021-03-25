@@ -32,12 +32,15 @@ def api_topic_sub_2(conn, topic_num):
         ip_a = ip_pas([i[3] for i in data])
         ip_a_2 = ip_pas([i[3] for i in data], 1)
         for i in data:
+            data_v = i[1] if i[4] != 'O' or admin == 1 else ''
             data_a[i[0]] = {
-                "data" : i[1] if i[4] != 'O' or admin == 1 else '',
+                "data" : data_v,
                 "date" : i[2],
                 "ip" : ip_a_2[i[3]],
-                "ip_pas" : ip_a[i[3]],
                 "blind" : i[4],
+                
+                "ip_pas" : ip_a[i[3]],
+                "data_pas" : render_set(data = data_v, num = 2, include = 'topic_' + i[0], acl = get_acl)
             }
 
         return flask.jsonify(data_a)
