@@ -16,7 +16,7 @@
         'EsnW_hyI-V8', // 디자이어 드라이브
         'es9twrnfZ_Q', // 유심지의 유정천
     ];
-    var get_num = location.search.replace('[^0-9]+', '');
+    var get_num = location.search.replace(/[^0-9]+/g, '');
     if(get_num !== '' && Number(get_num) < random_code.length) {
         var random_num = Number(get_num);
     } else {

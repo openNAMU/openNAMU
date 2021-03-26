@@ -515,7 +515,6 @@ function do_onmark_render(test_mode = 1, name_id = '', name_include = '', name_d
     var data_js = '';
     var data_backlink = [];
     var data_nowiki = {};
-    console.log(data);
     
     var data_var = do_onmark_math_render(data, data_js, name_include);
     data = data_var[0];
@@ -526,7 +525,6 @@ function do_onmark_render(test_mode = 1, name_id = '', name_include = '', name_d
     data_js = data_var[1];
     data_nowiki = data_var[2];
     var num_nowiki = data_var[3];
-    console.log(data_js);
     
     data_var = do_onmark_include_render(data, data_js, name_include);
     data = data_var[0];

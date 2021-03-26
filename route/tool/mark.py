@@ -1,5 +1,4 @@
 from .set_mark.namumark import namumark
-from .set_mark.markdown import markdown
 
 from .set_mark.tool import *
 
@@ -52,21 +51,17 @@ def render_do(title, data, num, include):
     rep_data = curs.fetchall()
     if rep_data[0][0] == 'namumark':
         data = namumark(conn, data, title, include)
-    elif rep_data[0][0] == 'markdown':
-        data = markdown(conn, data, title, include)
     elif rep_data[0][0] == 'custom':
         data = custom_mark(conn, data, title, include)
     elif rep_data[0][0] == 'js_onmark':
         include = (include + '_') if include else ''
         data = [
-            '<div id="' + include + 'render_contect">' + html.escape(data) + '</div>', 
-            'do_onmark_render(0, "' + include + 'render_contect");',
+            '<div id="' + include + 'render_content">' + html.escape(data) + '</div>', 
+            'do_onmark_render(0, "' + include + 'render_content");',
             []
         ]
-    elif rep_data[0][0] == 'raw':
-        data = [data, '', []]
     else:
-        data = ['', '', []]
+        data = [data, '', []]
 
     if num == 1:
         if data[2] == []:

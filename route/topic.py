@@ -102,7 +102,7 @@ def topic_2(conn, topic_num):
                 <div id="top_topic"></div>
                 <div id="main_topic"></div>
                 <div id="plus_topic"></div>
-                <script>topic_top_load("''' + topic_num + '''");</script>
+                <script>new_topic_load("''' + topic_num + '''");</script>
                 <a href="/thread/''' + topic_num + '/tool">(' + load_lang('topic_tool') + ''')</a>
                 <hr class="main_hr">
                 <form style="''' + display + '''" method="post">
