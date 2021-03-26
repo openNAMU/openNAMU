@@ -36,14 +36,12 @@ def api_skin_info_2(conn, name):
 
                 if "info_link" in json_data:
                     info_link = json_data["info_link"]
-                    get_num = 1
                 elif json_data["name"] in d_link_data:
                     info_link = d_link_data[json_data["name"]]
-                    get_num = 1
                 else:
-                    get_num = 0
+                    info_link = 0
 
-                if get_num == 1:
+                if info_link != 0:
                     try:
                         get_data = urllib.request.urlopen(info_link)
                     except:
@@ -52,12 +50,14 @@ def api_skin_info_2(conn, name):
                     if get_data and get_data.getcode() == 200:
                         try:
                             get_data = json.loads(get_data.read().decode())
-                            if "skin_ver" in get_data:
-                                json_data = {**json_data, **{ "lastest_version" : {
-                                    "skin_ver" : json_data["skin_ver"]
-                                }}}
                         except:
-                            pass
+                            get_data = {}
+                        
+                        if "skin_ver" in get_data:
+                            json_data = {**json_data, **{ "lastest_version" : {
+                                "skin_ver" : get_data["skin_ver"]
+                            }}}
+                        
 
                 a_data = {**a_data, **{ i : json_data }}
 
