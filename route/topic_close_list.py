@@ -61,9 +61,9 @@ def topic_close_list_2(conn, name):
             <div id="topic_pre_''' + data[0] + '''"></div>
             <div id="topic_back_pre_''' + data[0] + '''"></div>
             <script>
-                new_topic_load(''' + data[0] + ', 0, 1, "?num=1", "topic_pre_' + data[0] + '''");
+                new_topic_load(''' + data[0] + ', "list", "?num=1", "topic_pre_' + data[0] + '''");
                 if(''' + t_data[0][0] + ''' !== 1) {
-                    new_topic_load(''' + data[0] + ', 0, 1, "?num=' + t_data[0][0] + '", "topic_back_pre_' + data[0] + '''");
+                    new_topic_load(''' + data[0] + ', "list", "?num=' + t_data[0][0] + '", "topic_back_pre_' + data[0] + '''");
                 }
             </script>
         '''
