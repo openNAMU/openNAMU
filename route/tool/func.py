@@ -1236,7 +1236,7 @@ def edit_filter_do(data):
     return 0
 
 def redirect(data = '/'):
-    return flask.redirect(flask.request.host_url + data)
+    return flask.redirect(flask.request.host_url[:-1] + data)
     
 def get_acl_list(type_d = 'normal'):
     if type_d == 'user':
