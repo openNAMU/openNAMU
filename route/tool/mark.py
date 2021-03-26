@@ -51,9 +51,7 @@ def render_do(title, data, num, include):
     rep_data = curs.fetchall()
     if rep_data[0][0] == 'namumark':
         data = namumark(conn, data, title, include)
-    elif rep_data[0][0] == 'markdown':
-        data = markdown(conn, data, title, include)
-    elif rep_data[0][0] in ('custom', 'raw'):
+    elif rep_data[0][0] == 'custom':
         data = custom_mark(conn, data, title, include)
     elif rep_data[0][0] == 'js_onmark':
         include = (include + '_') if include else ''
@@ -63,7 +61,7 @@ def render_do(title, data, num, include):
             []
         ]
     else:
-        data = ['', '', []]
+        data = [data, '', []]
 
     if num == 1:
         if data[2] == []:
