@@ -51,7 +51,7 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
                 }
                 
                 if(blind === 'O') {
-                    ip += ' <a href="/admin_log?search=blind%20(code%20' + topic_num + '#' + i[0] + '">(B)</a>';
+                    ip += ' <a href="/admin_log?search=blind%20(code%20' + topic_num + '#' + key + '">(B)</a>';
                     
                     if(admin === '1') {
                         ip += ' <a href="/thread/' + topic_num + '/raw/' + key + '">(R)</a>';
