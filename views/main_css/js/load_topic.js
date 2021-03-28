@@ -38,10 +38,10 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
                 var ip = data_t[key]['ip_pas'];
                 var ip_o = data_t[key]['ip'];
                 var blind = data_t[key]['blind'];
-                var data_i = data_t[key]['data'];
+                var data_i_pas = data_t[key]['data_pas'][0];
                 
-                if(data_i === '') {
-                    data_i = '<br>';
+                if(data_i_pas === '') {
+                    data_i_pas = '<br>';
                 }
                 
                 if(blind === 'O') {
@@ -62,7 +62,7 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
                     ip += ' <a href="/thread/' + topic_num + '/admin/' + key + '">(T)</a>';
                 }
                 
-                if(type_do === 0) {
+                if(type_do === 'top') {
                     color_t = 'toron_color_red';
                 } else if(blind === '1') {
                     color_t = 'toron_color_blue';
@@ -83,7 +83,7 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
                         '</tr>' + 
                         '<tr>' + 
                             '<td id="' + color_b + '">' + 
-                                '<div id="topic_scroll">' + data_t[key]['data_pas'][0] + '</div>' + 
+                                '<div id="topic_scroll">' + data_i_pas + '</div>' + 
                             '</td>' + 
                         '</tr>' +
                     '</table>' + 

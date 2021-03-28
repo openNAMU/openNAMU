@@ -19,6 +19,7 @@ def give_user_ban_2(conn, name):
         regex_get = flask.request.form.get('regex', None)
         login = flask.request.form.get('login', '')
         why = flask.request.form.get('why', '')
+        print([end])
 
         if regex_get or band != '':
             type_d = 'regex' if regex_get else band
@@ -84,10 +85,10 @@ def give_user_ban_2(conn, name):
             
             time_data = [
                 ['86400', load_lang('1_day')],
-                ['432000‬', load_lang('5_day')],
+                ['432000', load_lang('5_day')],
                 ['2592000', load_lang('30_day')],
                 ['15552000', load_lang('180_day')],
-                ['31104000‬', load_lang('360_day')],
+                ['31104000', load_lang('360_day')],
                 ['0', load_lang('limitless')]
             ]
             insert_data = ''
