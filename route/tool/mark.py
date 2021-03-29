@@ -12,8 +12,8 @@ import urllib.parse
 conn = ''
 curs = ''
 
-if os.path.exists('route/tool/set_mark/custom.py'):
-    from .set_mark.custom import custom_mark
+if os.path.exists('route/tool/custom.py'):
+    from .custom import custom_mark
 else:
     def custom_mark(conn, data, title, num, include):
         return [data, '', []]
@@ -40,12 +40,9 @@ def send_parser(data):
     return data
 
 def render_do(title, data, num, include):
-    if num == 3:
-        num = 1
-        back_num = 3
-    else:
-        back_num = num
-
+    # num == 1 -> commit O | html
+    # num == 2 -> commit X | list
+    # num == 3 -> commit X 
     curs.execute(db_change('select data from other where name = "markup"'))
     rep_data = curs.fetchall()
     if rep_data[0][0] == 'namumark':
@@ -56,20 +53,27 @@ def render_do(title, data, num, include):
         include = (include + '_') if include else ''
         data = [
             '<div id="' + include + 'render_content">' + html.escape(data) + '</div>', 
-            'do_onmark_render(0, "' + include + 'render_content");',
+            '''
+                do_onmark_render(
+                    test_mode = 0, 
+                    name_id = "''' + include + '''render_content",
+                    name_include = "'''·+ include + '''",
+                    name_doc = "''' +title.replace('"', '//"') + '''",
+                );
+            ''',
             []
         ]
     else:
         data = [data, '', []]
 
-    if num == 1:
+    if num in [1, 3]:
         if data[2] == []:
             curs.execute(db_change("insert into back (title, link, type) values ('test', ?, 'nothing')"), [title])
         else:
             curs.executemany(db_change("insert into back (link, title, type) values (?, ?, ?)"), data[2])
             curs.execute(db_change("delete from back where title = ? and type = 'no'"), [title])
 
-        if back_num != 3:
+        if num != 3:
             conn.commit()
 
     if num == 2:
