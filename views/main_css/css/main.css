@@ -24,10 +24,6 @@ input {
     margin-top: 10px;
 }
 
-#toc-name {
-    font-size: 18px;
-}
-
 table {
     border-collapse: collapse;
 }
@@ -164,7 +160,7 @@ body {
 }
 
 #toc_title {
-    font-size: 18px;
+    font-size: 1.2rem;
 }
 
 #admin_log_search {
@@ -246,7 +242,6 @@ blockquote {
     background-position: calc(100% - 10px) 10px;
     background-repeat: no-repeat;
     background-size: 25px;
-    font-size: inherit;
 }
 
 hr {
