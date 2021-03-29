@@ -19,7 +19,6 @@ def give_user_ban_2(conn, name):
         regex_get = flask.request.form.get('regex', None)
         login = flask.request.form.get('login', '')
         why = flask.request.form.get('why', '')
-        print([end])
 
         if regex_get or band != '':
             type_d = 'regex' if regex_get else band

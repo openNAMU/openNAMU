@@ -1,6 +1,5 @@
-from .set_mark.namumark import namumark
-
-from .set_mark.tool import *
+from .namumark import namumark
+from .tool import *
 
 import re
 import os
