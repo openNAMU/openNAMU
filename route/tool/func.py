@@ -297,7 +297,8 @@ def update(ver_num, set_data):
         if get_data and get_data[0][0] == 'master':
             curs.execute(db_change("update other set data = 'beta' where name = 'update'"), [])
 
-    if ver_num < 3202500:
+    # 캐시 초기화
+    if ver_num < 3206000:
         curs.execute(db_change('delete from cache_data'))
 
     if ver_num < 3202600:
@@ -586,7 +587,7 @@ def next_fix(link, num, page, end = 50):
 
 def other2(data):
     global req_list
-    main_css_ver = '78'
+    main_css_ver = '79'
     data += ['' for _ in range(0, 3 - len(data))]
 
     if req_list == '':
