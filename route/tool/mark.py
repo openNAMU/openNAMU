@@ -57,8 +57,8 @@ def render_do(title, data, num, include):
                 do_onmark_render(
                     test_mode = 0, 
                     name_id = "''' + include + '''render_content",
-                    name_include = "'''·+ include + '''",
-                    name_doc = "''' +title.replace('"', '//"') + '''",
+                    name_include = "''' + include + '''",
+                    name_doc = "''' + title.replace('"', '//"') + '''",
                 );
             ''',
             []
