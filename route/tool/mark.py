@@ -15,8 +15,12 @@ curs = ''
 if os.path.exists('route/tool/custom.py'):
     from .custom import custom_mark
 else:
-    def custom_mark(conn, data, title, num, include):
-        return [data, '', []]
+    def custom_mark(conn, doc_data, doc_name, data_in):
+        return [
+            doc_data, 
+            '', 
+            []
+        ]
 
 def load_conn2(data):
     global conn
@@ -39,44 +43,51 @@ def send_parser(data):
 
     return data
 
-def render_do(title, data, num, include):
-    # num == 1 -> commit O | html
-    # num == 2 -> commit X | list
-    # num == 3 -> commit X 
+def render_do(doc_name, doc_data, data_type, data_in):
+    data_in = None if data_in == '' else data_in
     curs.execute(db_change('select data from other where name = "markup"'))
     rep_data = curs.fetchall()
-    if rep_data[0][0] == 'namumark':
-        data = namumark(conn, data, title, include)
-    elif rep_data[0][0] == 'custom':
-        data = custom_mark(conn, data, title, include)
-    elif rep_data[0][0] == 'js_onmark':
-        include = (include + '_') if include else ''
-        data = [
-            '<div id="' + include + 'render_content">' + html.escape(data) + '</div>', 
+    if rep_data[0][0] in ('namumark', 'js_onmark'):
+        data_in = (data_in + '_') if data_in else ''
+        data_end = [
+            '<div class="render_content" id="' + data_in + 'render_content">' + html.escape(doc_data) + '</div>', 
             '''
                 do_onmark_render(
                     test_mode = 0, 
-                    name_id = "''' + include + '''render_content",
-                    name_include = "''' + include + '''",
-                    name_doc = "''' + title.replace('"', '//"') + '''",
+                    name_id = "''' + data_in + '''render_content",
+                    name_include = "''' + data_in + '''",
+                    name_doc = "''' + doc_name.replace('"', '//"') + '''",
                 );
             ''',
             []
         ]
+    elif rep_data[0][0] == 'custom':
+        data_end = custom_mark(
+            conn, 
+            doc_data, 
+            doc_name, 
+            data_in
+        )
     else:
-        data = [data, '', []]
+        data_end = [
+            doc_data, 
+            '', 
+            []
+        ]
 
-    if num in [1, 3]:
-        if data[2] == []:
-            curs.execute(db_change("insert into back (title, link, type) values ('test', ?, 'nothing')"), [title])
+    if data_type == 'backlink':
+        if data_end[2] == []:
+            curs.execute(db_change("insert into back (title, link, type) values ('test', ?, 'nothing')"), [doc_name])
         else:
-            curs.executemany(db_change("insert into back (link, title, type) values (?, ?, ?)"), data[2])
-            curs.execute(db_change("delete from back where title = ? and type = 'no'"), [title])
+            curs.executemany(db_change("insert into back (link, title, type) values (?, ?, ?)"), data_end[2])
+            curs.execute(db_change("delete from back where title = ? and type = 'no'"), [doc_name])
 
-        if num != 3:
-            conn.commit()
-
-    if num == 2:
-        return [data[0], data[1]]
+        conn.commit()
     else:
-        return data[0] + '<script>' + data[1] + '</script>'
+        if data_type == 'api_view':
+            return [
+                data_end[0], 
+                data_end[1]
+            ]
+        else:
+            return data_end[0] + '<script>' + data_end[1] + '</script>'

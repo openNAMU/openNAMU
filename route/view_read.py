@@ -81,8 +81,8 @@ def view_read_2(conn, name):
             else_data = re.sub(r'\r\n$', '', else_data)
 
         end_data = render_set(
-            title = name,
-            data = else_data
+            doc_name = name,
+            doc_data = else_data
         )
 
         if not num and acl_check(name, 'render') != 1:

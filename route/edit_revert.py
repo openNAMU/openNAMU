@@ -52,9 +52,9 @@ def edit_revert_2(conn, name):
             )
 
             render_set(
-                title = name,
-                data = data[0][0],
-                num = 1
+                doc_name = name,
+                doc_data = data[0][0],
+                data_type = 'backlink'
             )
 
             conn.commit()
