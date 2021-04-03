@@ -103,9 +103,9 @@ def edit_2(conn, name):
         curs.execute(db_change("delete from back where title = ? and type = 'no'"), [name])
         
         render_set(
-            title = name,
-            data = content,
-            num = 1
+            doc_name = name,
+            doc_data = content,
+            data_type = 'backlink'
         )
         
         conn.commit()

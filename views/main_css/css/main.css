@@ -247,3 +247,7 @@ blockquote {
 hr {
     border-top: 1px solid lightgray;
 }
+
+.render_content {
+    white-space: pre-wrap;
+}

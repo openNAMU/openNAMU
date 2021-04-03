@@ -13,9 +13,9 @@ def api_w_2(conn, name):
             if flask.request.method == 'POST':
                 data_org = flask.request.form.get('data', '')
                 data_pas = render_set(
-                    title = name, 
-                    data = data_org, 
-                    num = 2
+                    doc_name = name, 
+                    doc_data = data_org, 
+                    data_type = 'api_view'
                 )
 
                 return flask.jsonify({
@@ -58,10 +58,10 @@ def api_w_2(conn, name):
                             )
                         
                     data_pas = render_set(
-                        title = name_org, 
-                        data = json_data, 
-                        num = 2, 
-                        include = include_data
+                        doc_name = name_org, 
+                        doc_data = json_data, 
+                        data_type = 'api_view',
+                        data_in = include_data
                     )
 
                     return flask.jsonify({

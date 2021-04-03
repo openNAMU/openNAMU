@@ -95,9 +95,9 @@ def func_upload_2(conn, app_var):
             curs.execute(db_change("insert into acl (title, data, type) values (?, 'admin', 'decu')"), ['file:' + name])
 
             render_set(
-                title = 'file:' + name,
-                data = file_d,
-                num = 1
+                doc_name = 'file:' + name,
+                doc_data = file_d,
+                data_type = 'backlink'
             )
 
             history_plus(

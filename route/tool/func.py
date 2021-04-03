@@ -195,21 +195,21 @@ def last_change(data):
 def easy_minify(data, tool = None):
     return last_change(data)
 
-def render_set(title = '', data = '', num = 0, s_data = 0, include = None, acl = None):
-    if not acl:
-        acl = acl_check(title, 'render')
-
-    if acl == 1:
+def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', doc_acl = ''):
+    # data_type in ['view', 'raw', 'api_view', 'backlink']
+    doc_acl = acl_check(doc_name, 'render') if doc_acl == '' else doc_acl
+    doc_data = 0 if not doc_data else doc_data
+        
+    if doc_acl == 1:
         return 'HTTP Request 401.3'
-    elif s_data == 1:
-        return data
     else:
-        if data != None:
-            darkmode = flask.request.cookies.get('main_css_darkmode', '0')
-            
-            return render_do(title, data, num, include)
+        if data_type == 'raw':
+            return doc_data
         else:
-            return 'HTTP Request 404'
+            if doc_data != 0:
+                return render_do(doc_name, doc_data, data_type, data_in)
+            else:
+                return 'HTTP Request 404'
 
 def update(ver_num, set_data):
     print('----')
