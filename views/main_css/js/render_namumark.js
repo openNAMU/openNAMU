@@ -2,12 +2,8 @@ function get_link_state(data, i = 0) {
     var get_class = document.getElementsByClassName(data + 'link_finder')[i];
     if(get_class) {
         var xhr = new XMLHttpRequest();
-        xhr.open(
-            "GET", 
-            get_class.href.replace('/w/', '/api/w/').replace(/#([^#]*)/, '') + "?exist=1", 
-            true
-        );
-        xhr.send(null);
+        xhr.open("GET", get_class.href.replace('/w/', '/api/w/').replace(/#([^#]*)/, '') + "?exist=1");
+        xhr.send();
 
         xhr.onreadystatechange = function() {
             if(this.readyState === 4 && this.status === 200) {
@@ -23,6 +19,14 @@ function get_link_state(data, i = 0) {
     }
 }
 
+function load_image_link(data) {
+    data.innerHTML = '' +
+        '<img   style="' + data.getAttribute('under_style') + '" ' + 
+                'alt="' + data.getAttribute('under_alt') + '" ' + 
+                'src="' + data.getAttribute('under_src') + '">' +
+    '';
+}
+
 function get_file_state(data, i = 0) {       
     var get_class = document.getElementsByClassName(data + 'file_finder')[i];
     if(get_class) {            
@@ -32,9 +36,24 @@ function get_file_state(data, i = 0) {
                 document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '1'
             ) {
                 document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
-                    '<a href="' + get_class.getAttribute('under_src') + '">(' +
-                        get_class.getAttribute('under_src') +
-                    ')</a>' +
+                    '<a href="' + get_class.getAttribute('under_src') + '" ' +
+                        'title="' + get_class.getAttribute('under_src') + '">' + 
+                        '(External image link)' + 
+                    '</a>' +
+                '';
+            } else if(
+                document.cookie.match(main_css_regex_data('main_css_image_set')) &&
+                document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '2'
+            ) {
+                document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
+                    '<a href="javascript:void(0);" ' +
+                        'onclick="load_image_link(this); this.onclick = \'\';" ' + 
+                        'under_style="' + get_class.getAttribute('under_style') + '" ' +
+                        'under_alt="' + get_class.getAttribute('under_alt') + '" ' +
+                        'under_src="' + get_class.getAttribute('under_src') + '" ' +
+                        'title="' + get_class.getAttribute('under_src') + '">' + 
+                        '(External image load)' + 
+                    '</a>' +
                 '';
             } else {
                 document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
@@ -45,12 +64,8 @@ function get_file_state(data, i = 0) {
             }
         } else {
             var xhr = new XMLHttpRequest();
-            xhr.open(
-                "GET", 
-                get_class.getAttribute('under_src').replace('/image/', '/api/image/'), 
-                true
-            );
-            xhr.send(null);
+            xhr.open("GET", get_class.getAttribute('under_src').replace('/image/', '/api/image/'));
+            xhr.send();
             
             xhr.onreadystatechange = function() {
                 if(this.readyState === 4 && this.status === 200) {
@@ -58,7 +73,7 @@ function get_file_state(data, i = 0) {
                         document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
                             '<a href="' + get_class.getAttribute('under_href') + '" ' + 
                                 'id="not_thing">' +
-                                get_class.getAttribute('under_alt') +
+                                '(' + get_class.getAttribute('under_alt') + ')' +
                             '</a>' +
                         '';
                     } else {
@@ -67,9 +82,22 @@ function get_file_state(data, i = 0) {
                             document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '1'
                         ) {
                             document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
-                                '<a href="' + get_class.getAttribute('under_src') + '">(' +
-                                    get_class.getAttribute('under_alt') +
-                                ')</a>' +
+                                '<a href="' + get_class.getAttribute('under_src') + '">' +
+                                    '(' + get_class.getAttribute('under_alt') + ')' +
+                                '</a>' +
+                            '';
+                        } else if(
+                            document.cookie.match(main_css_regex_data('main_css_image_set')) &&
+                            document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '2'
+                        ) {
+                            document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
+                                '<a href="javascript:void(0);" ' +
+                                    'onclick="load_image_link(this); this.onclick = \'\';" ' + 
+                                    'under_style="' + get_class.getAttribute('under_style') + '" ' +
+                                    'under_alt="' + get_class.getAttribute('under_alt') + '" ' +
+                                    'under_src="' + get_class.getAttribute('under_src') + '">' + 
+                                    '(' + get_class.getAttribute('under_alt') + ' load)' +
+                                '</a>' +
                             '';
                         } else {
                             document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
@@ -87,29 +115,36 @@ function get_file_state(data, i = 0) {
     }
 }
 
-function load_include(title, name, p_data) {
+function load_include(name_doc, name_ob, data_include, name_org = '') {
     var change = '';
-    for(key in p_data) {
-        change += '@' + p_data[key][0].replace('&', '<amp>') + '@,' + p_data[key][1].replace(',', '<comma>').replace('&', '<amp>') + ','
+    for(var key in data_include) {
+        change += '' +
+            '@' + data_include[key][0].replace('&', '<amp>') + '@,' + 
+            data_include[key][1].replace(',', '<comma>').replace('&', '<amp>') + ',' +
+        ''
     }
     
-    var url = "/api/w/" + encodeURI(title) + "?include=" + name + "&change=" + change;
+    var url = '' +
+        "/api/w/" + encodeURI(name_doc) + 
+        "?include=" + name_ob + 
+        "&change=" + change +
+        '&name_org=' + name_org +
+    '';
 
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.send(null);
+    xhr.open("GET", url);
+    xhr.send();
 
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
             if(this.responseText === "{}\n") {
-                document.getElementById(name).innerHTML = "";
-                document.getElementsByClassName(name)[0].id = "not_thing";
+                document.getElementById(name_ob).innerHTML = "";
+                document.getElementsByClassName(name_ob)[0].href = "/w/" + do_url_change(name_doc); 
+                document.getElementsByClassName(name_ob)[0].id = "not_thing";
             } else {
-                var o_p_data = JSON.parse(this.responseText);
-                
-                document.getElementById(name).innerHTML = o_p_data['data'];
-                
-                eval(o_p_data['js_data']);
+                var data_load = JSON.parse(this.responseText);
+                document.getElementById(name_ob).innerHTML = data_load['data'];
+                eval(data_load['js_data']);
             }
         }
     }
@@ -119,8 +154,8 @@ function page_count() {
     var url = "/api/title_index";
 
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.send(null);
+    xhr.open("GET", url);
+    xhr.send();
 
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {

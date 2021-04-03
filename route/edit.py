@@ -29,12 +29,14 @@ def edit_2(conn, name):
     if acl_check(name) == 1:
         return re_error('/ban')
     
+    curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
+    doc_ver = curs.fetchall()
+    doc_ver = doc_ver[0][0] if doc_ver else '0'
+
     edit_repeat = 0
     if flask.request.method == 'POST':
         edit_repeat = 1
-        curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
-        old = curs.fetchall()
-        if old and flask.request.form.get('ver', '') != old[0][0]:
+        if flask.request.form.get('ver', '') != doc_ver:
             edit_repeat = 2
     
     if edit_repeat == 1:
@@ -48,10 +50,6 @@ def edit_2(conn, name):
 
         today = get_time()
         content = flask.request.form.get('content', '').replace('\r\n', '\n')
-        o_content = flask.request.form.get('o_content', '').replace('\r\n', '\n')
-
-        if o_content == content:
-            return redirect('/w/' + url_pas(name))
         
         if edit_filter_do(content) == 1:
             return re_error('/error/21')
@@ -90,11 +88,7 @@ def edit_2(conn, name):
 
         curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
         for scan_user in curs.fetchall():
-            curs.execute(db_change("insert into alarm (name, data, date) values (?, ?, ?)"), [
-                scan_user[0],
-                ip + ' | <a href="/w/' + url_pas(name) + '">' + name + '</a> | Edit', 
-                today
-            ])
+            add_alarm(scan_user[0], ip + ' | <a href="/w/' + url_pas(name) + '">' + name + '</a> | Edit')
                 
         history_plus(
             name,
@@ -116,66 +110,49 @@ def edit_2(conn, name):
         
         conn.commit()
         
-        return redirect('/w/' + url_pas(name))
+        return redirect('/w/' + url_pas(name) + (('#edit_load_' + str(section)) if section else ''))
     else:
-        curs.execute(db_change("select data, id from history where title = ? order by id + 0 desc"), [name])
-        old = curs.fetchall()
-        if old:
-            if section:
-                data = html.escape('\n' + old[0][0].replace('\r\n', '\n'))
-                data = re.sub(r'\n(?P<in>={1,6})', '<br>\g<in>', data)
-
-                section_data = re.findall(r'<br>((?:(?:(?!<br>).)*\n*)*)', data)
-                if len(section_data) >= section:
-                    data = html.unescape(section_data[section - 1])
-                else:
-                    return redirect('/edit/' + url_pas(name))
+        editor_top_text = ''
+        if edit_repeat != 2:
+            load_title = flask.request.args.get('plus', None)
+            if load_title:
+                curs.execute(db_change("select data from data where title = ?"), [load_title])
+                get_data = curs.fetchall()
+                data = get_data[0][0] if get_data else ''
             else:
-                data = old[0][0].replace('\r\n', '\n')
+                curs.execute(db_change("select data, id from history where title = ? order by id + 0 desc"), [name])
+                old = curs.fetchall()
+                old = old if old else [['']]
+                if section:
+                    data = html.escape('\n' + old[0][0].replace('\r\n', '\n'))
+                    data = re.sub(r'\n(?P<in>={1,6})', '<br>\g<in>', data)
+
+                    section_data = re.findall(r'<br>((?:(?:(?!<br>).)*\n*)*)', data)
+                    if len(section_data) >= section:
+                        data = html.unescape(section_data[section - 1])
+                    else:
+                        return redirect('/edit/' + url_pas(name))
+                else:
+                    data = old[0][0].replace('\r\n', '\n')
+                    editor_top_text += '<a href="/manager/15?plus=' + url_pas(name) + '">(' + load_lang('load') + ')</a> '
         else:
-            data = ''
-            
-        data_old = data
-        if edit_repeat == 2:
             data = flask.request.form.get('content', '')
-        
             warring_edit = load_lang('exp_edit_conflict') + ' '
 
             if flask.request.form.get('ver', '0') == '0':
-                warring_edit += '<a href="/raw/' + url_pas(name) + '">(r' + old[0][1] + ')</a>'
+                warring_edit += '<a href="/raw/' + url_pas(name) + '">(r' + doc_ver + ')</a>'
             else:
                 warring_edit += '' + \
-                    '<a href="/diff/' + url_pas(name) + '?first=' + flask.request.form.get('ver', '1') + '&second=' + old[0][1] + '">(r' + old[0][1] + ')</a>' + \
+                    '<a href="/diff/' + url_pas(name) + '?first=' + flask.request.form.get('ver', '1') + '&second=' + doc_ver + '">(r' + doc_ver + ')</a>' + \
                 ''
 
             warring_edit += '<hr class="main_hr">'
-        else:
-            warring_edit = ''
+            editor_top_text = warring_edit + editor_top_text
 
-        get_name = ''
-        if not section and not flask.request.args.get('plus', None):
-            get_name += '' + \
-                '<a href="/manager/15?plus=' + url_pas(name) + '">(' + load_lang('load') + ')</a> ' + \
-            ''
-            
-        get_name += '' + \
+        editor_top_text += '' + \
             '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>' + \
             '<hr class="main_hr">' + \
         ''
-            
-        if flask.request.args.get('plus', None):
-            curs.execute(db_change("select data from data where title = ?"), [flask.request.args.get('plus', 'test')])
-            get_data = curs.fetchall()
-            if get_data:
-                data = get_data[0][0]
-
-        save_button = load_lang('save')
-        menu_plus = [
-            ['delete/' + url_pas(name), load_lang('delete')], 
-            ['move/' + url_pas(name), load_lang('move')], 
-            ['upload', load_lang('upload')]
-        ]
-        sub = load_lang('edit')
 
         curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
         sql_d = curs.fetchall()
@@ -194,34 +171,80 @@ def edit_2(conn, name):
 
         curs.execute(db_change('select data from other where name = "edit_help"'))
         sql_d = curs.fetchall()
-        p_text = sql_d[0][0] if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
+        p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
 
         data = re.sub(r'\n+$', '', data)
-        data_old = re.sub(r'\n+$', '', data_old)
+
+        if flask.request.cookies.get('main_css_monaco', '0') == '1':
+            editor_display = 'style="display: none;"'
+            monaco_display = ''
+            add_get_file = '''
+                <link   rel="stylesheet"
+                        data-name="vs/editor/editor.main" 
+                        href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
+            '''
+            
+            if flask.request.cookies.get('main_css_darkmode', '0') == '1':
+                monaco_thema = 'vs-dark'
+            else:
+                monaco_thema = ''
+            
+            add_script = '''
+                require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
+                require(["vs/editor/editor.main"], function () {
+                    window.editor = monaco.editor.create(document.getElementById('monaco_editor'), {
+                        value: document.getElementById('content').value,
+                        language: 'plaintext',
+                        theme: \'''' + monaco_thema + '''\'
+                    });
+                });
+            '''
+        else:
+            editor_display = ''
+            monaco_display = 'style="display: none;"'
+            add_get_file = ''
+            add_script = ''
 
         return easy_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(), custom(), other2(['(' + sub + ')', 0])],
-            data =  get_name + '''
+            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('edit') + ')', 0])],
+            data =  editor_top_text + add_get_file + '''
                 <form method="post">
                     <script>
                         do_paste_image();
                         do_not_out();
+                        ''' + add_script + '''
                     </script>
-                    ''' + edit_button() + '''
-                    ''' + warring_edit + '''
-                    <textarea id="content" class="content" placeholder="''' + p_text + '''" name="content">''' + html.escape(data) + '''</textarea>
-                    <textarea id="origin" name="o_content">''' + html.escape(data_old) + '''</textarea>
+                    <div ''' + editor_display + '''>''' + edit_button() + '''</div>
+                    <div    id="monaco_editor"
+                            class="content" 
+                            ''' + monaco_display + '''></div>
+                    <textarea   id="content"
+                                ''' + editor_display + '''
+                                class="content" 
+                                placeholder="''' + p_text + '''" 
+                                name="content">''' + html.escape(data) + '''</textarea>
                     <hr class="main_hr">
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                    <input id="origin" name="ver" value="''' + (old[0][1] if old else '0') + '''">
+                    <textarea style="display: none;" id="origin">''' + html.escape(data) + '''</textarea>
+                    <input style="display: none;" name="ver" value="''' + doc_ver + '''">
                     <hr class="main_hr">
                     ''' + captcha_get() + ip_warring() + cccb_text + '''
-                    <button id="save" type="submit" onclick="save_stop_exit();">''' + save_button + '''</button>
-                    <button id="preview" type="button" onclick="load_preview(\'''' + url_pas(name) + '\')">' + load_lang('preview') + '''</button>
+                    <button id="save"
+                            type="submit" 
+                            onclick="monaco_to_content(); save_stop_exit();">''' + load_lang('save') + '''</button>
+                    <button id="preview" 
+                            type="button" 
+                            onclick="monaco_to_content(); load_preview(\'''' + url_pas(name) + '\');">' + load_lang('preview') + '''</button>
                 </form>
                 ''' + b_text + '''
                 <hr class="main_hr">
                 <div id="see_preview"></div>
             ''',
-            menu = [['w/' + url_pas(name), load_lang('return')]] + menu_plus
+            menu = [
+                ['w/' + url_pas(name), load_lang('return')],
+                ['delete/' + url_pas(name), load_lang('delete')], 
+                ['move/' + url_pas(name), load_lang('move')], 
+                ['upload', load_lang('upload')]
+            ]
         ))

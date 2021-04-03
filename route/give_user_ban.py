@@ -4,19 +4,13 @@ def give_user_ban_2(conn, name):
     curs = conn.cursor()
 
     band = flask.request.args.get('type', '')
-    if band == '':
-        if name and ip_or_user(name) == 0:
-            curs.execute(db_change("select acl from user where id = ?"), [name])
-            user = curs.fetchall()
-            if not user:
-                return re_error('/error/2')
-
-            if user and user[0][0] != 'user':
-                if admin_check() != 1:
-                    return re_error('/error/4')
-
-    if ban_check(ip = ip_check(), tool = 'login') == 1:
-        return re_error('/ban')
+    ip = ip_check()
+    if ban_check(ip = ip, tool = 'login') == 1:
+    	if ip_or_user(ip) == 1 or admin_check('all', None, ip) == 0:
+            return re_error('/ban')
+    else:
+    	if admin_check(1, None, ip) !=1:
+    	    return re_error('/error/3')
 
     if flask.request.method == 'POST':
         end = flask.request.form.get('second', '0')
@@ -40,8 +34,12 @@ def give_user_ban_2(conn, name):
             if admin_check(None, 'ban' + (' ' + type_d if type_d else '') + ' (' + name + ')') != 1:
                 return re_error('/error/3')
         else:
-            if admin_check(1, 'ban (' + name + ')') != 1:
-                return re_error('/error/3')
+            if name == ip:
+                if admin_check('all', 'ban (' + name + ')') != 1:
+                    return re_error('/error/3')
+            else:
+            	if admin_check(1, 'ban (' + name + ')') != 1:
+                    return re_error('/error/3')
 
         ban_insert(
             name,
@@ -54,9 +52,6 @@ def give_user_ban_2(conn, name):
 
         return redirect('/block_log')
     else:
-        if admin_check(1) != 1:
-            return re_error('/error/3')
-
         curs.execute(db_change("select end, why from rb where block = ? and ongoing = '1' and band = ?"), [name, band])
         end = curs.fetchall()
         if end:
@@ -66,9 +61,9 @@ def give_user_ban_2(conn, name):
             action = 'action="/ban/' + url_pas(name) + ('?type=' + band if band != '' else '') + '"'
 
             if end[0][0] == '':
-                data = '<ul><li>' + load_lang('limitless') + '</li>'
+                data = '<ul class="inside_ul"><li>' + load_lang('limitless') + '</li>'
             else:
-                data = '<ul><li>' + load_lang('period') + ' : ' + end[0][0] + '</li>'
+                data = '<ul class="inside_ul"><li>' + load_lang('period') + ' : ' + end[0][0] + '</li>'
 
             curs.execute(db_change("select block from rb where block = ? and login = 'O' and ongoing = '1'"), [name])
             if curs.fetchall():
@@ -89,10 +84,10 @@ def give_user_ban_2(conn, name):
             
             time_data = [
                 ['86400', load_lang('1_day')],
-                ['432000‬', load_lang('5_day')],
+                ['432000', load_lang('5_day')],
                 ['2592000', load_lang('30_day')],
                 ['15552000', load_lang('180_day')],
-                ['31104000‬', load_lang('360_day')],
+                ['31104000', load_lang('360_day')],
                 ['0', load_lang('limitless')]
             ]
             insert_data = ''

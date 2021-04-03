@@ -1,23 +1,40 @@
 <div id="easter_egg"></div>
 <script>
-    var random_num = String(Math.floor(Math.random() * 7));
-    var random_code = '';
-    
-    if(random_num === '6') {
-        random_code = 'DzjjcMNrTHU';
-    } else if(random_num === '5') {
-        random_code = 'xpg2Ag-xt_c';
-    } else if(random_num === '4') {
-        random_code = 'IKIoAlhQV-c';
-    } else if(random_num === '3') {
-        random_code = 'MLOvyLsYJvo';
-    } else if(random_num === '2') {
-        random_code = 'Fsppuynb440';
-    } else if(random_num === '1') {
-        random_code = 'DbTIoBK9Wvo';
+    var random_code = [
+        'DzjjcMNrTHU', // 상해홍차관
+        'xpg2Ag-xt_c', // 죽취비상
+        'IKIoAlhQV-c', // 유령악단
+        'MLOvyLsYJvo', // 플라워링 나이트
+        'Fsppuynb440', // 우상에 세계를 맡기고
+        'DbTIoBK9Wvo', // 고향별이 비치는 바다
+        'nytZOF0hp_c', // 오늘 밤은 표일한 에고이스트
+        'I9GiwMcg424', // 브와르 마법 도서관
+        '8NQSBvzjWZk', // 배드애플
+        'uiqEO6BK7BM', // 달까지 닿아라 불사의 연기
+        'np7BG71YTIY', // 라스트 리모드
+        '8gaqt1AOyck', // 쇄월
+        'EsnW_hyI-V8', // 디자이어 드라이브
+        'es9twrnfZ_Q', // 유심지의 유정천
+    ];
+    var get_num = location.search.replace(/[^0-9]+/g, '');
+    if(get_num !== '' && Number(get_num) < random_code.length) {
+        var random_num = Number(get_num);
     } else {
-        random_code = 'nytZOF0hp_c'
+        var random_num = Math.floor(Math.random() * random_code.length);
+    }
+    var random_code_select = random_code[random_num];
+
+    var i = 0;
+    var add_link = '';
+    while(i < random_code.length) {
+        add_link += '<a href="?select=' + String(i) + '">(' + String(i) + ')</a> ';
+        i += 1;
     }
 
-    document.getElementById('easter_egg').innerHTML = '<iframe style="width: 560px; height: 315px;" src="https://www.youtube.com/embed/' + random_code + '" allowfullscreen></iframe>';
+    document.getElementById('easter_egg').innerHTML = '' +
+        add_link +
+        '<hr class="main_hr">' +
+        '<iframe     style="width: 560px; height: 315px;" ' +
+                    'src="https://www.youtube.com/embed/' + random_code_select + '" allowfullscreen></iframe>' +
+        '';
 </script>

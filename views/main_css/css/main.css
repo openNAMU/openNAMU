@@ -1,53 +1,249 @@
-body, html, video, table, div, iframe, input, textarea, img, hr, blockquote, pre { max-width: 100%;}
-textarea { width: 100%; }
-input { width: 100%; box-sizing: border-box; }
-#last { margin-top: 30px; }
-#toc { border: 1px solid; padding: 20px; width: fit-content; width: -moz-fit-content; clear: both; margin-top: 10px; }
-#toc-name { font-size: 18px; }
-table { border-collapse: collapse; }
-td { border: 1px solid; padding: 5px; }
-a { text-decoration: none; }
-#not_thing { color: red; }
-#inside, #out_link, #open { color: green; }
-#out_link::before { background: green; color: white; content: "E"; }
-input[type="checkbox"], input[type="radio"] { width: auto; }
-#list { padding: 10px; }
-#toron { width: 100%; }
-#toron_color_green { background: #99ffcd; }
-#toron_color_blue { background: #ffcbf9; }
-#toron_color_red { background: #fecabf; }
-#toron_color_grey { background: gainsboro; }
-#toron_color_not { display: none; }
-#cate { border: 1px solid; padding: 5px; margin-top: 20px; }
-blockquote { border: 1px solid; padding: 15px; margin: 0; margin-top: 10px; display: inline-block; }
-img, iframe { max-width: 100%; }
-pre { border: 1px solid; padding: 10px; white-space: pre-wrap; }
-#in { margin-left: 20px; }
-#out { margin-left: 5px; }
-s, strike, del { color: gray; }
-s:hover, strike:hover, del:hover { color: gray; background-color: gainsboro; text-decoration: none; }
-#main_table_set { width: 100%; text-align: center; }
-#main_table_width { width: 33.3%; }
-#main_table_width_half { width: 50%; }
-#main_table_width_quarter { width: 25%; }
-#redirect { border: 1px solid; padding: 10px; }
-body { word-break: break-all; overflow: auto; }
-.main_hr { border: none; margin-top: 8px; margin-bottom: 8px; }
-#include_link { display: none; }
-#toc_title { font-size: 18px; }
-blockquote { background-image: url(/views/main_css/file/quote.png); background-position: calc(100% - 10px) 10px; background-repeat: no-repeat; background-size: 25px; }
-#admin_log_search { width: 100px; }
-@media (max-width: 768px) { table { min-width: 100%; } .table_safe { min-width: 100%; }}
-#origin { display: none; }
-.all_in_data { display: block; width: 100%; white-space: pre-wrap; }
-.table_safe { max-width: 100%; }
-.change_space { white-space: pre-line; }
-#topic_scroll { max-height: 500px; overflow: scroll; -ms-overflow-style: none; scrollbar-width: none; }
-#topic_scroll::-webkit-scrollbar { display: none; }
-.hidden_link { filter: blur(3px); }
-.hidden_link:hover { filter: none; }
-.content { height: 500px; }
-.topic_content { height: 200px; }
-.spead_footnote { background-color: #efefef; color: #555; border: 1px solid #cecece; }
-#footnote_data { border-top: 1px solid gainsboro; padding-top: 10px; }
-a { color: dodgerblue; }
+body, html, video, table, div, iframe, input, textarea, img, hr, blockquote, pre {
+    max-width: 100%;
+}
+
+textarea {
+    width: 100%;
+}
+
+input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#last {
+    margin-top: 30px;
+}
+
+#toc {
+    border: 1px solid;
+    padding: 20px;
+    width: fit-content;
+    width: -moz-fit-content;
+    clear: both;
+    margin-top: 10px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+td {
+    border: 1px solid;
+    padding: 5px;
+}
+
+a {
+    text-decoration: none;
+}
+
+.inside_ul li {
+    margin-left: 20px;
+}
+
+#not_thing {
+    color: red;
+}
+
+#inside, #out_link, #open {
+    color: green;
+}
+
+#out_link::before {
+    background: green;
+    color: white;
+    content: "E";
+    margin-right: 2px;
+}
+
+input[type="checkbox"], input[type="radio"] {
+    width: auto;
+}
+
+#list {
+    padding: 10px;
+}
+
+#toron {
+    width: 100%;
+}
+
+#toron_color_green {
+    background: #99ffcd;
+}
+
+#toron_color_blue {
+    background: #ffcbf9;
+}
+
+#toron_color_red {
+    background: #fecabf;
+}
+
+#toron_color_grey {
+    background: gainsboro;
+}
+
+#toron_color_not {
+    display: none;
+}
+
+#cate {
+    border: 1px solid;
+    padding: 5px;
+    margin-top: 20px;
+}
+
+img, iframe {
+    max-width: 100%;
+}
+
+pre {
+    border: 1px solid;
+    padding: 10px;
+    white-space: pre-wrap;
+}
+
+#in {
+    margin-left: 20px;
+}
+
+#out {
+    margin-left: 5px;
+}
+
+s, strike, del {
+    color: gray;
+}
+
+s:hover, strike:hover, del:hover {
+    color: gray;
+    background-color: gainsboro;
+    text-decoration: none;
+}
+
+#main_table_set {
+    width: 100%;
+    text-align: center;
+}
+
+#main_table_width {
+    width: 33.3%;
+}
+
+#main_table_width_half {
+    width: 50%;
+}
+
+#main_table_width_quarter {
+    width: 25%;
+}
+
+#redirect {
+    border: 1px solid;
+    padding: 10px;
+}
+
+body {
+    word-break: break-all;
+    overflow: auto;
+}
+
+.main_hr {
+    border: none;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#include_link {
+    display: none;
+}
+
+#toc_title {
+    font-size: 1.2rem;
+}
+
+#admin_log_search {
+    width: 100px;
+}
+
+@media (max-width: 768px) {
+    table {
+        min-width: 100%;
+    }
+    .table_safe {
+        min-width: 100%;
+    }
+}
+
+.all_in_data {
+    display: block;
+    width: 100%;
+    white-space: pre-wrap;
+}
+
+.table_safe {
+    max-width: 100%;
+}
+
+.change_space {
+    white-space: pre-line;
+}
+
+#topic_scroll {
+    max-height: 500px;
+    overflow: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+#topic_scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.hidden_link {
+    filter: blur(3px);
+}
+
+.hidden_link:hover {
+    filter: none;
+}
+
+.content {
+    height: 500px;
+}
+
+.topic_content {
+    height: 200px;
+}
+
+.spead_footnote {
+    background-color: #efefef;
+    color: #555;
+    border: 1px solid #cecece;
+}
+
+#footnote_data {
+    border-top: 1px solid gainsboro;
+    padding-top: 10px;
+}
+
+a {
+    color: dodgerblue;
+}
+
+blockquote {
+    padding: 15px 40px 15px 15px;
+    margin: 15px 0 0;
+    display: table;
+    border: 2px solid #ccc;
+    border-left: 5px solid black;
+    background-image: url('/views/main_css/file/quote.png');
+    background-position: calc(100% - 10px) 10px;
+    background-repeat: no-repeat;
+    background-size: 25px;
+}
+
+hr {
+    border-top: 1px solid lightgray;
+}

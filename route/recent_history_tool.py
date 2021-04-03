@@ -7,7 +7,7 @@ def recent_history_tool_2(conn, name):
 
     data = '' + \
         '<h2>' + load_lang('tool') + '</h2>' + \
-        '<ul>' + \
+        '<ul class="inside_ul">' + \
             '<li><a href="/raw/' + url_pas(name) + '?num=' + num + '">' + load_lang('raw') + '</a></li>' + \
     ''
 

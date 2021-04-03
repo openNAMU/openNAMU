@@ -9,28 +9,18 @@ def view_read_2(conn, name):
     run_redirect = ''
 
     num = flask.request.args.get('num', None)
-    if num:
-        num = int(number_check(num))
+    num = int(number_check(num)) if num else None
 
     curs.execute(db_change("select sub from rd where title = ? and not stop = 'O' order by date desc"), [name])
-    if curs.fetchall():
-        topic = 1
-    else:
-        topic = 0
+    topic = 1 if curs.fetchall() else 0
 
     curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
 
     curs.execute(db_change("select title from data where title like ?"), ['%' + name + '/%'])
-    if curs.fetchall():
-        down = 1
-    else:
-        down = 0
+    down = 1 if curs.fetchall() else 0
 
     m = re.search(r"^(.*)\/(.*)$", name)
-    if m:
-        uppage = m.group(1)
-    else:
-        uppage = 0
+    uppage = m.group(1) if m else 0
 
     if re.search(r'^category:', name):
         curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
@@ -40,7 +30,7 @@ def view_read_2(conn, name):
 
             for data in back:
                 if div == '':
-                    div = '<br><h2 id="cate_normal">' + load_lang('category_title') + '</h2><ul>'
+                    div = '<br><h2 id="cate_normal">' + load_lang('category_title') + '</h2><ul class="inside_ul">'
 
                 if re.search(r'^category:', data[0]):
                     u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
@@ -56,7 +46,7 @@ def view_read_2(conn, name):
                 div += '</ul>'
 
             if u_div != '':
-                div += '<br><h2 id="cate_under">' + load_lang('under_category') + '</h2><ul>' + u_div + '</ul>'
+                div += '<br><h2 id="cate_under">' + load_lang('under_category') + '</h2><ul class="inside_ul">' + u_div + '</ul>'
 
 
     cache_data = None
@@ -106,26 +96,26 @@ def view_read_2(conn, name):
         curs.execute(db_change('select data from other where name = "error_401"'))
         sql_d = curs.fetchall()
         if sql_d and sql_d[0][0] != '':
-            end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + sql_d[0][0] + '</li></ul>'
+            end_data = '<h2>' + load_lang('error') + '</h2><ul class="inside_ul"><li>' + sql_d[0][0] + '</li></ul>'
         else:
-            end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('authority_error') + '</li></ul>'
+            end_data = '<h2>' + load_lang('error') + '</h2><ul class="inside_ul"><li>' + load_lang('authority_error') + '</li></ul>'
     elif end_data == 'HTTP Request 404':
         response_data = 404
 
         curs.execute(db_change('select data from other where name = "error_404"'))
         sql_d = curs.fetchall()
         if sql_d and sql_d[0][0] != '':
-            end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + sql_d[0][0] + '</li></ul>'
+            end_data = '<h2>' + load_lang('error') + '</h2><ul class="inside_ul"><li>' + sql_d[0][0] + '</li></ul>'
         else:
-            end_data = '<h2>' + load_lang('error') + '</h2><ul><li>' + load_lang('decument_404_error') + '</li></ul>'
+            end_data = '<h2>' + load_lang('error') + '</h2><ul class="inside_ul"><li>' + load_lang('decument_404_error') + '</li></ul>'
 
         curs.execute(db_change('' + \
             'select ip, date, leng, send, id from history ' + \
-            'where title = ? and hide != "O" and type = "" order by id + 0 desc limit 3' + \
+            'where title = ? and hide != "O" order by id + 0 desc limit 3' + \
         ''), [name])
         sql_d = curs.fetchall()
         if sql_d:
-            end_data += '<h2>' + load_lang('history') + '</h2><ul>'
+            end_data += '<h2>' + load_lang('history') + '</h2><ul class="inside_ul">'
             for i in sql_d:
                 if re.search(r"\+", i[2]):
                     leng = '<span style="color:green;">(' + i[2] + ')</span>'
@@ -146,10 +136,14 @@ def view_read_2(conn, name):
         acl = 0
         r_date = 0
     else:
-        curs.execute(db_change("select decu from acl where title = ?"), [name])
+        curs.execute(db_change("select title from acl where title = ?"), [name])
         acl = 1 if curs.fetchall() else 0
         menu_acl = 1 if acl_check(name) == 1 else 0
-        menu = [['edit/' + url_pas(name), load_lang('create'), menu_acl]] if response_data == 404 else [['edit/' + url_pas(name), load_lang('edit'), menu_acl]]
+        if response_data == 404:
+            menu = [['edit/' + url_pas(name), load_lang('create'), menu_acl]] 
+        else:
+            menu = [['edit/' + url_pas(name), load_lang('edit'), menu_acl]]
+            
         menu += [
             ['topic/' + url_pas(name), load_lang('discussion'), topic], 
             ['history/' + url_pas(name), load_lang('history')], 

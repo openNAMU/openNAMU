@@ -7,7 +7,7 @@ def login_2(conn):
     if ip_or_user(ip) == 0:
         return redirect('/user')
 
-    if ban_check(tool = 'login') == 1:
+    if ban_check(None, 'login') == 1:
         return re_error('/ban')
 
     if flask.request.method == 'POST':
@@ -16,7 +16,7 @@ def login_2(conn):
         else:
             captcha_post('', 0)
 
-        agent = flask.request.headers.get('User-Agent')
+        user_agent = flask.request.headers.get('User-Agent', '')
         user_id = flask.request.form.get('id', '')
 
         curs.execute(db_change("select pw, encode from user where id = ?"), [user_id])
@@ -36,33 +36,17 @@ def login_2(conn):
         curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [user_id])
         fa_data = curs.fetchall()
         if fa_data and fa_data[0][0] != '':
-            curs.execute(db_change("select css from custom where user = ?"), [user_id])
-            css_data = curs.fetchall()
-            flask.session['b_head'] = css_data[0][0] if css_data else ''
             flask.session['b_id'] = user_id
 
             return redirect('/2fa_login')
         else:
-            curs.execute(db_change("select css from custom where user = ?"), [user_id])
-            css_data = curs.fetchall()
-            flask.session['head'] = css_data[0][0] if css_data else ''
             flask.session['id'] = user_id
 
-            curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [
-                user_id, 
-                ip, 
-                agent, 
-                get_time()
-            ])
+            ua_plus(user_id, ip, user_agent, get_time())
             conn.commit()
 
             return redirect('/user')
     else:
-        http_warring = '' + \
-            '<hr class="main_hr">' + \
-            '<span>' + load_lang('http_warring') + '</span>' + \
-        ''
-
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
@@ -73,7 +57,7 @@ def login_2(conn):
                         <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>
-                        ''' + http_warring + '''
+                        ''' + http_warring() + '''
                     </form>
                     ''',
             menu = [['user', load_lang('return')]]

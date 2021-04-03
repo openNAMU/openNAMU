@@ -72,7 +72,7 @@ def inter_wiki_2(conn, tools):
 
     db_data = curs.fetchall()
     if db_data:
-        div += '<ul>'
+        div += '<ul class="inside_ul">'
 
         for data in db_data:
             if tools == 'inter_wiki':

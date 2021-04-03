@@ -4,7 +4,7 @@ body {
     word-wrap: break-word;
     margin: 0;
     font-family: 'Apple SD Gothic', '맑은고딕', 'Nanum Gothic', 'Noto Sans KR', sans-serif;
-    font-size: 14px;
+    font-size: 0.85rem;
 }
 
 ul {
@@ -331,14 +331,6 @@ textarea, input {
 
 #nav_bar a {
     color: white;
-}
-
-blockquote {
-    padding: 1em calc(2em + 25px) 1em 1em;
-    margin: 1em 0em 0em;
-    background-color: #eeeeee;
-    border: 1px dashed #ccc;
-    border-left: 5px solid black;
 }
 
 #out_link::before {

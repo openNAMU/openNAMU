@@ -16,9 +16,17 @@ function do_insert_data(name, data) {
     }
 }
 
+function monaco_to_content() {
+    try {
+        document.getElementById('content').innerHTML = window.editor.getValue();
+    } catch(e) {}
+}
+
 function do_not_out() {
     window.addEventListener('DOMContentLoaded', function() {
         window.onbeforeunload = function() {
+            monaco_to_content();
+            
             data = document.getElementById('content').value;
             origin = document.getElementById('origin').value;
             if(data !== origin) {
@@ -48,20 +56,21 @@ function do_paste_image() {
 
 function pasteListener(e) {
     // find file
-    if (e.clipboardData && e.clipboardData.items) {
+    if(e.clipboardData && e.clipboardData.items) {
         const items = e.clipboardData.items;
         let haveImageInClipboard = false;
         const formData = new FormData();
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf("image") !== -1) {
+        for(let i = 0; i < items.length; i++) {
+            if(items[i].type.indexOf("image") !== -1) {
                 const file = items[i].getAsFile();
-                const customName = prompt("파일 이름을 설정해주세요. (확장자는 생략)");
+                const customName = prompt("파일 이름 (확장자 제외)");
                 
                 if (!customName) {
-                    return alert("취소되었습니다.");
+                    return alert("파일 이름 없음");
                 }
                 
-                const customFile = new File([file], customName + ".png", { type: file.type });
+                var file_name = customName + ".png";
+                const customFile = new File([file], file_name, { type: file.type });
                 formData.append("f_data[]", customFile);
                 haveImageInClipboard = true;
                 e.preventDefault();
@@ -69,7 +78,8 @@ function pasteListener(e) {
                 break;
             }
         }
-        if (!haveImageInClipboard) {
+
+        if(!haveImageInClipboard) {
             return;
         }
 
@@ -81,22 +91,50 @@ function pasteListener(e) {
             if (res.status === 200 || res.status === 201) {
                 const url = res.url;
                 alert(
-                    '클립보드의 이미지를 성공적으로 업로드했습니다. 아래 텍스트로 본문에 삽입할 수 있습니다. ' +
-                    '[[' + decodeURIComponent(url.replace(/.*\/w\/file/, "file")) + ']]'
+                    '업로드 완료 : ' +
+                    '[[파일:' + file_name + ']]'
                 );
             } else {
                 console.error("[ERROR] PasteUpload Fail :", res.statusText);
                 if(res.status === 400) {
-                    alert("클립보드의 이미지를 업로드하는데 실패했습니다. 파일 이름 중복일 수 있습니다.");
+                    alert("파일 이름 중복");
                 } else if(res.status === 401) {
-                    alert("클립보드의 이미지를 업로드하는데 실패했습니다. 권한 부족일 수 있습니다.");    
+                    alert("권한 부족");    
                 } else {
-                    alert("클립보드의 이미지를 업로드하는데 실패했습니다.");        
+                    alert("업로드 실패");        
                 }
             }
         }).catch((err) => {
-            console.error("[ERROR] PasteUpload Fail :", JSON.stringify(err), err);
-            alert("클립보드의 이미지를 업로드하는데 실패했습니다. 서버가 응답하지 않습니다.");
+            console.error("오류 내역 :", JSON.stringify(err), err);
+            alert("업로드 실패");
         });
     }
+}
+
+function load_preview(name) {
+    var s_data = new FormData();
+    s_data.append('data', document.getElementById('content').value);
+
+    var url = "/api/w/" + name;
+    var url_2 = "/api/markup";
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.send(s_data);
+
+    var xhr_2 = new XMLHttpRequest();
+    xhr_2.open("GET", url_2, true);
+    xhr_2.send(null);
+
+    xhr.onreadystatechange = function() {
+        if(xhr.readyState === 4 && xhr.status === 200) {
+            var o_p_data = JSON.parse(xhr.responseText);
+            document.getElementById('see_preview').innerHTML = o_p_data['data'];
+            eval(o_p_data['js_data'])
+        }
+    }
+}
+
+function load_raw_preview(name_1, name_2) {
+    document.getElementById(name_2).innerHTML = document.getElementById(name_1).value;
 }

@@ -7,30 +7,24 @@ def search_deep_2(conn, name):
         return redirect()
 
     num = int(number_check(flask.request.args.get('num', '1')))
-    if num * 50 > 0:
-        sql_num = num * 50 - 50
-    else:
-        sql_num = 0
+    sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
-    div = '<ul>'
+    div = '<ul class="inside_ul">'
 
     div_plus = ''
     test = ''
 
     curs.execute(db_change("select title from data where title = ?"), [name])
-    if curs.fetchall():
-        link_id = ''
-    else:
-        link_id = 'id="not_thing"'
+    link_id = '' if curs.fetchall() else 'id="not_thing"'
 
     div = '''
-        <ul>
+        <ul class="inside_ul">
             <li>
                 <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + html.escape(name) + '''</a>
             </li>
         </ul>
         <hr class=\"main_hr\">
-        <ul>
+        <ul class="inside_ul">
     '''
 
     curs.execute(db_change('select data from other where name = "count_all_title"'))
@@ -48,7 +42,7 @@ def search_deep_2(conn, name):
 
             for data in all_list:
                 if data[1] != test:
-                    div_plus += '</ul><hr class=\"main_hr\"><ul>'
+                    div_plus += '</ul><hr class=\"main_hr\"><ul class="inside_ul">'
 
                     test = data[1]
 

@@ -2,8 +2,6 @@ from .tool.func import *
 
 def topic_2(conn, topic_num):
     curs = conn.cursor()
-
-    admin = admin_check(3)
     topic_num = str(topic_num)
 
     if flask.request.method == 'POST':
@@ -37,38 +35,30 @@ def topic_2(conn, topic_num):
 
         curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [topic_num])
         old_num = curs.fetchall()
-        if old_num:
-            num = int(old_num[0][0]) + 1
-        else:
-            num = 1
-
-        num = str(num)
+        num = str((int(old_num[0][0]) + 1) if old_num else 1)
 
         match = re.search(r'^user:([^/]+)', name)
         if match:
+            match = match.group(1)
             y_check = 0
-            if ip_or_user(match.group(1)) == 1:
-                curs.execute(db_change("select ip from history where ip = ? limit 1"), [match.group(1)])
+            if ip_or_user(match) == 1:
+                curs.execute(db_change("select ip from history where ip = ? limit 1"), [match])
                 u_data = curs.fetchall()
                 if u_data:
                     y_check = 1
                 else:
-                    curs.execute(db_change("select ip from topic where ip = ? limit 1"), [match.group(1)])
+                    curs.execute(db_change("select ip from topic where ip = ? limit 1"), [match])
                     u_data = curs.fetchall()
                     if u_data:
                         y_check = 1
             else:
-                curs.execute(db_change("select id from user where id = ?"), [match.group(1)])
+                curs.execute(db_change("select id from user where id = ?"), [match])
                 u_data = curs.fetchall()
                 if u_data:
                     y_check = 1
 
             if y_check == 1:
-                curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
-                    match.group(1),
-                    ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>',
-                    today
-                ])
+                add_alarm(match, ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>')
 
         cate_re = re.compile(r'\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
         data = cate_re.sub('[br]', flask.request.form.get('content', 'Test').replace('\r', ''))
@@ -77,11 +67,7 @@ def topic_2(conn, topic_num):
             curs.execute(db_change("select ip from topic where code = ? and id = ?"), [topic_num, rd_data])
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
-                curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
-                    ip_data[0][0],
-                    ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>',
-                    today
-                ])
+                add_alarm(ip_data[0][0], ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>')
 
         for rd_data in re.findall(r"(?: |\n|^)@((?:[^ ]+))(?: |\n|$)", data):
             curs.execute(db_change("select ip from history where ip = ? limit 1"), [rd_data])
@@ -91,11 +77,7 @@ def topic_2(conn, topic_num):
                 ip_data = curs.fetchall()
 
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
-                curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [
-                    ip_data[0][0],
-                    ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>',
-                    today
-                ])
+                add_alarm(ip_data[0][0], ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>')
 
         data = re.sub(r"( |\n|^)(#(?:[0-9]+))( |\n|$)", '\g<1><topic_a>\g<2></topic_a>\g<3>', data)
         data = re.sub(r"( |\n|^)(@(?:[^ ]+))( |\n|$)", '\g<1><topic_call>\g<2></topic_call>\g<3>', data)
@@ -112,37 +94,28 @@ def topic_2(conn, topic_num):
 
         return redirect('/thread/' + topic_num + '#' + num)
     else:
-        data = ''
-
-        if ban == 1:
-            display = 'display: none;'
-        else:
-            display = ''
-
-        data += '''
-            <div id="top_topic"></div>
-            <div id="main_topic"></div>
-            <div id="plus_topic"></div>
-            <script>topic_top_load("''' + topic_num + '''");</script>
-            <a href="/thread/''' + topic_num + '/tool">(' + load_lang('topic_tool') + ''')</a>
-            <hr class=\"main_hr\">
-            <form style="''' + display + '''" method="post">
-                <textarea id="content" class="topic_content" placeholder="''' + load_lang('content') + '''" name="content"></textarea>
-                <hr class=\"main_hr\">
-                ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
-                <input style="display: none;" name="topic" value="''' + name + '''">
-                <input style="display: none;" name="title" value="''' + sub + '''">
-                <button id="save" type="submit">''' + load_lang('send') + '''</button>
-                <button id="preview" type="button" onclick="load_preview(\'\')">''' + load_lang('preview') + '''</button>
-            </form>
-            <hr class=\"main_hr\">
-            <div id="see_preview"></div>
-        '''
-
+        display = 'display: none;' if ban == 1 else ''
         return easy_minify(flask.render_template(skin_check(),
             imp = [name, wiki_set(), custom(), other2(['(' + load_lang('discussion') + ')', 0])],
             data = '''
                 <h2 id="topic_top_title">''' + html.escape(sub) + '''</h2>
-                ''' + data,
+                <div id="top_topic"></div>
+                <div id="main_topic"></div>
+                <div id="plus_topic"></div>
+                <script>new_topic_load("''' + topic_num + '''");</script>
+                <a href="/thread/''' + topic_num + '/tool">(' + load_lang('topic_tool') + ''')</a>
+                <hr class="main_hr">
+                <form style="''' + display + '''" method="post">
+                    <textarea id="content" class="topic_content" placeholder="''' + load_lang('content') + '''" name="content"></textarea>
+                    <hr class="main_hr">
+                    ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
+                    <input style="display: none;" name="topic" value="''' + name + '''">
+                    <input style="display: none;" name="title" value="''' + sub + '''">
+                    <button id="save" type="submit">''' + load_lang('send') + '''</button>
+                    <button id="preview" type="button" onclick="load_preview(\'\')">''' + load_lang('preview') + '''</button>
+                </form>
+                <hr class="main_hr">
+                <div id="see_preview"></div>
+            ''',
             menu = [['topic/' + url_pas(name), load_lang('list')]]
         ))

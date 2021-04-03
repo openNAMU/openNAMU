@@ -47,7 +47,7 @@ def watch_list_2(conn, tool):
         ''
 
     if data:
-        div = '<ul>' + div + '</ul><hr class=\"main_hr\">'
+        div = '<ul class="inside_ul">' + div + '</ul><hr class=\"main_hr\">'
 
     div += '<a href="/manager/' + ('13' if tool == 'watch_list' else '16') + '">(' + load_lang('add') + ')</a>'
 

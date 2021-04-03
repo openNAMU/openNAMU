@@ -3,7 +3,7 @@ function main_css_regex_data(data) {
 }
 
 function main_css_get_post() {    
-    var check = document.getElementById('strike');
+    var check = document.getElementById('main_css_strike');
     if(check.value === 'normal') {
         document.cookie = 'main_css_del_strike=0;';
     } else if(check.value === 'change') {
@@ -12,7 +12,7 @@ function main_css_get_post() {
         document.cookie = 'main_css_del_strike=2;';
     }
 
-    check = document.getElementById('bold');
+    check = document.getElementById('main_css_bold');
     if(check.value === 'normal') {
         document.cookie = 'main_css_del_bold=0;';
     } else if(check.value === 'change') {
@@ -21,39 +21,64 @@ function main_css_get_post() {
         document.cookie = 'main_css_del_bold=2;';
     }
 
-    check = document.getElementById('include');
+    check = document.getElementById('main_css_include');
     if(check.checked) {
         document.cookie = 'main_css_include_link=1;';
     } else {
         document.cookie = 'main_css_include_link=0;';
     }
 
-    check = document.getElementById('category');
+    check = document.getElementById('main_css_category');
     if(check.value === 'bottom') {
         document.cookie = 'main_css_category_set=0;';
     } else {
         document.cookie = 'main_css_category_set=1;';
     }
 
-    check = document.getElementById('footnote');
+    check = document.getElementById('main_css_footnote');
     if(check.value === 'spread') {
         document.cookie = 'main_css_footnote_set=1;';
     } else {
         document.cookie = 'main_css_footnote_set=0;';
     }
 
-    check = document.getElementById('image');
-    if(check.value === 'click') {
+    check = document.getElementById('main_css_image');
+    if(check.value === 'new_click') {
+        document.cookie = 'main_css_image_set=2;';
+    } else if(check.value === 'click') {
         document.cookie = 'main_css_image_set=1;';
     } else {
         document.cookie = 'main_css_image_set=0;';
     }
 
-    check = document.getElementById('image_paste');
+    check = document.getElementById('main_css_image_paste');
     if(check.checked) {
         document.cookie = 'main_css_image_paste=1;';
     } else {
         document.cookie = 'main_css_image_paste=0;';
+    }
+
+    check = document.getElementById('main_css_toc');
+    if(check.value === 'on') {
+        document.cookie = 'main_css_toc_set=2;';
+    } else if(check.value === 'off') {
+        document.cookie = 'main_css_toc_set=1;';
+    } else {
+        document.cookie = 'main_css_toc_set=0;';
+    }
+
+    check = document.getElementById('main_css_font_size');
+    if(check.value.match(/^[0-9]+$/)) {
+        document.cookie = 'main_css_font_size=' + check.value + ';';
+    } else {
+        document.cookie = 'main_css_font_size=;';
+    }
+
+    check = document.getElementById('main_css_monaco');
+    if(check.checked) {
+        document.cookie = 'main_css_monaco=1;';
+    } else {
+        document.cookie = 'main_css_monaco=0;';
     }
 
     history.go(0);
@@ -97,9 +122,24 @@ function main_css_skin_load() {
             head_data.innerHTML += '<style>#cate { margin-top: 0px; margin-bottom: 20px; }</style>';
         }
     }
+
+    if(
+        document.cookie.match(main_css_regex_data('main_css_font_size')) &&
+        document.cookie.match(main_css_regex_data('main_css_font_size'))[1] !== ''
+    ) {
+        head_data.innerHTML += '<style>.all_in_data { font-size: ' + document.cookie.match(main_css_regex_data('main_css_font_size'))[1] + 'px; }</style>';
+    }
+
+    if(document.cookie.match(main_css_regex_data('main_css_toc_set'))) {
+        if(document.cookie.match(main_css_regex_data('main_css_toc_set'))[1] === '2') {
+            head_data.innerHTML += '<style>#auto_toc { display: none; }</style>';
+        } else if(document.cookie.match(main_css_regex_data('main_css_toc_set'))[1] === '1') {
+            head_data.innerHTML += '<style>#toc { display: none; }</style>';
+        }
+    }
 }
 
-function main_css_skin_set() {    
+function main_css_load_lang(name) {
     var set_language = {
         "en-US" : {
             "default" : "Default",
@@ -116,7 +156,20 @@ function main_css_skin_set() {
             "set_footnote" : "Set footnote",
             "renderer" : "Renderer",
             "spread" : "Spread",
-            "set_image" : "Set image"
+            "set_image" : "Set image",
+            "set_toc" : "Set TOC",
+            "click_load" : "Load on click",
+            "in_content" : "Only when TOC is in the document",
+            "all_off" : "Always off",
+            "set_font_size" : "Set font size",
+            "change_to_link" : "Change to link",
+            "font_size" : "font size",
+            "editor" : "Editor",
+            "main" : "Main",
+            "clipboard_upload" : "Clipboard upload",
+            "only_korean" : "Supported in korean only",
+            "except_ie" : "Not supported for Internet Explorer",
+            "use_monaco" : "Use monaco editor"
         }, "ko-KR" : {
             "default" : "기본값",
             "change_to_normal" : "일반 텍스트로 변경",
@@ -132,25 +185,48 @@ function main_css_skin_set() {
             "set_footnote" : "각주 설정",
             "renderer" : "렌더러",
             "spread" : "펼치기",
-            "set_image" : "이미지 설정"
+            "set_image" : "이미지 설정",
+            "set_toc" : "목차 설정",
+            "click_load" : "클릭시 불러오기",
+            "in_content" : "문서 안에 있을 때만",
+            "all_off" : "항상 끔",
+            "set_font_size" : "글자 크기 설정",
+            "change_to_link" : "링크로 변경",
+            "font_size" : "글자 크기",
+            "editor" : "편집기",
+            "main" : "메인",
+            "clipboard_upload" : "클립보드 파일 올리기",
+            "only_korean" : "한국어로만 지원됨",
+            "except_ie" : "인터넷 익스플로러에선 지원되지 않음",
+            "use_monaco" : "모나코 에디터 사용"
         }
     }
 
-    var language = document.cookie.match(main_css_regex_data('language'))[1];
+    var server_language = document.cookie.match(main_css_regex_data('language'))[1];
     var user_language = document.cookie.match(main_css_regex_data('user_language'))[1];
     if(user_language in set_language) {
         language = user_language;
+    } else {
+        if(server_language in set_language) {
+            language = server_language;
+        } else {
+            language = 'en-US';
+        }
     }
 
-    if(!language in set_language) {
-        language = "en-US";
+    if(name in set_language[language]) {
+        return set_language[language][name];
+    } else {
+        return name + ' (' + language + ')';
     }
+}
 
+function main_css_skin_set() {    
     var set_data = {};
     var strike_list = [
-        ['0', 'normal', set_language[language]['default']],
-        ['1', 'change', set_language[language]['change_to_normal']],
-        ['2', 'delete', set_language[language]['delete']]
+        ['0', 'normal', main_css_load_lang('default')],
+        ['1', 'change', main_css_load_lang('change_to_normal')],
+        ['2', 'delete', main_css_load_lang('delete')]
     ];
     set_data["strike"] = '';
     var i = 0;
@@ -168,9 +244,9 @@ function main_css_skin_set() {
     }
 
     var bold_list = [
-        ['0', 'normal', set_language[language]['default']],
-        ['1', 'change', set_language[language]['change_to_normal']],
-        ['2', 'delete', set_language[language]['delete']]
+        ['0', 'normal', main_css_load_lang('default')],
+        ['1', 'change', main_css_load_lang('change_to_normal')],
+        ['2', 'delete', main_css_load_lang('delete')]
     ];
     set_data["bold"] = '';
     i = 0;
@@ -206,8 +282,8 @@ function main_css_skin_set() {
     }
 
     var category_list = [
-        ['0', 'bottom', set_language[language]['bottom']],
-        ['1', 'top', set_language[language]['top']],
+        ['0', 'bottom', main_css_load_lang('bottom')],
+        ['1', 'top', main_css_load_lang('top')],
     ];
     set_data["category"] = '';
     i = 0;
@@ -225,8 +301,8 @@ function main_css_skin_set() {
     }
 
     var footnote_list = [
-        ['0', 'normal', set_language[language]['default']],
-        ['1', 'spread', set_language[language]['spread']]
+        ['0', 'normal', main_css_load_lang('default')],
+        ['1', 'spread', main_css_load_lang('spread')]
     ];
     set_data["footnote"] = '';
     i = 0;
@@ -244,8 +320,9 @@ function main_css_skin_set() {
     }
 
     var image_list = [
-        ['0', 'normal', set_language[language]['default']],
-        ['1', 'click', 'click (beta)']
+        ['0', 'normal', main_css_load_lang('default')],
+        ['1', 'click', main_css_load_lang('change_to_link')],
+        ['2', 'new_click', main_css_load_lang('click_load')]
     ];
     set_data["image"] = '';
     i = 0;
@@ -262,33 +339,143 @@ function main_css_skin_set() {
         i += 1;
     }
 
+    var toc_list = [
+        ['0', 'normal', main_css_load_lang('default')],
+        ['1', 'off', main_css_load_lang('all_off')],
+        ['2', 'on', main_css_load_lang('in_content')]
+    ];
+    set_data["toc"] = '';
+    i = 0;
+    while(toc_list[i]) {
+        if(
+            document.cookie.match(main_css_regex_data('main_css_toc_set')) && 
+            document.cookie.match(main_css_regex_data('main_css_toc_set'))[1] === toc_list[i][0]
+        ) {
+            set_data["toc"] = '<option value="' + toc_list[i][1] + '">' + toc_list[i][2] + '</option>' + set_data["toc"];
+        } else {
+            set_data["toc"] += '<option value="' + toc_list[i][1] + '">' + toc_list[i][2] + '</option>';
+        }
+
+        i += 1;
+    }
+
+    if(document.cookie.match(main_css_regex_data('main_css_font_size'))) {
+        set_data["font_size"] = document.cookie.match(main_css_regex_data('main_css_font_size'))[1];
+    } else {
+        set_data["font_size"] = '';
+    }
+
+    if(
+        document.cookie.match(main_css_regex_data('main_css_monaco')) &&
+        document.cookie.match(main_css_regex_data('main_css_monaco'))[1] === '1'
+    ) {
+        set_data["monaco"] = "checked";
+    } else {
+        set_data["monaco"] = "";
+    }
+
     document.getElementById("main_skin_set").innerHTML = ' \
-        <h2>1. ' + set_language[language]['renderer'] + '</h2> \
-        <h3>1.1. ' + set_language[language]['strike'] + '</h3> \
-        <select id="strike" name="strike"> \
+        <h2>1. ' + main_css_load_lang('renderer') + '</h2> \
+        <h3>1.1. ' + main_css_load_lang('strike') + '</h3> \
+        <select id="main_css_strike"> \
             ' + set_data["strike"] + ' \
         </select> \
-        <h3>1.2. ' + set_language[language]['bold'] + '</h3> \
-        <select id="bold" name="bold"> \
+        <h3>1.2. ' + main_css_load_lang('bold') + '</h3> \
+        <select id="main_css_bold"> \
             ' + set_data["bold"] + ' \
         </select> \
-        <h3>1.3. ' + set_language[language]['where_category'] + '</h3> \
-        <select id="category" name="category"> \
+        <h3>1.3. ' + main_css_load_lang('where_category') + '</h3> \
+        <select id="main_css_category"> \
             ' + set_data["category"] + ' \
         </select> \
-        <h3>1.4. ' + set_language[language]['set_footnote'] + '</h3> \
-        <select id="footnote" name="footnote"> \
+        <h3>1.4. ' + main_css_load_lang('set_footnote') + '</h3> \
+        <select id="main_css_footnote"> \
             ' + set_data["footnote"] + ' \
         </select> \
-        <h3>1.5. ' + set_language[language]['set_image'] + '</h3> \
-        <select id="image" name="image"> \
+        <h3>1.5. ' + main_css_load_lang('set_image') + '</h3> \
+        <select id="main_css_image"> \
             ' + set_data["image"] + ' \
         </select> \
-        <h3>1.6. ' + set_language[language]['other'] + '</h3> \
-        <input ' + set_data["include"] + ' type="checkbox" id="include" name="include" value="include"> ' + set_language[language]['include_link'] + ' \
+        <h3>1.6. ' + main_css_load_lang('other') + '</h3> \
+        <input ' + set_data["include"] + ' type="checkbox" id="main_css_include" value="include"> ' + main_css_load_lang('include_link') + ' \
+        <h3>1.7. ' + main_css_load_lang('set_toc') + '</h3> \
+        <select id="main_css_toc"> \
+            ' + set_data["toc"] + ' \
+        </select> \
+        <h3>1.8. ' + main_css_load_lang('set_font_size') + '</h3> \
+        <input id="main_css_font_size" placeholder="' + main_css_load_lang('font_size') + ' (EX : 11)" value="' + set_data["font_size"] + '"> \
+        <h2>2. ' + main_css_load_lang('editor') + '</h2> \
+        <h3>2.1. ' + main_css_load_lang('main') + '</h3> \
+        <input ' + set_data["monaco"] + ' type="checkbox" id="main_css_monaco" value="monaco"> ' + main_css_load_lang('use_monaco') + '<sup>(1)</sup> \
         <hr class="main_hr"> \
-        <input ' + set_data["image_paste"] + ' type="checkbox" id="image_paste" name="image_paste" value="image_paste"> 클립보드 이미지 업로드 (ko-KR) \
+        <input ' + set_data["image_paste"] + ' type="checkbox" id="main_css_image_paste" value="image_paste"> ' + 
+            main_css_load_lang('clipboard_upload') + '<sup>(ko-KR)</sup><sup>(1)</sup> \
         <hr class="main_hr"> \
-        <button onclick="main_css_get_post();">' + set_language[language]['save'] + '</button> \
+        <button onclick="main_css_get_post();">' + main_css_load_lang('save') + '</button> \
+        <hr class="main_hr"> \
+        <ul id="footnote_data"> \
+            <li><a id="note_1_end" href="#note_1">(1)</a> ' + main_css_load_lang('except_ie') + '</li> \
+            <li><a href="#note_1_1">(1.1)</a></li> \
+            <li><a id="note_2_end" href="#note_2">(ko-KR)</a> ' + main_css_load_lang('only_korean') + '</li> \
+        </ul> \
     ';
+
+    // 목차 구현
+    var toc_all_data = '<div id="toc"><span id="toc_title">TOC</span><br>';
+    var skin_set_data = document.getElementById("main_skin_set").innerHTML;
+    var split_toc;
+    var toc_data;
+    i = 1;
+    while(1) {
+        toc_data = skin_set_data.match(/<h[1-6]>([^<>]+)<\/h[1-6]>/);
+        if(toc_data) {
+            split_toc = toc_data[1].match(/^([^ ]+)(.+)/);
+            toc_all_data += '' + 
+                '<br>' +
+                '<span style="margin-left: ' + String(((toc_data[1].match(/\./g) || []).length - 1) * 10) + 'px;">' +
+                    '<a href="#toc_' + String(i) + '">' + split_toc[1] + '</a>' + split_toc[2] +
+                '</span>' +
+            '';
+
+            skin_set_data = skin_set_data.replace(
+                /<(h[1-6])>([^<>]+)<\/h[1-6]>/, 
+                '<$1 id="toc_' + String(i) + '"><a href="#toc">' + split_toc[1] + '</a>' + split_toc[2] + '</$1>'
+            );
+            i += 1;
+        } else {
+            break;
+        }
+    }
+    document.getElementById("main_skin_set").innerHTML = toc_all_data + '</div>' + skin_set_data;
+
+    // 각주 구현
+    skin_set_data = document.getElementById("main_skin_set").innerHTML;
+    var note_list = {};
+    var plus_note;
+    i = 1;
+    while(1) {
+        toc_data = skin_set_data.match(/<sup>([^<>]+)<\/sup>/);
+        if(toc_data) {
+            if(!note_list[toc_data[1]]) {
+                note_list[toc_data[1]] = [String(i), 0];
+            } else {
+                note_list[toc_data[1]][1] += 1;
+            }
+
+            if(note_list[toc_data[1]][1] != 0) {
+                plus_note = '_' + String(note_list[toc_data[1]][1]);
+            } else {
+                plus_note = '';
+            }
+            
+            skin_set_data = skin_set_data.replace(
+                /<sup>([^<>]+)<\/sup>/, 
+                '<sup><a id="note_' + note_list[toc_data[1]][0] + plus_note + '" href="#note_' + note_list[toc_data[1]][0] + '_end">$1</a></sup>'
+            );
+            i += 1;
+        } else {
+            break;
+        }
+    }
+    document.getElementById("main_skin_set").innerHTML = skin_set_data;    
 }

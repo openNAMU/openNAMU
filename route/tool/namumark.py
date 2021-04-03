@@ -4,6 +4,11 @@ import datetime
 import html
 import re
 
+end_data = ''
+plus_data = ''
+nowiki_num = ''
+include_name = ''
+
 def nowiki_js(data):
     data = data.replace('\\', '\\\\')
     data = data.replace('"', '\\"')
@@ -396,17 +401,16 @@ def middle_parser(data):
                         ''
                         data = re.sub(
                             r'{{{#!folding ?((?:(?!\n).)*)\n?', '' + \
-                            '<div>' + \
-                                '<div style="display: inline-block;">' + \
-                                    '<b>' + \
-                                        '<a href="javascript:void(0);" ' + \
-                                            'onclick="do_open_folding(\'' + include_name + 'folding_' + str(folding_num) + '\');" ' + \
-                                            'id="get_' + include_name + 'folding_' + str(folding_num) + '">' + \
-                                        '</a>' + \
-                                    '</b>' + \
-                                '</div_2>' + \
-                                '<div id="' + include_name + 'folding_' + str(folding_num) + '" style="display: none;">' + \
-                                    '<div_1 style="">\n',
+                            '<div style="display: inline-block;">' + \
+                                '<b>' + \
+                                    '<a href="javascript:void(0);" ' + \
+                                        'onclick="do_open_folding(\'' + include_name + 'folding_' + str(folding_num) + '\');" ' + \
+                                        'id="get_' + include_name + 'folding_' + str(folding_num) + '">' + \
+                                    '</a>' + \
+                                '</b>' + \
+                            '</div_2>' + \
+                            '<div id="' + include_name + 'folding_' + str(folding_num) + '" style="display: none;">' + \
+                                '<div_1 style="">\n',
                             data,
                             1
                         )
@@ -444,7 +448,7 @@ def middle_parser(data):
                         middle_num -= 1
 
                     if middle_list[middle_num] == 'div_dd':
-                        data = middle_re.sub('</div_1></div_2></div_2>', data, 1)
+                        data = middle_re.sub('</div_1></div_2>', data, 1)
                     elif middle_list[middle_num] == 'pre':
                         data = middle_re.sub('</code></pre>', data, 1)
                     else:
@@ -465,8 +469,8 @@ def middle_parser(data):
                 if middle_num > 0:
                     middle_num -= 1
 
-                if middle_list[middle_num] == '2div':
-                    data += '</div_1></div_2></div_2>'
+                if middle_list[middle_num] == 'div_dd':
+                    data += '</div_1></div_2>'
                 elif middle_list[middle_num] == 'pre':
                     data += '</code></pre>'
                 else:
@@ -652,7 +656,14 @@ def namumark(conn, data, title, include_num):
                     else:
                         break
 
-                plus_data += 'load_include("' + include_link + '", "' + include_name + 'include_' + str(i) + '", ' + str(include_plus_data) + ');\n'
+                plus_data += '' + \
+                    'load_include(' + \
+                        '"' + include_link + '", '+ \
+                        '"' + include_name + 'include_' + str(i) + '", ' + \
+                        str(include_plus_data) + ', ' + \
+                        '"' + title + '"' + \
+                    ');\n' + \
+                ''
             else:
                 break
     else:
@@ -696,20 +707,21 @@ def namumark(conn, data, title, include_num):
         
         plus_data += '' + \
             'var get_link = window.location.search.match(/(?:\?|&)from=([^&]+)/);\n' + \
-            'var get_link_2 = window.location.pathname.match(/^\/w\//);' + \
+            'var get_link_2 = window.location.pathname.match(/^\/w\//);\n' + \
             'if(!get_link && get_link_2) {\n' + \
                 'window.location.href = "/w/' + tool.url_pas(main_link) + '?from=' + tool.url_pas(title) + other_link + '";\n' + \
             '}\n' + \
         ''
         data = redirect_re.sub('\nredirect to ' + html.escape(main_link) + other_link, data, 1)
 
-    no_toc_re = re.compile(r'\[(?:목차|toc)\((?:no)\)\]\n', re.I)
+    no_toc_re = re.compile(r'\[(?:목차|toc)\(no\)\]', re.I)
     toc_re = re.compile(r'\[(?:목차|toc)\]', re.I)
-    if not no_toc_re.search(data):
-        if not toc_re.search(data):
-            data = re.sub(r'(?P<in>\n(={1,6})(#)? ?((?:(?!(?: #=| =)).)+) ?#?(?:=+)\n)', '\n[toc]\g<in>', data, 1)
+    if not no_toc_re.search(data) and not toc_re.search(data):
+        data = re.sub(r'(?P<in>\n(={1,6})(#)? ?((?:(?!(?: #=| =)).)+) ?#?(?:=+)\n)', '\n[toc]\g<in>', data, 1)
+        auto_toc = 1
     else:
         data = no_toc_re.sub('', data)
+        auto_toc = 0
 
     data = '<div class="all_in_data" id="in_data_0">' + data
 
@@ -746,7 +758,7 @@ def namumark(conn, data, title, include_num):
                 '<h' + toc_len_str + ' id="s-' + toc_level_str + '">' + \
                     '<a href="#toc">' + toc_level_str + '.</a> ' + toc[2] + ' ' + \
                     '<span style="font-size: 12px">' + \
-                        '<a href="/edit/' + tool.url_pas(title) + '?section=' + edit_num_str + '">(Edit)</a>' + \
+                        '<a id="edit_load_' + edit_num_str + '" href="/edit/' + tool.url_pas(title) + '?section=' + edit_num_str + '">(Edit)</a>' + \
                         ' ' + \
                         '<a href="javascript:void(0);" onclick="do_open_folding(\'in_data_' + edit_num_str + '\', this);">' + \
                             '(' + toc_fol + ')' + \
@@ -773,7 +785,10 @@ def namumark(conn, data, title, include_num):
             break
 
     toc_data += '</div>'
-    data = toc_re.sub(toc_data, data)
+    if auto_toc == 1:
+        data = toc_re.sub('<div id="auto_toc">' + toc_data + '</div>', data, 1)
+    else:
+        data = toc_re.sub(toc_data, data)
     
     macro_re = re.compile(r'\[([^[(]+)\(((?:(?!\[|\)]).)+)\)\]')
     macro_data = macro_re.findall(data)
@@ -1033,7 +1048,6 @@ def namumark(conn, data, title, include_num):
                     main_link = category_re.sub('category:', main_link)
                     link_id = ''
 
-                    curs.execute(tool.db_change("select title from data where title = ?"), [main_link])
                     if re.search(r'#blur', main_link):
                         link_id = ' hidden_link'
                         main_link = main_link.replace('#blur', '')
@@ -1169,9 +1183,9 @@ def namumark(conn, data, title, include_num):
         else:
             break
 
-    if re.search(r'\[pagecount\]', data, flags = re.I):
+    if re.search(r'\[pagecount(?:\([^()]+\))?\]', data, flags = re.I):
         plus_data += 'page_count();\n'
-        data = re.sub(r'\[pagecount\]', '<span class="all_page_count"></span>', data, flags = re.I)
+        data = re.sub(r'\[pagecount(?:\([^()]+\))?\]', '<span class="all_page_count"></span>', data, flags = re.I)
 
     data = re.sub(r'\[date\]', now_time, data, flags = re.I)
     data = re.sub(r'\[clearfix\]', '<div style="clear:both"></div>', data, flags = re.I)

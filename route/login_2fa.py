@@ -10,7 +10,7 @@ def login_2fa_2(conn):
     if ip_or_user(ip) == 0:
         return redirect('/user')
 
-    if ban_check(tool = 'login') == 1:
+    if ban_check(None, 'login') == 1:
         return re_error('/ban')
 
     if flask.request.method == 'POST':
@@ -19,7 +19,7 @@ def login_2fa_2(conn):
         else:
             captcha_post('', 0)
 
-        agent = flask.request.headers.get('User-Agent')
+        user_agent = flask.request.headers.get('User-Agent', '')
         user_id = flask.session['b_id']
 
         curs.execute(db_change('select data from user_set where name = "2fa_pw" and id = ?'), [user_id])
@@ -38,27 +38,15 @@ def login_2fa_2(conn):
             if pw_check_d != 1:
                 return re_error('/error/10')
 
-        flask.session['head'] = flask.session['b_head']
         flask.session['id'] = user_id
 
-        curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [
-            user_id, 
-            ip, 
-            agent, 
-            get_time()
-        ])
+        ua_plus(user_id, ip, user_agent, get_time())
         conn.commit()
 
         flask.session.pop('b_id', None)
-        flask.session.pop('b_head', None)
 
         return redirect('/user')
     else:
-        http_warring = '' + \
-            '<hr class="main_hr">' + \
-            '<span>' + load_lang('http_warring') + '</span>' + \
-        ''
-
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('login'), wiki_set(), custom(), other2([0, 0])],
             data =  '''
@@ -67,7 +55,7 @@ def login_2fa_2(conn):
                         <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>
-                        ''' + http_warring + '''
+                        ''' + http_warring() + '''
                     </form>
                     ''',
             menu = [['user', load_lang('return')]]

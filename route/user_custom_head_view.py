@@ -8,11 +8,11 @@ def user_custom_head_view_2(conn):
     if flask.request.method == 'POST':
         get_data = flask.request.form.get('content', '')
         if ip_or_user(ip) == 0:
-            curs.execute(db_change("select user from custom where user = ?"), [ip + ' (head)'])
+            curs.execute(db_change("select id from user_set where id = ? and name = 'custom_css'"), [ip])
             if curs.fetchall():
-                curs.execute(db_change("update custom set css = ? where user = ?"), [get_data, ip + ' (head)'])
+                curs.execute(db_change("update user_set set data = ? where id = ? and name = 'custom_css'"), [get_data, ip])
             else:
-                curs.execute(db_change("insert into custom (user, css) values (?, ?)"), [ip + ' (head)', get_data])
+                curs.execute(db_change("insert into user_set (id, name, data) values (?, 'custom_css', ?)"), [ip, get_data])
 
             conn.commit()
 
@@ -23,30 +23,33 @@ def user_custom_head_view_2(conn):
         if ip_or_user(ip) == 0:
             start = ''
 
-            curs.execute(db_change("select css from custom where user = ?"), [ip + ' (head)'])
+            curs.execute(db_change("select data from user_set where id = ? and name = 'custom_css'"), [ip])
             head_data = curs.fetchall()
-            if head_data:
-                data = head_data[0][0]
-            else:
-                data = ''
+            data = head_data[0][0] if head_data else ''
         else:
-            start = '<span>' + load_lang('user_head_warring') + '</span><hr class=\"main_hr\">'
+            start = '' + \
+                '<span>' + load_lang('user_head_warring') + '</span>' + \
+                '<hr class="main_hr">' + \
+            ''
+            data = flask.session['head'] if 'head' in flask.session else ''
 
-            if 'head' in flask.session:
-                data = flask.session['head']
-            else:
-                data = ''
-
-        start += '<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr class=\"main_hr\">'
+        start += '' + \
+            '<span>' + \
+                '&lt;style&gt;CSS&lt;/style&gt;' + \
+                '<br>' + \
+                '&lt;script&gt;JS&lt;/script&gt;' + \
+            '</span>' + \
+            '<hr class="main_hr">' + \
+        ''
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang(data = 'user_head', safe = 1), wiki_set(), custom(), other2([0, 0])],
-            data =  start + '''
-                    <form method="post">
-                        <textarea rows="25" cols="100" name="content">''' + data + '''</textarea>
-                        <hr class=\"main_hr\">
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                    </form>
-                    ''',
+            data = start + '''
+                <form method="post">
+                    <textarea rows="25" cols="100" name="content">''' + data + '''</textarea>
+                    <hr class="main_hr">
+                    <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                </form>
+            ''',
             menu = [['user', load_lang('return')]]
         ))

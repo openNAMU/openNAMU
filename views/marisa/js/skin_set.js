@@ -1,9 +1,9 @@
 function get_post() {
     check = document.getElementById('invert');
     if(check.checked === true) {
-        document.cookie = 'invert=1;';
+        document.cookie = 'main_css_darkmode=1;';
     } else {
-        document.cookie = 'invert=0;';
+        document.cookie = 'main_css_darkmode=0;';
     }
 
     history.go(0);
@@ -12,11 +12,11 @@ function get_post() {
 function main_load() {
     var head_data = document.querySelector('head');
     if(
-        cookies.match(regex_data('invert')) &&
-        cookies.match(regex_data('invert'))[1] === '1'
+        cookies.match(regex_data('main_css_darkmode')) &&
+        cookies.match(regex_data('main_css_darkmode'))[1] === '1'
     ) {
         head_data.innerHTML += '' +
-            '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=1">' +
+            '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=2">' +
             '<link rel="stylesheet" href="/views/marisa/css/dark.css?ver=6">' +
         '';
     }
@@ -53,8 +53,8 @@ function skin_set() {
         var set_data = {};
 
         if(
-            cookies.match(regex_data('invert')) &&
-            cookies.match(regex_data('invert'))[1] === '1'
+            cookies.match(regex_data('main_css_darkmode')) &&
+            cookies.match(regex_data('main_css_darkmode'))[1] === '1'
         ) {
             set_data["invert"] = "checked";
         }

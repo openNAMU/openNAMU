@@ -11,23 +11,21 @@ def main_views_2(conn, name):
         file_name = file_name.group(1)
         dir_name = './views/' + re.sub(r'\.{2,}', '', re.sub(r'([^/]+)$', '', name))
 
-        mime_type = re.search(r'([^.]+)$', file_name)
-        image_type = [
-            '.jpeg', 
-            '.jpg', 
-            '.gif', 
-            '.png', 
-            '.webp'
-        ]
-        if mime_type:
-            mime_type = mime_type.group(1).lower()
+        mime_type = file_name.split('.')
+        if len(mime_type) < 2:
+            mime_type = 'text/plain'
+        else:
+            mime_type = mime_type[len(mime_type) - 1].lower()
+            image_type = ['jpeg', 'jpg', 'gif', 'png', 'webp']
             if mime_type in image_type:
                 mime_type = 'image/' + mime_type
+            elif mime_type == 'js':
+                mime_type = 'text/javascript'
+            elif mime_type == 'txt':
+                mime_type = 'text/plain'
             else:
                 mime_type = 'text/' + mime_type
-        else:
-            mime_type = 'text/plain'
-
+        
         return flask.send_from_directory(
             dir_name, file_name, 
             mimetype = mime_type

@@ -7,6 +7,10 @@ def edit_delete_2(conn, name, app_var):
     if acl_check(name) == 1:
         return re_error('/ban')
 
+    curs.execute(db_change("select title from data where title = ?"), [name])
+    if not curs.fetchall():
+        return redirect('/w/' + url_pas(name))
+
     if flask.request.method == 'POST':
         if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
             return re_error('/error/13')
@@ -29,7 +33,8 @@ def edit_delete_2(conn, name, app_var):
                 ip,
                 flask.request.form.get('send', ''),
                 leng,
-                'delete'
+                t_check = 'delete',
+                mode = 'delete'
             )
 
             curs.execute(db_change("select title, link from back where title = ? and not type = 'cat' and not type = 'no'"), [name])
@@ -49,26 +54,22 @@ def edit_delete_2(conn, name, app_var):
             )
             if os.path.exists(file_directory):
                 os.remove(file_directory)
-
-        curs.execute(db_change('select data from other where name = "count_all_title"'))
-        curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) - 1)])
+        else:
+            curs.execute(db_change('select data from other where name = "count_all_title"'))
+            curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) - 1)])
 
         return redirect('/w/' + url_pas(name))
     else:
-        curs.execute(db_change("select title from data where title = ?"), [name])
-        if not curs.fetchall():
-            return redirect('/w/' + url_pas(name))
-
         return easy_minify(flask.render_template(skin_check(),
             imp = [name, wiki_set(), custom(), other2(['(' + load_lang('delete') + ')', 0])],
             data = '''
                 <form method="post">
                     ''' + ip_warring() + '''
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                    <hr class=\"main_hr\">
+                    <hr class="main_hr">
                     ''' + captcha_get() + '''
                     <button type="submit">''' + load_lang('delete') + '''</button>
                 </form>
             ''',
             menu = [['w/' + url_pas(name), load_lang('return')]]
-        ))     
+        ))

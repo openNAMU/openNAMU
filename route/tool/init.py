@@ -29,7 +29,7 @@ server_set_var = {
         'display' : 'Markup',
         'require' : 'select',
         'default' : 'namumark',
-        'list' : ['namumark', 'markdown', 'custom', 'raw']
+        'list' : ['namumark', 'custom', 'js_onmark']
     },
     'encode' : {
         'display' : 'Encryption method',

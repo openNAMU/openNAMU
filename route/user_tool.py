@@ -5,7 +5,7 @@ def user_tool_2(conn, name):
 
     data = '''
         <h2>''' + load_lang('tool') + '''</h2>
-        <ul>
+        <ul class="inside_ul">
             <li><a href="/record/''' + url_pas(name) + '''">''' + load_lang('record') + '''</a></li>
             <li><a href="/topic/user:''' + url_pas(name) + '''">''' + load_lang('user_discussion') + '''</a></li>
         </ul>
@@ -13,14 +13,11 @@ def user_tool_2(conn, name):
 
     if admin_check(1) == 1:
         curs.execute(db_change("select block from rb where block = ? and ongoing = '1'"), [name])
-        if curs.fetchall():
-            ban_name = load_lang('release')
-        else:
-            ban_name = load_lang('ban')
-
+        ban_name = load_lang('release') if curs.fetchall() else load_lang('ban')
+        
         data += '''
             <h2>''' + load_lang('admin') + '''</h2>
-            <ul>
+            <ul class="inside_ul">
                 <li><a href="/ban/''' + url_pas(name) + '''">''' + ban_name + '''</a></li>
                 <li><a href="/check/''' + url_pas(name) + '''">''' + load_lang('check') + '''</a></li>
             </ul>

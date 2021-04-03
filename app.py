@@ -118,11 +118,11 @@ if set_data['db_type'] == 'mysql':
     curs = conn.cursor()
 
     try:
-        curs.execute(db_change('create database ? default character set utf8mb4;')%pymysql.escape_string(set_data['db']))
+        curs.execute(db_change('create database ' + set_data['db'] + ' default character set utf8mb4;'))
     except:
         pass
-
-    curs.execute(db_change('use ?')%pymysql.escape_string(set_data['db']))
+    
+    conn.select_db(set_data['db'])
 else:
     conn = sqlite3.connect(set_data['db'] + '.db')
     curs = conn.cursor()
@@ -131,7 +131,7 @@ load_conn(conn)
 
 # DB init
 create_data = {}
-create_data['data'] = ['title', 'data']
+create_data['data'] = ['title', 'data', 'type']
 create_data['cache_data'] = ['title', 'data', 'id']
 create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
 create_data['rc'] = ['id', 'title', 'date', 'type']
@@ -142,14 +142,13 @@ create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'an
 create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
 create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
 create_data['back'] = ['title', 'link', 'type']
-create_data['custom'] = ['user', 'css']
 create_data['other'] = ['name', 'data', 'coverage']
 create_data['alist'] = ['name', 'acl']
 create_data['re_admin'] = ['who', 'what', 'time']
 create_data['alarm'] = ['name', 'data', 'date']
 create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
 create_data['scan'] = ['user', 'title', 'type']
-create_data['acl'] = ['title', 'decu', 'dis', 'view', 'why']
+create_data['acl'] = ['title', 'data', 'type']
 create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
 create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
 for i in create_data:
@@ -159,7 +158,7 @@ for i in create_data:
         try:
             curs.execute(db_change('create table ' + i + '(test longtext)'))
         except:
-            curs.execute(db_change("alter table " + i + " add test longtext default ''"))
+            curs.execute(db_change("alter table " + i + " add test longtext"))
 
 setup_tool = 0
 try:
@@ -179,7 +178,10 @@ if setup_tool != 0:
             try:
                 curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
             except:
-                curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
+                try:
+                    curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
+                except:
+                    curs.execute(db_change("alter table " + create_table + " add " + create + " longtext"))
 
     if setup_tool == 1:
         update(int(ver_set_data[0][0]), set_data)
@@ -537,6 +539,10 @@ def login_pw_change():
 @app.route('/check/<name>')
 def give_user_check(name = None):
     return give_user_check_2(conn, name)
+    
+@app.route('/check_delete', methods=['POST', 'GET'])
+def give_user_check_delete():
+    return give_user_check_delete_2(conn)
 
 @app.route('/register', methods=['POST', 'GET'])
 def login_register():
@@ -604,6 +610,10 @@ def func_upload():
 @app.route('/user')
 def user_info():
     return user_info_2(conn)
+
+@app.route('/<regex("long_page|short_page"):tool>')
+def list_long_page(tool = 'long_page'):
+    return list_long_page_2(conn, tool)
 
 @app.route('/<regex("watch_list|star_doc"):tool>')
 def watch_list(tool = 'star_doc'):
