@@ -656,7 +656,14 @@ def namumark(conn, data, title, include_num):
                     else:
                         break
 
-                plus_data += 'load_include("' + include_link + '", "' + include_name + 'include_' + str(i) + '", ' + str(include_plus_data) + ');\n'
+                plus_data += '' + \
+                    'load_include(' + \
+                        '"' + include_link + '", '+ \
+                        '"' + include_name + 'include_' + str(i) + '", ' + \
+                        str(include_plus_data) + ', ' + \
+                        '"' + title + '"' + \
+                    ');\n' + \
+                ''
             else:
                 break
     else:

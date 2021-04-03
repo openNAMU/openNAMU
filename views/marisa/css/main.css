@@ -4,7 +4,7 @@ body {
     word-wrap: break-word;
     margin: 0;
     font-family: 'Apple SD Gothic', '맑은고딕', 'Nanum Gothic', 'Noto Sans KR', sans-serif;
-    font-size: 14px;
+    font-size: 0.85rem;
 }
 
 ul {

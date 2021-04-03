@@ -41,8 +41,11 @@ for i in range(0, 2):
             print(e)
             print('----')
             if platform.system() == 'Linux' or platform.system() == 'Windows':
-                ok = os.system('python' + ('3' if platform.system() != 'Windows' else '') + ' -m pip install --user -r requirements.txt')
-                if ok == 0:
+                sys_pip_ins = os.system(
+                    'python' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
+                    '-m pip install --user -r requirements.txt'
+                )
+                if sys_pip_ins == 0:
                     print('----')
                     try:
                         os.execl(sys.executable, sys.executable, *sys.argv)
@@ -55,17 +58,16 @@ for i in range(0, 2):
                 else:
                     print('Error : library install failed')
                     raise
-            else:
-                print('----')
-                print(e)
-                raise
-        else:
-            print('----')
-            print(e)
-            raise
+            
+        print('----')
+        print(e)
+        raise
 
 global_lang = {}
-req_list = ''
+
+data_css_ver = '75'
+data_css = ''
+
 conn = ''
 curs = ''
 
@@ -297,7 +299,8 @@ def update(ver_num, set_data):
         if get_data and get_data[0][0] == 'master':
             curs.execute(db_change("update other set data = 'beta' where name = 'update'"), [])
 
-    if ver_num < 3202500:
+    # 캐시 초기화
+    if ver_num < 3206000:
         curs.execute(db_change('delete from cache_data'))
 
     if ver_num < 3202600:
@@ -585,18 +588,19 @@ def next_fix(link, num, page, end = 50):
     return list_data
 
 def other2(data):
-    global req_list
-    main_css_ver = '78'
+    global data_css
+    global data_css_ver
+
     data += ['' for _ in range(0, 3 - len(data))]
 
-    if req_list == '':
+    if data_css == '':
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
             if i_data != 'sub':
-                req_list += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + main_css_ver + '">'
+                data_css += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + data_css_ver + '">'
 
         for i_data in os.listdir(os.path.join("views", "main_css", "js")):
             if i_data != 'sub':
-                req_list += '<script src="/views/main_css/js/' + i_data + '?ver=' + main_css_ver + '"></script>'
+                data_css += '<script src="/views/main_css/js/' + i_data + '?ver=' + data_css_ver + '"></script>'
 
     data = data[0:2] + ['', '''
         <link   rel="stylesheet"
@@ -609,7 +613,7 @@ def other2(data):
                 integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4"
                 crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.2/build/highlight.min.js"></script>
-    ''' + req_list + '<script>window.addEventListener(\'DOMContentLoaded\', main_css_skin_load);</script>'] + data[2:]
+    ''' + data_css + '<script>window.addEventListener(\'DOMContentLoaded\', main_css_skin_load);</script>'] + data[2:]
 
     return data
 
