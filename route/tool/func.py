@@ -65,7 +65,7 @@ for i in range(0, 2):
 
 global_lang = {}
 
-data_css_ver = '75'
+data_css_ver = '76'
 data_css = ''
 
 conn = ''
@@ -131,13 +131,14 @@ def send_email(who, title, data):
         smtp.login(smtp_email, smtp_pass)
 
         domain = load_domain()
-
+        wiki_name = wiki_set()[0]
+        
         msg = email.mime.text.MIMEText(data)
         msg['Subject'] = title
-        msg['From'] = email.utils.formataddr((str(email.header.Header(wiki_set()[0], 'utf-8')), 'noreply@' + domain))
+        msg['From'] = 'openNAMU <noreply@' + domain + '>'
         msg['To'] = who
-        smtp.sendmail('noreply@' + domain, who, msg.as_string())
-
+        
+        smtp.sendmail('openNAMU@' + domain, who, msg.as_string())
         smtp.quit()
 
         return 1

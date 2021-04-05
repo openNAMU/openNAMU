@@ -1,4 +1,3 @@
-from .namumark import namumark
 from .tool import *
 
 import re

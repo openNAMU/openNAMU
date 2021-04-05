@@ -23,6 +23,7 @@ function do_link_change(data, data_nowiki, no_change, data_nowiki) {
     var link_sub = data_var.length !== 1 ? ('#' + data_var[data_var.length - 1]) : '';
     
     link_main = do_nowiki_change(link_main, data_nowiki);
+    link_main = do_xss_change(link_main);
     
     return [link_main, link_sub];
 }
@@ -135,7 +136,16 @@ function do_onmark_heading_render(data) {
        );
     }
     
-    data = data.replace(/\[(?:toc|목차)\]/g, toc_data + '</div>');
+    toc_data += '</div>';
+    
+    data = data.replace(/\[(?:toc|목차)\]/g, toc_data);
+    
+    var toc_auto_add = data.match(/\[(?:목차|toc)\(no\)\]/);
+    if(toc_auto_add) {
+        data = data.replace(/\[(?:목차|toc)\(no\)\]/g, '');
+    } else {
+        data = data.replace(/(<h[1-6] (?:[^>]+)>)/, toc_data + '$1');
+    }
     
     return data;
 }
@@ -144,7 +154,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
     var num_link = 0;
     var category_data = '';
     var category_re = /^(분류|category):/i;
-    var file_re = /^(파일|file):/i;
+    var file_re = /^(파일|file|외부|out):/i;
     data = data.replace(/\[\[(((?!\]\]).)+)\]\]/g, function(x, x_1) {
         var link_split = x_1.split('|');
         var link_real = link_split[0];
@@ -154,8 +164,19 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
         num_link += 1;
         var num_link_str = String(num_link - 1);
         if(link_real.match(file_re)) {
+            var file_load_type = link_real.match(file_re)[1];
             var file_name = link_real.replace(file_re, '');
-            console.log(file_name);
+            
+            // 아직 더 짜야함
+            console.log([link_real, link_out_2]);
+        
+            if(file_load_type === '파일' || file_load_type === 'file') {
+                var file_type = file_name.split('.');
+                file_name = file_type.slice(0, file_type.length - 1).join('.');
+                file_type = file_type[file_type.length - 1].toLowerCase();
+            }
+            
+            console.log(file_name, file_load_type, file_type);
             
             return '';
         } else if(link_real.match(category_re)) {
@@ -440,7 +461,6 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki) {
         data = data.replace(code_re, '<span id="' + name_include + 'nowiki_mid_' + String(code_n) + '"></span>');
     }
     
-    console.log(data_js);
     return [data, data_js, data_nowiki];
 }
 
