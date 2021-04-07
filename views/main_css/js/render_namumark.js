@@ -27,7 +27,8 @@ function load_image_link(data) {
     '';
 }
 
-function get_file_state(data, i = 0) {       
+function get_file_state(data, i = 0) {      
+    // 개인적인 생각엔 이 부분 개편 필요
     var get_class = document.getElementsByClassName(data + 'file_finder')[i];
     if(get_class) {            
         if(get_class.getAttribute('under_href') === 'out_link') {
@@ -63,48 +64,62 @@ function get_file_state(data, i = 0) {
                 '';
             }
         } else {
+            var file_type = get_class.getAttribute('under_src').split('.');
+            var file_name = file_type.slice(0, file_type.length - 1).join('.');
+            file_type = file_type[file_type.length - 1].toLowerCase();
+            
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", get_class.getAttribute('under_src').replace('/image/', '/api/image/'));
+            xhr.open("GET", '/api/sha224/' + file_name);
             xhr.send();
             
             xhr.onreadystatechange = function() {
                 if(this.readyState === 4 && this.status === 200) {
-                    if(JSON.parse(this.responseText)['exist'] !== '1') {
-                        document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
-                            '<a href="' + get_class.getAttribute('under_href') + '" ' + 
-                                'id="not_thing">' +
-                                '(' + get_class.getAttribute('under_alt') + ')' +
-                            '</a>' +
-                        '';
-                    } else {
-                        if(
-                            document.cookie.match(main_css_regex_data('main_css_image_set')) &&
-                            document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '1'
-                        ) {
-                            document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
-                                '<a href="' + get_class.getAttribute('under_src') + '">' +
-                                    '(' + get_class.getAttribute('under_alt') + ')' +
-                                '</a>' +
-                            '';
-                        } else if(
-                            document.cookie.match(main_css_regex_data('main_css_image_set')) &&
-                            document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '2'
-                        ) {
-                            document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
-                                '<a href="javascript:void(0);" ' +
-                                    'onclick="load_image_link(this); this.onclick = \'\';" ' + 
-                                    'under_style="' + get_class.getAttribute('under_style') + '" ' +
-                                    'under_alt="' + get_class.getAttribute('under_alt') + '" ' +
-                                    'under_src="' + get_class.getAttribute('under_src') + '">' + 
-                                    '(' + get_class.getAttribute('under_alt') + ' load)' +
-                                '</a>' +
-                            '';
-                        } else {
-                            document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
-                                '<img   style="' + get_class.getAttribute('under_style') + '" ' + 
-                                        'alt="' + get_class.getAttribute('under_alt') + '" ' + 
-                                        'src="' + get_class.getAttribute('under_src') + '">' +
-                            '';
+                    file_name = JSON.parse(this.responseText)['data'];
+                    
+                    var xhr_2 = new XMLHttpRequest();
+                    xhr_2.open("GET", '/api/image/' + file_name + '.' + file_type);
+                    xhr_2.send();
+
+                    xhr_2.onreadystatechange = function() {
+                        if(this.readyState === 4 && this.status === 200) {
+                            if(JSON.parse(this.responseText)['exist'] !== '1') {
+                                document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
+                                    '<a href="' + get_class.getAttribute('under_href') + '" ' + 
+                                        'id="not_thing">' +
+                                        '(' + get_class.getAttribute('under_alt') + ')' +
+                                    '</a>' +
+                                '';
+                            } else {
+                                if(
+                                    document.cookie.match(main_css_regex_data('main_css_image_set')) &&
+                                    document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '1'
+                                ) {
+                                    document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
+                                        '<a href="/image/' + file_name + '.' + file_type + '">' +
+                                            '(' + get_class.getAttribute('under_alt') + ')' +
+                                        '</a>' +
+                                    '';
+                                } else if(
+                                    document.cookie.match(main_css_regex_data('main_css_image_set')) &&
+                                    document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === '2'
+                                ) {
+                                    document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
+                                        '<a href="javascript:void(0);" ' +
+                                            'onclick="load_image_link(this); this.onclick = \'\';" ' + 
+                                            'under_style="' + get_class.getAttribute('under_style') + '" ' +
+                                            'under_alt="' + get_class.getAttribute('under_alt') + '" ' +
+                                            'under_src="/image/' + file_name + '.' + file_type + '">' + 
+                                            '(' + get_class.getAttribute('under_alt') + ' load)' +
+                                        '</a>' +
+                                    '';
+                                } else {
+                                    document.getElementsByClassName(data + 'file_finder')[i].innerHTML = '' +
+                                        '<img   style="' + get_class.getAttribute('under_style') + '" ' + 
+                                                'alt="' + get_class.getAttribute('under_alt') + '" ' + 
+                                                'src="/image/' + file_name + '.' + file_type + '">' +
+                                    '';
+                                }
+                            }
                         }
                     }
                 }

@@ -46,11 +46,11 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
                     data_i_pas = data_i_pas.replace(
                         /&lt;topic_a&gt;((?:(?!&lt;\/topic_a&gt;).)+)&lt;\/topic_a&gt;/g,
                         '<a href="$1">$1</a>'
-                    )
+                    );
                     data_i_pas = data_i_pas.replace(
                         /&lt;topic_call&gt;((?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;/g,
                         '<a href="/w/user:$1">@$1</a>', 
-                    )
+                    );
                 }
                 
                 if(blind === 'O') {

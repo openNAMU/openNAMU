@@ -166,19 +166,62 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
         if(link_real.match(file_re)) {
             var file_load_type = link_real.match(file_re)[1];
             var file_name = link_real.replace(file_re, '');
-            
-            // 아직 더 짜야함
-            console.log([link_real, link_out_2]);
-        
+                 
             if(file_load_type === '파일' || file_load_type === 'file') {
                 var file_type = file_name.split('.');
                 file_name = file_type.slice(0, file_type.length - 1).join('.');
-                file_type = file_type[file_type.length - 1].toLowerCase();
+                file_type = file_type[file_type.length - 1];
+                
+                var file_src = do_url_change(file_name) + '.' + file_type;       
+                var file_alt = file_name + '.' + file_type;
+                var file_exist = 1;
+            } else {
+                var file_src = file_name;
+                var file_alt = file_name;
+                var file_exist = 0;
             }
             
-            console.log(file_name, file_load_type, file_type);
+            var file_style = '';
+            var file_bgcolor = '';
+            var file_align = '';
             
-            return '';
+            var file_set = link_out_2.split('&amp;');
+            var i = 0;
+            while(file_set[i]) {
+                var file_set_name = file_set[i].split('=');
+                var file_set_data = file_set_name[1];
+                file_set_name = file_set_name[0];
+                
+                if(file_set_name === 'width') {
+                    file_style += 'width:' + file_set_data + ';';
+                } else if(file_set_name === 'height') {
+                    file_style += 'height:' + file_set_data + ';';
+                } else if(file_set_name === 'bgcolor') {
+                    file_bgcolor += 'background:' + file_set_data + ';';
+                } else if(file_set_name === 'alt') {
+                    file_alt += file_set_data;
+                } else if(file_set_name === 'align') {
+                    if(file_set_data === 'center') {
+                        file_align = 'display: block; text-align: center;';
+                    } else {
+                        file_align = 'float: ' + file_set_data + ';';
+                    }
+                } 
+                
+                i += 1;
+            }
+            
+            return '' +
+                '<span style="' + file_align + '">' + 
+                    '<span  style="' + file_bgcolor + '" ' +
+                            'class="' + name_include + 'file_finder" ' +
+                            'under_style="' + file_style + '" ' +
+                            'under_alt="' + file_alt + '" ' +
+                            'under_src="' + file_src + '" ' +
+                            'under_href="' + (file_exist === 0 ? "out_link" : '/upload?name=' + do_url_change(file_name)) + '">' +
+                    '</span>' + 
+                '</span>' +
+            ''
         } else if(link_real.match(category_re)) {
             var category_link = link_real.replace(category_re, '');
             
