@@ -1,16 +1,20 @@
 function get_link_state(data, i = 0) { 
     var get_class = document.getElementsByClassName(data + 'link_finder')[i];
     if(get_class) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", get_class.href.replace('/w/', '/api/w/').replace(/#([^#]*)/, '') + "?exist=1");
-        xhr.send();
+        if(get_class.href.match(/^#/)) {
+            document.getElementsByClassName(data + 'link_finder')[i].id = "";
+        } else {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", get_class.href.replace('/w/', '/api/w/').replace(/#([^#]*)/, '') + "?exist=1");
+            xhr.send();
 
-        xhr.onreadystatechange = function() {
-            if(this.readyState === 4 && this.status === 200) {
-                if(JSON.parse(this.responseText)['exist'] !== '1') {
-                    document.getElementsByClassName(data + 'link_finder')[i].id = "not_thing";
-                } else {
-                    document.getElementsByClassName(data + 'link_finder')[i].id = "";
+            xhr.onreadystatechange = function() {
+                if(this.readyState === 4 && this.status === 200) {
+                    if(JSON.parse(this.responseText)['exist'] !== '1') {
+                        document.getElementsByClassName(data + 'link_finder')[i].id = "not_thing";
+                    } else {
+                        document.getElementsByClassName(data + 'link_finder')[i].id = "";
+                    }
                 }
             }
         }

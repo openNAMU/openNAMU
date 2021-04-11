@@ -65,7 +65,7 @@ for i in range(0, 2):
 
 global_lang = {}
 
-data_css_ver = '77'
+data_css_ver = '78'
 data_css = ''
 
 conn = ''
@@ -160,37 +160,6 @@ def load_random_key(long = 64):
     return ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(long))
 
 def last_change(data):
-    json_address = re.sub(r"(((?!\.|\/).)+)\.html$", "set.json", skin_check())
-    try:
-        json_data = json.loads(open(json_address, encoding='utf8').read())
-    except:
-        json_data = 0
-
-    if json_data != 0:
-        for j_data in json_data:
-            if "class" in json_data[j_data]:
-                if "require" in json_data[j_data]:
-                    re_data = re.compile("<((?:" + j_data + ")( (?:(?!>).)*)?)>")
-                    s_data = re_data.findall(data)
-                    for i_data in s_data:
-                        e_data = 0
-
-                        for j_i_data in json_data[j_data]["require"]:
-                            re_data_2 = re.compile("( |^)" + j_i_data + " *= *[\'\"]" + json_data[j_data]["require"][j_i_data] + "[\'\"]")
-                            if not re_data_2.search(i_data[1]):
-                                re_data_2 = re.compile("( |^)" + j_i_data + "=" + json_data[j_data]["require"][j_i_data] + "(?: |$)")
-                                if not re_data_2.search(i_data[1]):
-                                    e_data = 1
-
-                                    break
-
-                        if e_data == 0:
-                            re_data_3 = re.compile("<" + i_data[0] + ">")
-                            data = re_data_3.sub("<" + i_data[0] + " class=\"" + json_data[j_data]["class"] + "\">", data)
-                else:
-                    re_data = re.compile("<(?P<in>" + j_data + "(?: (?:(?!>).)*)?)>")
-                    data = re_data.sub("<\g<in> class=\"" + json_data[j_data]["class"] + "\">", data)
-
     return data
 
 def easy_minify(data, tool = None):
@@ -300,10 +269,6 @@ def update(ver_num, set_data):
         if get_data and get_data[0][0] == 'master':
             curs.execute(db_change("update other set data = 'beta' where name = 'update'"), [])
 
-    # 캐시 초기화
-    if ver_num < 3206000:
-        curs.execute(db_change('delete from cache_data'))
-
     if ver_num < 3202600:
         curs.execute(db_change("select name, regex, sub from filter"))
         for i in curs.fetchall():
@@ -336,7 +301,11 @@ def update(ver_num, set_data):
             curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[2], 'dis'])
             curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[3], 'view'])
             curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[4], 'why'])
-            
+          
+    # 캐시 초기화
+    if ver_num < 3300101:
+        curs.execute(db_change('delete from cache_data'))
+    
     conn.commit()
 
     print('Update completed')

@@ -129,6 +129,7 @@ function do_onmark_heading_render(data) {
             '\n' +
         ''
         data = data.replace(heading_re, 
+            '\n' +
             '<h' + heading_level + ' id="s-' + heading_level_string_no_end + '">' + 
                 '<a href="#toc">' + heading_level_string + '</a> ' + heading_data[2] + 
             '</h' + heading_level + '>' +
@@ -257,6 +258,17 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                         'title=""' +
                         'href="">' + link_out + '</a>';
         } else {
+            if(link_real.match(/^\//)) {
+                link_real = name_doc + link_real;
+            } else if(link_real === '../') {
+                link_real = name_doc.split('/');
+                if(link_real.length > 1) {
+                    link_real = link_real.slice(0, link_real.length - 1).join('/');
+                } else {
+                    link_real = name_doc;
+                }
+            }
+            
             var i = 0;
             while(i < 2) {
                 if(i === 0) {
@@ -265,7 +277,11 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                     var link_sub = link_data_var[1];
                     
                     var var_link_type = 'href';
-                    var var_link_data = '/w/' + do_url_change(link_main) + link_sub;
+                    if(link_main === '') {
+                        var var_link_data = link_sub;
+                    } else {
+                        var var_link_data = '/w/' + do_url_change(link_main) + link_sub;
+                    }
                 } else {
                     var var_link_type = 'title';
                     var var_link_data = do_js_safe_change(link_main) + link_sub;
@@ -664,7 +680,7 @@ function do_onmark_table_render_sub(data, data_col) {
             } else if(table_option_name === 'height') {
                 data_option_all['td'] += 'height:' + table_option_data + ';';
             } else {
-                no_option = '<lt>' + data_option + '<gt>';
+                data_option_all['td'] += 'background:' + table_option_data + ';';
             }
         } else {
             if(data_option.match(/^-[0-9]+$/)) {
