@@ -52,7 +52,7 @@ def render_do(doc_name, doc_data, data_type, data_in):
             '<div class="render_content" id="' + data_in + 'render_content">' + html.escape(doc_data) + '</div>', 
             '''
                 do_onmark_render(
-                    test_mode = 0, 
+                    test_mode = "normal", 
                     name_id = "''' + data_in + '''render_content",
                     name_include = "''' + data_in + '''",
                     name_doc = "''' + doc_name.replace('"', '//"') + '''",

@@ -413,7 +413,7 @@ function do_onmark_macro_render(data) {
     return data;
 }
 
-function do_onmark_middle_render(data, data_js, name_include, data_nowiki) {
+function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_doc) {
     var middle_stack = [];
     var middle_re = /(?:{{{([^{} ]*)|(}}}))/;
     
@@ -461,8 +461,8 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki) {
                     var wiki = data.match(wiki_re);
                     var wiki_style = wiki[1] ? wiki[1] : '';
 
-                    data = data.replace(wiki_re, '<div_wiki_start style="' + wiki_style + '">');  
-                    middle_stack.push('<div_wiki_end>');
+                    data = data.replace(wiki_re, '<wiki_start style="' + wiki_style + '">');  
+                    middle_stack.push('<wiki_end>');
                 } else if(middle_data[1] === '#!html') {
                     html_n += 1;
 
@@ -472,8 +472,8 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki) {
                     data = data.replace(middle_re, '<div>');
                     middle_stack.push('</div>');
                 } else {
-                    data = data.replace(middle_re, '<code>' + middle_data[1]);
-                    middle_stack.push('</code>');
+                    data = data.replace(middle_re, '<nowiki_start>' + middle_data[1]);
+                    middle_stack.push('<nowiki_end>');
                 }
             }
         }
@@ -489,7 +489,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki) {
     data = data.replace(/<middle_start>/g, '{{{');
     data = data.replace(/<middle_end>/g, '}}}');
     
-    var code_re = /<code>(\n*(?:(?:(?!<\/code>).)+\n*)+)<\/code>/;
+    var code_re = /<nowiki_start>(\n*(?:(?:(?!<nowiki_start>|<nowiki_end>).)+\n*)+)<nowiki_end>/;
     var code_n = 0;
     while(1) {
         code_n += 1;
@@ -504,13 +504,30 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki) {
         data = data.replace(code_re, '<span id="' + name_include + 'nowiki_mid_' + String(code_n) + '"></span>');
     }
     
+    var wiki_re = /<wiki_start (?:[^>]+)>(\n*(?:(?:(?!<wiki_start (?:[^>]+)>|<wiki_end>).)+\n*)+)<wiki_end>/;
+    var wiki_n = 0;
+    while(1) {
+        wiki_n += 1;
+        
+        var wiki_data = data.match(wiki_re);
+        if(!wiki_data) {
+            break;
+        }
+        
+        wiki_data = do_nowiki_change(wiki_data[1]);
+        wiki_data = do_onmark_render('manual', '', name_include + 'wiki_' + String(wiki_n) + '_', name_doc, wiki_data);
+        
+        data_js += wiki_data[1];
+        data = data.replace(wiki_re, wiki_data[0]);
+    }
+    
     return [data, data_js, data_nowiki];
 }
 
 function do_onmark_last_render(data) {
     // middle_render 마지막 처리
-    data = data.replace(/<div_wiki_start /g, '<div ');
-    data = data.replace(/<div_wiki_end>/g, '</div>');
+    data = data.replace(/<wiki_start /g, '<div ');
+    data = data.replace(/<wiki_end>/g, '</div>');
     
     // heading_render 마지막 처리
     data = data.replace(/(<\/h[0-9]>)\n/g, '$1');
@@ -580,7 +597,179 @@ function do_onmark_nowiki_before_render(data, data_js, name_include, data_nowiki
     return [data, data_js, data_nowiki, num_nowiki];
 }
 
+function do_onmark_table_render_sub(data, data_col) {
+    var data_option_all = {
+        "div" : "",
+        "table" : "",
+        "tr" : "",
+        "td" : "",
+        "col" : data_col,
+        "colspan" : "",
+        "rowspan" : "",
+        "data" : ""
+    };
+    
+    var table_option_re = /&lt;((?:(?!&lt;|&gt;).)+)&gt;/;
+    while(1) {
+        var no_option = '';
+        var data_option = data.match(table_option_re);
+        if(!data_option) {
+            break;
+        }
+        
+        data_option = data_option[1];
+        var data_option_var = data_option.split('=');
+        if(data_option_var.length === 2) {
+            var table_option_name = data_option_var[0].replace(/ /g, '');
+            var table_option_data = data_option_var[1].replace(/[^a-zA-Z0-9]/g, '');
+            if(table_option_name === 'tablebgcolor') {
+                // table
+               data_option_all['table'] += 'background:' + table_option_data + ';';
+            } else if(table_option_name === 'tablewidth') {
+                data_option_all['table'] += 'width:' + table_option_data + ';';
+            } else if(table_option_name === 'tableheight') {
+                data_option_all['table'] += 'height:' + table_option_data + ';';
+            } else if(table_option_name === 'tablealign') {
+                if(table_option_data === 'right') {
+                    data_option_all['div'] += 'float:right;';
+                } else if(table_option_data === 'center') {
+                    data_option_all['div'] += 'margin:auto;';
+                    data_option_all['table'] += 'margin:auto;';
+                }
+            } else if(table_option_name === 'tabletextalign') {
+                data_option_all['table'] += 'text-align:' + table_option_data + ';';
+            } else if(table_option_name === 'tablecolor') {
+                data_option_all['table'] += 'color:' + table_option_data + ';';
+            } else if(table_option_name === 'tablebordercolor') {
+                data_option_all['table'] += 'border:2px solid ' + table_option_data + ';';
+            } else if(table_option_name === 'rowbgcolor') {
+                // tr
+                data_option_all['tr'] += 'background:' + table_option_data + ';';
+            } else if(table_option_name === 'rowtextalign') {
+                data_option_all['tr'] += 'text-align:' + table_option_data + ';';
+            } else if(table_option_name === 'rowcolor') {
+                data_option_all['tr'] += 'color:' + table_option_data + ';';
+            } else if(table_option_name === 'colcolor') {
+                // col
+                data_option_all['col'] += 'color:' + table_option_data + ';';
+            } else if(table_option_name === 'colbgcolor') {
+                data_option_all['col'] += 'background:' + table_option_data + ';';
+            } else if(table_option_name === 'bgcolor') {
+                // td
+                data_option_all['td'] += 'background:' + table_option_data + ';';
+            } else if(table_option_name === 'color') {
+                data_option_all['td'] += 'color:' + table_option_data + ';';
+            } else if(table_option_name === 'width') {
+                data_option_all['td'] += 'width:' + table_option_data + ';';
+            } else if(table_option_name === 'height') {
+                data_option_all['td'] += 'height:' + table_option_data + ';';
+            } else {
+                no_option = '<lt>' + data_option + '<gt>';
+            }
+        } else {
+            if(data_option.match(/^-[0-9]+$/)) {
+                // span
+                data_option_all['colspan'] = data_option.replace('-', '');
+            } else if(data_option.match(/^\|[0-9]+$/)) {
+                data_option_all['rowspan'] = data_option.replace('|', '');
+            } else if(data_option === '(') {
+                // align
+                data_option_all['td'] += 'text-align:right;';
+            } else if(data_option === ':') {
+                data_option_all['td'] += 'text-align:center;';
+            } else if(data_option === ')') {
+                data_option_all['td'] += 'text-align:left;';
+            } else {
+                no_option = '<lt>' + data_option + '<gt>';
+            }
+        }
+        
+        data = data.replace(table_option_re, no_option);
+    }
+    
+    data = data.replace('<lt>', '&lt;');
+    data = data.replace('<gt>', '&gt;');
+    data_option_all['data'] = data;
+    
+    return data_option_all;
+}
+
 function do_onmark_table_render(data) {
+    var table_before_re = /\|\|((?:(?:(?:(?!\|\|).)+)\n)(?:(?:(?:(?!\|\|).)+)\n*)*)\|\|/;
+    while(1) {
+        if(data.match(table_before_re)) {
+            data = data.replace(table_before_re, function(x, x_1) {
+                return '||' + x_1.replace(/\n/g, '<t_br>') + '||';
+            })
+        } else {
+            break;
+        }
+    }
+    
+    var table_re = /\n((?:(?:(?:\|\|)+)(?:(?:(?:(?!\|\|).)+)|\n))+)\|\|\n/g;
+    var table_in_re = /(?:((?:\|\|)+)((?:(?:(?!\|\|).)+)|\n))/;
+    data = data.replace(table_re, function(x, x_1) {
+        var table_data_real = '';
+        var table_data_var = x_1;
+        var table_new_line = 0;
+        var table_col = 0;
+        var table_data_col = {};
+        while(1) {
+            var table_data_in = table_data_var.match(table_in_re);
+            if(!table_data_in) {
+                break;
+            }
+            
+            if(!table_data_col[table_col]) {
+                table_data_col[table_col] = '';
+            }
+
+            var table_data_option = do_onmark_table_render_sub(
+                table_data_in[2],
+                table_data_col[table_col]
+            );
+            table_data_col[table_col] = table_data_option['col'];
+            if(table_data_option['colspan'] === "") {
+                table_data_option['colspan'] = String(table_data_in[1].length / 2);
+            }
+            
+            if(table_data_real === '') {
+                table_data_real += '' + 
+                    '<div style="' + table_data_option['div'] + '">' +
+                        '<table style="' + table_data_option['table'] + '">' +
+                            '<tr style="' + table_data_option['tr'] + '">' +
+                '';
+            }
+
+            if(table_data_in[2] === '\n') {
+                table_data_real += '</tr>';
+                table_new_line = 1;
+                table_col = 0;
+            } else {
+                if(table_new_line === 1) {
+                    table_data_real += '<tr style="' + table_data_option['tr'] + '">';
+                    table_new_line = 0;
+                }
+                
+                table_data_real += '' +
+                    '<td     colspan="' + table_data_option['colspan'] + '" ' +
+                            'rowspan="' + table_data_option['rowspan'] + '" ' +
+                            'style="' + table_data_option['col'] + table_data_option['td'] + '">' + 
+                        table_data_option['data'] + 
+                    '</td>' +
+                '';
+                table_col += 1;
+            }
+
+            table_data_var = table_data_var.replace(table_in_re, '');
+        }
+        table_data_real += '</tr></table></div>';
+        
+        return table_data_real;
+    });
+    
+    data = data.replace(/<t_br>/g, '\n');
+    
     return data;
 }
 
@@ -618,13 +807,18 @@ function do_onmark_math_render(data, data_js, name_include) {
 }
 
 // Main
-function do_onmark_render(test_mode = 1, name_id = '', name_include = '', name_doc = '') {    
-	if(test_mode === 0) {
+function do_onmark_render(test_mode = 'test', name_id = '', name_include = '', name_doc = '', doc_data = '') {    
+	if(test_mode === 'normal') {
         var data = '\n' + document.getElementById(name_id).innerHTML.replace(/\r/g, '') + '\n';
+    } else if(test_mode === 'manual') { 
+        var data = '\n' + doc_data.replace(/\r/g, '') + '\n';
     } else {
     	var data = '\n' + (
-``
-        ) + '\n';
+`||||<tablebgcolor=red><bgcolor=red> test ||
+|| A || B ||
+||<bgcolor=red> test ||<bgcolor=red> test || asdf
+asdf || asdf`
+        ).replace(/\r/g, '') + '\n';
     }
     var data_js = '';
     var data_backlink = [];
@@ -643,7 +837,7 @@ function do_onmark_render(test_mode = 1, name_id = '', name_include = '', name_d
     data = data_var[0];
     data_js = data_var[1];
     
-    data_var = do_onmark_middle_render(data, data_js, name_include, data_nowiki);
+    data_var = do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_doc);
     data = data_var[0];
     data_js = data_var[1];
     data_nowiki = data_var[2];
@@ -667,9 +861,11 @@ function do_onmark_render(test_mode = 1, name_id = '', name_include = '', name_d
     ''
     data_js = 'render_html("' + name_include + 'render_contect");\n' + data_js
     
-    if(test_mode === 0) {
-        document.getElementById(name_id).innerHTML = data;
+    if(test_mode === 'normal') {
+        document.getElementById(name_id).innerHTML = data + '<script>' + data_js + '</script>';
         eval(data_js);
+    } else if(test_mode === 'manual') {
+        return [data, data_js];
     } else {
     	console.log([data, data_js]);
     }
