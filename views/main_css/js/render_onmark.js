@@ -1,3 +1,4 @@
+// 인터위키
 // Tool
 function do_url_change(data) {
     return encodeURIComponent(data);
@@ -31,6 +32,7 @@ function do_link_change(data, data_nowiki, no_change, data_nowiki) {
 function do_js_safe_change(data) {
     data = data.replace(/\\/g, '\\\\');
     data = data.replace(/"/g, '\\"');
+    data = data.replace(/\n/g, '<br>');
     
     return data;
 }
@@ -87,11 +89,14 @@ function do_onmark_text_render(data) {
     return data;
 }
 
-function do_onmark_heading_render(data) {
-    var heading_re = /\n(={1,6}) ?([^=]+) ?={1,6}\n/;
+function do_onmark_heading_render(data, name_doc, name_include) {
+    var heading_re = /\n(={1,6})(#)? ?([^=#]+) ?#?={1,6}\n/;
     var heading_level_all = [0, 0, 0, 0, 0, 0];
     var toc_data = '<div id="toc"><div id="toc_title">TOC</div>\n';
-    while(1) {        
+    var toc_n = 0;
+    while(1) {
+        toc_n += 1;
+        
         var heading_data = data.match(heading_re);
         if(!heading_data) {
             break;
@@ -119,20 +124,30 @@ function do_onmark_heading_render(data) {
         }
         
         var heading_level_string_no_end = heading_level_string.replace(/\.$/, '');
-
+        
         toc_data += '' +
             '<span style="margin-left: ' + String((heading_level_string.match(/\./g).length - 1) * 10) + 'px;">' +
                 '<a href="#s-' + heading_level_string_no_end + '">' + 
                     heading_level_string + ' ' +
-                '</a>' + heading_data[2] +
+                '</a>' + heading_data[3] +
             '</span>' +
             '\n' +
         ''
         data = data.replace(heading_re, 
             '\n' +
+            (toc_n === 1 ? '' : '</div>') +
             '<h' + heading_level + ' id="s-' + heading_level_string_no_end + '">' + 
-                '<a href="#toc">' + heading_level_string + '</a> ' + heading_data[2] + 
+                '<a href="#toc">' + heading_level_string + '</a> ' + 
+                heading_data[3] + 
+                '<a id="edit_load_' + String(toc_n) + '" ' +
+                    'style="font-size: 70%;"' +
+                    'href="/edit/' + do_url_change(name_doc) + '?section=' + String(toc_n) + '">✎</a> ' +
+                '<a href="javascript:void(0);" ' +
+                    'onclick="javascript:do_open_folding(\'' + name_include + 'in_data_' + String(toc_n) + '\', this);"' +
+                    'style="font-size: 70%;">' + (heading_data[2] ? '⊕' : '⊖') + '</a>' +
             '</h' + heading_level + '>' +
+            '<div   id="' + name_include + 'in_data_' + String(toc_n) + '" ' +
+                    'style="display: ' + (heading_data[2] ? 'none' : 'block') + ';"><toc_end_point>' +
             '\n'
        );
     }
@@ -140,6 +155,7 @@ function do_onmark_heading_render(data) {
     toc_data += '</div>';
     
     data = data.replace(/\[(?:toc|목차)\]/g, toc_data);
+    data += '</div>';
     
     var toc_auto_add = data.match(/\[(?:목차|toc)\(no\)\]/);
     if(toc_auto_add) {
@@ -485,8 +501,8 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                     data = data.replace(middle_re, '<span id="' + name_include + 'render_contect_' + String(html_n) + '">');
                     middle_stack.push('</span>');
                 } else if(middle_data[1] === '#!folding') {
-                    data = data.replace(middle_re, '<div>');
-                    middle_stack.push('</div>');
+                    data = data.replace(middle_re, '<wiki_start style="">');
+                    middle_stack.push('<wiki_end>');
                 } else {
                     data = data.replace(middle_re, '<nowiki_start>' + middle_data[1]);
                     middle_stack.push('<nowiki_end>');
@@ -533,6 +549,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
         wiki_data = do_nowiki_change(wiki_data[1]);
         wiki_data = do_onmark_render('manual', '', name_include + 'wiki_' + String(wiki_n) + '_', name_doc, wiki_data);
         
+        console.log(wiki_n);
         data_js += wiki_data[1];
         data = data.replace(wiki_re, wiki_data[0]);
     }
@@ -546,7 +563,7 @@ function do_onmark_last_render(data) {
     data = data.replace(/<wiki_end>/g, '</div>');
     
     // heading_render 마지막 처리
-    data = data.replace(/(<\/h[0-9]>)\n/g, '$1');
+    data = data.replace(/<toc_end_point>\n?/g, '');
     
     // list_render 마지막 처리
     data = data.replace(/(<\/ul>)\n/g, '$1');
@@ -628,6 +645,7 @@ function do_onmark_table_render_sub(data, data_col) {
     var table_option_re = /&lt;((?:(?!&lt;|&gt;).)+)&gt;/;
     while(1) {
         var no_option = '';
+        var align_auto = 1;
         var data_option = data.match(table_option_re);
         if(!data_option) {
             break;
@@ -637,7 +655,7 @@ function do_onmark_table_render_sub(data, data_col) {
         var data_option_var = data_option.split('=');
         if(data_option_var.length === 2) {
             var table_option_name = data_option_var[0].replace(/ /g, '');
-            var table_option_data = data_option_var[1].replace(/[^a-zA-Z0-9]/g, '');
+            var table_option_data = data_option_var[1].replace(/"/g, '');
             if(table_option_name === 'tablebgcolor') {
                 // table
                data_option_all['table'] += 'background:' + table_option_data + ';';
@@ -680,23 +698,42 @@ function do_onmark_table_render_sub(data, data_col) {
             } else if(table_option_name === 'height') {
                 data_option_all['td'] += 'height:' + table_option_data + ';';
             } else {
-                data_option_all['td'] += 'background:' + table_option_data + ';';
+                no_option = '<lt>' + data_option + '<gt>';
             }
         } else {
             if(data_option.match(/^-[0-9]+$/)) {
                 // span
                 data_option_all['colspan'] = data_option.replace('-', '');
-            } else if(data_option.match(/^\|[0-9]+$/)) {
-                data_option_all['rowspan'] = data_option.replace('|', '');
-            } else if(data_option === '(') {
+            } else if(data_option.match(/^(\^|v)?\|[0-9]+$/)) {
+                // 이 부분 다듬어야함
+                var rowspan_vertical = data_option.match(/^(\^|v)/);
+                if(rowspan_vertical) {
+                    data_option_all['td'] += rowspan_vertical[1] === '^' ? 'vertical-align: top;' : 'vertical-align: bottom;';
+                }
+                
+                data_option_all['rowspan'] = data_option.replace(/^(\^|v)?\|/, '');
+            } else if(
+                data_option === '(' ||
+                data_option === ':' ||
+                data_option === ')'
+            ) {
                 // align
-                data_option_all['td'] += 'text-align:right;';
-            } else if(data_option === ':') {
-                data_option_all['td'] += 'text-align:center;';
-            } else if(data_option === ')') {
-                data_option_all['td'] += 'text-align:left;';
+                if(data_option === '(') {
+                    data_option_all['td'] += 'text-align:right;';
+                } else if(data_option === ':') {
+                    data_option_all['td'] += 'text-align:center;';
+                } else {
+                    data_option_all['td'] += 'text-align:left;';
+                }
+                
+                align_auto = 0;
             } else {
-                no_option = '<lt>' + data_option + '<gt>';
+                var table_option_data = data_option.replace(/"/g, '');
+                if(table_option_data.match(/^[a-zA-Z0-9]{6}|[a-zA-Z0-9]{3}$/)) {
+                    data_option_all['td'] += 'background:#' + table_option_data + ';';
+                } else {
+                    data_option_all['td'] += 'background:' + table_option_data + ';';    
+                }
             }
         }
         
@@ -706,6 +743,17 @@ function do_onmark_table_render_sub(data, data_col) {
     data = data.replace('<lt>', '&lt;');
     data = data.replace('<gt>', '&gt;');
     data_option_all['data'] = data;
+    
+    if(align_auto === 1) {
+        if(
+            data_option_all['data'][0] === ' ' ||
+            data_option_all['data'][data_option_all['data'].length - 1] === ' '
+        ) {
+            data_option_all['td'] += 'text-align:center;';
+        } else if(data_option_all['data'][0] === ' ') {
+            data_option_all['td'] += 'text-align:right;';
+        }
+    }
     
     return data_option_all;
 }
@@ -781,7 +829,7 @@ function do_onmark_table_render(data) {
         }
         table_data_real += '</tr></table></div>';
         
-        return table_data_real;
+        return '\n' + table_data_real + '\n';
     });
     
     data = data.replace(/<t_br>/g, '\n');
@@ -840,36 +888,49 @@ asdf || asdf`
     var data_backlink = [];
     var data_nowiki = {};
     
+    console.log(name_include);
     var data_var = do_onmark_math_render(data, data_js, name_include);
     data = data_var[0];
     data_js = data_var[1];
+    console.log('math pass');
     
     data_var = do_onmark_nowiki_before_render(data, data_js, name_include, data_nowiki);
     data = data_var[0];
     data_js = data_var[1];
     data_nowiki = data_var[2];
+    console.log('nowiki before pass');
     
     data_var = do_onmark_include_render(data, data_js, name_include, data_nowiki);
     data = data_var[0];
     data_js = data_var[1];
+    console.log('include pass');
     
     data_var = do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_doc);
     data = data_var[0];
     data_js = data_var[1];
     data_nowiki = data_var[2];
+    console.log('middle pass');
     
     data = do_onmark_text_render(data);
-    data = do_onmark_heading_render(data);
+    console.log('text pass');
+    data = do_onmark_heading_render(data, name_doc, name_include);
+    console.log('heading pass');
     data = do_onmark_table_render(data);
+    console.log('table pass');
     
     data_var = do_onmark_link_render(data, data_js, name_doc, name_include, data_nowiki);
     data = data_var[0];
     data_js = data_var[1];
+    console.log('link pass');
     
     data = do_onmark_macro_render(data);
+    console.log('macro pass');
     data = do_onmark_list_render(data);
+    console.log('list pass');
     data = do_onmark_footnote_render(data, name_include);
+    console.log('footnote pass');
     data = do_onmark_last_render(data, name_include);
+    console.log('last pass');
     
     data_js += '' + 
         'get_link_state("' + name_include + '");\n' + 

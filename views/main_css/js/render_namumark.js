@@ -198,10 +198,10 @@ function do_open_folding(data, element = '') {
     
     if(element != '') {
         var fol_data = element.innerHTML;
-        if(fol_data != '(-)') {
-            element.innerHTML = '(-)';
+        if(fol_data != '⊖') {
+            element.innerHTML = '⊖';
         } else {
-            element.innerHTML = '(+)';
+            element.innerHTML = '⊕';
         }
     }
 }
