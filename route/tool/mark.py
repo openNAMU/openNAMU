@@ -46,7 +46,7 @@ def render_do(doc_name, doc_data, data_type, data_in):
     data_in = None if data_in == '' else data_in
     curs.execute(db_change('select data from other where name = "markup"'))
     rep_data = curs.fetchall()
-    if rep_data[0][0] in ('namumark', 'js_onmark'):
+    if rep_data[0][0] == 'namumark':
         data_in = (data_in + '_') if data_in else ''
         data_end = [
             '<div class="render_content" id="' + data_in + 'render_content">' + html.escape(doc_data) + '</div>', 
