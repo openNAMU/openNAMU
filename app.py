@@ -212,22 +212,79 @@ curs.execute(db_change('select name from alist where acl = "owner"'))
 if not curs.fetchall():
     curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
 
-curs.execute(db_change('select data from other where name = "image_where"'))
-app_var = curs.fetchall()
-if not app_var:
-    curs.execute(db_change('insert into other (name, data) values ("image_where", "data/images")'))
-    app_var = { 'path_data_image' : 'data/images' }
-else:
-    app_var = { 'path_data_image' : app_var[0][0] }
-
-if not os.path.exists(app_var['path_data_image']):
-    os.makedirs(app_var['path_data_image'])
+if not os.path.exists(load_image_url()):
+    os.makedirs(load_image_url())
 
 if not os.path.exists('views'):
     os.makedirs('views')
 
 print('----')
-import route.tool.init as server_init
+def server_init(key):
+    env_dict = {
+        'host' : os.getenv('NAMU_HOST'),
+        'port' : os.getenv('NAMU_PORT'),
+        'language' : os.getenv('NAMU_LANG'),
+        'markup' : os.getenv('NAMU_MARKUP'),
+        'encode' : os.getenv('NAMU_ENCRYPT')
+    }
+
+    server_set_var = {
+        'host' : {
+            'display' : 'Host',
+            'require' : 'conv',
+            'default' : '0.0.0.0'
+        },
+        'port' : {
+            'display' : 'Port',
+            'require' : 'conv',
+            'default' : '3000'
+        },
+        'language' : {
+            'display' : 'Language',
+            'require' : 'select',
+            'default' : 'ko-KR',
+            'list' : ['ko-KR', 'en-US']
+        },
+        'markup' : {
+            'display' : 'Markup',
+            'require' : 'select',
+            'default' : 'namumark',
+            'list' : ['namumark', 'custom', 'raw']
+        },
+        'encode' : {
+            'display' : 'Encryption method',
+            'require' : 'select',
+            'default' : 'sha3',
+            'list' : ['sha3', 'sha256']
+        }
+    }
+    
+    if env_dict[key] != None:
+        return env_dict[key]
+    else:
+        while 1:
+            if server_set_var[key]['require'] == 'select':
+                list_ = '[' + ', '.join(server_set_var[key]['list']) + ']'
+            else:
+                list_ = ''
+
+            print('{} ({}) {} : '.format(
+                server_set_var[key]['display'],
+                server_set_var[key]['default'],
+                list_
+            ), end = '')
+
+            server_set_val = input()
+            if server_set_val:
+                if server_set_var[key]['require'] == 'select':
+                    if server_set_val not in server_set_var[key]['list']:
+                        pass
+                    else:
+                        return server_set_val
+                else:
+                    return server_set_val
+            else:
+                return server_set_var[key]['default']
 
 dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encryption method']
 server_set_key = ['host', 'port', 'language', 'markup', 'encode']
@@ -237,7 +294,7 @@ for i in range(len(server_set_key)):
     curs.execute(db_change('select data from other where name = ?'), [server_set_key[i]])
     server_set_val = curs.fetchall()
     if not server_set_val:
-        server_set_val = server_init.init(server_set_key[i])
+        server_set_val = server_init(server_set_key[i])
 
         curs.execute(db_change('insert into other (name, data) values (?, ?)'), [server_set_key[i], server_set_val])
         conn.commit()
@@ -452,11 +509,11 @@ def edit_backlink_reset(name = 'Test'):
 
 @app.route('/delete/<everything:name>', methods=['POST', 'GET'])
 def edit_delete(name = None):
-    return edit_delete_2(conn, name, app_var)
+    return edit_delete_2(conn, name)
 
 @app.route('/many_delete', methods=['POST', 'GET'])
 def edit_many_delete(name = None):
-    return edit_many_delete_2(conn, app_var)
+    return edit_many_delete_2(conn)
 
 @app.route('/move/<everything:name>', methods=['POST', 'GET'])
 def edit_move(name = None):
@@ -604,7 +661,7 @@ def recent_history_delete(name = None):
 
 @app.route('/upload', methods=['GET', 'POST'])
 def func_upload():
-    return func_upload_2(conn, app_var)
+    return func_upload_2(conn)
 
 @app.route('/user')
 def user_info():
@@ -637,7 +694,7 @@ def func_title_random():
 
 @app.route('/image/<everything:name>')
 def main_image_view(name = None):
-    return main_image_view_2(conn, name, app_var)
+    return main_image_view_2(conn, name)
 
 @app.route('/skin_set')
 @app.route('/main_skin_set')
@@ -720,7 +777,7 @@ def api_title_index():
 
 @app.route('/api/image/<everything:name>')
 def api_image_view(name = ''):
-    return api_image_view_2(conn, name, app_var)
+    return api_image_view_2(conn, name)
 
 @app.route('/api/sitemap.xml')
 def api_sitemap():

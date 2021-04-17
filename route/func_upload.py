@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def func_upload_2(conn, app_var):
+def func_upload_2(conn):
     curs = conn.cursor()
 
     if acl_check(None, 'upload') == 1:
@@ -59,15 +59,16 @@ def func_upload_2(conn, app_var):
                 if t_re.search(name):
                     return redirect('/file_filter')
 
-            if os.path.exists(os.path.join(app_var['path_data_image'], e_data)):
-                os.remove(os.path.join(app_var['path_data_image'], e_data))
-                data.save(os.path.join(app_var['path_data_image'], e_data))
+            data_url_image = load_image_url()
+            if os.path.exists(os.path.join(data_url_image, e_data)):
+                os.remove(os.path.join(data_url_image, e_data))
+                data.save(os.path.join(data_url_image, e_data))
             else:
-                data.save(os.path.join(app_var['path_data_image'], e_data))
+                data.save(os.path.join(data_url_image, e_data))
 
             ip = ip_check()
             g_lice = flask.request.form.get('f_lice', '')
-            file_size = os.stat(os.path.join(app_var['path_data_image'], e_data)).st_size
+            file_size = os.stat(os.path.join(data_url_image, e_data)).st_size
 
             curs.execute(db_change("select data from other where name = 'markup'"))
             db_data = curs.fetchall()

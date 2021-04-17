@@ -1,12 +1,9 @@
-from .tool import *
-
-import re
 import os
 import html
 import sqlite3
-import asyncio
 import threading
-import urllib.parse
+
+from .func_tool import *
 
 conn = ''
 curs = ''
@@ -28,22 +25,9 @@ def load_conn2(data):
     conn = data
     curs = conn.cursor()
 
-def send_parser(data):
-    if not re.search(r'^<br>$', data):
-        data = html.escape(data)
-
-        data = re.sub(r'javascript:', '', data, flags = re.I)
-        data = data.replace('&lt;br&gt;', '')
-
-    link_re = re.compile(r'&lt;a(?: (?:(?:(?!&gt;).)*))?&gt;(?P<in>(?:(?!&lt;).)*)&lt;\/a&gt;')
-    link_data = link_re.findall(data)
-    for i in link_data:
-        data = link_re.sub('<a href="/w/' + urllib.parse.quote(i).replace('/','%2F') + '">' + i + '</a>', data, 1)
-
-    return data
-
 def render_do(doc_name, doc_data, data_type, data_in):
     data_in = None if data_in == '' else data_in
+    
     curs.execute(db_change('select data from other where name = "markup"'))
     rep_data = curs.fetchall()
     if rep_data[0][0] == 'namumark':
