@@ -132,7 +132,6 @@ load_conn(conn)
 # DB init
 create_data = {}
 create_data['data'] = ['title', 'data', 'type']
-create_data['cache_data'] = ['title', 'data', 'id']
 create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
 create_data['rc'] = ['id', 'title', 'date', 'type']
 create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']

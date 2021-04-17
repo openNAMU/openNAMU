@@ -448,7 +448,7 @@ def load_lang(data, num = 2, safe = 0):
         if rep_data and rep_data[0][0] != '' and rep_data[0][0] != 'default':
             try:
                 if not rep_data[0][0] in global_lang:
-                    lang = json.loads(open(os.path.join('language', rep_data[0][0] + '.json'), encoding='utf8').read())
+                    lang = json.loads(open(os.path.join('lang', rep_data[0][0] + '.json'), encoding='utf8').read())
                     global_lang[rep_data[0][0]] = lang
                 else:
                     lang = global_lang[rep_data[0][0]]
@@ -510,7 +510,7 @@ def ip_warring():
     return text_data
 
 def skin_check(set_n = 0):
-    skin_list = load_skin('marisa', 1)
+    skin_list = load_skin('tenshi', 1)
     skin = skin_list[0]
     check_list = []
     ip = ip_check()
@@ -823,7 +823,7 @@ def load_skin(data = '', set_n = 0, default = 0):
                 if default == 1:
                     data = [['default']]
                 else:
-                    data = [['marisa']]
+                    data = [['tenshi']]
     else:
         data = [[data]]
 

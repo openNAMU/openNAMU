@@ -17,7 +17,7 @@ function main_load() {
     ) {
         head_data.innerHTML += '' +
             '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=2">' +
-            '<link rel="stylesheet" href="/views/marisa/css/dark.css?ver=6">' +
+            '<link rel="stylesheet" href="/views/tenshi/css/dark.css?ver=6">' +
         '';
     }
 }

@@ -8,9 +8,9 @@
             <title>{{imp[0]}} - {{imp[1][0]}}</title>
         {% endif %}
         {{imp[3][3]|safe}}
-        <link rel="stylesheet" href="/views/marisa/css/main.css?ver=17">
-        <script src="/views/marisa/js/skin_set.js?ver=6"></script>
-        <script src="/views/marisa/js/main.js?ver=3"></script>
+        <link rel="stylesheet" href="/views/tenshi/css/main.css?ver=17">
+        <script src="/views/tenshi/js/skin_set.js?ver=6"></script>
+        <script src="/views/tenshi/js/main.js?ver=3"></script>
         <script>main_load(); window.addEventListener('DOMContentLoaded', skin_set);</script>
         <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
         <link rel="shortcut icon" href="/views/main_css/file/favicon.ico?ver=1">
@@ -30,12 +30,12 @@
             <div id="top">
                 <div id="top_main">
                     <div id="logo">
-                        <a href="/">{{imp[1][4]|safe}}</a>
+                        <a href="/" class="top_in_cel">{{imp[1][4]|safe}}</a>
                     </div>
                     <div id="top_tool">
-                        <div id="top_menu_groups">
+                        <div id="top_tool_group">
                             <div id="top_tool_cel">
-                                <a href="javascript:void(0);" onclick="opening('recent_cel');">
+                                <a href="javascript:opening('recent_cel');" class="top_in_cel">
                                     <span class="iconify" data-icon="ic:baseline-access-time" data-inline="true"></span>
                                     <span class="not_mobile">{{'list'|load_lang}}</span>
                                     <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
@@ -59,7 +59,7 @@
                             </div>
                              
                             <div id="top_tool_cel">
-                                <a href="javascript:void(0);" onclick="opening('other_cel');">
+                                <a href="javascript:opening('other_cel');" class="top_in_cel">
                                     <span class="iconify" data-icon="ic:baseline-archive" data-inline="true"></span>
                                     <span class="not_mobile">{{'tool'|load_lang}}</span>
                                     <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
@@ -94,8 +94,8 @@
                                 </div>
                             </div>
                              
-                            <div id="top_tool_cel">
-                                <a href="/user">
+                            <div id="top_tool_cel" id="top_in_user">
+                                <a href="/user" class="top_in_cel">
                                     {% if imp[2][2] == 1 %}
                                         {% if imp[2][8] != '0' %}
                                             <span class="iconify" data-icon="ic:baseline-add-alert" data-inline="true"></span>

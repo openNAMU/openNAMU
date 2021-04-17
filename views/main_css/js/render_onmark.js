@@ -1,4 +1,6 @@
 // 인터위키
+// 폴딩
+// 인용문
 // Tool
 function do_url_change(data) {
     return encodeURIComponent(data);
@@ -501,6 +503,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                     data = data.replace(middle_re, '<span id="' + name_include + 'render_contect_' + String(html_n) + '">');
                     middle_stack.push('</span>');
                 } else if(middle_data[1] === '#!folding') {
+                    // 이 부분 완성해야함
                     data = data.replace(middle_re, '<wiki_start style="">');
                     middle_stack.push('<wiki_end>');
                 } else {
@@ -728,6 +731,7 @@ function do_onmark_table_render_sub(data, data_col) {
                 
                 align_auto = 0;
             } else {
+                // 이 부분 다시 해야함
                 var table_option_data = data_option.replace(/"/g, '');
                 if(table_option_data.match(/^[a-zA-Z0-9]{6}|[a-zA-Z0-9]{3}$/)) {
                     data_option_all['td'] += 'background:#' + table_option_data + ';';
