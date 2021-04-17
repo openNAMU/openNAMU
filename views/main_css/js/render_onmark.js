@@ -31,6 +31,10 @@ function do_link_change(data, data_nowiki, no_change, data_nowiki) {
     return [link_main, link_sub];
 }
 
+function do_darkmode_split(data) {
+    return data.split(',')[0];
+}
+
 function do_js_safe_change(data) {
     data = data.replace(/\\/g, '\\\\');
     data = data.replace(/"/g, '\\"');
@@ -55,6 +59,10 @@ function do_data_try_insert(name_ob, data) {
             'document.getElementById("' + name_ob + '").innerHTML = "' + data + '";\n' + 
         '}\n' +
     ''
+}
+
+function do_px_add(data) {
+    return data.match(/^[0-9]+$/) ? (data + 'px') : data;
 }
 
 function do_return_date() {
@@ -94,14 +102,18 @@ function do_onmark_text_render(data) {
 function do_onmark_heading_render(data, name_doc, name_include) {
     var heading_re = /\n(={1,6})(#)? ?([^=#]+) ?#?={1,6}\n/;
     var heading_level_all = [0, 0, 0, 0, 0, 0];
-    var toc_data = '<div id="toc"><div id="toc_title">TOC</div>\n';
+    var toc_data = '';
     var toc_n = 0;
-    while(1) {
+    while(1) {        
         toc_n += 1;
         
         var heading_data = data.match(heading_re);
         if(!heading_data) {
             break;
+        }
+        
+        if(toc_data === '') {
+            toc_data += '<div id="toc"><div id="toc_title">TOC</div>\n';
         }
           
         var heading_level = heading_data[1].length;
@@ -136,7 +148,7 @@ function do_onmark_heading_render(data, name_doc, name_include) {
             '\n' +
         ''
         data = data.replace(heading_re, 
-            '\n' +
+            '\n<start_point>' +
             (toc_n === 1 ? '' : '</div>') +
             '<h' + heading_level + ' id="s-' + heading_level_string_no_end + '">' + 
                 '<a href="#toc">' + heading_level_string + '</a> ' + 
@@ -149,22 +161,27 @@ function do_onmark_heading_render(data, name_doc, name_include) {
                     'style="font-size: 70%;">' + (heading_data[2] ? '⊕' : '⊖') + '</a>' +
             '</h' + heading_level + '>' +
             '<div   id="' + name_include + 'in_data_' + String(toc_n) + '" ' +
-                    'style="display: ' + (heading_data[2] ? 'none' : 'block') + ';"><toc_end_point>' +
-            '\n'
+                    'style="display: ' + (heading_data[2] ? 'none' : 'block') + ';">' +
+            '<end_point>\n'
        );
     }
     
-    toc_data += '</div>';
-    
-    data = data.replace(/\[(?:toc|목차)\]/g, toc_data);
-    data += '</div>';
+    if(toc_data !== '') {
+        toc_data += '</div>';
+        data += '</div>';
+    }
     
     var toc_auto_add = data.match(/\[(?:목차|toc)\(no\)\]/);
+    var toc_re = /\[(?:toc|목차)\]/g;
     if(toc_auto_add) {
         data = data.replace(/\[(?:목차|toc)\(no\)\]/g, '');
     } else {
-        data = data.replace(/(<h[1-6] (?:[^>]+)>)/, toc_data + '$1');
+        if(!data.match(toc_re)) {
+            data = data.replace(/(<h[1-6] (?:[^>]+)>)/, toc_data + '$1');
+        }
     }
+    
+    data = data.replace(toc_re, toc_data);
     
     return data;
 }
@@ -423,6 +440,22 @@ function do_onmark_macro_render(data) {
             return '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + '" frameborder="0" allowfullscreen></iframe>';
         } else if(x_1 === 'anchor') {
             return '<span id="' + x_2 + '"></span>';
+        } else if(x_1 === 'dday') {
+            var date_old = new Date(x_2);
+            var date_now = new Date(do_return_date());
+            
+            var date_end = Math.floor((date_now - date_old) / (24 * 60 * 60 * 1000));
+            
+            return date_end > 0 ? '+' + date_end : '-' + date_end;
+        } else if(x_1 === 'age') {
+            var date_old = new Date(x_2);
+            var date_now = new Date(do_return_date());
+            
+            var date_end = Math.floor((date_now - date_old) / (365 * 24 * 60 * 60 * 1000));
+            
+            return date_end > 0 ? date_end : '';            
+        } else if(x_1 === 'pagecount') {
+            return '0';
         } else {
             return '<macro_start>' + x_1 + '(' + x_2 + ')<macro_end>';
         }
@@ -436,6 +469,8 @@ function do_onmark_macro_render(data) {
             return '<div style="clear:both"></div>';
         } else if(x_1 === 'br') { 
             return '<br>';
+        } else if(x_1 === 'pagecount') {
+            return '0';
         } else {
             return '<macro_start>' + x_1 + '<macro_end>';
         }
@@ -539,7 +574,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
         data = data.replace(code_re, '<span id="' + name_include + 'nowiki_mid_' + String(code_n) + '"></span>');
     }
     
-    var wiki_re = /<wiki_start (?:[^>]+)>(\n*(?:(?:(?!<wiki_start (?:[^>]+)>|<wiki_end>).)+\n*)+)<wiki_end>/;
+    var wiki_re = /<wiki_start ([^>]+)>(\n*(?:(?:(?!<wiki_start (?:[^>]+)>|<wiki_end>).)+\n*)+)<wiki_end>/;
     var wiki_n = 0;
     while(1) {
         wiki_n += 1;
@@ -549,12 +584,14 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
             break;
         }
         
-        wiki_data = do_nowiki_change(wiki_data[1]);
+        var wiki_data_style = wiki_data[1];
+        wiki_data = do_nowiki_change(wiki_data[2]);
         wiki_data = do_onmark_render('manual', '', name_include + 'wiki_' + String(wiki_n) + '_', name_doc, wiki_data);
         
-        console.log(wiki_n);
+        console.log([wiki_data[0]]);
+        
         data_js += wiki_data[1];
-        data = data.replace(wiki_re, wiki_data[0]);
+        data = data.replace(wiki_re, '<div ' + wiki_data_style + '>' + wiki_data[0] + '</div>');
     }
     
     return [data, data_js, data_nowiki];
@@ -566,7 +603,8 @@ function do_onmark_last_render(data) {
     data = data.replace(/<wiki_end>/g, '</div>');
     
     // heading_render 마지막 처리
-    data = data.replace(/<toc_end_point>\n?/g, '');
+    data = data.replace(/\n?<start_point>/g, '');
+    data = data.replace(/<end_point>\n?/g, '');
     
     // list_render 마지막 처리
     data = data.replace(/(<\/ul>)\n/g, '$1');
@@ -661,11 +699,11 @@ function do_onmark_table_render_sub(data, data_col) {
             var table_option_data = data_option_var[1].replace(/"/g, '');
             if(table_option_name === 'tablebgcolor') {
                 // table
-               data_option_all['table'] += 'background:' + table_option_data + ';';
+               data_option_all['table'] += 'background:' + do_darkmode_split(table_option_data) + ';';
             } else if(table_option_name === 'tablewidth') {
-                data_option_all['table'] += 'width:' + table_option_data + ';';
+                data_option_all['table'] += 'width:' + do_px_add(table_option_data) + ';';
             } else if(table_option_name === 'tableheight') {
-                data_option_all['table'] += 'height:' + table_option_data + ';';
+                data_option_all['table'] += 'height:' + do_px_add(table_option_data) + ';';
             } else if(table_option_name === 'tablealign') {
                 if(table_option_data === 'right') {
                     data_option_all['div'] += 'float:right;';
@@ -676,30 +714,30 @@ function do_onmark_table_render_sub(data, data_col) {
             } else if(table_option_name === 'tabletextalign') {
                 data_option_all['table'] += 'text-align:' + table_option_data + ';';
             } else if(table_option_name === 'tablecolor') {
-                data_option_all['table'] += 'color:' + table_option_data + ';';
+                data_option_all['table'] += 'color:' + do_darkmode_split(table_option_data) + ';';
             } else if(table_option_name === 'tablebordercolor') {
-                data_option_all['table'] += 'border:2px solid ' + table_option_data + ';';
+                data_option_all['table'] += 'border:2px solid ' + do_darkmode_split(table_option_data) + ';';
             } else if(table_option_name === 'rowbgcolor') {
                 // tr
-                data_option_all['tr'] += 'background:' + table_option_data + ';';
+                data_option_all['tr'] += 'background:' + do_darkmode_split(table_option_data) + ';';
             } else if(table_option_name === 'rowtextalign') {
                 data_option_all['tr'] += 'text-align:' + table_option_data + ';';
             } else if(table_option_name === 'rowcolor') {
-                data_option_all['tr'] += 'color:' + table_option_data + ';';
+                data_option_all['tr'] += 'color:' + do_darkmode_split(table_option_data) + ';';
             } else if(table_option_name === 'colcolor') {
                 // col
-                data_option_all['col'] += 'color:' + table_option_data + ';';
+                data_option_all['col'] += 'color:' + do_darkmode_split(table_option_data) + ';';
             } else if(table_option_name === 'colbgcolor') {
-                data_option_all['col'] += 'background:' + table_option_data + ';';
+                data_option_all['col'] += 'background:' + do_darkmode_split(table_option_data) + ';';
             } else if(table_option_name === 'bgcolor') {
                 // td
-                data_option_all['td'] += 'background:' + table_option_data + ';';
+                data_option_all['td'] += 'background:' + do_darkmode_split(table_option_data) + ';';
             } else if(table_option_name === 'color') {
-                data_option_all['td'] += 'color:' + table_option_data + ';';
+                data_option_all['td'] += 'color:' + do_darkmode_split(table_option_data) + ';';
             } else if(table_option_name === 'width') {
-                data_option_all['td'] += 'width:' + table_option_data + ';';
+                data_option_all['td'] += 'width:' + do_px_add(table_option_data) + ';';
             } else if(table_option_name === 'height') {
-                data_option_all['td'] += 'height:' + table_option_data + ';';
+                data_option_all['td'] += 'height:' + do_px_add(table_option_data) + ';';
             } else {
                 no_option = '<lt>' + data_option + '<gt>';
             }
@@ -708,13 +746,13 @@ function do_onmark_table_render_sub(data, data_col) {
                 // span
                 data_option_all['colspan'] = data_option.replace('-', '');
             } else if(data_option.match(/^(\^|v)?\|[0-9]+$/)) {
-                // 이 부분 다듬어야함
-                var rowspan_vertical = data_option.match(/^(\^|v)/);
-                if(rowspan_vertical) {
-                    data_option_all['td'] += rowspan_vertical[1] === '^' ? 'vertical-align: top;' : 'vertical-align: bottom;';
+                if(data_option[0] === '^') {
+                    data_option_all['td'] += 'vertical-align: top;';
+                } else if(data[1] === 'v') {
+                    data_option_all['td'] += 'vertical-align: bottom;';
                 }
                 
-                data_option_all['rowspan'] = data_option.replace(/^(\^|v)?\|/, '');
+                data_option_all['rowspan'] = data_option.replace(/[^0-9]+/g, '');
             } else if(
                 data_option === '(' ||
                 data_option === ':' ||
@@ -731,12 +769,11 @@ function do_onmark_table_render_sub(data, data_col) {
                 
                 align_auto = 0;
             } else {
-                // 이 부분 다시 해야함
-                var table_option_data = data_option.replace(/"/g, '');
-                if(table_option_data.match(/^[a-zA-Z0-9]{6}|[a-zA-Z0-9]{3}$/)) {
-                    data_option_all['td'] += 'background:#' + table_option_data + ';';
+                var table_option_data = data_option.replace(/"/g, '').match(/^((?:#[a-zA-Z0-9]{3}){1,2}|\w+)/);
+                if(table_option_data) {
+                    data_option_all['td'] += 'background:' + table_option_data[1] + ';';
                 } else {
-                    data_option_all['td'] += 'background:' + table_option_data + ';';    
+                    no_option = '<lt>' + data_option + '<gt>';
                 }
             }
         }
@@ -850,11 +887,11 @@ function do_onmark_list_render(data) {
             break;
         }
         
-        var list_end_data = '<ul>' + list_data[1].replace(list_short_re, function(x, x_1, x_2) {
+        var list_end_data = '<ul style="padding: 0;">' + list_data[1].replace(list_short_re, function(x, x_1, x_2) {
             return '<li style="margin-left: ' + String(x_1.length * 20) + 'px;">' + x_2 + '</li>';
         }) + '</ul>';
 
-        data = data.replace(list_re, '\n' + list_end_data + '\n');
+        data = data.replace(list_re, '\n<start_point>' + list_end_data + '<end_point>\n');
     }
     
     return data;
@@ -892,49 +929,36 @@ asdf || asdf`
     var data_backlink = [];
     var data_nowiki = {};
     
-    console.log(name_include);
     var data_var = do_onmark_math_render(data, data_js, name_include);
     data = data_var[0];
     data_js = data_var[1];
-    console.log('math pass');
     
     data_var = do_onmark_nowiki_before_render(data, data_js, name_include, data_nowiki);
     data = data_var[0];
     data_js = data_var[1];
     data_nowiki = data_var[2];
-    console.log('nowiki before pass');
     
     data_var = do_onmark_include_render(data, data_js, name_include, data_nowiki);
     data = data_var[0];
     data_js = data_var[1];
-    console.log('include pass');
     
     data_var = do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_doc);
     data = data_var[0];
     data_js = data_var[1];
     data_nowiki = data_var[2];
-    console.log('middle pass');
     
     data = do_onmark_text_render(data);
-    console.log('text pass');
     data = do_onmark_heading_render(data, name_doc, name_include);
-    console.log('heading pass');
     data = do_onmark_table_render(data);
-    console.log('table pass');
     
     data_var = do_onmark_link_render(data, data_js, name_doc, name_include, data_nowiki);
     data = data_var[0];
     data_js = data_var[1];
-    console.log('link pass');
     
     data = do_onmark_macro_render(data);
-    console.log('macro pass');
     data = do_onmark_list_render(data);
-    console.log('list pass');
     data = do_onmark_footnote_render(data, name_include);
-    console.log('footnote pass');
     data = do_onmark_last_render(data, name_include);
-    console.log('last pass');
     
     data_js += '' + 
         'get_link_state("' + name_include + '");\n' + 
@@ -951,5 +975,3 @@ asdf || asdf`
     	console.log([data, data_js]);
     }
 }
-
-do_onmark_render();

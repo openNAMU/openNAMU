@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def edit_delete_2(conn, name, app_var):
+def edit_delete_2(conn, name):
     curs = conn.cursor()
 
     ip = ip_check()
@@ -49,7 +49,7 @@ def edit_delete_2(conn, name, app_var):
         if file_check:
             file_check = file_check.groups()
             file_directory = os.path.join(
-                app_var['path_data_image'], 
+                load_image_url(), 
                 sha224_replace(file_check[0]) + '.' + file_check[1]
             )
             if os.path.exists(file_directory):

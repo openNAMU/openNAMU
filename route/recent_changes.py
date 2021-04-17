@@ -142,7 +142,7 @@ def recent_changes_2(conn, name, tool):
                     <td>''' + date + '''</td>
                 </tr>
                 <tr ''' + style[1] + '''>
-                    <td colspan="3">''' + send_parser(send) + '''</td>
+                    <td colspan="3">''' + html.escape(send) + '''</td>
                 </tr>
             '''
 

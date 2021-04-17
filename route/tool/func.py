@@ -1,41 +1,39 @@
-import os
 import sys
 import platform
+import json
+import smtplib
+import zipfile
+import shutil
+import logging
+import random
 
 for i in range(0, 2):
     try:
         from diff_match_patch import diff_match_patch
         import werkzeug.routing
         import werkzeug.debug
+        
+        import flask
         import flask_reggie
+        
         import tornado.ioloop
         import tornado.httpserver
         import tornado.wsgi
+        
         import urllib.request
+        
         import email.mime.text
         import email.utils
         import email.header
+        
         import requests
-        import sqlite3
+
         import pymysql
-        import hashlib
-        import smtplib
-        import asyncio
-        import zipfile
-        import shutil
-        import threading
+
         import PIL
-        import logging
-        import random
-        import flask
-        import json
-        import html
-        import re
 
         if sys.version_info < (3, 6):
             import sha3
-
-        from .mark import *
     except ImportError as e:
         if i == 0:
             print(e)
@@ -63,9 +61,11 @@ for i in range(0, 2):
         print(e)
         raise
 
+from .func_mark import *
+        
 global_lang = {}
 
-data_css_ver = '78'
+data_css_ver = '79'
 data_css = ''
 
 conn = ''
@@ -79,6 +79,13 @@ def load_conn(data):
     curs = conn.cursor()
 
     load_conn2(data)
+    
+def load_image_url():
+    curs.execute(db_change('select data from other where name = "image_where"'))
+    image_where = curs.fetchall()
+    image_where = image_where[0][0] if image_where else 'data/images'
+    
+    return image_where
 
 def http_warring():
     return '''
@@ -159,11 +166,8 @@ def load_domain():
 def load_random_key(long = 64):
     return ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(long))
 
-def last_change(data):
-    return data
-
 def easy_minify(data, tool = None):
-    return last_change(data)
+    return data
 
 def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', doc_acl = ''):
     # data_type in ['view', 'raw', 'api_view', 'backlink']

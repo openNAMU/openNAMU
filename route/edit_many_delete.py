@@ -1,7 +1,7 @@
 from .tool.func import *
 from . import edit_delete
 
-def edit_many_delete_2(conn, app_var):
+def edit_many_delete_2(conn):
     curs = conn.cursor()
 
     ip = ip_check()
@@ -11,7 +11,7 @@ def edit_many_delete_2(conn, app_var):
     if flask.request.method == 'POST':
         all_title = re.findall(r'([^\n]+)\n', flask.request.form.get('content', '').replace('\r\n', '\n') + '\n')
         for name in all_title:
-            edit_delete.edit_delete_2(conn, name, app_var)
+            edit_delete.edit_delete_2(conn, name)
 
         return redirect('/recent_changes')
     else:
