@@ -170,7 +170,7 @@ def setting_2(conn, num, db_set):
                         </span>
                         <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class="main_hr">
-                        <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'marisa') + '''</select>
+                        <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'tenshi') + '''</select>
                         <hr class="main_hr">
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
                         <hr class="main_hr">
