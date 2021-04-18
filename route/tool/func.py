@@ -65,7 +65,7 @@ from .func_mark import *
         
 global_lang = {}
 
-data_css_ver = '80'
+data_css_ver = '81'
 data_css = ''
 
 conn = ''
