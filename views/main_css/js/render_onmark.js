@@ -10,7 +10,7 @@ function do_nowiki_change(data, data_nowiki) {
     });
 }
 
-function do_link_change(data, data_nowiki, no_change, data_nowiki) {
+function do_link_change(data, data_nowiki, no_change) {
     data = data.replace(/^:/, '');
     
     if(no_change === 0) {
@@ -293,19 +293,15 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
         } else {
             if(link_real.match(/^\//)) {
                 link_real = name_doc + link_real;
-            } else if(link_real === '../') {
-                link_real = name_doc.split('/');
-                if(link_real.length > 1) {
-                    link_real = link_real.slice(0, link_real.length - 1).join('/');
-                } else {
-                    link_real = name_doc;
-                }
+            } else if(link_real.match(/^\.\.\//)) {
+                link_real = link_real.replace(/^\.\.\//, '');
+                link_real = name_doc.replace(/\/[^/]+$/, '') + (link_real !== '' ? '/' + link_real : '');
             }
             
             var i = 0;
             while(i < 2) {
                 if(i === 0) {
-                    var link_data_var = do_link_change(link_real, data_nowiki, 0, data_nowiki);
+                    var link_data_var = do_link_change(link_real, data_nowiki, 0);
                     var link_main = link_data_var[0];
                     var link_sub = link_data_var[1];
                     
@@ -488,6 +484,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
     
     var html_n = 0;
     var folding_n = 0;
+    var syntax_n = 0;
     
     while(1) {
         var middle_data = data.match(middle_re);
@@ -536,6 +533,18 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
 
                     data = data.replace(middle_re, '<span id="' + name_include + 'render_contect_' + String(html_n) + '">');
                     middle_stack.push('</span>');
+                } else if(middle_data[1] === '#!syntax') {
+                    syntax_n += 1;
+                    
+                    var syntax_re = /{{{#!syntax(?: ([^\n]+)\n)?/;
+                    
+                    var syntax = data.match(syntax_re);
+                    var syntax_name = syntax[1] ? syntax[1] : 'python';
+                    
+                    data = data.replace(syntax_re, 
+                        '<pre id="syntax"><code id="get_' + name_include + 'syntax_' + String(syntax_n) + '" class="' + syntax_name + '"><nowiki_start>'
+                    );
+                    middle_stack.push('<nowiki_end></code></pre>');
                 } else if(middle_data[1] === '#!folding') {
                     folding_n += 1;
                     
@@ -544,18 +553,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                     var folding = data.match(folding_re);
                     var folding_name = folding[1] ? folding[1] : 'open';
                     
-                    if(folding_n > 100) {
-                        break;
-                    }
-                    
-                    data_js += '' +
-                        'if(document.getElementById("get_' + name_include + 'folding_' + String(folding_n) + '")) { ' + 
-                            'document.getElementById("get_' + name_include + 'folding_' + String(folding_n) + '").innerHTML = ' + 
-                                '"' + do_js_safe_change(folding_name) + '"; ' + 
-                            '' + 
-                        '}' + 
-                        '\n' + 
-                    ''
+                    data_js += do_data_try_insert('get_' + name_include + 'folding_' + String(folding_n), do_js_safe_change(folding_name));
                     data = data.replace(folding_re, '' +
                         '<div style="display: inline-block;">' +
                             '<b>' + 
@@ -568,7 +566,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                             '\n' +
                             '<wiki_start style="">' +
                     '');
-                    middle_stack.push('<folding_end>');
+                    middle_stack.push('<wiki_end></div>');
                 } else {
                     data = data.replace(middle_re, '<nowiki_start>' + middle_data[1]);
                     middle_stack.push('<nowiki_end>');
@@ -582,7 +580,6 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
         middle_stack.pop();
     }
     
-    data = data.replace(/<folding_end>/g, '<wiki_end></div>');
     data = data.replace(/\n<wiki_end>/g, '<wiki_end>');
     
     data = data.replace(/<middle_start>/g, '{{{');
@@ -620,6 +617,10 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
         
         data_js += wiki_data[1];
         data = data.replace(wiki_re, '<div ' + wiki_data_style + '>' + wiki_data[0] + '</div>');
+    }
+    
+    if(syntax_n > 0) {
+        data_js += 'hljs.initHighlightingOnLoad();\n';
     }
     
     return [data, data_js, data_nowiki];
@@ -962,6 +963,31 @@ function do_onmark_hr_render(data) {
     return data;
 }
 
+function do_onmark_redirect_render(data, data_js, name_doc) {
+    var redirect_re = /#(?:redirect|넘겨주기) ([^\n]+)/;
+    var data_redirect = data.match(redirect_re);
+    if(data_redirect) {
+        var link_data_var = do_link_change(data_redirect[1], {}, 1);
+        var link_main = link_data_var[0];
+        var link_sub = link_data_var[1];
+        
+        if(
+            window.location.search === '' &&
+            window.location.pathname.match(/^\/w\//)
+        ) {
+            window.location.href = '/w/' + do_url_change(link_main) + '?from=' + do_url_change(name_doc) + link_sub;
+        }
+        
+        return [
+            data.replace(redirect_re, '/w/' + do_url_change(link_main) + '?from=' + do_url_change(name_doc) + link_sub), 
+            data_js, 
+            1
+        ];
+    } else {
+        return [data, data_js, 0];
+    }
+}
+
 // Main
 function do_onmark_render(test_mode = 'test', name_id = '', name_include = '', name_doc = '', doc_data = '') {    
 	if(test_mode === 'normal') {
@@ -980,44 +1006,51 @@ asdf || asdf`
     var data_backlink = [];
     var data_nowiki = {};
     
-    var data_var = do_onmark_math_render(data, data_js, name_include);
+    var data_var = do_onmark_redirect_render(data, data_js, name_doc);
     data = data_var[0];
     data_js = data_var[1];
-    console.log('math')
+    var passing = data_var[2];
     
-    data_var = do_onmark_nowiki_before_render(data, data_js, name_include, data_nowiki);
-    data = data_var[0];
-    data_js = data_var[1];
-    data_nowiki = data_var[2];
-    console.log('nowiki')
-    
-    data_var = do_onmark_include_render(data, data_js, name_include, data_nowiki);
-    data = data_var[0];
-    data_js = data_var[1];
-    console.log('include')
-    
-    data_var = do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_doc);
-    data = data_var[0];
-    data_js = data_var[1];
-    data_nowiki = data_var[2];
-    console.log('middle')
-    
-    data = do_onmark_text_render(data);
-    data = do_onmark_heading_render(data, name_doc, name_include);
-    data = do_onmark_table_render(data);
-    console.log('table')
-    
-    data_var = do_onmark_link_render(data, data_js, name_doc, name_include, data_nowiki);
-    data = data_var[0];
-    data_js = data_var[1];
-    
-    data = do_onmark_macro_render(data);
-    data = do_onmark_quote_render(data);
-    data = do_onmark_list_render(data);
-    data = do_onmark_hr_render(data);
-    data = do_onmark_footnote_render(data, name_include);
-    data = do_onmark_last_render(data, name_include);
-    console.log('all')
+    if(passing === 0) {
+        var data_var = do_onmark_math_render(data, data_js, name_include);
+        data = data_var[0];
+        data_js = data_var[1];
+        console.log('math')
+
+        data_var = do_onmark_nowiki_before_render(data, data_js, name_include, data_nowiki);
+        data = data_var[0];
+        data_js = data_var[1];
+        data_nowiki = data_var[2];
+        console.log('nowiki')
+
+        data_var = do_onmark_include_render(data, data_js, name_include, data_nowiki);
+        data = data_var[0];
+        data_js = data_var[1];
+        console.log('include')
+
+        data_var = do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_doc);
+        data = data_var[0];
+        data_js = data_var[1];
+        data_nowiki = data_var[2];
+        console.log('middle')
+
+        data = do_onmark_text_render(data);
+        data = do_onmark_heading_render(data, name_doc, name_include);
+        data = do_onmark_table_render(data);
+        console.log('table')
+
+        data_var = do_onmark_link_render(data, data_js, name_doc, name_include, data_nowiki);
+        data = data_var[0];
+        data_js = data_var[1];
+
+        data = do_onmark_macro_render(data);
+        data = do_onmark_quote_render(data);
+        data = do_onmark_list_render(data);
+        data = do_onmark_hr_render(data);
+        data = do_onmark_footnote_render(data, name_include);
+        data = do_onmark_last_render(data, name_include);
+        console.log('all')
+    }
     
     data_js += '' + 
         'get_link_state("' + name_include + '");\n' + 

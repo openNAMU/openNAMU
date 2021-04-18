@@ -73,7 +73,8 @@ def user_setting_2(conn, server_init):
                 imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + load_lang('id') + ''' : ''' + ip_pas(ip) + '''</span>
+                        <div id="get_user_info"></div>
+                        <script>load_user_info("''' + ip + '''");</script>
                         <hr class="main_hr">
                         <a href="/pw_change">(''' + load_lang('password_change') + ''')</a>
                         <hr class="main_hr">
@@ -124,7 +125,8 @@ def user_setting_2(conn, server_init):
                 imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + load_lang('id') + ''' : ''' + ip_pas(ip) + '''</span>
+                        <div id="get_user_info"></div>
+                        <script>load_user_info("''' + ip + '''");</script>
                         <hr class="main_hr">
                         <h2>''' + load_lang('main') + '''</h2>
                         <span>''' + load_lang('skin') + '''</span>
