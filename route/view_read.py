@@ -6,7 +6,6 @@ def view_read_2(conn, name):
     sub = ''
     div = ''
     ip = ip_check()
-    run_redirect = ''
     name_doc_pass = flask.request.args.get('from', '')
     uppage = re.sub(r"([^/]+)$", '', name)
 
@@ -164,10 +163,8 @@ def view_read_2(conn, name):
     else:
         watch_list = 0
 
-    div += run_redirect
-
     return easy_minify(flask.render_template(skin_check(),
-        imp = [flask.request.args.get('show', name), wiki_set(), custom(), other2([sub, r_date, watch_list])],
+        imp = [name, wiki_set(), custom(), other2([sub, r_date, watch_list])],
         data = div,
         menu = menu
     )), response_data

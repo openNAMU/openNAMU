@@ -1,3 +1,7 @@
+body, textarea, input, pre, code {
+    font-family: 'Apple SD Gothic', '맑은고딕', 'Nanum Gothic', 'Noto Sans KR', sans-serif;
+}
+
 body {
     max-width: 100%;
     
@@ -6,30 +10,11 @@ body {
     
     margin: 0;
     
-    font-family: 'Apple SD Gothic', '맑은고딕', 'Nanum Gothic', 'Noto Sans KR', sans-serif;
     font-size: 0.85rem;
 }
 
 select {
     padding: 5px;
-}
-
-hr {
-    border: 0;
-    border-top: 1px solid gainsboro;
-}
-
-button {
-    padding: 10px;
-    
-    border: 1px solid #aaa;
-    background: white;
-    
-    cursor: pointer;
-}
-
-td {
-    border: 1px solid gainsboro;
 }
 
 html {
@@ -248,6 +233,7 @@ h1, h2, h3, h4, h5, h6 {
     background-color: white;
     border: solid 2px #2780e3;
     color: black;
+    box-shadow: none;
     
     transition: .2s ease-in-out;
 }
@@ -260,10 +246,6 @@ h1, h2, h3, h4, h5, h6 {
     border: solid 2px #f4aba1;
     
     transition: .2s ease-in-out;
-}
-
-#search_input:hover::placeholder, #search_input:focus::placeholder {
-    color: black;
 }
 
 #pre_search {
@@ -282,8 +264,12 @@ h1, h2, h3, h4, h5, h6 {
 
 #search button {
     padding: 0;
+    
     border: none;
+    
     background: transparent;
+    box-shadow: none;
+    
     color: white;
 }
 
@@ -296,24 +282,108 @@ a {
     max-width: 300px;
 }
 
+/*
+pre, #toc, #cate, #redirect {
+    border: 1px solid #aaa;
+}
+*/
+
+#redirect, #cate, #toc, blockquote, button#save, button#preview {
+    border: 0;
+    
+    padding: 10px;
+    
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+}
+
+button#save {
+    background: #92f7f4;
+}
+
+button#preview {
+    margin-left: 5px;
+}
+
+blockquote {
+    background: #ffefff;
+    padding: 20px;
+    border-left: 4px solid #ffb3ff;
+    margin-bottom: 20px;
+}
+
+#cate {
+    background: #ccf5bc;
+}
+
+#redirect {
+    background: #d9edf7;
+}
+
+#toc {
+    background: lightyellow;
+    padding: 20px;
+}
+
+textarea, input, pre {    
+    border: 0;
+    
+    padding: 5px;
+    
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+}
+
+pre {
+    padding: 10px;
+}
+
 #syntax {
     background: #f0f0f0;
     padding: 5px;
 }
 
-pre, #toc, #cate, #redirect {
-    border: 1px solid #aaa;
-}
-
-textarea, input {
-    font-family: 'Apple SD Gothic', '맑은고딕', 'Nanum Gothic', 'Noto Sans KR', sans-serif;
-    border: 1px solid #aaa;
-    padding: 5px;
-    margin-left: -5px;
-}
-
 #syntax code {
     background: transparent;
+}
+
+table {
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+}
+
+td {
+    border: 1px solid gainsboro;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid gainsboro;
+}
+
+button {
+    border: 0;
+    
+    padding: 10px;
+    
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+    background: papayawhip;
+    
+    cursor: pointer;
+}
+
+input[type="checkbox"] {
+    box-shadow: None;
+    background: transparent;
+}
+
+select {
+    padding: 0;
+    padding-left: 5px;
+    padding-right: 5px;
+    
+    background: white;
+    border: 0;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+    
+    min-height: 30px;
 }
 
 /* nav_bar */
@@ -410,8 +480,4 @@ div#last_edit {
 
 #titlt_a {
     color: initial;
-}
-
-button#save {
-    background: #c6ffc6;
 }

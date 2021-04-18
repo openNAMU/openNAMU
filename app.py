@@ -219,72 +219,6 @@ if not os.path.exists('views'):
     os.makedirs('views')
 
 print('----')
-def server_init(key):
-    env_dict = {
-        'host' : os.getenv('NAMU_HOST'),
-        'port' : os.getenv('NAMU_PORT'),
-        'language' : os.getenv('NAMU_LANG'),
-        'markup' : os.getenv('NAMU_MARKUP'),
-        'encode' : os.getenv('NAMU_ENCRYPT')
-    }
-
-    server_set_var = {
-        'host' : {
-            'display' : 'Host',
-            'require' : 'conv',
-            'default' : '0.0.0.0'
-        },
-        'port' : {
-            'display' : 'Port',
-            'require' : 'conv',
-            'default' : '3000'
-        },
-        'language' : {
-            'display' : 'Language',
-            'require' : 'select',
-            'default' : 'ko-KR',
-            'list' : ['ko-KR', 'en-US']
-        },
-        'markup' : {
-            'display' : 'Markup',
-            'require' : 'select',
-            'default' : 'namumark',
-            'list' : ['namumark', 'custom', 'raw']
-        },
-        'encode' : {
-            'display' : 'Encryption method',
-            'require' : 'select',
-            'default' : 'sha3',
-            'list' : ['sha3', 'sha256']
-        }
-    }
-    
-    if env_dict[key] != None:
-        return env_dict[key]
-    else:
-        while 1:
-            if server_set_var[key]['require'] == 'select':
-                list_ = '[' + ', '.join(server_set_var[key]['list']) + ']'
-            else:
-                list_ = ''
-
-            print('{} ({}) {} : '.format(
-                server_set_var[key]['display'],
-                server_set_var[key]['default'],
-                list_
-            ), end = '')
-
-            server_set_val = input()
-            if server_set_val:
-                if server_set_var[key]['require'] == 'select':
-                    if server_set_val not in server_set_var[key]['list']:
-                        pass
-                    else:
-                        return server_set_val
-                else:
-                    return server_set_val
-            else:
-                return server_set_var[key]['default']
 
 dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encryption method']
 server_set_key = ['host', 'port', 'language', 'markup', 'encode']
@@ -294,7 +228,7 @@ for i in range(len(server_set_key)):
     curs.execute(db_change('select data from other where name = ?'), [server_set_key[i]])
     server_set_val = curs.fetchall()
     if not server_set_val:
-        server_set_val = server_init(server_set_key[i])
+        server_set_val = server_init.init(server_set_key[i])
 
         curs.execute(db_change('insert into other (name, data) values (?, ?)'), [server_set_key[i], server_set_val])
         conn.commit()

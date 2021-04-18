@@ -235,9 +235,12 @@ a {
 blockquote {
     padding: 15px 40px 15px 15px;
     margin: 15px 0 0;
+    
     display: table;
+    
     border: 2px solid #ccc;
     border-left: 5px solid black;
+    
     background-image: url('/views/main_css/file/quote.png');
     background-position: calc(100% - 10px) 10px;
     background-repeat: no-repeat;
