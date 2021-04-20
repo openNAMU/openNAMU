@@ -109,7 +109,8 @@ def render_do(doc_name, doc_data, data_type, data_in):
         ]
 
     if data_type == 'backlink':
-        backlink = backlink_generate(rep_data, html.escape(doc_data), doc_name)
+        # backlink = backlink_generate(rep_data, html.escape(doc_data), doc_name)
+        backlink = []
         if backlink == []:
             curs.execute(db_change("insert into back (title, link, type) values ('test', ?, 'nothing')"), [doc_name])
         else:
