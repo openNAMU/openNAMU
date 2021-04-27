@@ -1,6 +1,5 @@
 // 인터위키
-// middle 재설계
-// 테이블 재설계
+// footnote 오류 확인
 // Tool
 function do_url_change(data) {
     return encodeURIComponent(data);
@@ -484,6 +483,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
     var html_n = 0;
     var syntax_n = 0;
     var nowiki_n = 0;
+    var folding_n = 0;
     
     while(1) {
         if(!data.match(middle_re)) {
@@ -505,8 +505,9 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                 /^(?:(?:(#|@)([0-9a-f-A-F]{3}){1,2})|(#|@)([a-zA-Z]+))|(\+|-)([1-5])|#!(html|wiki|syntax|folding|html)$/i
             );
             if(middle_type) {
-                if(middle_data_x_1[middle_data_x_1.length - 1] === '\\') { } 
-                else if(middle_type[1]) {
+                if(middle_data_x_1[middle_data_x_1.length - 1] === '\\') {
+                    return middle_data_before + '{{{' + middle_data_x_1 + '<mid_e>';
+                } else if(middle_type[1]) {
                     if(middle_type[1] === '@') {
                         return middle_data_before + '<span style="background: #' + middle_type[2] + '">' + middle_data_all + '</span>';
                     } else {
@@ -537,21 +538,42 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
 
                         return middle_data_before + '<span id="' + name_include + 'nowiki_html_' + String(html_n) + '"></span>';
                     } else if(middle_type_sub === 'wiki') {
-                        // 테이블이랑 연계해야함
-                        
-                        var middle_wiki = middle_data_x_1.match(/^(?:[^ ]+) style=['"]([^\n'"]+)['"]\n/);
+                        var middle_wiki_re = /^(?:[^ ]+)(?: style=['"]([^\n'"]*)['"])?\n?/;
+                        var middle_wiki = middle_data_x_1.match(middle_wiki_re);
                         middle_wiki = middle_wiki ? middle_wiki[1] : '';
                         middle_wiki = middle_wiki.replace(/display/, '');
 
-                        middle_data_all = middle_data_x_1.replace(/^(?:[^ ]+) style=['"]([^\n'"]+)['"]\n/, '');
+                        middle_data_all = middle_data_x_1.replace(middle_wiki_re, '');
                         
                         return middle_data_before + '' +
-                            '<wiki_s style="' + middle_wiki + '">' + middle_data_all + '<wiki_e>'
+                            '<wiki_s style="' + middle_wiki + '"><end_point>\n' + middle_data_all + '<wiki_e>'
                         '';
                     } else if(middle_type_sub === 'folding') {
-                        // 만들어야함
+                        folding_n += 1;
                         
-                        return middle_data_before + '';
+                        var middle_folding_re = /^(?:[^ ]+)( ([^\n'"]*))?\n?/;
+                        var middle_folding = middle_data_x_1.match(middle_folding_re);
+                        middle_folding = middle_folding ? middle_folding[1] : 'open';
+
+                        middle_data_all = middle_data_x_1.replace(middle_folding_re, '');
+
+                        data_js += do_data_try_insert('get_' + name_include + 'folding_' + String(folding_n), do_js_safe_change(middle_folding));
+                        return '' +
+                            '<div style="display: inline-block;">' +
+                                '<b>' + 
+                                    '<a href="javascript:do_open_folding(\'' + name_include + 'folding_' + String(folding_n) + '\');" ' + 
+                                        'id="get_' + name_include + 'folding_' + String(folding_n) + '">' + 
+                                    '</a>' + 
+                                '</b>' + 
+                            '</div>' +
+                            '<div id="' + name_include + 'folding_' + String(folding_n) + '" style="display: none;">' +
+                                '\n' +
+                                '<wiki_s style="">' +
+                                    '<end_point>\n' +
+                                    middle_data_all +
+                                '<wiki_e>' +
+                            '</div>' +
+                        ''
                     } else if(middle_type_sub === 'syntax') {
                         syntax_n += 1;
 
@@ -591,6 +613,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
     
     data = data.replace(/<mid_s>/g, '{{{');
     data = data.replace(/<mid_e>/g, '}}}');
+    console.log(data);
     
     if(syntax_n > 0) {
         data_js += 'hljs.initHighlightingOnLoad();\n';
@@ -803,8 +826,77 @@ function do_onmark_table_render_sub(data, data_col) {
     return data_option_all;
 }
 
+function do_onmark_table_render_main(data) {
+    var table_re = /\n((?:(?:\|\|\n|(?:\|\|)+(?!\n)(?:(?:(?!\|\|).)+))+)\|\|)\n/gs;
+    data = data.replace(table_re, function(x, x_1) {
+        var table_cel_re = /((?:\|\|)+)((?:(?!\|\|).)+)/gs;
+        var table_data = '';
+        var table_data_org = x_1;
+        
+        var table_col = 0;
+        var table_col_data = {};
+        table_data_org = table_data_org.replace(table_cel_re, function(x, x_1, x_2) {
+            if(!table_col_data[table_col]) {
+                table_col_data[table_col] = '';
+            }
+
+            var table_data_option = do_onmark_table_render_sub(x_2, table_col_data[table_col]);
+            table_col_data[table_col] = table_data_option['col'];
+            if(table_data_option['colspan'] === '') {
+                table_data_option['colspan'] = String(x_1.length / 2);
+            }
+            
+            if(table_data === '') {
+                table_data += '' + 
+                    '<div style="' + table_data_option['div'] + '">' +
+                        '<table style="' + table_data_option['table'] + '">' +
+                '';
+            }
+            
+            if(x_2 === '\n') {
+                table_data += '</tr>';
+                table_col = 0;
+            } else {
+                if(table_col === 0) {
+                    table_data += '' + 
+                        '<tr style="' + table_data_option['tr'] + '">' +
+                    ''
+                }
+                
+                table_data += '' +
+                    '<td     colspan="' + table_data_option['colspan'] + '" ' +
+                            'rowspan="' + table_data_option['rowspan'] + '" ' +
+                            'style="' + table_data_option['col'] + table_data_option['td'] + '">' + 
+                        table_data_option['data'] + 
+                    '</td>' +
+                '';
+                table_col += 1;
+            }
+            
+            return '';
+        });
+        
+        table_data += '</tr></table></div>';
+        
+        return '\n' + table_data + '\n';
+    });
+    
+    return data;
+}
+
 function do_onmark_table_render(data) {
-    // 만들어야함
+    var wiki_re = /<wiki_s ([^>]+)>((?:(?!<wiki_s |<wiki_e>).)+)<wiki_e>/s;
+    while(1) {
+        if(!data.match(wiki_re)) {
+            break;
+        }
+        
+        data = data.replace(wiki_re, function(x, x_1, x_2) {
+            return '<div ' + x_1 + '>' + do_onmark_table_render_main(x_2) + '</div>';
+        });
+    }
+    
+    data = do_onmark_table_render_main(data);
     
     return data;
 }
