@@ -388,9 +388,10 @@ function do_onmark_footnote_render(data, name_include) {
             i += 1;
         } else {
             if(footnote_end_data !== '') {
-                data = data.replace(footnote_re, '<ul id="footnote_data">' + footnote_end_data + '</ul>');    
+                footnote_end_data = '<ul id="footnote_data">' + footnote_end_data + '</ul>';   
             }
             
+            data = data.replace(footnote_re, footnote_end_data);    
             footnote_end_data = '';
         }
     }
@@ -501,8 +502,9 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                 var middle_data_all = middle_data_x_1.replace(/^([^ ]+) /, '');    
             }
 
+            console.log(middle_data);
             var middle_type = middle_data.match(
-                /^(?:(?:(#|@)([0-9a-f-A-F]{3}){1,2})|(#|@)([a-zA-Z]+))|(\+|-)([1-5])|#!(html|wiki|syntax|folding|html)$/i
+                /^(?:(?:(?:(#|@)([0-9a-f-A-F]{3}){1,2})|(#|@)([a-zA-Z]+))|(\+|-)([1-5])|#!(html|wiki|syntax|folding|html))$/i
             );
             if(middle_type) {
                 if(middle_data_x_1[middle_data_x_1.length - 1] === '\\') {
@@ -546,19 +548,23 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                         middle_data_all = middle_data_x_1.replace(middle_wiki_re, '');
                         
                         return middle_data_before + '' +
-                            '<wiki_s style="' + middle_wiki + '"><end_point>\n' + middle_data_all + '<wiki_e>'
+                            '<wiki_s style="' + middle_wiki + '">' +
+                                '<end_point>\n' + 
+                                middle_data_all + 
+                                '\n<start_point>' +
+                            '<wiki_e>' +
                         '';
                     } else if(middle_type_sub === 'folding') {
                         folding_n += 1;
                         
-                        var middle_folding_re = /^(?:[^ ]+)( ([^\n'"]*))?\n?/;
+                        var middle_folding_re = /^(?:[^ ]+)(?: ([^\n]*))?\n?/;
                         var middle_folding = middle_data_x_1.match(middle_folding_re);
                         middle_folding = middle_folding ? middle_folding[1] : 'open';
-
+                        
                         middle_data_all = middle_data_x_1.replace(middle_folding_re, '');
 
                         data_js += do_data_try_insert('get_' + name_include + 'folding_' + String(folding_n), do_js_safe_change(middle_folding));
-                        return '' +
+                        return middle_data_before + 
                             '<div style="display: inline-block;">' +
                                 '<b>' + 
                                     '<a href="javascript:do_open_folding(\'' + name_include + 'folding_' + String(folding_n) + '\');" ' + 
@@ -571,6 +577,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                                 '<wiki_s style="">' +
                                     '<end_point>\n' +
                                     middle_data_all +
+                                    '\n<start_point>' +
                                 '<wiki_e>' +
                             '</div>' +
                         ''
@@ -613,7 +620,6 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
     
     data = data.replace(/<mid_s>/g, '{{{');
     data = data.replace(/<mid_e>/g, '}}}');
-    console.log(data);
     
     if(syntax_n > 0) {
         data_js += 'hljs.initHighlightingOnLoad();\n';
@@ -643,7 +649,7 @@ function do_onmark_last_render(data) {
 }
 
 function do_onmark_include_render(data, data_js, name_include, data_nowiki) {
-    var include_re = /\[include\(((?:(?!\)\]).)+)\)\]/;
+    var include_re = /\[include\(((?:(?!\)\]).)+)\)\]/i;
     var i = 0;
     while(1) {
         i += 1;
@@ -773,7 +779,7 @@ function do_onmark_table_render_sub(data, data_col) {
             } else if(data_option.match(/^(\^|v)?\|[0-9]+$/)) {
                 if(data_option[0] === '^') {
                     data_option_all['td'] += 'vertical-align: top;';
-                } else if(data[1] === 'v') {
+                } else if(data_option[0] === 'v') {
                     data_option_all['td'] += 'vertical-align: bottom;';
                 }
                 
@@ -827,15 +833,17 @@ function do_onmark_table_render_sub(data, data_col) {
 }
 
 function do_onmark_table_render_main(data) {
-    var table_re = /\n((?:(?:\|\|\n|(?:\|\|)+(?!\n)(?:(?:(?!\|\|).)+))+)\|\|)\n/gs;
+    var table_re = /\n((?:(?:\|\||\|\|\n|(?:\|\|)+(?!\n)(?:(?:(?!\|\|).)+))+)\|\|)\n/gs;
     data = data.replace(table_re, function(x, x_1) {
-        var table_cel_re = /((?:\|\|)+)((?:(?!\|\|).)+)/gs;
+        var table_cel_re = /((?:\|\|)+)((?:(?!\|\|).)*)/gs;
         var table_data = '';
         var table_data_org = x_1;
         
         var table_col = 0;
         var table_col_data = {};
+            
         table_data_org = table_data_org.replace(table_cel_re, function(x, x_1, x_2) {
+            console.log([x, x_1, x_2, table_data]);
             if(!table_col_data[table_col]) {
                 table_col_data[table_col] = '';
             }
@@ -845,16 +853,19 @@ function do_onmark_table_render_main(data) {
             if(table_data_option['colspan'] === '') {
                 table_data_option['colspan'] = String(x_1.length / 2);
             }
-            
+
             if(table_data === '') {
                 table_data += '' + 
                     '<div style="' + table_data_option['div'] + '">' +
                         '<table style="' + table_data_option['table'] + '">' +
                 '';
             }
-            
-            if(x_2 === '\n') {
+
+            if(x_1 === '||' && (x_2 === '\n' || x_2 === '')) {
                 table_data += '</tr>';
+                table_col = 0;
+            } else if(x_2 === '\n' || x_2 === '') {
+                table_data += '</tr><tr></tr>';
                 table_col = 0;
             } else {
                 if(table_col === 0) {
@@ -862,7 +873,7 @@ function do_onmark_table_render_main(data) {
                         '<tr style="' + table_data_option['tr'] + '">' +
                     ''
                 }
-                
+
                 table_data += '' +
                     '<td     colspan="' + table_data_option['colspan'] + '" ' +
                             'rowspan="' + table_data_option['rowspan'] + '" ' +
@@ -872,11 +883,15 @@ function do_onmark_table_render_main(data) {
                 '';
                 table_col += 1;
             }
-            
+
             return '';
         });
         
-        table_data += '</tr></table></div>';
+        if(table_col === 0) {
+            table_data += '</table></div>';
+        } else {
+            table_data += '</tr></table></div>';
+        }
         
         return '\n' + table_data + '\n';
     });
@@ -885,6 +900,8 @@ function do_onmark_table_render_main(data) {
 }
 
 function do_onmark_table_render(data) {
+    data = data.replace(/ +\|\|/g, '||');
+    
     var wiki_re = /<wiki_s ([^>]+)>((?:(?!<wiki_s |<wiki_e>).)+)<wiki_e>/s;
     while(1) {
         if(!data.match(wiki_re)) {
@@ -896,14 +913,15 @@ function do_onmark_table_render(data) {
         });
     }
     
+    console.log(data);
     data = do_onmark_table_render_main(data);
     
     return data;
 }
 
 function do_onmark_list_render(data) {
-    var list_re = /\n((?:(?:(?: )+)\* (?:(?:(?!\n).)+)\n)+)/;
-    var list_short_re = /((?: )+)\* ((?:(?!\n).)+)\n/g;
+    var list_re = /\n((?:(?:(?: )+)\* ?(?:(?:(?!\n).)+)\n)+)/;
+    var list_short_re = /((?: )+)\* ?((?:(?!\n).)+)\n/g;
     while(1) {
         var list_data = data.match(list_re);
         if(!list_data) {
