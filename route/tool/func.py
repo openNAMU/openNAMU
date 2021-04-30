@@ -65,7 +65,7 @@ from .func_mark import *
         
 global_lang = {}
 
-data_css_ver = '81'
+data_css_ver = '82'
 data_css = ''
 
 conn = ''
@@ -81,72 +81,69 @@ def load_conn(data):
     load_conn2(data)
     
 class server_init:
-    env_dict = {
-        'host' : os.getenv('NAMU_HOST'),
-        'port' : os.getenv('NAMU_PORT'),
-        'language' : os.getenv('NAMU_LANG'),
-        'markup' : os.getenv('NAMU_MARKUP'),
-        'encode' : os.getenv('NAMU_ENCRYPT')
-    }
-
-    server_set_var = {
-        'host' : {
-            'display' : 'Host',
-            'require' : 'conv',
-            'default' : '0.0.0.0'
-        },
-        'port' : {
-            'display' : 'Port',
-            'require' : 'conv',
-            'default' : '3000'
-        },
-        'language' : {
-            'display' : 'Language',
-            'require' : 'select',
-            'default' : 'ko-KR',
-            'list' : ['ko-KR', 'en-US']
-        },
-        'markup' : {
-            'display' : 'Markup',
-            'require' : 'select',
-            'default' : 'namumark',
-            'list' : ['namumark', 'custom', 'raw']
-        },
-        'encode' : {
-            'display' : 'Encryption method',
-            'require' : 'select',
-            'default' : 'sha3',
-            'list' : ['sha3', 'sha256']
+    def __init__(self):
+        self.env_dict = {
+            'host' : os.getenv('NAMU_HOST'),
+            'port' : os.getenv('NAMU_PORT'),
+            'language' : os.getenv('NAMU_LANG'),
+            'markup' : os.getenv('NAMU_MARKUP'),
+            'encode' : os.getenv('NAMU_ENCRYPT')
         }
-    }
+
+        self.server_set_var = {
+            'host' : {
+                'display' : 'Host',
+                'require' : 'conv',
+                'default' : '0.0.0.0'
+            }, 'port' : {
+                'display' : 'Port',
+                'require' : 'conv',
+                'default' : '3000'
+            }, 'language' : {
+                'display' : 'Language',
+                'require' : 'select',
+                'default' : 'ko-KR',
+                'list' : ['ko-KR', 'en-US']
+            }, 'markup' : {
+                'display' : 'Markup',
+                'require' : 'select',
+                'default' : 'namumark',
+                'list' : ['namumark', 'custom', 'raw']
+            }, 'encode' : {
+                'display' : 'Encryption method',
+                'require' : 'select',
+                'default' : 'sha3',
+                'list' : ['sha3', 'sha256']
+            }
+        }
     
-    def init(key):
-        if env_dict[key] != None:
-            return env_dict[key]
+    def init(self, key):
+        if self.env_dict[key] != None:
+            return self.env_dict[key]
         else:
             while 1:
-                if server_set_var[key]['require'] == 'select':
-                    list_ = '[' + ', '.join(server_set_var[key]['list']) + ']'
+                if self.server_set_var[key]['require'] == 'select':
+                    list_ = '[' + ', '.join(self.server_set_var[key]['list']) + ']'
                 else:
                     list_ = ''
 
                 print('{} ({}) {} : '.format(
-                    server_set_var[key]['display'],
-                    server_set_var[key]['default'],
+                    self.server_set_var[key]['display'],
+                    self.server_set_var[key]['default'],
                     list_
                 ), end = '')
 
                 server_set_val = input()
                 if server_set_val:
-                    if server_set_var[key]['require'] == 'select':
-                        if server_set_val not in server_set_var[key]['list']:
+                    if self.server_set_var[key]['require'] == 'select':
+                        if server_set_val not in self.server_set_var[key]['list']:
                             pass
                         else:
                             return server_set_val
                     else:
                         return server_set_val
                 else:
-                    return server_set_var[key]['default']
+                    return self.server_set_var[key]['default']
     
 def load_image_url():
     curs.execute(db_change('select data from other where name = "image_where"'))
