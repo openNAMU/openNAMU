@@ -36,6 +36,10 @@ input::placeholder, textarea::placeholder, select::placeholder {
     background: #314c56;
 }
 
+#main_table_top_tr {
+    background: #2e5f4e;
+}
+
 pre#syntax, pre#syntax code {
     background: black;
 }
