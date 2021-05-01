@@ -66,7 +66,7 @@ from .func_mark import *
         
 global_lang = {}
 
-data_css_ver = '83'
+data_css_ver = '84'
 data_css = ''
 
 conn = ''
@@ -526,7 +526,7 @@ def other2(data):
         for i_data in os.listdir(os.path.join("views", "main_css", "js")):
             if i_data != 'sub':
                 data_css += '<script src="/views/main_css/js/' + i_data + '?ver=' + data_css_ver + '"></script>'
-
+                
     data = data[0:2] + ['', '''
         <link   rel="stylesheet"
                 href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.2/build/styles/default.min.css">
