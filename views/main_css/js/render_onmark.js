@@ -630,8 +630,8 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
 
 function do_onmark_last_render(data) {
     // middle_render 마지막 처리
-    data = data.replace(/<wiki_s /g, '<div ');
-    data = data.replace(/<wiki_e>/g, '</div>');
+    data = data.replace(/<wiki_s_4 /g, '<div ');
+    data = data.replace(/<wiki_e_4>/g, '</div>');
     
     // heading_render 마지막 처리
     data = data.replace(/\n?<start_point>/g, '');
@@ -909,7 +909,7 @@ function do_onmark_table_render(data) {
         }
         
         data = data.replace(wiki_re, function(x, x_1, x_2) {
-            return '<div ' + x_1 + '>' + do_onmark_table_render_main(x_2) + '</div>';
+            return '<wiki_s_2 ' + x_1 + '>' + do_onmark_table_render_main(x_2) + '<wiki_e_2>';
         });
     }
     
@@ -919,7 +919,30 @@ function do_onmark_table_render(data) {
     return data;
 }
 
+function do_onmark_list_quote_render(data) {
+    data = data.replace(/(\n(?:&gt;(?:[^\n]+)\n)+)/g, function(x, x_1) {
+        return '\n<start_point><blockquote>' + do_onmark_list_quote_render(x_1.replace(/\n&gt; */g, '\n')).replace(/^\n/, '') + '</blockquote><end_point>\n';
+    });
+    
+    return data;
+}
+
 function do_onmark_list_render(data) {
+    var wiki_re = /<wiki_s_2 ([^>]+)>((?:(?!<wiki_s_2 |<wiki_e_2>).)+)<wiki_e_2>/s;
+    while(1) {
+        if(!data.match(wiki_re)) {
+            break;
+        }
+        
+        data = data.replace(wiki_re, function(x, x_1, x_2) {
+            return '<wiki_s_3 ' + x_1 + '>' + x_2.replace(/\n/g, '<t_br>') + '<wiki_e_3>';
+        });
+    }
+    
+    data = data.replace(/(\n(?:&gt;(?:[^\n]+)\n)+)/g, function(x, x_1) {
+        return '\n<start_point><blockquote>' + do_onmark_list_quote_render(x_1.replace(/\n&gt; */g, '\n')).replace(/^\n/, '') + '</blockquote><end_point>\n';
+    });
+    
     var list_re = /\n((?:(?:(?: )+)\* ?(?:(?:(?!\n).)+)\n)+)/;
     var list_short_re = /((?: )+)\* ?((?:(?!\n).)+)\n/g;
     while(1) {
@@ -933,6 +956,17 @@ function do_onmark_list_render(data) {
         }) + '</ul>';
 
         data = data.replace(list_re, '\n<start_point>' + list_end_data + '<end_point>\n');
+    }
+    
+    var wiki_re = /<wiki_s_3 ([^>]+)>((?:(?!<wiki_s_3 |<wiki_e_3>).)+)<wiki_e_3>/s;
+    while(1) {
+        if(!data.match(wiki_re)) {
+            break;
+        }
+        
+        data = data.replace(wiki_re, function(x, x_1, x_2) {
+            return '<wiki_s_4 ' + x_1 + '>' + x_2.replace(/<t_br>/g, '\n') + '<wiki_e_4>';
+        });
     }
     
     return data;
@@ -950,14 +984,6 @@ function do_onmark_math_render(data, data_js, name_include) {
     });
     
     return [data, data_js];
-}
-
-function do_onmark_quote_render(data) {
-    data = data.replace(/(\n(?:&gt;(?:[^\n]+)\n)+)/g, function(x, x_1) {
-        return '\n<start_point><blockquote>' + do_onmark_quote_render(x_1.replace(/\n&gt; */g, '\n')).replace(/^\n/, '') + '</blockquote><end_point>\n';
-    });
-    
-    return data;
 }
 
 function do_onmark_hr_render(data) {
@@ -1055,8 +1081,6 @@ function do_onmark_render(test_mode = 'test', name_id = '', name_include = '', n
 
         data = do_onmark_macro_render(data);
         console.log('macro');
-        data = do_onmark_quote_render(data);
-        console.log('quote');
         data = do_onmark_list_render(data);
         console.log('list');
         data = do_onmark_hr_render(data);
