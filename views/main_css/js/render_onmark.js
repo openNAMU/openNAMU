@@ -175,7 +175,7 @@ function do_onmark_heading_render(data, name_doc, name_include) {
         data = data.replace(/\[(?:목차|toc)\(no\)\]/g, '');
     } else {
         if(!data.match(toc_re)) {
-            data = data.replace(/(<h[1-6] (?:[^>]+)>)/, toc_data + '$1');
+            data = data.replace(/(<h[1-6] (?:[^>]+)>)/, '<div id="auto_toc">' + toc_data + '</div>$1');
         }
     }
     
@@ -501,7 +501,6 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                 var middle_data_all = middle_data_x_1.replace(/^([^ ]+) /, '');    
             }
 
-            console.log(middle_data);
             var middle_type = middle_data.match(
                 /^(?:(?:(?:(#|@)([0-9a-f-A-F]{3}){1,2})|(#|@)([a-zA-Z]+))|(\+|-)([1-5])|#!(html|wiki|syntax|folding|html))$/i
             );
@@ -842,7 +841,6 @@ function do_onmark_table_render_main(data) {
         var table_col_data = {};
             
         table_data_org = table_data_org.replace(table_cel_re, function(x, x_1, x_2) {
-            console.log([x, x_1, x_2, table_data]);
             if(!table_col_data[table_col]) {
                 table_col_data[table_col] = '';
             }
@@ -912,7 +910,6 @@ function do_onmark_table_render(data) {
         });
     }
     
-    console.log(data);
     data = do_onmark_table_render_main(data);
     
     return data;
