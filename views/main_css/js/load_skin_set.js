@@ -80,15 +80,6 @@ function main_css_get_post() {
     } else {
         document.cookie = 'main_css_monaco=0;';
     }
-
-    if(
-        cookies.match(regex_data('main_css_darkmode')) &&
-        cookies.match(regex_data('main_css_darkmode'))[1] === '1'
-    ) {
-        head_data.innerHTML += '' +
-            '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=5">' +
-        '';
-    }
     
     history.go(0);
 }
@@ -145,6 +136,15 @@ function main_css_skin_load() {
         } else if(document.cookie.match(main_css_regex_data('main_css_toc_set'))[1] === '1') {
             head_data.innerHTML += '<style>#toc { display: none; }</style>';
         }
+    }
+    
+    if(
+        cookies.match(regex_data('main_css_darkmode')) &&
+        cookies.match(regex_data('main_css_darkmode'))[1] === '1'
+    ) {
+        head_data.innerHTML += '' +
+            '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=5">' +
+        '';
     }
 }
 
