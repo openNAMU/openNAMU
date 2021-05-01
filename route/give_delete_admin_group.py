@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def delete_admin_group_2(conn, name):
+def give_delete_admin_group_2(conn, name):
     curs = conn.cursor()
 
     if admin_check() != 1:

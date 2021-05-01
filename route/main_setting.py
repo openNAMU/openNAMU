@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def setting_2(conn, num, db_set):
+def main_setting_2(conn, num, db_set):
     curs = conn.cursor()
 
     if not (num == 0 or num == 8) and admin_check() != 1:
