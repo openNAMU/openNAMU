@@ -16,7 +16,6 @@ function main_load() {
         cookies.match(regex_data('main_css_darkmode'))[1] === '1'
     ) {
         head_data.innerHTML += '' +
-            '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=4">' +
             '<link rel="stylesheet" href="/views/tenshi/css/dark.css?ver=8">' +
         '';
     }

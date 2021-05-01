@@ -81,6 +81,15 @@ function main_css_get_post() {
         document.cookie = 'main_css_monaco=0;';
     }
 
+    if(
+        cookies.match(regex_data('main_css_darkmode')) &&
+        cookies.match(regex_data('main_css_darkmode'))[1] === '1'
+    ) {
+        head_data.innerHTML += '' +
+            '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=5">' +
+        '';
+    }
+    
     history.go(0);
 }
 
