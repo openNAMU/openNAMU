@@ -224,6 +224,7 @@ dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encryption method']
 server_set_key = ['host', 'port', 'language', 'markup', 'encode']
 server_set = {}
 
+server_init = server_init()
 for i in range(len(server_set_key)):
     curs.execute(db_change('select data from other where name = ?'), [server_set_key[i]])
     server_set_val = curs.fetchall()

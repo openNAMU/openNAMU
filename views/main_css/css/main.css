@@ -92,6 +92,10 @@ input[type="checkbox"], input[type="radio"] {
     display: none;
 }
 
+#main_table_top_tr {
+    background: aquamarine;
+}
+
 #cate {
     border: 1px solid gainsboro;
     padding: 5px;
