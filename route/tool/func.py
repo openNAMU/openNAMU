@@ -120,6 +120,9 @@ class server_init:
                 'list' : ['sha3', 'sha256']
             }
         }
+        
+    def server_init(self):
+        return self.server_set_var
     
     def init(self, key):
         if self.env_dict[key] != None:
