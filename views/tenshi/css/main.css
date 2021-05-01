@@ -349,13 +349,8 @@ table {
     box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
 }
 
-td {
-    border: 1px solid gainsboro;
-}
-
-hr {
-    border: 0;
-    border-top: 1px solid gainsboro;
+#main_table_top_tr {
+    background: aquamarine;
 }
 
 button {
@@ -435,7 +430,7 @@ select {
     color: white;
 }
 
-/* */
+/* content */
 #out_link::before {
     content: '🅴';
     font-weight: lighter;

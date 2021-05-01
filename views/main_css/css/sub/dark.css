@@ -28,6 +28,10 @@ input::placeholder, textarea::placeholder, select::placeholder {
     background: #803737;
 }
 
+#toron_color_normal {
+    background: #38340e;
+}
+
 #toron_color_blue {
     background: #314c56;
 }

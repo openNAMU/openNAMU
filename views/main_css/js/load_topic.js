@@ -78,7 +78,7 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
                 } else if(ip_o === ip_first) {
                     color_t = 'toron_color_green';
                 } else {
-                    color_t = 'toron_color';
+                    color_t = 'toron_color_normal';
                 }
                 
                 data_a += '' + 

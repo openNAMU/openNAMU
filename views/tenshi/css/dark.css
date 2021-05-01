@@ -26,7 +26,7 @@ html, #main {
     color: white;
 }
 
-a#titlt_a {
+#titlt_a {
     color: white;
 }
 
@@ -46,4 +46,8 @@ a#titlt_a {
 
 button#save {
     background: #083808;
+}
+
+#main_table_top_tr {
+    background: black;
 }

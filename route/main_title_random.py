@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def func_title_random_2(conn):
+def main_title_random_2(conn):
     curs = conn.cursor()
 
     curs.execute(db_change("" + \

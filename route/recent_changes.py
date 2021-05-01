@@ -18,7 +18,7 @@ def recent_changes_2(conn, name, tool):
         div = '''
             <table id="main_table_set">
                 <tbody>
-                    <tr>
+                    <tr id="main_table_top_tr">
         '''
 
         num = int(number_check(flask.request.args.get('num', '1')))

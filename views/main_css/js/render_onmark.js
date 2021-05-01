@@ -1,5 +1,4 @@
 // 인터위키
-// footnote 오류 확인
 // Tool
 function do_url_change(data) {
     return encodeURIComponent(data);

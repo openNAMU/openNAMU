@@ -9,7 +9,7 @@ def recent_block_2(conn, name, tool):
     div = '''
         <table id="main_table_set">
             <tbody>
-                <tr>
+                <tr id="main_table_top_tr">
                     <td id="main_table_width">''' + load_lang('blocked') + '''</td>
                     <td id="main_table_width">''' + load_lang('admin') + '''</td>
                     <td id="main_table_width">''' + load_lang('period') + '''</td>

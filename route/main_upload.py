@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def func_upload_2(conn):
+def main_upload_2(conn):
     curs = conn.cursor()
 
     if acl_check(None, 'upload') == 1:
