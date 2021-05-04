@@ -304,13 +304,6 @@ button#preview {
     margin-left: 5px;
 }
 
-blockquote {
-    background: #ffefff;
-    padding: 20px;
-    border-left: 4px solid #ffb3ff;
-    margin-bottom: 20px;
-}
-
 #cate {
     background: #ccf5bc;
 }
@@ -471,4 +464,8 @@ div#last_edit {
 
 #titlt_a {
     color: initial;
+}
+
+#quote_replace {
+    border-left: 4px solid #ffb3ff;
 }
