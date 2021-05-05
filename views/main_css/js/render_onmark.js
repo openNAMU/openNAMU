@@ -960,7 +960,6 @@ function do_onmark_list_render(data) {
             '</blockquote>' +
        '');
     }
-    console.log(data);
     
     var list_re = /\n((?:(?:(?: )+)\* ?(?:(?:(?!\n).)+)\n)+)/;
     var list_short_re = /((?: )+)\* ?((?:(?!\n).)+)\n/g;
@@ -971,7 +970,10 @@ function do_onmark_list_render(data) {
         }
         
         var list_end_data = list_data[1].replace(list_short_re, function(x, x_1, x_2) {
-            return '<li style="margin-left: ' + String(x_1.length * 20) + 'px">' + x_2 + '</li>';
+            var list_leng = x_1.length;
+            list_leng = list_leng > 0 ? list_leng : 1;
+            
+            return '<li style="margin-left: ' + String((list_leng - 1) * 20) + 'px">' + x_2 + '</li>';
         });
 
         data = data.replace(list_re, '\n<start_point><ul>' + list_end_data + '</ul><end_point>\n');
