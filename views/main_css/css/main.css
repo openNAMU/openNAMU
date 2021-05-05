@@ -249,14 +249,12 @@ hr {
     white-space: pre-wrap;
 }
 
-#li_replace {
-    display: list-item;
-    float: left;
-}
+blockquote {
+    padding: 15px 40px 15px 15px;
+    margin: 15px 0 0;
 
-#quote_replace {
-    display: block;
-    float: left;
-    border-left: 4px solid;
-    padding-left: 10px;
+    display: table;
+
+    border: 2px solid #ccc;
+    border-left: 5px solid black;
 }
