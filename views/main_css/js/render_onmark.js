@@ -98,7 +98,7 @@ function do_onmark_text_render(data) {
 }
 
 function do_onmark_heading_render(data, name_doc, name_include) {
-    var heading_re = /\n(={1,6})(#)? ?([^=#]+) ?#?={1,6}\n/;
+    var heading_re = /\n(={1,6})(#)? ?([^=]+) ?#?={1,6}\n/;
     var heading_level_all = [0, 0, 0, 0, 0, 0];
     var toc_data = '';
     var toc_n = 0;
@@ -136,12 +136,13 @@ function do_onmark_heading_render(data, name_doc, name_include) {
         }
         
         var heading_level_string_no_end = heading_level_string.replace(/\.$/, '');
+        var heading_data_text = heading_data[3].replace(/ #$/, '');
         
         toc_data += '' +
             '<span style="margin-left: ' + String((heading_level_string.match(/\./g).length - 1) * 10) + 'px;">' +
                 '<a href="#s-' + heading_level_string_no_end + '">' + 
                     heading_level_string + ' ' +
-                '</a>' + heading_data[3] +
+                '</a>' + heading_data_text +
             '</span>' +
             '\n' +
         ''
@@ -150,7 +151,7 @@ function do_onmark_heading_render(data, name_doc, name_include) {
             (toc_n === 1 ? '' : '</div>') +
             '<h' + heading_level + ' id="s-' + heading_level_string_no_end + '">' + 
                 '<a href="#toc">' + heading_level_string + '</a> ' + 
-                heading_data[3] + 
+                heading_data_text + 
                 '<a id="edit_load_' + String(toc_n) + '" ' +
                     'style="font-size: 70%;"' +
                     'href="/edit/' + do_url_change(name_doc) + '?section=' + String(toc_n) + '">✎</a> ' +
@@ -540,7 +541,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                     } else if(middle_type_sub === 'wiki') {
                         var middle_wiki_re = /^(?:[^ ]+)(?: style=['"]([^\n'"]*)['"])?\n?/;
                         var middle_wiki = middle_data_x_1.match(middle_wiki_re);
-                        middle_wiki = middle_wiki ? middle_wiki[1] : '';
+                        middle_wiki = middle_wiki[1] ? middle_wiki[1] : '';
                         middle_wiki = middle_wiki.replace(/display/, '');
 
                         middle_data_all = middle_data_x_1.replace(middle_wiki_re, '');
@@ -563,17 +564,15 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
 
                         data_js += do_data_try_insert('get_' + name_include + 'folding_' + String(folding_n), do_js_safe_change(middle_folding));
                         return middle_data_before + 
-                            '<div style="display: inline-block;">' +
+                            '<div>' +
                                 '<b>' + 
                                     '<a href="javascript:do_open_folding(\'' + name_include + 'folding_' + String(folding_n) + '\');" ' + 
                                         'id="get_' + name_include + 'folding_' + String(folding_n) + '">' + 
                                     '</a>' + 
                                 '</b>' + 
-                            
                                 '<div id="' + name_include + 'folding_' + String(folding_n) + '" style="display: none;">' +
-                                    '\n' +
                                     '<wiki_s style="">' +
-                                        '<end_point>\n' +
+                                        '\n' +
                                         middle_data_all +
                                         '\n<start_point>' +
                                     '<wiki_e>' +
@@ -628,12 +627,13 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
 }
 
 function do_onmark_last_render(data) {   
+    // middle_render 마지막 처리
+    data = data.replace(/<wiki_s_[0-9] /g, '<div ');
+    data = data.replace(/<wiki_e_[0-9]>/g, '</div>');
+    
     // heading_render 마지막 처리
     data = data.replace(/\n?<start_point>/g, '');
     data = data.replace(/<end_point>\n?/g, '');
-    
-    // list_render 마지막 처리
-    data = data.replace(/(<\/ul>)\n/g, '$1');
     
     // br 마지막 처리
     data = data.replace(/^(\n| )+/, '');
@@ -903,7 +903,7 @@ function do_onmark_table_render(data) {
         }
         
         data = data.replace(wiki_re, function(x, x_1, x_2) {
-            return '<div ' + x_1 + '>' + do_onmark_table_render_main(x_2) + '</div>';
+            return '<wiki_s_2 ' + x_1 + '>' + do_onmark_table_render_main(x_2) + '</wiki_e_2>';
         });
     }
     
@@ -912,22 +912,55 @@ function do_onmark_table_render(data) {
     return data;
 }
 
-function do_onmark_list_quote_render(data) {
-    data = data.replace(/(\n(?:&gt;(?:[^\n]+)\n)+)/g, function(x, x_1) {
-        return '' +
-            '\n' +
-            '<span id="quote_replace"> </span>' +
-            do_onmark_list_quote_render(x_1.replace(/\n&gt; */g, '\n')).replace(/^\n/, '') +
-            '<end_point>\n' +
-        '';
-    });
-    
-    return data;
-}
-
 function do_onmark_list_render(data) {
+    var wiki_re = /<wiki_s_2 ([^>]+)>((?:(?!<wiki_s_2 |<wiki_e_2>).)+)<wiki_e_2>/s;
+    while(1) {
+        if(!data.match(wiki_re)) {
+            break;
+        }
+
+        data = data.replace(wiki_re, function(x, x_1, x_2) {
+            return '<wiki_s_3 ' + x_1 + '>' + x_2.replace(/\n/g, '<t_br>') + '<wiki_e_3>';
+        });
+    }
+    
+    var quote_re = /\n((?:(?:(?:&gt;)+) ?(?:(?:(?!\n).)+)\n)+)/;
+    var quote_short_re = /((?:&gt;)+) ?((?:(?!\n).)+)\n/g;
+    var quote_leng = 1;
+    while(1) {
+        var quote_data = data.match(quote_re);
+        if(!quote_data) {
+            break;
+        }
+        
+        var quote_end_data = quote_data[1].replace(quote_short_re, function(x, x_1, x_2) {
+            var quote_leng_now = (x_1.length / 4);
+            var quote_data_part_1 = '';
+            var quote_data_part_2 = '';
+            if(quote_leng < quote_leng_now) {
+                var quote_data_part_1 = ('<blockquote><end_point>\n'.repeat(quote_leng_now - quote_leng));
+            } else if(quote_leng > quote_leng_now) {
+                var quote_data_part_1 = ('\n<start_point></blockquote>'.repeat(quote_leng - quote_leng_now));
+            }
+            
+            quote_leng = quote_leng_now;
+            
+            return '' +
+                quote_data_part_1 + 
+                x_2 + '\n'
+                quote_data_part_2 +
+            '';
+        });
+
+        data = data.replace(quote_re, '' +
+            '<blockquote>' + 
+                '<end_point>\n' +
+                quote_end_data + 
+                '\n<start_point>' +
+            '</blockquote>' +
+       '');
+    }
     console.log(data);
-    data = do_onmark_list_quote_render(data);
     
     var list_re = /\n((?:(?:(?: )+)\* ?(?:(?:(?!\n).)+)\n)+)/;
     var list_short_re = /((?: )+)\* ?((?:(?!\n).)+)\n/g;
@@ -938,10 +971,21 @@ function do_onmark_list_render(data) {
         }
         
         var list_end_data = list_data[1].replace(list_short_re, function(x, x_1, x_2) {
-            return '\n<span id="li_replace" style="margin-left: ' + String(x_1.length * 20 + 20) + 'px;"></span> ' + x_2;
+            return '<li style="margin-left: ' + String(x_1.length * 20) + 'px">' + x_2 + '</li>';
         });
 
-        data = data.replace(list_re, '\n<start_point>' + list_end_data + '<end_point>\n');
+        data = data.replace(list_re, '\n<start_point><ul>' + list_end_data + '</ul><end_point>\n');
+    }
+    
+    var wiki_re = /<wiki_s_3 ([^>]+)>((?:(?!<wiki_s_3 |<wiki_e_3>).)+)<wiki_e_3>/s;
+    while(1) {
+        if(!data.match(wiki_re)) {
+            break;
+        }
+
+        data = data.replace(wiki_re, function(x, x_1, x_2) {
+            return '<wiki_s_4 ' + x_1 + '>' + x_2.replace(/<t_br>/g, '\n') + '<wiki_e_4>';
+        });
     }
     
     return data;

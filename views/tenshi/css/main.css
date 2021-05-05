@@ -466,6 +466,9 @@ div#last_edit {
     color: initial;
 }
 
-#quote_replace {
+blockquote {
+    background: #ffefff;
+    padding: 20px;
     border-left: 4px solid #ffb3ff;
+    margin-bottom: 20px;
 }
