@@ -8,6 +8,8 @@ import shutil
 import logging
 import random
 
+from .func_mark import *
+
 for i in range(0, 2):
     try:
         from diff_match_patch import diff_match_patch
@@ -17,9 +19,7 @@ for i in range(0, 2):
         import flask
         import flask_reggie
         
-        import tornado.ioloop
-        import tornado.httpserver
-        import tornado.wsgi
+        import wsgiref.simple_server
         
         import urllib.request
         
@@ -61,12 +61,10 @@ for i in range(0, 2):
         print('----')
         print(e)
         raise
-
-from .func_mark import *
         
 global_lang = {}
 
-data_css_ver = '84'
+data_css_ver = '85'
 data_css = ''
 
 conn = ''

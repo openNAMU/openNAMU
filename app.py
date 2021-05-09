@@ -1,13 +1,5 @@
 # Load
-import os
-import re
-
-for i_data in os.listdir("route"):
-    f_src = re.search(r"(.+)\.py$", i_data)
-    if f_src:
-        f_src = f_src.group(1)
-
-        exec("from route." + f_src + " import *")
+from route import *
 
 # Version
 version_list = json.loads(open('version.json', encoding = 'utf8').read())
@@ -748,14 +740,15 @@ def main_error_404(e):
 
 # End
 app.secret_key = rep_key
-app.wsgi_app = werkzeug.debug.DebuggedApplication(app.wsgi_app, True)
-app.debug = True
 
-if __name__ == "__main__":
-    if sys.platform == 'win32' and sys.version_info[0:2] >= (3, 8):
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+class NoLoggingWSGIRequestHandler(wsgiref.simple_server.WSGIRequestHandler):
+    def log_message(self, format, *args):
+        pass
 
-    http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
-    http_server.listen(int(server_set['port']), address = server_set['host'])
-
-    tornado.ioloop.IOLoop.instance().start()
+if __name__ == "__main__":    
+    wsgiref.simple_server.make_server(
+        server_set['host'], 
+        int(server_set['port']), 
+        app,
+        handler_class = NoLoggingWSGIRequestHandler
+    ).serve_forever()

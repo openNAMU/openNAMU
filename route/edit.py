@@ -1,45 +1,24 @@
 from .tool.func import *
 
-class run_count_section:
-    def __init__(self, key, change):
-        self.counter = key
-        self.change = change
-
-    def __call__(self, match):
-        self.counter -= 1
-
-        if self.counter == 0:
-            return '\n' + self.change + '\n'
-        else:
-            return '\n' + match[1]
-
 def edit_2(conn, name):
     curs = conn.cursor()
 
     ip = ip_check()
-    section = flask.request.args.get('section', None)
-    if section:
-        curs.execute(db_change("select data from other where name = 'markup'"))
-        markup = curs.fetchall()
-        if markup[0][0] == 'namumark':
-            section = int(number_check(section))
-        else:
-            return redirect('/edit/' + url_pas(name))
-
     if acl_check(name) == 1:
         return re_error('/ban')
     
     curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
     doc_ver = curs.fetchall()
     doc_ver = doc_ver[0][0] if doc_ver else '0'
-
-    edit_repeat = 0
-    if flask.request.method == 'POST':
-        edit_repeat = 1
-        if flask.request.form.get('ver', '') != doc_ver:
-            edit_repeat = 2
     
-    if edit_repeat == 1:
+    section = flask.request.args.get('section', '')
+    post_ver = flask.request.form.get('ver', '')
+    if flask.request.method == 'POST':
+        edit_repeat = 'error' if post_ver != doc_ver else 'post'
+    else:
+        edit_repeat = 'get'
+    
+    if edit_repeat == 'post':
         if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
             return re_error('/error/13')
         else:
@@ -63,17 +42,6 @@ def edit_2(conn, name):
         old = curs.fetchall()
         if old:  
             o_data = old[0][0].replace('\r\n', '\n')
-
-            if section:
-                run_count = run_count_section(section, content)
-
-                c_data = html.escape('\n' + o_data)
-                c_data = re.sub(r'\n(?P<in>={1,6})', '<br>\g<in>', c_data)
-                c_data = re.sub(r'<br>((?:(?:(?!<br>).)*\n*)*)', run_count, c_data)
-                c_data = re.sub(r'^\n', '', c_data)
-                c_data = html.unescape(c_data)
-
-                content = c_data
 
             leng = leng_check(len(o_data), len(content))
             
@@ -110,31 +78,22 @@ def edit_2(conn, name):
         
         conn.commit()
         
-        return redirect('/w/' + url_pas(name) + (('#edit_load_' + str(section)) if section else ''))
+        section = (('#edit_load_' + str(section)) if section != '' else '')
+        
+        return redirect('/w/' + url_pas(name) + section)
     else:
         editor_top_text = ''
-        if edit_repeat != 2:
-            load_title = flask.request.args.get('plus', None)
-            if load_title:
-                curs.execute(db_change("select data from data where title = ?"), [load_title])
-                get_data = curs.fetchall()
-                data = get_data[0][0] if get_data else ''
-            else:
-                curs.execute(db_change("select data, id from history where title = ? order by id + 0 desc"), [name])
-                old = curs.fetchall()
-                old = old if old else [['']]
-                if section:
-                    data = html.escape('\n' + old[0][0].replace('\r\n', '\n'))
-                    data = re.sub(r'\n(?P<in>={1,6})', '<br>\g<in>', data)
-
-                    section_data = re.findall(r'<br>((?:(?:(?!<br>).)*\n*)*)', data)
-                    if len(section_data) >= section:
-                        data = html.unescape(section_data[section - 1])
-                    else:
-                        return redirect('/edit/' + url_pas(name))
-                else:
-                    data = old[0][0].replace('\r\n', '\n')
-                    editor_top_text += '<a href="/manager/15?plus=' + url_pas(name) + '">(' + load_lang('load') + ')</a> '
+        if edit_repeat == 'get':
+            load_title = flask.request.args.get('plus', '')
+            if load_title == '':
+                load_title = name
+                editor_top_text += '<a href="/manager/15?plus=' + url_pas(name) + '">(' + load_lang('load') + ')</a> '
+                
+            curs.execute(db_change("select data from data where title = ?"), [load_title])
+            sql_d = curs.fetchall()
+            data = sql_d[0][0] if sql_d else ''
+            data = data.replace('\r\n', '\n')
+                    
         else:
             data = flask.request.form.get('content', '')
             warring_edit = load_lang('exp_edit_conflict') + ' '
@@ -143,7 +102,9 @@ def edit_2(conn, name):
                 warring_edit += '<a href="/raw/' + url_pas(name) + '">(r' + doc_ver + ')</a>'
             else:
                 warring_edit += '' + \
-                    '<a href="/diff/' + url_pas(name) + '?first=' + flask.request.form.get('ver', '1') + '&second=' + doc_ver + '">(r' + doc_ver + ')</a>' + \
+                    '<a href="/diff/' + url_pas(name) + '?first=' + flask.request.form.get('ver', '1') + '&second=' + doc_ver + '">' + \
+                        '(r' + doc_ver + ')' + \
+                    '</a>' + \
                 ''
 
             warring_edit += '<hr class="main_hr">'
@@ -205,10 +166,20 @@ def edit_2(conn, name):
             monaco_display = 'style="display: none;"'
             add_get_file = ''
             add_script = ''
+            
+        curs.execute(db_change("select data from other where name = 'markup'"))
+        markup = curs.fetchall()[0][0]
+        
+        server_set = {
+            'section' : section,
+            'markup' : markup
+         }
 
         return easy_minify(flask.render_template(skin_check(), 
             imp = [name, wiki_set(), custom(), other2(['(' + load_lang('edit') + ')', 0])],
             data =  editor_top_text + add_get_file + '''
+                <span   id="server_set"
+                        style="display: none;">''' + json.dumps(server_set) + '''</span>
                 <form method="post">
                     <script>
                         do_paste_image();
@@ -225,14 +196,17 @@ def edit_2(conn, name):
                                 placeholder="''' + p_text + '''" 
                                 name="content">''' + html.escape(data) + '''</textarea>
                     <hr class="main_hr">
-                    <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                    <input placeholder="''' + load_lang('why') + '''" name="send">
                     <textarea style="display: none;" id="origin">''' + html.escape(data) + '''</textarea>
                     <input style="display: none;" name="ver" value="''' + doc_ver + '''">
                     <hr class="main_hr">
                     ''' + captcha_get() + ip_warring() + cccb_text + '''
                     <button id="save"
                             type="submit" 
-                            onclick="monaco_to_content(); save_stop_exit();">''' + load_lang('save') + '''</button>
+                            onclick="
+                                monaco_to_content(); 
+                                save_stop_exit();
+                            ">''' + load_lang('save') + '''</button>
                     <button id="preview" 
                             type="button" 
                             onclick="monaco_to_content(); load_preview(\'''' + url_pas(name) + '\');">' + load_lang('preview') + '''</button>
