@@ -353,7 +353,7 @@ button {
     cursor: pointer;
 }
 
-input[type="checkbox"] {
+input[type="checkbox"], input[type="radio"] {
     box-shadow: None;
     background: transparent;
 }
