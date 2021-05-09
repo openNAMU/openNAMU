@@ -121,6 +121,9 @@ def login_register_2(conn):
                     <hr class="main_hr">
                     ''' + approval_question + '''
                     ''' + captcha_get() + '''
+                    <hr class="main_hr">
+                    (Google)
+                    <hr class="main_hr">
                     <button type="submit">''' + load_lang('save') + '''</button>
                     ''' + http_warring() + '''
                 </form>

@@ -506,7 +506,6 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                 /^(?:(?:(?:(#|@)((?:[0-9a-f-A-F]{3}){1,2}))(?:,(?:#|@)(?:(?:[0-9a-f-A-F]{3}){1,2}))?|(#|@)([a-zA-Z]+))|(\+|-)([1-5])|#!(html|wiki|syntax|folding|html))$/i
             );
             if(middle_type) {
-                console.log(middle_type);
                 if(middle_data_x_1[middle_data_x_1.length - 1] === '\\') {
                     return middle_data_before + '{{{' + middle_data_x_1 + '<mid_e>';
                 } else if(middle_type[1]) {
@@ -848,7 +847,6 @@ function do_onmark_table_render_main(data) {
                 table_col_count[table_col] = 0;
             }
             
-            console.log(table_col, table_col_count);
             if(table_col_count[table_col] !== 0) {
                 table_col_count[table_col] -= 1;
                 table_col += 1;

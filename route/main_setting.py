@@ -8,24 +8,17 @@ def main_setting_2(conn, num, db_set):
 
     if num == 0:
         li_list = [
-            load_lang('main_setting'),
-            load_lang('text_setting'),
-            load_lang('main_head'),
-            load_lang('main_body'),
-            'robots.txt',
-            'Google',
-            load_lang('main_bottom_body'),
-            load_lang('main_acl_setting'),
-            load_lang('wiki_logo')
+            [1, load_lang('main_setting')],
+            [2, load_lang('text_setting')],
+            [5, 'robots.txt'],
+            [6, load_lang('ext_api_req_set')],
+            [3, load_lang('main_head')],
+            [4, load_lang('main_body')],
+            [7, load_lang('main_bottom_body')]
         ]
 
-        x = 0
-        li_data = ''
-
-        for li in li_list:
-            x += 1
-            li_data += '<li><a href="/setting/' + str(x) + '">' + li + '</a></li>'
-
+        li_data = ''.join(['<li><a href="/setting/' + str(li[0]) + '">' + li[1] + '</a></li>' for li in li_list])
+        
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
             data = '<h2>' + load_lang('list') + '</h2><ul class="inside_ul">' + li_data + '</ul>',
@@ -139,12 +132,13 @@ def main_setting_2(conn, num, db_set):
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('main_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
-                    <form method="post">
+                    <form method="post" id="main_set_data">
+                        <h2>1. ''' + load_lang('basic_set') + '''</h2>
                         <span>''' + load_lang('wiki_name') + '''</span>
                         <hr class="main_hr">
                         <input name="name" value="''' + html.escape(d_list[0]) + '''">
                         <hr class="main_hr">
-                        <span><a href="/setting/10">(''' + load_lang('wiki_logo') + ''')</a></span>
+                        <span><a href="/setting/9">(''' + load_lang('wiki_logo') + ''')</a></span>
                         <hr class="main_hr">
                         <span>''' + load_lang('main_page') + '''</span>
                         <hr class="main_hr">
@@ -153,35 +147,41 @@ def main_setting_2(conn, num, db_set):
                         <span>''' + load_lang('bottom_text') + ''' (HTML)</span>
                         <hr class="main_hr">
                         <input name="license" value="''' + html.escape(d_list[3]) + '''">
+                        <h2>2. ''' + load_lang('design_set') + '''</h2>
+                        <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class="main_hr">
+                        <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'tenshi') + '''</select>
+                        <h2>3. ''' + load_lang('login_set') + '''</h2>
+                        <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
+                        <hr class="main_hr">
+                        <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + load_lang('hide_ip') + '''
+                        <hr class="main_hr">
+                        <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + \
+                             load_lang('email_required') + ' <a href="/setting/6">(' + load_lang('smtp_setting_required') + ''')</a>
+                        <hr class="main_hr">
+                        <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + load_lang('requires_approval') + '''
+                        <hr class="main_hr">
+                        <input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + load_lang('ua_get_off') + '''
+                        <h2>4. ''' + load_lang('server_set') + '''</h2>
                         <span>''' + load_lang('max_file_size') + ''' (MB)</span>
                         <hr class="main_hr">
                         <input name="upload" value="''' + html.escape(d_list[4]) + '''">
                         <hr class="main_hr">
                         <span ''' + sqlite_only + '''>
-                            <span>''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ') (' + load_lang('off') + ' : 0) (' + load_lang('restart_required') + ''')</span>
+                            <span>
+                                ''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ') (' + load_lang('off') + ' : 0) ' + \
+                                '(' + load_lang('restart_required') + ''')</span>
                             <hr class="main_hr">
                             <input name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr class="main_hr">
-                            <span>''' + load_lang('backup_where') + ' (' + load_lang('empty') + ' : ' + load_lang('default') + ') (' + load_lang('restart_required') + ''') (EX : ./data/backup.db)</span>
+                            <span>
+                                ''' + load_lang('backup_where') + ' (' + load_lang('empty') + ' : ' + load_lang('default') + ') ' + \
+                                '(' + load_lang('restart_required') + ''') (EX : ./data/backup.db)
+                            </span>
                             <hr class="main_hr">
                             <input name="backup_where" value="''' + html.escape(d_list[21]) + '''">
                             <hr class="main_hr">
                         </span>
-                        <span>''' + load_lang('wiki_skin') + '''</span>
-                        <hr class="main_hr">
-                        <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'tenshi') + '''</select>
-                        <hr class="main_hr">
-                        <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
-                        <hr class="main_hr">
-                        <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + load_lang('hide_ip') + '''
-                        <hr class="main_hr">
-                        <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + load_lang('email_required') + ' <a href="/setting/6">(' + load_lang('smtp_setting_required') + ''')</a>
-                        <hr class="main_hr">
-                        <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + load_lang('requires_approval') + '''
-                        <hr class="main_hr">
-                        <input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + load_lang('ua_get_off') + '''
-                        <hr class="main_hr">
                         <span>''' + load_lang('wiki_host') + '''</span>
                         <hr class="main_hr">
                         <input name="host" value="''' + html.escape(d_list[16]) + '''">
@@ -202,16 +202,19 @@ def main_setting_2(conn, num, db_set):
                         <hr class="main_hr">
                         <select name="encode">''' + acl_div[0] + '''</select>
                         <hr class="main_hr">
+                        <span>''' + load_lang('domain') + '''</span> (EX : http://2du.pythonanywhere.com/)
+                        <hr class="main_hr">
+                        <input name="''' + i_list[22] + '''" value="''' + html.escape(d_list[22]) + '''">
+                        <h2>5. ''' + load_lang('edit_set') + '''</h2>
+                        <span><a href="/setting/8">(''' + load_lang('main_acl_setting') + ''')</a></span>
+                        <hr class="main_hr">
                         <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ') (' + load_lang('off') + ''' : 0)</span>
                         <hr class="main_hr">
                         <input name="''' + i_list[19] + '''" value="''' + html.escape(d_list[19]) + '''">
                         <hr class="main_hr">
-                        <span>''' + load_lang('domain') + '''</span> (EX : http://2du.pythonanywhere.com/)
-                        <hr class="main_hr">
-                        <input name="''' + i_list[22] + '''" value="''' + html.escape(d_list[22]) + '''">
-                        <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
+                    <script>simple_render('main_set_data');</script>
                 ''',
                 menu = [['setting', load_lang('return')]]
             ))
@@ -538,10 +541,12 @@ def main_setting_2(conn, num, db_set):
                 re_ver += '<option value="v3">v3</option><option value="">v2</option>'
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = ['Google', wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('ext_api_req_set'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
-                    <form method="post">
-                        <h2><a href="https://www.google.com/recaptcha/admin">''' + load_lang('recaptcha') + '''</a></h2>
+                    <form method="post" id="main_set_data">
+                        <h2>1. ''' + load_lang('recaptcha') + '''</h2>
+                        <a href="https://www.google.com/recaptcha/admin">(Google)</a>
+                        <hr class="main_hr">
                         <span>''' + load_lang('public_key') + '''</span>
                         <hr class="main_hr">
                         <input name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
@@ -554,7 +559,9 @@ def main_setting_2(conn, num, db_set):
                             ''' + re_ver + '''
                         </select>
                         <hr class="main_hr">
-                        <h2>''' + load_lang('smtp_setting') + ' (' + load_lang('restart_required') + ''')</h1>
+                        <h2>2. ''' + load_lang('smtp_setting') + '''</h1>
+                        <a href="https://support.google.com/mail/answer/7126229">(Google)</a>
+                        <hr class="main_hr">
                         <span>''' + load_lang('smtp_server') + '''</span>
                         <hr class="main_hr">
                         <input name="smtp_server" value="''' + html.escape(d_list[2]) + '''">
@@ -564,9 +571,9 @@ def main_setting_2(conn, num, db_set):
                         <input name="smtp_port" value="''' + html.escape(d_list[3]) + '''">
                         <hr class="main_hr">
                         <span>''' + load_lang('smtp_security') + '''</span>
-                        <hr class="main_hr">'''
-                        + security_radios +
-                        '''<hr class="main_hr">
+                        <hr class="main_hr">
+                        ''' + security_radios + '''
+                        <hr class="main_hr">
                         <span>''' + load_lang('smtp_username') + '''</span>
                         <hr class="main_hr">
                         <input name="smtp_email" value="''' + html.escape(d_list[5]) + '''">
@@ -574,9 +581,11 @@ def main_setting_2(conn, num, db_set):
                         <span>''' + load_lang('smtp_password') + '''</span>
                         <hr class="main_hr">
                         <input type="password" name="smtp_pass" value="''' + html.escape(d_list[6]) + '''">
+                        <h2>3. ''' + load_lang('oauth') + '''</h2>
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
+                    <script>simple_render('main_set_data');</script>
                 ''',
                 menu = [['setting', load_lang('return')]]
             ))
