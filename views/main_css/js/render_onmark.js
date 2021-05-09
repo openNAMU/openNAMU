@@ -190,148 +190,152 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
     var category_data = '';
     var category_re = /^(분류|category):/i;
     var file_re = /^(파일|file|외부|out):/i;
-    data = data.replace(/\[\[(((?!\]\]).)+)\]\]/g, function(x, x_1) {
-        var link_split = x_1.split('|');
-        var link_real = link_split[0];
-        var link_out = link_split[1] ? link_split[1] : link_split[0];
-        var link_out_2 = link_split[1] ? link_split[1] : '';
-        
-        num_link += 1;
-        var num_link_str = String(num_link - 1);
-        if(link_real.match(file_re)) {
-            var file_load_type = link_real.match(file_re)[1];
-            var file_name = link_real.replace(file_re, '');
-                 
-            if(file_load_type === '파일' || file_load_type === 'file') {
-                var file_type = file_name.split('.');
-                file_name = file_type.slice(0, file_type.length - 1).join('.');
-                file_type = file_type[file_type.length - 1];
-                
-                var file_src = do_url_change(file_name) + '.' + file_type;       
-                var file_alt = file_name + '.' + file_type;
-                var file_exist = 1;
+    var link_re = /\[\[(((?!\[\[|\]\]).)+)\]\]/;
+    
+    while(data.match(link_re)) {
+        data = data.replace(link_re, function(x, x_1) {
+            var link_split = x_1.split('|');
+            var link_real = link_split[0];
+            var link_out = link_split[1] ? link_split[1] : link_split[0];
+            var link_out_2 = link_split[1] ? link_split[1] : '';
+
+            num_link += 1;
+            var num_link_str = String(num_link - 1);
+            if(link_real.match(file_re)) {
+                var file_load_type = link_real.match(file_re)[1];
+                var file_name = link_real.replace(file_re, '');
+
+                if(file_load_type === '파일' || file_load_type === 'file') {
+                    var file_type = file_name.split('.');
+                    file_name = file_type.slice(0, file_type.length - 1).join('.');
+                    file_type = file_type[file_type.length - 1];
+
+                    var file_src = do_url_change(file_name) + '.' + file_type;       
+                    var file_alt = file_name + '.' + file_type;
+                    var file_exist = 1;
+                } else {
+                    var file_src = file_name;
+                    var file_alt = file_name;
+                    var file_exist = 0;
+                }
+
+                var file_style = '';
+                var file_bgcolor = '';
+                var file_align = '';
+
+                var file_set = link_out_2.split('&amp;');
+                var i = 0;
+                while(file_set[i]) {
+                    var file_set_name = file_set[i].split('=');
+                    var file_set_data = file_set_name[1];
+                    file_set_name = file_set_name[0];
+
+                    if(file_set_name === 'width') {
+                        file_style += 'width:' + file_set_data + ';';
+                    } else if(file_set_name === 'height') {
+                        file_style += 'height:' + file_set_data + ';';
+                    } else if(file_set_name === 'bgcolor') {
+                        file_bgcolor += 'background:' + file_set_data + ';';
+                    } else if(file_set_name === 'alt') {
+                        file_alt += file_set_data;
+                    } else if(file_set_name === 'align') {
+                        if(file_set_data === 'center') {
+                            file_align = 'display: block; text-align: center;';
+                        } else {
+                            file_align = 'float: ' + file_set_data + ';';
+                        }
+                    } 
+
+                    i += 1;
+                }
+
+                return '' +
+                    '<span style="' + file_align + '">' + 
+                        '<span  style="' + file_bgcolor + '" ' +
+                                'class="' + name_include + 'file_finder" ' +
+                                'under_style="' + file_style + '" ' +
+                                'under_alt="' + file_alt + '" ' +
+                                'under_src="' + file_src + '" ' +
+                                'under_href="' + (file_exist === 0 ? "out_link" : '/upload?name=' + do_url_change(file_name)) + '">' +
+                        '</span>' + 
+                    '</span>' +
+                ''
+            } else if(link_real.match(category_re)) {
+                var category_link = link_real.replace(category_re, '');
+
+                category_data = (category_data === '' ? '<div id="cate_all"><div id="cate">Category : ' : category_data);
+                category_data += '' +
+                    '<a class="' + name_include + 'link_finder" ' +
+                        'href="/w/category:' + do_url_change(category_link) + '">' +
+                        category_link +
+                    '</a> | ' +
+                ''
+
+                return '';
+            } else if(link_real.match(/^http(s)?:\/\//)) {
+                var i = 0;
+                while(i < 2) {
+                    if(i === 0) {
+                        var var_link_type = 'href';
+                    } else {
+                        var var_link_type = 'title';
+                    }
+
+                    data_js += '' +
+                        'document.getElementsByName("' + name_include + 'set_link_' + num_link_str + '")[0].' + var_link_type + ' = ' + 
+                            '"' + do_js_safe_change(link_real) + '";' +
+                        '\n' +
+                    '';
+
+                    i += 1;
+                }
+
+                return  '<a id="out_link" ' +
+                            'name="' + name_include + 'set_link_' + num_link_str + '" ' + 
+                            'title=""' +
+                            'href="">' + link_out + '</a>';
             } else {
-                var file_src = file_name;
-                var file_alt = file_name;
-                var file_exist = 0;
-            }
-            
-            var file_style = '';
-            var file_bgcolor = '';
-            var file_align = '';
-            
-            var file_set = link_out_2.split('&amp;');
-            var i = 0;
-            while(file_set[i]) {
-                var file_set_name = file_set[i].split('=');
-                var file_set_data = file_set_name[1];
-                file_set_name = file_set_name[0];
-                
-                if(file_set_name === 'width') {
-                    file_style += 'width:' + file_set_data + ';';
-                } else if(file_set_name === 'height') {
-                    file_style += 'height:' + file_set_data + ';';
-                } else if(file_set_name === 'bgcolor') {
-                    file_bgcolor += 'background:' + file_set_data + ';';
-                } else if(file_set_name === 'alt') {
-                    file_alt += file_set_data;
-                } else if(file_set_name === 'align') {
-                    if(file_set_data === 'center') {
-                        file_align = 'display: block; text-align: center;';
-                    } else {
-                        file_align = 'float: ' + file_set_data + ';';
-                    }
-                } 
-                
-                i += 1;
-            }
-            
-            return '' +
-                '<span style="' + file_align + '">' + 
-                    '<span  style="' + file_bgcolor + '" ' +
-                            'class="' + name_include + 'file_finder" ' +
-                            'under_style="' + file_style + '" ' +
-                            'under_alt="' + file_alt + '" ' +
-                            'under_src="' + file_src + '" ' +
-                            'under_href="' + (file_exist === 0 ? "out_link" : '/upload?name=' + do_url_change(file_name)) + '">' +
-                    '</span>' + 
-                '</span>' +
-            ''
-        } else if(link_real.match(category_re)) {
-            var category_link = link_real.replace(category_re, '');
-            
-            category_data = (category_data === '' ? '<div id="cate_all"><div id="cate">Category : ' : category_data);
-            category_data += '' +
-                '<a class="' + name_include + 'link_finder" ' +
-                    'href="/w/category:' + do_url_change(category_link) + '">' +
-                    category_link +
-                '</a> | ' +
-            ''
-            
-            return '';
-        } else if(link_real.match(/^http(s)?:\/\//)) {
-            var i = 0;
-            while(i < 2) {
-                if(i === 0) {
-                    var var_link_type = 'href';
-                } else {
-                    var var_link_type = 'title';
+                if(link_real.match(/^\//)) {
+                    link_real = name_doc + link_real;
+                } else if(link_real.match(/^\.\.\//)) {
+                    link_real = link_real.replace(/^\.\.\//, '');
+                    link_real = name_doc.replace(/\/[^/]+$/, '') + (link_real !== '' ? '/' + link_real : '');
                 }
-                
-                data_js += '' +
-                    'document.getElementsByName("' + name_include + 'set_link_' + num_link_str + '")[0].' + var_link_type + ' = ' + 
-                        '"' + do_js_safe_change(link_real) + '";' +
-                    '\n' +
-                '';
-                
-                i += 1;
-            }
-            
-            return  '<a id="out_link" ' +
-                        'name="' + name_include + 'set_link_' + num_link_str + '" ' + 
-                        'title=""' +
-                        'href="">' + link_out + '</a>';
-        } else {
-            if(link_real.match(/^\//)) {
-                link_real = name_doc + link_real;
-            } else if(link_real.match(/^\.\.\//)) {
-                link_real = link_real.replace(/^\.\.\//, '');
-                link_real = name_doc.replace(/\/[^/]+$/, '') + (link_real !== '' ? '/' + link_real : '');
-            }
-            
-            var i = 0;
-            while(i < 2) {
-                if(i === 0) {
-                    var link_data_var = do_link_change(link_real, data_nowiki, 0);
-                    var link_main = link_data_var[0];
-                    var link_sub = link_data_var[1];
-                    
-                    var var_link_type = 'href';
-                    if(link_main === '') {
-                        var var_link_data = link_sub;
+
+                var i = 0;
+                while(i < 2) {
+                    if(i === 0) {
+                        var link_data_var = do_link_change(link_real, data_nowiki, 0);
+                        var link_main = link_data_var[0];
+                        var link_sub = link_data_var[1];
+
+                        var var_link_type = 'href';
+                        if(link_main === '') {
+                            var var_link_data = link_sub;
+                        } else {
+                            var var_link_data = '/w/' + do_url_change(link_main) + link_sub;
+                        }
                     } else {
-                        var var_link_data = '/w/' + do_url_change(link_main) + link_sub;
+                        var var_link_type = 'title';
+                        var var_link_data = do_js_safe_change(link_main) + link_sub;
                     }
-                } else {
-                    var var_link_type = 'title';
-                    var var_link_data = do_js_safe_change(link_main) + link_sub;
+
+                    data_js += '' +
+                        'document.getElementsByName("' + name_include + 'set_link_' + num_link_str + '")[0].' + var_link_type + ' = ' + 
+                            '"' + var_link_data + '";' +
+                        '\n' +
+                    '';
+
+                    i += 1;
                 }
-                
-                data_js += '' +
-                    'document.getElementsByName("' + name_include + 'set_link_' + num_link_str + '")[0].' + var_link_type + ' = ' + 
-                        '"' + var_link_data + '";' +
-                    '\n' +
-                '';
-                
-                i += 1;
+
+                return  '<a class="' + name_include + 'link_finder" ' +
+                            'name="' + name_include + 'set_link_' + num_link_str + '" ' +
+                            'title="" ' +
+                            'href="">' + link_out + '</a>';
             }
-            
-            return  '<a class="' + name_include + 'link_finder" ' +
-                        'name="' + name_include + 'set_link_' + num_link_str + '" ' +
-                        'title="" ' +
-                        'href="">' + link_out + '</a>';
-        }
-    });
+        });
+    }
     
     data += (category_data === '' ? '' : (category_data.replace(/\| $/, '') + '</div></div>'));
     
@@ -486,11 +490,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
     var nowiki_n = 0;
     var folding_n = 0;
     
-    while(1) {
-        if(!data.match(middle_re)) {
-            break;
-        }
-        
+    while(data.match(middle_re)) {        
         data = data.replace(middle_re, function(x, x_1) {
             var middle_data_before = x_1.match(/^({+)/);
             middle_data_before = middle_data_before ? middle_data_before[1] : '';
@@ -503,9 +503,10 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
             }
 
             var middle_type = middle_data.match(
-                /^(?:(?:(?:(#|@)([0-9a-f-A-F]{3}){1,2})|(#|@)([a-zA-Z]+))|(\+|-)([1-5])|#!(html|wiki|syntax|folding|html))$/i
+                /^(?:(?:(?:(#|@)((?:[0-9a-f-A-F]{3}){1,2}))(?:,(?:#|@)(?:(?:[0-9a-f-A-F]{3}){1,2}))?|(#|@)([a-zA-Z]+))|(\+|-)([1-5])|#!(html|wiki|syntax|folding|html))$/i
             );
             if(middle_type) {
+                console.log(middle_type);
                 if(middle_data_x_1[middle_data_x_1.length - 1] === '\\') {
                     return middle_data_before + '{{{' + middle_data_x_1 + '<mid_e>';
                 } else if(middle_type[1]) {
@@ -836,10 +837,21 @@ function do_onmark_table_render_main(data) {
         
         var table_col = 0;
         var table_col_data = {};
+        var table_col_count = {};
             
         table_data_org = table_data_org.replace(table_cel_re, function(x, x_1, x_2) {
             if(!table_col_data[table_col]) {
                 table_col_data[table_col] = '';
+            }
+            
+            if(!table_col_count[table_col]) {
+                table_col_count[table_col] = 0;
+            }
+            
+            console.log(table_col, table_col_count);
+            if(table_col_count[table_col] !== 0) {
+                table_col_count[table_col] -= 1;
+                table_col += 1;
             }
 
             var table_data_option = do_onmark_table_render_sub(x_2, table_col_data[table_col]);
@@ -868,6 +880,10 @@ function do_onmark_table_render_main(data) {
                     ''
                 }
 
+                if(table_data_option['rowspan'] !== '') {
+                    table_col_count[table_col] += Number(table_data_option['rowspan']) - 1;
+                }
+                
                 table_data += '' +
                     '<td     colspan="' + table_data_option['colspan'] + '" ' +
                             'rowspan="' + table_data_option['rowspan'] + '" ' +
