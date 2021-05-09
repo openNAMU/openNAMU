@@ -142,13 +142,14 @@ def recent_changes_2(conn, name, tool):
                     <td>''' + date + '''</td>
                 </tr>
                 <tr ''' + style[1] + '''>
-                    <td colspan="3">''' + html.escape(send) + '''</td>
+                    <td class="send_content" colspan="3">''' + html.escape(send) + '''</td>
                 </tr>
             '''
 
         div += '''
                 </tbody>
             </table>
+            <script>send_render();</script>
         '''
 
         if name:
