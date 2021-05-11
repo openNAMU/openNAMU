@@ -175,7 +175,7 @@ function do_onmark_heading_render(data, name_doc, name_include) {
     if(toc_auto_add) {
         data = data.replace(/\[(?:목차|toc)\(no\)\]/g, '');
     } else {
-        if(!data.match(toc_re)) {
+        if(name_include === '' && !data.match(toc_re)) {
             data = data.replace(/(<h[1-6] (?:[^>]+)>)/, '<div id="auto_toc">' + toc_data + '</div>$1');
         }
     }
@@ -337,7 +337,9 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
         });
     }
     
-    data += (category_data === '' ? '' : (category_data.replace(/\| $/, '') + '</div></div>'));
+    if(name_include === '') {
+        data += (category_data === '' ? '' : (category_data.replace(/\| $/, '') + '</div></div>'));
+    }
     
     return [data, data_js];
 }
@@ -400,7 +402,7 @@ function do_onmark_footnote_render(data, name_include) {
         }
     }
     
-    if(footnote_end_data !== '') {
+    if(name_include === '' && footnote_end_data !== '') {
         data += '<ul id="footnote_data">' + footnote_end_data + '</ul>';
     }
     
