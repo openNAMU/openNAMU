@@ -107,26 +107,43 @@ def login_register_2(conn):
                     <input placeholder="''' + load_lang('approval_question') + '''" name="approval_question_answer" type="text">
                     <hr class="main_hr">
                 '''
-
+                
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('register'), wiki_set(), custom(), other2([0, 0])],
             data = '''
                 <form method="post">
                     ''' + contract + '''
+                    
                     <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
                     <hr class="main_hr">
+                    
                     <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
                     <hr class="main_hr">
+                    
                     <input placeholder="''' + load_lang('password_confirm') + '''" name="pw2" type="password">
                     <hr class="main_hr">
+                    
                     ''' + approval_question + '''
                     ''' + captcha_get() + '''
-                    <hr class="main_hr">
-                    (Google)
+                    
+                    <a href="" id="oauth_google">(Google)</a>         
+                    
                     <hr class="main_hr">
                     <button type="submit">''' + load_lang('save') + '''</button>
+                    
                     ''' + http_warring() + '''
                 </form>
+                <script>
+                    document.getElementById('oauth_google').href = '' +
+                        'https://accounts.google.com/o/oauth2/auth' +
+                        '?client_id=ID' +
+                        '&redirect_uri=' + window.location.origin +
+                        '&response_type=code' +
+                        '&scope=https://www.googleapis.com/auth/userinfo.email' +
+                        '&approval_prompt=force' +
+                        '&access_type=offline' +
+                    '';
+                </script>
             ''',
             menu = [['user', load_lang('return')]]
         ))

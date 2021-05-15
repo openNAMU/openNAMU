@@ -28,7 +28,6 @@ def main_setting_2(conn, num, db_set):
         i_list = {
             0 : 'name',
             2 : 'frontpage',
-            3 : 'license',
             4 : 'upload',
             5 : 'skin',
             7 : 'reg',
@@ -37,7 +36,6 @@ def main_setting_2(conn, num, db_set):
             10 : 'port',
             11 : 'key',
             12 : 'update',
-            13 : 'email_have',
             15 : 'encode',
             16 : 'host',
             19 : 'slow_edit',
@@ -49,7 +47,6 @@ def main_setting_2(conn, num, db_set):
         n_list = {
             0 : 'Wiki',
             2 : 'FrontPage',
-            3 : 'ARR',
             4 : '2',
             5 : '',
             7 : '',
@@ -58,7 +55,6 @@ def main_setting_2(conn, num, db_set):
             10 : '3000',
             11 : 'test',
             12 : 'stable',
-            13 : '',
             15 : 'sha3',
             16 : '0.0.0.0',
             19 : '0',
@@ -109,8 +105,6 @@ def main_setting_2(conn, num, db_set):
                     acl_num = 7
                 elif i == 1:
                     acl_num = 8
-                elif i == 2:
-                    acl_num = 13
                 elif i == 3:
                     acl_num = 20
                 else:
@@ -138,35 +132,62 @@ def main_setting_2(conn, num, db_set):
                         <hr class="main_hr">
                         <input name="name" value="''' + html.escape(d_list[0]) + '''">
                         <hr class="main_hr">
+                        
                         <span><a href="/setting/9">(''' + load_lang('wiki_logo') + ''')</a></span>
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('main_page') + '''</span>
                         <hr class="main_hr">
                         <input name="frontpage" value="''' + html.escape(d_list[2]) + '''">
                         <hr class="main_hr">
-                        <span>''' + load_lang('bottom_text') + ''' (HTML)</span>
+                        
+                        <span>''' + load_lang('domain') + '''</span> (EX : http://2du.pythonanywhere.com/)
                         <hr class="main_hr">
-                        <input name="license" value="''' + html.escape(d_list[3]) + '''">
+                        <input name="''' + i_list[22] + '''" value="''' + html.escape(d_list[22]) + '''">
+                        <hr class="main_hr">
+                        
+                        <span>''' + load_lang('wiki_host') + '''</span>
+                        <hr class="main_hr">
+                        <input name="host" value="''' + html.escape(d_list[16]) + '''">
+                        <hr class="main_hr">
+                        
+                        <span>''' + load_lang('wiki_port') + '''</span>
+                        <hr class="main_hr">
+                        <input name="port" value="''' + html.escape(d_list[10]) + '''">
+                        <hr class="main_hr">
+                        
+                        <span>''' + load_lang('wiki_secret_key') + '''</span>
+                        <hr class="main_hr">
+                        <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
+                        <hr class="main_hr">
+                        
+                        <span>''' + load_lang('encryption_method') + '''</span>
+                        <hr class="main_hr">
+                        <select name="encode">''' + acl_div[0] + '''</select>
+                        
                         <h2>2. ''' + load_lang('design_set') + '''</h2>
                         <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class="main_hr">
                         <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'tenshi') + '''</select>
+                        
                         <h2>3. ''' + load_lang('login_set') + '''</h2>
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
                         <hr class="main_hr">
+                        
                         <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + load_lang('hide_ip') + '''
                         <hr class="main_hr">
-                        <input type="checkbox" name="email_have" ''' + check_box_div[2] + '''> ''' + \
-                             load_lang('email_required') + ' <a href="/setting/6">(' + load_lang('smtp_setting_required') + ''')</a>
-                        <hr class="main_hr">
+                        
                         <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + load_lang('requires_approval') + '''
                         <hr class="main_hr">
+                        
                         <input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + load_lang('ua_get_off') + '''
+                        
                         <h2>4. ''' + load_lang('server_set') + '''</h2>
                         <span>''' + load_lang('max_file_size') + ''' (MB)</span>
                         <hr class="main_hr">
                         <input name="upload" value="''' + html.escape(d_list[4]) + '''">
                         <hr class="main_hr">
+                        
                         <span ''' + sqlite_only + '''>
                             <span>
                                 ''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ') (' + load_lang('off') + ' : 0) ' + \
@@ -174,6 +195,7 @@ def main_setting_2(conn, num, db_set):
                             <hr class="main_hr">
                             <input name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr class="main_hr">
+                            
                             <span>
                                 ''' + load_lang('backup_where') + ' (' + load_lang('empty') + ' : ' + load_lang('default') + ') ' + \
                                 '(' + load_lang('restart_required') + ''') (EX : ./data/backup.db)
@@ -182,35 +204,19 @@ def main_setting_2(conn, num, db_set):
                             <input name="backup_where" value="''' + html.escape(d_list[21]) + '''">
                             <hr class="main_hr">
                         </span>
-                        <span>''' + load_lang('wiki_host') + '''</span>
-                        <hr class="main_hr">
-                        <input name="host" value="''' + html.escape(d_list[16]) + '''">
-                        <hr class="main_hr">
-                        <span>''' + load_lang('wiki_port') + '''</span>
-                        <hr class="main_hr">
-                        <input name="port" value="''' + html.escape(d_list[10]) + '''">
-                        <hr class="main_hr">
-                        <span>''' + load_lang('wiki_secret_key') + '''</span>
-                        <hr class="main_hr">
-                        <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
-                        <hr class="main_hr">
+                        
                         <span>''' + load_lang('update_branch') + '''</span>
                         <hr class="main_hr">
                         <select name="update">''' + branch_div + '''</select>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('encryption_method') + '''</span>
-                        <hr class="main_hr">
-                        <select name="encode">''' + acl_div[0] + '''</select>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('domain') + '''</span> (EX : http://2du.pythonanywhere.com/)
-                        <hr class="main_hr">
-                        <input name="''' + i_list[22] + '''" value="''' + html.escape(d_list[22]) + '''">
+                        
                         <h2>5. ''' + load_lang('edit_set') + '''</h2>
                         <span><a href="/setting/8">(''' + load_lang('main_acl_setting') + ''')</a></span>
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ') (' + load_lang('off') + ''' : 0)</span>
                         <hr class="main_hr">
                         <input name="''' + i_list[19] + '''" value="''' + html.escape(d_list[19]) + '''">
+                        
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
@@ -235,7 +241,8 @@ def main_setting_2(conn, num, db_set):
             'approval_question',
             'edit_help',
             'upload_help',
-            'upload_default'
+            'upload_default',
+            'license'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
@@ -267,77 +274,67 @@ def main_setting_2(conn, num, db_set):
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('text_setting'), wiki_set(), custom(), other2([0, 0])],
                 data = '''
-                    <form method="post">
-                        <span>''' + load_lang('register_text') + ''' (HTML)</span>
-                        <hr class="main_hr">
+                    <form method="post" id="main_set_data">
+                        <h2>1. ''' + load_lang('register_text') + ''' (HTML)</h2>
                         <textarea rows="3" name="''' + i_list[0] + '''">''' + html.escape(d_list[0]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('non_login_alert') + ''' (HTML)</span>
-                        <hr class="main_hr">
+                        
+                        <h2>2. ''' + load_lang('non_login_alert') + ''' (HTML)</h2>
                         <textarea rows="3" name="''' + i_list[1] + '''">''' + html.escape(d_list[1]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('edit_bottom_text') + ''' (HTML)</span>
-                        <hr class="main_hr">
+                        
+                        <h2>3. ''' + load_lang('edit_bottom_text') + ''' (HTML)</h2>
                         <textarea rows="3" name="''' + i_list[2] + '''">''' + html.escape(d_list[2]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('copyright_checkbox_text') + ''' (HTML)</span>
-                        <hr class="main_hr">
+                        
+                        <h2>4. ''' + load_lang('copyright_checkbox_text') + ''' (HTML)</h2>
                         <textarea rows="3" name="''' + i_list[3] + '''">''' + html.escape(d_list[3]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('check_key_text') + ''' (HTML)</span>
-                        <hr class="main_hr">
+                        
+                        <h2>5. ''' + load_lang('check_key_text') + ''' (HTML)</h2>
                         <textarea rows="3" name="''' + i_list[4] + '''">''' + html.escape(d_list[4]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('email_title') + '''</span>
-                        <hr class="main_hr">
+                        
+                        <h2>6. ''' + load_lang('email_title') + '''</h2>
                         <textarea rows="3" name="''' + i_list[5] + '''">''' + html.escape(d_list[5]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('email_text') + '''</span>
-                        <hr class="main_hr">
+                        
+                        <h2>7. ''' + load_lang('email_text') + '''</h2>
                         <textarea rows="3" name="''' + i_list[6] + '''">''' + html.escape(d_list[6]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('email_insert_text') + '''</span>
-                        <hr class="main_hr">
+                        
+                        <h2>8. ''' + load_lang('email_insert_text') + '''</h2>
                         <textarea rows="3" name="''' + i_list[7] + '''">''' + html.escape(d_list[7]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('password_search_text') + '''</span>
-                        <hr class="main_hr">
+                        
+                        <h2>9. ''' + load_lang('password_search_text') + '''</h2>
                         <textarea rows="3" name="''' + i_list[8] + '''">''' + html.escape(d_list[8]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('reset_user_text') + '''</span>
-                        <hr class="main_hr">
+                        
+                        <h2>10. ''' + load_lang('reset_user_text') + '''</h2>
                         <textarea rows="3" name="''' + i_list[9] + '''">''' + html.escape(d_list[9]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('error_401') + '''</span>
-                        <hr class="main_hr">
+                        
+                        <h2>11. ''' + load_lang('error_401') + '''</h2>
                         <textarea rows="3" name="''' + i_list[10] + '''">''' + html.escape(d_list[10]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('error_404') + '''</span>
-                        <hr class="main_hr">
+                        
+                        <h2>12. ''' + load_lang('error_404') + '''</h2>
                         <textarea rows="3" name="''' + i_list[11] + '''">''' + html.escape(d_list[11]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('approval_question') + '''</span><sup><a href="#note_1_end" id="note_1">(1)</a></sup>
+                        
+                        <h2>13. ''' + load_lang('approval_question') + '''</h2>
+                        <sup>(1)</sup>
                         <hr class="main_hr">
                         <textarea rows="3" name="''' + i_list[12] + '''">''' + html.escape(d_list[12]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('edit_help') + '''</span>
-                        <hr class="main_hr">
+                        
+                        <h2>14. ''' + load_lang('edit_help') + '''</h2>
                         <textarea rows="3" name="''' + i_list[13] + '''">''' + html.escape(d_list[13]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('upload_help') + ''' (HTML)</span>
-                        <hr class="main_hr">
+                        
+                        <h2>15. ''' + load_lang('upload_help') + ''' (HTML)</h2>
                         <textarea rows="3" name="''' + i_list[14] + '''">''' + html.escape(d_list[14]) + '''</textarea>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('upload_default') + '''</span>
-                        <hr class="main_hr">
+                        
+                        <h2>16. ''' + load_lang('upload_default') + '''</h2>
                         <textarea rows="3" name="''' + i_list[15] + '''">''' + html.escape(d_list[15]) + '''</textarea>
+                        
+                        <h2>17. ''' + load_lang('bottom_text') + ''' (HTML)</h2>
+                        <textarea rows="3" name="''' + i_list[16] + '''">''' + html.escape(d_list[16]) + '''</textarea>
+                        
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
-                        <hr class="main_hr">
-                        <ul id="footnote_data">
-                            <li><a href="#note_1" id="note_1_end">(1)</a> <span>''' + load_lang('approval_question_visible_only_when_approval_on') + '''</span></li>
-                        </ul>
                     </form>
+                    <ul id="footnote_data">
+                        <li><a href="#note_1" id="note_1_end">(1)</a> ''' + load_lang('approval_question_visible_only_when_approval_on') + '''</li>
+                    </ul>
+                    <script>simple_render('main_set_data');</script>
                 ''',
                 menu = [['setting', load_lang('return')]]
             ))
@@ -497,7 +494,9 @@ def main_setting_2(conn, num, db_set):
             'smtp_security',
             'smtp_email',
             'smtp_pass',
-            'recaptcha_ver'
+            'recaptcha_ver',
+            'oauth_client_id',
+            'email_have'
         ]
 
         if flask.request.method == 'POST':
@@ -547,41 +546,62 @@ def main_setting_2(conn, num, db_set):
                         <h2>1. ''' + load_lang('recaptcha') + '''</h2>
                         <a href="https://www.google.com/recaptcha/admin">(Google)</a>
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('public_key') + '''</span>
                         <hr class="main_hr">
                         <input name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('secret_key') + '''</span>
                         <hr class="main_hr">
                         <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                         <hr class="main_hr">
+                        
                         <select name="recaptcha_ver">
                             ''' + re_ver + '''
                         </select>
-                        <hr class="main_hr">
-                        <h2>2. ''' + load_lang('smtp_setting') + '''</h1>
+                        
+                        <h2>2. ''' + load_lang('email_setting') + '''</h1>
+                        <input type="checkbox" name="email_have" ''' + ('checked' if d_list[9] != '' else '')  + '''> ''' + \
+                             load_lang('email_required') + '''
+                        
+                        <h2>2.1. ''' + load_lang('smtp_setting') + '''</h1>
                         <a href="https://support.google.com/mail/answer/7126229">(Google)</a>
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('smtp_server') + '''</span>
                         <hr class="main_hr">
                         <input name="smtp_server" value="''' + html.escape(d_list[2]) + '''">
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('smtp_port') + '''</span>
                         <hr class="main_hr">
                         <input name="smtp_port" value="''' + html.escape(d_list[3]) + '''">
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('smtp_security') + '''</span>
                         <hr class="main_hr">
                         ''' + security_radios + '''
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('smtp_username') + '''</span>
                         <hr class="main_hr">
                         <input name="smtp_email" value="''' + html.escape(d_list[5]) + '''">
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('smtp_password') + '''</span>
                         <hr class="main_hr">
                         <input type="password" name="smtp_pass" value="''' + html.escape(d_list[6]) + '''">
+                        
                         <h2>3. ''' + load_lang('oauth') + '''</h2>
+                        <a href="https://developers.google.com/identity/protocols/oauth2">(Google)</a>
+                        <hr class="main_hr">
+                        
+                        <span>''' + load_lang('oauth_client_id') + '''</span>
+                        <hr class="main_hr">
+                        <input name="oauth_client_id" value="''' + html.escape(d_list[8]) + '''">
+                        <hr class="main_hr">
+                        
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
