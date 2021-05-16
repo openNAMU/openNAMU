@@ -7,7 +7,7 @@ def view_read_2(conn, name):
     div = ''
     ip = ip_check()
     name_doc_pass = flask.request.args.get('from', '')
-    uppage = re.sub(r"([^/]+)$", '', name)
+    uppage = re.sub(r"/([^/]+)$", '', name)
 
     num = flask.request.args.get('num', None)
     num = int(number_check(num)) if num else None
