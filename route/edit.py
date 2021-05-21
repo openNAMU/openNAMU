@@ -181,11 +181,6 @@ def edit_2(conn, name):
                 <span   id="server_set"
                         style="display: none;">''' + json.dumps(server_set) + '''</span>
                 <form method="post">
-                    <script>
-                        do_paste_image();
-                        do_not_out();
-                        ''' + add_script + '''
-                    </script>
                     <div ''' + editor_display + '''>''' + edit_button() + '''</div>
                     <div    id="monaco_editor"
                             class="content" 
@@ -196,9 +191,13 @@ def edit_2(conn, name):
                                 placeholder="''' + p_text + '''" 
                                 name="content">''' + html.escape(data) + '''</textarea>
                     <hr class="main_hr">
-                    <input placeholder="''' + load_lang('why') + '''" name="send">
-                    <textarea style="display: none;" id="origin">''' + html.escape(data) + '''</textarea>
-                    <input style="display: none;" name="ver" value="''' + doc_ver + '''">
+                    <input  placeholder="''' + load_lang('why') + '''" 
+                            name="send">
+                    <textarea   style="display: none;" 
+                                id="origin">''' + html.escape(data) + '''</textarea>
+                    <input  style="display: none;" 
+                            name="ver" 
+                            value="''' + doc_ver + '''">
                     <hr class="main_hr">
                     ''' + captcha_get() + ip_warring() + cccb_text + '''
                     <button id="save"
@@ -206,14 +205,24 @@ def edit_2(conn, name):
                             onclick="
                                 monaco_to_content(); 
                                 save_stop_exit();
+                                section_edit_do();
                             ">''' + load_lang('save') + '''</button>
                     <button id="preview" 
                             type="button" 
-                            onclick="monaco_to_content(); load_preview(\'''' + url_pas(name) + '\');">' + load_lang('preview') + '''</button>
+                            onclick="
+                                monaco_to_content(); 
+                                load_preview(\'''' + url_pas(name) + '''\');
+                            ">''' + load_lang('preview') + '''</button>
                 </form>
                 ''' + b_text + '''
                 <hr class="main_hr">
                 <div id="see_preview"></div>
+                <script>
+                    section_edit_init();
+                    do_paste_image();
+                    do_not_out();
+                    ''' + add_script + '''
+                </script>
             ''',
             menu = [
                 ['w/' + url_pas(name), load_lang('return')],
