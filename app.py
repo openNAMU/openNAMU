@@ -282,12 +282,10 @@ if set_data['db_type'] == 'sqlite':
         print('Back up state : Turn off')
 
 def mysql_dont_off():
-    try:
-        urllib.request.urlopen('http://localhost:' + server_set['port'] + '/')
-    except:
-        pass
+    curs = conn.cursor()
+    curs.execute(db_change("select title from data limit 1"))
 
-    threading.Timer(60 * 60 * 6, mysql_dont_off).start()
+    threading.Timer(60 * 60 * 1, mysql_dont_off).start()
 
 mysql_dont_off()
 
