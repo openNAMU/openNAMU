@@ -1101,44 +1101,46 @@ def ban_check(ip = None, tool = None):
 def ip_pas(raw_ip, type_d = 0):
     hide = 0
     end_ip = {}
+    i = 0
 
+    return_data = 0
     if type(raw_ip) != type([]):
         get_ip = [raw_ip]
-        return_ip = 1
+        
+        return_data = 1
     else:
         get_ip = raw_ip
-        return_ip = 0
 
+    curs.execute(db_change("select data from other where name = 'ip_view'"))
+    ip_view = curs.fetchall()
+    ip_view = ip_view[0][0] if ip_view else ''
+    ip_view = '' if admin_check(1) == 1 else ip_view
+    
     for raw_ip in get_ip:
         if not raw_ip in end_ip:
-            if ip_or_user(raw_ip) != 0:
-                curs.execute(db_change("select data from other where name = 'ip_view'"))
-                data = curs.fetchall()
-                if data and data[0][0] != '':
-                    ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip) if re.search(r'\.', raw_ip) else re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
-                    hide = 1 if not admin_check(1) else 0
-                else:
-                    ip = raw_ip
-            else:
-                if type_d == 0:
-                    ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
-                    ip = '<b>' + ip + '</b>' if admin_check('all', None, raw_ip) == 1 else ip
-                else:
-                    ip = raw_ip
-
+            change_ip = 0
+            is_this_ip = ip_or_user(raw_ip)
+            if is_this_ip != 0 and ip_view != '':
+                ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
+                ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
+                
+                change_ip = 1
+                
+            ip = raw_ip
             if type_d == 0:
-                if ban_check(raw_ip) == 1:
-                    ip = '<s>' + ip + '</s>'
+                if is_this_ip == 0:
+                    ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+                
+                if change_ip == 0:
+                    ip += ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
 
-                    if ban_check(raw_ip, 'login') == 1:
-                        ip = '<i>' + ip + '</i>'
-
-                ip = (ip + ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>') if hide == 0 else ip
-        
             end_ip[raw_ip] = ip
-
-    return ip if return_ip == 1 else end_ip
-
+    
+    if return_data == 1:
+        return end_ip[raw_ip]
+    else:
+        return end_ip
+        
 # Func-edit
 def slow_edit_check():
     curs.execute(db_change("select data from other where name = 'slow_edit'"))
