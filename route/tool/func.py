@@ -1116,25 +1116,26 @@ def ip_pas(raw_ip, type_d = 0):
     ip_view = ip_view[0][0] if ip_view else ''
     ip_view = '' if admin_check(1) == 1 else ip_view
     
+    get_ip = list(set(get_ip))
+    
     for raw_ip in get_ip:
-        if not raw_ip in end_ip:
-            change_ip = 0
-            is_this_ip = ip_or_user(raw_ip)
-            if is_this_ip != 0 and ip_view != '':
-                ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
-                ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
+        change_ip = 0
+        is_this_ip = ip_or_user(raw_ip)
+        if is_this_ip != 0 and ip_view != '':
+            ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
+            ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
                 
-                change_ip = 1
+            change_ip = 1
                 
-            ip = raw_ip
-            if type_d == 0:
-                if is_this_ip == 0:
-                    ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+        ip = raw_ip
+        if type_d == 0:
+            if is_this_ip == 0:
+                ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
                 
-                if change_ip == 0:
-                    ip += ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
+            if change_ip == 0:
+                ip += ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
 
-            end_ip[raw_ip] = ip
+        end_ip[raw_ip] = ip
     
     if return_data == 1:
         return end_ip[raw_ip]
