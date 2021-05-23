@@ -64,7 +64,7 @@ for i in range(0, 2):
         
 global_lang = {}
 
-data_css_ver = '87'
+data_css_ver = '88'
 data_css = ''
 
 conn = ''
