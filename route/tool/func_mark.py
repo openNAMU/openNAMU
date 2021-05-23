@@ -5,18 +5,10 @@ import threading
 
 from .func_tool import *
 
+# 커스텀 마크 언젠간 다시 추가 예정
+
 conn = ''
 curs = ''
-
-if os.path.exists('route/tool/custom.py'):
-    from .custom import custom_mark
-else:
-    def custom_mark(conn, doc_data, doc_name, data_in):
-        return [
-            doc_data, 
-            '', 
-            []
-        ]
 
 def load_conn2(data):
     global conn
@@ -80,36 +72,39 @@ def render_do(doc_name, doc_data, data_type, data_in):
     curs.execute(db_change('select data from other where name = "markup"'))
     rep_data = curs.fetchall()
     rep_data = rep_data[0][0] if rep_data else 'namumark'
-    if rep_data == 'namumark':
-        data_in = (data_in + '_') if data_in else ''
-        data_end = [
-            '<div class="render_content" id="' + data_in + 'render_content">' + html.escape(doc_data) + '</div>', 
-            '''
-                do_onmark_render(
-                    test_mode = "normal", 
-                    name_id = "''' + data_in + '''render_content",
-                    name_include = "''' + data_in + '''",
-                    name_doc = "''' + doc_name.replace('"', '//"') + '''",
-                );
-            ''',
-            []
-        ]
-    elif rep_data == 'custom':
-        data_end = custom_mark(
-            conn, 
-            doc_data, 
-            doc_name, 
-            data_in
-        )
-    else:
-        data_end = [
-            doc_data, 
-            '', 
-            []
-        ]
+    
+    if data_type != 'backlink':
+        if rep_data == 'namumark':
+            data_in = (data_in + '_') if data_in else ''
+            data_end = [
+                '<div class="render_content" id="' + data_in + 'render_content">' + html.escape(doc_data) + '</div>', 
+                '''
+                    do_onmark_render(
+                        test_mode = "normal", 
+                        name_id = "''' + data_in + '''render_content",
+                        name_include = "''' + data_in + '''",
+                        name_doc = "''' + doc_name.replace('"', '//"') + '''",
+                    );
+                ''',
+                []
+            ]
+        else:
+            data_end = [
+                doc_data, 
+                '', 
+                []
+            ]
 
-    if data_type == 'backlink':
+        if data_type == 'api_view':
+            return [
+                data_end[0], 
+                data_end[1]
+            ]
+        else:
+            return data_end[0] + '<script>' + data_end[1] + '</script>'
+    else:
         # backlink = backlink_generate(rep_data, html.escape(doc_data), doc_name)
+        
         backlink = []
         if backlink == []:
             curs.execute(db_change("insert into back (title, link, type) values ('test', ?, 'nothing')"), [doc_name])
@@ -118,11 +113,3 @@ def render_do(doc_name, doc_data, data_type, data_in):
             curs.execute(db_change("delete from back where title = ? and type = 'no'"), [doc_name])
 
         conn.commit()
-    else:
-        if data_type == 'api_view':
-            return [
-                data_end[0], 
-                data_end[1]
-            ]
-        else:
-            return data_end[0] + '<script>' + data_end[1] + '</script>'
