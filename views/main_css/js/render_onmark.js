@@ -1,4 +1,5 @@
 // 인터위키
+// 표 캡션
 // Tool
 function do_url_change(data) {
     return encodeURIComponent(data);
@@ -89,8 +90,13 @@ function do_onmark_text_render(data) {
     data = data.replace(/'''((?:(?!''').)+)'''/g, '<b>$1</b>');
     data = data.replace(/''((?:(?!'').)+)''/g, '<i>$1</i>');
     data = data.replace(/__((?:(?!__).)+)__/g, '<u>$1</u>');
+    
+    data = data.replace(/\^\^\^((?:(?!\^\^\^).)+)\^\^\^/g, '<sup>$1</sup>');
     data = data.replace(/\^\^((?:(?!\^\^).)+)\^\^/g, '<sup>$1</sup>');
+    
+    data = data.replace(/,,,((?:(?!,,,).)+),,,/g, '<sub>$1</sub>');
     data = data.replace(/,,((?:(?!,,).)+),,/g, '<sub>$1</sub>');
+    
     data = data.replace(/--((?:(?!--).)+)--/g, '<s>$1</s>');
     data = data.replace(/~~((?:(?!~~).)+)~~/g, '<s>$1</s>');
     
@@ -283,7 +289,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
 
                     data_js += '' +
                         'document.getElementsByName("' + name_include + 'set_link_' + num_link_str + '")[0].' + var_link_type + ' = ' + 
-                            '"' + do_js_safe_change(link_real) + '";' +
+                            '"' + do_js_safe_change(do_xss_change(link_real)) + '";' +
                         '\n' +
                     '';
 
