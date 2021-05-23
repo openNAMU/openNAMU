@@ -169,10 +169,12 @@ function section_edit_init() {
                 }
                 
                 data = data_org.slice(start_point, end_point);
+                data = data.replace(/\n$/, '');
+                
                 document.getElementById('content').value = data;
                 
                 data_server['start_point'] = start_point;
-                data_server['end_point'] = end_point - 1;
+                data_server['end_point'] = end_point;
                 
                 document.getElementById('server_set').innerHTML = JSON.stringify(data_server);
                 
@@ -191,7 +193,6 @@ function section_edit_do() {
         document.getElementById('server_set').innerHTML
     );
     
-    console.log(data_server, data_server['start_point']);
     if(data_server['start_point'] !== undefined) {
         var data = document.getElementById('origin').value;
         var data_section = document.getElementById('content').value;
@@ -199,12 +200,11 @@ function section_edit_do() {
         var start_point = data_server['start_point'];
         var end_point = data_server['end_point'];
         
-        console.log(data.length, end_point);
-        if(data.length > end_point) {
+        if(data.length >= end_point) {            
             var data_new = '';
             data_new += data.slice(0, start_point);
             data_new += data_section;
-            data_new += data.slice(end_point, data.length - 1);
+            data_new += data.slice(end_point, data.length);
             
             document.getElementById('content').value = data_new;
         }
