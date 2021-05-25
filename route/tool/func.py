@@ -1,4 +1,5 @@
 # Init
+import os
 import sys
 import platform
 import json
@@ -8,63 +9,47 @@ import shutil
 import logging
 import random
 
+import email.mime.text
+import email.utils
+import email.header
+
+import wsgiref.simple_server
+        
+import urllib.request
+
+if platform.system() == 'Linux' or platform.system() == 'Windows':
+    os.system(
+        'python' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
+        '-m pip install --upgrade --user -r requirements.txt'
+    )
+else:
+    print('Error : automatic installation is not supported.')
+    print('Help : try "python3 -m pip install -r requirements.txt"')
+
+print('----')
+
 from .func_mark import *
 
-for i in range(0, 2):
-    try:
-        from diff_match_patch import diff_match_patch
-        import werkzeug.routing
-        import werkzeug.debug
+from diff_match_patch import diff_match_patch
         
-        import flask
-        import flask_reggie
+import werkzeug.routing
+import werkzeug.debug
         
-        import wsgiref.simple_server
+import flask
+import flask_reggie
         
-        import urllib.request
-        
-        import email.mime.text
-        import email.utils
-        import email.header
-        
-        import requests
+import requests
 
-        import pymysql
+import pymysql
 
-        import PIL
+import PIL
 
-        if sys.version_info < (3, 6):
-            import sha3
-    except ImportError as e:
-        if i == 0:
-            print(e)
-            print('----')
-            if platform.system() == 'Linux' or platform.system() == 'Windows':
-                sys_pip_ins = os.system(
-                    'python' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
-                    '-m pip install --user -r requirements.txt'
-                )
-                if sys_pip_ins == 0:
-                    print('----')
-                    try:
-                        os.execl(sys.executable, sys.executable, *sys.argv)
-                    except:
-                        try:
-                            os.execl(sys.executable, '"' + sys.executable + '"', *sys.argv)
-                        except:
-                            print('Error : restart failed')
-                            raise
-                else:
-                    print('Error : library install failed')
-                    raise
-            
-        print('----')
-        print(e)
-        raise
+if sys.version_info < (3, 6):
+    import sha3
         
 global_lang = {}
 
-data_css_ver = '88'
+data_css_ver = '89'
 data_css = ''
 
 conn = ''
