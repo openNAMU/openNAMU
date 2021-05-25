@@ -160,7 +160,7 @@ function section_edit_init() {
                 }
                 
                 data = data.replace(re_heading, function(x) {
-                    return '.'.repeat(x.length);
+                    return '.'.repeat(x.length - 1) + '\n';
                 });
                 
                 var end_point = data.search(re_heading);
@@ -181,7 +181,7 @@ function section_edit_init() {
                 break;
             } else {
                 data = data.replace(re_heading, function(x) {
-                    return '.'.repeat(x.length);
+                    return '.'.repeat(x.length - 1) + '\n';
                 });
             }
         }
