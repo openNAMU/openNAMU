@@ -23,6 +23,13 @@ def backlink_generate(data_markup, doc_data, doc_name):
         data_link = link_re.findall(doc_data)
         data_link_end = []
         for i in data_link:
+            data_link_in = i
+            if data_link_in[0] === '#':
+                continue
+            
+            data_link_in = re.sub(r'([^/])#(?:[^#]*)$', '\1')
+            
+            
             data_link_in = re.sub(r'#([^#]+)$', '', i)
             if re.search(r'^(?:분류|category):', data_link_in):
                 data_link_end += [[
