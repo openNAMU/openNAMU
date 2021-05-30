@@ -19,59 +19,69 @@ def load_conn2(data):
     
 def backlink_generate(data_markup, doc_data, doc_name):
     if data_markup == 'namumark':
+        # Link
         link_re = re.compile(r'\[\[(?!https?:\/\/)((?:(?!\[\[|\]\]|\|).)+)(?:\]\]|\|)', re.I)
+        
         data_link = link_re.findall(doc_data)
-        data_link_end = []
+        data_link = list(set(data_link))
+        
+        data_link_end = {}
+        data_link_end['cat'] = []
+        data_link_end['file'] = []
+        data_link_end['link'] = []
+        
         for i in data_link:
             data_link_in = i
-            if data_link_in[0] === '#':
+            if data_link_in[0] == '#':
                 continue
-            
-            data_link_in = re.sub(r'([^/])#(?:[^#]*)$', '\1')
-            
-            
-            data_link_in = re.sub(r'#([^#]+)$', '', i)
-            if re.search(r'^(?:분류|category):', data_link_in):
-                data_link_end += [[
-                    doc_name,
-                    re.sub(r'^분류:', 'category:', data_link_in),
-                    'cat'
-                ]]
+            elif re.search(r'^(?:분류|category):', data_link_in):
+                data_link_in = re.sub(r'\\(.)', '\1', data_link_in)
+                data_link_end['cat'] += [re.sub(r'^분류:', 'category:', data_link_in)]
             elif re.search(r'^(?:파일|file):', data_link_in):
-                data_link_end += [[
-                    doc_name,
-                    re.sub(r'^파일:', 'file:', data_link_in),
-                    'file'
-                ]]
-            elif data_link_in[0] == ':':
-                data_link_end += [[
-                    doc_name, 
-                    re.sub(r'^:', '', data_link_in), 
-                    ''
-                ]]
-            elif data_link_in[0] == '/':
-                data_link_end += [[
-                    doc_name, 
-                    doc_name + data_link_in, 
-                    ''
-                ]]
-            elif re.search(r'^\.\.\/', data_link_in):
-                data_link_in = re.sub(r'^\.\.\/', '', data_link_in)
-                data_link_end += [[
-                    doc_name, 
-                    re.sub('\/[^/]+$', '', doc_name) + ('/' + data_link_in if data_link_in != '' else ''),
-                    ''
-                ]]
+                data_link_in = re.sub(r'\\(.)', '\1', data_link_in)
+                data_link_end['file'] += [re.sub(r'^파일:', 'file:', data_link_in)]
             else:
-                data_link_end += [[
-                    doc_name, 
-                    data_link_in,
+                data_link_in = re.sub(r'([^/])#(?:[^#]*)$', '\1', data_link_in)
+                
+                if data_link_in[0] == ':':
+                    data_link_in = re.sub(r'^:', '', data_link_in)
+                elif data_link_in[0] == '/':
+                    data_link_in = doc_name + data_link_in
+                elif len(data_link_in) >= 3 and data_link_in[0:3] == '../':
+                    data_link_in = data_link_in[3:len(data_link_in)]
+                    data_link_in = '' + \
+                        re.sub('\/[^/]+$', '', doc_name) + \
+                        (('/' + data_link_in) if data_link_in != '' else '') + \
                     ''
-                ]]
-    else:
-        data_link_end = [[]]
+
+                data_link_in = re.sub(r'\\(.)', '\1', data_link_in)
+                data_link_end['link'] += [data_link_in]
+                
+        if data_link_end != {}:
+            data_link_end['cat'] = list(set(data_link_end['cat']))
+            data_link_end['file'] = list(set(data_link_end['file']))
+            data_link_end['link'] = list(set(data_link_end['link']))
+
+            data_link_end_all = []
+            data_link_end_all += [[doc_name, i, 'cat'] for i in data_link_end['cat']]
+            data_link_end_all += [[doc_name, i, 'file'] for i in data_link_end['file']]
+            data_link_end_all += [[doc_name, i, ''] for i in data_link_end['link']]
+        else:
+            data_link_end_all = []
             
-    return data_link_end
+        # Include
+        include_re = re.compile(r'\[include\(((?:(?!\)\]).)+)\)\]', re.I)
+        
+        data_include = include_re.findall(doc_data)
+        data_include = list(set(data_include))
+        
+        
+        
+        # Redirect
+    else:
+        data_link_end_all = []
+            
+    return data_link_end_all
 
 def render_do(doc_name, doc_data, data_type, data_in):
     data_in = None if data_in == '' else data_in
@@ -110,12 +120,14 @@ def render_do(doc_name, doc_data, data_type, data_in):
         else:
             return data_end[0] + '<script>' + data_end[1] + '</script>'
     else:
-        # backlink = backlink_generate(rep_data, html.escape(doc_data), doc_name)
+        backlink = backlink_generate(
+            rep_data, 
+            html.escape(doc_data), 
+            doc_name
+        )
         
-        backlink = []
-        if backlink == []:
-            curs.execute(db_change("insert into back (title, link, type) values ('test', ?, 'nothing')"), [doc_name])
-        else:
+        print(backlink)
+        if backlink != []:
             curs.executemany(db_change("insert into back (link, title, type) values (?, ?, ?)"), backlink)
             curs.execute(db_change("delete from back where title = ? and type = 'no'"), [doc_name])
 
