@@ -697,7 +697,7 @@ def load_skin(data = '', set_n = 0, default = 0):
 def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', doc_acl = ''):
     # data_type in ['view', 'raw', 'api_view', 'backlink']
     doc_acl = acl_check(doc_name, 'render') if doc_acl == '' else doc_acl
-    doc_data = 0 if not doc_data else doc_data
+    doc_data = 0 if doc_data == None else doc_data
         
     if doc_acl == 1:
         return 'HTTP Request 401.3'
