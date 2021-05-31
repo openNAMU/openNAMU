@@ -29,7 +29,7 @@ def inter_wiki_2(conn, tools):
         curs.execute(db_change("select html from html_filter where kind = 'name'"))
     elif tools == 'edit_filter':
         del_link = 'del_edit_filter'
-        plus_link = 'plus_edit_filter'
+        plus_link = 'manager/9'
         title = load_lang('edit_filter_list')
         div = ''
 

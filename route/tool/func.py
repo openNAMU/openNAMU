@@ -260,6 +260,9 @@ def update(ver_num, set_data):
     if ver_num < 3300101:
         curs.execute(db_change('delete from cache_data'))
     
+    if ver_num < 3300301:
+        curs.execute(db_change('delete from html_filter where kind = "regex_filter" and html is null'))
+    
     conn.commit()
 
     print('Update completed')
