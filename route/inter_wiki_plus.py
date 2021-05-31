@@ -125,6 +125,9 @@ def inter_wiki_plus_2(conn, tools, name):
                 <input value="''' + html.escape(value[2]) + '''" type="text" name="icon">
             '''
         elif tools == 'plus_edit_filter':
+            if not name:
+                name = 'test'
+            
             curs.execute(db_change("select plus, plus_t from html_filter where html = ? and kind = 'regex_filter'"), [name])
             exist = curs.fetchall()
             if exist:
