@@ -244,15 +244,8 @@ else:
     rep_key = rep_data[0][0]
 
 if set_data['db_type'] == 'sqlite':
-    def back_up():
+    def back_up(back_time, back_up_where):
         print('----')
-
-        curs.execute(db_change('select data from other where name = "backup_where"'))
-        back_up_where = curs.fetchall()
-        if back_up_where and back_up_where[0][0] != '':
-            back_up_where = back_up_where[0][0]
-        else:
-            back_up_where = 'back_' + set_data['db'] + '.db'
         
         try:
             shutil.copyfile(
@@ -264,30 +257,43 @@ if set_data['db_type'] == 'sqlite':
         except:
             print('Back up : Error')
 
-        threading.Timer(60 * 60 * back_time, back_up).start()
+        threading.Timer(
+            60 * 60 * back_time, 
+            back_up,
+            [back_time, back_up_where]
+        ).start()
 
-    try:
-        curs.execute(db_change('select data from other where name = "back_up"'))
-        back_up_time = curs.fetchall()
+    curs.execute(db_change('select data from other where name = "back_up"'))
+    back_time = curs.fetchall()
+    if back_time:
+        back_time = int(number_check(back_time[0][0]))
 
-        back_time = int(back_up_time[0][0])
-    except:
-        back_time = 0
+        curs.execute(db_change('select data from other where name = "backup_where"'))
+        back_up_where = curs.fetchall()
+        if back_up_where and back_up_where[0][0] != '':
+            back_up_where = back_up_where[0][0]
+        else:
+            back_up_where = 'back_' + set_data['db'] + '.db'
 
-    if back_time != 0:
         print('Back up state : ' + str(back_time) + ' hours')
 
-        back_up()
+        back_up(back_time, back_up_where)
     else:
         print('Back up state : Turn off')
 
-def mysql_dont_off():
-    curs = conn.cursor()
-    curs.execute(db_change("select title from data limit 1"))
+def mysql_dont_off(port):
+    try:
+        urllib.request.urlopen('http://localhost:' + port + '/')
+    except:
+        pass
 
-    threading.Timer(60 * 60 * 1, mysql_dont_off).start()
+    threading.Timer(
+        60 * 60 * 3, 
+        mysql_dont_off,
+        [port]
+    ).start()
 
-mysql_dont_off()
+mysql_dont_off(server_set['port'])
 
 curs.execute(db_change('select data from other where name = "count_all_title"'))
 if not curs.fetchall():

@@ -983,8 +983,8 @@ function do_onmark_list_render(data) {
        '');
     }
     
-    var list_re = /\n((?:(?:(?: )+)\* ?(?:(?:(?!\n).)+)\n)+)/;
-    var list_short_re = /((?: )+)\* ?((?:(?!\n).)+)\n/g;
+    var list_re = /\n((?:(?:(?: )*)\* ?(?:(?:(?!\n).)+)\n)+)/;
+    var list_short_re = /((?: )*)\* ?((?:(?!\n).)+)\n/g;
     while(1) {
         var list_data = data.match(list_re);
         if(!list_data) {
@@ -1043,7 +1043,7 @@ function do_onmark_hr_render(data) {
 }
 
 function do_onmark_redirect_render(data, data_js, name_doc) {
-    var redirect_re = /^\n#(?:redirect|넘겨주기) ([^\n]+)/;
+    var redirect_re = /^\n#(?:redirect|넘겨주기) ([^\n]+)/i;
     var data_redirect = data.match(redirect_re);
     if(data_redirect) {
         var link_data_var = do_link_change(data_redirect[1], {}, 1);

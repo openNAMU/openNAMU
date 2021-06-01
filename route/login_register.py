@@ -126,9 +126,11 @@ def login_register_2(conn):
                     ''' + approval_question + '''
                     ''' + captcha_get() + '''
                     
-                    <a href="" id="oauth_google">(Google)</a>         
-                    
+                    <!--
+                    <a href="" id="oauth_google">(Google)</a>     
                     <hr class="main_hr">
+                    -->
+                    
                     <button type="submit">''' + load_lang('save') + '''</button>
                     
                     ''' + http_warring() + '''
