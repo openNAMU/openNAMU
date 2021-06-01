@@ -49,7 +49,7 @@ if sys.version_info < (3, 6):
         
 global_lang = {}
 
-data_css_ver = '89'
+data_css_ver = '90'
 data_css = ''
 
 conn = ''

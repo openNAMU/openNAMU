@@ -168,7 +168,7 @@ if what_i_do == '1':
     print('----')
     print('Load...')
 
-    curs.execute(db_change("select title from data d where not exists (select title from back where link = d.title)"))
+    curs.execute(db_change("select title from data d where not exists (select title from back where link = d.title limit 1)"))
     title = curs.fetchall()
 
     print('----')

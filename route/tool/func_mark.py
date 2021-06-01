@@ -30,18 +30,20 @@ def backlink_generate(data_markup, doc_data, doc_name):
         data_link_end['file'] = []
         data_link_end['link'] = []
         
+        data_link_end_all = []
+        
         for i in data_link:
             data_link_in = i
             if data_link_in[0] == '#':
                 continue
             elif re.search(r'^(?:분류|category):', data_link_in):
-                data_link_in = re.sub(r'\\(.)', '\1', data_link_in)
+                data_link_in = re.sub(r'\\(.)', r'\1', data_link_in)
                 data_link_end['cat'] += [re.sub(r'^분류:', 'category:', data_link_in)]
             elif re.search(r'^(?:파일|file):', data_link_in):
-                data_link_in = re.sub(r'\\(.)', '\1', data_link_in)
+                data_link_in = re.sub(r'\\(.)', r'\1', data_link_in)
                 data_link_end['file'] += [re.sub(r'^파일:', 'file:', data_link_in)]
             else:
-                data_link_in = re.sub(r'([^/])#(?:[^#]*)$', '\1', data_link_in)
+                data_link_in = re.sub(r'([^\\])#(?:[^#]*)$', r'\1', data_link_in)
                 
                 if data_link_in[0] == ':':
                     data_link_in = re.sub(r'^:', '', data_link_in)
@@ -54,7 +56,7 @@ def backlink_generate(data_markup, doc_data, doc_name):
                         (('/' + data_link_in) if data_link_in != '' else '') + \
                     ''
 
-                data_link_in = re.sub(r'\\(.)', '\1', data_link_in)
+                data_link_in = re.sub(r'\\(.)', r'\1', data_link_in)
                 data_link_end['link'] += [data_link_in]
                 
         if data_link_end != {}:
@@ -62,12 +64,9 @@ def backlink_generate(data_markup, doc_data, doc_name):
             data_link_end['file'] = list(set(data_link_end['file']))
             data_link_end['link'] = list(set(data_link_end['link']))
 
-            data_link_end_all = []
             data_link_end_all += [[doc_name, i, 'cat'] for i in data_link_end['cat']]
             data_link_end_all += [[doc_name, i, 'file'] for i in data_link_end['file']]
             data_link_end_all += [[doc_name, i, ''] for i in data_link_end['link']]
-        else:
-            data_link_end_all = []
             
         # Include
         include_re = re.compile(r'\[include\(((?:(?!\)\]).)+)\)\]', re.I)
@@ -75,10 +74,24 @@ def backlink_generate(data_markup, doc_data, doc_name):
         data_include = include_re.findall(doc_data)
         data_include = list(set(data_include))
         
-        
+        for i in data_include:
+            data_include_in = i
+            data_include_in = re.sub(r'([^\\]),.*$', r'\1', data_include_in)
+            
+            data_link_end_all += [[doc_name, data_include_in, 'include']]
         
         # Redirect
+        redirect_re = re.compile(r'^#(?:redirect|넘겨주기) ([^\n]+)', re.I)
+        
+        data_redirect = redirect_re.search(doc_data)
+        if data_redirect:
+            data_redirect = data_redirect.group(1)
+            
+            data_redirect = re.sub(r'([^\\])#(?:[^#]*)$', r'\1', data_redirect)
+            
+            data_link_end_all += [[doc_name, data_redirect, 'redirect']]
     else:
+        # markup == null
         data_link_end_all = []
             
     return data_link_end_all
@@ -126,7 +139,6 @@ def render_do(doc_name, doc_data, data_type, data_in):
             doc_name
         )
         
-        print(backlink)
         if backlink != []:
             curs.executemany(db_change("insert into back (link, title, type) values (?, ?, ?)"), backlink)
             curs.execute(db_change("delete from back where title = ? and type = 'no'"), [doc_name])
