@@ -1,5 +1,6 @@
 // 인터위키
 // 표 캡션
+// pagecount
 // Tool
 function do_url_change(data) {
     return encodeURIComponent(data);
@@ -415,7 +416,7 @@ function do_onmark_footnote_render(data, name_include) {
     return data;
 }
 
-function do_onmark_macro_render(data) {
+function do_onmark_macro_render(data, data_js) {
     data = data.replace(/\[([^[\](]+)\(((?:(?!\)\]).)+)\)\]/g, function(x, x_1, x_2) {
         x_1 = x_1.toLowerCase();
         if(x_1 === 'youtube' || x_1 === 'kakaotv' || x_1 === 'nicovideo') {
@@ -469,6 +470,7 @@ function do_onmark_macro_render(data) {
         }
     });
     
+    var pagecount_n = 0;
     data = data.replace(/\[([^[*()\]]+)\]/g, function(x, x_1) {
         x_1 = x_1.toLowerCase();
         if(x_1 === 'date') {
@@ -478,7 +480,13 @@ function do_onmark_macro_render(data) {
         } else if(x_1 === 'br') { 
             return '<br>';
         } else if(x_1 === 'pagecount') {
-            return '0';
+            if(pagecount_n === 0) {
+                pagecount_n += 1;
+                
+                data_js += 'page_count();\n';
+            }
+            
+            return '<span class="all_page_count"></span>';
         } else {
             return '<macro_start>' + x_1 + '<macro_end>';
         }
@@ -487,7 +495,7 @@ function do_onmark_macro_render(data) {
     data = data.replace(/<macro_start>/g, '[');
     data = data.replace(/<macro_end>/g, ']');
     
-    return data;
+    return [data, data_js];
 }
 
 function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_doc) {
@@ -1130,8 +1138,11 @@ function do_onmark_render(test_mode = 'test', name_id = '', name_include = '', n
         data_js = data_var[1];
         console.log('link');
 
-        data = do_onmark_macro_render(data);
+        data_var = do_onmark_macro_render(data, data_js);
+        data = data_var[0];
+        data_js = data_var[1];
         console.log('macro');
+        
         data = do_onmark_list_render(data);
         console.log('list');
         data = do_onmark_hr_render(data);
