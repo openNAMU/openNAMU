@@ -1,6 +1,9 @@
 # Init
 from route import *
 
+# Init-Version
+version_list = json.loads(open('version.json', encoding = 'utf8').read())
+
 # Init-DB
 if os.path.exists(os.path.join('data', 'set.json')):
     db_set_list = ['db', 'db_type']
@@ -188,6 +191,7 @@ app.jinja_env.filters['cut_100'] = cut_100
 
 app.url_map.converters['everything'] = EverythingConverter
 
+# Init-DB_Data
 curs.execute(db_change('select name from alist where acl = "owner"'))
 if not curs.fetchall():
     curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
@@ -226,11 +230,15 @@ curs.execute(db_change('select data from other where name = "key"'))
 rep_data = curs.fetchall()
 if not rep_data:
     rep_key = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
-    if rep_key:
-        curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [rep_key])
+    curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [rep_key])
 else:
     rep_key = rep_data[0][0]
 
+curs.execute(db_change('select data from other where name = "count_all_title"'))
+if not curs.fetchall():
+    curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
+    
+# Init-DB_care
 if set_data['db_type'] == 'sqlite':
     def back_up(back_time, back_up_where):
         print('----')
@@ -267,24 +275,20 @@ if set_data['db_type'] == 'sqlite':
         back_up(back_time, back_up_where)
     else:
         print('Back up state : Turn off')
+else:
+    def mysql_dont_off(port):
+        try:
+            urllib.request.urlopen('http://localhost:' + port + '/')
+        except:
+            pass
 
-def mysql_dont_off(port):
-    try:
-        urllib.request.urlopen('http://localhost:' + port + '/')
-    except:
-        pass
+        threading.Timer(
+            60 * 60 * 3, 
+            mysql_dont_off,
+            [port]
+        ).start()
 
-    threading.Timer(
-        60 * 60 * 3, 
-        mysql_dont_off,
-        [port]
-    ).start()
-
-mysql_dont_off(server_set['port'])
-
-curs.execute(db_change('select data from other where name = "count_all_title"'))
-if not curs.fetchall():
-    curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
+    mysql_dont_off(server_set['port'])
 
 conn.commit()
 
