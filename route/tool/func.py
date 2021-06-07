@@ -17,17 +17,39 @@ import wsgiref.simple_server
         
 import urllib.request
 
-if platform.system() == 'Linux' or platform.system() == 'Windows':
-    os.system(
-        'python' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
-        '-m pip install --upgrade --user -r requirements.txt'
-    )
-else:
-    print('Error : automatic installation is not supported.')
-    print('Help : try "python3 -m pip install -r requirements.txt"')
+# Init-Version
+version_list = json.loads(open('version.json', encoding = 'utf8').read())
 
+print('Version : ' + version_list['beta']['r_ver'])
+print('DB set version : ' + version_list['beta']['c_ver'])
+print('Skin set version : ' + version_list['beta']['s_ver'])
 print('----')
 
+# Init-PIP_Install
+data_up_date = 0
+if not os.path.exists(os.path.join('data', 'version.json')):
+    data_up_date = 1
+else:
+    data_load_ver = open(os.path.join('data', 'version.json'), encoding = 'utf8').read()
+    if data_load_ver != version_list['beta']['r_ver']:
+        data_up_date = 1
+    
+if data_up_date == 1:
+    with open(os.path.join('data', 'version.json'), 'w', encoding = 'utf8') as f:
+        f.write(version_list['beta']['r_ver'])
+    
+    if platform.system() == 'Linux' or platform.system() == 'Windows':
+        os.system(
+            'python' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
+            '-m pip install --upgrade --user -r requirements.txt'
+        )
+    else:
+        print('Error : automatic installation is not supported.')
+        print('Help : try "python3 -m pip install -r requirements.txt"')
+        
+    print('----')
+
+# Init-Load
 from .func_mark import *
 
 from diff_match_patch import diff_match_patch
@@ -46,7 +68,8 @@ import PIL
 
 if sys.version_info < (3, 6):
     import sha3
-        
+   
+# Init-Global
 global_lang = {}
 
 data_css_ver = '92'
@@ -1111,11 +1134,12 @@ def ip_pas(raw_ip, type_d = 0):
         is_this_ip = ip_or_user(raw_ip)
         if is_this_ip != 0 and ip_view != '':
             ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
-            ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
+            ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', ip)
                 
             change_ip = 1
-                
-        ip = raw_ip
+        else:     
+            ip = raw_ip
+            
         if type_d == 0:
             if is_this_ip == 0:
                 ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
