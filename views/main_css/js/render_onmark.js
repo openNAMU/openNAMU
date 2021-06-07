@@ -1,6 +1,5 @@
 // 인터위키
 // 표 캡션
-// pagecount
 // Tool
 function do_url_change(data) {
     return encodeURIComponent(data);
