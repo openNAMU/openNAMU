@@ -26,19 +26,17 @@ print('Skin set version : ' + version_list['beta']['s_ver'])
 print('----')
 
 # Init-PIP_Install
-data_up_date = 0
-if not os.path.exists(os.path.join('data', 'version.json')):
-    data_up_date = 1
-else:
+data_up_date = 1
+if os.path.exists(os.path.join('data', 'version.json')):
     data_load_ver = open(os.path.join('data', 'version.json'), encoding = 'utf8').read()
-    if data_load_ver != version_list['beta']['r_ver']:
-        data_up_date = 1
-    
+    if data_load_ver == version_list['beta']['r_ver']:
+        data_up_date = 0
+
 if data_up_date == 1:
     with open(os.path.join('data', 'version.json'), 'w', encoding = 'utf8') as f:
         f.write(version_list['beta']['r_ver'])
     
-    if platform.system() == 'Linux' or platform.system() == 'Windows':
+    if platform.system() in ('Linux', 'Windows'):
         os.system(
             'python' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
             '-m pip install --upgrade --user -r requirements.txt'
@@ -46,8 +44,10 @@ if data_up_date == 1:
     else:
         print('Error : automatic installation is not supported.')
         print('Help : try "python3 -m pip install -r requirements.txt"')
-        
-    print('----')
+else:
+    print('PIP check pass')
+    
+print('----')
 
 # Init-Load
 from .func_mark import *
