@@ -106,7 +106,7 @@ def main_upload_2(conn):
                 file_d,
                 get_time(),
                 ip,
-                ip,
+                '',
                 '0',
                 t_check = 'upload',
                 mode = 'upload'
