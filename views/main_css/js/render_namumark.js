@@ -67,7 +67,7 @@ function get_file_state_intermal(data, i) {
     
     var file_type = get_class.getAttribute('under_src').split('.');
     var file_name = file_type.slice(0, file_type.length - 1).join('.');
-    file_type = file_type[file_type.length - 1].toLowerCase();
+    file_type = file_type[file_type.length - 1];
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", '/api/sha224/' + file_name);
