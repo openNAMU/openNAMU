@@ -923,7 +923,7 @@ function do_onmark_table_render_main(data) {
 }
 
 function do_onmark_table_render(data) {
-    data = data.replace(/ +\|\|/g, '||');
+    data = data.replace(/\n +\|\|/g, '\n||');
     
     var wiki_re = /<wiki_s ([^>]+)>((?:(?!<wiki_s |<wiki_e>).)+)<wiki_e>/s;
     while(1) {

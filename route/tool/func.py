@@ -72,7 +72,7 @@ if sys.version_info < (3, 6):
 # Init-Global
 global_lang = {}
 
-data_css_ver = '93'
+data_css_ver = '94'
 data_css = ''
 
 conn = ''
