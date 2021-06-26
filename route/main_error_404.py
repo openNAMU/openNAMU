@@ -6,4 +6,4 @@ def main_error_404_2(conn):
     if os.path.exists('404.html') and flask.request.path != '/':
         return open('404.html', encoding='utf8').read()
     else:
-        return redirect('/w/' + url_pas(wiki_set(2)))
+        return redirect('/w/' + wiki_set(2))

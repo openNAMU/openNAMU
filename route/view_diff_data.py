@@ -50,7 +50,7 @@ def view_diff_data_2(conn, name):
             result = '<pre>' + end_data + '</pre>'
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('compare') + ')', 0])],
+            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('compare') + ')', 0])],
             data = result,
             menu = [['history/' + url_pas(name), load_lang('return')]]
         ))

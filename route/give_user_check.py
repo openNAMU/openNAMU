@@ -147,7 +147,7 @@ def give_user_check_2(conn, name):
         )
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('check'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('check'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = div,
             menu = [['manager', load_lang('return')]]
         ))
@@ -172,7 +172,7 @@ def give_user_check_2(conn, name):
             )
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('simple_check') + ')', 0])],
+            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('simple_check') + ')', 0])],
             data = div,
             menu = [['check/' + url_pas(name), load_lang('return')]]
         ))

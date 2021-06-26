@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def server_restart_2(conn):
+def main_restart_2(conn):
     curs = conn.cursor()
 
     if admin_check() != 1:
@@ -15,13 +15,15 @@ def server_restart_2(conn):
         try:
             os.execl(sys.executable, sys.executable, *sys.argv)
         except:
-            try:
-                os.execl(sys.executable, '"' + sys.executable + '"', *sys.argv)
-            except:
-                return re_error('/error/33')
+            pass
+        
+        try:
+            os.execl(sys.executable, '"' + sys.executable + '"', *sys.argv)
+        except:
+            return re_error('/error/33')
     else:
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('wiki_restart'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('wiki_restart'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
                     <button type="submit">''' + load_lang('restart') + '''</button>

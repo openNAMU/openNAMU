@@ -56,7 +56,7 @@ def topic_admin_2(conn, topic_num, num):
         '''
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('discussion_tool'), wiki_set(), custom(), other2(['(#' + num + ')', 0])],
+        imp = [load_lang('discussion_tool'), wiki_set(), wiki_custom(), wiki_css(['(#' + num + ')', 0])],
         data = ban,
         menu = [['thread/' + topic_num + '#' + num, load_lang('return')]]
     ))

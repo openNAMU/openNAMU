@@ -18,20 +18,39 @@ def login_pw_change_2(conn):
             if new_pw != re_pw:
                 return re_error('/error/20')
 
-            curs.execute(db_change("select pw, encode from user where id = ?"), [flask.session['id']])
-            user = curs.fetchall()
-            if not user:
+            curs.execute(db_change("" + \
+                "select name, data from user_set " + \
+                "where id = ? and (name = 'encode' or name = 'pw')" + \
+            ""), [
+                flask.session['id']
+            ])
+            sql_data = curs.fetchall()
+            if not sql_data:
                 return re_error('/error/2')
+            else:
+                user = {}
+                for i in sql_data:
+                    user[i[0]] = i[1]
 
-            if pw_check(now_pw, user[0][0], user[0][1], ip) != 1:
+            if pw_check(
+                now_pw,
+                user['pw'], 
+                user['encode'], 
+                ip
+            ) != 1:
                 return re_error('/error/10')
 
-            curs.execute(db_change("update user set pw = ? where id = ?"), [pw_encode(new_pw), ip])
+            curs.execute(db_change(
+                "update user_set set data = ? where id = ? and name = 'pw'"
+            ), [
+                pw_encode(new_pw), 
+                ip
+            ])
 
         return redirect('/user')
     else:
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('password_change'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('password_change'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
                     <input placeholder="''' + load_lang('now_password') + '''" name="pw4" type="password">

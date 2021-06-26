@@ -52,7 +52,7 @@ def watch_list_2(conn, tool):
     div += '<a href="/manager/' + ('13' if tool == 'watch_list' else '16') + '">(' + load_lang('add') + ')</a>'
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [title_name, wiki_set(), custom(), other2([0, 0])],
+        imp = [title_name, wiki_set(), wiki_custom(), wiki_css([0, 0])],
         data = div,
         menu = [['user', load_lang('return')]]
     ))

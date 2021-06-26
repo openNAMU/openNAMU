@@ -51,6 +51,10 @@ from .main_error_404 import *
 from .main_title_random import *
 from .main_image_view import *
 from .main_manager import *
+from .main_test_func import *
+from .main_shutdown import *
+from .main_restart import *
+from .main_update import *
 
 # Import-api
 from .api_topic_sub import *
@@ -118,10 +122,6 @@ from .edit_backlink_reset import *
 from .edit_revert import *
 from .edit_move import *
 from .edit_many_delete import *
-
-# Import-server
-from .server_restart import *
-from .server_now_update import *
 
 # Import-view
 from .view_xref import *

@@ -59,7 +59,7 @@ def search_deep_2(conn, name):
     div += next_fix('/search/' + url_pas(name) + '?num=', num, all_list)
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [name, wiki_set(), custom(), other2(['(' + load_lang('search') + ')', 0])],
+        imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('search') + ')', 0])],
         data = div,
         menu = 0
     ))

@@ -31,7 +31,7 @@ def login_check_key_2(conn, tool):
                 curs.execute(db_change("update user_set set data = '' where name = '2fa' and id = ?"), [user_id])
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('reset_user_ok'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('reset_user_ok'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = b_text + load_lang('id') + ' : ' + user_id + '<br>' + load_lang('password') + ' : ' + user_pw,
                 menu = [['user', load_lang('return')]]
             ))
@@ -126,7 +126,7 @@ def login_check_key_2(conn, tool):
         b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('check_key'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('check_key'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
                     ''' + b_text + '''

@@ -96,7 +96,7 @@ def topic_2(conn, topic_num):
     else:
         display = 'display: none;' if ban == 1 else ''
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('discussion') + ')', 0])],
+            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('discussion') + ')', 0])],
             data = '''
                 <h2 id="topic_top_title">''' + html.escape(sub) + '''</h2>
                 <div id="top_topic"></div>

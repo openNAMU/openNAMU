@@ -16,7 +16,7 @@ def edit_many_delete_2(conn):
         return redirect('/recent_changes')
     else:
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('many_delete'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('many_delete'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
                     <textarea rows="25" placeholder="''' + load_lang('many_delete_help') + '''" name="content"></textarea>

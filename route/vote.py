@@ -35,7 +35,7 @@ def vote_2(conn):
         data += next_fix('/vote?close=y&num=', sql_num_1, data_list)
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('vote_list'), wiki_set(), custom(), other2([sub, 0])],
+        imp = [load_lang('vote_list'), wiki_set(), wiki_custom(), wiki_css([sub, 0])],
         data = data,
         menu = [['other', load_lang('return')]]
     ))

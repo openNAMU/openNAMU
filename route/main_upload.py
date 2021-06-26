@@ -135,7 +135,7 @@ def main_upload_2(conn):
         upload_default = html.escape(db_data[0][0]) if db_data and db_data[0][0] != '' else ''
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('upload'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('upload'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <a href="/file_filter">(''' + load_lang('file_filter_list') + ''')</a>
                 ''' + upload_help + '''

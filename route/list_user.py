@@ -16,7 +16,7 @@ def list_user_2(conn):
     list_data += '</ul>' + next_fix('/user_log?num=', num, user_list)
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('member_list'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('member_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
         data = list_data,
         menu = [['other', load_lang('return')]]
     ))

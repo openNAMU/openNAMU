@@ -78,7 +78,7 @@ def login_need_email_2(conn, tool):
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('password_search'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('password_search'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = b_text + '''
                     <form method="post">
                         <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
@@ -99,7 +99,7 @@ def login_need_email_2(conn, tool):
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('email'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('email'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <a href="/email_filter">(''' + load_lang('email_filter_list') + ''')</a>
                     <hr class="main_hr">

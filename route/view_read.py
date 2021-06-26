@@ -164,7 +164,7 @@ def view_read_2(conn, name):
         watch_list = 0
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [name, wiki_set(), custom(), other2([sub, r_date, watch_list])],
+        imp = [name, wiki_set(), wiki_custom(), wiki_css([sub, r_date, watch_list])],
         data = div,
         menu = menu
     )), response_data

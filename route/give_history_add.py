@@ -30,7 +30,7 @@ def give_history_add_2(conn, name):
         return redirect('/history/' + url_pas(name))
     else:
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('history_add'), wiki_set(), custom(), other2(['(' + name + ')', 0])],
+            imp = [load_lang('history_add'), wiki_set(), wiki_custom(), wiki_css(['(' + name + ')', 0])],
             data = '''
                 <form method="post">
                     <script>do_stop_exit();</script>

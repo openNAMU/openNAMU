@@ -30,7 +30,7 @@ def list_admin_use_2(conn):
         list_data += next_fix('/admin_log?num=', num, get_list)
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('authority_use_list'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('authority_use_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
                     <input name="search" id="admin_log_search"> <button type="submit">''' + load_lang('search') + '''</button>

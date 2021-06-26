@@ -66,7 +66,7 @@ def edit_revert_2(conn, name):
             return redirect('/w/' + url_pas(name))
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('revert') + ')', 0])],
+            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('revert') + ')', 0])],
             data =  '''
                     <form method="post">
                         <span>r''' + flask.request.args.get('num', '0') + '''</span>

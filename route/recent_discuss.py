@@ -38,7 +38,7 @@ def recent_discuss_2(conn):
     div += '</tbody></table>'
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('recent_discussion'), wiki_set(), custom(), other2([m_sub, 0])],
+        imp = [load_lang('recent_discussion'), wiki_set(), wiki_custom(), wiki_css([m_sub, 0])],
         data = div,
         menu = 0
     ))

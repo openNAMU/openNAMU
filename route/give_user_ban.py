@@ -105,7 +105,7 @@ def give_user_ban_2(conn, name):
             ''' + plus
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [main_name, wiki_set(), custom(), other2([now, 0])],
+            imp = [main_name, wiki_set(), wiki_custom(), wiki_css([now, 0])],
             data = '''
                 <form method="post" ''' + action + '''>
                     ''' + data + '''

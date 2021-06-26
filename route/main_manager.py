@@ -24,7 +24,7 @@ def main_manager_2(conn, num, r_ver):
 
     if num == 1:
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('admin_tool'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('admin_tool'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <h2>''' + load_lang('admin') + '''</h2>
                 <ul class="inside_ul">
@@ -59,6 +59,7 @@ def main_manager_2(conn, num, r_ver):
                 <h2>''' + load_lang('server') + '''</h2>
                 <ul class="inside_ul">
                     <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
+                    <li><a href="/shutdown">''' + load_lang('wiki_shutdown') + '''</a></li>
                     <li><a href="/update">''' + load_lang('update') + '''</a></li>
                 </ul>
                 <br>
@@ -96,7 +97,7 @@ def main_manager_2(conn, num, r_ver):
                 plus = '<input type="checkbox" name="regex"> ' + load_lang('regex') + '<hr class="main_hr">'
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [title_list[(num - 2)][2], wiki_set(), custom(), other2([0, 0])],
+                imp = [title_list[(num - 2)][2], wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <input placeholder="''' + placeholder + '''" name="name" type="text">
