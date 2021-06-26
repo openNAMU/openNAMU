@@ -20,7 +20,7 @@ def main_setting_2(conn, num, db_set):
         li_data = ''.join(['<li><a href="/setting/' + str(li[0]) + '">' + li[1] + '</a></li>' for li in li_list])
         
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('setting'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '<h2>' + load_lang('list') + '</h2><ul class="inside_ul">' + li_data + '</ul>',
             menu = [['manager', load_lang('return')]]
         ))
@@ -124,7 +124,7 @@ def main_setting_2(conn, num, db_set):
             sqlite_only = 'style="display:none;"' if db_set != 'sqlite' else ''
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('main_setting'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('main_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post" id="main_set_data">
                         <h2>1. ''' + load_lang('basic_set') + '''</h2>
@@ -272,7 +272,7 @@ def main_setting_2(conn, num, db_set):
             conn.commit()
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('text_setting'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('text_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post" id="main_set_data">
                         <h2>1. ''' + load_lang('register_text') + ''' (HTML)</h2>
@@ -414,7 +414,7 @@ def main_setting_2(conn, num, db_set):
                 sub_plus = ''
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang(data = 'main' + title, safe = 1), wiki_set(), custom(), other2(['(HTML)' + sub_plus, 0])],
+                imp = [load_lang(data = 'main' + title, safe = 1), wiki_set(), wiki_custom(), wiki_css(['(HTML)' + sub_plus, 0])],
                 data = '''
                     <form method="post">
                         ''' + start + '''
@@ -473,7 +473,7 @@ def main_setting_2(conn, num, db_set):
                 data = ''.join(lines)
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = ['robots.txt', wiki_set(), custom(), other2([0, 0])],
+                imp = ['robots.txt', wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <a href="/robots.txt">(''' + load_lang('view') + ''')</a>
                     <hr class="main_hr">
@@ -540,7 +540,7 @@ def main_setting_2(conn, num, db_set):
                 re_ver += '<option value="v3">v3</option><option value="">v2</option>'
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('ext_api_req_set'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('ext_api_req_set'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post" id="main_set_data">
                         <h2>1. ''' + load_lang('recaptcha') + '''</h2>
@@ -667,7 +667,7 @@ def main_setting_2(conn, num, db_set):
                     acl_div[i] += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('main_acl_setting'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('main_acl_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <a href="/acl/TEST#exp">(''' + load_lang('reference') + ''')</a>
@@ -742,7 +742,7 @@ def main_setting_2(conn, num, db_set):
                 ''
             
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('wiki_logo'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('wiki_logo'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         ''' + end_data + '''

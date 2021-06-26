@@ -1,13 +1,19 @@
 # Init
 from route import *
 
+# 전반적으로 전부 수정 필요
+raise
+
 # Init-Version
 version_list = json.loads(open('version.json', encoding = 'utf8').read())
 
 # Init-DB
 if os.path.exists(os.path.join('data', 'set.json')):
     db_set_list = ['db', 'db_type']
-    set_data = json.loads(open(os.path.join('data', 'set.json'), encoding = 'utf8').read())
+    set_data = json.loads(open(
+        os.path.join('data', 'set.json'), 
+        encoding = 'utf8'
+    ).read())
     for i in db_set_list:
         if not i in set_data:
             print('Please delete set.json')
@@ -118,7 +124,7 @@ create_data['data'] = ['title', 'data', 'type']
 create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
 create_data['rc'] = ['id', 'title', 'date', 'type']
 create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
-create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
+# create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
 create_data['user_set'] = ['name', 'id', 'data']
 create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token', 'email']
 create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
@@ -180,16 +186,20 @@ logging.basicConfig(level = logging.ERROR)
 app = flask.Flask(__name__, template_folder = './')
 app.config['JSON_AS_ASCII'] = False
 
-flask_reggie.Reggie(app)
-
 class EverythingConverter(werkzeug.routing.PathConverter):
     regex = '.*?'
+
+class RegexConverter(werkzeug.routing.BaseConverter):
+    def __init__(self, url_map, *items):
+        super(RegexConverter, self).__init__(url_map)
+        self.regex = items[0]
 
 app.jinja_env.filters['md5_replace'] = md5_replace
 app.jinja_env.filters['load_lang'] = load_lang
 app.jinja_env.filters['cut_100'] = cut_100
 
 app.url_map.converters['everything'] = EverythingConverter
+app.url_map.converters['regex'] = RegexConverter
 
 # Init-DB_Data
 curs.execute(db_change('select name from alist where acl = "owner"'))
@@ -409,15 +419,6 @@ def give_acl(name = None):
 @app.route('/admin/<name>', methods=['POST', 'GET'])
 def give_admin(name = None):
     return give_admin_2(conn, name)
-
-# Func-server
-@app.route('/restart', methods=['POST', 'GET'])
-def server_restart():
-    return server_restart_2(conn)
-
-@app.route('/update', methods=['GET', 'POST'])
-def server_now_update():
-    return server_now_update_2(conn, version_list['beta']['r_ver'])
 
 # Func-view
 @app.route('/xref/<everything:name>')
@@ -690,6 +691,14 @@ def api_sitemap():
     return api_sitemap_2(conn)
 
 # Func-main
+@app.route('/restart', methods=['POST', 'GET'])
+def main_restart():
+    return main_restart_2(conn)
+
+@app.route('/update', methods=['GET', 'POST'])
+def main_update():
+    return main_update_2(conn, version_list['beta']['r_ver'])
+
 @app.route('/random')
 def main_title_random():
     return main_title_random_2(conn)
@@ -725,8 +734,16 @@ def main_skin_set():
 def main_views(name = None):
     return main_views_2(conn, name)
 
-@app.route('/<data>')
-def main_file(data = None):
+@app.route('/test_func')
+def main_test_func():
+	return main_test_func_2(conn)
+
+@app.route('/shutdown')
+def main_shutdown():
+    return main_shutdown_2(conn)
+
+@app.route('/<regex("easter_egg\.html|\.(?:txt|xml)$"):data>')
+def main_file(data = ''):
     return main_file_2(conn, data)
 
 @app.errorhandler(404)
@@ -739,7 +756,7 @@ app.secret_key = rep_key
 class NoLoggingWSGIRequestHandler(wsgiref.simple_server.WSGIRequestHandler):
     def log_message(self, format, *args):
         pass
-
+	
 if __name__ == "__main__":    
     wsgiref.simple_server.make_server(
         server_set['host'], 

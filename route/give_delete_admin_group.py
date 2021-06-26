@@ -10,14 +10,14 @@ def give_delete_admin_group_2(conn, name):
         admin_check(None, 'alist del ' + name)
 
         curs.execute(db_change("delete from alist where name = ?"), [name])
-        curs.execute(db_change("update user set acl = 'user' where acl = ?"), [name])
+        curs.execute(db_change("update user_set set data = 'user' where name = 'acl' and data = ?"), [name])
 
         conn.commit()
 
         return redirect('/give_log')
     else:
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang("delete_admin_group"), wiki_set(), custom(), other2(['(' + name + ')', 0])],
+            imp = [load_lang("delete_admin_group"), wiki_set(), wiki_custom(), wiki_css(['(' + name + ')', 0])],
             data = '''
                 <form method=post>
                     <button type=submit>''' + load_lang('start') + '''</button>

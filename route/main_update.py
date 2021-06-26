@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def server_now_update_2(conn, r_ver):
+def main_update_2(conn, r_ver):
     curs = conn.cursor()
 
     if admin_check() != 1:
@@ -43,7 +43,7 @@ def server_now_update_2(conn, r_ver):
         return re_error('/error/34')
     else:
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('update'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('update'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = load_lang('update_warring') + '''
                 <hr class=\"main_hr\">
                 <ul class="inside_ul">

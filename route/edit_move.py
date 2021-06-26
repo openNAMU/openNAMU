@@ -156,7 +156,7 @@ def edit_move_2(conn, name):
             return redirect('/w/' + url_pas(move_title))
     else:
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('move') + ')', 0])],
+            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('move') + ')', 0])],
             data = '''
                 <form method="post">
                     ''' + ip_warring() + '''

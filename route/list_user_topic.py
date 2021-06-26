@@ -46,7 +46,7 @@ def list_user_topic_2(conn, name):
     div += next_fix('/topic_record/' + url_pas(name) + '?num=', num, data_list)
     
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('discussion_record'), wiki_set(), custom(), other2([sub, 0])],
+        imp = [load_lang('discussion_record'), wiki_set(), wiki_custom(), wiki_css([sub, 0])],
         data = div,
         menu = [
             ['other', load_lang('other')], 

@@ -35,7 +35,7 @@ def recent_history_tool_2(conn, name):
     data += '</ul>'
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [name, wiki_set(), custom(), other2(['(r' + num + ')', 0])],
+        imp = [name, wiki_set(), wiki_custom(), wiki_css(['(r' + num + ')', 0])],
         data = data,
         menu = [['history/' + url_pas(name), load_lang('return')]]
     ))

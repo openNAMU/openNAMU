@@ -40,7 +40,7 @@ def give_admin_groups_2(conn, name):
         data += ''
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('admin_group') + ')', 0])],
+            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('admin_group') + ')', 0])],
             data = '''
                 <form method="post">
                     ''' + data + '''

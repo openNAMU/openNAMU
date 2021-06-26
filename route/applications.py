@@ -66,7 +66,7 @@ def applications_2(conn):
             div += load_lang('no_applications_now')
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('application_list'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('application_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = div,
             menu = [['other', load_lang('return')]]
         ))

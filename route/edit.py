@@ -176,7 +176,7 @@ def edit_2(conn, name):
          }
 
         return easy_minify(flask.render_template(skin_check(), 
-            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('edit') + ')', 0])],
+            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('edit') + ')', 0])],
             data =  editor_top_text + add_get_file + '''
                 <span   id="server_set"
                         style="display: none;">''' + json.dumps(server_set) + '''</span>

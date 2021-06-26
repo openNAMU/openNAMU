@@ -70,7 +70,7 @@ def user_setting_2(conn, server_init):
             fa_data_pw = load_lang('2fa_password_change') if fa_data_pw else load_lang('2fa_password')
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('user_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <div id="get_user_info"></div>
@@ -122,7 +122,7 @@ def user_setting_2(conn, server_init):
                     div3 += '<option value="' + lang_data + '">' + see_data + '</option>'
             
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('user_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <div id="get_user_info"></div>

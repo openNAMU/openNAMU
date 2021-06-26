@@ -55,7 +55,7 @@ def topic_tool_2(conn, topic_num):
         '''
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('topic_tool'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('topic_tool'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
         data = data,
         menu = [['thread/' + topic_num, load_lang('return')]]
     ))

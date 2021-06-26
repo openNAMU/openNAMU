@@ -21,7 +21,7 @@ def list_give_2(conn):
     list_data += '</ul><hr class=\"main_hr\"><a href="/manager/8">(' + load_lang('add') + ')</a>'
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('admin_group_list'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('admin_group_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
         data = list_data,
         menu = [['manager', load_lang('return')]]
     ))    

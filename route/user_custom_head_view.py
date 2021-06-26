@@ -43,7 +43,7 @@ def user_custom_head_view_2(conn):
         ''
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang(data = 'user_head', safe = 1), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang(data = 'user_head', safe = 1), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = start + '''
                 <form method="post">
                     <textarea rows="25" cols="100" name="content">''' + data + '''</textarea>

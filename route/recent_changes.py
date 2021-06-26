@@ -200,7 +200,7 @@ def recent_changes_2(conn, name, tool):
             sub = 0
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [title, wiki_set(), custom(), other2([sub, 0])],
+            imp = [title, wiki_set(), wiki_custom(), wiki_css([sub, 0])],
             data = div,
             menu = menu
         ))

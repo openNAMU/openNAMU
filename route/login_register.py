@@ -109,7 +109,7 @@ def login_register_2(conn):
                 '''
                 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('register'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('register'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
                     ''' + contract + '''

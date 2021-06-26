@@ -223,7 +223,7 @@ def inter_wiki_plus_2(conn, tools, name):
             '''
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [title, wiki_set(), custom(), other2([get_sub, 0])],
+            imp = [title, wiki_set(), wiki_custom(), wiki_css([get_sub, 0])],
             data =  '''
                     <form method="post">
                         ''' + form_data + '''
