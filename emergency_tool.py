@@ -245,7 +245,10 @@ elif what_i_do == '7':
         else:
             hashed = hashlib.sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
 
-    curs.execute(db_change("update user set pw = ? where id = ?"), [hashed, user_name])
+    curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [
+        hashed, 
+        user_name
+    ])
 elif what_i_do == '8':
     print('----')
     print('Insert version (0000000) : ', end = '')
@@ -269,7 +272,7 @@ elif what_i_do == '10':
     print('New name : ', end = '')
     new_name = input()
 
-    curs.execute(db_change("update user set id = ? where id = ?"), [new_name, user_name])
+    curs.execute(db_change("update user_set set id = ? where id = ?"), [new_name, user_name])
 elif what_i_do == '11':
     try:
         os.remove('data/mysql.json')
@@ -294,7 +297,7 @@ elif what_i_do == '15':
     print('User name : ', end = '')
     user_name = input()
 
-    curs.execute(db_change("update user set acl = 'owner' where id = ?"), [user_name])
+    curs.execute(db_change("update user_set set data = 'owner' where id = ? and name = 'acl'"), [user_name])
 elif what_i_do == '16':
     print('----')
     print('User name : ', end = '')

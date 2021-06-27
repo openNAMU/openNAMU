@@ -470,7 +470,14 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
 
     re_data = 1 if pw_encode(data, set_data) == data2 else 0
     if db_data[0][0] != set_data and re_data == 1 and id_d != '':
-        curs.execute(db_change("update user set pw = ?, encode = ? where id = ?"), [pw_encode(data), db_data[0][0], id_d])
+        curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [
+            pw_encode(data), 
+            id_d
+        ])
+        curs.execute(db_change("update user_set set data = ? where id = ? and name = 'encode'"), [
+            db_data[0][0], 
+            id_d
+        ])
 
     return re_data
         
@@ -665,7 +672,7 @@ def wiki_custom():
             user_admin = '1'
             user_acl_list = []
 
-            curs.execute(db_change("select acl from user where id = ?"), [ip])
+            curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
             curs.execute(db_change('select acl from alist where name = ?'), [curs.fetchall()[0][0]])
             user_acl = curs.fetchall()
             for i in user_acl:
@@ -878,7 +885,7 @@ def admin_check(num = None, what = None, name = ''):
     ip = ip_check() if name == '' else name
     time_data = get_time()
 
-    curs.execute(db_change("select acl from user where id = ?"), [ip])
+    curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
     user = curs.fetchall()
     if user:
         back_num = num
@@ -1047,7 +1054,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                     if admin_check(num) == 1:
                         return 0
                     else:
-                        curs.execute(db_change("select date from user where id = ?"), [ip])
+                        curs.execute(db_change("select data from user_set where id = ? and name = 'date'"), [ip])
                         user_date = curs.fetchall()[0][0]
                         
                         time_1 = datetime.datetime.strptime(user_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days = 30)

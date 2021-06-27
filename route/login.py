@@ -19,10 +19,19 @@ def login_2(conn):
         user_agent = flask.request.headers.get('User-Agent', '')
         user_id = flask.request.form.get('id', '')
 
-        curs.execute(db_change("select pw, encode from user where id = ?"), [user_id])
-        user = curs.fetchall()
-        if not user:
+        user_data = {}
+        curs.execute(db_change("" + \
+            "select name, data from user_set " + \
+            "where id = ? and (name = 'pw' or name = 'encode')" + \
+        ""), [
+            user_id
+        ])
+        sql_data = curs.fetchall()
+        if not sql_data:
             return re_error('/error/2')
+        else:
+            for i in sql_data:
+                user_data[i[0]] = i[1]
 
         pw_check_d = pw_check(
             flask.request.form.get('pw', ''),
