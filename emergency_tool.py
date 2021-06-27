@@ -70,7 +70,10 @@ if data_db_load == 'Y':
     if set_data['db_type'] == 'mysql':
         if not os.path.exists(os.path.join('data', 'mysql.json')):
             db_set_list = ['user', 'password', 'host', 'port']
-            set_data = json.loads(open(os.path.join('data', 'mysql.json'), encoding = 'utf8').read())
+            set_data = json.loads(open(
+                os.path.join('data', 'mysql.json'), 
+                encoding = 'utf8'
+            ).read())
             for i in db_set_list:
                 if not i in set_data:
                     print('Please delete mysql.json')
@@ -164,7 +167,12 @@ if what_i_do == '1':
     print('----')
     print('Load...')
 
-    curs.execute(db_change("select title from data d where not exists (select title from back where link = d.title limit 1)"))
+    curs.execute(db_change("" + \
+        "select title from data d " + \
+        "where not exists (" + \
+            "select title from back where link = d.title limit 1" + \
+        ")" + \
+    ""))
     title = curs.fetchall()
 
     print('----')
@@ -192,8 +200,11 @@ elif what_i_do == '3':
     print('IP or Name : ', end = '')
     user_data = input()
 
-    curs.execute(db_change("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)"),
-        [user_data,
+    curs.execute(db_change("" + \
+        "insert into rb (block, end, today, blocker, why, band) " + \
+        "values (?, ?, ?, ?, ?, ?)"
+    ), [
+        user_data,
         'release',
         get_time(),
         'tool:emergency',
@@ -259,10 +270,8 @@ elif what_i_do == '8':
 
     curs.execute(db_change("update other set data = ? where name = 'ver'"), [new_ver])
 elif what_i_do == '9':
-    try:
-        os.remove('data/set.json')
-    except:
-        pass
+    if os.path.exists(os.path.join('data', 'set.json')):
+        os.remove(os.path.join('data', 'set.json'))
 elif what_i_do == '10':
     print('----')
     print('User name : ', end = '')
@@ -272,12 +281,13 @@ elif what_i_do == '10':
     print('New name : ', end = '')
     new_name = input()
 
-    curs.execute(db_change("update user_set set id = ? where id = ?"), [new_name, user_name])
+    curs.execute(db_change("update user_set set id = ? where id = ?"), [
+        new_name, 
+        user_name
+    ])
 elif what_i_do == '11':
-    try:
-        os.remove('data/mysql.json')
-    except:
-        pass
+    if os.path.exists(os.path.join('data', 'mysql.json')):
+        os.remove(os.path.join('data', 'mysql.json'))
 elif what_i_do == '12':
     curs.execute(db_change("select count(*) from data"))
     count_data = curs.fetchall()
@@ -287,7 +297,9 @@ elif what_i_do == '12':
         count_data = 0
 
     curs.execute(db_change('delete from other where name = "count_all_title"'))
-    curs.execute(db_change('insert into other (name, data) values ("count_all_title", ?)'), [str(count_data)])
+    curs.execute(db_change('insert into other (name, data) values ("count_all_title", ?)'), [
+        str(count_data)
+    ])
 elif what_i_do == '13':
     curs.execute(db_change('delete from cache_data'))
 elif what_i_do == '14':

@@ -1,5 +1,4 @@
 flask
-flask-reggie
 
 requests
 

@@ -290,21 +290,54 @@ def update(ver_num, set_data):
             curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[2], 'dis'])
             curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[3], 'view'])
             curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[4], 'why'])
-          
-    # 캐시 초기화
+
     if ver_num < 3300101:
+        # 캐시 초기화
         curs.execute(db_change('delete from cache_data'))
     
     if ver_num < 3300301:
+        # regex_filter 오류 해결
         curs.execute(db_change('delete from html_filter where kind = "regex_filter" and html is null'))
         
     if ver_num < 3302302:
+        # user이랑 user_set 테이블의 통합
         curs.execute(db_change('select id, pw, acl, date, encode from user'))
         for i in curs.fetchall():
-            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['pw', i[0], i[1]])
-            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['acl', i[0], i[2]])
-            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['date', i[0], i[3]])
-            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['encode', i[0], i[4]])
+            curs.execute(db_change(
+                "insert into user_set (name, id, data) values (?, ?, ?)"
+            ), ['pw', i[0], i[1]])
+            curs.execute(db_change(
+                "insert into user_set (name, id, data) values (?, ?, ?)"
+            ), ['acl', i[0], i[2]])
+            curs.execute(db_change(
+                "insert into user_set (name, id, data) values (?, ?, ?)"
+            ), ['date', i[0], i[3]])
+            curs.execute(db_change(
+                "insert into user_set (name, id, data) values (?, ?, ?)"
+            ), ['encode', i[0], i[4]])
+            
+    if ver_num < 3400101:
+        # user_set이랑 user_application 테이블의 통합
+        curs.execute(db_change('' + \
+            'select id, pw, date, encode, question, answer, ip, ua, email ' + \
+            'from user_application' + \
+        ''))
+        for i in curs.fetchall():
+            sql_data = {}
+            sql_data['id'] = i[0]
+            sql_data['pw'] = i[1]
+            sql_data['date'] = i[2]
+            sql_data['encode'] = i[3]
+            sql_data['question'] = i[4]
+            sql_data['answer'] = i[5]
+            sql_data['ip'] = i[6]
+            sql_data['ua'] = i[7]
+            sql_data['email'] = i[8]
+            
+            curs.execute(db_change(
+                "insert into user_set (name, id, data) values (?, ?, ?)"
+            ), ['application', i[0], json.dumps(sql_data)])
+            
     
     conn.commit()
 

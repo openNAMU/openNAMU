@@ -59,31 +59,37 @@ def login_check_key_2(conn, tool):
 
                     return re_error('/error/6')
             
-                curs.execute(db_change("select id from user_application where id = ?"), [flask.session['c_id']])
+                curs.execute(db_change("select id from user_set where id = ? and name = 'application'"), [
+                    flask.session['c_id']
+                ])
                 if curs.fetchall():
                     for i in re_set_list:
                         flask.session.pop(i, None)
 
                     return re_error('/error/6')
 
-                curs.execute(db_change('select data from other where name = "requires_approval"'))
+                curs.execute(db_change(
+                    'select data from other where name = "requires_approval"'
+                ))
                 requires_approval = curs.fetchall()
                 if requires_approval and requires_approval[0][0] == 'on':
-                    application_token = load_random_key(32)
+                    user_app_data = {}
+                    user_app_data['id'] = flask.session['c_id']
+                    user_app_data['pw'] = flask.session['c_pw']
+                    user_app_data['date'] = get_time()
+                    user_app_data['encode'] = db_data[0][0]
+                    user_app_data['question'] = flask.session['c_que']
+                    user_app_data['answer'] = flask.session['c_ans']
+                    user_app_data['ip'] = ip
+                    user_app_data['ua'] = user_agent
+                    user_app_data['email'] = flask.session['c_email']
+                    
                     curs.execute(db_change(
-                        "insert into user_application (id, pw, date, encode, question, answer, token, ip, ua, email) " + \
-                        "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                        "insert into user_set (id, name, data) values (?, ?, ?)"
                     ), [
                         flask.session['c_id'],
-                        flask.session['c_pw'],
-                        get_time(),
-                        db_data[0][0],
-                        flask.session['c_que'],
-                        flask.session['c_ans'],
-                        application_token,
-                        ip,
-                        user_agent,
-                        flask.session['c_email']
+                        'application',
+                        json.dumps(user_app_data)
                     ])
                     conn.commit()
     

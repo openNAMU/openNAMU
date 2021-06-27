@@ -48,10 +48,6 @@ def login_register_2(conn):
         curs.execute(db_change("select id from user_set where id = ?"), [user_id])
         if curs.fetchall():
             return re_error('/error/6')
-    
-        curs.execute(db_change("select id from user_application where id = ?"), [user_id])
-        if curs.fetchall():
-            return re_error('/error/6')
 
         hashed = pw_encode(user_pw)
         ans_q = flask.request.form.get('approval_question_answer', '')

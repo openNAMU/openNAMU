@@ -1,9 +1,6 @@
 # Init
 from route import *
 
-# 전반적으로 전부 수정 필요
-raise
-
 # Init-Version
 version_list = json.loads(open('version.json', encoding = 'utf8').read())
 
@@ -124,9 +121,11 @@ create_data['data'] = ['title', 'data', 'type']
 create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
 create_data['rc'] = ['id', 'title', 'date', 'type']
 create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
+# 제거 완료
 # create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
 create_data['user_set'] = ['name', 'id', 'data']
-create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token', 'email']
+# 제거 완료
+# create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token', 'email']
 create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
 create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
 create_data['back'] = ['title', 'link', 'type']
@@ -674,7 +673,7 @@ def api_search(name = ''):
 def api_recent_change():
     return api_recent_change_2(conn)
 
-@app.route('/api/sha224/<everything:name>')
+@app.route('/api/sha224/<everything:name>', methods=['POST', 'GET'])
 def api_sha224(name = 'test'):
     return api_sha224_2(conn, name)
 
@@ -682,7 +681,7 @@ def api_sha224(name = 'test'):
 def api_title_index():
     return api_title_index_2(conn)
 
-@app.route('/api/image/<everything:name>')
+@app.route('/api/image/<everything:name>', methods=['POST', 'GET'])
 def api_image_view(name = ''):
     return api_image_view_2(conn, name)
 
