@@ -127,7 +127,7 @@ function load_preview(name) {
 
     var xhr_2 = new XMLHttpRequest();
     xhr_2.open("GET", url_2, true);
-    xhr_2.send(null);
+    xhr_2.send();
 
     xhr.onreadystatechange = function() {
         if(xhr.readyState === 4 && xhr.status === 200) {
