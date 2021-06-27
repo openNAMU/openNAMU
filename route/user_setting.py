@@ -23,7 +23,7 @@ def user_setting_2(conn, server_init):
                 twofa_pw = flask.request.form.get('2fa_pw', '')
                 if twofa_pw != '':
                     twofa_pw = pw_encode(twofa_pw)
-                    curs.execute(db_change("select encode from user where id = ?"), [ip])
+                    curs.execute(db_change("select data from user_set where id = ? and name = 'encode'"), [ip])
                     twofa_encode = curs.fetchall()[0][0]
                     auto_list += [['2fa', 'on'], ['2fa_pw', twofa_pw], ['2fa_pw_encode', twofa_encode]]
                 else:

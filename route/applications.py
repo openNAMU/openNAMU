@@ -81,26 +81,48 @@ def applications_2(conn):
             
             application = application[0]
 
-            curs.execute(db_change("select id from user where id = ?"), [application[0]])
+            curs.execute(db_change("select id from user_set where id = ?"), [application[0]])
             if curs.fetchall():
                 return re_error('/error/6')
             
-            curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, 'user', ?, ?)"), [
-                application[0], 
-                application[1], 
-                application[2], 
+            curs.execute(db_change("insert into user_set (id, name, data) values (?, 'pw', ?)"), [
+                application[0],
+                application[1]
+            ])
+            curs.execute(db_change("insert into user_set (id, name, data) values (?, 'acl', 'user')"), [
+                application[0]
+            ])
+            curs.execute(db_change("insert into user_set (id, name, data) values (?, 'date', ?)"), [
+                application[0],
+                application[2]
+            ])
+            curs.execute(db_change("insert into user_set (id, name, data) values (?, 'encode', ?)"), [
+                application[0],
                 application[3]
             ])
-            curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question', ?, ?)"), [application[0], application[4]])
-            curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question_answer', ?, ?)"), [application[0], application[5]])
+            curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question', ?, ?)"), [
+                application[0], 
+                application[4]
+            ])
+            curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question_answer', ?, ?)"), [
+                application[0], 
+                application[5]
+            ])
             ua_plus(application[0], application[6], application[7], application[2])
             if application[8] and application[8] != '':
-                curs.execute(db_change("insert into user_set (name, id, data) values ('email', ?, ?)"), [application[0], application[8]])
+                curs.execute(db_change("insert into user_set (name, id, data) values ('email', ?, ?)"), [
+                    application[0], 
+                    application[8]
+                ])
             
-            curs.execute(db_change('delete from user_application where token = ?'), [flask.request.form.get('approve', '')])
+            curs.execute(db_change('delete from user_application where token = ?'), [
+                flask.request.form.get('approve', '')
+            ])
             conn.commit()
         elif flask.request.form.get('decline', '') != '':
-            curs.execute(db_change('delete from user_application where token = ?'), [flask.request.form.get('decline', '')])
+            curs.execute(db_change('delete from user_application where token = ?'), [
+                flask.request.form.get('decline', '')
+            ])
             conn.commit()
 
         return redirect('/applications')

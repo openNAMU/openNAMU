@@ -52,7 +52,7 @@ def topic_2(conn, topic_num):
                     if u_data:
                         y_check = 1
             else:
-                curs.execute(db_change("select id from user where id = ?"), [match])
+                curs.execute(db_change("select id from user_set where id = ?"), [match])
                 u_data = curs.fetchall()
                 if u_data:
                     y_check = 1

@@ -45,7 +45,7 @@ def login_register_2(conn):
         if len(user_id) > 32:
             return re_error('/error/7')
 
-        curs.execute(db_change("select id from user where id = ?"), [user_id])
+        curs.execute(db_change("select id from user_set where id = ?"), [user_id])
         if curs.fetchall():
             return re_error('/error/6')
     
