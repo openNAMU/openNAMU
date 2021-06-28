@@ -163,7 +163,7 @@ def applications_2(conn):
             ])
             conn.commit()
         elif flask.request.form.get('decline', '') != '':
-             curs.execute(db_change(
+            curs.execute(db_change(
                 'delete from user_set where id = ? and name = "application"'
             ), [
                 flask.request.form.get('decline', '')
