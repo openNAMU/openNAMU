@@ -5,9 +5,14 @@ def list_admin_2(conn):
 
     div = '<ul class="inside_ul">'
 
-    curs.execute(db_change("select id, data from user_set where name = 'acl' and not data = 'user'"))
+    curs.execute(db_change(
+        "select id, data from user_set where name = 'acl' and not data = 'user'"
+    ))
     for data in curs.fetchall():
-        name = ip_pas(data[0]) + ' <a href="/admin_plus/' + url_pas(data[1]) + '">(' + data[1] + ')</a>'
+        name = '' + \
+            ip_pas(data[0]) + ' ' + \
+            '<a href="/admin_plus/' + url_pas(data[1]) + '">(' + data[1] + ')</a>' + \
+        ''
 
         div += '<li>' + name + '</li>'
 

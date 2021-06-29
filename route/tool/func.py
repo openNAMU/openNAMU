@@ -182,13 +182,27 @@ def update(ver_num, set_data):
         curs.execute(db_change("select html from html_filter where kind = 'extension'"))
         if not curs.fetchall():
             for i in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
-                curs.execute(db_change("insert into html_filter (html, kind) values (?, 'extension')"), [i])
+                curs.execute(db_change(
+                    "insert into html_filter (html, kind) values (?, 'extension')"
+                ), [i])
 
     if ver_num < 3170400:
         curs.execute(db_change("select title, sub, code from topic where id = '1'"))
         for i in curs.fetchall():
-            curs.execute(db_change("update topic set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
-            curs.execute(db_change("update rd set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
+            curs.execute(db_change(
+                "update topic set code = ? where title = ? and sub = ?"
+            ), [
+                i[2], 
+                i[0], 
+                i[1]
+            ])
+            curs.execute(db_change(
+                "update rd set code = ? where title = ? and sub = ?"
+            ), [
+                i[2], 
+                i[0], 
+                i[1]
+            ])
 
     if ver_num < 3171800:
         curs.execute(db_change("select data from other where name = 'recaptcha'"))
@@ -196,7 +210,9 @@ def update(ver_num, set_data):
         if change_rec and change_rec[0][0] != '':
             new_rec = re.search(r'data-sitekey="([^"]+)"', change_rec[0][0])
             if new_rec:
-                curs.execute(db_change("update other set data = ? where name = 'recaptcha'"), [new_rec.group(1)])
+                curs.execute(db_change(
+                    "update other set data = ? where name = 'recaptcha'"
+                ), [new_rec.group(1)])
             else:
                 curs.execute(db_change("update other set data = '' where name = 'recaptcha'"))
                 curs.execute(db_change("update other set data = '' where name = 'sec_re'"))
@@ -210,14 +226,18 @@ def update(ver_num, set_data):
     if ver_num < 3183603:
         curs.execute(db_change("select block from ban where band = 'O'"))
         for i in curs.fetchall():
-            curs.execute(db_change("update ban set block = ?, band = 'regex' where block = ? and band = 'O'"), [
+            curs.execute(db_change(
+                "update ban set block = ?, band = 'regex' where block = ? and band = 'O'"
+            ), [
                 '^' + i[0].replace('.', '\\.'),
                 i[0]
             ])
 
         curs.execute(db_change("select block from rb where band = 'O'"))
         for i in curs.fetchall():
-            curs.execute(db_change("update rb set block = ?, band = 'regex' where block = ? and band = 'O'"), [
+            curs.execute(db_change(
+                "update rb set block = ?, band = 'regex' where block = ? and band = 'O'"
+            ), [
                 '^' + i[0].replace('.', '\\.'),
                 i[0]
             ])
@@ -227,7 +247,10 @@ def update(ver_num, set_data):
 
         curs.execute(db_change("select block, end, why, band, login from ban"))
         for i in curs.fetchall():
-            curs.execute(db_change("insert into rb (block, end, today, why, band, login, ongoing) values (?, ?, ?, ?, ?, ?, ?)"), [
+            curs.execute(db_change(
+                "insert into rb (block, end, today, why, band, login, ongoing) " + \
+                "values (?, ?, ?, ?, ?, ?, ?)"
+            ), [
                 i[0],
                 i[1],
                 today_time,
@@ -246,7 +269,9 @@ def update(ver_num, set_data):
         ''))
         data_list = curs.fetchall()
         for get_data in data_list:
-            curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [
+            curs.execute(db_change(
+                "insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"
+            ), [
                 get_data[0], 
                 get_data[1],
                 get_data[2]
@@ -261,7 +286,10 @@ def update(ver_num, set_data):
     if ver_num < 3202600:
         curs.execute(db_change("select name, regex, sub from filter"))
         for i in curs.fetchall():
-            curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'regex_filter', ?, ?)"), [
+            curs.execute(db_change(
+                "insert into html_filter (html, kind, plus, plus_t) " + \
+                "values (?, 'regex_filter', ?, ?)"
+            ), [
                 i[0], 
                 i[1],
                 i[2]
@@ -269,7 +297,9 @@ def update(ver_num, set_data):
 
         curs.execute(db_change("select title, link, icon from inter"))
         for i in curs.fetchall():
-            curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'inter_wiki', ?, ?)"), [
+            curs.execute(db_change(
+                "insert into html_filter (html, kind, plus, plus_t) " + \
+                "values (?, 'inter_wiki', ?, ?)"), [
                 i[0], 
                 i[1],
                 i[2]
@@ -278,7 +308,9 @@ def update(ver_num, set_data):
     if ver_num < 3203400:
         curs.execute(db_change("select user, css from custom"))
         for i in curs.fetchall():
-            curs.execute(db_change("insert into user_set (name, id, data) values ('custom_css', ?, ?)"), [
+            curs.execute(db_change(
+                "insert into user_set (name, id, data) values ('custom_css', ?, ?)"
+            ), [
                 re.sub(r' \(head\)$', '', i[0]), 
                 i[1]
             ])
@@ -286,10 +318,18 @@ def update(ver_num, set_data):
     if ver_num < 3205500:
         curs.execute(db_change("select title, decu, dis, view, why from acl"))
         for i in curs.fetchall():
-            curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[1], 'decu'])
-            curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[2], 'dis'])
-            curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[3], 'view'])
-            curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[4], 'why'])
+            curs.execute(db_change(
+                "insert into acl (title, data, type) values (?, ?, ?)"
+            ), [i[0], i[1], 'decu'])
+            curs.execute(db_change(
+                "insert into acl (title, data, type) values (?, ?, ?)"
+            ), [i[0], i[2], 'dis'])
+            curs.execute(db_change(
+                "insert into acl (title, data, type) values (?, ?, ?)"
+            ), [i[0], i[3], 'view'])
+            curs.execute(db_change(
+                "insert into acl (title, data, type) values (?, ?, ?)"
+            ), [i[0], i[4], 'why'])
 
     if ver_num < 3300101:
         # 캐시 초기화
@@ -297,7 +337,9 @@ def update(ver_num, set_data):
     
     if ver_num < 3300301:
         # regex_filter 오류 해결
-        curs.execute(db_change('delete from html_filter where kind = "regex_filter" and html is null'))
+        curs.execute(db_change(
+            'delete from html_filter where kind = "regex_filter" and html is null'
+        ))
         
     if ver_num < 3302302:
         # user이랑 user_set 테이블의 통합
@@ -348,17 +390,30 @@ def set_init():
     curs.execute(db_change("select html from html_filter where kind = 'email'"))
     if not curs.fetchall():
         for i in ['naver.com', 'gmail.com', 'daum.net', 'kakao.com']:
-            curs.execute(db_change("insert into html_filter (html, kind) values (?, 'email')"), [i])
+            curs.execute(db_change(
+                "insert into html_filter (html, kind) values (?, 'email')"
+            ), [i])
 
     curs.execute(db_change("select html from html_filter where kind = 'extension'"))
     if not curs.fetchall():
         for i in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
-            curs.execute(db_change("insert into html_filter (html, kind) values (?, 'extension')"), [i])
+            curs.execute(db_change(
+                "insert into html_filter (html, kind) values (?, 'extension')"
+            ), [i])
 
-    curs.execute(db_change('select data from other where name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
+    curs.execute(db_change(
+        'select data from other ' + \
+        'where name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'
+    ))
     if not curs.fetchall():
-        for i in [['smtp_server', 'smtp.gmail.com'], ['smtp_port', '587'], ['smtp_security', 'starttls']]:
-            curs.execute(db_change("insert into other (name, data) values (?, ?)"), [i[0], i[1]])
+        for i in [
+            ['smtp_server', 'smtp.gmail.com'],
+            ['smtp_port', '587'], 
+            ['smtp_security', 'starttls']
+        ]:
+            curs.execute(db_change(
+                "insert into other (name, data) values (?, ?)"
+            ), [i[0], i[1]])
 
 # Func-simple
 def load_image_url():
@@ -373,7 +428,9 @@ def http_warring():
         <div id="http_warring_text"></div>
         <script>
             if(window.location.protocol !== 'https:') {
-                document.getElementById('http_warring_text').innerHTML = "''' + load_lang('http_warring') + '''";
+                document.getElementById('http_warring_text').innerHTML = "''' + \
+                    load_lang('http_warring') + \
+                '''";
                 document.getElementById('http_warring_text').style.margin = "10px 0px 0px 0px";
             }
         </script>
@@ -387,7 +444,11 @@ def load_domain():
     return domain
 
 def load_random_key(long = 64):
-    return ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(long))
+    return ''.join(
+        random.choice(
+            "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        ) for i in range(long)
+    )
 
 def edit_button():
     insert_list = []
@@ -399,12 +460,16 @@ def edit_button():
 
     data = ''
     for insert_data in insert_list:
-        data += '<a href="javascript:do_insert_data(\'content\', \'' + insert_data[0] + '\')">(' + insert_data[1] + ')</a> '
+        data += '' + \
+            '<a href="' + \
+                'javascript:do_insert_data(\'content\', \'' + insert_data[0] + '\')' + \
+            '">(' + insert_data[1] + ')</a> ' + \
+        ''
 
-    if admin_check() == 1:
-        data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')</a>'
-
-    return data + '<hr class="main_hr">'
+    data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')</a>'
+    data += '<hr class="main_hr">'
+    
+    return data
 
 def ip_warring():
     if ip_or_user() != 0:
@@ -906,6 +971,9 @@ def captcha_post(re_data, num = 1):
 
 # Func-user
 def ip_or_user(data = ''):
+    # 1 == ip
+    # 0 == reg
+    
     if data == '':
         data = ip_check()
 
@@ -918,47 +986,54 @@ def admin_check(num = None, what = None, name = ''):
     ip = ip_check() if name == '' else name
     time_data = get_time()
 
-    curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
-    user = curs.fetchall()
-    if user:
-        back_num = num
-        while 1:
-            if num == 1:
-                check = 'ban'
-            elif num == 2:
-                check = 'nothing'
-            elif num == 3:
-                check = 'toron'
-            elif num == 4:
-                check = 'check'
-            elif num == 5:
-                check = 'acl'
-            elif num == 6:
-                check = 'hidel'
-            elif num == 7:
-                check = 'give'
+    if ip_or_user(ip) == 0:
+        curs.execute(db_change(
+            "select data from user_set where id = ? and name = 'acl'"
+        ), [ip])
+        user_auth = curs.fetchall()
+        if user_auth:
+            user_auth = user_auth[0][0]
+            
+            check = {
+                0 : 'owner',
+                1 : 'ban',
+                2 : 'nothing',
+                3 : 'toron',
+                4 : 'check',
+                5 : 'acl',
+                6 : 'hidel',
+                7 : 'give'
+            }
+            if not num:
+                check = check[0]
+            elif num == 'all':
+                check = [check[i] for i in check]
             else:
-                check = 'owner'
+                check = check[num]
 
-            curs.execute(db_change('select name from alist where name = ? and acl = ?'), [user[0][0], check])
+            curs.execute(db_change(
+                'select name from alist where name = ? and acl = "owner"'
+            ), [user_auth])
             if curs.fetchall():
-                if what:
-                    curs.execute(db_change("insert into re_admin (who, what, time) values (?, ?, ?)"), [ip, what, time_data])
-                    conn.commit()
-
                 return 1
             else:
-                if back_num == 'all':
-                    if num == 'all':
-                        num = 1
-                    elif num != 8:
-                        num += 1
-                    else:
-                        break
-                elif num:
-                    num = None
+                if num == 'all':                    
+                    curs.execute(db_change(
+                        'select name from alist where name = ?'
+                    ), [user_auth])
                 else:
-                    break
+                    curs.execute(db_change(
+                        'select name from alist where name = ? and acl = ?'
+                    ), [user_auth, check])
+                    
+                if curs.fetchall():
+                    if what:
+                        curs.execute(db_change(
+                            "insert into re_admin (who, what, time) values (?, ?, ?)"
+                        ), [ip, what, time_data])
+                        conn.commit()
+
+                    return 1
 
     return 0
 
@@ -975,7 +1050,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
         if admin_check(5) == 1:
             return 0
 
-        curs.execute(db_change("select data from acl where title = ? and type = 'decu'"), ['user:' + acl_n[0]])
+        curs.execute(db_change(
+            "select data from acl where title = ? and type = 'decu'"
+        ), ['user:' + acl_n[0]])
         acl_data = curs.fetchall()
         if acl_data:
             if acl_data[0][0] == 'all':
@@ -1008,7 +1085,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
     for i in range(0, end):
         if tool == '':
             if i == 0:
-                curs.execute(db_change("select data from acl where title = ? and type = 'decu'"), [name])
+                curs.execute(db_change(
+                    "select data from acl where title = ? and type = 'decu'"
+                ), [name])
             else:
                 curs.execute(db_change('select data from other where name = "edit"'))
 
@@ -1017,7 +1096,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             if i == 0 and topic_num:
                 curs.execute(db_change("select acl from rd where code = ?"), [topic_num])
             elif i == 1:
-                curs.execute(db_change("select data from acl where title = ? and type = 'dis'"), [name])
+                curs.execute(db_change(
+                    "select data from acl where title = ? and type = 'dis'"
+                ), [name])
             else:
                 curs.execute(db_change('select data from other where name = "discussion"'))
 
@@ -1032,7 +1113,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             num = 5
         elif tool == 'vote':
             if i == 0:
-                curs.execute(db_change('select acl from vote where id = ? and user = ""'), [topic_num])
+                curs.execute(db_change(
+                    'select acl from vote where id = ? and user = ""'
+                ), [topic_num])
             else:
                 curs.execute(db_change('select data from other where name = "vote_acl"'))
 
@@ -1040,14 +1123,19 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
         else:
             # tool == 'render'
             if i == 0:
-                curs.execute(db_change("select data from acl where title = ? and type = 'view'"), [name])
+                curs.execute(db_change(
+                    "select data from acl where title = ? and type = 'view'"
+                ), [name])
             else:
                 curs.execute(db_change("select data from other where name = 'all_view_acl'"))
 
             num = 5
 
         acl_data = curs.fetchall()
-        if  (i == (end - 1) and (not acl_data or acl_data[0][0] == '' or acl_data[0][0] == 'normal')) and \
+        if  (
+                i == (end - 1) and \
+                (not acl_data or acl_data[0][0] == '' or acl_data[0][0] == 'normal')
+            ) and \
             get_ban == 1 and \
             tool != 'render':
             return 1
@@ -1069,7 +1157,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                     if admin_check(num) == 1:
                         return 0
                     else:
-                        curs.execute(db_change("select count(*) from history where ip = ?"), [ip])
+                        curs.execute(db_change(
+                            "select count(*) from history where ip = ?"
+                        ), [ip])
                         count = curs.fetchall()
                         count = count[0][0] if count else 0
                         if count >= 50:
@@ -1079,7 +1169,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                     if admin_check(num) == 1:
                         return 0
                 
-                curs.execute(db_change("select ip from history where title = ? and ip = ?"), [name, ip])
+                curs.execute(db_change(
+                    "select ip from history where title = ? and ip = ?"
+                ), [name, ip])
                 if curs.fetchall():
                     return 0
             elif acl_data[0][0] == '30_day':
@@ -1087,11 +1179,19 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                     if admin_check(num) == 1:
                         return 0
                     else:
-                        curs.execute(db_change("select data from user_set where id = ? and name = 'date'"), [ip])
+                        curs.execute(db_change(
+                            "select data from user_set where id = ? and name = 'date'"
+                        ), [ip])
                         user_date = curs.fetchall()[0][0]
                         
-                        time_1 = datetime.datetime.strptime(user_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days = 30)
-                        time_2 = datetime.datetime.strptime(get_time(), '%Y-%m-%d %H:%M:%S')
+                        time_1 = datetime.datetime.strptime(
+                            user_date, 
+                            '%Y-%m-%d %H:%M:%S'
+                        ) + datetime.timedelta(days = 30)
+                        time_2 = datetime.datetime.strptime(
+                            get_time(), 
+                            '%Y-%m-%d %H:%M:%S'
+                        )
                         
                         if time_2 > time_1:
                             return 0
@@ -1100,7 +1200,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                     if admin_check(num) == 1:
                         return 0
                     else:
-                        curs.execute(db_change("select data from user_set where id = ? and name = 'email'"), [ip])
+                        curs.execute(db_change(
+                            "select data from user_set where id = ? and name = 'email'"
+                        ), [ip])
                         if curs.fetchall():
                             return 0
             elif acl_data[0][0] == 'owner':
@@ -1114,7 +1216,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
         else:
             if i == (end - 1):
                 if tool == 'topic' and topic_num:
-                    curs.execute(db_change("select title from rd where code = ? and stop != ''"), [topic_num])
+                    curs.execute(db_change(
+                        "select title from rd where code = ? and stop != ''"
+                    ), [topic_num])
                     if curs.fetchall():
                         if admin_check(3, 'topic (code ' + topic_num + ')') == 1:
                             return 0
@@ -1131,7 +1235,9 @@ def ban_check(ip = None, tool = None):
     if admin_check(None, None, ip) == 1:
         return 0
 
-    curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [get_time()])
+    curs.execute(db_change(
+        "update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"
+    ), [get_time()])
     conn.commit()
 
     curs.execute(db_change("" + \
@@ -1150,7 +1256,9 @@ def ban_check(ip = None, tool = None):
 
     curs.execute(db_change("" + \
         "select login from rb " + \
-        "where ((end > ? and end != '') or end = '') and block = ? and band = '' and ongoing = '1'" + \
+        "where ((end > ? and end != '') or end = '') and block = ? and " + \
+            "band = '' and ongoing = '1'" + \
+        "" + \
     ""), [get_time(), ip])
     ban_d = curs.fetchall()
     if ban_d:
@@ -1214,11 +1322,17 @@ def slow_edit_check():
     if slow_edit and slow_edit != '0' and admin_check(5) != 1:
         slow_edit = slow_edit[0][0]
 
-        curs.execute(db_change("select date from history where ip = ? order by date desc limit 1"), [ip_check()])
+        curs.execute(db_change(
+            "select date from history where ip = ? order by date desc limit 1"
+        ), [ip_check()])
         last_edit_data = curs.fetchall()
         if last_edit_data:
             last_edit_data = int(re.sub(' |:|-', '', last_edit_data[0][0]))
-            now_edit_data = int((datetime.datetime.now() - datetime.timedelta(seconds = int(slow_edit))).strftime("%Y%m%d%H%M%S"))
+            now_edit_data = int(
+                (datetime.datetime.now() - datetime.timedelta(
+                    seconds = int(slow_edit))
+                ).strftime("%Y%m%d%H%M%S")
+            )
 
             if last_edit_data > now_edit_data:
                 return 1
@@ -1227,7 +1341,9 @@ def slow_edit_check():
 
 def edit_filter_do(data):
     if admin_check(1) != 1:
-        curs.execute(db_change("select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''"))
+        curs.execute(db_change(
+            "select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''"
+        ))
         for data_list in curs.fetchall():
             match = re.compile(data_list[0], re.I)
             if match.search(data):
@@ -1245,7 +1361,9 @@ def edit_filter_do(data):
 
 # Func-insert
 def add_alarm(who, context):
-    curs.execute(db_change('insert into alarm (name, data, date) values (?, ?, ?)'), [who, context, get_time()])
+    curs.execute(db_change(
+        'insert into alarm (name, data, date) values (?, ?, ?)'
+    ), [who, context, get_time()])
     
 def ua_plus(u_id, u_ip, u_agent, time):
     curs.execute(db_change("select data from other where name = 'ua_get'"))
@@ -1253,7 +1371,9 @@ def ua_plus(u_id, u_ip, u_agent, time):
     if rep_data and rep_data[0][0] != '':
         pass
     else:
-        curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [
+        curs.execute(db_change(
+            "insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"
+        ), [
             u_id, 
             u_ip, 
             u_agent, 
@@ -1264,12 +1384,18 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
     now_time = get_time()
     band = type_d if type_d else ''
 
-    curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [now_time])
+    curs.execute(db_change(
+        "update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"
+    ), [now_time])
     curs.execute(db_change("" + \
-        "select block from rb where ((end > ? and end != '') or end = '') and block = ? and band = ? and ongoing = '1'" + \
+        "select block from rb " + \
+        "where ((end > ? and end != '') or end = '') and block = ? and " + \
+            "band = ? and ongoing = '1'" + \
     ""), [now_time, name, band])
     if curs.fetchall():
-        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)"), [
+        curs.execute(db_change(
+            "insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)"
+        ), [
             name,
             'release',
             now_time,
@@ -1277,7 +1403,9 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
             '',
             band
         ])
-        curs.execute(db_change("update rb set ongoing = '' where block = ? and band = ? and ongoing = '1'"), [name, band])
+        curs.execute(db_change(
+            "update rb set ongoing = '' where block = ? and band = ? and ongoing = '1'"
+        ), [name, band])
     else:
         login = 'O' if login != '' else ''
 
@@ -1289,7 +1417,10 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
         else:
             r_time = ''
 
-        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band, ongoing, login) values (?, ?, ?, ?, ?, ?, '1', ?)"), [
+        curs.execute(db_change(
+            "insert into rb (block, end, today, blocker, why, band, ongoing, login) " + \
+            "values (?, ?, ?, ?, ?, ?, '1', ?)"
+        ), [
             name, 
             r_time, 
             now_time, 
@@ -1306,17 +1437,23 @@ def rd_plus(topic_num, date, name = None, sub = None):
     if curs.fetchall():
         curs.execute(db_change("update rd set date = ? where code = ?"), [date, topic_num])
     else:
-        curs.execute(db_change("insert into rd (title, sub, code, date) values (?, ?, ?, ?)"), [name, sub, topic_num, date])
+        curs.execute(db_change(
+            "insert into rd (title, sub, code, date) values (?, ?, ?, ?)"
+        ), [name, sub, topic_num, date])
 
     conn.commit()
 
 def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
     if mode == 'add':
-        curs.execute(db_change("select id from history where title = ? order by id + 0 asc limit 1"), [title])
+        curs.execute(db_change(
+            "select id from history where title = ? order by id + 0 asc limit 1"
+        ), [title])
         id_data = curs.fetchall()
         id_data = str(int(id_data[0][0]) - 1) if id_data else '0'
     else:
-        curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [title])
+        curs.execute(db_change(
+            "select id from history where title = ? order by id + 0 desc limit 1"
+        ), [title])
         id_data = curs.fetchall()
         id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
         
@@ -1329,15 +1466,21 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
     if mode != 'add' and mode != 'user':
         curs.execute(db_change("select count(*) from rc where type = 'normal'"))
         if curs.fetchall()[0][0] >= 200:
-            curs.execute(db_change("select id, title from rc where type = 'normal' order by date asc limit 1"))
+            curs.execute(db_change(
+                "select id, title from rc where type = 'normal' order by date asc limit 1"
+            ))
             rc_data = curs.fetchall()
             if rc_data:
-                curs.execute(db_change('delete from rc where id = ? and title = ? and type = "normal"'), [
+                curs.execute(db_change(
+                    'delete from rc where id = ? and title = ? and type = "normal"'
+                ), [
                     rc_data[0][0],
                     rc_data[0][1]
                 ])
     
-        curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [
+        curs.execute(db_change(
+            "insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"
+        ), [
             id_data,
             title,
             date
@@ -1346,23 +1489,32 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
     if mode != 'add':
         curs.execute(db_change("select count(*) from rc where type = ?"), [mode])
         if curs.fetchall()[0][0] >= 200:
-            curs.execute(db_change("select id, title from rc where type = ? order by date asc limit 1"), [mode])
+            curs.execute(db_change(
+                "select id, title from rc where type = ? order by date asc limit 1"
+            ), [mode])
             rc_data = curs.fetchall()
             if rc_data:
-                curs.execute(db_change('delete from rc where id = ? and title = ? and type = ?'), [
+                curs.execute(db_change(
+                    'delete from rc where id = ? and title = ? and type = ?'
+                ), [
                     rc_data[0][0],
                     rc_data[0][1],
                     mode
                 ])
     
-        curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [
+        curs.execute(db_change(
+            "insert into rc (id, title, date, type) values (?, ?, ?, ?)"
+        ), [
             id_data,
             title,
             date,
             mode
         ])
             
-    curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide, type) values (?, ?, ?, ?, ?, ?, ?, '', ?)"), [
+    curs.execute(db_change(
+        "insert into history (id, title, data, date, ip, send, leng, hide, type) " + \
+        "values (?, ?, ?, ?, ?, ?, ?, '', ?)"
+    ), [
         id_data,
         title,
         data,
