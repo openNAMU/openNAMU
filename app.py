@@ -163,12 +163,18 @@ if setup_tool != 0:
     for create_table in create_data:
         for create in create_data[create_table]:
             try:
-                curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
+                curs.execute(db_change(
+                    'select ' + create + ' from ' + create_table + ' limit 1'
+                ))
             except:
                 try:
-                    curs.execute(db_change("alter table " + create_table + " add " + create + " longtext default ''"))
+                    curs.execute(db_change(
+                        "alter table " + create_table + " add " + create + " longtext default ''"
+                    ))
                 except:
-                    curs.execute(db_change("alter table " + create_table + " add " + create + " longtext"))
+                    curs.execute(db_change(
+                        "alter table " + create_table + " add " + create + " longtext"
+                    ))
 
     if setup_tool == 1:
         update(int(ver_set_data[0][0]), set_data)
@@ -176,7 +182,9 @@ if setup_tool != 0:
         set_init()
 
 curs.execute(db_change('delete from other where name = "ver"'))
-curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [version_list['beta']['c_ver']])
+curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [
+    version_list['beta']['c_ver']
+])
 conn.commit()
 
 # Init-Route
