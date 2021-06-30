@@ -89,7 +89,7 @@ function get_file_state_intermal(data, data_inter) {
     for(var key in data_inter) {
         var data_class = document.getElementsByClassName(data + 'file_finder')[key];
     
-        var file_org = data_class.getAttribute('under_src');
+        var file_org = data_class.getAttribute('under_alt');
         var file_type = file_org.split('.');
         var file_name = file_type.slice(0, file_type.length - 1).join('.');
         file_type = file_type[file_type.length - 1];
@@ -138,7 +138,7 @@ function get_file_state_intermal(data, data_inter) {
             
             var xhr_2 = new XMLHttpRequest();
             xhr_2.open("POST", '/api/image/test');
-            xhr_2.send(data_list_2);
+            xhr_2.send(data_form_2);
 
             xhr_2.onreadystatechange = function() {
                 if(this.readyState === 4 && this.status === 200) {
