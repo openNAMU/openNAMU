@@ -953,8 +953,8 @@ function do_onmark_list_render(data) {
         });
     }
     
-    var quote_re = /\n((?:(?:(?:&gt;)+) ?(?:(?:(?!\n).)+)\n)+)/;
-    var quote_short_re = /((?:&gt;)+) ?((?:(?!\n).)+)\n/g;
+    var quote_re = /\n((?:(?:(?:&gt;)+) ?(?:(?:(?!\n).)*)\n)+)/;
+    var quote_short_re = /((?:&gt;)+) ?((?:(?!\n).)*)\n/g;
     var quote_leng = 1;
     while(1) {
         var quote_data = data.match(quote_re);
