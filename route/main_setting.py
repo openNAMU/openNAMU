@@ -719,7 +719,7 @@ def main_setting_2(conn, num, db_set):
 
             admin_check(None, 'edit_set (' + str(num) + ')')
 
-            return redirect('/setting/10')
+            return redirect('/setting/9')
         else:
             d_list = []
             for i in i_list:
