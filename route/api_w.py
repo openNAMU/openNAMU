@@ -80,6 +80,7 @@ def api_w_2(conn, name):
             else:
                 return flask.jsonify({})
         else:
+            data_arg_include = flask.request.args.get('include', '')
             if acl_check(name, 'render') == 1:
                 return flask.jsonify({})
             else:
@@ -92,6 +93,41 @@ def api_w_2(conn, name):
                 sql_data = curs.fetchall()
                 if not sql_data:
                     return flask.jsonify({})
+                elif data_arg_include != '':
+                    name_org = flask.request.args.get('name_org', '')
+                    name_org = name if name_org == '' else name_org
+
+                    json_data = sql_data[0][0]
+
+                    get_all_change_1 = []
+                    find_replace_moment = re.findall(r'(@([^=@]+)=([^=@]+)@|@([^=@]+)@)', json_data)
+                    for i in find_replace_moment:
+                        if i[1] != '':
+                            get_all_change_1 += [['@' + i[1] + '@', i[2]]]
+
+                            json_data = json_data.replace(i[0], '@' + i[1] + '@', 1)
+                        else:
+                            json_data = json_data.replace(i[0], '@' + i[3] + '@', 1)
+
+                    get_all_change_2 = re.findall(r'(@(?:[^@]*)@),([^,]*),', flask.request.args.get('change', '')) + get_all_change_1
+                    for i in get_all_change_2:
+                        json_data = json_data.replace(
+                            i[0].replace('<amp>', '&'), 
+                            i[1].replace('<amp>', '&').replace('<comma>', ','), 
+                            1
+                        )
+
+                    data_pas = render_set(
+                        doc_name = name_org, 
+                        doc_data = json_data, 
+                        data_type = 'api_view',
+                        data_in = data_arg_include
+                    )
+
+                    return flask.jsonify({
+                        "data" : data_pas[0], 
+                        "js_data" : data_pas[1]
+                    })
                 else:
                     data_pas = render_set(
                         doc_name = name, 

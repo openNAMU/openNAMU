@@ -35,8 +35,8 @@ def login_2(conn):
 
         pw_check_d = pw_check(
             flask.request.form.get('pw', ''),
-            user[0][0],
-            user[0][1],
+            user_data['pw'],
+            user_data['encode'],
             user_id
         )
         if pw_check_d != 1:
