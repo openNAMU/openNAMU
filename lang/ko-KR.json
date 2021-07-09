@@ -398,5 +398,7 @@
     "design_set" : "디자인 관련 설정",
     "login_set" : "로그인 관련 설정",
     "server_set" : "서버 관련 설정",
-    "edit_set" : "편집 관련 설정"
+    "edit_set" : "편집 관련 설정",
+    "wiki_shutdown" : "위키 엔진 종료",
+    "shutdown" : "종료"
 }
