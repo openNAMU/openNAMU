@@ -335,8 +335,8 @@ def inter_wiki(tools = None):
 def inter_wiki_del(tools = None, name = None):
     return inter_wiki_del_2(conn, tools, name)
 
-@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>', methods=['POST', 'GET'])
-@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/<name>', methods=['POST', 'GET'])
+@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>', methods = ['POST', 'GET'])
+@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/<name>', methods = ['POST', 'GET'])
 def inter_wiki_plus(tools = None, name = None):
     return inter_wiki_plus_2(conn, tools, name)
 
@@ -365,7 +365,7 @@ def list_admin():
 def list_user():
     return list_user_2(conn)
 
-@app.route('/admin_log', methods=['POST', 'GET'])
+@app.route('/admin_log', methods = ['POST', 'GET'])
 def list_admin_use():
     return list_admin_use_2(conn)
 
@@ -390,11 +390,11 @@ def list_long_page(tool = 'long_page'):
     return list_long_page_2(conn, tool)
 
 # Func-give
-@app.route('/admin_plus/<name>', methods=['POST', 'GET'])
+@app.route('/admin_plus/<name>', methods = ['POST', 'GET'])
 def give_admin_groups(name = None):
     return give_admin_groups_2(conn, name)
 
-@app.route('/delete_admin_group/<name>', methods=['POST', 'GET'])
+@app.route('/delete_admin_group/<name>', methods = ['POST', 'GET'])
 def give_delete_admin_group(name = None):
     return give_delete_admin_group_2(conn, name)
 
@@ -402,7 +402,7 @@ def give_delete_admin_group(name = None):
 def give_history_hidden(name = None):
     return give_history_hidden_2(conn, name)
 
-@app.route('/add_history/<everything:name>', methods=['POST', 'GET'])
+@app.route('/add_history/<everything:name>', methods = ['POST', 'GET'])
 def give_history_add(name = None):
     return give_history_add_2(conn, name)
 
@@ -410,20 +410,20 @@ def give_history_add(name = None):
 def give_user_check(name = None):
     return give_user_check_2(conn, name)
     
-@app.route('/check_delete', methods=['POST', 'GET'])
+@app.route('/check_delete', methods = ['POST', 'GET'])
 def give_user_check_delete():
     return give_user_check_delete_2(conn)
 
-@app.route('/ban', methods=['POST', 'GET'])
-@app.route('/ban/<name>', methods=['POST', 'GET'])
+@app.route('/ban', methods = ['POST', 'GET'])
+@app.route('/ban/<name>', methods = ['POST', 'GET'])
 def give_user_ban(name = None):
     return give_user_ban_2(conn, name)
 
-@app.route('/acl/<everything:name>', methods=['POST', 'GET'])
+@app.route('/acl/<everything:name>', methods = ['POST', 'GET'])
 def give_acl(name = None):
     return give_acl_2(conn, name)
 
-@app.route('/admin/<name>', methods=['POST', 'GET'])
+@app.route('/admin/<name>', methods = ['POST', 'GET'])
 def give_admin(name = None):
     return give_admin_2(conn, name)
 
@@ -461,7 +461,7 @@ def recent_block(name = None, tool = None):
 
 @app.route('/recent_changes')
 @app.route('/<regex("record"):tool>/<name>')
-@app.route('/<regex("history"):tool>/<everything:name>', methods=['POST', 'GET'])
+@app.route('/<regex("history"):tool>/<everything:name>', methods = ['POST', 'GET'])
 def recent_changes(name = None, tool = 'record'):
     return recent_changes_2(conn, name, tool)
 
@@ -469,7 +469,7 @@ def recent_changes(name = None, tool = 'record'):
 def recent_history_tool(name = None):
     return recent_history_tool_2(conn, name)
 
-@app.route('/history_delete/<everything:name>', methods=['POST', 'GET'])
+@app.route('/history_delete/<everything:name>', methods = ['POST', 'GET'])
 def recent_history_delete(name = None):
     return recent_history_delete_2(conn, name)
 
@@ -488,11 +488,11 @@ def search_deep(name = 'test'):
     return search_deep_2(conn, name)
 
 # Func-edit
-@app.route('/revert/<everything:name>', methods=['POST', 'GET'])
+@app.route('/revert/<everything:name>', methods = ['POST', 'GET'])
 def edit_revert(name = None):
     return edit_revert_2(conn, name)
 
-@app.route('/edit/<everything:name>', methods=['POST', 'GET'])
+@app.route('/edit/<everything:name>', methods = ['POST', 'GET'])
 def edit(name = 'Test'):
     return edit_2(conn, name)
 
@@ -500,15 +500,15 @@ def edit(name = 'Test'):
 def edit_backlink_reset(name = 'Test'):
     return edit_backlink_reset_2(conn, name)
 
-@app.route('/delete/<everything:name>', methods=['POST', 'GET'])
+@app.route('/delete/<everything:name>', methods = ['POST', 'GET'])
 def edit_delete(name = None):
     return edit_delete_2(conn, name)
 
-@app.route('/many_delete', methods=['POST', 'GET'])
+@app.route('/many_delete', methods = ['POST', 'GET'])
 def edit_many_delete(name = None):
     return edit_many_delete_2(conn)
 
-@app.route('/move/<everything:name>', methods=['POST', 'GET'])
+@app.route('/move/<everything:name>', methods = ['POST', 'GET'])
 def edit_move(name = None):
     return edit_move_2(conn, name)
 
@@ -521,15 +521,15 @@ def topic_block(topic_num = 1, num = 1):
 def topic_top(topic_num = 1, num = 1):
     return topic_top_2(conn, topic_num, num)
 
-@app.route('/thread/<int:topic_num>/setting', methods=['POST', 'GET'])
+@app.route('/thread/<int:topic_num>/setting', methods = ['POST', 'GET'])
 def topic_stop(topic_num = 1):
     return topic_stop_2(conn, topic_num)
 
-@app.route('/thread/<int:topic_num>/acl', methods=['POST', 'GET'])
+@app.route('/thread/<int:topic_num>/acl', methods = ['POST', 'GET'])
 def topic_acl(topic_num = 1):
     return topic_acl_2(conn, topic_num)
 
-@app.route('/thread/<int:topic_num>/delete', methods=['POST', 'GET'])
+@app.route('/thread/<int:topic_num>/delete', methods = ['POST', 'GET'])
 def topic_delete(topic_num = 1):
     return topic_delete_2(conn, topic_num)
 
@@ -537,7 +537,7 @@ def topic_delete(topic_num = 1):
 def topic_tool(topic_num = 1):
     return topic_tool_2(conn, topic_num)
 
-@app.route('/thread/<int:topic_num>/change', methods=['POST', 'GET'])
+@app.route('/thread/<int:topic_num>/change', methods = ['POST', 'GET'])
 def topic_change(topic_num = 1):
     return topic_change_2(conn, topic_num)
 
@@ -545,11 +545,11 @@ def topic_change(topic_num = 1):
 def topic_admin(topic_num = 1, num = 1):
     return topic_admin_2(conn, topic_num, num)
 
-@app.route('/thread/<int:topic_num>', methods=['POST', 'GET'])
+@app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])
 def topic(topic_num = 1):
     return topic_2(conn, topic_num)
 
-@app.route('/topic/<everything:name>', methods=['POST', 'GET'])
+@app.route('/topic/<everything:name>', methods = ['POST', 'GET'])
 def topic_close_list(name = 'test'):
     return topic_close_list_2(conn, name)
 
@@ -558,7 +558,7 @@ def topic_close_list(name = 'test'):
 def user_tool(name = None):
     return user_tool_2(conn, name)
 
-@app.route('/change', methods=['POST', 'GET'])
+@app.route('/change', methods = ['POST', 'GET'])
 def user_setting():
     return user_setting_2(conn, server_init)
 
@@ -576,27 +576,27 @@ def user_count_edit(name = None):
     return user_count_edit_2(conn, name)
 
 # Func-login
-@app.route('/2fa_login', methods=['POST', 'GET'])
+@app.route('/2fa_login', methods = ['POST', 'GET'])
 def login_2fa():
     return login_2fa_2(conn)
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/login', methods = ['POST', 'GET'])
 def login():
     return login_2(conn)
 
-@app.route('/pw_change', methods=['POST', 'GET'])
+@app.route('/pw_change', methods = ['POST', 'GET'])
 def login_pw_change():
     return login_pw_change_2(conn)
 
-@app.route('/register', methods=['POST', 'GET'])
+@app.route('/register', methods = ['POST', 'GET'])
 def login_register():
     return login_register_2(conn)
 
-@app.route('/<regex("need_email|pass_find|email_change"):tool>', methods=['POST', 'GET'])
+@app.route('/<regex("need_email|pass_find|email_change"):tool>', methods = ['POST', 'GET'])
 def login_need_email(tool = 'pass_find'):
     return login_need_email_2(conn, tool)
 
-@app.route('/<regex("check_key|check_pass_key|email_replace"):tool>', methods=['POST', 'GET'])
+@app.route('/<regex("check_key|check_pass_key|email_replace"):tool>', methods = ['POST', 'GET'])
 def login_check_key(tool = 'check_pass_key'):
     return login_check_key_2(conn, tool)
 
@@ -623,7 +623,7 @@ def applications():
     return applications_2(conn)
 
 # Func-vote
-@app.route('/vote/<num>', methods=['POST', 'GET'])
+@app.route('/vote/<num>', methods = ['POST', 'GET'])
 def vote_select(num = '1'):
     return vote_select_2(conn, num)
 
@@ -639,12 +639,12 @@ def vote_close(num = '1'):
 def vote():
     return vote_2(conn)
 
-@app.route('/add_vote', methods=['POST', 'GET'])
+@app.route('/add_vote', methods = ['POST', 'GET'])
 def vote_add():
     return vote_add_2(conn)
 
 # Func-api
-@app.route('/api/w/<everything:name>', methods=['POST', 'GET'])
+@app.route('/api/w/<everything:name>', methods = ['POST', 'GET'])
 def api_w(name = ''):
     return api_w_2(conn, name)
 
@@ -681,7 +681,7 @@ def api_search(name = ''):
 def api_recent_change():
     return api_recent_change_2(conn)
 
-@app.route('/api/sha224/<everything:name>', methods=['POST', 'GET'])
+@app.route('/api/sha224/<everything:name>', methods = ['POST', 'GET'])
 def api_sha224(name = 'test'):
     return api_sha224_2(conn, name)
 
@@ -689,7 +689,7 @@ def api_sha224(name = 'test'):
 def api_title_index():
     return api_title_index_2(conn)
 
-@app.route('/api/image/<everything:name>', methods=['POST', 'GET'])
+@app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])
 def api_image_view(name = ''):
     return api_image_view_2(conn, name)
 
@@ -698,7 +698,7 @@ def api_sitemap():
     return api_sitemap_2(conn)
 
 # Func-main
-@app.route('/restart', methods=['POST', 'GET'])
+@app.route('/restart', methods = ['POST', 'GET'])
 def main_restart():
     return main_restart_2(conn)
 
@@ -715,7 +715,7 @@ def main_upload():
     return main_upload_2(conn)
 
 @app.route('/setting')
-@app.route('/setting/<int:num>', methods=['POST', 'GET'])
+@app.route('/setting/<int:num>', methods = ['POST', 'GET'])
 def setting(num = 0):
     return main_setting_2(conn, num, set_data['db_type'])
 
@@ -723,8 +723,8 @@ def setting(num = 0):
 def main_other():
     return main_other_2(conn)
 
-@app.route('/manager', methods=['POST', 'GET'])
-@app.route('/manager/<int:num>', methods=['POST', 'GET'])
+@app.route('/manager', methods = ['POST', 'GET'])
+@app.route('/manager/<int:num>', methods = ['POST', 'GET'])
 def main_manager(num = 1):
     return main_manager_2(conn, num, version_list['beta']['r_ver'])
 
@@ -745,7 +745,7 @@ def main_views(name = None):
 def main_test_func():
 	return main_test_func_2(conn)
 
-@app.route('/shutdown')
+@app.route('/shutdown', methods = ['POST', 'GET'])
 def main_shutdown():
     return main_shutdown_2(conn)
 

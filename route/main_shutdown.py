@@ -12,7 +12,7 @@ def main_shutdown_2(conn):
         print('----')
         print('shutdown')
 
-        raise
+        os._exit(os.EX_OK)
     else:
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('wiki_shutdown'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
