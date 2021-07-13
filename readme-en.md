@@ -5,7 +5,7 @@
 
 ![](https://raw.githubusercontent.com/openNAMU/openNAMU/beta/.github/logo.png)
 
-openNAMU is a Python-based wiki engine. You can use openNAMU by installing Python and its dependency modules, and you can modify the code yourself to create more specialized wikis.
+openNAMU is a Python-based wiki engine. 
 
 ### Index
  * [Getting Started](#getting-started)
@@ -39,15 +39,7 @@ openNAMU is protected by [BSD 3-Clause License](./LICNESE). Please refer to the 
  * Numerical expression [MathJax](https://www.mathjax.org/)
  * Handling Keyboard Shortcuts [shortcut.js](http://www.openjs.com/scripts/events/keyboard_shortcuts/)
 
-### Authors
- * [Reference](https://github.com/openNAMU/openNAMU/graphs/contributors)
-
-### Special Thanks
- * [Team Croatia](https://github.com/TeamCroatia)
- * Basix
- * Efrit
- * Other chat rooms
-
 ## Etc.
  * Owner rights are granted to the first registor.
  * [Test Server](http://2du.pythonanywhere.com)
+ * [Contributors](https://github.com/openNAMU/openNAMU/graphs/contributors)
