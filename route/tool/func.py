@@ -1229,26 +1229,28 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
     return 1
 
-def ban_check(ip = None, tool = None):
+def ban_check(ip = None, tool = ''):
     ip = ip_check() if not ip else ip
+    tool = '' if not tool else tool
 
     if admin_check(None, None, ip) == 1:
         return 0
 
     curs.execute(db_change(
-        "update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"
+        "update rb set ongoing = '' " + \
+        "where end < ? and end != '' and ongoing = '1'"
     ), [get_time()])
     conn.commit()
 
     curs.execute(db_change("" + \
         "select login, block from rb " + \
-        "where ((end > ? and end != '') or end = '') and band = 'regex' and ongoing = '1'" + \
+        "where band = 'regex' and ongoing = '1'" + \
     ""), [get_time()])
     regex_d = curs.fetchall()
     for test_r in regex_d:
         g_regex = re.compile(test_r[1])
         if g_regex.search(ip):
-            if tool and tool == 'login':
+            if tool == 'login':
                 if test_r[0] != 'O':
                     return 1
             else:
@@ -1256,13 +1258,12 @@ def ban_check(ip = None, tool = None):
 
     curs.execute(db_change("" + \
         "select login from rb " + \
-        "where ((end > ? and end != '') or end = '') and block = ? and " + \
-            "band = '' and ongoing = '1'" + \
+        "where block = ? and band = '' and ongoing = '1'" + \
         "" + \
     ""), [get_time(), ip])
     ban_d = curs.fetchall()
     if ban_d:
-        if tool and tool == 'login':
+        if tool == 'login':
             if ban_d[0][0] != 'O':
                 return 1
         else:
