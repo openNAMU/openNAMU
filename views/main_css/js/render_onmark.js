@@ -1,5 +1,6 @@
 // 인터위키
 // 표 캡션
+// wiki 버그?
 // Tool
 function do_url_change(data) {
     return encodeURIComponent(data);

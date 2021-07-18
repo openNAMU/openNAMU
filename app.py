@@ -121,11 +121,7 @@ create_data['data'] = ['title', 'data', 'type']
 create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
 create_data['rc'] = ['id', 'title', 'date', 'type']
 create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
-# 제거 완료
-# create_data['user'] = ['id', 'pw', 'acl', 'date', 'encode']
 create_data['user_set'] = ['name', 'id', 'data']
-# 제거 완료
-# create_data['user_application'] = ['id', 'pw', 'date', 'encode', 'question', 'answer', 'ip', 'ua', 'token', 'email']
 create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
 create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
 create_data['back'] = ['title', 'link', 'type']
