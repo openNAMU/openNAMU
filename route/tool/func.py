@@ -1245,7 +1245,7 @@ def ban_check(ip = None, tool = ''):
     curs.execute(db_change("" + \
         "select login, block from rb " + \
         "where band = 'regex' and ongoing = '1'" + \
-    ""), [get_time()])
+    ""))
     regex_d = curs.fetchall()
     for test_r in regex_d:
         g_regex = re.compile(test_r[1])
@@ -1260,7 +1260,7 @@ def ban_check(ip = None, tool = ''):
         "select login from rb " + \
         "where block = ? and band = '' and ongoing = '1'" + \
         "" + \
-    ""), [get_time(), ip])
+    ""), [ip])
     ban_d = curs.fetchall()
     if ban_d:
         if tool == 'login':
