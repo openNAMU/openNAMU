@@ -642,7 +642,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
     return [data, data_js, data_nowiki];
 }
 
-function do_onmark_last_render(data) {   
+function do_onmark_last_render(data) {       
     // middle_render 마지막 처리
     data = data.replace(/<wiki_s_[0-9] /g, '<div ');
     data = data.replace(/<wiki_e_[0-9]>/g, '</div>');
@@ -724,11 +724,11 @@ function do_onmark_table_render_sub(data, data_col) {
         "rowspan" : "",
         "data" : ""
     };
+    var align_auto = 1;
     
     var table_option_re = /&lt;((?:(?!&lt;|&gt;).)+)&gt;/;
     while(1) {
         var no_option = '';
-        var align_auto = 1;
         var data_option = data.match(table_option_re);
         if(!data_option) {
             break;
@@ -800,6 +800,8 @@ function do_onmark_table_render_sub(data, data_col) {
                 data_option === ':' ||
                 data_option === ')'
             ) {
+                align_auto = 0;
+                
                 // align
                 if(data_option === '(') {
                     data_option_all['td'] += 'text-align:right;';
@@ -809,7 +811,7 @@ function do_onmark_table_render_sub(data, data_col) {
                     data_option_all['td'] += 'text-align:left;';
                 }
                 
-                align_auto = 0;
+                
             } else {
                 var table_option_data = data_option.replace(/"/g, '').match(/^((?:#[a-zA-Z0-9]{3}){1,2}|\w+)/);
                 if(table_option_data) {
@@ -933,7 +935,7 @@ function do_onmark_table_render(data) {
         }
         
         data = data.replace(wiki_re, function(x, x_1, x_2) {
-            return '<wiki_s_2 ' + x_1 + '>' + do_onmark_table_render_main(x_2) + '</wiki_e_2>';
+            return '<wiki_s_2 ' + x_1 + '>' + do_onmark_table_render_main(x_2) + '<wiki_e_2>';
         });
     }
     
