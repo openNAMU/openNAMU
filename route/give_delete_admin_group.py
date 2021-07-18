@@ -14,7 +14,7 @@ def give_delete_admin_group_2(conn, name):
 
         conn.commit()
 
-        return redirect('/give_log')
+        return redirect('/admin_group')
     else:
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang("delete_admin_group"), wiki_set(), wiki_custom(), wiki_css(['(' + name + ')', 0])],
@@ -23,5 +23,5 @@ def give_delete_admin_group_2(conn, name):
                     <button type=submit>''' + load_lang('start') + '''</button>
                 </form>
             ''',
-            menu = [['give_log', load_lang('return')]]
+            menu = [['admin_group', load_lang('return')]]
         ))  

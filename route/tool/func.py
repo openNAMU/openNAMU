@@ -217,7 +217,8 @@ def update(ver_num, set_data):
                 curs.execute(db_change("update other set data = '' where name = 'recaptcha'"))
                 curs.execute(db_change("update other set data = '' where name = 'sec_re'"))
     
-    if ver_num < 3172800 and set_data['db_type'] == 'mysql':
+    if  ver_num < 3172800 and \
+        set_data['db_type'] == 'mysql':
         get_data_mysql = json.loads(open('data/mysql.json', encoding = 'utf8').read())
         
         with open('data/mysql.json', 'w') as f:
@@ -385,6 +386,18 @@ def update(ver_num, set_data):
 
     print('Update completed')
 
+def set_init_always(ver_num):
+    curs.execute(db_change('delete from other where name = "ver"'))
+    curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [ver_num])
+    
+    curs.execute(db_change('delete from alist where name = "owner"'))
+    curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
+
+    if not os.path.exists(load_image_url()):
+        os.makedirs(load_image_url())
+    
+    conn.commit()
+    
 def set_init():
     # 초기값 설정 함수    
     curs.execute(db_change("select html from html_filter where kind = 'email'"))
@@ -414,8 +427,23 @@ def set_init():
             curs.execute(db_change(
                 "insert into other (name, data) values (?, ?)"
             ), [i[0], i[1]])
+            
+    curs.execute(db_change('select data from other where name = "key"'))
+    rep_data = curs.fetchall()
+    if not rep_data:
+        rep_key = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(64))
+        curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [rep_key])
+
+    curs.execute(db_change('select data from other where name = "count_all_title"'))
+    if not curs.fetchall():
+        curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
+        
+    conn.commit()
 
 # Func-simple
+def get_default_admin_group():
+    return ['owner', 'ban']
+
 def load_image_url():
     curs.execute(db_change('select data from other where name = "image_where"'))
     image_where = curs.fetchall()
