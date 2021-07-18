@@ -123,7 +123,10 @@ create_data['rc'] = ['id', 'title', 'date', 'type']
 create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
 create_data['user_set'] = ['name', 'id', 'data']
 create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
+
+# 폐지 예정
 create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
+
 create_data['back'] = ['title', 'link', 'type']
 create_data['other'] = ['name', 'data', 'coverage']
 create_data['alist'] = ['name', 'acl']
@@ -134,7 +137,7 @@ create_data['scan'] = ['user', 'title', 'type']
 create_data['acl'] = ['title', 'data', 'type']
 create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
 create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
-for i in create_data:
+for create_table in create_data:
     try:
         curs.execute(db_change('select test from ' + i + ' limit 1'))
     except:
@@ -142,46 +145,39 @@ for i in create_data:
             curs.execute(db_change('create table ' + i + '(test longtext)'))
         except:
             curs.execute(db_change("alter table " + i + " add test longtext"))
-
-setup_tool = 0
-try:
-    curs.execute(db_change('select data from other where name = "ver"'))
-    ver_set_data = curs.fetchall()
-    if not ver_set_data:
-        setup_tool = 2
-    else:
-        if int(version_list['beta']['c_ver']) > int(ver_set_data[0][0]):
-            setup_tool = 1
-except:
-    setup_tool = 2
-
-if setup_tool != 0:
-    for create_table in create_data:
-        for create in create_data[create_table]:
+            
+    for create in create_data[create_table]:
+        try:
+            curs.execute(db_change(
+                'select ' + create + ' from ' + create_table + ' limit 1'
+            ))
+        except:
             try:
                 curs.execute(db_change(
-                    'select ' + create + ' from ' + create_table + ' limit 1'
+                    "alter table " + create_table + " add " + create + " longtext default ''"
                 ))
             except:
-                try:
-                    curs.execute(db_change(
-                        "alter table " + create_table + " add " + create + " longtext default ''"
-                    ))
-                except:
-                    curs.execute(db_change(
-                        "alter table " + create_table + " add " + create + " longtext"
-                    ))
+                curs.execute(db_change(
+                    "alter table " + create_table + " add " + create + " longtext"
+                ))
 
-    if setup_tool == 1:
+curs.execute(db_change('select data from other where name = "ver"'))
+ver_set_data = curs.fetchall()
+if ver_set_data:
+    if int(version_list['beta']['c_ver']) > int(ver_set_data[0][0]):
+        setup_tool = 'update'
+    else:
+        setup_tool = 'normal'
+else:
+    setup_tool = 'init'
+
+if setup_tool != 'normal':
+    if setup_tool == 'update':
         update(int(ver_set_data[0][0]), set_data)
     else:
         set_init()
 
-curs.execute(db_change('delete from other where name = "ver"'))
-curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [
-    version_list['beta']['c_ver']
-])
-conn.commit()
+set_init_always(version_list['beta']['c_ver'])
 
 # Init-Route
 logging.basicConfig(level = logging.ERROR)
@@ -204,19 +200,13 @@ app.jinja_env.filters['cut_100'] = cut_100
 app.url_map.converters['everything'] = EverythingConverter
 app.url_map.converters['regex'] = RegexConverter
 
-# Init-DB_Data
-curs.execute(db_change('select name from alist where acl = "owner"'))
-if not curs.fetchall():
-    curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
-
-if not os.path.exists(load_image_url()):
-    os.makedirs(load_image_url())
-
-if not os.path.exists('views'):
-    os.makedirs('views')
+curs.execute(db_change('select data from other where name = "key"'))
+sql_data = curs.fetchall()
+app.secret_key = sql_data[0][0]
 
 print('----')
 
+# Init-DB_Data
 dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encryption method']
 server_set_key = ['host', 'port', 'language', 'markup', 'encode']
 server_set = {}
@@ -229,7 +219,6 @@ for i in range(len(server_set_key)):
         server_set_val = server_init.init(server_set_key[i])
 
         curs.execute(db_change('insert into other (name, data) values (?, ?)'), [server_set_key[i], server_set_val])
-        conn.commit()
     else:
         server_set_val = server_set_val[0][0]
 
@@ -238,18 +227,6 @@ for i in range(len(server_set_key)):
     server_set[server_set_key[i]] = server_set_val
 
 print('----')
-
-curs.execute(db_change('select data from other where name = "key"'))
-rep_data = curs.fetchall()
-if not rep_data:
-    rep_key = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(16))
-    curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [rep_key])
-else:
-    rep_key = rep_data[0][0]
-
-curs.execute(db_change('select data from other where name = "count_all_title"'))
-if not curs.fetchall():
-    curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
     
 # Init-DB_care
 if set_data['db_type'] == 'sqlite':
@@ -302,8 +279,6 @@ else:
         ).start()
 
     mysql_dont_off(server_set['port'])
-
-conn.commit()
 
 print('Now running... http://localhost:' + server_set['port'])
 
@@ -365,9 +340,9 @@ def list_user():
 def list_admin_use():
     return list_admin_use_2(conn)
 
-@app.route('/give_log')
-def list_give():
-    return list_give_2(conn)
+@app.route('/admin_group')
+def list_admin_group():
+    return list_admin_group_2(conn)
 
 @app.route('/please')
 def list_please():
@@ -754,7 +729,7 @@ def main_error_404(e):
     return main_error_404_2(conn)
 
 # End
-app.secret_key = rep_key
+conn.commit()
 
 class NoLoggingWSGIRequestHandler(wsgiref.simple_server.WSGIRequestHandler):
     def log_message(self, format, *args):

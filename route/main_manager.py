@@ -37,7 +37,7 @@ def main_manager_2(conn, num, r_ver):
                 <br>
                 <h2>''' + load_lang('owner') + '''</h2>
                 <ul class="inside_ul">
-                    <li><a href="/give_log">''' + load_lang('admin_group_list') + '''</a></li>
+                    <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
                     <li><a href="/many_delete">''' + load_lang('many_delete') + '''</a></li>
                     <li><a href="/applications">''' + load_lang('application_list') + '''</a></li>
                     <li><a href="/api/sitemap.xml">''' + load_lang('get_sitemap') + '''</a></li>

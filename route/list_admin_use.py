@@ -4,10 +4,7 @@ def list_admin_use_2(conn):
     curs = conn.cursor()
 
     num = int(number_check(flask.request.args.get('num', '1')))
-    if num * 50 > 0:
-        sql_num = num * 50 - 50
-    else:
-        sql_num = 0
+    sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
     if flask.request.method == 'POST':
         return redirect('/admin_log?search=' + flask.request.form.get('search', 'normal'))

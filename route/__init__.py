@@ -27,7 +27,7 @@ from .give_delete_admin_group import *
 from .give_admin import *
 
 # Import-list
-from .list_give import *
+from .list_admin_group import *
 from .list_image_file import *
 from .list_user_topic import *
 from .list_acl import *

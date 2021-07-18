@@ -8,6 +8,9 @@ def give_admin_groups_2(conn, name):
     if flask.request.method == 'POST':
         if admin_check(None, 'admin_plus (' + name + ')') != 1:
             return re_error('/error/3')
+        else:
+            if name in ['owner', 'ban']:
+                return re_error('/error/3')
 
         curs.execute(db_change("delete from alist where name = ?"), [name])
         for i in acl_name_list:
@@ -21,6 +24,7 @@ def give_admin_groups_2(conn, name):
         data = ''
         exist_list = ['', '', '', '', '', '', '', '']
         state = 'disabled' if admin_check() != 1 else ''
+        state = 'disabled' if name in get_default_admin_group() else ''
 
         curs.execute(db_change('select acl from alist where name = ?'), [name])
         acl_list = curs.fetchall()
@@ -59,5 +63,5 @@ def give_admin_groups_2(conn, name):
                     <button ''' + state +  ''' type="submit">''' + load_lang('save') + '''</button>
                 </form>
             ''',
-            menu = [['give_log', load_lang('return')]]
+            menu = [['admin_group', load_lang('return')]]
         ))
