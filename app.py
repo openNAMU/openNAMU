@@ -180,10 +180,10 @@ if setup_tool != 'normal':
 set_init_always(version_list['beta']['c_ver'])
 
 # Init-Route
-logging.basicConfig(level = logging.ERROR)
-
 app = flask.Flask(__name__, template_folder = './')
 app.config['JSON_AS_ASCII'] = False
+
+app.logger.setLevel(logging.ERROR)
 
 class EverythingConverter(werkzeug.routing.PathConverter):
     regex = '.*?'
@@ -730,15 +730,9 @@ def main_error_404(e):
 
 # End
 conn.commit()
-
-class NoLoggingWSGIRequestHandler(wsgiref.simple_server.WSGIRequestHandler):
-    def log_message(self, format, *args):
-        pass
 	
-if __name__ == "__main__":    
-    wsgiref.simple_server.make_server(
+if __name__ == "__main__":
+    WSGIServer((
         server_set['host'], 
-        int(server_set['port']), 
-        app,
-        handler_class = NoLoggingWSGIRequestHandler
-    ).serve_forever()
+        int(server_set['port'])
+    ), app, log = app.logger).serve_forever()

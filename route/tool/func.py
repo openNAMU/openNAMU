@@ -12,8 +12,6 @@ import random
 import email.mime.text
 import email.utils
 import email.header
-
-import wsgiref.simple_server
         
 import urllib.request
 
@@ -65,12 +63,14 @@ print('----')
 from .func_mark import *
 
 from diff_match_patch import diff_match_patch
-        
+
+from gevent.pywsgi import WSGIServer
+
 import werkzeug.routing
 import werkzeug.debug
-        
+
 import flask
-        
+
 import requests
 
 import pymysql
