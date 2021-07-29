@@ -18,13 +18,14 @@ function get_link_state(data) {
     data_form.append('title_list', JSON.stringify(link_list));
     
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/w/test?exist=1");
+    xhr.open("POST", "/api/w/test?v=exist");
     xhr.send(data_form);
 
     xhr.onreadystatechange = function() {
+        console.log(this)
         if(this.readyState === 4 && this.status === 200) {
             var data_xhr = JSON.parse(this.responseText);
-            
+            console.log(data_xhr)
             for(var key in link_list_2) {
                 if(!data_xhr[key]) {
                     for(var key_2 in link_list_2[key]) {
