@@ -68,7 +68,7 @@ def api_w_2(conn, name):
                 if curs.fetchall():
                     data_exist[i] = '1'
                     
-            return flask.json_data(data_exist)
+            return flask.jsonify(data_exist)
         else:
             return flask.jsonify({})
     else:
