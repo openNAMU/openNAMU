@@ -14,6 +14,8 @@ function get_link_state(data) {
         }
     }
     
+    console.log(link_list);
+    
     var data_form = new FormData();
     data_form.append('title_list', JSON.stringify(link_list));
     

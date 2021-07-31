@@ -270,10 +270,23 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
             } else if(link_real.match(category_re)) {
                 var category_link = link_real.replace(category_re, '');
 
+                data_js += '' +
+                    'document.getElementsByName("' + name_include + 'set_link_' + num_link_str + '")[0].href = ' + 
+                        '"/w/category:' + do_url_change(category_link) + '";' +
+                    '\n' +
+                '';
+                data_js += '' +
+                    'document.getElementsByName("' + name_include + 'set_link_' + num_link_str + '")[0].title = ' + 
+                        '"' + do_js_safe_change(do_xss_change('category:' + category_link)) + '";' +
+                    '\n' +
+                '';
+
                 category_data = (category_data === '' ? '<div id="cate_all"><div id="cate">Category : ' : category_data);
                 category_data += '' +
                     '<a class="' + name_include + 'link_finder" ' +
-                        'href="/w/category:' + do_url_change(category_link) + '">' +
+                        'name="' + name_include + 'set_link_' + num_link_str + '" ' +
+                        'href="" ' +
+                        'title="">' +
                         category_link +
                     '</a> | ' +
                 ''
