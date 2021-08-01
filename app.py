@@ -180,11 +180,6 @@ if setup_tool != 'normal':
 set_init_always(version_list['beta']['c_ver'])
 
 # Init-Route
-app = flask.Flask(__name__, template_folder = './')
-app.config['JSON_AS_ASCII'] = False
-
-app.logger.setLevel(logging.ERROR)
-
 class EverythingConverter(werkzeug.routing.PathConverter):
     regex = '.*?'
 
@@ -192,6 +187,11 @@ class RegexConverter(werkzeug.routing.BaseConverter):
     def __init__(self, url_map, *items):
         super(RegexConverter, self).__init__(url_map)
         self.regex = items[0]
+        
+app = flask.Flask(__name__, template_folder = './')
+app.config['JSON_AS_ASCII'] = False
+
+app.logger.setLevel(logging.ERROR)
 
 app.jinja_env.filters['md5_replace'] = md5_replace
 app.jinja_env.filters['load_lang'] = load_lang
