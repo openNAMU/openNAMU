@@ -661,16 +661,14 @@ def skin_check(set_n = 0):
     ip = ip_check()
     
     user_need_skin = ''
-    
-    if 'skin' in flask.session:
-        user_need_skin = flask.session['skin']
+    if ip_or_user(ip) == 0:
+        curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
+        skin_exist = curs.fetchall()
+        if skin_exist:
+            user_need_skin = skin_exist[0][0]            
     else:
-        if ip_or_user(ip) == 0:
-            curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
-            skin_exist = curs.fetchall()
-            if skin_exist:
-                user_need_skin = skin_exist[0][0]            
-                flask.session['skin'] = user_need_skin
+        if 'skin' in flask.session:
+            user_need_skin = flask.session['skin']
 
     if user_need_skin == '':
         curs.execute(db_change('select data from other where name = "skin"'))
@@ -863,9 +861,23 @@ def load_skin(data = '', set_n = 0, default = 0):
 
         if skin_data != 'main_css':
             if set_n == 0:
-                skin_return_data += '<option value="' + skin_data + '">' + see_data + '</option>'
+                if skin_data == data:
+                    skin_return_data = '' + \
+                        '<option value="' + skin_data + '">' + \
+                            see_data + \
+                        '</option>' + \
+                    '' + skin_return_data
+                else:
+                    skin_return_data += '' + \
+                        '<option value="' + skin_data + '">' + \
+                            see_data + \
+                        '</option>' + \
+                    ''
             else:
-                skin_return_data += [skin_data]                    
+                if skin_data == data:
+                    skin_return_data = [skin_data] + skin_return_data
+                else:
+                    skin_return_data += [skin_data]                    
 
     return skin_return_data
 

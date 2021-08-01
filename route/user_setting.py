@@ -46,13 +46,14 @@ def user_setting_2(conn, server_init):
             data = curs.fetchall()
             email = data[0][0] if data else '-'
 
-            div2 = load_skin('', 0, 1)
-            div3 = ''
+            curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
+            data = curs.fetchall()
+            div2 = load_skin(data[0][0] if data else '', 0, 1)
 
-            curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip_check()])
+            curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip])
             data = curs.fetchall()
             data = [['default']] if not data else data
-
+            div3 = ''
             for lang_data in support_language:
                 see_data = lang_data if lang_data != 'default' else load_lang('default')
                 
@@ -108,11 +109,14 @@ def user_setting_2(conn, server_init):
             
             return redirect('/change')
         else:
-            div2 = load_skin(('' if not 'skin' in flask.session else flask.session['skin']), 0, 1)
-            div3 = ''
+            div2 = load_skin(
+                ('' if not 'skin' in flask.session else flask.session['skin']), 
+                0, 
+                1
+            )
 
             data = [['default']] if not 'lang' in flask.session else [[flask.session['lang']]]
-
+            div3 = ''
             for lang_data in support_language:
                 see_data = lang_data if lang_data != 'default' else load_lang('default')
                 
