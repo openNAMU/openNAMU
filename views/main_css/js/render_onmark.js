@@ -816,11 +816,11 @@ function do_onmark_table_render_sub(data, data_col) {
                 
                 // align
                 if(data_option === '(') {
-                    data_option_all['td'] += 'text-align:right;';
+                    data_option_all['td'] += 'text-align: left;';
                 } else if(data_option === ':') {
-                    data_option_all['td'] += 'text-align:center;';
+                    data_option_all['td'] += 'text-align: center;';
                 } else {
-                    data_option_all['td'] += 'text-align:left;';
+                    data_option_all['td'] += 'text-align: right;';
                 }
                 
                 
@@ -843,7 +843,7 @@ function do_onmark_table_render_sub(data, data_col) {
     
     if(align_auto === 1) {
         if(
-            data_option_all['data'][0] === ' ' ||
+            data_option_all['data'][0] === ' ' &&
             data_option_all['data'][data_option_all['data'].length - 1] === ' '
         ) {
             data_option_all['td'] += 'text-align:center;';
