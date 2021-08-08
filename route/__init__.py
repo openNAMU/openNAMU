@@ -77,15 +77,15 @@ from .user_setting import *
 from .user_tool import *
 from .user_count_edit import *
 from .user_custom_head_view import *
+from .user_watch_list import *
+from .user_watch_list_name import *
+from .user_alarm import *
+from .user_alarm_del import *
 
 # Import-inter_wiki
 from .inter_wiki_plus import *
 from .inter_wiki_del import *
 from .inter_wiki import *
-
-# Import-watch_list
-from .watch_list import *
-from .watch_list_name import *
 
 # Import-login
 from .login import *
@@ -129,7 +129,3 @@ from .view_raw import *
 from .view_diff_data import *
 from .view_read import *
 from .view_down import *
-
-# Import-alarm
-from .alarm import *
-from .alarm_del import *

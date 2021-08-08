@@ -287,16 +287,9 @@ if os.path.exists('custom.py'):
 
     custom_run(conn, app)
 
+# alarm과 watch_list의 user 편입
+
 # Func
-# Func-alarm
-@app.route('/alarm')
-def alarm():
-    return alarm_2(conn)
-
-@app.route('/del_alarm')
-def alarm_del():
-    return alarm_del_2(conn)
-
 # Func-inter_wiki
 @app.route('/<regex("inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter"):tools>')
 def inter_wiki(tools = None):
@@ -545,6 +538,22 @@ def user_custom_head_view():
 @app.route('/count/<name>')
 def user_count_edit(name = None):
     return user_count_edit_2(conn, name)
+    
+@app.route('/alarm')
+def alarm():
+    return alarm_2(conn)
+
+@app.route('/del_alarm')
+def alarm_del():
+    return alarm_del_2(conn)
+    
+@app.route('/<regex("watch_list|star_doc"):tool>')
+def watch_list(tool = 'star_doc'):
+    return watch_list_2(conn, tool)
+
+@app.route('/<regex("watch_list|star_doc"):tool>/<everything:name>')
+def watch_list_name(tool = 'star_doc', name = 'Test'):
+    return watch_list_name_2(conn, tool, name)
 
 # Func-login
 @app.route('/2fa_login', methods = ['POST', 'GET'])
@@ -574,15 +583,6 @@ def login_check_key(tool = 'check_pass_key'):
 @app.route('/logout')
 def login_logout():
     return login_logout_2(conn)
-
-# Func-watch_list
-@app.route('/<regex("watch_list|star_doc"):tool>')
-def watch_list(tool = 'star_doc'):
-    return watch_list_2(conn, tool)
-
-@app.route('/<regex("watch_list|star_doc"):tool>/<everything:name>')
-def watch_list_name(tool = 'star_doc', name = 'Test'):
-    return watch_list_name_2(conn, tool, name)
 
 # Func-application
 @app.route('/application_submitted')
