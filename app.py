@@ -117,24 +117,33 @@ load_conn(conn)
 
 # Init-Create_DB
 create_data = {}
+
+# 폐지 예정 (data_set으로 통합)
 create_data['data'] = ['title', 'data', 'type']
 create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
 create_data['rc'] = ['id', 'title', 'date', 'type']
+create_data['acl'] = ['title', 'data', 'type']
+
+# 폐지 예정 (topic_set으로 통합)
 create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
-create_data['user_set'] = ['name', 'id', 'data']
 create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
 
-# 폐지 예정
+# 폐지 예정 (user_set으로 통합)
 create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
 
 create_data['back'] = ['title', 'link', 'type']
+
 create_data['other'] = ['name', 'data', 'coverage']
+
 create_data['alist'] = ['name', 'acl']
 create_data['re_admin'] = ['who', 'what', 'time']
+
 create_data['alarm'] = ['name', 'data', 'date']
 create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
+create_data['user_set'] = ['name', 'id', 'data']
+
 create_data['scan'] = ['user', 'title', 'type']
-create_data['acl'] = ['title', 'data', 'type']
+
 create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
 create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
 for create_table in create_data:
