@@ -49,8 +49,8 @@ def give_admin_2(conn, name):
 
         curs.execute(db_change('select distinct name from alist order by name asc'))
         for data in curs.fetchall():
-            if user[0][0] == data[0]:
-                div += '<option value="' + data[0] + '" selected="selected">' + data[0] + '</option>'
+            if user_acl == data[0]:
+                div = '<option value="' + data[0] + '">' + data[0] + '</option>' + div
             else:
                 div += '<option value="' + data[0] + '">' + data[0] + '</option>'
 
