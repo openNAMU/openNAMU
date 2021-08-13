@@ -74,6 +74,9 @@ from .api_version import *
 # Import-user
 from .user_info import *
 from .user_setting import *
+from .user_setting_email import *
+from .user_setting_email_check import *
+from .user_setting_pw_change import *
 from .user_tool import *
 from .user_count_edit import *
 from .user_custom_head_view import *
@@ -89,7 +92,6 @@ from .inter_wiki import *
 
 # Import-login
 from .login import *
-from .login_pw_change import *
 from .login_2fa import *
 from .login_check_key import *
 from .login_logout import *

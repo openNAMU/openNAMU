@@ -68,6 +68,14 @@ def backlink_generate(data_markup, doc_data, doc_name):
             data_link_end_all += [[doc_name, i, 'file'] for i in data_link_end['file']]
             data_link_end_all += [[doc_name, i, ''] for i in data_link_end['link']]
             
+            data_link_no = []
+            for i in data_link_end['link']:
+                curs.execute(db_change("select title from data where title = ?"), [i])
+                if not curs.fetchall():
+                    data_link_no += [[doc_name, i, 'no']]
+                    
+            data_link_end_all += data_link_no
+            
         # Include
         include_re = re.compile(r'\[include\(((?:(?!\)\]).)+)\)\]', re.I)
         
