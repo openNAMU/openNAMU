@@ -535,6 +535,18 @@ def user_tool(name = None):
 def user_setting():
     return user_setting_2(conn, server_init)
 
+@app.route('/change/email', methods = ['POST', 'GET'])
+def user_setting_email():
+    return user_setting_email_2(conn)
+
+@app.route('/change/email/check', methods = ['POST', 'GET'])
+def user_setting_email_check():
+    return user_setting_email_check_2(conn)
+
+@app.route('/change/pw', methods = ['POST', 'GET'])
+def user_setting_pw_change():
+    return user_setting_pw_change_2(conn)
+
 @app.route('/user')
 def user_info():
     return user_info_2(conn)
@@ -552,7 +564,7 @@ def user_count_edit(name = None):
 def alarm():
     return alarm_2(conn)
 
-@app.route('/del_alarm')
+@app.route('/alarm/delete')
 def alarm_del():
     return alarm_del_2(conn)
     
@@ -565,27 +577,27 @@ def watch_list_name(tool = 'star_doc', name = 'Test'):
     return watch_list_name_2(conn, tool, name)
 
 # Func-login
-@app.route('/2fa_login', methods = ['POST', 'GET'])
-def login_2fa():
-    return login_2fa_2(conn)
 
+# 현 구조
 @app.route('/login', methods = ['POST', 'GET'])
 def login():
     return login_2(conn)
 
-@app.route('/pw_change', methods = ['POST', 'GET'])
-def login_pw_change():
-    return login_pw_change_2(conn)
+@app.route('/login/2fa', methods = ['POST', 'GET'])
+def login_2fa():
+    return login_2fa_2(conn)
 
 @app.route('/register', methods = ['POST', 'GET'])
 def login_register():
     return login_register_2(conn)
 
-@app.route('/<regex("need_email|pass_find|email_change"):tool>', methods = ['POST', 'GET'])
+@app.route('/<regex("need_email"):tool>', methods = ['POST', 'GET'])
+@app.route('/<regex("pass_find"):tool>', methods = ['POST', 'GET'])
 def login_need_email(tool = 'pass_find'):
     return login_need_email_2(conn, tool)
 
-@app.route('/<regex("check_key|check_pass_key|email_replace"):tool>', methods = ['POST', 'GET'])
+@app.route('/<regex("check_key"):tool>', methods = ['POST', 'GET'])
+@app.route('/<regex("check_pass_key"):tool>', methods = ['POST', 'GET'])
 def login_check_key(tool = 'check_pass_key'):
     return login_check_key_2(conn, tool)
 

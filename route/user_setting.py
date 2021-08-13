@@ -77,9 +77,9 @@ def user_setting_2(conn, server_init):
                         <div id="get_user_info"></div>
                         <script>load_user_info("''' + ip + '''");</script>
                         <hr class="main_hr">
-                        <a href="/pw_change">(''' + load_lang('password_change') + ''')</a>
+                        <a href="/change/pw">(''' + load_lang('password_change') + ''')</a>
                         <hr class="main_hr">
-                        <span>''' + load_lang('email') + ''' : ''' + email + '''</span> <a href="/email_change">(''' + load_lang('email_change') + ''')</a>
+                        <span>''' + load_lang('email') + ''' : ''' + email + '''</span> <a href="/change/email">(''' + load_lang('email_change') + ''')</a>
                         <h2>''' + load_lang('main') + '''</h2>
                         <span>''' + load_lang('skin') + '''</span>
                         <hr class="main_hr">

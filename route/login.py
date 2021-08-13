@@ -47,7 +47,7 @@ def login_2(conn):
         if fa_data and fa_data[0][0] != '':
             flask.session['b_id'] = user_id
 
-            return redirect('/2fa_login')
+            return redirect('/login/2fa')
         else:
             flask.session['id'] = user_id
 
