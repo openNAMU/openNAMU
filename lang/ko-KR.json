@@ -109,7 +109,7 @@
     "topic_tool": "토론 관리 도구",
     "user_document": "사용자 문서",
     "id": "아이디",
-    "no_login_warring": "비로그인 상태입니다. 편집 시 지금 접속한 IP가 기록됩니다.",
+    "no_login_warning": "비로그인 상태입니다. 편집 시 지금 접속한 IP가 기록됩니다.",
     "decument_404_error": "이 문서는 존재하지 않습니다.",
     "key": "키",
     "lastest": "최신",
@@ -187,8 +187,8 @@
     "editor": "편집자",
     "wiki_secret_key": "위키 비밀 키",
     "band_ban": "대역 차단",
-    "http_warring": "경고: HTTPS 연결을 사용하지 않는다면 개인정보가 유출될 수 있습니다. 이 사항에 의해 입는 피해는 사용자에게 책임이 있음을 알려드립니다.",
-    "update_warring": "최신 버전보다 0.2 버전 이상 낮은 경우 수동 업데이트를 권장합니다. 윈도우의 경우 route 폴더의 내용이 사라집니다.",
+    "http_warning": "경고: HTTPS 연결을 사용하지 않는다면 개인정보가 유출될 수 있습니다. 이 사항에 의해 입는 피해는 사용자에게 책임이 있음을 알려드립니다.",
+    "update_warning": "최신 버전보다 0.2 버전 이상 낮은 경우 수동 업데이트를 권장합니다. 윈도우의 경우 route 폴더의 내용이 사라집니다.",
     "discussion_name": "토론 제목",
     "discussion": "토론",
     "main": "메인",
@@ -263,7 +263,7 @@
     "other": "기타",
     "edit": "편집",
     "open_discussion_list": "열린 토론 목록",
-    "user_head_warring": "비로그인시 브라우저를 닫거나 로그인시 사용자가 지정한 정보는 삭제됩니다.",
+    "user_head_warning": "비로그인시 브라우저를 닫거나 로그인시 사용자가 지정한 정보는 삭제됩니다.",
     "email_required": "이메일 사용",
     "1_day": "1일",
     "regex_error": "정규표현식에 오류가 있습니다.",
@@ -400,5 +400,6 @@
     "server_set" : "서버 관련 설정",
     "edit_set" : "편집 관련 설정",
     "wiki_shutdown" : "위키 엔진 종료",
-    "shutdown" : "종료"
+    "shutdown" : "종료",
+    "history_delete_warning" : "역사를 지울 경우 복구하기 어려우니 신중하게 결정하세요."
 }

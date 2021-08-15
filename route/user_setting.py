@@ -96,7 +96,7 @@ def user_setting_2(conn, server_init):
                         </div>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
-                        ''' + http_warring() + '''
+                        ''' + http_warning() + '''
                         <script>do_twofa_check(1);</script>
                     </form>
                 ''',
@@ -142,9 +142,9 @@ def user_setting_2(conn, server_init):
                         <select name="lang">''' + div3 + '''</select>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
-                        ''' + http_warring() + '''
+                        ''' + http_warning() + '''
                         <hr class="main_hr">
-                        <span>''' + load_lang('user_head_warring') + '''</span>
+                        <span>''' + load_lang('user_head_warning') + '''</span>
                     </form>
                 ''',
                 menu = [['user', load_lang('return')]]

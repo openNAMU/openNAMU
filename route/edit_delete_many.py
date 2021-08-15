@@ -1,7 +1,7 @@
 from .tool.func import *
 from . import edit_delete
 
-def edit_many_delete_2(conn):
+def edit_delete_many_2(conn):
     curs = conn.cursor()
 
     ip = ip_check()
@@ -27,4 +27,4 @@ def edit_many_delete_2(conn):
                 </form>
             ''',
             menu = [['manager/1', load_lang('return')]]
-        ))     
+        ))

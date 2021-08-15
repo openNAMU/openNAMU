@@ -159,7 +159,7 @@ def edit_move_2(conn, name):
             imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('move') + ')', 0])],
             data = '''
                 <form method="post">
-                    ''' + ip_warring() + '''
+                    ''' + ip_warning() + '''
                     <input placeholder="''' + load_lang('document_name') + '" value="' + name + '''" name="title" type="text">
                     <hr class=\"main_hr\">
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
