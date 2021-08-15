@@ -18,7 +18,6 @@ def user_setting_email_check_2(conn):
             curs.execute(db_change('delete from user_set where name = "email" and id = ?'), [ip])
             curs.execute(db_change('insert into user_set (name, id, data) values ("email", ?, ?)'), [ip, flask.session['c_email']])
 
-
         for i in re_set_list:
             flask.session.pop(i, None)
 

@@ -1,9 +1,9 @@
 from .tool.func import *
 
-def give_history_hidden_2(conn, name):
+def recent_history_hidden_2(conn, name, rev):
     curs = conn.cursor()
-
-    num = number_check(flask.request.args.get('num', '1'))
+    
+    num = str(rev)
 
     if admin_check(6, 'history_hidden (' + name + '#' + num + ')') == 1:
         curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])

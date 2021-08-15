@@ -1,15 +1,15 @@
 from .tool.func import *
 
-def recent_history_delete_2(conn, name, rev):
+def recent_record_reset_2(conn, name):
     curs = conn.cursor()
 
-    num = str(rev)
+    num = str(int(number_check(flask.request.args.get('num', '1'))))
 
     if admin_check() != 1:
         return re_error('/error/3')
 
     if flask.request.method == 'POST':
-        admin_check(None, 'history delete ' + name + ' r' + num)
+        admin_check(None, 'history delete r' + num)
 
         curs.execute(db_change("delete from history where id = ? and title = ?"), [num, name])
         conn.commit()

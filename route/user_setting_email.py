@@ -4,6 +4,7 @@ def user_setting_email_2(conn):
     curs = conn.cursor()
     
     if flask.request.method == 'POST':
+        # c_key 같은 이름 대신 한 기능에 고유 명칭 부여 필요
         re_set_list = ['c_key']
         flask.session['c_key'] = load_random_key(32)
 

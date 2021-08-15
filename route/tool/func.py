@@ -451,15 +451,15 @@ def load_image_url():
     
     return image_where
 
-def http_warring():
+def http_warning():
     return '''
-        <div id="http_warring_text"></div>
+        <div id="http_warning_text"></div>
         <script>
             if(window.location.protocol !== 'https:') {
-                document.getElementById('http_warring_text').innerHTML = "''' + \
-                    load_lang('http_warring') + \
+                document.getElementById('http_warning_text').innerHTML = "''' + \
+                    load_lang('http_warning') + \
                 '''";
-                document.getElementById('http_warring_text').style.margin = "10px 0px 0px 0px";
+                document.getElementById('http_warning_text').style.margin = "10px 0px 0px 0px";
             }
         </script>
     '''
@@ -499,9 +499,9 @@ def edit_button():
     
     return data
 
-def ip_warring():
+def ip_warning():
     if ip_or_user() != 0:
-        curs.execute(db_change('select data from other where name = "no_login_warring"'))
+        curs.execute(db_change('select data from other where name = "no_login_warning"'))
         data = curs.fetchall()
         if data and data[0][0] != '':
             text_data = '' + \
@@ -510,7 +510,7 @@ def ip_warring():
             ''
         else:
             text_data = '' + \
-                '<span>' + load_lang('no_login_warring') + '</span>' + \
+                '<span>' + load_lang('no_login_warning') + '</span>' + \
                 '<hr class="main_hr">' + \
             ''
     else:

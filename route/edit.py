@@ -96,19 +96,19 @@ def edit_2(conn, name):
                     
         else:
             data = flask.request.form.get('content', '')
-            warring_edit = load_lang('exp_edit_conflict') + ' '
+            warning_edit = load_lang('exp_edit_conflict') + ' '
 
             if flask.request.form.get('ver', '0') == '0':
-                warring_edit += '<a href="/raw/' + url_pas(name) + '">(r' + doc_ver + ')</a>'
+                warning_edit += '<a href="/raw/' + url_pas(name) + '">(r' + doc_ver + ')</a>'
             else:
-                warring_edit += '' + \
+                warning_edit += '' + \
                     '<a href="/diff/' + url_pas(name) + '?first=' + flask.request.form.get('ver', '1') + '&second=' + doc_ver + '">' + \
                         '(r' + doc_ver + ')' + \
                     '</a>' + \
                 ''
 
-            warring_edit += '<hr class="main_hr">'
-            editor_top_text = warring_edit + editor_top_text
+            warning_edit += '<hr class="main_hr">'
+            editor_top_text = warning_edit + editor_top_text
 
         editor_top_text += '' + \
             '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>' + \
@@ -199,7 +199,7 @@ def edit_2(conn, name):
                             name="ver" 
                             value="''' + doc_ver + '''">
                     <hr class="main_hr">
-                    ''' + captcha_get() + ip_warring() + cccb_text + '''
+                    ''' + captcha_get() + ip_warning() + cccb_text + '''
                     <button id="save"
                             type="submit" 
                             onclick="

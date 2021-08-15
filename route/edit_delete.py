@@ -64,7 +64,7 @@ def edit_delete_2(conn, name):
             imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('delete') + ')', 0])],
             data = '''
                 <form method="post">
-                    ''' + ip_warring() + '''
+                    ''' + ip_warning() + '''
                     <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                     <hr class="main_hr">
                     ''' + captcha_get() + '''

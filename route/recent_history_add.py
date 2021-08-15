@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def give_history_add_2(conn, name):
+def recent_history_add_2(conn, name):
     curs = conn.cursor()
 
     ip = ip_check()

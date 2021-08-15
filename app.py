@@ -1,5 +1,11 @@
 # Init
-from route import *
+import os
+import re
+
+for i_data in os.listdir("route"):
+    f_src = re.search(r"(.+)\.py$", i_data)
+    if f_src:
+        exec("from route." + f_src.group(1) + " import *")
 
 # Init-Version
 version_list = json.loads(open('version.json', encoding = 'utf8').read())
@@ -148,12 +154,12 @@ create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
 create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
 for create_table in create_data:
     try:
-        curs.execute(db_change('select test from ' + i + ' limit 1'))
+        curs.execute(db_change('select test from ' + create_table + ' limit 1'))
     except:
         try:
-            curs.execute(db_change('create table ' + i + '(test longtext)'))
+            curs.execute(db_change('create table ' + create_table + '(test longtext)'))
         except:
-            curs.execute(db_change("alter table " + i + " add test longtext"))
+            curs.execute(db_change("alter table " + create_table + " add test longtext"))
             
     for create in create_data[create_table]:
         try:
@@ -367,17 +373,10 @@ def list_long_page(tool = 'long_page'):
 def give_admin_groups(name = None):
     return give_admin_groups_2(conn, name)
 
+# 다듬어야할 듯
 @app.route('/delete_admin_group/<name>', methods = ['POST', 'GET'])
 def give_delete_admin_group(name = None):
     return give_delete_admin_group_2(conn, name)
-
-@app.route('/hidden/<everything:name>')
-def give_history_hidden(name = None):
-    return give_history_hidden_2(conn, name)
-
-@app.route('/add_history/<everything:name>', methods = ['POST', 'GET'])
-def give_history_add(name = None):
-    return give_history_add_2(conn, name)
 
 @app.route('/check/<name>')
 def give_user_check(name = None):
@@ -428,7 +427,8 @@ def recent_discuss():
     return recent_discuss_2(conn)
 
 @app.route('/block_log')
-@app.route('/<regex("block_user|block_admin"):tool>/<name>')
+@app.route('/<regex("block_user"):tool>/<name>')
+@app.route('/<regex("block_admin"):tool>/<name>')
 def recent_block(name = None, tool = None):
     return recent_block_2(conn, name, tool)
 
@@ -438,13 +438,31 @@ def recent_block(name = None, tool = None):
 def recent_changes(name = None, tool = 'record'):
     return recent_changes_2(conn, name, tool)
 
-@app.route('/history_tool/<everything:name>')
-def recent_history_tool(name = None):
-    return recent_history_tool_2(conn, name)
+@app.route('/history/tool/<int(signed=True):rev>/<everything:name>')
+def recent_history_tool(name = 'Test', rev = 1):
+    return recent_history_tool_2(conn, name, rev)
 
-@app.route('/history_delete/<everything:name>', methods = ['POST', 'GET'])
-def recent_history_delete(name = None):
-    return recent_history_delete_2(conn, name)
+@app.route('/history/delete/<int(signed=True):rev>/<everything:name>', methods = ['POST', 'GET'])
+def recent_history_delete(name = 'Test', rev = 1):
+    return recent_history_delete_2(conn, name, rev)
+
+@app.route('/history/hidden/<int(signed=True):rev>/<everything:name>')
+def recent_history_hidden(name = 'Test', rev = 1):
+    return recent_history_hidden_2(conn, name, rev)
+
+@app.route('/history/reset/<everything:name>', methods = ['POST', 'GET'])
+def recent_history_reset(name = 'Test'):
+    return recent_history_reset_2(conn, name)
+
+@app.route('/history/add/<everything:name>', methods = ['POST', 'GET'])
+def recent_history_add(name = None):
+    return recent_history_add_2(conn, name)
+
+'''
+@app.route('/record/reset/<name>', methods = ['POST', 'GET'])
+def recent_record_reset():
+    return recent_record_reset_2(conn)
+'''
 
 # Func-search
 @app.route('/search', methods=['POST'])
@@ -477,9 +495,10 @@ def edit_backlink_reset(name = 'Test'):
 def edit_delete(name = None):
     return edit_delete_2(conn, name)
 
+# 수정 필요
 @app.route('/many_delete', methods = ['POST', 'GET'])
-def edit_many_delete(name = None):
-    return edit_many_delete_2(conn)
+def edit_delete_many():
+    return edit_delete_many_2(conn)
 
 @app.route('/move/<everything:name>', methods = ['POST', 'GET'])
 def edit_move(name = None):

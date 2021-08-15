@@ -129,7 +129,7 @@ def login_register_2(conn):
                     
                     <button type="submit">''' + load_lang('save') + '''</button>
                     
-                    ''' + http_warring() + '''
+                    ''' + http_warning() + '''
                 </form>
                 <script>
                     document.getElementById('oauth_google').href = '' +

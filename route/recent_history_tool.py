@@ -1,9 +1,9 @@
 from .tool.func import *
 
-def recent_history_tool_2(conn, name):
+def recent_history_tool_2(conn, name, rev):
     curs = conn.cursor()
 
-    num = str(int(number_check(flask.request.args.get('num', '1'))))
+    num = str(rev)
 
     data = '' + \
         '<h2>' + load_lang('tool') + '</h2>' + \
@@ -11,26 +11,30 @@ def recent_history_tool_2(conn, name):
             '<li><a href="/raw/' + url_pas(name) + '?num=' + num + '">' + load_lang('raw') + '</a></li>' + \
     ''
 
-    if flask.request.args.get('type', '') == 'history':
-        data += '<li><a href="/revert/' + url_pas(name) + '?num=' + num + '">' + load_lang('revert') + '</a></li>'
-        if (int(num) - 1) > 0:
-            data += '<li><a href="/diff/' + url_pas(name) + '?first=' + str(int(num) - 1) + '&second=' + num + '">' + load_lang('compare') + '</a></li>'
-    elif (int(num) - 1) > 0:
-        data += '<li><a href="/revert/' + url_pas(name) + '?num=' + str(int(num) - 1) + '">' + load_lang('revert') + '</a></li>'
+    data += '<li><a href="/revert/' + url_pas(name) + '?num=' + num + '">' + load_lang('revert') + ' | r' + num + '</a></li>'
+    if rev - 1 > 0:
+        data += '<li><a href="/revert/' + url_pas(name) + '?num=' + str(rev - 1) + '">' + load_lang('revert') + ' | r' + str(rev - 1) + '</a></li>'
+    
+    if rev - 1 > 0:
+        data += '<li><a href="/diff/' + url_pas(name) + '?first=' + str(rev - 1) + '&second=' + num + '">' + load_lang('compare') + '</a></li>'
 
-    if flask.request.args.get('type', '') != 'history':
-        data += '<li><a href="/history/' + url_pas(name) + '">' + load_lang('history') + '</a></li>'
+    data += '<li><a href="/history/' + url_pas(name) + '">' + load_lang('history') + '</a></li>'
 
     if admin_check(6) == 1:
         curs.execute(db_change('' + \
             'select title from history ' + \
             'where title = ? and id = ? and hide = "O"' + \
         ''), [name, num])
-        hide = curs.fetchall()
-        data += '<li><a href="/hidden/' + url_pas(name) + '?num=' + num + '">' + (load_lang('hide_release') if hide else load_lang('hide')) + '</li>'
+        data += '<li><a href="/history/hidden/' + num + '/' + url_pas(name) + '">'
+        if curs.fetchall():
+            data += load_lang('hide_release') 
+        else:
+            data += load_lang('hide')
+            
+        data += '</li>'
 
     if admin_check() == 1:
-        data += '<li><a href="/history_delete/' + url_pas(name) + '?num=' + num + '">' + load_lang('history_delete') + '</li>'
+        data += '<li><a href="/history/delete/' + num + '/' + url_pas(name) + '">' + load_lang('history_delete') + '</li>'
 
     data += '</ul>'
 

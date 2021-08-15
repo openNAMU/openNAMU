@@ -383,11 +383,7 @@
         "application_submitted": "Applicatied successfully for registration",
         "waiting_for_approval": "Application for registration has been made successfully. Please wait for approval by administrators.",
         "ie_no_data_required" : "Operation cannot continue because all required data has not been collected.",
-        "http_warring" : "Warning: If you are not on HTTPS connection, Your information can be leaked. We won't response to that.",
-        "user_head_warring" : "User data will be deleted if you close the browser or when you sign in.",
-        "no_login_warring" : "You are not logged in. The IP address will be logged when editing or discussing with non-login.",
         "user_reset_sign" : "Your account information has changed like this.",
-        "update_warring" : "Manual updates are recommended if your version is 0.2 or lower than the latest version. For Windows, the contents of the route folder disappear.",
         "default_edit_help" : "Describe it here",
         "markup_enabled" : "Markup enabled",
         "many_delete_help" : "Please write down the document[s] name one by one on the line.",
@@ -433,4 +429,10 @@
             "restart_fail_error" : "Restart failed. Please use manual restart.",
             "same_email_error" : "There are users using the same email.",
             "input_email_error" : "There is a problem with the input value."
+        "_comment_3.2_" : "Warning",
+            "http_warning" : "Warning: If you are not on HTTPS connection, Your information can be leaked. We won't response to that.",
+            "user_head_warning" : "User data will be deleted if you close the browser or when you sign in.",
+            "no_login_warning" : "You are not logged in. The IP address will be logged when editing or discussing with non-login.",
+            "update_warning" : "Manual updates are recommended if your version is 0.2 or lower than the latest version. For Windows, the contents of the route folder disappear.",
+            "history_delete_warning" : "If you erase history, it's hard to restore it, so make a careful decision."
 }

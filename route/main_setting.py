@@ -227,7 +227,7 @@ def main_setting_2(conn, num, db_set):
     elif num == 2:
         i_list = [
             'contract',
-            'no_login_warring',
+            'no_login_warning',
             'edit_bottom_text',
             'copyright_checkbox_text',
             'check_key_text',

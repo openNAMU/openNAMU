@@ -28,7 +28,7 @@ def user_custom_head_view_2(conn):
             data = head_data[0][0] if head_data else ''
         else:
             start = '' + \
-                '<span>' + load_lang('user_head_warring') + '</span>' + \
+                '<span>' + load_lang('user_head_warning') + '</span>' + \
                 '<hr class="main_hr">' + \
             ''
             data = flask.session['head'] if 'head' in flask.session else ''

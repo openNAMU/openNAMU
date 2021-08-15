@@ -91,7 +91,7 @@ def recent_changes_2(conn, name, tool):
             send = '<br>'
 
             if data[4]:
-                if not re.search(r"^(?: *)$", data[4]):
+                if not re.search(r"^(?: +)$", data[4]):
                     send = data[4]
 
             if re.search(r"\+", data[5]):
@@ -102,10 +102,7 @@ def recent_changes_2(conn, name, tool):
                 leng = '<span style="color:gray;">(' + data[5] + ')</span>'
 
             ip = all_ip[data[3]]
-            if tool == 'history':
-                m_tool = '<a href="/history_tool/' + url_pas(data[1]) + '?num=' + data[0] + '&type=history">(' + load_lang('tool') + ')</a>'
-            else:
-                m_tool = '<a href="/history_tool/' + url_pas(data[1]) + '?num=' + data[0] + '">(' + load_lang('tool') + ')</a>'
+            m_tool = '<a href="/history/tool/' + data[0] + '/' + url_pas(data[1]) + '">(' + load_lang('tool') + ')</a>'
 
             style = ['', '']
             date = data[2]
@@ -114,14 +111,10 @@ def recent_changes_2(conn, name, tool):
                 if admin == 1:
                     style[0] = 'id="toron_color_grey"'
                     style[1] = 'id="toron_color_grey"'
-
-                    send += ' (' + load_lang('hide') + ')'
                 else:
                     ip = ''
                     ban = ''
                     date = ''
-
-                    send = '(' + load_lang('hide') + ')'
 
                     style[0] = 'style="display: none;"'
                     style[1] = 'id="toron_color_grey"'
@@ -174,13 +167,20 @@ def recent_changes_2(conn, name, tool):
                     ''' + div
 
                     if admin == 1:
-                        menu += [['add_history/' + url_pas(name), load_lang('history_add')]]
+                        menu += [
+                            ['history/add/' + url_pas(name), load_lang('history_add')],
+                            ['history/reset/' + url_pas(name), load_lang('history_reset')]
+                        ]
 
                 title = name
                 div += next_fix('/history/' + url_pas(name) + '?tool=' + set_type + '&num=', num, data_list)
             else:
                 title = load_lang('edit_record')
-                menu = [['other', load_lang('other')], ['user', load_lang('user')], ['count/' + url_pas(name), load_lang('count')]]
+                menu = [
+                    ['other', load_lang('other')], 
+                    ['user', load_lang('user')], 
+                    ['count/' + url_pas(name), load_lang('count')]
+                ]
                 div += next_fix('/record/' + url_pas(name) + '?num=', num, data_list)
         else:
             div = '' + \

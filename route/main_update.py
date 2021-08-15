@@ -44,7 +44,7 @@ def main_update_2(conn, r_ver):
     else:
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('update'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
-            data = load_lang('update_warring') + '''
+            data = load_lang('update_warning') + '''
                 <hr class=\"main_hr\">
                 <ul class="inside_ul">
                     <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>

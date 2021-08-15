@@ -108,7 +108,7 @@ def topic_2(conn, topic_num):
                 <form style="''' + display + '''" method="post">
                     <textarea id="content" class="topic_content" placeholder="''' + load_lang('content') + '''" name="content"></textarea>
                     <hr class="main_hr">
-                    ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
+                    ''' + captcha_get() + (ip_warning() if display == '' else '') + '''
                     <input style="display: none;" name="topic" value="''' + name + '''">
                     <input style="display: none;" name="title" value="''' + sub + '''">
                     <button id="save" type="submit">''' + load_lang('send') + '''</button>

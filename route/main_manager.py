@@ -39,7 +39,6 @@ def main_manager_2(conn, num, r_ver):
                 <ul class="inside_ul">
                     <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
                     <li><a href="/many_delete">''' + load_lang('many_delete') + '''</a></li>
-                    <li><a href="/many_delete_history">''' + load_lang('many_history_delete') + '''</a></li>
                     <li><a href="/applications">''' + load_lang('application_list') + '''</a></li>
                     <li><a href="/api/sitemap.xml">''' + load_lang('get_sitemap') + '''</a></li>
                     <li><a href="/register">''' + load_lang('add_user') + '''</a></li>

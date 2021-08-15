@@ -66,7 +66,7 @@ def login_2(conn):
                         <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>
-                        ''' + http_warring() + '''
+                        ''' + http_warning() + '''
                     </form>
                     ''',
             menu = [['user', load_lang('return')]]
