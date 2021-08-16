@@ -310,6 +310,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                 }
 
                 return  '<a id="out_link" ' +
+                            'class="' + name_include + 'link_finder" ' +
                             'target="_blank" ' +
                             'name="' + name_include + 'set_link_' + num_link_str + '" ' + 
                             'title=""' +
