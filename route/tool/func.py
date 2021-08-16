@@ -84,7 +84,7 @@ if sys.version_info < (3, 6):
 global_lang = {}
 global_wiki_set = {}
 
-data_css_ver = '98'
+data_css_ver = '99'
 data_css = ''
 
 conn = ''
@@ -1659,11 +1659,11 @@ def re_error(data):
             if flask.request.path != '/main_skin_set':
                 title = load_lang('skin_set')
                 tool = [['main_skin_set', load_lang('main_skin_set')]]
-                load_skin_set = '<script>main_css_skin_set();</script>'
+                load_skin_set = ''
             else:
                 title = load_lang('main_skin_set')
                 tool = [['skin_set', load_lang('skin_set')]]
-                load_skin_set = ''
+                load_skin_set = '<script>main_css_skin_set();</script>'
         
             return easy_minify(flask.render_template(skin_check(),
                 imp = [title, wiki_set(1), wiki_custom(), wiki_css([0, 0])],

@@ -1,9 +1,14 @@
 function get_link_state(data) {
+    let data_exter_link = '0';
+    if(document.cookie.match(main_css_regex_data('main_css_exter_link'))) {
+        data_exter_link = document.cookie.match(main_css_regex_data('main_css_exter_link'))[1];
+    }
+    
     var link_list = [];
     var link_list_2 = {}
     for(var i = 0; document.getElementsByClassName(data + 'link_finder')[i]; i++) {
         var data_class = document.getElementsByClassName(data + 'link_finder')[i];
-        if(!data_class.href.match(/^#/)) {            
+        if(data_class.id !== 'out_link' && !data_class.href.match(/^#/)) {            
             link_list.push(data_class.title);
             
             if(!link_list_2[data_class.title]) {
@@ -11,10 +16,10 @@ function get_link_state(data) {
             } else {
                 link_list_2[data_class.title].push(i);
             }
+        } else if(data_exter_link === '1' && data_class.id === 'out_link') {
+            document.getElementsByClassName(data + 'link_finder')[i].target = '_self';
         }
     }
-    
-    console.log(link_list);
     
     var data_form = new FormData();
     data_form.append('title_list', JSON.stringify(link_list));
@@ -24,10 +29,8 @@ function get_link_state(data) {
     xhr.send(data_form);
 
     xhr.onreadystatechange = function() {
-        console.log(this)
         if(this.readyState === 4 && this.status === 200) {
             var data_xhr = JSON.parse(this.responseText);
-            console.log(data_xhr)
             for(var key in link_list_2) {
                 if(!data_xhr[key]) {
                     for(var key_2 in link_list_2[key]) {
