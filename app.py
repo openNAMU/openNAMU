@@ -455,14 +455,12 @@ def recent_history_reset(name = 'Test'):
     return recent_history_reset_2(conn, name)
 
 @app.route('/history/add/<everything:name>', methods = ['POST', 'GET'])
-def recent_history_add(name = None):
+def recent_history_add(name = 'Test'):
     return recent_history_add_2(conn, name)
 
-'''
 @app.route('/record/reset/<name>', methods = ['POST', 'GET'])
-def recent_record_reset():
-    return recent_record_reset_2(conn)
-'''
+def recent_record_reset(name = 'Test'):
+    return recent_record_reset_2(conn, name)
 
 # Func-search
 @app.route('/search', methods=['POST'])
@@ -495,7 +493,7 @@ def edit_backlink_reset(name = 'Test'):
 def edit_delete(name = None):
     return edit_delete_2(conn, name)
 
-# 수정 필요
+# 개편 예정
 @app.route('/many_delete', methods = ['POST', 'GET'])
 def edit_delete_many():
     return edit_delete_many_2(conn)
@@ -596,8 +594,7 @@ def watch_list_name(tool = 'star_doc', name = 'Test'):
     return watch_list_name_2(conn, tool, name)
 
 # Func-login
-
-# 현 구조
+# 개편 예정
 @app.route('/login', methods = ['POST', 'GET'])
 def login():
     return login_2(conn)

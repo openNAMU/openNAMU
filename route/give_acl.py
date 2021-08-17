@@ -69,7 +69,9 @@ def give_acl_2(conn, name):
                 [load_lang('view_acl'), 'view']
             ]
         else:
-            acl_get_list = [load_lang('document_acl'), 'decu']
+            acl_get_list = [
+                [load_lang('document_acl'), 'decu']
+            ]
             
         for i in acl_get_list:
             data += '' + \
