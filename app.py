@@ -130,28 +130,31 @@ create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', '
 create_data['rc'] = ['id', 'title', 'date', 'type']
 create_data['acl'] = ['title', 'data', 'type']
 
-# 폐지 예정 (topic_set으로 통합)
+# 개편 예정 (data_link로 변경)
+create_data['back'] = ['title', 'link', 'type']
+
+# 폐지 예정 (topic_set으로 통합) [가장 시급]
 create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
 create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
 
 # 폐지 예정 (user_set으로 통합)
 create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
+create_data['scan'] = ['user', 'title', 'type']
 
-create_data['back'] = ['title', 'link', 'type']
-
+# 개편 예정 (wiki_set과 wiki_filter과 wiki_vote으로 변경)
 create_data['other'] = ['name', 'data', 'coverage']
+create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
+create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
 
+# 개편 예정 (auth_list와 auth_log로 변경)
 create_data['alist'] = ['name', 'acl']
 create_data['re_admin'] = ['who', 'what', 'time']
 
+# 개편 예정 (user_notice와 user_agent로 변경)
 create_data['alarm'] = ['name', 'data', 'date']
 create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
+
 create_data['user_set'] = ['name', 'id', 'data']
-
-create_data['scan'] = ['user', 'title', 'type']
-
-create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
-create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
 for create_table in create_data:
     try:
         curs.execute(db_change('select test from ' + create_table + ' limit 1'))
@@ -449,6 +452,12 @@ def recent_history_delete(name = 'Test', rev = 1):
 @app.route('/history/hidden/<int(signed=True):rev>/<everything:name>')
 def recent_history_hidden(name = 'Test', rev = 1):
     return recent_history_hidden_2(conn, name, rev)
+
+'''
+@app.route('/history/send/<int(signed=True):rev>/<everything:name>')
+def recent_history_send(name = 'Test', rev = 1):
+    return recent_history_send_2(conn, name, rev)
+'''
 
 @app.route('/history/reset/<everything:name>', methods = ['POST', 'GET'])
 def recent_history_reset(name = 'Test'):

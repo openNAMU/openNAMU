@@ -137,7 +137,7 @@ def main_upload_2(conn):
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('upload'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
-                <a href="/file_filter">(''' + load_lang('file_filter_list') + ''')</a>
+                <a href="/file_filter">(''' + load_lang('file_filter_list') + ''')</a> <a href="/extension_filter">(''' + load_lang('extension_filter_list') + ''')</a>
                 ''' + upload_help + '''
                 <hr class="main_hr">
                 ''' + load_lang('max_file_size') + ''' : ''' + wiki_set(3) + '''MB
