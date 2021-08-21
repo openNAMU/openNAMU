@@ -20,7 +20,7 @@ def recent_history_reset_2(conn, name):
                 <form method="post">
                     <span>''' + load_lang('history_delete_warning') + '''</span>
                     <hr class="main_hr">
-                    <button type="submit">''' + load_lang('history_reset') + '''</button>
+                    <button type="submit">''' + load_lang('reset') + '''</button>
                 </form>
             ''',
             menu = [['history/' + url_pas(name), load_lang('return')]]

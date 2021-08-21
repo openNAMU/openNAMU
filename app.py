@@ -367,7 +367,8 @@ def list_title_index():
 def list_user_topic(name = 'test'):
     return list_user_topic_2(conn, name)
 
-@app.route('/<regex("long_page|short_page"):tool>')
+@app.route('/<regex("long_page"):tool>')
+@app.route('/<regex("short_page"):tool>')
 def list_long_page(tool = 'long_page'):
     return list_long_page_2(conn, tool)
 
@@ -453,11 +454,9 @@ def recent_history_delete(name = 'Test', rev = 1):
 def recent_history_hidden(name = 'Test', rev = 1):
     return recent_history_hidden_2(conn, name, rev)
 
-'''
-@app.route('/history/send/<int(signed=True):rev>/<everything:name>')
+@app.route('/history/send/<int(signed=True):rev>/<everything:name>', methods = ['POST', 'GET'])
 def recent_history_send(name = 'Test', rev = 1):
     return recent_history_send_2(conn, name, rev)
-'''
 
 @app.route('/history/reset/<everything:name>', methods = ['POST', 'GET'])
 def recent_history_reset(name = 'Test'):

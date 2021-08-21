@@ -17,12 +17,12 @@ def recent_history_delete_2(conn, name, rev):
         return redirect('/history/' + url_pas(name))
     else:
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(r' + num + ')', 0])],
+            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('history_delete') + ') (r' + num + ')', 0])],
             data = '''
                 <form method="post">
                     <span>''' + load_lang('history_delete_warning') + '''</span>
                     <hr class="main_hr">
-                    <button type="submit">''' + load_lang('history_delete') + '''</button>
+                    <button type="submit">''' + load_lang('delete') + '''</button>
                 </form>
             ''',
             menu = [['history/' + url_pas(name), load_lang('return')]]
