@@ -28,7 +28,7 @@ def main_other_2(conn):
                 <li><a href="/image_file_list">''' + load_lang('image_file_list') + '''</a></li>
                 <li><a href="/vote">''' + load_lang('vote_list') + '''</a></li>
                 <li><a href="/long_page">''' + load_lang('long_page') + '''</a></li>
-                <!-- <li><a href="/short_page">''' + load_lang('short_page') + '''</a></li> -->
+                <li><a href="/short_page">''' + load_lang('short_page') + '''</a></li>
             </ul>
             <br>
             <h2>''' + load_lang('other') + '''</h2>
