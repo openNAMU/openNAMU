@@ -3,7 +3,10 @@ from .tool.func import *
 def login_2fa_2(conn):
     curs = conn.cursor()
 
-    if not (flask.session and 'b_id' in flask.session):
+    # email 2fa
+    # pw 2fa
+    # q_a 2fa
+    if not (flask.session and 'login_id' in flask.session):
         return redirect('/user')
 
     ip = ip_check()

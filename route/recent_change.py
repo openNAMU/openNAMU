@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def recent_changes_2(conn, name, tool):
+def recent_change_2(conn, name, tool):
     curs = conn.cursor()
 
     if flask.request.method == 'POST':
