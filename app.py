@@ -309,7 +309,12 @@ if os.path.exists('custom.py'):
 
 # Func
 # Func-inter_wiki
-@app.route('/<regex("inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter"):tools>')
+
+# 개편 필요
+@app.route('/<regex("inter_wiki"):tools>')
+@app.route('/<regex("edit_top"):tools>')
+@app.route('/<regex("image_license"):tools>')
+@app.route('/<regex("(?:edit|email|file|name|extension)_filter"):tools>')
 def inter_wiki(tools = None):
     return inter_wiki_2(conn, tools)
 
@@ -430,17 +435,26 @@ def view_read(name = None):
 def recent_discuss():
     return recent_discuss_2(conn)
 
+# ongoing 반영 필요
 @app.route('/block_log')
-@app.route('/<regex("block_user"):tool>/<name>')
-@app.route('/<regex("block_admin"):tool>/<name>')
-def recent_block(name = None, tool = None):
+@app.route('/block_log/<regex("user"):tool>/<name>')
+@app.route('/block_log/<regex("admin"):tool>/<name>')
+def recent_block(name = 'Test', tool = 'all'):
     return recent_block_2(conn, name, tool)
 
+# 이 쪽 분리 필요
+@app.route('/recent_change')
 @app.route('/recent_changes')
-@app.route('/<regex("record"):tool>/<name>')
-@app.route('/<regex("history"):tool>/<everything:name>', methods = ['POST', 'GET'])
-def recent_changes(name = None, tool = 'record'):
-    return recent_changes_2(conn, name, tool)
+def recent_change(name = None):
+    return recent_change_2(conn, name, '')
+
+@app.route('/record/<name>')
+def recent_record(name = None):
+    return recent_change_2(conn, name, 'record')
+
+@app.route('/history/<everything:name>', methods = ['POST', 'GET'])
+def recent_history(name = None):
+    return recent_change_2(conn, name, 'history')
 
 @app.route('/history/tool/<int(signed=True):rev>/<everything:name>')
 def recent_history_tool(name = 'Test', rev = 1):
@@ -603,17 +617,35 @@ def watch_list_name(tool = 'star_doc', name = 'Test'):
 
 # Func-login
 # 개편 예정
+
+# login -> login/2fa -> login/2fa/email with login_id
+# register -> register/email -> regiter/email/check with reg_id
+# pass_find -> passfind/email with find_id
 @app.route('/login', methods = ['POST', 'GET'])
-def login():
-    return login_2(conn)
+def login_login():
+    return login_login_2(conn)
 
 @app.route('/login/2fa', methods = ['POST', 'GET'])
 def login_2fa():
-    return login_2fa_2(conn)
+    return login_login_2fa_2(conn)
+
+'''
+@app.route('/login/2fa/email', methods = ['POST', 'GET'])
+def login_2fa_email():
+    return login_login_2fa_email_2(conn)
 
 @app.route('/register', methods = ['POST', 'GET'])
 def login_register():
     return login_register_2(conn)
+
+@app.route('/register/email', methods = ['POST', 'GET'])
+def login_register_email():
+    return login_register_email_2(conn)
+
+@app.route('/register/email/check', methods = ['POST', 'GET'])
+def login_register_email_check():
+    return login_register_email_check_2(conn)
+'''
 
 @app.route('/<regex("need_email"):tool>', methods = ['POST', 'GET'])
 @app.route('/<regex("pass_find"):tool>', methods = ['POST', 'GET'])

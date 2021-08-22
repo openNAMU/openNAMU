@@ -18,14 +18,11 @@ def login_2(conn):
 
         user_agent = flask.request.headers.get('User-Agent', '')
         user_id = flask.request.form.get('id', '')
-
         user_data = {}
-        curs.execute(db_change("" + \
-            "select name, data from user_set " + \
-            "where id = ? and (name = 'pw' or name = 'encode')" + \
-        ""), [
-            user_id
-        ])
+
+        curs.execute(db_change(
+            'select name, data from user_set where id = ? and name = "pw"'
+        ), [user_id])
         sql_data = curs.fetchall()
         if not sql_data:
             return re_error('/error/2')
@@ -33,19 +30,18 @@ def login_2(conn):
             for i in sql_data:
                 user_data[i[0]] = i[1]
 
-        pw_check_d = pw_check(
+        if pw_check(
             flask.request.form.get('pw', ''),
             user_data['pw'],
             user_data['encode'],
             user_id
-        )
-        if pw_check_d != 1:
+        ) != 1:
             return re_error('/error/10')
 
         curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [user_id])
         fa_data = curs.fetchall()
         if fa_data and fa_data[0][0] != '':
-            flask.session['b_id'] = user_id
+            flask.session['login_id'] = user_id
 
             return redirect('/login/2fa')
         else:

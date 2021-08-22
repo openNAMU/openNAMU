@@ -60,6 +60,14 @@ function do_data_try_insert(name_ob, data) {
     ''
 }
 
+function do_all_try(data) {
+    return '' +
+        'try {\n'
+            + data + 
+        '} catch {}\n' +
+    ''
+}
+
 function do_px_add(data) {
     return data.match(/^[0-9]+$/) ? (data + 'px') : data;
 }
@@ -280,7 +288,6 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                     '\n' +
                 '';
 
-                category_data = (category_data === '' ? '<div id="cate_all"><div id="cate">Category : ' : category_data);
                 category_data += '' +
                     '<a class="' + name_include + 'link_finder" ' +
                         'name="' + name_include + 'set_link_' + num_link_str + '" ' +
@@ -357,9 +364,15 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
             }
         });
     }
-    
-    if(name_include === '') {
-        data += (category_data === '' ? '' : (category_data.replace(/\| $/, '') + '</div></div>'));
+
+    if(category_data !== '') {
+        if(name_include === '') {
+            category_data = '<div id="cate_all"><div id="cate">Category : ' + category_data;
+        } else {
+            category_data = '<div style="display: none;" id="cate_all"><div id="cate">Category : ' + category_data;
+        }
+        
+        data += category_data.replace(/\| $/, '') + '</div></div>';
     }
     
     return [data, data_js];
@@ -958,18 +971,7 @@ function do_onmark_table_render(data) {
     return data;
 }
 
-function do_onmark_list_render(data) {
-    var wiki_re = /<wiki_s_2 ([^>]+)>((?:(?!<wiki_s_2 |<wiki_e_2>).)+)<wiki_e_2>/s;
-    while(1) {
-        if(!data.match(wiki_re)) {
-            break;
-        }
-
-        data = data.replace(wiki_re, function(x, x_1, x_2) {
-            return '<wiki_s_3 ' + x_1 + '>' + x_2.replace(/\n/g, '<t_br>') + '<wiki_e_3>';
-        });
-    }
-    
+function do_onmark_list_sub_render(data) {
     var quote_re = /\n((?:(?:(?:&gt;)+) ?(?:(?:(?!\n).)*)\n)+)/;
     var quote_short_re = /((?:&gt;)+) ?((?:(?!\n).)*)\n/g;
     var quote_leng = 1;
@@ -1017,13 +1019,31 @@ function do_onmark_list_render(data) {
         
         var list_end_data = list_data[1].replace(list_short_re, function(x, x_1, x_2) {
             var list_leng = x_1.length;
+            
             list_leng = list_leng > 0 ? list_leng : 1;
             
-            return '<li style="margin-left: ' + String((list_leng - 1) * 20) + 'px">' + x_2 + '</li>';
+            return '<li style="margin-left: ' + String(list_leng * 20) + 'px">' + x_2 + '</li>';
         });
 
         data = data.replace(list_re, '\n<start_point><ul>' + list_end_data + '</ul><end_point>\n');
     }
+    
+    return data;
+}
+
+function do_onmark_list_render(data) {
+    var wiki_re = /<wiki_s_2 ([^>]+)>((?:(?!<wiki_s_2 |<wiki_e_2>).)+)<wiki_e_2>/s;
+    while(1) {
+        if(!data.match(wiki_re)) {
+            break;
+        }
+
+        data = data.replace(wiki_re, function(x, x_1, x_2) {
+            return '<wiki_s_3 ' + x_1 + '>' + x_2.replace(/\n/g, '<t_br>') + '<wiki_e_3>';
+        });
+    }
+    
+    data = do_onmark_list_sub_render(data);
     
     var wiki_re = /<wiki_s_3 ([^>]+)>((?:(?!<wiki_s_3 |<wiki_e_3>).)+)<wiki_e_3>/s;
     while(1) {
@@ -1035,6 +1055,8 @@ function do_onmark_list_render(data) {
             return '<wiki_s_4 ' + x_1 + '>' + x_2.replace(/<t_br>/g, '\n') + '<wiki_e_4>';
         });
     }
+    
+    data = do_onmark_list_sub_render(data);
     
     return data;
 }
