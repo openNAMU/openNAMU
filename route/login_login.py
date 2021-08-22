@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def login_2(conn):
+def login_login_2(conn):
     curs = conn.cursor()
 
     ip = ip_check()
@@ -21,7 +21,7 @@ def login_2(conn):
         user_data = {}
 
         curs.execute(db_change(
-            'select name, data from user_set where id = ? and name = "pw"'
+            'select name, data from user_set where id = ? and name = "pw" or name = "encode"'
         ), [user_id])
         sql_data = curs.fetchall()
         if not sql_data:
