@@ -621,18 +621,20 @@ def watch_list_name(tool = 'star_doc', name = 'Test'):
 # login -> login/2fa -> login/2fa/email with login_id
 # register -> register/email -> regiter/email/check with reg_id
 # pass_find -> passfind/email with find_id
+
 @app.route('/login', methods = ['POST', 'GET'])
 def login_login():
     return login_login_2(conn)
 
 @app.route('/login/2fa', methods = ['POST', 'GET'])
-def login_2fa():
+def login_login_2fa():
     return login_login_2fa_2(conn)
 
 '''
 @app.route('/login/2fa/email', methods = ['POST', 'GET'])
 def login_2fa_email():
     return login_login_2fa_email_2(conn)
+'''
 
 @app.route('/register', methods = ['POST', 'GET'])
 def login_register():
@@ -645,7 +647,6 @@ def login_register_email():
 @app.route('/register/email/check', methods = ['POST', 'GET'])
 def login_register_email_check():
     return login_register_email_check_2(conn)
-'''
 
 @app.route('/<regex("need_email"):tool>', methods = ['POST', 'GET'])
 @app.route('/<regex("pass_find"):tool>', methods = ['POST', 'GET'])

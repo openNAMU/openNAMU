@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def login_2fa_2(conn):
+def login_login_2fa_2(conn):
     curs = conn.cursor()
 
     # email 2fa
@@ -23,7 +23,7 @@ def login_2fa_2(conn):
             captcha_post('', 0)
 
         user_agent = flask.request.headers.get('User-Agent', '')
-        user_id = flask.session['b_id']
+        user_id = flask.session['login_id']
 
         curs.execute(db_change('select data from user_set where name = "2fa_pw" and id = ?'), [user_id])
         user_1 = curs.fetchall()
@@ -43,7 +43,12 @@ def login_2fa_2(conn):
 
         flask.session['id'] = user_id
 
-        ua_plus(user_id, ip, user_agent, get_time())
+        ua_plus(
+            user_id, 
+            ip, 
+            user_agent, 
+            get_time()
+        )
         conn.commit()
 
         flask.session.pop('b_id', None)
