@@ -636,6 +636,7 @@ def login_2fa_email():
     return login_login_2fa_email_2(conn)
 '''
 
+# 아 이건 생각 좀 해보고 해야지
 @app.route('/register', methods = ['POST', 'GET'])
 def login_register():
     return login_register_2(conn)
@@ -648,6 +649,7 @@ def login_register_email():
 def login_register_email_check():
     return login_register_email_check_2(conn)
 
+# 이 파트와 통일 예정
 @app.route('/<regex("need_email"):tool>', methods = ['POST', 'GET'])
 @app.route('/<regex("pass_find"):tool>', methods = ['POST', 'GET'])
 def login_need_email(tool = 'pass_find'):
