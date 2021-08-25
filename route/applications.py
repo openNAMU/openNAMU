@@ -1,7 +1,6 @@
 from .tool.func import *
 
 def applications_2(conn):
-    # 만들다만 느낌이니 수정 필요
     curs = conn.cursor()
 
     div = ''
@@ -12,7 +11,7 @@ def applications_2(conn):
     curs.execute(db_change('select data from other where name = "requires_approval"'))
     requires_approval = curs.fetchall()
     if requires_approval and requires_approval[0][0] != 'on':
-        div += '<p>' + load_lang('approval_requirement_disabled') + '</p>'
+        div += load_lang('approval_requirement_disabled')
 
     if flask.request.method == 'GET':
         curs.execute(db_change(
@@ -21,68 +20,75 @@ def applications_2(conn):
         db_data = curs.fetchall()
         if db_data:
             div += '' + \
-                '<p>' + load_lang('all_register_num') + ' : ' + str(len(db_data)) + '</p>' + \
+                load_lang('all_register_num') + ' : ' + str(len(db_data)) + \
                 '<hr class="main_hr">' + \
             ''
+            
+            div += '''
+                <table id="main_table_set">
+                    <tr id="main_table_top_tr">
+                        <td id="main_table_width">''' + load_lang('id') + '''</td>
+                        <td id="main_table_width">''' + load_lang('email') + '''</td>
+                        <td id="main_table_width">''' + load_lang('application_time') + '''</td>
+                    </tr>
+                    <tr id="main_table_top_tr">
+                        <td>''' + load_lang('approval_question') + '''</td>
+                        <td colspan="2">''' + load_lang('answer') + '''</td>
+                    </tr>                        
+            '''
 
             for application in db_data:
-                application = json.loads(application)
+                application = json.loads(application[0])
                 
-                question = application['question']
-                if not question:
-                    question = ''
+                if 'question' in application:
+                    question = html.escape(application['question'])
+                    question = question if question != '' else '<br>'
+                else:
+                    question = '<br>'
                     
-                answer = application['answer']
-                if not answer:
-                    answer = ''
-                
-                email = application['email']
-                if not email:
-                    email = ''
+                if 'answer' in application:
+                    answer = html.escape(application['answer'])
+                    answer = answer if answer != '' else '<br>'
+                else:
+                    answer = '<br>'
+                    
+                    
+                if 'email' in application:
+                    email = html.escape(application['email'])
+                    email = email if email != '' else '<br>'
+                else:
+                    email = '<br>'
                 
                 div += '''
-                    <form method=\"post\">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td>''' + load_lang('id') + '''</td>
-                                    <td>''' + application['id'] + '''</td>
-                                </tr>
-                                <tr>
-                                    <td>''' + load_lang('application_time') + '''</td>
-                                    <td>''' + application['date'] + '''</td>
-                                </tr>
-                                <tr>
-                                    <td>''' + load_lang('approval_question') + '''</td>
-                                    <td>''' + html.escape(question) + '''</td>
-                                </tr>
-                                <tr>
-                                    <td>''' + load_lang('answer') + '''</td>
-                                    <td>''' + html.escape(answer) + '''</td>
-                                </tr>
-                                <tr>
-                                    <td>''' + load_lang('email') + '''</td>
-                                    <td>''' + html.escape(email) + '''</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" style="text-align: center;">
-                                        <button type="submit" 
-                                                name="approve" 
-                                                value="''' + application['id'] + '''">
-                                            ''' + load_lang('approve') + '''
-                                        </button>
-                                        <button type="submit" 
-                                                name="decline" 
-                                                value="''' + application['id'] + '''">
-                                            ''' + load_lang('decline') + '''
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <form method="post">
+                        <tr>
+                            <td>''' + application['id'] + '''</td>
+                            <td>''' + email + '''</td>
+                            <td>''' + application['date'] + '''</td>
+                        </tr>
+                        <tr>
+                            <td>''' + question + '''</td>
+                            <td colspan="2">''' + answer + '''</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <button type="submit" 
+                                        id="save"
+                                        name="approve" 
+                                        value="''' + application['id'] + '''">
+                                    ''' + load_lang('approve') + '''
+                                </button>
+                                <button type="submit" 
+                                        name="decline" 
+                                        value="''' + application['id'] + '''">
+                                    ''' + load_lang('decline') + '''
+                                </button>
+                            </td>
+                        </tr>
                     </form>
-                    <br>
                 '''
+                
+            div += '</table>'
         else:
             div += load_lang('no_applications_now')
 
