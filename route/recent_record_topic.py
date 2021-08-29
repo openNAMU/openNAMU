@@ -1,22 +1,18 @@
 from .tool.func import *
 
-def list_user_topic_2(conn, name):
+def recent_record_topic_2(conn, name):
     curs = conn.cursor()
 
     num = int(number_check(flask.request.args.get('num', '1')))
-    if num * 50 > 0:
-        sql_num = num * 50 - 50
-    else:
-        sql_num = 0
+    sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
     div = '''
         <table id="main_table_set">
-            <tbody>
-                <tr>
-                    <td id="main_table_width">''' + load_lang('discussion_name') + '''</td>
-                    <td id="main_table_width">''' + load_lang('writer') + '''</td>
-                    <td id="main_table_width">''' + load_lang('time') + '''</td>
-                </tr>
+            <tr id="main_table_top_tr">
+                <td id="main_table_width">''' + load_lang('discussion_name') + '''</td>
+                <td id="main_table_width">''' + load_lang('writer') + '''</td>
+                <td id="main_table_width">''' + load_lang('time') + '''</td>
+            </tr>
     '''
     sub = '(' + html.escape(name) + ')'
     pas_name = ip_pas(name)
@@ -39,19 +35,14 @@ def list_user_topic_2(conn, name):
             '</tr>' + \
         ''
 
-    div += '' + \
-            '</tbody>' + \
-        '</table>' + \
-    ''
-    div += next_fix('/topic_record/' + url_pas(name) + '?num=', num, data_list)
+    div += '</table>'
+    div += next_fix('/record/topic/' + url_pas(name) + '?num=', num, data_list)
     
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('discussion_record'), wiki_set(), wiki_custom(), wiki_css([sub, 0])],
         data = div,
         menu = [
             ['other', load_lang('other')], 
-            ['user', load_lang('user')], 
-            ['count/' + url_pas(name), load_lang('count')], 
-            ['record/' + url_pas(name), load_lang('record')]
+            ['user', load_lang('user')]
         ]
     ))

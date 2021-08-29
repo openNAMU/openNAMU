@@ -27,7 +27,7 @@ def user_count_edit_2(conn, name):
         data = '''
             <ul class="inside_ul">
                 <li><a href="/record/''' + url_pas(that) + '''">''' + load_lang('edit_record') + '''</a> : ''' + str(data) + '''</li>
-                <li><a href="/topic_record/''' + url_pas(that) + '''">''' + load_lang('discussion_record') + '''</a> : ''' + str(t_data) + '''</a></li>
+                <li><a href="/record/topic/''' + url_pas(that) + '''">''' + load_lang('discussion_record') + '''</a> : ''' + str(t_data) + '''</a></li>
             </ul>
         ''',
         menu = [['user', load_lang('return')]]

@@ -9,7 +9,7 @@ def main_manager_2(conn, num, r_ver):
         2 : [load_lang('file_name'), 'plus_file_filter', load_lang('file_filter_add')],
         3 : [0, 'admin', load_lang('authorize')],
         4 : [0, 'record', load_lang('edit_record')],
-        5 : [0, 'topic_record', load_lang('discussion_record')],
+        5 : [0, 'record/topic', load_lang('discussion_record')],
         6 : [load_lang('name'), 'admin_plus', load_lang('add_admin_group')],
         7 : [load_lang('name'), 'plus_edit_filter', load_lang('edit_filter_add')],
         8 : [load_lang('document_name'), 'search', load_lang('search')],
@@ -39,7 +39,7 @@ def main_manager_2(conn, num, r_ver):
                 <ul class="inside_ul">
                     <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
                     <li><a href="/many_delete">''' + load_lang('many_delete') + '''</a></li>
-                    <li><a href="/applications">''' + load_lang('application_list') + '''</a></li>
+                    <li><a href="/app_submit">''' + load_lang('application_list') + '''</a></li>
                     <li><a href="/api/sitemap.xml">''' + load_lang('get_sitemap') + '''</a></li>
                     <li><a href="/register">''' + load_lang('add_user') + '''</a></li>
                     <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
