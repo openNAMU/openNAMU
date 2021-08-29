@@ -95,7 +95,6 @@ def login_register_2(conn):
                     <input placeholder="''' + load_lang('password_confirm') + '''" name="pw2" type="password">
                     <hr class="main_hr">
                     
-                    ''' + approval_question + '''
                     ''' + captcha_get() + '''
                     
                     <!--

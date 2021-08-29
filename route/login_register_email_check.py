@@ -7,8 +7,6 @@ def login_register_email_check_2(conn):
         return redirect('/register')
     
     if  flask.request.method == 'POST':
-        user_ip = ip_check()
-        user_agent = flask.request.headers.get('User-Agent', '')
         input_key = flask.request.form.get('key', '')
 
         if flask.session['reg_key'] != input_key:

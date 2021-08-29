@@ -368,10 +368,6 @@ def list_please():
 def list_title_index():
     return list_title_index_2(conn)
 
-@app.route('/topic_record/<name>')
-def list_user_topic(name = 'test'):
-    return list_user_topic_2(conn, name)
-
 @app.route('/<regex("long_page"):tool>')
 @app.route('/<regex("short_page"):tool>')
 def list_long_page(tool = 'long_page'):
@@ -483,6 +479,14 @@ def recent_history_add(name = 'Test'):
 @app.route('/record/reset/<name>', methods = ['POST', 'GET'])
 def recent_record_reset(name = 'Test'):
     return recent_record_reset_2(conn, name)
+
+@app.route('/record/topic/<name>')
+def recent_record_topic(name = 'Test'):
+    return recent_record_topic_2(conn, name)
+
+@app.route('/app_submit', methods = ['POST', 'GET'])
+def recent_app_submit():
+    return recent_app_submit_2(conn)
 
 # Func-search
 @app.route('/search', methods=['POST'])
@@ -649,11 +653,9 @@ def login_register_email():
 def login_register_email_check():
     return login_register_email_check_2(conn)
 
-'''
 @app.route('/register/submit', methods = ['POST', 'GET'])
 def login_register_submit():
     return login_register_submit_2(conn)
-'''
 
 # 이 파트와 통일 예정
 @app.route('/<regex("need_email"):tool>', methods = ['POST', 'GET'])
@@ -669,16 +671,6 @@ def login_check_key(tool = 'check_pass_key'):
 @app.route('/logout')
 def login_logout():
     return login_logout_2(conn)
-
-# Func-application
-# 이 파트는 register과 list로 쪼갤 예정
-@app.route('/application_submitted')
-def application_submitted():
-    return application_submitted_2(conn)
-
-@app.route('/applications', methods = ['POST', 'GET'])
-def applications():
-    return applications_2(conn)
 
 # Func-vote
 @app.route('/vote/<num>', methods = ['POST', 'GET'])

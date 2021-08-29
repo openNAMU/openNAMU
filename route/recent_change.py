@@ -60,8 +60,6 @@ def recent_change_2(conn, name, tool):
                     <td id="main_table_width">''' + load_lang('time') + '''</td>
                 '''
 
-                div = '<a href="/topic_record/' + url_pas(name) + '">(' + load_lang('discussion') + ')</a><hr class=\"main_hr\">' + div
-
                 curs.execute(db_change('' + \
                     'select id, title, date, ip, send, leng, hide from history ' + \
                     "where ip = ? order by date desc limit ?, 50" + \
@@ -178,8 +176,7 @@ def recent_change_2(conn, name, tool):
                 title = load_lang('edit_record')
                 menu = [
                     ['other', load_lang('other')], 
-                    ['user', load_lang('user')], 
-                    ['count/' + url_pas(name), load_lang('count')],
+                    ['user', load_lang('user')],
                     ['record/reset/' + url_pas(name), load_lang('record_reset')]
                 ]
                 div += next_fix('/record/' + url_pas(name) + '?num=', num, data_list)

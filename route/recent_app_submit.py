@@ -1,12 +1,9 @@
 from .tool.func import *
 
-def applications_2(conn):
+def recent_app_submit_2(conn):
     curs = conn.cursor()
 
     div = ''
-
-    if admin_check() != 1:
-        return re_error('/ban')
 
     curs.execute(db_change('select data from other where name = "requires_approval"'))
     requires_approval = curs.fetchall()
@@ -27,13 +24,12 @@ def applications_2(conn):
             div += '''
                 <table id="main_table_set">
                     <tr id="main_table_top_tr">
-                        <td id="main_table_width">''' + load_lang('id') + '''</td>
-                        <td id="main_table_width">''' + load_lang('email') + '''</td>
-                        <td id="main_table_width">''' + load_lang('application_time') + '''</td>
+                        <td id="main_table_width_half">''' + load_lang('id') + '''</td>
+                        <td id="main_table_width_half">''' + load_lang('email') + '''</td>
                     </tr>
                     <tr id="main_table_top_tr">
                         <td>''' + load_lang('approval_question') + '''</td>
-                        <td colspan="2">''' + load_lang('answer') + '''</td>
+                        <td>''' + load_lang('answer') + '''</td>
                     </tr>                        
             '''
 
@@ -64,11 +60,10 @@ def applications_2(conn):
                         <tr>
                             <td>''' + application['id'] + '''</td>
                             <td>''' + email + '''</td>
-                            <td>''' + application['date'] + '''</td>
                         </tr>
                         <tr>
                             <td>''' + question + '''</td>
-                            <td colspan="2">''' + answer + '''</td>
+                            <td>''' + answer + '''</td>
                         </tr>
                         <tr>
                             <td colspan="3">
@@ -98,6 +93,9 @@ def applications_2(conn):
             menu = [['other', load_lang('return')]]
         ))
     else:
+        if admin_check(None, 'app submit') != 1:
+            return re_error('/ban')
+        
         if flask.request.form.get('approve', '') != '':
             curs.execute(db_change(
                 'select data from user_set where id = ? and name = "application"'
@@ -110,29 +108,13 @@ def applications_2(conn):
             else:
                 application = json.loads(application[0][0])
             
-            curs.execute(db_change(
-                "insert into user_set (id, name, data) values (?, 'pw', ?)"
-            ), [
-                application['id'],
-                application['pw']
-            ])
-            curs.execute(db_change(
-                "insert into user_set (id, name, data) values (?, 'acl', 'user')"
-            ), [
-                application['id']
-            ])
-            curs.execute(db_change(
-                "insert into user_set (id, name, data) values (?, 'date', ?)"
-            ), [
-                application['id'],
-                application['date']
-            ])
-            curs.execute(db_change(
-                "insert into user_set (id, name, data) values (?, 'encode', ?)"
-            ), [
-                application['id'],
+            add_user(
+                application['id'], 
+                application['pw'],
+                application['email'],
                 application['encode']
-            ])
+            )
+
             curs.execute(db_change(
                 "insert into user_set (name, id, data) values ('approval_question', ?, ?)"
             ), [
@@ -140,27 +122,11 @@ def applications_2(conn):
                 application['question']
             ])
             curs.execute(db_change(
-                "insert into user_set (name, id, data) " + \
-                "values ('approval_question_answer', ?, ?)"
+                "insert into user_set (name, id, data) values ('approval_question_answer', ?, ?)"
             ), [
                 application['id'], 
                 application['answer']
             ])
-            
-            ua_plus(
-                application['id'], 
-                application['ip'], 
-                application['ua'], 
-                application['date']
-            )
-            
-            if application['email'] != '':
-                curs.execute(db_change(
-                    "insert into user_set (name, id, data) values ('email', ?, ?)"
-                ), [
-                    application['id'], 
-                    application['email']
-                ])
             
             curs.execute(db_change(
                 'delete from user_set where id = ? and name = "application"'
@@ -176,4 +142,4 @@ def applications_2(conn):
             ])
             conn.commit()
 
-        return redirect('/applications')
+        return redirect('/app_submit')
