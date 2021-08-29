@@ -18,11 +18,13 @@ def login_register_2(conn):
             return re_error('/ban')
 
     if flask.request.method == 'POST':
+        # 리캡차
         if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
             return re_error('/error/13')
         else:
             captcha_post('', 0)
 
+        # 아이디 비밀번호 검증 파트
         user_id = flask.request.form.get('id', '')
         user_pw = flask.request.form.get('pw', '')
         user_repeat = flask.request.form.get('pw2', '')
@@ -48,61 +50,35 @@ def login_register_2(conn):
         curs.execute(db_change("select id from user_set where id = ?"), [user_id])
         if curs.fetchall():
             return re_error('/error/6')
-
-        hashed = pw_encode(user_pw)
-        ans_q = flask.request.form.get('approval_question_answer', '')
-
-        curs.execute(db_change('select data from other where name = "requires_approval"'))
-        requires_approval = curs.fetchall()
-        requires_approval = requires_approval and requires_approval[0][0] == 'on'
-        requires_approval = None if admin == 1 else requires_approval
-        if requires_approval:
-            curs.execute(db_change('select data from other where name = "approval_question"'))
-            approval_question = curs.fetchall()
-            approval_question = approval_question[0][0] if approval_question and approval_question[0][0] else ''
-        else:
-            approval_question = ''
-
-        # c_id, c_pw, c_ans, c_que, c_key, c_type
-        flask.session['c_id'] = user_id
-        flask.session['c_pw'] = hashed
-        flask.session['c_type'] = 'register'
-        if requires_approval:
-            flask.session['c_ans'] = flask.request.form.get('approval_question_answer', '')
-            flask.session['c_que'] = approval_question
         
-        curs.execute(db_change('select data from other where name = "email_have"'))
-        sql_data = curs.fetchall()
-        if sql_data and sql_data[0][0] != '' and admin != 1:
-            flask.session['c_key'] = load_random_key(32)
+        if admin != 1:
+            # 이메일 필요시 /register/email로 발송
+            curs.execute(db_change('select data from other where name = "email_have"'))
+            sql_data = curs.fetchall()
+            if sql_data and sql_data[0][0] != '':
+                # 임시로 세션에 저장
+                flask.session['reg_id'] = user_id
+                flask.session['reg_pw'] = user_pw
 
-            return redirect('/need_email')
-        else:
-            flask.session['c_key'] = 'email_pass'
-
-            return redirect('/check_key')
+                return redirect('/register/email')
+            
+            # 가입 승인 필요시 /register/submit으로 발송
+            curs.execute(db_change('select data from other where name = "requires_approval"'))
+            sql_data = curs.fetchall()
+            if sql_data and sql_data[0][0] != '':
+                flask.session['submit_id'] = user_id
+                flask.session['submit_pw'] = user_pw
+                
+                return redirect('/register/submit')
+        
+        # 전부 아니면 바로 가입 후 /login으로 발송
+        add_user(user_id, user_pw)
+        
+        return redirect('/login')
     else:
         curs.execute(db_change('select data from other where name = "contract"'))
         data = curs.fetchall()
         contract = (data[0][0] + '<hr class="main_hr">') if data and data[0][0] != '' else ''
-
-        approval_question = ''
-        
-        curs.execute(db_change('select data from other where name = "requires_approval"'))
-        requires_approval = curs.fetchall()
-        requires_approval = requires_approval and requires_approval[0][0] == 'on'
-        requires_approval = None if admin == 1 else requires_approval
-        if requires_approval:
-            curs.execute(db_change('select data from other where name = "approval_question"'))
-            data = curs.fetchall()
-            if data and data[0][0] != '':
-                approval_question = '''
-                    <hr class="main_hr">
-                    <span>''' + load_lang('approval_question') + ' : ' + data[0][0] + '''<span>
-                    <hr class="main_hr">
-                    <input placeholder="''' + load_lang('approval_question') + '''" name="approval_question_answer" type="text">
-                    <hr class="main_hr">
-                '''
                 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('register'), wiki_set(), wiki_custom(), wiki_css([0, 0])],

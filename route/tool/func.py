@@ -1406,6 +1406,52 @@ def add_alarm(who, context):
         'insert into alarm (name, data, date) values (?, ?, ?)'
     ), [who, context, get_time()])
     
+def add_user(user_name, user_pw, user_email = ''):
+    curs.execute(db_change("select id from user_set where id = ? limit 1"), [
+        user_name
+    ])
+    if curs.fetchall():
+        return 0
+    
+    user_pw_hash = pw_encode(user_pw)
+    
+    curs.execute(db_change('select data from other where name = "encode"'))
+    data_encode = curs.fetchall()
+    data_encode = data_encode[0][0]
+
+    curs.execute(db_change("select id from user_set limit 1"))
+    if not curs.fetchall():
+        user_auth = 'owner'
+    else:
+        user_auth = 'user'
+
+    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'pw', ?)"), [
+        user_name,
+        user_pw_hash
+    ])
+    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'acl', ?)"), [
+        user_name,
+        user_auth
+    ])
+    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'date', ?)"), [
+        user_name,
+        get_time()
+    ])
+    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'encode', ?)"), [
+        user_name,
+        data_encode
+    ])
+    
+    if user_email != '':
+        curs.execute(db_change("insert into user_set (name, id, data) values ('email', ?, ?)"), [
+            user_name,
+            user_email
+        ])
+        
+    conn.commit()
+        
+    return 1
+    
 def ua_plus(u_id, u_ip, u_agent, time):
     curs.execute(db_change("select data from other where name = 'ua_get'"))
     rep_data = curs.fetchall()
