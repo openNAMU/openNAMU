@@ -169,7 +169,33 @@ class server_init:
                         return server_set_val
                 else:
                     return self.server_set_var[key]['default']
-                
+
+def get_conn(db_set):
+    if db_set['type'] == 'sqlite':
+        conn = sqlite3.connect(db_set['name'] + '.db')
+        curs = conn.cursor()
+    else:
+        conn = pymysql.connect(
+            host = db_set['mysql_host'],
+            user = db_set['mysql_user'],
+            password = db_set['mysql_pw'],
+            charset = 'utf8mb4',
+            port = int(db_set['mysql_port'])
+        )
+        curs = conn.cursor()
+    
+        try:
+            curs.execute(db_change(
+                'create database ' + db_set['name'] + ' ' + \
+                'default character set utf8mb4;'
+            ))
+        except:
+            pass
+        
+        conn.select_db(db_set['name'])
+        
+    return conn
+
 def update(ver_num, set_data):
     print('----')
     # 업데이트 하위 호환 유지 함수
