@@ -589,7 +589,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                         var middle_wiki_re = /^(?:[^ ]+)(?: style=['"]([^\n'"]*)['"])?\n?/;
                         var middle_wiki = middle_data_x_1.match(middle_wiki_re);
                         middle_wiki = middle_wiki[1] ? middle_wiki[1] : '';
-                        middle_wiki = middle_wiki.replace(/display/, '');
+                        middle_wiki = middle_wiki.replace(/position/, '');
 
                         middle_data_all = middle_data_x_1.replace(middle_wiki_re, '');
                         
