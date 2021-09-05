@@ -34,10 +34,14 @@ function do_darkmode_split(data) {
     return data.split(',')[0];
 }
 
-function do_js_safe_change(data) {
+function do_js_safe_change(data, br_on = 1) {
     data = data.replace(/\\/g, '\\\\');
     data = data.replace(/"/g, '\\"');
-    data = data.replace(/\n/g, '<br>');
+    if(br_on === 1) {
+        data = data.replace(/\n/g, '<br>');
+    } else {
+        data = data.replace(/\n/g, '\\n');
+    }
     
     return data;
 }
@@ -633,7 +637,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                         data_nowiki[name_include + 'nowiki_syntax_' + String(syntax_n)] = middle_data_all;
                         data_js += do_data_try_insert(
                             name_include + 'nowiki_syntax_' + String(syntax_n),
-                            do_js_safe_change(middle_data_all)
+                            do_js_safe_change(do_xss_change(middle_data_all), 0)
                         );
 
                         return middle_data_before +
@@ -663,7 +667,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
     data = data.replace(/<mid_e>/g, '}}}');
     
     if(syntax_n > 0) {
-        data_js += 'hljs.initHighlightingOnLoad();\n';
+        data_js += 'hljs.highlightAll();\n';
     }
     
     return [data, data_js, data_nowiki];
