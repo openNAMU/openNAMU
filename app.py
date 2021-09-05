@@ -126,6 +126,7 @@ if data_db_set['type'] == 'mysql':
 db_data_get(data_db_set['type'])
 conn = get_conn(data_db_set)
 load_conn(conn)
+curs = conn.cursor()
 
 # Init-Create_DB
 create_data = {}
