@@ -1,4 +1,4 @@
-body, html, video, table, iframe, input, textarea, img, hr, blockquote, pre {
+body, html, video, table, iframe, input, textarea, img, hr, blockquote, pre, iframe {
     max-width: 100%;
 }
 
@@ -18,9 +18,12 @@ input {
 #toc {
     border: 1px solid gainsboro;
     padding: 20px;
+    
     width: fit-content;
     width: -moz-fit-content;
+    
     clear: both;
+    
     margin-top: 10px;
 }
 
@@ -30,6 +33,7 @@ table {
 
 td {
     border: 1px solid gainsboro;
+    
     padding: 5px 10px;
 }
 
@@ -100,10 +104,6 @@ input[type="checkbox"], input[type="radio"] {
     border: 1px solid gainsboro;
     padding: 5px;
     margin-top: 20px;
-}
-
-img, iframe {
-    max-width: 100%;
 }
 
 pre {
@@ -184,12 +184,6 @@ body {
     }
 }
 
-.all_in_data {
-    display: block;
-    width: 100%;
-    white-space: pre-wrap;
-}
-
 .table_safe {
     max-width: 100%;
 }
@@ -200,8 +194,10 @@ body {
 
 #topic_scroll {
     max-height: 500px;
+    
     overflow: scroll;
     -ms-overflow-style: none;
+
     scrollbar-width: none;
 }
 
@@ -247,6 +243,7 @@ hr {
 
 .render_content {
     white-space: pre-wrap;
+    line-break: anywhere;
 }
 
 blockquote {
