@@ -84,7 +84,7 @@ if sys.version_info < (3, 6):
 global_lang = {}
 global_wiki_set = {}
 
-data_css_ver = '99'
+data_css_ver = '100'
 data_css = ''
 
 conn = ''
@@ -727,8 +727,8 @@ def wiki_css(data):
                 
     data = data[0:2] + ['', '''
         <link   rel="stylesheet"
-                href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.2/build/styles/default.min.css">
-        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.2/build/highlight.min.js"></script>
+                href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.2.0/build/styles/default.min.css">
+        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.2.0/build/highlight.min.js"></script>
         <link   defer rel="stylesheet"
                 href="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.css"
                 integrity="sha384-Cqd8ihRLum0CCg8rz0hYKPoLZ3uw+gES2rXQXycqnL5pgVQIflxAUDS7ZSjITLb5"
