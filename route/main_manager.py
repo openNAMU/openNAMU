@@ -80,7 +80,7 @@ def main_manager_2(conn, num, r_ver):
         if flask.request.method == 'POST':
             if flask.request.args.get('plus', None):
                 return redirect(
-                    '/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.args.get('plus', 'test')) + '?plus=' + flask.request.form.get('name', 'test')
+                    '/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.args.get('plus', 'test')) + '?plus=' + url_pas(flask.request.form.get('name', 'test'))
                 )
             elif flask.request.form.get('regex', None):
                 return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.form.get('name', 'test')) + '?type=regex')

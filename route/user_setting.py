@@ -64,7 +64,15 @@ def user_setting_2(conn, server_init):
 
             curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [ip])
             fa_data = curs.fetchall()
-            fa_data = 'checked' if fa_data and fa_data[0][0] != '' else ''
+            fa_data = fa_data[0][0] if fa_data and fa_data[0][0] != '' else ''
+            fa_data_select = ''
+            fa_data_sp_list = [['off', ''], ['pw', 'on']]
+            for fa_data_get in fa_data_sp_list:
+                fa_data_selected = ''
+                if fa_data == fa_data_get[1]:
+                    fa_data_selected = 'selected'
+                
+                fa_data_select += '<option ' + fa_data_selected + ' value="' + fa_data_get[1] + '">' + fa_data_get[0] + '</option>'
 
             curs.execute(db_change('select data from user_set where name = "2fa_pw" and id = ?'), [ip])
             fa_data_pw = curs.fetchall()
@@ -89,7 +97,9 @@ def user_setting_2(conn, server_init):
                         <hr class="main_hr">
                         <select name="lang">''' + div3 + '''</select>
                         <h2>''' + load_lang('2fa') + '''</h2>
-                        <input type="checkbox" id="twofa_check_input" onclick="do_twofa_check(0);" name="2fa" value="on" ''' + fa_data + '''> ''' + load_lang('on') + '''
+                        <select name="2fa"
+                                id="twofa_check_input"
+                                onchange="do_twofa_check(0);">''' + fa_data_select + '''</select>
                         <div id="fa_plus_content">
                             <hr class="main_hr">
                             <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">

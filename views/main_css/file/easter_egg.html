@@ -1,6 +1,6 @@
 <div id="easter_egg"></div>
 <script>
-    var random_code = [
+    let random_code = [
         'DzjjcMNrTHU', // 상해홍차관
         'xpg2Ag-xt_c', // 죽취비상
         'IKIoAlhQV-c', // 유령악단
@@ -16,25 +16,22 @@
         'EsnW_hyI-V8', // 디자이어 드라이브
         'es9twrnfZ_Q', // 유심지의 유정천
     ];
-    var get_num = location.search.replace(/[^0-9]+/g, '');
+    let get_num = location.search.replace(/[^0-9]+/g, '');
     if(get_num !== '' && Number(get_num) < random_code.length) {
-        var random_num = Number(get_num);
+        get_num = Number(get_num);
     } else {
-        var random_num = Math.floor(Math.random() * random_code.length);
+        get_num = Math.floor(Math.random() * random_code.length);
     }
-    var random_code_select = random_code[random_num];
 
-    var i = 0;
-    var add_link = '';
-    while(i < random_code.length) {
+    let add_link = '';
+    for(let i = 0; i < random_code.length; i++) {
         add_link += '<a href="?select=' + String(i) + '">(' + String(i) + ')</a> ';
-        i += 1;
     }
 
     document.getElementById('easter_egg').innerHTML = '' +
         add_link +
         '<hr class="main_hr">' +
         '<iframe     style="width: 560px; height: 315px;" ' +
-                    'src="https://www.youtube.com/embed/' + random_code_select + '" allowfullscreen></iframe>' +
+                    'src="https://www.youtube.com/embed/' + random_code[get_num] + '" allowfullscreen></iframe>' +
         '';
 </script>
