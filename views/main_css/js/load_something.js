@@ -54,8 +54,15 @@ function do_skin_ver_check() {
 }
 
 function do_twofa_check(init = 0) {
-    var data_check = document.getElementById('twofa_check_input').checked;
-    document.getElementById('fa_plus_content').style.display = data_check === true ? "block" : "none";
+    let twofa_option = document.getElementById('twofa_check_input');
+    let twofa_option_num = twofa_option.options.selectedIndex;
+    let twofa_select_data = twofa_option.options[twofa_option_num].value;
+    
+    if(twofa_select_data === 'on') {
+        document.getElementById('fa_plus_content').style.display = "block";
+    } else {
+        document.getElementById('fa_plus_content').style.display = "none";
+    }
 }
 
 function do_ip_pas(i = 0) {

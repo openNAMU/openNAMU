@@ -60,7 +60,7 @@ def login_login_2fa_2(conn):
             data =  '''
                     <form method="post">
                         <input placeholder="''' + load_lang('2fa_password') + '''" name="pw" type="password">
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>
                         ''' + http_warning() + '''
