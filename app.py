@@ -805,7 +805,11 @@ def main_test_func():
 def main_shutdown():
     return main_shutdown_2(conn)
 
-@app.route('/<regex("easter_egg\.html|\.(?:txt|xml)$"):data>')
+@app.route('/easter_egg.xml')
+def main_easter_egg():
+    return main_easter_egg_2(conn)
+
+@app.route('/<regex("[^.]+\.(?:txt|xml)"):data>')
 def main_file(data = ''):
     return main_file_2(conn, data)
 

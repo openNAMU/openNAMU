@@ -349,7 +349,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                         }
                     } else {
                         var var_link_type = 'title';
-                        var var_link_data = do_js_safe_change(link_main) + link_sub;
+                        var var_link_data = do_js_safe_change(link_main);
                     }
 
                     data_js += '' +
@@ -530,6 +530,8 @@ function do_onmark_macro_render(data, data_js) {
 }
 
 function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_doc) {
+    // 이것도 nowiki 처럼 가야할 듯
+    
     var middle_re = /{{{((?:(?!{{{|}}}).)+)}}}/s;
     
     var html_n = 0;
@@ -692,41 +694,53 @@ function do_onmark_last_render(data) {
 
 function do_onmark_include_render(data, data_js, name_include, data_nowiki) {
     var include_re = /\[include\(((?:(?!\)\]).)+)\)\]/i;
-    var i = 0;
-    while(1) {
-        i += 1;
-        
-        var include_data = data.match(include_re);
-        if(!include_data) {
-            break;
-        }
-        
-        var include_name = do_nowiki_change(
-            include_data[1].match(/^([^,]+)/)[1],
-            data_nowiki
-        );
-        var include_add_re = /, *([^=]+)=((?:(?:(?!\)]|,).)+)+)/;
-        var include_add_data = []
-        var include_data = include_data[1];
+    
+    if(name_include === '') {
+        var i = 0;
         while(1) {
-            var include_add = include_data.match(include_add_re);
-            if(!include_add) {
+            i += 1;
+            
+            var include_data = data.match(include_re);
+            if(!include_data) {
                 break;
             }
             
-            include_add_data.push([
-                include_add[1], 
-                do_nowiki_change(include_add[2], data_nowiki)
-            ]);
-            include_data = include_data.replace(include_add_re, '');
+            var include_name = do_nowiki_change(
+                include_data[1].match(/^([^,]+)/)[1],
+                data_nowiki
+            );
+            var include_add_re = /, *([^=]+)=((?:(?:(?!\)]|,).)+)+)/;
+            var include_add_data = []
+            var include_data = include_data[1];
+            while(1) {
+                var include_add = include_data.match(include_add_re);
+                if(!include_add) {
+                    break;
+                }
+                
+                include_add_data.push([
+                    include_add[1], 
+                    do_nowiki_change(include_add[2], data_nowiki)
+                ]);
+                include_data = include_data.replace(include_add_re, '');
+            }
+            
+            data = data.replace(include_re,
+                '<a id="' + name_include + 'include_link" class="include_' + String(i) + '" href="">(' + include_name + ')</a>' +
+                '<div id="' + name_include + 'include_' + String(i) + '"></div>'
+            );
+            
+            data_js += 'load_include("' + do_js_safe_change(include_name) + '", "' + name_include + 'include_' + String(i) + '", ' + JSON.stringify(include_add_data) + ');\n'
         }
-        
-        data = data.replace(include_re,
-            '<a id="' + name_include + 'include_link" class="include_' + String(i) + '" href="">(' + include_name + ')</a>' +
-            '<div id="' + name_include + 'include_' + String(i) + '"></div>'
-        );
-        
-        data_js += 'load_include("' + do_js_safe_change(include_name) + '", "' + name_include + 'include_' + String(i) + '", ' + JSON.stringify(include_add_data) + ');\n'
+    } else {
+        while(1) {
+            var include_data = data.match(include_re);
+            if(!include_data) {
+                break;
+            }
+            
+            data = data.replace(include_re, '');
+        }
     }
     
     return [data, data_js];
@@ -1126,7 +1140,7 @@ function do_onmark_remark_render(data) {
 // Main
 function do_onmark_render(test_mode = 'test', name_id = '', name_include = '', name_doc = '', doc_data = '') {    
 	if(test_mode === 'normal') {
-        var data = '\n' + document.getElementById(name_id).innerHTML.replace(/\r/g, '') + '\n';
+        var data = '\n' + document.getElementById(name_id + '_load').innerHTML.replace(/\r/g, '') + '\n';
     } else if(test_mode === 'manual') { 
         var data = '\n' + doc_data.replace(/\r/g, '') + '\n';
     } else {
@@ -1146,7 +1160,15 @@ function do_onmark_render(test_mode = 'test', name_id = '', name_include = '', n
     if(passing === 0) {
         data = do_onmark_remark_render(data);
         
-        var data_var = do_onmark_math_render(data, data_js, name_include);
+        data_var = do_onmark_nowiki_before_render(data, data_js, name_include, data_nowiki);
+        data = data_var[0];
+        data_js = data_var[1];
+        data_nowiki = data_var[2];
+        console.log('nowiki');
+        
+        console.log(data);
+        
+        data_var = do_onmark_math_render(data, data_js, name_include);
         data = data_var[0];
         data_js = data_var[1];
         console.log('math');
@@ -1161,12 +1183,6 @@ function do_onmark_render(test_mode = 'test', name_id = '', name_include = '', n
         data_js = data_var[1];
         data_nowiki = data_var[2];
         console.log('middle');
-        
-        data_var = do_onmark_nowiki_before_render(data, data_js, name_include, data_nowiki);
-        data = data_var[0];
-        data_js = data_var[1];
-        data_nowiki = data_var[2];
-        console.log('nowiki');
 
         data = do_onmark_text_render(data);
         console.log('text');

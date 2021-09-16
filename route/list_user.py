@@ -8,7 +8,7 @@ def list_user_2(conn):
 
     list_data = '<ul class="inside_ul">'
 
-    curs.execute(db_change("select id, date from user order by date desc limit ?, 50"), [sql_num])
+    curs.execute(db_change("select id, data from user_set where name = 'date' order by data desc limit ?, 50"), [sql_num])
     user_list = curs.fetchall()
     for data in user_list:
         list_data += '' + \
