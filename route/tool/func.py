@@ -84,7 +84,7 @@ if sys.version_info < (3, 6):
 global_lang = {}
 global_wiki_set = {}
 
-data_css_ver = '102'
+data_css_ver = '103'
 data_css = ''
 
 conn = ''
@@ -406,7 +406,6 @@ def update(ver_num, set_data):
             curs.execute(db_change(
                 "insert into user_set (name, id, data) values (?, ?, ?)"
             ), ['application', i[0], json.dumps(sql_data)])
-            
     
     conn.commit()
 

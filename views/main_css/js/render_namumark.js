@@ -220,24 +220,12 @@ function get_file_state(data, i = 0) {
 }
 
 function load_include(name_doc, name_ob, data_include, name_org = '') {
-    var change = '';
-    for(var key in data_include) {
-        change += '' +
-            '@' + data_include[key][0].replace('&', '<amp>') + '@,' + 
-            data_include[key][1].replace(',', '<comma>').replace('&', '<amp>') + ',' +
-        ''
-    }
+    var data_form = new FormData();
+    data_form.append('include_list', JSON.stringify(data_include));
     
-    var url = '' +
-        "/api/w/" + encodeURI(name_doc) + 
-        "?include=" + name_ob + 
-        "&change=" + change +
-        '&name_org=' + name_org +
-    '';
-
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", url);
-    xhr.send();
+    xhr.open("POST", "/api/w/" + encodeURI(name_doc) + "?v=include&include=" + name_ob + "&name_org=" + name_org);
+    xhr.send(data_form);
 
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {

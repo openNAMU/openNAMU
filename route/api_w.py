@@ -5,6 +5,7 @@ def api_w_2(conn, name):
 
     data_arg_v = flask.request.args.get('v', '')
     if flask.request.method == 'POST':
+        print(data_arg_v)
         if data_arg_v == '' or data_arg_v == 'preview':
             data_org = flask.request.form.get('data', '')
             data_pas = render_set(
@@ -19,13 +20,22 @@ def api_w_2(conn, name):
             })
         elif data_arg_v == 'include':
             name_org = flask.request.args.get('name_org', '')
-            if name_org == '':
-                name_org = name
-
-            json_data = data[0][0]
-
+            name_org = name if name_org == '' else name_org
+            
             include_data = flask.request.args.get('include', '')
-            if include_data != '':
+                
+            try:
+                include_list = json.loads(flask.request.form.get('include_list', ''))
+            except:
+                include_list = []
+
+            curs.execute(db_change("select data from data where title = ?"), [name])
+            sql_data = curs.fetchall()
+            if not sql_data:
+                return flask.jsonify({})
+            else:
+                json_data = sql_data[0][0]
+
                 get_all_change_1 = []
                 find_replace_moment = re.findall(r'(@([^=@]+)=([^=@]+)@|@([^=@]+)@)', json_data)
                 for i in find_replace_moment:
@@ -36,25 +46,22 @@ def api_w_2(conn, name):
                     else:
                         json_data = json_data.replace(i[0], '@' + i[3] + '@', 1)
 
-                get_all_change_2 = re.findall(r'(@(?:[^@]*)@),([^,]*),', flask.request.args.get('change', '')) + get_all_change_1
+                get_all_change_2 = include_list + get_all_change_1
+                print(get_all_change_2)
                 for i in get_all_change_2:
-                    json_data = json_data.replace(
-                        i[0].replace('<amp>', '&'), 
-                        i[1].replace('<amp>', '&').replace('<comma>', ','), 
-                        1
-                    )
+                    json_data = json_data.replace('@' + i[0] + '@', i[1])
 
-            data_pas = render_set(
-                doc_name = name_org, 
-                doc_data = json_data, 
-                data_type = 'api_view',
-                data_in = include_data
-            )
+                data_pas = render_set(
+                    doc_name = name_org, 
+                    doc_data = json_data, 
+                    data_type = 'api_view',
+                    data_in = include_data
+                )
 
-            return flask.jsonify({
-                "data" : data_pas[0], 
-                "js_data" : data_pas[1]
-            })
+                return flask.jsonify({
+                    "data" : data_pas[0], 
+                    "js_data" : data_pas[1]
+                })
         elif data_arg_v == 'exist':
             try:
                 title_list = json.loads(flask.request.form.get('title_list', ''))
@@ -93,41 +100,6 @@ def api_w_2(conn, name):
                 sql_data = curs.fetchall()
                 if not sql_data:
                     return flask.jsonify({})
-                elif data_arg_include != '':
-                    name_org = flask.request.args.get('name_org', '')
-                    name_org = name if name_org == '' else name_org
-
-                    json_data = sql_data[0][0]
-
-                    get_all_change_1 = []
-                    find_replace_moment = re.findall(r'(@([^=@]+)=([^=@]+)@|@([^=@]+)@)', json_data)
-                    for i in find_replace_moment:
-                        if i[1] != '':
-                            get_all_change_1 += [['@' + i[1] + '@', i[2]]]
-
-                            json_data = json_data.replace(i[0], '@' + i[1] + '@', 1)
-                        else:
-                            json_data = json_data.replace(i[0], '@' + i[3] + '@', 1)
-
-                    get_all_change_2 = re.findall(r'(@(?:[^@]*)@),([^,]*),', flask.request.args.get('change', '')) + get_all_change_1
-                    for i in get_all_change_2:
-                        json_data = json_data.replace(
-                            i[0].replace('<amp>', '&'), 
-                            i[1].replace('<amp>', '&').replace('<comma>', ','), 
-                            1
-                        )
-
-                    data_pas = render_set(
-                        doc_name = name_org, 
-                        doc_data = json_data, 
-                        data_type = 'api_view',
-                        data_in = data_arg_include
-                    )
-
-                    return flask.jsonify({
-                        "data" : data_pas[0], 
-                        "js_data" : data_pas[1]
-                    })
                 else:
                     data_pas = render_set(
                         doc_name = name, 
