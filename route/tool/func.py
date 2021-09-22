@@ -12,7 +12,7 @@ import random
 import email.mime.text
 import email.utils
 import email.header
-        
+
 import urllib.request
 
 # Init-Version
@@ -1698,7 +1698,9 @@ def re_error(data):
             data = load_lang('regex_error')
         elif num == 24:
             curs.execute(db_change("select data from other where name = 'slow_edit'"))
-            data = load_lang('fast_edit_error') + curs.fetchall()[0][0]
+            slow_edit = curs.fetchall()
+            slow_edit = '' if not slow_edit else slow_edit[0][0]
+            data = load_lang('fast_edit_error') + slow_edit
         elif num == 25:
             data = load_lang('too_many_dec_error')
         elif num == 26:
