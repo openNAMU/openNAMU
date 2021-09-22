@@ -1,8 +1,3 @@
-import os
-import html
-import sqlite3
-import threading
-
 from .func_tool import *
 
 # 커스텀 마크 언젠간 다시 추가 예정
