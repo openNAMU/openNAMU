@@ -9,12 +9,12 @@ def main_manager_2(conn, num, r_ver):
         2 : [load_lang('file_name'), 'plus_file_filter', load_lang('file_filter_add')],
         3 : [0, 'admin', load_lang('authorize')],
         4 : [0, 'record', load_lang('edit_record')],
-        5 : [0, 'topic_record', load_lang('discussion_record')],
+        5 : [0, 'record/topic', load_lang('discussion_record')],
         6 : [load_lang('name'), 'admin_plus', load_lang('add_admin_group')],
         7 : [load_lang('name'), 'plus_edit_filter', load_lang('edit_filter_add')],
         8 : [load_lang('document_name'), 'search', load_lang('search')],
-        9 : [0, 'block_user', load_lang('blocked_user')],
-        10 : [0, 'block_admin', load_lang('blocked_admin')],
+        9 : [0, 'block_log/user', load_lang('blocked_user')],
+        10 : [0, 'block_log/admin', load_lang('blocked_admin')],
         11 : [load_lang('document_name'), 'watch_list', load_lang('add_watchlist')],
         12 : [load_lang('compare_target'), 'check', load_lang('compare_target')],
         13 : [load_lang('document_name'), 'edit', load_lang('load')],
@@ -24,7 +24,7 @@ def main_manager_2(conn, num, r_ver):
 
     if num == 1:
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('admin_tool'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('admin_tool'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <h2>''' + load_lang('admin') + '''</h2>
                 <ul class="inside_ul">
@@ -37,9 +37,9 @@ def main_manager_2(conn, num, r_ver):
                 <br>
                 <h2>''' + load_lang('owner') + '''</h2>
                 <ul class="inside_ul">
-                    <li><a href="/give_log">''' + load_lang('admin_group_list') + '''</a></li>
+                    <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
                     <li><a href="/many_delete">''' + load_lang('many_delete') + '''</a></li>
-                    <li><a href="/applications">''' + load_lang('application_list') + '''</a></li>
+                    <li><a href="/app_submit">''' + load_lang('application_list') + '''</a></li>
                     <li><a href="/api/sitemap.xml">''' + load_lang('get_sitemap') + '''</a></li>
                     <li><a href="/register">''' + load_lang('add_user') + '''</a></li>
                     <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
@@ -59,6 +59,7 @@ def main_manager_2(conn, num, r_ver):
                 <h2>''' + load_lang('server') + '''</h2>
                 <ul class="inside_ul">
                     <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
+                    <li><a href="/shutdown">''' + load_lang('wiki_shutdown') + '''</a></li>
                     <li><a href="/update">''' + load_lang('update') + '''</a></li>
                 </ul>
                 <br>
@@ -79,7 +80,7 @@ def main_manager_2(conn, num, r_ver):
         if flask.request.method == 'POST':
             if flask.request.args.get('plus', None):
                 return redirect(
-                    '/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.args.get('plus', 'test')) + '?plus=' + flask.request.form.get('name', 'test')
+                    '/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.args.get('plus', 'test')) + '?plus=' + url_pas(flask.request.form.get('name', 'test'))
                 )
             elif flask.request.form.get('regex', None):
                 return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.form.get('name', 'test')) + '?type=regex')
@@ -96,7 +97,7 @@ def main_manager_2(conn, num, r_ver):
                 plus = '<input type="checkbox" name="regex"> ' + load_lang('regex') + '<hr class="main_hr">'
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [title_list[(num - 2)][2], wiki_set(), custom(), other2([0, 0])],
+                imp = [title_list[(num - 2)][2], wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <input placeholder="''' + placeholder + '''" name="name" type="text">

@@ -29,7 +29,7 @@ def inter_wiki_2(conn, tools):
         curs.execute(db_change("select html from html_filter where kind = 'name'"))
     elif tools == 'edit_filter':
         del_link = 'del_edit_filter'
-        plus_link = 'plus_edit_filter'
+        plus_link = 'manager/9'
         title = load_lang('edit_filter_list')
         div = ''
 
@@ -100,7 +100,7 @@ def inter_wiki_2(conn, tools):
             div += '<a href="/' + plus_link + '">(' + load_lang('add') + ')</a>'
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [title, wiki_set(), custom(), other2([0, 0])],
+        imp = [title, wiki_set(), wiki_custom(), wiki_css([0, 0])],
         data = div,
         menu = [['manager/1', load_lang('return')]]
     ))

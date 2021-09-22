@@ -31,7 +31,7 @@ def list_acl_2(conn):
     div += next_fix('/acl_list?num=', num, list_data)
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('acl_document_list'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('acl_document_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
         data = div,
         menu = [['other', load_lang('return')]]
     ))

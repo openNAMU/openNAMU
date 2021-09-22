@@ -41,7 +41,7 @@ def vote_end_2(conn, num):
         data += '</ul>'
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('result_vote'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('result_vote'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
         data = data,
         menu = [['vote', load_lang('return')]]
     ))

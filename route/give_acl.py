@@ -69,7 +69,9 @@ def give_acl_2(conn, name):
                 [load_lang('view_acl'), 'view']
             ]
         else:
-            acl_get_list = [load_lang('document_acl'), 'decu']
+            acl_get_list = [
+                [load_lang('document_acl'), 'decu']
+            ]
             
         for i in acl_get_list:
             data += '' + \
@@ -113,7 +115,7 @@ def give_acl_2(conn, name):
         '''
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('acl') + ')', 0])],
+            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('acl') + ')', 0])],
             data = '''
                 <form method="post">
                     <a href="/setting/8">(''' + load_lang('main_acl_setting') + ''')</a>

@@ -9,7 +9,7 @@ def recent_block_2(conn, name, tool):
     div = '''
         <table id="main_table_set">
             <tbody>
-                <tr>
+                <tr id="main_table_top_tr">
                     <td id="main_table_width">''' + load_lang('blocked') + '''</td>
                     <td id="main_table_width">''' + load_lang('admin') + '''</td>
                     <td id="main_table_width">''' + load_lang('period') + '''</td>
@@ -21,10 +21,10 @@ def recent_block_2(conn, name, tool):
 
     get_type = flask.request.args.get('type', '')
     sub_type = flask.request.args.get('s_type', '')
-    if not name:
+    if tool == 'all':
         if get_type == 'ongoing':
             sub = ' (' + load_lang('in_progress') + ')'
-           
+
             if sub_type == '':
                 div = '' + \
                     '<a href="?type=ongoing&s_type=regex">(' + load_lang('regex') + ')</a> ' + \
@@ -66,29 +66,28 @@ def recent_block_2(conn, name, tool):
                 "select why, block, blocker, end, today, band, ongoing " + \
                 "from rb order by today desc limit ?, 50" + \
             ""), [sql_num])
-    else:
+    elif tool == 'user':
+        sub = ' (' + load_lang('blocked') + ')'
         menu = [['block_log', load_lang('normal')]]
 
-        if tool == 'block_user':
-            sub = ' (' + load_lang('blocked') + ')'
+        curs.execute(db_change("" + \
+            "select why, block, blocker, end, today, band, ongoing " + \
+            "from rb where block = ? order by today desc limit ?, 50" + \
+        ""), [
+            name, 
+            sql_num
+        ])
+    else:
+        sub = ' (' + load_lang('admin') + ')'
+        menu = [['block_log', load_lang('normal')]]
 
-            curs.execute(db_change("" + \
-                "select why, block, blocker, end, today, band, ongoing " + \
-                "from rb where block = ? order by today desc limit ?, 50" + \
-            ""), [
-                name, 
-                sql_num
-            ])
-        else:
-            sub = ' (' + load_lang('admin') + ')'
-
-            curs.execute(db_change("" + \
-                "select why, block, blocker, end, today, band, ongoing " + \
-                "from rb where blocker = ? order by today desc limit ?, 50" + \
-            ""), [
-                name, 
-                sql_num
-            ])
+        curs.execute(db_change("" + \
+            "select why, block, blocker, end, today, band, ongoing " + \
+            "from rb where blocker = ? order by today desc limit ?, 50" + \
+        ""), [
+            name, 
+            sql_num
+        ])
 
     data_list = curs.fetchall()
     all_ip = ip_pas([i[1] for i in data_list] + [i[2] for i in data_list])
@@ -136,11 +135,16 @@ def recent_block_2(conn, name, tool):
             </tr>
         '''
 
-    div += '</tbody></table>'
-    div += next_fix('/block_log?num=', num, data_list) if not name else next_fix('/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
+    div += '</tbody>'
+    div += '</table>'
+    
+    if tool == 'all':
+        div += next_fix('/block_log?num=', num, data_list)
+    else:
+        div += next_fix('/block_log/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('recent_ban'), wiki_set(), custom(), other2([sub, 0])],
+        imp = [load_lang('recent_ban'), wiki_set(), wiki_custom(), wiki_css([sub, 0])],
         data = div,
         menu = menu
     ))

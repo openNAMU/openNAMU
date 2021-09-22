@@ -7,6 +7,7 @@ def user_tool_2(conn, name):
         <h2>''' + load_lang('tool') + '''</h2>
         <ul class="inside_ul">
             <li><a href="/record/''' + url_pas(name) + '''">''' + load_lang('record') + '''</a></li>
+            <li><a href="/record/topic/''' + url_pas(name) + '''">''' + load_lang('discussion_record') + '''</a></li>
             <li><a href="/topic/user:''' + url_pas(name) + '''">''' + load_lang('user_discussion') + '''</a></li>
         </ul>
     '''
@@ -24,7 +25,7 @@ def user_tool_2(conn, name):
         '''
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [name, wiki_set(), custom(), other2(['(' + load_lang('tool') + ')', 0])],
+        imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('tool') + ')', 0])],
         data = data,
         menu = 0
     ))

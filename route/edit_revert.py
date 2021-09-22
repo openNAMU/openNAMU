@@ -52,9 +52,9 @@ def edit_revert_2(conn, name):
             )
 
             render_set(
-                title = name,
-                data = data[0][0],
-                num = 1
+                doc_name = name,
+                doc_data = data[0][0],
+                data_type = 'backlink'
             )
 
             conn.commit()
@@ -66,12 +66,12 @@ def edit_revert_2(conn, name):
             return redirect('/w/' + url_pas(name))
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), custom(), other2(['(' + load_lang('revert') + ')', 0])],
+            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('revert') + ')', 0])],
             data =  '''
                     <form method="post">
                         <span>r''' + flask.request.args.get('num', '0') + '''</span>
                         <hr class=\"main_hr\">
-                        ''' + ip_warring() + '''
+                        ''' + ip_warning() + '''
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                         <hr class=\"main_hr\">
                         ''' + captcha_get() + '''

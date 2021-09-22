@@ -3,7 +3,7 @@ from .tool.func import *
 def user_setting_2(conn, server_init):
     curs = conn.cursor()
 
-    support_language = ['default'] + server_init.server_set_var['language']['list']
+    support_language = ['default'] + server_init.server_init()['language']['list']
     ip = ip_check()
 
     if ban_check() == 1:
@@ -23,7 +23,7 @@ def user_setting_2(conn, server_init):
                 twofa_pw = flask.request.form.get('2fa_pw', '')
                 if twofa_pw != '':
                     twofa_pw = pw_encode(twofa_pw)
-                    curs.execute(db_change("select encode from user where id = ?"), [ip])
+                    curs.execute(db_change("select data from user_set where id = ? and name = 'encode'"), [ip])
                     twofa_encode = curs.fetchall()[0][0]
                     auto_list += [['2fa', 'on'], ['2fa_pw', twofa_pw], ['2fa_pw_encode', twofa_encode]]
                 else:
@@ -46,13 +46,14 @@ def user_setting_2(conn, server_init):
             data = curs.fetchall()
             email = data[0][0] if data else '-'
 
-            div2 = load_skin('', 0, 1)
-            div3 = ''
+            curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
+            data = curs.fetchall()
+            div2 = load_skin(data[0][0] if data else '', 0, 1)
 
-            curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip_check()])
+            curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip])
             data = curs.fetchall()
             data = [['default']] if not data else data
-
+            div3 = ''
             for lang_data in support_language:
                 see_data = lang_data if lang_data != 'default' else load_lang('default')
                 
@@ -63,21 +64,30 @@ def user_setting_2(conn, server_init):
 
             curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [ip])
             fa_data = curs.fetchall()
-            fa_data = 'checked' if fa_data and fa_data[0][0] != '' else ''
+            fa_data = fa_data[0][0] if fa_data and fa_data[0][0] != '' else ''
+            fa_data_select = ''
+            fa_data_sp_list = [['off', ''], ['pw', 'on']]
+            for fa_data_get in fa_data_sp_list:
+                fa_data_selected = ''
+                if fa_data == fa_data_get[1]:
+                    fa_data_selected = 'selected'
+                
+                fa_data_select += '<option ' + fa_data_selected + ' value="' + fa_data_get[1] + '">' + fa_data_get[0] + '</option>'
 
             curs.execute(db_change('select data from user_set where name = "2fa_pw" and id = ?'), [ip])
             fa_data_pw = curs.fetchall()
             fa_data_pw = load_lang('2fa_password_change') if fa_data_pw else load_lang('2fa_password')
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('user_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + load_lang('id') + ''' : ''' + ip_pas(ip) + '''</span>
+                        <div id="get_user_info"></div>
+                        <script>load_user_info("''' + ip + '''");</script>
                         <hr class="main_hr">
-                        <a href="/pw_change">(''' + load_lang('password_change') + ''')</a>
+                        <a href="/change/pw">(''' + load_lang('password_change') + ''')</a>
                         <hr class="main_hr">
-                        <span>''' + load_lang('email') + ''' : ''' + email + '''</span> <a href="/email_change">(''' + load_lang('email_change') + ''')</a>
+                        <span>''' + load_lang('email') + ''' : ''' + email + '''</span> <a href="/change/email">(''' + load_lang('email_change') + ''')</a>
                         <h2>''' + load_lang('main') + '''</h2>
                         <span>''' + load_lang('skin') + '''</span>
                         <hr class="main_hr">
@@ -87,14 +97,16 @@ def user_setting_2(conn, server_init):
                         <hr class="main_hr">
                         <select name="lang">''' + div3 + '''</select>
                         <h2>''' + load_lang('2fa') + '''</h2>
-                        <input type="checkbox" id="twofa_check_input" onclick="do_twofa_check(0);" name="2fa" value="on" ''' + fa_data + '''> ''' + load_lang('on') + '''
+                        <select name="2fa"
+                                id="twofa_check_input"
+                                onchange="do_twofa_check(0);">''' + fa_data_select + '''</select>
                         <div id="fa_plus_content">
                             <hr class="main_hr">
                             <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
                         </div>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
-                        ''' + http_warring() + '''
+                        ''' + http_warning() + '''
                         <script>do_twofa_check(1);</script>
                     </form>
                 ''',
@@ -107,11 +119,14 @@ def user_setting_2(conn, server_init):
             
             return redirect('/change')
         else:
-            div2 = load_skin(('' if not 'skin' in flask.session else flask.session['skin']), 0, 1)
-            div3 = ''
+            div2 = load_skin(
+                ('' if not 'skin' in flask.session else flask.session['skin']), 
+                0, 
+                1
+            )
 
             data = [['default']] if not 'lang' in flask.session else [[flask.session['lang']]]
-
+            div3 = ''
             for lang_data in support_language:
                 see_data = lang_data if lang_data != 'default' else load_lang('default')
                 
@@ -121,10 +136,11 @@ def user_setting_2(conn, server_init):
                     div3 += '<option value="' + lang_data + '">' + see_data + '</option>'
             
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('user_setting'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('user_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + load_lang('id') + ''' : ''' + ip_pas(ip) + '''</span>
+                        <div id="get_user_info"></div>
+                        <script>load_user_info("''' + ip + '''");</script>
                         <hr class="main_hr">
                         <h2>''' + load_lang('main') + '''</h2>
                         <span>''' + load_lang('skin') + '''</span>
@@ -136,9 +152,9 @@ def user_setting_2(conn, server_init):
                         <select name="lang">''' + div3 + '''</select>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
-                        ''' + http_warring() + '''
+                        ''' + http_warning() + '''
                         <hr class="main_hr">
-                        <span>''' + load_lang('user_head_warring') + '''</span>
+                        <span>''' + load_lang('user_head_warning') + '''</span>
                     </form>
                 ''',
                 menu = [['user', load_lang('return')]]

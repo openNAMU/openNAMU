@@ -13,7 +13,10 @@ def login_check_key_2(conn, tool):
         if  'c_type' in flask.session and \
             flask.session['c_type'] == 'pass_find' and \
             flask.session['c_key'] == input_key:
-            curs.execute(db_change("update user set pw = ? where id = ?"), [pw_encode(flask.session['c_key']), flask.session['c_id']])
+            curs.execute(db_change("update user_set set data = ? where name = 'pw' and id = ?"), [
+                pw_encode(flask.session['c_key']), 
+                flask.session['c_id']
+            ])
             conn.commit()
 
             user_id = flask.session['c_id']
@@ -31,7 +34,7 @@ def login_check_key_2(conn, tool):
                 curs.execute(db_change("update user_set set data = '' where name = '2fa' and id = ?"), [user_id])
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('reset_user_ok'), wiki_set(), custom(), other2([0, 0])],
+                imp = [load_lang('reset_user_ok'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = b_text + load_lang('id') + ' : ' + user_id + '<br>' + load_lang('password') + ' : ' + user_pw,
                 menu = [['user', load_lang('return')]]
             ))
@@ -44,41 +47,49 @@ def login_check_key_2(conn, tool):
                 if flask.session['c_key'] == 'email_pass':
                     flask.session['c_email'] = ''
 
-                curs.execute(db_change("select id from user limit 1"))
+                curs.execute(db_change("select id from user_set limit 1"))
                 first = 1 if not curs.fetchall() else 0
 
-                curs.execute(db_change("select id from user where id = ?"), [flask.session['c_id']])
+                curs.execute(db_change("select id from user_set where id = ?"), [
+                    flask.session['c_id']
+                ])
                 if curs.fetchall():
                     for i in re_set_list:
                         flask.session.pop(i, None)
 
                     return re_error('/error/6')
             
-                curs.execute(db_change("select id from user_application where id = ?"), [flask.session['c_id']])
+                curs.execute(db_change("select id from user_set where id = ? and name = 'application'"), [
+                    flask.session['c_id']
+                ])
                 if curs.fetchall():
                     for i in re_set_list:
                         flask.session.pop(i, None)
 
                     return re_error('/error/6')
 
-                curs.execute(db_change('select data from other where name = "requires_approval"'))
+                curs.execute(db_change(
+                    'select data from other where name = "requires_approval"'
+                ))
                 requires_approval = curs.fetchall()
                 if requires_approval and requires_approval[0][0] == 'on':
-                    application_token = load_random_key(32)
+                    user_app_data = {}
+                    user_app_data['id'] = flask.session['c_id']
+                    user_app_data['pw'] = flask.session['c_pw']
+                    user_app_data['date'] = get_time()
+                    user_app_data['encode'] = db_data[0][0]
+                    user_app_data['question'] = flask.session['c_que']
+                    user_app_data['answer'] = flask.session['c_ans']
+                    user_app_data['ip'] = ip
+                    user_app_data['ua'] = user_agent
+                    user_app_data['email'] = flask.session['c_email']
+                    
                     curs.execute(db_change(
-                        "insert into user_application (id, pw, date, encode, question, answer, token, ip, ua, email) " + \
-                        "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                        "insert into user_set (id, name, data) values (?, ?, ?)"
                     ), [
                         flask.session['c_id'],
-                        flask.session['c_pw'],
-                        get_time(),
-                        db_data[0][0],
-                        flask.session['c_que'],
-                        flask.session['c_ans'],
-                        application_token,
-                        ip,
-                        user_agent,
-                        flask.session['c_email']
+                        'application',
+                        json.dumps(user_app_data)
                     ])
                     conn.commit()
     
@@ -87,11 +98,25 @@ def login_check_key_2(conn, tool):
 
                     return redirect('/application_submitted')
                 else:
-                    curs.execute(db_change("insert into user (id, pw, acl, date, encode) values (?, ?, ?, ?, ?)"), [
+                    if first == 0:
+                        user_auth = 'user'
+                    else:
+                        user_auth = 'owner'
+                    
+                    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'pw', ?)"), [
                         flask.session['c_id'],
-                        flask.session['c_pw'],
-                        'user' if first == 0 else 'owner',
-                        get_time(),
+                        flask.session['c_pw']
+                    ])
+                    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'acl', ?)"), [
+                        flask.session['c_id'],
+                        user_auth
+                    ])
+                    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'date', ?)"), [
+                        flask.session['c_id'],
+                        get_time()
+                    ])
+                    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'encode', ?)"), [
+                        flask.session['c_id'],
                         db_data[0][0]
                     ])
 
@@ -126,7 +151,7 @@ def login_check_key_2(conn, tool):
         b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('check_key'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('check_key'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
                     ''' + b_text + '''

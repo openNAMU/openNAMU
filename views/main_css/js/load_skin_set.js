@@ -66,7 +66,7 @@ function main_css_get_post() {
     } else {
         document.cookie = 'main_css_toc_set=0;';
     }
-
+    
     check = document.getElementById('main_css_font_size');
     if(check.value.match(/^[0-9]+$/)) {
         document.cookie = 'main_css_font_size=' + check.value + ';';
@@ -80,7 +80,14 @@ function main_css_get_post() {
     } else {
         document.cookie = 'main_css_monaco=0;';
     }
-
+    
+    check = document.getElementById('main_css_exter_link');
+    if(check.value === 'self') {
+        document.cookie = 'main_css_exter_link=1;';
+    } else {
+        document.cookie = 'main_css_exter_link=0;';
+    }
+    
     history.go(0);
 }
 
@@ -123,19 +130,28 @@ function main_css_skin_load() {
         }
     }
 
-    if(
-        document.cookie.match(main_css_regex_data('main_css_font_size')) &&
-        document.cookie.match(main_css_regex_data('main_css_font_size'))[1] !== ''
-    ) {
-        head_data.innerHTML += '<style>.all_in_data { font-size: ' + document.cookie.match(main_css_regex_data('main_css_font_size'))[1] + 'px; }</style>';
-    }
-
     if(document.cookie.match(main_css_regex_data('main_css_toc_set'))) {
         if(document.cookie.match(main_css_regex_data('main_css_toc_set'))[1] === '2') {
             head_data.innerHTML += '<style>#auto_toc { display: none; }</style>';
         } else if(document.cookie.match(main_css_regex_data('main_css_toc_set'))[1] === '1') {
             head_data.innerHTML += '<style>#toc { display: none; }</style>';
         }
+    }
+    
+    if(
+        document.cookie.match(main_css_regex_data('main_css_font_size')) &&
+        document.cookie.match(main_css_regex_data('main_css_font_size'))[1] !== ''
+    ) {
+        head_data.innerHTML += '<style>body, input, textarea { font-size: ' + document.cookie.match(main_css_regex_data('main_css_font_size'))[1] + 'px; }</style>';
+    }
+    
+    if(
+        document.cookie.match(regex_data('main_css_darkmode')) &&
+        document.cookie.match(regex_data('main_css_darkmode'))[1] === '1'
+    ) {
+        head_data.innerHTML += '' +
+            '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=5">' +
+        '';
     }
 }
 
@@ -169,7 +185,9 @@ function main_css_load_lang(name) {
             "clipboard_upload" : "Clipboard upload",
             "only_korean" : "Supported in korean only",
             "except_ie" : "Not supported for Internet Explorer",
-            "use_monaco" : "Use monaco editor"
+            "use_monaco" : "Use monaco editor",
+            "self_tab" : "Current tab",
+            "exter_link_open_method" : "External link"
         }, "ko-KR" : {
             "default" : "기본값",
             "change_to_normal" : "일반 텍스트로 변경",
@@ -198,7 +216,9 @@ function main_css_load_lang(name) {
             "clipboard_upload" : "클립보드 파일 올리기",
             "only_korean" : "한국어로만 지원됨",
             "except_ie" : "인터넷 익스플로러에선 지원되지 않음",
-            "use_monaco" : "모나코 에디터 사용"
+            "use_monaco" : "모나코 에디터 사용",
+            "self_tab" : "현재 탭",
+            "exter_link_open_method" : "외부 링크"
         }
     }
 
@@ -359,12 +379,6 @@ function main_css_skin_set() {
         i += 1;
     }
 
-    if(document.cookie.match(main_css_regex_data('main_css_font_size'))) {
-        set_data["font_size"] = document.cookie.match(main_css_regex_data('main_css_font_size'))[1];
-    } else {
-        set_data["font_size"] = '';
-    }
-
     if(
         document.cookie.match(main_css_regex_data('main_css_monaco')) &&
         document.cookie.match(main_css_regex_data('main_css_monaco'))[1] === '1'
@@ -372,6 +386,28 @@ function main_css_skin_set() {
         set_data["monaco"] = "checked";
     } else {
         set_data["monaco"] = "";
+    }
+    
+    if(document.cookie.match(main_css_regex_data('main_css_font_size'))) {
+        set_data["font_size"] = document.cookie.match(main_css_regex_data('main_css_font_size'))[1];
+    } else {
+        set_data["font_size"] = '';
+    }
+    
+    let exter_link_list = [
+        ['0', 'blank', main_css_load_lang('default')],
+        ['1', 'self', main_css_load_lang('self_tab')]
+    ];
+    set_data["exter_link"] = '';
+    for(let i = 0; exter_link_list[i]; i++) {
+        if(
+            document.cookie.match(main_css_regex_data('main_css_exter_link')) && 
+            document.cookie.match(main_css_regex_data('main_css_exter_link'))[1] === exter_link_list[i][0]
+        ) {
+            set_data["exter_link"] = '<option value="' + exter_link_list[i][1] + '">' + exter_link_list[i][2] + '</option>' + set_data["exter_link"];
+        } else {
+            set_data["exter_link"] += '<option value="' + exter_link_list[i][1] + '">' + exter_link_list[i][2] + '</option>';
+        }
     }
 
     document.getElementById("main_skin_set").innerHTML = ' \
@@ -404,6 +440,10 @@ function main_css_skin_set() {
         </select> \
         <h3>1.8. ' + main_css_load_lang('set_font_size') + '</h3> \
         <input id="main_css_font_size" placeholder="' + main_css_load_lang('font_size') + ' (EX : 11)" value="' + set_data["font_size"] + '"> \
+        <h3>1.9. ' + main_css_load_lang('exter_link_open_method') + '</h3> \
+        <select id="main_css_exter_link"> \
+            ' + set_data["exter_link"] + ' \
+        </select> \
         <h2>2. ' + main_css_load_lang('editor') + '</h2> \
         <h3>2.1. ' + main_css_load_lang('main') + '</h3> \
         <input ' + set_data["monaco"] + ' type="checkbox" id="main_css_monaco" value="monaco"> ' + main_css_load_lang('use_monaco') + '<sup>(1)</sup> \
@@ -419,63 +459,6 @@ function main_css_skin_set() {
             <li><a id="note_2_end" href="#note_2">(ko-KR)</a> ' + main_css_load_lang('only_korean') + '</li> \
         </ul> \
     ';
-
-    // 목차 구현
-    var toc_all_data = '<div id="toc"><span id="toc_title">TOC</span><br>';
-    var skin_set_data = document.getElementById("main_skin_set").innerHTML;
-    var split_toc;
-    var toc_data;
-    i = 1;
-    while(1) {
-        toc_data = skin_set_data.match(/<h[1-6]>([^<>]+)<\/h[1-6]>/);
-        if(toc_data) {
-            split_toc = toc_data[1].match(/^([^ ]+)(.+)/);
-            toc_all_data += '' + 
-                '<br>' +
-                '<span style="margin-left: ' + String(((toc_data[1].match(/\./g) || []).length - 1) * 10) + 'px;">' +
-                    '<a href="#toc_' + String(i) + '">' + split_toc[1] + '</a>' + split_toc[2] +
-                '</span>' +
-            '';
-
-            skin_set_data = skin_set_data.replace(
-                /<(h[1-6])>([^<>]+)<\/h[1-6]>/, 
-                '<$1 id="toc_' + String(i) + '"><a href="#toc">' + split_toc[1] + '</a>' + split_toc[2] + '</$1>'
-            );
-            i += 1;
-        } else {
-            break;
-        }
-    }
-    document.getElementById("main_skin_set").innerHTML = toc_all_data + '</div>' + skin_set_data;
-
-    // 각주 구현
-    skin_set_data = document.getElementById("main_skin_set").innerHTML;
-    var note_list = {};
-    var plus_note;
-    i = 1;
-    while(1) {
-        toc_data = skin_set_data.match(/<sup>([^<>]+)<\/sup>/);
-        if(toc_data) {
-            if(!note_list[toc_data[1]]) {
-                note_list[toc_data[1]] = [String(i), 0];
-            } else {
-                note_list[toc_data[1]][1] += 1;
-            }
-
-            if(note_list[toc_data[1]][1] != 0) {
-                plus_note = '_' + String(note_list[toc_data[1]][1]);
-            } else {
-                plus_note = '';
-            }
-            
-            skin_set_data = skin_set_data.replace(
-                /<sup>([^<>]+)<\/sup>/, 
-                '<sup><a id="note_' + note_list[toc_data[1]][0] + plus_note + '" href="#note_' + note_list[toc_data[1]][0] + '_end">$1</a></sup>'
-            );
-            i += 1;
-        } else {
-            break;
-        }
-    }
-    document.getElementById("main_skin_set").innerHTML = skin_set_data;    
+ 
+    simple_render('main_skin_set');
 }

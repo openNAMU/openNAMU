@@ -1,4 +1,4 @@
-body, html, video, table, div, iframe, input, textarea, img, hr, blockquote, pre {
+body, html, video, table, iframe, input, textarea, img, hr, blockquote, pre, iframe {
     max-width: 100%;
 }
 
@@ -16,11 +16,14 @@ input {
 }
 
 #toc {
-    border: 1px solid;
+    border: 1px solid gainsboro;
     padding: 20px;
+    
     width: fit-content;
     width: -moz-fit-content;
+    
     clear: both;
+    
     margin-top: 10px;
 }
 
@@ -29,8 +32,9 @@ table {
 }
 
 td {
-    border: 1px solid;
-    padding: 5px;
+    border: 1px solid gainsboro;
+    
+    padding: 5px 10px;
 }
 
 a {
@@ -69,15 +73,19 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 #toron_color_green {
-    background: #99ffcd;
+    background: palegreen;
 }
 
 #toron_color_blue {
-    background: #ffcbf9;
+    background: paleturquoise;
 }
 
 #toron_color_red {
-    background: #fecabf;
+    background: palevioletred;
+}
+
+#toron_color_normal {
+    background: palegoldenrod;
 }
 
 #toron_color_grey {
@@ -88,18 +96,18 @@ input[type="checkbox"], input[type="radio"] {
     display: none;
 }
 
+#main_table_top_tr {
+    background: aquamarine;
+}
+
 #cate {
-    border: 1px solid;
+    border: 1px solid gainsboro;
     padding: 5px;
     margin-top: 20px;
 }
 
-img, iframe {
-    max-width: 100%;
-}
-
 pre {
-    border: 1px solid;
+    border: 1px solid gainsboro;
     padding: 10px;
     white-space: pre-wrap;
 }
@@ -140,7 +148,7 @@ s:hover, strike:hover, del:hover {
 }
 
 #redirect {
-    border: 1px solid;
+    border: 1px solid gainsboro;
     padding: 10px;
 }
 
@@ -176,12 +184,6 @@ body {
     }
 }
 
-.all_in_data {
-    display: block;
-    width: 100%;
-    white-space: pre-wrap;
-}
-
 .table_safe {
     max-width: 100%;
 }
@@ -192,8 +194,10 @@ body {
 
 #topic_scroll {
     max-height: 500px;
+    
     overflow: scroll;
     -ms-overflow-style: none;
+
     scrollbar-width: none;
 }
 
@@ -232,18 +236,27 @@ a {
     color: dodgerblue;
 }
 
+hr {
+    border: 0;
+    border-top: 1px solid gainsboro;
+}
+
+.render_content {
+    white-space: pre-wrap;
+    line-break: anywhere;
+}
+
 blockquote {
     padding: 15px 40px 15px 15px;
     margin: 15px 0 0;
+
     display: table;
+
     border: 2px solid #ccc;
     border-left: 5px solid black;
+
     background-image: url('/views/main_css/file/quote.png');
     background-position: calc(100% - 10px) 10px;
     background-repeat: no-repeat;
     background-size: 25px;
-}
-
-hr {
-    border-top: 1px solid lightgray;
 }
