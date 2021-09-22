@@ -28,7 +28,7 @@ def give_user_check_delete_2(conn):
             return redirect('/check/' + url_pas(user_id if return_type == '0' else user_ip))
         else:
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('check'), wiki_set(), custom(), other2(['(' + load_lang('delete') + ')', 0])],
+                imp = [load_lang('check'), wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('delete') + ')', 0])],
                 data = '''
                     ''' + load_lang('name') + ''' : ''' + user_id + '''
                     <hr class="main_hr">

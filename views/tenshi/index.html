@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        {% if imp[3][0] != 0 %}
+            <title>{{imp[0]}} {{imp[3][0]}} - {{imp[1][0]}}</title>
+        {% else %}
+            <title>{{imp[0]}} - {{imp[1][0]}}</title>
+        {% endif %}
+        {{imp[3][3]|safe}}
+        <link rel="stylesheet" href="/views/tenshi/css/main.css?ver=20">
+        <script src="/views/tenshi/js/skin_set.js?ver=8"></script>
+        <script src="/views/tenshi/js/main.js?ver=3"></script>
+        <script>main_load(); window.addEventListener('DOMContentLoaded', skin_set);</script>
+        <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
+        <link rel="shortcut icon" href="/views/main_css/file/favicon.ico?ver=1">
+        {{imp[1][5]|safe}}
+        {{imp[2][3]|safe}}
+        {% if imp[3][0] != 0 %}
+            <meta name="title" content="{{imp[0]}}{{imp[3][0]}} - {{imp[1][0]}}">
+        {% else %}
+            <meta name="title" content="{{imp[0]}} - {{imp[1][0]}}">
+        {% endif %}
+        <meta name="keywords" content="{{imp[0]}}">
+        <meta name="description" content="{{data|cut_100}}">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <div id="background">
+            <div id="top">
+                <div id="top_main">
+                    <div id="logo">
+                        <a href="/" class="top_in_cel">{{imp[1][4]|safe}}</a>
+                    </div>
+                    <div id="top_tool">
+                        <div id="top_tool_group">
+                            <div id="top_tool_cel">
+                                <a href="javascript:opening('recent_cel');" class="top_in_cel">
+                                    <span class="iconify" data-icon="ic:baseline-access-time" data-inline="true"></span>
+                                    <span class="not_mobile">{{'list'|load_lang}}</span>
+                                    <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
+                                </a>
+                                <div id="recent_cel" class="cel_in_cel" style="display: none;">
+                                    <a href="/recent_changes">
+                                        <span class="iconify" data-icon="ic:baseline-autorenew" data-inline="true"></span>
+                                        {{'recent_change'|load_lang}}
+                                    </a>
+                                    <hr>
+                                    <a href="/recent_discuss">
+                                        <span class="iconify" data-icon="ic:baseline-add-comment" data-inline="true"></span>
+                                        {{'recent_discussion'|load_lang}}
+                                    </a>
+                                    <hr>
+                                    <a href="/vote">
+                                        <span class="iconify" data-icon="ic:baseline-how-to-vote" data-inline="true"></span>
+                                        {{'vote_list'|load_lang}}
+                                    </a>
+                                </div>
+                            </div>
+                             
+                            <div id="top_tool_cel">
+                                <a href="javascript:opening('other_cel');" class="top_in_cel">
+                                    <span class="iconify" data-icon="ic:baseline-archive" data-inline="true"></span>
+                                    <span class="not_mobile">{{'tool'|load_lang}}</span>
+                                    <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
+                                </a>
+                                <div id="other_cel" class="cel_in_cel" style="display: none;">
+                                    <a href="/random">
+                                        <span class="iconify" data-icon="ic:baseline-shuffle" data-inline="true"></span>
+                                        {{'random'|load_lang}}
+                                    </a>
+                                    <hr>
+                                    <a href="/other">
+                                        <span class="iconify" data-icon="ic:baseline-build" data-inline="true"></span>
+                                        {{'other_tool'|load_lang}}
+                                    </a>
+                                    {% if imp[2][9] != '0' %}
+                                        <hr>
+                                        <a href="/manager">
+                                            <span class="iconify" data-icon="ic:baseline-how-to-reg" data-inline="true"></span>
+                                            {{'admin_tool'|load_lang}}
+                                        </a>
+                                    {% endif %}
+                                    <hr>
+                                    <a href="/upload">
+                                        <span class="iconify" data-icon="ic:baseline-cloud-upload" data-inline="true"></span>
+                                        {{'upload'|load_lang}}
+                                    </a>
+                                    <hr>
+                                    <a href="/skin_set">
+                                        <span class="iconify" data-icon="ic:baseline-settings" data-inline="true"></span>
+                                        {{'skin_setting'|load_lang}}
+                                    </a>
+                                </div>
+                            </div>
+                             
+                            <div id="top_tool_cel" id="top_in_user">
+                                <a href="/user" class="top_in_cel">
+                                    {% if imp[2][2] == 1 %}
+                                        {% if imp[2][8] != '0' %}
+                                            <span class="iconify" data-icon="ic:baseline-add-alert" data-inline="true"></span>
+                                        {% else %}
+                                            <span class="iconify" data-icon="ic:baseline-person-add" data-inline="true"></span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="iconify" data-icon="ic:baseline-person" data-inline="true"></span>
+                                    {% endif %}
+                                    <span class="not_mobile">{{imp[2][5]}}</span>
+                                </a>
+                            </div>
+                        </div>
+                         
+                        <form method="post" action="/search" id="search" role="search">
+                            <input id="search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
+                            |
+                            <button type="submit" formaction="/goto">
+                                <span class="iconify" data-icon="ic:round-find-in-page" data-inline="true"></span>
+                            </button>
+                            |
+                            <button type="submit" formaction="/search">
+                                <span class="iconify" data-icon="ic:baseline-search" data-inline="true"></span>
+                            </button>
+                            <div id="pre_search" style="display: none;"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div id="main">
+                <div id="main_top">
+                    {% if menu != 0 %}
+                        <div id="tool" class="not_mobile">
+                            {% for sub_d in menu %}
+                                <div id="tool_cel">
+                                    {% if sub_d|length > 2 and sub_d[2] == 1 %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}" id="topic_color">{{sub_d[1]}}</a>
+                                    {% else %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                    {% endif %}
+                                </div>
+                                {% if menu[loop.index] %}
+                                    |
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <h1 id="title">
+                        <a id="titlt_a" href="#"><span class="change_space">{{imp[0]}}</span></a>
+                        {% if imp[3][0] != 0 %}
+                            <sub>{{imp[3][0]}}</sub>
+                        {% endif %}
+                    </h1>
+                    <div id="last_edit">
+                        {% if imp[3][1] != 0 %}
+                            {{'last_edit_time'|load_lang}} : {{imp[3][1]}}
+                        {% endif %}
+                    </div>
+                    {% if menu != 0 %}
+                        <div id="tool" class="is_mobile">
+                            {% for sub_d in menu %}
+                                <div id="tool_cel">
+                                    {% if sub_d|length > 2 and sub_d[2] == 1 %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}" id="topic_color">{{sub_d[1]}}</a>
+                                    {% else %}
+                                        <a class="menu-item" href="/{{sub_d[0]}}">{{sub_d[1]}}</a>
+                                    {% endif %}
+                                </div>
+                                {% if menu[loop.index] %}
+                                    |
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div id="main_data">
+                    {{data|safe}}
+                </div>
+            </div>
+        </div>
+        <div id="bottom">
+            <div id="bottom_main">
+                {{imp[1][1]|safe}}
+                <br>
+                <br>
+                <a href="https://github.com/openNAMU/openNAMU"><img id="b_logo" src="/views/main_css/file/s_logo.png"></a>
+            </div>
+        </div>
+        <div id="nav_bar">
+            <div id="go_top">
+                <a href="#top">
+                    <span class="iconify" data-icon="ic:baseline-arrow-upward" data-inline="true"></span>
+                </a>
+            </div>
+            <div id="go_bottom">
+                <a href="#bottom">
+                    <span class="iconify" data-icon="ic:baseline-arrow-downward" data-inline="true"></span>
+                </a>
+            </div>
+            <div id="go_toc">
+                <a href="#toc">
+                    <span class="iconify" data-icon="ic:baseline-list" data-inline="true"></span>
+                </a>
+            </div>
+        </div>
+    </body>
+</html>

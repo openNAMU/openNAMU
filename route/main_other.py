@@ -4,7 +4,7 @@ def main_other_2(conn):
     curs = conn.cursor()
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('other_tool'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('other_tool'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
         data = '''
             <h2>''' + load_lang('record') + '''</h2>
             <ul class="inside_ul">
@@ -28,7 +28,7 @@ def main_other_2(conn):
                 <li><a href="/image_file_list">''' + load_lang('image_file_list') + '''</a></li>
                 <li><a href="/vote">''' + load_lang('vote_list') + '''</a></li>
                 <li><a href="/long_page">''' + load_lang('long_page') + '''</a></li>
-                <!-- <li><a href="/short_page">''' + load_lang('short_page') + '''</a></li> -->
+                <li><a href="/short_page">''' + load_lang('short_page') + '''</a></li>
             </ul>
             <br>
             <h2>''' + load_lang('other') + '''</h2>

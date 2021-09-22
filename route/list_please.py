@@ -20,7 +20,7 @@ def list_please_2(conn):
     div += '</ul>' + next_fix('/please?num=', num, data_list)
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('need_document'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('need_document'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
         data = div,
         menu = [['other', load_lang('return')]]
     ))

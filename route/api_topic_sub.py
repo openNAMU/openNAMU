@@ -4,7 +4,6 @@ def api_topic_sub_2(conn, topic_num):
     curs = conn.cursor()
 
     topic_num = str(topic_num)
-    get_acl = acl_check('', 'render')
 
     if flask.request.args.get('num', None):
         curs.execute(db_change("select id, data, date, ip, block, top from topic where code = ? and id + 0 = ? + 0 order by id + 0 asc"), [
@@ -56,7 +55,12 @@ def api_topic_sub_2(conn, topic_num):
                 "blind" : i[4],
                 
                 "ip_pas" : ip_a[i[3]],
-                "data_pas" : [data_r_html, data_r_js]
+                "data_pas" : render_set(
+                    doc_data = data_v, 
+                    data_type = 'api_view',
+                    data_in = i[0],
+                    doc_acl = 0
+                )
             }
 
         return flask.jsonify(data_a)

@@ -29,7 +29,7 @@ def api_user_info_2(conn, name):
             </table>
         '''
 
-        curs.execute(db_change("select acl from user where id = ?"), [name])
+        curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [name])
         data = curs.fetchall()
         if data:
             if data[0][0] != 'user':

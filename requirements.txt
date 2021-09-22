@@ -1,8 +1,12 @@
 flask
-flask-Reggie
-tornado
+gevent
+
 requests
+
 pymysql
+
 Pillow
+
 diff-match-patch
+
 pysha3; python_version < "3.6"

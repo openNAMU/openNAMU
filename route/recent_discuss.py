@@ -15,10 +15,10 @@ def recent_discuss_2(conn):
         m_sub = ' (' + load_lang('closed') + ')'
 
     div +=  '''
-            <hr class=\"main_hr\">
+            <hr class="main_hr">
             <table id="main_table_set">
                 <tbody>
-                    <tr>
+                    <tr id="main_table_top_tr">
                         <td id="main_table_width_half">''' + load_lang('discussion_name') + '''</td>
                         <td id="main_table_width_half">''' + load_lang('time') + '''</td>
                     </tr>
@@ -38,7 +38,7 @@ def recent_discuss_2(conn):
     div += '</tbody></table>'
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('recent_discussion'), wiki_set(), custom(), other2([m_sub, 0])],
+        imp = [load_lang('recent_discussion'), wiki_set(), wiki_custom(), wiki_css([m_sub, 0])],
         data = div,
         menu = 0
     ))
