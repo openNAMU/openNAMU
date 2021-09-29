@@ -39,13 +39,14 @@ def api_w_2(conn, name):
                 find_replace_moment = re.findall(r'(@([^=@]+)=([^=@]+)@|@([^=@]+)@)', json_data)
                 for i in find_replace_moment:
                     if i[1] != '':
-                        get_all_change_1 += [['@' + i[1] + '@', i[2]]]
+                        get_all_change_1 += [[i[1], i[2]]]
 
                         json_data = json_data.replace(i[0], '@' + i[1] + '@', 1)
                     else:
                         json_data = json_data.replace(i[0], '@' + i[3] + '@', 1)
 
                 get_all_change_2 = include_list + get_all_change_1
+                print(get_all_change_2)
                 for i in get_all_change_2:
                     json_data = json_data.replace('@' + i[0] + '@', i[1])
 
