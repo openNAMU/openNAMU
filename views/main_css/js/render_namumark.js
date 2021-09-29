@@ -8,7 +8,11 @@ function get_link_state(data) {
     var link_list_2 = {}
     for(var i = 0; document.getElementsByClassName(data + 'link_finder')[i]; i++) {
         var data_class = document.getElementsByClassName(data + 'link_finder')[i];
-        if(data_class.id !== 'out_link' && !data_class.href.match(/^#/)) {            
+        if(
+            data_class.id !== 'out_link' && 
+            data_class.id !== 'inside' && 
+            !data_class.href.match(/^#/)
+        ) {            
             link_list.push(data_class.title);
             
             if(!link_list_2[data_class.title]) {
