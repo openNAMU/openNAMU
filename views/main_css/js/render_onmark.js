@@ -350,10 +350,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                         );
                     }
                         
-                    console.log(data_inter);
-                    console.log(link_real);
                     let data_inter_get = data_wiki_set['inter_wiki'][data_inter[1]];
-                    console.log(data_inter_get);
                     if(data_inter_get) {
                         data_inter_link = data_inter_get['link'];
                         if(data_inter_get['logo'] !== '') {
@@ -1224,10 +1221,7 @@ function do_onmark_render(
     data = data_var[0];
     data_js = data_var[1];
     var passing = data_var[2];
-    
-    console.log(data_wiki_set);
-    console.log('test');
-    
+
     if(passing === 0) {
         data = do_onmark_remark_render(data);
         
@@ -1235,32 +1229,23 @@ function do_onmark_render(
         data = data_var[0];
         data_js = data_var[1];
         data_nowiki = data_var[2];
-        console.log('nowiki');
-        
-        console.log(data);
         
         data_var = do_onmark_math_render(data, data_js, name_include);
         data = data_var[0];
         data_js = data_var[1];
-        console.log('math');
 
         data_var = do_onmark_include_render(data, data_js, name_include, data_nowiki);
         data = data_var[0];
         data_js = data_var[1];
-        console.log('include');
 
         data_var = do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_doc);
         data = data_var[0];
         data_js = data_var[1];
         data_nowiki = data_var[2];
-        console.log('middle');
 
         data = do_onmark_text_render(data);
-        console.log('text');
         data = do_onmark_heading_render(data, name_doc, name_include);
-        console.log('heading');
         data = do_onmark_table_render(data);
-        console.log('table');
 
         data_var = do_onmark_link_render(
             data, 
@@ -1272,21 +1257,15 @@ function do_onmark_render(
         );
         data = data_var[0];
         data_js = data_var[1];
-        console.log('link');
 
         data_var = do_onmark_macro_render(data, data_js);
         data = data_var[0];
         data_js = data_var[1];
-        console.log('macro');
         
         data = do_onmark_list_render(data);
-        console.log('list');
         data = do_onmark_hr_render(data);
-        console.log('hr');
         data = do_onmark_footnote_render(data, name_include);
-        console.log('footnote');
         data = do_onmark_last_render(data, name_include);
-        console.log('all')
     }
     
     data_js += '' + 

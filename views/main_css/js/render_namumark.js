@@ -20,7 +20,13 @@ function get_link_state(data) {
             } else {
                 link_list_2[data_class.title].push(i);
             }
-        } else if(data_exter_link === '1' && data_class.id === 'out_link') {
+        } else if(
+            data_exter_link === '1' && 
+            (
+                data_class.id === 'out_link' ||
+                data_class.id === 'inside'
+            )
+        ) {
             document.getElementsByClassName(data + 'link_finder')[i].target = '_self';
         }
     }
