@@ -106,11 +106,25 @@ def render_do(doc_name, doc_data, data_type, data_in):
     rep_data = curs.fetchall()
     rep_data = rep_data[0][0] if rep_data else 'namumark'
     
+    curs.execute(db_change('select html, plus, plus_t from html_filter where kind = "inter_wiki"'))
+    inter_wiki_data = curs.fetchall()
+    wiki_set_data = {
+        "inter_wiki" : {}
+    }
+    for i in inter_wiki_data:
+        wiki_set_data['inter_wiki'][i[0]] = {
+            "logo" : i[2],
+            "link" : i[1]
+        }
+        
+    wiki_set_data = json.dumps(wiki_set_data, ensure_ascii = False)
+    
     if data_type != 'backlink':
         if rep_data == 'namumark':
             data_in = (data_in + '_') if data_in else ''
             data_end = [
-                '<pre style="display: none;" id="' + data_in + 'render_content_load">' + html.escape(doc_data) + '</pre>'
+                '<pre style="display: none;" id="' + data_in + 'render_content_set">' + html.escape(wiki_set_data) + '</pre>' + \
+                '<pre style="display: none;" id="' + data_in + 'render_content_load">' + html.escape(doc_data) + '</pre>' + \
                 '<div class="render_content" id="' + data_in + 'render_content"></div>', 
                 '''
                     do_onmark_render(

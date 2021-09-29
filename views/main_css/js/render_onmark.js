@@ -1,5 +1,5 @@
-// 인터위키
 // 표 캡션
+// 중괄호 문법 정리
 // Tool
 function do_url_change(data) {
     return encodeURIComponent(data);
@@ -203,11 +203,16 @@ function do_onmark_heading_render(data, name_doc, name_include) {
     return data;
 }
 
-function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowiki) {
+function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowiki, data_wiki_set) {
     var num_link = 0;
+    
     var category_data = '';
+    
     var category_re = /^(분류|category):/i;
+    let inter_re = /^inter:([^:]+):/i;
+    let out_link_re = /^http(s)?:\/\//i;
     var file_re = /^(파일|file|외부|out):/i;
+    
     var link_re = /\[\[(((?!\[\[|\]\]).)+)\]\]/;
     
     while(data.match(link_re)) {
@@ -302,7 +307,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                 ''
 
                 return '';
-            } else if(link_real.match(/^http(s)?:\/\//)) {
+            } else if(link_real.match(out_link_re)) {
                 var i = 0;
                 while(i < 2) {
                     if(i === 0) {
@@ -326,6 +331,61 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                             'name="' + name_include + 'set_link_' + num_link_str + '" ' + 
                             'title=""' +
                             'href="">' + link_out + '</a>';
+            } else if(link_real.match(inter_re)) {
+                let data_inter = link_real.match(inter_re);
+                let data_inter_link = '';
+                let data_inter_logo = '';
+                if(data_inter) {
+                    if(link_real === link_out) {
+                        link_real = link_real.replace(
+                            inter_re, 
+                            ''
+                        );
+                        
+                        link_out = link_real;
+                    } else {
+                        link_real = link_real.replace(
+                            inter_re, 
+                            ''
+                        );
+                    }
+                        
+                    console.log(data_inter);
+                    console.log(link_real);
+                    let data_inter_get = data_wiki_set['inter_wiki'][data_inter[1]];
+                    console.log(data_inter_get);
+                    if(data_inter_get) {
+                        data_inter_link = data_inter_get['link'];
+                        if(data_inter_get['logo'] !== '') {
+                            data_inter_logo = data_inter_get['logo'];
+                            data_inter_logo = data_inter_logo.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                        } else {
+                            data_inter_logo = data_inter[1] + ':';
+                        }
+                    } else {
+                        return '';
+                    }
+                    
+                    data_js += '' +
+                        'document.getElementsByName("' + name_include + 'set_link_' + num_link_str + '")[0].title = ' + 
+                        '"' + do_js_safe_change(do_xss_change(data_inter[1] + ':' + link_real)) + '";' +
+                            '\n' +
+                    '';
+                    data_js += '' +
+                        'document.getElementsByName("' + name_include + 'set_link_' + num_link_str + '")[0].href = ' + 
+                        '"' + data_inter_link + do_url_change(link_real) + '";' +
+                            '\n' +
+                    '';
+
+                    return  '<a id="inside" ' +
+                            'class="' + name_include + 'link_finder" ' +
+                            'target="_blank" ' +
+                            'name="' + name_include + 'set_link_' + num_link_str + '" ' + 
+                            'title=""' +
+                            'href="">' + data_inter_logo + link_out + '</a>'; 
+                } else {
+                    return '';
+                }
             } else {
                 if(link_real.match(/^\//)) {
                     link_real = name_doc + link_real;
@@ -1138,9 +1198,17 @@ function do_onmark_remark_render(data) {
 }
 
 // Main
-function do_onmark_render(test_mode = 'test', name_id = '', name_include = '', name_doc = '', doc_data = '') {    
+function do_onmark_render(
+    test_mode = 'test', 
+    name_id = '', 
+    name_include = '', 
+    name_doc = '', 
+    doc_data = ''
+) {
+    let data_wiki_set = {};
 	if(test_mode === 'normal') {
         var data = '\n' + document.getElementById(name_id + '_load').innerHTML.replace(/\r/g, '') + '\n';
+        data_wiki_set = JSON.parse(document.getElementById(name_id + '_set').innerHTML);
     } else if(test_mode === 'manual') { 
         var data = '\n' + doc_data.replace(/\r/g, '') + '\n';
     } else {
@@ -1156,6 +1224,9 @@ function do_onmark_render(test_mode = 'test', name_id = '', name_include = '', n
     data = data_var[0];
     data_js = data_var[1];
     var passing = data_var[2];
+    
+    console.log(data_wiki_set);
+    console.log('test');
     
     if(passing === 0) {
         data = do_onmark_remark_render(data);
@@ -1191,7 +1262,14 @@ function do_onmark_render(test_mode = 'test', name_id = '', name_include = '', n
         data = do_onmark_table_render(data);
         console.log('table');
 
-        data_var = do_onmark_link_render(data, data_js, name_doc, name_include, data_nowiki);
+        data_var = do_onmark_link_render(
+            data, 
+            data_js, 
+            name_doc, 
+            name_include,
+            data_nowiki,
+            data_wiki_set
+        );
         data = data_var[0];
         data_js = data_var[1];
         console.log('link');
