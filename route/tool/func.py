@@ -84,7 +84,7 @@ if sys.version_info < (3, 6):
 global_lang = {}
 global_wiki_set = {}
 
-data_css_ver = '104'
+data_css_ver = '105'
 data_css = ''
 
 conn = ''
@@ -1050,6 +1050,7 @@ def ip_or_user(data = ''):
 def admin_check(num = None, what = None, name = ''):
     ip = ip_check() if name == '' else name
     time_data = get_time()
+    pass_ok = 0
 
     if ip_or_user(ip) == 0:
         curs.execute(db_change(
@@ -1080,7 +1081,7 @@ def admin_check(num = None, what = None, name = ''):
                 'select name from alist where name = ? and acl = "owner"'
             ), [user_auth])
             if curs.fetchall():
-                return 1
+                pass_ok = 1
             else:
                 if num == 'all':                    
                     curs.execute(db_change(
@@ -1092,13 +1093,17 @@ def admin_check(num = None, what = None, name = ''):
                     ), [user_auth, check])
                     
                 if curs.fetchall():
-                    if what:
-                        curs.execute(db_change(
-                            "insert into re_admin (who, what, time) values (?, ?, ?)"
-                        ), [ip, what, time_data])
-                        conn.commit()
+                    pass_ok = 1
 
-                    return 1
+                
+            if pass_ok == 1:
+                if what:
+                    curs.execute(db_change(
+                        "insert into re_admin (who, what, time) values (?, ?, ?)"
+                    ), [ip, what, time_data])
+                    conn.commit()
+
+                return 1
 
     return 0
 

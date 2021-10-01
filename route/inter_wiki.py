@@ -29,7 +29,7 @@ def inter_wiki_2(conn, tools):
         curs.execute(db_change("select html from html_filter where kind = 'name'"))
     elif tools == 'edit_filter':
         del_link = 'del_edit_filter'
-        plus_link = 'manager/9'
+        plus_link = 'plus_edit_filter'
         title = load_lang('edit_filter_list')
         div = ''
 
@@ -75,29 +75,26 @@ def inter_wiki_2(conn, tools):
         div += '<ul class="inside_ul">'
 
         for data in db_data:
-            if tools == 'inter_wiki':
-                div += '<li>' + data[0] + ' : <a id="out_link" href="' + data[1] + '">' + data[1] + '</a>'
-            elif tools == 'edit_filter':
-                div += '<li><a href="/plus_edit_filter/' + url_pas(data[0]) + '">' + data[0] + '</a>'
-            else:
-                div += '<li>' + data[0]
+            div += '<li>' + data[0]
 
-                if tools == 'edit_top':
-                    div += ' : ' + data[1]
+            if tools == 'edit_top':
+                div += ' : ' + data[1]
+            elif tools == 'inter_wiki':
+                div += ' : <a id="out_link" href="' + data[1] + '">' + data[1] + '</a>'
 
             if admin == 1:
                 div += ' <a href="/' + plus_link + '/' + url_pas(data[0]) + '">(' + load_lang('edit') + ')</a>'
                 div += ' <a href="/' + del_link + '/' + url_pas(data[0]) + '">(' + load_lang('delete') + ')</a>'
-
+                
             div += '</li>'
 
         div += '</ul>'
 
         if admin == 1:
-            div += '<hr class=\"main_hr\"><a href="/' + plus_link + '">(' + load_lang('add') + ')</a>'
-    else:
-        if admin == 1:
-            div += '<a href="/' + plus_link + '">(' + load_lang('add') + ')</a>'
+            div += '<hr class="main_hr">'
+            
+    if admin == 1:    
+        div += '<a href="/' + plus_link + '">(' + load_lang('add') + ')</a>'
 
     return easy_minify(flask.render_template(skin_check(),
         imp = [title, wiki_set(), wiki_custom(), wiki_css([0, 0])],
