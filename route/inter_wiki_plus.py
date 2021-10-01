@@ -2,6 +2,10 @@ from .tool.func import *
 
 def inter_wiki_plus_2(conn, tools, name):
     curs = conn.cursor()
+    
+    if not name:
+        if tools == 'plus_edit_filter':
+            return redirect('/manager/9')
 
     if flask.request.method == 'POST':
         if tools == 'plus_inter_wiki':
@@ -124,10 +128,7 @@ def inter_wiki_plus_2(conn, tools, name):
                 <hr class="main_hr">
                 <input value="''' + html.escape(value[2]) + '''" type="text" name="icon">
             '''
-        elif tools == 'plus_edit_filter':
-            if not name:
-                name = 'test'
-            
+        elif tools == 'plus_edit_filter':            
             curs.execute(db_change("select plus, plus_t from html_filter where html = ? and kind = 'regex_filter'"), [name])
             exist = curs.fetchall()
             if exist:
