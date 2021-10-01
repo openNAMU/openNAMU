@@ -46,7 +46,6 @@ def api_w_2(conn, name):
                         json_data = json_data.replace(i[0], '@' + i[3] + '@', 1)
 
                 get_all_change_2 = include_list + get_all_change_1
-                print(get_all_change_2)
                 for i in get_all_change_2:
                     json_data = json_data.replace('@' + i[0] + '@', i[1])
 

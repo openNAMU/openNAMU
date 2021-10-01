@@ -237,11 +237,11 @@ function load_include(name_doc, name_ob, data_include, name_org = '') {
     xhr.open("POST", "/api/w/" + encodeURI(name_doc) + "?v=include&include=" + name_ob + "&name_org=" + name_org);
     xhr.send(data_form);
 
+    document.getElementsByClassName(name_ob)[0].href = "/w/" + do_url_change(name_doc);
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
             if(this.responseText === "{}\n") {
                 document.getElementById(name_ob).innerHTML = "";
-                document.getElementsByClassName(name_ob)[0].href = "/w/" + do_url_change(name_doc); 
                 document.getElementsByClassName(name_ob)[0].id = "not_thing";
             } else {
                 var data_load = JSON.parse(this.responseText);
