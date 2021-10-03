@@ -430,7 +430,7 @@
             "email_send_error" : "Email transfer failed.",
             "restart_fail_error" : "Restart failed. Please use manual restart.",
             "same_email_error" : "There are users using the same email.",
-            "input_email_error" : "There is a problem with the input value."
+            "input_email_error" : "There is a problem with the input value.",
         "_comment_3.2_" : "Warning",
             "http_warning" : "Warning: If you are not on HTTPS connection, Your information can be leaked. We won't response to that.",
             "user_head_warning" : "User data will be deleted if you close the browser or when you sign in.",
