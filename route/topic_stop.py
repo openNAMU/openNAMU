@@ -67,7 +67,7 @@ def topic_stop_2(conn, topic_num):
         agree_check = 'checked="checked"' if rd_d[0][1] == 'O' else ''
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('topic_setting'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('topic_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
                     <select name="stop_d">

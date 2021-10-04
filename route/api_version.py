@@ -11,7 +11,7 @@ def api_version_2(conn, r_ver, c_ver):
     up_data = up_data[0][0] if up_data and up_data[0][0] in ['stable', 'beta', 'dev'] else 'stable'
 
     try:
-        data = urllib.request.urlopen('https://raw.githubusercontent.com/2du/openNAMU/' + up_data + '/version.json')
+        data = urllib.request.urlopen('https://raw.githubusercontent.com/openNAMU/openNAMU/' + up_data + '/version.json')
     except:
         data = None
 

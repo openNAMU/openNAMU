@@ -16,7 +16,7 @@ def topic_delete_2(conn, topic_num):
         return redirect('/')
     else:
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('topic_delete'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('topic_delete'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <hr class=\"main_hr\">
                 <form method="post">

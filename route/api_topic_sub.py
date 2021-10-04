@@ -4,7 +4,6 @@ def api_topic_sub_2(conn, topic_num):
     curs = conn.cursor()
 
     topic_num = str(topic_num)
-    get_acl = acl_check('', 'render')
 
     if flask.request.args.get('num', None):
         curs.execute(db_change("select id, data, date, ip, block, top from topic where code = ? and id + 0 = ? + 0 order by id + 0 asc"), [
@@ -34,21 +33,6 @@ def api_topic_sub_2(conn, topic_num):
         for i in data:
             data_v = i[1] if i[4] != 'O' or admin == 1 else ''
             
-            data_r = render_set(data = data_v, num = 2, include = 'topic_' + i[0], acl = get_acl)
-            data_r_html = data_r[0]
-            data_r_js = data_r[1]
-            
-            data_r_html = re.sub(
-                r'&lt;topic_a&gt;((?:(?!&lt;\/topic_a&gt;).)+)&lt;\/topic_a&gt;', 
-                '<a href="\g<1>">\g<1></a>', 
-                data_r_html
-            )
-            data_r_html = re.sub(
-                r'&lt;topic_call&gt;@((?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;', 
-                '<a href="/w/user:\g<1>">@\g<1></a>', 
-                data_r_html
-            )
-            
             data_a[i[0]] = {
                 "data" : data_v,
                 "date" : i[2],
@@ -56,7 +40,12 @@ def api_topic_sub_2(conn, topic_num):
                 "blind" : i[4],
                 
                 "ip_pas" : ip_a[i[3]],
-                "data_pas" : [data_r_html, data_r_js]
+                "data_pas" : render_set(
+                    doc_data = data_v, 
+                    data_type = 'api_view',
+                    data_in = i[0],
+                    doc_acl = 0
+                )
             }
 
         return flask.jsonify(data_a)

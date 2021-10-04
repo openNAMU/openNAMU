@@ -20,7 +20,7 @@ def list_image_file_2(conn):
     list_data += next_fix('/image_file_list?num=', num, data_list)
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('image_file_list'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('image_file_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
         data = list_data,
         menu = [['other', load_lang('return')]]
     ))    

@@ -28,8 +28,16 @@ input::placeholder, textarea::placeholder, select::placeholder {
     background: #803737;
 }
 
+#toron_color_normal {
+    background: #38340e;
+}
+
 #toron_color_blue {
     background: #314c56;
+}
+
+#main_table_top_tr {
+    background: #2e5f4e;
 }
 
 pre#syntax, pre#syntax code {

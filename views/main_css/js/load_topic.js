@@ -42,6 +42,15 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
                 
                 if(data_i_pas === '') {
                     data_i_pas = '<br>';
+                } else {
+                    data_i_pas = data_i_pas.replace(
+                        /&lt;topic_a&gt;((?:(?!&lt;\/topic_a&gt;).)+)&lt;\/topic_a&gt;/g,
+                        '<a href="$1">$1</a>'
+                    );
+                    data_i_pas = data_i_pas.replace(
+                        /&lt;topic_call&gt;@((?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;/g,
+                        '<a href="/w/user:$1">@$1</a>', 
+                    );
                 }
                 
                 if(blind === 'O') {
@@ -69,7 +78,7 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
                 } else if(ip_o === ip_first) {
                     color_t = 'toron_color_green';
                 } else {
-                    color_t = 'toron_color';
+                    color_t = 'toron_color_normal';
                 }
                 
                 data_a += '' + 

@@ -53,7 +53,7 @@ def view_raw_2(conn, name, topic_num, num):
         p_data = '<textarea readonly rows="25">' + p_data + '</textarea>'
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [v_name, wiki_set(), custom(), other2([sub, 0])],
+            imp = [v_name, wiki_set(), wiki_custom(), wiki_css([sub, 0])],
             data = p_data,
             menu = menu
         ))

@@ -54,7 +54,7 @@ def topic_acl_2(conn, topic_num):
             acl_html_list += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('topic_acl_setting'), wiki_set(), custom(), other2([0, 0])],
+            imp = [load_lang('topic_acl_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
                     <a href="/acl/TEST#exp">(''' + load_lang('reference') + ''')</a>

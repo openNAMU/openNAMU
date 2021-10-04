@@ -41,7 +41,7 @@ def topic_close_list_2(conn, name):
                 <hr class="main_hr">
                 <textarea rows="10" id="content" placeholder="''' + load_lang('content') + '''" name="content"></textarea>
                 <hr class="main_hr">
-                ''' + captcha_get() + (ip_warring() if display == '' else '') + '''
+                ''' + captcha_get() + (ip_warning() if display == '' else '') + '''
                 <input style="display: none;" name="topic" value="''' + name + '''">
                 <button type="submit">''' + load_lang('send') + '''</button>
                 <button id="preview" type="button" onclick="load_preview(\'''' + url_pas(name) + '\')">' + load_lang('preview') + '''</button>
@@ -72,7 +72,7 @@ def topic_close_list_2(conn, name):
         plus = re.sub(r'^<br>', '', plus)
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [name, wiki_set(), custom(), other2(['(' + sub + ')', 0])],
+        imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + sub + ')', 0])],
         data = div + plus,
         menu = menu
     ))

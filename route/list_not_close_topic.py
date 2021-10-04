@@ -13,7 +13,7 @@ def list_not_close_topic_2(conn):
     div += '</ul>'
 
     return easy_minify(flask.render_template(skin_check(),
-        imp = [load_lang('open_discussion_list'), wiki_set(), custom(), other2([0, 0])],
+        imp = [load_lang('open_discussion_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
         data = div,
         menu = [['manager', load_lang('return')]]
     ))
