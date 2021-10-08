@@ -1,19 +1,12 @@
 [(en-US)](./readme-en.md) | [(ko-KR)](./readme.md)
+
 # 오픈나무
-[![Python 3.5 이상](https://img.shields.io/badge/python->=%203.5-blue.svg)](https://python.org)
+[![Python 3.6 이상](https://img.shields.io/badge/python->=%203.5-blue.svg)](https://python.org)
 [![라이선스](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
 ![](https://raw.githubusercontent.com/openNAMU/openNAMU/beta/.github/logo.png)
 
 오픈나무는 파이썬 기반의 위키 엔진입니다.
-
-### 목차
- * [시작하기](#시작하기)
- * [클론](#클론)
- * [기여](#기여)
- * [라이선스](#라이선스)
- * [지원 문법](#지원-문법)
- * [기타](#기타)
 
 ## 시작하기
 오픈나무는 파이썬 환경에서 동작하는 파이썬 애플리케이션으로, 파이썬 환경을 필요로 합니다.
@@ -38,13 +31,12 @@
  * Quotes icon - [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672)
  * Syntax highlighting - [highlightjs](https://highlightjs.org/)
  * Numerical expression - [MathJax](https://www.mathjax.org/)
- * Handling Keyboard Shortcuts [shortcut.js](http://www.openjs.com/scripts/events/keyboard_shortcuts/)
 
 ### 도움을 주신 분들
  * [Team Croatia](https://github.com/TeamCroatia)
  * Basix
  * Efrit
- * 기타 채팅방 사람들
+ * 기타 여러 사람들
 
 ## 지원 문법
  * 나무마크 (NamuMark)
