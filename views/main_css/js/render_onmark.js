@@ -31,7 +31,21 @@ function do_link_change(data, data_nowiki, no_change) {
 }
 
 function do_darkmode_split(data) {
-    return data.split(',')[0];
+    console.log(document.cookie.match(regex_data('main_css_darkmode')));
+    if(
+        document.cookie.match(regex_data('main_css_darkmode')) &&
+        document.cookie.match(regex_data('main_css_darkmode'))[1] === '1'
+    ) {
+        let data_split = data.split(',');
+        console.log(data_split);
+        if(data_split.length > 1) {
+            return data.split(',')[1];
+        } else {
+            return data.split(',')[0];
+        }
+    } else {
+        return data.split(',')[0];
+    }
 }
 
 function do_js_safe_change(data, br_on = 1) {
@@ -93,6 +107,12 @@ function do_xss_change(data) {
     data = data.replace(/&lt;/g, '<');
     data = data.replace(/&gt;/g, '>');
     data = data.replace(/&amp;/g, '&');
+    
+    return data;
+}
+
+function do_end_br_replace(data) {
+    data = data.replace(/(\n| )+$/, '');
     
     return data;
 }
@@ -185,7 +205,7 @@ function do_onmark_heading_render(data, name_doc, name_include) {
     
     if(toc_data !== '') {
         toc_data += '</div>';
-        data += '</div>';
+        data = do_end_br_replace(data) + '</div>';
     }
     
     var toc_auto_add = data.match(/\[(?:목차|toc)\(no\)\]/);
@@ -254,9 +274,9 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                     file_set_name = file_set_name[0];
 
                     if(file_set_name === 'width') {
-                        file_style += 'width:' + file_set_data + ';';
+                        file_style += 'width:' + do_px_add(file_set_data) + ';';
                     } else if(file_set_name === 'height') {
-                        file_style += 'height:' + file_set_data + ';';
+                        file_style += 'height:' + do_px_add(file_set_data) + ';';
                     } else if(file_set_name === 'bgcolor') {
                         file_bgcolor += 'background:' + file_set_data + ';';
                     } else if(file_set_name === 'alt') {
@@ -433,7 +453,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
             category_data = '<div style="display: none;" id="cate_all"><div id="cate">Category : ' + category_data;
         }
         
-        data += category_data.replace(/\| $/, '') + '</div></div>';
+        data = do_end_br_replace(data) + category_data.replace(/\| $/, '') + '</div></div>';
     }
     
     return [data, data_js];
@@ -498,7 +518,7 @@ function do_onmark_footnote_render(data, name_include) {
     }
     
     if(name_include === '' && footnote_end_data !== '') {
-        data += '<ul id="footnote_data">' + footnote_end_data + '</ul>';
+        data = do_end_br_replace(data) + '<ul id="footnote_data">' + footnote_end_data + '</ul>';
     }
     
     return data;
@@ -609,22 +629,26 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
             }
 
             var middle_type = middle_data.match(
-                /^(?:(?:(?:(#|@)((?:[0-9a-f-A-F]{3}){1,2}))(?:,(?:#|@)(?:(?:[0-9a-f-A-F]{3}){1,2}))?|(#|@)([a-zA-Z]+))|(\+|-)([1-5])|#!(html|wiki|syntax|folding|html))$/i
+                /^(?:(?:(#|@)((?:[0-9a-f-A-F]{3}){1,2}|\w+))(?:,(?:(#|@)((?:[0-9a-f-A-F]{3}){1,2}|\w+)))?|(\+|-)([1-5])|#!(html|wiki|syntax|folding|html))$/i
             );
             if(middle_type) {
                 if(middle_data_x_1[middle_data_x_1.length - 1] === '\\') {
                     return middle_data_before + '{{{' + middle_data_x_1 + '<mid_e>';
                 } else if(middle_type[1]) {
-                    if(middle_type[1] === '@') {
-                        return middle_data_before + '<span style="background: #' + middle_type[2] + '">' + middle_data_all + '</span>';
-                    } else {
-                        return middle_data_before + '<span style="color: #' + middle_type[2] + '">' + middle_data_all + '</span>';
+                    let data_color = middle_type[2];
+                    if(middle_type[3]) {
+                        data_color = do_darkmode_split(middle_type[2] + ',' + middle_type[4])    
                     }
-                } else if(middle_type[3]) {
-                    if(middle_type[3] === '@') {
-                        return middle_data_before + '<span style="background: ' + middle_type[4] + '">' + middle_data_all + '</span>';
+                    
+                    let data_sharp = '';
+                    if(data_color.match(/^(?:[0-9a-f-A-F]{3}){1,2}$/)) {
+                        data_sharp = '#';
+                    }
+                    
+                    if(middle_type[1] === '@') {
+                        return middle_data_before + '<span style="background: ' + data_sharp + data_color + '">' + middle_data_all + '</span>';
                     } else {
-                        return middle_data_before + '<span style="color: ' + middle_type[4] + '">' + middle_data_all + '</span>';
+                        return middle_data_before + '<span style="color: ' + data_sharp + data_color + '">' + middle_data_all + '</span>';
                     }
                 } else if(middle_type[5]) {
                     if(middle_type[5] === '+') {
@@ -743,7 +767,7 @@ function do_onmark_last_render(data) {
     
     // br 마지막 처리
     data = data.replace(/^(\n| )+/, '');
-    data = data.replace(/(\n| )+$/, '');
+    data = do_end_br_replace(data);
     data = data.replace(/\n/g, '<br>');
     
     return data;
@@ -915,9 +939,10 @@ function do_onmark_table_render_sub(data, data_col) {
                 
                 
             } else {
-                var table_option_data = data_option.replace(/"/g, '').match(/^((?:#[a-zA-Z0-9]{3}){1,2}|\w+)/);
+                var table_option_data = data_option.replace(/"/g, '')
+                table_option_data = table_option_data.match(/^((?:(?:#[a-zA-Z0-9]{3}){1,2}|\w+)(?:,(?:(?:#[a-zA-Z0-9]{3}){1,2}|\w+))?)/);
                 if(table_option_data) {
-                    data_option_all['td'] += 'background:' + table_option_data[1] + ';';
+                    data_option_all['td'] += 'background:' + do_darkmode_split(table_option_data[1]) + ';';
                 } else {
                     no_option = '<lt>' + data_option + '<gt>';
                 }
@@ -1076,11 +1101,13 @@ function do_onmark_list_sub_render(data) {
         });
 
         data = data.replace(quote_re, '' +
+            '\n<start_point>' +
             '<blockquote>' + 
                 '<end_point>\n' +
                 quote_end_data + 
                 '\n<start_point>' +
             '</blockquote>' +
+            '<end_point>\n' +
        '');
     }
     
@@ -1189,7 +1216,7 @@ function do_onmark_redirect_render(data, data_js, name_doc) {
 }
 
 function do_onmark_remark_render(data) {
-    data = data.replace(/\n##([^\n]+)/, '');
+    data = data.replace(/\n##([^\n]+)/g, '');
     
     return data;
 }
