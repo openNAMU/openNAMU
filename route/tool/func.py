@@ -84,7 +84,7 @@ if sys.version_info < (3, 6):
 global_lang = {}
 global_wiki_set = {}
 
-data_css_ver = '105'
+data_css_ver = '106'
 data_css = ''
 
 conn = ''
