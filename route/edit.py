@@ -136,7 +136,8 @@ def edit_2(conn, name):
 
         data = re.sub(r'\n+$', '', data)
 
-        if flask.request.cookies.get('main_css_monaco', '0') == '1':
+        monaco_on = flask.request.cookies.get('main_css_monaco', '0')
+        if monaco_on == '1':
             editor_display = 'style="display: none;"'
             monaco_display = ''
             add_get_file = '''
@@ -181,7 +182,7 @@ def edit_2(conn, name):
                 <span   id="server_set"
                         style="display: none;">''' + json.dumps(server_set) + '''</span>
                 <form method="post">
-                    <div ''' + editor_display + '''>''' + edit_button() + '''</div>
+                    <div>''' + edit_button(monaco_on) + '''</div>
                     <div    id="monaco_editor"
                             class="content" 
                             ''' + monaco_display + '''></div>

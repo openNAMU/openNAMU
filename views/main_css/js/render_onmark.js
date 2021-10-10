@@ -112,7 +112,7 @@ function do_xss_change(data) {
 }
 
 function do_end_br_replace(data) {
-    data = data.replace(/(\n| )+$/, '');
+    data = data.replace(/(\n| )+$/, '\n');
     
     return data;
 }
@@ -395,11 +395,11 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                     '';
 
                     return  '<a id="inside" ' +
-                            'class="' + name_include + 'link_finder" ' +
-                            'target="_blank" ' +
-                            'name="' + name_include + 'set_link_' + num_link_str + '" ' + 
-                            'title=""' +
-                            'href="">' + data_inter_logo + link_out + '</a>'; 
+                                'class="' + name_include + 'link_finder" ' +
+                                'target="_blank" ' +
+                                'name="' + name_include + 'set_link_' + num_link_str + '" ' + 
+                                'title=""' +
+                                'href="">' + data_inter_logo + link_out + '</a>'; 
                 } else {
                     return '';
                 }
@@ -439,6 +439,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                 }
 
                 return  '<a class="' + name_include + 'link_finder" ' +
+                            'id="real_normal_link"' +
                             'name="' + name_include + 'set_link_' + num_link_str + '" ' +
                             'title="" ' +
                             'href="">' + link_out + '</a>';
