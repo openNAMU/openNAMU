@@ -15,7 +15,7 @@ def load_conn2(data):
 def backlink_generate(data_markup, doc_data, doc_name):
     if data_markup == 'namumark':
         # Link
-        link_re = re.compile(r'\[\[(?!https?:\/\/)((?:(?!\[\[|\]\]|\|).)+)(?:\]\]|\|)', re.I)
+        link_re = re.compile(r'\[\[(?!https?:\/\/|inter:|#)((?:(?!\[\[|\]\]|\|).)+)(?:\]\]|\|)', re.I)
         
         data_link = link_re.findall(doc_data)
         data_link = list(set(data_link))
@@ -29,9 +29,7 @@ def backlink_generate(data_markup, doc_data, doc_name):
         
         for i in data_link:
             data_link_in = i
-            if data_link_in[0] == '#':
-                continue
-            elif re.search(r'^(?:분류|category):', data_link_in):
+            if re.search(r'^(?:분류|category):', data_link_in):
                 data_link_in = re.sub(r'\\(.)', r'\1', data_link_in)
                 data_link_end['cat'] += [re.sub(r'^분류:', 'category:', data_link_in)]
             elif re.search(r'^(?:파일|file):', data_link_in):
@@ -153,7 +151,7 @@ def render_do(doc_name, doc_data, data_type, data_in):
     else:
         backlink = backlink_generate(
             rep_data, 
-            html.escape(doc_data), 
+            doc_data, 
             doc_name
         )
         

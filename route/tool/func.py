@@ -84,7 +84,7 @@ if sys.version_info < (3, 6):
 global_lang = {}
 global_wiki_set = {}
 
-data_css_ver = '106'
+data_css_ver = '107'
 data_css = ''
 
 conn = ''
@@ -503,7 +503,7 @@ def load_random_key(long = 64):
         ) for i in range(long)
     )
 
-def edit_button():
+def edit_button(editor_display = '0'):
     insert_list = []
 
     curs.execute(db_change("select html, plus from html_filter where kind = 'edit_top'"))
@@ -515,7 +515,7 @@ def edit_button():
     for insert_data in insert_list:
         data += '' + \
             '<a href="' + \
-                'javascript:do_insert_data(\'content\', \'' + insert_data[0] + '\')' + \
+                'javascript:do_insert_data(\'content\', \'' + insert_data[0] + '\', ' + editor_display + ')' + \
             '">(' + insert_data[1] + ')</a> ' + \
         ''
 
