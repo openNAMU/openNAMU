@@ -1,21 +1,35 @@
-function do_insert_data(name, data) {
-    // https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-    if(document.selection) {
-        document.getElementById(name).focus();
+function do_insert_data(name, data, monaco = 0) {
+    if(monaco === 0) {
+        // https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
+        if(document.selection) {
+            document.getElementById(name).focus();
 
-        var sel = document.selection.createRange();
-        sel.text = data;
-    } else if(
-        document.getElementById(name).selectionStart || 
-        document.getElementById(name).selectionStart == '0'
-    ) {
-        var startPos = document.getElementById(name).selectionStart;
-        var endPos = document.getElementById(name).selectionEnd;
-        var myPos = document.getElementById(name).value;
+            var sel = document.selection.createRange();
+            sel.text = data;
+        } else if(
+            document.getElementById(name).selectionStart || 
+            document.getElementById(name).selectionStart == '0'
+        ) {
+            var startPos = document.getElementById(name).selectionStart;
+            var endPos = document.getElementById(name).selectionEnd;
+            var myPos = document.getElementById(name).value;
 
-        document.getElementById(name).value = myPos.substring(0, startPos) + data + myPos.substring(endPos, myPos.length);
+            document.getElementById(name).value = myPos.substring(0, startPos) + data + myPos.substring(endPos, myPos.length);
+        } else {
+            document.getElementById(name).value += data;
+        }
     } else {
-        document.getElementById(name).value += data;
+        var selection = editor.getSelection();
+        var id = { major: 1, minor: 1 };             
+        var text = data;
+        var op = {
+            identifier: id, 
+            range: selection, 
+            text: text, 
+            forceMoveMarkers: true
+        };
+        
+        editor.executeEdits("my-source", [op]);
     }
 }
 

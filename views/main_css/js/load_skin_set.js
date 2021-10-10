@@ -88,6 +88,13 @@ function main_css_get_post() {
         document.cookie = 'main_css_exter_link=0;';
     }
     
+    check = document.getElementById('main_css_link_delimiter');
+    if(check.checked) {
+        document.cookie = 'main_css_link_delimiter=1;';
+    } else {
+        document.cookie = 'main_css_link_delimiter=0;';
+    }
+    
     history.go(0);
 }
 
@@ -153,6 +160,13 @@ function main_css_skin_load() {
             '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=5">' +
         '';
     }
+    
+    if(
+        document.cookie.match(main_css_regex_data('main_css_link_delimiter')) &&
+        document.cookie.match(main_css_regex_data('main_css_link_delimiter'))[1] === '1'
+    ) {
+        head_data.innerHTML += '<style>#real_normal_link::before, #not_thing::before, #inside::before { content: \'🅸\'; font-weight: lighter; background: transparent; }</style>';
+    }
 }
 
 function main_css_load_lang(name) {
@@ -187,7 +201,8 @@ function main_css_load_lang(name) {
             "except_ie" : "Not supported for Internet Explorer",
             "use_monaco" : "Use monaco editor",
             "self_tab" : "Current tab",
-            "exter_link_open_method" : "External link"
+            "exter_link_open_method" : "External link",
+            "link_delimiter" : "Add link delimiter"
         }, "ko-KR" : {
             "default" : "기본값",
             "change_to_normal" : "일반 텍스트로 변경",
@@ -218,7 +233,8 @@ function main_css_load_lang(name) {
             "except_ie" : "인터넷 익스플로러에선 지원되지 않음",
             "use_monaco" : "모나코 에디터 사용",
             "self_tab" : "현재 탭",
-            "exter_link_open_method" : "외부 링크"
+            "exter_link_open_method" : "외부 링크",
+            "link_delimiter" : "링크 구분자 추가"
         }
     }
 
@@ -409,6 +425,15 @@ function main_css_skin_set() {
             set_data["exter_link"] += '<option value="' + exter_link_list[i][1] + '">' + exter_link_list[i][2] + '</option>';
         }
     }
+    
+    if(
+        document.cookie.match(main_css_regex_data('main_css_link_delimiter')) &&
+        document.cookie.match(main_css_regex_data('main_css_link_delimiter'))[1] === '1'
+    ) {
+        set_data["link_delimiter"] = "checked";
+    } else {
+        set_data["link_delimiter"] = "";
+    }
 
     document.getElementById("main_skin_set").innerHTML = ' \
         <h2>1. ' + main_css_load_lang('renderer') + '</h2> \
@@ -434,6 +459,8 @@ function main_css_skin_set() {
         </select> \
         <h3>1.6. ' + main_css_load_lang('other') + '</h3> \
         <input ' + set_data["include"] + ' type="checkbox" id="main_css_include" value="include"> ' + main_css_load_lang('include_link') + ' \
+        <hr class="main_hr"> \
+        <input ' + set_data["link_delimiter"] + ' type="checkbox" id="main_css_link_delimiter" value="link_delimiter"> ' + main_css_load_lang('link_delimiter') + '<sup>(1)</sup> \
         <h3>1.7. ' + main_css_load_lang('set_toc') + '</h3> \
         <select id="main_css_toc"> \
             ' + set_data["toc"] + ' \
