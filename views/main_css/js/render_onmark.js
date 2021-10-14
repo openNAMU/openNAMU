@@ -670,7 +670,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
 
                         return middle_data_before + '<span id="' + name_include + 'nowiki_html_' + String(html_n) + '"></span>';
                     } else if(middle_type_sub === 'wiki') {
-                        var middle_wiki_re = /^(?:[^ ]+)(?: style=['"]([^\n'"]*)['"])?\n?/;
+                        var middle_wiki_re = /^(?:[^ ]+)(?: style=['"]([^\n'"]*)['"])?[^\n]*\n?/;
                         var middle_wiki = middle_data_x_1.match(middle_wiki_re);
                         middle_wiki = middle_wiki[1] ? middle_wiki[1] : '';
                         middle_wiki = middle_wiki.replace(/position/, '');
@@ -713,10 +713,11 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                     } else if(middle_type_sub === 'syntax') {
                         syntax_n += 1;
 
-                        var middle_syntax = middle_data_x_1.match(/^(?:[^ ]+) ([^\n]+)\n/);
+                        let middle_syntax_re = /^(?:[^ ]+) ([^\n]+)\n?/;
+                        var middle_syntax = middle_data_x_1.match(middle_syntax_re);
                         middle_syntax = middle_syntax ? middle_syntax[1] : 'python';
 
-                        middle_data_all = middle_data_x_1.replace(/^(?:[^ ]+) ([^\n]+)\n/, '');
+                        middle_data_all = middle_data_x_1.replace(middle_syntax_re, '');
 
                         data_nowiki[name_include + 'nowiki_syntax_' + String(syntax_n)] = middle_data_all;
                         data_js += do_data_try_insert(
@@ -761,6 +762,8 @@ function do_onmark_last_render(data) {
     // middle_render 마지막 처리
     data = data.replace(/<wiki_s_[0-9] /g, '<div ');
     data = data.replace(/<wiki_e_[0-9]>/g, '</div>');
+    
+    console.log(data);
     
     // heading_render 마지막 처리
     data = data.replace(/\n?<start_point>/g, '');
