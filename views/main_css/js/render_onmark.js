@@ -244,7 +244,9 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
 
             num_link += 1;
             var num_link_str = String(num_link - 1);
-            if(link_real.match(file_re)) {
+            if(link_real.match(/<|>/)) {
+                return '<link_s>' + x_1 + '<link_e>';
+            } else if(link_real.match(file_re)) {
                 var file_load_type = link_real.match(file_re)[1];
                 var file_name = link_real.replace(file_re, '');
 
@@ -446,6 +448,9 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
             }
         });
     }
+    
+    data = data.replace(/<link_s>/, '[[');
+    data = data.replace(/<link_e>/, ']]');
 
     if(category_data !== '') {
         if(name_include === '') {
@@ -762,8 +767,6 @@ function do_onmark_last_render(data) {
     // middle_render 마지막 처리
     data = data.replace(/<wiki_s_[0-9] /g, '<div ');
     data = data.replace(/<wiki_e_[0-9]>/g, '</div>');
-    
-    console.log(data);
     
     // heading_render 마지막 처리
     data = data.replace(/\n?<start_point>/g, '');
