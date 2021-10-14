@@ -156,7 +156,7 @@ def edit_2(conn, name):
                 require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
                 require(["vs/editor/editor.main"], function () {
                     window.editor = monaco.editor.create(document.getElementById('monaco_editor'), {
-                        value: document.getElementById('content').value,
+                        value: document.getElementById('textarea_edit_view').value,
                         language: 'plaintext',
                         theme: \'''' + monaco_thema + '''\'
                     });
@@ -186,16 +186,18 @@ def edit_2(conn, name):
                     <div    id="monaco_editor"
                             class="content" 
                             ''' + monaco_display + '''></div>
-                    <textarea   id="content"
+                    <textarea   id="textarea_edit_view"
                                 ''' + editor_display + '''
-                                class="content" 
-                                placeholder="''' + p_text + '''" 
-                                name="content">''' + html.escape(data) + '''</textarea>
+                                class="content"
+                                placeholder="''' + p_text + '''">''' + html.escape(data) + '''</textarea>
                     <hr class="main_hr">
                     <input  placeholder="''' + load_lang('why') + '''" 
                             name="send">
                     <textarea   style="display: none;" 
                                 id="origin">''' + html.escape(data) + '''</textarea>
+                    <textarea   style="display: none;"
+                                name="content"
+                                id="content"></textarea>
                     <input  style="display: none;" 
                             name="ver" 
                             value="''' + doc_ver + '''">
@@ -211,7 +213,7 @@ def edit_2(conn, name):
                     <button id="preview" 
                             type="button" 
                             onclick="
-                                monaco_to_content(); 
+                                monaco_to_content();
                                 load_preview(\'''' + url_pas(name) + '''\');
                             ">''' + load_lang('preview') + '''</button>
                 </form>

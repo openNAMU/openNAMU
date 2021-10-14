@@ -244,7 +244,9 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
 
             num_link += 1;
             var num_link_str = String(num_link - 1);
-            if(link_real.match(file_re)) {
+            if(link_real.match(/<|>/)) {
+                return '<link_s>' + x_1 + '<link_e>';
+            } else if(link_real.match(file_re)) {
                 var file_load_type = link_real.match(file_re)[1];
                 var file_name = link_real.replace(file_re, '');
 
@@ -446,6 +448,9 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
             }
         });
     }
+    
+    data = data.replace(/<link_s>/, '[[');
+    data = data.replace(/<link_e>/, ']]');
 
     if(category_data !== '') {
         if(name_include === '') {
@@ -670,7 +675,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
 
                         return middle_data_before + '<span id="' + name_include + 'nowiki_html_' + String(html_n) + '"></span>';
                     } else if(middle_type_sub === 'wiki') {
-                        var middle_wiki_re = /^(?:[^ ]+)(?: style=['"]([^\n'"]*)['"])?\n?/;
+                        var middle_wiki_re = /^(?:[^ ]+)(?: style=['"]([^\n'"]*)['"])?[^\n]*\n?/;
                         var middle_wiki = middle_data_x_1.match(middle_wiki_re);
                         middle_wiki = middle_wiki[1] ? middle_wiki[1] : '';
                         middle_wiki = middle_wiki.replace(/position/, '');
@@ -713,10 +718,11 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                     } else if(middle_type_sub === 'syntax') {
                         syntax_n += 1;
 
-                        var middle_syntax = middle_data_x_1.match(/^(?:[^ ]+) ([^\n]+)\n/);
+                        let middle_syntax_re = /^(?:[^ ]+) ([^\n]+)\n?/;
+                        var middle_syntax = middle_data_x_1.match(middle_syntax_re);
                         middle_syntax = middle_syntax ? middle_syntax[1] : 'python';
 
-                        middle_data_all = middle_data_x_1.replace(/^(?:[^ ]+) ([^\n]+)\n/, '');
+                        middle_data_all = middle_data_x_1.replace(middle_syntax_re, '');
 
                         data_nowiki[name_include + 'nowiki_syntax_' + String(syntax_n)] = middle_data_all;
                         data_js += do_data_try_insert(
