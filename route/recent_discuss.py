@@ -33,7 +33,12 @@ def recent_discuss_2(conn):
         title = html.escape(data[0])
         sub = html.escape(data[1])
 
-        div += '<tr><td><a href="/thread/' + data[3] + '">' + sub + '</a> (' + title + ')</td><td>' + data[2] + '</td></tr>'
+        div += '' + \
+            '<tr>' + \
+                '<td><a href="/thread/' + data[3] + '">' + sub + '</a> <a href="/topic/' + url_pas(title) + '">(' + title + ')</a></td>' + \
+                '<td>' + data[2] + '</td>' + \
+            '</tr>' + \
+        ''
 
     div += '</tbody></table>'
 
