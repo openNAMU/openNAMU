@@ -31,13 +31,11 @@ function do_link_change(data, data_nowiki, no_change) {
 }
 
 function do_darkmode_split(data) {
-    console.log(document.cookie.match(regex_data('main_css_darkmode')));
     if(
         document.cookie.match(regex_data('main_css_darkmode')) &&
         document.cookie.match(regex_data('main_css_darkmode'))[1] === '1'
     ) {
         let data_split = data.split(',');
-        console.log(data_split);
         if(data_split.length > 1) {
             return data.split(',')[1];
         } else {
@@ -996,7 +994,6 @@ function do_onmark_table_render_main(data) {
         let table_caption_re = /^\|([^|]+)\|/;
         let table_caption = '';
         let table_caption_get = table_data_org.match(table_caption_re);
-        console.log(table_caption_get);
         if(table_caption_get) {
             table_caption = '<caption>' + table_caption_get[1] + '</caption>';
             table_data_org = table_data_org.replace(table_caption_re, '||');
