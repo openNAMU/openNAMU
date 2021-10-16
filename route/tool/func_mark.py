@@ -15,7 +15,7 @@ def load_conn2(data):
 def backlink_generate(data_markup, doc_data, doc_name):
     if data_markup == 'namumark':
         # Link
-        link_re = re.compile(r'\[\[(?!https?:\/\/|inter:|#)((?:(?!\[\[|\]\]|\|).)+)(?:\]\]|\|)', re.I)
+        link_re = re.compile(r'\[\[(?!https?:\/\/|inter:|외부:|out:|#)((?:(?!\[\[|\]\]|\|).)+)(?:\]\]|\|)', re.I)
         
         data_link = link_re.findall(doc_data)
         data_link = list(set(data_link))
