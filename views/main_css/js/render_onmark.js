@@ -950,7 +950,6 @@ function do_onmark_table_render_sub(data, data_col) {
                 
             } else {
                 var table_option_data = data_option.replace(/"/g, '')
-                console.log(table_option_data);
                 table_option_data = table_option_data.match(/^((?:(?:#(?:[a-zA-Z0-9]{3}){1,2})|\w+)(?:,(?:(?:#(?:[a-zA-Z0-9]{3}){1,2})|\w+))?)/);
                 if(table_option_data) {
                     data_option_all['td'] += 'background:' + do_darkmode_split(table_option_data[1]) + ';';
