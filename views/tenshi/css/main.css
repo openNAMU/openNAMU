@@ -420,13 +420,6 @@ select {
 }
 
 /* content */
-#out_link::before {
-    content: '🅴';
-    font-weight: lighter;
-    background: transparent;
-    color: green;
-}
-
 a:hover {
     text-decoration: underline;
 }
