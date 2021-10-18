@@ -211,7 +211,6 @@ function do_onmark_heading_render(data, name_doc, name_include) {
     
     if(toc_data !== '') {
         toc_data += '</div>';
-        data = do_end_br_replace(data) + '</div>';
     }
     
     var toc_auto_add = data.match(/\[(?:목차|toc)\(no\)\]/);
@@ -226,7 +225,7 @@ function do_onmark_heading_render(data, name_doc, name_include) {
     
     data = data.replace(toc_re, toc_data);
     
-    return data;
+    return [data, toc_data];
 }
 
 function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowiki, data_wiki_set) {
@@ -768,7 +767,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
     return [data, data_js, data_nowiki];
 }
 
-function do_onmark_last_render(data, name_include, data_category) {       
+function do_onmark_last_render(data, name_include, data_category, data_toc) {       
     // middle_render 마지막 처리
     data = data.replace(/<wiki_s_[0-9] /g, '<div ');
     data = data.replace(/<wiki_e_[0-9]>/g, '</div>');
@@ -784,6 +783,10 @@ function do_onmark_last_render(data, name_include, data_category) {
     
     if(name_include === '') {
         data += data_category;
+    }
+    
+    if(data_toc !== '') {
+        data += '</div>';
     }
     
     return data;
@@ -1300,7 +1303,10 @@ function do_onmark_render(
         data_nowiki = data_var[2];
 
         data = do_onmark_text_render(data);
-        data = do_onmark_heading_render(data, name_doc, name_include);
+        data_var = do_onmark_heading_render(data, name_doc, name_include);
+        data = data_var[0];
+        var data_toc = data_var[1];
+        
         data = do_onmark_table_render(data);
 
         data_var = do_onmark_link_render(
@@ -1322,7 +1328,12 @@ function do_onmark_render(
         data = do_onmark_list_render(data);
         data = do_onmark_hr_render(data);
         data = do_onmark_footnote_render(data, name_include);
-        data = do_onmark_last_render(data, name_include, data_category);
+        data = do_onmark_last_render(
+            data, 
+            name_include, 
+            data_category,
+            data_toc
+        );
     }
     
     data_js += '' + 
