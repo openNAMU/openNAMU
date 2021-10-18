@@ -84,7 +84,7 @@ if sys.version_info < (3, 6):
 global_lang = {}
 global_wiki_set = {}
 
-data_css_ver = '108'
+data_css_ver = '109'
 data_css = ''
 
 conn = ''
@@ -515,7 +515,7 @@ def edit_button(editor_display = '0'):
     for insert_data in insert_list:
         data += '' + \
             '<a href="' + \
-                'javascript:do_insert_data(\'content\', \'' + insert_data[0] + '\', ' + editor_display + ')' + \
+                'javascript:do_insert_data(\'textarea_edit_view\', \'' + insert_data[0] + '\', ' + editor_display + ')' + \
             '">(' + insert_data[1] + ')</a> ' + \
         ''
 
@@ -740,18 +740,13 @@ def wiki_css(data):
     return data
 
 def cut_100(data):
-    if re.search(r'^\/w\/', flask.request.path):
-        data = re.sub(r'<script>((\n*(((?!<\/script>).)+)\n*)+)<\/script>', '', data)
-        data = re.sub(r'<hr class="main_hr">((\n*((.+)\n*))+)$', '', data)
-        data = re.sub(r'<div id="cate_all">((\n*((.+)\n*))+)$', '', data)        
-
-        data = re.sub(r'<(((?!>).)*)>', ' ', data)
-        data = re.sub(r'\n', ' ', data)
-        data = re.sub(r'^ +', '', data)
-        data = re.sub(r' +$', '', data)
-        data = re.sub(r' {2,}', ' ', data)
-    
-        return data[0:100] + '...'
+    data = re.search(r'<pre style="display: none;" id="render_content_load">([^<>]+)<\/pre>', data)
+    if data:
+        data = data.group(1)
+        if len(data) > 100:
+            return data[0:100] + '...'
+        else:
+            return data[0:len(data)]
     else:
         return ''
 
@@ -803,7 +798,7 @@ def wiki_set(num = 1):
 
     return data_list
 
-def wiki_custom():
+def wiki_custom():    
     ip = ip_check()
     if ip_or_user(ip) == 0:
         user_icon = 1
@@ -846,6 +841,12 @@ def wiki_custom():
 
     curs.execute(db_change("select title from rd where title = ? and stop = ''"), ['user:' + ip])
     user_topic = '1' if curs.fetchall() else '0'
+    
+    split_path = flask.request.path.split('/')
+    if len(split_path) > 1:
+        split_path = split_path[1]
+    else:
+        split_path = 0
 
     return [
         '',
@@ -859,7 +860,8 @@ def wiki_custom():
         user_notice,
         user_acl_list,
         ip,
-        user_topic
+        user_topic,
+        split_path
     ]
 
 def load_skin(data = '', set_n = 0, default = 0):

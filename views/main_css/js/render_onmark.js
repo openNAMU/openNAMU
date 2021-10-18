@@ -5,9 +5,13 @@ function do_url_change(data) {
     return encodeURIComponent(data);
 }
 
-function do_nowiki_change(data, data_nowiki) {
-    return data.replace(/<span id="((?:.*)(?:nowiki_(?:[^"]+)))"><\/span>/, function(x, x_1) {
-        return data_nowiki[x_1];
+function do_nowiki_change(data, data_nowiki, type = 'normal') {
+    return data.replace(/<span id="((?:[^"]*)(?:nowiki_(?:[^"]+)))"><\/span>/g, function(x, x_1) {
+        if(type === 'normal') {
+            return data_nowiki[x_1];
+        } else {
+            return '\\' + data_nowiki[x_1];
+        }
     });
 }
 
@@ -460,10 +464,10 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
             category_data = '<div style="display: none;" id="cate_all"><div id="cate">Category : ' + category_data;
         }
         
-        data = do_end_br_replace(data) + category_data.replace(/\| $/, '') + '</div></div>';
+        category_data = category_data.replace(/\| $/, '') + '</div></div>';
     }
     
-    return [data, data_js];
+    return [data, data_js, category_data];
 }
 
 function do_onmark_footnote_render(data, name_include) {
@@ -764,7 +768,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
     return [data, data_js, data_nowiki];
 }
 
-function do_onmark_last_render(data) {       
+function do_onmark_last_render(data, name_include, data_category) {       
     // middle_render 마지막 처리
     data = data.replace(/<wiki_s_[0-9] /g, '<div ');
     data = data.replace(/<wiki_e_[0-9]>/g, '</div>');
@@ -777,6 +781,10 @@ function do_onmark_last_render(data) {
     data = data.replace(/^(\n| )+/, '');
     data = do_end_br_replace(data);
     data = data.replace(/\n/g, '<br>');
+    
+    if(name_include === '') {
+        data += data_category;
+    }
     
     return data;
 }
@@ -1180,14 +1188,18 @@ function do_onmark_list_render(data) {
     return data;
 }
 
-function do_onmark_math_render(data, data_js, name_include) {
-    data = data.replace(/<math>((?:(?!<\/math>).)+)<\/math>/g, '[math($1)]');
+function do_onmark_math_render(data, data_js, name_include, data_nowiki) {
+    data = data.replace(/&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;/g, '[math($1)]');
     
     var i = 0;
     data = data.replace(/\[math\((((?!\)]).)+)\)]/g, function(x, x_1) {
         i += 1;
         
-        data_js += do_math_try_insert(name_include + 'math_' + String(i), do_js_safe_change(do_xss_change(x_1)));
+        data_js += do_math_try_insert(
+            name_include + 'math_' + String(i), 
+            do_js_safe_change(do_xss_change(do_nowiki_change(x_1, data_nowiki, 'math')))
+        );
+        
         return '<span id="' + name_include + 'math_' + String(i) + '"></span>';
     });
     
@@ -1274,7 +1286,7 @@ function do_onmark_render(
         data_js = data_var[1];
         data_nowiki = data_var[2];
         
-        data_var = do_onmark_math_render(data, data_js, name_include);
+        data_var = do_onmark_math_render(data, data_js, name_include, data_nowiki);
         data = data_var[0];
         data_js = data_var[1];
 
@@ -1301,6 +1313,7 @@ function do_onmark_render(
         );
         data = data_var[0];
         data_js = data_var[1];
+        var data_category = data_var[2];
 
         data_var = do_onmark_macro_render(data, data_js);
         data = data_var[0];
@@ -1309,7 +1322,7 @@ function do_onmark_render(
         data = do_onmark_list_render(data);
         data = do_onmark_hr_render(data);
         data = do_onmark_footnote_render(data, name_include);
-        data = do_onmark_last_render(data, name_include);
+        data = do_onmark_last_render(data, name_include, data_category);
     }
     
     data_js += '' + 
