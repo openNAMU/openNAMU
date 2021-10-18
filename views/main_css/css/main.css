@@ -54,9 +54,13 @@ a {
 }
 
 #out_link::before {
-    background: green;
-    color: white;
-    content: "E";
+    content: '🅴';
+    
+    font-weight: lighter;
+    
+    background: transparent;
+    color: green;
+    
     margin-right: 2px;
 }
 
