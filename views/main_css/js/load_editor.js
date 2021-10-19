@@ -1,27 +1,41 @@
-function do_insert_data(name, data) {
-    // https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-    if(document.selection) {
-        document.getElementById(name).focus();
+function do_insert_data(name, data, monaco = 0) {
+    if(monaco === 0) {
+        // https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
+        if(document.selection) {
+            document.getElementById(name).focus();
 
-        var sel = document.selection.createRange();
-        sel.text = data;
-    } else if(
-        document.getElementById(name).selectionStart || 
-        document.getElementById(name).selectionStart == '0'
-    ) {
-        var startPos = document.getElementById(name).selectionStart;
-        var endPos = document.getElementById(name).selectionEnd;
-        var myPos = document.getElementById(name).value;
+            var sel = document.selection.createRange();
+            sel.text = data;
+        } else if(
+            document.getElementById(name).selectionStart || 
+            document.getElementById(name).selectionStart == '0'
+        ) {
+            var startPos = document.getElementById(name).selectionStart;
+            var endPos = document.getElementById(name).selectionEnd;
+            var myPos = document.getElementById(name).value;
 
-        document.getElementById(name).value = myPos.substring(0, startPos) + data + myPos.substring(endPos, myPos.length);
+            document.getElementById(name).value = myPos.substring(0, startPos) + data + myPos.substring(endPos, myPos.length);
+        } else {
+            document.getElementById(name).value += data;
+        }
     } else {
-        document.getElementById(name).value += data;
+        var selection = editor.getSelection();
+        var id = { major: 1, minor: 1 };             
+        var text = data;
+        var op = {
+            identifier: id, 
+            range: selection, 
+            text: text, 
+            forceMoveMarkers: true
+        };
+        
+        editor.executeEdits("my-source", [op]);
     }
 }
 
 function monaco_to_content() {
     try {
-        document.getElementById('content').innerHTML = window.editor.getValue();
+        document.getElementById('textarea_edit_view').value = window.editor.getValue();
     } catch(e) {}
 }
 
@@ -29,6 +43,7 @@ function do_not_out() {
     window.addEventListener('DOMContentLoaded', function() {
         window.onbeforeunload = function() {
             monaco_to_content();
+            section_edit_do();
             
             data = document.getElementById('content').value;
             origin = document.getElementById('origin').value;
@@ -116,7 +131,7 @@ function pasteListener(e) {
 
 function load_preview(name) {
     var s_data = new FormData();
-    s_data.append('data', document.getElementById('content').value);
+    s_data.append('data', document.getElementById('textarea_edit_view').value);
 
     var url = "/api/w/" + name;
     var url_2 = "/api/markup";
@@ -148,7 +163,7 @@ function section_edit_init() {
     );
     
     if(data_server['markup'] === 'namumark') {
-        var data = document.getElementById('content').value;
+        var data = document.getElementById('textarea_edit_view').value;
         var data_org = data;
         var data_section = Number(data_server['section']);
         var re_heading = /(^|\n)(={1,6})(#)? ?([^=]+) ?#?={1,6}(\n|$)/;
@@ -171,7 +186,7 @@ function section_edit_init() {
                 data = data_org.slice(start_point, end_point);
                 data = data.replace(/\n$/, '');
                 
-                document.getElementById('content').value = data;
+                document.getElementById('textarea_edit_view').value = data;
                 
                 data_server['start_point'] = start_point;
                 data_server['end_point'] = end_point;
@@ -195,12 +210,12 @@ function section_edit_do() {
     
     if(data_server['start_point'] !== undefined) {
         var data = document.getElementById('origin').value;
-        var data_section = document.getElementById('content').value;
+        var data_section = document.getElementById('textarea_edit_view').value;
         
         var start_point = data_server['start_point'];
         var end_point = data_server['end_point'];
         
-        if(data.length >= end_point) {            
+        if(data.length >= end_point) {
             var data_new = '';
             data_new += data.slice(0, start_point);
             data_new += data_section;
@@ -208,5 +223,7 @@ function section_edit_do() {
             
             document.getElementById('content').value = data_new;
         }
+    } else {
+        document.getElementById('content').value = document.getElementById('textarea_edit_view').value;
     }
 }

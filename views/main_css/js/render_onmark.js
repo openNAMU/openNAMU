@@ -5,9 +5,13 @@ function do_url_change(data) {
     return encodeURIComponent(data);
 }
 
-function do_nowiki_change(data, data_nowiki) {
-    return data.replace(/<span id="((?:.*)(?:nowiki_(?:[^"]+)))"><\/span>/, function(x, x_1) {
-        return data_nowiki[x_1];
+function do_nowiki_change(data, data_nowiki, type = 'normal') {
+    return data.replace(/<span id="((?:[^"]*)(?:nowiki_(?:[^"]+)))"><\/span>/g, function(x, x_1) {
+        if(type === 'normal') {
+            return data_nowiki[x_1];
+        } else {
+            return '\\' + data_nowiki[x_1];
+        }
     });
 }
 
@@ -31,7 +35,19 @@ function do_link_change(data, data_nowiki, no_change) {
 }
 
 function do_darkmode_split(data) {
-    return data.split(',')[0];
+    if(
+        document.cookie.match(regex_data('main_css_darkmode')) &&
+        document.cookie.match(regex_data('main_css_darkmode'))[1] === '1'
+    ) {
+        let data_split = data.split(',');
+        if(data_split.length > 1) {
+            return data.split(',')[1];
+        } else {
+            return data.split(',')[0];
+        }
+    } else {
+        return data.split(',')[0];
+    }
 }
 
 function do_js_safe_change(data, br_on = 1) {
@@ -73,7 +89,11 @@ function do_all_try(data) {
 }
 
 function do_px_add(data) {
-    return data.match(/^[0-9]+$/) ? (data + 'px') : data;
+    if(data) {
+        return data.match(/^[0-9]+$/) ? (data + 'px') : data;
+    } else {
+        return '';
+    }
 }
 
 function do_return_date() {
@@ -93,6 +113,12 @@ function do_xss_change(data) {
     data = data.replace(/&lt;/g, '<');
     data = data.replace(/&gt;/g, '>');
     data = data.replace(/&amp;/g, '&');
+    
+    return data;
+}
+
+function do_end_br_replace(data) {
+    data = data.replace(/(\n| )+$/, '\n');
     
     return data;
 }
@@ -185,7 +211,8 @@ function do_onmark_heading_render(data, name_doc, name_include) {
     
     if(toc_data !== '') {
         toc_data += '</div>';
-        data += '</div>';
+
+        data = do_end_br_replace(data) + '</div>';
     }
     
     var toc_auto_add = data.match(/\[(?:목차|toc)\(no\)\]/);
@@ -224,7 +251,9 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
 
             num_link += 1;
             var num_link_str = String(num_link - 1);
-            if(link_real.match(file_re)) {
+            if(link_real.match(/<|>/)) {
+                return '<link_s>' + x_1 + '<link_e>';
+            } else if(link_real.match(file_re)) {
                 var file_load_type = link_real.match(file_re)[1];
                 var file_name = link_real.replace(file_re, '');
 
@@ -247,29 +276,28 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                 var file_align = '';
 
                 var file_set = link_out_2.split('&amp;');
-                var i = 0;
-                while(file_set[i]) {
+                for(let i = 0; file_set[i]; i++) {
                     var file_set_name = file_set[i].split('=');
                     var file_set_data = file_set_name[1];
                     file_set_name = file_set_name[0];
-
-                    if(file_set_name === 'width') {
-                        file_style += 'width:' + file_set_data + ';';
-                    } else if(file_set_name === 'height') {
-                        file_style += 'height:' + file_set_data + ';';
-                    } else if(file_set_name === 'bgcolor') {
-                        file_bgcolor += 'background:' + file_set_data + ';';
-                    } else if(file_set_name === 'alt') {
-                        file_alt += file_set_data;
-                    } else if(file_set_name === 'align') {
-                        if(file_set_data === 'center') {
-                            file_align = 'display: block; text-align: center;';
-                        } else {
-                            file_align = 'float: ' + file_set_data + ';';
+                    
+                    if(file_set_data) {
+                        if(file_set_name === 'width') {
+                            file_style += 'width:' + do_px_add(file_set_data) + ';';
+                        } else if(file_set_name === 'height') {
+                            file_style += 'height:' + do_px_add(file_set_data) + ';';
+                        } else if(file_set_name === 'bgcolor') {
+                            file_bgcolor += 'background:' + file_set_data + ';';
+                        } else if(file_set_name === 'alt') {
+                            file_alt += file_set_data;
+                        } else if(file_set_name === 'align') {
+                            if(file_set_data === 'center') {
+                                file_align = 'display: block; text-align: center;';
+                            } else {
+                                file_align = 'float: ' + file_set_data + ';';
+                            }
                         }
-                    } 
-
-                    i += 1;
+                    }
                 }
 
                 return '' +
@@ -375,11 +403,11 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                     '';
 
                     return  '<a id="inside" ' +
-                            'class="' + name_include + 'link_finder" ' +
-                            'target="_blank" ' +
-                            'name="' + name_include + 'set_link_' + num_link_str + '" ' + 
-                            'title=""' +
-                            'href="">' + data_inter_logo + link_out + '</a>'; 
+                                'class="' + name_include + 'link_finder" ' +
+                                'target="_blank" ' +
+                                'name="' + name_include + 'set_link_' + num_link_str + '" ' + 
+                                'title=""' +
+                                'href="">' + data_inter_logo + link_out + '</a>'; 
                 } else {
                     return '';
                 }
@@ -419,12 +447,16 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                 }
 
                 return  '<a class="' + name_include + 'link_finder" ' +
+                            'id="real_normal_link"' +
                             'name="' + name_include + 'set_link_' + num_link_str + '" ' +
                             'title="" ' +
                             'href="">' + link_out + '</a>';
             }
         });
     }
+    
+    data = data.replace(/<link_s>/, '[[');
+    data = data.replace(/<link_e>/, ']]');
 
     if(category_data !== '') {
         if(name_include === '') {
@@ -433,10 +465,10 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
             category_data = '<div style="display: none;" id="cate_all"><div id="cate">Category : ' + category_data;
         }
         
-        data += category_data.replace(/\| $/, '') + '</div></div>';
+        category_data = category_data.replace(/\| $/, '') + '</div></div>';
     }
     
-    return [data, data_js];
+    return [data, data_js, category_data];
 }
 
 function do_onmark_footnote_render(data, name_include) {
@@ -498,7 +530,7 @@ function do_onmark_footnote_render(data, name_include) {
     }
     
     if(name_include === '' && footnote_end_data !== '') {
-        data += '<ul id="footnote_data">' + footnote_end_data + '</ul>';
+        data = do_end_br_replace(data) + '<ul id="footnote_data">' + footnote_end_data + '</ul>';
     }
     
     return data;
@@ -609,22 +641,26 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
             }
 
             var middle_type = middle_data.match(
-                /^(?:(?:(?:(#|@)((?:[0-9a-f-A-F]{3}){1,2}))(?:,(?:#|@)(?:(?:[0-9a-f-A-F]{3}){1,2}))?|(#|@)([a-zA-Z]+))|(\+|-)([1-5])|#!(html|wiki|syntax|folding|html))$/i
+                /^(?:(?:(#|@)((?:[0-9a-f-A-F]{3}){1,2}|\w+))(?:,(?:(#|@)((?:[0-9a-f-A-F]{3}){1,2}|\w+)))?|(\+|-)([1-5])|#!(html|wiki|syntax|folding|html))$/i
             );
             if(middle_type) {
                 if(middle_data_x_1[middle_data_x_1.length - 1] === '\\') {
                     return middle_data_before + '{{{' + middle_data_x_1 + '<mid_e>';
                 } else if(middle_type[1]) {
-                    if(middle_type[1] === '@') {
-                        return middle_data_before + '<span style="background: #' + middle_type[2] + '">' + middle_data_all + '</span>';
-                    } else {
-                        return middle_data_before + '<span style="color: #' + middle_type[2] + '">' + middle_data_all + '</span>';
+                    let data_color = middle_type[2];
+                    if(middle_type[3]) {
+                        data_color = do_darkmode_split(middle_type[2] + ',' + middle_type[4])    
                     }
-                } else if(middle_type[3]) {
-                    if(middle_type[3] === '@') {
-                        return middle_data_before + '<span style="background: ' + middle_type[4] + '">' + middle_data_all + '</span>';
+                    
+                    let data_sharp = '';
+                    if(data_color.match(/^(?:[0-9a-f-A-F]{3}){1,2}$/)) {
+                        data_sharp = '#';
+                    }
+                    
+                    if(middle_type[1] === '@') {
+                        return middle_data_before + '<span style="background: ' + data_sharp + data_color + '">' + middle_data_all + '</span>';
                     } else {
-                        return middle_data_before + '<span style="color: ' + middle_type[4] + '">' + middle_data_all + '</span>';
+                        return middle_data_before + '<span style="color: ' + data_sharp + data_color + '">' + middle_data_all + '</span>';
                     }
                 } else if(middle_type[5]) {
                     if(middle_type[5] === '+') {
@@ -645,7 +681,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
 
                         return middle_data_before + '<span id="' + name_include + 'nowiki_html_' + String(html_n) + '"></span>';
                     } else if(middle_type_sub === 'wiki') {
-                        var middle_wiki_re = /^(?:[^ ]+)(?: style=['"]([^\n'"]*)['"])?\n?/;
+                        var middle_wiki_re = /^(?:[^ ]+)(?: style=['"]([^\n'"]*)['"])?[^\n]*\n?/;
                         var middle_wiki = middle_data_x_1.match(middle_wiki_re);
                         middle_wiki = middle_wiki[1] ? middle_wiki[1] : '';
                         middle_wiki = middle_wiki.replace(/position/, '');
@@ -688,10 +724,11 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
                     } else if(middle_type_sub === 'syntax') {
                         syntax_n += 1;
 
-                        var middle_syntax = middle_data_x_1.match(/^(?:[^ ]+) ([^\n]+)\n/);
+                        let middle_syntax_re = /^(?:[^ ]+) ([^\n]+)\n?/;
+                        var middle_syntax = middle_data_x_1.match(middle_syntax_re);
                         middle_syntax = middle_syntax ? middle_syntax[1] : 'python';
 
-                        middle_data_all = middle_data_x_1.replace(/^(?:[^ ]+) ([^\n]+)\n/, '');
+                        middle_data_all = middle_data_x_1.replace(middle_syntax_re, '');
 
                         data_nowiki[name_include + 'nowiki_syntax_' + String(syntax_n)] = middle_data_all;
                         data_js += do_data_try_insert(
@@ -732,7 +769,7 @@ function do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_
     return [data, data_js, data_nowiki];
 }
 
-function do_onmark_last_render(data) {       
+function do_onmark_last_render(data, name_include, data_category) {       
     // middle_render 마지막 처리
     data = data.replace(/<wiki_s_[0-9] /g, '<div ');
     data = data.replace(/<wiki_e_[0-9]>/g, '</div>');
@@ -743,8 +780,12 @@ function do_onmark_last_render(data) {
     
     // br 마지막 처리
     data = data.replace(/^(\n| )+/, '');
-    data = data.replace(/(\n| )+$/, '');
+    data = do_end_br_replace(data);
     data = data.replace(/\n/g, '<br>');
+    
+    if(name_include === '') {
+        data += data_category;
+    }
     
     return data;
 }
@@ -915,9 +956,10 @@ function do_onmark_table_render_sub(data, data_col) {
                 
                 
             } else {
-                var table_option_data = data_option.replace(/"/g, '').match(/^((?:#[a-zA-Z0-9]{3}){1,2}|\w+)/);
+                var table_option_data = data_option.replace(/"/g, '')
+                table_option_data = table_option_data.match(/^((?:(?:#(?:[a-zA-Z0-9]{3}){1,2})|\w+)(?:,(?:(?:#(?:[a-zA-Z0-9]{3}){1,2})|\w+))?)/);
                 if(table_option_data) {
-                    data_option_all['td'] += 'background:' + table_option_data[1] + ';';
+                    data_option_all['td'] += 'background:' + do_darkmode_split(table_option_data[1]) + ';';
                 } else {
                     no_option = '<lt>' + data_option + '<gt>';
                 }
@@ -948,7 +990,7 @@ function do_onmark_table_render_sub(data, data_col) {
 }
 
 function do_onmark_table_render_main(data) {
-    var table_re = /\n((?:(?:\|\||\|\|\n|(?:\|\|)+(?!\n)(?:(?:(?!\|\|).)+))+)\|\|)\n/gs;
+    var table_re = /\n((?:(?:(?:(?:\|\|)+)|(?:\|[^|]+\|(?:\|\|)*))(?!\n)(?:(?:(?!\|\|).)+))(?:(?:\|\||\|\|\n|(?:\|\|)+(?!\n)(?:(?:(?!\|\|).)+))*)\|\|)\n/gs;
     data = data.replace(table_re, function(x, x_1) {
         var table_cel_re = /((?:\|\|)+)((?:(?!\|\|).)*)/gs;
         var table_data = '';
@@ -957,6 +999,14 @@ function do_onmark_table_render_main(data) {
         var table_col = 0;
         var table_col_data = {};
         var table_col_count = {};
+        
+        let table_caption_re = /^\|([^|]+)\|/;
+        let table_caption = '';
+        let table_caption_get = table_data_org.match(table_caption_re);
+        if(table_caption_get) {
+            table_caption = '<caption>' + table_caption_get[1] + '</caption>';
+            table_data_org = table_data_org.replace(table_caption_re, '||');
+        }
             
         table_data_org = table_data_org.replace(table_cel_re, function(x, x_1, x_2) {
             if(!table_col_data[table_col]) {
@@ -982,6 +1032,7 @@ function do_onmark_table_render_main(data) {
                 table_data += '' + 
                     '<div style="' + table_data_option['div'] + '">' +
                         '<table style="' + table_data_option['table'] + '">' +
+                            table_caption +
                 '';
             }
 
@@ -1076,11 +1127,13 @@ function do_onmark_list_sub_render(data) {
         });
 
         data = data.replace(quote_re, '' +
+            '\n<start_point>' +
             '<blockquote>' + 
                 '<end_point>\n' +
                 quote_end_data + 
                 '\n<start_point>' +
             '</blockquote>' +
+            '<end_point>\n' +
        '');
     }
     
@@ -1136,14 +1189,18 @@ function do_onmark_list_render(data) {
     return data;
 }
 
-function do_onmark_math_render(data, data_js, name_include) {
-    data = data.replace(/<math>((?:(?!<\/math>).)+)<\/math>/g, '[math($1)]');
+function do_onmark_math_render(data, data_js, name_include, data_nowiki) {
+    data = data.replace(/&lt;math&gt;((?:(?!&lt;\/math&gt;).)+)&lt;\/math&gt;/g, '[math($1)]');
     
     var i = 0;
     data = data.replace(/\[math\((((?!\)]).)+)\)]/g, function(x, x_1) {
         i += 1;
         
-        data_js += do_math_try_insert(name_include + 'math_' + String(i), do_js_safe_change(do_xss_change(x_1)));
+        data_js += do_math_try_insert(
+            name_include + 'math_' + String(i), 
+            do_js_safe_change(do_xss_change(do_nowiki_change(x_1, data_nowiki, 'math')))
+        );
+        
         return '<span id="' + name_include + 'math_' + String(i) + '"></span>';
     });
     
@@ -1189,7 +1246,7 @@ function do_onmark_redirect_render(data, data_js, name_doc) {
 }
 
 function do_onmark_remark_render(data) {
-    data = data.replace(/\n##([^\n]+)/, '');
+    data = data.replace(/\n##([^\n]+)/g, '');
     
     return data;
 }
@@ -1230,7 +1287,7 @@ function do_onmark_render(
         data_js = data_var[1];
         data_nowiki = data_var[2];
         
-        data_var = do_onmark_math_render(data, data_js, name_include);
+        data_var = do_onmark_math_render(data, data_js, name_include, data_nowiki);
         data = data_var[0];
         data_js = data_var[1];
 
@@ -1257,6 +1314,7 @@ function do_onmark_render(
         );
         data = data_var[0];
         data_js = data_var[1];
+        var data_category = data_var[2];
 
         data_var = do_onmark_macro_render(data, data_js);
         data = data_var[0];
@@ -1265,7 +1323,7 @@ function do_onmark_render(
         data = do_onmark_list_render(data);
         data = do_onmark_hr_render(data);
         data = do_onmark_footnote_render(data, name_include);
-        data = do_onmark_last_render(data, name_include);
+        data = do_onmark_last_render(data, name_include, data_category);
     }
     
     data_js += '' + 

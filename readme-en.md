@@ -1,18 +1,12 @@
 ﻿[(en-US)](./readme-en.md) | [(ko-KR)](./readme.md)
+
 # openNAMU
-[![Up to Python 3.5](https://img.shields.io/badge/python->=%203.5-blue.svg)](https://python.org)
+[![Up to Python 3.6](https://img.shields.io/badge/python->=%203.6-blue.svg)](https://python.org)
 [![LICENSE](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
 ![](https://raw.githubusercontent.com/openNAMU/openNAMU/beta/.github/logo.png)
 
 openNAMU is a Python-based wiki engine. 
-
-### Index
- * [Getting Started](#getting-started)
- * [Clone](#clone)
- * [Contribute](#contribute)
- * [License](#license)
- * [Etc.](#etc)
 
 ## Getting Started
 openNAMU is based upon Python, and it requires a Python environment.
@@ -37,7 +31,6 @@ openNAMU is protected by [BSD 3-Clause License](./LICNESE). Please refer to the 
  * Quotes icon [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672)
  * Syntax highlighting [highlightjs](https://highlightjs.org/)
  * Numerical expression [MathJax](https://www.mathjax.org/)
- * Handling Keyboard Shortcuts [shortcut.js](http://www.openjs.com/scripts/events/keyboard_shortcuts/)
 
 ## Etc.
  * Owner rights are granted to the first registor.
