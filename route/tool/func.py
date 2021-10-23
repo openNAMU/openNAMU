@@ -84,7 +84,7 @@ if sys.version_info < (3, 6):
 global_lang = {}
 global_wiki_set = {}
 
-data_css_ver = '109'
+data_css_ver = '110'
 data_css = ''
 
 conn = ''
@@ -878,7 +878,7 @@ def load_skin(data = '', set_n = 0, default = 0):
 
     skin_list_get = os.listdir('views')
     if default == 1:
-        skin_list_get += ['default']
+        skin_list_get = ['default'] + skin_list_get
 
     for skin_data in skin_list_get:
         if skin_data != 'default':
