@@ -783,9 +783,7 @@ function do_onmark_last_render(data, name_include, data_category) {
     data = do_end_br_replace(data);
     data = data.replace(/\n/g, '<br>');
     
-    if(name_include === '') {
-        data += data_category;
-    }
+    data += data_category;
     
     return data;
 }
