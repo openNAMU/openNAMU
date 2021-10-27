@@ -125,7 +125,6 @@ if data_db_set['type'] == 'mysql':
 
 db_data_get(data_db_set['type'])
 conn = get_conn(data_db_set)
-load_conn(conn)
 curs = conn.cursor()
 
 # Init-Create_DB
@@ -307,6 +306,9 @@ else:
 
 print('Now running... http://localhost:' + server_set['port'])
 conn.commit()
+conn.close()
+
+conn = get_conn()
 
 if os.path.exists('custom.py'):
     from custom import custom_run
