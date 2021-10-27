@@ -75,14 +75,14 @@ import requests
 
 import pymysql
 
-import PIL
-
 if sys.version_info < (3, 6):
     import sha3
    
 # Init-Global
 global_lang = {}
 global_wiki_set = {}
+
+global_db_set = ''
 
 data_css_ver = '111'
 data_css = ''
@@ -170,7 +170,13 @@ class server_init:
                 else:
                     return self.server_set_var[key]['default']
 
-def get_conn(db_set):
+def get_conn(db_set = ''):
+    global global_db_set
+    if db_set != '':
+        global_db_set = db_set
+    else:
+        db_set = global_db_set
+    
     if db_set['type'] == 'sqlite':
         conn = sqlite3.connect(db_set['name'] + '.db')
         curs = conn.cursor()
@@ -193,6 +199,8 @@ def get_conn(db_set):
             pass
         
         conn.select_db(db_set['name'])
+        
+    load_conn(conn)
         
     return conn
 
