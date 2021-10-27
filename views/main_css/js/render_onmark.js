@@ -569,6 +569,22 @@ function do_onmark_macro_render(data, data_js) {
             return '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + '" frameborder="0" allowfullscreen></iframe>';
         } else if(x_1 === 'anchor') {
             return '<span id="' + x_2 + '"></span>';
+        } else if(x_1 === 'ruby') {
+            let ruby_main_data = x_2.match(/^([^,]+)/);
+            if(ruby_main_data) {
+                ruby_main_data = ruby_main_data[1];
+            } else {
+                ruby_main_data = 'Test';
+            }
+            
+            let ruby_sub_data = x_2.match(/,(?: *)ruby=([^,]+)/);
+            if(ruby_sub_data) {
+                ruby_sub_data = ruby_sub_data[1];
+            } else {
+                ruby_sub_data = 'Test';
+            }
+            
+            return '<ruby>' + ruby_main_data + '<rp>(</rp><rt>' + ruby_sub_data + '</rt><rp>)</rp></ruby>';
         } else if(x_1 === 'dday') {
             var date_old = new Date(x_2);
             var date_now = new Date(do_return_date());
