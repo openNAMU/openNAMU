@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def alarm_2(conn):
+def user_alarm_2(conn):
     curs = conn.cursor()
 
     num = int(number_check(flask.request.args.get('num', '1')))
