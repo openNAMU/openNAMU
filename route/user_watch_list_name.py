@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def watch_list_name_2(conn, tool, name):
+def user_watch_list_name_2(conn, tool, name):
     curs = conn.cursor()
 
     ip = ip_check()

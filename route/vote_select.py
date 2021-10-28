@@ -9,14 +9,14 @@ def vote_select_2(conn, num):
         return redirect('/vote')
 
     if data_list[0][3] == 'close' or data_list[0][3] == 'n_close':
-        return redirect('/end_vote/' + num)
+        return redirect('/vote/end/' + num)
 
     if acl_check('', 'vote', num) == 1:
-        return redirect('/end_vote/' + num)
+        return redirect('/vote/end/' + num)
 
     curs.execute(db_change('select user from vote where id = ? and user = ?'), [num, ip_check()])
     if curs.fetchall():
-        return redirect('/end_vote/' + num)
+        return redirect('/vote/end/' + num)
 
     vote_data = re.findall(r'([^\n]+)', data_list[0][2].replace('\r\n', '\n'))
 
@@ -36,7 +36,7 @@ def vote_select_2(conn, num):
         ])
         conn.commit()
 
-        return redirect('/end_vote/' + num)
+        return redirect('/vote/end/' + num)
     else:
         data = '' + \
             '<h2>' + data_list[0][0] + '</h2>' + \

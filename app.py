@@ -206,7 +206,7 @@ set_init_always(version_list['beta']['c_ver'])
 # Init-Route
 class EverythingConverter(werkzeug.routing.PathConverter):
     regex = '.*?'
-
+    
 class RegexConverter(werkzeug.routing.BaseConverter):
     def __init__(self, url_map, *items):
         super(RegexConverter, self).__init__(url_map)
@@ -315,20 +315,28 @@ if os.path.exists('custom.py'):
 
     custom_run(conn, app)
 
-# alarm과 watch_list의 user 편입
-
 # Func
 # Func-inter_wiki
-
-# 개편 필요
+# 개편 필요(각각 분리 예정)
 @app.route('/<regex("inter_wiki"):tools>')
 @app.route('/<regex("edit_top"):tools>')
 @app.route('/<regex("image_license"):tools>')
-@app.route('/<regex("(?:edit|email|file|name|extension)_filter"):tools>')
+@app.route('/<regex("edit_filter"):tools>')
+@app.route('/<regex("email_filter"):tools>')
+@app.route('/<regex("file_filter"):tools>')
+@app.route('/<regex("name_filter"):tools>')
+@app.route('/<regex("extension_filter"):tools>')
 def inter_wiki(tools = None):
     return inter_wiki_2(conn, tools)
 
-@app.route('/<regex("del_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/<name>')
+@app.route('/<regex("del_inter_wiki"):tools>')
+@app.route('/<regex("del_edit_top"):tools>')
+@app.route('/<regex("del_image_license"):tools>')
+@app.route('/<regex("del_edit_filter"):tools>')
+@app.route('/<regex("del_email_filter"):tools>')
+@app.route('/<regex("del_file_filter"):tools>')
+@app.route('/<regex("del_name_filter"):tools>')
+@app.route('/<regex("del_extension_filter"):tools>')
 def inter_wiki_del(tools = None, name = None):
     return inter_wiki_del_2(conn, tools, name)
 
@@ -338,81 +346,113 @@ def inter_wiki_plus(tools = None, name = None):
     return inter_wiki_plus_2(conn, tools, name)
 
 # Func-list
+# /list/topic/open
 @app.route('/not_close_topic')
 def list_not_close_topic():
     return list_not_close_topic_2(conn)
 
+# /list/document/old
 @app.route('/old_page')
 def list_old_page():
     return list_old_page_2(conn)
 
+# /list/document/acl
 @app.route('/acl_list')
 def list_acl():
     return list_acl_2(conn)
 
-@app.route('/image_file_list')
-def list_image_file():
-    return list_image_file_2(conn)
+# /list/document/acl/add
+@app.route('/acl/<everything:name>', methods = ['POST', 'GET'])
+def give_acl(name = None):
+    return give_acl_2(conn, name)
 
-@app.route('/admin_list')
-def list_admin():
-    return list_admin_2(conn)
-
-@app.route('/user_log')
-def list_user():
-    return list_user_2(conn)
-
-@app.route('/admin_log', methods = ['POST', 'GET'])
-def list_admin_use():
-    return list_admin_use_2(conn)
-
-@app.route('/admin_group')
-def list_admin_group():
-    return list_admin_group_2(conn)
-
+# /list/document/need
 @app.route('/please')
 def list_please():
     return list_please_2(conn)
 
+# /list/document/all
 @app.route('/title_index')
 def list_title_index():
     return list_title_index_2(conn)
 
-@app.route('/<regex("long_page"):tool>')
-@app.route('/<regex("short_page"):tool>')
-def list_long_page(tool = 'long_page'):
-    return list_long_page_2(conn, tool)
+# /list/document/long
+@app.route('/long_page')
+def list_long_page():
+    return list_long_page_2(conn, 'long_page')
 
-# Func-give
-@app.route('/admin_plus/<name>', methods = ['POST', 'GET'])
-def give_admin_groups(name = None):
-    return give_admin_groups_2(conn, name)
+# /list/document/short
+@app.route('/short_page')
+def list_short_page():
+    return list_long_page_2(conn, 'short_page')
 
-# 다듬어야할 듯
-@app.route('/delete_admin_group/<name>', methods = ['POST', 'GET'])
-def give_delete_admin_group(name = None):
-    return give_delete_admin_group_2(conn, name)
+# /list/file
+@app.route('/image_file_list')
+def list_image_file():
+    return list_image_file_2(conn)
 
+# /list/admin
+# /list/admin/list
+@app.route('/admin_list')
+def list_admin():
+    return list_admin_2(conn)
+
+# /list/admin/auth_use
+@app.route('/admin_log', methods = ['POST', 'GET'])
+def list_admin_use():
+    return list_admin_use_2(conn)
+
+# /list/user
+@app.route('/user_log')
+def list_user():
+    return list_user_2(conn)
+
+# /list/user/check
 @app.route('/check/<name>')
 def give_user_check(name = None):
     return give_user_check_2(conn, name)
     
+# /list/user/check/delete
 @app.route('/check_delete', methods = ['POST', 'GET'])
 def give_user_check_delete():
     return give_user_check_delete_2(conn)
 
+# Func-auth
+# /auth/give
+# /auth/give/<name>
+@app.route('/admin/<name>', methods = ['POST', 'GET'])
+def give_admin(name = None):
+    return give_admin_2(conn, name)
+
+# /auth/give
+# /auth/give/<name>
 @app.route('/ban', methods = ['POST', 'GET'])
 @app.route('/ban/<name>', methods = ['POST', 'GET'])
 def give_user_ban(name = None):
     return give_user_ban_2(conn, name)
 
-@app.route('/acl/<everything:name>', methods = ['POST', 'GET'])
-def give_acl(name = None):
-    return give_acl_2(conn, name)
+# /auth/list
+@app.route('/admin_group')
+def list_admin_group():
+    return list_admin_group_2(conn)
 
-@app.route('/admin/<name>', methods = ['POST', 'GET'])
-def give_admin(name = None):
-    return give_admin_2(conn, name)
+# /auth/list/add/<name>
+@app.route('/admin_plus/<name>', methods = ['POST', 'GET'])
+def give_admin_groups(name = None):
+    return give_admin_groups_2(conn, name)
+
+# /auth/list/delete/<name>
+@app.route('/delete_admin_group/<name>', methods = ['POST', 'GET'])
+def give_delete_admin_group(name = None):
+    return give_delete_admin_group_2(conn, name)
+
+# /auth/history
+# ongoing 반영 필요
+@app.route('/block_log')
+@app.route('/block_log/<regex("user"):tool>/<name>')
+@app.route('/block_log/<regex("admin"):tool>/<name>')
+def recent_block(name = 'Test', tool = 'all'):
+    return recent_block_2(conn, name, tool)
 
 # Func-view
 @app.route('/xref/<everything:name>')
@@ -436,19 +476,7 @@ def view_down(name = None):
 def view_read(name = None):
     return view_read_2(conn, name)
 
-# Func-recent
-@app.route('/recent_discuss')
-def recent_discuss():
-    return recent_discuss_2(conn)
-
-# ongoing 반영 필요
-@app.route('/block_log')
-@app.route('/block_log/<regex("user"):tool>/<name>')
-@app.route('/block_log/<regex("admin"):tool>/<name>')
-def recent_block(name = 'Test', tool = 'all'):
-    return recent_block_2(conn, name, tool)
-
-# 이 쪽 분리 필요
+# Func-history
 @app.route('/recent_change')
 @app.route('/recent_changes')
 def recent_change(name = None):
@@ -494,6 +522,7 @@ def recent_record_reset(name = 'Test'):
 def recent_record_topic(name = 'Test'):
     return recent_record_topic_2(conn, name)
 
+# 거처를 고심중
 @app.route('/app_submit', methods = ['POST', 'GET'])
 def recent_app_submit():
     return recent_app_submit_2(conn)
@@ -539,6 +568,10 @@ def edit_move(name = None):
     return edit_move_2(conn, name)
 
 # Func-topic
+@app.route('/recent_discuss')
+def recent_discuss():
+    return recent_discuss_2(conn)
+
 @app.route('/thread/<int:topic_num>/b/<int:num>')
 def topic_block(topic_num = 1, num = 1):
     return topic_block_2(conn, topic_num, num)
@@ -614,20 +647,28 @@ def user_count_edit(name = None):
     return user_count_edit_2(conn, name)
     
 @app.route('/alarm')
-def alarm():
-    return alarm_2(conn)
+def user_alarm():
+    return user_alarm_2(conn)
 
 @app.route('/alarm/delete')
-def alarm_del():
-    return alarm_del_2(conn)
+def user_alarm_del():
+    return user_alarm_del_2(conn)
     
-@app.route('/<regex("watch_list|star_doc"):tool>')
-def watch_list(tool = 'star_doc'):
-    return watch_list_2(conn, tool)
+@app.route('/watch_list')
+def user_watch_list():
+    return user_watch_list_2(conn, 'watch_list')
 
-@app.route('/<regex("watch_list|star_doc"):tool>/<everything:name>')
-def watch_list_name(tool = 'star_doc', name = 'Test'):
-    return watch_list_name_2(conn, tool, name)
+@app.route('/watch_list/<everything:name>')
+def user_watch_list_name(name = 'Test'):
+    return user_watch_list_name_2(conn, 'watch_list', name)
+
+@app.route('/star_doc')
+def user_star_doc():
+    return user_watch_list_2(conn, 'star_doc')
+
+@app.route('/star_doc/<everything:name>')
+def user_star_doc_name(name = 'Test'):
+    return user_watch_list_name_2(conn, 'star_doc', name)
 
 # Func-login
 # 개편 예정
@@ -681,23 +722,30 @@ def login_logout():
     return login_logout_2(conn)
 
 # Func-vote
-@app.route('/vote/<num>', methods = ['POST', 'GET'])
-def vote_select(num = '1'):
-    return vote_select_2(conn, num)
+@app.route('/vote/<int:num>', methods = ['POST', 'GET'])
+def vote_select(num = 1):
+    return vote_select_2(conn, str(num))
 
-@app.route('/end_vote/<num>')
-def vote_end(num = '1'):
-    return vote_end_2(conn, num)
+@app.route('/vote/end/<int:num>')
+def vote_end(num = 1):
+    return vote_end_2(conn, str(num))
 
-@app.route('/close_vote/<num>')
-def vote_close(num = '1'):
-    return vote_close_2(conn, num)
+@app.route('/vote/close/<int:num>')
+def vote_close(num = 1):
+    return vote_close_2(conn, str(num))
 
 @app.route('/vote')
-def vote():
-    return vote_2(conn)
+@app.route('/vote/list')
+@app.route('/vote/list/<int:num>')
+def vote_list(num = 1):
+    return vote_list_2(conn, 'normal', num)
 
-@app.route('/add_vote', methods = ['POST', 'GET'])
+@app.route('/vote/list/close')
+@app.route('/vote/list/close/<int:num>')
+def vote_list_close(num = 1):
+    return vote_list_2(conn, 'close', num)
+
+@app.route('/vote/add', methods = ['POST', 'GET'])
 def vote_add():
     return vote_add_2(conn)
 
@@ -712,7 +760,11 @@ def api_raw(name = ''):
 
 @app.route('/api/version')
 def api_version():
-    return api_version_2(conn, version_list['beta']['r_ver'], version_list['beta']['c_ver'])
+    return api_version_2(
+        conn, 
+        version_list['beta']['r_ver'], 
+        version_list['beta']['c_ver']
+    )
 
 @app.route('/api/skin_info')
 @app.route('/api/skin_info/<name>')
@@ -756,6 +808,7 @@ def api_sitemap():
     return api_sitemap_2(conn)
 
 # Func-main
+# 여기도 전반적인 조정 시행 예정
 @app.route('/restart', methods = ['POST', 'GET'])
 def main_restart():
     return main_restart_2(conn)
@@ -784,7 +837,11 @@ def main_other():
 @app.route('/manager', methods = ['POST', 'GET'])
 @app.route('/manager/<int:num>', methods = ['POST', 'GET'])
 def main_manager(num = 1):
-    return main_manager_2(conn, num, version_list['beta']['r_ver'])
+    return main_manager_2(
+        conn, 
+        num, 
+        version_list['beta']['r_ver']
+    )
 
 @app.route('/image/<everything:name>')
 def main_image_view(name = None):

@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def watch_list_2(conn, tool):
+def user_watch_list_2(conn, tool):
     curs = conn.cursor()
 
     if tool == 'watch_list':
