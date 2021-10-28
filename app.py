@@ -231,24 +231,65 @@ app.secret_key = sql_data[0][0]
 print('----')
 
 # Init-DB_Data
-dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encryption method']
-server_set_key = ['host', 'port', 'language', 'markup', 'encode']
 server_set = {}
-
-server_init = server_init()
-for i in range(len(server_set_key)):
-    curs.execute(db_change('select data from other where name = ?'), [server_set_key[i]])
+server_set_var = {
+    'host' : {
+        'display' : 'Host',
+        'require' : 'conv',
+        'default' : '0.0.0.0'
+    }, 'port' : {
+        'display' : 'Port',
+        'require' : 'conv',
+        'default' : '3000'
+    }, 'language' : {
+        'display' : 'Language',
+        'require' : 'select',
+        'default' : 'ko-KR',
+        'list' : ['ko-KR', 'en-US']
+    }, 'markup' : {
+        'display' : 'Markup',
+        'require' : 'select',
+        'default' : 'namumark',
+        'list' : ['namumark', 'custom', 'raw']
+    }, 'encode' : {
+        'display' : 'Encryption method',
+        'require' : 'select',
+        'default' : 'sha3',
+        'list' : ['sha3', 'sha256']
+    }
+}
+server_set_env = {
+    'host' : os.getenv('NAMU_HOST'),
+    'port' : os.getenv('NAMU_PORT'),
+    'language' : os.getenv('NAMU_LANG'),
+    'markup' : os.getenv('NAMU_MARKUP'),
+    'encode' : os.getenv('NAMU_ENCRYPT')
+}
+for i in server_set_var:
+    curs.execute(db_change('select data from other where name = ?'), [i])
     server_set_val = curs.fetchall()
-    if not server_set_val:
-        server_set_val = server_init.init(server_set_key[i])
-
-        curs.execute(db_change('insert into other (name, data) values (?, ?)'), [server_set_key[i], server_set_val])
-    else:
+    if server_set_val:
         server_set_val = server_set_val[0][0]
-
-    print(dislay_set_key[i] + ' : ' + server_set_val)
-
-    server_set[server_set_key[i]] = server_set_val
+    elif server_set_env[i] != None:
+        server_set_val = server_set_env[i]
+    else:
+        if 'list' in server_set_var[i]:
+            print(server_set_var[i]['display'] + ' (' + server_set_var[i]['default'] + ') [' + ', '.join(server_set_var[i]['list']) + ']' + ' : ', end = '')
+        else:
+            print(server_set_var[i]['display'] + ' (' + server_set_var[i]['default'] + ') : ', end = '')
+            
+        server_set_val = input()
+        if server_set_val == '':
+            server_set_val = server_set_var[i]['default']
+        elif server_set_var[i]['require'] == 'select':
+            if not server_set_val in server_set_var[i]['list']:
+                server_set_val = server_set_var[i]['default']
+                
+        curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, server_set_val])
+        
+    print(server_set_var[i]['display'] + ' : ' + server_set_val)
+    
+    server_set[i] = server_set_val
 
 print('----')
     
@@ -619,7 +660,7 @@ def user_tool(name = None):
 
 @app.route('/change', methods = ['POST', 'GET'])
 def user_setting():
-    return user_setting_2(conn, server_init)
+    return user_setting_2(conn, server_set_var)
 
 @app.route('/change/email', methods = ['POST', 'GET'])
 def user_setting_email():
