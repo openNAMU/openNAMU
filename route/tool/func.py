@@ -1319,7 +1319,7 @@ def ip_pas(raw_ip, type_d = 0):
                 ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
                 
             if change_ip == 0:
-                ip += ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
+                ip += ' <a href="/user/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
 
         end_ip[raw_ip] = ip
     

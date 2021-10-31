@@ -65,21 +65,6 @@ function do_twofa_check(init = 0) {
     }
 }
 
-function do_ip_pas(i = 0) {
-    var get_class = document.getElementsByClassName('need_ip_pas')[i];
-    if(undefined) {
-        // 완성해야함
-        do_ip_pas(i + 1);
-        
-        var ip = get_class.innerHTML;
-        
-        ip = '<a href="' + encodeURIComponent(ip) + '">' + ip + '</a>';
-        ip += ' <a href="/tool/' + encodeURIComponent(ip) + '">(T)</a>';
-        
-        document.getElementsByClassName('need_ip_pas')[i].innerHTML = ip;
-    }
-}
-
 function send_render(i = 0) {
     var get_class = document.getElementsByClassName('send_content')[i];
     if(get_class) {

@@ -16,7 +16,7 @@ def recent_history_tool_2(conn, name, rev):
         data += '<li><a href="/revert/' + url_pas(name) + '?num=' + str(rev - 1) + '">' + load_lang('revert') + ' | r' + str(rev - 1) + '</a></li>'
     
     if rev - 1 > 0:
-        data += '<li><a href="/diff/' + url_pas(name) + '?first=' + str(rev - 1) + '&second=' + num + '">' + load_lang('compare') + '</a></li>'
+        data += '<li><a href="/diff/' + str(rev - 1) + '/' + num + '/' + url_pas(name) + '">' + load_lang('compare') + '</a></li>'
 
     data += '<li><a href="/history/' + url_pas(name) + '">' + load_lang('history') + '</a></li>'
     data += '</ul>'
