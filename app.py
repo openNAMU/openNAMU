@@ -351,6 +351,7 @@ conn.close()
 
 conn = get_conn()
 
+# Init-custom
 if os.path.exists('custom.py'):
     from custom import custom_run
 
@@ -495,28 +496,6 @@ def give_delete_admin_group(name = None):
 def recent_block(name = 'Test', tool = 'all'):
     return recent_block_2(conn, name, tool)
 
-# Func-view
-@app.route('/xref/<everything:name>')
-def view_xref(name = None):
-    return view_xref_2(conn, name)
-
-@app.route('/raw/<everything:name>')
-@app.route('/thread/<int:topic_num>/raw/<int:num>')
-def view_raw(name = None, topic_num = None, num = None):
-    return view_raw_2(conn, name, topic_num, num)
-
-@app.route('/diff/<everything:name>')
-def view_diff_data(name = None):
-    return view_diff_data_2(conn, name)
-
-@app.route('/down/<everything:name>')
-def view_down(name = None):
-    return view_down_2(conn, name)
-
-@app.route('/w/<everything:name>')
-def view_read(name = None):
-    return view_read_2(conn, name)
-
 # Func-history
 @app.route('/recent_change')
 @app.route('/recent_changes')
@@ -581,6 +560,29 @@ def search_goto(name = 'test'):
 @app.route('/search/<everything:name>')
 def search_deep(name = 'test'):
     return search_deep_2(conn, name)
+
+# Func-view
+@app.route('/xref/<everything:name>')
+def view_xref(name = None):
+    return view_xref_2(conn, name)
+
+@app.route('/raw/<everything:name>')
+@app.route('/thread/<int:topic_num>/raw/<int:num>')
+def view_raw(name = None, topic_num = None, num = None):
+    return view_raw_2(conn, name, topic_num, num)
+
+@app.route('/diff/<int:num_a>/<int:num_b>/<everything:name>')
+def view_diff(name = 'Test', num_a = 1, num_b = 1):
+    return view_diff_2(conn, name, num_a, num_b)
+
+@app.route('/down/<everything:name>')
+def view_down(name = None):
+    return view_down_2(conn, name)
+
+@app.route('/w/<int:num>/<everything:name>')
+@app.route('/w/<everything:name>')
+def view_read(name = 'Test', num = 0):
+    return view_read_2(conn, name)
 
 # Func-edit
 @app.route('/revert/<everything:name>', methods = ['POST', 'GET'])
@@ -654,10 +656,6 @@ def topic_close_list(name = 'test'):
     return topic_close_list_2(conn, name)
 
 # Func-user
-@app.route('/tool/<name>')
-def user_tool(name = None):
-    return user_tool_2(conn, name)
-
 @app.route('/change', methods = ['POST', 'GET'])
 def user_setting():
     return user_setting_2(conn, server_set_var)
@@ -675,8 +673,9 @@ def user_setting_pw_change():
     return user_setting_pw_change_2(conn)
 
 @app.route('/user')
-def user_info():
-    return user_info_2(conn)
+@app.route('/user/<name>')
+def user_info(name = ''):
+    return user_info_2(conn, name)
 
 @app.route('/custom_head', methods=['GET', 'POST'])
 def user_custom_head_view():

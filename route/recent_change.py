@@ -5,9 +5,10 @@ def recent_change_2(conn, name, tool):
 
     if flask.request.method == 'POST':
         return redirect(
-            '/diff/' + url_pas(name) +
-            '?first=' + flask.request.form.get('b', '1') +
-            '&second=' + flask.request.form.get('a', '1')
+            '/diff' + 
+            '/' + flask.request.form.get('b', '1') +
+            '/' + flask.request.form.get('a', '1') +
+            '/' + url_pas(name)
         )
     else:
         ban = ''
@@ -124,7 +125,7 @@ def recent_change_2(conn, name, tool):
                 if int(data[0]) < 2:
                     title += '<a href="/history/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
                 else:
-                    title += '<a href="/diff/' + url_pas(data[1]) + '?first=' + str(int(data[0]) - 1) + '&second=' + data[0] + '">(r' + data[0] + ')</a> '
+                    title += '<a href="/diff/' + str(int(data[0]) - 1) + '/' + data[0] + '/' + url_pas(data[1]) + '">(r' + data[0] + ')</a> '
 
             div += '''
                 <tr ''' + style[0] + '''>
