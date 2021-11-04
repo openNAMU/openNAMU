@@ -1246,11 +1246,11 @@ function do_onmark_redirect_render(data, data_js, name_doc) {
             window.location.search === '' &&
             window.location.pathname.match(/^\/w\//)
         ) {
-            window.location.href = '/w/' + do_url_change(link_main) + '?from=' + do_url_change(name_doc) + link_sub;
+            window.location.href = '/w/' + do_url_change(link_main) + '/doc_from/' + do_url_change(name_doc) + link_sub;
         }
         
         return [
-            data.replace(redirect_re, '/w/' + do_url_change(link_main) + '?from=' + do_url_change(name_doc) + link_sub), 
+            data.replace(redirect_re, '/w/' + do_url_change(link_main) + '/doc_from/' + do_url_change(name_doc) + link_sub), 
             data_js, 
             1
         ];

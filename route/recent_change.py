@@ -119,7 +119,7 @@ def recent_change_2(conn, name, tool):
                     style[1] = 'id="toron_color_grey"'
 
             if tool == 'history':
-                title = '<a href="/w/' + url_pas(name) + '?num=' + data[0] + '">r' + data[0] + '</a> '
+                title = '<a href="/w/' + url_pas(name) + '/doc_rev/' + data[0] + '">r' + data[0] + '</a> '
             else:
                 title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
                 if int(data[0]) < 2:
