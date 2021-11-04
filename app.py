@@ -357,6 +357,9 @@ if os.path.exists('custom.py'):
 
     custom_run(conn, app)
 
+# 전체 파라미터 제거 및 URL화 (한 눈에 모든 URL이 관리되게)
+# 되도록 1기능 1라우터
+    
 # Func
 # Func-inter_wiki
 # 개편 필요(각각 분리 예정)
@@ -579,10 +582,11 @@ def view_diff(name = 'Test', num_a = 1, num_b = 1):
 def view_down(name = None):
     return view_down_2(conn, name)
 
-@app.route('/w/<int:num>/<everything:name>')
+@app.route('/w/<everything:name>/doc_rev/<int:doc_rev>')
+@app.route('/w/<everything:name>/doc_from/<everything:doc_from>')
 @app.route('/w/<everything:name>')
-def view_read(name = 'Test', num = 0):
-    return view_read_2(conn, name)
+def view_read(name = 'Test', doc_rev = 0, doc_from = ''):
+    return view_read_2(conn, name, doc_rev, doc_from)
 
 # Func-edit
 @app.route('/revert/<everything:name>', methods = ['POST', 'GET'])
