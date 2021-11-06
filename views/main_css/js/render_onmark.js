@@ -1,4 +1,3 @@
-// 표 캡션
 // 중괄호 문법 정리
 // Tool
 function do_url_change(data) {
