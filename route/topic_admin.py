@@ -17,7 +17,6 @@ def topic_admin_2(conn, topic_num, num):
             <li>''' + load_lang('writer') + ' : ''' + ip_pas(data[0][1]) + '''</li>
             <li>''' + load_lang('time') + ' : ' + data[0][2] + '''</li>
         </ul>
-        <br>
         <h2>''' + load_lang('other_tool') + '''</h2>
         <ul class="inside_ul">
             <li>
@@ -38,7 +37,6 @@ def topic_admin_2(conn, topic_num, num):
         user_ban_d = curs.fetchall()
 
         ban += '''
-            <br>
             <h2>''' + load_lang('admin_tool') + '''</h2>
             <ul class="inside_ul">
                 <li>
