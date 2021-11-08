@@ -180,6 +180,7 @@ function do_onmark_heading_render(data, name_doc, name_include) {
         
         var heading_level_string_no_end = heading_level_string.replace(/\.$/, '');
         var heading_data_text = heading_data[3].replace(/ #$/, '');
+        heading_data_text = heading_data_text.replace(/ $/, '');
         
         toc_data += '' +
             '<span style="margin-left: ' + String((heading_level_string.match(/\./g).length - 1) * 10) + 'px;">' +
@@ -193,7 +194,7 @@ function do_onmark_heading_render(data, name_doc, name_include) {
             '\n<start_point>' +
             (toc_n === 1 ? '' : '</div>') +
             '<h' + heading_level + ' id="s-' + heading_level_string_no_end + '">' + 
-                '<a href="#toc">' + heading_level_string + '</a> ' + 
+                '<a href="#toc" id="' + do_js_safe_change(heading_data_text) + '">' + heading_level_string + '</a> ' + 
                 heading_data_text + 
                 '<a id="edit_load_' + String(toc_n) + '" ' +
                     'style="font-size: 70%;"' +
