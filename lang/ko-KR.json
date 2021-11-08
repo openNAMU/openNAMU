@@ -405,5 +405,7 @@
     "history_reset": "문서 역사 초기화",
     "record_reset": "사용자 편집 기록 초기화",
     "email_setting": "이메일 설정",
-    "oauth_client_id": "OAuth 클라이언트 ID"
+    "oauth_client_id": "OAuth 클라이언트 ID",
+    "today_doc" : "오늘의 문서",
+    "send_edit" : "편집 사유 수정"
 }
