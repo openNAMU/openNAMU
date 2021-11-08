@@ -213,6 +213,8 @@
         "2fa_password_change" : "Change 2FA password",
         "history_reset" : "Document history reset",
         "record_reset" : "User edit log reset",
+        "today_doc" : "Today[s] document",
+        "send_edit" : "Modify reason",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
