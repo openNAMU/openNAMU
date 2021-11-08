@@ -835,6 +835,21 @@ def api_search(name = ''):
 def api_recent_change():
     return api_recent_change_2(conn)
 
+@app.route('/api/recent_discuss')
+@app.route('/api/recent_discuss/<int:num>')
+def api_recent_discuss(num = 10):
+    return api_recent_discuss_2(conn, num, 'normal')
+
+@app.route('/api/recent_discuss/stop')
+@app.route('/api/recent_discuss/<int:num>/stop')
+def api_recent_discuss_stop(num = 10):
+    return api_recent_discuss_2(conn, num, 'stop')
+
+@app.route('/api/recent_discuss/all')
+@app.route('/api/recent_discuss/<int:num>/all')
+def api_recent_discuss_all(num = 10):
+    return api_recent_discuss_2(conn, num, 'all')
+
 @app.route('/api/sha224/<everything:name>', methods = ['POST', 'GET'])
 def api_sha224(name = 'test'):
     return api_sha224_2(conn, name)
