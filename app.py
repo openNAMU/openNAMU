@@ -127,75 +127,67 @@ db_data_get(data_db_set['type'])
 conn = get_conn(data_db_set)
 curs = conn.cursor()
 
-# Init-Create_DB
-create_data = {}
-
-# 폐지 예정 (data_set으로 통합)
-create_data['data'] = ['title', 'data', 'type']
-create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
-create_data['rc'] = ['id', 'title', 'date', 'type']
-create_data['acl'] = ['title', 'data', 'type']
-
-# 개편 예정 (data_link로 변경)
-create_data['back'] = ['title', 'link', 'type']
-
-# 폐지 예정 (topic_set으로 통합) [가장 시급]
-create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
-create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
-
-# 폐지 예정 (user_set으로 통합)
-create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
-create_data['scan'] = ['user', 'title', 'type']
-
-# 개편 예정 (wiki_set과 wiki_filter과 wiki_vote으로 변경)
-create_data['other'] = ['name', 'data', 'coverage']
-create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
-create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
-
-# 개편 예정 (auth_list와 auth_log로 변경)
-create_data['alist'] = ['name', 'acl']
-create_data['re_admin'] = ['who', 'what', 'time']
-
-# 개편 예정 (user_notice와 user_agent로 변경)
-create_data['alarm'] = ['name', 'data', 'date']
-create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
-
-create_data['user_set'] = ['name', 'id', 'data']
-for create_table in create_data:
-    try:
-        curs.execute(db_change('select test from ' + create_table + ' limit 1'))
-    except:
-        try:
-            curs.execute(db_change('create table ' + create_table + '(test longtext)'))
-        except:
-            curs.execute(db_change("alter table " + create_table + " add test longtext"))
-            
-    for create in create_data[create_table]:
-        try:
-            curs.execute(db_change(
-                'select ' + create + ' from ' + create_table + ' limit 1'
-            ))
-        except:
-            try:
-                curs.execute(db_change(
-                    "alter table " + create_table + " add " + create + " longtext default ''"
-                ))
-            except:
-                curs.execute(db_change(
-                    "alter table " + create_table + " add " + create + " longtext"
-                ))
-
-curs.execute(db_change('select data from other where name = "ver"'))
-ver_set_data = curs.fetchall()
-if ver_set_data:
-    if int(version_list['beta']['c_ver']) > int(ver_set_data[0][0]):
-        setup_tool = 'update'
-    else:
-        setup_tool = 'normal'
-else:
+setup_tool = ''
+try:
+    curs.execute(db_change('select data from other where name = "ver"'))
+except:
     setup_tool = 'init'
-
+    
+if setup_tool != 'init':
+    ver_set_data = curs.fetchall()
+    if ver_set_data:
+        if int(version_list['beta']['c_ver']) > int(ver_set_data[0][0]):
+            setup_tool = 'update'
+        else:
+            setup_tool = 'normal'
+    else:
+        setup_tool = 'init'
+    
 if setup_tool != 'normal':
+    # Init-Create_DB
+    create_data = {}
+
+    # 폐지 예정 (data_set으로 통합)
+    create_data['data'] = ['title', 'data', 'type']
+    create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
+    create_data['rc'] = ['id', 'title', 'date', 'type']
+    create_data['acl'] = ['title', 'data', 'type']
+
+    # 개편 예정 (data_link로 변경)
+    create_data['back'] = ['title', 'link', 'type']
+
+    # 폐지 예정 (topic_set으로 통합) [가장 시급]
+    create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
+    create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
+
+    # 폐지 예정 (user_set으로 통합)
+    create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
+    create_data['scan'] = ['user', 'title', 'type']
+
+    # 개편 예정 (wiki_set과 wiki_filter과 wiki_vote으로 변경)
+    create_data['other'] = ['name', 'data', 'coverage']
+    create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
+    create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
+
+    # 개편 예정 (auth_list와 auth_log로 변경)
+    create_data['alist'] = ['name', 'acl']
+    create_data['re_admin'] = ['who', 'what', 'time']
+
+    # 개편 예정 (user_notice와 user_agent로 변경)
+    create_data['alarm'] = ['name', 'data', 'date']
+    create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
+
+    create_data['user_set'] = ['name', 'id', 'data']
+    for create_table in create_data:
+        for create in ['test'] + create_data[create_table]:
+            try:
+                curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
+            except:
+                try:
+                    curs.execute(db_change('create table ' + create_table + '(test longtext default "")'))
+                except:
+                    curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ''"))
+
     if setup_tool == 'update':
         update(int(ver_set_data[0][0]), set_data)
     else:
@@ -356,39 +348,77 @@ if os.path.exists('custom.py'):
     from custom import custom_run
 
     custom_run(conn, app)
-
-# 전체 파라미터 제거 및 URL화 (한 눈에 모든 URL이 관리되게)
-# 되도록 1기능 1라우터
     
 # Func
 # Func-inter_wiki
-# 개편 필요(각각 분리 예정)
-@app.route('/<regex("inter_wiki"):tools>')
-@app.route('/<regex("edit_top"):tools>')
-@app.route('/<regex("image_license"):tools>')
-@app.route('/<regex("edit_filter"):tools>')
-@app.route('/<regex("email_filter"):tools>')
-@app.route('/<regex("file_filter"):tools>')
-@app.route('/<regex("name_filter"):tools>')
-@app.route('/<regex("extension_filter"):tools>')
-def inter_wiki(tools = None):
-    return inter_wiki_2(conn, tools)
+@app.route('/inter_wiki')
+def inter_wiki():
+    return inter_wiki_2(conn, 'inter_wiki')
 
-@app.route('/<regex("del_inter_wiki"):tools>')
-@app.route('/<regex("del_edit_top"):tools>')
-@app.route('/<regex("del_image_license"):tools>')
-@app.route('/<regex("del_edit_filter"):tools>')
-@app.route('/<regex("del_email_filter"):tools>')
-@app.route('/<regex("del_file_filter"):tools>')
-@app.route('/<regex("del_name_filter"):tools>')
-@app.route('/<regex("del_extension_filter"):tools>')
-def inter_wiki_del(tools = None, name = None):
-    return inter_wiki_del_2(conn, tools, name)
+@app.route('/inter_wiki/del/<name>')
+def inter_wiki_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_inter_wiki', name)
 
-@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>', methods = ['POST', 'GET'])
-@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/<name>', methods = ['POST', 'GET'])
+@app.route('/edit_top')
+def inter_wiki_edit_top():
+    return inter_wiki_2(conn, 'edit_top')
+
+@app.route('/edit_top/del/<name>')
+def inter_wiki_edit_top_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_edit_top', name)
+
+@app.route('/image_license')
+def inter_wiki_image_license():
+    return inter_wiki_2(conn, 'image_license')
+
+@app.route('/image_license/del/<name>')
+def inter_wiki_image_license_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_image_license', name)
+
+@app.route('/edit_filter')
+def inter_wiki_edit_filter():
+    return inter_wiki_2(conn, 'edit_filter')
+
+@app.route('/edit_filter/del/<name>')
+def inter_wiki_edit_filter_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_edit_filter', name)
+
+@app.route('/email_filter')
+def inter_wiki_email_filter():
+    return inter_wiki_2(conn, 'email_filter')
+
+@app.route('/email_filter/del/<name>')
+def inter_wiki_email_filter_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_email_filter', name)
+
+@app.route('/file_filter')
+def inter_wiki_file_filter():
+    return inter_wiki_2(conn, 'file_filter')
+
+@app.route('/file_filter/del/<name>')
+def inter_wiki_file_filter_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_file_filter', name)
+
+@app.route('/name_filter')
+def inter_wiki_name_filter():
+    return inter_wiki_2(conn, 'name_filter')
+
+@app.route('/name_filter/del/<name>')
+def inter_wiki_name_filter_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_name_filter', name)
+
+@app.route('/extension_filter')
+def inter_wiki_extension_filter():
+    return inter_wiki_2(conn, 'extension_filter')
+
+@app.route('/extension_filter/del/<name>')
+def inter_wiki_extension_filter_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_extension_filter', name)
+
+@app.route('/<regex("(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/add', methods = ['POST', 'GET'])
+@app.route('/<regex("(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/add/<name>', methods = ['POST', 'GET'])
 def inter_wiki_plus(tools = None, name = None):
-    return inter_wiki_plus_2(conn, tools, name)
+    return inter_wiki_plus_2(conn, 'plus_' + tools, name)
 
 # Func-list
 # /list/topic/open

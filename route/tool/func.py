@@ -369,14 +369,14 @@ def set_init():
     if not curs.fetchall():
         for i in ['naver.com', 'gmail.com', 'daum.net', 'kakao.com']:
             curs.execute(db_change(
-                "insert into html_filter (html, kind) values (?, 'email')"
+                "insert into html_filter (html, kind, plus, plus_t) values (?, 'email', '', '')"
             ), [i])
 
     curs.execute(db_change("select html from html_filter where kind = 'extension'"))
     if not curs.fetchall():
         for i in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
             curs.execute(db_change(
-                "insert into html_filter (html, kind) values (?, 'extension')"
+                "insert into html_filter (html, kind, plus, plus_t) values (?, 'extension', '', '')"
             ), [i])
 
     curs.execute(db_change(
@@ -396,8 +396,7 @@ def set_init():
     curs.execute(db_change('select data from other where name = "key"'))
     rep_data = curs.fetchall()
     if not rep_data:
-        rep_key = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(64))
-        curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [rep_key])
+        curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [load_random_key()])
 
     curs.execute(db_change('select data from other where name = "count_all_title"'))
     if not curs.fetchall():
@@ -505,15 +504,10 @@ def next_fix(link, num, page, end = 50):
 
     return list_data
 
-def leng_check(first, second):
-    if first < second:
-        all_plus = '+' + str(second - first)
-    elif second < first:
-        all_plus = '-' + str(first - second)
-    else:
-        all_plus = '0'
-
-    return all_plus
+def leng_check(A, B):
+    # B -> new
+    # A -> old
+    return '0' if A == B else (('-' + str(A - B)) if A > B else ('+' + str(B - A)))
 
 def number_check(data):
     try:
