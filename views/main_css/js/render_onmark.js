@@ -551,7 +551,7 @@ function do_onmark_macro_render(data, data_js) {
             
             if(x_1 === 'youtube') {
                 var video_start = x_2.match(/,(?: *)start=([0-9]+)/);
-                video_start = video_start ? ('?' + video_start[1]) : '';
+                video_start = video_start ? ('?start=' + video_start[1]) : '';
                 
                 video_code = video_code.replace(/^https:\/\/www\.youtube\.com\/watch\?v=/, '');
                 video_code = video_code.replace(/^https:\/\/youtu\.be\//, '');
