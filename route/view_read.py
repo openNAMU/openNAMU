@@ -29,7 +29,7 @@ def view_read_2(conn, name, doc_rev, doc_from):
                 category_doc += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a></li>'
 
         if category_doc != '':
-            category_doc += '<h2 id="cate_normal">' + load_lang('category_title') + '</h2><ul class="inside_ul">' + category_doc + '</ul>'
+            category_doc = '<h2 id="cate_normal">' + load_lang('category_title') + '</h2><ul class="inside_ul">' + category_doc + '</ul>'
 
         if category_sub != '':
             category_doc += '<h2 id="cate_under">' + load_lang('under_category') + '</h2><ul class="inside_ul">' + category_sub + '</ul>'
