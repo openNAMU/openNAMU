@@ -1,32 +1,28 @@
-body, html, video, table, iframe, input, textarea, img, hr, blockquote, pre, iframe {
+/* 기본 전체 옵션 */
+body, html, video, table, iframe, input, textarea, img, hr, blockquote, pre, iframe, .table_safe {
     max-width: 100%;
 }
 
-textarea {
+body {
+    word-break: break-all;
+    
+    overflow: auto;
+}
+
+/* 텍스트 필드 */
+textarea, input {
     width: 100%;
 }
 
 input {
-    width: 100%;
     box-sizing: border-box;
 }
 
-#last {
-    margin-top: 30px;
+input[type="checkbox"], input[type="radio"] {
+    width: auto;
 }
 
-#toc {
-    border: 1px solid gainsboro;
-    padding: 20px;
-    
-    width: fit-content;
-    width: -moz-fit-content;
-    
-    clear: both;
-    
-    margin-top: 10px;
-}
-
+/* 테이블 */
 table {
     border-collapse: collapse;
 }
@@ -37,19 +33,18 @@ td {
     padding: 5px 10px;
 }
 
+/* 링크 */
 a {
+    color: dodgerblue;
+    
     text-decoration: none;
-}
-
-.inside_ul li {
-    margin-left: 20px;
 }
 
 #not_thing {
     color: red;
 }
 
-#inside, #out_link, #open {
+#inside, #out_link, #out_link::before {
     color: green;
 }
 
@@ -59,17 +54,26 @@ a {
     font-weight: lighter;
     
     background: transparent;
-    color: green;
 }
 
-input[type="checkbox"], input[type="radio"] {
-    width: auto;
+#include_link {
+    display: none;
 }
 
-#list {
-    padding: 10px;
+.hidden_link {
+    filter: blur(3px);
 }
 
+.hidden_link:hover {
+    filter: none;
+}
+
+/* 리스트 */
+.inside_ul li {
+    margin-left: 20px;
+}
+
+/* 토론 관련 */
 #toron {
     width: 100%;
 }
@@ -98,102 +102,6 @@ input[type="checkbox"], input[type="radio"] {
     display: none;
 }
 
-#main_table_top_tr {
-    background: aquamarine;
-}
-
-#cate {
-    border: 1px solid gainsboro;
-    padding: 5px;
-    margin-top: 20px;
-}
-
-pre {
-    border: 1px solid gainsboro;
-    padding: 10px;
-    white-space: pre-wrap;
-}
-
-#in {
-    margin-left: 20px;
-}
-
-#out {
-    margin-left: 5px;
-}
-
-s, strike, del {
-    color: gray;
-}
-
-s:hover, strike:hover, del:hover {
-    color: gray;
-    background-color: gainsboro;
-    text-decoration: none;
-}
-
-#main_table_set {
-    width: 100%;
-    text-align: center;
-}
-
-#main_table_width {
-    width: 33.3%;
-}
-
-#main_table_width_half {
-    width: 50%;
-}
-
-#main_table_width_quarter {
-    width: 25%;
-}
-
-#redirect {
-    border: 1px solid gainsboro;
-    padding: 10px;
-}
-
-body {
-    word-break: break-all;
-    overflow: auto;
-}
-
-.main_hr {
-    border: none;
-    margin-top: 8px;
-    margin-bottom: 8px;
-}
-
-#include_link {
-    display: none;
-}
-
-#toc_title {
-    font-size: 1.2rem;
-}
-
-#admin_log_search {
-    width: 100px;
-}
-
-@media (max-width: 768px) {
-    table {
-        min-width: 100%;
-    }
-    .table_safe {
-        min-width: 100%;
-    }
-}
-
-.table_safe {
-    max-width: 100%;
-}
-
-.change_space {
-    white-space: pre-line;
-}
-
 #topic_scroll {
     max-height: 500px;
     
@@ -207,35 +115,66 @@ body {
     display: none;
 }
 
-.hidden_link {
-    filter: blur(3px);
+.topic_content {
+    height: 200px;
 }
 
-.hidden_link:hover {
-    filter: none;
+/* 위키 내용 관련 */
+#toc {
+    border: 1px solid gainsboro;
+    padding: 20px;
+    
+    width: fit-content;
+    width: -moz-fit-content;
+    
+    clear: both;
+    
+    margin-top: 10px;
+}
+
+#cate, pre, #redirect {
+    border: 1px solid gainsboro;
+    
+    padding: 10px;
+}
+
+#cate {
+    margin-top: 20px;
+}
+
+pre {    
+    white-space: pre-wrap;
+}
+
+#toc_title {
+    font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    table {
+        min-width: 100%;
+    }
+    
+    .table_safe {
+        min-width: 100%;
+    }
 }
 
 .content {
     height: 500px;
 }
 
-.topic_content {
-    height: 200px;
-}
-
 .spead_footnote {
-    background-color: #efefef;
     color: #555;
+    background-color: #efefef;
+    
     border: 1px solid #cecece;
 }
 
 #footnote_data {
     border-top: 1px solid gainsboro;
+    
     padding-top: 10px;
-}
-
-a {
-    color: dodgerblue;
 }
 
 hr {
@@ -245,6 +184,7 @@ hr {
 
 .render_content {
     white-space: pre-wrap;
+    
     line-break: anywhere;
 }
 
@@ -261,4 +201,55 @@ blockquote {
     background-position: calc(100% - 10px) 10px;
     background-repeat: no-repeat;
     background-size: 25px;
+}
+
+/* 취소선 */
+s, strike, del {
+    color: gray;
+}
+
+s:hover, strike:hover, del:hover {
+    color: gray;
+    background-color: gainsboro;
+    
+    text-decoration: none;
+}
+
+/* 최근 변경 관련 테이블 */
+#main_table_set {
+    width: 100%;
+    
+    text-align: center;
+}
+
+#main_table_width {
+    width: 33.3%;
+}
+
+#main_table_width_half {
+    width: 50%;
+}
+
+#main_table_width_quarter {
+    width: 25%;
+}
+
+#main_table_top_tr {
+    background: aquamarine;
+}
+
+/* 기타 */
+.main_hr {
+    border: none;
+    
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#admin_log_search {
+    width: 100px;
+}
+
+.change_space {
+    white-space: pre-line;
 }

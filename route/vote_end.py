@@ -17,12 +17,12 @@ def vote_end_2(conn, num):
         if data_list[0][3] == 'open' or data_list[0][3] == 'n_open':
             data += '' + \
                 '<hr class="main_hr">' + \
-                '<a href="/close_vote/' + num + '">(' + load_lang('close_vote') + ')</a>' + \
+                '<a href="/vote/close/' + num + '">(' + load_lang('close_vote') + ')</a>' + \
             ''
         else:
             data += '' + \
                 '<hr class="main_hr">' + \
-                '<a href="/close_vote/' + num + '">(' + load_lang('re_open_vote') + ')</a>' + \
+                '<a href="/vote/close/' + num + '">(' + load_lang('re_open_vote') + ')</a>' + \
             ''
 
     vote_data = re.findall(r'([^\n]+)', data_list[0][2].replace('\r\n', '\n'))

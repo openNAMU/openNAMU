@@ -1,16 +1,14 @@
 from .tool.func import *
 
-def view_read_2(conn, name):
+def view_read_2(conn, name, doc_rev, doc_from):
     curs = conn.cursor()
 
     sub = ''
     div = ''
     ip = ip_check()
-    name_doc_pass = flask.request.args.get('from', '')
+    name_doc_pass = doc_from
     uppage = re.sub(r"/([^/]+)$", '', name)
-
-    num = flask.request.args.get('num', None)
-    num = int(number_check(num)) if num else None
+    num = str(doc_rev)        
 
     curs.execute(db_change("select sub from rd where title = ? and not stop = 'O' order by date desc"), [name])
     topic = 1 if curs.fetchall() else 0
@@ -19,37 +17,31 @@ def view_read_2(conn, name):
     down = 1 if curs.fetchall() else 0
     
     if re.search(r'^category:', name):
+        category_doc = ''
+        category_sub = ''
+        
         curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
-        back = curs.fetchall()
-        if back:
-            u_div = ''
+        category_sql = curs.fetchall()
+        for data in category_sql:
+            if re.search(r'^category:', data[0]):
+                category_sub += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+            else:
+                category_doc += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a></li>'
 
-            for data in back:
-                if div == '':
-                    div = '<br><h2 id="cate_normal">' + load_lang('category_title') + '</h2><ul class="inside_ul">'
+        if category_doc != '':
+            category_doc = '<h2 id="cate_normal">' + load_lang('category_title') + '</h2><ul class="inside_ul">' + category_doc + '</ul>'
 
-                if re.search(r'^category:', data[0]):
-                    u_div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
-                else:
-                    curs.execute(db_change("select title from back where title = ? and type = 'include'"), [data[0]])
-                    db_data = curs.fetchall()
-                    if db_data:
-                        div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a></li>'
-                    else:
-                        div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+        if category_sub != '':
+            category_doc += '<h2 id="cate_under">' + load_lang('under_category') + '</h2><ul class="inside_ul">' + category_sub + '</ul>'
+            
+        div += category_doc
 
-            if div != '':
-                div += '</ul>'
-
-            if u_div != '':
-                div += '<br><h2 id="cate_under">' + load_lang('under_category') + '</h2><ul class="inside_ul">' + u_div + '</ul>'
-
-    if num:
-        curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, str(num)])
+    if num != '0':
+        curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
         if curs.fetchall() and admin_check(6) != 1:
             return redirect('/history/' + url_pas(name))
 
-        curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])
+        curs.execute(db_change("select data from history where title = ? and id = ?"), [name, num])
     else:
         curs.execute(db_change("select data from data where title = ?"), [name])
 
@@ -99,7 +91,7 @@ def view_read_2(conn, name):
     else:
         response_data = 200
 
-    if num:
+    if num != '0':
         menu = [['history/' + url_pas(name), load_lang('history')]]
         sub = ' (r' + str(num) + ')'
         acl = 0
@@ -124,7 +116,7 @@ def view_read_2(conn, name):
             menu += [['w/' + url_pas(name), load_lang('pass')]]
             end_data = '''
                 <div id="redirect">
-                    <a href="/w/''' + url_pas(name_doc_pass) + '?from=' + url_pas(name) + '">' + name_doc_pass + '</a> ⇨ <b>' + name + '''</b>
+                    <a href="/w/''' + url_pas(name_doc_pass) + '/doc_from/' + url_pas(name) + '">' + name_doc_pass + '</a> ⇨ <b>' + name + '''</b>
                 </div>
                 <br>
             ''' + end_data
@@ -148,6 +140,7 @@ def view_read_2(conn, name):
             <div id="get_user_info"></div>
             <script>load_user_info("''' + user_name + '''");</script>
         ''' + div
+        menu += [['w/' + url_pas(name) + '/' + url_pas(get_time().split()[0]), load_lang('today_doc')]]
 
     curs.execute(db_change("select data from other where name = 'body'"))
     body = curs.fetchall()

@@ -125,78 +125,69 @@ if data_db_set['type'] == 'mysql':
 
 db_data_get(data_db_set['type'])
 conn = get_conn(data_db_set)
-load_conn(conn)
 curs = conn.cursor()
 
-# Init-Create_DB
-create_data = {}
-
-# 폐지 예정 (data_set으로 통합)
-create_data['data'] = ['title', 'data', 'type']
-create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
-create_data['rc'] = ['id', 'title', 'date', 'type']
-create_data['acl'] = ['title', 'data', 'type']
-
-# 개편 예정 (data_link로 변경)
-create_data['back'] = ['title', 'link', 'type']
-
-# 폐지 예정 (topic_set으로 통합) [가장 시급]
-create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
-create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
-
-# 폐지 예정 (user_set으로 통합)
-create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
-create_data['scan'] = ['user', 'title', 'type']
-
-# 개편 예정 (wiki_set과 wiki_filter과 wiki_vote으로 변경)
-create_data['other'] = ['name', 'data', 'coverage']
-create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
-create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
-
-# 개편 예정 (auth_list와 auth_log로 변경)
-create_data['alist'] = ['name', 'acl']
-create_data['re_admin'] = ['who', 'what', 'time']
-
-# 개편 예정 (user_notice와 user_agent로 변경)
-create_data['alarm'] = ['name', 'data', 'date']
-create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
-
-create_data['user_set'] = ['name', 'id', 'data']
-for create_table in create_data:
-    try:
-        curs.execute(db_change('select test from ' + create_table + ' limit 1'))
-    except:
-        try:
-            curs.execute(db_change('create table ' + create_table + '(test longtext)'))
-        except:
-            curs.execute(db_change("alter table " + create_table + " add test longtext"))
-            
-    for create in create_data[create_table]:
-        try:
-            curs.execute(db_change(
-                'select ' + create + ' from ' + create_table + ' limit 1'
-            ))
-        except:
-            try:
-                curs.execute(db_change(
-                    "alter table " + create_table + " add " + create + " longtext default ''"
-                ))
-            except:
-                curs.execute(db_change(
-                    "alter table " + create_table + " add " + create + " longtext"
-                ))
-
-curs.execute(db_change('select data from other where name = "ver"'))
-ver_set_data = curs.fetchall()
-if ver_set_data:
-    if int(version_list['beta']['c_ver']) > int(ver_set_data[0][0]):
-        setup_tool = 'update'
-    else:
-        setup_tool = 'normal'
-else:
+setup_tool = ''
+try:
+    curs.execute(db_change('select data from other where name = "ver"'))
+except:
     setup_tool = 'init'
-
+    
+if setup_tool != 'init':
+    ver_set_data = curs.fetchall()
+    if ver_set_data:
+        if int(version_list['beta']['c_ver']) > int(ver_set_data[0][0]):
+            setup_tool = 'update'
+        else:
+            setup_tool = 'normal'
+    else:
+        setup_tool = 'init'
+    
 if setup_tool != 'normal':
+    # Init-Create_DB
+    create_data = {}
+
+    # 폐지 예정 (data_set으로 통합)
+    create_data['data'] = ['title', 'data', 'type']
+    create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
+    create_data['rc'] = ['id', 'title', 'date', 'type']
+    create_data['acl'] = ['title', 'data', 'type']
+
+    # 개편 예정 (data_link로 변경)
+    create_data['back'] = ['title', 'link', 'type']
+
+    # 폐지 예정 (topic_set으로 통합) [가장 시급]
+    create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
+    create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
+
+    # 폐지 예정 (user_set으로 통합)
+    create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
+    create_data['scan'] = ['user', 'title', 'type']
+
+    # 개편 예정 (wiki_set과 wiki_filter과 wiki_vote으로 변경)
+    create_data['other'] = ['name', 'data', 'coverage']
+    create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
+    create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
+
+    # 개편 예정 (auth_list와 auth_log로 변경)
+    create_data['alist'] = ['name', 'acl']
+    create_data['re_admin'] = ['who', 'what', 'time']
+
+    # 개편 예정 (user_notice와 user_agent로 변경)
+    create_data['alarm'] = ['name', 'data', 'date']
+    create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
+
+    create_data['user_set'] = ['name', 'id', 'data']
+    for create_table in create_data:
+        for create in ['test'] + create_data[create_table]:
+            try:
+                curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
+            except:
+                try:
+                    curs.execute(db_change('create table ' + create_table + '(test longtext default "")'))
+                except:
+                    curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ''"))
+
     if setup_tool == 'update':
         update(int(ver_set_data[0][0]), set_data)
     else:
@@ -207,7 +198,7 @@ set_init_always(version_list['beta']['c_ver'])
 # Init-Route
 class EverythingConverter(werkzeug.routing.PathConverter):
     regex = '.*?'
-
+    
 class RegexConverter(werkzeug.routing.BaseConverter):
     def __init__(self, url_map, *items):
         super(RegexConverter, self).__init__(url_map)
@@ -232,24 +223,65 @@ app.secret_key = sql_data[0][0]
 print('----')
 
 # Init-DB_Data
-dislay_set_key = ['Host', 'Port', 'Language', 'Markup', 'Encryption method']
-server_set_key = ['host', 'port', 'language', 'markup', 'encode']
 server_set = {}
-
-server_init = server_init()
-for i in range(len(server_set_key)):
-    curs.execute(db_change('select data from other where name = ?'), [server_set_key[i]])
+server_set_var = {
+    'host' : {
+        'display' : 'Host',
+        'require' : 'conv',
+        'default' : '0.0.0.0'
+    }, 'port' : {
+        'display' : 'Port',
+        'require' : 'conv',
+        'default' : '3000'
+    }, 'language' : {
+        'display' : 'Language',
+        'require' : 'select',
+        'default' : 'ko-KR',
+        'list' : ['ko-KR', 'en-US']
+    }, 'markup' : {
+        'display' : 'Markup',
+        'require' : 'select',
+        'default' : 'namumark',
+        'list' : ['namumark', 'custom', 'raw']
+    }, 'encode' : {
+        'display' : 'Encryption method',
+        'require' : 'select',
+        'default' : 'sha3',
+        'list' : ['sha3', 'sha256']
+    }
+}
+server_set_env = {
+    'host' : os.getenv('NAMU_HOST'),
+    'port' : os.getenv('NAMU_PORT'),
+    'language' : os.getenv('NAMU_LANG'),
+    'markup' : os.getenv('NAMU_MARKUP'),
+    'encode' : os.getenv('NAMU_ENCRYPT')
+}
+for i in server_set_var:
+    curs.execute(db_change('select data from other where name = ?'), [i])
     server_set_val = curs.fetchall()
-    if not server_set_val:
-        server_set_val = server_init.init(server_set_key[i])
-
-        curs.execute(db_change('insert into other (name, data) values (?, ?)'), [server_set_key[i], server_set_val])
-    else:
+    if server_set_val:
         server_set_val = server_set_val[0][0]
-
-    print(dislay_set_key[i] + ' : ' + server_set_val)
-
-    server_set[server_set_key[i]] = server_set_val
+    elif server_set_env[i] != None:
+        server_set_val = server_set_env[i]
+    else:
+        if 'list' in server_set_var[i]:
+            print(server_set_var[i]['display'] + ' (' + server_set_var[i]['default'] + ') [' + ', '.join(server_set_var[i]['list']) + ']' + ' : ', end = '')
+        else:
+            print(server_set_var[i]['display'] + ' (' + server_set_var[i]['default'] + ') : ', end = '')
+            
+        server_set_val = input()
+        if server_set_val == '':
+            server_set_val = server_set_var[i]['default']
+        elif server_set_var[i]['require'] == 'select':
+            if not server_set_val in server_set_var[i]['list']:
+                server_set_val = server_set_var[i]['default']
+                
+        curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, server_set_val])
+        
+    print(server_set_var[i]['display'] + ' : ' + server_set_val)
+    
+    server_set[i] = server_set_val
 
 print('----')
     
@@ -307,138 +339,189 @@ else:
 
 print('Now running... http://localhost:' + server_set['port'])
 conn.commit()
+conn.close()
 
+conn = get_conn()
+
+# Init-custom
 if os.path.exists('custom.py'):
     from custom import custom_run
 
     custom_run(conn, app)
-
-# alarm과 watch_list의 user 편입
-
+    
 # Func
 # Func-inter_wiki
+@app.route('/inter_wiki')
+def inter_wiki():
+    return inter_wiki_2(conn, 'inter_wiki')
 
-# 개편 필요
-@app.route('/<regex("inter_wiki"):tools>')
-@app.route('/<regex("edit_top"):tools>')
-@app.route('/<regex("image_license"):tools>')
-@app.route('/<regex("(?:edit|email|file|name|extension)_filter"):tools>')
-def inter_wiki(tools = None):
-    return inter_wiki_2(conn, tools)
+@app.route('/inter_wiki/del/<name>')
+def inter_wiki_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_inter_wiki', name)
 
-@app.route('/<regex("del_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/<name>')
-def inter_wiki_del(tools = None, name = None):
-    return inter_wiki_del_2(conn, tools, name)
+@app.route('/edit_top')
+def inter_wiki_edit_top():
+    return inter_wiki_2(conn, 'edit_top')
 
-@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>', methods = ['POST', 'GET'])
-@app.route('/<regex("plus_(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/<name>', methods = ['POST', 'GET'])
+@app.route('/edit_top/del/<name>')
+def inter_wiki_edit_top_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_edit_top', name)
+
+@app.route('/image_license')
+def inter_wiki_image_license():
+    return inter_wiki_2(conn, 'image_license')
+
+@app.route('/image_license/del/<name>')
+def inter_wiki_image_license_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_image_license', name)
+
+@app.route('/edit_filter')
+def inter_wiki_edit_filter():
+    return inter_wiki_2(conn, 'edit_filter')
+
+@app.route('/edit_filter/del/<name>')
+def inter_wiki_edit_filter_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_edit_filter', name)
+
+@app.route('/email_filter')
+def inter_wiki_email_filter():
+    return inter_wiki_2(conn, 'email_filter')
+
+@app.route('/email_filter/del/<name>')
+def inter_wiki_email_filter_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_email_filter', name)
+
+@app.route('/file_filter')
+def inter_wiki_file_filter():
+    return inter_wiki_2(conn, 'file_filter')
+
+@app.route('/file_filter/del/<name>')
+def inter_wiki_file_filter_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_file_filter', name)
+
+@app.route('/name_filter')
+def inter_wiki_name_filter():
+    return inter_wiki_2(conn, 'name_filter')
+
+@app.route('/name_filter/del/<name>')
+def inter_wiki_name_filter_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_name_filter', name)
+
+@app.route('/extension_filter')
+def inter_wiki_extension_filter():
+    return inter_wiki_2(conn, 'extension_filter')
+
+@app.route('/extension_filter/del/<name>')
+def inter_wiki_extension_filter_del(name = 'Test'):
+    return inter_wiki_del_2(conn, 'del_extension_filter', name)
+
+@app.route('/<regex("(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/add', methods = ['POST', 'GET'])
+@app.route('/<regex("(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/add/<name>', methods = ['POST', 'GET'])
 def inter_wiki_plus(tools = None, name = None):
-    return inter_wiki_plus_2(conn, tools, name)
+    return inter_wiki_plus_2(conn, 'plus_' + tools, name)
 
 # Func-list
+# /list/topic/open
 @app.route('/not_close_topic')
 def list_not_close_topic():
     return list_not_close_topic_2(conn)
 
+# /list/document/old
 @app.route('/old_page')
 def list_old_page():
     return list_old_page_2(conn)
 
+# /list/document/acl
 @app.route('/acl_list')
 def list_acl():
     return list_acl_2(conn)
 
-@app.route('/image_file_list')
-def list_image_file():
-    return list_image_file_2(conn)
+# /list/document/acl/add
+@app.route('/acl/<everything:name>', methods = ['POST', 'GET'])
+def give_acl(name = None):
+    return give_acl_2(conn, name)
 
-@app.route('/admin_list')
-def list_admin():
-    return list_admin_2(conn)
-
-@app.route('/user_log')
-def list_user():
-    return list_user_2(conn)
-
-@app.route('/admin_log', methods = ['POST', 'GET'])
-def list_admin_use():
-    return list_admin_use_2(conn)
-
-@app.route('/admin_group')
-def list_admin_group():
-    return list_admin_group_2(conn)
-
+# /list/document/need
 @app.route('/please')
 def list_please():
     return list_please_2(conn)
 
+# /list/document/all
 @app.route('/title_index')
 def list_title_index():
     return list_title_index_2(conn)
 
-@app.route('/<regex("long_page"):tool>')
-@app.route('/<regex("short_page"):tool>')
-def list_long_page(tool = 'long_page'):
-    return list_long_page_2(conn, tool)
+# /list/document/long
+@app.route('/long_page')
+def list_long_page():
+    return list_long_page_2(conn, 'long_page')
 
-# Func-give
-@app.route('/admin_plus/<name>', methods = ['POST', 'GET'])
-def give_admin_groups(name = None):
-    return give_admin_groups_2(conn, name)
+# /list/document/short
+@app.route('/short_page')
+def list_short_page():
+    return list_long_page_2(conn, 'short_page')
 
-# 다듬어야할 듯
-@app.route('/delete_admin_group/<name>', methods = ['POST', 'GET'])
-def give_delete_admin_group(name = None):
-    return give_delete_admin_group_2(conn, name)
+# /list/file
+@app.route('/image_file_list')
+def list_image_file():
+    return list_image_file_2(conn)
 
+# /list/admin
+# /list/admin/list
+@app.route('/admin_list')
+def list_admin():
+    return list_admin_2(conn)
+
+# /list/admin/auth_use
+@app.route('/admin_log', methods = ['POST', 'GET'])
+def list_admin_use():
+    return list_admin_use_2(conn)
+
+# /list/user
+@app.route('/user_log')
+def list_user():
+    return list_user_2(conn)
+
+# /list/user/check
 @app.route('/check/<name>')
 def give_user_check(name = None):
     return give_user_check_2(conn, name)
     
+# /list/user/check/delete
 @app.route('/check_delete', methods = ['POST', 'GET'])
 def give_user_check_delete():
     return give_user_check_delete_2(conn)
 
+# Func-auth
+# /auth/give
+# /auth/give/<name>
+@app.route('/admin/<name>', methods = ['POST', 'GET'])
+def give_admin(name = None):
+    return give_admin_2(conn, name)
+
+# /auth/give
+# /auth/give/<name>
 @app.route('/ban', methods = ['POST', 'GET'])
 @app.route('/ban/<name>', methods = ['POST', 'GET'])
 def give_user_ban(name = None):
     return give_user_ban_2(conn, name)
 
-@app.route('/acl/<everything:name>', methods = ['POST', 'GET'])
-def give_acl(name = None):
-    return give_acl_2(conn, name)
+# /auth/list
+@app.route('/admin_group')
+def list_admin_group():
+    return list_admin_group_2(conn)
 
-@app.route('/admin/<name>', methods = ['POST', 'GET'])
-def give_admin(name = None):
-    return give_admin_2(conn, name)
+# /auth/list/add/<name>
+@app.route('/admin_plus/<name>', methods = ['POST', 'GET'])
+def give_admin_groups(name = None):
+    return give_admin_groups_2(conn, name)
 
-# Func-view
-@app.route('/xref/<everything:name>')
-def view_xref(name = None):
-    return view_xref_2(conn, name)
+# /auth/list/delete/<name>
+@app.route('/delete_admin_group/<name>', methods = ['POST', 'GET'])
+def give_delete_admin_group(name = None):
+    return give_delete_admin_group_2(conn, name)
 
-@app.route('/raw/<everything:name>')
-@app.route('/thread/<int:topic_num>/raw/<int:num>')
-def view_raw(name = None, topic_num = None, num = None):
-    return view_raw_2(conn, name, topic_num, num)
-
-@app.route('/diff/<everything:name>')
-def view_diff_data(name = None):
-    return view_diff_data_2(conn, name)
-
-@app.route('/down/<everything:name>')
-def view_down(name = None):
-    return view_down_2(conn, name)
-
-@app.route('/w/<everything:name>')
-def view_read(name = None):
-    return view_read_2(conn, name)
-
-# Func-recent
-@app.route('/recent_discuss')
-def recent_discuss():
-    return recent_discuss_2(conn)
-
+# /auth/history
 # ongoing 반영 필요
 @app.route('/block_log')
 @app.route('/block_log/<regex("user"):tool>/<name>')
@@ -446,7 +529,7 @@ def recent_discuss():
 def recent_block(name = 'Test', tool = 'all'):
     return recent_block_2(conn, name, tool)
 
-# 이 쪽 분리 필요
+# Func-history
 @app.route('/recent_change')
 @app.route('/recent_changes')
 def recent_change(name = None):
@@ -492,6 +575,7 @@ def recent_record_reset(name = 'Test'):
 def recent_record_topic(name = 'Test'):
     return recent_record_topic_2(conn, name)
 
+# 거처를 고심중
 @app.route('/app_submit', methods = ['POST', 'GET'])
 def recent_app_submit():
     return recent_app_submit_2(conn)
@@ -509,6 +593,30 @@ def search_goto(name = 'test'):
 @app.route('/search/<everything:name>')
 def search_deep(name = 'test'):
     return search_deep_2(conn, name)
+
+# Func-view
+@app.route('/xref/<everything:name>')
+def view_xref(name = None):
+    return view_xref_2(conn, name)
+
+@app.route('/raw/<everything:name>')
+@app.route('/thread/<int:topic_num>/raw/<int:num>')
+def view_raw(name = None, topic_num = None, num = None):
+    return view_raw_2(conn, name, topic_num, num)
+
+@app.route('/diff/<int:num_a>/<int:num_b>/<everything:name>')
+def view_diff(name = 'Test', num_a = 1, num_b = 1):
+    return view_diff_2(conn, name, num_a, num_b)
+
+@app.route('/down/<everything:name>')
+def view_down(name = None):
+    return view_down_2(conn, name)
+
+@app.route('/w/<everything:name>/doc_rev/<int:doc_rev>')
+@app.route('/w/<everything:name>/doc_from/<everything:doc_from>')
+@app.route('/w/<everything:name>')
+def view_read(name = 'Test', doc_rev = 0, doc_from = ''):
+    return view_read_2(conn, name, doc_rev, doc_from)
 
 # Func-edit
 @app.route('/revert/<everything:name>', methods = ['POST', 'GET'])
@@ -537,6 +645,10 @@ def edit_move(name = None):
     return edit_move_2(conn, name)
 
 # Func-topic
+@app.route('/recent_discuss')
+def recent_discuss():
+    return recent_discuss_2(conn)
+
 @app.route('/thread/<int:topic_num>/b/<int:num>')
 def topic_block(topic_num = 1, num = 1):
     return topic_block_2(conn, topic_num, num)
@@ -578,13 +690,9 @@ def topic_close_list(name = 'test'):
     return topic_close_list_2(conn, name)
 
 # Func-user
-@app.route('/tool/<name>')
-def user_tool(name = None):
-    return user_tool_2(conn, name)
-
 @app.route('/change', methods = ['POST', 'GET'])
 def user_setting():
-    return user_setting_2(conn, server_init)
+    return user_setting_2(conn, server_set_var)
 
 @app.route('/change/email', methods = ['POST', 'GET'])
 def user_setting_email():
@@ -599,8 +707,9 @@ def user_setting_pw_change():
     return user_setting_pw_change_2(conn)
 
 @app.route('/user')
-def user_info():
-    return user_info_2(conn)
+@app.route('/user/<name>')
+def user_info(name = ''):
+    return user_info_2(conn, name)
 
 @app.route('/custom_head', methods=['GET', 'POST'])
 def user_custom_head_view():
@@ -612,20 +721,28 @@ def user_count_edit(name = None):
     return user_count_edit_2(conn, name)
     
 @app.route('/alarm')
-def alarm():
-    return alarm_2(conn)
+def user_alarm():
+    return user_alarm_2(conn)
 
 @app.route('/alarm/delete')
-def alarm_del():
-    return alarm_del_2(conn)
+def user_alarm_del():
+    return user_alarm_del_2(conn)
     
-@app.route('/<regex("watch_list|star_doc"):tool>')
-def watch_list(tool = 'star_doc'):
-    return watch_list_2(conn, tool)
+@app.route('/watch_list')
+def user_watch_list():
+    return user_watch_list_2(conn, 'watch_list')
 
-@app.route('/<regex("watch_list|star_doc"):tool>/<everything:name>')
-def watch_list_name(tool = 'star_doc', name = 'Test'):
-    return watch_list_name_2(conn, tool, name)
+@app.route('/watch_list/<everything:name>')
+def user_watch_list_name(name = 'Test'):
+    return user_watch_list_name_2(conn, 'watch_list', name)
+
+@app.route('/star_doc')
+def user_star_doc():
+    return user_watch_list_2(conn, 'star_doc')
+
+@app.route('/star_doc/<everything:name>')
+def user_star_doc_name(name = 'Test'):
+    return user_watch_list_name_2(conn, 'star_doc', name)
 
 # Func-login
 # 개편 예정
@@ -679,23 +796,30 @@ def login_logout():
     return login_logout_2(conn)
 
 # Func-vote
-@app.route('/vote/<num>', methods = ['POST', 'GET'])
-def vote_select(num = '1'):
-    return vote_select_2(conn, num)
+@app.route('/vote/<int:num>', methods = ['POST', 'GET'])
+def vote_select(num = 1):
+    return vote_select_2(conn, str(num))
 
-@app.route('/end_vote/<num>')
-def vote_end(num = '1'):
-    return vote_end_2(conn, num)
+@app.route('/vote/end/<int:num>')
+def vote_end(num = 1):
+    return vote_end_2(conn, str(num))
 
-@app.route('/close_vote/<num>')
-def vote_close(num = '1'):
-    return vote_close_2(conn, num)
+@app.route('/vote/close/<int:num>')
+def vote_close(num = 1):
+    return vote_close_2(conn, str(num))
 
 @app.route('/vote')
-def vote():
-    return vote_2(conn)
+@app.route('/vote/list')
+@app.route('/vote/list/<int:num>')
+def vote_list(num = 1):
+    return vote_list_2(conn, 'normal', num)
 
-@app.route('/add_vote', methods = ['POST', 'GET'])
+@app.route('/vote/list/close')
+@app.route('/vote/list/close/<int:num>')
+def vote_list_close(num = 1):
+    return vote_list_2(conn, 'close', num)
+
+@app.route('/vote/add', methods = ['POST', 'GET'])
 def vote_add():
     return vote_add_2(conn)
 
@@ -710,7 +834,11 @@ def api_raw(name = ''):
 
 @app.route('/api/version')
 def api_version():
-    return api_version_2(conn, version_list['beta']['r_ver'], version_list['beta']['c_ver'])
+    return api_version_2(
+        conn, 
+        version_list['beta']['r_ver'], 
+        version_list['beta']['c_ver']
+    )
 
 @app.route('/api/skin_info')
 @app.route('/api/skin_info/<name>')
@@ -737,6 +865,21 @@ def api_search(name = ''):
 def api_recent_change():
     return api_recent_change_2(conn)
 
+@app.route('/api/recent_discuss')
+@app.route('/api/recent_discuss/<int:num>')
+def api_recent_discuss(num = 10):
+    return api_recent_discuss_2(conn, num, 'normal')
+
+@app.route('/api/recent_discuss/stop')
+@app.route('/api/recent_discuss/<int:num>/stop')
+def api_recent_discuss_stop(num = 10):
+    return api_recent_discuss_2(conn, num, 'stop')
+
+@app.route('/api/recent_discuss/all')
+@app.route('/api/recent_discuss/<int:num>/all')
+def api_recent_discuss_all(num = 10):
+    return api_recent_discuss_2(conn, num, 'all')
+
 @app.route('/api/sha224/<everything:name>', methods = ['POST', 'GET'])
 def api_sha224(name = 'test'):
     return api_sha224_2(conn, name)
@@ -754,6 +897,7 @@ def api_sitemap():
     return api_sitemap_2(conn)
 
 # Func-main
+# 여기도 전반적인 조정 시행 예정
 @app.route('/restart', methods = ['POST', 'GET'])
 def main_restart():
     return main_restart_2(conn)
@@ -782,7 +926,11 @@ def main_other():
 @app.route('/manager', methods = ['POST', 'GET'])
 @app.route('/manager/<int:num>', methods = ['POST', 'GET'])
 def main_manager(num = 1):
-    return main_manager_2(conn, num, version_list['beta']['r_ver'])
+    return main_manager_2(
+        conn, 
+        num, 
+        version_list['beta']['r_ver']
+    )
 
 @app.route('/image/<everything:name>')
 def main_image_view(name = None):

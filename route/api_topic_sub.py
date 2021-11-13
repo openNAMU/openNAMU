@@ -43,7 +43,7 @@ def api_topic_sub_2(conn, topic_num):
                 "data_pas" : render_set(
                     doc_data = data_v, 
                     data_type = 'api_view',
-                    data_in = i[0],
+                    data_in = 'topic_' + topic_num + '_' + i[0],
                     doc_acl = 0
                 )
             }
