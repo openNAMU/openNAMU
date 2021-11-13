@@ -1,6 +1,7 @@
 from .tool.func import *
 
-def login_need_email_2(conn, tool):
+# 개편 필요
+def login_pass_find_2(conn, tool):
     curs = conn.cursor()
     
     if flask.request.method == 'POST':
@@ -53,7 +54,7 @@ def login_need_email_2(conn, tool):
             if send_email(user_email, t_text, i_text) == 0:
                 return re_error('/error/18')
 
-            return redirect('/check_key')
+            return redirect('/pass_find/email')
         else:
             curs.execute(db_change('select id from user_set where name = "email" and data = ?'), [user_email])
             if curs.fetchall():
@@ -70,7 +71,7 @@ def login_need_email_2(conn, tool):
 
             flask.session['c_email'] = user_email
 
-            return redirect('/check_key')
+            return redirect('/pass_find/email')
     else:
         if tool == 'pass_find':
             curs.execute(db_change('select data from other where name = "password_search_text"'))

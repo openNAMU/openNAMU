@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def login_check_key_2(conn, tool):
+def login_pass_find_email_2(conn, tool):
     curs = conn.cursor()
 
     if  flask.request.method == 'POST' or \
