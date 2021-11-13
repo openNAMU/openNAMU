@@ -12,7 +12,10 @@ if data_db_load == 'Y':
     # Init-DB
     if os.path.exists(os.path.join('data', 'set.json')):
         db_set_list = ['db', 'db_type']
-        set_data = json.loads(open(os.path.join('data', 'set.json'), encoding = 'utf8').read())
+        set_data = json.loads(open(
+            os.path.join('data', 'set.json'), 
+            encoding = 'utf8'
+        ).read())
         for i in db_set_list:
             if not i in set_data:
                 print('Please delete set.json')
@@ -65,15 +68,19 @@ if data_db_load == 'Y':
         with open(os.path.join('data', 'set.json'), 'w', encoding = 'utf8') as f:
             f.write(json.dumps(set_data))
 
-    db_data_get(set_data['db_type'])
+    data_db_set = {}
+    data_db_set['name'] = set_data['db']
+    data_db_set['type'] = set_data['db_type']
 
-    if set_data['db_type'] == 'mysql':
+    if data_db_set['type'] == 'mysql':
         if not os.path.exists(os.path.join('data', 'mysql.json')):
             db_set_list = ['user', 'password', 'host', 'port']
-            set_data = json.loads(open(
-                os.path.join('data', 'mysql.json'), 
-                encoding = 'utf8'
-            ).read())
+            set_data = json.loads(
+                open(
+                    os.path.join('data', 'mysql.json'),
+                    encoding = 'utf8'
+                ).read()
+            )
             for i in db_set_list:
                 if not i in set_data:
                     print('Please delete mysql.json')
@@ -96,29 +103,28 @@ if data_db_load == 'Y':
             if set_data_mysql['port'] == '':
                 set_data_mysql['port'] = '3306'
 
-            with open(os.path.join('data', 'mysql.json'), 'w', encoding = 'utf8') as f:
+            with open(
+                os.path.join('data', 'mysql.json'), 
+                'w', 
+                encoding = 'utf8'
+            ) as f:
                 f.write(json.dumps(set_data_mysql))
 
-        conn = pymysql.connect(
-            host = set_data_mysql['host'] if 'host' in set_data_mysql else 'localhost',
-            user = set_data_mysql['user'],
-            password = set_data_mysql['password'],
-            charset = 'utf8mb4',
-            port = int(set_data_mysql['port']) if 'port' in set_data_mysql else 3306
-        )
-        curs = conn.cursor()
+        data_db_set['mysql_user'] = set_data_mysql['user']
+        data_db_set['mysql_pw'] = set_data_mysql['password']
+        if 'host' in set_data_mysql:
+            data_db_set['mysql_host'] = set_data_mysql['host']
+        else:
+            data_db_set['mysql_host'] = 'localhost'
 
-        try:
-            curs.execute(db_change('create database ' + set_data['db'] + ' default character set utf8mb4;'))
-        except:
-            pass
+        if 'port' in set_data_mysql:
+            data_db_set['mysql_port'] = set_data_mysql['port']
+        else:
+            data_db_set['mysql_port'] = '3306'
 
-        conn.select_db(set_data['db'])
-    else:
-        conn = sqlite3.connect(set_data['db'] + '.db')
-        curs = conn.cursor()
-
-    load_conn(conn)
+    db_data_get(data_db_set['type'])
+    conn = get_conn(data_db_set)
+    curs = conn.cursor()
 else:
     print('----')
     print('You can use [9, 11]')
@@ -191,7 +197,7 @@ if what_i_do == '1':
 
         curs.execute(db_change("select data from data where title = ?"), [name[0]])
         data = curs.fetchall()
-        render_do(name[0], data[0][0], 3, None)
+        render_do(name[0], data[0][0], 'backlink', '')
 elif what_i_do == '2':
     curs.execute(db_change("delete from other where name = 'recaptcha'"))
     curs.execute(db_change("delete from other where name = 'sec_re'"))

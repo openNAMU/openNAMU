@@ -1,7 +1,7 @@
 {
     "beta" : {
-        "r_ver" : "v3.4.0-stable (stable2) (beta7) (dev23)",
-        "c_ver" : "3400101",
-        "s_ver" : "13"
+        "r_ver" : "v3.5.0-dev (stable1) (beta1) (dev3)",
+        "c_ver" : "3500101",
+        "s_ver" : "3500101"
     }
 }

@@ -102,7 +102,7 @@ def edit_2(conn, name):
                 warning_edit += '<a href="/raw/' + url_pas(name) + '">(r' + doc_ver + ')</a>'
             else:
                 warning_edit += '' + \
-                    '<a href="/diff/' + url_pas(name) + '?first=' + flask.request.form.get('ver', '1') + '&second=' + doc_ver + '">' + \
+                    '<a href="/diff/' + flask.request.form.get('ver', '1') + '/' + doc_ver + '/' + url_pas(name) + '">' + \
                         '(r' + doc_ver + ')' + \
                     '</a>' + \
                 ''

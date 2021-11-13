@@ -34,7 +34,6 @@ def main_manager_2(conn, num, r_ver):
                     <li><a href="/manager/17">''' + load_lang('release') + '''</a></li>
                     <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
                 </ul>
-                <br>
                 <h2>''' + load_lang('owner') + '''</h2>
                 <ul class="inside_ul">
                     <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
@@ -55,14 +54,12 @@ def main_manager_2(conn, num, r_ver):
                     <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
                     <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
                 </ul>
-                <br>
                 <h2>''' + load_lang('server') + '''</h2>
                 <ul class="inside_ul">
                     <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
                     <li><a href="/shutdown">''' + load_lang('wiki_shutdown') + '''</a></li>
                     <li><a href="/update">''' + load_lang('update') + '''</a></li>
                 </ul>
-                <br>
                 <h2>''' + load_lang('version') + '''</h2>
                 <ul class="inside_ul">
                     <li>

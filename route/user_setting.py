@@ -1,9 +1,9 @@
 from .tool.func import *
 
-def user_setting_2(conn, server_init):
+def user_setting_2(conn, server_set_var):
     curs = conn.cursor()
 
-    support_language = ['default'] + server_init.server_init()['language']['list']
+    support_language = ['default'] + server_set_var['language']['list']
     ip = ip_check()
 
     if ban_check() == 1:

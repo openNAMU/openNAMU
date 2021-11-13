@@ -1,4 +1,3 @@
-// 표 캡션
 // 중괄호 문법 정리
 // Tool
 function do_url_change(data) {
@@ -141,7 +140,7 @@ function do_onmark_text_render(data) {
     return data;
 }
 
-function do_onmark_heading_render(data, name_doc, name_include) {
+function do_onmark_heading_render(data, data_js, name_doc, name_include) {
     var heading_re = /\n(={1,6})(#)? ?([^=]+) ?#?={1,6}\n/;
     var heading_level_all = [0, 0, 0, 0, 0, 0];
     var toc_data = '';
@@ -181,6 +180,7 @@ function do_onmark_heading_render(data, name_doc, name_include) {
         
         var heading_level_string_no_end = heading_level_string.replace(/\.$/, '');
         var heading_data_text = heading_data[3].replace(/ #$/, '');
+        heading_data_text = heading_data_text.replace(/ $/, '');
         
         toc_data += '' +
             '<span style="margin-left: ' + String((heading_level_string.match(/\./g).length - 1) * 10) + 'px;">' +
@@ -193,8 +193,8 @@ function do_onmark_heading_render(data, name_doc, name_include) {
         data = data.replace(heading_re, 
             '\n<start_point>' +
             (toc_n === 1 ? '' : '</div>') +
-            '<h' + heading_level + ' id="s-' + heading_level_string_no_end + '">' + 
-                '<a href="#toc">' + heading_level_string + '</a> ' + 
+            '<h' + heading_level + ' class="render_heading_text">' + 
+                '<a href="#toc" id="s-' + heading_level_string_no_end + '">' + heading_level_string + '</a> ' + 
                 heading_data_text + 
                 '<a id="edit_load_' + String(toc_n) + '" ' +
                     'style="font-size: 70%;"' +
@@ -539,7 +539,7 @@ function do_onmark_footnote_render(data, name_include) {
 function do_onmark_macro_render(data, data_js) {
     data = data.replace(/\[([^[\](]+)\(((?:(?!\)\]).)+)\)\]/g, function(x, x_1, x_2) {
         x_1 = x_1.toLowerCase();
-        if(x_1 === 'youtube' || x_1 === 'kakaotv' || x_1 === 'nicovideo') {
+        if(x_1 === 'youtube' || x_1 === 'kakaotv' || x_1 === 'nicovideo' || x_1 === 'navertv') {
             var video_code = x_2.match(/^([^,]+)/);
             video_code = video_code ? video_code[1] : '';
             
@@ -551,7 +551,7 @@ function do_onmark_macro_render(data, data_js) {
             
             if(x_1 === 'youtube') {
                 var video_start = x_2.match(/,(?: *)start=([0-9]+)/);
-                video_start = video_start ? ('?' + video_start[1]) : '';
+                video_start = video_start ? ('?start=' + video_start[1]) : '';
                 
                 video_code = video_code.replace(/^https:\/\/www\.youtube\.com\/watch\?v=/, '');
                 video_code = video_code.replace(/^https:\/\/youtu\.be\//, '');
@@ -562,9 +562,11 @@ function do_onmark_macro_render(data, data_js) {
                 video_code = video_code.replace(/^http:\/\/tv\.kakao\.com\/v\//, '');
                 
                 var video_src = 'https://tv.kakao.com/embed/player/cliplink/' + video_code +'?service=kakao_tv'
-            } else {
+            } else if(x_1 === 'nicovideo') {
                 var video_src = 'https://embed.nicovideo.jp/watch/' + video_code
-            }
+            } else {
+				var video_src = 'https://tv.naver.com/embed/' + video_code
+			}
             
             return '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + '" frameborder="0" allowfullscreen></iframe>';
         } else if(x_1 === 'anchor') {
@@ -1004,7 +1006,7 @@ function do_onmark_table_render_sub(data, data_col) {
 }
 
 function do_onmark_table_render_main(data) {
-    var table_re = /\n((?:(?:(?:(?:\|\|)+)|(?:\|[^|]+\|(?:\|\|)*))(?!\n)(?:(?:(?!\|\|).)+))(?:(?:\|\||\|\|\n|(?:\|\|)+(?!\n)(?:(?:(?!\|\|).)+))*)\|\|)\n/gs;
+    var table_re = /\n((?:(?:(?:(?:\|\|)+)|(?:\|[^|]+\|(?:\|\|)*))\n?(?:(?:(?!\|\|).)+))(?:(?:\|\||\|\|\n|(?:\|\|)+(?!\n)(?:(?:(?!\|\|).)+)\n*)*)\|\|)\n/gs;
     data = data.replace(table_re, function(x, x_1) {
         var table_cel_re = /((?:\|\|)+)((?:(?!\|\|).)*)/gs;
         var table_data = '';
@@ -1246,11 +1248,11 @@ function do_onmark_redirect_render(data, data_js, name_doc) {
             window.location.search === '' &&
             window.location.pathname.match(/^\/w\//)
         ) {
-            window.location.href = '/w/' + do_url_change(link_main) + '?from=' + do_url_change(name_doc) + link_sub;
+            window.location.href = '/w/' + do_url_change(link_main) + '/doc_from/' + do_url_change(name_doc) + link_sub;
         }
         
         return [
-            data.replace(redirect_re, '/w/' + do_url_change(link_main) + '?from=' + do_url_change(name_doc) + link_sub), 
+            data.replace(redirect_re, '/w/' + do_url_change(link_main) + '/doc_from/' + do_url_change(name_doc) + link_sub), 
             data_js, 
             1
         ];
@@ -1343,6 +1345,7 @@ function do_onmark_render(
     data_js += '' + 
         'get_link_state("' + name_include + '");\n' + 
         'get_file_state("' + name_include + '");\n' + 
+		'get_heading_name();'
     ''
     data_js += 'render_html("' + name_include + 'nowiki_html");\n'
     
