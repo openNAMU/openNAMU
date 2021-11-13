@@ -749,7 +749,7 @@ def user_star_doc_name(name = 'Test'):
 
 # login -> login/2fa -> login/2fa/email with login_id
 # register -> register/email -> regiter/email/check with reg_id
-# pass_find -> passfind/email with find_id
+# pass_find -> pass_find/email with find_id
 
 @app.route('/login', methods = ['POST', 'GET'])
 def login_login():
@@ -781,15 +781,14 @@ def login_register_email_check():
 def login_register_submit():
     return login_register_submit_2(conn)
 
-@app.route('/<regex("need_email"):tool>', methods = ['POST', 'GET'])
-@app.route('/<regex("pass_find"):tool>', methods = ['POST', 'GET'])
-def login_need_email(tool = 'pass_find'):
-    return login_need_email_2(conn, tool)
+# 개편 필요
+@app.route('/pass_find', methods = ['POST', 'GET'])
+def login_pass_find():
+    return login_pass_find_2(conn, 'pass_find')
 
-@app.route('/<regex("check_key"):tool>', methods = ['POST', 'GET'])
-@app.route('/<regex("check_pass_key"):tool>', methods = ['POST', 'GET'])
-def login_check_key(tool = 'check_pass_key'):
-    return login_check_key_2(conn, tool)
+@app.route('/pass_find/email', methods = ['POST', 'GET'])
+def login_pass_find_email():
+    return login_pass_find_email_2(conn, 'check_key')
 
 @app.route('/logout')
 def login_logout():
