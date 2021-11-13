@@ -140,7 +140,7 @@ function do_onmark_text_render(data) {
     return data;
 }
 
-function do_onmark_heading_render(data, name_doc, name_include) {
+function do_onmark_heading_render(data, data_js, name_doc, name_include) {
     var heading_re = /\n(={1,6})(#)? ?([^=]+) ?#?={1,6}\n/;
     var heading_level_all = [0, 0, 0, 0, 0, 0];
     var toc_data = '';
@@ -193,8 +193,8 @@ function do_onmark_heading_render(data, name_doc, name_include) {
         data = data.replace(heading_re, 
             '\n<start_point>' +
             (toc_n === 1 ? '' : '</div>') +
-            '<h' + heading_level + ' id="s-' + heading_level_string_no_end + '">' + 
-                '<a href="#toc" id="' + do_js_safe_change(heading_data_text) + '">' + heading_level_string + '</a> ' + 
+            '<h' + heading_level + ' class="render_heading_text">' + 
+                '<a href="#toc" id="s-' + heading_level_string_no_end + '">' + heading_level_string + '</a> ' + 
                 heading_data_text + 
                 '<a id="edit_load_' + String(toc_n) + '" ' +
                     'style="font-size: 70%;"' +
@@ -1345,6 +1345,7 @@ function do_onmark_render(
     data_js += '' + 
         'get_link_state("' + name_include + '");\n' + 
         'get_file_state("' + name_include + '");\n' + 
+		'get_heading_name();'
     ''
     data_js += 'render_html("' + name_include + 'nowiki_html");\n'
     
