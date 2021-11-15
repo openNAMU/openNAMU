@@ -1289,7 +1289,7 @@ function do_onmark_render(
     var data_js = '';
     var data_backlink = [];
     var data_nowiki = {};
-    
+	
     var data_var = do_onmark_redirect_render(data, data_js, name_doc);
     data = data_var[0];
     data_js = data_var[1];
@@ -1317,7 +1317,7 @@ function do_onmark_render(
         data_nowiki = data_var[2];
 
         data = do_onmark_text_render(data);
-        data = do_onmark_heading_render(data, name_doc, name_include);
+        data = do_onmark_heading_render(data, data_js, name_doc, name_include);
         data = do_onmark_table_render(data);
 
         data_var = do_onmark_link_render(
