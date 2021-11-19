@@ -30,9 +30,9 @@ def login_register_email_2(conn):
         curs.execute(db_change('select data from other where name = "email_text"'))
         sql_d = curs.fetchall()
         if sql_d and sql_d[0][0] != '':
-            i_text = html.escape(sql_d[0][0]) + '\n\nKey : ' + flask.session['c_key']
+            i_text = html.escape(sql_d[0][0]) + '\n\nKey : ' + str(flask.session.get('reg_key'))
         else:
-            i_text = 'Key : ' + flask.session['c_key']
+            i_text = 'Key : ' + str(flask.session.get('reg_key'))
         
 
         curs.execute(db_change('select id from user_set where name = "email" and data = ?'), [user_email])
