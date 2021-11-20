@@ -82,7 +82,9 @@ if sys.version_info < (3, 6):
 global_lang = {}
 global_wiki_set = {}
 
-data_css_ver = '106'
+global_db_set = ''
+
+data_css_ver = '114'
 data_css = ''
 
 conn = ''
@@ -100,75 +102,13 @@ def load_conn(data):
     load_conn2(data)
     
 # Func-init
-class server_init:
-    def __init__(self):
-        self.env_dict = {
-            'host' : os.getenv('NAMU_HOST'),
-            'port' : os.getenv('NAMU_PORT'),
-            'language' : os.getenv('NAMU_LANG'),
-            'markup' : os.getenv('NAMU_MARKUP'),
-            'encode' : os.getenv('NAMU_ENCRYPT')
-        }
-
-        self.server_set_var = {
-            'host' : {
-                'display' : 'Host',
-                'require' : 'conv',
-                'default' : '0.0.0.0'
-            }, 'port' : {
-                'display' : 'Port',
-                'require' : 'conv',
-                'default' : '3000'
-            }, 'language' : {
-                'display' : 'Language',
-                'require' : 'select',
-                'default' : 'ko-KR',
-                'list' : ['ko-KR', 'en-US']
-            }, 'markup' : {
-                'display' : 'Markup',
-                'require' : 'select',
-                'default' : 'namumark',
-                'list' : ['namumark', 'custom', 'raw']
-            }, 'encode' : {
-                'display' : 'Encryption method',
-                'require' : 'select',
-                'default' : 'sha3',
-                'list' : ['sha3', 'sha256']
-            }
-        }
-        
-    def server_init(self):
-        return self.server_set_var
+def get_conn(db_set = ''):
+    global global_db_set
+    if db_set != '':
+        global_db_set = db_set
+    else:
+        db_set = global_db_set
     
-    def init(self, key):
-        if self.env_dict[key] != None:
-            return self.env_dict[key]
-        else:
-            while 1:
-                if self.server_set_var[key]['require'] == 'select':
-                    list_ = '[' + ', '.join(self.server_set_var[key]['list']) + ']'
-                else:
-                    list_ = ''
-
-                print('{} ({}) {} : '.format(
-                    self.server_set_var[key]['display'],
-                    self.server_set_var[key]['default'],
-                    list_
-                ), end = '')
-
-                server_set_val = input()
-                if server_set_val:
-                    if self.server_set_var[key]['require'] == 'select':
-                        if server_set_val not in self.server_set_var[key]['list']:
-                            pass
-                        else:
-                            return server_set_val
-                    else:
-                        return server_set_val
-                else:
-                    return self.server_set_var[key]['default']
-
-def get_conn(db_set):
     if db_set['type'] == 'sqlite':
         conn = sqlite3.connect(db_set['name'] + '.db')
         curs = conn.cursor()
@@ -191,6 +131,8 @@ def get_conn(db_set):
             pass
         
         conn.select_db(db_set['name'])
+        
+    load_conn(conn)
         
     return conn
 
@@ -427,14 +369,14 @@ def set_init():
     if not curs.fetchall():
         for i in ['naver.com', 'gmail.com', 'daum.net', 'kakao.com']:
             curs.execute(db_change(
-                "insert into html_filter (html, kind) values (?, 'email')"
+                "insert into html_filter (html, kind, plus, plus_t) values (?, 'email', '', '')"
             ), [i])
 
     curs.execute(db_change("select html from html_filter where kind = 'extension'"))
     if not curs.fetchall():
         for i in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
             curs.execute(db_change(
-                "insert into html_filter (html, kind) values (?, 'extension')"
+                "insert into html_filter (html, kind, plus, plus_t) values (?, 'extension', '', '')"
             ), [i])
 
     curs.execute(db_change(
@@ -454,8 +396,7 @@ def set_init():
     curs.execute(db_change('select data from other where name = "key"'))
     rep_data = curs.fetchall()
     if not rep_data:
-        rep_key = ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for i in range(64))
-        curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [rep_key])
+        curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [load_random_key()])
 
     curs.execute(db_change('select data from other where name = "count_all_title"'))
     if not curs.fetchall():
@@ -501,7 +442,7 @@ def load_random_key(long = 64):
         ) for i in range(long)
     )
 
-def edit_button():
+def edit_button(editor_display = '0'):
     insert_list = []
 
     curs.execute(db_change("select html, plus from html_filter where kind = 'edit_top'"))
@@ -513,7 +454,7 @@ def edit_button():
     for insert_data in insert_list:
         data += '' + \
             '<a href="' + \
-                'javascript:do_insert_data(\'content\', \'' + insert_data[0] + '\')' + \
+                'javascript:do_insert_data(\'textarea_edit_view\', \'' + insert_data[0] + '\', ' + editor_display + ')' + \
             '">(' + insert_data[1] + ')</a> ' + \
         ''
 
@@ -563,15 +504,10 @@ def next_fix(link, num, page, end = 50):
 
     return list_data
 
-def leng_check(first, second):
-    if first < second:
-        all_plus = '+' + str(second - first)
-    elif second < first:
-        all_plus = '-' + str(first - second)
-    else:
-        all_plus = '0'
-
-    return all_plus
+def leng_check(A, B):
+    # B -> new
+    # A -> old
+    return '0' if A == B else (('-' + str(A - B)) if A > B else ('+' + str(B - A)))
 
 def number_check(data):
     try:
@@ -738,18 +674,13 @@ def wiki_css(data):
     return data
 
 def cut_100(data):
-    if re.search(r'^\/w\/', flask.request.path):
-        data = re.sub(r'<script>((\n*(((?!<\/script>).)+)\n*)+)<\/script>', '', data)
-        data = re.sub(r'<hr class="main_hr">((\n*((.+)\n*))+)$', '', data)
-        data = re.sub(r'<div id="cate_all">((\n*((.+)\n*))+)$', '', data)        
-
-        data = re.sub(r'<(((?!>).)*)>', ' ', data)
-        data = re.sub(r'\n', ' ', data)
-        data = re.sub(r'^ +', '', data)
-        data = re.sub(r' +$', '', data)
-        data = re.sub(r' {2,}', ' ', data)
-    
-        return data[0:100] + '...'
+    data = re.search(r'<pre style="display: none;" id="render_content_load">([^<>]+)<\/pre>', data)
+    if data:
+        data = data.group(1)
+        if len(data) > 100:
+            return data[0:100] + '...'
+        else:
+            return data[0:len(data)]
     else:
         return ''
 
@@ -801,7 +732,7 @@ def wiki_set(num = 1):
 
     return data_list
 
-def wiki_custom():
+def wiki_custom():    
     ip = ip_check()
     if ip_or_user(ip) == 0:
         user_icon = 1
@@ -844,6 +775,12 @@ def wiki_custom():
 
     curs.execute(db_change("select title from rd where title = ? and stop = ''"), ['user:' + ip])
     user_topic = '1' if curs.fetchall() else '0'
+    
+    split_path = flask.request.path.split('/')
+    if len(split_path) > 1:
+        split_path = split_path[1]
+    else:
+        split_path = 0
 
     return [
         '',
@@ -857,7 +794,8 @@ def wiki_custom():
         user_notice,
         user_acl_list,
         ip,
-        user_topic
+        user_topic,
+        split_path
     ]
 
 def load_skin(data = '', set_n = 0, default = 0):
@@ -874,7 +812,7 @@ def load_skin(data = '', set_n = 0, default = 0):
 
     skin_list_get = os.listdir('views')
     if default == 1:
-        skin_list_get += ['default']
+        skin_list_get = ['default'] + skin_list_get
 
     for skin_data in skin_list_get:
         if skin_data != 'default':
@@ -1375,7 +1313,7 @@ def ip_pas(raw_ip, type_d = 0):
                 ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
                 
             if change_ip == 0:
-                ip += ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
+                ip += ' <a href="/user/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
 
         end_ip[raw_ip] = ip
     
