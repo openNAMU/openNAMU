@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def edit_2(conn, name):
+def edit_2(conn, name, section):
     curs = conn.cursor()
 
     ip = ip_check()
@@ -11,7 +11,7 @@ def edit_2(conn, name):
     doc_ver = curs.fetchall()
     doc_ver = doc_ver[0][0] if doc_ver else '0'
     
-    section = flask.request.args.get('section', '')
+    section = '' if section == 0 else section
     post_ver = flask.request.form.get('ver', '')
     if flask.request.method == 'POST':
         edit_repeat = 'error' if post_ver != doc_ver else 'post'
