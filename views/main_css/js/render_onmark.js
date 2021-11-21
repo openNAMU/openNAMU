@@ -1289,7 +1289,7 @@ function do_onmark_render(
     var data_js = '';
     var data_backlink = [];
     var data_nowiki = {};
-	
+
     var data_var = do_onmark_redirect_render(data, data_js, name_doc);
     data = data_var[0];
     data_js = data_var[1];
