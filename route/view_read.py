@@ -139,8 +139,10 @@ def view_read_2(conn, name, doc_rev, doc_from):
         div = '''
             <div id="get_user_info"></div>
             <script>load_user_info("''' + user_name + '''");</script>
+            <hr class="main_hr">
         ''' + div
-        menu += [['w/' + url_pas(name) + '/' + url_pas(get_time().split()[0]), load_lang('today_doc')]]
+        if name == 'user:' + user_name:
+            menu += [['w/' + url_pas(name) + '/' + url_pas(get_time().split()[0]), load_lang('today_doc')]]
 
     curs.execute(db_change("select data from other where name = 'body'"))
     body = curs.fetchall()

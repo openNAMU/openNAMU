@@ -195,10 +195,10 @@ function do_onmark_heading_render(data, data_js, name_doc, name_include) {
             (toc_n === 1 ? '' : '</div>') +
             '<h' + heading_level + ' class="render_heading_text">' + 
                 '<a href="#toc" id="s-' + heading_level_string_no_end + '">' + heading_level_string + '</a> ' + 
-                heading_data_text + 
+                heading_data_text + ' ' +
                 '<a id="edit_load_' + String(toc_n) + '" ' +
                     'style="font-size: 70%;"' +
-                    'href="/edit/' + do_url_change(name_doc) + '?section=' + String(toc_n) + '">✎</a> ' +
+                    'href="/edit/' + do_url_change(name_doc) + '/doc_section/' + String(toc_n) + '">✎</a> ' +
                 '<a href="javascript:void(0);" ' +
                     'onclick="javascript:do_open_folding(\'' + name_include + 'in_data_' + String(toc_n) + '\', this);"' +
                     'style="font-size: 70%;">' + (heading_data[2] ? '⊕' : '⊖') + '</a>' +
@@ -565,8 +565,8 @@ function do_onmark_macro_render(data, data_js) {
             } else if(x_1 === 'nicovideo') {
                 var video_src = 'https://embed.nicovideo.jp/watch/' + video_code
             } else {
-				var video_src = 'https://tv.naver.com/embed/' + video_code
-			}
+                var video_src = 'https://tv.naver.com/embed/' + video_code
+            }
             
             return '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + '" frameborder="0" allowfullscreen></iframe>';
         } else if(x_1 === 'anchor') {
@@ -1289,7 +1289,7 @@ function do_onmark_render(
     var data_js = '';
     var data_backlink = [];
     var data_nowiki = {};
-    
+
     var data_var = do_onmark_redirect_render(data, data_js, name_doc);
     data = data_var[0];
     data_js = data_var[1];
@@ -1317,7 +1317,7 @@ function do_onmark_render(
         data_nowiki = data_var[2];
 
         data = do_onmark_text_render(data);
-        data = do_onmark_heading_render(data, name_doc, name_include);
+        data = do_onmark_heading_render(data, data_js, name_doc, name_include);
         data = do_onmark_table_render(data);
 
         data_var = do_onmark_link_render(

@@ -23,12 +23,14 @@ document.onkeypress = function(e) {
         }
 
         if(window.location.pathname.match(doc_shortcut)) {
+            let doc_href = window.location.pathname.replace(doc_shortcut, '');
+            doc_href = doc_href.replace(/%2Fdoc_from%2F(?:((?!%2F).)+)$/, '');
             if(shortcut_key_list['w'] === 1) {
-                window.location.pathname = window.location.pathname.replace(doc_shortcut, '/w/');
+                window.location.pathname = '/w/' + doc_href;
             } else if(shortcut_key_list['e'] === 1) {
-                window.location.pathname = window.location.pathname.replace(doc_shortcut, '/edit/');
+                window.location.pathname = '/edit/' + doc_href;
             } else if(shortcut_key_list['h'] === 1) {
-                window.location.pathname = window.location.pathname.replace(doc_shortcut, '/history/');
+                window.location.pathname = '/history/' + doc_href;
             }
         }
     }
