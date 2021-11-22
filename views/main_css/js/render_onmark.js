@@ -191,7 +191,7 @@ function do_onmark_heading_render(data, data_js, name_doc, name_include) {
             '\n' +
         ''
         data = data.replace(heading_re, 
-            '\n<start_point>' +
+            '\n' +
             (toc_n === 1 ? '' : '</div>') +
             '<h' + heading_level + ' class="render_heading_text">' + 
                 '<a href="#toc" id="s-' + heading_level_string_no_end + '">' + heading_level_string + '</a> ' + 
@@ -796,6 +796,8 @@ function do_onmark_last_render(data, name_include, data_category) {
     data = data.replace(/\n?<start_point>/g, '');
     data = data.replace(/<end_point>\n?/g, '');
     
+    console.log(data);
+    
     // br 마지막 처리
     data = data.replace(/^(\n| )+/, '');
     data = do_end_br_replace(data);
@@ -1143,7 +1145,7 @@ function do_onmark_list_sub_render(data) {
         });
 
         data = data.replace(quote_re, '' +
-            '\n<start_point>' +
+            '\n' +
             '<blockquote>' + 
                 '<end_point>\n' +
                 quote_end_data + 
@@ -1169,7 +1171,7 @@ function do_onmark_list_sub_render(data) {
             return '<li style="margin-left: ' + String(list_leng * 20) + 'px">' + x_2 + '</li>';
         });
 
-        data = data.replace(list_re, '\n<start_point><ul>' + list_end_data + '</ul><end_point>\n');
+        data = data.replace(list_re, '\n<ul>' + list_end_data + '</ul><end_point>\n');
     }
     
     return data;
@@ -1230,7 +1232,7 @@ function do_onmark_hr_render(data) {
             break;
         }
         
-        data = data.replace(hr_re, '\n<start_point><hr><end_point>\n');
+        data = data.replace(hr_re, '\n<hr><end_point>\n');
     }
     
     return data;
@@ -1277,14 +1279,18 @@ function do_onmark_render(
 ) {
     let data_wiki_set = {};
 	if(test_mode === 'normal') {
-        var data = '\n' + document.getElementById(name_id + '_load').innerHTML.replace(/\r/g, '') + '\n';
+        var data = '<end_point>\n' + 
+            document.getElementById(name_id + '_load').innerHTML.replace(/\r/g, '') + 
+        '\n<start_point>';
         data_wiki_set = JSON.parse(document.getElementById(name_id + '_set').innerHTML);
     } else if(test_mode === 'manual') { 
-        var data = '\n' + doc_data.replace(/\r/g, '') + '\n';
+        var data = '<end_point>\n' + 
+            doc_data.replace(/\r/g, '') + 
+        '\n<start_point>';
     } else {
-    	var data = '\n' + (
+    	var data = '<end_point>\n' + (
 ``
-        ).replace(/\r/g, '') + '\n';
+        ).replace(/\r/g, '') + '\n<start_point>';
     }
     var data_js = '';
     var data_backlink = [];
