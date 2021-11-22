@@ -1279,18 +1279,18 @@ function do_onmark_render(
 ) {
     let data_wiki_set = {};
 	if(test_mode === 'normal') {
-        var data = '\n<start_point>' + 
+        var data = '<end_point>\n' + 
             document.getElementById(name_id + '_load').innerHTML.replace(/\r/g, '') + 
-        '<end_point>\n';
+        '\n<start_point>';
         data_wiki_set = JSON.parse(document.getElementById(name_id + '_set').innerHTML);
     } else if(test_mode === 'manual') { 
-        var data = '\n<start_point>' + 
+        var data = '<end_point>\n' + 
             doc_data.replace(/\r/g, '') + 
-        '<end_point>\n';
+        '\n<start_point>';
     } else {
-    	var data = '\n<start_point>' + (
+    	var data = '<end_point>\n' + (
 ``
-        ).replace(/\r/g, '') + '<end_point>\n';
+        ).replace(/\r/g, '') + '\n<start_point>';
     }
     var data_js = '';
     var data_backlink = [];
