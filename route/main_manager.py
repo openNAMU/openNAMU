@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_manager_2(conn, num, r_ver):
+def main_manager_2(conn, num):
     curs = conn.cursor()
 
     title_list = {
@@ -63,12 +63,13 @@ def main_manager_2(conn, num, r_ver):
                     </ul>
                     <h2>3. ''' + load_lang('version') + '''</h2>
                     <ul class="inside_ul">
-                        <li>
-                            <a href="/api/skin_info?all=true">''' + load_lang('skin_info') + '''</a>
-                            <span id="need_skin_update"></span>
-                        </li>
-                        <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
+                        <li>''' + load_lang('version') + ''' : <span id="ver_send_2"></span></li>
                         <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
+                    </ul>
+                    <h3>3.1. ''' + load_lang('skin_info') + '''</h3>
+                    <ul class="inside_ul">
+                        <li><a href="/api/skin_info?all=true">''' + load_lang('skin_info') + '''</a></li>
+                        <div id="ver_send_3"></div>
                     </ul>
                 </div>
                 <script>load_ver(); do_skin_ver_check(); simple_render('other_simple_render');</script>

@@ -205,7 +205,9 @@ class RegexConverter(werkzeug.routing.BaseConverter):
         self.regex = items[0]
         
 app = flask.Flask(__name__, template_folder = './')
+
 app.config['JSON_AS_ASCII'] = False
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
 app.logger.setLevel(logging.ERROR)
 
@@ -707,14 +709,14 @@ def user_setting_email_check():
 def user_setting_pw_change():
     return user_setting_pw_change_2(conn)
 
+@app.route('/change/head', methods=['GET', 'POST'])
+def user_setting_head():
+    return user_setting_head_2(conn)
+
 @app.route('/user')
 @app.route('/user/<name>')
 def user_info(name = ''):
     return user_info_2(conn, name)
-
-@app.route('/custom_head', methods=['GET', 'POST'])
-def user_custom_head_view():
-    return user_custom_head_view_2(conn)
 
 @app.route('/count')
 @app.route('/count/<name>')
@@ -834,11 +836,7 @@ def api_raw(name = ''):
 
 @app.route('/api/version')
 def api_version():
-    return api_version_2(
-        conn, 
-        version_list['beta']['r_ver'], 
-        version_list['beta']['c_ver']
-    )
+    return api_version_2(conn, version_list)
 
 @app.route('/api/skin_info')
 @app.route('/api/skin_info/<name>')
@@ -926,11 +924,7 @@ def main_other():
 @app.route('/manager', methods = ['POST', 'GET'])
 @app.route('/manager/<int:num>', methods = ['POST', 'GET'])
 def main_manager(num = 1):
-    return main_manager_2(
-        conn, 
-        num, 
-        version_list['beta']['r_ver']
-    )
+    return main_manager_2(conn, num)
 
 @app.route('/image/<everything:name>')
 def main_image_view(name = None):
