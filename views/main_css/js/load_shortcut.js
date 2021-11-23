@@ -24,7 +24,7 @@ document.onkeypress = function(e) {
 
         if(window.location.pathname.match(doc_shortcut)) {
             let doc_href = window.location.pathname.replace(doc_shortcut, '');
-            doc_href = doc_href.replace(/(?:%2F|\/)(doc_from|doc_rev)(?:%2F|\/)(?:((?!%2F|\/).)+)$/, '');
+            doc_href = doc_href.replace(/(?:%2F|\/)(?:doc_from|doc_rev)(?:%2F|\/)(?:((?!%2F|\/).)+)$/, '');
             
             if(shortcut_key_list['w'] === 1) {
                 window.location.pathname = '/w/' + doc_href;

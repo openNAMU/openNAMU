@@ -796,8 +796,6 @@ function do_onmark_last_render(data, name_include, data_category) {
     data = data.replace(/\n?<start_point>/g, '');
     data = data.replace(/<end_point>\n?/g, '');
     
-    console.log(data);
-    
     // br 마지막 처리
     data = data.replace(/^(\n| )+/, '');
     data = do_end_br_replace(data);
@@ -1279,18 +1277,18 @@ function do_onmark_render(
 ) {
     let data_wiki_set = {};
 	if(test_mode === 'normal') {
-        var data = '<end_point>\n' + 
+        var data = '\n' + 
             document.getElementById(name_id + '_load').innerHTML.replace(/\r/g, '') + 
-        '\n<start_point>';
+        '\n';
         data_wiki_set = JSON.parse(document.getElementById(name_id + '_set').innerHTML);
     } else if(test_mode === 'manual') { 
-        var data = '<end_point>\n' + 
+        var data = '\n' + 
             doc_data.replace(/\r/g, '') + 
-        '\n<start_point>';
+        '\n';
     } else {
-    	var data = '<end_point>\n' + (
+    	var data = '\n' + (
 ``
-        ).replace(/\r/g, '') + '\n<start_point>';
+        ).replace(/\r/g, '') + '\n';
     }
     var data_js = '';
     var data_backlink = [];

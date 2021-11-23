@@ -18,7 +18,7 @@ def main_upload_2(conn):
 
         file_len = len(file_data)
 
-        if int(wiki_set(3)) * 1024 * 1024 * file_len < flask.request.content_length:
+        if (int(wiki_set(3)) * 1000 * 1000 * file_len) < flask.request.content_length:
             return re_error('/error/17')
 
         if file_len == 1:    
@@ -69,6 +69,7 @@ def main_upload_2(conn):
             ip = ip_check()
             g_lice = flask.request.form.get('f_lice', '')
             file_size = os.stat(os.path.join(data_url_image, e_data)).st_size
+            file_size = str(round(file_size / 1000, 1))
 
             curs.execute(db_change("select data from other where name = 'markup'"))
             db_data = curs.fetchall()
@@ -78,7 +79,7 @@ def main_upload_2(conn):
                     '{{{[[file:' + name + ']]}}}\n\n' + \
                     flask.request.form.get('f_lice_sel', 'direct_input') + '\n' + \
                     (ip if ip_or_user(ip) != 0 else '[[user:' + ip + ']]') + '\n' + \
-                    str(file_size) + ' Byte\n' + \
+                    file_size + 'KB\n' + \
                     '[[category:' + re.sub(r'\]', '_', flask.request.form.get('f_lice_sel', '')) + ']]\n' + \
                     (g_lice if g_lice != '' else '') + \
                 ''
@@ -88,7 +89,7 @@ def main_upload_2(conn):
                     '/image/' + e_data + '\n\n' + \
                     flask.request.form.get('f_lice_sel', 'direct_input') + '\n' + \
                     ip + \
-                    str(file_size) + ' Byte\n\n' + \
+                    file_size + 'KB\n\n' + \
                     (g_lice if g_lice != '' else '') + \
                 ''
 
