@@ -74,7 +74,7 @@ data_db_set['name'] = set_data['db']
 data_db_set['type'] = set_data['db_type']
 
 if data_db_set['type'] == 'mysql':
-    if not os.path.exists(os.path.join('data', 'mysql.json')):
+    if os.path.exists(os.path.join('data', 'mysql.json')):
         db_set_list = ['user', 'password', 'host', 'port']
         set_data = json.loads(
             open(
@@ -84,10 +84,15 @@ if data_db_set['type'] == 'mysql':
         )
         for i in db_set_list:
             if not i in set_data:
-                print('Please delete mysql.json')
-                print('----')
-                raise
-
+                os.remove(os.path.join('data', 'mysql.json'))
+                
+                break
+                
+        set_data_mysql = set_data
+    
+    if not os.path.exists(os.path.join('data', 'mysql.json')):
+        set_data_mysql = {}
+        
         print('DB user ID : ', end = '')
         set_data_mysql['user'] = str(input())
 
