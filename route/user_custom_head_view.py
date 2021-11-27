@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def user_custom_head_view_2(conn):
+def user_setting_head_2(conn):
     curs = conn.cursor()
 
     ip = ip_check()
@@ -18,7 +18,7 @@ def user_custom_head_view_2(conn):
 
         flask.session['head'] = get_data
 
-        return redirect('/custom_head')
+        return redirect('/change/head')
     else:
         if ip_or_user(ip) == 0:
             start = ''
