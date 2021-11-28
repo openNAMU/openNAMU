@@ -75,21 +75,13 @@ def main_upload_2(conn):
             db_data = curs.fetchall()
             if db_data and db_data[0][0] == 'namumark':
                 file_d = '' + \
-                    '[[file:' + name + ']]\n' + \
-                    '{{{[[file:' + name + ']]}}}\n\n' + \
                     flask.request.form.get('f_lice_sel', 'direct_input') + '\n' + \
-                    (ip if ip_or_user(ip) != 0 else '[[user:' + ip + ']]') + '\n' + \
-                    file_size + 'KB\n' + \
                     '[[category:' + re.sub(r'\]', '_', flask.request.form.get('f_lice_sel', '')) + ']]\n' + \
                     (g_lice if g_lice != '' else '') + \
                 ''
             else:
                 file_d = '' + \
-                    'file:' + name + '\n' + \
-                    '/image/' + e_data + '\n\n' + \
                     flask.request.form.get('f_lice_sel', 'direct_input') + '\n' + \
-                    ip + \
-                    file_size + 'KB\n\n' + \
                     (g_lice if g_lice != '' else '') + \
                 ''
 
