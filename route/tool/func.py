@@ -411,7 +411,7 @@ def get_default_admin_group():
 def load_image_url():
     curs.execute(db_change('select data from other where name = "image_where"'))
     image_where = curs.fetchall()
-    image_where = image_where[0][0] if image_where else 'data/images'
+    image_where = image_where[0][0] if image_where else os.path.join('data', 'images')
     
     return image_where
 
