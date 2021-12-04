@@ -603,8 +603,12 @@ def search_deep(name = 'test'):
 
 # Func-view
 @app.route('/xref/<everything:name>')
-def view_xref(name = None):
+def view_xref(name = 'Test'):
     return view_xref_2(conn, name)
+
+@app.route('/xref/this/<everything:name>')
+def view_xref_this(name = 'Test'):
+    return view_xref_2(conn, name, xref_type = '2')
 
 @app.route('/raw/<everything:name>')
 @app.route('/thread/<int:topic_num>/raw/<int:num>')
@@ -643,10 +647,13 @@ def edit_backlink_reset(name = 'Test'):
 def edit_delete(name = None):
     return edit_delete_2(conn, name)
 
-# 개편 예정
-@app.route('/many_delete', methods = ['POST', 'GET'])
-def edit_delete_many():
-    return edit_delete_many_2(conn)
+@app.route('/delete/doc_file/<everything:name>', methods = ['POST', 'GET'])
+def edit_delete_file(name = 'test.jpg'):
+    return edit_delete_file_2(conn, name)
+
+@app.route('/delete/doc_mutiple', methods = ['POST', 'GET'])
+def edit_delete_mutiple():
+    return edit_delete_mutiple_2(conn)
 
 @app.route('/move/<everything:name>', methods = ['POST', 'GET'])
 def edit_move(name = None):
