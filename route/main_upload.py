@@ -61,8 +61,7 @@ def main_upload_2(conn):
 
             data_url_image = load_image_url()
             if os.path.exists(os.path.join(data_url_image, e_data)):
-                os.remove(os.path.join(data_url_image, e_data))
-                data.save(os.path.join(data_url_image, e_data))
+                return re_error('/error/16')
             else:
                 data.save(os.path.join(data_url_image, e_data))
 

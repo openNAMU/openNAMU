@@ -59,16 +59,23 @@ def view_read_2(conn, name, doc_rev, doc_from):
         file_name = re.sub(r'\.([^.]+)$', '', name)
         file_name = re.sub(r'^file:', '', file_name)
         
-        file_size = str(round(os.path.getsize(os.path.join(load_image_url(), sha224_replace(file_name) + '.' + mime_type)) / 1000, 1))
-        file_data = '''
-            <img src="/image/''' + sha224_replace(file_name) + '''.''' + mime_type + '''">
-            <h2>DATA</h2>
-            <table>
-                <tr><td>URL</td><td><a href="/image/''' + url_pas(sha224_replace(name) + '.' + mime_type) + '''">LINK</a></td></tr>
-                <tr><td>VOLUME</td><td>''' + file_size + '''KB</td></tr>
-            </table>
-            <h2>CONTENT</h2>
-        '''
+        file_all_name = sha224_replace(file_name) + '.' + mime_type
+        file_path_name = os.path.join(load_image_url(), file_all_name)
+        if os.path.exists(file_path_name):
+            file_size = str(round(os.path.getsize(file_path_name) / 1000, 1))
+            file_data = '''
+                <img src="/image/''' + url_pas(file_all_name) + '''">
+                <h2>DATA</h2>
+                <table>
+                    <tr><td>URL</td><td><a href="/image/''' + url_pas(file_all_name) + '''">LINK</a></td></tr>
+                    <tr><td>VOLUME</td><td>''' + file_size + '''KB</td></tr>
+                </table>
+                <h2>CONTENT</h2>
+            '''
+
+            menu += [['delete/doc_file/' + url_pas(name), load_lang('file_delete')]]
+        else:
+            file_data = ''
             
     if num != '0':
         curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
