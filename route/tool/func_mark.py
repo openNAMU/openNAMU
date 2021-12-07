@@ -134,6 +134,22 @@ def render_do(doc_name, doc_data, data_type, data_in):
                 ''',
                 []
             ]
+        elif rep_data == 'markdown':
+            data_in = (data_in + '_') if data_in else ''
+            data_end = [
+                '<pre style="display: none;" id="' + data_in + 'render_content_set">' + html.escape(wiki_set_data) + '</pre>' + \
+                '<pre style="display: none;" id="' + data_in + 'render_content_load">' + html.escape(doc_data) + '</pre>' + \
+                '<div class="render_content" id="' + data_in + 'render_content"></div>', 
+                '''
+                    do_onmark_render(
+                        test_mode = "normal", 
+                        name_id = "''' + data_in + '''render_content",
+                        name_include = "''' + data_in + '''",
+                        name_doc = "''' + doc_name.replace('"', '//"') + '''"
+                    );
+                ''',
+                []
+            ]
         else:
             data_end = [
                 doc_data, 
