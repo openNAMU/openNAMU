@@ -102,39 +102,43 @@ def load_conn(data):
     load_conn2(data)
     
 # Func-init
-def get_conn(db_set = ''):
-    global global_db_set
-    if db_set != '':
-        global_db_set = db_set
-    else:
-        db_set = global_db_set
-    
-    if db_set['type'] == 'sqlite':
-        conn = sqlite3.connect(db_set['name'] + '.db')
-        curs = conn.cursor()
-    else:
-        conn = pymysql.connect(
-            host = db_set['mysql_host'],
-            user = db_set['mysql_user'],
-            password = db_set['mysql_pw'],
-            charset = 'utf8mb4',
-            port = int(db_set['mysql_port'])
-        )
-        curs = conn.cursor()
-    
-        try:
-            curs.execute(db_change(
-                'create database ' + db_set['name'] + ' ' + \
-                'default character set utf8mb4;'
-            ))
-        except:
-            pass
+class get_db_connect:
+    def __init__(self, db_set):
+        self.db_set = db_set
+        self.conn = ''
         
-        conn.select_db(db_set['name'])
+    def __call__(self):
+        return self.conn
         
-    load_conn(conn)
+    def __enter__(self):
+        if self.db_set['type'] == 'sqlite':
+            self.conn = sqlite3.connect(self.db_set['name'] + '.db')
+        else:
+            self.conn = pymysql.connect(
+                host = self.db_set['mysql_host'],
+                user = self.db_set['mysql_user'],
+                password = self.db_set['mysql_pw'],
+                charset = 'utf8mb4',
+                port = int(self.db_set['mysql_port'])
+            )
+            curs = self.conn.cursor()
+
+            try:
+                curs.execute(db_change(
+                    'create database ' + self.db_set['name'] + ' ' + \
+                    'default character set utf8mb4;'
+                ))
+            except:
+                pass
+
+            self.conn.select_db(self.db_set['name'])
+
+        load_conn(self.conn)
+
+        return self.conn
         
-    return conn
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.conn.close()
 
 def update(ver_num, set_data):
     print('----')
