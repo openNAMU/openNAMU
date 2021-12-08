@@ -153,8 +153,8 @@ function main_css_skin_load() {
     }
     
     if(
-        document.cookie.match(regex_data('main_css_darkmode')) &&
-        document.cookie.match(regex_data('main_css_darkmode'))[1] === '1'
+        document.cookie.match(main_css_regex_data('main_css_darkmode')) &&
+        document.cookie.match(main_css_regex_data('main_css_darkmode'))[1] === '1'
     ) {
         head_data.innerHTML += '' +
             '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=5">' +
