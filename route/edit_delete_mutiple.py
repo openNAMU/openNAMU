@@ -1,7 +1,7 @@
 from .tool.func import *
 from . import edit_delete
 
-def edit_delete_many_2(conn):
+def edit_delete_mutiple_2(conn):
     curs = conn.cursor()
 
     ip = ip_check()

@@ -4,8 +4,14 @@ def view_read_2(conn, name, doc_rev, doc_from):
     curs = conn.cursor()
 
     sub = ''
-    div = ''
+    menu = []
+    
+    user_doc = ''
+    category_doc = ''
+    file_data = ''
+    
     ip = ip_check()
+    
     name_doc_pass = doc_from
     uppage = re.sub(r"/([^/]+)$", '', name)
     num = str(doc_rev)        
@@ -33,9 +39,44 @@ def view_read_2(conn, name, doc_rev, doc_from):
 
         if category_sub != '':
             category_doc += '<h2 id="cate_under">' + load_lang('under_category') + '</h2><ul class="inside_ul">' + category_sub + '</ul>'
+    elif re.search(r"^user:([^/]*)", name):
+        match = re.search(r"^user:([^/]*)", name)
+        user_name = html.escape(match.group(1))
+        user_doc = '''
+            <div id="get_user_info"></div>
+            <script>load_user_info("''' + user_name + '''");</script>
+            <hr class="main_hr">
+        '''
+        if name == 'user:' + user_name:
+            menu += [['w/' + url_pas(name) + '/' + url_pas(get_time().split()[0]), load_lang('today_doc')]]
+    elif re.search(r"^file:", name):
+        mime_type = re.search(r'([^.]+)$', name)
+        if mime_type:
+            mime_type = mime_type.group(1).lower()
+        else:
+            mime_type = 'jpg'
             
-        div += category_doc
+        file_name = re.sub(r'\.([^.]+)$', '', name)
+        file_name = re.sub(r'^file:', '', file_name)
+        
+        file_all_name = sha224_replace(file_name) + '.' + mime_type
+        file_path_name = os.path.join(load_image_url(), file_all_name)
+        if os.path.exists(file_path_name):
+            file_size = str(round(os.path.getsize(file_path_name) / 1000, 1))
+            file_data = '''
+                <img src="/image/''' + url_pas(file_all_name) + '''">
+                <h2>DATA</h2>
+                <table>
+                    <tr><td>URL</td><td><a href="/image/''' + url_pas(file_all_name) + '''">LINK</a></td></tr>
+                    <tr><td>VOLUME</td><td>''' + file_size + '''KB</td></tr>
+                </table>
+                <h2>CONTENT</h2>
+            '''
 
+            menu += [['delete/doc_file/' + url_pas(name), load_lang('file_delete')]]
+        else:
+            file_data = ''
+            
     if num != '0':
         curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
         if curs.fetchall() and admin_check(6) != 1:
@@ -92,7 +133,7 @@ def view_read_2(conn, name, doc_rev, doc_from):
         response_data = 200
 
     if num != '0':
-        menu = [['history/' + url_pas(name), load_lang('history')]]
+        menu += [['history/' + url_pas(name), load_lang('history')]]
         sub = ' (r' + str(num) + ')'
         acl = 0
         r_date = 0
@@ -101,9 +142,9 @@ def view_read_2(conn, name, doc_rev, doc_from):
         acl = 1 if curs.fetchall() else 0
         menu_acl = 1 if acl_check(name) == 1 else 0
         if response_data == 404:
-            menu = [['edit/' + url_pas(name), load_lang('create'), menu_acl]] 
+            menu += [['edit/' + url_pas(name), load_lang('create'), menu_acl]] 
         else:
-            menu = [['edit/' + url_pas(name), load_lang('edit'), menu_acl]]
+            menu += [['edit/' + url_pas(name), load_lang('edit'), menu_acl]]
             
         menu += [
             ['topic/' + url_pas(name), load_lang('discussion'), topic], 
@@ -131,18 +172,7 @@ def view_read_2(conn, name, doc_rev, doc_from):
         r_date = curs.fetchall()
         r_date = r_date[0][0] if r_date else 0
 
-    div = end_data + div
-
-    match = re.search(r"^user:([^/]*)", name)
-    if match:
-        user_name = html.escape(match.group(1))
-        div = '''
-            <div id="get_user_info"></div>
-            <script>load_user_info("''' + user_name + '''");</script>
-            <hr class="main_hr">
-        ''' + div
-        if name == 'user:' + user_name:
-            menu += [['w/' + url_pas(name) + '/' + url_pas(get_time().split()[0]), load_lang('today_doc')]]
+    div = file_data + user_doc + end_data + category_doc
 
     curs.execute(db_change("select data from other where name = 'body'"))
     body = curs.fetchall()
