@@ -209,12 +209,16 @@ with get_db_connect(data_db_set) as conn:
             super(RegexConverter, self).__init__(url_map)
             self.regex = items[0]
 
-    app = flask.Flask(__name__, template_folder = './')
+    app = flask.Flask(
+        __name__, 
+        template_folder = './'
+    )
 
     app.config['JSON_AS_ASCII'] = False
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
-    app.logger.setLevel(logging.ERROR)
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
 
     app.jinja_env.filters['md5_replace'] = md5_replace
     app.jinja_env.filters['load_lang'] = load_lang
@@ -1091,7 +1095,8 @@ def main_error_404(e):
         return main_error_404_2(conn)
     
 if __name__ == "__main__":
-    WSGIServer((
-        server_set['host'], 
-        int(server_set['port'])
-    ), app, log = app.logger).serve_forever()
+    waitress.serve(
+        app,
+        host = server_set['host'],
+        port = int(server_set['port']), 
+    )
