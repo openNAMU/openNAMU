@@ -64,7 +64,7 @@ from .func_mark import *
 
 from diff_match_patch import diff_match_patch
 
-from gevent.pywsgi import WSGIServer
+import waitress
 
 import werkzeug.routing
 import werkzeug.debug
@@ -108,6 +108,8 @@ class get_db_connect:
         self.conn = ''
         
     def __call__(self):
+        load_conn(self.conn)
+        
         return self.conn
         
     def __enter__(self):
