@@ -108,13 +108,8 @@ class get_db_connect:
         self.conn = ''
         
     def __call__(self):
-        load_conn(self.conn)
-        
-        return self.conn
-        
-    def __enter__(self):
         if self.db_set['type'] == 'sqlite':
-            self.conn = sqlite3.connect(self.db_set['name'] + '.db')
+            self.conn = sqlite3.connect(self.db_set['name'] + '.db', check_same_thread = False)
         else:
             self.conn = pymysql.connect(
                 host = self.db_set['mysql_host'],
@@ -138,9 +133,6 @@ class get_db_connect:
         load_conn(self.conn)
 
         return self.conn
-        
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.conn.close()
 
 def update(ver_num, set_data):
     print('----')
