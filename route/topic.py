@@ -106,7 +106,7 @@ def topic_2(conn, topic_num):
                 <a href="/thread/''' + topic_num + '/tool">(' + load_lang('topic_tool') + ''')</a>
                 <hr class="main_hr">
                 <form style="''' + display + '''" method="post">
-                    <textarea id="content" class="topic_content" placeholder="''' + load_lang('content') + '''" name="content"></textarea>
+                    <textarea id="textarea_edit_view" class="topic_content" placeholder="''' + load_lang('content') + '''" name="content"></textarea>
                     <hr class="main_hr">
                     ''' + captcha_get() + (ip_warning() if display == '' else '') + '''
                     <input style="display: none;" name="topic" value="''' + name + '''">
