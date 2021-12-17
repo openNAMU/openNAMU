@@ -503,7 +503,7 @@ function do_onmark_footnote_render(data, name_include) {
             
             footnote_end_data += '' +
                 '<li>' +
-                    '<a href="javascript:do_open_foot(\'' + name_include + 'fn-' + String(i) + '\', 1);" ' +
+                    '<a href="javascript:do_open_foot(\'' + name_include + '\', \'fn-' + String(i) + '\', 1);" ' +
                         'id="' + name_include + 'cfn-' + String(i) + '">' +
                         '(' + footnote_name + ')' +
                     '</a> <span id="' + name_include + 'fn-' + String(i) + '">' + footnote_line_data + '</span>' +
@@ -511,7 +511,7 @@ function do_onmark_footnote_render(data, name_include) {
             '';
             data = data.replace(footnote_re, '' +
                 '<sup>' +
-                    '<a href="javascript:do_open_foot(\'' + name_include + 'fn-' + String(i) + '\', 0);" ' +
+                    '<a href="javascript:do_open_foot(\'' + name_include + '\', \'fn-' + String(i) + '\', 0);" ' +
                         'id="' + name_include + 'rfn-' + String(i) + '">' +
                         '(' + footnote_name + ')' +
                     '</a>' +
@@ -529,7 +529,7 @@ function do_onmark_footnote_render(data, name_include) {
         }
     }
     
-    if(name_include === '' && footnote_end_data !== '') {
+    if(footnote_end_data !== '') {
         data = do_end_br_replace(data) + '<ul id="footnote_data">' + footnote_end_data + '</ul>';
     }
     
@@ -1246,7 +1246,7 @@ function do_onmark_redirect_render(data, data_js, name_doc) {
         
         if(
             window.location.search === '' &&
-            window.location.pathname.match(/^\/doc_from\//)
+            !window.location.pathname.match(/\/doc_from\//)
         ) {
             window.location.href = '/w/' + do_url_change(link_main) + '/doc_from/' + do_url_change(name_doc) + link_sub;
         }
@@ -1349,9 +1349,9 @@ function do_onmark_render(
     data_js += '' + 
         'get_link_state("' + name_include + '");\n' + 
         'get_file_state("' + name_include + '");\n' + 
-		'get_heading_name();'
+		'get_heading_name();' +
+        'render_html("' + name_include + 'nowiki_html");\n' +
     ''
-    data_js += 'render_html("' + name_include + 'nowiki_html");\n'
     
     if(test_mode === 'normal') {
         document.getElementById(name_id).innerHTML = data + '<script>' + data_js + '</script>';
