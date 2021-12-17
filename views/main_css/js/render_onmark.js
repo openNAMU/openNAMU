@@ -1246,7 +1246,7 @@ function do_onmark_redirect_render(data, data_js, name_doc) {
         
         if(
             window.location.search === '' &&
-            window.location.pathname.match(/^\/w\//)
+            window.location.pathname.match(/^\/doc_from\//)
         ) {
             window.location.href = '/w/' + do_url_change(link_main) + '/doc_from/' + do_url_change(name_doc) + link_sub;
         }
