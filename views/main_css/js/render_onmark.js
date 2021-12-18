@@ -862,7 +862,6 @@ function do_onmark_include_render(data, data_js, name_include, data_nowiki) {
 
 function do_onmark_nowiki_before_render(data, data_js, name_include, data_nowiki) {   
     var num_nowiki = 0;
-    console.log(data);
     data = data.replace(/\\(&gt;|&lt;|.)/g, function(x, x_1) {
         num_nowiki += 1;
         data_nowiki[name_include + 'nowiki_one_' + String(num_nowiki)] = x_1;
