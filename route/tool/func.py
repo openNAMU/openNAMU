@@ -107,7 +107,7 @@ class get_db_connect:
         self.db_set = db_set
         self.conn = ''
         
-    def __call__(self):
+    def db_load(self):
         if self.db_set['type'] == 'sqlite':
             self.conn = sqlite3.connect(self.db_set['name'] + '.db', check_same_thread = False)
         else:
@@ -116,7 +116,7 @@ class get_db_connect:
                 user = self.db_set['mysql_user'],
                 password = self.db_set['mysql_pw'],
                 charset = 'utf8mb4',
-                port = int(self.db_set['mysql_port'])
+                port = int(self.db_set['mysql_port']),
             )
             curs = self.conn.cursor()
 
@@ -132,6 +132,12 @@ class get_db_connect:
 
         load_conn(self.conn)
 
+        return self.conn
+    
+    def db_get(self):
+        if self.db_set['type'] != 'sqlite':
+            self.conn.ping(reconnect = True)
+            
         return self.conn
 
 def update(ver_num, set_data):
