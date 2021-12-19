@@ -913,7 +913,7 @@ def main_restart():
 
 @app.route('/update', methods=['GET', 'POST'])
 def main_update():
-    return main_update_2(load_db.db_get(), version_list['beta']['r_ver'])
+    return main_update_2(load_db.db_get())
 
 @app.route('/random')
 def main_title_random():
