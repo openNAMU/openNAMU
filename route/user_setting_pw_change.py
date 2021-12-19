@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def login_pw_change_2(conn):
+def user_setting_pw_change_2(conn):
     curs = conn.cursor()
 
     if ban_check() == 1:
