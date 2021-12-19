@@ -14,7 +14,7 @@ def user_alarm_2(conn):
         data = '<a href="/alarm/delete">(' + load_lang('delete') + ')</a><hr class=\"main_hr\">' + data
 
         for data_one in data_list:
-            data += '<li>' + data_one[0] + ' (' + data_one[1] + ')</li>'
+            data += '<li>' + html.escape(data_one[0]) + ' (' + data_one[1] + ')</li>'
 
     data += '</ul>' + next_fix('/alarm?num=', num, data_list)
 

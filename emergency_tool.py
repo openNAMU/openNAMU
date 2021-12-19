@@ -123,7 +123,9 @@ if data_db_load == 'Y':
             data_db_set['mysql_port'] = '3306'
 
     db_data_get(data_db_set['type'])
-    conn = get_conn(data_db_set)
+    load_db = get_db_connect(data_db_set)
+
+    conn = load_db.db_load()
     curs = conn.cursor()
 else:
     print('----')

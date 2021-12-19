@@ -131,7 +131,7 @@ if data_db_set['type'] == 'mysql':
 db_data_get(data_db_set['type'])
 load_db = get_db_connect(data_db_set)
 
-conn = load_db()
+conn = load_db.db_load()
 curs = conn.cursor()
 
 setup_tool = ''
@@ -342,179 +342,190 @@ conn.commit()
 # Init-custom
 if os.path.exists('custom.py'):
     from custom import custom_run
-    custom_run(conn, app)
+    custom_run(load_db.db_get(), app)
     
 # Func
 # Func-inter_wiki
-@app.route('/inter_wiki')
-def inter_wiki():
-    return inter_wiki_2(conn, 'inter_wiki')
+app.add_url_rule(
+    rule = '/inter_wiki',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'inter_wiki' 
+    }, 
+    view_func = inter_wiki
+)
 
-@app.route('/inter_wiki/del/<name>')
-def inter_wiki_del(name = 'Test'):
-    return inter_wiki_del_2(conn, 'del_inter_wiki', name)
+app.add_url_rule(
+    rule = '/inter_wiki/del/<name>',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'del_inter_wiki',
+        'name' : 'Test'
+    }, 
+    view_func = inter_wiki_del
+)
 
 @app.route('/edit_top')
 def inter_wiki_edit_top():
-    return inter_wiki_2(conn, 'edit_top')
+    return inter_wiki(load_db.db_get(), 'edit_top')
 
 @app.route('/edit_top/del/<name>')
 def inter_wiki_edit_top_del(name = 'Test'):
-    return inter_wiki_del_2(conn, 'del_edit_top', name)
+    return inter_wiki_del(load_db.db_get(), 'del_edit_top', name)
 
 @app.route('/image_license')
 def inter_wiki_image_license():
-    return inter_wiki_2(conn, 'image_license')
+    return inter_wiki(load_db.db_get(), 'image_license')
 
 @app.route('/image_license/del/<name>')
 def inter_wiki_image_license_del(name = 'Test'):
-    return inter_wiki_del_2(conn, 'del_image_license', name)
+    return inter_wiki_del(load_db.db_get(), 'del_image_license', name)
 
 @app.route('/edit_filter')
 def inter_wiki_edit_filter():
-    return inter_wiki_2(conn, 'edit_filter')
+    return inter_wiki(load_db.db_get(), 'edit_filter')
 
 @app.route('/edit_filter/del/<name>')
 def inter_wiki_edit_filter_del(name = 'Test'):
-    return inter_wiki_del_2(conn, 'del_edit_filter', name)
+    return inter_wiki_del(load_db.db_get(), 'del_edit_filter', name)
 
 @app.route('/email_filter')
 def inter_wiki_email_filter():
-    return inter_wiki_2(conn, 'email_filter')
+    return inter_wiki(load_db.db_get(), 'email_filter')
 
 @app.route('/email_filter/del/<name>')
 def inter_wiki_email_filter_del(name = 'Test'):
-    return inter_wiki_del_2(conn, 'del_email_filter', name)
+    return inter_wiki_del(load_db.db_get(), 'del_email_filter', name)
 
 @app.route('/file_filter')
 def inter_wiki_file_filter():
-    return inter_wiki_2(conn, 'file_filter')
+    return inter_wiki(load_db.db_get(), 'file_filter')
 
 @app.route('/file_filter/del/<name>')
 def inter_wiki_file_filter_del(name = 'Test'):
-    return inter_wiki_del_2(conn, 'del_file_filter', name)
+    return inter_wiki_del(load_db.db_get(), 'del_file_filter', name)
 
 @app.route('/name_filter')
 def inter_wiki_name_filter():
-    return inter_wiki_2(conn, 'name_filter')
+    return inter_wiki(load_db.db_get(), 'name_filter')
 
 @app.route('/name_filter/del/<name>')
 def inter_wiki_name_filter_del(name = 'Test'):
-    return inter_wiki_del_2(conn, 'del_name_filter', name)
+    return inter_wiki_del(load_db.db_get(), 'del_name_filter', name)
 
 @app.route('/extension_filter')
 def inter_wiki_extension_filter():
-    return inter_wiki_2(conn, 'extension_filter')
+    return inter_wiki(load_db.db_get(), 'extension_filter')
 
 @app.route('/extension_filter/del/<name>')
 def inter_wiki_extension_filter_del(name = 'Test'):
-    return inter_wiki_del_2(conn, 'del_extension_filter', name)
+    return inter_wiki_del(load_db.db_get(), 'del_extension_filter', name)
 
 @app.route('/<regex("(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/add', methods = ['POST', 'GET'])
 @app.route('/<regex("(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/add/<name>', methods = ['POST', 'GET'])
 def inter_wiki_plus(tools = None, name = None):
-    return inter_wiki_plus_2(conn, 'plus_' + tools, name)
+    return inter_wiki_plus_2(load_db.db_get(), 'plus_' + tools, name)
 
 # Func-list
 # /list/topic/open
 @app.route('/not_close_topic')
 def list_not_close_topic():
-    return list_not_close_topic_2(conn)
+    return list_not_close_topic_2(load_db.db_get())
 
 # /list/document/old
 @app.route('/old_page')
 def list_old_page():
-    return list_old_page_2(conn)
+    return list_old_page_2(load_db.db_get())
 
 # /list/document/acl
 @app.route('/acl_list')
 def list_acl():
-    return list_acl_2(conn)
+    return list_acl_2(load_db.db_get())
 
 # /list/document/acl/add
 @app.route('/acl/<everything:name>', methods = ['POST', 'GET'])
 def give_acl(name = None):
-    return give_acl_2(conn, name)
+    return give_acl_2(load_db.db_get(), name)
 
 # /list/document/need
 @app.route('/please')
 def list_please():
-    return list_please_2(conn)
+    return list_please_2(load_db.db_get())
 
 # /list/document/all
 @app.route('/title_index')
 def list_title_index():
-    return list_title_index_2(conn)
+    return list_title_index_2(load_db.db_get())
 
 # /list/document/long
 @app.route('/long_page')
 def list_long_page():
-    return list_long_page_2(conn, 'long_page')
+    return list_long_page_2(load_db.db_get(), 'long_page')
 
 # /list/document/short
 @app.route('/short_page')
 def list_short_page():
-    return list_long_page_2(conn, 'short_page')
+    return list_long_page_2(load_db.db_get(), 'short_page')
 
 # /list/file
 @app.route('/image_file_list')
 def list_image_file():
-    return list_image_file_2(conn)
+    return list_image_file_2(load_db.db_get())
 
 # /list/admin
 # /list/admin/list
 @app.route('/admin_list')
 def list_admin():
-    return list_admin_2(conn)
+    return list_admin_2(load_db.db_get())
 
 # /list/admin/auth_use
 @app.route('/admin_log', methods = ['POST', 'GET'])
 def list_admin_use():
-    return list_admin_use_2(conn)
+    return list_admin_use_2(load_db.db_get())
 
 # /list/user
 @app.route('/user_log')
 def list_user():
-    return list_user_2(conn)
+    return list_user_2(load_db.db_get())
 
 # /list/user/check
 @app.route('/check/<name>')
 def give_user_check(name = None):
-    return give_user_check_2(conn, name)
+    return give_user_check_2(load_db.db_get(), name)
     
 # /list/user/check/delete
 @app.route('/check_delete', methods = ['POST', 'GET'])
 def give_user_check_delete():
-    return give_user_check_delete_2(conn)
+    return give_user_check_delete_2(load_db.db_get())
 
 # Func-auth
 # /auth/give
 # /auth/give/<name>
 @app.route('/admin/<name>', methods = ['POST', 'GET'])
 def give_admin(name = None):
-    return give_admin_2(conn, name)
+    return give_admin_2(load_db.db_get(), name)
 
 # /auth/give
 # /auth/give/<name>
 @app.route('/ban', methods = ['POST', 'GET'])
 @app.route('/ban/<name>', methods = ['POST', 'GET'])
 def give_user_ban(name = None):
-    return give_user_ban_2(conn, name)
+    return give_user_ban_2(load_db.db_get(), name)
 
 # /auth/list
 @app.route('/admin_group')
 def list_admin_group():
-    return list_admin_group_2(conn)
+    return list_admin_group_2(load_db.db_get())
 
 # /auth/list/add/<name>
 @app.route('/admin_plus/<name>', methods = ['POST', 'GET'])
 def give_admin_groups(name = None):
-    return give_admin_groups_2(conn, name)
+    return give_admin_groups_2(load_db.db_get(), name)
 
 # /auth/list/delete/<name>
 @app.route('/delete_admin_group/<name>', methods = ['POST', 'GET'])
 def give_delete_admin_group(name = None):
-    return give_delete_admin_group_2(conn, name)
+    return give_delete_admin_group_2(load_db.db_get(), name)
 
 # /auth/history
 # ongoing 반영 필요
@@ -522,230 +533,230 @@ def give_delete_admin_group(name = None):
 @app.route('/block_log/<regex("user"):tool>/<name>')
 @app.route('/block_log/<regex("admin"):tool>/<name>')
 def recent_block(name = 'Test', tool = 'all'):
-    return recent_block_2(conn, name, tool)
+    return recent_block_2(load_db.db_get(), name, tool)
 
 # Func-history
 @app.route('/recent_change')
 @app.route('/recent_changes')
 def recent_change(name = None):
-    return recent_change_2(conn, name, '')
+    return recent_change_2(load_db.db_get(), name, '')
 
 @app.route('/record/<name>')
 def recent_record(name = None):
-    return recent_change_2(conn, name, 'record')
+    return recent_change_2(load_db.db_get(), name, 'record')
 
 @app.route('/history/<everything:name>', methods = ['POST', 'GET'])
 def recent_history(name = None):
-    return recent_change_2(conn, name, 'history')
+    return recent_change_2(load_db.db_get(), name, 'history')
 
 @app.route('/history/tool/<int(signed=True):rev>/<everything:name>')
 def recent_history_tool(name = 'Test', rev = 1):
-    return recent_history_tool_2(conn, name, rev)
+    return recent_history_tool_2(load_db.db_get(), name, rev)
 
 @app.route('/history/delete/<int(signed=True):rev>/<everything:name>', methods = ['POST', 'GET'])
 def recent_history_delete(name = 'Test', rev = 1):
-    return recent_history_delete_2(conn, name, rev)
+    return recent_history_delete_2(load_db.db_get(), name, rev)
 
 @app.route('/history/hidden/<int(signed=True):rev>/<everything:name>')
 def recent_history_hidden(name = 'Test', rev = 1):
-    return recent_history_hidden_2(conn, name, rev)
+    return recent_history_hidden_2(load_db.db_get(), name, rev)
 
 @app.route('/history/send/<int(signed=True):rev>/<everything:name>', methods = ['POST', 'GET'])
 def recent_history_send(name = 'Test', rev = 1):
-    return recent_history_send_2(conn, name, rev)
+    return recent_history_send_2(load_db.db_get(), name, rev)
 
 @app.route('/history/reset/<everything:name>', methods = ['POST', 'GET'])
 def recent_history_reset(name = 'Test'):
-    return recent_history_reset_2(conn, name)
+    return recent_history_reset_2(load_db.db_get(), name)
 
 @app.route('/history/add/<everything:name>', methods = ['POST', 'GET'])
 def recent_history_add(name = 'Test'):
-    return recent_history_add_2(conn, name)
+    return recent_history_add_2(load_db.db_get(), name)
 
 @app.route('/record/reset/<name>', methods = ['POST', 'GET'])
 def recent_record_reset(name = 'Test'):
-    return recent_record_reset_2(conn, name)
+    return recent_record_reset_2(load_db.db_get(), name)
 
 @app.route('/record/topic/<name>')
 def recent_record_topic(name = 'Test'):
-    return recent_record_topic_2(conn, name)
+    return recent_record_topic_2(load_db.db_get(), name)
 
 # 거처를 고심중
 @app.route('/app_submit', methods = ['POST', 'GET'])
 def recent_app_submit():
-    return recent_app_submit_2(conn)
+    return recent_app_submit_2(load_db.db_get())
 
 # Func-search
 @app.route('/search', methods=['POST'])
 def search():
-    return search_2(conn)
+    return search_2(load_db.db_get())
 
 @app.route('/goto', methods=['POST'])
 @app.route('/goto/<everything:name>', methods=['POST'])
 def search_goto(name = 'test'):
-    return search_goto_2(conn, name)
+    return search_goto_2(load_db.db_get(), name)
 
 @app.route('/search/<everything:name>')
 def search_deep(name = 'test'):
-    return search_deep_2(conn, name)
+    return search_deep_2(load_db.db_get(), name)
 
 # Func-view
 @app.route('/xref/<everything:name>')
 def view_xref(name = 'Test'):
-    return view_xref_2(conn, name)
+    return view_xref_2(load_db.db_get(), name)
 
 @app.route('/xref/this/<everything:name>')
 def view_xref_this(name = 'Test'):
-    return view_xref_2(conn, name, xref_type = '2')
+    return view_xref_2(load_db.db_get(), name, xref_type = '2')
 
 @app.route('/raw/<everything:name>')
 @app.route('/thread/<int:topic_num>/raw/<int:num>')
 def view_raw(name = None, topic_num = None, num = None):
-    return view_raw_2(conn, name, topic_num, num)
+    return view_raw_2(load_db.db_get(), name, topic_num, num)
 
 @app.route('/diff/<int:num_a>/<int:num_b>/<everything:name>')
 def view_diff(name = 'Test', num_a = 1, num_b = 1):
-    return view_diff_2(conn, name, num_a, num_b)
+    return view_diff_2(load_db.db_get(), name, num_a, num_b)
 
 @app.route('/down/<everything:name>')
 def view_down(name = None):
-    return view_down_2(conn, name)
+    return view_down_2(load_db.db_get(), name)
 
 @app.route('/w/<everything:name>/doc_rev/<int:doc_rev>')
 @app.route('/w/<everything:name>/doc_from/<everything:doc_from>')
 @app.route('/w/<everything:name>')
 def view_read(name = 'Test', doc_rev = 0, doc_from = ''):
-    return view_read_2(conn, name, doc_rev, doc_from)
+    return view_read_2(load_db.db_get(), name, doc_rev, doc_from)
 
 # Func-edit
 @app.route('/revert/<everything:name>', methods = ['POST', 'GET'])
 def edit_revert(name = None):
-    return edit_revert_2(conn, name)
+    return edit_revert_2(load_db.db_get(), name)
 
 @app.route('/edit/<everything:name>', methods = ['POST', 'GET'])
 @app.route('/edit/<everything:name>/doc_section/<int:section>', methods = ['POST', 'GET'])
 def edit(name = 'Test', section = 0):
-    return edit_2(conn, name, section)
+    return edit_2(load_db.db_get(), name, section)
 
 @app.route('/backlink_reset/<everything:name>')
 def edit_backlink_reset(name = 'Test'):
-    return edit_backlink_reset_2(conn, name)
+    return edit_backlink_reset_2(load_db.db_get(), name)
 
 @app.route('/delete/<everything:name>', methods = ['POST', 'GET'])
 def edit_delete(name = None):
-    return edit_delete_2(conn, name)
+    return edit_delete_2(load_db.db_get(), name)
 
 @app.route('/delete/doc_file/<everything:name>', methods = ['POST', 'GET'])
 def edit_delete_file(name = 'test.jpg'):
-    return edit_delete_file_2(conn, name)
+    return edit_delete_file_2(load_db.db_get(), name)
 
 @app.route('/delete/doc_mutiple', methods = ['POST', 'GET'])
 def edit_delete_mutiple():
-    return edit_delete_mutiple_2(conn)
+    return edit_delete_mutiple_2(load_db.db_get())
 
 @app.route('/move/<everything:name>', methods = ['POST', 'GET'])
 def edit_move(name = None):
-    return edit_move_2(conn, name)
+    return edit_move_2(load_db.db_get(), name)
 
 # Func-topic
 @app.route('/recent_discuss')
 def recent_discuss():
-    return recent_discuss_2(conn)
+    return recent_discuss_2(load_db.db_get())
 
 @app.route('/thread/<int:topic_num>/b/<int:num>')
 def topic_block(topic_num = 1, num = 1):
-    return topic_block_2(conn, topic_num, num)
+    return topic_block_2(load_db.db_get(), topic_num, num)
 
 @app.route('/thread/<int:topic_num>/notice/<int:num>')
 def topic_top(topic_num = 1, num = 1):
-    return topic_top_2(conn, topic_num, num)
+    return topic_top_2(load_db.db_get(), topic_num, num)
 
 @app.route('/thread/<int:topic_num>/setting', methods = ['POST', 'GET'])
 def topic_stop(topic_num = 1):
-    return topic_stop_2(conn, topic_num)
+    return topic_stop_2(load_db.db_get(), topic_num)
 
 @app.route('/thread/<int:topic_num>/acl', methods = ['POST', 'GET'])
 def topic_acl(topic_num = 1):
-    return topic_acl_2(conn, topic_num)
+    return topic_acl_2(load_db.db_get(), topic_num)
 
 @app.route('/thread/<int:topic_num>/delete', methods = ['POST', 'GET'])
 def topic_delete(topic_num = 1):
-    return topic_delete_2(conn, topic_num)
+    return topic_delete_2(load_db.db_get(), topic_num)
 
 @app.route('/thread/<int:topic_num>/tool')
 def topic_tool(topic_num = 1):
-    return topic_tool_2(conn, topic_num)
+    return topic_tool_2(load_db.db_get(), topic_num)
 
 @app.route('/thread/<int:topic_num>/change', methods = ['POST', 'GET'])
 def topic_change(topic_num = 1):
-    return topic_change_2(conn, topic_num)
+    return topic_change_2(load_db.db_get(), topic_num)
 
 @app.route('/thread/<int:topic_num>/admin/<int:num>')
 def topic_admin(topic_num = 1, num = 1):
-    return topic_admin_2(conn, topic_num, num)
+    return topic_admin_2(load_db.db_get(), topic_num, num)
 
 @app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])
 def topic(topic_num = 1):
-    return topic_2(conn, topic_num)
+    return topic_2(load_db.db_get(), topic_num)
 
 @app.route('/topic/<everything:name>', methods = ['POST', 'GET'])
 def topic_close_list(name = 'test'):
-    return topic_close_list_2(conn, name)
+    return topic_close_list_2(load_db.db_get(), name)
 
 # Func-user
 @app.route('/change', methods = ['POST', 'GET'])
 def user_setting():
-    return user_setting_2(conn, server_set_var)
+    return user_setting_2(load_db.db_get(), server_set_var)
 
 @app.route('/change/email', methods = ['POST', 'GET'])
 def user_setting_email():
-    return user_setting_email_2(conn)
+    return user_setting_email_2(load_db.db_get())
 
 @app.route('/change/email/check', methods = ['POST', 'GET'])
 def user_setting_email_check():
-    return user_setting_email_check_2(conn)
+    return user_setting_email_check_2(load_db.db_get())
 
 @app.route('/change/pw', methods = ['POST', 'GET'])
 def user_setting_pw_change():
-    return user_setting_pw_change_2(conn)
+    return user_setting_pw_change_2(load_db.db_get())
 
 @app.route('/change/head', methods=['GET', 'POST'])
 def user_setting_head():
-    return user_setting_head_2(conn)
+    return user_setting_head_2(load_db.db_get())
 
 @app.route('/user')
 @app.route('/user/<name>')
 def user_info(name = ''):
-    return user_info_2(conn, name)
+    return user_info_2(load_db.db_get(), name)
 
 @app.route('/count')
 @app.route('/count/<name>')
 def user_count_edit(name = None):
-    return user_count_edit_2(conn, name)
+    return user_count_edit_2(load_db.db_get(), name)
     
 @app.route('/alarm')
 def user_alarm():
-    return user_alarm_2(conn)
+    return user_alarm_2(load_db.db_get())
 
 @app.route('/alarm/delete')
 def user_alarm_del():
-    return user_alarm_del_2(conn)
+    return user_alarm_del_2(load_db.db_get())
     
 @app.route('/watch_list')
 def user_watch_list():
-    return user_watch_list_2(conn, 'watch_list')
+    return user_watch_list_2(load_db.db_get(), 'watch_list')
 
 @app.route('/watch_list/<everything:name>')
 def user_watch_list_name(name = 'Test'):
-    return user_watch_list_name_2(conn, 'watch_list', name)
+    return user_watch_list_name_2(load_db.db_get(), 'watch_list', name)
 
 @app.route('/star_doc')
 def user_star_doc():
-    return user_watch_list_2(conn, 'star_doc')
+    return user_watch_list_2(load_db.db_get(), 'star_doc')
 
 @app.route('/star_doc/<everything:name>')
 def user_star_doc_name(name = 'Test'):
-    return user_watch_list_name_2(conn, 'star_doc', name)
+    return user_watch_list_name_2(load_db.db_get(), 'star_doc', name)
 
 # Func-login
 # 개편 예정
@@ -756,208 +767,208 @@ def user_star_doc_name(name = 'Test'):
 
 @app.route('/login', methods = ['POST', 'GET'])
 def login_login():
-    return login_login_2(conn)
+    return login_login_2(load_db.db_get())
 
 @app.route('/login/2fa', methods = ['POST', 'GET'])
 def login_login_2fa():
-    return login_login_2fa_2(conn)
+    return login_login_2fa_2(load_db.db_get())
 
 '''
 @app.route('/login/2fa/email', methods = ['POST', 'GET'])
 def login_2fa_email():
-    return login_login_2fa_email_2(conn)
+    return login_login_2fa_email_2(load_db.db_get())
 '''
 
 @app.route('/register', methods = ['POST', 'GET'])
 def login_register():
-    return login_register_2(conn)
+    return login_register_2(load_db.db_get())
 
 @app.route('/register/email', methods = ['POST', 'GET'])
 def login_register_email():
-    return login_register_email_2(conn)
+    return login_register_email_2(load_db.db_get())
 
 @app.route('/register/email/check', methods = ['POST', 'GET'])
 def login_register_email_check():
-    return login_register_email_check_2(conn)
+    return login_register_email_check_2(load_db.db_get())
 
 @app.route('/register/submit', methods = ['POST', 'GET'])
 def login_register_submit():
-    return login_register_submit_2(conn)
+    return login_register_submit_2(load_db.db_get())
 
 # 개편 필요
 @app.route('/pass_find', methods = ['POST', 'GET'])
 def login_pass_find():
-    return login_pass_find_2(conn, 'pass_find')
+    return login_pass_find_2(load_db.db_get(), 'pass_find')
 
 @app.route('/pass_find/email', methods = ['POST', 'GET'])
 def login_pass_find_email():
-    return login_pass_find_email_2(conn, 'check_key')
+    return login_pass_find_email_2(load_db.db_get(), 'check_key')
 
 @app.route('/logout')
 def login_logout():
-    return login_logout_2(conn)
+    return login_logout_2(load_db.db_get())
 
 # Func-vote
 @app.route('/vote/<int:num>', methods = ['POST', 'GET'])
 def vote_select(num = 1):
-    return vote_select_2(conn, str(num))
+    return vote_select_2(load_db.db_get(), str(num))
 
 @app.route('/vote/end/<int:num>')
 def vote_end(num = 1):
-    return vote_end_2(conn, str(num))
+    return vote_end_2(load_db.db_get(), str(num))
 
 @app.route('/vote/close/<int:num>')
 def vote_close(num = 1):
-    return vote_close_2(conn, str(num))
+    return vote_close_2(load_db.db_get(), str(num))
 
 @app.route('/vote')
 @app.route('/vote/list')
 @app.route('/vote/list/<int:num>')
 def vote_list(num = 1):
-    return vote_list_2(conn, 'normal', num)
+    return vote_list_2(load_db.db_get(), 'normal', num)
 
 @app.route('/vote/list/close')
 @app.route('/vote/list/close/<int:num>')
 def vote_list_close(num = 1):
-    return vote_list_2(conn, 'close', num)
+    return vote_list_2(load_db.db_get(), 'close', num)
 
 @app.route('/vote/add', methods = ['POST', 'GET'])
 def vote_add():
-    return vote_add_2(conn)
+    return vote_add_2(load_db.db_get())
 
 # Func-api
 @app.route('/api/w/<everything:name>', methods = ['POST', 'GET'])
 def api_w(name = ''):
-    return api_w_2(conn, name)
+    return api_w_2(load_db.db_get(), name)
 
 @app.route('/api/raw/<everything:name>')
 def api_raw(name = ''):
-    return api_raw_2(conn, name)
+    return api_raw_2(load_db.db_get(), name)
 
 @app.route('/api/version')
 def api_version():
-    return api_version_2(conn, version_list)
+    return api_version_2(load_db.db_get(), version_list)
 
 @app.route('/api/skin_info')
 @app.route('/api/skin_info/<name>')
 def api_skin_info(name = ''):
-    return api_skin_info_2(conn, name)
+    return api_skin_info_2(load_db.db_get(), name)
 
 @app.route('/api/markup')
 def api_markup():
-    return api_markup_2(conn)
+    return api_markup_2(load_db.db_get())
 
 @app.route('/api/user_info/<name>')
 def api_user_info(name = ''):
-    return api_user_info_2(conn, name)
+    return api_user_info_2(load_db.db_get(), name)
 
 @app.route('/api/thread/<topic_num>')
 def api_topic_sub(name = '', topic_num = 1):
-    return api_topic_sub_2(conn, topic_num)
+    return api_topic_sub_2(load_db.db_get(), topic_num)
 
 @app.route('/api/search/<name>')
 def api_search(name = ''):
-    return api_search_2(conn, name)
+    return api_search_2(load_db.db_get(), name)
 
 @app.route('/api/recent_changes')
 def api_recent_change():
-    return api_recent_change_2(conn)
+    return api_recent_change_2(load_db.db_get())
 
 @app.route('/api/recent_discuss')
 @app.route('/api/recent_discuss/<int:num>')
 def api_recent_discuss(num = 10):
-    return api_recent_discuss_2(conn, num, 'normal')
+    return api_recent_discuss_2(load_db.db_get(), num, 'normal')
 
 @app.route('/api/recent_discuss/stop')
 @app.route('/api/recent_discuss/<int:num>/stop')
 def api_recent_discuss_stop(num = 10):
-    return api_recent_discuss_2(conn, num, 'stop')
+    return api_recent_discuss_2(load_db.db_get(), num, 'stop')
 
 @app.route('/api/recent_discuss/all')
 @app.route('/api/recent_discuss/<int:num>/all')
 def api_recent_discuss_all(num = 10):
-    return api_recent_discuss_2(conn, num, 'all')
+    return api_recent_discuss_2(load_db.db_get(), num, 'all')
 
 @app.route('/api/sha224/<everything:name>', methods = ['POST', 'GET'])
 def api_sha224(name = 'test'):
-    return api_sha224_2(conn, name)
+    return api_sha224_2(load_db.db_get(), name)
 
 @app.route('/api/title_index')
 def api_title_index():
-    return api_title_index_2(conn)
+    return api_title_index_2(load_db.db_get())
 
 @app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])
 def api_image_view(name = ''):
-    return api_image_view_2(conn, name)
+    return api_image_view_2(load_db.db_get(), name)
 
 @app.route('/api/sitemap.xml')
 def api_sitemap():
-    return api_sitemap_2(conn)
+    return api_sitemap_2(load_db.db_get())
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정
 @app.route('/restart', methods = ['POST', 'GET'])
 def main_restart():
-    return main_restart_2(conn)
+    return main_restart_2(load_db.db_get())
 
 @app.route('/update', methods=['GET', 'POST'])
 def main_update():
-    return main_update_2(conn, version_list['beta']['r_ver'])
+    return main_update_2(load_db.db_get(), version_list['beta']['r_ver'])
 
 @app.route('/random')
 def main_title_random():
-    return main_title_random_2(conn)
+    return main_title_random_2(load_db.db_get())
 
 @app.route('/upload', methods=['GET', 'POST'])
 def main_upload():
-    return main_upload_2(conn)
+    return main_upload_2(load_db.db_get())
 
 @app.route('/setting')
 @app.route('/setting/<int:num>', methods = ['POST', 'GET'])
 def setting(num = 0):
-    return main_setting_2(conn, num, set_data['db_type'])
+    return main_setting_2(load_db.db_get(), num, set_data['db_type'])
 
 @app.route('/other')
 def main_other():
-    return main_other_2(conn)
+    return main_other_2(load_db.db_get())
 
 @app.route('/manager', methods = ['POST', 'GET'])
 @app.route('/manager/<int:num>', methods = ['POST', 'GET'])
 def main_manager(num = 1):
-    return main_manager_2(conn, num)
+    return main_manager_2(load_db.db_get(), num)
 
 @app.route('/image/<everything:name>')
 def main_image_view(name = None):
-    return main_image_view_2(conn, name)
+    return main_image_view_2(load_db.db_get(), name)
 
 @app.route('/skin_set')
 @app.route('/main_skin_set')
 def main_skin_set():
-    return main_skin_set_2(conn)
+    return main_skin_set_2(load_db.db_get())
 
 @app.route('/views/<everything:name>')
 def main_views(name = None):
-    return main_views_2(conn, name)
+    return main_views_2(load_db.db_get(), name)
 
 @app.route('/test_func')
 def main_test_func():
-    return main_test_func_2(conn)
+    return main_test_func_2(load_db.db_get())
 
 @app.route('/shutdown', methods = ['POST', 'GET'])
 def main_shutdown():
-    return main_shutdown_2(conn)
+    return main_shutdown_2(load_db.db_get())
 
 @app.route('/easter_egg.xml')
 def main_easter_egg():
-    return main_easter_egg_2(conn)
+    return main_easter_egg_2(load_db.db_get())
 
 @app.route('/<regex("[^.]+\.(?:txt|xml)"):data>')
 def main_file(data = ''):
-    return main_file_2(conn, data)
+    return main_file_2(load_db.db_get(), data)
 
 @app.errorhandler(404)
 def main_error_404(e):
-    return main_error_404_2(conn)
+    return main_error_404_2(load_db.db_get())
     
 if __name__ == "__main__":
     waitress.serve(

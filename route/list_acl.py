@@ -22,7 +22,7 @@ def list_acl_2(conn):
             div += '' + \
                 '<li>' + \
                     time_data + \
-                    '<a href="/acl/' + url_pas(data[0]) + '">' + data[0] + '</a>' + \
+                    '<a href="/acl/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a>' + \
                     why_data + \
                 '</li>' + \
             ''

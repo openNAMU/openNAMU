@@ -20,7 +20,7 @@ def list_title_index_2(conn):
         data += '<hr class="main_hr"><ul class="inside_ul">'
 
     for list_data in title_list:
-        data += '<li>' + str(all_list) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + list_data[0] + '</a></li>'
+        data += '<li>' + str(all_list) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + html.escape(list_data[0]) + '</a></li>'
         all_list += 1
 
     if page == 1:

@@ -3,16 +3,15 @@ from .func_tool import *
 # 커스텀 마크 언젠간 다시 추가 예정
 
 conn = ''
-curs = ''
 
 def load_conn2(data):
     global conn
-    global curs
 
     conn = data
-    curs = conn.cursor()
     
 def backlink_generate(data_markup, doc_data, doc_name):
+    curs = conn.cursor()
+    
     if data_markup == 'namumark':
         # Link
         link_re = re.compile(r'\[\[(?!https?:\/\/|inter:|외부:|out:|#)((?:(?!\[\[|\]\]|\|).)+)(?:\]\]|\|)', re.I)
@@ -29,17 +28,23 @@ def backlink_generate(data_markup, doc_data, doc_name):
         
         for i in data_link:
             data_link_in = i
-            if re.search(r'^(?:분류|category):', data_link_in):
+            if  data_link_in.startswith('분류:') or \
+                data_link_in.startswith('category:'):
                 data_link_in = re.sub(r'\\(.)', r'\1', data_link_in)
                 data_link_end['cat'] += [re.sub(r'^분류:', 'category:', data_link_in)]
-            elif re.search(r'^(?:파일|file):', data_link_in):
+            elif data_link_in.startswith('파일:') or \
+                data_link_in.startswith('file:'):
                 data_link_in = re.sub(r'\\(.)', r'\1', data_link_in)
                 data_link_end['file'] += [re.sub(r'^파일:', 'file:', data_link_in)]
             else:
                 data_link_in = re.sub(r'([^\\])#(?:[^#]*)$', r'\1', data_link_in)
                 
                 if data_link_in[0] == ':':
-                    data_link_in = re.sub(r'^:', '', data_link_in)
+                    data_link_in = re.sub(r'^:분류:', 'category:', data_link_in)
+                    data_link_in = re.sub(r'^:category:', 'category:', data_link_in)
+                    
+                    data_link_in = re.sub(r'^:file:', 'file:', data_link_in)
+                    data_link_in = re.sub(r'^:파일:', 'file:', data_link_in)
                 elif data_link_in[0] == '/':
                     data_link_in = doc_name + data_link_in
                 elif len(data_link_in) >= 3 and data_link_in[0:3] == '../':
@@ -98,6 +103,8 @@ def backlink_generate(data_markup, doc_data, doc_name):
     return data_link_end_all
 
 def render_do(doc_name, doc_data, data_type, data_in):
+    curs = conn.cursor()
+    
     data_in = None if data_in == '' else data_in
     
     curs.execute(db_change('select data from other where name = "markup"'))
@@ -129,7 +136,7 @@ def render_do(doc_name, doc_data, data_type, data_in):
                         test_mode = "normal", 
                         name_id = "''' + data_in + '''render_content",
                         name_include = "''' + data_in + '''",
-                        name_doc = "''' + doc_name.replace('"', '//"') + '''"
+                        name_doc = "''' + doc_name.replace('"', '\\"') + '''"
                     );
                 ''',
                 []
@@ -145,7 +152,7 @@ def render_do(doc_name, doc_data, data_type, data_in):
                         test_mode = "normal", 
                         name_id = "''' + data_in + '''render_content",
                         name_include = "''' + data_in + '''",
-                        name_doc = "''' + doc_name.replace('"', '//"') + '''"
+                        name_doc = "''' + doc_name.replace('"', '\\"') + '''"
                     );
                 ''',
                 []
