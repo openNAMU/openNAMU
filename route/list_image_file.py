@@ -15,7 +15,7 @@ def list_image_file_2(conn):
     curs.execute(db_change("select title from data where title like 'file:%' limit ?, 50"), [sql_num])
     data_list = curs.fetchall()
     for data in data_list:
-        list_data += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+        list_data += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a></li>'
 
     list_data += next_fix('/image_file_list?num=', num, data_list)
 

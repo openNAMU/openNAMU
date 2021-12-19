@@ -13,7 +13,7 @@ def list_long_page_2(conn, tool):
 
     curs.execute(db_change("select title, length(data) from data order by length(data) " + select_data + " limit 50"))
     for data in curs.fetchall():
-        div += '<li>' + str(data[1]) + ' : <a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+        div += '<li>' + str(data[1]) + ' : <a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a></li>'
 
     div += '</ul>'
 

@@ -361,6 +361,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                             'href="">' + link_out + '</a>';
             } else if(link_real.match(inter_re)) {
                 let data_inter = link_real.match(inter_re);
+                
                 let data_inter_link = '';
                 let data_inter_logo = '';
                 if(data_inter) {
@@ -377,6 +378,10 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                             ''
                         );
                     }
+                    
+                    var data_inter_var = do_link_change(link_real, data_nowiki, 0);
+                    var data_inter_link_main = data_inter_var[0];
+                    var data_inter_link_sub = data_inter_var[1];
                         
                     let data_inter_get = data_wiki_set['inter_wiki'][data_inter[1]];
                     if(data_inter_get) {
@@ -398,7 +403,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                     '';
                     data_js += '' +
                         'document.getElementsByName("' + name_include + 'set_link_' + num_link_str + '")[0].href = ' + 
-                        '"' + data_inter_link + do_url_change(link_real) + '";' +
+                        '"' + data_inter_link + do_url_change(data_inter_link_main) + data_inter_link_sub + '";' +
                             '\n' +
                     '';
 
