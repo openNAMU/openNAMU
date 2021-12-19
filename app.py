@@ -299,7 +299,7 @@ for i in server_set_var:
 print('----')
 
 # Init-DB_care
-if set_data['db_type'] == 'sqlite':
+if data_db_set['type'] == 'sqlite':
     def back_up(back_time, back_up_where):
         print('----')
 
@@ -926,7 +926,7 @@ def main_upload():
 @app.route('/setting')
 @app.route('/setting/<int:num>', methods = ['POST', 'GET'])
 def setting(num = 0):
-    return main_setting_2(load_db.db_get(), num, set_data['db_type'])
+    return main_setting_2(load_db.db_get(), num, data_db_set['type'])
 
 @app.route('/other')
 def main_other():
