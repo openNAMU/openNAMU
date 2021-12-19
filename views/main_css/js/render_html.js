@@ -11,8 +11,7 @@ function render_html(name = '') {
                 'b', 'i', 's', 'del', 'strong', 'bold', 'em', 'sub', 'sup', 
                 'div', 'span', 
                 'a',
-                'iframe',
-                'video'
+                'iframe'
             ];
             for(var key in t_data) {
                 patt = new RegExp(
