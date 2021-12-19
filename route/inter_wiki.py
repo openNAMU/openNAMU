@@ -73,11 +73,11 @@ def inter_wiki(conn, tool):
         div += '</td>'
 
         if tool == 'inter_wiki':
-            div += '<td><a id="out_link" href="' + data[1] + '">' + data[1] + '</a></td>'
+            div += '<td><a id="out_link" href="' + data[1] + '">' + html.escape(data[1]) + '</a></td>'
         else:
-            div += '<td>' + data[1] + '</td>'
+            div += '<td>' + html.escape(data[1]) + '</td>'
             
-        div += '<td>' + data[2] + '</td>'
+        div += '<td>' + html.escape(data[2]) + '</td>'
         div += '</tr>'
         
     div += '</table>'

@@ -367,59 +367,59 @@ app.add_url_rule(
 
 @app.route('/edit_top')
 def inter_wiki_edit_top():
-    return inter_wiki_2(load_db.db_get(), 'edit_top')
+    return inter_wiki(load_db.db_get(), 'edit_top')
 
 @app.route('/edit_top/del/<name>')
 def inter_wiki_edit_top_del(name = 'Test'):
-    return inter_wiki_del_2(load_db.db_get(), 'del_edit_top', name)
+    return inter_wiki_del(load_db.db_get(), 'del_edit_top', name)
 
 @app.route('/image_license')
 def inter_wiki_image_license():
-    return inter_wiki_2(load_db.db_get(), 'image_license')
+    return inter_wiki(load_db.db_get(), 'image_license')
 
 @app.route('/image_license/del/<name>')
 def inter_wiki_image_license_del(name = 'Test'):
-    return inter_wiki_del_2(load_db.db_get(), 'del_image_license', name)
+    return inter_wiki_del(load_db.db_get(), 'del_image_license', name)
 
 @app.route('/edit_filter')
 def inter_wiki_edit_filter():
-    return inter_wiki_2(load_db.db_get(), 'edit_filter')
+    return inter_wiki(load_db.db_get(), 'edit_filter')
 
 @app.route('/edit_filter/del/<name>')
 def inter_wiki_edit_filter_del(name = 'Test'):
-    return inter_wiki_del_2(load_db.db_get(), 'del_edit_filter', name)
+    return inter_wiki_del(load_db.db_get(), 'del_edit_filter', name)
 
 @app.route('/email_filter')
 def inter_wiki_email_filter():
-    return inter_wiki_2(load_db.db_get(), 'email_filter')
+    return inter_wiki(load_db.db_get(), 'email_filter')
 
 @app.route('/email_filter/del/<name>')
 def inter_wiki_email_filter_del(name = 'Test'):
-    return inter_wiki_del_2(load_db.db_get(), 'del_email_filter', name)
+    return inter_wiki_del(load_db.db_get(), 'del_email_filter', name)
 
 @app.route('/file_filter')
 def inter_wiki_file_filter():
-    return inter_wiki_2(load_db.db_get(), 'file_filter')
+    return inter_wiki(load_db.db_get(), 'file_filter')
 
 @app.route('/file_filter/del/<name>')
 def inter_wiki_file_filter_del(name = 'Test'):
-    return inter_wiki_del_2(load_db.db_get(), 'del_file_filter', name)
+    return inter_wiki_del(load_db.db_get(), 'del_file_filter', name)
 
 @app.route('/name_filter')
 def inter_wiki_name_filter():
-    return inter_wiki_2(load_db.db_get(), 'name_filter')
+    return inter_wiki(load_db.db_get(), 'name_filter')
 
 @app.route('/name_filter/del/<name>')
 def inter_wiki_name_filter_del(name = 'Test'):
-    return inter_wiki_del_2(load_db.db_get(), 'del_name_filter', name)
+    return inter_wiki_del(load_db.db_get(), 'del_name_filter', name)
 
 @app.route('/extension_filter')
 def inter_wiki_extension_filter():
-    return inter_wiki_2(load_db.db_get(), 'extension_filter')
+    return inter_wiki(load_db.db_get(), 'extension_filter')
 
 @app.route('/extension_filter/del/<name>')
 def inter_wiki_extension_filter_del(name = 'Test'):
-    return inter_wiki_del_2(load_db.db_get(), 'del_extension_filter', name)
+    return inter_wiki_del(load_db.db_get(), 'del_extension_filter', name)
 
 @app.route('/<regex("(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/add', methods = ['POST', 'GET'])
 @app.route('/<regex("(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/add/<name>', methods = ['POST', 'GET'])

@@ -32,7 +32,7 @@ def view_xref_2(conn, name, xref_type = '1'):
 
     data_list = curs.fetchall()
     for data in data_list:
-        div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a>'
+        div += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a>'
 
         if data[1]:
             div += ' (' + data[1] + ')'
