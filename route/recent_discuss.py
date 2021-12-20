@@ -32,7 +32,10 @@ def recent_discuss_2(conn):
     for data in curs.fetchall():
         div += '' + \
             '<tr>' + \
-                '<td><a href="/thread/' + data[3] + '">' + html.escape(sub) + '</a> <a href="/topic/' + url_pas(title) + '">(' + html.escape(title) + ')</a></td>' + \
+                '<td>' + \
+                    '<a href="/thread/' + data[3] + '">' + html.escape(data[1]) + '</a> ' + \
+                    '<a href="/topic/' + url_pas(data[0]) + '">(' + html.escape(data[0]) + ')</a>' + \
+                '</td>' + \
                 '<td>' + data[2] + '</td>' + \
             '</tr>' + \
         ''

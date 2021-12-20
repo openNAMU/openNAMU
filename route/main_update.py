@@ -47,8 +47,8 @@ def main_update_2(conn):
             data = load_lang('update_warning') + '''
                 <hr class=\"main_hr\">
                 <ul class="inside_ul">
-                        <li>''' + load_lang('version') + ''' : <span id="ver_send_2"></span></li>
-                        <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
+                    <li>''' + load_lang('version') + ''' : <span id="ver_send_2"></span></li>
+                    <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
                 </ul>
                 <a href="https://github.com/openNAMU/openNAMU">(Beta)</a> <a href="https://github.com/openNAMU/openNAMU/tree/stable">(Stable)</a>
                 <hr class=\"main_hr\">
