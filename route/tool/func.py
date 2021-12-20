@@ -64,7 +64,7 @@ from .func_mark import *
 
 from diff_match_patch import diff_match_patch
 
-import waitress
+import netius.servers
 
 import werkzeug.routing
 import werkzeug.debug
@@ -106,7 +106,7 @@ class get_db_connect:
         
     def db_load(self):
         if self.db_set['type'] == 'sqlite':
-            self.conn = sqlite3.connect(self.db_set['name'] + '.db', check_same_thread = False)
+            self.conn = sqlite3.connect(self.db_set['name'] + '.db')
         else:
             self.conn = pymysql.connect(
                 host = self.db_set['mysql_host'],
@@ -132,8 +132,8 @@ class get_db_connect:
         return self.conn
     
     def db_get(self):
-        if self.db_set['type'] != 'sqlite':
-            self.conn.ping(reconnect = True)
+        # if self.db_set['type'] != 'sqlite':
+        #     self.conn.ping(reconnect = True)
             
         return self.conn
 
