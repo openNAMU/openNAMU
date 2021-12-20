@@ -15,47 +15,38 @@ def inter_wiki(conn, tool):
     admin = admin_check()
 
     if tool == 'inter_wiki':
-        plus_link = 'plus_inter_wiki'
         title = load_lang('interwiki_list')
 
         curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'inter_wiki'"))
     elif tool == 'email_filter':
-        plus_link = 'plus_email_filter'
         title = load_lang('email_filter_list')
 
         curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'email'"))
     elif tool == 'name_filter':
-        plus_link = 'plus_name_filter'
         title = load_lang('id_filter_list')
 
         curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'name'"))
     elif tool == 'edit_filter':
-        plus_link = 'plus_edit_filter'
         title = load_lang('edit_filter_list')
 
         curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'regex_filter'"))
     elif tool == 'file_filter':
-        plus_link = 'plus_file_filter'
         title = load_lang('file_filter_list')
 
         curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'file'"))
     elif tool == 'file_filter':
-        plus_link = 'plus_file_filter'
         title = load_lang('file_filter_list')
 
         curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'file'"))
     elif tool == 'image_license':
-        plus_link = 'plus_image_license'
         title = load_lang('image_license_list')
 
         curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'image_license'"))
     elif tool == 'extension_filter':
-        plus_link = 'plus_extension_filter'
         title = load_lang('extension_filter_list')
 
         curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'extension'"))
     else:
-        plus_link = 'plus_edit_top'
         title = load_lang('edit_tool_list')
 
         curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'edit_top'"))

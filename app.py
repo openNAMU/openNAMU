@@ -299,13 +299,13 @@ for i in server_set_var:
 print('----')
 
 # Init-DB_care
-if set_data['db_type'] == 'sqlite':
+if data_db_set['type'] == 'sqlite':
     def back_up(back_time, back_up_where):
         print('----')
 
         try:
             shutil.copyfile(
-                set_data['db'] + '.db', 
+                data_db_set['name'] + '.db', 
                 back_up_where
             )
 
@@ -328,7 +328,7 @@ if set_data['db_type'] == 'sqlite':
         if back_up_where and back_up_where[0][0] != '':
             back_up_where = back_up_where[0][0]
         else:
-            back_up_where = 'back_' + set_data['db'] + '.db'
+            back_up_where = 'back_' + data_db_set['name'] + '.db'
 
         print('Back up state : ' + str(back_time) + ' hours')
 
@@ -926,7 +926,7 @@ def main_upload():
 @app.route('/setting')
 @app.route('/setting/<int:num>', methods = ['POST', 'GET'])
 def setting(num = 0):
-    return main_setting_2(load_db.db_get(), num, set_data['db_type'])
+    return main_setting_2(load_db.db_get(), num, data_db_set['type'])
 
 @app.route('/other')
 def main_other():
@@ -971,8 +971,8 @@ def main_error_404(e):
     return main_error_404_2(load_db.db_get())
     
 if __name__ == "__main__":
-    waitress.serve(
-        app,
+    do_server = netius.servers.WSGIServer(app = app)
+    do_server.serve(
         host = server_set['host'],
-        port = int(server_set['port']), 
+        port = int(server_set['port'])
     )
