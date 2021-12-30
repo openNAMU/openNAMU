@@ -365,73 +365,239 @@ app.add_url_rule(
     view_func = inter_wiki_del
 )
 
-@app.route('/edit_top')
-def inter_wiki_edit_top():
-    return inter_wiki(load_db.db_get(), 'edit_top')
+app.add_url_rule(
+    rule = '/inter_wiki/add',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'plus_inter_wiki',
+        'name' : None
+    }, 
+    methods = ['GET', 'POST'],
+    view_func = inter_wiki_add
+)
 
-@app.route('/edit_top/del/<name>')
-def inter_wiki_edit_top_del(name = 'Test'):
-    return inter_wiki_del(load_db.db_get(), 'del_edit_top', name)
+app.add_url_rule(
+    rule = '/edit_top',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'edit_top'
+    }, 
+    view_func = inter_wiki
+)
 
-@app.route('/image_license')
-def inter_wiki_image_license():
-    return inter_wiki(load_db.db_get(), 'image_license')
+app.add_url_rule(
+    rule = '/edit_top/del/<name>',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'del_edit_top',
+        'name' : 'Test'
+    }, 
+    view_func = inter_wiki_del
+)
 
-@app.route('/image_license/del/<name>')
-def inter_wiki_image_license_del(name = 'Test'):
-    return inter_wiki_del(load_db.db_get(), 'del_image_license', name)
+app.add_url_rule(
+    rule = '/edit_top/add',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'plus_edit_top',
+        'name' : None
+    }, 
+    methods = ['GET', 'POST'],
+    view_func = inter_wiki_add
+)
 
-@app.route('/edit_filter')
-def inter_wiki_edit_filter():
-    return inter_wiki(load_db.db_get(), 'edit_filter')
+app.add_url_rule(
+    rule = '/image_license',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'image_license'
+    }, 
+    view_func = inter_wiki
+)
 
-@app.route('/edit_filter/del/<name>')
-def inter_wiki_edit_filter_del(name = 'Test'):
-    return inter_wiki_del(load_db.db_get(), 'del_edit_filter', name)
+app.add_url_rule(
+    rule = '/image_license/del/<name>',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'del_image_license',
+        'name' : 'Test'
+    }, 
+    view_func = inter_wiki_del
+)
 
-@app.route('/email_filter')
-def inter_wiki_email_filter():
-    return inter_wiki(load_db.db_get(), 'email_filter')
+app.add_url_rule(
+    rule = '/image_license/add',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'plus_image_license',
+        'name' : None
+    }, 
+    methods = ['GET', 'POST'],
+    view_func = inter_wiki_add
+)
 
-@app.route('/email_filter/del/<name>')
-def inter_wiki_email_filter_del(name = 'Test'):
-    return inter_wiki_del(load_db.db_get(), 'del_email_filter', name)
+app.add_url_rule(
+    rule = '/edit_filter',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'edit_filter'
+    }, 
+    view_func = inter_wiki
+)
 
-@app.route('/file_filter')
-def inter_wiki_file_filter():
-    return inter_wiki(load_db.db_get(), 'file_filter')
+app.add_url_rule(
+    rule = '/edit_filter/del/<name>',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'del_edit_filter',
+        'name' : 'Test'
+    }, 
+    view_func = inter_wiki_del
+)
 
-@app.route('/file_filter/del/<name>')
-def inter_wiki_file_filter_del(name = 'Test'):
-    return inter_wiki_del(load_db.db_get(), 'del_file_filter', name)
+# 이거 수정 필요 할 듯
+app.add_url_rule(
+    rule = '/edit_filter/add',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'plus_edit_filter',
+        'name' : None
+    }, 
+    view_func = inter_wiki_add
+)
 
-@app.route('/name_filter')
-def inter_wiki_name_filter():
-    return inter_wiki(load_db.db_get(), 'name_filter')
+app.add_url_rule(
+    rule = '/edit_filter/add/<name>',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'plus_edit_filter',
+        'name' : 'Test'
+    }, 
+    methods = ['GET', 'POST'],
+    view_func = inter_wiki_add
+)
 
-@app.route('/name_filter/del/<name>')
-def inter_wiki_name_filter_del(name = 'Test'):
-    return inter_wiki_del(load_db.db_get(), 'del_name_filter', name)
+app.add_url_rule(
+    rule = '/email_filter',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'email_filter'
+    }, 
+    view_func = inter_wiki
+)
 
-@app.route('/extension_filter')
-def inter_wiki_extension_filter():
-    return inter_wiki(load_db.db_get(), 'extension_filter')
+app.add_url_rule(
+    rule = '/email_filter/del/<name>',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'del_email_filter',
+        'name' : 'Test'
+    }, 
+    view_func = inter_wiki_del
+)
 
-@app.route('/extension_filter/del/<name>')
-def inter_wiki_extension_filter_del(name = 'Test'):
-    return inter_wiki_del(load_db.db_get(), 'del_extension_filter', name)
+app.add_url_rule(
+    rule = '/email_filter/add',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'plus_email_filter',
+        'name' : None
+    }, 
+    methods = ['GET', 'POST'],
+    view_func = inter_wiki_add
+)
 
-@app.route('/<regex("(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/add', methods = ['POST', 'GET'])
-@app.route('/<regex("(?:inter_wiki|edit_top|image_license|(?:edit|email|file|name|extension)_filter)"):tools>/add/<name>', methods = ['POST', 'GET'])
-def inter_wiki_plus(tools = None, name = None):
-    return inter_wiki_plus_2(load_db.db_get(), 'plus_' + tools, name)
+app.add_url_rule(
+    rule = '/file_filter',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'file_filter'
+    }, 
+    view_func = inter_wiki
+)
+
+app.add_url_rule(
+    rule = '/file_filter/del/<name>',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'del_file_filter',
+        'name' : 'Test'
+    }, 
+    view_func = inter_wiki_del
+)
+
+app.add_url_rule(
+    rule = '/file_filter/add',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'plus_file_filter',
+        'name' : None
+    }, 
+    methods = ['GET', 'POST'],
+    view_func = inter_wiki_add
+)
+
+app.add_url_rule(
+    rule = '/name_filter',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'name_filter'
+    }, 
+    view_func = inter_wiki
+)
+
+app.add_url_rule(
+    rule = '/name_filter/del/<name>',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'del_name_filter',
+        'name' : 'Test'
+    }, 
+    view_func = inter_wiki_del
+)
+
+app.add_url_rule(
+    rule = '/name_filter/add',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'plus_name_filter',
+        'name' : None
+    }, 
+    methods = ['GET', 'POST'],
+    view_func = inter_wiki_add
+)
+
+app.add_url_rule(
+    rule = '/extension_filter',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'extension_filter'
+    }, 
+    view_func = inter_wiki
+)
+
+app.add_url_rule(
+    rule = '/extension_filter/del/<name>',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'del_extension_filter',
+        'name' : 'Test'
+    }, 
+    view_func = inter_wiki_del
+)
+
+app.add_url_rule(
+    rule = '/extension_filter/add',
+    defaults = { 
+        'conn' : load_db.db_get(), 
+        'tool' : 'plus_extension_filter',
+        'name' : None
+    }, 
+    methods = ['GET', 'POST'],
+    view_func = inter_wiki_add
+)
 
 # Func-list
-# /list/topic/open
-@app.route('/not_close_topic')
-def list_not_close_topic():
-    return list_not_close_topic_2(load_db.db_get())
-
 # /list/document/old
 @app.route('/old_page')
 def list_old_page():
@@ -661,7 +827,15 @@ def edit_move(name = None):
 # Func-topic
 @app.route('/recent_discuss')
 def recent_discuss():
-    return recent_discuss_2(load_db.db_get())
+    return recent_discuss_2(load_db.db_get(), 'normal')
+
+@app.route('/recent_discuss/close')
+def recent_discuss_close():
+    return recent_discuss_2(load_db.db_get(), 'close')
+
+@app.route('/recent_discuss/open')
+def recent_discuss_open():
+    return recent_discuss_2(load_db.db_get(), 'open')
 
 @app.route('/thread/<int:topic_num>/b/<int:num>')
 def topic_block(topic_num = 1, num = 1):

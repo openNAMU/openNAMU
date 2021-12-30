@@ -10,7 +10,8 @@ def api_w_2(conn, name):
             data_pas = render_set(
                 doc_name = name, 
                 doc_data = data_org, 
-                data_type = 'api_view'
+                data_type = 'api_view',
+                data_in = 'preview'
             )
 
             return flask.jsonify({

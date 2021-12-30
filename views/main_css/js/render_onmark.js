@@ -1250,6 +1250,7 @@ function do_onmark_redirect_render(data, data_js, name_doc) {
         var link_sub = link_data_var[1];
         
         if(
+            name_include == '' &&
             window.location.search === '' &&
             !window.location.pathname.match(/\/doc_from\//)
         ) {
@@ -1273,6 +1274,8 @@ function do_onmark_remark_render(data) {
 }
 
 // Main
+// var 쓰인 부분 전부 let으로 변경하기 (호이스팅 혼용 방지)
+// 중첩 함수 구조로 개편하기
 function do_onmark_render(
     test_mode = 'test', 
     name_id = '', 
@@ -1299,7 +1302,7 @@ function do_onmark_render(
     var data_backlink = [];
     var data_nowiki = {};
 
-    var data_var = do_onmark_redirect_render(data, data_js, name_doc);
+    var data_var = do_onmark_redirect_render(data, data_js, name_doc, name_include);
     data = data_var[0];
     data_js = data_var[1];
     var passing = data_var[2];
