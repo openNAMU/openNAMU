@@ -1,18 +1,23 @@
 from .tool.func import *
 
-def recent_discuss_2(conn):
+def recent_discuss_2(conn, tool):
     curs = conn.cursor()
 
     div = ''
 
-    if flask.request.args.get('what', 'normal') == 'normal':
-        div += '<a href="/recent_discuss?what=close">(' + load_lang('close_discussion') + ')</a>'
+    if tool == 'normal':
+        div += '<a href="/recent_discuss/close">(' + load_lang('close_discussion') + ')</a> '
+        div += '<a href="/recent_discuss/open">(' + load_lang('open_discussion_list') + ')</a>'
 
         m_sub = 0
-    else:
-        div += '<a href="/recent_discuss">(' + load_lang('open_discussion') + ')</a>'
+    elif tool == 'close':
+        div += '<a href="/recent_discuss">(' + load_lang('normal') + ')</a>'
 
         m_sub = ' (' + load_lang('closed') + ')'
+    else:
+        div += '<a href="/recent_discuss">(' + load_lang('normal') + ')</a>'
+        
+        m_sub = ' (' + load_lang('open_discussion_list') + ')'
 
     div +=  '''
             <hr class="main_hr">
@@ -24,10 +29,12 @@ def recent_discuss_2(conn):
                     </tr>
             '''
 
-    if m_sub == 0:
+    if tool == 'normal':
         curs.execute(db_change("select title, sub, date, code from rd where not stop = 'O' order by date desc limit 50"))
-    else:
+    elif tool == 'close':
         curs.execute(db_change("select title, sub, date, code from rd where stop = 'O' order by date desc limit 50"))
+    else:
+        curs.execute(db_change('select title, sub, date, code from rd where stop != "O" order by date asc limit 50'))
 
     for data in curs.fetchall():
         div += '' + \
