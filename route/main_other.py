@@ -21,7 +21,6 @@ def main_other_2(conn):
                 <h3>2.2. ''' + load_lang('discussion') + '''</h3>
                 <ul class="inside_ul">
                     <li><a href="/recent_discuss">''' + load_lang('recent_discussion') + '''</a></li>
-                    <li><a href="/not_close_topic">''' + load_lang('open_discussion_list') + '''</a></li>
                 </ul>
                 <h3>2.3. ''' + load_lang('document') + '''</h3>
                 <ul class="inside_ul">

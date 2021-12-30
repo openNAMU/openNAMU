@@ -18,6 +18,8 @@ robots.txt
 custom.py
 404.html
 
+goorm.manifest
+
 views/liberty
 views/buma
 views/before_namu
