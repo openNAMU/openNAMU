@@ -16,7 +16,7 @@ def list_admin_group_2(conn):
 
         list_data += '' + \
             '<li>' + \
-                '<a href="/admin_plus/' + url_pas(data[0]) + '">' + data[0] + '</a>' + \
+                '<a href="/admin_plus/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a>' + \
                 delete_admin_group + \
             '</li>' + \
         ''

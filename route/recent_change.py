@@ -87,11 +87,7 @@ def recent_change_2(conn, name, tool):
         all_ip = ip_pas([i[3] for i in data_list])
         for data in data_list:
             select += '<option value="' + data[0] + '">' + data[0] + '</option>'
-            send = '<br>'
-
-            if data[4]:
-                if not re.search(r"^(?: +)$", data[4]):
-                    send = data[4]
+            send = data[4]
 
             if re.search(r"\+", data[5]):
                 leng = '<span style="color:green;">(' + data[5] + ')</span>'
@@ -114,6 +110,7 @@ def recent_change_2(conn, name, tool):
                     ip = ''
                     ban = ''
                     date = ''
+                    send = ''
 
                     style[0] = 'style="display: none;"'
                     style[1] = 'id="toron_color_grey"'
@@ -134,7 +131,9 @@ def recent_change_2(conn, name, tool):
                     <td>''' + date + '''</td>
                 </tr>
                 <tr ''' + style[1] + '''>
-                    <td class="send_content" colspan="3">''' + html.escape(send) + '''</td>
+                    <td class="send_content" colspan="3">
+                        ''' + (html.escape(send) if send != '' else '<br>') + '''
+                    </td>
                 </tr>
             '''
 

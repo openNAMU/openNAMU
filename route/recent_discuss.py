@@ -1,18 +1,23 @@
 from .tool.func import *
 
-def recent_discuss_2(conn):
+def recent_discuss_2(conn, tool):
     curs = conn.cursor()
 
     div = ''
 
-    if flask.request.args.get('what', 'normal') == 'normal':
-        div += '<a href="/recent_discuss?what=close">(' + load_lang('close_discussion') + ')</a>'
+    if tool == 'normal':
+        div += '<a href="/recent_discuss/close">(' + load_lang('close_discussion') + ')</a> '
+        div += '<a href="/recent_discuss/open">(' + load_lang('open_discussion_list') + ')</a>'
 
         m_sub = 0
-    else:
-        div += '<a href="/recent_discuss">(' + load_lang('open_discussion') + ')</a>'
+    elif tool == 'close':
+        div += '<a href="/recent_discuss">(' + load_lang('normal') + ')</a>'
 
         m_sub = ' (' + load_lang('closed') + ')'
+    else:
+        div += '<a href="/recent_discuss">(' + load_lang('normal') + ')</a>'
+        
+        m_sub = ' (' + load_lang('open_discussion_list') + ')'
 
     div +=  '''
             <hr class="main_hr">
@@ -24,18 +29,20 @@ def recent_discuss_2(conn):
                     </tr>
             '''
 
-    if m_sub == 0:
+    if tool == 'normal':
         curs.execute(db_change("select title, sub, date, code from rd where not stop = 'O' order by date desc limit 50"))
-    else:
+    elif tool == 'close':
         curs.execute(db_change("select title, sub, date, code from rd where stop = 'O' order by date desc limit 50"))
+    else:
+        curs.execute(db_change('select title, sub, date, code from rd where stop != "O" order by date asc limit 50'))
 
     for data in curs.fetchall():
-        title = html.escape(data[0])
-        sub = html.escape(data[1])
-
         div += '' + \
             '<tr>' + \
-                '<td><a href="/thread/' + data[3] + '">' + sub + '</a> <a href="/topic/' + url_pas(title) + '">(' + title + ')</a></td>' + \
+                '<td>' + \
+                    '<a href="/thread/' + data[3] + '">' + html.escape(data[1]) + '</a> ' + \
+                    '<a href="/topic/' + url_pas(data[0]) + '">(' + html.escape(data[0]) + ')</a>' + \
+                '</td>' + \
                 '<td>' + data[2] + '</td>' + \
             '</tr>' + \
         ''

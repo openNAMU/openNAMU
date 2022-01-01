@@ -6,12 +6,12 @@ def main_manager_2(conn, num):
     title_list = {
         0 : [load_lang('document_name'), 'acl', load_lang('acl')],
         1 : [0, 'check', load_lang('check')],
-        2 : [load_lang('file_name'), 'plus_file_filter', load_lang('file_filter_add')],
+        2 : [load_lang('file_name'), 'file_filter/add', load_lang('file_filter_add')],
         3 : [0, 'admin', load_lang('authorize')],
         4 : [0, 'record', load_lang('edit_record')],
         5 : [0, 'record/topic', load_lang('discussion_record')],
         6 : [load_lang('name'), 'admin_plus', load_lang('add_admin_group')],
-        7 : [load_lang('name'), 'plus_edit_filter', load_lang('edit_filter_add')],
+        7 : [load_lang('name'), 'edit_filter/add', load_lang('edit_filter_add')],
         8 : [load_lang('document_name'), 'search', load_lang('search')],
         9 : [0, 'block_log/user', load_lang('blocked_user')],
         10 : [0, 'block_log/admin', load_lang('blocked_admin')],
@@ -38,7 +38,7 @@ def main_manager_2(conn, num):
                     <h2>2. ''' + load_lang('owner') + '''</h2>
                     <ul class="inside_ul">
                         <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
-                        <li><a href="/many_delete">''' + load_lang('many_delete') + '''</a></li>
+                        <li><a href="/delete/doc_mutiple">''' + load_lang('many_delete') + '''</a></li>
                         <li><a href="/app_submit">''' + load_lang('application_list') + '''</a></li>
                         <li><a href="/api/sitemap.xml">''' + load_lang('get_sitemap') + '''</a></li>
                         <li><a href="/register">''' + load_lang('add_user') + '''</a></li>
@@ -54,6 +54,7 @@ def main_manager_2(conn, num):
                         <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
                         <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
                         <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
+                        <li><a href="/doc_filter">''' + load_lang('doc_filter_list') + '''</a></li>
                     </ul>
                     <h3>2.2. ''' + load_lang('server') + '''</h2>
                     <ul class="inside_ul">

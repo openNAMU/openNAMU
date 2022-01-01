@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_update_2(conn, r_ver):
+def main_update_2(conn):
     curs = conn.cursor()
 
     if admin_check() != 1:
@@ -47,7 +47,7 @@ def main_update_2(conn, r_ver):
             data = load_lang('update_warning') + '''
                 <hr class=\"main_hr\">
                 <ul class="inside_ul">
-                    <li>''' + load_lang('version') + ' : ' + r_ver + '''</li>
+                    <li>''' + load_lang('version') + ''' : <span id="ver_send_2"></span></li>
                     <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
                 </ul>
                 <a href="https://github.com/openNAMU/openNAMU">(Beta)</a> <a href="https://github.com/openNAMU/openNAMU/tree/stable">(Stable)</a>

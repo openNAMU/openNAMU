@@ -1,0 +1,186 @@
+body {
+    margin: 0;
+}
+
+html {
+    background: #eee;
+}
+
+header#main {
+    border-bottom: 0;
+    
+    line-height: 50px;
+    
+    padding-left: 20px;
+    padding-right: 20px;
+    
+    background-color: #99ddff;
+}
+
+header#main a {
+    color: black;
+}
+
+header#main span#right {
+    float: right;
+}
+
+header#main form.not_mobile input.search {
+    display: inline-block;
+    
+    width: 200px;
+}
+
+header#main form.not_mobile {
+    display: inline-block;
+}
+
+input.search {
+    height: 35px;
+    
+    vertical-align: middle;
+    
+    margin-top: -5px;
+    
+    border: 0;
+    
+    padding: 10px;
+}
+
+input.only_mobile.search {
+    width: calc(100% - 70px);
+    
+    display: inline-block;
+}
+
+input.search:focus-visible {
+    outline: none;
+}
+
+button.search_button {
+    width: 35px;
+    height: 35px;
+    
+    vertical-align: middle;
+    
+    margin-top: -5px;
+    margin-left: -5px;
+    
+    border: 0;
+    
+    font-size: 20px;
+    
+    line-height: 0px;
+}
+
+button.search_button#goto {
+    background-color: #ccffbb;
+}
+
+button.search_button#search {
+    background-color: #ffeecc;
+}
+
+aside {
+    width: 250px;
+    
+    float: left;
+    
+    display: inline-block;
+    
+    padding-top: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    
+    background-color: #ffeaee;
+    
+    height: calc(100vh - (50px + 20px));
+}
+
+aside button {
+    width: 25%;
+}
+
+section {
+    width: calc(100% - (250px + 40px));
+    
+    display: inline-block;
+    
+    border-left: 0px solid;
+    
+    background-color: white;
+}
+
+header#section {
+    padding-top: 11px;
+    padding-bottom: 11px;
+    
+    border-bottom: 0px solid;
+    
+    background-color: #cceeff;
+}
+
+article.main {
+    max-width: 1000px;
+    
+    padding-left: 20px;
+    padding-right: 20px;
+    
+    margin: auto;
+}
+
+article.main#content {
+    padding-top: 20px;
+    
+    min-height: 400px;
+}
+
+article.main#title h1 {
+    margin: 0;
+}
+
+.only_mobile, header#main form.only_mobile {
+    display: none;
+}
+
+@media screen and (max-width: 1000px) {    
+    aside {        
+        float: none;
+        
+        border-top: 0px solid;
+        
+        width: calc(100vw - 40px);
+        height: 100%;
+        
+        padding: 20px;
+    }
+    
+    section {
+        width: 100vw;
+        
+        padding-bottom: 20px;
+        
+        border-left: 0;
+    }
+    
+    .not_mobile, header#main form.not_mobile {
+        display: none;
+    }
+    
+    .only_mobile, header#main form.only_mobile {
+        display: block;
+    }
+}
+
+footer {
+    border-top: 0px solid;
+    
+    margin-top: 20px;
+    background: #eee;
+    
+    padding: 20px;
+}
+
+footer.only_mobile {
+    margin-top: 0px;
+}

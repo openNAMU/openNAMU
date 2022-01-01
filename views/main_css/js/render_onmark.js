@@ -361,6 +361,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                             'href="">' + link_out + '</a>';
             } else if(link_real.match(inter_re)) {
                 let data_inter = link_real.match(inter_re);
+                
                 let data_inter_link = '';
                 let data_inter_logo = '';
                 if(data_inter) {
@@ -377,6 +378,10 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                             ''
                         );
                     }
+                    
+                    var data_inter_var = do_link_change(link_real, data_nowiki, 1);
+                    var data_inter_link_main = data_inter_var[0];
+                    var data_inter_link_sub = data_inter_var[1];
                         
                     let data_inter_get = data_wiki_set['inter_wiki'][data_inter[1]];
                     if(data_inter_get) {
@@ -398,7 +403,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                     '';
                     data_js += '' +
                         'document.getElementsByName("' + name_include + 'set_link_' + num_link_str + '")[0].href = ' + 
-                        '"' + data_inter_link + do_url_change(link_real) + '";' +
+                        '"' + data_inter_link + do_url_change(data_inter_link_main) + data_inter_link_sub + '";' +
                             '\n' +
                     '';
 
@@ -503,7 +508,7 @@ function do_onmark_footnote_render(data, name_include) {
             
             footnote_end_data += '' +
                 '<li>' +
-                    '<a href="javascript:do_open_foot(\'' + name_include + 'fn-' + String(i) + '\', 1);" ' +
+                    '<a href="javascript:do_open_foot(\'' + name_include + '\', \'fn-' + String(i) + '\', 1);" ' +
                         'id="' + name_include + 'cfn-' + String(i) + '">' +
                         '(' + footnote_name + ')' +
                     '</a> <span id="' + name_include + 'fn-' + String(i) + '">' + footnote_line_data + '</span>' +
@@ -511,7 +516,7 @@ function do_onmark_footnote_render(data, name_include) {
             '';
             data = data.replace(footnote_re, '' +
                 '<sup>' +
-                    '<a href="javascript:do_open_foot(\'' + name_include + 'fn-' + String(i) + '\', 0);" ' +
+                    '<a href="javascript:do_open_foot(\'' + name_include + '\', \'fn-' + String(i) + '\', 0);" ' +
                         'id="' + name_include + 'rfn-' + String(i) + '">' +
                         '(' + footnote_name + ')' +
                     '</a>' +
@@ -529,7 +534,7 @@ function do_onmark_footnote_render(data, name_include) {
         }
     }
     
-    if(name_include === '' && footnote_end_data !== '') {
+    if(footnote_end_data !== '') {
         data = do_end_br_replace(data) + '<ul id="footnote_data">' + footnote_end_data + '</ul>';
     }
     
@@ -862,7 +867,7 @@ function do_onmark_include_render(data, data_js, name_include, data_nowiki) {
 
 function do_onmark_nowiki_before_render(data, data_js, name_include, data_nowiki) {   
     var num_nowiki = 0;
-    data = data.replace(/\\(.)/g, function(x, x_1) {
+    data = data.replace(/\\(&gt;|&lt;|.)/g, function(x, x_1) {
         num_nowiki += 1;
         data_nowiki[name_include + 'nowiki_one_' + String(num_nowiki)] = x_1;
         data_js += do_data_try_insert(name_include + 'nowiki_one_' + String(num_nowiki), do_js_safe_change(x_1));
@@ -1245,8 +1250,9 @@ function do_onmark_redirect_render(data, data_js, name_doc) {
         var link_sub = link_data_var[1];
         
         if(
+            name_include == '' &&
             window.location.search === '' &&
-            window.location.pathname.match(/^\/w\//)
+            !window.location.pathname.match(/\/doc_from\//)
         ) {
             window.location.href = '/w/' + do_url_change(link_main) + '/doc_from/' + do_url_change(name_doc) + link_sub;
         }
@@ -1268,6 +1274,8 @@ function do_onmark_remark_render(data) {
 }
 
 // Main
+// var 쓰인 부분 전부 let으로 변경하기 (호이스팅 혼용 방지)
+// 중첩 함수 구조로 개편하기
 function do_onmark_render(
     test_mode = 'test', 
     name_id = '', 
@@ -1294,7 +1302,7 @@ function do_onmark_render(
     var data_backlink = [];
     var data_nowiki = {};
 
-    var data_var = do_onmark_redirect_render(data, data_js, name_doc);
+    var data_var = do_onmark_redirect_render(data, data_js, name_doc, name_include);
     data = data_var[0];
     data_js = data_var[1];
     var passing = data_var[2];
@@ -1349,9 +1357,9 @@ function do_onmark_render(
     data_js += '' + 
         'get_link_state("' + name_include + '");\n' + 
         'get_file_state("' + name_include + '");\n' + 
-		'get_heading_name();'
+		'get_heading_name();' +
+        'render_html("' + name_include + 'nowiki_html");\n' +
     ''
-    data_js += 'render_html("' + name_include + 'nowiki_html");\n'
     
     if(test_mode === 'normal') {
         document.getElementById(name_id).innerHTML = data + '<script>' + data_js + '</script>';

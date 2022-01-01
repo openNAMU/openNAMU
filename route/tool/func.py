@@ -64,7 +64,7 @@ from .func_mark import *
 
 from diff_match_patch import diff_match_patch
 
-from gevent.pywsgi import WSGIServer
+import netius.servers
 
 import werkzeug.routing
 import werkzeug.debug
@@ -84,59 +84,60 @@ global_wiki_set = {}
 
 global_db_set = ''
 
-data_css_ver = '116'
+data_css_ver = '118'
 data_css = ''
 
 conn = ''
-curs = ''
 
 # Func
 # Func-main
 def load_conn(data):
     global conn
-    global curs
 
     conn = data
-    curs = conn.cursor()
-
-    load_conn2(data)
     
 # Func-init
-def get_conn(db_set = ''):
-    global global_db_set
-    if db_set != '':
-        global_db_set = db_set
-    else:
-        db_set = global_db_set
+class get_db_connect:
+    def __init__(self, db_set):
+        self.db_set = db_set
+        self.conn = ''
+        
+    def db_load(self):
+        if self.db_set['type'] == 'sqlite':
+            self.conn = sqlite3.connect(self.db_set['name'] + '.db')
+        else:
+            self.conn = pymysql.connect(
+                host = self.db_set['mysql_host'],
+                user = self.db_set['mysql_user'],
+                password = self.db_set['mysql_pw'],
+                charset = 'utf8mb4',
+                port = int(self.db_set['mysql_port']),
+            )
+            curs = self.conn.cursor()
+
+            try:
+                curs.execute(db_change(
+                    'create database ' + self.db_set['name'] + ' ' + \
+                    'default character set utf8mb4;'
+                ))
+            except:
+                pass
+
+            self.conn.select_db(self.db_set['name'])
+
+        load_conn(self.conn)
+
+        return self.conn
     
-    if db_set['type'] == 'sqlite':
-        conn = sqlite3.connect(db_set['name'] + '.db')
-        curs = conn.cursor()
-    else:
-        conn = pymysql.connect(
-            host = db_set['mysql_host'],
-            user = db_set['mysql_user'],
-            password = db_set['mysql_pw'],
-            charset = 'utf8mb4',
-            port = int(db_set['mysql_port'])
-        )
-        curs = conn.cursor()
-    
-        try:
-            curs.execute(db_change(
-                'create database ' + db_set['name'] + ' ' + \
-                'default character set utf8mb4;'
-            ))
-        except:
-            pass
-        
-        conn.select_db(db_set['name'])
-        
-    load_conn(conn)
-        
-    return conn
+    def db_get(self):
+        # if self.db_set['type'] != 'sqlite':
+        #     self.conn.ping(reconnect = True)
+            
+        return self.conn
 
 def update(ver_num, set_data):
+    curs = conn.cursor()
+
     print('----')
     # 업데이트 하위 호환 유지 함수
 
@@ -352,6 +353,8 @@ def update(ver_num, set_data):
     print('Update completed')
 
 def set_init_always(ver_num):
+    curs = conn.cursor()
+
     curs.execute(db_change('delete from other where name = "ver"'))
     curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [ver_num])
     
@@ -364,6 +367,8 @@ def set_init_always(ver_num):
     conn.commit()
     
 def set_init():
+    curs = conn.cursor()
+
     # 초기값 설정 함수    
     curs.execute(db_change("select html from html_filter where kind = 'email'"))
     if not curs.fetchall():
@@ -405,15 +410,16 @@ def set_init():
     conn.commit()
 
 # Func-simple
+## Func-simple-without_DB
 def get_default_admin_group():
     return ['owner', 'ban']
 
-def load_image_url():
-    curs.execute(db_change('select data from other where name = "image_where"'))
-    image_where = curs.fetchall()
-    image_where = image_where[0][0] if image_where else 'data/images'
-    
-    return image_where
+def load_random_key(long = 64):
+    return ''.join(
+        random.choice(
+            "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        ) for i in range(long)
+    )
 
 def http_warning():
     return '''
@@ -427,60 +433,6 @@ def http_warning():
             }
         </script>
     '''
-
-def load_domain():
-    curs.execute(db_change("select data from other where name = 'domain'"))
-    domain = curs.fetchall()
-    domain = domain[0][0] if domain and domain[0][0] != '' else flask.request.host_url
-
-    return domain
-
-def load_random_key(long = 64):
-    return ''.join(
-        random.choice(
-            "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        ) for i in range(long)
-    )
-
-def edit_button(editor_display = '0'):
-    insert_list = []
-
-    curs.execute(db_change("select html, plus from html_filter where kind = 'edit_top'"))
-    db_data = curs.fetchall()
-    for get_data in db_data:
-        insert_list += [[get_data[1], get_data[0]]]
-
-    data = ''
-    for insert_data in insert_list:
-        data += '' + \
-            '<a href="' + \
-                'javascript:do_insert_data(\'textarea_edit_view\', \'' + insert_data[0] + '\', ' + editor_display + ')' + \
-            '">(' + insert_data[1] + ')</a> ' + \
-        ''
-
-    data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')</a>'
-    data += '<hr class="main_hr">'
-    
-    return data
-
-def ip_warning():
-    if ip_or_user() != 0:
-        curs.execute(db_change('select data from other where name = "no_login_warning"'))
-        data = curs.fetchall()
-        if data and data[0][0] != '':
-            text_data = '' + \
-                '<span>' + data[0][0] + '</span>' + \
-                '<hr class="main_hr">' + \
-            ''
-        else:
-            text_data = '' + \
-                '<span>' + load_lang('no_login_warning') + '</span>' + \
-                '<hr class="main_hr">' + \
-            ''
-    else:
-        text_data = ''
-
-    return text_data
 
 def next_fix(link, num, page, end = 50):
     list_data = ''
@@ -524,9 +476,74 @@ def get_acl_list(type_d = 'normal'):
         return ['', 'user', 'all']
     else:
         return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', 'ban_admin']
+
+## Func-simple-with_DB
+def load_image_url():
+    curs = conn.cursor()
+
+    curs.execute(db_change('select data from other where name = "image_where"'))
+    image_where = curs.fetchall()
+    image_where = image_where[0][0] if image_where else os.path.join('data', 'images')
+    
+    return image_where
+
+def load_domain():
+    curs = conn.cursor()
+
+    curs.execute(db_change("select data from other where name = 'domain'"))
+    domain = curs.fetchall()
+    domain = domain[0][0] if domain and domain[0][0] != '' else flask.request.host_url
+
+    return domain
+
+def edit_button(editor_display = '0'):
+    curs = conn.cursor()
+
+    insert_list = []
+
+    curs.execute(db_change("select html, plus from html_filter where kind = 'edit_top'"))
+    db_data = curs.fetchall()
+    for get_data in db_data:
+        insert_list += [[get_data[1], get_data[0]]]
+
+    data = ''
+    for insert_data in insert_list:
+        data += '' + \
+            '<a href="' + \
+                'javascript:do_insert_data(\'textarea_edit_view\', \'' + insert_data[0] + '\', ' + editor_display + ')' + \
+            '">(' + insert_data[1] + ')</a> ' + \
+        ''
+
+    data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')</a>'
+    data += '<hr class="main_hr">'
+    
+    return data
+
+def ip_warning():
+    curs = conn.cursor()
+
+    if ip_or_user() != 0:
+        curs.execute(db_change('select data from other where name = "no_login_warning"'))
+        data = curs.fetchall()
+        if data and data[0][0] != '':
+            text_data = '' + \
+                '<span>' + data[0][0] + '</span>' + \
+                '<hr class="main_hr">' + \
+            ''
+        else:
+            text_data = '' + \
+                '<span>' + load_lang('no_login_warning') + '</span>' + \
+                '<hr class="main_hr">' + \
+            ''
+    else:
+        text_data = ''
+
+    return text_data
     
 # Func-login    
 def pw_encode(data, type_d = ''):
+    curs = conn.cursor()
+
     if type_d == '':
         curs.execute(db_change('select data from other where name = "encode"'))
         set_data = curs.fetchall()
@@ -542,6 +559,8 @@ def pw_encode(data, type_d = ''):
             return hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
 
 def pw_check(data, data2, type_d = 'no', id_d = ''):
+    curs = conn.cursor()
+
     curs.execute(db_change('select data from other where name = "encode"'))
     db_data = curs.fetchall()
 
@@ -568,9 +587,13 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
         
 # Func-skin
 def easy_minify(data, tool = None):
+    # without_DB
+
     return data
 
 def load_lang(data, safe = 0):
+    curs = conn.cursor()
+
     global global_lang
 
     ip = ip_check()
@@ -614,6 +637,8 @@ def load_lang(data, safe = 0):
     return html.escape(data + ' (' + lang_name + ')')
 
 def skin_check(set_n = 0):
+    curs = conn.cursor()
+
     # 개편 필요?
     skin_list = load_skin('tenshi', 1)
     skin = skin_list[0]
@@ -644,6 +669,8 @@ def skin_check(set_n = 0):
         return skin
     
 def wiki_css(data):
+    # without_DB
+
     global data_css
     global data_css_ver
 
@@ -674,6 +701,8 @@ def wiki_css(data):
     return data
 
 def cut_100(data):
+    # without_DB
+
     data = re.search(r'<pre style="display: none;" id="render_content_load">([^<>]+)<\/pre>', data)
     if data:
         data = data.group(1)
@@ -685,6 +714,8 @@ def cut_100(data):
         return ''
 
 def wiki_set(num = 1):
+    curs = conn.cursor()
+
     if num == 1:
         skin_name = skin_check(1)
         data_list = []
@@ -732,7 +763,9 @@ def wiki_set(num = 1):
 
     return data_list
 
-def wiki_custom():    
+def wiki_custom():
+    curs = conn.cursor()
+
     ip = ip_check()
     if ip_or_user(ip) == 0:
         user_icon = 1
@@ -799,6 +832,8 @@ def wiki_custom():
     ]
 
 def load_skin(data = '', set_n = 0, default = 0):
+    # without_DB
+
     # data -> 가장 앞에 있을 스킨 이름
     # set_n == 0 -> 스트링으로 반환
     # set_n == 1 -> 리스트로 반환
@@ -844,6 +879,8 @@ def load_skin(data = '', set_n = 0, default = 0):
 
 # Func-markup
 def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', doc_acl = ''):
+    # without_DB
+
     # data_type in ['view', 'raw', 'api_view', 'backlink']
     doc_acl = acl_check(doc_name, 'render') if doc_acl == '' else doc_acl
     doc_data = 0 if doc_data == None else doc_data
@@ -855,12 +892,15 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
             return doc_data
         else:
             if doc_data != 0:
-                return render_do(doc_name, doc_data, data_type, data_in)
+                get_class_render = class_do_render(conn)
+                return get_class_render.do_render(doc_name, doc_data, data_type, data_in)
             else:
                 return 'HTTP Request 404'
 
 # Func-request
 def send_email(who, title, data):
+    curs = conn.cursor()
+
     try:
         curs.execute(db_change('' + \
             'select name, data from other ' + \
@@ -919,6 +959,8 @@ def send_email(who, title, data):
         return 0
 
 def captcha_get():
+    curs = conn.cursor()
+
     data = ''
     
     if ip_or_user() != 0:
@@ -954,6 +996,8 @@ def captcha_get():
     return data
 
 def captcha_post(re_data, num = 1):
+    curs = conn.cursor()
+
     if num == 1:
         curs.execute(db_change('select data from other where name = "sec_re"'))
         sec_re = curs.fetchall()
@@ -972,6 +1016,8 @@ def captcha_post(re_data, num = 1):
 
 # Func-user
 def ip_or_user(data = ''):
+    # without_DB
+
     # 1 == ip
     # 0 == reg
     
@@ -984,6 +1030,8 @@ def ip_or_user(data = ''):
         return 0
 
 def admin_check(num = None, what = None, name = ''):
+    curs = conn.cursor()
+
     ip = ip_check() if name == '' else name
     time_data = get_time()
     pass_ok = 0
@@ -1044,6 +1092,8 @@ def admin_check(num = None, what = None, name = ''):
     return 0
 
 def acl_check(name = 'test', tool = '', topic_num = '1'):
+    curs = conn.cursor()
+
     ip = ip_check()
     get_ban = ban_check()
     acl_c = re.search(r"^user:((?:(?!\/).)*)", name) if name else None
@@ -1236,6 +1286,8 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
     return 1
 
 def ban_check(ip = None, tool = ''):
+    curs = conn.cursor()
+
     ip = ip_check() if not ip else ip
     tool = '' if not tool else tool
 
@@ -1278,6 +1330,8 @@ def ban_check(ip = None, tool = ''):
     return 0
 
 def ip_pas(raw_ip, type_d = 0):
+    curs = conn.cursor()
+
     hide = 0
     end_ip = {}
     i = 0
@@ -1324,6 +1378,8 @@ def ip_pas(raw_ip, type_d = 0):
         
 # Func-edit
 def slow_edit_check():
+    curs = conn.cursor()
+
     curs.execute(db_change("select data from other where name = 'slow_edit'"))
     slow_edit = curs.fetchall()
     if slow_edit and slow_edit != '0' and admin_check(5) != 1:
@@ -1347,6 +1403,8 @@ def slow_edit_check():
     return 0
 
 def edit_filter_do(data):
+    curs = conn.cursor()
+
     if admin_check(1) != 1:
         curs.execute(db_change(
             "select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''"
@@ -1368,11 +1426,16 @@ def edit_filter_do(data):
 
 # Func-insert
 def add_alarm(who, context):
+    curs = conn.cursor()
+
     curs.execute(db_change(
         'insert into alarm (name, data, date) values (?, ?, ?)'
     ), [who, context, get_time()])
+    conn.commit()
     
-def add_user(user_name, user_pw, user_email = '', user_encode = ''):    
+def add_user(user_name, user_pw, user_email = '', user_encode = ''):
+    curs = conn.cursor()
+
     if user_encode == '':
         user_pw_hash = pw_encode(user_pw)
 
@@ -1415,6 +1478,8 @@ def add_user(user_name, user_pw, user_email = '', user_encode = ''):
     conn.commit()
     
 def ua_plus(u_id, u_ip, u_agent, time):
+    curs = conn.cursor()
+
     curs.execute(db_change("select data from other where name = 'ua_get'"))
     rep_data = curs.fetchall()
     if rep_data and rep_data[0][0] != '':
@@ -1428,8 +1493,11 @@ def ua_plus(u_id, u_ip, u_agent, time):
             u_agent, 
             time
         ])
+        conn.commit()
 
 def ban_insert(name, end, why, login, blocker, type_d = None):
+    curs = conn.cursor()
+
     now_time = get_time()
     band = type_d if type_d else ''
 
@@ -1482,6 +1550,8 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
     conn.commit()
 
 def rd_plus(topic_num, date, name = None, sub = None):
+    curs = conn.cursor()
+
     curs.execute(db_change("select code from rd where code = ?"), [topic_num])
     if curs.fetchall():
         curs.execute(db_change("update rd set date = ? where code = ?"), [date, topic_num])
@@ -1493,6 +1563,8 @@ def rd_plus(topic_num, date, name = None, sub = None):
     conn.commit()
 
 def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
+    curs = conn.cursor()
+
     if mode == 'add':
         curs.execute(db_change(
             "select id from history where title = ? order by id + 0 asc limit 1"
@@ -1576,6 +1648,8 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
 
 # Func-error
 def re_error(data):
+    curs = conn.cursor()
+
     conn.commit()
 
     if data == '/ban':

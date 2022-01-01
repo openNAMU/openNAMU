@@ -123,7 +123,9 @@ if data_db_load == 'Y':
             data_db_set['mysql_port'] = '3306'
 
     db_data_get(data_db_set['type'])
-    conn = get_conn(data_db_set)
+    load_db = get_db_connect(data_db_set)
+
+    conn = load_db.db_load()
     curs = conn.cursor()
 else:
     print('----')
@@ -197,7 +199,9 @@ if what_i_do == '1':
 
         curs.execute(db_change("select data from data where title = ?"), [name[0]])
         data = curs.fetchall()
-        render_do(name[0], data[0][0], 'backlink', '')
+        
+        get_class_render = class_do_render(conn)
+        get_class_render.do_render(name[0], data[0][0], 'backlink', '')
 elif what_i_do == '2':
     curs.execute(db_change("delete from other where name = 'recaptcha'"))
     curs.execute(db_change("delete from other where name = 'sec_re'"))

@@ -1,14 +1,14 @@
 from .tool.func import *
 
-def inter_wiki_plus_2(conn, tools, name):
+def inter_wiki_add(conn, tool, name):
     curs = conn.cursor()
     
     if not name:
-        if tools == 'plus_edit_filter':
+        if tool == 'plus_edit_filter':
             return redirect('/manager/9')
 
     if flask.request.method == 'POST':
-        if tools == 'plus_inter_wiki':
+        if tool == 'plus_inter_wiki':
             if name:
                 curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki'"), [name])
 
@@ -22,7 +22,7 @@ def inter_wiki_plus_2(conn, tools, name):
             ])
 
             admin_check(None, 'inter_wiki_plus')
-        elif tools == 'plus_edit_filter':
+        elif tool == 'plus_edit_filter':
             if admin_check(None, 'edit_filter edit') != 1:
                 return re_error('/error/3')
 
@@ -45,7 +45,7 @@ def inter_wiki_plus_2(conn, tools, name):
         else:
             plus_d = ''
 
-            if tools == 'plus_name_filter':
+            if tool == 'plus_name_filter':
                 try:
                     re.compile(flask.request.form.get('title', 'test'))
                 except:
@@ -54,7 +54,7 @@ def inter_wiki_plus_2(conn, tools, name):
                 admin_check(None, 'name_filter edit')
 
                 type_d = 'name'
-            elif tools == 'plus_file_filter':
+            elif tool == 'plus_file_filter':
                 try:
                     re.compile(flask.request.form.get('title', 'test'))
                 except:
@@ -63,15 +63,15 @@ def inter_wiki_plus_2(conn, tools, name):
                 admin_check(None, 'file_filter edit')
 
                 type_d = 'file'
-            elif tools == 'plus_email_filter':
+            elif tool == 'plus_email_filter':
                 admin_check(None, 'email_filter edit')
 
                 type_d = 'email'
-            elif tools == 'plus_image_license':
+            elif tool == 'plus_image_license':
                 admin_check(None, 'image_license edit')
 
                 type_d = 'image_license'
-            elif tools == 'plus_extension_filter':
+            elif tool == 'plus_extension_filter':
                 admin_check(None, 'extension_filter edit')
 
                 type_d = 'extension'
@@ -95,7 +95,7 @@ def inter_wiki_plus_2(conn, tools, name):
 
         conn.commit()
 
-        return redirect('/' + re.sub(r'^plus_', '', tools))
+        return redirect('/' + re.sub(r'^plus_', '', tool))
     else:
         get_sub = 0
         if admin_check() != 1:
@@ -103,7 +103,7 @@ def inter_wiki_plus_2(conn, tools, name):
         else:
             stat = ''
 
-        if tools == 'plus_inter_wiki':
+        if tool == 'plus_inter_wiki':
             if name:
                 curs.execute(db_change("select html, plus, plus_t from html_filter where html = ? and kind = 'inter_wiki'"), [name])
                 exist = curs.fetchall()
@@ -128,7 +128,7 @@ def inter_wiki_plus_2(conn, tools, name):
                 <hr class="main_hr">
                 <input value="''' + html.escape(value[2]) + '''" type="text" name="icon">
             '''
-        elif tools == 'plus_edit_filter':            
+        elif tool == 'plus_edit_filter':            
             curs.execute(db_change("select plus, plus_t from html_filter where html = ? and kind = 'regex_filter'"), [name])
             exist = curs.fetchall()
             if exist:
@@ -166,35 +166,35 @@ def inter_wiki_plus_2(conn, tools, name):
                 <hr class="main_hr">
                 <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
             '''
-        elif tools == 'plus_name_filter':
+        elif tool == 'plus_name_filter':
             title = load_lang('id_filter_add')
             form_data = '' + \
                 load_lang('regex') + \
                 '<hr class="main_hr">' + \
                 '<input value="' + html.escape(name if name else '') + '" type="text" name="title">' + \
             ''
-        elif tools == 'plus_file_filter':
+        elif tool == 'plus_file_filter':
             title = load_lang('file_filter_add')
             form_data = '' + \
                 load_lang('regex') + \
                 '<hr class="main_hr">' + \
                 '<input value="' + html.escape(name if name else '') + '" type="text" name="title">' + \
             ''
-        elif tools == 'plus_email_filter':
+        elif tool == 'plus_email_filter':
             title = load_lang('email_filter_add')
             form_data = '' + \
                 load_lang('email') + \
                 '<hr class="main_hr">' + \
                 '<input value="' + html.escape(name if name else '') + '" type="text" name="title">' + \
             ''
-        elif tools == 'plus_image_license':
+        elif tool == 'plus_image_license':
             title = load_lang('image_license_add')
             form_data = '' + \
                 load_lang('license') + \
                 '<hr class="main_hr">' + \
                 '<input value="' + html.escape(name if name else '') + '" type="text" name="title">' + \
             ''
-        elif tools == 'plus_extension_filter':
+        elif tool == 'plus_extension_filter':
             title = load_lang('extension_filter_add')
             form_data = '' + \
                 load_lang('extension') + \
@@ -232,5 +232,5 @@ def inter_wiki_plus_2(conn, tools, name):
                         <button ''' + stat + ''' type="submit">''' + load_lang('add') + '''</button>
                     </form>
                     ''',
-            menu = [[re.sub('^plus_', '', tools), load_lang('return')]]
+            menu = [[re.sub('^plus_', '', tool), load_lang('return')]]
         ))

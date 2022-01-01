@@ -1,5 +1,7 @@
 flask
-gevent
+
+waitress
+netius
 
 requests
 
