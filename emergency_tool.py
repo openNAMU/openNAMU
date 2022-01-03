@@ -2,10 +2,9 @@
 import time
 from route.tool.func import *
 
-while 1:
-    print('Load DB (Y) [Y, N] : ', end = '')
-    data_db_load = input()
-    if data_db_load in ['Y', 'N']:
+while True:
+    data_db_load = input('Load DB (Y) [Y, N] : ')
+    if data_db_load in ('Y', 'N'):
         break
 
 if data_db_load == 'Y':
@@ -13,14 +12,14 @@ if data_db_load == 'Y':
     if os.path.exists(os.path.join('data', 'set.json')):
         db_set_list = ['db', 'db_type']
         set_data = json.loads(open(
-            os.path.join('data', 'set.json'), 
-            encoding = 'utf8'
+            os.path.join('data', 'set.json'),
+            encoding='utf8'
         ).read())
         for i in db_set_list:
-            if not i in set_data:
+            if i not in set_data:
                 print('Please delete set.json')
                 print('----')
-                raise
+                raise KeyError(i)
 
         print('DB name : ' + set_data['db'])
         print('DB type : ' + set_data['db_type'])
@@ -43,8 +42,7 @@ if data_db_load == 'Y':
         set_data = {}
         normal_db_type = ['sqlite', 'mysql']
 
-        print('DB type (' + normal_db_type[0] + ') [' + ', '.join(normal_db_type) + '] : ', end = '')
-        data_get = str(input())
+        data_get = input('DB type (' + normal_db_type[0] + ') [' + ', '.join(normal_db_type) + '] : ')
         if data_get == '' or not data_get in normal_db_type:
             set_data['db_type'] = 'sqlite'
         else:
@@ -57,57 +55,44 @@ if data_db_load == 'Y':
                 if f_src:
                     all_src += [f_src.group(1)]
 
-        print('DB name (data) [' + ', '.join(all_src) + '] : ', end = '')
-
-        data_get = str(input())
+        data_get = input('DB name (data) [' + ', '.join(all_src) + '] : ')
         if data_get == '':
             set_data['db'] = 'data'
         else:
             set_data['db'] = data_get
 
-        with open(os.path.join('data', 'set.json'), 'w', encoding = 'utf8') as f:
+        with open(os.path.join('data', 'set.json'), 'w', encoding='utf8') as f:
             f.write(json.dumps(set_data))
 
-    data_db_set = {}
-    data_db_set['name'] = set_data['db']
-    data_db_set['type'] = set_data['db_type']
+    data_db_set = {'name': set_data['db'], 'type': set_data['db_type']}
 
     if data_db_set['type'] == 'mysql':
-        if not os.path.exists(os.path.join('data', 'mysql.json')):
-            db_set_list = ['user', 'password', 'host', 'port']
-            set_data = json.loads(
-                open(
-                    os.path.join('data', 'mysql.json'),
-                    encoding = 'utf8'
-                ).read()
-            )
-            for i in db_set_list:
-                if not i in set_data:
+        if os.path.exists(os.path.join('data', 'mysql.json')):
+            with open(os.path.join('data', 'mysql.json'), encoding='utf8') as f:
+                set_data = json.loads(f.read())
+
+            for i in ('user', 'password', 'host', 'port'):
+                if i not in set_data:
                     print('Please delete mysql.json')
                     print('----')
-                    raise
+                    raise KeyError(i)
 
-            print('DB user ID : ', end = '')
-            set_data_mysql['user'] = str(input())
+            set_data_mysql = set_data
+        else:
+            set_data_mysql = {
+                'user': input('DB user ID : '),
+                'password': input('DB password : '),
+                'host': input('DB host (localhost) : '),
+                'port': input('DB port (3306) : '),
+            }
 
-            print('DB password : ', end = '')
-            set_data_mysql['password'] = str(input())
-
-            print('DB host (localhost) : ', end = '')
-            set_data_mysql['host'] = str(input())
             if set_data_mysql['host'] == '':
                 set_data_mysql['host'] = 'localhost'
 
-            print('DB port (3306) : ', end = '')
-            set_data_mysql['port'] = str(input())
             if set_data_mysql['port'] == '':
                 set_data_mysql['port'] = '3306'
 
-            with open(
-                os.path.join('data', 'mysql.json'), 
-                'w', 
-                encoding = 'utf8'
-            ) as f:
+            with open(os.path.join('data', 'mysql.json'), 'w', encoding='utf8') as f:
                 f.write(json.dumps(set_data_mysql))
 
         data_db_set['mysql_user'] = set_data_mysql['user']
@@ -152,22 +137,19 @@ print('16. Delete 2FA password')
 print('17. Change markup')
 
 print('----')
-print('Select : ', end = '')
-what_i_do = input()
+what_i_do = input('Select : ')
 
 if what_i_do == '1':
     print('----')
-    print('All delete (Y) [Y, N] : ', end = '')
-    go_num = input()
+    go_num = input('All delete (Y) [Y, N] : ')
     if not go_num == 'N':
         curs.execute(db_change("delete from back"))
         conn.commit()
 
     print('----')
-    print('Count (100) : ', end = '')
     try:
-        go_num = int(input())
-    except:
+        go_num = int(input('Count (100) : '))
+    except ValueError:
         go_num = 100
 
     num = 0
@@ -175,12 +157,15 @@ if what_i_do == '1':
     print('----')
     print('Load...')
 
-    curs.execute(db_change("" + \
-        "select title from data d " + \
-        "where not exists (" + \
-            "select title from back where link = d.title limit 1" + \
-        ")" + \
-    ""))
+    curs.execute(
+        db_change(
+            "select title from data d "
+            "where not exists ("
+            "select title from back where link = d.title limit 1"
+            ")"
+            ""
+        )
+    )
     title = curs.fetchall()
 
     print('----')
@@ -199,7 +184,7 @@ if what_i_do == '1':
 
         curs.execute(db_change("select data from data where title = ?"), [name[0]])
         data = curs.fetchall()
-        
+
         get_class_render = class_do_render(conn)
         get_class_render.do_render(name[0], data[0][0], 'backlink', '')
 elif what_i_do == '2':
@@ -207,38 +192,37 @@ elif what_i_do == '2':
     curs.execute(db_change("delete from other where name = 'sec_re'"))
 elif what_i_do == '3':
     print('----')
-    print('IP or Name : ', end = '')
-    user_data = input()
+    user_data = input('IP or Name : ')
 
-    curs.execute(db_change("" + \
-        "insert into rb (block, end, today, blocker, why, band) " + \
-        "values (?, ?, ?, ?, ?, ?)"
-    ), [
-        user_data,
-        'release',
-        get_time(),
-        'tool:emergency',
-        '',
-        ''
-    ])
+    curs.execute(
+        db_change(
+            "insert into rb (block, end, today, blocker, why, band) "
+            "values (?, ?, ?, ?, ?, ?)"
+        ),
+        [
+            user_data,
+            'release',
+            get_time(),
+            'tool:emergency',
+            '',
+            '',
+        ]
+    )
 
     curs.execute(db_change("update rb set ongoing = '' where block = ?"), [user_data])
 elif what_i_do == '4':
     print('----')
-    print('Host : ', end = '')
-    host = input()
+    host = input('Host : ')
 
     curs.execute(db_change("update other set data = ? where name = 'host'"), [host])
 elif what_i_do == '5':
     print('----')
-    print('Port : ', end = '')
-    port = int(input())
+    port = int(input('Port : '))
 
     curs.execute(db_change("update other set data = ? where name = 'port'"), [port])
 elif what_i_do == '6':
     print('----')
-    print('Skin name : ', end = '')
-    skin = input()
+    skin = input('Skin name : ')
 
     curs.execute(db_change("update other set data = ? where name = 'skin'"), [skin])
 elif what_i_do == '7':
@@ -247,36 +231,34 @@ elif what_i_do == '7':
     print('2. sha3')
 
     print('----')
-    print('Select : ', end = '')
-    what_i_do = int(input())
+    what_i_do = input('Select : ')
 
     print('----')
-    print('User name : ', end = '')
-    user_name = input()
+    user_name = input('User name : ')
 
     print('----')
-    print('User password : ', end = '')
-    user_pw = input()
+    user_pw = input('User password : ')
 
     if what_i_do == '1':
         hashed = hashlib.sha256(bytes(user_pw, 'utf-8')).hexdigest()
-    else:
+    elif what_i_do == '2':
         if sys.version_info < (3, 6):
             hashed = sha3.sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
         else:
             hashed = hashlib.sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
+    else:
+        raise ValueError(what_i_do)
 
     curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [
-        hashed, 
+        hashed,
         user_name
     ])
 elif what_i_do == '8':
     print('----')
-    print('Insert version (0000000) : ', end = '')
-    new_ver = input()
-    
+    new_ver = input('Insert version (0000000) : ')
+
     if new_ver == '':
-        new_ver == '0000000'
+        new_ver = '0000000'
 
     curs.execute(db_change("update other set data = ? where name = 'ver'"), [new_ver])
 elif what_i_do == '9':
@@ -284,17 +266,15 @@ elif what_i_do == '9':
         os.remove(os.path.join('data', 'set.json'))
 elif what_i_do == '10':
     print('----')
-    print('User name : ', end = '')
-    user_name = input()
+    user_name = input('User name : ')
 
     print('----')
-    print('New name : ', end = '')
-    new_name = input()
+    new_name = input('New name : ')
 
-    curs.execute(db_change("update user_set set id = ? where id = ?"), [
-        new_name, 
-        user_name
-    ])
+    curs.execute(
+        db_change("update user_set set id = ? where id = ?"),
+        [new_name, user_name]
+    )
 elif what_i_do == '11':
     if os.path.exists(os.path.join('data', 'mysql.json')):
         os.remove(os.path.join('data', 'mysql.json'))
@@ -307,33 +287,35 @@ elif what_i_do == '12':
         count_data = 0
 
     curs.execute(db_change('delete from other where name = "count_all_title"'))
-    curs.execute(db_change('insert into other (name, data) values ("count_all_title", ?)'), [
-        str(count_data)
-    ])
+    curs.execute(
+        db_change(
+            'insert into other (name, data) values ("count_all_title", ?)'
+        ),
+        [str(count_data)]
+    )
 elif what_i_do == '13':
     curs.execute(db_change('delete from cache_data'))
 elif what_i_do == '14':
     curs.execute(db_change('delete from other where name = "head"'))
 elif what_i_do == '15':
     print('----')
-    print('User name : ', end = '')
-    user_name = input()
+    user_name = input('User name : ')
 
     curs.execute(db_change("update user_set set data = 'owner' where id = ? and name = 'acl'"), [user_name])
 elif what_i_do == '16':
     print('----')
-    print('User name : ', end = '')
-    user_name = input()
+    user_name = input('User name : ')
 
     curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [user_name])
     if curs.fetchall():
         curs.execute(db_change("update user_set set data = '' where name = '2fa' and id = ?"), [user_name])
-else:
+elif what_i_do == '17':
     print('----')
-    print('Markup name : ', end = '')
-    markup = input()
+    markup = input('Markup name : ')
 
     curs.execute(db_change("update other set data = ? where name = 'markup'"), [markup])
+else:
+    raise ValueError(what_i_do)
 
 if data_db_load == 'Y':
     conn.commit()
