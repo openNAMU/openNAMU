@@ -1,8 +1,6 @@
 from .tool.func import *
 
-def api_image_view_2(conn, name):
-    curs = conn.cursor()
-
+def api_image_view(name = 'Test'):
     if flask.request.method == 'POST':
         try:
             title_list = json.loads(flask.request.form.get('title_list', ''))

@@ -1249,9 +1249,11 @@ function do_onmark_redirect_render(data, data_js, name_doc) {
         var link_main = link_data_var[0];
         var link_sub = link_data_var[1];
         
+        // 임시 조치
         if(
             name_include == '' &&
             window.location.search === '' &&
+            window.location.pathname.match(/\/w\//) &&
             !window.location.pathname.match(/\/doc_from\//)
         ) {
             window.location.href = '/w/' + do_url_change(link_main) + '/doc_from/' + do_url_change(name_doc) + link_sub;
