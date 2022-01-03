@@ -129,7 +129,8 @@ if data_db_set['type'] == 'mysql':
         data_db_set['mysql_port'] = '3306'
 
 db_data_get(data_db_set['type'])
-load_db = get_db_connect(data_db_set)
+do_db_set(data_db_set)
+load_db = get_db_connect_old(data_db_set)
 
 conn = load_db.db_load()
 curs = conn.cursor()
@@ -715,19 +716,19 @@ def recent_record(name = None):
 def recent_history(name = None):
     return recent_change_2(load_db.db_get(), name, 'history')
 
-@app.route('/history/tool/<int(signed=True):rev>/<everything:name>')
+@app.route('/history/tool/<int(signed = True):rev>/<everything:name>')
 def recent_history_tool(name = 'Test', rev = 1):
     return recent_history_tool_2(load_db.db_get(), name, rev)
 
-@app.route('/history/delete/<int(signed=True):rev>/<everything:name>', methods = ['POST', 'GET'])
+@app.route('/history/delete/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])
 def recent_history_delete(name = 'Test', rev = 1):
     return recent_history_delete_2(load_db.db_get(), name, rev)
 
-@app.route('/history/hidden/<int(signed=True):rev>/<everything:name>')
+@app.route('/history/hidden/<int(signed = True):rev>/<everything:name>')
 def recent_history_hidden(name = 'Test', rev = 1):
     return recent_history_hidden_2(load_db.db_get(), name, rev)
 
-@app.route('/history/send/<int(signed=True):rev>/<everything:name>', methods = ['POST', 'GET'])
+@app.route('/history/send/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])
 def recent_history_send(name = 'Test', rev = 1):
     return recent_history_send_2(load_db.db_get(), name, rev)
 
@@ -780,7 +781,7 @@ def view_xref_this(name = 'Test'):
 def view_raw(name = None, topic_num = None, num = None):
     return view_raw_2(load_db.db_get(), name, topic_num, num)
 
-@app.route('/diff/<int:num_a>/<int:num_b>/<everything:name>')
+@app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')
 def view_diff(name = 'Test', num_a = 1, num_b = 1):
     return view_diff_2(load_db.db_get(), name, num_a, num_b)
 
@@ -788,7 +789,7 @@ def view_diff(name = 'Test', num_a = 1, num_b = 1):
 def view_down(name = None):
     return view_down_2(load_db.db_get(), name)
 
-@app.route('/w/<everything:name>/doc_rev/<int:doc_rev>')
+@app.route('/w/<everything:name>/doc_rev/<int(signed = True):doc_rev>')
 @app.route('/w/<everything:name>/doc_from/<everything:doc_from>')
 @app.route('/w/<everything:name>')
 def view_read(name = 'Test', doc_rev = 0, doc_from = ''):
@@ -1011,73 +1012,32 @@ def vote_add():
     return vote_add_2(load_db.db_get())
 
 # Func-api
-@app.route('/api/w/<everything:name>', methods = ['POST', 'GET'])
-def api_w(name = ''):
-    return api_w_2(load_db.db_get(), name)
-
-@app.route('/api/raw/<everything:name>')
-def api_raw(name = ''):
-    return api_raw_2(load_db.db_get(), name)
-
-@app.route('/api/version')
-def api_version():
-    return api_version_2(load_db.db_get(), version_list)
-
-@app.route('/api/skin_info')
-@app.route('/api/skin_info/<name>')
-def api_skin_info(name = ''):
-    return api_skin_info_2(load_db.db_get(), name)
-
-@app.route('/api/markup')
-def api_markup():
-    return api_markup_2(load_db.db_get())
-
-@app.route('/api/user_info/<name>')
-def api_user_info(name = ''):
-    return api_user_info_2(load_db.db_get(), name)
-
-@app.route('/api/thread/<topic_num>')
-def api_topic_sub(name = '', topic_num = 1):
-    return api_topic_sub_2(load_db.db_get(), topic_num)
-
-@app.route('/api/search/<name>')
-def api_search(name = ''):
-    return api_search_2(load_db.db_get(), name)
-
-@app.route('/api/recent_changes')
-def api_recent_change():
-    return api_recent_change_2(load_db.db_get())
-
-@app.route('/api/recent_discuss')
-@app.route('/api/recent_discuss/<int:num>')
-def api_recent_discuss(num = 10):
-    return api_recent_discuss_2(load_db.db_get(), num, 'normal')
-
-@app.route('/api/recent_discuss/stop')
-@app.route('/api/recent_discuss/<int:num>/stop')
-def api_recent_discuss_stop(num = 10):
-    return api_recent_discuss_2(load_db.db_get(), num, 'stop')
-
-@app.route('/api/recent_discuss/all')
-@app.route('/api/recent_discuss/<int:num>/all')
-def api_recent_discuss_all(num = 10):
-    return api_recent_discuss_2(load_db.db_get(), num, 'all')
-
-@app.route('/api/sha224/<everything:name>', methods = ['POST', 'GET'])
-def api_sha224(name = 'test'):
-    return api_sha224_2(load_db.db_get(), name)
-
-@app.route('/api/title_index')
-def api_title_index():
-    return api_title_index_2(load_db.db_get())
-
-@app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])
-def api_image_view(name = ''):
-    return api_image_view_2(load_db.db_get(), name)
-
-@app.route('/api/sitemap.xml')
-def api_sitemap():
-    return api_sitemap_2(load_db.db_get())
+app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):rev>')(api_w)
+app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['GET', 'POST'])(api_w)
+app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
+app.route('/api/raw/<everything:name>')(api_raw)
+app.route('/api/version', defaults = { 'version_list' : version_list })(api_version)
+app.route('/api/skin_info')(api_skin_info)
+app.route('/api/skin_info/<name>')(api_skin_info)
+app.route('/api/markup')(api_markup)
+app.route('/api/user_info/<name>')(api_user_info)
+app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic_sub)
+app.route('/api/thread/<int:topic_num>/<tool>')(api_topic_sub)
+app.route('/api/thread/<int:topic_num>')(api_topic_sub)
+app.route('/api/search/<everything:name>/doc_num/<int:num>/<int:page>')(api_search)
+app.route('/api/search/<everything:name>')(api_search)
+app.route('/api/recent_change/<int:num>')(api_recent_change)
+app.route('/api/recent_change')(api_recent_change)
+# recent_changes -> recent_change
+app.route('/api/recent_changes')(api_recent_change)
+app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)
+app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)
+app.route('/api/recent_discuss')(api_recent_discuss)
+app.route('/api/sha224/<everything:data>', methods = ['POST', 'GET'])(api_sha224)
+app.route('/api/title_index')(api_title_index)
+app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])(api_image_view)
+# 이건 API 영역이 아닌 것 같아서 고심 중
+app.route('/api/sitemap.xml')(api_sitemap)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정

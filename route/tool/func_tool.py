@@ -17,6 +17,7 @@ def get_time():
 
 def db_data_get(data):
     global set_data
+    
     set_data = data
 
 def db_change(data):
