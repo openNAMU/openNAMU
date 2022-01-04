@@ -1,8 +1,6 @@
 from .tool.func import *
 
-def main_manager_2(conn, num):
-    curs = conn.cursor()
-
+def main_tool_admin(num = 1, add_1 = '', add_2 = ''):
     title_list = {
         0 : [load_lang('document_name'), 'acl', load_lang('acl')],
         1 : [0, 'check', load_lang('check')],
@@ -78,31 +76,32 @@ def main_manager_2(conn, num):
             menu = [['other', load_lang('return')]]
         ))
     elif not num - 1 > len(title_list):
+        num -= 2
         if flask.request.method == 'POST':
-            if flask.request.args.get('plus', None):
+            if add_2 != '':
                 return redirect(
-                    '/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.args.get('plus', 'test')) + '?plus=' + url_pas(flask.request.form.get('name', 'test'))
+                    '/' + title_list[num][1] + '/' + url_pas(add_2) + '?plus=' + url_pas(add_1)
                 )
             elif flask.request.form.get('regex', None):
-                return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.form.get('name', 'test')) + '?type=regex')
+                return redirect('/' + title_list[num][1] + '/' + url_pas(add_1) + '?type=regex')
             else:
-                return redirect('/' + title_list[(num - 2)][1] + '/' + url_pas(flask.request.form.get('name', 'test')))
+                return redirect('/' + title_list[num][1] + '/' + url_pas(add_1))
         else:
             if title_list[(num - 2)][0] == 0:
                 placeholder = load_lang('user_name')
             else:
-                placeholder = title_list[(num - 2)][0]
+                placeholder = title_list[num][0]
 
             plus = ''
-            if num - 2 == 15:
+            if num == 15:
                 plus = '<input type="checkbox" name="regex"> ' + load_lang('regex') + '<hr class="main_hr">'
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [title_list[(num - 2)][2], wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                imp = [title_list[num][2], wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <input placeholder="''' + placeholder + '''" name="name" type="text">
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         ''' + plus + '''
                         <button type="submit">''' + load_lang('go') + '''</button>
                     </form>
