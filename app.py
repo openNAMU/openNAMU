@@ -347,256 +347,38 @@ if os.path.exists('custom.py'):
     
 # Func
 # Func-inter_wiki
-app.add_url_rule(
-    rule = '/inter_wiki',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'inter_wiki' 
-    }, 
-    view_func = inter_wiki
-)
+app.route('/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(inter_wiki)
+app.route('/inter_wiki/del/<name>', defaults = { 'tool' : 'del_inter_wiki' })(inter_wiki_del)
+app.route('/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/inter_wiki/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_inter_wiki',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
+app.route('/edit_top', defaults = { 'tool' : 'edit_top' })(inter_wiki)
+app.route('/edit_top/del/<name>', defaults = { 'tool' : 'del_edit_top' })(inter_wiki_del)
+app.route('/edit_top/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_top' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/inter_wiki/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_inter_wiki',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
+app.route('/image_license', defaults = { 'tool' : 'image_license' })(inter_wiki)
+app.route('/image_license/del/<name>', defaults = { 'tool' : 'del_image_license' })(inter_wiki_del)
+app.route('/image_license/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_image_license' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/edit_top',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'edit_top'
-    }, 
-    view_func = inter_wiki
-)
+app.route('/edit_filter', defaults = { 'tool' : 'edit_filter' })(inter_wiki)
+app.route('/edit_filter/del/<name>', defaults = { 'tool' : 'del_edit_filter' })(inter_wiki_del)
+app.route('/edit_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(inter_wiki_add)
+app.route('/edit_filter/add/<name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/edit_top/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_edit_top',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
+app.route('/email_filter', defaults = { 'tool' : 'email_filter' })(inter_wiki)
+app.route('/email_filter/del/<name>', defaults = { 'tool' : 'del_email_filter' })(inter_wiki_del)
+app.route('/email_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_email_filter' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/edit_top/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_edit_top',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
+app.route('/file_filter', defaults = { 'tool' : 'file_filter' })(inter_wiki)
+app.route('/file_filter/del/<name>', defaults = { 'tool' : 'del_file_filter' })(inter_wiki_del)
+app.route('/file_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_file_filter' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/image_license',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'image_license'
-    }, 
-    view_func = inter_wiki
-)
+app.route('/name_filter', defaults = { 'tool' : 'name_filter' })(inter_wiki)
+app.route('/name_filter/del/<name>', defaults = { 'tool' : 'del_name_filter' })(inter_wiki_del)
+app.route('/name_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_name_filter' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/image_license/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_image_license',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
-
-app.add_url_rule(
-    rule = '/image_license/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_image_license',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
-
-app.add_url_rule(
-    rule = '/edit_filter',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'edit_filter'
-    }, 
-    view_func = inter_wiki
-)
-
-app.add_url_rule(
-    rule = '/edit_filter/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_edit_filter',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
-
-# 이거 수정 필요 할 듯
-app.add_url_rule(
-    rule = '/edit_filter/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_edit_filter',
-        'name' : None
-    }, 
-    view_func = inter_wiki_add
-)
-
-app.add_url_rule(
-    rule = '/edit_filter/add/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_edit_filter',
-        'name' : 'Test'
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
-
-app.add_url_rule(
-    rule = '/email_filter',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'email_filter'
-    }, 
-    view_func = inter_wiki
-)
-
-app.add_url_rule(
-    rule = '/email_filter/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_email_filter',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
-
-app.add_url_rule(
-    rule = '/email_filter/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_email_filter',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
-
-app.add_url_rule(
-    rule = '/file_filter',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'file_filter'
-    }, 
-    view_func = inter_wiki
-)
-
-app.add_url_rule(
-    rule = '/file_filter/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_file_filter',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
-
-app.add_url_rule(
-    rule = '/file_filter/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_file_filter',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
-
-app.add_url_rule(
-    rule = '/name_filter',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'name_filter'
-    }, 
-    view_func = inter_wiki
-)
-
-app.add_url_rule(
-    rule = '/name_filter/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_name_filter',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
-
-app.add_url_rule(
-    rule = '/name_filter/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_name_filter',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
-
-app.add_url_rule(
-    rule = '/extension_filter',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'extension_filter'
-    }, 
-    view_func = inter_wiki
-)
-
-app.add_url_rule(
-    rule = '/extension_filter/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_extension_filter',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
-
-app.add_url_rule(
-    rule = '/extension_filter/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_extension_filter',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
+app.route('/extension_filter', defaults = { 'tool' : 'extension_filter' })(inter_wiki)
+app.route('/extension_filter/del/<name>', defaults = { 'tool' : 'del_extension_filter' })(inter_wiki_del)
+app.route('/extension_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_extension_filter' })(inter_wiki_add)
 
 # Func-list
 # /list/document/old
@@ -948,12 +730,6 @@ def login_login():
 def login_login_2fa():
     return login_login_2fa_2(load_db.db_get())
 
-'''
-@app.route('/login/2fa/email', methods = ['POST', 'GET'])
-def login_2fa_email():
-    return login_login_2fa_email_2(load_db.db_get())
-'''
-
 @app.route('/register', methods = ['POST', 'GET'])
 def login_register():
     return login_register_2(load_db.db_get())
@@ -1041,68 +817,32 @@ app.route('/api/sitemap.xml')(api_sitemap)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정
-@app.route('/restart', methods = ['POST', 'GET'])
-def main_restart():
-    return main_restart_2(load_db.db_get())
+app.route('/other')(main_tool_other)
+app.route('/manager', methods = ['POST', 'GET'])(main_tool_admin)
+app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_admin)
+app.route('/manager/<int:num>/<add_1>', methods = ['POST', 'GET'])(main_tool_admin)
+app.route('/manager/<int:num>/<add_1>/<add_2>', methods = ['POST', 'GET'])(main_tool_admin)
 
-@app.route('/update', methods=['GET', 'POST'])
-def main_update():
-    return main_update_2(load_db.db_get())
+app.route('/random')(main_func_random)
+app.route('/upload', methods = ['POST', 'GET'])(main_func_upload)
+app.route('/setting', defaults = { 'db_set' : data_db_set['type'] })(main_func_setting)
+app.route('/setting/<int:num>', methods = ['POST', 'GET'], defaults = { 'db_set' : data_db_set['type'] })(main_func_setting)
+app.route('/skin_set')(main_func_skin_set)
+app.route('/main_skin_set')(main_func_skin_set)
+app.route('/easter_egg.xml')(main_func_easter_egg)
 
-@app.route('/random')
-def main_title_random():
-    return main_title_random_2(load_db.db_get())
+# views -> view
+app.route('/view/<everything:name>')(main_view)
+app.route('/views/<everything:name>')(main_view)
+app.route('/image/<everything:name>')(main_view_image)
+# 조정 계획 중
+app.route('/<regex("[^.]+\.(?:txt|xml)"):data>')(main_view_file)
 
-@app.route('/upload', methods=['GET', 'POST'])
-def main_upload():
-    return main_upload_2(load_db.db_get())
+app.route('/shutdown', methods = ['POST', 'GET'])(main_sys_shutdown)
+app.route('/restart', methods = ['POST', 'GET'])(main_sys_restart)
+app.route('/update', methods = ['POST', 'GET'])(main_sys_update)
 
-@app.route('/setting')
-@app.route('/setting/<int:num>', methods = ['POST', 'GET'])
-def setting(num = 0):
-    return main_setting_2(load_db.db_get(), num, data_db_set['type'])
-
-@app.route('/other')
-def main_other():
-    return main_other_2(load_db.db_get())
-
-@app.route('/manager', methods = ['POST', 'GET'])
-@app.route('/manager/<int:num>', methods = ['POST', 'GET'])
-def main_manager(num = 1):
-    return main_manager_2(load_db.db_get(), num)
-
-@app.route('/image/<everything:name>')
-def main_image_view(name = None):
-    return main_image_view_2(load_db.db_get(), name)
-
-@app.route('/skin_set')
-@app.route('/main_skin_set')
-def main_skin_set():
-    return main_skin_set_2(load_db.db_get())
-
-@app.route('/views/<everything:name>')
-def main_views(name = None):
-    return main_views_2(load_db.db_get(), name)
-
-@app.route('/test_func')
-def main_test_func():
-    return main_test_func_2(load_db.db_get())
-
-@app.route('/shutdown', methods = ['POST', 'GET'])
-def main_shutdown():
-    return main_shutdown_2(load_db.db_get())
-
-@app.route('/easter_egg.xml')
-def main_easter_egg():
-    return main_easter_egg_2(load_db.db_get())
-
-@app.route('/<regex("[^.]+\.(?:txt|xml)"):data>')
-def main_file(data = ''):
-    return main_file_2(load_db.db_get(), data)
-
-@app.errorhandler(404)
-def main_error_404(e):
-    return main_error_404_2(load_db.db_get())
+app.errorhandler(404)(main_error_404)
     
 if __name__ == "__main__":
     do_server = netius.servers.WSGIServer(app = app)
