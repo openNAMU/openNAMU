@@ -1,6 +1,6 @@
 function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topic') {
     if(type_do === 'top') {
-        var url = "/api/thread/" + topic_num + "?top=1";
+        var url = "/api/thread/" + topic_num + "/top";
     } else if(type_do === 'main') {
         var url = "/api/thread/" + topic_num;
     } else {
@@ -15,7 +15,7 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
         if(this.readyState === 4 && this.status === 200) {
             var data_t = JSON.parse(this.responseText);
             var start = 0;
-            var key_v = '?num=1';
+            var key_v = '/normal/1';
             
             for(var key in data_t) {
                 var data_a = '';
@@ -30,7 +30,7 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
                     continue;
                 }
                 
-                key_v = '?num=' + String(Number(key) + 1);
+                key_v = '/normal/' + String(Number(key) + 1);
                 
                 var color_b = '';
                 var color_t = '';

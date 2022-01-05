@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def api_topic_sub(topic_num = 1, tool = '', num = ''):
+def api_topic_sub(topic_num = 1, tool = 'normal', num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
