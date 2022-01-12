@@ -243,7 +243,8 @@ def main_func_setting(db_set, num = 0):
                 'edit_help',
                 'upload_help',
                 'upload_default',
-                'license'
+                'license',
+                'topic_text'
             ]
             if flask.request.method == 'POST':
                 for i in i_list:
@@ -328,6 +329,9 @@ def main_func_setting(db_set, num = 0):
 
                             <h2>17. ''' + load_lang('bottom_text') + ''' (HTML)</h2>
                             <textarea rows="3" name="''' + i_list[16] + '''">''' + html.escape(d_list[16]) + '''</textarea>
+                            
+                            <h2>18. ''' + load_lang('topic_text') + '''</h2>
+                            <textarea rows="3" name="''' + i_list[17] + '''">''' + html.escape(d_list[17]) + '''</textarea>
 
                             <hr class="main_hr">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>

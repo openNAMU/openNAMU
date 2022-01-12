@@ -652,13 +652,8 @@ def topic_change(topic_num = 1):
 def topic_admin(topic_num = 1, num = 1):
     return topic_admin_2(load_db.db_get(), topic_num, num)
 
-@app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])
-def topic(topic_num = 1):
-    return topic_2(load_db.db_get(), topic_num)
-
-@app.route('/topic/<everything:name>', methods = ['POST', 'GET'])
-def topic_close_list(name = 'test'):
-    return topic_close_list_2(load_db.db_get(), name)
+app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
+app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_close_list)
 
 # Func-user
 @app.route('/change', methods = ['POST', 'GET'])
