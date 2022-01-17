@@ -69,19 +69,18 @@ function do_twofa_check(init = 0) {
 }
 
 function send_render(i = 0) {
-    var get_class = document.getElementsByClassName('send_content')[i];
+    let get_class = document.getElementsByClassName('send_content')[i];
     if(get_class) {
         send_render(i + 1);
         
-        var data = get_class.innerHTML;
-        
+        let data = get_class.innerHTML;
         if(data === '&lt;br&gt;') {
             document.getElementsByClassName('send_content')[i].innerHTML = '<br>';
         } else {
             data = data.replace(/javascript:/i, '');
-            
-            data = data.replace(/&lt;a&gt;((?:(?!&lt;\/a&gt;).)+)&lt;\/a&gt;/g, function(x, x_1) {
-                return '<a href="/w/' + encodeURIComponent(x_1) + '">' + x_1 + '</a>';
+            data = data.replace(/&lt;a(?:(?:(?!&gt;).)+)&gt;((?:(?!&lt;\/a&gt;).)+)&lt;\/a&gt;/g, function(x, x_1) {
+                x_1_org = x_1.replace('&lt;', '<').replace('&gt;', '>');
+                return '<a href="/w/' + encodeURIComponent(x_1_org) + '">' + x_1 + '</a>';
             });
             
             document.getElementsByClassName('send_content')[i].innerHTML = data;

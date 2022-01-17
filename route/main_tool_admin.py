@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_tool_admin(num = 1, add_1 = '', add_2 = ''):
+def main_tool_admin(num = 1, add_2 = ''):
     title_list = {
         0 : [load_lang('document_name'), 'acl', load_lang('acl')],
         1 : [0, 'check', load_lang('check')],
@@ -77,12 +77,12 @@ def main_tool_admin(num = 1, add_1 = '', add_2 = ''):
         ))
     elif not num - 1 > len(title_list):
         num -= 2
+        
+        add_1 = flask.request.form.get('name', 'test')
         if flask.request.method == 'POST':
             if add_2 != '':
-                return redirect(
-                    '/' + title_list[num][1] + '/' + url_pas(add_2) + '?plus=' + url_pas(add_1)
-                )
-            elif flask.request.form.get('regex', None):
+                return redirect('/' + title_list[num][1] + '/' + url_pas(add_2) + '?plus=' + url_pas(add_1))
+            elif flask.request.form.get('regex', '') != '':
                 return redirect('/' + title_list[num][1] + '/' + url_pas(add_1) + '?type=regex')
             else:
                 return redirect('/' + title_list[num][1] + '/' + url_pas(add_1))

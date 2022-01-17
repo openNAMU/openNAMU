@@ -686,13 +686,8 @@ def user_info(name = ''):
 def user_count_edit(name = None):
     return user_count_edit_2(load_db.db_get(), name)
     
-@app.route('/alarm')
-def user_alarm():
-    return user_alarm_2(load_db.db_get())
-
-@app.route('/alarm/delete')
-def user_alarm_del():
-    return user_alarm_del_2(load_db.db_get())
+app.route('/alarm')(user_alarm)
+app.route('/alarm/delete')(user_alarm_del)
     
 @app.route('/watch_list')
 def user_watch_list():
@@ -815,8 +810,7 @@ app.route('/api/sitemap.xml')(api_sitemap)
 app.route('/other')(main_tool_other)
 app.route('/manager', methods = ['POST', 'GET'])(main_tool_admin)
 app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_admin)
-app.route('/manager/<int:num>/<add_1>', methods = ['POST', 'GET'])(main_tool_admin)
-app.route('/manager/<int:num>/<add_1>/<add_2>', methods = ['POST', 'GET'])(main_tool_admin)
+app.route('/manager/<int:num>/<add_2>', methods = ['POST', 'GET'])(main_tool_admin)
 
 app.route('/random')(main_func_random)
 app.route('/upload', methods = ['POST', 'GET'])(main_func_upload)
