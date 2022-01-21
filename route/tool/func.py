@@ -109,7 +109,7 @@ class get_db_connect_old:
         
     def db_load(self):
         if self.db_set['type'] == 'sqlite':
-            self.conn = sqlite3.connect(self.db_set['name'] + '.db')
+            self.conn = sqlite3.connect(self.db_set['name'] + '.db', check_same_thread = False)
         else:
             self.conn = pymysql.connect(
                 host = self.db_set['mysql_host'],
@@ -133,7 +133,7 @@ class get_db_connect_old:
         load_conn(self.conn)
 
         return self.conn
-    
+
     def db_get(self):
         # if self.db_set['type'] != 'sqlite':
         #     self.conn.ping(reconnect = True)
@@ -141,9 +141,18 @@ class get_db_connect_old:
         return self.conn
     
 class get_db_connect:
+    # 임시 DB 커넥션 동작 구조
+    # Init 파트
+    # DB 커넥트(get_db_connect_old) -> func.py로 conn 넘겨줌
+    # route 파트
+    # DB 새로 커넥트 -> func.py에서 쓰던 conn은 conn_sub로 보관 ->
+    # func.py로 conn 넘겨줌 -> 모든 라우터 과정이 끝나면 conn_sub를 다시 func.py에 conn으로 넘겨줌 ->
+    # DB 커넥트 종료
     def __init__(self):
         global global_db_set
+        global conn
         
+        self.conn_sub = conn
         self.db_set = global_db_set
         
     def __enter__(self):
@@ -169,9 +178,11 @@ class get_db_connect:
 
             self.conn.select_db(self.db_set['name'])
 
+        load_conn(self.conn)
         return self.conn
     
     def __exit__(self, exc_type, exc_value, traceback):
+        load_conn(self.conn_sub)
         self.conn.close()
 
 def update(ver_num, set_data):
