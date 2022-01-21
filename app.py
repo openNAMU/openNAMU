@@ -350,6 +350,9 @@ if os.path.exists('custom.py'):
 app.route('/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(inter_wiki)
 app.route('/inter_wiki/del/<name>', defaults = { 'tool' : 'del_inter_wiki' })(inter_wiki_del)
 app.route('/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(inter_wiki_add)
+app.route('/inter_wiki/add/<name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(inter_wiki_add)
+
+app.route('/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(inter_wiki_add)
 
 app.route('/edit_top', defaults = { 'tool' : 'edit_top' })(inter_wiki)
 app.route('/edit_top/del/<name>', defaults = { 'tool' : 'del_edit_top' })(inter_wiki_del)
