@@ -57,7 +57,7 @@ def inter_wiki(tool):
             div += '<tr>'
             div += '<td>'
 
-            div += data[0]
+            div += html.escape(data[0])
             if admin == 1:
                 div += ' <a href="/' + tool + '/add/' + url_pas(data[0]) + '">(' + load_lang('edit') + ')</a>'
                 div += ' <a href="/' + tool + '/del/' + url_pas(data[0]) + '">(' + load_lang('delete') + ')</a>'
@@ -65,7 +65,7 @@ def inter_wiki(tool):
             div += '</td>'
 
             if tool == 'inter_wiki':
-                div += '<td><a id="out_link" href="' + data[1] + '">' + html.escape(data[1]) + '</a></td>'
+                div += '<td><a id="out_link" href="' + html.escape(data[1]) + '">' + html.escape(data[1]) + '</a></td>'
             else:
                 div += '<td>' + html.escape(data[1]) + '</td>'
 

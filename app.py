@@ -352,7 +352,10 @@ app.route('/inter_wiki/del/<name>', defaults = { 'tool' : 'del_inter_wiki' })(in
 app.route('/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(inter_wiki_add)
 app.route('/inter_wiki/add/<name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(inter_wiki_add)
 
-app.route('/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(inter_wiki_add)
+app.route('/filter/document/list')(filter_document)
+app.route('/filter/document/add/<name>', methods = ['POST', 'GET'])(filter_document_add)
+app.route('/filter/document/add', methods = ['POST', 'GET'])(filter_document_add)
+app.route('/filter/document/del/<name>')(filter_document_del)
 
 app.route('/edit_top', defaults = { 'tool' : 'edit_top' })(inter_wiki)
 app.route('/edit_top/del/<name>', defaults = { 'tool' : 'del_edit_top' })(inter_wiki_del)
