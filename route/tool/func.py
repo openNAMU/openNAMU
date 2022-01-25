@@ -1148,11 +1148,18 @@ def admin_check(num = None, what = None, name = ''):
 
     return 0
 
+def get_check_acl_user():
+    curs = conn.cursor()
+
+    
+
+# 이 파트 싹다 재설계 필요
 def acl_check(name = 'test', tool = '', topic_num = '1'):
     curs = conn.cursor()
 
     ip = ip_check()
     get_ban = ban_check()
+
     acl_c = re.search(r"^user:((?:(?!\/).)*)", name) if name else None
     if tool == '' and acl_c:
         acl_n = acl_c.groups()

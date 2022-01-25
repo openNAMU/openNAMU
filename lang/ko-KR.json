@@ -406,6 +406,8 @@
     "record_reset": "사용자 편집 기록 초기화",
     "email_setting": "이메일 설정",
     "oauth_client_id": "OAuth 클라이언트 ID",
-    "today_doc" : "오늘의 문서",
-    "send_edit" : "편집 사유 수정"
+    "today_doc": "오늘의 문서",
+    "send_edit": "편집 사유 수정",
+    "document_filter_list": "문서명 필터 목록",
+    "document_filter_add": "문서명 필터 추가"
 }
