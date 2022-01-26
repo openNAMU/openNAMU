@@ -4,7 +4,7 @@ def inter_wiki_del(tool, name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
         
-        if admin_check() != 1:
+        if admin_check(None, tool) != 1:
             return re_error('/error/3')
 
         if tool == 'del_inter_wiki':
