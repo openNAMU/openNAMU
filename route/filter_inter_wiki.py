@@ -35,10 +35,6 @@ def inter_wiki(tool):
             title = load_lang('file_filter_list')
 
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'file'"))
-        elif tool == 'file_filter':
-            title = load_lang('file_filter_list')
-
-            curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'file'"))
         elif tool == 'image_license':
             title = load_lang('image_license_list')
 
@@ -69,7 +65,11 @@ def inter_wiki(tool):
             else:
                 div += '<td>' + html.escape(data[1]) + '</td>'
 
-            div += '<td>' + html.escape(data[2]) + '</td>'
+            if tool == 'inter_wiki':
+                div += '<td>' + data[2] + '</td>'
+            else:
+                div += '<td>' + html.escape(data[2]) + '</td>'
+            
             div += '</tr>'
 
         div += '</table>'
