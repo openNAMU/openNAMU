@@ -1148,56 +1148,47 @@ def admin_check(num = None, what = None, name = ''):
 
     return 0
 
-def get_check_acl_user():
-    curs = conn.cursor()
-
-    
-
-# 이 파트 싹다 재설계 필요
 def acl_check(name = 'test', tool = '', topic_num = '1'):
     curs = conn.cursor()
 
     ip = ip_check()
     get_ban = ban_check()
-
-    acl_c = re.search(r"^user:((?:(?!\/).)*)", name) if name else None
-    if tool == '' and acl_c:
-        acl_n = acl_c.groups()
-
-        if get_ban == 1:
-            return 1
-
-        if admin_check(5) == 1:
-            return 0
-
-        curs.execute(db_change(
-            "select data from acl where title = ? and type = 'decu'"
-        ), ['user:' + acl_n[0]])
-        acl_data = curs.fetchall()
-        if acl_data:
-            if acl_data[0][0] == 'all':
-                return 0
-            elif acl_data[0][0] == 'user' and not ip_or_user(ip) == 1:
-                return 0
-            elif ip == acl_n[0] and not ip_or_user(ip) == 1:
-                return 0
-        else:
-            if ip == acl_n[0] and not ip_or_user(ip) == 1 and not ip_or_user(acl_n[0]) == 1:
-                return 0
-
-        return 1
-
-    if tool == 'topic':
-        if not name:
-            curs.execute(db_change("select title from rd where code = ?"), [topic_num])
-            name = curs.fetchall()
-            name = name[0][0] if name else 'test'
-        
-        end = 3
-    elif tool == 'render' or tool == '' or tool == 'vote':
+    
+    if tool == '' and name:
         if tool == '' and acl_check(name, 'render') == 1:
             return 1
+        
+        user_page = re.search(r"^user:((?:(?!\/).)*)", name)
+        if user_page:
+            user_page = user_page.group(1)
+            if admin_check(5) == 1:
+                return 0
+                
+            if get_ban == 1:
+                return 1
+                
+            curs.execute(db_change(
+                "select data from acl where title = ? and type = 'decu'"
+            ), [name])
+            acl_data = curs.fetchall()
+            if acl_data:
+                if acl_data[0][0] == 'all':
+                    return 0
+                elif acl_data[0][0] == 'user' and not ip_or_user(ip) == 1:
+                    return 0
+            
+            if ip == user_page and not ip_or_user(ip) == 1:
+                return 0
+    
+            return 1
+    elif tool == 'topic':
+        curs.execute(db_change("select title from rd where code = ?"), [topic_num])
+        name = curs.fetchall()
+        name = name[0][0] if name else 'test'
 
+    if tool in ['topic']:
+        end = 3
+    elif tool in ['render', 'vote', '']:
         end = 2
     else:
         end = 1
@@ -1208,27 +1199,43 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 curs.execute(db_change(
                     "select data from acl where title = ? and type = 'decu'"
                 ), [name])
+                '''
+            elif i == 1:
+                curs.execute(db_change(
+                    "select plus from html_filter where kind = 'document'"
+                ))
+                '''
             else:
-                curs.execute(db_change('select data from other where name = "edit"'))
+                curs.execute(db_change(
+                    'select data from other where name = "edit"'
+                ))
 
             num = 5
         elif tool == 'topic':
-            if i == 0 and topic_num:
-                curs.execute(db_change("select acl from rd where code = ?"), [topic_num])
+            if i == 0:
+                curs.execute(db_change(
+                    "select acl from rd where code = ?"
+                ), [topic_num])
             elif i == 1:
                 curs.execute(db_change(
                     "select data from acl where title = ? and type = 'dis'"
                 ), [name])
             else:
-                curs.execute(db_change('select data from other where name = "discussion"'))
+                curs.execute(db_change(
+                    'select data from other where name = "discussion"'
+                ))
 
             num = 3
         elif tool == 'upload':
-            curs.execute(db_change("select data from other where name = 'upload_acl'"))
+            curs.execute(db_change(
+                "select data from other where name = 'upload_acl'"
+            ))
 
             num = 5
         elif tool == 'many_upload':
-            curs.execute(db_change("select data from other where name = 'many_upload_acl'"))
+            curs.execute(db_change(
+                "select data from other where name = 'many_upload_acl'"
+            ))
 
             num = 5
         elif tool == 'vote':
@@ -1237,7 +1244,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                     'select acl from vote where id = ? and user = ""'
                 ), [topic_num])
             else:
-                curs.execute(db_change('select data from other where name = "vote_acl"'))
+                curs.execute(db_change(
+                    'select data from other where name = "vote_acl"'
+                ))
 
             num = None
         else:
@@ -1252,18 +1261,16 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             num = 5
 
         acl_data = curs.fetchall()
-        if  (
-                i == (end - 1) and \
-                (not acl_data or acl_data[0][0] == '' or acl_data[0][0] == 'normal')
-            ) and \
-            get_ban == 1 and \
-            tool != 'render':
-            return 1
-        elif acl_data and acl_data[0][0] != 'normal' and acl_data[0][0] != '':
-            if acl_data[0][0] != 'ban' and get_ban == 1 and tool != 'render':
+        if not acl_data:
+            acl_data = [['normal']]
+        elif acl_data and acl_data[0][0] == '':
+            acl_data = [['normal']]
+
+        if acl_data[0][0] != 'normal':
+            if not acl_data[0][0] in ['ban', 'ban_admin'] and get_ban == 1 and tool != 'render':
                 return 1
 
-            if acl_data[0][0] == 'all' or acl_data[0][0] == 'ban':
+            if acl_data[0][0] in ['all', 'ban']:
                 return 0
             elif acl_data[0][0] == 'user':
                 if ip_or_user(ip) != 1:
@@ -1329,23 +1336,27 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 if admin_check() == 1:
                     return 0
             elif acl_data[0][0] == 'ban_admin':
-                if admin_check(1) == 1 or ban_check() == 1:
+                if admin_check(1) == 1 or get_ban == 1:
                     return 0
 
             return 1
-        else:
-            if i == (end - 1):
-                if tool == 'topic' and topic_num:
-                    curs.execute(db_change(
-                        "select title from rd where code = ? and stop != ''"
-                    ), [topic_num])
-                    if curs.fetchall():
-                        if admin_check(3, 'topic (code ' + topic_num + ')') == 1:
-                            return 0
-                    else:
+        elif i == (end - 1):
+            if get_ban == 1 and tool != 'render':
+                return 1
+            
+            if tool == 'topic':
+                curs.execute(db_change(
+                    "select title from rd where code = ? and stop != ''"
+                ), [topic_num])
+                if curs.fetchall():
+                    if admin_check(3, 'topic (code ' + topic_num + ')') == 1:
                         return 0
+                    else:
+                        return 1
                 else:
                     return 0
+            else:
+                return 0
 
     return 1
 
