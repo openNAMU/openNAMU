@@ -1,9 +1,10 @@
 from .tool.func import *
 
-def user_alarm_del_2(conn):
-    curs = conn.cursor()
+def user_alarm_del():
+    with get_db_connect() as conn:
+        curs = conn.cursor()
+    
+        curs.execute(db_change("delete from alarm where name = ?"), [ip_check()])
+        conn.commit()
 
-    curs.execute(db_change("delete from alarm where name = ?"), [ip_check()])
-    conn.commit()
-
-    return redirect('/alarm')
+        return redirect('/alarm')

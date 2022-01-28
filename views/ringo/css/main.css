@@ -3,6 +3,7 @@ body {
 }
 
 html {
+    font-family: "나눔바른고딕", "나눔고딕", "맑은고딕", "Sans-Serif";
     background: #eee;
 }
 
@@ -32,6 +33,19 @@ header#main form.not_mobile input.search {
 }
 
 header#main form.not_mobile {
+    display: inline-block;
+}
+
+div#menu {
+    margin-top: 10px;
+}
+
+.menu_item {
+    border: 0;
+    background-color: white;
+    
+    padding: 10px;
+    
     display: inline-block;
 }
 
@@ -101,6 +115,30 @@ aside button {
     width: 25%;
 }
 
+aside .side_button {
+    border: 0;
+    background-color: white;
+    
+    padding: 10px;
+}
+
+aside .side_button:hover {
+    background-color: #eee;
+}
+
+#side_button_2 {
+    border-left: 0;
+    border-right: 0;
+}
+
+#side_button_3 {
+    border-right: 0;
+}
+
+#side_content {
+    margin-top: 20px;
+}
+
 section {
     width: calc(100% - (250px + 40px));
     
@@ -129,7 +167,7 @@ article.main {
     margin: auto;
 }
 
-article.main#content {
+article.main#main_data {
     padding-top: 20px;
     
     min-height: 400px;
@@ -183,4 +221,12 @@ footer {
 
 footer.only_mobile {
     margin-top: 0px;
+}
+
+#main_data input, #main_data textarea, #main_data button, #main_data select {
+    border: 1px solid #aaa;
+    
+    padding: 10px;
+    
+    background-color: white;
 }

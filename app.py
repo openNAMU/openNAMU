@@ -129,7 +129,8 @@ if data_db_set['type'] == 'mysql':
         data_db_set['mysql_port'] = '3306'
 
 db_data_get(data_db_set['type'])
-load_db = get_db_connect(data_db_set)
+do_db_set(data_db_set)
+load_db = get_db_connect_old(data_db_set)
 
 conn = load_db.db_load()
 curs = conn.cursor()
@@ -346,256 +347,44 @@ if os.path.exists('custom.py'):
     
 # Func
 # Func-inter_wiki
-app.add_url_rule(
-    rule = '/inter_wiki',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'inter_wiki' 
-    }, 
-    view_func = inter_wiki
-)
+app.route('/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(inter_wiki)
+app.route('/inter_wiki/del/<name>', defaults = { 'tool' : 'del_inter_wiki' })(inter_wiki_del)
+app.route('/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(inter_wiki_add)
+app.route('/inter_wiki/add/<name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/inter_wiki/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_inter_wiki',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
+app.route('/filter/document/list')(filter_document)
+app.route('/filter/document/add/<name>', methods = ['POST', 'GET'])(filter_document_add)
+app.route('/filter/document/add', methods = ['POST', 'GET'])(filter_document_add)
+app.route('/filter/document/del/<name>')(filter_document_del)
 
-app.add_url_rule(
-    rule = '/inter_wiki/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_inter_wiki',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
+app.route('/edit_top', defaults = { 'tool' : 'edit_top' })(inter_wiki)
+app.route('/edit_top/del/<name>', defaults = { 'tool' : 'del_edit_top' })(inter_wiki_del)
+app.route('/edit_top/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_top' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/edit_top',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'edit_top'
-    }, 
-    view_func = inter_wiki
-)
+app.route('/image_license', defaults = { 'tool' : 'image_license' })(inter_wiki)
+app.route('/image_license/del/<name>', defaults = { 'tool' : 'del_image_license' })(inter_wiki_del)
+app.route('/image_license/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_image_license' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/edit_top/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_edit_top',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
+app.route('/edit_filter', defaults = { 'tool' : 'edit_filter' })(inter_wiki)
+app.route('/edit_filter/del/<name>', defaults = { 'tool' : 'del_edit_filter' })(inter_wiki_del)
+app.route('/edit_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(inter_wiki_add)
+app.route('/edit_filter/add/<name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/edit_top/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_edit_top',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
+app.route('/email_filter', defaults = { 'tool' : 'email_filter' })(inter_wiki)
+app.route('/email_filter/del/<name>', defaults = { 'tool' : 'del_email_filter' })(inter_wiki_del)
+app.route('/email_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_email_filter' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/image_license',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'image_license'
-    }, 
-    view_func = inter_wiki
-)
+app.route('/file_filter', defaults = { 'tool' : 'file_filter' })(inter_wiki)
+app.route('/file_filter/del/<name>', defaults = { 'tool' : 'del_file_filter' })(inter_wiki_del)
+app.route('/file_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_file_filter' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/image_license/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_image_license',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
+app.route('/name_filter', defaults = { 'tool' : 'name_filter' })(inter_wiki)
+app.route('/name_filter/del/<name>', defaults = { 'tool' : 'del_name_filter' })(inter_wiki_del)
+app.route('/name_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_name_filter' })(inter_wiki_add)
 
-app.add_url_rule(
-    rule = '/image_license/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_image_license',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
-
-app.add_url_rule(
-    rule = '/edit_filter',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'edit_filter'
-    }, 
-    view_func = inter_wiki
-)
-
-app.add_url_rule(
-    rule = '/edit_filter/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_edit_filter',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
-
-# 이거 수정 필요 할 듯
-app.add_url_rule(
-    rule = '/edit_filter/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_edit_filter',
-        'name' : None
-    }, 
-    view_func = inter_wiki_add
-)
-
-app.add_url_rule(
-    rule = '/edit_filter/add/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_edit_filter',
-        'name' : 'Test'
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
-
-app.add_url_rule(
-    rule = '/email_filter',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'email_filter'
-    }, 
-    view_func = inter_wiki
-)
-
-app.add_url_rule(
-    rule = '/email_filter/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_email_filter',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
-
-app.add_url_rule(
-    rule = '/email_filter/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_email_filter',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
-
-app.add_url_rule(
-    rule = '/file_filter',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'file_filter'
-    }, 
-    view_func = inter_wiki
-)
-
-app.add_url_rule(
-    rule = '/file_filter/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_file_filter',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
-
-app.add_url_rule(
-    rule = '/file_filter/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_file_filter',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
-
-app.add_url_rule(
-    rule = '/name_filter',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'name_filter'
-    }, 
-    view_func = inter_wiki
-)
-
-app.add_url_rule(
-    rule = '/name_filter/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_name_filter',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
-
-app.add_url_rule(
-    rule = '/name_filter/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_name_filter',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
-
-app.add_url_rule(
-    rule = '/extension_filter',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'extension_filter'
-    }, 
-    view_func = inter_wiki
-)
-
-app.add_url_rule(
-    rule = '/extension_filter/del/<name>',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'del_extension_filter',
-        'name' : 'Test'
-    }, 
-    view_func = inter_wiki_del
-)
-
-app.add_url_rule(
-    rule = '/extension_filter/add',
-    defaults = { 
-        'conn' : load_db.db_get(), 
-        'tool' : 'plus_extension_filter',
-        'name' : None
-    }, 
-    methods = ['GET', 'POST'],
-    view_func = inter_wiki_add
-)
+app.route('/extension_filter', defaults = { 'tool' : 'extension_filter' })(inter_wiki)
+app.route('/extension_filter/del/<name>', defaults = { 'tool' : 'del_extension_filter' })(inter_wiki_del)
+app.route('/extension_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_extension_filter' })(inter_wiki_add)
 
 # Func-list
 # /list/document/old
@@ -715,19 +504,19 @@ def recent_record(name = None):
 def recent_history(name = None):
     return recent_change_2(load_db.db_get(), name, 'history')
 
-@app.route('/history/tool/<int(signed=True):rev>/<everything:name>')
+@app.route('/history/tool/<int(signed = True):rev>/<everything:name>')
 def recent_history_tool(name = 'Test', rev = 1):
     return recent_history_tool_2(load_db.db_get(), name, rev)
 
-@app.route('/history/delete/<int(signed=True):rev>/<everything:name>', methods = ['POST', 'GET'])
+@app.route('/history/delete/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])
 def recent_history_delete(name = 'Test', rev = 1):
     return recent_history_delete_2(load_db.db_get(), name, rev)
 
-@app.route('/history/hidden/<int(signed=True):rev>/<everything:name>')
+@app.route('/history/hidden/<int(signed = True):rev>/<everything:name>')
 def recent_history_hidden(name = 'Test', rev = 1):
     return recent_history_hidden_2(load_db.db_get(), name, rev)
 
-@app.route('/history/send/<int(signed=True):rev>/<everything:name>', methods = ['POST', 'GET'])
+@app.route('/history/send/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])
 def recent_history_send(name = 'Test', rev = 1):
     return recent_history_send_2(load_db.db_get(), name, rev)
 
@@ -780,7 +569,7 @@ def view_xref_this(name = 'Test'):
 def view_raw(name = None, topic_num = None, num = None):
     return view_raw_2(load_db.db_get(), name, topic_num, num)
 
-@app.route('/diff/<int:num_a>/<int:num_b>/<everything:name>')
+@app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')
 def view_diff(name = 'Test', num_a = 1, num_b = 1):
     return view_diff_2(load_db.db_get(), name, num_a, num_b)
 
@@ -788,7 +577,7 @@ def view_diff(name = 'Test', num_a = 1, num_b = 1):
 def view_down(name = None):
     return view_down_2(load_db.db_get(), name)
 
-@app.route('/w/<everything:name>/doc_rev/<int:doc_rev>')
+@app.route('/w/<everything:name>/doc_rev/<int(signed = True):doc_rev>')
 @app.route('/w/<everything:name>/doc_from/<everything:doc_from>')
 @app.route('/w/<everything:name>')
 def view_read(name = 'Test', doc_rev = 0, doc_from = ''):
@@ -869,13 +658,8 @@ def topic_change(topic_num = 1):
 def topic_admin(topic_num = 1, num = 1):
     return topic_admin_2(load_db.db_get(), topic_num, num)
 
-@app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])
-def topic(topic_num = 1):
-    return topic_2(load_db.db_get(), topic_num)
-
-@app.route('/topic/<everything:name>', methods = ['POST', 'GET'])
-def topic_close_list(name = 'test'):
-    return topic_close_list_2(load_db.db_get(), name)
+app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
+app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_close_list)
 
 # Func-user
 @app.route('/change', methods = ['POST', 'GET'])
@@ -908,13 +692,8 @@ def user_info(name = ''):
 def user_count_edit(name = None):
     return user_count_edit_2(load_db.db_get(), name)
     
-@app.route('/alarm')
-def user_alarm():
-    return user_alarm_2(load_db.db_get())
-
-@app.route('/alarm/delete')
-def user_alarm_del():
-    return user_alarm_del_2(load_db.db_get())
+app.route('/alarm')(user_alarm)
+app.route('/alarm/delete')(user_alarm_del)
     
 @app.route('/watch_list')
 def user_watch_list():
@@ -946,12 +725,6 @@ def login_login():
 @app.route('/login/2fa', methods = ['POST', 'GET'])
 def login_login_2fa():
     return login_login_2fa_2(load_db.db_get())
-
-'''
-@app.route('/login/2fa/email', methods = ['POST', 'GET'])
-def login_2fa_email():
-    return login_login_2fa_email_2(load_db.db_get())
-'''
 
 @app.route('/register', methods = ['POST', 'GET'])
 def login_register():
@@ -1011,138 +784,60 @@ def vote_add():
     return vote_add_2(load_db.db_get())
 
 # Func-api
-@app.route('/api/w/<everything:name>', methods = ['POST', 'GET'])
-def api_w(name = ''):
-    return api_w_2(load_db.db_get(), name)
-
-@app.route('/api/raw/<everything:name>')
-def api_raw(name = ''):
-    return api_raw_2(load_db.db_get(), name)
-
-@app.route('/api/version')
-def api_version():
-    return api_version_2(load_db.db_get(), version_list)
-
-@app.route('/api/skin_info')
-@app.route('/api/skin_info/<name>')
-def api_skin_info(name = ''):
-    return api_skin_info_2(load_db.db_get(), name)
-
-@app.route('/api/markup')
-def api_markup():
-    return api_markup_2(load_db.db_get())
-
-@app.route('/api/user_info/<name>')
-def api_user_info(name = ''):
-    return api_user_info_2(load_db.db_get(), name)
-
-@app.route('/api/thread/<topic_num>')
-def api_topic_sub(name = '', topic_num = 1):
-    return api_topic_sub_2(load_db.db_get(), topic_num)
-
-@app.route('/api/search/<name>')
-def api_search(name = ''):
-    return api_search_2(load_db.db_get(), name)
-
-@app.route('/api/recent_changes')
-def api_recent_change():
-    return api_recent_change_2(load_db.db_get())
-
-@app.route('/api/recent_discuss')
-@app.route('/api/recent_discuss/<int:num>')
-def api_recent_discuss(num = 10):
-    return api_recent_discuss_2(load_db.db_get(), num, 'normal')
-
-@app.route('/api/recent_discuss/stop')
-@app.route('/api/recent_discuss/<int:num>/stop')
-def api_recent_discuss_stop(num = 10):
-    return api_recent_discuss_2(load_db.db_get(), num, 'stop')
-
-@app.route('/api/recent_discuss/all')
-@app.route('/api/recent_discuss/<int:num>/all')
-def api_recent_discuss_all(num = 10):
-    return api_recent_discuss_2(load_db.db_get(), num, 'all')
-
-@app.route('/api/sha224/<everything:name>', methods = ['POST', 'GET'])
-def api_sha224(name = 'test'):
-    return api_sha224_2(load_db.db_get(), name)
-
-@app.route('/api/title_index')
-def api_title_index():
-    return api_title_index_2(load_db.db_get())
-
-@app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])
-def api_image_view(name = ''):
-    return api_image_view_2(load_db.db_get(), name)
-
-@app.route('/api/sitemap.xml')
-def api_sitemap():
-    return api_sitemap_2(load_db.db_get())
+app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):rev>')(api_w)
+app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['GET', 'POST'])(api_w)
+app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
+app.route('/api/raw/<everything:name>')(api_raw)
+app.route('/api/version', defaults = { 'version_list' : version_list })(api_version)
+app.route('/api/skin_info')(api_skin_info)
+app.route('/api/skin_info/<name>')(api_skin_info)
+app.route('/api/markup')(api_markup)
+app.route('/api/user_info/<name>')(api_user_info)
+app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic_sub)
+app.route('/api/thread/<int:topic_num>/<tool>')(api_topic_sub)
+app.route('/api/thread/<int:topic_num>')(api_topic_sub)
+app.route('/api/search/<everything:name>/doc_num/<int:num>/<int:page>')(api_search)
+app.route('/api/search/<everything:name>')(api_search)
+app.route('/api/recent_change/<int:num>')(api_recent_change)
+app.route('/api/recent_change')(api_recent_change)
+# recent_changes -> recent_change
+app.route('/api/recent_changes')(api_recent_change)
+app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)
+app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)
+app.route('/api/recent_discuss')(api_recent_discuss)
+app.route('/api/sha224/<everything:data>', methods = ['POST', 'GET'])(api_sha224)
+app.route('/api/title_index')(api_title_index)
+app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])(api_image_view)
+# 이건 API 영역이 아닌 것 같아서 고심 중
+app.route('/api/sitemap.xml')(api_sitemap)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정
-@app.route('/restart', methods = ['POST', 'GET'])
-def main_restart():
-    return main_restart_2(load_db.db_get())
+app.route('/other')(main_tool_other)
+app.route('/manager', methods = ['POST', 'GET'])(main_tool_admin)
+app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_admin)
+app.route('/manager/<int:num>/<add_2>', methods = ['POST', 'GET'])(main_tool_admin)
 
-@app.route('/update', methods=['GET', 'POST'])
-def main_update():
-    return main_update_2(load_db.db_get())
+app.route('/random')(main_func_random)
+app.route('/upload', methods = ['POST', 'GET'])(main_func_upload)
+app.route('/setting', defaults = { 'db_set' : data_db_set['type'] })(main_func_setting)
+app.route('/setting/<int:num>', methods = ['POST', 'GET'], defaults = { 'db_set' : data_db_set['type'] })(main_func_setting)
+app.route('/skin_set')(main_func_skin_set)
+app.route('/main_skin_set')(main_func_skin_set)
+app.route('/easter_egg.xml')(main_func_easter_egg)
 
-@app.route('/random')
-def main_title_random():
-    return main_title_random_2(load_db.db_get())
+# views -> view
+app.route('/view/<everything:name>')(main_view)
+app.route('/views/<everything:name>')(main_view)
+app.route('/image/<everything:name>')(main_view_image)
+# 조정 계획 중
+app.route('/<regex("[^.]+\.(?:txt|xml)"):data>')(main_view_file)
 
-@app.route('/upload', methods=['GET', 'POST'])
-def main_upload():
-    return main_upload_2(load_db.db_get())
+app.route('/shutdown', methods = ['POST', 'GET'])(main_sys_shutdown)
+app.route('/restart', methods = ['POST', 'GET'])(main_sys_restart)
+app.route('/update', methods = ['POST', 'GET'])(main_sys_update)
 
-@app.route('/setting')
-@app.route('/setting/<int:num>', methods = ['POST', 'GET'])
-def setting(num = 0):
-    return main_setting_2(load_db.db_get(), num, data_db_set['type'])
-
-@app.route('/other')
-def main_other():
-    return main_other_2(load_db.db_get())
-
-@app.route('/manager', methods = ['POST', 'GET'])
-@app.route('/manager/<int:num>', methods = ['POST', 'GET'])
-def main_manager(num = 1):
-    return main_manager_2(load_db.db_get(), num)
-
-@app.route('/image/<everything:name>')
-def main_image_view(name = None):
-    return main_image_view_2(load_db.db_get(), name)
-
-@app.route('/skin_set')
-@app.route('/main_skin_set')
-def main_skin_set():
-    return main_skin_set_2(load_db.db_get())
-
-@app.route('/views/<everything:name>')
-def main_views(name = None):
-    return main_views_2(load_db.db_get(), name)
-
-@app.route('/test_func')
-def main_test_func():
-    return main_test_func_2(load_db.db_get())
-
-@app.route('/shutdown', methods = ['POST', 'GET'])
-def main_shutdown():
-    return main_shutdown_2(load_db.db_get())
-
-@app.route('/easter_egg.xml')
-def main_easter_egg():
-    return main_easter_egg_2(load_db.db_get())
-
-@app.route('/<regex("[^.]+\.(?:txt|xml)"):data>')
-def main_file(data = ''):
-    return main_file_2(load_db.db_get(), data)
-
-@app.errorhandler(404)
-def main_error_404(e):
-    return main_error_404_2(load_db.db_get())
+app.errorhandler(404)(main_error_404)
     
 if __name__ == "__main__":
     do_server = netius.servers.WSGIServer(app = app)

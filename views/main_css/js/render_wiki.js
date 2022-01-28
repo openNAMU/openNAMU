@@ -35,7 +35,7 @@ function get_link_state(data) {
     data_form.append('title_list', JSON.stringify(link_list));
     
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/w/test?v=exist");
+    xhr.open("POST", "/api/w/test/doc_tool/exist");
     xhr.send(data_form);
 
     xhr.onreadystatechange = function() {
@@ -239,9 +239,11 @@ function get_file_state(data, i = 0) {
 function load_include(name_doc, name_ob, data_include, name_org = '') {
     var data_form = new FormData();
     data_form.append('include_list', JSON.stringify(data_include));
+    data_form.append('name_include', name_ob);
+    data_form.append('name_org', name_org);
     
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/w/" + encodeURI(name_doc) + "?v=include&include=" + name_ob + "&name_org=" + name_org);
+    xhr.open("POST", "/api/w/" + encodeURI(name_doc) + "/doc_tool/include");
     xhr.send(data_form);
 
     document.getElementsByClassName(name_ob)[0].href = "/w/" + do_url_change(name_doc);

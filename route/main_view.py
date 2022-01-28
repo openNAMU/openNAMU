@@ -1,12 +1,10 @@
 from .tool.func import *
-from . import main_error_404
+from .main_error_404 import main_error_404
 
-def main_views_2(conn, name):
-    curs = conn.cursor()
-
+def main_view(name = ''):
     file_name = re.search(r'([^/]+)$', name)
     if not file_name:
-        return main_error_404.main_error_404_2(conn)
+        return main_error_404(conn)
     else:
         file_name = file_name.group(1)
         dir_name = './views/' + re.sub(r'\.{2,}', '', re.sub(r'([^/]+)$', '', name))

@@ -1,8 +1,6 @@
 from .tool.func import *
 
-def main_restart_2(conn):
-    curs = conn.cursor()
-
+def main_sys_restart():
     if admin_check() != 1:
         return re_error('/error/3')
 
