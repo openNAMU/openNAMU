@@ -409,5 +409,9 @@
     "today_doc": "오늘의 문서",
     "send_edit": "편집 사유 수정",
     "document_filter_list": "문서명 필터 목록",
-    "document_filter_add": "문서명 필터 추가"
+    "document_filter_add": "문서명 필터 추가",
+    "password_instead_key": "대체 인증키",
+    "key_change": "키 변경",
+    "key_delete": "키 삭제",
+    "email_delete": "이메일 삭제"
 }

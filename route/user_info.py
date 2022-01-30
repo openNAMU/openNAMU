@@ -33,7 +33,7 @@ def user_info_2(conn, name):
                 <li><a href="/login">''' + load_lang('login') + '''</a></li>
                 <li><a href="/register">''' + load_lang('register') + '''</a></li>
                 <li><a href="/change">''' + load_lang('user_setting') + '''</a></li>
-                <li><a href="/pass_find">''' + load_lang('password_search') + '''</a></li>
+                <li><a href="/login/find">''' + load_lang('password_search') + '''</a></li>
             '''
             
         tool_menu += '<li><a href="/change/head">' + load_lang('user_head') + '</a></li>'
