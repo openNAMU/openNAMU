@@ -668,9 +668,14 @@ def user_setting():
 def user_setting_email():
     return user_setting_email_2(load_db.db_get())
 
+app.route('/change/email/delete')(user_setting_email_delete)
+
 @app.route('/change/email/check', methods = ['POST', 'GET'])
 def user_setting_email_check():
     return user_setting_email_check_2(load_db.db_get())
+
+app.route('/change/key')(user_setting_key)
+app.route('/change/key/delete')(user_setting_key_delete)
 
 @app.route('/change/pw', methods = ['POST', 'GET'])
 def user_setting_pw_change():
@@ -740,14 +745,10 @@ def login_register_email_check():
 def login_register_submit():
     return login_register_submit_2(load_db.db_get())
 
-# 개편 필요
-@app.route('/pass_find', methods = ['POST', 'GET'])
-def login_pass_find():
-    return login_pass_find_2(load_db.db_get(), 'pass_find')
-
-@app.route('/pass_find/email', methods = ['POST', 'GET'])
-def login_pass_find_email():
-    return login_pass_find_email_2(load_db.db_get(), 'check_key')
+app.route('/login/find')(login_find)
+app.route('/login/find/key', methods = ['POST', 'GET'])(login_find_key)
+app.route('/login/find/email', methods = ['POST', 'GET'], defaults = { 'tool' : 'pass_find' })(login_find_email)
+app.route('/login/find/email/check', methods = ['POST', 'GET'], defaults = { 'tool' : 'check_key' })(login_find_email_check)
 
 @app.route('/logout')
 def login_logout():
@@ -838,8 +839,9 @@ app.route('/update', methods = ['POST', 'GET'])(main_sys_update)
 app.errorhandler(404)(main_error_404)
     
 if __name__ == "__main__":
-    do_server = netius.servers.WSGIServer(app = app)
-    do_server.serve(
+    waitress.serve(
+        app,
         host = server_set['host'],
-        port = int(server_set['port'])
+        port = int(server_set['port']),
+        threads = 1
     )
