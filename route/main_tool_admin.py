@@ -81,7 +81,7 @@ def main_tool_admin(num = 1, add_2 = ''):
         add_1 = flask.request.form.get('name', 'test')
         if flask.request.method == 'POST':
             if add_2 != '':
-                return redirect('/' + title_list[num][1] + '/' + url_pas(add_2) + '?plus=' + url_pas(add_1))
+                return redirect('/' + title_list[num][1] + '/' + url_pas(add_2) + '/doc_from/' + url_pas(add_1))
             elif flask.request.form.get('regex', '') != '':
                 return redirect('/' + title_list[num][1] + '/' + url_pas(add_1) + '?type=regex')
             else:
