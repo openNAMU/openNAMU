@@ -586,11 +586,11 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = ''):
 def edit_revert(name = None):
     return edit_revert_2(load_db.db_get(), name)
 
-@app.route('/edit/<everything:name>', methods = ['POST', 'GET'])
-@app.route('/edit/<everything:name>/doc_section/<int:section>', methods = ['POST', 'GET'])
-def edit(name = 'Test', section = 0):
-    return edit_2(load_db.db_get(), name, section)
+app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
+app.route('/edit/<everything:name>/doc_from/<everything:name_load>', methods = ['POST', 'GET'])(edit)
+app.route('/edit/<everything:name>/doc_section/<int:section>', methods = ['POST', 'GET'])(edit)
 
+# 개편 예정
 @app.route('/backlink_reset/<everything:name>')
 def edit_backlink_reset(name = 'Test'):
     return edit_backlink_reset_2(load_db.db_get(), name)
