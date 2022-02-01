@@ -787,23 +787,30 @@ app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):
 app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['GET', 'POST'])(api_w)
 app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
 app.route('/api/raw/<everything:name>')(api_raw)
+
 app.route('/api/version', defaults = { 'version_list' : version_list })(api_version)
 app.route('/api/skin_info')(api_skin_info)
 app.route('/api/skin_info/<name>')(api_skin_info)
 app.route('/api/markup')(api_markup)
 app.route('/api/user_info/<name>')(api_user_info)
+app.route('/api/setting/<name>')(api_setting)
+
 app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic_sub)
 app.route('/api/thread/<int:topic_num>/<tool>')(api_topic_sub)
 app.route('/api/thread/<int:topic_num>')(api_topic_sub)
+
 app.route('/api/search/<everything:name>/doc_num/<int:num>/<int:page>')(api_search)
 app.route('/api/search/<everything:name>')(api_search)
+
 app.route('/api/recent_change/<int:num>')(api_recent_change)
 app.route('/api/recent_change')(api_recent_change)
 # recent_changes -> recent_change
 app.route('/api/recent_changes')(api_recent_change)
+
 app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss')(api_recent_discuss)
+
 app.route('/api/sha224/<everything:data>', methods = ['POST', 'GET'])(api_sha224)
 app.route('/api/title_index')(api_title_index)
 app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])(api_image_view)
