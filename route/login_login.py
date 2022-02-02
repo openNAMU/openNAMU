@@ -57,9 +57,9 @@ def login_login_2(conn):
             data =  '''
                     <form method="post">
                         <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>
                         ''' + http_warning() + '''

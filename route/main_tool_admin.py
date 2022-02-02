@@ -52,7 +52,7 @@ def main_tool_admin(num = 1, add_2 = ''):
                         <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
                         <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
                         <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
-                        <li><a href="/filter/document/list">''' + load_lang('doc_filter_list') + '''</a></li>
+                        <li><a href="/filter/document/list">''' + load_lang('document_filter_list') + '''</a></li>
                     </ul>
                     <h3>2.2. ''' + load_lang('server') + '''</h2>
                     <ul class="inside_ul">
@@ -81,7 +81,7 @@ def main_tool_admin(num = 1, add_2 = ''):
         add_1 = flask.request.form.get('name', 'test')
         if flask.request.method == 'POST':
             if add_2 != '':
-                return redirect('/' + title_list[num][1] + '/' + url_pas(add_2) + '?plus=' + url_pas(add_1))
+                return redirect('/' + title_list[num][1] + '/' + url_pas(add_2) + '/doc_from/' + url_pas(add_1))
             elif flask.request.form.get('regex', '') != '':
                 return redirect('/' + title_list[num][1] + '/' + url_pas(add_1) + '?type=regex')
             else:

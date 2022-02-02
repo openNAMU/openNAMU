@@ -388,9 +388,7 @@ app.route('/extension_filter/add', methods = ['POST', 'GET'], defaults = { 'tool
 
 # Func-list
 # /list/document/old
-@app.route('/old_page')
-def list_old_page():
-    return list_old_page_2(load_db.db_get())
+app.route('/old_page')(list_old_page)
 
 # /list/document/acl
 @app.route('/acl_list')
@@ -588,11 +586,11 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = ''):
 def edit_revert(name = None):
     return edit_revert_2(load_db.db_get(), name)
 
-@app.route('/edit/<everything:name>', methods = ['POST', 'GET'])
-@app.route('/edit/<everything:name>/doc_section/<int:section>', methods = ['POST', 'GET'])
-def edit(name = 'Test', section = 0):
-    return edit_2(load_db.db_get(), name, section)
+app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
+app.route('/edit/<everything:name>/doc_from/<everything:name_load>', methods = ['POST', 'GET'])(edit)
+app.route('/edit/<everything:name>/doc_section/<int:section>', methods = ['POST', 'GET'])(edit)
 
+# 개편 예정
 @app.route('/backlink_reset/<everything:name>')
 def edit_backlink_reset(name = 'Test'):
     return edit_backlink_reset_2(load_db.db_get(), name)
@@ -670,9 +668,14 @@ def user_setting():
 def user_setting_email():
     return user_setting_email_2(load_db.db_get())
 
+app.route('/change/email/delete')(user_setting_email_delete)
+
 @app.route('/change/email/check', methods = ['POST', 'GET'])
 def user_setting_email_check():
     return user_setting_email_check_2(load_db.db_get())
+
+app.route('/change/key')(user_setting_key)
+app.route('/change/key/delete')(user_setting_key_delete)
 
 @app.route('/change/pw', methods = ['POST', 'GET'])
 def user_setting_pw_change():
@@ -742,14 +745,10 @@ def login_register_email_check():
 def login_register_submit():
     return login_register_submit_2(load_db.db_get())
 
-# 개편 필요
-@app.route('/pass_find', methods = ['POST', 'GET'])
-def login_pass_find():
-    return login_pass_find_2(load_db.db_get(), 'pass_find')
-
-@app.route('/pass_find/email', methods = ['POST', 'GET'])
-def login_pass_find_email():
-    return login_pass_find_email_2(load_db.db_get(), 'check_key')
+app.route('/login/find')(login_find)
+app.route('/login/find/key', methods = ['POST', 'GET'])(login_find_key)
+app.route('/login/find/email', methods = ['POST', 'GET'], defaults = { 'tool' : 'pass_find' })(login_find_email)
+app.route('/login/find/email/check', methods = ['POST', 'GET'], defaults = { 'tool' : 'check_key' })(login_find_email_check)
 
 @app.route('/logout')
 def login_logout():
@@ -788,23 +787,30 @@ app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):
 app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['GET', 'POST'])(api_w)
 app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
 app.route('/api/raw/<everything:name>')(api_raw)
+
 app.route('/api/version', defaults = { 'version_list' : version_list })(api_version)
 app.route('/api/skin_info')(api_skin_info)
 app.route('/api/skin_info/<name>')(api_skin_info)
 app.route('/api/markup')(api_markup)
 app.route('/api/user_info/<name>')(api_user_info)
+app.route('/api/setting/<name>')(api_setting)
+
 app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic_sub)
 app.route('/api/thread/<int:topic_num>/<tool>')(api_topic_sub)
 app.route('/api/thread/<int:topic_num>')(api_topic_sub)
+
 app.route('/api/search/<everything:name>/doc_num/<int:num>/<int:page>')(api_search)
 app.route('/api/search/<everything:name>')(api_search)
+
 app.route('/api/recent_change/<int:num>')(api_recent_change)
 app.route('/api/recent_change')(api_recent_change)
 # recent_changes -> recent_change
 app.route('/api/recent_changes')(api_recent_change)
+
 app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss')(api_recent_discuss)
+
 app.route('/api/sha224/<everything:data>', methods = ['POST', 'GET'])(api_sha224)
 app.route('/api/title_index')(api_title_index)
 app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])(api_image_view)
@@ -840,8 +846,9 @@ app.route('/update', methods = ['POST', 'GET'])(main_sys_update)
 app.errorhandler(404)(main_error_404)
     
 if __name__ == "__main__":
-    do_server = netius.servers.WSGIServer(app = app)
-    do_server.serve(
+    waitress.serve(
+        app,
         host = server_set['host'],
-        port = int(server_set['port'])
+        port = int(server_set['port']),
+        threads = 1
     )
