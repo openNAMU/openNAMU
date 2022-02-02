@@ -192,7 +192,7 @@ function do_onmark_heading_render(
                 '<a href="#s-' + heading_level_string_no_end + '">' + 
                     heading_level_string + ' ' +
                 '</a> ' + 
-                '<span id="toc_text_' + heading_level_string_no_end + '"></span>'
+                '<span id="toc_text_' + heading_level_string_no_end + '"></span>' +
             '</span>' +
             '\n' +
         ''
