@@ -55,7 +55,7 @@ function get_link_state(data) {
 function get_heading_name() {
     let heading_name = document.getElementsByClassName('render_heading_text');
     for(let i = 0; i < heading_name.length; i++) {
-        heading_name[i].id = heading_name[i].innerText.replace(/^([0-9]+\.)+ /, '').replace(/✎ ⊖$/, '');
+        heading_name[i].id = heading_name[i].innerText.replace(/^([0-9]+\.)+ /, '').replace(/ ✎ ⊖$/, '');
     }
 }
 
