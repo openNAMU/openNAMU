@@ -65,6 +65,7 @@ from .func_mark import *
 from diff_match_patch import diff_match_patch
 
 import netius.servers
+import waitress
 
 import werkzeug.routing
 import werkzeug.debug
@@ -84,7 +85,7 @@ global_wiki_set = {}
 
 global_db_set = ''
 
-data_css_ver = '119'
+data_css_ver = '120'
 data_css = ''
 
 conn = ''
@@ -464,7 +465,7 @@ def set_init():
 def get_default_admin_group():
     return ['owner', 'ban']
 
-def load_random_key(long = 64):
+def load_random_key(long = 128):
     return ''.join(
         random.choice(
             "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
