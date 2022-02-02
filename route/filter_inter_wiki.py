@@ -55,7 +55,9 @@ def inter_wiki(tool):
 
             div += html.escape(data[0])
             if admin == 1:
-                div += ' <a href="/' + tool + '/add/' + url_pas(data[0]) + '">(' + load_lang('edit') + ')</a>'
+                if tool in ('inter_wiki', 'edit_filter'):
+                    div += ' <a href="/' + tool + '/add/' + url_pas(data[0]) + '">(' + load_lang('edit') + ')</a>'
+                    
                 div += ' <a href="/' + tool + '/del/' + url_pas(data[0]) + '">(' + load_lang('delete') + ')</a>'
 
             div += '</td>'
