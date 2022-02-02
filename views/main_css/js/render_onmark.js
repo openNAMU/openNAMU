@@ -1323,12 +1323,14 @@ function do_onmark_render(
         if(this.readyState === 4 && this.status === 200) {
             data_wiki_set = JSON.parse(this.responseText);
             let data_wiki_set_inter_wiki = { "inter_wiki" : {}};
-            for(let i = 0; i < data_wiki_set["inter_wiki"].length; i++) {
-                data_wiki_set_inter_wiki["inter_wiki"][
-                    data_wiki_set["inter_wiki"][i][0]
-                ] = {
-                    "link" : data_wiki_set["inter_wiki"][i][1],
-                    "logo" : data_wiki_set["inter_wiki"][i][2]
+            if(data_wiki_set["inter_wiki"]) {
+                for(let i = 0; i < data_wiki_set["inter_wiki"].length; i++) {
+                    data_wiki_set_inter_wiki["inter_wiki"][
+                        data_wiki_set["inter_wiki"][i][0]
+                    ] = {
+                        "link" : data_wiki_set["inter_wiki"][i][1],
+                        "logo" : data_wiki_set["inter_wiki"][i][2]
+                    }
                 }
             }
             
