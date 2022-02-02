@@ -146,7 +146,7 @@ function do_onmark_heading_render(
     name_doc, 
     name_include
 ) {
-    var heading_re = /\n(={1,6})(#)? ?([^=]+) ?#?={1,6}\n/;
+    var heading_re = /\n(={1,6})(#)? ?([^\n]+) ?#?(?:={6}|={5}|={4}|={3}|={2}|={6})\n/;
     var heading_level_all = [0, 0, 0, 0, 0, 0];
     var toc_data = '';
     var toc_n = 0;
@@ -1399,7 +1399,6 @@ function do_onmark_render(
             data_nowiki = data_var[2];
         
             data = do_onmark_text_render(data);
-            
             data_var = do_onmark_heading_render(
                 data, 
                 data_js, 
