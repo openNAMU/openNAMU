@@ -85,7 +85,7 @@ global_wiki_set = {}
 
 global_db_set = ''
 
-data_css_ver = '120'
+data_css_ver = '121'
 data_css = ''
 
 conn = ''
