@@ -26,9 +26,12 @@ def login_login_2(conn):
         sql_data = curs.fetchall()
         if not sql_data:
             return re_error('/error/2')
-        else:
-            for i in sql_data:
-                user_data[i[0]] = i[1]
+
+        for i in sql_data:
+            user_data[i[0]] = i[1]
+                
+        if len(user_data) < 2:
+            return re_error('/error/2')
 
         if pw_check(
             flask.request.form.get('pw', ''),

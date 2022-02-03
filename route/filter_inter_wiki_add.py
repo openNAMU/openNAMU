@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def inter_wiki_add(tool, name = None):
+def filter_inter_wiki_add(tool, name = None):
     with get_db_connect() as conn:
         curs = conn.cursor()
 

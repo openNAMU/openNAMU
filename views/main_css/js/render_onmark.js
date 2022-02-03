@@ -146,7 +146,7 @@ function do_onmark_heading_render(
     name_doc, 
     name_include
 ) {
-    var heading_re = /\n(={1,6})(#)? ?([^\n]+) ?#?(?:={6}|={5}|={4}|={3}|={2}|={6})\n/;
+    var heading_re = /\n(={1,6})(#)? ?([^\n]+) ?#?={1,6}\n/;
     var heading_level_all = [0, 0, 0, 0, 0, 0];
     var toc_data = '';
     var toc_n = 0;
@@ -184,8 +184,10 @@ function do_onmark_heading_render(
         }
         
         var heading_level_string_no_end = heading_level_string.replace(/\.$/, '');
-        var heading_data_text = heading_data[3].replace(/ #$/, '');
-        heading_data_text = heading_data_text.replace(/ $/, '');
+        
+        var heading_data_text = heading_data[3].replace(/=+$/, '');
+        heading_data_text = heading_data_text.replace(/#$/, '');
+        ading_data_text = heading_data_text.replace(/ $/, '');
         
         toc_data += '' +
             '<span style="margin-left: ' + String((heading_level_string.match(/\./g).length - 1) * 10) + 'px;">' +

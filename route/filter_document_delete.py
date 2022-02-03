@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def filter_document_del(name = ''):
+def filter_document_delete(name = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
