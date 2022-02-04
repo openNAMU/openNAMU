@@ -110,7 +110,11 @@ class get_db_connect_old:
         
     def db_load(self):
         if self.db_set['type'] == 'sqlite':
-            self.conn = sqlite3.connect(self.db_set['name'] + '.db', check_same_thread = False)
+            self.conn = sqlite3.connect(
+                self.db_set['name'] + '.db',
+                check_same_thread = False
+            )
+            self.conn.execute('pragma journal_mode = wal')
         else:
             self.conn = pymysql.connect(
                 host = self.db_set['mysql_host'],
@@ -158,7 +162,11 @@ class get_db_connect:
         
     def __enter__(self):
         if self.db_set['type'] == 'sqlite':
-            self.conn = sqlite3.connect(self.db_set['name'] + '.db')
+            self.conn = sqlite3.connect(
+                self.db_set['name'] + '.db',
+                check_same_thread = False
+            )
+            self.conn.execute('pragma journal_mode = wal')
         else:
             self.conn = pymysql.connect(
                 host = self.db_set['mysql_host'],
