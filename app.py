@@ -2,13 +2,33 @@
 import os
 import re
 
+from route.tool.func import *
+# from route import *
+
 for i_data in os.listdir("route"):
     f_src = re.search(r"(.+)\.py$", i_data)
-    if f_src:
-        exec("from route." + f_src.group(1) + " import *")
+    f_src = f_src.group(1) if f_src else ""
+    
+    if not f_src in ('', '__init__'):
+        try:
+            exec(
+                "from route." + f_src + " " + 
+                "import " + f_src
+            )
+        except:
+            try:
+                exec(
+                    "from route." + f_src + " " + 
+                    "import " + f_src + "_2"
+                )
+            except:
+                pass
 
 # Init-Version
-version_list = json.loads(open('version.json', encoding = 'utf8').read())
+version_list = json.loads(open(
+    'version.json', 
+    encoding = 'utf8'
+).read())
 
 # Init-DB
 if os.path.exists(os.path.join('data', 'set.json')):
@@ -347,44 +367,44 @@ if os.path.exists('custom.py'):
     
 # Func
 # Func-inter_wiki
-app.route('/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(inter_wiki)
-app.route('/inter_wiki/del/<name>', defaults = { 'tool' : 'del_inter_wiki' })(inter_wiki_del)
-app.route('/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(inter_wiki_add)
-app.route('/inter_wiki/add/<name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(inter_wiki_add)
+app.route('/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(filter_inter_wiki)
+app.route('/inter_wiki/del/<name>', defaults = { 'tool' : 'del_inter_wiki' })(filter_inter_wiki_delete)
+app.route('/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(filter_inter_wiki_add)
+app.route('/inter_wiki/add/<name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(filter_inter_wiki_add)
 
 app.route('/filter/document/list')(filter_document)
 app.route('/filter/document/add/<name>', methods = ['POST', 'GET'])(filter_document_add)
 app.route('/filter/document/add', methods = ['POST', 'GET'])(filter_document_add)
-app.route('/filter/document/del/<name>')(filter_document_del)
+app.route('/filter/document/del/<name>')(filter_document_delete)
 
-app.route('/edit_top', defaults = { 'tool' : 'edit_top' })(inter_wiki)
-app.route('/edit_top/del/<name>', defaults = { 'tool' : 'del_edit_top' })(inter_wiki_del)
-app.route('/edit_top/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_top' })(inter_wiki_add)
+app.route('/edit_top', defaults = { 'tool' : 'edit_top' })(filter_inter_wiki)
+app.route('/edit_top/del/<name>', defaults = { 'tool' : 'del_edit_top' })(filter_inter_wiki_delete)
+app.route('/edit_top/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_top' })(filter_inter_wiki_add)
 
-app.route('/image_license', defaults = { 'tool' : 'image_license' })(inter_wiki)
-app.route('/image_license/del/<name>', defaults = { 'tool' : 'del_image_license' })(inter_wiki_del)
-app.route('/image_license/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_image_license' })(inter_wiki_add)
+app.route('/image_license', defaults = { 'tool' : 'image_license' })(filter_inter_wiki)
+app.route('/image_license/del/<name>', defaults = { 'tool' : 'del_image_license' })(filter_inter_wiki_delete)
+app.route('/image_license/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_image_license' })(filter_inter_wiki_add)
 
-app.route('/edit_filter', defaults = { 'tool' : 'edit_filter' })(inter_wiki)
-app.route('/edit_filter/del/<name>', defaults = { 'tool' : 'del_edit_filter' })(inter_wiki_del)
-app.route('/edit_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(inter_wiki_add)
-app.route('/edit_filter/add/<name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(inter_wiki_add)
+app.route('/edit_filter', defaults = { 'tool' : 'edit_filter' })(filter_inter_wiki)
+app.route('/edit_filter/del/<name>', defaults = { 'tool' : 'del_edit_filter' })(filter_inter_wiki_delete)
+app.route('/edit_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(filter_inter_wiki_add)
+app.route('/edit_filter/add/<name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(filter_inter_wiki_add)
 
-app.route('/email_filter', defaults = { 'tool' : 'email_filter' })(inter_wiki)
-app.route('/email_filter/del/<name>', defaults = { 'tool' : 'del_email_filter' })(inter_wiki_del)
-app.route('/email_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_email_filter' })(inter_wiki_add)
+app.route('/email_filter', defaults = { 'tool' : 'email_filter' })(filter_inter_wiki)
+app.route('/email_filter/del/<name>', defaults = { 'tool' : 'del_email_filter' })(filter_inter_wiki_delete)
+app.route('/email_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_email_filter' })(filter_inter_wiki_add)
 
-app.route('/file_filter', defaults = { 'tool' : 'file_filter' })(inter_wiki)
-app.route('/file_filter/del/<name>', defaults = { 'tool' : 'del_file_filter' })(inter_wiki_del)
-app.route('/file_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_file_filter' })(inter_wiki_add)
+app.route('/file_filter', defaults = { 'tool' : 'file_filter' })(filter_inter_wiki)
+app.route('/file_filter/del/<name>', defaults = { 'tool' : 'del_file_filter' })(filter_inter_wiki_delete)
+app.route('/file_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_file_filter' })(filter_inter_wiki_add)
 
-app.route('/name_filter', defaults = { 'tool' : 'name_filter' })(inter_wiki)
-app.route('/name_filter/del/<name>', defaults = { 'tool' : 'del_name_filter' })(inter_wiki_del)
-app.route('/name_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_name_filter' })(inter_wiki_add)
+app.route('/name_filter', defaults = { 'tool' : 'name_filter' })(filter_inter_wiki)
+app.route('/name_filter/del/<name>', defaults = { 'tool' : 'del_name_filter' })(filter_inter_wiki_delete)
+app.route('/name_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_name_filter' })(filter_inter_wiki_add)
 
-app.route('/extension_filter', defaults = { 'tool' : 'extension_filter' })(inter_wiki)
-app.route('/extension_filter/del/<name>', defaults = { 'tool' : 'del_extension_filter' })(inter_wiki_del)
-app.route('/extension_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_extension_filter' })(inter_wiki_add)
+app.route('/extension_filter', defaults = { 'tool' : 'extension_filter' })(filter_inter_wiki)
+app.route('/extension_filter/del/<name>', defaults = { 'tool' : 'del_extension_filter' })(filter_inter_wiki_delete)
+app.route('/extension_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_extension_filter' })(filter_inter_wiki_add)
 
 # Func-list
 # /list/document/old
@@ -844,7 +864,7 @@ app.route('/restart', methods = ['POST', 'GET'])(main_sys_restart)
 app.route('/update', methods = ['POST', 'GET'])(main_sys_update)
 
 app.errorhandler(404)(main_error_404)
-    
+
 if __name__ == "__main__":
     waitress.serve(
         app,

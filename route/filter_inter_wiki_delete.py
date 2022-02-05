@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def inter_wiki_del(tool, name = 'Test'):
+def filter_inter_wiki_delete(tool, name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
         

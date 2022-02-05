@@ -8,10 +8,11 @@ function get_link_state(data) {
     var link_list_2 = {}
     for(var i = 0; document.getElementsByClassName(data + 'link_finder')[i]; i++) {
         var data_class = document.getElementsByClassName(data + 'link_finder')[i];
+        console.log(data_class.href)
         if(
             data_class.id !== 'out_link' && 
             data_class.id !== 'inside' && 
-            !data_class.href.match(/^#/)
+            data_class.id !== 'in_doc_link'
         ) {            
             link_list.push(data_class.title);
             
@@ -55,7 +56,7 @@ function get_link_state(data) {
 function get_heading_name() {
     let heading_name = document.getElementsByClassName('render_heading_text');
     for(let i = 0; i < heading_name.length; i++) {
-        heading_name[i].id = heading_name[i].innerText.replace(/^([0-9]+\.)+ /, '').replace(/✎ ⊖$/, '');
+        heading_name[i].id = heading_name[i].innerText.replace(/^([0-9]+\.)+ /, '').replace(/ ✎ ⊖$/, '');
     }
 }
 
