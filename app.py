@@ -16,10 +16,13 @@ for i_data in os.listdir("route"):
                 "import " + f_src
             )
         except:
-            exec(
-                "from route." + f_src + " " + 
-                "import " + f_src + "_2"
-            )
+            try:
+                exec(
+                    "from route." + f_src + " " + 
+                    "import " + f_src + "_2"
+                )
+            except:
+                pass
 
 # Init-Version
 version_list = json.loads(open(
