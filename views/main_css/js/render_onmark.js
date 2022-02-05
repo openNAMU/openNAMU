@@ -146,7 +146,7 @@ function do_onmark_heading_render(
     name_doc, 
     name_include
 ) {
-    var heading_re = /\n(={1,6})(#)? ?([^\n]+) ?#?(?:={6}|={5}|={4}|={3}|={2}|={6})\n/;
+    var heading_re = /\n(={1,6})(#)? ?([^\n]+) ?#?={1,6}\n/;
     var heading_level_all = [0, 0, 0, 0, 0, 0];
     var toc_data = '';
     var toc_n = 0;
@@ -184,8 +184,10 @@ function do_onmark_heading_render(
         }
         
         var heading_level_string_no_end = heading_level_string.replace(/\.$/, '');
-        var heading_data_text = heading_data[3].replace(/ #$/, '');
-        heading_data_text = heading_data_text.replace(/ $/, '');
+        
+        var heading_data_text = heading_data[3].replace(/=+$/, '');
+        heading_data_text = heading_data_text.replace(/#$/, '');
+        ading_data_text = heading_data_text.replace(/ $/, '');
         
         toc_data += '' +
             '<span style="margin-left: ' + String((heading_level_string.match(/\./g).length - 1) * 10) + 'px;">' +
@@ -433,16 +435,19 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                     link_real = link_real.replace(/^\.\.\//, '');
                     link_real = name_doc.replace(/\/[^/]+$/, '') + (link_real !== '' ? '/' + link_real : '');
                 }
+                
+                var link_data_var = do_link_change(link_real, data_nowiki, 0);
+                var link_main = link_data_var[0];
+                var link_sub = link_data_var[1];
+                
+                let link_id = "real_normal_link"
 
                 var i = 0;
                 while(i < 2) {
                     if(i === 0) {
-                        var link_data_var = do_link_change(link_real, data_nowiki, 0);
-                        var link_main = link_data_var[0];
-                        var link_sub = link_data_var[1];
-
                         var var_link_type = 'href';
                         if(link_main === '') {
+                            link_id = "in_doc_link"
                             var var_link_data = link_sub;
                         } else {
                             var var_link_data = '/w/' + do_url_change(link_main) + link_sub;
@@ -462,7 +467,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                 }
 
                 return  '<a class="' + name_include + 'link_finder" ' +
-                            'id="real_normal_link"' +
+                            'id="' + link_id + '"' +
                             'name="' + name_include + 'set_link_' + num_link_str + '" ' +
                             'title="" ' +
                             'href="">' + link_out + '</a>';

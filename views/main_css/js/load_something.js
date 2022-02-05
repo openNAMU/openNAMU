@@ -78,7 +78,7 @@ function send_render(i = 0) {
             document.getElementsByClassName('send_content')[i].innerHTML = '<br>';
         } else {
             data = data.replace(/javascript:/i, '');
-            data = data.replace(/&lt;a(?:(?:(?!&gt;).)+)&gt;((?:(?!&lt;\/a&gt;).)+)&lt;\/a&gt;/g, function(x, x_1) {
+            data = data.replace(/&lt;a(?:(?:(?!&gt;).)*)&gt;((?:(?!&lt;\/a&gt;).)+)&lt;\/a&gt;/g, function(x, x_1) {
                 x_1_org = x_1.replace('&lt;', '<').replace('&gt;', '>');
                 return '<a href="/w/' + encodeURIComponent(x_1_org) + '">' + x_1 + '</a>';
             });

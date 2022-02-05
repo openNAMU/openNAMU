@@ -39,9 +39,10 @@ def ip_check(d_type = 0):
             flask.request.environ.get('REMOTE_ADDR', '::1')
         ]
         for ip in ip_list:
-            if not (ip == '::1' or ip == '127.0.0.1'):
-                ip = ip[0] if type(ip) == type([]) else ip.split(',')[0]
-                
+            if type(ip) == type([]):
+                ip = ip[len(ip) - 1]
+
+            if not ip in ('::1', '127.0.0.1'):
                 break
 
     return ip
