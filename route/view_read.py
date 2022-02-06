@@ -14,6 +14,7 @@ def view_read_2(conn, name, doc_rev, doc_from):
     
     name_doc_pass = doc_from
     uppage = re.sub(r"/([^/]+)$", '', name)
+    uppage = 0 if uppage == name else uppage
     num = str(doc_rev)        
 
     curs.execute(db_change("select sub from rd where title = ? and not stop = 'O' order by date desc"), [name])
