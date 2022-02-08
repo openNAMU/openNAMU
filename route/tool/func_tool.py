@@ -32,17 +32,26 @@ def ip_check(d_type = 0):
     ip = ''
     if d_type == 0 and (flask.session and 'id' in flask.session):
         ip = flask.session['id']
-    else:
-        ip_list = [
-            flask.request.environ.get('HTTP_X_REAL_IP', '::1'),
-            flask.request.environ.get('HTTP_X_FORWARDED_FOR', '::1'),
-            flask.request.environ.get('REMOTE_ADDR', '::1')
-        ]
-        for ip in ip_list:
+    else:    
+        for for_a in range(5):
+            if for_a == 0:
+                ip = flask.request.environ.get('HTTP_X_REAL_IP', '::1')
+            elif for_a == 1:
+                ip = flask.request.environ.get('HTTP_CLIENT_IP', '::1')
+            elif for_a == 2:
+                ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR', '::1')
+            elif for_a == 3:
+                ip = flask.request.environ.get('HTTP_CF_CONNECTING_IP', '::1')
+            else:
+                ip = flask.request.environ.get('REMOTE_ADDR', '::1')
+            
             if type(ip) == type([]):
-                ip = ip[len(ip) - 1]
+                ip = ip[0]
+            else:
+                ip = ip.split(',')
+                ip = ip[0]
 
-            if not ip in ('::1', '127.0.0.1'):
+            if ip != '::1':
                 break
 
     return ip
