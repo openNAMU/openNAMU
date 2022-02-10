@@ -3,7 +3,7 @@ from .tool.func import *
 def view_read_2(conn, name, doc_rev, doc_from):
     curs = conn.cursor()
 
-    sub = ''
+    sub = 0
     menu = []
     
     user_doc = ''
