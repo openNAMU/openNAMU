@@ -140,8 +140,13 @@ function do_onmark_text_render(data) {
     return data;
 }
 
-function do_onmark_heading_render(data, data_js, name_doc, name_include) {
-    var heading_re = /\n(={1,6})(#)? ?([^=]+) ?#?={1,6}\n/;
+function do_onmark_heading_render(
+    data, 
+    data_js, 
+    name_doc, 
+    name_include
+) {
+    var heading_re = /\n(={1,6})(#)? ?([^\n]+) ?#?={1,6}\n/;
     var heading_level_all = [0, 0, 0, 0, 0, 0];
     var toc_data = '';
     var toc_n = 0;
@@ -179,23 +184,30 @@ function do_onmark_heading_render(data, data_js, name_doc, name_include) {
         }
         
         var heading_level_string_no_end = heading_level_string.replace(/\.$/, '');
-        var heading_data_text = heading_data[3].replace(/ #$/, '');
-        heading_data_text = heading_data_text.replace(/ $/, '');
+        
+        var heading_data_text = heading_data[3].replace(/=+$/, '');
+        heading_data_text = heading_data_text.replace(/#$/, '');
+        ading_data_text = heading_data_text.replace(/ $/, '');
         
         toc_data += '' +
             '<span style="margin-left: ' + String((heading_level_string.match(/\./g).length - 1) * 10) + 'px;">' +
                 '<a href="#s-' + heading_level_string_no_end + '">' + 
                     heading_level_string + ' ' +
-                '</a>' + heading_data_text +
+                '</a> ' + 
+                '<span id="toc_text_' + heading_level_string_no_end + '"></span>' +
             '</span>' +
             '\n' +
         ''
+        data_js += 'document.getElementById("toc_text_' + heading_level_string_no_end + '").innerHTML = document.getElementById("heading_text_' + heading_level_string_no_end + '").innerText;\n';
+        
         data = data.replace(heading_re, 
             '\n' +
             (toc_n === 1 ? '' : '</div>') +
             '<h' + heading_level + ' class="render_heading_text">' + 
                 '<a href="#toc" id="s-' + heading_level_string_no_end + '">' + heading_level_string + '</a> ' + 
-                heading_data_text + ' ' +
+                '<span id="heading_text_' + heading_level_string_no_end + '">' +
+                    heading_data_text + 
+                '</span> ' +
                 '<a id="edit_load_' + String(toc_n) + '" ' +
                     'style="font-size: 70%;"' +
                     'href="/edit/' + do_url_change(name_doc) + '/doc_section/' + String(toc_n) + '">✎</a> ' +
@@ -227,7 +239,7 @@ function do_onmark_heading_render(data, data_js, name_doc, name_include) {
     
     data = data.replace(toc_re, toc_data);
     
-    return data;
+    return [data, data_js];
 }
 
 function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowiki, data_wiki_set) {
@@ -423,16 +435,19 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                     link_real = link_real.replace(/^\.\.\//, '');
                     link_real = name_doc.replace(/\/[^/]+$/, '') + (link_real !== '' ? '/' + link_real : '');
                 }
+                
+                var link_data_var = do_link_change(link_real, data_nowiki, 0);
+                var link_main = link_data_var[0];
+                var link_sub = link_data_var[1];
+                
+                let link_id = "real_normal_link"
 
                 var i = 0;
                 while(i < 2) {
                     if(i === 0) {
-                        var link_data_var = do_link_change(link_real, data_nowiki, 0);
-                        var link_main = link_data_var[0];
-                        var link_sub = link_data_var[1];
-
                         var var_link_type = 'href';
                         if(link_main === '') {
+                            link_id = "in_doc_link"
                             var var_link_data = link_sub;
                         } else {
                             var var_link_data = '/w/' + do_url_change(link_main) + link_sub;
@@ -452,7 +467,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                 }
 
                 return  '<a class="' + name_include + 'link_finder" ' +
-                            'id="real_normal_link"' +
+                            'id="' + link_id + '"' +
                             'name="' + name_include + 'set_link_' + num_link_str + '" ' +
                             'title="" ' +
                             'href="">' + link_out + '</a>';
@@ -1249,16 +1264,20 @@ function do_onmark_redirect_render(data, data_js, name_doc) {
         var link_main = link_data_var[0];
         var link_sub = link_data_var[1];
         
+        // 임시 조치
         if(
             name_include == '' &&
             window.location.search === '' &&
+            window.location.pathname.match(/\/w\//) &&
             !window.location.pathname.match(/\/doc_from\//)
         ) {
             window.location.href = '/w/' + do_url_change(link_main) + '/doc_from/' + do_url_change(name_doc) + link_sub;
         }
         
         return [
-            data.replace(redirect_re, '/w/' + do_url_change(link_main) + '/doc_from/' + do_url_change(name_doc) + link_sub), 
+            '/w/' + do_url_change(link_main) + 
+            '/doc_from/' + do_url_change(name_doc) + 
+            link_sub,
             data_js, 
             1
         ];
@@ -1288,7 +1307,6 @@ function do_onmark_render(
         var data = '\n' + 
             document.getElementById(name_id + '_load').innerHTML.replace(/\r/g, '') + 
         '\n';
-        data_wiki_set = JSON.parse(document.getElementById(name_id + '_set').innerHTML);
     } else if(test_mode === 'manual') { 
         var data = '\n' + 
             doc_data.replace(/\r/g, '') + 
@@ -1302,71 +1320,141 @@ function do_onmark_render(
     var data_backlink = [];
     var data_nowiki = {};
 
-    var data_var = do_onmark_redirect_render(data, data_js, name_doc, name_include);
-    data = data_var[0];
-    data_js = data_var[1];
-    var passing = data_var[2];
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", "/api/setting/inter_wiki");
+    xhr.send();
 
-    if(passing === 0) {
-        data = do_onmark_remark_render(data);
+    xhr.onreadystatechange = function() {
+        if(this.readyState === 4 && this.status === 200) {
+            data_wiki_set = JSON.parse(this.responseText);
+            let data_wiki_set_inter_wiki = { "inter_wiki" : {}};
+            if(data_wiki_set["inter_wiki"]) {
+                for(let i = 0; i < data_wiki_set["inter_wiki"].length; i++) {
+                    data_wiki_set_inter_wiki["inter_wiki"][
+                        data_wiki_set["inter_wiki"][i][0]
+                    ] = {
+                        "link" : data_wiki_set["inter_wiki"][i][1],
+                        "logo" : data_wiki_set["inter_wiki"][i][2]
+                    }
+                }
+            }
+            
+            let data_var = do_onmark_redirect_render(
+                data, 
+                data_js, 
+                name_doc, 
+                name_include
+            );
+            data = data_var[0];
+            data_js = data_var[1];
+            let passing = data_var[2];
+            
+            if(passing === 1) {
+                if(test_mode === 'normal') {
+                    document.getElementById(name_id).innerHTML = data + '<script>' + data_js + '</script>';
+                    eval(data_js);
+                } else if(test_mode === 'manual') {
+                    return [data, data_js];
+                } else {
+                	console.log([data, data_js]);
+                }
+                
+                return 0;
+            }
+            
+            data = do_onmark_remark_render(data);
+            
+            data_var = do_onmark_nowiki_before_render(
+                data, 
+                data_js, 
+                name_include, 
+                data_nowiki
+            );
+            data = data_var[0];
+            data_js = data_var[1];
+            data_nowiki = data_var[2];
+            
+            data_var = do_onmark_math_render(
+                data, 
+                data_js, 
+                name_include, 
+                data_nowiki
+            );
+            data = data_var[0];
+            data_js = data_var[1];
         
-        data_var = do_onmark_nowiki_before_render(data, data_js, name_include, data_nowiki);
-        data = data_var[0];
-        data_js = data_var[1];
-        data_nowiki = data_var[2];
+            data_var = do_onmark_include_render(
+                data, 
+                data_js, 
+                name_include, 
+                data_nowiki
+            );
+            data = data_var[0];
+            data_js = data_var[1];
         
-        data_var = do_onmark_math_render(data, data_js, name_include, data_nowiki);
-        data = data_var[0];
-        data_js = data_var[1];
-
-        data_var = do_onmark_include_render(data, data_js, name_include, data_nowiki);
-        data = data_var[0];
-        data_js = data_var[1];
-
-        data_var = do_onmark_middle_render(data, data_js, name_include, data_nowiki, name_doc);
-        data = data_var[0];
-        data_js = data_var[1];
-        data_nowiki = data_var[2];
-
-        data = do_onmark_text_render(data);
-        data = do_onmark_heading_render(data, data_js, name_doc, name_include);
-        data = do_onmark_table_render(data);
-
-        data_var = do_onmark_link_render(
-            data, 
-            data_js, 
-            name_doc, 
-            name_include,
-            data_nowiki,
-            data_wiki_set
-        );
-        data = data_var[0];
-        data_js = data_var[1];
-        var data_category = data_var[2];
-
-        data_var = do_onmark_macro_render(data, data_js);
-        data = data_var[0];
-        data_js = data_var[1];
+            data_var = do_onmark_middle_render(
+                data, 
+                data_js, 
+                name_include, 
+                data_nowiki, 
+                name_doc
+            );
+            data = data_var[0];
+            data_js = data_var[1];
+            data_nowiki = data_var[2];
         
-        data = do_onmark_list_render(data);
-        data = do_onmark_hr_render(data);
-        data = do_onmark_footnote_render(data, name_include);
-        data = do_onmark_last_render(data, name_include, data_category);
-    }
-    
-    data_js += '' + 
-        'get_link_state("' + name_include + '");\n' + 
-        'get_file_state("' + name_include + '");\n' + 
-		'get_heading_name();' +
-        'render_html("' + name_include + 'nowiki_html");\n' +
-    ''
-    
-    if(test_mode === 'normal') {
-        document.getElementById(name_id).innerHTML = data + '<script>' + data_js + '</script>';
-        eval(data_js);
-    } else if(test_mode === 'manual') {
-        return [data, data_js];
-    } else {
-    	console.log([data, data_js]);
+            data = do_onmark_text_render(data);
+            data_var = do_onmark_heading_render(
+                data, 
+                data_js, 
+                name_doc, 
+                name_include
+            );
+            data = data_var[0];
+            data_js = data_var[1];
+            
+            data = do_onmark_table_render(data);
+        
+            data_var = do_onmark_link_render(
+                data, 
+                data_js, 
+                name_doc, 
+                name_include,
+                data_nowiki,
+                data_wiki_set_inter_wiki
+            );
+            data = data_var[0];
+            data_js = data_var[1];
+            var data_category = data_var[2];
+        
+            data_var = do_onmark_macro_render(data, data_js);
+            data = data_var[0];
+            data_js = data_var[1];
+            
+            data = do_onmark_list_render(data);
+            data = do_onmark_hr_render(data);
+            data = do_onmark_footnote_render(data, name_include);
+            data = do_onmark_last_render(
+                data, 
+                name_include, 
+                data_category
+            );
+            
+            data_js += '' + 
+                'get_link_state("' + name_include + '");\n' + 
+                'get_file_state("' + name_include + '");\n' + 
+        		'get_heading_name();\n' +
+                'render_html("' + name_include + 'nowiki_html");\n' +
+            ''
+            
+            if(test_mode === 'normal') {
+                document.getElementById(name_id).innerHTML = data + '<script>' + data_js + '</script>';
+                eval(data_js);
+            } else if(test_mode === 'manual') {
+                return [data, data_js];
+            } else {
+            	console.log([data, data_js]);
+            }
+        }
     }
 }

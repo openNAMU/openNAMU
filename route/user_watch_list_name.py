@@ -2,6 +2,8 @@ from .tool.func import *
 
 def user_watch_list_name_2(conn, tool, name):
     curs = conn.cursor()
+    
+    print(tool, name)
 
     ip = ip_check()
     if ip_or_user(ip) != 0:

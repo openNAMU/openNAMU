@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{'language_tag'|load_lang}}">
     <head>
         <meta charset="utf-8">
         {% if imp[3][0] != 0 %}
@@ -48,7 +48,7 @@
                             <span class="iconify" data-icon="ic:baseline-person-add" data-inline="true"></span>
                         {% endif %}
                     {% else %}
-                        <span class="iconify" data-icon="ic:baseline-person" data-inline="true"></span>
+                        <span class="iconify" data-icon="ic:round-person-search" data-inline="true"></span>
                     {% endif %}
                     <span class="not_mobile">{{'tool'|load_lang}}</span>
                     <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
@@ -77,9 +77,32 @@
             <header id="section">
                 <article class="main" id="title">
                     <h1><span class="change_space">{{imp[0]}}</span></h1>
+                    {% if menu != 0 %}
+                        <div id="menu">
+                            {% for menu_data in menu %}<!--
+                             --><div class="menu_item">
+                                    {% if menu[0] == 1 %}
+                                        {% set menu_data_2 = menu_data[0] %}
+                                    {% else %}
+                                        {% set menu_data_2 = '/' + menu_data[0] %}
+                                    {% endif %}
+                                    
+                                    {% if menu_data|length > 2 and menu_data[2] == 1 %}
+                                        {% set menu_topic = 'topic_color' %}
+                                    {% else %}
+                                        {% set menu_topic = '' %}
+                                    {% endif %}
+                                    
+                                    <a class="menu_item_link" href="{{menu_data_2}}" id="{{menu_topic}}">
+                                        {{menu_data[1]}}
+                                    </a>
+                                </div><!--
+                         -->{% endfor %}
+                        </div>
+                    {% endif %}
                 </article>
             </header>
-            <article class="main" id="content">
+            <article class="main" id="main_data">
                 {{data|safe}}
             </article>
             <footer class="not_mobile">
@@ -92,10 +115,13 @@
             </footer>
         </section>
         <aside>
-            <button class="side_button selected">A</button><!--
-         --><button class="side_button">B</button><!--
-         --><button class="side_button">C</button><!--
-         --><button class="side_button">D</button>
+            <button id="side_button_1" class="side_button selected">변경</button><!--
+         --><button id="side_button_2" class="side_button">토론</button><!--
+         --><button id="side_button_3" class="side_button">목차</button><!--
+         --><button id="side_button_4" class="side_button">각주</button>
+            <div id="side_content">
+                Loading...
+            </div>
         </aside>
         <footer class="only_mobile">
             {{imp[1][1]|safe}}

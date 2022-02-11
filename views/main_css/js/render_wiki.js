@@ -8,10 +8,11 @@ function get_link_state(data) {
     var link_list_2 = {}
     for(var i = 0; document.getElementsByClassName(data + 'link_finder')[i]; i++) {
         var data_class = document.getElementsByClassName(data + 'link_finder')[i];
+        console.log(data_class.href)
         if(
             data_class.id !== 'out_link' && 
             data_class.id !== 'inside' && 
-            !data_class.href.match(/^#/)
+            data_class.id !== 'in_doc_link'
         ) {            
             link_list.push(data_class.title);
             
@@ -35,7 +36,7 @@ function get_link_state(data) {
     data_form.append('title_list', JSON.stringify(link_list));
     
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/w/test?v=exist");
+    xhr.open("POST", "/api/w/test/doc_tool/exist");
     xhr.send(data_form);
 
     xhr.onreadystatechange = function() {
@@ -53,10 +54,10 @@ function get_link_state(data) {
 }
 
 function get_heading_name() {
-	let heading_name = document.getElementsByClassName('render_heading_text');
-	for(let i = 0; i < heading_name.length; i++) {
-		heading_name[i].id = heading_name[i].innerText.replace(/^([0-9]+\.)+ /, '').replace(/✎ ⊖$/, '');
-	}
+    let heading_name = document.getElementsByClassName('render_heading_text');
+    for(let i = 0; i < heading_name.length; i++) {
+        heading_name[i].id = heading_name[i].innerText.replace(/^([0-9]+\.)+ /, '').replace(/ ✎ ⊖$/, '');
+    }
 }
 
 function load_image_link(data) {
@@ -239,9 +240,11 @@ function get_file_state(data, i = 0) {
 function load_include(name_doc, name_ob, data_include, name_org = '') {
     var data_form = new FormData();
     data_form.append('include_list', JSON.stringify(data_include));
+    data_form.append('name_include', name_ob);
+    data_form.append('name_org', name_org);
     
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/w/" + encodeURI(name_doc) + "?v=include&include=" + name_ob + "&name_org=" + name_org);
+    xhr.open("POST", "/api/w/" + encodeURI(name_doc) + "/doc_tool/include");
     xhr.send(data_form);
 
     document.getElementsByClassName(name_ob)[0].href = "/w/" + do_url_change(name_doc);

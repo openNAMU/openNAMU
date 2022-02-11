@@ -65,7 +65,6 @@ from .func_mark import *
 from diff_match_patch import diff_match_patch
 
 import netius.servers
-import waitress
 
 import werkzeug.routing
 import werkzeug.debug
@@ -85,7 +84,7 @@ global_wiki_set = {}
 
 global_db_set = ''
 
-data_css_ver = '122'
+data_css_ver = '118'
 data_css = ''
 
 conn = ''
@@ -110,11 +109,7 @@ class get_db_connect_old:
         
     def db_load(self):
         if self.db_set['type'] == 'sqlite':
-            self.conn = sqlite3.connect(
-                self.db_set['name'] + '.db',
-                check_same_thread = False
-            )
-            self.conn.execute('pragma journal_mode = wal')
+            self.conn = sqlite3.connect(self.db_set['name'] + '.db')
         else:
             self.conn = pymysql.connect(
                 host = self.db_set['mysql_host'],
@@ -138,7 +133,7 @@ class get_db_connect_old:
         load_conn(self.conn)
 
         return self.conn
-
+    
     def db_get(self):
         # if self.db_set['type'] != 'sqlite':
         #     self.conn.ping(reconnect = True)
@@ -146,27 +141,14 @@ class get_db_connect_old:
         return self.conn
     
 class get_db_connect:
-    # 임시 DB 커넥션 동작 구조
-    # Init 파트
-    # DB 커넥트(get_db_connect_old) -> func.py로 conn 넘겨줌
-    # route 파트
-    # DB 새로 커넥트 -> func.py에서 쓰던 conn은 conn_sub로 보관 ->
-    # func.py로 conn 넘겨줌 -> 모든 라우터 과정이 끝나면 conn_sub를 다시 func.py에 conn으로 넘겨줌 ->
-    # DB 커넥트 종료
     def __init__(self):
         global global_db_set
-        global conn
         
-        self.conn_sub = conn
         self.db_set = global_db_set
         
     def __enter__(self):
         if self.db_set['type'] == 'sqlite':
-            self.conn = sqlite3.connect(
-                self.db_set['name'] + '.db',
-                check_same_thread = False
-            )
-            self.conn.execute('pragma journal_mode = wal')
+            self.conn = sqlite3.connect(self.db_set['name'] + '.db')
         else:
             self.conn = pymysql.connect(
                 host = self.db_set['mysql_host'],
@@ -187,11 +169,9 @@ class get_db_connect:
 
             self.conn.select_db(self.db_set['name'])
 
-        load_conn(self.conn)
         return self.conn
     
     def __exit__(self, exc_type, exc_value, traceback):
-        load_conn(self.conn_sub)
         self.conn.close()
 
 def update(ver_num, set_data):
@@ -473,7 +453,7 @@ def set_init():
 def get_default_admin_group():
     return ['owner', 'ban']
 
-def load_random_key(long = 128):
+def load_random_key(long = 64):
     return ''.join(
         random.choice(
             "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -1162,42 +1142,44 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
     ip = ip_check()
     get_ban = ban_check()
-    
-    if tool == '' and name:
+    acl_c = re.search(r"^user:((?:(?!\/).)*)", name) if name else None
+    if tool == '' and acl_c:
+        acl_n = acl_c.groups()
+
+        if get_ban == 1:
+            return 1
+
+        if admin_check(5) == 1:
+            return 0
+
+        curs.execute(db_change(
+            "select data from acl where title = ? and type = 'decu'"
+        ), ['user:' + acl_n[0]])
+        acl_data = curs.fetchall()
+        if acl_data:
+            if acl_data[0][0] == 'all':
+                return 0
+            elif acl_data[0][0] == 'user' and not ip_or_user(ip) == 1:
+                return 0
+            elif ip == acl_n[0] and not ip_or_user(ip) == 1:
+                return 0
+        else:
+            if ip == acl_n[0] and not ip_or_user(ip) == 1 and not ip_or_user(acl_n[0]) == 1:
+                return 0
+
+        return 1
+
+    if tool == 'topic':
+        if not name:
+            curs.execute(db_change("select title from rd where code = ?"), [topic_num])
+            name = curs.fetchall()
+            name = name[0][0] if name else 'test'
+        
+        end = 3
+    elif tool == 'render' or tool == '' or tool == 'vote':
         if tool == '' and acl_check(name, 'render') == 1:
             return 1
-        
-        user_page = re.search(r"^user:((?:(?!\/).)*)", name)
-        if user_page:
-            user_page = user_page.group(1)
-            if admin_check(5) == 1:
-                return 0
-                
-            if get_ban == 1:
-                return 1
-                
-            curs.execute(db_change(
-                "select data from acl where title = ? and type = 'decu'"
-            ), [name])
-            acl_data = curs.fetchall()
-            if acl_data:
-                if acl_data[0][0] == 'all':
-                    return 0
-                elif acl_data[0][0] == 'user' and not ip_or_user(ip) == 1:
-                    return 0
-            
-            if ip == user_page and not ip_or_user(ip) == 1:
-                return 0
-    
-            return 1
-    elif tool == 'topic':
-        curs.execute(db_change("select title from rd where code = ?"), [topic_num])
-        name = curs.fetchall()
-        name = name[0][0] if name else 'test'
 
-    if tool in ['topic']:
-        end = 3
-    elif tool in ['render', 'vote', '']:
         end = 2
     else:
         end = 1
@@ -1208,43 +1190,27 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 curs.execute(db_change(
                     "select data from acl where title = ? and type = 'decu'"
                 ), [name])
-                '''
-            elif i == 1:
-                curs.execute(db_change(
-                    "select plus from html_filter where kind = 'document'"
-                ))
-                '''
             else:
-                curs.execute(db_change(
-                    'select data from other where name = "edit"'
-                ))
+                curs.execute(db_change('select data from other where name = "edit"'))
 
             num = 5
         elif tool == 'topic':
-            if i == 0:
-                curs.execute(db_change(
-                    "select acl from rd where code = ?"
-                ), [topic_num])
+            if i == 0 and topic_num:
+                curs.execute(db_change("select acl from rd where code = ?"), [topic_num])
             elif i == 1:
                 curs.execute(db_change(
                     "select data from acl where title = ? and type = 'dis'"
                 ), [name])
             else:
-                curs.execute(db_change(
-                    'select data from other where name = "discussion"'
-                ))
+                curs.execute(db_change('select data from other where name = "discussion"'))
 
             num = 3
         elif tool == 'upload':
-            curs.execute(db_change(
-                "select data from other where name = 'upload_acl'"
-            ))
+            curs.execute(db_change("select data from other where name = 'upload_acl'"))
 
             num = 5
         elif tool == 'many_upload':
-            curs.execute(db_change(
-                "select data from other where name = 'many_upload_acl'"
-            ))
+            curs.execute(db_change("select data from other where name = 'many_upload_acl'"))
 
             num = 5
         elif tool == 'vote':
@@ -1253,9 +1219,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                     'select acl from vote where id = ? and user = ""'
                 ), [topic_num])
             else:
-                curs.execute(db_change(
-                    'select data from other where name = "vote_acl"'
-                ))
+                curs.execute(db_change('select data from other where name = "vote_acl"'))
 
             num = None
         else:
@@ -1270,16 +1234,18 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             num = 5
 
         acl_data = curs.fetchall()
-        if not acl_data:
-            acl_data = [['normal']]
-        elif acl_data and acl_data[0][0] == '':
-            acl_data = [['normal']]
-
-        if acl_data[0][0] != 'normal':
-            if not acl_data[0][0] in ['ban', 'ban_admin'] and get_ban == 1 and tool != 'render':
+        if  (
+                i == (end - 1) and \
+                (not acl_data or acl_data[0][0] == '' or acl_data[0][0] == 'normal')
+            ) and \
+            get_ban == 1 and \
+            tool != 'render':
+            return 1
+        elif acl_data and acl_data[0][0] != 'normal' and acl_data[0][0] != '':
+            if acl_data[0][0] != 'ban' and get_ban == 1 and tool != 'render':
                 return 1
 
-            if acl_data[0][0] in ['all', 'ban']:
+            if acl_data[0][0] == 'all' or acl_data[0][0] == 'ban':
                 return 0
             elif acl_data[0][0] == 'user':
                 if ip_or_user(ip) != 1:
@@ -1345,27 +1311,23 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 if admin_check() == 1:
                     return 0
             elif acl_data[0][0] == 'ban_admin':
-                if admin_check(1) == 1 or get_ban == 1:
+                if admin_check(1) == 1 or ban_check() == 1:
                     return 0
 
             return 1
-        elif i == (end - 1):
-            if get_ban == 1 and tool != 'render':
-                return 1
-            
-            if tool == 'topic':
-                curs.execute(db_change(
-                    "select title from rd where code = ? and stop != ''"
-                ), [topic_num])
-                if curs.fetchall():
-                    if admin_check(3, 'topic (code ' + topic_num + ')') == 1:
-                        return 0
+        else:
+            if i == (end - 1):
+                if tool == 'topic' and topic_num:
+                    curs.execute(db_change(
+                        "select title from rd where code = ? and stop != ''"
+                    ), [topic_num])
+                    if curs.fetchall():
+                        if admin_check(3, 'topic (code ' + topic_num + ')') == 1:
+                            return 0
                     else:
-                        return 1
+                        return 0
                 else:
                     return 0
-            else:
-                return 0
 
     return 1
 

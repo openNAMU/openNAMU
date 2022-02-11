@@ -26,9 +26,12 @@ def login_login_2(conn):
         sql_data = curs.fetchall()
         if not sql_data:
             return re_error('/error/2')
-        else:
-            for i in sql_data:
-                user_data[i[0]] = i[1]
+
+        for i in sql_data:
+            user_data[i[0]] = i[1]
+                
+        if len(user_data) < 2:
+            return re_error('/error/2')
 
         if pw_check(
             flask.request.form.get('pw', ''),
@@ -57,9 +60,9 @@ def login_login_2(conn):
             data =  '''
                     <form method="post">
                         <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>
                         ''' + http_warning() + '''
