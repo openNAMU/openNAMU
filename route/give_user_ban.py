@@ -76,8 +76,8 @@ def give_user_ban_2(conn, name):
         else:
             main_name = load_lang('ban')
             n_name = '<input placeholder="' + load_lang('name_or_ip_or_regex') + '" value="' + (name if name else '') + '" name="name" type="text"><hr class="main_hr">'
-            regex = '<input type="checkbox" name="regex" ' + ('checked' if band == 'regex' else '') + '> ' + load_lang('regex') + '<hr class="main_hr">'
-            plus = '<input type="checkbox" name="login"> ' + load_lang('login_able') + '<hr class="main_hr">'
+            regex = '<label class="checkbox"><input type="checkbox" name="regex" ' + ('checked' if band == 'regex' else '') + '> ' + load_lang('regex') + '</label><hr class="main_hr">'
+            plus = '<label class="checkbox"><input type="checkbox" name="login"> ' + load_lang('login_able') + '</label><hr class="main_hr">'
             now = 0
             b_now = load_lang('ban')
             action = 'action="/ban"'
