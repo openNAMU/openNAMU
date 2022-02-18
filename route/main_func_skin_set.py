@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_func_skin_set(conn):
+def main_func_skin_set():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
