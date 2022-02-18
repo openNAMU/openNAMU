@@ -736,6 +736,8 @@ def main_func_setting(db_set, num = 0):
                         curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, ?)'), [i[0], '', i[1]])
 
                         d_list += ['']
+                        
+                conn.commit()
 
                 end_data = ''
                 for i in range(0, len(skin_list)):
