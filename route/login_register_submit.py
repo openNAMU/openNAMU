@@ -44,7 +44,7 @@ def login_register_submit_2(conn):
         ])
         conn.commit()
         
-        return redirect('/app_submit')
+        return redirect('/w/Frontpage')
     else:
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('approval_question'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
