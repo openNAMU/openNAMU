@@ -86,7 +86,6 @@ def edit(name = 'Test', name_load = 0, section = 0):
             editor_top_text = ''
             if edit_repeat == 'get':
                 load_title = name_load
-                print(load_title, section)
                 if load_title == 0 and section == '':
                     load_title = name
                     editor_top_text += '<a href="/manager/15/' + url_pas(name) + '">(' + load_lang('load') + ')</a> '

@@ -187,7 +187,7 @@ function do_onmark_heading_render(
         
         var heading_data_text = heading_data[3].replace(/=+$/, '');
         heading_data_text = heading_data_text.replace(/#$/, '');
-        ading_data_text = heading_data_text.replace(/ $/, '');
+        heading_data_text = heading_data_text.replace(/ $/, '');
         
         toc_data += '' +
             '<span style="margin-left: ' + String((heading_level_string.match(/\./g).length - 1) * 10) + 'px;">' +

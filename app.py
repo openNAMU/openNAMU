@@ -240,7 +240,7 @@ app = flask.Flask(
 app.config['JSON_AS_ASCII'] = False
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
-log = logging.getLogger('werkzeug')
+log = logging.getLogger('waitress')
 log.setLevel(logging.ERROR)
 
 app.jinja_env.filters['md5_replace'] = md5_replace
