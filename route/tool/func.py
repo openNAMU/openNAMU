@@ -85,7 +85,7 @@ global_wiki_set = {}
 
 global_db_set = ''
 
-data_css_ver = '122'
+data_css_ver = '123'
 data_css = ''
 
 conn = ''
@@ -112,7 +112,8 @@ class get_db_connect_old:
         if self.db_set['type'] == 'sqlite':
             self.conn = sqlite3.connect(
                 self.db_set['name'] + '.db',
-                check_same_thread = False
+                check_same_thread = False,
+                isolation_level = None
             )
             self.conn.execute('pragma journal_mode = wal')
         else:
@@ -164,7 +165,8 @@ class get_db_connect:
         if self.db_set['type'] == 'sqlite':
             self.conn = sqlite3.connect(
                 self.db_set['name'] + '.db',
-                check_same_thread = False
+                check_same_thread = False,
+                isolation_level = None
             )
             self.conn.execute('pragma journal_mode = wal')
         else:
