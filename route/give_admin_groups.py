@@ -34,7 +34,7 @@ def give_admin_groups_2(conn, name):
         for i in range(0, 8):
             if i != 1:
                 data += '' + \
-                    '<label class="checkbox">' + \
+                    '<label class="input-checkbox">' + \
                         '<input type="checkbox" ' + \
                                 state + ' ' + \
                                 'name="' + acl_name_list[i] + '" ' + \

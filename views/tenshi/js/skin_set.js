@@ -59,7 +59,7 @@ function skin_set() {
         }
 
         document.getElementById("main_skin_set").innerHTML = ' \
-            <label class="checkbox"> \
+            <label class="input-checkbox"> \
                 <input ' + set_data["invert"] + ' type="checkbox" id="invert" name="invert" value="invert"> ' + set_language[language]['darkmode'] + ' \
             </label> \
             <hr class="main_hr"> \

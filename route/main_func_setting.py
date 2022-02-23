@@ -172,22 +172,22 @@ def main_func_setting(db_set, num = 0):
                             <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'tenshi') + '''</select>
 
                             <h2>3. ''' + load_lang('login_set') + '''</h2>
-                            <label class="checkbox">
+                            <label class="input-checkbox">
                                 <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
                             </label>
                             <hr class="main_hr">
 
-                            <label class="checkbox">
+                            <label class="input-checkbox">
                                 <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + load_lang('hide_ip') + '''
                             </label>
                             <hr class="main_hr">
 
-                            <label class="checkbox">
+                            <label class="input-checkbox">
                                 <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + load_lang('requires_approval') + '''
                             </label>
                             <hr class="main_hr">
 
-                            <label class="checkbox">
+                            <label class="input-checkbox">
                                 <input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + load_lang('ua_get_off') + '''
                             </label>
 
@@ -544,7 +544,7 @@ def main_func_setting(db_set, num = 0):
 
                 security_radios = ''
                 for i in ['tls', 'starttls', 'plain']:
-                    security_radios += '<label class="radio"><input name="smtp_security" type="radio" value="' + i + '" ' + ('checked' if d_list[4] == i else '') + '>' + i + '</label><hr class="main_hr">'
+                    security_radios += '<label class="input-radio"><input name="smtp_security" type="radio" value="' + i + '" ' + ('checked' if d_list[4] == i else '') + '>' + i + '</label><hr class="main_hr">'
 
                 re_ver = ''
                 if d_list[7] == '':
@@ -575,7 +575,7 @@ def main_func_setting(db_set, num = 0):
                             </select>
 
                             <h2>2. ''' + load_lang('email_setting') + '''</h1>
-                            <label class="checkbox">
+                            <label class="input-checkbox">
                                 <input type="checkbox" name="email_have" ''' + ('checked' if d_list[9] != '' else '')  + '''> ''' + \
                                     load_lang('email_required') + '''
                             </label>

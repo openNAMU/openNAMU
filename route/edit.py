@@ -127,7 +127,7 @@ def edit(name = 'Test', name_load = 0, section = 0):
             if sql_d and sql_d[0][0] != '':
                 cccb_text = '' + \
                     '<hr class="main_hr">' + \
-                    '<label class="checkbox">' + \
+                    '<label class="input-checkbox">' + \
                         '<input type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + \
                     '</label>' + \
                     '<hr class="main_hr">' + \

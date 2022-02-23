@@ -94,7 +94,7 @@ def main_tool_admin(num = 1, add_2 = ''):
 
             plus = ''
             if num == 15:
-                plus = '<label class="checkbox"><input type="checkbox" name="regex"> ' + load_lang('regex') + '</label><hr class="main_hr">'
+                plus = '<label class="input-checkbox"><input type="checkbox" name="regex"> ' + load_lang('regex') + '</label><hr class="main_hr">'
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [title_list[num][2], wiki_set(), wiki_custom(), wiki_css([0, 0])],

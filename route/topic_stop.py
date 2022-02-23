@@ -74,7 +74,7 @@ def topic_stop_2(conn, topic_num):
                         ''' + stop_d_list + '''
                     </select>
                     <hr class=\"main_hr\">
-                    <label class="checkbox">
+                    <label class="input-checkbox">
                         <input type="checkbox" name="agree" value="O" ''' + agree_check + '''> Agree
                     </label>
                     <hr class=\"main_hr\">

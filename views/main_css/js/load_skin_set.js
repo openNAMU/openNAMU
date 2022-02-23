@@ -458,11 +458,11 @@ function main_css_skin_set() {
             ' + set_data["image"] + ' \
         </select> \
         <h3>1.6. ' + main_css_load_lang('other') + '</h3> \
-        <label class="checkbox"> \
+        <label class="input-checkbox"> \
             <input ' + set_data["include"] + ' type="checkbox" id="main_css_include" value="include"> ' + main_css_load_lang('include_link') + ' \
         </label> \
         <hr class="main_hr"> \
-        <label class="checkbox"> \
+        <label class="input-checkbox"> \
             <input ' + set_data["link_delimiter"] + ' type="checkbox" id="main_css_link_delimiter" value="link_delimiter"> ' + main_css_load_lang('link_delimiter') + '<sup>(1)</sup> \
         </label> \
         <h3>1.7. ' + main_css_load_lang('set_toc') + '</h3> \
@@ -477,11 +477,11 @@ function main_css_skin_set() {
         </select> \
         <h2>2. ' + main_css_load_lang('editor') + '</h2> \
         <h3>2.1. ' + main_css_load_lang('main') + '</h3> \
-        <label class="checkbox"> \
+        <label class="input-checkbox"> \
             <input ' + set_data["monaco"] + ' type="checkbox" id="main_css_monaco" value="monaco"> ' + main_css_load_lang('use_monaco') + '<sup>(1)</sup> \
         </label> \
         <hr class="main_hr"> \
-        <label class="checkbox"> \
+        <label class="input-checkbox"> \
             <input ' + set_data["image_paste"] + ' type="checkbox" id="main_css_image_paste" value="image_paste"> ' + 
                 main_css_load_lang('clipboard_upload') + '<sup>(ko-KR)</sup><sup>(1)</sup> \
         </label> \

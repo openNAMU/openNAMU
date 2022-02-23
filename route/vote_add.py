@@ -51,7 +51,7 @@ def vote_add_2(conn):
                     '<hr class="main_hr">' + \
                     '<textarea rows="10" name="data" placeholder="' + load_lang('1_line_1_q') + '"></textarea>' + \
                     '<hr class="main_hr">' + \
-                    '<label class="checkbox">' + \
+                    '<label class="input-checkbox">' + \
                         '<input type="checkbox" value="Y" name="open_select"> ' + load_lang('open_vote') + \
                     '</label>' + \
                     '<h2>' + load_lang('acl') + '</h2>' + \
