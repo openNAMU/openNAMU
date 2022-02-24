@@ -75,9 +75,9 @@ def give_acl_2(conn, name):
             
         for i in acl_get_list:
             data += '' + \
-                '<h2>' + i[0] + '</h2>' + \
+                '<h2><label for="acl-' + i[1] + '">' + i[0] + '</label></h2>' + \
                 '<hr class="main_hr">' + \
-                '<select name="' + i[1] + '" ' + check_ok + '>' + \
+                '<select id="acl-' + i[1] + '" name="' + i[1] + '" ' + check_ok + '>' + \
             ''
     
             curs.execute(db_change("select data from acl where title = ? and type = ?"), [name, i[1]])

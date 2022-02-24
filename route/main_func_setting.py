@@ -174,14 +174,18 @@ def main_func_setting(db_set, num = 0):
                             </label>
                             <hr class="main_hr">
 
-                            <span>''' + load_lang('encryption_method') + '''</span>
-                            <hr class="main_hr">
-                            <select name="encode">''' + acl_div[0] + '''</select>
+                            <label class="select">
+                                <span>''' + load_lang('encryption_method') + '''</span>
+                                <hr class="main_hr">
+                                <select name="encode">''' + acl_div[0] + '''</select>
+                            </label>
 
                             <h2>2. ''' + load_lang('design_set') + '''</h2>
-                            <span>''' + load_lang('wiki_skin') + '''</span>
-                            <hr class="main_hr">
-                            <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'tenshi') + '''</select>
+                            <label class="select">
+                                <span>''' + load_lang('wiki_skin') + '''</span>
+                                <hr class="main_hr">
+                                <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'tenshi') + '''</select>
+                            </label>
 
                             <h2>3. ''' + load_lang('login_set') + '''</h2>
                             <label class="input-checkbox">
@@ -232,9 +236,11 @@ def main_func_setting(db_set, num = 0):
                                 <hr class="main_hr">
                             </span>
 
-                            <span>''' + load_lang('update_branch') + '''</span>
-                            <hr class="main_hr">
-                            <select name="update">''' + branch_div + '''</select>
+                            <label class="select">
+                                <span>''' + load_lang('update_branch') + '''</span>
+                                <hr class="main_hr">
+                                <select name="update">''' + branch_div + '''</select>
+                            </label>
 
                             <h2>5. ''' + load_lang('edit_set') + '''</h2>
                             <span><a href="/setting/8">(''' + load_lang('main_acl_setting') + ''')</a></span>
@@ -594,9 +600,11 @@ def main_func_setting(db_set, num = 0):
                             </label>
                             <hr class="main_hr">
 
-                            <select name="recaptcha_ver">
-                                ''' + re_ver + '''
-                            </select>
+                            <label class="select">
+                                <select name="recaptcha_ver">
+                                    ''' + re_ver + '''
+                                </select>
+                            </label>
 
                             <h2>2. ''' + load_lang('email_setting') + '''</h1>
                             <label class="input-checkbox">
@@ -721,29 +729,41 @@ def main_func_setting(db_set, num = 0):
                         <form method="post">
                             <a href="/acl/TEST#exp">(''' + load_lang('reference') + ''')</a>
                             <hr class="main_hr">
-                            <span>''' + load_lang('document_acl') + '''</span> 
+                            <label class="select">
+                                <span>''' + load_lang('document_acl') + '''</span> 
+                                <hr class="main_hr">
+                                <select ''' + disable + ''' name="edit">''' + acl_div[0] + '''</select>
+                            </label>
                             <hr class="main_hr">
-                            <select ''' + disable + ''' name="edit">''' + acl_div[0] + '''</select>
+                            <label class="select">
+                                <span>''' + load_lang('discussion_acl') + '''</span>
+                                <hr class="main_hr">
+                                <select ''' + disable + ''' name="discussion">''' + acl_div[1] + '''</select>
+                            </label>
                             <hr class="main_hr">
-                            <span>''' + load_lang('discussion_acl') + '''</span>
+                            <label class="select">
+                                <span>''' + load_lang('upload_acl') + '''</span>
+                                <hr class="main_hr">
+                                <select ''' + disable + ''' name="upload_acl">''' + acl_div[2] + '''</select>
+                            </label>
                             <hr class="main_hr">
-                            <select ''' + disable + ''' name="discussion">''' + acl_div[1] + '''</select>
+                            <label class="select">
+                                <span>''' + load_lang('view_acl') + '''</span>
+                                <hr class="main_hr">
+                                <select ''' + disable + ''' name="all_view_acl">''' + acl_div[3] + '''</select>
+                            </label>
                             <hr class="main_hr">
-                            <span>''' + load_lang('upload_acl') + '''</span>
+                            <label class="select">
+                                <span>''' + load_lang('many_upload_acl') + '''</span>
+                                <hr class="main_hr">
+                                <select ''' + disable + ''' name="many_upload_acl">''' + acl_div[4] + '''</select>
+                            </label>
                             <hr class="main_hr">
-                            <select ''' + disable + ''' name="upload_acl">''' + acl_div[2] + '''</select>
-                            <hr class="main_hr">
-                            <span>''' + load_lang('view_acl') + '''</span>
-                            <hr class="main_hr">
-                            <select ''' + disable + ''' name="all_view_acl">''' + acl_div[3] + '''</select>
-                            <hr class="main_hr">
-                            <span>''' + load_lang('many_upload_acl') + '''</span>
-                            <hr class="main_hr">
-                            <select ''' + disable + ''' name="many_upload_acl">''' + acl_div[4] + '''</select>
-                            <hr class="main_hr">
-                            <span>''' + load_lang('vote_acl') + '''</span>
-                            <hr class="main_hr">
-                            <select ''' + disable + ''' name="vote_acl">''' + acl_div[5] + '''</select>
+                            <label class="select">
+                                <span>''' + load_lang('vote_acl') + '''</span>
+                                <hr class="main_hr">
+                                <select ''' + disable + ''' name="vote_acl">''' + acl_div[5] + '''</select>
+                            </label>
                             <hr class="main_hr">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
                         </form>

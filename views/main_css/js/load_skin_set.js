@@ -438,25 +438,35 @@ function main_css_skin_set() {
     document.getElementById("main_skin_set").innerHTML = ' \
         <h2>1. ' + main_css_load_lang('renderer') + '</h2> \
         <h3>1.1. ' + main_css_load_lang('strike') + '</h3> \
-        <select id="main_css_strike"> \
-            ' + set_data["strike"] + ' \
+        <label class="select"> \
+            <select id="main_css_strike"> \
+                ' + set_data["strike"] + ' \
+            </select> \
         </select> \
         <h3>1.2. ' + main_css_load_lang('bold') + '</h3> \
-        <select id="main_css_bold"> \
-            ' + set_data["bold"] + ' \
-        </select> \
+        <label class="select"> \
+            <select id="main_css_bold"> \
+                ' + set_data["bold"] + ' \
+            </select> \
+        </label> \
         <h3>1.3. ' + main_css_load_lang('where_category') + '</h3> \
-        <select id="main_css_category"> \
-            ' + set_data["category"] + ' \
-        </select> \
+        <label class="select"> \
+            <select id="main_css_category"> \
+                ' + set_data["category"] + ' \
+            </select> \
+        </label> \
         <h3>1.4. ' + main_css_load_lang('set_footnote') + '</h3> \
-        <select id="main_css_footnote"> \
-            ' + set_data["footnote"] + ' \
-        </select> \
+        <label class="select"> \
+            <select id="main_css_footnote"> \
+                ' + set_data["footnote"] + ' \
+            </select> \
+        </label> \
         <h3>1.5. ' + main_css_load_lang('set_image') + '</h3> \
-        <select id="main_css_image"> \
-            ' + set_data["image"] + ' \
-        </select> \
+        <label class="select"> \
+            <select id="main_css_image"> \
+                ' + set_data["image"] + ' \
+            </select> \
+        </label> \
         <h3>1.6. ' + main_css_load_lang('other') + '</h3> \
         <label class="input-checkbox"> \
             <input ' + set_data["include"] + ' type="checkbox" id="main_css_include" value="include"> ' + main_css_load_lang('include_link') + ' \
@@ -466,17 +476,23 @@ function main_css_skin_set() {
             <input ' + set_data["link_delimiter"] + ' type="checkbox" id="main_css_link_delimiter" value="link_delimiter"> ' + main_css_load_lang('link_delimiter') + '<sup>(1)</sup> \
         </label> \
         <h3>1.7. ' + main_css_load_lang('set_toc') + '</h3> \
-        <select id="main_css_toc"> \
-            ' + set_data["toc"] + ' \
-        </select> \
+        <label class="select"> \
+            <select id="main_css_toc"> \
+                ' + set_data["toc"] + ' \
+            </select> \
+        </label> \
         <h3>1.8. ' + main_css_load_lang('set_font_size') + '</h3> \
-        <label class="input-text"> \
-            <input id="main_css_font_size" placeholder="' + main_css_load_lang('font_size') + ' (EX : 11)" value="' + set_data["font_size"] + '"> \
+        <label class="select"> \
+            <label class="input-text"> \
+                <input id="main_css_font_size" placeholder="' + main_css_load_lang('font_size') + ' (EX : 11)" value="' + set_data["font_size"] + '"> \
+            </label> \
         </label> \
         <h3>1.9. ' + main_css_load_lang('exter_link_open_method') + '</h3> \
-        <select id="main_css_exter_link"> \
-            ' + set_data["exter_link"] + ' \
-        </select> \
+        <label class="select"> \
+            <select id="main_css_exter_link"> \
+                ' + set_data["exter_link"] + ' \
+            </select> \
+        </label> \
         <h2>2. ' + main_css_load_lang('editor') + '</h2> \
         <h3>2.1. ' + main_css_load_lang('main') + '</h3> \
         <label class="input-checkbox"> \

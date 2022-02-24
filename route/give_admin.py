@@ -58,7 +58,9 @@ def give_admin_2(conn, name):
             imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('authorize') + ')', 0])],
             data =  '''
                     <form method="post">
-                        <select name="select">''' + div + '''</select>
+                        <label class="select">
+                            <select name="select">''' + div + '''</select>
+                        </label>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
                     </form>

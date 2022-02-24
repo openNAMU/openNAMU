@@ -144,9 +144,11 @@ def main_func_upload():
                             <input placeholder="''' + load_lang('file_name') + '''" name="f_name" value="''' + file_name + '''">
                         </label>
                         <hr class="main_hr">
-                        <select name="f_lice_sel">
-                            ''' + license_list + '''
-                        </select>
+                        <label class="select">
+                            <select name="f_lice_sel">
+                                ''' + license_list + '''
+                            </select>
+                        </label>
                         <hr class="main_hr">
                         <textarea rows="10" placeholder="''' + load_lang('other') + '''" name="f_lice">''' + upload_default + '''</textarea>
                         <hr class="main_hr">

@@ -34,7 +34,7 @@ def vote_add_2(conn):
 
         return redirect('/vote')
     else:
-        acl_data = '<select name="acl_select">'
+        acl_data = '<select id="acl_select" name="acl_select">'
         acl_list = get_acl_list()
         for data_list in acl_list:
             acl_data += '<option value="' + data_list + '">' + (data_list if data_list != '' else 'normal') + '</option>'
@@ -56,7 +56,7 @@ def vote_add_2(conn):
                     '<label class="input-checkbox">' + \
                         '<input type="checkbox" value="Y" name="open_select"> ' + load_lang('open_vote') + \
                     '</label>' + \
-                    '<h2>' + load_lang('acl') + '</h2>' + \
+                    '<h2><label for="acl_select">' + load_lang('acl') + '</label></h2>' + \
                     acl_data + ' <a href="/acl/TEST#exp">(' + load_lang('explanation') + ')</a>' + \
                     '<hr class="main_hr">' + \
                     '<button type="submit">' + load_lang('send') + '</buttom>' + \

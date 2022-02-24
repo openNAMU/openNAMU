@@ -158,7 +158,12 @@ def recent_change_2(conn, name, tool):
                 if set_type == 'normal':
                     div = '''
                         <form method="post">
-                            <select name="a">''' + select + '''</select> <select name="b">''' + select + '''</select>
+                            <label class="select">
+                                <select name="a">''' + select + '''</select>
+                            </label>
+                            <label class="select">
+                                <select name="b">''' + select + '''</select>
+                            </label>
                             <button type="submit">''' + load_lang('compare') + '''</button>
                         </form>
                         <hr class=\"main_hr\">

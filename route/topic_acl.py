@@ -59,9 +59,11 @@ def topic_acl_2(conn, topic_num):
                 <form method="post">
                     <a href="/acl/TEST#exp">(''' + load_lang('reference') + ''')</a>
                     <hr>
-                    <select name="acl">
-                    ''' + acl_html_list + '''
-                    </select>
+                    <label class="select">
+                        <select name="acl">
+                        ''' + acl_html_list + '''
+                        </select>
+                    </label>
                     <hr class=\"main_hr\">
                     <button type="submit">''' + load_lang('save') + '''</button>
                 </form>

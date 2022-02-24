@@ -53,11 +53,13 @@ def filter_document_add(name = ''):
                                 <input value="''' + (html.escape(db_data[0][0]) if db_data else '') + '''" type="text" name="regex">
                             </label>
                             <hr class="main_hr">
-                            <a href="/acl/Test#exp">''' + load_lang('acl') + '''</a>
-                            <hr class="main_hr">
-                            <select name="acl">
-                                ''' + ''.join(['<option ' + i[0] + ' value=' + i[1] + '>' + ('normal' if i[1] == '' else i[1]) + '</option>' for i in acl_list]) + '''
-                            </select>
+                            <label class="select">
+                                <a href="/acl/Test#exp">''' + load_lang('acl') + '''</a>
+                                <hr class="main_hr">
+                                <select name="acl">
+                                    ''' + ''.join(['<option ' + i[0] + ' value=' + i[1] + '>' + ('normal' if i[1] == '' else i[1]) + '</option>' for i in acl_list]) + '''
+                                </select>
+                            </label>
                             <hr class="main_hr">
                             <button ''' + stat + ''' type="submit">''' + load_lang('add') + '''</button>
                         </form>

@@ -44,13 +44,13 @@ def vote_select_2(conn, num):
             '<hr class="main_hr">' + \
         ''
 
-        select_data = '<select name="vote_data">'
+        select_data = '<label class="select"><select name="vote_data">'
         line_num = 0
         for i in vote_data:
             select_data += '<option value="' + str(line_num) + '">' + i + '</option>'
             line_num += 1
 
-        select_data += '</select>'
+        select_data += '</select></label>'
         data += '' + \
             '<form method="post">' + \
                 select_data + \

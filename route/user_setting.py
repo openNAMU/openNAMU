@@ -95,14 +95,18 @@ def user_setting_2(conn, server_set_var):
                         <hr class="main_hr">
                         <span>''' + load_lang('password_instead_key') + ''' : ''' + ramdom_key + ''' <a href="/change/key">(''' + load_lang('key_change') + ''')</a> <a href="/change/key/delete">(''' + load_lang('key_delete') + ''')</a></span>
                         <h2>''' + load_lang('main') + '''</h2>
-                        <span>''' + load_lang('skin') + '''</span>
+                        <label class="select">
+                            <span>''' + load_lang('skin') + '''</span>
+                            <hr class="main_hr">
+                            <select name="skin">''' + div2 + '''</select>
+                        </label>
                         <hr class="main_hr">
-                        <select name="skin">''' + div2 + '''</select>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('language') + '''</span>
-                        <hr class="main_hr">
-                        <select name="lang">''' + div3 + '''</select>
-                        <h2>''' + load_lang('2fa') + '''</h2>
+                        <label class="select">
+                            <span>''' + load_lang('language') + '''</span>
+                            <hr class="main_hr">
+                            <select name="lang">''' + div3 + '''</select>
+                        </label>
+                        <h2><label for="twofa_check_input">''' + load_lang('2fa') + '''</label></h2>
                         <select name="2fa"
                                 id="twofa_check_input"
                                 onchange="do_twofa_check(0);">''' + fa_data_select + '''</select>
@@ -151,13 +155,17 @@ def user_setting_2(conn, server_set_var):
                         <script>load_user_info("''' + ip + '''");</script>
                         <hr class="main_hr">
                         <h2>''' + load_lang('main') + '''</h2>
-                        <span>''' + load_lang('skin') + '''</span>
+                        <label class="select">
+                            <span>''' + load_lang('skin') + '''</span>
+                            <hr class="main_hr">
+                            <select name="skin">''' + div2 + '''</select>
+                        </label>
                         <hr class="main_hr">
-                        <select name="skin">''' + div2 + '''</select>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('language') + '''</span>
-                        <hr class="main_hr">
-                        <select name="lang">''' + div3 + '''</select>
+                        <label class="select">
+                            <span>''' + load_lang('language') + '''</span>
+                            <hr class="main_hr">
+                            <select name="lang">''' + div3 + '''</select>
+                        </label>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
                         ''' + http_warning() + '''

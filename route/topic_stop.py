@@ -70,9 +70,11 @@ def topic_stop_2(conn, topic_num):
             imp = [load_lang('topic_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
-                    <select name="stop_d">
-                        ''' + stop_d_list + '''
-                    </select>
+                    <label class="select">
+                        <select name="stop_d">
+                            ''' + stop_d_list + '''
+                        </select>
+                    </label>
                     <hr class=\"main_hr\">
                     <label class="input-checkbox">
                         <input type="checkbox" name="agree" value="O" ''' + agree_check + '''> Agree
