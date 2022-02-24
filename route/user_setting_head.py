@@ -46,7 +46,9 @@ def user_setting_head_2(conn):
             imp = [load_lang(data = 'user_head', safe = 1), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = start + '''
                 <form method="post">
-                    <textarea rows="25" cols="100" name="content">''' + data + '''</textarea>
+                    <label class="textarea">
+                        <textarea rows="25" cols="100" name="content">''' + data + '''</textarea>
+                    </label>
                     <hr class="main_hr">
                     <button id="save" type="submit">''' + load_lang('save') + '''</button>
                 </form>

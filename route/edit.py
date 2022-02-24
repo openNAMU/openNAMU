@@ -191,10 +191,12 @@ def edit(name = 'Test', name_load = 0, section = 0):
                         <div    id="monaco_editor"
                                 class="content" 
                                 ''' + monaco_display + '''></div>
-                        <textarea   id="textarea_edit_view"
-                                    ''' + editor_display + '''
-                                    class="content"
-                                    placeholder="''' + p_text + '''">''' + html.escape(data) + '''</textarea>
+                        <label class="textarea">
+                            <textarea   id="textarea_edit_view"
+                                        ''' + editor_display + '''
+                                        class="content"
+                                        placeholder="''' + p_text + '''">''' + html.escape(data) + '''</textarea>
+                        </label>
                         <hr class="main_hr">
                         <label class="input-text">
                             <input  placeholder="''' + load_lang('why') + '''" 

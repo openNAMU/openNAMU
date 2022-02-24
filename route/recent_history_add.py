@@ -35,7 +35,9 @@ def recent_history_add_2(conn, name):
                 <form method="post">
                     <script>do_stop_exit();</script>
                     ''' + edit_button() + '''
-                    <textarea rows="25" id="content" name="content"></textarea>
+                    <label class="textarea">
+                        <textarea rows="25" id="content" name="content"></textarea>
+                    </label>
                     <hr class="main_hr">
                     <label class="input-text">
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">

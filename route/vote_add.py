@@ -49,9 +49,13 @@ def vote_add_2(conn):
                         '<input name="name" placeholder="' + load_lang('name') + '">' + \
                     '</label>' + \
                     '<hr class="main_hr">' + \
-                    '<textarea rows="3" name="subject" placeholder="' + load_lang('explanation') + '"></textarea>' + \
+                    '<label class="textarea">' + \
+                        '<textarea rows="3" name="subject" placeholder="' + load_lang('explanation') + '"></textarea>' + \
+                    '</label>' + \
                     '<hr class="main_hr">' + \
-                    '<textarea rows="10" name="data" placeholder="' + load_lang('1_line_1_q') + '"></textarea>' + \
+                    '<label class="textarea">' + \
+                        '<textarea rows="10" name="data" placeholder="' + load_lang('1_line_1_q') + '"></textarea>' + \
+                    '</label>' + \
                     '<hr class="main_hr">' + \
                     '<label class="input-checkbox">' + \
                         '<input type="checkbox" value="Y" name="open_select"> ' + load_lang('open_vote') + \

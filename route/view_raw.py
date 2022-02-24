@@ -50,7 +50,7 @@ def view_raw_2(conn, name, topic_num, num):
     data = curs.fetchall()
     if data:
         p_data = html.escape(data[0][0])
-        p_data = '<textarea readonly rows="25">' + p_data + '</textarea>'
+        p_data = '<label class="textarea"><textarea readonly rows="25">' + p_data + '</textarea></label>'
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [v_name, wiki_set(), wiki_custom(), wiki_css([sub, 0])],

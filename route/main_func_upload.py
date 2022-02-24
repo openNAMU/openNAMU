@@ -150,7 +150,9 @@ def main_func_upload():
                             </select>
                         </label>
                         <hr class="main_hr">
-                        <textarea rows="10" placeholder="''' + load_lang('other') + '''" name="f_lice">''' + upload_default + '''</textarea>
+                        <label class="textarea">
+                            <textarea rows="10" placeholder="''' + load_lang('other') + '''" name="f_lice">''' + upload_default + '''</textarea>
+                        </label>
                         <hr class="main_hr">
                         ''' + captcha_get() + '''
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
