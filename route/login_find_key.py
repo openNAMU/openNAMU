@@ -46,7 +46,9 @@ def login_find_key():
                 imp = [load_lang('password_search'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + load_lang('key') + '''" name="key" type="password">
+                        <label class="input-password">
+                            <input placeholder="''' + load_lang('key') + '''" name="key" type="password">
+                        </label>
                         <hr class="main_hr">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('send') + '''</button>

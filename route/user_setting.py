@@ -108,7 +108,9 @@ def user_setting_2(conn, server_set_var):
                                 onchange="do_twofa_check(0);">''' + fa_data_select + '''</select>
                         <div id="fa_plus_content">
                             <hr class="main_hr">
-                            <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
+                            <label class="input-password">
+                                <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
+                            </label>
                         </div>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>

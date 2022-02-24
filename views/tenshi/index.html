@@ -113,7 +113,9 @@
                         </div>
                          
                         <form method="post" action="/search" id="search" role="search">
-                            <input id="search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
+                            <label class="input-search">
+                                <input id="search_input" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
+                            </label>
                             |
                             <button type="submit" formaction="/goto">
                                 <span class="iconify" data-icon="ic:round-find-in-page" data-inline="true"></span>

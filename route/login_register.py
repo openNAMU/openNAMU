@@ -86,13 +86,19 @@ def login_register_2(conn):
                 <form method="post">
                     ''' + contract + '''
                     
-                    <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
+                    <label class="input-text">
+                        <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
+                    </label>
                     <hr class="main_hr">
                     
-                    <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
+                    <label class="input-password">
+                        <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
+                    </label>
                     <hr class="main_hr">
                     
-                    <input placeholder="''' + load_lang('password_confirm') + '''" name="pw2" type="password">
+                    <label class="input-password">
+                        <input placeholder="''' + load_lang('password_confirm') + '''" name="pw2" type="password">
+                    </label>
                     <hr class="main_hr">
                     
                     ''' + captcha_get() + '''

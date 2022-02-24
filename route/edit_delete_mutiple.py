@@ -21,7 +21,9 @@ def edit_delete_mutiple_2(conn):
                 <form method="post">
                     <textarea rows="25" placeholder="''' + load_lang('many_delete_help') + '''" name="content"></textarea>
                     <hr class=\"main_hr\">
-                    <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                    <label class="input-text">
+                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                    </label>
                     <hr class=\"main_hr\">
                     <button type="submit">''' + load_lang('delete') + '''</button>
                 </form>

@@ -38,7 +38,9 @@ def login_register_email_check_2(conn):
             data = '''
                 <form method="post">
                     ''' + b_text + '''
-                    <input placeholder="''' + load_lang('key') + '''" name="key" type="text">
+                    <label class="input-text">
+                        <input placeholder="''' + load_lang('key') + '''" name="key" type="text">
+                    </label>
                     <hr class="main_hr">
                     <button type="submit">''' + load_lang('save') + '''</button>
                 </form>

@@ -57,7 +57,9 @@ def login_register_email_2(conn):
                 <hr class="main_hr">
                 ''' + b_text + '''
                 <form method="post">
-                    <input placeholder="''' + load_lang('email') + '''" name="email" type="text">
+                    <label class="input-text">
+                        <input placeholder="''' + load_lang('email') + '''" name="email" type="text">
+                    </label>
                     <hr class="main_hr">
                     <button type="submit">''' + load_lang('save') + '''</button>
                 </form>

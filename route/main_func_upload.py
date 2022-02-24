@@ -136,9 +136,13 @@ def main_func_upload():
                     ''' + load_lang('max_file_size') + ''' : ''' + wiki_set(3) + '''MB
                     <hr class="main_hr">
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
-                        <input multiple="multiple" type="file" name="f_data[]">
+                        <label class="input-file">
+                            <input multiple="multiple" type="file" name="f_data[]">
+                        </label>
                         <hr class="main_hr">
-                        <input placeholder="''' + load_lang('file_name') + '''" name="f_name" value="''' + file_name + '''">
+                        <label class="input-text">
+                            <input placeholder="''' + load_lang('file_name') + '''" name="f_name" value="''' + file_name + '''">
+                        </label>
                         <hr class="main_hr">
                         <select name="f_lice_sel">
                             ''' + license_list + '''

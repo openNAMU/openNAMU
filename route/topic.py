@@ -108,9 +108,13 @@ def topic(topic_num = 0):
             data_input_topic_name = ''
             if topic_num == '0':
                 data_input_topic_name = '' + \
-                    '<input placeholder="' + load_lang('discussion_name') + '" name="title">' + \
+                    '<label class="input-text">' + \
+                        '<input placeholder="' + load_lang('discussion_name') + '" name="title">' + \
+                    '</label>' + \
                     '<hr class="main_hr">' + \
-                    '<input placeholder="' + load_lang('document_name') + '" name="topic">' + \
+                    '<label class="input-text">' + \
+                        '<input placeholder="' + load_lang('document_name') + '" name="topic">' + \
+                    '</label>' + \
                     '<hr class="main_hr">' + \
                 ''
                 

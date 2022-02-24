@@ -54,7 +54,9 @@
                     <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                 </span>
                 <form class="not_mobile" method="post" action="/search" role="search">
-                    <input class="not_mobile search" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
+                    <label class="input-search">
+                        <input class="not_mobile search" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
+                    </label>
                     <button type="submit" id="goto" formaction="/goto" class="search_button">
                         <span class="iconify" data-icon="ic:round-find-in-page" data-inline="true"></span>
                     </button>
@@ -64,7 +66,9 @@
                 </form>
             </span>
             <form class="only_mobile" method="post" action="/search" role="search">
-                <input class="only_mobile search" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
+                <label class="input-search">
+                    <input class="only_mobile search" name="search" placeholder="{{'search'|load_lang}}" autocomplete="off" type="search">
+                </label>
                 <button type="submit" id="goto" formaction="/goto" class="search_button">
                     <span class="iconify" data-icon="ic:round-find-in-page" data-inline="true"></span>
                 </button>

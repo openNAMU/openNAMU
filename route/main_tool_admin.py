@@ -100,7 +100,9 @@ def main_tool_admin(num = 1, add_2 = ''):
                 imp = [title_list[num][2], wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + placeholder + '''" name="name" type="text">
+                        <label class="input-text">
+                            <input placeholder="''' + placeholder + '''" name="name" type="text">
+                        </label>
                         <hr class="main_hr">
                         ''' + plus + '''
                         <button type="submit">''' + load_lang('go') + '''</button>

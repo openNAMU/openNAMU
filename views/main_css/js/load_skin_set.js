@@ -470,7 +470,9 @@ function main_css_skin_set() {
             ' + set_data["toc"] + ' \
         </select> \
         <h3>1.8. ' + main_css_load_lang('set_font_size') + '</h3> \
-        <input id="main_css_font_size" placeholder="' + main_css_load_lang('font_size') + ' (EX : 11)" value="' + set_data["font_size"] + '"> \
+        <label class="input-text"> \
+            <input id="main_css_font_size" placeholder="' + main_css_load_lang('font_size') + ' (EX : 11)" value="' + set_data["font_size"] + '"> \
+        </label> \
         <h3>1.9. ' + main_css_load_lang('exter_link_open_method') + '</h3> \
         <select id="main_css_exter_link"> \
             ' + set_data["exter_link"] + ' \

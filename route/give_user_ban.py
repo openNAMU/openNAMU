@@ -75,7 +75,7 @@ def give_user_ban_2(conn, name):
                 data += '</ul><hr class="main_hr">'
         else:
             main_name = load_lang('ban')
-            n_name = '<input placeholder="' + load_lang('name_or_ip_or_regex') + '" value="' + (name if name else '') + '" name="name" type="text"><hr class="main_hr">'
+            n_name = '<label class="input-text"><input placeholder="' + load_lang('name_or_ip_or_regex') + '" value="' + (name if name else '') + '" name="name" type="text"></label><hr class="main_hr">'
             regex = '<label class="input-checkbox"><input type="checkbox" name="regex" ' + ('checked' if band == 'regex' else '') + '> ' + load_lang('regex') + '</label><hr class="main_hr">'
             plus = '<label class="input-checkbox"><input type="checkbox" name="login"> ' + load_lang('login_able') + '</label><hr class="main_hr">'
             now = 0
@@ -98,9 +98,13 @@ def give_user_ban_2(conn, name):
                 ''' + regex + '''
                 <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''
                 <hr class="main_hr">
-                <input placeholder="''' + load_lang('ban_period') + ''' (''' + load_lang('second') + ''')" name="second" id="second" type="text">
+                <label class="input-text">
+                    <input placeholder="''' + load_lang('ban_period') + ''' (''' + load_lang('second') + ''')" name="second" id="second" type="text">
+                </label>
                 <hr class="main_hr">
-                <input placeholder="''' + load_lang('why') + '''" name="why" type="text">
+                <label class="input-text">
+                    <input placeholder="''' + load_lang('why') + '''" name="why" type="text">
+                </label>
                 <hr class="main_hr">
             ''' + plus
 

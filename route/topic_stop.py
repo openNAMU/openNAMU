@@ -78,7 +78,9 @@ def topic_stop_2(conn, topic_num):
                         <input type="checkbox" name="agree" value="O" ''' + agree_check + '''> Agree
                     </label>
                     <hr class=\"main_hr\">
-                    <input placeholder="''' + load_lang('why') + ''' (''' + load_lang('markup_enabled') + ''')" name="why" type="text">
+                    <label class="input-text">
+                        <input placeholder="''' + load_lang('why') + ''' (''' + load_lang('markup_enabled') + ''')" name="why" type="text">
+                    </label>
                     <hr class=\"main_hr\">
                     <button type="submit">''' + load_lang('save') + '''</button>
                 </form>

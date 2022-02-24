@@ -30,7 +30,10 @@ def list_admin_use_2(conn):
             imp = [load_lang('authority_use_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
-                    <input name="search" id="admin_log_search"> <button type="submit">''' + load_lang('search') + '''</button>
+                    <label class="input-text">
+                        <input name="search" id="admin_log_search">
+                    </label>
+                    <button type="submit">''' + load_lang('search') + '''</button>
                 </form>
                 <hr class=\"main_hr\">
             ''' + list_data,

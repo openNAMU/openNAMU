@@ -196,8 +196,10 @@ def edit(name = 'Test', name_load = 0, section = 0):
                                     class="content"
                                     placeholder="''' + p_text + '''">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
-                        <input  placeholder="''' + load_lang('why') + '''" 
-                                name="send">
+                        <label class="input-text">
+                            <input  placeholder="''' + load_lang('why') + '''" 
+                                    name="send">
+                        </label>
                         <textarea   style="display: none;" 
                                     id="origin">''' + html.escape(data) + '''</textarea>
                         <textarea   style="display: none;"

@@ -160,9 +160,13 @@ def edit_move_2(conn, name):
             data = '''
                 <form method="post">
                     ''' + ip_warning() + '''
-                    <input placeholder="''' + load_lang('document_name') + '" value="' + name + '''" name="title" type="text">
+                    <label class="input-text">
+                        <input placeholder="''' + load_lang('document_name') + '" value="' + name + '''" name="title" type="text">
+                    </label>
                     <hr class=\"main_hr\">
-                    <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                    <label class="input-text">
+                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                    </label>
                     <hr class=\"main_hr\">
                     <select name="move_option">
                         <option value="normal"> ''' + load_lang('normal') + '''</option>

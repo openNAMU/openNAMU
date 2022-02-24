@@ -59,9 +59,13 @@ def login_login_2(conn):
             imp = [load_lang('login'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data =  '''
                     <form method="post">
-                        <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
+                        <label class="input-text">
+                            <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
+                        </label>
                         <hr class="main_hr">
-                        <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
+                        <label class="input-password">
+                            <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
+                        </label>
                         <hr class="main_hr">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>

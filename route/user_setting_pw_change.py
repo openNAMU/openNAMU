@@ -53,11 +53,17 @@ def user_setting_pw_change_2(conn):
             imp = [load_lang('password_change'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
-                    <input placeholder="''' + load_lang('now_password') + '''" name="pw4" type="password">
+                    <label class="input-password">
+                        <input placeholder="''' + load_lang('now_password') + '''" name="pw4" type="password">
+                    </label>
                     <hr class="main_hr">
-                    <input placeholder="''' + load_lang('new_password') + '''" name="pw2" type="password">
+                    <label class="input-password">
+                        <input placeholder="''' + load_lang('new_password') + '''" name="pw2" type="password">
+                    </label>
                     <hr class="main_hr">
-                    <input placeholder="''' + load_lang('password_confirm') + '''" name="pw3" type="password">
+                    <label class="input-password">
+                        <input placeholder="''' + load_lang('password_confirm') + '''" name="pw3" type="password">
+                    </label>
                     <hr class="main_hr">
                     <button type="submit">''' + load_lang('save') + '''</button>
                 </form>

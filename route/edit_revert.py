@@ -72,7 +72,9 @@ def edit_revert_2(conn, name):
                         <span>r''' + flask.request.args.get('num', '0') + '''</span>
                         <hr class=\"main_hr\">
                         ''' + ip_warning() + '''
-                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                        <label class="input-text">
+                            <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                        </label>
                         <hr class=\"main_hr\">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('revert') + '''</button>

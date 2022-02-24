@@ -163,7 +163,9 @@ def login_find_email_check(tool):
                 data = '''
                     <form method="post">
                         ''' + b_text + '''
-                        <input placeholder="''' + load_lang('key') + '''" name="key" type="password">
+                        <label class="input-password">
+                            <input placeholder="''' + load_lang('key') + '''" name="key" type="password">
+                        </label>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
                     </form>

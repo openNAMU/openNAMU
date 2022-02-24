@@ -94,7 +94,9 @@ def give_acl_2(conn, name):
         acl_why = html.escape(acl_data[0][0]) if acl_data else ''
         data += '' + \
             '<hr class="main_hr">' + \
-            '<input value="' + acl_why + '" placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>' + \
+            '<label class="input-text">' + \
+                '<input value="' + acl_why + '" placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>' + \
+            '</label>' + \
         ''
 
         data += '''

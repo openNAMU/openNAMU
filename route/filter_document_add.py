@@ -41,13 +41,17 @@ def filter_document_add(name = ''):
                 imp = [load_lang('document_filter_add'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data =  '''
                         <form method="post">
-                            ''' + load_lang('name') + '''
+                            <label class="input-text">
+                                ''' + load_lang('name') + '''
+                                <hr class="main_hr">
+                                <input value="''' + html.escape(name) + '''" type="text" name="name">
+                            </label>
                             <hr class="main_hr">
-                            <input value="''' + html.escape(name) + '''" type="text" name="name">
-                            <hr class="main_hr">
-                            ''' + load_lang('regex') + '''
-                            <hr class="main_hr">
-                            <input value="''' + (html.escape(db_data[0][0]) if db_data else '') + '''" type="text" name="regex">
+                            <label class="input-text">
+                                ''' + load_lang('regex') + '''
+                                <hr class="main_hr">
+                                <input value="''' + (html.escape(db_data[0][0]) if db_data else '') + '''" type="text" name="regex">
+                            </label>
                             <hr class="main_hr">
                             <a href="/acl/Test#exp">''' + load_lang('acl') + '''</a>
                             <hr class="main_hr">

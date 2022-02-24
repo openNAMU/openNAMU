@@ -129,37 +129,49 @@ def main_func_setting(db_set, num = 0):
                     data = '''
                         <form method="post" id="main_set_data">
                             <h2>1. ''' + load_lang('basic_set') + '''</h2>
-                            <span>''' + load_lang('wiki_name') + '''</span>
-                            <hr class="main_hr">
-                            <input name="name" value="''' + html.escape(d_list[0]) + '''">
+                            <label class="input-text">
+                                <span>''' + load_lang('wiki_name') + '''</span>
+                                <hr class="main_hr">
+                                <input name="name" value="''' + html.escape(d_list[0]) + '''">
+                            </label>
                             <hr class="main_hr">
 
                             <span><a href="/setting/9">(''' + load_lang('wiki_logo') + ''')</a></span>
                             <hr class="main_hr">
 
-                            <span>''' + load_lang('main_page') + '''</span>
-                            <hr class="main_hr">
-                            <input name="frontpage" value="''' + html.escape(d_list[2]) + '''">
-                            <hr class="main_hr">
-
-                            <span>''' + load_lang('domain') + '''</span> (EX : http://2du.pythonanywhere.com/)
-                            <hr class="main_hr">
-                            <input name="''' + i_list[22] + '''" value="''' + html.escape(d_list[22]) + '''">
+                            <label class="input-text">
+                                <span>''' + load_lang('main_page') + '''</span>
+                                <hr class="main_hr">
+                                <input name="frontpage" value="''' + html.escape(d_list[2]) + '''">
+                            </label>
                             <hr class="main_hr">
 
-                            <span>''' + load_lang('wiki_host') + '''</span>
-                            <hr class="main_hr">
-                            <input name="host" value="''' + html.escape(d_list[16]) + '''">
-                            <hr class="main_hr">
-
-                            <span>''' + load_lang('wiki_port') + '''</span>
-                            <hr class="main_hr">
-                            <input name="port" value="''' + html.escape(d_list[10]) + '''">
+                            <label class="input-text">
+                                <span>''' + load_lang('domain') + '''</span> (EX : http://2du.pythonanywhere.com/)
+                                <hr class="main_hr">
+                                <input name="''' + i_list[22] + '''" value="''' + html.escape(d_list[22]) + '''">
+                            </label>
                             <hr class="main_hr">
 
-                            <span>''' + load_lang('wiki_secret_key') + '''</span>
+                            <label class="input-text">
+                                <span>''' + load_lang('wiki_host') + '''</span>
+                                <hr class="main_hr">
+                                <input name="host" value="''' + html.escape(d_list[16]) + '''">
+                            </label>
                             <hr class="main_hr">
-                            <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
+
+                            <label class="input-text">
+                                <span>''' + load_lang('wiki_port') + '''</span>
+                                <hr class="main_hr">
+                                <input name="port" value="''' + html.escape(d_list[10]) + '''">
+                            </label>
+                            <hr class="main_hr">
+
+                            <label class="input-password">
+                                <span>''' + load_lang('wiki_secret_key') + '''</span>
+                                <hr class="main_hr">
+                                <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
+                            </label>
                             <hr class="main_hr">
 
                             <span>''' + load_lang('encryption_method') + '''</span>
@@ -192,25 +204,31 @@ def main_func_setting(db_set, num = 0):
                             </label>
 
                             <h2>4. ''' + load_lang('server_set') + '''</h2>
-                            <span>''' + load_lang('max_file_size') + ''' (MB)</span>
-                            <hr class="main_hr">
-                            <input name="upload" value="''' + html.escape(d_list[4]) + '''">
+                            <label class="input-text">
+                                <span>''' + load_lang('max_file_size') + ''' (MB)</span>
+                                <hr class="main_hr">
+                                <input name="upload" value="''' + html.escape(d_list[4]) + '''">
+                            </label>
                             <hr class="main_hr">
 
                             <span ''' + sqlite_only + '''>
-                                <span>
-                                    ''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ') (' + load_lang('off') + ' : 0) ' + \
-                                    '(' + load_lang('restart_required') + ''')</span>
-                                <hr class="main_hr">
-                                <input name="back_up" value="''' + html.escape(d_list[9]) + '''">
+                                <label class="input-text">
+                                    <span>
+                                        ''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ') (' + load_lang('off') + ' : 0) ' + \
+                                        '(' + load_lang('restart_required') + ''')</span>
+                                    <hr class="main_hr">
+                                    <input name="back_up" value="''' + html.escape(d_list[9]) + '''">
+                                </label>
                                 <hr class="main_hr">
 
-                                <span>
-                                    ''' + load_lang('backup_where') + ' (' + load_lang('empty') + ' : ' + load_lang('default') + ') ' + \
-                                    '(' + load_lang('restart_required') + ''') (EX : ./data/backup.db)
-                                </span>
-                                <hr class="main_hr">
-                                <input name="backup_where" value="''' + html.escape(d_list[21]) + '''">
+                                <label class="input-text">
+                                    <span>
+                                        ''' + load_lang('backup_where') + ' (' + load_lang('empty') + ' : ' + load_lang('default') + ') ' + \
+                                        '(' + load_lang('restart_required') + ''') (EX : ./data/backup.db)
+                                    </span>
+                                    <hr class="main_hr">
+                                    <input name="backup_where" value="''' + html.escape(d_list[21]) + '''">
+                                </label>
                                 <hr class="main_hr">
                             </span>
 
@@ -222,9 +240,11 @@ def main_func_setting(db_set, num = 0):
                             <span><a href="/setting/8">(''' + load_lang('main_acl_setting') + ''')</a></span>
                             <hr class="main_hr">
 
-                            <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ') (' + load_lang('off') + ''' : 0)</span>
-                            <hr class="main_hr">
-                            <input name="''' + i_list[19] + '''" value="''' + html.escape(d_list[19]) + '''">
+                            <label class="input-text">
+                                <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ') (' + load_lang('off') + ''' : 0)</span>
+                                <hr class="main_hr">
+                                <input name="''' + i_list[19] + '''" value="''' + html.escape(d_list[19]) + '''">
+                            </label>
 
                             <hr class="main_hr">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
@@ -560,14 +580,18 @@ def main_func_setting(db_set, num = 0):
                             <a href="https://www.google.com/recaptcha/admin">(Google)</a>
                             <hr class="main_hr">
 
-                            <span>''' + load_lang('public_key') + '''</span>
-                            <hr class="main_hr">
-                            <input name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
+                            <label class="input-text">
+                                <span>''' + load_lang('public_key') + '''</span>
+                                <hr class="main_hr">
+                                <input name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
+                            </label>
                             <hr class="main_hr">
 
-                            <span>''' + load_lang('secret_key') + '''</span>
-                            <hr class="main_hr">
-                            <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
+                            <label class="input-text">
+                                <span>''' + load_lang('secret_key') + '''</span>
+                                <hr class="main_hr">
+                                <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
+                            </label>
                             <hr class="main_hr">
 
                             <select name="recaptcha_ver">
@@ -584,14 +608,18 @@ def main_func_setting(db_set, num = 0):
                             <a href="https://support.google.com/mail/answer/7126229">(Google)</a>
                             <hr class="main_hr">
 
-                            <span>''' + load_lang('smtp_server') + '''</span>
-                            <hr class="main_hr">
-                            <input name="smtp_server" value="''' + html.escape(d_list[2]) + '''">
+                            <label class="input-text">
+                                <span>''' + load_lang('smtp_server') + '''</span>
+                                <hr class="main_hr">
+                                <input name="smtp_server" value="''' + html.escape(d_list[2]) + '''">
+                            </label>
                             <hr class="main_hr">
 
-                            <span>''' + load_lang('smtp_port') + '''</span>
-                            <hr class="main_hr">
-                            <input name="smtp_port" value="''' + html.escape(d_list[3]) + '''">
+                            <label class="input-text">
+                                <span>''' + load_lang('smtp_port') + '''</span>
+                                <hr class="main_hr">
+                                <input name="smtp_port" value="''' + html.escape(d_list[3]) + '''">
+                            </label>
                             <hr class="main_hr">
 
                             <span>''' + load_lang('smtp_security') + '''</span>
@@ -599,22 +627,28 @@ def main_func_setting(db_set, num = 0):
                             ''' + security_radios + '''
                             <hr class="main_hr">
 
-                            <span>''' + load_lang('smtp_username') + '''</span>
-                            <hr class="main_hr">
-                            <input name="smtp_email" value="''' + html.escape(d_list[5]) + '''">
+                            <label class="input-text">
+                                <span>''' + load_lang('smtp_username') + '''</span>
+                                <hr class="main_hr">
+                                <input name="smtp_email" value="''' + html.escape(d_list[5]) + '''">
+                            </label>
                             <hr class="main_hr">
 
-                            <span>''' + load_lang('smtp_password') + '''</span>
-                            <hr class="main_hr">
-                            <input type="password" name="smtp_pass" value="''' + html.escape(d_list[6]) + '''">
+                            <label class="input-password">
+                                <span>''' + load_lang('smtp_password') + '''</span>
+                                <hr class="main_hr">
+                                <input type="password" name="smtp_pass" value="''' + html.escape(d_list[6]) + '''">
+                            </label>
 
                             <h2>3. ''' + load_lang('oauth') + '''</h2>
                             <a href="https://developers.google.com/identity/protocols/oauth2">(Google)</a>
                             <hr class="main_hr">
 
-                            <span>''' + load_lang('oauth_client_id') + '''</span>
-                            <hr class="main_hr">
-                            <input name="oauth_client_id" value="''' + html.escape(d_list[8]) + '''">
+                            <label class="input-text">
+                                <span>''' + load_lang('oauth_client_id') + '''</span>
+                                <hr class="main_hr">
+                                <input name="oauth_client_id" value="''' + html.escape(d_list[8]) + '''">
+                            </label>
                             <hr class="main_hr">
 
                             <hr class="main_hr">
@@ -750,9 +784,11 @@ def main_func_setting(db_set, num = 0):
                 end_data = ''
                 for i in range(0, len(skin_list)):
                     end_data += '' + \
-                        '<span>' + load_lang('wiki_logo') + ' ' + ('(' + skin_list[i] + ')' if skin_list[i] != 0 else '') + ' (HTML)' + \
-                        '<hr class="main_hr">' + \
-                        '<input name="' + (skin_list[i] if skin_list[i] != 0 else 'main_css') + '" value="' + html.escape(d_list[i]) + '">' + \
+                        '<label class="input-text">' + \
+                            '<span>' + load_lang('wiki_logo') + ' ' + ('(' + skin_list[i] + ')' if skin_list[i] != 0 else '') + ' (HTML)' + \
+                            '<hr class="main_hr">' + \
+                            '<input name="' + (skin_list[i] if skin_list[i] != 0 else 'main_css') + '" value="' + html.escape(d_list[i]) + '">' + \
+                        '</label>' + \
                         '<hr class="main_hr">' + \
                     ''
 

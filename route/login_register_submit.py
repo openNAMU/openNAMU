@@ -50,9 +50,11 @@ def login_register_submit_2(conn):
             imp = [load_lang('approval_question'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
-                    ''' + load_lang('approval_question') + ' : ' + data_que + '''
-                    <hr class="main_hr">
-                    <input placeholder="''' + load_lang('approval_question') + '''" name="answer">
+                    <label class="input-text">
+                        ''' + load_lang('approval_question') + ' : ' + data_que + '''
+                        <hr class="main_hr">
+                        <input placeholder="''' + load_lang('approval_question') + '''" name="answer">
+                    </label>
                     <hr class="main_hr">
                     <button type="submit">''' + load_lang('save') + '''</button>
                 </form>

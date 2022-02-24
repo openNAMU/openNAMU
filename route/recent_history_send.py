@@ -34,7 +34,9 @@ def recent_history_send_2(conn, name, rev):
                     <form method="post">
                         <span>''' + load_lang('history_delete_warning') + '''</span>
                         <hr class="main_hr">
-                        <input value="''' + html.escape(send) + '''" name="send">
+                        <label class="input-text">
+                            <input value="''' + html.escape(send) + '''" name="send">
+                        </label>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('edit') + '''</button>
                     </form>

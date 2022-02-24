@@ -83,9 +83,13 @@ def login_find_email(tool):
                     imp = [load_lang('password_search'), wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('email') + ')', 0])],
                     data = b_text + '''
                         <form method="post">
-                            <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
+                            <label class="input-text">
+                                <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
+                            </label>
                             <hr class="main_hr">
-                            <input placeholder="''' + load_lang('email') + '''" name="email" type="text">
+                            <label class="input-text">
+                                <input placeholder="''' + load_lang('email') + '''" name="email" type="text">
+                            </label>
                             <hr class="main_hr">
                             <button type="submit">''' + load_lang('save') + '''</button>
                         </form>
@@ -107,7 +111,9 @@ def login_find_email(tool):
                         <hr class="main_hr">
                         ''' + b_text + '''
                         <form method="post">
-                            <input placeholder="''' + load_lang('email') + '''" name="email" type="text">
+                            <label class="input-text">                            
+                                <input placeholder="''' + load_lang('email') + '''" name="email" type="text">
+                            </label>
                             <hr class="main_hr">
                             <button type="submit">''' + load_lang('save') + '''</button>
                         </form>

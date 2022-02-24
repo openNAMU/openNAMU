@@ -59,7 +59,9 @@ def login_login_2fa_2(conn):
             imp = [load_lang('login'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data =  '''
                     <form method="post">
-                        <input placeholder="''' + load_lang('2fa_password') + '''" name="pw" type="password">
+                        <label class="input-password">
+                            <input placeholder="''' + load_lang('2fa_password') + '''" name="pw" type="password">
+                        </label>
                         <hr class="main_hr">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('login') + '''</button>

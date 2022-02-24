@@ -45,7 +45,9 @@ def vote_add_2(conn):
             imp = [load_lang('add_vote'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '' + \
                 '<form method="post">' + \
-                    '<input name="name" placeholder="' + load_lang('name') + '">' + \
+                    '<label class="input-text">' + \
+                        '<input name="name" placeholder="' + load_lang('name') + '">' + \
+                    '</label>' + \
                     '<hr class="main_hr">' + \
                     '<textarea rows="3" name="subject" placeholder="' + load_lang('explanation') + '"></textarea>' + \
                     '<hr class="main_hr">' + \

@@ -46,13 +46,17 @@ def topic_change_2(conn, topic_num):
             imp = [load_lang('topic_name_change'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <form method="post">
-                    ''' + load_lang('document_name') + '''
+                    <label class="input-text">
+                        ''' + load_lang('document_name') + '''
+                        <hr class=\"main_hr\">
+                        <input value="''' + rd_d[0][0] + '''" name="title" type="text">
+                    </label>
                     <hr class=\"main_hr\">
-                    <input value="''' + rd_d[0][0] + '''" name="title" type="text">
-                    <hr class=\"main_hr\">
-                    ''' + load_lang('discussion_name') + '''
-                    <hr class=\"main_hr\">
-                    <input value="''' + rd_d[0][1] + '''" name="sub" type="text">
+                    <label class="input-text">
+                        ''' + load_lang('discussion_name') + '''
+                        <hr class=\"main_hr\">
+                        <input value="''' + rd_d[0][1] + '''" name="sub" type="text">
+                    </label>
                     <hr class=\"main_hr\">
                     <button type="submit">''' + load_lang('save') + '''</button>
                 </form>

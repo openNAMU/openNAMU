@@ -37,9 +37,13 @@ def recent_history_add_2(conn, name):
                     ''' + edit_button() + '''
                     <textarea rows="25" id="content" name="content"></textarea>
                     <hr class="main_hr">
-                    <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                    <label class="input-text">
+                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                    </label>
                     <hr class="main_hr">
-                    <input placeholder="''' + load_lang('name') + '''" name="get_ip" type="text">
+                    <label class="input-text">
+                        <input placeholder="''' + load_lang('name') + '''" name="get_ip" type="text">
+                    </label>
                     <hr class="main_hr">
                     <button id="save" type="submit" onclick="go_save_zone = 1;">''' + load_lang('save') + '''</button>
                     <button id="preview" type="button" onclick="load_preview(\'''' + url_pas(name) + '\')">' + load_lang('preview') + '''</button>
