@@ -8,106 +8,10 @@ while True:
         break
 
 if data_db_load == 'Y':
-    # Init-DB
-    if os.path.exists(os.path.join('data', 'set.json')):
-        db_set_list = ['db', 'db_type']
-        set_data = json.loads(open(
-            os.path.join('data', 'set.json'),
-            encoding='utf8'
-        ).read())
-        for i in db_set_list:
-            if i not in set_data:
-                print('Please delete set.json')
-                print('----')
-                raise KeyError(i)
-
-        print('DB name : ' + set_data['db'])
-        print('DB type : ' + set_data['db_type'])
-    elif os.getenv('NAMU_DB') or os.getenv('NAMU_DB_TYPE'):
-        set_data = {}
-
-        if os.getenv('NAMU_DB'):
-            set_data['db'] = os.getenv('NAMU_DB')
-        else:
-            set_data['db'] = 'data'
-
-        if os.getenv('NAMU_DB_TYPE'):
-            set_data['db'] = os.getenv('NAMU_DB_TYPE')
-        else:
-            set_data['db'] = 'sqlite'
-
-        print('DB name : ' + set_data['db'])
-        print('DB type : ' + set_data['db_type'])
-    else:
-        set_data = {}
-        normal_db_type = ['sqlite', 'mysql']
-
-        data_get = input('DB type (' + normal_db_type[0] + ') [' + ', '.join(normal_db_type) + '] : ')
-        if data_get == '' or not data_get in normal_db_type:
-            set_data['db_type'] = 'sqlite'
-        else:
-            set_data['db_type'] = data_get
-
-        all_src = []
-        if set_data['db_type'] == 'sqlite':
-            for i_data in os.listdir("."):
-                f_src = re.search(r"(.+)\.db$", i_data)
-                if f_src:
-                    all_src += [f_src.group(1)]
-
-        data_get = input('DB name (data) [' + ', '.join(all_src) + '] : ')
-        if data_get == '':
-            set_data['db'] = 'data'
-        else:
-            set_data['db'] = data_get
-
-        with open(os.path.join('data', 'set.json'), 'w', encoding='utf8') as f:
-            f.write(json.dumps(set_data))
-
-    data_db_set = {'name': set_data['db'], 'type': set_data['db_type']}
-
-    if data_db_set['type'] == 'mysql':
-        if os.path.exists(os.path.join('data', 'mysql.json')):
-            with open(os.path.join('data', 'mysql.json'), encoding='utf8') as f:
-                set_data = json.loads(f.read())
-
-            for i in ('user', 'password', 'host', 'port'):
-                if i not in set_data:
-                    print('Please delete mysql.json')
-                    print('----')
-                    raise KeyError(i)
-
-            set_data_mysql = set_data
-        else:
-            set_data_mysql = {
-                'user': input('DB user ID : '),
-                'password': input('DB password : '),
-                'host': input('DB host (localhost) : '),
-                'port': input('DB port (3306) : '),
-            }
-
-            if set_data_mysql['host'] == '':
-                set_data_mysql['host'] = 'localhost'
-
-            if set_data_mysql['port'] == '':
-                set_data_mysql['port'] = '3306'
-
-            with open(os.path.join('data', 'mysql.json'), 'w', encoding='utf8') as f:
-                f.write(json.dumps(set_data_mysql))
-
-        data_db_set['mysql_user'] = set_data_mysql['user']
-        data_db_set['mysql_pw'] = set_data_mysql['password']
-        if 'host' in set_data_mysql:
-            data_db_set['mysql_host'] = set_data_mysql['host']
-        else:
-            data_db_set['mysql_host'] = 'localhost'
-
-        if 'port' in set_data_mysql:
-            data_db_set['mysql_port'] = set_data_mysql['port']
-        else:
-            data_db_set['mysql_port'] = '3306'
+    data_db_set = class_check_json()
 
     db_data_get(data_db_set['type'])
+    do_db_set(data_db_set)
     load_db = get_db_connect_old(data_db_set)
 
     conn = load_db.db_load()
