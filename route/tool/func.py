@@ -78,7 +78,7 @@ import pymysql
 
 if sys.version_info < (3, 6):
     import sha3
-   
+
 # Init-Global
 global_lang = {}
 global_wiki_set = {}
@@ -1040,15 +1040,14 @@ def captcha_get():
         
         curs.execute(db_change('select data from other where name = "recaptcha_ver"'))
         rec_ver = curs.fetchall()
-        if  recaptcha and recaptcha[0][0] != '' and \
-            sec_re and sec_re[0][0] != '':
+        if recaptcha and recaptcha[0][0] != '' and sec_re and sec_re[0][0] != '':
             if not rec_ver or rec_ver[0][0] == '':
                 data += '' + \
                     '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + \
                     '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
                     '<hr class="main_hr">' + \
                 ''
-            else:
+            elif rec_ver[0][0] == 'v3':
                 data += '' + \
                     '<script src="https://www.google.com/recaptcha/api.js?render=' + recaptcha[0][0] + '"></script>' + \
                     '<input type="hidden" id="g-recaptcha" name="g-recaptcha">' + \
@@ -1060,25 +1059,43 @@ def captcha_get():
                         '});' + \
                     '</script>' + \
                 ''
+            else:
+                data += '''
+                    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+                    <div class="h-captcha" data-sitekey="''' + recaptcha[0][0] + '''"></div>
+                    <hr class="main_hr">
+                '''
 
     return data
 
 def captcha_post(re_data, num = 1):
     curs = conn.cursor()
 
-    if num == 1:
+    if num == 1 and ip_or_user() != 0:
         curs.execute(db_change('select data from other where name = "sec_re"'))
         sec_re = curs.fetchall()
-        if  sec_re and sec_re[0][0] != '' and \
-            ip_or_user() != 0 and captcha_get() != '':
-            data = requests.get(
-                'https://www.google.com/recaptcha/api/siteverify' + \
-                '?secret=' + sec_re[0][0] + '&response=' + re_data
-            )
-            if data.status_code == 200:
-                json_data = json.loads(data.text)
-                if json_data['success'] != True:
-                    return 1
+        
+        curs.execute(db_change('select data from other where name = "recaptcha_ver"'))
+        rec_ver = curs.fetchall()
+        if captcha_get() != '':
+            if not rec_ver or rec_ver[0][0] in ('', 'v3'):
+                data = requests.get(
+                    'https://www.google.com/recaptcha/api/siteverify' + \
+                    '?secret=' + sec_re[0][0] + '&response=' + re_data
+                )
+                if data.status_code == 200:
+                    json_data = json.loads(data.text)
+                    if json_data['success'] != True:
+                        return 1
+            else:
+                data = requests.get(
+                    'https://hcaptcha.com/siteverify' + \
+                    '?secret=' + sec_re[0][0] + '&response=' + re_data
+                )
+                if data.status_code == 200:
+                    json_data = json.loads(data.text)
+                    if json_data['success'] != True:
+                        return 1
 
         return 0
 
