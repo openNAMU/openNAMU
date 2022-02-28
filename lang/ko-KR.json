@@ -414,5 +414,10 @@
     "password_instead_key": "대체 인증키",
     "key_change": "키 변경",
     "key_delete": "키 삭제",
-    "email_delete": "이메일 삭제"
+    "email_delete": "이메일 삭제",
+    "incomplete": "미완성",
+    "topic_text": "토론 기본 문구",
+    "hcaptcha": "hCAPTCHA",
+    "captcha": "CAPTCHA",
+    "make_new_topic": "새 토론 생성"
 }
