@@ -559,7 +559,7 @@ function do_onmark_footnote_render(data, name_include) {
 function do_onmark_macro_render(data, data_js) {
     data = data.replace(/\[([^[\](]+)\(((?:(?!\)\]).)+)\)\]/g, function(x, x_1, x_2) {
         x_1 = x_1.toLowerCase();
-        if(x_1 === 'youtube' || x_1 === 'kakaotv' || x_1 === 'nicovideo' || x_1 === 'navertv') {
+        if(x_1 === 'youtube' || x_1 === 'kakaotv' || x_1 === 'nicovideo' || x_1 === 'navertv' || x_1 === 'vimeo') {
             var video_code = x_2.match(/^([^,]+)/);
             video_code = video_code ? video_code[1] : '';
             
@@ -584,9 +584,11 @@ function do_onmark_macro_render(data, data_js) {
                 var video_src = 'https://tv.kakao.com/embed/player/cliplink/' + video_code +'?service=kakao_tv'
             } else if(x_1 === 'nicovideo') {
                 var video_src = 'https://embed.nicovideo.jp/watch/' + video_code
-            } else {
+            } else if(x_1 === 'navertv') {
                 var video_src = 'https://tv.naver.com/embed/' + video_code
-            }
+            } else {
+		var video_src = 'https://player.vimeo.com/video/' + video_code
+	    }
             
             return '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + '" frameborder="0" allowfullscreen></iframe>';
         } else if(x_1 === 'anchor') {
@@ -613,7 +615,7 @@ function do_onmark_macro_render(data, data_js) {
             
             var date_end = Math.floor((date_now - date_old) / (24 * 60 * 60 * 1000));
             
-            return date_end > 0 ? '+' + date_end : '-' + date_end;
+            return (date_end > 0 ? '+' : '') + date_end;
         } else if(x_1 === 'age') {
             var date_old = new Date(x_2);
             var date_now = new Date(do_return_date());
@@ -631,7 +633,7 @@ function do_onmark_macro_render(data, data_js) {
     var pagecount_n = 0;
     data = data.replace(/\[([^[*()\]]+)\]/g, function(x, x_1) {
         x_1 = x_1.toLowerCase();
-        if(x_1 === 'date') {
+        if(x_1 === 'date' || x_1 === 'datetime') {
             return do_return_date();
         } else if(x_1 === 'clearfix') {
             return '<div style="clear:both"></div>';
