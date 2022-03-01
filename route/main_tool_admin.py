@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_tool_admin(num = 1, add_1 = '', add_2 = ''):
+def main_tool_admin(num = 1, add_2 = ''):
     title_list = {
         0 : [load_lang('document_name'), 'acl', load_lang('acl')],
         1 : [0, 'check', load_lang('check')],
@@ -52,7 +52,7 @@ def main_tool_admin(num = 1, add_1 = '', add_2 = ''):
                         <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
                         <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
                         <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
-                        <li><a href="/doc_filter">''' + load_lang('doc_filter_list') + '''</a></li>
+                        <li><a href="/filter/document/list">''' + load_lang('document_filter_list') + '''</a></li>
                     </ul>
                     <h3>2.2. ''' + load_lang('server') + '''</h2>
                     <ul class="inside_ul">
@@ -77,17 +77,17 @@ def main_tool_admin(num = 1, add_1 = '', add_2 = ''):
         ))
     elif not num - 1 > len(title_list):
         num -= 2
+        
+        add_1 = flask.request.form.get('name', 'test')
         if flask.request.method == 'POST':
             if add_2 != '':
-                return redirect(
-                    '/' + title_list[num][1] + '/' + url_pas(add_2) + '?plus=' + url_pas(add_1)
-                )
-            elif flask.request.form.get('regex', None):
+                return redirect('/' + title_list[num][1] + '/' + url_pas(add_2) + '/doc_from/' + url_pas(add_1))
+            elif flask.request.form.get('regex', '') != '':
                 return redirect('/' + title_list[num][1] + '/' + url_pas(add_1) + '?type=regex')
             else:
                 return redirect('/' + title_list[num][1] + '/' + url_pas(add_1))
         else:
-            if title_list[(num - 2)][0] == 0:
+            if title_list[num][0] == 0:
                 placeholder = load_lang('user_name')
             else:
                 placeholder = title_list[num][0]

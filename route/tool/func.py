@@ -65,6 +65,7 @@ from .func_mark import *
 from diff_match_patch import diff_match_patch
 
 import netius.servers
+import waitress
 
 import werkzeug.routing
 import werkzeug.debug
@@ -77,14 +78,14 @@ import pymysql
 
 if sys.version_info < (3, 6):
     import sha3
-   
+
 # Init-Global
 global_lang = {}
 global_wiki_set = {}
 
 global_db_set = ''
 
-data_css_ver = '119'
+data_css_ver = '123'
 data_css = ''
 
 conn = ''
@@ -109,7 +110,12 @@ class get_db_connect_old:
         
     def db_load(self):
         if self.db_set['type'] == 'sqlite':
-            self.conn = sqlite3.connect(self.db_set['name'] + '.db')
+            self.conn = sqlite3.connect(
+                self.db_set['name'] + '.db',
+                check_same_thread = False,
+                isolation_level = None
+            )
+            self.conn.execute('pragma journal_mode = wal')
         else:
             self.conn = pymysql.connect(
                 host = self.db_set['mysql_host'],
@@ -133,7 +139,7 @@ class get_db_connect_old:
         load_conn(self.conn)
 
         return self.conn
-    
+
     def db_get(self):
         # if self.db_set['type'] != 'sqlite':
         #     self.conn.ping(reconnect = True)
@@ -141,14 +147,28 @@ class get_db_connect_old:
         return self.conn
     
 class get_db_connect:
+    # 임시 DB 커넥션 동작 구조
+    # Init 파트
+    # DB 커넥트(get_db_connect_old) -> func.py로 conn 넘겨줌
+    # route 파트
+    # DB 새로 커넥트 -> func.py에서 쓰던 conn은 conn_sub로 보관 ->
+    # func.py로 conn 넘겨줌 -> 모든 라우터 과정이 끝나면 conn_sub를 다시 func.py에 conn으로 넘겨줌 ->
+    # DB 커넥트 종료
     def __init__(self):
         global global_db_set
+        global conn
         
+        self.conn_sub = conn
         self.db_set = global_db_set
         
     def __enter__(self):
         if self.db_set['type'] == 'sqlite':
-            self.conn = sqlite3.connect(self.db_set['name'] + '.db')
+            self.conn = sqlite3.connect(
+                self.db_set['name'] + '.db',
+                check_same_thread = False,
+                isolation_level = None
+            )
+            self.conn.execute('pragma journal_mode = wal')
         else:
             self.conn = pymysql.connect(
                 host = self.db_set['mysql_host'],
@@ -169,10 +189,136 @@ class get_db_connect:
 
             self.conn.select_db(self.db_set['name'])
 
+        load_conn(self.conn)
         return self.conn
     
     def __exit__(self, exc_type, exc_value, traceback):
+        load_conn(self.conn_sub)
         self.conn.close()
+
+class class_check_json:
+    def do_check_set_json():
+        if os.getenv('NAMU_DB') or os.getenv('NAMU_DB_TYPE'):
+            set_data = {}
+            set_data['db'] = os.getenv('NAMU_DB') if os.getenv('NAMU_DB') else 'data'
+            set_data['db'] = os.getenv('NAMU_DB_TYPE') if os.getenv('NAMU_DB_TYPE') else 'sqlite'
+        else:
+            if os.path.exists(os.path.join('data', 'set.json')):
+                db_set_list = ['db', 'db_type']
+                set_data = json.loads(open(
+                    os.path.join('data', 'set.json'), 
+                    encoding = 'utf8'
+                ).read())
+                for i in db_set_list:
+                    if not i in set_data:
+                        os.remove(os.path.join('data', 'set.json'))
+                        
+                        break
+            
+            if not os.path.exists(os.path.join('data', 'set.json')):
+                set_data = {}
+                normal_db_type = ['sqlite', 'mysql']
+
+                print('DB type (' + normal_db_type[0] + ') [' + ', '.join(normal_db_type) + '] : ', end = '')
+                data_get = str(input())
+                if data_get == '' or not data_get in normal_db_type:
+                    set_data['db_type'] = 'sqlite'
+                else:
+                    set_data['db_type'] = data_get
+
+                all_src = []
+                if set_data['db_type'] == 'sqlite':
+                    for i_data in os.listdir("."):
+                        f_src = re.search(r"(.+)\.db$", i_data)
+                        if f_src:
+                            all_src += [f_src.group(1)]
+
+                print('DB name (data) [' + ', '.join(all_src) + '] : ', end = '')
+
+                data_get = str(input())
+                if data_get == '':
+                    set_data['db'] = 'data'
+                else:
+                    set_data['db'] = data_get
+
+                with open(os.path.join('data', 'set.json'), 'w', encoding = 'utf8') as f:
+                    f.write(json.dumps(set_data))
+
+        print('DB name : ' + set_data['db'])
+        print('DB type : ' + set_data['db_type'])
+        
+        data_db_set = {}
+        data_db_set['name'] = set_data['db']
+        data_db_set['type'] = set_data['db_type']
+
+        return data_db_set
+
+    def do_check_mysql_json(data_db_set):
+        if os.path.exists(os.path.join('data', 'mysql.json')):
+            db_set_list = ['user', 'password', 'host', 'port']
+            set_data = json.loads(
+                open(
+                    os.path.join('data', 'mysql.json'),
+                    encoding = 'utf8'
+                ).read()
+            )
+            for i in db_set_list:
+                if not i in set_data:
+                    os.remove(os.path.join('data', 'mysql.json'))
+                    
+                    break
+
+            set_data_mysql = set_data
+
+        if not os.path.exists(os.path.join('data', 'mysql.json')):
+            set_data_mysql = {}
+
+            print('DB user ID : ', end = '')
+            set_data_mysql['user'] = str(input())
+
+            print('DB password : ', end = '')
+            set_data_mysql['password'] = str(input())
+
+            print('DB host (localhost) : ', end = '')
+            set_data_mysql['host'] = str(input())
+            if set_data_mysql['host'] == '':
+                set_data_mysql['host'] = 'localhost'
+
+            print('DB port (3306) : ', end = '')
+            set_data_mysql['port'] = str(input())
+            if set_data_mysql['port'] == '':
+                set_data_mysql['port'] = '3306'
+
+            with open(
+                os.path.join('data', 'mysql.json'), 
+                'w', 
+                encoding = 'utf8'
+            ) as f:
+                f.write(json.dumps(set_data_mysql))
+
+        data_db_set['mysql_user'] = set_data_mysql['user']
+        data_db_set['mysql_pw'] = set_data_mysql['password']
+        if 'host' in set_data_mysql:
+            data_db_set['mysql_host'] = set_data_mysql['host']
+        else:
+            data_db_set['mysql_host'] = 'localhost'
+
+        if 'port' in set_data_mysql:
+            data_db_set['mysql_port'] = set_data_mysql['port']
+        else:
+            data_db_set['mysql_port'] = '3306'
+            
+        return data_db_set
+    
+    def __init__(self):
+        self.data_db_set = {}
+            
+    def __new__(self):
+        self.data_db_set = self.do_check_set_json()
+        if self.data_db_set['type'] == 'mysql':
+            self.data_db_set = self.do_check_mysql_json(self.data_db_set)
+        
+        return self.data_db_set
 
 def update(ver_num, set_data):
     curs = conn.cursor()
@@ -453,7 +599,7 @@ def set_init():
 def get_default_admin_group():
     return ['owner', 'ban']
 
-def load_random_key(long = 64):
+def load_random_key(long = 128):
     return ''.join(
         random.choice(
             "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -1018,15 +1164,14 @@ def captcha_get():
         
         curs.execute(db_change('select data from other where name = "recaptcha_ver"'))
         rec_ver = curs.fetchall()
-        if  recaptcha and recaptcha[0][0] != '' and \
-            sec_re and sec_re[0][0] != '':
+        if recaptcha and recaptcha[0][0] != '' and sec_re and sec_re[0][0] != '':
             if not rec_ver or rec_ver[0][0] == '':
                 data += '' + \
                     '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + \
                     '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
                     '<hr class="main_hr">' + \
                 ''
-            else:
+            elif rec_ver[0][0] == 'v3':
                 data += '' + \
                     '<script src="https://www.google.com/recaptcha/api.js?render=' + recaptcha[0][0] + '"></script>' + \
                     '<input type="hidden" id="g-recaptcha" name="g-recaptcha">' + \
@@ -1038,25 +1183,43 @@ def captcha_get():
                         '});' + \
                     '</script>' + \
                 ''
+            else:
+                data += '''
+                    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+                    <div class="h-captcha" data-sitekey="''' + recaptcha[0][0] + '''"></div>
+                    <hr class="main_hr">
+                '''
 
     return data
 
 def captcha_post(re_data, num = 1):
     curs = conn.cursor()
 
-    if num == 1:
+    if num == 1 and ip_or_user() != 0:
         curs.execute(db_change('select data from other where name = "sec_re"'))
         sec_re = curs.fetchall()
-        if  sec_re and sec_re[0][0] != '' and \
-            ip_or_user() != 0 and captcha_get() != '':
-            data = requests.get(
-                'https://www.google.com/recaptcha/api/siteverify' + \
-                '?secret=' + sec_re[0][0] + '&response=' + re_data
-            )
-            if data.status_code == 200:
-                json_data = json.loads(data.text)
-                if json_data['success'] != True:
-                    return 1
+        
+        curs.execute(db_change('select data from other where name = "recaptcha_ver"'))
+        rec_ver = curs.fetchall()
+        if captcha_get() != '':
+            if not rec_ver or rec_ver[0][0] in ('', 'v3'):
+                data = requests.get(
+                    'https://www.google.com/recaptcha/api/siteverify' + \
+                    '?secret=' + sec_re[0][0] + '&response=' + re_data
+                )
+                if data.status_code == 200:
+                    json_data = json.loads(data.text)
+                    if json_data['success'] != True:
+                        return 1
+            else:
+                data = requests.get(
+                    'https://hcaptcha.com/siteverify' + \
+                    '?secret=' + sec_re[0][0] + '&response=' + re_data
+                )
+                if data.status_code == 200:
+                    json_data = json.loads(data.text)
+                    if json_data['success'] != True:
+                        return 1
 
         return 0
 
@@ -1142,44 +1305,42 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
     ip = ip_check()
     get_ban = ban_check()
-    acl_c = re.search(r"^user:((?:(?!\/).)*)", name) if name else None
-    if tool == '' and acl_c:
-        acl_n = acl_c.groups()
-
-        if get_ban == 1:
-            return 1
-
-        if admin_check(5) == 1:
-            return 0
-
-        curs.execute(db_change(
-            "select data from acl where title = ? and type = 'decu'"
-        ), ['user:' + acl_n[0]])
-        acl_data = curs.fetchall()
-        if acl_data:
-            if acl_data[0][0] == 'all':
-                return 0
-            elif acl_data[0][0] == 'user' and not ip_or_user(ip) == 1:
-                return 0
-            elif ip == acl_n[0] and not ip_or_user(ip) == 1:
-                return 0
-        else:
-            if ip == acl_n[0] and not ip_or_user(ip) == 1 and not ip_or_user(acl_n[0]) == 1:
-                return 0
-
-        return 1
-
-    if tool == 'topic':
-        if not name:
-            curs.execute(db_change("select title from rd where code = ?"), [topic_num])
-            name = curs.fetchall()
-            name = name[0][0] if name else 'test'
-        
-        end = 3
-    elif tool == 'render' or tool == '' or tool == 'vote':
+    
+    if tool == '' and name:
         if tool == '' and acl_check(name, 'render') == 1:
             return 1
+        
+        user_page = re.search(r"^user:((?:(?!\/).)*)", name)
+        if user_page:
+            user_page = user_page.group(1)
+            if admin_check(5) == 1:
+                return 0
+                
+            if get_ban == 1:
+                return 1
+                
+            curs.execute(db_change(
+                "select data from acl where title = ? and type = 'decu'"
+            ), [name])
+            acl_data = curs.fetchall()
+            if acl_data:
+                if acl_data[0][0] == 'all':
+                    return 0
+                elif acl_data[0][0] == 'user' and not ip_or_user(ip) == 1:
+                    return 0
+            
+            if ip == user_page and not ip_or_user(ip) == 1:
+                return 0
+    
+            return 1
+    elif tool == 'topic':
+        curs.execute(db_change("select title from rd where code = ?"), [topic_num])
+        name = curs.fetchall()
+        name = name[0][0] if name else 'test'
 
+    if tool in ['topic']:
+        end = 3
+    elif tool in ['render', 'vote', '']:
         end = 2
     else:
         end = 1
@@ -1190,27 +1351,43 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 curs.execute(db_change(
                     "select data from acl where title = ? and type = 'decu'"
                 ), [name])
+                '''
+            elif i == 1:
+                curs.execute(db_change(
+                    "select plus from html_filter where kind = 'document'"
+                ))
+                '''
             else:
-                curs.execute(db_change('select data from other where name = "edit"'))
+                curs.execute(db_change(
+                    'select data from other where name = "edit"'
+                ))
 
             num = 5
         elif tool == 'topic':
-            if i == 0 and topic_num:
-                curs.execute(db_change("select acl from rd where code = ?"), [topic_num])
+            if i == 0:
+                curs.execute(db_change(
+                    "select acl from rd where code = ?"
+                ), [topic_num])
             elif i == 1:
                 curs.execute(db_change(
                     "select data from acl where title = ? and type = 'dis'"
                 ), [name])
             else:
-                curs.execute(db_change('select data from other where name = "discussion"'))
+                curs.execute(db_change(
+                    'select data from other where name = "discussion"'
+                ))
 
             num = 3
         elif tool == 'upload':
-            curs.execute(db_change("select data from other where name = 'upload_acl'"))
+            curs.execute(db_change(
+                "select data from other where name = 'upload_acl'"
+            ))
 
             num = 5
         elif tool == 'many_upload':
-            curs.execute(db_change("select data from other where name = 'many_upload_acl'"))
+            curs.execute(db_change(
+                "select data from other where name = 'many_upload_acl'"
+            ))
 
             num = 5
         elif tool == 'vote':
@@ -1219,7 +1396,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                     'select acl from vote where id = ? and user = ""'
                 ), [topic_num])
             else:
-                curs.execute(db_change('select data from other where name = "vote_acl"'))
+                curs.execute(db_change(
+                    'select data from other where name = "vote_acl"'
+                ))
 
             num = None
         else:
@@ -1234,18 +1413,16 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             num = 5
 
         acl_data = curs.fetchall()
-        if  (
-                i == (end - 1) and \
-                (not acl_data or acl_data[0][0] == '' or acl_data[0][0] == 'normal')
-            ) and \
-            get_ban == 1 and \
-            tool != 'render':
-            return 1
-        elif acl_data and acl_data[0][0] != 'normal' and acl_data[0][0] != '':
-            if acl_data[0][0] != 'ban' and get_ban == 1 and tool != 'render':
+        if not acl_data:
+            acl_data = [['normal']]
+        elif acl_data and acl_data[0][0] == '':
+            acl_data = [['normal']]
+
+        if acl_data[0][0] != 'normal':
+            if not acl_data[0][0] in ['ban', 'ban_admin'] and get_ban == 1 and tool != 'render':
                 return 1
 
-            if acl_data[0][0] == 'all' or acl_data[0][0] == 'ban':
+            if acl_data[0][0] in ['all', 'ban']:
                 return 0
             elif acl_data[0][0] == 'user':
                 if ip_or_user(ip) != 1:
@@ -1311,23 +1488,27 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 if admin_check() == 1:
                     return 0
             elif acl_data[0][0] == 'ban_admin':
-                if admin_check(1) == 1 or ban_check() == 1:
+                if admin_check(1) == 1 or get_ban == 1:
                     return 0
 
             return 1
-        else:
-            if i == (end - 1):
-                if tool == 'topic' and topic_num:
-                    curs.execute(db_change(
-                        "select title from rd where code = ? and stop != ''"
-                    ), [topic_num])
-                    if curs.fetchall():
-                        if admin_check(3, 'topic (code ' + topic_num + ')') == 1:
-                            return 0
-                    else:
+        elif i == (end - 1):
+            if get_ban == 1 and tool != 'render':
+                return 1
+            
+            if tool == 'topic':
+                curs.execute(db_change(
+                    "select title from rd where code = ? and stop != ''"
+                ), [topic_num])
+                if curs.fetchall():
+                    if admin_check(3, 'topic (code ' + topic_num + ')') == 1:
                         return 0
+                    else:
+                        return 1
                 else:
                     return 0
+            else:
+                return 0
 
     return 1
 

@@ -243,7 +243,8 @@ def main_func_setting(db_set, num = 0):
                 'edit_help',
                 'upload_help',
                 'upload_default',
-                'license'
+                'license',
+                'topic_text'
             ]
             if flask.request.method == 'POST':
                 for i in i_list:
@@ -328,6 +329,9 @@ def main_func_setting(db_set, num = 0):
 
                             <h2>17. ''' + load_lang('bottom_text') + ''' (HTML)</h2>
                             <textarea rows="3" name="''' + i_list[16] + '''">''' + html.escape(d_list[16]) + '''</textarea>
+                            
+                            <h2>18. ''' + load_lang('topic_text') + '''</h2>
+                            <textarea rows="3" name="''' + i_list[17] + '''">''' + html.escape(d_list[17]) + '''</textarea>
 
                             <hr class="main_hr">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
@@ -532,20 +536,29 @@ def main_func_setting(db_set, num = 0):
 
                 security_radios = ''
                 for i in ['tls', 'starttls', 'plain']:
-                    security_radios += '<input name="smtp_security" type="radio" value="' + i + '" ' + ('checked' if d_list[4] == i else '') + '>' + i + '<hr class="main_hr">'
+                    if d_list[4] == i:
+                        security_radios = '<option value="' + i + '">' + i + '</option>' + security_radios
+                    else:
+                        security_radios += '<option value="' + i + '">' + i + '</option>'
 
+                re_ver_list = {
+                    '' : 'reCAPTCHA v2',
+                    'v3' : 'reCAPTCHA v3',
+                    'h' : 'hCAPTCHA'
+                }
                 re_ver = ''
-                if d_list[7] == '':
-                    re_ver += '<option value="">v2</option><option value="v3">v3</option>'
-                else:
-                    re_ver += '<option value="v3">v3</option><option value="">v2</option>'
+                for i in re_ver_list:
+                    if d_list[7] == i:
+                        re_ver = '<option value="' + i + '">' + re_ver_list[i] + '</option>' + re_ver
+                    else:
+                        re_ver += '<option value="' + i + '">' + re_ver_list[i] + '</option>'
 
                 return easy_minify(flask.render_template(skin_check(),
                     imp = [load_lang('ext_api_req_set'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                     data = '''
                         <form method="post" id="main_set_data">
-                            <h2>1. ''' + load_lang('recaptcha') + '''</h2>
-                            <a href="https://www.google.com/recaptcha/admin">(Google)</a>
+                            <h2>1. ''' + load_lang('captcha') + '''</h2>
+                            <a href="https://www.google.com/recaptcha/">(''' + load_lang('recaptcha') + ''')</a> <a href="https://www.hcaptcha.com/">(''' + load_lang('hcaptcha') + ''')</a>
                             <hr class="main_hr">
 
                             <span>''' + load_lang('public_key') + '''</span>
@@ -558,6 +571,8 @@ def main_func_setting(db_set, num = 0):
                             <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                             <hr class="main_hr">
 
+                            <span>''' + load_lang('version') + '''</span>
+                            <hr class="main_hr">
                             <select name="recaptcha_ver">
                                 ''' + re_ver + '''
                             </select>
@@ -582,7 +597,9 @@ def main_func_setting(db_set, num = 0):
 
                             <span>''' + load_lang('smtp_security') + '''</span>
                             <hr class="main_hr">
-                            ''' + security_radios + '''
+                            <select name="recaptcha_ver">
+                                ''' + security_radios + '''
+                            </select>
                             <hr class="main_hr">
 
                             <span>''' + load_lang('smtp_username') + '''</span>
@@ -594,7 +611,7 @@ def main_func_setting(db_set, num = 0):
                             <hr class="main_hr">
                             <input type="password" name="smtp_pass" value="''' + html.escape(d_list[6]) + '''">
 
-                            <h2>3. ''' + load_lang('oauth') + '''</h2>
+                            <h2>3. ''' + load_lang('oauth') + ''' (''' + load_lang('incomplete') + ''')</h2>
                             <a href="https://developers.google.com/identity/protocols/oauth2">(Google)</a>
                             <hr class="main_hr">
 
@@ -732,6 +749,8 @@ def main_func_setting(db_set, num = 0):
                         curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, ?)'), [i[0], '', i[1]])
 
                         d_list += ['']
+                        
+                conn.commit()
 
                 end_data = ''
                 for i in range(0, len(skin_list)):

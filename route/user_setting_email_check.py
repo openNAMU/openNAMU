@@ -2,6 +2,10 @@ from .tool.func import *
 
 def user_setting_email_check_2(conn):
     curs = conn.cursor()
+    
+    ip = ip_check()
+    if ip_or_user(ip) != 0:
+        return redirect('/login')
 
     re_set_list = ['c_key', 'c_email']
     if  not 'c_key' in flask.session or \

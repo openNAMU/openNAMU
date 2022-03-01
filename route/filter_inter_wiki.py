@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def inter_wiki(tool):
+def filter_inter_wiki(tool):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -35,10 +35,6 @@ def inter_wiki(tool):
             title = load_lang('file_filter_list')
 
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'file'"))
-        elif tool == 'file_filter':
-            title = load_lang('file_filter_list')
-
-            curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'file'"))
         elif tool == 'image_license':
             title = load_lang('image_license_list')
 
@@ -57,19 +53,25 @@ def inter_wiki(tool):
             div += '<tr>'
             div += '<td>'
 
-            div += data[0]
+            div += html.escape(data[0])
             if admin == 1:
-                div += ' <a href="/' + tool + '/add/' + url_pas(data[0]) + '">(' + load_lang('edit') + ')</a>'
+                if tool in ('inter_wiki', 'edit_filter'):
+                    div += ' <a href="/' + tool + '/add/' + url_pas(data[0]) + '">(' + load_lang('edit') + ')</a>'
+                    
                 div += ' <a href="/' + tool + '/del/' + url_pas(data[0]) + '">(' + load_lang('delete') + ')</a>'
 
             div += '</td>'
 
             if tool == 'inter_wiki':
-                div += '<td><a id="out_link" href="' + data[1] + '">' + html.escape(data[1]) + '</a></td>'
+                div += '<td><a id="out_link" href="' + html.escape(data[1]) + '">' + html.escape(data[1]) + '</a></td>'
             else:
                 div += '<td>' + html.escape(data[1]) + '</td>'
 
-            div += '<td>' + html.escape(data[2]) + '</td>'
+            if tool == 'inter_wiki':
+                div += '<td>' + data[2] + '</td>'
+            else:
+                div += '<td>' + html.escape(data[2]) + '</td>'
+            
             div += '</tr>'
 
         div += '</table>'

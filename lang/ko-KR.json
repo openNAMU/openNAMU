@@ -1,4 +1,5 @@
 {
+    "language_tag": "ko-KR",
     "delete_admin_group": "관리자 그룹 삭제",
     "document_name": "문서명",
     "non_login_alert": "비로그인 알림",
@@ -406,6 +407,17 @@
     "record_reset": "사용자 편집 기록 초기화",
     "email_setting": "이메일 설정",
     "oauth_client_id": "OAuth 클라이언트 ID",
-    "today_doc" : "오늘의 문서",
-    "send_edit" : "편집 사유 수정"
+    "today_doc": "오늘의 문서",
+    "send_edit": "편집 사유 수정",
+    "document_filter_list": "문서명 필터 목록",
+    "document_filter_add": "문서명 필터 추가",
+    "password_instead_key": "대체 인증키",
+    "key_change": "키 변경",
+    "key_delete": "키 삭제",
+    "email_delete": "이메일 삭제",
+    "incomplete": "미완성",
+    "topic_text": "토론 기본 문구",
+    "hcaptcha": "hCAPTCHA",
+    "captcha": "CAPTCHA",
+    "make_new_topic": "새 토론 생성"
 }
