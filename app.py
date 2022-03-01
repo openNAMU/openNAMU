@@ -61,6 +61,8 @@ if setup_tool != 'normal':
     create_data = {}
 
     # 폐지 예정 (data_set으로 통합)
+    create_data['data_set'] = ['doc_name', 'doc_rev', 'set_name', 'set_data']
+    
     create_data['data'] = ['title', 'data', 'type']
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
     create_data['rc'] = ['id', 'title', 'date', 'type']
