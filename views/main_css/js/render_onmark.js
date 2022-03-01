@@ -615,7 +615,7 @@ function do_onmark_macro_render(data, data_js) {
             
             var date_end = Math.floor((date_now - date_old) / (24 * 60 * 60 * 1000));
             
-            return date_end > 0 ? '+' + date_end : '-' + date_end;
+            return (date_end > 0 ? '+' : '') + date_end;
         } else if(x_1 === 'age') {
             var date_old = new Date(x_2);
             var date_now = new Date(do_return_date());
@@ -633,7 +633,7 @@ function do_onmark_macro_render(data, data_js) {
     var pagecount_n = 0;
     data = data.replace(/\[([^[*()\]]+)\]/g, function(x, x_1) {
         x_1 = x_1.toLowerCase();
-        if(x_1 === 'date') {
+        if(x_1 === 'date' || x_1 === 'datetime') {
             return do_return_date();
         } else if(x_1 === 'clearfix') {
             return '<div style="clear:both"></div>';
