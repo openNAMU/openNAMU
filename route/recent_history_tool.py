@@ -34,7 +34,7 @@ def recent_history_tool_2(conn, name, rev):
         else:
             data += load_lang('hide')
             
-        data += '</li>'
+        data += '</a></li>'
         data += '</ul>'
 
     if admin_check() == 1:

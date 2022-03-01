@@ -1,14 +1,16 @@
 from .tool.func import *
 
-def inter_wiki_add(tool, name = None):
+def filter_inter_wiki_add(tool, name = None):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if not name:
-            if tool == 'plus_edit_filter':
-                return redirect('/manager/9')
+        if not name and tool == 'plus_edit_filter':
+            return redirect('/manager/9')
 
         if flask.request.method == 'POST':
+            if admin_check() != 1:
+                return re_error('/error/3')
+
             if tool == 'plus_inter_wiki':
                 if name:
                     curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki'"), [name])
@@ -88,10 +90,11 @@ def inter_wiki_add(tool, name = None):
                         type_d
                     ])
 
-                curs.execute(db_change('insert into html_filter (html, kind, plus) values (?, ?, ?)'), [
+                curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [
                     flask.request.form.get('title', 'test'),
                     type_d,
-                    plus_d
+                    plus_d,
+                    ''
                 ])
 
             conn.commit()
@@ -99,10 +102,7 @@ def inter_wiki_add(tool, name = None):
             return redirect('/' + re.sub(r'^plus_', '', tool))
         else:
             get_sub = 0
-            if admin_check() != 1:
-                stat = 'disabled'
-            else:
-                stat = ''
+            stat = 'disabled' if admin_check() != 1 else ''
 
             if tool == 'plus_inter_wiki':
                 if name:
@@ -163,9 +163,9 @@ def inter_wiki_add(tool, name = None):
                 form_data = '''
                     <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''
                     <hr class="main_hr">
-                    <input ''' + stat + ''' placeholder="''' + load_lang('second') + '''" id="second" name="second" type="text" value="''' + html.escape(time_data) + '''">
+                    <input placeholder="''' + load_lang('second') + '''" id="second" name="second" type="text" value="''' + html.escape(time_data) + '''">
                     <hr class="main_hr">
-                    <input ''' + stat + ''' placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
+                    <input placeholder="''' + load_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
                 '''
             elif tool == 'plus_name_filter':
                 title = load_lang('id_filter_add')
