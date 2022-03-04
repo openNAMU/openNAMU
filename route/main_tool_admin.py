@@ -87,7 +87,7 @@ def main_tool_admin(num = 1, add_2 = ''):
             else:
                 return redirect('/' + title_list[num][1] + '/' + url_pas(add_1))
         else:
-            if title_list[(num - 2)][0] == 0:
+            if title_list[num][0] == 0:
                 placeholder = load_lang('user_name')
             else:
                 placeholder = title_list[num][0]

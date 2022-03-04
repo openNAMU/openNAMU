@@ -29,7 +29,7 @@ def give_user_check_2(conn, name):
                     div += '''
                         <table id="main_table_set">
                             <tbody>
-                                <tr>
+                                <tr id="main_table_top_tr">
                                     <td>Q</td>
                                     <td>''' + approval_question[0][0] + '''</td>
                                     <td>A</td>
@@ -94,7 +94,7 @@ def give_user_check_2(conn, name):
             div += '''
                 <table id="main_table_set">
                     <tbody>
-                        <tr>
+                        <tr id="main_table_top_tr">
                             <td id="main_table_width">''' + load_lang('name') + '''</td>
                             <td id="main_table_width">''' + load_lang('ip') + '''</td>
                             <td id="main_table_width">''' + load_lang('time') + '''</td>
