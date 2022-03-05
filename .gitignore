@@ -12,6 +12,8 @@ images
 .vscode
 
 *.db
+*.db-shm
+*.db-wal
 *.db-journal
 
 robots.txt

@@ -2,6 +2,7 @@
 
 # 오픈나무
 [![Python 3.7 이상](https://img.shields.io/badge/python->=%203.7-blue.svg)](https://python.org)
+[![PyPy 3.7 이상](https://img.shields.io/badge/pypy3-%3E=%203.7-blue.svg)](https://www.pypy.org/)
 [![라이선스](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
 ![](https://raw.githubusercontent.com/openNAMU/openNAMU/beta/.github/logo.png)
