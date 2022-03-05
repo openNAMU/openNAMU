@@ -534,6 +534,8 @@ def update(ver_num, set_data):
             ), ['application', i[0], json.dumps(sql_data)])
     
     conn.commit()
+    
+    # 아이피 상태인 이메일 제거 예정
 
     print('Update completed')
 
@@ -870,11 +872,11 @@ def wiki_css(data):
 
     if data_css == '':
         for i_data in os.listdir(os.path.join("views", "main_css", "css")):
-            if i_data != 'sub':
+            if not i_data in ('sub'):
                 data_css += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + data_css_ver + '">'
 
         for i_data in os.listdir(os.path.join("views", "main_css", "js")):
-            if i_data != 'sub':
+            if not i_data in ('render', 'route'):
                 data_css += '<script src="/views/main_css/js/' + i_data + '?ver=' + data_css_ver + '"></script>'
                 
     data = data[0:2] + ['', '''
