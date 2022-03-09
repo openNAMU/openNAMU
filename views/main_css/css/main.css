@@ -1,5 +1,5 @@
 /* 기본 전체 옵션 */
-body, html, video, table, iframe, input, textarea, img, hr, blockquote, pre, iframe, .table_safe {
+body, html, video, table, iframe, input, textarea, img, hr, blockquote, pre, iframe, .table_safe, .table_wrapper {
     max-width: 100%;
 }
 
@@ -23,6 +23,10 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 /* 테이블 */
+.table_wrapper {
+    overflow-x: auto;
+}
+
 table {
     border-collapse: collapse;
 }

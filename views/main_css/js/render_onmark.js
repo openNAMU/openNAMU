@@ -1068,7 +1068,7 @@ function do_onmark_table_render_main(data) {
 
             if(table_data === '') {
                 table_data += '' + 
-                    '<div style="' + table_data_option['div'] + '">' +
+                    '<div class="table_wrapper" style="' + table_data_option['div'] + '">' +
                         '<table style="' + table_data_option['table'] + '">' +
                             table_caption +
                 '';
