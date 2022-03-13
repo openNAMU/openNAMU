@@ -44,7 +44,8 @@ def main_func_setting(db_set, num = 0):
                 21 : ['backup_where', ''],
                 22 : ['domain', flask.request.host_url],
                 23 : ['ua_get', ''],
-                24 : ['enable_comment', '']
+                24 : ['enable_comment', ''],
+                25 : ['enable_challenge', '']
             }
 
             if flask.request.method == 'POST':
@@ -79,7 +80,7 @@ def main_func_setting(db_set, num = 0):
                     else:
                         acl_div[0] += '<option value="' + acl_data + '">' + acl_data + '</option>'
 
-                check_box_div = ['', '', '', '', '', '']
+                check_box_div = ['', '', '', '', '', '', '']
                 for i in range(0, len(check_box_div)):
                     if i == 0:
                         acl_num = 7
@@ -91,6 +92,8 @@ def main_func_setting(db_set, num = 0):
                         acl_num = 23
                     elif i == 5:
                         acl_num = 24
+                    elif i == 6:
+                        acl_num = 25
 
                     if d_list[acl_num]:
                         check_box_div[i] = 'checked="checked"'
@@ -148,8 +151,10 @@ def main_func_setting(db_set, num = 0):
                             <select name="encode">''' + acl_div[0] + '''</select>
                             
                             <h3>1.1. ''' + load_lang('communication_function') + '''</h3>
-                            <hr class="main_hr">
                             <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + load_lang('enable_comment_function') + '''
+                            <hr class="main_hr">
+                            
+                            <input type="checkbox" name="enable_challenge" ''' + check_box_div[6] + '''> ''' + load_lang('enable_challenge_function') + '''
                             <hr class="main_hr">
 
                             <h2>2. ''' + load_lang('design_set') + '''</h2>

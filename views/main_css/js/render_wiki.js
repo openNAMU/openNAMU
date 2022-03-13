@@ -8,7 +8,6 @@ function get_link_state(data) {
     var link_list_2 = {}
     for(var i = 0; document.getElementsByClassName(data + 'link_finder')[i]; i++) {
         var data_class = document.getElementsByClassName(data + 'link_finder')[i];
-        console.log(data_class.href)
         if(
             data_class.id !== 'out_link' && 
             data_class.id !== 'inside' && 

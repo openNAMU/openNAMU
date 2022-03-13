@@ -35,10 +35,16 @@ if data_up_date == 1:
         f.write(version_list['beta']['r_ver'])
     
     if platform.system() in ('Linux', 'Windows'):
-        os.system(
-            'python' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
-            '-m pip install --upgrade --user -r requirements.txt'
-        )
+        if platform.python_implementation() == 'PyPy':
+            os.system(
+                'pypy' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
+                '-m pip install --upgrade --user -r requirements.txt'
+            )
+        else:
+            os.system(
+                'python' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
+                '-m pip install --upgrade --user -r requirements.txt'
+            )
         
         print('----')
         try:
@@ -890,7 +896,7 @@ def wiki_css(data):
         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.js"
                 integrity="sha384-1Or6BdeNQb0ezrmtGeqQHFpppNd7a/gw29xeiSikBbsb44xu3uAo8c7FwbF5jhbd"
                 crossorigin="anonymous"></script>
-    ''' + data_css + '<script>window.addEventListener(\'DOMContentLoaded\', main_css_skin_load);</script>'] + data[2:]
+    ''' + data_css] + data[2:]
 
     return data
 
@@ -1558,12 +1564,11 @@ def ban_check(ip = None, tool = ''):
 
     return 0
 
-def ip_pas(raw_ip, type_d = 0):
+def ip_pas(raw_ip, type_data = 0):
     curs = conn.cursor()
 
     hide = 0
     end_ip = {}
-    i = 0
 
     return_data = 0
     if type(raw_ip) != type([]):
@@ -1580,7 +1585,7 @@ def ip_pas(raw_ip, type_d = 0):
     
     get_ip = list(set(get_ip))
     
-    for raw_ip in get_ip:
+    for raw_ip in get_ip:        
         change_ip = 0
         is_this_ip = ip_or_user(raw_ip)
         if is_this_ip != 0 and ip_view != '':
@@ -1591,12 +1596,8 @@ def ip_pas(raw_ip, type_d = 0):
         else:     
             ip = raw_ip
             
-        if type_d == 0:
-            if is_this_ip == 0:
-                ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
-                
-            if change_ip == 0:
-                ip += ' <a href="/user/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
+        if type_data == 0 and change_ip == 0:
+            ip = '<span class="opennamu_ip_render">' + raw_ip + '</span>'
 
         end_ip[raw_ip] = ip
     

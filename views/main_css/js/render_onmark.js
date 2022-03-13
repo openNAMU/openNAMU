@@ -140,6 +140,14 @@ function do_onmark_text_render(data) {
     return data;
 }
 
+function do_onmark_set_toc_name(toc_name) {
+    let toc_data = document.getElementById("heading_text_" + toc_name).innerText;
+    
+    for(let for_a = 0; document.getElementsByClassName("toc_text_" + toc_name)[for_a]; for_a++) {
+        document.getElementsByClassName("toc_text_" + toc_name)[for_a].innerHTML = toc_data;
+    }
+}
+
 function do_onmark_heading_render(
     data, 
     data_js, 
@@ -192,13 +200,13 @@ function do_onmark_heading_render(
         toc_data += '' +
             '<span style="margin-left: ' + String((heading_level_string.match(/\./g).length - 1) * 10) + 'px;">' +
                 '<a href="#s-' + heading_level_string_no_end + '">' + 
-                    heading_level_string + ' ' +
+                    heading_level_string + 
                 '</a> ' + 
-                '<span id="toc_text_' + heading_level_string_no_end + '"></span>' +
+                '<span class="toc_text_' + heading_level_string_no_end + '"></span>' +
             '</span>' +
             '\n' +
         ''
-        data_js += 'document.getElementById("toc_text_' + heading_level_string_no_end + '").innerHTML = document.getElementById("heading_text_' + heading_level_string_no_end + '").innerText;\n';
+        data_js += 'do_onmark_set_toc_name(' + heading_level_string_no_end + ');\n';
         
         data = data.replace(heading_re, 
             '\n' +

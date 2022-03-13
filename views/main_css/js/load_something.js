@@ -7,6 +7,7 @@ function load_user_info(name) {
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
             document.getElementById('get_user_info').innerHTML += JSON.parse(this.responseText)['data'];
+            opennamu_do_ip_parser();
         }
     }
 }
@@ -149,14 +150,3 @@ function simple_render(name_ele) {
     
     document.getElementById(name_ele).innerHTML = skin_set_data;
 }
-
-function ie_end_support() {
-    if(document.currentScript === undefined) {
-        window.location = 'microsoft-edge:' + window.location;
-        setTimeout(function() {
-            window.location = 'https://go.microsoft.com/fwlink/?linkid=2135547';
-        }, 1);
-    }
-}
-
-ie_end_support();
