@@ -597,6 +597,8 @@ def user_setting_head():
 def user_info(name = ''):
     return user_info_2(load_db.db_get(), name)
 
+app.route('/challenge')(user_challenge)
+
 @app.route('/count')
 @app.route('/count/<name>')
 def user_count_edit(name = None):
@@ -691,7 +693,7 @@ def vote_add():
 
 # Func-api
 app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):rev>')(api_w)
-app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['GET', 'POST'])(api_w)
+app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['POST', 'GET'])(api_w)
 app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
 app.route('/api/raw/<everything:name>')(api_raw)
 
@@ -699,7 +701,7 @@ app.route('/api/version', defaults = { 'version_list' : version_list })(api_vers
 app.route('/api/skin_info')(api_skin_info)
 app.route('/api/skin_info/<name>')(api_skin_info)
 app.route('/api/markup')(api_markup)
-app.route('/api/user_info/<name>')(api_user_info)
+app.route('/api/user_info/<name>', methods = ['POST', 'GET'])(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
 app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic_sub)
