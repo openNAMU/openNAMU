@@ -206,7 +206,7 @@ function do_onmark_heading_render(
             '</span>' +
             '\n' +
         ''
-        data_js += 'do_onmark_set_toc_name(' + heading_level_string_no_end + ');\n';
+        data_js += 'do_onmark_set_toc_name("' + heading_level_string_no_end + '");\n';
         
         data = data.replace(heading_re, 
             '\n' +
