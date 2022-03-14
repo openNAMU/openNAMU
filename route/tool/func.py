@@ -675,7 +675,7 @@ def get_acl_list(type_d = 'normal'):
     if type_d == 'user':
         return ['', 'user', 'all']
     else:
-        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', 'ban_admin']
+        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', 'ban_admin', 'not_all']
 
 ## Func-simple-with_DB
 def load_image_url():
@@ -1429,7 +1429,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
         if acl_data[0][0] != 'normal':
             if not acl_data[0][0] in ['ban', 'ban_admin'] and get_ban == 1 and tool != 'render':
                 return 1
-
+            
             if acl_data[0][0] in ['all', 'ban']:
                 return 0
             elif acl_data[0][0] == 'user':
@@ -1498,6 +1498,8 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             elif acl_data[0][0] == 'ban_admin':
                 if admin_check(1) == 1 or get_ban == 1:
                     return 0
+            elif acl_data[0][0] == 'not_all':
+                return 1
 
             return 1
         elif i == (end - 1):
