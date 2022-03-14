@@ -29,7 +29,7 @@ def api_user_info(name = ''):
                 else:
                     data_result[user_name]['auth'] = 0
                     
-                curs.execute(db_change("select title from data where title = ?"), [user_name])
+                curs.execute(db_change("select title from data where title = ?"), ['user:' + user_name])
                 if curs.fetchall():
                     data_result[user_name]['document'] = 1
                 else:
