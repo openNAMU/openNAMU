@@ -469,10 +469,10 @@ def view_xref(name = 'Test'):
 def view_xref_this(name = 'Test'):
     return view_xref_2(load_db.db_get(), name, xref_type = '2')
 
-@app.route('/raw/<everything:name>')
-@app.route('/thread/<int:topic_num>/raw/<int:num>')
-def view_raw(name = None, topic_num = None, num = None):
-    return view_raw_2(load_db.db_get(), name, topic_num, num)
+app.route('/raw/<everything:name>')(view_raw_2)
+app.route('/raw/<everything:name>/doc_acl', defaults = { 'doc_acl' : 1 })(view_raw_2)
+app.route('/raw/<everything:name>/doc_rev/<int:num>')(view_raw_2)
+app.route('/thread/<int:topic_num>/raw/<int:num>')(view_raw_2)
 
 @app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')
 def view_diff(name = 'Test', num_a = 1, num_b = 1):

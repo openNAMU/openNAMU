@@ -6,7 +6,7 @@ def edit(name = 'Test', name_load = 0, section = 0):
     
         ip = ip_check()
         if acl_check(name) == 1:
-            return re_error('/ban')
+            return redirect('/raw/' + url_pas(name) + '/doc_acl')
         
         curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
         doc_ver = curs.fetchall()
