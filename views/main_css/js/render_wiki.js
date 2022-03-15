@@ -104,7 +104,6 @@ function get_file_state_extermal(data, data_exter) {
                 '</a>' +
             '';
         } else {
-            console.log(data_class[key]);
             document.getElementsByClassName(data + 'file_finder')[key].innerHTML = '' +
                 load_image_link(data_class[key], 1) +
             '';
