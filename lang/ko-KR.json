@@ -419,5 +419,14 @@
     "topic_text": "토론 기본 문구",
     "hcaptcha": "hCAPTCHA",
     "captcha": "CAPTCHA",
-    "make_new_topic": "새 토론 생성"
+    "make_new_topic": "새 토론 생성",
+    "old_page_warring": "이 문서는 오래되었습니다.",
+    "challenge_title_register": "Hello, World!",
+    "challenge_info_register": "가입을 하세요.",
+    "challenge_title_first_contribute": "시작이 반이다.",
+    "challenge_info_first_contribute": "첫 기여를 하세요.",
+    "challenge_title_tenthousandth_contribute": "대기만성",
+    "challenge_info_tenthousandth_contribute": "1000번째 기여를 하세요.",
+    "challenge_title_thousandth_discussion": "나는 생각한다. 고로 존재한다.",
+    "challenge_info_thousandth_discussion": "1000번째 토론 스레드를 올리세요."
 }
