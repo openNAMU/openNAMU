@@ -27,10 +27,10 @@ function opennamu_do_user_document_check() {
         xhr.open("POST", "/api/user_info/" + opennamu_do_url_encode(data));
         xhr.send();
         
+        document.getElementsByClassName('opennamu_user_link')[for_a].setAttribute('complete', '1');
         xhr.onreadystatechange = function() {
             if(this.readyState === 4 && this.status === 200) {
                 let xhr_data = JSON.parse(this.responseText);
-                console.log(xhr_data);
                 if(xhr_data[data]['document'] === 0) {
                     document.getElementsByClassName('opennamu_user_link')[for_a].id = "not_thing";
                 }
@@ -42,8 +42,6 @@ function opennamu_do_user_document_check() {
                 } else {
                     document.getElementsByClassName('opennamu_user_link')[for_a].innerHTML += "✅";
                 }
-                
-                document.getElementsByClassName('opennamu_user_link')[for_a].setAttribute('complete', '1');
             }
         }
     }

@@ -59,12 +59,19 @@ function get_heading_name() {
     }
 }
 
-function load_image_link(data) {
-    data.innerHTML = '' +
+function load_image_link(data, data_type = 0) {
+    let data_end = '';
+    data_end = '' +
         '<img   style="' + data.getAttribute('under_style') + '" ' + 
                 'alt="' + data.getAttribute('under_alt') + '" ' + 
                 'src="' + data.getAttribute('under_src') + '">' +
     '';
+    
+    if(data_type === 0) {
+        data.innerHTML = data_end;
+    } else {
+        return data_end;
+    }
 }
 
 function get_file_state_extermal(data, data_exter) {
@@ -97,10 +104,9 @@ function get_file_state_extermal(data, data_exter) {
                 '</a>' +
             '';
         } else {
+            console.log(data_class[key]);
             document.getElementsByClassName(data + 'file_finder')[key].innerHTML = '' +
-                '<img   style="' + data_class[key].getAttribute('under_style') + '" ' + 
-                        'alt="' + data_class[key].getAttribute('under_alt') + '" ' + 
-                        'src="' + data_class[key].getAttribute('under_src') + '">' +
+                load_image_link(data_class[key], 1) +
             '';
         }
     }
@@ -205,10 +211,11 @@ function get_file_state_intermal(data, data_inter) {
                                 for(var key_4 in data_dict[key_3]['list']) {
                                     var key_4 = data_dict[key_3]['list'][key_4];
                                     document.getElementsByClassName(data + 'file_finder')[key_4].innerHTML = '' +
-                                        '<img   style="' + data_class[key_4].getAttribute('under_style') + '" ' + 
-                                                'alt="' + data_class[key_4].getAttribute('under_alt') + '" ' + 
-                                                'src="/image/' + data_dict[key_3]['file_sha224'] + '.' + data_dict[key_3]['file_type'] + '">' +
-                                        '' +
+                                        '<a href="/w/file:' + data_class[key_4].getAttribute('under_alt') + '">' + 
+                                            '<img   style="' + data_class[key_4].getAttribute('under_style') + '" ' + 
+                                                    'alt="' + data_class[key_4].getAttribute('under_alt') + '" ' + 
+                                                    'src="/image/' + data_dict[key_3]['file_sha224'] + '.' + data_dict[key_3]['file_type'] + '">' +
+                                        '</a>' +
                                     '';
                                 }
                             }
