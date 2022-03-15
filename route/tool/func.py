@@ -892,8 +892,8 @@ def wiki_css(data):
     data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css?ver=' + data_css_ver + '">'
                 
     data = data[0:2] + ['', '''
-        <link rel="stylesheet"
-              href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/styles/default.min.css">
+        <link   rel="stylesheet"
+                href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/styles/default.min.css">
         <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/highlight.min.js"></script>
         <link   rel="stylesheet" 
                 href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css" 
