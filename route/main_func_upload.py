@@ -113,7 +113,7 @@ def main_func_upload():
             return redirect('/w/file:' + name)
         else:
             license_list = '<option value="direct_input">' + load_lang('direct_input') + '</option>'
-            file_name = flask.request.args.get('name', '')
+            file_name = html.escape(flask.request.args.get('name', ''))
 
             curs.execute(db_change("select html from html_filter where kind = 'image_license'"))
             db_data = curs.fetchall()

@@ -116,6 +116,15 @@ function do_xss_change(data) {
     return data;
 }
 
+function do_html_escape(data) {
+    data = data.replace(/</g, '&lt;');
+    data = data.replace(/>/g, '&gt;');
+    data = data.replace(/&/g, '&amp;');
+    data = data.replace(/"/g, '&quot;');
+    
+    return data
+}
+
 function do_end_br_replace(data) {
     data = data.replace(/(\n| )+$/, '\n');
     
@@ -282,12 +291,12 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                     file_name = file_type.slice(0, file_type.length - 1).join('.');
                     file_type = file_type[file_type.length - 1];
 
-                    var file_src = do_url_change(file_name) + '.' + file_type;       
-                    var file_alt = file_name + '.' + file_type;
+                    var file_src = do_url_change(do_xss_change(file_name)) + '.' + do_html_escape(file_type);
+                    var file_alt = do_html_escape(file_name + '.' + file_type);
                     var file_exist = 1;
                 } else {
-                    var file_src = file_name;
-                    var file_alt = file_name;
+                    var file_src = do_html_escape(file_name);
+                    var file_alt = do_html_escape(file_name);
                     var file_exist = 0;
                 }
 
@@ -327,7 +336,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                                 'under_style="' + file_style + '" ' +
                                 'under_alt="' + file_alt + '" ' +
                                 'under_src="' + file_src + '" ' +
-                                'under_href="' + (file_exist === 0 ? "out_link" : '/upload?name=' + do_url_change(file_name)) + '">' +
+                                'under_href="' + (file_exist === 0 ? "out_link" : '/upload?name=' + file_src.replace(/\.[^.]+$/, '')) + '">' +
                         '</span>' + 
                     '</span>' +
                 ''

@@ -202,7 +202,7 @@ function get_file_state_intermal(data, data_inter) {
                                             'under_style="' + data_class[key_4].getAttribute('under_style') + '" ' +
                                             'under_alt="' + data_class[key_4].getAttribute('under_alt') + '" ' +
                                             'under_src="/image/' + data_dict[key_3]['file_sha224'] + '.' + data_dict[key_3]['file_type'] + '">' + 
-                                            '(' + data_class[key_4].getAttribute('under_alt') + ' load)' +
+                                            '(' + data_class[key_4].getAttribute('under_alt') + ' GET)' +
                                         '</a>' +
                                     '';
                                 }
@@ -210,11 +210,10 @@ function get_file_state_intermal(data, data_inter) {
                                 for(var key_4 in data_dict[key_3]['list']) {
                                     var key_4 = data_dict[key_3]['list'][key_4];
                                     document.getElementsByClassName(data + 'file_finder')[key_4].innerHTML = '' +
-                                        '<a href="/w/file:' + data_class[key_4].getAttribute('under_alt') + '">' + 
-                                            '<img   style="' + data_class[key_4].getAttribute('under_style') + '" ' + 
-                                                    'alt="' + data_class[key_4].getAttribute('under_alt') + '" ' + 
-                                                    'src="/image/' + data_dict[key_3]['file_sha224'] + '.' + data_dict[key_3]['file_type'] + '">' +
-                                        '</a>' +
+                                        '<img   style="' + data_class[key_4].getAttribute('under_style') + ';cursor: pointer;" ' + 
+                                                'onclick="window.location.href=\'/w/file:' + data_class[key_4].getAttribute('under_src') + '\';"' +
+                                                'alt="' + data_class[key_4].getAttribute('under_alt') + '" ' + 
+                                                'src="/image/' + data_dict[key_3]['file_sha224'] + '.' + data_dict[key_3]['file_type'] + '">' +
                                     '';
                                 }
                             }
