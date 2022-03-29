@@ -103,6 +103,8 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
                 eval(data_t[key]['data_pas'][1]);
             }
             
+            opennamu_do_ip_parser();
+            
             if(type_do === 'top') {
                 new_topic_load(topic_num, 'main', '', 'main_topic');
             } else if(type_do === 'main') {

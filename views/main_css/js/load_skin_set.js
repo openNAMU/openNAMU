@@ -515,3 +515,5 @@ function main_css_skin_set() {
  
     simple_render('main_skin_set');
 }
+
+document.addEventListener("DOMContentLoaded", main_css_skin_load);

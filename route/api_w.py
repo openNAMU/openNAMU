@@ -67,7 +67,7 @@ def api_w(name = 'Test', tool = '', rev = ''):
                     title_list = json.loads(flask.request.form.get('title_list', ''))
                     title_list = list(set(title_list))
                 except:
-                    title_list = []
+                    title_list = [name]
 
                 data_exist = {}
                 for i in title_list:

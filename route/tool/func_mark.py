@@ -114,7 +114,7 @@ class class_do_render:
             if rep_data == 'namumark':
                 data_in = (data_in + '_') if data_in else ''
                 data_end = [
-                    '<pre style="display: none;" id="' + data_in + 'render_content_load">' + html.escape(doc_data) + '</pre>' + \
+                    '<pre class="render_content_load" id="' + data_in + 'render_content_load">' + html.escape(doc_data) + '</pre>' + \
                     '<div class="render_content" id="' + data_in + 'render_content"></div>', 
                     '''
                         do_onmark_render(
@@ -129,7 +129,7 @@ class class_do_render:
             elif rep_data == 'markdown':
                 data_in = (data_in + '_') if data_in else ''
                 data_end = [
-                    '<pre style="display: none;" id="' + data_in + 'render_content_load">' + html.escape(doc_data) + '</pre>' + \
+                    '<pre class="render_content_load" id="' + data_in + 'render_content_load">' + html.escape(doc_data) + '</pre>' + \
                     '<div class="render_content" id="' + data_in + 'render_content"></div>', 
                     '''
                         do_onmark_render(

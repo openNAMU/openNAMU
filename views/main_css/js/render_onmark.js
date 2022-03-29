@@ -116,6 +116,15 @@ function do_xss_change(data) {
     return data;
 }
 
+function do_html_escape(data) {
+    data = data.replace(/</g, '&lt;');
+    data = data.replace(/>/g, '&gt;');
+    data = data.replace(/&/g, '&amp;');
+    data = data.replace(/"/g, '&quot;');
+    
+    return data
+}
+
 function do_end_br_replace(data) {
     data = data.replace(/(\n| )+$/, '\n');
     
@@ -138,6 +147,14 @@ function do_onmark_text_render(data) {
     data = data.replace(/~~((?:(?!~~).)+)~~/g, '<s>$1</s>');
     
     return data;
+}
+
+function do_onmark_set_toc_name(toc_name) {
+    let toc_data = document.getElementById("heading_text_" + toc_name).innerText;
+    
+    for(let for_a = 0; document.getElementsByClassName("toc_text_" + toc_name)[for_a]; for_a++) {
+        document.getElementsByClassName("toc_text_" + toc_name)[for_a].innerHTML = toc_data;
+    }
 }
 
 function do_onmark_heading_render(
@@ -192,13 +209,13 @@ function do_onmark_heading_render(
         toc_data += '' +
             '<span style="margin-left: ' + String((heading_level_string.match(/\./g).length - 1) * 10) + 'px;">' +
                 '<a href="#s-' + heading_level_string_no_end + '">' + 
-                    heading_level_string + ' ' +
+                    heading_level_string + 
                 '</a> ' + 
-                '<span id="toc_text_' + heading_level_string_no_end + '"></span>' +
+                '<span class="toc_text_' + heading_level_string_no_end + '"></span>' +
             '</span>' +
             '\n' +
         ''
-        data_js += 'document.getElementById("toc_text_' + heading_level_string_no_end + '").innerHTML = document.getElementById("heading_text_' + heading_level_string_no_end + '").innerText;\n';
+        data_js += 'do_onmark_set_toc_name("' + heading_level_string_no_end + '");\n';
         
         data = data.replace(heading_re, 
             '\n' +
@@ -274,12 +291,12 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                     file_name = file_type.slice(0, file_type.length - 1).join('.');
                     file_type = file_type[file_type.length - 1];
 
-                    var file_src = do_url_change(file_name) + '.' + file_type;       
-                    var file_alt = file_name + '.' + file_type;
+                    var file_src = do_url_change(do_xss_change(file_name)) + '.' + do_html_escape(file_type);
+                    var file_alt = do_html_escape(file_name + '.' + file_type);
                     var file_exist = 1;
                 } else {
-                    var file_src = file_name;
-                    var file_alt = file_name;
+                    var file_src = do_html_escape(file_name);
+                    var file_alt = do_html_escape(file_name);
                     var file_exist = 0;
                 }
 
@@ -319,7 +336,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                                 'under_style="' + file_style + '" ' +
                                 'under_alt="' + file_alt + '" ' +
                                 'under_src="' + file_src + '" ' +
-                                'under_href="' + (file_exist === 0 ? "out_link" : '/upload?name=' + do_url_change(file_name)) + '">' +
+                                'under_href="' + (file_exist === 0 ? "out_link" : '/upload?name=' + file_src.replace(/\.[^.]+$/, '')) + '">' +
                         '</span>' + 
                     '</span>' +
                 ''

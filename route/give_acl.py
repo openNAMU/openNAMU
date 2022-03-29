@@ -113,6 +113,7 @@ def give_acl_2(conn, name):
                 <li>before : ''' + load_lang('before_acl') + '''</li>
                 <li>30_day : ''' + load_lang('30_day_acl') + '''</li>
                 <li>ban_admin : ''' + load_lang('ban_admin_acl') + '''</li>
+                <li>not_all : ''' + load_lang('not_all_acl') + '''</li>
             </ul>
         '''
 

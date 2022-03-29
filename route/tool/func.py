@@ -35,10 +35,16 @@ if data_up_date == 1:
         f.write(version_list['beta']['r_ver'])
     
     if platform.system() in ('Linux', 'Windows'):
-        os.system(
-            'python' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
-            '-m pip install --upgrade --user -r requirements.txt'
-        )
+        if platform.python_implementation() == 'PyPy':
+            os.system(
+                'pypy' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
+                '-m pip install --upgrade --user -r requirements.txt'
+            )
+        else:
+            os.system(
+                'python' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
+                '-m pip install --upgrade --user -r requirements.txt'
+            )
         
         print('----')
         try:
@@ -84,9 +90,6 @@ global_lang = {}
 global_wiki_set = {}
 
 global_db_set = ''
-
-data_css_ver = '123'
-data_css = ''
 
 conn = ''
 
@@ -534,6 +537,8 @@ def update(ver_num, set_data):
             ), ['application', i[0], json.dumps(sql_data)])
     
     conn.commit()
+    
+    # 아이피 상태인 이메일 제거 예정
 
     print('Update completed')
 
@@ -667,7 +672,7 @@ def get_acl_list(type_d = 'normal'):
     if type_d == 'user':
         return ['', 'user', 'all']
     else:
-        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', 'ban_admin']
+        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', 'ban_admin', 'not_all']
 
 ## Func-simple-with_DB
 def load_image_url():
@@ -862,48 +867,53 @@ def skin_check(set_n = 0):
     
 def wiki_css(data):
     # without_DB
-
-    global data_css
-    global data_css_ver
-
     data += ['' for _ in range(0, 3 - len(data))]
-
-    if data_css == '':
-        for i_data in os.listdir(os.path.join("views", "main_css", "css")):
-            if i_data != 'sub':
-                data_css += '<link rel="stylesheet" href="/views/main_css/css/' + i_data + '?ver=' + data_css_ver + '">'
-
-        for i_data in os.listdir(os.path.join("views", "main_css", "js")):
-            if i_data != 'sub':
-                data_css += '<script src="/views/main_css/js/' + i_data + '?ver=' + data_css_ver + '"></script>'
+    
+    data_css = ''
+    data_css_ver = '145'
+    
+    # Func JS
+    data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script defer src="/views/main_css/js/func/shortcut.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script defer src="/views/main_css/js/func/user_name_parser.js?ver=' + data_css_ver + '"></script>'
+    
+    # 레거시 일반 JS
+    data_css += '<script src="/views/main_css/js/load_editor.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/load_skin_set.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/load_something.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/load_topic.js?ver=' + data_css_ver + '"></script>'
+    
+    # 레거시 렌더러 JS
+    data_css += '<script src="/views/main_css/js/render_html.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/render_onmark.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/render_wiki.js?ver=' + data_css_ver + '"></script>'
+    
+    # Main CSS
+    data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css?ver=' + data_css_ver + '">'
                 
     data = data[0:2] + ['', '''
         <link   rel="stylesheet"
-                href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.2.0/build/styles/default.min.css">
-        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.2.0/build/highlight.min.js"></script>
-        <link   defer rel="stylesheet"
-                href="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.css"
-                integrity="sha384-Cqd8ihRLum0CCg8rz0hYKPoLZ3uw+gES2rXQXycqnL5pgVQIflxAUDS7ZSjITLb5"
+                href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/styles/default.min.css">
+        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/highlight.min.js"></script>
+        <link   rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css" 
+                integrity="sha384-KiWOvVjnN8qwAZbuQyWDIbfCLFhLXNETzBQjA/92pIowpC0d2O3nppDGQVgwd2nB" 
                 crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/katex@0.13.2/dist/katex.min.js"
-                integrity="sha384-1Or6BdeNQb0ezrmtGeqQHFpppNd7a/gw29xeiSikBbsb44xu3uAo8c7FwbF5jhbd"
+        <script defer 
+                src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js" 
+                integrity="sha384-0fdwu/T/EQMsQlrHCCHoH10pkPLlKA1jL5dFyUOvB3lfeT2540/2g6YgSi2BL14p" 
                 crossorigin="anonymous"></script>
-    ''' + data_css + '<script>window.addEventListener(\'DOMContentLoaded\', main_css_skin_load);</script>'] + data[2:]
+    ''' + data_css] + data[2:]
 
     return data
 
 def cut_100(data):
     # without_DB
-
-    data = re.search(r'<pre style="display: none;" id="render_content_load">([^<>]+)<\/pre>', data)
-    if data:
-        data = data.group(1)
-        if len(data) > 100:
-            return data[0:100] + '...'
-        else:
-            return data[0:len(data)]
-    else:
-        return ''
+    
+    data = data.replace('<pre class="render_content_load" id="render_content_load">', '')
+    data = data.replace('</pre>', ' ' * 100)
+    
+    return data[0 : 100]
 
 def wiki_set(num = 1):
     curs = conn.cursor()
@@ -1421,7 +1431,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
         if acl_data[0][0] != 'normal':
             if not acl_data[0][0] in ['ban', 'ban_admin'] and get_ban == 1 and tool != 'render':
                 return 1
-
+            
             if acl_data[0][0] in ['all', 'ban']:
                 return 0
             elif acl_data[0][0] == 'user':
@@ -1490,6 +1500,8 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             elif acl_data[0][0] == 'ban_admin':
                 if admin_check(1) == 1 or get_ban == 1:
                     return 0
+            elif acl_data[0][0] == 'not_all':
+                return 1
 
             return 1
         elif i == (end - 1):
@@ -1556,12 +1568,11 @@ def ban_check(ip = None, tool = ''):
 
     return 0
 
-def ip_pas(raw_ip, type_d = 0):
+def ip_pas(raw_ip, type_data = 0):
     curs = conn.cursor()
 
     hide = 0
     end_ip = {}
-    i = 0
 
     return_data = 0
     if type(raw_ip) != type([]):
@@ -1578,7 +1589,7 @@ def ip_pas(raw_ip, type_d = 0):
     
     get_ip = list(set(get_ip))
     
-    for raw_ip in get_ip:
+    for raw_ip in get_ip:        
         change_ip = 0
         is_this_ip = ip_or_user(raw_ip)
         if is_this_ip != 0 and ip_view != '':
@@ -1589,12 +1600,8 @@ def ip_pas(raw_ip, type_d = 0):
         else:     
             ip = raw_ip
             
-        if type_d == 0:
-            if is_this_ip == 0:
-                ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
-                
-            if change_ip == 0:
-                ip += ' <a href="/user/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
+        if type_data == 0 and change_ip == 0:
+            ip = '<span class="opennamu_ip_render">' + raw_ip + '</span>'
 
         end_ip[raw_ip] = ip
     

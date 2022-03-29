@@ -1,3 +1,5 @@
+"use strict";
+
 let shortcut_key_list = [];
 document.onkeyup = function(e) {
     delete shortcut_key_list[e.key];

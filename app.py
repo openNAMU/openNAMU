@@ -469,10 +469,10 @@ def view_xref(name = 'Test'):
 def view_xref_this(name = 'Test'):
     return view_xref_2(load_db.db_get(), name, xref_type = '2')
 
-@app.route('/raw/<everything:name>')
-@app.route('/thread/<int:topic_num>/raw/<int:num>')
-def view_raw(name = None, topic_num = None, num = None):
-    return view_raw_2(load_db.db_get(), name, topic_num, num)
+app.route('/raw/<everything:name>')(view_raw_2)
+app.route('/raw/<everything:name>/doc_acl', defaults = { 'doc_acl' : 1 })(view_raw_2)
+app.route('/raw/<everything:name>/doc_rev/<int:num>')(view_raw_2)
+app.route('/thread/<int:topic_num>/raw/<int:num>')(view_raw_2)
 
 @app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')
 def view_diff(name = 'Test', num_a = 1, num_b = 1):
@@ -597,6 +597,8 @@ def user_setting_head():
 def user_info(name = ''):
     return user_info_2(load_db.db_get(), name)
 
+app.route('/challenge')(user_challenge)
+
 @app.route('/count')
 @app.route('/count/<name>')
 def user_count_edit(name = None):
@@ -691,7 +693,7 @@ def vote_add():
 
 # Func-api
 app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):rev>')(api_w)
-app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['GET', 'POST'])(api_w)
+app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['POST', 'GET'])(api_w)
 app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
 app.route('/api/raw/<everything:name>')(api_raw)
 
@@ -699,7 +701,7 @@ app.route('/api/version', defaults = { 'version_list' : version_list })(api_vers
 app.route('/api/skin_info')(api_skin_info)
 app.route('/api/skin_info/<name>')(api_skin_info)
 app.route('/api/markup')(api_markup)
-app.route('/api/user_info/<name>')(api_user_info)
+app.route('/api/user_info/<name>', methods = ['POST', 'GET'])(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
 app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic_sub)

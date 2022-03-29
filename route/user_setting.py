@@ -49,6 +49,10 @@ def user_setting_2(conn, server_set_var):
             curs.execute(db_change('select data from user_set where name = "random_key" and id = ?'), [ip])
             data = curs.fetchall()
             ramdom_key = data[0][0] if data and data[0][0] != '' else '-'
+            
+            curs.execute(db_change('select data from user_set where name = "user_title" and id = ?'), [ip])
+            data = curs.fetchall()
+            user_title = data[0][0] if data and data[0][0] != '' else '-'
 
             curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
             data = curs.fetchall()
@@ -94,6 +98,8 @@ def user_setting_2(conn, server_set_var):
                         <span>''' + load_lang('email') + ''' : ''' + email + '''</span> <a href="/change/email">(''' + load_lang('email_change') + ''')</a> <a href="/change/email/delete">(''' + load_lang('email_delete') + ''')</a>
                         <hr class="main_hr">
                         <span>''' + load_lang('password_instead_key') + ''' : ''' + ramdom_key + ''' <a href="/change/key">(''' + load_lang('key_change') + ''')</a> <a href="/change/key/delete">(''' + load_lang('key_delete') + ''')</a></span>
+                        <hr class="main_hr">
+                        <span>''' + load_lang('user_title') + ''' : ''' + user_title + ''' <a href="/change/title">(''' + load_lang('user_title_change') + ''')</a>
                         <h2>''' + load_lang('main') + '''</h2>
                         <label class="select">
                             <span>''' + load_lang('skin') + '''</span>
