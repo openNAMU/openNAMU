@@ -30,18 +30,29 @@ function opennamu_do_user_document_check() {
         document.getElementsByClassName('opennamu_user_link')[for_a].setAttribute('complete', '1');
         xhr.onreadystatechange = function() {
             if(this.readyState === 4 && this.status === 200) {
+                // start part
                 let xhr_data = JSON.parse(this.responseText);
+                
+                // user document part
                 if(xhr_data[data]['document'] === 0) {
                     document.getElementsByClassName('opennamu_user_link')[for_a].id = "not_thing";
                 }
                 
+                // user auth part
+                let user_data = document.getElementsByClassName('opennamu_user_link')[for_a].innerHTML;
                 if(xhr_data[data]['auth'] === 0) {
                     
                 } else if(xhr_data[data]['auth'] === 1) {
                     
                 } else {
-                    document.getElementsByClassName('opennamu_user_link')[for_a].innerHTML += "✅";
+                    user_data = '<b>' + user_data + '</b>';
                 }
+                
+                // user title part
+                user_data = xhr_data[data]['user_title'] + user_data;
+                
+                // end part
+                document.getElementsByClassName('opennamu_user_link')[for_a].innerHTML = user_data;
             }
         }
     }

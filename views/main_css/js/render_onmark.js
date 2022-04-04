@@ -112,6 +112,7 @@ function do_xss_change(data) {
     data = data.replace(/&lt;/g, '<');
     data = data.replace(/&gt;/g, '>');
     data = data.replace(/&amp;/g, '&');
+    data = data.replace(/&quot;/g, '"');
     
     return data;
 }
@@ -1338,6 +1339,9 @@ function do_onmark_render(
     var data_js = '';
     var data_backlink = [];
     var data_nowiki = {};
+        
+    name_doc = do_xss_change(name_doc);
+    console.log(name_doc);
 
     let xhr = new XMLHttpRequest();
     xhr.open("GET", "/api/setting/inter_wiki");

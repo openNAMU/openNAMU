@@ -15,6 +15,7 @@ def api_user_info(name = ''):
             for user_name in data_list:
                 data_result[user_name] = {}
                 
+                # auth part
                 curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [user_name])
                 db_data = curs.fetchall()
                 if db_data:
@@ -28,12 +29,21 @@ def api_user_info(name = ''):
                         data_result[user_name]['auth'] = 1
                 else:
                     data_result[user_name]['auth'] = 0
-                    
+                
+                # user document part
                 curs.execute(db_change("select title from data where title = ?"), ['user:' + user_name])
                 if curs.fetchall():
                     data_result[user_name]['document'] = 1
                 else:
                     data_result[user_name]['document'] = 0
+
+                # user title part
+                curs.execute(db_change('select data from user_set where name = "user_title" and id = ?'), [user_name])
+                db_data = curs.fetchall()
+                if db_data:
+                    data_result[user_name]['user_title'] = db_data[0][0]
+                else:
+                    data_result[user_name]['user_title'] = ''
                     
             return flask.jsonify(data_result)
         else:
