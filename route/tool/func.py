@@ -604,6 +604,18 @@ def set_init():
 def get_default_admin_group():
     return ['owner', 'ban']
 
+def get_user_title_list():
+    # default
+    user_title = {
+        '' : load_lang('default'),
+        '🌳' : '🌳 namu',
+    }
+    
+    # admin
+    user_title['✅'] = '✅ admin'
+    
+    return user_title
+
 def load_random_key(long = 128):
     return ''.join(
         random.choice(
@@ -613,15 +625,9 @@ def load_random_key(long = 128):
 
 def http_warning():
     return '''
-        <div id="http_warning_text"></div>
-        <script>
-            if(window.location.protocol !== 'https:') {
-                document.getElementById('http_warning_text').innerHTML = "''' + \
-                    load_lang('http_warning') + \
-                '''";
-                document.getElementById('http_warning_text').style.margin = "10px 0px 0px 0px";
-            }
-        </script>
+        <div id="opennamu_http_warning_text"></div>
+        <span style="display: none;" id="opennamu_http_warning_text_lang">''' + load_lang('http_warning') + '''</span>
+        <script>opennamu_do_warning_text();</script>
     '''
 
 def next_fix(link, num, page, end = 50):
@@ -873,9 +879,14 @@ def wiki_css(data):
     data_css_ver = '145'
     
     # Func JS
+    data_css += '<script src="/views/main_css/js/func/http_warning_text.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/func/shortcut.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/func/user_name_parser.js?ver=' + data_css_ver + '"></script>'
+    
+    # Render JS
+    data_css += '<script src="/views/main_css/js/render/markdown.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/render/wiki.js?ver=' + data_css_ver + '"></script>'
     
     # 레거시 일반 JS
     data_css += '<script src="/views/main_css/js/load_editor.js?ver=' + data_css_ver + '"></script>'
@@ -890,20 +901,15 @@ def wiki_css(data):
     
     # Main CSS
     data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css?ver=' + data_css_ver + '">'
-                
-    data = data[0:2] + ['', '''
-        <link   rel="stylesheet"
-                href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/styles/default.min.css">
-        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/highlight.min.js"></script>
-        <link   rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css" 
-                integrity="sha384-KiWOvVjnN8qwAZbuQyWDIbfCLFhLXNETzBQjA/92pIowpC0d2O3nppDGQVgwd2nB" 
-                crossorigin="anonymous">
-        <script defer 
-                src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js" 
-                integrity="sha384-0fdwu/T/EQMsQlrHCCHoH10pkPLlKA1jL5dFyUOvB3lfeT2540/2g6YgSi2BL14p" 
-                crossorigin="anonymous"></script>
-    ''' + data_css] + data[2:]
+    
+    # External
+    data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/styles/default.min.css">'
+    data_css += '<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/highlight.min.js"></script>'
+    
+    data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css" integrity="sha384-KiWOvVjnN8qwAZbuQyWDIbfCLFhLXNETzBQjA/92pIowpC0d2O3nppDGQVgwd2nB" crossorigin="anonymous">'
+    data_css += '<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js" integrity="sha384-0fdwu/T/EQMsQlrHCCHoH10pkPLlKA1jL5dFyUOvB3lfeT2540/2g6YgSi2BL14p" crossorigin="anonymous"></script>'
+
+    data = data[0:2] + ['', data_css] + data[2:]
 
     return data
 

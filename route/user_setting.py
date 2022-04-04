@@ -13,7 +13,8 @@ def user_setting_2(conn, server_set_var):
         if flask.request.method == 'POST':
             auto_list = [
                 ['skin', flask.request.form.get('skin', '')], 
-                ['lang', flask.request.form.get('lang', '')]
+                ['lang', flask.request.form.get('lang', '')],
+                ['user_title', flask.request.form.get('user_title', '')]
             ]
                 
             twofa_turn_on = 0 
@@ -50,10 +51,6 @@ def user_setting_2(conn, server_set_var):
             data = curs.fetchall()
             ramdom_key = data[0][0] if data and data[0][0] != '' else '-'
             
-            curs.execute(db_change('select data from user_set where name = "user_title" and id = ?'), [ip])
-            data = curs.fetchall()
-            user_title = data[0][0] if data and data[0][0] != '' else '-'
-
             curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
             data = curs.fetchall()
             div2 = load_skin(data[0][0] if data else '', 0, 1)
@@ -69,6 +66,18 @@ def user_setting_2(conn, server_set_var):
                     div3 = '<option value="' + lang_data + '">' + see_data + '</option>' + div3
                 else:
                     div3 += '<option value="' + lang_data + '">' + see_data + '</option>'
+            
+            # 여기 잘못 짬
+            curs.execute(db_change('select data from user_set where name = "user_title" and id = ?'), [ip])
+            data = curs.fetchall()
+            data = [['']] if not data else data
+            user_title_list = get_user_title_list()
+            div4 = ''
+            for user_title in user_title_list:                
+                if data and data[0][0] == user_title:
+                    div4 = '<option value="' + user_title + '">' + user_title_list[user_title] + '</option>' + div4
+                else:
+                    div4 += '<option value="' + user_title + '">' + user_title_list[user_title] + '</option>'
 
             curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [ip])
             fa_data = curs.fetchall()
@@ -98,8 +107,6 @@ def user_setting_2(conn, server_set_var):
                         <span>''' + load_lang('email') + ''' : ''' + email + '''</span> <a href="/change/email">(''' + load_lang('email_change') + ''')</a> <a href="/change/email/delete">(''' + load_lang('email_delete') + ''')</a>
                         <hr class="main_hr">
                         <span>''' + load_lang('password_instead_key') + ''' : ''' + ramdom_key + ''' <a href="/change/key">(''' + load_lang('key_change') + ''')</a> <a href="/change/key/delete">(''' + load_lang('key_delete') + ''')</a></span>
-                        <hr class="main_hr">
-                        <span>''' + load_lang('user_title') + ''' : ''' + user_title + ''' <a href="/change/title">(''' + load_lang('user_title_change') + ''')</a>
                         <h2>''' + load_lang('main') + '''</h2>
                         <span>''' + load_lang('skin') + '''</span>
                         <hr class="main_hr">
@@ -108,6 +115,10 @@ def user_setting_2(conn, server_set_var):
                         <span>''' + load_lang('language') + '''</span>
                         <hr class="main_hr">
                         <select name="lang">''' + div3 + '''</select>
+                        <hr class="main_hr">
+                        <span>''' + load_lang('user_title') + '''</span>
+                        <hr class="main_hr">
+                        <select name="user_title">''' + div4 + '''</select>
                         <h2>''' + load_lang('2fa') + '''</h2>
                         <select name="2fa"
                                 id="twofa_check_input"
