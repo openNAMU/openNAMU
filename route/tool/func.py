@@ -612,7 +612,8 @@ def get_user_title_list():
     }
     
     # admin
-    user_title['✅'] = '✅ admin'
+    if admin_check('all') == 1:
+        user_title['✅'] = '✅ admin'
     
     return user_title
 

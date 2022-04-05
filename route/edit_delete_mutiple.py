@@ -1,5 +1,5 @@
 from .tool.func import *
-from . import edit_delete
+from edit_delete import edit_delete
 
 def edit_delete_mutiple_2(conn):
     curs = conn.cursor()
