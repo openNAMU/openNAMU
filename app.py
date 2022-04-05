@@ -658,38 +658,18 @@ app.route('/login/find')(login_find)
 app.route('/login/find/key', methods = ['POST', 'GET'])(login_find_key)
 app.route('/login/find/email', methods = ['POST', 'GET'], defaults = { 'tool' : 'pass_find' })(login_find_email)
 app.route('/login/find/email/check', methods = ['POST', 'GET'], defaults = { 'tool' : 'check_key' })(login_find_email_check)
-
-@app.route('/logout')
-def login_logout():
-    return login_logout_2(load_db.db_get())
+app.route('/logout')(login_logout)
 
 # Func-vote
-@app.route('/vote/<int:num>', methods = ['POST', 'GET'])
-def vote_select(num = 1):
-    return vote_select_2(load_db.db_get(), str(num))
-
-@app.route('/vote/end/<int:num>')
-def vote_end(num = 1):
-    return vote_end_2(load_db.db_get(), str(num))
-
-@app.route('/vote/close/<int:num>')
-def vote_close(num = 1):
-    return vote_close_2(load_db.db_get(), str(num))
-
-@app.route('/vote')
-@app.route('/vote/list')
-@app.route('/vote/list/<int:num>')
-def vote_list(num = 1):
-    return vote_list_2(load_db.db_get(), 'normal', num)
-
-@app.route('/vote/list/close')
-@app.route('/vote/list/close/<int:num>')
-def vote_list_close(num = 1):
-    return vote_list_2(load_db.db_get(), 'close', num)
-
-@app.route('/vote/add', methods = ['POST', 'GET'])
-def vote_add():
-    return vote_add_2(load_db.db_get())
+app.route('/vote/<int:num>', methods = ['POST', 'GET'])(vote_select)
+app.route('/vote/end/<int:num>')(vote_end)
+app.route('/vote/close/<int:num>')(vote_close)
+app.route('/vote', defaults = { 'list_type' : 'normal' })(vote_list)
+app.route('/vote/list', defaults = { 'list_type' : 'normal' })(vote_list)
+app.route('/vote/list/<int:num>', defaults = { 'list_type' : 'normal' })(vote_list)
+app.route('/vote/list/close', defaults = { 'list_type' : 'close' })(vote_list)
+app.route('/vote/list/close/<int:num>', defaults = { 'list_type' : 'close' })(vote_list)
+app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 
 # Func-api
 app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):rev>')(api_w)
