@@ -880,6 +880,8 @@ def wiki_css(data):
     data_css_ver = '145'
     
     # Func JS
+    data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
+    
     data_css += '<script src="/views/main_css/js/func/http_warning_text.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/func/shortcut.js?ver=' + data_css_ver + '"></script>'

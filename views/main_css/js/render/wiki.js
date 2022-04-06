@@ -52,7 +52,35 @@ class opennamu_render_wiki {
         }
     }
     
+    do_part_toc() {
+        for(
+            let for_a = 1;
+            document.getElementById('opennamuHeadingContent' + String(for_a));
+            for_a++
+        ) {
+            let heading_data = document.getElementById('opennamuHeadingContent' + String(for_a));
+            document.getElementById('opennamuTOCcontent' + String(for_a)).innerHTML = heading_data.innerText;
+            
+            document.getElementById('opennamuHeadingContent' + String(for_a)).id = heading_data.innerText;
+        }
+        
+        let toc_data_all = document.getElementsByClassName('opennamuTOC');
+        let toc_data = '';
+        for(
+            let for_a = 0;
+            for_a < toc_data_all.length;
+            for_a++
+        ) {
+            if(toc_data === '') {
+                toc_data = toc_data_all[0].innerHTML;
+            }
+            
+            document.getElementsByClassName('opennamuTOC')[for_a].innerHTML = toc_data;
+        }
+    }
+    
     do_main() {
         this.do_part_link();
+        this.do_part_toc();
     }
 }
