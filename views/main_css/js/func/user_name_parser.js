@@ -1,17 +1,5 @@
 "use strict";
 
-function opennamu_do_id_check(data) {
-    if(data.match(/\.|\:/)) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
-
-function opennamu_do_url_encode(data) {
-    return encodeURIComponent(data);
-}
-
 function opennamu_do_user_document_check() {
     let data_all = document.getElementsByClassName('opennamu_user_link');
     for(let for_a = 0; for_a < data_all.length; for_a++) {

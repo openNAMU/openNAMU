@@ -67,10 +67,6 @@ class opennamu_render_markdown {
         return data;
     }
     
-    do_func_url_encode(data) {
-        return encodeURIComponent(data);
-    }
-    
     // Render Part
     do_part_text() {
         let parser_count = this.parser_count['parser'];
@@ -165,26 +161,49 @@ class opennamu_render_markdown {
         let parser_data_temp = this.parser_data_temp;
         
         let toc_data = '';
-        let toc_list = [0, 0, 0, 0, 0, 0];
-        let toc_regex = /\n(#{1,6})([^\n]+)\n/;
-        while(this.doc_data.match(toc_regex)) {
-            this.doc_data = this.doc_data.replace(toc_regex, function(match, x1, x2) {
-                let toc_level = x1.length - 1;
-                let toc_level_str = String(toc_level + 1);
+        
+        let heading_n = 0;
+        let heading_list = [0, 0, 0, 0, 0, 0];
+        let heading_regex = /\n(#{1,6})([^\n]+)\n/;
+        while(this.doc_data.match(heading_regex)) {
+            this.doc_data = this.doc_data.replace(heading_regex, function(match, x1, x2) {
+                let heading_level = x1.length - 1;
+                let heading_level_str = String(heading_level + 1);
 
-                toc_list[toc_level] += 1;
-                for(let for_a = toc_level + 1; for_a < 6; for_a++) {
-                    toc_list[for_a] = 0;
+                heading_list[heading_level] += 1;
+                for(let for_a = heading_level + 1; for_a < 6; for_a++) {
+                    heading_list[for_a] = 0;
                 }
 
-                let toc_list_str = '';
+                let heading_list_str = '';
                 for(let for_a = 0; for_a < 6; for_a++) {
-                    if(toc_list[for_a] !== 0) {
-                        toc_list_str += String(toc_list[for_a]) + '.'
+                    if(heading_list[for_a] !== 0) {
+                        heading_list_str += String(heading_list[for_a]) + '.'
                     }
                 }
+                
+                let heading_list_str_2 = heading_list_str.replace(/\.$/, '');
+                
+                heading_n += 1;
+                let heading_n_str = String(heading_n);
+                
+                toc_data += '' +
+                    '<a href="#opennamuHeading' + heading_list_str_2 + '">' + heading_list_str + '</a> ' +
+                    '<span id="opennamuTOCcontent' + heading_n_str + '"></span>' +
+                    '<br>' +
+                ''
+                
+                let heading_data = x2;
+                heading_data = heading_data.replace(/^ /, '');
 
-                return '\n<brEnd><h' + toc_level_str + '>' + toc_list_str + x2 + '</h' + toc_level_str + '><brStart>\n';
+                return '' + 
+                    '\n<brEnd>' + 
+                    '<h' + heading_level_str + ' id="opennamuHeading' + heading_list_str_2 + '">' + 
+                        '<a href="#opennamuTOC">' + heading_list_str + '</a> ' + 
+                        '<span id="opennamuHeadingContent' + heading_n_str + '">' + heading_data + '</span>' + 
+                    '</h' + heading_level_str + '>' +
+                    '<brStart>\n' +
+                '';
             });
         }
         
@@ -284,7 +303,7 @@ class opennamu_render_markdown {
                     link_title = render_main.do_func_xss_encode(link_main);
 
                     link_main = render_main.do_func_xss_decode(link_main);
-                    link_main = render_main.do_func_url_encode(link_main);
+                    link_main = opennamu_do_url_encode(link_main);
 
                     parser_data_temp['render' + parser_count_str + 'Span'] = '<a class="' + render_part_id_add + 'opennamuLink" title="' + link_title + '" href="/w/' + link_main + '">';
                     parser_data_temp['/render' + parser_count_str + 'Span'] = '</a>';
@@ -399,7 +418,7 @@ class opennamu_render_markdown {
         let parser_data_temp = this.parser_data_temp;
         let parser_data_temp_other = this.parser_data_temp_other;
         
-        this.doc_data = this.doc_data.replace(/\[([^\[\(<>]+)\(((?:(?!\(|\)\]|<|>).)+)\)\]/g, function(match, x1, x2) {
+        this.doc_data = this.doc_data.replace(/\[([^\[\(<>]+)\(((?:(?!\(|\)\]|<|>).)*)\)\]/g, function(match, x1, x2) {
             if(x1 === 'anchor') {
                 parser_count += 1;
                 let parser_count_str = String(parser_count);
@@ -420,7 +439,7 @@ class opennamu_render_markdown {
                 let link_title = render_main.do_func_xss_encode(link_main);
                 
                 link_main = render_main.do_func_xss_decode(link_main);
-                link_main = render_main.do_func_url_encode(link_main);
+                link_main = opennamu_do_url_encode(link_main);
                 
                 parser_data_temp_other['category'] += '<a class="' + render_part_id_add + 'opennamuLink" title="' + link_title + '" href="/w/' + link_main + '">';
                 parser_data_temp_other['category'] += category_data;
@@ -428,8 +447,21 @@ class opennamu_render_markdown {
                 parser_data_temp_other['category'] += ' | ';
                 
                 return '';
-            } else if(x1 === 'toc') {                
-                return parser_data_temp_other['toc'];
+            } else if(x1 === 'toc') {
+                if(parser_data_temp_other['toc'] !== '') {
+                    return '' +
+                        '<div class="opennamuTOC">' + 
+                            '<span class="opennamuTOCtitle">' +
+                                'TOC' +
+                            '</span>' + 
+                            '<br>' + 
+                            '<br>' + 
+                            parser_data_temp_other['toc'] + 
+                        '</div>' +
+                    '';
+                } else {
+                    return '';
+                }
             }
             else {
                 return '';
