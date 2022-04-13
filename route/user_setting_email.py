@@ -12,7 +12,7 @@ def user_setting_email_2(conn):
         re_set_list = ['c_key']
         flask.session['c_key'] = load_random_key(32)
 
-        user_email = flask.request.form.get('email', '')
+        user_email = re.sub(r'\\', '', flask.request.form.get('email', ''))
         email_data = re.search(r'@([^@]+)$', user_email)
         if email_data:
             curs.execute(db_change("select html from html_filter where html = ? and kind = 'email'"), [email_data.group(1)])
