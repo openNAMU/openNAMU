@@ -46,7 +46,7 @@ def search_deep_2(conn, name):
 
                     test = data[1]
 
-                div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a> (' + data[1] + ')</li>'
+                div_plus += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> (' + data[1] + ')</li>'
     else:
         curs.execute(db_change("select title from data where title like ? order by title limit ?, 50"),
             ['%' + name + '%', sql_num]
