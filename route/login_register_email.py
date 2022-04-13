@@ -9,7 +9,7 @@ def login_register_email_2(conn):
     if flask.request.method == 'POST':
         flask.session['reg_key'] = load_random_key(32)
 
-        user_email = flask.request.form.get('email', '')
+        user_email = re.sub(r'\\', '', flask.request.form.get('email', ''))
         email_data = re.search(r'@([^@]+)$', user_email)
         if email_data:
             email_data = email_data.group(1)
