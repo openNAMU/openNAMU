@@ -1,4 +1,4 @@
-function opennamu_ie_end_support() {
+function opennamu_do_ie_end_support() {
     if(document.currentScript === undefined) {
         window.location = 'microsoft-edge:' + window.location;
         setTimeout(function() {
@@ -7,4 +7,4 @@ function opennamu_ie_end_support() {
     }
 }
 
-opennamu_ie_end_support();
+opennamu_do_ie_end_support();
