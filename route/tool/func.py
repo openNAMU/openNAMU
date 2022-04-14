@@ -883,19 +883,21 @@ def wiki_css(data):
     data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
     
     data_css += '<script src="/views/main_css/js/func/http_warning_text.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script defer src="/views/main_css/js/func/shortcut.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script defer src="/views/main_css/js/func/user_name_parser.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/func/ie_end_of_life.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/func/shortcut.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/func/user_name_parser.js?ver=' + data_css_ver + '"></script>'
     
     # Render JS
     data_css += '<script src="/views/main_css/js/render/markdown.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script src="/views/main_css/js/render/wiki.js?ver=' + data_css_ver + '"></script>'
     
+    # Route JS
+    data_css += '<script src="/views/main_css/js/route/thread.js?ver=' + data_css_ver + '"></script>'
+    
     # 레거시 일반 JS
     data_css += '<script src="/views/main_css/js/load_editor.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script src="/views/main_css/js/load_skin_set.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script src="/views/main_css/js/load_something.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script src="/views/main_css/js/load_topic.js?ver=' + data_css_ver + '"></script>'
     
     # 레거시 렌더러 JS
     data_css += '<script src="/views/main_css/js/render_html.js?ver=' + data_css_ver + '"></script>'

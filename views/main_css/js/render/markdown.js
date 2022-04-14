@@ -9,6 +9,9 @@ class opennamu_render_markdown {
         doc_name
     ) {
         this.doc_data = document.getElementById(render_part_id_add + render_part_id).innerHTML;
+
+        render_part_id_add = render_part_id_add.replace(/_/g, '<underBar>');
+
         this.doc_data = this.doc_data.replace(/&amp;/g, '&');
         this.doc_data = '<brStart>\n' + this.doc_data + '\n<brEnd>';
         this.doc_data.replace(/\r/g, '');
@@ -478,6 +481,7 @@ class opennamu_render_markdown {
         this.doc_data = this.doc_data.replace(/\n?<brEnd>/g, '');
         
         this.doc_data = this.doc_data.replace(/<underBar>/g, '_');
+        this.render_part_id_add = this.render_part_id_add.replace(/<underBar>/g, '_');
         
         this.doc_data = this.doc_data.replace(/\n/g, '<br>');
         
