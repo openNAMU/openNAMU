@@ -6,7 +6,7 @@ def edit(name = 'Test', name_load = 0, section = 0):
     
         ip = ip_check()
         if acl_check(name) == 1:
-            return re_error('/ban')
+            return redirect('/raw/' + url_pas(name) + '/doc_acl')
         
         curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
         doc_ver = curs.fetchall()
@@ -137,7 +137,8 @@ def edit(name = 'Test', name_load = 0, section = 0):
             p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
     
             data = re.sub(r'\n+$', '', data)
-    
+            
+            # 이 파트 JS로 이동 예정
             monaco_on = flask.request.cookies.get('main_css_monaco', '0')
             if monaco_on == '1':
                 editor_display = 'style="display: none;"'
@@ -160,7 +161,9 @@ def edit(name = 'Test', name_load = 0, section = 0):
                         window.editor = monaco.editor.create(document.getElementById('monaco_editor'), {
                             value: document.getElementById('textarea_edit_view').value,
                             language: 'plaintext',
-                            theme: \'''' + monaco_thema + '''\'
+                            wordWrap: true,
+                            theme: \'''' + monaco_thema + '''\',
+                            minimap: { enabled: false }
                         });
                     });
                 '''

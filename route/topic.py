@@ -125,7 +125,7 @@ def topic(topic_num = 0):
                     <div id="top_topic"></div>
                     <div id="main_topic"></div>
                     <div id="plus_topic"></div>
-                    <script>new_topic_load("''' + topic_num + '''");</script>
+                    <script>opennamu_do_thread_make("''' + topic_num + '''");</script>
                     <a href="/thread/''' + topic_num + '/tool">(' + load_lang('topic_tool') + ''')</a>
                     <hr class="main_hr">
                     <form style="''' + display + '''" method="post">

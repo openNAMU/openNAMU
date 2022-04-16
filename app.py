@@ -61,6 +61,8 @@ if setup_tool != 'normal':
     create_data = {}
 
     # 폐지 예정 (data_set으로 통합)
+    create_data['data_set'] = ['doc_name', 'doc_rev', 'set_name', 'set_data']
+    
     create_data['data'] = ['title', 'data', 'type']
     create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
     create_data['rc'] = ['id', 'title', 'date', 'type']
@@ -161,7 +163,7 @@ server_set_var = {
         'display' : 'Markup',
         'require' : 'select',
         'default' : 'namumark',
-        'list' : ['namumark', 'custom', 'raw']
+        'list' : ['namumark', 'markdown', 'custom', 'raw']
     }, 'encode' : {
         'display' : 'Encryption method',
         'require' : 'select',
@@ -467,10 +469,10 @@ def view_xref(name = 'Test'):
 def view_xref_this(name = 'Test'):
     return view_xref_2(load_db.db_get(), name, xref_type = '2')
 
-@app.route('/raw/<everything:name>')
-@app.route('/thread/<int:topic_num>/raw/<int:num>')
-def view_raw(name = None, topic_num = None, num = None):
-    return view_raw_2(load_db.db_get(), name, topic_num, num)
+app.route('/raw/<everything:name>')(view_raw_2)
+app.route('/raw/<everything:name>/doc_acl', defaults = { 'doc_acl' : 1 })(view_raw_2)
+app.route('/raw/<everything:name>/doc_rev/<int:num>')(view_raw_2)
+app.route('/thread/<int:topic_num>/raw/<int:num>')(view_raw_2)
 
 @app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')
 def view_diff(name = 'Test', num_a = 1, num_b = 1):
@@ -595,6 +597,8 @@ def user_setting_head():
 def user_info(name = ''):
     return user_info_2(load_db.db_get(), name)
 
+app.route('/challenge')(user_challenge)
+
 @app.route('/count')
 @app.route('/count/<name>')
 def user_count_edit(name = None):
@@ -654,42 +658,22 @@ app.route('/login/find')(login_find)
 app.route('/login/find/key', methods = ['POST', 'GET'])(login_find_key)
 app.route('/login/find/email', methods = ['POST', 'GET'], defaults = { 'tool' : 'pass_find' })(login_find_email)
 app.route('/login/find/email/check', methods = ['POST', 'GET'], defaults = { 'tool' : 'check_key' })(login_find_email_check)
-
-@app.route('/logout')
-def login_logout():
-    return login_logout_2(load_db.db_get())
+app.route('/logout')(login_logout)
 
 # Func-vote
-@app.route('/vote/<int:num>', methods = ['POST', 'GET'])
-def vote_select(num = 1):
-    return vote_select_2(load_db.db_get(), str(num))
-
-@app.route('/vote/end/<int:num>')
-def vote_end(num = 1):
-    return vote_end_2(load_db.db_get(), str(num))
-
-@app.route('/vote/close/<int:num>')
-def vote_close(num = 1):
-    return vote_close_2(load_db.db_get(), str(num))
-
-@app.route('/vote')
-@app.route('/vote/list')
-@app.route('/vote/list/<int:num>')
-def vote_list(num = 1):
-    return vote_list_2(load_db.db_get(), 'normal', num)
-
-@app.route('/vote/list/close')
-@app.route('/vote/list/close/<int:num>')
-def vote_list_close(num = 1):
-    return vote_list_2(load_db.db_get(), 'close', num)
-
-@app.route('/vote/add', methods = ['POST', 'GET'])
-def vote_add():
-    return vote_add_2(load_db.db_get())
+app.route('/vote/<int:num>', methods = ['POST', 'GET'])(vote_select)
+app.route('/vote/end/<int:num>')(vote_end)
+app.route('/vote/close/<int:num>')(vote_close)
+app.route('/vote', defaults = { 'list_type' : 'normal' })(vote_list)
+app.route('/vote/list', defaults = { 'list_type' : 'normal' })(vote_list)
+app.route('/vote/list/<int:num>', defaults = { 'list_type' : 'normal' })(vote_list)
+app.route('/vote/list/close', defaults = { 'list_type' : 'close' })(vote_list)
+app.route('/vote/list/close/<int:num>', defaults = { 'list_type' : 'close' })(vote_list)
+app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 
 # Func-api
 app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):rev>')(api_w)
-app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['GET', 'POST'])(api_w)
+app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['POST', 'GET'])(api_w)
 app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
 app.route('/api/raw/<everything:name>')(api_raw)
 
@@ -697,7 +681,7 @@ app.route('/api/version', defaults = { 'version_list' : version_list })(api_vers
 app.route('/api/skin_info')(api_skin_info)
 app.route('/api/skin_info/<name>')(api_skin_info)
 app.route('/api/markup')(api_markup)
-app.route('/api/user_info/<name>')(api_user_info)
+app.route('/api/user_info/<name>', methods = ['POST', 'GET'])(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
 app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic_sub)

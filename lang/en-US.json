@@ -221,6 +221,8 @@
         "key_change" : "Change key",
         "key_delete" : "Delete key",
         "email_delete" : "Delete email",
+        "challenge" : "Challenge",
+        "user_title" : "User title",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
@@ -409,6 +411,7 @@
         "enter_html" : "Please enter HTML",
         "exp_edit_conflict" : "Editing conflict occurred",
         "same_ip_exist" : "Same IP exists",
+        "old_page_warring" : "This page is out of date.",
         "_comment_3.1_" : "Error",
             "update_error" : "Auto update is not supported.",
             "inter_error" : "Internal error.",
@@ -450,5 +453,17 @@
             "user_head_warning" : "User data will be deleted if you close the browser or when you sign in.",
             "no_login_warning" : "You are not logged in. Your current IP address will be logged within editing or discussing until you log in.",
             "update_warning" : "Manual updates are recommended if your version is 0.2 or lower than the latest version. For Windows, the contents of the route folder will be deleted.",
-            "history_delete_warning" : "If you erase history, it's hard to restore it, so please be careful."
+            "history_delete_warning" : "If you erase history, it's hard to restore it, so please be careful.",
+        "_comment_" : "Challenge",
+            "challenge_title_register" : "Hello, World!",
+            "challenge_info_register" : "Sign up",
+    
+            "challenge_title_first_contribute" : "Well begun is half done.",
+            "challenge_info_first_contribute" : "Make your 1st contribution",
+    
+            "challenge_title_tenthousandth_contribute" : "Rome wasn't built in a day.",
+            "challenge_info_tenthousandth_contribute" : "Make your 1000th contribution",
+    
+            "challenge_title_thousandth_discussion" : "I think, therefore I am.",
+            "challenge_info_thousandth_discussion" : "Post the 1000th discussion thread"
 }

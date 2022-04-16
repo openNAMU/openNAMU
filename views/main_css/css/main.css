@@ -120,7 +120,7 @@ a {
 }
 
 /* 위키 내용 관련 */
-#toc {
+#toc, .opennamuTOC {
     border: 1px solid gainsboro;
     padding: 20px;
     
@@ -146,7 +146,7 @@ pre {
     white-space: pre-wrap;
 }
 
-#toc_title {
+#toc_title, .opennamuTOCtitle {
     font-size: 1.2rem;
 }
 
@@ -186,6 +186,10 @@ hr {
     white-space: pre-wrap;
     
     line-break: anywhere;
+}
+
+.render_content_load {
+    display: none;
 }
 
 blockquote {
