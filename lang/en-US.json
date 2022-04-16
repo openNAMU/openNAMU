@@ -221,6 +221,8 @@
         "key_change" : "Change key",
         "key_delete" : "Delete key",
         "email_delete" : "Delete email",
+        "challenge" : "Challenge",
+        "user_title" : "User title",
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
