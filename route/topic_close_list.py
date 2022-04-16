@@ -40,9 +40,9 @@ def topic_close_list(name = 'Test'):
                 <div id="topic_pre_''' + data[0] + '''"></div>
                 <div id="topic_back_pre_''' + data[0] + '''"></div>
                 <script>
-                    new_topic_load(''' + data[0] + ', "list", "/normal/1", "topic_pre_' + data[0] + '''");
+                    opennamu_do_thread_make(''' + data[0] + ', "list", "/normal/1", "topic_pre_' + data[0] + '''");
                     if(''' + t_data[0][0] + ''' !== 1) {
-                        new_topic_load(''' + data[0] + ', "list", "/normal/' + t_data[0][0] + '", "topic_back_pre_' + data[0] + '''");
+                        opennamu_do_thread_make(''' + data[0] + ', "list", "/normal/' + t_data[0][0] + '", "topic_back_pre_' + data[0] + '''");
                     }
                 </script>
             '''
