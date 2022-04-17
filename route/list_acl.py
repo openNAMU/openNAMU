@@ -11,7 +11,6 @@ def list_acl_2(conn):
         "select distinct title, data, type from acl where data != '' and not title like 'user:%' order by title desc limit ?, 50"
     ), [sql_num])
     list_data = curs.fetchall()
-    print(list_data)
     for data in list_data:
         curs.execute(db_change("select time from re_admin where what like ? order by time desc limit 1"), ['acl (' + data[0] + ')%'])
         time_data = curs.fetchall()

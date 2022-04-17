@@ -1,9 +1,3 @@
-function do_render_wiki() {
-    (function (callback) {
-        
-    });
-}
-
 function get_link_state(data) {
     let data_exter_link = '0';
     if(document.cookie.match(main_css_regex_data('main_css_exter_link'))) {
