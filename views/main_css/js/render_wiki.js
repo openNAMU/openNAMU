@@ -1,3 +1,9 @@
+function do_render_wiki() {
+    (function (callback) {
+        
+    });
+}
+
 function get_link_state(data) {
     let data_exter_link = '0';
     if(document.cookie.match(main_css_regex_data('main_css_exter_link'))) {
@@ -56,6 +62,15 @@ function get_heading_name() {
     let heading_name = document.getElementsByClassName('render_heading_text');
     for(let i = 0; i < heading_name.length; i++) {
         heading_name[i].id = heading_name[i].innerText.replace(/^([0-9]+\.)+ /, '').replace(/ ✎ ⊖$/, '');
+    }
+}
+
+function do_heading_move() {
+    let data_url_v = window.location.hash.replace(/^#/, '');
+    if(data_url_v !== '') {
+        if(document.getElementById(data_url_v)) {
+            document.getElementById(data_url_v).focus();
+        }
     }
 }
 
