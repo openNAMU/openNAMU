@@ -59,6 +59,15 @@ function get_heading_name() {
     }
 }
 
+function do_heading_move() {
+    let data_url_v = window.location.hash.replace(/^#/, '');
+    if(data_url_v !== '') {
+        if(document.getElementById(data_url_v)) {
+            document.getElementById(data_url_v).focus();
+        }
+    }
+}
+
 function load_image_link(data, data_type = 0) {
     let data_end = '';
     data_end = '' +

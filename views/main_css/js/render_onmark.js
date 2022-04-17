@@ -1464,6 +1464,7 @@ function do_onmark_render(
             );
             
             data_js += '' + 
+                'do_heading_move();\n' + 
                 'get_link_state("' + name_include + '");\n' + 
                 'get_file_state("' + name_include + '");\n' + 
         		'get_heading_name();\n' +
@@ -1472,6 +1473,10 @@ function do_onmark_render(
             
             if(test_mode === 'normal') {
                 document.getElementById(name_id).innerHTML = data + '<script>' + data_js + '</script>';
+                
+                document.getElementById(name_id).style.display = "";
+                document.getElementById(name_id + '_load').style.display = "none";
+                
                 eval(data_js);
             } else if(test_mode === 'manual') {
                 return [data, data_js];

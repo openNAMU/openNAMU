@@ -26,6 +26,7 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
             let data_all = '';
             let data_all_js = '';
             
+            let count = 0;
             for(let key in data_t) {
                 let data_a = '';
                 
@@ -109,11 +110,19 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                     '<hr class="main_hr">' + 
                 ''
 
-                data_all += data_a;
+                document.getElementById(where).innerHTML += data_a;
+                
+                count += 1;
                 data_all_js += data_t[key]['data_pas'][1] + '\n';
+                
+                if(count > 100) {
+                    eval(data_all_js);
+                    
+                    count = 0;
+                    data_all_js = '';
+                }
             }
             
-            document.getElementById(where).innerHTML += data_all;
             eval(data_all_js);
             
             opennamu_do_ip_parser();
@@ -121,10 +130,10 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
             if(type_do === 'top') {
                 opennamu_do_thread_make(topic_num, 'main', '', 'main_topic');
             } else if(type_do === 'main') {
-                let data_url_v = window.location.href.split('#');
-                if(data_url_v.length !== 0) {
-                    if(document.getElementById(data_url_v[1])) {
-                        document.getElementById(data_url_v[1]).focus();
+                let data_url_v = window.location.hash.replace(/^#/, '');
+                if(data_url_v !== '') {
+                    if(document.getElementById(data_url_v)) {
+                        document.getElementById(data_url_v).focus();
                     }
                 }
                 

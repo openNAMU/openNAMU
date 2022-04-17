@@ -34,7 +34,6 @@ print('9. Delete set.json')
 print('10. Change name')
 print('11. Delete mysql.json')
 print('12. All title count reset')
-print('13. Cache data reset')
 print('14. Delete Main <HEAD>')
 print('15. Give owner')
 print('16. Delete 2FA password')
@@ -197,8 +196,6 @@ elif what_i_do == '12':
         ),
         [str(count_data)]
     )
-elif what_i_do == '13':
-    curs.execute(db_change('delete from cache_data'))
 elif what_i_do == '14':
     curs.execute(db_change('delete from other where name = "head"'))
 elif what_i_do == '15':
