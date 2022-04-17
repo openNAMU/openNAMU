@@ -117,8 +117,8 @@ class class_do_render:
                 doc_name = html.escape(doc_name)
                 
                 data_end = [
-                    '<pre class="render_content_load" id="' + data_in + 'render_content_load">' + doc_data + '</pre>' + \
-                    '<div class="render_content" id="' + data_in + 'render_content"></div>', 
+                    '<div class="render_content_load" id="' + data_in + 'render_content_load">' + doc_data + '</div>' + \
+                    '<div class="render_content" id="' + data_in + 'render_content" style="display: none;"></div>', 
                     '''
                         do_onmark_render(
                             test_mode = "normal", 
@@ -135,8 +135,8 @@ class class_do_render:
                 doc_name = html.escape(doc_name)
                 
                 data_end = [
-                    '<pre class="render_content_load" id="' + data_in + 'render_content_load">' + html.escape(doc_data) + '</pre>' + \
-                    '<div class="render_content" id="' + data_in + 'render_content"></div>', 
+                    '<div class="render_content_load" id="' + data_in + 'render_content_load">' + html.escape(doc_data) + '</div>' + \
+                    '<div class="render_content" id="' + data_in + 'render_content" style="display: none;"></div>', 
                     'new opennamu_render_markdown(' + \
                         'render_part_id = "render_content_load",' + \
                         'render_part_id_after = "render_content",' + \
