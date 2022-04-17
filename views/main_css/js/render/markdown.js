@@ -30,6 +30,7 @@ class opennamu_render_markdown {
         this.parser_count['parser'] = 0;
         this.parser_count['nowiki'] = 0;
         
+        this.render_part_id = render_part_id;
         this.render_part_id_add = render_part_id_add;
         this.render_part_id_after = render_part_id_after;
     }
@@ -508,7 +509,12 @@ class opennamu_render_markdown {
         this.do_part_final();
         
         this.doc_data = this.do_func_parser_to_text(this.doc_data);
+        
         document.getElementById(this.render_part_id_add + this.render_part_id_after).innerHTML = this.doc_data;
+        
+        document.getElementById(this.render_part_id_add + this.render_part_id).style.display = "none";
+        document.getElementById(this.render_part_id_add + this.render_part_id_after).style.display = "";
+        
         for(let x1 in this.parser_data_js) {
             eval(this.parser_data_js[x1]);
         }
