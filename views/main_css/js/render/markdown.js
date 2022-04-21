@@ -55,6 +55,7 @@ class opennamu_render_markdown {
     }
     
     do_func_xss_encode(data) {
+        data = data.replace(/'/g, '&#x27;');
         data = data.replace(/"/g, '&quot;');
         data = data.replace(/</g, '&lt;');
         data = data.replace(/</g, '&gt;');
