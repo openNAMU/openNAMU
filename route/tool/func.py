@@ -926,8 +926,8 @@ def wiki_css(data):
 def cut_100(data):
     # without_DB
     
-    data = data.replace('<div class="render_content_load" id="render_content_load">', '')
-    data = data.replace('</div>', ' ' * 100)
+    data = data.replace('<pre class="render_content_load" id="render_content_load">', '')
+    data = data.replace('</pre>', ' ' * 100)
     
     return data[0 : 100]
 
