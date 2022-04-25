@@ -77,7 +77,7 @@ class opennamu_render_markdown {
         let parser_count = this.parser_count['parser'];
         let parser_data_temp = this.parser_data_temp;
         
-        this.doc_data = this.doc_data.replace(/~~((?:(?!~~).)+)~~/g, function(match, x1) {
+        this.doc_data = this.doc_data.replace(/~~((?:(?!~~|\n).)+)~~/g, function(match, x1) {
             parser_count += 1;
             let parser_count_str = String(parser_count);
             
@@ -87,7 +87,7 @@ class opennamu_render_markdown {
             return '<render' + parser_count_str + 'Span>' + x1 + '</render' + parser_count_str + 'Span>';
         });
         
-        this.doc_data = this.doc_data.replace(/\*\*((?:(?!\*\*).)+)\*\*/g, function(match, x1) {
+        this.doc_data = this.doc_data.replace(/\*\*((?:(?!\*\*|\n).)+)\*\*/g, function(match, x1) {
             parser_count += 1;
             let parser_count_str = String(parser_count);
             
@@ -97,7 +97,7 @@ class opennamu_render_markdown {
             return '<render' + parser_count_str + 'Span>' + x1 + '</render' + parser_count_str + 'Span>';
         });
         
-        this.doc_data = this.doc_data.replace(/__((?:(?!__).)+)__/g, function(match, x1) {
+        this.doc_data = this.doc_data.replace(/__((?:(?!__|\n).)+)__/g, function(match, x1) {
             parser_count += 1;
             let parser_count_str = String(parser_count);
             
@@ -107,7 +107,7 @@ class opennamu_render_markdown {
             return '<render' + parser_count_str + 'Span>' + x1 + '</render' + parser_count_str + 'Span>';
         });
         
-        this.doc_data = this.doc_data.replace(/\*([^*]+)\*/g, function(match, x1) {
+        this.doc_data = this.doc_data.replace(/\*([^*\n]+)\*/g, function(match, x1) {
             parser_count += 1;
             let parser_count_str = String(parser_count);
             
@@ -117,7 +117,7 @@ class opennamu_render_markdown {
             return '<render' + parser_count_str + 'Span>' + x1 + '</render' + parser_count_str + 'Span>';
         });
         
-        this.doc_data = this.doc_data.replace(/_([^_]+)_/g, function(match, x1) {
+        this.doc_data = this.doc_data.replace(/_([^_\n]+)_/g, function(match, x1) {
             parser_count += 1;
             let parser_count_str = String(parser_count);
             
@@ -127,7 +127,7 @@ class opennamu_render_markdown {
             return '<render' + parser_count_str + 'Span>' + x1 + '</render' + parser_count_str + 'Span>';
         });
         
-        this.doc_data = this.doc_data.replace(/&lt;ins&gt;((?:(?!&lt;ins&gt;|&lt;\/ins&gt;).)+)&lt;\/ins&gt;/g, function(match, x1) {
+        this.doc_data = this.doc_data.replace(/&lt;ins&gt;((?:(?!&lt;ins&gt;|&lt;\/ins&gt;|\n).)+)&lt;\/ins&gt;/g, function(match, x1) {
             parser_count += 1;
             let parser_count_str = String(parser_count);
             
@@ -137,7 +137,7 @@ class opennamu_render_markdown {
             return '<render' + parser_count_str + 'Span>' + x1 + '</render' + parser_count_str + 'Span>';
         });
         
-        this.doc_data = this.doc_data.replace(/&lt;sub&gt;((?:(?!&lt;sub&gt;|&lt;\/sub&gt;).)+)&lt;\/sub&gt;/g, function(match, x1) {
+        this.doc_data = this.doc_data.replace(/&lt;sub&gt;((?:(?!&lt;sub&gt;|&lt;\/sub&gt;|\n).)+)&lt;\/sub&gt;/g, function(match, x1) {
             parser_count += 1;
             let parser_count_str = String(parser_count);
             
@@ -147,7 +147,7 @@ class opennamu_render_markdown {
             return '<render' + parser_count_str + 'Span>' + x1 + '</render' + parser_count_str + 'Span>';
         });
         
-        this.doc_data = this.doc_data.replace(/&lt;sup&gt;((?:(?!&lt;sup&gt;|&lt;\/sup&gt;).)+)&lt;\/sup&gt;/g, function(match, x1) {
+        this.doc_data = this.doc_data.replace(/&lt;sup&gt;((?:(?!&lt;sup&gt;|&lt;\/sup&gt;|\n).)+)&lt;\/sup&gt;/g, function(match, x1) {
             parser_count += 1;
             let parser_count_str = String(parser_count);
             
@@ -222,7 +222,7 @@ class opennamu_render_markdown {
         let parser_count = this.parser_count['parser'];
         let parser_data_temp = this.parser_data_temp;
         
-        this.doc_data = this.doc_data.replace(/!\[([^\[\]]*)\]\(([^\(\)]*)\)/g, function(match, x1, x2) {
+        this.doc_data = this.doc_data.replace(/!\[([^\[\]\n]*)\]\(([^\(\)\n]*)\)/g, function(match, x1, x2) {
             if(x1 === '' && x2 === '') {
                 return '<imageBlink>';
             } else {
@@ -267,7 +267,7 @@ class opennamu_render_markdown {
         let parser_count = this.parser_count['parser'];
         let parser_data_temp = this.parser_data_temp;
         
-        this.doc_data = this.doc_data.replace(/\[([^\[\]]*)\]\(([^\(\)]*)\)/g, function(match, x1, x2) {
+        this.doc_data = this.doc_data.replace(/\[([^\[\]\n]*)\]\(([^\(\)\n]*)\)/g, function(match, x1, x2) {
             if(x1 === '' && x2 === '') {
                 return '<linkBlink>';
             } else {
@@ -423,7 +423,7 @@ class opennamu_render_markdown {
         let parser_data_temp = this.parser_data_temp;
         let parser_data_temp_other = this.parser_data_temp_other;
         
-        this.doc_data = this.doc_data.replace(/\[([^\[\(<>]+)\(((?:(?!\(|\)\]|<|>).)*)\)\]/g, function(match, x1, x2) {
+        this.doc_data = this.doc_data.replace(/\[([^\[\(<>\n]+)\(((?:(?!\(|\)\]|<|>|\n).)*)\)\]/g, function(match, x1, x2) {
             if(x1 === 'anchor') {
                 parser_count += 1;
                 let parser_count_str = String(parser_count);
@@ -478,6 +478,67 @@ class opennamu_render_markdown {
         this.parser_data_temp_other = parser_data_temp_other;
     }
     
+    do_part_nowiki() {
+        let render_main = this;
+        
+        let parser_count = this.parser_count['parser'];
+        let parser_data_temp = this.parser_data_temp;
+        
+        this.doc_data = this.doc_data.replace(/\\\\/g, '<slash>');
+        this.doc_data = this.doc_data.replace(/\\(.)/g, function(match, x1) {
+            let nowiki_data = x1;
+            
+            parser_count += 1;
+            let parser_count_str = String(parser_count);
+
+            parser_data_temp['render' + parser_count_str + 'Span'] = nowiki_data;
+            parser_data_temp['/render' + parser_count_str + 'Span'] = '';
+            
+            return '<render' + parser_count_str + 'Span>' + '</render' + parser_count_str + 'Span>';
+        });
+        this.doc_data = this.doc_data.replace(/<slash>/g, '\\');
+        
+        this.doc_data = this.doc_data.replace(/```((?:(?:(?!```).)|\n)+)```/g, function(match, x1) {
+            let nowiki_data = render_main.do_func_parser_to_text(x1);
+            
+            parser_count += 1;
+            let parser_count_str = String(parser_count);
+            
+            if(nowiki_data.match(/\n/)) {
+                parser_data_temp['render' + parser_count_str + 'Span'] = '<pre>' + nowiki_data;
+                parser_data_temp['/render' + parser_count_str + 'Span'] = '</pre>';
+            } else {
+                parser_data_temp['render' + parser_count_str + 'Span'] = '<code>' + nowiki_data;
+                parser_data_temp['/render' + parser_count_str + 'Span'] = '</code>';
+            }
+            
+            return '<render' + parser_count_str + 'Span>' + '</render' + parser_count_str + 'Span>';
+        });
+        
+        // 원래 문법 원복 기능 필요
+        this.doc_data = this.doc_data.replace(
+            /&lt;pre&gt;(?:\n| )*&lt;code&gt;((?:(?:(?!&lt;pre&gt;(?:\n| )*&lt;code&gt;|&lt;\/code&gt;(?:\n| )*&lt;\/pre&gt;).)|\n)+)&lt;\/code&gt;(?:\n| )*&lt;\/pre&gt;/g,
+            function(match, x1) {
+            let nowiki_data = render_main.do_func_parser_to_text(x1);
+            
+            parser_count += 1;
+            let parser_count_str = String(parser_count);
+            
+            if(nowiki_data.match(/\n/)) {
+                parser_data_temp['render' + parser_count_str + 'Span'] = '<pre>' + nowiki_data;
+                parser_data_temp['/render' + parser_count_str + 'Span'] = '</pre>';
+            } else {
+                parser_data_temp['render' + parser_count_str + 'Span'] = '<code>' + nowiki_data;
+                parser_data_temp['/render' + parser_count_str + 'Span'] = '</code>';
+            }
+            
+            return '<render' + parser_count_str + 'Span>' + '</render' + parser_count_str + 'Span>';
+        });
+        
+        this.parser_count['parser'] = parser_count;
+        this.parser_data_temp = parser_data_temp;
+    }
+    
     do_part_final() {
         this.doc_data = this.doc_data.replace(/<brStart>\n?/g, '');
         this.doc_data = this.doc_data.replace(/\n?<brEnd>/g, '');
@@ -501,6 +562,7 @@ class opennamu_render_markdown {
     
     // Main Part
     do_main() {
+        this.do_part_nowiki();
         this.do_part_heading();
         this.do_part_footnote();
         this.do_part_macro();
