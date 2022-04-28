@@ -39,7 +39,7 @@ class opennamu_render_markdown {
     do_func_parser_to_text(data, parser_type = 'parser') {
         let parser_data_temp = this.parser_data_temp;
         let parser_match;
-        if(parser_type === 'nowiki') {
+        if(parser_type === 'nowiki' || parser_type === 'nowikiEnd') {
             parser_match = /<(\/?nowiki[0-9]+Span)>/;
         } else {
             parser_match = /<(\/?render[0-9]+Span)>/;
@@ -47,7 +47,11 @@ class opennamu_render_markdown {
         
         while(data.match(parser_match)) {
             data = data.replace(parser_match, function(match, x1) {
-                return parser_data_temp[x1];
+                if(parser_type === 'nowikiEnd') {
+                    return parser_data_temp[x1 + 'End'];
+                } else {
+                    return parser_data_temp[x1];
+                }
             });
         }
         
@@ -491,48 +495,64 @@ class opennamu_render_markdown {
             parser_count += 1;
             let parser_count_str = String(parser_count);
 
-            parser_data_temp['render' + parser_count_str + 'Span'] = nowiki_data;
-            parser_data_temp['/render' + parser_count_str + 'Span'] = '';
+            parser_data_temp['nowiki' + parser_count_str + 'Span'] = match;
+            parser_data_temp['/nowiki' + parser_count_str + 'Span'] = '';
             
-            return '<render' + parser_count_str + 'Span>' + '</render' + parser_count_str + 'Span>';
+            parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = x1;
+            parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '';
+            
+            return '<nowiki' + parser_count_str + 'Span>' + '</nowiki' + parser_count_str + 'Span>';
         });
         this.doc_data = this.doc_data.replace(/<slash>/g, '\\');
         
+        // 원복은 했는데 마지막에는 적용 안되게 필요
         this.doc_data = this.doc_data.replace(/```((?:(?:(?!```).)|\n)+)```/g, function(match, x1) {
-            let nowiki_data = render_main.do_func_parser_to_text(x1);
+            let nowiki_data = render_main.do_func_parser_to_text(x1, 'nowiki');
             
             parser_count += 1;
             let parser_count_str = String(parser_count);
             
             if(nowiki_data.match(/\n/)) {
-                parser_data_temp['render' + parser_count_str + 'Span'] = '<pre>' + nowiki_data;
-                parser_data_temp['/render' + parser_count_str + 'Span'] = '</pre>';
+                parser_data_temp['nowiki' + parser_count_str + 'Span'] = match;
+                parser_data_temp['/nowiki' + parser_count_str + 'Span'] = '';
+                
+                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = x1;
+                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '';
             } else {
-                parser_data_temp['render' + parser_count_str + 'Span'] = '<code>' + nowiki_data;
-                parser_data_temp['/render' + parser_count_str + 'Span'] = '</code>';
+                parser_data_temp['nowiki' + parser_count_str + 'Span'] = match;
+                parser_data_temp['/nowiki' + parser_count_str + 'Span'] = '';
+                
+                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = x1;
+                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '';
             }
             
-            return '<render' + parser_count_str + 'Span>' + '</render' + parser_count_str + 'Span>';
+            return '<nowiki' + parser_count_str + 'Span>' + '</nowiki' + parser_count_str + 'Span>';
         });
         
         // 원래 문법 원복 기능 필요
         this.doc_data = this.doc_data.replace(
             /&lt;pre&gt;(?:\n| )*&lt;code&gt;((?:(?:(?!&lt;pre&gt;(?:\n| )*&lt;code&gt;|&lt;\/code&gt;(?:\n| )*&lt;\/pre&gt;).)|\n)+)&lt;\/code&gt;(?:\n| )*&lt;\/pre&gt;/g,
             function(match, x1) {
-            let nowiki_data = render_main.do_func_parser_to_text(x1);
+            let nowiki_data = render_main.do_func_parser_to_text(x1, 'nowiki');
             
             parser_count += 1;
             let parser_count_str = String(parser_count);
             
             if(nowiki_data.match(/\n/)) {
-                parser_data_temp['render' + parser_count_str + 'Span'] = '<pre>' + nowiki_data;
-                parser_data_temp['/render' + parser_count_str + 'Span'] = '</pre>';
+                parser_data_temp['nowiki' + parser_count_str + 'Span'] = match;
+                parser_data_temp['/nowiki' + parser_count_str + 'Span'] = '';
+                
+                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = x1;
+                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '';
             } else {
-                parser_data_temp['render' + parser_count_str + 'Span'] = '<code>' + nowiki_data;
-                parser_data_temp['/render' + parser_count_str + 'Span'] = '</code>';
+                parser_data_temp['nowiki' + parser_count_str + 'Span'] = match;
+                parser_data_temp['/nowiki' + parser_count_str + 'Span'] = '';
+                
+                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = x1;
+                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '';
             }
             
-            return '<render' + parser_count_str + 'Span>' + '</render' + parser_count_str + 'Span>';
+            return '<nowiki' + parser_count_str + 'Span>' + '</nowiki' + parser_count_str + 'Span>';
         });
         
         this.parser_count['parser'] = parser_count;
@@ -572,6 +592,7 @@ class opennamu_render_markdown {
         this.do_part_final();
         
         this.doc_data = this.do_func_parser_to_text(this.doc_data);
+        this.doc_data = this.do_func_parser_to_text(this.doc_data, 'nowikiEnd');
         
         document.getElementById(this.render_part_id_add + this.render_part_id_after).innerHTML = this.doc_data;
         
