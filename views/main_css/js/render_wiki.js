@@ -124,7 +124,7 @@ function get_file_state_intermal(data, data_inter) {
     var data_dict = {};
     var data_list = [];
     for(var key in data_inter) {
-        var data_class = document.getElementsByClassName(data + 'file_finder')[key];
+        var data_class = document.getElementsByClassName(data + 'file_finder')[data_inter[key]];
     
         var file_org = data_class.getAttribute('under_alt');
         var file_type = file_org.split('.');
@@ -141,9 +141,9 @@ function get_file_state_intermal(data, data_inter) {
         data_list.push(file_name);
         
         if(!data_dict[file_org]['list']) {
-            data_dict[file_org]['list'] = [key];
+            data_dict[file_org]['list'] = [data_inter[key]];
         } else {
-            data_dict[file_org]['list'].push(key);
+            data_dict[file_org]['list'].push(data_inter[key]);
         }
     }
     
