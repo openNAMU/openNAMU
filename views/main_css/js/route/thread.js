@@ -74,12 +74,12 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                     ip += ' <a href="/admin_log?search=blind%20(code%20' + topic_num + '#' + key + '">(B)</a>';
                     
                     if(admin === '1') {
-                        ip += ' <a href="/thread/' + topic_num + '/raw/' + key + '">(R)</a>';
+                        ip += ' <a href="/thread/' + topic_num + '/comment/' + key + '/raw">(R)</a>';
                     }
                 }
                 
                 if(admin === '1' || blind !== 'O') {
-                    ip += ' <a href="/thread/' + topic_num + '/admin/' + key + '">(T)</a>';
+                    ip += ' <a href="/thread/' + topic_num + '/comment/' + key + '/tool">(T)</a>';
                 }
                 
                 if(type_do === 'top') {
