@@ -472,7 +472,6 @@ def view_xref_this(name = 'Test'):
 app.route('/raw/<everything:name>')(view_raw_2)
 app.route('/raw/<everything:name>/doc_acl', defaults = { 'doc_acl' : 1 })(view_raw_2)
 app.route('/raw/<everything:name>/doc_rev/<int:num>')(view_raw_2)
-app.route('/thread/<int:topic_num>/raw/<int:num>')(view_raw_2)
 
 @app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')
 def view_diff(name = 'Test', num_a = 1, num_b = 1):
@@ -531,40 +530,20 @@ def recent_discuss_close():
 def recent_discuss_open():
     return recent_discuss_2(load_db.db_get(), 'open')
 
-@app.route('/thread/<int:topic_num>/b/<int:num>')
-def topic_block(topic_num = 1, num = 1):
-    return topic_block_2(load_db.db_get(), topic_num, num)
-
-@app.route('/thread/<int:topic_num>/notice/<int:num>')
-def topic_top(topic_num = 1, num = 1):
-    return topic_top_2(load_db.db_get(), topic_num, num)
-
-@app.route('/thread/<int:topic_num>/setting', methods = ['POST', 'GET'])
-def topic_stop(topic_num = 1):
-    return topic_stop_2(load_db.db_get(), topic_num)
-
-@app.route('/thread/<int:topic_num>/acl', methods = ['POST', 'GET'])
-def topic_acl(topic_num = 1):
-    return topic_acl_2(load_db.db_get(), topic_num)
-
-@app.route('/thread/<int:topic_num>/delete', methods = ['POST', 'GET'])
-def topic_delete(topic_num = 1):
-    return topic_delete_2(load_db.db_get(), topic_num)
-
-@app.route('/thread/<int:topic_num>/tool')
-def topic_tool(topic_num = 1):
-    return topic_tool_2(load_db.db_get(), topic_num)
-
-@app.route('/thread/<int:topic_num>/change', methods = ['POST', 'GET'])
-def topic_change(topic_num = 1):
-    return topic_change_2(load_db.db_get(), topic_num)
-
-@app.route('/thread/<int:topic_num>/admin/<int:num>')
-def topic_admin(topic_num = 1, num = 1):
-    return topic_admin_2(load_db.db_get(), topic_num, num)
-
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
-app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_close_list)
+app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
+
+app.route('/thread/<int:topic_num>/tool')(topic_tool)
+app.route('/thread/<int:topic_num>/setting', methods = ['POST', 'GET'])(topic_tool_setting)
+app.route('/thread/<int:topic_num>/acl', methods = ['POST', 'GET'])(topic_tool_acl)
+app.route('/thread/<int:topic_num>/delete', methods = ['POST', 'GET'])(topic_tool_delete)
+app.route('/thread/<int:topic_num>/change', methods = ['POST', 'GET'])(topic_tool_change)
+
+app.route('/thread/<int:topic_num>/comment/<int:num>/tool')(topic_comment_tool)
+app.route('/thread/<int:topic_num>/comment/<int:num>/notice')(topic_comment_notice)
+app.route('/thread/<int:topic_num>/comment/<int:num>/blind')(topic_comment_blind)
+app.route('/thread/<int:topic_num>/comment/<int:num>/raw')(view_raw_2)
+app.route('/thread/<int:topic_num>/comment/<int:num>/delete', methods = ['POST', 'GET'])(topic_comment_delete)
 
 # Func-user
 @app.route('/change', methods = ['POST', 'GET'])

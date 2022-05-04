@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def topic_close_list(name = 'Test'):
+def topic_list(name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 

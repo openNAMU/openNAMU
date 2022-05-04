@@ -38,7 +38,7 @@ def view_raw_2(name = None, topic_num = None, num = None, doc_acl = 0):
 
             menu = [
                 ['thread/' + topic_num + '#' + num, load_lang('discussion')], 
-                ['thread/' + topic_num + '/admin/' + num, load_lang('return')]
+                ['thread/' + topic_num + '/comment/' + num + '/tool', load_lang('return')]
             ]
         else:
             curs.execute(db_change("select data from data where title = ?"), [name])
