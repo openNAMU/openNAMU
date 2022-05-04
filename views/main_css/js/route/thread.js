@@ -1,27 +1,38 @@
-function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topic') {
+// 좀 더 개선 필요
+// use strict 적용 필요 (eval 동작에 문제 있음)
+function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 'top_topic') {
+    let url = '';
     if(type_do === 'top') {
-        var url = "/api/thread/" + topic_num + "/top";
+        url = "/api/thread/" + topic_num + "/top";
     } else if(type_do === 'main') {
-        var url = "/api/thread/" + topic_num;
+        url = "/api/thread/" + topic_num;
     } else {
-        var url = "/api/thread/" + topic_num + some;
+        url = "/api/thread/" + topic_num + some;
     }
 
-    var xhr = new XMLHttpRequest();
+    let xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.send(null);
 
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
-            var data_t = JSON.parse(this.responseText);
-            var start = 0;
-            var key_v = '/normal/1';
+            let data_t = JSON.parse(this.responseText);
             
-            for(var key in data_t) {
-                var data_a = '';
+            let start = 0;
+            let key_v = '/normal/1';
+            let admin = '';
+            let ip_first = '';
+            
+            let data_all = '';
+            let data_all_js = '';
+            
+            let count = 0;
+            for(let key in data_t) {
+                let data_a = '';
+                
                 if(start === 0) {
-                    var admin = data_t['data_main']['admin'];
-                    var ip_first = data_t['data_main']['ip_first'];
+                    admin = data_t['data_main']['admin'];
+                    ip_first = data_t['data_main']['ip_first'];
                 
                     start = 1;
                 }
@@ -32,13 +43,13 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
                 
                 key_v = '/normal/' + String(Number(key) + 1);
                 
-                var color_b = '';
-                var color_t = '';
+                let color_b = '';
+                let color_t = '';
                 
-                var ip = data_t[key]['ip_pas'];
-                var ip_o = data_t[key]['ip'];
-                var blind = data_t[key]['blind'];
-                var data_i_pas = data_t[key]['data_pas'][0];
+                let ip = data_t[key]['ip_pas'];
+                let ip_o = data_t[key]['ip'];
+                let blind = data_t[key]['blind'];
+                let data_i_pas = data_t[key]['data_pas'][0];
                 
                 if(data_i_pas === '') {
                     data_i_pas = '<br>';
@@ -63,12 +74,12 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
                     ip += ' <a href="/admin_log?search=blind%20(code%20' + topic_num + '#' + key + '">(B)</a>';
                     
                     if(admin === '1') {
-                        ip += ' <a href="/thread/' + topic_num + '/raw/' + key + '">(R)</a>';
+                        ip += ' <a href="/thread/' + topic_num + '/comment/' + key + '/raw">(R)</a>';
                     }
                 }
                 
                 if(admin === '1' || blind !== 'O') {
-                    ip += ' <a href="/thread/' + topic_num + '/admin/' + key + '">(T)</a>';
+                    ip += ' <a href="/thread/' + topic_num + '/comment/' + key + '/tool">(T)</a>';
                 }
                 
                 if(type_do === 'top') {
@@ -100,26 +111,39 @@ function new_topic_load(topic_num, type_do = 'top', some = '', where = 'top_topi
                 ''
 
                 document.getElementById(where).innerHTML += data_a;
-                eval(data_t[key]['data_pas'][1]);
+                
+                count += 1;
+                data_all_js += data_t[key]['data_pas'][1] + '\n';
+                
+                if(count > 100) {
+                    eval(data_all_js);
+                    
+                    count = 0;
+                    data_all_js = '';
+                }
             }
             
+            eval(data_all_js);
+            
+            opennamu_do_ip_parser();
+            
             if(type_do === 'top') {
-                new_topic_load(topic_num, 'main', '', 'main_topic');
+                opennamu_do_thread_make(topic_num, 'main', '', 'main_topic');
             } else if(type_do === 'main') {
-                data_url_v = window.location.href.split('#');
-                if(data_url_v.length !== 0) {
-                    if(document.getElementById(data_url_v[1])) {
-                        document.getElementById(data_url_v[1]).focus();
+                let data_url_v = window.location.hash.replace(/^#/, '');
+                if(data_url_v !== '') {
+                    if(document.getElementById(data_url_v)) {
+                        document.getElementById(data_url_v).focus();
                     }
                 }
                 
-                new_topic_load(topic_num, 're', key_v, where);
+                opennamu_do_thread_make(topic_num, 're', key_v, where);
             } else if(type_do === 're') {
                 setTimeout(function() {
                     if(start === 0) {
-                        new_topic_load(topic_num, 're', some, where);
+                        opennamu_do_thread_make(topic_num, 're', some, where);
                     } else {
-                        new_topic_load(topic_num, 're', key_v, where);
+                        opennamu_do_thread_make(topic_num, 're', key_v, where);
                     }
                 }, 2000);
             }

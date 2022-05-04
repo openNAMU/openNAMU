@@ -27,6 +27,7 @@ def user_info_2(conn, name):
 
             tool_menu += '<li><a href="/watch_list">' + load_lang('watchlist') + '</a></li>'
             tool_menu += '<li><a href="/star_doc">' + load_lang('star_doc') + '</a></li>'
+            tool_menu += '<li><a href="/challenge">' + load_lang('challenge') + '</a></li>'
             tool_menu += '<li><a href="/acl/user:' + url_pas(ip) + '">' + load_lang('user_document_acl') + '</a></li>'
         else:
             login_menu += '''

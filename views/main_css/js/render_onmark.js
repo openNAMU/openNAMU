@@ -112,8 +112,18 @@ function do_xss_change(data) {
     data = data.replace(/&lt;/g, '<');
     data = data.replace(/&gt;/g, '>');
     data = data.replace(/&amp;/g, '&');
+    data = data.replace(/&quot;/g, '"');
     
     return data;
+}
+
+function do_html_escape(data) {
+    data = data.replace(/</g, '&lt;');
+    data = data.replace(/>/g, '&gt;');
+    data = data.replace(/&/g, '&amp;');
+    data = data.replace(/"/g, '&quot;');
+    
+    return data
 }
 
 function do_end_br_replace(data) {
@@ -138,6 +148,14 @@ function do_onmark_text_render(data) {
     data = data.replace(/~~((?:(?!~~).)+)~~/g, '<s>$1</s>');
     
     return data;
+}
+
+function do_onmark_set_toc_name(toc_name) {
+    let toc_data = document.getElementById("heading_text_" + toc_name).innerText;
+    
+    for(let for_a = 0; document.getElementsByClassName("toc_text_" + toc_name)[for_a]; for_a++) {
+        document.getElementsByClassName("toc_text_" + toc_name)[for_a].innerHTML = toc_data;
+    }
 }
 
 function do_onmark_heading_render(
@@ -192,13 +210,13 @@ function do_onmark_heading_render(
         toc_data += '' +
             '<span style="margin-left: ' + String((heading_level_string.match(/\./g).length - 1) * 10) + 'px;">' +
                 '<a href="#s-' + heading_level_string_no_end + '">' + 
-                    heading_level_string + ' ' +
+                    heading_level_string + 
                 '</a> ' + 
-                '<span id="toc_text_' + heading_level_string_no_end + '"></span>' +
+                '<span class="toc_text_' + heading_level_string_no_end + '"></span>' +
             '</span>' +
             '\n' +
         ''
-        data_js += 'document.getElementById("toc_text_' + heading_level_string_no_end + '").innerHTML = document.getElementById("heading_text_' + heading_level_string_no_end + '").innerText;\n';
+        data_js += 'do_onmark_set_toc_name("' + heading_level_string_no_end + '");\n';
         
         data = data.replace(heading_re, 
             '\n' +
@@ -274,12 +292,12 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                     file_name = file_type.slice(0, file_type.length - 1).join('.');
                     file_type = file_type[file_type.length - 1];
 
-                    var file_src = do_url_change(file_name) + '.' + file_type;       
-                    var file_alt = file_name + '.' + file_type;
+                    var file_src = do_url_change(do_xss_change(file_name)) + '.' + do_html_escape(file_type);
+                    var file_alt = do_html_escape(file_name + '.' + file_type);
                     var file_exist = 1;
                 } else {
-                    var file_src = file_name;
-                    var file_alt = file_name;
+                    var file_src = do_html_escape(file_name);
+                    var file_alt = do_html_escape(file_name);
                     var file_exist = 0;
                 }
 
@@ -319,7 +337,7 @@ function do_onmark_link_render(data, data_js, name_doc, name_include, data_nowik
                                 'under_style="' + file_style + '" ' +
                                 'under_alt="' + file_alt + '" ' +
                                 'under_src="' + file_src + '" ' +
-                                'under_href="' + (file_exist === 0 ? "out_link" : '/upload?name=' + do_url_change(file_name)) + '">' +
+                                'under_href="' + (file_exist === 0 ? "out_link" : '/upload?name=' + file_src.replace(/\.[^.]+$/, '')) + '">' +
                         '</span>' + 
                     '</span>' +
                 ''
@@ -559,7 +577,7 @@ function do_onmark_footnote_render(data, name_include) {
 function do_onmark_macro_render(data, data_js) {
     data = data.replace(/\[([^[\](]+)\(((?:(?!\)\]).)+)\)\]/g, function(x, x_1, x_2) {
         x_1 = x_1.toLowerCase();
-        if(x_1 === 'youtube' || x_1 === 'kakaotv' || x_1 === 'nicovideo' || x_1 === 'navertv') {
+        if(x_1 === 'youtube' || x_1 === 'kakaotv' || x_1 === 'nicovideo' || x_1 === 'navertv' || x_1 === 'vimeo') {
             var video_code = x_2.match(/^([^,]+)/);
             video_code = video_code ? video_code[1] : '';
             
@@ -584,9 +602,11 @@ function do_onmark_macro_render(data, data_js) {
                 var video_src = 'https://tv.kakao.com/embed/player/cliplink/' + video_code +'?service=kakao_tv'
             } else if(x_1 === 'nicovideo') {
                 var video_src = 'https://embed.nicovideo.jp/watch/' + video_code
-            } else {
+            } else if(x_1 === 'navertv') {
                 var video_src = 'https://tv.naver.com/embed/' + video_code
-            }
+            } else {
+		var video_src = 'https://player.vimeo.com/video/' + video_code
+	    }
             
             return '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + '" frameborder="0" allowfullscreen></iframe>';
         } else if(x_1 === 'anchor') {
@@ -613,7 +633,7 @@ function do_onmark_macro_render(data, data_js) {
             
             var date_end = Math.floor((date_now - date_old) / (24 * 60 * 60 * 1000));
             
-            return date_end > 0 ? '+' + date_end : '-' + date_end;
+            return (date_end > 0 ? '+' : '') + date_end;
         } else if(x_1 === 'age') {
             var date_old = new Date(x_2);
             var date_now = new Date(do_return_date());
@@ -631,7 +651,7 @@ function do_onmark_macro_render(data, data_js) {
     var pagecount_n = 0;
     data = data.replace(/\[([^[*()\]]+)\]/g, function(x, x_1) {
         x_1 = x_1.toLowerCase();
-        if(x_1 === 'date') {
+        if(x_1 === 'date' || x_1 === 'datetime') {
             return do_return_date();
         } else if(x_1 === 'clearfix') {
             return '<div style="clear:both"></div>';
@@ -1066,7 +1086,7 @@ function do_onmark_table_render_main(data) {
 
             if(table_data === '') {
                 table_data += '' + 
-                    '<div style="' + table_data_option['div'] + '">' +
+                    '<div class="table_safe" style="' + table_data_option['div'] + '">' +
                         '<table style="' + table_data_option['table'] + '">' +
                             table_caption +
                 '';
@@ -1319,6 +1339,9 @@ function do_onmark_render(
     var data_js = '';
     var data_backlink = [];
     var data_nowiki = {};
+        
+    name_doc = do_xss_change(name_doc);
+    console.log(name_doc);
 
     let xhr = new XMLHttpRequest();
     xhr.open("GET", "/api/setting/inter_wiki");
@@ -1441,6 +1464,7 @@ function do_onmark_render(
             );
             
             data_js += '' + 
+                'do_heading_move();\n' + 
                 'get_link_state("' + name_include + '");\n' + 
                 'get_file_state("' + name_include + '");\n' + 
         		'get_heading_name();\n' +
@@ -1449,6 +1473,10 @@ function do_onmark_render(
             
             if(test_mode === 'normal') {
                 document.getElementById(name_id).innerHTML = data + '<script>' + data_js + '</script>';
+                
+                document.getElementById(name_id).style.display = "";
+                document.getElementById(name_id + '_load').style.display = "none";
+                
                 eval(data_js);
             } else if(test_mode === 'manual') {
                 return [data, data_js];

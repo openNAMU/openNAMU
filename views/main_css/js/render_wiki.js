@@ -8,7 +8,6 @@ function get_link_state(data) {
     var link_list_2 = {}
     for(var i = 0; document.getElementsByClassName(data + 'link_finder')[i]; i++) {
         var data_class = document.getElementsByClassName(data + 'link_finder')[i];
-        console.log(data_class.href)
         if(
             data_class.id !== 'out_link' && 
             data_class.id !== 'inside' && 
@@ -60,12 +59,28 @@ function get_heading_name() {
     }
 }
 
-function load_image_link(data) {
-    data.innerHTML = '' +
+function do_heading_move() {
+    let data_url_v = window.location.hash.replace(/^#/, '');
+    if(data_url_v !== '') {
+        if(document.getElementById(data_url_v)) {
+            document.getElementById(data_url_v).focus();
+        }
+    }
+}
+
+function load_image_link(data, data_type = 0) {
+    let data_end = '';
+    data_end = '' +
         '<img   style="' + data.getAttribute('under_style') + '" ' + 
                 'alt="' + data.getAttribute('under_alt') + '" ' + 
                 'src="' + data.getAttribute('under_src') + '">' +
     '';
+    
+    if(data_type === 0) {
+        data.innerHTML = data_end;
+    } else {
+        return data_end;
+    }
 }
 
 function get_file_state_extermal(data, data_exter) {
@@ -99,9 +114,7 @@ function get_file_state_extermal(data, data_exter) {
             '';
         } else {
             document.getElementsByClassName(data + 'file_finder')[key].innerHTML = '' +
-                '<img   style="' + data_class[key].getAttribute('under_style') + '" ' + 
-                        'alt="' + data_class[key].getAttribute('under_alt') + '" ' + 
-                        'src="' + data_class[key].getAttribute('under_src') + '">' +
+                load_image_link(data_class[key], 1) +
             '';
         }
     }
@@ -111,7 +124,7 @@ function get_file_state_intermal(data, data_inter) {
     var data_dict = {};
     var data_list = [];
     for(var key in data_inter) {
-        var data_class = document.getElementsByClassName(data + 'file_finder')[key];
+        var data_class = document.getElementsByClassName(data + 'file_finder')[data_inter[key]];
     
         var file_org = data_class.getAttribute('under_alt');
         var file_type = file_org.split('.');
@@ -128,9 +141,9 @@ function get_file_state_intermal(data, data_inter) {
         data_list.push(file_name);
         
         if(!data_dict[file_org]['list']) {
-            data_dict[file_org]['list'] = [key];
+            data_dict[file_org]['list'] = [data_inter[key]];
         } else {
-            data_dict[file_org]['list'].push(key);
+            data_dict[file_org]['list'].push(data_inter[key]);
         }
     }
     
@@ -198,7 +211,7 @@ function get_file_state_intermal(data, data_inter) {
                                             'under_style="' + data_class[key_4].getAttribute('under_style') + '" ' +
                                             'under_alt="' + data_class[key_4].getAttribute('under_alt') + '" ' +
                                             'under_src="/image/' + data_dict[key_3]['file_sha224'] + '.' + data_dict[key_3]['file_type'] + '">' + 
-                                            '(' + data_class[key_4].getAttribute('under_alt') + ' load)' +
+                                            '(' + data_class[key_4].getAttribute('under_alt') + ' GET)' +
                                         '</a>' +
                                     '';
                                 }
@@ -206,10 +219,10 @@ function get_file_state_intermal(data, data_inter) {
                                 for(var key_4 in data_dict[key_3]['list']) {
                                     var key_4 = data_dict[key_3]['list'][key_4];
                                     document.getElementsByClassName(data + 'file_finder')[key_4].innerHTML = '' +
-                                        '<img   style="' + data_class[key_4].getAttribute('under_style') + '" ' + 
+                                        '<img   style="' + data_class[key_4].getAttribute('under_style') + ';cursor: pointer;" ' + 
+                                                'onclick="window.location.href=\'/w/file:' + data_class[key_4].getAttribute('under_src') + '\';"' +
                                                 'alt="' + data_class[key_4].getAttribute('under_alt') + '" ' + 
                                                 'src="/image/' + data_dict[key_3]['file_sha224'] + '.' + data_dict[key_3]['file_type'] + '">' +
-                                        '' +
                                     '';
                                 }
                             }

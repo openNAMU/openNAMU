@@ -26,50 +26,33 @@ def main_func_setting(db_set, num = 0):
                 menu = [['manager', load_lang('return')]]
             ))
         elif num == 1:
-            i_list = {
-                0 : 'name',
-                2 : 'frontpage',
-                4 : 'upload',
-                5 : 'skin',
-                7 : 'reg',
-                8 : 'ip_view',
-                9 : 'back_up',
-                10 : 'port',
-                11 : 'key',
-                12 : 'update',
-                15 : 'encode',
-                16 : 'host',
-                19 : 'slow_edit',
-                20 : 'requires_approval',
-                21 : 'backup_where',
-                22 : 'domain',
-                23 : 'ua_get'
-            }
-            n_list = {
-                0 : 'Wiki',
-                2 : 'FrontPage',
-                4 : '2',
-                5 : '',
-                7 : '',
-                8 : '',
-                9 : '0',
-                10 : '3000',
-                11 : 'test',
-                12 : 'stable',
-                15 : 'sha3',
-                16 : '0.0.0.0',
-                19 : '0',
-                20 : '',
-                21 : '',
-                22 : flask.request.host_url,
-                23 : ''
+            setting_list = {
+                0 : ['name', 'Wiki'],
+                2 : ['frontpage', 'FrontPage'],
+                4 : ['upload', '2'],
+                5 : ['skin', ''],
+                7 : ['reg', ''],
+                8 : ['ip_view', ''],
+                9 : ['back_up', '0'],
+                10 : ['port', '3000'],
+                11 : ['key', load_random_key()],
+                12 : ['update', 'stable'],
+                15 : ['encode', 'sha3'],
+                16 : ['host', '0.0.0.0'],
+                19 : ['slow_edit', '0'],
+                20 : ['requires_approval', ''],
+                21 : ['backup_where', ''],
+                22 : ['domain', flask.request.host_url],
+                23 : ['ua_get', ''],
+                24 : ['enable_comment', ''],
+                25 : ['enable_challenge', '']
             }
 
             if flask.request.method == 'POST':
-                for i in i_list:
+                for i in setting_list:
                     curs.execute(db_change("update other set data = ? where name = ?"), [
-                        flask.request.form.get(i_list[i], n_list[i]),
-                        i_list[i]
+                        flask.request.form.get(setting_list[i][0], setting_list[i][1]),
+                        setting_list[i][0]
                     ])
 
                 conn.commit()
@@ -79,18 +62,15 @@ def main_func_setting(db_set, num = 0):
                 return redirect('/setting/1')
             else:
                 d_list = {}
+                for i in setting_list:
+                    curs.execute(db_change('select data from other where name = ?'), [setting_list[i][0]])
+                    db_data = curs.fetchall()
+                    if not db_data:
+                        curs.execute(db_change('insert into other (name, data) values (?, ?)'), [setting_list[i][0], setting_list[i][1]])
 
-                for i in i_list:
-                    curs.execute(db_change('select data from other where name = ?'), [i_list[i]])
-                    sql_d = curs.fetchall()
-                    if sql_d:
-                        d_list[i] = sql_d[0][0]
-                    else:
-                        curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i_list[i], n_list[i]])
-
-                        d_list[i] = n_list[i]
-
-                conn.commit()
+                    d_list[i] = db_data[0][0] if db_data else setting_list[i][1]
+                else:
+                    conn.commit()
 
                 acl_div = ['']
                 encode_data = ['sha256', 'sha3']
@@ -100,7 +80,7 @@ def main_func_setting(db_set, num = 0):
                     else:
                         acl_div[0] += '<option value="' + acl_data + '">' + acl_data + '</option>'
 
-                check_box_div = ['', '', '', '', '']
+                check_box_div = ['', '', '', '', '', '', '']
                 for i in range(0, len(check_box_div)):
                     if i == 0:
                         acl_num = 7
@@ -108,8 +88,12 @@ def main_func_setting(db_set, num = 0):
                         acl_num = 8
                     elif i == 3:
                         acl_num = 20
-                    else:
+                    elif i == 4:
                         acl_num = 23
+                    elif i == 5:
+                        acl_num = 24
+                    elif i == 6:
+                        acl_num = 25
 
                     if d_list[acl_num]:
                         check_box_div[i] = 'checked="checked"'
@@ -144,7 +128,7 @@ def main_func_setting(db_set, num = 0):
 
                             <span>''' + load_lang('domain') + '''</span> (EX : http://2du.pythonanywhere.com/)
                             <hr class="main_hr">
-                            <input name="''' + i_list[22] + '''" value="''' + html.escape(d_list[22]) + '''">
+                            <input name="''' + setting_list[22][0] + '''" value="''' + html.escape(d_list[22]) + '''">
                             <hr class="main_hr">
 
                             <span>''' + load_lang('wiki_host') + '''</span>
@@ -165,6 +149,13 @@ def main_func_setting(db_set, num = 0):
                             <span>''' + load_lang('encryption_method') + '''</span>
                             <hr class="main_hr">
                             <select name="encode">''' + acl_div[0] + '''</select>
+                            
+                            <h3>1.1. ''' + load_lang('communication_function') + '''</h3>
+                            <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + load_lang('enable_comment_function') + '''
+                            <hr class="main_hr">
+                            
+                            <input type="checkbox" name="enable_challenge" ''' + check_box_div[6] + '''> ''' + load_lang('enable_challenge_function') + '''
+                            <hr class="main_hr">
 
                             <h2>2. ''' + load_lang('design_set') + '''</h2>
                             <span>''' + load_lang('wiki_skin') + '''</span>
@@ -188,8 +179,13 @@ def main_func_setting(db_set, num = 0):
                             <hr class="main_hr">
                             <input name="upload" value="''' + html.escape(d_list[4]) + '''">
                             <hr class="main_hr">
-
+                            
+                            <span>''' + load_lang('update_branch') + '''</span>
+                            <hr class="main_hr">
+                            <select name="update">''' + branch_div + '''</select>
+                            
                             <span ''' + sqlite_only + '''>
+                                <h3>4.1. ''' + load_lang('sqlite') + '''</h3>
                                 <span>
                                     ''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ') (' + load_lang('off') + ' : 0) ' + \
                                     '(' + load_lang('restart_required') + ''')</span>
@@ -199,16 +195,12 @@ def main_func_setting(db_set, num = 0):
 
                                 <span>
                                     ''' + load_lang('backup_where') + ' (' + load_lang('empty') + ' : ' + load_lang('default') + ') ' + \
-                                    '(' + load_lang('restart_required') + ''') (EX : ./data/backup.db)
+                                    '(' + load_lang('restart_required') + ''') (''' + load_lang('example') + ''' : ./data/backup.db)
                                 </span>
                                 <hr class="main_hr">
                                 <input name="backup_where" value="''' + html.escape(d_list[21]) + '''">
                                 <hr class="main_hr">
                             </span>
-
-                            <span>''' + load_lang('update_branch') + '''</span>
-                            <hr class="main_hr">
-                            <select name="update">''' + branch_div + '''</select>
 
                             <h2>5. ''' + load_lang('edit_set') + '''</h2>
                             <span><a href="/setting/8">(''' + load_lang('main_acl_setting') + ''')</a></span>
@@ -216,7 +208,7 @@ def main_func_setting(db_set, num = 0):
 
                             <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ') (' + load_lang('off') + ''' : 0)</span>
                             <hr class="main_hr">
-                            <input name="''' + i_list[19] + '''" value="''' + html.escape(d_list[19]) + '''">
+                            <input name="''' + setting_list[19][0] + '''" value="''' + html.escape(d_list[19]) + '''">
 
                             <hr class="main_hr">
                             <button id="save" type="submit">''' + load_lang('save') + '''</button>
