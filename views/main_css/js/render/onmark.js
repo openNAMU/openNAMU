@@ -2,7 +2,9 @@
 
 class opennamu_render_onmark {
     constructor(
-        doc_data,
+        render_part_id,
+        render_part_id_after,
+        render_part_id_add,
         doc_name
     ) {
         this.doc_data = doc_data;
