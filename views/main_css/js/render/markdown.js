@@ -39,7 +39,7 @@ class opennamu_render_markdown {
     do_func_parser_to_text(data, parser_type = 'parser') {
         let parser_data_temp = this.parser_data_temp;
         let parser_match;
-        if(parser_type === 'nowiki' || parser_type === 'nowikiEnd') {
+        if(parser_type === 'nowiki' || parser_type === 'nowikiLink' || parser_type === 'nowikiEnd') {
             parser_match = /<(\/?nowiki[0-9]+Span)>/;
         } else {
             parser_match = /<(\/?render[0-9]+Span)>/;
@@ -49,6 +49,11 @@ class opennamu_render_markdown {
             data = data.replace(parser_match, function(match, x1) {
                 if(parser_type === 'nowikiEnd') {
                     return parser_data_temp[x1 + 'End'];
+                } else if(parser_type === 'nowikiLink') {
+                    let nowiki_data = parser_data_temp[x1];
+                    nowiki_data = nowiki_data.replace(/\\(.)/g, '$1');
+                    
+                    return nowiki_data;
                 } else {
                     return parser_data_temp[x1];
                 }
@@ -63,6 +68,7 @@ class opennamu_render_markdown {
         data = data.replace(/"/g, '&quot;');
         data = data.replace(/</g, '&lt;');
         data = data.replace(/</g, '&gt;');
+        data = data.replace(/&/g, '&amp;');
         
         return data;
     }
@@ -71,7 +77,8 @@ class opennamu_render_markdown {
         data = data.replace(/&#x27;/g, '\'');
         data = data.replace(/&quot;/g, '"');
         data = data.replace(/&lt;/g, '<');
-        data = data.replace(/&gt;/g, '<');
+        data = data.replace(/&gt;/g, '>');
+        data = data.replace(/&amp;/g, '&');
         
         return data;
     }
@@ -173,7 +180,7 @@ class opennamu_render_markdown {
         
         let heading_n = 0;
         let heading_list = [0, 0, 0, 0, 0, 0];
-        let heading_regex = /\n(#{1,6})([^\n]+)\n/;
+        let heading_regex = /\n(#{1,6})([^#][^\n]*)\n/;
         while(this.doc_data.match(heading_regex)) {
             this.doc_data = this.doc_data.replace(heading_regex, function(match, x1, x2) {
                 let heading_level = x1.length - 1;
@@ -279,7 +286,9 @@ class opennamu_render_markdown {
                     parser_count += 1;
                     let parser_count_str = String(parser_count);
                     
-                    let link_main = render_main.do_func_xss_encode(x2);;
+                    let link_main = render_main.do_func_parser_to_text(x2, 'nowikiLink');
+                    link_main = render_main.do_func_xss_encode(link_main);
+                    
                     let link_sub;
                     if(x1 === '') {
                         link_sub = x2;
@@ -309,7 +318,10 @@ class opennamu_render_markdown {
                         link_sub = x1;
                     }
                     
-                    link_title = render_main.do_func_xss_encode(link_main);
+                    link_main = render_main.do_func_parser_to_text(link_main, 'nowikiLink');
+                    link_main = render_main.do_func_xss_encode(link_main);
+                    
+                    link_title = link_main;
 
                     link_main = render_main.do_func_xss_decode(link_main);
                     link_main = opennamu_do_url_encode(link_main);
@@ -487,9 +499,8 @@ class opennamu_render_markdown {
         
         let parser_count = this.parser_count['parser'];
         let parser_data_temp = this.parser_data_temp;
-        
-        this.doc_data = this.doc_data.replace(/\\\\/g, '<slash>');
-        this.doc_data = this.doc_data.replace(/\\(.)/g, function(match, x1) {
+
+        this.doc_data = this.doc_data.replace(/\\(&#x27;|&quot;|&lt;|&gt;|&amp;|.)/g, function(match, x1) {
             let nowiki_data = x1;
             
             parser_count += 1;
@@ -498,14 +509,12 @@ class opennamu_render_markdown {
             parser_data_temp['nowiki' + parser_count_str + 'Span'] = match;
             parser_data_temp['/nowiki' + parser_count_str + 'Span'] = '';
             
-            parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = x1;
-            parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '';
+            parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = '<code>' + nowiki_data;
+            parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '</code>';
             
             return '<nowiki' + parser_count_str + 'Span>' + '</nowiki' + parser_count_str + 'Span>';
         });
-        this.doc_data = this.doc_data.replace(/<slash>/g, '\\');
         
-        // 원복은 했는데 마지막에는 적용 안되게 필요
         this.doc_data = this.doc_data.replace(/```((?:(?:(?!```).)|\n)+)```/g, function(match, x1) {
             let nowiki_data = render_main.do_func_parser_to_text(x1, 'nowiki');
             
@@ -516,20 +525,34 @@ class opennamu_render_markdown {
                 parser_data_temp['nowiki' + parser_count_str + 'Span'] = match;
                 parser_data_temp['/nowiki' + parser_count_str + 'Span'] = '';
                 
-                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = x1;
-                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '';
+                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = '<pre>' + nowiki_data;
+                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '</pre>';
             } else {
                 parser_data_temp['nowiki' + parser_count_str + 'Span'] = match;
                 parser_data_temp['/nowiki' + parser_count_str + 'Span'] = '';
                 
-                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = x1;
-                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '';
+                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = '<code>' + nowiki_data;
+                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '</code>';
             }
             
             return '<nowiki' + parser_count_str + 'Span>' + '</nowiki' + parser_count_str + 'Span>';
         });
         
-        // 원래 문법 원복 기능 필요
+        this.doc_data = this.doc_data.replace(/`([^`\n]+)`/g, function(match, x1) {
+            let nowiki_data = render_main.do_func_parser_to_text(x1, 'nowiki');
+            
+            parser_count += 1;
+            let parser_count_str = String(parser_count);
+            
+            parser_data_temp['nowiki' + parser_count_str + 'Span'] = match;
+            parser_data_temp['/nowiki' + parser_count_str + 'Span'] = '';
+
+            parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = '<code>' + nowiki_data;
+            parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '</code>';
+            
+            return '<nowiki' + parser_count_str + 'Span>' + '</nowiki' + parser_count_str + 'Span>';
+        });
+        
         this.doc_data = this.doc_data.replace(
             /&lt;pre&gt;(?:\n| )*&lt;code&gt;((?:(?:(?!&lt;pre&gt;(?:\n| )*&lt;code&gt;|&lt;\/code&gt;(?:\n| )*&lt;\/pre&gt;).)|\n)+)&lt;\/code&gt;(?:\n| )*&lt;\/pre&gt;/g,
             function(match, x1) {
@@ -542,14 +565,14 @@ class opennamu_render_markdown {
                 parser_data_temp['nowiki' + parser_count_str + 'Span'] = match;
                 parser_data_temp['/nowiki' + parser_count_str + 'Span'] = '';
                 
-                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = x1;
-                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '';
+                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = '<pre>' + nowiki_data;
+                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '</pre>';
             } else {
                 parser_data_temp['nowiki' + parser_count_str + 'Span'] = match;
                 parser_data_temp['/nowiki' + parser_count_str + 'Span'] = '';
                 
-                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = x1;
-                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '';
+                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = '<code>' + nowiki_data;
+                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '</code>';
             }
             
             return '<nowiki' + parser_count_str + 'Span>' + '</nowiki' + parser_count_str + 'Span>';
@@ -557,6 +580,15 @@ class opennamu_render_markdown {
         
         this.parser_count['parser'] = parser_count;
         this.parser_data_temp = parser_data_temp;
+    }
+    
+    do_part_horizon() {
+        let horizone_regex = /\n((?:\*|\* |_|_ ){3,})\n/;
+        while(this.doc_data.match(horizone_regex)) {
+            this.doc_data = this.doc_data.replace(horizone_regex, function(match, x1, x2) {
+                return '\n<brEnd><hr><brStart>\n';
+            });
+        }
     }
     
     do_part_final() {
@@ -584,6 +616,7 @@ class opennamu_render_markdown {
     do_main() {
         this.do_part_nowiki();
         this.do_part_heading();
+        this.do_part_horizon();
         this.do_part_footnote();
         this.do_part_macro();
         this.do_part_image();
