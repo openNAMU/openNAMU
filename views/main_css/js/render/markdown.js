@@ -500,6 +500,7 @@ class opennamu_render_markdown {
         let parser_count = this.parser_count['parser'];
         let parser_data_temp = this.parser_data_temp;
 
+        this.doc_data = this.doc_data.replace(/\\\n/g, '\n');
         this.doc_data = this.doc_data.replace(/\\(&#x27;|&quot;|&lt;|&gt;|&amp;|.)/g, function(match, x1) {
             let nowiki_data = x1;
             
@@ -583,7 +584,7 @@ class opennamu_render_markdown {
     }
     
     do_part_horizon() {
-        let horizone_regex = /\n((?:\*|\* |_|_ ){3,})\n/;
+        let horizone_regex = /\n((?:\*|\* |-|- ){3,})\n/;
         while(this.doc_data.match(horizone_regex)) {
             this.doc_data = this.doc_data.replace(horizone_regex, function(match, x1, x2) {
                 return '\n<brEnd><hr><brStart>\n';
