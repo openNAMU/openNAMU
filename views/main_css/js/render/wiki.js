@@ -43,7 +43,7 @@ class opennamu_render_wiki {
                 let xhr_data = JSON.parse(this.responseText);
                 for(let for_a in link_list) {
                     if(!xhr_data[for_a]) {
-                        for(var for_b in link_list[for_a]) {
+                        for(let for_b in link_list[for_a]) {
                             document.getElementsByClassName(render_part_id_add + 'opennamuLink')[link_list[for_a][for_b]].id = "not_thing";
                         }
                     }
