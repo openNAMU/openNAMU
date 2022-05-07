@@ -296,7 +296,7 @@ class opennamu_render_markdown {
                         link_sub = x1;
                     }
                     
-                    parser_data_temp['render' + parser_count_str + 'Span'] = '<a href="' + link_main + '">';
+                    parser_data_temp['render' + parser_count_str + 'Span'] = '<a class="opennamuLinkOut" href="' + link_main + '">';
                     parser_data_temp['/render' + parser_count_str + 'Span'] = '</a>';
 
                     return '<render' + parser_count_str + 'Span>' + link_sub + '</render' + parser_count_str + 'Span>';
@@ -335,6 +335,21 @@ class opennamu_render_markdown {
         });
         
         this.doc_data = this.doc_data.replace(/<linkBlink>/g, '[]()');
+        
+        this.doc_data = this.doc_data.replace(/&lt;(https?:\/\/(?:(?:(?!&lt;|&gt;).)+))&gt;/g, function(match, x1) {
+            parser_count += 1;
+            let parser_count_str = String(parser_count);
+            
+            let link_main = render_main.do_func_parser_to_text(x1, 'nowikiLink');
+            link_main = render_main.do_func_xss_encode(link_main);
+            
+            let link_sub = x1;
+
+            parser_data_temp['render' + parser_count_str + 'Span'] = '<a class="opennamuLinkOut" href="' + link_main + '">';
+            parser_data_temp['/render' + parser_count_str + 'Span'] = '</a>';
+
+            return '<render' + parser_count_str + 'Span>' + link_sub + '</render' + parser_count_str + 'Span>';
+        });
         
         this.parser_count['parser'] = parser_count;
         this.parser_data_temp = parser_data_temp;
@@ -485,7 +500,7 @@ class opennamu_render_markdown {
                 }
             }
             else {
-                return '';
+                return match;
             }
         });
         
@@ -554,42 +569,67 @@ class opennamu_render_markdown {
             return '<nowiki' + parser_count_str + 'Span>' + '</nowiki' + parser_count_str + 'Span>';
         });
         
-        this.doc_data = this.doc_data.replace(
-            /&lt;pre&gt;(?:\n| )*&lt;code&gt;((?:(?:(?!&lt;pre&gt;(?:\n| )*&lt;code&gt;|&lt;\/code&gt;(?:\n| )*&lt;\/pre&gt;).)|\n)+)&lt;\/code&gt;(?:\n| )*&lt;\/pre&gt;/g,
-            function(match, x1) {
-            let nowiki_data = render_main.do_func_parser_to_text(x1, 'nowiki');
-            
-            parser_count += 1;
-            let parser_count_str = String(parser_count);
-            
-            if(nowiki_data.match(/\n/)) {
-                parser_data_temp['nowiki' + parser_count_str + 'Span'] = match;
-                parser_data_temp['/nowiki' + parser_count_str + 'Span'] = '';
-                
-                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = '<pre>' + nowiki_data;
-                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '</pre>';
-            } else {
-                parser_data_temp['nowiki' + parser_count_str + 'Span'] = match;
-                parser_data_temp['/nowiki' + parser_count_str + 'Span'] = '';
-                
-                parser_data_temp['nowiki' + parser_count_str + 'SpanEnd'] = '<code>' + nowiki_data;
-                parser_data_temp['/nowiki' + parser_count_str + 'SpanEnd'] = '</code>';
-            }
-            
-            return '<nowiki' + parser_count_str + 'Span>' + '</nowiki' + parser_count_str + 'Span>';
-        });
-        
         this.parser_count['parser'] = parser_count;
         this.parser_data_temp = parser_data_temp;
     }
     
-    do_part_horizon() {
+    do_part_horizon() {        
         let horizone_regex = /\n((?:\*|\* |-|- ){3,})\n/;
         while(this.doc_data.match(horizone_regex)) {
             this.doc_data = this.doc_data.replace(horizone_regex, function(match, x1, x2) {
                 return '\n<brEnd><hr><brStart>\n';
             });
         }
+    }
+    
+    do_part_blockquote() {
+        let parser_count = this.parser_count['parser'];
+        let parser_data_temp = this.parser_data_temp;
+        
+        let blockquote_regex = /((?:\n&gt;(?:[^\n]+))+)/;
+        while(this.doc_data.match(blockquote_regex)) {
+            this.doc_data = this.doc_data.replace(blockquote_regex, function(match, x1) {
+                let blockquote_data = '<brStart>' + x1;
+                blockquote_data = blockquote_data.replace(/\n&gt;	?/g, '\n');
+
+                parser_count += 1;
+                let parser_count_str = String(parser_count);
+
+                parser_data_temp['render' + parser_count_str + 'Span'] = '<blockquote>';
+                parser_data_temp['/render' + parser_count_str + 'Span'] = '</blockquote>';
+
+                return '\n<brEnd><render' + parser_count_str + 'Span>' + blockquote_data + '</render' + parser_count_str + 'Span>';
+            });
+        }
+        
+        this.parser_count['parser'] = parser_count;
+        this.parser_data_temp = parser_data_temp;
+    }
+    
+    do_part_list() {
+        let parser_count = this.parser_count['parser'];
+        let parser_data_temp = this.parser_data_temp;
+        
+        // 여기 파트 개선 필요
+        this.doc_data = this.doc_data.replace(/((?:\n(?: )*\* ?(?:[^\n]+))+)/g, function(match, x1) {
+            let list_data = x1;
+            let list_depth = -1;
+            
+            list_data = list_data.replace(/\n( )*\* ?([^\n]+)/g, function(match, x1, x2) {
+                return '';
+            });
+
+            parser_count += 1;
+            let parser_count_str = String(parser_count);
+
+            parser_data_temp['render' + parser_count_str + 'Span'] = '<ul>';
+            parser_data_temp['/render' + parser_count_str + 'Span'] = '</ul>';
+
+            return '\n<brEnd><render' + parser_count_str + 'Span>' + list_data + '</render' + parser_count_str + 'Span>';
+        });
+        
+        this.parser_count['parser'] = parser_count;
+        this.parser_data_temp = parser_data_temp;
     }
     
     do_part_final() {
@@ -616,6 +656,8 @@ class opennamu_render_markdown {
     // Main Part
     do_main() {
         this.do_part_nowiki();
+        this.do_part_list();
+        this.do_part_blockquote();
         this.do_part_heading();
         this.do_part_horizon();
         this.do_part_footnote();
