@@ -567,14 +567,10 @@ app.route('/change/key/delete')(user_setting_key_delete)
 def user_setting_pw_change():
     return user_setting_pw_change_2(load_db.db_get())
 
-@app.route('/change/head', methods=['GET', 'POST'])
-def user_setting_head():
-    return user_setting_head_2(load_db.db_get())
+app.route('/change/head', methods=['GET', 'POST'])(user_setting_head)
 
-@app.route('/user')
-@app.route('/user/<name>')
-def user_info(name = ''):
-    return user_info_2(load_db.db_get(), name)
+app.route('/user')(user_info)
+app.route('/user/<name>')(user_info)
 
 app.route('/challenge')(user_challenge)
 
