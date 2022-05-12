@@ -481,6 +481,7 @@ def view_diff(name = 'Test', num_a = 1, num_b = 1):
 def view_down(name = None):
     return view_down_2(load_db.db_get(), name)
 
+# everything 다음에 추가 붙은 경우에 대해서 재검토 필요
 @app.route('/w/<everything:name>/doc_rev/<int(signed = True):doc_rev>')
 @app.route('/w/<everything:name>/doc_from/<everything:doc_from>')
 @app.route('/w/<everything:name>')
@@ -488,34 +489,17 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = ''):
     return view_read_2(load_db.db_get(), name, doc_rev, doc_from)
 
 # Func-edit
-@app.route('/revert/<everything:name>', methods = ['POST', 'GET'])
-def edit_revert(name = None):
-    return edit_revert_2(load_db.db_get(), name)
-
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
 app.route('/edit/<everything:name>/doc_from/<everything:name_load>', methods = ['POST', 'GET'])(edit)
 app.route('/edit/<everything:name>/doc_section/<int:section>', methods = ['POST', 'GET'])(edit)
 
 # 개편 예정
-@app.route('/backlink_reset/<everything:name>')
-def edit_backlink_reset(name = 'Test'):
-    return edit_backlink_reset_2(load_db.db_get(), name)
-
-@app.route('/delete/<everything:name>', methods = ['POST', 'GET'])
-def edit_delete(name = None):
-    return edit_delete_2(load_db.db_get(), name)
-
-@app.route('/delete/doc_file/<everything:name>', methods = ['POST', 'GET'])
-def edit_delete_file(name = 'test.jpg'):
-    return edit_delete_file_2(load_db.db_get(), name)
-
-@app.route('/delete/doc_mutiple', methods = ['POST', 'GET'])
-def edit_delete_mutiple():
-    return edit_delete_mutiple_2(load_db.db_get())
-
-@app.route('/move/<everything:name>', methods = ['POST', 'GET'])
-def edit_move(name = None):
-    return edit_move_2(load_db.db_get(), name)
+app.route('/xref_reset/<everything:name>')(edit_backlink_reset)
+app.route('/delete/<everything:name>', methods = ['POST', 'GET'])(edit_delete)
+app.route('/delete_file/<everything:name>', methods = ['POST', 'GET'])(edit_delete_file)
+app.route('/delete_mutiple', methods = ['POST', 'GET'])(edit_delete_mutiple)
+app.route('/revert/<everything:name>', methods = ['POST', 'GET'])(edit_revert)
+app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
 
 # Func-topic
 @app.route('/recent_discuss')
@@ -690,11 +674,23 @@ app.route('/manager/<int:num>/<add_2>', methods = ['POST', 'GET'])(main_tool_adm
 
 app.route('/random')(main_func_random)
 app.route('/upload', methods = ['POST', 'GET'])(main_func_upload)
-app.route('/setting', defaults = { 'db_set' : data_db_set['type'] })(main_func_setting)
-app.route('/setting/<int:num>', methods = ['POST', 'GET'], defaults = { 'db_set' : data_db_set['type'] })(main_func_setting)
 app.route('/skin_set')(main_func_skin_set)
 app.route('/main_skin_set')(main_func_skin_set)
 app.route('/easter_egg.xml')(main_func_easter_egg)
+
+app.route('/setting')(main_func_setting)
+app.route('/setting/main', defaults = { 'db_set' : data_db_set['type'] }, methods = ['POST', 'GET'])(main_func_setting_main)
+app.route('/setting/main/logo', methods = ['POST', 'GET'])(main_func_setting_main_logo)
+app.route('/setting/phrase', methods = ['POST', 'GET'])(main_func_setting_phrase)
+app.route('/setting/head', defaults = { 'num' : 3 }, methods = ['POST', 'GET'])(main_func_setting_head)
+app.route('/setting/head/<skin_name>', defaults = { 'num' : 3 }, methods = ['POST', 'GET'])(main_func_setting_head)
+app.route('/setting/body/top', defaults = { 'num' : 4 }, methods = ['POST', 'GET'])(main_func_setting_head)
+app.route('/setting/body/top/<skin_name>', defaults = { 'num' : 4 }, methods = ['POST', 'GET'])(main_func_setting_head)
+app.route('/setting/body/bottom', defaults = { 'num' : 7 }, methods = ['POST', 'GET'])(main_func_setting_head)
+app.route('/setting/body/bottom/<skin_name>', defaults = { 'num' : 7 }, methods = ['POST', 'GET'])(main_func_setting_head)
+app.route('/setting/robot', methods = ['POST', 'GET'])(main_func_setting_robot)
+app.route('/setting/external', methods = ['POST', 'GET'])(main_func_setting_external)
+app.route('/setting/acl', methods = ['POST', 'GET'])(main_func_setting_acl)
 
 # views -> view
 app.route('/view/<everything:name>')(main_view)

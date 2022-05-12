@@ -106,6 +106,7 @@
         "domain" : "Domain",
         "result" : "Result",
         "incomplete" : "Incomplete",
+        "example" : "Example",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
             "hour" : "Hour(s)",
@@ -264,6 +265,7 @@
                 "login_set" : "Login-related settings",
                 "server_set" : "Server-related settings",
                 "edit_set" : "Edit-related settings",
+                "communication_set" : "Communication-related settings",
     
                 "wiki_name" : "Wiki[s] name",
                 "wiki_logo" : "Wiki[s] logo",

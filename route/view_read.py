@@ -74,7 +74,7 @@ def view_read_2(conn, name, doc_rev, doc_from):
                 <h2>CONTENT</h2>
             '''
 
-            menu += [['delete/doc_file/' + url_pas(name), load_lang('file_delete')]]
+            menu += [['delete_file/' + url_pas(name), load_lang('file_delete')]]
         else:
             file_data = ''
             
