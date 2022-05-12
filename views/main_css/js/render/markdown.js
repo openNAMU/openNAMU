@@ -1,5 +1,6 @@
 "use strict";
 
+// 걍 언더바로 통일하자
 class opennamu_render_markdown {
     // Init Part
     constructor(
@@ -486,8 +487,8 @@ class opennamu_render_markdown {
             } else if(x1 === 'toc') {
                 if(parser_data_temp_other['toc'] !== '') {
                     return '' +
-                        '<div class="opennamuTOC">' + 
-                            '<span class="opennamuTOCtitle">' +
+                        '<div class="opennamu_TOC">' + 
+                            '<span class="opennamu_TOC_title">' +
                                 'TOC' +
                             '</span>' + 
                             '<br>' + 

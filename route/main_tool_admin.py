@@ -36,7 +36,7 @@ def main_tool_admin(num = 1, add_2 = ''):
                     <h2>2. ''' + load_lang('owner') + '''</h2>
                     <ul class="inside_ul">
                         <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
-                        <li><a href="/delete/doc_mutiple">''' + load_lang('many_delete') + '''</a></li>
+                        <li><a href="/delete_mutiple">''' + load_lang('many_delete') + '''</a></li>
                         <li><a href="/app_submit">''' + load_lang('application_list') + '''</a></li>
                         <li><a href="/api/sitemap.xml">''' + load_lang('get_sitemap') + '''</a></li>
                         <li><a href="/register">''' + load_lang('add_user') + '''</a></li>

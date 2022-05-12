@@ -49,5 +49,5 @@ def view_xref_2(conn, name, xref_type = '1'):
     return easy_minify(flask.render_template(skin_check(),
         imp = [name, wiki_set(), wiki_custom(), wiki_css([data_sub, 0])],
         data = div,
-        menu = [['w/' + url_pas(name), load_lang('return')], ['backlink_reset/' + url_pas(name), load_lang('reset_backlink')]]
+        menu = [['w/' + url_pas(name), load_lang('return')], ['xref_reset/' + url_pas(name), load_lang('reset_backlink')]]
     ))
