@@ -502,17 +502,9 @@ app.route('/revert/<everything:name>', methods = ['POST', 'GET'])(edit_revert)
 app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
 
 # Func-topic
-@app.route('/recent_discuss')
-def recent_discuss():
-    return recent_discuss_2(load_db.db_get(), 'normal')
-
-@app.route('/recent_discuss/close')
-def recent_discuss_close():
-    return recent_discuss_2(load_db.db_get(), 'close')
-
-@app.route('/recent_discuss/open')
-def recent_discuss_open():
-    return recent_discuss_2(load_db.db_get(), 'open')
+app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(recent_discuss)
+app.route('/recent_discuss/close', defaults = { 'tool' : 'close' })(recent_discuss)
+app.route('/recent_discuss/open', defaults = { 'tool' : 'open' })(recent_discuss)
 
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
 app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
