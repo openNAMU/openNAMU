@@ -255,42 +255,42 @@ if os.path.exists('custom.py'):
 # Func
 # Func-inter_wiki
 app.route('/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(filter_inter_wiki)
-app.route('/inter_wiki/del/<name>', defaults = { 'tool' : 'del_inter_wiki' })(filter_inter_wiki_delete)
+app.route('/inter_wiki/del/<everything:name>', defaults = { 'tool' : 'del_inter_wiki' })(filter_inter_wiki_delete)
 app.route('/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(filter_inter_wiki_add)
-app.route('/inter_wiki/add/<name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(filter_inter_wiki_add)
+app.route('/inter_wiki/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(filter_inter_wiki_add)
 
 app.route('/filter/document/list')(filter_document)
-app.route('/filter/document/add/<name>', methods = ['POST', 'GET'])(filter_document_add)
+app.route('/filter/document/add/<everything:name>', methods = ['POST', 'GET'])(filter_document_add)
 app.route('/filter/document/add', methods = ['POST', 'GET'])(filter_document_add)
 app.route('/filter/document/del/<name>')(filter_document_delete)
 
 app.route('/edit_top', defaults = { 'tool' : 'edit_top' })(filter_inter_wiki)
-app.route('/edit_top/del/<name>', defaults = { 'tool' : 'del_edit_top' })(filter_inter_wiki_delete)
+app.route('/edit_top/del/<everything:name>', defaults = { 'tool' : 'del_edit_top' })(filter_inter_wiki_delete)
 app.route('/edit_top/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_top' })(filter_inter_wiki_add)
 
 app.route('/image_license', defaults = { 'tool' : 'image_license' })(filter_inter_wiki)
-app.route('/image_license/del/<name>', defaults = { 'tool' : 'del_image_license' })(filter_inter_wiki_delete)
+app.route('/image_license/del/<everything:name>', defaults = { 'tool' : 'del_image_license' })(filter_inter_wiki_delete)
 app.route('/image_license/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_image_license' })(filter_inter_wiki_add)
 
 app.route('/edit_filter', defaults = { 'tool' : 'edit_filter' })(filter_inter_wiki)
-app.route('/edit_filter/del/<name>', defaults = { 'tool' : 'del_edit_filter' })(filter_inter_wiki_delete)
+app.route('/edit_filter/del/<everything:name>', defaults = { 'tool' : 'del_edit_filter' })(filter_inter_wiki_delete)
 app.route('/edit_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(filter_inter_wiki_add)
-app.route('/edit_filter/add/<name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(filter_inter_wiki_add)
+app.route('/edit_filter/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(filter_inter_wiki_add)
 
 app.route('/email_filter', defaults = { 'tool' : 'email_filter' })(filter_inter_wiki)
-app.route('/email_filter/del/<name>', defaults = { 'tool' : 'del_email_filter' })(filter_inter_wiki_delete)
+app.route('/email_filter/del/<everything:name>', defaults = { 'tool' : 'del_email_filter' })(filter_inter_wiki_delete)
 app.route('/email_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_email_filter' })(filter_inter_wiki_add)
 
 app.route('/file_filter', defaults = { 'tool' : 'file_filter' })(filter_inter_wiki)
-app.route('/file_filter/del/<name>', defaults = { 'tool' : 'del_file_filter' })(filter_inter_wiki_delete)
+app.route('/file_filter/del/<everything:name>', defaults = { 'tool' : 'del_file_filter' })(filter_inter_wiki_delete)
 app.route('/file_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_file_filter' })(filter_inter_wiki_add)
 
 app.route('/name_filter', defaults = { 'tool' : 'name_filter' })(filter_inter_wiki)
-app.route('/name_filter/del/<name>', defaults = { 'tool' : 'del_name_filter' })(filter_inter_wiki_delete)
+app.route('/name_filter/del/<everything:name>', defaults = { 'tool' : 'del_name_filter' })(filter_inter_wiki_delete)
 app.route('/name_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_name_filter' })(filter_inter_wiki_add)
 
 app.route('/extension_filter', defaults = { 'tool' : 'extension_filter' })(filter_inter_wiki)
-app.route('/extension_filter/del/<name>', defaults = { 'tool' : 'del_extension_filter' })(filter_inter_wiki_delete)
+app.route('/extension_filter/del/<everything:name>', defaults = { 'tool' : 'del_extension_filter' })(filter_inter_wiki_delete)
 app.route('/extension_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_extension_filter' })(filter_inter_wiki_add)
 
 # Func-list
