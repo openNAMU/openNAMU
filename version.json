@@ -1,10 +1,6 @@
 {
     "beta" : {
-<<<<<<< HEAD
-        "r_ver" : "v3.4.4 (stable1) (beta3) (dev12)",
-=======
-        "r_ver" : "v3.4.5 (stable1) (beta1) (dev1)",
->>>>>>> 95246c0f3e0bd580c4d50961b19132b9d0639a5a
+        "r_ver" : "v3.4.5 (stable1) (beta1) (dev2)",
         "c_ver" : "3500105",
         "s_ver" : "3500110"
     }
