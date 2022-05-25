@@ -7,8 +7,8 @@ def main_func_setting():
         ['robot', 'robots.txt'],
         ['external', load_lang('ext_api_req_set')],
         ['head', load_lang('main_head')],
-        ['body_top', load_lang('main_body')],
-        ['body_bottom', load_lang('main_bottom_body')]
+        ['body/top', load_lang('main_body')],
+        ['body/bottom', load_lang('main_bottom_body')]
     ]
 
     li_data = ''.join(['<li><a href="/setting/' + str(li[0]) + '">' + li[1] + '</a></li>' for li in li_list])
