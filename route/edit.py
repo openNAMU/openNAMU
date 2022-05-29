@@ -30,14 +30,21 @@ def edit(name = 'Test', name_load = 0, section = 0):
     
             today = get_time()
             content = flask.request.form.get('content', '').replace('\r\n', '\n')
+            send = flask.request.form.get('send', '')
             
             if edit_filter_do(content) == 1:
                 return re_error('/error/21')
-                
+            
+            curs.execute(db_change('select data from other where name = "edit_bottom_compulsion"'))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '' and send == '':
+                return re_error('/error/37')
+
             curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
-            copyright_checkbox_text_d = curs.fetchall()
-            if copyright_checkbox_text_d and copyright_checkbox_text_d[0][0] != '' and flask.request.form.get('copyright_agreement', '') != 'yes':
-                return re_error('/error/29')
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '':
+                if flask.request.form.get('copyright_agreement', '') != 'yes':
+                    return re_error('/error/29')
             
             curs.execute(db_change("select data from data where title = ?"), [name])
             old = curs.fetchall()
@@ -64,7 +71,7 @@ def edit(name = 'Test', name_load = 0, section = 0):
                 content,
                 today,
                 ip,
-                flask.request.form.get('send', ''),
+                send,
                 leng
             )
             
@@ -117,20 +124,8 @@ def edit(name = 'Test', name_load = 0, section = 0):
                 '<hr class="main_hr">' + \
             ''
     
-            curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
-            sql_d = curs.fetchall()
-            b_text = ('<hr class="main_hr">' + sql_d[0][0]) if sql_d and sql_d[0][0] != '' else ''
-            
-            curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
-            sql_d = curs.fetchall()
-            if sql_d and sql_d[0][0] != '':
-                cccb_text = '' + \
-                    '<hr class="main_hr">' + \
-                    '<input type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + \
-                    '<hr class="main_hr">' + \
-                ''
-            else:
-                cccb_text = ''
+            b_text = get_edit_text_bottom()
+            cccb_text = get_edit_text_bottom_check()
     
             curs.execute(db_change('select data from other where name = "edit_help"'))
             sql_d = curs.fetchall()

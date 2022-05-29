@@ -162,15 +162,15 @@ def edit_move(name):
                     <form method="post">
                         ''' + ip_warning() + '''
                         <input placeholder="''' + load_lang('document_name') + '" value="' + name + '''" name="title" type="text">
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         <select name="move_option">
                             <option value="normal"> ''' + load_lang('normal') + '''</option>
                             <option value="reverse"> ''' + load_lang('replace_move') + '''</option>
                             ''' + ('<option value="merge"> ' + load_lang('merge_move') + '</option>' if admin_check() == 1 else '') + '''
                         </select>
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         ''' + captcha_get() + '''
                         <button type="submit">''' + load_lang('move') + '''</button>
                     </form>
