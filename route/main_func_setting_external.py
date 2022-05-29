@@ -113,7 +113,7 @@ def main_func_setting_external():
 
                         <span>''' + load_lang('smtp_security') + '''</span>
                         <hr class="main_hr">
-                        <select name="recaptcha_ver">
+                        <select name="smtp_security">
                             ''' + security_radios + '''
                         </select>
                         <hr class="main_hr">
