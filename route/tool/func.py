@@ -540,6 +540,24 @@ def update(ver_num, set_data):
         curs.execute(db_change(
             'delete from acl where title like "file:%" and data = "admin" and type like "decu%"'
         ))
+        
+    if ver_num < 3500106:
+        curs.execute(db_change("select data from other where name = 'domain'"))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            db_data = db_data[0][0]
+            db_data = re.match(r'[^/]+\/\/([^/]+)', db_data)
+            if db_data:
+                db_data = db_data.group(1)
+                curs.execute(db_change(
+                    "update other set data = ? where name = 'domain'"
+                ), [
+                    db_data
+                ])
+            else:
+                curs.execute(db_change(
+                    "update other set data = '' where name = 'domain'"
+                ))
     
     conn.commit()
     
@@ -678,7 +696,7 @@ def check_int(data):
         return ''
     
 def redirect(data = '/'):
-    return flask.redirect(flask.request.host_url[:-1] + data)
+    return flask.redirect(load_domain('full') + data)
     
 def get_acl_list(type_d = 'normal'):
     if type_d == 'user':
@@ -696,12 +714,25 @@ def load_image_url():
     
     return image_where
 
-def load_domain():
+def load_domain(data_type = 'normal'):
     curs = conn.cursor()
+    
+    domain = ''
+    
+    if data_type == 'full':
+        curs.execute(db_change("select data from other where name = 'http_select'"))
+        db_data = curs.fetchall()
+        domain += db_data[0][0] if db_data and db_data[0][0] != '' else 'http'
+        domain += '://'
 
-    curs.execute(db_change("select data from other where name = 'domain'"))
-    domain = curs.fetchall()
-    domain = domain[0][0] if domain and domain[0][0] != '' else flask.request.host_url
+        curs.execute(db_change("select data from other where name = 'domain'"))
+        db_data = curs.fetchall()
+        domain += db_data[0][0] if db_data and db_data[0][0] != '' else flask.request.host
+        domain += '/'
+    else:
+        curs.execute(db_change("select data from other where name = 'domain'"))
+        db_data = curs.fetchall()
+        domain += db_data[0][0] if db_data and db_data[0][0] != '' else flask.request.host
 
     return domain
 
@@ -1627,6 +1658,25 @@ def ip_pas(raw_ip, type_data = 0):
         return end_ip
         
 # Func-edit
+def get_edit_text_bottom():
+    curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
+    sql_d = curs.fetchall()
+    return ('<hr class="main_hr">' + sql_d[0][0]) if sql_d and sql_d[0][0] != '' else ''
+
+def get_edit_text_bottom_check():
+    cccb_text = ''
+
+    curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
+    sql_d = curs.fetchall()
+    if sql_d and sql_d[0][0] != '':
+        cccb_text = '' + \
+            '<hr class="main_hr">' + \
+            '<input type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + \
+            '<hr class="main_hr">' + \
+        ''
+        
+    return cccb_text
+
 def slow_edit_check():
     curs = conn.cursor()
 

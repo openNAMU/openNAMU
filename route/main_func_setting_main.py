@@ -27,7 +27,8 @@ def main_func_setting_main(db_set):
             23 : ['ua_get', ''],
             24 : ['enable_comment', ''],
             25 : ['enable_challenge', ''],
-            26 : ['edit_bottom_compulsion', '']
+            26 : ['edit_bottom_compulsion', ''],
+            27 : ['http_select', 'http']
         }
 
         if flask.request.method == 'POST':
@@ -54,13 +55,21 @@ def main_func_setting_main(db_set):
             else:
                 conn.commit()
 
-            acl_div = ['']
-            encode_data = ['sha256', 'sha3']
-            for acl_data in encode_data:
-                if acl_data == d_list[15]:
-                    acl_div[0] = '<option value="' + acl_data + '">' + acl_data + '</option>' + acl_div[0]
+            encode_select = ''
+            encode_select_data = ['sha256', 'sha3']
+            for encode_select_one in encode_select_data:
+                if encode_select_one == d_list[15]:
+                    encode_select = '<option value="' + encode_select_one + '">' + encode_select_one + '</option>' + encode_select
                 else:
-                    acl_div[0] += '<option value="' + acl_data + '">' + acl_data + '</option>'
+                    encode_select += '<option value="' + encode_select_one + '">' + encode_select_one + '</option>'
+                    
+            tls_select = ''
+            tls_select_data = ['http', 'https']
+            for tls_select_one in tls_select_data:
+                if tls_select_one == d_list[27]:
+                    tls_select = '<option value="' + tls_select_one + '">' + tls_select_one + '</option>' + tls_select
+                else:
+                    tls_select += '<option value="' + tls_select_one + '">' + tls_select_one + '</option>'
 
             check_box_div = ['', '', '', '', '', '', '', '']
             for i in range(0, len(check_box_div)):
@@ -110,9 +119,14 @@ def main_func_setting_main(db_set):
                         <input name="frontpage" value="''' + html.escape(d_list[2]) + '''">
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('domain') + '''</span> (EX : http://2du.pythonanywhere.com/)
+                        <span>''' + load_lang('tls_method') + '''</span>
                         <hr class="main_hr">
-                        <input name="''' + setting_list[22][0] + '''" value="''' + html.escape(d_list[22]) + '''">
+                        <select name="http_select">''' + tls_select + '''</select>
+                        <hr class="main_hr">
+
+                        <span>''' + load_lang('domain') + '''</span> (EX : 2du.pythonanywhere.com)
+                        <hr class="main_hr">
+                        <input name="domain" value="''' + html.escape(d_list[22]) + '''">
                         <hr class="main_hr">
 
                         <span>''' + load_lang('wiki_host') + '''</span>
@@ -132,7 +146,7 @@ def main_func_setting_main(db_set):
 
                         <span>''' + load_lang('encryption_method') + '''</span>
                         <hr class="main_hr">
-                        <select name="encode">''' + acl_div[0] + '''</select>
+                        <select name="encode">''' + encode_select + '''</select>
 
                         <h3>1.1. ''' + load_lang('communication_set') + '''</h3>
                         <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + load_lang('enable_comment_function') + '''
@@ -192,7 +206,7 @@ def main_func_setting_main(db_set):
 
                         <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ') (' + load_lang('off') + ''' : 0)</span>
                         <hr class="main_hr">
-                        <input name="''' + setting_list[19][0] + '''" value="''' + html.escape(d_list[19]) + '''">
+                        <input name="slow_edit" value="''' + html.escape(d_list[19]) + '''">
                         
                         <hr class="main_hr">
                         <input type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + load_lang('edit_bottom_compulsion') + '''
