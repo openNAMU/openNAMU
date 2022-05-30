@@ -1659,13 +1659,11 @@ def ip_pas(raw_ip, type_data = 0):
         
 # Func-edit
 def get_edit_text_bottom():
-    curs = conn.cursor()
-    
     curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
     sql_d = curs.fetchall()
     return ('<hr class="main_hr">' + sql_d[0][0]) if sql_d and sql_d[0][0] != '' else ''
 
-def get_edit_text_bottom_check():
+def get_edit_text_bottom_check_box():
     curs = conn.cursor()
     
     cccb_text = ''
@@ -1681,7 +1679,15 @@ def get_edit_text_bottom_check():
         
     return cccb_text
 
-def slow_edit_check():
+def do_edit_send_check(data):
+    curs.execute(db_change('select data from other where name = "edit_bottom_compulsion"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '' and data == '':
+        return 1
+    
+    return 0
+
+def do_edit_slow_check():
     curs = conn.cursor()
 
     curs.execute(db_change("select data from other where name = 'slow_edit'"))
@@ -1706,7 +1712,7 @@ def slow_edit_check():
 
     return 0
 
-def edit_filter_do(data):
+def do_edit_filter(data):
     curs = conn.cursor()
 
     if admin_check(1) != 1:

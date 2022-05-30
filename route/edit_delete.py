@@ -18,7 +18,7 @@ def edit_delete(name):
             else:
                 captcha_post('', 0)
 
-            if slow_edit_check() == 1:
+            if do_edit_slow_check() == 1:
                 return re_error('/error/24')
 
             curs.execute(db_change("select data from data where title = ?"), [name])

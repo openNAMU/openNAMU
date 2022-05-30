@@ -25,19 +25,17 @@ def edit(name = 'Test', name_load = 0, section = 0):
             else:
                 captcha_post('', 0)
     
-            if slow_edit_check() == 1:
+            if do_edit_slow_check() == 1:
                 return re_error('/error/24')
     
             today = get_time()
             content = flask.request.form.get('content', '').replace('\r\n', '\n')
             send = flask.request.form.get('send', '')
             
-            if edit_filter_do(content) == 1:
+            if do_edit_filter(content) == 1:
                 return re_error('/error/21')
-            
-            curs.execute(db_change('select data from other where name = "edit_bottom_compulsion"'))
-            db_data = curs.fetchall()
-            if db_data and db_data[0][0] != '' and send == '':
+
+            if do_edit_send_check(send) == 1:
                 return re_error('/error/37')
 
             curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
@@ -125,7 +123,7 @@ def edit(name = 'Test', name_load = 0, section = 0):
             ''
     
             b_text = get_edit_text_bottom()
-            cccb_text = get_edit_text_bottom_check()
+            cccb_text = get_edit_text_bottom_check_box()
     
             curs.execute(db_change('select data from other where name = "edit_help"'))
             sql_d = curs.fetchall()
