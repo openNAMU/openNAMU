@@ -1659,11 +1659,15 @@ def ip_pas(raw_ip, type_data = 0):
         
 # Func-edit
 def get_edit_text_bottom():
+    curs = conn.cursor()
+    
     curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
     sql_d = curs.fetchall()
     return ('<hr class="main_hr">' + sql_d[0][0]) if sql_d and sql_d[0][0] != '' else ''
 
 def get_edit_text_bottom_check():
+    curs = conn.cursor()
+    
     cccb_text = ''
 
     curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
