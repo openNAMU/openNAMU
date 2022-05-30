@@ -19,13 +19,13 @@ def edit_revert(name):
             else:
                 captcha_post('', 0)
 
-            if slow_edit_check() == 1:
+            if do_edit_slow_check() == 1:
                 return re_error('/error/24')
 
             curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])
             data = curs.fetchall()
             if data:
-                if edit_filter_do(data[0][0]) == 1:
+                if do_edit_filter(data[0][0]) == 1:
                     return re_error('/error/21')
 
             curs.execute(db_change("delete from back where link = ?"), [name])
