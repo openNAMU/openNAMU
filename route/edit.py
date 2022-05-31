@@ -200,7 +200,7 @@ def edit(name = 'Test', name_load = 0, section = 0):
                                 name="ver" 
                                 value="''' + doc_ver + '''">
                         <hr class="main_hr">
-                        ''' + captcha_get() + ip_warning() + cccb_text + '''
+                        ''' + captcha_get() + ip_warning() + cccb_text + b_text + '''
                         <button id="save"
                                 type="submit" 
                                 onclick="
@@ -215,7 +215,6 @@ def edit(name = 'Test', name_load = 0, section = 0):
                                     load_preview(\'''' + url_pas(name) + '''\');
                                 ">''' + load_lang('preview') + '''</button>
                     </form>
-                    ''' + b_text + '''
                     <hr class="main_hr">
                     <div id="see_preview"></div>
                     <script>
