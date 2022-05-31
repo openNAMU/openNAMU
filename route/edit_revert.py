@@ -65,17 +65,19 @@ def edit_revert(name):
             curs.execute(db_change("select title from history where title = ? and id = ?"), [name, str(num)])
             if not curs.fetchall():
                 return redirect('/w/' + url_pas(name))
+                
+            b_text = get_edit_text_bottom()
+            cccb_text = get_edit_text_bottom_check_box()
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('revert') + ')', 0])],
                 data =  '''
                         <form method="post">
                             <span>r''' + flask.request.args.get('num', '0') + '''</span>
-                            <hr class=\"main_hr\">
-                            ''' + ip_warning() + '''
+                            <hr class="main_hr">
                             <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                            <hr class=\"main_hr\">
-                            ''' + captcha_get() + '''
+                            <hr class="main_hr">
+                            ''' + captcha_get() + ip_warning() + cccb_text + b_text + '''
                             <button type="submit">''' + load_lang('revert') + '''</button>
                         </form>
                         ''',
