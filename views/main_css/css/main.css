@@ -44,11 +44,11 @@ a {
     color: red;
 }
 
-#inside, #out_link, #out_link::before, .opennamuLinkOut {
+#inside, #out_link, #out_link::before, .opennamu_link_out {
     color: green;
 }
 
-#out_link::before, .opennamuLinkOut::before {
+#out_link::before, .opennamu_link_out::before {
     content: '🅴';
     
     font-weight: lighter;
@@ -74,35 +74,35 @@ a {
 }
 
 /* 토론 관련 */
-#toron, .opennamu_comment {
+.opennamu_comment {
     width: 100%;
 }
 
-#toron_color_green, .opennamu_comment_color_green {
+.opennamu_comment_color_green {
     background: palegreen;
 }
 
-#toron_color_blue, .opennamu_comment_color_blue {
+.opennamu_comment_color_blue {
     background: paleturquoise;
 }
 
-#toron_color_red, .opennamu_comment_color_red {
+.opennamu_comment_color_red {
     background: palevioletred;
 }
 
-#toron_color_normal, .opennamu_comment_color_default {
+.opennamu_comment_color_default {
     background: palegoldenrod;
 }
 
-#toron_color_grey, .opennamu_comment_color_gray {
+.opennamu_comment_color_gray {
     background: gainsboro;
 }
 
-#toron_color_not, .opennamu_comment_blind {
+.opennamu_comment_blind {
     display: none;
 }
 
-#topic_scroll, .opennamu_comment_scroll {
+.opennamu_comment_scroll {
     max-height: 500px;
     
     overflow: scroll;
@@ -111,11 +111,11 @@ a {
     scrollbar-width: none;
 }
 
-#topic_scroll::-webkit-scrollbar, .opennamu_comment_scroll::-webkit-scrollbar {
+.opennamu_comment_scroll::-webkit-scrollbar {
     display: none;
 }
 
-.topic_content {
+.opennamu_comment_textarea {
     height: 200px;
 }
 
