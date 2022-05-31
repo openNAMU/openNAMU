@@ -112,7 +112,7 @@ set_init_always(version_list['beta']['c_ver'])
 
 # Init-Route
 class EverythingConverter(werkzeug.routing.PathConverter):
-    regex = '.*?'
+    regex = r'.*?'
 
 class RegexConverter(werkzeug.routing.BaseConverter):
     def __init__(self, url_map, *items):
@@ -461,32 +461,21 @@ def search_deep(name = 'test'):
     return search_deep_2(load_db.db_get(), name)
 
 # Func-view
-@app.route('/xref/<everything:name>')
-def view_xref(name = 'Test'):
-    return view_xref_2(load_db.db_get(), name)
-
-@app.route('/xref/this/<everything:name>')
-def view_xref_this(name = 'Test'):
-    return view_xref_2(load_db.db_get(), name, xref_type = '2')
+app.route('/xref/<everything:name>')(view_xref)
+app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
 app.route('/raw/<everything:name>')(view_raw_2)
-app.route('/raw/<everything:name>/doc_acl', defaults = { 'doc_acl' : 1 })(view_raw_2)
-app.route('/raw/<everything:name>/doc_rev/<int:num>')(view_raw_2)
+app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 1 })(view_raw_2)
+app.route('/raw_rev/<int:num>/<everything:name>')(view_raw_2)
 
-@app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')
-def view_diff(name = 'Test', num_a = 1, num_b = 1):
-    return view_diff_2(load_db.db_get(), name, num_a, num_b)
+app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')(view_diff)
 
-@app.route('/down/<everything:name>')
-def view_down(name = None):
-    return view_down_2(load_db.db_get(), name)
+app.route('/down/<everything:name>')(view_down)
 
 # everything 다음에 추가 붙은 경우에 대해서 재검토 필요
-@app.route('/w/<everything:name>/doc_rev/<int(signed = True):doc_rev>')
-@app.route('/w/<everything:name>/doc_from/<everything:doc_from>')
-@app.route('/w/<everything:name>')
-def view_read(name = 'Test', doc_rev = 0, doc_from = ''):
-    return view_read_2(load_db.db_get(), name, doc_rev, doc_from)
+app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
+app.route('/w_from/<everything:name>')(view_read)
+app.route('/w/<everything:name>')(view_read)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
@@ -495,10 +484,13 @@ app.route('/edit/<everything:name>/doc_section/<int:section>', methods = ['POST'
 
 # 개편 예정
 app.route('/xref_reset/<everything:name>')(edit_backlink_reset)
+
 app.route('/delete/<everything:name>', methods = ['POST', 'GET'])(edit_delete)
 app.route('/delete_file/<everything:name>', methods = ['POST', 'GET'])(edit_delete_file)
 app.route('/delete_mutiple', methods = ['POST', 'GET'])(edit_delete_mutiple)
+
 app.route('/revert/<everything:name>', methods = ['POST', 'GET'])(edit_revert)
+
 app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
 
 # Func-topic

@@ -1288,15 +1288,13 @@ function do_onmark_redirect_render(data, data_js, name_doc) {
         if(
             name_include == '' &&
             window.location.search === '' &&
-            window.location.pathname.match(/\/w\//) &&
-            !window.location.pathname.match(/\/doc_from\//)
+            window.location.pathname.match(/\/w\//)
         ) {
-            window.location.href = '/w/' + do_url_change(link_main) + '/doc_from/' + do_url_change(name_doc) + link_sub;
+            window.location.href = '/w_from/' + do_url_change(link_main);
         }
         
         return [
-            '/w/' + do_url_change(link_main) + 
-            '/doc_from/' + do_url_change(name_doc) + 
+            '/w_from/' + do_url_change(link_main), 
             link_sub,
             data_js, 
             1
@@ -1341,7 +1339,6 @@ function do_onmark_render(
     var data_nowiki = {};
         
     name_doc = do_xss_change(name_doc);
-    console.log(name_doc);
 
     let xhr = new XMLHttpRequest();
     xhr.open("GET", "/api/setting/inter_wiki");

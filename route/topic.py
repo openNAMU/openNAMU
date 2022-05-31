@@ -130,7 +130,7 @@ def topic(topic_num = 0):
                     <hr class="main_hr">
                     <form style="''' + display + '''" method="post">
                         ''' + data_input_topic_name + '''
-                        <textarea id="textarea_edit_view" class="topic_content" placeholder="''' + topic_text + '''" name="content"></textarea>
+                        <textarea id="textarea_edit_view" class="opennamu_comment_textarea" placeholder="''' + topic_text + '''" name="content"></textarea>
                         <hr class="main_hr">
                         ''' + captcha_get() + (ip_warning() if display == '' else '') + '''
                         <input style="display: none;" name="topic" value="''' + name + '''">
