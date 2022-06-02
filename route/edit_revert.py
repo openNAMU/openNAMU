@@ -12,6 +12,11 @@ def edit_revert(name):
 
         if acl_check(name) == 1:
             return re_error('/ban')
+        
+        curs.execute(db_change("select title from history where title = ? and id = ?"), [name, str(num)])
+        data = curs.fetchall()
+        if not data:
+            return redirect('/w/' + url_pas(name))
 
         if flask.request.method == 'POST':
             if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
@@ -21,15 +26,20 @@ def edit_revert(name):
 
             if do_edit_slow_check() == 1:
                 return re_error('/error/24')
+            
+            send = flask.request.form.get('send', '')
+            agree = flask.request.form.get('copyright_agreement', '')
+            
+            if do_edit_send_check(send) == 1:
+                return re_error('/error/37')
+            
+            if do_edit_text_bottom_check_box_check(agree) == 1:
+                return re_error('/error/29')
 
-            curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])
-            data = curs.fetchall()
-            if data:
-                if do_edit_filter(data[0][0]) == 1:
-                    return re_error('/error/21')
+            if do_edit_filter(data[0][0]) == 1:
+                return re_error('/error/21')
 
             curs.execute(db_change("delete from back where link = ?"), [name])
-            conn.commit()
 
             if data:
                 curs.execute(db_change("select data from data where title = ?"), [name])
@@ -58,17 +68,10 @@ def edit_revert(name):
                     data_type = 'backlink'
                 )
 
-                conn.commit()
+            conn.commit()
 
             return redirect('/w/' + url_pas(name))
         else:
-            curs.execute(db_change("select title from history where title = ? and id = ?"), [name, str(num)])
-            if not curs.fetchall():
-                return redirect('/w/' + url_pas(name))
-                
-            b_text = get_edit_text_bottom()
-            cccb_text = get_edit_text_bottom_check_box()
-
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('revert') + ')', 0])],
                 data =  '''
@@ -77,7 +80,7 @@ def edit_revert(name):
                             <hr class="main_hr">
                             <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                             <hr class="main_hr">
-                            ''' + captcha_get() + ip_warning() + cccb_text + b_text + '''
+                            ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
                             <button type="submit">''' + load_lang('revert') + '''</button>
                         </form>
                         ''',

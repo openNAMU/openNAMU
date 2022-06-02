@@ -10,9 +10,18 @@ def edit_delete_mutiple():
             return re_error('/ban')
 
         if flask.request.method == 'POST':
+            send = flask.request.form.get('send', '')
+            agree = flask.request.form.get('copyright_agreement', '')
+            
+            if do_edit_send_check(send) == 1:
+                return re_error('/error/37')
+            
+            if do_edit_text_bottom_check_box_check(agree) == 1:
+                return re_error('/error/29')
+            
             all_title = re.findall(r'([^\n]+)\n', flask.request.form.get('content', '').replace('\r\n', '\n') + '\n')
             for name in all_title:
-                edit_delete.edit_delete_2(conn, name)
+                edit_delete.edit_delete(name)
 
             return redirect('/recent_changes')
         else:
@@ -21,9 +30,10 @@ def edit_delete_mutiple():
                 data = '''
                     <form method="post">
                         <textarea rows="25" placeholder="''' + load_lang('many_delete_help') + '''" name="content"></textarea>
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
+                        ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
                         <button type="submit">''' + load_lang('delete') + '''</button>
                     </form>
                 ''',

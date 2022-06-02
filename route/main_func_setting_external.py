@@ -127,7 +127,7 @@ def main_func_setting_external():
                         <hr class="main_hr">
                         <input type="password" name="smtp_pass" value="''' + html.escape(d_list[6]) + '''">
 
-                        <h2>3. ''' + load_lang('oauth') + ''' (''' + load_lang('incomplete') + ''')</h2>
+                        <h2>3. ''' + load_lang('oauth') + ''' (''' + load_lang('not_working') + ''')</h2>
                         <a href="https://developers.google.com/identity/protocols/oauth2">(Google)</a>
                         <hr class="main_hr">
 

@@ -1690,6 +1690,17 @@ def get_edit_text_bottom_check_box():
         
     return cccb_text
 
+def do_edit_text_bottom_check_box_check(data):
+    curs = conn.cursor()
+    
+    curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        if data != 'yes':
+            return 1
+        
+    return 0
+
 def do_edit_send_check(data):
     curs = conn.cursor()
     
@@ -2059,6 +2070,8 @@ def re_error(data):
             data = load_lang('same_email_error')
         elif num == 36:
             data = load_lang('input_email_error')
+        elif num == 37:
+            data = load_lang('error_edit_send_request')
         else:
             data = '???'
 

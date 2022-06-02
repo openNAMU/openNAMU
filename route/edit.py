@@ -31,6 +31,7 @@ def edit(name = 'Test', name_load = 0, section = 0):
             today = get_time()
             content = flask.request.form.get('content', '').replace('\r\n', '\n')
             send = flask.request.form.get('send', '')
+            agree = flask.request.form.get('copyright_agreement', '')
             
             if do_edit_filter(content) == 1:
                 return re_error('/error/21')
@@ -38,11 +39,8 @@ def edit(name = 'Test', name_load = 0, section = 0):
             if do_edit_send_check(send) == 1:
                 return re_error('/error/37')
 
-            curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
-            db_data = curs.fetchall()
-            if db_data and db_data[0][0] != '':
-                if flask.request.form.get('copyright_agreement', '') != 'yes':
-                    return re_error('/error/29')
+            if do_edit_text_bottom_check_box_check(agree) == 1:
+                return re_error('/error/29')
             
             curs.execute(db_change("select data from data where title = ?"), [name])
             old = curs.fetchall()
@@ -122,9 +120,6 @@ def edit(name = 'Test', name_load = 0, section = 0):
                 '<hr class="main_hr">' + \
             ''
     
-            b_text = get_edit_text_bottom()
-            cccb_text = get_edit_text_bottom_check_box()
-    
             curs.execute(db_change('select data from other where name = "edit_help"'))
             sql_d = curs.fetchall()
             p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
@@ -200,7 +195,7 @@ def edit(name = 'Test', name_load = 0, section = 0):
                                 name="ver" 
                                 value="''' + doc_ver + '''">
                         <hr class="main_hr">
-                        ''' + captcha_get() + ip_warning() + cccb_text + b_text + '''
+                        ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
                         <button id="save"
                                 type="submit" 
                                 onclick="
