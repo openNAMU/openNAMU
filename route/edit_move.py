@@ -19,6 +19,17 @@ def edit_move(name):
 
             if do_edit_slow_check() == 1:
                 return re_error('/error/24')
+            
+            send = flask.request.form.get('send', '')
+            agree = flask.request.form.get('copyright_agreement', '')
+            time = get_time()
+            ip = ip_check()
+            
+            if do_edit_send_check(send) == 1:
+                return re_error('/error/37')
+            
+            if do_edit_text_bottom_check_box_check(agree) == 1:
+                return re_error('/error/29')
 
             curs.execute(db_change("select title from history where title = ?"), [move_title])
             if curs.fetchall():
@@ -42,9 +53,9 @@ def edit_move(name):
                     history_plus(
                         name,
                         data_in,
-                        get_time(),
-                        ip_check(),
-                        flask.request.form.get('send', ''),
+                        time,
+                        ip,
+                        send,
                         '0',
                         t_check = 'merge <a>' + name + '</a> - <a>' + move_title + '</a> move',
                         mode = 'move'
@@ -110,9 +121,9 @@ def edit_move(name):
                         history_plus(
                             title_name[0],
                             data_in,
-                            get_time(),
-                            ip_check(),
-                            flask.request.form.get('send', ''),
+                            time,
+                            ip,
+                            send,
                             '0',
                             t_check = '<a>' + (title_name[0] if title_name[0] != 'test ' + str(i) else name) + '</a> - <a>' + title_name[1] + '</a> move',
                             mode = 'move'
@@ -139,9 +150,9 @@ def edit_move(name):
                 history_plus(
                     name,
                     data_in,
-                    get_time(),
-                    ip_check(),
-                    flask.request.form.get('send', ''),
+                    time,
+                    ip,
+                    send,
                     '0',
                     t_check = '<a>' + name + '</a> - <a>' + move_title + '</a> move',
                     mode = 'move'
@@ -171,7 +182,7 @@ def edit_move(name):
                             ''' + ('<option value="merge"> ' + load_lang('merge_move') + '</option>' if admin_check() == 1 else '') + '''
                         </select>
                         <hr class="main_hr">
-                        ''' + captcha_get() + '''
+                        ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
                         <button type="submit">''' + load_lang('move') + '''</button>
                     </form>
                 ''',

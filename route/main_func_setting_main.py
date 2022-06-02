@@ -149,10 +149,10 @@ def main_func_setting_main(db_set):
                         <select name="encode">''' + encode_select + '''</select>
 
                         <h3>1.1. ''' + load_lang('communication_set') + '''</h3>
-                        <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + load_lang('enable_comment_function') + '''
+                        <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + load_lang('enable_comment_function') + ''' (''' + load_lang('not_working') + ''')
                         <hr class="main_hr">
 
-                        <input type="checkbox" name="enable_challenge" ''' + check_box_div[6] + '''> ''' + load_lang('enable_challenge_function') + '''
+                        <input type="checkbox" name="enable_challenge" ''' + check_box_div[6] + '''> ''' + load_lang('enable_challenge_function') + ''' (''' + load_lang('not_working') + ''')
                         <hr class="main_hr">
 
                         <h2>2. ''' + load_lang('design_set') + '''</h2>
@@ -209,7 +209,7 @@ def main_func_setting_main(db_set):
                         <input name="slow_edit" value="''' + html.escape(d_list[19]) + '''">
                         
                         <hr class="main_hr">
-                        <input type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + load_lang('edit_bottom_compulsion') + '''
+                        <input type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + load_lang('edit_bottom_compulsion') + ''' (''' + load_lang('beta') + ''')
 
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>

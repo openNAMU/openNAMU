@@ -20,6 +20,15 @@ def edit_delete(name):
 
             if do_edit_slow_check() == 1:
                 return re_error('/error/24')
+            
+            send = flask.request.form.get('send', '')
+            agree = flask.request.form.get('copyright_agreement', '')
+            
+            if do_edit_send_check(send) == 1:
+                return re_error('/error/37')
+            
+            if do_edit_text_bottom_check_box_check(agree) == 1:
+                return re_error('/error/29')
 
             curs.execute(db_change("select data from data where title = ?"), [name])
             data = curs.fetchall()
@@ -32,7 +41,7 @@ def edit_delete(name):
                     '',
                     today,
                     ip,
-                    flask.request.form.get('send', ''),
+                    send,
                     leng,
                     t_check = 'delete',
                     mode = 'delete'
@@ -50,15 +59,14 @@ def edit_delete(name):
             curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) - 1)])
 
             return redirect('/w/' + url_pas(name))
-        else:
+        else:            
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('delete') + ')', 0])],
                 data = '''
                     <form method="post">
-                        ''' + ip_warning() + '''
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                         <hr class="main_hr">
-                        ''' + captcha_get() + '''
+                        ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
                         <button type="submit">''' + load_lang('delete') + '''</button>
                     </form>
                 ''',
