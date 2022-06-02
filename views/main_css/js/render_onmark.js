@@ -1209,13 +1209,15 @@ function do_onmark_list_sub_render(data) {
             return '<li style="margin-left: ' + String(list_leng * 20) + 'px">' + x_2 + '</li>';
         });
 
+        list_end_data = list_end_data.replace(/\$/g, '$$$$');
+
         data = data.replace(list_re, '\n<ul>' + list_end_data + '</ul><end_point>\n');
     }
     
     return data;
 }
 
-function do_onmark_list_render(data) {
+function do_onmark_list_render(data) {    
     var wiki_re = /<wiki_s_2 ([^>]+)>((?:(?!<wiki_s_2 |<wiki_e_2>).)+)<wiki_e_2>/s;
     while(1) {
         if(!data.match(wiki_re)) {
