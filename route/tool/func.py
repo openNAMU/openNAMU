@@ -204,7 +204,7 @@ class class_check_json:
         if os.getenv('NAMU_DB') or os.getenv('NAMU_DB_TYPE'):
             set_data = {}
             set_data['db'] = os.getenv('NAMU_DB') if os.getenv('NAMU_DB') else 'data'
-            set_data['db'] = os.getenv('NAMU_DB_TYPE') if os.getenv('NAMU_DB_TYPE') else 'sqlite'
+            set_data['db_type'] = os.getenv('NAMU_DB_TYPE') if os.getenv('NAMU_DB_TYPE') else 'sqlite'
         else:
             if os.path.exists(os.path.join('data', 'set.json')):
                 db_set_list = ['db', 'db_type']
