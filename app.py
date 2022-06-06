@@ -472,7 +472,7 @@ app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everythi
 
 app.route('/down/<everything:name>')(view_down)
 
-# everything 다음에 추가 붙은 경우에 대해서 재검토 필요
+# everything 다음에 추가 붙은 경우에 대해서 재검토 필요 (진행중)
 app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
 app.route('/w_from/<everything:name>')(view_read)
 app.route('/w/<everything:name>')(view_read)
@@ -489,7 +489,7 @@ app.route('/delete/<everything:name>', methods = ['POST', 'GET'])(edit_delete)
 app.route('/delete_file/<everything:name>', methods = ['POST', 'GET'])(edit_delete_file)
 app.route('/delete_mutiple', methods = ['POST', 'GET'])(edit_delete_mutiple)
 
-app.route('/revert/<everything:name>', methods = ['POST', 'GET'])(edit_revert)
+app.route('/revert/<int:num>/<everything:name>', methods = ['POST', 'GET'])(edit_revert)
 
 app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
 
