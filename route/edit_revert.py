@@ -1,10 +1,8 @@
 from .tool.func import *
 
-def edit_revert(name):
+def edit_revert(name, num):
     with get_db_connect() as conn:
         curs = conn.cursor()
-
-        num = int(number_check(flask.request.args.get('num', '1')))
 
         curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, str(num)])
         if curs.fetchall() and admin_check(6) != 1:
@@ -13,7 +11,7 @@ def edit_revert(name):
         if acl_check(name) == 1:
             return re_error('/ban')
         
-        curs.execute(db_change("select title from history where title = ? and id = ?"), [name, str(num)])
+        curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])
         data = curs.fetchall()
         if not data:
             return redirect('/w/' + url_pas(name))
@@ -72,17 +70,20 @@ def edit_revert(name):
 
             return redirect('/w/' + url_pas(name))
         else:
+            if data:
+                preview = '<pre>' + data[0][0] + '</pre>'
+            else:
+                preview = ''
+            
             return easy_minify(flask.render_template(skin_check(),
-                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('revert') + ')', 0])],
+                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(r' + str(num) + ') (' + load_lang('revert') + ')', 0])],
                 data =  '''
                         <form method="post">
-                            <span>r''' + flask.request.args.get('num', '0') + '''</span>
-                            <hr class="main_hr">
                             <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                             <hr class="main_hr">
                             ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
                             <button type="submit">''' + load_lang('revert') + '''</button>
                         </form>
-                        ''',
+                        ''' + preview,
                 menu = [['history/' + url_pas(name), load_lang('history')], ['recent_changes', load_lang('recent_change')]]
             ))

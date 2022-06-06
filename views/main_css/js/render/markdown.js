@@ -1,6 +1,5 @@
 "use strict";
 
-// 걍 언더바로 통일하자
 class opennamu_render_markdown {
     // Init Part
     constructor(
