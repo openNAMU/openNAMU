@@ -145,32 +145,7 @@ print('----')
 
 # Init-DB_Data
 server_set = {}
-server_set_var = {
-    'host' : {
-        'display' : 'Host',
-        'require' : 'conv',
-        'default' : '0.0.0.0'
-    }, 'port' : {
-        'display' : 'Port',
-        'require' : 'conv',
-        'default' : '3000'
-    }, 'language' : {
-        'display' : 'Language',
-        'require' : 'select',
-        'default' : 'ko-KR',
-        'list' : ['ko-KR', 'en-US']
-    }, 'markup' : {
-        'display' : 'Markup',
-        'require' : 'select',
-        'default' : 'namumark',
-        'list' : ['namumark', 'markdown', 'custom', 'raw']
-    }, 'encode' : {
-        'display' : 'Encryption method',
-        'require' : 'select',
-        'default' : 'sha3',
-        'list' : ['sha3', 'sha256']
-    }
-}
+server_set_var = get_init_set_list()
 server_set_env = {
     'host' : os.getenv('NAMU_HOST'),
     'port' : os.getenv('NAMU_PORT'),
@@ -387,6 +362,10 @@ def give_admin_groups(name = None):
 def give_delete_admin_group(name = None):
     return give_delete_admin_group_2(load_db.db_get(), name)
 
+@app.route('/app_submit', methods = ['POST', 'GET'])
+def recent_app_submit():
+    return recent_app_submit_2(load_db.db_get())
+
 # /auth/history
 # ongoing 반영 필요
 @app.route('/block_log')
@@ -441,25 +420,6 @@ def recent_record_reset(name = 'Test'):
 def recent_record_topic(name = 'Test'):
     return recent_record_topic_2(load_db.db_get(), name)
 
-# 거처를 고심중
-@app.route('/app_submit', methods = ['POST', 'GET'])
-def recent_app_submit():
-    return recent_app_submit_2(load_db.db_get())
-
-# Func-search
-@app.route('/search', methods=['POST'])
-def search():
-    return search_2(load_db.db_get())
-
-@app.route('/goto', methods=['POST'])
-@app.route('/goto/<everything:name>', methods=['POST'])
-def search_goto(name = 'test'):
-    return search_goto_2(load_db.db_get(), name)
-
-@app.route('/search/<everything:name>')
-def search_deep(name = 'test'):
-    return search_deep_2(load_db.db_get(), name)
-
 # Func-view
 app.route('/xref/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
@@ -477,10 +437,14 @@ app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
 app.route('/w_from/<everything:name>')(view_read)
 app.route('/w/<everything:name>')(view_read)
 
+app.route('/random')(main_func_random)
+
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
 app.route('/edit/<everything:name>/doc_from/<everything:name_load>', methods = ['POST', 'GET'])(edit)
 app.route('/edit/<everything:name>/doc_section/<int:section>', methods = ['POST', 'GET'])(edit)
+
+app.route('/upload', methods = ['POST', 'GET'])(main_func_upload)
 
 # 개편 예정
 app.route('/xref_reset/<everything:name>')(edit_backlink_reset)
@@ -514,10 +478,35 @@ app.route('/thread/<int:topic_num>/comment/<int:num>/raw')(view_raw_2)
 app.route('/thread/<int:topic_num>/comment/<int:num>/delete', methods = ['POST', 'GET'])(topic_comment_delete)
 
 # Func-user
-@app.route('/change', methods = ['POST', 'GET'])
-def user_setting():
-    return user_setting_2(load_db.db_get(), server_set_var)
+app.route('/change', methods = ['POST', 'GET'])(user_setting)
+app.route('/change/key')(user_setting_key)
+app.route('/change/key/delete')(user_setting_key_delete)
+app.route('/change/pw', methods = ['POST', 'GET'])(user_setting_pw)
+app.route('/change/head', methods=['GET', 'POST'])(user_setting_head)
 
+app.route('/user')(user_info)
+app.route('/user/<name>')(user_info)
+
+app.route('/challenge')(user_challenge)
+
+app.route('/count')(user_count)
+app.route('/count/<name>')(user_count)
+
+app.route('/alarm')(user_alarm)
+app.route('/alarm/delete')(user_alarm_delete)
+
+app.route('/watch_list', defaults = { 'tool' : 'watch_list' })(user_watch_list)
+app.route('/watch_list/<everything:name>', defaults = { 'tool' : 'watch_list' })(user_watch_list_name)
+
+app.route('/star_doc', defaults = { 'tool' : 'star_doc' })(user_watch_list)
+app.route('/star_doc/<everything:name>', defaults = { 'tool' : 'star_doc' })(user_watch_list_name)
+
+# 하위 호환용 S
+app.route('/skin_set')(main_func_skin_set)
+app.route('/main_skin_set')(main_func_skin_set)
+# 하위 호환용 E
+
+# 개편 보류중 S
 @app.route('/change/email', methods = ['POST', 'GET'])
 def user_setting_email():
     return user_setting_email_2(load_db.db_get())
@@ -527,44 +516,7 @@ app.route('/change/email/delete')(user_setting_email_delete)
 @app.route('/change/email/check', methods = ['POST', 'GET'])
 def user_setting_email_check():
     return user_setting_email_check_2(load_db.db_get())
-
-app.route('/change/key')(user_setting_key)
-app.route('/change/key/delete')(user_setting_key_delete)
-
-@app.route('/change/pw', methods = ['POST', 'GET'])
-def user_setting_pw_change():
-    return user_setting_pw_change_2(load_db.db_get())
-
-app.route('/change/head', methods=['GET', 'POST'])(user_setting_head)
-
-app.route('/user')(user_info)
-app.route('/user/<name>')(user_info)
-
-app.route('/challenge')(user_challenge)
-
-@app.route('/count')
-@app.route('/count/<name>')
-def user_count_edit(name = None):
-    return user_count_edit_2(load_db.db_get(), name)
-    
-app.route('/alarm')(user_alarm)
-app.route('/alarm/delete')(user_alarm_del)
-    
-@app.route('/watch_list')
-def user_watch_list():
-    return user_watch_list_2(load_db.db_get(), 'watch_list')
-
-@app.route('/watch_list/<everything:name>')
-def user_watch_list_name(name = 'Test'):
-    return user_watch_list_name_2(load_db.db_get(), 'watch_list', name)
-
-@app.route('/star_doc')
-def user_star_doc():
-    return user_watch_list_2(load_db.db_get(), 'star_doc')
-
-@app.route('/star_doc/<everything:name>')
-def user_star_doc_name(name = 'Test'):
-    return user_watch_list_name_2(load_db.db_get(), 'star_doc', name)
+# 개편 보류중 E
 
 # Func-login
 # 개편 예정
@@ -656,11 +608,10 @@ app.route('/manager', methods = ['POST', 'GET'])(main_tool_admin)
 app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_admin)
 app.route('/manager/<int:num>/<add_2>', methods = ['POST', 'GET'])(main_tool_admin)
 
-app.route('/random')(main_func_random)
-app.route('/upload', methods = ['POST', 'GET'])(main_func_upload)
-app.route('/skin_set')(main_func_skin_set)
-app.route('/main_skin_set')(main_func_skin_set)
-app.route('/easter_egg.xml')(main_func_easter_egg)
+app.route('/search', methods=['POST'])(main_search)
+app.route('/search/<everything:name>')(main_search_deep)
+app.route('/goto', methods=['POST'])(main_search_goto)
+app.route('/goto/<everything:name>', methods=['POST'])(main_search_goto)
 
 app.route('/setting')(main_func_setting)
 app.route('/setting/main', defaults = { 'db_set' : data_db_set['type'] }, methods = ['POST', 'GET'])(main_func_setting_main)
