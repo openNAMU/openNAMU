@@ -23,7 +23,7 @@ def main_func_setting_main(db_set):
             19 : ['slow_edit', '0'],
             20 : ['requires_approval', ''],
             21 : ['backup_where', ''],
-            22 : ['domain', flask.request.host_url],
+            22 : ['domain', flask.request.host],
             23 : ['ua_get', ''],
             24 : ['enable_comment', ''],
             25 : ['enable_challenge', ''],

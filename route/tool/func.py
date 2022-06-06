@@ -106,6 +106,36 @@ def do_db_set(db_set):
     global_db_set = db_set
     
 # Func-init
+def get_init_set_list(need = 'all'):
+    init_set_list = {
+        'host' : {
+            'display' : 'Host',
+            'require' : 'conv',
+            'default' : '0.0.0.0'
+        }, 'port' : {
+            'display' : 'Port',
+            'require' : 'conv',
+            'default' : '3000'
+        }, 'language' : {
+            'display' : 'Language',
+            'require' : 'select',
+            'default' : 'ko-KR',
+            'list' : ['ko-KR', 'en-US']
+        }, 'markup' : {
+            'display' : 'Markup',
+            'require' : 'select',
+            'default' : 'namumark',
+            'list' : ['namumark', 'markdown', 'custom', 'raw']
+        }, 'encode' : {
+            'display' : 'Encryption method',
+            'require' : 'select',
+            'default' : 'sha3',
+            'list' : ['sha3', 'sha256']
+        }
+    }
+    
+    return init_set_list
+
 class get_db_connect_old:
     def __init__(self, db_set):
         self.db_set = db_set
