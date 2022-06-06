@@ -9,7 +9,7 @@ def api_sitemap():
                 '<?xml version="1.0" encoding="UTF-8"?>\n' + \
                 '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + \
             ''
-            domain = load_domain()
+            domain = load_domain('full')
 
             curs.execute(db_change("select title from data"))
             all_data = curs.fetchall()

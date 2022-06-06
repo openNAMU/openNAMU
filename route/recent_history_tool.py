@@ -8,12 +8,12 @@ def recent_history_tool_2(conn, name, rev):
     data = '' + \
         '<h2>' + load_lang('tool') + '</h2>' + \
         '<ul class="inside_ul">' + \
-            '<li><a href="/raw/' + url_pas(name) + '/doc_rev/' + num + '">' + load_lang('raw') + '</a></li>' + \
+            '<li><a href="/raw_rev/' + num + '/' + url_pas(name) + '">' + load_lang('raw') + '</a></li>' + \
     ''
 
-    data += '<li><a href="/revert/' + url_pas(name) + '?num=' + num + '">' + load_lang('revert') + ' | r' + num + '</a></li>'
+    data += '<li><a href="/revert/' + num + '/' + url_pas(name) + '">' + load_lang('revert') + ' | r' + num + '</a></li>'
     if rev - 1 > 0:
-        data += '<li><a href="/revert/' + url_pas(name) + '?num=' + str(rev - 1) + '">' + load_lang('revert') + ' | r' + str(rev - 1) + '</a></li>'
+        data += '<li><a href="/revert/' + str(rev - 1) + '/' + url_pas(name) + '">' + load_lang('revert') + ' | r' + str(rev - 1) + '</a></li>'
     
     if rev - 1 > 0:
         data += '<li><a href="/diff/' + str(rev - 1) + '/' + num + '/' + url_pas(name) + '">' + load_lang('compare') + '</a></li>'

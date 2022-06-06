@@ -218,25 +218,27 @@ function do_onmark_heading_render(
         ''
         data_js += 'do_onmark_set_toc_name("' + heading_level_string_no_end + '");\n';
         
-        data = data.replace(heading_re, 
-            '\n' +
-            (toc_n === 1 ? '' : '</div>') +
-            '<h' + heading_level + ' class="render_heading_text">' + 
-                '<a href="#toc" id="s-' + heading_level_string_no_end + '">' + heading_level_string + '</a> ' + 
-                '<span id="heading_text_' + heading_level_string_no_end + '">' +
-                    heading_data_text + 
-                '</span> ' +
-                '<a id="edit_load_' + String(toc_n) + '" ' +
-                    'style="font-size: 70%;"' +
-                    'href="/edit/' + do_url_change(name_doc) + '/doc_section/' + String(toc_n) + '">✎</a> ' +
-                '<a href="javascript:void(0);" ' +
-                    'onclick="javascript:do_open_folding(\'' + name_include + 'in_data_' + String(toc_n) + '\', this);"' +
-                    'style="font-size: 70%;">' + (heading_data[2] ? '⊕' : '⊖') + '</a>' +
-            '</h' + heading_level + '>' +
-            '<div   id="' + name_include + 'in_data_' + String(toc_n) + '" ' +
-                    'style="display: ' + (heading_data[2] ? 'none' : 'block') + ';">' +
-            '<end_point>\n'
-       );
+        data = data.replace(heading_re, function() {
+            return '' +
+                '\n' +
+                (toc_n === 1 ? '' : '</div>') +
+                '<h' + heading_level + ' class="render_heading_text">' + 
+                    '<a href="#toc" id="s-' + heading_level_string_no_end + '">' + heading_level_string + '</a> ' + 
+                    '<span id="heading_text_' + heading_level_string_no_end + '">' +
+                        heading_data_text + 
+                    '</span> ' +
+                    '<a id="edit_load_' + String(toc_n) + '" ' +
+                        'style="font-size: 70%;"' +
+                        'href="/edit/' + do_url_change(name_doc) + '/doc_section/' + String(toc_n) + '">✎</a> ' +
+                    '<a href="javascript:void(0);" ' +
+                        'onclick="javascript:do_open_folding(\'' + name_include + 'in_data_' + String(toc_n) + '\', this);"' +
+                        'style="font-size: 70%;">' + (heading_data[2] ? '⊕' : '⊖') + '</a>' +
+                '</h' + heading_level + '>' +
+                '<div   id="' + name_include + 'in_data_' + String(toc_n) + '" ' +
+                        'style="display: ' + (heading_data[2] ? 'none' : 'block') + ';">' +
+                '<end_point>\n' +
+            ''
+        });
     }
     
     if(toc_data !== '') {
@@ -547,14 +549,16 @@ function do_onmark_footnote_render(data, name_include) {
                     '</a> <span id="' + name_include + 'fn-' + String(i) + '">' + footnote_line_data + '</span>' +
                 '</li>' +
             '';
-            data = data.replace(footnote_re, '' +
-                '<sup>' +
-                    '<a href="javascript:do_open_foot(\'' + name_include + '\', \'fn-' + String(i) + '\', 0);" ' +
-                        'id="' + name_include + 'rfn-' + String(i) + '">' +
-                        '(' + footnote_name + ')' +
-                    '</a>' +
-                '</sup><span id="' + name_include + 'dfn-' + String(i) + '"></span>' +
-           '');
+            data = data.replace(footnote_re, function() {
+                return '' +
+                    '<sup>' +
+                        '<a href="javascript:do_open_foot(\'' + name_include + '\', \'fn-' + String(i) + '\', 0);" ' +
+                            'id="' + name_include + 'rfn-' + String(i) + '">' +
+                            '(' + footnote_name + ')' +
+                        '</a>' +
+                    '</sup><span id="' + name_include + 'dfn-' + String(i) + '"></span>' +
+               ''
+            });
             
             i += 1;
         } else {
@@ -562,7 +566,7 @@ function do_onmark_footnote_render(data, name_include) {
                 footnote_end_data = '<ul id="footnote_data">' + footnote_end_data + '</ul>';   
             }
             
-            data = data.replace(footnote_re, footnote_end_data);    
+            data = data.replace(footnote_re, function() { return footnote_end_data });    
             footnote_end_data = '';
         }
     }
@@ -879,10 +883,12 @@ function do_onmark_include_render(data, data_js, name_include, data_nowiki) {
                 include_data = include_data.replace(include_add_re, '');
             }
             
-            data = data.replace(include_re,
-                '<a id="' + name_include + 'include_link" class="include_' + String(i) + '" href="">(' + include_name + ')</a>' +
-                '<div id="' + name_include + 'include_' + String(i) + '"></div>'
-            );
+            data = data.replace(include_re, function() {
+                return '' + 
+                    '<a id="' + name_include + 'include_link" class="include_' + String(i) + '" href="">(' + include_name + ')</a>' +
+                    '<div id="' + name_include + 'include_' + String(i) + '"></div>' +
+                ''
+            });
             
             data_js += 'load_include("' + do_js_safe_change(include_name) + '", "' + name_include + 'include_' + String(i) + '", ' + JSON.stringify(include_add_data) + ');\n'
         }
@@ -1022,7 +1028,7 @@ function do_onmark_table_render_sub(data, data_col) {
             }
         }
         
-        data = data.replace(table_option_re, no_option);
+        data = data.replace(table_option_re, function() { return no_option });
     }
     
     data = data.replace('<lt>', '&lt;');
@@ -1182,15 +1188,17 @@ function do_onmark_list_sub_render(data) {
             '';
         });
 
-        data = data.replace(quote_re, '' +
-            '\n' +
-            '<blockquote>' + 
+        data = data.replace(quote_re, function() {
+            return '' +
+                '\n' +
+                '<blockquote>' + 
+                    '<end_point>\n' +
+                    quote_end_data + 
+                    '\n<start_point>' +
+                '</blockquote>' +
                 '<end_point>\n' +
-                quote_end_data + 
-                '\n<start_point>' +
-            '</blockquote>' +
-            '<end_point>\n' +
-       '');
+           ''
+        });
     }
     
     var list_re = /\n((?:(?:(?: )*)\* ?(?:(?:(?!\n).)+)\n)+)/;
@@ -1209,13 +1217,13 @@ function do_onmark_list_sub_render(data) {
             return '<li style="margin-left: ' + String(list_leng * 20) + 'px">' + x_2 + '</li>';
         });
 
-        data = data.replace(list_re, '\n<ul>' + list_end_data + '</ul><end_point>\n');
+        data = data.replace(list_re, function() { return '\n<ul>' + list_end_data + '</ul><end_point>\n' });
     }
     
     return data;
 }
 
-function do_onmark_list_render(data) {
+function do_onmark_list_render(data) {    
     var wiki_re = /<wiki_s_2 ([^>]+)>((?:(?!<wiki_s_2 |<wiki_e_2>).)+)<wiki_e_2>/s;
     while(1) {
         if(!data.match(wiki_re)) {
@@ -1288,15 +1296,13 @@ function do_onmark_redirect_render(data, data_js, name_doc) {
         if(
             name_include == '' &&
             window.location.search === '' &&
-            window.location.pathname.match(/\/w\//) &&
-            !window.location.pathname.match(/\/doc_from\//)
+            window.location.pathname.match(/\/w\//)
         ) {
-            window.location.href = '/w/' + do_url_change(link_main) + '/doc_from/' + do_url_change(name_doc) + link_sub;
+            window.location.href = '/w_from/' + do_url_change(link_main);
         }
         
         return [
-            '/w/' + do_url_change(link_main) + 
-            '/doc_from/' + do_url_change(name_doc) + 
+            '/w_from/' + do_url_change(link_main), 
             link_sub,
             data_js, 
             1
@@ -1341,7 +1347,6 @@ function do_onmark_render(
     var data_nowiki = {};
         
     name_doc = do_xss_change(name_doc);
-    console.log(name_doc);
 
     let xhr = new XMLHttpRequest();
     xhr.open("GET", "/api/setting/inter_wiki");
