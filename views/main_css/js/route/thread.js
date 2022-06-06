@@ -65,16 +65,16 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                 }
                 
                 if(blind === 'O') {
-                    color_b = 'toron_color_not';
+                    color_b = 'opennamu_comment_blind';
                 } else {
-                    color_b = 'toron_color';
+                    color_b = 'opennamu_comment_blind_not';
                 }
                 
                 if(blind === 'O') {
                     ip += ' <a href="/admin_log?search=blind%20(code%20' + topic_num + '#' + key + '">(B)</a>';
                     
                     if(admin === '1') {
-                        ip += ' <a href="/thread/' + topic_num + '/comment/' + key + '/raw">(R)</a>';
+                        ip += ' <a href="javascript:opennamu_do_open_comment(\'' + key + '\');">(O)</a>';
                     }
                 }
                 
@@ -83,27 +83,29 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                 }
                 
                 if(type_do === 'top') {
-                    color_t = 'toron_color_red';
+                    color_t = 'opennamu_comment_color_red';
                 } else if(blind === '1') {
-                    color_t = 'toron_color_blue';
+                    color_t = 'opennamu_comment_color_blue';
+                } else if(blind === 'O') {
+                    color_t = 'opennamu_comment_color_gray';
                 } else if(ip_o === ip_first) {
-                    color_t = 'toron_color_green';
+                    color_t = 'opennamu_comment_color_green';
                 } else {
-                    color_t = 'toron_color_normal';
+                    color_t = 'opennamu_comment_color_default';
                 }
                 
                 data_a += '' + 
-                    '<table id="toron">' + 
+                    '<table class="opennamu_comment">' + 
                         '<tr>' + 
-                            '<td id="' + color_t + '">' + 
+                            '<td class="' + color_t + '">' + 
                                 '<a href="javascript:void(0);" id="' + key + '">#' + key + '</a> ' + 
                                 ip + 
                                 '<span style="float: right;">' + data_t[key]['date'] + '</span>' + 
                             '</td>' + 
                         '</tr>' + 
                         '<tr>' + 
-                            '<td id="' + color_b + '">' + 
-                                '<div id="topic_scroll">' + data_i_pas + '</div>' + 
+                            '<td class="' + color_b + '" id="opennamu_comment_data_' + key + '">' + 
+                                '<div class="opennamu_comment_scroll">' + data_i_pas + '</div>' + 
                             '</td>' + 
                         '</tr>' +
                     '</table>' + 
@@ -148,5 +150,14 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                 }, 2000);
             }
         }
+    }
+}
+
+function opennamu_do_open_comment(key) {
+    let elementState = document.getElementById('opennamu_comment_data_' + key).style.display;
+    if(!elementState || elementState === 'none') {
+        document.getElementById('opennamu_comment_data_' + key).style.display = 'block';
+    } else {
+        document.getElementById('opennamu_comment_data_' + key).style.display = 'none';
     }
 }

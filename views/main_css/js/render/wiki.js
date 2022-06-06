@@ -18,10 +18,10 @@ class opennamu_render_wiki {
         let link_list_sub = [];
         for(
             let for_a = 0;
-            document.getElementsByClassName(this.render_part_id_add + 'opennamuLink')[for_a];
+            document.getElementsByClassName(this.render_part_id_add + 'opennamu_link')[for_a];
             for_a++
         ) {
-            let link_data = document.getElementsByClassName(this.render_part_id_add + 'opennamuLink')[for_a];
+            let link_data = document.getElementsByClassName(this.render_part_id_add + 'opennamu_link')[for_a];
             
             link_list_sub.push(link_data.title);
             
@@ -43,8 +43,8 @@ class opennamu_render_wiki {
                 let xhr_data = JSON.parse(this.responseText);
                 for(let for_a in link_list) {
                     if(!xhr_data[for_a]) {
-                        for(var for_b in link_list[for_a]) {
-                            document.getElementsByClassName(render_part_id_add + 'opennamuLink')[link_list[for_a][for_b]].id = "not_thing";
+                        for(let for_b in link_list[for_a]) {
+                            document.getElementsByClassName(render_part_id_add + 'opennamu_link')[link_list[for_a][for_b]].id = "not_thing";
                         }
                     }
                 }
@@ -53,19 +53,19 @@ class opennamu_render_wiki {
     }
     
     do_part_toc() {
-        if(document.getElementById('opennamuTOCcontent1')) {
+        if(document.getElementById('opennamu_TOC_content_1')) {
             for(
                 let for_a = 1;
-                document.getElementById('opennamuHeadingContent' + String(for_a));
+                document.getElementById('opennamu_heading_content_' + String(for_a));
                 for_a++
             ) {
-                let heading_data = document.getElementById('opennamuHeadingContent' + String(for_a));
-                document.getElementById('opennamuTOCcontent' + String(for_a)).innerHTML = heading_data.innerText;
+                let heading_data = document.getElementById('opennamu_heading_content_' + String(for_a));
+                document.getElementById('opennamu_TOC_content_' + String(for_a)).innerHTML = heading_data.innerText;
 
-                document.getElementById('opennamuHeadingContent' + String(for_a)).id = heading_data.innerText;
+                document.getElementById('opennamu_heading_content_' + String(for_a)).id = heading_data.innerText;
             }
 
-            let toc_data_all = document.getElementsByClassName('opennamuTOC');
+            let toc_data_all = document.getElementsByClassName('opennamu_TOC');
             let toc_data = '';
             for(
                 let for_a = 0;
@@ -76,7 +76,7 @@ class opennamu_render_wiki {
                     toc_data = toc_data_all[0].innerHTML;
                 }
 
-                document.getElementsByClassName('opennamuTOC')[for_a].innerHTML = toc_data;
+                document.getElementsByClassName('opennamu_TOC')[for_a].innerHTML = toc_data;
             }
         }
     }
