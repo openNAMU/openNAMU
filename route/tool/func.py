@@ -130,7 +130,7 @@ def get_init_set_list(need = 'all'):
             'display' : 'Encryption method',
             'require' : 'select',
             'default' : 'sha3',
-            'list' : ['sha3', 'sha256']
+            'list' : ['sha3', 'sha3-512']
         }
     }
     
@@ -811,22 +811,20 @@ def ip_warning():
     return text_data
     
 # Func-login    
-def pw_encode(data, type_d = ''):
+def pw_encode(data, db_data = ''):
     curs = conn.cursor()
 
-    if type_d == '':
+    if db_data == '':
         curs.execute(db_change('select data from other where name = "encode"'))
-        set_data = curs.fetchall()
+        db_data = curs.fetchall()
+        db_data = db_data[0][0] if db_data else 'sha3'
 
-        type_d = set_data[0][0]
-
-    if type_d == 'sha256':
+    if db_data == 'sha256':
         return hashlib.sha256(bytes(data, 'utf-8')).hexdigest()
-    else:
-        if sys.version_info < (3, 6):
-            return sha3.sha3_256(bytes(data, 'utf-8')).hexdigest()
-        else:
-            return hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
+    elif db_data == 'sha3-512':
+        return hashlib.sha3_512(bytes(data, 'utf-8')).hexdigest()
+    else: # type_d == 'sha3'
+        return hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
 
 def pw_check(data, data2, type_d = 'no', id_d = ''):
     curs = conn.cursor()
