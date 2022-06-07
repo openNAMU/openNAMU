@@ -28,7 +28,9 @@ def main_func_setting_main(db_set):
             24 : ['enable_comment', ''],
             25 : ['enable_challenge', ''],
             26 : ['edit_bottom_compulsion', ''],
-            27 : ['http_select', 'http']
+            27 : ['http_select', 'http'],
+            28 : ['title_max_length', ''],
+            29 : ['title_topic_max_length', '']
         }
 
         if flask.request.method == 'POST':
@@ -207,9 +209,20 @@ def main_func_setting_main(db_set):
                         <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ') (' + load_lang('off') + ''' : 0)</span>
                         <hr class="main_hr">
                         <input name="slow_edit" value="''' + html.escape(d_list[19]) + '''">
-                        
                         <hr class="main_hr">
+                        
                         <input type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + load_lang('edit_bottom_compulsion') + ''' (''' + load_lang('beta') + ''')
+                        <hr class="main_hr">
+                        
+                        <span>''' + load_lang('title_max_length') + ''' (''' + load_lang('beta') + ''')</span>
+                        <hr class="main_hr">
+                        <input name="title_max_length" value="''' + html.escape(d_list[28]) + '''">
+                        <hr class="main_hr">
+                        
+                        <span>''' + load_lang('title_topic_max_length') + ''' (''' + load_lang('not_working') + ''')</span>
+                        <hr class="main_hr">
+                        <input name="title_topic_max_length" value="''' + html.escape(d_list[29]) + '''">
+                        <hr class="main_hr">
 
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>

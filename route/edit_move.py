@@ -6,6 +6,9 @@ def edit_move(name):
 
         if acl_check(name) == 1:
             return re_error('/ban')
+        
+        if do_title_length_check(name) == 1:
+            return re_error('/error/38')
 
         if flask.request.method == 'POST':
             move_title = flask.request.form.get('title', 'test')
