@@ -845,7 +845,14 @@ function do_onmark_last_render(data, name_include, data_category) {
     data = do_end_br_replace(data);
     data = data.replace(/\n/g, '<br>');
     
-    data += data_category;
+    if(
+        document.cookie.match(main_css_regex_data('main_css_category_set')) &&
+        document.cookie.match(main_css_regex_data('main_css_category_set'))[1] === '1'
+    ) {
+        data = data_category + '<hr class="main_hr">' + data;
+    } else {
+        data += data_category;
+    }
 
     return data;
 }

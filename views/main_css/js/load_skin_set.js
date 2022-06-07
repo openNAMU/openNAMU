@@ -5,94 +5,94 @@ function main_css_regex_data(data) {
 function main_css_get_post() {    
     var check = document.getElementById('main_css_strike');
     if(check.value === 'normal') {
-        document.cookie = 'main_css_del_strike=0;';
+        document.cookie = 'main_css_del_strike=0; path=/;';
     } else if(check.value === 'change') {
-        document.cookie = 'main_css_del_strike=1;';
+        document.cookie = 'main_css_del_strike=1; path=/;';
     } else {
-        document.cookie = 'main_css_del_strike=2;';
+        document.cookie = 'main_css_del_strike=2; path=/;';
     }
 
     check = document.getElementById('main_css_bold');
     if(check.value === 'normal') {
-        document.cookie = 'main_css_del_bold=0;';
+        document.cookie = 'main_css_del_bold=0; path=/;';
     } else if(check.value === 'change') {
-        document.cookie = 'main_css_del_bold=1;';
+        document.cookie = 'main_css_del_bold=1; path=/;';
     } else {
-        document.cookie = 'main_css_del_bold=2;';
+        document.cookie = 'main_css_del_bold=2; path=/;';
     }
 
     check = document.getElementById('main_css_include');
     if(check.checked) {
-        document.cookie = 'main_css_include_link=1;';
+        document.cookie = 'main_css_include_link=1; path=/;';
     } else {
-        document.cookie = 'main_css_include_link=0;';
+        document.cookie = 'main_css_include_link=0; path=/;';
     }
 
     check = document.getElementById('main_css_category');
     if(check.value === 'bottom') {
-        document.cookie = 'main_css_category_set=0;';
+        document.cookie = 'main_css_category_set=0; path=/;';
     } else {
-        document.cookie = 'main_css_category_set=1;';
+        document.cookie = 'main_css_category_set=1; path=/;';
     }
 
     check = document.getElementById('main_css_footnote');
     if(check.value === 'spread') {
-        document.cookie = 'main_css_footnote_set=1;';
+        document.cookie = 'main_css_footnote_set=1; path=/;';
     } else {
-        document.cookie = 'main_css_footnote_set=0;';
+        document.cookie = 'main_css_footnote_set=0; path=/;';
     }
 
     check = document.getElementById('main_css_image');
     if(check.value === 'new_click') {
-        document.cookie = 'main_css_image_set=2;';
+        document.cookie = 'main_css_image_set=2; path=/;';
     } else if(check.value === 'click') {
-        document.cookie = 'main_css_image_set=1;';
+        document.cookie = 'main_css_image_set=1; path=/;';
     } else {
-        document.cookie = 'main_css_image_set=0;';
+        document.cookie = 'main_css_image_set=0; path=/;';
     }
 
     check = document.getElementById('main_css_image_paste');
     if(check.checked) {
-        document.cookie = 'main_css_image_paste=1;';
+        document.cookie = 'main_css_image_paste=1; path=/;';
     } else {
-        document.cookie = 'main_css_image_paste=0;';
+        document.cookie = 'main_css_image_paste=0; path=/;';
     }
 
     check = document.getElementById('main_css_toc');
     if(check.value === 'on') {
-        document.cookie = 'main_css_toc_set=2;';
+        document.cookie = 'main_css_toc_set=2; path=/;';
     } else if(check.value === 'off') {
-        document.cookie = 'main_css_toc_set=1;';
+        document.cookie = 'main_css_toc_set=1; path=/;';
     } else {
-        document.cookie = 'main_css_toc_set=0;';
+        document.cookie = 'main_css_toc_set=0; path=/;';
     }
     
     check = document.getElementById('main_css_font_size');
     if(check.value.match(/^[0-9]+$/)) {
-        document.cookie = 'main_css_font_size=' + check.value + ';';
+        document.cookie = 'main_css_font_size=' + check.value + '; path=/;';
     } else {
-        document.cookie = 'main_css_font_size=;';
+        document.cookie = 'main_css_font_size=; path=/;';
     }
 
     check = document.getElementById('main_css_monaco');
     if(check.checked) {
-        document.cookie = 'main_css_monaco=1;';
+        document.cookie = 'main_css_monaco=1; path=/;';
     } else {
-        document.cookie = 'main_css_monaco=0;';
+        document.cookie = 'main_css_monaco=0; path=/;';
     }
     
     check = document.getElementById('main_css_exter_link');
     if(check.value === 'self') {
-        document.cookie = 'main_css_exter_link=1;';
+        document.cookie = 'main_css_exter_link=1; path=/;';
     } else {
-        document.cookie = 'main_css_exter_link=0;';
+        document.cookie = 'main_css_exter_link=0; path=/;';
     }
     
     check = document.getElementById('main_css_link_delimiter');
     if(check.checked) {
-        document.cookie = 'main_css_link_delimiter=1;';
+        document.cookie = 'main_css_link_delimiter=1; path=/;';
     } else {
-        document.cookie = 'main_css_link_delimiter=0;';
+        document.cookie = 'main_css_link_delimiter=0; path=/;';
     }
     
     history.go(0);
@@ -121,20 +121,6 @@ function main_css_skin_load() {
         document.cookie.match(main_css_regex_data('main_css_include_link'))[1] === '1'
     ) {
         head_data.innerHTML += '<style>#include_link { display: inline; }</style>';
-    }
-
-    if(
-        document.cookie.match(main_css_regex_data('main_css_category_set')) &&
-        document.cookie.match(main_css_regex_data('main_css_category_set'))[1] === '1'
-    ) {
-        var get_category = document.getElementById('cate_all');
-        if(get_category) {
-            var backup_category = get_category.innerHTML;
-            var in_data = document.getElementById('render_content').innerHTML;
-            get_category.innerHTML = '';
-            document.getElementById('render_content').innerHTML = backup_category + in_data;
-            head_data.innerHTML += '<style>#cate { margin-top: 0px; margin-bottom: 20px; }</style>';
-        }
     }
 
     if(document.cookie.match(main_css_regex_data('main_css_toc_set'))) {
