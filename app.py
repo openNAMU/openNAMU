@@ -375,50 +375,20 @@ def recent_block(name = 'Test', tool = 'all'):
     return recent_block_2(load_db.db_get(), name, tool)
 
 # Func-history
-@app.route('/recent_change')
-@app.route('/recent_changes')
-def recent_change(name = None):
-    return recent_change_2(load_db.db_get(), name, '')
+app.route('/recent_change')(recent_change)
+app.route('/recent_changes')(recent_change)
 
-@app.route('/record/<name>')
-def recent_record(name = None):
-    return recent_change_2(load_db.db_get(), name, 'record')
+app.route('/record/<name>', defaults = { 'tool' : 'record' })(recent_change)
+app.route('/record/reset/<name>', methods = ['POST', 'GET'])(recent_record_reset)
+app.route('/record/topic/<name>')(recent_record_topic)
 
-@app.route('/history/<everything:name>', methods = ['POST', 'GET'])
-def recent_history(name = None):
-    return recent_change_2(load_db.db_get(), name, 'history')
-
-@app.route('/history/tool/<int(signed = True):rev>/<everything:name>')
-def recent_history_tool(name = 'Test', rev = 1):
-    return recent_history_tool_2(load_db.db_get(), name, rev)
-
-@app.route('/history/delete/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])
-def recent_history_delete(name = 'Test', rev = 1):
-    return recent_history_delete_2(load_db.db_get(), name, rev)
-
-@app.route('/history/hidden/<int(signed = True):rev>/<everything:name>')
-def recent_history_hidden(name = 'Test', rev = 1):
-    return recent_history_hidden_2(load_db.db_get(), name, rev)
-
-@app.route('/history/send/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])
-def recent_history_send(name = 'Test', rev = 1):
-    return recent_history_send_2(load_db.db_get(), name, rev)
-
-@app.route('/history/reset/<everything:name>', methods = ['POST', 'GET'])
-def recent_history_reset(name = 'Test'):
-    return recent_history_reset_2(load_db.db_get(), name)
-
-@app.route('/history/add/<everything:name>', methods = ['POST', 'GET'])
-def recent_history_add(name = 'Test'):
-    return recent_history_add_2(load_db.db_get(), name)
-
-@app.route('/record/reset/<name>', methods = ['POST', 'GET'])
-def recent_record_reset(name = 'Test'):
-    return recent_record_reset_2(load_db.db_get(), name)
-
-@app.route('/record/topic/<name>')
-def recent_record_topic(name = 'Test'):
-    return recent_record_topic_2(load_db.db_get(), name)
+app.route('/history/<everything:name>', defaults = { 'tool' : 'history' }, methods = ['POST', 'GET'])(recent_change)
+app.route('/history_tool/<int(signed = True):rev>/<everything:name>')(recent_history_tool)
+app.route('/history_delete/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])(recent_history_delete)
+app.route('/history_hidden/<int(signed = True):rev>/<everything:name>')(recent_history_hidden)
+app.route('/history_send/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])(recent_history_send)
+app.route('/history_reset/<everything:name>', methods = ['POST', 'GET'])(recent_history_reset)
+app.route('/history_add/<everything:name>', methods = ['POST', 'GET'])(recent_history_add)
 
 # Func-view
 app.route('/xref/<everything:name>')(view_xref)
@@ -483,6 +453,8 @@ app.route('/change/key')(user_setting_key)
 app.route('/change/key/delete')(user_setting_key_delete)
 app.route('/change/pw', methods = ['POST', 'GET'])(user_setting_pw)
 app.route('/change/head', methods=['GET', 'POST'])(user_setting_head)
+app.route('/change/skin_set')(user_setting_skin_set)
+app.route('/change/skin_set/main')(user_setting_skin_set)
 
 app.route('/user')(user_info)
 app.route('/user/<name>')(user_info)
@@ -502,8 +474,8 @@ app.route('/star_doc', defaults = { 'tool' : 'star_doc' })(user_watch_list)
 app.route('/star_doc/<everything:name>', defaults = { 'tool' : 'star_doc' })(user_watch_list_name)
 
 # 하위 호환용 S
-app.route('/skin_set')(main_func_skin_set)
-app.route('/main_skin_set')(main_func_skin_set)
+# /change/skin_set
+app.route('/skin_set')(user_setting_skin_set)
 # 하위 호환용 E
 
 # 개편 보류중 S
