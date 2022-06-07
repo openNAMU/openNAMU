@@ -2036,7 +2036,7 @@ def re_error(data):
         elif num == 4:
             data = load_lang('no_admin_block_error')
         elif num == 5:
-            data = load_lang('skin_error')
+            data = load_lang('error_skin_set')
         elif num == 6:
             data = load_lang('same_id_exist_error')
         elif num == 7:
@@ -2104,13 +2104,16 @@ def re_error(data):
             data = '???'
 
         if num == 5:
-            if flask.request.path != '/main_skin_set':
+            if not flask.request.path in ('/main_skin_set', '/change/skin_set/main'):
+                if flask.request.path != '/skin_set':
+                    data += '<br>' + load_lang('error_skin_set_old') + ' <a href="/skin_set">(' + load_lang('go') + ')</a>'
+
                 title = load_lang('skin_set')
-                tool = [['main_skin_set', load_lang('main_skin_set')]]
+                tool = [['change', load_lang('user_setting')]]
                 load_skin_set = ''
             else:
                 title = load_lang('main_skin_set')
-                tool = [['skin_set', load_lang('skin_set')]]
+                tool = [['change', load_lang('user_setting')]]
                 load_skin_set = '<script>main_css_skin_set();</script>'
         
             return easy_minify(flask.render_template(skin_check(),
@@ -2119,7 +2122,7 @@ def re_error(data):
                     '<div id="main_skin_set">' + \
                         '<h2>' + load_lang('error') + '</h2>' + \
                         '<ul class="inside_ul">' + \
-                            '<li>' + data + ' <a href="/main_skin_set">(' + load_lang('main_skin_set') + ')</a></li>' + \
+                            '<li>' + data + '</a></li>' + \
                         '</ul>' + \
                     '</div>' + \
                     load_skin_set,

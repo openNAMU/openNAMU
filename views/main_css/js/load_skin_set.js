@@ -130,9 +130,9 @@ function main_css_skin_load() {
         var get_category = document.getElementById('cate_all');
         if(get_category) {
             var backup_category = get_category.innerHTML;
-            var in_data = document.getElementById('in_data_0').innerHTML;
+            var in_data = document.getElementById('render_content').innerHTML;
             get_category.innerHTML = '';
-            document.getElementById('in_data_0').innerHTML = backup_category + in_data;
+            document.getElementById('render_content').innerHTML = backup_category + in_data;
             head_data.innerHTML += '<style>#cate { margin-top: 0px; margin-bottom: 20px; }</style>';
         }
     }
