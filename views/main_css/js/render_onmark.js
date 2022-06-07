@@ -849,7 +849,9 @@ function do_onmark_last_render(data, name_include, data_category) {
         document.cookie.match(main_css_regex_data('main_css_category_set')) &&
         document.cookie.match(main_css_regex_data('main_css_category_set'))[1] === '1'
     ) {
-        data = data_category + '<hr class="main_hr">' + data;
+        if(data_category !== '') {
+            data = data_category + '<hr class="main_hr">' + data;
+        }
     } else {
         data += data_category;
     }

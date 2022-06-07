@@ -1786,6 +1786,18 @@ def do_edit_filter(data):
 
     return 0
 
+def do_title_length_check(name):
+    curs = conn.cursor()
+    
+    curs.execute(db_change('select data from other where name = "title_max_length"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        db_data = int(number_check(db_data[0][0]))
+        if len(name) > db_data:        
+            return 1
+    
+    return 0
+
 # Func-insert
 def add_alarm(who, context):
     curs = conn.cursor()
@@ -2075,9 +2087,9 @@ def re_error(data):
             data = load_lang('regex_error')
         elif num == 24:
             curs.execute(db_change("select data from other where name = 'slow_edit'"))
-            slow_edit = curs.fetchall()
-            slow_edit = '' if not slow_edit else slow_edit[0][0]
-            data = load_lang('fast_edit_error') + slow_edit
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = load_lang('fast_edit_error') + db_data
         elif num == 25:
             data = load_lang('too_many_dec_error')
         elif num == 26:
@@ -2100,6 +2112,16 @@ def re_error(data):
             data = load_lang('input_email_error')
         elif num == 37:
             data = load_lang('error_edit_send_request')
+        elif num == 38:
+            curs.execute(db_change("select data from other where name = 'title_max_length'"))
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = load_lang('error_title_length_too_long') + db_data
+        elif num == 39:
+            curs.execute(db_change("select data from other where name = 'title_topic_max_length'"))
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = load_lang('error_title_length_too_long') + db_data
         else:
             data = '???'
 

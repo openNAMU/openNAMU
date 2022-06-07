@@ -8,6 +8,9 @@ def edit(name = 'Test', name_load = 0, section = 0):
         if acl_check(name) == 1:
             return redirect('/raw_acl/' + url_pas(name))
         
+        if do_title_length_check(name) == 1:
+            return re_error('/error/38')
+        
         curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
         doc_ver = curs.fetchall()
         doc_ver = doc_ver[0][0] if doc_ver else '0'
