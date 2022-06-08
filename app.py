@@ -3,7 +3,6 @@ import os
 import re
 
 from route.tool.func import *
-# from route import *
 
 for i_data in os.listdir("route"):
     f_src = re.search(r"(.+)\.py$", i_data)
