@@ -56,42 +56,7 @@ if setup_tool != 'init':
         setup_tool = 'init'
 
 if setup_tool != 'normal':
-    # Init-Create_DB
-    create_data = {}
-
-    # 폐지 예정 (data_set으로 통합)
-    create_data['data_set'] = ['doc_name', 'doc_rev', 'set_name', 'set_data']
-    
-    create_data['data'] = ['title', 'data', 'type']
-    create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
-    create_data['rc'] = ['id', 'title', 'date', 'type']
-    create_data['acl'] = ['title', 'data', 'type']
-
-    # 개편 예정 (data_link로 변경)
-    create_data['back'] = ['title', 'link', 'type']
-
-    # 폐지 예정 (topic_set으로 통합) [가장 시급]
-    create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
-    create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
-
-    # 폐지 예정 (user_set으로 통합)
-    create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
-    create_data['scan'] = ['user', 'title', 'type']
-
-    # 개편 예정 (wiki_set과 wiki_filter과 wiki_vote으로 변경)
-    create_data['other'] = ['name', 'data', 'coverage']
-    create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
-    create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
-
-    # 개편 예정 (auth_list와 auth_log로 변경)
-    create_data['alist'] = ['name', 'acl']
-    create_data['re_admin'] = ['who', 'what', 'time']
-
-    # 개편 예정 (user_notice와 user_agent로 변경)
-    create_data['alarm'] = ['name', 'data', 'date']
-    create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
-
-    create_data['user_set'] = ['name', 'id', 'data']
+    create_data = get_db_table_list()
     for create_table in create_data:
         for create in ['test'] + create_data[create_table]:
             try:
