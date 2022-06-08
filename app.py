@@ -369,7 +369,7 @@ app.route('/down/<everything:name>')(view_down)
 
 # everything 다음에 추가 붙은 경우에 대해서 재검토 필요 (진행중)
 app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
-app.route('/w_from/<everything:name>')(view_read)
+app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_read)
 app.route('/w/<everything:name>')(view_read)
 
 app.route('/random')(main_func_random)
