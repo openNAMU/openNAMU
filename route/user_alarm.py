@@ -21,7 +21,7 @@ def user_alarm():
             for data_one in data_list:
                 data += '' + \
                     '<li>' + \
-                        '<span class="send_content">' + html.escape(data_one[0]) + '</span> ' + \
+                        '<span class="send_content">' + data_one[0] + '</span> ' + \
                         '(' + data_one[1] + ')' + \
                     '</li>' + \
                 ''

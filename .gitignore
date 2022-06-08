@@ -32,3 +32,5 @@ views/nitori
 .DS_Store
 sitemap.xml
 sitemap_0.xml
+
+.idea/
