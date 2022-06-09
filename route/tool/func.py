@@ -2020,6 +2020,28 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
         mode
     ])
 
+#Func-frame-admin
+def frame_admin(user):
+    if admin_check('all', None, user) == 1:
+        return '''
+                <div style="border:1px solid gray;border-top:5px solid #c169c6;padding:12px;margin-bottom:0px">
+                    <span style="float: left;">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 172 172" style=" fill:#26e07f;">
+                            <g fill="none" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal">
+                                <path d="M0,172v-172h172v172z" fill="none"></path>
+                                <g fill="#1fb141">
+                                    <path d="M21.5,21.5v129h64.5v-32.25v-64.5v-32.25zM86,53.75c0,17.7805 14.4695,32.25 32.25,32.25c17.7805,0 32.25,-14.4695 32.25,-32.25c0,-17.7805 -14.4695,-32.25 -32.25,-32.25c-17.7805,0 -32.25,14.4695 -32.25,32.25zM118.25,86c-17.7805,0 -32.25,14.4695 -32.25,32.25c0,17.7805 14.4695,32.25 32.25,32.25c17.7805,0 32.25,-14.4695 32.25,-32.25c0,-17.7805 -14.4695,-32.25 -32.25,-32.25z">
+                                    </path>
+                                </g>
+                            </g>
+                        </svg>
+                    </span>
+                    <span style="font-size: 120%"><b>이 계정은 관리자 권한이 있습니다.</b></span>
+                    <br><br>
+                </div>
+                '''
+    return ''
+
 # Func-error
 def re_error(data):
     curs = conn.cursor()

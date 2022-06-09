@@ -1,13 +1,12 @@
-FROM python:3.6.8-stretch
+FROM python:alpine
 
-MAINTAINER 2du <min08101@naver.com>
-MAINTAINER hoparkgo9ma <me@ho9.me>
+LABEL org.opencontainers.image.authors="2du <min08101@naver.com>, hoparkgo9ma <me@ho9.me>"
 
 ENV NAMU_DB_TYPE sqlite
 ENV NAMU_DB data
 ENV NAMU_HOST 0.0.0.0
 ENV NAMU_PORT 3000
-ENV NAMU_LANG en-US
+ENV NAMU_LANG ko-KR
 ENV NAMU_MARKUP namumark
 ENV NAMU_ENCRYPT sha3
 
