@@ -57,42 +57,7 @@ if setup_tool != 'init':
         setup_tool = 'init'
 
 if setup_tool != 'normal':
-    # Init-Create_DB
-    create_data = {}
-
-    # 폐지 예정 (data_set으로 통합)
-    create_data['data_set'] = ['doc_name', 'doc_rev', 'set_name', 'set_data']
-    
-    create_data['data'] = ['title', 'data', 'type']
-    create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
-    create_data['rc'] = ['id', 'title', 'date', 'type']
-    create_data['acl'] = ['title', 'data', 'type']
-
-    # 개편 예정 (data_link로 변경)
-    create_data['back'] = ['title', 'link', 'type']
-
-    # 폐지 예정 (topic_set으로 통합) [가장 시급]
-    create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
-    create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
-
-    # 폐지 예정 (user_set으로 통합)
-    create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
-    create_data['scan'] = ['user', 'title', 'type']
-
-    # 개편 예정 (wiki_set과 wiki_filter과 wiki_vote으로 변경)
-    create_data['other'] = ['name', 'data', 'coverage']
-    create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
-    create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
-
-    # 개편 예정 (auth_list와 auth_log로 변경)
-    create_data['alist'] = ['name', 'acl']
-    create_data['re_admin'] = ['who', 'what', 'time']
-
-    # 개편 예정 (user_notice와 user_agent로 변경)
-    create_data['alarm'] = ['name', 'data', 'date']
-    create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
-
-    create_data['user_set'] = ['name', 'id', 'data']
+    create_data = get_db_table_list()
     for create_table in create_data:
         for create in ['test'] + create_data[create_table]:
             try:
@@ -375,50 +340,20 @@ def recent_block(name = 'Test', tool = 'all'):
     return recent_block_2(load_db.db_get(), name, tool)
 
 # Func-history
-@app.route('/recent_change')
-@app.route('/recent_changes')
-def recent_change(name = None):
-    return recent_change_2(load_db.db_get(), name, '')
+app.route('/recent_change')(recent_change)
+app.route('/recent_changes')(recent_change)
 
-@app.route('/record/<name>')
-def recent_record(name = None):
-    return recent_change_2(load_db.db_get(), name, 'record')
+app.route('/record/<name>', defaults = { 'tool' : 'record' })(recent_change)
+app.route('/record/reset/<name>', methods = ['POST', 'GET'])(recent_record_reset)
+app.route('/record/topic/<name>')(recent_record_topic)
 
-@app.route('/history/<everything:name>', methods = ['POST', 'GET'])
-def recent_history(name = None):
-    return recent_change_2(load_db.db_get(), name, 'history')
-
-@app.route('/history/tool/<int(signed = True):rev>/<everything:name>')
-def recent_history_tool(name = 'Test', rev = 1):
-    return recent_history_tool_2(load_db.db_get(), name, rev)
-
-@app.route('/history/delete/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])
-def recent_history_delete(name = 'Test', rev = 1):
-    return recent_history_delete_2(load_db.db_get(), name, rev)
-
-@app.route('/history/hidden/<int(signed = True):rev>/<everything:name>')
-def recent_history_hidden(name = 'Test', rev = 1):
-    return recent_history_hidden_2(load_db.db_get(), name, rev)
-
-@app.route('/history/send/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])
-def recent_history_send(name = 'Test', rev = 1):
-    return recent_history_send_2(load_db.db_get(), name, rev)
-
-@app.route('/history/reset/<everything:name>', methods = ['POST', 'GET'])
-def recent_history_reset(name = 'Test'):
-    return recent_history_reset_2(load_db.db_get(), name)
-
-@app.route('/history/add/<everything:name>', methods = ['POST', 'GET'])
-def recent_history_add(name = 'Test'):
-    return recent_history_add_2(load_db.db_get(), name)
-
-@app.route('/record/reset/<name>', methods = ['POST', 'GET'])
-def recent_record_reset(name = 'Test'):
-    return recent_record_reset_2(load_db.db_get(), name)
-
-@app.route('/record/topic/<name>')
-def recent_record_topic(name = 'Test'):
-    return recent_record_topic_2(load_db.db_get(), name)
+app.route('/history/<everything:name>', defaults = { 'tool' : 'history' }, methods = ['POST', 'GET'])(recent_change)
+app.route('/history_tool/<int(signed = True):rev>/<everything:name>')(recent_history_tool)
+app.route('/history_delete/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])(recent_history_delete)
+app.route('/history_hidden/<int(signed = True):rev>/<everything:name>')(recent_history_hidden)
+app.route('/history_send/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])(recent_history_send)
+app.route('/history_reset/<everything:name>', methods = ['POST', 'GET'])(recent_history_reset)
+app.route('/history_add/<everything:name>', methods = ['POST', 'GET'])(recent_history_add)
 
 # Func-view
 app.route('/xref/<everything:name>')(view_xref)
@@ -434,7 +369,7 @@ app.route('/down/<everything:name>')(view_down)
 
 # everything 다음에 추가 붙은 경우에 대해서 재검토 필요 (진행중)
 app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
-app.route('/w_from/<everything:name>')(view_read)
+app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_read)
 app.route('/w/<everything:name>')(view_read)
 
 app.route('/random')(main_func_random)
@@ -483,6 +418,8 @@ app.route('/change/key')(user_setting_key)
 app.route('/change/key/delete')(user_setting_key_delete)
 app.route('/change/pw', methods = ['POST', 'GET'])(user_setting_pw)
 app.route('/change/head', methods=['GET', 'POST'])(user_setting_head)
+app.route('/change/skin_set')(user_setting_skin_set)
+app.route('/change/skin_set/main')(user_setting_skin_set)
 
 app.route('/user')(user_info)
 app.route('/user/<name>')(user_info)
@@ -502,8 +439,8 @@ app.route('/star_doc', defaults = { 'tool' : 'star_doc' })(user_watch_list)
 app.route('/star_doc/<everything:name>', defaults = { 'tool' : 'star_doc' })(user_watch_list_name)
 
 # 하위 호환용 S
-app.route('/skin_set')(main_func_skin_set)
-app.route('/main_skin_set')(main_func_skin_set)
+# /change/skin_set
+app.route('/skin_set')(user_setting_skin_set)
 # 하위 호환용 E
 
 # 개편 보류중 S
