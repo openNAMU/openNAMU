@@ -159,7 +159,8 @@
     "wiki_skin": "위키 스킨",
     "admin_group": "관리자 그룹",
     "all": "전체",
-    "skin_error": "사용 중인 스킨은 스킨 설정 기능을 지원하지 않습니다.",
+    "error_skin_set": "사용 중인 스킨은 스킨 설정 기능을 지원하지 않습니다.",
+    "error_skin_set_old": "일부 오래된 스킨은 구버전 링크를 이용해야만 작동할 수도 있습니다.",
     "member": "가입자",
     "backlink": "역링크",
     "no_admin_block_error": "관리자를 검사하거나 차단할 수 없습니다.",
@@ -439,5 +440,8 @@
     "enable_comment_function": "댓글 기능 사용",
     "enable_challenge_function": "도전과제 기능 사용",
     "error_edit_send_request": "편집 사유가 필요합니다.",
-    "tls_method": "TLS 방식"
+    "tls_method": "TLS 방식",
+    "title_max_length": "문서 제목 최대 길이",
+    "title_topic_max_length": "토론 제목 최대 길이",
+    "error_title_length_too_long": "문서 제목이나 토론 제목의 길이가 너무 깁니다. 최대 글자 수 : "
 }

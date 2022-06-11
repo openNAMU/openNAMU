@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def view_read(name = 'Test', doc_rev = 0, doc_from = ''):
+def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -12,8 +12,7 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = ''):
         file_data = ''
 
         ip = ip_check()
-
-        # name_doc_pass = flask.request.cookies.get('opennamu_redirect', '')
+            
         uppage = re.sub(r"/([^/]+)$", '', name)
         uppage = 0 if uppage == name else uppage
         num = str(doc_rev)        
@@ -155,16 +154,19 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = ''):
                 ['acl/' + url_pas(name), load_lang('acl'), acl],
             ]
 
-            """
-            if name_doc_pass != '':
+            if do_type == 'from':
                 menu += [['w/' + url_pas(name), load_lang('pass')]]
-                end_data = '''
-                    <div id="redirect">
-                        <a href="/w/''' + url_pas(name_doc_pass) + '/doc_from/' + url_pas(name) + '">' + name_doc_pass + '</a> ⇨ <b>' + name + '''</b>
-                    </div>
-                    <br>
-                ''' + end_data
-            """
+                if flask.session and 'lastest_document' in flask.session:
+                    end_data = '''
+                        <div id="redirect">
+                            <a href="/w_from/''' + url_pas(flask.session['lastest_document']) + '''">''' + flask.session['lastest_document'] + '''</a> ⇨ <b>''' + name + '''</b>
+                        </div>
+                        <br>
+                    ''' + end_data
+                    
+                flask.session['lastest_document'] = name
+            else:
+                flask.session['lastest_document'] = name
 
             if uppage != 0:
                 menu += [['w/' + url_pas(uppage), load_lang('upper')]]

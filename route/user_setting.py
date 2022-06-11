@@ -113,6 +113,8 @@ def user_setting():
                             <hr class="main_hr">
                             <select name="skin">''' + div2 + '''</select>
                             <hr class="main_hr">
+                            <a href="/change/skin_set">(''' + load_lang('skin_set') + ''')</a> <a href="/change/skin_set/main">(''' + load_lang('main_skin_set') + ''')</a>
+                            <hr class="main_hr">
                             <span>''' + load_lang('language') + '''</span>
                             <hr class="main_hr">
                             <select name="lang">''' + div3 + '''</select>
@@ -170,6 +172,8 @@ def user_setting():
                             <span>''' + load_lang('skin') + '''</span>
                             <hr class="main_hr">
                             <select name="skin">''' + div2 + '''</select>
+                            <hr class="main_hr">
+                            <a href="/change/skin_set">(''' + load_lang('skin_set') + ''')</a> <a href="/change/skin_set/main">(''' + load_lang('main_skin_set') + ''')</a>
                             <hr class="main_hr">
                             <span>''' + load_lang('language') + '''</span>
                             <hr class="main_hr">
