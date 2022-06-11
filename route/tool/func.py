@@ -66,7 +66,7 @@ else:
 print('----')
 
 # Init-Load
-from .func_mark import *
+from .func_render import *
 
 from diff_match_patch import diff_match_patch
 
@@ -1845,12 +1845,12 @@ def do_title_length_check(name):
     return 0
 
 # Func-insert
-def add_alarm(who, context):
+def add_alarm(who, by, link, link_name, additional_content = ''):
     curs = conn.cursor()
 
     curs.execute(db_change(
         'insert into alarm (name, data, date) values (?, ?, ?)'
-    ), [who, context, get_time()])
+    ), [who, by + ' | <a href="' + link + '">' + html.escape(link_name) + "</a>" + (' | ' + additional_content if additional_content != '' else ''), get_time()])
     conn.commit()
     
 def add_user(user_name, user_pw, user_email = '', user_encode = ''):
@@ -2110,7 +2110,7 @@ def frame_admin(user):
                         </g>
                         </svg>
                     </span>
-                    <span style="font-size: 120%"><b>이 계정은 관리자 권한이 있습니다.</b></span>
+                    <span style="font-size: 120%"><b>이 계정은 특수 권한이 있습니다.</b></span>
                     <br><br>
                 </div>
                 '''
