@@ -43,7 +43,7 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
         elif re.search(r"^user:([^/]*)", name):
             match = re.search(r"^user:([^/]*)", name)
             user_name = html.escape(match.group(1))
-            user_doc = '''
+            user_doc = frame_admin(user_name) + '''
                 <div id="get_user_info"></div>
                 <script>load_user_info("''' + user_name + '''");</script>
                 <hr class="main_hr">

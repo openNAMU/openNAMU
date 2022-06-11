@@ -59,7 +59,7 @@ def user_info(name = ''):
                 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('user_tool'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
-            data = '''
+            data = frame_admin(ip) + '''
                 <h2>''' + load_lang('state') + '''</h2>
                 <div id="get_user_info"></div>
                 <script>load_user_info("''' + ip + '''");</script>
