@@ -9,6 +9,12 @@ def topic(topic_num = 0):
             name = flask.request.form.get('topic', 'Test')
             sub = flask.request.form.get('title', 'Test')
             
+            if do_title_length_check(name) == 1:
+                return re_error('/error/38')
+            
+            if do_title_length_check(sub, 'topic') == 1:
+                return re_error('/error/38')
+            
             if topic_num == '0':
                 curs.execute(db_change("select code from topic order by code + 0 desc limit 1"))
                 t_data = curs.fetchall()
