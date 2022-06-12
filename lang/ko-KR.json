@@ -443,5 +443,7 @@
     "tls_method": "TLS 방식",
     "title_max_length": "문서 제목 최대 길이",
     "title_topic_max_length": "토론 제목 최대 길이",
-    "error_title_length_too_long": "문서 제목이나 토론 제목의 길이가 너무 깁니다. 최대 글자 수 : "
+    "error_title_length_too_long": "문서 제목이나 토론 제목의 길이가 너무 깁니다. 최대 글자 수 : ",
+    "thread_acl": "스레드 ACL",
+    "not_all_acl": "전부 금지"
 }
