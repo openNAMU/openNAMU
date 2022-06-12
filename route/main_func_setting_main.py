@@ -14,13 +14,13 @@ def main_func_setting_main(db_set):
             5 : ['skin', ''],
             7 : ['reg', ''],
             8 : ['ip_view', ''],
-            9 : ['back_up', '0'],
+            9 : ['back_up', ''],
             10 : ['port', '3000'],
             11 : ['key', load_random_key()],
             12 : ['update', 'stable'],
             15 : ['encode', 'sha3'],
             16 : ['host', '0.0.0.0'],
-            19 : ['slow_edit', '0'],
+            19 : ['slow_edit', ''],
             20 : ['requires_approval', ''],
             21 : ['backup_where', ''],
             22 : ['domain', flask.request.host],
@@ -187,15 +187,15 @@ def main_func_setting_main(db_set):
                         <span ''' + sqlite_only + '''>
                             <h3>4.1. ''' + load_lang('sqlite_only') + '''</h3>
                             <span>
-                                ''' + load_lang('backup_interval') + ' (' + load_lang('hour') + ') (' + load_lang('off') + ' : 0) ' + \
-                                '(' + load_lang('restart_required') + ''')</span>
+                                ''' + load_lang('backup_interval') + ''' (''' + load_lang('hour') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') ''' + \
+                                '''(''' + load_lang('restart_required') + ''')</span>
                             <hr class="main_hr">
                             <input name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr class="main_hr">
 
                             <span>
-                                ''' + load_lang('backup_where') + ' (' + load_lang('empty') + ' : ' + load_lang('default') + ') ' + \
-                                '(' + load_lang('restart_required') + ''') (''' + load_lang('example') + ''' : ./data/backup.db)
+                                ''' + load_lang('backup_where') + ''' (''' + load_lang('default') + ''' : ''' + load_lang('empty') + ''') ''' + \
+                                '''(''' + load_lang('restart_required') + ''') (''' + load_lang('example') + ''' : ./data/backup.db)
                             </span>
                             <hr class="main_hr">
                             <input name="backup_where" value="''' + html.escape(d_list[21]) + '''">
@@ -206,7 +206,7 @@ def main_func_setting_main(db_set):
                         <span><a href="/setting/acl">(''' + load_lang('main_acl_setting') + ''')</a></span>
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('slow_edit') + ' (' + load_lang('second') + ') (' + load_lang('off') + ''' : 0)</span>
+                        <span>''' + load_lang('slow_edit') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
                         <hr class="main_hr">
                         <input name="slow_edit" value="''' + html.escape(d_list[19]) + '''">
                         <hr class="main_hr">
@@ -214,12 +214,12 @@ def main_func_setting_main(db_set):
                         <input type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + load_lang('edit_bottom_compulsion') + ''' (''' + load_lang('beta') + ''')
                         <hr class="main_hr">
                         
-                        <span>''' + load_lang('title_max_length') + ''' (''' + load_lang('beta') + ''')</span>
+                        <span>''' + load_lang('title_max_length') + ''' (''' + load_lang('beta') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
                         <hr class="main_hr">
                         <input name="title_max_length" value="''' + html.escape(d_list[28]) + '''">
                         <hr class="main_hr">
                         
-                        <span>''' + load_lang('title_topic_max_length') + ''' (''' + load_lang('not_working') + ''')</span>
+                        <span>''' + load_lang('title_topic_max_length') + ''' (''' + load_lang('beta') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
                         <hr class="main_hr">
                         <input name="title_topic_max_length" value="''' + html.escape(d_list[29]) + '''">
                         <hr class="main_hr">

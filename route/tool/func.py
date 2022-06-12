@@ -1039,50 +1039,39 @@ def cut_100(data):
 def wiki_set(num = 1):
     curs = conn.cursor()
 
-    if num == 1:
-        skin_name = skin_check(1)
-        data_list = []
+    skin_name = skin_check(1)
+    data_list = []
 
-        curs.execute(db_change('select data from other where name = ?'), ['name'])
-        db_data = curs.fetchall()
-        data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['Wiki']
+    curs.execute(db_change('select data from other where name = ?'), ['name'])
+    db_data = curs.fetchall()
+    data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['Wiki']
 
-        curs.execute(db_change('select data from other where name = "license"'))
-        db_data = curs.fetchall()
-        data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['ARR']
+    curs.execute(db_change('select data from other where name = "license"'))
+    db_data = curs.fetchall()
+    data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['ARR']
 
-        data_list += ['', '']
+    data_list += ['', '']
 
-        curs.execute(db_change('select data from other where name = "logo" and coverage = ?'), [skin_name])
-        db_data = curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            data_list += [db_data[0][0]]
-        else:
-            curs.execute(db_change('select data from other where name = "logo" and coverage = ""'))
-            db_data = curs.fetchall()
-            data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else [data_list[0]]
-
-        head_data = ''
-
-        curs.execute(db_change("select data from other where name = 'head' and coverage = ''"))
-        db_data = curs.fetchall()
-        head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
-
-        curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
-        db_data = curs.fetchall()
-        head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
-            
-        data_list += [head_data]
-    elif num == 2:
-        curs.execute(db_change('select data from other where name = "frontpage"'))
-        db_data = curs.fetchall()
-        data_list = db_data[0][0] if db_data and db_data[0][0] != '' else 'FrontPage'
-    elif num == 3:
-        curs.execute(db_change('select data from other where name = "upload"'))
-        db_data = curs.fetchall()
-        data_list = db_data[0][0] if db_data and db_data[0][0] != '' else '2'
+    curs.execute(db_change('select data from other where name = "logo" and coverage = ?'), [skin_name])
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        data_list += [db_data[0][0]]
     else:
-        data_list = ''
+        curs.execute(db_change('select data from other where name = "logo" and coverage = ""'))
+        db_data = curs.fetchall()
+        data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else [data_list[0]]
+
+    head_data = ''
+
+    curs.execute(db_change("select data from other where name = 'head' and coverage = ''"))
+    db_data = curs.fetchall()
+    head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
+
+    curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
+    db_data = curs.fetchall()
+    head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
+
+    data_list += [head_data]
 
     return data_list
 
@@ -1790,8 +1779,8 @@ def do_edit_slow_check():
 
     curs.execute(db_change("select data from other where name = 'slow_edit'"))
     slow_edit = curs.fetchall()
-    if slow_edit and slow_edit != '0' and admin_check(5) != 1:
-        slow_edit = slow_edit[0][0]
+    if slow_edit and slow_edit != '' and admin_check(5) != 1:
+        slow_edit = int(number_check(slow_edit[0][0]))
 
         curs.execute(db_change(
             "select date from history where ip = ? order by date desc limit 1"
@@ -1799,11 +1788,9 @@ def do_edit_slow_check():
         last_edit_data = curs.fetchall()
         if last_edit_data:
             last_edit_data = int(re.sub(' |:|-', '', last_edit_data[0][0]))
-            now_edit_data = int(
-                (datetime.datetime.now() - datetime.timedelta(
-                    seconds = int(slow_edit))
-                ).strftime("%Y%m%d%H%M%S")
-            )
+            now_edit_data = int((
+                datetime.datetime.now() - datetime.timedelta(seconds = slow_edit)
+            ).strftime("%Y%m%d%H%M%S"))
 
             if last_edit_data > now_edit_data:
                 return 1
@@ -1832,15 +1819,23 @@ def do_edit_filter(data):
 
     return 0
 
-def do_title_length_check(name):
+def do_title_length_check(name, check_type = 'document'):
     curs = conn.cursor()
     
-    curs.execute(db_change('select data from other where name = "title_max_length"'))
-    db_data = curs.fetchall()
-    if db_data and db_data[0][0] != '':
-        db_data = int(number_check(db_data[0][0]))
-        if len(name) > db_data:        
-            return 1
+    if check_type == 'topic':
+        curs.execute(db_change('select data from other where name = "title_topic_max_length"'))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            db_data = int(number_check(db_data[0][0]))
+            if len(name) > db_data:        
+                return 1
+    else:
+        curs.execute(db_change('select data from other where name = "title_max_length"'))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            db_data = int(number_check(db_data[0][0]))
+            if len(name) > db_data:        
+                return 1
     
     return 0
 
@@ -2079,7 +2074,7 @@ def re_error(data):
             end = '<ul class="inside_ul"><li>' + load_lang('authority_error') + '</li></ul>'
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('error'), wiki_set(1), wiki_custom(), wiki_css([0, 0])],
+            imp = [load_lang('error'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '<h2>' + load_lang('error') + '</h2>' + end,
             menu = 0
         )), 401
@@ -2118,7 +2113,10 @@ def re_error(data):
         elif num == 16:
             data = load_lang('same_file_error')
         elif num == 17:
-            data = load_lang('file_capacity_error') + wiki_set(3)
+            curs.execute(db_change('select data from other where name = "upload"'))
+            db_data = curs.fetchall()
+            file_max = int(number_check(db_data[0][0]) if db_data and db_data[0][0] != '' else '2'
+            data = load_lang('file_capacity_error') + file_max
         elif num == 18:
             data = load_lang('email_send_error')
         elif num == 19:
@@ -2185,7 +2183,7 @@ def re_error(data):
                 load_skin_set = '<script>main_css_skin_set();</script>'
         
             return easy_minify(flask.render_template(skin_check(),
-                imp = [title, wiki_set(1), wiki_custom(), wiki_css([0, 0])],
+                imp = [title, wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '' + \
                     '<div id="main_skin_set">' + \
                         '<h2>' + load_lang('error') + '</h2>' + \
@@ -2198,7 +2196,7 @@ def re_error(data):
             ))
         else:
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('error'), wiki_set(1), wiki_custom(), wiki_css([0, 0])],
+                imp = [load_lang('error'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '' + \
                      '<h2>' + load_lang('error') + '</h2>' + \
                      '<ul class="inside_ul">' + \
