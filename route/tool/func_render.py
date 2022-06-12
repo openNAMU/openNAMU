@@ -1,4 +1,4 @@
-from .func_tool import *
+from .func_render_namumark import *
 
 # 커스텀 마크 언젠간 다시 추가 예정
 
@@ -129,6 +129,14 @@ class class_do_render:
                     ''',
                     []
                 ]
+            elif rep_data == 'namumark_beta':
+                doc_include = (data_in + '_') if data_in else ''
+                data_end = class_do_render_namumark(
+                    curs,
+                    doc_name,
+                    doc_data,
+                    doc_include
+                )()
             elif rep_data == 'markdown':
                 data_in = (data_in + '_') if data_in else ''
                 doc_data = html.escape(doc_data)
@@ -160,11 +168,14 @@ class class_do_render:
             else:
                 return data_end[0] + '<script>' + data_end[1] + '</script>'
         else:
-            backlink = self.do_backlink_generate(
-                rep_data, 
-                doc_data, 
-                doc_name
-            )
+            if rep_data == 'namumark':
+                backlink = self.do_backlink_generate(
+                    rep_data, 
+                    doc_data, 
+                    doc_name
+                )
+            else:
+                backlink = []
 
             if backlink != []:
                 curs.executemany(db_change("insert into back (link, title, type) values (?, ?, ?)"), backlink)

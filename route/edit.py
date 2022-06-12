@@ -6,7 +6,10 @@ def edit(name = 'Test', name_load = 0, section = 0):
     
         ip = ip_check()
         if acl_check(name) == 1:
-            return redirect('/raw/' + url_pas(name) + '/doc_acl')
+            return redirect('/raw_acl/' + url_pas(name))
+        
+        if do_title_length_check(name) == 1:
+            return re_error('/error/38')
         
         curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
         doc_ver = curs.fetchall()
@@ -25,18 +28,21 @@ def edit(name = 'Test', name_load = 0, section = 0):
             else:
                 captcha_post('', 0)
     
-            if slow_edit_check() == 1:
+            if do_edit_slow_check() == 1:
                 return re_error('/error/24')
     
             today = get_time()
             content = flask.request.form.get('content', '').replace('\r\n', '\n')
+            send = flask.request.form.get('send', '')
+            agree = flask.request.form.get('copyright_agreement', '')
             
-            if edit_filter_do(content) == 1:
+            if do_edit_filter(content) == 1:
                 return re_error('/error/21')
-                
-            curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
-            copyright_checkbox_text_d = curs.fetchall()
-            if copyright_checkbox_text_d and copyright_checkbox_text_d[0][0] != '' and flask.request.form.get('copyright_agreement', '') != 'yes':
+
+            if do_edit_send_check(send) == 1:
+                return re_error('/error/37')
+
+            if do_edit_text_bottom_check_box_check(agree) == 1:
                 return re_error('/error/29')
             
             curs.execute(db_change("select data from data where title = ?"), [name])
@@ -64,7 +70,7 @@ def edit(name = 'Test', name_load = 0, section = 0):
                 content,
                 today,
                 ip,
-                flask.request.form.get('send', ''),
+                send,
                 leng
             )
             
@@ -116,21 +122,6 @@ def edit(name = 'Test', name_load = 0, section = 0):
                 '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>' + \
                 '<hr class="main_hr">' + \
             ''
-    
-            curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
-            sql_d = curs.fetchall()
-            b_text = ('<hr class="main_hr">' + sql_d[0][0]) if sql_d and sql_d[0][0] != '' else ''
-            
-            curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
-            sql_d = curs.fetchall()
-            if sql_d and sql_d[0][0] != '':
-                cccb_text = '' + \
-                    '<hr class="main_hr">' + \
-                    '<input type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + \
-                    '<hr class="main_hr">' + \
-                ''
-            else:
-                cccb_text = ''
     
             curs.execute(db_change('select data from other where name = "edit_help"'))
             sql_d = curs.fetchall()
@@ -207,7 +198,7 @@ def edit(name = 'Test', name_load = 0, section = 0):
                                 name="ver" 
                                 value="''' + doc_ver + '''">
                         <hr class="main_hr">
-                        ''' + captcha_get() + ip_warning() + cccb_text + '''
+                        ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
                         <button id="save"
                                 type="submit" 
                                 onclick="
@@ -222,7 +213,6 @@ def edit(name = 'Test', name_load = 0, section = 0):
                                     load_preview(\'''' + url_pas(name) + '''\');
                                 ">''' + load_lang('preview') + '''</button>
                     </form>
-                    ''' + b_text + '''
                     <hr class="main_hr">
                     <div id="see_preview"></div>
                     <script>

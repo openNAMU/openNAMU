@@ -66,7 +66,7 @@ else:
 print('----')
 
 # Init-Load
-from .func_mark import *
+from .func_render import *
 
 from diff_match_patch import diff_match_patch
 
@@ -106,6 +106,36 @@ def do_db_set(db_set):
     global_db_set = db_set
     
 # Func-init
+def get_init_set_list(need = 'all'):
+    init_set_list = {
+        'host' : {
+            'display' : 'Host',
+            'require' : 'conv',
+            'default' : '0.0.0.0'
+        }, 'port' : {
+            'display' : 'Port',
+            'require' : 'conv',
+            'default' : '3000'
+        }, 'language' : {
+            'display' : 'Language',
+            'require' : 'select',
+            'default' : 'ko-KR',
+            'list' : ['ko-KR', 'en-US']
+        }, 'markup' : {
+            'display' : 'Markup',
+            'require' : 'select',
+            'default' : 'namumark',
+            'list' : ['namumark', 'markdown', 'custom', 'raw']
+        }, 'encode' : {
+            'display' : 'Encryption method',
+            'require' : 'select',
+            'default' : 'sha3',
+            'list' : ['sha3', 'sha3-512']
+        }
+    }
+    
+    return init_set_list
+
 class get_db_connect_old:
     def __init__(self, db_set):
         self.db_set = db_set
@@ -204,7 +234,7 @@ class class_check_json:
         if os.getenv('NAMU_DB') or os.getenv('NAMU_DB_TYPE'):
             set_data = {}
             set_data['db'] = os.getenv('NAMU_DB') if os.getenv('NAMU_DB') else 'data'
-            set_data['db'] = os.getenv('NAMU_DB_TYPE') if os.getenv('NAMU_DB_TYPE') else 'sqlite'
+            set_data['db_type'] = os.getenv('NAMU_DB_TYPE') if os.getenv('NAMU_DB_TYPE') else 'sqlite'
         else:
             if os.path.exists(os.path.join('data', 'set.json')):
                 db_set_list = ['db', 'db_type']
@@ -322,6 +352,46 @@ class class_check_json:
             self.data_db_set = self.do_check_mysql_json(self.data_db_set)
         
         return self.data_db_set
+
+def get_db_table_list():
+    # Init-Create_DB
+    create_data = {}
+
+    # 폐지 예정 (data_set으로 통합)
+    create_data['data_set'] = ['doc_name', 'doc_rev', 'set_name', 'set_data']
+    
+    create_data['data'] = ['title', 'data', 'type']
+    create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
+    create_data['rc'] = ['id', 'title', 'date', 'type']
+    create_data['acl'] = ['title', 'data', 'type']
+
+    # 개편 예정 (data_link로 변경)
+    create_data['back'] = ['title', 'link', 'type']
+
+    # 폐지 예정 (topic_set으로 통합) [가장 시급]
+    create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
+    create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
+
+    # 폐지 예정 (user_set으로 통합)
+    create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
+    create_data['scan'] = ['user', 'title', 'type']
+
+    # 개편 예정 (wiki_set과 wiki_filter과 wiki_vote으로 변경)
+    create_data['other'] = ['name', 'data', 'coverage']
+    create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
+    create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
+
+    # 개편 예정 (auth_list와 auth_log로 변경)
+    create_data['alist'] = ['name', 'acl']
+    create_data['re_admin'] = ['who', 'what', 'time']
+
+    # 개편 예정 (user_notice와 user_agent로 변경)
+    create_data['alarm'] = ['name', 'data', 'date']
+    create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
+
+    create_data['user_set'] = ['name', 'id', 'data']
+    
+    return create_data
 
 def update(ver_num, set_data):
     curs = conn.cursor()
@@ -540,7 +610,31 @@ def update(ver_num, set_data):
         curs.execute(db_change(
             'delete from acl where title like "file:%" and data = "admin" and type like "decu%"'
         ))
-    
+        
+    if ver_num < 3500106:
+        curs.execute(db_change("select data from other where name = 'domain'"))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            db_data = db_data[0][0]
+            db_data = re.match(r'[^/]+\/\/([^/]+)', db_data)
+            if db_data:
+                db_data = db_data.group(1)
+                curs.execute(db_change(
+                    "update other set data = ? where name = 'domain'"
+                ), [
+                    db_data
+                ])
+            else:
+                curs.execute(db_change(
+                    "update other set data = '' where name = 'domain'"
+                ))
+
+    if ver_num < 3500107:
+        db_table_list = get_db_table_list()
+        for for_a in db_table_list:
+            for for_b in db_table_list[for_a]:
+                curs.execute(db_change("update " + for_a + " set " + for_b + " = '' where " + for_b + " is null"))
+
     conn.commit()
     
     # 아이피 상태인 이메일 제거 예정
@@ -678,7 +772,7 @@ def check_int(data):
         return ''
     
 def redirect(data = '/'):
-    return flask.redirect(flask.request.host_url[:-1] + data)
+    return flask.redirect(load_domain('full') + data)
     
 def get_acl_list(type_d = 'normal'):
     if type_d == 'user':
@@ -696,12 +790,25 @@ def load_image_url():
     
     return image_where
 
-def load_domain():
+def load_domain(data_type = 'normal'):
     curs = conn.cursor()
+    
+    domain = ''
+    
+    if data_type == 'full':
+        curs.execute(db_change("select data from other where name = 'http_select'"))
+        db_data = curs.fetchall()
+        domain += db_data[0][0] if db_data and db_data[0][0] != '' else 'http'
+        domain += '://'
 
-    curs.execute(db_change("select data from other where name = 'domain'"))
-    domain = curs.fetchall()
-    domain = domain[0][0] if domain and domain[0][0] != '' else flask.request.host_url
+        curs.execute(db_change("select data from other where name = 'domain'"))
+        db_data = curs.fetchall()
+        domain += db_data[0][0] if db_data and db_data[0][0] != '' else flask.request.host
+        domain += '/'
+    else:
+        curs.execute(db_change("select data from other where name = 'domain'"))
+        db_data = curs.fetchall()
+        domain += db_data[0][0] if db_data and db_data[0][0] != '' else flask.request.host
 
     return domain
 
@@ -750,22 +857,20 @@ def ip_warning():
     return text_data
     
 # Func-login    
-def pw_encode(data, type_d = ''):
+def pw_encode(data, db_data = ''):
     curs = conn.cursor()
 
-    if type_d == '':
+    if db_data == '':
         curs.execute(db_change('select data from other where name = "encode"'))
-        set_data = curs.fetchall()
+        db_data = curs.fetchall()
+        db_data = db_data[0][0] if db_data else 'sha3'
 
-        type_d = set_data[0][0]
-
-    if type_d == 'sha256':
+    if db_data == 'sha256':
         return hashlib.sha256(bytes(data, 'utf-8')).hexdigest()
-    else:
-        if sys.version_info < (3, 6):
-            return sha3.sha3_256(bytes(data, 'utf-8')).hexdigest()
-        else:
-            return hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
+    elif db_data == 'sha3-512':
+        return hashlib.sha3_512(bytes(data, 'utf-8')).hexdigest()
+    else: # type_d == 'sha3'
+        return hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
 
 def pw_check(data, data2, type_d = 'no', id_d = ''):
     curs = conn.cursor()
@@ -1627,7 +1732,60 @@ def ip_pas(raw_ip, type_data = 0):
         return end_ip
         
 # Func-edit
-def slow_edit_check():
+def get_edit_text_bottom():
+    curs = conn.cursor()
+    
+    b_text = ''
+    
+    curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
+    db_data= curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        b_text = '' + \
+            '<hr class="main_hr">' + \
+            db_data[0][0] + \
+            '<hr class="main_hr">' + \
+        ''
+
+    return b_text
+
+def get_edit_text_bottom_check_box():
+    curs = conn.cursor()
+    
+    cccb_text = ''
+
+    curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
+    sql_d = curs.fetchall()
+    if sql_d and sql_d[0][0] != '':
+        cccb_text = '' + \
+            '<hr class="main_hr">' + \
+            '<input type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + \
+            '<hr class="main_hr">' + \
+        ''
+        
+    return cccb_text
+
+def do_edit_text_bottom_check_box_check(data):
+    curs = conn.cursor()
+    
+    curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        if data != 'yes':
+            return 1
+        
+    return 0
+
+def do_edit_send_check(data):
+    curs = conn.cursor()
+    
+    curs.execute(db_change('select data from other where name = "edit_bottom_compulsion"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '' and data == '':
+        return 1
+    
+    return 0
+
+def do_edit_slow_check():
     curs = conn.cursor()
 
     curs.execute(db_change("select data from other where name = 'slow_edit'"))
@@ -1652,7 +1810,7 @@ def slow_edit_check():
 
     return 0
 
-def edit_filter_do(data):
+def do_edit_filter(data):
     curs = conn.cursor()
 
     if admin_check(1) != 1:
@@ -1672,6 +1830,18 @@ def edit_filter_do(data):
 
                 return 1
 
+    return 0
+
+def do_title_length_check(name):
+    curs = conn.cursor()
+    
+    curs.execute(db_change('select data from other where name = "title_max_length"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        db_data = int(number_check(db_data[0][0]))
+        if len(name) > db_data:        
+            return 1
+    
     return 0
 
 # Func-insert
@@ -1807,7 +1977,7 @@ def rd_plus(topic_num, date, name = None, sub = None):
         curs.execute(db_change("update rd set date = ? where code = ?"), [date, topic_num])
     else:
         curs.execute(db_change(
-            "insert into rd (title, sub, code, date) values (?, ?, ?, ?)"
+            "insert into rd (title, sub, code, date, band, stop, agree, acl) values (?, ?, ?, ?, '', '', '', '')"
         ), [name, sub, topic_num, date])
 
     conn.commit()
@@ -1924,7 +2094,7 @@ def re_error(data):
         elif num == 4:
             data = load_lang('no_admin_block_error')
         elif num == 5:
-            data = load_lang('skin_error')
+            data = load_lang('error_skin_set')
         elif num == 6:
             data = load_lang('same_id_exist_error')
         elif num == 7:
@@ -1963,9 +2133,9 @@ def re_error(data):
             data = load_lang('regex_error')
         elif num == 24:
             curs.execute(db_change("select data from other where name = 'slow_edit'"))
-            slow_edit = curs.fetchall()
-            slow_edit = '' if not slow_edit else slow_edit[0][0]
-            data = load_lang('fast_edit_error') + slow_edit
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = load_lang('fast_edit_error') + db_data
         elif num == 25:
             data = load_lang('too_many_dec_error')
         elif num == 26:
@@ -1986,17 +2156,32 @@ def re_error(data):
             data = load_lang('same_email_error')
         elif num == 36:
             data = load_lang('input_email_error')
+        elif num == 37:
+            data = load_lang('error_edit_send_request')
+        elif num == 38:
+            curs.execute(db_change("select data from other where name = 'title_max_length'"))
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = load_lang('error_title_length_too_long') + db_data
+        elif num == 39:
+            curs.execute(db_change("select data from other where name = 'title_topic_max_length'"))
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = load_lang('error_title_length_too_long') + db_data
         else:
             data = '???'
 
         if num == 5:
-            if flask.request.path != '/main_skin_set':
+            if not flask.request.path in ('/main_skin_set', '/change/skin_set/main'):
+                if flask.request.path != '/skin_set':
+                    data += '<br>' + load_lang('error_skin_set_old') + ' <a href="/skin_set">(' + load_lang('go') + ')</a>'
+
                 title = load_lang('skin_set')
-                tool = [['main_skin_set', load_lang('main_skin_set')]]
+                tool = [['change', load_lang('user_setting')]]
                 load_skin_set = ''
             else:
                 title = load_lang('main_skin_set')
-                tool = [['skin_set', load_lang('skin_set')]]
+                tool = [['change', load_lang('user_setting')]]
                 load_skin_set = '<script>main_css_skin_set();</script>'
         
             return easy_minify(flask.render_template(skin_check(),
@@ -2005,7 +2190,7 @@ def re_error(data):
                     '<div id="main_skin_set">' + \
                         '<h2>' + load_lang('error') + '</h2>' + \
                         '<ul class="inside_ul">' + \
-                            '<li>' + data + ' <a href="/main_skin_set">(' + load_lang('main_skin_set') + ')</a></li>' + \
+                            '<li>' + data + '</a></li>' + \
                         '</ul>' + \
                     '</div>' + \
                     load_skin_set,
