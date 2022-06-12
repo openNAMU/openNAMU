@@ -369,6 +369,8 @@ def get_db_table_list():
     create_data['back'] = ['title', 'link', 'type']
 
     # 폐지 예정 (topic_set으로 통합) [가장 시급]
+    create_data['topic_set'] = ['thread_code', 'set_name', 'set_id', 'set_data']
+
     create_data['rd'] = ['title', 'sub', 'code', 'date', 'band', 'stop', 'agree', 'acl']
     create_data['topic'] = ['id', 'data', 'date', 'ip', 'block', 'top', 'code']
 
@@ -2115,7 +2117,8 @@ def re_error(data):
         elif num == 17:
             curs.execute(db_change('select data from other where name = "upload"'))
             db_data = curs.fetchall()
-            file_max = int(number_check(db_data[0][0]) if db_data and db_data[0][0] != '' else '2'
+            file_max = int(number_check(db_data[0][0])) if db_data and db_data[0][0] != '' else '2'
+
             data = load_lang('file_capacity_error') + file_max
         elif num == 18:
             data = load_lang('email_send_error')
