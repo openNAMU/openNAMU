@@ -88,7 +88,7 @@ def topic_tool_acl(topic_num = 1):
                         <select name="acl">
                             ''' + acl_html_list + '''
                         </select>
-                        <h2>''' + load_lang('view_acl') + '''</h2>
+                        <h2>''' + load_lang('view_acl') + ''' (''' + load_lang('beta') + ''')</h2>
                         <select name="acl_view">
                             ''' + acl_html_list_view + '''
                         </select>
