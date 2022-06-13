@@ -168,7 +168,7 @@ if data_db_set['type'] == 'sqlite':
 
     curs.execute(db_change('select data from other where name = "back_up"'))
     back_time = curs.fetchall()
-    back_time = int(number_check(back_time[0][0])) if back_time else 0
+    back_time = int(number_check(back_time[0][0])) if back_time and back_time != '' else 0
     if back_time != 0:
         curs.execute(db_change('select data from other where name = "backup_where"'))
         back_up_where = curs.fetchall()
@@ -515,9 +515,9 @@ app.route('/api/markup')(api_markup)
 app.route('/api/user_info/<name>', methods = ['POST', 'GET'])(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
-app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic_sub)
-app.route('/api/thread/<int:topic_num>/<tool>')(api_topic_sub)
-app.route('/api/thread/<int:topic_num>')(api_topic_sub)
+app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic)
+app.route('/api/thread/<int:topic_num>/<tool>')(api_topic)
+app.route('/api/thread/<int:topic_num>')(api_topic)
 
 app.route('/api/search/<everything:name>/doc_num/<int:num>/<int:page>')(api_search)
 app.route('/api/search/<everything:name>')(api_search)
