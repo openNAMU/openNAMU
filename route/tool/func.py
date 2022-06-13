@@ -1500,6 +1500,12 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 ))
 
             num = 3
+        elif tool == 'topic_view':
+            curs.execute(db_change("select set_data from topic_set where thread_code = ? and set_name = 'thread_view_acl'"), [
+                topic_num
+            ])
+            
+            num = 3
         elif tool == 'upload':
             curs.execute(db_change(
                 "select data from other where name = 'upload_acl'"

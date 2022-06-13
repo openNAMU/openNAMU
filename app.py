@@ -516,9 +516,9 @@ app.route('/api/markup')(api_markup)
 app.route('/api/user_info/<name>', methods = ['POST', 'GET'])(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
-app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic_sub)
-app.route('/api/thread/<int:topic_num>/<tool>')(api_topic_sub)
-app.route('/api/thread/<int:topic_num>')(api_topic_sub)
+app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic)
+app.route('/api/thread/<int:topic_num>/<tool>')(api_topic)
+app.route('/api/thread/<int:topic_num>')(api_topic)
 
 app.route('/api/search/<everything:name>/doc_num/<int:num>/<int:page>')(api_search)
 app.route('/api/search/<everything:name>')(api_search)

@@ -32,7 +32,10 @@ def topic(topic_num = 0):
                 else:
                     return redirect('/')
 
-        ban = acl_check(name, 'topic', topic_num)
+        topic_acl = acl_check('', 'topic', topic_num)
+        topic_view_acl = acl_check('', 'topic_view', topic_num)
+        if topic_view_acl == 1:
+            return re_error('/ban')
 
         if flask.request.method == 'POST':
             if flask.request.form.get('content', 'Test') == '':
@@ -46,7 +49,7 @@ def topic(topic_num = 0):
             ip = ip_check()
             today = get_time()
 
-            if ban == 1:
+            if topic_acl == 1:
                 return re_error('/ban')
 
             curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [topic_num])
@@ -110,7 +113,7 @@ def topic(topic_num = 0):
 
             return redirect('/thread/' + topic_num + '#' + num)
         else:
-            display = 'display: none;' if ban == 1 else ''
+            display = 'display: none;' if topic_acl == 1 else ''
             data_input_topic_name = ''
             if topic_num == '0':
                 data_input_topic_name = '' + \

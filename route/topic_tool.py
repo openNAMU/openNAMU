@@ -16,11 +16,31 @@ def topic_tool(topic_num = 1):
                 t_state = 'Close'
             else:
                 t_state = 'Normal'
+                
+            if close_data[0][1] == 'O':
+                t_state += ' (Agree)'
         else:
             t_state = 'Normal'
 
         curs.execute(db_change("select acl from rd where code = ?"), [topic_num])
-        topic_acl_get = curs.fetchall()
+        db_data = curs.fetchall()
+        if db_data:
+            if db_data[0][0] == '':
+                acl_state = 'Normal'
+            else:
+                acl_state = db_data[0][0]
+        else:
+            acl_state = 'Normal'
+        
+        curs.execute(db_change("select set_data from topic_set where thread_code = ? and set_name = 'thread_view_acl'"), [topic_num])
+        db_data = curs.fetchall()
+        if db_data:
+            if db_data[0][0] == '':
+                acl_view_state = 'Normal'
+            else:
+                acl_view_state = db_data[0][0]
+        else:
+            acl_view_state = 'Normal'
 
         if admin_check(3) == 1:
             data = '''
@@ -33,8 +53,9 @@ def topic_tool(topic_num = 1):
         data += '''
             <h2>''' + load_lang('tool') + '''</h2>
             <ul class="inside_ul">
-                <li>''' + load_lang('topic_state') + ''' : ''' + t_state + '' + (' (Agree)' if close_data and (close_data[0][1] == 'O') else '') + '''</li>
-                <li>''' + load_lang('topic_acl') + ''' : <a href="/acl/TEST#exp">''' + ('Normal' if not topic_acl_get or (topic_acl_get[0][0] == '') else topic_acl_get[0][0]) + '''</a></li>
+                <li>''' + load_lang('topic_state') + ''' : ''' + t_state + '''</li>
+                <li>''' + load_lang('topic_acl') + ''' : <a href="/acl/TEST#exp">''' + acl_state + '''</a></li>
+                <li>''' + load_lang('topic_view_acl') + ''' : <a href="/acl/TEST#exp">''' + acl_view_state + '''</a></li>
             </ul>
         '''
 

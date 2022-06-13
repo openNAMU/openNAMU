@@ -36,7 +36,7 @@ def topic_list(name = 'Test'):
             t_data = curs.fetchall()
 
             div += '''
-                <h2><a href="/thread/''' + data[0] + '">' + html.escape(data[0] + '. ' + data[1]) + '''</a></h2>
+                <h2><a href="/thread/''' + data[0] + '">' + data[0] + '. ' + html.escape(data[1]) + '''</a></h2>
                 <div id="topic_pre_''' + data[0] + '''"></div>
                 <div id="topic_back_pre_''' + data[0] + '''"></div>
                 <script>

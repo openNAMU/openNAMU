@@ -26,9 +26,22 @@ def topic_tool_acl(topic_num = 1):
                 acl_data_view = flask.request.form.get('acl_view', '')
 
                 curs.execute(db_change("update rd set acl = ? where code = ?"), [
-                    acl_data,
+                    acl_data, 
                     topic_num
                 ])
+                
+                curs.execute(db_change("select set_data from topic_set where thread_code = ? and set_name = 'thread_view_acl'"), [topic_num])
+                db_data = curs.fetchall()
+                if db_data:
+                    curs.execute(db_change("update topic_set set set_data = ? where thread_code = ?"), [
+                        acl_data_view,
+                        topic_num
+                    ])
+                else:
+                    curs.execute(db_change("insert into topic_set (thread_code, set_name, set_id, set_data) values (?, 'thread_view_acl', '1', ?)"), [
+                        topic_num,
+                        acl_data_view
+                    ])
 
                 curs.execute(db_change("insert into topic (id, data, date, ip, top, code) values (?, ?, ?, ?, '1', ?)"), [
                     str(int(topic_check[0][0]) + 1),
