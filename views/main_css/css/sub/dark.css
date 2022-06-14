@@ -57,3 +57,7 @@ blockquote {
     background-color: black;
     color: white;
 }
+
+#admin_icon {
+    fill: whitesmoke;
+}

@@ -2075,8 +2075,8 @@ def frame_admin(user):
         return '''
                 <div style="border:1px solid gray;border-top:5px solid #c169c6;padding:12px;margin-bottom:0px">
                     <span style="float: left;">
-                        <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                            viewBox="0 0 474.565 474.565" style="enable-background:new 0 0 474.565 474.565;" width="50" height="50" xml:space="preserve">
+                        <svg version="1.1" id="admin_icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            viewBox="0 0 474.565 474.565" width="50" height="50" xml:space="preserve">
                         <g>
                             <path d="M255.204,102.3c-0.606-11.321-12.176-9.395-23.465-9.395C240.078,95.126,247.967,98.216,255.204,102.3z"/>
                             <path d="M134.524,73.928c-43.825,0-63.997,55.471-28.963,83.37c11.943-31.89,35.718-54.788,66.886-63.826
