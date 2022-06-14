@@ -65,7 +65,7 @@ if setup_tool != 'normal':
                 try:
                     curs.execute(db_change('create table ' + create_table + '(test longtext default "")'))
                 except:
-                    curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ''"))
+                    curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext"))
 
     if setup_tool == 'update':
         update(int(ver_set_data[0][0]), set_data)
