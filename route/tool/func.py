@@ -2069,14 +2069,6 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
         mode
     ])
 
-#Func-frame-admin
-def admin_special_text(curs, user):
-    if admin_check('all', None, user) == 1:
-        curs.execute(db_change("select data from other where name = 'admin_user_text'"))
-        db_data = curs.fetchall()
-        return db_data[0][0] if db_data and db_data[0][0] else ''
-    return ''
-
 # Func-error
 def re_error(data):
     curs = conn.cursor()
