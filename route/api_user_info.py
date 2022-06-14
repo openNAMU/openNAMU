@@ -114,6 +114,6 @@ def api_user_info(name = ''):
 
                 plus_d = plus_d.format(ip_pas(name), plus_t[0], plus_t[1])
 
-                return flask.jsonify({ "data" : plus_d })
+                return flask.jsonify({ "data" : admin_special_text(curs, name) + plus_d })
             else:
                 return flask.jsonify({})
