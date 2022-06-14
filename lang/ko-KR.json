@@ -445,5 +445,7 @@
     "title_topic_max_length": "토론 제목 최대 길이",
     "error_title_length_too_long": "문서 제목이나 토론 제목의 길이가 너무 깁니다. 최대 글자 수 : ",
     "thread_acl": "스레드 ACL",
-    "not_all_acl": "전부 금지"
+    "not_all_acl": "전부 금지",
+    "admin_special_text": "관리자 문구",
+    "admin_special_text_detail": "정보가 조회된 사용자가 관리자 권한이 있다면 사용자 정보 위에 표시되는 문구입니다."
 }

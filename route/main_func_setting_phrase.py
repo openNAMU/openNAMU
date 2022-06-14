@@ -25,7 +25,8 @@ def main_func_setting_phrase():
             'upload_help',
             'upload_default',
             'license',
-            'topic_text'
+            'topic_text',
+            'admin_user_text'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
@@ -114,11 +115,17 @@ def main_func_setting_phrase():
                         <h2>18. ''' + load_lang('topic_text') + '''</h2>
                         <textarea rows="3" name="''' + i_list[17] + '''">''' + html.escape(d_list[17]) + '''</textarea>
 
+                        <h2>19. ''' + load_lang('admin_special_text') + ''' (HTML)</h2>
+                        <sup>(2)</sup>
+                        <hr class="main_hr">
+                        <textarea rows="3" name="''' + i_list[18] + '''">''' + html.escape(d_list[18]) + '''</textarea>
+
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     <ul id="footnote_data">
                         <li><a href="#note_1" id="note_1_end">(1)</a> ''' + load_lang('approval_question_visible_only_when_approval_on') + '''</li>
+                        <li><a href="#note_2" id="note_2_end">(2)</a> ''' + load_lang('admin_special_text_detail') + '''</li>
                     </ul>
                     <script>simple_render('main_set_data');</script>
                 ''',
