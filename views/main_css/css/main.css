@@ -253,3 +253,7 @@ s:hover, strike:hover, del:hover {
 .change_space {
     white-space: pre-line;
 }
+
+#admin_icon {
+    fill: black;
+}
