@@ -3,10 +3,10 @@ from .tool.func import *
 def topic_comment_notice(topic_num = 1, num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
-
+        
         topic_num = str(topic_num)
         num = str(num)
-
+        
         if admin_check(3, 'notice (code ' + topic_num + '#' + num + ')') != 1:
             return re_error('/error/3')
 

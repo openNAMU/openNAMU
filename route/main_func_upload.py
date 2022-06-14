@@ -6,6 +6,10 @@ def main_func_upload():
 
         if acl_check(None, 'upload') == 1:
             return re_error('/ban')
+        
+        curs.execute(db_change('select data from other where name = "upload"'))
+        db_data = curs.fetchall()
+        file_max = int(number_check(db_data[0][0])) if db_data and db_data[0][0] != '' else '2'
 
         if flask.request.method == 'POST':
             if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
@@ -19,7 +23,7 @@ def main_func_upload():
 
             file_len = len(file_data)
 
-            if (int(wiki_set(3)) * 1000 * 1000 * file_len) < flask.request.content_length:
+            if (file_max * 1000 * 1000 * file_len) < flask.request.content_length:
                 return re_error('/error/17')
 
             if file_len == 1:    
@@ -133,7 +137,7 @@ def main_func_upload():
                     <a href="/file_filter">(''' + load_lang('file_filter_list') + ''')</a> <a href="/extension_filter">(''' + load_lang('extension_filter_list') + ''')</a>
                     ''' + upload_help + '''
                     <hr class="main_hr">
-                    ''' + load_lang('max_file_size') + ''' : ''' + wiki_set(3) + '''MB
+                    ''' + load_lang('max_file_size') + ''' : ''' + file_max + '''MB
                     <hr class="main_hr">
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                         <input multiple="multiple" type="file" name="f_data[]">

@@ -139,7 +139,8 @@ h1, h2, h3, h4, h5, h6 {
     top: 0;
     left: 0;
 
-    background: #2780e3;
+    /**background: #2780e3;**/
+    background: #6937a1;
     box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
 }
 
@@ -165,14 +166,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .top_in_cel {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
     
     transition: .2s ease-in-out;
 }
 
 .top_in_cel:hover {
-    background: #022988;
+    background: #4f2b78;
     
     transition: .2s ease-in-out;
 }
