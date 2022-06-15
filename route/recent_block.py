@@ -1,6 +1,7 @@
 from .tool.func import *
 
 def recent_block_2(conn, name, tool):
+    conn.ping(True)
     curs = conn.cursor()
 
     num = int(number_check(flask.request.args.get('num', '1')))
@@ -28,6 +29,7 @@ def recent_block_2(conn, name, tool):
             if sub_type == '':
                 div = '' + \
                     '<a href="?type=ongoing&s_type=regex">(' + load_lang('regex') + ')</a> ' + \
+                    '<a href="?type=ongoing&s_type=range">(' + load_lang('ip_range') + ')</a> ' + \
                     '<a href="?type=ongoing&s_type=normal">(' + load_lang('normal') + ')</a>' + \
                     '<hr class="main_hr">' + \
                 '' + div
@@ -39,6 +41,9 @@ def recent_block_2(conn, name, tool):
                 if sub_type == 'regex':
                     sub += ' (' + load_lang('regex') + ')'
                     plus_sql = 'and band = \'regex\' '
+                elif sub_type == 'range':
+                    sub += ' (' + load_lang('ip_range') + ')'
+                    plus_sql = 'and band = \'range\' '
                 else:
                     sub += ' (' + load_lang('normal') + ')'
                     plus_sql = 'and band = \'\' '
@@ -102,6 +107,14 @@ def recent_block_2(conn, name, tool):
                 ip += ' <a href="/ban/' + url_pas(data[1]) + '?type=regex">(' + load_lang('ban') + ')</a>'
                 
             ip += ' (' + load_lang('regex') + ')'
+        elif data[5] == 'range':
+            ip = data[1]
+            if data[6] == '1':
+                ip = '<s>' + ip + '</s> <a href="/ban/' + url_pas(data[1]) + '?type=range">(' + load_lang('release') + ')</a>'
+            else:
+                ip += ' <a href="/ban/' + url_pas(data[1]) + '?type=range">(' + load_lang('ban') + ')</a>'
+                
+            ip += ' (' + load_lang('ip_range') + ')'
         else:
             ip = all_ip[data[1]]
 
@@ -143,6 +156,7 @@ def recent_block_2(conn, name, tool):
     else:
         div += next_fix('/block_log/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
 
+    curs.close()
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('recent_ban'), wiki_set(), wiki_custom(), wiki_css([sub, 0])],
         data = div,

@@ -907,6 +907,8 @@ def easy_minify(data, tool = None):
     return data
 
 def load_lang(data, safe = 0):
+    conn.ping(True)
+    conn.select_db(global_db_set['name'])
     curs = conn.cursor()
 
     global global_lang
@@ -1642,6 +1644,8 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
     return 1
 
 def ban_check(ip = None, tool = ''):
+    conn.ping(True)
+    conn.select_db(global_db_set['name'])
     curs = conn.cursor()
 
     ip = ip_check() if not ip else ip
@@ -1664,6 +1668,19 @@ def ban_check(ip = None, tool = ''):
     for test_r in regex_d:
         g_regex = re.compile(test_r[1])
         if g_regex.search(ip):
+            if tool == 'login':
+                if test_r[0] != 'O':
+                    return 1
+            else:
+                return 1
+
+    curs.execute(db_change("" + \
+        "select login, block from rb " + \
+        "where band = 'range' and ongoing = '1'" + \
+    ""))
+    range_d = curs.fetchall()
+    for test_r in range_d:
+        if ip_in_range(ip, test_r[1]):
             if tool == 'login':
                 if test_r[0] != 'O':
                     return 1
@@ -2183,6 +2200,8 @@ def re_error(data):
                 password_min_length = ''
                 
             data = load_lang('error_password_length_too_short') + password_min_length
+        elif num == 41:
+            data = load_lang('ip_range_error')
         else:
             data = '???'
 
