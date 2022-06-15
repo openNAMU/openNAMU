@@ -31,7 +31,7 @@ def main_func_setting_main(db_set):
             27 : ['http_select', 'http'],
             28 : ['title_max_length', ''],
             29 : ['title_topic_max_length', ''],
-            30 : ['limit_forwarded_for_header', '']
+            30 : ['limit_forwarded_for_header', ''],
             31 : ['password_min_length', '']
         }
 
