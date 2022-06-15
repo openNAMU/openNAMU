@@ -156,7 +156,7 @@ def main_func_setting_main(db_set):
 
                         <span>''' + load_lang('limit_forwarded_for_header') + '''</span>
                         <hr class="main_hr">
-                        <input type="checkbox" name="limit_forwarded_for_header" ''' + check_box_div[8] + '''> ''' + load_lang('trust_forwarded_for_header_from_private_ip') + ''' (''' + load_lang('not_working') + ''')
+                        <input type="checkbox" name="limit_forwarded_for_header" ''' + check_box_div[8] + '''> ''' + load_lang('trust_forwarded_for_header_from_private_ip') + '''
                         <hr class="main_hr">
 
                         <h3>1.1. ''' + load_lang('communication_set') + '''</h3>

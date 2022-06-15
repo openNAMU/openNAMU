@@ -2226,10 +2226,10 @@ def ip_check(d_type = 0):
         conn_ip = flask.request.environ.get('REMOTE_ADDR','::1')
         if not db_data[0][0] or (db_data[0][0] == 'on' and (ip_in_range(conn_ip, '10.0.0.0/8') or ip_in_range(conn_ip, '127.0.0.0/8') or ip_in_range(conn_ip, '172.16.0.0/12') or ip_in_range(conn_ip, '192.0.0.0/24'))):
             ip = flask.request.environ.get('HTTP_X_FORWARDED_FOR',
-                flask.request.environ.get('HTTP_X_REAL_IP',
-                    flask.request.environ.get('HTTP_CF_CONNECTING_IP', conn_ip)
+                    flask.request.environ.get('HTTP_X_REAL_IP',
+                        flask.request.environ.get('HTTP_CF_CONNECTING_IP', conn_ip)
+                    )
                 )
-            )
         else:
             ip = conn_ip
     return ip
