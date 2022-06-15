@@ -449,5 +449,7 @@
     "admin_special_text": "관리자 문구",
     "admin_special_text_detail": "정보가 조회된 사용자가 관리자 권한이 있다면 사용자 정보 위에 표시되는 문구입니다.",
     "limit_forwarded_for_header": "x-forwarded-for 헤더 제한",
-    "trust_forwarded_for_header_from_private_ip": "사설 IP에서 전송할 때만 x-forwarded-for 헤더 신뢰"
+    "trust_forwarded_for_header_from_private_ip": "사설 IP에서 전송할 때만 x-forwarded-for 헤더 신뢰",
+    "password_min_length": "비밀번호 최소 길이",
+    "error_password_length_too_short": "비밀번호 길이가 너무 짧습니다. 최소 글자 수 : "
 }
