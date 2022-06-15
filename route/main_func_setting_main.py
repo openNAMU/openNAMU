@@ -30,7 +30,8 @@ def main_func_setting_main(db_set):
             26 : ['edit_bottom_compulsion', ''],
             27 : ['http_select', 'http'],
             28 : ['title_max_length', ''],
-            29 : ['title_topic_max_length', '']
+            29 : ['title_topic_max_length', ''],
+            30 : ['password_min_length', '']
         }
 
         if flask.request.method == 'POST':
@@ -173,7 +174,12 @@ def main_func_setting_main(db_set):
                         <hr class="main_hr">
 
                         <input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + load_lang('ua_get_off') + '''
-
+                        <hr class="main_hr">
+                        
+                        <span>''' + load_lang('password_min_length') + ''' (''' + load_lang('beta') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
+                        <hr class="main_hr">
+                        <input name="password_min_length" value="''' + html.escape(d_list[30]) + '''">
+                        
                         <h2>4. ''' + load_lang('server_set') + '''</h2>
                         <span>''' + load_lang('max_file_size') + ''' (MB)</span>
                         <hr class="main_hr">
@@ -224,7 +230,6 @@ def main_func_setting_main(db_set):
                         <input name="title_topic_max_length" value="''' + html.escape(d_list[29]) + '''">
                         <hr class="main_hr">
 
-                        <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     <script>simple_render('main_set_data');</script>
