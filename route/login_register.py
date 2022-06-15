@@ -24,19 +24,30 @@ def login_register_2(conn):
         else:
             captcha_post('', 0)
 
-        # 아이디 비밀번호 검증 파트
         user_id = flask.request.form.get('id', '')
         user_pw = flask.request.form.get('pw', '')
         user_repeat = flask.request.form.get('pw2', '')
+        
+        # PW 검증
         if user_id == '' or user_pw == '':
             return re_error('/error/27')
 
         if user_pw != user_repeat:
             return re_error('/error/20')
 
+        # PW 길이 제한
+        curs.execute(db_change("select data from other where name = 'password_min_length'"))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            password_min_length = int(number_check(db_data[0][0]))
+            if password_min_length > len(user_pw):
+                return re_error('/error/40')
+        
+        # ID 글자 확인
         if re.search(r'(?:[^A-Za-zㄱ-힣0-9])', user_id):
             return re_error('/error/8')
 
+        # ID 필터
         curs.execute(db_change('select html from html_filter where kind = "name"'))
         set_d = curs.fetchall()
         for i in set_d:
@@ -44,9 +55,11 @@ def login_register_2(conn):
             if check_r.search(user_id):
                 return re_error('/error/8')
 
+        # ID 길이 제한 (32글자)
         if len(user_id) > 32:
             return re_error('/error/7')
 
+        # 중복 확인
         curs.execute(db_change("select id from user_set where id = ?"), [user_id])
         if curs.fetchall():
             return re_error('/error/6')
@@ -74,11 +87,20 @@ def login_register_2(conn):
         # 전부 아니면 바로 가입 후 /login으로 발송
         add_user(user_id, user_pw)
         
+        conn.commit()
+        
         return redirect('/login')
     else:
         curs.execute(db_change('select data from other where name = "contract"'))
         data = curs.fetchall()
         contract = (data[0][0] + '<hr class="main_hr">') if data and data[0][0] != '' else ''
+        
+        curs.execute(db_change("select data from other where name = 'password_min_length'"))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            password_min_length = ' (' + load_lang('password_min_length') + ' : ' + db_data[0][0] + ')'
+        else:
+            password_min_length = ''
                 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('register'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
@@ -89,7 +111,7 @@ def login_register_2(conn):
                     <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
                     <hr class="main_hr">
                     
-                    <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
+                    <input placeholder="''' + load_lang('password') + password_min_length + '''" name="pw" type="password">
                     <hr class="main_hr">
                     
                     <input placeholder="''' + load_lang('password_confirm') + '''" name="pw2" type="password">
