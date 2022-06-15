@@ -30,7 +30,8 @@ def main_func_setting_main(db_set):
             26 : ['edit_bottom_compulsion', ''],
             27 : ['http_select', 'http'],
             28 : ['title_max_length', ''],
-            29 : ['title_topic_max_length', '']
+            29 : ['title_topic_max_length', ''],
+            30 : ['limit_forwarded_for_header', '']
         }
 
         if flask.request.method == 'POST':
@@ -73,7 +74,7 @@ def main_func_setting_main(db_set):
                 else:
                     tls_select += '<option value="' + tls_select_one + '">' + tls_select_one + '</option>'
 
-            check_box_div = ['', '', '', '', '', '', '', '']
+            check_box_div = ['', '', '', '', '', '', '', '', '']
             for i in range(0, len(check_box_div)):
                 if i == 0:
                     acl_num = 7
@@ -89,6 +90,8 @@ def main_func_setting_main(db_set):
                     acl_num = 25
                 elif i == 7:
                     acl_num = 26
+                elif i == 8:
+                    acl_num = 30
 
                 if d_list[acl_num]:
                     check_box_div[i] = 'checked="checked"'
@@ -149,6 +152,12 @@ def main_func_setting_main(db_set):
                         <span>''' + load_lang('encryption_method') + '''</span>
                         <hr class="main_hr">
                         <select name="encode">''' + encode_select + '''</select>
+                        <hr class="main_hr">
+
+                        <span>''' + load_lang('limit_forwarded_for_header') + '''</span>
+                        <hr class="main_hr">
+                        <input type="checkbox" name="limit_forwarded_for_header" ''' + check_box_div[8] + '''> ''' + load_lang('trust_forwarded_for_header_from_private_ip') + ''' (''' + load_lang('not_working') + ''')
+                        <hr class="main_hr">
 
                         <h3>1.1. ''' + load_lang('communication_set') + '''</h3>
                         <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + load_lang('enable_comment_function') + ''' (''' + load_lang('not_working') + ''')

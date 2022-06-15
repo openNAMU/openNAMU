@@ -114,6 +114,11 @@ def api_user_info(name = ''):
 
                 plus_d = plus_d.format(ip_pas(name), plus_t[0], plus_t[1])
 
-                return flask.jsonify({ "data" : admin_special_text(curs, name) + plus_d })
+                if admin_check('all', None, name) == 1:
+                    curs.execute(db_change("select data from other where name = 'admin_user_text'"))
+                    db_data = curs.fetchall()
+                    plus_d = (db_data[0][0] if db_data and db_data[0][0] else '') + plus_d
+
+                return flask.jsonify({ "data" : plus_d })
             else:
                 return flask.jsonify({})

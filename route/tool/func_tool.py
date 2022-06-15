@@ -9,6 +9,7 @@ import html
 import json
 import sqlite3
 import threading
+import ipaddress
 
 set_data = ''
 
@@ -51,3 +52,6 @@ def sha224_replace(data):
 
 def md5_replace(data):
     return hashlib.md5(data.encode()).hexdigest()
+
+def ip_in_range(ip, ip_range):
+    return ipaddress.ip_address(ip) in ipaddress.ip_address(ip_range)
