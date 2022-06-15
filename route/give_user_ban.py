@@ -32,7 +32,7 @@ def give_user_ban_2(conn, name):
             type_d = 'range'
 
             try:
-                ipaddress.ip_network(name)
+                ipaddress.ip_network(name, False)
             except:
                 return re_error('/error/41')
         else:
