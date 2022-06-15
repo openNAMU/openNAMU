@@ -806,7 +806,6 @@ def load_domain(data_type = 'normal'):
         curs.execute(db_change("select data from other where name = 'domain'"))
         db_data = curs.fetchall()
         domain += db_data[0][0] if db_data and db_data[0][0] != '' else flask.request.host
-        domain += '/'
     else:
         curs.execute(db_change("select data from other where name = 'domain'"))
         db_data = curs.fetchall()
