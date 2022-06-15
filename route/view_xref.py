@@ -21,7 +21,7 @@ def view_xref(name = 'Test', xref_type = 1):
 
         div += '<ul class="inside_ul">'
 
-        sql_insert = ['link', 'title'] if xref_type == 1 else ['title', 'link']
+        sql_insert = ['link', 'title', 'type'] if xref_type == 1 else ['title', 'link']
         curs.execute(db_change("" + \
             "select distinct " + sql_insert[0] + ", type from back " + \
             "where " + sql_insert[1] + " = ? and not type = 'no' and not type = 'nothing'" + \

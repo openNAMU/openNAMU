@@ -137,7 +137,7 @@ def main_func_upload():
                     <a href="/file_filter">(''' + load_lang('file_filter_list') + ''')</a> <a href="/extension_filter">(''' + load_lang('extension_filter_list') + ''')</a>
                     ''' + upload_help + '''
                     <hr class="main_hr">
-                    ''' + load_lang('max_file_size') + ''' : ''' + file_max + '''MB
+                    ''' + load_lang('max_file_size') + ''' : ''' + str(file_max) + '''MB
                     <hr class="main_hr">
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                         <input multiple="multiple" type="file" name="f_data[]">
