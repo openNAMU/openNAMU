@@ -29,21 +29,6 @@ def db_change(data):
 
     return data
 
-def ip_check(d_type = 0):
-    ip = ''
-    if d_type == 0 and (flask.session and 'id' in flask.session):
-        ip = flask.session['id']
-    else:        
-        ip = flask.request.environ.get('HTTP_X_REAL_IP',
-            flask.request.environ.get('HTTP_CF_CONNECTING_IP',
-                flask.request.environ.get('REMOTE_ADDR',
-                    '::1'
-                )
-            )
-        )
-
-    return ip
-
 def url_pas(data):
     return urllib.parse.quote(data).replace('/','%2F')
 
@@ -54,4 +39,4 @@ def md5_replace(data):
     return hashlib.md5(data.encode()).hexdigest()
 
 def ip_in_range(ip, ip_range):
-    return ipaddress.ip_address(ip) in ipaddress.ip_address(ip_range)
+    return ipaddress.ip_address(ip) in ipaddress.ip_network(ip_range)
