@@ -2179,7 +2179,7 @@ def re_error(data):
             curs.execute(db_change("select data from other where name = 'password_min_length'"))
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
-                password_min_length = int(number_check(db_data[0][0]))
+                password_min_length = db_data[0][0]
             else:
                 password_min_length = ''
                 
