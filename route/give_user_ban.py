@@ -1,6 +1,7 @@
 from .tool.func import *
 
 def give_user_ban_2(conn, name):
+    conn.ping(True)
     curs = conn.cursor()
 
     band = flask.request.args.get('type', '')
@@ -10,23 +11,30 @@ def give_user_ban_2(conn, name):
             return re_error('/ban')
     else:
     	if admin_check(1, None, ip) !=1:
-    	    return re_error('/error/3')
+            return re_error('/error/3')
 
     if flask.request.method == 'POST':
         end = flask.request.form.get('second', '0')
         end = end if end else '0'
         name = name if name else flask.request.form.get('name', 'test')
-        regex_get = flask.request.form.get('regex', None)
+        type = flask.request.form.get('ban_type', None)
         login = flask.request.form.get('login', '')
         why = flask.request.form.get('why', '')
 
-        if regex_get or band != '':
-            type_d = 'regex' if regex_get else band
+        if type == 'regex' or band == 'regex':
+            type_d = 'regex'
 
             try:
                 re.compile(name)
             except:
                 return re_error('/error/23')
+        elif type == 'range' or band == 'range':
+            type_d = 'range'
+
+            try:
+                ipaddress.ip_network(name)
+            except:
+                return re_error('/error/41')
         else:
             type_d = None
 
@@ -76,7 +84,10 @@ def give_user_ban_2(conn, name):
         else:
             main_name = load_lang('ban')
             n_name = '<input placeholder="' + load_lang('name_or_ip_or_regex') + '" value="' + (name if name else '') + '" name="name" type="text"><hr class="main_hr">'
-            regex = '<input type="checkbox" name="regex" ' + ('checked' if band == 'regex' else '') + '> ' + load_lang('regex') + '<hr class="main_hr">'
+            regex = '<input type="radio" name="ban_type" value="regex" ' + ('checked' if band == 'regex' else '') + '> ' + load_lang('regex') + '<hr class="main_hr">'
+            range = '<input type="radio" name="ban_type" value="range" ' + ('checked' if band == 'range' else '') + '> ' + load_lang('ip_range') + '<hr class="main_hr">'
+            default_ban = '<input type="radio" name="ban_type" value="default" ' + ('checked' if band != 'regex' and band != 'range' else '') + '> ' + load_lang('default') + '<hr class="main_hr">'
+
             plus = '<input type="checkbox" name="login"> ' + load_lang('login_able') + '<hr class="main_hr">'
             now = 0
             b_now = load_lang('ban')
@@ -96,6 +107,8 @@ def give_user_ban_2(conn, name):
 
             data = n_name + '''
                 ''' + regex + '''
+                ''' + range + '''
+                ''' + default_ban + '''
                 <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''
                 <hr class="main_hr">
                 <input placeholder="''' + load_lang('ban_period') + ''' (''' + load_lang('second') + ''')" name="second" id="second" type="text">

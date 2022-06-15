@@ -307,7 +307,7 @@ def give_admin(name = None):
 # /auth/give
 # /auth/give/<name>
 @app.route('/ban', methods = ['POST', 'GET'])
-@app.route('/ban/<name>', methods = ['POST', 'GET'])
+@app.route('/ban/<everything:name>', methods = ['POST', 'GET'])
 def give_user_ban(name = None):
     return give_user_ban_2(load_db.db_get(), name)
 
