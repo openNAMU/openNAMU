@@ -806,7 +806,6 @@ def load_domain(data_type = 'normal'):
         curs.execute(db_change("select data from other where name = 'domain'"))
         db_data = curs.fetchall()
         domain += db_data[0][0] if db_data and db_data[0][0] != '' else flask.request.host
-        domain += '/'
     else:
         curs.execute(db_change("select data from other where name = 'domain'"))
         db_data = curs.fetchall()
@@ -2175,6 +2174,15 @@ def re_error(data):
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
             data = load_lang('error_title_length_too_long') + db_data
+        elif num == 40:
+            curs.execute(db_change("select data from other where name = 'password_min_length'"))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '':
+                password_min_length = db_data[0][0]
+            else:
+                password_min_length = ''
+                
+            data = load_lang('error_password_length_too_short') + password_min_length
         else:
             data = '???'
 
