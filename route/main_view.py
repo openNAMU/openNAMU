@@ -17,6 +17,8 @@ def main_view(name = ''):
             image_type = ['jpeg', 'jpg', 'gif', 'png', 'webp']
             if mime_type in image_type:
                 mime_type = 'image/' + mime_type
+            elif mime_type == 'svg':
+                mime_type = 'image/svg+xml'
             elif mime_type == 'js':
                 mime_type = 'text/javascript'
             elif mime_type == 'txt':
