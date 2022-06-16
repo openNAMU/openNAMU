@@ -1,4 +1,5 @@
 # Init
+from ast import Pass
 import os
 import sys
 import platform
@@ -1680,12 +1681,15 @@ def ban_check(ip = None, tool = ''):
     ""))
     range_d = curs.fetchall()
     for test_r in range_d:
-        if ip_in_range(ip, test_r[1]):
-            if tool == 'login':
-                if test_r[0] != 'O':
+        try:
+            if ip_in_range(ip, test_r[1]):
+                if tool == 'login':
+                    if test_r[0] != 'O':
+                        return 1
+                else:
                     return 1
-            else:
-                return 1
+        except:
+            pass
 
     curs.execute(db_change("" + \
         "select login from rb " + \
