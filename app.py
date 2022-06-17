@@ -60,13 +60,46 @@ if setup_tool != 'normal':
     create_data = get_db_table_list()
     for create_table in create_data:
         for create in ['test'] + create_data[create_table]:
+            db_pass = 0
+            
             try:
                 curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
+                
+                db_pass = 1
             except:
+                pass
+            
+            if db_pass == 0:
+                try:
+                    curs.execute(db_change('create table ' + create_table + '(test longtext default (""))'))
+                    
+                    db_pass = 1
+                except:
+                    pass
+            
+            if db_pass == 0:
                 try:
                     curs.execute(db_change('create table ' + create_table + '(test longtext default "")'))
+                    
+                    db_pass = 1
                 except:
+                    pass
+                    
+            if db_pass == 0:
+                try:
+                    curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ('')"))
+                    
+                    db_pass = 1
+                except:
+                    pass
+                
+            if db_pass == 0:
+                try:
                     curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ''"))
+                    
+                    db_pass = 1
+                except:
+                    pass
 
     if setup_tool == 'update':
         update(int(ver_set_data[0][0]), set_data)
