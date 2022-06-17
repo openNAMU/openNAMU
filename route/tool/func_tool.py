@@ -38,5 +38,7 @@ def sha224_replace(data):
 def md5_replace(data):
     return hashlib.md5(data.encode()).hexdigest()
 
+# IP범위 확인
+# CIDR표기법에 맞출 것
 def ip_in_range(ip, ip_range):
     return ipaddress.ip_address(ip) in ipaddress.ip_network(ip_range, False)
