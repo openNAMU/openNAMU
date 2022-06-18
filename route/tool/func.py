@@ -130,7 +130,7 @@ def get_init_set_list(need = 'all'):
             'display' : 'Encryption method',
             'require' : 'select',
             'default' : 'sha3',
-            'list' : ['sha3', 'sha3-512']
+            'list' : ['sha3', 'sha3-salt', 'sha3-512', 'sha3-512-salt']
         }
     }
     
@@ -654,6 +654,18 @@ def set_init_always(ver_num):
 
     if not os.path.exists(load_image_url()):
         os.makedirs(load_image_url())
+
+    curs.execute(db_change('select data from other where name = "key"'))
+    if not curs.fetchall():
+        curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [load_random_key()])
+        
+    curs.execute(db_change('select data from other where name = "salt_key"'))
+    if not curs.fetchall():
+        curs.execute(db_change('insert into other (name, data) values ("salt_key", ?)'), [load_random_key(4)])
+
+    curs.execute(db_change('select data from other where name = "count_all_title"'))
+    if not curs.fetchall():
+        curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
     
     conn.commit()
     
@@ -688,15 +700,6 @@ def set_init():
             curs.execute(db_change(
                 "insert into other (name, data) values (?, ?)"
             ), [i[0], i[1]])
-            
-    curs.execute(db_change('select data from other where name = "key"'))
-    rep_data = curs.fetchall()
-    if not rep_data:
-        curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [load_random_key()])
-
-    curs.execute(db_change('select data from other where name = "count_all_title"'))
-    if not curs.fetchall():
-        curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
         
     conn.commit()
 
@@ -858,20 +861,29 @@ def ip_warning():
     return text_data
     
 # Func-login    
-def pw_encode(data, db_data = ''):
+def pw_encode(data, db_data_encode = ''):
     curs = conn.cursor()
 
-    if db_data == '':
+    if db_data_encode == '':
         curs.execute(db_change('select data from other where name = "encode"'))
         db_data = curs.fetchall()
-        db_data = db_data[0][0] if db_data else 'sha3'
+        db_data_encode = db_data[0][0] if db_data else 'sha3'
 
-    if db_data == 'sha256':
+    if db_data_encode == 'sha256':
         return hashlib.sha256(bytes(data, 'utf-8')).hexdigest()
-    elif db_data == 'sha3-512':
-        return hashlib.sha3_512(bytes(data, 'utf-8')).hexdigest()
-    else: # type_d == 'sha3'
+    elif db_data_encode == 'sha3':
         return hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
+    elif db_data_encode == 'sha3-512':
+        return hashlib.sha3_512(bytes(data, 'utf-8')).hexdigest()
+    else:
+        curs.execute(db_change('select data from other where name = "salt_key"'))
+        db_data = curs.fetchall()
+        db_data_salt = db_data[0][0] if db_data else ''
+        
+        if db_data_encode == 'sha3-salt':
+            return hashlib.sha3_256(bytes(data + db_data_salt, 'utf-8')).hexdigest()
+        else:
+            return hashlib.sha3_512(bytes(data + db_data_salt, 'utf-8')).hexdigest()
 
 def pw_check(data, data2, type_d = 'no', id_d = ''):
     curs = conn.cursor()
