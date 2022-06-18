@@ -59,13 +59,46 @@ if setup_tool != 'normal':
     create_data = get_db_table_list()
     for create_table in create_data:
         for create in ['test'] + create_data[create_table]:
+            db_pass = 0
+            
             try:
                 curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
+                
+                db_pass = 1
             except:
+                pass
+            
+            if db_pass == 0:
+                try:
+                    curs.execute(db_change('create table ' + create_table + '(test longtext default (""))'))
+                    
+                    db_pass = 1
+                except:
+                    pass
+            
+            if db_pass == 0:
                 try:
                     curs.execute(db_change('create table ' + create_table + '(test longtext default "")'))
+                    
+                    db_pass = 1
                 except:
-                    curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext"))
+                    pass
+                    
+            if db_pass == 0:
+                try:
+                    curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ('')"))
+                    
+                    db_pass = 1
+                except:
+                    pass
+                
+            if db_pass == 0:
+                try:
+                    curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ''"))
+                    
+                    db_pass = 1
+                except:
+                    pass
 
     if setup_tool == 'update':
         update(int(ver_set_data[0][0]), set_data)
@@ -371,7 +404,7 @@ app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_read)
 app.route('/w/<everything:name>')(view_read)
 
-app.route('/random')(main_func_random)
+app.route('/random')(view_random)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
