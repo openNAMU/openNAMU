@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_func_upload():
+def edit_upload():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -9,7 +9,8 @@ def main_func_upload():
         
         curs.execute(db_change('select data from other where name = "upload"'))
         db_data = curs.fetchall()
-        file_max = int(number_check(db_data[0][0])) if db_data and db_data[0][0] != '' else '2'
+        file_max = number_check(db_data[0][0]) if db_data and db_data[0][0] != '' else '2'
+        file_max = int(file_max)
 
         if flask.request.method == 'POST':
             if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
@@ -18,9 +19,6 @@ def main_func_upload():
                 captcha_post('', 0)
 
             file_data = flask.request.files.getlist("f_data[]", None)
-            if not file_data:
-                return re_error('/error/9')
-
             file_len = len(file_data)
 
             if (file_max * 1000 * 1000 * file_len) < flask.request.content_length:
@@ -35,6 +33,9 @@ def main_func_upload():
                 file_num = 1
 
             for data in file_data:
+                if data.filename == '':
+                    return re_error('/error/9')
+                
                 value = os.path.splitext(data.filename)[1]
 
                 curs.execute(db_change("select html from html_filter where kind = 'extension'"))
@@ -112,7 +113,7 @@ def main_func_upload():
                 if file_num:
                     file_num += 1
 
-            conn.commit()
+                conn.commit()
 
             return redirect('/w/file:' + name)
         else:
