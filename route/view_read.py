@@ -42,8 +42,30 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
                 category_doc += '<h2 id="cate_under">' + load_lang('under_category') + '</h2><ul class="inside_ul">' + category_sub + '</ul>'
         elif re.search(r"^user:([^/]*)", name):
             match = re.search(r"^user:([^/]*)", name)
+            
             user_name = html.escape(match.group(1))
-            user_doc = '''
+            user_doc = ''
+            
+            # S admin or owner 특수 틀 추가
+            if admin_check('all', None, user_name) == 1:
+                if admin_check(None, None, user_name) == 1:
+                    curs.execute(db_change('select data from other where name = "phrase_user_page_owner"'))
+                    db_data = curs.fetchall()
+                    if db_data and db_data[0][0] != '':
+                        user_doc += db_data[0][0] + '<br>'
+                    else:
+                        curs.execute(db_change('select data from other where name = "phrase_user_page_admin"'))
+                        db_data = curs.fetchall()
+                        if db_data and db_data[0][0] != '':
+                            user_doc += db_data[0][0] + '<br>'
+                else:
+                    curs.execute(db_change('select data from other where name = "phrase_user_page_admin"'))
+                    db_data = curs.fetchall()
+                    if db_data and db_data[0][0] != '':
+                        user_doc += db_data[0][0] + '<br>'
+            # E
+            
+            user_doc += '''
                 <div id="get_user_info"></div>
                 <script>load_user_info("''' + user_name + '''");</script>
                 <hr class="main_hr">

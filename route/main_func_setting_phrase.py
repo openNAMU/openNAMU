@@ -25,7 +25,9 @@ def main_func_setting_phrase():
             'upload_help',
             'upload_default',
             'license',
-            'topic_text'
+            'topic_text',
+            'phrase_user_page_admin',
+            'phrase_user_page_owner'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
@@ -113,12 +115,21 @@ def main_func_setting_phrase():
 
                         <h2>18. ''' + load_lang('topic_text') + '''</h2>
                         <textarea rows="3" name="''' + i_list[17] + '''">''' + html.escape(d_list[17]) + '''</textarea>
+                        
+                        <h2>19. ''' + load_lang('phrase_user_page_admin') + '''  (HTML)</h2>
+                        <textarea rows="3" name="''' + i_list[18] + '''">''' + html.escape(d_list[18]) + '''</textarea>
+                        
+                        <h2>20. ''' + load_lang('phrase_user_page_owner') + '''  (HTML)</h2>
+                        <textarea rows="3" name="''' + i_list[19] + '''">''' + html.escape(d_list[19]) + '''</textarea>
 
                         <hr class="main_hr">
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     <ul id="footnote_data">
-                        <li><a href="#note_1" id="note_1_end">(1)</a> ''' + load_lang('approval_question_visible_only_when_approval_on') + '''</li>
+                        <li>
+                            <a href="#note_1" id="note_1_end">(1)</a>
+                            <a href="/setting/main">''' + load_lang('approval_question_visible_only_when_approval_on') + '''</a>
+                        </li>
                     </ul>
                     <script>simple_render('main_set_data');</script>
                 ''',
