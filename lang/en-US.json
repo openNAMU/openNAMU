@@ -313,6 +313,8 @@
                 "upload_help" : "File upload phrase",
                 "upload_default" : "File upload other Default",
                 "topic_text" : "Discussion textarea phrase",
+                "phrase_user_page_admin" : "Administrator user page phrase",
+                "phrase_user_page_owner" : "Onwer user page phrase",
             "_comment_2.2.4_" : "Ext_API",
                 "recaptcha" : "reCAPTCHA",
                 "hcaptcha" : "hCAPTCHA",
