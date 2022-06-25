@@ -653,6 +653,8 @@ def update(ver_num, set_data):
     print('Update completed')
 
 def set_init_always(ver_num):
+    global global_wiki_set
+    
     curs = conn.cursor()
 
     curs.execute(db_change('delete from other where name = "ver"'))
@@ -675,6 +677,14 @@ def set_init_always(ver_num):
     curs.execute(db_change('select data from other where name = "count_all_title"'))
     if not curs.fetchall():
         curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
+        
+    curs.execute(db_change('select data from other where name = "wiki_access_password_need"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        curs.execute(db_change('select data from other where name = "wiki_access_password"'))
+        db_data = curs.fetchall()
+        if db_data:
+            global_wiki_set['wiki_access_password'] = db_data[0][0]
     
     conn.commit()
     
@@ -924,8 +934,20 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
 # Func-skin
 def easy_minify(data, tool = None):
     # without_DB
-
-    return data
+    if 'wiki_access_password' in global_wiki_set:
+        access_password = global_wiki_set['wiki_access_password']
+        input_password = flask.request.cookies.get('opennamu_wiki_access', ' ')
+        if url_pas(access_password) == input_password:
+            return data
+            
+        return '''
+            <script src="/views/main_css/js/route/wiki_access_password.js"></script>
+            <h2>''' + load_lang('error_password_require_for_wiki_access') + '''</h2>
+            <input type="password" id="wiki_access">
+            <input type="submit" onclick="opennamu_do_wiki_access();">
+        '''
+    else:
+        return data
 
 def load_lang(data, safe = 0):
     curs = conn.cursor()

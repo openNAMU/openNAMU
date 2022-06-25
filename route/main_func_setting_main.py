@@ -31,7 +31,9 @@ def main_func_setting_main(db_set):
             27 : ['http_select', 'http'],
             28 : ['title_max_length', ''],
             29 : ['title_topic_max_length', ''],
-            30 : ['password_min_length', '']
+            30 : ['password_min_length', ''],
+            31 : ['wiki_access_password_need', ''],
+            32 : ['wiki_access_password', '']
         }
 
         if flask.request.method == 'POST':
@@ -74,7 +76,7 @@ def main_func_setting_main(db_set):
                 else:
                     tls_select += '<option value="' + tls_select_one + '">' + tls_select_one + '</option>'
 
-            check_box_div = ['', '', '', '', '', '', '', '']
+            check_box_div = ['', '', '', '', '', '', '', '', '']
             for i in range(0, len(check_box_div)):
                 if i == 0:
                     acl_num = 7
@@ -90,6 +92,8 @@ def main_func_setting_main(db_set):
                     acl_num = 25
                 elif i == 7:
                     acl_num = 26
+                elif i == 8:
+                    acl_num = 31
 
                 if d_list[acl_num]:
                     check_box_div[i] = 'checked="checked"'
@@ -150,6 +154,13 @@ def main_func_setting_main(db_set):
                         <span>''' + load_lang('encryption_method') + '''</span>
                         <hr class="main_hr">
                         <select name="encode">''' + encode_select + '''</select>
+                        <hr class="main_hr">
+                        
+                        <input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + load_lang('set_wiki_access_password_need') + ''' (''' + load_lang('restart_required') + ''') (''' + load_lang('beta') + ''')
+                        <hr class="main_hr">
+                        <span>''' + load_lang('set_wiki_access_password') + ''' (''' + load_lang('restart_required') + ''') (''' + load_lang('beta') + ''')</span>
+                        <hr class="main_hr">
+                        <input type="password" name="wiki_access_password" value="''' + html.escape(d_list[32]) + '''">
 
                         <h3>1.1. ''' + load_lang('communication_set') + '''</h3>
                         <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + load_lang('enable_comment_function') + ''' (''' + load_lang('not_working') + ''')
