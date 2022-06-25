@@ -60,8 +60,10 @@ def main_func_setting_main(db_set):
             else:
                 conn.commit()
 
+            init_set_list = get_init_set_list()
+                
             encode_select = ''
-            encode_select_data = ['sha256', 'sha3']
+            encode_select_data = init_set_list['encode']['list'] + ['sha256']
             for encode_select_one in encode_select_data:
                 if encode_select_one == d_list[15]:
                     encode_select = '<option value="' + encode_select_one + '">' + encode_select_one + '</option>' + encode_select
