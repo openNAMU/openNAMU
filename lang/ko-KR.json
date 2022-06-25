@@ -449,5 +449,6 @@
     "password_min_length": "비밀번호 최소 길이",
     "error_password_length_too_short": "비밀번호 길이가 너무 짧습니다. 최소 글자 수 : ",
     "phrase_user_page_admin": "관리자인 사용자 문서 문구",
-    "phrase_user_page_owner": "소유자인 사용자 문서 문구"
+    "phrase_user_page_owner": "소유자인 사용자 문서 문구",
+    "error_password_require_for_wiki_access": "위키에 접속하려면 비밀번호가 필요합니다."
 }

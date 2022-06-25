@@ -38,6 +38,7 @@ print('14. Delete Main <HEAD>')
 print('15. Give owner')
 print('16. Delete 2FA password')
 print('17. Change markup')
+print('18. Change wiki access password')
 
 print('----')
 what_i_do = input('Select : ')
@@ -215,6 +216,11 @@ elif what_i_do == '17':
     markup = input('Markup name : ')
 
     curs.execute(db_change("update other set data = ? where name = 'markup'"), [markup])
+elif what_i_do == '18':
+    print('----')
+    wiki_access_password = input('Password : ')
+
+    curs.execute(db_change("update other set data = ? where name = 'wiki_access_password'"), [wiki_access_password])
 else:
     raise ValueError(what_i_do)
 
