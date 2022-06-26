@@ -17,7 +17,7 @@ def main_tool_admin(num = 1, add_2 = ''):
         12 : [load_lang('compare_target'), 'check', load_lang('compare_target')],
         13 : [load_lang('document_name'), 'edit', load_lang('load')],
         14 : [load_lang('document_name'), 'star_doc', load_lang('add_star_doc')],
-        15 : [load_lang('name_or_ip_or_regex'), 'ban', load_lang('release')]
+        15 : [load_lang('name_or_ip_or_regex'), 'auth/give/ban', load_lang('release')]
     }
 
     if num == 1:
@@ -29,14 +29,14 @@ def main_tool_admin(num = 1, add_2 = ''):
                     <ul class="inside_ul">
                         <li><a href="/manager/2">''' + load_lang('acl_change') + '''</a></li>
                         <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
-                        <li><a href="/ban">''' + load_lang('ban') + '''</a></li>
+                        <li><a href="/auth/give/ban">''' + load_lang('ban') + '''</a></li>
                         <li><a href="/manager/17">''' + load_lang('release') + '''</a></li>
                         <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
                     </ul>
                     <h2>2. ''' + load_lang('owner') + '''</h2>
                     <ul class="inside_ul">
                         <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
-                        <li><a href="/delete_mutiple">''' + load_lang('many_delete') + '''</a></li>
+                        <li><a href="/delete_multiple">''' + load_lang('many_delete') + '''</a></li>
                         <li><a href="/app_submit">''' + load_lang('application_list') + '''</a></li>
                         <li><a href="/api/sitemap.xml">''' + load_lang('get_sitemap') + '''</a></li>
                         <li><a href="/register">''' + load_lang('add_user') + '''</a></li>
@@ -83,7 +83,7 @@ def main_tool_admin(num = 1, add_2 = ''):
             if add_2 != '':
                 return redirect('/' + title_list[num][1] + '/' + url_pas(add_2) + '/doc_from/' + url_pas(add_1))
             elif flask.request.form.get('regex', '') != '':
-                return redirect('/' + title_list[num][1] + '/' + url_pas(add_1) + '?type=regex')
+                return redirect('/auth/give/ban_regex/' + url_pas(add_1))
             else:
                 return redirect('/' + title_list[num][1] + '/' + url_pas(add_1))
         else:
