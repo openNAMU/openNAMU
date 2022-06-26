@@ -298,6 +298,7 @@
                 "password_min_length" : "Password minimum length",
                 "set_wiki_access_password_need" : "Password required for wiki access",
                 "set_wiki_access_password" : "Wiki access password",
+                "set_history_recording_off" : "Stop recording history",
             "_comment_2.2.3_" : "Text",
                 "register_text" : "Terms of sign-up",
                 "non_login_alert" : "Non-login alert",

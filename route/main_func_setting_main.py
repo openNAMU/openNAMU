@@ -33,7 +33,8 @@ def main_func_setting_main(db_set):
             29 : ['title_topic_max_length', ''],
             30 : ['password_min_length', ''],
             31 : ['wiki_access_password_need', ''],
-            32 : ['wiki_access_password', '']
+            32 : ['wiki_access_password', ''],
+            33 : ['history_recording_off', '']
         }
 
         if flask.request.method == 'POST':
@@ -62,6 +63,8 @@ def main_func_setting_main(db_set):
 
             init_set_list = get_init_set_list()
                 
+            # 언어도 변경 가능하도록 필요
+                
             encode_select = ''
             encode_select_data = init_set_list['encode']['list'] + ['sha256']
             for encode_select_one in encode_select_data:
@@ -78,7 +81,7 @@ def main_func_setting_main(db_set):
                 else:
                     tls_select += '<option value="' + tls_select_one + '">' + tls_select_one + '</option>'
 
-            check_box_div = ['', '', '', '', '', '', '', '', '']
+            check_box_div = ['', '', '', '', '', '', '', '', '', '']
             for i in range(0, len(check_box_div)):
                 if i == 0:
                     acl_num = 7
@@ -96,6 +99,8 @@ def main_func_setting_main(db_set):
                     acl_num = 26
                 elif i == 8:
                     acl_num = 31
+                elif i == 9:
+                    acl_num = 33
 
                 if d_list[acl_num]:
                     check_box_div[i] = 'checked="checked"'
@@ -194,10 +199,6 @@ def main_func_setting_main(db_set):
                         <input name="password_min_length" value="''' + html.escape(d_list[30]) + '''">
                         
                         <h2>4. ''' + load_lang('server_set') + '''</h2>
-                        <span>''' + load_lang('max_file_size') + ''' (MB)</span>
-                        <hr class="main_hr">
-                        <input name="upload" value="''' + html.escape(d_list[4]) + '''">
-                        <hr class="main_hr">
 
                         <span>''' + load_lang('update_branch') + '''</span>
                         <hr class="main_hr">
@@ -241,6 +242,14 @@ def main_func_setting_main(db_set):
                         <span>''' + load_lang('title_topic_max_length') + ''' (''' + load_lang('beta') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
                         <hr class="main_hr">
                         <input name="title_topic_max_length" value="''' + html.escape(d_list[29]) + '''">
+                        <hr class="main_hr">
+                        
+                        <span>''' + load_lang('max_file_size') + ''' (MB)</span>
+                        <hr class="main_hr">
+                        <input name="upload" value="''' + html.escape(d_list[4]) + '''">
+                        <hr class="main_hr">
+                        
+                        <input type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + load_lang('set_history_recording_off') + ''' (''' + load_lang('beta') + ''')
                         <hr class="main_hr">
 
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>

@@ -2029,6 +2029,11 @@ def rd_plus(topic_num, date, name = None, sub = None):
 
 def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
     curs = conn.cursor()
+    
+    curs.execute(db_change('select data from other where name = "history_recording_off"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        return 0
 
     if mode == 'add':
         curs.execute(db_change(
