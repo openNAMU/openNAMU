@@ -452,5 +452,6 @@
     "phrase_user_page_owner": "소유자인 사용자 문서 문구",
     "error_password_require_for_wiki_access": "위키에 접속하려면 비밀번호가 필요합니다.",
     "set_wiki_access_password_need": "위키 접속시 비밀번호 필요",
-    "set_wiki_access_password": "위키 접속 비밀번호"
+    "set_wiki_access_password": "위키 접속 비밀번호",
+    "set_history_recording_off" : "역사 기록 중지"
 }
