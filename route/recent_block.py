@@ -97,9 +97,9 @@ def recent_block_2(conn, name, tool):
         if data[5] == 'regex':
             ip = data[1]
             if data[6] == '1':
-                ip = '<s>' + ip + '</s> <a href="/ban/' + url_pas(data[1]) + '?type=regex">(' + load_lang('release') + ')</a>'
+                ip = '<s>' + ip + '</s> <a href="/auth/give/ban_regex/' + url_pas(data[1]) + '">(' + load_lang('release') + ')</a>'
             else:
-                ip += ' <a href="/ban/' + url_pas(data[1]) + '?type=regex">(' + load_lang('ban') + ')</a>'
+                ip += ' <a href="/auth/give/ban_regex/' + url_pas(data[1]) + '">(' + load_lang('ban') + ')</a>'
                 
             ip += ' (' + load_lang('regex') + ')'
         else:

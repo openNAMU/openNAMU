@@ -340,10 +340,12 @@ def give_admin(name = None):
 
 # /auth/give
 # /auth/give/<name>
-@app.route('/ban', methods = ['POST', 'GET'])
-@app.route('/ban/<name>', methods = ['POST', 'GET'])
-def give_user_ban(name = None):
-    return give_user_ban_2(load_db.db_get(), name)
+app.route('/auth/give/ban', methods = ['POST', 'GET'])(give_user_ban)
+app.route('/auth/give/ban/<name>', methods = ['POST', 'GET'])(give_user_ban)
+
+app.route('/auth/give/ban_regex/<everything:name>', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'regex' })(give_user_ban)
+
+# app.route('/auth/give/ban_multiple', methods = ['POST', 'GET'])(give_user_ban_multiple)
 
 # /auth/list
 @app.route('/admin_group')
@@ -419,7 +421,7 @@ app.route('/xref_reset/<everything:name>')(edit_backlink_reset)
 
 app.route('/delete/<everything:name>', methods = ['POST', 'GET'])(edit_delete)
 app.route('/delete_file/<everything:name>', methods = ['POST', 'GET'])(edit_delete_file)
-app.route('/delete_mutiple', methods = ['POST', 'GET'])(edit_delete_mutiple)
+app.route('/delete_multiple', methods = ['POST', 'GET'])(edit_delete_multiple)
 
 app.route('/revert/<int:num>/<everything:name>', methods = ['POST', 'GET'])(edit_revert)
 

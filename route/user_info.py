@@ -50,7 +50,7 @@ def user_info(name = ''):
             admin_menu = '''
                 <h2>''' + load_lang('admin') + '''</h2>
                 <ul class="inside_ul">
-                    <li><a href="/ban/''' + url_pas(ip) + '''">''' + ban_name + '''</a></li>
+                    <li><a href="/auth/give/ban/''' + url_pas(ip) + '''">''' + ban_name + '''</a></li>
                     <li><a href="/check/''' + url_pas(ip) + '''">''' + load_lang('check') + '''</a></li>
                 </ul>
             '''
