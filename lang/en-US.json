@@ -226,6 +226,7 @@
         "email_delete" : "Delete email",
         "challenge" : "Challenge",
         "user_title" : "User title",
+        "multiple_ban" : "Multiple ban"
         "_comment_2.1_" : "Filter",
             "_comment_2.1.1_" : "List",
                 "interwiki_list" : "Interwiki(s) list",
@@ -423,6 +424,7 @@
         "default_edit_help" : "Describe it here",
         "markup_enabled" : "Markup enabled",
         "many_delete_help" : "Please write down the documents name one by one on the line.",
+        "name_or_ip_or_regex_multiple" : "Please write down the username or IP or Regex one by one on the line.",
         "sqlite_only" : "SQLite only",
         "approval_question_visible_only_when_approval_on" : "Approval questions are visible only when approval requirement is on",
         "msg_whatchlist_lmt": "You can add as many as",
