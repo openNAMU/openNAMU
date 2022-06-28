@@ -131,14 +131,14 @@ def edit_upload():
             curs.execute(db_change("select data from other where name = 'upload_default'"))
             db_data = curs.fetchall()
             upload_default = html.escape(db_data[0][0]) if db_data and db_data[0][0] != '' else ''
-
+            
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('upload'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <a href="/file_filter">(''' + load_lang('file_filter_list') + ''')</a> <a href="/extension_filter">(''' + load_lang('extension_filter_list') + ''')</a>
                     ''' + upload_help + '''
                     <hr class="main_hr">
-                    ''' + load_lang('max_file_size') + ''' : ''' + file_max + '''MB
+                    ''' + load_lang('max_file_size') + ''' : ''' + str(file_max) + '''MB
                     <hr class="main_hr">
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                         <input multiple="multiple" type="file" name="f_data[]">
