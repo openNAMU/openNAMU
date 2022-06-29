@@ -453,5 +453,7 @@
     "error_password_require_for_wiki_access": "위키에 접속하려면 비밀번호가 필요합니다.",
     "set_wiki_access_password_need": "위키 접속시 비밀번호 필요",
     "set_wiki_access_password": "위키 접속 비밀번호",
-    "set_history_recording_off" : "역사 기록 중지"
+    "set_history_recording_off": "역사 기록 중지",
+    "multiple_ban": "다중 차단",
+    "name_or_ip_or_regex_multiple": "한 줄에 IP나 정규식을 한 개씩 적어주세요."
 }
