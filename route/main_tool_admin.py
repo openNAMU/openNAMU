@@ -30,6 +30,7 @@ def main_tool_admin(num = 1, add_2 = ''):
                         <li><a href="/manager/2">''' + load_lang('acl_change') + '''</a></li>
                         <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
                         <li><a href="/auth/give/ban">''' + load_lang('ban') + '''</a></li>
+                        <li><a href="/auth/give/ban_multiple">''' + load_lang('multiple_ban') + '''</a></li>
                         <li><a href="/manager/17">''' + load_lang('release') + '''</a></li>
                         <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
                     </ul>
