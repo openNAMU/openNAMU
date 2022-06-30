@@ -229,7 +229,7 @@ function do_onmark_heading_render(
                     '</span> ' +
                     '<a id="edit_load_' + String(toc_n) + '" ' +
                         'style="font-size: 70%;"' +
-                        'href="/edit/' + do_url_change(name_doc) + '/doc_section/' + String(toc_n) + '">✎</a> ' +
+                        'href="/edit_section/' + String(toc_n) + '/' + do_url_change(name_doc) + '">✎</a> ' +
                     '<a href="javascript:void(0);" ' +
                         'onclick="javascript:do_open_folding(\'' + name_include + 'in_data_' + String(toc_n) + '\', this);"' +
                         'style="font-size: 70%;">' + (heading_data[2] ? '⊕' : '⊖') + '</a>' +

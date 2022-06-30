@@ -82,7 +82,8 @@ def main_tool_admin(num = 1, add_2 = ''):
         add_1 = flask.request.form.get('name', 'test')
         if flask.request.method == 'POST':
             if add_2 != '':
-                return redirect('/' + title_list[num][1] + '/' + url_pas(add_2) + '/doc_from/' + url_pas(add_1))
+                flask.session['edit_load_document'] = add_1
+                return redirect('/edit_from/' + url_pas(add_2))
             elif flask.request.form.get('regex', '') != '':
                 return redirect('/auth/give/ban_regex/' + url_pas(add_1))
             else:
