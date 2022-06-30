@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def edit(name = 'Test', name_load = 0, section = 0):
+def edit(name = 'Test', section = 0, do_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
     
@@ -91,7 +91,14 @@ def edit(name = 'Test', name_load = 0, section = 0):
         else:
             editor_top_text = ''
             if edit_repeat == 'get':
-                load_title = name_load
+                if do_type == 'load':
+                    if flask.session and 'edit_load_document' in flask.session:
+                        load_title = flask.session['edit_load_document']
+                    else:
+                        load_title = 0
+                else:
+                    load_title = 0
+                
                 if load_title == 0 and section == '':
                     load_title = name
                     editor_top_text += '<a href="/manager/15/' + url_pas(name) + '">(' + load_lang('load') + ')</a> '

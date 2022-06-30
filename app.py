@@ -409,8 +409,8 @@ app.route('/random')(view_random)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
-app.route('/edit/<everything:name>/doc_from/<everything:name_load>', methods = ['POST', 'GET'])(edit)
-app.route('/edit/<everything:name>/doc_section/<int:section>', methods = ['POST', 'GET'])(edit)
+app.route('/edit_from/<everything:name>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'load' })(edit)
+app.route('/edit_section/<int:section>/<everything:name>', methods = ['POST', 'GET'])(edit)
 
 app.route('/upload', methods = ['POST', 'GET'])(edit_upload)
 
