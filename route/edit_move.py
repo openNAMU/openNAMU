@@ -36,111 +36,111 @@ def edit_move(name):
                 return re_error('/error/29')
 
             # 문서 이동 파트 S
-            if (
-                move_option == 'merge' and 
-                admin_check(None, 'merge documents (' + name + ') (' + move_title + ')') == 1
-            ):
-                curs.execute(db_change("select data from data where title = ?"), [move_title])
-                data = curs.fetchall()
-                if data:
-                    curs.execute(db_change("delete from data where title = ?"), [move_title])
-                    curs.execute(db_change("delete from back where link = ?"), [move_title])
-
-                curs.execute(db_change("select data from data where title = ?"), [name])
-                data = curs.fetchall()
-                if data:
-                    curs.execute(db_change("update data set title = ? where title = ?"), [move_title, name])
-                    curs.execute(db_change("update back set link = ? where link = ?"), [move_title, name])
-
-                    data_in = data[0][0]
-                else:
-                    data_in = ''
-
-                history_plus(
-                    name,
-                    data_in,
-                    time,
-                    ip,
-                    send,
-                    '0',
-                    t_check = 'merge <a>' + name + '</a> - <a>' + move_title + '</a> move',
-                    mode = 'move'
-                )
-
-                curs.execute(db_change("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'"), [name])
-                curs.execute(db_change("delete from back where title = ? and not type = 'cat' and type = 'no'"), [move_title])
-
-                curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [move_title])
-                data = curs.fetchall()
-
-                num = data[0][0]
-
-                curs.execute(db_change("select id from history where title = ? order by id + 0 asc"), [name])
-                data = curs.fetchall()
-                for move in data:
-                    curs.execute(db_change("update rc set title = ?, id = ? where title = ? and id = ?"), [
-                        move_title, 
-                        str(int(num) + int(move[0])), 
-                        name, 
-                        move[0]
-                    ])
-                    curs.execute(db_change("update history set title = ?, id = ? where title = ? and id = ?"), [
-                        move_title, 
-                        str(int(num) + int(move[0])), 
-                        name, 
-                        move[0]
-                    ])
-            elif move_option == 'reverse':
-                var_name = ''
-                
-                i = 0
-                while 1:
-                    curs.execute(db_change("select title from history where title = ?"), ['test ' + str(i)])
-                    if not curs.fetchall():
-                        var_name = 'test ' + str(i)
-
-                        break
-                    else:
-                        i += 1
-                        
-                curs.execute(db_change("select data from data where title = ?"), [name])
-                data = curs.fetchall()
-                if data:
-                    curs.execute(db_change("update data set title = ? where title = ?"), [var_name, name])
-                    curs.execute(db_change("update back set link = ? where link = ?"), [var_name, name])
-
-                curs.execute(db_change("update history set title = ? where title = ?"), [var_name, name])
-                curs.execute(db_change("update rc set title = ? where title = ?"), [var_name, name])
-
-                for title_name in [[move_title, name], [var_name, move_title]]:
-                    curs.execute(db_change("select data from data where title = ?"), [title_name[0]])
+            curs.execute(db_change("select title from history where title = ?"), [move_title])
+            if curs.fetchall():
+                if (
+                    move_option == 'merge' and 
+                    admin_check(None, 'merge documents (' + name + ') (' + move_title + ')') == 1
+                ):
+                    curs.execute(db_change("select data from data where title = ?"), [move_title])
                     data = curs.fetchall()
                     if data:
-                        curs.execute(db_change("update data set title = ? where title = ?"), [title_name[1], title_name[0]])
-                        curs.execute(db_change("update back set link = ? where link = ?"), [title_name[1], title_name[0]])
+                        curs.execute(db_change("delete from data where title = ?"), [move_title])
+                        curs.execute(db_change("delete from back where link = ?"), [move_title])
+
+                    curs.execute(db_change("select data from data where title = ?"), [name])
+                    data = curs.fetchall()
+                    if data:
+                        curs.execute(db_change("update data set title = ? where title = ?"), [move_title, name])
+                        curs.execute(db_change("update back set link = ? where link = ?"), [move_title, name])
 
                         data_in = data[0][0]
                     else:
                         data_in = ''
 
                     history_plus(
-                        title_name[0],
+                        name,
                         data_in,
                         time,
                         ip,
                         send,
                         '0',
-                        t_check = '<a>' + (title_name[0] if title_name[0] != var_name else name) + '</a> - <a>' + title_name[1] + '</a> move',
+                        t_check = 'merge <a>' + name + '</a> - <a>' + move_title + '</a> move',
                         mode = 'move'
                     )
 
-                    curs.execute(db_change("update history set title = ? where title = ?"), [title_name[1], title_name[0]])
-                    curs.execute(db_change("update rc set title = ? where title = ?"), [title_name[1], title_name[0]])
-            else:
-                curs.execute(db_change("select title from history where title = ?"), [move_title])
-                if curs.fetchall():
-                    return re_error('/error/19')
-                
+                    curs.execute(db_change("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'"), [name])
+                    curs.execute(db_change("delete from back where title = ? and not type = 'cat' and type = 'no'"), [move_title])
+
+                    curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [move_title])
+                    data = curs.fetchall()
+
+                    num = data[0][0]
+
+                    curs.execute(db_change("select id from history where title = ? order by id + 0 asc"), [name])
+                    data = curs.fetchall()
+                    for move in data:
+                        curs.execute(db_change("update rc set title = ?, id = ? where title = ? and id = ?"), [
+                            move_title, 
+                            str(int(num) + int(move[0])), 
+                            name, 
+                            move[0]
+                        ])
+                        curs.execute(db_change("update history set title = ?, id = ? where title = ? and id = ?"), [
+                            move_title, 
+                            str(int(num) + int(move[0])), 
+                            name, 
+                            move[0]
+                        ])
+                elif move_option == 'reverse':
+                    var_name = ''
+
+                    i = 0
+                    while 1:
+                        curs.execute(db_change("select title from history where title = ?"), ['test ' + str(i)])
+                        if not curs.fetchall():
+                            var_name = 'test ' + str(i)
+
+                            break
+                        else:
+                            i += 1
+
+                    curs.execute(db_change("select data from data where title = ?"), [name])
+                    data = curs.fetchall()
+                    if data:
+                        curs.execute(db_change("update data set title = ? where title = ?"), [var_name, name])
+                        curs.execute(db_change("update back set link = ? where link = ?"), [var_name, name])
+
+                    curs.execute(db_change("update history set title = ? where title = ?"), [var_name, name])
+                    curs.execute(db_change("update rc set title = ? where title = ?"), [var_name, name])
+
+                    for title_name in [[move_title, name], [var_name, move_title]]:
+                        curs.execute(db_change("select data from data where title = ?"), [title_name[0]])
+                        data = curs.fetchall()
+                        if data:
+                            curs.execute(db_change("update data set title = ? where title = ?"), [title_name[1], title_name[0]])
+                            curs.execute(db_change("update back set link = ? where link = ?"), [title_name[1], title_name[0]])
+
+                            data_in = data[0][0]
+                        else:
+                            data_in = ''
+
+                        history_plus(
+                            title_name[0],
+                            data_in,
+                            time,
+                            ip,
+                            send,
+                            '0',
+                            t_check = '<a>' + (title_name[0] if title_name[0] != var_name else name) + '</a> - <a>' + title_name[1] + '</a> move',
+                            mode = 'move'
+                        )
+
+                        curs.execute(db_change("update history set title = ? where title = ?"), [title_name[1], title_name[0]])
+                        curs.execute(db_change("update rc set title = ? where title = ?"), [title_name[1], title_name[0]])
+            	else:
+                	return re_error('/error/19')
+            else:                
                 curs.execute(db_change("select data from data where title = ?"), [name])
                 data = curs.fetchall()
                 if data:
