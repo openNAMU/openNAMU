@@ -138,7 +138,7 @@ def edit_move(name):
 
                         curs.execute(db_change("update history set title = ? where title = ?"), [title_name[1], title_name[0]])
                         curs.execute(db_change("update rc set title = ? where title = ?"), [title_name[1], title_name[0]])
-            	else:
+                else:
                 	return re_error('/error/19')
             else:                
                 curs.execute(db_change("select data from data where title = ?"), [name])
