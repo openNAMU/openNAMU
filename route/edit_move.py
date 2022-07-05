@@ -27,7 +27,8 @@ def edit_move(name):
             agree = flask.request.form.get('copyright_agreement', '')
             time = get_time()
             ip = ip_check()
-            move_option = flask.request.form.get('move_option', 'normal')
+            move_option = flask.request.form.get('move_option', 'none')
+            has_error = 0
             
             if do_edit_send_check(send) == 1:
                 return re_error('/error/37')
@@ -93,15 +94,12 @@ def edit_move(name):
                             move[0]
                         ])
                 elif move_option == 'reverse':
-                    var_name = ''
-
                     i = 0
-                    while 1:
+                    var_name = ''
+                    while var_name == '':
                         curs.execute(db_change("select title from history where title = ?"), ['test ' + str(i)])
                         if not curs.fetchall():
                             var_name = 'test ' + str(i)
-
-                            break
                         else:
                             i += 1
 
@@ -138,9 +136,9 @@ def edit_move(name):
 
                         curs.execute(db_change("update history set title = ? where title = ?"), [title_name[1], title_name[0]])
                         curs.execute(db_change("update rc set title = ? where title = ?"), [title_name[1], title_name[0]])
-                else:
-                	return re_error('/error/19')
-            else:                
+                elif move_option != 'none':
+                    has_error = 1
+            elif move_option != 'none':                
                 curs.execute(db_change("select data from data where title = ?"), [name])
                 data = curs.fetchall()
                 if data:
@@ -172,7 +170,6 @@ def edit_move(name):
             
             # 토론 이동 파트 S
             
-            '''
             move_option_topic = flask.request.form.get('move_topic_option', 'none')
             if (
                 move_option_topic == 'merge' and
@@ -180,18 +177,34 @@ def edit_move(name):
             ):
                 curs.execute(db_change("update rd set title = ? where title = ?"), [move_title, name])
             elif move_option_topic == 'reverse':
+                i = 0
+                var_name = ''
+                while var_name == '':
+                    curs.execute(db_change("select title from rd where title = ?"), ['test ' + str(i)])
+                    if not curs.fetchall():
+                        var_name = 'test ' + str(i)
+                    else:
+                        i += 1
                 
+                curs.execute(db_change("update rd set title = ? where title = ?"), [var_name, move_title])
+                curs.execute(db_change("update rd set title = ? where title = ?"), [move_title, name])
+                curs.execute(db_change("update rd set title = ? where title = ?"), [name, var_name])
             elif move_option_topic == 'normal':
-            '''
-            
-            # 토론 이동 파트 E 제작중
+                curs.execute(db_change("select title from rd where title = ?"), [move_title])
+                if curs.fetchall():
+                    has_error = 1
+                else:
+                    curs.execute(db_change("update rd set title = ? where title = ?"), [move_title, name])
+
+            # 토론 이동 파트 E
                 
             conn.commit()
 
-            return redirect('/w/' + url_pas(move_title))
+            if has_error == 0:
+                return redirect('/w/' + url_pas(move_title))
+            else:
+                return re_error('/error/19')
         else:
-            # 설정 값 제작 필요
-            
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('move') + ')', 0])],
                 data = '''
@@ -206,13 +219,14 @@ def edit_move(name):
                         
                         <h2>''' + load_lang('document') + '''</h2>
                         <select name="move_option">
+                            <option value="none"> ''' + load_lang('dont_move') + '''</option>
                             <option value="normal"> ''' + load_lang('normal') + '''</option>
                             <option value="reverse"> ''' + load_lang('replace_move') + '''</option>
                             ''' + ('<option value="merge"> ' + load_lang('merge_move') + '</option>' if admin_check() == 1 else '') + '''
                         </select>
                         <hr class="main_hr">
                         
-                        <h2>''' + load_lang('discussion') + ''' (''' + load_lang('not_working') + ''')</h2>
+                        <h2>''' + load_lang('discussion') + '''</h2>
                         <select name="move_topic_option">
                             <option value="none"> ''' + load_lang('dont_move') + '''</option>
                             <option value="normal"> ''' + load_lang('normal') + '''</option>

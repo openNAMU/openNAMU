@@ -171,7 +171,7 @@
     "copyright_checkbox_text": "저작권 동의 문구(체크박스 형태)",
     "authority": "권한",
     "document": "문서",
-    "decument_exist_error": "이동하려는 문서에 이미 문서가 존재합니다.",
+    "move_error": "이동하는 과정 중 오류가 발생하였습니다. 전부 또는 일부가 이동되지 않았습니다.",
     "skin_setting": "스킨 설정",
     "discussion_list": "토론 목록",
     "restart_required": "재시작 필요",
@@ -455,5 +455,6 @@
     "set_wiki_access_password": "위키 접속 비밀번호",
     "set_history_recording_off": "역사 기록 중지",
     "multiple_ban": "다중 차단",
-    "name_or_ip_or_regex_multiple": "한 줄에 IP나 정규식을 한 개씩 적어주세요."
+    "name_or_ip_or_regex_multiple": "한 줄에 IP나 정규식을 한 개씩 적어주세요.",
+    "dont_move" : "이동하지 않음"
 }
