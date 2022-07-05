@@ -645,6 +645,12 @@ def update(ver_num, set_data):
                 curs.execute(db_change(
                     'delete from user_set where id = ? and name = "email"'
                 ), [db_data[0]])
+                
+    if ver_num < 3500113:
+        db_table_list = get_db_table_list()
+        for for_a in db_table_list:
+            for for_b in db_table_list[for_a]:
+                curs.execute(db_change("update " + for_a + " set " + for_b + " = '' where " + for_b + " is null"))
 
     conn.commit()
     
