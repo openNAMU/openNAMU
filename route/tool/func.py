@@ -2176,7 +2176,7 @@ def re_error(data):
         elif num == 18:
             data = load_lang('email_send_error')
         elif num == 19:
-            data = load_lang('decument_exist_error')
+            data = load_lang('move_error')
         elif num == 20:
             data = load_lang('password_diffrent_error')
         elif num == 21:
