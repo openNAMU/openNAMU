@@ -43,15 +43,15 @@ def topic_tool_acl(topic_num = 1):
                         acl_data_view
                     ])
 
-                curs.execute(db_change("insert into topic (id, data, date, ip, top, code) values (?, ?, ?, ?, '1', ?)"), [
-                    str(int(topic_check[0][0]) + 1),
-                    'acl change ' + acl_data,
-                    time,
-                    ip,
-                    topic_num
-                ])
-
-                rd_plus(topic_num, time)
+                do_add_thread(
+                    topic_num,
+                	'acl change ' + acl_data,
+                    '1'
+                )
+                do_reload_recent_thread(
+                    topic_num, 
+                    time
+                )
 
             return redirect('/thread/' + topic_num)
         else:

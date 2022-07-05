@@ -1890,6 +1890,49 @@ def do_title_length_check(name, check_type = 'document'):
     return 0
 
 # Func-insert
+def do_add_thread(thread_code, thread_data, thread_top = '', thread_id = ''):
+    curs = conn.cursor()
+    
+    if thread_id == '':
+        curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [thread_code])
+        db_data = curs.fetchall()
+        if db_data:
+            thread_id = str(int(db_data[0][0]) + 1)
+        else:
+            thread_id = '1'
+        
+    curs.execute(db_change("insert into topic (id, data, date, ip, block, top, code) values (?, ?, ?, ?, ?, '', ?)"), [
+        thread_id,
+        thread_data,
+        get_time(),
+        ip_check(),
+        thread_top,
+        thread_code
+    ])
+    
+    conn.commit()
+    
+def do_reload_recent_thread(topic_num, date, name = None, sub = None):
+    curs = conn.cursor()
+
+    curs.execute(db_change("select code from rd where code = ?"), [topic_num])
+    if curs.fetchall():
+        curs.execute(db_change("update rd set date = ? where code = ?"), [
+            date, 
+            topic_num
+        ])
+    else:
+        curs.execute(db_change(
+            "insert into rd (title, sub, code, date, band, stop, agree, acl) values (?, ?, ?, ?, '', '', '', '')"
+        ), [
+            name, 
+            sub, 
+            topic_num, 
+            date
+        ])
+
+    conn.commit()
+
 def add_alarm(who, context):
     curs = conn.cursor()
 
@@ -2011,19 +2054,6 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
             band,
             login
         ])
-
-    conn.commit()
-
-def rd_plus(topic_num, date, name = None, sub = None):
-    curs = conn.cursor()
-
-    curs.execute(db_change("select code from rd where code = ?"), [topic_num])
-    if curs.fetchall():
-        curs.execute(db_change("update rd set date = ? where code = ?"), [date, topic_num])
-    else:
-        curs.execute(db_change(
-            "insert into rd (title, sub, code, date, band, stop, agree, acl) values (?, ?, ?, ?, '', '', '', '')"
-        ), [name, sub, topic_num, date])
 
     conn.commit()
 

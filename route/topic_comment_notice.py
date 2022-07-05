@@ -20,7 +20,11 @@ def topic_comment_notice(topic_num = 1, num = 1):
                 else:
                     curs.execute(db_change("update topic set top = 'O' where code = ? and id = ?"), [topic_num, num])
 
-            rd_plus(topic_num, get_time())
+            do_reload_recent_thread(
+                topic_num, 
+                get_time()
+            )
+            
             conn.commit()
 
         return redirect('/thread/' + topic_num + '#' + num)

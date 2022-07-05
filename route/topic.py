@@ -101,14 +101,19 @@ def topic(topic_num = 0):
             data = re.sub(r"( |\n|^)(#(?:[0-9]+))( |\n|$)", '\g<1><topic_a>\g<2></topic_a>\g<3>', data)
             data = re.sub(r"( |\n|^)(@(?:[^ ]+))( |\n|$)", '\g<1><topic_call>\g<2></topic_call>\g<3>', data)
 
-            rd_plus(topic_num, today, name, sub)
-            curs.execute(db_change("insert into topic (id, data, date, ip, code) values (?, ?, ?, ?, ?)"), [
-                num,
+            do_add_thread(
+            	topic_num,
                 data,
-                today,
-                ip,
-                topic_num
-            ])
+                '',
+                num
+            )
+            do_reload_recent_thread(
+                topic_num, 
+                today, 
+                name, 
+                sub
+            )
+
             conn.commit()
 
             return redirect('/thread/' + topic_num + '#' + num)
