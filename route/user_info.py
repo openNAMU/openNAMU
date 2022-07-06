@@ -62,7 +62,6 @@ def user_info(name = ''):
             data = '''
                 <h2>''' + load_lang('state') + '''</h2>
                 <div id="get_user_info"></div>
-                <script>load_user_info("''' + ip + '''");</script>
                 ''' + login_menu + '''
                 ''' + tool_menu + '''
                 <h2>''' + load_lang('other') + '''</h2>
@@ -73,6 +72,7 @@ def user_info(name = ''):
                     <li><a href="/count/''' + url_pas(ip) + '''">''' + load_lang('count') + '''</a></li>
                 </ul>
                 ''' + admin_menu + '''
+                <script>load_user_info("''' + ip + '''");</script>
             ''',
             menu = 0
         ))

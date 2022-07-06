@@ -63,8 +63,8 @@ def main_tool_admin(num = 1, add_2 = ''):
                     </ul>
                     <h2>3. ''' + load_lang('version') + '''</h2>
                     <ul class="inside_ul">
-                        <li>''' + load_lang('version') + ''' : <span id="ver_send_2"></span></li>
-                        <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
+                        <li id="ver_send_2">''' + load_lang('version') + ''' : </li>
+                        <li id="ver_send">''' + load_lang('lastest') + ''' : </li>
                     </ul>
                     <h3>3.1. ''' + load_lang('skin_info') + '''</h3>
                     <ul class="inside_ul">
@@ -72,7 +72,11 @@ def main_tool_admin(num = 1, add_2 = ''):
                         <div id="ver_send_3"></div>
                     </ul>
                 </div>
-                <script>load_ver(); do_skin_ver_check(); simple_render('other_simple_render');</script>
+                <!-- JS : opennamu_do_insert_version -->
+                <script>
+                    do_skin_ver_check();
+                    simple_render('other_simple_render');
+                </script>
             ''',
             menu = [['other', load_lang('return')]]
         ))

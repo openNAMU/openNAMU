@@ -12,32 +12,6 @@ function load_user_info(name) {
     }
 }
 
-function load_ver() {
-    var url = "/api/version";
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.send();
-
-    xhr.onreadystatechange = function() {
-        if(this.readyState === 4 && this.status === 200) {
-            let get_data = JSON.parse(this.responseText);
-            document.getElementById('ver_send_2').innerHTML = get_data['version'];
-            
-            let url_2 = 'https://raw.githubusercontent.com/openNAMU/openNAMU/' + get_data['build'] + '/version.json';
-            var xhr_2 = new XMLHttpRequest();
-            xhr_2.open("GET", url_2, true);
-            xhr_2.send();
-            
-            xhr_2.onreadystatechange = function() {
-                if(this.readyState === 4 && this.status === 200) {
-                    document.getElementById('ver_send').innerHTML += JSON.parse(this.responseText)['beta']['r_ver'];
-                    document.getElementById('ver_send').style.display = "list-item";
-                }
-            }
-        }
-    }
-}
-
 function do_skin_ver_check() {
     var url = "/api/skin_info?all=true";
     var xhr = new XMLHttpRequest();

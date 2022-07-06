@@ -34,7 +34,6 @@ def recent_history_add(name = 'Test'):
                 imp = [load_lang('history_add'), wiki_set(), wiki_custom(), wiki_css(['(' + name + ')', 0])],
                 data = '''
                     <form method="post">
-                        <script>do_stop_exit();</script>
                         ''' + edit_button() + '''
                         <textarea rows="25" id="content" name="content"></textarea>
                         <hr class="main_hr">
@@ -47,6 +46,7 @@ def recent_history_add(name = 'Test'):
                     </form>
                     <hr class="main_hr">
                     <div id="see_preview"></div>
+                    <script>do_stop_exit();</script>
                 ''',
                 menu = [['history/' + url_pas(name), load_lang('return')]]
             ))

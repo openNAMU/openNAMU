@@ -139,7 +139,6 @@ def topic(topic_num = 0):
                     <div id="top_topic"></div>
                     <div id="main_topic"></div>
                     <div id="plus_topic"></div>
-                    <script>opennamu_do_thread_make("''' + topic_num + '''");</script>
                     <a href="/thread/''' + topic_num + '/tool">(' + load_lang('topic_tool') + ''')</a>
                     <hr class="main_hr">
                     <form style="''' + display + '''" method="post">
@@ -154,6 +153,7 @@ def topic(topic_num = 0):
                     </form>
                     <hr class="main_hr">
                     <div id="see_preview"></div>
+                    <script>opennamu_do_thread_make("''' + topic_num + '''");</script>
                 ''',
                 menu = [['topic/' + url_pas(name), load_lang('list')]]
             ))
