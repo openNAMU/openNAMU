@@ -30,6 +30,7 @@ function opennamu_do_insert_version(
 
 let opennamu_do_insert_version_url = [
     '/manager/1',
+    '/manager',
     '/update'
 ];
 if(opennamu_do_insert_version_url.includes(window.location.pathname)) {

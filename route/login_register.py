@@ -119,26 +119,10 @@ def login_register_2(conn):
                     
                     ''' + captcha_get() + '''
                     
-                    <!--
-                    <a href="" id="oauth_google">(Google)</a>     
-                    <hr class="main_hr">
-                    -->
-                    
                     <button type="submit">''' + load_lang('save') + '''</button>
                     
                     ''' + http_warning() + '''
                 </form>
-                <script>
-                    document.getElementById('oauth_google').href = '' +
-                        'https://accounts.google.com/o/oauth2/auth' +
-                        '?client_id=ID' +
-                        '&redirect_uri=' + window.location.origin +
-                        '&response_type=code' +
-                        '&scope=https://www.googleapis.com/auth/userinfo.email' +
-                        '&approval_prompt=force' +
-                        '&access_type=offline' +
-                    '';
-                </script>
             ''',
             menu = [['user', load_lang('return')]]
         ))

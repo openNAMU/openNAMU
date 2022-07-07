@@ -118,7 +118,7 @@ def main_func_setting_main(db_set):
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('main_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
-                    <form method="post" id="main_set_data">
+                    <form method="post" id="opennamu_simple_render">
                         <h2>1. ''' + load_lang('basic_set') + '''</h2>
                         <span>''' + load_lang('wiki_name') + '''</span>
                         <hr class="main_hr">
@@ -254,7 +254,7 @@ def main_func_setting_main(db_set):
 
                         <button id="save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
-                    <script>simple_render('main_set_data');</script>
+                    <!-- JS : opennamu_do_render_simple -->
                 ''',
                 menu = [['setting', load_lang('return')]]
             ))

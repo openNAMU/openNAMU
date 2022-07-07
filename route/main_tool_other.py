@@ -4,7 +4,7 @@ def main_tool_other():
     return easy_minify(flask.render_template(skin_check(),
         imp = [load_lang('other_tool'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
         data = '''
-            <div id="other_simple_render">
+            <div id="opennamu_simple_render">
                 <h2>1. ''' + load_lang('record') + '''</h2>
                 <ul class="inside_ul">
                     <li><a href="/manager/6">''' + load_lang('edit_record') + '''</a></li>
@@ -50,7 +50,7 @@ def main_tool_other():
                     <li><a href="/manager/1">''' + load_lang('admin_tool') + '''</a></li>
                 </ul>
             </div>
-            <script>simple_render('other_simple_render');</script>
+            <!-- JS : opennamu_do_render_simple -->
         ''',
         menu = 0
     ))

@@ -473,7 +473,7 @@ function main_css_skin_set() {
         </ul> \
     ';
  
-    simple_render('main_skin_set');
+    opennamu_do_render_simple('main_skin_set');
 }
 
 document.addEventListener("DOMContentLoaded", main_css_skin_load);
