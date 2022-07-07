@@ -61,7 +61,7 @@ def user_info(name = ''):
             imp = [load_lang('user_tool'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <h2>''' + load_lang('state') + '''</h2>
-                <div id="get_user_info"></div>
+                <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
                 ''' + login_menu + '''
                 ''' + tool_menu + '''
                 <h2>''' + load_lang('other') + '''</h2>
@@ -72,7 +72,6 @@ def user_info(name = ''):
                     <li><a href="/count/''' + url_pas(ip) + '''">''' + load_lang('count') + '''</a></li>
                 </ul>
                 ''' + admin_menu + '''
-                <script>load_user_info("''' + ip + '''");</script>
             ''',
             menu = 0
         ))

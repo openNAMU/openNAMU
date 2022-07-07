@@ -24,7 +24,7 @@ def main_tool_admin(num = 1, add_2 = ''):
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('admin_tool'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
-                <div id="other_simple_render">
+                <div id="opennamu_simple_render">
                     <h2>1. ''' + load_lang('admin') + '''</h2>
                     <ul class="inside_ul">
                         <li><a href="/manager/2">''' + load_lang('acl_change') + '''</a></li>
@@ -73,10 +73,8 @@ def main_tool_admin(num = 1, add_2 = ''):
                     </ul>
                 </div>
                 <!-- JS : opennamu_do_insert_version -->
-                <script>
-                    do_skin_ver_check();
-                    simple_render('other_simple_render');
-                </script>
+                <!-- JS : opennamu_do_insert_version_skin -->
+                <!-- JS : opennamu_do_render_simple -->
             ''',
             menu = [['other', load_lang('return')]]
         ))

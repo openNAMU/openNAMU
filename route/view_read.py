@@ -66,8 +66,7 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
             # E
             
             user_doc += '''
-                <div id="get_user_info"></div>
-                <script>load_user_info("''' + user_name + '''");</script>
+                <div id="opennamu_get_user_info">''' + html.escape(user_name) + '''</div>
                 <hr class="main_hr">
             '''
             if name == 'user:' + user_name:

@@ -757,7 +757,6 @@ def http_warning():
     return '''
         <div id="opennamu_http_warning_text"></div>
         <span style="display: none;" id="opennamu_http_warning_text_lang">''' + load_lang('http_warning') + '''</span>
-        <script>opennamu_do_warning_text();</script>
     '''
 
 def next_fix(link, num, page, end = 50):
@@ -1040,13 +1039,18 @@ def wiki_css(data):
     data_css_ver = '147'
     
     # Func JS
-    data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script defer src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
     
-    data_css += '<script defer src="/views/main_css/js/func/version.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script src="/views/main_css/js/func/http_warning_text.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script src="/views/main_css/js/func/ie_end_of_life.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script src="/views/main_css/js/func/shortcut.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script src="/views/main_css/js/func/user_name_parser.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script defer src="/views/main_css/js/func/insert_version.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script defer src="/views/main_css/js/func/insert_user_info.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script defer src="/views/main_css/js/func/insert_version_skin.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script defer src="/views/main_css/js/func/insert_http_warning_text.js?ver=' + data_css_ver + '"></script>'
+    
+    data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script defer src="/views/main_css/js/func/shortcut.js?ver=' + data_css_ver + '"></script>'
+    
+    data_css += '<script defer src="/views/main_css/js/func/render_user_name.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script defer src="/views/main_css/js/func/render_simple.js?ver=' + data_css_ver + '"></script>'
     
     # Render JS
     data_css += '<script src="/views/main_css/js/render/markdown.js?ver=' + data_css_ver + '"></script>'
@@ -1073,7 +1077,7 @@ def wiki_css(data):
     data_css += '<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/highlight.min.js"></script>'
     
     data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css" integrity="sha384-KiWOvVjnN8qwAZbuQyWDIbfCLFhLXNETzBQjA/92pIowpC0d2O3nppDGQVgwd2nB" crossorigin="anonymous">'
-    data_css += '<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js" integrity="sha384-0fdwu/T/EQMsQlrHCCHoH10pkPLlKA1jL5dFyUOvB3lfeT2540/2g6YgSi2BL14p" crossorigin="anonymous"></script>'
+    data_css += '<script src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js" integrity="sha384-0fdwu/T/EQMsQlrHCCHoH10pkPLlKA1jL5dFyUOvB3lfeT2540/2g6YgSi2BL14p" crossorigin="anonymous"></script>'
 
     data = data[0:2] + ['', data_css] + data[2:]
 
@@ -2161,7 +2165,7 @@ def re_error(data):
 
     if data == '/ban':
         if ban_check() == 1:
-            end = '<div id="get_user_info"></div><script>load_user_info("' + ip_check() + '");</script>'
+            end = '<div id="opennamu_get_user_info">' + html.escape(ip_check()) + '</div>'
         else:
             end = '<ul class="inside_ul"><li>' + load_lang('authority_error') + '</li></ul>'
 

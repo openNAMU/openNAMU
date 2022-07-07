@@ -100,8 +100,7 @@ def user_setting():
                     imp = [load_lang('user_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
-                            <div id="get_user_info"></div>
-                            <script>load_user_info("''' + ip + '''");</script>
+                            <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
                             <hr class="main_hr">
                             <a href="/change/pw">(''' + load_lang('password_change') + ''')</a>
                             <hr class="main_hr">
@@ -165,8 +164,7 @@ def user_setting():
                     imp = [load_lang('user_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
-                            <div id="get_user_info"></div>
-                            <script>load_user_info("''' + ip + '''");</script>
+                            <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
                             <hr class="main_hr">
                             <h2>''' + load_lang('main') + '''</h2>
                             <span>''' + load_lang('skin') + '''</span>

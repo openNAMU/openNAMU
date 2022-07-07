@@ -59,7 +59,7 @@ def main_func_setting_phrase():
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('text_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
-                    <form method="post" id="main_set_data">
+                    <form method="post" id="opennamu_simple_render">
                         <h2>1. ''' + load_lang('register_text') + ''' (HTML)</h2>
                         <textarea rows="3" name="''' + i_list[0] + '''">''' + html.escape(d_list[0]) + '''</textarea>
 
@@ -131,7 +131,7 @@ def main_func_setting_phrase():
                             <a href="/setting/main">''' + load_lang('approval_question_visible_only_when_approval_on') + '''</a>
                         </li>
                     </ul>
-                    <script>simple_render('main_set_data');</script>
+                    <!-- JS : opennamu_do_render_simple -->
                 ''',
                 menu = [['setting', load_lang('return')]]
             ))

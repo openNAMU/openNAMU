@@ -88,4 +88,4 @@ function opennamu_do_ip_parser() {
     opennamu_do_user_document_check();
 }
 
-document.addEventListener("DOMContentLoaded", opennamu_do_ip_parser);
+opennamu_do_ip_parser();
