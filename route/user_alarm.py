@@ -21,14 +21,14 @@ def user_alarm():
             for data_one in data_list:
                 data += '' + \
                     '<li>' + \
-                        '<span class="send_content">' + html.escape(data_one[0]) + '</span> ' + \
+                        '<span class="opennamu_send_content">' + html.escape(data_one[0]) + '</span> ' + \
                         '(' + data_one[1] + ')' + \
                     '</li>' + \
                 ''
     
         data += '' + \
             '</ul>' + \
-            '<script>send_render();</script>' + \
+            '<!-- JS : opennamu_send_render -->' + \
             next_fix('/alarm?num=', num, data_list) + \
         ''
     
