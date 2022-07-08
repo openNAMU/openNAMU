@@ -132,16 +132,14 @@ def recent_change(name = None, tool = ''):
                         <td>''' + date + '''</td>
                     </tr>
                     <tr ''' + style[1] + '''>
-                        <td class="send_content" colspan="3">
-                            ''' + (html.escape(send) if send != '' else '<br>') + '''
-                        </td>
+                        <td class="opennamu_send_content" colspan="3">''' + html.escape(send) + '''</td>
                     </tr>
                 '''
 
             div += '''
                     </tbody>
                 </table>
-                <script>send_render();</script>
+                <!-- JS : opennamu_send_render -->
             '''
 
             if name:
