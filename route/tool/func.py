@@ -159,14 +159,6 @@ class get_db_connect_old:
             )
             curs = self.conn.cursor()
 
-            try:
-                curs.execute(db_change(
-                    'create database ' + self.db_set['name'] + ' ' + \
-                    'default character set utf8mb4;'
-                ))
-            except:
-                pass
-
             self.conn.select_db(self.db_set['name'])
 
         load_conn(self.conn)
@@ -211,14 +203,6 @@ class get_db_connect:
                 port = int(self.db_set['mysql_port']),
             )
             curs = self.conn.cursor()
-
-            try:
-                curs.execute(db_change(
-                    'create database ' + self.db_set['name'] + ' ' + \
-                    'default character set utf8mb4;'
-                ))
-            except:
-                pass
 
             self.conn.select_db(self.db_set['name'])
 

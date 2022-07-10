@@ -55,6 +55,21 @@ if setup_tool != 'init':
             setup_tool = 'normal'
     else:
         setup_tool = 'init'
+        
+if data_db_set['type'] == 'mysql':
+    try:
+        curs.execute(db_change(
+            'create database ' + data_db_set['name'] + ' ' + \
+            'default character set utf8mb4'
+        ))
+    except:
+        try:
+            curs.execute(db_change(
+                'alter database ' + data_db_set['name'] + ' ' + \
+                'character set utf8mb4'
+            ))
+        except:
+            pass
 
 if setup_tool != 'normal':
     create_data = get_db_table_list()
@@ -84,6 +99,14 @@ if setup_tool != 'normal':
                     db_pass = 1
                 except:
                     pass
+                
+            if db_pass == 0:
+                try:
+                    curs.execute(db_change('create table ' + create_table + '(test longtext)'))
+                    
+                    db_pass = 1
+                except:
+                    pass
                     
             if db_pass == 0:
                 try:
@@ -100,7 +123,18 @@ if setup_tool != 'normal':
                     db_pass = 1
                 except:
                     pass
-
+                
+            if db_pass == 0:
+                try:
+                    curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext"))
+                    
+                    db_pass = 1
+                except:
+                    pass
+                
+            if db_pass == 0:
+                raise
+                    
     if setup_tool == 'update':
         update(int(ver_set_data[0][0]), set_data)
     else:
