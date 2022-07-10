@@ -12,6 +12,7 @@ function do_insert_user_info() {
             if(this.readyState === 4 && this.status === 200) {
                 let get_data = JSON.parse(this.responseText);
                 
+                // 한글 지원 필요
                 let get_data_auth = get_data[name]['auth'];
                 if(get_data_auth === '0') {
                     get_data_auth = 'IP';
