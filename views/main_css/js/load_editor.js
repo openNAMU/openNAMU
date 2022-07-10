@@ -133,20 +133,14 @@ function load_preview(name) {
     var s_data = new FormData();
     s_data.append('data', document.getElementById('textarea_edit_view').value);
 
-    var url = "/api/w/" + name;
-    var url_2 = "/api/markup";
-
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", url, true);
+    xhr.open("POST", "/api/w/" + name);
     xhr.send(s_data);
-
-    var xhr_2 = new XMLHttpRequest();
-    xhr_2.open("GET", url_2, true);
-    xhr_2.send();
-
+    
     xhr.onreadystatechange = function() {
         if(xhr.readyState === 4 && xhr.status === 200) {
             var o_p_data = JSON.parse(xhr.responseText);
+            
             document.getElementById('see_preview').innerHTML = o_p_data['data'];
             eval(o_p_data['js_data'])
         }

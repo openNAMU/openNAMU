@@ -579,7 +579,6 @@ app.route('/api/raw/<everything:name>')(api_raw)
 app.route('/api/version', defaults = { 'version_list' : version_list })(api_version)
 app.route('/api/skin_info')(api_skin_info)
 app.route('/api/skin_info/<name>')(api_skin_info)
-app.route('/api/markup')(api_markup)
 app.route('/api/user_info/<name>', methods = ['POST', 'GET'])(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
@@ -599,7 +598,9 @@ app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss')(api_recent_discuss)
 
-app.route('/api/sha224/<everything:data>', methods = ['POST', 'GET'])(api_sha224)
+# app.route('/api/lang/<data>', methods = ['POST', 'GET'])(api_func_lang)
+app.route('/api/sha224/<everything:data>', methods = ['POST', 'GET'])(api_func_sha224)
+
 app.route('/api/title_index')(api_title_index)
 app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])(api_image_view)
 # 이건 API 영역이 아닌 것 같아서 고심 중
