@@ -22,18 +22,22 @@ function opennamu_do_user_document_check() {
                 let xhr_data = JSON.parse(this.responseText);
                 
                 // user document part
-                if(xhr_data[data]['document'] === 0) {
+                if(xhr_data[data]['document'] === '0') {
                     document.getElementsByClassName('opennamu_user_link')[for_a].id = "not_thing";
                 }
                 
                 // user auth part
                 let user_data = document.getElementsByClassName('opennamu_user_link')[for_a].innerHTML;
-                if(xhr_data[data]['auth'] === 0) {
+                if(xhr_data[data]['auth'] === '0') {
                     
-                } else if(xhr_data[data]['auth'] === 1) {
+                } else if(xhr_data[data]['auth'] === '1') {
                     
                 } else {
                     user_data = '<b>' + user_data + '</b>';
+                }
+                
+                if(xhr_data[data]['ban'] != '0') {
+                    user_data = '<s>' + user_data + '</s>';
                 }
                 
                 // user title part
