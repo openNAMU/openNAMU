@@ -1020,7 +1020,7 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '147'
+    data_css_ver = '148'
     
     # Func JS
     data_css += '<script defer src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
