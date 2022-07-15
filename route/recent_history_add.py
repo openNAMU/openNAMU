@@ -30,23 +30,34 @@ def recent_history_add(name = 'Test'):
 
             return redirect('/history/' + url_pas(name))
         else:
+            curs.execute(db_change('select data from other where name = "edit_help"'))
+            sql_d = curs.fetchall()
+            p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
+            
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('history_add'), wiki_set(), wiki_custom(), wiki_css(['(' + name + ')', 0])],
                 data = '''
                     <form method="post">
-                        ''' + edit_button() + '''
-                        <textarea rows="25" id="content" name="content"></textarea>
+                        <textarea style="display: none;" id="opennamu_js_edit_origin"></textarea>
+                        <textarea style="display: none;" id="opennamu_js_edit_textarea" name="content"></textarea>
+                        
+                        <div>''' + edit_button() + '''</div>
+                        
+                        <textarea id="opennamu_js_edit_textarea_view" class="content" placeholder="''' + p_text + '''"></textarea>
                         <hr class="main_hr">
+                        
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                         <hr class="main_hr">
+                        
                         <input placeholder="''' + load_lang('name') + '''" name="get_ip" type="text">
                         <hr class="main_hr">
+                        
                         <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
-                        <button id="opennamu_js_preview" type="button" onclick="load_preview(\'''' + url_pas(name) + '\')">' + load_lang('preview') + '''</button>
+                        <button id="opennamu_js_preview" type="button">''' + load_lang('preview') + '''</button>
                     </form>
+                    
                     <hr class="main_hr">
-                    <div id="see_preview"></div>
-                    <script>do_stop_exit();</script>
+                    <div id="opennamu_js_preview_area"></div>
                 ''',
                 menu = [['history/' + url_pas(name), load_lang('return')]]
             ))
