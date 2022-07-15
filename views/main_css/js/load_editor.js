@@ -33,30 +33,7 @@ function do_insert_data(name, data, monaco = 0) {
     }
 }
 
-function monaco_to_content() {
-    try {
-        document.getElementById('textarea_edit_view').value = window.editor.getValue();
-    } catch(e) {}
-}
-
-function do_not_out() {
-    window.addEventListener('DOMContentLoaded', function() {
-        window.onbeforeunload = function() {
-            monaco_to_content();
-            section_edit_do();
-            
-            data = document.getElementById('content').value;
-            origin = document.getElementById('origin').value;
-            if(data !== origin) {
-                return '';
-            }
-        }
-    });
-}
-
-function save_stop_exit() {
-    window.onbeforeunload = function () {}
-}
+// 아직 개편이 더 필요함
 
 function do_paste_image() {
     window.addEventListener('DOMContentLoaded', function() {

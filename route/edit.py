@@ -170,62 +170,36 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 monaco_display = 'style="display: none;"'
                 add_get_file = ''
                 add_script = ''
-                
-            curs.execute(db_change("select data from other where name = 'markup'"))
-            markup = curs.fetchall()[0][0]
-            
-            server_set = {
-                'section' : section,
-                'markup' : markup
-             }
     
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('edit') + ')', 0])],
-                data =  editor_top_text + add_get_file + '''
-                    <span   id="server_set"
-                            style="display: none;">''' + json.dumps(server_set) + '''</span>
+                data =  editor_top_text + add_get_file + '''                    
                     <form method="post">
+                        <textarea style="display: none;" id="opennamu_js_edit_origin">''' + html.escape(data) + '''</textarea>
+                        <textarea style="display: none;" id="opennamu_js_edit_textarea" name="content"></textarea>
+                        <input style="display: none;" name="ver" value="''' + doc_ver + '''">
+                        
                         <div>''' + edit_button(monaco_on) + '''</div>
-                        <div    id="monaco_editor"
-                                class="content" 
-                                ''' + monaco_display + '''></div>
-                        <textarea   id="textarea_edit_view"
-                                    ''' + editor_display + '''
-                                    class="content"
-                                    placeholder="''' + p_text + '''">''' + html.escape(data) + '''</textarea>
+                        
+                        <div id="monaco_editor" class="content" ''' + monaco_display + '''></div>
+                        <textarea id="opennamu_js_edit_textarea_view" ''' + editor_display + ''' class="content" placeholder="''' + p_text + '''">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
-                        <input  placeholder="''' + load_lang('why') + '''" 
-                                name="send">
-                        <textarea   style="display: none;" 
-                                    id="origin">''' + html.escape(data) + '''</textarea>
-                        <textarea   style="display: none;"
-                                    name="content"
-                                    id="content"></textarea>
-                        <input  style="display: none;" 
-                                name="ver" 
-                                value="''' + doc_ver + '''">
+                        
+                        <input placeholder="''' + load_lang('why') + '''" name="send">
                         <hr class="main_hr">
+                        
                         ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
-                        <button id="save"
-                                type="submit" 
-                                onclick="
-                                    monaco_to_content(); 
-                                    save_stop_exit();
-                                    section_edit_do();
-                                ">''' + load_lang('save') + '''</button>
-                        <button id="preview" 
-                                type="button" 
-                                onclick="
-                                    monaco_to_content();
-                                    load_preview(\'''' + url_pas(name) + '''\');
-                                ">''' + load_lang('preview') + '''</button>
+                        
+                        <button id="opennamu_js_save" type="submit" onclick="monaco_to_content(); section_edit_do();">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_js_preview" type="button" onclick="monaco_to_content(); load_preview(\'''' + url_pas(name) + '''\');">''' + load_lang('preview') + '''</button>
                     </form>
                     <hr class="main_hr">
+                    
                     <div id="see_preview"></div>
+                    
                     <script>
                         section_edit_init();
                         do_paste_image();
-                        do_not_out();
                         ''' + add_script + '''
                     </script>
                 ''',
