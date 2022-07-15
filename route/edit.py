@@ -190,15 +190,14 @@ def edit(name = 'Test', section = 0, do_type = ''):
                         
                         ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
                         
-                        <button id="opennamu_js_save" type="submit" onclick="monaco_to_content(); section_edit_do();">''' + load_lang('save') + '''</button>
-                        <button id="opennamu_js_preview" type="button" onclick="monaco_to_content(); load_preview(\'''' + url_pas(name) + '''\');">''' + load_lang('preview') + '''</button>
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_js_preview" type="button">''' + load_lang('preview') + '''</button>
                     </form>
-                    <hr class="main_hr">
                     
-                    <div id="see_preview"></div>
+                    <hr class="main_hr">
+                    <div id="opennamu_js_preview_area"></div>
                     
                     <script>
-                        section_edit_init();
                         do_paste_image();
                         ''' + add_script + '''
                     </script>
