@@ -41,8 +41,8 @@ def recent_history_add(name = 'Test'):
                         <hr class="main_hr">
                         <input placeholder="''' + load_lang('name') + '''" name="get_ip" type="text">
                         <hr class="main_hr">
-                        <button id="save" type="submit" onclick="go_save_zone = 1;">''' + load_lang('save') + '''</button>
-                        <button id="preview" type="button" onclick="load_preview(\'''' + url_pas(name) + '\')">' + load_lang('preview') + '''</button>
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_js_preview" type="button" onclick="load_preview(\'''' + url_pas(name) + '\')">' + load_lang('preview') + '''</button>
                     </form>
                     <hr class="main_hr">
                     <div id="see_preview"></div>

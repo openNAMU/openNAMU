@@ -1022,7 +1022,7 @@ def wiki_css(data):
     data_css = ''
     data_css_ver = '148'
     
-    # Func JS
+    # Func JS + Defer
     data_css += '<script defer src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
     
     data_css += '<script defer src="/views/main_css/js/func/insert_version.js?ver=' + data_css_ver + '"></script>'
@@ -1040,6 +1040,9 @@ def wiki_css(data):
     # Render JS
     data_css += '<script src="/views/main_css/js/render/markdown.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script src="/views/main_css/js/render/wiki.js?ver=' + data_css_ver + '"></script>'
+    
+    # Route JS + Defer
+    data_css += '<script defer src="/views/main_css/js/route/edit.js?ver=' + data_css_ver + '"></script>'
     
     # Route JS
     data_css += '<script src="/views/main_css/js/route/thread.js?ver=' + data_css_ver + '"></script>'

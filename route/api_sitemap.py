@@ -19,7 +19,7 @@ def api_sitemap():
             other_count = len_all_data % 30000
 
             for i in range(count + 1):
-                data += '<sitemap><loc>' + domain + 'sitemap_' + str(i) + '.xml</loc></sitemap>\n'
+                data += '<sitemap><loc>' + domain + '/sitemap_' + str(i) + '.xml</loc></sitemap>\n'
 
             data += '' + \
                 '</sitemapindex>' + \
@@ -38,10 +38,10 @@ def api_sitemap():
 
                 if count == i:
                     for x in all_data[30000 * i:]:
-                        data += '<url><loc>' + domain + 'w/' + url_pas(x[0]) + '</loc></url>\n'
+                        data += '<url><loc>' + domain + '/w/' + url_pas(x[0]) + '</loc></url>\n'
                 else:
                     for x in all_data[30000 * i:30000 * (i + 1)]:
-                        data += '<url><loc>' + domain + 'w/' + url_pas(x[0]) + '</loc></url>\n'
+                        data += '<url><loc>' + domain + '/w/' + url_pas(x[0]) + '</loc></url>\n'
 
                 data += '' + \
                     '</urlset>' + \
