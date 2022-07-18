@@ -6,9 +6,11 @@ def main_sys_shutdown():
 
     if flask.request.method == 'POST':
         admin_check(None, 'shutdown')
+        
+        conn.commit()
 
         print('----')
-        print('shutdown')
+        print('Shutdown')
 
         os._exit(os.EX_OK)
     else:
