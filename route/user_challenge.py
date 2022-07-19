@@ -22,13 +22,13 @@ def do_make_challenge_design(img, title, info, disable = 0):
         <hr class="main_hr">
     '''
 
-def user_challenge():
-    ip = ip_check()
-    if ip_or_user(ip) == 1:
-        return redirect('/user')
-    
+def user_challenge():    
     with get_db_connect() as conn:
         curs = conn.cursor()
+        
+        ip = ip_check()
+        if ip_or_user(ip) == 1:
+            return redirect('/user')
 
         data_html_green = ''
         data_html_red = ''
