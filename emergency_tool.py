@@ -12,9 +12,10 @@ if data_db_load == 'Y':
 
     db_data_get(data_db_set['type'])
     do_db_set(data_db_set)
-    load_db = get_db_connect_old(data_db_set)
 
-    conn = load_db.db_load()
+    load_db = get_db_connect()
+
+    conn = load_db.__enter__()
     curs = conn.cursor()
 else:
     print('----')
