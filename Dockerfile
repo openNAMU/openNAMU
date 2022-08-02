@@ -1,4 +1,4 @@
-FROM python:3.6.8-stretch
+FROM python:3.10.5-alpine
 
 MAINTAINER 2du <min08101@naver.com>
 MAINTAINER hoparkgo9ma <me@ho9.me>
@@ -10,6 +10,7 @@ ENV NAMU_PORT 3000
 ENV NAMU_LANG en-US
 ENV NAMU_MARKUP namumark
 ENV NAMU_ENCRYPT sha3
+ENV NAMU_DOCKER O
 
 ADD . /app
 WORKDIR /app
