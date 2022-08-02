@@ -41,6 +41,24 @@ def user_count(name = None):
         for count in db_data:
         	data_today_len += int(count[0][1:])
 
+        date_yesterday = str((
+            datetime.datetime.today() + datetime.timedelta(days = -1)
+        ).strftime("%Y-%m-%d"))
+
+        curs.execute(db_change("select count(*) from history where date like ? and ip = ?"), [date_yesterday + '%', that])
+        count = curs.fetchall()
+        if count:
+            data_yesterday = count[0][0]
+        else:
+            data_yesterday = 0
+            
+        data_yesterday_len = 0
+            
+        curs.execute(db_change("select leng from history where date like ? and ip = ?"), [date_yesterday + '%', that])
+        db_data = curs.fetchall()
+        for count in db_data:
+        	data_yesterday_len += int(count[0][1:])
+
         # 한글 지원 필요
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('count'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
@@ -51,6 +69,10 @@ def user_count(name = None):
                     <hr>
                     <li>(''' + load_lang('beta') + ''') TODAY : ''' + str(data_today) + '''</li>
                     <li>(''' + load_lang('beta') + ''') TODAY LEN : ''' + str(data_today_len) + '''</li>
+                    <li>(''' + load_lang('beta') + ''') TODAY DIFF : ''' + str(data_today_len - data_yesterday_len) + '''</li>
+                    <hr>
+                    <li>(''' + load_lang('beta') + ''') YESTERDAY : ''' + str(data_yesterday) + '''</li>
+                    <li>(''' + load_lang('beta') + ''') YESTERDAY LEN : ''' + str(data_yesterday_len) + '''</li>
                 </ul>
             ''',
             menu = [['user', load_lang('return')]]
