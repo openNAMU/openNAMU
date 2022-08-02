@@ -191,6 +191,8 @@ with get_db_connect() as conn:
             server_set_val = server_set_val[0][0]
         elif server_set_env[i] != None:
             server_set_val = server_set_env[i]
+
+            curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, server_set_env[i]])
         else:
             if 'list' in server_set_var[i]:
                 print(server_set_var[i]['display'] + ' (' + server_set_var[i]['default'] + ') [' + ', '.join(server_set_var[i]['list']) + ']' + ' : ', end = '')
