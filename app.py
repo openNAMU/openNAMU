@@ -598,7 +598,7 @@ app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss')(api_recent_discuss)
 
-# app.route('/api/lang/<data>', methods = ['POST', 'GET'])(api_func_lang)
+app.route('/api/lang/<data>', methods = ['POST', 'GET'])(api_func_lang)
 app.route('/api/sha224/<everything:data>', methods = ['POST', 'GET'])(api_func_sha224)
 
 app.route('/api/title_index')(api_title_index)
