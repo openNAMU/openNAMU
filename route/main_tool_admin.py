@@ -34,7 +34,7 @@ def main_tool_admin():
                         <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
                         <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
                         <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
-                        <li><a href="/filter/document/list">''' + load_lang('document_filter_list') + '''</a></li>
+                        <li><a href="/filter/document/list">''' + load_lang('document_filter_list') + ''' ''' + load_lang('beta') + '''</a></li>
                     </ul>
                     <h3>2.2. ''' + load_lang('server') + '''</h2>
                     <ul class="inside_ul">
