@@ -20,7 +20,6 @@ def main_tool_admin():
                         <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
                         <li><a href="/delete_multiple">''' + load_lang('many_delete') + '''</a></li>
                         <li><a href="/app_submit">''' + load_lang('application_list') + '''</a></li>
-                        <li><a href="/api/sitemap.xml">''' + load_lang('get_sitemap') + '''</a></li>
                         <li><a href="/register">''' + load_lang('add_user') + '''</a></li>
                         <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
                     </ul>
@@ -34,7 +33,7 @@ def main_tool_admin():
                         <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
                         <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
                         <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
-                        <li><a href="/filter/document/list">''' + load_lang('document_filter_list') + ''' ''' + load_lang('beta') + '''</a></li>
+                        <li><a href="/filter/document/list">''' + load_lang('document_filter_list') + ''' (''' + load_lang('beta') + ''')</a></li>
                     </ul>
                     <h3>2.2. ''' + load_lang('server') + '''</h2>
                     <ul class="inside_ul">

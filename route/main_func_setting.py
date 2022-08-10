@@ -9,7 +9,8 @@ def main_func_setting():
             ['external', load_lang('ext_api_req_set')],
             ['head', load_lang('main_head')],
             ['body/top', load_lang('main_body')],
-            ['body/bottom', load_lang('main_bottom_body')]
+            ['body/bottom', load_lang('main_bottom_body')],
+            ['sitemap', load_lang('sitemap_management') + ' (' + load_lang('beta') + ')']
         ]
 
         li_data = ''.join(['<li><a href="/setting/' + str(li[0]) + '">' + li[1] + '</a></li>' for li in li_list])

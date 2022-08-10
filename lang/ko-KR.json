@@ -362,7 +362,7 @@
     "backup_where": "백업 위치",
     "empty": "빈칸",
     "email_send_error": "이메일 전송이 실패했습니다.",
-    "get_sitemap": "sitemap.xml 만들거나 갱신하기",
+    "sitemap_management": "sitemap.xml 관리",
     "same_ip_exist": "동일한 아이피가 존재합니다.",
     "restart_fail_error": "재시작이 실패했습니다. 수동 재시작을 이용해주세요.",
     "domain": "도메인",
@@ -456,5 +456,9 @@
     "set_history_recording_off": "역사 기록 중지",
     "multiple_ban": "다중 차단",
     "name_or_ip_or_regex_multiple": "한 줄에 IP나 정규식을 한 개씩 적어주세요.",
-    "dont_move" : "이동하지 않음"
+    "dont_move": "이동하지 않음",
+    "stiemap_exclude_domain": "도메인 제외",
+    "stiemap_exclude_user_page": "사용자 문서 제외",
+    "stiemap_exclude_file_page": "파일 문서 제외",
+    "stiemap_exclude_category_page": "분류 문서 제외"
 }

@@ -605,8 +605,6 @@ app.route('/api/sha224/<everything:data>', methods = ['POST', 'GET'])(api_func_s
 
 app.route('/api/title_index')(api_title_index)
 app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])(api_image_view)
-# 이건 API 영역이 아닌 것 같아서 고심 중
-app.route('/api/sitemap.xml')(api_sitemap)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정
@@ -634,6 +632,7 @@ app.route('/setting/body/bottom/<skin_name>', defaults = { 'num' : 7 }, methods 
 app.route('/setting/robot', methods = ['POST', 'GET'])(main_func_setting_robot)
 app.route('/setting/external', methods = ['POST', 'GET'])(main_func_setting_external)
 app.route('/setting/acl', methods = ['POST', 'GET'])(main_func_setting_acl)
+app.route('/setting/sitemap', methods = ['POST', 'GET'])(main_func_setting_sitemap)
 
 # views -> view
 app.route('/view/<everything:name>')(main_view)
