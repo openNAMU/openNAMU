@@ -460,5 +460,7 @@
     "stiemap_exclude_domain": "도메인 제외",
     "stiemap_exclude_user_page": "사용자 문서 제외",
     "stiemap_exclude_file_page": "파일 문서 제외",
-    "stiemap_exclude_category_page": "분류 문서 제외"
+    "stiemap_exclude_category_page": "분류 문서 제외",
+    "search_document_name": "문서명 검색",
+    "search_document_data": "문서 내용 검색"
 }

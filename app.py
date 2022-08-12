@@ -616,6 +616,9 @@ app.route('/manager/<int:num>/<add_2>', methods = ['POST', 'GET'])(main_tool_red
 
 app.route('/search', methods=['POST'])(main_search)
 app.route('/search/<everything:name>')(main_search_deep)
+app.route('/search/<int:num>/<everything:name>')(main_search_deep)
+app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data' })(main_search_deep)
+app.route('/search_data/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' })(main_search_deep)
 app.route('/goto', methods=['POST'])(main_search_goto)
 app.route('/goto/<everything:name>', methods=['POST'])(main_search_goto)
 

@@ -15,7 +15,7 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
             
         uppage = re.sub(r"/([^/]+)$", '', name)
         uppage = 0 if uppage == name else uppage
-        num = str(doc_rev)        
+        num = str(doc_rev)
 
         curs.execute(db_change("select sub from rd where title = ? and not stop = 'O' order by date desc"), [name])
         topic = 1 if curs.fetchall() else 0
@@ -24,6 +24,8 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
         down = 1 if curs.fetchall() else 0
 
         if re.search(r'^category:', name):
+            name_view = name
+
             category_doc = ''
             category_sub = ''
 
@@ -41,6 +43,8 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
             if category_sub != '':
                 category_doc += '<h2 id="cate_under">' + load_lang('under_category') + '</h2><ul class="inside_ul">' + category_sub + '</ul>'
         elif re.search(r"^user:([^/]*)", name):
+            name_view = name
+
             match = re.search(r"^user:([^/]*)", name)
             
             user_name = html.escape(match.group(1))
@@ -72,6 +76,8 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
             if name == 'user:' + user_name:
                 menu += [['w/' + url_pas(name) + '/' + url_pas(get_time().split()[0]), load_lang('today_doc')]]
         elif re.search(r"^file:", name):
+            name_view = name
+
             mime_type = re.search(r'([^.]+)$', name)
             if mime_type:
                 mime_type = mime_type.group(1).lower()
@@ -98,6 +104,8 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
                 menu += [['delete_file/' + url_pas(name), load_lang('file_delete')]]
             else:
                 file_data = ''
+        else:
+            name_view = name
 
         if num != '0':
             curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
@@ -216,7 +224,7 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
             watch_list = 0
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), wiki_custom(), wiki_css([sub, r_date, watch_list])],
+            imp = [name_view, wiki_set(), wiki_custom(), wiki_css([sub, r_date, watch_list])],
             data = div,
             menu = menu
         )), response_data
