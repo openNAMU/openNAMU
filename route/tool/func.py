@@ -1457,7 +1457,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
     get_ban = ban_check()
     
     if tool == '' and name:
-        if tool == '' and acl_check(name, 'render') == 1:
+        if acl_check(name, 'render') == 1:
             return 1
         
         user_page = re.search(r"^user:((?:(?!\/).)*)", name)
@@ -1482,6 +1482,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             if ip == user_page and not ip_or_user(ip) == 1:
                 return 0
     
+            return 1
+    elif tool == 'document_edit' or tool == 'document_move' or tool == 'document_delete':
+        if acl_check(name, '') == 1:
             return 1
     elif tool == 'topic':
         curs.execute(db_change("select title from rd where code = ?"), [topic_num])
@@ -1511,6 +1514,24 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 curs.execute(db_change(
                     'select data from other where name = "edit"'
                 ))
+
+            num = 5
+        elif tool == 'document_move':
+            curs.execute(db_change(
+                "select data from acl where title = ? and type = 'document_move_acl'"
+            ), [name])
+
+            num = 5
+        elif tool == 'document_edit':
+            curs.execute(db_change(
+                "select data from acl where title = ? and type = 'document_edit_acl'"
+            ), [name])
+
+            num = 5
+        elif tool == 'document_delete':
+            curs.execute(db_change(
+                "select data from acl where title = ? and type = 'document_delete_acl'"
+            ), [name])
 
             num = 5
         elif tool == 'topic':
