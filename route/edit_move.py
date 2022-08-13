@@ -4,7 +4,7 @@ def edit_move(name):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check(name) == 1:
+        if acl_check(name, 'document_move') == 1:
             return re_error('/ban')
         
         if do_title_length_check(name) == 1:

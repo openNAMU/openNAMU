@@ -32,6 +32,9 @@ def give_acl_2(name):
 
         if flask.request.method == 'POST':
             acl_data = [['decu', flask.request.form.get('decu', '')]]
+            acl_data += [['document_edit_acl', flask.request.form.get('document_edit_acl', '')]]
+            acl_data += [['document_move_acl', flask.request.form.get('document_move_acl', '')]]
+            acl_data += [['document_delete_acl', flask.request.form.get('document_delete_acl', '')]]
             acl_data += [['dis', flask.request.form.get('dis', '')]]
             acl_data += [['view', flask.request.form.get('view', '')]]
             acl_data += [['why', flask.request.form.get('why', '')]]
@@ -45,7 +48,7 @@ def give_acl_2(name):
                     curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [name, i[1], i[0]])
 
             all_d = ''
-            for i in ['decu', 'dis', 'view']:
+            for i in ['decu', 'document_edit_acl', 'document_move_acl', 'document_delete_acl', 'dis', 'view']:
                 if flask.request.form.get(i, '') == '':
                     all_d += 'normal'
                     if i != 'view':
@@ -65,18 +68,21 @@ def give_acl_2(name):
             acl_list = get_acl_list('user') if re.search(r'^user:', name) else get_acl_list()
             if not re.search(r'^user:', name):
                 acl_get_list = [
-                    [load_lang('document_acl'), 'decu'], 
-                    [load_lang('discussion_acl'), 'dis'], 
-                    [load_lang('view_acl'), 'view']
+                    [load_lang('view_acl'), 'view', '2', '1.'],
+                    [load_lang('document_acl'), 'decu', '3', '1.1.'],
+                    [load_lang('document_edit_acl'), 'document_edit_acl', '4', '1.1.1.'],
+                    [load_lang('document_move_acl'), 'document_move_acl', '4', '1.1.2.'],
+                    [load_lang('document_delete_acl'), 'document_delete_acl', '4', '1.1.3.'],
+                    [load_lang('discussion_acl'), 'dis', '2', '2.'],
                 ]
             else:
                 acl_get_list = [
-                    [load_lang('document_acl'), 'decu']
+                    [load_lang('document_acl'), 'decu', '2', '1.']
                 ]
 
             for i in acl_get_list:
                 data += '' + \
-                    '<h2>' + i[0] + '</h2>' + \
+                    '<h' + i[2] + '>' + i[3] + ' ' + i[0] + (' (' + load_lang('beta') + ')' if i[2] == '4' else '') + '</h' + i[2] + '>' + \
                     '<hr class="main_hr">' + \
                     '<select name="' + i[1] + '" ' + check_ok + '>' + \
                 ''
@@ -95,7 +101,7 @@ def give_acl_2(name):
             acl_why = html.escape(acl_data[0][0]) if acl_data else ''
             data += '' + \
                 '<hr class="main_hr">' + \
-                '<input value="' + acl_why + '" placeholder="' + load_lang('why') + '" name="why" type="text" ' + check_ok + '>' + \
+                '<input value="' + acl_why + '" placeholder="' + load_lang('why') + '" name="why" ' + check_ok + '>' + \
             ''
 
             data += '''

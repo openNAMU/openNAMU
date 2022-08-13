@@ -5,7 +5,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
         curs = conn.cursor()
     
         ip = ip_check()
-        if acl_check(name) == 1:
+        if acl_check(name, 'document_edit') == 1:
             return redirect('/raw_acl/' + url_pas(name))
         
         if do_title_length_check(name) == 1:
