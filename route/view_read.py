@@ -212,6 +212,12 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
 
         div = file_data + user_doc + end_data + category_doc
 
+        if num != '0':
+            curs.execute(db_change('select data from other where name = "phrase_old_page_warring"'))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '':
+                div = db_data[0][0] + '<hr class="main_hr">' + div
+
         curs.execute(db_change("select data from other where name = 'body'"))
         body = curs.fetchall()
         div = (body[0][0] + div) if body else div

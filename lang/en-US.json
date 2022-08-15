@@ -322,6 +322,7 @@
                 "topic_text" : "Discussion textarea phrase",
                 "phrase_user_page_admin" : "Administrator user page phrase",
                 "phrase_user_page_owner" : "Onwer user page phrase",
+                "phrase_old_page_warring" : "Warning on previous revision document visit",
             "_comment_2.2.4_" : "Ext_API",
                 "recaptcha" : "reCAPTCHA",
                 "hcaptcha" : "hCAPTCHA",
