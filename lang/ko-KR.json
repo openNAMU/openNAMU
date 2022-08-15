@@ -465,5 +465,6 @@
     "not_all_acl": "전부 금지",
     "document_move_acl": "문서 이동 ACL",
     "document_delete_acl": "문서 삭제 ACL",
-    "document_edit_acl" : "문서 편집 ACL"
+    "document_edit_acl" : "문서 편집 ACL",
+    "phrase_old_page_warring" : "이전 리비전 문서 방문시 경고문"
 }

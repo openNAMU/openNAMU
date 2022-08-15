@@ -28,9 +28,9 @@ table {
 }
 
 td {
-    border: 1px solid gainsboro;
+    border: 0.5px solid gainsboro;
     
-    padding: 5px 10px;
+    padding: 8px 10px;
 }
 
 /* 링크 */
