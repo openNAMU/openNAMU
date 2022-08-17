@@ -57,3 +57,23 @@ blockquote {
     background-color: black;
     color: white;
 }
+
+.opennamu_comment_color_green {
+    background: #5c855c;
+}
+
+.opennamu_comment_color_blue {
+    background: #537c7c;
+}
+
+.opennamu_comment_color_red {
+    background: #6E3254;
+}
+
+.opennamu_comment_color_default {
+    background: #857f4a;
+}
+
+.opennamu_comment_color_gray {
+    background: #303030;
+}
