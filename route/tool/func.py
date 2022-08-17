@@ -1031,9 +1031,7 @@ def wiki_css(data):
     
     # Route JS + Defer
     data_css += '<script defer src="/views/main_css/js/route/edit.js?ver=' + data_css_ver + '"></script>'
-    
-    # Route JS
-    data_css += '<script src="/views/main_css/js/route/thread.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script defer src="/views/main_css/js/route/thread.js?ver=' + data_css_ver + '"></script>'
     
     # 레거시 일반 JS
     data_css += '<script src="/views/main_css/js/load_editor.js?ver=' + data_css_ver + '"></script>'

@@ -20,7 +20,15 @@ def api_topic(topic_num = 1, tool = 'normal', num = ''):
                         "select id, data, date, ip, block, top from topic where code = ? order by id + 0 asc"
                     ), [
                         topic_num
-                    ]) 
+                    ])
+            elif tool == 'length':
+                curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [topic_num])
+                db_data = curs.fetchall()
+
+                if db_data:
+                    return flask.jsonify({ 'length' : db_data[0][0] })
+                else:
+                    return flask.jsonify({})
             else:
                 curs.execute(db_change(
                     "select id, data, date, ip, block, top from topic where code = ? and top = 'O' order by id + 0 asc"

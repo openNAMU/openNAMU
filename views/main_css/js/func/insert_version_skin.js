@@ -26,6 +26,5 @@ let opennamu_do_insert_version_skin_url = [
     '/manager'
 ];
 if(opennamu_do_insert_version_skin_url.includes(window.location.pathname)) {
-    console.log('t')
     opennamu_do_insert_version_skin('ver_send_3');
 }
