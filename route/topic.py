@@ -153,7 +153,7 @@ def topic(topic_num = 0):
                     </form>
                     <hr class="main_hr">
                     <div id="see_preview"></div>
-                    <script>opennamu_do_thread_make("''' + topic_num + '''");</script>
+                    <!-- JS : opennamu_do_thread_make -->
                 ''',
                 menu = [['topic/' + url_pas(name), load_lang('list')]]
             ))

@@ -37,14 +37,9 @@ def topic_list(name = 'Test'):
 
             div += '''
                 <h2><a href="/thread/''' + data[0] + '">' + data[0] + '. ' + html.escape(data[1]) + '''</a></h2>
-                <div id="topic_pre_''' + data[0] + '''"></div>
-                <div id="topic_back_pre_''' + data[0] + '''"></div>
-                <script>
-                    opennamu_do_thread_make(''' + data[0] + ', "list", "/normal/1", "topic_pre_' + data[0] + '''");
-                    if(''' + t_data[0][0] + ''' !== 1) {
-                        opennamu_do_thread_make(''' + data[0] + ', "list", "/normal/' + t_data[0][0] + '", "topic_back_pre_' + data[0] + '''");
-                    }
-                </script>
+                <div class="topic_pre" id="opennamu_thread_''' + data[0] + '''"></div>
+                <div class="topic_back_pre" id="opennamu_thread_back_''' + data[0] + '''"></div>
+                <!-- JS : opennamu_do_thread_make -->
             '''
 
         if div == '':

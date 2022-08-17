@@ -11,8 +11,8 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
     }
 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.send(null);
+    xhr.open("GET", url);
+    xhr.send();
 
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
@@ -112,6 +112,7 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                     '<hr class="main_hr">' + 
                 ''
 
+                console.log(where);
                 document.getElementById(where).innerHTML += data_a;
                 
                 count += 1;
@@ -154,10 +155,36 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
 }
 
 function opennamu_do_open_comment(key) {
-    let elementState = document.getElementById('opennamu_comment_data_' + key).style.display;
-    if(!elementState || elementState === 'none') {
+    let element_state = document.getElementById('opennamu_comment_data_' + key).style.display;
+    if(!element_state || element_state === 'none') {
         document.getElementById('opennamu_comment_data_' + key).style.display = 'block';
     } else {
         document.getElementById('opennamu_comment_data_' + key).style.display = 'none';
+    }
+}
+
+if(window.location.pathname.match(/^\/thread\//)) {
+    let thread_num = window.location.pathname.match(/^\/thread\/([0-9]+)/)[1];
+
+    opennamu_do_thread_make(thread_num);
+} else if(window.location.pathname.match(/^\/topic\//)) {
+    for(let for_a = 0; document.getElementsByClassName('topic_pre')[for_a]; for_a++) {
+        let thread_num = document.getElementsByClassName('topic_pre')[for_a].id;
+        thread_num = thread_num.match(/^opennamu_thread_([0-9]+)/)[1];
+
+        opennamu_do_thread_make(thread_num, "list", "/normal/1", "opennamu_thread_" + thread_num);
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/thread/" + thread_num + "/length");
+        xhr.send();
+
+        xhr.onreadystatechange = function() {
+            if(this.readyState === 4 && this.status === 200) {
+                let thread_length = JSON.parse(this.responseText)['length'];
+                if(thread_length !== '1') {
+                    opennamu_do_thread_make(thread_num, "list", "/normal/" + thread_length, "opennamu_thread_back_" + thread_num);
+                }
+            }
+        }
     }
 }
