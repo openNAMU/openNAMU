@@ -9,7 +9,10 @@
         {% endif %}
         {{imp[3][3]|safe}}
         <link rel="stylesheet" href="/views/tenshi/css/main.css?ver=20">
-        <script src="/views/tenshi/js/skin_set.js?ver=8"></script>
+        {% if request.cookies.get('main_css_darkmode', '') == '1' %}
+            <link rel="stylesheet" href="/views/tenshi/css/dark.css?ver=8">
+        {% endif %}
+        <script src="/views/tenshi/js/skin_set.js?ver=9"></script>
         <script src="/views/tenshi/js/main.js?ver=3"></script>
         <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
         <link rel="shortcut icon" href="/views/main_css/file/favicon.ico?ver=1">
@@ -217,6 +220,6 @@
                 </a>
             </div>
         </div>
-        <script>main_load(); window.addEventListener('DOMContentLoaded', skin_set);</script>
+        <script>window.addEventListener('DOMContentLoaded', skin_set);</script>
     </body>
 </html>

@@ -27,7 +27,7 @@
     <body>
         <header id="main">
             <span id="left">
-                <span id="logo"><a href="/">{{imp[1][4]|safe}}</a></span>
+                <a id="logo" href="/">{{imp[1][4]|safe}}</a>
             </span>
             <span id="right">
                 <span class="top_cel" id="">
@@ -76,28 +76,26 @@
         <section>
             <header id="section">
                 <article class="main" id="title">
-                    <h1><span class="change_space">{{imp[0]}}</span></h1>
+                    <h1 class="blank"><span class="change_space">{{imp[0]}}</span></h1>
                     {% if menu != 0 %}
                         <div id="menu">
-                            {% for menu_data in menu %}<!--
-                             --><div class="menu_item">
-                                    {% if menu[0] == 1 %}
-                                        {% set menu_data_2 = menu_data[0] %}
-                                    {% else %}
-                                        {% set menu_data_2 = '/' + menu_data[0] %}
-                                    {% endif %}
-                                    
-                                    {% if menu_data|length > 2 and menu_data[2] == 1 %}
-                                        {% set menu_topic = 'topic_color' %}
-                                    {% else %}
-                                        {% set menu_topic = '' %}
-                                    {% endif %}
-                                    
-                                    <a class="menu_item_link" href="{{menu_data_2}}" id="{{menu_topic}}">
-                                        {{menu_data[1]}}
-                                    </a>
-                                </div><!--
-                         -->{% endfor %}
+                            {% for menu_data in menu %}
+                                {% if menu[0] == 1 %}
+                                    {% set menu_data_2 = menu_data[0] %}
+                                {% else %}
+                                    {% set menu_data_2 = '/' + menu_data[0] %}
+                                {% endif %}
+                                
+                                {% if menu_data|length > 2 and menu_data[2] == 1 %}
+                                    {% set menu_topic = 'topic_color' %}
+                                {% else %}
+                                    {% set menu_topic = '' %}
+                                {% endif %}
+                                
+                                <a class="menu_item_link" href="{{menu_data_2}}" id="{{menu_topic}}">
+                                    {{menu_data[1]}}
+                                </a>
+                            {% endfor %}
                         </div>
                     {% endif %}
                 </article>

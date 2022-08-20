@@ -7,6 +7,18 @@ html {
     background: #eee;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    border-bottom: 1px solid gainsboro;
+    
+    padding-bottom: 10px;
+}
+
+h1.blank, h2.blank, h3.blank, h4.blank, h5.blank, h6.blank {
+    border-bottom: none;
+
+    padding-bottom: 0px;
+}
+
 header#main {
     border-bottom: 0;
     
@@ -36,17 +48,40 @@ header#main form.not_mobile {
     display: inline-block;
 }
 
-div#menu {
-    margin-top: 10px;
+header a#logo {
+    height: 52px;
+
+    display: inline-block;
+
+    padding-left: 20px;
+    padding-right: 20px;
+
+    margin-left: -20px;
 }
 
-.menu_item {
+header a#logo:hover {
+    background-color: #95c3df;
+}
+
+div#menu {
+    margin-top: 10px;
+
+    margin-left: 6px;
+}
+
+.menu_item_link {
     border: 0;
     background-color: white;
     
     padding: 10px;
     
     display: inline-block;
+
+    margin-left: -6px;
+}
+
+.menu_item_link:hover {
+    background-color: #eee;
 }
 
 input.search {
@@ -78,21 +113,31 @@ button.search_button {
     vertical-align: middle;
     
     margin-top: -5px;
-    margin-left: -5px;
+    margin-left: -6px;
     
     border: 0;
     
     font-size: 20px;
     
     line-height: 0px;
+
+    cursor: pointer;
 }
 
 button.search_button#goto {
     background-color: #ccffbb;
 }
 
+button.search_button#goto:hover {
+    background-color: #99bf8c;
+}
+
 button.search_button#search {
     background-color: #ffeecc;
+}
+
+button.search_button#search:hover {
+    background-color: #bcb097;
 }
 
 aside {
@@ -100,7 +145,7 @@ aside {
     
     float: left;
     
-    display: inline-block;
+    display: block;
     
     padding-top: 10px;
     padding-left: 20px;
