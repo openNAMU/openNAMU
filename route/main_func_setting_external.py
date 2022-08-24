@@ -137,7 +137,7 @@ def main_func_setting_external():
                         <hr class="main_hr">
 
                         <hr class="main_hr">
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     <!-- JS : opennamu_do_render_simple -->
                 ''',

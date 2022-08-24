@@ -48,7 +48,7 @@ def main_func_setting_head(num, skin_name = ''):
                 title = '_body'
                 start = ''
                 plus = '''
-                    <button id="preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
+                    <button id="opennamu_js_preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
                     <hr class="main_hr">
                     <div id="see_preview"></div>
                 '''
@@ -57,7 +57,7 @@ def main_func_setting_head(num, skin_name = ''):
                 title = '_bottom_body'
                 start = ''
                 plus = '''
-                    <button id="preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
+                    <button id="opennamu_js_preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
                     <hr class="main_hr">
                     <div id="see_preview"></div>
                 '''
@@ -91,7 +91,7 @@ def main_func_setting_head(num, skin_name = ''):
                         ''' + start + '''
                         <textarea rows="25" placeholder="''' + load_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
                         ''' + plus + '''
                     </form>
                 ''',

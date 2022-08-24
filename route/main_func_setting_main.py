@@ -252,7 +252,7 @@ def main_func_setting_main(db_set):
                         <input type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + load_lang('set_history_recording_off') + ''' (''' + load_lang('beta') + ''')
                         <hr class="main_hr">
 
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     <!-- JS : opennamu_do_render_simple -->
                 ''',

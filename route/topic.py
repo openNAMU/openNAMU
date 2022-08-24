@@ -148,8 +148,8 @@ def topic(topic_num = 0):
                         ''' + captcha_get() + (ip_warning() if display == '' else '') + '''
                         <input style="display: none;" name="topic" value="''' + name + '''">
                         <input style="display: none;" name="title" value="''' + sub + '''">
-                        <button id="save" type="submit">''' + load_lang('send') + '''</button>
-                        <button id="preview" type="button" onclick="load_preview(\'\')">''' + load_lang('preview') + '''</button>
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('send') + '''</button>
+                        <button id="opennamu_js_preview" type="button" onclick="load_preview(\'\')">''' + load_lang('preview') + '''</button>
                     </form>
                     <hr class="main_hr">
                     <div id="see_preview"></div>

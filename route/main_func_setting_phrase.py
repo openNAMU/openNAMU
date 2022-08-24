@@ -127,7 +127,7 @@ def main_func_setting_phrase():
                         <textarea rows="3" name="''' + i_list[20] + '''">''' + html.escape(d_list[20]) + '''</textarea>
 
                         <hr class="main_hr">
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     <ul id="footnote_data">
                         <li>

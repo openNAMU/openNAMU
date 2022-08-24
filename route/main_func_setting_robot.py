@@ -60,7 +60,7 @@ def main_func_setting_robot():
                     <form method="post">
                         <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
                 menu = [['setting', load_lang('return')]]

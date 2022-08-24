@@ -49,7 +49,7 @@ def user_setting_head():
                     <form method="post">
                         <textarea rows="25" cols="100" name="content">''' + data + '''</textarea>
                         <hr class="main_hr">
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
                 menu = [['user', load_lang('return')]]
