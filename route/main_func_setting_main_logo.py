@@ -53,7 +53,7 @@ def main_func_setting_main_logo():
                 data = '''
                     <form method="post">
                         ''' + end_data + '''
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
                 menu = [['setting/main', load_lang('return')]]
