@@ -29,7 +29,7 @@ class class_do_render_namumark:
 
     def get_tool_temp_storage(self, data_A = '', data_B = ''):
         self.data_temp_storage_count += 1
-        data_name = 'opennamu_render_' + str(self.data_temp_storage_count)
+        data_name = 'render_' + str(self.data_temp_storage_count)
 
         self.data_temp_storage[data_name] = data_A
         self.data_temp_storage['/' + data_name] = data_B
@@ -37,24 +37,18 @@ class class_do_render_namumark:
         return data_name
 
     def get_tool_data_restore(self, data):
-        storage_count = self.data_temp_storage_count * 2
-        storage_regex = r'<(\/?opennamu_render_(?:[0-9]+))>'
+        storage_count = self.data_temp_storage_count * 3
+        storage_regex = r'<(\/?render_(?:[0-9]+))>'
 
         while 1:
+            if not re.search(storage_regex, data):
+                break
             if storage_count < 0:
-                print('Error : render count overflow')
+                print('Error : render restore count overflow')
 
                 break
             else:
-                if re.search(storage_regex, data):
-                    data = re.sub(
-                        storage_regex, 
-                        lambda match : self.data_temp_storage[match.group(1)], 
-                        data,
-                        1
-                    )
-                else:
-                    break
+                data = re.sub(storage_regex, lambda match : self.data_temp_storage[match.group(1)], data, 1)
 
             storage_count -= 1
 
@@ -69,11 +63,7 @@ class class_do_render_namumark:
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
         # <b>
-        self.render_data = re.sub(
-            r"&#x27;&#x27;&#x27;((?:(?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;",
-            do_render_text_bold,
-            self.render_data
-        )
+        self.render_data = re.sub(r"&#x27;&#x27;&#x27;((?:(?!&#x27;&#x27;&#x27;).)+)&#x27;&#x27;&#x27;", do_render_text_bold, self.render_data)
 
         # <i> function
         def do_render_text_italic(match):
@@ -83,11 +73,7 @@ class class_do_render_namumark:
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
         # <i>
-        self.render_data = re.sub(
-            r"&#x27;&#x27;((?:(?!&#x27;&#x27;).)+)&#x27;&#x27;",
-            do_render_text_italic,
-            self.render_data
-        )
+        self.render_data = re.sub(r"&#x27;&#x27;((?:(?!&#x27;&#x27;).)+)&#x27;&#x27;", do_render_text_italic, self.render_data)
 
         # <u> function
         def do_render_text_under(match):
@@ -97,11 +83,7 @@ class class_do_render_namumark:
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
         # <u>
-        self.render_data = re.sub(
-            r"__((?:(?!__).)+)__",
-            do_render_text_under,
-            self.render_data
-        )
+        self.render_data = re.sub(r"__((?:(?!__).)+)__", do_render_text_under, self.render_data)
         
         # <sup> function
         def do_render_text_sup(match):
@@ -111,17 +93,9 @@ class class_do_render_namumark:
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
         # <sup>
-        self.render_data = re.sub(
-            r"\^\^\^((?:(?!\^\^\^).)+)\^\^\^",
-            do_render_text_sup,
-            self.render_data
-        )
+        self.render_data = re.sub(r"\^\^\^((?:(?!\^\^\^).)+)\^\^\^", do_render_text_sup, self.render_data)
         # <sup> 2
-        self.render_data = re.sub(
-            r"\^\^((?:(?!\^\^).)+)\^\^",
-            do_render_text_sup,
-            self.render_data
-        )
+        self.render_data = re.sub(r"\^\^((?:(?!\^\^).)+)\^\^", do_render_text_sup, self.render_data)
 
         # <sub> function
         def do_render_text_sub(match):
@@ -131,17 +105,9 @@ class class_do_render_namumark:
             return '<' + data_name + '>' + data + '</' + data_name + '>'
         
         # <sub>
-        self.render_data = re.sub(
-            r",,,((?:(?!,,,).)+),,,",
-            do_render_text_sub,
-            self.render_data
-        )
+        self.render_data = re.sub(r",,,((?:(?!,,,).)+),,,", do_render_text_sub, self.render_data)
         # <sub> 2
-        self.render_data = re.sub(
-            r",,((?:(?!,,).)+),,",
-            do_render_text_sub,
-            self.render_data
-        )
+        self.render_data = re.sub(r",,((?:(?!,,).)+),,", do_render_text_sub, self.render_data)
 
         # <sub> function
         def do_render_text_strike(match):
@@ -151,49 +117,74 @@ class class_do_render_namumark:
             return '<' + data_name + '>' + data + '</' + data_name + '>'
         
         # <s>
-        self.render_data = re.sub(
-            r"--((?:(?!--).)+)--",
-            do_render_text_strike,
-            self.render_data
-        )
+        self.render_data = re.sub(r"--((?:(?!--).)+)--", do_render_text_strike, self.render_data)
         # <s> 2
-        self.render_data = re.sub(
-            r"~~((?:(?!~~).)+)~~",
-            do_render_text_strike,
-            self.render_data
-        )
+        self.render_data = re.sub(r"~~((?:(?!~~).)+)~~", do_render_text_strike, self.render_data)
     
     def do_render_heading(self):
-        pass
+        heading_regex = r'\n((={1,6})(#?) ?([^\n]+))\n'
+        heading_count_all = len(re.findall(heading_regex, self.render_data)) * 3
+        while 1:
+            if not re.search(heading_regex, self.render_data):
+                break
+            elif heading_count_all < 0:
+                print('Error : render heading count overflow')
+
+                break
+            else:
+                heading_data = re.search(heading_regex, self.render_data)
+                heading_data = heading_data.groups()
+                
+                heading_data_last_regex = r' ?(#?={1,6})$'
+                heading_data_last = re.search(heading_data_last_regex, heading_data[3])
+                heading_data_text = re.sub(heading_data_last_regex, '', heading_data[3])
+
+                # front != back -> restore
+                heading_data_diff = heading_data[2] + heading_data[1]
+                if heading_data_diff != heading_data_last:
+                    heading_data_all = heading_data[0]
+
+                    for for_a in reversed(range(1, 7)):
+                        for_a_str = str(for_a)
+
+                        heading_restore_regex = re.compile('^={' + for_a_str + '}|={' + for_a_str + '}$')
+
+                        heading_data_all = re.sub(heading_restore_regex, '<heading_' + for_a_str + '>', heading_data_all)
+
+                    self.render_data = re.sub(heading_regex, '\n' + heading_data_all + '\n', self.render_data, 1)
+                else:
+                    
+
+                    self.render_data = re.sub(heading_regex, heading_data_text, self.render_data, 1)
+
+            heading_count_all -= 1
+
+        for for_a in range(1, 7):
+            for_a_str = str(for_a)
+
+            heading_restore_regex = re.compile('<heading_' + for_a_str + '>')
+
+            self.render_data = re.sub(heading_restore_regex, ('=' * for_a), self.render_data)
+            print(('=' * for_a))
 
     def do_render_last(self):
         # remove front_br and back_br
-        self.render_data = re.sub(
-            r'\n<front_br>',
-            '',
-            self.render_data
-        )
-        self.render_data = re.sub(
-            r'<back_br>\n',
-            '',
-            self.render_data
-        )
+        self.render_data = re.sub(r'\n?<front_br>', '', self.render_data)
+        self.render_data = re.sub(r'<back_br>\n?', '', self.render_data)
         
         # \n to <br>
-        self.render_data = re.sub(
-            r'\n',
-            '<br>',
-            self.render_data
-        )
+        self.render_data = re.sub(r'\n', '<br>', self.render_data)
+
+        # <render_n> restore
+        self.render_data = self.get_tool_data_restore(self.render_data)
 
     def __call__(self):
         self.do_render_text()
+        # self.do_render_macro()
         self.do_render_heading()
         self.do_render_last()
 
         print(self.data_temp_storage)
-        self.render_data = self.get_tool_data_restore(self.render_data)
-        print('----')
         print(self.render_data)
 
         return [
