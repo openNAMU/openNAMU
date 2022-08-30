@@ -15,7 +15,7 @@ def main_view(name = ''):
                 mime_type = 'text/plain'
             else:
                 mime_type = mime_type[len(mime_type) - 1].lower()
-                image_type = ['jpeg', 'jpg', 'gif', 'png', 'webp']
+                image_type = ['jpeg', 'jpg', 'gif', 'png', 'webp', 'ico']
                 if mime_type in image_type:
                     mime_type = 'image/' + mime_type
                 elif mime_type == 'js':
