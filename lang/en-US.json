@@ -227,6 +227,8 @@
         "user_title" : "User title",
         "multiple_ban" : "Multiple ban",
     	"dont_move" : "Don't move",
+        "_comment_" : "Render",
+            "toc" : "TOC",
         "_comment_" : "Search",
             "search_document_name" : "Search document name",
             "search_document_data" : "Search document data",

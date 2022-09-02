@@ -1232,7 +1232,10 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
             return doc_data
         else:
             if doc_data != 0:
-                get_class_render = class_do_render(conn)
+                render_lang_data = {
+                    'toc' : load_lang('toc')
+                }
+                get_class_render = class_do_render(conn, render_lang_data)
                 return get_class_render.do_render(doc_name, doc_data, data_type, data_in)
             else:
                 return 'HTTP Request 404'
