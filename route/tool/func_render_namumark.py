@@ -1,19 +1,15 @@
 from .func_tool import *
 
 class class_do_render_namumark:
-    def __init__(
-        self,
-        curs,
-        doc_name, 
-        doc_data, 
-        doc_include
-    ):
+    def __init__(self, curs, doc_name, doc_data, doc_include, lang_data):
         self.curs = curs
         
         self.doc_data = doc_data
         self.doc_name = doc_name
         self.doc_include = doc_include
         
+        self.lang_data = lang_data
+
         self.data_temp_storage = {}
         self.data_temp_storage_count = 0
         self.data_backlink = []
@@ -26,6 +22,12 @@ class class_do_render_namumark:
         self.render_data = html.escape(self.render_data)
         self.render_data = '<back_br>\n' + self.render_data + '\n<front_br>'
         self.render_data_js = ''
+
+    def get_tool_lang(self, name):
+        if name in self.lang_data:
+            return self.lang_data[name]
+        else:
+            return name + ' (RENDER LANG)'
 
     def get_tool_temp_storage(self, data_A = '', data_B = ''):
         self.data_temp_storage_count += 1
@@ -124,6 +126,7 @@ class class_do_render_namumark:
     def do_render_heading(self):
         toc_list = []
 
+        # make heading base
         heading_regex = r'\n((={1,6})(#?) ?([^\n]+))\n'
         heading_count_all = len(re.findall(heading_regex, self.render_data)) * 3
         heading_stack = [0, 0, 0, 0, 0, 0]
@@ -216,6 +219,164 @@ class class_do_render_namumark:
 
             self.render_data = re.sub(heading_restore_regex, ('=' * for_a), self.render_data)
 
+        # make toc
+        if len(toc_list) == 0:
+            toc_data = ''
+        else:
+            toc_data = '' + \
+                '<div class="opennamu_TOC" id="toc">' + \
+                    '<span class="opennamu_TOC_title">' + self.get_tool_lang('toc') + '</span>' + \
+                    '<br>' + \
+                ''
+
+        for for_a in toc_list:
+            toc_data += '' + \
+                '<br>' + \
+                ('<span style="margin-left: 10px;">' * for_a[0].count('.')) + \
+                '<span>' + \
+                    '<a href="#s-' + for_a[0] + '">' + \
+                        for_a[0] + '. ' + \
+                    '</a>' + \
+                    for_a[1] + \
+                '</span>' + \
+            ''
+
+        if toc_data != '':
+            toc_data += '</div>'
+
+        # toc replace
+        self.render_data = re.sub(r'\[(목차|toc|tableofcontents)\]', toc_data, self.render_data)
+
+    def do_render_macro(self):
+        # double macro function
+        def do_render_macro_double(match):
+            match = match.groups()
+
+            name_data = match[0]
+            macro_split_regex = r'(?:^|,) *([^,]+)'
+            macro_split_sub_regex = r'(^[^=]+) *= *([^=]+)'
+            if name_data in ('youtube', 'nicovideo', 'navertv', 'kakaotv', 'vimeo'):
+                data = re.findall(macro_split_regex, match[1])
+
+                # get option
+                video_code = ''
+                video_start = ''
+                video_end = ''
+                video_width = '640px'
+                video_height = '360px'
+                for for_a in data:
+                    data_sub = re.search(macro_split_sub_regex, for_a)
+                    if data_sub:
+                        data_sub = data_sub.groups()
+                        if data_sub[0] == 'width':
+                            if re.search(r'^[0-9]+$', data_sub[1]):
+                                video_width = data_sub[1] + 'px'
+                            else:
+                                video_width = data_sub[1]
+                        elif data_sub[0] == 'height':
+                            if re.search(r'^[0-9]+$', data_sub[1]):
+                                video_height = data_sub[1] + 'px'
+                            else:
+                                video_height = data_sub[1]
+                        elif data_sub[0] == 'start':
+                            video_start = data_sub[1]
+                        elif data_sub[0] == 'end':
+                            video_end = data_sub[1]
+                        elif data_sub[0] == 'https://www.youtube.com/watch?v' and name_data == 'youtube':
+                            video_code = data_sub[1]
+                    else:
+                        video_code = for_a
+
+                # code to url
+                if name_data == 'youtube':
+                    video_code = re.sub(r'^https:\/\/youtu\.be\/', '', video_code)
+
+                    video_code = 'https://www.youtube.com/embed/' + video_code
+
+                    if video_start != '':
+                        if video_end != '':
+                            video_code += '?start=' + video_start + '&end=' + video_end
+                        else:
+                            video_code += '?start=' + video_start
+                    else:
+                        if video_end != '':
+                            video_code += '?end=' + video_end
+                elif name_data == 'kakaotv':
+                    video_code = re.sub(r'^https:\/\/tv\.kakao\.com\/v\/', '', video_code)
+
+                    video_code = 'https://tv.kakao.com/embed/player/cliplink/' + video_code +'?service=kakao_tv'
+                elif name_data == 'navertv':
+                    video_code = re.sub(r'^https:\/\/tv\.naver\.com\/v\/', '', video_code)
+
+                    video_code = 'https://tv.naver.com/embed/' + video_code
+                elif name_data == 'nicoviedo':
+                    video_code = 'https://embed.nicovideo.jp/watch/' + video_code
+                else:
+                    video_code = 'https://player.vimeo.com/video/' + video_code
+
+                return '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen></iframe>'
+            elif name_data == 'ruby':
+                data = re.findall(macro_split_regex, match[1])
+
+                # get option
+                main_text = ''
+                sub_text = ''
+                color = ''
+                for for_a in data:
+                    data_sub = re.search(macro_split_sub_regex, for_a)
+                    if data_sub:
+                        data_sub = data_sub.groups()
+                        if data_sub[0] == 'ruby':
+                            sub_text = data_sub[1]
+                        elif data_sub[0] == 'color':
+                            color = data_sub[1]
+                    else:
+                        main_text = for_a
+
+                # add color
+                if color != '':
+                    sub_text = '<span style="color:' + color + ';">' + sub_text + '</span>'
+
+                return '' + \
+                    '<ruby>' + \
+                        main_text + \
+                        '<rp>(</rp>' + \
+                        '<rt>' + \
+                            sub_text + \
+                        '</rt>' + \
+                        '<rp>)</rp>' + \
+                    '</ruby>' + \
+                ''
+            elif name_data == 'age':
+                return ''
+            elif name_data == 'dday':
+                return ''
+            else:
+                return '<macro>' + match[0] + '(' + match[1] + ')' + '</macro>'
+
+        # double macro replace
+        self.render_data = re.sub(r'\[([^[(]+)\(([^()]+)\)\]', do_render_macro_double, self.render_data)
+
+        # single macro function
+        def do_render_macro_single(match):
+            match = match.group(1)
+
+            if match in ('date', 'datetime'):
+                return get_time()
+            elif match == 'br':
+                return '<br>'
+            elif match == 'clearfix':
+                return '<div style="clear: both;"></div>'
+            else:
+                return '<macro>' + match + '</macro>'
+
+        # single macro replace
+        self.render_data = re.sub(r'\[([^[\]]+)\]', do_render_macro_single, self.render_data)
+
+        # macro safe restore
+        self.render_data = re.sub(r'<macro>', '[', self.render_data)
+        self.render_data = re.sub(r'<\/macro>', ']', self.render_data)
+
     def do_render_last(self):
         # remove front_br and back_br
         self.render_data = re.sub(r'\n?<front_br>', '', self.render_data)
@@ -229,12 +390,12 @@ class class_do_render_namumark:
 
     def __call__(self):
         self.do_render_text()
-        # self.do_render_macro()
+        self.do_render_macro()
         self.do_render_heading()
         self.do_render_last()
 
-        print(self.data_temp_storage)
-        print(self.render_data)
+        # print(self.data_temp_storage)
+        # print(self.render_data)
 
         return [
             self.render_data, # HTML

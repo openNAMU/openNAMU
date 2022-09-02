@@ -3,8 +3,10 @@ from .func_render_namumark import *
 # 커스텀 마크 언젠간 다시 추가 예정
 
 class class_do_render:
-    def __init__(self, conn):
+    def __init__(self, conn, lang_data):
         self.conn = conn
+
+        self.lang_data = lang_data
     
     def do_backlink_generate(self, data_markup, doc_data, doc_name):
         conn = self.conn
@@ -135,7 +137,8 @@ class class_do_render:
                     curs,
                     doc_name,
                     doc_data,
-                    doc_include
+                    doc_include,
+                    self.lang_data
                 )()
             elif rep_data == 'markdown':
                 data_in = (data_in + '_') if data_in else ''
