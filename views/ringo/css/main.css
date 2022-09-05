@@ -63,6 +63,46 @@ header a#logo:hover {
     background-color: #95c3df;
 }
 
+.top_cel {
+    display: inline-block;
+}
+
+.top_cel a {
+    display: inline-block;
+    
+    height: 52px;
+    
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.top_cel a:hover {
+    background-color: #95c3df;
+}
+
+.top_cel_in {
+    position: absolute;
+    
+    background: #efd8f7;
+    
+    padding: 10px;
+    
+    line-height: initial;
+
+    z-index: 1;
+}
+
+.top_cel_in a {
+    padding: 0px;
+    
+    display: block;
+    
+    height: inherit;
+
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
 div#menu {
     margin-top: 10px;
 
@@ -89,8 +129,6 @@ input.search {
     
     vertical-align: middle;
     
-    margin-top: -5px;
-    
     border: 0;
     
     padding: 10px;
@@ -112,7 +150,6 @@ button.search_button {
     
     vertical-align: middle;
     
-    margin-top: -5px;
     margin-left: -6px;
     
     border: 0;
@@ -169,6 +206,8 @@ aside .side_button {
 
 aside .side_button:hover {
     background-color: #eee;
+
+    cursor: pointer;
 }
 
 #side_button_2 {
@@ -274,4 +313,10 @@ footer.only_mobile {
     padding: 10px;
     
     background-color: white;
+}
+
+#main_data button:hover {
+    background-color: #eee;
+
+    cursor: pointer;
 }
