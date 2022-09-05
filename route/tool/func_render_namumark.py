@@ -348,9 +348,39 @@ class class_do_render_namumark:
                     '</ruby>' + \
                 ''
             elif name_data == 'age':
-                return ''
+                if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', match[1]):
+                    try:
+                        date = datetime.datetime.strptime(match[1], '%Y-%m-%d')
+                    except:
+                        return 'invalid date'
+
+                    date_now = datetime.datetime.today()
+
+                    if date > date_now:
+                        return 'invalid date'
+                    else:
+                        return str((date_now - date).days // 365)
+                else:
+                    return 'invalid date'
             elif name_data == 'dday':
-                return ''
+                if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', match[1]):
+                    try:
+                        date = datetime.datetime.strptime(match[1], '%Y-%m-%d')
+                    except:
+                        return 'invalid date'
+
+                    date_now = datetime.datetime.today()
+                    
+                    date_end = (date_now - date).days
+                    if date_end > 0:
+                        return '+' + str(date_end)
+                    else:
+                        if date_end == 0:
+                            return '-' + str(date_end)
+                        else:
+                            return str(date_end)
+                else:
+                    return 'invalid date'
             else:
                 return '<macro>' + match[0] + '(' + match[1] + ')' + '</macro>'
 
