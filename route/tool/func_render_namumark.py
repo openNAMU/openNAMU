@@ -13,6 +13,8 @@ class class_do_render_namumark:
         self.data_temp_storage = {}
         self.data_temp_storage_count = 0
         self.data_backlink = []
+
+        self.math_count = 0
         
         self.data_toc = ''
         self.data_footnote = ''
@@ -29,12 +31,21 @@ class class_do_render_namumark:
         else:
             return name + ' (RENDER LANG)'
 
-    def get_tool_temp_storage(self, data_A = '', data_B = ''):
+    def get_tool_js_safe(self, data):
+        data = re.sub(r'\\', '\\\\\\\\', data)
+        data = re.sub(r'"', '\\"', data)
+        data = re.sub(r'\n', '\\n', data)
+
+        return data
+
+    def get_tool_data_storage(self, data_A = '', data_B = '', data_C = ''):
         self.data_temp_storage_count += 1
         data_name = 'render_' + str(self.data_temp_storage_count)
 
         self.data_temp_storage[data_name] = data_A
         self.data_temp_storage['/' + data_name] = data_B
+
+        self.data_temp_storage['revert_' + data_name] = data_C
 
         return data_name
 
@@ -56,11 +67,29 @@ class class_do_render_namumark:
 
         return data
 
+    def get_tool_data_revert(self, data):
+        storage_count = self.data_temp_storage_count * 2
+        storage_regex = r'<(render_(?:[0-9]+))>(?:(?:(?!<(?:\/?render_(?:[0-9]+))>).)*)<\/render_(?:[0-9]+)>'
+
+        while 1:
+            if not re.search(storage_regex, data):
+                break
+            if storage_count < 0:
+                print('Error : render restore count overflow')
+
+                break
+            else:
+                data = re.sub(storage_regex, lambda match : self.data_temp_storage['revert_' + match.group(1)], data, 1)
+
+            storage_count -= 1
+
+        return data
+
     def do_render_text(self):
         # <b> function
         def do_render_text_bold(match):
             data = match.group(1)
-            data_name = self.get_tool_temp_storage('<b>', '</b>')
+            data_name = self.get_tool_data_storage('<b>', '</b>', match.group(0))
             
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
@@ -70,7 +99,7 @@ class class_do_render_namumark:
         # <i> function
         def do_render_text_italic(match):
             data = match.group(1)
-            data_name = self.get_tool_temp_storage('<i>', '</i>')
+            data_name = self.get_tool_data_storage('<i>', '</i>', match.group(0))
             
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
@@ -80,7 +109,7 @@ class class_do_render_namumark:
         # <u> function
         def do_render_text_under(match):
             data = match.group(1)
-            data_name = self.get_tool_temp_storage('<u>', '</u>')
+            data_name = self.get_tool_data_storage('<u>', '</u>', match.group(0))
             
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
@@ -90,7 +119,7 @@ class class_do_render_namumark:
         # <sup> function
         def do_render_text_sup(match):
             data = match.group(1)
-            data_name = self.get_tool_temp_storage('<sup>', '</sup>')
+            data_name = self.get_tool_data_storage('<sup>', '</sup>', match.group(0))
             
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
@@ -102,7 +131,7 @@ class class_do_render_namumark:
         # <sub> function
         def do_render_text_sub(match):
             data = match.group(1)
-            data_name = self.get_tool_temp_storage('<sub>', '</sub>')
+            data_name = self.get_tool_data_storage('<sub>', '</sub>', match.group(0))
             
             return '<' + data_name + '>' + data + '</' + data_name + '>'
         
@@ -114,7 +143,7 @@ class class_do_render_namumark:
         # <sub> function
         def do_render_text_strike(match):
             data = match.group(1)
-            data_name = self.get_tool_temp_storage('<s>', '</s>')
+            data_name = self.get_tool_data_storage('<s>', '</s>', match.group(0))
             
             return '<' + data_name + '>' + data + '</' + data_name + '>'
         
@@ -172,19 +201,19 @@ class class_do_render_namumark:
                     heading_stack_str = re.sub(r'(\.0)+$', '', heading_stack_str)
 
                     toc_list += [['', heading_data_text]]
+
+                    heading_data_text_fix = re.sub(r'<([^<>]*)>', '', heading_data_text)
                     
-                    heading_html_name = self.get_tool_temp_storage(
-                        '<h' + heading_level_str + '>',
-                        '</h' + heading_level_str + '>'
-                    )
+                    data_name = self.get_tool_data_storage('<h' + heading_level_str + ' id="' + heading_data_text_fix + '">', '</h' + heading_level_str + '>', '')
+
                     heading_data_complete = '' + \
                         '\n<front_br>' + \
-                        '<' + heading_html_name + '>' + \
+                        '<' + data_name + '>' + \
                             '<heading_stack>' + \
                                 heading_stack_str + \
                             '</heading_stack>' + \
                             ' ' + heading_data_text + \
-                        '</' + heading_html_name + '>' + \
+                        '</' + data_name + '>' + \
                         '<back_br>\n' + \
                     ''
 
@@ -250,6 +279,7 @@ class class_do_render_namumark:
     def do_render_macro(self):
         # double macro function
         def do_render_macro_double(match):
+            match_org = match
             match = match.groups()
 
             name_data = match[0]
@@ -314,7 +344,9 @@ class class_do_render_namumark:
                 else:
                     video_code = 'https://player.vimeo.com/video/' + video_code
 
-                return '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen></iframe>'
+                data_name = self.get_tool_data_storage('<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen></iframe>', '', match_org.group(0))
+
+                return '<' + data_name + '></' + data_name + '>'
             elif name_data == 'ruby':
                 data = re.findall(macro_split_regex, match[1])
 
@@ -333,54 +365,58 @@ class class_do_render_namumark:
                     else:
                         main_text = for_a
 
+                main_text = self.get_tool_data_revert(main_text)
+                sub_text = self.get_tool_data_revert(sub_text)
+
                 # add color
                 if color != '':
                     sub_text = '<span style="color:' + color + ';">' + sub_text + '</span>'
 
-                return '' + \
-                    '<ruby>' + \
-                        main_text + \
-                        '<rp>(</rp>' + \
-                        '<rt>' + \
-                            sub_text + \
-                        '</rt>' + \
-                        '<rp>)</rp>' + \
-                    '</ruby>' + \
-                ''
+                data_name = self.get_tool_data_storage('<ruby>' + main_text + '<rp>(</rp><rt>' + sub_text + '</rt><rp>)</rp></ruby>', '', match_org.group(0))
+
+                return '<' + data_name + '></' + data_name + '>'
             elif name_data == 'age':
                 if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', match[1]):
                     try:
                         date = datetime.datetime.strptime(match[1], '%Y-%m-%d')
                     except:
-                        return 'invalid date'
+                        data_text = 'invalid date'
 
                     date_now = datetime.datetime.today()
 
                     if date > date_now:
-                        return 'invalid date'
+                        data_text = 'invalid date'
                     else:
-                        return str((date_now - date).days // 365)
+                        data_text = str((date_now - date).days // 365)
                 else:
-                    return 'invalid date'
+                    data_text = 'invalid date'
+
+                data_name = self.get_tool_data_storage(data_text, '', match_org.group(0))
+
+                return '<' + data_name + '></' + data_name + '>'
             elif name_data == 'dday':
                 if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', match[1]):
                     try:
                         date = datetime.datetime.strptime(match[1], '%Y-%m-%d')
                     except:
-                        return 'invalid date'
+                        data_text = 'invalid date'
 
                     date_now = datetime.datetime.today()
                     
                     date_end = (date_now - date).days
                     if date_end > 0:
-                        return '+' + str(date_end)
+                        data_text = '+' + str(date_end)
                     else:
                         if date_end == 0:
-                            return '-' + str(date_end)
+                            data_text = '-' + str(date_end)
                         else:
-                            return str(date_end)
+                            data_text = str(date_end)
                 else:
-                    return 'invalid date'
+                    data_text = 'invalid date'
+
+                data_name = self.get_tool_data_storage(data_text, '', match_org.group(0))
+
+                return '<' + data_name + '></' + data_name + '>'
             else:
                 return '<macro>' + match[0] + '(' + match[1] + ')' + '</macro>'
 
@@ -389,14 +425,21 @@ class class_do_render_namumark:
 
         # single macro function
         def do_render_macro_single(match):
+            match_org = match
             match = match.group(1)
 
             if match in ('date', 'datetime'):
-                return get_time()
+                data_name = self.get_tool_data_storage(get_time(), '', match_org.group(0))
+
+                return '<' + data_name + '></' + data_name + '>'
             elif match == 'br':
-                return '<br>'
+                data_name = self.get_tool_data_storage('<br>', '', match_org.group(0))
+
+                return '<' + data_name + '></' + data_name + '>'
             elif match == 'clearfix':
-                return '<div style="clear: both;"></div>'
+                data_name = self.get_tool_data_storage('<div style="clear: both;"></div>', '', match_org.group(0))
+
+                return '<' + data_name + '></' + data_name + '>'
             else:
                 return '<macro>' + match + '</macro>'
 
@@ -406,6 +449,34 @@ class class_do_render_namumark:
         # macro safe restore
         self.render_data = re.sub(r'<macro>', '[', self.render_data)
         self.render_data = re.sub(r'<\/macro>', ']', self.render_data)
+
+    def do_render_math(self):
+        def do_render_math_sub(match):
+            data = html.unescape(match.group(1))
+            data = self.get_tool_js_safe(data)
+
+            data_html = self.get_tool_js_safe(match.group(1))
+
+            name_ob = 'opennamu_math_' + str(self.math_count)
+
+            data_name = self.get_tool_data_storage('<span id="' + name_ob + '">', '</span>', match.group(0))
+
+            self.render_data_js += '' + \
+                'try {\n' + \
+                    'katex.render("' + data + '", document.getElementById(\"' + name_ob + '\"));\n' + \
+                '} catch {\n' + \
+                    'document.getElementById(\"' + name_ob + '\").innerHTML = "<span style=\'color: red;\'>' + data_html + '</span>";\n' + \
+                '}\n' + \
+            ''
+
+            self.math_count += 1
+
+            return '<' + data_name + '></' + data_name + '>'
+
+        self.render_data = re.sub(r'\[math\(((?:(?!\)\]).)+)\)\]', do_render_math_sub, self.render_data)
+
+    def do_render_link(self):
+        pass
 
     def do_render_last(self):
         # remove front_br and back_br
@@ -419,8 +490,11 @@ class class_do_render_namumark:
         self.render_data = self.get_tool_data_restore(self.render_data)
 
     def __call__(self):
+        self.do_render_math()
+        # self.do_render_middle()
         self.do_render_text()
         self.do_render_macro()
+        # self.do_render_link()
         self.do_render_heading()
         self.do_render_last()
 
