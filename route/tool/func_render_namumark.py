@@ -12,9 +12,10 @@ class class_do_render_namumark:
 
         self.data_temp_storage = {}
         self.data_temp_storage_count = 0
+
         self.data_backlink = []
 
-        self.math_count = 0
+        self.data_math_count = 0
         
         self.data_toc = ''
         self.data_footnote = ''
@@ -38,20 +39,29 @@ class class_do_render_namumark:
 
         return data
 
-    def get_tool_data_storage(self, data_A = '', data_B = '', data_C = ''):
+    def get_tool_data_storage(self, data_A = '', data_B = '', data_C = '', do_type = 'render'):
         self.data_temp_storage_count += 1
-        data_name = 'render_' + str(self.data_temp_storage_count)
+        if do_type == 'render':
+            data_name = 'render_' + str(self.data_temp_storage_count)
 
-        self.data_temp_storage[data_name] = data_A
-        self.data_temp_storage['/' + data_name] = data_B
+            self.data_temp_storage[data_name] = data_A
+            self.data_temp_storage['/' + data_name] = data_B
+            self.data_temp_storage['revert_' + data_name] = data_C
+        else:
+            data_name = 'slash_' + str(self.data_temp_storage_count)
 
-        self.data_temp_storage['revert_' + data_name] = data_C
+            self.data_temp_storage[data_name] = data_A
 
         return data_name
 
-    def get_tool_data_restore(self, data):
+    def get_tool_data_restore(self, data, do_type = 'all'):
         storage_count = self.data_temp_storage_count * 3
-        storage_regex = r'<(\/?render_(?:[0-9]+))>'
+        if do_type == 'all':
+            storage_regex = r'<(\/?(?:render|slash)_(?:[0-9]+))>'
+        elif do_type == 'render':
+            storage_regex = r'<(\/?(?:render)_(?:[0-9]+))>'
+        else:
+            storage_regex = r'<(\/?(?:slash)_(?:[0-9]+))>'
 
         while 1:
             if not re.search(storage_regex, data):
@@ -452,12 +462,13 @@ class class_do_render_namumark:
 
     def do_render_math(self):
         def do_render_math_sub(match):
-            data = html.unescape(match.group(1))
+            data = self.get_tool_data_restore(match.group(1), do_type = 'slash')
+            data = html.unescape(data)
             data = self.get_tool_js_safe(data)
 
             data_html = self.get_tool_js_safe(match.group(1))
 
-            name_ob = 'opennamu_math_' + str(self.math_count)
+            name_ob = 'opennamu_math_' + str(self.data_math_count)
 
             data_name = self.get_tool_data_storage('<span id="' + name_ob + '">', '</span>', match.group(0))
 
@@ -469,14 +480,73 @@ class class_do_render_namumark:
                 '}\n' + \
             ''
 
-            self.math_count += 1
+            self.data_math_count += 1
 
             return '<' + data_name + '></' + data_name + '>'
 
         self.render_data = re.sub(r'\[math\(((?:(?!\)\]).)+)\)\]', do_render_math_sub, self.render_data)
 
     def do_render_link(self):
-        pass
+        link_regex = r'\[\[((?:(?!\[\[|\]\]|\||<|>).|<slash_[0-9]+>)+)(?:\|((?:(?!\[\[|\]\]|\|).)+))?\]\]'
+        link_count_all = len(re.findall(link_regex, self.render_data)) * 4
+        while 1:
+            if not re.search(link_regex, self.render_data):
+                break
+            elif link_count_all < 0:
+                print('Error : render heading count overflow')
+
+                break
+            else:
+                link_data = re.search(link_regex, self.render_data)
+                link_data_full = link_data.group(0)
+                link_data = link_data.groups()
+
+                link_main = link_data[0]
+                link_main_org = link_main
+
+                # sharp
+                link_data_sharp_regex = r'#([^#]+)$'
+                link_data_sharp = re.search(link_data_sharp_regex, link_main)
+                if link_data_sharp:
+                    link_data_sharp = link_data_sharp.group(1)
+                    link_data_sharp = html.unescape(link_data_sharp)
+                    link_data_sharp = '#' + url_pas(link_data_sharp)
+
+                    link_main = re.sub(link_data_sharp_regex, '', link_main)
+                else:
+                    link_data_sharp = ''
+
+                # under page
+                if link_main == '../':
+                    link_main = self.doc_name
+                    link_main = re.sub(r'(\/[^/]+)$', '', link_main)
+                elif re.search(r'^\/', link_main):
+                    link_main = re.sub(r'^\/', self.doc_name + '/', link_main)
+
+                # sub not exist -> sub = main
+                link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                link_main = html.unescape(link_main)
+                if link_data[1]:
+                    link_sub = link_data[1]
+                else:
+                    link_sub = link_main_org
+
+                if link_main != '':
+                    link_main = '/w/' + url_pas(link_main)
+
+                link_end = '<a href="' + link_main + link_data_sharp + '">' + link_sub + '</a>'
+
+                self.render_data = re.sub(link_regex, link_end, self.render_data, 1)
+
+            link_count_all -= 1
+
+    def do_render_slash(self):
+        def do_render_slash_sub(match):
+            data_name = self.get_tool_data_storage(match.group(1), do_type = 'slash')
+
+            return '<' + data_name + '>'
+
+        self.render_data = re.sub(r'\\(.)', do_render_slash_sub, self.render_data)
 
     def do_render_last(self):
         # remove front_br and back_br
@@ -490,11 +560,12 @@ class class_do_render_namumark:
         self.render_data = self.get_tool_data_restore(self.render_data)
 
     def __call__(self):
+        self.do_render_slash()
         self.do_render_math()
         # self.do_render_middle()
         self.do_render_text()
         self.do_render_macro()
-        # self.do_render_link()
+        self.do_render_link()
         self.do_render_heading()
         self.do_render_last()
 
@@ -502,7 +573,9 @@ class class_do_render_namumark:
         # print(self.render_data)
 
         return [
-            self.render_data, # HTML
-            self.render_data_js, # JS
-            [] # Other
+            self.render_data, # html
+            self.render_data_js, # js
+            [
+                self.data_backlink # backlink
+            ] # other
         ]
