@@ -517,26 +517,59 @@ class class_do_render_namumark:
                     if link_data[1]:
                         data = re.findall(file_split_regex, link_data[1])
                         for for_a in data:
-                        data_sub = re.search(file_split_sub_regex, for_a)
-                        if data_sub:
-                            data_sub = data_sub.groups()
-                            if data_sub[0] == 'width':
-                                if re.search(r'^[0-9]+$', data_sub[1]):
-                                    file_width = data_sub[1] + 'px'
-                                else:
-                                    file_width = data_sub[1]
-                            elif data_sub[0] == 'height':
-                                if re.search(r'^[0-9]+$', data_sub[1]):
-                                    file_height = data_sub[1] + 'px'
-                                else:
-                                    file_height = data_sub[1]
-                            elif data_sub[0] == 'align':
-                                if data_sub[1] in ('left', 'center', 'right'):
-                                    file_align = data_sub[1]
-                            elif data_sub[0] == 'bgcolor':
-                                file_bgcolor = data_sub[1]
+                            data_sub = re.search(file_split_sub_regex, for_a)
+                            if data_sub:
+                                data_sub = data_sub.groups()
+                                if data_sub[0] == 'width':
+                                    if re.search(r'^[0-9]+$', data_sub[1]):
+                                        file_width = data_sub[1] + 'px'
+                                    else:
+                                        file_width = data_sub[1]
+                                elif data_sub[0] == 'height':
+                                    if re.search(r'^[0-9]+$', data_sub[1]):
+                                        file_height = data_sub[1] + 'px'
+                                    else:
+                                        file_height = data_sub[1]
+                                elif data_sub[0] == 'align':
+                                    if data_sub[1] in ('left', 'right'):
+                                        file_align = 'float:' + data_sub[1] + ';'
+                                    elif data_sub[1] == 'center':
+                                        file_align = 'center'
+                                elif data_sub[0] == 'bgcolor':
+                                    file_bgcolor = data_sub[1]
 
-                    self.render_data = re.sub(link_regex, '', self.render_data, 1)
+                    link_out_regex = r'^(외부|out):'
+                    link_in_regex = r'^(파일|file):'
+                    if re.search(link_out_regex, link_main):
+                        link_main = re.sub(link_out_regex, '', link_main)
+
+                        link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                        link_main = html.unescape(link_main)
+                        link_main = re.sub(r'"', '&quot;', link_main)
+                    else:
+                        link_main = re.sub(link_in_regex, '', link_main)
+
+                        link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                        link_main = html.unescape(link_main)
+                        
+                        link_extension_regex = r'\.([^.]+)$'
+                        link_extension = re.search(link_extension_regex, link_main)
+                        if link_extension:
+                            link_extension = link_extension.group(1)
+                        else:
+                            link_extension = 'jpg'
+
+                        link_main = re.sub(link_extension_regex, '', link_main)
+
+                        link_main = '/image/' + url_pas(sha224_replace(link_main)) + '.' + link_extension
+
+                    file_end = '<image style="width:' + file_width + ';height:' + file_height + ';' + file_align + '" src="' + link_main + '">'
+                    if file_align == 'center':
+                        file_end = '<div style="text-align:center;">' + file_end + '</div>'
+
+                    data_name = self.get_tool_data_storage(file_end, '', link_data_full)
+
+                    self.render_data = re.sub(link_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
                 # out link
                 elif re.search(r'^https?:\/\/', link_main):
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
