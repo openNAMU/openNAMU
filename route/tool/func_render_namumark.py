@@ -497,6 +497,7 @@ class class_do_render_namumark:
 
                 break
             else:
+                # link split
                 link_data = re.search(link_regex, self.render_data)
                 link_data_full = link_data.group(0)
                 link_data = link_data.groups()
@@ -504,39 +505,95 @@ class class_do_render_namumark:
                 link_main = link_data[0]
                 link_main_org = link_main
 
-                # sharp
-                link_data_sharp_regex = r'#([^#]+)$'
-                link_data_sharp = re.search(link_data_sharp_regex, link_main)
-                if link_data_sharp:
-                    link_data_sharp = link_data_sharp.group(1)
-                    link_data_sharp = html.unescape(link_data_sharp)
-                    link_data_sharp = '#' + url_pas(link_data_sharp)
+                # file link
+                if re.search(r'^(파일|file|외부|out):', link_main):
+                    file_width = ''
+                    file_height = ''
+                    file_align = ''
+                    file_bgcolor = ''
 
-                    link_main = re.sub(link_data_sharp_regex, '', link_main)
+                    file_split_regex = r'(?:^|&amp;) *((?:(?!&amp;).)+)'
+                    file_split_sub_regex = r'(^[^=]+) *= *([^=]+)'
+                    if link_data[1]:
+                        data = re.findall(file_split_regex, link_data[1])
+                        for for_a in data:
+                        data_sub = re.search(file_split_sub_regex, for_a)
+                        if data_sub:
+                            data_sub = data_sub.groups()
+                            if data_sub[0] == 'width':
+                                if re.search(r'^[0-9]+$', data_sub[1]):
+                                    file_width = data_sub[1] + 'px'
+                                else:
+                                    file_width = data_sub[1]
+                            elif data_sub[0] == 'height':
+                                if re.search(r'^[0-9]+$', data_sub[1]):
+                                    file_height = data_sub[1] + 'px'
+                                else:
+                                    file_height = data_sub[1]
+                            elif data_sub[0] == 'align':
+                                if data_sub[1] in ('left', 'center', 'right'):
+                                    file_align = data_sub[1]
+                            elif data_sub[0] == 'bgcolor':
+                                file_bgcolor = data_sub[1]
+
+                    self.render_data = re.sub(link_regex, '', self.render_data, 1)
+                # out link
+                elif re.search(r'^https?:\/\/', link_main):
+                    link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                    link_main = html.unescape(link_main)
+                    link_main = re.sub(r'"', '&quot;', link_main)
+                    
+                    # sub not exist -> sub = main
+                    if link_data[1]:
+                        link_sub = link_data[1]
+                        link_sub_storage = ''
+                    else:
+                        link_sub = ''
+                        link_sub_storage = link_main_org
+
+                    data_name = self.get_tool_data_storage('<a class="opennamu_link_out" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
+
+                    self.render_data = re.sub(link_regex, '<' + data_name + '>' + link_sub + '</' + data_name + '>', self.render_data, 1)
+                # in link
                 else:
-                    link_data_sharp = ''
+                    # sharp
+                    link_data_sharp_regex = r'#([^#]+)$'
+                    link_data_sharp = re.search(link_data_sharp_regex, link_main)
+                    if link_data_sharp:
+                        link_data_sharp = link_data_sharp.group(1)
+                        link_data_sharp = html.unescape(link_data_sharp)
+                        link_data_sharp = '#' + url_pas(link_data_sharp)
 
-                # under page
-                if link_main == '../':
-                    link_main = self.doc_name
-                    link_main = re.sub(r'(\/[^/]+)$', '', link_main)
-                elif re.search(r'^\/', link_main):
-                    link_main = re.sub(r'^\/', self.doc_name + '/', link_main)
+                        link_main = re.sub(link_data_sharp_regex, '', link_main)
+                    else:
+                        link_data_sharp = ''
 
-                # sub not exist -> sub = main
-                link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
-                link_main = html.unescape(link_main)
-                if link_data[1]:
-                    link_sub = link_data[1]
-                else:
-                    link_sub = link_main_org
+                    # under page
+                    if link_main == '../':
+                        link_main = self.doc_name
+                        link_main = re.sub(r'(\/[^/]+)$', '', link_main)
+                    elif re.search(r'^\/', link_main):
+                        link_main = re.sub(r'^\/', self.doc_name + '/', link_main)
 
-                if link_main != '':
-                    link_main = '/w/' + url_pas(link_main)
+                    # main link fix
+                    link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                    link_main = html.unescape(link_main)
+                    link_main = url_pas(link_main)
 
-                link_end = '<a href="' + link_main + link_data_sharp + '">' + link_sub + '</a>'
+                    if link_main != '':
+                        link_main = '/w/' + link_main
 
-                self.render_data = re.sub(link_regex, link_end, self.render_data, 1)
+                    # sub not exist -> sub = main
+                    if link_data[1]:
+                        link_sub = link_data[1]
+                        link_sub_storage = ''
+                    else:
+                        link_sub = ''
+                        link_sub_storage = link_main_org
+
+                    data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
+
+                    self.render_data = re.sub(link_regex, '<' + data_name + '>' + link_sub + '</' + data_name + '>', self.render_data, 1)
 
             link_count_all -= 1
 
@@ -546,7 +603,7 @@ class class_do_render_namumark:
 
             return '<' + data_name + '>'
 
-        self.render_data = re.sub(r'\\(.)', do_render_slash_sub, self.render_data)
+        self.render_data = re.sub(r'\\(&lt;|&gt;|&#x27;|&quot;|&amp;|.)', do_render_slash_sub, self.render_data)
 
     def do_render_last(self):
         # remove front_br and back_br
@@ -560,12 +617,13 @@ class class_do_render_namumark:
         self.render_data = self.get_tool_data_restore(self.render_data)
 
     def __call__(self):
+        print(self.render_data)
         self.do_render_slash()
         self.do_render_math()
         # self.do_render_middle()
-        self.do_render_text()
         self.do_render_macro()
         self.do_render_link()
+        self.do_render_text()
         self.do_render_heading()
         self.do_render_last()
 
