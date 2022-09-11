@@ -487,6 +487,10 @@ class class_do_render_namumark:
         self.render_data = re.sub(r'\[math\(((?:(?!\)\]).)+)\)\]', do_render_math_sub, self.render_data)
 
     def do_render_link(self):
+        # todo list
+        # add link exist check
+        # add file exist check
+
         link_regex = r'\[\[((?:(?!\[\[|\]\]|\||<|>).|<slash_[0-9]+>)+)(?:\|((?:(?!\[\[|\]\]|\|).)+))?\]\]'
         link_count_all = len(re.findall(link_regex, self.render_data)) * 4
         while 1:
@@ -631,12 +635,26 @@ class class_do_render_namumark:
             link_count_all -= 1
 
     def do_render_slash(self):
+        # slash text -> <slash_n>
+        
         def do_render_slash_sub(match):
             data_name = self.get_tool_data_storage(match.group(1), do_type = 'slash')
 
             return '<' + data_name + '>'
 
         self.render_data = re.sub(r'\\(&lt;|&gt;|&#x27;|&quot;|&amp;|.)', do_render_slash_sub, self.render_data)
+
+    def do_render_include(self):
+        pass
+
+    def do_render_middle(self):
+        pass
+
+    def do_render_list(self):
+        pass
+
+    def do_render_table(self):
+        pass
 
     def do_render_last(self):
         # remove front_br and back_br
@@ -651,9 +669,12 @@ class class_do_render_namumark:
 
     def __call__(self):
         print(self.render_data)
+        # self.do_render_include()
         self.do_render_slash()
         self.do_render_math()
         # self.do_render_middle()
+        # self.do_render_list()
+        # self.do_render_table()
         self.do_render_macro()
         self.do_render_link()
         self.do_render_text()
