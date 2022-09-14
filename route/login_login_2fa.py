@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def login_login_2fa_2(conn):
+def login_login_2fa_2():
     with get_db_connect() as conn:
         curs = conn.cursor()
 

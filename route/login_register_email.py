@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def login_register_email_2(conn):
+def login_register_email_2():
     with get_db_connect() as conn:
         curs = conn.cursor()
 

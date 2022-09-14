@@ -5,7 +5,7 @@ def main_view(name = ''):
     with get_db_connect() as conn:
         file_name = re.search(r'([^/]+)$', name)
         if not file_name:
-            return main_error_404(conn)
+            return main_error_404()
         else:
             file_name = file_name.group(1)
             dir_name = './views/' + re.sub(r'\.{2,}', '', re.sub(r'([^/]+)$', '', name))

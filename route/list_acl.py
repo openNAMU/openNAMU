@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def list_acl_2(conn):
+def list_acl_2():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
