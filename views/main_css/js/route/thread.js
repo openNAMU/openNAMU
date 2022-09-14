@@ -50,18 +50,17 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                 let ip_o = data_t[key]['ip'];
                 let blind = data_t[key]['blind'];
                 let data_i_pas = data_t[key]['data_pas'][0];
-                
+                let data_get_list = [];
+
                 if(data_i_pas === '') {
                     data_i_pas = '<br>';
                 } else {
-                    data_i_pas = data_i_pas.replace(
-                        /&lt;topic_a&gt;((?:(?!&lt;\/topic_a&gt;).)+)&lt;\/topic_a&gt;/g,
-                        '<a href="$1">$1</a>'
-                    );
-                    data_i_pas = data_i_pas.replace(
-                        /&lt;topic_call&gt;@((?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;/g,
-                        '<a href="/w/user:$1">@$1</a>', 
-                    );
+                    let load_thread_regex = /&lt;topic_a&gt;((?:(?!&lt;\/topic_a&gt;).)+)&lt;\/topic_a&gt;/g;
+
+                    data_get_list = data_i_pas.match(load_thread_regex);
+
+                    data_i_pas = data_i_pas.replace(load_thread_regex, '<a href="$1">$1</a>');
+                    data_i_pas = data_i_pas.replace(/&lt;topic_call&gt;@((?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;/g, '<a href="/w/user:$1">@$1</a>');
                 }
                 
                 if(blind === 'O') {
@@ -112,7 +111,6 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                     '<hr class="main_hr">' + 
                 ''
 
-                console.log(where);
                 document.getElementById(where).innerHTML += data_a;
                 
                 count += 1;

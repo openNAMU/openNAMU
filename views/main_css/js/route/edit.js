@@ -42,8 +42,6 @@ function do_insert_preview() {
         if(xhr.readyState === 4 && xhr.status === 200) {
             let o_p_data = JSON.parse(xhr.responseText);
             
-            console.log(o_p_data);
-            
             document.getElementById('opennamu_js_preview_area').innerHTML = o_p_data['data'];
             eval(o_p_data['js_data'])
         }
@@ -51,7 +49,7 @@ function do_insert_preview() {
 }
 
 
-if(document.getElementById('opennamu_js_save')) {
+if(window.location.pathname.match(/^\/(edit|edit_from|edit_section)\//)) {
     do_stop_exit();
     
     document.getElementById('opennamu_js_save').onclick = function() {
@@ -60,6 +58,12 @@ if(document.getElementById('opennamu_js_save')) {
     };
     document.getElementById('opennamu_js_preview').onclick = function() {
         do_insert_edit_data();
+        do_insert_preview();
+    };
+}
+
+if(window.location.pathname.match(/^\/(thread)\//)) {
+    document.getElementById('opennamu_js_preview').onclick = function() {
         do_insert_preview();
     };
 }

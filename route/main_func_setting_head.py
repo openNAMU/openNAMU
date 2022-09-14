@@ -48,18 +48,18 @@ def main_func_setting_head(num, skin_name = ''):
                 title = '_body'
                 start = ''
                 plus = '''
-                    <button id="opennamu_js_preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
+                    <button id="opennamu_js_preview" type="button" onclick="load_raw_preview(\'content\', \'opennamu_js_preview_area\')">''' + load_lang('preview') + '''</button>
                     <hr class="main_hr">
-                    <div id="see_preview"></div>
+                    <div id="opennamu_js_preview_area"></div>
                 '''
             elif num == 7:
                 curs.execute(db_change("select data from other where name = 'bottom_body'"))
                 title = '_bottom_body'
                 start = ''
                 plus = '''
-                    <button id="opennamu_js_preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
+                    <button id="opennamu_js_preview" type="button" onclick="load_raw_preview(\'content\', \'opennamu_js_preview_area\')">''' + load_lang('preview') + '''</button>
                     <hr class="main_hr">
-                    <div id="see_preview"></div>
+                    <div id="opennamu_js_preview_area"></div>
                 '''
             else:
                 curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])

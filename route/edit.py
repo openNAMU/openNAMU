@@ -157,7 +157,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                     require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
                     require(["vs/editor/editor.main"], function () {
                         window.editor = monaco.editor.create(document.getElementById('monaco_editor'), {
-                            value: document.getElementById('textarea_edit_view').value,
+                            value: document.getElementById('opennamu_js_edit_textarea_view').value,
                             language: 'plaintext',
                             wordWrap: true,
                             theme: \'''' + monaco_thema + '''\',
@@ -201,6 +201,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                         do_paste_image();
                         ''' + add_script + '''
                     </script>
+                    <!-- JS : edit.js -->
                 ''',
                 menu = [
                     ['w/' + url_pas(name), load_lang('return')],
