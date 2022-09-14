@@ -826,7 +826,7 @@ def edit_button(editor_display = '0'):
     for insert_data in insert_list:
         data += '' + \
             '<a href="' + \
-                'javascript:do_insert_data(\'textarea_edit_view\', \'' + insert_data[0] + '\', ' + editor_display + ')' + \
+                'javascript:do_insert_data(\'opennamu_js_edit_textarea_view\', \'' + insert_data[0] + '\', ' + editor_display + ')' + \
             '">(' + insert_data[1] + ')</a> ' + \
         ''
 
