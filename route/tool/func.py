@@ -1596,9 +1596,11 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
         elif acl_data and acl_data[0][0] == '':
             acl_data = [['normal']]
 
+        except_ban_tool_list = ['render', 'topic_view']
         if acl_data[0][0] != 'normal':
-            if not acl_data[0][0] in ['ban', 'ban_admin'] and get_ban == 1 and tool != 'render':
-                return 1
+            if not acl_data[0][0] in ['ban', 'ban_admin'] and not tool in except_ban_tool_list:
+                if get_ban == 1:
+                    return 1
             
             if acl_data[0][0] in ['all', 'ban']:
                 return 0
@@ -1673,8 +1675,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
             return 1
         elif i == (end - 1):
-            if get_ban == 1 and tool != 'render':
-                return 1
+            if not tool in except_ban_tool_list:
+                if get_ban == 1:
+                    return 1
             
             if tool == 'topic':
                 curs.execute(db_change(
