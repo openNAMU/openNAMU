@@ -2168,7 +2168,7 @@ def re_error(data):
 
     if data == '/ban':
         if ban_check() == 1:
-            end = '<div id="opennamu_get_user_info">' + html.escape(ip_check()) + '</div>'
+            end = '<div id="opennamu_get_user_info">' + ip_check() + '</div>'
         else:
             end = '<ul class="inside_ul"><li>' + load_lang('authority_error') + '</li></ul>'
 
