@@ -77,7 +77,7 @@ def topic(topic_num = 0):
                         y_check = 1
 
                 if y_check == 1:
-                    add_alarm(match, ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>')
+                    add_alarm(match, ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' | ' + html.escape(sub) + ' | #' + num + '</a>')
 
             cate_re = re.compile(r'\[\[((?:분류|category):(?:(?:(?!\]\]).)*))\]\]', re.I)
             data = cate_re.sub('[br]', flask.request.form.get('content', 'Test').replace('\r', ''))
@@ -96,7 +96,7 @@ def topic(topic_num = 0):
                     curs.execute(db_change("select ip from topic where code = ? and id = ?"), [topic_num, rd_data[1]])
                     ip_data = curs.fetchall()
                     if ip_data and ip_or_user(ip_data[0][0]) == 0 and ip != ip_data[0][0]:
-                        add_alarm(ip_data[0][0], ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>')
+                        add_alarm(ip_data[0][0], ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' | ' + html.escape(sub) + ' | #' + num + '</a>')
 
                     data = re.sub(call_thread_regex, rd_data[0] + '<topic_a>#' + rd_data[1] + '</topic_a>' + rd_data[2], data, 1)
 
@@ -120,7 +120,7 @@ def topic(topic_num = 0):
                         ip_data = curs.fetchall()
 
                     if ip_data and ip_or_user(ip_data[0][0]) == 0 and ip != ip_data[0][0]:
-                        add_alarm(ip_data[0][0], ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + name + ' | ' + sub + ' | #' + num + '</a>')
+                        add_alarm(ip_data[0][0], ip + ' | <a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' | ' + html.escape(sub) + ' | #' + num + '</a>')
 
                     data = re.sub(call_user_regex, rd_data[0] + '<topic_call>@' + rd_data[1] + '</topic_call>' + rd_data[2], data, 1)
 
