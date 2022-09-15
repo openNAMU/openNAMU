@@ -601,6 +601,9 @@ def update(ver_num, set_data):
             for for_b in db_table_list[for_a]:
                 curs.execute(db_change("update " + for_a + " set " + for_b + " = '' where " + for_b + " is null"))
 
+    if ver_num < 3500114:
+        curs.execute(db_change('delete from alarm'))
+
     conn.commit()
     
     # 아이피 상태인 이메일 제거 예정

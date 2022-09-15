@@ -63,7 +63,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
     
             curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
             for scan_user in curs.fetchall():
-                add_alarm(scan_user[0], ip + ' | <a href="/w/' + url_pas(name) + '">' + name + '</a> | Edit')
+                add_alarm(scan_user[0], ip + ' | <a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a> | Edit')
                     
             history_plus(
                 name,
