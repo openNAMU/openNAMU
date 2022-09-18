@@ -77,7 +77,7 @@
                             <span class="iconify" data-icon="ic:baseline-cloud-upload" data-inline="true"></span>
                             {{'upload'|load_lang}}
                         </a>
-                        <a href="/skin_set">
+                        <a href="/change/skin_set">
                             <span class="iconify" data-icon="ic:baseline-settings" data-inline="true"></span>
                             {{'skin_setting'|load_lang}}
                         </a>
@@ -102,15 +102,35 @@
                             <span class="iconify" data-icon="ic:baseline-account-box" data-inline="true"></span>
                             {{'user_tool'|load_lang}}
                         </a>
+                        <a href="/change">
+                            <span class="iconify" data-icon="ic:baseline-manage-accounts" data-inline="true"></span>
+                            {{'user_setting'|load_lang}}
+                        </a>
                         {% if imp[2][2] == 1 %}
                             <a href="/alarm">
                                 <span class="iconify" data-icon="ic:baseline-contact-mail" data-inline="true"></span>
                                 {{'alarm'|load_lang}} ({{imp[2][8]}})
                             </a>
+                            <a href="/watch_list">
+                                <span class="iconify" data-icon="ic:round-preview" data-inline="true"></span>
+                                {{'watchlist'|load_lang}}
+                            </a>
+                            <a href="/star_doc">
+                                <span class="iconify" data-icon="ic:twotone-stars" data-inline="true"></span>
+                                {{'star_doc'|load_lang}}
+                            </a>
+                            <a href="/logout">
+                                <span class="iconify" data-icon="ic:baseline-logout" data-inline="true"></span>
+                                {{'logout'|load_lang}}
+                            </a>
                         {% else %}
                             <a href="/login">
-                                <span class="iconify" data-icon="ic:baseline-contact-mail" data-inline="true"></span>
-                                {{'alarm'|load_lang}} ({{imp[2][8]}})
+                                <span class="iconify" data-icon="ic:baseline-login" data-inline="true"></span>
+                                {{'login'|load_lang}}
+                            </a>
+                            <a href="/register">
+                                <span class="iconify" data-icon="ic:baseline-person-add-alt-1" data-inline="true"></span>
+                                {{'register'|load_lang}}
                             </a>
                         {% endif %}
                     </div>

@@ -2284,11 +2284,11 @@ def re_error(data):
                     data += '<br>' + load_lang('error_skin_set_old') + ' <a href="/skin_set">(' + load_lang('go') + ')</a>'
 
                 title = load_lang('skin_set')
-                tool = [['change', load_lang('user_setting')]]
+                tool = [['change', load_lang('user_setting')], ['change/skin_set/main', load_lang('main_skin_set')]]
                 load_skin_set = ''
             else:
                 title = load_lang('main_skin_set')
-                tool = [['change', load_lang('user_setting')]]
+                tool = [['change', load_lang('user_setting')], ['change/skin_set', load_lang('skin_set')]]
                 load_skin_set = '<script>main_css_skin_set();</script>'
         
             return easy_minify(flask.render_template(skin_check(),
