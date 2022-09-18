@@ -179,7 +179,7 @@ def main_func_setting_main(db_set):
                         <h2>2. ''' + load_lang('design_set') + '''</h2>
                         <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class="main_hr">
-                        <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'tenshi') + '''</select>
+                        <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'ringo') + '''</select>
 
                         <h2>3. ''' + load_lang('login_set') + '''</h2>
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''

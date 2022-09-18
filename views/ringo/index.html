@@ -94,32 +94,25 @@
                         {% else %}
                             <span class="iconify" data-icon="ic:round-person-search" data-inline="true"></span>
                         {% endif %}
-                        <span class="not_mobile">{{'tool'|load_lang}}</span>
+                        <span class="not_mobile">{{imp[2][5]}}</span>
                         <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                     </a>
                     <div class="top_cel_in" id="user_cel_in" style="display: none;">
-                        <a href="/random">
-                            <span class="iconify" data-icon="ic:baseline-shuffle" data-inline="true"></span>
-                            {{'random'|load_lang}}
+                        <a href="/user">
+                            <span class="iconify" data-icon="ic:baseline-account-box" data-inline="true"></span>
+                            {{'user_tool'|load_lang}}
                         </a>
-                        <a href="/other">
-                            <span class="iconify" data-icon="ic:baseline-build" data-inline="true"></span>
-                            {{'other_tool'|load_lang}}
-                        </a>
-                        {% if imp[2][9] != '0' %}
-                            <a href="/manager">
-                                <span class="iconify" data-icon="ic:baseline-how-to-reg" data-inline="true"></span>
-                                {{'admin_tool'|load_lang}}
+                        {% if imp[2][2] == 1 %}
+                            <a href="/alarm">
+                                <span class="iconify" data-icon="ic:baseline-contact-mail" data-inline="true"></span>
+                                {{'alarm'|load_lang}} ({{imp[2][8]}})
+                            </a>
+                        {% else %}
+                            <a href="/login">
+                                <span class="iconify" data-icon="ic:baseline-contact-mail" data-inline="true"></span>
+                                {{'alarm'|load_lang}} ({{imp[2][8]}})
                             </a>
                         {% endif %}
-                        <a href="/upload">
-                            <span class="iconify" data-icon="ic:baseline-cloud-upload" data-inline="true"></span>
-                            {{'upload'|load_lang}}
-                        </a>
-                        <a href="/skin_set">
-                            <span class="iconify" data-icon="ic:baseline-settings" data-inline="true"></span>
-                            {{'skin_setting'|load_lang}}
-                        </a>
                     </div>
                 </div>
                 <form class="not_mobile" method="post" action="/search" role="search" id="search">

@@ -85,15 +85,13 @@ header a#logo:hover {
     
     background: #efd8f7;
     
-    padding: 10px;
-    
     line-height: initial;
 
     z-index: 1;
 }
 
 .top_cel_in a {
-    padding: 0px;
+    padding: 10px;
     
     display: block;
     
@@ -291,6 +289,12 @@ article.main#title h1 {
     
     .only_mobile, header#main form.only_mobile {
         display: block;
+    }
+
+    .top_cel_in {
+        left: 0;
+
+        width: 100%;
     }
 }
 
