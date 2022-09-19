@@ -37,8 +37,8 @@ function do_insert_data(name, data, monaco = 0) {
 function do_paste_image() {
     window.addEventListener('DOMContentLoaded', function() {
         if(
-            document.cookie.match(main_css_regex_data('main_css_image_paste')) &&
-            document.cookie.match(main_css_regex_data('main_css_image_paste'))[1] === '1'
+            document.cookie.match(opennamu_cookie_split_regex('main_css_image_paste')) &&
+            document.cookie.match(opennamu_cookie_split_regex('main_css_image_paste'))[1] === '1'
         ) {
             const textarea = document.querySelector("textarea");
             if (textarea) {
