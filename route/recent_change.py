@@ -105,8 +105,8 @@ def recent_change(name = None, tool = ''):
 
                 if data[6] == 'O':
                     if admin == 1:
-                        style[0] = 'id="toron_color_grey"'
-                        style[1] = 'id="toron_color_grey"'
+                        style[0] = 'class="opennamu_history_blind"'
+                        style[1] = 'class="opennamu_history_blind"'
                     else:
                         ip = ''
                         ban = ''
@@ -114,7 +114,7 @@ def recent_change(name = None, tool = ''):
                         send = ''
 
                         style[0] = 'style="display: none;"'
-                        style[1] = 'id="toron_color_grey"'
+                        style[1] = 'class="opennamu_history_blind"'
 
                 if tool == 'history':
                     title = '<a href="/w_rev/' + data[0] + '/' + url_pas(name) + '">r' + data[0] + '</a> '
