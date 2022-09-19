@@ -1,5 +1,20 @@
 from .tool.func import *
 
+def recent_change_send_render(data):
+    def send_render_href_replace(match):
+        match = match.group(1)
+        data_unescape = html.unescape(match)
+
+        return '<a href="/w/' + url_pas(data_unescape) + '">' + match + '</a>'
+
+    if data == '&lt;br&gt;' or data == '':
+        data = '<br>'
+    else:
+        data = data.replace('javascript:', '')
+        data = re.sub(r'&lt;a(?:(?:(?!&gt;).)*)&gt;((?:(?!&lt;\/a&gt;).)+)&lt;\/a&gt;', send_render_href_replace, data)
+
+    return data
+
 def recent_change(name = None, tool = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -132,7 +147,7 @@ def recent_change(name = None, tool = ''):
                         <td>''' + date + '''</td>
                     </tr>
                     <tr ''' + style[1] + '''>
-                        <td class="opennamu_js_send_content" colspan="3">''' + html.escape(send) + '''</td>
+                        <td colspan="3">''' + recent_change_send_render(html.escape(send)) + '''</td>
                     </tr>
                 '''
 
