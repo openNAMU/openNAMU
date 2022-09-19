@@ -1,7 +1,3 @@
-function main_css_regex_data(data) {
-    return new RegExp('(?:^|; )' + data + '=([^;]*)');
-}
-
 function main_css_get_post() {    
     var check = document.getElementById('main_css_strike');
     if(check.value === 'normal') {
@@ -100,47 +96,47 @@ function main_css_get_post() {
 
 function main_css_skin_load() {    
     var head_data = document.querySelector('head');
-    if(document.cookie.match(main_css_regex_data('main_css_del_strike'))) {
-        if(document.cookie.match(main_css_regex_data('main_css_del_strike'))[1] === '1') {
+    if(document.cookie.match(opennamu_cookie_split_regex('main_css_del_strike'))) {
+        if(document.cookie.match(opennamu_cookie_split_regex('main_css_del_strike'))[1] === '1') {
             head_data.innerHTML += '<style>s { text-decoration: none; } s:hover { background-color: transparent; }</style>';
-        } else if(document.cookie.match(main_css_regex_data('main_css_del_strike'))[1] === '2') {
+        } else if(document.cookie.match(opennamu_cookie_split_regex('main_css_del_strike'))[1] === '2') {
             head_data.innerHTML += '<style>s { display: none; }</style>';
         }
     }
 
-    if(document.cookie.match(main_css_regex_data('main_css_del_bold'))) {
-        if(document.cookie.match(main_css_regex_data('main_css_del_bold'))[1] === '1') {
+    if(document.cookie.match(opennamu_cookie_split_regex('main_css_del_bold'))) {
+        if(document.cookie.match(opennamu_cookie_split_regex('main_css_del_bold'))[1] === '1') {
             head_data.innerHTML += '<style>b { font-weight: normal; }</style>';
-        } else if(document.cookie.match(main_css_regex_data('main_css_del_bold'))[1] === '2') {
+        } else if(document.cookie.match(opennamu_cookie_split_regex('main_css_del_bold'))[1] === '2') {
             head_data.innerHTML += '<style>b { display: none; }</style>';
         }
     }
 
     if(
-        document.cookie.match(main_css_regex_data('main_css_include_link')) &&
-        document.cookie.match(main_css_regex_data('main_css_include_link'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_include_link')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_include_link'))[1] === '1'
     ) {
         head_data.innerHTML += '<style>#include_link { display: inline; }</style>';
     }
 
-    if(document.cookie.match(main_css_regex_data('main_css_toc_set'))) {
-        if(document.cookie.match(main_css_regex_data('main_css_toc_set'))[1] === '2') {
+    if(document.cookie.match(opennamu_cookie_split_regex('main_css_toc_set'))) {
+        if(document.cookie.match(opennamu_cookie_split_regex('main_css_toc_set'))[1] === '2') {
             head_data.innerHTML += '<style>#auto_toc { display: none; }</style>';
-        } else if(document.cookie.match(main_css_regex_data('main_css_toc_set'))[1] === '1') {
+        } else if(document.cookie.match(opennamu_cookie_split_regex('main_css_toc_set'))[1] === '1') {
             head_data.innerHTML += '<style>#toc { display: none; }</style>';
         }
     }
     
     if(
-        document.cookie.match(main_css_regex_data('main_css_font_size')) &&
-        document.cookie.match(main_css_regex_data('main_css_font_size'))[1] !== ''
+        document.cookie.match(opennamu_cookie_split_regex('main_css_font_size')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_font_size'))[1] !== ''
     ) {
-        head_data.innerHTML += '<style>body, input, textarea { font-size: ' + document.cookie.match(main_css_regex_data('main_css_font_size'))[1] + 'px; }</style>';
+        head_data.innerHTML += '<style>body, input, textarea { font-size: ' + document.cookie.match(opennamu_cookie_split_regex('main_css_font_size'))[1] + 'px; }</style>';
     }
     
     if(
-        document.cookie.match(main_css_regex_data('main_css_darkmode')) &&
-        document.cookie.match(main_css_regex_data('main_css_darkmode'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_darkmode')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_darkmode'))[1] === '1'
     ) {
         head_data.innerHTML += '' +
             '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=5">' +
@@ -148,8 +144,8 @@ function main_css_skin_load() {
     }
     
     if(
-        document.cookie.match(main_css_regex_data('main_css_link_delimiter')) &&
-        document.cookie.match(main_css_regex_data('main_css_link_delimiter'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_link_delimiter')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_link_delimiter'))[1] === '1'
     ) {
         head_data.innerHTML += '<style>#real_normal_link::before, #not_thing::before, #inside::before { content: \'🅸\'; font-weight: lighter; background: transparent; }</style>';
     }
@@ -224,8 +220,8 @@ function main_css_load_lang(name) {
         }
     }
 
-    var server_language = document.cookie.match(main_css_regex_data('language'))[1];
-    var user_language = document.cookie.match(main_css_regex_data('user_language'))[1];
+    var server_language = document.cookie.match(opennamu_cookie_split_regex('language'))[1];
+    var user_language = document.cookie.match(opennamu_cookie_split_regex('user_language'))[1];
     if(user_language in set_language) {
         language = user_language;
     } else {
@@ -254,8 +250,8 @@ function main_css_skin_set() {
     var i = 0;
     while(strike_list[i]) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_del_strike')) && 
-            document.cookie.match(main_css_regex_data('main_css_del_strike'))[1] === strike_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_del_strike')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_del_strike'))[1] === strike_list[i][0]
         ) {
             set_data["strike"] = '<option value="' + strike_list[i][1] + '">' + strike_list[i][2] + '</option>' + set_data["strike"];
         } else {
@@ -274,8 +270,8 @@ function main_css_skin_set() {
     i = 0;
     while(bold_list[i]) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_del_bold')) && 
-            document.cookie.match(main_css_regex_data('main_css_del_bold'))[1] === bold_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_del_bold')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_del_bold'))[1] === bold_list[i][0]
         ) {
             set_data["bold"] = '<option value="' + bold_list[i][1] + '">' + bold_list[i][2] + '</option>' + set_data["bold"];
         } else {
@@ -286,8 +282,8 @@ function main_css_skin_set() {
     }
 
     if(
-        document.cookie.match(main_css_regex_data('main_css_include_link')) &&
-        document.cookie.match(main_css_regex_data('main_css_include_link'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_include_link')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_include_link'))[1] === '1'
     ) {
         set_data["include"] = "checked";
     } else {
@@ -295,8 +291,8 @@ function main_css_skin_set() {
     }
 
     if(
-        document.cookie.match(main_css_regex_data('main_css_image_paste')) &&
-        document.cookie.match(main_css_regex_data('main_css_image_paste'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_image_paste')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_image_paste'))[1] === '1'
     ) {
         set_data["image_paste"] = "checked";
     } else {
@@ -311,8 +307,8 @@ function main_css_skin_set() {
     i = 0;
     while(category_list[i]) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_category_set')) && 
-            document.cookie.match(main_css_regex_data('main_css_category_set'))[1] === category_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_category_set')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_category_set'))[1] === category_list[i][0]
         ) {
             set_data["category"] = '<option value="' + category_list[i][1] + '">' + category_list[i][2] + '</option>' + set_data["category"];
         } else {
@@ -330,8 +326,8 @@ function main_css_skin_set() {
     i = 0;
     while(footnote_list[i]) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_footnote_set')) && 
-            document.cookie.match(main_css_regex_data('main_css_footnote_set'))[1] === footnote_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_footnote_set')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_footnote_set'))[1] === footnote_list[i][0]
         ) {
             set_data["footnote"] = '<option value="' + footnote_list[i][1] + '">' + footnote_list[i][2] + '</option>' + set_data["footnote"];
         } else {
@@ -350,8 +346,8 @@ function main_css_skin_set() {
     i = 0;
     while(image_list[i]) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_image_set')) && 
-            document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === image_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_image_set')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_image_set'))[1] === image_list[i][0]
         ) {
             set_data["image"] = '<option value="' + image_list[i][1] + '">' + image_list[i][2] + '</option>' + set_data["image"];
         } else {
@@ -370,8 +366,8 @@ function main_css_skin_set() {
     i = 0;
     while(toc_list[i]) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_toc_set')) && 
-            document.cookie.match(main_css_regex_data('main_css_toc_set'))[1] === toc_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_toc_set')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_toc_set'))[1] === toc_list[i][0]
         ) {
             set_data["toc"] = '<option value="' + toc_list[i][1] + '">' + toc_list[i][2] + '</option>' + set_data["toc"];
         } else {
@@ -382,16 +378,16 @@ function main_css_skin_set() {
     }
 
     if(
-        document.cookie.match(main_css_regex_data('main_css_monaco')) &&
-        document.cookie.match(main_css_regex_data('main_css_monaco'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_monaco')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_monaco'))[1] === '1'
     ) {
         set_data["monaco"] = "checked";
     } else {
         set_data["monaco"] = "";
     }
     
-    if(document.cookie.match(main_css_regex_data('main_css_font_size'))) {
-        set_data["font_size"] = document.cookie.match(main_css_regex_data('main_css_font_size'))[1];
+    if(document.cookie.match(opennamu_cookie_split_regex('main_css_font_size'))) {
+        set_data["font_size"] = document.cookie.match(opennamu_cookie_split_regex('main_css_font_size'))[1];
     } else {
         set_data["font_size"] = '';
     }
@@ -403,8 +399,8 @@ function main_css_skin_set() {
     set_data["exter_link"] = '';
     for(let i = 0; exter_link_list[i]; i++) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_exter_link')) && 
-            document.cookie.match(main_css_regex_data('main_css_exter_link'))[1] === exter_link_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_exter_link')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_exter_link'))[1] === exter_link_list[i][0]
         ) {
             set_data["exter_link"] = '<option value="' + exter_link_list[i][1] + '">' + exter_link_list[i][2] + '</option>' + set_data["exter_link"];
         } else {
@@ -413,8 +409,8 @@ function main_css_skin_set() {
     }
     
     if(
-        document.cookie.match(main_css_regex_data('main_css_link_delimiter')) &&
-        document.cookie.match(main_css_regex_data('main_css_link_delimiter'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_link_delimiter')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_link_delimiter'))[1] === '1'
     ) {
         set_data["link_delimiter"] = "checked";
     } else {

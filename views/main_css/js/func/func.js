@@ -11,3 +11,7 @@ function opennamu_do_id_check(data) {
 function opennamu_do_url_encode(data) {
     return encodeURIComponent(data);
 }
+
+function opennamu_cookie_split_regex(data) {
+    return new RegExp('(?:^|; )' + data + '=([^;]*)');
+}

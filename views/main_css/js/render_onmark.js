@@ -35,8 +35,8 @@ function do_link_change(data, data_nowiki, no_change) {
 
 function do_darkmode_split(data) {
     if(
-        document.cookie.match(regex_data('main_css_darkmode')) &&
-        document.cookie.match(regex_data('main_css_darkmode'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_darkmode')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_darkmode'))[1] === '1'
     ) {
         let data_split = data.split(',');
         if(data_split.length > 1) {
@@ -846,8 +846,8 @@ function do_onmark_last_render(data, name_include, data_category) {
     data = data.replace(/\n/g, '<br>');
     
     if(
-        document.cookie.match(main_css_regex_data('main_css_category_set')) &&
-        document.cookie.match(main_css_regex_data('main_css_category_set'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_category_set')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_category_set'))[1] === '1'
     ) {
         if(data_category !== '') {
             data = data_category + '<hr class="main_hr">' + data;
