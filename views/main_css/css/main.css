@@ -241,6 +241,10 @@ s:hover, strike:hover, del:hover {
     background: aquamarine;
 }
 
+.opennamu_history_blind {
+    background: gainsboro;
+}
+
 /* 기타 */
 .main_hr {
     border: none;

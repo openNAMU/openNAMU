@@ -23,7 +23,7 @@ def recent_history_tool(name = 'Test', rev = 1):
         data += '</ul>'
 
         if admin_check(6) == 1:
-            data += '<h3>admin</h3>'
+            data += '<h3>' + load_lang('admin') + '</h3>'
             data += '<ul class="inside_ul">'
             curs.execute(db_change('' + \
                 'select title from history ' + \
@@ -39,7 +39,7 @@ def recent_history_tool(name = 'Test', rev = 1):
             data += '</ul>'
 
         if admin_check() == 1:
-            data += '<h3>owner</h3>'
+            data += '<h3>' + load_lang('owner') + '</h3>'
             data += '<ul class="inside_ul">'
             data += '<li><a href="/history_delete/' + num + '/' + url_pas(name) + '">' + load_lang('history_delete') + '</li>'
             data += '<li><a href="/history_send/' + num + '/' + url_pas(name) + '">' + load_lang('send_edit') + '</li>'
