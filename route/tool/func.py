@@ -1011,10 +1011,10 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '152'
+    data_css_ver = '154'
     
     # Func JS + Defer
-    data_css += '<script defer src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
     
     data_css += '<script defer src="/views/main_css/js/func/insert_version.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/func/insert_user_info.js?ver=' + data_css_ver + '"></script>'
@@ -1026,7 +1026,6 @@ def wiki_css(data):
     
     data_css += '<script defer src="/views/main_css/js/func/render_user_name.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/func/render_simple.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script defer src="/views/main_css/js/func/render_send.js?ver=' + data_css_ver + '"></script>'
     
     # Render JS
     data_css += '<script src="/views/main_css/js/render/markdown.js?ver=' + data_css_ver + '"></script>'
@@ -1236,7 +1235,8 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
         else:
             if doc_data != 0:
                 render_lang_data = {
-                    'toc' : load_lang('toc')
+                    'toc' : load_lang('toc'),
+                    'category' : load_lang('category')
                 }
                 get_class_render = class_do_render(conn, render_lang_data)
                 return get_class_render.do_render(doc_name, doc_data, data_type, data_in)

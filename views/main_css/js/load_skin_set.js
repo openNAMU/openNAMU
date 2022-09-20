@@ -418,58 +418,58 @@ function main_css_skin_set() {
     }
 
     document.getElementById("main_skin_set").innerHTML = ' \
-        <h2>1. ' + main_css_load_lang('renderer') + '</h2> \
-        <h3>1.1. ' + main_css_load_lang('strike') + '</h3> \
-        <select id="main_css_strike"> \
-            ' + set_data["strike"] + ' \
-        </select> \
-        <h3>1.2. ' + main_css_load_lang('bold') + '</h3> \
-        <select id="main_css_bold"> \
-            ' + set_data["bold"] + ' \
-        </select> \
-        <h3>1.3. ' + main_css_load_lang('where_category') + '</h3> \
-        <select id="main_css_category"> \
-            ' + set_data["category"] + ' \
-        </select> \
-        <h3>1.4. ' + main_css_load_lang('set_footnote') + '</h3> \
-        <select id="main_css_footnote"> \
-            ' + set_data["footnote"] + ' \
-        </select> \
-        <h3>1.5. ' + main_css_load_lang('set_image') + '</h3> \
-        <select id="main_css_image"> \
-            ' + set_data["image"] + ' \
-        </select> \
-        <h3>1.6. ' + main_css_load_lang('other') + '</h3> \
-        <input ' + set_data["include"] + ' type="checkbox" id="main_css_include" value="include"> ' + main_css_load_lang('include_link') + ' \
-        <hr class="main_hr"> \
-        <input ' + set_data["link_delimiter"] + ' type="checkbox" id="main_css_link_delimiter" value="link_delimiter"> ' + main_css_load_lang('link_delimiter') + '<sup>(1)</sup> \
-        <h3>1.7. ' + main_css_load_lang('set_toc') + '</h3> \
-        <select id="main_css_toc"> \
-            ' + set_data["toc"] + ' \
-        </select> \
-        <h3>1.8. ' + main_css_load_lang('set_font_size') + '</h3> \
-        <input id="main_css_font_size" placeholder="' + main_css_load_lang('font_size') + ' (EX : 11)" value="' + set_data["font_size"] + '"> \
-        <h3>1.9. ' + main_css_load_lang('exter_link_open_method') + '</h3> \
-        <select id="main_css_exter_link"> \
-            ' + set_data["exter_link"] + ' \
-        </select> \
-        <h2>2. ' + main_css_load_lang('editor') + '</h2> \
-        <h3>2.1. ' + main_css_load_lang('main') + '</h3> \
-        <input ' + set_data["monaco"] + ' type="checkbox" id="main_css_monaco" value="monaco"> ' + main_css_load_lang('use_monaco') + '<sup>(1)</sup> \
-        <hr class="main_hr"> \
-        <input ' + set_data["image_paste"] + ' type="checkbox" id="main_css_image_paste" value="image_paste"> ' + 
-            main_css_load_lang('clipboard_upload') + '<sup>(ko-KR)</sup><sup>(1)</sup> \
-        <hr class="main_hr"> \
-        <button onclick="main_css_get_post();">' + main_css_load_lang('save') + '</button> \
-        <hr class="main_hr"> \
-        <ul id="footnote_data"> \
-            <li><a id="note_1_end" href="#note_1">(1)</a> ' + main_css_load_lang('except_ie') + '</li> \
-            <li><a href="#note_1_1">(1.1)</a></li> \
-            <li><a id="note_2_end" href="#note_2">(ko-KR)</a> ' + main_css_load_lang('only_korean') + '</li> \
-        </ul> \
+        <div id="opennamu_simple_render"> \
+            <h2>1. ' + main_css_load_lang('renderer') + '</h2> \
+            <h3>1.1. ' + main_css_load_lang('strike') + '</h3> \
+            <select id="main_css_strike"> \
+                ' + set_data["strike"] + ' \
+            </select> \
+            <h3>1.2. ' + main_css_load_lang('bold') + '</h3> \
+            <select id="main_css_bold"> \
+                ' + set_data["bold"] + ' \
+            </select> \
+            <h3>1.3. ' + main_css_load_lang('where_category') + '</h3> \
+            <select id="main_css_category"> \
+                ' + set_data["category"] + ' \
+            </select> \
+            <h3>1.4. ' + main_css_load_lang('set_footnote') + '</h3> \
+            <select id="main_css_footnote"> \
+                ' + set_data["footnote"] + ' \
+            </select> \
+            <h3>1.5. ' + main_css_load_lang('set_image') + '</h3> \
+            <select id="main_css_image"> \
+                ' + set_data["image"] + ' \
+            </select> \
+            <h3>1.6. ' + main_css_load_lang('other') + '</h3> \
+            <input ' + set_data["include"] + ' type="checkbox" id="main_css_include" value="include"> ' + main_css_load_lang('include_link') + ' \
+            <hr class="main_hr"> \
+            <input ' + set_data["link_delimiter"] + ' type="checkbox" id="main_css_link_delimiter" value="link_delimiter"> ' + main_css_load_lang('link_delimiter') + '<sup>(1)</sup> \
+            <h3>1.7. ' + main_css_load_lang('set_toc') + '</h3> \
+            <select id="main_css_toc"> \
+                ' + set_data["toc"] + ' \
+            </select> \
+            <h3>1.8. ' + main_css_load_lang('set_font_size') + '</h3> \
+            <input id="main_css_font_size" placeholder="' + main_css_load_lang('font_size') + ' (EX : 11)" value="' + set_data["font_size"] + '"> \
+            <h3>1.9. ' + main_css_load_lang('exter_link_open_method') + '</h3> \
+            <select id="main_css_exter_link"> \
+                ' + set_data["exter_link"] + ' \
+            </select> \
+            <h2>2. ' + main_css_load_lang('editor') + '</h2> \
+            <h3>2.1. ' + main_css_load_lang('main') + '</h3> \
+            <input ' + set_data["monaco"] + ' type="checkbox" id="main_css_monaco" value="monaco"> ' + main_css_load_lang('use_monaco') + '<sup>(1)</sup> \
+            <hr class="main_hr"> \
+            <input ' + set_data["image_paste"] + ' type="checkbox" id="main_css_image_paste" value="image_paste"> ' + 
+                main_css_load_lang('clipboard_upload') + '<sup>(ko-KR)</sup><sup>(1)</sup> \
+            <hr class="main_hr"> \
+            <button onclick="main_css_get_post();">' + main_css_load_lang('save') + '</button> \
+            <hr class="main_hr"> \
+            <ul id="footnote_data"> \
+                <li><a id="note_1_end" href="#note_1">(1)</a> ' + main_css_load_lang('except_ie') + '</li> \
+                <li><a href="#note_1_1">(1.1)</a></li> \
+                <li><a id="note_2_end" href="#note_2">(ko-KR)</a> ' + main_css_load_lang('only_korean') + '</li> \
+            </ul> \
+        </div> \
     ';
- 
-    opennamu_do_render_simple('main_skin_set');
 }
 
 document.addEventListener("DOMContentLoaded", main_css_skin_load);
