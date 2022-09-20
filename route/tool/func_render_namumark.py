@@ -18,7 +18,7 @@ class class_do_render_namumark:
         self.data_math_count = 0
         
         self.data_toc = ''
-        self.data_footnote = ''
+        self.data_footnote = {}
         self.data_category = ''
 
         self.render_data = self.doc_data
@@ -92,6 +92,33 @@ class class_do_render_namumark:
                 data = re.sub(storage_regex, lambda match : self.data_temp_storage['revert_' + match.group(1)], data, 1)
 
             storage_count -= 1
+
+        return data
+
+    def get_tool_footnote_make(self):
+        data = ''
+        for for_a in self.data_footnote:
+            if data == '':
+                data += '<div class="opennamu_footnote">'
+            else:
+                data += '<br>'
+
+            
+
+            if len(self.data_footnote[for_a]['list']) > 1:
+                data += '(' + for_a + ') '
+
+                for for_b in self.data_footnote[for_a]['list']:
+                    data += '<sup><a href="#rfn-' + for_b + '">(' + for_b + ')</a></sup> '
+            else:
+                data += '<a href="#rfn-' + self.data_footnote[for_a]['list'][0] + '">(' + for_a + ') </a> '
+
+            data += self.data_footnote[for_a]['data']
+
+        if data != '':
+            data += '</div>'
+
+        self.data_footnote = {}
 
         return data
 
@@ -574,6 +601,33 @@ class class_do_render_namumark:
                     data_name = self.get_tool_data_storage(file_end, '', link_data_full)
 
                     self.render_data = re.sub(link_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
+                # category
+                elif re.search(r'^(분류|category):', link_main):
+                    link_main = re.sub(r'^(분류|category):', '', link_main)
+
+                    if self.data_category == '':
+                        self.data_category = '<div class="opennamu_category">' + self.get_tool_lang('category') + ' : '
+                    else:
+                        self.data_category += ' | '
+
+                    if link_data[1]:
+                        link_main += link_data[1]
+
+                    category_blur = ''
+                    if re.search(r'#blur$', link_main):
+                        link_main = re.sub(r'#blur$', '', link_main)
+
+                        category_blur = 'class="opennamu_category_blur"'
+                    
+                    link_sub = link_main
+
+                    link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                    link_main = html.unescape(link_main)
+                    link_main = url_pas(link_main)
+
+                    self.data_category += '<a ' + category_blur + ' href="/w/' + link_main + '">' + link_sub + '</a>'
+
+                    self.render_data = re.sub(link_regex, '', self.render_data, 1)
                 # out link
                 elif re.search(r'^https?:\/\/', link_main):
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
@@ -634,6 +688,19 @@ class class_do_render_namumark:
 
             link_count_all -= 1
 
+        if self.data_category != '':
+            data_name = self.get_tool_data_storage(self.data_category, '</div>', '')
+
+            print(flask.request.cookies.get('main_css_category_set', ''))
+            if flask.request.cookies.get('main_css_category_set', '') == '':
+                if re.search(r'<footnote_category>', self.render_data):
+                    self.render_data = re.sub(r'<footnote_category>', '<' + data_name + '></' + data_name + '>', self.render_data, 1)
+                else:
+                    self.render_data += '<' + data_name + '></' + data_name + '>'
+            else:
+                self.render_data = re.sub(r'<footnote_category>', '', self.render_data, 1)
+                self.render_data = '<' + data_name + '></' + data_name + '>' + self.render_data
+
     def do_render_slash(self):
         # slash text -> <slash_n>
         
@@ -656,6 +723,57 @@ class class_do_render_namumark:
     def do_render_table(self):
         pass
 
+    def do_redner_footnote(self):
+        footnote_num = 0
+        footnote_regex = r'(?:\[\*((?:(?!\[\*|\]| ).)+)?(?: ((?:(?!\[\*|\]).)+))?\]|\[(각주|footnote)\])'
+        footnote_count_all = len(re.findall(footnote_regex, self.render_data)) * 4
+        while 1:
+            footnote_num += 1
+
+            footnote_data = re.search(footnote_regex, self.render_data)
+            if footnote_count_all < 0:
+                break
+            elif not footnote_data:
+                break
+            else:
+                footnote_data_org = footnote_data.group(0)
+                footnote_data = footnote_data.groups()
+                if footnote_data[2]:
+                    self.render_data = re.sub(footnote_regex, self.get_tool_footnote_make(), self.render_data, 1)
+                else:
+                    if not footnote_data[0]:
+                        footnote_name = str(footnote_num)
+                        footnote_name_add = ''
+                    else:
+                        footnote_name = footnote_data[0]
+                        footnote_name_add = ' (' + str(footnote_num) + ')'
+
+                    if not footnote_data[1]:
+                        footnote_text_data = ''
+                    else:
+                        footnote_text_data = footnote_data[1]
+
+                    if footnote_name in self.data_footnote:
+                        self.data_footnote[footnote_name]['list'] += [str(footnote_num)]
+                        footnote_first = self.data_footnote[footnote_name]['list'][0]
+                    
+                        data_name = self.get_tool_data_storage('<sup><a id="rfn-' + str(footnote_num) + '" href="#fn-' + footnote_first + '">(' + footnote_name + ' (' + str(footnote_num) + ')' + ')</a></sup>', '', footnote_data_org)
+
+                        self.render_data = re.sub(footnote_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
+                    else:
+                        self.data_footnote[footnote_name] = {}
+                        self.data_footnote[footnote_name]['list'] = [str(footnote_num)]
+                        self.data_footnote[footnote_name]['data'] = footnote_text_data
+
+                        data_name = self.get_tool_data_storage('<sup><a id="rfn-' + str(footnote_num) + '" href="#fn-' + str(footnote_num) + '">(' + footnote_name + footnote_name_add + ')</a></sup>', '', footnote_data_org)
+
+                        self.render_data = re.sub(footnote_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
+
+            footnote_count_all -= 1
+
+        self.render_data += '<footnote_category>'
+        self.render_data += self.get_tool_footnote_make()
+
     def do_render_last(self):
         # remove front_br and back_br
         self.render_data = re.sub(r'\n?<front_br>', '', self.render_data)
@@ -675,8 +793,9 @@ class class_do_render_namumark:
         # self.do_render_middle()
         # self.do_render_list()
         # self.do_render_table()
-        self.do_render_macro()
         self.do_render_link()
+        self.do_redner_footnote()
+        self.do_render_macro()
         self.do_render_text()
         self.do_render_heading()
         self.do_render_last()

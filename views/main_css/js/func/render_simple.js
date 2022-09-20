@@ -73,7 +73,8 @@ let opennamu_do_render_simple_url = [
     '/other',
     '/setting/phrase',
     '/setting/main',
-    '/setting/external'
+    '/setting/external',
+    '/change/skin_set/main'
 ];
 if(opennamu_do_render_simple_url.includes(window.location.pathname)) {
     opennamu_do_render_simple('opennamu_simple_render');

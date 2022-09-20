@@ -122,7 +122,8 @@ a {
     height: 200px;
 }
 
-/* 위키 내용 관련 */
+/* render */
+/* - toc */
 #toc, .opennamu_TOC {
     border: 1px solid gainsboro;
     padding: 20px;
@@ -135,22 +136,49 @@ a {
     margin-top: 10px;
 }
 
+#toc_title, .opennamu_TOC_title {
+    font-size: 1.2rem;
+}
+
+/* - category */
+.opennamu_category {
+    border: 1px solid gainsboro;
+    
+    padding: 10px;
+}
+
+.opennamu_category_blur {
+    filter: blur(5px);
+}
+
+.opennamu_category_blur:hover {
+    filter: none;
+}
+
+#cate {
+    margin-top: 20px;
+}
+/* - footnote */
+.opennamu_footnote {
+    border-top: 1px solid gainsboro;
+
+    padding-top: 10px;
+}
+
+#footnote_data {
+    border-top: 1px solid gainsboro;
+    
+    padding-top: 10px;
+}
+
 #cate, pre, #redirect {
     border: 1px solid gainsboro;
     
     padding: 10px;
 }
 
-#cate {
-    margin-top: 20px;
-}
-
 pre {    
     white-space: pre-wrap;
-}
-
-#toc_title, .opennamu_TOC_title {
-    font-size: 1.2rem;
 }
 
 @media (max-width: 768px) {
@@ -172,12 +200,6 @@ pre {
     background-color: #efefef;
     
     border: 1px solid #cecece;
-}
-
-#footnote_data {
-    border-top: 1px solid gainsboro;
-    
-    padding-top: 10px;
 }
 
 hr {
