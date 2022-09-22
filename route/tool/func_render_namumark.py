@@ -691,7 +691,6 @@ class class_do_render_namumark:
         if self.data_category != '':
             data_name = self.get_tool_data_storage(self.data_category, '</div>', '')
 
-            print(flask.request.cookies.get('main_css_category_set', ''))
             if flask.request.cookies.get('main_css_category_set', '') == '':
                 if re.search(r'<footnote_category>', self.render_data):
                     self.render_data = re.sub(r'<footnote_category>', '<' + data_name + '></' + data_name + '>', self.render_data, 1)
@@ -705,14 +704,77 @@ class class_do_render_namumark:
         # slash text -> <slash_n>
         
         def do_render_slash_sub(match):
-            data_name = self.get_tool_data_storage(match.group(1), do_type = 'slash')
+            if match.group(1) == '<':
+                return '<'
+            else:
+                data_name = self.get_tool_data_storage(match.group(1), do_type = 'slash')
 
-            return '<' + data_name + '>'
+                return '<' + data_name + '>'
 
         self.render_data = re.sub(r'\\(&lt;|&gt;|&#x27;|&quot;|&amp;|.)', do_render_slash_sub, self.render_data)
 
+    def do_render_include_default(self):
+        def do_render_include_default_sub(match):
+            match_org = match.group(0)
+            match = match.groups()
+            if match[2] == '\\':
+                return match_org
+            else:
+                slash_add = ''
+                if match[0]:
+                    if len(match[0]) % 2 == 1:
+                        slash_add = '\\' * (len(match[0]) - 1)
+                    else:
+                        slash_add = match[0]
+
+                return slash_add + match[2]
+
+        self.render_data = re.sub(r'(\\+)?@([^@=]+)=((?:\\@|[^@])+)@', do_render_include_default_sub, self.render_data)
+
     def do_render_include(self):
-        pass
+        def do_render_include_sub(match):
+            match_org = match.group(0)
+            match = match.groups()
+
+            macro_split_regex = r'(?:^|,) *([^,]+)'
+            macro_split_sub_regex = r'(^[^=]+) *= *([^=]+)'
+
+            include_change_list = []
+            include_name = ''
+
+            data = re.findall(macro_split_regex, match[0])
+            for for_a in data:
+                data_sub = re.search(macro_split_sub_regex, for_a)
+                if data_sub:
+                    data_sub = data_sub.groups()
+                    
+                    data_sub_name = data_sub[0]
+                    data_sub_data = self.get_tool_data_restore(data_sub[1], do_type = 'slash')
+
+                    include_change_list += [[data_sub_name, data_sub_data]]
+                else:
+                    include_name = for_a
+
+            include_name_org = include_name
+            
+            include_name = self.get_tool_data_restore(include_name, do_type = 'slash')
+            include_name = html.unescape(include_name)
+
+            print('test')
+            data_end = class_do_render_namumark(
+                self.curs,
+                self.doc_name,
+                'test',
+                self.doc_include,
+                self.lang_data
+            )()
+
+            data_name = self.get_tool_data_storage('<opennamu_include name="' + re.sub(r'"', '&quot;', include_name) + '">' + data_end, '</opennamu_include>', match_org)
+
+            return '<' + data_name + '></' + data_name + '>'
+
+        print('test')
+        self.render_data = re.sub(r'\[include\(((?:(?!\[include\(|\)\]).)+)\)\]', do_render_include_sub, self.render_data)
 
     def do_render_middle(self):
         pass
@@ -786,9 +848,9 @@ class class_do_render_namumark:
         self.render_data = self.get_tool_data_restore(self.render_data)
 
     def __call__(self):
-        print(self.render_data)
-        # self.do_render_include()
+        self.do_render_include_default()
         self.do_render_slash()
+        self.do_render_include()
         self.do_render_math()
         # self.do_render_middle()
         # self.do_render_list()
