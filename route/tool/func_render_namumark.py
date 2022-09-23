@@ -760,20 +760,10 @@ class class_do_render_namumark:
             include_name = self.get_tool_data_restore(include_name, do_type = 'slash')
             include_name = html.unescape(include_name)
 
-            print('test')
-            data_end = class_do_render_namumark(
-                self.curs,
-                self.doc_name,
-                'test',
-                self.doc_include,
-                self.lang_data
-            )()
-
-            data_name = self.get_tool_data_storage('<opennamu_include name="' + re.sub(r'"', '&quot;', include_name) + '">' + data_end, '</opennamu_include>', match_org)
+            data_name = self.get_tool_data_storage('<a href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')', '</a>', match_org)
 
             return '<' + data_name + '></' + data_name + '>'
 
-        print('test')
         self.render_data = re.sub(r'\[include\(((?:(?!\[include\(|\)\]).)+)\)\]', do_render_include_sub, self.render_data)
 
     def do_render_middle(self):
