@@ -709,7 +709,7 @@ def get_default_robots_txt():
     if os.path.exists('sitemap.xml'):
         data += '' + \
             '\n' + \
-            'Sitemap: /sitemap.xml' + \
+            'Sitemap: ' + load_domain('full') + '/sitemap.xml' + \
         ''
 
     return data
