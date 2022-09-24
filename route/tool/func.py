@@ -604,6 +604,19 @@ def update(ver_num, set_data):
     if ver_num < 3500114:
         curs.execute(db_change('delete from alarm'))
 
+    if ver_num < 3500354:
+        curs.execute(db_change("select data from other where name = 'robot'"))
+        db_data = curs.fetchall()
+        if db_data:
+            robot_default = '' + \
+                'User-agent: *\n' + \
+                'Disallow: /\n' + \
+                'Allow: /$\n' + \
+                'Allow: /w/' + \
+            ''
+            if db_data[0][0] == robot_default:
+                curs.execute(db_change("insert into other (name, data) values ('robot_default', 'on')"))
+
     conn.commit()
     
     # 아이피 상태인 이메일 제거 예정
@@ -684,6 +697,22 @@ def set_init():
 ## Func-simple-without_DB
 def get_default_admin_group():
     return ['owner', 'ban']
+
+def get_default_robots_txt():
+    data = '' + \
+        'User-agent: *\n' + \
+        'Disallow: /\n' + \
+        'Allow: /$\n' + \
+        'Allow: /w/' + \
+    ''
+
+    if os.path.exists('sitemap.xml'):
+        data += '' + \
+            '\n' + \
+            'Sitemap: /sitemap.xml' + \
+        ''
+
+    return data
 
 def get_user_title_list():
     # default
@@ -1238,8 +1267,10 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                     'toc' : load_lang('toc'),
                     'category' : load_lang('category')
                 }
-                get_class_render = class_do_render(conn, render_lang_data)
-                return get_class_render.do_render(doc_name, doc_data, data_type, data_in)
+
+                get_class_render = class_do_render(conn, render_lang_data).do_render(doc_name, doc_data, data_type, data_in)
+
+                return get_class_render
             else:
                 return 'HTTP Request 404'
 
