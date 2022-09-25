@@ -1261,18 +1261,37 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
     else:
         if data_type == 'raw':
             return doc_data
-        else:
-            if doc_data != 0:
-                render_lang_data = {
-                    'toc' : load_lang('toc'),
-                    'category' : load_lang('category')
-                }
+        
+        if doc_data != 0:
+            render_lang_data = {
+                'toc' : load_lang('toc'),
+                'category' : load_lang('category')
+            }
 
-                get_class_render = class_do_render(conn, render_lang_data).do_render(doc_name, doc_data, data_type, data_in)
+            get_class_render = class_do_render(conn, render_lang_data).do_render(doc_name, doc_data, data_type, data_in)
 
-                return get_class_render
+            if data_type == 'backlink':
+                return ''
+
+            for include_data in get_class_render[2]['include']:
+                if acl_check(include_data[1], 'render') == 0:
+                    include_regex = re.compile('<div id="' + include_data[0] + '"><\/div>')
+                    
+                    include_data_render = class_do_render(conn, render_lang_data).do_render(include_data[1], include_data[2], data_type, include_data[0] + '_' + data_in)
+                    include_data_render[0] = '<div id="' + include_data[0] + '">' + include_data_render[0] + '</div>'
+
+                    get_class_render[0] = re.sub(include_regex, include_data_render[0], get_class_render[0])
+                    get_class_render[1] += include_data_render[1]
+
+            if data_type == 'api_view':
+                return [
+                    get_class_render[0], 
+                    get_class_render[1]
+                ]
             else:
-                return 'HTTP Request 404'
+                return get_class_render[0] + '<script>' + get_class_render[1] + '</script>'
+        else:
+            return 'HTTP Request 404'
 
 # Func-request
 def send_email(who, title, data):

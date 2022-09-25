@@ -129,7 +129,7 @@ class class_do_render:
                             name_doc = "''' + doc_name + '''"
                         );
                     ''',
-                    []
+                    {}
                 ]
             elif rep_data == 'namumark_beta':
                 doc_include = (data_in + '_') if data_in else ''
@@ -154,22 +154,20 @@ class class_do_render:
                         'render_part_id_add = "' + data_in + '",' + \
                         'doc_name = "' + doc_name + '"' + \
                     ').do_main();',
-                    []
+                    {}
                 ]
             else:
                 data_end = [
                     doc_data, 
                     '', 
-                    []
+                    {}
                 ]
 
-            if data_type == 'api_view':
-                return [
-                    data_end[0], 
-                    data_end[1]
-                ]
-            else:
-                return data_end[0] + '<script>' + data_end[1] + '</script>'
+            return [
+                data_end[0], 
+                data_end[1],
+                data_end[2]
+            ]
         else:
             if rep_data == 'namumark':
                 backlink = self.do_backlink_generate(
