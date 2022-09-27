@@ -33,42 +33,7 @@ td {
     padding: 8px 10px;
 }
 
-/* 링크 */
-a {
-    color: dodgerblue;
-    
-    text-decoration: none;
-}
-
-#not_thing {
-    color: red;
-}
-
-#inside, #out_link, #out_link::before, .opennamu_link_out {
-    color: green;
-}
-
-#out_link::before, .opennamu_link_out::before {
-    content: '🅴';
-    
-    font-weight: lighter;
-    
-    background: transparent;
-}
-
-#include_link {
-    display: none;
-}
-
-.hidden_link {
-    filter: blur(3px);
-}
-
-.hidden_link:hover {
-    filter: none;
-}
-
-/* 리스트 */
+/* list */
 .inside_ul li {
     margin-left: 20px;
 
@@ -76,7 +41,7 @@ a {
     margin-bottom: 5px;
 }
 
-/* 토론 관련 */
+/* thread */
 .opennamu_comment {
     width: 100%;
 }
@@ -123,6 +88,37 @@ a {
 }
 
 /* render */
+/* - link */
+a {
+    color: dodgerblue;
+    
+    text-decoration: none;
+}
+
+#not_thing, .opennamu_not_exist_link {
+    color: red;
+}
+
+.opennamu_same_link {
+    font-weight: bold;
+}
+
+#inside, #out_link, .opennamu_link_out {
+    color: green;
+}
+
+#out_link::before, .opennamu_link_out::before {
+    content: '🅴';
+    
+    font-weight: lighter;
+    
+    background: transparent;
+}
+
+#include_link {
+    display: none;
+}
+
 /* - toc */
 #toc, .opennamu_TOC {
     border: 1px solid gainsboro;
@@ -158,6 +154,15 @@ a {
 #cate {
     margin-top: 20px;
 }
+
+.hidden_link {
+    filter: blur(3px);
+}
+
+.hidden_link:hover {
+    filter: none;
+}
+
 /* - footnote */
 .opennamu_footnote {
     border-top: 1px solid gainsboro;
@@ -207,7 +212,7 @@ hr {
     border-top: 1px solid gainsboro;
 }
 
-.render_content_load, .render_content {
+.render_content_load, .render_content, .opennamu_render_complete {
     white-space: pre-wrap;
     
     line-break: anywhere;
