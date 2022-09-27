@@ -656,7 +656,7 @@ class class_do_render_namumark:
                         link_sub = ''
                         link_sub_storage = link_main_org
 
-                    data_name = self.get_tool_data_storage('<a class="opennamu_link_out" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
+                    data_name = self.get_tool_data_storage('<a class="opennamu_link_out" href="' + link_main + '">' + link_sub_storage, '</a>', link_data_full)
 
                     self.render_data = re.sub(link_regex, '<' + data_name + '>' + link_sub + '</' + data_name + '>', self.render_data, 1)
                 # in link
