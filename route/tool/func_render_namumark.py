@@ -7,7 +7,7 @@ class class_do_render_namumark:
         self.doc_data = doc_data
         self.doc_name = doc_name
         self.doc_include = doc_include
-        
+
         self.lang_data = lang_data
 
         self.data_temp_storage = {}
@@ -97,9 +97,6 @@ class class_do_render_namumark:
         return data
 
     def get_tool_footnote_make(self):
-        if self.doc_name != '':
-            return ''
-
         data = ''
         for for_a in self.data_footnote:
             if data == '':
@@ -111,9 +108,9 @@ class class_do_render_namumark:
                 data += '(' + for_a + ') '
 
                 for for_b in self.data_footnote[for_a]['list']:
-                    data += '<sup><a href="#rfn-' + for_b + '">(' + for_b + ')</a></sup> '
+                    data += '<sup><a id="' + self.doc_include + 'fn_' + for_b + '" href="#' + self.doc_include + 'rfn_' + for_b + '">(' + for_b + ')</a></sup> '
             else:
-                data += '<a href="#rfn-' + self.data_footnote[for_a]['list'][0] + '">(' + for_a + ') </a> '
+                data += '<a id="' + self.doc_include + 'fn_' + self.data_footnote[for_a]['list'][0] + '" href="#' + self.doc_include + 'rfn_' + self.data_footnote[for_a]['list'][0] + '">(' + for_a + ') </a> '
 
             data += self.data_footnote[for_a]['data']
 
@@ -583,6 +580,9 @@ class class_do_render_namumark:
                                 elif data_sub[0] == 'bgcolor':
                                     file_bgcolor = data_sub[1]
 
+                    link_main_org = ''
+                    link_sub = link_main
+
                     link_out_regex = r'^(외부|out):'
                     link_in_regex = r'^(파일|file):'
                     if re.search(link_out_regex, link_main):
@@ -591,11 +591,20 @@ class class_do_render_namumark:
                         link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                         link_main = html.unescape(link_main)
                         link_main = re.sub(r'"', '&quot;', link_main)
+                        
+                        link_exist = ''
                     else:
                         link_main = re.sub(link_in_regex, '', link_main)
 
                         link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                         link_main = html.unescape(link_main)
+
+                        self.curs.execute(db_change("select title from data where title = ?"), [link_main])
+                        db_data = self.curs.fetchall()
+                        if db_data:
+                            link_exist = ''
+                        else:
+                            link_exist = 'opennamu_not_exist_link'
                         
                         link_extension_regex = r'\.([^.]+)$'
                         link_extension = re.search(link_extension_regex, link_main)
@@ -605,6 +614,7 @@ class class_do_render_namumark:
                             link_extension = 'jpg'
 
                         link_main = re.sub(link_extension_regex, '', link_main)
+                        link_main_org = link_main
 
                         link_main = '/image/' + url_pas(sha224_replace(link_main)) + '.' + link_extension
 
@@ -612,9 +622,14 @@ class class_do_render_namumark:
                     if file_align == 'center':
                         file_end = '<div style="text-align:center;">' + file_end + '</div>'
 
-                    data_name = self.get_tool_data_storage(file_end, '', link_data_full)
+                    if link_exist != '':
+                        data_name = self.get_tool_data_storage('<a class="' + link_exist + '" href="/upload?name=' + url_pas(link_main_org) + '">', '</a>', link_data_full)
 
-                    self.render_data = re.sub(link_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
+                        self.render_data = re.sub(link_regex, '<' + data_name + '>' + link_sub + '</' + data_name + '>', self.render_data, 1)
+                    else:
+                        data_name = self.get_tool_data_storage(file_end, '', link_data_full)
+
+                        self.render_data = re.sub(link_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
                 # category
                 elif re.search(r'^(분류|category):', link_main):
                     link_main = re.sub(r'^(분류|category):', '', link_main)
@@ -631,15 +646,23 @@ class class_do_render_namumark:
                     if re.search(r'#blur$', link_main):
                         link_main = re.sub(r'#blur$', '', link_main)
 
-                        category_blur = 'class="opennamu_category_blur"'
+                        category_blur = 'opennamu_category_blur'
                     
                     link_sub = link_main
 
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_main = html.unescape(link_main)
+
+                    self.curs.execute(db_change("select title from data where title = ?"), [link_main])
+                    db_data = self.curs.fetchall()
+                    if db_data:
+                        link_exist = ''
+                    else:
+                        link_exist = 'opennamu_not_exist_link'
+
                     link_main = url_pas(link_main)
 
-                    self.data_category += '<a ' + category_blur + ' href="/w/' + link_main + '">' + link_sub + '</a>'
+                    self.data_category += '<a class="' + category_blur + ' ' + link_exist + '" href="/w/' + link_main + '">' + link_sub + '</a>'
 
                     self.render_data = re.sub(link_regex, '', self.render_data, 1)
                 # out link
@@ -683,6 +706,18 @@ class class_do_render_namumark:
                     # main link fix
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_main = html.unescape(link_main)
+
+                    self.curs.execute(db_change("select title from data where title = ?"), [link_main])
+                    db_data = self.curs.fetchall()
+                    if db_data:
+                        link_exist = ''
+                    else:
+                        link_exist = 'opennamu_not_exist_link'
+
+                    link_same = ''
+                    if link_main == self.doc_name and self.doc_include == '':
+                        link_same = 'opennamu_same_link'
+
                     link_main = url_pas(link_main)
 
                     if link_main != '':
@@ -696,7 +731,7 @@ class class_do_render_namumark:
                         link_sub = ''
                         link_sub_storage = link_main_org
 
-                    data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
+                    data_name = self.get_tool_data_storage('<a class="' + link_exist + ' ' + link_same + '" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
 
                     self.render_data = re.sub(link_regex, '<' + data_name + '>' + link_sub + '</' + data_name + '>', self.render_data, 1)
 
@@ -801,32 +836,34 @@ class class_do_render_namumark:
                 include_name = self.get_tool_data_restore(include_name, do_type = 'slash')
                 include_name = html.unescape(include_name)
 
-                # include link func
-                include_link = ''
-                if flask.request.cookies.get('main_css_include_link', '') == '1':
-                    include_link = '<div><a href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
-
                 # load include db data
                 self.curs.execute(db_change("select data from data where title = ?"), [include_name])
                 db_data = self.curs.fetchall()
                 if db_data:
+                    # include link func
+                    include_link = ''
+                    if flask.request.cookies.get('main_css_include_link', '') == '1':
+                        include_link = '<div><a href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
+
                     include_data = db_data[0][0]
+
+                    # parameter replace
+                    include_data = re.sub(r'(\\+)?@([^@=]+)=((?:\\@|[^@])+)@', do_render_include_default_sub, include_data)
+                    include_data = re.sub(r'(\\+)?@([^@=]+)@', do_render_include_default_sub, include_data)
+
+                    # remove include
+                    include_data = re.sub(include_regex, '', include_data)
+
+                    self.data_include += [['opennamu_include_' + str(include_num), include_name, include_data]]
+
+                    data_name = self.get_tool_data_storage('' + \
+                        include_link + \
+                        '<div id="opennamu_include_' + str(include_num) + '"></div>' + \
+                    '', '', match_org)
                 else:
-                    include_data = ''
+                    include_link = '<div><a class="opennamu_not_exist_link" href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
 
-                # parameter replace
-                include_data = re.sub(r'(\\+)?@([^@=]+)=((?:\\@|[^@])+)@', do_render_include_default_sub, include_data)
-                include_data = re.sub(r'(\\+)?@([^@=]+)@', do_render_include_default_sub, include_data)
-
-                # remove include
-                include_data = re.sub(include_regex, '', include_data)
-
-                self.data_include += [['opennamu_include_' + str(include_num), include_name, include_data]]
-
-                data_name = self.get_tool_data_storage('' + \
-                    include_link + \
-                    '<div id="opennamu_include_' + str(include_num) + '"></div>' + \
-                '', '', match_org)
+                    data_name = self.get_tool_data_storage(include_link, '', match_org)
 
                 self.render_data = re.sub(include_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
 
@@ -875,7 +912,7 @@ class class_do_render_namumark:
                         self.data_footnote[footnote_name]['list'] += [str(footnote_num)]
                         footnote_first = self.data_footnote[footnote_name]['list'][0]
                     
-                        data_name = self.get_tool_data_storage('<sup><a id="rfn-' + str(footnote_num) + '" href="#fn-' + footnote_first + '">(' + footnote_name + ' (' + str(footnote_num) + ')' + ')</a></sup>', '', footnote_data_org)
+                        data_name = self.get_tool_data_storage('<sup><a id="' + self.doc_include + 'rfn_' + str(footnote_num) + '" href="#' + self.doc_include + 'fn_' + footnote_first + '">(' + footnote_name + ' (' + str(footnote_num) + ')' + ')</a></sup>', '', footnote_data_org)
 
                         self.render_data = re.sub(footnote_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
                     else:
@@ -883,7 +920,7 @@ class class_do_render_namumark:
                         self.data_footnote[footnote_name]['list'] = [str(footnote_num)]
                         self.data_footnote[footnote_name]['data'] = footnote_text_data
 
-                        data_name = self.get_tool_data_storage('<sup><a id="rfn-' + str(footnote_num) + '" href="#fn-' + str(footnote_num) + '">(' + footnote_name + footnote_name_add + ')</a></sup>', '', footnote_data_org)
+                        data_name = self.get_tool_data_storage('<sup><a id="' + self.doc_include + 'rfn_' + str(footnote_num) + '" href="#' + self.doc_include + 'fn_' + str(footnote_num) + '">(' + footnote_name + footnote_name_add + ')</a></sup>', '', footnote_data_org)
 
                         self.render_data = re.sub(footnote_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
 
@@ -894,7 +931,7 @@ class class_do_render_namumark:
 
     def do_render_last(self):
         # add category
-        if self.doc_name == '':
+        if self.doc_include == '':
             if self.data_category != '':
                 data_name = self.get_tool_data_storage(self.data_category, '</div>', '')
 
@@ -920,6 +957,8 @@ class class_do_render_namumark:
 
         # <render_n> restore
         self.render_data = self.get_tool_data_restore(self.render_data)
+
+        self.render_data = '<div class="opennamu_render_complete">' + self.render_data + '</div>'
 
     def __call__(self):
         self.do_render_include_default()

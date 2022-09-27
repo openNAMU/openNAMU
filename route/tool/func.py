@@ -1278,7 +1278,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                     if acl_check(include_data[1], 'render') == 0:
                         include_regex = re.compile('<div id="' + include_data[0] + '"><\/div>')
                         
-                        include_data_render = class_do_render(conn, render_lang_data).do_render(include_data[1], include_data[2], data_type, include_data[0] + '_' + data_in)
+                        include_data_render = class_do_render(conn, render_lang_data).do_render(include_data[1], include_data[2], data_type, include_data[0] + data_in)
                         include_data_render[0] = '<div id="' + include_data[0] + '">' + include_data_render[0] + '</div>'
 
                         get_class_render[0] = re.sub(include_regex, include_data_render[0], get_class_render[0])
