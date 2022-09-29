@@ -599,7 +599,7 @@ class class_do_render_namumark:
                         link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                         link_main = html.unescape(link_main)
 
-                        self.curs.execute(db_change("select title from data where title = ?"), [link_main])
+                        self.curs.execute(db_change("select title from data where title = ?"), ['file:' + link_main])
                         db_data = self.curs.fetchall()
                         if db_data:
                             link_exist = ''
@@ -653,7 +653,7 @@ class class_do_render_namumark:
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_main = html.unescape(link_main)
 
-                    self.curs.execute(db_change("select title from data where title = ?"), [link_main])
+                    self.curs.execute(db_change("select title from data where title = ?"), ['category:' + link_main])
                     db_data = self.curs.fetchall()
                     if db_data:
                         link_exist = ''
@@ -662,7 +662,7 @@ class class_do_render_namumark:
 
                     link_main = url_pas(link_main)
 
-                    self.data_category += '<a class="' + category_blur + ' ' + link_exist + '" href="/w/' + link_main + '">' + link_sub + '</a>'
+                    self.data_category += '<a class="' + category_blur + ' ' + link_exist + '" href="/w/category:' + link_main + '">' + link_sub + '</a>'
 
                     self.render_data = re.sub(link_regex, '', self.render_data, 1)
                 # out link

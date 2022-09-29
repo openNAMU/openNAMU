@@ -101,6 +101,10 @@ header a#logo:hover {
     padding-bottom: 10px;
 }
 
+.top_cel_in a:hover {
+    background-color: #e3baf1;
+}
+
 div#menu {
     margin-top: 10px;
 

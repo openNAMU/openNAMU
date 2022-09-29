@@ -158,7 +158,12 @@
         <section>
             <header id="section">
                 <article class="main" id="title">
-                    <h1 class="blank"><span class="change_space">{{imp[0]}}</span></h1>
+                    <h1 class="blank">
+                        <span class="change_space">{{imp[0]}}</span>
+                        {% if imp[3][0] != 0 %}
+                            <sub>{{imp[3][0]}}</sub>
+                        {% endif %}
+                    </h1>
                     {% if menu != 0 %}
                         <div id="menu">
                             {% for menu_data in menu %}

@@ -11,36 +11,36 @@ def topic_tool(topic_num = 1):
         close_data = curs.fetchall()
         if close_data:
             if close_data[0][0] == 'S':
-                t_state = 'Stop'
+                t_state = load_lang('topic_stop')
             elif close_data[0][0] == 'O':
-                t_state = 'Close'
+                t_state = load_lang('topic_close')
             else:
-                t_state = 'Normal'
+                t_state = load_lang('topic_normal')
                 
             if close_data[0][1] == 'O':
-                t_state += ' (Agree)'
+                t_state += ' (' + load_lang('topic_agree') + ')'
         else:
-            t_state = 'Normal'
+            t_state = load_lang('topic_normal')
 
         curs.execute(db_change("select acl from rd where code = ?"), [topic_num])
         db_data = curs.fetchall()
         if db_data:
             if db_data[0][0] == '':
-                acl_state = 'Normal'
+                acl_state = 'normal'
             else:
                 acl_state = db_data[0][0]
         else:
-            acl_state = 'Normal'
+            acl_state = 'normal'
         
         curs.execute(db_change("select set_data from topic_set where thread_code = ? and set_name = 'thread_view_acl'"), [topic_num])
         db_data = curs.fetchall()
         if db_data:
             if db_data[0][0] == '':
-                acl_view_state = 'Normal'
+                acl_view_state = 'normal'
             else:
                 acl_view_state = db_data[0][0]
         else:
-            acl_view_state = 'Normal'
+            acl_view_state = 'normal'
 
         if admin_check(3) == 1:
             data = '''
