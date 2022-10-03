@@ -482,5 +482,6 @@
     "topic_state_change_disagree" : "관리자가 토론의 합의를 파기했습니다.",
     "topic_normal" : "일반",
     "topic_stop" : "중지",
-    "topic_close" : "닫힘"
+    "topic_close" : "닫힘",
+    "turn_off_monaco" : "모나코 에디터 끄기"
 }
