@@ -125,10 +125,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 warning_edit += '<hr class="main_hr">'
                 editor_top_text = warning_edit + editor_top_text
     
-            editor_top_text += '' + \
-                '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>' + \
-                '<hr class="main_hr">' + \
-            ''
+            editor_top_text += '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
     
             curs.execute(db_change('select data from other where name = "edit_help"'))
             sql_d = curs.fetchall()
@@ -136,7 +133,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
     
             data = re.sub(r'\n+$', '', data)
             
-            # 이 파트 JS로 이동 예정
             monaco_on = flask.request.cookies.get('main_css_monaco', '0')
             if monaco_on == '1':
                 editor_display = 'style="display: none;"'
@@ -146,7 +142,18 @@ def edit(name = 'Test', section = 0, do_type = ''):
                             data-name="vs/editor/editor.main" 
                             href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"></script>
+                    <script>
+                        function opennamu_edit_turn_off_monaco() {
+                            do_monaco_to_textarea();
+
+                            document.getElementById('opennamu_js_edit_textarea_view').style.display = 'block';
+                            document.getElementById('opennamu_monaco_editor').style.display = 'none';
+                            document.getElementById('opennamu_monaco_editor').remove();
+                        }
+                    </script>
                 '''
+
+                editor_top_text += ' <a href="javascript:opennamu_edit_turn_off_monaco();">(' + load_lang('turn_off_monaco') + ')</a>'
                 
                 if flask.request.cookies.get('main_css_darkmode', '0') == '1':
                     monaco_thema = 'vs-dark'
@@ -156,7 +163,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 add_script = '''
                     require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs' }});
                     require(["vs/editor/editor.main"], function () {
-                        window.editor = monaco.editor.create(document.getElementById('monaco_editor'), {
+                        window.editor = monaco.editor.create(document.getElementById('opennamu_monaco_editor'), {
                             value: document.getElementById('opennamu_js_edit_textarea_view').value,
                             language: 'plaintext',
                             wordWrap: true,
@@ -170,10 +177,13 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 monaco_display = 'style="display: none;"'
                 add_get_file = ''
                 add_script = ''
+
+            if editor_top_text != '':
+                editor_top_text += '<hr class="main_hr">'
     
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('edit') + ')', 0])],
-                data =  editor_top_text + add_get_file + '''                    
+                data =  editor_top_text + add_get_file + '''
                     <form method="post">
                         <textarea style="display: none;" id="opennamu_js_edit_origin">''' + html.escape(data) + '''</textarea>
                         <textarea style="display: none;" id="opennamu_js_edit_textarea" name="content"></textarea>
@@ -181,7 +191,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                         
                         <div>''' + edit_button(monaco_on) + '''</div>
                         
-                        <div id="monaco_editor" class="content" ''' + monaco_display + '''></div>
+                        <div id="opennamu_monaco_editor" class="content" ''' + monaco_display + '''></div>
                         <textarea id="opennamu_js_edit_textarea_view" ''' + editor_display + ''' class="content" placeholder="''' + p_text + '''">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
                         

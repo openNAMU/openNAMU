@@ -13,7 +13,9 @@ function do_stop_exit() {
 }
 
 function do_insert_edit_data() {
-    do_monaco_to_textarea();
+    if(document.getElementById('opennamu_monaco_editor')) {
+        do_monaco_to_textarea();
+    }
     
     let get_data = document.getElementById('opennamu_js_edit_textarea_view').value;
     
