@@ -1138,13 +1138,29 @@ def wiki_custom():
     curs = conn.cursor()
 
     ip = ip_check()
+    skin_name = '_' + skin_check(1)
+
     if ip_or_user(ip) == 0:
         user_icon = 1
         user_name = ip
 
-        curs.execute(db_change("select data from user_set where id = ? and name = 'custom_css'"), [ip])
-        user_head = curs.fetchall()
-        user_head = user_head[0][0] if user_head else ''
+        if 'head' in flask.session:
+            user_head = flask.session['head']
+        else:
+            curs.execute(db_change("select data from user_set where id = ? and name = 'custom_css'"), [ip])
+            user_head = curs.fetchall()
+            user_head = user_head[0][0] if user_head else ''
+
+            flask.session['head'] = user_head[0][0]
+
+        if 'head' + skin_name in flask.session:
+            user_head += flask.session['head' + skin_name]
+        else:
+            curs.execute(db_change("select data from user_set where id = ? and name = ?"), [ip, 'custom_css' + skin_name])
+            user_head = curs.fetchall()
+            user_head += user_head[0][0] if user_head else ''
+
+            flask.session['head' + skin_name] = user_head[0][0]
         
         curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
         email = curs.fetchall()
@@ -1176,6 +1192,7 @@ def wiki_custom():
         user_acl_list = '0'
         user_notice = '0'
         user_head = flask.session['head'] if 'head' in flask.session else ''
+        user_head += flask.session['head' + skin_name] if 'head' + skin_name in flask.session else ''
 
     curs.execute(db_change("select title from rd where title = ? and stop = ''"), ['user:' + ip])
     user_topic = '1' if curs.fetchall() else '0'

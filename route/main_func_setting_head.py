@@ -65,10 +65,14 @@ def main_func_setting_head(num, skin_name = ''):
                 curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
                 title = '_head'
                 start = '' + \
-                    '<a href="?">(' + load_lang('all') + ')</a> ' + \
-                    ' '.join(['<a href="/setting/head/' + i + '">(' + i + ')</a>' for i in load_skin('', 1)]) + '''
+                    '<a href="/setting/head">(' + load_lang('all') + ')</a> ' + \
+                    ' '.join(['<a href="/setting/head/' + url_pas(i) + '">(' + html.escape(i) + ')</a>' for i in load_skin('', 1)]) + '''
                     <hr class="main_hr">
-                    <span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span>
+                    <span>
+                        &lt;style&gt;CSS&lt;/style&gt;
+                        <br>
+                        &lt;script&gt;JS&lt;/script&gt;
+                    </span>
                     <hr class="main_hr">
                 '''
                 plus = ''
@@ -91,6 +95,7 @@ def main_func_setting_head(num, skin_name = ''):
                         ''' + start + '''
                         <textarea rows="25" placeholder="''' + load_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
+                        ''' + (load_lang('main_css_warning') + '<hr class="main_hr">' if title == '_head' else '') + '''
                         <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
                         ''' + plus + '''
                     </form>
