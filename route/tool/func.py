@@ -1148,8 +1148,8 @@ def wiki_custom():
             user_head = flask.session['head']
         else:
             curs.execute(db_change("select data from user_set where id = ? and name = 'custom_css'"), [ip])
-            user_head = curs.fetchall()
-            user_head = user_head[0][0] if user_head else ''
+            db_data = curs.fetchall()
+            user_head = db_data[0][0] if db_data else ''
 
             flask.session['head'] = user_head[0][0]
 
@@ -1157,8 +1157,8 @@ def wiki_custom():
             user_head += flask.session['head' + skin_name]
         else:
             curs.execute(db_change("select data from user_set where id = ? and name = ?"), [ip, 'custom_css' + skin_name])
-            user_head = curs.fetchall()
-            user_head += user_head[0][0] if user_head else ''
+            db_data = curs.fetchall()
+            user_head += db_data[0][0] if db_data else ''
 
             flask.session['head' + skin_name] = user_head[0][0]
         
