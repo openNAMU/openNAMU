@@ -61,10 +61,13 @@ def edit(name = 'Test', section = 0, do_type = ''):
                                 else:
                                     data_match_b = 'inf'
 
-                                if data_match_b != 'inf':
-                                    content = o_data[ : data_match_a] + content + o_data[data_match_b : ]
-                                else:
-                                    content = o_data[ : data_match_a] + content
+                                try:
+                                    if data_match_b != 'inf':
+                                        content = o_data[ : data_match_a] + content + o_data[data_match_b : ]
+                                    else:
+                                        content = o_data[ : data_match_a] + content
+                                except:
+                                    pass
     
                 leng = leng_check(len(o_data), len(content))
                 
@@ -148,7 +151,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                                 break
                             elif count > section:
                                 data_section = ''
-                                
+
                                 break
 
                             if section == count:
