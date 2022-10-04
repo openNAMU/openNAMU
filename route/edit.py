@@ -47,8 +47,24 @@ def edit(name = 'Test', section = 0, do_type = ''):
             
             curs.execute(db_change("select data from data where title = ?"), [name])
             old = curs.fetchall()
-            if old:  
+            if old:
                 o_data = old[0][0].replace('\r\n', '\n')
+
+                if section != '':
+                    if flask.request.form.get('doc_section_edit_apply', 'X') != 'X':
+                        if flask.request.form.get('doc_section_data_where', '') != '':
+                            data_match_where = flask.request.form.get('doc_section_data_where', '').split(',')
+                            if len(data_match_where) == 2:
+                                data_match_a = int(number_check(data_match_where[0]))
+                                if data_match_where[1] != 'inf':
+                                    data_match_b = int(number_check(data_match_where[1]))
+                                else:
+                                    data_match_b = 'inf'
+
+                                if data_match_b != 'inf':
+                                    content = o_data[ : data_match_a] + content + o_data[data_match_b : ]
+                                else:
+                                    content = o_data[ : data_match_a] + content
     
                 leng = leng_check(len(o_data), len(content))
                 
@@ -90,6 +106,11 @@ def edit(name = 'Test', section = 0, do_type = ''):
             return redirect('/w/' + url_pas(name) + section)
         else:
             editor_top_text = ''
+
+            doc_section_edit_apply = 'X'
+            data_section = ''
+            data_section_where = ''
+
             if edit_repeat == 'get':
                 if do_type == 'load':
                     if flask.session and 'edit_load_document' in flask.session:
@@ -106,9 +127,49 @@ def edit(name = 'Test', section = 0, do_type = ''):
                     load_title = name
                     
                 curs.execute(db_change("select data from data where title = ?"), [load_title])
-                sql_d = curs.fetchall()
-                data = sql_d[0][0] if sql_d else ''
+                db_data = curs.fetchall()
+                data = db_data[0][0] if db_data else ''
                 data = data.replace('\r\n', '\n')
+
+                if section != '':
+                    curs.execute(db_change('select data from other where name = "markup"'))
+                    db_data = curs.fetchall()
+                    db_data = db_data[0][0] if db_data else 'namumark'
+                    if db_data == 'namumark':
+                        count = 1
+                        data_section = '\n' + data + '\n'
+                        
+                        while 1:
+                            data_match_re = r'\n((={1,6})(#?) ?([^\n]+))\n'
+                            data_match = re.search(data_match_re, data_section)
+                            if not data_match:
+                                data_section = ''
+
+                                break
+                            elif count > section:
+                                data_section = ''
+                                
+                                break
+
+                            if section == count:
+                                data_section_sub = data_section
+                                data_section_sub = re.sub(data_match_re, '.' * len(data_match.group(0)), data_section_sub, 1)
+
+                                data_match_plus = re.search(data_match_re, data_section_sub)
+                                if data_match_plus:
+                                    data_section = data[data_match.span()[0] : data_match_plus.span()[0] - 1]
+                                    data_section_where = str(data_match.span()[0]) + ',' + str(data_match_plus.span()[0] - 1)
+                                else:
+                                    data_section = data[data_match.span()[0] : ]
+                                    data_section_where = str(data_match.span()[0]) + ',inf'
+
+                                doc_section_edit_apply = 'O'
+
+                                break
+                            else:
+                                data_section = re.sub(data_match_re, '.' * len(data_match.group(0)), data_section, 1)
+
+                            count += 1
             else:
                 data = flask.request.form.get('content', '')
                 warning_edit = load_lang('exp_edit_conflict') + ' '
@@ -124,14 +185,15 @@ def edit(name = 'Test', section = 0, do_type = ''):
     
                 warning_edit += '<hr class="main_hr">'
                 editor_top_text = warning_edit + editor_top_text
+
+            if data_section == '':
+                data_section = data
     
             editor_top_text += '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
     
             curs.execute(db_change('select data from other where name = "edit_help"'))
             sql_d = curs.fetchall()
             p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
-    
-            data = re.sub(r'\n+$', '', data)
             
             monaco_on = flask.request.cookies.get('main_css_monaco', '0')
             if monaco_on == '1':
@@ -180,19 +242,24 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
             if editor_top_text != '':
                 editor_top_text += '<hr class="main_hr">'
+
+            sub_menu = ' (' + str(section) + ')' if section != '' else ''
     
             return easy_minify(flask.render_template(skin_check(), 
-                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('edit') + ')', 0])],
+                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('edit') + ')' + sub_menu, 0])],
                 data =  editor_top_text + add_get_file + '''
                     <form method="post">
-                        <textarea style="display: none;" id="opennamu_js_edit_origin">''' + html.escape(data) + '''</textarea>
+                        <textarea style="display: none;" id="opennamu_js_edit_origin" name="doc_data_org">''' + html.escape(data_section) + '''</textarea>
+                        <textarea style="display: none;" name="doc_section_data_where">''' + data_section_where + '''</textarea>
+                        <input style="display: none;" name="doc_section_edit_apply" value="''' + doc_section_edit_apply + '''">
+
                         <textarea style="display: none;" id="opennamu_js_edit_textarea" name="content"></textarea>
                         <input style="display: none;" name="ver" value="''' + doc_ver + '''">
                         
                         <div>''' + edit_button(monaco_on) + '''</div>
                         
                         <div id="opennamu_monaco_editor" class="content" ''' + monaco_display + '''></div>
-                        <textarea id="opennamu_js_edit_textarea_view" ''' + editor_display + ''' class="content" placeholder="''' + p_text + '''">''' + html.escape(data) + '''</textarea>
+                        <textarea id="opennamu_js_edit_textarea_view" ''' + editor_display + ''' class="content" placeholder="''' + p_text + '''">''' + html.escape(data_section) + '''</textarea>
                         <hr class="main_hr">
                         
                         <input placeholder="''' + load_lang('why') + '''" name="send">
