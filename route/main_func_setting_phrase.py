@@ -25,7 +25,10 @@ def main_func_setting_phrase():
             'upload_help',
             'upload_default',
             'license',
-            'topic_text'
+            'topic_text',
+            'phrase_user_page_admin',
+            'phrase_user_page_owner',
+            'phrase_old_page_warring'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
@@ -57,7 +60,7 @@ def main_func_setting_phrase():
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('text_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
-                    <form method="post" id="main_set_data">
+                    <form method="post" id="opennamu_simple_render">
                         <h2>1. ''' + load_lang('register_text') + ''' (HTML)</h2>
                         <textarea rows="3" name="''' + i_list[0] + '''">''' + html.escape(d_list[0]) + '''</textarea>
 
@@ -113,14 +116,26 @@ def main_func_setting_phrase():
 
                         <h2>18. ''' + load_lang('topic_text') + '''</h2>
                         <textarea rows="3" name="''' + i_list[17] + '''">''' + html.escape(d_list[17]) + '''</textarea>
+                        
+                        <h2>19. ''' + load_lang('phrase_user_page_admin') + ''' (HTML)</h2>
+                        <textarea rows="3" name="''' + i_list[18] + '''">''' + html.escape(d_list[18]) + '''</textarea>
+                        
+                        <h2>20. ''' + load_lang('phrase_user_page_owner') + ''' (HTML)</h2>
+                        <textarea rows="3" name="''' + i_list[19] + '''">''' + html.escape(d_list[19]) + '''</textarea>
+
+                        <h2>21. ''' + load_lang('phrase_old_page_warring') + ''' (''' + load_lang('beta') + ''') (HTML)</h2>
+                        <textarea rows="3" name="''' + i_list[20] + '''">''' + html.escape(d_list[20]) + '''</textarea>
 
                         <hr class="main_hr">
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                     <ul id="footnote_data">
-                        <li><a href="#note_1" id="note_1_end">(1)</a> ''' + load_lang('approval_question_visible_only_when_approval_on') + '''</li>
+                        <li>
+                            <a href="#note_1" id="note_1_end">(1)</a>
+                            <a href="/setting/main">''' + load_lang('approval_question_visible_only_when_approval_on') + '''</a>
+                        </li>
                     </ul>
-                    <script>simple_render('main_set_data');</script>
+                    <!-- JS : opennamu_do_render_simple -->
                 ''',
                 menu = [['setting', load_lang('return')]]
             ))

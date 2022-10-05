@@ -73,7 +73,7 @@ def vote_select(num = 1):
             ''
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('vote'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                imp = [load_lang('vote'), wiki_set(), wiki_custom(), wiki_css(['(' + num + ')', 0])],
                 data = data,
                 menu = [['vote', load_lang('return')], ['vote/end/' + num, load_lang('result')]]
             ))

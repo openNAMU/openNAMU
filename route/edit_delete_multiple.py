@@ -1,7 +1,7 @@
 from .tool.func import *
 from . import edit_delete
 
-def edit_delete_mutiple():
+def edit_delete_multiple():
     with get_db_connect() as conn:
         curs = conn.cursor()
 

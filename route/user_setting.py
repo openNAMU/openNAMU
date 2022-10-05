@@ -100,8 +100,7 @@ def user_setting():
                     imp = [load_lang('user_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
-                            <div id="get_user_info"></div>
-                            <script>load_user_info("''' + ip + '''");</script>
+                            <div id="opennamu_get_user_info">''' + ip + '''</div>
                             <hr class="main_hr">
                             <a href="/change/pw">(''' + load_lang('password_change') + ''')</a>
                             <hr class="main_hr">
@@ -123,17 +122,12 @@ def user_setting():
                             <hr class="main_hr">
                             <select name="user_title">''' + div4 + '''</select>
                             <h2>''' + load_lang('2fa') + '''</h2>
-                            <select name="2fa"
-                                    id="twofa_check_input"
-                                    onchange="do_twofa_check(0);">''' + fa_data_select + '''</select>
-                            <div id="fa_plus_content">
-                                <hr class="main_hr">
-                                <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
-                            </div>
+                            <select name="2fa" id="twofa_check_input">''' + fa_data_select + '''</select>
+                            <hr class="main_hr">
+                            <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
                             <hr class="main_hr">
                             <button type="submit">''' + load_lang('save') + '''</button>
                             ''' + http_warning() + '''
-                            <script>do_twofa_check(1);</script>
                         </form>
                     ''',
                     menu = [['user', load_lang('return')]]
@@ -165,8 +159,7 @@ def user_setting():
                     imp = [load_lang('user_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
-                            <div id="get_user_info"></div>
-                            <script>load_user_info("''' + ip + '''");</script>
+                            <div id="opennamu_get_user_info">''' + ip + '''</div>
                             <hr class="main_hr">
                             <h2>''' + load_lang('main') + '''</h2>
                             <span>''' + load_lang('skin') + '''</span>

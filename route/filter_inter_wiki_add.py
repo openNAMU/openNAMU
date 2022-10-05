@@ -150,10 +150,10 @@ def filter_inter_wiki_add(tool, name = None):
                 if stat == '':
                     t_data = [
                         ['86400', load_lang('1_day')],
-                        ['432000‬', load_lang('5_day')],
+                        ['432000', load_lang('5_day')],
                         ['2592000', load_lang('30_day')],
                         ['15552000', load_lang('180_day')],
-                        ['31104000‬', load_lang('360_day')],
+                        ['31104000', load_lang('360_day')],
                         ['0', load_lang('limitless')]
                     ]
                     for i in t_data:

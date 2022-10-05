@@ -66,31 +66,38 @@ def main_func_setting_acl():
                     <form method="post">
                         <a href="/acl/TEST#exp">(''' + load_lang('reference') + ''')</a>
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('document_acl') + '''</span> 
                         <hr class="main_hr">
                         <select ''' + disable + ''' name="edit">''' + acl_div[0] + '''</select>
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('discussion_acl') + '''</span>
                         <hr class="main_hr">
                         <select ''' + disable + ''' name="discussion">''' + acl_div[1] + '''</select>
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('upload_acl') + '''</span>
                         <hr class="main_hr">
                         <select ''' + disable + ''' name="upload_acl">''' + acl_div[2] + '''</select>
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('view_acl') + '''</span>
                         <hr class="main_hr">
                         <select ''' + disable + ''' name="all_view_acl">''' + acl_div[3] + '''</select>
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('many_upload_acl') + '''</span>
                         <hr class="main_hr">
                         <select ''' + disable + ''' name="many_upload_acl">''' + acl_div[4] + '''</select>
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('vote_acl') + '''</span>
                         <hr class="main_hr">
                         <select ''' + disable + ''' name="vote_acl">''' + acl_div[5] + '''</select>
                         <hr class="main_hr">
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
                 menu = [['setting', load_lang('return')]]

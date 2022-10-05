@@ -48,27 +48,31 @@ def main_func_setting_head(num, skin_name = ''):
                 title = '_body'
                 start = ''
                 plus = '''
-                    <button id="preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
+                    <button id="opennamu_js_preview" type="button" onclick="load_raw_preview(\'content\', \'opennamu_js_preview_area\')">''' + load_lang('preview') + '''</button>
                     <hr class="main_hr">
-                    <div id="see_preview"></div>
+                    <div id="opennamu_js_preview_area"></div>
                 '''
             elif num == 7:
                 curs.execute(db_change("select data from other where name = 'bottom_body'"))
                 title = '_bottom_body'
                 start = ''
                 plus = '''
-                    <button id="preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
+                    <button id="opennamu_js_preview" type="button" onclick="load_raw_preview(\'content\', \'opennamu_js_preview_area\')">''' + load_lang('preview') + '''</button>
                     <hr class="main_hr">
-                    <div id="see_preview"></div>
+                    <div id="opennamu_js_preview_area"></div>
                 '''
             else:
                 curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
                 title = '_head'
                 start = '' + \
-                    '<a href="?">(' + load_lang('all') + ')</a> ' + \
-                    ' '.join(['<a href="/setting/head/' + i + '">(' + i + ')</a>' for i in load_skin('', 1)]) + '''
+                    '<a href="/setting/head">(' + load_lang('all') + ')</a> ' + \
+                    ' '.join(['<a href="/setting/head/' + url_pas(i) + '">(' + html.escape(i) + ')</a>' for i in load_skin('', 1)]) + '''
                     <hr class="main_hr">
-                    <span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span>
+                    <span>
+                        &lt;style&gt;CSS&lt;/style&gt;
+                        <br>
+                        &lt;script&gt;JS&lt;/script&gt;
+                    </span>
                     <hr class="main_hr">
                 '''
                 plus = ''
@@ -91,7 +95,8 @@ def main_func_setting_head(num, skin_name = ''):
                         ''' + start + '''
                         <textarea rows="25" placeholder="''' + load_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        ''' + (load_lang('main_css_warning') + '<hr class="main_hr">' if title == '_head' else '') + '''
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
                         ''' + plus + '''
                     </form>
                 ''',

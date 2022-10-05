@@ -1,11 +1,16 @@
 from .tool.func import *
 
-def main_func_upload():
+def edit_upload():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         if acl_check(None, 'upload') == 1:
             return re_error('/ban')
+        
+        curs.execute(db_change('select data from other where name = "upload"'))
+        db_data = curs.fetchall()
+        file_max = number_check(db_data[0][0]) if db_data and db_data[0][0] != '' else '2'
+        file_max = int(file_max)
 
         if flask.request.method == 'POST':
             if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
@@ -14,12 +19,9 @@ def main_func_upload():
                 captcha_post('', 0)
 
             file_data = flask.request.files.getlist("f_data[]", None)
-            if not file_data:
-                return re_error('/error/9')
-
             file_len = len(file_data)
 
-            if (int(wiki_set(3)) * 1000 * 1000 * file_len) < flask.request.content_length:
+            if (file_max * 1000 * 1000 * file_len) < flask.request.content_length:
                 return re_error('/error/17')
 
             if file_len == 1:    
@@ -31,6 +33,9 @@ def main_func_upload():
                 file_num = 1
 
             for data in file_data:
+                if data.filename == '':
+                    return re_error('/error/9')
+                
                 value = os.path.splitext(data.filename)[1]
 
                 curs.execute(db_change("select html from html_filter where kind = 'extension'"))
@@ -108,7 +113,7 @@ def main_func_upload():
                 if file_num:
                     file_num += 1
 
-            conn.commit()
+                conn.commit()
 
             return redirect('/w/file:' + name)
         else:
@@ -126,14 +131,14 @@ def main_func_upload():
             curs.execute(db_change("select data from other where name = 'upload_default'"))
             db_data = curs.fetchall()
             upload_default = html.escape(db_data[0][0]) if db_data and db_data[0][0] != '' else ''
-
+            
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('upload'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <a href="/file_filter">(''' + load_lang('file_filter_list') + ''')</a> <a href="/extension_filter">(''' + load_lang('extension_filter_list') + ''')</a>
                     ''' + upload_help + '''
                     <hr class="main_hr">
-                    ''' + load_lang('max_file_size') + ''' : ''' + wiki_set(3) + '''MB
+                    ''' + load_lang('max_file_size') + ''' : ''' + str(file_max) + '''MB
                     <hr class="main_hr">
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                         <input multiple="multiple" type="file" name="f_data[]">
@@ -147,7 +152,7 @@ def main_func_upload():
                         <textarea rows="10" placeholder="''' + load_lang('other') + '''" name="f_lice">''' + upload_default + '''</textarea>
                         <hr class="main_hr">
                         ''' + captcha_get() + '''
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
                 menu = [['other', load_lang('return')]]

@@ -72,7 +72,7 @@ def main_func_setting_external():
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('ext_api_req_set'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
-                    <form method="post" id="main_set_data">
+                    <form method="post" id="opennamu_simple_render">
                         <h2>1. ''' + load_lang('captcha') + '''</h2>
                         <a href="https://www.google.com/recaptcha/">(''' + load_lang('recaptcha') + ''')</a> <a href="https://www.hcaptcha.com/">(''' + load_lang('hcaptcha') + ''')</a>
                         <hr class="main_hr">
@@ -137,9 +137,9 @@ def main_func_setting_external():
                         <hr class="main_hr">
 
                         <hr class="main_hr">
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
                     </form>
-                    <script>simple_render('main_set_data');</script>
+                    <!-- JS : opennamu_do_render_simple -->
                 ''',
                 menu = [['setting', load_lang('return')]]
             ))

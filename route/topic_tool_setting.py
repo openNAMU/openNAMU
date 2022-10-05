@@ -19,44 +19,66 @@ def topic_tool_setting(topic_num = 1):
         if flask.request.method == 'POST':
             admin_check(3, 'change_topic_set (code ' + topic_num + ')')
 
-            curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [topic_num])
-            topic_check = curs.fetchall()
-            if topic_check:
-                stop_d = flask.request.form.get('stop_d', '')
-                why_d = flask.request.form.get('why', '')
-                agree_d = flask.request.form.get('agree', '')
+            stop_d = flask.request.form.get('stop_d', '')
+            why_d = flask.request.form.get('why', '')
+            agree_d = flask.request.form.get('agree', '')
 
-                curs.execute(db_change("update rd set stop = ?, agree = ? where code = ?"), [
+            if stop_d != rd_d[0][0]:
+                curs.execute(db_change("update rd set stop = ? where code = ?"), [
                     stop_d,
-                    agree_d,
                     topic_num
                 ])
 
                 if stop_d == 'S':
-                    t_state = 'Stop'
+                    t_state = 'topic_state_change_stop'
                 elif stop_d == 'O':
-                    t_state = 'Close'
+                    t_state = 'topic_state_change_close'
                 else:
-                    t_state = 'Normal'
+                    t_state = 'topic_state_change_normal'
 
-                curs.execute(db_change("insert into topic (id, data, date, ip, top, code) values (?, ?, ?, ?, '1', ?)"), [
-                    str(int(topic_check[0][0]) + 1),
-                    t_state + (' (Agree)' if agree_d != '' else '') + (('[br][br]Why : ' + why_d) if why_d else ''),
-                    time,
-                    ip,
+                do_add_thread(
+                    topic_num,
+                    load_lang(t_state),
+                    '1'
+                )
+
+            if agree_d != rd_d[0][1]:
+                curs.execute(db_change("update rd set agree = ? where code = ?"), [
+                    agree_d,
                     topic_num
                 ])
 
-                rd_plus(topic_num, time)
+                if agree_d == 'O':
+                    t_state = 'topic_state_change_agree'
+                else:
+                    t_state = 'topic_state_change_disagree'
+
+                do_add_thread(
+                    topic_num,
+                    load_lang(t_state),
+                    '1'
+                )
+
+            if why_d != '':
+                do_add_thread(
+                    topic_num,
+                    load_lang('why') + ' : ' + why_d,
+                    '1'
+                )
+            
+            do_reload_recent_thread(
+                topic_num, 
+                time
+            )
 
             return redirect('/thread/' + topic_num)
         else:
             stop_d_list = ''
             agree_check = ''
             for_list = [
-                ['O', 'Close'],
-                ['S', 'Stop'],
-                ['', 'Normal']
+                ['O', load_lang('topic_close')],
+                ['S', load_lang('topic_stop')],
+                ['', load_lang('topic_normal')]
             ]
 
             for i in for_list:
@@ -71,14 +93,22 @@ def topic_tool_setting(topic_num = 1):
                 imp = [load_lang('topic_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
+                        <h2>1. ''' + load_lang('topic_progress') + '''</h2>
                         <select name="stop_d">
                             ''' + stop_d_list + '''
                         </select>
-                        <hr class=\"main_hr\">
-                        <input type="checkbox" name="agree" value="O" ''' + agree_check + '''> Agree
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
+                        <input type="checkbox" name="agree" value="O" ''' + agree_check + '''> ''' + load_lang('topic_change_agree') + '''
+
+                        <h2>2. ''' + load_lang('topic_associate') + '''</h2>
+                        ''' + load_lang('topic_link_vote') + ''' (''' + load_lang('not_working') + ''')
+                        <hr class="main_hr">
+                        <input placeholder="''' + load_lang('topic_insert_vote_number') + '''" name="vote_number" type="number">
+
+                        <h2>3. ''' + load_lang('why') + '''</h2>
                         <input placeholder="''' + load_lang('why') + ''' (''' + load_lang('markup_enabled') + ''')" name="why" type="text">
-                        <hr class=\"main_hr\">
+                        <hr class="main_hr">
+
                         <button type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
