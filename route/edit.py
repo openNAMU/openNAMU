@@ -138,7 +138,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                     curs.execute(db_change('select data from other where name = "markup"'))
                     db_data = curs.fetchall()
                     db_data = db_data[0][0] if db_data else 'namumark'
-                    if db_data == 'namumark':
+                    if db_data in ('namumark', 'namumark_beta'):
                         count = 1
                         data_section = '\n' + data + '\n'
                         
