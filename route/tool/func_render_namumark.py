@@ -1,12 +1,13 @@
 from .func_tool import *
 
 class class_do_render_namumark:
-    def __init__(self, curs, doc_name, doc_data, doc_include, lang_data):
+    def __init__(self, curs, doc_name, doc_data, doc_set, lang_data):
         self.curs = curs
         
         self.doc_data = doc_data
         self.doc_name = doc_name
-        self.doc_include = doc_include
+        self.doc_set = doc_set
+        self.doc_include = self.doc_set['doc_include'] if 'doc_include' in self.doc_set else ''
 
         self.lang_data = lang_data
 
@@ -696,12 +697,16 @@ class class_do_render_namumark:
                     else:
                         link_data_sharp = ''
 
-                    # under page
+                    # under page & fix url
                     if link_main == '../':
                         link_main = self.doc_name
                         link_main = re.sub(r'(\/[^/]+)$', '', link_main)
                     elif re.search(r'^\/', link_main):
                         link_main = re.sub(r'^\/', self.doc_name + '/', link_main)
+                    elif re.search(r'^분류:', link_main):
+                        link_main = re.sub(r'^분류:', 'category:', link_main)
+                    elif re.search(r'^사용자:', link_main):
+                        link_main = re.sub(r'^사용자:', 'user:', link_main)
 
                     # main link fix
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
@@ -929,6 +934,49 @@ class class_do_render_namumark:
         self.render_data += '<footnote_category>'
         self.render_data += self.get_tool_footnote_make()
 
+    def do_render_redirect(self):
+        match = re.search(r'^<back_br>\n#(?:redirect|넘겨주기) ([^\n]+)', self.render_data)
+        if match:
+            link_data_full = match.group(0)
+            link_main = match.group(1)
+
+            # sharp
+            link_data_sharp_regex = r'#([^#]+)$'
+            link_data_sharp = re.search(link_data_sharp_regex, link_main)
+            if link_data_sharp:
+                link_data_sharp = link_data_sharp.group(1)
+                link_data_sharp = html.unescape(link_data_sharp)
+                link_data_sharp = '#' + url_pas(link_data_sharp)
+
+                link_main = re.sub(link_data_sharp_regex, '', link_main)
+            else:
+                link_data_sharp = ''
+
+            # under page & fix url
+            if link_main == '../':
+                link_main = self.doc_name
+                link_main = re.sub(r'(\/[^/]+)$', '', link_main)
+            elif re.search(r'^\/', link_main):
+                link_main = re.sub(r'^\/', self.doc_name + '/', link_main)
+            elif re.search(r'^분류:', link_main):
+                link_main = re.sub(r'^분류:', 'category:', link_main)
+            elif re.search(r'^사용자:', link_main):
+                link_main = re.sub(r'^사용자:', 'user:', link_main)
+
+            link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+            link_main = html.unescape(link_main)
+            link_main = url_pas(link_main)
+
+            if link_main != '':
+                link_main = '/w_from/' + link_main
+
+            if 'doc_from' in self.doc_set:
+                data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', link_data_full)
+            else:
+                data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', link_data_full)
+                
+            self.render_data = '<' + data_name + '></' + data_name + '>'
+
     def do_render_last(self):
         # add category
         if self.doc_include == '':
@@ -963,6 +1011,7 @@ class class_do_render_namumark:
     def __call__(self):
         self.do_render_include_default()
         self.do_render_slash()
+        self.do_render_redirect()
         self.do_render_include()
         self.do_render_math()
         # self.do_render_middle()

@@ -106,7 +106,13 @@ class class_do_render:
         conn = self.conn
         curs = self.conn.cursor()
 
-        data_in = None if data_in == '' else data_in
+        doc_set = {}
+        if data_in == 'from':
+            data_in = ''
+            doc_set['doc_from'] = 'O'
+        
+        data_in = (data_in + '_') if data_in != '' else ''
+        doc_set['doc_include'] = data_in
 
         curs.execute(db_change('select data from other where name = "markup"'))
         rep_data = curs.fetchall()
@@ -114,7 +120,6 @@ class class_do_render:
 
         if data_type != 'backlink':
             if rep_data == 'namumark':
-                data_in = (data_in + '_') if data_in else ''
                 doc_data = html.escape(doc_data)
                 doc_name = html.escape(doc_name)
                 
@@ -132,30 +137,13 @@ class class_do_render:
                     {}
                 ]
             elif rep_data == 'namumark_beta':
-                doc_include = (data_in + '_') if data_in else ''
                 data_end = class_do_render_namumark(
                     curs,
                     doc_name,
                     doc_data,
-                    doc_include,
+                    doc_set,
                     self.lang_data
                 )()
-            elif rep_data == 'markdown':
-                data_in = (data_in + '_') if data_in else ''
-                doc_data = html.escape(doc_data)
-                doc_name = html.escape(doc_name)
-                
-                data_end = [
-                    '<pre class="render_content_load" id="' + data_in + 'render_content_load">' + html.escape(doc_data) + '</pre>' + \
-                    '<div class="render_content" id="' + data_in + 'render_content" style="display: none;"></div>', 
-                    'new opennamu_render_markdown(' + \
-                        'render_part_id = "render_content_load",' + \
-                        'render_part_id_after = "render_content",' + \
-                        'render_part_id_add = "' + data_in + '",' + \
-                        'doc_name = "' + doc_name + '"' + \
-                    ').do_main();',
-                    {}
-                ]
             else:
                 data_end = [
                     doc_data, 

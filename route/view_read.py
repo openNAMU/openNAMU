@@ -143,7 +143,8 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
         data = curs.fetchall()
         end_data = render_set(
             doc_name = name,
-            doc_data = data[0][0] if data else None
+            doc_data = data[0][0] if data else None,
+            data_in = 'from' if do_type == 'from' else ''
         )
 
         if end_data == 'HTTP Request 401.3':
