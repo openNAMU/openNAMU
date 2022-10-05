@@ -1,7 +1,7 @@
 function get_link_state(data) {
     let data_exter_link = '0';
-    if(document.cookie.match(main_css_regex_data('main_css_exter_link'))) {
-        data_exter_link = document.cookie.match(main_css_regex_data('main_css_exter_link'))[1];
+    if(document.cookie.match(opennamu_cookie_split_regex('main_css_exter_link'))) {
+        data_exter_link = document.cookie.match(opennamu_cookie_split_regex('main_css_exter_link'))[1];
     }
     
     var link_list = [];
@@ -84,8 +84,8 @@ function load_image_link(data, data_type = 0) {
 }
 
 function get_file_state_extermal(data, data_exter) {
-    if(document.cookie.match(main_css_regex_data('main_css_image_set'))) {
-        var data_image_set = document.cookie.match(main_css_regex_data('main_css_image_set'))[1];
+    if(document.cookie.match(opennamu_cookie_split_regex('main_css_image_set'))) {
+        var data_image_set = document.cookie.match(opennamu_cookie_split_regex('main_css_image_set'))[1];
     } else {
         var data_image_set = '0';
     }
@@ -147,8 +147,8 @@ function get_file_state_intermal(data, data_inter) {
         }
     }
     
-    if(document.cookie.match(main_css_regex_data('main_css_image_set'))) {
-        var data_image_set = document.cookie.match(main_css_regex_data('main_css_image_set'))[1];
+    if(document.cookie.match(opennamu_cookie_split_regex('main_css_image_set'))) {
+        var data_image_set = document.cookie.match(opennamu_cookie_split_regex('main_css_image_set'))[1];
     } else {
         var data_image_set = '0';
     }
@@ -314,8 +314,8 @@ function do_open_folding(data, element = '') {
 
 function do_open_foot(front_data, name, num = 0) {    
     if(
-        document.cookie.match(main_css_regex_data('main_css_footnote_set')) &&
-        document.cookie.match(main_css_regex_data('main_css_footnote_set'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_footnote_set')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_footnote_set'))[1] === '1'
     ) {
         if(num === 1) {
             document.getElementById(front_data + 'r' + name).focus();

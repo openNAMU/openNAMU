@@ -1,5 +1,20 @@
 from .tool.func import *
 
+def recent_change_send_render(data):
+    def send_render_href_replace(match):
+        match = match.group(1)
+        data_unescape = html.unescape(match)
+
+        return '<a href="/w/' + url_pas(data_unescape) + '">' + match + '</a>'
+
+    if data == '&lt;br&gt;' or data == '':
+        data = '<br>'
+    else:
+        data = data.replace('javascript:', '')
+        data = re.sub(r'&lt;a(?:(?:(?!&gt;).)*)&gt;((?:(?!&lt;\/a&gt;).)+)&lt;\/a&gt;', send_render_href_replace, data)
+
+    return data
+
 def recent_change(name = None, tool = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -105,8 +120,8 @@ def recent_change(name = None, tool = ''):
 
                 if data[6] == 'O':
                     if admin == 1:
-                        style[0] = 'id="toron_color_grey"'
-                        style[1] = 'id="toron_color_grey"'
+                        style[0] = 'class="opennamu_history_blind"'
+                        style[1] = 'class="opennamu_history_blind"'
                     else:
                         ip = ''
                         ban = ''
@@ -114,7 +129,7 @@ def recent_change(name = None, tool = ''):
                         send = ''
 
                         style[0] = 'style="display: none;"'
-                        style[1] = 'id="toron_color_grey"'
+                        style[1] = 'class="opennamu_history_blind"'
 
                 if tool == 'history':
                     title = '<a href="/w_rev/' + data[0] + '/' + url_pas(name) + '">r' + data[0] + '</a> '
@@ -132,16 +147,13 @@ def recent_change(name = None, tool = ''):
                         <td>''' + date + '''</td>
                     </tr>
                     <tr ''' + style[1] + '''>
-                        <td class="send_content" colspan="3">
-                            ''' + (html.escape(send) if send != '' else '<br>') + '''
-                        </td>
+                        <td colspan="3">''' + recent_change_send_render(html.escape(send)) + '''</td>
                     </tr>
                 '''
 
             div += '''
                     </tbody>
                 </table>
-                <script>send_render();</script>
             '''
 
             if name:

@@ -28,52 +28,20 @@ table {
 }
 
 td {
-    border: 1px solid gainsboro;
+    border: 0.5px solid gainsboro;
     
-    padding: 5px 10px;
+    padding: 8px 10px;
 }
 
-/* 링크 */
-a {
-    color: dodgerblue;
-    
-    text-decoration: none;
-}
-
-#not_thing {
-    color: red;
-}
-
-#inside, #out_link, #out_link::before, .opennamu_link_out {
-    color: green;
-}
-
-#out_link::before, .opennamu_link_out::before {
-    content: '🅴';
-    
-    font-weight: lighter;
-    
-    background: transparent;
-}
-
-#include_link {
-    display: none;
-}
-
-.hidden_link {
-    filter: blur(3px);
-}
-
-.hidden_link:hover {
-    filter: none;
-}
-
-/* 리스트 */
+/* list */
 .inside_ul li {
     margin-left: 20px;
+
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
-/* 토론 관련 */
+/* thread */
 .opennamu_comment {
     width: 100%;
 }
@@ -87,7 +55,7 @@ a {
 }
 
 .opennamu_comment_color_red {
-    background: palevioletred;
+    background: pink;
 }
 
 .opennamu_comment_color_default {
@@ -119,7 +87,39 @@ a {
     height: 200px;
 }
 
-/* 위키 내용 관련 */
+/* render */
+/* - link */
+a {
+    color: dodgerblue;
+    
+    text-decoration: none;
+}
+
+#not_thing, .opennamu_not_exist_link {
+    color: red;
+}
+
+.opennamu_same_link {
+    font-weight: bold;
+}
+
+#inside, #out_link, .opennamu_link_out {
+    color: green;
+}
+
+#out_link::before, .opennamu_link_out::before {
+    content: '🅴';
+    
+    font-weight: lighter;
+    
+    background: transparent;
+}
+
+#include_link {
+    display: none;
+}
+
+/* - toc */
 #toc, .opennamu_TOC {
     border: 1px solid gainsboro;
     padding: 20px;
@@ -132,22 +132,58 @@ a {
     margin-top: 10px;
 }
 
-#cate, pre, #redirect {
+#toc_title, .opennamu_TOC_title {
+    font-size: 1.2rem;
+}
+
+/* - category */
+.opennamu_category {
     border: 1px solid gainsboro;
     
     padding: 10px;
+}
+
+.opennamu_category_blur {
+    filter: blur(5px);
+}
+
+.opennamu_category_blur:hover {
+    filter: none;
 }
 
 #cate {
     margin-top: 20px;
 }
 
-pre {    
-    white-space: pre-wrap;
+.hidden_link {
+    filter: blur(3px);
 }
 
-#toc_title, .opennamu_TOC_title {
-    font-size: 1.2rem;
+.hidden_link:hover {
+    filter: none;
+}
+
+/* - footnote */
+.opennamu_footnote {
+    border-top: 1px solid gainsboro;
+
+    padding-top: 10px;
+}
+
+#footnote_data {
+    border-top: 1px solid gainsboro;
+    
+    padding-top: 10px;
+}
+
+#cate, pre, #redirect {
+    border: 1px solid gainsboro;
+    
+    padding: 10px;
+}
+
+pre {    
+    white-space: pre-wrap;
 }
 
 @media (max-width: 768px) {
@@ -171,18 +207,12 @@ pre {
     border: 1px solid #cecece;
 }
 
-#footnote_data {
-    border-top: 1px solid gainsboro;
-    
-    padding-top: 10px;
-}
-
 hr {
     border: 0;
     border-top: 1px solid gainsboro;
 }
 
-.render_content_load, .render_content {
+.render_content_load, .render_content, .opennamu_render_complete {
     white-space: pre-wrap;
     
     line-break: anywhere;
@@ -236,6 +266,10 @@ s:hover, strike:hover, del:hover {
 
 #main_table_top_tr {
     background: aquamarine;
+}
+
+.opennamu_history_blind {
+    background: gainsboro;
 }
 
 /* 기타 */

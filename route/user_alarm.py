@@ -19,16 +19,10 @@ def user_alarm():
             ''
     
             for data_one in data_list:
-                data += '' + \
-                    '<li>' + \
-                        '<span class="send_content">' + html.escape(data_one[0]) + '</span> ' + \
-                        '(' + data_one[1] + ')' + \
-                    '</li>' + \
-                ''
+                data += '<li>' + data_one[0] + ' (' + data_one[1] + ')</li>'
     
         data += '' + \
             '</ul>' + \
-            '<script>send_render();</script>' + \
             next_fix('/alarm?num=', num, data_list) + \
         ''
     

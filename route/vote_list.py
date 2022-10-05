@@ -25,7 +25,7 @@ def vote_list(list_type = 'normal', num = 1):
             else:
                 open_select = load_lang('open_vote') if i[2] == 'close' else load_lang('not_open_vote')
 
-            data += '<li><a href="/vote/' + i[1] + '">' + html.escape(i[0]) + '</a> (' + open_select + ')</li>'
+            data += '<li><a href="/vote/' + i[1] + '">' + i[1] + '. ' + html.escape(i[0]) + '</a> (' + open_select + ')</li>'
 
         data += '</ul>'
         if list_type == 'normal':

@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_func_random():
+def view_random():
     with get_db_connect() as conn:
         curs = conn.cursor()
 

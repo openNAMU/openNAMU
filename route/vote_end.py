@@ -10,6 +10,13 @@ def vote_end(num = 1):
         data_list = curs.fetchall()
         if not data_list:
             return redirect('/vote')
+
+        data = ''
+        if admin_check() == 1:
+            if data_list[0][3] == 'open' or data_list[0][3] == 'n_open':
+                data += '<a href="/vote/close/' + num + '">(' + load_lang('close_vote') + ')</a>'
+            else:
+                data += '<a href="/vote/close/' + num + '">(' + load_lang('re_open_vote') + ')</a>'
         
         curs.execute(db_change('select data from vote where id = ? and name = "end_date" and type = "option"'), [num])
         db_data = curs.fetchall()
@@ -17,15 +24,9 @@ def vote_end(num = 1):
         if db_data:
             time_limit = db_data[0][0]
 
-        data = '<h2>' + data_list[0][0] + '</h2>'
+        data += '<h2>' + data_list[0][0] + '</h2>'
         data += '<b>' + data_list[0][1] + '</b><hr class="main_hr">' if data_list[0][1] != '' else ''
         data += '<span>~ ' + time_limit + '</span><hr class="main_hr">' if time_limit != '' else ''
-
-        if admin_check() == 1:
-            if data_list[0][3] == 'open' or data_list[0][3] == 'n_open':
-                data += '<a href="/vote/close/' + num + '">(' + load_lang('close_vote') + ')</a>'
-            else:
-                data += '<a href="/vote/close/' + num + '">(' + load_lang('re_open_vote') + ')</a>'
 
         vote_data = re.findall(r'([^\n]+)', data_list[0][2].replace('\r\n', '\n'))
         for i in range(0, len(vote_data)):
@@ -43,7 +44,7 @@ def vote_end(num = 1):
             data += '</ul>'
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('result_vote'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            imp = [load_lang('result_vote'), wiki_set(), wiki_custom(), wiki_css(['(' + num + ')', 0])],
             data = data,
             menu = [['vote', load_lang('return')]]
         ))

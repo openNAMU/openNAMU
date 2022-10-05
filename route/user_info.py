@@ -50,7 +50,7 @@ def user_info(name = ''):
             admin_menu = '''
                 <h2>''' + load_lang('admin') + '''</h2>
                 <ul class="inside_ul">
-                    <li><a href="/ban/''' + url_pas(ip) + '''">''' + ban_name + '''</a></li>
+                    <li><a href="/auth/give/ban/''' + url_pas(ip) + '''">''' + ban_name + '''</a></li>
                     <li><a href="/check/''' + url_pas(ip) + '''">''' + load_lang('check') + '''</a></li>
                 </ul>
             '''
@@ -61,8 +61,7 @@ def user_info(name = ''):
             imp = [load_lang('user_tool'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <h2>''' + load_lang('state') + '''</h2>
-                <div id="get_user_info"></div>
-                <script>load_user_info("''' + ip + '''");</script>
+                <div id="opennamu_get_user_info">''' + ip + '''</div>
                 ''' + login_menu + '''
                 ''' + tool_menu + '''
                 <h2>''' + load_lang('other') + '''</h2>

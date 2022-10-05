@@ -35,162 +35,231 @@ data_db_set = class_check_json()
 
 db_data_get(data_db_set['type'])
 do_db_set(data_db_set)
-load_db = get_db_connect_old(data_db_set)
 
-conn = load_db.db_load()
-curs = conn.cursor()
+with get_db_connect() as conn:
+    curs = conn.cursor()
 
-setup_tool = ''
-try:
-    curs.execute(db_change('select data from other where name = "ver"'))
-except:
-    setup_tool = 'init'
-
-if setup_tool != 'init':
-    ver_set_data = curs.fetchall()
-    if ver_set_data:
-        if int(version_list['beta']['c_ver']) > int(ver_set_data[0][0]):
-            setup_tool = 'update'
-        else:
-            setup_tool = 'normal'
-    else:
+    setup_tool = ''
+    try:
+        curs.execute(db_change('select data from other where name = "ver"'))
+    except:
         setup_tool = 'init'
 
-if setup_tool != 'normal':
-    create_data = get_db_table_list()
-    for create_table in create_data:
-        for create in ['test'] + create_data[create_table]:
-            try:
-                curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
-            except:
-                try:
-                    curs.execute(db_change('create table ' + create_table + '(test longtext default "")'))
-                except:
-                    curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ''"))
-
-    if setup_tool == 'update':
-        update(int(ver_set_data[0][0]), set_data)
-    else:
-        set_init()
-
-set_init_always(version_list['beta']['c_ver'])
-
-# Init-Route
-class EverythingConverter(werkzeug.routing.PathConverter):
-    regex = r'.*?'
-
-class RegexConverter(werkzeug.routing.BaseConverter):
-    def __init__(self, url_map, *items):
-        super(RegexConverter, self).__init__(url_map)
-        self.regex = items[0]
-
-app = flask.Flask(
-    __name__, 
-    template_folder = './'
-)
-
-app.config['JSON_AS_ASCII'] = False
-app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
-
-log = logging.getLogger('waitress')
-log.setLevel(logging.ERROR)
-
-app.jinja_env.filters['md5_replace'] = md5_replace
-app.jinja_env.filters['load_lang'] = load_lang
-app.jinja_env.filters['cut_100'] = cut_100
-
-app.url_map.converters['everything'] = EverythingConverter
-app.url_map.converters['regex'] = RegexConverter
-
-curs.execute(db_change('select data from other where name = "key"'))
-sql_data = curs.fetchall()
-app.secret_key = sql_data[0][0]
-
-print('----')
-
-# Init-DB_Data
-server_set = {}
-server_set_var = get_init_set_list()
-server_set_env = {
-    'host' : os.getenv('NAMU_HOST'),
-    'port' : os.getenv('NAMU_PORT'),
-    'language' : os.getenv('NAMU_LANG'),
-    'markup' : os.getenv('NAMU_MARKUP'),
-    'encode' : os.getenv('NAMU_ENCRYPT')
-}
-for i in server_set_var:
-    curs.execute(db_change('select data from other where name = ?'), [i])
-    server_set_val = curs.fetchall()
-    if server_set_val:
-        server_set_val = server_set_val[0][0]
-    elif server_set_env[i] != None:
-        server_set_val = server_set_env[i]
-    else:
-        if 'list' in server_set_var[i]:
-            print(server_set_var[i]['display'] + ' (' + server_set_var[i]['default'] + ') [' + ', '.join(server_set_var[i]['list']) + ']' + ' : ', end = '')
+    if setup_tool != 'init':
+        ver_set_data = curs.fetchall()
+        if ver_set_data:
+            if int(version_list['beta']['c_ver']) > int(ver_set_data[0][0]):
+                setup_tool = 'update'
+            else:
+                setup_tool = 'normal'
         else:
-            print(server_set_var[i]['display'] + ' (' + server_set_var[i]['default'] + ') : ', end = '')
+            setup_tool = 'init'
 
-        server_set_val = input()
-        if server_set_val == '':
-            server_set_val = server_set_var[i]['default']
-        elif server_set_var[i]['require'] == 'select':
-            if not server_set_val in server_set_var[i]['list']:
-                server_set_val = server_set_var[i]['default']
-
-        curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, server_set_val])
-
-    print(server_set_var[i]['display'] + ' : ' + server_set_val)
-
-    server_set[i] = server_set_val
-
-print('----')
-
-# Init-DB_care
-if data_db_set['type'] == 'sqlite':
-    def back_up(back_time, back_up_where):
-        print('----')
-
+    if data_db_set['type'] == 'mysql':
         try:
-            shutil.copyfile(
-                data_db_set['name'] + '.db', 
-                back_up_where
-            )
-
-            print('Back up : OK')
+            curs.execute(db_change(
+                'create database ' + data_db_set['name'] + ' ' + \
+                'default character set utf8mb4'
+            ))
         except:
-            print('Back up : Error')
+            try:
+                curs.execute(db_change(
+                    'alter database ' + data_db_set['name'] + ' ' + \
+                    'character set utf8mb4'
+                ))
+            except:
+                pass
 
-        threading.Timer(
-            60 * 60 * back_time, 
-            back_up,
-            [back_time, back_up_where]
-        ).start()
+    if setup_tool != 'normal':
+        create_data = get_db_table_list()
+        for create_table in create_data:
+            for create in ['test'] + create_data[create_table]:
+                db_pass = 0
 
-    curs.execute(db_change('select data from other where name = "back_up"'))
-    back_time = curs.fetchall()
-    back_time = int(number_check(back_time[0][0])) if back_time else 0
-    if back_time != 0:
-        curs.execute(db_change('select data from other where name = "backup_where"'))
-        back_up_where = curs.fetchall()
-        if back_up_where and back_up_where[0][0] != '':
-            back_up_where = back_up_where[0][0]
+                try:
+                    curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
+
+                    db_pass = 1
+                except:
+                    pass
+
+                if db_pass == 0:
+                    try:
+                        curs.execute(db_change('create table ' + create_table + '(test longtext default (""))'))
+
+                        db_pass = 1
+                    except:
+                        pass
+
+                if db_pass == 0:
+                    try:
+                        curs.execute(db_change('create table ' + create_table + '(test longtext default "")'))
+
+                        db_pass = 1
+                    except:
+                        pass
+
+                if db_pass == 0:
+                    try:
+                        curs.execute(db_change('create table ' + create_table + '(test longtext)'))
+
+                        db_pass = 1
+                    except:
+                        pass
+
+                if db_pass == 0:
+                    try:
+                        curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ('')"))
+
+                        db_pass = 1
+                    except:
+                        pass
+
+                if db_pass == 0:
+                    try:
+                        curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ''"))
+
+                        db_pass = 1
+                    except:
+                        pass
+
+                if db_pass == 0:
+                    try:
+                        curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext"))
+
+                        db_pass = 1
+                    except:
+                        pass
+
+                if db_pass == 0:
+                    raise
+
+        if setup_tool == 'update':
+            update(int(ver_set_data[0][0]), set_data)
         else:
-            back_up_where = 'back_' + data_db_set['name'] + '.db'
+            set_init()
 
-        print('Back up state : ' + str(back_time) + ' hours')
+    set_init_always(version_list['beta']['c_ver'])
 
-        back_up(back_time, back_up_where)
-    else:
-        print('Back up state : Turn off')
+    # Init-Route
+    class EverythingConverter(werkzeug.routing.PathConverter):
+        regex = r'.*?'
 
-print('Now running... http://localhost:' + server_set['port'])
-conn.commit()
+    class RegexConverter(werkzeug.routing.BaseConverter):
+        def __init__(self, url_map, *items):
+            super(RegexConverter, self).__init__(url_map)
+            self.regex = items[0]
+
+    app = flask.Flask(
+        __name__, 
+        template_folder = './'
+    )
+
+    app.config['JSON_AS_ASCII'] = False
+    app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+
+    log = logging.getLogger('waitress')
+    log.setLevel(logging.ERROR)
+
+    app.jinja_env.filters['md5_replace'] = md5_replace
+    app.jinja_env.filters['load_lang'] = load_lang
+    app.jinja_env.filters['cut_100'] = cut_100
+
+    app.url_map.converters['everything'] = EverythingConverter
+    app.url_map.converters['regex'] = RegexConverter
+
+    curs.execute(db_change('select data from other where name = "key"'))
+    sql_data = curs.fetchall()
+    app.secret_key = sql_data[0][0]
+
+    print('----')
+
+    # Init-DB_Data
+    server_set = {}
+    server_set_var = get_init_set_list()
+    server_set_env = {
+        'host' : os.getenv('NAMU_HOST'),
+        'port' : os.getenv('NAMU_PORT'),
+        'language' : os.getenv('NAMU_LANG'),
+        'markup' : os.getenv('NAMU_MARKUP'),
+        'encode' : os.getenv('NAMU_ENCRYPT')
+    }
+    for i in server_set_var:
+        curs.execute(db_change('select data from other where name = ?'), [i])
+        server_set_val = curs.fetchall()
+        if server_set_val:
+            server_set_val = server_set_val[0][0]
+        elif server_set_env[i] != None:
+            server_set_val = server_set_env[i]
+
+            curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, server_set_env[i]])
+        else:
+            if 'list' in server_set_var[i]:
+                print(server_set_var[i]['display'] + ' (' + server_set_var[i]['default'] + ') [' + ', '.join(server_set_var[i]['list']) + ']' + ' : ', end = '')
+            else:
+                print(server_set_var[i]['display'] + ' (' + server_set_var[i]['default'] + ') : ', end = '')
+
+            server_set_val = input()
+            if server_set_val == '':
+                server_set_val = server_set_var[i]['default']
+            elif server_set_var[i]['require'] == 'select':
+                if not server_set_val in server_set_var[i]['list']:
+                    server_set_val = server_set_var[i]['default']
+
+            curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, server_set_val])
+
+        print(server_set_var[i]['display'] + ' : ' + server_set_val)
+
+        server_set[i] = server_set_val
+
+    print('----')
+
+    # Init-DB_care
+    if data_db_set['type'] == 'sqlite':
+        def back_up(back_time, back_up_where):
+            print('----')
+
+            try:
+                shutil.copyfile(
+                    data_db_set['name'] + '.db', 
+                    back_up_where
+                )
+
+                print('Back up : OK')
+            except:
+                print('Back up : Error')
+
+            threading.Timer(
+                60 * 60 * back_time, 
+                back_up,
+                [back_time, back_up_where]
+            ).start()
+
+        curs.execute(db_change('select data from other where name = "back_up"'))
+        back_time = curs.fetchall()
+        back_time = int(number_check(back_time[0][0])) if back_time and back_time != '' else 0
+        if back_time != 0:
+            curs.execute(db_change('select data from other where name = "backup_where"'))
+            back_up_where = curs.fetchall()
+            if back_up_where and back_up_where[0][0] != '':
+                back_up_where = back_up_where[0][0]
+            else:
+                back_up_where = 'back_' + data_db_set['name'] + '.db'
+
+            print('Back up state : ' + str(back_time) + ' hours')
+
+            back_up(back_time, back_up_where)
+        else:
+            print('Back up state : Turn off')
+
+    print('Now running... http://localhost:' + server_set['port'])
+    
+    conn.commit()
 
 # Init-custom
 if os.path.exists('custom.py'):
     from custom import custom_run
-    custom_run(load_db.db_get(), app)
+    custom_run('error', app)
     
 # Func
 # Func-inter_wiki
@@ -240,96 +309,96 @@ app.route('/old_page')(list_old_page)
 # /list/document/acl
 @app.route('/acl_list')
 def list_acl():
-    return list_acl_2(load_db.db_get())
+    return list_acl_2()
 
 # /list/document/acl/add
 @app.route('/acl/<everything:name>', methods = ['POST', 'GET'])
 def give_acl(name = None):
-    return give_acl_2(load_db.db_get(), name)
+    return give_acl_2(name)
 
 # /list/document/need
 @app.route('/please')
 def list_please():
-    return list_please_2(load_db.db_get())
+    return list_please_2()
 
 # /list/document/all
 @app.route('/title_index')
 def list_title_index():
-    return list_title_index_2(load_db.db_get())
+    return list_title_index_2()
 
 # /list/document/long
 @app.route('/long_page')
 def list_long_page():
-    return list_long_page_2(load_db.db_get(), 'long_page')
+    return list_long_page_2('long_page')
 
 # /list/document/short
 @app.route('/short_page')
 def list_short_page():
-    return list_long_page_2(load_db.db_get(), 'short_page')
+    return list_long_page_2('short_page')
 
 # /list/file
 @app.route('/image_file_list')
 def list_image_file():
-    return list_image_file_2(load_db.db_get())
+    return list_image_file_2()
 
 # /list/admin
 # /list/admin/list
 @app.route('/admin_list')
 def list_admin():
-    return list_admin_2(load_db.db_get())
+    return list_admin_2()
 
 # /list/admin/auth_use
 @app.route('/admin_log', methods = ['POST', 'GET'])
 def list_admin_use():
-    return list_admin_use_2(load_db.db_get())
+    return list_admin_use_2()
 
 # /list/user
 @app.route('/user_log')
 def list_user():
-    return list_user_2(load_db.db_get())
+    return list_user_2()
 
 # /list/user/check
 @app.route('/check/<name>')
 def give_user_check(name = None):
-    return give_user_check_2(load_db.db_get(), name)
+    return give_user_check_2(name)
     
 # /list/user/check/delete
 @app.route('/check_delete', methods = ['POST', 'GET'])
 def give_user_check_delete():
-    return give_user_check_delete_2(load_db.db_get())
+    return give_user_check_delete_2()
 
 # Func-auth
 # /auth/give
 # /auth/give/<name>
 @app.route('/admin/<name>', methods = ['POST', 'GET'])
 def give_admin(name = None):
-    return give_admin_2(load_db.db_get(), name)
+    return give_admin_2(name)
 
 # /auth/give
 # /auth/give/<name>
-@app.route('/ban', methods = ['POST', 'GET'])
-@app.route('/ban/<name>', methods = ['POST', 'GET'])
-def give_user_ban(name = None):
-    return give_user_ban_2(load_db.db_get(), name)
+app.route('/auth/give/ban', methods = ['POST', 'GET'])(give_user_ban)
+app.route('/auth/give/ban/<name>', methods = ['POST', 'GET'])(give_user_ban)
+app.route('/auth/give/ban_regex/<everything:name>', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'regex' })(give_user_ban)
+app.route('/auth/give/ban_multiple', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'multiple' })(give_user_ban)
 
 # /auth/list
 @app.route('/admin_group')
 def list_admin_group():
-    return list_admin_group_2(load_db.db_get())
+    return list_admin_group_2()
 
 # /auth/list/add/<name>
 @app.route('/admin_plus/<name>', methods = ['POST', 'GET'])
 def give_admin_groups(name = None):
-    return give_admin_groups_2(load_db.db_get(), name)
+    return give_admin_groups_2(name)
 
 # /auth/list/delete/<name>
 @app.route('/delete_admin_group/<name>', methods = ['POST', 'GET'])
 def give_delete_admin_group(name = None):
-    return give_delete_admin_group_2(load_db.db_get(), name)
+    return give_delete_admin_group_2(name)
 
 @app.route('/app_submit', methods = ['POST', 'GET'])
 def recent_app_submit():
-    return recent_app_submit_2(load_db.db_get())
+    return recent_app_submit_2()
 
 # /auth/history
 # ongoing 반영 필요
@@ -337,7 +406,7 @@ def recent_app_submit():
 @app.route('/block_log/<regex("user"):tool>/<name>')
 @app.route('/block_log/<regex("admin"):tool>/<name>')
 def recent_block(name = 'Test', tool = 'all'):
-    return recent_block_2(load_db.db_get(), name, tool)
+    return recent_block_2(name, tool)
 
 # Func-history
 app.route('/recent_change')(recent_change)
@@ -372,21 +441,21 @@ app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_read)
 app.route('/w/<everything:name>')(view_read)
 
-app.route('/random')(main_func_random)
+app.route('/random')(view_random)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
-app.route('/edit/<everything:name>/doc_from/<everything:name_load>', methods = ['POST', 'GET'])(edit)
-app.route('/edit/<everything:name>/doc_section/<int:section>', methods = ['POST', 'GET'])(edit)
+app.route('/edit_from/<everything:name>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'load' })(edit)
+app.route('/edit_section/<int:section>/<everything:name>', methods = ['POST', 'GET'])(edit)
 
-app.route('/upload', methods = ['POST', 'GET'])(main_func_upload)
+app.route('/upload', methods = ['POST', 'GET'])(edit_upload)
 
 # 개편 예정
 app.route('/xref_reset/<everything:name>')(edit_backlink_reset)
 
 app.route('/delete/<everything:name>', methods = ['POST', 'GET'])(edit_delete)
 app.route('/delete_file/<everything:name>', methods = ['POST', 'GET'])(edit_delete_file)
-app.route('/delete_mutiple', methods = ['POST', 'GET'])(edit_delete_mutiple)
+app.route('/delete_multiple', methods = ['POST', 'GET'])(edit_delete_multiple)
 
 app.route('/revert/<int:num>/<everything:name>', methods = ['POST', 'GET'])(edit_revert)
 
@@ -417,7 +486,9 @@ app.route('/change', methods = ['POST', 'GET'])(user_setting)
 app.route('/change/key')(user_setting_key)
 app.route('/change/key/delete')(user_setting_key_delete)
 app.route('/change/pw', methods = ['POST', 'GET'])(user_setting_pw)
-app.route('/change/head', methods=['GET', 'POST'])(user_setting_head)
+app.route('/change/head', methods=['GET', 'POST'], defaults = { 'skin_name' : '' })(user_setting_head)
+app.route('/change/head/<skin_name>', methods=['GET', 'POST'])(user_setting_head)
+app.route('/change/head_reset', methods=['GET', 'POST'])(user_setting_head_reset)
 app.route('/change/skin_set')(user_setting_skin_set)
 app.route('/change/skin_set/main')(user_setting_skin_set)
 
@@ -446,13 +517,13 @@ app.route('/skin_set')(user_setting_skin_set)
 # 개편 보류중 S
 @app.route('/change/email', methods = ['POST', 'GET'])
 def user_setting_email():
-    return user_setting_email_2(load_db.db_get())
+    return user_setting_email_2()
 
 app.route('/change/email/delete')(user_setting_email_delete)
 
 @app.route('/change/email/check', methods = ['POST', 'GET'])
 def user_setting_email_check():
-    return user_setting_email_check_2(load_db.db_get())
+    return user_setting_email_check_2()
 # 개편 보류중 E
 
 # Func-login
@@ -464,27 +535,27 @@ def user_setting_email_check():
 
 @app.route('/login', methods = ['POST', 'GET'])
 def login_login():
-    return login_login_2(load_db.db_get())
+    return login_login_2()
 
 @app.route('/login/2fa', methods = ['POST', 'GET'])
 def login_login_2fa():
-    return login_login_2fa_2(load_db.db_get())
+    return login_login_2fa_2()
 
 @app.route('/register', methods = ['POST', 'GET'])
 def login_register():
-    return login_register_2(load_db.db_get())
+    return login_register_2()
 
 @app.route('/register/email', methods = ['POST', 'GET'])
 def login_register_email():
-    return login_register_email_2(load_db.db_get())
+    return login_register_email_2()
 
 @app.route('/register/email/check', methods = ['POST', 'GET'])
 def login_register_email_check():
-    return login_register_email_check_2(load_db.db_get())
+    return login_register_email_check_2()
 
 @app.route('/register/submit', methods = ['POST', 'GET'])
 def login_register_submit():
-    return login_register_submit_2(load_db.db_get())
+    return login_register_submit_2()
 
 app.route('/login/find')(login_find)
 app.route('/login/find/key', methods = ['POST', 'GET'])(login_find_key)
@@ -512,13 +583,12 @@ app.route('/api/raw/<everything:name>')(api_raw)
 app.route('/api/version', defaults = { 'version_list' : version_list })(api_version)
 app.route('/api/skin_info')(api_skin_info)
 app.route('/api/skin_info/<name>')(api_skin_info)
-app.route('/api/markup')(api_markup)
 app.route('/api/user_info/<name>', methods = ['POST', 'GET'])(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
-app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic_sub)
-app.route('/api/thread/<int:topic_num>/<tool>')(api_topic_sub)
-app.route('/api/thread/<int:topic_num>')(api_topic_sub)
+app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic)
+app.route('/api/thread/<int:topic_num>/<tool>')(api_topic)
+app.route('/api/thread/<int:topic_num>')(api_topic)
 
 app.route('/api/search/<everything:name>/doc_num/<int:num>/<int:page>')(api_search)
 app.route('/api/search/<everything:name>')(api_search)
@@ -532,21 +602,25 @@ app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss')(api_recent_discuss)
 
-app.route('/api/sha224/<everything:data>', methods = ['POST', 'GET'])(api_sha224)
+app.route('/api/lang/<data>', methods = ['POST', 'GET'])(api_func_lang)
+app.route('/api/sha224/<everything:data>', methods = ['POST', 'GET'])(api_func_sha224)
+
 app.route('/api/title_index')(api_title_index)
 app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])(api_image_view)
-# 이건 API 영역이 아닌 것 같아서 고심 중
-app.route('/api/sitemap.xml')(api_sitemap)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정
 app.route('/other')(main_tool_other)
 app.route('/manager', methods = ['POST', 'GET'])(main_tool_admin)
-app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_admin)
-app.route('/manager/<int:num>/<add_2>', methods = ['POST', 'GET'])(main_tool_admin)
+app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_redirect)
+app.route('/manager/<int:num>/<add_2>', methods = ['POST', 'GET'])(main_tool_redirect)
+# app.route('/guide/<doc_name>')(main_tool_guide)
 
 app.route('/search', methods=['POST'])(main_search)
 app.route('/search/<everything:name>')(main_search_deep)
+app.route('/search/<int:num>/<everything:name>')(main_search_deep)
+app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data' })(main_search_deep)
+app.route('/search_data/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' })(main_search_deep)
 app.route('/goto', methods=['POST'])(main_search_goto)
 app.route('/goto/<everything:name>', methods=['POST'])(main_search_goto)
 
@@ -563,6 +637,7 @@ app.route('/setting/body/bottom/<skin_name>', defaults = { 'num' : 7 }, methods 
 app.route('/setting/robot', methods = ['POST', 'GET'])(main_func_setting_robot)
 app.route('/setting/external', methods = ['POST', 'GET'])(main_func_setting_external)
 app.route('/setting/acl', methods = ['POST', 'GET'])(main_func_setting_acl)
+app.route('/setting/sitemap', methods = ['POST', 'GET'])(main_func_setting_sitemap)
 
 # views -> view
 app.route('/view/<everything:name>')(main_view)

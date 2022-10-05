@@ -3,9 +3,12 @@ from .tool.func import *
 def topic_comment_tool(topic_num = 1, num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
-
+        
         num = str(num)
         topic_num = str(topic_num)
+        
+        if acl_check('', 'topic_view', topic_num) == 1:
+            return re_error('/ban')
 
         curs.execute(db_change("select block, ip, date from topic where code = ? and id = ?"), [topic_num, num])
         data = curs.fetchall()
@@ -41,7 +44,7 @@ def topic_comment_tool(topic_num = 1, num = 1):
                 <h2>''' + load_lang('admin_tool') + '''</h2>
                 <ul class="inside_ul">
                     <li>
-                        <a href="/ban/''' + url_pas(data[0][1]) + '''">
+                        <a href="/auth/give/ban/''' + url_pas(data[0][1]) + '''">
                             ''' + (load_lang('release') if user_ban_d else load_lang('ban')) + '''
                         </a>
                     </li>
