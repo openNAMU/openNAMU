@@ -208,7 +208,10 @@ class class_do_render_namumark:
         heading_regex = r'\n((={1,6})(#?) ?([^\n]+))\n'
         heading_count_all = len(re.findall(heading_regex, self.render_data)) * 3
         heading_stack = [0, 0, 0, 0, 0, 0]
+        heading_count = 0
         while 1:
+            heading_count += 1
+
             if not re.search(heading_regex, self.render_data):
                 break
             elif heading_count_all < 0:
@@ -219,9 +222,13 @@ class class_do_render_namumark:
                 heading_data = re.search(heading_regex, self.render_data)
                 heading_data = heading_data.groups()
 
-                heading_data_last_regex = r' ?(#?={1,6})$'
+                heading_data_last_regex = r' ?(#?={1,6}[^=]*)$'
                 heading_data_last = re.search(heading_data_last_regex, heading_data[3])
-                heading_data_last = heading_data_last.group(1)
+                if heading_data_last:
+                    heading_data_last = heading_data_last.group(1)
+                else:
+                    heading_data_last = ''
+
                 heading_data_text = re.sub(heading_data_last_regex, '', heading_data[3])
 
                 heading_data_diff = heading_data[2] + heading_data[1]
@@ -253,7 +260,11 @@ class class_do_render_namumark:
 
                     heading_data_text_fix = re.sub(r'<([^<>]*)>', '', heading_data_text)
                     
-                    data_name = self.get_tool_data_storage('<h' + heading_level_str + ' id="' + heading_data_text_fix + '">', '</h' + heading_level_str + '>', '')
+                    data_name = self.get_tool_data_storage(
+                        '<h' + heading_level_str + ' id="' + heading_data_text_fix + '">', 
+                        ' <sub><a href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a></sub></h' + heading_level_str + '>', 
+                        ''
+                    )
 
                     heading_data_complete = '' + \
                         '\n<front_br>' + \
