@@ -1,7 +1,7 @@
 "use strict";
 
 function opennamu_do_insert_version_skin(
-	dom_name_version
+    dom_name_version
 ) {
     let url = "/api/skin_info?all=true";
     let xhr = new XMLHttpRequest();
