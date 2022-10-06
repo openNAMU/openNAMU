@@ -39,7 +39,11 @@ def user_count(name = None):
         curs.execute(db_change("select leng from history where date like ? and ip = ?"), [date + '%', that])
         db_data = curs.fetchall()
         for count in db_data:
-        	data_today_len += int(count[0][1:])
+            count_data = count[0]
+            count_data = count_data.replace('+', '')
+            count_data = count_data.replace('-', '')
+
+            data_today_len += int(count_data)
 
         date_yesterday = str((
             datetime.datetime.today() + datetime.timedelta(days = -1)
@@ -57,7 +61,7 @@ def user_count(name = None):
         curs.execute(db_change("select leng from history where date like ? and ip = ?"), [date_yesterday + '%', that])
         db_data = curs.fetchall()
         for count in db_data:
-        	data_yesterday_len += int(count[0][1:])
+            data_yesterday_len += int(count[0][1:])
 
         # 한글 지원 필요
         return easy_minify(flask.render_template(skin_check(),

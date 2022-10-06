@@ -225,7 +225,7 @@
         "challenge" : "Challenge",
         "user_title" : "User title",
         "multiple_ban" : "Multiple ban",
-    	"dont_move" : "Don't move",
+        "dont_move" : "Don't move",
         "file_delete" : "File delete",
         "_comment_" : "Edit",
             "load" : "Load another document",

@@ -609,8 +609,8 @@ function do_onmark_macro_render(data, data_js) {
             } else if(x_1 === 'navertv') {
                 var video_src = 'https://tv.naver.com/embed/' + video_code
             } else {
-		var video_src = 'https://player.vimeo.com/video/' + video_code
-	    }
+        var video_src = 'https://player.vimeo.com/video/' + video_code
+        }
             
             return '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_src + '" frameborder="0" allowfullscreen></iframe>';
         } else if(x_1 === 'anchor') {
@@ -1337,7 +1337,7 @@ function do_onmark_render(
     doc_data = ''
 ) {
     let data_wiki_set = {};
-	if(test_mode === 'normal') {
+    if(test_mode === 'normal') {
         var data = '\n' + 
             document.getElementById(name_id + '_load').innerHTML.replace(/\r/g, '') + 
         '\n';
@@ -1346,7 +1346,7 @@ function do_onmark_render(
             doc_data.replace(/\r/g, '') + 
         '\n';
     } else {
-    	var data = '\n' + (
+        var data = '\n' + (
 ``
         ).replace(/\r/g, '') + '\n';
     }
@@ -1392,7 +1392,7 @@ function do_onmark_render(
                 } else if(test_mode === 'manual') {
                     return [data, data_js];
                 } else {
-                	console.log([data, data_js]);
+                    console.log([data, data_js]);
                 }
                 
                 return 0;
@@ -1480,7 +1480,7 @@ function do_onmark_render(
                 'do_heading_move();\n' + 
                 'get_link_state("' + name_include + '");\n' + 
                 'get_file_state("' + name_include + '");\n' + 
-        		'get_heading_name();\n' +
+                'get_heading_name();\n' +
                 'render_html("' + name_include + 'nowiki_html");\n' +
             ''
             
@@ -1494,7 +1494,7 @@ function do_onmark_render(
             } else if(test_mode === 'manual') {
                 return [data, data_js];
             } else {
-            	console.log([data, data_js]);
+                console.log([data, data_js]);
             }
         }
     }
