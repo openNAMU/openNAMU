@@ -5,6 +5,8 @@ import re
 from route.tool.func import *
 # from route import *
 
+print(os.getcwd())
+
 for i_data in os.listdir("route"):
     f_src = re.search(r"(.+)\.py$", i_data)
     f_src = f_src.group(1) if f_src else ""
@@ -465,6 +467,7 @@ app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
 app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(recent_discuss)
 app.route('/recent_discuss/close', defaults = { 'tool' : 'close' })(recent_discuss)
 app.route('/recent_discuss/open', defaults = { 'tool' : 'open' })(recent_discuss)
+app.route('/recent_discuss/delete')(recent_discuss_delete)
 
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
 app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
