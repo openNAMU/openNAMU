@@ -742,6 +742,7 @@ class class_do_render_namumark:
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_main = html.unescape(link_main)
 
+                    # todo : sharp only link error
                     self.curs.execute(db_change("select title from data where title = ?"), [link_main])
                     db_data = self.curs.fetchall()
                     if db_data:
