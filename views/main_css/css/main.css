@@ -126,6 +126,8 @@ a {
     
     width: fit-content;
     width: -moz-fit-content;
+
+    display: inline-block;
     
     clear: both;
     
@@ -168,6 +170,8 @@ a {
     border-top: 1px solid gainsboro;
 
     padding-top: 10px;
+
+    margin-top: 10px;
 }
 
 #footnote_data {
