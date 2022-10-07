@@ -157,7 +157,10 @@ with get_db_connect() as conn:
 
     app.config['JSON_AS_ASCII'] = False
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
-    app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days = 31)
+
+    @app.before_request
+    def make_session_permanent():
+        flask.session.permanent = True
 
     log = logging.getLogger('waitress')
     log.setLevel(logging.ERROR)
