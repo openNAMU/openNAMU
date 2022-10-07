@@ -5,8 +5,6 @@ import re
 from route.tool.func import *
 # from route import *
 
-print(os.getcwd())
-
 for i_data in os.listdir("route"):
     f_src = re.search(r"(.+)\.py$", i_data)
     f_src = f_src.group(1) if f_src else ""

@@ -41,6 +41,9 @@ class class_do_render_namumark:
 
         return data
 
+    def get_tool_css_safe(self, data):
+        return data.replace(';', '')
+
     def get_tool_data_storage(self, data_A = '', data_B = '', data_C = '', do_type = 'render'):
         self.data_temp_storage_count += 1
         if do_type == 'render':
@@ -121,6 +124,22 @@ class class_do_render_namumark:
         self.data_footnote = {}
 
         return data
+
+    def get_tool_px_add_check(self, data):
+        if re.search(r'^[0-9]+$', data):
+            return data + 'px'
+        else:
+            return data
+
+    def get_tool_dark_mode_split(self, data):
+        data = data.split(',')
+        if len(data) == 1:
+            return data[0]
+        else:
+            if flask.request.cookies.get('main_css_del_bold', '0') == '0':
+                return data[0]
+            else:
+                return data[1]
 
     def do_render_text(self):
         # <b> function
@@ -359,15 +378,9 @@ class class_do_render_namumark:
                     if data_sub:
                         data_sub = data_sub.groups()
                         if data_sub[0] == 'width':
-                            if re.search(r'^[0-9]+$', data_sub[1]):
-                                video_width = data_sub[1] + 'px'
-                            else:
-                                video_width = data_sub[1]
+                            video_width = self.get_tool_px_add_check(data_sub[1])
                         elif data_sub[0] == 'height':
-                            if re.search(r'^[0-9]+$', data_sub[1]):
-                                video_height = data_sub[1] + 'px'
-                            else:
-                                video_height = data_sub[1]
+                            video_height = self.get_tool_px_add_check(data_sub[1])
                         elif data_sub[0] == 'start':
                             video_start = data_sub[1]
                         elif data_sub[0] == 'end':
@@ -404,6 +417,9 @@ class class_do_render_namumark:
                 else:
                     video_code = 'https://player.vimeo.com/video/' + video_code
 
+                video_width = self.get_tool_css_safe(video_width)
+                video_height = self.get_tool_css_safe(video_height)
+
                 data_name = self.get_tool_data_storage('<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen></iframe>', '', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
@@ -427,6 +443,8 @@ class class_do_render_namumark:
 
                 main_text = self.get_tool_data_revert(main_text)
                 sub_text = self.get_tool_data_revert(sub_text)
+
+                color = self.get_tool_css_safe(color)
 
                 # add color
                 if color != '':
@@ -477,6 +495,8 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage(data_text, '', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
+            elif name_data == 'pagecount':
+                return '0'
             else:
                 return '<macro>' + match[0] + '(' + match[1] + ')' + '</macro>'
 
@@ -500,6 +520,8 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage('<div style="clear: both;"></div>', '', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
+            elif match == 'pagecount':
+                return '0'
             else:
                 return '<macro>' + match + '</macro>'
 
@@ -575,15 +597,9 @@ class class_do_render_namumark:
                             if data_sub:
                                 data_sub = data_sub.groups()
                                 if data_sub[0] == 'width':
-                                    if re.search(r'^[0-9]+$', data_sub[1]):
-                                        file_width = data_sub[1] + 'px'
-                                    else:
-                                        file_width = data_sub[1]
+                                    file_width = self.get_tool_px_add_check(data_sub[1])
                                 elif data_sub[0] == 'height':
-                                    if re.search(r'^[0-9]+$', data_sub[1]):
-                                        file_height = data_sub[1] + 'px'
-                                    else:
-                                        file_height = data_sub[1]
+                                    file_height = self.get_tool_px_add_check(data_sub[1])
                                 elif data_sub[0] == 'align':
                                     if data_sub[1] in ('left', 'right'):
                                         file_align = 'float:' + data_sub[1] + ';'
@@ -629,6 +645,9 @@ class class_do_render_namumark:
                         link_main_org = link_main
 
                         link_main = '/image/' + url_pas(sha224_replace(link_main)) + '.' + link_extension
+
+                    file_width = self.get_tool_css_safe(file_width)
+                    file_height = self.get_tool_css_safe(file_height)
 
                     file_end = '<image style="width:' + file_width + ';height:' + file_height + ';' + file_align + '" src="' + link_main + '">'
                     if file_align == 'center':
@@ -988,20 +1007,157 @@ class class_do_render_namumark:
                 
             self.render_data = '<' + data_name + '></' + data_name + '>'
 
+    def do_render_table(self):
+        # get_tool_dark_mode_split
+        # get_tool_px_add_check
+        # get_tool_css_safe
+        def do_render_table_parameter(cell_count, parameter, data, option = {}):
+            table_parameter_all = { "div" : "", "table" : "", "tr" : "", "td" : "", "col" : "", "colspan" : "", "rowspan" : "" }
+            
+            table_align_auto = 1
+            table_colspan_auto = 1
+
+            # todo : useless parameter return
+            table_parameter_regex = r'&lt;((?:(?!&lt;|&gt;).)+)&gt;'
+            for table_parameter in re.findall(table_parameter_regex, parameter):
+                table_parameter_split = table_parameter.split('=')
+                if len(table_parameter_split) == 2:
+                    table_parameter_name = table_parameter_split[0].replace(' ', '')
+                    table_parameter_data = self.get_tool_css_safe(table_parameter_split[1])
+                    if table_parameter_name == 'tablebgcolor':
+                        table_parameter_all['table'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'tablewidth':
+                        table_parameter_all['table'] += 'width:' + self.get_tool_px_add_check(table_parameter_data) + ';'
+                    elif table_parameter_name == 'tableheight':
+                        table_parameter_all['table'] += 'height:' + self.get_tool_px_add_check(table_parameter_data) + ';'
+                    elif table_parameter_name == 'tablealign':
+                        if table_parameter_data == 'right':
+                            table_parameter_all['div'] += 'float:right;'
+                        elif table_parameter_data == 'center':
+                            table_parameter_all['div'] += 'margin:auto;'
+                            table_parameter_all['table'] += 'margin:auto;'
+                    elif table_parameter_name == 'tabletextalign':
+                        table_parameter_all['table'] += 'text-align:' + table_parameter_data + ';'
+                    elif table_parameter_name == 'tablecolor':
+                        table_parameter_all['table'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'tablebordercolor':
+                        table_parameter_all['table'] += 'border:2px solid ' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'rowbgcolor':
+                        table_parameter_all['tr'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'rowtextalign':
+                        table_parameter_all['tr'] += 'text-align:' + table_parameter_data + ';'
+                    elif table_parameter_name == 'rowcolor':
+                        table_parameter_all['tr'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'colcolor':
+                        table_parameter_all['col'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'colbgcolor':
+                        table_parameter_all['col'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'bgcolor':
+                        table_parameter_all['td'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'color':
+                        table_parameter_all['td'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'width':
+                        table_parameter_all['td'] += 'width:' + self.get_tool_px_add_check(table_parameter_data) + ';'
+                    elif table_parameter_name == 'height':
+                        table_parameter_all['td'] += 'height:' + self.get_tool_px_add_check(table_parameter_data) + ';'
+                elif len(table_parameter_split) == 1:
+                    if re.search(r'^-[0-9]+$', table_parameter):
+                        table_colspan_auto = 0
+                        table_parameter_all['colspan'] = table_parameter.replace('-', '')
+                    elif re.search(r'^(\^|v)?\|[0-9]+$', table_parameter):
+                        if table_parameter[0] == '^':
+                            table_parameter_all['td'] += 'vertical-align: top;'
+                        elif table_parameter[0] == 'v':
+                            table_parameter_all['td'] += 'vertical-align: bottom;'
+
+                        table_parameter_all['rowspan'] = re.sub(r'^|v|\|', '', table_parameter)
+                    elif table_parameter in ('(', ':', ')'):
+                        table_align_auto = 0
+                        if table_parameter == '(':
+                            table_parameter_all['td'] += 'text-align: left;'
+                        elif table_parameter == ':':
+                            table_parameter_all['td'] += 'text-align: center;'
+                        elif table_parameter == ':':
+                            table_parameter_all['td'] += 'text-align: right;'
+                    else:
+                        table_parameter_data = self.get_tool_css_safe(table_parameter)
+                        table_parameter_all['td'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+            
+            if table_align_auto == 1:
+                if re.search(r'^ ', data):
+                    if re.search(r' $', data):
+                        table_parameter_all['td'] += 'text-align: center;'
+                    else:
+                        table_parameter_all['td'] += 'text-align: right;'
+
+            if table_colspan_auto == 1:
+                table_parameter_all['colspan'] = str(len(cell_count) // 2)
+
+            return table_parameter_all
+
+        table_regex = r'\n *((?:(?:(?:(?:\|\|)+)(?:(?:(?:(?:(?:(?!\|\|).)+)\n*)+)|(?:(?:(?!\|\|).)*)))+(?:(?:\|\|+)\n))+)'
+        table_sub_regex = r'(\n?)((?:\|\|)+)((?:&lt;(?:(?:(?!&lt;|&gt;).)+)&gt;)*)((?:(?:(?:(?:(?!\|\|).)+)\n*)+)|(?:(?:(?!\|\|).)*))'
+        table_count_all = len(re.findall(table_regex, self.render_data)) * 2
+        while 1:
+            table_data = re.search(table_regex, self.render_data)
+            if table_count_all < 0:
+                print('Error : render table count overflow')
+
+                break
+            elif not table_data:
+                break
+            else:
+                table_data_org = table_data.group(0)
+                table_data = table_data.group(1)
+
+                table_parameter = { "div" : "", "table" : "", "col" : {} }
+                table_data_end = ''
+                table_col_num = 0
+                table_tr_change = 0
+                for table_sub in re.findall(table_sub_regex, table_data):
+                    if table_sub[0] != '' and table_tr_change == 1:
+                        table_col_num = 0
+                        table_data_end += '</tr><tr style="' + table_sub_parameter['tr'] + '">'
+                    
+                    table_sub_parameter = do_render_table_parameter(table_sub[1], table_sub[2], table_sub[3])
+                    if not table_col_num in table_parameter['col']:
+                        table_parameter['col'][table_col_num] = ''
+
+                    table_parameter['div'] += table_sub_parameter['div']
+                    table_parameter['table'] += table_sub_parameter['table']
+                    table_parameter['col'][table_col_num] += table_sub_parameter['col']
+
+                    if table_sub[2] == '' and table_sub[3] == '':
+                        table_tr_change = 1
+                    else:
+                        table_tr_change = 0
+                    
+                        table_data_end += '<td colspan="' + table_sub_parameter['colspan'] + '" rowspan="' + table_sub_parameter['rowspan'] + '" style="' + table_sub_parameter['td'] + table_parameter['col'][table_col_num] + '">' + table_sub[3] + '</td>'
+                    
+                    table_col_num += 1
+
+                table_data_end = '<table style="' + table_parameter['table'] + '">' + table_data_end + '</table>'
+                if table_parameter['div'] != '':
+                    table_data_end = '<div style="' + table_parameter['div'] + '">' + table_data_end + '</div>'
+
+                self.render_data = re.sub(table_regex, '\n<front_br>' + table_data_end + '<back_br>\n', self.render_data, 1)
+
+            table_count_all -= 1
+
     def do_render_last(self):
         # add category
         if self.doc_include == '':
             if self.data_category != '':
                 data_name = self.get_tool_data_storage(self.data_category, '</div>', '')
 
-                if flask.request.cookies.get('main_css_category_set', '') == '':
+                if flask.request.cookies.get('main_css_category_set', '0') == '0':
                     if re.search(r'<footnote_category>', self.render_data):
-                        self.render_data = re.sub(r'<footnote_category>', '<' + data_name + '></' + data_name + '>', self.render_data, 1)
+                        self.render_data = re.sub(r'<footnote_category>', '<hr><' + data_name + '></' + data_name + '>', self.render_data, 1)
                     else:
-                        self.render_data += '<' + data_name + '></' + data_name + '>'
+                        self.render_data += '<hr><' + data_name + '></' + data_name + '>'
                 else:
                     self.render_data = re.sub(r'<footnote_category>', '', self.render_data, 1)
-                    self.render_data = '<' + data_name + '></' + data_name + '>' + self.render_data
+                    self.render_data = '<' + data_name + '></' + data_name + '><hr>' + self.render_data
             else:
                 self.render_data = re.sub(r'<footnote_category>', '', self.render_data, 1)
         else:
@@ -1027,10 +1183,10 @@ class class_do_render_namumark:
         self.do_render_math()
         # self.do_render_middle()
         # self.do_render_list()
-        # self.do_render_table()
+        self.do_render_table()
         self.do_render_link()
-        self.do_redner_footnote()
         self.do_render_macro()
+        self.do_redner_footnote()
         self.do_render_text()
         self.do_render_heading()
         self.do_render_last()
