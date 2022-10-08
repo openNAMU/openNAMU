@@ -166,6 +166,7 @@ class get_db_connect:
                 password = self.db_set['mysql_pw'],
                 charset = 'utf8mb4',
                 port = int(self.db_set['mysql_port']),
+                autocommit = True
             )
             curs = self.conn.cursor()
 
@@ -1291,15 +1292,23 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                 return ''
 
             if 'include' in get_class_render[2]:
-                for include_data in get_class_render[2]['include']:
+                for_a = 0
+                while len(get_class_render[2]['include']) > for_a:
+                    include_data = get_class_render[2]['include'][for_a]
                     if acl_check(include_data[1], 'render') == 0:
                         include_regex = re.compile('<div id="' + include_data[0] + '"><\/div>')
                         
                         include_data_render = class_do_render(conn, render_lang_data).do_render(include_data[1], include_data[2], data_type, include_data[0] + data_in)
-                        include_data_render[0] = '<div id="' + include_data[0] + '">' + include_data_render[0] + '</div>'
+                        if len(include_data) > 3:
+                            include_data_render[0] = '<div id="' + include_data[0] + '" ' + include_data[3] + '>' + include_data_render[0] + '</div>'
+                        else:
+                            include_data_render[0] = '<div id="' + include_data[0] + '">' + include_data_render[0] + '</div>'
 
                         get_class_render[0] = re.sub(include_regex, include_data_render[0], get_class_render[0])
                         get_class_render[1] += include_data_render[1]
+                        get_class_render[2]['include'] += include_data_render[2]['include']
+
+                    for_a += 1
 
             if data_type == 'api_view':
                 return [
