@@ -590,7 +590,7 @@ class opennamu_render_markdown {
         while(this.doc_data.match(blockquote_regex)) {
             this.doc_data = this.doc_data.replace(blockquote_regex, function(match, x1) {
                 let blockquote_data = '<brStart>' + x1;
-                blockquote_data = blockquote_data.replace(/\n&gt;	?/g, '\n');
+                blockquote_data = blockquote_data.replace(/\n&gt;    ?/g, '\n');
 
                 parser_count += 1;
                 let parser_count_str = String(parser_count);

@@ -1,7 +1,7 @@
 "use strict";
 
 function opennamu_do_insert_version(
-	dom_name_version_now, 
+    dom_name_version_now, 
     dom_name_version_new
 ) {
     let url = "/api/version";

@@ -225,7 +225,7 @@
         "challenge" : "Challenge",
         "user_title" : "User title",
         "multiple_ban" : "Multiple ban",
-    	"dont_move" : "Don't move",
+        "dont_move" : "Don't move",
         "file_delete" : "File delete",
         "_comment_" : "Edit",
             "load" : "Load another document",
@@ -279,6 +279,7 @@
                 "edit_set" : "Edit-related settings",
                 "communication_set" : "Communication-related settings",
     
+                "namumark_fully_compatible_mode" : "namumark fully compatible mode",
                 "wiki_name" : "Wikis name",
                 "wiki_logo" : "Wikis logo",
                 "main_page" : "Main page",
