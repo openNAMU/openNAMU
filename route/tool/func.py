@@ -1268,7 +1268,7 @@ def load_skin(data = '', set_n = 0, default = 0):
 
 # Func-markup
 def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', doc_acl = ''):
-    # without_DB
+    curs = conn.cursor()
 
     # data_type in ['view', 'raw', 'api_view', 'backlink']
     doc_acl = acl_check(doc_name, 'render') if doc_acl == '' else doc_acl
@@ -1309,6 +1309,20 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                         get_class_render[2]['include'] += include_data_render[2]['include']
 
                     for_a += 1
+
+            curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '':
+                get_class_render[0] = '''
+                    <style>
+                        .render_content, .opennamu_render_complete {
+                            font-size: 14.4px !important;
+                        }
+                        .render_content td, .opennamu_render_complete td {
+                            padding: 5px 10px !important;
+                        }
+                    </style>
+                ''' + get_class_render[0]
 
             if data_type == 'api_view':
                 return [
