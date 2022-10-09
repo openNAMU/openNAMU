@@ -221,7 +221,7 @@ hr {
     
     line-break: anywhere;
 
-    display: inline-block;
+    display: inline;
 }
 
 blockquote {

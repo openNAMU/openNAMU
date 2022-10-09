@@ -71,7 +71,7 @@ def edit_revert(name, num):
             return redirect('/w/' + url_pas(name))
         else:
             if data:
-                preview = '<pre>' + data[0][0] + '</pre>'
+                preview = '<pre>' + html.escape(data[0][0]) + '</pre>'
             else:
                 preview = ''
             
