@@ -34,7 +34,8 @@ def main_func_setting_main(db_set):
             30 : ['password_min_length', ''],
             31 : ['wiki_access_password_need', ''],
             32 : ['wiki_access_password', ''],
-            33 : ['history_recording_off', '']
+            33 : ['history_recording_off', ''],
+            34 : ['namumark_compatible', '']
         }
 
         if flask.request.method == 'POST':
@@ -81,7 +82,7 @@ def main_func_setting_main(db_set):
                 else:
                     tls_select += '<option value="' + tls_select_one + '">' + tls_select_one + '</option>'
 
-            check_box_div = ['', '', '', '', '', '', '', '', '', '']
+            check_box_div = ['', '', '', '', '', '', '', '', '', '', '']
             for i in range(0, len(check_box_div)):
                 if i == 0:
                     acl_num = 7
@@ -101,6 +102,8 @@ def main_func_setting_main(db_set):
                     acl_num = 31
                 elif i == 9:
                     acl_num = 33
+                elif i == 10:
+                    acl_num = 34
 
                 if d_list[acl_num]:
                     check_box_div[i] = 'checked="checked"'
@@ -180,6 +183,9 @@ def main_func_setting_main(db_set):
                         <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class="main_hr">
                         <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'ringo') + '''</select>
+
+                        <hr class="main_hr">
+                        <input type="checkbox" name="namumark_compatible" ''' + check_box_div[10] + '''> ''' + load_lang('namumark_fully_compatible_mode') + '''
 
                         <h2>3. ''' + load_lang('login_set') + '''</h2>
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''

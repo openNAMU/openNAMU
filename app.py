@@ -465,6 +465,7 @@ app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
 app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(recent_discuss)
 app.route('/recent_discuss/close', defaults = { 'tool' : 'close' })(recent_discuss)
 app.route('/recent_discuss/open', defaults = { 'tool' : 'open' })(recent_discuss)
+app.route('/recent_discuss/delete')(recent_discuss_delete)
 
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
 app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
@@ -574,6 +575,16 @@ app.route('/vote/list/close', defaults = { 'list_type' : 'close' })(vote_list)
 app.route('/vote/list/close/<int:num>', defaults = { 'list_type' : 'close' })(vote_list)
 app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 
+# Func-bbs
+# app.route('/bbs/main')
+# app.route('/bbs/main/set')
+# app.route('/bbs/make')
+# app.route('/bbs/w/<int:bbs_num>')
+# app.route('/bbs/set/<int:bbs_num>')
+# app.route('/bbs/edit/<int:bbs_num>')
+# app.route('/bbs/w/<int:bbs_num>/<int:post_num>')
+# app.route('/bbs/edit/<int:bbs_num>/<int:post_num>')
+
 # Func-api
 app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):rev>')(api_w)
 app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['POST', 'GET'])(api_w)
@@ -638,6 +649,8 @@ app.route('/setting/robot', methods = ['POST', 'GET'])(main_func_setting_robot)
 app.route('/setting/external', methods = ['POST', 'GET'])(main_func_setting_external)
 app.route('/setting/acl', methods = ['POST', 'GET'])(main_func_setting_acl)
 app.route('/setting/sitemap', methods = ['POST', 'GET'])(main_func_setting_sitemap)
+
+app.route('/easter_egg')(main_func_easter_egg)
 
 # views -> view
 app.route('/view/<everything:name>')(main_view)

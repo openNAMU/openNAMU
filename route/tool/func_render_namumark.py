@@ -41,6 +41,9 @@ class class_do_render_namumark:
 
         return data
 
+    def get_tool_css_safe(self, data):
+        return data.replace(';', '')
+
     def get_tool_data_storage(self, data_A = '', data_B = '', data_C = '', do_type = 'render'):
         self.data_temp_storage_count += 1
         if do_type == 'render':
@@ -79,21 +82,48 @@ class class_do_render_namumark:
 
         return data
 
-    def get_tool_data_revert(self, data):
-        storage_count = self.data_temp_storage_count * 2
-        storage_regex = r'<(render_(?:[0-9]+))>(?:(?:(?!<(?:\/?render_(?:[0-9]+))>).)*)<\/render_(?:[0-9]+)>'
+    def get_tool_data_revert(self, data, do_type = 'all'):
+        storage_count = self.data_temp_storage_count * 3
+        if do_type == 'all':
+            storage_regex = r'(?:<((slash)_(?:[0-9]+))>|<((render)_(?:[0-9]+))>(?:(?:(?!<(?:\/?render_(?:[0-9]+))>).)*)<\/render_(?:[0-9]+)>)'
+        elif do_type == 'render':
+            storage_regex = r'<((render)_(?:[0-9]+))>(?:(?:(?!<(?:\/?render_(?:[0-9]+))>).)*)<\/render_(?:[0-9]+)>'
+        else:
+            storage_regex = r'<((slash)_(?:[0-9]+))>'
 
         while 1:
-            if not re.search(storage_regex, data):
+            match = re.search(storage_regex, data)
+            if not match:
                 break
             if storage_count < 0:
                 print('Error : render restore count overflow')
 
                 break
             else:
-                data = re.sub(storage_regex, lambda match : self.data_temp_storage['revert_' + match.group(1)], data, 1)
+                match = match.groups()
+                if match[1] and match[1] == 'render':
+                    if ('revert_' + match[0]) in self.data_temp_storage:
+                        data_revert = self.data_temp_storage['revert_' + match[0]]
+                    else:
+                        data_revert = ''
+                else:
+                    if len(match) > 3 and match[3] == 'render':
+                        if ('revert_' + match[2]) in self.data_temp_storage:
+                            data_revert = self.data_temp_storage['revert_' + match[2]]
+                        else:
+                            data_revert = ''
+                    else:
+                        if self.data_temp_storage[match[0]] == '\\':
+                            data_revert = '\\\\\\\\'
+                        else:
+                            data_revert = '\\' + self.data_temp_storage[match[0]]
+
+                data = re.sub(storage_regex, data_revert, data, 1)
 
             storage_count -= 1
+
+        data = re.sub(r'<front_br>', '', data)
+        data = re.sub(r'<back_br>', '', data)
 
         return data
 
@@ -121,6 +151,22 @@ class class_do_render_namumark:
         self.data_footnote = {}
 
         return data
+
+    def get_tool_px_add_check(self, data):
+        if re.search(r'^[0-9]+$', data):
+            return data + 'px'
+        else:
+            return data
+
+    def get_tool_dark_mode_split(self, data):
+        data = data.split(',')
+        if len(data) == 1:
+            return data[0]
+        else:
+            if flask.request.cookies.get('main_css_del_bold', '0') == '0':
+                return data[0]
+            else:
+                return data[1]
 
     def do_render_text(self):
         # <b> function
@@ -359,15 +405,9 @@ class class_do_render_namumark:
                     if data_sub:
                         data_sub = data_sub.groups()
                         if data_sub[0] == 'width':
-                            if re.search(r'^[0-9]+$', data_sub[1]):
-                                video_width = data_sub[1] + 'px'
-                            else:
-                                video_width = data_sub[1]
+                            video_width = self.get_tool_px_add_check(data_sub[1])
                         elif data_sub[0] == 'height':
-                            if re.search(r'^[0-9]+$', data_sub[1]):
-                                video_height = data_sub[1] + 'px'
-                            else:
-                                video_height = data_sub[1]
+                            video_height = self.get_tool_px_add_check(data_sub[1])
                         elif data_sub[0] == 'start':
                             video_start = data_sub[1]
                         elif data_sub[0] == 'end':
@@ -404,6 +444,9 @@ class class_do_render_namumark:
                 else:
                     video_code = 'https://player.vimeo.com/video/' + video_code
 
+                video_width = self.get_tool_css_safe(video_width)
+                video_height = self.get_tool_css_safe(video_height)
+
                 data_name = self.get_tool_data_storage('<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen></iframe>', '', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
@@ -425,8 +468,10 @@ class class_do_render_namumark:
                     else:
                         main_text = for_a
 
-                main_text = self.get_tool_data_revert(main_text)
-                sub_text = self.get_tool_data_revert(sub_text)
+                main_text = self.get_tool_data_revert(main_text, do_type = 'render')
+                sub_text = self.get_tool_data_revert(sub_text, do_type = 'render')
+
+                color = self.get_tool_css_safe(color)
 
                 # add color
                 if color != '':
@@ -477,6 +522,8 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage(data_text, '', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
+            elif name_data == 'pagecount':
+                return '0'
             else:
                 return '<macro>' + match[0] + '(' + match[1] + ')' + '</macro>'
 
@@ -500,6 +547,8 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage('<div style="clear: both;"></div>', '', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
+            elif match == 'pagecount':
+                return '0'
             else:
                 return '<macro>' + match + '</macro>'
 
@@ -575,15 +624,9 @@ class class_do_render_namumark:
                             if data_sub:
                                 data_sub = data_sub.groups()
                                 if data_sub[0] == 'width':
-                                    if re.search(r'^[0-9]+$', data_sub[1]):
-                                        file_width = data_sub[1] + 'px'
-                                    else:
-                                        file_width = data_sub[1]
+                                    file_width = self.get_tool_px_add_check(data_sub[1])
                                 elif data_sub[0] == 'height':
-                                    if re.search(r'^[0-9]+$', data_sub[1]):
-                                        file_height = data_sub[1] + 'px'
-                                    else:
-                                        file_height = data_sub[1]
+                                    file_height = self.get_tool_px_add_check(data_sub[1])
                                 elif data_sub[0] == 'align':
                                     if data_sub[1] in ('left', 'right'):
                                         file_align = 'float:' + data_sub[1] + ';'
@@ -629,6 +672,9 @@ class class_do_render_namumark:
                         link_main_org = link_main
 
                         link_main = '/image/' + url_pas(sha224_replace(link_main)) + '.' + link_extension
+
+                    file_width = self.get_tool_css_safe(file_width)
+                    file_height = self.get_tool_css_safe(file_height)
 
                     file_end = '<image style="width:' + file_width + ';height:' + file_height + ';' + file_align + '" src="' + link_main + '">'
                     if file_align == 'center':
@@ -714,8 +760,10 @@ class class_do_render_namumark:
                         link_main = re.sub(r'(\/[^/]+)$', '', link_main)
                     elif re.search(r'^\/', link_main):
                         link_main = re.sub(r'^\/', self.doc_name + '/', link_main)
-                    elif re.search(r'^분류:', link_main):
-                        link_main = re.sub(r'^분류:', 'category:', link_main)
+                    elif re.search(r'^:(분류|category):', link_main):
+                        link_main = re.sub(r'^:(분류|category):', 'category:', link_main)
+                    elif re.search(r'^:(파일|file):', link_main):
+                        link_main = re.sub(r'^:(파일|file):', 'file:', link_main)
                     elif re.search(r'^사용자:', link_main):
                         link_main = re.sub(r'^사용자:', 'user:', link_main)
 
@@ -723,12 +771,12 @@ class class_do_render_namumark:
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_main = html.unescape(link_main)
 
-                    self.curs.execute(db_change("select title from data where title = ?"), [link_main])
-                    db_data = self.curs.fetchall()
-                    if db_data:
-                        link_exist = ''
-                    else:
-                        link_exist = 'opennamu_not_exist_link'
+                    link_exist = ''
+                    if link_main != '':
+                        self.curs.execute(db_change("select title from data where title = ?"), [link_main])
+                        db_data = self.curs.fetchall()
+                        if not db_data:
+                            link_exist = 'opennamu_not_exist_link'
 
                     link_same = ''
                     if link_main == self.doc_name and self.doc_include == '':
@@ -786,8 +834,8 @@ class class_do_render_namumark:
 
                 return slash_add + match[2]
 
-        self.render_data = re.sub(r'(\\+)?@([^@=]+)=((?:\\@|[^@])+)@', do_render_include_default_sub, self.render_data)
-        self.render_data = re.sub(r'(\\+)?@([^@=]+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([^@= ]+)=((?:\\@|[^@])+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([^@= ]+)@', do_render_include_default_sub, self.render_data)
 
     def do_render_include(self):
         def do_render_include_default_sub(match):
@@ -830,7 +878,7 @@ class class_do_render_namumark:
                 match = match.groups()
 
                 macro_split_regex = r'(?:^|,) *([^,]+)'
-                macro_split_sub_regex = r'(^[^=]+) *= *([^=]+)'
+                macro_split_sub_regex = r'(^[^=]+) *= *([^=]*)'
 
                 include_name = ''
 
@@ -842,6 +890,9 @@ class class_do_render_namumark:
                         
                         data_sub_name = data_sub[0]
                         data_sub_data = self.get_tool_data_restore(data_sub[1], do_type = 'slash')
+                        
+                        data_sub_data = re.sub(r'^분류:', ':분류:', data_sub_data)
+                        data_sub_data = re.sub(r'^파일:', ':파일:', data_sub_data)
 
                         include_change_list[data_sub_name] = data_sub_data
                     else:
@@ -864,17 +915,17 @@ class class_do_render_namumark:
                     include_data = db_data[0][0]
 
                     # parameter replace
-                    include_data = re.sub(r'(\\+)?@([^@=]+)=((?:\\@|[^@])+)@', do_render_include_default_sub, include_data)
-                    include_data = re.sub(r'(\\+)?@([^@=]+)@', do_render_include_default_sub, include_data)
+                    include_data = re.sub(r'(\\+)?@([^@= ]+)=((?:\\@|[^@])+)@', do_render_include_default_sub, include_data)
+                    include_data = re.sub(r'(\\+)?@([^@= ]+)@', do_render_include_default_sub, include_data)
 
                     # remove include
                     include_data = re.sub(include_regex, '', include_data)
 
-                    self.data_include += [['opennamu_include_' + str(include_num), include_name, include_data]]
+                    self.data_include += [[self.doc_include + 'opennamu_include_' + str(include_num), include_name, include_data]]
 
                     data_name = self.get_tool_data_storage('' + \
                         include_link + \
-                        '<div id="opennamu_include_' + str(include_num) + '"></div>' + \
+                        '<div id="' + self.doc_include + 'opennamu_include_' + str(include_num) + '"></div>' + \
                     '', '', match_org)
                 else:
                     include_link = '<div><a class="opennamu_not_exist_link" href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
@@ -885,13 +936,7 @@ class class_do_render_namumark:
 
             include_count_max -= 1
 
-    def do_render_middle(self):
-        pass
-
     def do_render_list(self):
-        pass
-
-    def do_render_table(self):
         pass
 
     def do_redner_footnote(self):
@@ -982,11 +1027,324 @@ class class_do_render_namumark:
                 link_main = '/w_from/' + link_main
 
             if 'doc_from' in self.doc_set:
-                data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', link_data_full)
+                data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
             else:
-                data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', link_data_full)
+                data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', '', link_data_full)
                 
             self.render_data = '<' + data_name + '></' + data_name + '>'
+
+    def do_render_table(self):
+        self.render_data = re.sub(r'\n +\|\|', '\n||', self.render_data)
+
+        # get_tool_dark_mode_split
+        # get_tool_px_add_check
+        # get_tool_css_safe
+        def do_render_table_parameter(cell_count, parameter, data, option = {}):
+            table_parameter_all = { "div" : "", "table" : "", "tr" : "", "td" : "", "col" : "", "colspan" : "", "rowspan" : "", "data" : "" }
+            
+            table_align_auto = 1
+            table_colspan_auto = 1
+
+            # todo : useless parameter return
+            table_parameter_regex = r'&lt;((?:(?!&lt;|&gt;).)+)&gt;'
+            for table_parameter in re.findall(table_parameter_regex, parameter):
+                table_parameter_split = table_parameter.split('=')
+                if len(table_parameter_split) == 2:
+                    table_parameter_name = table_parameter_split[0].replace(' ', '')
+                    table_parameter_data = self.get_tool_css_safe(table_parameter_split[1])
+                    if table_parameter_name == 'tablebgcolor':
+                        table_parameter_all['table'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'tablewidth':
+                        table_parameter_all['table'] += 'width:' + self.get_tool_px_add_check(table_parameter_data) + ';'
+                    elif table_parameter_name == 'tableheight':
+                        table_parameter_all['table'] += 'height:' + self.get_tool_px_add_check(table_parameter_data) + ';'
+                    elif table_parameter_name == 'tablealign':
+                        if table_parameter_data == 'right':
+                            table_parameter_all['div'] += 'float:right;'
+                        elif table_parameter_data == 'center':
+                            table_parameter_all['div'] += 'margin:auto;'
+                            table_parameter_all['table'] += 'margin:auto;'
+                    elif table_parameter_name == 'tabletextalign':
+                        table_parameter_all['table'] += 'text-align:' + table_parameter_data + ';'
+                    elif table_parameter_name == 'tablecolor':
+                        table_parameter_all['table'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'tablebordercolor':
+                        table_parameter_all['table'] += 'border:2px solid ' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'rowbgcolor':
+                        table_parameter_all['tr'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'rowtextalign':
+                        table_parameter_all['tr'] += 'text-align:' + table_parameter_data + ';'
+                    elif table_parameter_name == 'rowcolor':
+                        table_parameter_all['tr'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'colcolor':
+                        table_parameter_all['col'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'colbgcolor':
+                        table_parameter_all['col'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'bgcolor':
+                        table_parameter_all['td'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'color':
+                        table_parameter_all['td'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'width':
+                        table_parameter_all['td'] += 'width:' + self.get_tool_px_add_check(table_parameter_data) + ';'
+                    elif table_parameter_name == 'height':
+                        table_parameter_all['td'] += 'height:' + self.get_tool_px_add_check(table_parameter_data) + ';'
+                elif len(table_parameter_split) == 1:
+                    if re.search(r'^-[0-9]+$', table_parameter):
+                        table_colspan_auto = 0
+                        table_parameter_all['colspan'] = table_parameter.replace('-', '')
+                    elif re.search(r'^(\^|v)?\|[0-9]+$', table_parameter):
+                        if table_parameter[0] == '^':
+                            table_parameter_all['td'] += 'vertical-align: top;'
+                        elif table_parameter[0] == 'v':
+                            table_parameter_all['td'] += 'vertical-align: bottom;'
+
+                        table_parameter_all['rowspan'] = re.sub(r'^|v|\|', '', table_parameter)
+                    elif table_parameter in ('(', ':', ')'):
+                        table_align_auto = 0
+                        if table_parameter == '(':
+                            table_parameter_all['td'] += 'text-align: left;'
+                        elif table_parameter == ':':
+                            table_parameter_all['td'] += 'text-align: center;'
+                        elif table_parameter == ':':
+                            table_parameter_all['td'] += 'text-align: right;'
+                    else:
+                        table_parameter_data = self.get_tool_css_safe(table_parameter)
+                        table_parameter_all['td'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+            
+            if table_align_auto == 1:
+                if re.search(r'^ ', data):
+                    data = re.sub(r'^ ', '', data)
+                    if re.search(r' $', data):
+                        table_parameter_all['td'] += 'text-align: center;'
+
+                        data = re.sub(r' $', '', data)
+                    else:
+                        table_parameter_all['td'] += 'text-align: right;'
+                else:
+                    if re.search(r' $', data):
+                        data = re.sub(r' $', '', data)
+
+            if table_colspan_auto == 1:
+                table_parameter_all['colspan'] = str(len(cell_count) // 2)
+
+            table_parameter_all['data'] = data
+
+            return table_parameter_all
+
+        table_regex = r'\n *((?:(?:(?:(?:\|\|)+)(?:(?:(?:(?:(?:(?!\|\|).)+)\n*)+)|(?:(?:(?!\|\|).)*)))+(?:(?:\|\|+)\n))+)'
+        table_sub_regex = r'(\n?)((?:\|\|)+)((?:&lt;(?:(?:(?!&lt;|&gt;).)+)&gt;)*)((?:\n*(?:(?:(?:(?!\|\|).)+)\n*)+)|(?:(?:(?!\|\|).)*))'
+        table_count_all = len(re.findall(table_regex, self.render_data)) * 2
+        while 1:
+            table_data = re.search(table_regex, self.render_data)
+            if table_count_all < 0:
+                print('Error : render table count overflow')
+
+                break
+            elif not table_data:
+                break
+            else:
+                table_data_org = table_data.group(0)
+                table_data = table_data.group(1)
+                print(table_data)
+
+                table_parameter = { "div" : "", "table" : "", "col" : {} }
+                table_data_end = ''
+                table_col_num = 0
+                table_tr_change = 0
+                for table_sub in re.findall(table_sub_regex, table_data):
+                    if table_sub[0] != '' and table_tr_change == 1:
+                        table_col_num = 0
+                        table_data_end += '</tr><tr style="' + table_sub_parameter['tr'] + '">'
+
+                    table_sub_parameter = do_render_table_parameter(table_sub[1], table_sub[2], table_sub[3])
+                    if not table_col_num in table_parameter['col']:
+                        table_parameter['col'][table_col_num] = ''
+
+                    table_parameter['div'] += table_sub_parameter['div']
+                    table_parameter['table'] += table_sub_parameter['table']
+                    table_parameter['col'][table_col_num] += table_sub_parameter['col']
+
+                    if table_sub[2] == '' and table_sub[3] == '':
+                        table_tr_change = 1
+                    else:
+                        table_tr_change = 0
+                    
+                        table_data_end += '<td colspan="' + table_sub_parameter['colspan'] + '" rowspan="' + table_sub_parameter['rowspan'] + '" style="' + table_sub_parameter['td'] + table_parameter['col'][table_col_num] + '">' + table_sub_parameter['data'] + '</td>'
+                    
+                    table_col_num += 1
+
+                table_data_end = '<table style="' + table_parameter['table'] + '">' + table_data_end + '</table>'
+                if table_parameter['div'] != '':
+                    table_data_end = '<div style="' + table_parameter['div'] + '">' + table_data_end + '</div>'
+
+                self.render_data = re.sub(table_regex, '\n<front_br>' + table_data_end + '<back_br>\n', self.render_data, 1)
+
+            table_count_all -= 1
+    
+    def do_render_middle(self):
+        middle_regex = r'{{{([^{](?:(?!{{{|}}}).|\n)*)?(?:}|<(\/?(?:slash)_(?:[0-9]+))>)}}'
+        wiki_count = 0
+        middle_count_all = len(re.findall(middle_regex, self.render_data)) * 10
+        while 1:
+            middle_data = re.search(middle_regex, self.render_data)
+            if middle_count_all < 0:
+                break
+            elif not middle_data:
+                break
+            else:
+                middle_data_org = middle_data.group(0)
+                middle_slash = middle_data.group(2)
+                if middle_slash:
+                    if self.data_temp_storage[middle_slash] != '}':
+                        middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
+                        self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                        continue
+
+                middle_data = middle_data.group(1)
+                if not middle_data:
+                    middle_data = ''
+
+                middle_name = re.search(r'^([^ \n]+)', middle_data)
+                middle_data_pass = ''
+                if middle_name:
+                    middle_name = middle_name.group(1)
+                    if middle_name == '#!wiki':
+                        if middle_slash:
+                            middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
+                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            continue
+
+                        wiki_regex = r'^#!wiki(?:(?: style=(&quot;(?:(?:(?!&quot;).)*)&quot;|&#x27;(?:(?:(?!&#x27;).)*)&#x27;))| [^\n]*)?\n'
+                        wiki_data_style = re.search(wiki_regex, middle_data)
+                        wiki_data = re.sub(wiki_regex, '', middle_data)
+                        if wiki_data_style:
+                            wiki_data_style = wiki_data_style.group(1)
+                            if wiki_data_style:
+                                wiki_data_style = wiki_data_style.replace('&#x27;', '\'')
+                                wiki_data_style = wiki_data_style.replace('&quot;', '"')
+                                wiki_data_style = 'style=' + wiki_data_style
+                            else:
+                                wiki_data_style = ''
+                        else:
+                            wiki_data_style = ''
+
+                        wiki_data = self.get_tool_data_revert(wiki_data)
+                        wiki_data = html.unescape(wiki_data)
+                        wiki_data = re.sub('\n$', '', wiki_data)
+
+                        self.data_include += [[self.doc_include + 'opennamu_wiki_' + str(wiki_count), self.doc_name, wiki_data, wiki_data_style]]
+
+                        data_name = self.get_tool_data_storage('<div id="' + self.doc_include + 'opennamu_wiki_' + str(wiki_count) + '"></div>', '', middle_data_org)
+                        wiki_count += 1
+                    elif middle_name == '#!html':
+                        if middle_slash:
+                            middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
+                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            continue
+
+                        data_name = self.get_tool_data_storage('', '', middle_data_org)
+                    elif middle_name == '#!folding':
+                        if middle_slash:
+                            middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
+                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            continue
+
+                        data_name = self.get_tool_data_storage('', '', middle_data_org)
+                    elif middle_name == '#!syntax':
+                        if middle_slash:
+                            middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
+                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            continue
+
+                        data_name = self.get_tool_data_storage('', '', middle_data_org)
+                    elif middle_name in ('+5', '+4', '+3', '+2', '+1'):
+                        if middle_slash:
+                            middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
+                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            continue
+
+                        wiki_data = re.sub(r'^\+[1-5] ', '', middle_data)
+                        if middle_name == '+5':
+                            wiki_size = '200'
+                        elif middle_name == '+4':
+                            wiki_size = '180'
+                        elif middle_name == '+3':
+                            wiki_size = '160'
+                        elif middle_name == '+2':
+                            wiki_size = '140'
+                        else:
+                            wiki_size = '120'
+
+                        middle_data_pass = wiki_data
+                        data_name = self.get_tool_data_storage('<span style="font-size:' + wiki_size + '%">', '</span>', middle_data_org)
+                    elif middle_name in ('-5', '-4', '-3', '-2', '-1'):
+                        if middle_slash:
+                            middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
+                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            continue
+
+                        wiki_data = re.sub(r'^\-[1-5] ', '', middle_data)
+                        if middle_name == '-5':
+                            wiki_size = '50'
+                        elif middle_name == '-4':
+                            wiki_size = '60'
+                        elif middle_name == '-3':
+                            wiki_size = '70'
+                        elif middle_name == '-2':
+                            wiki_size = '80'
+                        else:
+                            wiki_size = '90'
+
+                        middle_data_pass = wiki_data
+                        data_name = self.get_tool_data_storage('<span style="font-size:' + wiki_size + '%">', '</span>', middle_data_org)
+                    elif re.search(r'^#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))', middle_name):
+                        if middle_slash:
+                            middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
+                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            continue
+
+                        wiki_color = re.search(r'^#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))?', middle_name)
+                        if wiki_color:
+                            wiki_color = wiki_color.groups()
+                            if wiki_color[0]:
+                                wiki_color = '#' + wiki_color[0]
+                            else:
+                                wiki_color = wiki_color[1]
+
+                            if wiki_color[2]:
+                                wiki_color += ',#' + wiki_color[0]
+                            elif wiki_color[3]:
+                                wiki_color = ',' + wiki_color[1]
+                        else:
+                            wiki_color = 'red'
+
+                        wiki_color = self.get_tool_css_safe(wiki_color)
+                        wiki_color = self.get_tool_dark_mode_split(wiki_color)
+
+                        wiki_data = re.sub(r'^#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))? ?', '', middle_data)
+
+                        middle_data_pass = wiki_data
+                        data_name = self.get_tool_data_storage('<span style="color:' + wiki_color + '">', '</span>', middle_data_org)
+                    else:
+                        if middle_slash:
+                            middle_data += '\\'
+
+                        data_revert = self.get_tool_data_revert(middle_data)
+
+                        data_name = self.get_tool_data_storage(data_revert, '', middle_data_org)
+                else:
+                    if middle_slash:
+                        middle_data += '\\'
+
+                    data_revert = self.get_tool_data_revert(middle_data)
+
+                    data_name = self.get_tool_data_storage(data_revert, '', middle_data_org)
+
+                self.render_data = re.sub(middle_regex, '<' + data_name + '>' + middle_data_pass + '</' + data_name + '>', self.render_data, 1)
+
+            middle_count_all -= 1
+
+        self.render_data = re.sub(r'<temp_(?P<in>(?:slash)_(?:[0-9]+))>', '<\g<in>>', self.render_data)
 
     def do_render_last(self):
         # add category
@@ -994,14 +1352,14 @@ class class_do_render_namumark:
             if self.data_category != '':
                 data_name = self.get_tool_data_storage(self.data_category, '</div>', '')
 
-                if flask.request.cookies.get('main_css_category_set', '') == '':
+                if flask.request.cookies.get('main_css_category_set', '0') == '0':
                     if re.search(r'<footnote_category>', self.render_data):
-                        self.render_data = re.sub(r'<footnote_category>', '<' + data_name + '></' + data_name + '>', self.render_data, 1)
+                        self.render_data = re.sub(r'<footnote_category>', '<hr><' + data_name + '></' + data_name + '>', self.render_data, 1)
                     else:
-                        self.render_data += '<' + data_name + '></' + data_name + '>'
+                        self.render_data += '<hr><' + data_name + '></' + data_name + '>'
                 else:
                     self.render_data = re.sub(r'<footnote_category>', '', self.render_data, 1)
-                    self.render_data = '<' + data_name + '></' + data_name + '>' + self.render_data
+                    self.render_data = '<' + data_name + '></' + data_name + '><hr>' + self.render_data
             else:
                 self.render_data = re.sub(r'<footnote_category>', '', self.render_data, 1)
         else:
@@ -1025,12 +1383,12 @@ class class_do_render_namumark:
         self.do_render_redirect()
         self.do_render_include()
         self.do_render_math()
-        # self.do_render_middle()
+        self.do_render_middle()
         # self.do_render_list()
-        # self.do_render_table()
+        self.do_render_table()
         self.do_render_link()
-        self.do_redner_footnote()
         self.do_render_macro()
+        self.do_redner_footnote()
         self.do_render_text()
         self.do_render_heading()
         self.do_render_last()

@@ -9,6 +9,8 @@ def recent_discuss(tool):
         if tool == 'normal':
             div += '<a href="/recent_discuss/close">(' + load_lang('close_discussion') + ')</a> '
             div += '<a href="/recent_discuss/open">(' + load_lang('open_discussion_list') + ')</a>'
+            if admin_check() == 1:
+                div += ' <a href="/recent_discuss/delete">(' + load_lang('delete') + ')</a>'
 
             m_sub = 0
         elif tool == 'close':
@@ -48,7 +50,10 @@ def recent_discuss(tool):
                 '</tr>' + \
             ''
 
-        div += '</tbody></table>'
+        div += '' + \
+                '</tbody>' + \
+            '</table>' + \
+        ''
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('recent_discussion'), wiki_set(), wiki_custom(), wiki_css([m_sub, 0])],
