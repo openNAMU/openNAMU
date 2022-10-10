@@ -704,7 +704,9 @@ def get_default_robots_txt():
         'User-agent: *\n' + \
         'Disallow: /\n' + \
         'Allow: /$\n' + \
-        'Allow: /w/' + \
+        'Allow: /w/\n' + \
+        'Allow: /sitemap.xml$\n' + \
+        'Allow: /sitemap_*.xml$' + \
     ''
 
     if os.path.exists('sitemap.xml'):
