@@ -156,7 +156,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
                             if section == count:
                                 data_section_sub = data_section
-                                data_section_sub = re.sub(data_match_re, '.' * len(data_match.group(0)), data_section_sub, 1)
+                                data_section_sub = re.sub(data_match_re, ('.' * (len(data_match.group(0)) - 1)) + '\n', data_section_sub, 1)
 
                                 data_match_plus = re.search(data_match_re, data_section_sub)
                                 if data_match_plus:
@@ -170,7 +170,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
                                 break
                             else:
-                                data_section = re.sub(data_match_re, '.' * len(data_match.group(0)), data_section, 1)
+                                data_section = re.sub(data_match_re, ('.' * (len(data_match.group(0)) - 1)) + '\n', data_section, 1)
 
                             count += 1
             else:
