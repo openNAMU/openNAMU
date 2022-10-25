@@ -613,6 +613,8 @@ def update(ver_num, set_data):
                 'User-agent: *\n' + \
                 'Disallow: /\n' + \
                 'Allow: /$\n' + \
+                'Allow: /image/\n' + \
+                'Allow: /views/\n' + \
                 'Allow: /w/' + \
             ''
             if db_data[0][0] == robot_default:

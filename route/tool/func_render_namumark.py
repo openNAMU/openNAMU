@@ -1082,6 +1082,7 @@ class class_do_render_namumark:
         # get_tool_px_add_check
         # get_tool_css_safe
         # todo : after text render text not use to make table
+        # todo : table caption
         def do_render_table_parameter(cell_count, parameter, data, option = {}):
             table_parameter_all = { "div" : "", "table" : "", "tr" : "", "td" : "", "col" : "", "colspan" : "", "rowspan" : "", "data" : "" }
             
