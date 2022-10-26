@@ -1,5 +1,5 @@
-function do_insert_data(name, data, monaco = 0) {
-    if(monaco === 0) {
+function do_insert_data(name, data, monaco_name) {
+    if(!document.getElementById(monaco_name)) {
         // https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
         if(document.selection) {
             document.getElementById(name).focus();
@@ -103,8 +103,4 @@ function pasteListener(e) {
             alert("업로드 실패");
         });
     }
-}
-
-function load_raw_preview(name_1, name_2) {
-    document.getElementById(name_2).innerHTML = document.getElementById(name_1).value;
 }

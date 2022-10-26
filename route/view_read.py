@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
+def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -131,7 +131,7 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
         else:
             name_view = name
 
-        if num != '0':
+        if num != '':
             curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
             if curs.fetchall() and admin_check(6) != 1:
                 return redirect('/history/' + url_pas(name))
@@ -187,7 +187,7 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
         else:
             response_data = 200
 
-        if num != '0':
+        if num != '':
             menu += [['history/' + url_pas(name), load_lang('history')]]
             sub = ' (r' + str(num) + ')'
             acl = 0
@@ -234,7 +234,7 @@ def view_read(name = 'Test', doc_rev = 0, doc_from = '', do_type = ''):
 
         div = file_data + user_doc + end_data + category_doc
 
-        if num != '0':
+        if num != '':
             curs.execute(db_change('select data from other where name = "phrase_old_page_warring"'))
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':

@@ -103,7 +103,7 @@ a {
     font-weight: bold;
 }
 
-#inside, #out_link, .opennamu_link_out {
+#inside, #out_link, .opennamu_link_out, .opennamu_link_inter {
     color: green;
 }
 

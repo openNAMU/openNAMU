@@ -63,7 +63,7 @@ def filter_inter_wiki(tool):
             div += '</td>'
 
             if tool == 'inter_wiki':
-                div += '<td><a class="opennamuLinkOut" href="' + html.escape(data[1]) + '">' + html.escape(data[1]) + '</a></td>'
+                div += '<td><a class="opennamu_link_out" href="' + html.escape(data[1]) + '">' + html.escape(data[1]) + '</a></td>'
             else:
                 div += '<td>' + html.escape(data[1]) + '</td>'
 

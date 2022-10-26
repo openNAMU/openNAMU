@@ -35,9 +35,9 @@ class class_do_render_namumark:
             return name + ' (RENDER LANG)'
 
     def get_tool_js_safe(self, data):
-        data = re.sub(r'\\', '\\\\\\\\', data)
-        data = re.sub(r'"', '\\"', data)
-        data = re.sub(r'\n', '\\n', data)
+        data = data.replace('\n', '\\\\n')
+        data = data.replace('\\', '\\\\')
+        data = data.replace('"', '\\"')
 
         return data
 
@@ -85,7 +85,7 @@ class class_do_render_namumark:
     def get_tool_data_revert(self, data, do_type = 'all'):
         storage_count = self.data_temp_storage_count * 3
         if do_type == 'all':
-            storage_regex = r'(?:<((slash)_(?:[0-9]+))>|<((render)_(?:[0-9]+))>(?:(?:(?!<(?:\/?render_(?:[0-9]+))>).)*)<\/render_(?:[0-9]+)>)'
+            storage_regex = r'(?:<((slash)_(?:[0-9]+))>|<((render)_(?:[0-9]+))>(?:(?:(?!<(?:\/?render_(?:[0-9]+))>).|\n)*)<\/render_(?:[0-9]+)>)'
         elif do_type == 'render':
             storage_regex = r'<((render)_(?:[0-9]+))>(?:(?:(?!<(?:\/?render_(?:[0-9]+))>).)*)<\/render_(?:[0-9]+)>'
         else:
@@ -113,12 +113,9 @@ class class_do_render_namumark:
                         else:
                             data_revert = ''
                     else:
-                        if self.data_temp_storage[match[0]] == '\\':
-                            data_revert = '\\\\\\\\'
-                        else:
-                            data_revert = '\\' + self.data_temp_storage[match[0]]
+                        data_revert = '\\' + self.data_temp_storage[match[0]]
 
-                data = re.sub(storage_regex, data_revert, data, 1)
+                data = re.sub(storage_regex, lambda x : data_revert, data, 1)
 
             storage_count -= 1
 
@@ -380,7 +377,7 @@ class class_do_render_namumark:
             toc_data += '</div>'
 
         # toc replace
-        self.render_data = re.sub(r'\[(목차|toc|tableofcontents)\]', toc_data, self.render_data)
+        self.render_data = re.sub(r'\[(목차|toc|tableofcontents)\]', lambda x : toc_data, self.render_data)
 
     def do_render_macro(self):
         # double macro function
@@ -561,11 +558,15 @@ class class_do_render_namumark:
 
     def do_render_math(self):
         def do_render_math_sub(match):
-            data = self.get_tool_data_restore(match.group(1), do_type = 'slash')
+            data = match.group(1)
+
+            data = re.sub(r'\n', '', data)
+            data = self.get_tool_data_revert(data)
+
+            data_html = self.get_tool_js_safe(data)
+
             data = html.unescape(data)
             data = self.get_tool_js_safe(data)
-
-            data_html = self.get_tool_js_safe(match.group(1))
 
             name_ob = 'opennamu_math_' + str(self.data_math_count)
 
@@ -575,7 +576,9 @@ class class_do_render_namumark:
                 'try {\n' + \
                     'katex.render("' + data + '", document.getElementById(\"' + name_ob + '\"));\n' + \
                 '} catch {\n' + \
-                    'document.getElementById(\"' + name_ob + '\").innerHTML = "<span style=\'color: red;\'>' + data_html + '</span>";\n' + \
+                    'if(document.getElementById(\"' + name_ob + '\")) {\n' + \
+                        'document.getElementById(\"' + name_ob + '\").innerHTML = "<span style=\'color: red;\'>' + data_html + '</span>";\n' + \
+                    '}\n' + \
                 '}\n' + \
             ''
 
@@ -583,13 +586,9 @@ class class_do_render_namumark:
 
             return '<' + data_name + '></' + data_name + '>'
 
-        self.render_data = re.sub(r'\[math\(((?:(?!\)\]).)+)\)\]', do_render_math_sub, self.render_data)
+        self.render_data = re.sub(r'\[math\(((?:(?!\[math\(|\)\]).|\n)+)\)\]', do_render_math_sub, self.render_data)
 
     def do_render_link(self):
-        # todo list
-        # add link exist check
-        # add file exist check
-
         link_regex = r'\[\[((?:(?!\[\[|\]\]|\||<|>).|<slash_[0-9]+>)+)(?:\|((?:(?!\[\[|\]\]|\|).)+))?\]\]'
         link_count_all = len(re.findall(link_regex, self.render_data)) * 4
         while 1:
@@ -683,7 +682,7 @@ class class_do_render_namumark:
                     if link_exist != '':
                         data_name = self.get_tool_data_storage('<a class="' + link_exist + '" href="/upload?name=' + url_pas(link_main_org) + '">', '</a>', link_data_full)
 
-                        self.render_data = re.sub(link_regex, '<' + data_name + '>' + link_sub + '</' + data_name + '>', self.render_data, 1)
+                        self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
                     else:
                         data_name = self.get_tool_data_storage(file_end, '', link_data_full)
 
@@ -724,6 +723,49 @@ class class_do_render_namumark:
 
                     self.render_data = re.sub(link_regex, '', self.render_data, 1)
                 # out link
+                elif re.search(r'^(?:inter|인터):([^:]+):', link_main):
+                    link_inter_name = re.search(r'^(?:inter|인터):([^:]+):', link_main)
+                    link_inter_name = link_inter_name.group(1)
+
+                    link_main = re.sub(r'^(?:inter|인터):([^:]+):', '', link_main)
+
+                    # sharp
+                    link_data_sharp_regex = r'#([^#]+)$'
+                    link_data_sharp = re.search(link_data_sharp_regex, link_main)
+                    if link_data_sharp:
+                        link_data_sharp = link_data_sharp.group(1)
+                        link_data_sharp = html.unescape(link_data_sharp)
+                        link_data_sharp = '#' + url_pas(link_data_sharp)
+
+                        link_main = re.sub(link_data_sharp_regex, '', link_main)
+                    else:
+                        link_data_sharp = ''
+
+                    link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                    link_main = html.unescape(link_main)
+                    link_main = url_pas(link_main)
+
+                    self.curs.execute(db_change("select plus, plus_t from html_filter where kind = 'inter_wiki' and html = ?"), [link_inter_name])
+                    db_data = self.curs.fetchall()
+                    if db_data:
+                        link_main = db_data[0][0] + link_main
+
+                        # sub not exist -> sub = main
+                        if link_data[1]:
+                            link_sub = link_data[1]
+                            link_sub_storage = ''
+                        else:
+                            link_sub = ''
+                            link_sub_storage = link_main_org
+
+                        if db_data[0][1] != '':
+                            link_sub_storage = db_data[0][1] + link_sub_storage
+
+                        data_name = self.get_tool_data_storage('<a class="opennamu_link_inter" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
+                    
+                        self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
+                    else:
+                        self.render_data = re.sub(link_regex, '', self.render_data, 1)
                 elif re.search(r'^https?:\/\/', link_main):
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_main = html.unescape(link_main)
@@ -739,7 +781,7 @@ class class_do_render_namumark:
 
                     data_name = self.get_tool_data_storage('<a class="opennamu_link_out" href="' + link_main + '">' + link_sub_storage, '</a>', link_data_full)
 
-                    self.render_data = re.sub(link_regex, '<' + data_name + '>' + link_sub + '</' + data_name + '>', self.render_data, 1)
+                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
                 # in link
                 else:
                     # sharp
@@ -759,7 +801,7 @@ class class_do_render_namumark:
                         link_main = self.doc_name
                         link_main = re.sub(r'(\/[^/]+)$', '', link_main)
                     elif re.search(r'^\/', link_main):
-                        link_main = re.sub(r'^\/', self.doc_name + '/', link_main)
+                        link_main = re.sub(r'^\/', lambda x : (self.doc_name + '/'), link_main)
                     elif re.search(r'^:(분류|category):', link_main):
                         link_main = re.sub(r'^:(분류|category):', 'category:', link_main)
                     elif re.search(r'^:(파일|file):', link_main):
@@ -797,7 +839,7 @@ class class_do_render_namumark:
 
                     data_name = self.get_tool_data_storage('<a class="' + link_exist + ' ' + link_same + '" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
 
-                    self.render_data = re.sub(link_regex, '<' + data_name + '>' + link_sub + '</' + data_name + '>', self.render_data, 1)
+                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
 
             link_count_all -= 1
 
@@ -955,7 +997,7 @@ class class_do_render_namumark:
                 footnote_data_org = footnote_data.group(0)
                 footnote_data = footnote_data.groups()
                 if footnote_data[2]:
-                    self.render_data = re.sub(footnote_regex, self.get_tool_footnote_make(), self.render_data, 1)
+                    self.render_data = re.sub(footnote_regex, lambda x : self.get_tool_footnote_make(), self.render_data, 1)
                 else:
                     if not footnote_data[0]:
                         footnote_name = str(footnote_num)
@@ -1013,7 +1055,7 @@ class class_do_render_namumark:
                 link_main = self.doc_name
                 link_main = re.sub(r'(\/[^/]+)$', '', link_main)
             elif re.search(r'^\/', link_main):
-                link_main = re.sub(r'^\/', self.doc_name + '/', link_main)
+                link_main = re.sub(r'^\/', lambda x : (self.doc_name + '/'), link_main)
             elif re.search(r'^분류:', link_main):
                 link_main = re.sub(r'^분류:', 'category:', link_main)
             elif re.search(r'^사용자:', link_main):
@@ -1039,6 +1081,8 @@ class class_do_render_namumark:
         # get_tool_dark_mode_split
         # get_tool_px_add_check
         # get_tool_css_safe
+        # todo : after text render text not use to make table
+        # todo : table caption
         def do_render_table_parameter(cell_count, parameter, data, option = {}):
             table_parameter_all = { "div" : "", "table" : "", "tr" : "", "td" : "", "col" : "", "colspan" : "", "rowspan" : "", "data" : "" }
             
@@ -1131,7 +1175,7 @@ class class_do_render_namumark:
 
             return table_parameter_all
 
-        table_regex = r'\n *((?:(?:(?:(?:\|\|)+)(?:(?:(?:(?:(?:(?!\|\|).)+)\n*)+)|(?:(?:(?!\|\|).)*)))+(?:(?:\|\|+)\n))+)'
+        table_regex = re.compile('\n((?:(?:(?:(?:\|\|)+)|(?:\|[^|]+\|(?:\|\|)*))\n?(?:(?:(?!\|\|).)+))(?:(?:\|\||\|\|\n|(?:\|\|)+(?!\n)(?:(?:(?!\|\|).)+)\n*)*)\|\|)\n', re.DOTALL)
         table_sub_regex = r'(\n?)((?:\|\|)+)((?:&lt;(?:(?:(?!&lt;|&gt;).)+)&gt;)*)((?:\n*(?:(?:(?:(?!\|\|).)+)\n*)+)|(?:(?:(?!\|\|).)*))'
         table_count_all = len(re.findall(table_regex, self.render_data)) * 2
         while 1:
@@ -1145,18 +1189,24 @@ class class_do_render_namumark:
             else:
                 table_data_org = table_data.group(0)
                 table_data = table_data.group(1)
-                print(table_data)
 
                 table_parameter = { "div" : "", "table" : "", "col" : {} }
                 table_data_end = ''
                 table_col_num = 0
                 table_tr_change = 0
                 for table_sub in re.findall(table_sub_regex, table_data):
+                    table_data_in = table_sub[3]
+                    table_data_in = re.sub(r'^\n+', '', table_data_in)
+
+                    table_sub_parameter = do_render_table_parameter(table_sub[1], table_sub[2], table_data_in)
+
+                    if table_data_end == '':
+                        table_data_end += '<tr style="' + table_sub_parameter['tr'] + '">'
+
                     if table_sub[0] != '' and table_tr_change == 1:
                         table_col_num = 0
                         table_data_end += '</tr><tr style="' + table_sub_parameter['tr'] + '">'
 
-                    table_sub_parameter = do_render_table_parameter(table_sub[1], table_sub[2], table_sub[3])
                     if not table_col_num in table_parameter['col']:
                         table_parameter['col'][table_col_num] = ''
 
@@ -1173,17 +1223,20 @@ class class_do_render_namumark:
                     
                     table_col_num += 1
 
+                table_data_end += '</tr>'
                 table_data_end = '<table style="' + table_parameter['table'] + '">' + table_data_end + '</table>'
                 if table_parameter['div'] != '':
                     table_data_end = '<div style="' + table_parameter['div'] + '">' + table_data_end + '</div>'
 
-                self.render_data = re.sub(table_regex, '\n<front_br>' + table_data_end + '<back_br>\n', self.render_data, 1)
+                self.render_data = re.sub(table_regex, lambda x : ('\n<front_br>' + table_data_end + '<back_br>\n'), self.render_data, 1)
 
             table_count_all -= 1
     
     def do_render_middle(self):
         middle_regex = r'{{{([^{](?:(?!{{{|}}}).|\n)*)?(?:}|<(\/?(?:slash)_(?:[0-9]+))>)}}'
         wiki_count = 0
+        syntax_count = 0
+        folding_count = 0
         middle_count_all = len(re.findall(middle_regex, self.render_data)) * 10
         while 1:
             middle_data = re.search(middle_regex, self.render_data)
@@ -1197,7 +1250,7 @@ class class_do_render_namumark:
                 if middle_slash:
                     if self.data_temp_storage[middle_slash] != '}':
                         middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
-                        self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                        self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                         continue
 
                 middle_data = middle_data.group(1)
@@ -1211,7 +1264,7 @@ class class_do_render_namumark:
                     if middle_name == '#!wiki':
                         if middle_slash:
                             middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
-                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
                         wiki_regex = r'^#!wiki(?:(?: style=(&quot;(?:(?:(?!&quot;).)*)&quot;|&#x27;(?:(?:(?!&#x27;).)*)&#x27;))| [^\n]*)?\n'
@@ -1239,28 +1292,64 @@ class class_do_render_namumark:
                     elif middle_name == '#!html':
                         if middle_slash:
                             middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
-                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
                         data_name = self.get_tool_data_storage('', '', middle_data_org)
                     elif middle_name == '#!folding':
                         if middle_slash:
                             middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
-                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        data_name = self.get_tool_data_storage('', '', middle_data_org)
+                        wiki_regex = r'^#!folding(?: ([^\n]*))?\n'
+                        wiki_data_folding = re.search(wiki_regex, middle_data)
+                        wiki_data = re.sub(wiki_regex, '', middle_data)
+                        if wiki_data_folding:
+                            wiki_data_folding = wiki_data_folding.group(1)
+                            if not wiki_data_folding:
+                                wiki_data_folding = 'test'
+                        else:
+                            wiki_data_folding = 'test'
+
+                        wiki_data = self.get_tool_data_revert(wiki_data)
+                        wiki_data = html.unescape(wiki_data)
+                        wiki_data = re.sub('\n$', '', wiki_data)
+
+                        self.data_include += [[self.doc_include + 'opennamu_folding_' + str(folding_count), self.doc_name, wiki_data]]
+
+                        middle_data_pass = wiki_data_folding
+                        data_name = self.get_tool_data_storage(
+                            '<details><summary>',
+                            '</summary><div id="' + self.doc_include + 'opennamu_folding_' + str(folding_count) + '"></div></details>', 
+                            middle_data_org
+                        )
+                        folding_count += 1
                     elif middle_name == '#!syntax':
                         if middle_slash:
                             middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
-                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        data_name = self.get_tool_data_storage('', '', middle_data_org)
+                        wiki_regex = r'^#!syntax(?: ([^\n]*))?\n'
+                        wiki_data_syntax = re.search(wiki_regex, middle_data)
+                        wiki_data = re.sub(wiki_regex, '', middle_data)
+                        if wiki_data_syntax:
+                            wiki_data_syntax = wiki_data_syntax.group(1)
+                            if not wiki_data_syntax:
+                                wiki_data_syntax = 'python'
+                        else:
+                            wiki_data_syntax = 'python'
+
+                        if syntax_count == 0:
+                            self.render_data_js += 'hljs.highlightAll();\n'
+
+                        data_name = self.get_tool_data_storage('<pre id="syntax"><code class="' + wiki_data_syntax + '">' + wiki_data, '</code></pre>', middle_data_org)
+                        syntax_count += 1
                     elif middle_name in ('+5', '+4', '+3', '+2', '+1'):
                         if middle_slash:
                             middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
-                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
                         wiki_data = re.sub(r'^\+[1-5] ', '', middle_data)
@@ -1280,7 +1369,7 @@ class class_do_render_namumark:
                     elif middle_name in ('-5', '-4', '-3', '-2', '-1'):
                         if middle_slash:
                             middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
-                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
                         wiki_data = re.sub(r'^\-[1-5] ', '', middle_data)
@@ -1297,10 +1386,38 @@ class class_do_render_namumark:
 
                         middle_data_pass = wiki_data
                         data_name = self.get_tool_data_storage('<span style="font-size:' + wiki_size + '%">', '</span>', middle_data_org)
+                    elif re.search(r'^@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))', middle_name):
+                        if middle_slash:
+                            middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
+                            self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
+                            continue
+
+                        wiki_color = re.search(r'^@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))?', middle_name)
+                        if wiki_color:
+                            wiki_color = wiki_color.groups()
+                            if wiki_color[0]:
+                                wiki_color = '#' + wiki_color[0]
+                            else:
+                                wiki_color = wiki_color[1]
+
+                            if wiki_color[2]:
+                                wiki_color += ',#' + wiki_color[0]
+                            elif wiki_color[3]:
+                                wiki_color = ',' + wiki_color[1]
+                        else:
+                            wiki_color = 'red'
+
+                        wiki_color = self.get_tool_css_safe(wiki_color)
+                        wiki_color = self.get_tool_dark_mode_split(wiki_color)
+
+                        wiki_data = re.sub(r'^@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))? ?', '', middle_data)
+
+                        middle_data_pass = wiki_data
+                        data_name = self.get_tool_data_storage('<span style="background-color:' + wiki_color + '">', '</span>', middle_data_org)
                     elif re.search(r'^#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))', middle_name):
                         if middle_slash:
                             middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
-                            self.render_data = re.sub(middle_regex, middle_data_org, self.render_data, 1)
+                            self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
                         wiki_color = re.search(r'^#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))?', middle_name)
@@ -1330,6 +1447,8 @@ class class_do_render_namumark:
                             middle_data += '\\'
 
                         data_revert = self.get_tool_data_revert(middle_data)
+                        data_revert = re.sub('^\n', '', data_revert)
+                        data_revert = re.sub('\n$', '', data_revert)
 
                         data_name = self.get_tool_data_storage(data_revert, '', middle_data_org)
                 else:
@@ -1337,10 +1456,12 @@ class class_do_render_namumark:
                         middle_data += '\\'
 
                     data_revert = self.get_tool_data_revert(middle_data)
+                    data_revert = re.sub('^\n', '', data_revert)
+                    data_revert = re.sub('\n$', '', data_revert)
 
                     data_name = self.get_tool_data_storage(data_revert, '', middle_data_org)
 
-                self.render_data = re.sub(middle_regex, '<' + data_name + '>' + middle_data_pass + '</' + data_name + '>', self.render_data, 1)
+                self.render_data = re.sub(middle_regex, lambda x : ('<' + data_name + '>' + middle_data_pass + '</' + data_name + '>'), self.render_data, 1)
 
             middle_count_all -= 1
 
@@ -1382,9 +1503,10 @@ class class_do_render_namumark:
         self.do_render_slash()
         self.do_render_redirect()
         self.do_render_include()
-        self.do_render_math()
         self.do_render_middle()
+        self.do_render_math()
         # self.do_render_list()
+        # todo : fix slash
         self.do_render_table()
         self.do_render_link()
         self.do_render_macro()
