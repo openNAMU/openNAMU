@@ -12,9 +12,9 @@ def recent_history_tool(name = 'Test', rev = 1):
                 '<li><a href="/raw_rev/' + num + '/' + url_pas(name) + '">' + load_lang('raw') + '</a></li>' + \
         ''
 
-        data += '<li><a href="/revert/' + num + '/' + url_pas(name) + '">' + load_lang('revert') + ' | r' + num + '</a></li>'
+        data += '<li><a href="/revert/' + num + '/' + url_pas(name) + '">' + load_lang('revert') + ' (r' + num + ')</a></li>'
         if rev - 1 > 0:
-            data += '<li><a href="/revert/' + str(rev - 1) + '/' + url_pas(name) + '">' + load_lang('revert') + ' | r' + str(rev - 1) + '</a></li>'
+            data += '<li><a href="/revert/' + str(rev - 1) + '/' + url_pas(name) + '">' + load_lang('revert') + ' (r' + str(rev - 1) + ')</a></li>'
 
         if rev - 1 > 0:
             data += '<li><a href="/diff/' + str(rev - 1) + '/' + num + '/' + url_pas(name) + '">' + load_lang('compare') + '</a></li>'

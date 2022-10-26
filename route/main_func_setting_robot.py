@@ -48,7 +48,7 @@ def main_func_setting_robot():
                         <hr class="main_hr">
                         <input type="checkbox" name="default" ''' + default_data + '''> ''' + load_lang('default') + '''
                         <hr class="main_hr">
-                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
                 menu = [['setting', load_lang('return')]]

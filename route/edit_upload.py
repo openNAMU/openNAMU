@@ -152,7 +152,7 @@ def edit_upload():
                         <textarea rows="10" placeholder="''' + load_lang('other') + '''" name="f_lice">''' + upload_default + '''</textarea>
                         <hr class="main_hr">
                         ''' + captcha_get() + '''
-                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
                 menu = [['other', load_lang('return')]]
