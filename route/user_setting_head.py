@@ -70,7 +70,7 @@ def user_setting_head(skin_name = ''):
                         <hr class="main_hr">
                         ''' + load_lang('user_css_warning') + ''' : <a href="/change/head_reset">/change/head_reset</a>
                         <hr class="main_hr">
-                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
                 menu = [['user', load_lang('return')]]

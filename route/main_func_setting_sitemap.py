@@ -109,7 +109,7 @@ def main_func_setting_sitemap():
                         <input type="checkbox" name="exclude_category_page"> ''' + load_lang('stiemap_exclude_category_page') + '''
                         <hr class="main_hr">
 
-                        <button id="opennamu_js_save" type="submit">''' + load_lang('create') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + load_lang('create') + '''</button>
                     </form>
                 ''',
                 menu = [['setting', load_lang('return')]]

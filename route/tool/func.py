@@ -849,7 +849,7 @@ def load_domain(data_type = 'normal'):
 
     return domain
 
-def edit_button(editor_display = '0'):
+def edit_button(ob_name = 'opennamu_edit_textarea', monaco_ob_name = 'opennamu_monaco_editor'):
     curs = conn.cursor()
 
     insert_list = []
@@ -861,11 +861,7 @@ def edit_button(editor_display = '0'):
 
     data = ''
     for insert_data in insert_list:
-        data += '' + \
-            '<a href="' + \
-                'javascript:do_insert_data(\'opennamu_js_edit_textarea_view\', \'' + insert_data[0] + '\', ' + editor_display + ')' + \
-            '">(' + insert_data[1] + ')</a> ' + \
-        ''
+        data += '<a href="javascript:do_insert_data(\'' + ob_name + '\', \'' + insert_data[0] + '\', \'' + monaco_ob_name + '\');">(' + insert_data[1] + ')</a> '
 
     data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')</a>'
     data += '<hr class="main_hr">'
@@ -1045,7 +1041,7 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '155'
+    data_css_ver = '156'
     
     # Func JS + Defer
     data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
@@ -1066,7 +1062,6 @@ def wiki_css(data):
     data_css += '<script src="/views/main_css/js/render/wiki.js?ver=' + data_css_ver + '"></script>'
     
     # Route JS + Defer
-    data_css += '<script defer src="/views/main_css/js/route/edit.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/route/thread.js?ver=' + data_css_ver + '"></script>'
     
     # 레거시 일반 JS

@@ -97,7 +97,7 @@ def main_func_setting_acl():
                         <select ''' + disable + ''' name="vote_acl">''' + acl_div[5] + '''</select>
                         <hr class="main_hr">
                         
-                        <button id="opennamu_js_save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
                 menu = [['setting', load_lang('return')]]

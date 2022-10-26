@@ -423,6 +423,7 @@ app.route('/history_hidden/<int(signed = True):rev>/<everything:name>')(recent_h
 app.route('/history_send/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])(recent_history_send)
 app.route('/history_reset/<everything:name>', methods = ['POST', 'GET'])(recent_history_reset)
 app.route('/history_add/<everything:name>', methods = ['POST', 'GET'])(recent_history_add)
+app.route('/history_add_preview/<everything:name>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(recent_history_add)
 
 # Func-view
 app.route('/xref/<everything:name>')(view_xref)
@@ -445,8 +446,10 @@ app.route('/random')(view_random)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
-app.route('/edit_from/<everything:name>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'load' })(edit)
+app.route('/edit_preview/<everything:name>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(edit)
+app.route('/edit_from/<everything:name>', defaults = { 'do_type' : 'load' })(edit)
 app.route('/edit_section/<int:section>/<everything:name>', methods = ['POST', 'GET'])(edit)
+app.route('/edit_section_preview/<int:section>/<everything:name>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(edit)
 
 app.route('/upload', methods = ['POST', 'GET'])(edit_upload)
 
@@ -468,6 +471,7 @@ app.route('/recent_discuss/open', defaults = { 'tool' : 'open' })(recent_discuss
 app.route('/recent_discuss/delete')(recent_discuss_delete)
 
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
+app.route('/thread_preview/<int:topic_num>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(topic)
 app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
 
 app.route('/thread/<int:topic_num>/tool')(topic_tool)
@@ -642,9 +646,9 @@ app.route('/setting/phrase', methods = ['POST', 'GET'])(main_func_setting_phrase
 app.route('/setting/head', defaults = { 'num' : 3 }, methods = ['POST', 'GET'])(main_func_setting_head)
 app.route('/setting/head/<skin_name>', defaults = { 'num' : 3 }, methods = ['POST', 'GET'])(main_func_setting_head)
 app.route('/setting/body/top', defaults = { 'num' : 4 }, methods = ['POST', 'GET'])(main_func_setting_head)
-app.route('/setting/body/top/<skin_name>', defaults = { 'num' : 4 }, methods = ['POST', 'GET'])(main_func_setting_head)
+app.route('/setting_preview/body/top', defaults = { 'num' : 4, 'set_preview' : 1 }, methods = ['POST'])(main_func_setting_head)
 app.route('/setting/body/bottom', defaults = { 'num' : 7 }, methods = ['POST', 'GET'])(main_func_setting_head)
-app.route('/setting/body/bottom/<skin_name>', defaults = { 'num' : 7 }, methods = ['POST', 'GET'])(main_func_setting_head)
+app.route('/setting_preview/body/bottom', defaults = { 'num' : 7, 'set_preview' : 1 }, methods = ['POST'])(main_func_setting_head)
 app.route('/setting/robot', methods = ['POST', 'GET'])(main_func_setting_robot)
 app.route('/setting/external', methods = ['POST', 'GET'])(main_func_setting_external)
 app.route('/setting/acl', methods = ['POST', 'GET'])(main_func_setting_acl)

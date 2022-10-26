@@ -288,7 +288,7 @@ pre, #toc, #cate, #redirect {
 }
 */
 
-#redirect, #cate, #toc, blockquote, button#opennamu_js_save, button#opennamu_js_preview {
+#redirect, #cate, #toc, blockquote, button#opennamu_save_button, button#opennamu_preview_button {
     border: 0;
     
     padding: 10px;
@@ -296,11 +296,11 @@ pre, #toc, #cate, #redirect {
     box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
 }
 
-button#opennamu_js_save {
+button#opennamu_save_button {
     background: #92f7f4;
 }
 
-button#opennamu_js_preview {
+button#opennamu_preview_button {
     margin-left: 5px;
 }
 
