@@ -69,7 +69,7 @@ def recent_app_submit_2():
                             <tr>
                                 <td colspan="3">
                                     <button type="submit" 
-                                            id="opennamu_js_save"
+                                            id="opennamu_save_button"
                                             name="approve" 
                                             value="''' + application['id'] + '''">
                                         ''' + load_lang('approve') + '''

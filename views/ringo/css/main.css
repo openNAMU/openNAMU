@@ -315,7 +315,7 @@ footer.only_mobile {
     margin-top: 0px;
 }
 
-#main_data input, #main_data textarea, #main_data button, #main_data select {
+input, textarea, button, select {
     border: 1px solid #aaa;
     
     padding: 10px;

@@ -161,8 +161,8 @@ function opennamu_do_open_comment(key) {
     }
 }
 
-if(window.location.pathname.match(/^\/thread\//)) {
-    let thread_num = window.location.pathname.match(/^\/thread\/([0-9]+)/)[1];
+if(window.location.pathname.match(/^\/(thread|thread_preview)\//)) {
+    let thread_num = window.location.pathname.match(/^\/(?:thread|thread_preview)\/([0-9]+)/)[1];
 
     opennamu_do_thread_make(thread_num);
 } else if(window.location.pathname.match(/^\/topic\//)) {
