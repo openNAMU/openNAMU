@@ -963,7 +963,7 @@ class class_do_render_namumark:
                     # remove include
                     include_data = re.sub(include_regex, '', include_data)
 
-                    self.data_include += [[self.doc_include + 'opennamu_include_' + str(include_num), include_name, include_data]]
+                    self.data_include += [[self.doc_include + 'opennamu_include_' + str(include_num), include_name, include_data, 'style="display: inline-block;"']]
 
                     data_name = self.get_tool_data_storage('' + \
                         include_link + \
