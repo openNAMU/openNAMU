@@ -1082,7 +1082,6 @@ class class_do_render_namumark:
         # get_tool_px_add_check
         # get_tool_css_safe
         # todo : after text render text not use to make table
-        # todo : table caption
         def do_render_table_parameter(cell_count, parameter, data, option = {}):
             table_parameter_all = { "div" : "", "table" : "", "tr" : "", "td" : "", "col" : "", "colspan" : "", "rowspan" : "", "data" : "" }
             
@@ -1177,6 +1176,7 @@ class class_do_render_namumark:
 
         table_regex = re.compile('\n((?:(?:(?:(?:\|\|)+)|(?:\|[^|]+\|(?:\|\|)*))\n?(?:(?:(?!\|\|).)+))(?:(?:\|\||\|\|\n|(?:\|\|)+(?!\n)(?:(?:(?!\|\|).)+)\n*)*)\|\|)\n', re.DOTALL)
         table_sub_regex = r'(\n?)((?:\|\|)+)((?:&lt;(?:(?:(?!&lt;|&gt;).)+)&gt;)*)((?:\n*(?:(?:(?:(?!\|\|).)+)\n*)+)|(?:(?:(?!\|\|).)*))'
+        table_caption_regex = r'^\|([^|]+)\|'
         table_count_all = len(re.findall(table_regex, self.render_data)) * 2
         while 1:
             table_data = re.search(table_regex, self.render_data)
@@ -1189,6 +1189,15 @@ class class_do_render_namumark:
             else:
                 table_data_org = table_data.group(0)
                 table_data = table_data.group(1)
+                
+                table_caption = re.search(table_caption_regex, table_data)
+                if table_caption:
+                    table_caption = table_caption.group(1)
+                    table_caption = '<caption>' + table_caption + '</caption>'
+
+                    table_data = re.sub(table_caption_regex, '||', table_data)
+                else:
+                    table_caption = ''
 
                 table_parameter = { "div" : "", "table" : "", "col" : {} }
                 table_data_end = ''
@@ -1224,7 +1233,7 @@ class class_do_render_namumark:
                     table_col_num += 1
 
                 table_data_end += '</tr>'
-                table_data_end = '<table style="' + table_parameter['table'] + '">' + table_data_end + '</table>'
+                table_data_end = '<table style="' + table_parameter['table'] + '">' + table_caption + table_data_end + '</table>'
                 if table_parameter['div'] != '':
                     table_data_end = '<div style="' + table_parameter['div'] + '">' + table_data_end + '</div>'
 
@@ -1506,10 +1515,9 @@ class class_do_render_namumark:
         self.do_render_middle()
         self.do_render_math()
         # self.do_render_list()
-        # todo : fix slash
         self.do_render_table()
-        self.do_render_link()
         self.do_render_macro()
+        self.do_render_link()
         self.do_redner_footnote()
         self.do_render_text()
         self.do_render_heading()
