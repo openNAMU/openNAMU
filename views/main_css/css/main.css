@@ -95,8 +95,16 @@ a {
     text-decoration: none;
 }
 
+a:hover {
+    color: cornflowerblue;
+}
+
 #not_thing, .opennamu_not_exist_link {
     color: red;
+}
+
+#not_thing:hover, .opennamu_not_exist_link:hover {
+    color: darkred;
 }
 
 .opennamu_same_link {
@@ -105,6 +113,10 @@ a {
 
 #inside, #out_link, .opennamu_link_out, .opennamu_link_inter {
     color: green;
+}
+
+#inside:hover, #out_link:hover, .opennamu_link_out:hover, .opennamu_link_inter:hover {
+    color: darkgreen;
 }
 
 #out_link::before, .opennamu_link_out::before {
