@@ -139,7 +139,7 @@ function main_css_skin_load() {
         document.cookie.match(opennamu_cookie_split_regex('main_css_darkmode'))[1] === '1'
     ) {
         head_data.innerHTML += '' +
-            '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=5">' +
+            '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=6">' +
         '';
     }
     
