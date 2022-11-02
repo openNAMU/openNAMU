@@ -29,6 +29,7 @@ table {
 
 td {
     border: 0.5px solid gainsboro;
+    border-width: 0.5px;
     
     padding: 8px 10px;
 }
