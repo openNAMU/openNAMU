@@ -19,7 +19,9 @@ def user_alarm():
             ''
     
             for data_one in data_list:
-                data += '<li>' + data_one[0] + ' (' + data_one[1] + ')</li>'
+                data_split = data_one[0].split(' | ')
+                
+                data += '<li>' + ip_pas(data_split[0]) + (' | ' + ' | '.join(data_split[1:]) if len(data_split) > 1 else '') + ' (' + data_one[1] + ')</li>'
     
         data += '' + \
             '</ul>' + \
