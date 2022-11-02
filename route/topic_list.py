@@ -26,7 +26,7 @@ def topic_list(name = 'Test'):
                 <a href="/topic/''' + url_pas(name) + '?tool=close">(' + load_lang('closed_discussion') + ''')</a>
                 <a href="/topic/''' + url_pas(name) + '?tool=agree">(' + load_lang('agreed_discussion') + ''')</a>
                 <hr class="main_hr">
-                <a href="/thread/0">(''' + load_lang('make_new_topic') + ''')</a>
+                <a href="/thread/0/''' + url_pas(name) + '''">(''' + load_lang('make_new_topic') + ''')</a>
             '''
 
             curs.execute(db_change("select code, sub from rd where title = ? and stop != 'O' order by date desc"), [name])

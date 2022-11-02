@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def topic(topic_num = 0, do_type = ''):
+def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
         topic_num = str(topic_num)
@@ -141,7 +141,7 @@ def topic(topic_num = 0, do_type = ''):
                     name_value = flask.request.form.get('topic', '')
                     sub_value = flask.request.form.get('title', '')
                 else:
-                    name_value = ''
+                    name_value = doc_name
                     sub_value = ''
             else:
                 curs.execute(db_change("select title, sub from rd where code = ?"), [topic_num])
