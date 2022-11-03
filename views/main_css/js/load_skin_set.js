@@ -135,15 +135,6 @@ function main_css_skin_load() {
     }
     
     if(
-        document.cookie.match(opennamu_cookie_split_regex('main_css_darkmode')) &&
-        document.cookie.match(opennamu_cookie_split_regex('main_css_darkmode'))[1] === '1'
-    ) {
-        head_data.innerHTML += '' +
-            '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=6">' +
-        '';
-    }
-    
-    if(
         document.cookie.match(opennamu_cookie_split_regex('main_css_link_delimiter')) &&
         document.cookie.match(opennamu_cookie_split_regex('main_css_link_delimiter'))[1] === '1'
     ) {
