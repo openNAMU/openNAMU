@@ -256,7 +256,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 editor_display = ''
                 monaco_display = 'style="display: none;"'
                 add_get_file = ''
-                add_script = ''
+                add_script = 'opennamu_edit_turn_off_monaco();'
 
             if editor_top_text != '':
                 editor_top_text += '<hr class="main_hr">'
