@@ -1075,7 +1075,7 @@ def wiki_css(data):
     
     # Main CSS
     data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css?ver=' + data_css_ver + '">'
-    if request.cookies.get('main_css_darkmode', '') == '1':
+    if flask.request.cookies.get('main_css_darkmode', '') == '1':
         data_css += '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=' + data_css_ver + '">'
 
     # External
