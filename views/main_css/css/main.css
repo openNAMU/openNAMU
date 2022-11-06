@@ -209,16 +209,6 @@ pre {
     white-space: pre-wrap;
 }
 
-@media (max-width: 768px) {
-    table {
-        min-width: 100%;
-    }
-    
-    .table_safe {
-        min-width: 100%;
-    }
-}
-
 .content {
     height: 500px;
 }
