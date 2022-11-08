@@ -6,7 +6,7 @@ def list_acl_2():
 
         num = int(number_check(flask.request.args.get('num', '1')))
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
-        div = '<ul class="inside_ul">'
+        div = '<ul class="opennamu_ul">'
 
         curs.execute(db_change(
             "select distinct title, data, type from acl where data != '' and not title like 'user:%' order by title desc limit ?, 50"

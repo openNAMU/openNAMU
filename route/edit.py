@@ -292,8 +292,8 @@ def edit(name = 'Test', section = 0, do_type = ''):
                         
                         <div>''' + edit_button('opennamu_edit_textarea', 'opennamu_monaco_editor') + '''</div>
                         
-                        <div id="opennamu_monaco_editor" class="content" ''' + monaco_display + '''></div>
-                        <textarea id="opennamu_edit_textarea" ''' + editor_display + ''' class="content" name="content" placeholder="''' + p_text + '''">''' + html.escape(data_section) + '''</textarea>
+                        <div id="opennamu_monaco_editor" class="opennamu_textarea_500" ''' + monaco_display + '''></div>
+                        <textarea id="opennamu_edit_textarea" ''' + editor_display + ''' class="opennamu_textarea_500" name="content" placeholder="''' + p_text + '''">''' + html.escape(data_section) + '''</textarea>
                         <hr class="main_hr">
                         
                         <input placeholder="''' + load_lang('why') + '''" name="send">

@@ -30,13 +30,13 @@ def main_search_deep(name = 'Test', search_type = 'title', num = 1):
         link_id = '' if curs.fetchall() else 'id="not_thing"'
 
         div += '''
-            <ul class="inside_ul">
+            <ul class="opennamu_ul">
                 <li>
                     <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + html.escape(name) + '''</a>
                 </li>
             </ul>
             <hr class="main_hr">
-            <ul class="inside_ul">
+            <ul class="opennamu_ul">
         '''
 
         if search_type == 'title':

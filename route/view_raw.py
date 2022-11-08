@@ -50,7 +50,7 @@ def view_raw_2(name = None, topic_num = None, num = None, doc_acl = 0):
 
         data = curs.fetchall()
         if data:
-            p_data += '<textarea readonly rows="25">' + html.escape(data[0][0]) + '</textarea>'
+            p_data += '<textarea readonly class="opennamu_textarea_500">' + html.escape(data[0][0]) + '</textarea>'
             
             if doc_acl == 1:
                 p_data = '' + \

@@ -6,7 +6,7 @@ def recent_discuss_delete():
         
         data_html = '' + \
             '<a href="/recent_discuss">(' + load_lang('normal') + ')</a>' + \
-            '<ul id="inside_ul">' + \
+            '<ul id="opennamu_ul">' + \
         ''
         count = 0
         

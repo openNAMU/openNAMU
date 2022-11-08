@@ -75,9 +75,9 @@ def give_user_ban(name = None, ban_type = ''):
                     action = 'action="/auth/give/ban/' + url_pas(name) + '"'
 
                 if end[0][0] == '':
-                    data = '<ul class="inside_ul"><li>' + load_lang('limitless') + '</li>'
+                    data = '<ul class="opennamu_ul"><li>' + load_lang('limitless') + '</li>'
                 else:
-                    data = '<ul class="inside_ul"><li>' + load_lang('period') + ' : ' + end[0][0] + '</li>'
+                    data = '<ul class="opennamu_ul"><li>' + load_lang('period') + ' : ' + end[0][0] + '</li>'
 
                 curs.execute(db_change("select block from rb where block = ? and login = 'O' and ongoing = '1'"), [name])
                 if curs.fetchall():
@@ -90,7 +90,7 @@ def give_user_ban(name = None, ban_type = ''):
             else:
                 if ban_type == 'multiple':
                     main_name = load_lang('multiple_ban')
-                    n_name = '<textarea rows="25" placeholder="' + load_lang('name_or_ip_or_regex_multiple') + '" name="name"></textarea><hr class="main_hr">'
+                    n_name = '<textarea class="opennamu_textarea_500" placeholder="' + load_lang('name_or_ip_or_regex_multiple') + '" name="name"></textarea><hr class="main_hr">'
                 else:
                     main_name = load_lang('ban')
                     n_name = '<input placeholder="' + load_lang('name_or_ip_or_regex') + '" value="' + (name if name else '') + '" name="name"><hr class="main_hr">'

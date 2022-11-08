@@ -62,69 +62,69 @@ def main_func_setting_phrase():
                 data = '''
                     <form method="post" id="opennamu_simple_render">
                         <h2>1. ''' + load_lang('register_text') + ''' (HTML)</h2>
-                        <textarea rows="3" name="''' + i_list[0] + '''">''' + html.escape(d_list[0]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[0] + '''">''' + html.escape(d_list[0]) + '''</textarea>
 
                         <h2>2. ''' + load_lang('non_login_alert') + ''' (HTML)</h2>
-                        <textarea rows="3" name="''' + i_list[1] + '''">''' + html.escape(d_list[1]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[1] + '''">''' + html.escape(d_list[1]) + '''</textarea>
 
                         <h2>3. ''' + load_lang('edit_bottom_text') + ''' (HTML)</h2>
-                        <textarea rows="3" name="''' + i_list[2] + '''">''' + html.escape(d_list[2]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[2] + '''">''' + html.escape(d_list[2]) + '''</textarea>
 
                         <h2>4. ''' + load_lang('copyright_checkbox_text') + ''' (HTML)</h2>
-                        <textarea rows="3" name="''' + i_list[3] + '''">''' + html.escape(d_list[3]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[3] + '''">''' + html.escape(d_list[3]) + '''</textarea>
 
                         <h2>5. ''' + load_lang('check_key_text') + ''' (HTML)</h2>
-                        <textarea rows="3" name="''' + i_list[4] + '''">''' + html.escape(d_list[4]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[4] + '''">''' + html.escape(d_list[4]) + '''</textarea>
 
                         <h2>6. ''' + load_lang('email_title') + '''</h2>
-                        <textarea rows="3" name="''' + i_list[5] + '''">''' + html.escape(d_list[5]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[5] + '''">''' + html.escape(d_list[5]) + '''</textarea>
 
                         <h2>7. ''' + load_lang('email_text') + '''</h2>
-                        <textarea rows="3" name="''' + i_list[6] + '''">''' + html.escape(d_list[6]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[6] + '''">''' + html.escape(d_list[6]) + '''</textarea>
 
                         <h2>8. ''' + load_lang('email_insert_text') + '''</h2>
-                        <textarea rows="3" name="''' + i_list[7] + '''">''' + html.escape(d_list[7]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[7] + '''">''' + html.escape(d_list[7]) + '''</textarea>
 
                         <h2>9. ''' + load_lang('password_search_text') + '''</h2>
-                        <textarea rows="3" name="''' + i_list[8] + '''">''' + html.escape(d_list[8]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[8] + '''">''' + html.escape(d_list[8]) + '''</textarea>
 
                         <h2>10. ''' + load_lang('reset_user_text') + '''</h2>
-                        <textarea rows="3" name="''' + i_list[9] + '''">''' + html.escape(d_list[9]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[9] + '''">''' + html.escape(d_list[9]) + '''</textarea>
 
                         <h2>11. ''' + load_lang('error_401') + '''</h2>
-                        <textarea rows="3" name="''' + i_list[10] + '''">''' + html.escape(d_list[10]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[10] + '''">''' + html.escape(d_list[10]) + '''</textarea>
 
                         <h2>12. ''' + load_lang('error_404') + '''</h2>
-                        <textarea rows="3" name="''' + i_list[11] + '''">''' + html.escape(d_list[11]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[11] + '''">''' + html.escape(d_list[11]) + '''</textarea>
 
                         <h2>13. ''' + load_lang('approval_question') + '''</h2>
                         <sup>(1)</sup>
                         <hr class="main_hr">
-                        <textarea rows="3" name="''' + i_list[12] + '''">''' + html.escape(d_list[12]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[12] + '''">''' + html.escape(d_list[12]) + '''</textarea>
 
                         <h2>14. ''' + load_lang('edit_help') + '''</h2>
-                        <textarea rows="3" name="''' + i_list[13] + '''">''' + html.escape(d_list[13]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[13] + '''">''' + html.escape(d_list[13]) + '''</textarea>
 
                         <h2>15. ''' + load_lang('upload_help') + ''' (HTML)</h2>
-                        <textarea rows="3" name="''' + i_list[14] + '''">''' + html.escape(d_list[14]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[14] + '''">''' + html.escape(d_list[14]) + '''</textarea>
 
                         <h2>16. ''' + load_lang('upload_default') + '''</h2>
-                        <textarea rows="3" name="''' + i_list[15] + '''">''' + html.escape(d_list[15]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[15] + '''">''' + html.escape(d_list[15]) + '''</textarea>
 
                         <h2>17. ''' + load_lang('bottom_text') + ''' (HTML)</h2>
-                        <textarea rows="3" name="''' + i_list[16] + '''">''' + html.escape(d_list[16]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[16] + '''">''' + html.escape(d_list[16]) + '''</textarea>
 
                         <h2>18. ''' + load_lang('topic_text') + '''</h2>
-                        <textarea rows="3" name="''' + i_list[17] + '''">''' + html.escape(d_list[17]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[17] + '''">''' + html.escape(d_list[17]) + '''</textarea>
                         
                         <h2>19. ''' + load_lang('phrase_user_page_admin') + ''' (HTML)</h2>
-                        <textarea rows="3" name="''' + i_list[18] + '''">''' + html.escape(d_list[18]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[18] + '''">''' + html.escape(d_list[18]) + '''</textarea>
                         
                         <h2>20. ''' + load_lang('phrase_user_page_owner') + ''' (HTML)</h2>
-                        <textarea rows="3" name="''' + i_list[19] + '''">''' + html.escape(d_list[19]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[19] + '''">''' + html.escape(d_list[19]) + '''</textarea>
 
                         <h2>21. ''' + load_lang('phrase_old_page_warring') + ''' (''' + load_lang('beta') + ''') (HTML)</h2>
-                        <textarea rows="3" name="''' + i_list[20] + '''">''' + html.escape(d_list[20]) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="''' + i_list[20] + '''">''' + html.escape(d_list[20]) + '''</textarea>
 
                         <hr class="main_hr">
                         <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
