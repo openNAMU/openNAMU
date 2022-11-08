@@ -1041,7 +1041,7 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '162'
+    data_css_ver = '163'
     
     # Func JS + Defer
     data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
@@ -2262,7 +2262,7 @@ def re_error(data):
         if ban_check() == 1:
             end = '<div id="opennamu_get_user_info">' + ip_check() + '</div>'
         else:
-            end = '<ul class="inside_ul"><li>' + load_lang('authority_error') + '</li></ul>'
+            end = '<ul class="opennamu_ul"><li>' + load_lang('authority_error') + '</li></ul>'
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('error'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
@@ -2388,7 +2388,7 @@ def re_error(data):
                 data = '' + \
                     '<div id="main_skin_set">' + \
                         '<h2>' + load_lang('error') + '</h2>' + \
-                        '<ul class="inside_ul">' + \
+                        '<ul class="opennamu_ul">' + \
                             '<li>' + data + '</a></li>' + \
                         '</ul>' + \
                     '</div>' + \
@@ -2400,7 +2400,7 @@ def re_error(data):
                 imp = [load_lang('error'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '' + \
                      '<h2>' + load_lang('error') + '</h2>' + \
-                     '<ul class="inside_ul">' + \
+                     '<ul class="opennamu_ul">' + \
                          '<li>' + data + '</li>' + \
                      '</ul>' + \
                 '',

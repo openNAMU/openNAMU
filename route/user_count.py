@@ -67,7 +67,7 @@ def user_count(name = None):
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('count'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
-                <ul class="inside_ul">
+                <ul class="opennamu_ul">
                     <li><a href="/record/''' + url_pas(that) + '''">''' + load_lang('edit_record') + '''</a> : ''' + str(data) + '''</li>
                     <li><a href="/record/topic/''' + url_pas(that) + '''">''' + load_lang('discussion_record') + '''</a> : ''' + str(data_topic) + '''</a></li>
                     <hr>

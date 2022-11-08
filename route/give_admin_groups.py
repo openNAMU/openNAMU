@@ -51,7 +51,7 @@ def give_admin_groups_2(name):
                         ''' + data + '''
                         <hr class="main_hr">
                         <h2>''' + load_lang('explanation') + '''</h2>
-                        <ul class="inside_ul">
+                        <ul class="opennamu_ul">
                             <li>ban : ''' + load_lang('ban_authority') + '''</li>
                             <li>toron : ''' + load_lang('discussion_authority') + '''</li>
                             <li>check : ''' + load_lang('user_check_authority') + '''</li>

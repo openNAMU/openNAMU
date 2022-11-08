@@ -8,7 +8,7 @@ def recent_history_tool(name = 'Test', rev = 1):
 
         data = '' + \
             '<h2>' + load_lang('tool') + '</h2>' + \
-            '<ul class="inside_ul">' + \
+            '<ul class="opennamu_ul">' + \
                 '<li><a href="/raw_rev/' + num + '/' + url_pas(name) + '">' + load_lang('raw') + '</a></li>' + \
         ''
 
@@ -24,7 +24,7 @@ def recent_history_tool(name = 'Test', rev = 1):
 
         if admin_check(6) == 1:
             data += '<h3>' + load_lang('admin') + '</h3>'
-            data += '<ul class="inside_ul">'
+            data += '<ul class="opennamu_ul">'
             curs.execute(db_change('' + \
                 'select title from history ' + \
                 'where title = ? and id = ? and hide = "O"' + \
@@ -40,7 +40,7 @@ def recent_history_tool(name = 'Test', rev = 1):
 
         if admin_check() == 1:
             data += '<h3>' + load_lang('owner') + '</h3>'
-            data += '<ul class="inside_ul">'
+            data += '<ul class="opennamu_ul">'
             data += '<li><a href="/history_delete/' + num + '/' + url_pas(name) + '">' + load_lang('history_delete') + '</li>'
             data += '<li><a href="/history_send/' + num + '/' + url_pas(name) + '">' + load_lang('send_edit') + '</li>'
             data += '</ul>'

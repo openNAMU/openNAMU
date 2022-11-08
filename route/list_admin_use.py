@@ -10,7 +10,7 @@ def list_admin_use_2():
         if flask.request.method == 'POST':
             return redirect('/admin_log?search=' + flask.request.form.get('search', 'normal'))
         else:
-            list_data = '<ul class="inside_ul">'
+            list_data = '<ul class="opennamu_ul">'
 
             if flask.request.args.get('search', 'normal') == 'normal':
                 curs.execute(db_change("select who, what, time from re_admin order by time desc limit ?, 50"), [sql_num])
@@ -31,9 +31,11 @@ def list_admin_use_2():
                 imp = [load_lang('authority_use_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input name="search" id="admin_log_search"> <button type="submit">''' + load_lang('search') + '''</button>
+                        <input name="search">
+                        <hr class="main_hr">
+                        <button type="submit">''' + load_lang('search') + '''</button>
                     </form>
-                    <hr class=\"main_hr\">
+                    <hr class="main_hr">
                 ''' + list_data,
                 menu = [['other', load_lang('return')]]
             ))

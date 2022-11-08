@@ -7,7 +7,7 @@ def user_alarm():
         num = int(number_check(flask.request.args.get('num', '1')))
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
     
-        data = '<ul class="inside_ul">'
+        data = '<ul class="opennamu_ul">'
     
         curs.execute(db_change("select data, date from alarm where name = ? order by date desc limit ?, 50"), [ip_check(), sql_num])
         data_list = curs.fetchall()

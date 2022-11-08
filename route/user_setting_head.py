@@ -66,7 +66,7 @@ def user_setting_head(skin_name = ''):
                 imp = [load_lang(data = 'user_head', safe = 1), wiki_set(), wiki_custom(), wiki_css(['(HTML)' + sub_name, 0])],
                 data = start + '''
                     <form method="post">
-                        <textarea rows="25" cols="100" name="content">''' + html.escape(data) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" cols="100" name="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
                         ''' + load_lang('user_css_warning') + ''' : <a href="/change/head_reset">/change/head_reset</a>
                         <hr class="main_hr">

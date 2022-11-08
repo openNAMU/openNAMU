@@ -4,7 +4,7 @@ def list_admin_2():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        div = '<ul class="inside_ul">'
+        div = '<ul class="opennamu_ul">'
 
         curs.execute(db_change(
             "select id, data from user_set where name = 'acl' and not data = 'user'"

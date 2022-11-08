@@ -19,7 +19,7 @@ def view_xref(name = 'Test', xref_type = 1):
 
             data_sub = '(' + load_lang('link_in_this') + ')'
 
-        div += '<ul class="inside_ul">'
+        div += '<ul class="opennamu_ul">'
 
         sql_insert = ['link', 'title'] if xref_type == 1 else ['title', 'link']
         curs.execute(db_change("" + \
