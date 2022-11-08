@@ -4,7 +4,7 @@ class class_do_render_namumark:
     def __init__(self, curs, doc_name, doc_data, doc_set, lang_data):
         self.curs = curs
         
-        self.doc_data = doc_data
+        self.doc_data = doc_data.replace('\r', '')
         self.doc_name = doc_name
         self.doc_set = doc_set
         self.doc_include = self.doc_set['doc_include'] if 'doc_include' in self.doc_set else ''
@@ -963,7 +963,7 @@ class class_do_render_namumark:
                     # remove include
                     include_data = re.sub(include_regex, '', include_data)
 
-                    self.data_include += [[self.doc_include + 'opennamu_include_' + str(include_num), include_name, include_data, 'style="display: inline-block;"']]
+                    self.data_include += [[self.doc_include + 'opennamu_include_' + str(include_num), include_name, include_data, 'style="display: inline;"']]
 
                     data_name = self.get_tool_data_storage('' + \
                         include_link + \
@@ -1234,8 +1234,7 @@ class class_do_render_namumark:
 
                 table_data_end += '</tr>'
                 table_data_end = '<table style="' + table_parameter['table'] + '">' + table_caption + table_data_end + '</table>'
-                if table_parameter['div'] != '':
-                    table_data_end = '<div style="' + table_parameter['div'] + '">' + table_data_end + '</div>'
+                table_data_end = '<div class="table_safe" style="' + table_parameter['div'] + '">' + table_data_end + '</div>'
 
                 self.render_data = re.sub(table_regex, lambda x : ('\n<front_br>' + table_data_end + '<back_br>\n'), self.render_data, 1)
 
