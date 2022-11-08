@@ -34,13 +34,14 @@ td {
     padding: 8px 10px;
 }
 
-@media not all and (min-resolution:.001dpcm)
-{ @supports (-webkit-appearance:none) {
+@supports (-webkit-text-size-adjust:none) and (not (-ms-accelerator:true))
+and (not (-moz-appearance:none))
+{
     td {
         border: 1px solid gainsboro;
         border-width: 1px;
     }
-}}
+}
 
 /* list */
 .inside_ul li {
