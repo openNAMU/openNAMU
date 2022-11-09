@@ -96,29 +96,6 @@ function main_css_get_post() {
 
 function main_css_skin_load() {    
     var head_data = document.querySelector('head');
-    if(document.cookie.match(opennamu_cookie_split_regex('main_css_del_strike'))) {
-        if(document.cookie.match(opennamu_cookie_split_regex('main_css_del_strike'))[1] === '1') {
-            head_data.innerHTML += '<style>s { text-decoration: none; } s:hover { background-color: transparent; }</style>';
-        } else if(document.cookie.match(opennamu_cookie_split_regex('main_css_del_strike'))[1] === '2') {
-            head_data.innerHTML += '<style>s { display: none; }</style>';
-        }
-    }
-
-    if(document.cookie.match(opennamu_cookie_split_regex('main_css_del_bold'))) {
-        if(document.cookie.match(opennamu_cookie_split_regex('main_css_del_bold'))[1] === '1') {
-            head_data.innerHTML += '<style>b { font-weight: normal; }</style>';
-        } else if(document.cookie.match(opennamu_cookie_split_regex('main_css_del_bold'))[1] === '2') {
-            head_data.innerHTML += '<style>b { display: none; }</style>';
-        }
-    }
-
-    if(
-        document.cookie.match(opennamu_cookie_split_regex('main_css_include_link')) &&
-        document.cookie.match(opennamu_cookie_split_regex('main_css_include_link'))[1] === '1'
-    ) {
-        head_data.innerHTML += '<style>#include_link { display: inline; }</style>';
-    }
-
     if(document.cookie.match(opennamu_cookie_split_regex('main_css_toc_set'))) {
         if(document.cookie.match(opennamu_cookie_split_regex('main_css_toc_set'))[1] === '2') {
             head_data.innerHTML += '<style>#auto_toc { display: none; }</style>';
@@ -134,6 +111,7 @@ function main_css_skin_load() {
         head_data.innerHTML += '<style>body, input, textarea { font-size: ' + document.cookie.match(opennamu_cookie_split_regex('main_css_font_size'))[1] + 'px; }</style>';
     }
     
+    /* 개편 필요 */
     if(
         document.cookie.match(opennamu_cookie_split_regex('main_css_link_delimiter')) &&
         document.cookie.match(opennamu_cookie_split_regex('main_css_link_delimiter'))[1] === '1'

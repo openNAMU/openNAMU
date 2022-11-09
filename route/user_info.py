@@ -16,7 +16,7 @@ def user_info(name = ''):
             curs.execute(db_change("select count(*) from alarm where name = ?"), [ip])
             count = curs.fetchall()
             if count and count[0][0] != 0:
-                tool_menu += '<li><a id="not_thing" href="/alarm">' + load_lang('alarm') + ' (' + str(count[0][0]) + ')</a></li>'
+                tool_menu += '<li><a class="opennamu_not_exist_link" href="/alarm">' + load_lang('alarm') + ' (' + str(count[0][0]) + ')</a></li>'
             else:
                 tool_menu += '<li><a href="/alarm">' + load_lang('alarm') + '</a></li>'
     

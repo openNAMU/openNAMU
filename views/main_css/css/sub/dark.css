@@ -3,6 +3,10 @@ html, body {
     color: white;
 }
 
+a:hover {
+    color: cornflowerblue;
+}
+
 textarea, input, button, select {
     background: #1f2023;
     color: white;

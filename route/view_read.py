@@ -43,7 +43,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                     category_doc += '' + \
                         '<li>' + \
                             '<a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> ' + \
-                            '<a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>' + \
+                            '<a class="opennamu_link_inter" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>' + \
                         '</li>' + \
                     ''
 

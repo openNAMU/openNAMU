@@ -7,7 +7,7 @@ def api_user_info(name = ''):
         if flask.request.method == 'POST':
             try:
                 data_list = json.loads(flask.request.form.get('title_list', ''))
-                data_list = list(set(title_list))
+                data_list = list(set(data_list))
             except:
                 data_list = [name]
 

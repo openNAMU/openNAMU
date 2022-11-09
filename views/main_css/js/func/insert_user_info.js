@@ -102,8 +102,6 @@ function do_insert_user_info() {
                         '';
                         
                         document.getElementById('opennamu_get_user_info').innerHTML = data;
-                        
-                        opennamu_do_ip_parser();
                     }
                 }
             }
