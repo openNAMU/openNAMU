@@ -36,9 +36,7 @@ td {
     padding: 8px 10px;
 }
 
-@supports (-webkit-text-size-adjust:none) and (not (-ms-accelerator:true))
-and (not (-moz-appearance:none))
-{
+@supports (-webkit-touch-callout: none) {
     td {
         border: 1px solid gainsboro;
         border-width: 1px;
@@ -108,7 +106,7 @@ a {
 }
 
 a:hover {
-    color: cornflowerblue;
+    color: darkblue;
 }
 
 .opennamu_not_exist_link {

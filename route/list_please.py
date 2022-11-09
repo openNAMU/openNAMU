@@ -18,7 +18,7 @@ def list_please_2():
         for data in data_list:
             div += '' + \
                 '<li>' + \
-                    '<a id="not_thing" href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> ' + \
+                    '<a class="opennamu_not_exist_link" href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> ' + \
                     '<a href="/w/' + url_pas(data[1]) + '">(' + html.escape(data[1]) + ')</a>' + \
                 '</li>' + \
             ''

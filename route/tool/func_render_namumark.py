@@ -263,6 +263,7 @@ class class_do_render_namumark:
                 break
             else:
                 heading_data = re.search(heading_regex, self.render_data)
+                heading_data_org = heading_data.group(0)
                 heading_data = heading_data.groups()
 
                 heading_data_last_regex = r' ?(#?={1,6}[^=]*)$'
@@ -302,11 +303,11 @@ class class_do_render_namumark:
                     toc_list += [['', heading_data_text]]
 
                     heading_data_text_fix = re.sub(r'<([^<>]*)>', '', heading_data_text)
-                    
+
                     data_name = self.get_tool_data_storage(
                         '<h' + heading_level_str + ' id="' + heading_data_text_fix + '">', 
                         ' <sub><a href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a></sub></h' + heading_level_str + '>', 
-                        ''
+                        heading_data_org
                     )
 
                     heading_data_complete = '' + \
@@ -375,6 +376,8 @@ class class_do_render_namumark:
 
         if toc_data != '':
             toc_data += '</div>'
+
+        self.data_toc = toc_data
 
         # toc replace
         self.render_data = re.sub(r'\[(목차|toc|tableofcontents)\]', lambda x : toc_data, self.render_data)
@@ -657,8 +660,11 @@ class class_do_render_namumark:
                         db_data = self.curs.fetchall()
                         if db_data:
                             link_exist = ''
+                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file']]
                         else:
                             link_exist = 'opennamu_not_exist_link'
+                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'no']]
+                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file']]
                         
                         link_extension_regex = r'\.([^.]+)$'
                         link_extension = re.search(link_extension_regex, link_main)
@@ -675,7 +681,7 @@ class class_do_render_namumark:
                     file_width = self.get_tool_css_safe(file_width)
                     file_height = self.get_tool_css_safe(file_height)
 
-                    file_end = '<image style="width:' + file_width + ';height:' + file_height + ';' + file_align + '" src="' + link_main + '">'
+                    file_end = '<image style="width:' + file_width + ';height:' + file_height + ';' + file_align + ';background:' + file_bgcolor + ';" src="' + link_main + '">'
                     if file_align == 'center':
                         file_end = '<div style="text-align:center;">' + file_end + '</div>'
 
@@ -714,8 +720,11 @@ class class_do_render_namumark:
                     db_data = self.curs.fetchall()
                     if db_data:
                         link_exist = ''
+                        self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat']]
                     else:
                         link_exist = 'opennamu_not_exist_link'
+                        self.data_backlink += [[self.doc_name, 'category:' + link_main, 'no']]
+                        self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat']]
 
                     link_main = url_pas(link_main)
 
@@ -818,7 +827,11 @@ class class_do_render_namumark:
                         self.curs.execute(db_change("select title from data where title = ?"), [link_main])
                         db_data = self.curs.fetchall()
                         if not db_data:
+                            self.data_backlink += [[self.doc_name, link_main, 'no']]
+                            self.data_backlink += [[self.doc_name, link_main, '']]
                             link_exist = 'opennamu_not_exist_link'
+                        else:
+                            self.data_backlink += [[self.doc_name, link_main, '']]
 
                     link_same = ''
                     if link_main == self.doc_name and self.doc_include == '':
@@ -949,6 +962,8 @@ class class_do_render_namumark:
                 self.curs.execute(db_change("select data from data where title = ?"), [include_name])
                 db_data = self.curs.fetchall()
                 if db_data:
+                    self.data_backlink += [[self.doc_name, include_name, 'include']]
+
                     # include link func
                     include_link = ''
                     if flask.request.cookies.get('main_css_include_link', '') == '1':
@@ -970,6 +985,8 @@ class class_do_render_namumark:
                         '<div id="' + self.doc_include + 'opennamu_include_' + str(include_num) + '"></div>' + \
                     '', '', match_org)
                 else:
+                    self.data_backlink += [[self.doc_name, include_name, 'no']]
+
                     include_link = '<div><a class="opennamu_not_exist_link" href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
 
                     data_name = self.get_tool_data_storage(include_link, '', match_org)
@@ -1063,6 +1080,9 @@ class class_do_render_namumark:
 
             link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
             link_main = html.unescape(link_main)
+
+            self.data_backlink += [[self.doc_name, link_main, 'redirect']]
+
             link_main = url_pas(link_main)
 
             if link_main != '':
@@ -1228,7 +1248,7 @@ class class_do_render_namumark:
                     else:
                         table_tr_change = 0
                     
-                        table_data_end += '<td colspan="' + table_sub_parameter['colspan'] + '" rowspan="' + table_sub_parameter['rowspan'] + '" style="' + table_sub_parameter['td'] + table_parameter['col'][table_col_num] + '">' + table_sub_parameter['data'] + '</td>'
+                        table_data_end += '<td colspan="' + table_sub_parameter['colspan'] + '" rowspan="' + table_sub_parameter['rowspan'] + '" style="' + table_sub_parameter['td'] + table_parameter['col'][table_col_num] + '"><back_br>\n' + table_sub_parameter['data'] + '\n<front_br></td>'
                     
                     table_col_num += 1
 
@@ -1475,6 +1495,72 @@ class class_do_render_namumark:
 
         self.render_data = re.sub(r'<temp_(?P<in>(?:slash)_(?:[0-9]+))>', '<\g<in>>', self.render_data)
 
+    def do_render_hr(self):
+        hr_regex = r'\n-{4,9}\n'
+        hr_count_max = len(re.findall(hr_regex, self.render_data)) * 3
+        while 1:
+            hr_data = re.search(hr_regex, self.render_data)
+            if hr_count_max < 0:
+                break
+            elif not hr_data:
+                break
+            else:
+                self.render_data = re.sub(hr_regex, '\n<front_br><hr><back_br>\n', self.render_data, 1)
+
+            hr_count_max -= 1
+
+    def do_render_list(self):        
+        quote_regex = r'((?:\n&gt; *[^\n]+)+)\n'
+        quote_count_max = len(re.findall(quote_regex, self.render_data)) * 10
+        while 1:
+            quote_data = re.search(quote_regex, self.render_data)
+            if quote_count_max < 0:
+                break
+            elif not quote_data:
+                break
+            else:
+                quote_data = quote_data.group(1)
+                quote_data = re.sub(r'\n&gt; *(?P<in>[^\n]+)', '\g<in>\n', quote_data)
+
+                self.render_data = re.sub(quote_regex, lambda x : ('\n<front_br><blockquote><back_br>\n' + quote_data + '<front_br></blockquote><back_br>\n'), self.render_data, 1)
+
+            quote_count_max -= 1
+
+        def do_render_list_sub(match):
+            list_data = match.group(2)
+            list_len = len(match.group(1))
+            if list_len == 0:
+                list_len = 1
+
+            list_style = {
+                1 : 'list-style: unset;',
+                2 : 'list-style: circle;',
+                3 : 'list-style: square;',
+            }
+            list_style_data = 'list-style: square;'
+            if list_len in list_style:
+                list_style_data = list_style[list_len]
+
+            return '<li style="margin-left: ' + str(list_len * 20) + 'px;' + list_style_data + '">' + list_data + '</li>'
+
+        list_regex = r'((?:\n *\* [^\n]+)+)\n'
+        list_count_max = len(re.findall(list_regex, self.render_data)) * 3
+        while 1:
+            list_data = re.search(list_regex, self.render_data)
+            if list_count_max < 0:
+                break
+            elif not list_data:
+                break
+            else:
+                list_data = list_data.group(1)
+                list_sub_regex = r'\n( *)\* ([^\n]+)'
+
+                list_data = re.sub(list_sub_regex, do_render_list_sub, list_data)
+
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
+
+            list_count_max -= 1
+
     def do_render_last(self):
         # add category
         if self.doc_include == '':
@@ -1513,12 +1599,13 @@ class class_do_render_namumark:
         self.do_render_include()
         self.do_render_middle()
         self.do_render_math()
-        # self.do_render_list()
         self.do_render_table()
+        self.do_render_list()
         self.do_render_macro()
         self.do_render_link()
         self.do_redner_footnote()
         self.do_render_text()
+        self.do_render_hr()
         self.do_render_heading()
         self.do_render_last()
 

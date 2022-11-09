@@ -1041,7 +1041,7 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '163'
+    data_css_ver = '165'
     
     # Func JS + Defer
     data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
@@ -1054,12 +1054,7 @@ def wiki_css(data):
     data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/func/shortcut.js?ver=' + data_css_ver + '"></script>'
     
-    data_css += '<script defer src="/views/main_css/js/func/render_user_name.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/func/render_simple.js?ver=' + data_css_ver + '"></script>'
-    
-    # Render JS
-    data_css += '<script src="/views/main_css/js/render/markdown.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script src="/views/main_css/js/render/wiki.js?ver=' + data_css_ver + '"></script>'
     
     # Route JS + Defer
     data_css += '<script defer src="/views/main_css/js/route/thread.js?ver=' + data_css_ver + '"></script>'
@@ -1068,15 +1063,8 @@ def wiki_css(data):
     data_css += '<script src="/views/main_css/js/load_editor.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script src="/views/main_css/js/load_skin_set.js?ver=' + data_css_ver + '"></script>'
     
-    # 레거시 렌더러 JS
-    data_css += '<script src="/views/main_css/js/render_html.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script src="/views/main_css/js/render_onmark.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script src="/views/main_css/js/render_wiki.js?ver=' + data_css_ver + '"></script>'
-    
     # Main CSS
     data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css?ver=' + data_css_ver + '">'
-    if flask.request.cookies.get('main_css_darkmode', '') == '1':
-        data_css += '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=' + data_css_ver + '">'
 
     # External
     data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/styles/default.min.css">'
@@ -1837,7 +1825,6 @@ def ban_check(ip = None, tool = ''):
 def ip_pas(raw_ip, type_data = 0):
     curs = conn.cursor()
 
-    hide = 0
     end_ip = {}
 
     return_data = 0
@@ -1867,7 +1854,24 @@ def ip_pas(raw_ip, type_data = 0):
             ip = raw_ip
             
         if type_data == 0 and change_ip == 0:
-            ip = '<span class="opennamu_ip_render">' + raw_ip + '</span>'
+            if is_this_ip == 0:
+                ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+                
+                if admin_check('all', None, raw_ip) == 1:
+                    ip = '<b>' + ip + '</b>'
+
+                curs.execute(db_change('select data from user_set where name = "user_title" and id = ?'), [raw_ip])
+                db_data = curs.fetchall()
+                if db_data:
+                    ip = db_data[0][0] + ip
+
+            if ban_check(raw_ip) == 1:
+                ip = '<s>' + ip + '</s>'
+
+                if ban_check(raw_ip, 'login') == 1:
+                    ip = '<i>' + ip + '</i>'
+
+            ip = ip + ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
 
         end_ip[raw_ip] = ip
     
