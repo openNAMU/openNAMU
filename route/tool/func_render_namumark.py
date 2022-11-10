@@ -1220,7 +1220,7 @@ class class_do_render_namumark:
                 else:
                     table_caption = ''
 
-                table_parameter = { "div" : "", "table" : "", "col" : {} }
+                table_parameter = { "div" : "", "table" : "", "col" : {}, "rowspan" : {} }
                 table_data_end = ''
                 table_col_num = 0
                 table_tr_change = 0
@@ -1237,6 +1237,16 @@ class class_do_render_namumark:
                         table_col_num = 0
                         table_data_end += '</tr><tr style="' + table_sub_parameter['tr'] + '">'
 
+                    if not table_col_num in table_parameter['rowspan']:
+                        table_parameter['rowspan'][table_col_num] = 0
+                    else:
+                        if table_parameter['rowspan'][table_col_num] != 0:
+                            table_col_num += 1
+                            table_parameter['rowspan'][table_col_num] -= 1
+
+                    if table_sub_parameter['rowspan'] != '':
+                        table_parameter['rowspan'][table_col_num] = int(table_sub_parameter['rowspan'])
+
                     if not table_col_num in table_parameter['col']:
                         table_parameter['col'][table_col_num] = ''
 
@@ -1249,7 +1259,7 @@ class class_do_render_namumark:
                     else:
                         table_tr_change = 0
                     
-                        table_data_end += '<td colspan="' + table_sub_parameter['colspan'] + '" rowspan="' + table_sub_parameter['rowspan'] + '" style="' + table_sub_parameter['td'] + table_parameter['col'][table_col_num] + '"><back_br>\n' + table_sub_parameter['data'] + '\n<front_br></td>'
+                        table_data_end += '<td colspan="' + table_sub_parameter['colspan'] + '" rowspan="' + table_sub_parameter['rowspan'] + '" style="' + table_parameter['col'][table_col_num] + table_sub_parameter['td'] + '"><back_br>\n' + table_sub_parameter['data'] + '\n<front_br></td>'
                     
                     table_col_num += 1
 
@@ -1524,6 +1534,7 @@ class class_do_render_namumark:
                 quote_data_org = quote_data.group(0)
                 quote_data = quote_data.group(1)
                 quote_data = re.sub(r'\n&gt; *(?P<in>[^\n]+)', '\g<in>\n', quote_data)
+                quote_data = html.unescape(quote_data)
 
                 self.data_include += [[self.doc_include + 'opennamu_quote_' + str(quote_count), self.doc_name, quote_data, '']]
 
