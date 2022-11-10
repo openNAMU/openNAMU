@@ -1562,7 +1562,7 @@ class class_do_render_namumark:
 
             return '<li style="margin-left: ' + str(list_len * 20) + 'px;' + list_style_data + '">' + list_data + '</li>'
 
-        list_regex = r'((?:\n *\* [^\n]+)+)\n'
+        list_regex = r'((?:\n *\* ?[^\n]+)+)\n'
         list_count_max = len(re.findall(list_regex, self.render_data)) * 3
         while 1:
             list_data = re.search(list_regex, self.render_data)
@@ -1572,7 +1572,7 @@ class class_do_render_namumark:
                 break
             else:
                 list_data = list_data.group(1)
-                list_sub_regex = r'\n( *)\* ([^\n]+)'
+                list_sub_regex = r'\n( *)\* ?([^\n]+)'
 
                 list_data = re.sub(list_sub_regex, do_render_list_sub, list_data)
 
