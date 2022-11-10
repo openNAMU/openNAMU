@@ -969,7 +969,7 @@ class class_do_render_namumark:
                     if flask.request.cookies.get('main_css_include_link', '') == '1':
                         include_link = '<div><a href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
 
-                    include_data = db_data[0][0]
+                    include_data = db_data[0][0].replace('\r', '')
 
                     # parameter replace
                     include_data = re.sub(r'(\\+)?@([^@= ]+)=((?:\\@|[^@])+)@', do_render_include_default_sub, include_data)
@@ -977,6 +977,7 @@ class class_do_render_namumark:
 
                     # remove include
                     include_data = re.sub(include_regex, '', include_data)
+                    include_data = re.sub('^\n+', '', include_data)
 
                     self.data_include += [[self.doc_include + 'opennamu_include_' + str(include_num), include_name, include_data, 'style="display: inline;"']]
 
@@ -1511,6 +1512,7 @@ class class_do_render_namumark:
 
     def do_render_list(self):        
         quote_regex = r'((?:\n&gt; *[^\n]+)+)\n'
+        quote_count = 0
         quote_count_max = len(re.findall(quote_regex, self.render_data)) * 10
         while 1:
             quote_data = re.search(quote_regex, self.render_data)
@@ -1519,12 +1521,18 @@ class class_do_render_namumark:
             elif not quote_data:
                 break
             else:
+                quote_data_org = quote_data.group(0)
                 quote_data = quote_data.group(1)
                 quote_data = re.sub(r'\n&gt; *(?P<in>[^\n]+)', '\g<in>\n', quote_data)
 
-                self.render_data = re.sub(quote_regex, lambda x : ('\n<front_br><blockquote><back_br>\n' + quote_data + '<front_br></blockquote><back_br>\n'), self.render_data, 1)
+                self.data_include += [[self.doc_include + 'opennamu_quote_' + str(quote_count), self.doc_name, quote_data, '']]
+
+                data_name = self.get_tool_data_storage('<div id="' + self.doc_include + 'opennamu_quote_' + str(quote_count) + '"></div>', '', quote_data_org)
+
+                self.render_data = re.sub(quote_regex, lambda x : ('\n<front_br><blockquote><back_br>\n<' + data_name + '></' + data_name + '><front_br></blockquote><back_br>\n'), self.render_data, 1)
 
             quote_count_max -= 1
+            quote_count += 1
 
         def do_render_list_sub(match):
             list_data = match.group(2)
@@ -1561,6 +1569,9 @@ class class_do_render_namumark:
 
             list_count_max -= 1
 
+    def do_render_remark(self):
+        self.render_data = re.sub(r'\n##[^\n]+', '\n<front_br>', self.render_data)
+
     def do_render_last(self):
         # add category
         if self.doc_include == '':
@@ -1593,6 +1604,7 @@ class class_do_render_namumark:
         self.render_data = '<div class="opennamu_render_complete">' + self.render_data + '</div>'
 
     def __call__(self):
+        self.do_render_remark()
         self.do_render_include_default()
         self.do_render_slash()
         self.do_render_redirect()

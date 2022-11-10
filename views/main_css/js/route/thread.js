@@ -126,8 +126,6 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
             
             eval(data_all_js);
             
-            opennamu_do_ip_parser();
-            
             if(type_do === 'top') {
                 opennamu_do_thread_make(topic_num, 'main', '', 'main_topic');
             } else if(type_do === 'main') {
