@@ -1871,7 +1871,7 @@ def ip_pas(raw_ip, type_data = 0):
                 if ban_check(raw_ip, 'login') == 1:
                     ip = '<i>' + ip + '</i>'
 
-            ip = ip + ' <a href="/tool/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
+            ip = ip + ' <a href="/user/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
 
         end_ip[raw_ip] = ip
     
