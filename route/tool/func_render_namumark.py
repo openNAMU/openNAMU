@@ -18,6 +18,7 @@ class class_do_render_namumark:
         self.data_include = []
 
         self.data_math_count = 0
+        self.data_redirect = 0
         
         self.data_toc = ''
         self.data_footnote = {}
@@ -1052,7 +1053,7 @@ class class_do_render_namumark:
 
     def do_render_redirect(self):
         match = re.search(r'^<back_br>\n#(?:redirect|넘겨주기) ([^\n]+)', self.render_data)
-        if match:
+        if match and self.doc_include == '':
             link_data_full = match.group(0)
             link_main = match.group(1)
 
@@ -1086,6 +1087,7 @@ class class_do_render_namumark:
 
             link_main = url_pas(link_main)
 
+            self.data_redirect = 1
             if link_main != '':
                 link_main = '/w_from/' + link_main
 
@@ -1241,11 +1243,13 @@ class class_do_render_namumark:
                         table_parameter['rowspan'][table_col_num] = 0
                     else:
                         if table_parameter['rowspan'][table_col_num] != 0:
-                            table_col_num += 1
                             table_parameter['rowspan'][table_col_num] -= 1
+                            table_col_num += 1
 
                     if table_sub_parameter['rowspan'] != '':
-                        table_parameter['rowspan'][table_col_num] = int(table_sub_parameter['rowspan'])
+                        rowspan_int = int(table_sub_parameter['rowspan'])
+                        if rowspan_int > 1:
+                            table_parameter['rowspan'][table_col_num] = rowspan_int - 1
 
                     if not table_col_num in table_parameter['col']:
                         table_parameter['col'][table_col_num] = ''
@@ -1619,17 +1623,19 @@ class class_do_render_namumark:
         self.do_render_include_default()
         self.do_render_slash()
         self.do_render_redirect()
-        self.do_render_include()
-        self.do_render_middle()
-        self.do_render_math()
-        self.do_render_table()
-        self.do_render_list()
-        self.do_render_macro()
-        self.do_render_link()
-        self.do_redner_footnote()
-        self.do_render_text()
-        self.do_render_hr()
-        self.do_render_heading()
+        if self.data_redirect == 0:
+            self.do_render_include()
+            self.do_render_middle()
+            self.do_render_math()
+            self.do_render_table()
+            self.do_render_list()
+            self.do_render_macro()
+            self.do_render_link()
+            self.do_redner_footnote()
+            self.do_render_text()
+            self.do_render_hr()
+            self.do_render_heading()
+            
         self.do_render_last()
 
         # print(self.data_temp_storage)
