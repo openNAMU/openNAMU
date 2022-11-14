@@ -303,6 +303,7 @@ class class_do_render_namumark:
 
                     toc_list += [['', heading_data_text]]
 
+                    # 수정 필요... JS 써야하나?
                     heading_data_text_fix = re.sub(r'<([^<>]*)>', '', heading_data_text)
 
                     data_name = self.get_tool_data_storage(
@@ -451,6 +452,8 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage('<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen></iframe>', '', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
+            elif name_data == 'toc':
+                return '<toc_no_auto>'
             elif name_data == 'ruby':
                 data = re.findall(macro_split_regex, match[1])
 
@@ -1652,15 +1655,29 @@ class class_do_render_namumark:
         if self.data_toc != '':
             toc_search_regex = r'<toc_data>((?:(?!<toc_data>|<\/toc_data>).)*)<\/toc_data>'
 
+            toc_data_on = 0
+
             toc_data = re.search(toc_search_regex, self.render_data)
             toc_data = toc_data.group(1)
             self.data_toc = toc_data
             self.data_toc = re.sub(r'<toc_inside>((?:(?!<toc_inside>|<\/toc_inside>).)*)<\/toc_inside>', do_render_last_toc, self.data_toc)
 
             self.render_data = re.sub(toc_search_regex, '', self.render_data)
-            self.render_data = re.sub(r'<toc_need_part>', self.data_toc, self.render_data)
+            if flask.request.cookies.get('main_css_toc_set', '0') != '1':
+                if re.search(r'<toc_need_part>', self.render_data):
+                    toc_data_on = 1
+
+                self.render_data = re.sub(r'<toc_need_part>', lambda x : (self.data_toc), self.render_data)
+            else:
+                self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
+
+            if re.search(r'<toc_no_auto>', self.render_data) or flask.request.cookies.get('main_css_toc_set', '0') != '0' or toc_data_on == 1:
+                self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
+            else:
+                self.render_data = re.sub(r'(?P<in><h[1-6] id="(?:["]*)">)', '<br>' + self.data_toc + '\g<in>', self.render_data)
         else:
             self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
+            self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
 
         self.render_data = '<div class="opennamu_render_complete">' + self.render_data + '</div>'
 
