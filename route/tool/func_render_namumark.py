@@ -161,7 +161,7 @@ class class_do_render_namumark:
         if len(data) == 1:
             return data[0]
         else:
-            if flask.request.cookies.get('main_css_del_bold', '0') == '0':
+            if flask.request.cookies.get('main_css_darkmode', '0') == '0':
                 return data[0]
             else:
                 return data[1]
@@ -617,6 +617,7 @@ class class_do_render_namumark:
                     file_height = ''
                     file_align = ''
                     file_bgcolor = ''
+                    file_turn = ''
 
                     file_split_regex = r'(?:^|&amp;) *((?:(?!&amp;).)+)'
                     file_split_sub_regex = r'(^[^=]+) *= *([^=]+)'
@@ -637,6 +638,11 @@ class class_do_render_namumark:
                                         file_align = 'center'
                                 elif data_sub[0] == 'bgcolor':
                                     file_bgcolor = data_sub[1]
+                                elif data_sub[0] == 'theme':
+                                    if data_sub[1] == 'dark':
+                                        file_turn = 'dark'
+                                    elif data_sub[1] == 'light':
+                                        file_turn = 'light'
 
                     link_main_org = ''
                     link_sub = link_main
@@ -688,11 +694,22 @@ class class_do_render_namumark:
 
                     if link_exist != '':
                         data_name = self.get_tool_data_storage('<a class="' + link_exist + '" href="/upload?name=' + url_pas(link_main_org) + '">', '</a>', link_data_full)
-
                         self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
                     else:
-                        data_name = self.get_tool_data_storage(file_end, '', link_data_full)
+                        file_pass = 0
+                        if file_turn != '':
+                            if file_turn == 'dark' and flask.request.cookies.get('main_css_darkmode', '0') == '1':
+                                file_pass = 1
+                            elif file_turn == 'light' and flask.request.cookies.get('main_css_darkmode', '0') == '0':
+                                file_pass = 1
+                        else:
+                            file_pass = 1
 
+                        if file_pass == 1:
+                            data_name = self.get_tool_data_storage(file_end, '', link_data_full)
+                        else:
+                            data_name = self.get_tool_data_storage('', '', link_data_full)
+                        
                         self.render_data = re.sub(link_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
                 # category
                 elif re.search(r'^(분류|category):', link_main):
