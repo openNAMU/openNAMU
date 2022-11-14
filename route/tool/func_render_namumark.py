@@ -367,21 +367,21 @@ class class_do_render_namumark:
             toc_data += '' + \
                 '<br>' + \
                 ('<span style="margin-left: 10px;">' * for_a[0].count('.')) + \
-                '<span>' + \
+                '<span class="opennamu_TOC_list">' + \
                     '<a href="#s-' + for_a[0] + '">' + \
                         for_a[0] + '. ' + \
                     '</a>' + \
-                    for_a[1] + \
+                    '<toc_inside>' + for_a[1] + '</toc_inside>' + \
                 '</span>' + \
             ''
 
         if toc_data != '':
             toc_data += '</div>'
 
-        self.data_toc = toc_data
-
-        # toc replace
-        self.render_data = re.sub(r'\[(목차|toc|tableofcontents)\]', lambda x : toc_data, self.render_data)
+            self.data_toc = toc_data
+            self.render_data += '<toc_data>' + toc_data + '</toc_data>'
+        else:
+            self.data_toc = ''
 
     def do_render_macro(self):
         # double macro function
@@ -481,6 +481,12 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage('<ruby>' + main_text + '<rp>(</rp><rt>' + sub_text + '</rt><rp>)</rp></ruby>', '', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
+            elif name_data == 'anchor':
+                main_text = self.get_tool_data_revert(match[1], do_type = 'render')
+
+                data_name = self.get_tool_data_storage('<span id="' + main_text + '">', '</span>', match_org.group(0))
+
+                return '<' + data_name + '></' + data_name + '>'
             elif name_data == 'age':
                 if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', match[1]):
                     try:
@@ -548,6 +554,8 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage('<div style="clear: both;"></div>', '', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
+            elif match in ('목차', 'toc', 'tableofcontents'):
+                return '<toc_need_part>'
             elif match == 'pagecount':
                 return '0'
             else:
@@ -1632,6 +1640,27 @@ class class_do_render_namumark:
 
         # <render_n> restore
         self.render_data = self.get_tool_data_restore(self.render_data)
+
+        def do_render_last_toc(match):
+            data = match.group(1)
+
+            data = re.sub(r'<[^<>]*>', '', data)
+            
+            return data
+
+        # add toc
+        if self.data_toc != '':
+            toc_search_regex = r'<toc_data>((?:(?!<toc_data>|<\/toc_data>).)*)<\/toc_data>'
+
+            toc_data = re.search(toc_search_regex, self.render_data)
+            toc_data = toc_data.group(1)
+            self.data_toc = toc_data
+            self.data_toc = re.sub(r'<toc_inside>((?:(?!<toc_inside>|<\/toc_inside>).)*)<\/toc_inside>', do_render_last_toc, self.data_toc)
+
+            self.render_data = re.sub(toc_search_regex, '', self.render_data)
+            self.render_data = re.sub(r'<toc_need_part>', self.data_toc, self.render_data)
+        else:
+            self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
 
         self.render_data = '<div class="opennamu_render_complete">' + self.render_data + '</div>'
 
