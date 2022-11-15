@@ -303,11 +303,8 @@ class class_do_render_namumark:
 
                     toc_list += [['', heading_data_text]]
 
-                    # 수정 필요... JS 써야하나?
-                    heading_data_text_fix = re.sub(r'<([^<>]*)>', '', heading_data_text)
-
                     data_name = self.get_tool_data_storage(
-                        '<h' + heading_level_str + ' id="' + heading_data_text_fix + '">', 
+                        '<h' + heading_level_str + '>', 
                         ' <sub><a href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a></sub></h' + heading_level_str + '>', 
                         heading_data_org
                     )
@@ -918,8 +915,8 @@ class class_do_render_namumark:
 
                 return slash_add + match[2]
 
-        self.render_data = re.sub(r'(\\+)?@([^@= ]+)=((?:\\@|[^@])+)@', do_render_include_default_sub, self.render_data)
-        self.render_data = re.sub(r'(\\+)?@([^@= ]+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([^@= \n]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([^@= \n]+)@', do_render_include_default_sub, self.render_data)
 
     def do_render_include(self):
         def do_render_include_default_sub(match):
@@ -1001,8 +998,8 @@ class class_do_render_namumark:
                     include_data = db_data[0][0].replace('\r', '')
 
                     # parameter replace
-                    include_data = re.sub(r'(\\+)?@([^@= ]+)=((?:\\@|[^@])+)@', do_render_include_default_sub, include_data)
-                    include_data = re.sub(r'(\\+)?@([^@= ]+)@', do_render_include_default_sub, include_data)
+                    include_data = re.sub(r'(\\+)?@([^@= \n]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, include_data)
+                    include_data = re.sub(r'(\\+)?@([^@= \n]+)@', do_render_include_default_sub, include_data)
 
                     # remove include
                     include_data = re.sub(include_regex, '', include_data)
@@ -1674,7 +1671,7 @@ class class_do_render_namumark:
             if re.search(r'<toc_no_auto>', self.render_data) or flask.request.cookies.get('main_css_toc_set', '0') != '0' or toc_data_on == 1:
                 self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
             else:
-                self.render_data = re.sub(r'(?P<in><h[1-6] id="(?:["]*)">)', '<br>' + self.data_toc + '\g<in>', self.render_data)
+                self.render_data = re.sub(r'(?P<in><h[1-6]>)', '<br>' + self.data_toc + '\g<in>', self.render_data)
         else:
             self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
             self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
