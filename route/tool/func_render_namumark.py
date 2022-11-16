@@ -1671,7 +1671,7 @@ class class_do_render_namumark:
             if re.search(r'<toc_no_auto>', self.render_data) or flask.request.cookies.get('main_css_toc_set', '0') != '0' or toc_data_on == 1:
                 self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
             else:
-                self.render_data = re.sub(r'(?P<in><h[1-6]>)', '<br>' + self.data_toc + '\g<in>', self.render_data)
+                self.render_data = re.sub(r'(?P<in><h[1-6]>)', '<br>' + self.data_toc + '\g<in>', self.render_data, 1)
         else:
             self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
             self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
