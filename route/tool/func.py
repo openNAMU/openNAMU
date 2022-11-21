@@ -1305,11 +1305,16 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
             if db_data and db_data[0][0] != '':
                 get_class_render[0] = '''
                     <style>
-                        .render_content, .opennamu_render_complete {
+                        .opennamu_render_complete {
                             font-size: 14.4px !important;
                         }
-                        .render_content td, .opennamu_render_complete td {
+
+                        .opennamu_render_complete td {
                             padding: 5px 10px !important;
+                        }
+
+                        .opennamu_render_complete summary {
+                            list-style: none !important;
                         }
                     </style>
                 ''' + get_class_render[0]
