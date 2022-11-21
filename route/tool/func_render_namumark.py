@@ -305,7 +305,7 @@ class class_do_render_namumark:
 
                     data_name = self.get_tool_data_storage(
                         '<h' + heading_level_str + '>', 
-                        ' <sub><a href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a></sub></h' + heading_level_str + '>', 
+                        ' <sub><a id="edit_load_' + str(heading_count) + '" href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a></sub></h' + heading_level_str + '>', 
                         heading_data_org
                     )
 
