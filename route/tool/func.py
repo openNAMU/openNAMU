@@ -8,6 +8,7 @@ import zipfile
 import shutil
 import logging
 import random
+import ipaddress
 
 import email.mime.text
 import email.utils
@@ -1846,8 +1847,13 @@ def ip_pas(raw_ip, type_data = 0):
         change_ip = 0
         is_this_ip = ip_or_user(raw_ip)
         if is_this_ip != 0 and ip_view != '':
-            ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
-            ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', ip)
+            raw_ip = ipaddress.ip_address(raw_ip)
+            if type(raw_ip) == ipaddress.IPv6Address:
+                raw_ip = raw_ip.exploded
+                ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
+            else:
+                raw_ip = raw_ip.exploded
+                ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
                 
             change_ip = 1
         else:     
