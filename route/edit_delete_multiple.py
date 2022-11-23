@@ -19,7 +19,7 @@ def edit_delete_multiple():
             if do_edit_text_bottom_check_box_check(agree) == 1:
                 return re_error('/error/29')
             
-            all_title = re.findall(r'([^\n]+)\n', flask.request.form.get('content', '').replace('\r\n', '\n') + '\n')
+            all_title = re.findall(r'([^\n]+)\n', flask.request.form.get('content', '').replace('\r', '') + '\n')
             for name in all_title:
                 edit_delete.edit_delete(name)
 

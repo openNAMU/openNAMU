@@ -22,7 +22,7 @@ def give_user_ban(name = None, ban_type = ''):
             why = flask.request.form.get('why', '')
 
             if ban_type == 'multiple':
-                all_user = re.findall(r'([^\n]+)\n', flask.request.form.get('name', 'test').replace('\r\n', '\n') + '\n')
+                all_user = re.findall(r'([^\n]+)\n', flask.request.form.get('name', 'test').replace('\r', '') + '\n')
             else:
                 if name:
                     all_user = [name]

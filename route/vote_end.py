@@ -28,7 +28,7 @@ def vote_end(num = 1):
         data += '<b>' + data_list[0][1] + '</b><hr class="main_hr">' if data_list[0][1] != '' else ''
         data += '<span>~ ' + time_limit + '</span><hr class="main_hr">' if time_limit != '' else ''
 
-        vote_data = re.findall(r'([^\n]+)', data_list[0][2].replace('\r\n', '\n'))
+        vote_data = re.findall(r'([^\n]+)', data_list[0][2].replace('\r', ''))
         for i in range(0, len(vote_data)):
             data += '<h2>' + vote_data[i] + '</h2>'
             data += '<ul class="opennamu_ul">'
