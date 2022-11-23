@@ -66,6 +66,7 @@ def recent_discuss(tool):
                 '</tr>' + \
             ''
 
+            count += 1
 
         div += '' + \
                 '</tbody>' + \
