@@ -40,7 +40,7 @@ def recent_history_add(name = 'Test', do_type = ''):
             data_preview = ''
             if do_type == 'preview':
                 data = flask.request.form.get('content', '')
-                data = data.replace('\r\n', '\n')
+                data = data.replace('\r', '')
 
                 send = flask.request.form.get('send', '')
                 get_ip = flask.request.form.get('get_ip', '')

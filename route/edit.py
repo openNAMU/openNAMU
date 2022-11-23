@@ -33,7 +33,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 return re_error('/error/24')
     
             today = get_time()
-            content = flask.request.form.get('content', '').replace('\r\n', '\n')
+            content = flask.request.form.get('content', '').replace('\r', '')
             send = flask.request.form.get('send', '')
             agree = flask.request.form.get('copyright_agreement', '')
             
@@ -47,9 +47,9 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 return re_error('/error/29')
             
             curs.execute(db_change("select data from data where title = ?"), [name])
-            old = curs.fetchall()
-            if old:
-                o_data = old[0][0].replace('\r\n', '\n')
+            db_data = curs.fetchall()
+            if db_data:
+                o_data = db_data[0][0].replace('\r', '')
 
                 if section != '':
                     if flask.request.form.get('doc_section_edit_apply', 'X') != 'X':
@@ -71,11 +71,18 @@ def edit(name = 'Test', section = 0, do_type = ''):
                                     pass
     
                 leng = leng_check(len(o_data), len(content))
-                
-                curs.execute(db_change("update data set data = ? where title = ?"), [content, name])
             else:
                 leng = '+' + str(len(content))
-    
+
+            render_set(
+                doc_name = name,
+                doc_data = content,
+                data_in = ''
+            )
+                
+            if db_data:
+                curs.execute(db_change("update data set data = ? where title = ?"), [content, name])
+            else:    
                 curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, content])
     
                 curs.execute(db_change('select data from other where name = "count_all_title"'))
@@ -134,7 +141,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 curs.execute(db_change("select data from data where title = ?"), [load_title])
                 db_data = curs.fetchall()
                 data = db_data[0][0] if db_data else ''
-                data = data.replace('\r\n', '\n')
+                data = data.replace('\r', '')
 
                 if section != '':
                     curs.execute(db_change('select data from other where name = "markup"'))
@@ -177,7 +184,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                             count += 1
             else:
                 data = flask.request.form.get('content', '')
-                data = data.replace('\r\n', '\n')
+                data = data.replace('\r', '')
                 
                 data_section_where = flask.request.form.get('doc_section_data_where', '')
                 doc_section_edit_apply = flask.request.form.get('doc_section_edit_apply', '')

@@ -33,7 +33,7 @@ def vote_select(num = 1):
             if time_today > time_db:
                 return redirect('/vote/end/' + num)
 
-        vote_data = re.findall(r'([^\n]+)', data_list[0][2].replace('\r\n', '\n'))
+        vote_data = re.findall(r'([^\n]+)', data_list[0][2].replace('\r', ''))
 
         if flask.request.method == 'POST':
             try:
