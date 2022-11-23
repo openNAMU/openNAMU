@@ -97,7 +97,7 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                     '<table class="opennamu_comment">' + 
                         '<tr>' + 
                             '<td class="' + color_t + '">' + 
-                                '<a href="javascript:void(0);" id="' + key + '">#' + key + '</a> ' + 
+                                '<a href="#thread_shortcut" id="' + key + '">#' + key + '</a> ' + 
                                 ip + 
                                 '<span style="float: right;">' + data_t[key]['date'] + '</span>' + 
                             '</td>' + 
