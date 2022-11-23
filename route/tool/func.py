@@ -1848,17 +1848,17 @@ def ip_pas(raw_ip, type_data = 0):
     
     get_ip = list(set(get_ip))
     
-    for raw_ip in get_ip:        
+    for raw_ip in get_ip:
         change_ip = 0
         is_this_ip = ip_or_user(raw_ip)
         if is_this_ip != 0 and ip_view != '':
-            raw_ip = ipaddress.ip_address(raw_ip)
-            if type(raw_ip) == ipaddress.IPv6Address:
-                raw_ip = raw_ip.exploded
-                ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', raw_ip)
+            ip = ipaddress.ip_address(raw_ip)
+            if type(ip) == ipaddress.IPv6Address:
+                ip = ip.exploded
+                ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', ip)
             else:
-                raw_ip = raw_ip.exploded
-                ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
+                ip = ip.exploded
+                ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', ip)
                 
             change_ip = 1
         else:     
