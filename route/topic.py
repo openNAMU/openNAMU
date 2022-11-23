@@ -172,9 +172,20 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             sql_d = curs.fetchall()
             topic_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('content')
 
+            shortcut = '<div class="opennamu_thread_shortcut" id="thread_shortcut">'
+            curs.execute(db_change(
+                "select id from topic where code = ? order by id + 0 asc"
+            ), [topic_num])
+            db_data = curs.fetchall()
+            for for_a in db_data:
+                shortcut += '<a href="#' + for_a[0] + '">#' + for_a[0] + '</a> '
+            
+            shortcut += '</div>'
+
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('discussion') + ')', 0])],
                 data = '''
+                    ''' + shortcut + '''
                     <h2 id="topic_top_title">''' + html.escape(sub) + '''</h2>
                     
                     <div id="top_topic"></div>
