@@ -1665,7 +1665,8 @@ class class_do_render_namumark:
                 if re.search(r'<toc_need_part>', self.render_data):
                     toc_data_on = 1
 
-                self.render_data = re.sub(r'<toc_need_part>', lambda x : (self.data_toc), self.render_data)
+                self.render_data = re.sub(r'<toc_need_part>', lambda x : (self.data_toc), self.render_data, 20)
+                self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
             else:
                 self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
 
