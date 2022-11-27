@@ -1182,14 +1182,14 @@ class class_do_render_namumark:
                 elif len(table_parameter_split) == 1:
                     if re.search(r'^-[0-9]+$', table_parameter):
                         table_colspan_auto = 0
-                        table_parameter_all['colspan'] = table_parameter.replace('-', '')
+                        table_parameter_all['colspan'] = re.sub(r'[^0-9]+', '', table_parameter)
                     elif re.search(r'^(\^|v)?\|[0-9]+$', table_parameter):
                         if table_parameter[0] == '^':
                             table_parameter_all['td'] += 'vertical-align: top;'
                         elif table_parameter[0] == 'v':
                             table_parameter_all['td'] += 'vertical-align: bottom;'
 
-                        table_parameter_all['rowspan'] = re.sub(r'^|v|\|', '', table_parameter)
+                        table_parameter_all['rowspan'] = re.sub(r'[^0-9]+', '', table_parameter)
                     elif table_parameter in ('(', ':', ')'):
                         table_align_auto = 0
                         if table_parameter == '(':
