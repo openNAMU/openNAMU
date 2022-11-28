@@ -70,7 +70,7 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                 }
                 
                 if(blind === 'O') {
-                    ip += ' <a href="/admin_log?search=blind%20(code%20' + topic_num + '#' + key + '">(B)</a>';
+                    ip += ' <a href="/list/admin/auth_use/' + opennamu_do_url_encode('blind (code ' + topic_num + '#' + key) + '/1">(B)</a>';
                     
                     if(admin === '1') {
                         ip += ' <a href="javascript:opennamu_do_open_comment(\'' + key + '\');">(O)</a>';

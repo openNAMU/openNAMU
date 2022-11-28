@@ -15,7 +15,7 @@ def main_tool_other():
                     <h3>2.1. ''' + load_lang('admin') + '''</h3>
                     <ul class="opennamu_ul">               
                         <li><a href="/admin_list">''' + load_lang('admin_list') + '''</a></li>
-                        <li><a href="/admin_log">''' + load_lang('authority_use_list') + '''</a></li>
+                        <li><a href="/list/admin/auth_use">''' + load_lang('authority_use_list') + '''</a></li>
                     </ul>
                     <h3>2.2. ''' + load_lang('discussion') + '''</h3>
                     <ul class="opennamu_ul">
