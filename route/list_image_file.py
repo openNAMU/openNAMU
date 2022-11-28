@@ -7,7 +7,7 @@ def list_image_file_2():
         num = int(number_check(flask.request.args.get('num', '1')))
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
-        list_data = '<ul class="inside_ul">'
+        list_data = '<ul class="opennamu_ul">'
         back = ''
 
         curs.execute(db_change("select title from data where title like 'file:%' limit ?, 50"), [sql_num])

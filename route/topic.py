@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def topic(topic_num = 0, do_type = ''):
+def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
         topic_num = str(topic_num)
@@ -141,7 +141,7 @@ def topic(topic_num = 0, do_type = ''):
                     name_value = flask.request.form.get('topic', '')
                     sub_value = flask.request.form.get('title', '')
                 else:
-                    name_value = ''
+                    name_value = doc_name
                     sub_value = ''
             else:
                 curs.execute(db_change("select title, sub from rd where code = ?"), [topic_num])
@@ -172,9 +172,20 @@ def topic(topic_num = 0, do_type = ''):
             sql_d = curs.fetchall()
             topic_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('content')
 
+            shortcut = '<div class="opennamu_thread_shortcut" id="thread_shortcut">'
+            curs.execute(db_change(
+                "select id from topic where code = ? order by id + 0 asc"
+            ), [topic_num])
+            db_data = curs.fetchall()
+            for for_a in db_data:
+                shortcut += '<a href="#' + for_a[0] + '">#' + for_a[0] + '</a> '
+            
+            shortcut += '</div>'
+
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('discussion') + ')', 0])],
                 data = '''
+                    ''' + shortcut + '''
                     <h2 id="topic_top_title">''' + html.escape(sub) + '''</h2>
                     
                     <div id="top_topic"></div>
@@ -194,7 +205,7 @@ def topic(topic_num = 0, do_type = ''):
                         
                         <div>''' + edit_button('opennamu_edit_textarea') + '''</div>
 
-                        <textarea id="opennamu_edit_textarea" class="opennamu_comment_textarea" placeholder="''' + topic_text + '''" name="content">''' + html.escape(thread_data) + '''</textarea>
+                        <textarea id="opennamu_edit_textarea" class="opennamu_textarea_200" placeholder="''' + topic_text + '''" name="content">''' + html.escape(thread_data) + '''</textarea>
                         <hr class="main_hr">
                         
                         ''' + captcha_get() + ip_warning() + '''

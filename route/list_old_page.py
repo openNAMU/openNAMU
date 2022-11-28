@@ -12,7 +12,7 @@ def list_old_page():
         if int(curs.fetchall()[0][0]) > 30000:
             return re_error('/error/25')
         
-        div = '<ul class="inside_ul">'
+        div = '<ul class="opennamu_ul">'
         
         curs.execute(db_change('' + \
             'select h.title, max(h.date) from history as h where not (title like "user:%" or title like "category:%" or title like "file:%") and exists (select title from data where title = h.title) and not exists (select title from back where link = h.title and type = "redirect") group by h.title order by h.date asc limit ?, 50' + \

@@ -16,7 +16,7 @@ def user_info(name = ''):
             curs.execute(db_change("select count(*) from alarm where name = ?"), [ip])
             count = curs.fetchall()
             if count and count[0][0] != 0:
-                tool_menu += '<li><a id="not_thing" href="/alarm">' + load_lang('alarm') + ' (' + str(count[0][0]) + ')</a></li>'
+                tool_menu += '<li><a class="opennamu_not_exist_link" href="/alarm">' + load_lang('alarm') + ' (' + str(count[0][0]) + ')</a></li>'
             else:
                 tool_menu += '<li><a href="/alarm">' + load_lang('alarm') + '</a></li>'
     
@@ -40,8 +40,8 @@ def user_info(name = ''):
                 
             tool_menu += '<li><a href="/change/head">' + load_lang('user_head') + '</a></li>'
                 
-            login_menu = '<h2>' + load_lang('login') + '</h2><ul class="inside_ul">' + login_menu + '</ul>'
-            tool_menu = '<h2>' + load_lang('tool') + '</h2><ul class="inside_ul">' + tool_menu + '</ul>'
+            login_menu = '<h2>' + load_lang('login') + '</h2><ul class="opennamu_ul">' + login_menu + '</ul>'
+            tool_menu = '<h2>' + load_lang('tool') + '</h2><ul class="opennamu_ul">' + tool_menu + '</ul>'
     
         if admin_check(1) == 1:
             curs.execute(db_change("select block from rb where block = ? and ongoing = '1'"), [ip])
@@ -49,7 +49,7 @@ def user_info(name = ''):
             
             admin_menu = '''
                 <h2>''' + load_lang('admin') + '''</h2>
-                <ul class="inside_ul">
+                <ul class="opennamu_ul">
                     <li><a href="/auth/give/ban/''' + url_pas(ip) + '''">''' + ban_name + '''</a></li>
                     <li><a href="/check/''' + url_pas(ip) + '''">''' + load_lang('check') + '''</a></li>
                 </ul>
@@ -65,7 +65,7 @@ def user_info(name = ''):
                 ''' + login_menu + '''
                 ''' + tool_menu + '''
                 <h2>''' + load_lang('other') + '''</h2>
-                <ul class="inside_ul">
+                <ul class="opennamu_ul">
                     <li><a href="/record/''' + url_pas(ip) + '''">''' + load_lang('record') + '''</a></li>
                     <li><a href="/record/topic/''' + url_pas(ip) + '''">''' + load_lang('discussion_record') + '''</a></li>
                     <li><a href="/topic/user:''' + url_pas(ip) + '''">''' + load_lang('user_discussion') + '''</a></li>

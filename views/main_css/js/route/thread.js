@@ -70,7 +70,7 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                 }
                 
                 if(blind === 'O') {
-                    ip += ' <a href="/admin_log?search=blind%20(code%20' + topic_num + '#' + key + '">(B)</a>';
+                    ip += ' <a href="/list/admin/auth_use/' + opennamu_do_url_encode('blind (code ' + topic_num + '#' + key) + '/1">(B)</a>';
                     
                     if(admin === '1') {
                         ip += ' <a href="javascript:opennamu_do_open_comment(\'' + key + '\');">(O)</a>';
@@ -97,7 +97,7 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                     '<table class="opennamu_comment">' + 
                         '<tr>' + 
                             '<td class="' + color_t + '">' + 
-                                '<a href="javascript:void(0);" id="' + key + '">#' + key + '</a> ' + 
+                                '<a href="#thread_shortcut" id="' + key + '">#' + key + '</a> ' + 
                                 ip + 
                                 '<span style="float: right;">' + data_t[key]['date'] + '</span>' + 
                             '</td>' + 
@@ -125,8 +125,6 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
             }
             
             eval(data_all_js);
-            
-            opennamu_do_ip_parser();
             
             if(type_do === 'top') {
                 opennamu_do_thread_make(topic_num, 'main', '', 'main_topic');

@@ -58,9 +58,9 @@ def vote_add():
                     '<form method="post">' + \
                         '<input name="name" placeholder="' + load_lang('name') + '">' + \
                         '<hr class="main_hr">' + \
-                        '<textarea rows="3" name="subject" placeholder="' + load_lang('explanation') + '"></textarea>' + \
+                        '<textarea class="opennamu_textarea_200" name="subject" placeholder="' + load_lang('explanation') + '"></textarea>' + \
                         '<hr class="main_hr">' + \
-                        '<textarea rows="10" name="data" placeholder="' + load_lang('1_line_1_q') + '"></textarea>' + \
+                        '<textarea class="opennamu_textarea_500" name="data" placeholder="' + load_lang('1_line_1_q') + '"></textarea>' + \
                         '<hr class="main_hr">' + \
                         '<input type="checkbox" value="Y" name="open_select"> ' + load_lang('open_vote') + \
                         '<h2>' + load_lang('period') + '</h2>'

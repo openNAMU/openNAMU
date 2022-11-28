@@ -8,6 +8,7 @@ import zipfile
 import shutil
 import logging
 import random
+import ipaddress
 
 import email.mime.text
 import email.utils
@@ -1041,7 +1042,7 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '156'
+    data_css_ver = '169'
     
     # Func JS + Defer
     data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
@@ -1054,12 +1055,7 @@ def wiki_css(data):
     data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/func/shortcut.js?ver=' + data_css_ver + '"></script>'
     
-    data_css += '<script defer src="/views/main_css/js/func/render_user_name.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/func/render_simple.js?ver=' + data_css_ver + '"></script>'
-    
-    # Render JS
-    data_css += '<script src="/views/main_css/js/render/markdown.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script src="/views/main_css/js/render/wiki.js?ver=' + data_css_ver + '"></script>'
     
     # Route JS + Defer
     data_css += '<script defer src="/views/main_css/js/route/thread.js?ver=' + data_css_ver + '"></script>'
@@ -1068,14 +1064,9 @@ def wiki_css(data):
     data_css += '<script src="/views/main_css/js/load_editor.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script src="/views/main_css/js/load_skin_set.js?ver=' + data_css_ver + '"></script>'
     
-    # 레거시 렌더러 JS
-    data_css += '<script src="/views/main_css/js/render_html.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script src="/views/main_css/js/render_onmark.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script src="/views/main_css/js/render_wiki.js?ver=' + data_css_ver + '"></script>'
-    
     # Main CSS
     data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css?ver=' + data_css_ver + '">'
-    
+
     # External
     data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/styles/default.min.css">'
     data_css += '<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/highlight.min.js"></script>'
@@ -1314,11 +1305,16 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
             if db_data and db_data[0][0] != '':
                 get_class_render[0] = '''
                     <style>
-                        .render_content, .opennamu_render_complete {
+                        .opennamu_render_complete {
                             font-size: 14.4px !important;
                         }
-                        .render_content td, .opennamu_render_complete td {
+
+                        .opennamu_render_complete td {
                             padding: 5px 10px !important;
+                        }
+
+                        .opennamu_render_complete summary {
+                            list-style: none !important;
                         }
                     </style>
                 ''' + get_class_render[0]
@@ -1835,7 +1831,6 @@ def ban_check(ip = None, tool = ''):
 def ip_pas(raw_ip, type_data = 0):
     curs = conn.cursor()
 
-    hide = 0
     end_ip = {}
 
     return_data = 0
@@ -1853,19 +1848,41 @@ def ip_pas(raw_ip, type_data = 0):
     
     get_ip = list(set(get_ip))
     
-    for raw_ip in get_ip:        
+    for raw_ip in get_ip:
         change_ip = 0
         is_this_ip = ip_or_user(raw_ip)
         if is_this_ip != 0 and ip_view != '':
-            ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', raw_ip)
-            ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', ip)
+            ip = ipaddress.ip_address(raw_ip)
+            if type(ip) == ipaddress.IPv6Address:
+                ip = ip.exploded
+                ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', ip)
+            else:
+                ip = ip.exploded
+                ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', ip)
                 
             change_ip = 1
         else:     
             ip = raw_ip
             
         if type_data == 0 and change_ip == 0:
-            ip = '<span class="opennamu_ip_render">' + raw_ip + '</span>'
+            if is_this_ip == 0:
+                ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+                
+                if admin_check('all', None, raw_ip) == 1:
+                    ip = '<b>' + ip + '</b>'
+
+                curs.execute(db_change('select data from user_set where name = "user_title" and id = ?'), [raw_ip])
+                db_data = curs.fetchall()
+                if db_data:
+                    ip = db_data[0][0] + ip
+
+            if ban_check(raw_ip) == 1:
+                ip = '<s>' + ip + '</s>'
+
+                if ban_check(raw_ip, 'login') == 1:
+                    ip = '<i>' + ip + '</i>'
+
+            ip = ip + ' <a href="/user/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
 
         end_ip[raw_ip] = ip
     
@@ -2260,7 +2277,7 @@ def re_error(data):
         if ban_check() == 1:
             end = '<div id="opennamu_get_user_info">' + ip_check() + '</div>'
         else:
-            end = '<ul class="inside_ul"><li>' + load_lang('authority_error') + '</li></ul>'
+            end = '<ul class="opennamu_ul"><li>' + load_lang('authority_error') + '</li></ul>'
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('error'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
@@ -2386,7 +2403,7 @@ def re_error(data):
                 data = '' + \
                     '<div id="main_skin_set">' + \
                         '<h2>' + load_lang('error') + '</h2>' + \
-                        '<ul class="inside_ul">' + \
+                        '<ul class="opennamu_ul">' + \
                             '<li>' + data + '</a></li>' + \
                         '</ul>' + \
                     '</div>' + \
@@ -2398,7 +2415,7 @@ def re_error(data):
                 imp = [load_lang('error'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '' + \
                      '<h2>' + load_lang('error') + '</h2>' + \
-                     '<ul class="inside_ul">' + \
+                     '<ul class="opennamu_ul">' + \
                          '<li>' + data + '</li>' + \
                      '</ul>' + \
                 '',

@@ -5,7 +5,7 @@ def login_find():
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('password_search'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
-                <ul class="inside_ul">
+                <ul class="opennamu_ul">
                     <li><a href="/login/find/email">''' + load_lang('email') + '''</a></li>
                     <li><a href="/login/find/key">''' + load_lang('key') + '''</a></li>
                 </ul>

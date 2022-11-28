@@ -27,16 +27,16 @@ def main_search_deep(name = 'Test', search_type = 'title', num = 1):
             div += ' <a href="/search/1/' + url_pas(name_new) + '">(' + name_new + ')</a>'
 
         curs.execute(db_change("select title from data where title = ?"), [name])
-        link_id = '' if curs.fetchall() else 'id="not_thing"'
+        link_id = '' if curs.fetchall() else 'class="opennamu_not_exist_link"'
 
         div += '''
-            <ul class="inside_ul">
+            <ul class="opennamu_ul">
                 <li>
                     <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + html.escape(name) + '''</a>
                 </li>
             </ul>
             <hr class="main_hr">
-            <ul class="inside_ul">
+            <ul class="opennamu_ul">
         '''
 
         if search_type == 'title':

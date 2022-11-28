@@ -19,7 +19,7 @@ def view_xref(name = 'Test', xref_type = 1):
 
             data_sub = '(' + load_lang('link_in_this') + ')'
 
-        div += '<ul class="inside_ul">'
+        div += '<ul class="opennamu_ul">'
 
         sql_insert = ['link', 'title'] if xref_type == 1 else ['title', 'link']
         curs.execute(db_change("" + \
@@ -41,7 +41,7 @@ def view_xref(name = 'Test', xref_type = 1):
             curs.execute(db_change("select title from back where title = ? and type = 'include'"), [data[0]])
             db_data = curs.fetchall()
             if db_data:
-                div += ' <a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>'
+                div += ' <a class="opennamu_link_inter" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>'
 
             div += '</li>'
 

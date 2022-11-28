@@ -7,7 +7,7 @@ def main_tool_admin():
             data = '''
                 <div id="opennamu_simple_render">
                     <h2>1. ''' + load_lang('admin') + '''</h2>
-                    <ul class="inside_ul">
+                    <ul class="opennamu_ul">
                         <li><a href="/manager/2">''' + load_lang('acl_change') + '''</a></li>
                         <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
                         <li><a href="/auth/give/ban">''' + load_lang('ban') + '''</a></li>
@@ -16,7 +16,7 @@ def main_tool_admin():
                         <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
                     </ul>
                     <h2>2. ''' + load_lang('owner') + '''</h2>
-                    <ul class="inside_ul">
+                    <ul class="opennamu_ul">
                         <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
                         <li><a href="/delete_multiple">''' + load_lang('many_delete') + '''</a></li>
                         <li><a href="/app_submit">''' + load_lang('application_list') + '''</a></li>
@@ -24,7 +24,7 @@ def main_tool_admin():
                         <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
                     </ul>
                     <h3>2.1. ''' + load_lang('filter') + '''</h3>
-                    <ul class="inside_ul">
+                    <ul class="opennamu_ul">
                         <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
                         <li><a href="/inter_wiki">''' + load_lang('interwiki_list') + '''</a></li>
                         <li><a href="/edit_top">''' + load_lang('edit_tool_list') + '''</a></li>
@@ -36,18 +36,18 @@ def main_tool_admin():
                         <li><a href="/filter/document/list">''' + load_lang('document_filter_list') + ''' (''' + load_lang('beta') + ''')</a></li>
                     </ul>
                     <h3>2.2. ''' + load_lang('server') + '''</h2>
-                    <ul class="inside_ul">
+                    <ul class="opennamu_ul">
                         <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
                         <li><a href="/shutdown">''' + load_lang('wiki_shutdown') + '''</a></li>
                         <li><a href="/update">''' + load_lang('update') + '''</a></li>
                     </ul>
                     <h2>3. ''' + load_lang('version') + '''</h2>
-                    <ul class="inside_ul">
+                    <ul class="opennamu_ul">
                         <li id="ver_send_2">''' + load_lang('version') + ''' : </li>
                         <li id="ver_send">''' + load_lang('lastest') + ''' : </li>
                     </ul>
                     <h3>3.1. ''' + load_lang('skin_info') + '''</h3>
-                    <ul class="inside_ul">
+                    <ul class="opennamu_ul">
                         <li><a href="/api/skin_info?all=true">''' + load_lang('skin_info') + '''</a></li>
                         <div id="ver_send_3"></div>
                     </ul>

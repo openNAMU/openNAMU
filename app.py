@@ -348,9 +348,8 @@ def list_admin():
     return list_admin_2()
 
 # /list/admin/auth_use
-@app.route('/admin_log', methods = ['POST', 'GET'])
-def list_admin_use():
-    return list_admin_use_2()
+app.route('/list/admin/auth_use', methods = ['POST', 'GET'])(list_admin_use)
+app.route('/list/admin/auth_use/<arg_search>/<int:arg_num>', methods = ['POST', 'GET'])(list_admin_use)
 
 # /list/user
 @app.route('/user_log')
@@ -471,6 +470,7 @@ app.route('/recent_discuss/open', defaults = { 'tool' : 'open' })(recent_discuss
 app.route('/recent_discuss/delete')(recent_discuss_delete)
 
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
+app.route('/thread/0/<everything:doc_name>', defaults = { 'topic_num' : '0' }, methods = ['POST', 'GET'])(topic)
 app.route('/thread_preview/<int:topic_num>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(topic)
 app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
 

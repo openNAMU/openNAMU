@@ -43,7 +43,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                     category_doc += '' + \
                         '<li>' + \
                             '<a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> ' + \
-                            '<a id="inside" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>' + \
+                            '<a class="opennamu_link_inter" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>' + \
                         '</li>' + \
                     ''
 
@@ -52,7 +52,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             if category_doc != '':
                 category_doc = '' + \
                     '<h2 id="cate_normal">' + load_lang('category_title') + '</h2>' + \
-                    '<ul class="inside_ul">' + \
+                    '<ul class="opennamu_ul">' + \
                         '<li>' + load_lang('all') + ' : ' + str(count_category) + '</li>' + \
                         category_doc + \
                     '</ul>' + \
@@ -61,7 +61,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             if category_sub != '':
                 category_doc += '' + \
                     '<h2 id="cate_under">' + load_lang('under_category') + '</h2>' + \
-                    '<ul class="inside_ul">' + \
+                    '<ul class="opennamu_ul">' + \
                         '<li>' + load_lang('all') + ' : ' + str(count_sub_category) + '</li>' + \
                         category_sub + \
                     '</ul>' + \
@@ -153,18 +153,18 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             curs.execute(db_change('select data from other where name = "error_401"'))
             sql_d = curs.fetchall()
             if sql_d and sql_d[0][0] != '':
-                end_data = '<h2>' + load_lang('error') + '</h2><ul class="inside_ul"><li>' + sql_d[0][0] + '</li></ul>'
+                end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + sql_d[0][0] + '</li></ul>'
             else:
-                end_data = '<h2>' + load_lang('error') + '</h2><ul class="inside_ul"><li>' + load_lang('authority_error') + '</li></ul>'
+                end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + load_lang('authority_error') + '</li></ul>'
         elif end_data == 'HTTP Request 404':
             response_data = 404
 
             curs.execute(db_change('select data from other where name = "error_404"'))
             sql_d = curs.fetchall()
             if sql_d and sql_d[0][0] != '':
-                end_data = '<h2>' + load_lang('error') + '</h2><ul class="inside_ul"><li>' + sql_d[0][0] + '</li></ul>'
+                end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + sql_d[0][0] + '</li></ul>'
             else:
-                end_data = '<h2>' + load_lang('error') + '</h2><ul class="inside_ul"><li>' + load_lang('decument_404_error') + '</li></ul>'
+                end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + load_lang('decument_404_error') + '</li></ul>'
 
             curs.execute(db_change('' + \
                 'select ip, date, leng, send, id from history ' + \
@@ -172,7 +172,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             ''), [name])
             sql_d = curs.fetchall()
             if sql_d:
-                end_data += '<h2>' + load_lang('history') + '</h2><ul class="inside_ul">'
+                end_data += '<h2>' + load_lang('history') + '</h2><ul class="opennamu_ul">'
                 for i in sql_d:
                     if re.search(r"\+", i[2]):
                         leng = '<span style="color:green;">(' + i[2] + ')</span>'

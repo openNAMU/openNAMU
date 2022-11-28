@@ -165,7 +165,7 @@ def give_user_check_2(name):
                 div += '<li><a href="/check/' + url_pas(i[0]) + '?type=simple">' + i[0] + '</a></li>'
 
             if div != '':
-                div = '<ul class="inside_ul">' + div + '</ul>'
+                div = '<ul class="opennamu_ul">' + div + '</ul>'
                 div += next_fix(
                     '/check/' + url_pas(name) + '?type=' + check_type + '&num=', 
                     num, 
