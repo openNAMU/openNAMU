@@ -348,9 +348,8 @@ def list_admin():
     return list_admin_2()
 
 # /list/admin/auth_use
-@app.route('/admin_log', methods = ['POST', 'GET'])
-def list_admin_use():
-    return list_admin_use_2()
+app.route('/list/admin/auth_use', methods = ['POST', 'GET'])(list_admin_use)
+app.route('/list/admin/auth_use/<arg_search>/<int:arg_num>', methods = ['POST', 'GET'])(list_admin_use)
 
 # /list/user
 @app.route('/user_log')
