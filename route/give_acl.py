@@ -106,7 +106,7 @@ def give_acl_2(name):
 
             data += '''
                 <h2 id="exp">''' + load_lang('explanation') + '''</h2>
-                <ul class="inside_ul">
+                <ul class="opennamu_ul">
                     <li>normal : ''' + load_lang('unset') + '''</li>
                     <li>admin : ''' + load_lang('admin_acl') + '''</li>
                     <li>user : ''' + load_lang('member_acl') + '''</li>

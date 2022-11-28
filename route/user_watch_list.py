@@ -45,7 +45,7 @@ def user_watch_list(tool):
 
         if data:
             div = '' + \
-                '<ul class="inside_ul">' + div + '</ul>' + \
+                '<ul class="opennamu_ul">' + div + '</ul>' + \
                 '<hr class="main_hr">' + \
             ''
 

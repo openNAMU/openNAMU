@@ -101,7 +101,7 @@ def main_func_setting_head(num, skin_name = '', set_preview = 0):
                 data = '''
                     <form method="post">
                         ''' + start + '''
-                        <textarea rows="25" placeholder="''' + load_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" placeholder="''' + load_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
                         ''' + (load_lang('main_css_warning') + '<hr class="main_hr">' if title == '_head' else '') + '''
                         <button id="opennamu_save_button" type="submit" ''' + form_action + '''>''' + load_lang('save') + '''</button>

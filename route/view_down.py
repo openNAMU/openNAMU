@@ -4,7 +4,7 @@ def view_down(name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        div = '<ul class="inside_ul">'
+        div = '<ul class="opennamu_ul">'
 
         curs.execute(db_change("select title from data where title like ?"), [name + '/%'])
         for data in curs.fetchall():

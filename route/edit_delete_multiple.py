@@ -19,7 +19,7 @@ def edit_delete_multiple():
             if do_edit_text_bottom_check_box_check(agree) == 1:
                 return re_error('/error/29')
             
-            all_title = re.findall(r'([^\n]+)\n', flask.request.form.get('content', '').replace('\r\n', '\n') + '\n')
+            all_title = re.findall(r'([^\n]+)\n', flask.request.form.get('content', '').replace('\r', '') + '\n')
             for name in all_title:
                 edit_delete.edit_delete(name)
 
@@ -29,7 +29,7 @@ def edit_delete_multiple():
                 imp = [load_lang('many_delete'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <textarea rows="25" placeholder="''' + load_lang('many_delete_help') + '''" name="content"></textarea>
+                        <textarea class="opennamu_textarea_500" placeholder="''' + load_lang('many_delete_help') + '''" name="content"></textarea>
                         <hr class="main_hr">
                         <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
                         <hr class="main_hr">

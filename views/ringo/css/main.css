@@ -1,10 +1,12 @@
-body {
-    margin: 0;
+html {
+    background: #eee;
 }
 
-html {
+body {
     font-family: "나눔바른고딕", "나눔고딕", "맑은고딕", "Sans-Serif";
-    background: #eee;
+    font-size: 14px;
+
+    margin: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -327,4 +329,8 @@ input, textarea, button, select {
     background-color: #eee;
 
     cursor: pointer;
+}
+
+#opennamu_save_button {
+    background: antiquewhite;
 }

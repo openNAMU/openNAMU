@@ -44,7 +44,7 @@ def main_func_setting_robot():
                     <a href="/robots.txt">(''' + load_lang('view') + ''')</a>
                     <hr class="main_hr">
                     <form method="post">
-                        <textarea rows="25" name="content">''' + html.escape(data) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" name="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
                         <input type="checkbox" name="default" ''' + default_data + '''> ''' + load_lang('default') + '''
                         <hr class="main_hr">

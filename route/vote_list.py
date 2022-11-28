@@ -16,7 +16,7 @@ def vote_list(list_type = 'normal', num = 1):
             sub = '(' + load_lang('closed') + ')'
             curs.execute(db_change('select name, id, type from vote where type = "close" or type = "n_close" limit ?, 50'), [sql_num])
 
-        data += '<ul class="inside_ul">'
+        data += '<ul class="opennamu_ul">'
 
         data_list = curs.fetchall()
         for i in data_list:

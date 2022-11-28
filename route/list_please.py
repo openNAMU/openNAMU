@@ -11,14 +11,14 @@ def list_please_2():
         if int(curs.fetchall()[0][0]) > 30000:
             return re_error('/error/25')
 
-        div = '<ul class="inside_ul">'
+        div = '<ul class="opennamu_ul">'
 
         curs.execute(db_change("select distinct title, link from back where type = 'no' order by title asc limit ?, 50"), [sql_num])
         data_list = curs.fetchall()
         for data in data_list:
             div += '' + \
                 '<li>' + \
-                    '<a id="not_thing" href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> ' + \
+                    '<a class="opennamu_not_exist_link" href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> ' + \
                     '<a href="/w/' + url_pas(data[1]) + '">(' + html.escape(data[1]) + ')</a>' + \
                 '</li>' + \
             ''

@@ -40,7 +40,7 @@ def recent_history_add(name = 'Test', do_type = ''):
             data_preview = ''
             if do_type == 'preview':
                 data = flask.request.form.get('content', '')
-                data = data.replace('\r\n', '\n')
+                data = data.replace('\r', '')
 
                 send = flask.request.form.get('send', '')
                 get_ip = flask.request.form.get('get_ip', '')
@@ -57,7 +57,7 @@ def recent_history_add(name = 'Test', do_type = ''):
                     <form method="post">                        
                         <div>''' + edit_button('opennamu_edit_textarea') + '''</div>
                         
-                        <textarea id="opennamu_edit_textarea" class="content" name="content" placeholder="''' + p_text + '''">''' + html.escape(data) + '''</textarea>
+                        <textarea id="opennamu_edit_textarea" class="opennamu_textarea_500" name="content" placeholder="''' + p_text + '''">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
                         
                         <input placeholder="''' + load_lang('why') + '''" name="send" value="''' + html.escape(send) + '''">

@@ -17,6 +17,6 @@ def main_func_setting():
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
-            data = '<h2>' + load_lang('list') + '</h2><ul class="inside_ul">' + li_data + '</ul>',
+            data = '<h2>' + load_lang('list') + '</h2><ul class="opennamu_ul">' + li_data + '</ul>',
             menu = [['manager', load_lang('return')]]
         ))
