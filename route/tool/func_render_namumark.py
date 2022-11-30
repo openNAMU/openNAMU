@@ -574,7 +574,7 @@ class class_do_render_namumark:
             elif match == 'pagecount':
                 return '0'
             else:
-                return '<macro>' + match + '</macro>'
+                return '<macro>' + match_org.group(1) + '</macro>'
 
         # single macro replace
         self.render_data = re.sub(r'\[([^[\]]+)\]', do_render_macro_single, self.render_data)
