@@ -305,18 +305,25 @@ class class_do_render_namumark:
 
                     data_name = self.get_tool_data_storage(
                         '<h' + heading_level_str + '>', 
-                        ' <sub><a id="edit_load_' + str(heading_count) + '" href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a></sub></h' + heading_level_str + '>', 
+                        '' + \
+                            ' <sub>' + \
+                                '<a id="' + self.doc_include + 'edit_load_' + str(heading_count) + '" href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a> ' + \
+                            '</sub>' + \
+                            '</h' + heading_level_str + '>' + \
+                        '', 
                         heading_data_org
                     )
 
                     heading_data_complete = '' + \
                         '\n<front_br>' + \
+                        ('</div>' if heading_count != 1 else '') + \
                         '<' + data_name + '>' + \
                             '<heading_stack>' + \
                                 heading_stack_str + \
                             '</heading_stack>' + \
                             ' ' + heading_data_text + \
                         '</' + data_name + '>' + \
+                        '<div id="' + self.doc_include + 'opennamu_heading_' + str(heading_count) + '" style="display: block;">' + \
                         '<back_br>\n' + \
                     ''
 
@@ -1660,6 +1667,7 @@ class class_do_render_namumark:
 
         # add toc
         if self.data_toc != '':
+            self.render_data += '</div>'
             toc_search_regex = r'<toc_data>((?:(?!<toc_data>|<\/toc_data>).)*)<\/toc_data>'
 
             toc_data_on = 0
