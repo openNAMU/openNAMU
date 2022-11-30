@@ -395,6 +395,8 @@ class class_do_render_namumark:
             match = match.groups()
 
             name_data = match[0]
+            name_data = name_data.lower()
+
             macro_split_regex = r'(?:^|,) *([^,]+)'
             macro_split_sub_regex = r'(^[^=]+) *= *([^=]+)'
             if name_data in ('youtube', 'nicovideo', 'navertv', 'kakaotv', 'vimeo'):
@@ -410,6 +412,8 @@ class class_do_render_namumark:
                     data_sub = re.search(macro_split_sub_regex, for_a)
                     if data_sub:
                         data_sub = data_sub.groups()
+                        data_sub = [data_sub[0].lower(), data_sub[1]]
+
                         if data_sub[0] == 'width':
                             video_width = self.get_tool_px_add_check(data_sub[1])
                         elif data_sub[0] == 'height':
@@ -469,6 +473,8 @@ class class_do_render_namumark:
                     data_sub = re.search(macro_split_sub_regex, for_a)
                     if data_sub:
                         data_sub = data_sub.groups()
+                        data_sub = [data_sub[0].lower(), data_sub[1]]
+
                         if data_sub[0] == 'ruby':
                             sub_text = data_sub[1]
                         elif data_sub[0] == 'color':
@@ -547,7 +553,9 @@ class class_do_render_namumark:
         # single macro function
         def do_render_macro_single(match):
             match_org = match
+
             match = match.group(1)
+            match = match.lower()
 
             if match in ('date', 'datetime'):
                 data_name = self.get_tool_data_storage(get_time(), '', match_org.group(0))
@@ -605,7 +613,7 @@ class class_do_render_namumark:
 
             return '<' + data_name + '></' + data_name + '>'
 
-        self.render_data = re.sub(r'\[math\(((?:(?!\[math\(|\)\]).|\n)+)\)\]', do_render_math_sub, self.render_data)
+        self.render_data = re.sub(r'\[math\(((?:(?!\[math\(|\)\]).|\n)+)\)\]', do_render_math_sub, self.render_data, re.I)
 
     def do_render_link(self):
         link_regex = r'\[\[((?:(?!\[\[|\]\]|\||<|>).|<slash_[0-9]+>)+)(?:\|((?:(?!\[\[|\]\]|\|).)+))?\]\]'
@@ -627,7 +635,7 @@ class class_do_render_namumark:
                 link_main_org = link_main
 
                 # file link
-                if re.search(r'^(파일|file|외부|out):', link_main):
+                if re.search(r'^(파일|file|외부|out):', link_main, re.I):
                     file_width = ''
                     file_height = ''
                     file_align = ''
@@ -662,8 +670,8 @@ class class_do_render_namumark:
                     link_main_org = ''
                     link_sub = link_main
 
-                    link_out_regex = r'^(외부|out):'
-                    link_in_regex = r'^(파일|file):'
+                    link_out_regex = re.compile('^(외부|out):', re.I)
+                    link_in_regex = re.compile('^(파일|file):', re.I)
                     if re.search(link_out_regex, link_main):
                         link_main = re.sub(link_out_regex, '', link_main)
 
@@ -727,8 +735,8 @@ class class_do_render_namumark:
                         
                         self.render_data = re.sub(link_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
                 # category
-                elif re.search(r'^(분류|category):', link_main):
-                    link_main = re.sub(r'^(분류|category):', '', link_main)
+                elif re.search(r'^(분류|category):', link_main, re.I):
+                    link_main = re.sub(r'^(분류|category):', '', link_main, re.I)
 
                     if self.data_category == '':
                         self.data_category = '<div class="opennamu_category">' + self.get_tool_lang('category') + ' : '
@@ -739,8 +747,8 @@ class class_do_render_namumark:
                         link_main += link_data[1]
 
                     category_blur = ''
-                    if re.search(r'#blur$', link_main):
-                        link_main = re.sub(r'#blur$', '', link_main)
+                    if re.search(r'#blur$', link_main, re.I):
+                        link_main = re.sub(r'#blur$', '', link_main, re.I)
 
                         category_blur = 'opennamu_category_blur'
                     
@@ -765,8 +773,8 @@ class class_do_render_namumark:
 
                     self.render_data = re.sub(link_regex, '', self.render_data, 1)
                 # out link
-                elif re.search(r'^(?:inter|인터):([^:]+):', link_main):
-                    link_inter_regex = r'^(?:inter|인터):([^:]+):'
+                elif re.search(r'^(?:inter|인터):([^:]+):', link_main, re.I):
+                    link_inter_regex = re.compile('^(?:inter|인터):([^:]+):', re.I)
 
                     link_inter_name = re.search(link_inter_regex, link_main)
                     link_inter_name = link_inter_name.group(1)
@@ -814,7 +822,7 @@ class class_do_render_namumark:
                         self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
                     else:
                         self.render_data = re.sub(link_regex, '', self.render_data, 1)
-                elif re.search(r'^https?:\/\/', link_main):
+                elif re.search(r'^https?:\/\/', link_main, re.I):
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_main = html.unescape(link_main)
                     link_main = re.sub(r'"', '&quot;', link_main)
@@ -850,12 +858,12 @@ class class_do_render_namumark:
                         link_main = re.sub(r'(\/[^/]+)$', '', link_main)
                     elif re.search(r'^\/', link_main):
                         link_main = re.sub(r'^\/', lambda x : (self.doc_name + '/'), link_main)
-                    elif re.search(r'^:(분류|category):', link_main):
-                        link_main = re.sub(r'^:(분류|category):', 'category:', link_main)
-                    elif re.search(r'^:(파일|file):', link_main):
-                        link_main = re.sub(r'^:(파일|file):', 'file:', link_main)
-                    elif re.search(r'^사용자:', link_main):
-                        link_main = re.sub(r'^사용자:', 'user:', link_main)
+                    elif re.search(r'^:(분류|category):', link_main, re.I):
+                        link_main = re.sub(r'^:(분류|category):', 'category:', link_main, re.I)
+                    elif re.search(r'^:(파일|file):', link_main, re.I):
+                        link_main = re.sub(r'^:(파일|file):', 'file:', link_main, re.I)
+                    elif re.search(r'^사용자:', link_main, re.I):
+                        link_main = re.sub(r'^사용자:', 'user:', link_main, re.I)
 
                     # main link fix
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
@@ -955,7 +963,7 @@ class class_do_render_namumark:
                     return slash_add + match[2]
 
         include_num = 0
-        include_regex = r'\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\]'
+        include_regex = re.compile('\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\]', re.I)
         include_count_max = len(re.findall(include_regex, self.render_data)) * 2
         include_change_list = {}
         while 1:
@@ -1040,7 +1048,7 @@ class class_do_render_namumark:
 
     def do_redner_footnote(self):
         footnote_num = 0
-        footnote_regex = r'(?:\[\*((?:(?!\[\*|\]| ).)+)?(?: ((?:(?!\[\*|\]).)+))?\]|\[(각주|footnote)\])'
+        footnote_regex = re.compile('(?:\[\*((?:(?!\[\*|\]| ).)+)?(?: ((?:(?!\[\*|\]).)+))?\]|\[(각주|footnote)\])', re.I)
         footnote_count_all = len(re.findall(footnote_regex, self.render_data)) * 4
         while 1:
             footnote_num += 1
@@ -1090,7 +1098,7 @@ class class_do_render_namumark:
         self.render_data += self.get_tool_footnote_make()
 
     def do_render_redirect(self):
-        match = re.search(r'^<back_br>\n#(?:redirect|넘겨주기) ([^\n]+)', self.render_data)
+        match = re.search(r'^<back_br>\n#(?:redirect|넘겨주기) ([^\n]+)', self.render_data, re.I)
         if match and self.doc_include == '':
             link_data_full = match.group(0)
             link_main = match.group(1)
@@ -1155,7 +1163,10 @@ class class_do_render_namumark:
                 table_parameter_split = table_parameter.split('=')
                 if len(table_parameter_split) == 2:
                     table_parameter_name = table_parameter_split[0].replace(' ', '')
+                    table_parameter_name = table_parameter_name.lower()
+                    
                     table_parameter_data = self.get_tool_css_safe(table_parameter_split[1])
+
                     if table_parameter_name == 'tablebgcolor':
                         table_parameter_all['table'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
                     elif table_parameter_name == 'tablewidth':
@@ -1345,13 +1356,14 @@ class class_do_render_namumark:
                 middle_data_pass = ''
                 if middle_name:
                     middle_name = middle_name.group(1)
+                    middle_name = middle_name.lower()
                     if middle_name == '#!wiki':
                         if middle_slash:
                             middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
                             self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        wiki_regex = r'^#!wiki(?:(?: style=(&quot;(?:(?:(?!&quot;).)*)&quot;|&#x27;(?:(?:(?!&#x27;).)*)&#x27;))| [^\n]*)?\n'
+                        wiki_regex = re.compile('^#!wiki(?:(?: style=(&quot;(?:(?:(?!&quot;).)*)&quot;|&#x27;(?:(?:(?!&#x27;).)*)&#x27;))| [^\n]*)?\n', re.I)
                         wiki_data_style = re.search(wiki_regex, middle_data)
                         wiki_data = re.sub(wiki_regex, '', middle_data)
                         if wiki_data_style:
@@ -1386,7 +1398,7 @@ class class_do_render_namumark:
                             self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        wiki_regex = r'^#!folding(?: ([^\n]*))?\n'
+                        wiki_regex = re.compile('^#!folding(?: ([^\n]*))?\n', re.I)
                         wiki_data_folding = re.search(wiki_regex, middle_data)
                         wiki_data = re.sub(wiki_regex, '', middle_data)
                         if wiki_data_folding:
@@ -1415,7 +1427,7 @@ class class_do_render_namumark:
                             self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        wiki_regex = r'^#!syntax(?: ([^\n]*))?\n'
+                        wiki_regex = re.compile('^#!syntax(?: ([^\n]*))?\n', re.I)
                         wiki_data_syntax = re.search(wiki_regex, middle_data)
                         wiki_data = re.sub(wiki_regex, '', middle_data)
                         if wiki_data_syntax:
@@ -1607,7 +1619,7 @@ class class_do_render_namumark:
 
             return '<li style="margin-left: ' + str(list_len * 20) + 'px;' + list_style_data + '">' + list_data + '</li>'
 
-        list_regex = r'((?:\n *\* ?[^\n]+)+)\n'
+        list_regex = r'((?:\n *\* ?[^\n]*)+)\n'
         list_count_max = len(re.findall(list_regex, self.render_data)) * 3
         while 1:
             list_data = re.search(list_regex, self.render_data)
@@ -1617,7 +1629,7 @@ class class_do_render_namumark:
                 break
             else:
                 list_data = list_data.group(1)
-                list_sub_regex = r'\n( *)\* ?([^\n]+)'
+                list_sub_regex = r'\n( *)\* ?([^\n]*)'
 
                 list_data = re.sub(list_sub_regex, do_render_list_sub, list_data)
 
