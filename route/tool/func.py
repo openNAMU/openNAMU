@@ -1950,7 +1950,7 @@ def do_edit_slow_check():
 
     curs.execute(db_change("select data from other where name = 'slow_edit'"))
     slow_edit = curs.fetchall()
-    if slow_edit and slow_edit != '' and admin_check(5) != 1:
+    if slow_edit and slow_edit[0][0] != '' and admin_check(5) != 1:
         slow_edit = int(number_check(slow_edit[0][0]))
 
         curs.execute(db_change(

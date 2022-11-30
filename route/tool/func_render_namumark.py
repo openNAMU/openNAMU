@@ -1131,7 +1131,7 @@ class class_do_render_namumark:
         # get_tool_css_safe
         # todo : after text render text not use to make table
         def do_render_table_parameter(cell_count, parameter, data, option = {}):
-            table_parameter_all = { "div" : "", "table" : "", "tr" : "", "td" : "", "col" : "", "colspan" : "", "rowspan" : "", "data" : "" }
+            table_parameter_all = { "div" : "", "class" : "", "table" : "", "tr" : "", "td" : "", "col" : "", "colspan" : "", "rowspan" : "", "data" : "" }
             
             table_align_auto = 1
             table_colspan_auto = 1
@@ -1155,6 +1155,8 @@ class class_do_render_namumark:
                         elif table_parameter_data == 'center':
                             table_parameter_all['div'] += 'margin:auto;'
                             table_parameter_all['table'] += 'margin:auto;'
+                    elif table_parameter_name == 'tableclass':
+                        table_parameter_all['class'] = table_parameter_split[1]
                     elif table_parameter_name == 'tabletextalign':
                         table_parameter_all['table'] += 'text-align:' + table_parameter_data + ';'
                     elif table_parameter_name == 'tablecolor':
@@ -1247,7 +1249,7 @@ class class_do_render_namumark:
                 else:
                     table_caption = ''
 
-                table_parameter = { "div" : "", "table" : "", "col" : {}, "rowspan" : {} }
+                table_parameter = { "div" : "", "class" : "", "table" : "", "col" : {}, "rowspan" : {} }
                 table_data_end = ''
                 table_col_num = 0
                 table_tr_change = 0
@@ -1280,6 +1282,7 @@ class class_do_render_namumark:
                         table_parameter['col'][table_col_num] = ''
 
                     table_parameter['div'] += table_sub_parameter['div']
+                    table_parameter['class'] = table_sub_parameter['class'] if table_sub_parameter['class'] != '' else table_parameter['class']
                     table_parameter['table'] += table_sub_parameter['table']
                     table_parameter['col'][table_col_num] += table_sub_parameter['col']
 
@@ -1293,7 +1296,7 @@ class class_do_render_namumark:
                     table_col_num += 1
 
                 table_data_end += '</tr>'
-                table_data_end = '<table style="' + table_parameter['table'] + '">' + table_caption + table_data_end + '</table>'
+                table_data_end = '<table class="' + table_parameter['class'] + '" style="' + table_parameter['table'] + '">' + table_caption + table_data_end + '</table>'
                 table_data_end = '<div class="table_safe" style="' + table_parameter['div'] + '">' + table_data_end + '</div>'
 
                 self.render_data = re.sub(table_regex, lambda x : ('\n<front_br>' + table_data_end + '<back_br>\n'), self.render_data, 1)
