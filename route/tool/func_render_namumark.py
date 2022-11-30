@@ -1550,7 +1550,7 @@ class class_do_render_namumark:
             hr_count_max -= 1
 
     def do_render_list(self):        
-        quote_regex = r'((?:\n&gt; *[^\n]+)+)\n'
+        quote_regex = r'((?:\n&gt; *[^\n]*)+)\n'
         quote_count = 0
         quote_count_max = len(re.findall(quote_regex, self.render_data)) * 10
         while 1:
@@ -1562,7 +1562,7 @@ class class_do_render_namumark:
             else:
                 quote_data_org = quote_data.group(0)
                 quote_data = quote_data.group(1)
-                quote_data = re.sub(r'\n&gt; *(?P<in>[^\n]+)', '\g<in>\n', quote_data)
+                quote_data = re.sub(r'\n&gt; *(?P<in>[^\n]*)', '\g<in>\n', quote_data)
                 quote_data = html.unescape(quote_data)
 
                 self.data_include += [[self.doc_include + 'opennamu_quote_' + str(quote_count), self.doc_name, quote_data, '']]
