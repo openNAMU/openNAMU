@@ -759,10 +759,12 @@ class class_do_render_namumark:
                     self.render_data = re.sub(link_regex, '', self.render_data, 1)
                 # out link
                 elif re.search(r'^(?:inter|인터):([^:]+):', link_main):
-                    link_inter_name = re.search(r'^(?:inter|인터):([^:]+):', link_main)
+                    link_inter_regex = r'^(?:inter|인터):([^:]+):'
+
+                    link_inter_name = re.search(link_inter_regex, link_main)
                     link_inter_name = link_inter_name.group(1)
 
-                    link_main = re.sub(r'^(?:inter|인터):([^:]+):', '', link_main)
+                    link_main = re.sub(link_inter_regex, '', link_main)
 
                     # sharp
                     link_data_sharp_regex = r'#([^#]+)$'
@@ -792,9 +794,13 @@ class class_do_render_namumark:
                         else:
                             link_sub = ''
                             link_sub_storage = link_main_org
+                            link_sub_storage = re.sub(link_inter_regex, '', link_sub_storage)
 
+                        link_inter_icon = link_inter_name + ':'
                         if db_data[0][1] != '':
-                            link_sub_storage = db_data[0][1] + link_sub_storage
+                            link_inter_icon = db_data[0][1]
+
+                        link_sub_storage = link_inter_icon + link_sub_storage
 
                         data_name = self.get_tool_data_storage('<a class="opennamu_link_inter" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
                     
