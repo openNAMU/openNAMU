@@ -449,7 +449,7 @@ class class_do_render_namumark:
                     video_code = re.sub(r'^https:\/\/tv\.naver\.com\/v\/', '', video_code)
 
                     video_code = 'https://tv.naver.com/embed/' + video_code
-                elif name_data == 'nicoviedo':
+                elif name_data == 'nicovideo':
                     video_code = 'https://embed.nicovideo.jp/watch/' + video_code
                 else:
                     video_code = 'https://player.vimeo.com/video/' + video_code
@@ -457,7 +457,11 @@ class class_do_render_namumark:
                 video_width = self.get_tool_css_safe(video_width)
                 video_height = self.get_tool_css_safe(video_height)
 
-                data_name = self.get_tool_data_storage('<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen></iframe>', '', match_org.group(0))
+                data_name = self.get_tool_data_storage(
+                    '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen>',
+                    '</iframe>', 
+                    match_org.group(0)
+                )
 
                 return '<' + data_name + '></' + data_name + '>'
             elif name_data == 'toc':
