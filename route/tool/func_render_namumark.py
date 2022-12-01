@@ -1589,8 +1589,10 @@ class class_do_render_namumark:
                 break
             else:
                 quote_data_org = quote_data.group(0)
+                
                 quote_data = quote_data.group(1)
                 quote_data = re.sub(r'\n&gt; *(?P<in>[^\n]*)', '\g<in>\n', quote_data)
+                quote_data = self.get_tool_data_revert(quote_data)
                 quote_data = html.unescape(quote_data)
 
                 self.data_include += [[self.doc_include + 'opennamu_quote_' + str(quote_count), self.doc_name, quote_data, '']]
