@@ -1492,22 +1492,24 @@ class class_do_render_namumark:
                             self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        wiki_color = re.search(r'^@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))?', middle_name)
+                        wiki_color = re.search(r'^@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(,@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))?', middle_name)
+                        wiki_color_data = ''
                         if wiki_color:
                             wiki_color = wiki_color.groups()
                             if wiki_color[0]:
-                                wiki_color = '#' + wiki_color[0]
+                                wiki_color_data += '#' + wiki_color[0]
                             else:
-                                wiki_color = wiki_color[1]
+                                wiki_color_data += wiki_color[1]
 
                             if wiki_color[2]:
-                                wiki_color += ',#' + wiki_color[0]
-                            elif wiki_color[3]:
-                                wiki_color = ',' + wiki_color[1]
+                                if wiki_color[3]:
+                                    wiki_color_data += ',#' + wiki_color[3]
+                                elif wiki_color[4]:
+                                    wiki_color_data += ',' + wiki_color[4]
                         else:
-                            wiki_color = 'red'
+                            wiki_color_data += 'red'
 
-                        wiki_color = self.get_tool_css_safe(wiki_color)
+                        wiki_color = self.get_tool_css_safe(wiki_color_data)
                         wiki_color = self.get_tool_dark_mode_split(wiki_color)
 
                         wiki_data = re.sub(r'^@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))? ?', '', middle_data)
@@ -1520,22 +1522,24 @@ class class_do_render_namumark:
                             self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        wiki_color = re.search(r'^#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))?', middle_name)
+                        wiki_color = re.search(r'^#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(,#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))?', middle_name)
+                        wiki_color_data = ''
                         if wiki_color:
                             wiki_color = wiki_color.groups()
                             if wiki_color[0]:
-                                wiki_color = '#' + wiki_color[0]
+                                wiki_color_data += '#' + wiki_color[0]
                             else:
-                                wiki_color = wiki_color[1]
+                                wiki_color_data += wiki_color[1]
 
                             if wiki_color[2]:
-                                wiki_color += ',#' + wiki_color[0]
-                            elif wiki_color[3]:
-                                wiki_color = ',' + wiki_color[1]
+                                if wiki_color[3]:
+                                    wiki_color_data += ',#' + wiki_color[3]
+                                elif wiki_color[4]:
+                                    wiki_color_data += ',' + wiki_color[4]
                         else:
-                            wiki_color = 'red'
+                            wiki_color_data += 'red'
 
-                        wiki_color = self.get_tool_css_safe(wiki_color)
+                        wiki_color = self.get_tool_css_safe(wiki_color_data)
                         wiki_color = self.get_tool_dark_mode_split(wiki_color)
 
                         wiki_data = re.sub(r'^#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))? ?', '', middle_data)
