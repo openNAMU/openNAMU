@@ -43,6 +43,11 @@ td {
     }
 }
 
+summary {
+    cursor: pointer;
+    user-select: none;
+}
+    
 /* list */
 .opennamu_ul {
     padding-left: 20px;
