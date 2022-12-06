@@ -940,8 +940,8 @@ class class_do_render_namumark:
 
                 return slash_add + match[2]
 
-        self.render_data = re.sub(r'(\\+)?@([^@= \n]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
-        self.render_data = re.sub(r'(\\+)?@([^@= \n]+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)@', do_render_include_default_sub, self.render_data)
 
     def do_render_include(self):
         def do_render_include_default_sub(match):
@@ -1023,8 +1023,8 @@ class class_do_render_namumark:
                     include_data = db_data[0][0].replace('\r', '')
 
                     # parameter replace
-                    include_data = re.sub(r'(\\+)?@([^@= \n]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, include_data)
-                    include_data = re.sub(r'(\\+)?@([^@= \n]+)@', do_render_include_default_sub, include_data)
+                    include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, include_data)
+                    include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)@', do_render_include_default_sub, include_data)
 
                     # remove include
                     include_data = re.sub(include_regex, '', include_data)
