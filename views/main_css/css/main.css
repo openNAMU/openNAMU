@@ -43,6 +43,14 @@ td {
     }
 }
 
+summary {
+    cursor: pointer;
+    user-select: none;
+	
+	display: list-item;
+	list-style: inside disclosure-closed;
+}
+    
 /* list */
 .opennamu_ul {
     padding-left: 20px;

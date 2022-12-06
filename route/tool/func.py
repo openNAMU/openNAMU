@@ -1042,7 +1042,7 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '169'
+    data_css_ver = '170'
     
     # Func JS + Defer
     data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
@@ -1315,6 +1315,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
 
                         .opennamu_render_complete summary {
                             list-style: none !important;
+                            font-weight: bold;
                         }
                     </style>
                 ''' + get_class_render[0]

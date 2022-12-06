@@ -449,7 +449,7 @@ class class_do_render_namumark:
                     video_code = re.sub(r'^https:\/\/tv\.naver\.com\/v\/', '', video_code)
 
                     video_code = 'https://tv.naver.com/embed/' + video_code
-                elif name_data == 'nicoviedo':
+                elif name_data == 'nicovideo':
                     video_code = 'https://embed.nicovideo.jp/watch/' + video_code
                 else:
                     video_code = 'https://player.vimeo.com/video/' + video_code
@@ -457,7 +457,11 @@ class class_do_render_namumark:
                 video_width = self.get_tool_css_safe(video_width)
                 video_height = self.get_tool_css_safe(video_height)
 
-                data_name = self.get_tool_data_storage('<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen></iframe>', '', match_org.group(0))
+                data_name = self.get_tool_data_storage(
+                    '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen>',
+                    '</iframe>', 
+                    match_org.group(0)
+                )
 
                 return '<' + data_name + '></' + data_name + '>'
             elif name_data == 'toc':
@@ -936,8 +940,8 @@ class class_do_render_namumark:
 
                 return slash_add + match[2]
 
-        self.render_data = re.sub(r'(\\+)?@([^@= \n]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
-        self.render_data = re.sub(r'(\\+)?@([^@= \n]+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)@', do_render_include_default_sub, self.render_data)
 
     def do_render_include(self):
         def do_render_include_default_sub(match):
@@ -1019,8 +1023,8 @@ class class_do_render_namumark:
                     include_data = db_data[0][0].replace('\r', '')
 
                     # parameter replace
-                    include_data = re.sub(r'(\\+)?@([^@= \n]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, include_data)
-                    include_data = re.sub(r'(\\+)?@([^@= \n]+)@', do_render_include_default_sub, include_data)
+                    include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, include_data)
+                    include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)@', do_render_include_default_sub, include_data)
 
                     # remove include
                     include_data = re.sub(include_regex, '', include_data)
@@ -1488,22 +1492,24 @@ class class_do_render_namumark:
                             self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        wiki_color = re.search(r'^@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))?', middle_name)
+                        wiki_color = re.search(r'^@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(,@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))?', middle_name)
+                        wiki_color_data = ''
                         if wiki_color:
                             wiki_color = wiki_color.groups()
                             if wiki_color[0]:
-                                wiki_color = '#' + wiki_color[0]
+                                wiki_color_data += '#' + wiki_color[0]
                             else:
-                                wiki_color = wiki_color[1]
+                                wiki_color_data += wiki_color[1]
 
                             if wiki_color[2]:
-                                wiki_color += ',#' + wiki_color[0]
-                            elif wiki_color[3]:
-                                wiki_color = ',' + wiki_color[1]
+                                if wiki_color[3]:
+                                    wiki_color_data += ',#' + wiki_color[3]
+                                elif wiki_color[4]:
+                                    wiki_color_data += ',' + wiki_color[4]
                         else:
-                            wiki_color = 'red'
+                            wiki_color_data += 'red'
 
-                        wiki_color = self.get_tool_css_safe(wiki_color)
+                        wiki_color = self.get_tool_css_safe(wiki_color_data)
                         wiki_color = self.get_tool_dark_mode_split(wiki_color)
 
                         wiki_data = re.sub(r'^@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))? ?', '', middle_data)
@@ -1516,22 +1522,24 @@ class class_do_render_namumark:
                             self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        wiki_color = re.search(r'^#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))?', middle_name)
+                        wiki_color = re.search(r'^#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(,#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))?', middle_name)
+                        wiki_color_data = ''
                         if wiki_color:
                             wiki_color = wiki_color.groups()
                             if wiki_color[0]:
-                                wiki_color = '#' + wiki_color[0]
+                                wiki_color_data += '#' + wiki_color[0]
                             else:
-                                wiki_color = wiki_color[1]
+                                wiki_color_data += wiki_color[1]
 
                             if wiki_color[2]:
-                                wiki_color += ',#' + wiki_color[0]
-                            elif wiki_color[3]:
-                                wiki_color = ',' + wiki_color[1]
+                                if wiki_color[3]:
+                                    wiki_color_data += ',#' + wiki_color[3]
+                                elif wiki_color[4]:
+                                    wiki_color_data += ',' + wiki_color[4]
                         else:
-                            wiki_color = 'red'
+                            wiki_color_data += 'red'
 
-                        wiki_color = self.get_tool_css_safe(wiki_color)
+                        wiki_color = self.get_tool_css_safe(wiki_color_data)
                         wiki_color = self.get_tool_dark_mode_split(wiki_color)
 
                         wiki_data = re.sub(r'^#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))? ?', '', middle_data)
@@ -1589,8 +1597,11 @@ class class_do_render_namumark:
                 break
             else:
                 quote_data_org = quote_data.group(0)
+                
                 quote_data = quote_data.group(1)
                 quote_data = re.sub(r'\n&gt; *(?P<in>[^\n]*)', '\g<in>\n', quote_data)
+                quote_data = re.sub(r'\n$', '', quote_data)
+                quote_data = self.get_tool_data_revert(quote_data)
                 quote_data = html.unescape(quote_data)
 
                 self.data_include += [[self.doc_include + 'opennamu_quote_' + str(quote_count), self.doc_name, quote_data, '']]
@@ -1664,7 +1675,7 @@ class class_do_render_namumark:
         self.render_data = re.sub(r'<back_br>\n?', '', self.render_data)
         
         # \n to <br>
-        self.render_data = re.sub(r'\n', '<br>', self.render_data)
+        self.render_data = re.sub(r'\n', '<hr class="main_hr">', self.render_data)
 
         # <render_n> restore
         self.render_data = self.get_tool_data_restore(self.render_data)
