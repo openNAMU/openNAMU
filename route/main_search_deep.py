@@ -53,7 +53,11 @@ def main_search_deep(name = 'Test', search_type = 'title', num = 1):
             div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
 
         div += '</ul>'
-        div += get_next_page_bottom('/search/{}/' + url_pas(name), num, all_list)
+        
+        if search_type == 'title':
+            div += get_next_page_bottom('/search_data/{}/' + url_pas(name), num, all_list)
+        else:
+            div += get_next_page_bottom('/search/{}/' + url_pas(name), num, all_list)
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('search') + ')', 0])],
