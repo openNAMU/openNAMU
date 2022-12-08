@@ -620,7 +620,7 @@ class class_do_render_namumark:
         self.render_data = re.sub(r'\[math\(((?:(?!\[math\(|\)\]).|\n)+)\)\]', do_render_math_sub, self.render_data, re.I)
 
     def do_render_link(self):
-        link_regex = r'\[\[((?:(?!\[\[|\]\]|\||<|>).|<slash_[0-9]+>)+)(?:\|((?:(?!\[\[|\]\]|\|).)+))?\]\]'
+        link_regex = r'\[\[((?:(?!\[\[|\]\]|\||<|>).|<slash_[0-9]+>)+)(?:\|((?:(?!\[\[|\]\]|\|).)+))?\]\](\n)?'
         link_count_all = len(re.findall(link_regex, self.render_data)) * 4
         while 1:
             if not re.search(link_regex, self.render_data):
@@ -637,6 +637,8 @@ class class_do_render_namumark:
 
                 link_main = link_data[0]
                 link_main_org = link_main
+                
+                link_br = link_data[2]
 
                 # file link
                 if re.search(r'^(파일|file|외부|out):', link_main, re.I):
@@ -737,7 +739,7 @@ class class_do_render_namumark:
                         else:
                             data_name = self.get_tool_data_storage('', '', link_data_full)
                         
-                        self.render_data = re.sub(link_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
+                        self.render_data = re.sub(link_regex, '<' + data_name + '></' + data_name + '>' + ('\n' if link_br else ''), self.render_data, 1)
                 # category
                 elif re.search(r'^(분류|category):', link_main, re.I):
                     link_main = re.sub(r'^(분류|category):', '', link_main, re.I)
@@ -776,7 +778,7 @@ class class_do_render_namumark:
                     self.data_category += '<a class="' + category_blur + ' ' + link_exist + '" href="/w/category:' + link_main + '">' + link_sub + '</a>'
 
                     self.render_data = re.sub(link_regex, '', self.render_data, 1)
-                # out link
+                # inter link
                 elif re.search(r'^(?:inter|인터):([^:]+):', link_main, re.I):
                     link_inter_regex = re.compile('^(?:inter|인터):([^:]+):', re.I)
 
@@ -785,20 +787,20 @@ class class_do_render_namumark:
 
                     link_main = re.sub(link_inter_regex, '', link_main)
 
+                    link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                    link_main = html.unescape(link_main)
+                    
                     # sharp
                     link_data_sharp_regex = r'#([^#]+)$'
                     link_data_sharp = re.search(link_data_sharp_regex, link_main)
                     if link_data_sharp:
                         link_data_sharp = link_data_sharp.group(1)
-                        link_data_sharp = html.unescape(link_data_sharp)
                         link_data_sharp = '#' + url_pas(link_data_sharp)
 
                         link_main = re.sub(link_data_sharp_regex, '', link_main)
                     else:
                         link_data_sharp = ''
-
-                    link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
-                    link_main = html.unescape(link_main)
+                    
                     link_main = url_pas(link_main)
 
                     self.curs.execute(db_change("select plus, plus_t from html_filter where kind = 'inter_wiki' and html = ?"), [link_inter_name])
@@ -823,9 +825,10 @@ class class_do_render_namumark:
 
                         data_name = self.get_tool_data_storage('<a class="opennamu_link_inter" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
                     
-                        self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
+                        self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>' + ('\n' if link_br else '')), self.render_data, 1)
                     else:
                         self.render_data = re.sub(link_regex, '', self.render_data, 1)
+                # out link
                 elif re.search(r'^https?:\/\/', link_main, re.I):
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_main = html.unescape(link_main)
@@ -841,21 +844,9 @@ class class_do_render_namumark:
 
                     data_name = self.get_tool_data_storage('<a class="opennamu_link_out" href="' + link_main + '">' + link_sub_storage, '</a>', link_data_full)
 
-                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
+                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>' + ('\n' if link_br else '')), self.render_data, 1)
                 # in link
                 else:
-                    # sharp
-                    link_data_sharp_regex = r'#([^#]+)$'
-                    link_data_sharp = re.search(link_data_sharp_regex, link_main)
-                    if link_data_sharp:
-                        link_data_sharp = link_data_sharp.group(1)
-                        link_data_sharp = html.unescape(link_data_sharp)
-                        link_data_sharp = '#' + url_pas(link_data_sharp)
-
-                        link_main = re.sub(link_data_sharp_regex, '', link_main)
-                    else:
-                        link_data_sharp = ''
-
                     # under page & fix url
                     if link_main == '../':
                         link_main = self.doc_name
@@ -872,6 +863,17 @@ class class_do_render_namumark:
                     # main link fix
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_main = html.unescape(link_main)
+                    
+                    # sharp
+                    link_data_sharp_regex = r'#([^#]+)$'
+                    link_data_sharp = re.search(link_data_sharp_regex, link_main)
+                    if link_data_sharp:
+                        link_data_sharp = link_data_sharp.group(1)
+                        link_data_sharp = '#' + url_pas(link_data_sharp)
+
+                        link_main = re.sub(link_data_sharp_regex, '', link_main)
+                    else:
+                        link_data_sharp = ''
 
                     link_exist = ''
                     if link_main != '':
@@ -903,7 +905,7 @@ class class_do_render_namumark:
 
                     data_name = self.get_tool_data_storage('<a class="' + link_exist + ' ' + link_same + '" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
 
-                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
+                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>' + ('\n' if link_br else '')), self.render_data, 1)
 
             link_count_all -= 1
 
@@ -1107,18 +1109,6 @@ class class_do_render_namumark:
             link_data_full = match.group(0)
             link_main = match.group(1)
 
-            # sharp
-            link_data_sharp_regex = r'#([^#]+)$'
-            link_data_sharp = re.search(link_data_sharp_regex, link_main)
-            if link_data_sharp:
-                link_data_sharp = link_data_sharp.group(1)
-                link_data_sharp = html.unescape(link_data_sharp)
-                link_data_sharp = '#' + url_pas(link_data_sharp)
-
-                link_main = re.sub(link_data_sharp_regex, '', link_main)
-            else:
-                link_data_sharp = ''
-
             # under page & fix url
             if link_main == '../':
                 link_main = self.doc_name
@@ -1132,6 +1122,17 @@ class class_do_render_namumark:
 
             link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
             link_main = html.unescape(link_main)
+            
+            # sharp
+            link_data_sharp_regex = r'#([^#]+)$'
+            link_data_sharp = re.search(link_data_sharp_regex, link_main)
+            if link_data_sharp:
+                link_data_sharp = link_data_sharp.group(1)
+                link_data_sharp = '#' + url_pas(link_data_sharp)
+
+                link_main = re.sub(link_data_sharp_regex, '', link_main)
+            else:
+                link_data_sharp = ''
 
             self.data_backlink += [[self.doc_name, link_main, 'redirect']]
 
@@ -1382,8 +1383,8 @@ class class_do_render_namumark:
                             wiki_data_style = ''
 
                         wiki_data = self.get_tool_data_revert(wiki_data)
+                        wiki_data = re.sub('(^\n|\n$)', '', wiki_data)
                         wiki_data = html.unescape(wiki_data)
-                        wiki_data = re.sub('\n$', '', wiki_data)
 
                         self.data_include += [[self.doc_include + 'opennamu_wiki_' + str(wiki_count), self.doc_name, wiki_data, wiki_data_style]]
 

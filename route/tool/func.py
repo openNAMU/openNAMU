@@ -1042,7 +1042,7 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '170'
+    data_css_ver = '171'
     
     # Func JS + Defer
     data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
@@ -1902,7 +1902,6 @@ def get_edit_text_bottom():
     db_data= curs.fetchall()
     if db_data and db_data[0][0] != '':
         b_text = '' + \
-            '<hr class="main_hr">' + \
             db_data[0][0] + \
             '<hr class="main_hr">' + \
         ''
@@ -1918,7 +1917,6 @@ def get_edit_text_bottom_check_box():
     sql_d = curs.fetchall()
     if sql_d and sql_d[0][0] != '':
         cccb_text = '' + \
-            '<hr class="main_hr">' + \
             '<input type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + \
             '<hr class="main_hr">' + \
         ''
