@@ -283,9 +283,11 @@ s:hover, strike:hover, del:hover {
 /* 기타 */
 .main_hr {
     border: none;
-    
-    margin-top: 8px;
-    margin-bottom: 8px;
+	
+    padding-top: 6px;
+    padding-bottom: 6px;
+	
+    margin: 0;
 }
 
 .change_space {
