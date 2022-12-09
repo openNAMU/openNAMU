@@ -120,9 +120,9 @@ def main_func_setting_main(db_set):
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('main_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
-                data = '''
-                    <form method="post" id="opennamu_simple_render">
-                        <h2>1. ''' + load_lang('basic_set') + '''</h2>
+                data = render_simple_set('''
+                    <form method="post">
+                        <h2>''' + load_lang('basic_set') + '''</h2>
                         <span>''' + load_lang('wiki_name') + '''</span>
                         <hr class="main_hr">
                         <input name="name" value="''' + html.escape(d_list[0]) + '''">
@@ -172,14 +172,14 @@ def main_func_setting_main(db_set):
                         <hr class="main_hr">
                         <input type="password" name="wiki_access_password" value="''' + html.escape(d_list[32]) + '''">
 
-                        <h3>1.1. ''' + load_lang('communication_set') + '''</h3>
+                        <h3>''' + load_lang('communication_set') + '''</h3>
                         <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + load_lang('enable_comment_function') + ''' (''' + load_lang('not_working') + ''')
                         <hr class="main_hr">
 
                         <input type="checkbox" name="enable_challenge" ''' + check_box_div[6] + '''> ''' + load_lang('enable_challenge_function') + ''' (''' + load_lang('not_working') + ''')
                         <hr class="main_hr">
 
-                        <h2>2. ''' + load_lang('design_set') + '''</h2>
+                        <h2>''' + load_lang('design_set') + '''</h2>
                         <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class="main_hr">
                         <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'ringo') + '''</select>
@@ -187,7 +187,7 @@ def main_func_setting_main(db_set):
                         <hr class="main_hr">
                         <input type="checkbox" name="namumark_compatible" ''' + check_box_div[10] + '''> ''' + load_lang('namumark_fully_compatible_mode') + '''
 
-                        <h2>3. ''' + load_lang('login_set') + '''</h2>
+                        <h2>''' + load_lang('login_set') + '''</h2>
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
                         <hr class="main_hr">
 
@@ -204,14 +204,14 @@ def main_func_setting_main(db_set):
                         <hr class="main_hr">
                         <input name="password_min_length" value="''' + html.escape(d_list[30]) + '''">
                         
-                        <h2>4. ''' + load_lang('server_set') + '''</h2>
+                        <h2>''' + load_lang('server_set') + '''</h2>
 
                         <span>''' + load_lang('update_branch') + '''</span>
                         <hr class="main_hr">
                         <select name="update">''' + branch_div + '''</select>
 
                         <span ''' + sqlite_only + '''>
-                            <h3>4.1. ''' + load_lang('sqlite_only') + '''</h3>
+                            <h3>''' + load_lang('sqlite_only') + '''</h3>
                             <span>
                                 ''' + load_lang('backup_interval') + ''' (''' + load_lang('hour') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') ''' + \
                                 '''(''' + load_lang('restart_required') + ''')</span>
@@ -228,7 +228,7 @@ def main_func_setting_main(db_set):
                             <hr class="main_hr">
                         </span>
 
-                        <h2>5. ''' + load_lang('edit_set') + '''</h2>
+                        <h2>''' + load_lang('edit_set') + '''</h2>
                         <span><a href="/setting/acl">(''' + load_lang('main_acl_setting') + ''')</a></span>
                         <hr class="main_hr">
 
@@ -260,7 +260,6 @@ def main_func_setting_main(db_set):
 
                         <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
                     </form>
-                    <!-- JS : opennamu_do_render_simple -->
-                ''',
+                '''),
                 menu = [['setting', load_lang('return')]]
             ))

@@ -371,7 +371,7 @@ class class_do_render_namumark:
         for for_a in toc_list:
             toc_data += '' + \
                 '<br>' + \
-                ('<span style="margin-left: 10px;">' * for_a[0].count('.')) + \
+                ('<span style="margin-left: 10px;"></span>' * for_a[0].count('.')) + \
                 '<span class="opennamu_TOC_list">' + \
                     '<a href="#s-' + for_a[0] + '">' + \
                         for_a[0] + '. ' + \
