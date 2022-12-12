@@ -4,57 +4,54 @@ def main_tool_admin():
     with get_db_connect() as conn:
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('admin_tool'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
-            data = '''
-                <div id="opennamu_simple_render">
-                    <h2>1. ''' + load_lang('admin') + '''</h2>
-                    <ul class="opennamu_ul">
-                        <li><a href="/manager/2">''' + load_lang('acl_change') + '''</a></li>
-                        <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
-                        <li><a href="/auth/give/ban">''' + load_lang('ban') + '''</a></li>
-                        <li><a href="/auth/give/ban_multiple">''' + load_lang('multiple_ban') + '''</a></li>
-                        <li><a href="/manager/17">''' + load_lang('release') + '''</a></li>
-                        <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
-                    </ul>
-                    <h2>2. ''' + load_lang('owner') + '''</h2>
-                    <ul class="opennamu_ul">
-                        <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
-                        <li><a href="/delete_multiple">''' + load_lang('many_delete') + '''</a></li>
-                        <li><a href="/app_submit">''' + load_lang('application_list') + '''</a></li>
-                        <li><a href="/register">''' + load_lang('add_user') + '''</a></li>
-                        <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
-                    </ul>
-                    <h3>2.1. ''' + load_lang('filter') + '''</h3>
-                    <ul class="opennamu_ul">
-                        <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
-                        <li><a href="/inter_wiki">''' + load_lang('interwiki_list') + '''</a></li>
-                        <li><a href="/edit_top">''' + load_lang('edit_tool_list') + '''</a></li>
-                        <li><a href="/image_license">''' + load_lang('image_license_list') + '''</a></li>
-                        <li><a href="/email_filter">''' + load_lang('email_filter_list') + '''</a></li>
-                        <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
-                        <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
-                        <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
-                        <li><a href="/filter/document/list">''' + load_lang('document_filter_list') + ''' (''' + load_lang('beta') + ''')</a></li>
-                    </ul>
-                    <h3>2.2. ''' + load_lang('server') + '''</h2>
-                    <ul class="opennamu_ul">
-                        <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
-                        <li><a href="/shutdown">''' + load_lang('wiki_shutdown') + '''</a></li>
-                        <li><a href="/update">''' + load_lang('update') + '''</a></li>
-                    </ul>
-                    <h2>3. ''' + load_lang('version') + '''</h2>
-                    <ul class="opennamu_ul">
-                        <li id="ver_send_2">''' + load_lang('version') + ''' : </li>
-                        <li id="ver_send">''' + load_lang('lastest') + ''' : </li>
-                    </ul>
-                    <h3>3.1. ''' + load_lang('skin_info') + '''</h3>
-                    <ul class="opennamu_ul">
-                        <li><a href="/api/skin_info?all=true">''' + load_lang('skin_info') + '''</a></li>
-                        <div id="ver_send_3"></div>
-                    </ul>
-                </div>
+            data = render_simple_set('''
+                <h2>''' + load_lang('admin') + '''</h2>
+                <ul class="opennamu_ul">
+                    <li><a href="/manager/2">''' + load_lang('acl_change') + '''</a></li>
+                    <li><a href="/manager/3">''' + load_lang('check_user') + '''</a></li>
+                    <li><a href="/auth/give/ban">''' + load_lang('ban') + '''</a></li>
+                    <li><a href="/auth/give/ban_multiple">''' + load_lang('multiple_ban') + '''</a></li>
+                    <li><a href="/manager/17">''' + load_lang('release') + '''</a></li>
+                    <li><a href="/manager/5">''' + load_lang('authorize') + '''</a></li>
+                </ul>
+                <h2>''' + load_lang('owner') + '''</h2>
+                <ul class="opennamu_ul">
+                    <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
+                    <li><a href="/delete_multiple">''' + load_lang('many_delete') + '''</a></li>
+                    <li><a href="/app_submit">''' + load_lang('application_list') + '''</a></li>
+                    <li><a href="/register">''' + load_lang('add_user') + '''</a></li>
+                    <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
+                </ul>
+                <h3>''' + load_lang('filter') + '''</h3>
+                <ul class="opennamu_ul">
+                    <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
+                    <li><a href="/inter_wiki">''' + load_lang('interwiki_list') + '''</a></li>
+                    <li><a href="/edit_top">''' + load_lang('edit_tool_list') + '''</a></li>
+                    <li><a href="/image_license">''' + load_lang('image_license_list') + '''</a></li>
+                    <li><a href="/email_filter">''' + load_lang('email_filter_list') + '''</a></li>
+                    <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
+                    <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
+                    <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
+                    <li><a href="/filter/document/list">''' + load_lang('document_filter_list') + ''' (''' + load_lang('beta') + ''')</a></li>
+                </ul>
+                <h3>''' + load_lang('server') + '''</h2>
+                <ul class="opennamu_ul">
+                    <li><a href="/restart">''' + load_lang('wiki_restart') + '''</a></li>
+                    <li><a href="/shutdown">''' + load_lang('wiki_shutdown') + '''</a></li>
+                    <li><a href="/update">''' + load_lang('update') + '''</a></li>
+                </ul>
+                <h2>''' + load_lang('version') + '''</h2>
+                <ul class="opennamu_ul">
+                    <li id="ver_send_2">''' + load_lang('version') + ''' : </li>
+                    <li id="ver_send">''' + load_lang('lastest') + ''' : </li>
+                </ul>
+                <h3>''' + load_lang('skin_info') + '''</h3>
+                <ul class="opennamu_ul">
+                    <li><a href="/api/skin_info?all=true">''' + load_lang('skin_info') + '''</a></li>
+                    <div id="ver_send_3"></div>
+                </ul>
                 <!-- JS : opennamu_do_insert_version -->
                 <!-- JS : opennamu_do_insert_version_skin -->
-                <!-- JS : opennamu_do_render_simple -->
-            ''',
+            '''),
             menu = [['other', load_lang('return')]]
         ))
