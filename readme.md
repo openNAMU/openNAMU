@@ -26,7 +26,7 @@
 오픈나무는 오픈소스 프로젝트입니다. 원한다면 직접 코드를 수정하고 [Pull Request](https://github.com/openNAMU/openNAMU/compare)를 보낼 수 있습니다.
 
 ## 라이선스
-오픈나무 프로젝트는 [BSD 3-Clause License](./LICENSE)의 보호를 받고 있으며, 오픈나무 프로젝트를 사용하고자 한다면 라이선스를 준수해야 합니다. 본 라이선스를 위반할 경우 법적인 조치가 취해질 수 있습니다. 자세한 내용은 문서를 참고하세요.
+오픈나무 프로젝트는 [BSD 3-Clause License](./LICENSE) [(ko-KR)](https://www.olis.or.kr/license/Detailselect.do?lId=1092)이며, 오픈나무 프로젝트를 사용하고자 한다면 라이선스를 준수해야 합니다. 자세한 내용은 문서를 참고하세요.
 
 ### 포함된 외부 프로젝트
  * Quotes icon - [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672)
