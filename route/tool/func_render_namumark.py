@@ -701,6 +701,7 @@ class class_do_render_namumark:
 
                     link_main_org = ''
                     link_sub = link_main
+                    file_out = 0
 
                     link_out_regex = re.compile('^(외부|out):', re.I)
                     link_in_regex = re.compile('^(파일|file):', re.I)
@@ -712,6 +713,7 @@ class class_do_render_namumark:
                         link_main = re.sub(r'"', '&quot;', link_main)
                         
                         link_exist = ''
+                        file_out = 1
                     else:
                         link_main = re.sub(link_in_regex, '', link_main)
 
@@ -761,7 +763,10 @@ class class_do_render_namumark:
                             file_pass = 1
 
                         if file_pass == 1:
-                            data_name = self.get_tool_data_storage('<a title="' + link_sub + '" href="/w/file:' + url_pas(link_main_org) + '.' + url_pas(link_extension) + '">' + file_end, '</a>', link_data_full)
+                            if file_out == 0:
+                                data_name = self.get_tool_data_storage('<a title="' + link_sub + '" href="/w/file:' + url_pas(link_main_org) + '.' + url_pas(link_extension) + '">' + file_end, '</a>', link_data_full)
+                            else:
+                                data_name = self.get_tool_data_storage('<a title="' + link_sub + '" href="' + link_main + '">' + file_end, '</a>', link_data_full)
                         else:
                             data_name = self.get_tool_data_storage('', '', link_data_full)
                         
