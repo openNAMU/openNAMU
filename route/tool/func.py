@@ -1329,6 +1329,69 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                 return get_class_render[0] + '<script>' + get_class_render[1] + '</script>'
         else:
             return 'HTTP Request 404'
+            
+def render_simple_set(data):
+    toc_data = ''
+    toc_regex = r'<h([1-6])>([^<>]+)<\/h[1-6]>'
+    toc_search_data = re.findall(toc_regex,  data)
+    heading_stack = [0, 0, 0, 0, 0, 0]
+
+    if toc_search_data:
+        toc_data += '''
+            <div class="opennamu_TOC" id="toc">
+                <span class="opennamu_TOC_title">''' + load_lang('toc') + '''</span>
+                <br>
+        '''
+    
+    for toc_search_in in toc_search_data:
+        heading_level = int(toc_search_in[0])
+        heading_level_str = str(heading_level)
+
+        heading_stack[heading_level - 1] += 1
+        for for_a in range(heading_level, 6):
+            heading_stack[for_a] = 0
+        
+        heading_stack_str = ''.join([str(for_a) + '.' if for_a != 0 else '' for for_a in heading_stack])
+        heading_stack_str = re.sub(r'\.$', '', heading_stack_str)
+    
+        toc_data += '''
+            <br>
+            <span class="opennamu_TOC_list">
+                ''' + ('<span style="margin-left: 10px;"></span>' * (heading_stack_str.count('.'))) + '''
+                <a href="#s-''' + heading_stack_str + '''">''' + heading_stack_str + '''.</a>
+                ''' + toc_search_in[1] + '''
+            </span>
+        '''
+        
+        data = re.sub(toc_regex, '<h' + toc_search_in[0] + ' id="s-' + heading_stack_str + '"><a href="#toc">' + heading_stack_str + '.</a> ' + toc_search_in[1] + '</h' + toc_search_in[0] + '>', data, 1)
+        
+    if toc_data != '':
+        toc_data += '</div>'
+        
+    footnote_data = ''
+    footnote_regex = r'<sup>((?:(?!<sup>|<\/sup>).)+)<\/sup>'
+    footnote_search_data = re.findall(footnote_regex, data)
+    footnote_count = 1
+    if footnote_search_data:
+        footnote_data += '<div class="opennamu_footnote">'
+    
+    for footnote_search in footnote_search_data:
+        footnote_count_str = str(footnote_count)
+        
+        if footnote_count != 1:
+            footnote_data += '<br>'
+    
+        footnote_data += '<a id="fn_' + footnote_count_str + '" href="#rfn_' + footnote_count_str + '">(' + footnote_count_str + ')</a> ' + footnote_search
+        data = re.sub(footnote_regex, '<sup id="rfn-' + footnote_count_str + '"><a href="#fn-' + footnote_count_str + '">(' + footnote_count_str + ')</sup>', data, 1)
+        
+        footnote_count += 1
+        
+    if footnote_data != '':
+        footnote_data += '</div>'
+        
+    data = toc_data + data + footnote_data
+
+    return data
 
 # Func-request
 def send_email(who, title, data):
