@@ -1021,7 +1021,7 @@ class class_do_render_namumark:
                 match = match.groups()
 
                 macro_split_regex = r'(?:^|,) *([^,]+)'
-                macro_split_sub_regex = r'(^[^=]+) *= *([^=]*)'
+                macro_split_sub_regex = r'^([^=]+) *= *(.*)$'
 
                 include_name = ''
 
