@@ -1,7 +1,6 @@
 flask
 
 waitress
-netius
 
 requests
 
