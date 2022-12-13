@@ -1381,7 +1381,7 @@ def render_simple_set(data):
             footnote_data += '<br>'
     
         footnote_data += '<a id="fn_' + footnote_count_str + '" href="#rfn_' + footnote_count_str + '">(' + footnote_count_str + ')</a> ' + footnote_search
-        data = re.sub(footnote_regex, '<sup id="rfn-' + footnote_count_str + '"><a href="#fn-' + footnote_count_str + '">(' + footnote_count_str + ')</sup>', data, 1)
+        data = re.sub(footnote_regex, '<sup id="rfn-' + footnote_count_str + '"><a href="#fn-' + footnote_count_str + '">(' + footnote_count_str + ')</a></sup>', data, 1)
         
         footnote_count += 1
         
