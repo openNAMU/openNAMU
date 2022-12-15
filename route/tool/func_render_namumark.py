@@ -645,7 +645,8 @@ class class_do_render_namumark:
 
             return '<' + data_name + '></' + data_name + '>'
 
-        self.render_data = re.sub(r'\[math\(((?:(?!\[math\(|\)\]).|\n)+)\)\]', do_render_math_sub, self.render_data, re.I)
+        math_regex = re.compile('\[math\(((?:(?!\[math\(|\)\]).|\n)+)\)\]', re.I)
+        self.render_data = re.sub(math_regex, do_render_math_sub, self.render_data)
 
     def do_render_link(self):
         link_regex = r'\[\[((?:(?!\[\[|\]\]|\||<|>).|<slash_[0-9]+>)+)(?:\|((?:(?!\[\[|\]\]|\|).)+))?\]\]'
@@ -667,7 +668,7 @@ class class_do_render_namumark:
                 link_main_org = link_main
 
                 # file link
-                if re.search(r'^(파일|file|외부|out):', link_main, re.I):
+                if re.search(r'^(파일|file|외부|out):', link_main, flags = re.I):
                     file_width = ''
                     file_height = ''
                     file_align = ''
@@ -772,15 +773,15 @@ class class_do_render_namumark:
                         
                         self.render_data = re.sub(link_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
                 # category
-                elif re.search(r'^(분류|category):', link_main, re.I):
-                    link_main = re.sub(r'^(분류|category):', '', link_main, re.I)
+                elif re.search(r'^(분류|category):', link_main, flags = re.I):
+                    link_main = re.sub(r'^(분류|category):', '', link_main, flags = re.I)
 
                     if link_data[1]:
                         link_main += link_data[1]
 
                     category_blur = ''
-                    if re.search(r'#blur$', link_main, re.I):
-                        link_main = re.sub(r'#blur$', '', link_main, re.I)
+                    if re.search(r'#blur$', link_main, flags = re.I):
+                        link_main = re.sub(r'#blur$', '', link_main, flags = re.I)
 
                         category_blur = 'opennamu_category_blur'
                     
@@ -816,8 +817,8 @@ class class_do_render_namumark:
                     else:
                         self.render_data = re.sub(link_regex, '', self.render_data, 1)
                 # inter link
-                elif re.search(r'^(?:inter|인터):([^:]+):', link_main, re.I):
-                    link_inter_regex = re.compile('^(?:inter|인터):([^:]+):', re.I)
+                elif re.search(r'^(?:inter|인터):([^:]+):', link_main, flags = re.I):
+                    link_inter_regex = re.compile('^(?:inter|인터):([^:]+):', flags = re.I)
 
                     link_inter_name = re.search(link_inter_regex, link_main)
                     link_inter_name = link_inter_name.group(1)
@@ -867,7 +868,7 @@ class class_do_render_namumark:
                     else:
                         self.render_data = re.sub(link_regex, '', self.render_data, 1)
                 # out link
-                elif re.search(r'^https?:\/\/', link_main, re.I):
+                elif re.search(r'^https?:\/\/', link_main, flags = re.I):
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_main = html.unescape(link_main)
                     link_main = re.sub(r'"', '&quot;', link_main)
@@ -891,12 +892,12 @@ class class_do_render_namumark:
                         link_main = re.sub(r'(\/[^/]+)$', '', link_main)
                     elif re.search(r'^\/', link_main):
                         link_main = re.sub(r'^\/', lambda x : (self.doc_name + '/'), link_main)
-                    elif re.search(r'^:(분류|category):', link_main, re.I):
-                        link_main = re.sub(r'^:(분류|category):', 'category:', link_main, re.I)
-                    elif re.search(r'^:(파일|file):', link_main, re.I):
-                        link_main = re.sub(r'^:(파일|file):', 'file:', link_main, re.I)
-                    elif re.search(r'^사용자:', link_main, re.I):
-                        link_main = re.sub(r'^사용자:', 'user:', link_main, re.I)
+                    elif re.search(r'^:(분류|category):', link_main, flags = re.I):
+                        link_main = re.sub(r'^:(분류|category):', 'category:', link_main, flags = re.I)
+                    elif re.search(r'^:(파일|file):', link_main, flags = re.I):
+                        link_main = re.sub(r'^:(파일|file):', 'file:', link_main, flags = re.I)
+                    elif re.search(r'^사용자:', link_main, flags = re.I):
+                        link_main = re.sub(r'^사용자:', 'user:', link_main, flags = re.I)
 
                     # main link fix
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
@@ -1146,7 +1147,7 @@ class class_do_render_namumark:
         self.render_data += self.get_tool_footnote_make()
 
     def do_render_redirect(self):
-        match = re.search(r'^<back_br>\n#(?:redirect|넘겨주기) ([^\n]+)', self.render_data, re.I)
+        match = re.search(r'^<back_br>\n#(?:redirect|넘겨주기) ([^\n]+)', self.render_data, flags = re.I)
         if match and self.doc_include == '':
             link_data_full = match.group(0)
             link_main = match.group(1)
@@ -1728,7 +1729,12 @@ class class_do_render_namumark:
             data = match.group(1)
 
             data = re.sub(r'<[^<>]*>', '', data)
-            self.render_data = re.sub(r'<h(?P<in>[1-6])>', '<h\g<in> id="' + data + '">', self.render_data, 1)
+
+            heading_regex = r'<h([1-6])>'
+            heading_data = re.search(heading_regex, self.render_data)
+            if heading_data:
+                heading_data = heading_data.group(1)
+                self.render_data = re.sub(heading_regex, lambda x : ('<h' + heading_data + ' id="' + data + '">'), self.render_data, 1)
             
             return data
 
