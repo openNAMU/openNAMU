@@ -1719,7 +1719,7 @@ class class_do_render_namumark:
         self.render_data = re.sub(r'<back_br>\n?', '', self.render_data)
         
         # \n to <br>
-        self.render_data = re.sub(r'\n', '<hr class="main_hr">', self.render_data)
+        self.render_data = re.sub(r'\n', '<br>', self.render_data)
 
         # <render_n> restore
         self.render_data = self.get_tool_data_restore(self.render_data)
