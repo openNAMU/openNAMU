@@ -39,6 +39,7 @@ class class_do_render_namumark:
     def get_tool_js_safe(self, data):
         data = data.replace('\n', '\\\\n')
         data = data.replace('\\', '\\\\')
+        data = data.replace("'", "\\'")
         data = data.replace('"', '\\"')
 
         return data
@@ -688,10 +689,8 @@ class class_do_render_namumark:
                                 elif data_sub[0] == 'height':
                                     file_height = self.get_tool_px_add_check(data_sub[1])
                                 elif data_sub[0] == 'align':
-                                    if data_sub[1] in ('left', 'right'):
-                                        file_align = 'float:' + data_sub[1] + ';'
-                                    elif data_sub[1] == 'center':
-                                        file_align = 'center'
+                                    if data_sub[1] in ('center', 'left', 'right'):
+                                        file_align = data_sub[1]
                                 elif data_sub[0] == 'bgcolor':
                                     file_bgcolor = data_sub[1]
                                 elif data_sub[0] == 'theme':
@@ -743,16 +742,33 @@ class class_do_render_namumark:
 
                         link_main = '/image/' + url_pas(sha224_replace(link_main)) + '.' + link_extension
 
-                    file_width = self.get_tool_css_safe(file_width)
-                    file_height = self.get_tool_css_safe(file_height)
+                    if file_width != '':
+                        file_width = 'width:' + self.get_tool_css_safe(file_width) + ';'
+                    
+                    if file_height != '':
+                        file_height = 'height:' + self.get_tool_css_safe(file_height) + ';'
 
-                    file_end = '<image style="width:' + file_width + ';height:' + file_height + ';' + file_align + ';background:' + file_bgcolor + ';" alt="' + link_sub + '" src="' + link_main + '">'
+                    file_align_style = ''
+                    if file_align in ('left', 'right'):
+                        file_align_style = 'float:' + file_align + ';'
+
+                    if file_bgcolor != '':
+                        file_bgcolor = 'background:' + self.get_tool_css_safe(file_bgcolor) + ';'
+
+                    if file_out == 0:
+                        file_onclick = 'onclick="javascript:document.location.pathname=\'/w/file:' + url_pas(link_main_org) + '.' + url_pas(link_extension) + '\'"'
+                        file_style = 'cursor: pointer;'
+                    else:
+                        file_onclick = ''
+                        file_style = ''
+
+                    file_end = '<img ' + file_onclick + ' style="' + file_width + file_height + file_align_style + file_bgcolor + file_style + '" alt="' + link_sub + '" src="' + link_main + '">'
                     if file_align == 'center':
                         file_end = '<div style="text-align:center;">' + file_end + '</div>'
 
                     if link_exist != '':
-                        data_name = self.get_tool_data_storage('<a class="' + link_exist + '" title="' + link_sub + '" href="/upload?name=' + url_pas(link_main_org) + '">', '</a>', link_data_full)
-                        self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
+                        data_name = self.get_tool_data_storage('<a class="' + link_exist + '" title="' + link_sub + '" href="/upload?name=' + url_pas(link_main_org) + '">' + link_sub, '</a>', link_data_full)
+                        self.render_data = re.sub(link_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
                     else:
                         file_pass = 0
                         if file_turn != '':
@@ -764,10 +780,7 @@ class class_do_render_namumark:
                             file_pass = 1
 
                         if file_pass == 1:
-                            if file_out == 0:
-                                data_name = self.get_tool_data_storage('<a title="' + link_sub + '" href="/w/file:' + url_pas(link_main_org) + '.' + url_pas(link_extension) + '">' + file_end, '</a>', link_data_full)
-                            else:
-                                data_name = self.get_tool_data_storage('<a title="' + link_sub + '" href="' + link_main + '">' + file_end, '</a>', link_data_full)
+                            data_name = self.get_tool_data_storage(file_end, '', link_data_full)
                         else:
                             data_name = self.get_tool_data_storage('', '', link_data_full)
                         
@@ -826,19 +839,24 @@ class class_do_render_namumark:
                     link_main = re.sub(link_inter_regex, '', link_main)
                     link_title = link_inter_name + ':' + link_main
 
-                    link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
-                    link_main = html.unescape(link_main)
-                    
                     # sharp
+                    link_main = link_main.replace('&#x27;', '<link_single>')
                     link_data_sharp_regex = r'#([^#]+)$'
                     link_data_sharp = re.search(link_data_sharp_regex, link_main)
                     if link_data_sharp:
                         link_data_sharp = link_data_sharp.group(1)
+                        link_data_sharp = html.unescape(link_data_sharp)
                         link_data_sharp = '#' + url_pas(link_data_sharp)
 
                         link_main = re.sub(link_data_sharp_regex, '', link_main)
                     else:
                         link_data_sharp = ''
+                    
+                    link_main = link_main.replace('<link_single>', '&#x27;')
+
+                    # main link fix
+                    link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                    link_main = html.unescape(link_main)
                     
                     link_main = url_pas(link_main)
 
@@ -870,6 +888,7 @@ class class_do_render_namumark:
                 # out link
                 elif re.search(r'^https?:\/\/', link_main, flags = re.I):
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                    link_title = link_main
                     link_main = html.unescape(link_main)
                     link_main = re.sub(r'"', '&quot;', link_main)
                     
@@ -881,7 +900,7 @@ class class_do_render_namumark:
                         link_sub = ''
                         link_sub_storage = link_main_org
 
-                    data_name = self.get_tool_data_storage('<a class="opennamu_link_out" title="" href="' + link_main + '">' + link_sub_storage, '</a>', link_data_full)
+                    data_name = self.get_tool_data_storage('<a class="opennamu_link_out" target="_blank" title="' + link_title + '" href="' + link_main + '">' + link_sub_storage, '</a>', link_data_full)
 
                     self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
                 # in link
@@ -899,21 +918,26 @@ class class_do_render_namumark:
                     elif re.search(r'^사용자:', link_main, flags = re.I):
                         link_main = re.sub(r'^사용자:', 'user:', link_main, flags = re.I)
 
-                    # main link fix
-                    link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
-                    link_main = html.unescape(link_main)
-                    
                     # sharp
+                    link_main = link_main.replace('&#x27;', '<link_single>')
                     link_data_sharp_regex = r'#([^#]+)$'
                     link_data_sharp = re.search(link_data_sharp_regex, link_main)
                     if link_data_sharp:
                         link_data_sharp = link_data_sharp.group(1)
+                        link_data_sharp = html.unescape(link_data_sharp)
                         link_data_sharp = '#' + url_pas(link_data_sharp)
 
                         link_main = re.sub(link_data_sharp_regex, '', link_main)
                     else:
                         link_data_sharp = ''
+                    
+                    link_main = link_main.replace('<link_single>', '&#x27;')
 
+                    # main link fix
+                    link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                    link_main = html.unescape(link_main)
+
+                    # link_title
                     link_title = html.escape(link_main + link_data_sharp)
 
                     link_exist = ''
@@ -1163,19 +1187,24 @@ class class_do_render_namumark:
             elif re.search(r'^사용자:', link_main):
                 link_main = re.sub(r'^사용자:', 'user:', link_main)
 
-            link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
-            link_main = html.unescape(link_main)
-            
             # sharp
+            link_main = link_main.replace('&#x27;', '<link_single>')
             link_data_sharp_regex = r'#([^#]+)$'
             link_data_sharp = re.search(link_data_sharp_regex, link_main)
             if link_data_sharp:
                 link_data_sharp = link_data_sharp.group(1)
+                link_data_sharp = html.unescape(link_data_sharp)
                 link_data_sharp = '#' + url_pas(link_data_sharp)
 
                 link_main = re.sub(link_data_sharp_regex, '', link_main)
             else:
                 link_data_sharp = ''
+            
+            link_main = link_main.replace('<link_single>', '&#x27;')
+
+            # main link fix
+            link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+            link_main = html.unescape(link_main)
 
             self.data_backlink += [[self.doc_name, link_main, 'redirect']]
 
