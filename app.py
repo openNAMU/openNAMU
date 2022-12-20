@@ -495,7 +495,10 @@ app.route('/change/head', methods=['GET', 'POST'], defaults = { 'skin_name' : ''
 app.route('/change/head/<skin_name>', methods=['GET', 'POST'])(user_setting_head)
 app.route('/change/head_reset', methods=['GET', 'POST'])(user_setting_head_reset)
 app.route('/change/skin_set')(user_setting_skin_set)
-app.route('/change/skin_set/main')(user_setting_skin_set)
+# 하위 호환용 S
+app.route('/skin_set')(user_setting_skin_set)
+# 하위 호환용 E
+app.route('/change/skin_set/main', methods = ['POST', 'GET'])(user_setting_skin_set_main)
 
 app.route('/user')(user_info)
 app.route('/user/<name>')(user_info)
@@ -513,11 +516,6 @@ app.route('/watch_list/<everything:name>', defaults = { 'tool' : 'watch_list' })
 
 app.route('/star_doc', defaults = { 'tool' : 'star_doc' })(user_watch_list)
 app.route('/star_doc/<everything:name>', defaults = { 'tool' : 'star_doc' })(user_watch_list_name)
-
-# 하위 호환용 S
-# /change/skin_set
-app.route('/skin_set')(user_setting_skin_set)
-# 하위 호환용 E
 
 # 개편 보류중 S
 @app.route('/change/email', methods = ['POST', 'GET'])
