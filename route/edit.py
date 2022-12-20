@@ -228,8 +228,14 @@ def edit(name = 'Test', section = 0, do_type = ''):
             sql_d = curs.fetchall()
             p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
             
-            monaco_on = flask.request.cookies.get('main_css_monaco', '0')
-            if monaco_on == '1':
+            if ip_or_user(ip) == 0:
+                curs.execute(db_change('select data from user_set where name = "main_css_monaco" and id = ?'), [ip])
+                db_data = curs.fetchall()
+                monaco_on = db_data[0][0] if db_data else 'normal'
+            else:
+                monaco_on = flask.session['main_css_monaco'] if 'main_css_monaco' in flask.session else 'normal'
+            
+            if monaco_on == 'use':
                 editor_display = 'style="display: none;"'
                 monaco_display = ''
                 add_get_file = '''
@@ -333,7 +339,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                         }
 
                         do_stop_exit();
-                        do_paste_image();
+                        do_paste_image('opennamu_edit_textarea', 'opennamu_monaco_editor');
 
                         ''' + add_script + '''
                     </script>

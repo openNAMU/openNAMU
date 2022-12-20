@@ -10,6 +10,7 @@ class class_do_render_namumark:
         self.doc_include = self.doc_set['doc_include'] if 'doc_include' in self.doc_set else ''
 
         self.lang_data = lang_data
+        self.ip = ip_check()
 
         self.data_temp_storage = {}
         self.data_temp_storage_count = 0
@@ -170,12 +171,18 @@ class class_do_render_namumark:
 
     def do_render_text(self):
         # <b> function
-        bold_user_set = flask.request.cookies.get('main_css_del_bold', '0')
+        if ip_or_user(self.ip) == 0:
+            self.curs.execute(db_change('select data from user_set where name = "main_css_bold" and id = ?'), [self.ip])
+            db_data = self.curs.fetchall()
+            bold_user_set = db_data[0][0] if db_data else 'normal'
+        else:
+            bold_user_set = flask.session['main_css_bold'] if 'main_css_bold' in flask.session else 'normal'
+
         def do_render_text_bold(match):
             data = match.group(1)
-            if bold_user_set == '0':
+            if bold_user_set == 'normal':
                 data_name = self.get_tool_data_storage('<b>', '</b>', match.group(0))
-            elif bold_user_set == '1':
+            elif bold_user_set == 'change':
                 data_name = self.get_tool_data_storage('', '', match.group(0))
             else:
                 return ''
@@ -229,13 +236,19 @@ class class_do_render_namumark:
         # <sub> 2
         self.render_data = re.sub(r",,((?:(?!,,).)+),,", do_render_text_sub, self.render_data)
 
-        # <sub> function
-        strike_user_set = flask.request.cookies.get('main_css_del_strike', '0')
+        # <s> function
+        if ip_or_user(self.ip) == 0:
+            self.curs.execute(db_change('select data from user_set where name = "main_css_strike" and id = ?'), [self.ip])
+            db_data = self.curs.fetchall()
+            strike_user_set = db_data[0][0] if db_data else 'normal'
+        else:
+            strike_user_set = flask.session['main_css_strike'] if 'main_css_strike' in flask.session else 'normal'
+
         def do_render_text_strike(match):
             data = match.group(1)
-            if bold_user_set == '0':
+            if strike_user_set == 'normal':
                 data_name = self.get_tool_data_storage('<s>', '</s>', match.group(0))
-            elif bold_user_set == '1':
+            elif strike_user_set == 'change':
                 data_name = self.get_tool_data_storage('', '', match.group(0))
             else:
                 return ''
@@ -1083,8 +1096,15 @@ class class_do_render_namumark:
                     self.data_backlink += [[self.doc_name, include_name, 'include']]
 
                     # include link func
+                    if ip_or_user(self.ip) == 0:
+                        self.curs.execute(db_change('select data from user_set where name = "main_css_include_link" and id = ?'), [self.ip])
+                        db_data = self.curs.fetchall()
+                        include_set_data = db_data[0][0] if db_data else 'normal'
+                    else:
+                        include_set_data = flask.session['main_css_include_link'] if 'main_css_include_link' in flask.session else 'normal'
+
                     include_link = ''
-                    if flask.request.cookies.get('main_css_include_link', '') == '1':
+                    if include_set_data == 'use':
                         include_link = '<div><a href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
 
                     include_data = db_data[0][0].replace('\r', '')
@@ -1730,7 +1750,14 @@ class class_do_render_namumark:
             if self.data_category != '':
                 data_name = self.get_tool_data_storage(self.data_category, '</div>', '')
 
-                if flask.request.cookies.get('main_css_category_set', '0') == '0':
+                if ip_or_user(self.ip) == 0:
+                    self.curs.execute(db_change('select data from user_set where name = "main_css_category_set" and id = ?'), [self.ip])
+                    db_data = self.curs.fetchall()
+                    category_set_data = db_data[0][0] if db_data else 'normal'
+                else:
+                    category_set_data = flask.session['main_css_category_set'] if 'main_css_category_set' in flask.session else 'normal'
+
+                if category_set_data == 'normal':
                     if re.search(r'<footnote_category>', self.render_data):
                         self.render_data = re.sub(r'<footnote_category>', '<hr><' + data_name + '></' + data_name + '>', self.render_data, 1)
                     else:
@@ -1778,8 +1805,15 @@ class class_do_render_namumark:
             self.data_toc = toc_data
             self.data_toc = re.sub(r'<toc_inside>((?:(?!<toc_inside>|<\/toc_inside>).)*)<\/toc_inside>', do_render_last_toc, self.data_toc)
 
+            if ip_or_user(self.ip) == 0:
+                self.curs.execute(db_change('select data from user_set where name = "main_css_toc_set" and id = ?'), [self.ip])
+                db_data = self.curs.fetchall()
+                toc_set_data = db_data[0][0] if db_data else 'normal'
+            else:
+                toc_set_data = flask.session['main_css_toc_set'] if 'main_css_toc_set' in flask.session else 'normal'
+
             self.render_data = re.sub(toc_search_regex, '', self.render_data)
-            if flask.request.cookies.get('main_css_toc_set', '0') != '1':
+            if toc_set_data != 'off':
                 if re.search(r'<toc_need_part>', self.render_data):
                     toc_data_on = 1
 
@@ -1790,7 +1824,7 @@ class class_do_render_namumark:
 
             if  self.doc_include != '' or \
                 re.search(r'<toc_no_auto>', self.render_data) or \
-                flask.request.cookies.get('main_css_toc_set', '0') != '0' or \
+                toc_set_data != 'normal' or \
                 toc_data_on == 1:
                 self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
             else:

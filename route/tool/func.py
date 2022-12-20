@@ -1041,7 +1041,7 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '171'
+    data_css_ver = '172'
     
     # Func JS + Defer
     data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
@@ -1054,14 +1054,11 @@ def wiki_css(data):
     data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/func/shortcut.js?ver=' + data_css_ver + '"></script>'
     
-    data_css += '<script defer src="/views/main_css/js/func/render_simple.js?ver=' + data_css_ver + '"></script>'
-    
     # Route JS + Defer
     data_css += '<script defer src="/views/main_css/js/route/thread.js?ver=' + data_css_ver + '"></script>'
     
     # 레거시 일반 JS
     data_css += '<script src="/views/main_css/js/load_editor.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script src="/views/main_css/js/load_skin_set.js?ver=' + data_css_ver + '"></script>'
     
     # Main CSS
     data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css?ver=' + data_css_ver + '">'
@@ -1380,7 +1377,7 @@ def render_simple_set(data):
         if footnote_count != 1:
             footnote_data += '<br>'
     
-        footnote_data += '<a id="fn_' + footnote_count_str + '" href="#rfn_' + footnote_count_str + '">(' + footnote_count_str + ')</a> ' + footnote_search
+        footnote_data += '<a id="fn-' + footnote_count_str + '" href="#rfn-' + footnote_count_str + '">(' + footnote_count_str + ')</a> ' + footnote_search
         data = re.sub(footnote_regex, '<sup id="rfn-' + footnote_count_str + '"><a href="#fn-' + footnote_count_str + '">(' + footnote_count_str + ')</a></sup>', data, 1)
         
         footnote_count += 1
@@ -1527,20 +1524,6 @@ def captcha_post(re_data, num = 1):
         return 0
 
 # Func-user
-def ip_or_user(data = ''):
-    # without_DB
-
-    # 1 == ip
-    # 0 == reg
-    
-    if data == '':
-        data = ip_check()
-
-    if re.search(r'(\.|:)', data):
-        return 1
-    else:
-        return 0
-
 def admin_check(num = None, what = None, name = ''):
     curs = conn.cursor()
 
@@ -2451,17 +2434,12 @@ def re_error(data):
             data = '???'
 
         if num == 5:
-            if not flask.request.path in ('/main_skin_set', '/change/skin_set/main'):
-                if flask.request.path != '/skin_set':
-                    data += '<br>' + load_lang('error_skin_set_old') + ' <a href="/skin_set">(' + load_lang('go') + ')</a>'
+            if flask.request.path != '/skin_set':
+                data += '<br>' + load_lang('error_skin_set_old') + ' <a href="/skin_set">(' + load_lang('go') + ')</a>'
 
-                title = load_lang('skin_set')
-                tool = [['change', load_lang('user_setting')], ['change/skin_set/main', load_lang('main_skin_set')]]
-                load_skin_set = ''
-            else:
-                title = load_lang('main_skin_set')
-                tool = [['change', load_lang('user_setting')], ['change/skin_set', load_lang('skin_set')]]
-                load_skin_set = '<script>main_css_skin_set();</script>'
+            title = load_lang('skin_set')
+            tool = [['change', load_lang('user_setting')], ['change/skin_set/main', load_lang('main_skin_set')]]
+            load_skin_set = ''
         
             return easy_minify(flask.render_template(skin_check(),
                 imp = [title, wiki_set(), wiki_custom(), wiki_css([0, 0])],

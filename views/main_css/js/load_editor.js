@@ -34,14 +34,20 @@ function do_insert_data(name, data, monaco_name) {
 }
 
 // 아직 개편이 더 필요함
-function do_paste_image() {
+function do_paste_image(name, monaco_name) {
     window.addEventListener('DOMContentLoaded', function() {
         if(
             document.cookie.match(opennamu_cookie_split_regex('main_css_image_paste')) &&
-            document.cookie.match(opennamu_cookie_split_regex('main_css_image_paste'))[1] === '1'
+            document.cookie.match(opennamu_cookie_split_regex('main_css_image_paste'))[1] === 'use'
         ) {
-            const textarea = document.querySelector("textarea");
-            if (textarea) {
+            let textarea;
+            if(!document.getElementById(monaco_name)) {
+                textarea = document.getElementById(monaco_name);   
+            } else {
+                textarea = document.getElementById(name);   
+            }
+
+            if(textarea) {
                 textarea.addEventListener("paste", pasteListener);
             }
         }
