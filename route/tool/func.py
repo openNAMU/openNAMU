@@ -1085,6 +1085,7 @@ def wiki_css(data):
 def cut_100(data):
     # without_DB
     data = data.replace('<br>', ' ')
+    data = data.replace('\n', ' ')
     data = re.sub(r'<[^<>]+>', ' ', data)
     data = data.replace('\n', ' ')
     data = re.sub(r' {2,}', ' ', data)
