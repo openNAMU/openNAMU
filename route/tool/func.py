@@ -1089,7 +1089,7 @@ def cut_100(data):
     data = re.sub(r'<[^<>]+>', ' ', data)
     data = data.replace('\n', ' ')
     data = re.sub(r' {2,}', ' ', data)
-    data = re.sub(r'(^ | $)', '', data)
+    data = re.sub(r'(^ +| +$)', '', data)
 
     data_len = len(data)
     if data_len > 100:
