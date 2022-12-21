@@ -63,8 +63,7 @@ def user_setting_skin_set_main():
                     html_data.set_cookie(for_b, flask.request.form.get(for_b, set_list[for_b][0][0]))
                 elif ip_or_user(ip) == 0:
                     curs.execute(db_change('select data from user_set where name = ? and id = ?'), [for_b, ip])
-                    db_data = curs.fetchall()
-                    if db_data:
+                    if curs.fetchall():
                         curs.execute(db_change("update user_set set data = ? where name = ? and id = ?"), [
                             flask.request.form.get(for_b, set_list[for_b][0][0]),
                             for_b,

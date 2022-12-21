@@ -1094,6 +1094,7 @@ class class_do_render_namumark:
                 db_data = self.curs.fetchall()
                 if db_data:
                     self.data_backlink += [[self.doc_name, include_name, 'include']]
+                    include_data = db_data[0][0].replace('\r', '')
 
                     # include link func
                     if ip_or_user(self.ip) == 0:
@@ -1106,8 +1107,6 @@ class class_do_render_namumark:
                     include_link = ''
                     if include_set_data == 'use':
                         include_link = '<div><a href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
-
-                    include_data = db_data[0][0].replace('\r', '')
 
                     # parameter replace
                     include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, include_data)

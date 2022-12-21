@@ -719,7 +719,11 @@ def get_default_robots_txt():
 
     return data
 
-def get_user_title_list():
+def get_user_title_list(ip = ''):
+    curs = conn.cursor()
+
+    ip = ip_check() if ip == '' else ip
+
     # default
     user_title = {
         '' : load_lang('default'),
@@ -727,8 +731,12 @@ def get_user_title_list():
     }
     
     # admin
-    if admin_check('all') == 1:
+    if admin_check('all', None, ip) == 1:
         user_title['✅'] = '✅ admin'
+
+    curs.execute(db_change('select name from user_set where id = ? and name = ?'), [ip, 'get_🥚'])
+    if curs.fetchall():
+        user_title['🥚'] = '🥚 easter_egg'
     
     return user_title
 
