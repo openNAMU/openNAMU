@@ -1084,11 +1084,17 @@ def wiki_css(data):
 
 def cut_100(data):
     # without_DB
-    
-    data = data.replace('<pre class="render_content_load" id="render_content_load">', '')
-    data = data.replace('</pre>', ' ' * 100)
-    
-    return data[0 : 100]
+    data = data.replace('<br>', ' ')
+    data = re.sub(r'<[^<>]+>', ' ', data)
+    data = data.replace('\n', ' ')
+    data = re.sub(r' {2,}', ' ', data)
+    data = re.sub(r'(^ | $)', '', data)
+
+    data_len = len(data)
+    if data_len > 100:
+        return data[0:100]
+    else:
+        return data[0:data_len]
 
 def wiki_set(num = 1):
     curs = conn.cursor()
@@ -1307,7 +1313,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
             curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
-                get_class_render[0] = '''
+                get_class_render[0] += '''
                     <style>
                         .opennamu_render_complete {
                             font-size: 14.4px !important;
@@ -1322,7 +1328,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                             font-weight: bold;
                         }
                     </style>
-                ''' + get_class_render[0]
+                '''
 
             if data_type == 'api_view':
                 return [
