@@ -198,12 +198,7 @@ elif what_i_do == '12':
         count_data = 0
 
     curs.execute(db_change('delete from other where name = "count_all_title"'))
-    curs.execute(
-        db_change(
-            'insert into other (name, data) values ("count_all_title", ?)'
-        ),
-        [str(count_data)]
-    )
+    curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", ?, "")'), [str(count_data)])
 elif what_i_do == '14':
     curs.execute(db_change('delete from other where name = "head"'))
 elif what_i_do == '15':

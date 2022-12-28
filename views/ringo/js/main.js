@@ -3,7 +3,8 @@ let ringo_open = 0;
 let ringo_menu_list = [
     'recent_cel',
     'other_cel',
-    'user_cel'
+    'user_cel',
+    'add_cel'
 ];
 
 function ringo_opening(data) {
@@ -41,7 +42,7 @@ document.onclick = function(event) {
         cel_list.push(document.getElementById(ringo_menu_list[for_a]));
     }
 
-    if(ringo_save_data !== '' && ringo_open == 2 && !cel_list.includes(event.path[1])) {
+    if(ringo_save_data !== '' && ringo_open == 2) {
         document.getElementById(ringo_save_data).style.display = 'none';
 
         setTimeout(function() { ringo_open = 0; }, 100);

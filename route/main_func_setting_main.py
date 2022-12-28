@@ -56,7 +56,7 @@ def main_func_setting_main(db_set):
                 curs.execute(db_change('select data from other where name = ?'), [setting_list[i][0]])
                 db_data = curs.fetchall()
                 if not db_data:
-                    curs.execute(db_change('insert into other (name, data) values (?, ?)'), [
+                    curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [
                         setting_list[i][0],
                         setting_list[i][1]
                     ])
