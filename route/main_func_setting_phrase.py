@@ -51,7 +51,7 @@ def main_func_setting_phrase():
                 if sql_d:
                     d_list += [sql_d[0][0]]
                 else:
-                    curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, ''])
+                    curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [i, ''])
 
                     d_list += ['']
 

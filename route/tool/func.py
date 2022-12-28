@@ -305,6 +305,7 @@ class class_check_json:
 
 def get_db_table_list():
     # Init-Create_DB
+    # --이거 개편한다더니 도대체 언제?--
     create_data = {}
 
     # 폐지 예정 (data_set으로 통합)
@@ -342,6 +343,9 @@ def get_db_table_list():
     create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
 
     create_data['user_set'] = ['name', 'id', 'data']
+
+    create_data['bbs_set'] = ['set_name', 'set_code', 'set_id', 'set_data']
+    create_data['bbs_data'] = ['set_name', 'set_code', 'set_id', 'set_data']
     
     return create_data
 
@@ -618,7 +622,13 @@ def update(ver_num, set_data):
                 'Allow: /w/' + \
             ''
             if db_data[0][0] == robot_default:
-                curs.execute(db_change("insert into other (name, data) values ('robot_default', 'on')"))
+                curs.execute(db_change("insert into other (name, data, coverage) values ('robot_default', 'on', '')"))
+
+    if ver_num < 3500355:
+        # other coverage 오류 해결
+        curs.execute(db_change(
+            "update other set coverage = '' where coverage is null"
+        ))
 
     conn.commit()
     
@@ -632,7 +642,7 @@ def set_init_always(ver_num):
     curs = conn.cursor()
 
     curs.execute(db_change('delete from other where name = "ver"'))
-    curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [ver_num])
+    curs.execute(db_change('insert into other (name, data, coverage) values ("ver", ?, "")'), [ver_num])
     
     curs.execute(db_change('delete from alist where name = "owner"'))
     curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
@@ -642,15 +652,15 @@ def set_init_always(ver_num):
 
     curs.execute(db_change('select data from other where name = "key"'))
     if not curs.fetchall():
-        curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [load_random_key()])
+        curs.execute(db_change('insert into other (name, data, coverage) values ("key", ?, "")'), [load_random_key()])
         
     curs.execute(db_change('select data from other where name = "salt_key"'))
     if not curs.fetchall():
-        curs.execute(db_change('insert into other (name, data) values ("salt_key", ?)'), [load_random_key(4)])
+        curs.execute(db_change('insert into other (name, data, coverage) values ("salt_key", ?, "")'), [load_random_key(4)])
 
     curs.execute(db_change('select data from other where name = "count_all_title"'))
     if not curs.fetchall():
-        curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
+        curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", "0", "")'))
         
     curs.execute(db_change('select data from other where name = "wiki_access_password_need"'))
     db_data = curs.fetchall()
@@ -690,9 +700,7 @@ def set_init():
             ['smtp_port', '587'], 
             ['smtp_security', 'starttls']
         ]:
-            curs.execute(db_change(
-                "insert into other (name, data) values (?, ?)"
-            ), [i[0], i[1]])
+            curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, '')"), [i[0], i[1]])
         
     conn.commit()
 
@@ -1134,6 +1142,20 @@ def wiki_set(num = 1):
     head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
 
     data_list += [head_data]
+
+    curs.execute(db_change("select data from other where name = 'top_menu'"))
+    db_data = curs.fetchall()
+    db_data = db_data[0][0] if db_data else ''
+    db_data = db_data.replace('\r', '')
+    if db_data != '':
+        db_data = db_data.split('\n')
+    
+        if len(db_data) % 2 != 0:
+            db_data += ['']
+
+        db_data = [[db_data[for_a], db_data[for_a + 1]] for for_a in range(0, len(db_data), 2)]
+
+    data_list += [db_data]
 
     return data_list
 
