@@ -1934,12 +1934,9 @@ def ip_pas(raw_ip, type_data = 0):
     
     for raw_ip in get_ip:
         change_ip = 0
-        if re.search(r'^Add:', raw_ip):
-            is_this_ip = 1
-            ip = raw_ip
-        else:
-            is_this_ip = ip_or_user(raw_ip)
-            if is_this_ip != 0 and ip_view != '':
+        is_this_ip = ip_or_user(raw_ip)
+        if is_this_ip != 0 and ip_view != '':
+            try:
                 ip = ipaddress.ip_address(raw_ip)
                 if type(ip) == ipaddress.IPv6Address:
                     ip = ip.exploded
@@ -1949,8 +1946,10 @@ def ip_pas(raw_ip, type_data = 0):
                     ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', ip)
                     
                 change_ip = 1
-            else:     
+            except:
                 ip = raw_ip
+        else:     
+            ip = raw_ip
             
         if type_data == 0 and change_ip == 0:
             if is_this_ip == 0:
