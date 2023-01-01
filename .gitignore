@@ -11,6 +11,7 @@ route/tool/set_mark/custom.py
 images
 
 .vscode
+.vs
 goorm.manifest
 .DS_Store
 

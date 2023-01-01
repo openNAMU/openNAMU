@@ -5,9 +5,9 @@ def user_setting():
         curs = conn.cursor()
 
         support_language = ['default'] + get_init_set_list()['language']['list']
+        
         ip = ip_check()
-
-        if ban_check() == 1:
+        if ban_check(ip) == 1:
             return re_error('/ban')
 
         if ip_or_user(ip) == 0:

@@ -33,7 +33,7 @@ def topic_tool_change(topic_num = 1):
 
                 do_add_thread(
                     topic_num,
-                    'change name to ' + sub_d + ' (' + title_d + ')',
+                    load_lang('topic_name_change') + ' : ' + sub_d + ' (' + title_d + ')',
                     '1'
                 )
                 do_reload_recent_thread(

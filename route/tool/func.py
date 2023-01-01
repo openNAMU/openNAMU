@@ -305,6 +305,7 @@ class class_check_json:
 
 def get_db_table_list():
     # Init-Create_DB
+    # --이거 개편한다더니 도대체 언제?--
     create_data = {}
 
     # 폐지 예정 (data_set으로 통합)
@@ -342,6 +343,9 @@ def get_db_table_list():
     create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
 
     create_data['user_set'] = ['name', 'id', 'data']
+
+    create_data['bbs_set'] = ['set_name', 'set_code', 'set_id', 'set_data']
+    create_data['bbs_data'] = ['set_name', 'set_code', 'set_id', 'set_data']
     
     return create_data
 
@@ -618,7 +622,13 @@ def update(ver_num, set_data):
                 'Allow: /w/' + \
             ''
             if db_data[0][0] == robot_default:
-                curs.execute(db_change("insert into other (name, data) values ('robot_default', 'on')"))
+                curs.execute(db_change("insert into other (name, data, coverage) values ('robot_default', 'on', '')"))
+
+    if ver_num < 3500355:
+        # other coverage 오류 해결
+        curs.execute(db_change(
+            "update other set coverage = '' where coverage is null"
+        ))
 
     conn.commit()
     
@@ -632,7 +642,7 @@ def set_init_always(ver_num):
     curs = conn.cursor()
 
     curs.execute(db_change('delete from other where name = "ver"'))
-    curs.execute(db_change('insert into other (name, data) values ("ver", ?)'), [ver_num])
+    curs.execute(db_change('insert into other (name, data, coverage) values ("ver", ?, "")'), [ver_num])
     
     curs.execute(db_change('delete from alist where name = "owner"'))
     curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
@@ -642,15 +652,15 @@ def set_init_always(ver_num):
 
     curs.execute(db_change('select data from other where name = "key"'))
     if not curs.fetchall():
-        curs.execute(db_change('insert into other (name, data) values ("key", ?)'), [load_random_key()])
+        curs.execute(db_change('insert into other (name, data, coverage) values ("key", ?, "")'), [load_random_key()])
         
     curs.execute(db_change('select data from other where name = "salt_key"'))
     if not curs.fetchall():
-        curs.execute(db_change('insert into other (name, data) values ("salt_key", ?)'), [load_random_key(4)])
+        curs.execute(db_change('insert into other (name, data, coverage) values ("salt_key", ?, "")'), [load_random_key(4)])
 
     curs.execute(db_change('select data from other where name = "count_all_title"'))
     if not curs.fetchall():
-        curs.execute(db_change('insert into other (name, data) values ("count_all_title", "0")'))
+        curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", "0", "")'))
         
     curs.execute(db_change('select data from other where name = "wiki_access_password_need"'))
     db_data = curs.fetchall()
@@ -690,9 +700,7 @@ def set_init():
             ['smtp_port', '587'], 
             ['smtp_security', 'starttls']
         ]:
-            curs.execute(db_change(
-                "insert into other (name, data) values (?, ?)"
-            ), [i[0], i[1]])
+            curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, '')"), [i[0], i[1]])
         
     conn.commit()
 
@@ -719,7 +727,11 @@ def get_default_robots_txt():
 
     return data
 
-def get_user_title_list():
+def get_user_title_list(ip = ''):
+    curs = conn.cursor()
+
+    ip = ip_check() if ip == '' else ip
+
     # default
     user_title = {
         '' : load_lang('default'),
@@ -727,8 +739,12 @@ def get_user_title_list():
     }
     
     # admin
-    if admin_check('all') == 1:
+    if admin_check('all', None, ip) == 1:
         user_title['✅'] = '✅ admin'
+
+    curs.execute(db_change('select name from user_set where id = ? and name = ?'), [ip, 'get_🥚'])
+    if curs.fetchall():
+        user_title['🥚'] = '🥚 easter_egg'
     
     return user_title
 
@@ -1041,7 +1057,7 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '171'
+    data_css_ver = '172'
     
     # Func JS + Defer
     data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
@@ -1054,14 +1070,11 @@ def wiki_css(data):
     data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script defer src="/views/main_css/js/func/shortcut.js?ver=' + data_css_ver + '"></script>'
     
-    data_css += '<script defer src="/views/main_css/js/func/render_simple.js?ver=' + data_css_ver + '"></script>'
-    
     # Route JS + Defer
     data_css += '<script defer src="/views/main_css/js/route/thread.js?ver=' + data_css_ver + '"></script>'
     
     # 레거시 일반 JS
     data_css += '<script src="/views/main_css/js/load_editor.js?ver=' + data_css_ver + '"></script>'
-    data_css += '<script src="/views/main_css/js/load_skin_set.js?ver=' + data_css_ver + '"></script>'
     
     # Main CSS
     data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css?ver=' + data_css_ver + '">'
@@ -1079,11 +1092,19 @@ def wiki_css(data):
 
 def cut_100(data):
     # without_DB
-    
-    data = data.replace('<pre class="render_content_load" id="render_content_load">', '')
-    data = data.replace('</pre>', ' ' * 100)
-    
-    return data[0 : 100]
+    data = data.replace('<br>', ' ')
+    data = data.replace('\r', '') 
+    data = data.replace('\n', ' ')
+    data = re.sub(r'<[^<>]+>', ' ', data)
+    data = data.replace('\n', ' ')
+    data = re.sub(r' {2,}', ' ', data)
+    data = re.sub(r'(^ +| +$)', '', data)
+
+    data_len = len(data)
+    if data_len > 100:
+        return data[0:100]
+    else:
+        return data[0:data_len]
 
 def wiki_set(num = 1):
     curs = conn.cursor()
@@ -1121,6 +1142,20 @@ def wiki_set(num = 1):
     head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
 
     data_list += [head_data]
+
+    curs.execute(db_change("select data from other where name = 'top_menu'"))
+    db_data = curs.fetchall()
+    db_data = db_data[0][0] if db_data else ''
+    db_data = db_data.replace('\r', '')
+    if db_data != '':
+        db_data = db_data.split('\n')
+    
+        if len(db_data) % 2 != 0:
+            db_data += ['']
+
+        db_data = [[db_data[for_a], db_data[for_a + 1]] for for_a in range(0, len(db_data), 2)]
+
+    data_list += [db_data]
 
     return data_list
 
@@ -1302,7 +1337,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
             curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
-                get_class_render[0] = '''
+                get_class_render[0] += '''
                     <style>
                         .opennamu_render_complete {
                             font-size: 14.4px !important;
@@ -1317,7 +1352,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                             font-weight: bold;
                         }
                     </style>
-                ''' + get_class_render[0]
+                '''
 
             if data_type == 'api_view':
                 return [
@@ -1380,7 +1415,7 @@ def render_simple_set(data):
         if footnote_count != 1:
             footnote_data += '<br>'
     
-        footnote_data += '<a id="fn_' + footnote_count_str + '" href="#rfn_' + footnote_count_str + '">(' + footnote_count_str + ')</a> ' + footnote_search
+        footnote_data += '<a id="fn-' + footnote_count_str + '" href="#rfn-' + footnote_count_str + '">(' + footnote_count_str + ')</a> ' + footnote_search
         data = re.sub(footnote_regex, '<sup id="rfn-' + footnote_count_str + '"><a href="#fn-' + footnote_count_str + '">(' + footnote_count_str + ')</a></sup>', data, 1)
         
         footnote_count += 1
@@ -1527,20 +1562,6 @@ def captcha_post(re_data, num = 1):
         return 0
 
 # Func-user
-def ip_or_user(data = ''):
-    # without_DB
-
-    # 1 == ip
-    # 0 == reg
-    
-    if data == '':
-        data = ip_check()
-
-    if re.search(r'(\.|:)', data):
-        return 1
-    else:
-        return 0
-
 def admin_check(num = None, what = None, name = ''):
     curs = conn.cursor()
 
@@ -1913,12 +1934,9 @@ def ip_pas(raw_ip, type_data = 0):
     
     for raw_ip in get_ip:
         change_ip = 0
-        if re.search(r'^Add:', raw_ip):
-            is_this_ip = 1
-            ip = raw_ip
-        else:
-            is_this_ip = ip_or_user(raw_ip)
-            if is_this_ip != 0 and ip_view != '':
+        is_this_ip = ip_or_user(raw_ip)
+        if is_this_ip != 0 and ip_view != '':
+            try:
                 ip = ipaddress.ip_address(raw_ip)
                 if type(ip) == ipaddress.IPv6Address:
                     ip = ip.exploded
@@ -1928,8 +1946,10 @@ def ip_pas(raw_ip, type_data = 0):
                     ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', ip)
                     
                 change_ip = 1
-            else:     
+            except:
                 ip = raw_ip
+        else:     
+            ip = raw_ip
             
         if type_data == 0 and change_ip == 0:
             if is_this_ip == 0:
@@ -2451,17 +2471,12 @@ def re_error(data):
             data = '???'
 
         if num == 5:
-            if not flask.request.path in ('/main_skin_set', '/change/skin_set/main'):
-                if flask.request.path != '/skin_set':
-                    data += '<br>' + load_lang('error_skin_set_old') + ' <a href="/skin_set">(' + load_lang('go') + ')</a>'
+            if flask.request.path != '/skin_set':
+                data += '<br>' + load_lang('error_skin_set_old') + ' <a href="/skin_set">(' + load_lang('go') + ')</a>'
 
-                title = load_lang('skin_set')
-                tool = [['change', load_lang('user_setting')], ['change/skin_set/main', load_lang('main_skin_set')]]
-                load_skin_set = ''
-            else:
-                title = load_lang('main_skin_set')
-                tool = [['change', load_lang('user_setting')], ['change/skin_set', load_lang('skin_set')]]
-                load_skin_set = '<script>main_css_skin_set();</script>'
+            title = load_lang('skin_set')
+            tool = [['change', load_lang('user_setting')], ['change/skin_set/main', load_lang('main_skin_set')]]
+            load_skin_set = ''
         
             return easy_minify(flask.render_template(skin_check(),
                 imp = [title, wiki_set(), wiki_custom(), wiki_css([0, 0])],

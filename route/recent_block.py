@@ -115,8 +115,6 @@ def recent_block_2(name, tool):
 
             if data[2] == '':
                 admin = ''
-            elif re.search(r'^tool:', data[2]):
-                admin = data[2]
             else:
                 admin = all_ip[data[2]]
 

@@ -40,7 +40,7 @@ def main_func_setting_acl():
                 if sql_d:
                     d_list[i] = sql_d[0][0]
                 else:
-                    curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i_list[i], 'normal'])
+                    curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [i_list[i], 'normal'])
 
                     d_list[i] = 'normal'
 

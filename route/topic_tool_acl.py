@@ -45,7 +45,7 @@ def topic_tool_acl(topic_num = 1):
 
                 do_add_thread(
                     topic_num,
-                    'acl change ' + acl_data,
+                    load_lang('acl_thread_change') + ' : ' + acl_data,
                     '1'
                 )
                 do_reload_recent_thread(
