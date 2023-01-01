@@ -26,11 +26,7 @@ def main_func_setting_head(num, skin_name = '', set_preview = 0):
 
             curs.execute(db_change("select name from other where name = ? and coverage = ?"), [info_d, coverage])
             if curs.fetchall():
-                curs.execute(db_change("update other set data = ? where name = ? and coverage = ?"), [
-                    flask.request.form.get('content', ''),
-                    info_d,
-                    coverage
-                ])
+                curs.execute(db_change("update other set data = ? where name = ? and coverage = ?"), [flask.request.form.get('content', ''), info_d, coverage])
             else:
                 curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, ?)"), [info_d, flask.request.form.get('content', ''), coverage])
 

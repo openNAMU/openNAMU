@@ -25,12 +25,12 @@ def main_func_setting_robot():
             if db_data:
                 curs.execute(db_change("update other set data = ? where name = 'robot'"), [flask.request.form.get('content', '')])
             else:
-                curs.execute(db_change("insert into other (name, data) values ('robot', ?)"), [flask.request.form.get('content', '')])
+                curs.execute(db_change("insert into other (name, data, coverage) values ('robot', ?, '')"), [flask.request.form.get('content', '')])
 
             if db_data_2:
                 curs.execute(db_change("update other set data = ? where name = 'robot_default'"), [flask.request.form.get('default', '')])
             else:
-                curs.execute(db_change("insert into other (name, data) values ('robot_default', ?)"), [flask.request.form.get('default', '')])
+                curs.execute(db_change("insert into other (name, data, coverage) values ('robot_default', ?, '')"), [flask.request.form.get('default', '')])
 
             conn.commit()
 
