@@ -493,5 +493,6 @@
     "top_menu_setting": "추가 메뉴 설정",
     "enter_top_menu_setting": "윗 줄에는 이름을 쓰고 아랫 줄에는 URL을 입력하세요.",
     "not_support_skin_warning": "이 기능을 미지원하는 스킨에서는 작동하지 않습니다.",
-    "acl_thread_change": "스레드 ACL 변경"
+    "acl_thread_change": "스레드 ACL 변경",
+    "new_application": "새로운 가입 신청이 있습니다."
 }

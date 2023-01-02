@@ -260,7 +260,7 @@ with get_db_connect() as conn:
 if os.path.exists('custom.py'):
     from custom import custom_run
     custom_run('error', app)
-    
+
 # Func
 # Func-inter_wiki
 app.route('/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(filter_inter_wiki)
