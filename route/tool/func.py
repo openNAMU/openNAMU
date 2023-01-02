@@ -707,7 +707,7 @@ def set_init():
 # Func-simple
 ## Func-simple-without_DB
 def get_default_admin_group():
-    return ['owner', 'ban']
+    return ['owner', 'user', 'ban']
 
 def get_default_robots_txt():
     data = '' + \
@@ -1562,6 +1562,54 @@ def captcha_post(re_data, num = 1):
         return 0
 
 # Func-user
+def get_admin_auth_list(num = None):
+    check = {
+        0 : 'owner',
+        1 : 'ban',
+        2 : 'nothing',
+        3 : 'toron',
+        4 : 'check',
+        5 : 'acl',
+        6 : 'hidel',
+        7 : 'give'
+    }
+    if not num:
+        check = check[0]
+    elif num == 'all':
+        check = [check[i] for i in check]
+    else:
+        check = check[num]
+        
+    return check
+
+def get_admin_list(num = None):
+    curs = conn.cursor()
+    
+    if num == 'all':
+        curs.execute(db_change(
+            "select data from user_set where data != 'user' and name = 'acl'"
+        ))
+        db_data = curs.fetchall()
+        db_data = [db_data_in[0] for db_data_in in db_data] if db_data else []
+        
+        return db_data
+    else:
+        check = get_admin_auth_list(num)
+        admin_list = []
+        
+        curs.execute(db_change(
+            'select name from alist where acl = ?'
+        ), [check])
+        db_data = curs.fetchall()
+        for db_data_in in db_data:
+            curs.execute(db_change(
+                "select id from user_set where data = ? and name = 'acl'"
+            ), [db_data_in[0]])
+            db_data_2 = curs.fetchall()
+            admin_list += [db_data_2_in[0] for db_data_2_in in db_data_2] if db_data_2 else []
+            
+        return admin_list
+
 def admin_check(num = None, what = None, name = ''):
     curs = conn.cursor()
 
@@ -1576,24 +1624,8 @@ def admin_check(num = None, what = None, name = ''):
         user_auth = curs.fetchall()
         if user_auth:
             user_auth = user_auth[0][0]
+            check = get_admin_auth_list(num)
             
-            check = {
-                0 : 'owner',
-                1 : 'ban',
-                2 : 'nothing',
-                3 : 'toron',
-                4 : 'check',
-                5 : 'acl',
-                6 : 'hidel',
-                7 : 'give'
-            }
-            if not num:
-                check = check[0]
-            elif num == 'all':
-                check = [check[i] for i in check]
-            else:
-                check = check[num]
-
             curs.execute(db_change(
                 'select name from alist where name = ? and acl = "owner"'
             ), [user_auth])
