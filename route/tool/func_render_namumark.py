@@ -550,15 +550,17 @@ class class_do_render_namumark:
                 if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', match[1]):
                     try:
                         date = datetime.datetime.strptime(match[1], '%Y-%m-%d')
+                        data_text = ''
                     except:
                         data_text = 'invalid date'
 
                     date_now = datetime.datetime.today()
 
-                    if date > date_now:
-                        data_text = 'invalid date'
-                    else:
-                        data_text = str((date_now - date).days // 365)
+                    if data_text == '':
+                        if date > date_now:
+                            data_text = 'invalid date'
+                        else:
+                            data_text = str((date_now - date).days // 365)
                 else:
                     data_text = 'invalid date'
 
@@ -569,19 +571,21 @@ class class_do_render_namumark:
                 if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', match[1]):
                     try:
                         date = datetime.datetime.strptime(match[1], '%Y-%m-%d')
+                        data_text = ''
                     except:
                         data_text = 'invalid date'
 
                     date_now = datetime.datetime.today()
                     
-                    date_end = (date_now - date).days
-                    if date_end > 0:
-                        data_text = '+' + str(date_end)
-                    else:
-                        if date_end == 0:
-                            data_text = '-' + str(date_end)
+                    if data_text == '':
+                        date_end = (date_now - date).days
+                        if date_end > 0:
+                            data_text = '+' + str(date_end)
                         else:
-                            data_text = str(date_end)
+                            if date_end == 0:
+                                data_text = '-' + str(date_end)
+                            else:
+                                data_text = str(date_end)
                 else:
                     data_text = 'invalid date'
 
