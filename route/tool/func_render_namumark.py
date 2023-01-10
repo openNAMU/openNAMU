@@ -1780,9 +1780,32 @@ class class_do_render_namumark:
         self.render_data = self.get_tool_data_restore(self.render_data)
 
         # a fix
-        # def do_render_last_a_link(match):
-
-
+        self.temp_a_link_count = 0
+        def do_render_last_a_link(match):
+            data = match.group(1)
+            if data == '</a>':
+                if self.temp_a_link_count == 0:
+                    return ''
+                elif self.temp_a_link_count > 1:
+                    self.temp_a_link_count -= 1
+                    
+                    return ''
+                else:
+                    self.temp_a_link_count -= 1
+                    
+                    return match.group(0)
+            else:
+                if self.temp_a_link_count > 0:
+                    self.temp_a_link_count += 1
+                    
+                    return ''
+                else:
+                    self.temp_a_link_count += 1
+                    
+                    return match.group(0)
+            
+        self.render_data = re.sub(r'(<a(?: [^<>]*)?>|<\/a>)', do_render_last_a_link, self.render_data)
+        
         # add toc
         def do_render_last_toc(match):
             data = match.group(1)
