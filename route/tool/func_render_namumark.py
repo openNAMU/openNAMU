@@ -1763,7 +1763,7 @@ class class_do_render_namumark:
                         self.render_data += '<hr><' + data_name + '></' + data_name + '>'
                 else:
                     self.render_data = re.sub(r'<footnote_category>', '', self.render_data, 1)
-                    self.render_data = '<' + data_name + '></' + data_name + '><hr>' + self.render_data
+                    self.render_data = '<' + data_name + '></' + data_name + '><hr class="main_hr">' + self.render_data
             else:
                 self.render_data = re.sub(r'<footnote_category>', '', self.render_data, 1)
         else:
