@@ -26,14 +26,8 @@ def user_count(name = None):
         date = get_time()
         date = date.split()
         date = date[0]
-            
-        curs.execute(db_change("select count(*) from history where date like ? and ip = ?"), [date + '%', that])
-        count = curs.fetchall()
-        if count:
-            data_today = count[0][0]
-        else:
-            data_today = 0
-            
+        
+        data_today = 0
         data_today_len = 0
             
         curs.execute(db_change("select leng from history where date like ? and ip = ?"), [date + '%', that])
@@ -44,24 +38,24 @@ def user_count(name = None):
             count_data = count_data.replace('-', '')
 
             data_today_len += int(count_data)
+            data_today += 1
 
         date_yesterday = str((
             datetime.datetime.today() + datetime.timedelta(days = -1)
         ).strftime("%Y-%m-%d"))
-
-        curs.execute(db_change("select count(*) from history where date like ? and ip = ?"), [date_yesterday + '%', that])
-        count = curs.fetchall()
-        if count:
-            data_yesterday = count[0][0]
-        else:
-            data_yesterday = 0
-            
+        
+        data_yesterday = 0
         data_yesterday_len = 0
             
         curs.execute(db_change("select leng from history where date like ? and ip = ?"), [date_yesterday + '%', that])
         db_data = curs.fetchall()
         for count in db_data:
-            data_yesterday_len += int(count[0][1:])
+            count_data = count[0]
+            count_data = count_data.replace('+', '')
+            count_data = count_data.replace('-', '')
+
+            data_yesterday_len += int(count_data)
+            data_yesterday += 1
 
         # 한글 지원 필요
         return easy_minify(flask.render_template(skin_check(),
