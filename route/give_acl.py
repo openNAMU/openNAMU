@@ -82,7 +82,7 @@ def give_acl_2(name):
 
             for i in acl_get_list:
                 data += '' + \
-                    '<h' + i[2] + '>' + i[3] + ' ' + i[0] + (' (' + load_lang('beta') + ')' if i[2] == '4' else '') + '</h' + i[2] + '>' + \
+                    '<h' + i[2] + '>' + i[0] + (' (' + load_lang('beta') + ')' if i[2] == '4' else '') + '</h' + i[2] + '>' + \
                     '<hr class="main_hr">' + \
                     '<select name="' + i[1] + '" ' + check_ok + '>' + \
                 ''
@@ -100,12 +100,14 @@ def give_acl_2(name):
             acl_data = curs.fetchall()
             acl_why = html.escape(acl_data[0][0]) if acl_data else ''
             data += '' + \
-                '<hr class="main_hr">' + \
+                '<h2>' + load_lang('why') + '</h2>' + \
                 '<input value="' + acl_why + '" placeholder="' + load_lang('why') + '" name="why" ' + check_ok + '>' + \
+                '<hr class="main_hr">' + \
             ''
 
             data += '''
-                <h2 id="exp">''' + load_lang('explanation') + '''</h2>
+                <h2>''' + load_lang('explanation') + '''</h2>
+                <span id="exp"></span>
                 <ul class="opennamu_ul">
                     <li>normal : ''' + load_lang('unset') + '''</li>
                     <li>admin : ''' + load_lang('admin_acl') + '''</li>
@@ -127,7 +129,8 @@ def give_acl_2(name):
                 data = '''
                     <form method="post">
                         <a href="/setting/acl">(''' + load_lang('main_acl_setting') + ''')</a>
-                        ''' + data + '''
+                        <hr class="main_hr">
+                        ''' + render_simple_set(data) + '''
                         <button type="submit" ''' + check_ok + '''>''' + load_lang('save') + '''</button>
                     </form>
                 ''',
