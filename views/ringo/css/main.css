@@ -317,6 +317,10 @@ footer.only_mobile {
     margin-top: 0px;
 }
 
+#b_logo {
+    width: 100px;
+}
+
 input, textarea, button, select {
     border: 1px solid #aaa;
     
