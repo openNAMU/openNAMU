@@ -42,6 +42,9 @@ def login_register_submit_2():
                 json.dumps(user_app_data)
             ])
             conn.commit()
+            
+            for for_a in get_admin_list():
+                add_alarm(for_a, flask.session['submit_id'] + ' | <a href="/app_submit">' + load_lang('new_application') + '</a>')
 
             return redirect('/')
         else:

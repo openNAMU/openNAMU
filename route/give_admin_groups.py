@@ -9,9 +9,8 @@ def give_admin_groups_2(name):
         if flask.request.method == 'POST':
             if admin_check(None, 'admin_plus (' + name + ')') != 1:
                 return re_error('/error/3')
-            else:
-                if name in ['owner', 'ban']:
-                    return re_error('/error/3')
+            elif name in get_default_admin_group():
+                return re_error('/error/3')
 
             curs.execute(db_change("delete from alist where name = ?"), [name])
             for i in acl_name_list:
@@ -52,13 +51,13 @@ def give_admin_groups_2(name):
                         <hr class="main_hr">
                         <h2>''' + load_lang('explanation') + '''</h2>
                         <ul class="opennamu_ul">
-                            <li>ban : ''' + load_lang('ban_authority') + '''</li>
-                            <li>toron : ''' + load_lang('discussion_authority') + '''</li>
-                            <li>check : ''' + load_lang('user_check_authority') + '''</li>
-                            <li>acl : ''' + load_lang('document_acl_authority') + '''</li>
-                            <li>hidel : ''' + load_lang('history_hide_authority') + '''</li>
-                            <li>give : ''' + load_lang('authorization_authority') + '''</li>
-                            <li>owner : ''' + load_lang('owner_authority') + '''</li>
+                            <li style="margin-left: 20px;">owner : ''' + load_lang('owner_authority') + '''</li>
+                            <li style="margin-left: 40px; list-style: circle;">ban : ''' + load_lang('ban_authority') + '''</li>
+                            <li style="margin-left: 40px; list-style: circle;">toron : ''' + load_lang('discussion_authority') + '''</li>
+                            <li style="margin-left: 40px; list-style: circle;">check : ''' + load_lang('user_check_authority') + '''</li>
+                            <li style="margin-left: 40px; list-style: circle;">acl : ''' + load_lang('document_acl_authority') + '''</li>
+                            <li style="margin-left: 40px; list-style: circle;">hidel : ''' + load_lang('history_hide_authority') + '''</li>
+                            <li style="margin-left: 40px; list-style: circle;">give : ''' + load_lang('authorization_authority') + '''</li>
                         </ul>
                         <hr class="main_hr">
                         <button ''' + state +  ''' type="submit">''' + load_lang('save') + '''</button>

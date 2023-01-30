@@ -24,7 +24,7 @@ def user_setting_skin_set_main():
                 ['normal', load_lang('default')],
                 ['use', load_lang('use')]
             ], 'main_css_category_set' : [
-                ['bottom', load_lang('bottom')],
+                ['bottom', load_lang('default')],
                 ['top', load_lang('top')]
             ], 'main_css_footnote_set' : [
                 ['normal', load_lang('default')],
@@ -107,59 +107,59 @@ def user_setting_skin_set_main():
                 imp = [load_lang('main_skin_set'), wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('beta') + ')', 0])],
                 data = render_simple_set('''
                     <form method="post">
-                        <h2>render</h2>
-                        <h3>strike</h3>
+                        <h2>''' + load_lang("render") + '''</h2>
+                        <h3>''' + load_lang("strike") + '''</h3>
                         <select name="main_css_strike">
                             ''' + set_data["main_css_strike"] + '''
                         </select>
-                        <h3>bold</h3>
+                        <h3>''' + load_lang("bold") + '''</h3>
                         <select name="main_css_bold">
                             ''' + set_data["main_css_bold"] + '''
                         </select>
-                        <h3>category</h3>
+                        <h3>''' + load_lang("category") + '''</h3>
                         <select name="main_css_category_set">
                             ''' + set_data["main_css_category_set"] + '''
                         </select>
-                        <h3>footnote</h3>
+                        <h3>''' + load_lang("footnote") + '''</h3>
                         <select name="main_css_footnote_set">
                             ''' + set_data["main_css_footnote_set"] + '''
                         </select>
-                        <h3>include link</h3>
+                        <h3>''' + load_lang("include_link") + '''</h3>
                         <select name="main_css_include_link">
                             ''' + set_data["main_css_include_link"] + '''
                         </select>
-                        <h3>image</h3>
+                        <h3>''' + load_lang("image") + ''' (''' + load_lang("not_working") + ''')</h3>
                         <select name="main_css_image_set">
                             ''' + set_data["main_css_image_set"] + '''
                         </select>
-                        <h3>toc</h3>
+                        <h3>''' + load_lang("toc") + '''</h3>
                         <select name="main_css_toc_set">
                             ''' + set_data["main_css_toc_set"] + '''
                         </select>
-                        <h3>exter link</h3>
+                        <h3>''' + load_lang("exter_link") + '''</h3>
                         <select name="main_css_exter_link">
                             ''' + set_data["main_css_exter_link"] + '''
                         </select>
-                        <h3>link delimiter</h3>
+                        <h3>''' + load_lang("link_delimiter") + '''</h3>
                         <select name="main_css_link_delimiter">
                             ''' + set_data["main_css_link_delimiter"] + '''
                         </select>
-                        <h3>force darkmode</h3>
+                        <h3>''' + load_lang("force_darkmode") + '''</h3>
                         <select name="main_css_darkmode">
                             ''' + set_data["main_css_darkmode"] + '''
                         </select>
-                        <h3>font size</h3>
+                        <h3>''' + load_lang("font_size") + '''</h3>
                         (EX : 11) (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input id="main_css_font_size" value="''' + set_data["main_css_font_size"] + '''">
-                        <h2>editor</h2>
-                        <h3>image paste</h3>
+                        <h2>''' + load_lang("editor") + '''</h2>
+                        <h3>''' + load_lang("image_paste") + '''</h3>
                         <sup>''' + load_lang('only_korean') + '''</sup> <sup>''' + load_lang('unavailable_in_monaco') + '''</sup>
                         <hr class="main_hr">
                         <select name="main_css_image_paste">
                             ''' + set_data["main_css_image_paste"] + '''
                         </select>
-                        <h3>monaco</h3>
+                        <h3>''' + load_lang("monaco_editor") + '''</h3>
                         <select name="main_css_monaco">
                             ''' + set_data["main_css_monaco"] + '''
                         </select>

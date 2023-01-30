@@ -46,9 +46,9 @@ td {
 summary {
     cursor: pointer;
     user-select: none;
-	
-	display: list-item;
-	list-style: inside disclosure-closed;
+    
+    display: list-item;
+    list-style: inside disclosure-closed;
 }
     
 /* list */
@@ -283,10 +283,10 @@ s:hover, strike:hover, del:hover {
 /* 기타 */
 .main_hr {
     border: none;
-	
+    
     padding-top: 6px;
     padding-bottom: 6px;
-	
+    
     margin: 0;
 }
 

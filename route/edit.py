@@ -209,7 +209,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                     data_preview = render_set(
                         doc_name = name, 
                         doc_data = data,
-                        data_in = ''
+                        data_in = 'from'
                     )
 
             if data_section == '':
