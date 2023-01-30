@@ -550,15 +550,17 @@ class class_do_render_namumark:
                 if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', match[1]):
                     try:
                         date = datetime.datetime.strptime(match[1], '%Y-%m-%d')
+                        data_text = ''
                     except:
                         data_text = 'invalid date'
 
                     date_now = datetime.datetime.today()
 
-                    if date > date_now:
-                        data_text = 'invalid date'
-                    else:
-                        data_text = str((date_now - date).days // 365)
+                    if data_text == '':
+                        if date > date_now:
+                            data_text = 'invalid date'
+                        else:
+                            data_text = str((date_now - date).days // 365)
                 else:
                     data_text = 'invalid date'
 
@@ -569,19 +571,21 @@ class class_do_render_namumark:
                 if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', match[1]):
                     try:
                         date = datetime.datetime.strptime(match[1], '%Y-%m-%d')
+                        data_text = ''
                     except:
                         data_text = 'invalid date'
 
                     date_now = datetime.datetime.today()
                     
-                    date_end = (date_now - date).days
-                    if date_end > 0:
-                        data_text = '+' + str(date_end)
-                    else:
-                        if date_end == 0:
-                            data_text = '-' + str(date_end)
+                    if data_text == '':
+                        date_end = (date_now - date).days
+                        if date_end > 0:
+                            data_text = '+' + str(date_end)
                         else:
-                            data_text = str(date_end)
+                            if date_end == 0:
+                                data_text = '-' + str(date_end)
+                            else:
+                                data_text = str(date_end)
                 else:
                     data_text = 'invalid date'
 
@@ -618,7 +622,12 @@ class class_do_render_namumark:
             elif match in ('목차', 'toc', 'tableofcontents'):
                 return '<toc_need_part>'
             elif match == 'pagecount':
-                return '0'
+                self.curs.execute(db_change('select data from other where name = "count_all_title"'))
+                db_data = self.curs.fetchall()
+                if db_data:
+                    return db_data[0][0]
+                else:
+                    return '0'
             else:
                 return '<macro>' + match_org.group(1) + '</macro>'
 
@@ -768,14 +777,7 @@ class class_do_render_namumark:
                     if file_bgcolor != '':
                         file_bgcolor = 'background:' + self.get_tool_css_safe(file_bgcolor) + ';'
 
-                    if file_out == 0:
-                        file_onclick = 'onclick="javascript:document.location.pathname=\'/w/file:' + url_pas(link_main_org) + '.' + url_pas(link_extension) + '\'"'
-                        file_style = 'cursor: pointer;'
-                    else:
-                        file_onclick = ''
-                        file_style = ''
-
-                    file_end = '<img ' + file_onclick + ' style="' + file_width + file_height + file_align_style + file_bgcolor + file_style + '" alt="' + link_sub + '" src="' + link_main + '">'
+                    file_end = '<img style="' + file_width + file_height + file_align_style + file_bgcolor + '" alt="' + link_sub + '" src="' + link_main + '">'
                     if file_align == 'center':
                         file_end = '<div style="text-align:center;">' + file_end + '</div>'
 
@@ -793,7 +795,10 @@ class class_do_render_namumark:
                             file_pass = 1
 
                         if file_pass == 1:
-                            data_name = self.get_tool_data_storage(file_end, '', link_data_full)
+                            if file_out == 0:
+                                data_name = self.get_tool_data_storage('<a title="' + link_sub + '" href="/w/file:' + url_pas(link_main_org) + '.' + url_pas(link_extension) + '">' + file_end, '</a>', link_data_full)
+                            else:
+                                data_name = self.get_tool_data_storage('<a title="' + link_sub + '" href="' + link_main + '">' + file_end, '</a>', link_data_full)
                         else:
                             data_name = self.get_tool_data_storage('', '', link_data_full)
                         
@@ -1763,7 +1768,7 @@ class class_do_render_namumark:
                         self.render_data += '<hr><' + data_name + '></' + data_name + '>'
                 else:
                     self.render_data = re.sub(r'<footnote_category>', '', self.render_data, 1)
-                    self.render_data = '<' + data_name + '></' + data_name + '><hr>' + self.render_data
+                    self.render_data = '<' + data_name + '></' + data_name + '><hr class="main_hr">' + self.render_data
             else:
                 self.render_data = re.sub(r'<footnote_category>', '', self.render_data, 1)
         else:
@@ -1779,6 +1784,33 @@ class class_do_render_namumark:
         # <render_n> restore
         self.render_data = self.get_tool_data_restore(self.render_data)
 
+        # a fix
+        self.temp_a_link_count = 0
+        def do_render_last_a_link(match):
+            data = match.group(1)
+            if data == '</a>':
+                if self.temp_a_link_count == 0:
+                    return ''
+                elif self.temp_a_link_count > 1:
+                    self.temp_a_link_count -= 1
+                    
+                    return ''
+                else:
+                    self.temp_a_link_count -= 1
+                    
+                    return match.group(0)
+            else:
+                if self.temp_a_link_count > 0:
+                    self.temp_a_link_count += 1
+                    
+                    return ''
+                else:
+                    self.temp_a_link_count += 1
+                    
+                    return match.group(0)
+            
+        self.render_data = re.sub(r'(<a(?: [^<>]*)?>|<\/a>)', do_render_last_a_link, self.render_data)
+        
         # add toc
         def do_render_last_toc(match):
             data = match.group(1)

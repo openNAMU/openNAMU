@@ -260,7 +260,7 @@ with get_db_connect() as conn:
 if os.path.exists('custom.py'):
     from custom import custom_run
     custom_run('error', app)
-    
+
 # Func
 # Func-inter_wiki
 app.route('/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(filter_inter_wiki)
@@ -495,6 +495,7 @@ app.route('/change/head', methods=['GET', 'POST'], defaults = { 'skin_name' : ''
 app.route('/change/head/<skin_name>', methods=['GET', 'POST'])(user_setting_head)
 app.route('/change/head_reset', methods=['GET', 'POST'])(user_setting_head_reset)
 app.route('/change/skin_set')(user_setting_skin_set)
+app.route('/change/top_menu', methods=['GET', 'POST'])(user_setting_top_menu)
 # 하위 호환용 S
 app.route('/skin_set')(user_setting_skin_set)
 # 하위 호환용 E
