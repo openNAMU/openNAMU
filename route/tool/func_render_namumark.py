@@ -625,9 +625,9 @@ class class_do_render_namumark:
                 self.curs.execute(db_change('select data from other where name = "count_all_title"'))
                 db_data = self.curs.fetchall()
                 if db_data:
-                	return db_data[0][0]
+                    return db_data[0][0]
                 else:
-                	return '0'
+                    return '0'
             else:
                 return '<macro>' + match_org.group(1) + '</macro>'
 

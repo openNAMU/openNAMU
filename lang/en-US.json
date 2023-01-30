@@ -177,7 +177,7 @@
         "password_change" : "Change password",
         "email_change" : "Change email",
         "acl_change" : "Change document ACL",
-		"acl_thread_change" : "Change thread ACL",
+        "acl_thread_change" : "Change thread ACL",
         "user_tool" : "Users tools",
         "skin_info" : "Skin information",
         "closed_discussion" : "Closed discussions",
