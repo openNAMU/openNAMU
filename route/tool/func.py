@@ -2303,6 +2303,7 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
 
 def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
     curs = conn.cursor()
+    # 여기 좀 느린 듯
     
     curs.execute(db_change('select data from other where name = "history_recording_off"'))
     db_data = curs.fetchall()
