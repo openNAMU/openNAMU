@@ -134,7 +134,7 @@ with get_db_connect() as conn:
                 if db_pass == 0:
                     raise
         try:
-            curs.execute(db_change("create index history_index on history (title)"))
+            curs.execute(db_change("create index history_index on history (title, ip)"))
         except:
             pass
 
