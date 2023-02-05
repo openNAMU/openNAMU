@@ -630,6 +630,10 @@ def update(ver_num, set_data):
             "update other set coverage = '' where coverage is null"
         ))
 
+    if ver_num < 3500358:
+        curs.execute(db_change("drop index history_index"))
+        curs.execute(db_change("create index history_index on history (title, ip)"))
+
     conn.commit()
     
     # 아이피 상태인 이메일 제거 예정
