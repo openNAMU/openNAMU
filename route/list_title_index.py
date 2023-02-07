@@ -30,12 +30,7 @@ def list_title_index_2():
             curs.execute(db_change('select data from other where name = "count_all_title"'))
             all_title = curs.fetchall()
             if int(all_title[0][0]) < 30000:
-                curs.execute(db_change("select count(*) from data"))
-                count = curs.fetchall()
-                if count:
-                    count_end += [count[0][0]]
-                else:
-                    count_end += [0]
+                count_end += [all_title[0][0]]
 
                 sql_list = ['category:', 'user:', 'file:']
                 for sql in sql_list:
