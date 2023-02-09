@@ -65,43 +65,49 @@ def main_func_setting_acl():
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('main_acl_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
-                data = '''
+                data = render_simple_set('''
                     <form method="post">
+                        <hr class="main_hr">
                         <a href="/acl/TEST#exp">(''' + load_lang('reference') + ''')</a>
-                        <hr class="main_hr">
                         
-                        <span>''' + load_lang('document_acl') + '''</span> 
-                        <hr class="main_hr">
+                        <h2>''' + load_lang('document_acl') + '''</h2>
                         <select ''' + disable + ''' name="edit">''' + acl_div[0] + '''</select>
                         <hr class="main_hr">
-                        
-                        <span>''' + load_lang('discussion_acl') + '''</span>
+
+                        <h3>''' + load_lang('document_edit_acl') + '''</h3>
+                        <select ''' + disable + ''' name="document_edit_acl">''' + acl_div[6] + '''</select>
                         <hr class="main_hr">
+
+                        <h3>''' + load_lang('document_move_acl') + '''</h3>
+                        <select ''' + disable + ''' name="document_move_acl">''' + acl_div[7] + '''</select>
+                        <hr class="main_hr">
+
+                        <h3>''' + load_lang('document_delete_acl') + '''</h3>
+                        <select ''' + disable + ''' name="document_delete_acl">''' + acl_div[8] + '''</select>
+                        <hr class="main_hr">
+                        
+                        <h2>''' + load_lang('discussion_acl') + '''</h2>
                         <select ''' + disable + ''' name="discussion">''' + acl_div[1] + '''</select>
                         <hr class="main_hr">
                         
-                        <span>''' + load_lang('upload_acl') + '''</span>
-                        <hr class="main_hr">
+                        <h2>''' + load_lang('upload_acl') + '''</h2>
                         <select ''' + disable + ''' name="upload_acl">''' + acl_div[2] + '''</select>
                         <hr class="main_hr">
                         
-                        <span>''' + load_lang('view_acl') + '''</span>
-                        <hr class="main_hr">
+                        <h2>''' + load_lang('view_acl') + '''</h2>
                         <select ''' + disable + ''' name="all_view_acl">''' + acl_div[3] + '''</select>
                         <hr class="main_hr">
                         
-                        <span>''' + load_lang('many_upload_acl') + '''</span>
-                        <hr class="main_hr">
+                        <h2>''' + load_lang('many_upload_acl') + '''</h2>
                         <select ''' + disable + ''' name="many_upload_acl">''' + acl_div[4] + '''</select>
                         <hr class="main_hr">
                         
-                        <span>''' + load_lang('vote_acl') + '''</span>
-                        <hr class="main_hr">
+                        <h2>''' + load_lang('vote_acl') + '''</h2>
                         <select ''' + disable + ''' name="vote_acl">''' + acl_div[5] + '''</select>
-                        <hr class="main_hr">
                         
+                        <hr class="main_hr">
                         <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
                     </form>
-                ''',
+                '''),
                 menu = [['setting', load_lang('return')]]
             ))
