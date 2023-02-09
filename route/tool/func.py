@@ -1699,7 +1699,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 return 0
     
             return 1
-    elif tool == 'document_edit' or tool == 'document_move' or tool == 'document_delete':
+    elif tool in ['document_edit', 'document_move', 'document_delete']:
         if acl_check(name, '') == 1:
             return 1
     elif tool == 'topic':
@@ -1709,7 +1709,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
     if tool in ['topic']:
         end = 3
-    elif tool in ['render', 'vote', '']:
+    elif tool in ['render', 'vote', '', 'document_edit', 'document_move', 'document_delete']:
         end = 2
     else:
         end = 1
@@ -1733,21 +1733,36 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
             num = 5
         elif tool == 'document_move':
-            curs.execute(db_change(
-                "select data from acl where title = ? and type = 'document_move_acl'"
-            ), [name])
+            if i == 0:
+                curs.execute(db_change(
+                    "select data from acl where title = ? and type = 'document_move_acl'"
+                ), [name])
+            else:
+                curs.execute(db_change(
+                    'select data from other where name = "document_move_acl"'
+                ))
 
             num = 5
         elif tool == 'document_edit':
-            curs.execute(db_change(
-                "select data from acl where title = ? and type = 'document_edit_acl'"
-            ), [name])
+            if i == 0:
+                curs.execute(db_change(
+                    "select data from acl where title = ? and type = 'document_edit_acl'"
+                ), [name])
+            else:
+                curs.execute(db_change(
+                    'select data from other where name = "document_edit_acl"'
+                ))
 
             num = 5
         elif tool == 'document_delete':
-            curs.execute(db_change(
-                "select data from acl where title = ? and type = 'document_delete_acl'"
-            ), [name])
+            if i == 0:
+                curs.execute(db_change(
+                    "select data from acl where title = ? and type = 'document_delete_acl'"
+                ), [name])
+            else:
+                curs.execute(db_change(
+                    'select data from other where name = "document_delete_acl"'
+                ))
 
             num = 5
         elif tool == 'topic':
