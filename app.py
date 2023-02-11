@@ -429,7 +429,7 @@ app.route('/history_add/<everything:name>', methods = ['POST', 'GET'])(recent_hi
 app.route('/history_add_preview/<everything:name>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(recent_history_add)
 
 # Func-view
-app.route('/xref/<everything:name>')(view_xref)
+app.route('/xref/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
 app.route('/raw/<everything:name>')(view_raw_2)
