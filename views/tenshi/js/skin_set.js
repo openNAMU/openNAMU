@@ -14,6 +14,8 @@ function get_post() {
 }
 
 function skin_set() {
+    let cookies = document.cookie;
+
     if(window.location.pathname === '/skin_set') {
         var set_language = {
             "en-US" : {
