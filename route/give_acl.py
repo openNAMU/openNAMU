@@ -31,6 +31,7 @@ def give_acl_2(name):
                     check_ok = 'disabled'
 
         if flask.request.method == 'POST':
+            print('test')
             acl_data = [['decu', flask.request.form.get('decu', '')]]
             acl_data += [['document_edit_acl', flask.request.form.get('document_edit_acl', '')]]
             acl_data += [['document_move_acl', flask.request.form.get('document_move_acl', '')]]
@@ -39,12 +40,11 @@ def give_acl_2(name):
             acl_data += [['view', flask.request.form.get('view', '')]]
             acl_data += [['why', flask.request.form.get('why', '')]]
 
-            curs.execute(db_change("select title from acl where title = ?"), [name])
-            if curs.fetchall():
-                for i in acl_data:
+            for i in acl_data:
+                curs.execute(db_change("select title from acl where title = ? and type = ?"), [name, i[0]])
+                if curs.fetchall():
                     curs.execute(db_change("update acl set data = ? where title = ? and type = ?"), [i[1], name, i[0]])
-            else:
-                for i in acl_data:
+                else:
                     curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [name, i[1], i[0]])
 
             all_d = ''
