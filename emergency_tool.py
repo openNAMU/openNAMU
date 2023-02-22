@@ -9,6 +9,7 @@ from route.tool.func import *
 
 while True:
     data_db_load = input('Load DB (Y) [Y, N] : ')
+    data_db_load = data_db_load.upper()
     if data_db_load in ('Y', 'N'):
         break
 
@@ -46,6 +47,8 @@ print('16. Delete 2FA password')
 print('17. Change markup')
 print('18. Change wiki access password')
 print('19. Forced update')
+print('20. Change domain')
+print('21. Change TLS')
 
 print('----')
 what_i_do = input('Select : ')
@@ -249,6 +252,18 @@ elif what_i_do == '19':
             os.system('del update.zip')
         else:
             print('Error : update failed')
+elif what_i_do == '20':
+    print('----')
+    domain = input('Domain (EX : 2du.pythonanywhere.com) : ')
+
+    curs.execute(db_change("update other set data = ? where name = 'domain'"), [domain])
+elif what_i_do == '21':
+    print('----')
+    tls_v = input('TLS (http) [http, https] : ')
+    if not tls_v in ['http', 'https']:
+        tls_v = 'http'
+
+    curs.execute(db_change("update other set data = ? where name = 'http_select'"), [tls_v])
 else:
     raise ValueError(what_i_do)
 

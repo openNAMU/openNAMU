@@ -30,19 +30,14 @@ def list_title_index_2():
             curs.execute(db_change('select data from other where name = "count_all_title"'))
             all_title = curs.fetchall()
             if int(all_title[0][0]) < 30000:
-                curs.execute(db_change("select count(*) from data"))
-                count = curs.fetchall()
-                if count:
-                    count_end += [count[0][0]]
-                else:
-                    count_end += [0]
+                count_end += [int(all_title[0][0])]
 
                 sql_list = ['category:', 'user:', 'file:']
                 for sql in sql_list:
                     curs.execute(db_change("select count(*) from data where title like ?"), [sql + '%'])
                     count = curs.fetchall()
                     if count:
-                        count_end += [count[0][0]]
+                        count_end += [int(count[0][0])]
                     else:
                         count_end += [0]
 
@@ -50,11 +45,9 @@ def list_title_index_2():
 
                 data += '''
                     </ul>
-                    <hr class="main_hr">
                     <ul class="opennamu_ul">
                         <li>''' + load_lang('all') + ' : ' + str(count_end[0]) + '''</li>
                     </ul>
-                    <hr class="main_hr">
                     <ul class="opennamu_ul">
                         <li>''' + load_lang('category') + ' : ' + str(count_end[1]) + '''</li>
                         <li>''' + load_lang('user_document') + ' : ' + str(count_end[2]) + '''</li>
@@ -64,7 +57,6 @@ def list_title_index_2():
             else:
                 data += '''
                     </ul>
-                    <hr class="main_hr">
                     <ul class="opennamu_ul">
                         <li>''' + load_lang('all') + ' : ' + all_title[0][0] + '''</li>
                 '''
