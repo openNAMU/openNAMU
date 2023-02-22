@@ -1042,6 +1042,8 @@ def skin_check(set_n = 0):
         if 'skin' in flask.session:
             user_need_skin = flask.session['skin']
 
+    user_need_skin = '' if user_need_skin == 'default' else user_need_skin
+
     if user_need_skin == '':
         curs.execute(db_change('select data from other where name = "skin"'))
         skin_exist = curs.fetchall()
