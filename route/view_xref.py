@@ -25,7 +25,7 @@ def view_xref(name = 'Test', xref_type = 1):
         curs.execute(db_change("" + \
             "select distinct " + sql_insert[0] + ", type from back " + \
             "where " + sql_insert[1] + " = ? and not type = 'no' and not type = 'nothing'" + \
-            "order by type asc, title asc limit ?, 50" + \
+            "order by type asc, " + sql_insert[0] + " asc limit ?, 50" + \
         ""), [
             name,
             sql_num

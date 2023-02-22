@@ -51,7 +51,7 @@ def view_diff(name = 'Test', num_a = 1, num_b = 1):
                 result = '<pre>' + end_data + '</pre>'
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('compare') + ')', 0])],
+                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('compare') + ') (r' + first + ') (r' + second + ')', 0])],
                 data = result,
                 menu = [['history/' + url_pas(name), load_lang('return')]]
             ))

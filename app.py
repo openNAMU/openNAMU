@@ -133,6 +133,10 @@ with get_db_connect() as conn:
 
                 if db_pass == 0:
                     raise
+        try:
+            curs.execute(db_change("create index history_index on history (title, ip)"))
+        except:
+            pass
 
         if setup_tool == 'update':
             update(int(ver_set_data[0][0]), set_data)

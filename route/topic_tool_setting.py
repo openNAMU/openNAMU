@@ -91,26 +91,26 @@ def topic_tool_setting(topic_num = 1):
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('topic_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
-                data = '''
+                data = render_simple_set('''
                     <form method="post">
-                        <h2>1. ''' + load_lang('topic_progress') + '''</h2>
+                        <h2>''' + load_lang('topic_progress') + '''</h2>
                         <select name="stop_d">
                             ''' + stop_d_list + '''
                         </select>
                         <hr class="main_hr">
                         <input type="checkbox" name="agree" value="O" ''' + agree_check + '''> ''' + load_lang('topic_change_agree') + '''
 
-                        <h2>2. ''' + load_lang('topic_associate') + '''</h2>
+                        <h2>''' + load_lang('topic_associate') + '''</h2>
                         ''' + load_lang('topic_link_vote') + ''' (''' + load_lang('not_working') + ''')
                         <hr class="main_hr">
                         <input placeholder="''' + load_lang('topic_insert_vote_number') + '''" name="vote_number" type="number">
 
-                        <h2>3. ''' + load_lang('why') + '''</h2>
+                        <h2>''' + load_lang('why') + '''</h2>
                         <input placeholder="''' + load_lang('why') + ''' (''' + load_lang('markup_enabled') + ''')" name="why" type="text">
+                        
                         <hr class="main_hr">
-
                         <button type="submit">''' + load_lang('save') + '''</button>
                     </form>
-                ''',
+                '''),
                 menu = [['thread/' + topic_num + '/tool', load_lang('return')]]
             ))
