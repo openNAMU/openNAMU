@@ -48,7 +48,7 @@ def give_user_check_2(name):
                 if num == 1:
                     curs.execute(db_change("" + \
                         "select distinct ip from ua_d " + \
-                        "where " + ('ip' if ip_or_user(name) == 1 else 'name') + " = ? or " + ('ip' if ip_or_user(plus_id) == 1 else 'name') + " = ? "
+                        "where " + ('ip' if ip_or_user(name) == 1 else 'name') + " = ? or " + ('ip' if ip_or_user(plus_id) == 1 else 'name') + " = ?"
                     ""), [name, plus_id])
                     all_ip_count = len(curs.fetchall())
 
@@ -60,7 +60,7 @@ def give_user_check_2(name):
 
                     curs.execute(db_change("" + \
                         "select distinct ip from ua_d " + \
-                        "where " + ('ip' if ip_or_user(plus_id) == 1 else 'name') + " = ? "
+                        "where " + ('ip' if ip_or_user(plus_id) == 1 else 'name') + " = ?"
                     ""), [plus_id])
                     b_ip_count = len(curs.fetchall())
 
@@ -154,7 +154,7 @@ def give_user_check_2(name):
             ))
         else:
             curs.execute(db_change("" + \
-                "select distinct " + ('name' if ip_or_user(name) == 1 else 'ip') + " from ua_d " + \
+                "select distinct " + ('name' if ip_or_user(name) == 1 else 'ip') + ", today from ua_d " + \
                 "where " + ('ip' if ip_or_user(name) == 1 else 'name') + " = ? "
                 "order by today desc limit ?, 50" + \
             ""), [name, sql_num])
