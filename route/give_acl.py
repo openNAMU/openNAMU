@@ -31,7 +31,6 @@ def give_acl_2(name):
                     check_ok = 'disabled'
 
         if flask.request.method == 'POST':
-            print('test')
             acl_data = [['decu', flask.request.form.get('decu', '')]]
             acl_data += [['document_edit_acl', flask.request.form.get('document_edit_acl', '')]]
             acl_data += [['document_move_acl', flask.request.form.get('document_move_acl', '')]]
