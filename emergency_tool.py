@@ -9,6 +9,7 @@ from route.tool.func import *
 
 while True:
     data_db_load = input('Load DB (Y) [Y, N] : ')
+    data_db_load = data_db_load.upper()
     if data_db_load in ('Y', 'N'):
         break
 
