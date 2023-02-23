@@ -99,8 +99,12 @@ if what_i_do == '1':
         curs.execute(db_change("select data from data where title = ?"), [name[0]])
         data = curs.fetchall()
 
-        get_class_render = class_do_render(conn)
-        get_class_render.do_render(name[0], data[0][0], 'backlink', '')
+        render_lang_data = {
+            'toc' : load_lang('toc'),
+            'category' : load_lang('category')
+        }
+
+        class_do_render(conn, render_lang_data).do_render(name[0], data[0][0], 'backlink', '')
 elif what_i_do == '2':
     curs.execute(db_change("delete from other where name = 'recaptcha'"))
     curs.execute(db_change("delete from other where name = 'sec_re'"))
