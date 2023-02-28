@@ -3,8 +3,14 @@ from .func_render_namumark import *
 # 커스텀 마크 언젠간 다시 추가 예정
 
 class class_do_render:
-    def __init__(self, conn, lang_data):
+    def __init__(self, conn, lang_data = {}):
         self.conn = conn
+
+        if lang_data == '{}':
+            lang_data = {
+                'toc' : 'toc',
+                'category' : 'category'
+            }
 
         self.lang_data = lang_data
 
