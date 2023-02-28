@@ -13,7 +13,7 @@ def main_sys_shutdown():
             print('----')
             print('Shutdown')
 
-            os._exit(os.EX_OK)
+            os._exit(0)
         else:
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('wiki_shutdown'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
