@@ -471,7 +471,6 @@ app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
 app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(recent_discuss)
 app.route('/recent_discuss/close', defaults = { 'tool' : 'close' })(recent_discuss)
 app.route('/recent_discuss/open', defaults = { 'tool' : 'open' })(recent_discuss)
-app.route('/recent_discuss/delete')(recent_discuss_delete)
 
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
 app.route('/thread/0/<everything:doc_name>', defaults = { 'topic_num' : '0' }, methods = ['POST', 'GET'])(topic)
