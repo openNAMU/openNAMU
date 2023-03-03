@@ -228,7 +228,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             if down:
                 menu += [['down/' + url_pas(name), load_lang('sub')]]
 
-            curs.execute(db_change("select date from history where title = ? order by date desc limit 1"), [name])
+            curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'last_edit'"), [name])
             r_date = curs.fetchall()
             r_date = r_date[0][0] if r_date else 0
 

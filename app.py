@@ -308,7 +308,8 @@ app.route('/extension_filter/add', methods = ['POST', 'GET'], defaults = { 'tool
 
 # Func-list
 # /list/document/old
-app.route('/old_page')(list_old_page)
+app.route('/list/document/old')(list_old_page)
+app.route('/list/document/old/<int:num>')(list_old_page)
 
 # /list/document/acl
 @app.route('/acl_list')
