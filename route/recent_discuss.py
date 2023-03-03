@@ -5,12 +5,11 @@ def recent_discuss(tool):
         curs = conn.cursor()
 
         div = ''
+        admin_auth = admin_check(3)
 
         if tool == 'normal':
             div += '<a href="/recent_discuss/close">(' + load_lang('close_discussion') + ')</a> '
             div += '<a href="/recent_discuss/open">(' + load_lang('open_discussion_list') + ')</a>'
-            if admin_check() == 1:
-                div += ' <a href="/recent_discuss/delete">(' + load_lang('delete') + ')</a>'
 
             m_sub = 0
         elif tool == 'close':
@@ -60,6 +59,7 @@ def recent_discuss(tool):
                     '<td>' + \
                         '<a href="/thread/' + data[3] + '">' + html.escape(data[1]) + '</a> ' + \
                         '<a href="/topic/' + url_pas(data[0]) + '">(' + html.escape(data[0]) + ')</a>' + \
+                        (' <a href="/thread/' + data[3] + '/tool">(' + load_lang('tool') + ')</a>' if admin_auth == 1 else '') + \
                     '</td>' + \
                     '<td>' + last_editor_ip_pas[last_editor[count]] + '</td>' + \
                     '<td>' + data[2] + '</td>' + \
