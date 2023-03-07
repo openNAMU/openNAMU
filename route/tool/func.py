@@ -134,7 +134,10 @@ def get_init_set_list(need = 'all'):
         }
     }
     
-    return init_set_list
+    if need == 'all':
+        return init_set_list
+    else:
+        return init_set_list[need]
 
 class get_db_connect:
     # 임시 DB 커넥션 동작 구조
@@ -305,6 +308,8 @@ class class_check_json:
 
 def get_db_table_list():
     # Init-Create_DB
+    # DB 테이블 구조
+    
     # --이거 개편한다더니 도대체 언제?--
     create_data = {}
 

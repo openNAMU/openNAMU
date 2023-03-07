@@ -5,10 +5,11 @@ def give_acl_2(name):
         curs = conn.cursor()
 
         check_ok = ''
+        user_page = 0
         ip = ip_check()
 
         if flask.request.method == 'POST':
-            check_data = 'acl (' + name + ')'
+            check_data = 'document_set (' + name + ')'
         else:
             check_data = None
 
@@ -17,12 +18,14 @@ def give_acl_2(name):
             if check_data and ip_or_user(ip) != 0:
                 return redirect('/login')
 
-            if user_data.group(1) != ip_check():
+            if user_data.group(1) != ip:
                 if admin_check(5) != 1:
                     if check_data:
                         return re_error('/error/3')
                     else:
                         check_ok = 'disabled'
+            else:
+                user_page = 1
         else:
             if admin_check(5) != 1:
                 if check_data:
@@ -57,26 +60,52 @@ def give_acl_2(name):
                     if i != 'view':
                         all_d += ' | '
 
-            admin_check(5, check_data + ' (' + all_d + ')')
+            markup_data = flask.request.form.get('document_markup', '')
+
+            curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [name])
+            db_data = curs.fetchall()
+            if db_data:
+                curs.execute(db_change("update data_set set set_data = ? where doc_name = ? and set_name = 'document_markup'"), [
+                    markup_data, name
+                ])
+            else:
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_markup', ?)"), [
+                    name, markup_data
+                ])
+
+            if db_data[0][0] != markup_data:
+                curs.execute(db_change("select data from data where title = ?"), [name])
+                db_data_2 = curs.fetchall()
+                if db_data_2:
+                    render_set(
+                        doc_name = name,
+                        doc_data = db_data_2[0][0],
+                        data_type = 'backlink'
+                    )
+
+            markup_data = markup_data if markup_data != '' else 'default'
+
+            if user_page == 1:
+                admin_check(5, check_data + ' (' + all_d + ')' + ' (' + markup_data + ')')
 
             conn.commit()
 
             return redirect('/acl/' + url_pas(name))
         else:
-            data = ''
+            data = '<h2>' + load_lang('acl') + '</h2>'
             acl_list = get_acl_list('user') if re.search(r'^user:', name) else get_acl_list()
             if not re.search(r'^user:', name):
                 acl_get_list = [
-                    [load_lang('view_acl'), 'view', '2', '1.'],
-                    [load_lang('document_acl'), 'decu', '3', '1.1.'],
-                    [load_lang('document_edit_acl'), 'document_edit_acl', '4', '1.1.1.'],
-                    [load_lang('document_move_acl'), 'document_move_acl', '4', '1.1.2.'],
-                    [load_lang('document_delete_acl'), 'document_delete_acl', '4', '1.1.3.'],
-                    [load_lang('discussion_acl'), 'dis', '2', '2.'],
+                    [load_lang('view_acl'), 'view', '3'],
+                    [load_lang('document_acl'), 'decu', '4'],
+                    [load_lang('document_edit_acl'), 'document_edit_acl', '5'],
+                    [load_lang('document_move_acl'), 'document_move_acl', '5'],
+                    [load_lang('document_delete_acl'), 'document_delete_acl', '5'],
+                    [load_lang('discussion_acl'), 'dis', '3'],
                 ]
             else:
                 acl_get_list = [
-                    [load_lang('document_acl'), 'decu', '2', '1.']
+                    [load_lang('document_acl'), 'decu', '2']
                 ]
 
             for i in acl_get_list:
@@ -99,13 +128,13 @@ def give_acl_2(name):
             acl_data = curs.fetchall()
             acl_why = html.escape(acl_data[0][0]) if acl_data else ''
             data += '' + \
-                '<h2>' + load_lang('why') + '</h2>' + \
+                '<h3>' + load_lang('why') + '</h3>' + \
                 '<input value="' + acl_why + '" placeholder="' + load_lang('why') + '" name="why" ' + check_ok + '>' + \
                 '<hr class="main_hr">' + \
             ''
 
             data += '''
-                <h2>''' + load_lang('explanation') + '''</h2>
+                <h3>''' + load_lang('explanation') + '''</h3>
                 <span id="exp"></span>
                 <ul class="opennamu_ul">
                     <li>normal : ''' + load_lang('unset') + '''</li>
@@ -121,7 +150,27 @@ def give_acl_2(name):
                     <li>ban_admin : ''' + load_lang('ban_admin_acl') + '''</li>
                     <li>not_all : ''' + load_lang('not_all_acl') + '''</li>
                 </ul>
+                <hr class="main_hr">
+                <h2>''' + load_lang('markup') + '''</h2>
             '''
+
+
+            curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [name])
+            db_data = curs.fetchall()
+            markup_load = db_data[0][0] if db_data and db_data[0][0] != '' else ''
+
+            markup_list = ['default'] + get_init_set_list('markup')['list']
+            markup_html = ''
+            for for_a in markup_list:
+                if markup_load == for_a:
+                    markup_html = '<option value="' + (for_a if for_a != 'default' else '') + '">' + for_a + '</option>' + markup_html
+                else:
+                    markup_html += '<option value="' + (for_a if for_a != 'default' else '') + '">' + for_a + '</option>'
+            
+            markup_html = '<select name="document_markup" ' + check_ok + '>' + markup_html + '</select>'
+
+            data += markup_html
+            data += '<hr class="main_hr">'
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('acl') + ')', 0])],
