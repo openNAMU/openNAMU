@@ -308,7 +308,8 @@ app.route('/extension_filter/add', methods = ['POST', 'GET'], defaults = { 'tool
 
 # Func-list
 # /list/document/old
-app.route('/old_page')(list_old_page)
+app.route('/list/document/old')(list_old_page)
+app.route('/list/document/old/<int:num>')(list_old_page)
 
 # /list/document/acl
 @app.route('/acl_list')
@@ -471,7 +472,6 @@ app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
 app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(recent_discuss)
 app.route('/recent_discuss/close', defaults = { 'tool' : 'close' })(recent_discuss)
 app.route('/recent_discuss/open', defaults = { 'tool' : 'open' })(recent_discuss)
-app.route('/recent_discuss/delete')(recent_discuss_delete)
 
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
 app.route('/thread/0/<everything:doc_name>', defaults = { 'topic_num' : '0' }, methods = ['POST', 'GET'])(topic)

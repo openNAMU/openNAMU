@@ -3,8 +3,14 @@ from .func_render_namumark import *
 # 커스텀 마크 언젠간 다시 추가 예정
 
 class class_do_render:
-    def __init__(self, conn, lang_data):
+    def __init__(self, conn, lang_data = {}):
         self.conn = conn
+
+        if lang_data == '{}':
+            lang_data = {
+                'toc' : 'toc',
+                'category' : 'category'
+            }
 
         self.lang_data = lang_data
 
@@ -19,9 +25,15 @@ class class_do_render:
         data_in = (data_in + '_') if data_in != '' else ''
         doc_set['doc_include'] = data_in
 
-        curs.execute(db_change('select data from other where name = "markup"'))
+        curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [doc_name])
         rep_data = curs.fetchall()
-        rep_data = rep_data[0][0] if rep_data else 'namumark'
+        if rep_data and rep_data[0][0] != '':
+            rep_data = rep_data[0][0]
+        else:
+            curs.execute(db_change('select data from other where name = "markup"'))
+            rep_data = curs.fetchall()
+            rep_data = rep_data[0][0] if rep_data else 'namumark'
+
         if rep_data == 'namumark' or rep_data == 'namumark_beta':
             data_end = class_do_render_namumark(
                 curs,
@@ -30,6 +42,12 @@ class class_do_render:
                 doc_set,
                 self.lang_data
             )()
+        elif rep_data == 'raw':
+            data_end = [
+                html.escape(doc_data).replace('\n', '<br>'), 
+                '', 
+                {}
+            ]
         else:
             data_end = [
                 doc_data, 

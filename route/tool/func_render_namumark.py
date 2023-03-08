@@ -10,7 +10,24 @@ class class_do_render_namumark:
         self.doc_include = self.doc_set['doc_include'] if 'doc_include' in self.doc_set else ''
 
         self.lang_data = lang_data
-        self.ip = ip_check()
+        try:
+            self.ip = ip_check()
+        except:
+            self.ip = '0.0.0.0'
+
+        try:
+            if 'main_css_bold' in self.flask_session:
+                pass    
+                
+            self.flask_session = flask.session
+        except:
+            self.flask_session = ''
+
+        try:
+            self.darkmode = flask.request.cookies.get('main_css_darkmode', '0')
+        except:
+            self.darkmode = '0'
+
 
         self.data_temp_storage = {}
         self.data_temp_storage_count = 0
@@ -164,7 +181,7 @@ class class_do_render_namumark:
         if len(data) == 1:
             return data[0]
         else:
-            if flask.request.cookies.get('main_css_darkmode', '0') == '0':
+            if self.darkmode == '0':
                 return data[0]
             else:
                 return data[1]
@@ -176,7 +193,7 @@ class class_do_render_namumark:
             db_data = self.curs.fetchall()
             bold_user_set = db_data[0][0] if db_data else 'normal'
         else:
-            bold_user_set = flask.session['main_css_bold'] if 'main_css_bold' in flask.session else 'normal'
+            bold_user_set = self.flask_session['main_css_bold'] if 'main_css_bold' in self.flask_session else 'normal'
 
         def do_render_text_bold(match):
             data = match.group(1)
@@ -242,7 +259,7 @@ class class_do_render_namumark:
             db_data = self.curs.fetchall()
             strike_user_set = db_data[0][0] if db_data else 'normal'
         else:
-            strike_user_set = flask.session['main_css_strike'] if 'main_css_strike' in flask.session else 'normal'
+            strike_user_set = self.flask_session['main_css_strike'] if 'main_css_strike' in self.flask_session else 'normal'
 
         def do_render_text_strike(match):
             data = match.group(1)
@@ -787,9 +804,9 @@ class class_do_render_namumark:
                     else:
                         file_pass = 0
                         if file_turn != '':
-                            if file_turn == 'dark' and flask.request.cookies.get('main_css_darkmode', '0') == '1':
+                            if file_turn == 'dark' and self.darkmode == '1':
                                 file_pass = 1
-                            elif file_turn == 'light' and flask.request.cookies.get('main_css_darkmode', '0') == '0':
+                            elif file_turn == 'light' and self.darkmode == '0':
                                 file_pass = 1
                         else:
                             file_pass = 1
@@ -1110,7 +1127,7 @@ class class_do_render_namumark:
                             db_data = self.curs.fetchall()
                             include_set_data = db_data[0][0] if db_data else 'normal'
                         else:
-                            include_set_data = flask.session['main_css_include_link'] if 'main_css_include_link' in flask.session else 'normal'
+                            include_set_data = self.flask_session['main_css_include_link'] if 'main_css_include_link' in self.flask_session else 'normal'
 
                         include_link = ''
                         if include_set_data == 'use':
@@ -1761,7 +1778,7 @@ class class_do_render_namumark:
                     db_data = self.curs.fetchall()
                     category_set_data = db_data[0][0] if db_data else 'normal'
                 else:
-                    category_set_data = flask.session['main_css_category_set'] if 'main_css_category_set' in flask.session else 'normal'
+                    category_set_data = self.flask_session['main_css_category_set'] if 'main_css_category_set' in self.flask_session else 'normal'
 
                 if category_set_data == 'normal':
                     if re.search(r'<footnote_category>', self.render_data):
@@ -1843,7 +1860,7 @@ class class_do_render_namumark:
                 db_data = self.curs.fetchall()
                 toc_set_data = db_data[0][0] if db_data else 'normal'
             else:
-                toc_set_data = flask.session['main_css_toc_set'] if 'main_css_toc_set' in flask.session else 'normal'
+                toc_set_data = self.flask_session['main_css_toc_set'] if 'main_css_toc_set' in self.flask_session else 'normal'
 
             self.render_data = re.sub(toc_search_regex, '', self.render_data)
             if toc_set_data != 'off':
