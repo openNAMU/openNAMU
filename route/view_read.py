@@ -8,7 +8,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
         menu = []
 
         user_doc = ''
-        category_doc = ''
+        category_total = ''
         file_data = ''
 
         ip = ip_check()
@@ -49,21 +49,21 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
 
                     count_category += 1
 
-            if category_doc != '':
-                category_doc = '' + \
-                    '<h2 id="cate_normal">' + load_lang('category_title') + '</h2>' + \
-                    '<ul class="opennamu_ul">' + \
-                        '<li>' + load_lang('all') + ' : ' + str(count_category) + '</li>' + \
-                        category_doc + \
-                    '</ul>' + \
-                ''
-
             if category_sub != '':
-                category_doc += '' + \
+                category_total += '' + \
                     '<h2 id="cate_under">' + load_lang('under_category') + '</h2>' + \
                     '<ul class="opennamu_ul">' + \
                         '<li>' + load_lang('all') + ' : ' + str(count_sub_category) + '</li>' + \
                         category_sub + \
+                    '</ul>' + \
+                ''
+
+            if category_doc != '':
+                category_total += '' + \
+                    '<h2 id="cate_normal">' + load_lang('category_title') + '</h2>' + \
+                    '<ul class="opennamu_ul">' + \
+                        '<li>' + load_lang('all') + ' : ' + str(count_category) + '</li>' + \
+                        category_doc + \
                     '</ul>' + \
                 ''
         elif re.search(r"^user:([^/]*)", name):
@@ -205,7 +205,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                 ['topic/' + url_pas(name), load_lang('discussion'), topic], 
                 ['history/' + url_pas(name), load_lang('history')], 
                 ['xref/' + url_pas(name), load_lang('backlink')], 
-                ['acl/' + url_pas(name), load_lang('acl'), acl],
+                ['acl/' + url_pas(name), load_lang('setting'), acl],
             ]
 
             if do_type == 'from':
@@ -228,11 +228,11 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             if down:
                 menu += [['down/' + url_pas(name), load_lang('sub')]]
 
-            curs.execute(db_change("select date from history where title = ? order by date desc limit 1"), [name])
+            curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'last_edit'"), [name])
             r_date = curs.fetchall()
             r_date = r_date[0][0] if r_date else 0
 
-        div = file_data + user_doc + end_data + category_doc
+        div = file_data + user_doc + end_data + category_total
 
         if num != '':
             curs.execute(db_change('select data from other where name = "phrase_old_page_warring"'))
