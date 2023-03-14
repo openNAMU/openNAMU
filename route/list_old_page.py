@@ -12,7 +12,7 @@ def list_old_page(num = 1):
         
         div = '<ul class="opennamu_ul">'
         
-        curs.execute(db_change("select doc_name, set_data from data_set where set_name = 'last_edit' order by set_data asc"))
+        curs.execute(db_change("select doc_name, set_data from data_set where set_name = 'last_edit' and doc_rev = '' order by set_data asc limit ?, 50"), [sql_num])
         n_list = curs.fetchall()
         for data in n_list:
             div += '<li>' + data[1] + ' | <a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a></li>'
