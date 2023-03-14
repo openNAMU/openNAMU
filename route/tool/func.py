@@ -639,10 +639,12 @@ def update(ver_num, set_data):
         curs.execute(db_change("drop index history_index"))
         curs.execute(db_change("create index history_index on history (title, ip)"))
 
-    if ver_num < 3500359:
+    if ver_num < 3500360:
         # 마지막 편집 따로 기록하도록
         # create_data['data_set'] = ['doc_name', 'doc_rev', 'set_name', 'set_data']
-        print("Update 3500359...")
+        print("Update 3500360...")
+
+        curs.execute(db_change('delete from data_set where set_name = "last_edit"'))
 
         curs.execute(db_change("select title from data"))
         db_data = curs.fetchall()
@@ -652,7 +654,11 @@ def update(ver_num, set_data):
             if db_data_2:
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'last_edit', ?)"), [for_a[0], db_data_2[0][0]])
 
-        print("Update 3500359 complete")
+        curs.execute(db_change(
+            'delete from acl where title like "file:%" and data = "admin" and type like "decu%"'
+        ))
+
+        print("Update 3500360 complete")
 
     conn.commit()
     
@@ -2434,6 +2440,15 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
         leng,
         mode
     ])
+
+    data_set_exist = '' if t_check != 'delete' else '1'
+
+    curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'last_edit'"), [title])
+    db_data = curs.fetchall()
+    if db_data:
+        curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'last_edit'"), [date, data_set_exist, title])
+    else:
+        curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'last_edit', ?)"), [title, data_set_exist, date])
 
 # Func-error
 def re_error(data):

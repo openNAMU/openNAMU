@@ -327,9 +327,8 @@ def list_please():
     return list_please_2()
 
 # /list/document/all
-@app.route('/title_index')
-def list_title_index():
-    return list_title_index_2()
+app.route('/list/document/all')(list_title_index)
+app.route('/list/document/all/<int:num>')(list_title_index)
 
 # /list/document/long
 @app.route('/long_page')

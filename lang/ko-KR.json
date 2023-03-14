@@ -516,5 +516,7 @@
     "force_darkmode": "강제 다크모드",
     "font_size": "글자 크기",
     "image_paste": "이미지 붙여넣기 (컨트롤 C + V로)",
-    "monaco_editor": "모나코 에디터"
+    "monaco_editor": "모나코 에디터",
+    "document_set" : "문서 설정",
+    "move_redirect_make" : "리다이렉트 문서 생성 (가능한 경우에만)"
 }
