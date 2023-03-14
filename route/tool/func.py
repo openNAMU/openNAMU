@@ -1837,6 +1837,18 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 ))
 
             num = None
+        elif tool == 'slow_edit':
+            curs.execute(db_change(
+                'select data from other where name = "slow_edit_acl"'
+            ))
+
+            num = 'all'
+        elif tool == 'edit_bottom_compulsion':
+            curs.execute(db_change(
+                'select data from other where name = "edit_bottom_compulsion_acl"'
+            ))
+
+            num = 'all'
         else:
             # tool == 'render'
             if i == 0:
@@ -1849,10 +1861,11 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             num = 5
 
         acl_data = curs.fetchall()
-        if not acl_data:
-            acl_data = [['normal']]
-        elif acl_data and acl_data[0][0] == '':
-            acl_data = [['normal']]
+        if not acl_data or acl_data[0][0] == '':
+            if tool == 'slow_edit' or tool == 'edit_bottom_compulsion':
+                acl_data = [['not_all']]
+            else:
+                acl_data = [['normal']]
 
         except_ban_tool_list = ['render', 'topic_view']
         if acl_data[0][0] != 'normal':
@@ -1891,7 +1904,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 ), [name, ip])
                 if curs.fetchall():
                     return 0
-            elif acl_data[0][0] == '30_day':
+            elif acl_data[0][0] == '30_day' or acl_data[0][0] == '90_day':
                 if ip_or_user(ip) != 1:
                     if admin_check(num) == 1:
                         return 0
@@ -1901,10 +1914,17 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                         ), [ip])
                         user_date = curs.fetchall()[0][0]
                         
-                        time_1 = datetime.datetime.strptime(
-                            user_date, 
-                            '%Y-%m-%d %H:%M:%S'
-                        ) + datetime.timedelta(days = 30)
+                        if acl_data[0][0] == '30_day':
+                            time_1 = datetime.datetime.strptime(
+                                user_date, 
+                                '%Y-%m-%d %H:%M:%S'
+                            ) + datetime.timedelta(days = 30)
+                        else:
+                            time_1 = datetime.datetime.strptime(
+                                user_date, 
+                                '%Y-%m-%d %H:%M:%S'
+                            ) + datetime.timedelta(days = 90)
+
                         time_2 = datetime.datetime.strptime(
                             get_time(), 
                             '%Y-%m-%d %H:%M:%S'
@@ -2113,8 +2133,10 @@ def do_edit_send_check(data):
     
     curs.execute(db_change('select data from other where name = "edit_bottom_compulsion"'))
     db_data = curs.fetchall()
-    if db_data and db_data[0][0] != '' and data == '':
-        return 1
+    if db_data and db_data[0][0] != '':
+        if acl_check(None, 'edit_bottom_compulsion') == 1:
+            if data == '':
+                return 1
     
     return 0
 
@@ -2123,21 +2145,22 @@ def do_edit_slow_check():
 
     curs.execute(db_change("select data from other where name = 'slow_edit'"))
     slow_edit = curs.fetchall()
-    if slow_edit and slow_edit[0][0] != '' and admin_check(5) != 1:
-        slow_edit = int(number_check(slow_edit[0][0]))
+    if slow_edit and slow_edit[0][0] != '':
+        if acl_check(None, 'slow_edit') == 1:
+            slow_edit = int(number_check(slow_edit[0][0]))
 
-        curs.execute(db_change(
-            "select date from history where ip = ? order by date desc limit 1"
-        ), [ip_check()])
-        last_edit_data = curs.fetchall()
-        if last_edit_data:
-            last_edit_data = int(re.sub(' |:|-', '', last_edit_data[0][0]))
-            now_edit_data = int((
-                datetime.datetime.now() - datetime.timedelta(seconds = slow_edit)
-            ).strftime("%Y%m%d%H%M%S"))
+            curs.execute(db_change(
+                "select date from history where ip = ? order by date desc limit 1"
+            ), [ip_check()])
+            last_edit_data = curs.fetchall()
+            if last_edit_data:
+                last_edit_data = int(re.sub(' |:|-', '', last_edit_data[0][0]))
+                now_edit_data = int((
+                    datetime.datetime.now() - datetime.timedelta(seconds = slow_edit)
+                ).strftime("%Y%m%d%H%M%S"))
 
-            if last_edit_data > now_edit_data:
-                return 1
+                if last_edit_data > now_edit_data:
+                    return 1
 
     return 0
 

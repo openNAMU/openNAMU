@@ -149,6 +149,7 @@ def give_acl_2(name):
                     <li>30_day : ''' + load_lang('30_day_acl') + '''</li>
                     <li>ban_admin : ''' + load_lang('ban_admin_acl') + '''</li>
                     <li>not_all : ''' + load_lang('not_all_acl') + '''</li>
+                    <li>90_day : ''' + load_lang('90_day_acl') + '''</li>
                 </ul>
                 <hr class="main_hr">
                 <h2>''' + load_lang('markup') + '''</h2>
