@@ -23,7 +23,7 @@ def edit_delete_multiple():
             for name in all_title:
                 edit_delete.edit_delete(name)
 
-            return redirect('/recent_changes')
+            return redirect('/recent_change')
         else:
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('many_delete'), wiki_set(), wiki_custom(), wiki_css([0, 0])],

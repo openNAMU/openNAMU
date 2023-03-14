@@ -22,8 +22,8 @@ def main_tool_other():
                 </ul>
                 <h3>''' + load_lang('document') + '''</h3>
                 <ul class="opennamu_ul">
-                    <li><a href="/recent_changes">''' + load_lang('recent_change') + '''</a></li>
-                    <li><a href="/title_index">''' + load_lang('all_document_list') + '''</a></li>
+                    <li><a href="/recent_change">''' + load_lang('recent_change') + '''</a></li>
+                    <li><a href="/list/document/all">''' + load_lang('all_document_list') + '''</a></li>
                     <li><a href="/acl_list">''' + load_lang('acl_document_list') + '''</a></li>
                     <li><a href="/please">''' + load_lang('need_document') + '''</a></li>
                     <li><a href="/long_page">''' + load_lang('long_page') + '''</a></li>

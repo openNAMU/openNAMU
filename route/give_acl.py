@@ -73,7 +73,7 @@ def give_acl_2(name):
                     name, markup_data
                 ])
 
-            if db_data[0][0] != markup_data:
+            if not db_data or db_data[0][0] != markup_data:
                 curs.execute(db_change("select data from data where title = ?"), [name])
                 db_data_2 = curs.fetchall()
                 if db_data_2:
