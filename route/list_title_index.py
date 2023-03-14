@@ -1,21 +1,15 @@
 from .tool.func import *
 
-def list_title_index_2():
+def list_title_index(num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        page = int(number_check(flask.request.args.get('page', '1')))
-        num = int(number_check(flask.request.args.get('num', '100')))
-        sql_num = (page * num - num) if page * num > 0 else 0
+        sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
         all_list = sql_num + 1
+        data = ''
 
-        if num > 1000:
-            return re_error('/error/3')
-
-        data = '<a href="/title_index?num=250">(250)</a> <a href="/title_index?num=500">(500)</a> <a href="/title_index?num=1000">(1000)</a>'
-
-        curs.execute(db_change("select title from data order by title asc limit ?, ?"), [sql_num, num])
+        curs.execute(db_change("select title from data asc limit ?, 50"), [sql_num])
         title_list = curs.fetchall()
         if title_list:
             data += '<hr class="main_hr"><ul class="opennamu_ul">'
@@ -24,7 +18,7 @@ def list_title_index_2():
             data += '<li>' + str(all_list) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + html.escape(list_data[0]) + '</a></li>'
             all_list += 1
 
-        if page == 1:
+        if num == 1:
             count_end = []
 
             curs.execute(db_change('select data from other where name = "count_all_title"'))
@@ -61,7 +55,7 @@ def list_title_index_2():
                         <li>''' + load_lang('all') + ' : ' + all_title[0][0] + '''</li>
                 '''
 
-        data += '</ul>' + next_fix('/title_index?num=' + str(num) + '&page=', page, title_list, num)
+        data += '</ul>' + next_fix('/list/document/all/', num, title_list, num)
         sub = ' (' + str(num) + ')'
 
         return easy_minify(flask.render_template(skin_check(),

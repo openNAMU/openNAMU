@@ -231,6 +231,8 @@
         "dont_move" : "Don't move",
         "file_delete" : "File delete",
         "added_menu" : "Added menu",
+        "document_set" : "Document settings",
+        "move_redirect_make" : "Redirect document generation (Only if possible)",
         "_comment_" : "Edit",
             "load" : "Load another document",
             "turn_off_monaco" : "Turn off monaco editor",

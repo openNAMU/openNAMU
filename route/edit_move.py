@@ -25,10 +25,15 @@ def edit_move(name):
             
             send = flask.request.form.get('send', '')
             agree = flask.request.form.get('copyright_agreement', '')
+
             time = get_time()
             ip = ip_check()
-            move_option = flask.request.form.get('move_option', 'none')
+            
             has_error = 0
+
+            move_option = flask.request.form.get('move_option', 'none')
+            move_option_topic = flask.request.form.get('move_topic_option', 'none')
+            document_set_option = flask.request.form.get('document_set_option', 'none')
             
             if do_edit_send_check(send) == 1:
                 return re_error('/error/37')
@@ -169,8 +174,6 @@ def edit_move(name):
             # 문서 이동 파트 E
             
             # 토론 이동 파트 S
-            
-            move_option_topic = flask.request.form.get('move_topic_option', 'none')
             if (
                 move_option_topic == 'merge' and
                 admin_check(None, 'merge document\'s topics (' + name + ') (' + move_title + ')') == 1
@@ -197,6 +200,54 @@ def edit_move(name):
                     curs.execute(db_change("update rd set title = ? where title = ?"), [move_title, name])
 
             # 토론 이동 파트 E
+
+            # data_set 이동 파트 S
+            if document_set_option == 'reverse':
+                i = 0
+                var_name = ''
+                while var_name == '':
+                    curs.execute(db_change("select title from rd where title = ?"), ['test ' + str(i)])
+                    if not curs.fetchall():
+                        var_name = 'test ' + str(i)
+                    else:
+                        i += 1
+                
+                # create_data['data_set'] = ['doc_name', 'doc_rev', 'set_name', 'set_data']
+                # create_data['acl'] = ['title', 'data', 'type']
+                curs.execute(db_change("update data_set set doc_name = ? where doc_name = ?"), [var_name, move_title])
+                curs.execute(db_change("update data_set set doc_name = ? where doc_name = ?"), [move_title, name])
+                curs.execute(db_change("update data_set set doc_name = ? where doc_name = ?"), [name, var_name])
+
+                curs.execute(db_change("update acl set title = ? where title = ?"), [var_name, move_title])
+                curs.execute(db_change("update acl set title = ? where title = ?"), [move_title, name])
+                curs.execute(db_change("update acl set title = ? where title = ?"), [name, var_name])
+            elif document_set_option == 'normal':
+                curs.execute(db_change("delete from data_set where doc_name = ?"), [move_title])
+                curs.execute(db_change("update data_set set doc_name = ? where doc_name = ?"), [move_title, name])
+
+                curs.execute(db_change("delete from acl where title = ?"), [move_title])
+                curs.execute(db_change("update acl set title = ? where title = ?"), [move_title, name])
+
+            if document_set_option != 'reverse':
+                curs.execute(db_change("select data from data where title = ?"), [name])
+                db_data = curs.fetchall()
+                if db_data:
+                    render_set(
+                        doc_name = name,
+                        doc_data = db_data[0][0],
+                        data_type = 'backlink'
+                    )
+
+                curs.execute(db_change("select data from data where title = ?"), [move_title])
+                db_data = curs.fetchall()
+                if db_data:
+                    render_set(
+                        doc_name = move_title,
+                        doc_data = db_data[0][0],
+                        data_type = 'backlink'
+                    )
+
+            # data_set 이동 파트 E
                 
             conn.commit()
 
@@ -205,6 +256,8 @@ def edit_move(name):
             else:
                 return re_error('/error/19')
         else:
+            owner_auth = admin_check()
+
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('move') + ')', 0])],
                 data = '''
@@ -222,19 +275,32 @@ def edit_move(name):
                             <option value="none"> ''' + load_lang('dont_move') + '''</option>
                             <option value="normal"> ''' + load_lang('normal') + '''</option>
                             <option value="reverse"> ''' + load_lang('replace_move') + '''</option>
-                            ''' + ('<option value="merge"> ' + load_lang('merge_move') + '</option>' if admin_check() == 1 else '') + '''
+                            ''' + ('<option value="merge"> ' + load_lang('merge_move') + '</option>' if owner_auth == 1 else '') + '''
                         </select>
                         <hr class="main_hr">
+                        <!-- <input type="checkbox" name="move_redirect_make"> ''' + load_lang('move_redirect_make') + '''
+                        <hr class="main_hr"> -->
                         
                         <h2>''' + load_lang('discussion') + '''</h2>
                         <select name="move_topic_option">
                             <option value="none"> ''' + load_lang('dont_move') + '''</option>
                             <option value="normal"> ''' + load_lang('normal') + '''</option>
                             <option value="reverse"> ''' + load_lang('replace_move') + '''</option>
-                            ''' + ('<option value="merge"> ' + load_lang('merge_move') + '</option>' if admin_check() == 1 else '') + '''
+                            ''' + ('<option value="merge"> ' + load_lang('merge_move') + '</option>' if owner_auth == 1 else '') + '''
                         </select>
                         <hr class="main_hr">
-                        
+
+                        ''' + ((
+                            '''<h2>''' + load_lang('document_set') + '''</h2>
+                            <select name="document_set_option">
+                                <option value="none"> ''' + load_lang('dont_move') + '''</option>
+                                <option value="normal"> ''' + load_lang('normal') + '''</option>
+                                <option value="reverse"> ''' + load_lang('replace_move') + '''</option>
+                            </select>
+                            <hr class="main_hr">
+                            '''
+                        ) if owner_auth == 1 else '') + '''
+
                         ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
                         
                         <button type="submit">''' + load_lang('move') + '''</button>
