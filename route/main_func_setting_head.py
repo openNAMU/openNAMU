@@ -1,13 +1,13 @@
 from .tool.func import *
 
-def main_func_setting_head(num, skin_name = ''):
+def main_func_setting_head(num, skin_name = '', set_preview = 0):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         if admin_check() != 1:
             return re_error('/ban')
         
-        if flask.request.method == 'POST':
+        if flask.request.method == 'POST' and set_preview == 0:
             if num == 4:
                 info_d = 'body'
                 end_r = 'body/top'
@@ -26,11 +26,7 @@ def main_func_setting_head(num, skin_name = ''):
 
             curs.execute(db_change("select name from other where name = ? and coverage = ?"), [info_d, coverage])
             if curs.fetchall():
-                curs.execute(db_change("update other set data = ? where name = ? and coverage = ?"), [
-                    flask.request.form.get('content', ''),
-                    info_d,
-                    coverage
-                ])
+                curs.execute(db_change("update other set data = ? where name = ? and coverage = ?"), [flask.request.form.get('content', ''), info_d, coverage])
             else:
                 curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, ?)"), [info_d, flask.request.form.get('content', ''), coverage])
 
@@ -47,37 +43,49 @@ def main_func_setting_head(num, skin_name = ''):
                 curs.execute(db_change("select data from other where name = 'body'"))
                 title = '_body'
                 start = ''
+                form_action = 'formaction="/setting/body/top"'
+                data_preview = flask.request.form.get('content', '') if set_preview == 1 else ''
                 plus = '''
-                    <button id="preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
+                    <button id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/top">''' + load_lang('preview') + '''</button>
                     <hr class="main_hr">
-                    <div id="see_preview"></div>
+                    <div id="opennamu_preview_area">''' + data_preview + '''</div>
                 '''
             elif num == 7:
                 curs.execute(db_change("select data from other where name = 'bottom_body'"))
                 title = '_bottom_body'
                 start = ''
+                data_preview = flask.request.form.get('content', '') if set_preview == 1 else ''
+                form_action = 'formaction="/setting/body/bottom"'
                 plus = '''
-                    <button id="preview" type="button" onclick="load_raw_preview(\'content\', \'see_preview\')">''' + load_lang('preview') + '''</button>
+                    <button id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/bottom">''' + load_lang('preview') + '''</button>
                     <hr class="main_hr">
-                    <div id="see_preview"></div>
+                    <div id="opennamu_preview_area">''' + data_preview + '''</div>
                 '''
             else:
                 curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
                 title = '_head'
                 start = '' + \
-                    '<a href="?">(' + load_lang('all') + ')</a> ' + \
-                    ' '.join(['<a href="/setting/head/' + i + '">(' + i + ')</a>' for i in load_skin('', 1)]) + '''
+                    '<a href="/setting/head">(' + load_lang('all') + ')</a> ' + \
+                    ' '.join(['<a href="/setting/head/' + url_pas(i) + '">(' + html.escape(i) + ')</a>' for i in load_skin('', 1)]) + '''
                     <hr class="main_hr">
-                    <span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span>
+                    <span>
+                        &lt;style&gt;CSS&lt;/style&gt;
+                        <br>
+                        &lt;script&gt;JS&lt;/script&gt;
+                    </span>
                     <hr class="main_hr">
                 '''
+                form_action = ''
                 plus = ''
 
-            head = curs.fetchall()
-            if head:
-                data = head[0][0]
+            if set_preview == 1:
+                data = data_preview
             else:
-                data = ''
+                head = curs.fetchall()
+                if head:
+                    data = head[0][0]
+                else:
+                    data = ''
 
             if skin_name != '':
                 sub_plus = ' (' + skin_name + ')'
@@ -89,9 +97,10 @@ def main_func_setting_head(num, skin_name = ''):
                 data = '''
                     <form method="post">
                         ''' + start + '''
-                        <textarea rows="25" placeholder="''' + load_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" placeholder="''' + load_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        ''' + (load_lang('main_css_warning') + '<hr class="main_hr">' if title == '_head' else '') + '''
+                        <button id="opennamu_save_button" type="submit" ''' + form_action + '''>''' + load_lang('save') + '''</button>
                         ''' + plus + '''
                     </form>
                 ''',

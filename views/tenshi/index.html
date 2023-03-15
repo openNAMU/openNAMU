@@ -9,9 +9,11 @@
         {% endif %}
         {{imp[3][3]|safe}}
         <link rel="stylesheet" href="/views/tenshi/css/main.css?ver=20">
-        <script src="/views/tenshi/js/skin_set.js?ver=8"></script>
+        {% if request.cookies.get('main_css_darkmode', '') == '1' %}
+            <link rel="stylesheet" href="/views/tenshi/css/dark.css?ver=9">
+        {% endif %}
+        <script src="/views/tenshi/js/skin_set.js?ver=9"></script>
         <script src="/views/tenshi/js/main.js?ver=3"></script>
-        <script>main_load(); window.addEventListener('DOMContentLoaded', skin_set);</script>
         <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
         <link rel="shortcut icon" href="/views/main_css/file/favicon.ico?ver=1">
         {{imp[1][5]|safe}}
@@ -198,7 +200,7 @@
                 {{imp[1][1]|safe}}
                 <br>
                 <br>
-                <a href="https://github.com/openNAMU/openNAMU"><img id="b_logo" src="/views/main_css/file/s_logo.png"></a>
+                <a href="https://github.com/openNAMU/openNAMU"><img id="b_logo" src="/views/main_css/file/logo.svg"></a>
             </div>
         </div>
         <div id="nav_bar">
@@ -218,5 +220,6 @@
                 </a>
             </div>
         </div>
+        <script>window.addEventListener('DOMContentLoaded', skin_set);</script>
     </body>
 </html>

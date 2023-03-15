@@ -3,9 +3,12 @@ from .tool.func import *
 def topic_comment_tool(topic_num = 1, num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
-
+        
         num = str(num)
         topic_num = str(topic_num)
+        
+        if acl_check('', 'topic_view', topic_num) == 1:
+            return re_error('/ban')
 
         curs.execute(db_change("select block, ip, date from topic where code = ? and id = ?"), [topic_num, num])
         data = curs.fetchall()
@@ -14,12 +17,12 @@ def topic_comment_tool(topic_num = 1, num = 1):
 
         ban = '''
             <h2>''' + load_lang('state') + '''</h2>
-            <ul class="inside_ul">
+            <ul class="opennamu_ul">
                 <li>''' + load_lang('writer') + ' : ''' + ip_pas(data[0][1]) + '''</li>
                 <li>''' + load_lang('time') + ' : ' + data[0][2] + '''</li>
             </ul>
             <h2>''' + load_lang('other_tool') + '''</h2>
-            <ul class="inside_ul">
+            <ul class="opennamu_ul">
                 <li>
                     <a href="/thread/''' + topic_num + '/comment/' + num + '''/raw">''' + load_lang('raw') + '''</a>
                 </li>
@@ -39,9 +42,9 @@ def topic_comment_tool(topic_num = 1, num = 1):
 
             ban += '''
                 <h2>''' + load_lang('admin_tool') + '''</h2>
-                <ul class="inside_ul">
+                <ul class="opennamu_ul">
                     <li>
-                        <a href="/ban/''' + url_pas(data[0][1]) + '''">
+                        <a href="/auth/give/ban/''' + url_pas(data[0][1]) + '''">
                             ''' + (load_lang('release') if user_ban_d else load_lang('ban')) + '''
                         </a>
                     </li>

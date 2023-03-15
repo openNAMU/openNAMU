@@ -42,7 +42,7 @@ def main_func_setting_external():
                 if sql_d:
                     d_list += [sql_d[0][0]]
                 else:
-                    curs.execute(db_change('insert into other (name, data) values (?, ?)'), [i, ''])
+                    curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [i, ''])
 
                     d_list += ['']
 
@@ -71,9 +71,9 @@ def main_func_setting_external():
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('ext_api_req_set'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
-                data = '''
-                    <form method="post" id="main_set_data">
-                        <h2>1. ''' + load_lang('captcha') + '''</h2>
+                data = render_simple_set('''
+                    <form method="post">
+                        <h2>''' + load_lang('captcha') + '''</h2>
                         <a href="https://www.google.com/recaptcha/">(''' + load_lang('recaptcha') + ''')</a> <a href="https://www.hcaptcha.com/">(''' + load_lang('hcaptcha') + ''')</a>
                         <hr class="main_hr">
 
@@ -93,11 +93,11 @@ def main_func_setting_external():
                             ''' + re_ver + '''
                         </select>
 
-                        <h2>2. ''' + load_lang('email_setting') + '''</h1>
+                        <h2>''' + load_lang('email_setting') + '''</h1>
                         <input type="checkbox" name="email_have" ''' + ('checked' if d_list[9] != '' else '')  + '''> ''' + \
                              load_lang('email_required') + '''
 
-                        <h2>2.1. ''' + load_lang('smtp_setting') + '''</h1>
+                        <h2>''' + load_lang('smtp_setting') + '''</h1>
                         <a href="https://support.google.com/mail/answer/7126229">(Google)</a>
                         <hr class="main_hr">
 
@@ -127,7 +127,7 @@ def main_func_setting_external():
                         <hr class="main_hr">
                         <input type="password" name="smtp_pass" value="''' + html.escape(d_list[6]) + '''">
 
-                        <h2>3. ''' + load_lang('oauth') + ''' (''' + load_lang('not_working') + ''')</h2>
+                        <h2>''' + load_lang('oauth') + ''' (''' + load_lang('not_working') + ''')</h2>
                         <a href="https://developers.google.com/identity/protocols/oauth2">(Google)</a>
                         <hr class="main_hr">
 
@@ -137,9 +137,8 @@ def main_func_setting_external():
                         <hr class="main_hr">
 
                         <hr class="main_hr">
-                        <button id="save" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
                     </form>
-                    <script>simple_render('main_set_data');</script>
-                ''',
+                '''),
                 menu = [['setting', load_lang('return')]]
             ))

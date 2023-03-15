@@ -43,6 +43,20 @@ def ip_check(d_type = 0):
 
     return ip
 
+def ip_or_user(data = ''):
+    # without_DB
+
+    # 1 == ip
+    # 0 == reg
+    
+    if data == '':
+        data = ip_check()
+
+    if re.search(r'(\.|:)', data):
+        return 1
+    else:
+        return 0
+
 def url_pas(data):
     return urllib.parse.quote(data).replace('/','%2F')
 

@@ -46,17 +46,17 @@ def main_sys_update():
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('update'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = load_lang('update_warning') + '''
-                    <hr class=\"main_hr\">
-                    <ul class="inside_ul">
-                        <li>''' + load_lang('version') + ''' : <span id="ver_send_2"></span></li>
-                        <li id="ver_send" style="display: none;">''' + load_lang('lastest') + ''' : </li>
+                    <hr class="main_hr">
+                    <ul class="opennamu_ul">
+                        <li id="ver_send_2">''' + load_lang('version') + ''' : </li>
+                        <li id="ver_send">''' + load_lang('lastest') + ''' : </li>
                     </ul>
                     <a href="https://github.com/openNAMU/openNAMU">(Beta)</a> <a href="https://github.com/openNAMU/openNAMU/tree/stable">(Stable)</a>
-                    <hr class=\"main_hr\">
+                    <hr class="main_hr">
                     <form method="post">
                         <button type="submit">''' + load_lang('update') + '''</button>
                     </form>
-                    <script>load_ver();</script>
+                    <!-- JS : opennamu_do_insert_version -->
                 ''',
                 menu = [['manager', load_lang('return')]]
             ))

@@ -1,7 +1,3 @@
-function main_css_regex_data(data) {
-    return new RegExp('(?:^|; )' + data + '=([^;]*)');
-}
-
 function main_css_get_post() {    
     var check = document.getElementById('main_css_strike');
     if(check.value === 'normal') {
@@ -100,56 +96,25 @@ function main_css_get_post() {
 
 function main_css_skin_load() {    
     var head_data = document.querySelector('head');
-    if(document.cookie.match(main_css_regex_data('main_css_del_strike'))) {
-        if(document.cookie.match(main_css_regex_data('main_css_del_strike'))[1] === '1') {
-            head_data.innerHTML += '<style>s { text-decoration: none; } s:hover { background-color: transparent; }</style>';
-        } else if(document.cookie.match(main_css_regex_data('main_css_del_strike'))[1] === '2') {
-            head_data.innerHTML += '<style>s { display: none; }</style>';
-        }
-    }
-
-    if(document.cookie.match(main_css_regex_data('main_css_del_bold'))) {
-        if(document.cookie.match(main_css_regex_data('main_css_del_bold'))[1] === '1') {
-            head_data.innerHTML += '<style>b { font-weight: normal; }</style>';
-        } else if(document.cookie.match(main_css_regex_data('main_css_del_bold'))[1] === '2') {
-            head_data.innerHTML += '<style>b { display: none; }</style>';
-        }
-    }
-
-    if(
-        document.cookie.match(main_css_regex_data('main_css_include_link')) &&
-        document.cookie.match(main_css_regex_data('main_css_include_link'))[1] === '1'
-    ) {
-        head_data.innerHTML += '<style>#include_link { display: inline; }</style>';
-    }
-
-    if(document.cookie.match(main_css_regex_data('main_css_toc_set'))) {
-        if(document.cookie.match(main_css_regex_data('main_css_toc_set'))[1] === '2') {
+    if(document.cookie.match(opennamu_cookie_split_regex('main_css_toc_set'))) {
+        if(document.cookie.match(opennamu_cookie_split_regex('main_css_toc_set'))[1] === '2') {
             head_data.innerHTML += '<style>#auto_toc { display: none; }</style>';
-        } else if(document.cookie.match(main_css_regex_data('main_css_toc_set'))[1] === '1') {
+        } else if(document.cookie.match(opennamu_cookie_split_regex('main_css_toc_set'))[1] === '1') {
             head_data.innerHTML += '<style>#toc { display: none; }</style>';
         }
     }
     
     if(
-        document.cookie.match(main_css_regex_data('main_css_font_size')) &&
-        document.cookie.match(main_css_regex_data('main_css_font_size'))[1] !== ''
+        document.cookie.match(opennamu_cookie_split_regex('main_css_font_size')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_font_size'))[1] !== ''
     ) {
-        head_data.innerHTML += '<style>body, input, textarea { font-size: ' + document.cookie.match(main_css_regex_data('main_css_font_size'))[1] + 'px; }</style>';
+        head_data.innerHTML += '<style>body, input, textarea { font-size: ' + document.cookie.match(opennamu_cookie_split_regex('main_css_font_size'))[1] + 'px; }</style>';
     }
     
+    /* 개편 필요 */
     if(
-        document.cookie.match(main_css_regex_data('main_css_darkmode')) &&
-        document.cookie.match(main_css_regex_data('main_css_darkmode'))[1] === '1'
-    ) {
-        head_data.innerHTML += '' +
-            '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=5">' +
-        '';
-    }
-    
-    if(
-        document.cookie.match(main_css_regex_data('main_css_link_delimiter')) &&
-        document.cookie.match(main_css_regex_data('main_css_link_delimiter'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_link_delimiter')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_link_delimiter'))[1] === '1'
     ) {
         head_data.innerHTML += '<style>#real_normal_link::before, #not_thing::before, #inside::before { content: \'🅸\'; font-weight: lighter; background: transparent; }</style>';
     }
@@ -224,8 +189,8 @@ function main_css_load_lang(name) {
         }
     }
 
-    var server_language = document.cookie.match(main_css_regex_data('language'))[1];
-    var user_language = document.cookie.match(main_css_regex_data('user_language'))[1];
+    var server_language = document.cookie.match(opennamu_cookie_split_regex('language'))[1];
+    var user_language = document.cookie.match(opennamu_cookie_split_regex('user_language'))[1];
     if(user_language in set_language) {
         language = user_language;
     } else {
@@ -254,8 +219,8 @@ function main_css_skin_set() {
     var i = 0;
     while(strike_list[i]) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_del_strike')) && 
-            document.cookie.match(main_css_regex_data('main_css_del_strike'))[1] === strike_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_del_strike')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_del_strike'))[1] === strike_list[i][0]
         ) {
             set_data["strike"] = '<option value="' + strike_list[i][1] + '">' + strike_list[i][2] + '</option>' + set_data["strike"];
         } else {
@@ -274,8 +239,8 @@ function main_css_skin_set() {
     i = 0;
     while(bold_list[i]) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_del_bold')) && 
-            document.cookie.match(main_css_regex_data('main_css_del_bold'))[1] === bold_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_del_bold')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_del_bold'))[1] === bold_list[i][0]
         ) {
             set_data["bold"] = '<option value="' + bold_list[i][1] + '">' + bold_list[i][2] + '</option>' + set_data["bold"];
         } else {
@@ -286,8 +251,8 @@ function main_css_skin_set() {
     }
 
     if(
-        document.cookie.match(main_css_regex_data('main_css_include_link')) &&
-        document.cookie.match(main_css_regex_data('main_css_include_link'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_include_link')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_include_link'))[1] === '1'
     ) {
         set_data["include"] = "checked";
     } else {
@@ -295,8 +260,8 @@ function main_css_skin_set() {
     }
 
     if(
-        document.cookie.match(main_css_regex_data('main_css_image_paste')) &&
-        document.cookie.match(main_css_regex_data('main_css_image_paste'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_image_paste')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_image_paste'))[1] === '1'
     ) {
         set_data["image_paste"] = "checked";
     } else {
@@ -311,8 +276,8 @@ function main_css_skin_set() {
     i = 0;
     while(category_list[i]) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_category_set')) && 
-            document.cookie.match(main_css_regex_data('main_css_category_set'))[1] === category_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_category_set')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_category_set'))[1] === category_list[i][0]
         ) {
             set_data["category"] = '<option value="' + category_list[i][1] + '">' + category_list[i][2] + '</option>' + set_data["category"];
         } else {
@@ -330,8 +295,8 @@ function main_css_skin_set() {
     i = 0;
     while(footnote_list[i]) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_footnote_set')) && 
-            document.cookie.match(main_css_regex_data('main_css_footnote_set'))[1] === footnote_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_footnote_set')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_footnote_set'))[1] === footnote_list[i][0]
         ) {
             set_data["footnote"] = '<option value="' + footnote_list[i][1] + '">' + footnote_list[i][2] + '</option>' + set_data["footnote"];
         } else {
@@ -350,8 +315,8 @@ function main_css_skin_set() {
     i = 0;
     while(image_list[i]) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_image_set')) && 
-            document.cookie.match(main_css_regex_data('main_css_image_set'))[1] === image_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_image_set')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_image_set'))[1] === image_list[i][0]
         ) {
             set_data["image"] = '<option value="' + image_list[i][1] + '">' + image_list[i][2] + '</option>' + set_data["image"];
         } else {
@@ -370,8 +335,8 @@ function main_css_skin_set() {
     i = 0;
     while(toc_list[i]) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_toc_set')) && 
-            document.cookie.match(main_css_regex_data('main_css_toc_set'))[1] === toc_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_toc_set')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_toc_set'))[1] === toc_list[i][0]
         ) {
             set_data["toc"] = '<option value="' + toc_list[i][1] + '">' + toc_list[i][2] + '</option>' + set_data["toc"];
         } else {
@@ -382,16 +347,16 @@ function main_css_skin_set() {
     }
 
     if(
-        document.cookie.match(main_css_regex_data('main_css_monaco')) &&
-        document.cookie.match(main_css_regex_data('main_css_monaco'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_monaco')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_monaco'))[1] === '1'
     ) {
         set_data["monaco"] = "checked";
     } else {
         set_data["monaco"] = "";
     }
     
-    if(document.cookie.match(main_css_regex_data('main_css_font_size'))) {
-        set_data["font_size"] = document.cookie.match(main_css_regex_data('main_css_font_size'))[1];
+    if(document.cookie.match(opennamu_cookie_split_regex('main_css_font_size'))) {
+        set_data["font_size"] = document.cookie.match(opennamu_cookie_split_regex('main_css_font_size'))[1];
     } else {
         set_data["font_size"] = '';
     }
@@ -403,8 +368,8 @@ function main_css_skin_set() {
     set_data["exter_link"] = '';
     for(let i = 0; exter_link_list[i]; i++) {
         if(
-            document.cookie.match(main_css_regex_data('main_css_exter_link')) && 
-            document.cookie.match(main_css_regex_data('main_css_exter_link'))[1] === exter_link_list[i][0]
+            document.cookie.match(opennamu_cookie_split_regex('main_css_exter_link')) && 
+            document.cookie.match(opennamu_cookie_split_regex('main_css_exter_link'))[1] === exter_link_list[i][0]
         ) {
             set_data["exter_link"] = '<option value="' + exter_link_list[i][1] + '">' + exter_link_list[i][2] + '</option>' + set_data["exter_link"];
         } else {
@@ -413,8 +378,8 @@ function main_css_skin_set() {
     }
     
     if(
-        document.cookie.match(main_css_regex_data('main_css_link_delimiter')) &&
-        document.cookie.match(main_css_regex_data('main_css_link_delimiter'))[1] === '1'
+        document.cookie.match(opennamu_cookie_split_regex('main_css_link_delimiter')) &&
+        document.cookie.match(opennamu_cookie_split_regex('main_css_link_delimiter'))[1] === '1'
     ) {
         set_data["link_delimiter"] = "checked";
     } else {
@@ -422,58 +387,58 @@ function main_css_skin_set() {
     }
 
     document.getElementById("main_skin_set").innerHTML = ' \
-        <h2>1. ' + main_css_load_lang('renderer') + '</h2> \
-        <h3>1.1. ' + main_css_load_lang('strike') + '</h3> \
-        <select id="main_css_strike"> \
-            ' + set_data["strike"] + ' \
-        </select> \
-        <h3>1.2. ' + main_css_load_lang('bold') + '</h3> \
-        <select id="main_css_bold"> \
-            ' + set_data["bold"] + ' \
-        </select> \
-        <h3>1.3. ' + main_css_load_lang('where_category') + '</h3> \
-        <select id="main_css_category"> \
-            ' + set_data["category"] + ' \
-        </select> \
-        <h3>1.4. ' + main_css_load_lang('set_footnote') + '</h3> \
-        <select id="main_css_footnote"> \
-            ' + set_data["footnote"] + ' \
-        </select> \
-        <h3>1.5. ' + main_css_load_lang('set_image') + '</h3> \
-        <select id="main_css_image"> \
-            ' + set_data["image"] + ' \
-        </select> \
-        <h3>1.6. ' + main_css_load_lang('other') + '</h3> \
-        <input ' + set_data["include"] + ' type="checkbox" id="main_css_include" value="include"> ' + main_css_load_lang('include_link') + ' \
-        <hr class="main_hr"> \
-        <input ' + set_data["link_delimiter"] + ' type="checkbox" id="main_css_link_delimiter" value="link_delimiter"> ' + main_css_load_lang('link_delimiter') + '<sup>(1)</sup> \
-        <h3>1.7. ' + main_css_load_lang('set_toc') + '</h3> \
-        <select id="main_css_toc"> \
-            ' + set_data["toc"] + ' \
-        </select> \
-        <h3>1.8. ' + main_css_load_lang('set_font_size') + '</h3> \
-        <input id="main_css_font_size" placeholder="' + main_css_load_lang('font_size') + ' (EX : 11)" value="' + set_data["font_size"] + '"> \
-        <h3>1.9. ' + main_css_load_lang('exter_link_open_method') + '</h3> \
-        <select id="main_css_exter_link"> \
-            ' + set_data["exter_link"] + ' \
-        </select> \
-        <h2>2. ' + main_css_load_lang('editor') + '</h2> \
-        <h3>2.1. ' + main_css_load_lang('main') + '</h3> \
-        <input ' + set_data["monaco"] + ' type="checkbox" id="main_css_monaco" value="monaco"> ' + main_css_load_lang('use_monaco') + '<sup>(1)</sup> \
-        <hr class="main_hr"> \
-        <input ' + set_data["image_paste"] + ' type="checkbox" id="main_css_image_paste" value="image_paste"> ' + 
-            main_css_load_lang('clipboard_upload') + '<sup>(ko-KR)</sup><sup>(1)</sup> \
-        <hr class="main_hr"> \
-        <button onclick="main_css_get_post();">' + main_css_load_lang('save') + '</button> \
-        <hr class="main_hr"> \
-        <ul id="footnote_data"> \
-            <li><a id="note_1_end" href="#note_1">(1)</a> ' + main_css_load_lang('except_ie') + '</li> \
-            <li><a href="#note_1_1">(1.1)</a></li> \
-            <li><a id="note_2_end" href="#note_2">(ko-KR)</a> ' + main_css_load_lang('only_korean') + '</li> \
-        </ul> \
+        <div id="opennamu_simple_render"> \
+            <h2>1. ' + main_css_load_lang('renderer') + '</h2> \
+            <h3>1.1. ' + main_css_load_lang('strike') + '</h3> \
+            <select id="main_css_strike"> \
+                ' + set_data["strike"] + ' \
+            </select> \
+            <h3>1.2. ' + main_css_load_lang('bold') + '</h3> \
+            <select id="main_css_bold"> \
+                ' + set_data["bold"] + ' \
+            </select> \
+            <h3>1.3. ' + main_css_load_lang('where_category') + '</h3> \
+            <select id="main_css_category"> \
+                ' + set_data["category"] + ' \
+            </select> \
+            <h3>1.4. ' + main_css_load_lang('set_footnote') + '</h3> \
+            <select id="main_css_footnote"> \
+                ' + set_data["footnote"] + ' \
+            </select> \
+            <h3>1.5. ' + main_css_load_lang('set_image') + '</h3> \
+            <select id="main_css_image"> \
+                ' + set_data["image"] + ' \
+            </select> \
+            <h3>1.6. ' + main_css_load_lang('other') + '</h3> \
+            <input ' + set_data["include"] + ' type="checkbox" id="main_css_include" value="include"> ' + main_css_load_lang('include_link') + ' \
+            <hr class="main_hr"> \
+            <input ' + set_data["link_delimiter"] + ' type="checkbox" id="main_css_link_delimiter" value="link_delimiter"> ' + main_css_load_lang('link_delimiter') + '<sup>(1)</sup> \
+            <h3>1.7. ' + main_css_load_lang('set_toc') + '</h3> \
+            <select id="main_css_toc"> \
+                ' + set_data["toc"] + ' \
+            </select> \
+            <h3>1.8. ' + main_css_load_lang('set_font_size') + '</h3> \
+            <input id="main_css_font_size" placeholder="' + main_css_load_lang('font_size') + ' (EX : 11)" value="' + set_data["font_size"] + '"> \
+            <h3>1.9. ' + main_css_load_lang('exter_link_open_method') + '</h3> \
+            <select id="main_css_exter_link"> \
+                ' + set_data["exter_link"] + ' \
+            </select> \
+            <h2>2. ' + main_css_load_lang('editor') + '</h2> \
+            <h3>2.1. ' + main_css_load_lang('main') + '</h3> \
+            <input ' + set_data["monaco"] + ' type="checkbox" id="main_css_monaco" value="monaco"> ' + main_css_load_lang('use_monaco') + '<sup>(1)</sup> \
+            <hr class="main_hr"> \
+            <input ' + set_data["image_paste"] + ' type="checkbox" id="main_css_image_paste" value="image_paste"> ' + 
+                main_css_load_lang('clipboard_upload') + '<sup>(ko-KR)</sup><sup>(1)</sup> \
+            <hr class="main_hr"> \
+            <button onclick="main_css_get_post();">' + main_css_load_lang('save') + '</button> \
+            <hr class="main_hr"> \
+            <ul id="footnote_data"> \
+                <li><a id="note_1_end" href="#note_1">(1)</a> ' + main_css_load_lang('except_ie') + '</li> \
+                <li><a href="#note_1_1">(1.1)</a></li> \
+                <li><a id="note_2_end" href="#note_2">(ko-KR)</a> ' + main_css_load_lang('only_korean') + '</li> \
+            </ul> \
+        </div> \
     ';
- 
-    simple_render('main_skin_set');
 }
 
 document.addEventListener("DOMContentLoaded", main_css_skin_load);

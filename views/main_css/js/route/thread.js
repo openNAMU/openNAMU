@@ -11,8 +11,8 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
     }
 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.send(null);
+    xhr.open("GET", url);
+    xhr.send();
 
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
@@ -50,18 +50,17 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                 let ip_o = data_t[key]['ip'];
                 let blind = data_t[key]['blind'];
                 let data_i_pas = data_t[key]['data_pas'][0];
-                
+                let data_get_list = [];
+
                 if(data_i_pas === '') {
                     data_i_pas = '<br>';
                 } else {
-                    data_i_pas = data_i_pas.replace(
-                        /&lt;topic_a&gt;((?:(?!&lt;\/topic_a&gt;).)+)&lt;\/topic_a&gt;/g,
-                        '<a href="$1">$1</a>'
-                    );
-                    data_i_pas = data_i_pas.replace(
-                        /&lt;topic_call&gt;@((?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;/g,
-                        '<a href="/w/user:$1">@$1</a>', 
-                    );
+                    let load_thread_regex = /&lt;topic_a&gt;((?:(?!&lt;\/topic_a&gt;).)+)&lt;\/topic_a&gt;/g;
+
+                    data_get_list = data_i_pas.match(load_thread_regex);
+
+                    data_i_pas = data_i_pas.replace(load_thread_regex, '<a href="$1">$1</a>');
+                    data_i_pas = data_i_pas.replace(/&lt;topic_call&gt;@((?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;/g, '<a href="/w/user:$1">@$1</a>');
                 }
                 
                 if(blind === 'O') {
@@ -71,7 +70,7 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                 }
                 
                 if(blind === 'O') {
-                    ip += ' <a href="/admin_log?search=blind%20(code%20' + topic_num + '#' + key + '">(B)</a>';
+                    ip += ' <a href="/list/admin/auth_use/' + opennamu_do_url_encode('blind (code ' + topic_num + '#' + key) + '/1">(B)</a>';
                     
                     if(admin === '1') {
                         ip += ' <a href="javascript:opennamu_do_open_comment(\'' + key + '\');">(O)</a>';
@@ -98,7 +97,7 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
                     '<table class="opennamu_comment">' + 
                         '<tr>' + 
                             '<td class="' + color_t + '">' + 
-                                '<a href="javascript:void(0);" id="' + key + '">#' + key + '</a> ' + 
+                                '<a href="#thread_shortcut" id="' + key + '">#' + key + '</a> ' + 
                                 ip + 
                                 '<span style="float: right;">' + data_t[key]['date'] + '</span>' + 
                             '</td>' + 
@@ -127,8 +126,6 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
             
             eval(data_all_js);
             
-            opennamu_do_ip_parser();
-            
             if(type_do === 'top') {
                 opennamu_do_thread_make(topic_num, 'main', '', 'main_topic');
             } else if(type_do === 'main') {
@@ -154,10 +151,36 @@ function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 
 }
 
 function opennamu_do_open_comment(key) {
-    let elementState = document.getElementById('opennamu_comment_data_' + key).style.display;
-    if(!elementState || elementState === 'none') {
+    let element_state = document.getElementById('opennamu_comment_data_' + key).style.display;
+    if(!element_state || element_state === 'none') {
         document.getElementById('opennamu_comment_data_' + key).style.display = 'block';
     } else {
         document.getElementById('opennamu_comment_data_' + key).style.display = 'none';
+    }
+}
+
+if(window.location.pathname.match(/^\/(thread|thread_preview)\//)) {
+    let thread_num = window.location.pathname.match(/^\/(?:thread|thread_preview)\/([0-9]+)/)[1];
+
+    opennamu_do_thread_make(thread_num);
+} else if(window.location.pathname.match(/^\/topic\//)) {
+    for(let for_a = 0; document.getElementsByClassName('topic_pre')[for_a]; for_a++) {
+        let thread_num = document.getElementsByClassName('topic_pre')[for_a].id;
+        thread_num = thread_num.match(/^opennamu_thread_([0-9]+)/)[1];
+
+        opennamu_do_thread_make(thread_num, "list", "/normal/1", "opennamu_thread_" + thread_num);
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/thread/" + thread_num + "/length");
+        xhr.send();
+
+        xhr.onreadystatechange = function() {
+            if(this.readyState === 4 && this.status === 200) {
+                let thread_length = JSON.parse(this.responseText)['length'];
+                if(thread_length !== '1') {
+                    opennamu_do_thread_make(thread_num, "list", "/normal/" + thread_length, "opennamu_thread_back_" + thread_num);
+                }
+            }
+        }
     }
 }

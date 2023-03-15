@@ -7,7 +7,7 @@ def user_alarm():
         num = int(number_check(flask.request.args.get('num', '1')))
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
     
-        data = '<ul class="inside_ul">'
+        data = '<ul class="opennamu_ul">'
     
         curs.execute(db_change("select data, date from alarm where name = ? order by date desc limit ?, 50"), [ip_check(), sql_num])
         data_list = curs.fetchall()
@@ -19,16 +19,12 @@ def user_alarm():
             ''
     
             for data_one in data_list:
-                data += '' + \
-                    '<li>' + \
-                        '<span class="send_content">' + html.escape(data_one[0]) + '</span> ' + \
-                        '(' + data_one[1] + ')' + \
-                    '</li>' + \
-                ''
+                data_split = data_one[0].split(' | ')
+                
+                data += '<li>' + ip_pas(data_split[0]) + (' | ' + ' | '.join(data_split[1:]) if len(data_split) > 1 else '') + ' (' + data_one[1] + ')</li>'
     
         data += '' + \
             '</ul>' + \
-            '<script>send_render();</script>' + \
             next_fix('/alarm?num=', num, data_list) + \
         ''
     

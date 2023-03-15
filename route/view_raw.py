@@ -4,11 +4,14 @@ def view_raw_2(name = None, topic_num = None, num = None, doc_acl = 0):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check(name, 'render') == 1:
-            return re_error('/ban')
-
         if topic_num:
             topic_num = str(topic_num)
+            
+            if acl_check('', 'topic_view', topic_num) == 1:
+                return re_error('/ban')
+        else:
+            if acl_check(name, 'render') == 1:
+                return re_error('/ban')
 
         if num:
             num = str(num)
@@ -47,7 +50,7 @@ def view_raw_2(name = None, topic_num = None, num = None, doc_acl = 0):
 
         data = curs.fetchall()
         if data:
-            p_data += '<textarea readonly rows="25">' + html.escape(data[0][0]) + '</textarea>'
+            p_data += '<textarea readonly class="opennamu_textarea_500">' + html.escape(data[0][0]) + '</textarea>'
             
             if doc_acl == 1:
                 p_data = '' + \

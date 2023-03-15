@@ -8,7 +8,7 @@ def edit_revert(name, num):
         if curs.fetchall() and admin_check(6) != 1:
             return re_error('/error/3')
 
-        if acl_check(name) == 1:
+        if acl_check(name, 'document_edit') == 1:
             return re_error('/ban')
         
         curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])
@@ -71,7 +71,7 @@ def edit_revert(name, num):
             return redirect('/w/' + url_pas(name))
         else:
             if data:
-                preview = '<pre>' + data[0][0] + '</pre>'
+                preview = '<pre>' + html.escape(data[0][0]) + '</pre>'
             else:
                 preview = ''
             

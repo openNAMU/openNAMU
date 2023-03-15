@@ -44,6 +44,10 @@ html, #main {
     color: white;
 }
 
-button#save {
+button#opennamu_save_button {
     background: #083808;
+}
+
+#nav_bar {
+    background: #2f0000;
 }

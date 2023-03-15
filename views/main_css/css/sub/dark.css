@@ -3,6 +3,10 @@ html, body {
     color: white;
 }
 
+a:hover {
+    color: cornflowerblue;
+}
+
 textarea, input, button, select {
     background: #1f2023;
     color: white;
@@ -12,27 +16,27 @@ input::placeholder, textarea::placeholder, select::placeholder {
     color: white;
 }
 
-#toc, #cate, #redirect {
+#toc, .opennamu_TOC, #cate, #redirect {
     background: #1f2023;
 }
 
-#toron_color_grey {
+.opennamu_comment_color_gray {
     background: #4a4a4a;
 }
 
-#toron_color_green {
+.opennamu_comment_color_green {
     background: #2e4a2e;
 }
 
-#toron_color_red {
+.opennamu_comment_color_red {
     background: #803737;
 }
 
-#toron_color_normal {
+.opennamu_comment_color_default {
     background: #38340e;
 }
 
-#toron_color_blue {
+.opennamu_comment_color_blue {
     background: #314c56;
 }
 

@@ -31,15 +31,15 @@ def topic_tool_change(topic_num = 1):
                     topic_num
                 ])
 
-                curs.execute(db_change("insert into topic (id, data, date, ip, top, code) values (?, ?, ?, ?, '1', ?)"), [
-                    str(int(topic_check[0][0]) + 1),
-                    'change name to ' + sub_d + '(' + title_d + ')',
-                    time,
-                    ip,
-                    topic_num
-                ])
-
-                rd_plus(topic_num, time)
+                do_add_thread(
+                    topic_num,
+                    load_lang('topic_name_change') + ' : ' + sub_d + ' (' + title_d + ')',
+                    '1'
+                )
+                do_reload_recent_thread(
+                    topic_num, 
+                    time
+                )
 
             return redirect('/thread/' + topic_num)
         else:

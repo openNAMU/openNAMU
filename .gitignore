@@ -9,7 +9,11 @@ data/version.json
 route/tool/set_mark/custom.py
 
 images
+
 .vscode
+.vs
+goorm.manifest
+.DS_Store
 
 *.db
 *.db-shm
@@ -20,8 +24,6 @@ robots.txt
 custom.py
 404.html
 
-goorm.manifest
-
 views/liberty
 views/buma
 views/before_namu
@@ -29,6 +31,5 @@ views/acme
 views/sl_open
 views/nitori
 
-.DS_Store
 sitemap.xml
 sitemap_0.xml

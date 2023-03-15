@@ -5,7 +5,7 @@ def edit_delete(name):
         curs = conn.cursor()
 
         ip = ip_check()
-        if acl_check(name) == 1:
+        if acl_check(name, 'document_delete') == 1:
             return re_error('/ban')
 
         curs.execute(db_change("select title from data where title = ?"), [name])
@@ -64,7 +64,7 @@ def edit_delete(name):
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('delete') + ')', 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                        <input placeholder="''' + load_lang('why') + '''" name="send">
                         <hr class="main_hr">
                         ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
                         <button type="submit">''' + load_lang('delete') + '''</button>

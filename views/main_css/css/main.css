@@ -7,6 +7,8 @@ body {
     word-break: break-all;
     
     overflow: auto;
+
+    font-size: 14px;
 }
 
 /* 텍스트 필드 */
@@ -28,52 +30,40 @@ table {
 }
 
 td {
-    border: 1px solid gainsboro;
+    border: 0.5px solid gainsboro;
+    border-width: 0.5px;
+
+    padding: 8px 10px;
+}
+
+@supports (-webkit-touch-callout: none) {
+    td {
+        border: 1px solid gainsboro;
+        border-width: 1px;
+    }
+}
+
+summary {
+    cursor: pointer;
+    user-select: none;
     
-    padding: 5px 10px;
+    display: list-item;
+    list-style: inside disclosure-closed;
 }
-
-/* 링크 */
-a {
-    color: dodgerblue;
     
-    text-decoration: none;
+/* list */
+.opennamu_ul {
+    padding-left: 20px;
 }
 
-#not_thing {
-    color: red;
-}
-
-#inside, #out_link, #out_link::before, .opennamu_link_out {
-    color: green;
-}
-
-#out_link::before, .opennamu_link_out::before {
-    content: '🅴';
-    
-    font-weight: lighter;
-    
-    background: transparent;
-}
-
-#include_link {
-    display: none;
-}
-
-.hidden_link {
-    filter: blur(3px);
-}
-
-.hidden_link:hover {
-    filter: none;
-}
-
-/* 리스트 */
-.inside_ul li {
+.opennamu_ul li {
     margin-left: 20px;
+
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
-/* 토론 관련 */
+/* thread */
 .opennamu_comment {
     width: 100%;
 }
@@ -87,7 +77,7 @@ a {
 }
 
 .opennamu_comment_color_red {
-    background: palevioletred;
+    background: pink;
 }
 
 .opennamu_comment_color_default {
@@ -115,66 +105,112 @@ a {
     display: none;
 }
 
-.opennamu_comment_textarea {
-    height: 200px;
+/* render */
+/* - link */
+a {
+    color: dodgerblue;
+    
+    text-decoration: none;
 }
 
-/* 위키 내용 관련 */
-#toc, .opennamu_TOC {
+a:hover {
+    color: darkblue;
+}
+
+.opennamu_not_exist_link {
+    color: red;
+}
+
+.opennamu_not_exist_link:hover {
+    color: darkred;
+}
+
+.opennamu_same_link {
+    font-weight: bold;
+}
+
+.opennamu_link_out, .opennamu_link_inter {
+    color: green;
+}
+
+.opennamu_link_out:hover, .opennamu_link_inter:hover {
+    color: darkgreen;
+}
+
+.opennamu_link_out::before {
+    content: '🅴';
+    
+    font-weight: lighter;
+    
+    background: transparent;
+}
+
+/* - toc */
+.opennamu_TOC {
     border: 1px solid gainsboro;
     padding: 20px;
     
     width: fit-content;
     width: -moz-fit-content;
+
+    display: inline-block;
     
     clear: both;
     
     margin-top: 10px;
 }
 
-#cate, pre, #redirect {
+.opennamu_TOC_title {
+    font-size: 18px;
+}
+
+/* - category */
+.opennamu_category {
     border: 1px solid gainsboro;
     
     padding: 10px;
 }
 
-#cate {
-    margin-top: 20px;
+.opennamu_category_blur {
+    filter: blur(5px);
+}
+
+.opennamu_category_blur:hover {
+    filter: none;
+}
+
+/* - footnote */
+.opennamu_footnote {
+    border-top: 1px solid gainsboro;
+
+    padding-top: 10px;
+
+    margin-top: 10px;
+}
+
+pre, #redirect {
+    border: 1px solid gainsboro;
+    
+    padding: 10px;
 }
 
 pre {    
     white-space: pre-wrap;
 }
 
-#toc_title, .opennamu_TOC_title {
-    font-size: 1.2rem;
-}
-
-@media (max-width: 768px) {
-    table {
-        min-width: 100%;
-    }
-    
-    .table_safe {
-        min-width: 100%;
-    }
-}
-
-.content {
+.opennamu_textarea_500 {
     height: 500px;
 }
 
-.spead_footnote {
+.opennamu_textarea_200 {
+    height: 200px;
+}
+
+.opennamu_spead_footnote {
     color: #555;
     background-color: #efefef;
     
     border: 1px solid #cecece;
-}
-
-#footnote_data {
-    border-top: 1px solid gainsboro;
-    
-    padding-top: 10px;
 }
 
 hr {
@@ -182,10 +218,12 @@ hr {
     border-top: 1px solid gainsboro;
 }
 
-.render_content_load, .render_content {
+.opennamu_render_complete {
     white-space: pre-wrap;
     
     line-break: anywhere;
+
+    display: inline;
 }
 
 blockquote {
@@ -235,19 +273,21 @@ s:hover, strike:hover, del:hover {
 }
 
 #main_table_top_tr {
-    background: aquamarine;
+    background: gainsboro;
+}
+
+.opennamu_history_blind {
+    background: gainsboro;
 }
 
 /* 기타 */
 .main_hr {
     border: none;
     
-    margin-top: 8px;
-    margin-bottom: 8px;
-}
-
-#admin_log_search {
-    width: 100px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    
+    margin: 0;
 }
 
 .change_space {
