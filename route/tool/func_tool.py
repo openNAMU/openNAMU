@@ -58,7 +58,11 @@ def ip_or_user(data = ''):
         return 0
 
 def url_pas(data):
-    return urllib.parse.quote(data).replace('/','%2F')
+    data = re.sub(r'^\.', '\\\\.', data)
+    data = urllib.parse.quote(data)
+    data = data.replace('/','%2F')
+
+    return data
 
 def sha224_replace(data):
     return hashlib.sha224(bytes(data, 'utf-8')).hexdigest()
