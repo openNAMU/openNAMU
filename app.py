@@ -147,7 +147,12 @@ with get_db_connect() as conn:
 
     # Init-Route
     class EverythingConverter(werkzeug.routing.PathConverter):
-        regex = r'.*?'
+        def __init__(self, map):
+            super(EverythingConverter, self).__init__(map)
+            self.regex = r'.*?'
+
+        def to_python(self, value):
+            return re.sub(r'^\\\.', '.', value)
 
     class RegexConverter(werkzeug.routing.BaseConverter):
         def __init__(self, url_map, *items):
