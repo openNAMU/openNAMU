@@ -1124,6 +1124,8 @@ def wiki_css(data):
 
 def cut_100(data):
     # without_DB
+    data = re.sub(r'.*<div class="opennamu_render_complete">', '', data, 1)
+
     data = data.replace('<br>', ' ')
     data = data.replace('\r', '') 
     data = data.replace('\n', ' ')
@@ -1371,6 +1373,8 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                         get_class_render[2]['include'] += include_data_render[2]['include']
 
                     for_a += 1
+
+            get_class_render[0] = '<div class="opennamu_render_complete">' + get_class_render[0] + '</div>'
 
             curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
             db_data = curs.fetchall()
