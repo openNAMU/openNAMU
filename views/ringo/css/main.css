@@ -3,7 +3,7 @@ html {
 }
 
 body {
-    font-family: "나눔바른고딕", "나눔고딕", "맑은고딕", "Sans-Serif";
+    font-family: 'SUIT', sans-serif;
     font-size: 14px;
 
     margin: 0;
@@ -13,6 +13,14 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom: 1px solid gainsboro;
     
     padding-bottom: 10px;
+}
+
+select {
+    font-family: 'SUIT', sans-serif;
+}
+
+textarea {
+    font-family: 'SUIT', monospace;
 }
 
 h1.blank, h2.blank, h3.blank, h4.blank, h5.blank, h6.blank {
@@ -194,7 +202,7 @@ aside {
     
     background-color: #ffeaee;
     
-    height: calc(100vh - (50px + 20px));
+    min-height: calc(100vh - (50px + 20px));
 }
 
 aside button {
