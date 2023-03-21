@@ -4,7 +4,7 @@ def api_recent_discuss(num = 10, get_type = 'normal'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        num = 50 if num > 50 else num
+        num = 50 if (1 if not num > 0 else num) > 50 else num
         data_list = []
 
         if get_type == 'stop':
