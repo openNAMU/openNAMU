@@ -10,10 +10,11 @@
         {{imp[3][3]|safe}}
         <link rel="stylesheet" href="/views/tenshi/css/main.css?ver=20">
         {% if request.cookies.get('main_css_darkmode', '') == '1' %}
+            <link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=1">
             <link rel="stylesheet" href="/views/tenshi/css/dark.css?ver=9">
         {% endif %}
-        <script src="/views/tenshi/js/skin_set.js?ver=9"></script>
-        <script src="/views/tenshi/js/main.js?ver=3"></script>
+        <script src="/views/tenshi/js/skin_set.js?ver=10"></script>
+        <script src="/views/tenshi/js/main.js?ver=4"></script>
         <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
         <link rel="shortcut icon" href="/views/main_css/file/favicon.ico?ver=1">
         {{imp[1][5]|safe}}
@@ -39,12 +40,12 @@
                     <div id="top_tool">
                         <div id="top_tool_group">
                             <div id="top_tool_cel">
-                                <a href="javascript:opening('recent_cel');" class="top_in_cel">
+                                <a href="javascript:ringo_opening('recent_cel_in');" class="top_in_cel">
                                     <span class="iconify" data-icon="ic:baseline-access-time" data-inline="true"></span>
                                     <span class="not_mobile">{{'list'|load_lang}}</span>
                                     <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                                 </a>
-                                <div id="recent_cel" class="cel_in_cel" style="display: none;">
+                                <div id="recent_cel_in" class="cel_in_cel" style="display: none;">
                                     <a href="/recent_changes">
                                         <span class="iconify" data-icon="ic:baseline-autorenew" data-inline="true"></span>
                                         {{'recent_change'|load_lang}}
@@ -63,12 +64,12 @@
                             </div>
                              
                             <div id="top_tool_cel">
-                                <a href="javascript:opening('other_cel');" class="top_in_cel">
+                                <a href="javascript:ringo_opening('other_cel_in');" class="top_in_cel">
                                     <span class="iconify" data-icon="ic:baseline-archive" data-inline="true"></span>
                                     <span class="not_mobile">{{'tool'|load_lang}}</span>
                                     <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                                 </a>
-                                <div id="other_cel" class="cel_in_cel" style="display: none;">
+                                <div id="other_cel_in" class="cel_in_cel" style="display: none;">
                                     <a href="/random">
                                         <span class="iconify" data-icon="ic:baseline-shuffle" data-inline="true"></span>
                                         {{'random'|load_lang}}
@@ -91,12 +92,30 @@
                                         {{'upload'|load_lang}}
                                     </a>
                                     <hr>
-                                    <a href="/skin_set">
+                                    <a href="/change/skin_set">
                                         <span class="iconify" data-icon="ic:baseline-settings" data-inline="true"></span>
                                         {{'skin_setting'|load_lang}}
                                     </a>
                                 </div>
                             </div>
+                            {% if imp[1][6] != '' %}
+                                 
+                                <div id="top_tool_cel">
+                                    <a href="javascript:ringo_opening('add_cel_in');" class="top_in_cel">
+                                        <span class="iconify" data-icon="ic:baseline-playlist-add" data-inline="true"></span>
+                                        <span class="not_mobile">{{'added_menu'|load_lang}}</span>
+                                        <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
+                                    </a>
+                                    <div id="add_cel_in" class="cel_in_cel" style="display: none;">
+                                        {% for added_top_menu in imp[1][6] %}
+                                            <a href="{{added_top_menu[1]}}">
+                                                <span class="iconify" data-icon="ic:baseline-plus" data-inline="true"></span>
+                                                {{added_top_menu[0]}}
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
                              
                             <div id="top_tool_cel" id="top_in_user">
                                 <a href="/user" class="top_in_cel">
@@ -220,6 +239,5 @@
                 </a>
             </div>
         </div>
-        <script>window.addEventListener('DOMContentLoaded', skin_set);</script>
     </body>
 </html>
