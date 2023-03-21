@@ -5,17 +5,17 @@ function ringo_do_regex_data(data) {
 function ringo_get_post() {
     check = document.getElementById('invert');
     if(check.checked === true) {
-        document.cookie = 'main_css_darkmode=1;';
+        document.cookie = 'main_css_darkmode=1; path=/';
     } else {
-        document.cookie = 'main_css_darkmode=0;';
+        document.cookie = 'main_css_darkmode=0; path=/';
     }
 
     history.go(0);
 }
 
-let cookies = document.cookie;
-
 function ringo_do_skin_set() {
+    let cookies = document.cookie;
+    
     if(window.location.pathname === '/change/skin_set') {
         let set_language = {
             "en-US" : {
