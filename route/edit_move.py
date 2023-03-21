@@ -78,6 +78,9 @@ def edit_move(name):
                     curs.execute(db_change("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'"), [name])
                     curs.execute(db_change("delete from back where title = ? and not type = 'cat' and type = 'no'"), [move_title])
 
+                    curs.execute(db_change('select data from other where name = "count_all_title"'))
+                    curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) - 1)])
+
                     curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [move_title])
                     data = curs.fetchall()
 
