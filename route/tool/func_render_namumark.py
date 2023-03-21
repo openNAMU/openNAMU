@@ -1898,8 +1898,6 @@ class class_do_render_namumark:
 
         self.render_data = re.sub(r'<a fn_target="([^"]+)"', do_render_last_footnote, self.render_data)
 
-        self.render_data = '<div class="opennamu_render_complete">' + self.render_data + '</div>'
-
     def __call__(self):
         self.do_render_remark()
         self.do_render_include_default()

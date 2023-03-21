@@ -1,23 +1,23 @@
-function regex_data(data) {
+function ringo_do_regex_data(data) {
     return new RegExp('(?:^|; )' + data + '=([^;]*)');
 }
 
-function get_post() {
+function ringo_get_post() {
     check = document.getElementById('invert');
     if(check.checked === true) {
-        document.cookie = 'main_css_darkmode=1;';
+        document.cookie = 'main_css_darkmode=1; path=/';
     } else {
-        document.cookie = 'main_css_darkmode=0;';
+        document.cookie = 'main_css_darkmode=0; path=/';
     }
 
     history.go(0);
 }
 
-function skin_set() {
+function ringo_do_skin_set() {
     let cookies = document.cookie;
-
-    if(window.location.pathname === '/skin_set') {
-        var set_language = {
+    
+    if(window.location.pathname === '/change/skin_set') {
+        let set_language = {
             "en-US" : {
                 "save" : "Save",
                 "darkmode" : "Darkmode"
@@ -27,8 +27,8 @@ function skin_set() {
             }
         }
 
-        var language = cookies.match(regex_data('language'))[1];
-        var user_language = cookies.match(regex_data('user_language'))[1];
+        let language = cookies.match(ringo_do_regex_data('language'))[1];
+        let user_language = cookies.match(ringo_do_regex_data('user_language'))[1];
         if(user_language in set_language) {
             language = user_language;
         }
@@ -37,11 +37,11 @@ function skin_set() {
             language = "en-US";
         }
 
-        var set_data = {};
+        let set_data = {};
 
         if(
-            cookies.match(regex_data('main_css_darkmode')) &&
-            cookies.match(regex_data('main_css_darkmode'))[1] === '1'
+            cookies.match(ringo_do_regex_data('main_css_darkmode')) &&
+            cookies.match(ringo_do_regex_data('main_css_darkmode'))[1] === '1'
         ) {
             set_data["invert"] = "checked";
         }
@@ -49,7 +49,9 @@ function skin_set() {
         document.getElementById("main_skin_set").innerHTML = ' \
             <input ' + set_data["invert"] + ' type="checkbox" id="invert" name="invert" value="invert"> ' + set_language[language]['darkmode'] + ' \
             <hr class="main_hr"> \
-            <button onclick="get_post();">' + set_language[language]['save'] + '</button> \
+            <button onclick="ringo_get_post();">' + set_language[language]['save'] + '</button> \
         ';
     }
 }
+
+window.addEventListener('DOMContentLoaded', ringo_do_skin_set);
