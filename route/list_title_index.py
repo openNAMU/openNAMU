@@ -55,7 +55,7 @@ def list_title_index(num = 1):
                         <li>''' + load_lang('all') + ' : ' + all_title[0][0] + '''</li>
                 '''
 
-        data += '</ul>' + next_fix('/list/document/all/', num, title_list, num)
+        data += '</ul>' + next_fix('/list/document/all/', num, title_list)
         sub = ' (' + str(num) + ')'
 
         return easy_minify(flask.render_template(skin_check(),

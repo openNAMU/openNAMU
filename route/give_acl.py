@@ -186,6 +186,6 @@ def give_acl_2(name):
                 menu = [
                     ['w/' + url_pas(name), load_lang('document')], 
                     ['manager', load_lang('admin')], 
-                    ['admin_log?search=' + url_pas('acl (' + name + ')'), load_lang('acl_record')]
+                    ['list/admin/auth_use/' + url_pas('acl (' + name + ')') + '/1', load_lang('acl_record')]
                 ]
             ))
