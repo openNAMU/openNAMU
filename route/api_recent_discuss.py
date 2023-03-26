@@ -14,7 +14,7 @@ def api_recent_discuss(num = 10, get_type = 'normal'):
         else:
             curs.execute(db_change("select title, sub, date, code, stop from rd where not stop = 'O' order by date desc limit ?"), [num])
 
-        for i in curs.fetchall():
-            data_list += [i]
+        for for_a in curs.fetchall():
+            data_list += [for_a]
 
         return flask.jsonify(data_list if data_list else {}) 
