@@ -24,7 +24,7 @@ def user_setting_top_menu():
             db_data = db_data[0][0] if db_data else ''
             
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('top_menu_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                imp = [load_lang('user_added_menu'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <span>
                         EX)
