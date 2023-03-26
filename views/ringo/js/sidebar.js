@@ -20,8 +20,13 @@ function ringo_do_side_button_1() {
         if(temp_save[0] === '') {
             let data = '';
             for(let for_a = 0; for_a < text.length; for_a++) {
-                data += '<a href="/w/' + ringo_do_url_encode(text[for_a][1]) + '">' + ringo_do_xss_encode(text[for_a][1]) + '</a><br>';
-                data += text[for_a][2] + ' | ' + ringo_do_xss_encode(text[for_a][3]) + '<br>';
+                if(text[for_a][6] === '') {
+                    data += '<a href="/w/' + ringo_do_url_encode(text[for_a][1]) + '">' + ringo_do_xss_encode(text[for_a][1]) + '</a><br>';
+                    data += text[for_a][2] + ' | ' + ringo_do_xss_encode(text[for_a][3]) + '<br>';
+                } else {
+                    data += '---<br>';
+                    data += '--- | ---<br>';
+                }
             }
 
             document.getElementById('side_content').innerHTML = data;
@@ -41,7 +46,7 @@ function ringo_do_side_button_2() {
         if(temp_save[1] === '') {
             let data = '';
             for(let for_a = 0; for_a < text.length; for_a++) {
-                data += '<a href="/w/' + ringo_do_url_encode(text[for_a][3]) + '">' + ringo_do_xss_encode(text[for_a][1]) + '</a><br>';
+                data += '<a href="/thread/' + ringo_do_url_encode(text[for_a][3]) + '">' + ringo_do_xss_encode(text[for_a][1]) + '</a><br>';
                 data += text[for_a][2] + '<br>';
             }
 
