@@ -232,6 +232,7 @@
         "file_delete" : "File delete",
         "added_menu" : "Added menu",
         "document_set" : "Document settings",
+        "user_added_menu" : "User added menu",
         "move_redirect_make" : "Redirect document generation (Only if possible)",
         "_comment_" : "Edit",
             "load" : "Load another document",
