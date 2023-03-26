@@ -11,16 +11,21 @@ def api_recent_change(num = 10):
         get_title = ''
 
         curs.execute(db_change('select id, title from rc where type = "" order by date desc limit ?'), [num])
-        for i in curs.fetchall():
-            if repeat_ok == '1' or i[1] != get_title:
-                get_title = i[1]
-                curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where id = ? and title = ?'), i)
+        for for_a in curs.fetchall():
+            if repeat_ok == '1' or for_a[1] != get_title:
+                get_title = for_a[1]
+                curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where id = ? and title = ?'), for_a)
                 get_data = curs.fetchall()
                 if get_data:
-                    if get_data[0][6] == '' or admin == 1:
-                        data_list += get_data
+                    get_data = list(get_data[0])
+                    if get_data[6] == '' or admin == 1:
+                        if admin == 1:
+                            data_list += get_data
+                        else:
+                            get_data[3] = ip_pas(get_data[3], 1)
+                            data_list += get_data
                     else:
-                        data_list += [['', '', '', '', '', '', get_data[0][6]]]
+                        data_list += [['', '', '', '', '', '', get_data[6]]]
                 else:
                     data_list += [['', '', '', '', '', '', '']]
 
