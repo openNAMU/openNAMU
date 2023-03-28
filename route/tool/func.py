@@ -1337,6 +1337,9 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
     # data_type in ['view', 'raw', 'api_view', 'backlink']
     doc_acl = acl_check(doc_name, 'render') if doc_acl == '' else doc_acl
     doc_data = 0 if doc_data == None else doc_data
+
+    acl_dict = {}
+    acl_dict[doc_name] = doc_acl
         
     if doc_acl == 1:
         return 'HTTP Request 401.3'
@@ -1355,11 +1358,18 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
             if data_type == 'backlink':
                 return ''
 
+            
             if 'include' in get_class_render[2]:
                 for_a = 0
                 while len(get_class_render[2]['include']) > for_a:
                     include_data = get_class_render[2]['include'][for_a]
-                    if acl_check(include_data[1], 'render') == 0:
+                    if include_data[1] in acl_dict:
+                        acl_result = acl_dict[include_data[1]]
+                    else:
+                        acl_result = acl_check(include_data[1], 'render')
+                        acl_dict[include_data[1]] = acl_result
+
+                    if acl_result == 0:
                         include_regex = re.compile('<div id="' + include_data[0] + '"><\/div>')
                         if re.search(include_regex, get_class_render[0]):
                             include_data_render = class_do_render(conn, render_lang_data).do_render(include_data[1], include_data[2], data_type, include_data[0] + data_in)
