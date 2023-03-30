@@ -6,8 +6,8 @@
 * 스킨 (Skin) : 
 * 스킨 버전 (Skin version) : 
 
-<!-- 무언가 작동 안할 때는 캐시 초기화를 먼저 해보세요. -->
-<!-- Try initializing the cache first when something isn't working. -->
+<!-- 무언가 작동 안할 때는 캐시 초기화, 재시작을 먼저 해보세요. -->
+<!-- Try initializing the cache, restart first when something isn't working. -->
 
 ## 설명 (Explanation)
 
@@ -17,3 +17,5 @@
 
 <!-- 다 작성해주시면 오류 해결에 좀 더 빠른 시간이 소요됩니다. -->
 <!-- If you fill it out, it will take faster time to resolve the error. -->
+
+<!-- 완전 뜬금없는 내용이 아닌 한 단순 질문 올리셔도 됩니다. -->
