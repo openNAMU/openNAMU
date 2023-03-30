@@ -1925,6 +1925,6 @@ class class_do_render_namumark:
             self.render_data_js, # js
             {
                 'backlink' : self.data_backlink, # backlink
-                'include' : self.data_include # include data
+                'include' : list(reversed(self.data_include)) # include data
             } # other
         ]
