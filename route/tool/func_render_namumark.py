@@ -669,7 +669,7 @@ class class_do_render_namumark:
 
             name_ob = 'opennamu_math_' + str(self.data_math_count)
 
-            data_name = self.get_tool_data_storage('<span id="' + name_ob + '">', '</span>', match.group(0))
+            data_name = self.get_tool_data_storage('<span id="' + name_ob + '">' + data_html, '</span>', match.group(0))
 
             self.render_data_js += '' + \
                 'try {\n' + \
@@ -1917,8 +1917,6 @@ class class_do_render_namumark:
             self.do_render_heading()
             
         self.do_render_last()
-
-        # print(self.data_temp_storage)
 
         return [
             self.render_data, # html
