@@ -669,7 +669,7 @@ class class_do_render_namumark:
 
             name_ob = 'opennamu_math_' + str(self.data_math_count)
 
-            data_name = self.get_tool_data_storage('<span id="' + name_ob + '">', '</span>', match.group(0))
+            data_name = self.get_tool_data_storage('<span id="' + name_ob + '">' + data_html, '</span>', match.group(0))
 
             self.render_data_js += '' + \
                 'try {\n' + \
@@ -1082,7 +1082,7 @@ class class_do_render_namumark:
             elif not match:
                 break
             else:
-                if self.doc_include != '':
+                if re.search('opennamu_include_', self.doc_include):
                     self.render_data = re.sub(include_regex, '', self.render_data, 1)
                 else:
                     match_org = match.group(0)
@@ -1156,9 +1156,6 @@ class class_do_render_namumark:
                     self.render_data = re.sub(include_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
 
             include_count_max -= 1
-
-    def do_render_list(self):
-        pass
 
     def do_redner_footnote(self):
         footnote_num = 0
@@ -1917,8 +1914,6 @@ class class_do_render_namumark:
             self.do_render_heading()
             
         self.do_render_last()
-
-        # print(self.data_temp_storage)
 
         return [
             self.render_data, # html
