@@ -1124,21 +1124,24 @@ def wiki_css(data):
 
 def cut_100(data):
     # without_DB
-    data = re.sub(r'(.|\r|\n)*<div class="opennamu_render_complete">', '', data, 1)
+    if re.search(r'<div class="opennamu_render_complete">', data):
+        data = re.sub(r'(.|\r|\n)*<div class="opennamu_render_complete">', '', data, 1)
 
-    data = data.replace('<br>', ' ')
-    data = data.replace('\r', '') 
-    data = data.replace('\n', ' ')
-    data = re.sub(r'<[^<>]+>', ' ', data)
-    data = data.replace('\n', ' ')
-    data = re.sub(r' {2,}', ' ', data)
-    data = re.sub(r'(^ +| +$)', '', data)
+        data = data.replace('<br>', ' ')
+        data = data.replace('\r', '') 
+        data = data.replace('\n', ' ')
+        data = re.sub(r'<[^<>]+>', ' ', data)
+        data = data.replace('\n', ' ')
+        data = re.sub(r' {2,}', ' ', data)
+        data = re.sub(r'(^ +| +$)', '', data)
 
-    data_len = len(data)
-    if data_len > 100:
-        return data[0:100]
+        data_len = len(data)
+        if data_len > 100:
+            return data[0:100]
+        else:
+            return data[0:data_len]
     else:
-        return data[0:data_len]
+        return ''
 
 def wiki_set(num = 1):
     curs = conn.cursor()
