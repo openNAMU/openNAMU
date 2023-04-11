@@ -1124,7 +1124,7 @@ def wiki_css(data):
 
 def cut_100(data):
     # without_DB
-    data = re.sub(r'.*<div class="opennamu_render_complete">', '', data, 1)
+    data = re.sub(r'(.|\r|\n)*<div class="opennamu_render_complete">', '', data, 1)
 
     data = data.replace('<br>', ' ')
     data = data.replace('\r', '') 
