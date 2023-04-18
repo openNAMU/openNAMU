@@ -182,6 +182,9 @@ class get_db_connect:
         load_conn(self.conn_sub)
         self.conn.close()
 
+# class get_whoosh_connect:
+    
+
 class class_check_json:
     def do_check_set_json():
         if os.getenv('NAMU_DB') or os.getenv('NAMU_DB_TYPE'):
@@ -596,15 +599,6 @@ def update(ver_num, set_data):
             for for_b in db_table_list[for_a]:
                 curs.execute(db_change("update " + for_a + " set " + for_b + " = '' where " + for_b + " is null"))
                 
-    if ver_num < 3500112:
-        # curs.execute(db_change('select id from user_set where name = "email" and data = ?'), [user_email])
-        curs.execute(db_change('select id from user_set where name = "email"'))
-        for db_data in curs.fetchall():
-            if ip_or_user(db_data[0]) == 1:
-                curs.execute(db_change(
-                    'delete from user_set where id = ? and name = "email"'
-                ), [db_data[0]])
-                
     if ver_num < 3500113:
         db_table_list = get_db_table_list()
         for for_a in db_table_list:
@@ -660,9 +654,19 @@ def update(ver_num, set_data):
 
         print("Update 3500360 complete")
 
+    if ver_num < 3500361:
+        # curs.execute(db_change('select id from user_set where name = "email" and data = ?'), [user_email])
+        curs.execute(db_change('select id from user_set where name = "email"'))
+        for db_data in curs.fetchall():
+            if ip_or_user(db_data[0]) == 1:
+                curs.execute(db_change(
+                    'delete from user_set where id = ? and name = "email"'
+                ), [db_data[0]])
+
+#    if ver_num < 3500361:
+
+
     conn.commit()
-    
-    # 아이피 상태인 이메일 제거 예정
 
     print('Update completed')
 
@@ -1486,51 +1490,52 @@ def render_simple_set(data):
 def send_email(who, title, data):
     curs = conn.cursor()
 
+    curs.execute(db_change('' + \
+        'select name, data from other ' + \
+        'where name = "smtp_email" or name = "smtp_pass" or name = "smtp_server" or name = "smtp_port" or name = "smtp_security"' + \
+    ''))
+    rep_data = curs.fetchall()
+
+    smtp_email = ''
+    smtp_pass = ''
+    smtp_server = ''
+    smtp_security = ''
+    smtp_port = ''
+    smtp = ''
+
+    for i in rep_data:
+        if i[0] == 'smtp_email':
+            smtp_email = i[1]
+        elif i[0] == 'smtp_pass':
+            smtp_pass = i[1]
+        elif i[0] == 'smtp_server':
+            smtp_server = i[1]
+        elif i[0] == 'smtp_security':
+            smtp_security = i[1]
+        elif i[0] == 'smtp_port':
+            smtp_port = i[1]
+    
+    smtp_port = int(number_check(smtp_port))
+    if smtp_security == 'plain':
+        smtp = smtplib.SMTP(smtp_server, smtp_port)
+    elif smtp_security == 'starttls':
+        smtp = smtplib.SMTP(smtp_server, smtp_port)
+        smtp.starttls()
+    else:
+        # if smtp_security == 'tls':
+        smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
+        
+    domain = load_domain()
+    wiki_name = wiki_set()[0]
+    
+    msg = email.mime.text.MIMEText(data)
+
+    msg['Subject'] = title
+    msg['From'] = wiki_name + ' <noreply@' + domain + '>'
+    msg['To'] = who
+
     try:
-        curs.execute(db_change('' + \
-            'select name, data from other ' + \
-            'where name = "smtp_email" or name = "smtp_pass" or name = "smtp_server" or name = "smtp_port" or name = "smtp_security"' + \
-        ''))
-        rep_data = curs.fetchall()
-
-        smtp_email = ''
-        smtp_pass = ''
-        smtp_server = ''
-        smtp_security = ''
-        smtp_port = ''
-        smtp = ''
-
-        for i in rep_data:
-            if i[0] == 'smtp_email':
-                smtp_email = i[1]
-            elif i[0] == 'smtp_pass':
-                smtp_pass = i[1]
-            elif i[0] == 'smtp_server':
-                smtp_server = i[1]
-            elif i[0] == 'smtp_security':
-                smtp_security = i[1]
-            elif i[0] == 'smtp_port':
-                smtp_port = i[1]
-        
-        smtp_port = int(smtp_port)
-        if smtp_security == 'plain':
-            smtp = smtplib.SMTP(smtp_server, smtp_port)
-        elif smtp_security == 'starttls':
-            smtp = smtplib.SMTP(smtp_server, smtp_port)
-            smtp.starttls()
-        else:
-            # if smtp_security == 'tls':
-            smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
-        
         smtp.login(smtp_email, smtp_pass)
-
-        domain = load_domain()
-        wiki_name = wiki_set()[0]
-        
-        msg = email.mime.text.MIMEText(data)
-        msg['Subject'] = title
-        msg['From'] = 'openNAMU <noreply@' + domain + '>'
-        msg['To'] = who
         
         smtp.sendmail('openNAMU@' + domain, who, msg.as_string())
         smtp.quit()

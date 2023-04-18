@@ -93,11 +93,13 @@ def main_func_setting_external():
                             ''' + re_ver + '''
                         </select>
 
-                        <h2>''' + load_lang('email_setting') + '''</h1>
-                        <input type="checkbox" name="email_have" ''' + ('checked' if d_list[9] != '' else '')  + '''> ''' + \
-                             load_lang('email_required') + '''
+                        <h2>''' + load_lang('email_setting') + '''</h2>
+                        <a href="/setting/phrase#s-6">(''' + load_lang('text_setting') + ''')</a>
+                        <hr class="main_hr">
 
-                        <h2>''' + load_lang('smtp_setting') + '''</h1>
+                        <input type="checkbox" name="email_have" ''' + ('checked' if d_list[9] != '' else '')  + '''> ''' + load_lang('email_required') + '''
+
+                        <h3>''' + load_lang('smtp_setting') + '''</h3>
                         <a href="https://support.google.com/mail/answer/7126229">(Google)</a>
                         <hr class="main_hr">
 
