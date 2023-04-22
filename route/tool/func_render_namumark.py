@@ -686,6 +686,9 @@ class class_do_render_namumark:
             return '<' + data_name + '></' + data_name + '>'
 
         math_regex = re.compile('\[math\(((?:(?!\[math\(|\)\]).|\n)+)\)\]', re.I)
+        math_regex_2 = re.compile('&lt;math&gt;((?:(?!&lt;math&gt;|&lt;\/math&gt;).)+)&lt;\/math&gt;', re.I)
+
+        self.render_data = re.sub(math_regex_2, do_render_math_sub, self.render_data)
         self.render_data = re.sub(math_regex, do_render_math_sub, self.render_data)
 
     def do_render_link(self):
