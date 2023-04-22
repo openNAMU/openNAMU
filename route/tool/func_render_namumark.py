@@ -667,7 +667,7 @@ class class_do_render_namumark:
             data = html.unescape(data)
             data = self.get_tool_js_safe(data)
 
-            name_ob = 'opennamu_math_' + str(self.data_math_count)
+            name_ob = self.doc_include + 'opennamu_math_' + str(self.data_math_count)
 
             data_name = self.get_tool_data_storage('<span id="' + name_ob + '">' + data_html, '</span>', match.group(0))
 
