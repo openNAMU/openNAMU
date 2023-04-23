@@ -1111,7 +1111,7 @@ def wiki_css(data):
     data_css += '<script defer src="/views/main_css/js/route/thread.js?ver=' + data_css_ver + '"></script>'
     
     # Route JS
-    data_css += '<script src="/views/main_css/js/load_editor.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/route/editor.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script src="/views/main_css/js/route/render.js?ver=' + data_css_ver + '"></script>'
     
     # Main CSS

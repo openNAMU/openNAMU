@@ -101,6 +101,8 @@ def filter_inter_wiki_add(tool, name = None):
 
             return redirect('/' + re.sub(r'^plus_', '', tool))
         else:
+            # 추가 편집 구분 필요
+            # 각 파일 별로 분리 필요
             get_sub = 0
             stat = 'disabled' if admin_check() != 1 else ''
 
