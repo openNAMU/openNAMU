@@ -90,8 +90,8 @@ def main_setting_skin_set():
                         <select name="main_css_darkmode">
                             ''' + set_data["main_css_darkmode"] + '''
                         </select>
-                        <h2>''' + load_lang("editor") + '''</h2>
-                        <h3>''' + load_lang("image_paste") + ''' (''' + load_lang("not_working") + ''')</h3>
+                        <h2>''' + load_lang("edit") + '''</h2>
+                        <h3>''' + load_lang("image_paste") + '''
                         <sup>''' + load_lang('only_korean') + '''</sup> <sup>''' + load_lang('unavailable_in_monaco') + '''</sup>
                         <hr class="main_hr">
                         <select name="main_css_image_paste">
@@ -105,5 +105,5 @@ def main_setting_skin_set():
                         <button type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 '''),
-                menu = [['change', load_lang('user_setting')], ['change/skin_set', load_lang('skin_set')]]
+                menu = [['setting', load_lang('return')]]
             ))
