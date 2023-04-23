@@ -325,26 +325,6 @@ class class_do_render_namumark:
 
                     toc_list += [['', heading_data_text]]
 
-                    self.render_data_js += '''
-                        function opennamu_heading_folding(data, element = '') {
-                            let fol = document.getElementById(data);
-                            if(fol.style.display === '' || fol.style.display === 'inline-block' || fol.style.display === 'block') {
-                                document.getElementById(data).style.display = 'none';
-                            } else {
-                                document.getElementById(data).style.display = 'block';
-                            }
-                            
-                            if(element !== '') {
-                                console.log(element.innerHTML);
-                                if(element.innerHTML !== '⊖') {
-                                    element.innerHTML = '⊖';
-                                } else {
-                                    element.innerHTML = '⊕';
-                                }
-                            }
-                        }\n
-                    '''
-
                     heading_folding = ['⊖', 'block']
                     if heading_data[2]:
                         heading_folding = ['⊕', 'none']
@@ -1433,10 +1413,12 @@ class class_do_render_namumark:
             table_count_all -= 1
     
     def do_render_middle(self):
-        middle_regex = r'{{{([^{](?:(?!{{{|}}}).|\n)*)?(?:}|<(\/?(?:slash)_(?:[0-9]+))>)}}'
         wiki_count = 0
+        html_count = 0
         syntax_count = 0
         folding_count = 0
+
+        middle_regex = r'{{{([^{](?:(?!{{{|}}}).|\n)*)?(?:}|<(\/?(?:slash)_(?:[0-9]+))>)}}'
         middle_count_all = len(re.findall(middle_regex, self.render_data)) * 10
         while 1:
             middle_data = re.search(middle_regex, self.render_data)
@@ -1491,12 +1473,19 @@ class class_do_render_namumark:
                         data_name = self.get_tool_data_storage('<div id="' + self.doc_include + 'opennamu_wiki_' + str(wiki_count) + '"></div>', '', middle_data_org)
                         wiki_count += 1
                     elif middle_name == '#!html':
+                        html_data = re.sub(r'^#!html ', '', middle_data)
                         if middle_slash:
-                            middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
-                            self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
-                            continue
+                            html_data += '\\'
 
-                        data_name = self.get_tool_data_storage('', '', middle_data_org)
+                        data_revert = self.get_tool_data_revert(html_data)
+                        data_revert = re.sub(r'^\n', '', data_revert)
+                        data_revert = re.sub(r'\n$', '', data_revert)
+                        data_revert = re.sub(r'&amp;nbsp;', '&nbsp;', data_revert)
+
+                        self.render_data_js += 'opennamu_render_html("' + self.doc_include + 'opennamu_wiki_' + str(html_count) + '");\n'
+
+                        data_name = self.get_tool_data_storage('<span id="' + self.doc_include + 'opennamu_wiki_' + str(html_count) + '">' + data_revert, '</span>', middle_data_org)
+                        html_count += 1
                     elif middle_name == '#!folding':
                         if middle_slash:
                             middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+))>', '<temp_' + middle_slash + '>', middle_data_org)
@@ -1652,8 +1641,8 @@ class class_do_render_namumark:
                             middle_data += '\\'
 
                         data_revert = self.get_tool_data_revert(middle_data)
-                        data_revert = re.sub('^\n', '', data_revert)
-                        data_revert = re.sub('\n$', '', data_revert)
+                        data_revert = re.sub(r'^\n', '', data_revert)
+                        data_revert = re.sub(r'\n$', '', data_revert)
 
                         data_name = self.get_tool_data_storage(data_revert, '', middle_data_org)
                 else:
@@ -1661,8 +1650,8 @@ class class_do_render_namumark:
                         middle_data += '\\'
 
                     data_revert = self.get_tool_data_revert(middle_data)
-                    data_revert = re.sub('^\n', '', data_revert)
-                    data_revert = re.sub('\n$', '', data_revert)
+                    data_revert = re.sub(r'^\n', '', data_revert)
+                    data_revert = re.sub(r'\n$', '', data_revert)
 
                     data_name = self.get_tool_data_storage(data_revert, '', middle_data_org)
 
