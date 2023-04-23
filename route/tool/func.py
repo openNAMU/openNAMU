@@ -67,7 +67,8 @@ else:
 print('----')
 
 # Init-Load
-from .func_render import *
+from .func_tool import *
+from .func_render import class_do_render
 
 from diff_match_patch import diff_match_patch
 

@@ -188,21 +188,16 @@ class class_do_render_namumark:
 
     def do_render_text(self):
         # <b> function
-        if ip_or_user(self.ip) == 0:
-            self.curs.execute(db_change('select data from user_set where name = "main_css_bold" and id = ?'), [self.ip])
-            db_data = self.curs.fetchall()
-            bold_user_set = db_data[0][0] if db_data else 'normal'
-        else:
-            bold_user_set = self.flask_session['main_css_bold'] if 'main_css_bold' in self.flask_session else 'normal'
+        bold_user_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_bold', self.ip)
 
         def do_render_text_bold(match):
             data = match.group(1)
-            if bold_user_set == 'normal':
-                data_name = self.get_tool_data_storage('<b>', '</b>', match.group(0))
+            if bold_user_set == 'delete':
+                return ''
             elif bold_user_set == 'change':
                 data_name = self.get_tool_data_storage('', '', match.group(0))
             else:
-                return ''
+                data_name = self.get_tool_data_storage('<b>', '</b>', match.group(0))
             
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
@@ -254,21 +249,16 @@ class class_do_render_namumark:
         self.render_data = re.sub(r",,((?:(?!,,).)+),,", do_render_text_sub, self.render_data)
 
         # <s> function
-        if ip_or_user(self.ip) == 0:
-            self.curs.execute(db_change('select data from user_set where name = "main_css_strike" and id = ?'), [self.ip])
-            db_data = self.curs.fetchall()
-            strike_user_set = db_data[0][0] if db_data else 'normal'
-        else:
-            strike_user_set = self.flask_session['main_css_strike'] if 'main_css_strike' in self.flask_session else 'normal'
+        strike_user_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_strike', self.ip)
 
         def do_render_text_strike(match):
             data = match.group(1)
-            if strike_user_set == 'normal':
-                data_name = self.get_tool_data_storage('<s>', '</s>', match.group(0))
+            if strike_user_set == 'delete':
+                return ''
             elif strike_user_set == 'change':
                 data_name = self.get_tool_data_storage('', '', match.group(0))
             else:
-                return ''
+                data_name = self.get_tool_data_storage('<s>', '</s>', match.group(0))
             
             return '<' + data_name + '>' + data + '</' + data_name + '>'
         
@@ -1125,12 +1115,7 @@ class class_do_render_namumark:
                         include_data = db_data[0][0].replace('\r', '')
 
                         # include link func
-                        if ip_or_user(self.ip) == 0:
-                            self.curs.execute(db_change('select data from user_set where name = "main_css_include_link" and id = ?'), [self.ip])
-                            db_data = self.curs.fetchall()
-                            include_set_data = db_data[0][0] if db_data else 'normal'
-                        else:
-                            include_set_data = self.flask_session['main_css_include_link'] if 'main_css_include_link' in self.flask_session else 'normal'
+                        include_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_include_link', self.ip)
 
                         include_link = ''
                         if include_set_data == 'use':
@@ -1773,14 +1758,9 @@ class class_do_render_namumark:
             if self.data_category != '':
                 data_name = self.get_tool_data_storage(self.data_category, '</div>', '')
 
-                if ip_or_user(self.ip) == 0:
-                    self.curs.execute(db_change('select data from user_set where name = "main_css_category_set" and id = ?'), [self.ip])
-                    db_data = self.curs.fetchall()
-                    category_set_data = db_data[0][0] if db_data else 'normal'
-                else:
-                    category_set_data = self.flask_session['main_css_category_set'] if 'main_css_category_set' in self.flask_session else 'normal'
+                category_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_category_set', self.ip)
 
-                if category_set_data == 'normal':
+                if category_set_data == 'bottom':
                     if re.search(r'<footnote_category>', self.render_data):
                         self.render_data = re.sub(r'<footnote_category>', '<hr><' + data_name + '></' + data_name + '>', self.render_data, 1)
                     else:
@@ -1855,26 +1835,22 @@ class class_do_render_namumark:
             self.data_toc = toc_data
             self.data_toc = re.sub(r'<toc_inside>((?:(?!<toc_inside>|<\/toc_inside>).)*)<\/toc_inside>', do_render_last_toc, self.data_toc)
 
-            if ip_or_user(self.ip) == 0:
-                self.curs.execute(db_change('select data from user_set where name = "main_css_toc_set" and id = ?'), [self.ip])
-                db_data = self.curs.fetchall()
-                toc_set_data = db_data[0][0] if db_data else 'normal'
-            else:
-                toc_set_data = self.flask_session['main_css_toc_set'] if 'main_css_toc_set' in self.flask_session else 'normal'
+            toc_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_toc_set', self.ip)
 
             self.render_data = re.sub(toc_search_regex, '', self.render_data)
-            if toc_set_data != 'off':
+            if toc_set_data == 'off':
+                self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
+            else:
                 if re.search(r'<toc_need_part>', self.render_data):
                     toc_data_on = 1
 
                 self.render_data = re.sub(r'<toc_need_part>', lambda x : (self.data_toc), self.render_data, 20)
                 self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
-            else:
-                self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
 
             if  self.doc_include != '' or \
                 re.search(r'<toc_no_auto>', self.render_data) or \
-                toc_set_data != 'normal' or \
+                toc_set_data == 'half_off' or \
+                toc_set_data == 'off' or \
                 toc_data_on == 1:
                 self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
             else:
