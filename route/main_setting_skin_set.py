@@ -34,16 +34,16 @@ def main_setting_skin_set():
             set_data = {}
             for for_b in set_list:
                 set_data[for_b] = ''
-                get_data = ''
 
-                if set_list[for_b][0] == ['']:
-                    set_data[for_b] = get_data
-                else:
-                    for for_a in set_list[for_b]:
-                        if get_data == for_a[0]:
-                            set_data[for_b] = '<option value="' + for_a[0] + '">' + for_a[1] + '</option>' + set_data[for_b]
-                        else:
-                            set_data[for_b] += '<option value="' + for_a[0] + '">' + for_a[1] + '</option>'
+                curs.execute(db_change('select data from other where name = ?'), [for_b])
+                db_data = curs.fetchall()
+                get_data = db_data[0][0] if db_data else ''
+
+                for for_a in set_list[for_b]:
+                    if get_data == for_a[0]:
+                        set_data[for_b] = '<option value="' + for_a[0] + '">' + for_a[1] + '</option>' + set_data[for_b]
+                    else:
+                        set_data[for_b] += '<option value="' + for_a[0] + '">' + for_a[1] + '</option>'
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('main_skin_set_default'), wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('beta') + ')', 0])],

@@ -110,14 +110,11 @@ def user_setting_skin_set_main():
                 else:
                     get_data = flask.session[for_b] if for_b in flask.session else ''
 
-                if set_list[for_b][0] == ['']:
-                    set_data[for_b] = get_data
-                else:
-                    for for_a in set_list[for_b]:
-                        if get_data == for_a[0]:
-                            set_data[for_b] = '<option value="' + for_a[0] + '">' + for_a[1] + '</option>' + set_data[for_b]
-                        else:
-                            set_data[for_b] += '<option value="' + for_a[0] + '">' + for_a[1] + '</option>'
+                for for_a in set_list[for_b]:
+                    if get_data == for_a[0]:
+                        set_data[for_b] = '<option value="' + for_a[0] + '">' + for_a[1] + '</option>' + set_data[for_b]
+                    else:
+                        set_data[for_b] += '<option value="' + for_a[0] + '">' + for_a[1] + '</option>'
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('main_skin_set'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
