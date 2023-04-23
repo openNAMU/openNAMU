@@ -91,7 +91,7 @@ def main_setting_skin_set():
                             ''' + set_data["main_css_darkmode"] + '''
                         </select>
                         <h2>''' + load_lang("edit") + '''</h2>
-                        <h3>''' + load_lang("image_paste") + '''
+                        <h3>''' + load_lang("image_paste") + '''</h3>
                         <sup>''' + load_lang('only_korean') + '''</sup> <sup>''' + load_lang('unavailable_in_monaco') + '''</sup>
                         <hr class="main_hr">
                         <select name="main_css_image_paste">
