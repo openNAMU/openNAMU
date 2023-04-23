@@ -1,66 +1,7 @@
 from .tool.func import *
+from .user_setting_skin_set_main import user_setting_skin_set_main_set_list
 
-def user_setting_skin_set_main_set_list():
-    set_list = {
-        'main_css_strike' : [
-            ['default', load_lang('default')],
-            ['normal', load_lang('off')],
-            ['change', load_lang('change_to_normal')],
-            ['delete', load_lang('delete')]
-        ], 'main_css_bold' : [
-            ['default', load_lang('default')],
-            ['normal', load_lang('off')],
-            ['change', load_lang('change_to_normal')],
-            ['delete', load_lang('delete')]
-        ], 'main_css_include_link' : [
-            ['default', load_lang('default')],
-            ['normal', load_lang('off')],
-            ['use', load_lang('use')]
-        ], 'main_css_image_paste' : [
-            ['default', load_lang('default')],
-            ['normal', load_lang('off')],
-            ['use', load_lang('use')]
-        ], 'main_css_category_set' : [
-            ['default', load_lang('default')],
-            ['bottom', load_lang('bottom')],
-            ['top', load_lang('top')]
-        ], 'main_css_footnote_set' : [
-            ['default', load_lang('default')],
-            ['normal', load_lang('normal')],
-            ['spread', load_lang('spread')],
-            ['popup', load_lang('popup')]
-        ], 'main_css_image_set' : [
-            ['default', load_lang('default')],
-            ['normal', load_lang('normal')],
-            ['click', load_lang('change_to_link')],
-            ['new_click', load_lang('click_load')]
-        ], 'main_css_toc_set' : [
-            ['default', load_lang('default')],
-            ['normal', load_lang('normal')],
-            ['off', load_lang('all_off')],
-            ['half_off', load_lang('in_content')]
-        ], 'main_css_monaco' : [
-            ['default', load_lang('default')],
-            ['normal', load_lang('off')],
-            ['use', load_lang('use')]
-        ], 'main_css_exter_link' : [
-            ['default', load_lang('default')],
-            ['blank', load_lang('normal')],
-            ['self', load_lang('self_tab')]
-        ], 'main_css_link_delimiter' : [
-            ['default', load_lang('default')],
-            ['normal', load_lang('off')],
-            ['use', load_lang('use')]
-        ], 'main_css_darkmode' : [
-            ['default', load_lang('default')],
-            ['0', load_lang('off')],
-            ['1', load_lang('use')]
-        ]
-    }
-
-    return set_list
-
-def user_setting_skin_set_main():
+def main_setting_skin_set():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -69,46 +10,31 @@ def user_setting_skin_set_main():
             return re_error('/ban')
             
         set_list = user_setting_skin_set_main_set_list()
-        use_cookie = ['main_css_image_paste', 'main_css_darkmode']
 
         if flask.request.method == 'POST':
-            html_data = flask.make_response(redirect('/change/skin_set/main'))
-
             for for_b in set_list:
-                if for_b in use_cookie:
-                    html_data.set_cookie(for_b, flask.request.form.get(for_b, set_list[for_b][0][0]))
-                elif ip_or_user(ip) == 0:
-                    curs.execute(db_change('select data from user_set where name = ? and id = ?'), [for_b, ip])
-                    if curs.fetchall():
-                        curs.execute(db_change("update user_set set data = ? where name = ? and id = ?"), [
-                            flask.request.form.get(for_b, set_list[for_b][0][0]),
-                            for_b,
-                            ip
-                        ])
-                    else:
-                        curs.execute(db_change('insert into user_set (name, id, data) values (?, ?, ?)'), [
-                            for_b, 
-                            ip,
-                            flask.request.form.get(for_b, set_list[for_b][0][0])
-                        ])
+                curs.execute(db_change('select data from other where name = ?'), [for_b])
+                if curs.fetchall():
+                    curs.execute(db_change("update other set data = ? where name = ?"), [
+                        flask.request.form.get(for_b, set_list[for_b][0][0]),
+                        for_b
+                    ])
                 else:
-                    flask.session[for_b] = flask.request.form.get(for_b, set_list[for_b][0][0])
-
+                    curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [
+                        for_b, 
+                        flask.request.form.get(for_b, set_list[for_b][0][0])
+                    ])
+            
             conn.commit()
 
-            return html_data
+            admin_check(None, 'edit_set (skin_set)')
+
+            return redirect('/setting/skin_set')
         else:
             set_data = {}
             for for_b in set_list:
                 set_data[for_b] = ''
-                if for_b in use_cookie:
-                    get_data = flask.request.cookies.get(for_b, '')
-                elif ip_or_user(ip) == 0:
-                    curs.execute(db_change('select data from user_set where name = ? and id = ?'), [for_b, ip])
-                    db_data = curs.fetchall()
-                    get_data = db_data[0][0] if db_data else ''
-                else:
-                    get_data = flask.session[for_b] if for_b in flask.session else ''
+                get_data = ''
 
                 if set_list[for_b][0] == ['']:
                     set_data[for_b] = get_data
@@ -120,7 +46,7 @@ def user_setting_skin_set_main():
                             set_data[for_b] += '<option value="' + for_a[0] + '">' + for_a[1] + '</option>'
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('main_skin_set'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                imp = [load_lang('main_skin_set_default'), wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('beta') + ')', 0])],
                 data = render_simple_set('''
                     <form method="post">
                         <h2>''' + load_lang("render") + '''</h2>

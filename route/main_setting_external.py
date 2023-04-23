@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_func_setting_external():
+def main_setting_external():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
