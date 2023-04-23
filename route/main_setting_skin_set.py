@@ -86,12 +86,12 @@ def main_setting_skin_set():
                         <select name="main_css_link_delimiter">
                             ''' + set_data["main_css_link_delimiter"] + '''
                         </select>
-                        <h3>''' + load_lang("force_darkmode") + '''</h3>
+                        <h3>''' + load_lang("force_darkmode") + ''' (''' + load_lang("not_working") + ''')</h3>
                         <select name="main_css_darkmode">
                             ''' + set_data["main_css_darkmode"] + '''
                         </select>
                         <h2>''' + load_lang("editor") + '''</h2>
-                        <h3>''' + load_lang("image_paste") + '''</h3>
+                        <h3>''' + load_lang("image_paste") + ''' (''' + load_lang("not_working") + ''')</h3>
                         <sup>''' + load_lang('only_korean') + '''</sup> <sup>''' + load_lang('unavailable_in_monaco') + '''</sup>
                         <hr class="main_hr">
                         <select name="main_css_image_paste">
