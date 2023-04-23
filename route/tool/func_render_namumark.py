@@ -25,6 +25,8 @@ class class_do_render_namumark:
 
         try:
             self.darkmode = flask.request.cookies.get('main_css_darkmode', '0')
+            if self.darkmode == 'default':
+                self.darkmode = '0'
         except:
             self.darkmode = '0'
 
