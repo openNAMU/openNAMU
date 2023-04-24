@@ -1,10 +1,10 @@
 flask
-
 waitress
 
 requests
 
 pymysql
+whoosh
 
 diff-match-patch
 
