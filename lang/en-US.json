@@ -113,6 +113,8 @@
         "bottom" : "Bottom",
         "use" : "Use",
         "spread" : "Speard",
+        "popup" : "Popup",
+        "popover" : "Popover",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
             "hour" : "Hour(s)",

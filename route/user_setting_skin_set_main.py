@@ -144,7 +144,7 @@ def user_setting_skin_set_main():
                         <select name="main_css_category_set">
                             ''' + set_data["main_css_category_set"] + '''
                         </select>
-                        <h3>''' + load_lang("footnote") + '''</h3>
+                        <h3>''' + load_lang("footnote") + ''' (''' + load_lang('beta') + ''')</h3>
                         ''' + set_data_main["main_css_footnote_set"] + '''
                         <select name="main_css_footnote_set">
                             ''' + set_data["main_css_footnote_set"] + '''
