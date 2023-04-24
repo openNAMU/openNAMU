@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_error_404(e = ''):
+def main_func_error_404(e = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
         

@@ -1,5 +1,4 @@
-// 좀 더 개선 필요
-// use strict 적용 필요 (eval 동작에 문제 있음)
+// 폐지하고 다시 SSR 방식으로 전환 예정
 function opennamu_do_thread_make(topic_num, type_do = 'top', some = '', where = 'top_topic') {
     let url = '';
     if(type_do === 'top') {

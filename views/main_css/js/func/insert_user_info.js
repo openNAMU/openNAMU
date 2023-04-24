@@ -1,5 +1,6 @@
 "use strict";
 
+// 폐지하고 다시 SSR 방식으로 전환 예정
 function do_insert_user_info() {
     if(document.getElementById('opennamu_get_user_info')) {
         let name = document.getElementById('opennamu_get_user_info').innerHTML;
