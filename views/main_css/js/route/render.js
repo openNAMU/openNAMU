@@ -18,8 +18,7 @@ function opennamu_heading_folding(data, element = '') {
     }
 }
 
-function opennamu_render_html(name = '') {
-    console.log(name);
+function opennamu_do_render_html(name = '') {
     if(document.getElementById(name)) {
         let data = document.getElementById(name).innerHTML;
 
@@ -117,5 +116,44 @@ function opennamu_render_html(name = '') {
         }
 
         document.getElementById(name).innerHTML = data;
+    }
+}
+
+function opennamu_do_footnote_spread(set_name, load_name) {
+    if(document.getElementById(set_name + '_load').style.display === 'none') {
+        console.log(set_name, load_name);
+        document.getElementById(set_name).title = '';
+        document.getElementById(set_name + '_load').innerHTML = '<a href="#' + load_name + '">(Go)</a> ' + document.getElementById(load_name + '_title').innerHTML;
+        document.getElementById(set_name + '_load').style.display = "inline-block";
+    } else {
+        document.getElementById(set_name + '_load').style.display = "none";
+    }
+}
+
+function opennamu_do_footnote_popover(set_name, load_name) {
+    if(document.getElementById(set_name + '_load').style.display === 'none') {
+        console.log(set_name, load_name);
+        document.getElementById(set_name).title = '';
+        document.getElementById(set_name + '_load').innerHTML = '<a href="#' + load_name + '">(Go)</a> ' + document.getElementById(load_name + '_title').innerHTML;
+        document.getElementById(set_name + '_load').style.display = "inline-block";
+
+        let width = document.getElementById(set_name + '_load').clientWidth;
+        let screen_width = screen.availWidth;
+        let left = document.getElementById(set_name).getBoundingClientRect().left;
+        let top = document.getElementById(set_name).getBoundingClientRect().top;
+        console.log(width, screen_width, left);
+        console.log(screen_width - (left + width));
+        if(screen_width - (left + width) < 30) {
+            console.log("test");
+            if(left > 350) {
+                document.getElementById(set_name + '_load').style.left = String(left - 300) + "px";
+            } else {
+                document.getElementById(set_name + '_load').style.left = "0px";
+            }
+
+            document.getElementById(set_name + '_load').style.top = String(top + 20) + "px";
+        }
+    } else {
+        document.getElementById(set_name + '_load').style.display = "none";
     }
 }
