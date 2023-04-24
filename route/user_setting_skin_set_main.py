@@ -28,7 +28,8 @@ def user_setting_skin_set_main_set_list():
             ['default', load_lang('default')],
             ['normal', load_lang('normal')],
             ['spread', load_lang('spread')],
-            ['popup', load_lang('popup')]
+            ['popup', load_lang('popup') + ' (' + load_lang('not_working') + ')'],
+            ['popover', load_lang('popover')]
         ], 'main_css_image_set' : [
             ['default', load_lang('default')],
             ['normal', load_lang('normal')],

@@ -213,6 +213,24 @@ pre {
     border: 1px solid #cecece;
 }
 
+.opennamu_popup_footnote {
+    position: absolute;
+    
+    max-width: 50%;
+
+    padding: 10px;
+
+    background-color: #efefef;
+    
+    border: 1px solid #cecece;
+}
+
+@media ( max-width: 768px ) {
+    .opennamu_popup_footnote {
+        max-width: 100%;
+    }
+}
+
 hr {
     border: 0;
     border-top: 1px solid gainsboro;
