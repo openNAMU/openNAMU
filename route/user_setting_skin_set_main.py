@@ -28,7 +28,8 @@ def user_setting_skin_set_main_set_list():
             ['default', load_lang('default')],
             ['normal', load_lang('normal')],
             ['spread', load_lang('spread')],
-            ['popup', load_lang('popup')]
+            ['popup', load_lang('popup') + ' (' + load_lang('not_working') + ')'],
+            ['popover', load_lang('popover')]
         ], 'main_css_image_set' : [
             ['default', load_lang('default')],
             ['normal', load_lang('normal')],
@@ -143,7 +144,7 @@ def user_setting_skin_set_main():
                         <select name="main_css_category_set">
                             ''' + set_data["main_css_category_set"] + '''
                         </select>
-                        <h3>''' + load_lang("footnote") + '''</h3>
+                        <h3>''' + load_lang("footnote") + ''' (''' + load_lang('beta') + ''')</h3>
                         ''' + set_data_main["main_css_footnote_set"] + '''
                         <select name="main_css_footnote_set">
                             ''' + set_data["main_css_footnote_set"] + '''
