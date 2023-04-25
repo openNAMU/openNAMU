@@ -16,7 +16,7 @@ class class_do_render_namumark:
             self.ip = '0.0.0.0'
 
         try:
-            if 'main_css_bold' in self.flask_session:
+            if 'main_css_bold' in flask.session:
                 pass    
                 
             self.flask_session = flask.session
@@ -163,7 +163,7 @@ class class_do_render_namumark:
             else:
                 data += '<a id="' + self.doc_include + 'fn_' + self.data_footnote[for_a]['list'][0] + '" href="#' + self.doc_include + 'rfn_' + self.data_footnote[for_a]['list'][0] + '">(' + for_a + ') </a> '
 
-            data += '<footnote_title target="' + self.doc_include + 'fn_' + self.data_footnote[for_a]['list'][0] + '">' + self.data_footnote[for_a]['data'] + '</footnote_title>'
+            data += '<footnote_title id="' + self.doc_include + 'fn_' + self.data_footnote[for_a]['list'][0] + '_title">' + self.data_footnote[for_a]['data'] + '</footnote_title>'
 
         if data != '':
             data += '</div>'
@@ -1044,6 +1044,7 @@ class class_do_render_namumark:
                     return slash_add + match[2]
 
         include_num = 0
+        include_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_include_link', self.ip)
         include_regex = re.compile('\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\]', re.I)
         include_count_max = len(re.findall(include_regex, self.render_data)) * 2
         include_change_list = {}
@@ -1097,8 +1098,6 @@ class class_do_render_namumark:
                         include_data = db_data[0][0].replace('\r', '')
 
                         # include link func
-                        include_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_include_link', self.ip)
-
                         include_link = ''
                         if include_set_data == 'use':
                             include_link = '<div><a href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
@@ -1129,6 +1128,7 @@ class class_do_render_namumark:
 
     def do_redner_footnote(self):
         footnote_num = 0
+        footnote_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_set', self.ip)
         footnote_regex = re.compile('(?:\[\*((?:(?!\[\*|\]| ).)+)?(?: ((?:(?!\[\*|\]).)+))?\]|\[(각주|footnote)\])', re.I)
         footnote_count_all = len(re.findall(footnote_regex, self.render_data)) * 4
         while 1:
@@ -1159,21 +1159,63 @@ class class_do_render_namumark:
                     else:
                         footnote_text_data = footnote_data[1]
 
+                    fn = ''
+                    rfn = ''
+                    foot_v_name = ''
+
                     if footnote_name in self.data_footnote:
                         self.data_footnote[footnote_name]['list'] += [footnote_num_str]
                         footnote_first = self.data_footnote[footnote_name]['list'][0]
 
-                        data_name = self.get_tool_data_storage('<sup><a fn_target="' + self.doc_include + 'fn_' + footnote_first + '" id="' + self.doc_include + 'rfn_' + footnote_num_str + '" href="#' + self.doc_include + 'fn_' + footnote_first + '">(' + footnote_name + ' (' + footnote_num_str + ')' + ')</a></sup>', '', footnote_data_org)
-
-                        self.render_data = re.sub(footnote_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
+                        fn = self.doc_include + 'fn_' + footnote_first
+                        rfn = self.doc_include + 'rfn_' + footnote_num_str
+                        foot_v_name = footnote_name + ' (' + footnote_num_str + ')'
                     else:
                         self.data_footnote[footnote_name] = {}
                         self.data_footnote[footnote_name]['list'] = [footnote_num_str]
                         self.data_footnote[footnote_name]['data'] = footnote_text_data
 
-                        data_name = self.get_tool_data_storage('<sup><a fn_target="' + self.doc_include + 'fn_' + footnote_num_str + '" id="' + self.doc_include + 'rfn_' + footnote_num_str + '" href="#' + self.doc_include + 'fn_' + footnote_num_str + '">(' + footnote_name + footnote_name_add + ')</a></sup>', '', footnote_data_org)
+                        fn = self.doc_include + 'fn_' + footnote_num_str
+                        rfn = self.doc_include + 'rfn_' + footnote_num_str
+                        foot_v_name = footnote_name + footnote_name_add
 
-                        self.render_data = re.sub(footnote_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
+                    if footnote_set == 'spread':
+                        data_name = self.get_tool_data_storage(
+                            '<sup>' + \
+                                '<a fn_target="' + fn + '" id="' + rfn + '" href="javascript:void(0);">(' + foot_v_name + ')</a>' + \
+                            '</sup>' + \
+                            '<span class="opennamu_spead_footnote" id="' + rfn + '_load" style="display: none;"></span>',
+                            '',
+                            footnote_data_org
+                        )
+                        self.render_data_js += 'document.getElementById("' + rfn + '").addEventListener("click", function() { opennamu_do_footnote_spread("' + rfn + '", "' + fn + '"); });\n'
+                    elif footnote_set == 'popup':
+                        data_name = self.get_tool_data_storage(
+                            '<sup>' + \
+                                '<a fn_target="' + fn + '" id="' + rfn + '" href="javascript:void(0);">(' + foot_v_name + ')</a>' + \
+                            '</sup>' + \
+                            '<span class="opennamu_spead_footnote" id="' + rfn + '_load" style="display: none;"></span>',
+                            '',
+                            footnote_data_org
+                        )
+                        self.render_data_js += 'document.getElementById("' + rfn + '").addEventListener("click", function() { opennamu_do_footnote_spread("' + rfn + '", "' + fn + '"); });\n'
+                    elif footnote_set == 'popover':
+                        data_name = self.get_tool_data_storage(
+                            '<span id="' + rfn + '_over">' + \
+                                '<sup>' + \
+                                    '<a fn_target="' + fn + '" id="' + rfn + '" href="javascript:void(0);">(' + foot_v_name + ')</a>' + \
+                                '</sup>' + \
+                                '<span class="opennamu_popup_footnote" id="' + rfn + '_load" style="display: none;"></span>' + \
+                            '</span>',
+                            '',
+                            footnote_data_org
+                        )
+                        self.render_data_js += 'document.getElementById("' + rfn + '_over").addEventListener("mouseenter", function() { opennamu_do_footnote_popover("' + rfn + '", "' + fn + '"); });\n'
+                        self.render_data_js += 'document.getElementById("' + rfn + '_over").addEventListener("mouseleave", function() { opennamu_do_footnote_popover("' + rfn + '", "' + fn + '"); });\n'
+                    else:
+                        data_name = self.get_tool_data_storage('<sup><a fn_target="' + fn + '" id="' + rfn + '" href="#' + fn + '">(' + foot_v_name + ')</a></sup>', '', footnote_data_org)
+
+                    self.render_data = re.sub(footnote_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
 
             footnote_count_all -= 1
 
@@ -1484,7 +1526,7 @@ class class_do_render_namumark:
                         data_revert = re.sub(r'\n$', '', data_revert)
                         data_revert = re.sub(r'&amp;nbsp;', '&nbsp;', data_revert)
 
-                        self.render_data_js += 'opennamu_render_html("' + self.doc_include + 'opennamu_wiki_' + str(html_count) + '");\n'
+                        self.render_data_js += 'opennamu_do_render_html("' + self.doc_include + 'opennamu_wiki_' + str(html_count) + '");\n'
 
                         data_name = self.get_tool_data_storage('<span id="' + self.doc_include + 'opennamu_wiki_' + str(html_count) + '">' + data_revert, '</span>', middle_data_org)
                         html_count += 1
@@ -1750,7 +1792,6 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage(self.data_category, '</div>', '')
 
                 category_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_category_set', self.ip)
-
                 if category_set_data == 'bottom':
                     if re.search(r'<footnote_category>', self.render_data):
                         self.render_data = re.sub(r'<footnote_category>', '<hr><' + data_name + '></' + data_name + '>', self.render_data, 1)
@@ -1853,7 +1894,7 @@ class class_do_render_namumark:
         def do_render_last_footnote(match):
             match = match.group(1)
 
-            find_regex = re.compile('<footnote_title target="' + match + '">((?:(?!<footnote_title|<\/footnote_title>).)*)<\/footnote_title>')
+            find_regex = re.compile('<footnote_title id="' + match + '_title">((?:(?!<footnote_title|<\/footnote_title>).)*)<\/footnote_title>')
             find_data = re.search(find_regex, self.render_data)
             if find_data:
                 find_data = find_data.group(1)
