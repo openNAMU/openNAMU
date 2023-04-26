@@ -215,7 +215,9 @@ pre {
 
 .opennamu_popup_footnote {
     position: absolute;
-    
+
+    z-index: 10000;
+
     max-width: 50%;
 
     padding: 10px;
