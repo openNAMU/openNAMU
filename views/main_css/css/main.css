@@ -196,6 +196,12 @@ pre, #redirect {
 
 pre {    
     white-space: pre-wrap;
+
+    margin: 0;
+}
+
+#syntax {
+    padding: 0;
 }
 
 .opennamu_textarea_500 {
@@ -312,4 +318,13 @@ s:hover, strike:hover, del:hover {
 
 .change_space {
     white-space: pre-line;
+}
+
+.katex {
+    max-width: 100%;
+
+    display: inline-block;
+
+    overflow-x: scroll;
+    overflow-y: hidden;
 }
