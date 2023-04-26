@@ -57,7 +57,11 @@ blockquote {
     border-left: 5px solid #eee;
 }
 
-.spead_footnote {
+.opennamu_spead_footnote {
     background-color: black;
     color: white;
+}
+
+.opennamu_popup_footnote {
+    background-color: black;
 }
