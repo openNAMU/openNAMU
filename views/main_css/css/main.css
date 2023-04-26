@@ -273,9 +273,6 @@ s, strike, del {
 }
 
 s:hover, strike:hover, del:hover {
-    color: gray;
-    background-color: gainsboro;
-    
     text-decoration: none;
 }
 
