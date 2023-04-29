@@ -527,5 +527,7 @@
     "main_skin_set_default": "기본 스킨 설정 기본값",
     "spread": "펼침",
     "popup": "팝업",
-    "popover": "팝오버"
+    "popover": "팝오버",
+    "user_fix" : "사용자 수정",
+    "2fa_off" : "2FA 끄기"
 }
