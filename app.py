@@ -404,6 +404,8 @@ def give_admin_groups(name = None):
 def give_delete_admin_group(name = None):
     return give_delete_admin_group_2(name)
 
+app.route('/auth/give/fix/<user_name>', methods = ['POST', 'GET'])(give_user_fix)
+
 @app.route('/app_submit', methods = ['POST', 'GET'])
 def recent_app_submit():
     return recent_app_submit_2()
