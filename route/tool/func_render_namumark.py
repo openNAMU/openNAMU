@@ -665,6 +665,7 @@ class class_do_render_namumark:
 
     def do_render_link(self):
         link_regex = r'\[\[((?:(?!\[\[|\]\]|\||<|>).|<slash_[0-9]+>)+)(?:\|((?:(?!\[\[|\]\]|\|).)+))?\]\]'
+        image_count = 0
         link_count_all = len(re.findall(link_regex, self.render_data)) * 4
         while 1:
             if not re.search(link_regex, self.render_data):
@@ -769,12 +770,18 @@ class class_do_render_namumark:
                     if file_bgcolor != '':
                         file_bgcolor = 'background:' + self.get_tool_css_safe(file_bgcolor) + ';'
 
-                    file_end = '<img style="' + file_width + file_height + file_align_style + file_bgcolor + '" alt="' + link_sub + '" src="' + link_main + '">'
+
+                    image_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_image_set', self.ip)
+                    if image_set == 'new_click' or image_set == 'click':
+                        file_end = '<img style="' + file_width + file_height + file_align_style + file_bgcolor + '" id="opennamu_image_' + str(image_count) + '" alt="' + link_sub + '" src="">'
+                    else:
+                        file_end = '<img style="' + file_width + file_height + file_align_style + file_bgcolor + '" alt="' + link_sub + '" src="' + link_main + '">'
+
                     if file_align == 'center':
                         file_end = '<div style="text-align:center;">' + file_end + '</div>'
 
                     if link_exist != '':
-                        data_name = self.get_tool_data_storage('<a class="' + link_exist + '" title="' + link_sub + '" href="/upload?name=' + url_pas(link_main_org) + '">' + link_sub, '</a>', link_data_full)
+                        data_name = self.get_tool_data_storage('<a class="' + link_exist + '" title="' + link_sub + '" href="/upload?name=' + url_pas(link_main_org) + '">(' + link_sub, ')</a>', link_data_full)
                         self.render_data = re.sub(link_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
                     else:
                         file_pass = 0
@@ -788,9 +795,23 @@ class class_do_render_namumark:
 
                         if file_pass == 1:
                             if file_out == 0:
-                                data_name = self.get_tool_data_storage('<a title="' + link_sub + '" href="/w/file:' + url_pas(link_main_org) + '.' + url_pas(link_extension) + '">' + file_end, '</a>', link_data_full)
+                                file_link = '/w/file:' + url_pas(link_main_org) + '.' + url_pas(link_extension)
                             else:
-                                data_name = self.get_tool_data_storage('<a title="' + link_sub + '" href="' + link_main + '">' + file_end, '</a>', link_data_full)
+                                file_link = link_main
+
+                            if image_set == 'new_click':
+                                data_name = self.get_tool_data_storage('<a title="' + link_sub + '" id="opennamu_image_' + str(image_count) + '_link" href="javascript:void(0);">' + file_end, '</a>', link_data_full)
+                                self.render_data_js += '''
+                                    document.getElementById("opennamu_image_''' + str(image_count) + '''_link").addEventListener("click", function(e) {
+                                        document.getElementById("opennamu_image_''' + str(image_count) + '''").src = "''' + self.get_tool_js_safe(link_main) + '''";
+                                        setTimeout(function() {
+                                            document.getElementById("opennamu_image_''' + str(image_count) + '''_link").href = "''' + self.get_tool_js_safe(file_link) + '''";
+                                        }, 100);
+                                    });\n
+                                '''
+                                image_count += 1
+                            else:
+                                data_name = self.get_tool_data_storage('<a title="' + link_sub + '" href="' + file_link + '">' + file_end, '</a>', link_data_full)
                         else:
                             data_name = self.get_tool_data_storage('', '', link_data_full)
                         

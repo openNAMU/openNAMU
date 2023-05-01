@@ -70,7 +70,7 @@ def main_setting_skin_set():
                         <select name="main_css_include_link">
                             ''' + set_data["main_css_include_link"] + '''
                         </select>
-                        <h3>''' + load_lang("image") + ''' (''' + load_lang("not_working") + ''')</h3>
+                        <h3>''' + load_lang("image") + '''</h3>
                         <select name="main_css_image_set">
                             ''' + set_data["main_css_image_set"] + '''
                         </select>

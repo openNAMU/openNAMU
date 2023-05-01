@@ -21,6 +21,7 @@ def main_tool_admin():
                     <li><a href="/app_submit">''' + load_lang('application_list') + '''</a></li>
                     <li><a href="/register">''' + load_lang('add_user') + '''</a></li>
                     <li><a href="/setting">''' + load_lang('setting') + '''</a></li>
+                    <li><a href="/manager/18">''' + load_lang('user_fix') + '''</a></li>
                 </ul>
                 <h3>''' + load_lang('filter') + '''</h3>
                 <ul class="opennamu_ul">

@@ -140,27 +140,11 @@ elif what_i_do == '6':
     curs.execute(db_change("update other set data = ? where name = 'skin'"), [skin])
 elif what_i_do == '7':
     print('----')
-    print('1. sha256')
-    print('2. sha3')
-
-    print('----')
-    what_i_do = input('Select : ')
-
-    print('----')
     user_name = input('User name : ')
 
     print('----')
     user_pw = input('User password : ')
-
-    if what_i_do == '1':
-        hashed = hashlib.sha256(bytes(user_pw, 'utf-8')).hexdigest()
-    elif what_i_do == '2':
-        if sys.version_info < (3, 6):
-            hashed = sha3.sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
-        else:
-            hashed = hashlib.sha3_256(bytes(user_pw, 'utf-8')).hexdigest()
-    else:
-        raise ValueError(what_i_do)
+    hashed = pw_encode(user_pw)
 
     curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [
         hashed,
