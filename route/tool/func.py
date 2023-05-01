@@ -67,7 +67,8 @@ else:
 print('----')
 
 # Init-Load
-from .func_render import *
+from .func_tool import *
+from .func_render import class_do_render
 
 from diff_match_patch import diff_match_patch
 
@@ -181,6 +182,9 @@ class get_db_connect:
     def __exit__(self, exc_type, exc_value, traceback):
         load_conn(self.conn_sub)
         self.conn.close()
+
+# class get_whoosh_connect:
+    
 
 class class_check_json:
     def do_check_set_json():
@@ -596,15 +600,6 @@ def update(ver_num, set_data):
             for for_b in db_table_list[for_a]:
                 curs.execute(db_change("update " + for_a + " set " + for_b + " = '' where " + for_b + " is null"))
                 
-    if ver_num < 3500112:
-        # curs.execute(db_change('select id from user_set where name = "email" and data = ?'), [user_email])
-        curs.execute(db_change('select id from user_set where name = "email"'))
-        for db_data in curs.fetchall():
-            if ip_or_user(db_data[0]) == 1:
-                curs.execute(db_change(
-                    'delete from user_set where id = ? and name = "email"'
-                ), [db_data[0]])
-                
     if ver_num < 3500113:
         db_table_list = get_db_table_list()
         for for_a in db_table_list:
@@ -660,9 +655,19 @@ def update(ver_num, set_data):
 
         print("Update 3500360 complete")
 
+    if ver_num < 3500361:
+        # curs.execute(db_change('select id from user_set where name = "email" and data = ?'), [user_email])
+        curs.execute(db_change('select id from user_set where name = "email"'))
+        for db_data in curs.fetchall():
+            if ip_or_user(db_data[0]) == 1:
+                curs.execute(db_change(
+                    'delete from user_set where id = ? and name = "email"'
+                ), [db_data[0]])
+
+#    if ver_num < 3500361:
+
+
     conn.commit()
-    
-    # 아이피 상태인 이메일 제거 예정
 
     print('Update completed')
 
@@ -1105,8 +1110,9 @@ def wiki_css(data):
     # Route JS + Defer
     data_css += '<script defer src="/views/main_css/js/route/thread.js?ver=' + data_css_ver + '"></script>'
     
-    # 레거시 일반 JS
-    data_css += '<script src="/views/main_css/js/load_editor.js?ver=' + data_css_ver + '"></script>'
+    # Route JS
+    data_css += '<script src="/views/main_css/js/route/editor.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/route/render.js?ver=' + data_css_ver + '"></script>'
     
     # Main CSS
     data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css?ver=' + data_css_ver + '">'
@@ -1115,8 +1121,8 @@ def wiki_css(data):
     data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/styles/default.min.css">'
     data_css += '<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.0/build/highlight.min.js"></script>'
     
-    data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css" integrity="sha384-KiWOvVjnN8qwAZbuQyWDIbfCLFhLXNETzBQjA/92pIowpC0d2O3nppDGQVgwd2nB" crossorigin="anonymous">'
-    data_css += '<script src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js" integrity="sha384-0fdwu/T/EQMsQlrHCCHoH10pkPLlKA1jL5dFyUOvB3lfeT2540/2g6YgSi2BL14p" crossorigin="anonymous"></script>'
+    data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">'
+    data_css += '<script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>'
 
     data = data[0:2] + ['', data_css] + data[2:]
 
@@ -1486,51 +1492,52 @@ def render_simple_set(data):
 def send_email(who, title, data):
     curs = conn.cursor()
 
+    curs.execute(db_change('' + \
+        'select name, data from other ' + \
+        'where name = "smtp_email" or name = "smtp_pass" or name = "smtp_server" or name = "smtp_port" or name = "smtp_security"' + \
+    ''))
+    rep_data = curs.fetchall()
+
+    smtp_email = ''
+    smtp_pass = ''
+    smtp_server = ''
+    smtp_security = ''
+    smtp_port = ''
+    smtp = ''
+
+    for i in rep_data:
+        if i[0] == 'smtp_email':
+            smtp_email = i[1]
+        elif i[0] == 'smtp_pass':
+            smtp_pass = i[1]
+        elif i[0] == 'smtp_server':
+            smtp_server = i[1]
+        elif i[0] == 'smtp_security':
+            smtp_security = i[1]
+        elif i[0] == 'smtp_port':
+            smtp_port = i[1]
+    
+    smtp_port = int(number_check(smtp_port))
+    if smtp_security == 'plain':
+        smtp = smtplib.SMTP(smtp_server, smtp_port)
+    elif smtp_security == 'starttls':
+        smtp = smtplib.SMTP(smtp_server, smtp_port)
+        smtp.starttls()
+    else:
+        # if smtp_security == 'tls':
+        smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
+        
+    domain = load_domain()
+    wiki_name = wiki_set()[0]
+    
+    msg = email.mime.text.MIMEText(data)
+
+    msg['Subject'] = title
+    msg['From'] = wiki_name + ' <noreply@' + domain + '>'
+    msg['To'] = who
+
     try:
-        curs.execute(db_change('' + \
-            'select name, data from other ' + \
-            'where name = "smtp_email" or name = "smtp_pass" or name = "smtp_server" or name = "smtp_port" or name = "smtp_security"' + \
-        ''))
-        rep_data = curs.fetchall()
-
-        smtp_email = ''
-        smtp_pass = ''
-        smtp_server = ''
-        smtp_security = ''
-        smtp_port = ''
-        smtp = ''
-
-        for i in rep_data:
-            if i[0] == 'smtp_email':
-                smtp_email = i[1]
-            elif i[0] == 'smtp_pass':
-                smtp_pass = i[1]
-            elif i[0] == 'smtp_server':
-                smtp_server = i[1]
-            elif i[0] == 'smtp_security':
-                smtp_security = i[1]
-            elif i[0] == 'smtp_port':
-                smtp_port = i[1]
-        
-        smtp_port = int(smtp_port)
-        if smtp_security == 'plain':
-            smtp = smtplib.SMTP(smtp_server, smtp_port)
-        elif smtp_security == 'starttls':
-            smtp = smtplib.SMTP(smtp_server, smtp_port)
-            smtp.starttls()
-        else:
-            # if smtp_security == 'tls':
-            smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
-        
         smtp.login(smtp_email, smtp_pass)
-
-        domain = load_domain()
-        wiki_name = wiki_set()[0]
-        
-        msg = email.mime.text.MIMEText(data)
-        msg['Subject'] = title
-        msg['From'] = 'openNAMU <noreply@' + domain + '>'
-        msg['To'] = who
         
         smtp.sendmail('openNAMU@' + domain, who, msg.as_string())
         smtp.quit()

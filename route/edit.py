@@ -228,21 +228,15 @@ def edit(name = 'Test', section = 0, do_type = ''):
             sql_d = curs.fetchall()
             p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
             
-            if ip_or_user(ip) == 0:
-                curs.execute(db_change('select data from user_set where name = "main_css_monaco" and id = ?'), [ip])
-                db_data = curs.fetchall()
-                monaco_on = db_data[0][0] if db_data else 'normal'
-            else:
-                monaco_on = flask.session['main_css_monaco'] if 'main_css_monaco' in flask.session else 'normal'
-            
+            monaco_on = get_main_skin_set(curs, flask.session, 'main_css_monaco', ip)
             if monaco_on == 'use':
                 editor_display = 'style="display: none;"'
                 monaco_display = ''
                 add_get_file = '''
                     <link   rel="stylesheet"
                             data-name="vs/editor/editor.main" 
-                            href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.min.css">
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>
+                            href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.1/min/vs/editor/editor.main.min.css">
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.1/min/vs/loader.min.js"></script>
                 '''
 
                 editor_top_text += ' <a href="javascript:opennamu_edit_turn_off_monaco();">(' + load_lang('turn_off_monaco') + ')</a>'
@@ -253,7 +247,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                     monaco_thema = ''
                 
                 add_script = '''
-                    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs' }});
+                    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.1/min/vs' }});
                     require.config({ 'vs/nls': { availableLanguages: { '*': 'ko' } }});
                     require(["vs/editor/editor.main"], function () {
                         window.editor = monaco.editor.create(document.getElementById('opennamu_monaco_editor'), {

@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_func_setting_head(num, skin_name = '', set_preview = 0):
+def main_setting_head(num, skin_name = '', set_preview = 0):
     with get_db_connect() as conn:
         curs = conn.cursor()
 

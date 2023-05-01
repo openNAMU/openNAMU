@@ -18,7 +18,8 @@ def main_tool_redirect(num = 1, add_2 = ''):
             12 : [load_lang('compare_target'), 'check', load_lang('compare_target')],
             13 : [load_lang('document_name'), 'edit', load_lang('load')],
             14 : [load_lang('document_name'), 'star_doc', load_lang('add_star_doc')],
-            15 : [load_lang('name_or_ip_or_regex'), 'auth/give/ban', load_lang('release')]
+            15 : [load_lang('name_or_ip_or_regex'), 'auth/give/ban', load_lang('release')],
+            16 : [0, 'auth/give/fix', load_lang('user_fix')],
         }
         
         if num == 1:

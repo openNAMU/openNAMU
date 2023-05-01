@@ -1,4 +1,8 @@
 from .tool.func import *
+from .api_topic import api_topic
+
+def topic_make(data, ip_first = ''):
+    data = ''
 
 def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
     with get_db_connect() as conn:

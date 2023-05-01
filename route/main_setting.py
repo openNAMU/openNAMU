@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_func_setting():
+def main_setting():
     with get_db_connect() as conn:
         li_list = [
             ['main', load_lang('main_setting')],
@@ -11,7 +11,8 @@ def main_func_setting():
             ['body/top', load_lang('main_body')],
             ['body/bottom', load_lang('main_bottom_body')],
             ['sitemap', load_lang('sitemap_management')],
-            ['top_menu', load_lang('top_menu_setting') + ' (' + load_lang('beta') + ')']
+            ['top_menu', load_lang('top_menu_setting')],
+            ['skin_set', load_lang('main_skin_set_default')],
         ]
 
         li_data = ''.join(['<li><a href="/setting/' + str(li[0]) + '">' + li[1] + '</a></li>' for li in li_list])

@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_func_setting_phrase():
+def main_setting_phrase():
     with get_db_connect() as conn:
         curs = conn.cursor()
 

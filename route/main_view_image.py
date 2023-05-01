@@ -1,5 +1,5 @@
 from .tool.func import *
-from .main_error_404 import main_error_404
+from .main_func_error_404 import main_func_error_404
 
 def main_view_image(name = ''):
     with get_db_connect() as conn:
@@ -14,4 +14,4 @@ def main_view_image(name = ''):
                 mimetype = 'image/' + mime_type
             )
         else:
-            return main_error_404()
+            return main_func_error_404()
