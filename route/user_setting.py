@@ -84,7 +84,7 @@ def user_setting():
                 fa_data = curs.fetchall()
                 fa_data = fa_data[0][0] if fa_data and fa_data[0][0] != '' else ''
                 fa_data_select = ''
-                fa_data_sp_list = [['off', ''], ['pw', 'on']]
+                fa_data_sp_list = [[load_lang('off'), ''], [load_lang('password'), 'on']]
                 for fa_data_get in fa_data_sp_list:
                     fa_data_selected = ''
                     if fa_data == fa_data_get[1]:

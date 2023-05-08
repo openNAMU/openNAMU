@@ -204,7 +204,7 @@ def recent_change(name = None, tool = ''):
                     '<hr class="main_hr">' + div + \
                 ''
 
-                menu = 0
+                menu = [['other', load_lang('return')]]
                 title = load_lang('recent_change')
 
             if sub == '':

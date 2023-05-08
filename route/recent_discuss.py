@@ -76,5 +76,5 @@ def recent_discuss(tool):
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('recent_discussion'), wiki_set(), wiki_custom(), wiki_css([m_sub, 0])],
             data = div,
-            menu = 0
+            menu = [['other', load_lang('return')]]
         ))

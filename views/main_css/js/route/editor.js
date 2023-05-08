@@ -118,3 +118,49 @@ function pasteListener(e) {
         });
     }
 }
+
+function do_stop_exit() {
+    window.onbeforeunload = function() {
+        do_monaco_to_textarea();
+
+        let data = document.getElementById('opennamu_edit_textarea').value;
+        let origin = document.getElementById('opennamu_edit_origin').value;
+        if(data !== origin) {
+            return '';
+        }
+    }
+}
+
+function do_stop_exit_release() {
+    window.onbeforeunload = function () {}
+}
+
+function opennamu_edit_turn_off_monaco() {
+    do_monaco_to_textarea();
+    
+    document.getElementById('opennamu_edit_textarea').style.display = 'block';
+    document.getElementById('opennamu_monaco_editor').style.display = 'none';
+    document.getElementById('opennamu_monaco_editor').remove();
+}
+
+function do_monaco_to_textarea() {
+    if(document.getElementById('opennamu_monaco_editor')) {
+        try {
+            document.getElementById('opennamu_edit_textarea').value = window.editor.getValue();
+        } catch(e) {}
+    }
+}
+
+function do_monaco_init(monaco_thema) {
+    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.1/min/vs' }});
+    require.config({ 'vs/nls': { availableLanguages: { '*': 'ko' } }});
+    require(["vs/editor/editor.main"], function () {
+        window.editor = monaco.editor.create(document.getElementById('opennamu_monaco_editor'), {
+            value: document.getElementById('opennamu_edit_textarea').value,
+            language: 'plaintext',
+            automaticLayout: true,
+            wordWrap: true,
+            theme: monaco_thema
+        });
+    });
+}
