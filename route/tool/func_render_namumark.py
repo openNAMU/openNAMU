@@ -1763,7 +1763,7 @@ class class_do_render_namumark:
 
                 data_name = self.get_tool_data_storage('<div id="' + self.doc_include + 'opennamu_quote_' + str(quote_count) + '"></div>', '', quote_data_org)
 
-                self.render_data = re.sub(quote_regex, lambda x : ('\n<front_br><blockquote><back_br>\n<' + data_name + '></' + data_name + '><front_br></blockquote><back_br>\n'), self.render_data, 1)
+                self.render_data = re.sub(quote_regex, lambda x : ('\n<blockquote><back_br>\n<' + data_name + '></' + data_name + '><front_br></blockquote>\n'), self.render_data, 1)
 
             quote_count_max -= 1
             quote_count += 1
