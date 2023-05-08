@@ -39,6 +39,7 @@ def main_tool_other():
                 <ul class="opennamu_ul">
                     <li><a href="/image_file_list">''' + load_lang('image_file_list') + '''</a></li>
                     <li><a href="/vote">''' + load_lang('vote_list') + '''</a></li>
+                    <li><a href="/bbs/main">''' + load_lang('bbs_main') + '''</a></li>
                 </ul>
                 <h2>''' + load_lang('other') + '''</h2>
                 <ul class="opennamu_ul">

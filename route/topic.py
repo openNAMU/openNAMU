@@ -209,7 +209,7 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                         
                         <div>''' + edit_button('opennamu_edit_textarea') + '''</div>
 
-                        <textarea id="opennamu_edit_textarea" class="opennamu_textarea_200" placeholder="''' + topic_text + '''" name="content">''' + html.escape(thread_data) + '''</textarea>
+                        <textarea id="opennamu_edit_textarea" class="opennamu_textarea_100" placeholder="''' + topic_text + '''" name="content">''' + html.escape(thread_data) + '''</textarea>
                         <hr class="main_hr">
                         
                         ''' + captcha_get() + ip_warning() + '''
