@@ -246,19 +246,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 else:
                     monaco_thema = ''
                 
-                add_script = '''
-                    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.1/min/vs' }});
-                    require.config({ 'vs/nls': { availableLanguages: { '*': 'ko' } }});
-                    require(["vs/editor/editor.main"], function () {
-                        window.editor = monaco.editor.create(document.getElementById('opennamu_monaco_editor'), {
-                            value: document.getElementById('opennamu_edit_textarea').value,
-                            language: 'plaintext',
-                            automaticLayout: true,
-                            wordWrap: true,
-                            theme: \'''' + monaco_thema + '''\'
-                        });
-                    });
-                '''
+                add_script = 'do_monaco_init("' + monaco_thema + '");'
             else:
                 editor_display = ''
                 monaco_display = 'style="display: none;"'
@@ -274,21 +262,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('edit') + ')' + sub_menu, 0])],
                 data =  editor_top_text + add_get_file + '''
                     <script>
-                        function opennamu_edit_turn_off_monaco() {
-                            do_monaco_to_textarea();
-                            
-                            document.getElementById('opennamu_edit_textarea').style.display = 'block';
-                            document.getElementById('opennamu_monaco_editor').style.display = 'none';
-                            document.getElementById('opennamu_monaco_editor').remove();
-                        }
-
-                        function do_monaco_to_textarea() {
-                            if(document.getElementById('opennamu_monaco_editor')) {
-                                try {
-                                    document.getElementById('opennamu_edit_textarea').value = window.editor.getValue();
-                                } catch(e) {}
-                            }
-                        }
+                        
                     </script>
                     <form method="post">
                         <textarea style="display: none;" id="opennamu_edit_origin" name="doc_data_org">''' + html.escape(data_section) + '''</textarea>
@@ -302,7 +276,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                         <div id="opennamu_monaco_editor" class="opennamu_textarea_500" ''' + monaco_display + '''></div>
                         <textarea id="opennamu_edit_textarea" ''' + editor_display + ''' class="opennamu_textarea_500" name="content" placeholder="''' + p_text + '''">''' + html.escape(data_section) + '''</textarea>
                         <hr class="main_hr">
-                        
+
                         <input placeholder="''' + load_lang('why') + '''" name="send">
                         <hr class="main_hr">
                         
@@ -316,25 +290,8 @@ def edit(name = 'Test', section = 0, do_type = ''):
                     <div id="opennamu_preview_area">''' + data_preview + '''</div>
                     
                     <script>
-                        function do_stop_exit() {
-                            window.onbeforeunload = function() {
-                                do_monaco_to_textarea();
-
-                                let data = document.getElementById('opennamu_edit_textarea').value;
-                                let origin = document.getElementById('opennamu_edit_origin').value;
-                                if(data !== origin) {
-                                    return '';
-                                }
-                            }
-                        }
-
-                        function do_stop_exit_release() {
-                            window.onbeforeunload = function () {}
-                        }
-
                         do_stop_exit();
                         do_paste_image('opennamu_edit_textarea', 'opennamu_monaco_editor');
-
                         ''' + add_script + '''
                     </script>
                 ''',

@@ -9,7 +9,7 @@ def list_title_index(num = 1):
         all_list = sql_num + 1
         data = ''
 
-        curs.execute(db_change("select title from data asc limit ?, 50"), [sql_num])
+        curs.execute(db_change("select title from data order by title asc limit ?, 50"), [sql_num])
         title_list = curs.fetchall()
         if title_list:
             data += '<hr class="main_hr"><ul class="opennamu_ul">'

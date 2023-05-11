@@ -151,7 +151,7 @@ def edit_upload():
                             ''' + license_list + '''
                         </select>
                         <hr class="main_hr">
-                        <textarea class="opennamu_textarea_200" placeholder="''' + load_lang('other') + '''" name="f_lice">''' + upload_default + '''</textarea>
+                        <textarea class="opennamu_textarea_100" placeholder="''' + load_lang('other') + '''" name="f_lice">''' + upload_default + '''</textarea>
                         <hr class="main_hr">
                         ''' + captcha_get() + '''
                         <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>

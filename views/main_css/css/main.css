@@ -65,6 +65,7 @@ summary {
 
 /* thread */
 .opennamu_comment {
+    display: inline-table;
     width: 100%;
 }
 
@@ -208,8 +209,8 @@ pre {
     height: 500px;
 }
 
-.opennamu_textarea_200 {
-    height: 200px;
+.opennamu_textarea_100 {
+    height: 100px;
 }
 
 .opennamu_spead_footnote {
@@ -256,7 +257,7 @@ blockquote {
     padding: 15px 40px 15px 15px;
     margin: 15px 0 0;
 
-    display: table;
+    display: inline-block;
 
     border: 2px solid #ccc;
     border-left: 5px solid black;
