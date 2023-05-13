@@ -637,7 +637,7 @@ app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])(api_image_v
 app.route('/other')(main_tool_other)
 app.route('/manager', methods = ['POST', 'GET'])(main_tool_admin)
 app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_redirect)
-app.route('/manager/<int:num>/<add_2>', methods = ['POST', 'GET'])(main_tool_redirect)
+app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(main_tool_redirect)
 # app.route('/guide/<doc_name>')(main_tool_guide)
 
 app.route('/search', methods=['POST'])(main_search)
