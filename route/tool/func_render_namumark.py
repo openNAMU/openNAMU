@@ -690,6 +690,7 @@ class class_do_render_namumark:
                     file_align = ''
                     file_bgcolor = ''
                     file_turn = ''
+                    file_radius = ''
 
                     file_split_regex = r'(?:^|&amp;) *((?:(?!&amp;).)+)'
                     file_split_sub_regex = r'(^[^=]+) *= *([^=]+)'
@@ -713,6 +714,8 @@ class class_do_render_namumark:
                                         file_turn = 'dark'
                                     elif data_sub[1] == 'light':
                                         file_turn = 'light'
+                                elif data_sub[0] == 'border-radius':
+                                    file_radius = self.get_tool_px_add_check(data_sub[1])
 
                     link_main_org = ''
                     link_sub = link_main
@@ -770,12 +773,14 @@ class class_do_render_namumark:
                     if file_bgcolor != '':
                         file_bgcolor = 'background:' + self.get_tool_css_safe(file_bgcolor) + ';'
 
+                    if file_radius != '':
+                        file_radius = 'border-radius:' + self.get_tool_css_safe(file_radius) + ';'
 
                     image_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_image_set', self.ip)
                     if image_set == 'new_click' or image_set == 'click':
-                        file_end = '<img style="' + file_width + file_height + file_align_style + file_bgcolor + '" id="opennamu_image_' + str(image_count) + '" alt="' + link_sub + '" src="">'
+                        file_end = '<img style="' + file_width + file_height + file_align_style + file_bgcolor + file_radius + '" id="opennamu_image_' + str(image_count) + '" alt="' + link_sub + '" src="">'
                     else:
-                        file_end = '<img style="' + file_width + file_height + file_align_style + file_bgcolor + '" alt="' + link_sub + '" src="' + link_main + '">'
+                        file_end = '<img style="' + file_width + file_height + file_align_style + file_bgcolor + file_radius + '" alt="' + link_sub + '" src="' + link_main + '">'
 
                     if file_align == 'center':
                         file_end = '<div style="text-align:center;">' + file_end + '</div>'
