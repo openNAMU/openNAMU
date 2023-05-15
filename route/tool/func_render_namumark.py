@@ -188,6 +188,34 @@ class class_do_render_namumark:
             else:
                 return data[1]
 
+    def get_tool_link_fix(self, link_main, do_type = 'link'):
+        if do_type == 'link':
+            if link_main == '../':
+                link_main = self.doc_name
+                link_main = re.sub(r'(\/[^/]+)$', '', link_main)
+            elif re.search(r'^\/', link_main):
+                link_main = re.sub(r'^\/', lambda x : (self.doc_name + '/'), link_main)
+            elif re.search(r'^:(분류|category):', link_main, flags = re.I):
+                link_main = re.sub(r'^:(분류|category):', 'category:', link_main, flags = re.I)
+            elif re.search(r'^:(파일|file):', link_main, flags = re.I):
+                link_main = re.sub(r'^:(파일|file):', 'file:', link_main, flags = re.I)
+            elif re.search(r'^사용자:', link_main, flags = re.I):
+                link_main = re.sub(r'^사용자:', 'user:', link_main, flags = re.I)
+        else:
+            # do_type == 'redirect'
+            if link_main == '../':
+                link_main = self.doc_name
+                link_main = re.sub(r'(\/[^/]+)$', '', link_main)
+            elif re.search(r'^\/', link_main):
+                link_main = re.sub(r'^\/', lambda x : (self.doc_name + '/'), link_main)
+            elif re.search(r'^분류:', link_main):
+                link_main = re.sub(r'^분류:', 'category:', link_main)
+            elif re.search(r'^사용자:', link_main):
+                link_main = re.sub(r'^사용자:', 'user:', link_main)
+
+        return link_main
+
+    # Render
     def do_render_text(self):
         # <b> function
         bold_user_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_bold', self.ip)
@@ -584,12 +612,19 @@ class class_do_render_namumark:
             elif name_data == 'pagecount':
                 return '0'
             elif name_data == 'lastedit':
-                self.curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'last_edit'"), [match[1]])
+                link_main = self.get_tool_link_fix(match[1], 'redirect')
+
+                link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                link_main = html.unescape(link_main)
+
+                print(link_main)
+
+                self.curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'last_edit'"), [link_main])
                 db_data = self.curs.fetchall()
                 if db_data:
                     return db_data[0][0]
                 else:
-                    return ''
+                    return '0'
             else:
                 return '<macro>' + match[0] + '(' + match[1] + ')' + '</macro>'
 
@@ -949,17 +984,7 @@ class class_do_render_namumark:
                 # in link
                 else:
                     # under page & fix url
-                    if link_main == '../':
-                        link_main = self.doc_name
-                        link_main = re.sub(r'(\/[^/]+)$', '', link_main)
-                    elif re.search(r'^\/', link_main):
-                        link_main = re.sub(r'^\/', lambda x : (self.doc_name + '/'), link_main)
-                    elif re.search(r'^:(분류|category):', link_main, flags = re.I):
-                        link_main = re.sub(r'^:(분류|category):', 'category:', link_main, flags = re.I)
-                    elif re.search(r'^:(파일|file):', link_main, flags = re.I):
-                        link_main = re.sub(r'^:(파일|file):', 'file:', link_main, flags = re.I)
-                    elif re.search(r'^사용자:', link_main, flags = re.I):
-                        link_main = re.sub(r'^사용자:', 'user:', link_main, flags = re.I)
+                    link_main = self.get_tool_link_fix(link_main)
 
                     # sharp
                     link_main = link_main.replace('&#x27;', '<link_single>')
@@ -1111,8 +1136,8 @@ class class_do_render_namumark:
                             data_sub_name = data_sub[0]
                             data_sub_data = self.get_tool_data_restore(data_sub[1], do_type = 'slash')
                             
-                            data_sub_data = re.sub(r'^분류:', ':분류:', data_sub_data)
-                            data_sub_data = re.sub(r'^파일:', ':파일:', data_sub_data)
+                            data_sub_data = re.sub(r'^(?P<in>분류|category):', ':\g<in>:', data_sub_data)
+                            data_sub_data = re.sub(r'^(?P<in>파일|file):', ':\g<in>:', data_sub_data)
 
                             include_change_list[data_sub_name] = data_sub_data
                         else:
@@ -1262,15 +1287,7 @@ class class_do_render_namumark:
             link_main = match.group(1)
 
             # under page & fix url
-            if link_main == '../':
-                link_main = self.doc_name
-                link_main = re.sub(r'(\/[^/]+)$', '', link_main)
-            elif re.search(r'^\/', link_main):
-                link_main = re.sub(r'^\/', lambda x : (self.doc_name + '/'), link_main)
-            elif re.search(r'^분류:', link_main):
-                link_main = re.sub(r'^분류:', 'category:', link_main)
-            elif re.search(r'^사용자:', link_main):
-                link_main = re.sub(r'^사용자:', 'user:', link_main)
+            link_main = self.get_tool_link_fix(link_main, 'redirect')
 
             # sharp
             link_main = link_main.replace('&#x27;', '<link_single>')
