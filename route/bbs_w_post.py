@@ -261,7 +261,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                 curs.execute(db_change('select set_name, set_data, set_code, set_id from bbs_data where (set_name = "comment" or set_name = "comment_date" or set_name = "comment_user_id") and set_id = ? order by set_code + 0 asc'), [bbs_num_str + '-' + post_num_str])
                 db_data = curs.fetchall()
                 if db_data:
-                    data += '<hr class="main_hr"><hr><hr class="main_hr">'
+                    data += '<hr class="main_hr"><hr>'
                 else:
                     db_data = []
 
