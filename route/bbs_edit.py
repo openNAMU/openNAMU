@@ -38,8 +38,13 @@ def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
             else:
                 id_data = post_num_str
 
-            title = flask.request.form.get('title', '')
+            title = flask.request.form.get('title', 'test')
+            title = 'test' if title == '' else title
             data = flask.request.form.get('content', '')
+            if data == '':
+                # re_error로 대체 예정
+                return redirect('/bbs/w/' + bbs_num_str)
+            
             date = get_time()
 
             if post_num == '':
