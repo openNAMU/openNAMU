@@ -1,16 +1,27 @@
 from .tool.func import *
 
-def bbs_edit(bbs_num = '', do_type = ''):
+def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         bbs_num_str = str(bbs_num)
+        post_num_str = str(post_num)
+
         ip = ip_check()
 
         curs.execute(db_change('select set_id from bbs_set where set_id = ? and set_name = "bbs_name"'), [bbs_num_str])
         if not curs.fetchall():
             return redirect('/bbs/main')
         
+        if post_num != '':
+            curs.execute(db_change('select set_data from bbs_data where set_name = "user_id" and set_id = ? and set_code = ?'), [bbs_num, post_num])
+            db_data = curs.fetchall()
+            if not db_data:
+                return redirect('/bbs/main')
+            else:
+                if not db_data[0][0] == ip and admin_check() != 1:
+                    return re_error('/ban')
+            
         if acl_check(bbs_num_str, 'bbs_edit') == 1:
             return redirect('/bbs/set/' + bbs_num_str)
 
@@ -20,22 +31,31 @@ def bbs_edit(bbs_num = '', do_type = ''):
             else:
                 captcha_post('', 0)
         
-            curs.execute(db_change('select set_code from bbs_data where set_name = "title" and set_id = ? order by set_code + 0 desc'), [bbs_num_str])
-            db_data = curs.fetchall()
-            id_data = str(int(db_data[0][0]) + 1) if db_data else '1'
+            if post_num == '':
+                curs.execute(db_change('select set_code from bbs_data where set_name = "title" and set_id = ? order by set_code + 0 desc'), [bbs_num_str])
+                db_data = curs.fetchall()
+                id_data = str(int(db_data[0][0]) + 1) if db_data else '1'
+            else:
+                id_data = post_num_str
 
             title = flask.request.form.get('title', '')
             data = flask.request.form.get('content', '')
             date = get_time()
 
-            curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('title', ?, ?, ?)"), [id_data, bbs_num_str, title])
-            curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('data', ?, ?, ?)"), [id_data, bbs_num_str, data])
-            curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('date', ?, ?, ?)"), [id_data, bbs_num_str, date])
-            curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('user_id', ?, ?, ?)"), [id_data, bbs_num_str, ip])
+            if post_num == '':
+                curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('title', ?, ?, ?)"), [id_data, bbs_num_str, title])
+                curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('data', ?, ?, ?)"), [id_data, bbs_num_str, data])
+                curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('date', ?, ?, ?)"), [id_data, bbs_num_str, date])
+                curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('user_id', ?, ?, ?)"), [id_data, bbs_num_str, ip])
+            else:
+                curs.execute(db_change("update bbs_data set set_data = ? where set_name = 'title' and set_code = ? and set_id = ?"), [title, post_num, bbs_num_str])
+                curs.execute(db_change("update bbs_data set set_data = ? where set_name = 'data' and set_code = ? and set_id = ?"), [data, id_data, bbs_num_str])
+                curs.execute(db_change("update bbs_data set set_data = ? where set_name = 'date' and set_code = ? and set_id = ?"), [date, id_data, bbs_num_str])
 
             return redirect('/bbs/w/' + bbs_num_str + '/' + id_data)
         else:
             if do_type == 'preview':
+                title = flask.request.form.get('title', '')
                 data = flask.request.form.get('content', '')
                 data = data.replace('\r', '')
 
@@ -45,11 +65,34 @@ def bbs_edit(bbs_num = '', do_type = ''):
                     data_in = 'from'
                 )
             else:
-                data = ''
-                data_preview = ''
+                if post_num == '':
+                    title = ''
+                    data = ''
+                    data_preview = ''
+                else:
+                    curs.execute(db_change('select set_name, set_data, set_code from bbs_data where set_id = ? and set_code = ?'), [bbs_num, post_num])
+                    db_data = curs.fetchall()
+
+                    temp_id = ''
+                    temp_dict = {}
+
+                    for for_a in db_data + [['', '', '']]:
+                        if temp_id != for_a[2]:
+                            temp_id = for_a[2]
+                            temp_dict['code'] = for_a[2]
+
+                        temp_dict[for_a[0]] = for_a[1]
+
+                    title = temp_dict['title']
+                    data = temp_dict['data']
+                    data_preview = ''
             
-            form_action = 'formaction="/bbs/edit/' + bbs_num_str + '"'
-            form_action_preview = 'formaction="/bbs/edit/preview/' + bbs_num_str + '"'
+            if post_num == '':
+                form_action = 'formaction="/bbs/edit/' + bbs_num_str + '"'
+                form_action_preview = 'formaction="/bbs/edit/preview/' + bbs_num_str + '"'
+            else:
+                form_action = 'formaction="/bbs/edit/' + bbs_num_str + '/' + post_num_str + '"'
+                form_action_preview = 'formaction="/bbs/edit/preview/' + bbs_num_str + '/' + post_num_str + '"'
     
             editor_top_text = '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
             
@@ -89,7 +132,7 @@ def bbs_edit(bbs_num = '', do_type = ''):
 
                         <div>''' + edit_button('opennamu_edit_textarea', 'opennamu_monaco_editor') + '''</div>
                         
-                        <input placeholder="''' + load_lang('bbs_title') + '''" name="title">
+                        <input placeholder="''' + load_lang('bbs_title') + '''" name="title" value="''' + html.escape(title) + '''">
                         <hr class="main_hr">
 
                         <div id="opennamu_monaco_editor" class="opennamu_textarea_500" ''' + monaco_display + '''></div>

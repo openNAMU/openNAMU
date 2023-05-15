@@ -597,6 +597,8 @@ app.route('/bbs/set/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_set)
 app.route('/bbs/edit/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_edit)
 app.route('/bbs/edit/preview/<int:bbs_num>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'preview' })(bbs_edit)
 app.route('/bbs/w/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_post)
+app.route('/bbs/edit/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_edit)
+app.route('/bbs/edit/preview/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'preview' })(bbs_edit)
 app.route('/bbs/w/preview/<int:bbs_num>/<int:post_num>', methods = ['POST'], defaults = { 'do_type' : 'preview' })(bbs_w_post)
 # app.route('/bbs/edit/<int:bbs_num>/<int:post_num>')
 
