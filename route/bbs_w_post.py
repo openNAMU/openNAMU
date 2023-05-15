@@ -53,6 +53,10 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                 id_data = str(int(db_data[0][0]) + 1) if db_data else '1'
 
                 data = flask.request.form.get('content', '')
+                if data == '':
+                    # re_error로 대체 예정
+                    return redirect('/bbs/w/' + bbs_num_str + '/' + post_num_str)
+                
                 date = get_time()
 
                 curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('comment', ?, ?, ?)"), [id_data, set_id, data])
@@ -199,6 +203,10 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                 id_data = str(int(db_data[0][0]) + 1) if db_data else '1'
 
                 data = flask.request.form.get('content', '')
+                if data == '':
+                    # re_error로 대체 예정
+                    return redirect('/bbs/w/' + bbs_num_str + '/' + post_num_str)
+
                 date = get_time()
 
                 curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('comment', ?, ?, ?)"), [id_data, set_id, data])
