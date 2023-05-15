@@ -263,7 +263,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                 if db_data:
                     data += '<hr class="main_hr"><hr><hr class="main_hr">'
                 else:
-                    db_data = [[]]
+                    db_data = []
 
                 for_a = 0
                 db_data_2 = db_data + [['', '', '', '']]
