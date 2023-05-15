@@ -589,13 +589,15 @@ app.route('/vote/list/close/<int:num>', defaults = { 'list_type' : 'close' })(vo
 app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 
 # Func-bbs
-# app.route('/bbs/main')
+app.route('/bbs/main')(bbs_main)
+app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
 # app.route('/bbs/main/set')
-# app.route('/bbs/make')
-# app.route('/bbs/w/<int:bbs_num>')
-# app.route('/bbs/set/<int:bbs_num>')
-# app.route('/bbs/edit/<int:bbs_num>')
-# app.route('/bbs/w/<int:bbs_num>/<int:post_num>')
+app.route('/bbs/w/<int:bbs_num>')(bbs_w)
+app.route('/bbs/set/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_set)
+app.route('/bbs/edit/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_edit)
+app.route('/bbs/edit/preview/<int:bbs_num>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'preview' })(bbs_edit)
+app.route('/bbs/w/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_post)
+app.route('/bbs/w/preview/<int:bbs_num>/<int:post_num>', methods = ['POST'], defaults = { 'do_type' : 'preview' })(bbs_w_post)
 # app.route('/bbs/edit/<int:bbs_num>/<int:post_num>')
 
 # Func-api
