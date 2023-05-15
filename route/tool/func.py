@@ -1761,7 +1761,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
     if tool in ['topic']:
         end = 3
-    elif tool in ['render', 'vote', '', 'document_edit', 'document_move', 'document_delete']:
+    elif tool in ['render', 'vote', '', 'document_edit', 'document_move', 'document_delete', 'document_edit', 'bbs_edit', 'bbs_comment']:
         end = 2
     else:
         end = 1
@@ -1871,6 +1871,20 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             curs.execute(db_change(
                 'select data from other where name = "edit_bottom_compulsion_acl"'
             ))
+
+            num = 'all'
+        elif tool == 'bbs_edit':
+            if i == 0:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_edit_acl" and set_id = ?'), [name])
+            else:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_acl" and set_id = ?'), [name])
+
+            num = 'all'
+        elif tool == 'bbs_comment':
+            if i == 0:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_comment_acl" and set_id = ?'), [name])
+            else:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_acl" and set_id = ?'), [name])
 
             num = 'all'
         else:

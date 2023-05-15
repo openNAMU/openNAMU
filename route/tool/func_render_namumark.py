@@ -617,8 +617,6 @@ class class_do_render_namumark:
                 link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                 link_main = html.unescape(link_main)
 
-                print(link_main)
-
                 self.curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'last_edit'"), [link_main])
                 db_data = self.curs.fetchall()
                 if db_data:
