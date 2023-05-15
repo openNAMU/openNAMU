@@ -583,6 +583,13 @@ class class_do_render_namumark:
                 return '<' + data_name + '></' + data_name + '>'
             elif name_data == 'pagecount':
                 return '0'
+            elif name_data == 'lastedit':
+                self.curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'last_edit'"), [match[1]])
+                db_data = self.curs.fetchall()
+                if db_data:
+                    return db_data[0][0]
+                else:
+                    return ''
             else:
                 return '<macro>' + match[0] + '(' + match[1] + ')' + '</macro>'
 
