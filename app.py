@@ -317,53 +317,37 @@ app.route('/list/document/old')(list_old_page)
 app.route('/list/document/old/<int:num>')(list_old_page)
 
 # /list/document/acl
-@app.route('/acl_list')
-def list_acl():
-    return list_acl_2()
-
-# /list/document/acl/add
-@app.route('/acl/<everything:name>', methods = ['POST', 'GET'])
-def give_acl(name = None):
-    return give_acl_2(name)
+app.route('/list/document/acl')(list_acl)
+app.route('/list/document/acl/<int:arg_num>')(list_acl)
 
 # /list/document/need
-@app.route('/please')
-def list_please():
-    return list_please_2()
+app.route('/list/document/need')(list_please)
+app.route('/list/document/need/<int:arg_num>')(list_please)
 
 # /list/document/all
 app.route('/list/document/all')(list_title_index)
 app.route('/list/document/all/<int:num>')(list_title_index)
 
 # /list/document/long
-@app.route('/long_page')
-def list_long_page():
-    return list_long_page_2('long_page')
+app.route('/list/document/long')(list_long_page)
 
 # /list/document/short
-@app.route('/short_page')
-def list_short_page():
-    return list_long_page_2('short_page')
+app.route('/list/document/short', defaults = { 'tool' : 'short_page' })(list_long_page)
 
 # /list/file
-@app.route('/image_file_list')
-def list_image_file():
-    return list_image_file_2()
+app.route('/list/file')(list_image_file)
 
 # /list/admin
 # /list/admin/list
-@app.route('/admin_list')
-def list_admin():
-    return list_admin_2()
+app.route('/list/admin')(list_admin)
 
 # /list/admin/auth_use
-app.route('/list/admin/auth_use', methods = ['POST', 'GET'])(list_admin_use)
-app.route('/list/admin/auth_use/<arg_search>/<int:arg_num>', methods = ['POST', 'GET'])(list_admin_use)
+app.route('/list/admin/auth_use', methods = ['POST', 'GET'])(list_admin_auth_use)
+app.route('/list/admin/auth_use/<arg_search>/<int:arg_num>', methods = ['POST', 'GET'])(list_admin_auth_use)
 
 # /list/user
-@app.route('/user_log')
-def list_user():
-    return list_user_2()
+app.route('/list/user')(list_user)
+app.route('/list/user/<int:arg_num>')(list_user)
 
 # /list/user/check
 @app.route('/check/<name>')
@@ -378,9 +362,8 @@ def give_user_check_delete():
 # Func-auth
 # /auth/give
 # /auth/give/<name>
-@app.route('/admin/<name>', methods = ['POST', 'GET'])
-def give_admin(name = None):
-    return give_admin_2(name)
+app.route('/auth/give', methods = ['POST', 'GET'])(give_auth)
+app.route('/auth/give/<name>', methods = ['POST', 'GET'])(give_auth)
 
 # /auth/give
 # /auth/give/<name>
@@ -446,6 +429,8 @@ app.route('/raw_rev/<int:num>/<everything:name>')(view_raw_2)
 app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')(view_diff)
 
 app.route('/down/<everything:name>')(view_down)
+
+app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_acl)
 
 # everything 다음에 추가 붙은 경우에 대해서 재검토 필요 (진행중)
 app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
