@@ -672,9 +672,9 @@ app.route('/setting/skin_set', methods = ['POST', 'GET'])(main_setting_skin_set)
 app.route('/easter_egg')(main_func_easter_egg)
 
 # views -> view
-app.route('/view/<everything:name>')(main_view)
-app.route('/views/<everything:name>')(main_view)
-app.route('/image/<everything:name>')(main_view_image)
+app.route('/view/<path:name>')(main_view)
+app.route('/views/<path:name>')(main_view)
+app.route('/image/<path:name>')(main_view_image)
 # 조정 계획 중
 app.route('/<regex("[^.]+\.(?:txt|xml)"):data>')(main_view_file)
 
