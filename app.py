@@ -3,26 +3,7 @@ import os
 import re
 
 from route.tool.func import *
-# from route import *
-
-for i_data in os.listdir("route"):
-    f_src = re.search(r"(.+)\.py$", i_data)
-    f_src = f_src.group(1) if f_src else ""
-    
-    if not f_src in ('', '__init__'):
-        try:
-            exec(
-                "from route." + f_src + " " + 
-                "import " + f_src
-            )
-        except:
-            try:
-                exec(
-                    "from route." + f_src + " " + 
-                    "import " + f_src + "_2"
-                )
-            except:
-                pass
+from route import *
 
 # Init-Version
 version_list = json.loads(open(
@@ -599,6 +580,7 @@ app.route('/api/skin_info/<name>')(api_skin_info)
 app.route('/api/user_info/<name>', methods = ['POST', 'GET'])(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
+app.route('/api/thread/<int:topic_num>/<tool>/<int:num>/<render>')(api_topic)
 app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic)
 app.route('/api/thread/<int:topic_num>/<tool>')(api_topic)
 app.route('/api/thread/<int:topic_num>')(api_topic)

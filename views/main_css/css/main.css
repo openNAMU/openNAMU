@@ -93,6 +93,10 @@ summary {
     display: none;
 }
 
+.opennamu_comment_blind_admin {
+    background: gainsboro;
+}
+
 .opennamu_comment_scroll {
     max-height: 500px;
     
@@ -255,7 +259,7 @@ hr {
 
 blockquote {
     padding: 15px 40px 15px 15px;
-    margin: 15px 0 0;
+    margin: 0;
 
     display: inline-block;
 
