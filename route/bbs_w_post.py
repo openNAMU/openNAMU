@@ -1,17 +1,25 @@
 from .tool.func import *
 
 def bbs_w_post_make_thread(user_id, date, data, code, color = '', blind = '', add_style = ''):
+    if blind != '':
+        if data == '':
+            color_b = 'opennamu_comment_blind'
+        else:
+            color_b = 'opennamu_comment_blind_admin'
+    else:
+        color_b = 'opennamu_comment_blind_not'
+
     return '''
         <table class="opennamu_comment" style="''' + add_style + '''">
             <tr>
                 <td class="opennamu_comment_color_''' + color + '''">
-                    <a href="#thread_shortcut" id="comment_''' + code + '''">#''' + code + '''</a>
+                    <a href="#thread_shortcut" id="''' + code + '''">#''' + code + '''</a>
                     ''' + user_id + '''
                     <span style="float: right;">''' + date + '''</span>
                 </td>
             </tr>
             <tr>
-                <td class="" id="opennamu_comment_data_main">
+                <td class="''' + color_b + '''" id="opennamu_comment_data_main">
                     ''' + data + '''
                 </td>
             </tr>
