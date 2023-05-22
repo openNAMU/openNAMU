@@ -222,6 +222,9 @@ pre {
     background-color: #efefef;
     
     border: 1px solid #cecece;
+
+    font-size: small;
+    font-weight: initial;
 }
 
 .opennamu_popup_footnote {
@@ -236,6 +239,9 @@ pre {
     background-color: #efefef;
     
     border: 1px solid #cecece;
+
+    font-size: small;
+    font-weight: initial;
 }
 
 @media ( max-width: 768px ) {

@@ -72,7 +72,7 @@ def bbs_w_set(bbs_num = ''):
                         
                         <h2>''' + load_lang('acl') + '''</h2>
                         <h3>''' + load_lang('bbs_view_acl') + '''</h3>
-                        <select ''' + disable + ''' name="bbs_comment_acl">''' + acl_div[3] + '''</select>
+                        <select ''' + disable + ''' name="bbs_view_acl">''' + acl_div[3] + '''</select>
 
                         <h4>''' + load_lang('bbs_acl') + '''</h4>
                         <select ''' + disable + ''' name="bbs_acl">''' + acl_div[0] + '''</select>
