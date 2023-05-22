@@ -15,7 +15,8 @@ def user_setting():
                 auto_list = [
                     ['skin', flask.request.form.get('skin', '')], 
                     ['lang', flask.request.form.get('lang', '')],
-                    ['user_title', flask.request.form.get('user_title', '')]
+                    ['user_title', flask.request.form.get('user_title', '')],
+                    ['sub_user_name' , flask.request.form.get('sub_user_name', '')]
                 ]
 
                 twofa_on = flask.request.form.get('2fa', '')
@@ -96,6 +97,10 @@ def user_setting():
                 fa_data_pw = curs.fetchall()
                 fa_data_pw = load_lang('2fa_password_change') if fa_data_pw else load_lang('2fa_password')
 
+                curs.execute(db_change('select data from user_set where name = "sub_user_name" and id = ?'), [ip])
+                db_data = curs.fetchall()
+                sub_user_name = db_data[0][0] if db_data else ''
+
                 return easy_minify(flask.render_template(skin_check(),
                     imp = [load_lang('user_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                     data = '''
@@ -127,6 +132,8 @@ def user_setting():
                             <select name="2fa" id="twofa_check_input">''' + fa_data_select + '''</select>
                             <hr class="main_hr">
                             <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
+                            <h2>''' + load_lang('sub_user_name') + '''</h2>
+                            <input name="sub_user_name" value="''' + html.escape(sub_user_name) + '''" placeholder="''' + load_lang('sub_user_name') + '''">
                             <hr class="main_hr">
                             <button type="submit">''' + load_lang('save') + '''</button>
                             ''' + http_warning() + '''
