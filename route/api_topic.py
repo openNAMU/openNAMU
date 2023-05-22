@@ -59,6 +59,8 @@ def api_topic(topic_num = 1, tool = 'normal', num = '', render = ''):
                             '<a href="/w/user:\g<in>">@\g<in></a>',
                             data_v[0]
                         )
+                    else:
+                        data_v = ['', '']
 
                     data_a['data'] += [{
                         "id" : i[0],

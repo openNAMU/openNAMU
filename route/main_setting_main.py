@@ -35,7 +35,8 @@ def main_setting_main(db_set):
             31 : ['wiki_access_password_need', ''],
             32 : ['wiki_access_password', ''],
             33 : ['history_recording_off', ''],
-            34 : ['namumark_compatible', '']
+            34 : ['namumark_compatible', ''],
+            35 : ['user_name_view', '']
         }
 
         if flask.request.method == 'POST':
@@ -85,7 +86,7 @@ def main_setting_main(db_set):
                 else:
                     tls_select += '<option value="' + tls_select_one + '">' + tls_select_one + '</option>'
 
-            check_box_div = ['', '', '', '', '', '', '', '', '', '', '']
+            check_box_div = ['', '', '', '', '', '', '', '', '', '', '', '']
             for i in range(0, len(check_box_div)):
                 if i == 0:
                     acl_num = 7
@@ -107,6 +108,8 @@ def main_setting_main(db_set):
                     acl_num = 33
                 elif i == 10:
                     acl_num = 34
+                elif i == 11:
+                    acl_num = 35
 
                 if d_list[acl_num]:
                     check_box_div[i] = 'checked="checked"'
@@ -195,6 +198,9 @@ def main_setting_main(db_set):
                         <hr class="main_hr">
 
                         <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + load_lang('hide_ip') + '''
+                        <hr class="main_hr">
+
+                        <input type="checkbox" name="user_name_view" ''' + check_box_div[11] + '''> ''' + load_lang('hide_user_name') + '''
                         <hr class="main_hr">
 
                         <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + load_lang('requires_approval') + '''
