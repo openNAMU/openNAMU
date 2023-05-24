@@ -1,9 +1,6 @@
 from .tool.func import *
 from .api_topic import api_topic
 
-def topic_make(data, ip_first = ''):
-    data = ''
-
 def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -186,14 +183,22 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             
             shortcut += '</div>'
 
+            top_topic = ''
+            json_data = json.loads(api_topic(int(topic_num), 'top', '', 'render').data)
+            top_topic += json_data['data'] if 'data' in json_data else ''
+            
+            main_topic = ''
+            json_data = json.loads(api_topic(int(topic_num), 'normal', '', 'render').data)
+            main_topic += json_data['data'] if 'data' in json_data else ''
+
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('discussion') + ')', 0])],
                 data = '''
                     ''' + shortcut + '''
                     <h2 id="topic_top_title">''' + html.escape(sub) + '''</h2>
                     
-                    <div id="top_topic"></div>
-                    <div id="main_topic"></div>
+                    <div id="top_topic">''' + top_topic + '''</div>
+                    <div id="main_topic">''' + main_topic + '''</div>
                     <div id="plus_topic"></div>
                     
                     <a href="/thread/''' + topic_num + '/tool">(' + load_lang('topic_tool') + ''')</a>

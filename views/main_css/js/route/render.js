@@ -121,7 +121,6 @@ function opennamu_do_render_html(name = '') {
 
 function opennamu_do_footnote_spread(set_name, load_name) {
     if(document.getElementById(set_name + '_load').style.display === 'none') {
-        console.log(set_name, load_name);
         document.getElementById(set_name).title = '';
         document.getElementById(set_name + '_load').innerHTML = '<a href="#' + load_name + '">(Go)</a> ' + document.getElementById(load_name + '_title').innerHTML;
         document.getElementById(set_name + '_load').style.display = "inline-block";
@@ -132,7 +131,6 @@ function opennamu_do_footnote_spread(set_name, load_name) {
 
 function opennamu_do_footnote_popover(set_name, load_name) {
     if(document.getElementById(set_name + '_load').style.display === 'none') {
-        console.log(set_name, load_name);
         document.getElementById(set_name).title = '';
         document.getElementById(set_name + '_load').innerHTML = '<a href="#' + load_name + '">(Go)</a> ' + document.getElementById(load_name + '_title').innerHTML;
         document.getElementById(set_name + '_load').style.display = "inline-block";
@@ -141,11 +139,10 @@ function opennamu_do_footnote_popover(set_name, load_name) {
         let screen_width = window.innerWidth;
         let left = document.getElementById(set_name).getBoundingClientRect().left;
         let left_org = document.getElementById(set_name + '_load').getBoundingClientRect().left;
-        let top = document.getElementById(set_name).getBoundingClientRect().top;
-        console.log(width, screen_width, left, left_org);
-        console.log(screen_width - (left + width));
+        let top = window.pageYOffset + document.getElementById(set_name).getBoundingClientRect().top;
+
+        document.getElementById(set_name + '_load').style.top = String(top) + "px";
         if(screen_width - (left + width) < 50) {
-            console.log("test");
             if(left > 350) {
                 document.getElementById(set_name + '_load').style.left = String(left - 300) + "px";
             } else {
