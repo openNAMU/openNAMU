@@ -25,6 +25,7 @@ def db_change(data):
         data = data.replace('random()', 'rand()')
         data = data.replace('%', '%%')
         data = data.replace('?', '%s')
+        data = data.replace('collate nocase', 'collate utf8mb4_general_ci')
 
     return data
 

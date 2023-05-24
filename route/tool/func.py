@@ -174,7 +174,10 @@ class get_db_connect:
             )
             curs = self.conn.cursor()
 
-            self.conn.select_db(self.db_set['name'])
+            try:
+                self.conn.select_db(self.db_set['name'])
+            except:
+                pass
 
         load_conn(self.conn)
         return self.conn
@@ -1754,6 +1757,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
     elif tool in ['document_edit', 'document_move', 'document_delete']:
         if acl_check(name, '') == 1:
             return 1
+    elif tool in ['bbs_edit', 'bbs_comment']:
+        if acl_check(name, 'bbs_view') == 1:
+            return 1
     elif tool == 'topic':
         curs.execute(db_change("select title from rd where code = ?"), [topic_num])
         name = curs.fetchall()
@@ -1887,6 +1893,8 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_acl" and set_id = ?'), [name])
 
             num = 'all'
+        elif tool == 'bbs_view':
+            curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_view_acl" and set_id = ?'), [name])
         else:
             # tool == 'render'
             if i == 0:
