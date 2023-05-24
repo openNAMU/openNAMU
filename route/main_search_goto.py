@@ -9,9 +9,9 @@ def main_search_goto(name = 'Test'):
         else:
             data = name
 
-        curs.execute(db_change("select title from data where title = ?"), [data])
-        t_data = curs.fetchall()
-        if t_data:
-            return redirect('/w/' + url_pas(data))
+        curs.execute(db_change("select title from data where title = ? collate nocase"), [data])
+        db_data = curs.fetchall()
+        if db_data:
+            return redirect('/w/' + url_pas(db_data[0][0]))
         else:
             return redirect('/search/' + url_pas(data))

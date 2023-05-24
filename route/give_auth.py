@@ -1,10 +1,11 @@
 from .tool.func import *
 
-def give_admin_2(name):
+def give_auth(name):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        owner = admin_check()
+        owner_auth = admin_check()
+        admin_auth = admin_check(7)
 
         curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [name])
         user_acl = curs.fetchall()
@@ -13,7 +14,7 @@ def give_admin_2(name):
         else:
             user_acl = user_acl[0][0]
 
-        if owner != 1:
+        if owner_auth != 1:
             curs.execute(db_change('select name from alist where name = ? and acl = "owner"'), [user_acl])
             if curs.fetchall():
                 return re_error('/error/3')
@@ -31,7 +32,7 @@ def give_admin_2(name):
                 select_data = flask.request.form.get('select', 'X')
 
             curs.execute(db_change('select name from alist where name = ? and acl = "owner"'), [select_data])
-            if owner != 1 and curs.fetchall():
+            if owner_auth != 1 and curs.fetchall():
                 return re_error('/error/3')
 
             curs.execute(db_change("update user_set set data = ? where id = ? and name = 'acl'"), [
@@ -41,12 +42,12 @@ def give_admin_2(name):
 
             conn.commit()
 
-            return redirect('/admin/' + url_pas(name))
+            return redirect('/auth/give/' + url_pas(name))
         else:
-            if admin_check(7) != 1:
+            if admin_auth != 1:
                 return re_error('/error/3')
 
-            div = '<option value="X">X</option>'
+            div = '<option value="X">' + load_lang('normal') + '</option>'
 
             curs.execute(db_change('select distinct name from alist order by name asc'))
             for data in curs.fetchall():

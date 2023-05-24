@@ -46,7 +46,6 @@ def main_setting_acl():
                     d_list[i] = sql_d[0][0]
                 else:
                     curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [i_list[i], 'normal'])
-
                     d_list[i] = 'normal'
 
             conn.commit()

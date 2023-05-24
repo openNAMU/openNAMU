@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def list_long_page_2(tool):
+def list_long_page(tool = 'long_page'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 

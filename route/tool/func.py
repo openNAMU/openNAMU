@@ -174,7 +174,10 @@ class get_db_connect:
             )
             curs = self.conn.cursor()
 
-            self.conn.select_db(self.db_set['name'])
+            try:
+                self.conn.select_db(self.db_set['name'])
+            except:
+                pass
 
         load_conn(self.conn)
         return self.conn
@@ -1108,7 +1111,7 @@ def wiki_css(data):
     data_css += '<script defer src="/views/main_css/js/func/shortcut.js?ver=' + data_css_ver + '"></script>'
     
     # Route JS + Defer
-    data_css += '<script defer src="/views/main_css/js/route/thread.js?ver=' + data_css_ver + '"></script>'
+
     
     # Route JS
     data_css += '<script src="/views/main_css/js/route/editor.js?ver=' + data_css_ver + '"></script>'
@@ -1754,6 +1757,9 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
     elif tool in ['document_edit', 'document_move', 'document_delete']:
         if acl_check(name, '') == 1:
             return 1
+    elif tool in ['bbs_edit', 'bbs_comment']:
+        if acl_check(name, 'bbs_view') == 1:
+            return 1
     elif tool == 'topic':
         curs.execute(db_change("select title from rd where code = ?"), [topic_num])
         name = curs.fetchall()
@@ -1761,7 +1767,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
     if tool in ['topic']:
         end = 3
-    elif tool in ['render', 'vote', '', 'document_edit', 'document_move', 'document_delete']:
+    elif tool in ['render', 'vote', '', 'document_edit', 'document_move', 'document_delete', 'document_edit', 'bbs_edit', 'bbs_comment']:
         end = 2
     else:
         end = 1
@@ -1873,6 +1879,22 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             ))
 
             num = 'all'
+        elif tool == 'bbs_edit':
+            if i == 0:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_edit_acl" and set_id = ?'), [name])
+            else:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_acl" and set_id = ?'), [name])
+
+            num = 'all'
+        elif tool == 'bbs_comment':
+            if i == 0:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_comment_acl" and set_id = ?'), [name])
+            else:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_acl" and set_id = ?'), [name])
+
+            num = 'all'
+        elif tool == 'bbs_view':
+            curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_view_acl" and set_id = ?'), [name])
         else:
             # tool == 'render'
             if i == 0:
@@ -2055,33 +2077,53 @@ def ip_pas(raw_ip, type_data = 0):
         get_ip = raw_ip
 
     curs.execute(db_change("select data from other where name = 'ip_view'"))
-    ip_view = curs.fetchall()
-    ip_view = ip_view[0][0] if ip_view else ''
+    db_data = curs.fetchall()
+    ip_view = db_data[0][0] if db_data else ''
     ip_view = '' if admin_check(1) == 1 else ip_view
+
+    curs.execute(db_change("select data from other where name = 'user_name_view'"))
+    db_data = curs.fetchall()
+    user_name_view = db_data[0][0] if db_data else ''
+    user_name_view = '' if admin_check(1) == 1 else user_name_view
     
     get_ip = list(set(get_ip))
     
     for raw_ip in get_ip:
         change_ip = 0
         is_this_ip = ip_or_user(raw_ip)
-        if is_this_ip != 0 and ip_view != '':
-            try:
-                ip = ipaddress.ip_address(raw_ip)
-                if type(ip) == ipaddress.IPv6Address:
-                    ip = ip.exploded
-                    ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', ip)
+        if is_this_ip != 0:
+            # ip user
+            if ip_view != '':
+                try:
+                    ip = ipaddress.ip_address(raw_ip)
+                    if type(ip) == ipaddress.IPv6Address:
+                        ip = ip.exploded
+                        ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', ip)
+                    else:
+                        ip = ip.exploded
+                        ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', ip)
+                    
+                    # ip = hashlib.sha3_224(bytes(raw_ip, 'utf-8')).hexdigest()
+                    # ip = ip[0:4] + '-' + ip[4:8] + '-' + ip[8:12] + '-' + ip[12:16]
+
+                    change_ip = 1
+                except:
+                    ip = raw_ip
+            else:
+                ip = raw_ip
+        else:
+            # not ip user
+            if ip_view != '':
+                curs.execute(db_change("select data from user_set where id = ? and name = 'sub_user_name'"), [raw_ip])
+                db_data = curs.fetchall()
+                if db_data and db_data[0][0] != '':
+                    ip = db_data[0][0]
                 else:
-                    ip = ip.exploded
-                    ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', ip)
-                
-                # ip = hashlib.sha3_224(bytes(raw_ip, 'utf-8')).hexdigest()
-                # ip = ip[0:4] + '-' + ip[4:8] + '-' + ip[8:12] + '-' + ip[12:16]
+                    ip = load_lang('member')
 
                 change_ip = 1
-            except:
+            else:
                 ip = raw_ip
-        else:     
-            ip = raw_ip
             
         if type_data == 0 and change_ip == 0:
             if is_this_ip == 0:
