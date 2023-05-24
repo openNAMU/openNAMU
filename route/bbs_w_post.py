@@ -75,6 +75,9 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
 
                 return redirect('/bbs/w/' + bbs_num_str + '/' + post_num_str + '#comment_' + str(int(id_data) + 1))
             else:
+                if acl_check(bbs_num_str, 'bbs_view') == 1:
+                    return re_error('/ban')
+
                 if do_type == 'preview':
                     text = flask.request.form.get('content', '')
                     text = text.replace('\r', '')
@@ -229,6 +232,9 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                     set_id = re.sub(r'^[0-9]+-[0-9]+-?', '', set_id)
                     return redirect('/bbs/w/' + bbs_num_str + '/' + post_num_str + '#comment_' + set_id + '-' + id_data)
             else:
+                if acl_check(bbs_num_str, 'bbs_view') == 1:
+                    return re_error('/ban')
+                    
                 if do_type == 'preview':
                     text = flask.request.form.get('content', '')
                     text = text.replace('\r', '')

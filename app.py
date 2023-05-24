@@ -51,6 +51,8 @@ with get_db_connect() as conn:
             except:
                 pass
 
+        conn.select_db(data_db_set['name'])
+
     if setup_tool != 'normal':
         create_data = get_db_table_list()
         for create_table in create_data:

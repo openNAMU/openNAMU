@@ -26,7 +26,7 @@ def main_search_deep(name = 'Test', search_type = 'title', num = 1):
         if name_new != '':
             div += ' <a href="/search/1/' + url_pas(name_new) + '">(' + name_new + ')</a>'
 
-        curs.execute(db_change("select title from data where title = ?"), [name])
+        curs.execute(db_change("select title from data where title = ? collate nocase"), [name])
         link_id = '' if curs.fetchall() else 'class="opennamu_not_exist_link"'
 
         div += '''
@@ -40,11 +40,11 @@ def main_search_deep(name = 'Test', search_type = 'title', num = 1):
         '''
 
         if search_type == 'title':
-            curs.execute(db_change("select title from data where title like ? order by title limit ?, 50"),
+            curs.execute(db_change("select title from data where title like ? collate nocase order by title limit ?, 50"),
                 ['%' + name + '%', sql_num]
             )
         else:
-            curs.execute(db_change("select title from data where data like ? order by title limit ?, 50"),
+            curs.execute(db_change("select title from data where data like ? collate nocase order by title limit ?, 50"),
                 ['%' + name + '%', sql_num]
             )
 
