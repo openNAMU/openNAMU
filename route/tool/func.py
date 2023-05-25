@@ -2113,7 +2113,7 @@ def ip_pas(raw_ip, type_data = 0):
                 ip = raw_ip
         else:
             # not ip user
-            if ip_view != '':
+            if user_name_view != '':
                 curs.execute(db_change("select data from user_set where id = ? and name = 'sub_user_name'"), [raw_ip])
                 db_data = curs.fetchall()
                 if db_data and db_data[0][0] != '':
