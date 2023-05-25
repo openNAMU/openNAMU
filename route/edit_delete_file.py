@@ -23,14 +23,14 @@ def edit_delete_file(name : str = 'test.jpg') -> str:
         file_all_name : str = sha224_replace(file_name) + '.' + mime_type
         file_directory : str = os.path.join(load_image_url(), file_all_name)
 
-        if(not os.path.exists(file_directory)):
+        if not os.path.exists(file_directory):
             return redirect('/w/' + url_pas(name))
 
-        if(flask.request.method == 'POST'):
+        if flask.request.method == 'POST':
             admin_check(None, 'file del (' + name + ')')
             os.remove(file_directory)
 
-            if(flask.request.form.get('with_doc', '') != ''):
+            if flask.request.form.get('with_doc', '') != '':
                 edit_delete(name)
 
             return redirect('/w/' + url_pas(name))
