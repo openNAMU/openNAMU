@@ -22,7 +22,7 @@ def list_please(arg_num = 1):
                 '</li>' + \
             ''
 
-        div += '</ul>' + next_fix('/list/document/need/', num, data_list)
+        div += '</ul>' + next_fix('/list/document/need/', arg_num, data_list)
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('need_document'), wiki_set(), wiki_custom(), wiki_css([0, 0])],

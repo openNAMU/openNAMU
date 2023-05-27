@@ -25,6 +25,8 @@ def bbs_w(bbs_num = ''):
 
         curs.execute(db_change('select set_name, set_data, set_code from bbs_data where set_id = ? order by set_code + 0 desc'), [bbs_num])
         db_data = curs.fetchall()
+        db_data = list(db_data) if db_data else []
+
         for for_a in db_data + [['', '', '']]:
             if temp_id != for_a[2]:
                 if temp_id != '':

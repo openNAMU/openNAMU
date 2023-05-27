@@ -6,10 +6,8 @@ from route.tool.func import *
 from route import *
 
 # Init-Version
-version_list = json.loads(open(
-    'version.json', 
-    encoding = 'utf8'
-).read())
+with open('version.json', encoding = 'utf8') as file_data:
+    version_list = json.loads(file_data.read())
 
 # Init-DB
 data_db_set = class_check_json()
@@ -614,10 +612,10 @@ app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(ma
 # app.route('/guide/<doc_name>')(main_tool_guide)
 
 app.route('/search', methods=['POST'])(main_search)
-app.route('/search/<everything:name>')(main_search_deep)
-app.route('/search/<int:num>/<everything:name>')(main_search_deep)
-app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data' })(main_search_deep)
-app.route('/search_data/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' })(main_search_deep)
+app.route('/search/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search/<int:num>/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search_data/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
 app.route('/goto', methods=['POST'])(main_search_goto)
 app.route('/goto/<everything:name>', methods=['POST'])(main_search_goto)
 
@@ -645,7 +643,7 @@ app.route('/view/<path:name>')(main_view)
 app.route('/views/<path:name>')(main_view)
 app.route('/image/<path:name>')(main_view_image)
 # 조정 계획 중
-app.route('/<regex("[^.]+\.(?:txt|xml)"):data>')(main_view_file)
+app.route('/<regex("[^.]+\\.(?:txt|xml)"):data>')(main_view_file)
 
 app.route('/shutdown', methods = ['POST', 'GET'])(main_sys_shutdown)
 app.route('/restart', methods = ['POST', 'GET'])(main_sys_restart)
@@ -658,5 +656,6 @@ if __name__ == "__main__":
         app,
         host = server_set['host'],
         port = int(server_set['port']),
-        threads = 1
+        threads = 1,
+        clear_untrusted_proxy_headers = True
     )

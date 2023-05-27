@@ -8,7 +8,6 @@ def list_image_file():
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
         list_data = '<ul class="opennamu_ul">'
-        back = ''
 
         curs.execute(db_change("select title from data where title like 'file:%' limit ?, 50"), [sql_num])
         data_list = curs.fetchall()
