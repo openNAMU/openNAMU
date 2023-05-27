@@ -1895,6 +1895,8 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             num = 'all'
         elif tool == 'bbs_view':
             curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_view_acl" and set_id = ?'), [name])
+
+            num = 'all'
         else:
             # tool == 'render'
             if i == 0:

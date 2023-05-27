@@ -17,7 +17,7 @@ def list_user(arg_num = 1):
                 '</li>' + \
             ''
 
-        list_data += '</ul>' + next_fix('/list/user/', num, user_list)
+        list_data += '</ul>' + next_fix('/list/user/', arg_num, user_list)
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('member_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
