@@ -77,6 +77,7 @@ def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
                 else:
                     curs.execute(db_change('select set_name, set_data, set_code from bbs_data where set_id = ? and set_code = ?'), [bbs_num, post_num])
                     db_data = curs.fetchall()
+                    db_data = list(db_data) if db_data else []
 
                     temp_id = ''
                     temp_dict = {}

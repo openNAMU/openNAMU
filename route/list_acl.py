@@ -30,7 +30,7 @@ def list_acl(arg_num = 1):
             ''
 
         div += '</ul>'
-        div += next_fix('/list/document/acl/', num, list_data)
+        div += next_fix('/list/document/acl/', arg_num, list_data)
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('acl_document_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
