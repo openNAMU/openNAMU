@@ -336,3 +336,7 @@ s:hover, strike:hover, del:hover {
     overflow-x: scroll;
     overflow-y: hidden;
 }
+
+.opennamu_width_200 {
+    width: 200px;
+}

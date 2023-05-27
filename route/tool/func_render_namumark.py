@@ -1347,7 +1347,8 @@ class class_do_render_namumark:
                     if table_parameter_name == 'tablebgcolor':
                         table_parameter_all['table'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
                     elif table_parameter_name == 'tablewidth':
-                        table_parameter_all['table'] += 'width:' + self.get_tool_px_add_check(table_parameter_data) + ';'
+                        table_parameter_all['div'] += 'width:' + self.get_tool_px_add_check(table_parameter_data) + ';'
+                        table_parameter_all['table'] += 'width:100%;'
                     elif table_parameter_name == 'tableheight':
                         table_parameter_all['table'] += 'height:' + self.get_tool_px_add_check(table_parameter_data) + ';'
                     elif table_parameter_name == 'tablealign':

@@ -18,7 +18,8 @@ import email.header
 import urllib.request
 
 # Init-Version
-version_list = json.loads(open('version.json', encoding = 'utf8').read())
+with open('version.json', encoding = 'utf8') as file_data:
+    version_list = json.loads(file_data.read())
 
 print('Version : ' + version_list['beta']['r_ver'])
 print('DB set version : ' + version_list['beta']['c_ver'])
@@ -28,7 +29,9 @@ print('----')
 # Init-PIP_Install
 data_up_date = 1
 if os.path.exists(os.path.join('data', 'version.json')):
-    data_load_ver = open(os.path.join('data', 'version.json'), encoding = 'utf8').read()
+    with open(os.path.join('data', 'version.json'), encoding = 'utf8') as file_data:
+        data_load_ver = file_data.read()
+    
     if data_load_ver == version_list['beta']['r_ver']:
         data_up_date = 0
 
@@ -199,10 +202,9 @@ class class_check_json:
         else:
             if os.path.exists(os.path.join('data', 'set.json')):
                 db_set_list = ['db', 'db_type']
-                set_data = json.loads(open(
-                    os.path.join('data', 'set.json'), 
-                    encoding = 'utf8'
-                ).read())
+                with open(os.path.join('data', 'set.json'), encoding = 'utf8') as file_data:
+                    set_data = json.loads(file_data.read())
+
                 for i in db_set_list:
                     if not i in set_data:
                         os.remove(os.path.join('data', 'set.json'))
@@ -250,12 +252,9 @@ class class_check_json:
     def do_check_mysql_json(data_db_set):
         if os.path.exists(os.path.join('data', 'mysql.json')):
             db_set_list = ['user', 'password', 'host', 'port']
-            set_data = json.loads(
-                open(
-                    os.path.join('data', 'mysql.json'),
-                    encoding = 'utf8'
-                ).read()
-            )
+            with open(os.path.join('data', 'mysql.json'), encoding = 'utf8') as file_data:
+                set_data = json.loads(file_data.read())
+
             for i in db_set_list:
                 if not i in set_data:
                     os.remove(os.path.join('data', 'mysql.json'))
@@ -1383,7 +1382,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                         acl_dict[include_data[1]] = acl_result
 
                     if acl_result == 0:
-                        include_regex = re.compile('<div id="' + include_data[0] + '"><\/div>')
+                        include_regex = re.compile('<div id="' + include_data[0] + '"><\\/div>')
                         if re.search(include_regex, get_class_render[0]):
                             include_data_render = class_do_render(conn, render_lang_data).do_render(include_data[1], include_data[2], data_type, include_data[0] + data_in)
                             if len(include_data) > 3:
@@ -1896,6 +1895,8 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             num = 'all'
         elif tool == 'bbs_view':
             curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_view_acl" and set_id = ?'), [name])
+
+            num = 'all'
         else:
             # tool == 'render'
             if i == 0:
