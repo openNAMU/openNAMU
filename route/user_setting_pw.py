@@ -12,8 +12,8 @@ def user_setting_pw():
             return redirect('/login')
 
         if flask.request.method == 'POST':
-            user_pw = flask.request.form.get('password_new', '')
             user_pw_now = flask.request.form.get('password_now', '')
+            user_pw = flask.request.form.get('password_new', '')
             user_repeat = flask.request.form.get('password_new_repeat', '')
         
             # PW 검증
@@ -48,10 +48,7 @@ def user_setting_pw():
             if pw_check(user_pw_now, db_user_pw, db_user_encode, ip) != 1:
                 return re_error('/error/10')
 
-            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [
-                pw_encode(new_pw), 
-                ip
-            ])
+            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [pw_encode(user_pw), ip])
             
             conn.commit()
 
