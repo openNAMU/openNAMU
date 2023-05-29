@@ -971,16 +971,15 @@ def pw_encode(data, db_data_encode = ''):
 def pw_check(data, data2, type_d = 'no', id_d = ''):
     curs = conn.cursor()
 
-    curs.execute(db_change('select data from other where name = "encode"'))
-    db_data = curs.fetchall()
-
     if type_d != 'no':
         if type_d == '':
             set_data = 'sha3'
         else:
             set_data = type_d
     else:
-        set_data = db_data[0][0]
+        curs.execute(db_change('select data from other where name = "encode"'))
+        db_data = curs.fetchall()
+        set_data = db_data[0][0] if db_data and db_data[0][0] != '' else 'sha3'
 
     re_data = 1 if pw_encode(data, set_data) == data2 else 0
     if db_data[0][0] != set_data and re_data == 1 and id_d != '':
