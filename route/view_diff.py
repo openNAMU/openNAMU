@@ -60,27 +60,29 @@ def view_diff(name = 'Test', num_a = 1, num_b = 1):
 
                         temp_list += [[line, for_a[0], for_a[1]]]
 
-            result = '<table style="width: 100%;"><tr><td colspan="2">r' + first + ' ➤ r' + second + '</td></tr>'
-            result += '<tr><td style="width: 40px; user-select: none;">'
+                result = '<table style="width: 100%;"><tr><td colspan="2">r' + first + ' ➤ r' + second + '</td></tr>'
+                result += '<tr><td style="width: 40px; user-select: none;">'
 
-            line = 0
-            for for_a in diff_data_2:
-                if line == 0:
-                    line = for_a[0]
-                    result += str(line) + '</td><td>'
-                else:
-                    if line != for_a[0]:
+                # 개행만 추가된 경우 조정 필요
+                
+                line = 0
+                for for_a in diff_data_2:
+                    if line == 0:
                         line = for_a[0]
-                        result += '</td></tr><tr><td style="width: 40px; user-select: none;">' + str(line) + '</td><td>'
+                        result += str(line) + '</td><td>'
+                    else:
+                        if line != for_a[0]:
+                            line = for_a[0]
+                            result += '</td></tr><tr><td style="width: 40px; user-select: none;">' + str(line) + '</td><td>'
 
-                if for_a[1] == 1:
-                    result += '<span style="background: #eaf2c2;">' + for_a[2] + '</span>'
-                elif for_a[1] == 0:
-                    result += for_a[2]
-                else:
-                    result += '<span style="background: #fadad7;">' + for_a[2] + '</span>'
+                    if for_a[1] == 1:
+                        result += '<span style="background: #eaf2c2;">' + for_a[2] + '</span>'
+                    elif for_a[1] == 0:
+                        result += for_a[2]
+                    else:
+                        result += '<span style="background: #fadad7;">' + for_a[2] + '</span>'
 
-            result += '</td></tr></table>'
+                result += '</td></tr></table>'
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('compare') + ')', 0])],
