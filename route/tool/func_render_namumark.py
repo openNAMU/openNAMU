@@ -1805,9 +1805,9 @@ class class_do_render_namumark:
             list_style = {
                 1 : 'list-style: unset;',
                 2 : 'list-style: circle;',
-                3 : 'list-style: square;',
+                3 : 'list-style: \'◼  \';',
             }
-            list_style_data = 'list-style: square;'
+            list_style_data = 'list-style: \'◻  \';'
             if list_len in list_style:
                 list_style_data = list_style[list_len]
 
