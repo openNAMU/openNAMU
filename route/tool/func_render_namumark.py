@@ -1803,15 +1803,16 @@ class class_do_render_namumark:
                 list_len = 1
 
             list_style = {
-                1 : 'list-style: unset;',
-                2 : 'list-style: circle;',
-                3 : 'list-style: \'◼  \';',
+                1 : 'opennamu_list_1',
+                2 : 'opennamu_list_2',
+                3 : 'opennamu_list_3',
+                4 : 'opennamu_list_4'
             }
-            list_style_data = 'list-style: \'◻  \';'
+            list_style_data = 'opennamu_list_5'
             if list_len in list_style:
                 list_style_data = list_style[list_len]
 
-            return '<li style="margin-left: ' + str(list_len * 20) + 'px;' + list_style_data + '">' + list_data + '</li>'
+            return '<li style="margin-left: ' + str(list_len * 20) + 'px;" class="' + list_style_data + '">' + list_data + '</li>'
 
         list_regex = r'((?:\n *\* ?[^\n]*)+)\n'
         list_count_max = len(re.findall(list_regex, self.render_data)) * 3
