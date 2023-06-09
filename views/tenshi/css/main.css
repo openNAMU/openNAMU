@@ -288,10 +288,16 @@ pre, #toc, #cate, #redirect {
 }
 */
 
-#redirect, #cate, #toc, blockquote, button#opennamu_save_button, button#opennamu_preview_button {
+#redirect, #cate, #toc, button#opennamu_save_button, button#opennamu_preview_button {
     border: 0;
     
     padding: 10px;
+    
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+}
+
+blockquote {
+    border: 0;
     
     box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
 }
@@ -461,11 +467,7 @@ div#last_edit {
 
 blockquote {
     background-color: #ffefff;
-
-    padding: 15px 40px 15px 15px;
     border-left: 4px solid #ffb3ff;
-    
-    margin-bottom: 20px;
 }
 
 #b_logo {

@@ -15,8 +15,12 @@ def bbs_main():
                 curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_type" and set_id = ?'), [for_a[1]])
                 db_data_2 = curs.fetchall()
                 bbs_type = db_data_2[0][0] if db_data_2 else 'comment'
+                
+                curs.execute(db_change('select set_data from bbs_data where set_id = ? and set_name = "date" order by set_code + 0 desc limit 1'), [for_a[1]])
+                db_data_2 = curs.fetchall()
+                last_date = ('(' + db_data_2[0][0] + ')') if db_data_2 else ''
 
-                data += '<li><a href="/bbs/w/' + for_a[1] + '">' + for_a[0] + ' (' + bbs_type + ')</a></li>'
+                data += '<li><a href="/bbs/w/' + for_a[1] + '">' + for_a[0] + ' (' + bbs_type + ') ' + last_date + '</a></li>'
 
             data += '</ul>'
 

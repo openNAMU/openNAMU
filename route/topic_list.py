@@ -1,4 +1,5 @@
 from .tool.func import *
+from .api_topic import api_topic
 
 def topic_list(name = 'Test'):
     with get_db_connect() as conn:
@@ -33,14 +34,17 @@ def topic_list(name = 'Test'):
 
         for data in curs.fetchall():
             curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [data[0]])
-            t_data = curs.fetchall()
+            db_data = curs.fetchall()
+            last_thread = db_data[0][0] if db_data else '1'
 
-            div += '''
-                <h2><a href="/thread/''' + data[0] + '">' + data[0] + '. ' + html.escape(data[1]) + '''</a></h2>
-                <div class="topic_pre" id="opennamu_thread_''' + data[0] + '''"></div>
-                <div class="topic_back_pre" id="opennamu_thread_back_''' + data[0] + '''"></div>
-                <!-- JS : opennamu_do_thread_make -->
-            '''
+            div += '<h2><a href="/thread/' + data[0] + '">' + data[0] + '. ' + html.escape(data[1]) + '</a></h2>'
+
+            first_data = json.loads(api_topic(data[0], 'normal', 1, 'render').data)
+            div += first_data['data'] if 'data' in first_data else ''
+
+            if last_thread != '1':
+                last_data = json.loads(api_topic(data[0], 'normal', int(last_thread), 'render').data)
+                div += last_data['data'] if 'data' in last_data else ''
 
         if div == '':
             plus = re.sub(r'^<br>', '', plus)
