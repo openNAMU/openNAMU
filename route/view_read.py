@@ -213,7 +213,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                 if flask.session and 'lastest_document' in flask.session:
                     end_data = '''
                         <div id="redirect">
-                            <a href="/w_from/''' + url_pas(flask.session['lastest_document']) + '''">''' + flask.session['lastest_document'] + '''</a> ⇨ <b>''' + name + '''</b>
+                            <a href="/w_from/''' + url_pas(flask.session['lastest_document']) + '''">''' + flask.session['lastest_document'] + '''</a> ➤ <b>''' + name + '''</b>
                         </div>
                         <hr class="main_hr">
                     ''' + end_data

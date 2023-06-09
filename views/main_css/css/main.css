@@ -205,6 +205,10 @@ pre {
     margin: 0;
 }
 
+code, pre {
+    font-family: Consolas, Monaco, monospace;
+}
+
 #syntax {
     padding: 0;
 }
@@ -339,4 +343,38 @@ s:hover, strike:hover, del:hover {
 
 .opennamu_width_200 {
     width: 200px;
+}
+
+.opennamu_list_1 {
+    list-style: disc;
+}
+
+.opennamu_list_2 {
+    list-style: circle;
+}
+
+.opennamu_list_3 {
+    list-style: square;
+}
+
+.opennamu_list_4 {
+    list-style: none;
+}
+
+.opennamu_list_4::before {
+    display: inline-block;
+    content: "⬦";
+    width: 1.2em;
+    margin-left: -1.2em;
+}
+
+.opennamu_list_5 {
+    list-style: none;
+}
+
+.opennamu_list_5::before {
+    display: inline-block;
+    content: "⬥";
+    width: 1.2em;
+    margin-left: -1.2em;
 }
