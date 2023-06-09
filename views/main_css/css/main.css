@@ -205,6 +205,10 @@ pre {
     margin: 0;
 }
 
+code, pre {
+    font-family: Consolas, Monaco, monospace;
+}
+
 #syntax {
     padding: 0;
 }
