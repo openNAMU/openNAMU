@@ -36,7 +36,8 @@ def main_setting_main(db_set):
             32 : ['wiki_access_password', ''],
             33 : ['history_recording_off', ''],
             34 : ['namumark_compatible', ''],
-            35 : ['user_name_view', '']
+            35 : ['user_name_view', ''],
+            36 : ['link_case_insensitive', '']
         }
 
         if flask.request.method == 'POST':
@@ -86,7 +87,7 @@ def main_setting_main(db_set):
                 else:
                     tls_select += '<option value="' + tls_select_one + '">' + tls_select_one + '</option>'
 
-            check_box_div = ['', '', '', '', '', '', '', '', '', '', '', '']
+            check_box_div = ['', '', '', '', '', '', '', '', '', '', '', '', '']
             for i in range(0, len(check_box_div)):
                 if i == 0:
                     acl_num = 7
@@ -110,6 +111,8 @@ def main_setting_main(db_set):
                     acl_num = 34
                 elif i == 11:
                     acl_num = 35
+                elif i == 12:
+                    acl_num = 36
 
                 if d_list[acl_num]:
                     check_box_div[i] = 'checked="checked"'
@@ -190,8 +193,12 @@ def main_setting_main(db_set):
                         <hr class="main_hr">
                         <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'ringo') + '''</select>
 
-                        <hr class="main_hr">
+                        <h2>''' + load_lang('render_set') + '''</h2>
                         <input type="checkbox" name="namumark_compatible" ''' + check_box_div[10] + '''> ''' + load_lang('namumark_fully_compatible_mode') + '''
+                        <hr class="main_hr">
+                        
+                        <input type="checkbox" name="link_case_insensitive" ''' + check_box_div[12] + '''> ''' + load_lang('link_case_insensitive') + '''
+                        <hr class="main_hr">
 
                         <h2>''' + load_lang('login_set') + '''</h2>
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''

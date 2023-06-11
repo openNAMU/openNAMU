@@ -51,6 +51,10 @@ class class_do_render_namumark:
         self.render_data_cdn = ''
         self.render_data_js = ''
 
+        self.curs.execute(db_change('select data from other where name = "link_case_insensitive"'))
+        db_data = self.curs.fetchall()
+        self.link_case_insensitive = ' collate nocase' if db_data and db_data[0][0] != '' else ''
+
     def get_tool_lang(self, name):
         if name in self.lang_data:
             return self.lang_data[name]
@@ -1013,13 +1017,14 @@ class class_do_render_namumark:
 
                     link_exist = ''
                     if link_main != '':
-                        self.curs.execute(db_change("select title from data where title = ?"), [link_main])
+                        self.curs.execute(db_change("select title from data where title = ?" + self.link_case_insensitive), [link_main])
                         db_data = self.curs.fetchall()
                         if not db_data:
                             self.data_backlink += [[self.doc_name, link_main, 'no']]
                             self.data_backlink += [[self.doc_name, link_main, '']]
                             link_exist = 'opennamu_not_exist_link'
                         else:
+                            link_main = db_data[0][0]
                             self.data_backlink += [[self.doc_name, link_main, '']]
 
                     link_same = ''
