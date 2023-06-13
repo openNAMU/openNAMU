@@ -153,6 +153,9 @@ class class_do_render_namumark:
         return data
 
     def get_tool_footnote_make(self):
+        footnote_number_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_number', self.ip)
+        footnote_number_view_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_view_real_footnote_num', self.ip)
+    
         data = ''
         for for_a in self.data_footnote:
             if data == '':
@@ -1194,7 +1197,11 @@ class class_do_render_namumark:
 
     def do_redner_footnote(self):
         footnote_num = 0
+
         footnote_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_set', self.ip)
+        footnote_number_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_number', self.ip)
+        footnote_number_view_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_view_real_footnote_num', self.ip)
+
         footnote_regex = re.compile('(?:\[\*((?:(?!\[\*|\]| ).)+)?(?: ((?:(?!\[\*|\]).)+))?\]|\[(각주|footnote)\])', re.I)
         footnote_count_all = len(re.findall(footnote_regex, self.render_data)) * 4
         while 1:
@@ -1235,7 +1242,14 @@ class class_do_render_namumark:
 
                         fn = self.doc_include + 'fn_' + footnote_first
                         rfn = self.doc_include + 'rfn_' + footnote_num_str
-                        foot_v_name = footnote_name + ' (' + footnote_num_str + ')'
+
+                        if footnote_number_set == 'only_number':
+                            foot_v_name += footnote_first
+                        else:
+                            foot_v_name += footnote_name
+                            
+                        if footnote_number_view_set != 'off':
+                            foot_v_name += ' (' + footnote_num_str + ')'
                     else:
                         self.data_footnote[footnote_name] = {}
                         self.data_footnote[footnote_name]['list'] = [footnote_num_str]
@@ -1243,7 +1257,14 @@ class class_do_render_namumark:
 
                         fn = self.doc_include + 'fn_' + footnote_num_str
                         rfn = self.doc_include + 'rfn_' + footnote_num_str
-                        foot_v_name = footnote_name + footnote_name_add
+
+                        if footnote_number_set == 'only_number':
+                            foot_v_name += footnote_num_str
+                        else:
+                            foot_v_name += footnote_name
+                            
+                        if footnote_number_view_set != 'off':
+                            foot_v_name += footnote_name_add
 
                     if footnote_set == 'spread':
                         data_name = self.get_tool_data_storage(
