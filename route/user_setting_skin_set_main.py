@@ -56,6 +56,14 @@ def user_setting_skin_set_main_set_list():
             ['default', load_lang('default')],
             ['0', load_lang('off')],
             ['1', load_lang('use')]
+        ], 'main_css_footnote_number' : [
+            ['default', load_lang('default')],
+            ['all', load_lang('all')],
+            ['only_number', load_lang('only_number')]
+        ], 'main_css_view_real_footnote_num' : [
+            ['default', load_lang('default')],
+            ['off', load_lang('off')],
+            ['on', load_lang('use')]
         ]
     }
 
@@ -145,9 +153,20 @@ def user_setting_skin_set_main():
                             ''' + set_data["main_css_category_set"] + '''
                         </select>
                         <h3>''' + load_lang("footnote") + ''' (''' + load_lang('beta') + ''')</h3>
+                        <h4>''' + load_lang("footnote_render") + '''</h4>
                         ''' + set_data_main["main_css_footnote_set"] + '''
                         <select name="main_css_footnote_set">
                             ''' + set_data["main_css_footnote_set"] + '''
+                        </select>
+                        <h4>''' + load_lang("footnote_number") + '''</h4>
+                        ''' + set_data_main["main_css_footnote_number"] + '''
+                        <select name="main_css_footnote_number">
+                            ''' + set_data["main_css_footnote_number"] + '''
+                        </select>
+                        <h4>''' + load_lang("footnote_real_num_view") + '''</h4>
+                        ''' + set_data_main["main_css_view_real_footnote_num"] + '''
+                        <select name="main_css_view_real_footnote_num">
+                            ''' + set_data["main_css_view_real_footnote_num"] + '''
                         </select>
                         <h3>''' + load_lang("include_link") + '''</h3>
                         ''' + set_data_main["main_css_include_link"] + '''
