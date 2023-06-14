@@ -1355,10 +1355,6 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
             }
 
             get_class_render = class_do_render(conn, render_lang_data).do_render(doc_name, doc_data, data_type, data_in)
-
-            if data_type == 'backlink':
-                return ''
-
             
             if 'include' in get_class_render[2]:
                 for_a = 0
@@ -1384,6 +1380,9 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                             get_class_render[2]['include'] += include_data_render[2]['include']
 
                     for_a += 1
+
+            if data_type == 'backlink':
+                return ''
 
             get_class_render[0] = '<div class="opennamu_render_complete">' + get_class_render[0] + '</div>'
 
