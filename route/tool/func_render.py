@@ -67,9 +67,9 @@ class class_do_render:
                 curs.execute(db_change("delete from back where title = ? and type = 'no'"), [doc_name])
 
             self.conn.commit()
-        else:
-            return [
-                data_end[0], 
-                data_end[1],
-                data_end[2]
-            ]
+
+        return [
+            data_end[0], 
+            data_end[1],
+            data_end[2]
+        ]
