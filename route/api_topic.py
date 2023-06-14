@@ -91,7 +91,7 @@ def api_topic(topic_num = 1, tool = 'normal', num = '', render = ''):
                             data_r += bbs_w_post_make_thread(
                                 for_a["ip_pas"],
                                 '<a href="/thread/' + topic_num + '/comment/' + for_a["id"] + '/tool">(' + load_lang('tool') + ')</a> ' + for_a["date"],
-                                for_a["data_pas"][0] + for_a["data_pas"][1],
+                                for_a["data_pas"][0] + '<script>' + for_a["data_pas"][1] + '</script>',
                                 for_a["id"],
                                 color = color,
                                 blind = for_a["blind"],
