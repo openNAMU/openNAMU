@@ -21,10 +21,14 @@ def view_xref(name = 'Test', xref_type = 1):
 
         div += '<ul class="opennamu_ul">'
 
+        curs.execute(db_change('select data from other where name = "link_case_insensitive"'))
+        db_data = curs.fetchall()
+        link_case_insensitive = ' collate nocase' if db_data and db_data[0][0] != '' else ''
+
         sql_insert = ['link', 'title'] if xref_type == 1 else ['title', 'link']
         curs.execute(db_change("" + \
             "select distinct " + sql_insert[0] + ", type from back " + \
-            "where " + sql_insert[1] + " = ? and not type = 'no' and not type = 'nothing'" + \
+            "where " + sql_insert[1] + " = ?" + link_case_insensitive + " and not type = 'no' and not type = 'nothing' " + \
             "order by type asc, " + sql_insert[0] + " asc limit ?, 50" + \
         ""), [
             name,

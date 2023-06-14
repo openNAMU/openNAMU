@@ -62,9 +62,18 @@ def main_setting_skin_set():
                         <select name="main_css_category_set">
                             ''' + set_data["main_css_category_set"] + '''
                         </select>
-                        <h3>''' + load_lang("footnote") + '''</h3>
+                        <h3>''' + load_lang("footnote") + ''' (''' + load_lang('beta') + ''')</h3>
+                        <h4>''' + load_lang("footnote_render") + '''</h4>
                         <select name="main_css_footnote_set">
                             ''' + set_data["main_css_footnote_set"] + '''
+                        </select>
+                        <h4>''' + load_lang("footnote_number") + '''</h4>
+                        <select name="main_css_footnote_number">
+                            ''' + set_data["main_css_footnote_number"] + '''
+                        </select>
+                        <h4>''' + load_lang("footnote_real_num_view") + '''</h4>
+                        <select name="main_css_view_real_footnote_num">
+                            ''' + set_data["main_css_view_real_footnote_num"] + '''
                         </select>
                         <h3>''' + load_lang("include_link") + '''</h3>
                         <select name="main_css_include_link">
