@@ -3,32 +3,11 @@ import os
 import re
 
 from route.tool.func import *
-# from route import *
-
-for i_data in os.listdir("route"):
-    f_src = re.search(r"(.+)\.py$", i_data)
-    f_src = f_src.group(1) if f_src else ""
-    
-    if not f_src in ('', '__init__'):
-        try:
-            exec(
-                "from route." + f_src + " " + 
-                "import " + f_src
-            )
-        except:
-            try:
-                exec(
-                    "from route." + f_src + " " + 
-                    "import " + f_src + "_2"
-                )
-            except:
-                pass
+from route import *
 
 # Init-Version
-version_list = json.loads(open(
-    'version.json', 
-    encoding = 'utf8'
-).read())
+with open('version.json', encoding = 'utf8') as file_data:
+    version_list = json.loads(file_data.read())
 
 # Init-DB
 data_db_set = class_check_json()
@@ -69,6 +48,8 @@ with get_db_connect() as conn:
                 ))
             except:
                 pass
+
+        conn.select_db(data_db_set['name'])
 
     if setup_tool != 'normal':
         create_data = get_db_table_list()
@@ -317,53 +298,37 @@ app.route('/list/document/old')(list_old_page)
 app.route('/list/document/old/<int:num>')(list_old_page)
 
 # /list/document/acl
-@app.route('/acl_list')
-def list_acl():
-    return list_acl_2()
-
-# /list/document/acl/add
-@app.route('/acl/<everything:name>', methods = ['POST', 'GET'])
-def give_acl(name = None):
-    return give_acl_2(name)
+app.route('/list/document/acl')(list_acl)
+app.route('/list/document/acl/<int:arg_num>')(list_acl)
 
 # /list/document/need
-@app.route('/please')
-def list_please():
-    return list_please_2()
+app.route('/list/document/need')(list_please)
+app.route('/list/document/need/<int:arg_num>')(list_please)
 
 # /list/document/all
 app.route('/list/document/all')(list_title_index)
 app.route('/list/document/all/<int:num>')(list_title_index)
 
 # /list/document/long
-@app.route('/long_page')
-def list_long_page():
-    return list_long_page_2('long_page')
+app.route('/list/document/long')(list_long_page)
 
 # /list/document/short
-@app.route('/short_page')
-def list_short_page():
-    return list_long_page_2('short_page')
+app.route('/list/document/short', defaults = { 'tool' : 'short_page' })(list_long_page)
 
 # /list/file
-@app.route('/image_file_list')
-def list_image_file():
-    return list_image_file_2()
+app.route('/list/file')(list_image_file)
 
 # /list/admin
 # /list/admin/list
-@app.route('/admin_list')
-def list_admin():
-    return list_admin_2()
+app.route('/list/admin')(list_admin)
 
 # /list/admin/auth_use
-app.route('/list/admin/auth_use', methods = ['POST', 'GET'])(list_admin_use)
-app.route('/list/admin/auth_use/<arg_search>/<int:arg_num>', methods = ['POST', 'GET'])(list_admin_use)
+app.route('/list/admin/auth_use', methods = ['POST', 'GET'])(list_admin_auth_use)
+app.route('/list/admin/auth_use/<arg_search>/<int:arg_num>', methods = ['POST', 'GET'])(list_admin_auth_use)
 
 # /list/user
-@app.route('/user_log')
-def list_user():
-    return list_user_2()
+app.route('/list/user')(list_user)
+app.route('/list/user/<int:arg_num>')(list_user)
 
 # /list/user/check
 @app.route('/check/<name>')
@@ -378,9 +343,8 @@ def give_user_check_delete():
 # Func-auth
 # /auth/give
 # /auth/give/<name>
-@app.route('/admin/<name>', methods = ['POST', 'GET'])
-def give_admin(name = None):
-    return give_admin_2(name)
+app.route('/auth/give', methods = ['POST', 'GET'])(give_auth)
+app.route('/auth/give/<name>', methods = ['POST', 'GET'])(give_auth)
 
 # /auth/give
 # /auth/give/<name>
@@ -446,6 +410,8 @@ app.route('/raw_rev/<int:num>/<everything:name>')(view_raw_2)
 app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')(view_diff)
 
 app.route('/down/<everything:name>')(view_down)
+
+app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_acl)
 
 # everything 다음에 추가 붙은 경우에 대해서 재검토 필요 (진행중)
 app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
@@ -589,13 +555,17 @@ app.route('/vote/list/close/<int:num>', defaults = { 'list_type' : 'close' })(vo
 app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 
 # Func-bbs
-# app.route('/bbs/main')
+app.route('/bbs/main')(bbs_main)
+app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
 # app.route('/bbs/main/set')
-# app.route('/bbs/make')
-# app.route('/bbs/w/<int:bbs_num>')
-# app.route('/bbs/set/<int:bbs_num>')
-# app.route('/bbs/edit/<int:bbs_num>')
-# app.route('/bbs/w/<int:bbs_num>/<int:post_num>')
+app.route('/bbs/w/<int:bbs_num>')(bbs_w)
+app.route('/bbs/set/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_set)
+app.route('/bbs/edit/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_edit)
+app.route('/bbs/edit/preview/<int:bbs_num>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'preview' })(bbs_edit)
+app.route('/bbs/w/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_post)
+app.route('/bbs/edit/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_edit)
+app.route('/bbs/edit/preview/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'preview' })(bbs_edit)
+app.route('/bbs/w/preview/<int:bbs_num>/<int:post_num>', methods = ['POST'], defaults = { 'do_type' : 'preview' })(bbs_w_post)
 # app.route('/bbs/edit/<int:bbs_num>/<int:post_num>')
 
 # Func-api
@@ -610,6 +580,7 @@ app.route('/api/skin_info/<name>')(api_skin_info)
 app.route('/api/user_info/<name>', methods = ['POST', 'GET'])(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
+app.route('/api/thread/<int:topic_num>/<tool>/<int:num>/<render>')(api_topic)
 app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic)
 app.route('/api/thread/<int:topic_num>/<tool>')(api_topic)
 app.route('/api/thread/<int:topic_num>')(api_topic)
@@ -641,10 +612,10 @@ app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(ma
 # app.route('/guide/<doc_name>')(main_tool_guide)
 
 app.route('/search', methods=['POST'])(main_search)
-app.route('/search/<everything:name>')(main_search_deep)
-app.route('/search/<int:num>/<everything:name>')(main_search_deep)
-app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data' })(main_search_deep)
-app.route('/search_data/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' })(main_search_deep)
+app.route('/search/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search/<int:num>/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search_data/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
 app.route('/goto', methods=['POST'])(main_search_goto)
 app.route('/goto/<everything:name>', methods=['POST'])(main_search_goto)
 
@@ -668,11 +639,11 @@ app.route('/setting/skin_set', methods = ['POST', 'GET'])(main_setting_skin_set)
 app.route('/easter_egg')(main_func_easter_egg)
 
 # views -> view
-app.route('/view/<everything:name>')(main_view)
-app.route('/views/<everything:name>')(main_view)
-app.route('/image/<everything:name>')(main_view_image)
+app.route('/view/<path:name>')(main_view)
+app.route('/views/<path:name>')(main_view)
+app.route('/image/<path:name>')(main_view_image)
 # 조정 계획 중
-app.route('/<regex("[^.]+\.(?:txt|xml)"):data>')(main_view_file)
+app.route('/<regex("[^.]+\\.(?:txt|xml)"):data>')(main_view_file)
 
 app.route('/shutdown', methods = ['POST', 'GET'])(main_sys_shutdown)
 app.route('/restart', methods = ['POST', 'GET'])(main_sys_restart)
@@ -685,5 +656,6 @@ if __name__ == "__main__":
         app,
         host = server_set['host'],
         port = int(server_set['port']),
-        threads = 1
+        threads = 1,
+        clear_untrusted_proxy_headers = True
     )

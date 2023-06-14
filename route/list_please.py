@@ -1,11 +1,10 @@
 from .tool.func import *
 
-def list_please_2():
+def list_please(arg_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        num = int(number_check(flask.request.args.get('num', '1')))
-        sql_num = (num * 50 - 50) if num * 50 > 0 else 0
+        sql_num = (arg_num * 50 - 50) if arg_num * 50 > 0 else 0
 
         curs.execute(db_change('select data from other where name = "count_all_title"'))
         if int(curs.fetchall()[0][0]) > 30000:
@@ -23,7 +22,7 @@ def list_please_2():
                 '</li>' + \
             ''
 
-        div += '</ul>' + next_fix('/please?num=', num, data_list)
+        div += '</ul>' + next_fix('/list/document/need/', arg_num, data_list)
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('need_document'), wiki_set(), wiki_custom(), wiki_css([0, 0])],

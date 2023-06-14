@@ -13,7 +13,7 @@ def main_tool_other():
                 <h2>''' + load_lang('list') + '''</h2>
                 <h3>''' + load_lang('admin') + '''</h3>
                 <ul class="opennamu_ul">               
-                    <li><a href="/admin_list">''' + load_lang('admin_list') + '''</a></li>
+                    <li><a href="/list/admin">''' + load_lang('admin_list') + '''</a></li>
                     <li><a href="/list/admin/auth_use">''' + load_lang('authority_use_list') + '''</a></li>
                 </ul>
                 <h3>''' + load_lang('discussion') + '''</h3>
@@ -24,20 +24,20 @@ def main_tool_other():
                 <ul class="opennamu_ul">
                     <li><a href="/recent_change">''' + load_lang('recent_change') + '''</a></li>
                     <li><a href="/list/document/all">''' + load_lang('all_document_list') + '''</a></li>
-                    <li><a href="/acl_list">''' + load_lang('acl_document_list') + '''</a></li>
-                    <li><a href="/please">''' + load_lang('need_document') + '''</a></li>
-                    <li><a href="/long_page">''' + load_lang('long_page') + '''</a></li>
-                    <li><a href="/short_page">''' + load_lang('short_page') + '''</a></li>
+                    <li><a href="/list/document/acl">''' + load_lang('acl_document_list') + '''</a></li>
+                    <li><a href="/list/document/need">''' + load_lang('need_document') + '''</a></li>
+                    <li><a href="/list/document/long">''' + load_lang('long_page') + '''</a></li>
+                    <li><a href="/list/document/short">''' + load_lang('short_page') + '''</a></li>
                     <li><a href="/list/document/old">''' + load_lang('old_page') + '''</a></li>
                 </ul>
                 <h3>''' + load_lang('user') + '''</h3>
                 <ul class="opennamu_ul">
                     <li><a href="/block_log">''' + load_lang('recent_ban') + '''</a></li>
-                    <li><a href="/user_log">''' + load_lang('member_list') + '''</a></li>
+                    <li><a href="/list/user">''' + load_lang('member_list') + '''</a></li>
                 </ul>
                 <h3>''' + load_lang('other') + '''</h3>
                 <ul class="opennamu_ul">
-                    <li><a href="/image_file_list">''' + load_lang('image_file_list') + '''</a></li>
+                    <li><a href="/list/file">''' + load_lang('image_file_list') + '''</a></li>
                     <li><a href="/vote">''' + load_lang('vote_list') + '''</a></li>
                     <li><a href="/bbs/main">''' + load_lang('bbs_main') + '''</a></li>
                 </ul>

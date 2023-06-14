@@ -8,7 +8,7 @@
             <title>{{imp[0]}} - {{imp[1][0]}}</title>
         {% endif %}
         {{imp[3][3]|safe}}
-        <link rel="stylesheet" href="/views/tenshi/css/main.css?ver=20">
+        <link rel="stylesheet" href="/views/tenshi/css/main.css?ver=21">
         {% if request.cookies.get('main_css_darkmode', '') == '1' %}
             <link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=1">
             <link rel="stylesheet" href="/views/tenshi/css/dark.css?ver=9">
@@ -59,6 +59,11 @@
                                     <a href="/vote">
                                         <span class="iconify" data-icon="ic:baseline-how-to-vote" data-inline="true"></span>
                                         {{'vote_list'|load_lang}}
+                                    </a>
+                                    <hr>
+                                    <a href="/bbs/main">
+                                        <span class="iconify" data-icon="ic:outline-developer-board" data-inline="true"></span>
+                                        {{'bbs_main'|load_lang}}
                                     </a>
                                 </div>
                             </div>

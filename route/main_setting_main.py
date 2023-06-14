@@ -35,7 +35,11 @@ def main_setting_main(db_set):
             31 : ['wiki_access_password_need', ''],
             32 : ['wiki_access_password', ''],
             33 : ['history_recording_off', ''],
-            34 : ['namumark_compatible', '']
+            34 : ['namumark_compatible', ''],
+            35 : ['user_name_view', ''],
+            36 : ['link_case_insensitive', ''],
+            37 : ['move_with_redirect', ''],
+            38 : ['slow_thread', '']
         }
 
         if flask.request.method == 'POST':
@@ -85,31 +89,13 @@ def main_setting_main(db_set):
                 else:
                     tls_select += '<option value="' + tls_select_one + '">' + tls_select_one + '</option>'
 
-            check_box_div = ['', '', '', '', '', '', '', '', '', '', '']
+            check_box_div = [7, 8, '', 20, 23, 24, 25, 26, 31, 33, 34, 35, 36, 37]
             for i in range(0, len(check_box_div)):
-                if i == 0:
-                    acl_num = 7
-                elif i == 1:
-                    acl_num = 8
-                elif i == 3:
-                    acl_num = 20
-                elif i == 4:
-                    acl_num = 23
-                elif i == 5:
-                    acl_num = 24
-                elif i == 6:
-                    acl_num = 25
-                elif i == 7:
-                    acl_num = 26
-                elif i == 8:
-                    acl_num = 31
-                elif i == 9:
-                    acl_num = 33
-                elif i == 10:
-                    acl_num = 34
-
-                if d_list[acl_num]:
+                acl_num = check_box_div[i]
+                if acl_num != '' and d_list[acl_num]:
                     check_box_div[i] = 'checked="checked"'
+                else:
+                    check_box_div[i] = ''
 
             branch_div = ''
             branch_list = ['stable', 'dev', 'beta']
@@ -187,14 +173,21 @@ def main_setting_main(db_set):
                         <hr class="main_hr">
                         <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'ringo') + '''</select>
 
-                        <hr class="main_hr">
+                        <h2>''' + load_lang('render_set') + '''</h2>
                         <input type="checkbox" name="namumark_compatible" ''' + check_box_div[10] + '''> ''' + load_lang('namumark_fully_compatible_mode') + '''
+                        <hr class="main_hr">
+                        
+                        <input type="checkbox" name="link_case_insensitive" ''' + check_box_div[12] + '''> ''' + load_lang('link_case_insensitive') + '''
+                        <hr class="main_hr">
 
                         <h2>''' + load_lang('login_set') + '''</h2>
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
                         <hr class="main_hr">
 
                         <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + load_lang('hide_ip') + '''
+                        <hr class="main_hr">
+
+                        <input type="checkbox" name="user_name_view" ''' + check_box_div[11] + '''> ''' + load_lang('hide_user_name') + '''
                         <hr class="main_hr">
 
                         <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + load_lang('requires_approval') + '''
@@ -259,6 +252,14 @@ def main_setting_main(db_set):
                         <hr class="main_hr">
                         
                         <input type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + load_lang('set_history_recording_off') + ''' (''' + load_lang('beta') + ''')
+                        <hr class="main_hr">
+
+                        <input type="checkbox" name="move_with_redirect" ''' + check_box_div[13] + '''> ''' + load_lang('move_with_redirect') + '''
+                        <hr class="main_hr">
+
+                        <span>''' + load_lang('slow_thread') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('not_working') + ''')</span>
+                        <hr class="main_hr">
+                        <input name="slow_thread" value="''' + html.escape(d_list[38]) + '''">
                         <hr class="main_hr">
 
                         <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>

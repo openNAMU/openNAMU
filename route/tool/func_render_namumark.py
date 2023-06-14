@@ -48,7 +48,12 @@ class class_do_render_namumark:
         self.render_data = self.doc_data
         self.render_data = html.escape(self.render_data)
         self.render_data = '<back_br>\n' + self.render_data + '\n<front_br>'
+        self.render_data_cdn = ''
         self.render_data_js = ''
+
+        self.curs.execute(db_change('select data from other where name = "link_case_insensitive"'))
+        db_data = self.curs.fetchall()
+        self.link_case_insensitive = ' collate nocase' if db_data and db_data[0][0] != '' else ''
 
     def get_tool_lang(self, name):
         if name in self.lang_data:
@@ -148,6 +153,9 @@ class class_do_render_namumark:
         return data
 
     def get_tool_footnote_make(self):
+        footnote_number_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_number', self.ip)
+        footnote_number_view_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_view_real_footnote_num', self.ip)
+    
         data = ''
         for for_a in self.data_footnote:
             if data == '':
@@ -617,8 +625,6 @@ class class_do_render_namumark:
                 link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                 link_main = html.unescape(link_main)
 
-                print(link_main)
-
                 self.curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'last_edit'"), [link_main])
                 db_data = self.curs.fetchall()
                 if db_data:
@@ -672,6 +678,10 @@ class class_do_render_namumark:
     def do_render_math(self):
         def do_render_math_sub(match):
             data = match.group(1)
+
+            if self.data_math_count == 0:
+                self.render_data_cdn += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">'
+                self.render_data_cdn += '<script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>'
 
             data = re.sub(r'\n', '', data)
             data = self.get_tool_data_revert(data)
@@ -1010,13 +1020,14 @@ class class_do_render_namumark:
 
                     link_exist = ''
                     if link_main != '':
-                        self.curs.execute(db_change("select title from data where title = ?"), [link_main])
+                        self.curs.execute(db_change("select title from data where title = ?" + self.link_case_insensitive), [link_main])
                         db_data = self.curs.fetchall()
                         if not db_data:
                             self.data_backlink += [[self.doc_name, link_main, 'no']]
                             self.data_backlink += [[self.doc_name, link_main, '']]
                             link_exist = 'opennamu_not_exist_link'
                         else:
+                            link_main = db_data[0][0]
                             self.data_backlink += [[self.doc_name, link_main, '']]
 
                     link_same = ''
@@ -1186,7 +1197,11 @@ class class_do_render_namumark:
 
     def do_redner_footnote(self):
         footnote_num = 0
+
         footnote_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_set', self.ip)
+        footnote_number_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_number', self.ip)
+        footnote_number_view_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_view_real_footnote_num', self.ip)
+
         footnote_regex = re.compile('(?:\[\*((?:(?!\[\*|\]| ).)+)?(?: ((?:(?!\[\*|\]).)+))?\]|\[(각주|footnote)\])', re.I)
         footnote_count_all = len(re.findall(footnote_regex, self.render_data)) * 4
         while 1:
@@ -1227,7 +1242,14 @@ class class_do_render_namumark:
 
                         fn = self.doc_include + 'fn_' + footnote_first
                         rfn = self.doc_include + 'rfn_' + footnote_num_str
-                        foot_v_name = footnote_name + ' (' + footnote_num_str + ')'
+
+                        if footnote_number_set == 'only_number':
+                            foot_v_name += footnote_first
+                        else:
+                            foot_v_name += footnote_name
+                            
+                        if footnote_number_view_set != 'off':
+                            foot_v_name += ' (' + footnote_num_str + ')'
                     else:
                         self.data_footnote[footnote_name] = {}
                         self.data_footnote[footnote_name]['list'] = [footnote_num_str]
@@ -1235,7 +1257,14 @@ class class_do_render_namumark:
 
                         fn = self.doc_include + 'fn_' + footnote_num_str
                         rfn = self.doc_include + 'rfn_' + footnote_num_str
-                        foot_v_name = footnote_name + footnote_name_add
+
+                        if footnote_number_set == 'only_number':
+                            foot_v_name += footnote_num_str
+                        else:
+                            foot_v_name += footnote_name
+                            
+                        if footnote_number_view_set != 'off':
+                            foot_v_name += footnote_name_add
 
                     if footnote_set == 'spread':
                         data_name = self.get_tool_data_storage(
@@ -1349,7 +1378,8 @@ class class_do_render_namumark:
                     if table_parameter_name == 'tablebgcolor':
                         table_parameter_all['table'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
                     elif table_parameter_name == 'tablewidth':
-                        table_parameter_all['table'] += 'width:' + self.get_tool_px_add_check(table_parameter_data) + ';'
+                        table_parameter_all['div'] += 'width:' + self.get_tool_px_add_check(table_parameter_data) + ';'
+                        table_parameter_all['table'] += 'width:100%;'
                     elif table_parameter_name == 'tableheight':
                         table_parameter_all['table'] += 'height:' + self.get_tool_px_add_check(table_parameter_data) + ';'
                     elif table_parameter_name == 'tablealign':
@@ -1567,7 +1597,7 @@ class class_do_render_namumark:
                         data_name = self.get_tool_data_storage('<div id="' + self.doc_include + 'opennamu_wiki_' + str(wiki_count) + '"></div>', '', middle_data_org)
                         wiki_count += 1
                     elif middle_name == '#!html':
-                        html_data = re.sub(r'^#!html ', '', middle_data)
+                        html_data = re.sub(r'^#!html( |\n)', '', middle_data)
                         if middle_slash:
                             html_data += '\\'
 
@@ -1622,11 +1652,17 @@ class class_do_render_namumark:
                             wiki_data_syntax = wiki_data_syntax.group(1)
                             if not wiki_data_syntax:
                                 wiki_data_syntax = 'python'
+                            else:
+                                if wiki_data_syntax == 'asm' or wiki_data_syntax == 'assembly':
+                                    wiki_data_syntax = 'x86arm'
                         else:
                             wiki_data_syntax = 'python'
 
                         if syntax_count == 0:
                             self.render_data_js += 'hljs.highlightAll();\n'
+                            self.render_data_cdn += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+                            self.render_data_cdn += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+                            self.render_data_cdn += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
 
                         data_name = self.get_tool_data_storage('<pre id="syntax"><code class="' + wiki_data_syntax + '">' + wiki_data, '</code></pre>', middle_data_org)
                         syntax_count += 1
@@ -1636,7 +1672,7 @@ class class_do_render_namumark:
                             self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        wiki_data = re.sub(r'^\+[1-5] ', '', middle_data)
+                        wiki_data = re.sub(r'^\+[1-5]( |\n)', '', middle_data)
                         if middle_name == '+5':
                             wiki_size = '200'
                         elif middle_name == '+4':
@@ -1656,7 +1692,7 @@ class class_do_render_namumark:
                             self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        wiki_data = re.sub(r'^\-[1-5] ', '', middle_data)
+                        wiki_data = re.sub(r'^\-[1-5]( |\n)', '', middle_data)
                         if middle_name == '-5':
                             wiki_size = '50'
                         elif middle_name == '-4':
@@ -1696,7 +1732,7 @@ class class_do_render_namumark:
                         wiki_color = self.get_tool_css_safe(wiki_color_data)
                         wiki_color = self.get_tool_dark_mode_split(wiki_color)
 
-                        wiki_data = re.sub(r'^@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))? ?', '', middle_data)
+                        wiki_data = re.sub(r'^@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,@(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))?( |\n)', '', middle_data)
 
                         middle_data_pass = wiki_data
                         data_name = self.get_tool_data_storage('<span style="background-color:' + wiki_color + '">', '</span>', middle_data_org)
@@ -1726,7 +1762,7 @@ class class_do_render_namumark:
                         wiki_color = self.get_tool_css_safe(wiki_color_data)
                         wiki_color = self.get_tool_dark_mode_split(wiki_color)
 
-                        wiki_data = re.sub(r'^#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))? ?', '', middle_data)
+                        wiki_data = re.sub(r'^#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+))(?:,#(?:((?:[0-9a-f-A-F]{3}){1,2})|(\w+)))?( |\n)', '', middle_data)
 
                         middle_data_pass = wiki_data
                         data_name = self.get_tool_data_storage('<span style="color:' + wiki_color + '">', '</span>', middle_data_org)
@@ -1804,15 +1840,16 @@ class class_do_render_namumark:
                 list_len = 1
 
             list_style = {
-                1 : 'list-style: unset;',
-                2 : 'list-style: circle;',
-                3 : 'list-style: square;',
+                1 : 'opennamu_list_1',
+                2 : 'opennamu_list_2',
+                3 : 'opennamu_list_3',
+                4 : 'opennamu_list_4'
             }
-            list_style_data = 'list-style: square;'
+            list_style_data = 'opennamu_list_5'
             if list_len in list_style:
                 list_style_data = list_style[list_len]
 
-            return '<li style="margin-left: ' + str(list_len * 20) + 'px;' + list_style_data + '">' + list_data + '</li>'
+            return '<li style="margin-left: ' + str(list_len * 20) + 'px;" class="' + list_style_data + '">' + list_data + '</li>'
 
         list_regex = r'((?:\n *\* ?[^\n]*)+)\n'
         list_count_max = len(re.findall(list_regex, self.render_data)) * 3
@@ -1955,6 +1992,8 @@ class class_do_render_namumark:
             return '<a title="' + find_data + '"'
 
         self.render_data = re.sub(r'<a fn_target="([^"]+)"', do_render_last_footnote, self.render_data)
+
+        self.render_data = self.render_data_cdn + self.render_data
 
     def __call__(self):
         self.do_render_remark()

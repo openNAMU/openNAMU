@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def list_admin_use(arg_num = 1, arg_search = 'normal'):
+def list_admin_auth_use(arg_num = 1, arg_search = 'normal'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -35,12 +35,13 @@ def list_admin_use(arg_num = 1, arg_search = 'normal'):
             list_data += '</ul>'
             list_data += next_fix('/list/admin/auth_use/' + url_pas(arg_search) + '/', arg_num, get_list)
 
+            arg_search = html.escape(arg_search) if arg_search != 'normal' else ''
+
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('authority_use_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input name="search">
-                        <hr class="main_hr">
+                        <input class="opennamu_width_200" name="search" value="''' + arg_search + '''">
                         <button type="submit">''' + load_lang('search') + '''</button>
                     </form>
                     <hr class="main_hr">

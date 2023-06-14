@@ -43,7 +43,6 @@ def main_setting_external():
                     d_list += [sql_d[0][0]]
                 else:
                     curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [i, ''])
-
                     d_list += ['']
 
                 x += 1

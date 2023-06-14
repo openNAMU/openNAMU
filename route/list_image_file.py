@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def list_image_file_2():
+def list_image_file():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -8,14 +8,13 @@ def list_image_file_2():
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
         list_data = '<ul class="opennamu_ul">'
-        back = ''
 
         curs.execute(db_change("select title from data where title like 'file:%' limit ?, 50"), [sql_num])
         data_list = curs.fetchall()
         for data in data_list:
             list_data += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a></li>'
 
-        list_data += next_fix('/image_file_list?num=', num, data_list)
+        list_data += next_fix('/list/file/', num, data_list)
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('image_file_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],

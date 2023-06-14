@@ -346,3 +346,51 @@ input, textarea, button, select {
 #opennamu_save_button {
     background: antiquewhite;
 }
+
+/* nav_bar */
+#nav_bar {
+    z-index: 100;
+    
+    font-size: 25px;
+    
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    
+    background: #f7dfff;
+    
+    text-align: center;
+}
+
+#go_toc {
+    display: inline-block;
+
+    padding-right: 10px;
+    padding-left: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    
+    width: 25px;
+}
+
+#go_top {
+    display: inline-block;
+    
+    padding-right: 10px;
+    padding-left: 10px;
+    
+    width: 25px;
+}
+
+#go_bottom {
+    display: inline-block;
+
+    padding-right: 10px;
+    padding-left: 10px;
+    
+    width: 25px;
+}
+
+#nav_bar a {
+    color: black;
+}

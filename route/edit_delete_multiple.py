@@ -1,5 +1,5 @@
 from .tool.func import *
-from . import edit_delete
+from .edit_delete import edit_delete
 
 def edit_delete_multiple():
     with get_db_connect() as conn:
@@ -21,7 +21,7 @@ def edit_delete_multiple():
             
             all_title = re.findall(r'([^\n]+)\n', flask.request.form.get('content', '').replace('\r', '') + '\n')
             for name in all_title:
-                edit_delete.edit_delete(name)
+                edit_delete(name)
 
             return redirect('/recent_change')
         else:

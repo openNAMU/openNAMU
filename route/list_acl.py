@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def list_acl_2():
+def list_acl(arg_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        num = int(number_check(flask.request.args.get('num', '1')))
-        sql_num = (num * 50 - 50) if num * 50 > 0 else 0
+        sql_num = (arg_num * 50 - 50) if arg_num * 50 > 0 else 0
+
         div = '<ul class="opennamu_ul">'
 
         curs.execute(db_change(
@@ -30,7 +30,7 @@ def list_acl_2():
             ''
 
         div += '</ul>'
-        div += next_fix('/acl_list?num=', num, list_data)
+        div += next_fix('/list/document/acl/', arg_num, list_data)
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('acl_document_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],

@@ -26,32 +26,66 @@ def view_diff(name = 'Test', num_a = 1, num_b = 1):
             if first_raw_data == second_raw_data:
                 result = ''
             else:
-                i = 1
-                change_count = 0
-                diff_data = diff_match_patch().diff_prettyHtml(
-                    diff_match_patch().diff_main(first_raw_data, second_raw_data)
-                )
-                end_data = ''
+                diff_data = diff_match_patch().diff_main(first_raw_data, second_raw_data)
+                diff_data += [[0, '\n']]
+                
+                diff_data_2 = []
+                temp_list = []
+                line = 1
+                line_change = 0
+                for for_a in diff_data:
+                    line_split = re.findall(r'(.*\n)|(.+$)', for_a[1])
+                    if line_split:
+                        for for_b in line_split:
+                            if for_b[0] != '':
+                                if for_a[0] != 0:
+                                    line_change = 1
+                                
+                                temp_list += [[line, for_a[0], for_b[0].replace('\n', '')]]
 
-                diff_data = diff_data.replace('&para;<br>', '\n')
-                diff_data = diff_data.replace('<span>', '')
-                diff_data = diff_data.replace('</span>', '')
+                                if line_change == 1:
+                                    diff_data_2 += temp_list
+                                
+                                temp_list = []
+                                line_change = 0
+                                line += 1
+                            else:
+                                if for_a[0] != 0:
+                                    line_change = 1
 
-                re_data = re.findall(r'(?:(?:(?:(?!\n).)*)(?:\n)|(?:(?:(?!\n).)+)$)', diff_data)
-                for re_in_data in re_data:
-                    change_find_start = len(re.findall(r'<(?:del|ins) ', re_in_data))
-                    change_find_end = len(re.findall(r'<\/(?:del|ins)>', re_in_data))
+                                temp_list += [[line, for_a[0], for_b[1]]]
+                    else:
+                        if for_a[0] != 0:
+                            line_change = 1
 
-                    change_count += (change_find_start - change_find_end)
-                    if change_count != 0 or change_find_start != 0 or change_find_end != 0:
-                        end_data += str(i) + ' : ' + re_in_data
+                        temp_list += [[line, for_a[0], for_a[1]]]
 
-                    i += 1
+                result = '<table style="width: 100%;"><tr><td colspan="2">r' + first + ' ➤ r' + second + '</td></tr>'
+                result += '<tr><td style="width: 40px; user-select: none;">'
 
-                result = '<pre>' + end_data + '</pre>'
+                # 개행만 추가된 경우 조정 필요
+                
+                line = 0
+                for for_a in diff_data_2:
+                    if line == 0:
+                        line = for_a[0]
+                        result += str(line) + '</td><td>'
+                    else:
+                        if line != for_a[0]:
+                            line = for_a[0]
+                            result += '</td></tr><tr><td style="width: 40px; user-select: none;">' + str(line) + '</td><td>'
+
+                    if for_a[1] == 1:
+                        result += '<span style="background: #eaf2c2;">' + for_a[2] + '</span>'
+                    elif for_a[1] == 0:
+                        result += for_a[2]
+                    else:
+                        result += '<span style="background: #fadad7;">' + for_a[2] + '</span>'
+
+                result += '</td></tr></table>'
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('compare') + ') (r' + first + ') (r' + second + ')', 0])],
+                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('compare') + ')', 0])],
                 data = result,
                 menu = [['history/' + url_pas(name), load_lang('return')]]
             ))

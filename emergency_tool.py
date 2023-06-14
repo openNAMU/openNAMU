@@ -239,14 +239,16 @@ elif what_i_do == '20':
     print('----')
     domain = input('Domain (EX : 2du.pythonanywhere.com) : ')
 
-    curs.execute(db_change("update other set data = ? where name = 'domain'"), [domain])
+    curs.execute(db_change('delete from other where name = "domain"'))
+    curs.execute(db_change('insert into other (name, data, coverage) values ("domain", ?, "")'), [domain])
 elif what_i_do == '21':
     print('----')
     tls_v = input('TLS (http) [http, https] : ')
     if not tls_v in ['http', 'https']:
         tls_v = 'http'
 
-    curs.execute(db_change("update other set data = ? where name = 'http_select'"), [tls_v])
+    curs.execute(db_change('delete from other where name = "http_select"'))
+    curs.execute(db_change('insert into other (name, data, coverage) values ("http_select", ?, "")'), [tls_v])
 else:
     raise ValueError(what_i_do)
 

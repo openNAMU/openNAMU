@@ -1,11 +1,10 @@
 from .tool.func import *
 
-def list_user_2():
+def list_user(arg_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        num = int(number_check(flask.request.args.get('num', '1')))
-        sql_num = (num * 50 - 50) if num * 50 > 0 else 0
+        sql_num = (arg_num * 50 - 50) if arg_num * 50 > 0 else 0
 
         list_data = '<ul class="opennamu_ul">'
 
@@ -18,7 +17,7 @@ def list_user_2():
                 '</li>' + \
             ''
 
-        list_data += '</ul>' + next_fix('/user_log?num=', num, user_list)
+        list_data += '</ul>' + next_fix('/list/user/', arg_num, user_list)
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('member_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
