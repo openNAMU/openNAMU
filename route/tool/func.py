@@ -176,7 +176,6 @@ class get_db_connect:
                 port = int(self.db_set['mysql_port']),
                 autocommit = True
             )
-            curs = self.conn.cursor()
 
             try:
                 self.conn.select_db(self.db_set['name'])
@@ -187,6 +186,7 @@ class get_db_connect:
         return self.conn
     
     def __exit__(self, exc_type, exc_value, traceback):
+        self.conn.commit()
         load_conn(self.conn_sub)
         self.conn.close()
 
@@ -708,8 +708,6 @@ def set_init_always(ver_num):
         if db_data:
             global_wiki_set['wiki_access_password'] = db_data[0][0]
     
-    conn.commit()
-    
 def set_init():
     curs = conn.cursor()
 
@@ -739,8 +737,6 @@ def set_init():
             ['smtp_security', 'starttls']
         ]:
             curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, '')"), [i[0], i[1]])
-        
-    conn.commit()
 
 # Func-simple
 ## Func-simple-without_DB
@@ -1359,10 +1355,6 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
             }
 
             get_class_render = class_do_render(conn, render_lang_data).do_render(doc_name, doc_data, data_type, data_in)
-
-            if data_type == 'backlink':
-                return ''
-
             
             if 'include' in get_class_render[2]:
                 for_a = 0
@@ -1388,6 +1380,9 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                             get_class_render[2]['include'] += include_data_render[2]['include']
 
                     for_a += 1
+
+            if data_type == 'backlink':
+                return ''
 
             get_class_render[0] = '<div class="opennamu_render_complete">' + get_class_render[0] + '</div>'
 
@@ -1708,7 +1703,6 @@ def admin_check(num = None, what = None, name = ''):
                     curs.execute(db_change(
                         "insert into re_admin (who, what, time) values (?, ?, ?)"
                     ), [ip, what, time_data])
-                    conn.commit()
 
                 return 1
 
@@ -2027,7 +2021,6 @@ def ban_check(ip = None, tool = ''):
         "update rb set ongoing = '' " + \
         "where end < ? and end != '' and ongoing = '1'"
     ), [get_time()])
-    conn.commit()
 
     curs.execute(db_change("" + \
         "select login, block from rb " + \
@@ -2288,8 +2281,6 @@ def do_add_thread(thread_code, thread_data, thread_top = '', thread_id = ''):
         thread_code
     ])
     
-    conn.commit()
-    
 def do_reload_recent_thread(topic_num, date, name = None, sub = None):
     curs = conn.cursor()
 
@@ -2309,15 +2300,12 @@ def do_reload_recent_thread(topic_num, date, name = None, sub = None):
             date
         ])
 
-    conn.commit()
-
 def add_alarm(who, context):
     curs = conn.cursor()
 
     curs.execute(db_change(
         'insert into alarm (name, data, date) values (?, ?, ?)'
     ), [who, context, get_time()])
-    conn.commit()
     
 def add_user(user_name, user_pw, user_email = '', user_encode = ''):
     curs = conn.cursor()
@@ -2360,8 +2348,6 @@ def add_user(user_name, user_pw, user_email = '', user_encode = ''):
             user_name,
             user_email
         ])
-        
-    conn.commit()
     
 def ua_plus(u_id, u_ip, u_agent, time):
     curs = conn.cursor()
@@ -2379,7 +2365,6 @@ def ua_plus(u_id, u_ip, u_agent, time):
             u_agent, 
             time
         ])
-        conn.commit()
 
 def ban_insert(name, end, why, login, blocker, type_d = None):
     curs = conn.cursor()
@@ -2432,8 +2417,6 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
             band,
             login
         ])
-
-    conn.commit()
 
 def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
     curs = conn.cursor()
@@ -2537,8 +2520,6 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
 # Func-error
 def re_error(data):
     curs = conn.cursor()
-
-    conn.commit()
 
     if data == '/ban':
         if ban_check() == 1:
