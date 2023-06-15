@@ -1,6 +1,7 @@
 # Init
 import os
 import re
+import ctypes
 
 from route.tool.func import *
 from route import *
@@ -637,6 +638,20 @@ app.route('/setting/sitemap', methods = ['POST', 'GET'])(main_setting_sitemap)
 app.route('/setting/skin_set', methods = ['POST', 'GET'])(main_setting_skin_set)
 
 app.route('/easter_egg')(main_func_easter_egg)
+
+def main_easter_egg_go():
+    with get_db_connect() as conn:
+        lib = ctypes.cdll.LoadLibrary('./route_go/main_easter_egg.so')
+        lib.Do.restype = ctypes.c_char_p
+
+        return easy_minify(flask.render_template(skin_check(),
+            imp = ['Easter Egg', wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            data = str(lib.Do(), 'utf-8'),
+            menu = 0
+        ))
+
+app.route('/easter_egg_go')(main_easter_egg_go)
+
 
 # views -> view
 app.route('/view/<path:name>')(main_view)
