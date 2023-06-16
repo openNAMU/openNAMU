@@ -1,12 +1,11 @@
 package main
 
 import (
-	"C"
+	"fmt"
 	"math/rand"
 )
 
-//export Do
-func Do() *C.char {
+func main() {
 	select_list := []string{
 		"PWD0ZbR7AOY",
 		"HoU29ljOmTE",
@@ -24,9 +23,5 @@ func Do() *C.char {
 	}
 	select_str := select_list[rand.Intn(len(select_list)-1)]
 
-	return C.CString("<iframe width=\"640\" height=\"360\" src=\"https://www.youtube.com/embed/" + select_str + "\" frameborder=\"0\" allowfullscreen></iframe>")
-}
-
-func main() {
-
+	fmt.Println("<iframe width=\"640\" height=\"360\" src=\"https://www.youtube.com/embed/" + select_str + "\" frameborder=\"0\" allowfullscreen></iframe>")
 }
