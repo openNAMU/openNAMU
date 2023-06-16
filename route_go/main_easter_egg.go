@@ -3,9 +3,12 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	select_list := []string{
 		"PWD0ZbR7AOY",
 		"HoU29ljOmTE",
