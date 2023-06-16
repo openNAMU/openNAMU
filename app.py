@@ -647,12 +647,12 @@ def main_easter_egg_go():
     with get_db_connect() as conn:
         print(platform.machine())
         if platform.system() == 'Linux':
-            if platform.machine() == 'AMD64':
+            if platform.machine() in ["AMD64", "x86_64"]:
                 data = os.popen(os.path.join(".", "route_go", "main_easter_egg.amd64.bin")).read()
             else:
                 data = os.popen(os.path.join(".", "route_go", "main_easter_egg.arm64.bin")).read()
         else:
-            if platform.machine() == 'AMD64':
+            if platform.machine() in ["AMD64", "x86_64"]:
                 data = os.popen(os.path.join(".", "route_go", "main_easter_egg.amd64.exe")).read()
             else:
                 data = os.popen(os.path.join(".", "route_go", "main_easter_egg.arm64.exe")).read()
