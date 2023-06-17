@@ -545,5 +545,7 @@
     "sub_user_name": "보조 사용자 이름",
     "render_set": "렌더링 관련 설정",
     "link_case_insensitive": "링크 대소문자 구분 안함",
-    "hide_user_name" : "가입자 이름 숨기기"
+    "hide_user_name" : "가입자 이름 숨기기",
+    "comment" : "댓글",
+    "reply" : "대댓글"
 }
