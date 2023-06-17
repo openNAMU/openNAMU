@@ -4,6 +4,8 @@ def list_old_page(num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
         
+        # 리다이렉트 구분도 넣을 예정
+        # 그 전에 로직 개편하고
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
         
         curs.execute(db_change('select data from other where name = "count_all_title"'))

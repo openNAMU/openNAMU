@@ -138,7 +138,7 @@ def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
 
                         <div>''' + edit_button('opennamu_edit_textarea', 'opennamu_monaco_editor') + '''</div>
                         
-                        <input placeholder="''' + load_lang('bbs_title') + '''" name="title" value="''' + html.escape(title) + '''">
+                        <input placeholder="''' + load_lang('title') + '''" name="title" value="''' + html.escape(title) + '''">
                         <hr class="main_hr">
 
                         <div id="opennamu_monaco_editor" class="opennamu_textarea_500" ''' + monaco_display + '''></div>

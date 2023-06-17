@@ -316,12 +316,15 @@ app.route('/list/document/all/<int:num>')(list_title_index)
 
 # /list/document/long
 app.route('/list/document/long')(list_long_page)
+app.route('/list/document/long/<int:arg_num>')(list_long_page)
 
 # /list/document/short
 app.route('/list/document/short', defaults = { 'tool' : 'short_page' })(list_long_page)
+app.route('/list/document/short/<int:arg_num>', defaults = { 'tool' : 'short_page' })(list_long_page)
 
 # /list/file
 app.route('/list/file')(list_image_file)
+app.route('/list/file/<int:arg_num>')(list_image_file)
 
 # /list/admin
 # /list/admin/list
@@ -648,14 +651,14 @@ def main_easter_egg_go():
         print(platform.machine())
         if platform.system() == 'Linux':
             if platform.machine() in ["AMD64", "x86_64"]:
-                data = os.popen(os.path.join(".", "route_go", "main_easter_egg.amd64.bin")).read()
+                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.amd64.bin")).read()
             else:
-                data = os.popen(os.path.join(".", "route_go", "main_easter_egg.arm64.bin")).read()
+                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.arm64.bin")).read()
         else:
             if platform.machine() in ["AMD64", "x86_64"]:
-                data = os.popen(os.path.join(".", "route_go", "main_easter_egg.amd64.exe")).read()
+                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.amd64.exe")).read()
             else:
-                data = os.popen(os.path.join(".", "route_go", "main_easter_egg.arm64.exe")).read()
+                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.arm64.exe")).read()
 
         return easy_minify(flask.render_template(skin_check(),
             imp = ['Easter Egg', wiki_set(), wiki_custom(), wiki_css([0, 0])],
