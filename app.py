@@ -7,8 +7,8 @@ from route.tool.func import *
 from route import *
 
 if platform.system() == 'Linux':
-    for for_a in os.listdir("route_go"):
-        os.system('chmod +x ./route_go/' + for_a)
+    for for_a in os.listdir(os.path.join("route_go", "bin")):
+        os.system('chmod +x ./route_go/bin/' + for_a)
 
 # Init-Version
 with open('version.json', encoding = 'utf8') as file_data:
