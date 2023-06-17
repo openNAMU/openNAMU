@@ -30,6 +30,13 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
+        curs.execute(db_change('select set_data from bbs_set where set_id = ? and set_name = "bbs_name"'), [bbs_num])
+        db_data = curs.fetchall()
+        if not db_data:
+            return redirect('/bbs/main')
+        
+        bbs_name = db_data[0][0]
+
         curs.execute(db_change('select set_name, set_data, set_code from bbs_data where set_id = ? and set_code = ?'), [bbs_num, post_num])
         db_data = curs.fetchall()
         if not db_data:
@@ -373,7 +380,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                 '''
 
                 return easy_minify(flask.render_template(skin_check(),
-                    imp = [load_lang('bbs_main'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                    imp = [bbs_name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('bbs') + ')', 0])],
                     data = data,
                     menu = [['bbs/w/' + bbs_num_str, load_lang('return')], ['bbs/edit/' + bbs_num_str + '/' + post_num_str, load_lang('edit')]]
                 ))

@@ -337,6 +337,10 @@ input, textarea, button, select {
     background-color: white;
 }
 
+input, textarea {
+    width: calc(100% - 20px);
+}
+
 #main_data button:hover {
     background-color: #eee;
 

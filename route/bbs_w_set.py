@@ -4,9 +4,12 @@ def bbs_w_set(bbs_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        curs.execute(db_change('select set_id from bbs_set where set_id = ? and set_name = "bbs_name"'), [bbs_num])
-        if not curs.fetchall():
+        curs.execute(db_change('select set_data from bbs_set where set_id = ? and set_name = "bbs_name"'), [bbs_num])
+        db_data = curs.fetchall()
+        if not db_data:
             return redirect('/bbs/main')
+        
+        bbs_name = db_data[0][0]
 
         i_list = {
             1 : 'bbs_acl',
@@ -64,7 +67,7 @@ def bbs_w_set(bbs_num = ''):
                     acl_div[i] += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('main_acl_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                imp = [load_lang('bbs_set'), wiki_set(), wiki_custom(), wiki_css(['(' + bbs_name + ')', 0])],
                 data = render_simple_set('''
                     <form method="post">
                         <hr class="main_hr">
