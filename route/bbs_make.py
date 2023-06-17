@@ -32,8 +32,8 @@ def bbs_make():
                         <hr class="main_hr">
                         
                         <select name="bbs_type">
-                            <option value="comment">''' + load_lang('comment') + '''</option>
-                            <option value="thread">''' + load_lang('thread') + '''</option>
+                            <option value="comment">''' + load_lang('comment_base') + '''</option>
+                            <option value="thread">''' + load_lang('thread_base') + '''</option>
                         </select>
                         <hr class="main_hr">
                         

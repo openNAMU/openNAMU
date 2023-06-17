@@ -4,17 +4,19 @@ def bbs_w(bbs_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        curs.execute(db_change('select set_id from bbs_set where set_id = ? and set_name = "bbs_name"'), [bbs_num])
-        if not curs.fetchall():
+        curs.execute(db_change('select set_data from bbs_set where set_id = ? and set_name = "bbs_name"'), [bbs_num])
+        db_data = curs.fetchall()
+        if not db_data:
             return redirect('/bbs/main')
-
+        
+        bbs_name = db_data[0][0]
         bbs_num_str = str(bbs_num)
 
         data = ''
         data += '''
             <table id="main_table_set">
                 <tr id="main_table_top_tr">
-                    <td id="main_table_width">''' + load_lang('version') + '''</td>
+                    <td id="main_table_width">''' + load_lang('order') + '''</td>
                     <td id="main_table_width">''' + load_lang('editor') + '''</td>
                     <td id="main_table_width">''' + load_lang('time') + '''</td>
                 </tr>
@@ -58,7 +60,7 @@ def bbs_w(bbs_num = ''):
         data += '</table>'
 
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('bbs_main'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            imp = [bbs_name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('bbs') + ')', 0])],
             data = data,
-            menu = [['bbs/main', load_lang('return')], ['bbs/edit/' + bbs_num_str, load_lang('add')], ['bbs/set/' + bbs_num_str, load_lang('setting')]]
+            menu = [['bbs/main', load_lang('return')], ['bbs/edit/' + bbs_num_str, load_lang('add')], ['bbs/set/' + bbs_num_str, load_lang('bbs_set')]]
         ))
