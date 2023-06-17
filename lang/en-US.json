@@ -250,6 +250,8 @@
             "comment_base" : "Comment based",
             "thread_base" : "Thread based",
             "bbs_set" : "BBS set",
+            "comment" : "Comment",
+            "reply" : "Reply",
             "_comment_" : "BBS ACL",
                 "bbs_view_acl" : "BBS ACL to view posts",
                 "bbs_acl" : "BBS ACL",
