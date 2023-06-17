@@ -1093,7 +1093,7 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '174'
+    data_css_ver = '175'
     
     # Func JS + Defer
     data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
@@ -2516,6 +2516,13 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
         curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'last_edit'"), [date, data_set_exist, title])
     else:
         curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'last_edit', ?)"), [title, data_set_exist, date])
+
+    curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'length'"), [title])
+    db_data = curs.fetchall()
+    if db_data:
+        curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'length'"), [len(data), data_set_exist, title])
+    else:
+        curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'length', ?)"), [title, data_set_exist, len(data)])
 
 # Func-error
 def re_error(data):

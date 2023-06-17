@@ -1,8 +1,7 @@
 [(en-US)](./readme-en.md) | [(ko-KR)](./readme.md)
 
 # 오픈나무
-[![Python 3.7 이상](https://img.shields.io/badge/python->=%203.7-blue.svg)](https://python.org)
-[![PyPy 3.7 이상](https://img.shields.io/badge/pypy3-%3E=%203.7-blue.svg)](https://www.pypy.org/)
+[![Python 3.8 이상](https://img.shields.io/badge/python->=%203.8-blue.svg)](https://python.org)
 [![라이선스](https://img.shields.io/badge/license-BSD%203--Clause-lightgrey.svg)](./LICENSE)
 
 ![](https://raw.githubusercontent.com/openNAMU/openNAMU/beta/.github/logo.png)

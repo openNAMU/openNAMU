@@ -254,7 +254,7 @@ def main_setting_main(db_set):
                         <input type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + load_lang('set_history_recording_off') + ''' (''' + load_lang('beta') + ''')
                         <hr class="main_hr">
 
-                        <input type="checkbox" name="move_with_redirect" ''' + check_box_div[13] + '''> ''' + load_lang('move_with_redirect') + '''
+                        <input type="checkbox" name="move_with_redirect" ''' + check_box_div[13] + '''> ''' + load_lang('move_with_redirect') + ''' (''' + load_lang('not_working') + ''')
                         <hr class="main_hr">
 
                         <span>''' + load_lang('slow_thread') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('not_working') + ''')</span>

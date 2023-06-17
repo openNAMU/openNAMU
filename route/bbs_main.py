@@ -15,6 +15,11 @@ def bbs_main():
                 curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_type" and set_id = ?'), [for_a[1]])
                 db_data_2 = curs.fetchall()
                 bbs_type = db_data_2[0][0] if db_data_2 else 'comment'
+
+                if bbs_type == 'thread':
+                    bbs_type = load_lang('thread_base')
+                else:
+                    bbs_type = load_lang('comment_base')
                 
                 curs.execute(db_change('select set_data from bbs_data where set_id = ? and set_name = "date" order by set_code + 0 desc limit 1'), [for_a[1]])
                 db_data_2 = curs.fetchall()
