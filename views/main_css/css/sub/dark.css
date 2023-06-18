@@ -45,7 +45,7 @@ input::placeholder, textarea::placeholder, select::placeholder {
 }
 
 pre#syntax, pre#syntax code {
-    background: black;
+    background: #1f2023;
 }
 
 .hljs, .hljs-subst {
