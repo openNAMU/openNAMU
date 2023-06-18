@@ -1,7 +1,7 @@
 from .func_tool import *
 
 class class_do_render_namumark:
-    def __init__(self, curs, doc_name, doc_data, doc_set, lang_data):
+    def __init__(self, curs, doc_name, doc_data, doc_set, lang_data, footnote = {}):
         self.curs = curs
         
         self.doc_data = doc_data.replace('\r', '')
@@ -30,7 +30,6 @@ class class_do_render_namumark:
         except:
             self.darkmode = '0'
 
-
         self.data_temp_storage = {}
         self.data_temp_storage_count = 0
 
@@ -42,6 +41,7 @@ class class_do_render_namumark:
         
         self.data_toc = ''
         self.data_footnote = {}
+        self.data_footnote_all = {}
         self.data_category = ''
         self.data_category_list = []
 
@@ -152,10 +152,7 @@ class class_do_render_namumark:
 
         return data
 
-    def get_tool_footnote_make(self):
-        footnote_number_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_number', self.ip)
-        footnote_number_view_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_view_real_footnote_num', self.ip)
-    
+    def get_tool_footnote_make(self):    
         data = ''
         for for_a in self.data_footnote:
             if data == '':
@@ -176,6 +173,7 @@ class class_do_render_namumark:
         if data != '':
             data += '</div>'
 
+        self.data_footnote_all.update(self.data_footnote)
         self.data_footnote = {}
 
         return data
@@ -1236,9 +1234,15 @@ class class_do_render_namumark:
                     rfn = ''
                     foot_v_name = ''
 
-                    if footnote_name in self.data_footnote:
-                        self.data_footnote[footnote_name]['list'] += [footnote_num_str]
-                        footnote_first = self.data_footnote[footnote_name]['list'][0]
+                    if footnote_name in self.data_footnote_all or footnote_name in self.data_footnote:
+                        if footnote_name in self.data_footnote:
+                            self.data_footnote[footnote_name]['list'] += [footnote_num_str]
+                            footnote_first = self.data_footnote[footnote_name]['list'][0]
+                        else:
+                            self.data_footnote[footnote_name] = {}
+                            self.data_footnote[footnote_name]['list'] = [footnote_num_str]
+                            self.data_footnote[footnote_name]['data'] = footnote_text_data
+                            footnote_first = self.data_footnote_all[footnote_name]['list'][0]
 
                         fn = self.doc_include + 'fn_' + footnote_first
                         rfn = self.doc_include + 'rfn_' + footnote_num_str
@@ -2020,6 +2024,7 @@ class class_do_render_namumark:
             self.render_data_js, # js
             {
                 'backlink' : self.data_backlink, # backlink
-                'include' : list(reversed(self.data_include)) # include data
+                'include' : list(reversed(self.data_include)), # include data
+                'footnote' : self.data_footnote_all # footnote
             } # other
         ]
