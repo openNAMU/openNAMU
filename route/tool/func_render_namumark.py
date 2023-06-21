@@ -1144,6 +1144,7 @@ class class_do_render_namumark:
                             
                             data_sub_name = data_sub[0]
                             data_sub_data = self.get_tool_data_restore(data_sub[1], do_type = 'slash')
+                            data_sub_data = html.unescape(data_sub_data)
                             
                             data_sub_data = re.sub(r'^(?P<in>분류|category):', ':\g<in>:', data_sub_data)
                             data_sub_data = re.sub(r'^(?P<in>파일|file):', ':\g<in>:', data_sub_data)
