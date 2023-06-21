@@ -398,3 +398,7 @@ input, textarea {
 #nav_bar a {
     color: black;
 }
+
+pre#syntax, pre#syntax code {
+    border: 0;
+}

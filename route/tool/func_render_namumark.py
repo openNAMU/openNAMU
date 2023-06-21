@@ -1,7 +1,7 @@
 from .func_tool import *
 
 class class_do_render_namumark:
-    def __init__(self, curs, doc_name, doc_data, doc_set, lang_data):
+    def __init__(self, curs, doc_name, doc_data, doc_set, lang_data, footnote = {}):
         self.curs = curs
         
         self.doc_data = doc_data.replace('\r', '')
@@ -30,7 +30,6 @@ class class_do_render_namumark:
         except:
             self.darkmode = '0'
 
-
         self.data_temp_storage = {}
         self.data_temp_storage_count = 0
 
@@ -42,6 +41,7 @@ class class_do_render_namumark:
         
         self.data_toc = ''
         self.data_footnote = {}
+        self.data_footnote_all = {}
         self.data_category = ''
         self.data_category_list = []
 
@@ -152,10 +152,7 @@ class class_do_render_namumark:
 
         return data
 
-    def get_tool_footnote_make(self):
-        footnote_number_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_number', self.ip)
-        footnote_number_view_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_view_real_footnote_num', self.ip)
-    
+    def get_tool_footnote_make(self):    
         data = ''
         for for_a in self.data_footnote:
             if data == '':
@@ -176,6 +173,7 @@ class class_do_render_namumark:
         if data != '':
             data += '</div>'
 
+        self.data_footnote_all.update(self.data_footnote)
         self.data_footnote = {}
 
         return data
@@ -1146,6 +1144,7 @@ class class_do_render_namumark:
                             
                             data_sub_name = data_sub[0]
                             data_sub_data = self.get_tool_data_restore(data_sub[1], do_type = 'slash')
+                            data_sub_data = html.unescape(data_sub_data)
                             
                             data_sub_data = re.sub(r'^(?P<in>분류|category):', ':\g<in>:', data_sub_data)
                             data_sub_data = re.sub(r'^(?P<in>파일|file):', ':\g<in>:', data_sub_data)
@@ -1236,9 +1235,15 @@ class class_do_render_namumark:
                     rfn = ''
                     foot_v_name = ''
 
-                    if footnote_name in self.data_footnote:
-                        self.data_footnote[footnote_name]['list'] += [footnote_num_str]
-                        footnote_first = self.data_footnote[footnote_name]['list'][0]
+                    if footnote_name in self.data_footnote_all or footnote_name in self.data_footnote:
+                        if footnote_name in self.data_footnote:
+                            self.data_footnote[footnote_name]['list'] += [footnote_num_str]
+                            footnote_first = self.data_footnote[footnote_name]['list'][0]
+                        else:
+                            self.data_footnote[footnote_name] = {}
+                            self.data_footnote[footnote_name]['list'] = [footnote_num_str]
+                            self.data_footnote[footnote_name]['data'] = footnote_text_data
+                            footnote_first = self.data_footnote_all[footnote_name]['list'][0]
 
                         fn = self.doc_include + 'fn_' + footnote_first
                         rfn = self.doc_include + 'rfn_' + footnote_num_str
@@ -1660,7 +1665,11 @@ class class_do_render_namumark:
 
                         if syntax_count == 0:
                             self.render_data_js += 'hljs.highlightAll();\n'
-                            self.render_data_cdn += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+                            if self.darkmode == '0':
+                                self.render_data_cdn += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+                            else:
+                                self.render_data_cdn += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+
                             self.render_data_cdn += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
                             self.render_data_cdn += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
 
@@ -2020,6 +2029,7 @@ class class_do_render_namumark:
             self.render_data_js, # js
             {
                 'backlink' : self.data_backlink, # backlink
-                'include' : list(reversed(self.data_include)) # include data
+                'include' : list(reversed(self.data_include)), # include data
+                'footnote' : self.data_footnote_all # footnote
             } # other
         ]
