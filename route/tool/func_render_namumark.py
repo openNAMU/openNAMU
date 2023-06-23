@@ -633,7 +633,7 @@ class class_do_render_namumark:
                 return '<macro>' + match[0] + '(' + match[1] + ')' + '</macro>'
 
         # double macro replace
-        self.render_data = re.sub(r'\[([^[(]+)\(((?:(?!\)\]).)+)\)\]', do_render_macro_double, self.render_data)
+        self.render_data = re.sub(r'\[([^[(\]]+)\(((?:(?!\)\]).)+)\)\]', do_render_macro_double, self.render_data)
 
         # single macro function
         def do_render_macro_single(match):
