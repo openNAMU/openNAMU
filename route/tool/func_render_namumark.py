@@ -976,8 +976,11 @@ class class_do_render_namumark:
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_title = link_main
                     link_main = html.unescape(link_main)
+
                     link_main = re.sub(r'"', '&quot;', link_main)
-                    
+                    link_main = re.sub(r'<', '&lt;', link_main)
+                    link_main = re.sub(r'>', '&gt;', link_main)
+
                     # sub not exist -> sub = main
                     if link_data[1]:
                         link_sub = link_data[1]
