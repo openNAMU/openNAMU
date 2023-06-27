@@ -45,7 +45,7 @@ input::placeholder, textarea::placeholder, select::placeholder {
 }
 
 pre#syntax, pre#syntax code {
-    background: #1f2023;
+    background: #313236;
 }
 
 .hljs, .hljs-subst {
@@ -53,15 +53,15 @@ pre#syntax, pre#syntax code {
 }
 
 blockquote {
-    background-color: black;
-    border-left: 5px solid #eee;
+    background-color: #313236;
+    border-left: 4px solid #eee;
 }
 
 .opennamu_spead_footnote {
-    background-color: black;
+    background-color: #313236;
     color: white;
 }
 
 .opennamu_popup_footnote {
-    background-color: black;
+    background-color: #313236;
 }
