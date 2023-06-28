@@ -10,13 +10,14 @@ def api_bbs_w_post(sub_code : str = '') -> flask.Response:
         curs : typing.Union[sqlite3.Cursor, pymysql.cursors.Cursor] = conn.cursor()
 
         curs.execute(db_change('select set_name, set_data, set_code from bbs_data where set_id = ? and set_code = ?'), [sub_code_split[0], sub_code_split[1]])
-        db_data : typing.Union[list[tuple[str, str, str]], None] = curs.fetchall()
+        db_data : typing.Optional[list[tuple[str, str, str]]] = curs.fetchall()
         if not db_data:
             return flask.jsonify({})
         else:
             temp_id : str = ''
             temp_dict : dict[str, str] = {}
 
+            for_a : tuple[str, str, str]
             for for_a in db_data:
                 if temp_id != for_a[2]:
                     temp_id = for_a[2]

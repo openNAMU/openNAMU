@@ -41,6 +41,7 @@ def bbs_w_post_comment(user_id : str, sub_code : str, comment_num : str) -> tupl
     comment_count += len(thread_data)
     comment_add_count += comment_count
 
+    temp_dict : dict[str, str]
     for temp_dict in thread_data:
         color : str = 'default'
         if user_id == temp_dict['comment_user_id']:
@@ -84,14 +85,14 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
         curs : typing.Union[sqlite3.Cursor, pymysql.cursors.Cursor] = conn.cursor()
 
         curs.execute(db_change('select set_data from bbs_set where set_id = ? and set_name = "bbs_name"'), [bbs_num])
-        db_data_3 : list[tuple[str]] = curs.fetchall()
+        db_data_3 : typing.Optional[list[tuple[str]]] = curs.fetchall()
         if not db_data_3:
             return redirect('/bbs/main')
         
         bbs_name : str = db_data_3[0][0]
 
         curs.execute(db_change('select set_name, set_data, set_code from bbs_data where set_id = ? and set_code = ?'), [bbs_num, post_num])
-        db_data : list[tuple[str, str, str]] = curs.fetchall()
+        db_data : typing.Optional[list[tuple[str, str, str]]] = curs.fetchall()
         if not db_data:
             return redirect('/bbs/main')
 
@@ -111,7 +112,7 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
         temp_dict : dict[str, str]
         
         curs.execute(db_change('select set_data from bbs_set where set_id = ? and set_name = "bbs_type"'), [bbs_num])
-        db_data_2 : list[tuple[str]] = curs.fetchall()
+        db_data_2 : typing.Optional[list[tuple[str]]] = curs.fetchall()
         if not db_data_2:
             return redirect('/bbs/main')
         elif db_data_2[0][0] == 'thread':
@@ -127,7 +128,7 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                 set_id = bbs_num_str + '-' + post_num_str
 
                 curs.execute(db_change('select set_code from bbs_data where set_name = "comment" and set_id = ? order by set_code + 0 desc'), [set_id])
-                db_data_4 : list[tuple[str]] = curs.fetchall()
+                db_data_4 : typing.Optional[list[tuple[str]]] = curs.fetchall()
                 id_data = str(int(db_data_4[0][0]) + 1) if db_data_4 else '1'
 
                 data = flask.request.form.get('content', '')
@@ -258,7 +259,7 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                     set_id = bbs_num_str + '-' + post_num_str
 
                 curs.execute(db_change('select set_code from bbs_data where set_name = "comment" and set_id = ? order by set_code + 0 desc'), [set_id])
-                db_data_5 : list[tuple[str]] = curs.fetchall()
+                db_data_5 : typing.Optional[list[tuple[str]]] = curs.fetchall()
                 id_data = str(int(db_data_5[0][0]) + 1) if db_data_5 else '1'
 
                 data = flask.request.form.get('content', '')
