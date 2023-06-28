@@ -1,12 +1,12 @@
 from .tool.func import *
 
-def api_bbs_w_comment(sub_code : str = '') -> str:
-    conn : typing.Union[sqlite3.Connection, pymysql.connections.Connection, None]
+def api_bbs_w_comment(sub_code : str = '') -> flask.Response:
+    conn : typing.Union[sqlite3.Connection, pymysql.connections.Connection]
     with get_db_connect() as conn:
-        curs : typing.Union[sqlite3.Cursor, pymysql.cursors.Cursor, None] = conn.cursor()
+        curs : typing.Union[sqlite3.Cursor, pymysql.cursors.Cursor] = conn.cursor()
 
         curs.execute(db_change('select set_name, set_data, set_code, set_id from bbs_data where (set_name = "comment" or set_name = "comment_date" or set_name = "comment_user_id") and set_id = ? order by set_code + 0 asc'), [sub_code])
-        db_data : typing.Union[list[typing.Tuple[str, str, str]], None] = curs.fetchall()
+        db_data : typing.Union[list[tuple[str, str, str]], None] = curs.fetchall()
         if not db_data:
             return flask.jsonify({})
         else:
