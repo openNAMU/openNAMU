@@ -26,6 +26,7 @@ def bbs_main():
                 last_date = ('(' + db_data_2[0][0] + ')') if db_data_2 else ''
 
                 data += '<li><a href="/bbs/w/' + for_a[1] + '">' + for_a[0] + ' (' + bbs_type + ') ' + last_date + '</a></li>'
+                data += '<li></li>'
 
             data += '</ul>'
 

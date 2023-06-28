@@ -582,6 +582,9 @@ app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['POST', 'GET'])
 app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
 app.route('/api/raw/<everything:name>')(api_raw)
 
+app.route('/api/bbs/w/<sub_code>')(api_bbs_w_post)
+app.route('/api/bbs/w/comment/<sub_code>')(api_bbs_w_comment)
+
 app.route('/api/version', defaults = { 'version_list' : version_list })(api_version)
 app.route('/api/skin_info')(api_skin_info)
 app.route('/api/skin_info/<name>')(api_skin_info)

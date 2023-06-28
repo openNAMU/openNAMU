@@ -1,11 +1,13 @@
 from .tool.func import *
+
 from .edit_delete import edit_delete
 
 # 처음으로 차세대 코드 방법론 적용
 # 앞으로 다 이렇게 작성할 예정
 def edit_delete_file(name : str = 'test.jpg') -> str:
+    conn : typing.Union[sqlite3.Connection, pymysql.connections.Connection, None]
     with get_db_connect() as conn:
-        curs : typing.Union[sqlite3.dbapi2.Cursor, pymysql.cursors.Cursor, None] = conn.cursor()
+        curs : typing.Union[sqlite3.Cursor, pymysql.cursors.Cursor, None] = conn.cursor()
 
         ip : str = ip_check()
         if admin_check() == 0:

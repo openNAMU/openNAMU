@@ -1,4 +1,5 @@
 from .tool.func import *
+
 from .edit_delete import edit_delete
 
 def edit_delete_multiple():
