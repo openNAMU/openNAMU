@@ -194,7 +194,7 @@ class get_db_connect:
     
 
 class class_check_json:
-    def do_check_set_json():
+    def do_check_set_json(self):
         if os.getenv('NAMU_DB') or os.getenv('NAMU_DB_TYPE'):
             set_data = {}
             set_data['db'] = os.getenv('NAMU_DB') if os.getenv('NAMU_DB') else 'data'
@@ -249,7 +249,7 @@ class class_check_json:
 
         return data_db_set
 
-    def do_check_mysql_json(data_db_set):
+    def do_check_mysql_json(self, data_db_set):
         if os.path.exists(os.path.join('data', 'mysql.json')):
             db_set_list = ['user', 'password', 'host', 'port']
             with open(os.path.join('data', 'mysql.json'), encoding = 'utf8') as file_data:
