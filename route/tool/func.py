@@ -307,9 +307,9 @@ class class_check_json:
         self.data_db_set = {}
             
     def __new__(self):
-        self.data_db_set = self.do_check_set_json()
+        self.data_db_set = self.do_check_set_json(self)
         if self.data_db_set['type'] == 'mysql':
-            self.data_db_set = self.do_check_mysql_json(self.data_db_set)
+            self.data_db_set = self.do_check_mysql_json(self, self.data_db_set)
         
         return self.data_db_set
 
