@@ -29,7 +29,7 @@ def bbs_w_post_make_thread(user_id : str, date : str, data : str, code : str, co
         </table>
     '''
 
-def bbs_w_post_comment(user_id : str, sub_code : str, comment_num : str) -> tuple[str, str, int, int]:
+def bbs_w_post_comment(user_id : str, sub_code : str, comment_num : str, bbs_num_str : str, post_num_str : str) -> tuple[str, str, int, int]:
     comment_data : str = ''
     comment_select : str = ''
 
@@ -50,10 +50,12 @@ def bbs_w_post_comment(user_id : str, sub_code : str, comment_num : str) -> tupl
         sub_code_check : str = re.sub(r'^[0-9]+-[0-9]+-', '', sub_code + '-' + temp_dict['code'])
         margin_count : int = sub_code_check.count('-')
 
+        date : str = '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/comment/' + sub_code_check + '/tool">(' + load_lang('tool') + ')</a> ' + temp_dict['comment_date']
+
         comment_data += '<span style="padding-left: 20px;"></span>' * margin_count
         comment_data += bbs_w_post_make_thread(
             ip_pas(temp_dict['comment_user_id']),
-            temp_dict['comment_date'],
+            date,
             render_set(
                 doc_name = '', 
                 doc_data = temp_dict['comment'],
@@ -71,7 +73,7 @@ def bbs_w_post_comment(user_id : str, sub_code : str, comment_num : str) -> tupl
         comment_select += '<option value="' + sub_code_check + '" ' + comment_default + '>' + sub_code_check + '</option>'
         comment_data += '<hr class="main_hr">'
 
-        temp_data : tuple[str, str, int, int] = bbs_w_post_comment(user_id, sub_code + '-' + temp_dict['code'], comment_num)
+        temp_data : tuple[str, str, int, int] = bbs_w_post_comment(user_id, sub_code + '-' + temp_dict['code'], comment_num, bbs_num_str, post_num_str)
 
         comment_data += temp_data[0]
         comment_select += temp_data[1]
@@ -163,11 +165,13 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                 
                 temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
 
+                date = '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/tool">(' + load_lang('tool') + ')</a> ' + temp_dict['date']
+
                 data = ''
                 data += '<h2>' + html.escape(temp_dict['title']) + '</h2>'
                 data += bbs_w_post_make_thread(
                     ip_pas(temp_dict['user_id']),
-                    temp_dict['date'],
+                    date,
                     render_set(
                         doc_name = '', 
                         doc_data = temp_dict['data'],
@@ -301,11 +305,13 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
 
                 temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
 
+                date = '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/tool">(' + load_lang('tool') + ')</a> ' + temp_dict['date']
+
                 data = ''
                 data += '<h2>' + html.escape(temp_dict['title']) + '</h2>'
                 data += bbs_w_post_make_thread(
                     ip_pas(temp_dict['user_id']),
-                    temp_dict['date'],
+                    date,
                     render_set(
                         doc_name = '', 
                         doc_data = temp_dict['data'],
@@ -324,7 +330,7 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                 comment_count : int = 0
                 comment_add_count : int = 0
 
-                temp_data : tuple[str, str, int, int] = bbs_w_post_comment(user_id, bbs_num_str + '-' + post_num_str, comment_num)
+                temp_data : tuple[str, str, int, int] = bbs_w_post_comment(user_id, bbs_num_str + '-' + post_num_str, comment_num, bbs_num_str, post_num_str)
 
                 comment_data += temp_data[0]
                 comment_select += temp_data[1]
