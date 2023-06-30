@@ -192,10 +192,12 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                         color = 'green'
                     else:
                         color = 'default'
+                        
+                    date = '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/comment/' + str(count) + '/tool">(' + load_lang('tool') + ')</a> ' + temp_dict['comment_date']
 
                     data += bbs_w_post_make_thread(
                         ip_pas(temp_dict['comment_user_id']),
-                        temp_dict['comment_date'],
+                        date,
                         render_set(
                             doc_name = '', 
                             doc_data = temp_dict['comment'],
@@ -227,7 +229,7 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                 '''
 
                 return easy_minify(flask.render_template(skin_check(),
-                    imp = [load_lang('bbs_main'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                    imp = [bbs_name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('bbs') + ')', 0])],
                     data = data,
                     menu = [['bbs/w/' + bbs_num_str, load_lang('return')], ['bbs/edit/' + bbs_num_str + '/' + post_num_str, load_lang('edit')]]
                 ))
