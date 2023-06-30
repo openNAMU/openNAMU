@@ -10,6 +10,7 @@ import logging
 import random
 import typing
 import ipaddress
+import multiprocessing
 
 import email.mime.text
 import email.utils
@@ -2637,6 +2638,8 @@ def re_error(data):
                 password_min_length = ''
                 
             data = load_lang('error_password_length_too_short') + password_min_length
+        elif num == 41:
+            data = load_lang('timeout_error') + '5'
         else:
             data = '???'
 
