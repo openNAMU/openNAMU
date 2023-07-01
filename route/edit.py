@@ -1,5 +1,26 @@
 from .tool.func import *
 
+def edit_render_set(name, content):
+    render_set(
+        doc_name = name,
+        doc_data = content,
+        data_in = ''
+    )
+
+# https://stackoverflow.com/questions/13821156/timeout-function-using-threading-in-python-does-not-work
+def edit_timeout(func, args = (), timeout = 3):
+    pool = multiprocessing.Pool(processes = 1)
+    result = pool.apply_async(func, args = args)
+    try:
+        result.get(timeout = timeout)
+    except multiprocessing.TimeoutError:
+        pool.terminate()
+        return 1
+    else:
+        pool.close()
+        pool.join()
+        return 0
+
 def edit(name = 'Test', section = 0, do_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -74,11 +95,8 @@ def edit(name = 'Test', section = 0, do_type = ''):
             else:
                 leng = '+' + str(len(content))
 
-            render_set(
-                doc_name = name,
-                doc_data = content,
-                data_in = ''
-            )
+            if edit_timeout(edit_render_set, (name, content), timeout = 5) == 1:
+                return re_error('/error/41')
                 
             if db_data:
                 curs.execute(db_change("update data set data = ? where title = ?"), [content, name])

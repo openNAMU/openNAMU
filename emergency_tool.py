@@ -25,7 +25,7 @@ if data_db_load == 'Y':
     curs = conn.cursor()
 else:
     print('----')
-    print('You can use [9, 11]')
+    print('You can use [9, 11, 19]')
 
 # Main
 print('----')

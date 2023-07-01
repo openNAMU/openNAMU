@@ -84,7 +84,7 @@
     "file_name_error": "파일명에는 알파벳, 한글, 공백, 밑줄 및 빼기 기호만 사용할 수 있습니다.",
     "pass": "넘기기",
     "recaptcha_error": "'로봇이 아닙니다'를 통해 reCAPTCHA를 통과하세요.",
-    "file_capacity_error": "최대 파일 크기 (MB): ",
+    "file_capacity_error": "최대 파일 크기 (MB) : ",
     "setting": "설정",
     "end": "끝",
     "error": "오류",
@@ -307,7 +307,7 @@
     "requires_approval": "가입시 승인 필요",
     "approval_question": "회원가입 질문",
     "public_key": "공개 키",
-    "fast_edit_error": "편집 속도가 너무 빠릅니다. 제한 (초): ",
+    "fast_edit_error": "편집 속도가 너무 빠릅니다. 제한 (초) : ",
     "main_acl_setting": "기본 ACL 설정",
     "edit_req_acl": "편집 요청 ACL",
     "application_list": "가입신청 목록",
@@ -547,5 +547,6 @@
     "link_case_insensitive": "링크 대소문자 구분 안함",
     "hide_user_name" : "가입자 이름 숨기기",
     "comment" : "댓글",
-    "reply" : "대댓글"
+    "reply" : "대댓글",
+    "timeout_error" : "실행 시간이 너무 오래 걸립니다. 최대 실행 시간 (초) : "
 }
