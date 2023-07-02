@@ -29,14 +29,14 @@ def bbs_w_post_make_thread(user_id : str, date : str, data : str, code : str, co
         </table>
     '''
 
-def bbs_w_post_comment(user_id : str, sub_code : str, comment_num : str, bbs_num_str : str, post_num_str : str) -> tuple[str, str, int, int]:
+def bbs_w_post_comment(user_id : str, sub_code : str, comment_num : str, bbs_num_str : str, post_num_str : str) -> typing.Tuple[str, str, int, int]:
     comment_data : str = ''
     comment_select : str = ''
 
     comment_count : int = 0
     comment_add_count : int = 0
 
-    thread_data : list[dict[str, str]] = json.loads(api_bbs_w_comment(sub_code).data)
+    thread_data : typing.List[dict[str, str]] = json.loads(api_bbs_w_comment(sub_code).data)
     
     comment_count += len(thread_data)
     comment_add_count += comment_count
@@ -73,7 +73,7 @@ def bbs_w_post_comment(user_id : str, sub_code : str, comment_num : str, bbs_num
         comment_select += '<option value="' + sub_code_check + '" ' + comment_default + '>' + sub_code_check + '</option>'
         comment_data += '<hr class="main_hr">'
 
-        temp_data : tuple[str, str, int, int] = bbs_w_post_comment(user_id, sub_code + '-' + temp_dict['code'], comment_num, bbs_num_str, post_num_str)
+        temp_data : typing.Tuple[str, str, int, int] = bbs_w_post_comment(user_id, sub_code + '-' + temp_dict['code'], comment_num, bbs_num_str, post_num_str)
 
         comment_data += temp_data[0]
         comment_select += temp_data[1]
@@ -87,14 +87,14 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
         curs : typing.Union[sqlite3.Cursor, pymysql.cursors.Cursor] = conn.cursor()
 
         curs.execute(db_change('select set_data from bbs_set where set_id = ? and set_name = "bbs_name"'), [bbs_num])
-        db_data_3 : typing.Optional[list[tuple[str]]] = curs.fetchall()
+        db_data_3 : typing.Optional[typing.List[typing.Tuple[str]]] = curs.fetchall()
         if not db_data_3:
             return redirect('/bbs/main')
         
         bbs_name : str = db_data_3[0][0]
 
         curs.execute(db_change('select set_name, set_data, set_code from bbs_data where set_id = ? and set_code = ?'), [bbs_num, post_num])
-        db_data : typing.Optional[list[tuple[str, str, str]]] = curs.fetchall()
+        db_data : typing.Optional[typing.List[typing.Tuple[str, str, str]]] = curs.fetchall()
         if not db_data:
             return redirect('/bbs/main')
 
@@ -114,7 +114,7 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
         temp_dict : dict[str, str]
         
         curs.execute(db_change('select set_data from bbs_set where set_id = ? and set_name = "bbs_type"'), [bbs_num])
-        db_data_2 : typing.Optional[list[tuple[str]]] = curs.fetchall()
+        db_data_2 : typing.Optional[typing.List[typing.Tuple[str]]] = curs.fetchall()
         if not db_data_2:
             return redirect('/bbs/main')
         elif db_data_2[0][0] == 'thread':
@@ -130,7 +130,7 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                 set_id = bbs_num_str + '-' + post_num_str
 
                 curs.execute(db_change('select set_code from bbs_data where set_name = "comment" and set_id = ? order by set_code + 0 desc'), [set_id])
-                db_data_4 : typing.Optional[list[tuple[str]]] = curs.fetchall()
+                db_data_4 : typing.Optional[typing.List[typing.Tuple[str]]] = curs.fetchall()
                 id_data = str(int(db_data_4[0][0]) + 1) if db_data_4 else '1'
 
                 data = flask.request.form.get('content', '')
@@ -185,7 +185,7 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                 user_id = temp_dict['user_id']
                 count : int = 1
 
-                thread_data : list[dict[str, str]] = json.loads(api_bbs_w_comment(bbs_num_str + '-' + post_num_str).data)
+                thread_data : typing.List[dict[str, str]] = json.loads(api_bbs_w_comment(bbs_num_str + '-' + post_num_str).data)
                 for temp_dict in thread_data:
                     count += 1
                     if user_id == temp_dict['comment_user_id']:
@@ -247,7 +247,7 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                 select : str = flask.request.form.get('comment_select', 'default')
                 select = '' if select == 'default' else select
                 if select != '':
-                    select_split : list[str] = select.split('-')
+                    select_split : typing.List[str] = select.split('-')
                     if len(select_split) < 2:
                         curs.execute(db_change('select set_code from bbs_data where set_name = "comment" and set_id = ? and set_code = ? limit 1'), [bbs_num_str + '-' + post_num_str, select_split[0]])
                         if not curs.fetchall():
@@ -265,7 +265,7 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                     set_id = bbs_num_str + '-' + post_num_str
 
                 curs.execute(db_change('select set_code from bbs_data where set_name = "comment" and set_id = ? order by set_code + 0 desc'), [set_id])
-                db_data_5 : typing.Optional[list[tuple[str]]] = curs.fetchall()
+                db_data_5 : typing.Optional[typing.List[typing.Tuple[str]]] = curs.fetchall()
                 id_data = str(int(db_data_5[0][0]) + 1) if db_data_5 else '1'
 
                 data = flask.request.form.get('content', '')
@@ -332,7 +332,7 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                 comment_count : int = 0
                 comment_add_count : int = 0
 
-                temp_data : tuple[str, str, int, int] = bbs_w_post_comment(user_id, bbs_num_str + '-' + post_num_str, comment_num, bbs_num_str, post_num_str)
+                temp_data : typing.Tuple[str, str, int, int] = bbs_w_post_comment(user_id, bbs_num_str + '-' + post_num_str, comment_num, bbs_num_str, post_num_str)
 
                 comment_data += temp_data[0]
                 comment_select += temp_data[1]
