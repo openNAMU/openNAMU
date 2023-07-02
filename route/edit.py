@@ -1,11 +1,12 @@
 from .tool.func import *
 
 def edit_render_set(name, content):
-    render_set(
-        doc_name = name,
-        doc_data = content,
-        data_in = ''
-    )
+    with get_db_connect() as conn:
+        render_set(
+            doc_name = name,
+            doc_data = content,
+            data_in = ''
+        )
 
 # https://stackoverflow.com/questions/13821156/timeout-function-using-threading-in-python-does-not-work
 def edit_timeout(func, args = (), timeout = 3):
