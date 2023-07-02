@@ -1,12 +1,11 @@
 from .tool.func import *
 
 def edit_render_set(name, content):
-    with get_db_connect() as conn:
-        render_set(
-            doc_name = name,
-            doc_data = content,
-            data_in = ''
-        )
+    render_set(
+        doc_name = name,
+        doc_data = content,
+        data_in = ''
+    )
 
 # https://stackoverflow.com/questions/13821156/timeout-function-using-threading-in-python-does-not-work
 def edit_timeout(func, args = (), timeout = 3):
@@ -96,7 +95,16 @@ def edit(name = 'Test', section = 0, do_type = ''):
             else:
                 leng = '+' + str(len(content))
 
-            if edit_timeout(edit_render_set, (name, content), timeout = 5) == 1:
+            
+            try:
+                timeout = edit_timeout(edit_render_set, (name, content), timeout = 5)
+            except Exception as e:
+                print('multiprocessing error : ')
+                print(e)
+
+                timeout = 0
+
+            if timeout == 1:
                 return re_error('/error/41')
                 
             if db_data:
