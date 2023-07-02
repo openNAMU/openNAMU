@@ -1,10 +1,10 @@
 from .tool.func import *
 
 def vote_select(num = 1):
-    num = str(num)
-    
     with get_db_connect() as conn:
         curs = conn.cursor()
+        
+        num = str(num)
 
         curs.execute(db_change('select name, subject, data, type from vote where id = ? and user = ""'), [num])
         data_list = curs.fetchall()
