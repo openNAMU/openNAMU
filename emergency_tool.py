@@ -49,6 +49,8 @@ print('18. Change wiki access password')
 print('19. Forced update')
 print('20. Change domain')
 print('21. Change TLS')
+print('22. Delete body top')
+print('23. Delete body bottom')
 
 print('----')
 what_i_do = input('Select : ')
@@ -249,6 +251,10 @@ elif what_i_do == '21':
 
     curs.execute(db_change('delete from other where name = "http_select"'))
     curs.execute(db_change('insert into other (name, data, coverage) values ("http_select", ?, "")'), [tls_v])
+elif what_i_do == '22':
+    curs.execute(db_change('delete from other where name = "body"'))
+elif what_i_do == '23':
+    curs.execute(db_change('delete from other where name = "bottom_body"'))
 else:
     raise ValueError(what_i_do)
 
