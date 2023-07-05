@@ -7,8 +7,6 @@ def user_setting():
         support_language = ['default'] + get_init_set_list()['language']['list']
         
         ip = ip_check()
-        if ban_check(ip) == 1:
-            return re_error('/ban')
 
         if ip_or_user(ip) == 0:
             if flask.request.method == 'POST':

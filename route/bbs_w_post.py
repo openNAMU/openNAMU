@@ -50,16 +50,18 @@ def bbs_w_post_comment(user_id : str, sub_code : str, comment_num : str, bbs_num
         sub_code_check : str = re.sub(r'^[0-9]+-[0-9]+-', '', sub_code + '-' + temp_dict['code'])
         margin_count : int = sub_code_check.count('-')
 
-        date : str = '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/comment/' + sub_code_check + '/tool">(' + load_lang('tool') + ')</a> ' + temp_dict['comment_date']
+        date : str = ''
+        date += '<a href="javascript:opennamu_change_comment(\'' + sub_code_check + '\');">(' + load_lang('comment') + ')</a> '
+        date += '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/comment/' + sub_code_check + '/tool">(' + load_lang('tool') + ')</a> '
+        date += temp_dict['comment_date']
 
         comment_data += '<span style="padding-left: 20px;"></span>' * margin_count
         comment_data += bbs_w_post_make_thread(
             ip_pas(temp_dict['comment_user_id']),
             date,
             render_set(
-                doc_name = '', 
                 doc_data = temp_dict['comment'],
-                data_in = 'from'
+                data_in = 'bbs_comment_' + sub_code_check
             ),
             sub_code_check,
             color = color,
@@ -81,7 +83,7 @@ def bbs_w_post_comment(user_id : str, sub_code : str, comment_num : str, bbs_num
 
     return (comment_data, comment_select, comment_count, comment_add_count)
 
-def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[int, str] = '', do_type : str = '') -> flask.Response:
+def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[int, str] = '', do_type : str = '') -> typing.Union[str, werkzeug.wrappers.response.Response]:
     conn : typing.Union[sqlite3.Connection, pymysql.connections.Connection]
     with get_db_connect() as conn:
         curs : typing.Union[sqlite3.Cursor, pymysql.cursors.Cursor] = conn.cursor()
@@ -92,11 +94,6 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
             return redirect('/bbs/main')
         
         bbs_name : str = db_data_3[0][0]
-
-        curs.execute(db_change('select set_name, set_data, set_code from bbs_data where set_id = ? and set_code = ?'), [bbs_num, post_num])
-        db_data : typing.Optional[typing.List[typing.Tuple[str, str, str]]] = curs.fetchall()
-        if not db_data:
-            return redirect('/bbs/main')
 
         bbs_num_str : str = str(bbs_num)
         post_num_str : str = str(post_num)
@@ -112,6 +109,11 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
         data : str
         date : str
         temp_dict : dict[str, str]
+        new_id_data : str
+
+        temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
+        if temp_dict == {}:
+            return redirect('/bbs/main')
         
         curs.execute(db_change('select set_data from bbs_set where set_id = ? and set_name = "bbs_type"'), [bbs_num])
         db_data_2 : typing.Optional[typing.List[typing.Tuple[str]]] = curs.fetchall()
@@ -138,15 +140,20 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                     # re_error로 대체 예정
                     return redirect('/bbs/w/' + bbs_num_str + '/' + post_num_str)
                 
+                data = data.replace('\r', '')
+                data = get_thread_pre_render(data, id_data, ip, set_id, bbs_name, temp_dict['title'], 'post')
+                
                 date = get_time()
 
                 curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('comment', ?, ?, ?)"), [id_data, set_id, data])
                 curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('comment_date', ?, ?, ?)"), [id_data, set_id, date])
                 curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('comment_user_id', ?, ?, ?)"), [id_data, set_id, ip])
 
+                add_alarm(temp_dict['user_id'], ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + id_data + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + id_data + '</a>')
+
                 conn.commit()
 
-                return redirect('/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + str(int(id_data) + 1))
+                return redirect('/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + id_data)
             else:
                 if acl_check(bbs_num_str, 'bbs_view') == 1:
                     return re_error('/ban')
@@ -158,14 +165,14 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                     text = text.replace('\r', '')
 
                     data_preview = render_set(
-                        doc_name = '', 
                         doc_data = text,
-                        data_in = 'from'
+                        data_type = 'thread',
+                        data_in = 'bbs_comment_preview'
                     )
-                
-                temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
 
-                date = '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/tool">(' + load_lang('tool') + ')</a> ' + temp_dict['date']
+                date = ''
+                date += '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/tool">(' + load_lang('tool') + ')</a> '
+                date += temp_dict['date']
 
                 data = ''
                 data += '<h2>' + html.escape(temp_dict['title']) + '</h2>'
@@ -173,9 +180,9 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                     ip_pas(temp_dict['user_id']),
                     date,
                     render_set(
-                        doc_name = '', 
                         doc_data = temp_dict['data'],
-                        data_in = 'from'
+                        data_type = 'thread',
+                        data_in = 'bbs'
                     ),
                     '1',
                     color = 'green'
@@ -193,15 +200,17 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                     else:
                         color = 'default'
                         
-                    date = '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/comment/' + str(count) + '/tool">(' + load_lang('tool') + ')</a> ' + temp_dict['comment_date']
+                    date = ''
+                    date += '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/comment/' + str(count) + '/tool">(' + load_lang('tool') + ')</a> '
+                    date += temp_dict['comment_date']
 
                     data += bbs_w_post_make_thread(
                         ip_pas(temp_dict['comment_user_id']),
                         date,
                         render_set(
-                            doc_name = '', 
                             doc_data = temp_dict['comment'],
-                            data_in = 'from'
+                            data_type = 'thread',
+                            data_in = 'bbs_comment_' + str(count)
                         ),
                         str(count),
                         color = color
@@ -244,27 +253,34 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                 else:
                     captcha_post('', 0)
                 
-                select : str = flask.request.form.get('comment_select', 'default')
-                select = '' if select == 'default' else select
+                select : str = flask.request.form.get('comment_select', '0')
+                select = '' if select == '0' else select
+
+                comment_user_name : str = ''
+
                 if select != '':
                     select_split : typing.List[str] = select.split('-')
                     if len(select_split) < 2:
-                        curs.execute(db_change('select set_code from bbs_data where set_name = "comment" and set_id = ? and set_code = ? limit 1'), [bbs_num_str + '-' + post_num_str, select_split[0]])
-                        if not curs.fetchall():
+                        curs.execute(db_change('select set_data from bbs_data where set_name = "comment_user_id" and set_id = ? and set_code = ? limit 1'), [bbs_num_str + '-' + post_num_str, select_split[0]])    
+                        db_data_6 : typing.Optional[typing.List[typing.Tuple[str]]] = curs.fetchall()
+                        if not db_data_6:
                             # re_error로 변경 예정
                             return redirect('/bbs/w/' + bbs_num_str + '/' + post_num_str)
                         else:
                             set_id = bbs_num_str + '-' + post_num_str + '-' + select_split[0]
+                            comment_user_name = db_data_6[0][0]
                     else:
-                        curs.execute(db_change('select set_code from bbs_data where set_name = "comment" and set_id = ? and set_code = ? limit 1'), [bbs_num_str + '-' + post_num_str + '-' + '-'.join(select_split[0:len(select) - 1]), select_split[len(select_split) - 1]])
-                        if not curs.fetchall():
+                        curs.execute(db_change('select set_data from bbs_data where set_name = "comment_user_id" and set_id = ? and set_code = ? limit 1'), [bbs_num_str + '-' + post_num_str + '-' + '-'.join(select_split[0:len(select_split) - 1]), select_split[len(select_split) - 1]])
+                        db_data_7 : typing.Optional[typing.List[typing.Tuple[str]]] = curs.fetchall()
+                        if not db_data_7:
                             return redirect('/bbs/w/' + bbs_num_str + '/' + post_num_str)
                         else:
                             set_id = bbs_num_str + '-' + post_num_str + '-' + '-'.join(select_split)
+                            comment_user_name = db_data_7[0][0]
                 else:
                     set_id = bbs_num_str + '-' + post_num_str
 
-                curs.execute(db_change('select set_code from bbs_data where set_name = "comment" and set_id = ? order by set_code + 0 desc'), [set_id])
+                curs.execute(db_change('select set_code from bbs_data where set_name = "comment" and set_id = ? order by set_code + 0 desc limit 1'), [set_id])
                 db_data_5 : typing.Optional[typing.List[typing.Tuple[str]]] = curs.fetchall()
                 id_data = str(int(db_data_5[0][0]) + 1) if db_data_5 else '1'
 
@@ -282,10 +298,17 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                 conn.commit()
             
                 if set_id == '':
-                    return redirect('/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + id_data)
+                    end_id = id_data
                 else:
                     set_id = re.sub(r'^[0-9]+-[0-9]+-?', '', set_id)
-                    return redirect('/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + set_id + '-' + id_data)
+                    set_id += '-' if set_id != '' else ''
+                    end_id = set_id + id_data
+
+                add_alarm(temp_dict['user_id'], ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + end_id + '</a>')
+                if comment_user_name != '':
+                    add_alarm(comment_user_name, ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + end_id + '</a>')
+
+                return redirect('/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id)
             else:
                 if acl_check(bbs_num_str, 'bbs_view') == 1:
                     return re_error('/ban')
@@ -300,14 +323,14 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                     comment_num = flask.request.form.get('comment_select', '')
 
                     data_preview = render_set(
-                        doc_name = '', 
                         doc_data = text,
-                        data_in = 'from'
+                        data_in = 'bbs_comment_preview'
                     )
 
-                temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
-
-                date = '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/tool">(' + load_lang('tool') + ')</a> ' + temp_dict['date']
+                date = ''
+                date += '<a href="javascript:opennamu_change_comment(\'0\');">(' + load_lang('comment') + ')</a> '
+                date += '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/tool">(' + load_lang('tool') + ')</a> '
+                date += temp_dict['date']
 
                 data = ''
                 data += '<h2>' + html.escape(temp_dict['title']) + '</h2>'
@@ -315,9 +338,8 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                     ip_pas(temp_dict['user_id']),
                     date,
                     render_set(
-                        doc_name = '', 
                         doc_data = temp_dict['data'],
-                        data_in = 'from'
+                        data_in = 'bbs'
                     ),
                     '0',
                     color = 'red'
@@ -326,8 +348,8 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                 user_id = temp_dict['user_id']
                 comment_data : str = ''
 
-                comment_select : str = '<hr class="main_hr"><select name="comment_select">'
-                comment_select += '<option value="default">' + load_lang('normal') + '</option>'
+                comment_select : str = '<select id="opennamu_comment_select" name="comment_select">'
+                comment_select += '<option value="0">' + load_lang('normal') + '</option>'
 
                 comment_count : int = 0
                 comment_add_count : int = 0
@@ -348,11 +370,13 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                     data += load_lang('comment') + ' : ' + str(comment_count) + '<hr class="main_hr">'
                     data += load_lang('reply') + ' : ' + str(comment_add_count) + '<hr class="main_hr">'
                     data += comment_data
+                else:
+                    data += '<hr class="main_hr">'
 
                 bbs_comment_form = ''
                 if bbs_comment_acl == 0:
                     bbs_comment_form += '''
-                        ''' + comment_select + '''
+                        ''' + comment_select + ''' <a href="javascript:opennamu_return_comment();">(R)</a>
                         <hr class="main_hr">
                         
                         <textarea name="content" id="opennamu_edit_textarea" class="opennamu_textarea_100">''' + html.escape(text) + '''</textarea>
@@ -370,6 +394,7 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                         ''' + bbs_comment_form + '''
                         ''' + data_preview + '''
                     </form>
+                    <script src="/views/main_css/js/route/bbs_w_post.js"></script>
                 '''
 
                 return easy_minify(flask.render_template(skin_check(),

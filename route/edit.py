@@ -3,8 +3,7 @@ from .tool.func import *
 def edit_render_set(name, content):
     render_set(
         doc_name = name,
-        doc_data = content,
-        data_in = ''
+        doc_data = content
     )
 
 # https://stackoverflow.com/questions/13821156/timeout-function-using-threading-in-python-does-not-work
@@ -117,7 +116,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
     
             curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
             for scan_user in curs.fetchall():
-                add_alarm(scan_user[0], ip + ' | <a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a> | Edit')
+                add_alarm(scan_user[0], ip, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
                     
             history_plus(
                 name,
@@ -236,7 +235,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                     data_preview = render_set(
                         doc_name = name, 
                         doc_data = data,
-                        data_in = 'from'
+                        data_type = 'from'
                     )
 
             if data_section == '':

@@ -1817,7 +1817,8 @@ class class_do_render_namumark:
 
             hr_count_max -= 1
 
-    def do_render_list(self):        
+    def do_render_list(self):
+        # 인용문
         quote_regex = r'((?:\n&gt; *[^\n]*)+)\n'
         quote_count = 0
         quote_count_max = len(re.findall(quote_regex, self.render_data)) * 10
@@ -1845,18 +1846,19 @@ class class_do_render_namumark:
             quote_count_max -= 1
             quote_count += 1
 
+        # 일반 리스트
+        list_style = {
+            1 : 'opennamu_list_1',
+            2 : 'opennamu_list_2',
+            3 : 'opennamu_list_3',
+            4 : 'opennamu_list_4'
+        }
         def do_render_list_sub(match):
             list_data = match.group(2)
             list_len = len(match.group(1))
             if list_len == 0:
                 list_len = 1
 
-            list_style = {
-                1 : 'opennamu_list_1',
-                2 : 'opennamu_list_2',
-                3 : 'opennamu_list_3',
-                4 : 'opennamu_list_4'
-            }
             list_style_data = 'opennamu_list_5'
             if list_len in list_style:
                 list_style_data = list_style[list_len]
@@ -1876,6 +1878,173 @@ class class_do_render_namumark:
                 list_sub_regex = r'\n( *)\* ?([^\n]*)'
 
                 list_data = re.sub(list_sub_regex, do_render_list_sub, list_data)
+
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
+
+            list_count_max -= 1
+
+        # 기타 리스트 공통 파트
+        def int_to_alpha(num):
+            alpha_list = string.ascii_lowercase
+            alpha_len = len(alpha_list)
+            end_text = ''
+
+            while num:
+                end_text = alpha_list[num % alpha_len - 1] + end_text
+                num = num // alpha_len
+
+            return end_text
+ 
+        # https://www.geeksforgeeks.org/python-program-to-convert-integer-to-roman/
+        def int_to_roman(number):
+            num = [1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000]
+            sym = ["I", "IV", "V", "IX", "X", "XL", "L", "XC", "C", "CD", "D", "CM", "M"]
+            i = 12
+            end_text = ''
+
+            while number:
+                div = number // num[i]
+                number %= num[i]
+        
+                while div:
+                    end_text += sym[i]
+                    div -= 1
+
+                i -= 1
+
+            return end_text
+        
+        class do_render_list_int_to:
+            def __init__(self, do_type):
+                self.list_num = []
+                self.do_type = do_type
+
+            def __call__(self, match):
+                list_data = match.group(3)
+                list_start = match.group(2)
+                list_len = len(match.group(1))
+                if list_len == 0:
+                    list_len = 1
+
+                if len(self.list_num) >= list_len:
+                    self.list_num[list_len - 1] += 1
+
+                    for for_a in range(list_len, len(self.list_num)):
+                        self.list_num[for_a] = 0
+                else:
+                    self.list_num += [1] * (list_len - len(self.list_num))
+
+                if list_start:
+                    self.list_num[list_len - 1] = int(list_start)
+
+                if self.do_type == 'int':
+                    change_text = str(self.list_num[list_len - 1])
+                elif self.do_type == 'roman_big':
+                    change_text = int_to_roman(self.list_num[list_len - 1])
+                elif self.do_type == 'roman_small':
+                    change_text = int_to_roman(self.list_num[list_len - 1]).lower()
+                elif self.do_type == 'alpha_big':
+                    change_text = int_to_alpha(self.list_num[list_len - 1])
+                else:
+                    change_text = int_to_alpha(self.list_num[list_len - 1]).upper()
+
+                return '<li style="margin-left: ' + str((list_len - 1) * 20) + 'px;" class="opennamu_list_none">' + change_text + '. ' + list_data + '</li>'
+
+        # 숫자 리스트
+        list_regex = r'((?:\n *1\. ?[^\n]*)+)\n'
+        list_count_max = len(re.findall(list_regex, self.render_data)) * 3
+        while 1:
+            list_data = re.search(list_regex, self.render_data)
+            if list_count_max < 0:
+                break
+            elif not list_data:
+                break
+            else:
+                list_data = list_data.group(1)
+                list_sub_regex = r'\n( *)1\.(?:#([0-9]*))? ?([^\n]*)'
+
+                list_class = do_render_list_int_to('int')
+                list_data = re.sub(list_sub_regex, list_class, list_data)
+
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
+
+            list_count_max -= 1
+
+        # 소문자 리스트
+        list_regex = r'((?:\n *a\. ?[^\n]*)+)\n'
+        list_count_max = len(re.findall(list_regex, self.render_data)) * 3
+        while 1:
+            list_data = re.search(list_regex, self.render_data)
+            if list_count_max < 0:
+                break
+            elif not list_data:
+                break
+            else:
+                list_data = list_data.group(1)
+                list_sub_regex = r'\n( *)a.(?:#([0-9]*))? ?([^\n]*)'
+
+                list_class = do_render_list_int_to('alpha_small')
+                list_data = re.sub(list_sub_regex, list_class, list_data)
+
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
+
+            list_count_max -= 1
+
+        # 대문자 리스트
+        list_regex = r'((?:\n *A\. ?[^\n]*)+)\n'
+        list_count_max = len(re.findall(list_regex, self.render_data)) * 3
+        while 1:
+            list_data = re.search(list_regex, self.render_data)
+            if list_count_max < 0:
+                break
+            elif not list_data:
+                break
+            else:
+                list_data = list_data.group(1)
+                list_sub_regex = r'\n( *)A.(?:#([0-9]*))? ?([^\n]*)'
+
+                list_class = do_render_list_int_to('alpha_big')
+                list_data = re.sub(list_sub_regex, list_class, list_data)
+
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
+
+            list_count_max -= 1
+
+        # 로마자 대문자 리스트
+        list_regex = r'((?:\n *I\. ?[^\n]*)+)\n'
+        list_count_max = len(re.findall(list_regex, self.render_data)) * 3
+        while 1:
+            list_data = re.search(list_regex, self.render_data)
+            if list_count_max < 0:
+                break
+            elif not list_data:
+                break
+            else:
+                list_data = list_data.group(1)
+                list_sub_regex = r'\n( *)I.(?:#([0-9]*))? ?([^\n]*)'
+
+                list_class = do_render_list_int_to('roman_big')
+                list_data = re.sub(list_sub_regex, list_class, list_data)
+
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
+
+            list_count_max -= 1
+
+        # 로마자 소문자 리스트
+        list_regex = r'((?:\n *i\. ?[^\n]*)+)\n'
+        list_count_max = len(re.findall(list_regex, self.render_data)) * 3
+        while 1:
+            list_data = re.search(list_regex, self.render_data)
+            if list_count_max < 0:
+                break
+            elif not list_data:
+                break
+            else:
+                list_data = list_data.group(1)
+                list_sub_regex = r'\n( *)i.(?:#([0-9]*))? ?([^\n]*)'
+
+                list_class = do_render_list_int_to('roman_small')
+                list_data = re.sub(list_sub_regex, list_class, list_data)
 
                 self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
 

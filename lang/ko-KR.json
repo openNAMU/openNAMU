@@ -552,5 +552,7 @@
     "footnote_render": "각주 렌더링",
     "footnote_number": "각주 번호 출력",
     "only_number": "숫자만",
-    "footnote_real_num_view": "각주 실제 번호 보기"
+    "footnote_real_num_view": "각주 실제 번호 보기",
+    "post_edit" : "게시글 수정",
+    "post_add" : "게시글 추가"
 }

@@ -83,7 +83,7 @@ def view_acl(name):
                         data_type = 'backlink'
                     )
 
-            markup_data = markup_data if markup_data != '' else 'default'
+            markup_data = markup_data if markup_data != '' else 'normal'
 
             if user_page == 1:
                 admin_check(5, check_data + ' (' + all_d + ')' + ' (' + markup_data + ')')
@@ -155,18 +155,17 @@ def view_acl(name):
                 <h2>''' + load_lang('markup') + '''</h2>
             '''
 
-
             curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [name])
             db_data = curs.fetchall()
             markup_load = db_data[0][0] if db_data and db_data[0][0] != '' else ''
 
-            markup_list = ['default'] + get_init_set_list('markup')['list']
+            markup_list = ['normal'] + get_init_set_list('markup')['list']
             markup_html = ''
             for for_a in markup_list:
                 if markup_load == for_a:
-                    markup_html = '<option value="' + (for_a if for_a != 'default' else '') + '">' + for_a + '</option>' + markup_html
+                    markup_html = '<option value="' + (for_a if for_a != 'normal' else '') + '">' + for_a + '</option>' + markup_html
                 else:
-                    markup_html += '<option value="' + (for_a if for_a != 'default' else '') + '">' + for_a + '</option>'
+                    markup_html += '<option value="' + (for_a if for_a != 'normal' else '') + '">' + for_a + '</option>'
             
             markup_html = '<select name="document_markup" ' + check_ok + '>' + markup_html + '</select>'
 
