@@ -1336,8 +1336,14 @@ def load_skin(data = '', set_n = 0, default = 0):
 def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', doc_acl = ''):
     curs = conn.cursor()
 
-    # data_type in ['view', 'raw', 'api_view', 'backlink']
-    doc_acl = acl_check(doc_name, 'render') if doc_acl == '' else doc_acl
+    # data_type in ['view', 'from', 'thread', 'raw', 'api_view', 'api_thread', 'backlink']
+    # data_type을 list 형식으로 개편 필요할 듯
+    if doc_name != '':
+        doc_acl = acl_check(doc_name, 'render') if doc_acl == '' else doc_acl
+    else:
+        doc_acl = 0
+
+    data_type = 'view' if data_type == '' else data_type
     doc_data = 0 if doc_data == None else doc_data
 
     acl_dict = {}
@@ -1407,7 +1413,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                     </style>
                 '''
 
-            if data_type == 'api_view':
+            if data_type == 'api_view' or data_type == 'api_thread':
                 return [
                     get_class_render[0], 
                     get_class_render[1]
@@ -1477,6 +1483,67 @@ def render_simple_set(data):
         footnote_data += '</div>'
         
     data = toc_data + data + footnote_data
+
+    return data
+
+def get_thread_pre_render(data, num, ip, topic_num = '', name = '', sub = '', do_type = 'thread'):
+    curs = conn.cursor()
+
+    call_thread_regex = r"( |\n|^)(?:#([0-9]+))( |\n|$)"
+    call_thread_count = len(re.findall(call_thread_regex, data)) * 3
+    while 1:
+        rd_data = re.search(call_thread_regex, data)
+        if call_thread_count < 0:
+            break
+        elif not rd_data:
+            break
+        else:
+            rd_data = rd_data.groups()
+
+            if do_type == 'thread':
+                curs.execute(db_change("select ip from topic where code = ? and id = ?"), [topic_num, rd_data[1]])
+            else:
+                curs.execute(db_change('select set_data from bbs_data where set_name = "comment_user_id" and set_id = ? and set_code = ?'), [topic_num, rd_data[1]])
+
+            ip_data = curs.fetchall()
+            if ip_data and ip_or_user(ip_data[0][0]) == 0:
+                if do_type == 'thread':
+                    add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                else:
+                    set_id = topic_num.split('-')
+                    add_alarm(ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+
+            data = re.sub(call_thread_regex, rd_data[0] + '<topic_a>#' + rd_data[1] + '</topic_a>' + rd_data[2], data, 1)
+
+        call_thread_count -= 1
+
+    call_user_regex = r"( |\n|^)(?:@([^ \n]+))( |\n|$)"
+    call_user_count = len(re.findall(call_user_regex, data)) * 3
+    while 1:
+        rd_data = re.search(call_user_regex, data)
+        if call_user_count < 0:
+            break
+        elif not rd_data:
+            break
+        else:
+            rd_data = rd_data.groups()
+
+            curs.execute(db_change("select ip from history where ip = ? limit 1"), [rd_data[1]])
+            ip_data = curs.fetchall()
+            if not ip_data:
+                curs.execute(db_change("select ip from topic where ip = ? limit 1"), [rd_data[1]])
+                ip_data = curs.fetchall()
+
+            if ip_data and ip_or_user(ip_data[0][0]) == 0:
+                if do_type == 'thread':
+                    add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                else:
+                    set_id = topic_num.split('-')
+                    add_alarm(ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+
+            data = re.sub(call_user_regex, rd_data[0] + '<topic_call>@' + rd_data[1] + '</topic_call>' + rd_data[2], data, 1)
+
+        call_user_count -= 1
 
     return data
 
@@ -2301,12 +2368,15 @@ def do_reload_recent_thread(topic_num, date, name = None, sub = None):
             date
         ])
 
-def add_alarm(who, context):
+def add_alarm(to_user, from_user, context):
     curs = conn.cursor()
 
-    curs.execute(db_change(
-        'insert into alarm (name, data, date) values (?, ?, ?)'
-    ), [who, context, get_time()])
+    if to_user != from_user:
+        context = from_user + ' | ' + context
+
+        curs.execute(db_change(
+            'insert into alarm (name, data, date) values (?, ?, ?)'
+        ), [to_user, context, get_time()])
     
 def add_user(user_name, user_pw, user_email = '', user_encode = ''):
     curs = conn.cursor()

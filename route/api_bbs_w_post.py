@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def api_bbs_w_post(sub_code : str = '') -> flask.Response:
+def api_bbs_w_post(sub_code : str = '') -> typing.Union[str, werkzeug.wrappers.response.Response]:
     sub_code_split : typing.List[str] = sub_code.split('-')
     if len(sub_code_split) < 2:
         sub_code_split = ['', '']

@@ -59,7 +59,6 @@ def api_skin_info(name = ''):
                                     "skin_ver" : get_data["skin_ver"]
                                 }}}
 
-
                     a_data = {**a_data, **{ i : json_data }}
 
             return flask.jsonify(a_data)

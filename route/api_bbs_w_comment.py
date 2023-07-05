@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def api_bbs_w_comment(sub_code : str = '') -> flask.Response:
+def api_bbs_w_comment(sub_code : str = '') -> typing.Union[str, werkzeug.wrappers.response.Response]:
     conn : typing.Union[sqlite3.Connection, pymysql.connections.Connection]
     with get_db_connect() as conn:
         curs : typing.Union[sqlite3.Cursor, pymysql.cursors.Cursor] = conn.cursor()
