@@ -1946,7 +1946,7 @@ class class_do_render_namumark:
                 elif self.do_type == 'alpha_big':
                     change_text = int_to_alpha(self.list_num[list_len - 1])
                 else:
-                    change_text = int_to_alpha(self.list_num[list_len - 1]).lower()
+                    change_text = int_to_alpha(self.list_num[list_len - 1]).upper()
 
                 return '<li style="margin-left: ' + str((list_len - 1) * 20) + 'px;" class="opennamu_list_none">' + change_text + '. ' + list_data + '</li>'
 
