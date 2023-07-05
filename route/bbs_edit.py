@@ -1,5 +1,7 @@
 from .tool.func import *
 
+from .api_bbs_w_post import api_bbs_w_post
+
 def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -24,6 +26,8 @@ def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
             
         if acl_check(bbs_num_str, 'bbs_edit') == 1:
             return redirect('/bbs/set/' + bbs_num_str)
+        
+        i_list = ['post_view_acl', 'post_comment_acl']
 
         if flask.request.method == 'POST' and do_type != 'preview':
             if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
@@ -59,16 +63,18 @@ def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
 
             return redirect('/bbs/w/' + bbs_num_str + '/' + id_data)
         else:
+            d_list = ['' for _ in range(0, len(i_list))]
             if do_type == 'preview':
                 title = flask.request.form.get('title', '')
                 data = flask.request.form.get('content', '')
                 data = data.replace('\r', '')
-
                 data_preview = render_set(
-                    doc_name = '', 
                     doc_data = data,
-                    data_in = 'from'
-                )
+                    data_type = 'thread',
+                    data_in = 'bbs'
+                ) + '<hr>'
+                for for_a in range(0, len(i_list)):
+                    d_list[for_a] = flask.request.form.get(i_list[for_a], 'normal')
             else:
                 if post_num == '':
                     title = ''
@@ -79,19 +85,22 @@ def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
                     db_data = curs.fetchall()
                     db_data = list(db_data) if db_data else []
 
-                    temp_id = ''
-                    temp_dict = {}
-
-                    for for_a in db_data + [['', '', '']]:
-                        if temp_id != for_a[2]:
-                            temp_id = for_a[2]
-                            temp_dict['code'] = for_a[2]
-
-                        temp_dict[for_a[0]] = for_a[1]
+                    temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
 
                     title = temp_dict['title']
                     data = temp_dict['data']
                     data_preview = ''
+
+            acl_div = ['' for _ in range(0, len(i_list))]
+            acl_list = get_acl_list()
+            for for_a in range(0, len(i_list)):
+                for data_list in acl_list:
+                    if data_list == d_list[for_a]:
+                        check = 'selected="selected"'
+                    else:
+                        check = ''
+
+                    acl_div[for_a] += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
             
             if post_num == '':
                 form_action = 'formaction="/bbs/edit/' + bbs_num_str + '"'
@@ -129,9 +138,14 @@ def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
 
             if editor_top_text != '':
                 editor_top_text += '<hr class="main_hr">'
+
+            if post_num == '':
+                bbs_title = load_lang('post_add')
+            else:
+                bbs_title = load_lang('post_edit')
     
             return easy_minify(flask.render_template(skin_check(), 
-                imp = [load_lang('bbs_edit'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                imp = [bbs_title, wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data =  editor_top_text + add_get_file + '''
                     <form method="post">
                         <textarea style="display: none;" id="opennamu_edit_origin" name="doc_data_org"></textarea>
@@ -149,16 +163,30 @@ def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
                         
                         <button id="opennamu_save_button" type="submit" ''' + form_action + ''' onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('save') + '''</button>
                         <button id="opennamu_preview_button" type="submit" ''' + form_action_preview + ''' onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('preview') + '''</button>
+                    
+                        <hr class="main_hr">
+                        <div id="opennamu_preview_area">''' + data_preview + '''</div>
+                        
+                        <script>
+                            do_stop_exit();
+                            do_paste_image('opennamu_edit_textarea', 'opennamu_monaco_editor');
+                            ''' + add_script + '''
+                        </script>
+
+                        ''' + render_simple_set('''
+                            <hr class="main_hr">
+                            <a href="/acl/TEST#exp">(''' + load_lang('reference') + ''')</a>
+                            <h2>''' + load_lang('acl') + '''</h2>
+                            <h3>''' + load_lang('post_view_acl') + '''</h3>
+                            <select name="post_view_acl">''' + acl_div[0] + '''</select>
+
+                            <h4>''' + load_lang('post_comment_acl') + '''</h4>
+                            <select name="post_comment_acl">''' + acl_div[1] + '''</select>
+
+                            <h2>''' + load_lang('markup') + '''</h2>
+                            ''' + load_lang('not_working') + '''
+                        ''') + '''
                     </form>
-                    
-                    <hr class="main_hr">
-                    <div id="opennamu_preview_area">''' + data_preview + '''</div>
-                    
-                    <script>
-                        do_stop_exit();
-                        do_paste_image('opennamu_edit_textarea', 'opennamu_monaco_editor');
-                        ''' + add_script + '''
-                    </script>
                 ''',
                 menu = [['bbs/w/' + bbs_num_str, load_lang('return')]]
             ))

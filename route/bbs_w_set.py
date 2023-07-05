@@ -11,22 +11,17 @@ def bbs_w_set(bbs_num = ''):
         
         bbs_name = db_data[0][0]
 
-        i_list = {
-            1 : 'bbs_acl',
-            2 : 'bbs_edit_acl',
-            3 : 'bbs_comment_acl',
-            4 : 'bbs_view_acl'
-        }
+        i_list = ['bbs_acl', 'bbs_edit_acl', 'bbs_comment_acl', 'bbs_view_acl', 'bbs_markup']
         bbs_num_str = str(bbs_num)
 
         if flask.request.method == 'POST':
             if admin_check(None, 'bbs_set (acl)') != 1:
                 return re_error('/ban')
             else:
-                for i in i_list:
+                for for_a in range(len(i_list)):
                     curs.execute(db_change("update bbs_set set set_data = ? where set_name = ? and set_id = ?"), [
-                        flask.request.form.get(i_list[i], 'normal'),
-                        i_list[i],
+                        flask.request.form.get(i_list[for_a], 'normal'),
+                        i_list[for_a],
                         bbs_num
                     ])
 
@@ -34,37 +29,37 @@ def bbs_w_set(bbs_num = ''):
 
                 return redirect('/bbs/set/' + bbs_num_str)
         else:
-            d_list = {}
+            d_list = ['' for _ in range(0, len(i_list))]
 
             if admin_check() != 1:
                 disable = 'disabled'
             else:
                 disable = ''
 
-            for i in i_list:
-                curs.execute(db_change('select set_data from bbs_set where set_name = ? and set_id = ?'), [i_list[i], bbs_num])
+            for for_a in range(len(i_list)):
+                curs.execute(db_change('select set_data from bbs_set where set_name = ? and set_id = ?'), [i_list[for_a], bbs_num])
                 sql_d = curs.fetchall()
                 if sql_d:
-                    d_list[i] = sql_d[0][0]
+                    d_list[for_a] = sql_d[0][0]
                 else:
-                    curs.execute(db_change('insert into bbs_set (set_name, set_code, set_id, set_data) values (?, "", ?, ?)'), [i_list[i], bbs_num, 'normal'])
-                    d_list[i] = 'normal'
+                    curs.execute(db_change('insert into bbs_set (set_name, set_code, set_id, set_data) values (?, "", ?, ?)'), [i_list[for_a], bbs_num, 'normal'])
+                    d_list[for_a] = 'normal'
 
             conn.commit()
 
-            acl_div = []
-            for i in range(0, len(i_list)):
-                acl_div += ['']
-
+            acl_div = ['' for _ in range(0, len(i_list))]
             acl_list = get_acl_list()
-            for i in range(0, len(i_list)):
+            for for_a in range(0, len(i_list)):
+                if for_a == 4:
+                    acl_list = ['normal'] + get_init_set_list('markup')['list']
+
                 for data_list in acl_list:
-                    if data_list == d_list[i + 1]:
+                    if data_list == d_list[for_a]:
                         check = 'selected="selected"'
                     else:
                         check = ''
 
-                    acl_div[i] += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
+                    acl_div[for_a] += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('bbs_set'), wiki_set(), wiki_custom(), wiki_css(['(' + bbs_name + ')', 0])],
@@ -87,7 +82,7 @@ def bbs_w_set(bbs_num = ''):
                         <select ''' + disable + ''' name="bbs_comment_acl">''' + acl_div[2] + '''</select>
 
                         <h2>''' + load_lang('markup') + '''</h2>
-                        ''' + load_lang('not_working') + '''
+                        <select ''' + disable + ''' name="bbs_markup">''' + acl_div[4] + '''</select>
                         
                         <hr class="main_hr">
                         <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
