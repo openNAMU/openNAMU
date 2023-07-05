@@ -45,19 +45,8 @@ def api_topic(topic_num = 1, tool = 'normal', num = '', render = ''):
                     if data_v != '':
                         data_v = render_set(
                             doc_data = data_v, 
-                            data_type = 'api_view',
-                            data_in = 'topic_' + topic_num + '_' + i[0],
-                            doc_acl = 0
-                        )
-                        data_v[0] = re.sub(
-                            r'&lt;topic_a&gt;(?P<in>(?:(?!&lt;\/topic_a&gt;).)+)&lt;\/topic_a&gt;',
-                            '<a href="\g<in>">\g<in></a>',
-                            data_v[0]
-                        )
-                        data_v[0] = re.sub(
-                            r'&lt;topic_call&gt;@(?P<in>(?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;',
-                            '<a href="/w/user:\g<in>">@\g<in></a>',
-                            data_v[0]
+                            data_type = 'api_thread',
+                            data_in = 'topic_' + topic_num + '_' + i[0]
                         )
                     else:
                         data_v = ['', '']

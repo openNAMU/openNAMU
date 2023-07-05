@@ -25,8 +25,8 @@ def bbs_main():
                 db_data_2 = curs.fetchall()
                 last_date = ('(' + db_data_2[0][0] + ')') if db_data_2 else ''
 
-                data += '<li><a href="/bbs/w/' + for_a[1] + '">' + for_a[0] + ' (' + bbs_type + ') ' + last_date + '</a></li>'
-                data += '<li></li>'
+                data += '<li><a href="/bbs/w/' + for_a[1] + '">' + html.escape(for_a[0]) + ' (' + bbs_type + ') ' + last_date + '</a></li>'
+                # data += '<li></li>'
 
             data += '</ul>'
 

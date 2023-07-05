@@ -20,21 +20,24 @@ class class_do_render:
         curs = self.conn.cursor()
 
         doc_set = {}
-        if data_in == 'from':
-            data_in = ''
+        if data_type == 'from':
             doc_set['doc_from'] = 'O'
+            data_type = 'view'
         
         data_in = (data_in + '_') if data_in != '' else ''
         doc_set['doc_include'] = data_in
+        rep_data = ''
 
-        curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [doc_name])
-        rep_data = curs.fetchall()
-        if rep_data and rep_data[0][0] != '':
-            rep_data = rep_data[0][0]
-        else:
+        if rep_data == '' and doc_name != '':
+            curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [doc_name])
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '' and db_data[0][0] != 'normal':
+                rep_data = db_data[0][0]
+
+        if rep_data == '':
             curs.execute(db_change('select data from other where name = "markup"'))
-            rep_data = curs.fetchall()
-            rep_data = rep_data[0][0] if rep_data else 'namumark'
+            db_data = curs.fetchall()
+            rep_data = db_data[0][0] if db_data else 'namumark'
 
         if rep_data == 'namumark' or rep_data == 'namumark_beta':
             data_end = class_do_render_namumark(
@@ -56,6 +59,18 @@ class class_do_render:
                 '', 
                 {}
             ]
+
+        if data_type == 'thread' or data_type == 'api_thread':
+            data_end[0] = re.sub(
+                r'&lt;topic_a&gt;(?P<in>(?:(?!&lt;\/topic_a&gt;).)+)&lt;\/topic_a&gt;',
+                '<a href="\g<in>">\g<in></a>',
+                data_end[0]
+            )
+            data_end[0] = re.sub(
+                r'&lt;topic_call&gt;@(?P<in>(?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;',
+                '<a href="/w/user:\g<in>">@\g<in></a>',
+                data_end[0]
+            )
 
         if data_type == 'backlink':
             if 'backlink' in data_end[2]:

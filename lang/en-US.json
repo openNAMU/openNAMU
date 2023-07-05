@@ -252,6 +252,8 @@
             "bbs_set" : "BBS set",
             "comment" : "Comment",
             "reply" : "Reply",
+            "post_edit" : "Modify post",
+            "post_add" : "Add post",
             "_comment_" : "BBS ACL",
                 "bbs_view_acl" : "BBS ACL to view posts",
                 "bbs_acl" : "BBS ACL",

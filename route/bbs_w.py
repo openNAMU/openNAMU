@@ -32,10 +32,9 @@ def bbs_w(bbs_num = ''):
         for for_a in db_data + [['', '', '']]:
             if temp_id != for_a[2]:
                 if temp_id != '':
-                    curs.execute(db_change('select set_data from bbs_data where set_name = "comment_date" and set_id = ? order by set_code + 0 desc'), [bbs_num_str + '-' + temp_dict['code']])
+                    curs.execute(db_change('select count(*) from bbs_data where set_name = "comment_date" and (set_id = ? or set_id like ?) order by set_code + 0 desc'), [bbs_num_str + '-' + temp_dict['code'], bbs_num_str + '-' + temp_dict['code'] + '-%'])
                     db_data = curs.fetchall()
-                    last_comment_date = db_data[0][0] if db_data else '0'
-                    comment_count = str(len(db_data)) if db_data else '0'
+                    comment_count = str(db_data[0][0]) if db_data else '0'
                     
                     data += '''
                         <tr>
@@ -45,9 +44,8 @@ def bbs_w(bbs_num = ''):
                         </tr>
                         <tr>
                             <td colspan="3">
-                                <a href="/bbs/w/''' + bbs_num_str + '/' + temp_dict['code'] + '">' + temp_dict['title'] + '''</a> 
+                                <a href="/bbs/w/''' + bbs_num_str + '/' + temp_dict['code'] + '">' + html.escape(temp_dict['title']) + '''</a> 
                                 (''' + comment_count + ''') 
-                                (''' + last_comment_date + ''')
                             </td>
                         </tr>
                     '''
