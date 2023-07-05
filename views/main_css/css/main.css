@@ -378,3 +378,7 @@ s:hover, strike:hover, del:hover {
     width: 1.2em;
     margin-left: -1.2em;
 }
+
+.opennamu_list_none {
+    list-style: none;
+}
