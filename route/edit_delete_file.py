@@ -4,7 +4,7 @@ from .edit_delete import edit_delete
 
 # 처음으로 차세대 코드 방법론 적용
 # 앞으로 다 이렇게 작성할 예정
-def edit_delete_file(name : str = 'test.jpg') -> typing.Union[str, werkzeug.wrappers.response.Response]:
+def edit_delete_file(name : str = 'test.jpg') -> typing.Union[str, flask.Response, werkzeug.wrappers.response.Response]:
     conn : typing.Union[sqlite3.Connection, pymysql.connections.Connection]
     with get_db_connect() as conn:
         curs : typing.Union[sqlite3.Cursor, pymysql.cursors.Cursor] = conn.cursor()
