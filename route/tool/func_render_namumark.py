@@ -707,8 +707,8 @@ class class_do_render_namumark:
 
             return '<' + data_name + '></' + data_name + '>'
 
-        math_regex = re.compile('\[math\(((?:(?!\[math\(|\)\]).|\n)+)\)\]', re.I)
-        math_regex_2 = re.compile('&lt;math&gt;((?:(?!&lt;math&gt;|&lt;\/math&gt;).)+)&lt;\/math&gt;', re.I)
+        math_regex = re.compile(r'\[math\(((?:(?!\[math\(|\)\]).|\n)+)\)\]', re.I)
+        math_regex_2 = re.compile(r'&lt;math&gt;((?:(?!&lt;math&gt;|&lt;\/math&gt;).)+)&lt;\/math&gt;', re.I)
 
         self.render_data = re.sub(math_regex_2, do_render_math_sub, self.render_data)
         self.render_data = re.sub(math_regex, do_render_math_sub, self.render_data)
@@ -1115,7 +1115,7 @@ class class_do_render_namumark:
 
         include_num = 0
         include_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_include_link', self.ip)
-        include_regex = re.compile('\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\]', re.I)
+        include_regex = re.compile(r'\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\]', re.I)
         include_count_max = len(re.findall(include_regex, self.render_data)) * 2
         include_change_list = {}
         while 1:
@@ -1149,8 +1149,8 @@ class class_do_render_namumark:
                             data_sub_data = self.get_tool_data_restore(data_sub[1], do_type = 'slash')
                             data_sub_data = html.unescape(data_sub_data)
                             
-                            data_sub_data = re.sub(r'^(?P<in>분류|category):', ':\g<in>:', data_sub_data)
-                            data_sub_data = re.sub(r'^(?P<in>파일|file):', ':\g<in>:', data_sub_data)
+                            data_sub_data = re.sub(r'^(?P<in>분류|category):', ':\\g<in>:', data_sub_data)
+                            data_sub_data = re.sub(r'^(?P<in>파일|file):', ':\\g<in>:', data_sub_data)
 
                             include_change_list[data_sub_name] = data_sub_data
                         else:
@@ -1204,7 +1204,7 @@ class class_do_render_namumark:
         footnote_number_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_number', self.ip)
         footnote_number_view_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_view_real_footnote_num', self.ip)
 
-        footnote_regex = re.compile('(?:\[\*((?:(?!\[\*|\]| ).)+)?(?: ((?:(?!\[\*|\]).)+))?\]|\[(각주|footnote)\])', re.I)
+        footnote_regex = re.compile(r'(?:\[\*((?:(?!\[\*|\]| ).)+)?(?: ((?:(?!\[\*|\]).)+))?\]|\[(각주|footnote)\])', re.I)
         footnote_count_all = len(re.findall(footnote_regex, self.render_data)) * 4
         while 1:
             footnote_num += 1
@@ -1465,7 +1465,7 @@ class class_do_render_namumark:
 
             return table_parameter_all
 
-        table_regex = re.compile('\n((?:(?:(?:(?:\|\|)+)|(?:\|[^|]+\|(?:\|\|)*))\n?(?:(?:(?!\|\|).)+))(?:(?:\|\||\|\|\n|(?:\|\|)+(?!\n)(?:(?:(?!\|\|).)+)\n*)*)\|\|)\n', re.DOTALL)
+        table_regex = re.compile(r'\n((?:(?:(?:(?:\|\|)+)|(?:\|[^|]+\|(?:\|\|)*))\n?(?:(?:(?!\|\|).)+))(?:(?:\|\||\|\|\n|(?:\|\|)+(?!\n)(?:(?:(?!\|\|).)+)\n*)*)\|\|)\n', re.DOTALL)
         table_sub_regex = r'(\n?)((?:\|\|)+)((?:&lt;(?:(?:(?!&lt;|&gt;).)+)&gt;)*)((?:\n*(?:(?:(?:(?!\|\|).)+)\n*)+)|(?:(?:(?!\|\|).)*))'
         table_caption_regex = r'^\|([^|]+)\|'
         table_count_all = len(re.findall(table_regex, self.render_data)) * 2
@@ -1801,7 +1801,7 @@ class class_do_render_namumark:
 
             middle_count_all -= 1
 
-        self.render_data = re.sub(r'<temp_(?P<in>(?:slash)_(?:[0-9]+))>', '<\g<in>>', self.render_data)
+        self.render_data = re.sub(r'<temp_(?P<in>(?:slash)_(?:[0-9]+))>', '<\\g<in>>', self.render_data)
 
     def do_render_hr(self):
         hr_regex = r'\n-{4,9}\n'
@@ -1832,7 +1832,7 @@ class class_do_render_namumark:
                 quote_data_org = quote_data.group(0)
                 
                 quote_data = quote_data.group(1)
-                quote_data = re.sub(r'\n&gt; *(?P<in>[^\n]*)', '\g<in>\n', quote_data)
+                quote_data = re.sub(r'\n&gt; *(?P<in>[^\n]*)', '\\g<in>\n', quote_data)
                 quote_data = re.sub(r'\n$', '', quote_data)
                 quote_data = self.get_tool_data_revert(quote_data)
                 quote_data = html.unescape(quote_data)
@@ -2154,7 +2154,7 @@ class class_do_render_namumark:
                 toc_data_on == 1:
                 self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
             else:
-                self.render_data = re.sub(r'(?P<in><h[1-6] id="[^"]*">)', '<br>' + self.data_toc + '\g<in>', self.render_data, 1)
+                self.render_data = re.sub(r'(?P<in><h[1-6] id="[^"]*">)', '<br>' + self.data_toc + '\\g<in>', self.render_data, 1)
         else:
             self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
             self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
@@ -2162,7 +2162,7 @@ class class_do_render_namumark:
         def do_render_last_footnote(match):
             match = match.group(1)
 
-            find_regex = re.compile('<footnote_title id="' + match + '_title">((?:(?!<footnote_title|<\/footnote_title>).)*)<\/footnote_title>')
+            find_regex = re.compile(r'<footnote_title id="' + match + r'_title">((?:(?!<footnote_title|<\/footnote_title>).)*)<\/footnote_title>')
             find_data = re.search(find_regex, self.render_data)
             if find_data:
                 find_data = find_data.group(1)
