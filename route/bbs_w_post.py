@@ -83,7 +83,7 @@ def bbs_w_post_comment(user_id : str, sub_code : str, comment_num : str, bbs_num
 
     return (comment_data, comment_select, comment_count, comment_add_count)
 
-def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[int, str] = '', do_type : str = '') -> typing.Union[str, werkzeug.wrappers.response.Response]:
+def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[int, str] = '', do_type : str = '') -> typing.Union[str, flask.Response, werkzeug.wrappers.response.Response]:
     conn : typing.Union[sqlite3.Connection, pymysql.connections.Connection]
     with get_db_connect() as conn:
         curs : typing.Union[sqlite3.Cursor, pymysql.cursors.Cursor] = conn.cursor()
