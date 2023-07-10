@@ -103,12 +103,10 @@ conn = ''
 # Func-main
 def load_conn(data):
     global conn
-
     conn = data
     
 def do_db_set(db_set):
     global global_db_set
-    
     global_db_set = db_set
     
 # Func-init
@@ -2709,7 +2707,10 @@ def re_error(data):
                 
             data = load_lang('error_password_length_too_short') + password_min_length
         elif num == 41:
-            data = load_lang('timeout_error') + '5'
+            curs.execute(db_change("select data from other where name = 'edit_timeout'"))
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = load_lang('timeout_error') + db_data
         else:
             data = '???'
 
