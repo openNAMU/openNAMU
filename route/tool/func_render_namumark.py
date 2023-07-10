@@ -314,14 +314,14 @@ class class_do_render_namumark:
         while 1:
             heading_count += 1
 
-            if not re.search(heading_regex, self.render_data):
+            heading_data = re.search(heading_regex, self.render_data)
+            if not heading_data:
                 break
             elif heading_count_all < 0:
                 print('Error : render heading count overflow')
 
                 break
             else:
-                heading_data = re.search(heading_regex, self.render_data)
                 heading_data_org = heading_data.group(0)
                 heading_data = heading_data.groups()
 
@@ -718,7 +718,8 @@ class class_do_render_namumark:
         image_count = 0
         link_count_all = len(re.findall(link_regex, self.render_data)) * 4
         while 1:
-            if not re.search(link_regex, self.render_data):
+            link_data = re.search(link_regex, self.render_data)
+            if not link_data:
                 break
             elif link_count_all < 0:
                 print('Error : render link count overflow')
@@ -726,7 +727,6 @@ class class_do_render_namumark:
                 break
             else:
                 # link split
-                link_data = re.search(link_regex, self.render_data)
                 link_data_full = link_data.group(0)
                 link_data = link_data.groups()
 
