@@ -226,9 +226,6 @@ def main_setting_main(db_set):
                         </span>
 
                         <h2>''' + load_lang('edit_set') + '''</h2>
-                        <span><a href="/setting/acl">(''' + load_lang('main_acl_setting') + ''')</a></span>
-                        <hr class="main_hr">
-
                         <span>''' + load_lang('slow_edit') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
                         <hr class="main_hr">
                         <input name="slow_edit" value="''' + html.escape(d_list[19]) + '''">

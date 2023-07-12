@@ -2260,18 +2260,25 @@ def do_edit_send_check(data):
     
     return 0
 
-def do_edit_slow_check():
+def do_edit_slow_check(do_type = 'edit'):
     curs = conn.cursor()
 
-    curs.execute(db_change("select data from other where name = 'slow_edit'"))
+    if do_type == 'edit':
+        curs.execute(db_change("select data from other where name = 'slow_edit'"))
+    else:
+        # do_type == 'thread'
+        curs.execute(db_change("select data from other where name = 'slow_thread'"))
+    
     slow_edit = curs.fetchall()
     if slow_edit and slow_edit[0][0] != '':
         if acl_check(None, 'slow_edit') == 1:
             slow_edit = int(number_check(slow_edit[0][0]))
 
-            curs.execute(db_change(
-                "select date from history where ip = ? order by date desc limit 1"
-            ), [ip_check()])
+            if do_type == 'edit':
+                curs.execute(db_change("select date from history where ip = ? order by date desc limit 1"), [ip_check()])
+            else:
+                curs.execute(db_change("select date from topic where ip = ? order by date desc limit 1"), [ip_check()])
+            
             last_edit_data = curs.fetchall()
             if last_edit_data:
                 last_edit_data = int(re.sub(' |:|-', '', last_edit_data[0][0]))
@@ -2711,6 +2718,11 @@ def re_error(data):
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
             data = load_lang('timeout_error') + db_data
+        elif num == 42:
+            curs.execute(db_change("select data from other where name = 'slow_thread'"))
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = load_lang('fast_edit_error') + db_data
         else:
             data = '???'
 

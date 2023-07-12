@@ -13,6 +13,9 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             return re_error('/ban')
 
         if flask.request.method == 'POST' and do_type == '':
+            if do_edit_slow_check('thread') == 1:
+                return re_error('/error/42')
+
             name = flask.request.form.get('topic', 'Test')
             sub = flask.request.form.get('title', 'Test')
             
