@@ -95,12 +95,12 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 leng = '+' + str(len(content))
 
             curs.execute(db_change("select data from other where name = 'edit_timeout'"))
-            db_data = curs.fetchall()
-            db_data = '' if not db_data else number_check(db_data[0][0])
+            db_data_2 = curs.fetchall()
+            db_data_2 = '' if not db_data_2 else number_check(db_data_2[0][0])
 
             try:
-                if db_data != '':
-                    timeout = edit_timeout(edit_render_set, (name, content), timeout = int(db_data))
+                if db_data_2 != '':
+                    timeout = edit_timeout(edit_render_set, (name, content), timeout = int(db_data_2))
                 else:
                     timeout = 0
             except Exception as e:
