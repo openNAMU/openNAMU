@@ -39,7 +39,8 @@ def main_setting_main(db_set):
             35 : ['user_name_view', ''],
             36 : ['link_case_insensitive', ''],
             37 : ['move_with_redirect', ''],
-            38 : ['slow_thread', '']
+            38 : ['slow_thread', ''],
+            39 : ['edit_timeout', '5'],
         }
 
         if flask.request.method == 'POST':
@@ -225,9 +226,6 @@ def main_setting_main(db_set):
                         </span>
 
                         <h2>''' + load_lang('edit_set') + '''</h2>
-                        <span><a href="/setting/acl">(''' + load_lang('main_acl_setting') + ''')</a></span>
-                        <hr class="main_hr">
-
                         <span>''' + load_lang('slow_edit') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
                         <hr class="main_hr">
                         <input name="slow_edit" value="''' + html.escape(d_list[19]) + '''">
@@ -260,6 +258,11 @@ def main_setting_main(db_set):
                         <span>''' + load_lang('slow_thread') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('not_working') + ''')</span>
                         <hr class="main_hr">
                         <input name="slow_thread" value="''' + html.escape(d_list[38]) + '''">
+                        <hr class="main_hr">
+
+                        <span>''' + load_lang('edit_timeout') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
+                        <hr class="main_hr">
+                        <input name="edit_timeout" value="''' + html.escape(d_list[39]) + '''">
                         <hr class="main_hr">
 
                         <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>

@@ -63,12 +63,12 @@ class class_do_render:
         if data_type == 'thread' or data_type == 'api_thread':
             data_end[0] = re.sub(
                 r'&lt;topic_a&gt;(?P<in>(?:(?!&lt;\/topic_a&gt;).)+)&lt;\/topic_a&gt;',
-                '<a href="\g<in>">\g<in></a>',
+                '<a href="\\g<in>">\\g<in></a>',
                 data_end[0]
             )
             data_end[0] = re.sub(
                 r'&lt;topic_call&gt;@(?P<in>(?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;',
-                '<a href="/w/user:\g<in>">@\g<in></a>',
+                '<a href="/w/user:\\g<in>">@\\g<in></a>',
                 data_end[0]
             )
 
