@@ -2,6 +2,7 @@ from .tool.func import *
 
 from .api_bbs_w_post import api_bbs_w_post
 from .api_bbs_w_comment import api_bbs_w_comment
+from .edit import edit_editor
 
 def bbs_w_post_make_thread(user_id : str, date : str, data : str, code : str, color : str = '', blind : str = '', add_style : str = '') -> str:
     if blind != '':
@@ -220,13 +221,13 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                 bbs_comment_form = ''
                 if bbs_comment_acl == 0:
                     bbs_comment_form += '''                        
-                        <textarea name="content" id="opennamu_edit_textarea" class="opennamu_textarea_100">''' + html.escape(text) + '''</textarea>
+                        ''' + edit_editor(curs, ip, text, 'thread') + '''
                         <hr class="main_hr">
                         
                         ''' + captcha_get() + ip_warning() + '''
 
-                        <button id="opennamu_save_button" formaction="/bbs/w/''' + bbs_num_str + '''/''' + post_num_str + '''" type="submit">''' + load_lang('send') + '''</button>
-                        <button id="opennamu_preview_button" formaction="/bbs/w/preview/''' + bbs_num_str + '''/''' + post_num_str + '''#opennamu_edit_textarea" type="submit">''' + load_lang('preview') + '''</button>
+                        <button id="opennamu_save_button" formaction="/bbs/w/''' + bbs_num_str + '''/''' + post_num_str + '''" type="submit" onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('send') + '''</button>
+                        <button id="opennamu_preview_button" formaction="/bbs/w/preview/''' + bbs_num_str + '''/''' + post_num_str + '''#opennamu_edit_textarea" type="submit" onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('preview') + '''</button>
                         <hr class="main_hr">
                     '''
 
@@ -379,13 +380,13 @@ def bbs_w_post(bbs_num : typing.Union[int, str] = '', post_num : typing.Union[in
                         ''' + comment_select + ''' <a href="javascript:opennamu_return_comment();">(R)</a>
                         <hr class="main_hr">
                         
-                        <textarea name="content" id="opennamu_edit_textarea" class="opennamu_textarea_100">''' + html.escape(text) + '''</textarea>
+                        ''' + edit_editor(curs, ip, text, 'thread') + '''
                         <hr class="main_hr">
                         
                         ''' + captcha_get() + ip_warning() + '''
 
-                        <button id="opennamu_save_button" formaction="/bbs/w/''' + bbs_num_str + '''/''' + post_num_str + '''" type="submit">''' + load_lang('send') + '''</button>
-                        <button id="opennamu_preview_button" formaction="/bbs/w/preview/''' + bbs_num_str + '''/''' + post_num_str + '''#opennamu_edit_textarea" type="submit">''' + load_lang('preview') + '''</button>
+                        <button id="opennamu_save_button" formaction="/bbs/w/''' + bbs_num_str + '''/''' + post_num_str + '''" type="submit" onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('send') + '''</button>
+                        <button id="opennamu_preview_button" formaction="/bbs/w/preview/''' + bbs_num_str + '''/''' + post_num_str + '''#opennamu_edit_textarea" type="submit" onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('preview') + '''</button>
                         <hr class="main_hr">
                     '''
 

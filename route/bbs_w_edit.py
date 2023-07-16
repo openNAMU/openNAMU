@@ -1,8 +1,9 @@
 from .tool.func import *
 
 from .api_bbs_w_post import api_bbs_w_post
+from .edit import edit_editor
 
-def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
+def bbs_w_edit(bbs_num = '', post_num = '', do_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -110,31 +111,6 @@ def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
                 form_action_preview = 'formaction="/bbs/edit/preview/' + bbs_num_str + '/' + post_num_str + '"'
     
             editor_top_text = '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
-            
-            monaco_on = get_main_skin_set(curs, flask.session, 'main_css_monaco', ip)
-            if monaco_on == 'use':
-                editor_display = 'style="display: none;"'
-                monaco_display = ''
-                add_get_file = '''
-                    <link   rel="stylesheet"
-                            data-name="vs/editor/editor.main" 
-                            href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.1/min/vs/editor/editor.main.min.css">
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.1/min/vs/loader.min.js"></script>
-                '''
-
-                editor_top_text += ' <a href="javascript:opennamu_edit_turn_off_monaco();">(' + load_lang('turn_off_monaco') + ')</a>'
-                
-                if flask.request.cookies.get('main_css_darkmode', '0') == '1':
-                    monaco_thema = 'vs-dark'
-                else:
-                    monaco_thema = ''
-                
-                add_script = 'do_monaco_init("' + monaco_thema + '");'
-            else:
-                editor_display = ''
-                monaco_display = 'style="display: none;"'
-                add_get_file = ''
-                add_script = 'opennamu_edit_turn_off_monaco();'
 
             if editor_top_text != '':
                 editor_top_text += '<hr class="main_hr">'
@@ -146,17 +122,12 @@ def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
     
             return easy_minify(flask.render_template(skin_check(), 
                 imp = [bbs_title, wiki_set(), wiki_custom(), wiki_css([0, 0])],
-                data =  editor_top_text + add_get_file + '''
-                    <form method="post">
-                        <textarea style="display: none;" id="opennamu_edit_origin" name="doc_data_org"></textarea>
-
-                        <div>''' + edit_button('opennamu_edit_textarea', 'opennamu_monaco_editor') + '''</div>
-                        
+                data =  editor_top_text + '''
+                    <form method="post">                        
                         <input placeholder="''' + load_lang('title') + '''" name="title" value="''' + html.escape(title) + '''">
                         <hr class="main_hr">
 
-                        <div id="opennamu_monaco_editor" class="opennamu_textarea_500" ''' + monaco_display + '''></div>
-                        <textarea id="opennamu_edit_textarea" ''' + editor_display + ''' class="opennamu_textarea_500" name="content">''' + html.escape(data) + '''</textarea>
+                        ''' + edit_editor(curs, ip, data) + '''
                         <hr class="main_hr">
                         
                         ''' + captcha_get() + ip_warning() + '''
@@ -166,12 +137,6 @@ def bbs_edit(bbs_num = '', post_num = '', do_type = ''):
                     
                         <hr class="main_hr">
                         <div id="opennamu_preview_area">''' + data_preview + '''</div>
-                        
-                        <script>
-                            do_stop_exit();
-                            do_paste_image('opennamu_edit_textarea', 'opennamu_monaco_editor');
-                            ''' + add_script + '''
-                        </script>
 
                         ''' + render_simple_set('''
                             <hr class="main_hr">
