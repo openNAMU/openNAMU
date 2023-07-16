@@ -15,7 +15,7 @@ from route.api_w import api_w
 from route.api_bbs_w_post import api_bbs_w_post
 from route.api_bbs_w_comment import api_bbs_w_comment
 
-from route.bbs_edit import bbs_edit
+from route.bbs_w_edit import bbs_w_edit
 from route.bbs_main import bbs_main
 from route.bbs_make import bbs_make
 from route.bbs_w import bbs_w
