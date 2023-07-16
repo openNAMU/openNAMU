@@ -35,13 +35,18 @@ if data_up_date == 1:
         f.write(version_list['beta']['r_ver'])
     
     if platform.system() in ('Linux', 'Windows'):
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "--user", "-r", "requirements.txt"])
+        python_ver = sys.version_info.major + '.' + sys.version_info.minor
 
-        try:
-            os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
-        except:
-            print('Error : restart failed')
-            raise
+        run_list = [sys.executable, 'python' + python_ver, 'python3', 'python']
+        for exe_name in run_list:
+            try:
+                subprocess.check_call([exe_name, "-m", "pip", "install", "--upgrade", "--user", "-r", "requirements.txt"])
+                os.execl(exe_name, os.path.abspath(__file__), *sys.argv)
+            except:
+                pass
+        else:
+            print('Error : automatic installation is not supported.')
+            print('Help : try "python3 -m pip install -r requirements.txt"')
     else:
         print('Error : automatic installation is not supported.')
         print('Help : try "python3 -m pip install -r requirements.txt"')
