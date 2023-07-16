@@ -1,3 +1,5 @@
+import urllib.request
+
 from .tool.func import *
 
 def api_skin_info(name = ''):

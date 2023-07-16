@@ -4,19 +4,13 @@ import sys
 import platform
 import json
 import smtplib
-import zipfile
-import shutil
-import logging
 import random
-import typing
 import ipaddress
-import multiprocessing
+import subprocess
 
 import email.mime.text
 import email.utils
 import email.header
-
-import urllib.request
 
 # Init-Version
 with open('version.json', encoding = 'utf8') as file_data:
@@ -41,25 +35,10 @@ if data_up_date == 1:
         f.write(version_list['beta']['r_ver'])
     
     if platform.system() in ('Linux', 'Windows'):
-        if platform.python_implementation() == 'PyPy':
-            os.system(
-                'pypy' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
-                '-m pip install --upgrade --user -r requirements.txt'
-            )
-        else:
-            os.system(
-                'python' + ('3' if platform.system() != 'Windows' else '') + ' ' + \
-                '-m pip install --upgrade --user -r requirements.txt'
-            )
-        
-        print('----')
-        try:
-            os.execl(sys.executable, sys.executable, *sys.argv)
-        except:
-            pass
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "--user", "-r", "requirements.txt"])
 
         try:
-            os.execl(sys.executable, '"' + sys.executable + '"', *sys.argv)
+            os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
         except:
             print('Error : restart failed')
             raise
