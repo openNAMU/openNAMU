@@ -64,7 +64,7 @@ def vote_add():
                         '<hr class="main_hr">' + \
                         '<input type="checkbox" value="Y" name="open_select"> ' + load_lang('open_vote') + \
                         '<h2>' + load_lang('period') + '</h2>'
-                        '<input type="date" name="date" pattern="\d{4}-\d{2}-\d{2}">' + \
+                        '<input type="date" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">' + \
                         '<hr class="main_hr">' + \
                         '<input type="checkbox" value="Y" name="limitless"> ' + load_lang('limitless') + \
                         '<h2>' + load_lang('acl') + '</h2>' + \

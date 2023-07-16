@@ -94,9 +94,15 @@ def edit(name = 'Test', section = 0, do_type = ''):
             else:
                 leng = '+' + str(len(content))
 
-            
+            curs.execute(db_change("select data from other where name = 'edit_timeout'"))
+            db_data_2 = curs.fetchall()
+            db_data_2 = '' if not db_data_2 else number_check(db_data_2[0][0])
+
             try:
-                timeout = edit_timeout(edit_render_set, (name, content), timeout = 5)
+                if db_data_2 != '':
+                    timeout = edit_timeout(edit_render_set, (name, content), timeout = int(db_data_2))
+                else:
+                    timeout = 0
             except Exception as e:
                 print('multiprocessing error : ')
                 print(e)
@@ -105,7 +111,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
             if timeout == 1:
                 return re_error('/error/41')
-                
+            
             if db_data:
                 curs.execute(db_change("update data set data = ? where title = ?"), [content, name])
             else:    

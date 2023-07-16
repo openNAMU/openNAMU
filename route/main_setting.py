@@ -13,6 +13,7 @@ def main_setting():
             ['sitemap', load_lang('sitemap_management')],
             ['top_menu', load_lang('top_menu_setting')],
             ['skin_set', load_lang('main_skin_set_default')],
+            ['acl', load_lang('main_acl_setting')]
         ]
 
         li_data = ''.join(['<li><a href="/setting/' + str(li[0]) + '">' + li[1] + '</a></li>' for li in li_list])
