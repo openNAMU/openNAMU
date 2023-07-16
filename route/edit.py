@@ -152,15 +152,9 @@ def edit(name = 'Test', section = 0, do_type = ''):
             db_data_2 = curs.fetchall()
             db_data_2 = '' if not db_data_2 else number_check(db_data_2[0][0])
 
-            try:
-                if db_data_2 != '':
-                    timeout = edit_timeout(edit_render_set, (name, content), timeout = int(db_data_2))
-                else:
-                    timeout = 0
-            except Exception as e:
-                print('multiprocessing error : ')
-                print(e)
-
+            if db_data_2 != '' and platform.system() == 'Linux':
+                timeout = edit_timeout(edit_render_set, (name, content), timeout = int(db_data_2))
+            else:
                 timeout = 0
 
             if timeout == 1:
