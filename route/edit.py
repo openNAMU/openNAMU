@@ -1,4 +1,7 @@
+import multiprocessing
+
 from .tool.func import *
+
 
 def edit_render_set(name, content):
     render_set(
