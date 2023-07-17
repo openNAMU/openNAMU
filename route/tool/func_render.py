@@ -61,9 +61,21 @@ class class_do_render:
             ]
 
         if data_type == 'thread' or data_type == 'api_thread':
+            def do_thread_a_change(match):
+                data = match[2].replace('#', '')
+                data_split = data.split('-')
+                if match[1] == 'topic_a' or len(data_split) == 1:
+                    return '<a href="' + match[2] + '">' + match[2] + '</a>'
+                elif match[1] == 'topic_a_post' and len(data_split) == 3:
+                    return '<a href="/bbs/w/' + data_split[2] + '/' + data_split[1] + '#' + data_split[0] + '">#' + data_split[0] + '-' + data_split[1] + '</a>'
+                elif len(data_split) == 2:
+                    return '<a href="/thread/' + data_split[1] + '#' + data_split[0] + '">' + match[2] + '</a>'
+                else:
+                    return ''
+
             data_end[0] = re.sub(
-                r'&lt;topic_a&gt;(?P<in>(?:(?!&lt;\/topic_a&gt;).)+)&lt;\/topic_a&gt;',
-                '<a href="\\g<in>">\\g<in></a>',
+                r'&lt;(topic_a(?:_post|_thread)?)&gt;((?:(?!&lt;\/topic_a(?:_post|_thread)?&gt;).)+)&lt;\/topic_a(?:_post|_thread)?&gt;',
+                do_thread_a_change,
                 data_end[0]
             )
             data_end[0] = re.sub(

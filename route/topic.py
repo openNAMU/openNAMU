@@ -1,6 +1,7 @@
 from .tool.func import *
 
-from .api_topic import api_topic
+from .api_topic import api_topic, api_topic_thread_pre_render
+
 from .edit import edit_editor
 
 def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
@@ -79,7 +80,7 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                 add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
 
             data = flask.request.form.get('content', 'Test').replace('\r', '')
-            data = get_thread_pre_render(data, num, ip, topic_num, name, sub)
+            data = api_topic_thread_pre_render(curs, data, num, ip, topic_num, name, sub)
 
             do_add_thread(
                 topic_num,
