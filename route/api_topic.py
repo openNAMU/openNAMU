@@ -27,6 +27,8 @@ def api_topic_thread_make(user_id, date, data, code, color = '', blind = '', add
     '''
 
 def api_topic_thread_pre_render(curs, data, num, ip, topic_num = '', name = '', sub = '', do_type = 'thread'):
+    # 이거 좀 엉성해서 언젠간 손 보고 싶음
+
     call_thread_regex = r"( |\n|^)(?:#([0-9]+)(?:-([0-9]+))?)( |\n|$)"
     call_thread_count = len(re.findall(call_thread_regex, data)) * 3
     while 1:
@@ -50,7 +52,6 @@ def api_topic_thread_pre_render(curs, data, num, ip, topic_num = '', name = '', 
                     send_topic_num = set_id[0] + '-' + rd_data[2]
                     view_data += '-' + set_id[0]
 
-            print(send_topic_num, rd_data[1])
             if do_type == 'thread':
                 curs.execute(db_change("select ip from topic where code = ? and id = ?"), [send_topic_num, rd_data[1]])
             else:
