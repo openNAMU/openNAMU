@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def give_user_check_2(name):
+def give_user_check_2(name = None):
     with get_db_connect() as conn:
         curs = conn.cursor()
 

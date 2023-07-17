@@ -340,14 +340,10 @@ app.route('/list/user')(list_user)
 app.route('/list/user/<int:arg_num>')(list_user)
 
 # /list/user/check
-@app.route('/check/<name>')
-def give_user_check(name = None):
-    return give_user_check_2(name)
+app.route('/check/<name>')(give_user_check_2)
     
 # /list/user/check/delete
-@app.route('/check_delete', methods = ['POST', 'GET'])
-def give_user_check_delete():
-    return give_user_check_delete_2()
+app.route('/check_delete', methods = ['POST', 'GET'])(give_user_check_delete_2)
 
 # Func-auth
 # /auth/give
@@ -363,33 +359,23 @@ app.route('/auth/give/ban_regex/<everything:name>', methods = ['POST', 'GET'], d
 app.route('/auth/give/ban_multiple', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'multiple' })(give_user_ban)
 
 # /auth/list
-@app.route('/admin_group')
-def list_admin_group():
-    return list_admin_group_2()
+app.route('/admin_group')(list_admin_group_2)
 
 # /auth/list/add/<name>
-@app.route('/admin_plus/<name>', methods = ['POST', 'GET'])
-def give_admin_groups(name = None):
-    return give_admin_groups_2(name)
+app.route('/admin_plus/<name>', methods = ['POST', 'GET'])(give_admin_groups_2)
 
 # /auth/list/delete/<name>
-@app.route('/delete_admin_group/<name>', methods = ['POST', 'GET'])
-def give_delete_admin_group(name = None):
-    return give_delete_admin_group_2(name)
+app.route('/delete_admin_group/<name>', methods = ['POST', 'GET'])(give_delete_admin_group_2)
 
 app.route('/auth/give/fix/<user_name>', methods = ['POST', 'GET'])(give_user_fix)
 
-@app.route('/app_submit', methods = ['POST', 'GET'])
-def recent_app_submit():
-    return recent_app_submit_2()
+app.route('/app_submit', methods = ['POST', 'GET'])(recent_app_submit_2)
 
 # /auth/history
 # ongoing 반영 필요
-@app.route('/block_log')
-@app.route('/block_log/<regex("user"):tool>/<name>')
-@app.route('/block_log/<regex("admin"):tool>/<name>')
-def recent_block(name = 'Test', tool = 'all'):
-    return recent_block_2(name, tool)
+app.route('/block_log')(recent_block_2)
+app.route('/block_log/<regex("user"):tool>/<name>')(recent_block_2)
+app.route('/block_log/<regex("admin"):tool>/<name>')(recent_block_2)
 
 # Func-history
 app.route('/recent_change')(recent_change)
@@ -504,15 +490,9 @@ app.route('/star_doc', defaults = { 'tool' : 'star_doc' })(user_watch_list)
 app.route('/star_doc/<everything:name>', defaults = { 'tool' : 'star_doc' })(user_watch_list_name)
 
 # 개편 보류중 S
-@app.route('/change/email', methods = ['POST', 'GET'])
-def user_setting_email():
-    return user_setting_email_2()
-
+app.route('/change/email', methods = ['POST', 'GET'])(user_setting_email_2)
 app.route('/change/email/delete')(user_setting_email_delete)
-
-@app.route('/change/email/check', methods = ['POST', 'GET'])
-def user_setting_email_check():
-    return user_setting_email_check_2()
+app.route('/change/email/check', methods = ['POST', 'GET'])(user_setting_email_check_2)
 # 개편 보류중 E
 
 # Func-login
@@ -522,29 +502,12 @@ def user_setting_email_check():
 # register -> register/email -> regiter/email/check with reg_id
 # pass_find -> pass_find/email with find_id
 
-@app.route('/login', methods = ['POST', 'GET'])
-def login_login():
-    return login_login_2()
-
-@app.route('/login/2fa', methods = ['POST', 'GET'])
-def login_login_2fa():
-    return login_login_2fa_2()
-
-@app.route('/register', methods = ['POST', 'GET'])
-def login_register():
-    return login_register_2()
-
-@app.route('/register/email', methods = ['POST', 'GET'])
-def login_register_email():
-    return login_register_email_2()
-
-@app.route('/register/email/check', methods = ['POST', 'GET'])
-def login_register_email_check():
-    return login_register_email_check_2()
-
-@app.route('/register/submit', methods = ['POST', 'GET'])
-def login_register_submit():
-    return login_register_submit_2()
+app.route('/login', methods = ['POST', 'GET'])(login_login_2)
+app.route('/login/2fa', methods = ['POST', 'GET'])(login_login_2fa_2)
+app.route('/register', methods = ['POST', 'GET'])(login_register_2)
+app.route('/register/email', methods = ['POST', 'GET'])(login_register_email_2)
+app.route('/register/email/check', methods = ['POST', 'GET'])(login_register_email_check_2)
+app.route('/register/submit', methods = ['POST', 'GET'])(login_register_submit_2)
 
 app.route('/login/find')(login_find)
 app.route('/login/find/key', methods = ['POST', 'GET'])(login_find_key)
