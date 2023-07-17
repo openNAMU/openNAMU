@@ -12,10 +12,13 @@ def login_login_2():
             return re_error('/ban')
 
         if flask.request.method == 'POST':
-            if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error('/error/13')
-            else:
-                captcha_post('', 0)
+            if 'login_count' in flask.session:
+                count = int(number_check(flask.session['login_count']))
+                if count > 3:
+                    if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                        return re_error('/error/13')
+                    else:
+                        captcha_post('', 0)
 
             user_agent = flask.request.headers.get('User-Agent', '')
             user_id = flask.request.form.get('id', '')
@@ -40,6 +43,11 @@ def login_login_2():
                 user_data['encode'],
                 user_id
             ) != 1:
+                if not 'login_count' in flask.session:
+                    flask.session['login_count'] = 1
+                else:
+                    flask.session['login_count'] = int(number_check(flask.session['login_count'])) + 1
+
                 return re_error('/error/10')
 
             curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [user_id])
@@ -56,6 +64,12 @@ def login_login_2():
 
                 return redirect('/user')
         else:
+            captcha_data = ''
+            if 'login_count' in flask.session:
+                count = int(number_check(flask.session['login_count']))
+                if count > 3:
+                    captcha_data = captcha_get()
+
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('login'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data =  '''
@@ -66,7 +80,7 @@ def login_login_2():
                             <hr class="main_hr">
                             <!-- <input type="checkbox" name="auto_login"> ''' + load_lang('auto_login') + ''' (''' + load_lang('not_working') + ''')
                             <hr class="main_hr"> -->
-                            ''' + captcha_get() + '''
+                            ''' + captcha_data + '''
                             <button type="submit">''' + load_lang('login') + '''</button>
                             ''' + http_warning() + '''
                         </form>

@@ -35,7 +35,7 @@ if data_up_date == 1:
         f.write(version_list['beta']['r_ver'])
     
     if platform.system() in ('Linux', 'Windows'):
-        python_ver = sys.version_info.major + '.' + sys.version_info.minor
+        python_ver = str(sys.version_info.major) + '.' + str(sys.version_info.minor)
 
         run_list = [sys.executable, 'python' + python_ver, 'python3', 'python']
         for exe_name in run_list:
