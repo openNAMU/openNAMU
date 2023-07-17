@@ -1468,67 +1468,6 @@ def render_simple_set(data):
 
     return data
 
-def get_thread_pre_render(data, num, ip, topic_num = '', name = '', sub = '', do_type = 'thread'):
-    curs = conn.cursor()
-
-    call_thread_regex = r"( |\n|^)(?:#([0-9]+))( |\n|$)"
-    call_thread_count = len(re.findall(call_thread_regex, data)) * 3
-    while 1:
-        rd_data = re.search(call_thread_regex, data)
-        if call_thread_count < 0:
-            break
-        elif not rd_data:
-            break
-        else:
-            rd_data = rd_data.groups()
-
-            if do_type == 'thread':
-                curs.execute(db_change("select ip from topic where code = ? and id = ?"), [topic_num, rd_data[1]])
-            else:
-                curs.execute(db_change('select set_data from bbs_data where set_name = "comment_user_id" and set_id = ? and set_code = ?'), [topic_num, rd_data[1]])
-
-            ip_data = curs.fetchall()
-            if ip_data and ip_or_user(ip_data[0][0]) == 0:
-                if do_type == 'thread':
-                    add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
-                else:
-                    set_id = topic_num.split('-')
-                    add_alarm(ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
-
-            data = re.sub(call_thread_regex, rd_data[0] + '<topic_a>#' + rd_data[1] + '</topic_a>' + rd_data[2], data, 1)
-
-        call_thread_count -= 1
-
-    call_user_regex = r"( |\n|^)(?:@([^ \n]+))( |\n|$)"
-    call_user_count = len(re.findall(call_user_regex, data)) * 3
-    while 1:
-        rd_data = re.search(call_user_regex, data)
-        if call_user_count < 0:
-            break
-        elif not rd_data:
-            break
-        else:
-            rd_data = rd_data.groups()
-
-            curs.execute(db_change("select ip from history where ip = ? limit 1"), [rd_data[1]])
-            ip_data = curs.fetchall()
-            if not ip_data:
-                curs.execute(db_change("select ip from topic where ip = ? limit 1"), [rd_data[1]])
-                ip_data = curs.fetchall()
-
-            if ip_data and ip_or_user(ip_data[0][0]) == 0:
-                if do_type == 'thread':
-                    add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
-                else:
-                    set_id = topic_num.split('-')
-                    add_alarm(ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
-
-            data = re.sub(call_user_regex, rd_data[0] + '<topic_call>@' + rd_data[1] + '</topic_call>' + rd_data[2], data, 1)
-
-        call_user_count -= 1
-
-    return data
-
 # Func-request
 def send_email(who, title, data):
     curs = conn.cursor()

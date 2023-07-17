@@ -2,33 +2,9 @@ from .tool.func import *
 
 from .api_bbs_w_post import api_bbs_w_post
 from .api_bbs_w_comment import api_bbs_w_comment
+from .api_topic import api_topic_thread_make, api_topic_thread_pre_render
+
 from .edit import edit_editor
-
-def bbs_w_post_make_thread(user_id, date, data, code, color = '', blind = '', add_style = ''):
-    if blind != '':
-        if data == '':
-            color_b = 'opennamu_comment_blind'
-        else:
-            color_b = 'opennamu_comment_blind_admin'
-    else:
-        color_b = 'opennamu_comment_blind_not'
-
-    return '''
-        <table class="opennamu_comment" style="''' + add_style + '''">
-            <tr>
-                <td class="opennamu_comment_color_''' + color + '''">
-                    <a href="#thread_shortcut" id="''' + code + '''">#''' + code + '''</a>
-                    ''' + user_id + '''
-                    <span style="float: right;">''' + date + '''</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="''' + color_b + '''" id="opennamu_comment_data_main">
-                    ''' + data + '''
-                </td>
-            </tr>
-        </table>
-    '''
 
 def bbs_w_post_comment(user_id, sub_code, comment_num, bbs_num_str, post_num_str):
     comment_data = ''
@@ -56,7 +32,7 @@ def bbs_w_post_comment(user_id, sub_code, comment_num, bbs_num_str, post_num_str
         date += temp_dict['comment_date']
 
         comment_data += '<span style="padding-left: 20px;"></span>' * margin_count
-        comment_data += bbs_w_post_make_thread(
+        comment_data += api_topic_thread_make(
             ip_pas(temp_dict['comment_user_id']),
             date,
             render_set(
@@ -129,7 +105,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                     return redirect('/bbs/w/' + bbs_num_str + '/' + post_num_str)
                 
                 data = data.replace('\r', '')
-                data = get_thread_pre_render(data, id_data, ip, set_id, bbs_name, temp_dict['title'], 'post')
+                data = api_topic_thread_pre_render(curs, data, id_data, ip, set_id, bbs_name, temp_dict['title'], 'post')
                 
                 date = get_time()
 
@@ -164,7 +140,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
 
                 data = ''
                 data += '<h2>' + html.escape(temp_dict['title']) + '</h2>'
-                data += bbs_w_post_make_thread(
+                data += api_topic_thread_make(
                     ip_pas(temp_dict['user_id']),
                     date,
                     render_set(
@@ -172,13 +148,13 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                         data_type = 'thread',
                         data_in = 'bbs'
                     ),
-                    '1',
+                    '0',
                     color = 'green'
                 )
                 data += '<hr class="main_hr">'
 
                 user_id = temp_dict['user_id']
-                count = 1
+                count = 0
 
                 thread_data = json.loads(api_bbs_w_comment(bbs_num_str + '-' + post_num_str).data)
                 for temp_dict in thread_data:
@@ -192,7 +168,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                     date += '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/comment/' + str(count) + '/tool">(' + load_lang('tool') + ')</a> '
                     date += temp_dict['comment_date']
 
-                    data += bbs_w_post_make_thread(
+                    data += api_topic_thread_make(
                         ip_pas(temp_dict['comment_user_id']),
                         date,
                         render_set(
@@ -322,7 +298,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
 
                 data = ''
                 data += '<h2>' + html.escape(temp_dict['title']) + '</h2>'
-                data += bbs_w_post_make_thread(
+                data += api_topic_thread_make(
                     ip_pas(temp_dict['user_id']),
                     date,
                     render_set(
