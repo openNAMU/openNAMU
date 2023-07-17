@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def give_delete_admin_group_2(name):
+def give_delete_admin_group_2(name = None):
     with get_db_connect() as conn:
         curs = conn.cursor()
 

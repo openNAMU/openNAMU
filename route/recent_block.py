@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def recent_block_2(name, tool):
+def recent_block_2(name = 'Test', tool = 'all'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
