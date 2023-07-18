@@ -299,51 +299,40 @@ app.route('/extension_filter/del/<everything:name>', defaults = { 'tool' : 'del_
 app.route('/extension_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_extension_filter' })(filter_inter_wiki_add)
 
 # Func-list
-# /list/document/old
 app.route('/list/document/old')(list_old_page)
 app.route('/list/document/old/<int:num>')(list_old_page)
 
-# /list/document/acl
 app.route('/list/document/acl')(list_acl)
 app.route('/list/document/acl/<int:arg_num>')(list_acl)
 
-# /list/document/need
 app.route('/list/document/need')(list_please)
 app.route('/list/document/need/<int:arg_num>')(list_please)
 
-# /list/document/all
 app.route('/list/document/all')(list_title_index)
 app.route('/list/document/all/<int:num>')(list_title_index)
 
-# /list/document/long
 app.route('/list/document/long')(list_long_page)
 app.route('/list/document/long/<int:arg_num>')(list_long_page)
 
-# /list/document/short
 app.route('/list/document/short', defaults = { 'tool' : 'short_page' })(list_long_page)
 app.route('/list/document/short/<int:arg_num>', defaults = { 'tool' : 'short_page' })(list_long_page)
 
-# /list/file
 app.route('/list/file')(list_image_file)
 app.route('/list/file/<int:arg_num>')(list_image_file)
 
-# /list/admin
-# /list/admin/list
 app.route('/list/admin')(list_admin)
 
-# /list/admin/auth_use
 app.route('/list/admin/auth_use', methods = ['POST', 'GET'])(list_admin_auth_use)
 app.route('/list/admin/auth_use/<arg_search>/<int:arg_num>', methods = ['POST', 'GET'])(list_admin_auth_use)
 
-# /list/user
 app.route('/list/user')(list_user)
 app.route('/list/user/<int:arg_num>')(list_user)
 
-# /list/user/check
-app.route('/check/<name>')(give_user_check_2)
-    
-# /list/user/check/delete
-app.route('/check_delete', methods = ['POST', 'GET'])(give_user_check_delete_2)
+app.route('/list/user/check/<name>')(list_user_check)
+app.route('/list/user/check/<name>/<do_type>')(list_user_check)
+app.route('/list/user/check/<name>/<do_type>/<int:arg_num>')(list_user_check)
+app.route('/list/user/check/<name>/<do_type>/<int:arg_num>/<plus_name>')(list_user_check)
+app.route('/list/user/check/delete/<name>/<ip>/<time>/<do_type>', methods = ['POST', 'GET'])(list_user_check_delete)
 
 # Func-auth
 # /auth/give

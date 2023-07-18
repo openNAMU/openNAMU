@@ -1,20 +1,23 @@
 from .tool.func import *
 
-def give_user_check_2(name = None):
+def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'normal'):
+    # 파라미터 to URL
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        plus_id = flask.request.args.get('plus', None)
+        plus_id = plus_name
+
+        check_type = do_type if do_type in ['simple', 'normal'] else 'normal'
+        check_type = '' if check_type == 'normal' else check_type
+
+        num = arg_num
+        sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
         if admin_check('all', None, name) == 1 or (plus_id and admin_check('all', None, plus_id) == 1):
             if admin_check() != 1:
                 return re_error('/error/4')
 
-        num = int(number_check(flask.request.args.get('num', '1')))
-        sql_num = (num * 50 - 50) if num * 50 > 0 else 0
-
         div = ''
-        check_type = flask.request.args.get('type', '')
 
         if admin_check(4, (check_type + ' ' if check_type != '' else '') + 'check (' + name + ')') != 1:
             return re_error('/error/3')
@@ -81,14 +84,14 @@ def give_user_check_2(name = None):
             if record:
                 if not plus_id:
                     div = '' + \
-                        '<a href="/manager/14?plus=' + url_pas(name) + '">(' + load_lang('compare') + ')</a> ' + \
-                        '<a href="/check/' + url_pas(name) + '?type=simple">(' + load_lang('simple_check') + ')</a>' + \
+                        '<a href="/manager/14/' + url_pas(name) + '">(' + load_lang('compare') + ')</a> ' + \
+                        '<a href="/list/user/check/' + url_pas(name) + '/simple">(' + load_lang('simple_check') + ')</a>' + \
                         '<hr class="main_hr">' + \
                     '' + div
                 else:
                     div = '' + \
-                        '<a href="/check/' + url_pas(name) + '">(' + name + ')</a> ' + \
-                        '<a href="/check/' + url_pas(plus_id) + '">(' + plus_id + ')</a>' + \
+                        '<a href="/list/user/check/' + url_pas(name) + '">(' + name + ')</a> ' + \
+                        '<a href="/list/user/check/' + url_pas(plus_id) + '">(' + plus_id + ')</a>' + \
                         '<hr class="main_hr">' + \
                     '' + div
 
@@ -119,16 +122,12 @@ def give_user_check_2(name = None):
                     div += '''
                         <tr>
                             <td>
-                                <a href="/check/''' + url_pas(data[0]) + '''">''' + data[0] + '''</a>
-                                <a  href="/check_delete''' + \
-                                    '''?name=''' + url_pas(data[0]) + \
-                                    '''&ip=''' + url_pas(data[1]) + \
-                                    '''&time=''' + url_pas(data[3].replace(' ', '').replace(':', '').replace('-', '')) + \
-                                    '''&return_type=''' + ('0' if ip_or_user(name) == 0 else '1') + '''">
+                                <a href="/list/user/check/''' + url_pas(data[0]) + '''">''' + data[0] + '''</a>
+                                <a href="/list/user/check/delete/''' + url_pas(data[0]) + '/' + url_pas(data[1]) + '/' + url_pas(data[3]) + '/' + ('0' if ip_or_user(name) == 0 else '1') + '''">
                                     (''' + load_lang('delete') + ''')
                                 </a>
                             </td>
-                            <td><a href="/check/''' + url_pas(data[1]) + '''">''' + data[1] + '''</a></td>
+                            <td><a href="/list/user/check/''' + url_pas(data[1]) + '''">''' + data[1] + '''</a></td>
                             <td>''' + data[3] + '''</td>
                         </tr>
                         <tr>
@@ -141,36 +140,50 @@ def give_user_check_2(name = None):
                     </table>
                 '''
 
-            div += next_fix(
-                '/check/' + url_pas(name) + ('?plus=' + plus_id + '&num=' if plus_id else '?num='), 
-                num, 
-                record
-            )
+            if plus_id:
+                div += get_next_page_bottom(
+                    '/list/user/check/' + url_pas(name) + '/normal/{}/' + url_pas(plus_id), 
+                    num, 
+                    record
+                )
+            else:
+                div += next_fix(
+                    '/list/user/check/' + url_pas(name) + '/normal/', 
+                    num, 
+                    record
+                )
+
+            if plus_id:
+                name += ', ' + plus_id
 
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('check'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('check') + ')', 0])],
                 data = div,
                 menu = [['manager', load_lang('return')]]
             ))
         else:
             curs.execute(db_change("" + \
-                "select distinct " + ('name' if ip_or_user(name) == 1 else 'ip') + ", today from ua_d " + \
+                "select distinct " + ('name' if ip_or_user(name) == 1 else 'ip') + " from ua_d " + \
                 "where " + ('ip' if ip_or_user(name) == 1 else 'name') + " = ? "
                 "order by today desc limit ?, 50" + \
             ""), [name, sql_num])
             record = curs.fetchall()
 
             div = ''
-            for i in record:
-                div += '<li><a href="/check/' + url_pas(i[0]) + '?type=simple">' + i[0] + '</a></li>'
+            for for_a in record:
+                div += '<li><a href="/list/user/check/' + url_pas(for_a[0]) + '/simple">' + for_a[0] + '</a></li>'
 
             if div != '':
                 div = '<ul class="opennamu_ul">' + div + '</ul>'
                 div += next_fix(
-                    '/check/' + url_pas(name) + '?type=' + check_type + '&num=', 
+                    '/list/user/check/' + url_pas(name) + '/' + check_type + '/', 
                     num, 
                     record
                 )
+
+            div = '' + \
+                '<a href="/list/user/check/' + url_pas(name) + '/normal">(' + load_lang('check') + ')</a>' + \
+            '' + div
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('simple_check') + ')', 0])],
