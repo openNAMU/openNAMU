@@ -15,7 +15,7 @@ from route.api_w import api_w
 from route.api_bbs_w_post import api_bbs_w_post
 from route.api_bbs_w_comment import api_bbs_w_comment
 
-from route.bbs_edit import bbs_edit
+from route.bbs_w_edit import bbs_w_edit
 from route.bbs_main import bbs_main
 from route.bbs_make import bbs_make
 from route.bbs_w import bbs_w
@@ -42,8 +42,6 @@ from route.give_admin_groups import give_admin_groups_2
 from route.give_auth import give_auth
 from route.give_delete_admin_group import give_delete_admin_group_2
 from route.give_user_ban import give_user_ban
-from route.give_user_check import give_user_check_2
-from route.give_user_check_delete import give_user_check_delete_2
 from route.give_user_fix import give_user_fix
 
 from route.list_acl import list_acl
@@ -56,6 +54,8 @@ from route.list_old_page import list_old_page
 from route.list_please import list_please
 from route.list_title_index import list_title_index
 from route.list_user import list_user
+from route.list_user_check import list_user_check
+from route.list_user_check_delete import list_user_check_delete
 
 from route.login_find import login_find
 from route.login_find_email import login_find_email

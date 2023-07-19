@@ -151,8 +151,57 @@ function do_monaco_to_textarea() {
     }
 }
 
+// https://github.com/microsoft/monaco-editor/issues/568
+class PlaceholderContentWidget {
+    static ID = 'editor.widget.placeholderHint';
+
+    constructor(placeholder, editor) {
+		this.placeholder = placeholder;
+		this.editor = editor;
+        // register a listener for editor code changes
+        editor.onDidChangeModelContent(() => this.onDidChangeModelContent());
+        // ensure that on initial load the placeholder is shown
+        this.onDidChangeModelContent();
+    }
+
+    onDidChangeModelContent() {
+        if (this.editor.getValue() === '') {
+            this.editor.addContentWidget(this);
+        } else {
+            this.editor.removeContentWidget(this);
+        }
+    }
+
+    getId() {
+        return PlaceholderContentWidget.ID;
+    }
+
+    getDomNode() {
+        if (!this.domNode) {
+            this.domNode = document.createElement('div');
+            this.domNode.style.width = 'max-content';
+            this.domNode.textContent = this.placeholder;
+            this.domNode.style.fontStyle = 'italic';
+            this.editor.applyFontInfo(this.domNode);
+        }
+
+        return this.domNode;
+    }
+
+    getPosition() {
+        return {
+            position: { lineNumber: 1, column: 1 },
+            preference: [monaco.editor.ContentWidgetPositionPreference.EXACT],
+        };
+    }
+
+    dispose() {
+        this.editor.removeContentWidget(this);
+    }
+}
+
 function do_monaco_init(monaco_thema) {
-    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.1/min/vs' }});
+    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.40.0/min/vs' }});
     require.config({ 'vs/nls': { availableLanguages: { '*': 'ko' } }});
     require(["vs/editor/editor.main"], function () {
         window.editor = monaco.editor.create(document.getElementById('opennamu_monaco_editor'), {
@@ -162,5 +211,7 @@ function do_monaco_init(monaco_thema) {
             wordWrap: true,
             theme: monaco_thema
         });
+
+        new PlaceholderContentWidget(document.getElementById('opennamu_edit_textarea').placeholder, window.editor);
     });
 }

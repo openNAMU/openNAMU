@@ -1,4 +1,5 @@
 from .tool.func import *
+
 from .api_topic import api_topic
 
 def topic_list(name = 'Test'):
