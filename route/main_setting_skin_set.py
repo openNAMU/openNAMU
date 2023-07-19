@@ -100,6 +100,10 @@ def main_setting_skin_set():
                         <select name="main_css_darkmode">
                             ''' + set_data["main_css_darkmode"] + '''
                         </select>
+                        <h3>''' + load_lang("table_scroll") + '''</h3>
+                        <select name="main_css_table_scroll">
+                            ''' + set_data["main_css_table_scroll"] + '''
+                        </select>
                         <h2>''' + load_lang("edit") + '''</h2>
                         <h3>''' + load_lang("image_paste") + '''</h3>
                         <sup>''' + load_lang('only_korean') + '''</sup> <sup>''' + load_lang('unavailable_in_monaco') + '''</sup>
