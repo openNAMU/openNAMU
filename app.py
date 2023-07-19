@@ -642,6 +642,5 @@ if __name__ == "__main__":
         app,
         host = server_set['host'],
         port = int(server_set['port']),
-        threads = 1,
         clear_untrusted_proxy_headers = True
     )
