@@ -27,7 +27,11 @@ function opennamu_get_main_skin_set(set_name) {
         ) {
             return document.cookie.match(opennamu_cookie_split_regex(set_name))[1];
         } else {
-            return text[set_name][0][0];
+            if(text[set_name]) {
+                return text[set_name][0][0];
+            } else {
+                return '';
+            }
         }
     });
 }

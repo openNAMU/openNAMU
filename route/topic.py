@@ -1,6 +1,8 @@
 from .tool.func import *
 
-from .api_topic import api_topic
+from .api_topic import api_topic, api_topic_thread_pre_render
+
+from .edit import edit_editor
 
 def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
     with get_db_connect() as conn:
@@ -11,6 +13,8 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
         topic_view_acl = acl_check('', 'topic_view', topic_num)
         if topic_view_acl == 1:
             return re_error('/ban')
+
+        ip = ip_check()
 
         if flask.request.method == 'POST' and do_type == '':
             if do_edit_slow_check('thread') == 1:
@@ -38,7 +42,6 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             else:
                 captcha_post('', 0)
 
-            ip = ip_check()
             today = get_time()
 
             if topic_acl == 1:
@@ -77,7 +80,7 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                 add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
 
             data = flask.request.form.get('content', 'Test').replace('\r', '')
-            data = get_thread_pre_render(data, num, ip, topic_num, name, sub)
+            data = api_topic_thread_pre_render(curs, data, num, ip, topic_num, name, sub)
 
             do_add_thread(
                 topic_num,
@@ -175,15 +178,13 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                             <hr class="main_hr">
                         </div>
                         
-                        <div>''' + edit_button('opennamu_edit_textarea') + '''</div>
-
-                        <textarea id="opennamu_edit_textarea" class="opennamu_textarea_100" placeholder="''' + topic_text + '''" name="content">''' + html.escape(thread_data) + '''</textarea>
+                        ''' + edit_editor(curs, ip, thread_data, 'thread') + '''
                         <hr class="main_hr">
                         
                         ''' + captcha_get() + ip_warning() + '''
                         
-                        <button id="opennamu_save_button" formaction="/thread/''' + topic_num + '''" type="submit">''' + load_lang('send') + '''</button>
-                        <button id="opennamu_preview_button" formaction="/thread_preview/''' + topic_num + '''#opennamu_edit_textarea" type="submit">''' + load_lang('preview') + '''</button>
+                        <button id="opennamu_save_button" formaction="/thread/''' + topic_num + '''" type="submit" onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('send') + '''</button>
+                        <button id="opennamu_preview_button" formaction="/thread_preview/''' + topic_num + '''#opennamu_edit_textarea" type="submit" onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('preview') + '''</button>
                     </form>
                     <hr class="main_hr">
                     
