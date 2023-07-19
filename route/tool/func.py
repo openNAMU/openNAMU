@@ -1404,6 +1404,10 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                         </style>
                     '''
 
+                table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip_check())
+                if table_set_data == 'on':
+                    get_class_render[0] += '<style>.table_safe { overflow-x: scroll; white-space: nowrap; }</style>'
+
                 if data_type == 'api_view' or data_type == 'api_thread':
                     return [
                         get_class_render[0], 

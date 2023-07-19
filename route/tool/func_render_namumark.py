@@ -2183,10 +2183,6 @@ class class_do_render_namumark:
 
         self.render_data = re.sub(r'<a fn_target="([^"]+)"', do_render_last_footnote, self.render_data)
 
-        table_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_table_scroll', self.ip)
-        if table_set_data == 'on':
-            self.render_data += '<style>.table_safe { overflow-x: scroll; max-width: none; white-space: nowrap; }</style>'
-
         self.render_data = self.render_data_cdn + self.render_data
 
     def __call__(self):
