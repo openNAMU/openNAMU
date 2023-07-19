@@ -28,6 +28,10 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit'):
     editor_display = ''
     add_get_file = ''
     monaco_display = ''
+
+    curs.execute(db_change('select data from other where name = "edit_help"'))
+    sql_d = curs.fetchall()
+    p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
     
     monaco_on = get_main_skin_set(curs, flask.session, 'main_css_monaco', ip)
     if monaco_on == 'use':
@@ -50,10 +54,6 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit'):
     else:
         monaco_display = 'style="display: none;"'
         add_script = 'opennamu_edit_turn_off_monaco();'
-
-    curs.execute(db_change('select data from other where name = "edit_help"'))
-    sql_d = curs.fetchall()
-    p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
 
     if do_type == 'edit':
         textarea_size = 'opennamu_textarea_500'
