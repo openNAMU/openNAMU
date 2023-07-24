@@ -1,7 +1,7 @@
 from .func_tool import *
 
 class class_do_render_namumark:
-    def __init__(self, curs, doc_name, doc_data, doc_set, lang_data):
+    def __init__(self, curs, doc_name, doc_data, doc_set, lang_data, footnote = {}):
         self.curs = curs
         
         self.doc_data = doc_data.replace('\r', '')
@@ -30,7 +30,6 @@ class class_do_render_namumark:
         except:
             self.darkmode = '0'
 
-
         self.data_temp_storage = {}
         self.data_temp_storage_count = 0
 
@@ -42,6 +41,7 @@ class class_do_render_namumark:
         
         self.data_toc = ''
         self.data_footnote = {}
+        self.data_footnote_all = {}
         self.data_category = ''
         self.data_category_list = []
 
@@ -152,10 +152,7 @@ class class_do_render_namumark:
 
         return data
 
-    def get_tool_footnote_make(self):
-        footnote_number_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_number', self.ip)
-        footnote_number_view_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_view_real_footnote_num', self.ip)
-    
+    def get_tool_footnote_make(self):    
         data = ''
         for for_a in self.data_footnote:
             if data == '':
@@ -176,6 +173,7 @@ class class_do_render_namumark:
         if data != '':
             data += '</div>'
 
+        self.data_footnote_all.update(self.data_footnote)
         self.data_footnote = {}
 
         return data
@@ -316,14 +314,14 @@ class class_do_render_namumark:
         while 1:
             heading_count += 1
 
-            if not re.search(heading_regex, self.render_data):
+            heading_data = re.search(heading_regex, self.render_data)
+            if not heading_data:
                 break
             elif heading_count_all < 0:
                 print('Error : render heading count overflow')
 
                 break
             else:
-                heading_data = re.search(heading_regex, self.render_data)
                 heading_data_org = heading_data.group(0)
                 heading_data = heading_data.groups()
 
@@ -635,7 +633,7 @@ class class_do_render_namumark:
                 return '<macro>' + match[0] + '(' + match[1] + ')' + '</macro>'
 
         # double macro replace
-        self.render_data = re.sub(r'\[([^[(]+)\(([^()]+)\)\]', do_render_macro_double, self.render_data)
+        self.render_data = re.sub(r'\[([^[(\]]+)\(((?:(?!\)\]).)+)\)\]', do_render_macro_double, self.render_data)
 
         # single macro function
         def do_render_macro_single(match):
@@ -709,8 +707,8 @@ class class_do_render_namumark:
 
             return '<' + data_name + '></' + data_name + '>'
 
-        math_regex = re.compile('\[math\(((?:(?!\[math\(|\)\]).|\n)+)\)\]', re.I)
-        math_regex_2 = re.compile('&lt;math&gt;((?:(?!&lt;math&gt;|&lt;\/math&gt;).)+)&lt;\/math&gt;', re.I)
+        math_regex = re.compile(r'\[math\(((?:(?!\[math\(|\)\]).|\n)+)\)\]', re.I)
+        math_regex_2 = re.compile(r'&lt;math&gt;((?:(?!&lt;math&gt;|&lt;\/math&gt;).)+)&lt;\/math&gt;', re.I)
 
         self.render_data = re.sub(math_regex_2, do_render_math_sub, self.render_data)
         self.render_data = re.sub(math_regex, do_render_math_sub, self.render_data)
@@ -720,7 +718,8 @@ class class_do_render_namumark:
         image_count = 0
         link_count_all = len(re.findall(link_regex, self.render_data)) * 4
         while 1:
-            if not re.search(link_regex, self.render_data):
+            link_data = re.search(link_regex, self.render_data)
+            if not link_data:
                 break
             elif link_count_all < 0:
                 print('Error : render link count overflow')
@@ -728,7 +727,6 @@ class class_do_render_namumark:
                 break
             else:
                 # link split
-                link_data = re.search(link_regex, self.render_data)
                 link_data_full = link_data.group(0)
                 link_data = link_data.groups()
 
@@ -743,6 +741,7 @@ class class_do_render_namumark:
                     file_bgcolor = ''
                     file_turn = ''
                     file_radius = ''
+                    file_rendering = ''
 
                     file_split_regex = r'(?:^|&amp;) *((?:(?!&amp;).)+)'
                     file_split_sub_regex = r'(^[^=]+) *= *([^=]+)'
@@ -768,6 +767,9 @@ class class_do_render_namumark:
                                         file_turn = 'light'
                                 elif data_sub[0] == 'border-radius':
                                     file_radius = self.get_tool_px_add_check(data_sub[1])
+                                elif data_sub[0] == 'rendering':
+                                    if data_sub[1] == 'pixelated':
+                                        file_rendering = 'pixelated'
 
                     link_main_org = ''
                     link_sub = link_main
@@ -828,11 +830,16 @@ class class_do_render_namumark:
                     if file_radius != '':
                         file_radius = 'border-radius:' + self.get_tool_css_safe(file_radius) + ';'
 
+                    if file_rendering != '':
+                        file_rendering = 'image-rendering:' + self.get_tool_css_safe(file_rendering) + ';'
+
+                    file_style = file_width + file_height + file_align_style + file_bgcolor + file_radius + file_rendering
+
                     image_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_image_set', self.ip)
                     if image_set == 'new_click' or image_set == 'click':
-                        file_end = '<img style="' + file_width + file_height + file_align_style + file_bgcolor + file_radius + '" id="opennamu_image_' + str(image_count) + '" alt="' + link_sub + '" src="">'
+                        file_end = '<img style="' + file_style + '" id="opennamu_image_' + str(image_count) + '" alt="' + link_sub + '" src="">'
                     else:
-                        file_end = '<img style="' + file_width + file_height + file_align_style + file_bgcolor + file_radius + '" alt="' + link_sub + '" src="' + link_main + '">'
+                        file_end = '<img style="' + file_style + '" alt="' + link_sub + '" src="' + link_main + '">'
 
                     if file_align == 'center':
                         file_end = '<div style="text-align:center;">' + file_end + '</div>'
@@ -978,8 +985,11 @@ class class_do_render_namumark:
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_title = link_main
                     link_main = html.unescape(link_main)
+
                     link_main = re.sub(r'"', '&quot;', link_main)
-                    
+                    link_main = re.sub(r'<', '&lt;', link_main)
+                    link_main = re.sub(r'>', '&gt;', link_main)
+
                     # sub not exist -> sub = main
                     if link_data[1]:
                         link_sub = link_data[1]
@@ -1114,7 +1124,7 @@ class class_do_render_namumark:
 
         include_num = 0
         include_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_include_link', self.ip)
-        include_regex = re.compile('\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\]', re.I)
+        include_regex = re.compile(r'\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\]', re.I)
         include_count_max = len(re.findall(include_regex, self.render_data)) * 2
         include_change_list = {}
         while 1:
@@ -1146,9 +1156,10 @@ class class_do_render_namumark:
                             
                             data_sub_name = data_sub[0]
                             data_sub_data = self.get_tool_data_restore(data_sub[1], do_type = 'slash')
+                            data_sub_data = html.unescape(data_sub_data)
                             
-                            data_sub_data = re.sub(r'^(?P<in>분류|category):', ':\g<in>:', data_sub_data)
-                            data_sub_data = re.sub(r'^(?P<in>파일|file):', ':\g<in>:', data_sub_data)
+                            data_sub_data = re.sub(r'^(?P<in>분류|category):', ':\\g<in>:', data_sub_data)
+                            data_sub_data = re.sub(r'^(?P<in>파일|file):', ':\\g<in>:', data_sub_data)
 
                             include_change_list[data_sub_name] = data_sub_data
                         else:
@@ -1202,7 +1213,7 @@ class class_do_render_namumark:
         footnote_number_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_number', self.ip)
         footnote_number_view_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_view_real_footnote_num', self.ip)
 
-        footnote_regex = re.compile('(?:\[\*((?:(?!\[\*|\]| ).)+)?(?: ((?:(?!\[\*|\]).)+))?\]|\[(각주|footnote)\])', re.I)
+        footnote_regex = re.compile(r'(?:\[\*((?:(?!\[\*|\]| ).)+)?(?: ((?:(?!\[\*|\]).)+))?\]|\[(각주|footnote)\])', re.I)
         footnote_count_all = len(re.findall(footnote_regex, self.render_data)) * 4
         while 1:
             footnote_num += 1
@@ -1236,9 +1247,15 @@ class class_do_render_namumark:
                     rfn = ''
                     foot_v_name = ''
 
-                    if footnote_name in self.data_footnote:
-                        self.data_footnote[footnote_name]['list'] += [footnote_num_str]
-                        footnote_first = self.data_footnote[footnote_name]['list'][0]
+                    if footnote_name in self.data_footnote_all or footnote_name in self.data_footnote:
+                        if footnote_name in self.data_footnote:
+                            self.data_footnote[footnote_name]['list'] += [footnote_num_str]
+                            footnote_first = self.data_footnote[footnote_name]['list'][0]
+                        else:
+                            self.data_footnote[footnote_name] = {}
+                            self.data_footnote[footnote_name]['list'] = [footnote_num_str]
+                            self.data_footnote[footnote_name]['data'] = footnote_text_data
+                            footnote_first = self.data_footnote_all[footnote_name]['list'][0]
 
                         fn = self.doc_include + 'fn_' + footnote_first
                         rfn = self.doc_include + 'rfn_' + footnote_num_str
@@ -1457,7 +1474,7 @@ class class_do_render_namumark:
 
             return table_parameter_all
 
-        table_regex = re.compile('\n((?:(?:(?:(?:\|\|)+)|(?:\|[^|]+\|(?:\|\|)*))\n?(?:(?:(?!\|\|).)+))(?:(?:\|\||\|\|\n|(?:\|\|)+(?!\n)(?:(?:(?!\|\|).)+)\n*)*)\|\|)\n', re.DOTALL)
+        table_regex = re.compile(r'\n((?:(?:(?:(?:\|\|)+)|(?:\|[^|]+\|(?:\|\|)*))\n?(?:(?:(?!\|\|).)+))(?:(?:\|\||\|\|\n|(?:\|\|)+(?!\n)(?:(?:(?!\|\|).)+)\n*)*)\|\|)\n', re.DOTALL)
         table_sub_regex = r'(\n?)((?:\|\|)+)((?:&lt;(?:(?:(?!&lt;|&gt;).)+)&gt;)*)((?:\n*(?:(?:(?:(?!\|\|).)+)\n*)+)|(?:(?:(?!\|\|).)*))'
         table_caption_regex = r'^\|([^|]+)\|'
         table_count_all = len(re.findall(table_regex, self.render_data)) * 2
@@ -1532,7 +1549,7 @@ class class_do_render_namumark:
                 table_data_end = '<table class="' + table_parameter['class'] + '" style="' + table_parameter['table'] + '">' + table_caption + table_data_end + '</table>'
                 table_data_end = '<div class="table_safe" style="' + table_parameter['div'] + '">' + table_data_end + '</div>'
 
-                self.render_data = re.sub(table_regex, lambda x : ('\n<front_br>' + table_data_end + '<back_br>\n'), self.render_data, 1)
+                self.render_data = re.sub(table_regex, lambda x : ('\n<front_br>' + table_data_end + '\n'), self.render_data, 1)
 
             table_count_all -= 1
     
@@ -1660,7 +1677,11 @@ class class_do_render_namumark:
 
                         if syntax_count == 0:
                             self.render_data_js += 'hljs.highlightAll();\n'
-                            self.render_data_cdn += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+                            if self.darkmode == '0':
+                                self.render_data_cdn += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+                            else:
+                                self.render_data_cdn += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+
                             self.render_data_cdn += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
                             self.render_data_cdn += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
 
@@ -1789,7 +1810,7 @@ class class_do_render_namumark:
 
             middle_count_all -= 1
 
-        self.render_data = re.sub(r'<temp_(?P<in>(?:slash)_(?:[0-9]+))>', '<\g<in>>', self.render_data)
+        self.render_data = re.sub(r'<temp_(?P<in>(?:slash)_(?:[0-9]+))>', '<\\g<in>>', self.render_data)
 
     def do_render_hr(self):
         hr_regex = r'\n-{4,9}\n'
@@ -1805,7 +1826,8 @@ class class_do_render_namumark:
 
             hr_count_max -= 1
 
-    def do_render_list(self):        
+    def do_render_list(self):
+        # 인용문
         quote_regex = r'((?:\n&gt; *[^\n]*)+)\n'
         quote_count = 0
         quote_count_max = len(re.findall(quote_regex, self.render_data)) * 10
@@ -1819,7 +1841,7 @@ class class_do_render_namumark:
                 quote_data_org = quote_data.group(0)
                 
                 quote_data = quote_data.group(1)
-                quote_data = re.sub(r'\n&gt; *(?P<in>[^\n]*)', '\g<in>\n', quote_data)
+                quote_data = re.sub(r'\n&gt; *(?P<in>[^\n]*)', '\\g<in>\n', quote_data)
                 quote_data = re.sub(r'\n$', '', quote_data)
                 quote_data = self.get_tool_data_revert(quote_data)
                 quote_data = html.unescape(quote_data)
@@ -1833,18 +1855,19 @@ class class_do_render_namumark:
             quote_count_max -= 1
             quote_count += 1
 
+        # 일반 리스트
+        list_style = {
+            1 : 'opennamu_list_1',
+            2 : 'opennamu_list_2',
+            3 : 'opennamu_list_3',
+            4 : 'opennamu_list_4'
+        }
         def do_render_list_sub(match):
             list_data = match.group(2)
             list_len = len(match.group(1))
             if list_len == 0:
                 list_len = 1
 
-            list_style = {
-                1 : 'opennamu_list_1',
-                2 : 'opennamu_list_2',
-                3 : 'opennamu_list_3',
-                4 : 'opennamu_list_4'
-            }
             list_style_data = 'opennamu_list_5'
             if list_len in list_style:
                 list_style_data = list_style[list_len]
@@ -1864,6 +1887,173 @@ class class_do_render_namumark:
                 list_sub_regex = r'\n( *)\* ?([^\n]*)'
 
                 list_data = re.sub(list_sub_regex, do_render_list_sub, list_data)
+
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
+
+            list_count_max -= 1
+
+        # 기타 리스트 공통 파트
+        def int_to_alpha(num):
+            alpha_list = string.ascii_lowercase
+            alpha_len = len(alpha_list)
+            end_text = ''
+
+            while num:
+                end_text = alpha_list[num % alpha_len - 1] + end_text
+                num = num // alpha_len
+
+            return end_text
+ 
+        # https://www.geeksforgeeks.org/python-program-to-convert-integer-to-roman/
+        def int_to_roman(number):
+            num = [1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000]
+            sym = ["I", "IV", "V", "IX", "X", "XL", "L", "XC", "C", "CD", "D", "CM", "M"]
+            i = 12
+            end_text = ''
+
+            while number:
+                div = number // num[i]
+                number %= num[i]
+        
+                while div:
+                    end_text += sym[i]
+                    div -= 1
+
+                i -= 1
+
+            return end_text
+        
+        class do_render_list_int_to:
+            def __init__(self, do_type):
+                self.list_num = []
+                self.do_type = do_type
+
+            def __call__(self, match):
+                list_data = match.group(3)
+                list_start = match.group(2)
+                list_len = len(match.group(1))
+                if list_len == 0:
+                    list_len = 1
+
+                if len(self.list_num) >= list_len:
+                    self.list_num[list_len - 1] += 1
+
+                    for for_a in range(list_len, len(self.list_num)):
+                        self.list_num[for_a] = 0
+                else:
+                    self.list_num += [1] * (list_len - len(self.list_num))
+
+                if list_start:
+                    self.list_num[list_len - 1] = int(list_start)
+
+                if self.do_type == 'int':
+                    change_text = str(self.list_num[list_len - 1])
+                elif self.do_type == 'roman_big':
+                    change_text = int_to_roman(self.list_num[list_len - 1])
+                elif self.do_type == 'roman_small':
+                    change_text = int_to_roman(self.list_num[list_len - 1]).lower()
+                elif self.do_type == 'alpha_big':
+                    change_text = int_to_alpha(self.list_num[list_len - 1])
+                else:
+                    change_text = int_to_alpha(self.list_num[list_len - 1]).upper()
+
+                return '<li style="margin-left: ' + str((list_len - 1) * 20) + 'px;" class="opennamu_list_none">' + change_text + '. ' + list_data + '</li>'
+
+        # 숫자 리스트
+        list_regex = r'((?:\n *1\. ?[^\n]*)+)\n'
+        list_count_max = len(re.findall(list_regex, self.render_data)) * 3
+        while 1:
+            list_data = re.search(list_regex, self.render_data)
+            if list_count_max < 0:
+                break
+            elif not list_data:
+                break
+            else:
+                list_data = list_data.group(1)
+                list_sub_regex = r'\n( *)1\.(?:#([0-9]*))? ?([^\n]*)'
+
+                list_class = do_render_list_int_to('int')
+                list_data = re.sub(list_sub_regex, list_class, list_data)
+
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
+
+            list_count_max -= 1
+
+        # 소문자 리스트
+        list_regex = r'((?:\n *a\. ?[^\n]*)+)\n'
+        list_count_max = len(re.findall(list_regex, self.render_data)) * 3
+        while 1:
+            list_data = re.search(list_regex, self.render_data)
+            if list_count_max < 0:
+                break
+            elif not list_data:
+                break
+            else:
+                list_data = list_data.group(1)
+                list_sub_regex = r'\n( *)a.(?:#([0-9]*))? ?([^\n]*)'
+
+                list_class = do_render_list_int_to('alpha_small')
+                list_data = re.sub(list_sub_regex, list_class, list_data)
+
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
+
+            list_count_max -= 1
+
+        # 대문자 리스트
+        list_regex = r'((?:\n *A\. ?[^\n]*)+)\n'
+        list_count_max = len(re.findall(list_regex, self.render_data)) * 3
+        while 1:
+            list_data = re.search(list_regex, self.render_data)
+            if list_count_max < 0:
+                break
+            elif not list_data:
+                break
+            else:
+                list_data = list_data.group(1)
+                list_sub_regex = r'\n( *)A.(?:#([0-9]*))? ?([^\n]*)'
+
+                list_class = do_render_list_int_to('alpha_big')
+                list_data = re.sub(list_sub_regex, list_class, list_data)
+
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
+
+            list_count_max -= 1
+
+        # 로마자 대문자 리스트
+        list_regex = r'((?:\n *I\. ?[^\n]*)+)\n'
+        list_count_max = len(re.findall(list_regex, self.render_data)) * 3
+        while 1:
+            list_data = re.search(list_regex, self.render_data)
+            if list_count_max < 0:
+                break
+            elif not list_data:
+                break
+            else:
+                list_data = list_data.group(1)
+                list_sub_regex = r'\n( *)I.(?:#([0-9]*))? ?([^\n]*)'
+
+                list_class = do_render_list_int_to('roman_big')
+                list_data = re.sub(list_sub_regex, list_class, list_data)
+
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
+
+            list_count_max -= 1
+
+        # 로마자 소문자 리스트
+        list_regex = r'((?:\n *i\. ?[^\n]*)+)\n'
+        list_count_max = len(re.findall(list_regex, self.render_data)) * 3
+        while 1:
+            list_data = re.search(list_regex, self.render_data)
+            if list_count_max < 0:
+                break
+            elif not list_data:
+                break
+            else:
+                list_data = list_data.group(1)
+                list_sub_regex = r'\n( *)i.(?:#([0-9]*))? ?([^\n]*)'
+
+                list_class = do_render_list_int_to('roman_small')
+                list_data = re.sub(list_sub_regex, list_class, list_data)
 
                 self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
 
@@ -1973,7 +2163,7 @@ class class_do_render_namumark:
                 toc_data_on == 1:
                 self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
             else:
-                self.render_data = re.sub(r'(?P<in><h[1-6] id="[^"]*">)', '<br>' + self.data_toc + '\g<in>', self.render_data, 1)
+                self.render_data = re.sub(r'(?P<in><h[1-6] id="[^"]*">)', '<br>' + self.data_toc + '\\g<in>', self.render_data, 1)
         else:
             self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
             self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
@@ -1981,7 +2171,7 @@ class class_do_render_namumark:
         def do_render_last_footnote(match):
             match = match.group(1)
 
-            find_regex = re.compile('<footnote_title id="' + match + '_title">((?:(?!<footnote_title|<\/footnote_title>).)*)<\/footnote_title>')
+            find_regex = re.compile(r'<footnote_title id="' + match + r'_title">((?:(?!<footnote_title|<\/footnote_title>).)*)<\/footnote_title>')
             find_data = re.search(find_regex, self.render_data)
             if find_data:
                 find_data = find_data.group(1)
@@ -2008,10 +2198,10 @@ class class_do_render_namumark:
             self.do_render_list()
             self.do_render_macro()
             self.do_render_link()
-            self.do_redner_footnote()
             self.do_render_text()
             self.do_render_hr()
             self.do_render_heading()
+            self.do_redner_footnote()
             
         self.do_render_last()
 
@@ -2020,6 +2210,7 @@ class class_do_render_namumark:
             self.render_data_js, # js
             {
                 'backlink' : self.data_backlink, # backlink
-                'include' : list(reversed(self.data_include)) # include data
+                'include' : list(reversed(self.data_include)), # include data
+                'footnote' : self.data_footnote_all # footnote
             } # other
         ]

@@ -1,4 +1,5 @@
 from .func_tool import *
+
 from .func_render_namumark import class_do_render_namumark
 
 # 커스텀 마크 언젠간 다시 추가 예정
@@ -19,21 +20,24 @@ class class_do_render:
         curs = self.conn.cursor()
 
         doc_set = {}
-        if data_in == 'from':
-            data_in = ''
+        if data_type == 'from':
             doc_set['doc_from'] = 'O'
+            data_type = 'view'
         
         data_in = (data_in + '_') if data_in != '' else ''
         doc_set['doc_include'] = data_in
+        rep_data = ''
 
-        curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [doc_name])
-        rep_data = curs.fetchall()
-        if rep_data and rep_data[0][0] != '':
-            rep_data = rep_data[0][0]
-        else:
+        if rep_data == '' and doc_name != '':
+            curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [doc_name])
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '' and db_data[0][0] != 'normal':
+                rep_data = db_data[0][0]
+
+        if rep_data == '':
             curs.execute(db_change('select data from other where name = "markup"'))
-            rep_data = curs.fetchall()
-            rep_data = rep_data[0][0] if rep_data else 'namumark'
+            db_data = curs.fetchall()
+            rep_data = db_data[0][0] if db_data else 'namumark'
 
         if rep_data == 'namumark' or rep_data == 'namumark_beta':
             data_end = class_do_render_namumark(
@@ -55,6 +59,30 @@ class class_do_render:
                 '', 
                 {}
             ]
+
+        if data_type == 'thread' or data_type == 'api_thread':
+            def do_thread_a_change(match):
+                data = match[2].replace('#', '')
+                data_split = data.split('-')
+                if match[1] == 'topic_a' or len(data_split) == 1:
+                    return '<a href="' + match[2] + '">' + match[2] + '</a>'
+                elif match[1] == 'topic_a_post' and len(data_split) == 3:
+                    return '<a href="/bbs/w/' + data_split[2] + '/' + data_split[1] + '#' + data_split[0] + '">#' + data_split[0] + '-' + data_split[1] + '</a>'
+                elif len(data_split) == 2:
+                    return '<a href="/thread/' + data_split[1] + '#' + data_split[0] + '">' + match[2] + '</a>'
+                else:
+                    return ''
+
+            data_end[0] = re.sub(
+                r'&lt;(topic_a(?:_post|_thread)?)&gt;((?:(?!&lt;\/topic_a(?:_post|_thread)?&gt;).)+)&lt;\/topic_a(?:_post|_thread)?&gt;',
+                do_thread_a_change,
+                data_end[0]
+            )
+            data_end[0] = re.sub(
+                r'&lt;topic_call&gt;@(?P<in>(?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;',
+                '<a href="/w/user:\\g<in>">@\\g<in></a>',
+                data_end[0]
+            )
 
         if data_type == 'backlink':
             if 'backlink' in data_end[2]:

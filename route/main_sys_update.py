@@ -1,3 +1,6 @@
+import zipfile
+import urllib.request
+
 from .tool.func import *
 
 def main_sys_update():

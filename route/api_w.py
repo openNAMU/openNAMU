@@ -11,8 +11,7 @@ def api_w(name = 'Test', tool = '', rev = ''):
                 data_pas = render_set(
                     doc_name = name, 
                     doc_data = data_org, 
-                    data_type = 'api_view',
-                    data_in = ''
+                    data_type = 'api_view'
                 )
 
                 return flask.jsonify({

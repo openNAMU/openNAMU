@@ -47,8 +47,7 @@ def recent_history_add(name = 'Test', do_type = ''):
 
                 data_preview = render_set(
                     doc_name = name, 
-                    doc_data = data,
-                    data_in = ''
+                    doc_data = data
                 )
             
             return easy_minify(flask.render_template(skin_check(),

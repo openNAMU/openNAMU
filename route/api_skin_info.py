@@ -1,3 +1,5 @@
+import urllib.request
+
 from .tool.func import *
 
 def api_skin_info(name = ''):
@@ -58,7 +60,6 @@ def api_skin_info(name = ''):
                                 json_data = {**json_data, **{ "lastest_version" : {
                                     "skin_ver" : get_data["skin_ver"]
                                 }}}
-
 
                     a_data = {**a_data, **{ i : json_data }}
 

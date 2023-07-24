@@ -337,6 +337,10 @@ input, textarea, button, select {
     background-color: white;
 }
 
+input, textarea {
+    width: calc(100% - 20px);
+}
+
 #main_data button:hover {
     background-color: #eee;
 
@@ -393,4 +397,8 @@ input, textarea, button, select {
 
 #nav_bar a {
     color: black;
+}
+
+pre#syntax, pre#syntax code {
+    border: 0;
 }

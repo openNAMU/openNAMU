@@ -4,6 +4,7 @@ import os
 import platform
 import urllib
 import zipfile
+import urllib.request
 
 from route.tool.func import *
 
@@ -25,7 +26,7 @@ if data_db_load == 'Y':
     curs = conn.cursor()
 else:
     print('----')
-    print('You can use [9, 11]')
+    print('You can use [9, 11, 19]')
 
 # Main
 print('----')
@@ -49,6 +50,8 @@ print('18. Change wiki access password')
 print('19. Forced update')
 print('20. Change domain')
 print('21. Change TLS')
+print('22. Delete body top')
+print('23. Delete body bottom')
 
 print('----')
 what_i_do = input('Select : ')
@@ -249,6 +252,10 @@ elif what_i_do == '21':
 
     curs.execute(db_change('delete from other where name = "http_select"'))
     curs.execute(db_change('insert into other (name, data, coverage) values ("http_select", ?, "")'), [tls_v])
+elif what_i_do == '22':
+    curs.execute(db_change('delete from other where name = "body"'))
+elif what_i_do == '23':
+    curs.execute(db_change('delete from other where name = "bottom_body"'))
 else:
     raise ValueError(what_i_do)
 

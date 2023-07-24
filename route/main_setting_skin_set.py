@@ -1,4 +1,5 @@
 from .tool.func import *
+
 from .user_setting_skin_set_main import user_setting_skin_set_main_set_list
 
 def main_setting_skin_set():
@@ -98,6 +99,10 @@ def main_setting_skin_set():
                         <h3>''' + load_lang("force_darkmode") + ''' (''' + load_lang("not_working") + ''')</h3>
                         <select name="main_css_darkmode">
                             ''' + set_data["main_css_darkmode"] + '''
+                        </select>
+                        <h3>''' + load_lang("table_scroll") + '''</h3>
+                        <select name="main_css_table_scroll">
+                            ''' + set_data["main_css_table_scroll"] + '''
                         </select>
                         <h2>''' + load_lang("edit") + '''</h2>
                         <h3>''' + load_lang("image_paste") + '''</h3>

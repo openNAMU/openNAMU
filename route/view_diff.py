@@ -60,7 +60,7 @@ def view_diff(name = 'Test', num_a = 1, num_b = 1):
 
                         temp_list += [[line, for_a[0], for_a[1]]]
 
-                result = '<table style="width: 100%;"><tr><td colspan="2">r' + first + ' ➤ r' + second + '</td></tr>'
+                result = '<table style="width: 100%; white-space: pre-wrap;"><tr><td colspan="2">r' + first + ' ➤ r' + second + '</td></tr>'
                 result += '<tr><td style="width: 40px; user-select: none;">'
 
                 # 개행만 추가된 경우 조정 필요
@@ -76,11 +76,11 @@ def view_diff(name = 'Test', num_a = 1, num_b = 1):
                             result += '</td></tr><tr><td style="width: 40px; user-select: none;">' + str(line) + '</td><td>'
 
                     if for_a[1] == 1:
-                        result += '<span style="background: #eaf2c2;">' + for_a[2] + '</span>'
+                        result += '<span style="background: #eaf2c2;">' + html.escape(for_a[2]) + '</span>'
                     elif for_a[1] == 0:
-                        result += for_a[2]
+                        result += html.escape(for_a[2])
                     else:
-                        result += '<span style="background: #fadad7;">' + for_a[2] + '</span>'
+                        result += '<span style="background: #fadad7;">' + html.escape(for_a[2]) + '</span>'
 
                 result += '</td></tr></table>'
 
