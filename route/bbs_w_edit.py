@@ -127,7 +127,7 @@ def bbs_w_edit(bbs_num = '', post_num = '', do_type = ''):
                         <input placeholder="''' + load_lang('title') + '''" name="title" value="''' + html.escape(title) + '''">
                         <hr class="main_hr">
 
-                        ''' + edit_editor(curs, ip, data) + '''
+                        ''' + edit_editor(curs, ip, data, 'bbs') + '''
                         <hr class="main_hr">
                         
                         ''' + captcha_get() + ip_warning() + '''

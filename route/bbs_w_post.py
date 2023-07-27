@@ -184,7 +184,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                 bbs_comment_form = ''
                 if bbs_comment_acl == 0:
                     bbs_comment_form += '''                        
-                        ''' + edit_editor(curs, ip, text, 'thread') + '''
+                        ''' + edit_editor(curs, ip, text, 'bbs_comment') + '''
                         <hr class="main_hr">
                         
                         ''' + captcha_get() + ip_warning() + '''
@@ -343,7 +343,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                         ''' + comment_select + ''' <a href="javascript:opennamu_return_comment();">(R)</a>
                         <hr class="main_hr">
                         
-                        ''' + edit_editor(curs, ip, text, 'thread') + '''
+                        ''' + edit_editor(curs, ip, text, 'bbs_comment') + '''
                         <hr class="main_hr">
                         
                         ''' + captcha_get() + ip_warning() + '''
