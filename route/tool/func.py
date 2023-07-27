@@ -1634,7 +1634,6 @@ def captcha_post(re_data, num = 1):
                     )
                     
                 if data.status_code == 200:
-                    print(data.text)
                     json_data = json.loads(data.text)
                     if json_data['success'] != True:
                         return 1
