@@ -127,7 +127,7 @@ def main_setting_phrase():
                         <textarea class="opennamu_textarea_100" name="''' + i_list[20] + '''">''' + html.escape(d_list[20]) + '''</textarea>
                         
                         <h2>''' + load_lang('bbs_help') + '''</h2>
-                        <textarea class="opennamu_textarea_100" name="''' + i_list[13] + '''">''' + html.escape(d_list[22]) + '''</textarea>
+                        <textarea class="opennamu_textarea_100" name="''' + i_list[21] + '''">''' + html.escape(d_list[21]) + '''</textarea>
 
                         <hr class="main_hr">
                         <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
