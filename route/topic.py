@@ -134,10 +134,6 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
 
             acl_display = 'display: none;' if topic_acl == 1 else ''
             name_display = 'display: none;' if topic_num != '0' else ''
-                
-            curs.execute(db_change('select data from other where name = "topic_text"'))
-            sql_d = curs.fetchall()
-            topic_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('content')
 
             shortcut = '<div class="opennamu_thread_shortcut" id="thread_shortcut">'
             curs.execute(db_change(

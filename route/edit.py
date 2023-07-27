@@ -29,8 +29,24 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit'):
     add_get_file = ''
     monaco_display = ''
 
-    curs.execute(db_change('select data from other where name = "edit_help"'))
-    sql_d = curs.fetchall()
+    if do_type == 'edit':
+        curs.execute(db_change('select data from other where name = "edit_help"'))
+        sql_d = curs.fetchall()
+    elif do_type == 'bbs':
+        curs.execute(db_change('select data from other where name = "bbs_help"'))
+        sql_d = curs.fetchall()
+    elif do_type == 'bbs_comment':
+        curs.execute(db_change('select data from other where name = "bbs_comment_help"'))
+        sql_d = curs.fetchall()
+    else:
+        curs.execute(db_change('select data from other where name = "topic_text"'))
+        sql_d = curs.fetchall()
+
+    if do_type == 'bbs_comment':
+        do_type = 'thread'
+    elif do_type == 'bbs':
+        do_type = 'edit'
+            
     p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
     
     monaco_on = get_main_skin_set(curs, flask.session, 'main_css_monaco', ip)
