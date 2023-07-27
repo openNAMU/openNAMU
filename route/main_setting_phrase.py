@@ -29,7 +29,8 @@ def main_setting_phrase():
             'phrase_user_page_admin',
             'phrase_user_page_owner',
             'phrase_old_page_warring',
-            'bbs_help'
+            'bbs_help',
+            'bbs_comment_help'
         ]
         if flask.request.method == 'POST':
             for i in i_list:
@@ -127,7 +128,10 @@ def main_setting_phrase():
                         <textarea class="opennamu_textarea_100" name="''' + i_list[20] + '''">''' + html.escape(d_list[20]) + '''</textarea>
                         
                         <h2>''' + load_lang('bbs_help') + '''</h2>
-                        <textarea class="opennamu_textarea_100" name="''' + i_list[13] + '''">''' + html.escape(d_list[22]) + '''</textarea>
+                        <textarea class="opennamu_textarea_100" name="''' + i_list[21] + '''">''' + html.escape(d_list[21]) + '''</textarea>
+
+                        <h2>''' + load_lang('bbs_comment_help') + '''</h2>
+                        <textarea class="opennamu_textarea_100" name="''' + i_list[22] + '''">''' + html.escape(d_list[22]) + '''</textarea>
 
                         <hr class="main_hr">
                         <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
