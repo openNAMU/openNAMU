@@ -11,7 +11,7 @@ document.onkeypress = function(e) {
         shortcut_check !== 'input' &&
         shortcut_check !== 'textarea'
     ) {
-        let doc_shortcut = /^\/(w|w_rev|w_from|history|edit|acl|topic|xref)\//i;
+        let doc_shortcut = /^\/(w|w_rev\/[0-9]+|w_from|history|edit|acl|topic|xref)\//i;
 
         shortcut_key_list[e.key] = 1;
         if(shortcut_key_list['f'] === 1) {

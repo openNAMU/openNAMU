@@ -1960,7 +1960,7 @@ class class_do_render_namumark:
                 return '<li style="margin-left: ' + str((list_len - 1) * 20) + 'px;" class="opennamu_list_none">' + change_text + '. ' + list_data + '</li>'
 
         # 숫자 리스트
-        list_regex = r'((?:\n *1\. ?[^\n]*)+)\n'
+        list_regex = r'((?:\n *1\. ?[^\n]*){2,})\n'
         list_count_max = len(re.findall(list_regex, self.render_data)) * 3
         while 1:
             list_data = re.search(list_regex, self.render_data)
@@ -1980,7 +1980,7 @@ class class_do_render_namumark:
             list_count_max -= 1
 
         # 소문자 리스트
-        list_regex = r'((?:\n *a\. ?[^\n]*)+)\n'
+        list_regex = r'((?:\n *a\. ?[^\n]*){2,})\n'
         list_count_max = len(re.findall(list_regex, self.render_data)) * 3
         while 1:
             list_data = re.search(list_regex, self.render_data)
@@ -2000,7 +2000,7 @@ class class_do_render_namumark:
             list_count_max -= 1
 
         # 대문자 리스트
-        list_regex = r'((?:\n *A\. ?[^\n]*)+)\n'
+        list_regex = r'((?:\n *A\. ?[^\n]*){2,})\n'
         list_count_max = len(re.findall(list_regex, self.render_data)) * 3
         while 1:
             list_data = re.search(list_regex, self.render_data)
@@ -2020,7 +2020,7 @@ class class_do_render_namumark:
             list_count_max -= 1
 
         # 로마자 대문자 리스트
-        list_regex = r'((?:\n *I\. ?[^\n]*)+)\n'
+        list_regex = r'((?:\n *I\. ?[^\n]*){2,})\n'
         list_count_max = len(re.findall(list_regex, self.render_data)) * 3
         while 1:
             list_data = re.search(list_regex, self.render_data)
@@ -2040,7 +2040,7 @@ class class_do_render_namumark:
             list_count_max -= 1
 
         # 로마자 소문자 리스트
-        list_regex = r'((?:\n *i\. ?[^\n]*)+)\n'
+        list_regex = r'((?:\n *i\. ?[^\n]*){2,})\n'
         list_count_max = len(re.findall(list_regex, self.render_data)) * 3
         while 1:
             list_data = re.search(list_regex, self.render_data)
