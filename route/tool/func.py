@@ -1580,7 +1580,14 @@ def captcha_get():
                             '});' + \
                         '</script>' + \
                     ''
+                elif rec_ver[0][0] == 'cf':
+                    data += '' + \
+                        '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha" async defer></script>' + \
+                        '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
+                        '<hr class="main_hr">' + \
+                    ''
                 else:
+                    # rec_ver[0][0] == 'h'
                     data += '''
                         <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
                         <div class="h-captcha" data-sitekey="''' + recaptcha[0][0] + '''"></div>
@@ -1601,23 +1608,36 @@ def captcha_post(re_data, num = 1):
             rec_ver = curs.fetchall()
             if captcha_get() != '':
                 if not rec_ver or rec_ver[0][0] in ('', 'v3'):
-                    data = requests.get(
-                        'https://www.google.com/recaptcha/api/siteverify' + \
-                        '?secret=' + sec_re[0][0] + '&response=' + re_data
+                    data = requests.post(
+                        'https://www.google.com/recaptcha/api/siteverify',
+                        data = {
+                            "secret" : sec_re[0][0],
+                            "response" : re_data
+                        }
                     )
-                    if data.status_code == 200:
-                        json_data = json.loads(data.text)
-                        if json_data['success'] != True:
-                            return 1
+                elif rec_ver[0][0] == 'cf':
+                    data = requests.post(
+                        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                        data = {
+                            "secret" : sec_re[0][0],
+                            "response" : re_data
+                        }
+                    )
                 else:
-                    data = requests.get(
-                        'https://hcaptcha.com/siteverify' + \
-                        '?secret=' + sec_re[0][0] + '&response=' + re_data
+                    # rec_ver[0][0] == 'h'
+                    data = requests.post(
+                        'https://hcaptcha.com/siteverify',
+                        data = {
+                            "secret" : sec_re[0][0],
+                            "response" : re_data
+                        }
                     )
-                    if data.status_code == 200:
-                        json_data = json.loads(data.text)
-                        if json_data['success'] != True:
-                            return 1
+                    
+                if data.status_code == 200:
+                    print(data.text)
+                    json_data = json.loads(data.text)
+                    if json_data['success'] != True:
+                        return 1
 
         return 0
 
