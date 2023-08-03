@@ -21,6 +21,7 @@ from route.bbs_make import bbs_make
 from route.bbs_w import bbs_w
 from route.bbs_w_post import bbs_w_post
 from route.bbs_w_set import bbs_w_set
+from route.bbs_w_comment_tool import bbs_w_comment_tool
 
 from route.edit import edit
 from route.edit_backlink_reset import edit_backlink_reset
