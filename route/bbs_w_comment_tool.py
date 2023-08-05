@@ -8,19 +8,18 @@ def bbs_w_comment_tool(bbs_num = '', post_num = '', comment_num = ''):
         
         bbs_num_str = str(bbs_num)
         post_num_str = str(post_num)
-        comment_num_str = str(comment_num)
         
         data += '''
             <h2>''' + load_lang('tool') + '''</h2>
             <ul class="opennamu_ul">
-                <li><a href="bbs/w/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '/raw">' + load_lang('raw') + '''</a></li>
-                <li><a href="bbs/w/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '/edit">' + load_lang('edit') + '''</a></li>
-                <li><a href="bbs/w/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '/blind">' + load_lang('blind') + '''</a></li>
+                <li><a href="/bbs/raw/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '/' + url_pas(comment_num) + '">' + load_lang('raw') + '''</a></li>
+                <li><a href="/bbs/edit/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '/' + url_pas(comment_num) + '">' + load_lang('edit') + '''</a></li>
+                <li><a href="/bbs/w/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '/blind">' + load_lang('hide') + '''</a></li>
             </ul>
         '''
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('bbs_comment_tool'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = data,
-            menu = [['bbs/w/' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str), load_lang('return')]]
+            menu = [['bbs/w/' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '#' + url_pas(comment_num), load_lang('return')]]
         ))
