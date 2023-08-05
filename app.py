@@ -524,10 +524,13 @@ app.route('/bbs/set/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_set)
 app.route('/bbs/edit/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_edit)
 app.route('/bbs/edit/preview/<int:bbs_num>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'preview' })(bbs_w_edit)
 app.route('/bbs/w/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_post)
+app.route('/bbs/raw/<int:bbs_num>/<int:post_num>')(view_raw_2)
+app.route('/bbs/tool/<int:bbs_num>/<int:post_num>')(bbs_w_tool)
 app.route('/bbs/edit/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_edit)
 app.route('/bbs/edit/preview/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'preview' })(bbs_w_edit)
 app.route('/bbs/w/preview/<int:bbs_num>/<int:post_num>', methods = ['POST'], defaults = { 'do_type' : 'preview' })(bbs_w_post)
-app.route('/bbs/w/<int:bbs_num>/<int:post_num>/comment/<int:comment_num>/tool')(bbs_w_comment_tool)
+app.route('/bbs/tool/<int:bbs_num>/<int:post_num>/<comment_num>')(bbs_w_comment_tool)
+app.route('/bbs/raw/<int:bbs_num>/<int:post_num>/<comment_num>')(view_raw_2)
 
 # Func-api
 app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):rev>')(api_w)
@@ -537,6 +540,7 @@ app.route('/api/raw/<everything:name>')(api_raw)
 
 app.route('/api/bbs/w/<sub_code>')(api_bbs_w_post)
 app.route('/api/bbs/w/comment/<sub_code>')(api_bbs_w_comment)
+app.route('/api/bbs/w/comment_one/<sub_code>')(api_bbs_w_comment)
 
 app.route('/api/version', defaults = { 'version_list' : version_list })(api_version)
 app.route('/api/skin_info')(api_skin_info)

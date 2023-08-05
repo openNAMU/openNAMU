@@ -14,6 +14,7 @@ from route.api_version import api_version
 from route.api_w import api_w
 from route.api_bbs_w_post import api_bbs_w_post
 from route.api_bbs_w_comment import api_bbs_w_comment
+from route.api_bbs_w_comment_one import api_bbs_w_comment_one
 
 from route.bbs_w_edit import bbs_w_edit
 from route.bbs_main import bbs_main
@@ -22,6 +23,7 @@ from route.bbs_w import bbs_w
 from route.bbs_w_post import bbs_w_post
 from route.bbs_w_set import bbs_w_set
 from route.bbs_w_comment_tool import bbs_w_comment_tool
+from route.bbs_w_tool import bbs_w_tool
 
 from route.edit import edit
 from route.edit_backlink_reset import edit_backlink_reset
