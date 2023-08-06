@@ -456,6 +456,8 @@ app.route('/change/head/<skin_name>', methods=['GET', 'POST'])(user_setting_head
 app.route('/change/head_reset', methods=['GET', 'POST'])(user_setting_head_reset)
 app.route('/change/skin_set')(user_setting_skin_set)
 app.route('/change/top_menu', methods=['GET', 'POST'])(user_setting_top_menu)
+app.route('/change/user_name', methods=['GET', 'POST'])(user_setting_user_name)
+app.route('/change/user_name/<user_name>', methods=['GET', 'POST'])(user_setting_user_name)
 # 하위 호환용 S
 app.route('/skin_set')(user_setting_skin_set)
 # 하위 호환용 E

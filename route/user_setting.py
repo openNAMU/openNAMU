@@ -95,6 +95,10 @@ def user_setting():
                 fa_data_pw = curs.fetchall()
                 fa_data_pw = load_lang('2fa_password_change') if fa_data_pw else load_lang('2fa_password')
 
+                curs.execute(db_change('select data from user_set where name = "user_name" and id = ?'), [ip])
+                db_data = curs.fetchall()
+                user_name = db_data[0][0] if db_data else ip
+
                 curs.execute(db_change('select data from user_set where name = "sub_user_name" and id = ?'), [ip])
                 db_data = curs.fetchall()
                 sub_user_name = db_data[0][0] if db_data else ''
@@ -130,6 +134,10 @@ def user_setting():
                             <select name="2fa" id="twofa_check_input">''' + fa_data_select + '''</select>
                             <hr class="main_hr">
                             <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
+                            <h2>''' + load_lang('main_user_name') + '''</h2>
+                            <a href="/change/user_name">(''' + load_lang('change_user_name') + ''')</a>
+                            <hr class="main_hr">
+                            ''' + load_lang('user_name') + ''' : ''' + html.escape(user_name) + '''
                             <h2>''' + load_lang('sub_user_name') + '''</h2>
                             <input name="sub_user_name" value="''' + html.escape(sub_user_name) + '''" placeholder="''' + load_lang('sub_user_name') + '''">
                             <hr class="main_hr">
