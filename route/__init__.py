@@ -149,6 +149,7 @@ from route.user_setting_pw import user_setting_pw
 from route.user_setting_skin_set import user_setting_skin_set
 from route.user_setting_skin_set_main import user_setting_skin_set_main
 from route.user_setting_top_menu import user_setting_top_menu
+from route.user_setting_user_name import user_setting_user_name
 
 from route.user_watch_list import user_watch_list
 from route.user_watch_list_name import user_watch_list_name

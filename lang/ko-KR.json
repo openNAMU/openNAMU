@@ -208,7 +208,7 @@
     "name": "이름",
     "period": "기간",
     "writer": "작성자",
-    "long_id_error": "ID는 20자보다 짧아야 합니다.",
+    "long_id_error": "ID는 32자보다 짧아야 합니다.",
     "edit_record_error": "사유는 500자를 넘을 수 없습니다.",
     "revert": "복원",
     "discussion_authority": "토론 관리 권한",
