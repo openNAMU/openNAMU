@@ -37,11 +37,25 @@ if data_up_date == 1:
     if platform.system() in ('Linux', 'Windows'):
         python_ver = str(sys.version_info.major) + '.' + str(sys.version_info.minor)
 
-        run_list = [sys.executable, 'python' + python_ver, 'python3', 'python']
+        run_list = [sys.executable, 'python' + python_ver, 'python3', 'python', 'py -' + python_ver]
         for exe_name in run_list:
             try:
                 subprocess.check_call([exe_name, "-m", "pip", "install", "--upgrade", "--user", "-r", "requirements.txt"])
-                os.execl(exe_name, os.path.abspath(__file__), *sys.argv)
+
+                try:
+                    os.execl(exe_name, sys.executable, *sys.argv)
+                except:
+                    pass
+
+                try:
+                    os.execl(exe_name, '"' + sys.executable + '"', *sys.argv)
+                except:
+                    pass
+
+                try:
+                    os.execl(exe_name, os.path.abspath(__file__), *sys.argv)
+                except:
+                    pass
             except:
                 pass
         else:
