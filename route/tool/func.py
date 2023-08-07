@@ -1580,7 +1580,14 @@ def captcha_get():
                             '});' + \
                         '</script>' + \
                     ''
+                elif rec_ver[0][0] == 'cf':
+                    data += '' + \
+                        '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha" async defer></script>' + \
+                        '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
+                        '<hr class="main_hr">' + \
+                    ''
                 else:
+                    # rec_ver[0][0] == 'h'
                     data += '''
                         <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
                         <div class="h-captcha" data-sitekey="''' + recaptcha[0][0] + '''"></div>
@@ -1601,27 +1608,61 @@ def captcha_post(re_data, num = 1):
             rec_ver = curs.fetchall()
             if captcha_get() != '':
                 if not rec_ver or rec_ver[0][0] in ('', 'v3'):
-                    data = requests.get(
-                        'https://www.google.com/recaptcha/api/siteverify' + \
-                        '?secret=' + sec_re[0][0] + '&response=' + re_data
+                    data = requests.post(
+                        'https://www.google.com/recaptcha/api/siteverify',
+                        data = {
+                            "secret" : sec_re[0][0],
+                            "response" : re_data
+                        }
                     )
-                    if data.status_code == 200:
-                        json_data = json.loads(data.text)
-                        if json_data['success'] != True:
-                            return 1
+                elif rec_ver[0][0] == 'cf':
+                    data = requests.post(
+                        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                        data = {
+                            "secret" : sec_re[0][0],
+                            "response" : re_data
+                        }
+                    )
                 else:
-                    data = requests.get(
-                        'https://hcaptcha.com/siteverify' + \
-                        '?secret=' + sec_re[0][0] + '&response=' + re_data
+                    # rec_ver[0][0] == 'h'
+                    data = requests.post(
+                        'https://hcaptcha.com/siteverify',
+                        data = {
+                            "secret" : sec_re[0][0],
+                            "response" : re_data
+                        }
                     )
-                    if data.status_code == 200:
-                        json_data = json.loads(data.text)
-                        if json_data['success'] != True:
-                            return 1
+                    
+                if data.status_code == 200:
+                    json_data = json.loads(data.text)
+                    if json_data['success'] != True:
+                        return 1
 
         return 0
 
 # Func-user
+def do_user_name_check(user_name):
+    with get_db_connect() as conn:
+        curs = conn.cursor()
+
+        # ID 글자 확인
+        if re.search(r'(?:[^A-Za-zㄱ-힣0-9])', user_name):
+            return 1
+
+        # ID 필터
+        curs.execute(db_change('select html from html_filter where kind = "name"'))
+        set_d = curs.fetchall()
+        for i in set_d:
+            check_r = re.compile(i[0], re.I)
+            if check_r.search(user_name):
+                return 1
+
+        # ID 길이 제한 (32글자)
+        if len(user_name) > 32:
+            return 1
+        
+        return 0
+
 def get_admin_auth_list(num = None):
     # without_DB
 
@@ -2125,11 +2166,13 @@ def ip_pas(raw_ip, type_data = 0):
 
                     change_ip = 1
                 else:
-                    ip = raw_ip
+                    curs.execute(db_change('select data from user_set where name = "user_name" and id = ?'), [raw_ip])
+                    db_data = curs.fetchall()
+                    ip = db_data[0][0] if db_data else raw_ip
                 
             if type_data == 0 and change_ip == 0:
                 if is_this_ip == 0:
-                    ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+                    ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + ip + '</a>'
                     
                     if admin_check('all', None, raw_ip) == 1:
                         ip = '<b>' + ip + '</b>'
@@ -2593,9 +2636,10 @@ def re_error(data):
             elif num == 6:
                 data = load_lang('same_id_exist_error')
             elif num == 7:
+                # 폐지
                 data = load_lang('long_id_error')
             elif num == 8:
-                data = load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id_filter_list') + ')</a>'
+                data = load_lang('long_id_error') + '<br>' + load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id_filter_list') + ')</a>'
             elif num == 9:
                 data = load_lang('file_exist_error')
             elif num == 10:
