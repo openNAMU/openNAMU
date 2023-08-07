@@ -14,6 +14,7 @@ from route.api_version import api_version
 from route.api_w import api_w
 from route.api_bbs_w_post import api_bbs_w_post
 from route.api_bbs_w_comment import api_bbs_w_comment
+from route.api_bbs_w_comment_one import api_bbs_w_comment_one
 
 from route.bbs_w_edit import bbs_w_edit
 from route.bbs_main import bbs_main
@@ -21,6 +22,8 @@ from route.bbs_make import bbs_make
 from route.bbs_w import bbs_w
 from route.bbs_w_post import bbs_w_post
 from route.bbs_w_set import bbs_w_set
+from route.bbs_w_comment_tool import bbs_w_comment_tool
+from route.bbs_w_tool import bbs_w_tool
 
 from route.edit import edit
 from route.edit_backlink_reset import edit_backlink_reset
@@ -146,6 +149,7 @@ from route.user_setting_pw import user_setting_pw
 from route.user_setting_skin_set import user_setting_skin_set
 from route.user_setting_skin_set_main import user_setting_skin_set_main
 from route.user_setting_top_menu import user_setting_top_menu
+from route.user_setting_user_name import user_setting_user_name
 
 from route.user_watch_list import user_watch_list
 from route.user_watch_list_name import user_watch_list_name

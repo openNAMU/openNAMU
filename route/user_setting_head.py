@@ -73,5 +73,5 @@ def user_setting_head(skin_name = ''):
                         <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['user', load_lang('return')]]
+                menu = [['change', load_lang('return')]]
             ))

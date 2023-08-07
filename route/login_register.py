@@ -44,21 +44,8 @@ def login_register_2():
                 if password_min_length > len(user_pw):
                     return re_error('/error/40')
 
-            # ID 글자 확인
-            if re.search(r'(?:[^A-Za-zㄱ-힣0-9])', user_id):
+            if do_user_name_check(user_id) == 1:
                 return re_error('/error/8')
-
-            # ID 필터
-            curs.execute(db_change('select html from html_filter where kind = "name"'))
-            set_d = curs.fetchall()
-            for i in set_d:
-                check_r = re.compile(i[0], re.I)
-                if check_r.search(user_id):
-                    return re_error('/error/8')
-
-            # ID 길이 제한 (32글자)
-            if len(user_id) > 32:
-                return re_error('/error/7')
 
             # 중복 확인
             curs.execute(db_change("select id from user_set where id = ?"), [user_id])
