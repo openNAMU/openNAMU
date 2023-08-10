@@ -16,9 +16,9 @@ def bbs_w(bbs_num = ''):
         data += '''
             <table id="main_table_set">
                 <tr id="main_table_top_tr">
-                    <td id="main_table_width">''' + load_lang('order') + '''</td>
                     <td id="main_table_width">''' + load_lang('editor') + '''</td>
                     <td id="main_table_width">''' + load_lang('time') + '''</td>
+                    <td id="main_table_width">''' + load_lang('last_comment_time') + '''</td>
                 </tr>
         '''
         
@@ -35,12 +35,16 @@ def bbs_w(bbs_num = ''):
                     curs.execute(db_change('select count(*) from bbs_data where set_name = "comment_date" and (set_id = ? or set_id like ?) order by set_code + 0 desc'), [bbs_num_str + '-' + temp_dict['code'], bbs_num_str + '-' + temp_dict['code'] + '-%'])
                     db_data = curs.fetchall()
                     comment_count = str(db_data[0][0]) if db_data else '0'
+
+                    curs.execute(db_change('select set_data from bbs_data where set_name = "comment_date" and (set_id = ? or set_id like ?) order by set_data desc limit 1'), [bbs_num_str + '-' + temp_dict['code'], bbs_num_str + '-' + temp_dict['code'] + '-%'])
+                    db_data = curs.fetchall()
+                    last_comment_date = db_data[0][0] if db_data else '0'
                     
                     data += '''
                         <tr>
-                            <td>''' + temp_dict['code'] + '''</td>
                             <td>''' + ip_pas(temp_dict['user_id']) + '''</td>
                             <td>''' + temp_dict['date'] + '''</td>
+                            <td>''' + last_comment_date + '''</td>
                         </tr>
                         <tr>
                             <td colspan="3">
