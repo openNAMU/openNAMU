@@ -652,6 +652,10 @@ def update(ver_num, set_data):
             curs.execute(db_change("drop index history_index"))
             curs.execute(db_change("create index history_index on history (title, id, ip)"))
 
+        if ver_num < 3500363:
+            curs.execute(db_change("drop index history_index"))
+            curs.execute(db_change("create index history_index on history (title, ip)"))
+
         conn.commit()
 
         print('Update completed')
