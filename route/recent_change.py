@@ -7,7 +7,7 @@ def recent_change_send_render(data):
 
         return '<a href="/w/' + url_pas(data_unescape) + '">' + match + '</a>'
 
-    if data == '&lt;br&gt;' or data == '':
+    if data == '&lt;br&gt;' or data == '' or re.search(r'^ +$', data):
         data = '<br>'
     else:
         data = data.replace('javascript:', '')
@@ -92,9 +92,9 @@ def recent_change(name = None, tool = ''):
                 set_type = '' if set_type == 'edit' else set_type
 
                 data_list = []
-                curs.execute(db_change('select id, title from rc where type = ? order by date desc'), [set_type])
+                curs.execute(db_change('select title, id from rc where type = ? order by date desc'), [set_type])
                 for i in curs.fetchall():
-                    curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where id = ? and title = ?'), i)
+                    curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where title = ? and id = ?'), i)
                     data_list += curs.fetchall()
 
             div += '</tr>'
