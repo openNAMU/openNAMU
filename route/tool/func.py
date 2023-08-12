@@ -648,11 +648,7 @@ def update(ver_num, set_data):
 
         # create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
         # create_data['rc'] = ['id', 'title', 'date', 'type']
-        if ver_num < 3500362:
-            curs.execute(db_change("drop index history_index"))
-            curs.execute(db_change("create index history_index on history (title, id, ip)"))
-
-        if ver_num < 3500363:
+        if ver_num == 3500362:
             curs.execute(db_change("drop index history_index"))
             curs.execute(db_change("create index history_index on history (title, ip)"))
 
