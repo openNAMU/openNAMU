@@ -30,7 +30,6 @@ def recent_change(name = None, tool = ''):
             ban = ''
             select = ''
             sub = ''
-            admin_6 = admin_check(6)
             admin = admin_check()
             div = '''
                 <table id="main_table_set">
