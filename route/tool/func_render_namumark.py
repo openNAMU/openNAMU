@@ -1041,7 +1041,7 @@ class class_do_render_namumark:
                             self.data_backlink += [[self.doc_name, link_main, '']]
 
                     link_same = ''
-                    if link_main == self.doc_name and self.doc_include == '':
+                    if link_main == self.doc_name:
                         link_same = 'opennamu_same_link'
 
                     link_main = url_pas(link_main)
@@ -1189,7 +1189,7 @@ class class_do_render_namumark:
                         # remove end br
                         include_data = re.sub('^\n+', '', include_data)
 
-                        self.data_include += [[self.doc_include + 'opennamu_include_' + str(include_num), include_name, include_data, 'style="display: inline;"']]
+                        self.data_include += [[self.doc_include + 'opennamu_include_' + str(include_num), self.doc_name, include_data, 'style="display: inline;"']]
 
                         data_name = self.get_tool_data_storage('' + \
                             include_link + \
