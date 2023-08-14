@@ -2200,8 +2200,9 @@ class class_do_render_namumark:
             self.do_render_link()
             self.do_render_text()
             self.do_render_hr()
-            self.do_render_heading()
+
             self.do_redner_footnote()
+            self.do_render_heading()
             
         self.do_render_last()
 
