@@ -382,3 +382,7 @@ s:hover, strike:hover, del:hover {
 .opennamu_list_none {
     list-style: none;
 }
+
+#topic_color {
+    background: #bbeabb;
+}
