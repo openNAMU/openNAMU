@@ -183,7 +183,7 @@ def view_acl(name):
                     </form>
                 ''',
                 menu = [
-                    ['w/' + url_pas(name), load_lang('document')], 
+                    ['w/' + url_pas(name), load_lang('return')], 
                     ['manager', load_lang('admin')], 
                     ['list/admin/auth_use/' + url_pas('acl (' + name + ')') + '/1', load_lang('acl_record')]
                 ]
