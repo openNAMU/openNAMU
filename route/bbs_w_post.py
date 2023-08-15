@@ -338,7 +338,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                 bbs_comment_form = ''
                 if bbs_comment_acl == 0:
                     bbs_comment_form += '''
-                        ''' + comment_select + ''' <a href="javascript:opennamu_return_comment();">(R)</a>
+                        ''' + comment_select + ''' <a href="javascript:opennamu_return_comment();">''' + load_lang('return') + '''</a>
                         <hr class="main_hr">
                         
                         ''' + edit_editor(curs, ip, text, 'bbs_comment') + '''
