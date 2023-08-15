@@ -255,12 +255,12 @@ def main_setting_main(db_set):
                         <input type="checkbox" name="move_with_redirect" ''' + check_box_div[13] + '''> ''' + load_lang('move_with_redirect') + ''' (''' + load_lang('not_working') + ''')
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('slow_thread') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('not_working') + ''')</span>
+                        <span>''' + load_lang('slow_thread') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
                         <hr class="main_hr">
                         <input name="slow_thread" value="''' + html.escape(d_list[38]) + '''">
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('edit_timeout') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
+                        <span>''' + load_lang('edit_timeout') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('linux_only') + ''')</span>
                         <hr class="main_hr">
                         <input name="edit_timeout" value="''' + html.escape(d_list[39]) + '''">
                         <hr class="main_hr">
