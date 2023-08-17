@@ -1959,7 +1959,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 else:
                     acl_data = [['normal']]
 
-            except_ban_tool_list = ['render', 'topic_view']
+            except_ban_tool_list = ['render', 'topic_view', 'bbs_view']
             if acl_data[0][0] != 'normal':
                 if not acl_data[0][0] in ['ban', 'ban_admin'] and not tool in except_ban_tool_list:
                     if get_ban == 1:
