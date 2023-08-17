@@ -2663,7 +2663,7 @@ def re_error(data):
             elif num == 17:
                 curs.execute(db_change('select data from other where name = "upload"'))
                 db_data = curs.fetchall()
-                file_max = int(number_check(db_data[0][0])) if db_data and db_data[0][0] != '' else '2'
+                file_max = number_check(db_data[0][0]) if db_data and db_data[0][0] != '' else '2'
 
                 data = load_lang('file_capacity_error') + file_max
             elif num == 18:
