@@ -35,14 +35,21 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
             category_sql = curs.fetchall()
             for data in category_sql:
+                link_view = data[0]
+                if get_main_skin_set(curs, flask.session, 'main_css_category_change_title', ip) != 'off':
+                    curs.execute(db_change("select data from back where title = ? and link = ? and type = 'cat_view' limit 1"), [name, data[0]])
+                    db_data = curs.fetchall()
+                    if db_data and db_data[0][0] != '':
+                        link_view = db_data[0][0]
+
                 if data[0].startswith('category:'):
-                    category_sub += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a></li>'
+                    category_sub += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(link_view) + '</a></li>'
 
                     count_sub_category += 1
                 else:
                     category_doc += '' + \
                         '<li>' + \
-                            '<a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> ' + \
+                            '<a href="/w/' + url_pas(data[0]) + '">' + html.escape(link_view) + '</a> ' + \
                             '<a class="opennamu_link_inter" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>' + \
                         '</li>' + \
                     ''
@@ -188,7 +195,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             response_data = 200
 
         if num != '':
-            menu += [['history/' + url_pas(name), load_lang('history')]]
+            menu += [['history/' + url_pas(name), load_lang('return')]]
             sub = ' (r' + str(num) + ')'
             acl = 0
             r_date = 0

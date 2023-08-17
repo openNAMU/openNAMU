@@ -68,6 +68,10 @@ def user_setting_skin_set_main_set_list():
             ['default', load_lang('default')],
             ['off', load_lang('off')],
             ['on', load_lang('use')]
+        ], 'main_css_category_change_title' : [
+            ['default', load_lang('default')],
+            ['off', load_lang('off')],
+            ['on', load_lang('use')]
         ]
     }
 
@@ -152,9 +156,15 @@ def user_setting_skin_set_main():
                             ''' + set_data["main_css_bold"] + '''
                         </select>
                         <h3>''' + load_lang("category") + '''</h3>
+                        <h4>''' + load_lang("position") + '''</h4>
                         ''' + set_data_main["main_css_category_set"] + '''
                         <select name="main_css_category_set">
                             ''' + set_data["main_css_category_set"] + '''
+                        </select>
+                        <h4>''' + load_lang("category_change_title") + '''</h4>
+                        ''' + set_data_main["main_css_category_change_title"] + '''
+                        <select name="main_css_category_change_title">
+                            ''' + set_data["main_css_category_change_title"] + '''
                         </select>
                         <h3>''' + load_lang("footnote") + ''' (''' + load_lang('beta') + ''')</h3>
                         <h4>''' + load_lang("footnote_render") + '''</h4>
