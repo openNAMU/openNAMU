@@ -234,5 +234,5 @@ def user_setting_skin_set_main():
                         <button type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 '''),
-                menu = [['change', load_lang('user_setting')], ['change/skin_set', load_lang('skin_set')]]
+                menu = [['change', load_lang('user_setting')], ['change/skin_set', load_lang('skin_set')], ['setting/skin_set', load_lang('main_skin_set_default')]]
             ))
