@@ -95,8 +95,6 @@ global_wiki_set = {}
 
 global_db_set = ''
 
-conn = ''
-
 # Func
 # Func-main
 def do_db_set(db_set):
@@ -138,18 +136,9 @@ def get_init_set_list(need = 'all'):
         return init_set_list[need]
 
 class get_db_connect:
-    # 임시 DB 커넥션 동작 구조
-    # Init 파트
-    # DB 커넥트(get_db_connect_old) -> func.py로 conn 넘겨줌
-    # route 파트
-    # DB 새로 커넥트 -> func.py에서 쓰던 conn은 conn_sub로 보관 ->
-    # func.py로 conn 넘겨줌 -> 모든 라우터 과정이 끝나면 conn_sub를 다시 func.py에 conn으로 넘겨줌 ->
-    # DB 커넥트 종료
     def __init__(self):
         global global_db_set
-        global conn
-        
-        self.conn_sub = conn
+
         self.db_set = global_db_set
         
     def __enter__(self):
@@ -320,7 +309,7 @@ def get_db_table_list():
     create_data['acl'] = ['title', 'data', 'type']
 
     # 개편 예정 (data_link로 변경)
-    create_data['back'] = ['title', 'link', 'type']
+    create_data['back'] = ['title', 'link', 'type', 'data']
 
     # 폐지 예정 (topic_set으로 통합) [가장 시급]
     create_data['topic_set'] = ['thread_code', 'set_name', 'set_id', 'set_data']
@@ -644,9 +633,7 @@ def update(ver_num, set_data):
                 if db_data_2:
                     curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'last_edit', ?)"), [for_a[0], db_data_2[0][0]])
 
-            curs.execute(db_change(
-                'delete from acl where title like "file:%" and data = "admin" and type like "decu%"'
-            ))
+            curs.execute(db_change('delete from acl where title like "file:%" and data = "admin" and type like "decu%"'))
 
             print("Update 3500360 complete")
 
@@ -659,8 +646,11 @@ def update(ver_num, set_data):
                         'delete from user_set where id = ? and name = "email"'
                     ), [db_data[0]])
 
-    #    if ver_num < 3500361:
-
+        # create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
+        # create_data['rc'] = ['id', 'title', 'date', 'type']
+        if ver_num == 3500362:
+            curs.execute(db_change("drop index history_index"))
+            curs.execute(db_change("create index history_index on history (title, ip)"))
 
         conn.commit()
 
@@ -1096,7 +1086,7 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '179'
+    data_css_ver = '180'
     
     # Func JS + Defer
     data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
@@ -1969,7 +1959,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 else:
                     acl_data = [['normal']]
 
-            except_ban_tool_list = ['render', 'topic_view']
+            except_ban_tool_list = ['render', 'topic_view', 'bbs_view']
             if acl_data[0][0] != 'normal':
                 if not acl_data[0][0] in ['ban', 'ban_admin'] and not tool in except_ban_tool_list:
                     if get_ban == 1:
@@ -2673,8 +2663,7 @@ def re_error(data):
             elif num == 17:
                 curs.execute(db_change('select data from other where name = "upload"'))
                 db_data = curs.fetchall()
-                file_max = int(number_check(db_data[0][0])) if db_data and db_data[0][0] != '' else '2'
-
+                file_max = number_check(db_data[0][0]) if db_data and db_data[0][0] != '' else '2'
                 data = load_lang('file_capacity_error') + file_max
             elif num == 18:
                 data = load_lang('email_send_error')
@@ -2728,11 +2717,7 @@ def re_error(data):
             elif num == 40:
                 curs.execute(db_change("select data from other where name = 'password_min_length'"))
                 db_data = curs.fetchall()
-                if db_data and db_data[0][0] != '':
-                    password_min_length = db_data[0][0]
-                else:
-                    password_min_length = ''
-                    
+                password_min_length = '' if not db_data else db_data[0][0]
                 data = load_lang('error_password_length_too_short') + password_min_length
             elif num == 41:
                 curs.execute(db_change("select data from other where name = 'edit_timeout'"))

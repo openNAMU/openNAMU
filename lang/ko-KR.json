@@ -553,6 +553,16 @@
     "footnote_number": "각주 번호 출력",
     "only_number": "숫자만",
     "footnote_real_num_view": "각주 실제 번호 보기",
-    "post_edit" : "게시글 수정",
-    "post_add" : "게시글 추가"
+    "post_edit": "게시글 수정",
+    "post_add": "게시글 추가",
+    "main_user_name": "메인 사용자명",
+    "change_user_name": "메인 사용자명 변경",
+    "last_comment_time": "마지막 댓글 시간",
+    "bbs_comment_tool": "BBS 댓글 도구",
+    "bbs_comment_edit": "BBS 댓글 수정",
+    "move_with_redirect": "문서 이동시 리다이렉트 문서 생성",
+    "slow_thread": "토론 올리기 제한 시간",
+    "edit_timeout": "렌더링 제한 시간",
+    "linux_only": "리눅스 OS 전용",
+    "bbs_post_tool": "BBS 게시글 도구"
 }
