@@ -91,7 +91,7 @@ class class_do_render:
                 backlink = []
 
             if backlink != []:
-                curs.executemany(db_change("insert into back (link, title, type) values (?, ?, ?)"), data_end[2]['backlink'])
+                curs.executemany(db_change("insert into back (link, title, type, data) values (?, ?, ?, ?)"), data_end[2]['backlink'])
                 curs.execute(db_change("delete from back where title = ? and type = 'no'"), [doc_name])
 
             self.conn.commit()
