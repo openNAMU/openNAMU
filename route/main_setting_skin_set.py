@@ -60,8 +60,13 @@ def main_setting_skin_set():
                             ''' + set_data["main_css_bold"] + '''
                         </select>
                         <h3>''' + load_lang("category") + '''</h3>
+                        <h4>''' + load_lang("position") + '''</h4>
                         <select name="main_css_category_set">
                             ''' + set_data["main_css_category_set"] + '''
+                        </select>
+                        <h4>''' + load_lang("category_change_title") + '''</h4>
+                        <select name="main_css_category_change_title">
+                            ''' + set_data["main_css_category_change_title"] + '''
                         </select>
                         <h3>''' + load_lang("footnote") + ''' (''' + load_lang('beta') + ''')</h3>
                         <h4>''' + load_lang("footnote_render") + '''</h4>

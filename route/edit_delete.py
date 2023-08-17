@@ -49,7 +49,7 @@ def edit_delete(name):
 
                 curs.execute(db_change("select title, link from back where title = ? and not type = 'cat' and not type = 'no'"), [name])
                 for data in curs.fetchall():
-                    curs.execute(db_change("insert into back (title, link, type) values (?, ?, 'no')"), [data[0], data[1]])
+                    curs.execute(db_change("insert into back (title, link, type, data) values (?, ?, 'no', '')"), [data[0], data[1]])
 
                 curs.execute(db_change("delete from back where link = ?"), [name])
                 curs.execute(db_change("delete from data where title = ?"), [name])

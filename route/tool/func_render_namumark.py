@@ -796,11 +796,11 @@ class class_do_render_namumark:
                         db_data = self.curs.fetchall()
                         if db_data:
                             link_exist = ''
-                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file']]
+                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file', '']]
                         else:
                             link_exist = 'opennamu_not_exist_link'
-                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'no']]
-                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file']]
+                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'no', '']]
+                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file', '']]
                         
                         link_extension_regex = r'\.([^.]+)$'
                         link_extension = re.search(link_extension_regex, link_main)
@@ -884,9 +884,6 @@ class class_do_render_namumark:
                 elif re.search(r'^(분류|category):', link_main, flags = re.I):
                     link_main = re.sub(r'^(분류|category):', '', link_main, flags = re.I)
 
-                    if link_data[1]:
-                        link_main += link_data[1]
-
                     category_blur = ''
                     if re.search(r'#blur$', link_main, flags = re.I):
                         link_main = re.sub(r'#blur$', '', link_main, flags = re.I)
@@ -894,6 +891,9 @@ class class_do_render_namumark:
                         category_blur = 'opennamu_category_blur'
                     
                     link_sub = link_main
+                    link_view = ''
+                    if len(link_data) > 1:
+                        link_view = link_data[1]
 
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_main = html.unescape(link_main)
@@ -905,11 +905,12 @@ class class_do_render_namumark:
                         db_data = self.curs.fetchall()
                         if db_data:
                             link_exist = ''
-                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat']]
                         else:
                             link_exist = 'opennamu_not_exist_link'
-                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'no']]
-                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat']]
+                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'no', '']]
+
+                        self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat', '']]
+                        self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat_view', link_view]]
 
                         link_main = url_pas(link_main)
 
@@ -1033,12 +1034,12 @@ class class_do_render_namumark:
                         self.curs.execute(db_change("select title from data where title = ?" + self.link_case_insensitive), [link_main])
                         db_data = self.curs.fetchall()
                         if not db_data:
-                            self.data_backlink += [[self.doc_name, link_main, 'no']]
-                            self.data_backlink += [[self.doc_name, link_main, '']]
+                            self.data_backlink += [[self.doc_name, link_main, 'no', '']]
+                            self.data_backlink += [[self.doc_name, link_main, '', '']]
                             link_exist = 'opennamu_not_exist_link'
                         else:
                             link_main = db_data[0][0]
-                            self.data_backlink += [[self.doc_name, link_main, '']]
+                            self.data_backlink += [[self.doc_name, link_main, '', '']]
 
                     link_same = ''
                     if link_main == self.doc_name:
@@ -1174,7 +1175,7 @@ class class_do_render_namumark:
                     self.curs.execute(db_change("select data from data where title = ?"), [include_name])
                     db_data = self.curs.fetchall()
                     if db_data:
-                        self.data_backlink += [[self.doc_name, include_name, 'include']]
+                        self.data_backlink += [[self.doc_name, include_name, 'include', '']]
                         include_data = db_data[0][0].replace('\r', '')
 
                         # include link func
@@ -1196,7 +1197,7 @@ class class_do_render_namumark:
                             '<div id="' + self.doc_include + 'opennamu_include_' + str(include_num) + '"></div>' + \
                         '', '', match_org)
                     else:
-                        self.data_backlink += [[self.doc_name, include_name, 'no']]
+                        self.data_backlink += [[self.doc_name, include_name, 'no', '']]
 
                         include_link = '<div><a class="opennamu_not_exist_link" href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
 
@@ -1354,7 +1355,7 @@ class class_do_render_namumark:
             link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
             link_main = html.unescape(link_main)
 
-            self.data_backlink += [[self.doc_name, link_main, 'redirect']]
+            self.data_backlink += [[self.doc_name, link_main, 'redirect', '']]
 
             link_main = url_pas(link_main)
 

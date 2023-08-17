@@ -309,7 +309,7 @@ def get_db_table_list():
     create_data['acl'] = ['title', 'data', 'type']
 
     # 개편 예정 (data_link로 변경)
-    create_data['back'] = ['title', 'link', 'type']
+    create_data['back'] = ['title', 'link', 'type', 'data']
 
     # 폐지 예정 (topic_set으로 통합) [가장 시급]
     create_data['topic_set'] = ['thread_code', 'set_name', 'set_id', 'set_data']
@@ -2664,7 +2664,6 @@ def re_error(data):
                 curs.execute(db_change('select data from other where name = "upload"'))
                 db_data = curs.fetchall()
                 file_max = number_check(db_data[0][0]) if db_data and db_data[0][0] != '' else '2'
-
                 data = load_lang('file_capacity_error') + file_max
             elif num == 18:
                 data = load_lang('email_send_error')
@@ -2718,11 +2717,7 @@ def re_error(data):
             elif num == 40:
                 curs.execute(db_change("select data from other where name = 'password_min_length'"))
                 db_data = curs.fetchall()
-                if db_data and db_data[0][0] != '':
-                    password_min_length = db_data[0][0]
-                else:
-                    password_min_length = ''
-                    
+                password_min_length = '' if not db_data else db_data[0][0]
                 data = load_lang('error_password_length_too_short') + password_min_length
             elif num == 41:
                 curs.execute(db_change("select data from other where name = 'edit_timeout'"))
