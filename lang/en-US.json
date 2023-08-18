@@ -563,7 +563,7 @@
             "error_skin_set_old" : "Some older skins may only work by using the old version link.",
             "same_id_exist_error" : "There are users using the same username.",
             "long_id_error" : "Username must be shorter than 32 characters.",
-            "id_char_error" : "Only Korean letters and alphabets are allowed for Username.",
+            "id_char_error" : "Only Korean letters and alphabets and numbers are allowed for Username.",
             "file_exist_error" : "The file does not exist.",
             "password_error" : "Password does not match.",
             "recaptcha_error" : "Pass the reCAPTCHA.",
