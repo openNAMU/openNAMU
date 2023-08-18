@@ -231,7 +231,7 @@
     "file_name": "파일명",
     "close_discussion": "닫힌 토론",
     "language": "언어",
-    "id_char_error": "오직 한글과 알파벳만 사용 가능합니다.",
+    "id_char_error": "오직 한글과 알파벳, 숫자만 사용 가능합니다.",
     "id_filter_add": "ID 필터 추가",
     "skin": "스킨",
     "user_head": "사용자 <HEAD>",
