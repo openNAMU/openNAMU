@@ -35,6 +35,7 @@ if data_up_date == 1:
         f.write(version_list['beta']['r_ver'])
     
     if platform.system() in ('Linux', 'Windows'):
+        python_ver = ''
         python_ver = str(sys.version_info.major) + '.' + str(sys.version_info.minor)
 
         run_list = [sys.executable, 'python' + python_ver, 'python3', 'python', 'py -' + python_ver]
@@ -610,9 +611,7 @@ def update(ver_num, set_data):
 
         if ver_num < 3500355:
             # other coverage 오류 해결
-            curs.execute(db_change(
-                "update other set coverage = '' where coverage is null"
-            ))
+            curs.execute(db_change("update other set coverage = '' where coverage is null"))
 
         if ver_num < 3500358:
             curs.execute(db_change("drop index history_index"))
@@ -651,6 +650,9 @@ def update(ver_num, set_data):
         if ver_num == 3500362:
             curs.execute(db_change("drop index history_index"))
             curs.execute(db_change("create index history_index on history (title, ip)"))
+
+        if ver_num < 3500365:
+            curs.execute(db_change("update back set data = '' where data is null"))
 
         conn.commit()
 
