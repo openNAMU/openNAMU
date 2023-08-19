@@ -11,6 +11,7 @@ def main_sys_restart():
             print('----')
             print('Restart')
 
+            python_ver = ''
             python_ver = str(sys.version_info.major) + '.' + str(sys.version_info.minor)
 
             run_list = [sys.executable, 'python' + python_ver, 'python3', 'python', 'py -' + python_ver]

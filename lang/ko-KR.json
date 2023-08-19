@@ -564,5 +564,8 @@
     "slow_thread": "토론 올리기 제한 시간",
     "edit_timeout": "렌더링 제한 시간",
     "linux_only": "리눅스 OS 전용",
-    "bbs_post_tool": "BBS 게시글 도구"
+    "bbs_post_tool": "BBS 게시글 도구",
+    "position": "위치",
+    "category_change_title": "분류 내 문서명 변경 금지",
+    "table_scroll": "표에 스크롤 사용"
 }

@@ -892,7 +892,7 @@ class class_do_render_namumark:
                     
                     link_sub = link_main
                     link_view = ''
-                    if len(link_data) > 1:
+                    if len(link_data) > 1 and link_data[1]:
                         link_view = link_data[1]
 
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
