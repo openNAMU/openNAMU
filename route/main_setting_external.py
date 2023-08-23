@@ -59,7 +59,8 @@ def main_setting_external():
             re_ver_list = {
                 '' : 'reCAPTCHA v2',
                 'v3' : 'reCAPTCHA v3',
-                'h' : 'hCAPTCHA'
+                'h' : 'hCAPTCHA',
+                'cf' : 'Turnstile'
             }
             re_ver = ''
             for i in re_ver_list:

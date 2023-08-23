@@ -28,7 +28,7 @@ def bbs_w_post_comment(user_id, sub_code, comment_num, bbs_num_str, post_num_str
 
         date = ''
         date += '<a href="javascript:opennamu_change_comment(\'' + sub_code_check + '\');">(' + load_lang('comment') + ')</a> '
-        date += '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/comment/' + sub_code_check + '/tool">(' + load_lang('tool') + ')</a> '
+        date += '<a href="/bbs/tool/' + bbs_num_str + '/' + post_num_str + '/' + sub_code_check + '">(' + load_lang('tool') + ')</a> '
         date += temp_dict['comment_date']
 
         comment_data += '<span style="padding-left: 20px;"></span>' * margin_count
@@ -135,7 +135,6 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                     )
 
                 date = ''
-                date += '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/tool">(' + load_lang('tool') + ')</a> '
                 date += temp_dict['date']
 
                 data = ''
@@ -165,7 +164,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                         color = 'default'
                         
                     date = ''
-                    date += '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/comment/' + str(count) + '/tool">(' + load_lang('tool') + ')</a> '
+                    date += '<a href="/bbs/tool/' + bbs_num_str + '/' + post_num_str + '/' + str(count) + '">(' + load_lang('tool') + ')</a> '
                     date += temp_dict['comment_date']
 
                     data += api_topic_thread_make(
@@ -204,7 +203,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                 return easy_minify(flask.render_template(skin_check(),
                     imp = [bbs_name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('bbs') + ')', 0])],
                     data = data,
-                    menu = [['bbs/w/' + bbs_num_str, load_lang('return')], ['bbs/edit/' + bbs_num_str + '/' + post_num_str, load_lang('edit')]]
+                    menu = [['bbs/w/' + bbs_num_str, load_lang('return')], ['bbs/edit/' + bbs_num_str + '/' + post_num_str, load_lang('edit')], ['bbs/tool/' + bbs_num_str + '/' + post_num_str, load_lang('tool')]]
                 ))
         else:
             # db_data_2[0][0] == 'comment'
@@ -293,7 +292,6 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
 
                 date = ''
                 date += '<a href="javascript:opennamu_change_comment(\'0\');">(' + load_lang('comment') + ')</a> '
-                date += '<a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '/tool">(' + load_lang('tool') + ')</a> '
                 date += temp_dict['date']
 
                 data = ''
@@ -340,7 +338,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                 bbs_comment_form = ''
                 if bbs_comment_acl == 0:
                     bbs_comment_form += '''
-                        ''' + comment_select + ''' <a href="javascript:opennamu_return_comment();">(R)</a>
+                        ''' + comment_select + ''' <a href="javascript:opennamu_return_comment();">(''' + load_lang('return') + ''')</a>
                         <hr class="main_hr">
                         
                         ''' + edit_editor(curs, ip, text, 'bbs_comment') + '''
@@ -364,5 +362,5 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                 return easy_minify(flask.render_template(skin_check(),
                     imp = [bbs_name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('bbs') + ')', 0])],
                     data = data,
-                    menu = [['bbs/w/' + bbs_num_str, load_lang('return')], ['bbs/edit/' + bbs_num_str + '/' + post_num_str, load_lang('edit')]]
+                    menu = [['bbs/w/' + bbs_num_str, load_lang('return')], ['bbs/edit/' + bbs_num_str + '/' + post_num_str, load_lang('edit')], ['bbs/tool/' + bbs_num_str + '/' + post_num_str, load_lang('tool')]]
                 ))

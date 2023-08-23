@@ -35,13 +35,28 @@ if data_up_date == 1:
         f.write(version_list['beta']['r_ver'])
     
     if platform.system() in ('Linux', 'Windows'):
+        python_ver = ''
         python_ver = str(sys.version_info.major) + '.' + str(sys.version_info.minor)
 
-        run_list = [sys.executable, 'python' + python_ver, 'python3', 'python']
+        run_list = [sys.executable, 'python' + python_ver, 'python3', 'python', 'py -' + python_ver]
         for exe_name in run_list:
             try:
                 subprocess.check_call([exe_name, "-m", "pip", "install", "--upgrade", "--user", "-r", "requirements.txt"])
-                os.execl(exe_name, os.path.abspath(__file__), *sys.argv)
+
+                try:
+                    os.execl(exe_name, sys.executable, *sys.argv)
+                except:
+                    pass
+
+                try:
+                    os.execl(exe_name, '"' + sys.executable + '"', *sys.argv)
+                except:
+                    pass
+
+                try:
+                    os.execl(exe_name, os.path.abspath(__file__), *sys.argv)
+                except:
+                    pass
             except:
                 pass
         else:
@@ -80,8 +95,6 @@ global_lang = {}
 global_wiki_set = {}
 
 global_db_set = ''
-
-conn = ''
 
 # Func
 # Func-main
@@ -124,18 +137,9 @@ def get_init_set_list(need = 'all'):
         return init_set_list[need]
 
 class get_db_connect:
-    # 임시 DB 커넥션 동작 구조
-    # Init 파트
-    # DB 커넥트(get_db_connect_old) -> func.py로 conn 넘겨줌
-    # route 파트
-    # DB 새로 커넥트 -> func.py에서 쓰던 conn은 conn_sub로 보관 ->
-    # func.py로 conn 넘겨줌 -> 모든 라우터 과정이 끝나면 conn_sub를 다시 func.py에 conn으로 넘겨줌 ->
-    # DB 커넥트 종료
     def __init__(self):
         global global_db_set
-        global conn
-        
-        self.conn_sub = conn
+
         self.db_set = global_db_set
         
     def __enter__(self):
@@ -306,7 +310,7 @@ def get_db_table_list():
     create_data['acl'] = ['title', 'data', 'type']
 
     # 개편 예정 (data_link로 변경)
-    create_data['back'] = ['title', 'link', 'type']
+    create_data['back'] = ['title', 'link', 'type', 'data']
 
     # 폐지 예정 (topic_set으로 통합) [가장 시급]
     create_data['topic_set'] = ['thread_code', 'set_name', 'set_id', 'set_data']
@@ -607,9 +611,7 @@ def update(ver_num, set_data):
 
         if ver_num < 3500355:
             # other coverage 오류 해결
-            curs.execute(db_change(
-                "update other set coverage = '' where coverage is null"
-            ))
+            curs.execute(db_change("update other set coverage = '' where coverage is null"))
 
         if ver_num < 3500358:
             curs.execute(db_change("drop index history_index"))
@@ -630,9 +632,7 @@ def update(ver_num, set_data):
                 if db_data_2:
                     curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'last_edit', ?)"), [for_a[0], db_data_2[0][0]])
 
-            curs.execute(db_change(
-                'delete from acl where title like "file:%" and data = "admin" and type like "decu%"'
-            ))
+            curs.execute(db_change('delete from acl where title like "file:%" and data = "admin" and type like "decu%"'))
 
             print("Update 3500360 complete")
 
@@ -645,8 +645,14 @@ def update(ver_num, set_data):
                         'delete from user_set where id = ? and name = "email"'
                     ), [db_data[0]])
 
-    #    if ver_num < 3500361:
+        # create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
+        # create_data['rc'] = ['id', 'title', 'date', 'type']
+        if ver_num == 3500362:
+            curs.execute(db_change("drop index history_index"))
+            curs.execute(db_change("create index history_index on history (title, ip)"))
 
+        if ver_num < 3500365:
+            curs.execute(db_change("update back set data = '' where data is null"))
 
         conn.commit()
 
@@ -1082,7 +1088,7 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '179'
+    data_css_ver = '180'
     
     # Func JS + Defer
     data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
@@ -1580,7 +1586,14 @@ def captcha_get():
                             '});' + \
                         '</script>' + \
                     ''
+                elif rec_ver[0][0] == 'cf':
+                    data += '' + \
+                        '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha" async defer></script>' + \
+                        '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
+                        '<hr class="main_hr">' + \
+                    ''
                 else:
+                    # rec_ver[0][0] == 'h'
                     data += '''
                         <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
                         <div class="h-captcha" data-sitekey="''' + recaptcha[0][0] + '''"></div>
@@ -1601,27 +1614,61 @@ def captcha_post(re_data, num = 1):
             rec_ver = curs.fetchall()
             if captcha_get() != '':
                 if not rec_ver or rec_ver[0][0] in ('', 'v3'):
-                    data = requests.get(
-                        'https://www.google.com/recaptcha/api/siteverify' + \
-                        '?secret=' + sec_re[0][0] + '&response=' + re_data
+                    data = requests.post(
+                        'https://www.google.com/recaptcha/api/siteverify',
+                        data = {
+                            "secret" : sec_re[0][0],
+                            "response" : re_data
+                        }
                     )
-                    if data.status_code == 200:
-                        json_data = json.loads(data.text)
-                        if json_data['success'] != True:
-                            return 1
+                elif rec_ver[0][0] == 'cf':
+                    data = requests.post(
+                        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                        data = {
+                            "secret" : sec_re[0][0],
+                            "response" : re_data
+                        }
+                    )
                 else:
-                    data = requests.get(
-                        'https://hcaptcha.com/siteverify' + \
-                        '?secret=' + sec_re[0][0] + '&response=' + re_data
+                    # rec_ver[0][0] == 'h'
+                    data = requests.post(
+                        'https://hcaptcha.com/siteverify',
+                        data = {
+                            "secret" : sec_re[0][0],
+                            "response" : re_data
+                        }
                     )
-                    if data.status_code == 200:
-                        json_data = json.loads(data.text)
-                        if json_data['success'] != True:
-                            return 1
+                    
+                if data.status_code == 200:
+                    json_data = json.loads(data.text)
+                    if json_data['success'] != True:
+                        return 1
 
         return 0
 
 # Func-user
+def do_user_name_check(user_name):
+    with get_db_connect() as conn:
+        curs = conn.cursor()
+
+        # ID 글자 확인
+        if re.search(r'(?:[^A-Za-zㄱ-힣0-9])', user_name):
+            return 1
+
+        # ID 필터
+        curs.execute(db_change('select html from html_filter where kind = "name"'))
+        set_d = curs.fetchall()
+        for i in set_d:
+            check_r = re.compile(i[0], re.I)
+            if check_r.search(user_name):
+                return 1
+
+        # ID 길이 제한 (32글자)
+        if len(user_name) > 32:
+            return 1
+        
+        return 0
+
 def get_admin_auth_list(num = None):
     # without_DB
 
@@ -1914,7 +1961,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 else:
                     acl_data = [['normal']]
 
-            except_ban_tool_list = ['render', 'topic_view']
+            except_ban_tool_list = ['render', 'topic_view', 'bbs_view']
             if acl_data[0][0] != 'normal':
                 if not acl_data[0][0] in ['ban', 'ban_admin'] and not tool in except_ban_tool_list:
                     if get_ban == 1:
@@ -2125,11 +2172,13 @@ def ip_pas(raw_ip, type_data = 0):
 
                     change_ip = 1
                 else:
-                    ip = raw_ip
+                    curs.execute(db_change('select data from user_set where name = "user_name" and id = ?'), [raw_ip])
+                    db_data = curs.fetchall()
+                    ip = db_data[0][0] if db_data else raw_ip
                 
             if type_data == 0 and change_ip == 0:
                 if is_this_ip == 0:
-                    ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + raw_ip + '</a>'
+                    ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + ip + '</a>'
                     
                     if admin_check('all', None, raw_ip) == 1:
                         ip = '<b>' + ip + '</b>'
@@ -2593,9 +2642,10 @@ def re_error(data):
             elif num == 6:
                 data = load_lang('same_id_exist_error')
             elif num == 7:
+                # 폐지
                 data = load_lang('long_id_error')
             elif num == 8:
-                data = load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id_filter_list') + ')</a>'
+                data = load_lang('long_id_error') + '<br>' + load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id_filter_list') + ')</a>'
             elif num == 9:
                 data = load_lang('file_exist_error')
             elif num == 10:
@@ -2615,8 +2665,7 @@ def re_error(data):
             elif num == 17:
                 curs.execute(db_change('select data from other where name = "upload"'))
                 db_data = curs.fetchall()
-                file_max = int(number_check(db_data[0][0])) if db_data and db_data[0][0] != '' else '2'
-
+                file_max = number_check(db_data[0][0]) if db_data and db_data[0][0] != '' else '2'
                 data = load_lang('file_capacity_error') + file_max
             elif num == 18:
                 data = load_lang('email_send_error')
@@ -2670,11 +2719,7 @@ def re_error(data):
             elif num == 40:
                 curs.execute(db_change("select data from other where name = 'password_min_length'"))
                 db_data = curs.fetchall()
-                if db_data and db_data[0][0] != '':
-                    password_min_length = db_data[0][0]
-                else:
-                    password_min_length = ''
-                    
+                password_min_length = '' if not db_data else db_data[0][0]
                 data = load_lang('error_password_length_too_short') + password_min_length
             elif num == 41:
                 curs.execute(db_change("select data from other where name = 'edit_timeout'"))
