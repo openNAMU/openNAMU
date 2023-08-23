@@ -13,7 +13,7 @@ def bbs_w_tool(bbs_num = '', post_num = ''):
             <h2>''' + load_lang('tool') + '''</h2>
             <ul class="opennamu_ul">
                 <li><a href="/bbs/raw/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + load_lang('raw') + '''</a></li>
-                <li><a href="/bbs/blind/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + load_lang('hide') + '''</a></li>
+                <!-- <li><a href="/bbs/blind/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + load_lang('hide') + '''</a></li> -->
             </ul>
         '''
 

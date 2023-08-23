@@ -14,7 +14,7 @@ def bbs_w_comment_tool(bbs_num = '', post_num = '', comment_num = ''):
             <ul class="opennamu_ul">
                 <li><a href="/bbs/raw/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '/' + url_pas(comment_num) + '">' + load_lang('raw') + '''</a></li>
                 <li><a href="/bbs/edit/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '/' + url_pas(comment_num) + '">' + load_lang('edit') + '''</a></li>
-                <li><a href="/bbs/w/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '/blind">' + load_lang('hide') + '''</a></li>
+                <!-- <li><a href="/bbs/w/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '/blind">' + load_lang('hide') + '''</a></li> -->
             </ul>
         '''
 
