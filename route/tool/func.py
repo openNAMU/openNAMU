@@ -151,27 +151,19 @@ class get_db_connect:
             )
             self.conn.execute('pragma journal_mode = wal')
         else:
+            self.conn = pymysql.connect(
+                host = self.db_set['mysql_host'],
+                user = self.db_set['mysql_user'],
+                password = self.db_set['mysql_pw'],
+                charset = 'utf8mb4',
+                port = int(self.db_set['mysql_port']),
+                autocommit = True
+            )
+
             try:
-                self.conn = pymysql.connect(
-                    host = self.db_set['mysql_host'],
-                    user = self.db_set['mysql_user'],
-                    password = self.db_set['mysql_pw'],
-                    charset = 'utf8mb4',
-                    port = int(self.db_set['mysql_port']),
-                    autocommit = True
-                )
-                
                 self.conn.select_db(self.db_set['name'])
             except:
-                self.conn = pymysql.connect(
-                    host = self.db_set['mysql_host'],
-                    user = self.db_set['mysql_user'],
-                    password = self.db_set['mysql_pw'],
-                    charset = 'utf8mb4',
-                    port = int(self.db_set['mysql_port']),
-                    autocommit = True,
-                    db = self.db_set['name']
-                )
+                pass
 
         return self.conn
     
