@@ -137,10 +137,11 @@ def get_init_set_list(need = 'all'):
         return init_set_list[need]
 
 class get_db_connect:
-    def __init__(self):
+    def __init__(self, db_type = ''):
         global global_db_set
-
         self.db_set = global_db_set
+        if db_type != '':
+           self.db_set['type'] = db_type 
         
     def __enter__(self):
         if self.db_set['type'] == 'sqlite':
