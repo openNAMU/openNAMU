@@ -889,6 +889,14 @@ def load_domain(data_type = 'normal'):
 
         return domain
 
+def get_tool_js_safe(data):
+    data = data.replace('\n', '\\\\n')
+    data = data.replace('\\', '\\\\')
+    data = data.replace("'", "\\'")
+    data = data.replace('"', '\\"')
+
+    return data
+
 def edit_button(ob_name = 'opennamu_edit_textarea', monaco_ob_name = 'opennamu_monaco_editor'):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -902,7 +910,7 @@ def edit_button(ob_name = 'opennamu_edit_textarea', monaco_ob_name = 'opennamu_m
 
         data = ''
         for insert_data in insert_list:
-            data += '<a href="javascript:do_insert_data(\'' + ob_name + '\', \'' + insert_data[0] + '\', \'' + monaco_ob_name + '\');">(' + insert_data[1] + ')</a> '
+            data += '<a href="javascript:do_insert_data(\'' + ob_name + '\', \'' + get_tool_js_safe(insert_data[0]) + '\', \'' + monaco_ob_name + '\');">(' + html.escape(insert_data[1]) + ')</a> '
 
         data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')</a>'
         data += '<hr class="main_hr">'

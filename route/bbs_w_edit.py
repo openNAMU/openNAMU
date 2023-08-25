@@ -167,7 +167,7 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = '', do_type = ''):
                     
                         <hr class="main_hr">
                         <div id="opennamu_preview_area">''' + data_preview + '''</div>
-
+                        <!--
                         <div style="''' + option_display + '''">
                             ''' + render_simple_set('''
                                 <hr class="main_hr">
@@ -183,6 +183,7 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = '', do_type = ''):
                                 ''' + load_lang('not_working') + '''
                             ''') + '''
                         </div>
+                        -->
                     </form>
                 ''',
                 menu = [['bbs/w/' + bbs_num_str, load_lang('return')]]
