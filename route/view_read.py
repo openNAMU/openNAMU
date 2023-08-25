@@ -124,12 +124,12 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                 file_size = str(round(os.path.getsize(file_path_name) / 1000, 1))
                 file_data = '''
                     <img src="/image/''' + url_pas(file_all_name) + '''">
-                    <h2>DATA</h2>
+                    <h2>''' + load_lang('data') + '''</h2>
                     <table>
-                        <tr><td>URL</td><td><a href="/image/''' + url_pas(file_all_name) + '''">LINK</a></td></tr>
-                        <tr><td>VOLUME</td><td>''' + file_size + '''KB</td></tr>
+                        <tr><td>URL</td><td><a href="/image/''' + url_pas(file_all_name) + '''">''' + load_lang('link') + '''</a></td></tr>
+                        <tr><td>''' + load_lang('volume') + '''</td><td>''' + file_size + '''KB</td></tr>
                     </table>
-                    <h2>CONTENT</h2>
+                    <h2>''' + load_lang('content') + '''</h2>
                 '''
 
                 menu += [['delete_file/' + url_pas(name), load_lang('file_delete')]]
