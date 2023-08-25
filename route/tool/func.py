@@ -137,10 +137,11 @@ def get_init_set_list(need = 'all'):
         return init_set_list[need]
 
 class get_db_connect:
-    def __init__(self):
+    def __init__(self, db_type = ''):
         global global_db_set
-
         self.db_set = global_db_set
+        if db_type != '':
+           self.db_set['type'] = db_type 
         
     def __enter__(self):
         if self.db_set['type'] == 'sqlite':
@@ -888,6 +889,14 @@ def load_domain(data_type = 'normal'):
 
         return domain
 
+def get_tool_js_safe(data):
+    data = data.replace('\n', '\\\\n')
+    data = data.replace('\\', '\\\\')
+    data = data.replace("'", "\\'")
+    data = data.replace('"', '\\"')
+
+    return data
+
 def edit_button(ob_name = 'opennamu_edit_textarea', monaco_ob_name = 'opennamu_monaco_editor'):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -901,7 +910,7 @@ def edit_button(ob_name = 'opennamu_edit_textarea', monaco_ob_name = 'opennamu_m
 
         data = ''
         for insert_data in insert_list:
-            data += '<a href="javascript:do_insert_data(\'' + ob_name + '\', \'' + insert_data[0] + '\', \'' + monaco_ob_name + '\');">(' + insert_data[1] + ')</a> '
+            data += '<a href="javascript:do_insert_data(\'' + ob_name + '\', \'' + get_tool_js_safe(insert_data[0]) + '\', \'' + monaco_ob_name + '\');">(' + html.escape(insert_data[1]) + ')</a> '
 
         data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')</a>'
         data += '<hr class="main_hr">'
