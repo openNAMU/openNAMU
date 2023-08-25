@@ -52,6 +52,7 @@ print('20. Change domain')
 print('21. Change TLS')
 print('22. Delete body top')
 print('23. Delete body bottom')
+print('24. SQLite to MySQL')
 
 print('----')
 what_i_do = input('Select : ')
@@ -256,11 +257,33 @@ elif what_i_do == '22':
     curs.execute(db_change('delete from other where name = "body"'))
 elif what_i_do == '23':
     curs.execute(db_change('delete from other where name = "bottom_body"'))
+elif what_i_do == '24':
+    load_db = get_db_connect('mysql')
+    mysql_conn = load_db.__enter__()
+    mysql_curs = mysql_conn.cursor()
+    
+    load_db = get_db_connect('sqlite')
+    sqlite_conn = load_db.__enter__()
+    sqlite_curs = sqlite_conn.cursor()
+
+    create_data = get_db_table_list()
+    for create_table in create_data:
+        create = ['test'] + create_data[create_table]
+        create_r = ', '.join(['?' for _ in create])
+        create = ', '.join(create)
+        
+        print('select ' + create + ' from ' + create_table)
+        sqlite_curs.execute(db_change('select ' + create + ' from ' + create_table))
+        db_data = sqlite_curs.fetchall()
+        mysql_curs.executemany(db_change("insert into " + create_table + " (" + create + ") values (" + create_r + ")"), db_data)
 else:
     raise ValueError(what_i_do)
 
 if data_db_load == 'Y':
-    conn.commit()
+    try:
+        conn.commit()
+    except:
+        pass
 
 print('----')
 print('OK')
