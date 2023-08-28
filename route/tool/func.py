@@ -2134,15 +2134,17 @@ def ip_pas(raw_ip, type_data = 0):
         else:
             get_ip = raw_ip
 
+        admin_auth = admin_check(1)
+
         curs.execute(db_change("select data from other where name = 'ip_view'"))
         db_data = curs.fetchall()
         ip_view = db_data[0][0] if db_data else ''
-        ip_view = '' if admin_check(1) == 1 else ip_view
+        ip_view = '' if admin_auth == 1 else ip_view
 
         curs.execute(db_change("select data from other where name = 'user_name_view'"))
         db_data = curs.fetchall()
         user_name_view = db_data[0][0] if db_data else ''
-        user_name_view = '' if admin_check(1) == 1 else user_name_view
+        user_name_view = '' if admin_auth == 1 else user_name_view
         
         get_ip = list(set(get_ip))
         
@@ -2183,7 +2185,7 @@ def ip_pas(raw_ip, type_data = 0):
                 else:
                     curs.execute(db_change('select data from user_set where name = "user_name" and id = ?'), [raw_ip])
                     db_data = curs.fetchall()
-                    ip = db_data[0][0] if db_data else raw_ip
+                    ip = db_data[0][0] if db_data and db_data[0][0] != '' else raw_ip
                 
             if type_data == 0 and change_ip == 0:
                 if is_this_ip == 0:
