@@ -25,7 +25,7 @@ def bbs_w(bbs_num = ''):
         temp_id = ''
         temp_dict = {}
 
-        curs.execute(db_change('select set_name, set_data, set_code, set_id from bbs_data where set_id = binary ? order by set_code + 0 desc'), [bbs_num])
+        curs.execute(db_change('select set_name, set_data, set_code, set_id from bbs_data where set_id like ? order by set_code + 0 desc'), [bbs_num])
         db_data = curs.fetchall()
         db_data = list(db_data) if db_data else []
 

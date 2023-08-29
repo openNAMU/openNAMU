@@ -92,7 +92,7 @@ def recent_change(name = None, tool = ''):
                 set_type = '' if set_type == 'edit' else set_type
 
                 data_list = []
-                curs.execute(db_change('select title, id from rc where type = ? order by date desc'), [set_type])
+                curs.execute(db_change('select title, id from rc where type = ? order by date desc limit 50'), [set_type])
                 for i in curs.fetchall():
                     curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where title = ? and id = ?'), i)
                     data_list += curs.fetchall()
