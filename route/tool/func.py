@@ -1402,7 +1402,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                 curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
                 db_data = curs.fetchall()
                 if db_data and db_data[0][0] != '':
-                    get_class_render[0] += '''
+                    get_class_render[0] = '''
                         <style>
                             .opennamu_render_complete {
                                 font-size: 14.4px !important;
@@ -1417,11 +1417,11 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                                 font-weight: bold;
                             }
                         </style>
-                    '''
+                    ''' + get_class_render[0]
 
                 table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip_check())
                 if table_set_data == 'on':
-                    get_class_render[0] += '<style>.table_safe { overflow-x: scroll; white-space: nowrap; }</style>'
+                    get_class_render[0] = '<style>.table_safe { overflow-x: scroll; white-space: nowrap; }</style>' + get_class_render[0]
 
                 if data_type == 'api_view' or data_type == 'api_thread':
                     return [
