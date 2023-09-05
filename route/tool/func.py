@@ -667,8 +667,8 @@ def update(ver_num, set_data):
                     user_alarm_count[db_data[0]] = 1
 
                 curs.execute(db_change(
-                    'insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, ?)'
-                ), [str(user_alarm_count[db_data[0]]), db_data[0], db_data[1], db_data[2], db_data[3]])
+                    'insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'
+                ), [str(user_alarm_count[db_data[0]]), db_data[0], db_data[1], db_data[2]])
 
         conn.commit()
 
