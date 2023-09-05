@@ -13,7 +13,7 @@ def user_info(name = ''):
         tool_menu = ''
         
         if name == '':
-            curs.execute(db_change("select count(*) from user_notice where name = ? and read = ''"), [ip])
+            curs.execute(db_change("select count(*) from user_notice where name = ? and readme = ''"), [ip])
             count = curs.fetchall()
             if count and count[0][0] != 0:
                 tool_menu += '<li><a class="opennamu_not_exist_link" href="/alarm">' + load_lang('alarm') + ' (' + str(count[0][0]) + ')</a></li>'
