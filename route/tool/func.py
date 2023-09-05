@@ -1268,7 +1268,7 @@ def wiki_custom():
                 user_admin = '0'
                 user_acl_list = '0'
 
-            curs.execute(db_change("select count(*) from user_notice where name = ? and read = ''"), [ip])
+            curs.execute(db_change("select count(*) from user_notice where name = ? and readme = ''"), [ip])
             count = curs.fetchall()
             user_notice = str(count[0][0]) if count else '0'
         else:
