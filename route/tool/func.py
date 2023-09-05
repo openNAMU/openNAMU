@@ -336,7 +336,7 @@ def get_db_table_list():
     create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
 
     create_data['user_set'] = ['name', 'id', 'data']
-    create_data['user_notice'] = ['id', 'name', 'data', 'date', 'read']
+    create_data['user_notice'] = ['id', 'name', 'data', 'date', 'readme']
 
     create_data['bbs_set'] = ['set_name', 'set_code', 'set_id', 'set_data']
     create_data['bbs_data'] = ['set_name', 'set_code', 'set_id', 'set_data']
@@ -655,10 +655,11 @@ def update(ver_num, set_data):
         if ver_num < 3500365:
             curs.execute(db_change("update back set data = '' where data is null"))
 
-        if ver_num < 3500370:
+        if ver_num < 3500371:
+            curs.execute(db_change("delete from user_notice"))
             user_alarm_count = {}
 
-            curs.execute(db_change("select name, data, date, read from alarm"))
+            curs.execute(db_change("select name, data, date from alarm"))
             for db_data in curs.fetchall():
                 if db_data[0] in user_alarm_count:
                     user_alarm_count[db_data[0]] += 1
@@ -666,7 +667,7 @@ def update(ver_num, set_data):
                     user_alarm_count[db_data[0]] = 1
 
                 curs.execute(db_change(
-                    'insert into user_notice (id, name, data, date, read) values (?, ?, ?, ?, ?)'
+                    'insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, ?)'
                 ), [str(user_alarm_count[db_data[0]]), db_data[0], db_data[1], db_data[2], db_data[3]])
 
         conn.commit()
@@ -2418,7 +2419,7 @@ def add_alarm(to_user, from_user, context):
                 count = str(int(db_data[0][0]) + 1)
 
             curs.execute(db_change(
-                'insert into user_notice (id, name, data, date, read) values (?, ?, ?, ?, "")'
+                'insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'
             ), [count, to_user, context, get_time()])
     
 def add_user(user_name, user_pw, user_email = '', user_encode = ''):

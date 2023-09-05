@@ -11,7 +11,7 @@ def user_alarm():
 
         ip = ip_check()
     
-        curs.execute(db_change("select data, date, read, id from user_notice where name = ? order by date desc limit ?, 50"), [ip, sql_num])
+        curs.execute(db_change("select data, date, readme, id from user_notice where name = ? order by date desc limit ?, 50"), [ip, sql_num])
         data_list = curs.fetchall()
         if data_list:
             data = '' + \
@@ -34,7 +34,7 @@ def user_alarm():
                     '</li>' + \
                 ''
 
-        curs.execute(db_change("update user_notice set read = '1' where name = ?"), [ip])
+        curs.execute(db_change("update user_notice set readme = '1' where name = ?"), [ip])
         conn.commit()
     
         data += '' + \
