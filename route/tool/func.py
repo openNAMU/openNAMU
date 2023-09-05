@@ -333,10 +333,10 @@ def get_db_table_list():
     create_data['re_admin'] = ['who', 'what', 'time']
 
     # 개편 예정 (user_notice와 user_agent로 변경)
-    create_data['alarm'] = ['name', 'data', 'date']
     create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
 
     create_data['user_set'] = ['name', 'id', 'data']
+    create_data['user_notice'] = ['id', 'name', 'data', 'date', 'read']
 
     create_data['bbs_set'] = ['set_name', 'set_code', 'set_id', 'set_data']
     create_data['bbs_data'] = ['set_name', 'set_code', 'set_id', 'set_data']
@@ -654,6 +654,20 @@ def update(ver_num, set_data):
 
         if ver_num < 3500365:
             curs.execute(db_change("update back set data = '' where data is null"))
+
+        if ver_num < 3500370:
+            user_alarm_count = {}
+
+            curs.execute(db_change("select name, data, date, read from alarm"))
+            for db_data in curs.fetchall():
+                if db_data[0] in user_alarm_count:
+                    user_alarm_count[db_data[0]] += 1
+                else:
+                    user_alarm_count[db_data[0]] = 1
+
+                curs.execute(db_change(
+                    'insert into user_notice (id, name, data, date, read) values (?, ?, ?, ?, ?)'
+                ), [str(user_alarm_count[db_data[0]]), db_data[0], db_data[1], db_data[2], db_data[3]])
 
         conn.commit()
 
@@ -1253,7 +1267,7 @@ def wiki_custom():
                 user_admin = '0'
                 user_acl_list = '0'
 
-            curs.execute(db_change("select count(*) from alarm where name = ?"), [ip])
+            curs.execute(db_change("select count(*) from user_notice where name = ? and read = ''"), [ip])
             count = curs.fetchall()
             user_notice = str(count[0][0]) if count else '0'
         else:
@@ -2397,9 +2411,15 @@ def add_alarm(to_user, from_user, context):
         if to_user != from_user:
             context = from_user + ' | ' + context
 
+            count = '1'
+            curs.execute(db_change("select id from user_notice where name = ? order by id + 0 desc"), [to_user])
+            db_data = curs.fetchall()
+            if db_data:
+                count = str(int(db_data[0][0]) + 1)
+
             curs.execute(db_change(
-                'insert into alarm (name, data, date) values (?, ?, ?)'
-            ), [to_user, context, get_time()])
+                'insert into user_notice (id, name, data, date, read) values (?, ?, ?, ?, "")'
+            ), [count, to_user, context, get_time()])
     
 def add_user(user_name, user_pw, user_email = '', user_encode = ''):
     with get_db_connect() as conn:
