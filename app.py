@@ -75,48 +75,48 @@ with get_db_connect() as conn:
                         curs.execute(db_change('create table ' + create_table + '(test longtext default (""))'))
 
                         db_pass = 1
-                    except:
-                        pass
+                    except Exception as e:
+                        print(e)
 
                 if db_pass == 0:
                     try:
                         curs.execute(db_change('create table ' + create_table + '(test longtext default "")'))
 
                         db_pass = 1
-                    except:
-                        pass
+                    except Exception as e:
+                        print(e)
 
                 if db_pass == 0:
                     try:
                         curs.execute(db_change('create table ' + create_table + '(test longtext)'))
 
                         db_pass = 1
-                    except:
-                        pass
+                    except Exception as e:
+                        print(e)
 
                 if db_pass == 0:
                     try:
                         curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ('')"))
 
                         db_pass = 1
-                    except:
-                        pass
+                    except Exception as e:
+                        print(e)
 
                 if db_pass == 0:
                     try:
                         curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ''"))
 
                         db_pass = 1
-                    except:
-                        pass
+                    except Exception as e:
+                        print(e)
 
                 if db_pass == 0:
                     try:
                         curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext"))
 
                         db_pass = 1
-                    except:
-                        pass
+                    except Exception as e:
+                        print(e)
 
                 if db_pass == 0:
                     raise
