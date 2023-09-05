@@ -473,6 +473,7 @@ app.route('/count/<name>')(user_count)
 
 app.route('/alarm')(user_alarm)
 app.route('/alarm/delete')(user_alarm_delete)
+app.route('/alarm/delete/<int:id>')(user_alarm_delete)
 
 app.route('/watch_list', defaults = { 'tool' : 'watch_list' })(user_watch_list)
 app.route('/watch_list/<everything:name>', defaults = { 'tool' : 'watch_list' })(user_watch_list_name)

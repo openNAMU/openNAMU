@@ -8,8 +8,10 @@ def user_alarm():
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
     
         data = '<ul class="opennamu_ul">'
+
+        ip = ip_check()
     
-        curs.execute(db_change("select data, date from alarm where name = ? order by date desc limit ?, 50"), [ip_check(), sql_num])
+        curs.execute(db_change("select data, date, read, id from user_notice where name = ? order by date desc limit ?, 50"), [ip, sql_num])
         data_list = curs.fetchall()
         if data_list:
             data = '' + \
@@ -20,8 +22,20 @@ def user_alarm():
     
             for data_one in data_list:
                 data_split = data_one[0].split(' | ')
+                data_style = ''
+                if data_one[2] == '1':
+                    data_style = 'opacity: 0.75;'
                 
-                data += '<li>' + ip_pas(data_split[0]) + (' | ' + ' | '.join(data_split[1:]) if len(data_split) > 1 else '') + ' (' + data_one[1] + ')</li>'
+                data += '' + \
+                    '<li style="' + data_style + '">' + \
+                        ip_pas(data_split[0]) + (' | ' + ' | '.join(data_split[1:]) if len(data_split) > 1 else '') + \
+                        ' | ' + data_one[1] + \
+                        ' <a href="/alarm/delete/' + url_pas(data_one[3]) + '">(' + load_lang('delete') + ')</a>' + \
+                    '</li>' + \
+                ''
+
+        curs.execute(db_change("update user_notice set read = '1' where name = ?"), [ip])
+        conn.commit()
     
         data += '' + \
             '</ul>' + \
