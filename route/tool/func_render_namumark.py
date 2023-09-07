@@ -635,7 +635,23 @@ class class_do_render_namumark:
             elif name_data == 'pagecount':
                 return '0'
             elif name_data == 'lastedit':
-                link_main = self.get_tool_link_fix(match[1], 'redirect')
+                link_main = match[1]
+                data_view = ''
+
+                data = re.findall(macro_split_regex, match[1])
+                for for_a in data:
+                    data_sub = re.search(macro_split_sub_regex, for_a)
+                    if data_sub:
+                        data_sub = data_sub.groups()
+                        data_sub = [data_sub[0].lower(), data_sub[1]]
+
+                        if data_sub[0] == 'view':
+                            if data_sub[1] == 'full':
+                                data_view = '1'
+                    else:
+                        link_main = for_a
+                        
+                link_main = self.get_tool_link_fix(link_main, 'redirect')
 
                 link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                 link_main = html.unescape(link_main)
@@ -643,7 +659,11 @@ class class_do_render_namumark:
                 self.curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'last_edit'"), [link_main])
                 db_data = self.curs.fetchall()
                 if db_data:
-                    return db_data[0][0]
+                    date_data = db_data[0][0]
+                    if data_view != '1':
+                        date_data = date_data.split()[0]
+
+                    return date_data
                 else:
                     return '0'
             else:
