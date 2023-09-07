@@ -3,7 +3,7 @@ from .func_tool import *
 class class_do_render_namumark:
     def __init__(self, curs, doc_name, doc_data, doc_set, lang_data, footnote = {}):
         self.curs = curs
-        
+
         self.doc_data = doc_data.replace('\r', '')
         self.doc_name = doc_name
         self.doc_set = doc_set
@@ -17,8 +17,8 @@ class class_do_render_namumark:
 
         try:
             if 'main_css_bold' in flask.session:
-                pass    
-                
+                pass
+
             self.flask_session = flask.session
         except:
             self.flask_session = ''
@@ -38,7 +38,7 @@ class class_do_render_namumark:
 
         self.data_math_count = 0
         self.data_redirect = 0
-        
+
         self.data_toc = ''
         self.data_footnote = {}
         self.data_footnote_all = {}
@@ -234,7 +234,7 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage('', '', match.group(0))
             else:
                 data_name = self.get_tool_data_storage('<b>', '</b>', match.group(0))
-            
+
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
         # <b>
@@ -244,7 +244,7 @@ class class_do_render_namumark:
         def do_render_text_italic(match):
             data = match.group(1)
             data_name = self.get_tool_data_storage('<i>', '</i>', match.group(0))
-            
+
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
         # <i>
@@ -254,17 +254,17 @@ class class_do_render_namumark:
         def do_render_text_under(match):
             data = match.group(1)
             data_name = self.get_tool_data_storage('<u>', '</u>', match.group(0))
-            
+
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
         # <u>
         self.render_data = re.sub(r"__((?:(?!__).)+)__", do_render_text_under, self.render_data)
-        
+
         # <sup> function
         def do_render_text_sup(match):
             data = match.group(1)
             data_name = self.get_tool_data_storage('<sup>', '</sup>', match.group(0))
-            
+
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
         # <sup>
@@ -276,9 +276,9 @@ class class_do_render_namumark:
         def do_render_text_sub(match):
             data = match.group(1)
             data_name = self.get_tool_data_storage('<sub>', '</sub>', match.group(0))
-            
+
             return '<' + data_name + '>' + data + '</' + data_name + '>'
-        
+
         # <sub>
         self.render_data = re.sub(r",,,((?:(?!,,,).)+),,,", do_render_text_sub, self.render_data)
         # <sub> 2
@@ -295,14 +295,14 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage('', '', match.group(0))
             else:
                 data_name = self.get_tool_data_storage('<s>', '</s>', match.group(0))
-            
+
             return '<' + data_name + '>' + data + '</' + data_name + '>'
-        
+
         # <s>
         self.render_data = re.sub(r"--((?:(?!--).)+)--", do_render_text_strike, self.render_data)
         # <s> 2
         self.render_data = re.sub(r"~~((?:(?!~~).)+)~~", do_render_text_strike, self.render_data)
-    
+
     def do_render_heading(self):
         toc_list = []
 
@@ -412,7 +412,7 @@ class class_do_render_namumark:
         heading_id_data = re.findall(heading_id_regex, self.render_data)
         for for_a in range(len(heading_id_data)):
             self.render_data = re.sub(heading_id_regex, '<a href="#toc" id="s-' + heading_id_data[for_a] + '">' + heading_id_data[for_a] + '.</a>', self.render_data, 1)
-            
+
             toc_list[for_a][0] = heading_id_data[for_a]
 
         # not heading restore
@@ -524,7 +524,7 @@ class class_do_render_namumark:
 
                 data_name = self.get_tool_data_storage(
                     '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen>',
-                    '</iframe>', 
+                    '</iframe>',
                     match_org.group(0)
                 )
 
@@ -590,7 +590,7 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage(data_text, '', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
-            elif name_data == 'dday':
+            elif name_data in ('dday', 'dmonth', 'dyear'):
                 if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', match[1]):
                     try:
                         date = datetime.datetime.strptime(match[1], '%Y-%m-%d')
@@ -599,9 +599,26 @@ class class_do_render_namumark:
                         data_text = 'invalid date'
 
                     date_now = datetime.datetime.today()
-                    
                     if data_text == '':
-                        date_end = (date_now - date).days
+                        if name_data == 'dday':
+                            date_end = (date_now - date).days
+                        elif name_data == 'dyear':
+                            date_end = (date_now - date)
+                            if date_end.days > 0:
+                                date_end = datetime.date.min + date_end
+                                date_end = date_end.year - 1
+                            else:
+                                date_end = datetime.date.min - date_end
+                                date_end = 0 - (date_end.year - 1)
+                        else:
+                            date_end = (date_now - date)
+                            if date_end.days > 0:
+                                date_end = datetime.date.min + date_end
+                                date_end = (date_end.year - 1) * 12 + (date_end.month - 1)
+                            else:
+                                date_end = datetime.date.min - date_end
+                                date_end = 0 - ((date_end.year - 1) * 12 + (date_end.month - 1))
+
                         if date_end > 0:
                             data_text = '+' + str(date_end)
                         else:
