@@ -40,6 +40,10 @@ input::placeholder, textarea::placeholder, select::placeholder {
     background: #314c56;
 }
 
+.opennamu_comment_blind_admin {
+    background: #2f2f2f;
+}
+
 #main_table_top_tr {
     background: #2e5f4e;
 }
