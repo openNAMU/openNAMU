@@ -273,6 +273,7 @@ elif what_i_do == '24':
         create = ', '.join(create)
         
         print('select ' + create + ' from ' + create_table)
+        mysql_curs.execute(db_change('delete from ' + create_table))
         sqlite_curs.execute(db_change('select ' + create + ' from ' + create_table))
         db_data = sqlite_curs.fetchall()
         mysql_curs.executemany(db_change("insert into " + create_table + " (" + create + ") values (" + create_r + ")"), db_data)
