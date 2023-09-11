@@ -1960,11 +1960,14 @@ class class_do_render_namumark:
                 i -= 1
 
             return end_text
+            
+        list_view_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_list_view_change', self.ip)
         
         class do_render_list_int_to:
-            def __init__(self, do_type):
+            def __init__(self, do_type, list_view_set = ''):
                 self.list_num = []
                 self.do_type = do_type
+                self.list_view_set = list_view_set
 
             def __call__(self, match):
                 list_data = match.group(3)
@@ -1985,7 +1988,10 @@ class class_do_render_namumark:
                     self.list_num[list_len - 1] = int(list_start)
 
                 if self.do_type == 'int':
-                    change_text = str(self.list_num[list_len - 1])
+                    if self.list_view_set == 'on':
+                        change_text = str('-'.join([str(for_a) for for_a in self.list_num if for_a != 0]))
+                    else:
+                        change_text = str(self.list_num[list_len - 1])
                 elif self.do_type == 'roman_big':
                     change_text = int_to_roman(self.list_num[list_len - 1])
                 elif self.do_type == 'roman_small':
@@ -2010,7 +2016,7 @@ class class_do_render_namumark:
                 list_data = list_data.group(1)
                 list_sub_regex = r'\n( *)1\.(?:#([0-9]*))? ?([^\n]*)'
 
-                list_class = do_render_list_int_to('int')
+                list_class = do_render_list_int_to('int', list_view_set)
                 list_data = re.sub(list_sub_regex, list_class, list_data)
 
                 self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
