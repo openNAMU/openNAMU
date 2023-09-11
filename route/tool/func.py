@@ -749,6 +749,13 @@ def set_init():
             ]:
                 curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, '')"), [i[0], i[1]])
 
+        curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [
+            r'(?:[^A-Za-zㄱ-힣0-9])',
+            'name',
+            '',
+            ''
+        ])
+
 # Func-simple
 ## Func-simple-without_DB
 def get_default_admin_group():
