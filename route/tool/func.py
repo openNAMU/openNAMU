@@ -670,6 +670,15 @@ def update(ver_num, set_data):
                     'insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'
                 ), [str(user_alarm_count[db_data[0]]), db_data[0], db_data[1], db_data[2]])
 
+        if ver_num < 3500372:
+            # ID 글자 확인 호환용
+            curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [
+                r'(?:[^A-Za-zㄱ-힣0-9])',
+                'name',
+                '',
+                ''
+            ])
+
         conn.commit()
 
         print('Update completed')
@@ -1675,8 +1684,8 @@ def do_user_name_check(user_name):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        # ID 글자 확인
-        if re.search(r'(?:[^A-Za-zㄱ-힣0-9])', user_name):
+        # XSS 필터
+        if html.escape(user_name) != user_name:
             return 1
 
         # ID 필터
@@ -1687,8 +1696,8 @@ def do_user_name_check(user_name):
             if check_r.search(user_name):
                 return 1
 
-        # ID 길이 제한 (32글자)
-        if len(user_name) > 32:
+        # ID 길이 제한 (128글자)
+        if len(user_name) > 128:
             return 1
         
         return 0
@@ -2673,9 +2682,6 @@ def re_error(data):
                 data = load_lang('error_skin_set')
             elif num == 6:
                 data = load_lang('same_id_exist_error')
-            elif num == 7:
-                # 폐지
-                data = load_lang('long_id_error')
             elif num == 8:
                 data = load_lang('long_id_error') + '<br>' + load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id_filter_list') + ')</a>'
             elif num == 9:
