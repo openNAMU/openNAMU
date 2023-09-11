@@ -269,7 +269,7 @@ elif what_i_do == '24':
     create_data = get_db_table_list()
     for create_table in create_data:
         create = ['test'] + create_data[create_table]
-        create_r = ', '.join(['?' for _ in create])
+        create_r = ', '.join(['%s' for _ in create])
         create = ', '.join(create)
         
         print('select ' + create + ' from ' + create_table)
