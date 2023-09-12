@@ -632,6 +632,10 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage(data_text, '', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
+            elif name_data == 'joke':
+                data_name = self.get_tool_data_storage('<span class="opennamu_joke">', '</span>', match_org.group(0))
+
+                return '<' + data_name + '>' + match[1] + '</' + data_name + '>'
             elif name_data == 'pagecount':
                 return '0'
             elif name_data == 'lastedit':

@@ -1385,6 +1385,8 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
 
         acl_dict = {}
         acl_dict[doc_name] = doc_acl
+
+        ip = ip_check()
             
         if doc_acl == 1:
             return 'HTTP Request 401.3'
@@ -1450,9 +1452,13 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                         </style>
                     ''' + get_class_render[0]
 
-                table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip_check())
+                table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip)
                 if table_set_data == 'on':
                     get_class_render[0] = '<style>.table_safe { overflow-x: scroll; white-space: nowrap; }</style>' + get_class_render[0]
+
+                joke_set_data = get_main_skin_set(curs, flask.session, 'main_css_view_joke', ip)
+                if joke_set_data == 'off':
+                    get_class_render[0] = '<style>.opennamu_joke { display: none; }</style>' + get_class_render[0]
 
                 if data_type == 'api_view' or data_type == 'api_thread':
                     return [
