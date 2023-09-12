@@ -1370,8 +1370,18 @@ class class_do_render_namumark:
             link_data_full = match.group(0)
             link_main = match.group(1)
 
-            # under page & fix url
-            link_main = self.get_tool_link_fix(link_main, 'redirect')
+            link_inter_name = ''
+
+            link_inter_regex = re.compile('^(?:inter|인터):([^:]+):', flags = re.I)
+            inter_check = re.search(link_inter_regex, link_main)
+            if not inter_check:
+                # under page & fix url
+                link_main = self.get_tool_link_fix(link_main, 'redirect')
+            else:
+                link_inter_name = re.search(link_inter_regex, link_main)
+                link_inter_name = link_inter_name.group(1)
+
+                link_main = re.sub(link_inter_regex, '', link_main)
 
             # sharp
             link_main = link_main.replace('&#x27;', '<link_single>')
@@ -1388,24 +1398,50 @@ class class_do_render_namumark:
             
             link_main = link_main.replace('<link_single>', '&#x27;')
 
-            # main link fix
-            link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
-            link_main = html.unescape(link_main)
+            if not inter_check:
+                # main link fix
+                link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                link_main = html.unescape(link_main)
 
-            self.data_backlink += [[self.doc_name, link_main, 'redirect', '']]
+                self.data_backlink += [[self.doc_name, link_main, 'redirect', '']]
 
-            link_main = url_pas(link_main)
+                link_main = url_pas(link_main)
+                if link_main != '':
+                    link_main = '/w_from/' + link_main
 
-            self.data_redirect = 1
-            if link_main != '':
-                link_main = '/w_from/' + link_main
-
-            if 'doc_from' in self.doc_set:
-                data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
+                self.data_redirect = 1
+                if 'doc_from' in self.doc_set:
+                    data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
+                else:
+                    data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', '', link_data_full)
+                    
+                self.render_data = '<' + data_name + '></' + data_name + '>'
             else:
-                data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', '', link_data_full)
+                self.curs.execute(db_change("select plus, plus_t from html_filter where kind = 'inter_wiki' and html = ?"), [link_inter_name])
+                db_data = self.curs.fetchall()
+                if db_data:
+                    link_main = url_pas(link_main)
+                    link_main = db_data[0][0] + link_main
+
+                    link_sub_storage = match.group(1)
+                    link_sub_storage = re.sub(link_inter_regex, '', link_sub_storage)
+
+                    link_inter_icon = link_inter_name + ':'
+                    if db_data[0][1] != '':
+                        link_inter_icon = db_data[0][1]
+
+                    link_sub_storage = link_inter_icon + link_sub_storage
+
+                    self.data_redirect = 1
+                    if 'doc_from' in self.doc_set:
+                        data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
+                    else:
+                        data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="5; url=' + link_main + link_data_sharp + '">', link_sub_storage + ' - After 5s', link_data_full)
                 
-            self.render_data = '<' + data_name + '></' + data_name + '>'
+                    self.render_data = '<' + data_name + '></' + data_name + '>'
+                else:
+                    self.data_redirect = 1
+                    self.render_data = ''
 
     def do_render_table(self):
         self.render_data = re.sub(r'\n +\|\|', '\n||', self.render_data)
