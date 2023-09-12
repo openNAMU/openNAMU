@@ -297,6 +297,8 @@
                 "footnote_real_num_view" : "Footnote original number view",
                 "category_change_title" : "Don't rename documents in category",
                 "table_scroll" : "Use scroll in tables",
+                "list_view_change" : "Change how the number list is viewed",
+                "view_joke" : "Show contents of joke macro",
             "_comment_" : "Option",
                 "change_to_normal" : "Change to plain text.",
                 "change_to_link" : "Change to Link.",
