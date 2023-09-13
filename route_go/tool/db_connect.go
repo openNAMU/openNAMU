@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 func DB_connect(db_set map[string]string) *sql.DB {
