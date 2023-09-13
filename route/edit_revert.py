@@ -84,6 +84,7 @@ def edit_revert(name, num):
                             ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
                             <button type="submit">''' + load_lang('revert') + '''</button>
                         </form>
+                        <hr class="main_hr">
                         ''' + preview,
                 menu = [['history/' + url_pas(name), load_lang('history')], ['recent_changes', load_lang('recent_change')]]
             ))
