@@ -611,28 +611,6 @@ app.route('/setting/skin_set', methods = ['POST', 'GET'])(main_setting_skin_set)
 
 app.route('/easter_egg')(main_func_easter_egg)
 
-def main_easter_egg_go():
-    with get_db_connect() as conn:
-        print(platform.machine())
-        if platform.system() == 'Linux':
-            if platform.machine() in ["AMD64", "x86_64"]:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.amd64.bin")).read()
-            else:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.arm64.bin")).read()
-        else:
-            if platform.machine() in ["AMD64", "x86_64"]:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.amd64.exe")).read()
-            else:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.arm64.exe")).read()
-
-        return easy_minify(flask.render_template(skin_check(),
-            imp = ['Easter Egg', wiki_set(), wiki_custom(), wiki_css([0, 0])],
-            data = data,
-            menu = 0
-        ))
-
-app.route('/easter_egg_go')(main_easter_egg_go)
-
 # views -> view
 app.route('/view/<path:name>')(main_view)
 app.route('/views/<path:name>')(main_view)
