@@ -33,5 +33,5 @@ func main() {
 	}
 	select_str := select_list[rand.Intn(len(select_list)-1)]
 
-	fmt.Println("<iframe width=\"640\" height=\"360\" src=\"https://www.youtube.com/embed/" + select_str + "\" frameborder=\"0\" allowfullscreen></iframe>")
+	fmt.Print("<iframe width=\"640\" height=\"360\" src=\"https://www.youtube.com/embed/" + select_str + "\" frameborder=\"0\" allowfullscreen></iframe>")
 }

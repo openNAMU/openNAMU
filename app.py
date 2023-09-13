@@ -257,6 +257,8 @@ if os.path.exists('custom.py'):
     from custom import custom_run
     custom_run('error', app)
 
+db_set_str = json.dumps(data_db_set)
+
 # Func
 # Func-inter_wiki
 app.route('/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(filter_inter_wiki)
@@ -402,7 +404,7 @@ app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_read)
 app.route('/w/<everything:name>')(view_read)
 
-app.route('/random')(view_random)
+app.route('/random', defaults = { 'db_set' : db_set_str })(view_random)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
@@ -610,28 +612,6 @@ app.route('/setting/sitemap', methods = ['POST', 'GET'])(main_setting_sitemap)
 app.route('/setting/skin_set', methods = ['POST', 'GET'])(main_setting_skin_set)
 
 app.route('/easter_egg')(main_func_easter_egg)
-
-def main_easter_egg_go():
-    with get_db_connect() as conn:
-        print(platform.machine())
-        if platform.system() == 'Linux':
-            if platform.machine() in ["AMD64", "x86_64"]:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.amd64.bin")).read()
-            else:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.arm64.bin")).read()
-        else:
-            if platform.machine() in ["AMD64", "x86_64"]:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.amd64.exe")).read()
-            else:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.arm64.exe")).read()
-
-        return easy_minify(flask.render_template(skin_check(),
-            imp = ['Easter Egg', wiki_set(), wiki_custom(), wiki_css([0, 0])],
-            data = data,
-            menu = 0
-        ))
-
-app.route('/easter_egg_go')(main_easter_egg_go)
 
 # views -> view
 app.route('/view/<path:name>')(main_view)
