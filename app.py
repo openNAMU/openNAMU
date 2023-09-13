@@ -257,6 +257,8 @@ if os.path.exists('custom.py'):
     from custom import custom_run
     custom_run('error', app)
 
+db_set_str = json.dumps(data_db_set)
+
 # Func
 # Func-inter_wiki
 app.route('/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(filter_inter_wiki)
@@ -402,7 +404,7 @@ app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_read)
 app.route('/w/<everything:name>')(view_read)
 
-app.route('/random')(view_random)
+app.route('/random', defaults = { 'db_set' : db_set_str })(view_random)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
