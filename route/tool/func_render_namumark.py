@@ -1577,7 +1577,7 @@ class class_do_render_namumark:
                 else:
                     table_caption = ''
 
-                table_parameter = { "div" : "", "class" : "", "table" : "", "col" : {}, "rowspan" : {} }
+                table_parameter = { "div" : "", "class" : "", "table" : "", "tr" : "", "td" : "", "col" : {}, "rowspan" : {} }
                 table_data_end = ''
                 table_col_num = 0
                 table_tr_change = 0
@@ -1586,13 +1586,14 @@ class class_do_render_namumark:
                     table_data_in = re.sub(r'^\n+', '', table_data_in)
 
                     table_sub_parameter = do_render_table_parameter(table_sub[1], table_sub[2], table_data_in)
-
-                    if table_data_end == '':
-                        table_data_end += '<tr style="' + table_sub_parameter['tr'] + '">'
+                    table_parameter["tr"] += table_sub_parameter['tr']
 
                     if table_sub[0] != '' and table_tr_change == 1:
                         table_col_num = 0
-                        table_data_end += '</tr><tr style="' + table_sub_parameter['tr'] + '">'
+                        table_data_end += '<tr style="' + table_parameter["tr"] + '">' + table_parameter["td"] + '</tr>'
+                        
+                        table_parameter["tr"] = ""
+                        table_parameter["td"] = ""
 
                     if not table_col_num in table_parameter['rowspan']:
                         table_parameter['rowspan'][table_col_num] = 0
@@ -1619,11 +1620,12 @@ class class_do_render_namumark:
                     else:
                         table_tr_change = 0
                     
-                        table_data_end += '<td colspan="' + table_sub_parameter['colspan'] + '" rowspan="' + table_sub_parameter['rowspan'] + '" style="' + table_parameter['col'][table_col_num] + table_sub_parameter['td'] + '"><back_br>\n' + table_sub_parameter['data'] + '\n<front_br></td>'
+                        table_parameter["td"] += '<td colspan="' + table_sub_parameter['colspan'] + '" rowspan="' + table_sub_parameter['rowspan'] + '" style="' + table_parameter['col'][table_col_num] + table_sub_parameter['td'] + '"><back_br>\n' + table_sub_parameter['data'] + '\n<front_br></td>'
                     
                     table_col_num += 1
+                else:
+                    table_data_end += '<tr style="' + table_parameter["tr"] + '">' + table_parameter["td"] + '</tr>'
 
-                table_data_end += '</tr>'
                 table_data_end = '<table class="' + table_parameter['class'] + '" style="' + table_parameter['table'] + '">' + table_caption + table_data_end + '</table>'
                 table_data_end = '<div class="table_safe" style="' + table_parameter['div'] + '">' + table_data_end + '</div>'
 
