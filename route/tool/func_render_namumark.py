@@ -569,6 +569,43 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage('<span id="' + main_text + '">', '</span>', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
+            elif name_data == 'timeif':
+                data = re.findall(macro_split_regex, match[1])
+
+                main_text = ''
+                before_text = ''
+                after_text = ''
+                for for_a in data:
+                    data_sub = re.search(macro_split_sub_regex, for_a)
+                    if data_sub:
+                        data_sub = data_sub.groups()
+                        data_sub = [data_sub[0].lower(), data_sub[1]]
+
+                        if data_sub[0] == 'before':
+                            before_text = data_sub[1]
+                        elif data_sub[0] == 'after':
+                            after_text = data_sub[1]
+                    else:
+                        main_text = for_a
+
+                if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', main_text):
+                    try:
+                        date = datetime.datetime.strptime(main_text, '%Y-%m-%d')
+                        data_text = ''
+                    except:
+                        data_text = 'invalid date'
+
+                    date_now = datetime.datetime.today()
+
+                    if data_text == '':
+                        if date > date_now:
+                            data_text = before_text
+                        else:
+                            data_text = after_text
+                else:
+                    data_text = 'invalid date'
+
+                return data_text
             elif name_data == 'age':
                 if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', match[1]):
                     try:
