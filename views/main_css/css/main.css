@@ -26,6 +26,8 @@ input[type="checkbox"], input[type="radio"] {
 
 /* 테이블 */
 table {
+    overflow-x: scroll;
+
     border-collapse: collapse;
 }
 
@@ -332,12 +334,9 @@ s:hover, strike:hover, del:hover {
     white-space: pre-line;
 }
 
-.katex {
+.katex .base {
     max-width: 100%;
-
-    display: inline-block;
-
-    overflow-x: scroll;
+    overflow-x: hidden;
     overflow-y: hidden;
 }
 

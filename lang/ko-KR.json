@@ -571,5 +571,6 @@
     "data": "데이터",
     "volume": "용량",
     "list_view_change" : "숫자 리스트의 보기 방식 변경",
-    "view_joke" : "농담 매크로 내용 보이기"
+    "view_joke" : "농담 매크로 내용 보이기",
+    "math_scroll" : "Math 매크로에서 스크롤 사용"
 }
