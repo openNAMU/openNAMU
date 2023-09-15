@@ -1138,8 +1138,8 @@ class class_do_render_namumark:
 
                 return slash_add + match[2]
 
-        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
-        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)@', do_render_include_default_sub, self.render_data)
 
     def do_render_include(self):
         def do_render_include_default_sub(match):
@@ -1225,8 +1225,8 @@ class class_do_render_namumark:
                             include_link = '<div><a href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
 
                         # parameter replace
-                        include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, include_data)
-                        include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)@', do_render_include_default_sub, include_data)
+                        include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, include_data)
+                        include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)@', do_render_include_default_sub, include_data)
 
                         # remove end br
                         include_data = re.sub('^\n+', '', include_data)
