@@ -55,7 +55,7 @@ function opennamu_do_render_html(name = '') {
                         link_data = '';
                     }
 
-                    return '<' + t_data[key] + ' id="out_link" href="' + link_data + '">' + in_data_2 + '</' + t_data[key] + '>';
+                    return '<' + t_data[key] + ' class="opennamu_link_out" href="' + link_data + '">' + in_data_2 + '</' + t_data[key] + '>';
                 } else if(t_data[key] === 'iframe') {
                     let src_data = in_data.match(/ src=['"]([^'"]*)['"]/);
                     if(src_data) {
