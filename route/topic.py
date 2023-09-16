@@ -156,6 +156,13 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('discussion') + ')', 0])],
                 data = '''
+                    <style id="opennamu_remove_blind">
+                        .opennamu_comment_blind_js {
+                            display: none;
+                        }
+                    </style>
+                    <input type="checkbox" onclick="opennamu_do_remove_blind_thread();" checked> ''' + load_lang('remove_blind_thread') + '''
+
                     ''' + shortcut + '''
                     <h2 id="topic_top_title">''' + html.escape(sub) + '''</h2>
                     
@@ -185,8 +192,6 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                     <hr class="main_hr">
                     
                     <div id="opennamu_preview_area">''' + thread_data_preview + '''</div>
-                    
-                    <!-- JS : opennamu_do_thread_make -->
                 ''',
                 menu = [['topic/' + url_pas(name), load_lang('list')]]
             ))
