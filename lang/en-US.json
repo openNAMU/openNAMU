@@ -467,6 +467,7 @@
                 "edit_record" : "Edit record",
                 "discussion_record" : "Discussion record",
         "_comment_2.4_" : "Topic",
+            "remove_blind_thread" : "Hide blind thread",
             "make_new_topic" : "Make new discussion",
             "topic_tool" : "Discussion management tools",
             "topic_state" : "Discussion status",

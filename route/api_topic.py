@@ -6,24 +6,30 @@ def api_topic_thread_make(user_id, date, data, code, color = '', blind = '', add
             color_b = 'opennamu_comment_blind'
         else:
             color_b = 'opennamu_comment_blind_admin'
+
+        class_b = 'opennamu_comment_blind_js'
     else:
         color_b = 'opennamu_comment_blind_not'
+        class_b = ''
 
     return '''
-        <table class="opennamu_comment" style="''' + add_style + '''">
-            <tr>
-                <td class="opennamu_comment_color_''' + color + '''">
-                    <a href="#thread_shortcut" id="''' + code + '''">#''' + code + '''</a>
-                    ''' + user_id + '''
-                    <span style="float: right;">''' + date + '''</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="''' + color_b + '''" id="opennamu_comment_data_main">
-                    ''' + data + '''
-                </td>
-            </tr>
-        </table>
+        <span class="''' + class_b + '''">
+            <table class="opennamu_comment" style="''' + add_style + '''">
+                <tr>
+                    <td class="opennamu_comment_color_''' + color + '''">
+                        <a href="#thread_shortcut" id="''' + code + '''">#''' + code + '''</a>
+                        ''' + user_id + '''
+                        <span style="float: right;">''' + date + '''</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="''' + color_b + '''" id="opennamu_comment_data_main">
+                        ''' + data + '''
+                    </td>
+                </tr>
+            </table>
+            <hr class="main_hr">
+        </span>
     '''
 
 def api_topic_thread_pre_render(curs, data, num, ip, topic_num = '', name = '', sub = '', do_type = 'thread'):
@@ -192,7 +198,6 @@ def api_topic(topic_num = 1, tool = 'normal', num = '', render = ''):
                                 blind = for_a["blind"],
                                 add_style = ''
                             )
-                            data_r += '<hr class="main_hr">'
 
                     return flask.jsonify({ "data" : data_r })
             else:

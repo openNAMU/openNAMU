@@ -49,7 +49,6 @@ def bbs_w_post_comment(user_id, sub_code, comment_num, bbs_num_str, post_num_str
             comment_default = 'selected'
 
         comment_select += '<option value="' + sub_code_check + '" ' + comment_default + '>' + sub_code_check + '</option>'
-        comment_data += '<hr class="main_hr">'
 
         temp_data = bbs_w_post_comment(user_id, sub_code + '-' + temp_dict['code'], comment_num, bbs_num_str, post_num_str)
 
@@ -150,7 +149,6 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                     '0',
                     color = 'green'
                 )
-                data += '<hr class="main_hr">'
 
                 user_id = temp_dict['user_id']
                 count = 0
@@ -178,7 +176,6 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                         str(count),
                         color = color
                     )
-                    data += '<hr class="main_hr">'
 
                 bbs_comment_form = ''
                 if bbs_comment_acl == 0:
@@ -325,7 +322,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                 comment_add_count -= comment_count
 
                 if comment_data != '':
-                    data += '<hr class="main_hr"><hr>'
+                    data += '<hr>'
 
                 comment_select += '</select>'
                 if comment_data != '':

@@ -76,7 +76,8 @@ with get_db_connect() as conn:
 
                         db_pass = 1
                     except Exception as e:
-                        print(e)
+                        # print(e)
+                        pass
 
                 if db_pass == 0:
                     try:
@@ -84,7 +85,8 @@ with get_db_connect() as conn:
 
                         db_pass = 1
                     except Exception as e:
-                        print(e)
+                        # print(e)
+                        pass
 
                 if db_pass == 0:
                     try:
@@ -92,7 +94,8 @@ with get_db_connect() as conn:
 
                         db_pass = 1
                     except Exception as e:
-                        print(e)
+                        # print(e)
+                        pass
 
                 if db_pass == 0:
                     try:
@@ -100,7 +103,8 @@ with get_db_connect() as conn:
 
                         db_pass = 1
                     except Exception as e:
-                        print(e)
+                        # print(e)
+                        pass
 
                 if db_pass == 0:
                     try:
@@ -108,7 +112,8 @@ with get_db_connect() as conn:
 
                         db_pass = 1
                     except Exception as e:
-                        print(e)
+                        # print(e)
+                        pass
 
                 if db_pass == 0:
                     try:
@@ -116,7 +121,8 @@ with get_db_connect() as conn:
 
                         db_pass = 1
                     except Exception as e:
-                        print(e)
+                        # print(e)
+                        pass
 
                 if db_pass == 0:
                     raise
