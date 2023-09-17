@@ -75,7 +75,8 @@ with get_db_connect() as conn:
                         curs.execute(db_change('create table ' + create_table + '(test longtext default (""))'))
 
                         db_pass = 1
-                    except:
+                    except Exception as e:
+                        # print(e)
                         pass
 
                 if db_pass == 0:
@@ -83,7 +84,8 @@ with get_db_connect() as conn:
                         curs.execute(db_change('create table ' + create_table + '(test longtext default "")'))
 
                         db_pass = 1
-                    except:
+                    except Exception as e:
+                        # print(e)
                         pass
 
                 if db_pass == 0:
@@ -91,7 +93,8 @@ with get_db_connect() as conn:
                         curs.execute(db_change('create table ' + create_table + '(test longtext)'))
 
                         db_pass = 1
-                    except:
+                    except Exception as e:
+                        # print(e)
                         pass
 
                 if db_pass == 0:
@@ -99,7 +102,8 @@ with get_db_connect() as conn:
                         curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ('')"))
 
                         db_pass = 1
-                    except:
+                    except Exception as e:
+                        # print(e)
                         pass
 
                 if db_pass == 0:
@@ -107,7 +111,8 @@ with get_db_connect() as conn:
                         curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ''"))
 
                         db_pass = 1
-                    except:
+                    except Exception as e:
+                        # print(e)
                         pass
 
                 if db_pass == 0:
@@ -115,7 +120,8 @@ with get_db_connect() as conn:
                         curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext"))
 
                         db_pass = 1
-                    except:
+                    except Exception as e:
+                        # print(e)
                         pass
 
                 if db_pass == 0:
@@ -257,6 +263,8 @@ if os.path.exists('custom.py'):
     from custom import custom_run
     custom_run('error', app)
 
+db_set_str = json.dumps(data_db_set)
+
 # Func
 # Func-inter_wiki
 app.route('/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(filter_inter_wiki)
@@ -381,7 +389,6 @@ app.route('/history_hidden/<int(signed = True):rev>/<everything:name>')(recent_h
 app.route('/history_send/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])(recent_history_send)
 app.route('/history_reset/<everything:name>', methods = ['POST', 'GET'])(recent_history_reset)
 app.route('/history_add/<everything:name>', methods = ['POST', 'GET'])(recent_history_add)
-app.route('/history_add_preview/<everything:name>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(recent_history_add)
 
 # Func-view
 app.route('/xref/<everything:name>')(view_xref)
@@ -402,14 +409,12 @@ app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_read)
 app.route('/w/<everything:name>')(view_read)
 
-app.route('/random')(view_random)
+app.route('/random', defaults = { 'db_set' : db_set_str })(view_random)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
-app.route('/edit_preview/<everything:name>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(edit)
 app.route('/edit_from/<everything:name>', defaults = { 'do_type' : 'load' })(edit)
 app.route('/edit_section/<int:section>/<everything:name>', methods = ['POST', 'GET'])(edit)
-app.route('/edit_section_preview/<int:section>/<everything:name>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(edit)
 
 app.route('/upload', methods = ['POST', 'GET'])(edit_upload)
 
@@ -431,7 +436,6 @@ app.route('/recent_discuss/open', defaults = { 'tool' : 'open' })(recent_discuss
 
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
 app.route('/thread/0/<everything:doc_name>', defaults = { 'topic_num' : '0' }, methods = ['POST', 'GET'])(topic)
-app.route('/thread_preview/<int:topic_num>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(topic)
 app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
 
 app.route('/thread/<int:topic_num>/tool')(topic_tool)
@@ -473,6 +477,7 @@ app.route('/count/<name>')(user_count)
 
 app.route('/alarm')(user_alarm)
 app.route('/alarm/delete')(user_alarm_delete)
+app.route('/alarm/delete/<int:id>')(user_alarm_delete)
 
 app.route('/watch_list', defaults = { 'tool' : 'watch_list' })(user_watch_list)
 app.route('/watch_list/<everything:name>', defaults = { 'tool' : 'watch_list' })(user_watch_list_name)
@@ -524,17 +529,13 @@ app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
 app.route('/bbs/w/<int:bbs_num>')(bbs_w)
 app.route('/bbs/set/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_set)
 app.route('/bbs/edit/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_edit)
-app.route('/bbs/edit/preview/<int:bbs_num>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'preview' })(bbs_w_edit)
 app.route('/bbs/w/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_post)
 app.route('/bbs/raw/<int:bbs_num>/<int:post_num>')(view_raw_2)
 app.route('/bbs/tool/<int:bbs_num>/<int:post_num>')(bbs_w_tool)
 app.route('/bbs/edit/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_edit)
-app.route('/bbs/edit/preview/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'preview' })(bbs_w_edit)
-app.route('/bbs/w/preview/<int:bbs_num>/<int:post_num>', methods = ['POST'], defaults = { 'do_type' : 'preview' })(bbs_w_post)
 app.route('/bbs/tool/<int:bbs_num>/<int:post_num>/<comment_num>')(bbs_w_comment_tool)
 app.route('/bbs/raw/<int:bbs_num>/<int:post_num>/<comment_num>')(view_raw_2)
 app.route('/bbs/edit/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_edit)
-app.route('/bbs/edit/preview/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_edit)
 
 # Func-api
 app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):rev>')(api_w)
@@ -609,28 +610,6 @@ app.route('/setting/sitemap', methods = ['POST', 'GET'])(main_setting_sitemap)
 app.route('/setting/skin_set', methods = ['POST', 'GET'])(main_setting_skin_set)
 
 app.route('/easter_egg')(main_func_easter_egg)
-
-def main_easter_egg_go():
-    with get_db_connect() as conn:
-        print(platform.machine())
-        if platform.system() == 'Linux':
-            if platform.machine() in ["AMD64", "x86_64"]:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.amd64.bin")).read()
-            else:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.arm64.bin")).read()
-        else:
-            if platform.machine() in ["AMD64", "x86_64"]:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.amd64.exe")).read()
-            else:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.arm64.exe")).read()
-
-        return easy_minify(flask.render_template(skin_check(),
-            imp = ['Easter Egg', wiki_set(), wiki_custom(), wiki_css([0, 0])],
-            data = data,
-            menu = 0
-        ))
-
-app.route('/easter_egg_go')(main_easter_egg_go)
 
 # views -> view
 app.route('/view/<path:name>')(main_view)

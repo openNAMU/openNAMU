@@ -100,18 +100,13 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             return redirect('/thread/' + topic_num + '#' + num)
         else:
             thread_data = ''
-            thread_data_preview = ''
 
             if topic_num == '0':
                 name = load_lang('make_new_topic')
                 sub = load_lang('make_new_topic')
 
-                if do_type == 'preview':
-                    name_value = flask.request.form.get('topic', '')
-                    sub_value = flask.request.form.get('title', '')
-                else:
-                    name_value = doc_name
-                    sub_value = ''
+                name_value = doc_name
+                sub_value = ''
             else:
                 curs.execute(db_change("select title, sub from rd where code = ?"), [topic_num])
                 name = curs.fetchall()
@@ -123,14 +118,6 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                     sub_value = sub
                 else:
                     return redirect('/')
-
-            if do_type == 'preview':
-                thread_data = flask.request.form.get('content', 'Test')
-                thread_data = thread_data.replace('\r', '')
-
-                thread_data_preview = render_set(
-                    doc_data = thread_data
-                )
 
             acl_display = 'display: none;' if topic_acl == 1 else ''
             name_display = 'display: none;' if topic_num != '0' else ''
@@ -156,6 +143,13 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('discussion') + ')', 0])],
                 data = '''
+                    <style id="opennamu_remove_blind">
+                        .opennamu_comment_blind_js {
+                            display: none;
+                        }
+                    </style>
+                    <input type="checkbox" onclick="opennamu_do_remove_blind_thread();" checked> ''' + load_lang('remove_blind_thread') + '''
+
                     ''' + shortcut + '''
                     <h2 id="topic_top_title">''' + html.escape(sub) + '''</h2>
                     
@@ -175,18 +169,7 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                         </div>
                         
                         ''' + edit_editor(curs, ip, thread_data, 'thread') + '''
-                        <hr class="main_hr">
-                        
-                        ''' + captcha_get() + ip_warning() + '''
-                        
-                        <button id="opennamu_save_button" formaction="/thread/''' + topic_num + '''" type="submit" onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('send') + '''</button>
-                        <button id="opennamu_preview_button" formaction="/thread_preview/''' + topic_num + '''#opennamu_edit_textarea" type="submit" onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('preview') + '''</button>
                     </form>
-                    <hr class="main_hr">
-                    
-                    <div id="opennamu_preview_area">''' + thread_data_preview + '''</div>
-                    
-                    <!-- JS : opennamu_do_thread_make -->
                 ''',
                 menu = [['topic/' + url_pas(name), load_lang('list')]]
             ))

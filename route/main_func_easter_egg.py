@@ -11,4 +11,19 @@ def main_func_easter_egg():
                 curs.execute(db_change('insert into user_set (name, id, data) values ("get_🥚", ?, "Y")'), [ip])
                 conn.commit()
     
-        return redirect('/easter_egg_go')
+        if platform.system() == 'Linux':
+            if platform.machine() in ["AMD64", "x86_64"]:
+                data = os.popen(os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".amd64.bin")).read()
+            else:
+                data = os.popen(os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".arm64.bin")).read()
+        else:
+            if platform.machine() in ["AMD64", "x86_64"]:
+                data = os.popen(os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".amd64.exe")).read()
+            else:
+                data = os.popen(os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".arm64.exe")).read()
+
+        return easy_minify(flask.render_template(skin_check(),
+            imp = ['Easter Egg', wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            data = data,
+            menu = 0
+        ))

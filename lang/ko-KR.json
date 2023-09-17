@@ -208,7 +208,7 @@
     "name": "이름",
     "period": "기간",
     "writer": "작성자",
-    "long_id_error": "ID는 32자보다 짧아야 합니다.",
+    "long_id_error": "ID는 128자보다 짧아야 합니다.",
     "edit_record_error": "사유는 500자를 넘을 수 없습니다.",
     "revert": "복원",
     "discussion_authority": "토론 관리 권한",
@@ -231,7 +231,7 @@
     "file_name": "파일명",
     "close_discussion": "닫힌 토론",
     "language": "언어",
-    "id_char_error": "오직 한글과 알파벳, 숫자만 사용 가능합니다.",
+    "id_char_error": "XSS 문자(부등호, 따옴표)는 사용 불가능합니다.",
     "id_filter_add": "ID 필터 추가",
     "skin": "스킨",
     "user_head": "사용자 <HEAD>",
@@ -569,5 +569,9 @@
     "category_change_title": "분류 내 문서명 변경 금지",
     "table_scroll": "표에 스크롤 사용",
     "data": "데이터",
-    "volume": "용량"
+    "volume": "용량",
+    "list_view_change" : "숫자 리스트의 보기 방식 변경",
+    "view_joke" : "농담 매크로 내용 보이기",
+    "math_scroll" : "Math 매크로에서 스크롤 사용",
+    "remove_blind_thread" : "숨겨진 토론 보이지 않기"
 }

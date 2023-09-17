@@ -23,7 +23,7 @@ def edit_timeout(func, args = (), timeout = 3):
         pool.join()
         return 0
         
-def edit_editor(curs, ip, data_main = '', do_type = 'edit'):
+def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = ''):
     monaco_editor_top = ''
     editor_display = ''
     add_get_file = ''
@@ -81,11 +81,21 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit'):
         <div id="opennamu_monaco_editor" class="''' + textarea_size + '''" ''' + monaco_display + '''></div>
         <textarea id="opennamu_edit_textarea" ''' + editor_display + ''' class="''' + textarea_size + '''" name="content" placeholder="''' + p_text + '''">''' + html.escape(data_main) + '''</textarea>
         <hr class="main_hr">
+        
+        ''' + captcha_get() + ip_warning() + addon + '''
+        <hr class="main_hr">
+
         <script>
             do_stop_exit();
             do_paste_image('opennamu_edit_textarea', 'opennamu_monaco_editor');
             ''' + add_script + '''
         </script>
+                        
+        <button id="opennamu_save_button" type="submit" onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('send') + '''</button>
+        <button id="opennamu_preview_button" type="button" onclick="do_monaco_to_textarea(); opennamu_do_editor_preview();">''' + load_lang('preview') + '''</button>
+        <hr class="main_hr">
+
+        <div id="opennamu_preview_area"></div>
     '''
 
 def edit(name = 'Test', section = 0, do_type = ''):
@@ -107,7 +117,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
         post_ver = flask.request.form.get('ver', '')
         if flask.request.method == 'POST':
             edit_repeat = 'error' if post_ver != doc_ver else 'post'
-            edit_repeat = 'error' if do_type == 'preview' else 'post'
         else:
             edit_repeat = 'get'
         
@@ -215,7 +224,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
             doc_section_edit_apply = 'X'
             data_section = ''
             data_section_where = ''
-            data_preview = ''
 
             if edit_repeat == 'get':
                 if do_type == 'load':
@@ -285,36 +293,22 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
                 doc_ver = flask.request.form.get('ver', '')
 
-                if do_type != 'preview':
-                    warning_edit = load_lang('exp_edit_conflict') + ' '
-        
-                    if flask.request.form.get('ver', '0') == '0':
-                        warning_edit += '<a href="/raw/' + url_pas(name) + '">(r' + doc_ver + ')</a>'
-                    else:
-                        warning_edit += '' + \
-                            '<a href="/diff/' + flask.request.form.get('ver', '1') + '/' + doc_ver + '/' + url_pas(name) + '">' + \
-                                '(r' + doc_ver + ')' + \
-                            '</a>' + \
-                        ''
-        
-                    warning_edit += '<hr class="main_hr">'
-                    editor_top_text = warning_edit + editor_top_text
+                warning_edit = load_lang('exp_edit_conflict') + ' '
+    
+                if flask.request.form.get('ver', '0') == '0':
+                    warning_edit += '<a href="/raw/' + url_pas(name) + '">(r' + doc_ver + ')</a>'
                 else:
-                    data_preview = render_set(
-                        doc_name = name, 
-                        doc_data = data,
-                        data_type = 'from'
-                    )
+                    warning_edit += '' + \
+                        '<a href="/diff/' + flask.request.form.get('ver', '1') + '/' + doc_ver + '/' + url_pas(name) + '">' + \
+                            '(r' + doc_ver + ')' + \
+                        '</a>' + \
+                    ''
+    
+                warning_edit += '<hr class="main_hr">'
+                editor_top_text = warning_edit + editor_top_text
 
             if data_section == '':
                 data_section = data
-
-            if section == '':
-                form_action = 'formaction="/edit/' + url_pas(name) + '"'
-                form_action_preview = 'formaction="/edit_preview/' + url_pas(name) + '"'
-            else:
-                form_action = 'formaction="/edit_section/' + str(section) + '/' + url_pas(name) + '"'
-                form_action_preview = 'formaction="/edit_section_preview/' + str(section) + '/' + url_pas(name) + '"'
     
             editor_top_text += '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
     
@@ -332,19 +326,11 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
                         <input style="display: none;" name="ver" value="''' + doc_ver + '''">
                         
-                        ''' + edit_editor(curs, ip, data_section) + '''
-
                         <input placeholder="''' + load_lang('why') + '''" name="send">
                         <hr class="main_hr">
                         
-                        ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
-                        
-                        <button id="opennamu_save_button" type="submit" ''' + form_action + ''' onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('save') + '''</button>
-                        <button id="opennamu_preview_button" type="submit" ''' + form_action_preview + ''' onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('preview') + '''</button>
+                        ''' + edit_editor(curs, ip, data_section, addon = get_edit_text_bottom_check_box() + get_edit_text_bottom()) + '''
                     </form>
-                    
-                    <hr class="main_hr">
-                    <div id="opennamu_preview_area">''' + data_preview + '''</div>
                 ''',
                 menu = [
                     ['w/' + url_pas(name), load_lang('return')],

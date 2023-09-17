@@ -1,13 +1,19 @@
 from .tool.func import *
 
-def view_random():
+def view_random(db_set):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        curs.execute(db_change("" + \
-            "select title from data " + \
-            "where title not like 'user:%' and title not like 'category:%' and title not like 'file:%' " + \
-            "order by random() limit 1" + \
-        ""))
-        data = curs.fetchall()
-        return redirect('/w/' + url_pas(data[0][0])) if data else redirect()
+        if platform.system() == 'Linux':
+            if platform.machine() in ["AMD64", "x86_64"]:
+                data = subprocess.Popen([os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".amd64.bin"), db_set], stdout=subprocess.PIPE).communicate()[0]
+            else:
+                data = subprocess.Popen([os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".arm64.bin"), db_set], stdout=subprocess.PIPE).communicate()[0]
+        else:
+            if platform.machine() in ["AMD64", "x86_64"]:
+                data = subprocess.Popen([os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".amd64.exe"), db_set], stdout=subprocess.PIPE).communicate()[0]
+            else:
+                data = subprocess.Popen([os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".arm64.exe"), db_set], stdout=subprocess.PIPE).communicate()[0]
+
+        print(sys._getframe().f_code.co_name, data.decode('utf8'))
+        return redirect('/w/' + url_pas(data.decode('utf8')))
