@@ -71,19 +71,19 @@ def edit_revert(name, num):
             return redirect('/w/' + url_pas(name))
         else:
             if data:
-                preview = '<pre>' + html.escape(data[0][0]) + '</pre>'
+                preview = '<hr class="main_hr"><pre>' + html.escape(data[0][0]) + '</pre>'
             else:
                 preview = ''
             
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(r' + str(num) + ') (' + load_lang('revert') + ')', 0])],
-                data =  '''
-                        <form method="post">
-                            <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                            <hr class="main_hr">
-                            ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
-                            <button type="submit">''' + load_lang('revert') + '''</button>
-                        </form>
-                        ''' + preview,
+                data = '''
+                    <form method="post">
+                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                        <hr class="main_hr">
+                        ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
+                        <button type="submit">''' + load_lang('revert') + '''</button>
+                    </form>
+                ''' + preview,
                 menu = [['history/' + url_pas(name), load_lang('history')], ['recent_changes', load_lang('recent_change')]]
             ))

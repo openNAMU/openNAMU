@@ -72,6 +72,18 @@ def user_setting_skin_set_main_set_list():
             ['default', load_lang('default')],
             ['off', load_lang('off')],
             ['on', load_lang('use')]
+        ], 'main_css_list_view_change' : [
+            ['default', load_lang('default')],
+            ['off', load_lang('off')],
+            ['on', load_lang('use')]
+        ], 'main_css_view_joke' : [
+            ['default', load_lang('default')],
+            ['on', load_lang('use')],
+            ['off', load_lang('off')]
+        ], 'main_css_math_scroll' : [
+            ['default', load_lang('default')],
+            ['off', load_lang('off')],
+            ['on', load_lang('use')]
         ]
     }
 
@@ -216,6 +228,21 @@ def user_setting_skin_set_main():
                         ''' + set_data_main["main_css_table_scroll"] + '''
                         <select name="main_css_table_scroll">
                             ''' + set_data["main_css_table_scroll"] + '''
+                        </select>
+                        <h3>''' + load_lang("list_view_change") + '''</h3>
+                        ''' + set_data_main["main_css_list_view_change"] + '''
+                        <select name="main_css_list_view_change">
+                            ''' + set_data["main_css_list_view_change"] + '''
+                        </select>
+                        <h3>''' + load_lang("view_joke") + '''</h3>
+                        ''' + set_data_main["main_css_view_joke"] + '''
+                        <select name="main_css_view_joke">
+                            ''' + set_data["main_css_view_joke"] + '''
+                        </select>
+                        <h3>''' + load_lang("math_scroll") + '''</h3>
+                        ''' + set_data_main["main_css_math_scroll"] + '''
+                        <select name="main_css_math_scroll">
+                            ''' + set_data["main_css_math_scroll"] + '''
                         </select>
                         <h2>''' + load_lang("edit") + '''</h2>
                         <h3>''' + load_lang("image_paste") + '''</h3>

@@ -3,7 +3,7 @@ from .func_tool import *
 class class_do_render_namumark:
     def __init__(self, curs, doc_name, doc_data, doc_set, lang_data, footnote = {}):
         self.curs = curs
-        
+
         self.doc_data = doc_data.replace('\r', '')
         self.doc_name = doc_name
         self.doc_set = doc_set
@@ -17,8 +17,8 @@ class class_do_render_namumark:
 
         try:
             if 'main_css_bold' in flask.session:
-                pass    
-                
+                pass
+
             self.flask_session = flask.session
         except:
             self.flask_session = ''
@@ -38,7 +38,7 @@ class class_do_render_namumark:
 
         self.data_math_count = 0
         self.data_redirect = 0
-        
+
         self.data_toc = ''
         self.data_footnote = {}
         self.data_footnote_all = {}
@@ -234,7 +234,7 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage('', '', match.group(0))
             else:
                 data_name = self.get_tool_data_storage('<b>', '</b>', match.group(0))
-            
+
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
         # <b>
@@ -244,7 +244,7 @@ class class_do_render_namumark:
         def do_render_text_italic(match):
             data = match.group(1)
             data_name = self.get_tool_data_storage('<i>', '</i>', match.group(0))
-            
+
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
         # <i>
@@ -254,17 +254,17 @@ class class_do_render_namumark:
         def do_render_text_under(match):
             data = match.group(1)
             data_name = self.get_tool_data_storage('<u>', '</u>', match.group(0))
-            
+
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
         # <u>
         self.render_data = re.sub(r"__((?:(?!__).)+)__", do_render_text_under, self.render_data)
-        
+
         # <sup> function
         def do_render_text_sup(match):
             data = match.group(1)
             data_name = self.get_tool_data_storage('<sup>', '</sup>', match.group(0))
-            
+
             return '<' + data_name + '>' + data + '</' + data_name + '>'
 
         # <sup>
@@ -276,9 +276,9 @@ class class_do_render_namumark:
         def do_render_text_sub(match):
             data = match.group(1)
             data_name = self.get_tool_data_storage('<sub>', '</sub>', match.group(0))
-            
+
             return '<' + data_name + '>' + data + '</' + data_name + '>'
-        
+
         # <sub>
         self.render_data = re.sub(r",,,((?:(?!,,,).)+),,,", do_render_text_sub, self.render_data)
         # <sub> 2
@@ -295,14 +295,14 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage('', '', match.group(0))
             else:
                 data_name = self.get_tool_data_storage('<s>', '</s>', match.group(0))
-            
+
             return '<' + data_name + '>' + data + '</' + data_name + '>'
-        
+
         # <s>
         self.render_data = re.sub(r"--((?:(?!--).)+)--", do_render_text_strike, self.render_data)
         # <s> 2
         self.render_data = re.sub(r"~~((?:(?!~~).)+)~~", do_render_text_strike, self.render_data)
-    
+
     def do_render_heading(self):
         toc_list = []
 
@@ -412,7 +412,7 @@ class class_do_render_namumark:
         heading_id_data = re.findall(heading_id_regex, self.render_data)
         for for_a in range(len(heading_id_data)):
             self.render_data = re.sub(heading_id_regex, '<a href="#toc" id="s-' + heading_id_data[for_a] + '">' + heading_id_data[for_a] + '.</a>', self.render_data, 1)
-            
+
             toc_list[for_a][0] = heading_id_data[for_a]
 
         # not heading restore
@@ -524,7 +524,7 @@ class class_do_render_namumark:
 
                 data_name = self.get_tool_data_storage(
                     '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen>',
-                    '</iframe>', 
+                    '</iframe>',
                     match_org.group(0)
                 )
 
@@ -569,6 +569,43 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage('<span id="' + main_text + '">', '</span>', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
+            elif name_data == 'timeif':
+                data = re.findall(macro_split_regex, match[1])
+
+                main_text = ''
+                before_text = ''
+                after_text = ''
+                for for_a in data:
+                    data_sub = re.search(macro_split_sub_regex, for_a)
+                    if data_sub:
+                        data_sub = data_sub.groups()
+                        data_sub = [data_sub[0].lower(), data_sub[1]]
+
+                        if data_sub[0] == 'before':
+                            before_text = data_sub[1]
+                        elif data_sub[0] == 'after':
+                            after_text = data_sub[1]
+                    else:
+                        main_text = for_a
+
+                if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', main_text):
+                    try:
+                        date = datetime.datetime.strptime(main_text, '%Y-%m-%d')
+                        data_text = ''
+                    except:
+                        data_text = 'invalid date'
+
+                    date_now = datetime.datetime.today()
+
+                    if data_text == '':
+                        if date > date_now:
+                            data_text = before_text
+                        else:
+                            data_text = after_text
+                else:
+                    data_text = 'invalid date'
+
+                return data_text
             elif name_data == 'age':
                 if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', match[1]):
                     try:
@@ -590,7 +627,7 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage(data_text, '', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
-            elif name_data == 'dday':
+            elif name_data in ('dday', 'dmonth', 'dyear'):
                 if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', match[1]):
                     try:
                         date = datetime.datetime.strptime(match[1], '%Y-%m-%d')
@@ -599,9 +636,26 @@ class class_do_render_namumark:
                         data_text = 'invalid date'
 
                     date_now = datetime.datetime.today()
-                    
                     if data_text == '':
-                        date_end = (date_now - date).days
+                        if name_data == 'dday':
+                            date_end = (date_now - date).days
+                        elif name_data == 'dyear':
+                            date_end = (date_now - date)
+                            if date_end.days > 0:
+                                date_end = datetime.date.min + date_end
+                                date_end = date_end.year - 1
+                            else:
+                                date_end = datetime.date.min - date_end
+                                date_end = 0 - (date_end.year - 1)
+                        else:
+                            date_end = (date_now - date)
+                            if date_end.days > 0:
+                                date_end = datetime.date.min + date_end
+                                date_end = (date_end.year - 1) * 12 + (date_end.month - 1)
+                            else:
+                                date_end = datetime.date.min - date_end
+                                date_end = 0 - ((date_end.year - 1) * 12 + (date_end.month - 1))
+
                         if date_end > 0:
                             data_text = '+' + str(date_end)
                         else:
@@ -615,10 +669,30 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage(data_text, '', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
+            elif name_data == 'joke':
+                data_name = self.get_tool_data_storage('<span class="opennamu_joke">', '</span>', match_org.group(0))
+
+                return '<' + data_name + '>' + match[1] + '</' + data_name + '>'
             elif name_data == 'pagecount':
                 return '0'
             elif name_data == 'lastedit':
-                link_main = self.get_tool_link_fix(match[1], 'redirect')
+                link_main = match[1]
+                data_view = ''
+
+                data = re.findall(macro_split_regex, match[1])
+                for for_a in data:
+                    data_sub = re.search(macro_split_sub_regex, for_a)
+                    if data_sub:
+                        data_sub = data_sub.groups()
+                        data_sub = [data_sub[0].lower(), data_sub[1]]
+
+                        if data_sub[0] == 'view':
+                            if data_sub[1] == 'full':
+                                data_view = '1'
+                    else:
+                        link_main = for_a
+                        
+                link_main = self.get_tool_link_fix(link_main, 'redirect')
 
                 link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                 link_main = html.unescape(link_main)
@@ -626,7 +700,11 @@ class class_do_render_namumark:
                 self.curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'last_edit'"), [link_main])
                 db_data = self.curs.fetchall()
                 if db_data:
-                    return db_data[0][0]
+                    date_data = db_data[0][0]
+                    if data_view != '1':
+                        date_data = date_data.split()[0]
+
+                    return date_data
                 else:
                     return '0'
             else:
@@ -678,8 +756,8 @@ class class_do_render_namumark:
             data = match.group(1)
 
             if self.data_math_count == 0:
-                self.render_data_cdn += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">'
-                self.render_data_cdn += '<script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>'
+                self.render_data_cdn += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">'
+                self.render_data_cdn += '<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCct6O9ctzYFfFr4dgmgccOTx" crossorigin="anonymous"></script>'
 
             data = re.sub(r'\n', '', data)
             data = self.get_tool_data_revert(data)
@@ -1097,8 +1175,8 @@ class class_do_render_namumark:
 
                 return slash_add + match[2]
 
-        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
-        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)@', do_render_include_default_sub, self.render_data)
 
     def do_render_include(self):
         def do_render_include_default_sub(match):
@@ -1184,8 +1262,8 @@ class class_do_render_namumark:
                             include_link = '<div><a href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
 
                         # parameter replace
-                        include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, include_data)
-                        include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z]+)@', do_render_include_default_sub, include_data)
+                        include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, include_data)
+                        include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)@', do_render_include_default_sub, include_data)
 
                         # remove end br
                         include_data = re.sub('^\n+', '', include_data)
@@ -1333,8 +1411,18 @@ class class_do_render_namumark:
             link_data_full = match.group(0)
             link_main = match.group(1)
 
-            # under page & fix url
-            link_main = self.get_tool_link_fix(link_main, 'redirect')
+            link_inter_name = ''
+
+            link_inter_regex = re.compile('^(?:inter|인터):([^:]+):', flags = re.I)
+            inter_check = re.search(link_inter_regex, link_main)
+            if not inter_check:
+                # under page & fix url
+                link_main = self.get_tool_link_fix(link_main, 'redirect')
+            else:
+                link_inter_name = re.search(link_inter_regex, link_main)
+                link_inter_name = link_inter_name.group(1)
+
+                link_main = re.sub(link_inter_regex, '', link_main)
 
             # sharp
             link_main = link_main.replace('&#x27;', '<link_single>')
@@ -1351,24 +1439,50 @@ class class_do_render_namumark:
             
             link_main = link_main.replace('<link_single>', '&#x27;')
 
-            # main link fix
-            link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
-            link_main = html.unescape(link_main)
+            if not inter_check:
+                # main link fix
+                link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                link_main = html.unescape(link_main)
 
-            self.data_backlink += [[self.doc_name, link_main, 'redirect', '']]
+                self.data_backlink += [[self.doc_name, link_main, 'redirect', '']]
 
-            link_main = url_pas(link_main)
+                link_main = url_pas(link_main)
+                if link_main != '':
+                    link_main = '/w_from/' + link_main
 
-            self.data_redirect = 1
-            if link_main != '':
-                link_main = '/w_from/' + link_main
-
-            if 'doc_from' in self.doc_set:
-                data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
+                self.data_redirect = 1
+                if 'doc_from' in self.doc_set:
+                    data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
+                else:
+                    data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', '', link_data_full)
+                    
+                self.render_data = '<' + data_name + '></' + data_name + '>'
             else:
-                data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', '', link_data_full)
+                self.curs.execute(db_change("select plus, plus_t from html_filter where kind = 'inter_wiki' and html = ?"), [link_inter_name])
+                db_data = self.curs.fetchall()
+                if db_data:
+                    link_main = url_pas(link_main)
+                    link_main = db_data[0][0] + link_main
+
+                    link_sub_storage = match.group(1)
+                    link_sub_storage = re.sub(link_inter_regex, '', link_sub_storage)
+
+                    link_inter_icon = link_inter_name + ':'
+                    if db_data[0][1] != '':
+                        link_inter_icon = db_data[0][1]
+
+                    link_sub_storage = link_inter_icon + link_sub_storage
+
+                    self.data_redirect = 1
+                    if 'doc_from' in self.doc_set:
+                        data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
+                    else:
+                        data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="5; url=' + link_main + link_data_sharp + '">', link_sub_storage + ' - After 5s', link_data_full)
                 
-            self.render_data = '<' + data_name + '></' + data_name + '>'
+                    self.render_data = '<' + data_name + '></' + data_name + '>'
+                else:
+                    self.data_redirect = 1
+                    self.render_data = ''
 
     def do_render_table(self):
         self.render_data = re.sub(r'\n +\|\|', '\n||', self.render_data)
@@ -1449,7 +1563,7 @@ class class_do_render_namumark:
                             table_parameter_all['td'] += 'text-align: left;'
                         elif table_parameter == ':':
                             table_parameter_all['td'] += 'text-align: center;'
-                        elif table_parameter == ':':
+                        elif table_parameter == ')':
                             table_parameter_all['td'] += 'text-align: right;'
                     else:
                         table_parameter_data = self.get_tool_css_safe(table_parameter)
@@ -1500,7 +1614,7 @@ class class_do_render_namumark:
                 else:
                     table_caption = ''
 
-                table_parameter = { "div" : "", "class" : "", "table" : "", "col" : {}, "rowspan" : {} }
+                table_parameter = { "div" : "", "class" : "", "table" : "", "tr" : "", "td" : "", "col" : {}, "rowspan" : {} }
                 table_data_end = ''
                 table_col_num = 0
                 table_tr_change = 0
@@ -1509,13 +1623,14 @@ class class_do_render_namumark:
                     table_data_in = re.sub(r'^\n+', '', table_data_in)
 
                     table_sub_parameter = do_render_table_parameter(table_sub[1], table_sub[2], table_data_in)
-
-                    if table_data_end == '':
-                        table_data_end += '<tr style="' + table_sub_parameter['tr'] + '">'
+                    table_parameter["tr"] += table_sub_parameter['tr']
 
                     if table_sub[0] != '' and table_tr_change == 1:
                         table_col_num = 0
-                        table_data_end += '</tr><tr style="' + table_sub_parameter['tr'] + '">'
+                        table_data_end += '<tr style="' + table_parameter["tr"] + '">' + table_parameter["td"] + '</tr>'
+                        
+                        table_parameter["tr"] = ""
+                        table_parameter["td"] = ""
 
                     if not table_col_num in table_parameter['rowspan']:
                         table_parameter['rowspan'][table_col_num] = 0
@@ -1542,11 +1657,12 @@ class class_do_render_namumark:
                     else:
                         table_tr_change = 0
                     
-                        table_data_end += '<td colspan="' + table_sub_parameter['colspan'] + '" rowspan="' + table_sub_parameter['rowspan'] + '" style="' + table_parameter['col'][table_col_num] + table_sub_parameter['td'] + '"><back_br>\n' + table_sub_parameter['data'] + '\n<front_br></td>'
+                        table_parameter["td"] += '<td colspan="' + table_sub_parameter['colspan'] + '" rowspan="' + table_sub_parameter['rowspan'] + '" style="' + table_parameter['col'][table_col_num] + table_sub_parameter['td'] + '"><back_br>\n' + table_sub_parameter['data'] + '\n<front_br></td>'
                     
                     table_col_num += 1
+                else:
+                    table_data_end += '<tr style="' + table_parameter["tr"] + '">' + table_parameter["td"] + '</tr>'
 
-                table_data_end += '</tr>'
                 table_data_end = '<table class="' + table_parameter['class'] + '" style="' + table_parameter['table'] + '">' + table_caption + table_data_end + '</table>'
                 table_data_end = '<div class="table_safe" style="' + table_parameter['div'] + '">' + table_data_end + '</div>'
 
@@ -1923,11 +2039,14 @@ class class_do_render_namumark:
                 i -= 1
 
             return end_text
+            
+        list_view_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_list_view_change', self.ip)
         
         class do_render_list_int_to:
-            def __init__(self, do_type):
+            def __init__(self, do_type, list_view_set = ''):
                 self.list_num = []
                 self.do_type = do_type
+                self.list_view_set = list_view_set
 
             def __call__(self, match):
                 list_data = match.group(3)
@@ -1948,7 +2067,10 @@ class class_do_render_namumark:
                     self.list_num[list_len - 1] = int(list_start)
 
                 if self.do_type == 'int':
-                    change_text = str(self.list_num[list_len - 1])
+                    if self.list_view_set == 'on':
+                        change_text = str('-'.join([str(for_a) for for_a in self.list_num if for_a != 0]))
+                    else:
+                        change_text = str(self.list_num[list_len - 1])
                 elif self.do_type == 'roman_big':
                     change_text = int_to_roman(self.list_num[list_len - 1])
                 elif self.do_type == 'roman_small':
@@ -1973,7 +2095,7 @@ class class_do_render_namumark:
                 list_data = list_data.group(1)
                 list_sub_regex = r'\n( *)1\.(?:#([0-9]*))? ?([^\n]*)'
 
-                list_class = do_render_list_int_to('int')
+                list_class = do_render_list_int_to('int', list_view_set)
                 list_data = re.sub(list_sub_regex, list_class, list_data)
 
                 self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)

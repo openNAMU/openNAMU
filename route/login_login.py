@@ -25,7 +25,7 @@ def login_login_2():
             user_data = {}
 
             curs.execute(db_change(
-                'select name, data from user_set where id = ? and name = "pw" or name = "encode"'
+                'select name, data from user_set where id = ? and (name = "pw" or name = "encode")'
             ), [user_id])
             sql_data = curs.fetchall()
             if not sql_data:

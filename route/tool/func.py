@@ -333,10 +333,10 @@ def get_db_table_list():
     create_data['re_admin'] = ['who', 'what', 'time']
 
     # 개편 예정 (user_notice와 user_agent로 변경)
-    create_data['alarm'] = ['name', 'data', 'date']
     create_data['ua_d'] = ['name', 'ip', 'ua', 'today', 'sub']
 
     create_data['user_set'] = ['name', 'id', 'data']
+    create_data['user_notice'] = ['id', 'name', 'data', 'date', 'readme']
 
     create_data['bbs_set'] = ['set_name', 'set_code', 'set_id', 'set_data']
     create_data['bbs_data'] = ['set_name', 'set_code', 'set_id', 'set_data']
@@ -655,6 +655,30 @@ def update(ver_num, set_data):
         if ver_num < 3500365:
             curs.execute(db_change("update back set data = '' where data is null"))
 
+        if ver_num < 3500371:
+            curs.execute(db_change("delete from user_notice"))
+            user_alarm_count = {}
+
+            curs.execute(db_change("select name, data, date from alarm"))
+            for db_data in curs.fetchall():
+                if db_data[0] in user_alarm_count:
+                    user_alarm_count[db_data[0]] += 1
+                else:
+                    user_alarm_count[db_data[0]] = 1
+
+                curs.execute(db_change(
+                    'insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'
+                ), [str(user_alarm_count[db_data[0]]), db_data[0], db_data[1], db_data[2]])
+
+        if ver_num < 3500372:
+            # ID 글자 확인 호환용
+            curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [
+                r'(?:[^A-Za-zㄱ-힣0-9])',
+                'name',
+                '',
+                ''
+            ])
+
         conn.commit()
 
         print('Update completed')
@@ -724,6 +748,13 @@ def set_init():
                 ['smtp_security', 'starttls']
             ]:
                 curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, '')"), [i[0], i[1]])
+
+        curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [
+            r'(?:[^A-Za-zㄱ-힣0-9])',
+            'name',
+            '',
+            ''
+        ])
 
 # Func-simple
 ## Func-simple-without_DB
@@ -1097,7 +1128,7 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '180'
+    data_css_ver = '182'
     
     # Func JS + Defer
     data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
@@ -1115,7 +1146,9 @@ def wiki_css(data):
     
     # Route JS
     data_css += '<script src="/views/main_css/js/route/editor.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/route/editor_sub.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script src="/views/main_css/js/route/render.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/route/topic.js?ver=' + data_css_ver + '"></script>'
     
     # Main CSS
     data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css?ver=' + data_css_ver + '">'
@@ -1253,7 +1286,7 @@ def wiki_custom():
                 user_admin = '0'
                 user_acl_list = '0'
 
-            curs.execute(db_change("select count(*) from alarm where name = ?"), [ip])
+            curs.execute(db_change("select count(*) from user_notice where name = ? and readme = ''"), [ip])
             count = curs.fetchall()
             user_notice = str(count[0][0]) if count else '0'
         else:
@@ -1354,6 +1387,8 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
 
         acl_dict = {}
         acl_dict[doc_name] = doc_acl
+
+        ip = ip_check()
             
         if doc_acl == 1:
             return 'HTTP Request 401.3'
@@ -1402,7 +1437,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                 curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
                 db_data = curs.fetchall()
                 if db_data and db_data[0][0] != '':
-                    get_class_render[0] += '''
+                    get_class_render[0] = '''
                         <style>
                             .opennamu_render_complete {
                                 font-size: 14.4px !important;
@@ -1417,11 +1452,19 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                                 font-weight: bold;
                             }
                         </style>
-                    '''
+                    ''' + get_class_render[0]
 
-                table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip_check())
+                table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip)
                 if table_set_data == 'on':
-                    get_class_render[0] += '<style>.table_safe { overflow-x: scroll; white-space: nowrap; }</style>'
+                    get_class_render[0] = '<style>.table_safe { overflow-x: scroll; white-space: nowrap; }</style>' + get_class_render[0]
+
+                joke_set_data = get_main_skin_set(curs, flask.session, 'main_css_view_joke', ip)
+                if joke_set_data == 'off':
+                    get_class_render[0] = '<style>.opennamu_joke { display: none; }</style>' + get_class_render[0]
+
+                math_set_data = get_main_skin_set(curs, flask.session, 'main_css_math_scroll', ip)
+                if math_set_data == 'on':
+                    get_class_render[0] = '<style>.katex .base { overflow-x: scroll; }</style>' + get_class_render[0]
 
                 if data_type == 'api_view' or data_type == 'api_thread':
                     return [
@@ -1660,8 +1703,8 @@ def do_user_name_check(user_name):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        # ID 글자 확인
-        if re.search(r'(?:[^A-Za-zㄱ-힣0-9])', user_name):
+        # XSS 필터
+        if html.escape(user_name) != user_name:
             return 1
 
         # ID 필터
@@ -1672,8 +1715,8 @@ def do_user_name_check(user_name):
             if check_r.search(user_name):
                 return 1
 
-        # ID 길이 제한 (32글자)
-        if len(user_name) > 32:
+        # ID 길이 제한 (128글자)
+        if len(user_name) > 128:
             return 1
         
         return 0
@@ -2397,9 +2440,15 @@ def add_alarm(to_user, from_user, context):
         if to_user != from_user:
             context = from_user + ' | ' + context
 
+            count = '1'
+            curs.execute(db_change("select id from user_notice where name = ? order by id + 0 desc"), [to_user])
+            db_data = curs.fetchall()
+            if db_data:
+                count = str(int(db_data[0][0]) + 1)
+
             curs.execute(db_change(
-                'insert into alarm (name, data, date) values (?, ?, ?)'
-            ), [to_user, context, get_time()])
+                'insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'
+            ), [count, to_user, context, get_time()])
     
 def add_user(user_name, user_pw, user_email = '', user_encode = ''):
     with get_db_connect() as conn:
@@ -2652,9 +2701,6 @@ def re_error(data):
                 data = load_lang('error_skin_set')
             elif num == 6:
                 data = load_lang('same_id_exist_error')
-            elif num == 7:
-                # 폐지
-                data = load_lang('long_id_error')
             elif num == 8:
                 data = load_lang('long_id_error') + '<br>' + load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id_filter_list') + ')</a>'
             elif num == 9:
