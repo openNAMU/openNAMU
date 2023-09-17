@@ -1563,7 +1563,7 @@ class class_do_render_namumark:
                             table_parameter_all['td'] += 'text-align: left;'
                         elif table_parameter == ':':
                             table_parameter_all['td'] += 'text-align: center;'
-                        elif table_parameter == ':':
+                        elif table_parameter == ')':
                             table_parameter_all['td'] += 'text-align: right;'
                     else:
                         table_parameter_data = self.get_tool_css_safe(table_parameter)
