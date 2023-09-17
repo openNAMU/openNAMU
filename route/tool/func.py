@@ -1146,6 +1146,7 @@ def wiki_css(data):
     
     # Route JS
     data_css += '<script src="/views/main_css/js/route/editor.js?ver=' + data_css_ver + '"></script>'
+    data_css += '<script src="/views/main_css/js/route/editor_sub.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script src="/views/main_css/js/route/render.js?ver=' + data_css_ver + '"></script>'
     data_css += '<script src="/views/main_css/js/route/topic.js?ver=' + data_css_ver + '"></script>'
     

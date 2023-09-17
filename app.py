@@ -389,7 +389,6 @@ app.route('/history_hidden/<int(signed = True):rev>/<everything:name>')(recent_h
 app.route('/history_send/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])(recent_history_send)
 app.route('/history_reset/<everything:name>', methods = ['POST', 'GET'])(recent_history_reset)
 app.route('/history_add/<everything:name>', methods = ['POST', 'GET'])(recent_history_add)
-app.route('/history_add_preview/<everything:name>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(recent_history_add)
 
 # Func-view
 app.route('/xref/<everything:name>')(view_xref)
@@ -414,10 +413,8 @@ app.route('/random', defaults = { 'db_set' : db_set_str })(view_random)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
-app.route('/edit_preview/<everything:name>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(edit)
 app.route('/edit_from/<everything:name>', defaults = { 'do_type' : 'load' })(edit)
 app.route('/edit_section/<int:section>/<everything:name>', methods = ['POST', 'GET'])(edit)
-app.route('/edit_section_preview/<int:section>/<everything:name>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(edit)
 
 app.route('/upload', methods = ['POST', 'GET'])(edit_upload)
 
@@ -439,7 +436,6 @@ app.route('/recent_discuss/open', defaults = { 'tool' : 'open' })(recent_discuss
 
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
 app.route('/thread/0/<everything:doc_name>', defaults = { 'topic_num' : '0' }, methods = ['POST', 'GET'])(topic)
-app.route('/thread_preview/<int:topic_num>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(topic)
 app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
 
 app.route('/thread/<int:topic_num>/tool')(topic_tool)
@@ -533,17 +529,13 @@ app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
 app.route('/bbs/w/<int:bbs_num>')(bbs_w)
 app.route('/bbs/set/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_set)
 app.route('/bbs/edit/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_edit)
-app.route('/bbs/edit/preview/<int:bbs_num>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'preview' })(bbs_w_edit)
 app.route('/bbs/w/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_post)
 app.route('/bbs/raw/<int:bbs_num>/<int:post_num>')(view_raw_2)
 app.route('/bbs/tool/<int:bbs_num>/<int:post_num>')(bbs_w_tool)
 app.route('/bbs/edit/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_edit)
-app.route('/bbs/edit/preview/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'preview' })(bbs_w_edit)
-app.route('/bbs/w/preview/<int:bbs_num>/<int:post_num>', methods = ['POST'], defaults = { 'do_type' : 'preview' })(bbs_w_post)
 app.route('/bbs/tool/<int:bbs_num>/<int:post_num>/<comment_num>')(bbs_w_comment_tool)
 app.route('/bbs/raw/<int:bbs_num>/<int:post_num>/<comment_num>')(view_raw_2)
 app.route('/bbs/edit/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_edit)
-app.route('/bbs/edit/preview/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_edit)
 
 # Func-api
 app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):rev>')(api_w)

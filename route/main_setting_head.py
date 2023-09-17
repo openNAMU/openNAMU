@@ -39,10 +39,15 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
             else:
                 return redirect('/setting/' + end_r + '/' + skin_name)
         else:
+            title = ''
+            start = ''
+            form_action = ''
+            data_preview = ''
+            plus = ''
+
             if num == 4:
                 curs.execute(db_change("select data from other where name = 'body'"))
                 title = '_body'
-                start = ''
                 form_action = 'formaction="/setting/body/top"'
                 data_preview = flask.request.form.get('content', '') if set_preview == 1 else ''
                 plus = '''
@@ -53,7 +58,6 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
             elif num == 7:
                 curs.execute(db_change("select data from other where name = 'bottom_body'"))
                 title = '_bottom_body'
-                start = ''
                 data_preview = flask.request.form.get('content', '') if set_preview == 1 else ''
                 form_action = 'formaction="/setting/body/bottom"'
                 plus = '''
@@ -75,8 +79,6 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
                     </span>
                     <hr class="main_hr">
                 '''
-                form_action = ''
-                plus = ''
 
             if set_preview == 1:
                 data = data_preview
