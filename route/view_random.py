@@ -15,5 +15,4 @@ def view_random(db_set):
             else:
                 data = subprocess.Popen([os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".arm64.exe"), db_set], stdout=subprocess.PIPE).communicate()[0]
 
-        print(sys._getframe().f_code.co_name, data.decode('utf8'))
         return redirect('/w/' + url_pas(data.decode('utf8')))
