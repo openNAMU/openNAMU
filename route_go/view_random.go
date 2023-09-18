@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"opennamu/golang/tool"
+	"opennamu/tool"
 )
 
 func main() {
