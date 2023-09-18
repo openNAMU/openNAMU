@@ -11,7 +11,7 @@ import (
 
 func DB_connect(db_set map[string]string) *sql.DB {
 	if db_set["type"] == "sqlite" {
-		db, err := sql.Open("sqlite3", db_set["name"]+".db")
+		db, err := sql.Open("sqlite", db_set["name"]+".db")
 		if err != nil {
 			fmt.Println(err)
 			return nil
