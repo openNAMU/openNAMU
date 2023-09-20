@@ -12,9 +12,7 @@ def recent_app_submit_2():
             div += load_lang('approval_requirement_disabled')
 
         if flask.request.method == 'GET':
-            curs.execute(db_change(
-                'select data from user_set where name = "application"'
-            ))
+            curs.execute(db_change('select data from user_set where name = "application"'))
             db_data = curs.fetchall()
             if db_data:
                 div += '' + \
@@ -98,49 +96,22 @@ def recent_app_submit_2():
                 return re_error('/ban')
 
             if flask.request.form.get('approve', '') != '':
-                curs.execute(db_change(
-                    'select data from user_set where id = ? and name = "application"'
-                ), [
-                    flask.request.form.get('approve', '')
-                ])
+                curs.execute(db_change('select data from user_set where id = ? and name = "application"'), [flask.request.form.get('approve', '')])
                 application = curs.fetchall()
                 if not application:
                     return re_error('/error/26')
                 else:
                     application = json.loads(application[0][0])
 
-                add_user(
-                    application['id'], 
-                    application['pw'],
-                    application['email'],
-                    application['encode']
-                )
+                add_user(application['id'], application['pw'], application['email'], application['encode'])
 
-                curs.execute(db_change(
-                    "insert into user_set (name, id, data) values ('approval_question', ?, ?)"
-                ), [
-                    application['id'], 
-                    application['question']
-                ])
-                curs.execute(db_change(
-                    "insert into user_set (name, id, data) values ('approval_question_answer', ?, ?)"
-                ), [
-                    application['id'], 
-                    application['answer']
-                ])
+                curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question', ?, ?)"), [application['id'], application['question']])
+                curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question_answer', ?, ?)"), [application['id'], application['answer']])
 
-                curs.execute(db_change(
-                    'delete from user_set where id = ? and name = "application"'
-                ), [
-                    application['id']
-                ])
+                curs.execute(db_change('delete from user_set where id = ? and name = "application"'), [application['id']])
                 conn.commit()
             elif flask.request.form.get('decline', '') != '':
-                curs.execute(db_change(
-                    'delete from user_set where id = ? and name = "application"'
-                ), [
-                    flask.request.form.get('decline', '')
-                ])
+                curs.execute(db_change('delete from user_set where id = ? and name = "application"'), [flask.request.form.get('decline', '')])
                 conn.commit()
 
             return redirect('/app_submit')

@@ -17,20 +17,16 @@ def user_setting_user_name(user_name = ''):
                 if do_user_name_check(auto_data[1]) == 1:
                     return re_error('/error/8')
 
-                curs.execute(db_change('select data from user_set where name = ? and data = ?'), [auto_data[0], auto_data[1]])
+                curs.execute(db_change('select data from user_set where name = ? and id = ?'), [auto_data[0], ip])
                 if curs.fetchall():
-                    return re_error('/error/6')
+                    curs.execute(db_change("update user_set set data = ? where name = ? and id = ?"), [auto_data[1], auto_data[0], ip])
                 else:
-                    curs.execute(db_change('select data from user_set where name = ? and id = ?'), [auto_data[0], ip])
-                    if curs.fetchall():
-                        curs.execute(db_change("update user_set set data = ? where name = ? and id = ?"), [auto_data[1], auto_data[0], ip])
-                    else:
-                        curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), [auto_data[0], ip, auto_data[1]])
+                    curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), [auto_data[0], ip, auto_data[1]])
 
-                    if user_name != '':
-                        return redirect('/change/user_name/' + url_pas(user_name))
-                    else:
-                        return redirect('/change/user_name')
+                if user_name != '':
+                    return redirect('/change/user_name/' + url_pas(user_name))
+                else:
+                    return redirect('/change/user_name')
             else:
                 user_name = ip
 
