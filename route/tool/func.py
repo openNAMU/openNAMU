@@ -358,27 +358,13 @@ def update(ver_num, set_data):
             curs.execute(db_change("select html from html_filter where kind = 'extension'"))
             if not curs.fetchall():
                 for i in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
-                    curs.execute(db_change(
-                        "insert into html_filter (html, kind) values (?, 'extension')"
-                    ), [i])
+                    curs.execute(db_change("insert into html_filter (html, kind) values (?, 'extension')"), [i])
 
         if ver_num < 3170400:
             curs.execute(db_change("select title, sub, code from topic where id = '1'"))
             for i in curs.fetchall():
-                curs.execute(db_change(
-                    "update topic set code = ? where title = ? and sub = ?"
-                ), [
-                    i[2], 
-                    i[0], 
-                    i[1]
-                ])
-                curs.execute(db_change(
-                    "update rd set code = ? where title = ? and sub = ?"
-                ), [
-                    i[2], 
-                    i[0], 
-                    i[1]
-                ])
+                curs.execute(db_change("update topic set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
+                curs.execute(db_change("update rd set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
 
         if ver_num < 3171800:
             curs.execute(db_change("select data from other where name = 'recaptcha'"))
@@ -386,9 +372,7 @@ def update(ver_num, set_data):
             if change_rec and change_rec[0][0] != '':
                 new_rec = re.search(r'data-sitekey="([^"]+)"', change_rec[0][0])
                 if new_rec:
-                    curs.execute(db_change(
-                        "update other set data = ? where name = 'recaptcha'"
-                    ), [new_rec.group(1)])
+                    curs.execute(db_change("update other set data = ? where name = 'recaptcha'"), [new_rec.group(1)])
                 else:
                     curs.execute(db_change("update other set data = '' where name = 'recaptcha'"))
                     curs.execute(db_change("update other set data = '' where name = 'sec_re'"))
@@ -403,56 +387,24 @@ def update(ver_num, set_data):
         if ver_num < 3183603:
             curs.execute(db_change("select block from ban where band = 'O'"))
             for i in curs.fetchall():
-                curs.execute(db_change(
-                    "update ban set block = ?, band = 'regex' where block = ? and band = 'O'"
-                ), [
-                    '^' + i[0].replace('.', '\\.'),
-                    i[0]
-                ])
+                curs.execute(db_change("update ban set block = ?, band = 'regex' where block = ? and band = 'O'"), ['^' + i[0].replace('.', '\\.'), i[0]])
 
             curs.execute(db_change("select block from rb where band = 'O'"))
             for i in curs.fetchall():
-                curs.execute(db_change(
-                    "update rb set block = ?, band = 'regex' where block = ? and band = 'O'"
-                ), [
-                    '^' + i[0].replace('.', '\\.'),
-                    i[0]
-                ])
+                curs.execute(db_change("update rb set block = ?, band = 'regex' where block = ? and band = 'O'"), ['^' + i[0].replace('.', '\\.'), i[0]])
 
         if ver_num < 3190201:
             today_time = get_time()
 
             curs.execute(db_change("select block, end, why, band, login from ban"))
             for i in curs.fetchall():
-                curs.execute(db_change(
-                    "insert into rb (block, end, today, why, band, login, ongoing) " + \
-                    "values (?, ?, ?, ?, ?, ?, ?)"
-                ), [
-                    i[0],
-                    i[1],
-                    today_time,
-                    i[2],
-                    i[3],
-                    i[4],
-                    '1'
-                ])
+                curs.execute(db_change("insert into rb (block, end, today, why, band, login, ongoing) values (?, ?, ?, ?, ?, ?, ?)"), [i[0], i[1], today_time, i[2], i[3], i[4], '1'])
 
         if ver_num < 3191301:
-            curs.execute(db_change('' + \
-                'select id, title, date from history ' + \
-                'where not title like "user:%" ' + \
-                'order by date desc ' + \
-                'limit 50' + \
-            ''))
+            curs.execute(db_change('select id, title, date from history where not title like "user:%" order by date desc limit 50'))
             data_list = curs.fetchall()
             for get_data in data_list:
-                curs.execute(db_change(
-                    "insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"
-                ), [
-                    get_data[0], 
-                    get_data[1],
-                    get_data[2]
-                ])
+                curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [get_data[0], get_data[1], get_data[2]])
 
         if ver_num < 3202400:
             curs.execute(db_change("select data from other where name = 'update'"))
@@ -463,50 +415,24 @@ def update(ver_num, set_data):
         if ver_num < 3202600:
             curs.execute(db_change("select name, regex, sub from filter"))
             for i in curs.fetchall():
-                curs.execute(db_change(
-                    "insert into html_filter (html, kind, plus, plus_t) " + \
-                    "values (?, 'regex_filter', ?, ?)"
-                ), [
-                    i[0], 
-                    i[1],
-                    i[2]
-                ])
+                curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'regex_filter', ?, ?)"), [i[0], i[1], i[2]])
 
             curs.execute(db_change("select title, link, icon from inter"))
             for i in curs.fetchall():
-                curs.execute(db_change(
-                    "insert into html_filter (html, kind, plus, plus_t) " + \
-                    "values (?, 'inter_wiki', ?, ?)"), [
-                    i[0], 
-                    i[1],
-                    i[2]
-                ])
+                curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'inter_wiki', ?, ?)"), [i[0], i[1], i[2]])
 
         if ver_num < 3203400:
             curs.execute(db_change("select user, css from custom"))
             for i in curs.fetchall():
-                curs.execute(db_change(
-                    "insert into user_set (name, id, data) values ('custom_css', ?, ?)"
-                ), [
-                    re.sub(r' \(head\)$', '', i[0]), 
-                    i[1]
-                ])
+                curs.execute(db_change("insert into user_set (name, id, data) values ('custom_css', ?, ?)"), [re.sub(r' \(head\)$', '', i[0]), i[1]])
 
         if ver_num < 3205500:
             curs.execute(db_change("select title, decu, dis, view, why from acl"))
             for i in curs.fetchall():
-                curs.execute(db_change(
-                    "insert into acl (title, data, type) values (?, ?, ?)"
-                ), [i[0], i[1], 'decu'])
-                curs.execute(db_change(
-                    "insert into acl (title, data, type) values (?, ?, ?)"
-                ), [i[0], i[2], 'dis'])
-                curs.execute(db_change(
-                    "insert into acl (title, data, type) values (?, ?, ?)"
-                ), [i[0], i[3], 'view'])
-                curs.execute(db_change(
-                    "insert into acl (title, data, type) values (?, ?, ?)"
-                ), [i[0], i[4], 'why'])
+                curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[1], 'decu'])
+                curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[2], 'dis'])
+                curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[3], 'view'])
+                curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[4], 'why'])
 
         if ver_num < 3300101:
             # 캐시 초기화
@@ -514,33 +440,20 @@ def update(ver_num, set_data):
         
         if ver_num < 3300301:
             # regex_filter 오류 해결
-            curs.execute(db_change(
-                'delete from html_filter where kind = "regex_filter" and html is null'
-            ))
+            curs.execute(db_change('delete from html_filter where kind = "regex_filter" and html is null'))
             
         if ver_num < 3302302:
             # user이랑 user_set 테이블의 통합
             curs.execute(db_change('select id, pw, acl, date, encode from user'))
             for i in curs.fetchall():
-                curs.execute(db_change(
-                    "insert into user_set (name, id, data) values (?, ?, ?)"
-                ), ['pw', i[0], i[1]])
-                curs.execute(db_change(
-                    "insert into user_set (name, id, data) values (?, ?, ?)"
-                ), ['acl', i[0], i[2]])
-                curs.execute(db_change(
-                    "insert into user_set (name, id, data) values (?, ?, ?)"
-                ), ['date', i[0], i[3]])
-                curs.execute(db_change(
-                    "insert into user_set (name, id, data) values (?, ?, ?)"
-                ), ['encode', i[0], i[4]])
+                curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['pw', i[0], i[1]])
+                curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['acl', i[0], i[2]])
+                curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['date', i[0], i[3]])
+                curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['encode', i[0], i[4]])
                 
         if ver_num < 3400101:
             # user_set이랑 user_application 테이블의 통합
-            curs.execute(db_change('' + \
-                'select id, pw, date, encode, question, answer, ip, ua, email ' + \
-                'from user_application' + \
-            ''))
+            curs.execute(db_change('select id, pw, date, encode, question, answer, ip, ua, email from user_application'))
             for i in curs.fetchall():
                 sql_data = {}
                 sql_data['id'] = i[0]
@@ -553,14 +466,10 @@ def update(ver_num, set_data):
                 sql_data['ua'] = i[7]
                 sql_data['email'] = i[8]
                 
-                curs.execute(db_change(
-                    "insert into user_set (name, id, data) values (?, ?, ?)"
-                ), ['application', i[0], json.dumps(sql_data)])
+                curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['application', i[0], json.dumps(sql_data)])
         
         if ver_num < 3500105:
-            curs.execute(db_change(
-                'delete from acl where title like "file:%" and data = "admin" and type like "decu%"'
-            ))
+            curs.execute(db_change('delete from acl where title like "file:%" and data = "admin" and type like "decu%"'))
             
         if ver_num < 3500106:
             curs.execute(db_change("select data from other where name = 'domain'"))
@@ -570,15 +479,9 @@ def update(ver_num, set_data):
                 db_data = re.match(r'[^/]+\/\/([^/]+)', db_data)
                 if db_data:
                     db_data = db_data.group(1)
-                    curs.execute(db_change(
-                        "update other set data = ? where name = 'domain'"
-                    ), [
-                        db_data
-                    ])
+                    curs.execute(db_change("update other set data = ? where name = 'domain'"), [db_data])
                 else:
-                    curs.execute(db_change(
-                        "update other set data = '' where name = 'domain'"
-                    ))
+                    curs.execute(db_change("update other set data = '' where name = 'domain'"))
 
         if ver_num < 3500107:
             db_table_list = get_db_table_list()
@@ -642,9 +545,7 @@ def update(ver_num, set_data):
             curs.execute(db_change('select id from user_set where name = "email"'))
             for db_data in curs.fetchall():
                 if ip_or_user(db_data[0]) == 1:
-                    curs.execute(db_change(
-                        'delete from user_set where id = ? and name = "email"'
-                    ), [db_data[0]])
+                    curs.execute(db_change('delete from user_set where id = ? and name = "email"'), [db_data[0]])
 
         # create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
         # create_data['rc'] = ['id', 'title', 'date', 'type']
@@ -666,18 +567,23 @@ def update(ver_num, set_data):
                 else:
                     user_alarm_count[db_data[0]] = 1
 
-                curs.execute(db_change(
-                    'insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'
-                ), [str(user_alarm_count[db_data[0]]), db_data[0], db_data[1], db_data[2]])
+                curs.execute(db_change('insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'), [str(user_alarm_count[db_data[0]]), db_data[0], db_data[1], db_data[2]])
 
         if ver_num < 3500372:
             # ID 글자 확인 호환용
-            curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [
-                r'(?:[^A-Za-zㄱ-힣0-9])',
-                'name',
-                '',
-                ''
-            ])
+            curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-힣0-9])', 'name', '', ''])
+
+        if ver_num < 3500373:
+            select_data = {}
+
+            curs.execute(db_change("select name, id, data from user_set where name = 'application'"))
+            for db_data in curs.fetchall():
+                select_data[db_data[1]] = db_data
+
+            curs.execute(db_change("delete from user_set where name = 'application'"))
+            
+            for db_data in select_data:
+                curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [select_data[db_data][1], select_data[db_data][0], select_data[db_data][2]])
 
         conn.commit()
 
@@ -1719,6 +1625,15 @@ def do_user_name_check(user_name):
         if len(user_name) > 128:
             return 1
         
+        # 중복 확인
+        curs.execute(db_change("select id from user_set where name = 'user_name' and data = ?"), [user_name])
+        if curs.fetchall():
+            return 1
+        
+        curs.execute(db_change("select id from user_set where id = ?"), [user_name])
+        if curs.fetchall():
+            return 1
+        
         return 0
 
 def get_admin_auth_list(num = None):
@@ -2688,6 +2603,9 @@ def re_error(data):
                 menu = 0
             )), 401
         else:
+            title = load_lang('error')
+            sub_title = title
+
             num = int(number_check(data.replace('/error/', '')))
             if num == 1:
                 data = load_lang('no_login_error')
@@ -2699,10 +2617,12 @@ def re_error(data):
                 data = load_lang('no_admin_block_error')
             elif num == 5:
                 data = load_lang('error_skin_set')
-            elif num == 6:
-                data = load_lang('same_id_exist_error')
             elif num == 8:
-                data = load_lang('long_id_error') + '<br>' + load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id_filter_list') + ')</a>'
+                data = '' + \
+                    load_lang('long_id_error') + '<br>' + \
+                    load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id_filter_list') + ')</a><br>' + \
+                    load_lang('same_id_exist_error') + \
+                ''
             elif num == 9:
                 data = load_lang('file_exist_error')
             elif num == 10:
@@ -2788,6 +2708,11 @@ def re_error(data):
                 db_data = curs.fetchall()
                 db_data = '' if not db_data else db_data[0][0]
                 data = load_lang('fast_edit_error') + db_data
+            elif num == 43:
+                title = load_lang('application_submitted')
+                sub_title = title
+
+                data = load_lang('waiting_for_approval')
             else:
                 data = '???'
 
@@ -2795,12 +2720,8 @@ def re_error(data):
                 if flask.request.path != '/skin_set':
                     data += '<br>' + load_lang('error_skin_set_old') + ' <a href="/skin_set">(' + load_lang('go') + ')</a>'
 
-                title = load_lang('skin_set')
-                tool = [['change', load_lang('user_setting')], ['change/skin_set/main', load_lang('main_skin_set')]]
-                load_skin_set = ''
-            
                 return easy_minify(flask.render_template(skin_check(),
-                    imp = [title, wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                    imp = [load_lang('skin_set'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                     data = '' + \
                         '<div id="main_skin_set">' + \
                             '<h2>' + load_lang('error') + '</h2>' + \
@@ -2808,14 +2729,14 @@ def re_error(data):
                                 '<li>' + data + '</a></li>' + \
                             '</ul>' + \
                         '</div>' + \
-                        load_skin_set,
-                    menu = tool
+                    '',
+                    menu = [['change', load_lang('user_setting')], ['change/skin_set/main', load_lang('main_skin_set')]]
                 ))
             else:
                 return easy_minify(flask.render_template(skin_check(),
-                    imp = [load_lang('error'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                    imp = [title, wiki_set(), wiki_custom(), wiki_css([0, 0])],
                     data = '' + \
-                        '<h2>' + load_lang('error') + '</h2>' + \
+                        '<h2>' + sub_title + '</h2>' + \
                         '<ul class="opennamu_ul">' + \
                             '<li>' + data + '</li>' + \
                         '</ul>' + \
