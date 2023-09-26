@@ -1522,7 +1522,8 @@ class class_do_render_namumark:
             table_align_auto = 1
             table_colspan_auto = 1
 
-            # todo : useless parameter return
+            do_any_thing = ''
+
             table_parameter_regex = r'&lt;((?:(?!&lt;|&gt;).)+)&gt;'
             for table_parameter in re.findall(table_parameter_regex, parameter):
                 table_parameter_split = table_parameter.split('=')
@@ -1571,6 +1572,8 @@ class class_do_render_namumark:
                         table_parameter_all['td'] += 'width:' + self.get_tool_px_add_check(table_parameter_data) + ';'
                     elif table_parameter_name == 'height':
                         table_parameter_all['td'] += 'height:' + self.get_tool_px_add_check(table_parameter_data) + ';'
+                    else:
+                        do_any_thing += '&lt;' + table_parameter + '&gt;'
                 elif len(table_parameter_split) == 1:
                     if re.search(r'^-[0-9]+$', table_parameter):
                         table_colspan_auto = 0
@@ -1590,9 +1593,13 @@ class class_do_render_namumark:
                             table_parameter_all['td'] += 'text-align: center;'
                         elif table_parameter == ')':
                             table_parameter_all['td'] += 'text-align: right;'
-                    else:
+                    elif re.search(r'^(?:(?:#((?:[0-9a-f-A-F]{3}){1,2}))|(\w+))$', table_parameter):
                         table_parameter_data = self.get_tool_css_safe(table_parameter)
                         table_parameter_all['td'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    else:
+                        do_any_thing += '&lt;' + table_parameter + '&gt;'
+                else:
+                    do_any_thing += '&lt;' + table_parameter + '&gt;'
             
             if table_align_auto == 1:
                 if re.search(r'^ ', data):
@@ -1610,7 +1617,7 @@ class class_do_render_namumark:
             if table_colspan_auto == 1:
                 table_parameter_all['colspan'] = str(len(cell_count) // 2)
 
-            table_parameter_all['data'] = data
+            table_parameter_all['data'] = do_any_thing + data
 
             return table_parameter_all
 
@@ -1724,6 +1731,7 @@ class class_do_render_namumark:
 
                 middle_name = re.search(r'^([^ \n]+)', middle_data)
                 middle_data_pass = ''
+                middle_data_add = ''
                 if middle_name:
                     middle_name = middle_name.group(1)
                     middle_name = middle_name.lower()
@@ -1785,17 +1793,16 @@ class class_do_render_namumark:
                             wiki_data_folding = 'test'
 
                         wiki_data = self.get_tool_data_revert(wiki_data)
-                        wiki_data = html.unescape(wiki_data)
-                        wiki_data = re.sub('\n$', '', wiki_data)
+                        wiki_data = re.sub('(^\n|\n$)', '', wiki_data)
 
-                        self.data_include += [[self.doc_include + 'opennamu_folding_' + str(folding_count), self.doc_name, wiki_data]]
+                        wiki_data_end = self.do_inter_render(wiki_data, self.doc_include + 'opennamu_folding_' + str(folding_count))
 
                         middle_data_pass = wiki_data_folding
-                        data_name = self.get_tool_data_storage(
-                            '<details><summary>',
-                            '</summary><div id="' + self.doc_include + 'opennamu_folding_' + str(folding_count) + '"></div></details>', 
-                            middle_data_org
-                        )
+                        data_name = self.get_tool_data_storage('<details><summary>', '</summary>', middle_data_org)
+
+                        data_name_2 = self.get_tool_data_storage('', '</details>', '')
+                        middle_data_add = '<' + data_name_2 + '>' + wiki_data_end + '</' + data_name_2 + '>'
+
                         folding_count += 1
                     elif middle_name == '#!syntax':
                         if middle_slash:
@@ -1947,7 +1954,7 @@ class class_do_render_namumark:
 
                     data_name = self.get_tool_data_storage(data_revert, '', middle_data_org)
 
-                self.render_data = re.sub(middle_regex, lambda x : ('<' + data_name + '>' + middle_data_pass + '</' + data_name + '>'), self.render_data, 1)
+                self.render_data = re.sub(middle_regex, lambda x : ('<' + data_name + '>' + middle_data_pass + '</' + data_name + '>' + middle_data_add), self.render_data, 1)
 
             middle_count_all -= 1
 
@@ -1987,7 +1994,7 @@ class class_do_render_namumark:
                 quote_data = self.get_tool_data_revert(quote_data)
 
                 quote_data_end = self.do_inter_render(quote_data, self.doc_include + 'opennamu_quote_' + str(quote_count))
-                data_name = self.get_tool_data_storage('<div id="' + self.doc_include + 'opennamu_quote_' + str(quote_count) + '">', '</div>', quote_data_org)
+                data_name = self.get_tool_data_storage('<div>', '</div>', quote_data_org)
 
                 self.render_data = re.sub(quote_regex, lambda x : ('\n<blockquote><back_br>\n<' + data_name + '>' + quote_data_end + '</' + data_name + '><front_br></blockquote>\n'), self.render_data, 1)
 
