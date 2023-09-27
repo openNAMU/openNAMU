@@ -47,11 +47,6 @@ def login_register_2():
             if do_user_name_check(user_id) == 1:
                 return re_error('/error/8')
 
-            # 중복 확인
-            curs.execute(db_change("select id from user_set where id = ?"), [user_id])
-            if curs.fetchall():
-                return re_error('/error/6')
-
             if admin != 1:
                 # 이메일 필요시 /register/email로 발송
                 curs.execute(db_change('select data from other where name = "email_have"'))
