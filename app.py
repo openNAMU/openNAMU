@@ -239,7 +239,7 @@ with get_db_connect() as conn:
 
         curs.execute(db_change('select data from other where name = "back_up"'))
         back_time = curs.fetchall()
-        back_time = int(number_check(back_time[0][0])) if back_time and back_time != '' else 0
+        back_time = int(number_check(back_time[0][0])) if back_time and back_time[0][0] != '' else 0
         if back_time != 0:
             curs.execute(db_change('select data from other where name = "backup_where"'))
             back_up_where = curs.fetchall()
