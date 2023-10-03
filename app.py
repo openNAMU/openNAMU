@@ -541,7 +541,15 @@ app.route('/bbs/edit/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['PO
 app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):rev>')(api_w)
 app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['POST', 'GET'])(api_w)
 app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
-app.route('/api/raw/<everything:name>')(api_raw)
+
+app.route('/api/render_tool/<tool>/<everything:name>', methods = ['POST'])(api_w_render)
+app.route('/api/render_tool/<tool>', methods = ['POST'])(api_w_render)
+app.route('/api/render/<everything:name>', methods = ['POST'])(api_w_render)
+app.route('/api/render', methods = ['POST'])(api_w_render)
+
+app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on' })(api_w_raw)
+app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>')(api_w_raw)
+app.route('/api/raw/<everything:name>')(api_w_raw)
 
 app.route('/api/bbs/w/<sub_code>')(api_bbs_w_post)
 app.route('/api/bbs/w/comment/<sub_code>')(api_bbs_w_comment)
