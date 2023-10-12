@@ -1355,7 +1355,8 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
 
                             .opennamu_render_complete summary {
                                 list-style: none !important;
-                                font-weight: bold;
+                                
+                                font-weight: bold !important;
                             }
                         </style>
                     ''' + get_class_render[0]

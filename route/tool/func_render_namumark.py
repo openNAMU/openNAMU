@@ -1812,9 +1812,9 @@ class class_do_render_namumark:
                         wiki_data_end = self.do_inter_render(wiki_data, self.doc_include + 'opennamu_folding_' + str(folding_count))
 
                         middle_data_pass = wiki_data_folding
-                        data_name = self.get_tool_data_storage('<details><summary>', '</summary>', middle_data_org)
+                        data_name = self.get_tool_data_storage('<details><summary>', '</summary><div class="opennamu_folding">', middle_data_org)
 
-                        data_name_2 = self.get_tool_data_storage('', '</details>', '')
+                        data_name_2 = self.get_tool_data_storage('', '</div></details>', '')
                         middle_data_add = '<' + data_name_2 + '>' + wiki_data_end + '</' + data_name_2 + '>'
 
                         folding_count += 1
