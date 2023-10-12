@@ -899,12 +899,12 @@ class class_do_render_namumark:
                         db_data = self.curs.fetchall()
                         if db_data:
                             link_exist = ''
-                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file', '']]
                         else:
                             link_exist = 'opennamu_not_exist_link'
                             self.data_backlink += [[self.doc_name, 'file:' + link_main, 'no', '']]
-                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file', '']]
-                        
+
+                        self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file', '']]
+
                         link_extension_regex = r'\.([^.]+)$'
                         link_extension = re.search(link_extension_regex, link_main)
                         if link_extension:
@@ -1138,11 +1138,11 @@ class class_do_render_namumark:
                         db_data = self.curs.fetchall()
                         if not db_data:
                             self.data_backlink += [[self.doc_name, link_main, 'no', '']]
-                            self.data_backlink += [[self.doc_name, link_main, '', '']]
                             link_exist = 'opennamu_not_exist_link'
                         else:
                             link_main = db_data[0][0]
-                            self.data_backlink += [[self.doc_name, link_main, '', '']]
+                        
+                        self.data_backlink += [[self.doc_name, link_main, '', '']]
 
                     link_same = ''
                     if link_main == self.doc_name:
@@ -1274,11 +1274,12 @@ class class_do_render_namumark:
                     include_name = self.get_tool_data_restore(include_name, do_type = 'slash')
                     include_name = html.unescape(include_name)
 
+                    self.data_backlink += [[self.doc_name, include_name, 'include', '']]
+
                     # load include db data
                     self.curs.execute(db_change("select data from data where title = ?"), [include_name])
                     db_data = self.curs.fetchall()
                     if db_data:
-                        self.data_backlink += [[self.doc_name, include_name, 'include', '']]
                         include_data = db_data[0][0].replace('\r', '')
 
                         # include link func
