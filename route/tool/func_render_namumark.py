@@ -1470,6 +1470,16 @@ class class_do_render_namumark:
                 link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                 link_main = html.unescape(link_main)
 
+                link_exist = 1
+
+                self.curs.execute(db_change("select title from data where title = ?" + self.link_case_insensitive), [link_main])
+                db_data = self.curs.fetchall()
+                if not db_data:
+                    self.data_backlink += [[self.doc_name, link_main, 'no', '']]
+                    link_exist = 0
+                else:
+                    link_main = db_data[0][0]
+
                 self.data_backlink += [[self.doc_name, link_main, 'redirect', '']]
 
                 link_main = url_pas(link_main)
@@ -1477,11 +1487,14 @@ class class_do_render_namumark:
                     link_main = '/w_from/' + link_main
 
                 self.data_redirect = 1
-                if 'doc_from' in self.doc_set:
-                    data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
+                if link_exist == 1:
+                    if 'doc_from' in self.doc_set:
+                        data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
+                    else:
+                        data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', '', link_data_full)
                 else:
-                    data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', '', link_data_full)
-                    
+                    data_name = self.get_tool_data_storage('', '', link_data_full)
+
                 self.render_data = '<' + data_name + '></' + data_name + '>'
             else:
                 self.curs.execute(db_change("select plus, plus_t from html_filter where kind = 'inter_wiki' and html = ?"), [link_inter_name])
