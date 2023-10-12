@@ -60,8 +60,13 @@ def edit_move(name):
                     curs.execute(db_change("update data set title = ? where title = ?"), [move_title, name])
                     curs.execute(db_change("update back set link = ? where link = ?"), [move_title, name])
 
-                    curs.execute(db_change("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'"), [name])
-                    curs.execute(db_change("delete from back where title = ? and not type = 'cat' and type = 'no'"), [move_title])
+                    # 역링크 S
+                    # 문서 합치기이므로 기존 문서 쪽은 no 역링크 생성, 이동하는 곳에는 no 역링크 제거
+                    curs.execute(db_change("select distinct link from back where title = ?"), [name])
+                    backlink = [[for_a[0], name, 'no', ''] for for_a in curs.fetchall()]
+                    curs.executemany(db_change("insert into back (link, title, type, data) values (?, ?, ?, ?)"), backlink)
+                    curs.execute(db_change("delete from back where title = ? and type = 'no'"), [move_title])
+                    # 역링크 E
 
                     curs.execute(db_change('select data from other where name = "count_all_title"'))
                     curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) - 1)])
@@ -80,6 +85,9 @@ def edit_move(name):
                         mode = 'move'
                     )
                 elif move_option == 'reverse':
+                    # 전체적인 구조 변경 필요
+                    # 중간 문서 거치지 않고 불러와서 바로 변경하도록
+                    # 문서 이동 말고 나머지도 그렇게 변경 필요함
                     i = 0
                     var_name = ''
                     while var_name == '':
@@ -108,7 +116,7 @@ def edit_move(name):
                         )
                 elif move_option != 'none':
                     has_error = 1
-            elif move_option != 'none':                
+            elif move_option != 'none':
                 curs.execute(db_change("select data from data where title = ?"), [name])
                 data = curs.fetchall()
                 data_in = data[0][0] if data else ''
@@ -116,11 +124,18 @@ def edit_move(name):
                 curs.execute(db_change("update data set title = ? where title = ?"), [move_title, name])
                 curs.execute(db_change("update back set link = ? where link = ?"), [move_title, name])
 
-                curs.execute(db_change("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'"), [name])
-                curs.execute(db_change("delete from back where title = ? and not type = 'cat' and type = 'no'"), [move_title])
+                # 역링크 S
+                # 문서 합치기 쪽 역링크와 동일하게
+                curs.execute(db_change("select distinct link from back where title = ?"), [name])
+                backlink = [[for_a[0], name, 'no', ''] for for_a in curs.fetchall()]
+                curs.executemany(db_change("insert into back (link, title, type, data) values (?, ?, ?, ?)"), backlink)
+                curs.execute(db_change("delete from back where title = ? and type = 'no'"), [move_title])
+                # 역링크 E
 
+                # 역사와 최근 변경 이동 S
                 curs.execute(db_change("update history set title = ? where title = ?"), [move_title, name])
                 curs.execute(db_change("update rc set title = ? where title = ?"), [move_title, name])
+                # 역사와 최근 변경 이동 E
 
                 history_plus(move_title, data_in, time, ip, send, '0',
                     t_check = '<a>' + name + '</a> - <a>' + move_title + '</a> move',
