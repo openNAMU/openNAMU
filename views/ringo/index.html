@@ -192,6 +192,9 @@
                             <sub>{{imp[3][0]}}</sub>
                         {% endif %}
                     </h1>
+                    {% if imp[3][1] != 0 %}
+                        {{'last_edit_time'|load_lang}} : {{imp[3][1]}}
+                    {% endif %}
                     {% if menu != 0 %}
                         <div id="menu">
                             {% for menu_data in menu %}
