@@ -26,10 +26,10 @@ class Accordion {
         // Add an overflow on the <details> to avoid content overflowing
         this.el.style.overflow = 'hidden';
         // Check if the element is being closed or is already closed
-        if (this.isClosing || !this.el.open) {
+        if(this.isClosing || !this.el.open) {
             this.open();
         // Check if the element is being openned or is already open
-        } else if (this.isExpanding || this.el.open) {
+        } else if(this.isExpanding || this.el.open) {
             this.shrink();
         }
     }
@@ -44,7 +44,7 @@ class Accordion {
         const endHeight = `${this.summary.offsetHeight}px`;
         
         // If there is already an animation running
-        if (this.animation) {
+        if(this.animation) {
             // Cancel the current animation
             this.animation.cancel();
         }
@@ -65,12 +65,12 @@ class Accordion {
     }
   
     open() {
-      // Apply a fixed height on the element
-      this.el.style.height = `${this.el.offsetHeight}px`;
-      // Force the [open] attribute on the details element
-      this.el.open = true;
-      // Wait for the next frame to call the expand function
-      window.requestAnimationFrame(() => this.expand());
+        // Apply a fixed height on the element
+        this.el.style.height = `${this.el.offsetHeight}px`;
+        // Force the [open] attribute on the details element
+        this.el.open = true;
+        // Wait for the next frame to call the expand function
+        window.requestAnimationFrame(() => this.expand());
     }
   
     expand() {
@@ -82,7 +82,7 @@ class Accordion {
         const endHeight = `${this.summary.offsetHeight + this.content.offsetHeight}px`;
         
         // If there is already an animation running
-        if (this.animation) {
+        if(this.animation) {
             // Cancel the current animation
             this.animation.cancel();
         }
