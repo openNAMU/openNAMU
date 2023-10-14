@@ -26,15 +26,7 @@ def view_xref(name = 'Test', xref_type = 1):
         link_case_insensitive = ' collate nocase' if db_data and db_data[0][0] != '' else ''
 
         sql_insert = ['link', 'title'] if xref_type == 1 else ['title', 'link']
-        curs.execute(db_change("" + \
-            "select distinct " + sql_insert[0] + ", type from back " + \
-            "where " + sql_insert[1] + " = ?" + link_case_insensitive + " and not type = 'no' and not type = 'nothing' " + \
-            "order by type asc, " + sql_insert[0] + " asc limit ?, 50" + \
-        ""), [
-            name,
-            sql_num
-        ])
-
+        curs.execute(db_change("select distinct " + sql_insert[0] + ", type from back where " + sql_insert[1] + " = ?" + link_case_insensitive + " and not type = 'no' and not type = 'nothing' order by type asc, " + sql_insert[0] + " asc limit ?, 50"), [name, sql_num])
         data_list = curs.fetchall()
         for data in data_list:
             div += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a>'

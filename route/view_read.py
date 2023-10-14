@@ -32,7 +32,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             count_sub_category = 0
             count_category = 0
 
-            curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
+            curs.execute(db_change("select distinct link from back where title = ? and type = 'cat' order by link asc"), [name])
             category_sql = curs.fetchall()
             for data in category_sql:
                 link_view = data[0]
