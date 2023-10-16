@@ -1614,6 +1614,10 @@ def do_user_name_check(user_name):
         if html.escape(user_name) != user_name:
             return 1
 
+        # IP와 혼동 방지 
+        if ip_or_user(user_name) == 1:
+            return 1
+
         # ID 필터
         curs.execute(db_change('select html from html_filter where kind = "name"'))
         set_d = curs.fetchall()
