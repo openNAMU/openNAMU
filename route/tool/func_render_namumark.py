@@ -990,7 +990,6 @@ class class_do_render_namumark:
                     category_blur = ''
                     if re.search(r'#blur$', link_main, flags = re.I):
                         link_main = re.sub(r'#blur$', '', link_main, flags = re.I)
-
                         category_blur = 'opennamu_category_blur'
                     
                     link_sub = link_main
@@ -1013,7 +1012,12 @@ class class_do_render_namumark:
                             self.data_backlink += [[self.doc_name, 'category:' + link_main, 'no', '']]
 
                         self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat', '']]
-                        self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat_view', link_view]]
+                        
+                        if link_view != '':
+                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat_view', link_view]]
+                        
+                        if category_blur != '':
+                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat_blur', '']]
 
                         link_main = url_pas(link_main)
 
