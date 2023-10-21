@@ -32,7 +32,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             count_sub_category = 0
             count_category = 0
 
-            curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
+            curs.execute(db_change("select distinct link from back where title = ? and type = 'cat' order by link asc"), [name])
             category_sql = curs.fetchall()
             for data in category_sql:
                 link_view = data[0]
@@ -41,19 +41,23 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                     db_data = curs.fetchall()
                     if db_data and db_data[0][0] != '':
                         link_view = db_data[0][0]
+                        
+                link_blur = ''
+                curs.execute(db_change("select data from back where title = ? and link = ? and type = 'cat_blur' limit 1"), [name, data[0]])
+                db_data = curs.fetchall()
+                if db_data:
+                    link_blur = 'opennamu_category_blur'
 
                 if data[0].startswith('category:'):
-                    category_sub += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(link_view) + '</a></li>'
-
+                    category_sub += '<li><a class="' + link_blur + '" href="/w/' + url_pas(data[0]) + '">' + html.escape(link_view) + '</a></li>'
                     count_sub_category += 1
                 else:
                     category_doc += '' + \
                         '<li>' + \
-                            '<a href="/w/' + url_pas(data[0]) + '">' + html.escape(link_view) + '</a> ' + \
+                            '<a class="' + link_blur + '" href="/w/' + url_pas(data[0]) + '">' + html.escape(link_view) + '</a> ' + \
                             '<a class="opennamu_link_inter" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>' + \
                         '</li>' + \
                     ''
-
                     count_category += 1
 
             if category_sub != '':
