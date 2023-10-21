@@ -10,15 +10,15 @@
         {{imp[3][3]|safe}}
         <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" rel="stylesheet">
         <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
-        <script src="/views/ringo/js/main.js?ver=2"></script>
-        <script src="/views/ringo/js/sidebar.js?ver=1"></script>
-        <script src="/views/ringo/js/skin_set.js?ver=1"></script>
-        <link rel="stylesheet" href="/views/ringo/css/main.css?ver=4">
+        <script src="/views/ringo/js/main.js"></script>
+        <script src="/views/ringo/js/sidebar.js"></script>
+        <script src="/views/ringo/js/skin_set.js"></script>
+        <link rel="stylesheet" href="/views/ringo/css/main.css">
         {% if request.cookies.get('main_css_darkmode', '') == '1' %}
-            <link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=1">
-            <link rel="stylesheet" href="/views/ringo/css/dark.css?ver=1">
+            <link rel="stylesheet" href="/views/main_css/css/sub/dark.css">
+            <link rel="stylesheet" href="/views/ringo/css/dark.css">
         {% endif %}
-        <link rel="shortcut icon" href="/views/main_css/file/favicon.ico?ver=1">
+        <link rel="shortcut icon" href="/views/main_css/file/favicon.ico">
         {{imp[1][5]|safe}}
         {{imp[2][3]|safe}}
         {% if imp[3][0] != 0 %}
