@@ -51,9 +51,7 @@ class class_do_render_namumark:
             self.render_data = html.escape(self.render_data)
 
         self.render_data = '<back_br>\n' + self.render_data + '\n<front_br>'
-        self.render_data_cdn = ''
         self.render_data_js = ''
-
 
         self.curs.execute(db_change('select data from other where name = "link_case_insensitive"'))
         db_data = self.curs.fetchall()
@@ -780,10 +778,6 @@ class class_do_render_namumark:
         def do_render_math_sub(match):
             data = match.group(1)
 
-            if self.data_math_count == 0:
-                self.render_data_cdn += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">'
-                self.render_data_cdn += '<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCct6O9ctzYFfFr4dgmgccOTx" crossorigin="anonymous"></script>'
-
             data = re.sub(r'\n', '', data)
             data = self.get_tool_data_revert(data)
 
@@ -899,12 +893,12 @@ class class_do_render_namumark:
                         db_data = self.curs.fetchall()
                         if db_data:
                             link_exist = ''
-                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file', '']]
                         else:
                             link_exist = 'opennamu_not_exist_link'
                             self.data_backlink += [[self.doc_name, 'file:' + link_main, 'no', '']]
-                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file', '']]
-                        
+
+                        self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file', '']]
+
                         link_extension_regex = r'\.([^.]+)$'
                         link_extension = re.search(link_extension_regex, link_main)
                         if link_extension:
@@ -990,7 +984,6 @@ class class_do_render_namumark:
                     category_blur = ''
                     if re.search(r'#blur$', link_main, flags = re.I):
                         link_main = re.sub(r'#blur$', '', link_main, flags = re.I)
-
                         category_blur = 'opennamu_category_blur'
                     
                     link_sub = link_main
@@ -1013,7 +1006,12 @@ class class_do_render_namumark:
                             self.data_backlink += [[self.doc_name, 'category:' + link_main, 'no', '']]
 
                         self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat', '']]
-                        self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat_view', link_view]]
+                        
+                        if link_view != '':
+                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat_view', link_view]]
+                        
+                        if category_blur != '':
+                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat_blur', '']]
 
                         link_main = url_pas(link_main)
 
@@ -1138,11 +1136,11 @@ class class_do_render_namumark:
                         db_data = self.curs.fetchall()
                         if not db_data:
                             self.data_backlink += [[self.doc_name, link_main, 'no', '']]
-                            self.data_backlink += [[self.doc_name, link_main, '', '']]
                             link_exist = 'opennamu_not_exist_link'
                         else:
                             link_main = db_data[0][0]
-                            self.data_backlink += [[self.doc_name, link_main, '', '']]
+                        
+                        self.data_backlink += [[self.doc_name, link_main, '', '']]
 
                     link_same = ''
                     if link_main == self.doc_name:
@@ -1274,11 +1272,12 @@ class class_do_render_namumark:
                     include_name = self.get_tool_data_restore(include_name, do_type = 'slash')
                     include_name = html.unescape(include_name)
 
+                    self.data_backlink += [[self.doc_name, include_name, 'include', '']]
+
                     # load include db data
                     self.curs.execute(db_change("select data from data where title = ?"), [include_name])
                     db_data = self.curs.fetchall()
                     if db_data:
-                        self.data_backlink += [[self.doc_name, include_name, 'include', '']]
                         include_data = db_data[0][0].replace('\r', '')
 
                         # include link func
@@ -1469,6 +1468,16 @@ class class_do_render_namumark:
                 link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                 link_main = html.unescape(link_main)
 
+                link_exist = 1
+
+                self.curs.execute(db_change("select title from data where title = ?" + self.link_case_insensitive), [link_main])
+                db_data = self.curs.fetchall()
+                if not db_data:
+                    self.data_backlink += [[self.doc_name, link_main, 'no', '']]
+                    link_exist = 0
+                else:
+                    link_main = db_data[0][0]
+
                 self.data_backlink += [[self.doc_name, link_main, 'redirect', '']]
 
                 link_main = url_pas(link_main)
@@ -1476,11 +1485,14 @@ class class_do_render_namumark:
                     link_main = '/w_from/' + link_main
 
                 self.data_redirect = 1
-                if 'doc_from' in self.doc_set:
-                    data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
+                if link_exist == 1:
+                    if 'doc_from' in self.doc_set:
+                        data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
+                    else:
+                        data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', '', link_data_full)
                 else:
-                    data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', '', link_data_full)
-                    
+                    data_name = self.get_tool_data_storage('', '', link_data_full)
+
                 self.render_data = '<' + data_name + '></' + data_name + '>'
             else:
                 self.curs.execute(db_change("select plus, plus_t from html_filter where kind = 'inter_wiki' and html = ?"), [link_inter_name])
@@ -1798,9 +1810,9 @@ class class_do_render_namumark:
                         wiki_data_end = self.do_inter_render(wiki_data, self.doc_include + 'opennamu_folding_' + str(folding_count))
 
                         middle_data_pass = wiki_data_folding
-                        data_name = self.get_tool_data_storage('<details><summary>', '</summary>', middle_data_org)
+                        data_name = self.get_tool_data_storage('<details><summary>', '</summary><div class="opennamu_folding">', middle_data_org)
 
-                        data_name_2 = self.get_tool_data_storage('', '</details>', '')
+                        data_name_2 = self.get_tool_data_storage('', '</div></details>', '')
                         middle_data_add = '<' + data_name_2 + '>' + wiki_data_end + '</' + data_name_2 + '>'
 
                         folding_count += 1
@@ -1825,13 +1837,6 @@ class class_do_render_namumark:
 
                         if syntax_count == 0:
                             self.render_data_js += 'hljs.highlightAll();\n'
-                            if self.darkmode == '0':
-                                self.render_data_cdn += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-                            else:
-                                self.render_data_cdn += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-
-                            self.render_data_cdn += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-                            self.render_data_cdn += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
 
                         data_name = self.get_tool_data_storage('<pre id="syntax"><code class="' + wiki_data_syntax + '">' + wiki_data, '</code></pre>', middle_data_org)
                         syntax_count += 1
@@ -2337,8 +2342,6 @@ class class_do_render_namumark:
             return '<a title="' + find_data + '"'
 
         self.render_data = re.sub(r'<a fn_target="([^"]+)"', do_render_last_footnote, self.render_data)
-
-        self.render_data = self.render_data_cdn + self.render_data
 
     def __call__(self):
         self.do_render_remark()

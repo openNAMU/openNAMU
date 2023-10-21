@@ -45,14 +45,14 @@ td {
     }
 }
 
-summary {
+/* 폴딩 */
+details summary {
     cursor: pointer;
     user-select: none;
     
     display: list-item;
-    list-style: inside disclosure-closed;
 }
-    
+
 /* list */
 .opennamu_ul {
     padding-left: 20px;
@@ -382,6 +382,7 @@ s:hover, strike:hover, del:hover {
     list-style: none;
 }
 
+/* 이 부분 이하로는 레거시 */
 #topic_color {
     background: #bbeabb;
 }
