@@ -1036,30 +1036,32 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_ver = '182'
+    data_css_add = ''
 
     if 'main_css' in global_wiki_set:
         data_css = global_wiki_set['main_css']
-    else:    
+    else:
+        data_css_add = '<meta http-equiv="Expires" content="-1" />'
+
         # Func JS
-        data_css += '<script src="/views/main_css/js/func/func.js?ver=' + data_css_ver + '"></script>'
+        data_css += '<script src="/views/main_css/js/func/func.js"></script>'
         
-        data_css += '<script defer src="/views/main_css/js/func/insert_version.js?ver=' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/insert_user_info.js?ver=' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/insert_version_skin.js?ver=' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/insert_http_warning_text.js?ver=' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/insert_version.js"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/insert_user_info.js"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/insert_version_skin.js"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/insert_http_warning_text.js"></script>'
         
-        data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js?ver=' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/shortcut.js?ver=' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/shortcut.js"></script>'
         
         # Route JS
-        data_css += '<script src="/views/main_css/js/route/editor.js?ver=' + data_css_ver + '"></script>'
-        data_css += '<script src="/views/main_css/js/route/editor_sub.js?ver=' + data_css_ver + '"></script>'
-        data_css += '<script src="/views/main_css/js/route/render.js?ver=' + data_css_ver + '"></script>'
-        data_css += '<script src="/views/main_css/js/route/topic.js?ver=' + data_css_ver + '"></script>'
+        data_css += '<script src="/views/main_css/js/route/editor.js"></script>'
+        data_css += '<script src="/views/main_css/js/route/editor_sub.js"></script>'
+        data_css += '<script src="/views/main_css/js/route/render.js"></script>'
+        data_css += '<script src="/views/main_css/js/route/topic.js"></script>'
         
         # Main CSS
-        data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css?ver=' + data_css_ver + '">'
+        data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css">'
 
         # External
         data_css += '<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCct6O9ctzYFfFr4dgmgccOTx" crossorigin="anonymous"></script>'
@@ -1077,7 +1079,7 @@ def wiki_css(data):
     else:
         data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
 
-    data = data[0:2] + ['', data_css] + data[2:]
+    data = data[0:2] + ['', data_css_add + data_css] + data[2:]
 
     return data
 
