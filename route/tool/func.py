@@ -1041,7 +1041,7 @@ def wiki_css(data):
     if 'main_css' in global_wiki_set:
         data_css = global_wiki_set['main_css']
     else:
-        data_css_add = '<meta http-equiv="Expires" content="-1" />'
+        data_css += '<meta http-equiv="Cache-Control" content="max-age=3600">'
 
         # Func JS
         data_css += '<script src="/views/main_css/js/func/func.js"></script>'
