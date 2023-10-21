@@ -51,9 +51,7 @@ class class_do_render_namumark:
             self.render_data = html.escape(self.render_data)
 
         self.render_data = '<back_br>\n' + self.render_data + '\n<front_br>'
-        self.render_data_cdn = ''
         self.render_data_js = ''
-
 
         self.curs.execute(db_change('select data from other where name = "link_case_insensitive"'))
         db_data = self.curs.fetchall()
@@ -779,10 +777,6 @@ class class_do_render_namumark:
     def do_render_math(self):
         def do_render_math_sub(match):
             data = match.group(1)
-
-            if self.data_math_count == 0:
-                self.render_data_cdn += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">'
-                self.render_data_cdn += '<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCct6O9ctzYFfFr4dgmgccOTx" crossorigin="anonymous"></script>'
 
             data = re.sub(r'\n', '', data)
             data = self.get_tool_data_revert(data)
@@ -1843,13 +1837,6 @@ class class_do_render_namumark:
 
                         if syntax_count == 0:
                             self.render_data_js += 'hljs.highlightAll();\n'
-                            if self.darkmode == '0':
-                                self.render_data_cdn += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-                            else:
-                                self.render_data_cdn += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-
-                            self.render_data_cdn += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-                            self.render_data_cdn += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
 
                         data_name = self.get_tool_data_storage('<pre id="syntax"><code class="' + wiki_data_syntax + '">' + wiki_data, '</code></pre>', middle_data_org)
                         syntax_count += 1
@@ -2355,8 +2342,6 @@ class class_do_render_namumark:
             return '<a title="' + find_data + '"'
 
         self.render_data = re.sub(r'<a fn_target="([^"]+)"', do_render_last_footnote, self.render_data)
-
-        self.render_data = self.render_data_cdn + self.render_data
 
     def __call__(self):
         self.do_render_remark()
