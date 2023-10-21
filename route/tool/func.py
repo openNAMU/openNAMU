@@ -1038,30 +1038,33 @@ def wiki_css(data):
     data_css = ''
     data_css_add = ''
 
+    data_css_ver = '182'
+    data_css_ver = '.cache_v' + data_css_ver
+
     if 'main_css' in global_wiki_set:
         data_css = global_wiki_set['main_css']
     else:
         data_css += '<meta http-equiv="Cache-Control" content="max-age=3600">'
 
         # Func JS
-        data_css += '<script src="/views/main_css/js/func/func.js"></script>'
+        data_css += '<script src="/views/main_css/js/func/func.js' + data_css_ver + '"></script>'
         
-        data_css += '<script defer src="/views/main_css/js/func/insert_version.js"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/insert_user_info.js"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/insert_version_skin.js"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/insert_http_warning_text.js"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/insert_version.js' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/insert_user_info.js' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/insert_version_skin.js' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/insert_http_warning_text.js' + data_css_ver + '"></script>'
         
-        data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/shortcut.js"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/shortcut.js' + data_css_ver + '"></script>'
         
         # Route JS
-        data_css += '<script src="/views/main_css/js/route/editor.js"></script>'
-        data_css += '<script src="/views/main_css/js/route/editor_sub.js"></script>'
-        data_css += '<script src="/views/main_css/js/route/render.js"></script>'
-        data_css += '<script src="/views/main_css/js/route/topic.js"></script>'
+        data_css += '<script src="/views/main_css/js/route/editor.js' + data_css_ver + '"></script>'
+        data_css += '<script src="/views/main_css/js/route/editor_sub.js' + data_css_ver + '"></script>'
+        data_css += '<script src="/views/main_css/js/route/render.js' + data_css_ver + '"></script>'
+        data_css += '<script src="/views/main_css/js/route/topic.js' + data_css_ver + '"></script>'
         
         # Main CSS
-        data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css">'
+        data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css' + data_css_ver + '">'
 
         # External
         data_css += '<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCct6O9ctzYFfFr4dgmgccOTx" crossorigin="anonymous"></script>'
