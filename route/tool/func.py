@@ -85,7 +85,12 @@ import flask
 
 import requests
 
-import pymysql
+try:
+    import mysqlclient as pymysql
+except:
+    import pymysql
+
+import sqlite3
 
 if sys.version_info < (3, 6):
     import sha3
