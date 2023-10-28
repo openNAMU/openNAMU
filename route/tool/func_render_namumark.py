@@ -34,7 +34,7 @@ class class_do_render_namumark:
         self.data_temp_storage = {}
         self.data_temp_storage_count = 0
 
-        self.data_backlink = []
+        self.data_backlink = {}
         self.data_include = []
 
         self.data_math_count = 0
@@ -239,6 +239,7 @@ class class_do_render_namumark:
         self.render_data_js += data_end[1]
         self.data_include += data_end[2]['include']
         self.data_category_list += data_end[2]['category']
+        self.data_backlink = dict(self.data_backlink, **data_end[2]['backlink_dict'])
         self.data_temp_storage = dict(self.data_temp_storage, **data_end[2]['temp_storage'][0])
         self.data_temp_storage_count += data_end[2]['temp_storage'][1]
 
@@ -889,15 +890,18 @@ class class_do_render_namumark:
                         link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                         link_main = html.unescape(link_main)
 
+                        if not ('file:' + link_main) in self.data_backlink:
+                            self.data_backlink['file:' + link_main] = {}
+
                         self.curs.execute(db_change("select title from data where title = ?"), ['file:' + link_main])
                         db_data = self.curs.fetchall()
                         if db_data:
                             link_exist = ''
                         else:
                             link_exist = 'opennamu_not_exist_link'
-                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'no', '']]
+                            self.data_backlink['file:' + link_main]['no'] = ''
 
-                        self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file', '']]
+                        self.data_backlink['file:' + link_main]['file'] = ''
 
                         link_extension_regex = r'\.([^.]+)$'
                         link_extension = re.search(link_extension_regex, link_main)
@@ -997,21 +1001,24 @@ class class_do_render_namumark:
                     if not link_main in self.data_category_list:
                         self.data_category_list += [link_main]
                         
+                        if not ('category:' + link_main) in self.data_backlink:
+                            self.data_backlink['category:' + link_main] = {}
+
                         self.curs.execute(db_change("select title from data where title = ?"), ['category:' + link_main])
                         db_data = self.curs.fetchall()
                         if db_data:
                             link_exist = ''
                         else:
                             link_exist = 'opennamu_not_exist_link'
-                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'no', '']]
+                            self.data_backlink['category:' + link_main]['no'] = ''
 
-                        self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat', '']]
+                        self.data_backlink['category:' + link_main]['cat'] = ''
                         
                         if link_view != '':
-                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat_view', link_view]]
+                            self.data_backlink['category:' + link_main]['cat_view'] = link_view
                         
                         if category_blur != '':
-                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat_blur', '']]
+                            self.data_backlink['category:' + link_main]['cat_blur'] = ''
 
                         link_main = url_pas(link_main)
 
@@ -1135,12 +1142,17 @@ class class_do_render_namumark:
                         self.curs.execute(db_change("select title from data where title = ?" + self.link_case_insensitive), [link_main])
                         db_data = self.curs.fetchall()
                         if not db_data:
-                            self.data_backlink += [[self.doc_name, link_main, 'no', '']]
+                            if not link_main in self.data_backlink:
+                                self.data_backlink[link_main] = {}
+
+                            self.data_backlink[link_main]['no'] = ''
                             link_exist = 'opennamu_not_exist_link'
                         else:
                             link_main = db_data[0][0]
+                            if not link_main in self.data_backlink:
+                                self.data_backlink[link_main] = {}
                         
-                        self.data_backlink += [[self.doc_name, link_main, '', '']]
+                        self.data_backlink[link_main][''] = ''
 
                     link_same = ''
                     if link_main == self.doc_name:
@@ -1272,7 +1284,10 @@ class class_do_render_namumark:
                     include_name = self.get_tool_data_restore(include_name, do_type = 'slash')
                     include_name = html.unescape(include_name)
 
-                    self.data_backlink += [[self.doc_name, include_name, 'include', '']]
+                    if not include_name in self.data_backlink:
+                        self.data_backlink[include_name] = {}
+
+                    self.data_backlink[include_name]['include'] = ''
 
                     # load include db data
                     self.curs.execute(db_change("select data from data where title = ?"), [include_name])
@@ -1299,7 +1314,7 @@ class class_do_render_namumark:
                             '<div id="' + self.doc_include + 'opennamu_include_' + str(include_num) + '"></div>' + \
                         '', '', match_org)
                     else:
-                        self.data_backlink += [[self.doc_name, include_name, 'no', '']]
+                        self.data_backlink[include_name]['no'] = ''
 
                         include_link = '<div><a class="opennamu_not_exist_link" href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
 
@@ -1471,12 +1486,17 @@ class class_do_render_namumark:
                 self.curs.execute(db_change("select title from data where title = ?" + self.link_case_insensitive), [link_main])
                 db_data = self.curs.fetchall()
                 if not db_data:
-                    self.data_backlink += [[self.doc_name, link_main, 'no', '']]
+                    if not link_main in self.data_backlink:
+                        self.data_backlink[link_main] = {}
+
+                    self.data_backlink[link_main]['no'] = ''
                     link_exist = 0
                 else:
                     link_main = db_data[0][0]
+                    if not link_main in self.data_backlink:
+                        self.data_backlink[link_main] = {}
 
-                self.data_backlink += [[self.doc_name, link_main, 'redirect', '']]
+                self.data_backlink[link_main]['redirect'] = ''
 
                 link_main = url_pas(link_main)
                 if link_main != '':
@@ -2368,11 +2388,15 @@ class class_do_render_namumark:
             self.render_data = self.render_data.replace(r'\|\|', '<no_td>')
             self.render_data = self.render_data.replace('\n', '<no_br>')
 
+        data_backlink_dict = self.data_backlink
+        self.data_backlink = [[self.doc_name, for_a, for_b, self.data_backlink[for_a][for_b]] for for_a in self.data_backlink for for_b in self.data_backlink[for_a]]
+
         return [
             self.render_data, # html
             self.render_data_js, # js
             {
                 'backlink' : self.data_backlink, # backlink
+                'backlink_dict' : data_backlink_dict,
                 'include' : self.data_include, # include data
                 'footnote' : self.data_footnote_all, # footnote
                 'category' : self.data_category_list,
