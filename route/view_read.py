@@ -219,19 +219,33 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                 ['acl/' + url_pas(name), load_lang('setting'), acl],
             ]
 
+            if flask.session and 'lastest_document' in flask.session:
+                pass
+            else:
+                flask.session['lastest_document'] = []
+
             if do_type == 'from':
                 menu += [['w/' + url_pas(name), load_lang('pass')]]
-                if flask.session and 'lastest_document' in flask.session:
-                    end_data = '''
-                        <div id="redirect">
-                            <a href="/w_from/''' + url_pas(flask.session['lastest_document']) + '''">''' + flask.session['lastest_document'] + '''</a> ➤ <b>''' + name + '''</b>
-                        </div>
-                        <hr class="main_hr">
-                    ''' + end_data
+                
+                last_page = ''
+                for for_a in reversed(range(0, len(flask.session['lastest_document']))):
+                    last_page = flask.session['lastest_document'][for_a]
+
+                    curs.execute(db_change("select link from back where (title = ? or link = ?) and type = 'redirect' limit 1"), [last_page, last_page])
+                    if curs.fetchall():
+                        break
+
+                end_data = '''
+                    <div id="redirect">
+                        <a href="/w_from/''' + url_pas(last_page) + '''">''' + html.escape(last_page) + '''</a> ➤ <b>''' + html.escape(name) + '''</b>
+                    </div>
+                    <hr class="main_hr">
+                ''' + end_data
                     
-                flask.session['lastest_document'] = name
+            if len(flask.session['lastest_document']) >= 10:
+                flask.session['lastest_document'] = flask.session['lastest_document'][-9:] + [name]
             else:
-                flask.session['lastest_document'] = name
+                flask.session['lastest_document'] += [name]
 
             if uppage != 0:
                 menu += [['w/' + url_pas(uppage), load_lang('upper')]]
