@@ -2116,11 +2116,11 @@ def ip_pas(raw_ip, type_data = 0):
         curs = conn.cursor()
 
         end_ip = {}
+        my_ip = ip_check()
 
         return_data = 0
         if type(raw_ip) != type([]):
             get_ip = [raw_ip]
-            
             return_data = 1
         else:
             get_ip = raw_ip
@@ -2144,7 +2144,7 @@ def ip_pas(raw_ip, type_data = 0):
             is_this_ip = ip_or_user(raw_ip)
             if is_this_ip != 0:
                 # ip user
-                if ip_view != '':
+                if ip_view != '' and my_ip != raw_ip:
                     try:
                         ip = ipaddress.ip_address(raw_ip)
                         if type(ip) == ipaddress.IPv6Address:
@@ -2153,9 +2153,6 @@ def ip_pas(raw_ip, type_data = 0):
                         else:
                             ip = ip.exploded
                             ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', ip)
-                        
-                        # ip = hashlib.sha3_224(bytes(raw_ip, 'utf-8')).hexdigest()
-                        # ip = ip[0:4] + '-' + ip[4:8] + '-' + ip[8:12] + '-' + ip[12:16]
 
                         change_ip = 1
                     except:
