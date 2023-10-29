@@ -220,7 +220,8 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             ]
 
             if flask.session and 'lastest_document' in flask.session:
-                pass
+                if type(flask.session['lastest_document']) != type([]):
+                    flask.session['lastest_document'] = []
             else:
                 flask.session['lastest_document'] = []
 
