@@ -524,7 +524,7 @@ app.route('/vote/list/close/<int:num>', defaults = { 'list_type' : 'close' })(vo
 app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 
 # Func-bbs
-app.route('/bbs/main')(bbs_main)
+app.route('/bbs/main', defaults = { 'tool' : 'main' })(bbs_w)
 app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
 # app.route('/bbs/main/set')
 app.route('/bbs/w/<int:bbs_num>')(bbs_w)
