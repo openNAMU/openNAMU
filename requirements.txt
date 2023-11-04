@@ -4,11 +4,6 @@ flask
 waitress
 
 requests
+diff-match-patch
 
 pymysql
-whoosh
-
-diff-match-patch
-numba
-
-pysha3; python_version < "3.6"
