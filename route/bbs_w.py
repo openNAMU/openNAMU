@@ -64,11 +64,11 @@ def bbs_w(bbs_num = '', tool = 'bbs'):
             curs.execute(db_change('select set_code, set_id from bbs_data where set_name = "title" order by set_code + 0 desc limit 50'))
         
         db_data = curs.fetchall()
-        db_data = list(db_data) if db_data else []
-        
         for for_b in db_data:
             curs.execute(db_change('select set_name, set_data, set_code, set_id from bbs_data where set_code = ? and set_id = ?'), [for_b[0], for_b[1]])
             db_data = curs.fetchall()
+            db_data = list(db_data) if db_data else []
+
             for for_a in db_data + [['', '', '']]:
                 bbs_num_str = for_a[1]
                 if temp_id != for_a[2]:
