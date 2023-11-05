@@ -58,7 +58,7 @@ def bbs_w(bbs_num = '', tool = 'bbs'):
         if tool == 'bbs':
             curs.execute(db_change('select set_code, set_id from bbs_data where set_name = "title" and set_id like ? order by set_code + 0 desc'), [bbs_num])
         else:
-            curs.execute(db_change('select set_code, set_id from bbs_data where set_name = "title" order by set_code + 0 desc limit 50'))
+            curs.execute(db_change('select set_code, set_id, set_data from bbs_data where set_name = "date" order by set_data desc limit 50'))
         
         db_data = curs.fetchall()
         for for_b in db_data:
