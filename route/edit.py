@@ -324,6 +324,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                         <textarea style="display: none;" name="doc_section_data_where">''' + data_section_where + '''</textarea>
                         <input style="display: none;" name="doc_section_edit_apply" value="''' + doc_section_edit_apply + '''">
 
+                        <input style="display: none;" id="opennamu_editor_doc_name" value="''' + html.escape(name) + '''">
                         <input style="display: none;" name="ver" value="''' + doc_ver + '''">
                         
                         <input placeholder="''' + load_lang('why') + '''" name="send">

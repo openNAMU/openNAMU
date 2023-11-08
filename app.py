@@ -524,7 +524,7 @@ app.route('/vote/list/close/<int:num>', defaults = { 'list_type' : 'close' })(vo
 app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 
 # Func-bbs
-app.route('/bbs/main')(bbs_main)
+app.route('/bbs/main', defaults = { 'tool' : 'main' })(bbs_w)
 app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
 # app.route('/bbs/main/set')
 app.route('/bbs/w/<int:bbs_num>')(bbs_w)
@@ -539,14 +539,15 @@ app.route('/bbs/raw/<int:bbs_num>/<int:post_num>/<comment_num>')(view_raw_2)
 app.route('/bbs/edit/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_edit)
 
 # Func-api
-app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):rev>')(api_w)
-app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['POST', 'GET'])(api_w)
+# 폐지 예정
+app.route('/api/w_rev/<int(signed = True):rev>/<tool>/<everything:name>', methods = ['GET', 'POST'])(api_w)
+app.route('/api/w_tool/<tool>/<everything:name>', methods = ['GET', 'POST'])(api_w)
 app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
 
-app.route('/api/render_tool/<tool>/<everything:name>', methods = ['POST'])(api_w_render)
-app.route('/api/render_tool/<tool>', methods = ['POST'])(api_w_render)
-app.route('/api/render/<everything:name>', methods = ['POST'])(api_w_render)
-app.route('/api/render', methods = ['POST'])(api_w_render)
+# app.route('/api/render_tool/<tool>/<everything:name>', methods = ['POST'])(api_w_render)
+# app.route('/api/render_tool/<tool>', methods = ['POST'])(api_w_render)
+# app.route('/api/render/<everything:name>', methods = ['POST'])(api_w_render)
+# app.route('/api/render', methods = ['POST'])(api_w_render)
 
 app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on' })(api_w_raw)
 app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>')(api_w_raw)
