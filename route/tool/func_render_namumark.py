@@ -34,7 +34,7 @@ class class_do_render_namumark:
         self.data_temp_storage = {}
         self.data_temp_storage_count = 0
 
-        self.data_backlink = []
+        self.data_backlink = {}
         self.data_include = []
 
         self.data_math_count = 0
@@ -149,8 +149,8 @@ class class_do_render_namumark:
 
             storage_count -= 1
 
-        data = re.sub(r'<front_br>', '', data)
-        data = re.sub(r'<back_br>', '', data)
+        data = data.replace('<front_br>', '')
+        data = data.replace('<back_br>', '')
 
         return data
 
@@ -239,6 +239,7 @@ class class_do_render_namumark:
         self.render_data_js += data_end[1]
         self.data_include += data_end[2]['include']
         self.data_category_list += data_end[2]['category']
+        self.data_backlink = dict(self.data_backlink, **data_end[2]['backlink_dict'])
         self.data_temp_storage = dict(self.data_temp_storage, **data_end[2]['temp_storage'][0])
         self.data_temp_storage_count += data_end[2]['temp_storage'][1]
 
@@ -771,14 +772,14 @@ class class_do_render_namumark:
         self.render_data = re.sub(r'\[([^[\]]+)\]', do_render_macro_single, self.render_data)
 
         # macro safe restore
-        self.render_data = re.sub(r'<macro>', '[', self.render_data)
-        self.render_data = re.sub(r'<\/macro>', ']', self.render_data)
+        self.render_data = self.render_data.replace('<macro>', '[')
+        self.render_data = self.render_data.replace('</macro>', ']')
 
     def do_render_math(self):
         def do_render_math_sub(match):
             data = match.group(1)
 
-            data = re.sub(r'\n', '', data)
+            data = data.replace('\n', '')
             data = self.get_tool_data_revert(data)
 
             data_html = self.get_tool_js_safe(data)
@@ -879,7 +880,7 @@ class class_do_render_namumark:
 
                         link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                         link_main = html.unescape(link_main)
-                        link_main = re.sub(r'"', '&quot;', link_main)
+                        link_main = link_main.replace('"', '&quot;')
                         
                         link_exist = ''
                         file_out = 1
@@ -889,15 +890,18 @@ class class_do_render_namumark:
                         link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                         link_main = html.unescape(link_main)
 
+                        if not ('file:' + link_main) in self.data_backlink:
+                            self.data_backlink['file:' + link_main] = {}
+
                         self.curs.execute(db_change("select title from data where title = ?"), ['file:' + link_main])
                         db_data = self.curs.fetchall()
                         if db_data:
                             link_exist = ''
                         else:
                             link_exist = 'opennamu_not_exist_link'
-                            self.data_backlink += [[self.doc_name, 'file:' + link_main, 'no', '']]
+                            self.data_backlink['file:' + link_main]['no'] = ''
 
-                        self.data_backlink += [[self.doc_name, 'file:' + link_main, 'file', '']]
+                        self.data_backlink['file:' + link_main]['file'] = ''
 
                         link_extension_regex = r'\.([^.]+)$'
                         link_extension = re.search(link_extension_regex, link_main)
@@ -997,21 +1001,24 @@ class class_do_render_namumark:
                     if not link_main in self.data_category_list:
                         self.data_category_list += [link_main]
                         
+                        if not ('category:' + link_main) in self.data_backlink:
+                            self.data_backlink['category:' + link_main] = {}
+
                         self.curs.execute(db_change("select title from data where title = ?"), ['category:' + link_main])
                         db_data = self.curs.fetchall()
                         if db_data:
                             link_exist = ''
                         else:
                             link_exist = 'opennamu_not_exist_link'
-                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'no', '']]
+                            self.data_backlink['category:' + link_main]['no'] = ''
 
-                        self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat', '']]
+                        self.data_backlink['category:' + link_main]['cat'] = ''
                         
                         if link_view != '':
-                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat_view', link_view]]
+                            self.data_backlink['category:' + link_main]['cat_view'] = link_view
                         
                         if category_blur != '':
-                            self.data_backlink += [[self.doc_name, 'category:' + link_main, 'cat_blur', '']]
+                            self.data_backlink['category:' + link_main]['cat_blur'] = ''
 
                         link_main = url_pas(link_main)
 
@@ -1088,9 +1095,9 @@ class class_do_render_namumark:
                     link_title = link_main
                     link_main = html.unescape(link_main)
 
-                    link_main = re.sub(r'"', '&quot;', link_main)
-                    link_main = re.sub(r'<', '&lt;', link_main)
-                    link_main = re.sub(r'>', '&gt;', link_main)
+                    link_main = link_main.replace('"', '&quot;')
+                    link_main = link_main.replace('<', '&lt;')
+                    link_main = link_main.replace('>', '&gt;')
 
                     # sub not exist -> sub = main
                     if link_data[1]:
@@ -1135,12 +1142,17 @@ class class_do_render_namumark:
                         self.curs.execute(db_change("select title from data where title = ?" + self.link_case_insensitive), [link_main])
                         db_data = self.curs.fetchall()
                         if not db_data:
-                            self.data_backlink += [[self.doc_name, link_main, 'no', '']]
+                            if not link_main in self.data_backlink:
+                                self.data_backlink[link_main] = {}
+
+                            self.data_backlink[link_main]['no'] = ''
                             link_exist = 'opennamu_not_exist_link'
                         else:
                             link_main = db_data[0][0]
+                            if not link_main in self.data_backlink:
+                                self.data_backlink[link_main] = {}
                         
-                        self.data_backlink += [[self.doc_name, link_main, '', '']]
+                        self.data_backlink[link_main][''] = ''
 
                     link_same = ''
                     if link_main == self.doc_name:
@@ -1272,7 +1284,10 @@ class class_do_render_namumark:
                     include_name = self.get_tool_data_restore(include_name, do_type = 'slash')
                     include_name = html.unescape(include_name)
 
-                    self.data_backlink += [[self.doc_name, include_name, 'include', '']]
+                    if not include_name in self.data_backlink:
+                        self.data_backlink[include_name] = {}
+
+                    self.data_backlink[include_name]['include'] = ''
 
                     # load include db data
                     self.curs.execute(db_change("select data from data where title = ?"), [include_name])
@@ -1299,7 +1314,7 @@ class class_do_render_namumark:
                             '<div id="' + self.doc_include + 'opennamu_include_' + str(include_num) + '"></div>' + \
                         '', '', match_org)
                     else:
-                        self.data_backlink += [[self.doc_name, include_name, 'no', '']]
+                        self.data_backlink[include_name]['no'] = ''
 
                         include_link = '<div><a class="opennamu_not_exist_link" href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
 
@@ -1443,9 +1458,7 @@ class class_do_render_namumark:
                 # under page & fix url
                 link_main = self.get_tool_link_fix(link_main, 'redirect')
             else:
-                link_inter_name = re.search(link_inter_regex, link_main)
-                link_inter_name = link_inter_name.group(1)
-
+                link_inter_name = inter_check.group(1)
                 link_main = re.sub(link_inter_regex, '', link_main)
 
             # sharp
@@ -1473,12 +1486,17 @@ class class_do_render_namumark:
                 self.curs.execute(db_change("select title from data where title = ?" + self.link_case_insensitive), [link_main])
                 db_data = self.curs.fetchall()
                 if not db_data:
-                    self.data_backlink += [[self.doc_name, link_main, 'no', '']]
+                    if not link_main in self.data_backlink:
+                        self.data_backlink[link_main] = {}
+
+                    self.data_backlink[link_main]['no'] = ''
                     link_exist = 0
                 else:
                     link_main = db_data[0][0]
+                    if not link_main in self.data_backlink:
+                        self.data_backlink[link_main] = {}
 
-                self.data_backlink += [[self.doc_name, link_main, 'redirect', '']]
+                self.data_backlink[link_main]['redirect'] = ''
 
                 link_main = url_pas(link_main)
                 if link_main != '':
@@ -1782,7 +1800,7 @@ class class_do_render_namumark:
                         data_revert = self.get_tool_data_revert(html_data)
                         data_revert = re.sub(r'^\n', '', data_revert)
                         data_revert = re.sub(r'\n$', '', data_revert)
-                        data_revert = re.sub(r'&amp;nbsp;', '&nbsp;', data_revert)
+                        data_revert = data_revert.replace('&amp;nbsp;', '&nbsp;')
 
                         self.render_data_js += 'opennamu_do_render_html("' + self.doc_include + 'opennamu_wiki_' + str(html_count) + '");\n'
 
@@ -2220,8 +2238,8 @@ class class_do_render_namumark:
         self.render_data = re.sub(r'\n##[^\n]+', '\n<front_br>', self.render_data)
 
     def do_render_last(self):
-        self.render_data = re.sub(r'<no_br>', '\n', self.render_data)
-        self.render_data = re.sub(r'<no_td>', '||', self.render_data)
+        self.render_data = self.render_data.replace('<no_br>', '\n')
+        self.render_data = self.render_data.replace('<no_td>', '||')
 
         # add category
         if self.doc_include == '':
@@ -2231,23 +2249,23 @@ class class_do_render_namumark:
                 category_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_category_set', self.ip)
                 if category_set_data == 'bottom':
                     if re.search(r'<footnote_category>', self.render_data):
-                        self.render_data = re.sub(r'<footnote_category>', '<hr><' + data_name + '></' + data_name + '>', self.render_data, 1)
+                        self.render_data = self.render_data.replace('<footnote_category>', '<hr><' + data_name + '></' + data_name + '>', 1)
                     else:
                         self.render_data += '<hr><' + data_name + '></' + data_name + '>'
                 else:
-                    self.render_data = re.sub(r'<footnote_category>', '', self.render_data, 1)
+                    self.render_data = self.render_data.replace('<footnote_category>', '', 1)
                     self.render_data = '<' + data_name + '></' + data_name + '><hr class="main_hr">' + self.render_data
             else:
-                self.render_data = re.sub(r'<footnote_category>', '', self.render_data, 1)
+                self.render_data = self.render_data.replace(r'<footnote_category>', '', 1)
         else:
-            self.render_data = re.sub(r'<footnote_category>', '', self.render_data, 1)
+            self.render_data = self.render_data.replace(r'<footnote_category>', '', 1)
 
         # remove front_br and back_br
         self.render_data = re.sub(r'\n?<front_br>', '', self.render_data)
         self.render_data = re.sub(r'<back_br>\n?', '', self.render_data)
         
         # \n to <br>
-        self.render_data = re.sub(r'\n', '<br>', self.render_data)
+        self.render_data = self.render_data.replace('\n', '<br>')
 
         # <render_n> restore
         self.render_data = self.get_tool_data_restore(self.render_data)
@@ -2300,7 +2318,8 @@ class class_do_render_namumark:
             toc_data_on = 0
 
             toc_data = re.search(toc_search_regex, self.render_data)
-            toc_data = toc_data.group(1)
+            toc_data = toc_data.group(1) if toc_data else ''
+
             self.data_toc = toc_data
             self.data_toc = re.sub(r'<toc_inside>((?:(?!<toc_inside>|<\/toc_inside>).)*)<\/toc_inside>', do_render_last_toc, self.data_toc)
 
@@ -2308,25 +2327,21 @@ class class_do_render_namumark:
 
             self.render_data = re.sub(toc_search_regex, '', self.render_data)
             if toc_set_data == 'off':
-                self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
+                self.render_data = self.render_data.replace('<toc_need_part>', '')
             else:
                 if re.search(r'<toc_need_part>', self.render_data):
                     toc_data_on = 1
 
-                self.render_data = re.sub(r'<toc_need_part>', lambda x : (self.data_toc), self.render_data, 20)
-                self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
+                self.render_data = self.render_data.replace('<toc_need_part>', self.data_toc, 20)
+                self.render_data = self.render_data.replace('<toc_need_part>', '')
 
-            if  self.doc_include != '' or \
-                re.search(r'<toc_no_auto>', self.render_data) or \
-                toc_set_data == 'half_off' or \
-                toc_set_data == 'off' or \
-                toc_data_on == 1:
-                self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
+            if self.doc_include != '' or re.search(r'<toc_no_auto>', self.render_data) or toc_set_data == 'half_off' or toc_set_data == 'off' or toc_data_on == 1:
+                self.render_data = self.render_data.replace('<toc_no_auto>', '')
             else:
                 self.render_data = re.sub(r'(?P<in><h[1-6] id="[^"]*">)', '<br>' + self.data_toc + '\\g<in>', self.render_data, 1)
         else:
-            self.render_data = re.sub(r'<toc_need_part>', '', self.render_data)
-            self.render_data = re.sub(r'<toc_no_auto>', '', self.render_data)
+            self.render_data = self.render_data.replace('<toc_need_part>', '')
+            self.render_data = self.render_data.replace('<toc_no_auto>', '')
 
         def do_render_last_footnote(match):
             match = match.group(1)
@@ -2370,14 +2385,18 @@ class class_do_render_namumark:
             self.do_render_last()
             self.data_include = list(reversed(self.data_include))
         else:
-            self.render_data = re.sub(r'\|\|', '<no_td>', self.render_data)
-            self.render_data = re.sub(r'\n', '<no_br>', self.render_data)
+            self.render_data = self.render_data.replace(r'\|\|', '<no_td>')
+            self.render_data = self.render_data.replace('\n', '<no_br>')
+
+        data_backlink_dict = self.data_backlink
+        self.data_backlink = [[self.doc_name, for_a, for_b, self.data_backlink[for_a][for_b]] for for_a in self.data_backlink for for_b in self.data_backlink[for_a]]
 
         return [
             self.render_data, # html
             self.render_data_js, # js
             {
                 'backlink' : self.data_backlink, # backlink
+                'backlink_dict' : data_backlink_dict,
                 'include' : self.data_include, # include data
                 'footnote' : self.data_footnote_all, # footnote
                 'category' : self.data_category_list,
