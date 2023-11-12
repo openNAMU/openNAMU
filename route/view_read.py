@@ -248,6 +248,8 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             else:
                 flask.session['lastest_document'] += [name]
 
+            print(flask.session['lastest_document'])
+
             if uppage != 0:
                 menu += [['w/' + url_pas(uppage), load_lang('upper')]]
 
