@@ -247,8 +247,23 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                 flask.session['lastest_document'] = flask.session['lastest_document'][-9:] + [name]
             else:
                 flask.session['lastest_document'] += [name]
+            
+            flask.session['lastest_document'] = list(reversed(dict.fromkeys(reversed(flask.session['lastest_document']))))
 
-            print(flask.session['lastest_document'])
+            view_history_on = get_main_skin_set(curs, flask.session, 'main_css_view_history', ip)
+            if view_history_on == 'on':
+                end_data = '' + \
+                    '<div id="redirect">' + \
+                        load_lang('trace') + ' : ' + \
+                        ' ➥ '.join(
+                            [
+                                '<a href="/w/' + url_pas(for_a) + '">' + html.escape(for_a) + '</a>'
+                                for for_a in flask.session['lastest_document']
+                            ]
+                        ) + \
+                    '</div>' + \
+                    '<hr class="main_hr">' + \
+                '' + end_data
 
             if uppage != 0:
                 menu += [['w/' + url_pas(uppage), load_lang('upper')]]
