@@ -1684,15 +1684,15 @@ class class_do_render_namumark:
                     table_data_in = table_sub[3]
                     table_data_in = re.sub(r'^\n+', '', table_data_in)
 
-                    table_sub_parameter = do_render_table_parameter(table_sub[1], table_sub[2], table_data_in)
-                    table_parameter["tr"] += table_sub_parameter['tr']
-
                     if table_sub[0] != '' and table_tr_change == 1:
                         table_col_num = 0
                         table_data_end += '<tr style="' + table_parameter["tr"] + '">' + table_parameter["td"] + '</tr>'
                         
                         table_parameter["tr"] = ""
                         table_parameter["td"] = ""
+
+                    table_sub_parameter = do_render_table_parameter(table_sub[1], table_sub[2], table_data_in)
+                    table_parameter["tr"] += table_sub_parameter['tr']
 
                     if not table_col_num in table_parameter['rowspan']:
                         table_parameter['rowspan'][table_col_num] = 0
