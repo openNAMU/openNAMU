@@ -108,7 +108,7 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                 for data_list in acl_list:
                     acl_div[for_a] += '<option value="' + data_list + '">' + (data_list if data_list != '' else 'normal') + '</option>'
     
-            editor_top_text = '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
+            editor_top_text = '<a href="/filter/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
 
             if editor_top_text != '':
                 editor_top_text += '<hr class="main_hr">'

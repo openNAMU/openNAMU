@@ -25,14 +25,14 @@ def main_tool_admin():
                 </ul>
                 <h3>''' + load_lang('filter') + '''</h3>
                 <ul class="opennamu_ul">
-                    <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
-                    <li><a href="/inter_wiki">''' + load_lang('interwiki_list') + '''</a></li>
-                    <li><a href="/edit_top">''' + load_lang('edit_tool_list') + '''</a></li>
-                    <li><a href="/image_license">''' + load_lang('image_license_list') + '''</a></li>
-                    <li><a href="/email_filter">''' + load_lang('email_filter_list') + '''</a></li>
-                    <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
-                    <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
-                    <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
+                    <li><a href="/filter/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
+                    <li><a href="/filter/inter_wiki">''' + load_lang('interwiki_list') + '''</a></li>
+                    <li><a href="/filter/edit_top">''' + load_lang('edit_tool_list') + '''</a></li>
+                    <li><a href="/filter/image_license">''' + load_lang('image_license_list') + '''</a></li>
+                    <li><a href="/filter/email_filter">''' + load_lang('email_filter_list') + '''</a></li>
+                    <li><a href="/filter/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
+                    <li><a href="/filter/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
+                    <li><a href="/filter/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
                     <li><a href="/filter/document">''' + load_lang('document_filter_list') + '''</a></li>
                 </ul>
                 <h3>''' + load_lang('server') + '''</h2>

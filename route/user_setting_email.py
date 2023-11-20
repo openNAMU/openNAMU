@@ -21,7 +21,7 @@ def user_setting_email_2():
                     for i in re_set_list:
                         flask.session.pop(i, None)
 
-                    return redirect('/email_filter')
+                    return redirect('/filter/email_filter')
             else:
                 for i in re_set_list:
                     flask.session.pop(i, None)
@@ -63,7 +63,7 @@ def user_setting_email_2():
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('email'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
-                    <a href="/email_filter">(''' + load_lang('email_filter_list') + ''')</a>
+                    <a href="/filter/email_filter">(''' + load_lang('email_filter_list') + ''')</a>
                     <hr class="main_hr">
                     ''' + b_text + '''
                     <form method="post">

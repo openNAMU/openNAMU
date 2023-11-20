@@ -19,7 +19,7 @@ def login_register_email_2():
                     "select html from html_filter where html = ? and kind = 'email'"
                 ), [email_data])
                 if not curs.fetchall():                
-                    return redirect('/email_filter')
+                    return redirect('/filter/email_filter')
 
             curs.execute(db_change('select data from other where name = "email_title"'))
             sql_d = curs.fetchall()
@@ -54,7 +54,7 @@ def login_register_email_2():
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('email'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
-                    <a href="/email_filter">(''' + load_lang('email_filter_list') + ''')</a>
+                    <a href="/filter/email_filter">(''' + load_lang('email_filter_list') + ''')</a>
                     <hr class="main_hr">
                     ''' + b_text + '''
                     <form method="post">
