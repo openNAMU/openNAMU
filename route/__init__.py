@@ -34,12 +34,9 @@ from route.edit_move import edit_move
 from route.edit_revert import edit_revert
 from route.edit_upload import edit_upload
 
-from route.filter_document import filter_document
-from route.filter_document_add import filter_document_add
-from route.filter_document_delete import filter_document_delete
-from route.filter_inter_wiki import filter_inter_wiki
-from route.filter_inter_wiki_add import filter_inter_wiki_add
-from route.filter_inter_wiki_delete import filter_inter_wiki_delete
+from route.filter_all import filter_all
+from route.filter_all_add import filter_all_add
+from route.filter_all_delete import filter_all_delete
 
 from route.give_admin_groups import give_admin_groups_2
 from route.give_auth import give_auth
