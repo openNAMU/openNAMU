@@ -37,7 +37,7 @@ def filter_all_add(tool, name = None):
             elif tool == 'document':
                 post_name = flask.request.form.get('name', '')
                 if post_name == '':
-                    return redirect('/filter/document/list')
+                    return redirect('/filter/document')
             
                 post_acl = flask.request.form.get('acl', '')
                 post_regex = flask.request.form.get('regex', '')

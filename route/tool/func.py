@@ -855,7 +855,7 @@ def edit_button(ob_name = 'opennamu_edit_textarea', monaco_ob_name = 'opennamu_m
         for insert_data in insert_list:
             data += '<a href="javascript:do_insert_data(\'' + ob_name + '\', \'' + get_tool_js_safe(insert_data[0]) + '\', \'' + monaco_ob_name + '\');">(' + html.escape(insert_data[1]) + ')</a> '
 
-        data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')</a>'
+        data += (' ' if data != '' else '') + '<a href="/filter/edit_top">(' + load_lang('add') + ')</a>'
         data += '<hr class="main_hr">'
         
         return data
@@ -2651,7 +2651,7 @@ def re_error(data):
             elif num == 8:
                 data = '' + \
                     load_lang('long_id_error') + '<br>' + \
-                    load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id_filter_list') + ')</a><br>' + \
+                    load_lang('id_char_error') + ' <a href="/filter/name_filter">(' + load_lang('id_filter_list') + ')</a><br>' + \
                     load_lang('same_id_exist_error') + \
                 ''
             elif num == 9:
@@ -2665,7 +2665,7 @@ def re_error(data):
             elif num == 13:
                 data = load_lang('recaptcha_error')
             elif num == 14:
-                data = load_lang('file_extension_error') + ' <a href="/extension_filter">(' + load_lang('extension_filter_list') + ')</a>'
+                data = load_lang('file_extension_error') + ' <a href="/filter/extension_filter">(' + load_lang('extension_filter_list') + ')</a>'
             elif num == 15:
                 data = load_lang('edit_record_error')
             elif num == 16:
