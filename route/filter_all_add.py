@@ -12,17 +12,14 @@ def filter_all_add(tool, name = None):
                 return re_error('/error/3')
 
             title = flask.request.form.get('title', 'test')
-            if tool == 'inter_wiki':
+            if tool in ('inter_wiki', 'outer_link'):
                 link = flask.request.form.get('link', 'test')
                 icon = flask.request.form.get('icon', '')
 
-                curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki'"), [title])
-                curs.execute(db_change('insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, "inter_wiki")'), [title, link, icon])
-                admin_check(None, 'inter_wiki_plus')
+                curs.execute(db_change("delete from html_filter where html = ? and kind = ?"), [title, tool])
+                curs.execute(db_change('insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, ?)'), [title, link, icon, tool])
+                admin_check(None, tool + ' edit')
             elif tool == 'edit_filter':
-                if admin_check(None, 'edit_filter edit') != 1:
-                    return re_error('/error/3')
-
                 sec = flask.request.form.get('second', '0')
                 end = 'X' if sec == '0' else sec
 
@@ -34,6 +31,7 @@ def filter_all_add(tool, name = None):
                 
                 curs.execute(db_change("delete from html_filter where html = ? and kind = 'regex_filter'"), [name])
                 curs.execute(db_change("insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, 'regex_filter')"), [name, content, end])
+                admin_check(None, 'edit_filter edit')
             elif tool == 'document':
                 post_name = flask.request.form.get('name', '')
                 if post_name == '':
@@ -47,6 +45,7 @@ def filter_all_add(tool, name = None):
                     return re_error('/error/23')
                 
                 curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, "document", ?, ?)'), [post_name, post_regex, post_acl])
+                admin_check(None, 'document_filter edit')
             else:
                 plus_d = ''
                 if tool == 'name_filter':
@@ -92,14 +91,14 @@ def filter_all_add(tool, name = None):
             stat = 'disabled' if admin_check() != 1 else ''
             name = name if name else ''
 
-            if tool == 'inter_wiki':
+            if tool in ('inter_wiki', 'outer_link'):
                 value = ['', '', '']
                 if name != '':
-                    curs.execute(db_change("select html, plus, plus_t from html_filter where html = ? and kind = 'inter_wiki'"), [name])
+                    curs.execute(db_change("select html, plus, plus_t from html_filter where html = ? and kind = ?"), [name, tool])
                     exist = curs.fetchall()
                     value = exist[0] if exist else value
 
-                title = load_lang('interwiki_add')
+                title = load_lang('interwiki_add') if tool == 'inter_wiki' else load_lang('outer_link_add')
                 form_data = '''
                     ''' + load_lang('name') + '''
                     <hr class="main_hr">

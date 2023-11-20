@@ -273,9 +273,14 @@ app.route('/filter/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'too
 app.route('/filter/inter_wiki/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'inter_wiki' })(filter_all_add)
 app.route('/filter/inter_wiki/del/<everything:name>', defaults = { 'tool' : 'inter_wiki' })(filter_all_delete)
 
+app.route('/filter/outer_link', defaults = { 'tool' : 'outer_link' })(filter_all)
+app.route('/filter/outer_link/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'outer_link' })(filter_all_add)
+app.route('/filter/outer_link/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'outer_link' })(filter_all_add)
+app.route('/filter/outer_link/del/<everything:name>', defaults = { 'tool' : 'outer_link' })(filter_all_delete)
+
 app.route('/filter/document', defaults = { 'tool' : 'document' })(filter_all)
-app.route('/filter/document/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'document' })(filter_all_add)
 app.route('/filter/document/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'document' })(filter_all_add)
+app.route('/filter/document/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'document' })(filter_all_add)
 app.route('/filter/document/del/<everything:name>', defaults = { 'tool' : 'document' })(filter_all_delete)
 
 app.route('/filter/edit_top', defaults = { 'tool' : 'edit_top' })(filter_all)

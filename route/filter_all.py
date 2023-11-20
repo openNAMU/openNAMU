@@ -39,6 +39,9 @@ def filter_all(tool):
         elif tool == 'document':
             title = load_lang('document_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'document'"))
+        elif tool == 'outer_link':
+            title = load_lang('outer_link_filter_list')
+            curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'outer_link'"))
         else:
             title = load_lang('edit_tool_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'edit_top'"))
@@ -50,14 +53,14 @@ def filter_all(tool):
 
             div += html.escape(data[0])
             if admin == 1:
-                if tool in ('inter_wiki', 'edit_filter', 'document'):
+                if tool in ('inter_wiki', 'outer_link', 'edit_filter', 'document'):
                     div += ' <a href="/filter/' + tool + '/add/' + url_pas(data[0]) + '">(' + load_lang('edit') + ')</a>'
                     
                 div += ' <a href="/filter/' + tool + '/del/' + url_pas(data[0]) + '">(' + load_lang('delete') + ')</a>'
 
             div += '</td>'
 
-            if tool == 'inter_wiki':
+            if tool in ('inter_wiki', 'outer_link'):
                 div += '<td><a class="opennamu_link_out" href="' + html.escape(data[1]) + '">' + html.escape(data[1]) + '</a></td>'
                 div += '<td>' + data[2] + '</td>'
             else:
@@ -70,7 +73,7 @@ def filter_all(tool):
 
         if admin == 1:
             div += '<hr class="main_hr">'
-            div += '<a href="/' + tool + '/add">(' + load_lang('add') + ')</a>'
+            div += '<a href="/filter/' + tool + '/add">(' + load_lang('add') + ')</a>'
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [title, wiki_set(), wiki_custom(), wiki_css([0, 0])],

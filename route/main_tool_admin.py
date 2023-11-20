@@ -34,6 +34,7 @@ def main_tool_admin():
                     <li><a href="/filter/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
                     <li><a href="/filter/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
                     <li><a href="/filter/document">''' + load_lang('document_filter_list') + '''</a></li>
+                    <li><a href="/filter/outer_link">''' + load_lang('outer_link_filter_list') + '''</a> (''' + load_lang('beta') + ''')
                 </ul>
                 <h3>''' + load_lang('server') + '''</h2>
                 <ul class="opennamu_ul">
