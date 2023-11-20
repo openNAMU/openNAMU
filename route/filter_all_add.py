@@ -98,13 +98,18 @@ def filter_all_add(tool, name = None):
                     exist = curs.fetchall()
                     value = exist[0] if exist else value
 
+                if tool == 'inter_wiki':
+                    ex = 'https://namu.wiki/w/'
+                else:
+                    ex = 'youtube.com'
+
                 title = load_lang('interwiki_add') if tool == 'inter_wiki' else load_lang('outer_link_add')
                 form_data = '''
                     ''' + load_lang('name') + '''
                     <hr class="main_hr">
                     <input value="''' + html.escape(value[0]) + '''" type="text" name="title">
                     <hr class="main_hr">
-                    ''' + load_lang('link') + '''
+                    ''' + load_lang('link') + ''' (EX : ''' + ex + ''')
                     <hr class="main_hr">
                     <input value="''' + html.escape(value[1]) + '''" type="text" name="link">
                     <hr class="main_hr">

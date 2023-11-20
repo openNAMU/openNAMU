@@ -61,7 +61,11 @@ def filter_all(tool):
             div += '</td>'
 
             if tool in ('inter_wiki', 'outer_link'):
-                div += '<td><a class="opennamu_link_out" href="' + html.escape(data[1]) + '">' + html.escape(data[1]) + '</a></td>'
+                if tool == 'inter_wiki':
+                    div += '<td><a class="opennamu_link_out" href="' + html.escape(data[1]) + '">' + html.escape(data[1]) + '</a></td>'
+                else:
+                    div += '<td>' + html.escape(data[1]) + '</td>'
+                
                 div += '<td>' + data[2] + '</td>'
             else:
                 div += '<td>' + html.escape(data[1]) + '</td>'
