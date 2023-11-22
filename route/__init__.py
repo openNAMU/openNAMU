@@ -19,6 +19,8 @@ from route.api_bbs_w_comment_one import api_bbs_w_comment_one
 
 from route.bbs_w_edit import bbs_w_edit
 from route.bbs_make import bbs_make
+from route.bbs_hide import bbs_hide
+from route.bbs_delete import bbs_delete
 from route.bbs_w import bbs_w
 from route.bbs_w_post import bbs_w_post
 from route.bbs_w_set import bbs_w_set
