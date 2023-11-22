@@ -7,6 +7,8 @@ def bbs_w(bbs_num = '', tool = 'bbs'):
         data = ''
         title_name = ''
 
+        admin_auth = admin_check()
+
         if tool == 'bbs':
             curs.execute(db_change('select set_data from bbs_set where set_id = ? and set_name = "bbs_name"'), [bbs_num])
             db_data = curs.fetchall()
@@ -37,14 +39,16 @@ def bbs_w(bbs_num = '', tool = 'bbs'):
                     db_data_2 = curs.fetchall()
                     last_date = ('(' + db_data_2[0][0] + ')') if db_data_2 else ''
 
-                    data += '<li><a href="/bbs/w/' + for_a[1] + '">' + html.escape(for_a[0]) + ' (' + bbs_type + ') ' + last_date + '</a></li>'
+                    data += '<li>'
+                    data += '<a href="/bbs/w/' + for_a[1] + '">' + html.escape(for_a[0]) + '</a> (' + bbs_type + ') ' + last_date
+                    data += '</li>'
 
                 data += '</ul>'
             
             data += '<hr class="main_hr">'
 
             title_name = load_lang('bbs_main')
-            menu = [['other', load_lang('return')]] + ([['bbs/make', load_lang('add')]] if admin_check() == 1 else [])
+            menu = [['other', load_lang('return')]] + ([['bbs/make', load_lang('add')]] if admin_auth == 1 else [])
 
         data += '''
             <table id="main_table_set">
