@@ -753,9 +753,12 @@ def leng_check(A, B):
     # A -> old
     return '0' if A == B else (('-' + str(A - B)) if A > B else ('+' + str(B - A)))
 
-def number_check(data):
+def number_check(data, f=False):
     try:
-        int(data)
+        if f:
+            float(data)
+        else:
+            int(data)
         return data
     except:
         return '1'
