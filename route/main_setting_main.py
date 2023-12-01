@@ -23,7 +23,7 @@ def main_setting_main(db_set):
             19 : ['slow_edit', ''],
             20 : ['requires_approval', ''],
             21 : ['backup_where', ''],
-            22 : ['domain', load_domain()],
+            22 : ['domain', ''],
             23 : ['ua_get', ''],
             24 : ['enable_comment', ''],
             25 : ['enable_challenge', ''],
@@ -131,7 +131,7 @@ def main_setting_main(db_set):
                         <select name="http_select">''' + tls_select + '''</select>
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('domain') + '''</span> (EX : 2du.pythonanywhere.com)
+                        <span>''' + load_lang('domain') + '''</span> (EX : 2du.pythonanywhere.com) (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="domain" value="''' + html.escape(d_list[22]) + '''">
                         <hr class="main_hr">
@@ -156,9 +156,9 @@ def main_setting_main(db_set):
                         <select name="encode">''' + encode_select + '''</select>
                         <hr class="main_hr">
                         
-                        <input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + load_lang('set_wiki_access_password_need') + ''' (''' + load_lang('restart_required') + ''') (''' + load_lang('beta') + ''')
+                        <input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + load_lang('set_wiki_access_password_need') + ''' (''' + load_lang('restart_required') + ''')
                         <hr class="main_hr">
-                        <span>''' + load_lang('set_wiki_access_password') + ''' (''' + load_lang('restart_required') + ''') (''' + load_lang('beta') + ''')</span>
+                        <span>''' + load_lang('set_wiki_access_password') + '''</span> (''' + load_lang('restart_required') + ''')
                         <hr class="main_hr">
                         <input type="password" name="wiki_access_password" value="''' + html.escape(d_list[32]) + '''">
 
@@ -197,7 +197,7 @@ def main_setting_main(db_set):
                         <input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + load_lang('ua_get_off') + '''
                         <hr class="main_hr">
                         
-                        <span>''' + load_lang('password_min_length') + ''' (''' + load_lang('beta') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
+                        <span>''' + load_lang('password_min_length') + '''</span> (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="password_min_length" value="''' + html.escape(d_list[30]) + '''">
                         
@@ -209,37 +209,32 @@ def main_setting_main(db_set):
 
                         <span ''' + sqlite_only + '''>
                             <h3>''' + load_lang('sqlite_only') + '''</h3>
-                            <span>
-                                ''' + load_lang('backup_interval') + ''' (''' + load_lang('hour') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') ''' + \
-                                '''(''' + load_lang('restart_required') + ''')</span>
+                            <span>''' + load_lang('backup_interval') + '''</span> (''' + load_lang('hour') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('restart_required') + ''')
                             <hr class="main_hr">
                             <input name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr class="main_hr">
-
-                            <span>
-                                ''' + load_lang('backup_where') + ''' (''' + load_lang('default') + ''' : ''' + load_lang('empty') + ''') ''' + \
-                                '''(''' + load_lang('restart_required') + ''') (''' + load_lang('example') + ''' : ./data/backup.db)
-                            </span>
+                            
+                            <span>''' + load_lang('backup_where') + '''</span> (''' + load_lang('default') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('restart_required') + ''') (''' + load_lang('example') + ''' : ./data/backup.db)
                             <hr class="main_hr">
                             <input name="backup_where" value="''' + html.escape(d_list[21]) + '''">
                             <hr class="main_hr">
                         </span>
 
                         <h2>''' + load_lang('edit_set') + '''</h2>
-                        <span>''' + load_lang('slow_edit') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
+                        <span>''' + load_lang('slow_edit') + '''</span> (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="slow_edit" value="''' + html.escape(d_list[19]) + '''">
                         <hr class="main_hr">
                         
-                        <input type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + load_lang('edit_bottom_compulsion') + ''' (''' + load_lang('beta') + ''')
+                        <input type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + load_lang('edit_bottom_compulsion') + '''
                         <hr class="main_hr">
                         
-                        <span>''' + load_lang('title_max_length') + ''' (''' + load_lang('beta') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
+                        <span>''' + load_lang('title_max_length') + '''</span> (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="title_max_length" value="''' + html.escape(d_list[28]) + '''">
                         <hr class="main_hr">
                         
-                        <span>''' + load_lang('title_topic_max_length') + ''' (''' + load_lang('beta') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
+                        <span>''' + load_lang('title_topic_max_length') + '''</span> (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="title_topic_max_length" value="''' + html.escape(d_list[29]) + '''">
                         <hr class="main_hr">
@@ -249,18 +244,18 @@ def main_setting_main(db_set):
                         <input name="upload" value="''' + html.escape(d_list[4]) + '''">
                         <hr class="main_hr">
                         
-                        <input type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + load_lang('set_history_recording_off') + ''' (''' + load_lang('beta') + ''')
+                        <input type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + load_lang('set_history_recording_off') + '''
                         <hr class="main_hr">
 
                         <input type="checkbox" name="move_with_redirect" ''' + check_box_div[13] + '''> ''' + load_lang('move_with_redirect') + ''' (''' + load_lang('not_working') + ''')
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('slow_thread') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')</span>
+                        <span>''' + load_lang('slow_thread') + '''</span> (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="slow_thread" value="''' + html.escape(d_list[38]) + '''">
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('edit_timeout') + ''' (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('linux_only') + ''')</span>
+                        <span>''' + load_lang('edit_timeout') + '''</span> (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('linux_only') + ''')
                         <hr class="main_hr">
                         <input name="edit_timeout" value="''' + html.escape(d_list[39]) + '''">
                         <hr class="main_hr">
