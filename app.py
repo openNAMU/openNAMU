@@ -3,6 +3,7 @@ import os
 import re
 import logging
 import shutil
+import datetime
 
 from route.tool.func import *
 from route import *
@@ -225,7 +226,7 @@ with get_db_connect() as conn:
             try:
                 shutil.copyfile(
                     data_db_set['name'] + '.db', 
-                    back_up_where
+                    back_up_where.replace('%t', datetime.datetime.now().strftime('%Y-%m-%d_%H.%M.%S'))
                 )
 
                 print('Back up : OK')
@@ -240,7 +241,7 @@ with get_db_connect() as conn:
 
         curs.execute(db_change('select data from other where name = "back_up"'))
         back_time = curs.fetchall()
-        back_time = int(number_check(back_time[0][0])) if back_time and back_time[0][0] != '' else 0
+        back_time = float(number_check(back_time[0][0], True)) if back_time and back_time[0][0] != '' else 0
         if back_time != 0:
             curs.execute(db_change('select data from other where name = "backup_where"'))
             back_up_where = curs.fetchall()
