@@ -362,7 +362,7 @@ def update(ver_num, set_data):
         if ver_num < 3170002:
             curs.execute(db_change("select html from html_filter where kind = 'extension'"))
             if not curs.fetchall():
-                for i in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
+                for i in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']:
                     curs.execute(db_change("insert into html_filter (html, kind) values (?, 'extension')"), [i])
 
         if ver_num < 3170400:
