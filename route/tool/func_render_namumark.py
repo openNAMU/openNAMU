@@ -1114,16 +1114,27 @@ class class_do_render_namumark:
                         pass
 
                     link_inter_icon = ''
+                    link_class = 'opennamu_link_out'
 
                     self.curs.execute(db_change("select html, plus_t from html_filter where kind = 'outer_link' and plus = ?"), [domain])
                     db_data = self.curs.fetchall()
                     if db_data:
                         if db_data[0][1] != '':
-                            link_inter_icon = db_data[0][1]
+                            if re.search(r'<|>', db_data[0][1]):
+                                link_inter_icon = db_data[0][1]
+                                link_class = 'opennamu_link_inter'
+                            else:
+                                if self.get_tool_data_restore(link_sub).find('"' + db_data[0][1] + '"') != -1:
+                                    link_inter_icon = ''
+                                    link_class = 'opennamu_link_inter'
+                                else:
+                                    link_inter_icon = '<img src="' + db_data[0][1] + '">'
+                                    link_class = 'opennamu_link_inter'
                         else:
                             link_inter_icon = db_data[0][0] + ':'
+                            link_class = 'opennamu_link_inter'
 
-                    data_name = self.get_tool_data_storage('<a class="' + ('opennamu_link_inter' if link_inter_icon != '' else 'opennamu_link_out') + '" target="_blank" title="' + link_title + '" href="' + link_main + '">' + link_inter_icon + link_sub_storage, '</a>', link_data_full)
+                    data_name = self.get_tool_data_storage('<a class="' + link_class + '" target="_blank" title="' + link_title + '" href="' + link_main + '">' + link_inter_icon + link_sub_storage, '</a>', link_data_full)
                     self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
                 # in link
                 else:
