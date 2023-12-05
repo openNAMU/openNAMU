@@ -50,3 +50,41 @@ document.onclick = function(event) {
         setTimeout(function() { ringo_open = 0; }, 100);
     }
 }
+
+
+/* 자동완성 */
+document.addEventListener('DOMContentLoaded', function() {
+    function fetchAutocompleteSuggestions(inputElement, resultsElement) {
+        var input = inputElement.value;
+        if (!input) {
+            resultsElement.innerHTML = '';
+            return;
+        }
+
+        fetch('/autocomplete/' + encodeURIComponent(input))
+            .then(response => response.json())
+            .then(data => {
+                resultsElement.innerHTML = '';
+                data.forEach(function(item) {
+                    if (item.length > 0) {
+                        var div = document.createElement('div');
+                        div.textContent = item[0]; 
+                        div.addEventListener('click', function() {
+                            inputElement.value = this.textContent;
+                            resultsElement.innerHTML = '';
+                        });
+                        resultsElement.appendChild(div);
+                    }
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    var searchInputDesktop = document.getElementById('searchInputDesktop');
+    var autocompleteResultsDesktop = document.getElementById('autocompleteResultsDesktop');
+    searchInputDesktop.addEventListener('input', function() {
+        fetchAutocompleteSuggestions(searchInputDesktop, autocompleteResultsDesktop);
+    });
+
+    // Similar setup for the mobile search input...
+});

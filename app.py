@@ -602,6 +602,7 @@ app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_redirect)
 app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(main_tool_redirect)
 # app.route('/guide/<doc_name>')(main_tool_guide)
 
+app.route('/autocomplete/<everything:name>')(autocomplete)
 app.route('/search', methods=['POST'])(main_search)
 app.route('/search/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
 app.route('/search/<int:num>/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)

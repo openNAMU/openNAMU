@@ -402,3 +402,21 @@ input, textarea {
 pre#syntax, pre#syntax code {
     border: 0;
 }
+
+/* 자동완성 */
+.autocomplete-results {
+    position: absolute;
+    border: 1px solid #ddd;
+    background-color: white;
+    z-index: 1000;
+}
+
+.autocomplete-results div {
+    width: 200px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.autocomplete-results div:hover {
+    background-color: #f0f0f0;
+}

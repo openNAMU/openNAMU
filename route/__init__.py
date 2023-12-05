@@ -76,6 +76,7 @@ from route.login_register_submit import login_register_submit_2
 from route.main_func_easter_egg import main_func_easter_egg
 from route.main_func_error_404 import main_func_error_404
 
+from route.autocomplete import autocomplete
 from route.main_search import main_search
 from route.main_search_deep import main_search_deep
 from route.main_search_goto import main_search_goto
