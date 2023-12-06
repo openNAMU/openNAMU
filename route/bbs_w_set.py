@@ -8,11 +8,12 @@ def bbs_w_set(bbs_num = ''):
         db_data = curs.fetchall()
         if not db_data:
             return redirect('/bbs/main')
+        else:
+            bbs_name = db_data[0][0]
         
-        bbs_name = db_data[0][0]
+        bbs_num_str = str(bbs_num)
 
         i_list = ['bbs_acl', 'bbs_edit_acl', 'bbs_comment_acl', 'bbs_view_acl', 'bbs_markup']
-        bbs_num_str = str(bbs_num)
 
         if flask.request.method == 'POST':
             if admin_check(None, 'bbs_set (acl)') != 1:
@@ -31,10 +32,12 @@ def bbs_w_set(bbs_num = ''):
         else:
             d_list = ['' for _ in range(0, len(i_list))]
 
+            other_menu = []
             if admin_check() != 1:
                 disable = 'disabled'
             else:
                 disable = ''
+                other_menu += [['bbs/hide/' + bbs_num_str, load_lang('hide')], ['bbs/delete/' + bbs_num_str, load_lang('delete')]]
 
             for for_a in range(len(i_list)):
                 curs.execute(db_change('select set_data from bbs_set where set_name = ? and set_id = ?'), [i_list[for_a], bbs_num])
@@ -88,5 +91,5 @@ def bbs_w_set(bbs_num = ''):
                         <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 '''),
-                menu = [['bbs/w/' + bbs_num_str, load_lang('return')]]
+                menu = [['bbs/w/' + bbs_num_str, load_lang('return')]] + other_menu
             ))

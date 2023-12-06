@@ -11,6 +11,7 @@ route/tool/set_mark/custom.py
 images
 
 .vscode
+.vs
 goorm.manifest
 .DS_Store
 
@@ -29,6 +30,7 @@ views/before_namu
 views/acme
 views/sl_open
 views/nitori
+views/jsonnamu
 
 sitemap.xml
 sitemap_0.xml

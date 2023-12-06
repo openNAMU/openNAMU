@@ -3,6 +3,7 @@ import os
 import re
 import logging
 import shutil
+import datetime
 
 from route.tool.func import *
 from route import *
@@ -225,7 +226,7 @@ with get_db_connect() as conn:
             try:
                 shutil.copyfile(
                     data_db_set['name'] + '.db', 
-                    back_up_where
+                    back_up_where.replace('%t', datetime.datetime.now().strftime('%Y-%m-%d_%H.%M.%S'))
                 )
 
                 print('Back up : OK')
@@ -240,7 +241,7 @@ with get_db_connect() as conn:
 
         curs.execute(db_change('select data from other where name = "back_up"'))
         back_time = curs.fetchall()
-        back_time = int(number_check(back_time[0][0])) if back_time and back_time[0][0] != '' else 0
+        back_time = float(number_check(back_time[0][0], True)) if back_time and back_time[0][0] != '' else 0
         if back_time != 0:
             curs.execute(db_change('select data from other where name = "backup_where"'))
             back_up_where = curs.fetchall()
@@ -268,44 +269,49 @@ db_set_str = json.dumps(data_db_set)
 
 # Func
 # Func-inter_wiki
-app.route('/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(filter_inter_wiki)
-app.route('/inter_wiki/del/<everything:name>', defaults = { 'tool' : 'del_inter_wiki' })(filter_inter_wiki_delete)
-app.route('/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(filter_inter_wiki_add)
-app.route('/inter_wiki/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(filter_inter_wiki_add)
+app.route('/filter/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(filter_all)
+app.route('/filter/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'inter_wiki' })(filter_all_add)
+app.route('/filter/inter_wiki/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'inter_wiki' })(filter_all_add)
+app.route('/filter/inter_wiki/del/<everything:name>', defaults = { 'tool' : 'inter_wiki' })(filter_all_delete)
 
-app.route('/filter/document/list')(filter_document)
-app.route('/filter/document/add/<everything:name>', methods = ['POST', 'GET'])(filter_document_add)
-app.route('/filter/document/add', methods = ['POST', 'GET'])(filter_document_add)
-app.route('/filter/document/del/<name>')(filter_document_delete)
+app.route('/filter/outer_link', defaults = { 'tool' : 'outer_link' })(filter_all)
+app.route('/filter/outer_link/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'outer_link' })(filter_all_add)
+app.route('/filter/outer_link/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'outer_link' })(filter_all_add)
+app.route('/filter/outer_link/del/<everything:name>', defaults = { 'tool' : 'outer_link' })(filter_all_delete)
 
-app.route('/edit_top', defaults = { 'tool' : 'edit_top' })(filter_inter_wiki)
-app.route('/edit_top/del/<everything:name>', defaults = { 'tool' : 'del_edit_top' })(filter_inter_wiki_delete)
-app.route('/edit_top/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_top' })(filter_inter_wiki_add)
+app.route('/filter/document', defaults = { 'tool' : 'document' })(filter_all)
+app.route('/filter/document/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'document' })(filter_all_add)
+app.route('/filter/document/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'document' })(filter_all_add)
+app.route('/filter/document/del/<everything:name>', defaults = { 'tool' : 'document' })(filter_all_delete)
 
-app.route('/image_license', defaults = { 'tool' : 'image_license' })(filter_inter_wiki)
-app.route('/image_license/del/<everything:name>', defaults = { 'tool' : 'del_image_license' })(filter_inter_wiki_delete)
-app.route('/image_license/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_image_license' })(filter_inter_wiki_add)
+app.route('/filter/edit_top', defaults = { 'tool' : 'edit_top' })(filter_all)
+app.route('/filter/edit_top/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'edit_top' })(filter_all_add)
+app.route('/filter/edit_top/del/<everything:name>', defaults = { 'tool' : 'edit_top' })(filter_all_delete)
 
-app.route('/edit_filter', defaults = { 'tool' : 'edit_filter' })(filter_inter_wiki)
-app.route('/edit_filter/del/<everything:name>', defaults = { 'tool' : 'del_edit_filter' })(filter_inter_wiki_delete)
-app.route('/edit_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(filter_inter_wiki_add)
-app.route('/edit_filter/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(filter_inter_wiki_add)
+app.route('/filter/image_license', defaults = { 'tool' : 'image_license' })(filter_all)
+app.route('/filter/image_license/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'image_license' })(filter_all_add)
+app.route('/filter/image_license/del/<everything:name>', defaults = { 'tool' : 'image_license' })(filter_all_delete)
 
-app.route('/email_filter', defaults = { 'tool' : 'email_filter' })(filter_inter_wiki)
-app.route('/email_filter/del/<everything:name>', defaults = { 'tool' : 'del_email_filter' })(filter_inter_wiki_delete)
-app.route('/email_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_email_filter' })(filter_inter_wiki_add)
+app.route('/filter/edit_filter', defaults = { 'tool' : 'edit_filter' })(filter_all)
+app.route('/filter/edit_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'edit_filter' })(filter_all_add)
+app.route('/filter/edit_filter/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'edit_filter' })(filter_all_add)
+app.route('/filter/edit_filter/del/<everything:name>', defaults = { 'tool' : 'edit_filter' })(filter_all_delete)
 
-app.route('/file_filter', defaults = { 'tool' : 'file_filter' })(filter_inter_wiki)
-app.route('/file_filter/del/<everything:name>', defaults = { 'tool' : 'del_file_filter' })(filter_inter_wiki_delete)
-app.route('/file_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_file_filter' })(filter_inter_wiki_add)
+app.route('/filter/email_filter', defaults = { 'tool' : 'email_filter' })(filter_all)
+app.route('/filter/email_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'email_filter' })(filter_all_add)
+app.route('/filter/email_filter/del/<everything:name>', defaults = { 'tool' : 'email_filter' })(filter_all_delete)
 
-app.route('/name_filter', defaults = { 'tool' : 'name_filter' })(filter_inter_wiki)
-app.route('/name_filter/del/<everything:name>', defaults = { 'tool' : 'del_name_filter' })(filter_inter_wiki_delete)
-app.route('/name_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_name_filter' })(filter_inter_wiki_add)
+app.route('/filter/file_filter', defaults = { 'tool' : 'file_filter' })(filter_all)
+app.route('/filter/file_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'file_filter' })(filter_all_add)
+app.route('/filter/file_filter/del/<everything:name>', defaults = { 'tool' : 'file_filter' })(filter_all_delete)
 
-app.route('/extension_filter', defaults = { 'tool' : 'extension_filter' })(filter_inter_wiki)
-app.route('/extension_filter/del/<everything:name>', defaults = { 'tool' : 'del_extension_filter' })(filter_inter_wiki_delete)
-app.route('/extension_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_extension_filter' })(filter_inter_wiki_add)
+app.route('/filter/name_filter', defaults = { 'tool' : 'name_filter' })(filter_all)
+app.route('/filter/name_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'name_filter' })(filter_all_add)
+app.route('/filter/name_filter/del/<everything:name>', defaults = { 'tool' : 'name_filter' })(filter_all_delete)
+
+app.route('/filter/extension_filter', defaults = { 'tool' : 'extension_filter' })(filter_all)
+app.route('/filter/extension_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'extension_filter' })(filter_all_add)
+app.route('/filter/extension_filter/del/<everything:name>', defaults = { 'tool' : 'extension_filter' })(filter_all_delete)
 
 # Func-list
 app.route('/list/document/old')(list_old_page)
@@ -376,14 +382,20 @@ app.route('/block_log/<regex("user"):tool>/<name>')(recent_block_2)
 app.route('/block_log/<regex("admin"):tool>/<name>')(recent_block_2)
 
 # Func-history
-app.route('/recent_change')(recent_change)
-app.route('/recent_changes')(recent_change)
+app.route('/recent_change', defaults = { 'tool' : 'recent' })(recent_change)
+app.route('/recent_change/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
+app.route('/recent_changes', defaults = { 'tool' : 'recent' })(recent_change)
+app.route('/recent_changes/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
 
 app.route('/record/<name>', defaults = { 'tool' : 'record' })(recent_change)
+app.route('/record/<int:num>/<set_type>/<name>', defaults = { 'tool' : 'record' })(recent_change)
+
 app.route('/record/reset/<name>', methods = ['POST', 'GET'])(recent_record_reset)
 app.route('/record/topic/<name>')(recent_record_topic)
 
 app.route('/history/<everything:name>', defaults = { 'tool' : 'history' }, methods = ['POST', 'GET'])(recent_change)
+app.route('/history_page/<int:num>/<set_type>/<everything:name>', defaults = { 'tool' : 'history' }, methods = ['POST', 'GET'])(recent_change)
+
 app.route('/history_tool/<int(signed = True):rev>/<everything:name>')(recent_history_tool)
 app.route('/history_delete/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])(recent_history_delete)
 app.route('/history_hidden/<int(signed = True):rev>/<everything:name>')(recent_history_hidden)
@@ -527,6 +539,8 @@ app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 app.route('/bbs/main', defaults = { 'tool' : 'main' })(bbs_w)
 app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
 # app.route('/bbs/main/set')
+app.route('/bbs/hide/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_hide)
+app.route('/bbs/delete/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_delete)
 app.route('/bbs/w/<int:bbs_num>')(bbs_w)
 app.route('/bbs/set/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_set)
 app.route('/bbs/edit/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_edit)
@@ -639,5 +653,6 @@ if __name__ == "__main__":
         app,
         host = server_set['host'],
         port = int(server_set['port']),
-        clear_untrusted_proxy_headers = True
+        clear_untrusted_proxy_headers = True,
+        threads = os.cpu_count()
     )

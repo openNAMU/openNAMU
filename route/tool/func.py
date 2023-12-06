@@ -362,7 +362,7 @@ def update(ver_num, set_data):
         if ver_num < 3170002:
             curs.execute(db_change("select html from html_filter where kind = 'extension'"))
             if not curs.fetchall():
-                for i in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
+                for i in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']:
                     curs.execute(db_change("insert into html_filter (html, kind) values (?, 'extension')"), [i])
 
         if ver_num < 3170400:
@@ -753,9 +753,12 @@ def leng_check(A, B):
     # A -> old
     return '0' if A == B else (('-' + str(A - B)) if A > B else ('+' + str(B - A)))
 
-def number_check(data):
+def number_check(data, f=False):
     try:
-        int(data)
+        if f:
+            float(data)
+        else:
+            int(data)
         return data
     except:
         return '1'
@@ -814,6 +817,7 @@ def load_domain(data_type = 'normal'):
         curs = conn.cursor()
         
         domain = ''
+        sys_host = flask.request.host
         
         if data_type == 'full':
             curs.execute(db_change("select data from other where name = 'http_select'"))
@@ -823,11 +827,11 @@ def load_domain(data_type = 'normal'):
 
             curs.execute(db_change("select data from other where name = 'domain'"))
             db_data = curs.fetchall()
-            domain += db_data[0][0] if db_data and db_data[0][0] != '' else flask.request.host
+            domain += db_data[0][0] if db_data and db_data[0][0] != '' else sys_host
         else:
             curs.execute(db_change("select data from other where name = 'domain'"))
             db_data = curs.fetchall()
-            domain += db_data[0][0] if db_data and db_data[0][0] != '' else flask.request.host
+            domain += db_data[0][0] if db_data and db_data[0][0] != '' else sys_host
 
         return domain
 
@@ -854,7 +858,7 @@ def edit_button(ob_name = 'opennamu_edit_textarea', monaco_ob_name = 'opennamu_m
         for insert_data in insert_list:
             data += '<a href="javascript:do_insert_data(\'' + ob_name + '\', \'' + get_tool_js_safe(insert_data[0]) + '\', \'' + monaco_ob_name + '\');">(' + html.escape(insert_data[1]) + ')</a> '
 
-        data += (' ' if data != '' else '') + '<a href="/edit_top">(' + load_lang('add') + ')</a>'
+        data += (' ' if data != '' else '') + '<a href="/filter/edit_top">(' + load_lang('add') + ')</a>'
         data += '<hr class="main_hr">'
         
         return data
@@ -1375,6 +1379,8 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                         <style>
                             .opennamu_render_complete {
                                 font-size: 14.4px !important;
+
+                                line-height: 1.5;
                             }
 
                             .opennamu_render_complete td {
@@ -1644,6 +1650,10 @@ def do_user_name_check(user_name):
 
         # IP와 혼동 방지 
         if ip_or_user(user_name) == 1:
+            return 1
+        
+        # 슬래시 불가능
+        if user_name.find('/') != -1:
             return 1
 
         # ID 필터
@@ -2650,7 +2660,7 @@ def re_error(data):
             elif num == 8:
                 data = '' + \
                     load_lang('long_id_error') + '<br>' + \
-                    load_lang('id_char_error') + ' <a href="/name_filter">(' + load_lang('id_filter_list') + ')</a><br>' + \
+                    load_lang('id_char_error') + ' <a href="/filter/name_filter">(' + load_lang('id_filter_list') + ')</a><br>' + \
                     load_lang('same_id_exist_error') + \
                 ''
             elif num == 9:
@@ -2664,7 +2674,7 @@ def re_error(data):
             elif num == 13:
                 data = load_lang('recaptcha_error')
             elif num == 14:
-                data = load_lang('file_extension_error') + ' <a href="/extension_filter">(' + load_lang('extension_filter_list') + ')</a>'
+                data = load_lang('file_extension_error') + ' <a href="/filter/extension_filter">(' + load_lang('extension_filter_list') + ')</a>'
             elif num == 15:
                 data = load_lang('edit_record_error')
             elif num == 16:
