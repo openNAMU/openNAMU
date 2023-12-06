@@ -1890,7 +1890,6 @@ class class_do_render_namumark:
                             continue
 
                         wiki_data = re.sub(r'^#!(dark|white)( |\n)', '', middle_data)
-                        print(self.darkmode)
                         if middle_name == '#!dark' and self.darkmode == '1':
                             middle_data_pass = wiki_data
                         elif middle_name == '#!white' and self.darkmode == '0':
