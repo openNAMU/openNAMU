@@ -1379,6 +1379,8 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                         <style>
                             .opennamu_render_complete {
                                 font-size: 14.4px !important;
+
+                                line-height: 1.5;
                             }
 
                             .opennamu_render_complete td {
