@@ -1651,6 +1651,10 @@ def do_user_name_check(user_name):
         # IP와 혼동 방지 
         if ip_or_user(user_name) == 1:
             return 1
+        
+        # 슬래시 불가능
+        if user_name.find('/') != -1:
+            return 1
 
         # ID 필터
         curs.execute(db_change('select html from html_filter where kind = "name"'))

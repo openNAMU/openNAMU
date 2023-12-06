@@ -382,14 +382,20 @@ app.route('/block_log/<regex("user"):tool>/<name>')(recent_block_2)
 app.route('/block_log/<regex("admin"):tool>/<name>')(recent_block_2)
 
 # Func-history
-app.route('/recent_change')(recent_change)
-app.route('/recent_changes')(recent_change)
+app.route('/recent_change', defaults = { 'tool' : 'recent' })(recent_change)
+app.route('/recent_change/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
+app.route('/recent_changes', defaults = { 'tool' : 'recent' })(recent_change)
+app.route('/recent_changes/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
 
 app.route('/record/<name>', defaults = { 'tool' : 'record' })(recent_change)
+app.route('/record/<int:num>/<set_type>/<name>', defaults = { 'tool' : 'record' })(recent_change)
+
 app.route('/record/reset/<name>', methods = ['POST', 'GET'])(recent_record_reset)
 app.route('/record/topic/<name>')(recent_record_topic)
 
 app.route('/history/<everything:name>', defaults = { 'tool' : 'history' }, methods = ['POST', 'GET'])(recent_change)
+app.route('/history_page/<int:num>/<set_type>/<everything:name>', defaults = { 'tool' : 'history' }, methods = ['POST', 'GET'])(recent_change)
+
 app.route('/history_tool/<int(signed = True):rev>/<everything:name>')(recent_history_tool)
 app.route('/history_delete/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])(recent_history_delete)
 app.route('/history_hidden/<int(signed = True):rev>/<everything:name>')(recent_history_hidden)
