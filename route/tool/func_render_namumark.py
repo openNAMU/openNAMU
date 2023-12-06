@@ -1107,8 +1107,34 @@ class class_do_render_namumark:
                         link_sub = ''
                         link_sub_storage = link_main_org
 
-                    data_name = self.get_tool_data_storage('<a class="opennamu_link_out" target="_blank" title="' + link_title + '" href="' + link_main + '">' + link_sub_storage, '</a>', link_data_full)
+                    domain = ''
+                    try:
+                        domain = urllib.parse.urlparse(link_main).netloc
+                    except:
+                        pass
 
+                    link_inter_icon = ''
+                    link_class = 'opennamu_link_out'
+
+                    self.curs.execute(db_change("select html, plus_t from html_filter where kind = 'outer_link' and plus = ?"), [domain])
+                    db_data = self.curs.fetchall()
+                    if db_data:
+                        if db_data[0][1] != '':
+                            if re.search(r'<|>', db_data[0][1]):
+                                link_inter_icon = db_data[0][1]
+                                link_class = 'opennamu_link_inter'
+                            else:
+                                if self.get_tool_data_restore(link_sub).find('"' + db_data[0][1] + '"') != -1:
+                                    link_inter_icon = ''
+                                    link_class = 'opennamu_link_inter'
+                                else:
+                                    link_inter_icon = '<img src="' + db_data[0][1] + '">'
+                                    link_class = 'opennamu_link_inter'
+                        else:
+                            link_inter_icon = db_data[0][0] + ':'
+                            link_class = 'opennamu_link_inter'
+
+                    data_name = self.get_tool_data_storage('<a class="' + link_class + '" target="_blank" title="' + link_title + '" href="' + link_main + '">' + link_inter_icon + link_sub_storage, '</a>', link_data_full)
                     self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
                 # in link
                 else:
@@ -1172,7 +1198,6 @@ class class_do_render_namumark:
                         link_sub_storage = link_main_org
 
                     data_name = self.get_tool_data_storage('<a class="' + link_exist + ' ' + link_same + '" title="' + link_title + '" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
-
                     self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
 
             link_count_all -= 1
@@ -1684,15 +1709,15 @@ class class_do_render_namumark:
                     table_data_in = table_sub[3]
                     table_data_in = re.sub(r'^\n+', '', table_data_in)
 
-                    table_sub_parameter = do_render_table_parameter(table_sub[1], table_sub[2], table_data_in)
-                    table_parameter["tr"] += table_sub_parameter['tr']
-
                     if table_sub[0] != '' and table_tr_change == 1:
                         table_col_num = 0
                         table_data_end += '<tr style="' + table_parameter["tr"] + '">' + table_parameter["td"] + '</tr>'
                         
                         table_parameter["tr"] = ""
                         table_parameter["td"] = ""
+
+                    table_sub_parameter = do_render_table_parameter(table_sub[1], table_sub[2], table_data_in)
+                    table_parameter["tr"] += table_sub_parameter['tr']
 
                     if not table_col_num in table_parameter['rowspan']:
                         table_parameter['rowspan'][table_col_num] = 0
@@ -1858,13 +1883,28 @@ class class_do_render_namumark:
 
                         data_name = self.get_tool_data_storage('<pre id="syntax"><code class="' + wiki_data_syntax + '">' + wiki_data, '</code></pre>', middle_data_org)
                         syntax_count += 1
-                    elif middle_name in ('+5', '+4', '+3', '+2', '+1'):
+                    elif middle_name in ('#!dark', '#!white'):
                         if middle_slash:
                             middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+)(?:[^<>]+))>', '<temp_' + middle_slash + '>', middle_data_org)
                             self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        wiki_data = re.sub(r'^\+[1-5]( |\n)', '', middle_data)
+                        wiki_data = re.sub(r'^#!(dark|white)( |\n)', '', middle_data)
+                        if middle_name == '#!dark' and self.darkmode == '1':
+                            middle_data_pass = wiki_data
+                        elif middle_name == '#!white' and self.darkmode == '0':
+                            middle_data_pass = wiki_data
+                        else:
+                            middle_data_pass = ''
+                        
+                        data_name = self.get_tool_data_storage('', '', middle_data_org)
+                    elif middle_name in ('+5', '+4', '+3', '+2', '+1', '-5', '-4', '-3', '-2', '-1'):
+                        if middle_slash:
+                            middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+)(?:[^<>]+))>', '<temp_' + middle_slash + '>', middle_data_org)
+                            self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
+                            continue
+
+                        wiki_data = re.sub(r'^(\+|\-)[1-5]( |\n)', '', middle_data)
                         if middle_name == '+5':
                             wiki_size = '200'
                         elif middle_name == '+4':
@@ -1873,19 +1913,9 @@ class class_do_render_namumark:
                             wiki_size = '160'
                         elif middle_name == '+2':
                             wiki_size = '140'
-                        else:
+                        elif middle_name == '+1':
                             wiki_size = '120'
-
-                        middle_data_pass = wiki_data
-                        data_name = self.get_tool_data_storage('<span style="font-size:' + wiki_size + '%">', '</span>', middle_data_org)
-                    elif middle_name in ('-5', '-4', '-3', '-2', '-1'):
-                        if middle_slash:
-                            middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+)(?:[^<>]+))>', '<temp_' + middle_slash + '>', middle_data_org)
-                            self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
-                            continue
-
-                        wiki_data = re.sub(r'^\-[1-5]( |\n)', '', middle_data)
-                        if middle_name == '-5':
+                        elif middle_name == '-5':
                             wiki_size = '50'
                         elif middle_name == '-4':
                             wiki_size = '60'

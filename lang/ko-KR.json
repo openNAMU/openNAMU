@@ -548,7 +548,7 @@
     "hide_user_name": "가입자 이름 숨기기",
     "comment": "댓글",
     "reply": "대댓글",
-    "timeout_error": "실행 시간이 너무 오래 걸립니다. 최대 실행 시간 (초) : ",
+    "timeout_error": "렌더링 시간이 너무 오래 걸립니다. 최대 실행 시간 (초) : ",
     "footnote_render": "각주 렌더링",
     "footnote_number": "각주 번호 출력",
     "only_number": "숫자만",
@@ -570,8 +570,10 @@
     "table_scroll": "표에 스크롤 사용",
     "data": "데이터",
     "volume": "용량",
-    "list_view_change" : "숫자 리스트의 보기 방식 변경",
-    "view_joke" : "농담 매크로 내용 보이기",
-    "math_scroll" : "Math 매크로에서 스크롤 사용",
-    "remove_blind_thread" : "숨겨진 토론 보이지 않기"
+    "list_view_change": "숫자 리스트의 보기 방식 변경",
+    "view_joke": "농담 매크로 내용 보이기",
+    "math_scroll": "Math 매크로에서 스크롤 사용",
+    "remove_blind_thread": "숨겨진 토론 보이지 않기",
+    "trace": "추적",
+    "view_history": "문서 열람 추적 사용"
 }

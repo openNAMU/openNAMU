@@ -310,7 +310,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
             if data_section == '':
                 data_section = data
     
-            editor_top_text += '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
+            editor_top_text += '<a href="/filter/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
     
             if editor_top_text != '':
                 editor_top_text += '<hr class="main_hr">'

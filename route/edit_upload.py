@@ -63,7 +63,7 @@ def edit_upload():
                 for i in db_data:
                     t_re = re.compile(i[0])
                     if t_re.search(name):
-                        return redirect('/file_filter')
+                        return redirect('/filter/file_filter')
 
                 data_url_image = load_image_url()
                 if os.path.exists(os.path.join(data_url_image, e_data)):
@@ -137,7 +137,7 @@ def edit_upload():
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('upload'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
-                    <a href="/file_filter">(''' + load_lang('file_filter_list') + ''')</a> <a href="/extension_filter">(''' + load_lang('extension_filter_list') + ''')</a>
+                    <a href="/filter/file_filter">(''' + load_lang('file_filter_list') + ''')</a> <a href="/filter/extension_filter">(''' + load_lang('extension_filter_list') + ''')</a>
                     ''' + upload_help + '''
                     <hr class="main_hr">
                     ''' + load_lang('max_file_size') + ''' : ''' + str(file_max) + '''MB
