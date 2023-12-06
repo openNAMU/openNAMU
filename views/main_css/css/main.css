@@ -269,6 +269,10 @@ hr {
     display: inline;
 }
 
+.opennamu_render_complete img {
+    vertical-align: middle;
+}
+
 blockquote {
     padding: 15px 40px 15px 15px;
     margin: 0;
