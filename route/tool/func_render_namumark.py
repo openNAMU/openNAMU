@@ -1883,13 +1883,29 @@ class class_do_render_namumark:
 
                         data_name = self.get_tool_data_storage('<pre id="syntax"><code class="' + wiki_data_syntax + '">' + wiki_data, '</code></pre>', middle_data_org)
                         syntax_count += 1
-                    elif middle_name in ('+5', '+4', '+3', '+2', '+1'):
+                    elif middle_name in ('#!dark', '#!white'):
                         if middle_slash:
                             middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+)(?:[^<>]+))>', '<temp_' + middle_slash + '>', middle_data_org)
                             self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        wiki_data = re.sub(r'^\+[1-5]( |\n)', '', middle_data)
+                        wiki_data = re.sub(r'^#!(dark|white)( |\n)', '', middle_data)
+                        print(self.darkmode)
+                        if middle_name == '#!dark' and self.darkmode == '1':
+                            middle_data_pass = wiki_data
+                        elif middle_name == '#!white' and self.darkmode == '0':
+                            middle_data_pass = wiki_data
+                        else:
+                            middle_data_pass = ''
+                        
+                        data_name = self.get_tool_data_storage('', '', middle_data_org)
+                    elif middle_name in ('+5', '+4', '+3', '+2', '+1', '-5', '-4', '-3', '-2', '-1'):
+                        if middle_slash:
+                            middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+)(?:[^<>]+))>', '<temp_' + middle_slash + '>', middle_data_org)
+                            self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
+                            continue
+
+                        wiki_data = re.sub(r'^(\+|\-)[1-5]( |\n)', '', middle_data)
                         if middle_name == '+5':
                             wiki_size = '200'
                         elif middle_name == '+4':
@@ -1898,19 +1914,9 @@ class class_do_render_namumark:
                             wiki_size = '160'
                         elif middle_name == '+2':
                             wiki_size = '140'
-                        else:
+                        elif middle_name == '+1':
                             wiki_size = '120'
-
-                        middle_data_pass = wiki_data
-                        data_name = self.get_tool_data_storage('<span style="font-size:' + wiki_size + '%">', '</span>', middle_data_org)
-                    elif middle_name in ('-5', '-4', '-3', '-2', '-1'):
-                        if middle_slash:
-                            middle_data_org = re.sub(r'<(\/?(?:slash)_(?:[0-9]+)(?:[^<>]+))>', '<temp_' + middle_slash + '>', middle_data_org)
-                            self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
-                            continue
-
-                        wiki_data = re.sub(r'^\-[1-5]( |\n)', '', middle_data)
-                        if middle_name == '-5':
+                        elif middle_name == '-5':
                             wiki_size = '50'
                         elif middle_name == '-4':
                             wiki_size = '60'
