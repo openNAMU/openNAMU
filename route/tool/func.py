@@ -2479,7 +2479,7 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
         curs.execute(db_change("" + \
             "select block from rb " + \
             "where ((end > ? and end != '') or end = '') and block = ? and " + \
-                "band = ? and ongoing = '1'" + \
+            "band = ? and ongoing = '1'" + \
         ""), [now_time, name, band])
         if curs.fetchall():
             curs.execute(db_change(
@@ -2519,6 +2519,14 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
                 login
             ])
 
+def history_plus_rc_max(curs, mode):
+    curs.execute(db_change("select count(*) from rc where type = ?"), [mode])
+    if curs.fetchall()[0][0] >= 200:
+        curs.execute(db_change("select id, title from rc where type = ? order by date asc limit 1"), [mode])
+        rc_data = curs.fetchall()
+        if rc_data:
+            curs.execute(db_change('delete from rc where id = ? and title = ? and type = ?'), [rc_data[0][0], rc_data[0][1], mode])
+
 def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -2530,18 +2538,15 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
             return 0
 
         if mode == 'add':
-            curs.execute(db_change(
-                "select id from history where title = ? order by id + 0 asc limit 1"
-            ), [title])
+            curs.execute(db_change("select id from history where title = ? order by id + 0 asc limit 1"), [title])
             id_data = curs.fetchall()
             id_data = str(int(id_data[0][0]) - 1) if id_data else '0'
         else:
-            curs.execute(db_change(
-                "select id from history where title = ? order by id + 0 desc limit 1"
-            ), [title])
+            curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [title])
             id_data = curs.fetchall()
             id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
             
+            mode = 'r1' if id_data == '1' else mode
             mode = mode if not re.search('^user:', title) else 'user'
 
         send = re.sub(r'\(|\)|<|>', '', send)
@@ -2549,82 +2554,30 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
         send = send + ' (' + t_check + ')' if t_check != '' else send
 
         if mode != 'add' and mode != 'user':
-            curs.execute(db_change("select count(*) from rc where type = 'normal'"))
-            if curs.fetchall()[0][0] >= 200:
-                curs.execute(db_change(
-                    "select id, title from rc where type = 'normal' order by date asc limit 1"
-                ))
-                rc_data = curs.fetchall()
-                if rc_data:
-                    curs.execute(db_change(
-                        'delete from rc where id = ? and title = ? and type = "normal"'
-                    ), [
-                        rc_data[0][0],
-                        rc_data[0][1]
-                    ])
-        
-            curs.execute(db_change(
-                "insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"
-            ), [
-                id_data,
-                title,
-                date
-            ])
+            history_plus_rc_max(curs, 'normal')
+            curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [id_data, title, date])
         
         if mode != 'add':
-            curs.execute(db_change("select count(*) from rc where type = ?"), [mode])
-            if curs.fetchall()[0][0] >= 200:
-                curs.execute(db_change(
-                    "select id, title from rc where type = ? order by date asc limit 1"
-                ), [mode])
-                rc_data = curs.fetchall()
-                if rc_data:
-                    curs.execute(db_change(
-                        'delete from rc where id = ? and title = ? and type = ?'
-                    ), [
-                        rc_data[0][0],
-                        rc_data[0][1],
-                        mode
-                    ])
-        
-            curs.execute(db_change(
-                "insert into rc (id, title, date, type) values (?, ?, ?, ?)"
-            ), [
-                id_data,
-                title,
-                date,
-                mode
-            ])
-                
-        curs.execute(db_change(
-            "insert into history (id, title, data, date, ip, send, leng, hide, type) " + \
-            "values (?, ?, ?, ?, ?, ?, ?, '', ?)"
-        ), [
-            id_data,
-            title,
-            data,
-            date,
-            ip,
-            send,
-            leng,
-            mode
-        ])
+            history_plus_rc_max(curs, mode)
+            curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [id_data, title, date, mode])
 
-        data_set_exist = '' if t_check != 'delete' else '1'
+            data_set_exist = '' if t_check != 'delete' else '1'
 
-        curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'last_edit'"), [title])
-        db_data = curs.fetchall()
-        if db_data:
-            curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'last_edit'"), [date, data_set_exist, title])
-        else:
-            curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'last_edit', ?)"), [title, data_set_exist, date])
+            curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'last_edit'"), [title])
+            db_data = curs.fetchall()
+            if db_data:
+                curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'last_edit'"), [date, data_set_exist, title])
+            else:
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'last_edit', ?)"), [title, data_set_exist, date])
 
-        curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'length'"), [title])
-        db_data = curs.fetchall()
-        if db_data:
-            curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'length'"), [len(data), data_set_exist, title])
-        else:
-            curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'length', ?)"), [title, data_set_exist, len(data)])
+            curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'length'"), [title])
+            db_data = curs.fetchall()
+            if db_data:
+                curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'length'"), [len(data), data_set_exist, title])
+            else:
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'length', ?)"), [title, data_set_exist, len(data)])
+
+        curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide, type) values (?, ?, ?, ?, ?, ?, ?, '', ?)"), [id_data, title, data, date, ip, send, leng, mode])
 
 # Func-error
 def re_error(data):

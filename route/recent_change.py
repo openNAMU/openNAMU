@@ -23,6 +23,15 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
         all_admin = admin_check('all', None, ip)
         owner = admin_check(None, None, ip)
 
+        option_list = [
+            ['normal', load_lang('normal')],
+            ['edit', load_lang('edit')],
+            ['move', load_lang('move')],
+            ['delete', load_lang('delete')],
+            ['revert', load_lang('revert')],
+            ['r1', load_lang('new_doc')]
+        ]
+
         if flask.request.method == 'POST':
             return redirect('/diff/' + flask.request.form.get('b', '1') + '/' + flask.request.form.get('a', '1') + '/' + url_pas(name))
         else:
@@ -152,11 +161,7 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
 
             if tool == 'history':
                 div = '' + \
-                    '<a href="/history_page/1/normal/' + url_pas(name) + '">(' + load_lang('normal') + ')</a> ' + \
-                    '<a href="/history_page/1/edit/' + url_pas(name) + '">(' + load_lang('edit') + ')</a> ' + \
-                    '<a href="/history_page/1/move/' + url_pas(name) + '">(' + load_lang('move') + ')</a> ' + \
-                    '<a href="/history_page/1/delete/' + url_pas(name) + '">(' + load_lang('delete') + ')</a> ' + \
-                    '<a href="/history_page/1/revert/' + url_pas(name) + '">(' + load_lang('revert') + ')</a>' + \
+                    ' '.join(['<a href="/history_page/1/' + for_a[0] + '/' + url_pas(name) + '">(' + for_a[1] + ')</a> ' for for_a in option_list]) + \
                     '<hr class="main_hr">' + div + \
                 ''
                 menu = [['w/' + url_pas(name), load_lang('return')]]
@@ -180,11 +185,7 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                 div += get_next_page_bottom('/history_page/{}/' + set_type + '/' + url_pas(name), num, data_list)
             elif tool == 'record':
                 div = '' + \
-                    '<a href="/record/1/normal/' + url_pas(name) + '">(' + load_lang('normal') + ')</a> ' + \
-                    '<a href="/record/1/edit/' + url_pas(name) + '">(' + load_lang('edit') + ')</a> ' + \
-                    '<a href="/record/1/move/' + url_pas(name) + '">(' + load_lang('move') + ')</a> ' + \
-                    '<a href="/record/1/delete/' + url_pas(name) + '">(' + load_lang('delete') + ')</a> ' + \
-                    '<a href="/record/1/revert/' + url_pas(name) + '">(' + load_lang('revert') + ')</a>' + \
+                    ' '.join(['<a href="/record/1/' + for_a[0] + '/' + url_pas(name) + '">(' + for_a[1] + ')</a> ' for for_a in option_list]) + \
                     '<hr class="main_hr">' + div + \
                 ''
 
@@ -199,12 +200,8 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                 div += get_next_page_bottom('/record/{}/' + url_pas(name), num, data_list)
             else:
                 div = '' + \
-                    '<a href="/recent_change/1/normal">(' + load_lang('normal') + ')</a> ' + \
-                    '<a href="/recent_change/1/edit">(' + load_lang('edit') + ')</a> ' + \
+                    ' '.join(['<a href="/recent_change/1/' + for_a[0] + '">(' + for_a[1] + ')</a> ' for for_a in option_list]) + \
                     '<a href="/recent_change/1/user">(' + load_lang('user_document') + ')</a> ' + \
-                    '<a href="/recent_change/1/move">(' + load_lang('move') + ')</a> ' + \
-                    '<a href="/recent_change/1/delete">(' + load_lang('delete') + ')</a> ' + \
-                    '<a href="/recent_change/1/revert">(' + load_lang('revert') + ')</a>' + \
                     '<hr class="main_hr">' + div + \
                 ''
 
