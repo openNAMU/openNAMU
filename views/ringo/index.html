@@ -27,7 +27,7 @@
             <meta name="title" content="{{imp[0]}} - {{imp[1][0]}}">
         {% endif %}
         <meta name="keywords" content="{{imp[0]}}">
-        {% if imp[2][12] != 0 and imp[2][12] == 'w' %}
+        {% if imp[2][12] != 0 and imp[2][12][0] == 'w' %}
             <meta name="description" content="{{data|cut_100}}">
         {% endif %}
         <meta name="viewport" content="width=device-width, initial-scale=1">
