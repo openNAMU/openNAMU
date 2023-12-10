@@ -19,7 +19,7 @@ def recent_record_reset(name = 'Test'):
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('record_reset') + ')', 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + load_lang('history_delete_warning') + '''</span>
+                        <span>''' + load_lang('delete_warning') + '''</span>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('reset') + '''</button>
                     </form>
