@@ -1243,7 +1243,7 @@ def wiki_custom():
         
         split_path = flask.request.path.split('/')
         if len(split_path) > 1:
-            split_path = split_path[1]
+            split_path = split_path[1:]
         else:
             split_path = 0
 
