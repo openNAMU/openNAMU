@@ -691,11 +691,7 @@ def get_default_robots_txt():
     return data
 
 def load_random_key(long = 128):
-    return ''.join(
-        random.choice(
-            "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        ) for i in range(long)
-    )
+    return ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(long))
 
 def http_warning():
     return '''
