@@ -609,7 +609,7 @@
             "user_head_warning" : "User data will be deleted if you close the browser or when you sign in.",
             "no_login_warning" : "You are not logged in. Your current IP address will be logged within editing or discussing until you log in.",
             "update_warning" : "Manual updates are recommended if your version is 0.2 or lower than the latest version. For Windows, the contents of the route folder will be deleted.",
-            "history_delete_warning" : "If you erase history, it's hard to restore it, so please be careful.",
+            "delete_warning" : "If you erase this, it's hard to restore it, so please be careful.",
             "user_css_warning" : "If you have a problem using this, connect here.",
             "main_css_warning" : "If you have a problem using this, use the emergency tool.",
             "not_support_skin_warning" : "It does not work on skins that do not support this feature.",

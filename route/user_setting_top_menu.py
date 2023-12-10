@@ -7,9 +7,12 @@ def user_setting_top_menu():
         ip = ip_check()
         if ban_check(ip) == 1:
             return re_error('/ban')
+
+        if ip_or_user(ip) == 1:
+            return redirect('/login')
         
         if flask.request.method == 'POST':
-            curs.execute(db_change("select name from other where name = 'top_menu'"))
+            curs.execute(db_change("select data from user_set where name = 'top_menu' and id = ?"), [ip])
             if curs.fetchall():
                 curs.execute(db_change("update user_set set data = ? where name = 'top_menu' and id = ?"), [flask.request.form.get('content', ''), ip])
             else:
@@ -17,7 +20,7 @@ def user_setting_top_menu():
 
             conn.commit()
 
-            return redirect('/setting/top_menu')
+            return redirect('/change/top_menu')
         else:
             curs.execute(db_change("select data from user_set where name = 'top_menu' and id = ?"), [ip])
             db_data = curs.fetchall()

@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def bbs_hide(bbs_num = ''):
+def bbs_w_hide(bbs_num = '', post_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -8,10 +8,11 @@ def bbs_hide(bbs_num = ''):
         db_data = curs.fetchall()
         if not db_data:
             return redirect('/bbs/main')
-        else:
-            bbs_name = db_data[0][0]
+
+        bbs_name = db_data[0][0]
         
         bbs_num_str = str(bbs_num)
+        post_num_str = str(post_num)
 
         if admin_check() != 1:
             return redirect('/bbs/w/' + bbs_num_str)
@@ -20,11 +21,11 @@ def bbs_hide(bbs_num = ''):
             pass
         else:
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('bbs_hide'), wiki_set(), wiki_custom(), wiki_css(['(' + bbs_name + ')', 0])],
+                imp = [load_lang('bbs_post_hide'), wiki_set(), wiki_custom(), wiki_css(['(' + bbs_name + ')' + ' (' + post_num_str + ')', 0])],
                 data = render_simple_set('''
                     <form method="post">
-                        <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
+                        <button type="submit">''' + load_lang('hide') + '''</button>
                     </form>
                 '''),
-                menu = [['bbs/set/' + bbs_num_str, load_lang('return')]]
+                menu = [['bbs/w/' + bbs_num_str + '/' + post_num_str, load_lang('return')]]
             ))

@@ -33,7 +33,7 @@ def recent_history_send(name = 'Test', rev = 1):
                     imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('send_edit') + ') (r' + num + ')', 0])],
                     data = '''
                         <form method="post">
-                            <span>''' + load_lang('history_delete_warning') + '''</span>
+                            <span>''' + load_lang('delete_warning') + '''</span>
                             <hr class="main_hr">
                             <input value="''' + html.escape(send) + '''" name="send">
                             <hr class="main_hr">

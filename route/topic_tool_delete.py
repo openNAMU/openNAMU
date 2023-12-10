@@ -19,9 +19,10 @@ def topic_tool_delete(topic_num = 1):
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('topic_delete'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
-                    <hr class="main_hr">
                     <form method="post">
-                        <button type="submit">''' + load_lang('start') + '''</button>
+                        <span>''' + load_lang('delete_warning') + '''</span>
+                        <hr class="main_hr">
+                        <button type="submit">''' + load_lang('delete') + '''</button>
                     </form>
                 ''',
                 menu = [['thread/' + topic_num + '/tool', load_lang('return')]]

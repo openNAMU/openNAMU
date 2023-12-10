@@ -9,7 +9,7 @@ def api_recent_change(num = 10):
 
         data_list = []
 
-        curs.execute(db_change('select id, title from rc where type = "" order by date desc limit ?'), [num])
+        curs.execute(db_change('select id, title from rc where type = "normal" order by date desc limit ?'), [num])
         for for_a in curs.fetchall():
             curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where id = ? and title = ?'), for_a)
             db_data = curs.fetchall()

@@ -363,13 +363,11 @@ app.route('/auth/give/ban_regex/<everything:name>', methods = ['POST', 'GET'], d
 app.route('/auth/give/ban_multiple', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'multiple' })(give_user_ban)
 
 # /auth/list
-app.route('/admin_group')(list_admin_group_2)
-
 # /auth/list/add/<name>
-app.route('/admin_plus/<name>', methods = ['POST', 'GET'])(give_admin_groups_2)
-
 # /auth/list/delete/<name>
-app.route('/delete_admin_group/<name>', methods = ['POST', 'GET'])(give_delete_admin_group_2)
+app.route('/auth/list')(list_admin_group_2)
+app.route('/auth/list/add/<name>', methods = ['POST', 'GET'])(give_admin_groups_2)
+app.route('/auth/list/delete/<name>', methods = ['POST', 'GET'])(give_delete_admin_group_2)
 
 app.route('/auth/give/fix/<user_name>', methods = ['POST', 'GET'])(give_user_fix)
 
@@ -539,12 +537,14 @@ app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 app.route('/bbs/main', defaults = { 'tool' : 'main' })(bbs_w)
 app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
 # app.route('/bbs/main/set')
-app.route('/bbs/hide/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_hide)
-app.route('/bbs/delete/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_delete)
 app.route('/bbs/w/<int:bbs_num>')(bbs_w)
+# app.route('/bbs/blind/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_hide)
+app.route('/bbs/delete/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_delete)
 app.route('/bbs/set/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_set)
 app.route('/bbs/edit/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_edit)
 app.route('/bbs/w/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_post)
+# app.route('/bbs/blind/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_hide)
+app.route('/bbs/delete/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_delete)
 app.route('/bbs/raw/<int:bbs_num>/<int:post_num>')(view_raw_2)
 app.route('/bbs/tool/<int:bbs_num>/<int:post_num>')(bbs_w_tool)
 app.route('/bbs/edit/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_edit)

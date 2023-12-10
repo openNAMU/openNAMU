@@ -16,7 +16,7 @@ def main_tool_admin():
                 </ul>
                 <h2>''' + load_lang('owner') + '''</h2>
                 <ul class="opennamu_ul">
-                    <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
+                    <li><a href="/auth/list">''' + load_lang('admin_group_list') + '''</a></li>
                     <li><a href="/delete_multiple">''' + load_lang('many_delete') + '''</a></li>
                     <li><a href="/app_submit">''' + load_lang('application_list') + '''</a></li>
                     <li><a href="/register">''' + load_lang('add_user') + '''</a></li>

@@ -393,7 +393,7 @@
     "edit_set": "편집 관련 설정",
     "wiki_shutdown": "위키 엔진 종료",
     "shutdown": "종료",
-    "history_delete_warning": "역사를 지울 경우 복구하기 어려우니 신중하게 결정하세요.",
+    "delete_warning": "지울 경우 복구하기 어려우니 신중하게 결정하세요.",
     "history_reset": "문서 역사 초기화",
     "record_reset": "사용자 편집 기록 초기화",
     "email_setting": "이메일 설정",
