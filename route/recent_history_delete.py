@@ -21,7 +21,7 @@ def recent_history_delete(name = 'Test', rev = 1):
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('history_delete') + ') (r' + num + ')', 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + load_lang('history_delete_warning') + '''</span>
+                        <span>''' + load_lang('delete_warning') + '''</span>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('delete') + '''</button>
                     </form>
