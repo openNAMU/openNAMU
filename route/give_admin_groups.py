@@ -1,13 +1,13 @@
 from .tool.func import *
 
-def give_admin_groups_2(name = None):
+def give_admin_groups_2(name = 'test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         acl_name_list = ['ban', 'nothing', 'toron', 'check', 'acl', 'hidel', 'give', 'owner']
 
         if flask.request.method == 'POST':
-            if admin_check(None, 'admin_plus (' + name + ')') != 1:
+            if admin_check(None, 'auth list add (' + name + ')') != 1:
                 return re_error('/error/3')
             elif name in get_default_admin_group():
                 return re_error('/error/3')
@@ -19,7 +19,7 @@ def give_admin_groups_2(name = None):
 
             conn.commit()
 
-            return redirect('/admin_plus/' + url_pas(name))
+            return redirect('/auth/list/add/' + url_pas(name))
         else:
             data = ''
             exist_list = ['', '', '', '', '', '', '', '']
@@ -63,5 +63,5 @@ def give_admin_groups_2(name = None):
                         <button ''' + state +  ''' type="submit">''' + load_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['admin_group', load_lang('return')]]
+                menu = [['auth/list', load_lang('return')]]
             ))

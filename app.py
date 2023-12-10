@@ -363,13 +363,11 @@ app.route('/auth/give/ban_regex/<everything:name>', methods = ['POST', 'GET'], d
 app.route('/auth/give/ban_multiple', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'multiple' })(give_user_ban)
 
 # /auth/list
-app.route('/admin_group')(list_admin_group_2)
-
 # /auth/list/add/<name>
-app.route('/admin_plus/<name>', methods = ['POST', 'GET'])(give_admin_groups_2)
-
 # /auth/list/delete/<name>
-app.route('/delete_admin_group/<name>', methods = ['POST', 'GET'])(give_delete_admin_group_2)
+app.route('/auth/list')(list_admin_group_2)
+app.route('/auth/list/add/<name>', methods = ['POST', 'GET'])(give_admin_groups_2)
+app.route('/auth/list/delete/<name>', methods = ['POST', 'GET'])(give_delete_admin_group_2)
 
 app.route('/auth/give/fix/<user_name>', methods = ['POST', 'GET'])(give_user_fix)
 
