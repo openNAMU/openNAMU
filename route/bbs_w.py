@@ -6,6 +6,7 @@ def bbs_w(bbs_num = '', tool = 'bbs'):
         
         data = ''
         title_name = ''
+        bbs_name_dict = {}
 
         admin_auth = admin_check()
 
@@ -26,6 +27,8 @@ def bbs_w(bbs_num = '', tool = 'bbs'):
             if db_data:
                 data += '<ul class="opennamu_ul">'
                 for for_a in db_data:
+                    bbs_name_dict[for_a[1]] = for_a[0]
+
                     curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_type" and set_id = ?'), [for_a[1]])
                     db_data_2 = curs.fetchall()
                     bbs_type = db_data_2[0][0] if db_data_2 else 'comment'
@@ -80,6 +83,10 @@ def bbs_w(bbs_num = '', tool = 'bbs'):
             db_data = curs.fetchall()
             last_comment_date = db_data[0][0] if db_data else '0'
 
+            bbs_name_select = ''
+            if tool != 'bbs':
+                bbs_name_select = '(' + bbs_name_dict[for_b[1]] + ')'
+
             data += '''
                 <tr>
                     <td>''' + ip_pas(temp_dict['user_id']) + '''</td>
@@ -90,6 +97,7 @@ def bbs_w(bbs_num = '', tool = 'bbs'):
                     <td colspan="3">
                         <a href="/bbs/w/''' + for_b[1] + '/' + for_b[0] + '">' + html.escape(temp_dict['title']) + '''</a> 
                         (''' + comment_count + ''') 
+                        ''' + bbs_name_select + '''
                     </td>
                 </tr>
             '''
