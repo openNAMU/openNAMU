@@ -12,7 +12,7 @@ def list_admin():
         for data in curs.fetchall():
             name = '' + \
                 ip_pas(data[0]) + ' ' + \
-                '<a href="/admin_plus/' + url_pas(data[1]) + '">(' + data[1] + ')</a>' + \
+                '<a href="/auth/list/add/' + url_pas(data[1]) + '">(' + data[1] + ')</a>' + \
             ''
 
             div += '<li>' + name + '</li>'
