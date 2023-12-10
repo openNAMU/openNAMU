@@ -1156,10 +1156,15 @@ def wiki_set(num = 1):
         db_data = db_data[0][0] if db_data else ''
         db_data = db_data.replace('\r', '')
         
-        curs.execute(db_change("select data from user_set where name = '' and id = ?"), [ip])
+        curs.execute(db_change("select data from user_set where name = 'top_menu' and id = ?"), [ip])
         db_data_2 = curs.fetchall()
         db_data_2 = db_data_2[0][0] if db_data_2 else ''
-        db_data += db_data_2.replace('\r', '')
+        db_data_2 = db_data_2.replace('\r', '')
+        if db_data_2 != '' and db_data != '':
+            db_data += '\n' + db_data_2
+        elif db_data_2 != '':
+            db_data += db_data_2
+        
         if db_data != '':
             db_data = db_data.split('\n')
         
