@@ -80,7 +80,7 @@ def api_w(name = 'Test', tool = '', rev = ''):
         else:
             if tool == '' or tool == 'view':
                 if acl_check(name, 'render') != 1:
-                    if check_int(rev) == '':
+                    if number_check(rev) == '':
                         curs.execute(db_change("select data from data where title = ?"), [name])
                     else:
                         curs.execute(db_change("select data from history where title = ? and id = ?"), [name, rev])
