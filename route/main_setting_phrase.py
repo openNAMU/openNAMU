@@ -28,17 +28,14 @@ def main_setting_phrase():
             'topic_text',
             'phrase_user_page_admin',
             'phrase_user_page_owner',
-            'phrase_old_page_warring',
+            'phrase_old_page_warning',
             'bbs_help',
-            'bbs_comment_help'
+            'bbs_comment_help',
+            'outdated_doc_warning',
+            'outdated_doc_warning_date'
         ]
         if flask.request.method == 'POST':
-            for i in i_list:
-                curs.execute(db_change("update other set data = ? where name = ?"), [
-                    flask.request.form.get(i, ''),
-                    i
-                ])
-
+            curs.executemany(db_change("update other set data = ? where name = ?"), [[flask.request.form.get(for_a, ''), for_a] for for_a in i_list])
             conn.commit()
 
             admin_check(None, 'edit_set (phrase)')
@@ -46,7 +43,6 @@ def main_setting_phrase():
             return redirect('/setting/phrase')
         else:
             d_list = []
-
             for i in i_list:
                 curs.execute(db_change('select data from other where name = ?'), [i])
                 sql_d = curs.fetchall()
@@ -124,7 +120,7 @@ def main_setting_phrase():
                         <h2>''' + load_lang('phrase_user_page_owner') + ''' (HTML)</h2>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[19] + '''">''' + html.escape(d_list[19]) + '''</textarea>
 
-                        <h2>''' + load_lang('phrase_old_page_warring') + ''' (''' + load_lang('beta') + ''') (HTML)</h2>
+                        <h2>''' + load_lang('phrase_old_page_warning') + ''' (''' + load_lang('beta') + ''') (HTML)</h2>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[20] + '''">''' + html.escape(d_list[20]) + '''</textarea>
                         
                         <h2>''' + load_lang('bbs_help') + '''</h2>
@@ -132,6 +128,13 @@ def main_setting_phrase():
 
                         <h2>''' + load_lang('bbs_comment_help') + '''</h2>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[22] + '''">''' + html.escape(d_list[22]) + '''</textarea>
+
+                        <h2>''' + load_lang('outdated_doc_warning') + '''  (HTML)</h2>
+                        <span>''' + load_lang('period') + '''</span> (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
+                        <hr class="main_hr">
+                        <input name="''' + i_list[24] + '''" value="''' + html.escape(d_list[24]) + '''">
+                        <hr class="main_hr">
+                        <textarea class="opennamu_textarea_100" name="''' + i_list[23] + '''" placeholder="''' + load_lang('old_page_warning') + '''">''' + html.escape(d_list[23]) + '''</textarea>
 
                         <hr class="main_hr">
                         <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>

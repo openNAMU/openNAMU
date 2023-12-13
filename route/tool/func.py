@@ -749,22 +749,12 @@ def leng_check(A, B):
     # A -> old
     return '0' if A == B else (('-' + str(A - B)) if A > B else ('+' + str(B - A)))
 
-def number_check(data, f=False):
+def number_check(data, f = 0):
     try:
-        if f:
-            float(data)
-        else:
-            int(data)
+        float(data) if f == 1 else int(data)
         return data
     except:
         return '1'
-    
-def check_int(data):
-    try:
-        int(data)
-        return data
-    except:
-        return ''
     
 def redirect(data = '/'):
     return flask.redirect(load_domain('full') + data)
