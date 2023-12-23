@@ -17,9 +17,8 @@ def main_sys_update():
             up_data = curs.fetchall()
             up_data = up_data[0][0] if up_data and up_data[0][0] in ['stable', 'beta', 'dev'] else 'stable'
 
-            print('----')
             print('Update')
-            print('----')
+            
             if platform.system() == 'Linux':
                 ok = []
 

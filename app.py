@@ -176,8 +176,6 @@ with get_db_connect() as conn:
     sql_data = curs.fetchall()
     app.secret_key = sql_data[0][0]
 
-    print('----')
-
     # Init-DB_Data
     server_set = {}
     server_set_var = get_init_set_list()
@@ -216,13 +214,9 @@ with get_db_connect() as conn:
 
         server_set[i] = server_set_val
 
-    print('----')
-
     # Init-DB_care
     if data_db_set['type'] == 'sqlite':
         def back_up(back_time, back_up_where):
-            print('----')
-
             try:
                 shutil.copyfile(
                     data_db_set['name'] + '.db', 
