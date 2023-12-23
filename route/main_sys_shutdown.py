@@ -10,7 +10,6 @@ def main_sys_shutdown():
 
             conn.commit()
 
-            print('----')
             print('Shutdown')
 
             os._exit(0)

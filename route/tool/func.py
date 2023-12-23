@@ -19,7 +19,6 @@ with open('version.json', encoding = 'utf8') as file_data:
 print('Version : ' + version_list['beta']['r_ver'])
 print('DB set version : ' + version_list['beta']['c_ver'])
 print('Skin set version : ' + version_list['beta']['s_ver'])
-print('----')
 
 # Init-PIP_Install
 data_up_date = 1
@@ -67,8 +66,6 @@ if data_up_date == 1:
         print('Help : try "python3 -m pip install -r requirements.txt"')
 else:
     print('PIP check pass')
-    
-print('----')
 
 # Init-Load
 from .func_tool import *
@@ -352,9 +349,7 @@ def update(ver_num, set_data):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        print('----')
         # 업데이트 하위 호환 유지 함수
-
         if ver_num < 3160027:
             print('Add init set')
             set_init()
@@ -1530,7 +1525,6 @@ def send_email(who, title, data):
 
             return 1
         except Exception as e:
-            print('----')
             print('Error : email send error')
             print(e)
 
