@@ -2515,15 +2515,13 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
             data_set_exist = '' if t_check != 'delete' else '1'
 
             curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'last_edit'"), [title])
-            db_data = curs.fetchall()
-            if db_data:
+            if curs.fetchall():
                 curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'last_edit'"), [date, data_set_exist, title])
             else:
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'last_edit', ?)"), [title, data_set_exist, date])
 
             curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'length'"), [title])
-            db_data = curs.fetchall()
-            if db_data:
+            if curs.fetchall():
                 curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'length'"), [len(data), data_set_exist, title])
             else:
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'length', ?)"), [title, data_set_exist, len(data)])

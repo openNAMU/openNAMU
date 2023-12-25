@@ -204,9 +204,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 leng
             )
             
-            curs.execute(db_change("delete from back where link = ?"), [name])
-            curs.execute(db_change("delete from back where title = ? and type = 'no'"), [name])
-            
             render_set(
                 doc_name = name,
                 doc_data = content,
