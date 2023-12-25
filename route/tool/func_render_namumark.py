@@ -39,6 +39,7 @@ class class_do_render_namumark:
 
         self.data_math_count = 0
         self.data_redirect = 0
+        self.link_count = 0
 
         self.data_toc = ''
         self.data_footnote = {}
@@ -227,14 +228,7 @@ class class_do_render_namumark:
         doc_set = self.doc_set
         doc_set['doc_include'] = doc_include
 
-        data_end = class_do_render_namumark(
-            self.curs,
-            self.doc_name,
-            data,
-            doc_set,
-            self.lang_data,
-            do_type = 'inter'
-        )()
+        data_end = class_do_render_namumark(self.curs, self.doc_name, data, doc_set, self.lang_data, do_type = 'inter')()
 
         self.render_data_js += data_end[1]
         self.data_include += data_end[2]['include']
@@ -242,6 +236,7 @@ class class_do_render_namumark:
         self.data_backlink = dict(self.data_backlink, **data_end[2]['backlink_dict'])
         self.data_temp_storage = dict(self.data_temp_storage, **data_end[2]['temp_storage'][0])
         self.data_temp_storage_count += data_end[2]['temp_storage'][1]
+        self.link_count += data_end[2]['link_count']
 
         return data_end[0]
 
@@ -1196,6 +1191,8 @@ class class_do_render_namumark:
                     else:
                         link_sub = ''
                         link_sub_storage = link_main_org
+
+                    self.link_count += 1
 
                     data_name = self.get_tool_data_storage('<a class="' + link_exist + ' ' + link_same + '" title="' + link_title + '" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
                     self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
@@ -2340,6 +2337,7 @@ class class_do_render_namumark:
         data_backlink_dict = self.data_backlink
         self.data_backlink = [[self.doc_name, for_a, for_b, self.data_backlink[for_a][for_b]] for for_a in self.data_backlink for for_b in self.data_backlink[for_a]]
 
+        # 여기 수정시 do_inter_render도 수정 필요
         return [
             self.render_data, # html
             self.render_data_js, # js
@@ -2349,6 +2347,8 @@ class class_do_render_namumark:
                 'include' : self.data_include, # include data
                 'footnote' : self.data_footnote_all, # footnote
                 'category' : self.data_category_list,
-                'temp_storage' : [self.data_temp_storage, self.data_temp_storage_count]
+                'temp_storage' : [self.data_temp_storage, self.data_temp_storage_count],
+                'link_count' : self.link_count,
+                'redirect' : self.data_redirect
             } # other
         ]

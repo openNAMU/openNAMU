@@ -55,6 +55,7 @@ from route.list_admin_group import list_admin_group_2
 from route.list_image_file import list_image_file
 from route.list_long_page import list_long_page
 from route.list_old_page import list_old_page
+from route.list_no_link import list_no_link
 from route.list_please import list_please
 from route.list_title_index import list_title_index
 from route.list_user import list_user

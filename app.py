@@ -311,6 +311,9 @@ app.route('/filter/extension_filter/del/<everything:name>', defaults = { 'tool' 
 app.route('/list/document/old')(list_old_page)
 app.route('/list/document/old/<int:num>')(list_old_page)
 
+app.route('/list/document/no_link')(list_no_link)
+app.route('/list/document/no_link/<int:num>')(list_no_link)
+
 app.route('/list/document/acl')(list_acl)
 app.route('/list/document/acl/<int:arg_num>')(list_acl)
 
@@ -397,7 +400,9 @@ app.route('/history_add/<everything:name>', methods = ['POST', 'GET'])(recent_hi
 
 # Func-view
 app.route('/xref/<everything:name>')(view_xref)
+app.route('/xref_page/<int:num>/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
+app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
 app.route('/raw/<everything:name>')(view_raw_2)
 app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 1 })(view_raw_2)
