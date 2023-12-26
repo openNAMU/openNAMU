@@ -2501,7 +2501,7 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
             mode = mode if not re.search('^user:', title) else 'user'
 
         send = re.sub(r'\(|\)|<|>', '', send)
-        send = send[:128] if len(send) > 128 else send
+        send = send[:512] if len(send) > 512 else send
         send = send + ' (' + t_check + ')' if t_check != '' else send
 
         if mode != 'add' and mode != 'user':
