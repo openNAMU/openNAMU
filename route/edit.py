@@ -49,6 +49,8 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = ''):
             
     p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
     
+    monaco_editor_top += '<a href="javascript:do_monaco_to_textarea(); opennamu_do_editor_temp_save();">(' + load_lang('load_temp_save') + ')</a> <a href="javascript:opennamu_do_editor_temp_save_load();">(' + load_lang('load_temp_save_load') + ')</a> '
+    
     monaco_on = get_main_skin_set(curs, flask.session, 'main_css_monaco', ip)
     if monaco_on == 'use':
         editor_display = 'style="display: none;"'
@@ -57,7 +59,7 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = ''):
             <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.min.js" integrity="sha512-A+6SvPGkIN9Rf0mUXmW4xh7rDvALXf/f0VtOUiHlDUSPknu2kcfz1KzLpOJyL2pO+nZS13hhIjLqVgiQExLJrw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         '''
 
-        monaco_editor_top = '<a href="javascript:opennamu_edit_turn_off_monaco();">(' + load_lang('turn_off_monaco') + ')</a>'
+        monaco_editor_top += '<a href="javascript:opennamu_edit_turn_off_monaco();">(' + load_lang('turn_off_monaco') + ')</a>'
         
         if flask.request.cookies.get('main_css_darkmode', '0') == '1':
             monaco_thema = 'vs-dark'
@@ -76,7 +78,11 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = ''):
 
     return add_get_file + '''
         <textarea style="display: none;" id="opennamu_edit_origin" name="doc_data_org">''' + html.escape(data_main) + '''</textarea>
-        <div>''' + monaco_editor_top + ' ' + edit_button('opennamu_edit_textarea', 'opennamu_monaco_editor') + '''</div>
+        <div>
+            ''' + monaco_editor_top + '''
+            <hr class="main_hr">
+            ''' + edit_button() + '''
+        </div>
         
         <div id="opennamu_monaco_editor" class="''' + textarea_size + '''" ''' + monaco_display + '''></div>
         <textarea id="opennamu_edit_textarea" ''' + editor_display + ''' class="''' + textarea_size + '''" name="content" placeholder="''' + p_text + '''">''' + html.escape(data_main) + '''</textarea>
@@ -87,7 +93,7 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = ''):
 
         <script>
             do_stop_exit();
-            do_paste_image('opennamu_edit_textarea', 'opennamu_monaco_editor');
+            do_paste_image();
             ''' + add_script + '''
         </script>
                         
@@ -203,9 +209,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 send,
                 leng
             )
-            
-            curs.execute(db_change("delete from back where link = ?"), [name])
-            curs.execute(db_change("delete from back where title = ? and type = 'no'"), [name])
             
             render_set(
                 doc_name = name,

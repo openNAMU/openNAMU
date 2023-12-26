@@ -11,6 +11,9 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
         category_total = ''
         file_data = ''
 
+        doc_type = ''
+        now_time = get_time()
+
         ip = ip_check()
             
         uppage = re.sub(r"/([^/]+)$", '', name)
@@ -25,6 +28,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
 
         if re.search(r'^category:', name):
             name_view = name
+            doc_type = 'category'
 
             category_doc = ''
             category_sub = ''
@@ -79,6 +83,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                 ''
         elif re.search(r"^user:([^/]*)", name):
             name_view = name
+            doc_type = 'user'
 
             match = re.search(r"^user:([^/]*)", name)
             
@@ -109,9 +114,10 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                 <hr class="main_hr">
             '''
             if name == 'user:' + user_name:
-                menu += [['w/' + url_pas(name) + '/' + url_pas(get_time().split()[0]), load_lang('today_doc')]]
+                menu += [['w/' + url_pas(name) + '/' + url_pas(now_time.split()[0]), load_lang('today_doc')]]
         elif re.search(r"^file:", name):
             name_view = name
+            doc_type = 'file'
 
             mime_type = re.search(r'([^.]+)$', name)
             if mime_type:
@@ -278,10 +284,23 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
         div = file_data + user_doc + end_data + category_total
 
         if num != '':
-            curs.execute(db_change('select data from other where name = "phrase_old_page_warring"'))
+            curs.execute(db_change('select data from other where name = "phrase_old_page_warning"'))
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
                 div = db_data[0][0] + '<hr class="main_hr">' + div
+
+            doc_type = 'rev'
+        
+        if doc_type == '':
+            curs.execute(db_change('select data from other where name = "outdated_doc_warning_date"'))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '' and r_date != 0:
+                time_1 = datetime.datetime.strptime(r_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days = int(number_check(db_data[0][0])))
+                time_2 = datetime.datetime.strptime(now_time, '%Y-%m-%d %H:%M:%S')
+                if time_2 > time_1:
+                    curs.execute(db_change('select data from other where name = "outdated_doc_warning"'))
+                    db_data = curs.fetchall()
+                    div = (db_data[0][0] if db_data and db_data[0][0] != '' else load_lang('old_page_warning')) + '<hr class="main_hr">' + div
 
         curs.execute(db_change("select data from other where name = 'body'"))
         body = curs.fetchall()

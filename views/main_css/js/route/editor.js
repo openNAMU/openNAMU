@@ -1,6 +1,9 @@
 "use strict";
 
-function do_insert_data(name, data, monaco_name) {
+function do_insert_data(data) {
+    const name = 'opennamu_edit_textarea';
+    const monaco_name = 'opennamu_monaco_editor';
+
     if(!document.getElementById(monaco_name)) {
         // https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
         if(document.selection) {
@@ -36,7 +39,10 @@ function do_insert_data(name, data, monaco_name) {
 }
 
 // 아직 개편이 더 필요함
-function do_paste_image(name, monaco_name) {
+function do_paste_image() {
+    const name = 'opennamu_edit_textarea';
+    const monaco_name = 'opennamu_monaco_editor';
+
     window.addEventListener('DOMContentLoaded', async function() {
         let set = await opennamu_get_main_skin_set("main_css_image_paste");
         if(set === 'use') {

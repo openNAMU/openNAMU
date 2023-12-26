@@ -53,6 +53,7 @@ def edit_delete(name):
 
                 curs.execute(db_change("delete from back where link = ?"), [name])
                 curs.execute(db_change("delete from data where title = ?"), [name])
+                
                 conn.commit()
 
             curs.execute(db_change('select data from other where name = "count_all_title"'))

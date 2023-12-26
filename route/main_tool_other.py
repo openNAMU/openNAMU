@@ -29,6 +29,7 @@ def main_tool_other():
                     <li><a href="/list/document/long">''' + load_lang('long_page') + '''</a></li>
                     <li><a href="/list/document/short">''' + load_lang('short_page') + '''</a></li>
                     <li><a href="/list/document/old">''' + load_lang('old_page') + '''</a></li>
+                    <li><a href="/list/document/no_link">''' + load_lang('no_link_document_list') + '''</a></li>
                 </ul>
                 <h3>''' + load_lang('user') + '''</h3>
                 <ul class="opennamu_ul">

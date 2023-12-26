@@ -8,7 +8,6 @@ def main_sys_restart():
         if flask.request.method == 'POST':
             admin_check(None, 'restart')
 
-            print('----')
             print('Restart')
 
             python_ver = ''

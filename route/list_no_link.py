@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def list_old_page(num = 1):
+def list_no_link(num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
         
@@ -8,7 +8,7 @@ def list_old_page(num = 1):
         
         div = '<ul class="opennamu_ul">'
         
-        curs.execute(db_change("select doc_name, set_data from data_set where set_name = 'last_edit' and doc_rev = '' order by set_data asc limit ?, 50"), [sql_num])
+        curs.execute(db_change("select doc_name, set_data from data_set where set_name = 'link_count' and doc_rev = '' and set_data = '0' limit ?, 50"), [sql_num])
         n_list = curs.fetchall()
         for data in n_list:
             div += '<li>'
@@ -21,10 +21,10 @@ def list_old_page(num = 1):
 
             div += '</li>'
         
-        div += '</ul>' + next_fix('/list/document/old/', num, n_list)
+        div += '</ul>' + next_fix('/list/document/no_link/', num, n_list)
         
         return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('old_page'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            imp = [load_lang('no_link_document_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = div,
             menu = [['other', load_lang('return')]]
         ))

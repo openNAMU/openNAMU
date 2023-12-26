@@ -37,34 +37,31 @@ def edit_revert(name, num):
             if do_edit_filter(data[0][0]) == 1:
                 return re_error('/error/21')
 
-            curs.execute(db_change("delete from back where link = ?"), [name])
+            curs.execute(db_change("select data from data where title = ?"), [name])
+            data_old = curs.fetchall()
+            if data_old:
+                leng = leng_check(len(data_old[0][0]), len(data[0][0]))
+                curs.execute(db_change("update data set data = ? where title = ?"), [data[0][0], name])
+            else:
+                leng = '+' + str(len(data[0][0]))
+                curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, data[0][0]])
 
-            if data:
-                curs.execute(db_change("select data from data where title = ?"), [name])
-                data_old = curs.fetchall()
-                if data_old:
-                    leng = leng_check(len(data_old[0][0]), len(data[0][0]))
-                    curs.execute(db_change("update data set data = ? where title = ?"), [data[0][0], name])
-                else:
-                    leng = '+' + str(len(data[0][0]))
-                    curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, data[0][0]])
+            history_plus(
+                name,
+                data[0][0],
+                get_time(),
+                ip_check(),
+                flask.request.form.get('send', ''),
+                leng,
+                t_check = 'r' + str(num),
+                mode = 'revert'
+            )
 
-                history_plus(
-                    name,
-                    data[0][0],
-                    get_time(),
-                    ip_check(),
-                    flask.request.form.get('send', ''),
-                    leng,
-                    t_check = 'r' + str(num),
-                    mode = 'revert'
-                )
-
-                render_set(
-                    doc_name = name,
-                    doc_data = data[0][0],
-                    data_type = 'backlink'
-                )
+            render_set(
+                doc_name = name,
+                doc_data = data[0][0],
+                data_type = 'backlink'
+            )
 
             conn.commit()
 

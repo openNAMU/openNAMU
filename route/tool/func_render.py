@@ -40,25 +40,11 @@ class class_do_render:
             rep_data = db_data[0][0] if db_data else 'namumark'
 
         if rep_data == 'namumark' or rep_data == 'namumark_beta':
-            data_end = class_do_render_namumark(
-                curs,
-                doc_name,
-                doc_data,
-                doc_set,
-                self.lang_data
-            )()
+            data_end = class_do_render_namumark(curs, doc_name, doc_data, doc_set, self.lang_data)()
         elif rep_data == 'raw':
-            data_end = [
-                html.escape(doc_data).replace('\n', '<br>'), 
-                '', 
-                {}
-            ]
+            data_end = [html.escape(doc_data).replace('\n', '<br>'), '', {}]
         else:
-            data_end = [
-                doc_data, 
-                '', 
-                {}
-            ]
+            data_end = [doc_data, '', {}]
 
         if data_type == 'thread' or data_type == 'api_thread':
             def do_thread_a_change(match):
@@ -73,31 +59,32 @@ class class_do_render:
                 else:
                     return ''
 
-            data_end[0] = re.sub(
-                r'&lt;(topic_a(?:_post|_thread)?)&gt;((?:(?!&lt;\/topic_a(?:_post|_thread)?&gt;).)+)&lt;\/topic_a(?:_post|_thread)?&gt;',
-                do_thread_a_change,
-                data_end[0]
-            )
-            data_end[0] = re.sub(
-                r'&lt;topic_call&gt;@(?P<in>(?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;',
-                '<a href="/w/user:\\g<in>">@\\g<in></a>',
-                data_end[0]
-            )
+            data_end[0] = re.sub(r'&lt;(topic_a(?:_post|_thread)?)&gt;((?:(?!&lt;\/topic_a(?:_post|_thread)?&gt;).)+)&lt;\/topic_a(?:_post|_thread)?&gt;', do_thread_a_change, data_end[0])
+            data_end[0] = re.sub(r'&lt;topic_call&gt;@(?P<in>(?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;', '<a href="/w/user:\\g<in>">@\\g<in></a>', data_end[0])
 
         if data_type == 'backlink':
-            if 'backlink' in data_end[2]:
-                backlink = data_end[2]['backlink']
-            else:
-                backlink = []
+            curs.execute(db_change("delete from back where link = ?"), [doc_name])
+            curs.execute(db_change("delete from back where title = ? and type = 'no'"), [doc_name])
 
+            curs.execute(db_change("delete from data_set where doc_name = ? and set_name = 'link_count'"), [doc_name])
+            curs.execute(db_change("delete from data_set where doc_name = ? and set_name = 'doc_type'"), [doc_name])
+
+            backlink = data_end[2]['backlink'] if 'backlink' in data_end[2] else []
             if backlink != []:
                 curs.executemany(db_change("insert into back (link, title, type, data) values (?, ?, ?, ?)"), data_end[2]['backlink'])
                 curs.execute(db_change("delete from back where title = ? and type = 'no'"), [doc_name])
 
+            link_count = 0
+            if 'link_count' in data_end[2]:
+                link_count = data_end[2]['link_count']
+
+            curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'link_count', ?)"), [doc_name, link_count])
+
+            if 'redirect' in data_end[2] and data_end[2]['redirect'] == 1:
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', 'redirect')"), [doc_name])
+            else:
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', '')"), [doc_name])
+            
             self.conn.commit()
 
-        return [
-            data_end[0], 
-            data_end[1],
-            data_end[2]
-        ]
+        return [data_end[0], data_end[1], data_end[2]]
