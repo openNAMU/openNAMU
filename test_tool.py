@@ -17,14 +17,10 @@ load_db = get_db_connect()
 conn = load_db.__enter__()
 curs = conn.cursor()
 
-print('----')
 print('1. Add virtual doc')
 
-print('----')
 what_i_do = input('Select : ')
-
 if what_i_do == '1':
-    print('----')
     doc_count = int(input('Count : '))
     
     for for_a in range(doc_count):

@@ -176,8 +176,6 @@ with get_db_connect() as conn:
     sql_data = curs.fetchall()
     app.secret_key = sql_data[0][0]
 
-    print('----')
-
     # Init-DB_Data
     server_set = {}
     server_set_var = get_init_set_list()
@@ -216,13 +214,9 @@ with get_db_connect() as conn:
 
         server_set[i] = server_set_val
 
-    print('----')
-
     # Init-DB_care
     if data_db_set['type'] == 'sqlite':
         def back_up(back_time, back_up_where):
-            print('----')
-
             try:
                 shutil.copyfile(
                     data_db_set['name'] + '.db', 
@@ -317,6 +311,9 @@ app.route('/filter/extension_filter/del/<everything:name>', defaults = { 'tool' 
 app.route('/list/document/old')(list_old_page)
 app.route('/list/document/old/<int:num>')(list_old_page)
 
+app.route('/list/document/no_link')(list_no_link)
+app.route('/list/document/no_link/<int:num>')(list_no_link)
+
 app.route('/list/document/acl')(list_acl)
 app.route('/list/document/acl/<int:arg_num>')(list_acl)
 
@@ -403,7 +400,9 @@ app.route('/history_add/<everything:name>', methods = ['POST', 'GET'])(recent_hi
 
 # Func-view
 app.route('/xref/<everything:name>')(view_xref)
+app.route('/xref_page/<int:num>/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
+app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
 app.route('/raw/<everything:name>')(view_raw_2)
 app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 1 })(view_raw_2)

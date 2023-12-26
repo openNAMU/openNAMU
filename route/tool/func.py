@@ -19,7 +19,6 @@ with open('version.json', encoding = 'utf8') as file_data:
 print('Version : ' + version_list['beta']['r_ver'])
 print('DB set version : ' + version_list['beta']['c_ver'])
 print('Skin set version : ' + version_list['beta']['s_ver'])
-print('----')
 
 # Init-PIP_Install
 data_up_date = 1
@@ -67,8 +66,6 @@ if data_up_date == 1:
         print('Help : try "python3 -m pip install -r requirements.txt"')
 else:
     print('PIP check pass')
-    
-print('----')
 
 # Init-Load
 from .func_tool import *
@@ -352,9 +349,7 @@ def update(ver_num, set_data):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        print('----')
         # 업데이트 하위 호환 유지 함수
-
         if ver_num < 3160027:
             print('Add init set')
             set_init()
@@ -749,22 +744,12 @@ def leng_check(A, B):
     # A -> old
     return '0' if A == B else (('-' + str(A - B)) if A > B else ('+' + str(B - A)))
 
-def number_check(data, f=False):
+def number_check(data, f = 0):
     try:
-        if f:
-            float(data)
-        else:
-            int(data)
+        float(data) if f == 1 else int(data)
         return data
     except:
         return '1'
-    
-def check_int(data):
-    try:
-        int(data)
-        return data
-    except:
-        return ''
     
 def redirect(data = '/'):
     return flask.redirect(load_domain('full') + data)
@@ -839,7 +824,7 @@ def get_tool_js_safe(data):
 
     return data
 
-def edit_button(ob_name = 'opennamu_edit_textarea', monaco_ob_name = 'opennamu_monaco_editor'):
+def edit_button():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -852,7 +837,7 @@ def edit_button(ob_name = 'opennamu_edit_textarea', monaco_ob_name = 'opennamu_m
 
         data = ''
         for insert_data in insert_list:
-            data += '<a href="javascript:do_insert_data(\'' + ob_name + '\', \'' + get_tool_js_safe(insert_data[0]) + '\', \'' + monaco_ob_name + '\');">(' + html.escape(insert_data[1]) + ')</a> '
+            data += '<a href="javascript:do_insert_data(\'' + get_tool_js_safe(insert_data[0]) + '\');">(' + html.escape(insert_data[1]) + ')</a> '
 
         data += (' ' if data != '' else '') + '<a href="/filter/edit_top">(' + load_lang('add') + ')</a>'
         data += '<hr class="main_hr">'
@@ -1043,7 +1028,7 @@ def wiki_css(data):
     data_css = ''
     data_css_add = ''
 
-    data_css_ver = '182'
+    data_css_ver = '184'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:
@@ -1540,7 +1525,6 @@ def send_email(who, title, data):
 
             return 1
         except Exception as e:
-            print('----')
             print('Error : email send error')
             print(e)
 
@@ -2517,7 +2501,7 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
             mode = mode if not re.search('^user:', title) else 'user'
 
         send = re.sub(r'\(|\)|<|>', '', send)
-        send = send[:128] if len(send) > 128 else send
+        send = send[:512] if len(send) > 512 else send
         send = send + ' (' + t_check + ')' if t_check != '' else send
 
         if mode != 'add' and mode != 'user':
@@ -2531,15 +2515,13 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
             data_set_exist = '' if t_check != 'delete' else '1'
 
             curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'last_edit'"), [title])
-            db_data = curs.fetchall()
-            if db_data:
+            if curs.fetchall():
                 curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'last_edit'"), [date, data_set_exist, title])
             else:
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'last_edit', ?)"), [title, data_set_exist, date])
 
             curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'length'"), [title])
-            db_data = curs.fetchall()
-            if db_data:
+            if curs.fetchall():
                 curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'length'"), [len(data), data_set_exist, title])
             else:
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'length', ?)"), [title, data_set_exist, len(data)])
