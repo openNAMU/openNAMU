@@ -23,7 +23,6 @@ function ringo_get_post() {
 function ringo_do_skin_set() {
     let cookies = document.cookie;
     if(!cookies.match(ringo_do_regex_data('main_css_use_sys_darkmode')) || (cookies.match(ringo_do_regex_data('main_css_use_sys_darkmode')) && cookies.match(ringo_do_regex_data('main_css_use_sys_darkmode'))[1] === '1')) {
-        console.log('test');
         if(window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.cookie = 'main_css_darkmode=1; path=/';
         } else {

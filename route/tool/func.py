@@ -824,7 +824,7 @@ def get_tool_js_safe(data):
 
     return data
 
-def edit_button(ob_name = 'opennamu_edit_textarea', monaco_ob_name = 'opennamu_monaco_editor'):
+def edit_button():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -837,7 +837,7 @@ def edit_button(ob_name = 'opennamu_edit_textarea', monaco_ob_name = 'opennamu_m
 
         data = ''
         for insert_data in insert_list:
-            data += '<a href="javascript:do_insert_data(\'' + ob_name + '\', \'' + get_tool_js_safe(insert_data[0]) + '\', \'' + monaco_ob_name + '\');">(' + html.escape(insert_data[1]) + ')</a> '
+            data += '<a href="javascript:do_insert_data(\'' + get_tool_js_safe(insert_data[0]) + '\');">(' + html.escape(insert_data[1]) + ')</a> '
 
         data += (' ' if data != '' else '') + '<a href="/filter/edit_top">(' + load_lang('add') + ')</a>'
         data += '<hr class="main_hr">'
@@ -1028,7 +1028,7 @@ def wiki_css(data):
     data_css = ''
     data_css_add = ''
 
-    data_css_ver = '182'
+    data_css_ver = '184'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:
