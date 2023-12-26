@@ -2243,17 +2243,25 @@ class class_do_render_namumark:
             
         self.render_data = re.sub(r'(<a(?: [^<>]*)?>|<\/a>)', do_render_last_a_link, self.render_data)
         
+        def do_render_last_toc_filter(match):
+            data = match.group(1).split(' ')
+            if data[0] == 'a' or data[0] == '/a':
+                return '<' + match[1] + '>'
+            else:
+                return ''
+
         # add toc
         def do_render_last_toc(match):
             data = match.group(1)
-
-            data = re.sub(r'<[^<>]*>', '', data)
+            
+            data_sub = re.sub(r'<([^<>]*)>', '', data)
+            data = re.sub(r'<([^<>]*)>', do_render_last_toc_filter, data)
 
             heading_regex = r'<h([1-6])>'
             heading_data = re.search(heading_regex, self.render_data)
             if heading_data:
                 heading_data = heading_data.group(1)
-                self.render_data = re.sub(heading_regex, lambda x : ('<h' + heading_data + ' id="' + data + '">'), self.render_data, 1)
+                self.render_data = re.sub(heading_regex, lambda x : ('<h' + heading_data + ' id="' + data_sub + '">'), self.render_data, 1)
             
             return data
 
