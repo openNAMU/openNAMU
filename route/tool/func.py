@@ -968,10 +968,7 @@ def load_lang(data, safe = 0):
         else:
             lang_list = os.listdir('lang')
             if (lang_name + '.json') in lang_list:
-                lang = json.loads(open(
-                    os.path.join('lang', lang_name + '.json'), 
-                    encoding = 'utf8'
-                ).read())
+                lang = json.loads(open(os.path.join('lang', lang_name + '.json'), encoding = 'utf8').read())
                 global_lang[lang_name] = lang
             else:
                 lang = {}

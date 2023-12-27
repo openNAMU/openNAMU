@@ -1079,6 +1079,11 @@ class class_do_render_namumark:
 
                         link_sub_storage = link_inter_icon + link_sub_storage
 
+                        self.curs.execute(db_change("select plus_t from html_filter where kind = 'inter_wiki_sub' and html = ?"), [link_inter_name])
+                        db_data = self.curs.fetchall()
+                        if db_data and db_data[0][0] == 'under_bar':
+                            link_main = link_main.replace('%20', '_')
+
                         data_name = self.get_tool_data_storage('<a class="opennamu_link_inter" title="' + link_title + '" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
                     
                         self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
@@ -1549,6 +1554,11 @@ class class_do_render_namumark:
                         link_inter_icon = db_data[0][1]
 
                     link_sub_storage = link_inter_icon + link_sub_storage
+
+                    self.curs.execute(db_change("select plus_t from html_filter where kind = 'inter_wiki_sub' and html = ?"), [link_inter_name])
+                    db_data = self.curs.fetchall()
+                    if db_data and db_data[0][0] == 'under_bar':
+                        link_main = link_main.replace('%20', '_')
 
                     self.data_redirect = 1
                     if 'doc_from' in self.doc_set:

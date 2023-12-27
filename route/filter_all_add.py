@@ -15,9 +15,14 @@ def filter_all_add(tool, name = None):
             if tool in ('inter_wiki', 'outer_link'):
                 link = flask.request.form.get('link', 'test')
                 icon = flask.request.form.get('icon', '')
+                inter_type = flask.request.form.get('inter_type', '')
 
                 curs.execute(db_change("delete from html_filter where html = ? and kind = ?"), [title, tool])
                 curs.execute(db_change('insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, ?)'), [title, link, icon, tool])
+                if tool == 'inter_wiki':
+                    curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki_sub'"), [title])
+                    curs.execute(db_change('insert into html_filter (html, plus, plus_t, kind) values (?, "inter_wiki_type", ?, "inter_wiki_sub")'), [title, inter_type])
+                
                 admin_check(None, tool + ' edit')
             elif tool == 'edit_filter':
                 sec = flask.request.form.get('second', '0')
@@ -98,8 +103,25 @@ def filter_all_add(tool, name = None):
                     exist = curs.fetchall()
                     value = exist[0] if exist else value
 
+                select = ''
                 if tool == 'inter_wiki':
                     ex = 'https://namu.wiki/w/'
+
+                    select = ['', '']
+                    curs.execute(db_change("select plus_t from html_filter where kind = 'inter_wiki_sub' and html = ?"), [name])
+                    db_data = curs.fetchall()
+                    if db_data and db_data[0][0] == 'under_bar':
+                        select = ['', 'selected']
+
+                    select = '''
+                        <hr class="main_hr">
+                        ''' + load_lang('inter_wiki_space_change') + '''
+                        <hr class="main_hr">
+                        <select name="inter_type">
+                            <option ''' + select[0] + ''' value="url_encode">%20</option>
+                            <option ''' + select[1] + ''' value="under_bar">_</option>
+                        </select>
+                    '''
                 else:
                     ex = 'youtube.com'
 
@@ -116,6 +138,7 @@ def filter_all_add(tool, name = None):
                     ''' + load_lang('icon') + ''' (''' + ('HTML' if tool == 'inter_wiki' else load_lang('html_or_link')) + ''') (''' + load_lang('link') + ' EX' + ''' : /image/Test.svg)
                     <hr class="main_hr">
                     <input value="''' + html.escape(value[2]) + '''" type="text" name="icon">
+                    ''' + select + '''
                 '''
             elif tool == 'edit_filter':            
                 curs.execute(db_change("select plus, plus_t from html_filter where html = ? and kind = 'regex_filter'"), [name])
