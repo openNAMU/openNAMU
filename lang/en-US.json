@@ -247,6 +247,7 @@
         "main_user_name" : "Main user name",
         "change_user_name" : "Change main user name",
         "sub_user_name" : "Sub user name",
+        "start_with_search" : "Search from the first letter",
         "_comment_" : "BBS",
             "bbs" : "BBS",
             "bbs_main" : "BBS main",
