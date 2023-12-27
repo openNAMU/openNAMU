@@ -12,10 +12,7 @@ def list_admin_auth_use(arg_num = 1, arg_search = 'normal'):
             if arg_search == 'normal':
                 curs.execute(db_change("select who, what, time from re_admin order by time desc limit ?, 50"), [sql_num])
             else:
-                curs.execute(
-                    db_change("select who, what, time from re_admin where what like ? order by time desc limit ?, 50"),
-                    [arg_search + "%", sql_num]
-                )
+                curs.execute(db_change("select who, what, time from re_admin where what like ? order by time desc limit ?, 50"), [arg_search + "%", sql_num])
 
             list_data = '<ul class="opennamu_ul">'
 
@@ -41,7 +38,7 @@ def list_admin_auth_use(arg_num = 1, arg_search = 'normal'):
                 imp = [load_lang('authority_use_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input class="opennamu_width_200" name="search" value="''' + arg_search + '''">
+                        <input class="opennamu_width_200" name="search" placeholder="''' + load_lang('start_with_search') + '''" value="''' + arg_search + '''">
                         <button type="submit">''' + load_lang('search') + '''</button>
                     </form>
                     <hr class="main_hr">

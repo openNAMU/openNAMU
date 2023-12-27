@@ -575,5 +575,6 @@
     "math_scroll": "Math 매크로에서 스크롤 사용",
     "remove_blind_thread": "숨겨진 토론 보이지 않기",
     "trace": "추적",
-    "view_history": "문서 열람 추적 사용"
+    "view_history": "문서 열람 추적 사용",
+    "start_with_search" : "첫 글자부터 검색"
 }
