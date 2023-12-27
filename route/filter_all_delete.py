@@ -9,6 +9,7 @@ def filter_all_delete(tool, name = 'Test'):
 
         if tool == 'inter_wiki':
             curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki'"), [name])
+            curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki_sub'"), [name])
         elif tool == 'edit_filter':
             curs.execute(db_change("delete from html_filter where html = ? and kind = 'regex_filter'"), [name])
         elif tool == 'name_filter':
