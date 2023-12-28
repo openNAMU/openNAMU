@@ -177,6 +177,12 @@ def edit(name = 'Test', section = 0, do_type = ''):
             else:
                 leng = '+' + str(len(content))
 
+            curs.execute(db_change("select data from other where name = 'document_content_max_length'"))
+            db_data_3 = curs.fetchall()
+            if db_data_3 and db_data_3[0][0] != '':
+                if int(number_check(db_data_3[0][0])) < len(content):
+                    return re_error('/error/44')
+
             curs.execute(db_change("select data from other where name = 'edit_timeout'"))
             db_data_2 = curs.fetchall()
             db_data_2 = '' if not db_data_2 else number_check(db_data_2[0][0])
