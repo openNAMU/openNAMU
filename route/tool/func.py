@@ -2655,8 +2655,12 @@ def re_error(data):
             elif num == 43:
                 title = load_lang('application_submitted')
                 sub_title = title
-
                 data = load_lang('waiting_for_approval')
+            elif num == 44:
+                curs.execute(db_change("select data from other where name = 'document_content_max_length'"))
+                db_data = curs.fetchall()
+                db_data = '' if not db_data else db_data[0][0]
+                data = load_lang('error_content_length_too_long') + db_data
             else:
                 data = '???'
 

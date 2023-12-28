@@ -41,6 +41,7 @@ def main_setting_main(db_set):
             37 : ['move_with_redirect', ''],
             38 : ['slow_thread', ''],
             39 : ['edit_timeout', '5'],
+            40 : ['document_content_max_length', '']
         }
 
         if flask.request.method == 'POST':
@@ -258,6 +259,11 @@ def main_setting_main(db_set):
                         <span>''' + load_lang('edit_timeout') + '''</span> (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('linux_only') + ''')
                         <hr class="main_hr">
                         <input name="edit_timeout" value="''' + html.escape(d_list[39]) + '''">
+                        <hr class="main_hr">
+
+                        <span>''' + load_lang('document_content_max_length') + '''</span> (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
+                        <hr class="main_hr">
+                        <input name="document_content_max_length" value="''' + html.escape(d_list[40]) + '''">
                         <hr class="main_hr">
 
                         <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
