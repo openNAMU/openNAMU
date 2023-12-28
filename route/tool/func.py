@@ -1323,6 +1323,11 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                     'category' : load_lang('category')
                 }
 
+                curs.execute(db_change('select data from other where name = "category_text"'))
+                db_data = curs.fetchall()
+                if db_data and db_data[0][0] != '':
+                    render_lang_data['category'] = db_data[0][0]
+
                 get_class_render = class_do_render(conn, render_lang_data).do_render(doc_name, doc_data, data_type, data_in)
                 
                 if 'include' in get_class_render[2]:

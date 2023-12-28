@@ -242,9 +242,22 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                     if curs.fetchall():
                         break
 
+                redirect_text = '{0} ➤ {1}'
+
+                curs.execute(db_change('select data from other where name = "redirect_text"'))
+                db_data = curs.fetchall()
+                if db_data and db_data[0][0] != '':
+                    redirect_text = db_data[0][0]
+
+                try:
+                    redirect_text = redirect_text.format('<a href="/w_from/' + url_pas(last_page) + '">' + html.escape(last_page) + '</a>', '<b>' + html.escape(name) + '</b>')
+                except:
+                    redirect_text = '{0} ➤ {1}'
+                    redirect_text = redirect_text.format('<a href="/w_from/' + url_pas(last_page) + '">' + html.escape(last_page) + '</a>', '<b>' + html.escape(name) + '</b>')
+
                 end_data = '''
                     <div id="redirect">
-                        <a href="/w_from/''' + url_pas(last_page) + '''">''' + html.escape(last_page) + '''</a> ➤ <b>''' + html.escape(name) + '''</b>
+                        ''' + redirect_text + '''
                     </div>
                     <hr class="main_hr">
                 ''' + end_data
