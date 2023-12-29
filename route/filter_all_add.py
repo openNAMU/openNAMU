@@ -78,6 +78,10 @@ def filter_all_add(tool, name = None):
                 elif tool == 'extension_filter':
                     admin_check(None, 'extension_filter edit')
                     type_d = 'extension'
+                elif tool == 'template':
+                    admin_check(None, 'template_document edit')
+                    type_d = 'template'
+                    plus_d = flask.request.form.get('exp', 'test')
                 else:
                     admin_check(None, 'edit_top edit')
                     type_d = 'edit_top'
@@ -160,12 +164,11 @@ def filter_all_add(tool, name = None):
                         ['31104000', load_lang('360_day')],
                         ['0', load_lang('limitless')]
                     ]
-                    for i in t_data:
-                        insert_data += '<a href="javascript:insert_v(\'second\', \'' + i[0] + '\')">(' + i[1] + ')</a> '
+                    insert_data += ''.join(['<a href="javascript:opennamu_insert_v(\'second\', \'' + for_a[0] + '\')">(' + for_a[1] + ')</a> ' for for_a in t_data])
 
                 title = load_lang('edit_filter_add')
                 form_data = '''
-                    <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''
+                    ''' + insert_data + '''
                     <hr class="main_hr">
                     <input placeholder="''' + load_lang('second') + '''" id="second" name="second" type="text" value="''' + html.escape(time_data) + '''">
                     <hr class="main_hr">
@@ -229,17 +232,33 @@ def filter_all_add(tool, name = None):
                         ''' + ''.join(['<option ' + for_a[0] + ' value=' + for_a[1] + '>' + ('normal' if for_a[1] == '' else for_a[1]) + '</option>' for for_a in acl_list]) + '''
                     </select>
                 '''
+            elif tool == 'template':
+                title = load_lang('template_document_add')
+
+                value = ''
+                if name:
+                    curs.execute(db_change("select plus from html_filter where html = ? and kind = 'template'"), [name])
+                    exist = curs.fetchall()
+                    value = exist[0][0] if exist else '' 
+
+                form_data = '' + \
+                    load_lang('template') + \
+                    '<hr class="main_hr">' + \
+                    '<input value="' + html.escape(name) + '" type="text" name="title">' + \
+                    '<hr class="main_hr">' + \
+                    load_lang('explanation') + \
+                    '<hr class="main_hr">' + \
+                    '<input value="' + html.escape(value) + '" type="text" name="exp">' + \
+                    '<hr class="main_hr">' + \
+                ''
             else:
                 title = load_lang('edit_tool_add')
+                
+                value = ''
                 if name:
                     curs.execute(db_change("select plus from html_filter where html = ? and kind = 'edit_top'"), [name])
                     exist = curs.fetchall()
-                    if exist:
-                        value = exist[0][0]
-                    else:
-                        value = ''
-                else:
-                    value = ''
+                    value = exist[0][0] if exist else ''    
 
                 form_data = '''
                     ''' + load_lang('title') + '''

@@ -2,6 +2,8 @@ from .tool.func import *
 
 def main_tool_redirect(num = 1, add_2 = ''):
     with get_db_connect() as conn:
+        curs = conn.cursor()
+
         title_list = {
             0 : [load_lang('document_name'), '/acl', load_lang('acl')],
             1 : [0, '/list/user/check', load_lang('check')],
@@ -49,11 +51,22 @@ def main_tool_redirect(num = 1, add_2 = ''):
                 if num == 15:
                     plus = '<input type="checkbox" name="regex"> ' + load_lang('regex') + '<hr class="main_hr">'
 
+                top_plus = ''
+                if num == 13:
+                    curs.execute(db_change("select html, plus from html_filter where kind = 'template'"))
+                    db_data = curs.fetchall()
+                    for for_a in db_data:
+                        top_plus += '' + \
+                            '<a href="javascript:opennamu_insert_v(\'data_field\', \'' + get_tool_js_safe(for_a[0]) + '\')">' + html.escape(for_a[0]) + '</a> : ' + html.escape(for_a[1]) + \
+                            '<hr class="main_hr">' + \
+                        ''
+
                 return easy_minify(flask.render_template(skin_check(),
                     imp = [title_list[num][2], wiki_set(), wiki_custom(), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
-                            <input placeholder="''' + placeholder + '''" name="name" type="text">
+                            ''' + top_plus + '''
+                            <input placeholder="''' + placeholder + '''" id="data_field" name="name" type="text">
                             <hr class="main_hr">
                             ''' + plus + '''
                             <button type="submit">''' + load_lang('go') + '''</button>

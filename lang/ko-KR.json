@@ -132,7 +132,7 @@
     "update_error": "자동 업데이트가 지원되지 않습니다.",
     "need_document": "필요한 문서들",
     "sub": "하위",
-    "template": "틀",
+    "template": "템플릿 문서",
     "user_document_acl": "사용자 문서 ACL",
     "password_confirm": "비밀번호 확인",
     "pinned": "고정",

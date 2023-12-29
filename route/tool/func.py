@@ -1025,7 +1025,7 @@ def wiki_css(data):
     data_css = ''
     data_css_add = ''
 
-    data_css_ver = '184'
+    data_css_ver = '185'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:

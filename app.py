@@ -280,11 +280,17 @@ app.route('/filter/document/del/<everything:name>', defaults = { 'tool' : 'docum
 
 app.route('/filter/edit_top', defaults = { 'tool' : 'edit_top' })(filter_all)
 app.route('/filter/edit_top/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'edit_top' })(filter_all_add)
+app.route('/filter/edit_top/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'edit_top' })(filter_all_add)
 app.route('/filter/edit_top/del/<everything:name>', defaults = { 'tool' : 'edit_top' })(filter_all_delete)
 
 app.route('/filter/image_license', defaults = { 'tool' : 'image_license' })(filter_all)
 app.route('/filter/image_license/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'image_license' })(filter_all_add)
 app.route('/filter/image_license/del/<everything:name>', defaults = { 'tool' : 'image_license' })(filter_all_delete)
+
+app.route('/filter/template', defaults = { 'tool' : 'template' })(filter_all)
+app.route('/filter/template/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'template' })(filter_all_add)
+app.route('/filter/template/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'template' })(filter_all_add)
+app.route('/filter/template/del/<everything:name>', defaults = { 'tool' : 'template' })(filter_all_delete)
 
 app.route('/filter/edit_filter', defaults = { 'tool' : 'edit_filter' })(filter_all)
 app.route('/filter/edit_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'edit_filter' })(filter_all_add)

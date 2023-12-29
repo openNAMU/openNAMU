@@ -24,6 +24,10 @@ def filter_all_delete(tool, name = 'Test'):
             curs.execute(db_change("delete from html_filter where html = ? and kind = 'extension'"), [name])
         elif tool == 'document':
             curs.execute(db_change("delete from html_filter where html = ? and kind = 'document'"), [name])
+        elif tool == 'outer_link':
+            curs.execute(db_change("delete from html_filter where html = ? and kind = 'outer_link'"), [name])
+        elif tool == 'template':
+            curs.execute(db_change("delete from html_filter where html = ? and kind = 'template'"), [name])
         else:
             curs.execute(db_change("delete from html_filter where html = ? and kind = 'edit_top'"), [name])
 
