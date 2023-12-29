@@ -7,8 +7,10 @@ def list_admin_auth_use(arg_num = 1, arg_search = 'normal'):
         sql_num = (arg_num * 50 - 50) if arg_num * 50 > 0 else 0
 
         if flask.request.method == 'POST':
-            return redirect('/list/admin/auth_use/' + url_pas(flask.request.form.get('search', 'normal')) + '/1')
+            return redirect('/list/admin/auth_use_page/1/' + url_pas(flask.request.form.get('search', 'normal')))
         else:
+            arg_search = 'normal' if arg_search == '' else arg_search
+            
             if arg_search == 'normal':
                 curs.execute(db_change("select who, what, time from re_admin order by time desc limit ?, 50"), [sql_num])
             else:
@@ -30,7 +32,7 @@ def list_admin_auth_use(arg_num = 1, arg_search = 'normal'):
                 list_data += '<li>' + ip_pas(data[0]) + ' | ' + html.escape(do_data) + ' | ' + data[2] + '</li>'
 
             list_data += '</ul>'
-            list_data += next_fix('/list/admin/auth_use/' + url_pas(arg_search) + '/', arg_num, get_list)
+            list_data += get_next_page_bottom('/list/admin/auth_use_page/{}/' + url_pas(arg_search), arg_num, get_list)
 
             arg_search = html.escape(arg_search) if arg_search != 'normal' else ''
 

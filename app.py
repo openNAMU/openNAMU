@@ -341,7 +341,7 @@ app.route('/list/file/<int:arg_num>')(list_image_file)
 app.route('/list/admin')(list_admin)
 
 app.route('/list/admin/auth_use', methods = ['POST', 'GET'])(list_admin_auth_use)
-app.route('/list/admin/auth_use/<arg_search>/<int:arg_num>', methods = ['POST', 'GET'])(list_admin_auth_use)
+app.route('/list/admin/auth_use_page/<int:arg_num>/<everything:arg_search>', methods = ['POST', 'GET'])(list_admin_auth_use)
 
 app.route('/list/user')(list_user)
 app.route('/list/user/<int:arg_num>')(list_user)
