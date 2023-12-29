@@ -185,6 +185,6 @@ def view_acl(name):
                 menu = [
                     ['w/' + url_pas(name), load_lang('return')], 
                     ['manager', load_lang('admin')], 
-                    ['list/admin/auth_use/' + url_pas('acl (' + name + ')') + '/1', load_lang('acl_record')]
+                    ['list/admin/auth_use_page/1/' + url_pas('acl (' + name + ')'), load_lang('acl_record')]
                 ]
             ))
