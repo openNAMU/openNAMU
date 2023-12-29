@@ -3,6 +3,7 @@ from .main_func_error_404 import main_func_error_404
 
 def main_view_image(name = ''):
     with get_db_connect() as conn:
+        name = re.sub(r'\.cache_v(?:[0-9]+)$', '', name)
         mime_type = re.search(r'([^.]+)$', name)
         if mime_type:
             mime_type = mime_type.group(1).lower()

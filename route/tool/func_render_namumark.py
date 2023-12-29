@@ -896,6 +896,10 @@ class class_do_render_namumark:
                             link_exist = 'opennamu_not_exist_link'
                             self.data_backlink['file:' + link_main]['no'] = ''
 
+                        self.curs.execute(db_change('select id from history where title = ? order by date desc limit 1'), ['file:' + link_main])
+                        db_data = self.curs.fetchall()
+                        rev = db_data[0][0] if db_data else '1' 
+
                         self.data_backlink['file:' + link_main]['file'] = ''
 
                         link_extension_regex = r'\.([^.]+)$'
@@ -908,7 +912,7 @@ class class_do_render_namumark:
                         link_main = re.sub(link_extension_regex, '', link_main)
                         link_main_org = link_main
 
-                        link_main = '/image/' + url_pas(sha224_replace(link_main)) + '.' + link_extension
+                        link_main = '/image/' + url_pas(sha224_replace(link_main)) + '.' + link_extension + '.cache_v' + rev
 
                     if file_width != '':
                         file_width = 'width:' + self.get_tool_css_safe(file_width) + ';'
