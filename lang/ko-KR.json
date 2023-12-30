@@ -576,5 +576,6 @@
     "remove_blind_thread": "숨겨진 토론 보이지 않기",
     "trace": "추적",
     "view_history": "문서 열람 추적 사용",
-    "start_with_search" : "첫 글자부터 검색"
+    "start_with_search" : "첫 글자부터 검색",
+    "backup_warning" : "경고. 동일한 이름의 파일이 있는 경우 지워질 수 있습니다."
 }
