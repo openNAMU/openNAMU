@@ -41,7 +41,8 @@ def main_setting_main(db_set):
             37 : ['move_with_redirect', ''],
             38 : ['slow_thread', ''],
             39 : ['edit_timeout', '5'],
-            40 : ['document_content_max_length', '']
+            40 : ['document_content_max_length', ''],
+            41 : ['backup_count', '']
         }
 
         if flask.request.method == 'POST':
@@ -209,7 +210,11 @@ def main_setting_main(db_set):
                         <select name="update">''' + branch_div + '''</select>
 
                         <span ''' + sqlite_only + '''>
-                            <h3>''' + load_lang('sqlite_only') + '''</h3>
+                            <h3>''' + load_lang('backup') + ''' (''' + load_lang('sqlite_only') + ''')</h3>
+                            <span>''' + load_lang('backup_warning') + ''' (EX : data_YYYYMMDDHHMMSS.db)</span>
+                            <hr class="main_hr">
+                            <hr class="main_hr">
+                            
                             <span>''' + load_lang('backup_interval') + '''</span> (''' + load_lang('hour') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('restart_required') + ''')
                             <hr class="main_hr">
                             <input name="back_up" value="''' + html.escape(d_list[9]) + '''">
@@ -218,6 +223,11 @@ def main_setting_main(db_set):
                             <span>''' + load_lang('backup_where') + '''</span> (''' + load_lang('default') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('restart_required') + ''') (''' + load_lang('example') + ''' : ./data/backup.db)
                             <hr class="main_hr">
                             <input name="backup_where" value="''' + html.escape(d_list[21]) + '''">
+                            <hr class="main_hr">
+
+                            <span>''' + load_lang('backup_count') + '''</span> (''' + load_lang('default') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('restart_required') + ''')
+                            <hr class="main_hr">
+                            <input name="backup_count" value="''' + html.escape(d_list[41]) + '''">
                             <hr class="main_hr">
                         </span>
 

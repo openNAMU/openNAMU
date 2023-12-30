@@ -615,6 +615,7 @@
             "main_css_warning" : "If you have a problem using this, use the emergency tool.",
             "not_support_skin_warning" : "It does not work on skins that do not support this feature.",
             "old_page_warning" : "This page is out of date.",
+            "backup_warning" : "Warning. Files with the same name may be erased.",
         "_comment_" : "Challenge",
             "challenge_title_register" : "Hello, World!",
             "challenge_info_register" : "Sign up",
