@@ -25,6 +25,7 @@ def login_login_2fa_2():
 
             user_agent = flask.request.headers.get('User-Agent', '')
             user_id = flask.session['login_id']
+            user_pw = flask.request.form.get('pw', '')
 
             curs.execute(db_change('select data from user_set where name = "2fa_pw" and id = ?'), [user_id])
             user_1 = curs.fetchall()
@@ -33,12 +34,7 @@ def login_login_2fa_2():
                 user_1 = user_1[0][0]
                 user_2 = curs.fetchall()[0][0]
 
-                pw_check_d = pw_check(
-                    flask.request.form.get('pw', ''),
-                    user_1,
-                    user_2,
-                    user_id
-                )
+                pw_check_d = pw_check(user_pw, user_1, user_2, user_id)
                 if pw_check_d != 1:
                     return re_error('/error/10')
 

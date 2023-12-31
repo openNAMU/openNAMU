@@ -116,6 +116,10 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             if name == 'user:' + user_name:
                 menu += [['w/' + url_pas(name) + '/' + url_pas(now_time.split()[0]), load_lang('today_doc')]]
         elif re.search(r"^file:", name):
+            curs.execute(db_change('select id from history where title = ? order by date desc limit 1'), [name])
+            db_data = curs.fetchall()
+            rev = db_data[0][0] if db_data else '1' 
+
             name_view = name
             doc_type = 'file'
 
@@ -133,7 +137,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             if os.path.exists(file_path_name):
                 file_size = str(round(os.path.getsize(file_path_name) / 1000, 1))
                 file_data = '''
-                    <img src="/image/''' + url_pas(file_all_name) + '''">
+                    <img src="/image/''' + url_pas(file_all_name) + '''.cache_v''' + rev + '''">
                     <h2>''' + load_lang('data') + '''</h2>
                     <table>
                         <tr><td>URL</td><td><a href="/image/''' + url_pas(file_all_name) + '''">''' + load_lang('link') + '''</a></td></tr>
@@ -242,9 +246,22 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                     if curs.fetchall():
                         break
 
+                redirect_text = '{0} ➤ {1}'
+
+                curs.execute(db_change('select data from other where name = "redirect_text"'))
+                db_data = curs.fetchall()
+                if db_data and db_data[0][0] != '':
+                    redirect_text = db_data[0][0]
+
+                try:
+                    redirect_text = redirect_text.format('<a href="/w_from/' + url_pas(last_page) + '">' + html.escape(last_page) + '</a>', '<b>' + html.escape(name) + '</b>')
+                except:
+                    redirect_text = '{0} ➤ {1}'
+                    redirect_text = redirect_text.format('<a href="/w_from/' + url_pas(last_page) + '">' + html.escape(last_page) + '</a>', '<b>' + html.escape(name) + '</b>')
+
                 end_data = '''
                     <div id="redirect">
-                        <a href="/w_from/''' + url_pas(last_page) + '''">''' + html.escape(last_page) + '''</a> ➤ <b>''' + html.escape(name) + '''</b>
+                        ''' + redirect_text + '''
                     </div>
                     <hr class="main_hr">
                 ''' + end_data

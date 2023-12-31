@@ -899,24 +899,15 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
         curs.execute(db_change('select data from other where name = "encode"'))
         db_data = curs.fetchall()
         load_set_data = db_data[0][0] if db_data and db_data[0][0] != '' else 'sha3'
-        set_data = db_data[0][0] if db_data and db_data[0][0] != '' else 'sha3'
         
+        set_data = load_set_data
         if type_d != 'no':
-            if type_d == '':
-                set_data = 'sha3'
-            else:
-                set_data = type_d
+            set_data = 'sha3' if type_d == '' else type_d
 
         re_data = 1 if pw_encode(data, set_data) == data2 else 0
         if load_set_data != set_data and re_data == 1 and id_d != '':
-            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [
-                pw_encode(data), 
-                id_d
-            ])
-            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'encode'"), [
-                load_set_data, 
-                id_d
-            ])
+            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [pw_encode(data), id_d])
+            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'encode'"), [load_set_data, id_d])
 
         return re_data
         
@@ -968,10 +959,7 @@ def load_lang(data, safe = 0):
         else:
             lang_list = os.listdir('lang')
             if (lang_name + '.json') in lang_list:
-                lang = json.loads(open(
-                    os.path.join('lang', lang_name + '.json'), 
-                    encoding = 'utf8'
-                ).read())
+                lang = json.loads(open(os.path.join('lang', lang_name + '.json'), encoding = 'utf8').read())
                 global_lang[lang_name] = lang
             else:
                 lang = {}
@@ -1028,7 +1016,7 @@ def wiki_css(data):
     data_css = ''
     data_css_add = ''
 
-    data_css_ver = '184'
+    data_css_ver = '185'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:
@@ -1295,7 +1283,7 @@ def load_skin(data = '', set_n = 0, default = 0):
     return skin_return_data
 
 # Func-markup
-def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', doc_acl = ''):
+def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', doc_acl = '', markup = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -1326,7 +1314,12 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                     'category' : load_lang('category')
                 }
 
-                get_class_render = class_do_render(conn, render_lang_data).do_render(doc_name, doc_data, data_type, data_in)
+                curs.execute(db_change('select data from other where name = "category_text"'))
+                db_data = curs.fetchall()
+                if db_data and db_data[0][0] != '':
+                    render_lang_data['category'] = db_data[0][0]
+
+                get_class_render = class_do_render(conn, render_lang_data, markup).do_render(doc_name, doc_data, data_type, data_in)
                 
                 if 'include' in get_class_render[2]:
                     for_a = 0
@@ -1341,7 +1334,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                         if acl_result == 0:
                             include_regex = re.compile('<div id="' + include_data[0] + '"><\\/div>')
                             if re.search(include_regex, get_class_render[0]):
-                                include_data_render = class_do_render(conn, render_lang_data).do_render(include_data[1], include_data[2], data_type, include_data[0] + data_in)
+                                include_data_render = class_do_render(conn, render_lang_data, markup).do_render(include_data[1], include_data[2], data_type, include_data[0] + data_in)
                                 if len(include_data) > 3:
                                     include_data_render[0] = '<div id="' + include_data[0] + '" ' + include_data[3] + '>' + include_data_render[0] + '</div>'
                                 else:
@@ -2653,8 +2646,12 @@ def re_error(data):
             elif num == 43:
                 title = load_lang('application_submitted')
                 sub_title = title
-
                 data = load_lang('waiting_for_approval')
+            elif num == 44:
+                curs.execute(db_change("select data from other where name = 'document_content_max_length'"))
+                db_data = curs.fetchall()
+                db_data = '' if not db_data else db_data[0][0]
+                data = load_lang('error_content_length_too_long') + db_data
             else:
                 data = '???'
 

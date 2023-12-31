@@ -15,9 +15,14 @@ def filter_all_add(tool, name = None):
             if tool in ('inter_wiki', 'outer_link'):
                 link = flask.request.form.get('link', 'test')
                 icon = flask.request.form.get('icon', '')
+                inter_type = flask.request.form.get('inter_type', '')
 
                 curs.execute(db_change("delete from html_filter where html = ? and kind = ?"), [title, tool])
                 curs.execute(db_change('insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, ?)'), [title, link, icon, tool])
+                if tool == 'inter_wiki':
+                    curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki_sub'"), [title])
+                    curs.execute(db_change('insert into html_filter (html, plus, plus_t, kind) values (?, "inter_wiki_type", ?, "inter_wiki_sub")'), [title, inter_type])
+                
                 admin_check(None, tool + ' edit')
             elif tool == 'edit_filter':
                 sec = flask.request.form.get('second', '0')
@@ -73,6 +78,10 @@ def filter_all_add(tool, name = None):
                 elif tool == 'extension_filter':
                     admin_check(None, 'extension_filter edit')
                     type_d = 'extension'
+                elif tool == 'template':
+                    admin_check(None, 'template_document edit')
+                    type_d = 'template'
+                    plus_d = flask.request.form.get('exp', 'test')
                 else:
                     admin_check(None, 'edit_top edit')
                     type_d = 'edit_top'
@@ -98,8 +107,25 @@ def filter_all_add(tool, name = None):
                     exist = curs.fetchall()
                     value = exist[0] if exist else value
 
+                select = ''
                 if tool == 'inter_wiki':
                     ex = 'https://namu.wiki/w/'
+
+                    select = ['', '']
+                    curs.execute(db_change("select plus_t from html_filter where kind = 'inter_wiki_sub' and html = ?"), [name])
+                    db_data = curs.fetchall()
+                    if db_data and db_data[0][0] == 'under_bar':
+                        select = ['', 'selected']
+
+                    select = '''
+                        <hr class="main_hr">
+                        ''' + load_lang('inter_wiki_space_change') + '''
+                        <hr class="main_hr">
+                        <select name="inter_type">
+                            <option ''' + select[0] + ''' value="url_encode">%20</option>
+                            <option ''' + select[1] + ''' value="under_bar">_</option>
+                        </select>
+                    '''
                 else:
                     ex = 'youtube.com'
 
@@ -116,6 +142,7 @@ def filter_all_add(tool, name = None):
                     ''' + load_lang('icon') + ''' (''' + ('HTML' if tool == 'inter_wiki' else load_lang('html_or_link')) + ''') (''' + load_lang('link') + ' EX' + ''' : /image/Test.svg)
                     <hr class="main_hr">
                     <input value="''' + html.escape(value[2]) + '''" type="text" name="icon">
+                    ''' + select + '''
                 '''
             elif tool == 'edit_filter':            
                 curs.execute(db_change("select plus, plus_t from html_filter where html = ? and kind = 'regex_filter'"), [name])
@@ -137,12 +164,11 @@ def filter_all_add(tool, name = None):
                         ['31104000', load_lang('360_day')],
                         ['0', load_lang('limitless')]
                     ]
-                    for i in t_data:
-                        insert_data += '<a href="javascript:insert_v(\'second\', \'' + i[0] + '\')">(' + i[1] + ')</a> '
+                    insert_data += ''.join(['<a href="javascript:opennamu_insert_v(\'second\', \'' + for_a[0] + '\')">(' + for_a[1] + ')</a> ' for for_a in t_data])
 
                 title = load_lang('edit_filter_add')
                 form_data = '''
-                    <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''
+                    ''' + insert_data + '''
                     <hr class="main_hr">
                     <input placeholder="''' + load_lang('second') + '''" id="second" name="second" type="text" value="''' + html.escape(time_data) + '''">
                     <hr class="main_hr">
@@ -206,17 +232,33 @@ def filter_all_add(tool, name = None):
                         ''' + ''.join(['<option ' + for_a[0] + ' value=' + for_a[1] + '>' + ('normal' if for_a[1] == '' else for_a[1]) + '</option>' for for_a in acl_list]) + '''
                     </select>
                 '''
+            elif tool == 'template':
+                title = load_lang('template_document_add')
+
+                value = ''
+                if name:
+                    curs.execute(db_change("select plus from html_filter where html = ? and kind = 'template'"), [name])
+                    exist = curs.fetchall()
+                    value = exist[0][0] if exist else '' 
+
+                form_data = '' + \
+                    load_lang('template') + \
+                    '<hr class="main_hr">' + \
+                    '<input value="' + html.escape(name) + '" type="text" name="title">' + \
+                    '<hr class="main_hr">' + \
+                    load_lang('explanation') + \
+                    '<hr class="main_hr">' + \
+                    '<input value="' + html.escape(value) + '" type="text" name="exp">' + \
+                    '<hr class="main_hr">' + \
+                ''
             else:
                 title = load_lang('edit_tool_add')
+                
+                value = ''
                 if name:
                     curs.execute(db_change("select plus from html_filter where html = ? and kind = 'edit_top'"), [name])
                     exist = curs.fetchall()
-                    if exist:
-                        value = exist[0][0]
-                    else:
-                        value = ''
-                else:
-                    value = ''
+                    value = exist[0][0] if exist else ''    
 
                 form_data = '''
                     ''' + load_lang('title') + '''
