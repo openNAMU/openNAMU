@@ -155,3 +155,7 @@ function opennamu_get_main_skin_set(set_name) {
         }
     });
 }
+
+function opennamu_insert_v(name, data) {
+    document.getElementById(name).value = data;
+}

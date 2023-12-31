@@ -132,7 +132,7 @@
     "update_error": "자동 업데이트가 지원되지 않습니다.",
     "need_document": "필요한 문서들",
     "sub": "하위",
-    "template": "틀",
+    "template": "템플릿 문서",
     "user_document_acl": "사용자 문서 ACL",
     "password_confirm": "비밀번호 확인",
     "pinned": "고정",
@@ -575,5 +575,7 @@
     "math_scroll": "Math 매크로에서 스크롤 사용",
     "remove_blind_thread": "숨겨진 토론 보이지 않기",
     "trace": "추적",
-    "view_history": "문서 열람 추적 사용"
+    "view_history": "문서 열람 추적 사용",
+    "start_with_search" : "첫 글자부터 검색",
+    "backup_warning" : "경고. 동일한 이름의 파일이 있는 경우 지워질 수 있습니다."
 }

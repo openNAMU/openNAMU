@@ -36,6 +36,12 @@ def edit_revert(name, num):
 
             if do_edit_filter(data[0][0]) == 1:
                 return re_error('/error/21')
+            
+            curs.execute(db_change("select data from other where name = 'document_content_max_length'"))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '':
+                if int(number_check(db_data[0][0])) < len(data[0][0]):
+                    return re_error('/error/44')
 
             curs.execute(db_change("select data from data where title = ?"), [name])
             data_old = curs.fetchall()

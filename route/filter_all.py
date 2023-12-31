@@ -42,6 +42,9 @@ def filter_all(tool):
         elif tool == 'outer_link':
             title = load_lang('outer_link_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'outer_link'"))
+        elif tool == 'template':
+            title = load_lang('template_document_list')
+            curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'template'"))
         else:
             title = load_lang('edit_tool_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'edit_top'"))
@@ -53,7 +56,7 @@ def filter_all(tool):
 
             div += html.escape(data[0])
             if admin == 1:
-                if tool in ('inter_wiki', 'outer_link', 'edit_filter', 'document'):
+                if tool in ('inter_wiki', 'outer_link', 'edit_filter', 'document', 'edit_top', 'template'):
                     div += ' <a href="/filter/' + tool + '/add/' + url_pas(data[0]) + '">(' + load_lang('edit') + ')</a>'
                     
                 div += ' <a href="/filter/' + tool + '/del/' + url_pas(data[0]) + '">(' + load_lang('delete') + ')</a>'

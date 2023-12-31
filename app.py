@@ -43,16 +43,10 @@ with get_db_connect() as conn:
 
     if data_db_set['type'] == 'mysql':
         try:
-            curs.execute(db_change(
-                'create database ' + data_db_set['name'] + ' ' + \
-                'default character set utf8mb4'
-            ))
+            curs.execute(db_change('create database ' + data_db_set['name'] + ' default character set utf8mb4'))
         except:
             try:
-                curs.execute(db_change(
-                    'alter database ' + data_db_set['name'] + ' ' + \
-                    'character set utf8mb4'
-                ))
+                curs.execute(db_change('alter database ' + data_db_set['name'] + ' character set utf8mb4'))
             except:
                 pass
 
@@ -66,7 +60,6 @@ with get_db_connect() as conn:
 
                 try:
                     curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
-
                     db_pass = 1
                 except:
                     pass
@@ -74,7 +67,6 @@ with get_db_connect() as conn:
                 if db_pass == 0:
                     try:
                         curs.execute(db_change('create table ' + create_table + '(test longtext default (""))'))
-
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -83,7 +75,6 @@ with get_db_connect() as conn:
                 if db_pass == 0:
                     try:
                         curs.execute(db_change('create table ' + create_table + '(test longtext default "")'))
-
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -92,7 +83,6 @@ with get_db_connect() as conn:
                 if db_pass == 0:
                     try:
                         curs.execute(db_change('create table ' + create_table + '(test longtext)'))
-
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -101,7 +91,6 @@ with get_db_connect() as conn:
                 if db_pass == 0:
                     try:
                         curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ('')"))
-
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -110,7 +99,6 @@ with get_db_connect() as conn:
                 if db_pass == 0:
                     try:
                         curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ''"))
-
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -119,7 +107,6 @@ with get_db_connect() as conn:
                 if db_pass == 0:
                     try:
                         curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext"))
-
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -216,37 +203,60 @@ with get_db_connect() as conn:
 
     # Init-DB_care
     if data_db_set['type'] == 'sqlite':
-        def back_up(back_time, back_up_where):
+        def back_up(back_time, back_up_where, back_up_count = 0):
             try:
+                if back_up_count != 0:
+                    file_dir = os.path.split(back_up_where)[0]
+                    file_dir = '.' if file_dir == '' else file_dir
+                    
+                    file_name = os.path.split(back_up_where)[1]
+                    file_name = re.sub(r'\.db$', '_[0-9]{14}.db', file_name)
+
+                    backup_file = [for_a for for_a in os.listdir(file_dir) if re.search('^' + file_name + '$', for_a)]
+                    backup_file = sorted(backup_file)
+                    
+                    if len(backup_file) >= back_up_count:
+                        remove_dir = os.path.join(file_dir, backup_file[0])
+                        os.remove(remove_dir)
+                        print('Back up : Remove (' + remove_dir + ')')
+
+                now_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+                new_file_name = re.sub(r'\.db$', '_' + now_time + '.db', back_up_where)
                 shutil.copyfile(
                     data_db_set['name'] + '.db', 
-                    back_up_where.replace('%t', datetime.datetime.now().strftime('%Y-%m-%d_%H.%M.%S'))
+                    new_file_name
                 )
 
-                print('Back up : OK')
-            except:
+                print('Back up : OK (' + new_file_name + ')')
+            except Exception as e:
                 print('Back up : Error')
+                print(e)
 
             threading.Timer(
                 60 * 60 * back_time, 
                 back_up,
-                [back_time, back_up_where]
+                [back_time, back_up_where, back_up_count]
             ).start()
 
         curs.execute(db_change('select data from other where name = "back_up"'))
         back_time = curs.fetchall()
         back_time = float(number_check(back_time[0][0], True)) if back_time and back_time[0][0] != '' else 0
+
+        curs.execute(db_change('select data from other where name = "backup_count"'))
+        back_up_count = curs.fetchall()
+        back_up_count = int(number_check(back_up_count[0][0])) if back_up_count and back_up_count[0][0] != '' else 0
+
         if back_time != 0:
             curs.execute(db_change('select data from other where name = "backup_where"'))
             back_up_where = curs.fetchall()
-            if back_up_where and back_up_where[0][0] != '':
-                back_up_where = back_up_where[0][0]
-            else:
-                back_up_where = 'back_' + data_db_set['name'] + '.db'
+            back_up_where = back_up_where[0][0] if back_up_where and back_up_where[0][0] != '' else data_db_set['name'] + '.db'
 
             print('Back up state : ' + str(back_time) + ' hours')
+            print('Back up directory : ' + back_up_where)
+            if back_up_count != 0:
+                print('Back up max number : ' + str(back_up_count))
 
-            back_up(back_time, back_up_where)
+            back_up(back_time, back_up_where, back_up_count)
         else:
             print('Back up state : Turn off')
 
@@ -280,11 +290,17 @@ app.route('/filter/document/del/<everything:name>', defaults = { 'tool' : 'docum
 
 app.route('/filter/edit_top', defaults = { 'tool' : 'edit_top' })(filter_all)
 app.route('/filter/edit_top/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'edit_top' })(filter_all_add)
+app.route('/filter/edit_top/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'edit_top' })(filter_all_add)
 app.route('/filter/edit_top/del/<everything:name>', defaults = { 'tool' : 'edit_top' })(filter_all_delete)
 
 app.route('/filter/image_license', defaults = { 'tool' : 'image_license' })(filter_all)
 app.route('/filter/image_license/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'image_license' })(filter_all_add)
 app.route('/filter/image_license/del/<everything:name>', defaults = { 'tool' : 'image_license' })(filter_all_delete)
+
+app.route('/filter/template', defaults = { 'tool' : 'template' })(filter_all)
+app.route('/filter/template/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'template' })(filter_all_add)
+app.route('/filter/template/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'template' })(filter_all_add)
+app.route('/filter/template/del/<everything:name>', defaults = { 'tool' : 'template' })(filter_all_delete)
 
 app.route('/filter/edit_filter', defaults = { 'tool' : 'edit_filter' })(filter_all)
 app.route('/filter/edit_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'edit_filter' })(filter_all_add)
@@ -331,11 +347,13 @@ app.route('/list/document/short/<int:arg_num>', defaults = { 'tool' : 'short_pag
 
 app.route('/list/file')(list_image_file)
 app.route('/list/file/<int:arg_num>')(list_image_file)
+app.route('/list/image', defaults = { 'do_type' : 1 })(list_image_file)
+app.route('/list/image/int:arg_num', defaults = { 'do_type' : 1 })(list_image_file)
 
 app.route('/list/admin')(list_admin)
 
 app.route('/list/admin/auth_use', methods = ['POST', 'GET'])(list_admin_auth_use)
-app.route('/list/admin/auth_use/<arg_search>/<int:arg_num>', methods = ['POST', 'GET'])(list_admin_auth_use)
+app.route('/list/admin/auth_use_page/<int:arg_num>/<everything:arg_search>', methods = ['POST', 'GET'])(list_admin_auth_use)
 
 app.route('/list/user')(list_user)
 app.route('/list/user/<int:arg_num>')(list_user)
