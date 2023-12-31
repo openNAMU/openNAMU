@@ -899,24 +899,15 @@ def pw_check(data, data2, type_d = 'no', id_d = ''):
         curs.execute(db_change('select data from other where name = "encode"'))
         db_data = curs.fetchall()
         load_set_data = db_data[0][0] if db_data and db_data[0][0] != '' else 'sha3'
-        set_data = db_data[0][0] if db_data and db_data[0][0] != '' else 'sha3'
         
+        set_data = load_set_data
         if type_d != 'no':
-            if type_d == '':
-                set_data = 'sha3'
-            else:
-                set_data = type_d
+            set_data = 'sha3' if type_d == '' else type_d
 
         re_data = 1 if pw_encode(data, set_data) == data2 else 0
         if load_set_data != set_data and re_data == 1 and id_d != '':
-            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [
-                pw_encode(data), 
-                id_d
-            ])
-            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'encode'"), [
-                load_set_data, 
-                id_d
-            ])
+            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [pw_encode(data), id_d])
+            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'encode'"), [load_set_data, id_d])
 
         return re_data
         
