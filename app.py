@@ -347,6 +347,8 @@ app.route('/list/document/short/<int:arg_num>', defaults = { 'tool' : 'short_pag
 
 app.route('/list/file')(list_image_file)
 app.route('/list/file/<int:arg_num>')(list_image_file)
+app.route('/list/image', defaults = { 'do_type' : 1 })(list_image_file)
+app.route('/list/image/int:arg_num', defaults = { 'do_type' : 1 })(list_image_file)
 
 app.route('/list/admin')(list_admin)
 
