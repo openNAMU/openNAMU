@@ -1283,7 +1283,7 @@ def load_skin(data = '', set_n = 0, default = 0):
     return skin_return_data
 
 # Func-markup
-def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', doc_acl = ''):
+def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', doc_acl = '', markup = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -1319,7 +1319,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                 if db_data and db_data[0][0] != '':
                     render_lang_data['category'] = db_data[0][0]
 
-                get_class_render = class_do_render(conn, render_lang_data).do_render(doc_name, doc_data, data_type, data_in)
+                get_class_render = class_do_render(conn, render_lang_data, markup).do_render(doc_name, doc_data, data_type, data_in)
                 
                 if 'include' in get_class_render[2]:
                     for_a = 0
@@ -1334,7 +1334,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                         if acl_result == 0:
                             include_regex = re.compile('<div id="' + include_data[0] + '"><\\/div>')
                             if re.search(include_regex, get_class_render[0]):
-                                include_data_render = class_do_render(conn, render_lang_data).do_render(include_data[1], include_data[2], data_type, include_data[0] + data_in)
+                                include_data_render = class_do_render(conn, render_lang_data, markup).do_render(include_data[1], include_data[2], data_type, include_data[0] + data_in)
                                 if len(include_data) > 3:
                                     include_data_render[0] = '<div id="' + include_data[0] + '" ' + include_data[3] + '>' + include_data_render[0] + '</div>'
                                 else:
