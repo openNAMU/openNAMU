@@ -103,7 +103,7 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                         data_list += curs.fetchall()
                 else:
                     if set_type != 'normal':
-                        curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where type = ? order by date desc limit ?, 50'), [sql_num])
+                        curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where type = ? order by date desc limit ?, 50'), [set_type, sql_num])
                     else:
                         curs.execute(db_change('select id, title, date, ip, send, leng, hide from history order by date desc limit ?, 50'), [sql_num])
 
@@ -167,6 +167,7 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                 </table>
             '''
 
+            set_type = 'edit' if set_type == '' else set_type
             if tool == 'history':
                 div = '' + \
                     ' '.join(['<a href="/history_page/1/' + for_a[0] + '/' + url_pas(name) + '">(' + for_a[1] + ')</a> ' for for_a in option_list]) + \
