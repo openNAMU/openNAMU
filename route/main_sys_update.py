@@ -24,7 +24,7 @@ def main_sys_update():
 
                 ok += [os.system('git remote rm origin')]
                 ok += [os.system('git remote add origin https://github.com/opennamu/opennamu.git')]
-                ok += [os.system('git fetch --depth=100 origin ' + up_data)]
+                ok += [os.system('git fetch --depth=300 origin ' + up_data)]
                 ok += [os.system('git reset --hard origin/' + up_data)]
                 if (ok[0] and ok[1] and ok[2] and ok[3]) == 0:
                     return redirect('/restart')
