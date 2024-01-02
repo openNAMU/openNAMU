@@ -632,35 +632,19 @@ def set_init():
         curs.execute(db_change("select html from html_filter where kind = 'email'"))
         if not curs.fetchall():
             for i in ['naver.com', 'gmail.com', 'daum.net', 'kakao.com']:
-                curs.execute(db_change(
-                    "insert into html_filter (html, kind, plus, plus_t) values (?, 'email', '', '')"
-                ), [i])
+                curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'email', '', '')"), [i])
 
         curs.execute(db_change("select html from html_filter where kind = 'extension'"))
         if not curs.fetchall():
             for i in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
-                curs.execute(db_change(
-                    "insert into html_filter (html, kind, plus, plus_t) values (?, 'extension', '', '')"
-                ), [i])
+                curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'extension', '', '')"), [i])
 
-        curs.execute(db_change(
-            'select data from other ' + \
-            'where name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'
-        ))
+        curs.execute(db_change('select data from other where name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
         if not curs.fetchall():
-            for i in [
-                ['smtp_server', 'smtp.gmail.com'],
-                ['smtp_port', '587'], 
-                ['smtp_security', 'starttls']
-            ]:
+            for i in [['smtp_server', 'smtp.gmail.com'], ['smtp_port', '587'], ['smtp_security', 'starttls']]:
                 curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, '')"), [i[0], i[1]])
 
-        curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [
-            r'(?:[^A-Za-zㄱ-힣0-9])',
-            'name',
-            '',
-            ''
-        ])
+        curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-힣0-9])', 'name', '', ''])
 
 # Func-simple
 ## Func-simple-without_DB
@@ -1016,7 +1000,7 @@ def wiki_css(data):
     data_css = ''
     data_css_add = ''
 
-    data_css_ver = '185'
+    data_css_ver = '186'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:

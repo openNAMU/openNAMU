@@ -1,9 +1,14 @@
 declare function opennamu_do_url_encode(data : any) : string;
+declare function do_sync_monaco_and_textarea();
+declare function do_textarea_to_manaco();
+
 interface Window {
     editor? : any;
 }
 
 function opennamu_do_editor_preview() {
+    do_sync_monaco_and_textarea();
+
     const input = document.querySelector('#opennamu_edit_textarea') as HTMLInputElement | null;
     if(input !== null) {
         let doc_name : string = 'test';
@@ -32,6 +37,8 @@ function opennamu_do_editor_preview() {
 }
 
 function opennamu_do_editor_temp_save() {
+    do_sync_monaco_and_textarea();
+
     const input = document.querySelector('#opennamu_edit_textarea') as HTMLInputElement | null;
     if(input !== null) {
         localStorage.setItem("key", input.value);
@@ -40,16 +47,12 @@ function opennamu_do_editor_temp_save() {
 
 function opennamu_do_editor_temp_save_load() {
     const data = localStorage.getItem("key");
-    console.log(data);
     if(data !== null) {
         const input = document.querySelector('#opennamu_edit_textarea') as HTMLInputElement | null;
         if(input !== null) {
             input.value = data;
         }
-
-        const input_2 = document.querySelector('#opennamu_monaco_editor') as any;
-        if(input_2 !== null) {
-            window.editor.setValue(data);
-        }
+        
+        do_textarea_to_manaco();
     }
 }
