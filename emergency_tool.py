@@ -200,7 +200,7 @@ elif what_i_do == '19':
 
         ok += [os.system('git remote rm origin')]
         ok += [os.system('git remote add origin https://github.com/opennamu/opennamu.git')]
-        ok += [os.system('git fetch origin ' + up_data)]
+        ok += [os.system('git fetch --depth=10 origin ' + up_data)]
         ok += [os.system('git reset --hard origin/' + up_data)]
         if (ok[0] and ok[1] and ok[2] and ok[3]) != 0:
             print('Error : update failed')
