@@ -484,7 +484,7 @@
     "topic_normal": "일반",
     "topic_stop": "중지",
     "topic_close": "닫힘",
-    "turn_off_monaco": "모나코 에디터 끄기",
+    "turn_off_monaco": "모나코 에디터 켜기/끄기",
     "topic_agree": "토론 합의 완료",
     "user_css_warning": "만약 사용하다가 문제가 생기면 여기로 접속하세요.",
     "main_css_warning": "만약 사용하다가 문제가 생기면 이머전시 툴을 사용하세요.",
