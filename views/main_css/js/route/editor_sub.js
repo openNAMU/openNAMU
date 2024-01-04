@@ -1,4 +1,5 @@
 function opennamu_do_editor_preview() {
+    do_sync_monaco_and_textarea();
     var input = document.querySelector('#opennamu_edit_textarea');
     if (input !== null) {
         var doc_name = 'test';
@@ -24,6 +25,7 @@ function opennamu_do_editor_preview() {
     }
 }
 function opennamu_do_editor_temp_save() {
+    do_sync_monaco_and_textarea();
     var input = document.querySelector('#opennamu_edit_textarea');
     if (input !== null) {
         localStorage.setItem("key", input.value);
@@ -31,15 +33,11 @@ function opennamu_do_editor_temp_save() {
 }
 function opennamu_do_editor_temp_save_load() {
     var data = localStorage.getItem("key");
-    console.log(data);
     if (data !== null) {
         var input = document.querySelector('#opennamu_edit_textarea');
         if (input !== null) {
             input.value = data;
         }
-        var input_2 = document.querySelector('#opennamu_monaco_editor');
-        if (input_2 !== null) {
-            window.editor.setValue(data);
-        }
+        do_textarea_to_manaco();
     }
 }

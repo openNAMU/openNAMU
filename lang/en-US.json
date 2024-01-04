@@ -272,7 +272,7 @@
                 "bbs_comment_acl" : "BBS ACL to write comment",
         "_comment_" : "Edit",
             "load" : "Load another document",
-            "turn_off_monaco" : "Turn off monaco editor",
+            "turn_off_monaco" : "Turn on/off monaco editor",
         "_comment_" : "Render",
             "toc" : "TOC",
             "category" : "Category",
