@@ -380,21 +380,19 @@ class class_do_render_namumark:
 
                     toc_list += [['', heading_data_text]]
 
-                    heading_folding = ['⊖', 'block']
+                    heading_folding = ['⊖', 'block', '1']
                     if heading_data[2]:
-                        heading_folding = ['⊕', 'none']
+                        heading_folding = ['⊕', 'none', '0.5']
 
                     data_name = self.get_tool_data_storage(
-                        '<h' + heading_level_str + '>', 
-                        '' + \
+                        '<h' + heading_level_str + '><span id="' + self.doc_include + 'opennamu_heading_' + str(heading_count) + '_sub" style="opacity: ' + heading_folding[2] + '">', 
                             ' <sub>' + \
                                 '<a id="' + self.doc_include + 'edit_load_' + str(heading_count) + '" href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a> ' + \
                                 '<a href="javascript:void(0);" onclick="javascript:opennamu_heading_folding(\'' + self.doc_include + 'opennamu_heading_' + str(heading_count) + '\', this);">' + \
                                     heading_folding[0] + \
                                 '</a>'
                             '</sub>' + \
-                            '</h' + heading_level_str + '>' + \
-                        '', 
+                        '</span></h' + heading_level_str + '>', 
                         heading_data_org
                     )
 
