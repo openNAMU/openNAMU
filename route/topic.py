@@ -123,9 +123,7 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             name_display = 'display: none;' if topic_num != '0' else ''
 
             shortcut = '<div class="opennamu_thread_shortcut" id="thread_shortcut">'
-            curs.execute(db_change(
-                "select id from topic where code = ? order by id + 0 asc"
-            ), [topic_num])
+            curs.execute(db_change("select id from topic where code = ? order by id + 0 asc"), [topic_num])
             db_data = curs.fetchall()
             for for_a in db_data:
                 shortcut += '<a href="#' + for_a[0] + '">#' + for_a[0] + '</a> '
