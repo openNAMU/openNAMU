@@ -4,8 +4,10 @@ function opennamu_heading_folding(data, element = '') {
     let fol = document.getElementById(data);
     if(fol.style.display === '' || fol.style.display === 'inline-block' || fol.style.display === 'block') {
         document.getElementById(data).style.display = 'none';
+        document.getElementById(data + '_sub').style.opacity = '0.5';
     } else {
         document.getElementById(data).style.display = 'block';
+        document.getElementById(data + '_sub').style.opacity = '1';
     }
     
     if(element !== '') {
