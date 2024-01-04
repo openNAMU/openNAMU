@@ -5,7 +5,7 @@ from .func_render_namumark import class_do_render_namumark
 # 커스텀 마크 언젠간 다시 추가 예정
 
 class class_do_render:
-    def __init__(self, conn, lang_data = {}):
+    def __init__(self, conn, lang_data = {}, markup = ''):
         self.conn = conn
 
         if lang_data == '{}':
@@ -15,6 +15,7 @@ class class_do_render:
             }
 
         self.lang_data = lang_data
+        self.markup = markup
 
     def do_render(self, doc_name, doc_data, data_type, data_in):
         curs = self.conn.cursor()
@@ -26,7 +27,7 @@ class class_do_render:
         
         data_in = (data_in + '_') if data_in != '' else ''
         doc_set['doc_include'] = data_in
-        rep_data = ''
+        rep_data = self.markup
 
         if rep_data == '' and doc_name != '':
             curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [doc_name])
