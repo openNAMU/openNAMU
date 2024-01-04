@@ -81,6 +81,7 @@ import werkzeug.debug
 import flask
 
 import requests
+from PIL import Image
 
 try:
     import mysqlclient as pymysql
