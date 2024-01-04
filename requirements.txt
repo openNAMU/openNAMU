@@ -6,4 +6,6 @@ waitress
 requests
 diff-match-patch
 
+pillow
+
 pymysql
