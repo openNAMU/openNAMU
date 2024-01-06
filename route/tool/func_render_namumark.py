@@ -1267,7 +1267,7 @@ class class_do_render_namumark:
 
         include_num = 0
         include_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_include_link', self.ip)
-        include_regex = re.compile(r'\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\]', re.I)
+        include_regex = re.compile(r'\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\](\n?)', re.I)
         include_count_max = len(re.findall(include_regex, self.render_data)) * 2
         include_change_list = {}
         while 1:
@@ -1349,7 +1349,7 @@ class class_do_render_namumark:
 
                         data_name = self.get_tool_data_storage(include_link, '', match_org)
 
-                    self.render_data = re.sub(include_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
+                    self.render_data = re.sub(include_regex, '<' + data_name + '></' + data_name + '>' + match[1], self.render_data, 1)
 
             include_count_max -= 1
 
