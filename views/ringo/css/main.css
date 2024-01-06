@@ -214,6 +214,9 @@ aside .side_button {
     background-color: white;
     
     padding: 10px;
+
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 aside .side_button:hover {
