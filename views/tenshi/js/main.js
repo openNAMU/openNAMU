@@ -20,7 +20,9 @@ function ringo_opening(data) {
 
         for(for_a in element) {
             if(for_a !== '0') { 
-                document.getElementById(element[for_a]).style.display = 'none';
+                if(document.getElementById(element[for_a]) !== null) {
+                    document.getElementById(element[for_a]).style.display = 'none';
+                }
             }
         }
 
