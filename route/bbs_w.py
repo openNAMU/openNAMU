@@ -93,7 +93,10 @@ def bbs_w(bbs_num = '', tool = 'bbs'):
             if tool != 'bbs':
                 bbs_name_select = '(' + bbs_name_dict[for_b[1]] + ')'
 
-            notice = 1 if len(for_b) > 2 else 0
+            if tool == 'bbs':
+                notice = 1 if len(for_b) > 2 else 0
+            else:
+                notice = 0
 
             data += '''
                 <tr class="''' + ('opennamu_comment_color_red' if notice == 1 else '') + '''">
