@@ -63,11 +63,17 @@ def bbs_w(bbs_num = '', tool = 'bbs'):
         '''
 
         if tool == 'bbs':
+            curs.execute(db_change('select set_code, set_id, set_name from bbs_data where set_name = "pinned" and set_id like ? order by set_data desc'), [bbs_num])
+            db_data = curs.fetchall()
+            db_data = list(db_data) if db_data else []
+            
             curs.execute(db_change('select set_code, set_id from bbs_data where set_name = "title" and set_id like ? order by set_code + 0 desc'), [bbs_num])
+            db_data_2 = curs.fetchall()
+            db_data += list(db_data_2) if db_data_2 else []
         else:
             curs.execute(db_change('select set_code, set_id, set_data from bbs_data where set_name = "date" order by set_data desc limit 50'))
-        
-        db_data = curs.fetchall()
+            db_data = curs.fetchall()
+
         for for_b in db_data:
             curs.execute(db_change('select set_name, set_data, set_code, set_id from bbs_data where set_code = ? and set_id = ?'), [for_b[0], for_b[1]])
             db_data = curs.fetchall()
@@ -87,8 +93,10 @@ def bbs_w(bbs_num = '', tool = 'bbs'):
             if tool != 'bbs':
                 bbs_name_select = '(' + bbs_name_dict[for_b[1]] + ')'
 
+            notice = 1 if len(for_b) > 2 else 0
+
             data += '''
-                <tr>
+                <tr class="''' + ('opennamu_comment_color_red' if notice == 1 else '') + '''">
                     <td>''' + ip_pas(temp_dict['user_id']) + '''</td>
                     <td>''' + temp_dict['date'] + '''</td>
                     <td>''' + last_comment_date + '''</td>
