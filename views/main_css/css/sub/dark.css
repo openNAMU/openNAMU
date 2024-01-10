@@ -73,3 +73,12 @@ blockquote {
 #topic_color {
     background: #325a56;
 }
+
+/* diff */
+.opennamu_diff_green {
+    background: #2e4a2e;
+}
+
+.opennamu_diff_red {
+    background: #803737;
+}

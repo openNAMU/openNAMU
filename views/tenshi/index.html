@@ -112,11 +112,14 @@
                                         <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                                     </a>
                                     <div id="add_cel_in" class="cel_in_cel" style="display: none;">
-                                        {% for added_top_menu in imp[1][6] %}
-                                            <a href="{{added_top_menu[1]}}">
+                                        {% for list_n in range(0, imp[1][6]|length) %}
+                                            <a href="{{imp[1][6][list_n][1]}}">
                                                 <span class="iconify" data-icon="ic:baseline-plus" data-inline="true"></span>
-                                                {{added_top_menu[0]}}
+                                                {{imp[1][6][list_n][0]}}
                                             </a>
+                                            {% if list_n + 1 != imp[1][6]|length %}
+                                                <hr>
+                                            {% endif %}
                                         {% endfor %}
                                     </div>
                                 </div>

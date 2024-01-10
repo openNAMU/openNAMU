@@ -53,6 +53,15 @@ details summary {
     display: list-item;
 }
 
+/* diff */
+.opennamu_diff_green {
+    background: #eaf2c2;
+}
+
+.opennamu_diff_red {
+    background: #fadad7;
+}
+
 /* list */
 .opennamu_ul {
     padding-left: 20px;
