@@ -6,8 +6,7 @@ def main_setting_skin_set():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        ip = ip_check()
-        if ban_check(ip) == 1:
+        if admin_check() != 1:
             return re_error('/ban')
             
         set_list = user_setting_skin_set_main_set_list()
