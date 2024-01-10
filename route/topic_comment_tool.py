@@ -30,22 +30,15 @@ def topic_comment_tool(topic_num = 1, num = 1):
         '''
 
         if admin_check(3) == 1:
-            curs.execute(db_change(
-                "select id from topic where code = ? and id = ? and top = 'O'"
-            ), [topic_num, num])
+            curs.execute(db_change("select id from topic where code = ? and id = ? and top = 'O'"), [topic_num, num])
             top_topic_d = curs.fetchall()
-
-            curs.execute(db_change(
-                "select end from rb where block = ? and ongoing = '1'"
-            ), [data[0][1]])
-            user_ban_d = curs.fetchall()
 
             ban += '''
                 <h2>''' + load_lang('admin_tool') + '''</h2>
                 <ul class="opennamu_ul">
                     <li>
                         <a href="/auth/give/ban/''' + url_pas(data[0][1]) + '''">
-                            ''' + (load_lang('release') if user_ban_d else load_lang('ban')) + '''
+                            ''' + (load_lang('release') if ban_check(data[0][1]) == 1 else load_lang('ban')) + '''
                         </a>
                     </li>
                     <li>

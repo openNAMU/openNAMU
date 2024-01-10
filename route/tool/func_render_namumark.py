@@ -380,21 +380,19 @@ class class_do_render_namumark:
 
                     toc_list += [['', heading_data_text]]
 
-                    heading_folding = ['⊖', 'block']
+                    heading_folding = ['⊖', 'block', '1']
                     if heading_data[2]:
-                        heading_folding = ['⊕', 'none']
+                        heading_folding = ['⊕', 'none', '0.5']
 
                     data_name = self.get_tool_data_storage(
-                        '<h' + heading_level_str + '>', 
-                        '' + \
+                        '<h' + heading_level_str + '><span id="' + self.doc_include + 'opennamu_heading_' + str(heading_count) + '_sub" style="opacity: ' + heading_folding[2] + '">', 
                             ' <sub>' + \
                                 '<a id="' + self.doc_include + 'edit_load_' + str(heading_count) + '" href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a> ' + \
                                 '<a href="javascript:void(0);" onclick="javascript:opennamu_heading_folding(\'' + self.doc_include + 'opennamu_heading_' + str(heading_count) + '\', this);">' + \
                                     heading_folding[0] + \
                                 '</a>'
                             '</sub>' + \
-                            '</h' + heading_level_str + '>' + \
-                        '', 
+                        '</span></h' + heading_level_str + '>', 
                         heading_data_org
                     )
 
@@ -807,7 +805,7 @@ class class_do_render_namumark:
         self.render_data = re.sub(math_regex, do_render_math_sub, self.render_data)
 
     def do_render_link(self):
-        link_regex = r'\[\[((?:(?!\[\[|\]\]|\||<|>).|<(?:\/?(?:slash)_(?:[0-9]+)(?:[^<>]+))>)+)(?:\|((?:(?!\[\[|\]\]|\|).)+))?\]\]'
+        link_regex = r'\[\[((?:(?!\[\[|\]\]|\||<|>).|<(?:\/?(?:slash)_(?:[0-9]+)(?:[^<>]+))>)+)(?:\|((?:(?!\[\[|\]\]|\|).)+))?\]\](\n?)'
         image_count = 0
         link_count_all = len(re.findall(link_regex, self.render_data)) * 4
         while 1:
@@ -816,7 +814,6 @@ class class_do_render_namumark:
                 break
             elif link_count_all < 0:
                 print('Error : render link count overflow')
-
                 break
             else:
                 # link split
@@ -979,7 +976,7 @@ class class_do_render_namumark:
                         else:
                             data_name = self.get_tool_data_storage('', '', link_data_full)
                         
-                        self.render_data = re.sub(link_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
+                        self.render_data = re.sub(link_regex, '<' + data_name + '></' + data_name + '>' + link_data[2], self.render_data, 1)
                 # category
                 elif re.search(r'^(분류|category):', link_main, flags = re.I):
                     link_main = re.sub(r'^(분류|category):', '', link_main, flags = re.I)
@@ -1028,10 +1025,7 @@ class class_do_render_namumark:
 
                         self.data_category += '<a class="' + category_blur + ' ' + link_exist + '" title="' + link_sub + '" href="/w/category:' + link_main + '">' + link_sub + '</a>'
 
-                    if self.render_data.find('\n' + link_data_full + '\n') != -1:
-                        self.render_data = self.render_data.replace('\n' + link_data_full + '\n', '\n', 1)
-                    else:
-                        self.render_data = re.sub(link_regex, '', self.render_data, 1)
+                    self.render_data = re.sub(link_regex, '', self.render_data, 1)
                 # inter link
                 elif re.search(r'^(?:inter|인터):([^:]+):', link_main, flags = re.I):
                     link_inter_regex = re.compile('^(?:inter|인터):([^:]+):', flags = re.I)
@@ -1090,9 +1084,9 @@ class class_do_render_namumark:
 
                         data_name = self.get_tool_data_storage('<a class="opennamu_link_inter" title="' + link_title + '" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
                     
-                        self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
+                        self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>' + link_data[2]), self.render_data, 1)
                     else:
-                        self.render_data = re.sub(link_regex, '', self.render_data, 1)
+                        self.render_data = re.sub(link_regex, link_data[2], self.render_data, 1)
                 # out link
                 elif re.search(r'^https?:\/\/', link_main, flags = re.I):
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
@@ -1139,7 +1133,7 @@ class class_do_render_namumark:
                             link_class = 'opennamu_link_inter'
 
                     data_name = self.get_tool_data_storage('<a class="' + link_class + '" target="_blank" title="' + link_title + '" href="' + link_main + '">' + link_inter_icon + link_sub_storage, '</a>', link_data_full)
-                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
+                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>' + link_data[2]), self.render_data, 1)
                 # in link
                 else:
                     # under page & fix url
@@ -1204,7 +1198,7 @@ class class_do_render_namumark:
                     self.link_count += 1
 
                     data_name = self.get_tool_data_storage('<a class="' + link_exist + ' ' + link_same + '" title="' + link_title + '" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
-                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>'), self.render_data, 1)
+                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>' + link_data[2]), self.render_data, 1)
 
             link_count_all -= 1
 
@@ -1269,7 +1263,7 @@ class class_do_render_namumark:
 
         include_num = 0
         include_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_include_link', self.ip)
-        include_regex = re.compile(r'\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\]', re.I)
+        include_regex = re.compile(r'\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\](\n?)', re.I)
         include_count_max = len(re.findall(include_regex, self.render_data)) * 2
         include_change_list = {}
         while 1:
@@ -1351,7 +1345,7 @@ class class_do_render_namumark:
 
                         data_name = self.get_tool_data_storage(include_link, '', match_org)
 
-                    self.render_data = re.sub(include_regex, '<' + data_name + '></' + data_name + '>', self.render_data, 1)
+                    self.render_data = re.sub(include_regex, '<' + data_name + '></' + data_name + '>' + match[1], self.render_data, 1)
 
             include_count_max -= 1
 
