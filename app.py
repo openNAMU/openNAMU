@@ -406,6 +406,9 @@ app.route('/record/<int:num>/<set_type>/<name>', defaults = { 'tool' : 'record' 
 app.route('/record/reset/<name>', methods = ['POST', 'GET'])(recent_record_reset)
 app.route('/record/topic/<name>')(recent_record_topic)
 
+app.route('/record/bbs/<name>', defaults = { 'tool' : 'record' })(bbs_w)
+app.route('/record/bbs_comment/<name>', defaults = { 'tool' : 'comment_record' })(bbs_w)
+
 app.route('/history/<everything:name>', defaults = { 'tool' : 'history' }, methods = ['POST', 'GET'])(recent_change)
 app.route('/history_page/<int:num>/<set_type>/<everything:name>', defaults = { 'tool' : 'history' }, methods = ['POST', 'GET'])(recent_change)
 

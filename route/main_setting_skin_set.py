@@ -15,15 +15,9 @@ def main_setting_skin_set():
             for for_b in set_list:
                 curs.execute(db_change('select data from other where name = ?'), [for_b])
                 if curs.fetchall():
-                    curs.execute(db_change("update other set data = ? where name = ?"), [
-                        flask.request.form.get(for_b, set_list[for_b][0][0]),
-                        for_b
-                    ])
+                    curs.execute(db_change("update other set data = ? where name = ?"), [flask.request.form.get(for_b, set_list[for_b][0][0]), for_b])
                 else:
-                    curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [
-                        for_b, 
-                        flask.request.form.get(for_b, set_list[for_b][0][0])
-                    ])
+                    curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [for_b, flask.request.form.get(for_b, set_list[for_b][0][0])])
             
             conn.commit()
 
