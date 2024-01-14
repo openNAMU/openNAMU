@@ -119,7 +119,7 @@ def main_setting_skin_set():
                         <select name="main_css_table_scroll">
                             ''' + set_data["main_css_table_scroll"] + '''
                         </select>
-                        <h4>''' + load_lang("table_scroll") + '''</h4>
+                        <h4>''' + load_lang("table_transparent") + '''</h4>
                         ''' + set_data_main["main_css_table_transparent"] + '''
                         <select name="main_css_table_transparent">
                             ''' + set_data["main_css_table_transparent"] + '''
