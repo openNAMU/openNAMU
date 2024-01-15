@@ -199,10 +199,7 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                 ''
 
                 title = name
-                menu = [
-                    ['other', load_lang('other')], 
-                    ['user', load_lang('user')]
-                ]
+                menu = [['user/' + url_pas(name), load_lang('user_tool')]]
                 if admin == 1:
                     menu += [['record/reset/' + url_pas(name), load_lang('record_reset')]]
 
