@@ -1,7 +1,7 @@
 from .tool.func import *
 
 def api_topic_thread_make(user_id, date, data, code, color = '', blind = '', add_style = ''):
-    if blind != '':
+    if blind == 'O':
         if data == '':
             color_b = 'opennamu_comment_blind'
         else:
