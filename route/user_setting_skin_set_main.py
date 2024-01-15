@@ -88,6 +88,10 @@ def user_setting_skin_set_main_set_list():
             ['default', load_lang('default')],
             ['off', load_lang('off')],
             ['on', load_lang('use')]
+        ], 'main_css_table_transparent' : [
+            ['default', load_lang('default')],
+            ['off', load_lang('off')],
+            ['on', load_lang('use')]
         ]
     }
 
@@ -228,10 +232,16 @@ def user_setting_skin_set_main():
                         <select name="main_css_darkmode">
                             ''' + set_data["main_css_darkmode"] + '''
                         </select>
-                        <h3>''' + load_lang("table_scroll") + '''</h3>
+                        <h3>''' + load_lang("table") + '''</h3>
+                        <h4>''' + load_lang("table_scroll") + '''</h4>
                         ''' + set_data_main["main_css_table_scroll"] + '''
                         <select name="main_css_table_scroll">
                             ''' + set_data["main_css_table_scroll"] + '''
+                        </select>
+                        <h4>''' + load_lang("table_transparent") + '''</h4>
+                        ''' + set_data_main["main_css_table_transparent"] + '''
+                        <select name="main_css_table_transparent">
+                            ''' + set_data["main_css_table_transparent"] + '''
                         </select>
                         <h3>''' + load_lang("list_view_change") + '''</h3>
                         ''' + set_data_main["main_css_list_view_change"] + '''

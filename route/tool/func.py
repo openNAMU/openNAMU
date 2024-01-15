@@ -1371,6 +1371,20 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                 if math_set_data == 'on':
                     get_class_render[0] = '<style>.katex .base { overflow-x: scroll; }</style>' + get_class_render[0]
 
+                transparent_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_transparent', ip)
+                if transparent_set_data == 'on':
+                    get_class_render[0] = '''
+                        <style>
+                            .table_safe td {
+                                background: transparent !important;
+                            }
+
+                            .table_safe span {
+                                color: inherit !important;
+                            }
+                        </style>
+                    ''' + get_class_render[0]
+
                 if data_type == 'api_view' or data_type == 'api_thread':
                     return [
                         get_class_render[0], 

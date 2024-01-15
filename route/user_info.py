@@ -64,12 +64,14 @@ def user_info(name = ''):
                 ''' + tool_menu + '''
                 <h2>''' + load_lang('other') + '''</h2>
                 <ul class="opennamu_ul">
-                    <li><a href="/record/''' + url_pas(ip) + '''">''' + load_lang('record') + '''</a></li>
+                    <li><a href="/record/''' + url_pas(ip) + '''">''' + load_lang('edit_record') + '''</a></li>
                     <li><a href="/record/topic/''' + url_pas(ip) + '''">''' + load_lang('discussion_record') + '''</a></li>
+                    <li><a href="/record/bbs/''' + url_pas(ip) + '''">''' + load_lang('bbs_record') + '''</a></li>
+                    <li><a href="/record/bbs_comment/''' + url_pas(ip) + '''">''' + load_lang('bbs_comment_record') + '''</a></li>
                     <li><a href="/topic/user:''' + url_pas(ip) + '''">''' + load_lang('user_discussion') + '''</a></li>
                     <li><a href="/count/''' + url_pas(ip) + '''">''' + load_lang('count') + '''</a></li>
                 </ul>
                 ''' + admin_menu + '''
             ''',
-            menu = 0
+            menu = [['other', load_lang('other_tool')]]
         ))
