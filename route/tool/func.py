@@ -1001,7 +1001,7 @@ def wiki_css(data):
     data_css = ''
     data_css_add = ''
 
-    data_css_ver = '187'
+    data_css_ver = '188'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:
@@ -1025,6 +1025,7 @@ def wiki_css(data):
         data_css += '<script src="/views/main_css/js/route/editor_sub.js' + data_css_ver + '"></script>'
         data_css += '<script src="/views/main_css/js/route/render.js' + data_css_ver + '"></script>'
         data_css += '<script src="/views/main_css/js/route/topic.js' + data_css_ver + '"></script>'
+        data_css += '<script src="/views/main_css/js/route/topic_sub.js' + data_css_ver + '"></script>'
         
         # Main CSS
         data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css' + data_css_ver + '">'

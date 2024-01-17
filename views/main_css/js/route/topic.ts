@@ -1,7 +1,3 @@
-function opennamu_check_new_thread(do_type : string = '') {
-    
-}
-
 function opennamu_do_remove_blind_thread() {
     const style = document.querySelector('#opennamu_remove_blind') as HTMLInputElement | null;
     if(style !== null) {
