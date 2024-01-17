@@ -444,7 +444,7 @@ app.route('/random', defaults = { 'db_set' : db_set_str })(view_random)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
-app.route('/edit_from/<everything:name>', defaults = { 'do_type' : 'load' })(edit)
+app.route('/edit_from/<everything:name>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'load' })(edit)
 app.route('/edit_section/<int:section>/<everything:name>', methods = ['POST', 'GET'])(edit)
 
 app.route('/upload', methods = ['POST', 'GET'])(edit_upload)
