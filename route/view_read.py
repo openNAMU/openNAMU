@@ -135,8 +135,12 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             file_all_name = sha224_replace(file_name) + '.' + mime_type
             file_path_name = os.path.join(load_image_url(), file_all_name)
             if os.path.exists(file_path_name):
-                img = Image.open(file_path_name)
-                width, height = img.size
+                try:
+                    img = Image.open(file_path_name)
+                    width, height = img.size
+                    file_res = str(width) + 'x' + str(height)
+                except:
+                    file_res = 'Vector'
                 
                 file_size = str(round(os.path.getsize(file_path_name) / 1000, 1))
                 
@@ -146,7 +150,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                     <table>
                         <tr><td>URL</td><td><a href="/image/''' + url_pas(file_all_name) + '''">''' + load_lang('link') + '''</a></td></tr>
                         <tr><td>''' + load_lang('volume') + '''</td><td>''' + file_size + '''KB</td></tr>
-                        <tr><td>''' + load_lang('resolution') + '''</td><td>''' + str(width) + 'x' + str(height) + '''</td></tr>
+                        <tr><td>''' + load_lang('resolution') + '''</td><td>''' + file_res + '''</td></tr>
                     </table>
                     <h2>''' + load_lang('content') + '''</h2>
                 '''
