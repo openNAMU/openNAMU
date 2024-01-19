@@ -350,53 +350,18 @@ def get_db_table_list():
     
     return create_data
 
-def auto_do_something(data_db_set):
+def back_up(data_db_set):
     with get_db_connect() as conn:
         curs = conn.cursor()
-        
-        if data_db_set['type'] == 'sqlite':
-            def back_up(back_time, back_up_where, back_up_count = 0):
-                try:
-                    if back_up_count != 0:
-                        file_dir = os.path.split(back_up_where)[0]
-                        file_dir = '.' if file_dir == '' else file_dir
-                        
-                        file_name = os.path.split(back_up_where)[1]
-                        file_name = re.sub(r'\.db$', '_[0-9]{14}.db', file_name)
-
-                        backup_file = [for_a for for_a in os.listdir(file_dir) if re.search('^' + file_name + '$', for_a)]
-                        backup_file = sorted(backup_file)
-                        
-                        if len(backup_file) >= back_up_count:
-                            remove_dir = os.path.join(file_dir, backup_file[0])
-                            os.remove(remove_dir)
-                            print('Back up : Remove (' + remove_dir + ')')
-
-                    now_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-                    new_file_name = re.sub(r'\.db$', '_' + now_time + '.db', back_up_where)
-                    shutil.copyfile(
-                        data_db_set['name'] + '.db', 
-                        new_file_name
-                    )
-
-                    print('Back up : OK (' + new_file_name + ')')
-                except Exception as e:
-                    print('Back up : Error')
-                    print(e)
-
-                threading.Timer(
-                    60 * 60 * back_time, 
-                    back_up,
-                    [back_time, back_up_where, back_up_count]
-                ).start()
-
+    
+        try:
             curs.execute(db_change('select data from other where name = "back_up"'))
             back_time = curs.fetchall()
             back_time = float(number_check(back_time[0][0], True)) if back_time and back_time[0][0] != '' else 0
 
             curs.execute(db_change('select data from other where name = "backup_count"'))
             back_up_count = curs.fetchall()
-            back_up_count = int(number_check(back_up_count[0][0])) if back_up_count and back_up_count[0][0] != '' else 0
+            back_up_count = int(number_check(back_up_count[0][0])) if back_up_count and back_up_count[0][0] != '' else 3
 
             if back_time != 0:
                 curs.execute(db_change('select data from other where name = "backup_where"'))
@@ -408,9 +373,47 @@ def auto_do_something(data_db_set):
                 if back_up_count != 0:
                     print('Back up max number : ' + str(back_up_count))
 
-                back_up(back_time, back_up_where, back_up_count)
+                    file_dir = os.path.split(back_up_where)[0]
+                    file_dir = '.' if file_dir == '' else file_dir
+                    
+                    file_name = os.path.split(back_up_where)[1]
+                    file_name = re.sub(r'\.db$', '_[0-9]{14}.db', file_name)
+
+                    backup_file = [for_a for for_a in os.listdir(file_dir) if re.search('^' + file_name + '$', for_a)]
+                    backup_file = sorted(backup_file)
+                    
+                    if len(backup_file) >= back_up_count:
+                        remove_dir = os.path.join(file_dir, backup_file[0])
+                        os.remove(remove_dir)
+                        print('Back up : Remove (' + remove_dir + ')')
+
+                now_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+                new_file_name = re.sub(r'\.db$', '_' + now_time + '.db', back_up_where)
+                shutil.copyfile(
+                    data_db_set['name'] + '.db', 
+                    new_file_name
+                )
+
+                print('Back up : OK (' + new_file_name + ')')
             else:
                 print('Back up state : Turn off')
+
+                back_time = 1
+        except Exception as e:
+            print('Back up : Error')
+            print(e)
+
+            back_time = 1
+
+        threading.Timer(
+            60 * 60 * back_time, 
+            back_up,
+            [data_db_set]
+        ).start()
+
+def auto_do_something(data_db_set):
+    if data_db_set['type'] == 'sqlite':
+        back_up(data_db_set)
 
 def update(ver_num, set_data):
     with get_db_connect() as conn:
