@@ -215,17 +215,17 @@ def main_setting_main(db_set):
                             <hr class="main_hr">
                             <hr class="main_hr">
                             
-                            <span>''' + load_lang('backup_interval') + '''</span> (''' + load_lang('hour') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('restart_required') + ''')
+                            <span>''' + load_lang('backup_interval') + '''</span> (''' + load_lang('hour') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                             <hr class="main_hr">
                             <input name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr class="main_hr">
                             
-                            <span>''' + load_lang('backup_where') + '''</span> (''' + load_lang('default') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('restart_required') + ''') (''' + load_lang('example') + ''' : ./data/backup.db)
+                            <span>''' + load_lang('backup_where') + '''</span> (''' + load_lang('default') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('example') + ''' : ./data/backup.db)
                             <hr class="main_hr">
                             <input name="backup_where" value="''' + html.escape(d_list[21]) + '''">
                             <hr class="main_hr">
 
-                            <span>''' + load_lang('backup_count') + '''</span> (''' + load_lang('default') + ''' : ''' + load_lang('empty') + ''') (''' + load_lang('restart_required') + ''')
+                            <span>''' + load_lang('backup_count') + '''</span> (''' + load_lang('default') + ''' : ''' + load_lang('empty') + ''')
                             <hr class="main_hr">
                             <input name="backup_count" value="''' + html.escape(d_list[41]) + '''">
                             <hr class="main_hr">
