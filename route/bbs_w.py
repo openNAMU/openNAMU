@@ -102,7 +102,7 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
             curs.execute(db_change('select set_code, set_id, set_data from bbs_data where set_name = "date" and (set_code, set_id) in (select set_code, set_id from bbs_data where set_name = "user_id" and set_data = ?) as sub_query order by set_data desc limit 50'), [name])
             db_data = curs.fetchall()
         elif tool == 'comment_record':
-            curs.execute(db_change('select set_code, set_id, set_data from bbs_data where set_name = "comment_date" and (set_code, set_id) in (select set_code, set_id from bbs_data where set_name = "comment_user_id" and set_data = ?) order by set_data desc limit 50'), [name])
+            curs.execute(db_change('select set_code, set_id, set_data from bbs_data where set_name = "comment_date" and (set_code, set_id) in (select set_code, set_id from bbs_data where set_name = "comment_user_id" and set_data = ?) as sub_query order by set_data desc limit 50'), [name])
             db_data = curs.fetchall()
         else:
             curs.execute(db_change('select set_code, set_id, set_data from bbs_data where set_name = "date" order by set_data desc limit 50'))
