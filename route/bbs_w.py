@@ -99,7 +99,7 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
             db_data_2 = curs.fetchall()
             db_data += list(db_data_2) if db_data_2 else []
         elif tool == 'record':
-            curs.execute(db_change('select set_code, set_id, set_data from bbs_data where set_name = "date" and (set_code, set_id) in (select set_code, set_id from bbs_data where set_name = "user_id" and set_data = ?) order by set_data desc limit 50'), [name])
+            curs.execute(db_change('select set_code, set_id, set_data from bbs_data where set_name = "date" and (set_code, set_id) in (select set_code, set_id from bbs_data where set_name = "user_id" and set_data = ?) as sub_query order by set_data desc limit 50'), [name])
             db_data = curs.fetchall()
         elif tool == 'comment_record':
             curs.execute(db_change('select set_code, set_id, set_data from bbs_data where set_name = "comment_date" and (set_code, set_id) in (select set_code, set_id from bbs_data where set_name = "comment_user_id" and set_data = ?) order by set_data desc limit 50'), [name])
@@ -128,11 +128,9 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
                 notice = 0
 
             if tool == 'comment_record':
-                print(for_b, bbs_split)
                 curs.execute(db_change('select set_name, set_data, set_code, set_id from bbs_data where set_name = "title" and set_code = ? and set_id = ?'), [bbs_split[1], bbs_split[0]])
                 db_data = curs.fetchall()
                 db_data = list(db_data) if db_data else []
-                print(db_data)
                 for for_a in db_data:
                     temp_dict[for_a[0]] = for_a[1]
             
@@ -142,7 +140,6 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
                     
                 comment_link += ('-' + for_b[0] if comment_link != '' else for_b[0])
                     
-                
                 data += '''
                     <tr>
                         <td>''' + ip_pas(temp_dict['comment_user_id']) + '''</td>
