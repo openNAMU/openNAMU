@@ -10,7 +10,7 @@ def main_setting():
             ['head', load_lang('main_head')],
             ['body/top', load_lang('main_body')],
             ['body/bottom', load_lang('main_bottom_body')],
-            ['sitemap', load_lang('sitemap_management')],
+            ['sitemap_set', load_lang('sitemap_management')],
             ['top_menu', load_lang('top_menu_setting')],
             ['skin_set', load_lang('main_skin_set_default')],
             ['acl', load_lang('main_acl_setting')]
