@@ -787,8 +787,6 @@ def load_domain(data_type = 'normal'):
         curs = conn.cursor()
         
         domain = ''
-        sys_host = flask.request.host
-        
         if data_type == 'full':
             curs.execute(db_change("select data from other where name = 'http_select'"))
             db_data = curs.fetchall()
@@ -797,11 +795,11 @@ def load_domain(data_type = 'normal'):
 
             curs.execute(db_change("select data from other where name = 'domain'"))
             db_data = curs.fetchall()
-            domain += db_data[0][0] if db_data and db_data[0][0] != '' else sys_host
+            domain += db_data[0][0] if db_data and db_data[0][0] != '' else flask.request.host
         else:
             curs.execute(db_change("select data from other where name = 'domain'"))
             db_data = curs.fetchall()
-            domain += db_data[0][0] if db_data and db_data[0][0] != '' else sys_host
+            domain += db_data[0][0] if db_data and db_data[0][0] != '' else flask.request.host
 
         return domain
 
