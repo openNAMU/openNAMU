@@ -350,71 +350,6 @@ def get_db_table_list():
     
     return create_data
 
-def back_up(data_db_set):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-    
-        try:
-            curs.execute(db_change('select data from other where name = "back_up"'))
-            back_time = curs.fetchall()
-            back_time = float(number_check(back_time[0][0], True)) if back_time and back_time[0][0] != '' else 0
-
-            curs.execute(db_change('select data from other where name = "backup_count"'))
-            back_up_count = curs.fetchall()
-            back_up_count = int(number_check(back_up_count[0][0])) if back_up_count and back_up_count[0][0] != '' else 3
-
-            if back_time != 0:
-                curs.execute(db_change('select data from other where name = "backup_where"'))
-                back_up_where = curs.fetchall()
-                back_up_where = back_up_where[0][0] if back_up_where and back_up_where[0][0] != '' else data_db_set['name'] + '.db'
-
-                print('Back up state : ' + str(back_time) + ' hours')
-                print('Back up directory : ' + back_up_where)
-                if back_up_count != 0:
-                    print('Back up max number : ' + str(back_up_count))
-
-                    file_dir = os.path.split(back_up_where)[0]
-                    file_dir = '.' if file_dir == '' else file_dir
-                    
-                    file_name = os.path.split(back_up_where)[1]
-                    file_name = re.sub(r'\.db$', '_[0-9]{14}.db', file_name)
-
-                    backup_file = [for_a for for_a in os.listdir(file_dir) if re.search('^' + file_name + '$', for_a)]
-                    backup_file = sorted(backup_file)
-                    
-                    if len(backup_file) >= back_up_count:
-                        remove_dir = os.path.join(file_dir, backup_file[0])
-                        os.remove(remove_dir)
-                        print('Back up : Remove (' + remove_dir + ')')
-
-                now_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-                new_file_name = re.sub(r'\.db$', '_' + now_time + '.db', back_up_where)
-                shutil.copyfile(
-                    data_db_set['name'] + '.db', 
-                    new_file_name
-                )
-
-                print('Back up : OK (' + new_file_name + ')')
-            else:
-                print('Back up state : Turn off')
-
-                back_time = 1
-        except Exception as e:
-            print('Back up : Error')
-            print(e)
-
-            back_time = 1
-
-        threading.Timer(
-            60 * 60 * back_time, 
-            back_up,
-            [data_db_set]
-        ).start()
-
-def auto_do_something(data_db_set):
-    if data_db_set['type'] == 'sqlite':
-        back_up(data_db_set)
-
 def update(ver_num, set_data):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -852,7 +787,10 @@ def load_domain(data_type = 'normal'):
         curs = conn.cursor()
         
         domain = ''
-        sys_host = flask.request.host
+        try:
+            sys_host = flask.request.host
+        except:
+            sys_host = ''
         
         if data_type == 'full':
             curs.execute(db_change("select data from other where name = 'http_select'"))
@@ -2100,15 +2038,7 @@ def ban_check(ip = None, tool = ''):
         if admin_check(None, None, ip) == 1:
             return 0
 
-        curs.execute(db_change(
-            "update rb set ongoing = '' " + \
-            "where end < ? and end != '' and ongoing = '1'"
-        ), [get_time()])
-
-        curs.execute(db_change("" + \
-            "select login, block from rb " + \
-            "where band = 'regex' and ongoing = '1'" + \
-        ""))
+        curs.execute(db_change("select login, block from rb where band = 'regex' and ongoing = '1'"))
         regex_d = curs.fetchall()
         for test_r in regex_d:
             g_regex = re.compile(test_r[1])
@@ -2119,11 +2049,7 @@ def ban_check(ip = None, tool = ''):
                 else:
                     return 1
 
-        curs.execute(db_change("" + \
-            "select login from rb " + \
-            "where block = ? and band = '' and ongoing = '1'" + \
-            "" + \
-        ""), [ip])
+        curs.execute(db_change("select login from rb where block = ? and band = '' and ongoing = '1'"), [ip])
         ban_d = curs.fetchall()
         if ban_d:
             if tool == 'login':
