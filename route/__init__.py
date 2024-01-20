@@ -93,6 +93,7 @@ from route.main_setting_main_logo import main_setting_main_logo
 from route.main_setting_phrase import main_setting_phrase
 from route.main_setting_robot import main_setting_robot
 from route.main_setting_sitemap import main_setting_sitemap
+from route.main_setting_sitemap_set import main_setting_sitemap_set
 from route.main_setting_skin_set import main_setting_skin_set
 from route.main_setting_top_menu import main_setting_top_menu
 
