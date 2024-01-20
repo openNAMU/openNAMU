@@ -91,6 +91,8 @@ def main_setting_sitemap(do_type = 0):
 
             if not do_type == 1:
                 return redirect('/setting/sitemap')
+            else:
+                return ''
         else:
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('sitemap_manual_create'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
