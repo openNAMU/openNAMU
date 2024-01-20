@@ -405,15 +405,21 @@ def back_up(data_db_set):
 
             back_time = 1
 
-        threading.Timer(
-            60 * 60 * back_time, 
-            back_up,
-            [data_db_set]
-        ).start()
+        threading.Timer(60 * 60 * back_time, back_up, [data_db_set]).start()
+
+def do_ban_end():
+    with get_db_connect() as conn:
+        curs = conn.cursor()
+
+        curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [get_time()])
+
+        threading.Timer(60, do_ban_end).start()
 
 def auto_do_something(data_db_set):
     if data_db_set['type'] == 'sqlite':
         back_up(data_db_set)
+
+    do_ban_end()
 
 def update(ver_num, set_data):
     with get_db_connect() as conn:
@@ -2100,15 +2106,7 @@ def ban_check(ip = None, tool = ''):
         if admin_check(None, None, ip) == 1:
             return 0
 
-        curs.execute(db_change(
-            "update rb set ongoing = '' " + \
-            "where end < ? and end != '' and ongoing = '1'"
-        ), [get_time()])
-
-        curs.execute(db_change("" + \
-            "select login, block from rb " + \
-            "where band = 'regex' and ongoing = '1'" + \
-        ""))
+        curs.execute(db_change("select login, block from rb where band = 'regex' and ongoing = '1'"))
         regex_d = curs.fetchall()
         for test_r in regex_d:
             g_regex = re.compile(test_r[1])
@@ -2119,11 +2117,7 @@ def ban_check(ip = None, tool = ''):
                 else:
                     return 1
 
-        curs.execute(db_change("" + \
-            "select login from rb " + \
-            "where block = ? and band = '' and ongoing = '1'" + \
-            "" + \
-        ""), [ip])
+        curs.execute(db_change("select login from rb where block = ? and band = '' and ongoing = '1'"), [ip])
         ban_d = curs.fetchall()
         if ban_d:
             if tool == 'login':

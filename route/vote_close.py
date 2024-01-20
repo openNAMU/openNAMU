@@ -23,7 +23,7 @@ def vote_close(num = 1):
         else:
             type_set = 'n_close'
 
-        curs.execute(db_change("update vote set type = ? where user = '' and id = ?"), [type_set, num])
+        curs.execute(db_change("update vote set type = ? where user = '' and id = ? and type = ?"), [type_set, num, data_list[0][0]])
         conn.commit()
 
         if data_list[0][0] == 'close' or data_list[0][0] == 'n_close':
