@@ -412,14 +412,35 @@ def do_ban_end():
         curs = conn.cursor()
 
         curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [get_time()])
+        conn.commit()
 
         threading.Timer(60, do_ban_end).start()
+
+def do_vote_end():
+    with get_db_connect() as conn:
+        curs = conn.cursor()
+    
+        curs.execute(db_change('select id, type from vote where type = "open" or type = "n_open"'))
+        for for_a in curs.fetchall():
+            curs.execute(db_change('select data from vote where id = ? and name = "end_date" and type = "option"'), [for_a[0]])
+            db_data = curs.fetchall()
+            if db_data:
+                time_db = db_data[0][0].split()[0]
+                time_today = get_time().split()[0]
+
+                if time_today > time_db:
+                    curs.execute(db_change("update vote set type = ? where user = '' and id = ? and type = ?"), ['close' if for_a[1] == 'open' else 'n_close', for_a[0], for_a[1]])
+
+        conn.commit()
+
+        threading.Timer(60 * 60 * 24, do_ban_end).start()
 
 def auto_do_something(data_db_set):
     if data_db_set['type'] == 'sqlite':
         back_up(data_db_set)
 
     do_ban_end()
+    do_vote_end()
 
 def update(ver_num, set_data):
     with get_db_connect() as conn:
