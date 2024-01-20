@@ -188,11 +188,12 @@ def api_topic(topic_num = 1, tool = 'normal', num = '', render = ''):
                         for for_a in data_a['data']:
                             if tool == 'top':
                                 color = 'red'
+                            elif for_a["blind"] == '1':
+                                color = 'blue'
+                            elif data_a['data_main']["ip_first"] == for_a["ip"]:
+                                color = 'green'
                             else:
-                                if data_a['data_main']["ip_first"] == for_a["ip"]:
-                                    color = 'green'
-                                else:
-                                    color = 'default'
+                                color = 'default'
 
                             data_r += api_topic_thread_make(
                                 for_a["ip_pas"],

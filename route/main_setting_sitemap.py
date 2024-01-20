@@ -1,36 +1,47 @@
 from .tool.func import *
 
-def main_setting_sitemap():
+def main_setting_sitemap(do_type = 0):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check() != 1:
-            return re_error('/ban')
+        if not do_type == 1:
+            if admin_check() != 1:
+                return re_error('/ban')
         
-        if flask.request.method == 'POST':
-            admin_check(None, 'make sitemap')
+        if do_type == 1 or flask.request.method == 'POST':
+            if not do_type == 1:
+                admin_check(None, 'make sitemap')
 
             data = '' + \
                 '<?xml version="1.0" encoding="UTF-8"?>\n' + \
                 '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + \
             ''
 
-            if flask.request.form.get('exclude_domain', None):
+            curs.execute(db_change('select data from other where name = "sitemap_auto_exclude_domain"'))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '':
                 domain = ''
             else:
                 domain = load_domain('full')
 
             sql_add = ''
-            if flask.request.form.get('exclude_user_page', None):
+
+            curs.execute(db_change('select data from other where name = "sitemap_auto_exclude_user_page"'))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '':
                 sql_add += ' title not like "user:%"'
 
-            if flask.request.form.get('exclude_file_page', None):
+            curs.execute(db_change('select data from other where name = "sitemap_auto_exclude_file_page"'))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '':
                 if sql_add != '':
                     sql_add += ' and'
 
                 sql_add += ' title not like "file:%"'
 
-            if flask.request.form.get('exclude_category_page', None):
+            curs.execute(db_change('select data from other where name = "sitemap_auto_exclude_category_page"'))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '':
                 if sql_add != '':
                     sql_add += ' and'
 
@@ -39,7 +50,6 @@ def main_setting_sitemap():
             if sql_add != '':
                 sql_add = ' where' + sql_add
 
-            print(sql_add)
             curs.execute(db_change("select title from data" + sql_add))
             all_data = curs.fetchall()
 
@@ -79,38 +89,17 @@ def main_setting_sitemap():
                 f.write(data)
                 f.close()
 
-            return redirect('/setting/sitemap')
+            if not do_type == 1:
+                return redirect('/setting/sitemap')
+            else:
+                return ''
         else:
-            sitemap_list = ''
-            if os.path.exists('sitemap.xml'):
-                sitemap_list += '<a href="/sitemap.xml">(' + load_lang('view') + ')</a>'
-
-                for_a = 0
-                while os.path.exists('sitemap_' + str(for_a) + '.xml'):
-                    sitemap_list += ' <a href="/sitemap_' + str(for_a) + '.xml">(sitemap_' + str(for_a) + '.xml)</a>'
-
-                    for_a += 1
-
             return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('sitemap_management'), wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('beta') + ')', 0])],
+                imp = [load_lang('sitemap_manual_create'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
-                    ''' + sitemap_list + '''
-                    <hr class="main_hr">
                     <form method="post">
-                        <input type="checkbox" name="exclude_domain"> ''' + load_lang('stiemap_exclude_domain') + '''
-                        <hr class="main_hr">
-
-                        <input type="checkbox" name="exclude_user_page"> ''' + load_lang('stiemap_exclude_user_page') + '''
-                        <hr class="main_hr">
-
-                        <input type="checkbox" name="exclude_file_page"> ''' + load_lang('stiemap_exclude_file_page') + '''
-                        <hr class="main_hr">
-
-                        <input type="checkbox" name="exclude_category_page"> ''' + load_lang('stiemap_exclude_category_page') + '''
-                        <hr class="main_hr">
-
                         <button id="opennamu_save_button" type="submit">''' + load_lang('create') + '''</button>
                     </form>
                 ''',
-                menu = [['setting', load_lang('return')]]
+                menu = [['setting/sitemap_set', load_lang('return')]]
             ))
