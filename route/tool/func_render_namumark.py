@@ -1408,7 +1408,7 @@ class class_do_render_namumark:
                         else:
                             foot_v_name += footnote_name
                             
-                        if footnote_number_view_set != 'off':
+                        if footnote_number_view_set == 'on':
                             foot_v_name += ' (' + footnote_num_str + ')'
                     else:
                         self.data_footnote[footnote_name] = {}
@@ -1423,7 +1423,7 @@ class class_do_render_namumark:
                         else:
                             foot_v_name += footnote_name
                             
-                        if footnote_number_view_set != 'off':
+                        if footnote_number_view_set == 'on':
                             foot_v_name += footnote_name_add
 
                     if footnote_set == 'spread':
