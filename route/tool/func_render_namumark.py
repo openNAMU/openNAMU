@@ -2169,7 +2169,7 @@ class class_do_render_namumark:
                     return '<li style="margin-left: ' + str((list_len - 1) * 20) + 'px;" class="opennamu_list_none">' + change_text + '. ' + list_data + '</li>'
 
         # 숫자 리스트
-        list_regex = r'((?:\n( *)(?:(1|a|A|I|i)\.(?:#([0-9]*))?|(\*)) ?([^\n]*))+)\n'
+        list_regex = r'((?:\n( *)(?:(\*)) ?([^\n]*))+|(?:\n( *)(?:(1|a|A|I|i)\.(?:#([0-9]*))?) ?([^\n]*)){2,})\n'
         list_count_max = len(re.findall(list_regex, self.render_data)) * 3
         while 1:
             list_data = re.search(list_regex, self.render_data)
