@@ -51,6 +51,7 @@ def give_auth(name):
                 return re_error('/error/3')
 
             div = '<option value="X">' + load_lang('normal') + '</option>'
+            div += '<option value="ban">' + load_lang('ban') + '</option>'
 
             curs.execute(db_change('select distinct name from alist order by name asc'))
             for data in curs.fetchall():
