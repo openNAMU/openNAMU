@@ -420,7 +420,7 @@ app.route('/auth/give/<name>', methods = ['POST', 'GET'])(give_auth)
 # /auth/give
 # /auth/give/<name>
 app.route('/auth/give/ban', methods = ['POST', 'GET'])(give_user_ban)
-app.route('/auth/give/ban/<name>', methods = ['POST', 'GET'])(give_user_ban)
+app.route('/auth/give/ban/<everything:name>', methods = ['POST', 'GET'])(give_user_ban)
 app.route('/auth/give/ban_regex/<everything:name>', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'regex' })(give_user_ban)
 app.route('/auth/give/ban_multiple', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'multiple' })(give_user_ban)
 
