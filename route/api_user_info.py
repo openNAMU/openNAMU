@@ -24,7 +24,7 @@ def api_user_info(name = ''):
                 if db_data:
                     if db_data[0][0] != 'user':
                         curs.execute(db_change("select name from alist where name = ?"), [db_data[0][0]])
-                        if curs.fetchall():
+                        if curs.fetchall() or db_data[0][0] in get_default_admin_group():
                             data_result[user_name]['auth'] = db_data[0][0]
                         else:
                             data_result[user_name]['auth'] = '1'
