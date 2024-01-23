@@ -26,19 +26,22 @@ def give_auth(name):
             if admin_check(7, 'admin (' + name + ')') != 1:
                 return re_error('/error/3')
 
-            if flask.request.form.get('select', 'X') == 'X':
+            select_data = flask.request.form.get('select', 'X')
+            if select_data == 'X':
                 select_data = 'user'
-            else:
-                select_data = flask.request.form.get('select', 'X')
 
             curs.execute(db_change('select name from alist where name = ? and acl = "owner"'), [select_data])
             if owner_auth != 1 and curs.fetchall():
                 return re_error('/error/3')
 
-            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'acl'"), [
-                select_data, 
-                name
-            ])
+            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'acl'"), [select_data, name])
+            curs.execute(db_change('delete from user_set where name = "auth_date" and id = ?'), [name])
+
+            time_limitless = flask.request.form.get('limitless', '')
+            if time_limitless == '' and select_data != 'user':
+                time_limit = flask.request.form.get('date', '')
+                if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', time_limit):
+                    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'auth_date', ?)"), [name, time_limit])
 
             conn.commit()
 
@@ -59,11 +62,17 @@ def give_auth(name):
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('authorize') + ')', 0])],
                 data =  '''
-                        <form method="post">
-                            <select name="select">''' + div + '''</select>
-                            <hr class="main_hr">
-                            <button type="submit">''' + load_lang('save') + '''</button>
-                        </form>
-                        ''',
+                    <form method="post">
+                        <div id="opennamu_get_user_info">''' + html.escape(name) + '''</div>
+                        <hr class="main_hr">
+                        <select name="select">''' + div + '''</select>
+                        <hr class="main_hr">
+                        <input type="date" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">
+                        <hr class="main_hr">
+                        <input type="checkbox" value="Y" name="limitless"> ''' + load_lang('limitless') + '''
+                        <hr class="main_hr">
+                        <button type="submit">''' + load_lang('save') + '''</button>
+                    </form>
+                ''',
                 menu = [['manager', load_lang('return')]]
             ))

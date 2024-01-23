@@ -32,6 +32,13 @@ def api_user_info(name = ''):
                         data_result[user_name]['auth'] = '1'
                 else:
                     data_result[user_name]['auth'] = '0'
+
+                curs.execute(db_change("select data from user_set where id = ? and name = 'auth_date'"), [user_name])
+                db_data = curs.fetchall()
+                if db_data:
+                    data_result[user_name]['auth_date'] = db_data[0][0]
+                else:
+                    data_result[user_name]['auth_date'] = '0'
                     
                 # ban part
                 if ban_check(name) == 0:
