@@ -258,38 +258,45 @@ def back_up(data_db_set):
 
         threading.Timer(60 * 60 * back_time, back_up, [data_db_set]).start()
 
-def do_ban_end():
+def do_every_day():
     with get_db_connect() as conn:
         curs = conn.cursor()
-
-        curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [get_time()])
-        conn.commit()
-
-        threading.Timer(60, do_ban_end).start()
-
-def do_vote_end():
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+        
+        # 오늘의 날짜 불러오기
+        time_today = get_time().split()[0]
     
+        # vote 관리
         curs.execute(db_change('select id, type from vote where type = "open" or type = "n_open"'))
         for for_a in curs.fetchall():
             curs.execute(db_change('select data from vote where id = ? and name = "end_date" and type = "option"'), [for_a[0]])
             db_data = curs.fetchall()
             if db_data:
                 time_db = db_data[0][0].split()[0]
-                time_today = get_time().split()[0]
-
                 if time_today > time_db:
                     curs.execute(db_change("update vote set type = ? where user = '' and id = ? and type = ?"), ['close' if for_a[1] == 'open' else 'n_close', for_a[0], for_a[1]])
 
-        conn.commit()
+        # ban 관리
+        curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [get_time()])
 
-        threading.Timer(60 * 60 * 24, do_ban_end).start()
+        # auth 관리
+        curs.execute(db_change('select id, data from user_set where name = "auth_date"'))
+        db_data = curs.fetchall()
+        for for_a in db_data:
+            time_db = for_a[1].split()[0]
+            if time_today > time_db:
+                curs.execute(db_change("update user_set set data = 'user' where id = ? and name = 'acl'"), [for_a[0]])
+                curs.execute(db_change('delete from user_set where name = "auth_date" and id = ?'), [for_a[0]])
+                
+        # acl 관리
+        curs.execute(db_change("select doc_name, doc_rev, set_data from data_set where set_name = 'acl_date'"))
+        db_data = curs.fetchall()
+        for for_a in db_data:
+            time_db = for_a[2].split()[0]
+            if time_today > time_db:
+                curs.execute(db_change("delete from acl where title = ? and type = ?"), [for_a[0], for_a[1]])
+                curs.execute(db_change("delete from data_set where doc_name = ? and doc_rev = ? and set_name = 'acl_date'"), [for_a[0], for_a[1]])
 
-def do_make_sitemap():
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
+        # 사이트맵 생성 관리
         curs.execute(db_change('select data from other where name = "sitemap_auto_make"'))
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
@@ -297,15 +304,15 @@ def do_make_sitemap():
 
             print('Make sitemap')
 
-        threading.Timer(60 * 60 * 24, do_make_sitemap).start()
+        conn.commit()
+
+        threading.Timer(60 * 60 * 24, do_every_day).start()
 
 def auto_do_something(data_db_set):
     if data_db_set['type'] == 'sqlite':
         back_up(data_db_set)
 
-    do_ban_end()
-    do_vote_end()
-    do_make_sitemap()
+    do_every_day()
 
 auto_do_something(data_db_set)
 
