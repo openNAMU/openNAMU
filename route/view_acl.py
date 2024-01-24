@@ -34,23 +34,22 @@ def view_acl(name):
                     check_ok = 'disabled'
 
         if flask.request.method == 'POST':
-            acl_data = [['decu', flask.request.form.get('decu', '')]]
-            acl_data += [['document_edit_acl', flask.request.form.get('document_edit_acl', '')]]
-            acl_data += [['document_move_acl', flask.request.form.get('document_move_acl', '')]]
-            acl_data += [['document_delete_acl', flask.request.form.get('document_delete_acl', '')]]
-            acl_data += [['dis', flask.request.form.get('dis', '')]]
-            acl_data += [['view', flask.request.form.get('view', '')]]
-            acl_data += [['why', flask.request.form.get('why', '')]]
+            acl_data = ['decu', 'document_edit_acl', 'document_move_acl', 'document_delete_acl', 'dis', 'view', 'why']
 
             for i in acl_data:
-                curs.execute(db_change("select title from acl where title = ? and type = ?"), [name, i[0]])
-                if curs.fetchall():
-                    curs.execute(db_change("update acl set data = ? where title = ? and type = ?"), [i[1], name, i[0]])
-                else:
-                    curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [name, i[1], i[0]])
+                form_data = flask.request.form.get(i, '')
+            
+                curs.execute(db_change("delete from acl where title = ? and type = ?"), [name, i])
+                curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [name, form_data, i])
+                
+                curs.execute(db_change("delete from data_set where doc_name = ? and doc_rev = ? and set_name = 'acl_date'"), [name, i])
+                    
+                time_limit = flask.request.form.get(i + '_date', '')
+                if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', time_limit):
+                    curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'acl_date', ?)"), [name, i, time_limit])
 
             all_d = ''
-            for i in ['decu', 'document_edit_acl', 'document_move_acl', 'document_delete_acl', 'dis', 'view']:
+            for i in acl_data[:-1]:
                 if flask.request.form.get(i, '') == '':
                     all_d += 'normal'
                     if i != 'view':
@@ -64,14 +63,9 @@ def view_acl(name):
 
             curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [name])
             db_data = curs.fetchall()
-            if db_data:
-                curs.execute(db_change("update data_set set set_data = ? where doc_name = ? and set_name = 'document_markup'"), [
-                    markup_data, name
-                ])
-            else:
-                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_markup', ?)"), [
-                    name, markup_data
-                ])
+
+            curs.execute(db_change("delete from data_set where doc_name = ? and set_name = 'document_markup'"), [name])
+            curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_markup', ?)"), [name, markup_data])
 
             if not db_data or db_data[0][0] != markup_data:
                 curs.execute(db_change("select data from data where title = ?"), [name])
@@ -110,7 +104,7 @@ def view_acl(name):
 
             for i in acl_get_list:
                 data += '' + \
-                    '<h' + i[2] + '>' + i[0] + (' (' + load_lang('beta') + ')' if i[2] == '4' else '') + '</h' + i[2] + '>' + \
+                    '<h' + i[2] + '>' + i[0] + '</h' + i[2] + '>' + \
                     '<hr class="main_hr">' + \
                     '<select name="' + i[1] + '" ' + check_ok + '>' + \
                 ''
@@ -123,13 +117,23 @@ def view_acl(name):
 
                 data += '</select>'
                 data += '<hr class="main_hr">'
+                
+                date_value = ''
+                
+                curs.execute(db_change("select set_data from data_set where doc_name = ? and doc_rev = ? and set_name = 'acl_date'"), [name, i[1]])
+                db_data = curs.fetchall()
+                if db_data:
+                    date_value = db_data[0][0]
+                
+                data += '<input type="date" ' + check_ok + ' value="' + date_value + '" name="' + i[1] + '_date" pattern="\\d{4}-\\d{2}-\\d{2}">'
+                data += '<hr class="main_hr">'
 
             curs.execute(db_change("select data from acl where title = ? and type = ?"), [name, 'why'])
             acl_data = curs.fetchall()
             acl_why = html.escape(acl_data[0][0]) if acl_data else ''
             data += '' + \
                 '<h3>' + load_lang('why') + '</h3>' + \
-                '<input value="' + acl_why + '" placeholder="' + load_lang('why') + '" name="why" ' + check_ok + '>' + \
+                '<input value="' + acl_why + '" ' + check_ok + ' placeholder="' + load_lang('why') + '" name="why" ' + check_ok + '>' + \
                 '<hr class="main_hr">' + \
             ''
 

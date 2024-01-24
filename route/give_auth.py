@@ -37,11 +37,9 @@ def give_auth(name):
             curs.execute(db_change("update user_set set data = ? where id = ? and name = 'acl'"), [select_data, name])
             curs.execute(db_change('delete from user_set where name = "auth_date" and id = ?'), [name])
 
-            time_limitless = flask.request.form.get('limitless', '')
-            if time_limitless == '' and select_data != 'user':
-                time_limit = flask.request.form.get('date', '')
-                if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', time_limit):
-                    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'auth_date', ?)"), [name, time_limit])
+            time_limit = flask.request.form.get('date', '')
+            if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', time_limit):
+                curs.execute(db_change("insert into user_set (id, name, data) values (?, 'auth_date', ?)"), [name, time_limit])
 
             conn.commit()
 
@@ -59,6 +57,13 @@ def give_auth(name):
                     div = '<option value="' + data[0] + '">' + data[0] + '</option>' + div
                 else:
                     div += '<option value="' + data[0] + '">' + data[0] + '</option>'
+                    
+            date_value = ''
+            
+            curs.execute(db_change('select data from user_set where name = "auth_date" and id = ?'), [name])
+            db_data = curs.fetchall()
+            if db_data:
+                date_value = db_data[0][0]
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('authorize') + ')', 0])],
@@ -68,9 +73,7 @@ def give_auth(name):
                         <hr class="main_hr">
                         <select name="select">''' + div + '''</select>
                         <hr class="main_hr">
-                        <input type="date" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">
-                        <hr class="main_hr">
-                        <input type="checkbox" value="Y" name="limitless"> ''' + load_lang('limitless') + '''
+                        <input type="date" value="''' + date_value + '''" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
                     </form>
