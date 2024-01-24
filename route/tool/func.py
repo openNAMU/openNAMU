@@ -2058,6 +2058,11 @@ def ban_check(ip = None, tool = ''):
             else:
                 return 1
 
+        curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] == 'ban':
+            return 1
+
         return 0
 
 def ip_pas(raw_ip, type_data = 0):
@@ -2521,7 +2526,7 @@ def re_error(data):
 
         if data == '/ban':
             if ban_check() == 1:
-                end = '<div id="opennamu_get_user_info">' + ip_check() + '</div>'
+                end = '<div id="opennamu_get_user_info">' + html.escape(ip_check()) + '</div>'
             else:
                 end = '<ul class="opennamu_ul"><li>' + load_lang('authority_error') + '</li></ul>'
 

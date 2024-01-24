@@ -115,11 +115,11 @@ def give_user_ban(name = None, ban_type = ''):
                 ]
                 insert_data = ''
                 for i in time_data:
-                    insert_data += '<a href="javascript:insert_v(\'second\', \'' + i[0] + '\')">(' + i[1] + ')</a> '
+                    insert_data += '<a href="javascript:opennamu_insert_v(\'second\', \'' + i[0] + '\')">(' + i[1] + ')</a> '
 
                 data = n_name + '''
                     ''' + regex + '''
-                    <script>function insert_v(name, data) { document.getElementById(name).value = data; }</script>''' + insert_data + '''
+                    ''' + insert_data + '''
                     <hr class="main_hr">
                     <input placeholder="''' + load_lang('ban_period') + ''' (''' + load_lang('second') + ''')" name="second" id="second" type="text">
                     <hr class="main_hr">
