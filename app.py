@@ -286,6 +286,15 @@ def do_every_day():
             if time_today > time_db:
                 curs.execute(db_change("update user_set set data = 'user' where id = ? and name = 'acl'"), [for_a[0]])
                 curs.execute(db_change('delete from user_set where name = "auth_date" and id = ?'), [for_a[0]])
+                
+        # acl 관리
+        curs.execute(db_change("select doc_name, doc_rev, set_data from data_set where set_name = 'acl_date'"))
+        db_data = curs.fetchall()
+        for for_a in db_data:
+            time_db = for_a[2].split()[0]
+            if time_today > time_db:
+                curs.execute(db_change("delete from acl where title = ? and type = ?"), [for_a[0], for_a[1]])
+                curs.execute(db_change("delete from data_set where doc_name = ? and doc_rev = ? and set_name = 'acl_date'"), [for_a[0], for_a[1]])
 
         # 사이트맵 생성 관리
         curs.execute(db_change('select data from other where name = "sitemap_auto_make"'))
