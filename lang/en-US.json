@@ -381,7 +381,7 @@
                 "requires_approval" : "Requires approval for register",
                 "approval_question": "Registeration questions",
                 "backup_where" : "Backup location",
-                "ua_get_off" : "Turn off members information collection",
+                "ua_get_off" : "Turn off UA collection",
                 "edit_bottom_compulsion" : "Edit reason required",
                 "edit_bottom_compulsion_acl" : "Edit reason required excluded target ACL",
                 "enable_comment_function" : "Using the comment function",

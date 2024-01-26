@@ -383,7 +383,7 @@
     "input_email_error": "입력 값에 문제가 있습니다.",
     "short_page": "짧은 문서 목록",
     "long_page": "긴 문서 목록",
-    "ua_get_off": "가입자 정보 수집 끄기",
+    "ua_get_off": "UA 수집 끄기",
     "ext_api_req_set": "외부 API 필요 설정",
     "oauth": "OAuth",
     "basic_set": "기본 설정",
