@@ -1739,38 +1739,32 @@ def admin_check(num = None, what = None, name = ''):
         pass_ok = 0
 
         if ip_or_user(ip) == 0:
-            curs.execute(db_change(
-                "select data from user_set where id = ? and name = 'acl'"
-            ), [ip])
+            curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
             user_auth = curs.fetchall()
             if user_auth:
                 user_auth = user_auth[0][0]
                 check = get_admin_auth_list(num)
                 
-                curs.execute(db_change(
-                    'select name from alist where name = ? and acl = "owner"'
-                ), [user_auth])
+                curs.execute(db_change('select name from alist where name = ? and acl = "owner"'), [user_auth])
                 if curs.fetchall():
                     pass_ok = 1
                 else:
                     if num == 'all':                    
-                        curs.execute(db_change(
-                            'select name from alist where name = ?'
-                        ), [user_auth])
+                        curs.execute(db_change('select name from alist where name = ?'), [user_auth])
                     else:
-                        curs.execute(db_change(
-                            'select name from alist where name = ? and acl = ?'
-                        ), [user_auth, check])
+                        curs.execute(db_change('select name from alist where name = ? and acl = ?'), [user_auth, check])
                         
                     if curs.fetchall():
                         pass_ok = 1
 
-                    
                 if pass_ok == 1:
                     if what:
-                        curs.execute(db_change(
-                            "insert into re_admin (who, what, time) values (?, ?, ?)"
-                        ), [ip, what, time_data])
+                        curs.execute(db_change('select data from other where name = "auth_history_off"'))
+                        db_data = curs.fetchall()
+                        if db_data and db_data[0][0] != '':
+                            pass
+                        else:
+                            curs.execute(db_change("insert into re_admin (who, what, time) values (?, ?, ?)"), [ip, what, time_data])
 
                     return 1
 
