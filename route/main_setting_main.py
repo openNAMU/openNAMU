@@ -42,7 +42,10 @@ def main_setting_main(db_set):
             38 : ['slow_thread', ''],
             39 : ['edit_timeout', '5'],
             40 : ['document_content_max_length', ''],
-            41 : ['backup_count', '']
+            41 : ['backup_count', ''],
+            42 : ['ua_expiration_date', ''],
+            43 : ['auth_history_expiration_date', ''],
+            44 : ['auth_history_off', '']
         }
 
         if flask.request.method == 'POST':
@@ -63,10 +66,7 @@ def main_setting_main(db_set):
                 curs.execute(db_change('select data from other where name = ?'), [setting_list[i][0]])
                 db_data = curs.fetchall()
                 if not db_data:
-                    curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [
-                        setting_list[i][0],
-                        setting_list[i][1]
-                    ])
+                    curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [setting_list[i][0], setting_list[i][1]])
 
                 d_list[i] = db_data[0][0] if db_data else setting_list[i][1]
             else:
@@ -92,7 +92,7 @@ def main_setting_main(db_set):
                 else:
                     tls_select += '<option value="' + tls_select_one + '">' + tls_select_one + '</option>'
 
-            check_box_div = [7, 8, '', 20, 23, 24, 25, 26, 31, 33, 34, 35, 36, 37]
+            check_box_div = [7, 8, '', 20, 23, 24, 25, 26, 31, 33, 34, 35, 36, 37, 44]
             for i in range(0, len(check_box_div)):
                 acl_num = check_box_div[i]
                 if acl_num != '' and d_list[acl_num]:
@@ -115,6 +115,7 @@ def main_setting_main(db_set):
                 data = render_simple_set('''
                     <form method="post">
                         <h2>''' + load_lang('basic_set') + '''</h2>
+                        
                         <span>''' + load_lang('wiki_name') + '''</span>
                         <hr class="main_hr">
                         <input name="name" value="''' + html.escape(d_list[0]) + '''">
@@ -160,11 +161,23 @@ def main_setting_main(db_set):
                         
                         <input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + load_lang('set_wiki_access_password_need') + ''' (''' + load_lang('restart_required') + ''')
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('set_wiki_access_password') + '''</span> (''' + load_lang('restart_required') + ''')
                         <hr class="main_hr">
                         <input type="password" name="wiki_access_password" value="''' + html.escape(d_list[32]) + '''">
+                        
+                        <h3>''' + load_lang('auth_history') + '''</h3>
+                        
+                        <input type="checkbox" name="auth_history_off" ''' + check_box_div[14] + '''> ''' + load_lang('auth_history_off') + '''
+                        <hr class="main_hr">
+                        
+                        <span>''' + load_lang('auth_history_expiration_date') + '''</span> (''' + load_lang('day') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
+                        <hr class="main_hr">
+                        <input name="auth_history_expiration_date" value="''' + html.escape(d_list[43]) + '''">
+                        <hr class="main_hr">
 
                         <h3>''' + load_lang('communication_set') + '''</h3>
+                        
                         <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + load_lang('enable_comment_function') + ''' (''' + load_lang('not_working') + ''')
                         <hr class="main_hr">
 
@@ -172,11 +185,13 @@ def main_setting_main(db_set):
                         <hr class="main_hr">
 
                         <h2>''' + load_lang('design_set') + '''</h2>
+                        
                         <span>''' + load_lang('wiki_skin') + '''</span>
                         <hr class="main_hr">
                         <select name="skin">''' + load_skin(d_list[5] if d_list[5] != '' else 'ringo') + '''</select>
 
                         <h2>''' + load_lang('render_set') + '''</h2>
+                        
                         <input type="checkbox" name="namumark_compatible" ''' + check_box_div[10] + '''> ''' + load_lang('namumark_fully_compatible_mode') + '''
                         <hr class="main_hr">
                         
@@ -184,6 +199,7 @@ def main_setting_main(db_set):
                         <hr class="main_hr">
 
                         <h2>''' + load_lang('login_set') + '''</h2>
+                        
                         <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + load_lang('no_register') + '''
                         <hr class="main_hr">
 
@@ -196,12 +212,19 @@ def main_setting_main(db_set):
                         <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + load_lang('requires_approval') + '''
                         <hr class="main_hr">
 
-                        <input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + load_lang('ua_get_off') + '''
-                        <hr class="main_hr">
-                        
                         <span>''' + load_lang('password_min_length') + '''</span> (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="password_min_length" value="''' + html.escape(d_list[30]) + '''">
+
+                        <h3>''' + load_lang('ua') + '''</h3>
+                        
+                        <input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + load_lang('ua_get_off') + '''
+                        <hr class="main_hr">
+                        
+                        <span>''' + load_lang('ua_expiration_date') + '''</span> (''' + load_lang('day') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
+                        <hr class="main_hr">
+                        <input name="ua_expiration_date" value="''' + html.escape(d_list[42]) + '''">
+                        <hr class="main_hr">
                         
                         <h2>''' + load_lang('server_set') + '''</h2>
 
@@ -211,6 +234,7 @@ def main_setting_main(db_set):
 
                         <span ''' + sqlite_only + '''>
                             <h3>''' + load_lang('backup') + ''' (''' + load_lang('sqlite_only') + ''')</h3>
+                            
                             <span>''' + load_lang('backup_warning') + ''' (EX : data_YYYYMMDDHHMMSS.db)</span>
                             <hr class="main_hr">
                             <hr class="main_hr">
@@ -232,6 +256,7 @@ def main_setting_main(db_set):
                         </span>
 
                         <h2>''' + load_lang('edit_set') + '''</h2>
+                        
                         <span>''' + load_lang('slow_edit') + '''</span> (''' + load_lang('second') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="slow_edit" value="''' + html.escape(d_list[19]) + '''">

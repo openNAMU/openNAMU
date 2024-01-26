@@ -295,6 +295,28 @@ def do_every_day():
             if time_today > time_db:
                 curs.execute(db_change("delete from acl where title = ? and type = ?"), [for_a[0], for_a[1]])
                 curs.execute(db_change("delete from data_set where doc_name = ? and doc_rev = ? and set_name = 'acl_date'"), [for_a[0], for_a[1]])
+                
+        # ua 관리
+        curs.execute(db_change('select data from other where name = "ua_expiration_date"'))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            time_db = int(number_check(db_data[0][0]))
+            
+            time_calc = datetime.date.today() - datetime.timedelta(days = time_db)
+            time_calc = time_calc.strftime('%Y-%m-%d %H:%M:%S')
+            
+            curs.execute(db_change("delete from ua_d where today < ?"), [time_calc])
+            
+        # auth history 관리
+        curs.execute(db_change('select data from other where name = "auth_history_expiration_date"'))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            time_db = int(number_check(db_data[0][0]))
+            
+            time_calc = datetime.date.today() - datetime.timedelta(days = time_db)
+            time_calc = time_calc.strftime('%Y-%m-%d %H:%M:%S')
+            
+            curs.execute(db_change("delete from re_admin where time < ?"), [time_calc])
 
         # 사이트맵 생성 관리
         curs.execute(db_change('select data from other where name = "sitemap_auto_make"'))
