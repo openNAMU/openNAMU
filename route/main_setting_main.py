@@ -42,7 +42,8 @@ def main_setting_main(db_set):
             38 : ['slow_thread', ''],
             39 : ['edit_timeout', '5'],
             40 : ['document_content_max_length', ''],
-            41 : ['backup_count', '']
+            41 : ['backup_count', ''],
+            42 : ['ua_expiration_date', '']
         }
 
         if flask.request.method == 'POST':
@@ -160,6 +161,7 @@ def main_setting_main(db_set):
                         
                         <input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + load_lang('set_wiki_access_password_need') + ''' (''' + load_lang('restart_required') + ''')
                         <hr class="main_hr">
+                        
                         <span>''' + load_lang('set_wiki_access_password') + '''</span> (''' + load_lang('restart_required') + ''')
                         <hr class="main_hr">
                         <input type="password" name="wiki_access_password" value="''' + html.escape(d_list[32]) + '''">
@@ -196,12 +198,19 @@ def main_setting_main(db_set):
                         <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + load_lang('requires_approval') + '''
                         <hr class="main_hr">
 
-                        <input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + load_lang('ua_get_off') + '''
-                        <hr class="main_hr">
-                        
                         <span>''' + load_lang('password_min_length') + '''</span> (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="password_min_length" value="''' + html.escape(d_list[30]) + '''">
+
+                        <h3>''' + load_lang('ua') + '''</h3>
+                        
+                        <input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + load_lang('ua_get_off') + '''
+                        <hr class="main_hr">
+                        
+                        <span>''' + load_lang('ua_expiration_date') + '''</span> (''' + load_lang('day') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
+                        <hr class="main_hr">
+                        <input name="ua_expiration_date" value="''' + html.escape(d_list[42]) + '''">
+                        <hr class="main_hr">
                         
                         <h2>''' + load_lang('server_set') + '''</h2>
 
