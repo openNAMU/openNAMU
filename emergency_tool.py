@@ -103,8 +103,8 @@ elif what_i_do == '3':
 
     curs.execute(
         db_change(
-            "insert into rb (block, end, today, blocker, why, band) "
-            "values (?, ?, ?, ?, ?, ?)"
+            "insert into rb (block, end, today, blocker, why, band, ongoing, login) "
+            "values (?, ?, ?, ?, ?, ?, '', '')"
         ),
         [
             user_data,
