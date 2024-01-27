@@ -53,11 +53,8 @@ def edit_delete(name):
 
                 curs.execute(db_change("delete from back where link = ?"), [name])
                 curs.execute(db_change("delete from data where title = ?"), [name])
-                
-                conn.commit()
 
-            curs.execute(db_change('select data from other where name = "count_all_title"'))
-            curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) - 1)])
+                conn.commit()
 
             return redirect('/w/' + url_pas(name))
         else:            
