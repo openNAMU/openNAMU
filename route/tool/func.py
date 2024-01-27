@@ -590,6 +590,11 @@ def update(ver_num, set_data):
             for db_data in select_data:
                 curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [select_data[db_data][1], select_data[db_data][0], select_data[db_data][2]])
 
+        if ver_num < 3500374:
+            # ban 오류 해결
+            curs.execute(db_change("update rb set ongoing = '' where ongoing is null"))
+            curs.execute(db_change("update rb set login = '' where login is null"))
+
         conn.commit()
 
         print('Update completed')
@@ -2249,9 +2254,19 @@ def do_edit_filter(data):
             for data_list in curs.fetchall():
                 match = re.compile(data_list[0], re.I)
                 if match.search(data):
+                    end = '0' if data_list[1] == 'X' else data_list[1]
+
+                    if end != '0':
+                        end = int(number_check(end))
+                        time = datetime.datetime.now()
+                        plus = datetime.timedelta(seconds = end)
+                        r_time = (time + plus).strftime("%Y-%m-%d %H:%M:%S")
+                    else:
+                        r_time = '0'
+                
                     ban_insert(
                         ip_check(),
-                        '0' if data_list[1] == 'X' else data_list[1],
+                        r_time,
                         'edit filter',
                         None,
                         'tool:edit filter'
@@ -2402,25 +2417,16 @@ def ua_plus(u_id, u_ip, u_agent, time):
                 time
             ])
 
-def ban_insert(name, end, why, login, blocker, type_d = None):
+def ban_insert(name, end, why, login, blocker, type_d = None, release = 0):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         now_time = get_time()
         band = type_d if type_d else ''
 
-        curs.execute(db_change(
-            "update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"
-        ), [now_time])
-        curs.execute(db_change("" + \
-            "select block from rb " + \
-            "where ((end > ? and end != '') or end = '') and block = ? and " + \
-            "band = ? and ongoing = '1'" + \
-        ""), [now_time, name, band])
-        if curs.fetchall():
-            curs.execute(db_change(
-                "insert into rb (block, end, today, blocker, why, band) values (?, ?, ?, ?, ?, ?)"
-            ), [
+        curs.execute(db_change("update rb set ongoing = '' where block = ? and band = ? and ongoing = '1'"), [name, band])
+        if release == 1:
+            curs.execute(db_change("insert into rb (block, end, today, blocker, why, band, ongoing, login) values (?, ?, ?, ?, ?, ?, '', '')"), [
                 name,
                 'release',
                 now_time,
@@ -2428,24 +2434,11 @@ def ban_insert(name, end, why, login, blocker, type_d = None):
                 '',
                 band
             ])
-            curs.execute(db_change(
-                "update rb set ongoing = '' where block = ? and band = ? and ongoing = '1'"
-            ), [name, band])
         else:
             login = 'O' if login != '' else ''
+            r_time = end if end != '0' else ''
 
-            if end != '0':
-                end = int(number_check(end))
-                time = datetime.datetime.now()
-                plus = datetime.timedelta(seconds = end)
-                r_time = (time + plus).strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                r_time = ''
-
-            curs.execute(db_change(
-                "insert into rb (block, end, today, blocker, why, band, ongoing, login) " + \
-                "values (?, ?, ?, ?, ?, ?, '1', ?)"
-            ), [
+            curs.execute(db_change("insert into rb (block, end, today, blocker, why, band, ongoing, login) values (?, ?, ?, ?, ?, ?, '1', ?)"), [
                 name, 
                 r_time, 
                 now_time, 
