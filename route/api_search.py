@@ -7,6 +7,7 @@ def api_search(name = 'Test', num = 10, page = 1):
         num = 1 if num > 1000 else num
         page = (page * (num - 1)) if page * num > 0 else 0
 
+        # 개편 예정
         curs.execute(db_change('select data from other where name = "count_all_title"'))
         if int(curs.fetchall()[0][0]) < 30000:
             curs.execute(db_change("" + \

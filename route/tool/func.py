@@ -2490,19 +2490,15 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
             history_plus_rc_max(curs, mode)
             curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [id_data, title, date, mode])
 
-            data_set_exist = '' if t_check != 'delete' else '1'
+            data_set_exist = '' if t_check != 'delete' else 'not_exist'
 
-            curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'last_edit'"), [title])
-            if curs.fetchall():
-                curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'last_edit'"), [date, data_set_exist, title])
-            else:
-                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'last_edit', ?)"), [title, data_set_exist, date])
+            curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "last_edit"'), [title])
+            curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'last_edit', ?)"), [title, date])
 
-            curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'length'"), [title])
-            if curs.fetchall():
-                curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'length'"), [len(data), data_set_exist, title])
-            else:
-                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'length', ?)"), [title, data_set_exist, len(data)])
+            curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "length"'), [title])
+            curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'length', ?)"), [title, len(data)])
+
+            curs.execute(db_change("update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')"), [data_set_exist, title])
 
         curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide, type) values (?, ?, ?, ?, ?, ?, ?, '', ?)"), [id_data, title, data, date, ip, send, leng, mode])
 
