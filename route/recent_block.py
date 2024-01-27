@@ -17,9 +17,6 @@ def recent_block_2(name = 'Test', tool = 'all'):
                     </tr>
         '''
 
-        curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [get_time()])
-        conn.commit()
-
         get_type = flask.request.args.get('type', '')
         sub_type = flask.request.args.get('s_type', '')
         if tool == 'all':
