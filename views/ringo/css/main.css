@@ -200,7 +200,7 @@ aside {
     
     background-color: #ffeaee;
     
-    min-height: calc(100vh - (50px + 10px));
+    min-height: calc(100vh - (50px + 12px));
 }
 
 .aside_width {
@@ -212,7 +212,7 @@ aside {
 .do_fixed {
     position: fixed;
     
-    top: 50px;
+    top: 52px;
 }
 
 aside button {
