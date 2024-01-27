@@ -63,7 +63,7 @@ class class_do_render:
             data_end[0] = re.sub(r'&lt;(topic_a(?:_post|_thread)?)&gt;((?:(?!&lt;\/topic_a(?:_post|_thread)?&gt;).)+)&lt;\/topic_a(?:_post|_thread)?&gt;', do_thread_a_change, data_end[0])
             data_end[0] = re.sub(r'&lt;topic_call&gt;@(?P<in>(?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;', '<a href="/w/user:\\g<in>">@\\g<in></a>', data_end[0])
 
-        if data_type == 'backlink':
+        if data_type == 'backlink' and data_in == '':
             curs.execute(db_change("delete from back where link = ?"), [doc_name])
             curs.execute(db_change("delete from back where title = ? and type = 'no'"), [doc_name])
 
@@ -72,7 +72,7 @@ class class_do_render:
 
             backlink = data_end[2]['backlink'] if 'backlink' in data_end[2] else []
             if backlink != []:
-                curs.executemany(db_change("insert into back (link, title, type, data) values (?, ?, ?, ?)"), data_end[2]['backlink'])
+                curs.executemany(db_change("insert into back (link, title, type, data) values (?, ?, ?, ?)"), backlink)
                 curs.execute(db_change("delete from back where title = ? and type = 'no'"), [doc_name])
 
             link_count = 0
