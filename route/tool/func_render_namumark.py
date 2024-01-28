@@ -2305,7 +2305,7 @@ class class_do_render_namumark:
             if self.doc_include != '' or re.search(r'<toc_no_auto>', self.render_data) or toc_set_data == 'half_off' or toc_set_data == 'off' or toc_data_on == 1:
                 self.render_data = self.render_data.replace('<toc_no_auto>', '')
             else:
-                self.render_data = re.sub(r'(?P<in><h[1-6] id="[^"]*">)', '<br>' + self.data_toc + '\\g<in>', self.render_data, 1)
+                self.render_data = re.sub(r'(?P<in><h[1-6] id="[^"]*">)', self.data_toc + '\\g<in>', self.render_data, 1)
         else:
             self.render_data = self.render_data.replace('<toc_need_part>', '')
             self.render_data = self.render_data.replace('<toc_no_auto>', '')
