@@ -92,6 +92,15 @@ def user_setting_skin_set_main_set_list():
             ['default', load_lang('default')],
             ['off', load_lang('off')],
             ['on', load_lang('use')]
+        ], 'main_css_font_size' : [
+            ['default', load_lang('default')],
+            ['10', '10'],
+            ['12', '12'],
+            ['14', '14'],
+            ['16', '16'],
+            ['18', '18'],
+            ['20', '20'],
+            ['22', '22'],
         ]
     }
 
@@ -262,6 +271,11 @@ def user_setting_skin_set_main():
                         ''' + set_data_main["main_css_view_history"] + '''
                         <select name="main_css_view_history">
                             ''' + set_data["main_css_view_history"] + '''
+                        </select>
+                        <h3>''' + load_lang("font_size") + '''</h3>
+                        ''' + set_data_main["main_css_font_size"] + '''
+                        <select name="main_css_font_size">
+                            ''' + set_data["main_css_font_size"] + '''
                         </select>
                         <h2>''' + load_lang("edit") + '''</h2>
                         <h3>''' + load_lang("image_paste") + '''</h3>

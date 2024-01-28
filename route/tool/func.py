@@ -1013,7 +1013,7 @@ def wiki_css(data):
     data_css = ''
     data_css_add = ''
 
-    data_css_ver = '188'
+    data_css_ver = '189'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:
@@ -1349,6 +1349,18 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
 
                 get_class_render[0] = '<div class="opennamu_render_complete">' + get_class_render[0] + '</div>'
 
+                font_size_set_data = get_main_skin_set(curs, flask.session, 'main_css_font_size', ip)
+                if font_size_set_data != 'default':
+                    font_size_set_data = number_check(font_size_set_data)
+
+                    get_class_render[0] = '''
+                        <style>
+                            .opennamu_render_complete {
+                                font-size: ''' + font_size_set_data + '''px !important;
+                            }
+                        </style>
+                    ''' + get_class_render[0]
+
                 curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
                 db_data = curs.fetchall()
                 if db_data and db_data[0][0] != '':
@@ -1356,7 +1368,6 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                         <style>
                             .opennamu_render_complete {
                                 font-size: 14.4px !important;
-
                                 line-height: 1.5;
                             }
 
@@ -1366,7 +1377,6 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
 
                             .opennamu_render_complete summary {
                                 list-style: none !important;
-                                
                                 font-weight: bold !important;
                             }
                         </style>
@@ -2490,19 +2500,15 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
             history_plus_rc_max(curs, mode)
             curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [id_data, title, date, mode])
 
-            data_set_exist = '' if t_check != 'delete' else '1'
+            data_set_exist = '' if t_check != 'delete' else 'not_exist'
 
-            curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'last_edit'"), [title])
-            if curs.fetchall():
-                curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'last_edit'"), [date, data_set_exist, title])
-            else:
-                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'last_edit', ?)"), [title, data_set_exist, date])
+            curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "last_edit"'), [title])
+            curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'last_edit', ?)"), [title, date])
 
-            curs.execute(db_change("select doc_name from data_set where doc_name = ? and set_name = 'length'"), [title])
-            if curs.fetchall():
-                curs.execute(db_change("update data_set set set_data = ?, doc_rev = ? where doc_name = ? and set_name = 'length'"), [len(data), data_set_exist, title])
-            else:
-                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'length', ?)"), [title, data_set_exist, len(data)])
+            curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "length"'), [title])
+            curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'length', ?)"), [title, len(data)])
+
+            curs.execute(db_change("update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')"), [data_set_exist, title])
 
         curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide, type) values (?, ?, ?, ?, ?, ?, ?, '', ?)"), [id_data, title, data, date, ip, send, leng, mode])
 

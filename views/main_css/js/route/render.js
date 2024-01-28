@@ -163,3 +163,11 @@ function opennamu_do_footnote_popover(set_name, load_name) {
         document.getElementById(set_name + '_load').style.display = "none";
     }
 }
+
+function opennamu_do_category_spread() {
+    if(document.getElementsByClassName('opennamu_render_complete')) {
+        document.getElementsByClassName('opennamu_render_complete')[0].innerHTML = '' +
+            '<style>.opennamu_category_button { display: none; } .opennamu_category { white-space: pre-wrap; overflow-x: unset; text-overflow: unset; }</style>' +
+        '' + document.getElementsByClassName('opennamu_render_complete')[0].innerHTML
+    }
+}

@@ -194,9 +194,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
             else:    
                 curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, content])
     
-                curs.execute(db_change('select data from other where name = "count_all_title"'))
-                curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) + 1)])
-    
             curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
             for scan_user in curs.fetchall():
                 add_alarm(scan_user[0], ip, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')

@@ -92,9 +92,6 @@ def edit_upload():
 
                 curs.execute(db_change("insert into data (title, data) values (?, ?)"), ['file:' + name, file_d])
 
-                curs.execute(db_change('select data from other where name = "count_all_title"'))
-                curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) + 1)])
-
                 render_set(
                     doc_name = 'file:' + name,
                     doc_data = file_d,
