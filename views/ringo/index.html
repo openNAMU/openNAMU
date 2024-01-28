@@ -18,6 +18,22 @@
             <link rel="stylesheet" href="/views/main_css/css/sub/dark.css.cache_v1">
             <link rel="stylesheet" href="/views/ringo/css/dark.css.cache_v1">
         {% endif %}
+        {% if request.cookies.get('main_css_off_sidebar', '') == '1' %}
+            <style>
+                section {
+                    display: block;
+                    margin: auto;
+                }
+
+                .aside_width {
+                    display: none;
+                }
+
+                .do_fixed {
+                    display: none;
+                }
+            </style>
+        {% endif %}
         <link rel="shortcut icon" href="/views/main_css/file/favicon.ico.cache_v1">
         {{imp[1][5]|safe}}
         {{imp[2][3]|safe}}
@@ -239,24 +255,24 @@
             <div id="side_content">
                 Loading...
             </div>
-            <div id="nav_bar">
-                <div id="go_top">
-                    <a href="#main">
-                        <span class="iconify" data-icon="ic:baseline-arrow-upward" data-inline="true"></span>
-                    </a>
-                </div>
-                <div id="go_bottom">
-                    <a href="#footer">
-                        <span class="iconify" data-icon="ic:baseline-arrow-downward" data-inline="true"></span>
-                    </a>
-                </div>
-                <div id="go_toc">
-                    <a href="#toc">
-                        <span class="iconify" data-icon="ic:baseline-list" data-inline="true"></span>
-                    </a>
-                </div>
-            </div>
         </aside>
+        <div id="nav_bar">
+            <div id="go_top">
+                <a href="#main">
+                    <span class="iconify" data-icon="ic:baseline-arrow-upward" data-inline="true"></span>
+                </a>
+            </div>
+            <div id="go_bottom">
+                <a href="#footer">
+                    <span class="iconify" data-icon="ic:baseline-arrow-downward" data-inline="true"></span>
+                </a>
+            </div>
+            <div id="go_toc">
+                <a href="#toc">
+                    <span class="iconify" data-icon="ic:baseline-list" data-inline="true"></span>
+                </a>
+            </div>
+        </div>
         <footer class="only_mobile" id="footer">
             {{imp[1][1]|safe}}
             <br>
