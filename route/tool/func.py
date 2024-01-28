@@ -1349,6 +1349,18 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
 
                 get_class_render[0] = '<div class="opennamu_render_complete">' + get_class_render[0] + '</div>'
 
+                font_size_set_data = get_main_skin_set(curs, flask.session, 'main_css_font_size', ip)
+                if font_size_set_data != 'default':
+                    font_size_set_data = number_check(font_size_set_data)
+
+                    get_class_render[0] = '''
+                        <style>
+                            .opennamu_render_complete {
+                                font-size: ''' + font_size_set_data + '''px !important;
+                            }
+                        </style>
+                    ''' + get_class_render[0]
+
                 curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
                 db_data = curs.fetchall()
                 if db_data and db_data[0][0] != '':
@@ -1356,7 +1368,6 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                         <style>
                             .opennamu_render_complete {
                                 font-size: 14.4px !important;
-
                                 line-height: 1.5;
                             }
 
@@ -1366,7 +1377,6 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
 
                             .opennamu_render_complete summary {
                                 list-style: none !important;
-                                
                                 font-weight: bold !important;
                             }
                         </style>
