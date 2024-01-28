@@ -185,6 +185,16 @@ a:hover {
     border: 1px solid gainsboro;
     
     padding: 10px;
+    
+    white-space: pre;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+
+.opennamu_category_button {
+    float: right;
+    z-index: 100;
+    position: relative;
 }
 
 .opennamu_category_blur {

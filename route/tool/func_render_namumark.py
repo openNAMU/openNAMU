@@ -1019,7 +1019,12 @@ class class_do_render_namumark:
                         link_main = url_pas(link_main)
 
                         if self.data_category == '':
-                            self.data_category = '<div class="opennamu_category">' + self.get_tool_lang('category') + ' : '
+                            self.data_category = '' + \
+                                '<div class="opennamu_category">' + \
+                                    '<a class="opennamu_category_button" href="javascript:opennamu_do_category_spread();"> (+)</a>' + \
+                                    self.get_tool_lang('category') + ' : ' + \
+                                '' + \
+                            ''
                         else:
                             self.data_category += ' | '
 
