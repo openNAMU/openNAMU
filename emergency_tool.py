@@ -39,7 +39,6 @@ print('8. Change version')
 print('9. Delete set.json')
 print('10. Change name')
 print('11. Delete mysql.json')
-print('12. All title count reset')
 print('14. Delete Main <HEAD>')
 print('15. Give owner')
 print('16. Delete 2FA password')
@@ -159,16 +158,6 @@ elif what_i_do == '10':
 elif what_i_do == '11':
     if os.path.exists(os.path.join('data', 'mysql.json')):
         os.remove(os.path.join('data', 'mysql.json'))
-elif what_i_do == '12':
-    curs.execute(db_change("select count(*) from data"))
-    count_data = curs.fetchall()
-    if count_data:
-        count_data = count_data[0][0]
-    else:
-        count_data = 0
-
-    curs.execute(db_change('delete from other where name = "count_all_title"'))
-    curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", ?, "")'), [str(count_data)])
 elif what_i_do == '14':
     curs.execute(db_change('delete from other where name = "head"'))
 elif what_i_do == '15':

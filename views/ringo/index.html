@@ -13,10 +13,26 @@
         <script src="/views/ringo/js/main.js.cache_v2"></script>
         <script src="/views/ringo/js/sidebar.js.cache_v1"></script>
         <script src="/views/ringo/js/skin_set.js.cache_v1"></script>
-        <link rel="stylesheet" href="/views/ringo/css/main.css.cache_v4">
+        <link rel="stylesheet" href="/views/ringo/css/main.css.cache_v6">
         {% if request.cookies.get('main_css_darkmode', '') == '1' %}
             <link rel="stylesheet" href="/views/main_css/css/sub/dark.css.cache_v1">
             <link rel="stylesheet" href="/views/ringo/css/dark.css.cache_v1">
+        {% endif %}
+        {% if request.cookies.get('main_css_off_sidebar', '') == '1' %}
+            <style>
+                section {
+                    display: block;
+                    margin: auto;
+                }
+
+                .aside_width {
+                    display: none;
+                }
+
+                .do_fixed {
+                    display: none;
+                }
+            </style>
         {% endif %}
         <link rel="shortcut icon" href="/views/main_css/file/favicon.ico.cache_v1">
         {{imp[1][5]|safe}}
@@ -230,7 +246,8 @@
                 </article>
             </footer>
         </section>
-        <aside>
+        <div class="aside_width">A</div>
+        <aside class="do_fixed">
             <button id="side_button_1" class="side_button selected">{{'edit'|load_lang}}</button><!--
          --><button id="side_button_2" class="side_button">{{'discussion'|load_lang}}</button><!--
          --><button id="side_button_3" class="side_button">{{'toc'|load_lang}}</button><!--
@@ -238,24 +255,24 @@
             <div id="side_content">
                 Loading...
             </div>
-            <div id="nav_bar">
-                <div id="go_top">
-                    <a href="#main">
-                        <span class="iconify" data-icon="ic:baseline-arrow-upward" data-inline="true"></span>
-                    </a>
-                </div>
-                <div id="go_bottom">
-                    <a href="#footer">
-                        <span class="iconify" data-icon="ic:baseline-arrow-downward" data-inline="true"></span>
-                    </a>
-                </div>
-                <div id="go_toc">
-                    <a href="#toc">
-                        <span class="iconify" data-icon="ic:baseline-list" data-inline="true"></span>
-                    </a>
-                </div>
-            </div>
         </aside>
+        <div id="nav_bar">
+            <div id="go_top">
+                <a href="#main">
+                    <span class="iconify" data-icon="ic:baseline-arrow-upward" data-inline="true"></span>
+                </a>
+            </div>
+            <div id="go_bottom">
+                <a href="#footer">
+                    <span class="iconify" data-icon="ic:baseline-arrow-downward" data-inline="true"></span>
+                </a>
+            </div>
+            <div id="go_toc">
+                <a href="#toc">
+                    <span class="iconify" data-icon="ic:baseline-list" data-inline="true"></span>
+                </a>
+            </div>
+        </div>
         <footer class="only_mobile" id="footer">
             {{imp[1][1]|safe}}
             <br>

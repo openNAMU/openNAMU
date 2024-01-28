@@ -192,8 +192,6 @@ button.search_button#search:hover {
 aside {
     width: 250px;
     
-    float: left;
-    
     display: block;
     
     padding-top: 10px;
@@ -202,7 +200,19 @@ aside {
     
     background-color: #ffeaee;
     
-    min-height: calc(100vh - (50px + 20px));
+    min-height: calc(100vh - (50px + 12px));
+}
+
+.aside_width {
+    width: 290px;
+
+    float: left;
+}
+
+.do_fixed {
+    position: fixed;
+    
+    top: 52px;
 }
 
 aside button {
@@ -312,6 +322,14 @@ article.main#title h1 {
         left: 0;
 
         width: 100%;
+    }
+
+    .do_fixed {
+        position: inherit;
+    }
+
+    .aside_width {
+        display: none;
     }
 }
 

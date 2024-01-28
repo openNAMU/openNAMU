@@ -17,6 +17,13 @@ function ringo_get_post() {
         document.cookie = 'main_css_use_sys_darkmode=0; path=/';
     }
 
+    const check_3 = document.getElementById('off_sidebar');
+    if(check_3.checked === true) {
+        document.cookie = 'main_css_off_sidebar=1; path=/';
+    } else {
+        document.cookie = 'main_css_off_sidebar=0; path=/';
+    }
+
     history.go(0);
 }
 
@@ -40,10 +47,12 @@ function ringo_load_skin_set() {
                 "save" : "Save",
                 "darkmode" : "Darkmode",
                 "use_sys_darkmode" : "Use system darkmode set",
+                "off_sidebar" : "Turn off sidebar",
             }, "ko-KR" : {
                 "save" : "저장",
                 "darkmode" : "다크모드",
                 "use_sys_darkmode" : "시스템 다크모드 설정 사용",
+                "off_sidebar" : "사이드바 끄기",
             }
         }
 
@@ -67,10 +76,16 @@ function ringo_load_skin_set() {
             set_data["use_sys_darkmode"] = "checked";
         }
 
+        if(cookies.match(ringo_do_regex_data('main_css_off_sidebar')) && cookies.match(ringo_do_regex_data('main_css_off_sidebar'))[1] === '1') {
+            set_data["off_sidebar"] = "checked";
+        }
+
         document.getElementById("main_skin_set").innerHTML = ' \
             <input ' + set_data["use_sys_darkmode"] + ' type="checkbox" id="use_sys_darkmode" name="use_sys_darkmode" value="use_sys_darkmode"> ' + set_language[language]['use_sys_darkmode'] + ' \
             <hr class="main_hr"> \
             <input ' + set_data["invert"] + ' type="checkbox" id="invert" name="invert" value="invert"> ' + set_language[language]['darkmode'] + ' \
+            <hr class="main_hr"> \
+            <input ' + set_data["off_sidebar"] + ' type="checkbox" id="off_sidebar" name="off_sidebar" value="off_sidebar"> ' + set_language[language]['off_sidebar'] + ' \
             <hr class="main_hr"> \
             <button onclick="ringo_get_post();">' + set_language[language]['save'] + '</button> \
         ';
