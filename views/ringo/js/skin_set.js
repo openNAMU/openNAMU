@@ -29,12 +29,31 @@ function ringo_get_post() {
 
 function ringo_do_skin_set() {
     let cookies = document.cookie;
+    
     if(!cookies.match(ringo_do_regex_data('main_css_use_sys_darkmode')) || (cookies.match(ringo_do_regex_data('main_css_use_sys_darkmode')) && cookies.match(ringo_do_regex_data('main_css_use_sys_darkmode'))[1] === '1')) {
         if(window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.cookie = 'main_css_darkmode=1; path=/';
         } else {
             document.cookie = 'main_css_darkmode=0; path=/';
         }
+    }
+
+    if(cookies.match(ringo_do_regex_data('main_css_off_sidebar')) && cookies.match(ringo_do_regex_data('main_css_off_sidebar'))[1] === '1') {
+        document.getElementById('ringo_add_style').innerHTML = `
+            section {
+                width: auto;
+                display: block;
+                margin: auto;
+            }
+
+            .aside_width {
+                display: none;
+            }
+
+            .do_fixed {
+                display: none;
+            }
+        `;
     }
 }
 
