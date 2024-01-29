@@ -1640,7 +1640,9 @@ class class_do_render_namumark:
                     else:
                         do_any_thing += '&lt;' + table_parameter + '&gt;'
                 elif len(table_parameter_split) == 1:
-                    if re.search(r'^-[0-9]+$', table_parameter):
+                    if table_parameter == 'nopad':
+                        table_parameter_all['td'] += 'padding: 0 !important;'
+                    elif re.search(r'^-[0-9]+$', table_parameter):
                         table_colspan_auto = 0
                         table_parameter_all['colspan'] = re.sub(r'[^0-9]+', '', table_parameter)
                     elif re.search(r'^(\^|v)?\|[0-9]+$', table_parameter):
