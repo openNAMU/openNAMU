@@ -1640,7 +1640,9 @@ class class_do_render_namumark:
                     else:
                         do_any_thing += '&lt;' + table_parameter + '&gt;'
                 elif len(table_parameter_split) == 1:
-                    if re.search(r'^-[0-9]+$', table_parameter):
+                    if table_parameter == 'nopad':
+                        table_parameter_all['td'] += 'padding: 0 !important;'
+                    elif re.search(r'^-[0-9]+$', table_parameter):
                         table_colspan_auto = 0
                         table_parameter_all['colspan'] = re.sub(r'[^0-9]+', '', table_parameter)
                     elif re.search(r'^(\^|v)?\|[0-9]+$', table_parameter):
@@ -2305,7 +2307,7 @@ class class_do_render_namumark:
             if self.doc_include != '' or re.search(r'<toc_no_auto>', self.render_data) or toc_set_data == 'half_off' or toc_set_data == 'off' or toc_data_on == 1:
                 self.render_data = self.render_data.replace('<toc_no_auto>', '')
             else:
-                self.render_data = re.sub(r'(?P<in><h[1-6] id="[^"]*">)', '<br>' + self.data_toc + '\\g<in>', self.render_data, 1)
+                self.render_data = re.sub(r'(?P<in><h[1-6] id="[^"]*">)', self.data_toc + '\\g<in>', self.render_data, 1)
         else:
             self.render_data = self.render_data.replace('<toc_need_part>', '')
             self.render_data = self.render_data.replace('<toc_no_auto>', '')
