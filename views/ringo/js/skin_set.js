@@ -24,6 +24,13 @@ function ringo_get_post() {
         document.cookie = 'main_css_off_sidebar=0; path=/';
     }
 
+    const check_4 = document.getElementById('fixed_width');
+    if(check_4.options[check_4.selectedIndex].value) {
+        document.cookie = 'main_css_fixed_width=' + check_4.options[check_4.selectedIndex].value + '; path=/';
+    } else {
+        document.cookie = 'main_css_fixed_width=; path=/';
+    }
+
     history.go(0);
 }
 
@@ -39,7 +46,7 @@ function ringo_do_skin_set() {
     }
 
     if(cookies.match(ringo_do_regex_data('main_css_off_sidebar')) && cookies.match(ringo_do_regex_data('main_css_off_sidebar'))[1] === '1') {
-        document.getElementById('ringo_add_style').innerHTML = `
+        document.getElementById('ringo_add_style').innerHTML += `
             section {
                 width: auto;
                 display: block;
@@ -55,6 +62,15 @@ function ringo_do_skin_set() {
             }
         `;
     }
+
+    if(cookies.match(ringo_do_regex_data('main_css_fixed_width')) && cookies.match(ringo_do_regex_data('main_css_fixed_width'))[1] !== '') {
+        let fixed_width_data = cookies.match(ringo_do_regex_data('main_css_fixed_width'))[1];
+        document.getElementById('ringo_add_style').innerHTML += `
+            article.main {
+                max-width: ` + fixed_width_data + `px;
+            }
+        `;
+    }
 }
 
 function ringo_load_skin_set() {
@@ -67,11 +83,15 @@ function ringo_load_skin_set() {
                 "darkmode" : "Darkmode",
                 "use_sys_darkmode" : "Use system darkmode set",
                 "off_sidebar" : "Turn off sidebar",
+                "fixed_width" : "Fixed width",
+                'default' : 'Default',
             }, "ko-KR" : {
                 "save" : "저장",
                 "darkmode" : "다크모드",
                 "use_sys_darkmode" : "시스템 다크모드 설정 사용",
                 "off_sidebar" : "사이드바 끄기",
+                "fixed_width" : "고정폭",
+                'default' : '기본값',
             }
         }
 
@@ -99,12 +119,36 @@ function ringo_load_skin_set() {
             set_data["off_sidebar"] = "checked";
         }
 
+        let fixed_width_data = '';
+        if(cookies.match(ringo_do_regex_data('main_css_fixed_width'))) {
+            fixed_width_data = cookies.match(ringo_do_regex_data('main_css_fixed_width'))[1];
+        }
+
+        let select_fixed_width = [set_language[language]['default'], '800', '900', '1000', '1100', '1200', '1300', '1500', '1600'];
+        let select_fixed_width_html = '<select name="fixed_width" id="fixed_width">';
+        for(let for_a = 0; for_a < select_fixed_width.length; for_a++) {
+            let for_a_data = select_fixed_width[for_a];
+            if(for_a_data === set_language[language]['default']) {
+                for_a_data = '';
+            }
+
+            let selected = '';
+            if(fixed_width_data === for_a_data) {
+                selected = 'selected';
+            }
+
+            select_fixed_width_html += '<option value="' + for_a_data + '" ' + selected + '>' + select_fixed_width[for_a] + '</option>';
+        }
+        select_fixed_width_html += '</select>';
+
         document.getElementById("main_skin_set").innerHTML = ' \
             <input ' + set_data["use_sys_darkmode"] + ' type="checkbox" id="use_sys_darkmode" name="use_sys_darkmode" value="use_sys_darkmode"> ' + set_language[language]['use_sys_darkmode'] + ' \
             <hr class="main_hr"> \
             <input ' + set_data["invert"] + ' type="checkbox" id="invert" name="invert" value="invert"> ' + set_language[language]['darkmode'] + ' \
             <hr class="main_hr"> \
             <input ' + set_data["off_sidebar"] + ' type="checkbox" id="off_sidebar" name="off_sidebar" value="off_sidebar"> ' + set_language[language]['off_sidebar'] + ' \
+            <hr class="main_hr"> \
+            ' + select_fixed_width_html + ' \
             <hr class="main_hr"> \
             <button onclick="ringo_get_post();">' + set_language[language]['save'] + '</button> \
         ';
