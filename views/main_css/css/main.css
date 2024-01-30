@@ -293,8 +293,11 @@ hr {
 }
 
 blockquote {
-    padding: 10px;
+    padding: 15px;
+    
     margin: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
 
     display: inline-block;
 
