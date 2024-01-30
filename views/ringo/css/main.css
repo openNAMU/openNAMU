@@ -284,6 +284,8 @@ article.main#main_data {
 
 article.main#title h1 {
     margin: 0;
+
+    font-size: 32px;
 }
 
 .only_mobile, header#main form.only_mobile {
