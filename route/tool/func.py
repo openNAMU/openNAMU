@@ -1400,9 +1400,6 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                         <style>
                             .table_safe td {
                                 background: transparent !important;
-                            }
-
-                            .table_safe span {
                                 color: inherit !important;
                             }
                         </style>
