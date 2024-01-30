@@ -573,13 +573,13 @@ app.route('/change', methods = ['POST', 'GET'])(user_setting)
 app.route('/change/key')(user_setting_key)
 app.route('/change/key/delete')(user_setting_key_delete)
 app.route('/change/pw', methods = ['POST', 'GET'])(user_setting_pw)
-app.route('/change/head', methods=['GET', 'POST'], defaults = { 'skin_name' : '' })(user_setting_head)
-app.route('/change/head/<skin_name>', methods=['GET', 'POST'])(user_setting_head)
-app.route('/change/head_reset', methods=['GET', 'POST'])(user_setting_head_reset)
+app.route('/change/head', methods = ['GET', 'POST'], defaults = { 'skin_name' : '' })(user_setting_head)
+app.route('/change/head/<skin_name>', methods = ['GET', 'POST'])(user_setting_head)
+app.route('/change/head_reset', methods = ['GET', 'POST'])(user_setting_head_reset)
 app.route('/change/skin_set')(user_setting_skin_set)
-app.route('/change/top_menu', methods=['GET', 'POST'])(user_setting_top_menu)
-app.route('/change/user_name', methods=['GET', 'POST'])(user_setting_user_name)
-app.route('/change/user_name/<user_name>', methods=['GET', 'POST'])(user_setting_user_name)
+app.route('/change/top_menu', methods = ['GET', 'POST'])(user_setting_top_menu)
+app.route('/change/user_name', methods = ['GET', 'POST'])(user_setting_user_name)
+app.route('/change/user_name/<user_name>', methods = ['GET', 'POST'])(user_setting_user_name)
 # 하위 호환용 S
 app.route('/skin_set')(user_setting_skin_set)
 # 하위 호환용 E
@@ -588,7 +588,7 @@ app.route('/change/skin_set/main', methods = ['POST', 'GET'])(user_setting_skin_
 app.route('/user')(user_info)
 app.route('/user/<name>')(user_info)
 
-app.route('/challenge')(user_challenge)
+app.route('/challenge', methods = ['GET', 'POST'])(user_challenge)
 
 app.route('/count')(user_count)
 app.route('/count/<name>')(user_count)

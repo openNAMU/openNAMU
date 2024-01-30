@@ -119,6 +119,7 @@
         "popup" : "Popup",
         "popover" : "Popover",
         "trace" : "Trace",
+        "level" : "Level",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
             "hour" : "Hour(s)",
@@ -618,14 +619,32 @@
             "backup_warning" : "Warning. Files with the same name may be erased.",
         "_comment_" : "Challenge",
             "challenge_title_register" : "Hello, World!",
-            "challenge_info_register" : "Sign up",
+            "challenge_info_register" : "Sign up<br><br>Reward : 🌳 title",
     
             "challenge_title_first_contribute" : "Well begun is half done.",
-            "challenge_info_first_contribute" : "Make your 1st contribution",
+            "challenge_info_first_contribute" : "Make your 1st contribution<br><br>Reward : 🔰 title and 500 exp",
     
-            "challenge_title_tenthousandth_contribute" : "Rome wasn't built in a day.",
-            "challenge_info_tenthousandth_contribute" : "Make your 1000th contribution",
+            "challenge_title_tenth_contribute" : "Boys, Be Ambitious!",
+            "challenge_info_tenth_contribute" : "Make your 10th contribution<br><br>Reward : 📝 title and 1000 exp",
+
+            "challenge_title_hundredth_contribute" : "Knowledge is power.",
+            "challenge_info_hundredth_contribute" : "Make your 100th contribution<br><br>보상 : 🖊️ title and 3000 exp",
+
+            "challenge_title_thousandth_contribute" : "Rome wasn't built in a day.",
+            "challenge_info_thousandth_contribute" : "Make your 1000th contribution<br><br>Reward : 🏅 title and 10000 exp",
     
+            "challenge_title_first_discussion" : "Truth is generally the best vindication against slander.",
+            "challenge_info_first_discussion" : "Post the 1st discussion thread<br><br>Reward : 💬 title and 500 exp",
+
+            "challenge_title_tenth_discussion" : "I shall either find a way or make one.",
+            "challenge_info_tenth_discussion" : "Post the 10th discussion thread<br><br>Reward : 💡 title and 1000 exp",
+
+            "challenge_title_hundredth_discussion" : "When all think alike, no one thinks very much.",
+            "challenge_info_hundredth_discussion" : "Post the 100th discussion thread<br><br>Reward : 📢 title and 3000 exp",
+
             "challenge_title_thousandth_discussion" : "I think, therefore I am.",
-            "challenge_info_thousandth_discussion" : "Post the 1000th discussion thread"
+            "challenge_info_thousandth_discussion" : "Post the 1000th discussion thread<br><br>Reward : 📜 title and 10000 exp",
+
+            "challenge_title_admin" : "If you want to test a man's character, give him power.",
+            "challenge_info_admin" : "Be the administrator.<br><br>Reward : ✅ title and 10000 exp"
 }
