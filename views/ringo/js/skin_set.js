@@ -12,23 +12,23 @@ function ringo_get_post() {
 
     const check_2 = document.getElementById('use_sys_darkmode');
     if(check_2.checked === true) {
-        document.cookie = 'main_css_use_sys_darkmode=1; path=/';
+        window.localStorage.setItem('main_css_use_sys_darkmode', '1');
     } else {
-        document.cookie = 'main_css_use_sys_darkmode=0; path=/';
+        window.localStorage.setItem('main_css_use_sys_darkmode', '0');
     }
 
     const check_3 = document.getElementById('off_sidebar');
     if(check_3.checked === true) {
-        document.cookie = 'main_css_off_sidebar=1; path=/';
+        window.localStorage.setItem('main_css_off_sidebar', '1');
     } else {
-        document.cookie = 'main_css_off_sidebar=0; path=/';
+        window.localStorage.setItem('main_css_off_sidebar', '0');
     }
 
     const check_4 = document.getElementById('fixed_width');
     if(check_4.options[check_4.selectedIndex].value) {
-        document.cookie = 'main_css_fixed_width=' + check_4.options[check_4.selectedIndex].value + '; path=/';
+        window.localStorage.setItem('main_css_fixed_width', check_4.options[check_4.selectedIndex].value);
     } else {
-        document.cookie = 'main_css_fixed_width=; path=/';
+        window.localStorage.setItem('main_css_fixed_width', '');
     }
 
     history.go(0);
@@ -37,7 +37,7 @@ function ringo_get_post() {
 function ringo_do_skin_set() {
     let cookies = document.cookie;
     
-    if(!cookies.match(ringo_do_regex_data('main_css_use_sys_darkmode')) || (cookies.match(ringo_do_regex_data('main_css_use_sys_darkmode')) && cookies.match(ringo_do_regex_data('main_css_use_sys_darkmode'))[1] === '1')) {
+    if(!window.localStorage.getItem('main_css_use_sys_darkmode') || window.localStorage.getItem('main_css_use_sys_darkmode') === '1') {
         if(window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.cookie = 'main_css_darkmode=1; path=/';
         } else {
@@ -45,7 +45,7 @@ function ringo_do_skin_set() {
         }
     }
 
-    if(cookies.match(ringo_do_regex_data('main_css_off_sidebar')) && cookies.match(ringo_do_regex_data('main_css_off_sidebar'))[1] === '1') {
+    if(window.localStorage.getItem('main_css_off_sidebar') && window.localStorage.getItem('main_css_off_sidebar') === '1') {
         document.getElementById('ringo_add_style').innerHTML += `
             section {
                 width: auto;
@@ -63,8 +63,8 @@ function ringo_do_skin_set() {
         `;
     }
 
-    if(cookies.match(ringo_do_regex_data('main_css_fixed_width')) && cookies.match(ringo_do_regex_data('main_css_fixed_width'))[1] !== '') {
-        let fixed_width_data = cookies.match(ringo_do_regex_data('main_css_fixed_width'))[1];
+    if(window.localStorage.getItem('main_css_fixed_width') && window.localStorage.getItem('main_css_fixed_width') !== '') {
+        let fixed_width_data = window.localStorage.getItem('main_css_fixed_width');
         document.getElementById('ringo_add_style').innerHTML += `
             article.main {
                 max-width: ` + fixed_width_data + `px;
@@ -111,17 +111,17 @@ function ringo_load_skin_set() {
             set_data["invert"] = "checked";
         }
 
-        if(!cookies.match(ringo_do_regex_data('main_css_use_sys_darkmode')) || (cookies.match(ringo_do_regex_data('main_css_use_sys_darkmode')) && cookies.match(ringo_do_regex_data('main_css_use_sys_darkmode'))[1] === '1')) {
+        if(!window.localStorage.getItem('main_css_use_sys_darkmode') || window.localStorage.getItem('main_css_use_sys_darkmode') === '1') {
             set_data["use_sys_darkmode"] = "checked";
         }
 
-        if(cookies.match(ringo_do_regex_data('main_css_off_sidebar')) && cookies.match(ringo_do_regex_data('main_css_off_sidebar'))[1] === '1') {
+        if(window.localStorage.getItem('main_css_off_sidebar') && window.localStorage.getItem('main_css_off_sidebar') === '1') {
             set_data["off_sidebar"] = "checked";
         }
 
         let fixed_width_data = '';
-        if(cookies.match(ringo_do_regex_data('main_css_fixed_width'))) {
-            fixed_width_data = cookies.match(ringo_do_regex_data('main_css_fixed_width'))[1];
+        if(window.localStorage.getItem('main_css_fixed_width')) {
+            fixed_width_data = window.localStorage.getItem('main_css_fixed_width');
         }
 
         let select_fixed_width = [set_language[language]['default'], '800', '900', '1000', '1100', '1200', '1300', '1500', '1600'];
