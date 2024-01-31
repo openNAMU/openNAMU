@@ -764,16 +764,48 @@ def get_user_title_list(ip = ''):
         # default
         user_title = {
             '' : load_lang('default'),
-            '🌳' : '🌳 namu',
+            '🌳' : '🌳 newbie',
         }
-        
-        # admin
-        if admin_check('all', None, ip) == 1:
-            user_title['✅'] = '✅ admin'
 
         curs.execute(db_change('select name from user_set where id = ? and name = ?'), [ip, 'get_🥚'])
         if curs.fetchall():
             user_title['🥚'] = '🥚 easter_egg'
+
+        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_first_contribute', ip])
+        if curs.fetchall():
+            user_title['🔰'] = '🔰 first_contribute'
+
+        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_tenth_contribute', ip])
+        if curs.fetchall():
+            user_title['📝'] = '📝 tenth_contribute'
+
+        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_hundredth_contribute', ip])
+        if curs.fetchall():
+            user_title['🖊️'] = '🖊️ hundredth_contribute'
+
+        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_thousandth_contribute', ip])
+        if curs.fetchall():
+            user_title['🏅'] = '🏅 thousandth_contribute'
+
+        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_first_discussion', ip])
+        if curs.fetchall():
+            user_title['💬'] = '💬 first_discussion'
+
+        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_tenth_discussion', ip])
+        if curs.fetchall():
+            user_title['💡'] = '💡 tenth_discussion'
+
+        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_hundredth_discussion', ip])
+        if curs.fetchall():
+            user_title['📢'] = '📢 hundredth_discussion'
+
+        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_thousandth_discussion', ip])
+        if curs.fetchall():
+            user_title['📜'] = '📜 thousandth_discussion'
+
+        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_admin', ip])
+        if curs.fetchall():
+            user_title['✅'] = '✅ admin'
         
         return user_title
     
