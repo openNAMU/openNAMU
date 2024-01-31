@@ -590,5 +590,14 @@
     "view_history": "문서 열람 추적 사용",
     "start_with_search" : "첫 글자부터 검색",
     "backup_warning" : "경고. 동일한 이름의 파일이 있는 경우 지워질 수 있습니다.",
-    "level" : "레벨"
+    "level" : "레벨",
+    "challenge_and_level_manage" : "도전과제와 레벨 관리",
+    "display_level_in_user_name" : "사용자 이름에 레벨 표시",
+    "ua" : "UA",
+    "day" : "일",
+    "ua_expiration_date" : "UA 만료 기한",
+    "backup" : "백업",
+    "document_content_max_length" : "문서 최대 길이",
+    "bbs_record" : "게시판 작성글 목록",
+    "bbs_comment_record" : "게시판 작성댓글 목록"
 }
