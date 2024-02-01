@@ -132,7 +132,7 @@ def main_setting_phrase():
                         <textarea class="opennamu_textarea_100" name="''' + i_list[22] + '''">''' + html.escape(d_list[22]) + '''</textarea>
 
                         <h2>''' + load_lang('outdated_doc_warning') + '''  (HTML)</h2>
-                        <span>''' + load_lang('period') + '''</span> (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
+                        <span>''' + load_lang('period') + '''</span> (''' + load_lang('day') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="''' + i_list[24] + '''" value="''' + html.escape(d_list[24]) + '''">
                         <hr class="main_hr">

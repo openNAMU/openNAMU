@@ -49,9 +49,9 @@ def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
             sub = '(' + bbs_name + ')'
             sub += ' (' + post_num_str + ')'
             
-            name = load_lang('bbs_post_delete')
+            name = load_lang('bbs_comment_delete')
             if comment_num == '':
-                name = load_lang('bbs_comment_delete')
+                name = load_lang('bbs_post_delete')
             else:
                 sub += ' (' + comment_num + ')'
 
