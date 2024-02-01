@@ -139,7 +139,7 @@ def filter_all_add(tool, name = None):
                     <hr class="main_hr">
                     <input value="''' + html.escape(value[1]) + '''" type="text" name="link">
                     <hr class="main_hr">
-                    ''' + load_lang('icon') + ''' (''' + ('HTML' if tool == 'inter_wiki' else load_lang('html_or_link')) + ''') (''' + load_lang('link') + ' EX' + ''' : /image/Test.svg)
+                    ''' + load_lang('icon') + ''' (''' + ('HTML' if tool == 'inter_wiki' else load_lang('html_or_link')) + ''') (''' + load_lang('link') + ' - EX' + ''' : /image/Test.svg)
                     <hr class="main_hr">
                     <input value="''' + html.escape(value[2]) + '''" type="text" name="icon">
                     ''' + select + '''

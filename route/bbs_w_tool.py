@@ -23,7 +23,7 @@ def bbs_w_tool(bbs_num = '', post_num = ''):
             data += '''
                 <h3>''' + load_lang('admin') + '''</h3>
                 <ul class="opennamu_ul">
-                    <li><a href="/bbs/blind/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + load_lang('hide') + '''</a></li>
+                    <!-- <li><a href="/bbs/blind/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + load_lang('hide') + '''</a></li> -->
                     <li><a href="/bbs/pinned/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + pinned + '''</a></li>
                 </ul>
             '''
