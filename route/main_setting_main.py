@@ -45,7 +45,8 @@ def main_setting_main(db_set):
             41 : ['backup_count', ''],
             42 : ['ua_expiration_date', ''],
             43 : ['auth_history_expiration_date', ''],
-            44 : ['auth_history_off', '']
+            44 : ['auth_history_off', ''],
+            45 : ['user_name_level', '']
         }
 
         if flask.request.method == 'POST':
@@ -92,7 +93,7 @@ def main_setting_main(db_set):
                 else:
                     tls_select += '<option value="' + tls_select_one + '">' + tls_select_one + '</option>'
 
-            check_box_div = [7, 8, '', 20, 23, 24, 25, 26, 31, 33, 34, 35, 36, 37, 44]
+            check_box_div = [7, 8, '', 20, 23, 24, 25, 26, 31, 33, 34, 35, 36, 37, 44, 45]
             for i in range(0, len(check_box_div)):
                 acl_num = check_box_div[i]
                 if acl_num != '' and d_list[acl_num]:
@@ -182,6 +183,9 @@ def main_setting_main(db_set):
                         <hr class="main_hr">
 
                         <input type="checkbox" name="enable_challenge" ''' + check_box_div[6] + '''> ''' + load_lang('enable_challenge_function') + ''' (''' + load_lang('not_working') + ''')
+                        <hr class="main_hr">
+
+                        <input type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + load_lang('display_level_in_user_name') + '''
                         <hr class="main_hr">
 
                         <h2>''' + load_lang('design_set') + '''</h2>

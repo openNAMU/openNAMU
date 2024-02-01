@@ -16,6 +16,8 @@ def user_setting():
                     ['user_title', flask.request.form.get('user_title', '')],
                     ['sub_user_name' , flask.request.form.get('sub_user_name', '')]
                 ]
+                if not auto_list[2][1] in get_user_title_list(ip):
+                    auto_list[2][1] = ''
 
                 twofa_on = flask.request.form.get('2fa', '')
                 if twofa_on != '':
@@ -67,11 +69,10 @@ def user_setting():
                     else:
                         div3 += '<option value="' + lang_data + '">' + see_data + '</option>'
 
-                # 여기 잘못 짬
                 curs.execute(db_change('select data from user_set where name = "user_title" and id = ?'), [ip])
                 data = curs.fetchall()
                 data = [['']] if not data else data
-                user_title_list = get_user_title_list()
+                user_title_list = get_user_title_list(ip)
                 div4 = ''
                 for user_title in user_title_list:                
                     if data and data[0][0] == user_title:
