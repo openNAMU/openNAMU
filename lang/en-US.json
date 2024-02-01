@@ -119,6 +119,11 @@
         "popup" : "Popup",
         "popover" : "Popover",
         "trace" : "Trace",
+        "level" : "Level",
+        "challenge" : "Challenges",
+        "ua" : "UA",
+        "day" : "Day(s)",
+        "backup" : "Backup",
         "_comment_1.1_" : "Time",
             "second" : "Second(s)",
             "hour" : "Hour(s)",
@@ -215,7 +220,7 @@
         "topic_acl_setting" : "Discussion ACL setting",
         "topic_acl" : "Discussion ACL",
         "delete_admin_group": "Delete admin group",
-        "main_skin_set" : "Main skin setting(s)",
+        "main_skin_set" : "Main skin settings",
         "reset_backlink" : "Reset backlink",
         "link_in_this" : "Links in this document",
         "star_doc" : "Document(s) of interest",
@@ -234,7 +239,6 @@
         "key_change" : "Change key",
         "key_delete" : "Delete key",
         "email_delete" : "Delete email",
-        "challenge" : "Challenge",
         "user_title" : "User title",
         "multiple_ban" : "Multiple ban",
         "dont_move" : "Don't move",
@@ -248,6 +252,9 @@
         "change_user_name" : "Change main user name",
         "sub_user_name" : "Sub user name",
         "start_with_search" : "Search from the first letter",
+        "challenge_and_level_manage" : "Challenges and level management",
+        "bbs_record" : "BBS post(s) record",
+        "bbs_comment_record" : "BBS comment(s) record",
         "_comment_" : "BBS",
             "bbs" : "BBS",
             "bbs_main" : "BBS main",
@@ -398,6 +405,9 @@
                 "move_with_redirect" : "Create a redirect when moving a document",
                 "slow_thread" : "Continuous thread upload limit",
                 "edit_timeout" : "render timeout",
+                "display_level_in_user_name" : "Displaying levels in username",
+                "ua_expiration_date" : "UA Expiration deadline",
+                "document_content_max_length" : "Maximum document length",
             "_comment_" : "Text",
                 "register_text" : "Terms of sign-up",
                 "non_login_alert" : "Non-login alert",
@@ -618,14 +628,32 @@
             "backup_warning" : "Warning. Files with the same name may be erased.",
         "_comment_" : "Challenge",
             "challenge_title_register" : "Hello, World!",
-            "challenge_info_register" : "Sign up",
+            "challenge_info_register" : "Sign up<br><br>Reward : 🌳 title",
     
             "challenge_title_first_contribute" : "Well begun is half done.",
-            "challenge_info_first_contribute" : "Make your 1st contribution",
+            "challenge_info_first_contribute" : "Make your 1st contribution<br><br>Reward : 🔰 title and 500 exp",
     
-            "challenge_title_tenthousandth_contribute" : "Rome wasn't built in a day.",
-            "challenge_info_tenthousandth_contribute" : "Make your 1000th contribution",
+            "challenge_title_tenth_contribute" : "Boys, Be Ambitious!",
+            "challenge_info_tenth_contribute" : "Make your 10th contribution<br><br>Reward : 📝 title and 1000 exp",
+
+            "challenge_title_hundredth_contribute" : "Knowledge is power.",
+            "challenge_info_hundredth_contribute" : "Make your 100th contribution<br><br>보상 : 🖊️ title and 3000 exp",
+
+            "challenge_title_thousandth_contribute" : "Rome wasn't built in a day.",
+            "challenge_info_thousandth_contribute" : "Make your 1000th contribution<br><br>Reward : 🏅 title and 10000 exp",
     
+            "challenge_title_first_discussion" : "Truth is generally the best vindication against slander.",
+            "challenge_info_first_discussion" : "Post the 1st discussion thread<br><br>Reward : 💬 title and 500 exp",
+
+            "challenge_title_tenth_discussion" : "I shall either find a way or make one.",
+            "challenge_info_tenth_discussion" : "Post the 10th discussion thread<br><br>Reward : 💡 title and 1000 exp",
+
+            "challenge_title_hundredth_discussion" : "When all think alike, no one thinks very much.",
+            "challenge_info_hundredth_discussion" : "Post the 100th discussion thread<br><br>Reward : 📢 title and 3000 exp",
+
             "challenge_title_thousandth_discussion" : "I think, therefore I am.",
-            "challenge_info_thousandth_discussion" : "Post the 1000th discussion thread"
+            "challenge_info_thousandth_discussion" : "Post the 1000th discussion thread<br><br>Reward : 📜 title and 10000 exp",
+
+            "challenge_title_admin" : "If you want to test a man's character, give him power.",
+            "challenge_info_admin" : "Be the administrator.<br><br>Reward : ✅ title and 10000 exp"
 }
