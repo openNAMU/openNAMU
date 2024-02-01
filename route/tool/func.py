@@ -2166,21 +2166,21 @@ def ip_pas(raw_ip, type_data = 0):
                     curs.execute(db_change('select data from user_set where name = "user_name" and id = ?'), [raw_ip])
                     db_data = curs.fetchall()
                     ip = db_data[0][0] if db_data and db_data[0][0] != '' else raw_ip
-
-                curs.execute(db_change("select data from other where name = 'user_name_level'"))
-                db_data = curs.fetchall()
-                if db_data and db_data[0][0] != '':
-                    level = '0'
-
-                    curs.execute(db_change("select data from user_set where id = ? and name = 'level'"), [raw_ip])
-                    db_data = curs.fetchall()
-                    if db_data:
-                        level = db_data[0][0]
-
-                    ip += '<sup>' + level + '</sup>'
                 
             if type_data == 0 and change_ip == 0:
                 if is_this_ip == 0:
+                    curs.execute(db_change("select data from other where name = 'user_name_level'"))
+                    db_data = curs.fetchall()
+                    if db_data and db_data[0][0] != '':
+                        level = '0'
+
+                        curs.execute(db_change("select data from user_set where id = ? and name = 'level'"), [raw_ip])
+                        db_data = curs.fetchall()
+                        if db_data:
+                            level = db_data[0][0]
+
+                        ip += '<sup>' + level + '</sup>'
+
                     ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + ip + '</a>'
                     
                     if admin_check('all', None, raw_ip) == 1:
