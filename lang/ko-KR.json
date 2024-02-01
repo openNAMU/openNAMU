@@ -615,5 +615,9 @@
     "bbs_comment_help" : "게시판 댓글 편집기 도움말",
     "outdated_doc_warning" : "오래된 문서 경고",
     "redirect" : "넘겨주기",
-    "new_doc" : "새 문서"
+    "new_doc" : "새 문서",
+    "table" : "표",
+    "table_transparent" : "표 투명화",
+    "recaptcha_pass_acl" : "캡차 통과 ACL",
+    "recaptcha_one_check_five_pass_acl" : "캡차 1회 통과시 5회 미시행 ACL"
 }
