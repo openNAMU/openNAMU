@@ -19,36 +19,37 @@ def bbs_w_post_comment(user_id, sub_code, comment_num, bbs_num_str, post_num_str
     comment_add_count += comment_count
 
     for temp_dict in thread_data:
-        color = 'default'
-        if user_id == temp_dict['comment_user_id']:
-            color = 'green'
+        if temp_dict['comment_user_id'] != '':
+            color = 'default'
+            if user_id == temp_dict['comment_user_id']:
+                color = 'green'
 
-        sub_code_check = re.sub(r'^[0-9]+-[0-9]+-', '', sub_code + '-' + temp_dict['code'])
-        margin_count = sub_code_check.count('-')
+            sub_code_check = re.sub(r'^[0-9]+-[0-9]+-', '', sub_code + '-' + temp_dict['code'])
+            margin_count = sub_code_check.count('-')
 
-        date = ''
-        date += '<a href="javascript:opennamu_change_comment(\'' + sub_code_check + '\');">(' + load_lang('comment') + ')</a> '
-        date += '<a href="/bbs/tool/' + bbs_num_str + '/' + post_num_str + '/' + sub_code_check + '">(' + load_lang('tool') + ')</a> '
-        date += temp_dict['comment_date']
+            date = ''
+            date += '<a href="javascript:opennamu_change_comment(\'' + sub_code_check + '\');">(' + load_lang('comment') + ')</a> '
+            date += '<a href="/bbs/tool/' + bbs_num_str + '/' + post_num_str + '/' + sub_code_check + '">(' + load_lang('tool') + ')</a> '
+            date += temp_dict['comment_date']
 
-        comment_data += '<span style="padding-left: 20px;"></span>' * margin_count
-        comment_data += api_topic_thread_make(
-            ip_pas(temp_dict['comment_user_id']),
-            date,
-            render_set(
-                doc_data = temp_dict['comment'],
-                data_in = 'bbs_comment_' + sub_code_check
-            ),
-            sub_code_check,
-            color = color,
-            add_style = 'width: calc(100% - ' + str(margin_count * 20) + 'px);'
-        )
+            comment_data += '<span style="padding-left: 20px;"></span>' * margin_count
+            comment_data += api_topic_thread_make(
+                ip_pas(temp_dict['comment_user_id']),
+                date,
+                render_set(
+                    doc_data = temp_dict['comment'],
+                    data_in = 'bbs_comment_' + sub_code_check
+                ),
+                sub_code_check,
+                color = color,
+                add_style = 'width: calc(100% - ' + str(margin_count * 20) + 'px);'
+            )
 
-        comment_default = ''
-        if comment_num == sub_code_check:
-            comment_default = 'selected'
+            comment_default = ''
+            if comment_num == sub_code_check:
+                comment_default = 'selected'
 
-        comment_select += '<option value="' + sub_code_check + '" ' + comment_default + '>' + sub_code_check + '</option>'
+            comment_select += '<option value="' + sub_code_check + '" ' + comment_default + '>' + sub_code_check + '</option>'
 
         temp_data = bbs_w_post_comment(user_id, sub_code + '-' + temp_dict['code'], comment_num, bbs_num_str, post_num_str)
 
