@@ -167,12 +167,12 @@ def main_setting_main(db_set):
                         <hr class="main_hr">
                         <input type="password" name="wiki_access_password" value="''' + html.escape(d_list[32]) + '''">
                         
-                        <h3>''' + load_lang('auth_history') + '''</h3>
+                        <h3>''' + load_lang('authority_use_list') + '''</h3>
                         
-                        <input type="checkbox" name="auth_history_off" ''' + check_box_div[14] + '''> ''' + load_lang('auth_history_off') + '''
+                        <input type="checkbox" name="auth_history_off" ''' + check_box_div[14] + '''> ''' + load_lang('authority_use_list_off') + '''
                         <hr class="main_hr">
                         
-                        <span>''' + load_lang('auth_history_expiration_date') + '''</span> (''' + load_lang('day') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
+                        <span>''' + load_lang('authority_use_list_expiration_date') + '''</span> (''' + load_lang('day') + ''') (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="auth_history_expiration_date" value="''' + html.escape(d_list[43]) + '''">
                         <hr class="main_hr">

@@ -37,7 +37,7 @@ def bbs_w_set(bbs_num = ''):
                 disable = 'disabled'
             else:
                 disable = ''
-                other_menu += [['bbs/hide/' + bbs_num_str, load_lang('hide')], ['bbs/delete/' + bbs_num_str, load_lang('delete')]]
+                other_menu += [['bbs/delete/' + bbs_num_str, load_lang('delete')]]
 
             for for_a in range(len(i_list)):
                 curs.execute(db_change('select set_data from bbs_set where set_name = ? and set_id = ?'), [i_list[for_a], bbs_num])
