@@ -1,6 +1,8 @@
 {
     "language_tag": "en-US",
     "_comment_1_" : "Common",
+        "sitemap_manual_create" : "Create sitemap manually",
+        "sitemap_auto_make" : "Create sitemap automatically",
         "data" : "Data",
         "volume" : "Volume",
         "server" : "Server",
