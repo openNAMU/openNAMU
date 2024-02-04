@@ -1,5 +1,7 @@
 {
     "language_tag": "ko-KR",
+    "sitemap_manual_create" : "사이트맵 수동 생성",
+    "sitemap_auto_make" : "사이트맵 자동 생성",
     "delete_admin_group": "권한 그룹 삭제",
     "document_name": "문서명",
     "non_login_alert": "비로그인 알림",
@@ -81,7 +83,7 @@
     "markup_enabled": "문법 사용 가능",
     "send": "전송",
     "not_sure": "확실하지 않음",
-    "file_name_error": "파일명에는 알파벳, 한글, 공백, 밑줄 및 빼기 기호만 사용할 수 있습니다.",
+    "file_name_error": "파일명에는 점을 사용할 수 없습니다.",
     "pass": "넘기기",
     "recaptcha_error": "'로봇이 아닙니다'를 통해 reCAPTCHA를 통과하세요.",
     "file_capacity_error": "최대 파일 크기 (MB) : ",
