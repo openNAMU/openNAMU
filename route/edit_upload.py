@@ -24,7 +24,7 @@ def edit_upload():
             if (file_max * 1000 * 1000 * file_len) < flask.request.content_length:
                 return re_error('/error/17')
 
-            if file_len == 1:    
+            if file_len == 1:
                 file_num = None
             else:
                 if acl_check(None, 'many_upload') == 1:
@@ -49,7 +49,7 @@ def edit_upload():
                     name = data.filename
 
                 piece = os.path.splitext(name)
-                if re.search(r'[^ㄱ-힣0-9a-zA-Z_\- ]', piece[0]):
+                if re.search(r'\.', piece[0]):
                     return re_error('/error/22')
 
                 e_data = sha224_replace(piece[0]) + piece[1]
