@@ -49,7 +49,7 @@ def edit_upload():
                     name = data.filename
 
                 piece = os.path.splitext(name)
-                if re.search(r'[^\.]', piece[0]):
+                if re.search(r'\.', piece[0]):
                     return re_error('/error/22')
 
                 e_data = sha224_replace(piece[0]) + piece[1]
