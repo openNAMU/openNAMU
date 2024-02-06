@@ -11,6 +11,9 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
         category_total = ''
         file_data = ''
 
+        doc_type = ''
+        now_time = get_time()
+
         ip = ip_check()
             
         uppage = re.sub(r"/([^/]+)$", '', name)
@@ -25,6 +28,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
 
         if re.search(r'^category:', name):
             name_view = name
+            doc_type = 'category'
 
             category_doc = ''
             category_sub = ''
@@ -32,7 +36,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             count_sub_category = 0
             count_category = 0
 
-            curs.execute(db_change("select link from back where title = ? and type = 'cat' order by link asc"), [name])
+            curs.execute(db_change("select distinct link from back where title = ? and type = 'cat' order by link asc"), [name])
             category_sql = curs.fetchall()
             for data in category_sql:
                 link_view = data[0]
@@ -41,19 +45,23 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                     db_data = curs.fetchall()
                     if db_data and db_data[0][0] != '':
                         link_view = db_data[0][0]
+                        
+                link_blur = ''
+                curs.execute(db_change("select data from back where title = ? and link = ? and type = 'cat_blur' limit 1"), [name, data[0]])
+                db_data = curs.fetchall()
+                if db_data:
+                    link_blur = 'opennamu_category_blur'
 
                 if data[0].startswith('category:'):
-                    category_sub += '<li><a href="/w/' + url_pas(data[0]) + '">' + html.escape(link_view) + '</a></li>'
-
+                    category_sub += '<li><a class="' + link_blur + '" href="/w/' + url_pas(data[0]) + '">' + html.escape(link_view) + '</a></li>'
                     count_sub_category += 1
                 else:
                     category_doc += '' + \
                         '<li>' + \
-                            '<a href="/w/' + url_pas(data[0]) + '">' + html.escape(link_view) + '</a> ' + \
+                            '<a class="' + link_blur + '" href="/w/' + url_pas(data[0]) + '">' + html.escape(link_view) + '</a> ' + \
                             '<a class="opennamu_link_inter" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>' + \
                         '</li>' + \
                     ''
-
                     count_category += 1
 
             if category_sub != '':
@@ -75,6 +83,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                 ''
         elif re.search(r"^user:([^/]*)", name):
             name_view = name
+            doc_type = 'user'
 
             match = re.search(r"^user:([^/]*)", name)
             
@@ -105,9 +114,14 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                 <hr class="main_hr">
             '''
             if name == 'user:' + user_name:
-                menu += [['w/' + url_pas(name) + '/' + url_pas(get_time().split()[0]), load_lang('today_doc')]]
+                menu += [['w/' + url_pas(name) + '/' + url_pas(now_time.split()[0]), load_lang('today_doc')]]
         elif re.search(r"^file:", name):
+            curs.execute(db_change('select id from history where title = ? order by date desc limit 1'), [name])
+            db_data = curs.fetchall()
+            rev = db_data[0][0] if db_data else '1' 
+
             name_view = name
+            doc_type = 'file'
 
             mime_type = re.search(r'([^.]+)$', name)
             if mime_type:
@@ -121,13 +135,22 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             file_all_name = sha224_replace(file_name) + '.' + mime_type
             file_path_name = os.path.join(load_image_url(), file_all_name)
             if os.path.exists(file_path_name):
+                try:
+                    img = Image.open(file_path_name)
+                    width, height = img.size
+                    file_res = str(width) + 'x' + str(height)
+                except:
+                    file_res = 'Vector'
+                
                 file_size = str(round(os.path.getsize(file_path_name) / 1000, 1))
+                
                 file_data = '''
-                    <img src="/image/''' + url_pas(file_all_name) + '''">
+                    <img src="/image/''' + url_pas(file_all_name) + '''.cache_v''' + rev + '''">
                     <h2>''' + load_lang('data') + '''</h2>
                     <table>
                         <tr><td>URL</td><td><a href="/image/''' + url_pas(file_all_name) + '''">''' + load_lang('link') + '''</a></td></tr>
                         <tr><td>''' + load_lang('volume') + '''</td><td>''' + file_size + '''KB</td></tr>
+                        <tr><td>''' + load_lang('resolution') + '''</td><td>''' + file_res + '''</td></tr>
                     </table>
                     <h2>''' + load_lang('content') + '''</h2>
                 '''
@@ -215,19 +238,64 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                 ['acl/' + url_pas(name), load_lang('setting'), acl],
             ]
 
+            if flask.session and 'lastest_document' in flask.session:
+                if type(flask.session['lastest_document']) != type([]):
+                    flask.session['lastest_document'] = []
+            else:
+                flask.session['lastest_document'] = []
+
             if do_type == 'from':
                 menu += [['w/' + url_pas(name), load_lang('pass')]]
-                if flask.session and 'lastest_document' in flask.session:
-                    end_data = '''
-                        <div id="redirect">
-                            <a href="/w_from/''' + url_pas(flask.session['lastest_document']) + '''">''' + flask.session['lastest_document'] + '''</a> ➤ <b>''' + name + '''</b>
-                        </div>
-                        <hr class="main_hr">
-                    ''' + end_data
+                
+                last_page = ''
+                for for_a in reversed(range(0, len(flask.session['lastest_document']))):
+                    last_page = flask.session['lastest_document'][for_a]
+
+                    curs.execute(db_change("select link from back where (title = ? or link = ?) and type = 'redirect' limit 1"), [last_page, last_page])
+                    if curs.fetchall():
+                        break
+
+                redirect_text = '{0} ➤ {1}'
+
+                curs.execute(db_change('select data from other where name = "redirect_text"'))
+                db_data = curs.fetchall()
+                if db_data and db_data[0][0] != '':
+                    redirect_text = db_data[0][0]
+
+                try:
+                    redirect_text = redirect_text.format('<a href="/w_from/' + url_pas(last_page) + '">' + html.escape(last_page) + '</a>', '<b>' + html.escape(name) + '</b>')
+                except:
+                    redirect_text = '{0} ➤ {1}'
+                    redirect_text = redirect_text.format('<a href="/w_from/' + url_pas(last_page) + '">' + html.escape(last_page) + '</a>', '<b>' + html.escape(name) + '</b>')
+
+                end_data = '''
+                    <div id="redirect">
+                        ''' + redirect_text + '''
+                    </div>
+                    <hr class="main_hr">
+                ''' + end_data
                     
-                flask.session['lastest_document'] = name
+            if len(flask.session['lastest_document']) >= 10:
+                flask.session['lastest_document'] = flask.session['lastest_document'][-9:] + [name]
             else:
-                flask.session['lastest_document'] = name
+                flask.session['lastest_document'] += [name]
+            
+            flask.session['lastest_document'] = list(reversed(dict.fromkeys(reversed(flask.session['lastest_document']))))
+
+            view_history_on = get_main_skin_set(curs, flask.session, 'main_css_view_history', ip)
+            if view_history_on == 'on':
+                end_data = '' + \
+                    '<div id="redirect">' + \
+                        load_lang('trace') + ' : ' + \
+                        ' ➥ '.join(
+                            [
+                                '<a href="/w/' + url_pas(for_a) + '">' + html.escape(for_a) + '</a>'
+                                for for_a in flask.session['lastest_document']
+                            ]
+                        ) + \
+                    '</div>' + \
+                    '<hr class="main_hr">' + \
+                '' + end_data
 
             if uppage != 0:
                 menu += [['w/' + url_pas(uppage), load_lang('upper')]]
@@ -242,10 +310,23 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
         div = file_data + user_doc + end_data + category_total
 
         if num != '':
-            curs.execute(db_change('select data from other where name = "phrase_old_page_warring"'))
+            curs.execute(db_change('select data from other where name = "phrase_old_page_warning"'))
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
                 div = db_data[0][0] + '<hr class="main_hr">' + div
+
+            doc_type = 'rev'
+        
+        if doc_type == '':
+            curs.execute(db_change('select data from other where name = "outdated_doc_warning_date"'))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '' and r_date != 0:
+                time_1 = datetime.datetime.strptime(r_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days = int(number_check(db_data[0][0])))
+                time_2 = datetime.datetime.strptime(now_time, '%Y-%m-%d %H:%M:%S')
+                if time_2 > time_1:
+                    curs.execute(db_change('select data from other where name = "outdated_doc_warning"'))
+                    db_data = curs.fetchall()
+                    div = (db_data[0][0] if db_data and db_data[0][0] != '' else load_lang('old_page_warning')) + '<hr class="main_hr">' + div
 
         curs.execute(db_change("select data from other where name = 'body'"))
         body = curs.fetchall()

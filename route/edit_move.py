@@ -41,13 +41,12 @@ def edit_move(name):
             if do_edit_text_bottom_check_box_check(agree) == 1:
                 return re_error('/error/29')
 
+            # 역링크 관련 패치 해야할 듯
+
             # 문서 이동 파트 S
             curs.execute(db_change("select title from history where title = ?"), [move_title])
             if curs.fetchall():
-                if (
-                    move_option == 'merge' and 
-                    admin_check(None, 'merge documents (' + name + ') (' + move_title + ')') == 1
-                ):
+                if move_option == 'merge' and admin_check(None, 'merge documents (' + name + ') (' + move_title + ')') == 1:
                     curs.execute(db_change("select data from data where title = ?"), [move_title])
                     data = curs.fetchall()
                     if data:
@@ -56,151 +55,114 @@ def edit_move(name):
 
                     curs.execute(db_change("select data from data where title = ?"), [name])
                     data = curs.fetchall()
-                    if data:
-                        curs.execute(db_change("update data set title = ? where title = ?"), [move_title, name])
-                        curs.execute(db_change("update back set link = ? where link = ?"), [move_title, name])
+                    data_in = data[0][0] if data else ''
 
-                        data_in = data[0][0]
-                    else:
-                        data_in = ''
+                    curs.execute(db_change("update data set title = ? where title = ?"), [move_title, name])
+                    curs.execute(db_change("update back set link = ? where link = ?"), [move_title, name])
 
-                    history_plus(
-                        name,
-                        data_in,
-                        time,
-                        ip,
-                        send,
-                        '0',
-                        t_check = 'merge <a>' + name + '</a> - <a>' + move_title + '</a> move',
-                        mode = 'move'
-                    )
-
-                    curs.execute(db_change("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'"), [name])
-                    curs.execute(db_change("delete from back where title = ? and not type = 'cat' and type = 'no'"), [move_title])
-
-                    curs.execute(db_change('select data from other where name = "count_all_title"'))
-                    curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) - 1)])
+                    # 역링크 S
+                    # 문서 합치기이므로 기존 문서 쪽은 no 역링크 생성, 이동하는 곳에는 no 역링크 제거
+                    curs.execute(db_change("select distinct link from back where title = ?"), [name])
+                    backlink = [[for_a[0], name, 'no', ''] for for_a in curs.fetchall()]
+                    curs.executemany(db_change("insert into back (link, title, type, data) values (?, ?, ?, ?)"), backlink)
+                    curs.execute(db_change("delete from back where title = ? and type = 'no'"), [move_title])
+                    # 역링크 E
 
                     curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [move_title])
-                    data = curs.fetchall()
-
-                    num = data[0][0]
+                    num = curs.fetchall()[0][0]
 
                     curs.execute(db_change("select id from history where title = ? order by id + 0 asc"), [name])
                     data = curs.fetchall()
                     for move in data:
-                        curs.execute(db_change("update rc set title = ?, id = ? where title = ? and id = ?"), [
-                            move_title, 
-                            str(int(num) + int(move[0])), 
-                            name, 
-                            move[0]
-                        ])
-                        curs.execute(db_change("update history set title = ?, id = ? where title = ? and id = ?"), [
-                            move_title, 
-                            str(int(num) + int(move[0])), 
-                            name, 
-                            move[0]
-                        ])
+                        curs.execute(db_change("update rc set title = ?, id = ? where title = ? and id = ?"), [move_title, str(int(num) + int(move[0])), name, move[0]])
+                        curs.execute(db_change("update history set title = ?, id = ? where title = ? and id = ?"), [move_title, str(int(num) + int(move[0])), name, move[0]])
+
+                    history_plus(move_title, data_in, time, ip, send, '0',
+                        t_check = 'merge <a>' + name + '</a> - <a>' + move_title + '</a> move',
+                        mode = 'move'
+                    )
                 elif move_option == 'reverse':
+                    # 전체적인 구조 변경 필요
+                    # 중간 문서 거치지 않고 불러와서 바로 변경하도록
+                    # 문서 이동 말고 나머지도 그렇게 변경 필요함
                     i = 0
                     var_name = ''
                     while var_name == '':
-                        curs.execute(db_change("select title from history where title = ?"), ['test ' + str(i)])
+                        temp_title = 'test ' + load_random_key() + ' ' + str(i)
+                        curs.execute(db_change("select title from history where title = ? limit 1"), [temp_title])
                         if not curs.fetchall():
-                            var_name = 'test ' + str(i)
+                            var_name = temp_title
                         else:
                             i += 1
 
-                    curs.execute(db_change("select data from data where title = ?"), [name])
-                    data = curs.fetchall()
-                    if data:
-                        curs.execute(db_change("update data set title = ? where title = ?"), [var_name, name])
-                        curs.execute(db_change("update back set link = ? where link = ?"), [var_name, name])
-
-                    curs.execute(db_change("update history set title = ? where title = ?"), [var_name, name])
-                    curs.execute(db_change("update rc set title = ? where title = ?"), [var_name, name])
-
-                    for title_name in [[move_title, name], [var_name, move_title]]:
-                        curs.execute(db_change("select data from data where title = ?"), [title_name[0]])
-                        data = curs.fetchall()
-                        if data:
-                            curs.execute(db_change("update data set title = ? where title = ?"), [title_name[1], title_name[0]])
-                            curs.execute(db_change("update back set link = ? where link = ?"), [title_name[1], title_name[0]])
-
-                            data_in = data[0][0]
-                        else:
-                            data_in = ''
-
-                        history_plus(
-                            title_name[0],
-                            data_in,
-                            time,
-                            ip,
-                            send,
-                            '0',
-                            t_check = '<a>' + (title_name[0] if title_name[0] != var_name else name) + '</a> - <a>' + title_name[1] + '</a> move',
-                            mode = 'move'
-                        )
+                    for title_name in [[name, var_name], [move_title, name], [var_name, move_title]]:
+                        curs.execute(db_change("update data set title = ? where title = ?"), [title_name[1], title_name[0]])
+                        curs.execute(db_change("update back set link = ? where link = ?"), [title_name[1], title_name[0]])
 
                         curs.execute(db_change("update history set title = ? where title = ?"), [title_name[1], title_name[0]])
                         curs.execute(db_change("update rc set title = ? where title = ?"), [title_name[1], title_name[0]])
+
+                    for title_name in [[name, move_title], [move_title, name]]:
+                        curs.execute(db_change("select data from data where title = ?"), [name])
+                        data = curs.fetchall()
+                        data_in = data[0][0] if data else ''
+
+                        history_plus(title_name[0], data_in, time, ip, send, '0',
+                            t_check = '<a>' + title_name[0] + '</a> - <a>' + title_name[1] + '</a> move',
+                            mode = 'move'
+                        )
                 elif move_option != 'none':
                     has_error = 1
-            elif move_option != 'none':                
+            elif move_option != 'none':
                 curs.execute(db_change("select data from data where title = ?"), [name])
                 data = curs.fetchall()
-                if data:
-                    curs.execute(db_change("update data set title = ? where title = ?"), [move_title, name])
-                    curs.execute(db_change("update back set link = ? where link = ?"), [move_title, name])
+                data_in = data[0][0] if data else ''
 
-                    data_in = data[0][0]
-                else:
-                    data_in = ''
+                curs.execute(db_change("update data set title = ? where title = ?"), [move_title, name])
+                curs.execute(db_change("update back set link = ? where link = ?"), [move_title, name])
 
-                history_plus(
-                    name,
-                    data_in,
-                    time,
-                    ip,
-                    send,
-                    '0',
+                # 역링크 S
+                # 문서 합치기 쪽 역링크와 동일하게
+                curs.execute(db_change("select distinct link from back where title = ?"), [name])
+                backlink = [[for_a[0], name, 'no', ''] for for_a in curs.fetchall()]
+                curs.executemany(db_change("insert into back (link, title, type, data) values (?, ?, ?, ?)"), backlink)
+                curs.execute(db_change("delete from back where title = ? and type = 'no'"), [move_title])
+                # 역링크 E
+
+                # 역사와 최근 변경 이동 S
+                curs.execute(db_change("update history set title = ? where title = ?"), [move_title, name])
+                curs.execute(db_change("update rc set title = ? where title = ?"), [move_title, name])
+                # 역사와 최근 변경 이동 E
+
+                history_plus(move_title, data_in, time, ip, send, '0',
                     t_check = '<a>' + name + '</a> - <a>' + move_title + '</a> move',
                     mode = 'move'
                 )
 
-                curs.execute(db_change("update back set type = 'no' where title = ? and not type = 'cat' and not type = 'no'"), [name])
-                curs.execute(db_change("delete from back where title = ? and not type = 'cat' and type = 'no'"), [move_title])
-
-                curs.execute(db_change("update history set title = ? where title = ?"), [move_title, name])
-                curs.execute(db_change("update rc set title = ? where title = ?"), [move_title, name])
-                
             # 문서 이동 파트 E
             
             # 토론 이동 파트 S
-            if (
-                move_option_topic == 'merge' and
-                admin_check(None, 'merge document\'s topics (' + name + ') (' + move_title + ')') == 1
-            ):
-                curs.execute(db_change("update rd set title = ? where title = ?"), [move_title, name])
-            elif move_option_topic == 'reverse':
-                i = 0
-                var_name = ''
-                while var_name == '':
-                    curs.execute(db_change("select title from rd where title = ?"), ['test ' + str(i)])
-                    if not curs.fetchall():
-                        var_name = 'test ' + str(i)
-                    else:
-                        i += 1
-                
-                curs.execute(db_change("update rd set title = ? where title = ?"), [var_name, move_title])
-                curs.execute(db_change("update rd set title = ? where title = ?"), [move_title, name])
-                curs.execute(db_change("update rd set title = ? where title = ?"), [name, var_name])
-            elif move_option_topic == 'normal':
-                curs.execute(db_change("select title from rd where title = ?"), [move_title])
-                if curs.fetchall():
-                    has_error = 1
-                else:
+            curs.execute(db_change("select title from rd where title = ?"), [move_title])
+            if curs.fetchall():
+                if move_option_topic == 'merge' and admin_check(None, 'merge document\'s topics (' + name + ') (' + move_title + ')') == 1:
                     curs.execute(db_change("update rd set title = ? where title = ?"), [move_title, name])
+                elif move_option_topic == 'reverse':
+                    i = 0
+                    var_name = ''
+                    while var_name == '':
+                        temp_title = 'test ' + load_random_key() + ' ' + str(i)
+                        curs.execute(db_change("select title from rd where title = ? limit 1"), [temp_title])
+                        if not curs.fetchall():
+                            var_name = temp_title
+                        else:
+                            i += 1
+                    
+                    for title_name in [[name, var_name], [move_title, name], [var_name, move_title]]:
+                        curs.execute(db_change("update rd set title = ? where title = ?"), [title_name[1], title_name[0]])
+                else:
+                    has_error = 1
+            elif move_option_topic != 'none':
+                curs.execute(db_change("update rd set title = ? where title = ?"), [move_title, name])
 
             # 토론 이동 파트 E
 
@@ -209,46 +171,21 @@ def edit_move(name):
                 i = 0
                 var_name = ''
                 while var_name == '':
-                    curs.execute(db_change("select title from rd where title = ?"), ['test ' + str(i)])
+                    temp_title = 'test ' + load_random_key() + ' ' + str(i)
+                    curs.execute(db_change("select title from history where title = ? limit 1"), [temp_title])
                     if not curs.fetchall():
-                        var_name = 'test ' + str(i)
+                        var_name = temp_title
                     else:
                         i += 1
                 
-                # create_data['data_set'] = ['doc_name', 'doc_rev', 'set_name', 'set_data']
-                # create_data['acl'] = ['title', 'data', 'type']
-                curs.execute(db_change("update data_set set doc_name = ? where doc_name = ?"), [var_name, move_title])
-                curs.execute(db_change("update data_set set doc_name = ? where doc_name = ?"), [move_title, name])
-                curs.execute(db_change("update data_set set doc_name = ? where doc_name = ?"), [name, var_name])
-
-                curs.execute(db_change("update acl set title = ? where title = ?"), [var_name, move_title])
-                curs.execute(db_change("update acl set title = ? where title = ?"), [move_title, name])
-                curs.execute(db_change("update acl set title = ? where title = ?"), [name, var_name])
+                for title_name in [[name, var_name], [move_title, name], [var_name, move_title]]:
+                    curs.execute(db_change("update data_set set doc_name = ? where doc_name = ?"), [title_name[1], title_name[0]])
             elif document_set_option == 'normal':
                 curs.execute(db_change("delete from data_set where doc_name = ?"), [move_title])
-                curs.execute(db_change("update data_set set doc_name = ? where doc_name = ?"), [move_title, name])
-
                 curs.execute(db_change("delete from acl where title = ?"), [move_title])
+
+                curs.execute(db_change("update data_set set doc_name = ? where doc_name = ?"), [move_title, name])
                 curs.execute(db_change("update acl set title = ? where title = ?"), [move_title, name])
-
-            if document_set_option != 'reverse':
-                curs.execute(db_change("select data from data where title = ?"), [name])
-                db_data = curs.fetchall()
-                if db_data:
-                    render_set(
-                        doc_name = name,
-                        doc_data = db_data[0][0],
-                        data_type = 'backlink'
-                    )
-
-                curs.execute(db_change("select data from data where title = ?"), [move_title])
-                db_data = curs.fetchall()
-                if db_data:
-                    render_set(
-                        doc_name = move_title,
-                        doc_data = db_data[0][0],
-                        data_type = 'backlink'
-                    )
 
             # data_set 이동 파트 E
                 

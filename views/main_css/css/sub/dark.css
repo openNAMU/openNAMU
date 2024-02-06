@@ -40,6 +40,10 @@ input::placeholder, textarea::placeholder, select::placeholder {
     background: #314c56;
 }
 
+.opennamu_comment_blind_admin {
+    background: #2f2f2f;
+}
+
 #main_table_top_tr {
     background: #2e5f4e;
 }
@@ -68,4 +72,13 @@ blockquote {
 
 #topic_color {
     background: #325a56;
+}
+
+/* diff */
+.opennamu_diff_green {
+    background: #2e4a2e;
+}
+
+.opennamu_diff_red {
+    background: #803737;
 }

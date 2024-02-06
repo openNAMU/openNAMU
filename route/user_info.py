@@ -13,7 +13,7 @@ def user_info(name = ''):
         tool_menu = ''
         
         if name == '':
-            curs.execute(db_change("select count(*) from alarm where name = ?"), [ip])
+            curs.execute(db_change("select count(*) from user_notice where name = ? and readme = ''"), [ip])
             count = curs.fetchall()
             if count and count[0][0] != 0:
                 tool_menu += '<li><a class="opennamu_not_exist_link" href="/alarm">' + load_lang('alarm') + ' (' + str(count[0][0]) + ')</a></li>'
@@ -28,7 +28,7 @@ def user_info(name = ''):
     
                 tool_menu += '<li><a href="/watch_list">' + load_lang('watchlist') + '</a></li>'
                 tool_menu += '<li><a href="/star_doc">' + load_lang('star_doc') + '</a></li>'
-                tool_menu += '<li><a href="/challenge">' + load_lang('challenge') + '</a></li>'
+                tool_menu += '<li><a href="/challenge">' + load_lang('challenge_and_level_manage') + '</a></li>'
                 tool_menu += '<li><a href="/acl/user:' + url_pas(ip) + '">' + load_lang('user_document_acl') + '</a></li>'
             else:
                 login_menu += '''
@@ -59,17 +59,19 @@ def user_info(name = ''):
             imp = [load_lang('user_tool'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <h2>''' + load_lang('state') + '''</h2>
-                <div id="opennamu_get_user_info">''' + ip + '''</div>
+                <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
                 ''' + login_menu + '''
                 ''' + tool_menu + '''
                 <h2>''' + load_lang('other') + '''</h2>
                 <ul class="opennamu_ul">
-                    <li><a href="/record/''' + url_pas(ip) + '''">''' + load_lang('record') + '''</a></li>
+                    <li><a href="/record/''' + url_pas(ip) + '''">''' + load_lang('edit_record') + '''</a></li>
                     <li><a href="/record/topic/''' + url_pas(ip) + '''">''' + load_lang('discussion_record') + '''</a></li>
+                    <li><a href="/record/bbs/''' + url_pas(ip) + '''">''' + load_lang('bbs_record') + '''</a></li>
+                    <li><a href="/record/bbs_comment/''' + url_pas(ip) + '''">''' + load_lang('bbs_comment_record') + '''</a></li>
                     <li><a href="/topic/user:''' + url_pas(ip) + '''">''' + load_lang('user_discussion') + '''</a></li>
                     <li><a href="/count/''' + url_pas(ip) + '''">''' + load_lang('count') + '''</a></li>
                 </ul>
                 ''' + admin_menu + '''
             ''',
-            menu = 0
+            menu = [['other', load_lang('other_tool')]]
         ))

@@ -26,6 +26,8 @@ input[type="checkbox"], input[type="radio"] {
 
 /* 테이블 */
 table {
+    overflow-x: scroll;
+
     border-collapse: collapse;
 }
 
@@ -43,14 +45,23 @@ td {
     }
 }
 
-summary {
+/* 폴딩 */
+details summary {
     cursor: pointer;
     user-select: none;
     
     display: list-item;
-    list-style: inside disclosure-closed;
 }
-    
+
+/* diff */
+.opennamu_diff_green {
+    background: #eaf2c2;
+}
+
+.opennamu_diff_red {
+    background: #fadad7;
+}
+
 /* list */
 .opennamu_ul {
     padding-left: 20px;
@@ -174,6 +185,16 @@ a:hover {
     border: 1px solid gainsboro;
     
     padding: 10px;
+    
+    white-space: pre;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+
+.opennamu_category_button {
+    float: right;
+    z-index: 100;
+    position: relative;
 }
 
 .opennamu_category_blur {
@@ -267,19 +288,21 @@ hr {
     display: inline;
 }
 
+.opennamu_render_complete img {
+    vertical-align: middle;
+}
+
 blockquote {
-    padding: 15px 40px 15px 15px;
+    padding: 15px;
+    
     margin: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
 
     display: inline-block;
 
     border: 2px solid #ccc;
     border-left: 5px solid black;
-
-    background-image: url('/views/main_css/file/quote.png');
-    background-position: calc(100% - 10px) 10px;
-    background-repeat: no-repeat;
-    background-size: 25px;
 }
 
 /* 취소선 */
@@ -332,12 +355,9 @@ s:hover, strike:hover, del:hover {
     white-space: pre-line;
 }
 
-.katex {
+.katex .base {
     max-width: 100%;
-
-    display: inline-block;
-
-    overflow-x: scroll;
+    overflow-x: hidden;
     overflow-y: hidden;
 }
 
@@ -383,6 +403,7 @@ s:hover, strike:hover, del:hover {
     list-style: none;
 }
 
+/* 이 부분 이하로는 레거시 */
 #topic_color {
     background: #bbeabb;
 }

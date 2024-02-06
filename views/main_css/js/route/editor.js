@@ -1,7 +1,9 @@
 "use strict";
 
-function do_insert_data(name, data, monaco_name) {
-    if(!document.getElementById(monaco_name)) {
+function do_insert_data(data) {
+    const name = 'opennamu_edit_textarea';
+
+    if(get_select_editor() === 'textarea') {
         // https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
         if(document.selection) {
             document.getElementById(name).focus();
@@ -36,23 +38,13 @@ function do_insert_data(name, data, monaco_name) {
 }
 
 // 아직 개편이 더 필요함
-function do_paste_image(name, monaco_name) {
+function do_paste_image() {
+    const name = 'opennamu_edit_textarea';
+
     window.addEventListener('DOMContentLoaded', async function() {
         let set = await opennamu_get_main_skin_set("main_css_image_paste");
         if(set === 'use') {
-            let textarea;
-            if(
-                document.getElementById(monaco_name) !== null &&
-                document.getElementById(monaco_name) !== undefined
-            ) {
-                textarea = document.getElementById(monaco_name);
-            } else {
-                textarea = document.getElementById(name);
-            }
-
-            if(textarea) {
-                textarea.addEventListener("paste", pasteListener);
-            }
+            document.getElementById(name).addEventListener("paste", pasteListener);
         }
     });
 }
@@ -121,7 +113,7 @@ function pasteListener(e) {
 
 function do_stop_exit() {
     window.onbeforeunload = function() {
-        do_monaco_to_textarea();
+        do_sync_monaco_and_textarea();
 
         let data = document.getElementById('opennamu_edit_textarea').value;
         let origin = document.getElementById('opennamu_edit_origin').value;
@@ -132,22 +124,44 @@ function do_stop_exit() {
 }
 
 function do_stop_exit_release() {
+    do_sync_monaco_and_textarea();
+    
     window.onbeforeunload = function () {}
 }
 
 function opennamu_edit_turn_off_monaco() {
-    do_monaco_to_textarea();
-    
-    document.getElementById('opennamu_edit_textarea').style.display = 'block';
-    document.getElementById('opennamu_monaco_editor').style.display = 'none';
-    document.getElementById('opennamu_monaco_editor').remove();
+    do_sync_monaco_and_textarea();
+
+    if(get_select_editor() === 'textarea') {
+        document.getElementById('opennamu_edit_textarea').style.display = 'none';
+        document.getElementById('opennamu_monaco_editor').style.display = 'block';
+    } else {
+        document.getElementById('opennamu_edit_textarea').style.display = 'block';
+        document.getElementById('opennamu_monaco_editor').style.display = 'none';
+    }
 }
 
 function do_monaco_to_textarea() {
-    if(document.getElementById('opennamu_monaco_editor')) {
-        try {
-            document.getElementById('opennamu_edit_textarea').value = window.editor.getValue();
-        } catch(e) {}
+    document.getElementById('opennamu_edit_textarea').value = window.editor.getValue();
+}
+
+function do_textarea_to_manaco() {
+    window.editor.setValue(document.getElementById('opennamu_edit_textarea').value);
+}
+
+function get_select_editor() {
+    if(document.getElementById('opennamu_monaco_editor').style.display === 'none') {
+        return 'textarea'
+    } else {
+        return 'monaco'
+    }
+}
+
+function do_sync_monaco_and_textarea(select = '') {
+    if(select === 'textarea_to_monaco' || get_select_editor() === 'textarea') {
+        do_textarea_to_manaco();
+    } else {
+        do_monaco_to_textarea();
     }
 }
 

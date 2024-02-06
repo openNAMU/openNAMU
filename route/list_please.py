@@ -6,13 +6,9 @@ def list_please(arg_num = 1):
 
         sql_num = (arg_num * 50 - 50) if arg_num * 50 > 0 else 0
 
-        curs.execute(db_change('select data from other where name = "count_all_title"'))
-        if int(curs.fetchall()[0][0]) > 30000:
-            return re_error('/error/25')
-
         div = '<ul class="opennamu_ul">'
 
-        curs.execute(db_change("select distinct title, link from back where type = 'no' order by title asc limit ?, 50"), [sql_num])
+        curs.execute(db_change("select distinct title, link from back where type = 'no' limit ?, 50"), [sql_num])
         data_list = curs.fetchall()
         for data in data_list:
             div += '' + \

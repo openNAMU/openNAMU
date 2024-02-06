@@ -2,15 +2,16 @@ from .tool.func import *
 
 def main_tool_redirect(num = 1, add_2 = ''):
     with get_db_connect() as conn:
+        curs = conn.cursor()
+
         title_list = {
             0 : [load_lang('document_name'), '/acl', load_lang('acl')],
             1 : [0, '/list/user/check', load_lang('check')],
-            2 : [load_lang('file_name'), '/file_filter/add', load_lang('file_filter_add')],
+            2 : [load_lang('file_name'), '/filter/file_filter/add', load_lang('file_filter_add')],
             3 : [0, '/auth/give', load_lang('authorize')],
-            4 : [0, '/record', load_lang('edit_record')],
-            5 : [0, '/record/topic', load_lang('discussion_record')],
-            6 : [load_lang('name'), '/admin_plus', load_lang('add_admin_group')],
-            7 : [load_lang('name'), '/edit_filter/add', load_lang('edit_filter_add')],
+            4 : [0, '/user', load_lang('user_tool')],
+            6 : [load_lang('name'), '/auth/list/add', load_lang('add_admin_group')],
+            7 : [load_lang('name'), '/filter/edit_filter/add', load_lang('edit_filter_add')],
             8 : [load_lang('document_name'), '/search', load_lang('search')],
             9 : [0, '/block_log/user', load_lang('blocked_user')],
             10 : [0, '/block_log/admin', load_lang('blocked_admin')],
@@ -49,11 +50,22 @@ def main_tool_redirect(num = 1, add_2 = ''):
                 if num == 15:
                     plus = '<input type="checkbox" name="regex"> ' + load_lang('regex') + '<hr class="main_hr">'
 
+                top_plus = ''
+                if num == 13:
+                    curs.execute(db_change("select html, plus from html_filter where kind = 'template'"))
+                    db_data = curs.fetchall()
+                    for for_a in db_data:
+                        top_plus += '' + \
+                            '<a href="javascript:opennamu_insert_v(\'data_field\', \'' + get_tool_js_safe(for_a[0]) + '\')">' + html.escape(for_a[0]) + '</a> : ' + html.escape(for_a[1]) + \
+                            '<hr class="main_hr">' + \
+                        ''
+
                 return easy_minify(flask.render_template(skin_check(),
                     imp = [title_list[num][2], wiki_set(), wiki_custom(), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
-                            <input placeholder="''' + placeholder + '''" name="name" type="text">
+                            ''' + top_plus + '''
+                            <input placeholder="''' + placeholder + '''" id="data_field" name="name" type="text">
                             <hr class="main_hr">
                             ''' + plus + '''
                             <button type="submit">''' + load_lang('go') + '''</button>

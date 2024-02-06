@@ -11,4 +11,4 @@ def main_func_error_404(e = ''):
             db_data = curs.fetchall()
             db_data = db_data[0][0] if db_data and db_data[0][0] != '' else 'FrontPage'
             
-            return redirect('/w/' + db_data)
+            return redirect('/w/' + url_pas(db_data))

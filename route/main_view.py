@@ -8,7 +8,9 @@ def main_view(name = ''):
             return main_func_error_404()
         else:
             file_name = file_name.group(1)
-            dir_name = './views/' + re.sub(r'\.{2,}', '', re.sub(r'([^/]+)$', '', name))
+            dir_name = './views/' + re.sub(r'\.{2,}', '', name[:-len(file_name)])
+
+            file_name = re.sub(r'\.cache_v(?:[0-9]+)$', '', file_name)
 
             mime_type = file_name.split('.')
             if len(mime_type) < 2:

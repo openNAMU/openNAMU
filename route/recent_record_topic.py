@@ -42,8 +42,5 @@ def recent_record_topic(name = 'Test'):
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('discussion_record'), wiki_set(), wiki_custom(), wiki_css([sub, 0])],
             data = div,
-            menu = [
-                ['other', load_lang('other')], 
-                ['user', load_lang('user')]
-            ]
+            menu = [['other', load_lang('other')], ['user/' + url_pas(name), load_lang('user_tool')]]
         ))

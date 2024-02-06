@@ -36,54 +36,57 @@ def edit_revert(name, num):
 
             if do_edit_filter(data[0][0]) == 1:
                 return re_error('/error/21')
+            
+            curs.execute(db_change("select data from other where name = 'document_content_max_length'"))
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '':
+                if int(number_check(db_data[0][0])) < len(data[0][0]):
+                    return re_error('/error/44')
 
-            curs.execute(db_change("delete from back where link = ?"), [name])
+            curs.execute(db_change("select data from data where title = ?"), [name])
+            data_old = curs.fetchall()
+            if data_old:
+                leng = leng_check(len(data_old[0][0]), len(data[0][0]))
+                curs.execute(db_change("update data set data = ? where title = ?"), [data[0][0], name])
+            else:
+                leng = '+' + str(len(data[0][0]))
+                curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, data[0][0]])
 
-            if data:
-                curs.execute(db_change("select data from data where title = ?"), [name])
-                data_old = curs.fetchall()
-                if data_old:
-                    leng = leng_check(len(data_old[0][0]), len(data[0][0]))
-                    curs.execute(db_change("update data set data = ? where title = ?"), [data[0][0], name])
-                else:
-                    leng = '+' + str(len(data[0][0]))
-                    curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, data[0][0]])
+            history_plus(
+                name,
+                data[0][0],
+                get_time(),
+                ip_check(),
+                flask.request.form.get('send', ''),
+                leng,
+                t_check = 'r' + str(num),
+                mode = 'revert'
+            )
 
-                history_plus(
-                    name,
-                    data[0][0],
-                    get_time(),
-                    ip_check(),
-                    flask.request.form.get('send', ''),
-                    leng,
-                    t_check = 'r' + str(num),
-                    mode = 'revert'
-                )
-
-                render_set(
-                    doc_name = name,
-                    doc_data = data[0][0],
-                    data_type = 'backlink'
-                )
+            render_set(
+                doc_name = name,
+                doc_data = data[0][0],
+                data_type = 'backlink'
+            )
 
             conn.commit()
 
             return redirect('/w/' + url_pas(name))
         else:
             if data:
-                preview = '<pre>' + html.escape(data[0][0]) + '</pre>'
+                preview = '<hr class="main_hr"><pre>' + html.escape(data[0][0]) + '</pre>'
             else:
                 preview = ''
             
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(r' + str(num) + ') (' + load_lang('revert') + ')', 0])],
-                data =  '''
-                        <form method="post">
-                            <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
-                            <hr class="main_hr">
-                            ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
-                            <button type="submit">''' + load_lang('revert') + '''</button>
-                        </form>
-                        ''' + preview,
+                data = '''
+                    <form method="post">
+                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                        <hr class="main_hr">
+                        ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
+                        <button type="submit">''' + load_lang('revert') + '''</button>
+                    </form>
+                ''' + preview,
                 menu = [['history/' + url_pas(name), load_lang('history')], ['recent_changes', load_lang('recent_change')]]
             ))

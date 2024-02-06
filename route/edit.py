@@ -23,7 +23,7 @@ def edit_timeout(func, args = (), timeout = 3):
         pool.join()
         return 0
         
-def edit_editor(curs, ip, data_main = '', do_type = 'edit'):
+def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = ''):
     monaco_editor_top = ''
     editor_display = ''
     add_get_file = ''
@@ -49,43 +49,53 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit'):
             
     p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
     
+    monaco_editor_top += '<a href="javascript:opennamu_do_editor_temp_save();">(' + load_lang('load_temp_save') + ')</a> <a href="javascript:opennamu_do_editor_temp_save_load();">(' + load_lang('load_temp_save_load') + ')</a> '
+    monaco_editor_top += '<a href="javascript:opennamu_edit_turn_off_monaco();">(' + load_lang('turn_off_monaco') + ')</a>'
+
+    add_get_file = '''
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.min.css" integrity="sha512-MFDhxgOYIqLdcYTXw7en/n5BshKoduTitYmX8TkQ+iJOGjrWusRi8+KmfZOrgaDrCjZSotH2d1U1e/Z1KT6nWw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.min.js" integrity="sha512-A+6SvPGkIN9Rf0mUXmW4xh7rDvALXf/f0VtOUiHlDUSPknu2kcfz1KzLpOJyL2pO+nZS13hhIjLqVgiQExLJrw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    '''
+    
+    darkmode = flask.request.cookies.get('main_css_darkmode', '0')
+    monaco_thema = 'vs-dark' if darkmode == '1' else ''
+    
+    add_script = 'do_monaco_init("' + monaco_thema + '");'
+    
     monaco_on = get_main_skin_set(curs, flask.session, 'main_css_monaco', ip)
     if monaco_on == 'use':
         editor_display = 'style="display: none;"'
-        add_get_file = '''
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.min.css" integrity="sha512-MFDhxgOYIqLdcYTXw7en/n5BshKoduTitYmX8TkQ+iJOGjrWusRi8+KmfZOrgaDrCjZSotH2d1U1e/Z1KT6nWw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.min.js" integrity="sha512-A+6SvPGkIN9Rf0mUXmW4xh7rDvALXf/f0VtOUiHlDUSPknu2kcfz1KzLpOJyL2pO+nZS13hhIjLqVgiQExLJrw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        '''
-
-        monaco_editor_top = '<a href="javascript:opennamu_edit_turn_off_monaco();">(' + load_lang('turn_off_monaco') + ')</a>'
-        
-        if flask.request.cookies.get('main_css_darkmode', '0') == '1':
-            monaco_thema = 'vs-dark'
-        else:
-            monaco_thema = ''
-        
-        add_script = 'do_monaco_init("' + monaco_thema + '");'
     else:
         monaco_display = 'style="display: none;"'
-        add_script = 'opennamu_edit_turn_off_monaco();'
 
-    if do_type == 'edit':
-        textarea_size = 'opennamu_textarea_500'
-    else:
-        textarea_size = 'opennamu_textarea_100'
+    textarea_size = 'opennamu_textarea_500' if do_type == 'edit' else 'opennamu_textarea_100'
 
     return add_get_file + '''
         <textarea style="display: none;" id="opennamu_edit_origin" name="doc_data_org">''' + html.escape(data_main) + '''</textarea>
-        <div>''' + monaco_editor_top + ' ' + edit_button('opennamu_edit_textarea', 'opennamu_monaco_editor') + '''</div>
+        <div>
+            ''' + monaco_editor_top + '''
+            <hr class="main_hr">
+            ''' + edit_button() + '''
+        </div>
         
         <div id="opennamu_monaco_editor" class="''' + textarea_size + '''" ''' + monaco_display + '''></div>
         <textarea id="opennamu_edit_textarea" ''' + editor_display + ''' class="''' + textarea_size + '''" name="content" placeholder="''' + p_text + '''">''' + html.escape(data_main) + '''</textarea>
         <hr class="main_hr">
+        
+        ''' + captcha_get() + ip_warning() + addon + '''
+        <hr class="main_hr">
+
         <script>
             do_stop_exit();
-            do_paste_image('opennamu_edit_textarea', 'opennamu_monaco_editor');
+            do_paste_image();
             ''' + add_script + '''
         </script>
+                        
+        <button id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">''' + load_lang('send') + '''</button>
+        <button id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview();">''' + load_lang('preview') + '''</button>
+        <hr class="main_hr">
+
+        <div id="opennamu_preview_area"></div>
     '''
 
 def edit(name = 'Test', section = 0, do_type = ''):
@@ -107,7 +117,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
         post_ver = flask.request.form.get('ver', '')
         if flask.request.method == 'POST':
             edit_repeat = 'error' if post_ver != doc_ver else 'post'
-            edit_repeat = 'error' if do_type == 'preview' else 'post'
         else:
             edit_repeat = 'get'
         
@@ -162,6 +171,12 @@ def edit(name = 'Test', section = 0, do_type = ''):
             else:
                 leng = '+' + str(len(content))
 
+            curs.execute(db_change("select data from other where name = 'document_content_max_length'"))
+            db_data_3 = curs.fetchall()
+            if db_data_3 and db_data_3[0][0] != '':
+                if int(number_check(db_data_3[0][0])) < len(content):
+                    return re_error('/error/44')
+
             curs.execute(db_change("select data from other where name = 'edit_timeout'"))
             db_data_2 = curs.fetchall()
             db_data_2 = '' if not db_data_2 else number_check(db_data_2[0][0])
@@ -179,9 +194,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
             else:    
                 curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, content])
     
-                curs.execute(db_change('select data from other where name = "count_all_title"'))
-                curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) + 1)])
-    
             curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
             for scan_user in curs.fetchall():
                 add_alarm(scan_user[0], ip, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
@@ -194,9 +206,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 send,
                 leng
             )
-            
-            curs.execute(db_change("delete from back where link = ?"), [name])
-            curs.execute(db_change("delete from back where title = ? and type = 'no'"), [name])
             
             render_set(
                 doc_name = name,
@@ -215,7 +224,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
             doc_section_edit_apply = 'X'
             data_section = ''
             data_section_where = ''
-            data_preview = ''
 
             if edit_repeat == 'get':
                 if do_type == 'load':
@@ -285,38 +293,24 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
                 doc_ver = flask.request.form.get('ver', '')
 
-                if do_type != 'preview':
-                    warning_edit = load_lang('exp_edit_conflict') + ' '
-        
-                    if flask.request.form.get('ver', '0') == '0':
-                        warning_edit += '<a href="/raw/' + url_pas(name) + '">(r' + doc_ver + ')</a>'
-                    else:
-                        warning_edit += '' + \
-                            '<a href="/diff/' + flask.request.form.get('ver', '1') + '/' + doc_ver + '/' + url_pas(name) + '">' + \
-                                '(r' + doc_ver + ')' + \
-                            '</a>' + \
-                        ''
-        
-                    warning_edit += '<hr class="main_hr">'
-                    editor_top_text = warning_edit + editor_top_text
+                warning_edit = load_lang('exp_edit_conflict') + ' '
+    
+                if flask.request.form.get('ver', '0') == '0':
+                    warning_edit += '<a href="/raw/' + url_pas(name) + '">(r' + doc_ver + ')</a>'
                 else:
-                    data_preview = render_set(
-                        doc_name = name, 
-                        doc_data = data,
-                        data_type = 'from'
-                    )
+                    warning_edit += '' + \
+                        '<a href="/diff/' + flask.request.form.get('ver', '1') + '/' + doc_ver + '/' + url_pas(name) + '">' + \
+                            '(r' + doc_ver + ')' + \
+                        '</a>' + \
+                    ''
+    
+                warning_edit += '<hr class="main_hr">'
+                editor_top_text = warning_edit + editor_top_text
 
             if data_section == '':
                 data_section = data
-
-            if section == '':
-                form_action = 'formaction="/edit/' + url_pas(name) + '"'
-                form_action_preview = 'formaction="/edit_preview/' + url_pas(name) + '"'
-            else:
-                form_action = 'formaction="/edit_section/' + str(section) + '/' + url_pas(name) + '"'
-                form_action_preview = 'formaction="/edit_section_preview/' + str(section) + '/' + url_pas(name) + '"'
     
-            editor_top_text += '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
+            editor_top_text += '<a href="/filter/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
     
             if editor_top_text != '':
                 editor_top_text += '<hr class="main_hr">'
@@ -330,21 +324,14 @@ def edit(name = 'Test', section = 0, do_type = ''):
                         <textarea style="display: none;" name="doc_section_data_where">''' + data_section_where + '''</textarea>
                         <input style="display: none;" name="doc_section_edit_apply" value="''' + doc_section_edit_apply + '''">
 
+                        <input style="display: none;" id="opennamu_editor_doc_name" value="''' + html.escape(name) + '''">
                         <input style="display: none;" name="ver" value="''' + doc_ver + '''">
                         
-                        ''' + edit_editor(curs, ip, data_section) + '''
-
                         <input placeholder="''' + load_lang('why') + '''" name="send">
                         <hr class="main_hr">
                         
-                        ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
-                        
-                        <button id="opennamu_save_button" type="submit" ''' + form_action + ''' onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('save') + '''</button>
-                        <button id="opennamu_preview_button" type="submit" ''' + form_action_preview + ''' onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('preview') + '''</button>
+                        ''' + edit_editor(curs, ip, data_section, addon = get_edit_text_bottom_check_box() + get_edit_text_bottom()) + '''
                     </form>
-                    
-                    <hr class="main_hr">
-                    <div id="opennamu_preview_area">''' + data_preview + '''</div>
                 ''',
                 menu = [
                     ['w/' + url_pas(name), load_lang('return')],

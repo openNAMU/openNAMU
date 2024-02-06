@@ -11,13 +11,13 @@ def list_admin_group_2():
         for data in curs.fetchall():            
             if  admin_check() == 1 and \
                 not data[0] in org_acl_list:
-                delete_admin_group = ' <a href="/delete_admin_group/' + url_pas(data[0]) + '">(' + load_lang("delete") + ')</a>'
+                delete_admin_group = ' <a href="/auth/list/delete/' + url_pas(data[0]) + '">(' + load_lang("delete") + ')</a>'
             else:
                 delete_admin_group = ''
 
             list_data += '' + \
                 '<li>' + \
-                    '<a href="/admin_plus/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a>' + \
+                    '<a href="/auth/list/add/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a>' + \
                     delete_admin_group + \
                 '</li>' + \
             ''

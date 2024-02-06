@@ -19,37 +19,37 @@ def bbs_w_post_comment(user_id, sub_code, comment_num, bbs_num_str, post_num_str
     comment_add_count += comment_count
 
     for temp_dict in thread_data:
-        color = 'default'
-        if user_id == temp_dict['comment_user_id']:
-            color = 'green'
+        if temp_dict['comment_user_id'] != '':
+            color = 'default'
+            if user_id == temp_dict['comment_user_id']:
+                color = 'green'
 
-        sub_code_check = re.sub(r'^[0-9]+-[0-9]+-', '', sub_code + '-' + temp_dict['code'])
-        margin_count = sub_code_check.count('-')
+            sub_code_check = re.sub(r'^[0-9]+-[0-9]+-', '', sub_code + '-' + temp_dict['code'])
+            margin_count = sub_code_check.count('-')
 
-        date = ''
-        date += '<a href="javascript:opennamu_change_comment(\'' + sub_code_check + '\');">(' + load_lang('comment') + ')</a> '
-        date += '<a href="/bbs/tool/' + bbs_num_str + '/' + post_num_str + '/' + sub_code_check + '">(' + load_lang('tool') + ')</a> '
-        date += temp_dict['comment_date']
+            date = ''
+            date += '<a href="javascript:opennamu_change_comment(\'' + sub_code_check + '\');">(' + load_lang('comment') + ')</a> '
+            date += '<a href="/bbs/tool/' + bbs_num_str + '/' + post_num_str + '/' + sub_code_check + '">(' + load_lang('tool') + ')</a> '
+            date += temp_dict['comment_date']
 
-        comment_data += '<span style="padding-left: 20px;"></span>' * margin_count
-        comment_data += api_topic_thread_make(
-            ip_pas(temp_dict['comment_user_id']),
-            date,
-            render_set(
-                doc_data = temp_dict['comment'],
-                data_in = 'bbs_comment_' + sub_code_check
-            ),
-            sub_code_check,
-            color = color,
-            add_style = 'width: calc(100% - ' + str(margin_count * 20) + 'px);'
-        )
+            comment_data += '<span style="padding-left: 20px;"></span>' * margin_count
+            comment_data += api_topic_thread_make(
+                ip_pas(temp_dict['comment_user_id']),
+                date,
+                render_set(
+                    doc_data = temp_dict['comment'],
+                    data_in = 'bbs_comment_' + sub_code_check
+                ),
+                sub_code_check,
+                color = color,
+                add_style = 'width: calc(100% - ' + str(margin_count * 20) + 'px);'
+            )
 
-        comment_default = ''
-        if comment_num == sub_code_check:
-            comment_default = 'selected'
+            comment_default = ''
+            if comment_num == sub_code_check:
+                comment_default = 'selected'
 
-        comment_select += '<option value="' + sub_code_check + '" ' + comment_default + '>' + sub_code_check + '</option>'
-        comment_data += '<hr class="main_hr">'
+            comment_select += '<option value="' + sub_code_check + '" ' + comment_default + '>' + sub_code_check + '</option>'
 
         temp_data = bbs_w_post_comment(user_id, sub_code + '-' + temp_dict['code'], comment_num, bbs_num_str, post_num_str)
 
@@ -59,7 +59,7 @@ def bbs_w_post_comment(user_id, sub_code, comment_num, bbs_num_str, post_num_str
 
     return (comment_data, comment_select, comment_count, comment_add_count)
 
-def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
+def bbs_w_post(bbs_num = '', post_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -84,7 +84,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
         if not db_data_2:
             return redirect('/bbs/main')
         elif db_data_2[0][0] == 'thread':
-            if flask.request.method == 'POST' and do_type != 'preview':
+            if flask.request.method == 'POST':
                 if bbs_comment_acl == 1:
                     return redirect('/bbs/set/' + bbs_num_str)
                 
@@ -123,16 +123,6 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                     return re_error('/ban')
 
                 text = ''
-                data_preview = ''
-                if do_type == 'preview':
-                    text = flask.request.form.get('content', '')
-                    text = text.replace('\r', '')
-
-                    data_preview = render_set(
-                        doc_data = text,
-                        data_type = 'thread',
-                        data_in = 'bbs_comment_preview'
-                    )
 
                 date = ''
                 date += temp_dict['date']
@@ -150,7 +140,6 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                     '0',
                     color = 'green'
                 )
-                data += '<hr class="main_hr">'
 
                 user_id = temp_dict['user_id']
                 count = 0
@@ -178,25 +167,10 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                         str(count),
                         color = color
                     )
-                    data += '<hr class="main_hr">'
-
-                bbs_comment_form = ''
-                if bbs_comment_acl == 0:
-                    bbs_comment_form += '''                        
-                        ''' + edit_editor(curs, ip, text, 'bbs_comment') + '''
-                        <hr class="main_hr">
-                        
-                        ''' + captcha_get() + ip_warning() + '''
-
-                        <button id="opennamu_save_button" formaction="/bbs/w/''' + bbs_num_str + '''/''' + post_num_str + '''" type="submit" onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('send') + '''</button>
-                        <button id="opennamu_preview_button" formaction="/bbs/w/preview/''' + bbs_num_str + '''/''' + post_num_str + '''#opennamu_edit_textarea" type="submit" onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('preview') + '''</button>
-                        <hr class="main_hr">
-                    '''
 
                 data += '''
                     <form method="post">
-                        ''' + bbs_comment_form + '''
-                        ''' + data_preview + '''
+                        ''' + (edit_editor(curs, ip, text, 'bbs_comment') if bbs_comment_acl == 0 else '') + '''
                     </form>
                 '''
 
@@ -207,7 +181,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                 ))
         else:
             # db_data_2[0][0] == 'comment'
-            if flask.request.method == 'POST' and do_type != 'preview':
+            if flask.request.method == 'POST':
                 if bbs_comment_acl == 1:
                     return redirect('/bbs/set/' + bbs_num_str)
                 
@@ -278,17 +252,6 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                     
                 text = ''
                 comment_num = ''
-                data_preview = ''
-                if do_type == 'preview':
-                    text = flask.request.form.get('content', '')
-                    text = text.replace('\r', '')
-
-                    comment_num = flask.request.form.get('comment_select', '')
-
-                    data_preview = render_set(
-                        doc_data = text,
-                        data_in = 'bbs_comment_preview'
-                    )
 
                 date = ''
                 date += '<a href="javascript:opennamu_change_comment(\'0\');">(' + load_lang('comment') + ')</a> '
@@ -325,7 +288,7 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                 comment_add_count -= comment_count
 
                 if comment_data != '':
-                    data += '<hr class="main_hr"><hr>'
+                    data += '<hr>'
 
                 comment_select += '</select>'
                 if comment_data != '':
@@ -342,19 +305,11 @@ def bbs_w_post(bbs_num = '', post_num = '', do_type = ''):
                         <hr class="main_hr">
                         
                         ''' + edit_editor(curs, ip, text, 'bbs_comment') + '''
-                        <hr class="main_hr">
-                        
-                        ''' + captcha_get() + ip_warning() + '''
-
-                        <button id="opennamu_save_button" formaction="/bbs/w/''' + bbs_num_str + '''/''' + post_num_str + '''" type="submit" onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('send') + '''</button>
-                        <button id="opennamu_preview_button" formaction="/bbs/w/preview/''' + bbs_num_str + '''/''' + post_num_str + '''#opennamu_edit_textarea" type="submit" onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('preview') + '''</button>
-                        <hr class="main_hr">
                     '''
 
                 data += '''
                     <form method="post">
                         ''' + bbs_comment_form + '''
-                        ''' + data_preview + '''
                     </form>
                     <script src="/views/main_css/js/route/bbs_w_post.js"></script>
                 '''

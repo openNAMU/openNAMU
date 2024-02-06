@@ -27,8 +27,8 @@ def vote_select(num = 1):
         if db_data:
             time_limit = db_data[0][0]
             
-            time_db = int(db_data[0][0].split()[0].replace('-', ''))
-            time_today = int(get_time().split()[0].replace('-', ''))
+            time_db = db_data[0][0].split()[0]
+            time_today = get_time().split()[0]
             
             if time_today > time_db:
                 return redirect('/vote/end/' + num)

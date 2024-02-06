@@ -2,9 +2,10 @@ from .tool.func import *
 
 from .api_bbs_w_post import api_bbs_w_post
 from .api_bbs_w_comment_one import api_bbs_w_comment_one
+
 from .edit import edit_editor
 
-def bbs_w_edit(bbs_num = '', post_num = '', comment_num = '', do_type = ''):
+def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -37,7 +38,7 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = '', do_type = ''):
         
         i_list = ['post_view_acl', 'post_comment_acl']
 
-        if flask.request.method == 'POST' and do_type != 'preview':
+        if flask.request.method == 'POST':
             if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
                 return re_error('/error/13')
             else:
@@ -86,59 +87,28 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = '', do_type = ''):
         else:
             option_display = ''
 
-            d_list = ['' for _ in range(0, len(i_list))]
-            if do_type == 'preview':
-                title = flask.request.form.get('title', '')
-                data = flask.request.form.get('content', '')
-                data = data.replace('\r', '')
-                data_preview = render_set(
-                    doc_data = data,
-                    data_type = 'thread',
-                    data_in = 'bbs'
-                ) + '<hr>'
-                for for_a in range(0, len(i_list)):
-                    d_list[for_a] = flask.request.form.get(i_list[for_a], 'normal')
+            if comment_num != '':
+                temp_dict = json.loads(api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num).data)
+
+                title = ''
+                data = temp_dict['comment']
+                option_display = 'display: none;'
+            elif post_num == '':
+                title = ''
+                data = ''
             else:
-                if comment_num != '':
-                    temp_dict = json.loads(api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num).data)
+                temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
 
-                    title = ''
-                    data = temp_dict['comment']
-                    data_preview = ''
-                    option_display = 'display: none;'
-                elif post_num == '':
-                    title = ''
-                    data = ''
-                    data_preview = ''
-                else:
-                    temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
-
-                    title = temp_dict['title']
-                    data = temp_dict['data']
-                    data_preview = ''
+                title = temp_dict['title']
+                data = temp_dict['data']
 
             acl_div = ['' for _ in range(0, len(i_list))]
             acl_list = get_acl_list()
             for for_a in range(0, len(i_list)):
                 for data_list in acl_list:
-                    if data_list == d_list[for_a]:
-                        check = 'selected="selected"'
-                    else:
-                        check = ''
-
-                    acl_div[for_a] += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
-            
-            if comment_num != '':
-                form_action = 'formaction="/bbs/edit/' + bbs_num_str + '/' + post_num_str + '/' + url_pas(comment_num) + '"'
-                form_action_preview = 'formaction="/bbs/edit/preview/' + bbs_num_str + '/' + post_num_str + '/' + url_pas(comment_num) + '"'
-            elif post_num == '':
-                form_action = 'formaction="/bbs/edit/' + bbs_num_str + '"'
-                form_action_preview = 'formaction="/bbs/edit/preview/' + bbs_num_str + '"'
-            else:
-                form_action = 'formaction="/bbs/edit/' + bbs_num_str + '/' + post_num_str + '"'
-                form_action_preview = 'formaction="/bbs/edit/preview/' + bbs_num_str + '/' + post_num_str + '"'
+                    acl_div[for_a] += '<option value="' + data_list + '">' + (data_list if data_list != '' else 'normal') + '</option>'
     
-            editor_top_text = '<a href="/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
+            editor_top_text = '<a href="/filter/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
 
             if editor_top_text != '':
                 editor_top_text += '<hr class="main_hr">'
@@ -158,15 +128,7 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = '', do_type = ''):
                         <hr style="''' + option_display + '''" class="main_hr">
 
                         ''' + edit_editor(curs, ip, data, 'bbs') + '''
-                        <hr class="main_hr">
-                        
-                        ''' + captcha_get() + ip_warning() + '''
-                        
-                        <button id="opennamu_save_button" type="submit" ''' + form_action + ''' onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('save') + '''</button>
-                        <button id="opennamu_preview_button" type="submit" ''' + form_action_preview + ''' onclick="do_monaco_to_textarea(); do_stop_exit_release();">''' + load_lang('preview') + '''</button>
-                    
-                        <hr class="main_hr">
-                        <div id="opennamu_preview_area">''' + data_preview + '''</div>
+
                         <!--
                         <div style="''' + option_display + '''">
                             ''' + render_simple_set('''

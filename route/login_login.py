@@ -22,27 +22,23 @@ def login_login_2():
 
             user_agent = flask.request.headers.get('User-Agent', '')
             user_id = flask.request.form.get('id', '')
-            user_data = {}
+            user_pw = flask.request.form.get('pw', '')
 
-            curs.execute(db_change(
-                'select name, data from user_set where id = ? and name = "pw" or name = "encode"'
-            ), [user_id])
-            sql_data = curs.fetchall()
-            if not sql_data:
+            curs.execute(db_change("select data from user_set where id = ? and name = 'pw'"), [user_id])
+            db_data = curs.fetchall()
+            if not db_data:
                 return re_error('/error/2')
-
-            for i in sql_data:
-                user_data[i[0]] = i[1]
-
-            if len(user_data) < 2:
+            else:
+                db_user_pw = db_data[0][0]
+                
+            curs.execute(db_change("select data from user_set where id = ? and name = 'encode'"), [user_id])
+            db_data = curs.fetchall()
+            if not db_data:
                 return re_error('/error/2')
+            else:
+                db_user_encode = db_data[0][0]
 
-            if pw_check(
-                flask.request.form.get('pw', ''),
-                user_data['pw'],
-                user_data['encode'],
-                user_id
-            ) != 1:
+            if pw_check(user_pw, db_user_pw, db_user_encode, user_id) != 1:
                 if not 'login_count' in flask.session:
                     flask.session['login_count'] = 1
                 else:

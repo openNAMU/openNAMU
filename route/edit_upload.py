@@ -24,7 +24,7 @@ def edit_upload():
             if (file_max * 1000 * 1000 * file_len) < flask.request.content_length:
                 return re_error('/error/17')
 
-            if file_len == 1:    
+            if file_len == 1:
                 file_num = None
             else:
                 if acl_check(None, 'many_upload') == 1:
@@ -49,7 +49,7 @@ def edit_upload():
                     name = data.filename
 
                 piece = os.path.splitext(name)
-                if re.search(r'[^ㄱ-힣0-9a-zA-Z_\- ]', piece[0]):
+                if re.search(r'\.', piece[0]):
                     return re_error('/error/22')
 
                 e_data = sha224_replace(piece[0]) + piece[1]
@@ -63,7 +63,7 @@ def edit_upload():
                 for i in db_data:
                     t_re = re.compile(i[0])
                     if t_re.search(name):
-                        return redirect('/file_filter')
+                        return redirect('/filter/file_filter')
 
                 data_url_image = load_image_url()
                 if os.path.exists(os.path.join(data_url_image, e_data)):
@@ -91,9 +91,6 @@ def edit_upload():
                     ''
 
                 curs.execute(db_change("insert into data (title, data) values (?, ?)"), ['file:' + name, file_d])
-
-                curs.execute(db_change('select data from other where name = "count_all_title"'))
-                curs.execute(db_change("update other set data = ? where name = 'count_all_title'"), [str(int(curs.fetchall()[0][0]) + 1)])
 
                 render_set(
                     doc_name = 'file:' + name,
@@ -137,7 +134,7 @@ def edit_upload():
             return easy_minify(flask.render_template(skin_check(),
                 imp = [load_lang('upload'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
                 data = '''
-                    <a href="/file_filter">(''' + load_lang('file_filter_list') + ''')</a> <a href="/extension_filter">(''' + load_lang('extension_filter_list') + ''')</a>
+                    <a href="/filter/file_filter">(''' + load_lang('file_filter_list') + ''')</a> <a href="/filter/extension_filter">(''' + load_lang('extension_filter_list') + ''')</a>
                     ''' + upload_help + '''
                     <hr class="main_hr">
                     ''' + load_lang('max_file_size') + ''' : ''' + str(file_max) + '''MB

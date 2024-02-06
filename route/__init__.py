@@ -1,7 +1,8 @@
 from route.api_func_lang import api_func_lang
 from route.api_func_sha224 import api_func_sha224
 from route.api_image_view import api_image_view
-from route.api_raw import api_raw
+from route.api_w_raw import api_w_raw
+from route.api_w_render import api_w_render
 from route.api_recent_change import api_recent_change
 from route.api_recent_discuss import api_recent_discuss
 from route.api_search import api_search
@@ -17,9 +18,13 @@ from route.api_bbs_w_comment import api_bbs_w_comment
 from route.api_bbs_w_comment_one import api_bbs_w_comment_one
 
 from route.bbs_w_edit import bbs_w_edit
-from route.bbs_main import bbs_main
 from route.bbs_make import bbs_make
+# from route.bbs_w_hide import bbs_w_hide
+from route.bbs_w_pinned import bbs_w_pinned
+from route.bbs_w_delete import bbs_w_delete
 from route.bbs_w import bbs_w
+from route.bbs_delete import bbs_delete
+# from route.bbs_hide import bbs_hide
 from route.bbs_w_post import bbs_w_post
 from route.bbs_w_set import bbs_w_set
 from route.bbs_w_comment_tool import bbs_w_comment_tool
@@ -34,12 +39,9 @@ from route.edit_move import edit_move
 from route.edit_revert import edit_revert
 from route.edit_upload import edit_upload
 
-from route.filter_document import filter_document
-from route.filter_document_add import filter_document_add
-from route.filter_document_delete import filter_document_delete
-from route.filter_inter_wiki import filter_inter_wiki
-from route.filter_inter_wiki_add import filter_inter_wiki_add
-from route.filter_inter_wiki_delete import filter_inter_wiki_delete
+from route.filter_all import filter_all
+from route.filter_all_add import filter_all_add
+from route.filter_all_delete import filter_all_delete
 
 from route.give_admin_groups import give_admin_groups_2
 from route.give_auth import give_auth
@@ -54,6 +56,7 @@ from route.list_admin_group import list_admin_group_2
 from route.list_image_file import list_image_file
 from route.list_long_page import list_long_page
 from route.list_old_page import list_old_page
+from route.list_no_link import list_no_link
 from route.list_please import list_please
 from route.list_title_index import list_title_index
 from route.list_user import list_user
@@ -90,6 +93,7 @@ from route.main_setting_main_logo import main_setting_main_logo
 from route.main_setting_phrase import main_setting_phrase
 from route.main_setting_robot import main_setting_robot
 from route.main_setting_sitemap import main_setting_sitemap
+from route.main_setting_sitemap_set import main_setting_sitemap_set
 from route.main_setting_skin_set import main_setting_skin_set
 from route.main_setting_top_menu import main_setting_top_menu
 

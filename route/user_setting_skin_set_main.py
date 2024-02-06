@@ -72,6 +72,35 @@ def user_setting_skin_set_main_set_list():
             ['default', load_lang('default')],
             ['off', load_lang('off')],
             ['on', load_lang('use')]
+        ], 'main_css_list_view_change' : [
+            ['default', load_lang('default')],
+            ['off', load_lang('off')],
+            ['on', load_lang('use')]
+        ], 'main_css_view_joke' : [
+            ['default', load_lang('default')],
+            ['on', load_lang('use')],
+            ['off', load_lang('off')]
+        ], 'main_css_math_scroll' : [
+            ['default', load_lang('default')],
+            ['off', load_lang('off')],
+            ['on', load_lang('use')]
+        ], 'main_css_view_history' : [
+            ['default', load_lang('default')],
+            ['off', load_lang('off')],
+            ['on', load_lang('use')]
+        ], 'main_css_table_transparent' : [
+            ['default', load_lang('default')],
+            ['off', load_lang('off')],
+            ['on', load_lang('use')]
+        ], 'main_css_font_size' : [
+            ['default', load_lang('default')],
+            ['10', '10'],
+            ['12', '12'],
+            ['14', '14'],
+            ['16', '16'],
+            ['18', '18'],
+            ['20', '20'],
+            ['22', '22'],
         ]
     }
 
@@ -212,10 +241,41 @@ def user_setting_skin_set_main():
                         <select name="main_css_darkmode">
                             ''' + set_data["main_css_darkmode"] + '''
                         </select>
-                        <h3>''' + load_lang("table_scroll") + '''</h3>
+                        <h3>''' + load_lang("table") + '''</h3>
+                        <h4>''' + load_lang("table_scroll") + '''</h4>
                         ''' + set_data_main["main_css_table_scroll"] + '''
                         <select name="main_css_table_scroll">
                             ''' + set_data["main_css_table_scroll"] + '''
+                        </select>
+                        <h4>''' + load_lang("table_transparent") + '''</h4>
+                        ''' + set_data_main["main_css_table_transparent"] + '''
+                        <select name="main_css_table_transparent">
+                            ''' + set_data["main_css_table_transparent"] + '''
+                        </select>
+                        <h3>''' + load_lang("list_view_change") + '''</h3>
+                        ''' + set_data_main["main_css_list_view_change"] + '''
+                        <select name="main_css_list_view_change">
+                            ''' + set_data["main_css_list_view_change"] + '''
+                        </select>
+                        <h3>''' + load_lang("view_joke") + '''</h3>
+                        ''' + set_data_main["main_css_view_joke"] + '''
+                        <select name="main_css_view_joke">
+                            ''' + set_data["main_css_view_joke"] + '''
+                        </select>
+                        <h3>''' + load_lang("math_scroll") + '''</h3>
+                        ''' + set_data_main["main_css_math_scroll"] + '''
+                        <select name="main_css_math_scroll">
+                            ''' + set_data["main_css_math_scroll"] + '''
+                        </select>
+                        <h3>''' + load_lang("view_history") + '''</h3>
+                        ''' + set_data_main["main_css_view_history"] + '''
+                        <select name="main_css_view_history">
+                            ''' + set_data["main_css_view_history"] + '''
+                        </select>
+                        <h3>''' + load_lang("font_size") + '''</h3>
+                        ''' + set_data_main["main_css_font_size"] + '''
+                        <select name="main_css_font_size">
+                            ''' + set_data["main_css_font_size"] + '''
                         </select>
                         <h2>''' + load_lang("edit") + '''</h2>
                         <h3>''' + load_lang("image_paste") + '''</h3>

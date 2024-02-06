@@ -16,7 +16,7 @@ def main_tool_admin():
                 </ul>
                 <h2>''' + load_lang('owner') + '''</h2>
                 <ul class="opennamu_ul">
-                    <li><a href="/admin_group">''' + load_lang('admin_group_list') + '''</a></li>
+                    <li><a href="/auth/list">''' + load_lang('admin_group_list') + '''</a></li>
                     <li><a href="/delete_multiple">''' + load_lang('many_delete') + '''</a></li>
                     <li><a href="/app_submit">''' + load_lang('application_list') + '''</a></li>
                     <li><a href="/register">''' + load_lang('add_user') + '''</a></li>
@@ -25,15 +25,17 @@ def main_tool_admin():
                 </ul>
                 <h3>''' + load_lang('filter') + '''</h3>
                 <ul class="opennamu_ul">
-                    <li><a href="/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
-                    <li><a href="/inter_wiki">''' + load_lang('interwiki_list') + '''</a></li>
-                    <li><a href="/edit_top">''' + load_lang('edit_tool_list') + '''</a></li>
-                    <li><a href="/image_license">''' + load_lang('image_license_list') + '''</a></li>
-                    <li><a href="/email_filter">''' + load_lang('email_filter_list') + '''</a></li>
-                    <li><a href="/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
-                    <li><a href="/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
-                    <li><a href="/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
-                    <li><a href="/filter/document/list">''' + load_lang('document_filter_list') + ''' (''' + load_lang('beta') + ''')</a></li>
+                    <li><a href="/filter/edit_filter">''' + load_lang('edit_filter_list') + '''</a></li>
+                    <li><a href="/filter/inter_wiki">''' + load_lang('interwiki_list') + '''</a></li>
+                    <li><a href="/filter/edit_top">''' + load_lang('edit_tool_list') + '''</a></li>
+                    <li><a href="/filter/image_license">''' + load_lang('image_license_list') + '''</a></li>
+                    <li><a href="/filter/email_filter">''' + load_lang('email_filter_list') + '''</a></li>
+                    <li><a href="/filter/name_filter">''' + load_lang('id_filter_list') + '''</a></li>
+                    <li><a href="/filter/file_filter">''' + load_lang('file_filter_list') + '''</a></li>
+                    <li><a href="/filter/extension_filter">''' + load_lang('extension_filter_list') + '''</a></li>
+                    <li><a href="/filter/document">''' + load_lang('document_filter_list') + '''</a></li>
+                    <li><a href="/filter/outer_link">''' + load_lang('outer_link_filter_list') + '''</a> (''' + load_lang('beta') + ''')
+                    <li><a href="/filter/template">''' + load_lang('template_document_list') + '''</a> (''' + load_lang('beta') + ''')
                 </ul>
                 <h3>''' + load_lang('server') + '''</h2>
                 <ul class="opennamu_ul">

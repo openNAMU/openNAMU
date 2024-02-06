@@ -76,11 +76,11 @@ def view_diff(name = 'Test', num_a = 1, num_b = 1):
                             result += '</td></tr><tr><td style="width: 40px; user-select: none;">' + str(line) + '</td><td>'
 
                     if for_a[1] == 1:
-                        result += '<span style="background: #eaf2c2;">' + html.escape(for_a[2]) + '</span>'
+                        result += '<span class="opennamu_diff_green">' + html.escape(for_a[2]) + '</span>'
                     elif for_a[1] == 0:
                         result += html.escape(for_a[2])
                     else:
-                        result += '<span style="background: #fadad7;">' + html.escape(for_a[2]) + '</span>'
+                        result += '<span class="opennamu_diff_red">' + html.escape(for_a[2]) + '</span>'
 
                 result += '</td></tr></table>'
 

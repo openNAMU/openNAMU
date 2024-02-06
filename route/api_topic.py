@@ -1,29 +1,40 @@
 from .tool.func import *
 
-def api_topic_thread_make(user_id, date, data, code, color = '', blind = '', add_style = ''):
-    if blind != '':
+def api_topic_thread_make(user_id, date, data, code, color = '', blind = '', add_style = '', admin_check = 1, topic_num = ''):
+    if blind == 'O':
         if data == '':
             color_b = 'opennamu_comment_blind'
         else:
             color_b = 'opennamu_comment_blind_admin'
+
+        class_b = 'opennamu_comment_blind_js'
     else:
         color_b = 'opennamu_comment_blind_not'
+        class_b = ''
+
+    admin_check_box = ''
+    if admin_check == 1 and topic_num != '':
+        admin_check_box = '<input type="checkbox" class="opennamu_blind_button" id="opennamu_blind_' + topic_num + '_' + code + '">'
 
     return '''
-        <table class="opennamu_comment" style="''' + add_style + '''">
-            <tr>
-                <td class="opennamu_comment_color_''' + color + '''">
-                    <a href="#thread_shortcut" id="''' + code + '''">#''' + code + '''</a>
-                    ''' + user_id + '''
-                    <span style="float: right;">''' + date + '''</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="''' + color_b + '''" id="opennamu_comment_data_main">
-                    ''' + data + '''
-                </td>
-            </tr>
-        </table>
+        <span class="''' + class_b + '''">
+            <table class="opennamu_comment" style="''' + add_style + '''">
+                <tr>
+                    <td class="opennamu_comment_color_''' + color + '''">
+                        ''' + admin_check_box + '''
+                        <a href="#thread_shortcut" id="''' + code + '''">#''' + code + '''</a>
+                        ''' + user_id + '''
+                        <span style="float: right;">''' + date + '''</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="''' + color_b + '''" id="opennamu_comment_data_main">
+                        ''' + data + '''
+                    </td>
+                </tr>
+            </table>
+            <hr class="main_hr">
+        </span>
     '''
 
 def api_topic_thread_pre_render(curs, data, num, ip, topic_num = '', name = '', sub = '', do_type = 'thread'):
@@ -177,11 +188,12 @@ def api_topic(topic_num = 1, tool = 'normal', num = '', render = ''):
                         for for_a in data_a['data']:
                             if tool == 'top':
                                 color = 'red'
+                            elif for_a["blind"] == '1':
+                                color = 'blue'
+                            elif data_a['data_main']["ip_first"] == for_a["ip"]:
+                                color = 'green'
                             else:
-                                if data_a['data_main']["ip_first"] == for_a["ip"]:
-                                    color = 'green'
-                                else:
-                                    color = 'default'
+                                color = 'default'
 
                             data_r += api_topic_thread_make(
                                 for_a["ip_pas"],
@@ -190,9 +202,16 @@ def api_topic(topic_num = 1, tool = 'normal', num = '', render = ''):
                                 for_a["id"],
                                 color = color,
                                 blind = for_a["blind"],
-                                add_style = ''
+                                add_style = '',
+                                admin_check = admin if tool == 'normal' else 0,
+                                topic_num = topic_num
                             )
-                            data_r += '<hr class="main_hr">'
+
+                    if admin == 1 and tool == 'normal':
+                        data_r += '''
+                            <a href="javascript:opennamu_thread_blind();">(''' + load_lang('hide') + ''' | ''' + load_lang('hide_release') + ''')</a>
+                            <hr class="main_hr">
+                        '''
 
                     return flask.jsonify({ "data" : data_r })
             else:

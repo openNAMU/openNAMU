@@ -2,7 +2,6 @@
 import os
 import re
 import logging
-import shutil
 
 from route.tool.func import *
 from route import *
@@ -42,16 +41,10 @@ with get_db_connect() as conn:
 
     if data_db_set['type'] == 'mysql':
         try:
-            curs.execute(db_change(
-                'create database ' + data_db_set['name'] + ' ' + \
-                'default character set utf8mb4'
-            ))
+            curs.execute(db_change('create database ' + data_db_set['name'] + ' default character set utf8mb4'))
         except:
             try:
-                curs.execute(db_change(
-                    'alter database ' + data_db_set['name'] + ' ' + \
-                    'character set utf8mb4'
-                ))
+                curs.execute(db_change('alter database ' + data_db_set['name'] + ' character set utf8mb4'))
             except:
                 pass
 
@@ -65,7 +58,6 @@ with get_db_connect() as conn:
 
                 try:
                     curs.execute(db_change('select ' + create + ' from ' + create_table + ' limit 1'))
-
                     db_pass = 1
                 except:
                     pass
@@ -73,49 +65,49 @@ with get_db_connect() as conn:
                 if db_pass == 0:
                     try:
                         curs.execute(db_change('create table ' + create_table + '(test longtext default (""))'))
-
                         db_pass = 1
-                    except:
+                    except Exception as e:
+                        # print(e)
                         pass
 
                 if db_pass == 0:
                     try:
                         curs.execute(db_change('create table ' + create_table + '(test longtext default "")'))
-
                         db_pass = 1
-                    except:
+                    except Exception as e:
+                        # print(e)
                         pass
 
                 if db_pass == 0:
                     try:
                         curs.execute(db_change('create table ' + create_table + '(test longtext)'))
-
                         db_pass = 1
-                    except:
+                    except Exception as e:
+                        # print(e)
                         pass
 
                 if db_pass == 0:
                     try:
                         curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ('')"))
-
                         db_pass = 1
-                    except:
+                    except Exception as e:
+                        # print(e)
                         pass
 
                 if db_pass == 0:
                     try:
                         curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ''"))
-
                         db_pass = 1
-                    except:
+                    except Exception as e:
+                        # print(e)
                         pass
 
                 if db_pass == 0:
                     try:
                         curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext"))
-
                         db_pass = 1
-                    except:
+                    except Exception as e:
+                        # print(e)
                         pass
 
                 if db_pass == 0:
@@ -153,6 +145,7 @@ with get_db_connect() as conn:
 
     app.config['JSON_AS_ASCII'] = False
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
 
     log = logging.getLogger('waitress')
     log.setLevel(logging.ERROR)
@@ -167,8 +160,6 @@ with get_db_connect() as conn:
     curs.execute(db_change('select data from other where name = "key"'))
     sql_data = curs.fetchall()
     app.secret_key = sql_data[0][0]
-
-    print('----')
 
     # Init-DB_Data
     server_set = {}
@@ -208,99 +199,223 @@ with get_db_connect() as conn:
 
         server_set[i] = server_set_val
 
-    print('----')
+        conn.commit()
 
-    # Init-DB_care
-    if data_db_set['type'] == 'sqlite':
-        def back_up(back_time, back_up_where):
-            print('----')
+def back_up(data_db_set):
+    with get_db_connect() as conn:
+        curs = conn.cursor()
+    
+        try:
+            curs.execute(db_change('select data from other where name = "back_up"'))
+            back_time = curs.fetchall()
+            back_time = float(number_check(back_time[0][0], True)) if back_time and back_time[0][0] != '' else 0
 
-            try:
+            curs.execute(db_change('select data from other where name = "backup_count"'))
+            back_up_count = curs.fetchall()
+            back_up_count = int(number_check(back_up_count[0][0])) if back_up_count and back_up_count[0][0] != '' else 3
+
+            if back_time != 0:
+                curs.execute(db_change('select data from other where name = "backup_where"'))
+                back_up_where = curs.fetchall()
+                back_up_where = back_up_where[0][0] if back_up_where and back_up_where[0][0] != '' else data_db_set['name'] + '.db'
+
+                print('Back up state : ' + str(back_time) + ' hours')
+                print('Back up directory : ' + back_up_where)
+                if back_up_count != 0:
+                    print('Back up max number : ' + str(back_up_count))
+
+                    file_dir = os.path.split(back_up_where)[0]
+                    file_dir = '.' if file_dir == '' else file_dir
+                    
+                    file_name = os.path.split(back_up_where)[1]
+                    file_name = re.sub(r'\.db$', '_[0-9]{14}.db', file_name)
+
+                    backup_file = [for_a for for_a in os.listdir(file_dir) if re.search('^' + file_name + '$', for_a)]
+                    backup_file = sorted(backup_file)
+                    
+                    if len(backup_file) >= back_up_count:
+                        remove_dir = os.path.join(file_dir, backup_file[0])
+                        os.remove(remove_dir)
+                        print('Back up : Remove (' + remove_dir + ')')
+
+                now_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+                new_file_name = re.sub(r'\.db$', '_' + now_time + '.db', back_up_where)
                 shutil.copyfile(
                     data_db_set['name'] + '.db', 
-                    back_up_where
+                    new_file_name
                 )
 
-                print('Back up : OK')
-            except:
-                print('Back up : Error')
-
-            threading.Timer(
-                60 * 60 * back_time, 
-                back_up,
-                [back_time, back_up_where]
-            ).start()
-
-        curs.execute(db_change('select data from other where name = "back_up"'))
-        back_time = curs.fetchall()
-        back_time = int(number_check(back_time[0][0])) if back_time and back_time != '' else 0
-        if back_time != 0:
-            curs.execute(db_change('select data from other where name = "backup_where"'))
-            back_up_where = curs.fetchall()
-            if back_up_where and back_up_where[0][0] != '':
-                back_up_where = back_up_where[0][0]
+                print('Back up : OK (' + new_file_name + ')')
             else:
-                back_up_where = 'back_' + data_db_set['name'] + '.db'
+                print('Back up state : Turn off')
 
-            print('Back up state : ' + str(back_time) + ' hours')
+                back_time = 1
+        except Exception as e:
+            print('Back up : Error')
+            print(e)
 
-            back_up(back_time, back_up_where)
-        else:
-            print('Back up state : Turn off')
+            back_time = 1
 
-    print('Now running... http://localhost:' + server_set['port'])
+        threading.Timer(60 * 60 * back_time, back_up, [data_db_set]).start()
+
+def do_every_day():
+    with get_db_connect() as conn:
+        curs = conn.cursor()
+        
+        # 오늘의 날짜 불러오기
+        time_today = get_time().split()[0]
     
-    conn.commit()
+        # vote 관리
+        curs.execute(db_change('select id, type from vote where type = "open" or type = "n_open"'))
+        for for_a in curs.fetchall():
+            curs.execute(db_change('select data from vote where id = ? and name = "end_date" and type = "option"'), [for_a[0]])
+            db_data = curs.fetchall()
+            if db_data:
+                time_db = db_data[0][0].split()[0]
+                if time_today > time_db:
+                    curs.execute(db_change("update vote set type = ? where user = '' and id = ? and type = ?"), ['close' if for_a[1] == 'open' else 'n_close', for_a[0], for_a[1]])
 
+        # ban 관리
+        curs.execute(db_change("update rb set ongoing = '' where end < ? and end != '' and ongoing = '1'"), [get_time()])
+
+        # auth 관리
+        curs.execute(db_change('select id, data from user_set where name = "auth_date"'))
+        db_data = curs.fetchall()
+        for for_a in db_data:
+            time_db = for_a[1].split()[0]
+            if time_today > time_db:
+                curs.execute(db_change("update user_set set data = 'user' where id = ? and name = 'acl'"), [for_a[0]])
+                curs.execute(db_change('delete from user_set where name = "auth_date" and id = ?'), [for_a[0]])
+                
+        # acl 관리
+        curs.execute(db_change("select doc_name, doc_rev, set_data from data_set where set_name = 'acl_date'"))
+        db_data = curs.fetchall()
+        for for_a in db_data:
+            time_db = for_a[2].split()[0]
+            if time_today > time_db:
+                curs.execute(db_change("delete from acl where title = ? and type = ?"), [for_a[0], for_a[1]])
+                curs.execute(db_change("delete from data_set where doc_name = ? and doc_rev = ? and set_name = 'acl_date'"), [for_a[0], for_a[1]])
+                
+        # ua 관리
+        curs.execute(db_change('select data from other where name = "ua_expiration_date"'))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            time_db = int(number_check(db_data[0][0]))
+            
+            time_calc = datetime.date.today() - datetime.timedelta(days = time_db)
+            time_calc = time_calc.strftime('%Y-%m-%d %H:%M:%S')
+            
+            curs.execute(db_change("delete from ua_d where today < ?"), [time_calc])
+            
+        # auth history 관리
+        curs.execute(db_change('select data from other where name = "auth_history_expiration_date"'))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            time_db = int(number_check(db_data[0][0]))
+            
+            time_calc = datetime.date.today() - datetime.timedelta(days = time_db)
+            time_calc = time_calc.strftime('%Y-%m-%d %H:%M:%S')
+            
+            curs.execute(db_change("delete from re_admin where time < ?"), [time_calc])
+
+        # 전체 문서 수 재계산
+        curs.execute(db_change("select count(*) from data"))
+        count_data = curs.fetchall()
+        if count_data:
+            count_data = count_data[0][0]
+        else:
+            count_data = 0
+
+        curs.execute(db_change('delete from other where name = "count_all_title"'))
+        curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", ?, "")'), [str(count_data)])
+
+        # 사이트맵 생성 관리
+        curs.execute(db_change('select data from other where name = "sitemap_auto_make"'))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            main_setting_sitemap(1)
+
+            print('Make sitemap')
+
+        conn.commit()
+
+        threading.Timer(60 * 60 * 24, do_every_day).start()
+
+def auto_do_something(data_db_set):
+    if data_db_set['type'] == 'sqlite':
+        back_up(data_db_set)
+
+    do_every_day()
+
+auto_do_something(data_db_set)
+
+print('Now running... http://localhost:' + server_set['port'])
+    
 # Init-custom
 if os.path.exists('custom.py'):
     from custom import custom_run
     custom_run('error', app)
 
+db_set_str = json.dumps(data_db_set)
+
 # Func
 # Func-inter_wiki
-app.route('/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(filter_inter_wiki)
-app.route('/inter_wiki/del/<everything:name>', defaults = { 'tool' : 'del_inter_wiki' })(filter_inter_wiki_delete)
-app.route('/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(filter_inter_wiki_add)
-app.route('/inter_wiki/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_inter_wiki' })(filter_inter_wiki_add)
+app.route('/filter/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(filter_all)
+app.route('/filter/inter_wiki/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'inter_wiki' })(filter_all_add)
+app.route('/filter/inter_wiki/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'inter_wiki' })(filter_all_add)
+app.route('/filter/inter_wiki/del/<everything:name>', defaults = { 'tool' : 'inter_wiki' })(filter_all_delete)
 
-app.route('/filter/document/list')(filter_document)
-app.route('/filter/document/add/<everything:name>', methods = ['POST', 'GET'])(filter_document_add)
-app.route('/filter/document/add', methods = ['POST', 'GET'])(filter_document_add)
-app.route('/filter/document/del/<name>')(filter_document_delete)
+app.route('/filter/outer_link', defaults = { 'tool' : 'outer_link' })(filter_all)
+app.route('/filter/outer_link/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'outer_link' })(filter_all_add)
+app.route('/filter/outer_link/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'outer_link' })(filter_all_add)
+app.route('/filter/outer_link/del/<everything:name>', defaults = { 'tool' : 'outer_link' })(filter_all_delete)
 
-app.route('/edit_top', defaults = { 'tool' : 'edit_top' })(filter_inter_wiki)
-app.route('/edit_top/del/<everything:name>', defaults = { 'tool' : 'del_edit_top' })(filter_inter_wiki_delete)
-app.route('/edit_top/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_top' })(filter_inter_wiki_add)
+app.route('/filter/document', defaults = { 'tool' : 'document' })(filter_all)
+app.route('/filter/document/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'document' })(filter_all_add)
+app.route('/filter/document/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'document' })(filter_all_add)
+app.route('/filter/document/del/<everything:name>', defaults = { 'tool' : 'document' })(filter_all_delete)
 
-app.route('/image_license', defaults = { 'tool' : 'image_license' })(filter_inter_wiki)
-app.route('/image_license/del/<everything:name>', defaults = { 'tool' : 'del_image_license' })(filter_inter_wiki_delete)
-app.route('/image_license/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_image_license' })(filter_inter_wiki_add)
+app.route('/filter/edit_top', defaults = { 'tool' : 'edit_top' })(filter_all)
+app.route('/filter/edit_top/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'edit_top' })(filter_all_add)
+app.route('/filter/edit_top/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'edit_top' })(filter_all_add)
+app.route('/filter/edit_top/del/<everything:name>', defaults = { 'tool' : 'edit_top' })(filter_all_delete)
 
-app.route('/edit_filter', defaults = { 'tool' : 'edit_filter' })(filter_inter_wiki)
-app.route('/edit_filter/del/<everything:name>', defaults = { 'tool' : 'del_edit_filter' })(filter_inter_wiki_delete)
-app.route('/edit_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(filter_inter_wiki_add)
-app.route('/edit_filter/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_edit_filter' })(filter_inter_wiki_add)
+app.route('/filter/image_license', defaults = { 'tool' : 'image_license' })(filter_all)
+app.route('/filter/image_license/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'image_license' })(filter_all_add)
+app.route('/filter/image_license/del/<everything:name>', defaults = { 'tool' : 'image_license' })(filter_all_delete)
 
-app.route('/email_filter', defaults = { 'tool' : 'email_filter' })(filter_inter_wiki)
-app.route('/email_filter/del/<everything:name>', defaults = { 'tool' : 'del_email_filter' })(filter_inter_wiki_delete)
-app.route('/email_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_email_filter' })(filter_inter_wiki_add)
+app.route('/filter/template', defaults = { 'tool' : 'template' })(filter_all)
+app.route('/filter/template/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'template' })(filter_all_add)
+app.route('/filter/template/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'template' })(filter_all_add)
+app.route('/filter/template/del/<everything:name>', defaults = { 'tool' : 'template' })(filter_all_delete)
 
-app.route('/file_filter', defaults = { 'tool' : 'file_filter' })(filter_inter_wiki)
-app.route('/file_filter/del/<everything:name>', defaults = { 'tool' : 'del_file_filter' })(filter_inter_wiki_delete)
-app.route('/file_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_file_filter' })(filter_inter_wiki_add)
+app.route('/filter/edit_filter', defaults = { 'tool' : 'edit_filter' })(filter_all)
+app.route('/filter/edit_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'edit_filter' })(filter_all_add)
+app.route('/filter/edit_filter/add/<everything:name>', methods = ['POST', 'GET'], defaults = { 'tool' : 'edit_filter' })(filter_all_add)
+app.route('/filter/edit_filter/del/<everything:name>', defaults = { 'tool' : 'edit_filter' })(filter_all_delete)
 
-app.route('/name_filter', defaults = { 'tool' : 'name_filter' })(filter_inter_wiki)
-app.route('/name_filter/del/<everything:name>', defaults = { 'tool' : 'del_name_filter' })(filter_inter_wiki_delete)
-app.route('/name_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_name_filter' })(filter_inter_wiki_add)
+app.route('/filter/email_filter', defaults = { 'tool' : 'email_filter' })(filter_all)
+app.route('/filter/email_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'email_filter' })(filter_all_add)
+app.route('/filter/email_filter/del/<everything:name>', defaults = { 'tool' : 'email_filter' })(filter_all_delete)
 
-app.route('/extension_filter', defaults = { 'tool' : 'extension_filter' })(filter_inter_wiki)
-app.route('/extension_filter/del/<everything:name>', defaults = { 'tool' : 'del_extension_filter' })(filter_inter_wiki_delete)
-app.route('/extension_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'plus_extension_filter' })(filter_inter_wiki_add)
+app.route('/filter/file_filter', defaults = { 'tool' : 'file_filter' })(filter_all)
+app.route('/filter/file_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'file_filter' })(filter_all_add)
+app.route('/filter/file_filter/del/<everything:name>', defaults = { 'tool' : 'file_filter' })(filter_all_delete)
+
+app.route('/filter/name_filter', defaults = { 'tool' : 'name_filter' })(filter_all)
+app.route('/filter/name_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'name_filter' })(filter_all_add)
+app.route('/filter/name_filter/del/<everything:name>', defaults = { 'tool' : 'name_filter' })(filter_all_delete)
+
+app.route('/filter/extension_filter', defaults = { 'tool' : 'extension_filter' })(filter_all)
+app.route('/filter/extension_filter/add', methods = ['POST', 'GET'], defaults = { 'tool' : 'extension_filter' })(filter_all_add)
+app.route('/filter/extension_filter/del/<everything:name>', defaults = { 'tool' : 'extension_filter' })(filter_all_delete)
 
 # Func-list
 app.route('/list/document/old')(list_old_page)
 app.route('/list/document/old/<int:num>')(list_old_page)
+
+app.route('/list/document/no_link')(list_no_link)
+app.route('/list/document/no_link/<int:num>')(list_no_link)
 
 app.route('/list/document/acl')(list_acl)
 app.route('/list/document/acl/<int:arg_num>')(list_acl)
@@ -319,11 +434,13 @@ app.route('/list/document/short/<int:arg_num>', defaults = { 'tool' : 'short_pag
 
 app.route('/list/file')(list_image_file)
 app.route('/list/file/<int:arg_num>')(list_image_file)
+app.route('/list/image', defaults = { 'do_type' : 1 })(list_image_file)
+app.route('/list/image/<int:arg_num>', defaults = { 'do_type' : 1 })(list_image_file)
 
 app.route('/list/admin')(list_admin)
 
 app.route('/list/admin/auth_use', methods = ['POST', 'GET'])(list_admin_auth_use)
-app.route('/list/admin/auth_use/<arg_search>/<int:arg_num>', methods = ['POST', 'GET'])(list_admin_auth_use)
+app.route('/list/admin/auth_use_page/<int:arg_num>/<everything:arg_search>', methods = ['POST', 'GET'])(list_admin_auth_use)
 
 app.route('/list/user')(list_user)
 app.route('/list/user/<int:arg_num>')(list_user)
@@ -343,18 +460,16 @@ app.route('/auth/give/<name>', methods = ['POST', 'GET'])(give_auth)
 # /auth/give
 # /auth/give/<name>
 app.route('/auth/give/ban', methods = ['POST', 'GET'])(give_user_ban)
-app.route('/auth/give/ban/<name>', methods = ['POST', 'GET'])(give_user_ban)
+app.route('/auth/give/ban/<everything:name>', methods = ['POST', 'GET'])(give_user_ban)
 app.route('/auth/give/ban_regex/<everything:name>', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'regex' })(give_user_ban)
 app.route('/auth/give/ban_multiple', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'multiple' })(give_user_ban)
 
 # /auth/list
-app.route('/admin_group')(list_admin_group_2)
-
 # /auth/list/add/<name>
-app.route('/admin_plus/<name>', methods = ['POST', 'GET'])(give_admin_groups_2)
-
 # /auth/list/delete/<name>
-app.route('/delete_admin_group/<name>', methods = ['POST', 'GET'])(give_delete_admin_group_2)
+app.route('/auth/list')(list_admin_group_2)
+app.route('/auth/list/add/<name>', methods = ['POST', 'GET'])(give_admin_groups_2)
+app.route('/auth/list/delete/<name>', methods = ['POST', 'GET'])(give_delete_admin_group_2)
 
 app.route('/auth/give/fix/<user_name>', methods = ['POST', 'GET'])(give_user_fix)
 
@@ -367,25 +482,35 @@ app.route('/block_log/<regex("user"):tool>/<name>')(recent_block_2)
 app.route('/block_log/<regex("admin"):tool>/<name>')(recent_block_2)
 
 # Func-history
-app.route('/recent_change')(recent_change)
-app.route('/recent_changes')(recent_change)
+app.route('/recent_change', defaults = { 'tool' : 'recent' })(recent_change)
+app.route('/recent_change/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
+app.route('/recent_changes', defaults = { 'tool' : 'recent' })(recent_change)
+app.route('/recent_changes/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
 
 app.route('/record/<name>', defaults = { 'tool' : 'record' })(recent_change)
+app.route('/record/<int:num>/<set_type>/<name>', defaults = { 'tool' : 'record' })(recent_change)
+
 app.route('/record/reset/<name>', methods = ['POST', 'GET'])(recent_record_reset)
 app.route('/record/topic/<name>')(recent_record_topic)
 
+app.route('/record/bbs/<name>', defaults = { 'tool' : 'record' })(bbs_w)
+app.route('/record/bbs_comment/<name>', defaults = { 'tool' : 'comment_record' })(bbs_w)
+
 app.route('/history/<everything:name>', defaults = { 'tool' : 'history' }, methods = ['POST', 'GET'])(recent_change)
+app.route('/history_page/<int:num>/<set_type>/<everything:name>', defaults = { 'tool' : 'history' }, methods = ['POST', 'GET'])(recent_change)
+
 app.route('/history_tool/<int(signed = True):rev>/<everything:name>')(recent_history_tool)
 app.route('/history_delete/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])(recent_history_delete)
 app.route('/history_hidden/<int(signed = True):rev>/<everything:name>')(recent_history_hidden)
 app.route('/history_send/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])(recent_history_send)
 app.route('/history_reset/<everything:name>', methods = ['POST', 'GET'])(recent_history_reset)
 app.route('/history_add/<everything:name>', methods = ['POST', 'GET'])(recent_history_add)
-app.route('/history_add_preview/<everything:name>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(recent_history_add)
 
 # Func-view
 app.route('/xref/<everything:name>')(view_xref)
+app.route('/xref_page/<int:num>/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
+app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
 app.route('/raw/<everything:name>')(view_raw_2)
 app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 1 })(view_raw_2)
@@ -402,14 +527,12 @@ app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_read)
 app.route('/w/<everything:name>')(view_read)
 
-app.route('/random')(view_random)
+app.route('/random', defaults = { 'db_set' : db_set_str })(view_random)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
-app.route('/edit_preview/<everything:name>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(edit)
-app.route('/edit_from/<everything:name>', defaults = { 'do_type' : 'load' })(edit)
+app.route('/edit_from/<everything:name>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'load' })(edit)
 app.route('/edit_section/<int:section>/<everything:name>', methods = ['POST', 'GET'])(edit)
-app.route('/edit_section_preview/<int:section>/<everything:name>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(edit)
 
 app.route('/upload', methods = ['POST', 'GET'])(edit_upload)
 
@@ -431,7 +554,6 @@ app.route('/recent_discuss/open', defaults = { 'tool' : 'open' })(recent_discuss
 
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
 app.route('/thread/0/<everything:doc_name>', defaults = { 'topic_num' : '0' }, methods = ['POST', 'GET'])(topic)
-app.route('/thread_preview/<int:topic_num>', defaults = { 'do_type' : 'preview' }, methods = ['POST'])(topic)
 app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
 
 app.route('/thread/<int:topic_num>/tool')(topic_tool)
@@ -451,13 +573,13 @@ app.route('/change', methods = ['POST', 'GET'])(user_setting)
 app.route('/change/key')(user_setting_key)
 app.route('/change/key/delete')(user_setting_key_delete)
 app.route('/change/pw', methods = ['POST', 'GET'])(user_setting_pw)
-app.route('/change/head', methods=['GET', 'POST'], defaults = { 'skin_name' : '' })(user_setting_head)
-app.route('/change/head/<skin_name>', methods=['GET', 'POST'])(user_setting_head)
-app.route('/change/head_reset', methods=['GET', 'POST'])(user_setting_head_reset)
+app.route('/change/head', methods = ['GET', 'POST'], defaults = { 'skin_name' : '' })(user_setting_head)
+app.route('/change/head/<skin_name>', methods = ['GET', 'POST'])(user_setting_head)
+app.route('/change/head_reset', methods = ['GET', 'POST'])(user_setting_head_reset)
 app.route('/change/skin_set')(user_setting_skin_set)
-app.route('/change/top_menu', methods=['GET', 'POST'])(user_setting_top_menu)
-app.route('/change/user_name', methods=['GET', 'POST'])(user_setting_user_name)
-app.route('/change/user_name/<user_name>', methods=['GET', 'POST'])(user_setting_user_name)
+app.route('/change/top_menu', methods = ['GET', 'POST'])(user_setting_top_menu)
+app.route('/change/user_name', methods = ['GET', 'POST'])(user_setting_user_name)
+app.route('/change/user_name/<user_name>', methods = ['GET', 'POST'])(user_setting_user_name)
 # 하위 호환용 S
 app.route('/skin_set')(user_setting_skin_set)
 # 하위 호환용 E
@@ -466,13 +588,14 @@ app.route('/change/skin_set/main', methods = ['POST', 'GET'])(user_setting_skin_
 app.route('/user')(user_info)
 app.route('/user/<name>')(user_info)
 
-app.route('/challenge')(user_challenge)
+app.route('/challenge', methods = ['GET', 'POST'])(user_challenge)
 
 app.route('/count')(user_count)
 app.route('/count/<name>')(user_count)
 
 app.route('/alarm')(user_alarm)
 app.route('/alarm/delete')(user_alarm_delete)
+app.route('/alarm/delete/<int:id>')(user_alarm_delete)
 
 app.route('/watch_list', defaults = { 'tool' : 'watch_list' })(user_watch_list)
 app.route('/watch_list/<everything:name>', defaults = { 'tool' : 'watch_list' })(user_watch_list_name)
@@ -518,29 +641,40 @@ app.route('/vote/list/close/<int:num>', defaults = { 'list_type' : 'close' })(vo
 app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 
 # Func-bbs
-app.route('/bbs/main')(bbs_main)
+app.route('/bbs/main', defaults = { 'tool' : 'main' })(bbs_w)
 app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
 # app.route('/bbs/main/set')
 app.route('/bbs/w/<int:bbs_num>')(bbs_w)
+# app.route('/bbs/blind/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_hide)
+app.route('/bbs/delete/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_delete)
 app.route('/bbs/set/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_set)
 app.route('/bbs/edit/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_edit)
-app.route('/bbs/edit/preview/<int:bbs_num>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'preview' })(bbs_w_edit)
 app.route('/bbs/w/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_post)
+# app.route('/bbs/blind/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_hide)
+app.route('/bbs/pinned/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_pinned)
+app.route('/bbs/delete/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_delete)
 app.route('/bbs/raw/<int:bbs_num>/<int:post_num>')(view_raw_2)
 app.route('/bbs/tool/<int:bbs_num>/<int:post_num>')(bbs_w_tool)
 app.route('/bbs/edit/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_edit)
-app.route('/bbs/edit/preview/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'preview' })(bbs_w_edit)
-app.route('/bbs/w/preview/<int:bbs_num>/<int:post_num>', methods = ['POST'], defaults = { 'do_type' : 'preview' })(bbs_w_post)
 app.route('/bbs/tool/<int:bbs_num>/<int:post_num>/<comment_num>')(bbs_w_comment_tool)
 app.route('/bbs/raw/<int:bbs_num>/<int:post_num>/<comment_num>')(view_raw_2)
 app.route('/bbs/edit/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_edit)
-app.route('/bbs/edit/preview/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_edit)
+app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_delete)
 
 # Func-api
-app.route('/api/w/<everything:name>/doc_tool/<tool>/doc_rev/<int(signed = True):rev>')(api_w)
-app.route('/api/w/<everything:name>/doc_tool/<tool>', methods = ['POST', 'GET'])(api_w)
+# 폐지 예정
+app.route('/api/w_rev/<int(signed = True):rev>/<tool>/<everything:name>', methods = ['GET', 'POST'])(api_w)
+app.route('/api/w_tool/<tool>/<everything:name>', methods = ['GET', 'POST'])(api_w)
 app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
-app.route('/api/raw/<everything:name>')(api_raw)
+
+# app.route('/api/render_tool/<tool>/<everything:name>', methods = ['POST'])(api_w_render)
+# app.route('/api/render_tool/<tool>', methods = ['POST'])(api_w_render)
+# app.route('/api/render/<everything:name>', methods = ['POST'])(api_w_render)
+# app.route('/api/render', methods = ['POST'])(api_w_render)
+
+app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on' })(api_w_raw)
+app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>')(api_w_raw)
+app.route('/api/raw/<everything:name>')(api_w_raw)
 
 app.route('/api/bbs/w/<sub_code>')(api_bbs_w_post)
 app.route('/api/bbs/w/comment/<sub_code>')(api_bbs_w_comment)
@@ -606,31 +740,10 @@ app.route('/setting/robot', methods = ['POST', 'GET'])(main_setting_robot)
 app.route('/setting/external', methods = ['POST', 'GET'])(main_setting_external)
 app.route('/setting/acl', methods = ['POST', 'GET'])(main_setting_acl)
 app.route('/setting/sitemap', methods = ['POST', 'GET'])(main_setting_sitemap)
+app.route('/setting/sitemap_set', methods = ['POST', 'GET'])(main_setting_sitemap_set)
 app.route('/setting/skin_set', methods = ['POST', 'GET'])(main_setting_skin_set)
 
 app.route('/easter_egg')(main_func_easter_egg)
-
-def main_easter_egg_go():
-    with get_db_connect() as conn:
-        print(platform.machine())
-        if platform.system() == 'Linux':
-            if platform.machine() in ["AMD64", "x86_64"]:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.amd64.bin")).read()
-            else:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.arm64.bin")).read()
-        else:
-            if platform.machine() in ["AMD64", "x86_64"]:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.amd64.exe")).read()
-            else:
-                data = os.popen(os.path.join(".", "route_go", "bin", "main_easter_egg.arm64.exe")).read()
-
-        return easy_minify(flask.render_template(skin_check(),
-            imp = ['Easter Egg', wiki_set(), wiki_custom(), wiki_css([0, 0])],
-            data = data,
-            menu = 0
-        ))
-
-app.route('/easter_egg_go')(main_easter_egg_go)
 
 # views -> view
 app.route('/view/<path:name>')(main_view)
@@ -650,5 +763,6 @@ if __name__ == "__main__":
         app,
         host = server_set['host'],
         port = int(server_set['port']),
-        clear_untrusted_proxy_headers = True
+        clear_untrusted_proxy_headers = True,
+        threads = os.cpu_count()
     )

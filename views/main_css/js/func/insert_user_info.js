@@ -1,6 +1,5 @@
 "use strict";
 
-// 폐지하고 다시 SSR 방식으로 전환 예정
 function do_insert_user_info() {
     if(document.getElementById('opennamu_get_user_info')) {
         let name = document.getElementById('opennamu_get_user_info').innerHTML;
@@ -19,7 +18,8 @@ function do_insert_user_info() {
             'why',
             'band_blocked',
             'ip',
-            'ban'
+            'ban',
+            'level'
         ];
 
         let data_form = new FormData();
@@ -41,7 +41,6 @@ function do_insert_user_info() {
                     if(this.readyState === 4 && this.status === 200) {
                         let get_data = JSON.parse(this.responseText);
                         
-                        // 한글 지원 필요
                         let get_data_auth = get_data[name]['auth'];
                         if(get_data_auth === '0') {
                             get_data_auth = lang_data['ip'];
@@ -49,6 +48,11 @@ function do_insert_user_info() {
                             get_data_auth = lang_data['member'];
                         } else {
                             get_data_auth = get_data[name]['auth'];
+                        }
+
+                        let get_data_auth_date = get_data[name]['auth_date'];
+                        if(get_data_auth_date !== '0') {
+                            get_data_auth += ' (~' + get_data_auth_date + ')'
                         }
                         
                         let get_data_ban = get_data[name]['ban'];
@@ -84,6 +88,15 @@ function do_insert_user_info() {
                             
                             get_data_ban += lang_data['why'] + ' : ' + get_data[name]['ban']['reason'];
                         }
+
+                        let level = '0';
+                        let exp = '0';
+                        let max_exp = '0';
+                        if(get_data_auth !== lang_data['ip']) {
+                            level = get_data[name]['level'];
+                            exp = get_data[name]['exp'];
+                            max_exp = String(500 + (Number(get_data[name]['level']) * 50));
+                        }
                         
                         let data = '' +
                             '<table class="user_info_table">' +
@@ -98,6 +111,10 @@ function do_insert_user_info() {
                                 '<tr>' +
                                     '<td>' + lang_data['state'] + '</td>' +
                                     '<td>' + get_data_ban + '</td>' +
+                                '</tr>' +
+                                '<tr>' +
+                                    '<td>' + lang_data['level'] + '</td>' +
+                                    '<td>' + level + ' (' + exp + ' / ' + max_exp + ')</td>' +
                                 '</tr>' +
                             '</table>' +
                         '';

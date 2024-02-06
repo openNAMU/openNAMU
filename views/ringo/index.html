@@ -10,15 +10,16 @@
         {{imp[3][3]|safe}}
         <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" rel="stylesheet">
         <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
-        <script src="/views/ringo/js/main.js?ver=2"></script>
-        <script src="/views/ringo/js/sidebar.js?ver=1"></script>
-        <script src="/views/ringo/js/skin_set.js?ver=1"></script>
-        <link rel="stylesheet" href="/views/ringo/css/main.css?ver=4">
+        <script src="/views/ringo/js/main.js.cache_v2"></script>
+        <script src="/views/ringo/js/sidebar.js.cache_v1"></script>
+        <script src="/views/ringo/js/skin_set.js.cache_v5"></script>
+        <link rel="stylesheet" href="/views/ringo/css/main.css.cache_v7">
         {% if request.cookies.get('main_css_darkmode', '') == '1' %}
-            <link rel="stylesheet" href="/views/main_css/css/sub/dark.css?ver=1">
-            <link rel="stylesheet" href="/views/ringo/css/dark.css?ver=1">
+            <link rel="stylesheet" href="/views/main_css/css/sub/dark.css.cache_v1">
+            <link rel="stylesheet" href="/views/ringo/css/dark.css.cache_v1">
         {% endif %}
-        <link rel="shortcut icon" href="/views/main_css/file/favicon.ico?ver=1">
+        <style id="ringo_add_style"></style>
+        <link rel="shortcut icon" href="/views/main_css/file/favicon.ico.cache_v1">
         {{imp[1][5]|safe}}
         {{imp[2][3]|safe}}
         {% if imp[3][0] != 0 %}
@@ -27,7 +28,7 @@
             <meta name="title" content="{{imp[0]}} - {{imp[1][0]}}">
         {% endif %}
         <meta name="keywords" content="{{imp[0]}}">
-        {% if imp[2][12] != 0 and imp[2][12] == 'w' %}
+        {% if imp[2][12] != 0 and imp[2][12][0] == 'w' %}
             <meta name="description" content="{{data|cut_100}}">
         {% endif %}
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -192,6 +193,9 @@
                             <sub>{{imp[3][0]}}</sub>
                         {% endif %}
                     </h1>
+                    {% if imp[3][1] != 0 %}
+                        {{'last_edit_time'|load_lang}} : {{imp[3][1]}}
+                    {% endif %}
                     {% if menu != 0 %}
                         <div id="menu">
                             {% for menu_data in menu %}
@@ -227,33 +231,34 @@
                 </article>
             </footer>
         </section>
-        <aside>
-            <button id="side_button_1" class="side_button selected">변경</button><!--
-         --><button id="side_button_2" class="side_button">토론</button><!--
-         --><button id="side_button_3" class="side_button">목차</button><!--
-         --><button id="side_button_4" class="side_button">각주</button>
+        <div class="aside_width">　</div>
+        <aside class="do_fixed">
+            <button id="side_button_1" class="side_button selected">{{'edit'|load_lang}}</button><!--
+         --><button id="side_button_2" class="side_button">{{'discussion'|load_lang}}</button><!--
+         --><button id="side_button_3" class="side_button">{{'toc'|load_lang}}</button><!--
+         --><button id="side_button_4" class="side_button">{{'footnote'|load_lang}}</button>
             <div id="side_content">
                 Loading...
             </div>
-            <div id="nav_bar">
-                <div id="go_top">
-                    <a href="#logo">
-                        <span class="iconify" data-icon="ic:baseline-arrow-upward" data-inline="true"></span>
-                    </a>
-                </div>
-                <div id="go_bottom">
-                    <a href="#b_logo">
-                        <span class="iconify" data-icon="ic:baseline-arrow-downward" data-inline="true"></span>
-                    </a>
-                </div>
-                <div id="go_toc">
-                    <a href="#toc">
-                        <span class="iconify" data-icon="ic:baseline-list" data-inline="true"></span>
-                    </a>
-                </div>
-            </div>
         </aside>
-        <footer class="only_mobile">
+        <div id="nav_bar">
+            <div id="go_top">
+                <a href="#main">
+                    <span class="iconify" data-icon="ic:baseline-arrow-upward" data-inline="true"></span>
+                </a>
+            </div>
+            <div id="go_bottom">
+                <a href="#footer">
+                    <span class="iconify" data-icon="ic:baseline-arrow-downward" data-inline="true"></span>
+                </a>
+            </div>
+            <div id="go_toc">
+                <a href="#toc">
+                    <span class="iconify" data-icon="ic:baseline-list" data-inline="true"></span>
+                </a>
+            </div>
+        </div>
+        <footer class="only_mobile" id="footer">
             {{imp[1][1]|safe}}
             <br>
             <br>
