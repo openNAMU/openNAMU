@@ -523,7 +523,6 @@ app.route('/down/<everything:name>')(view_down)
 app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_acl)
 
 # everything 다음에 추가 붙은 경우에 대해서 재검토 필요 (진행중)
-app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_read)
 app.route('/w/<everything:name>')(view_read)
 
@@ -663,7 +662,6 @@ app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['
 
 # Func-api
 # 폐지 예정
-app.route('/api/w_rev/<int(signed = True):rev>/<tool>/<everything:name>', methods = ['GET', 'POST'])(api_w)
 app.route('/api/w_tool/<tool>/<everything:name>', methods = ['GET', 'POST'])(api_w)
 app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
 
