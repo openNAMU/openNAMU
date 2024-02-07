@@ -48,3 +48,23 @@ footer {
 #nav_bar a {
     color: white;
 }
+
+header#main a:hover {
+    background: #405d6a;
+}
+
+button:hover, aside .side_button:hover, .menu_item_link:hover, #main_data button:hover, #topic_color:hover {
+    background: #444;
+}
+
+button.search_button#goto:hover {
+    background: #53664d;
+}
+
+button.search_button#search:hover {
+    background: #665f52;
+}
+
+#opennamu_save_button {
+    background: #325a56;
+}
