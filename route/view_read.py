@@ -241,25 +241,26 @@ def view_read(name = 'Test', do_type = ''):
                 if curs.fetchall():
                     break
 
-            redirect_text = '{0} ➤ {1}'
-
-            curs.execute(db_change('select data from other where name = "redirect_text"'))
-            db_data = curs.fetchall()
-            if db_data and db_data[0][0] != '':
-                redirect_text = db_data[0][0]
-
-            try:
-                redirect_text = redirect_text.format('<a href="/w_from/' + url_pas(last_page) + '">' + html.escape(last_page) + '</a>', '<b>' + html.escape(name) + '</b>')
-            except:
+            if last_page != name:
                 redirect_text = '{0} ➤ {1}'
-                redirect_text = redirect_text.format('<a href="/w_from/' + url_pas(last_page) + '">' + html.escape(last_page) + '</a>', '<b>' + html.escape(name) + '</b>')
 
-            end_data = '''
-                <div class="opennamu_redirect" id="redirect">
-                    ''' + redirect_text + '''
-                </div>
-                <hr class="main_hr">
-            ''' + end_data
+                curs.execute(db_change('select data from other where name = "redirect_text"'))
+                db_data = curs.fetchall()
+                if db_data and db_data[0][0] != '':
+                    redirect_text = db_data[0][0]
+
+                try:
+                    redirect_text = redirect_text.format('<a href="/w_from/' + url_pas(last_page) + '">' + html.escape(last_page) + '</a>', '<b>' + html.escape(name) + '</b>')
+                except:
+                    redirect_text = '{0} ➤ {1}'
+                    redirect_text = redirect_text.format('<a href="/w_from/' + url_pas(last_page) + '">' + html.escape(last_page) + '</a>', '<b>' + html.escape(name) + '</b>')
+
+                end_data = '''
+                    <div class="opennamu_redirect" id="redirect">
+                        ''' + redirect_text + '''
+                    </div>
+                    <hr class="main_hr">
+                ''' + end_data
                 
         if len(flask.session['lastest_document']) >= 10:
             flask.session['lastest_document'] = flask.session['lastest_document'][-9:] + [name]
