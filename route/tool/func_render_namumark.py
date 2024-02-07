@@ -1020,7 +1020,7 @@ class class_do_render_namumark:
 
                         if self.data_category == '':
                             self.data_category = '' + \
-                                '<div class="opennamu_category">' + \
+                                '<div class="opennamu_category" id="cate">' + \
                                     '<a class="opennamu_category_button" href="javascript:opennamu_do_category_spread();"> (+)</a>' + \
                                     self.get_tool_lang('category') + ' : ' + \
                                 '' + \
