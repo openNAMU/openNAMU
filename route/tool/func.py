@@ -1043,9 +1043,9 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_add = ''
+    data_css_dark = ''
 
-    data_css_ver = '191'
+    data_css_ver = '192'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:
@@ -1081,16 +1081,23 @@ def wiki_css(data):
 
         # External CSS
         data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">'
+        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
     
         global_wiki_set['main_css'] = data_css
 
     # Darkmode
-    if flask.request.cookies.get('main_css_darkmode', '0') == '0':
-        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+    if 'dark_main_css' in global_wiki_set:
+        data_css_dark = global_wiki_set['dark_main_css']
     else:
-        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+        # Main CSS
+        data_css_dark += '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css' + data_css_ver + '">'
 
-    data = data[0:2] + ['', data_css_add + data_css] + data[2:]
+        # External CSS
+        data_css_dark += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+
+        global_wiki_set['dark_main_css'] = data_css_dark
+
+    data = data[0:2] + ['', data_css] + data[2:] + [data_css_dark]
 
     return data
 
