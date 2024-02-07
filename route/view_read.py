@@ -269,7 +269,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                     redirect_text = redirect_text.format('<a href="/w_from/' + url_pas(last_page) + '">' + html.escape(last_page) + '</a>', '<b>' + html.escape(name) + '</b>')
 
                 end_data = '''
-                    <div id="redirect">
+                    <div class="opennamu_redirect" id="redirect">
                         ''' + redirect_text + '''
                     </div>
                     <hr class="main_hr">
@@ -285,7 +285,8 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             view_history_on = get_main_skin_set(curs, flask.session, 'main_css_view_history', ip)
             if view_history_on == 'on':
                 end_data = '' + \
-                    '<div id="redirect">' + \
+                    '<div class="opennamu_trace">' + \
+                        '<a class="opennamu_trace_button" href="javascript:opennamu_do_trace_spread();"> (+)</a>' + \
                         load_lang('trace') + ' : ' + \
                         ' ➥ '.join(
                             [

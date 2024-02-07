@@ -16,7 +16,7 @@ input::placeholder, textarea::placeholder, select::placeholder {
     color: white;
 }
 
-#toc, .opennamu_TOC, #cate, #redirect {
+.opennamu_TOC, .opennamu_redirect {
     background: #1f2023;
 }
 
@@ -70,6 +70,7 @@ blockquote {
     background-color: #313236;
 }
 
+/* 이 부분은 레거시 */
 #topic_color {
     background: #325a56;
 }

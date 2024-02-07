@@ -181,7 +181,7 @@ a:hover {
 }
 
 /* - category */
-.opennamu_category {
+.opennamu_category, .opennamu_trace {
     border: 1px solid gainsboro;
     
     padding: 10px;
@@ -191,7 +191,7 @@ a:hover {
     text-overflow: ellipsis;
 }
 
-.opennamu_category_button {
+.opennamu_category_button, .opennamu_trace_button {
     float: right;
     z-index: 100;
     position: relative;
@@ -214,7 +214,7 @@ a:hover {
     margin-top: 10px;
 }
 
-pre, #redirect {
+pre, .opennamu_redirect {
     border: 1px solid gainsboro;
     
     padding: 10px;
