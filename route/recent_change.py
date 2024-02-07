@@ -143,7 +143,10 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                         style[1] = 'class="opennamu_history_blind"'
 
                 if tool == 'history':
-                    title = '<a href="/w_rev/' + data[0] + '/' + url_pas(name) + '">r' + data[0] + '</a> '
+                    if int(data[0]) < 2:
+                        title = '<a href="/raw_rev/' + data[0] + '/' + url_pas(name) + '">r' + data[0] + '</a> '
+                    else:
+                        title = '<a href="/diff/' + str(int(data[0]) - 1) + '/' + data[0] + '/' + url_pas(name) + '">r' + data[0] + '</a> '
                 else:
                     title = '<a href="/w/' + url_pas(data[1]) + '">' + html.escape(data[1]) + '</a> '
                     if int(data[0]) < 2:
