@@ -295,14 +295,6 @@ def view_read(name = 'Test', do_type = ''):
         r_date = r_date[0][0] if r_date else 0
 
         div = file_data + user_doc + end_data + category_total
-
-        if num != '':
-            curs.execute(db_change('select data from other where name = "phrase_old_page_warning"'))
-            db_data = curs.fetchall()
-            if db_data and db_data[0][0] != '':
-                div = db_data[0][0] + '<hr class="main_hr">' + div
-
-            doc_type = 'rev'
         
         if doc_type == '':
             curs.execute(db_change('select data from other where name = "outdated_doc_warning_date"'))
