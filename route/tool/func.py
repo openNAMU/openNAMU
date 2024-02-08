@@ -1406,7 +1406,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                     get_class_render[0] = '''
                         <style>
                             .opennamu_render_complete {
-                                font-size: 14.4px !important;
+                                font-size: 15px !important;
                                 line-height: 1.5;
                             }
 
