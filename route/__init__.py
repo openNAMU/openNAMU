@@ -1,14 +1,11 @@
 from route.api_func_lang import api_func_lang
-from route.api_func_sha224 import api_func_sha224
 from route.api_image_view import api_image_view
 from route.api_w_raw import api_w_raw
-from route.api_w_render import api_w_render
 from route.api_recent_change import api_recent_change
 from route.api_recent_discuss import api_recent_discuss
 from route.api_search import api_search
 from route.api_setting import api_setting
 from route.api_skin_info import api_skin_info
-from route.api_title_index import api_title_index
 from route.api_topic import api_topic
 from route.api_user_info import api_user_info
 from route.api_version import api_version
@@ -162,7 +159,6 @@ from route.user_watch_list_name import user_watch_list_name
 from route.view_acl import view_acl
 from route.view_diff import view_diff
 from route.view_down import view_down
-from route.view_random import view_random
 from route.view_raw import view_raw_2
 from route.view_read import view_read
 from route.view_xref import view_xref
@@ -172,3 +168,7 @@ from route.vote_close import vote_close
 from route.vote_end import vote_end
 from route.vote_list import vote_list
 from route.vote_select import vote_select
+
+from route.go_api_func_sha224 import api_func_sha224
+
+from route.go_view_random import view_random
