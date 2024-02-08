@@ -665,7 +665,6 @@ app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['
 # Func-api
 # 폐지 예정
 app.route('/api/w_tool/<tool>/<everything:name>', methods = ['GET', 'POST'])(api_w)
-app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
 
 # app.route('/api/render_tool/<tool>/<everything:name>', methods = ['POST'])(api_w_render)
 # app.route('/api/render_tool/<tool>', methods = ['POST'])(api_w_render)
@@ -683,7 +682,7 @@ app.route('/api/bbs/w/comment_one/<sub_code>')(api_bbs_w_comment)
 app.route('/api/version', defaults = { 'version_list' : version_list })(api_version)
 app.route('/api/skin_info')(api_skin_info)
 app.route('/api/skin_info/<name>')(api_skin_info)
-app.route('/api/user_info/<name>', methods = ['POST', 'GET'])(api_user_info)
+app.route('/api/user_info/<user_name>')(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
 app.route('/api/thread/<int:topic_num>/<tool>/<int:num>/<render>')(api_topic)
@@ -703,11 +702,10 @@ app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss')(api_recent_discuss)
 
-app.route('/api/lang/<data>', methods = ['POST', 'GET'])(api_func_lang)
-app.route('/api/sha224/<everything:data>', methods = ['POST', 'GET'])(api_func_sha224)
+app.route('/api/lang/<data>')(api_func_lang)
+app.route('/api/sha224/<everything:data>')(api_func_sha224)
 
-app.route('/api/title_index')(api_title_index)
-app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])(api_image_view)
+app.route('/api/image/<everything:name>')(api_image_view)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정

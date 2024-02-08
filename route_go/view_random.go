@@ -10,8 +10,8 @@ import (
 
 func main() {
 	call_arg := os.Args[1:]
-	db_set := map[string]string{}
 
+	db_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &db_set)
 
 	db := tool.DB_connect(db_set)
