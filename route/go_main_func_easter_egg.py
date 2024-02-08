@@ -13,14 +13,16 @@ def main_func_easter_egg():
     
         if platform.system() == 'Linux':
             if platform.machine() in ["AMD64", "x86_64"]:
-                data = os.popen(os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".amd64.bin")).read()
+                data = subprocess.Popen([os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".amd64.bin")], stdout = subprocess.PIPE).communicate()[0]
             else:
-                data = os.popen(os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".arm64.bin")).read()
+                data = subprocess.Popen([os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".arm64.bin")], stdout = subprocess.PIPE).communicate()[0]
         else:
             if platform.machine() in ["AMD64", "x86_64"]:
-                data = os.popen(os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".amd64.exe")).read()
+                data = subprocess.Popen([os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".amd64.exe")], stdout = subprocess.PIPE).communicate()[0]
             else:
-                data = os.popen(os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".arm64.exe")).read()
+                data = subprocess.Popen([os.path.join(".", "route_go", "bin", sys._getframe().f_code.co_name + ".arm64.exe")], stdout = subprocess.PIPE).communicate()[0]
+
+        data = data.decode('utf8')
 
         return easy_minify(flask.render_template(skin_check(),
             imp = ['Easter Egg', wiki_set(), wiki_custom(), wiki_css([0, 0])],

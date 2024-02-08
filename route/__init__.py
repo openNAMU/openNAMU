@@ -74,7 +74,6 @@ from route.login_register_email import login_register_email_2
 from route.login_register_email_check import login_register_email_check_2
 from route.login_register_submit import login_register_submit_2
 
-from route.main_func_easter_egg import main_func_easter_egg
 from route.main_func_error_404 import main_func_error_404
 
 from route.main_search import main_search
@@ -172,3 +171,5 @@ from route.vote_select import vote_select
 from route.go_api_func_sha224 import api_func_sha224
 
 from route.go_view_random import view_random
+
+from route.go_main_func_easter_egg import main_func_easter_egg
