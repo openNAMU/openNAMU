@@ -107,7 +107,7 @@ from route.main_view_image import main_view_image
 
 from route.recent_app_submit import recent_app_submit_2
 
-from route.recent_block import recent_block_2
+from route.recent_block import recent_block
 from route.recent_change import recent_change
 from route.recent_discuss import recent_discuss
 from route.recent_history_add import recent_history_add
