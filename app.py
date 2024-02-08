@@ -452,13 +452,9 @@ app.route('/list/user/check/<name>/<do_type>/<int:arg_num>/<plus_name>')(list_us
 app.route('/list/user/check/delete/<name>/<ip>/<time>/<do_type>', methods = ['POST', 'GET'])(list_user_check_delete)
 
 # Func-auth
-# /auth/give
-# /auth/give/<name>
 app.route('/auth/give', methods = ['POST', 'GET'])(give_auth)
 app.route('/auth/give/<name>', methods = ['POST', 'GET'])(give_auth)
 
-# /auth/give
-# /auth/give/<name>
 app.route('/auth/give/ban', methods = ['POST', 'GET'])(give_user_ban)
 app.route('/auth/give/ban/<everything:name>', methods = ['POST', 'GET'])(give_user_ban)
 app.route('/auth/give/ban_regex/<everything:name>', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'regex' })(give_user_ban)
@@ -477,9 +473,16 @@ app.route('/app_submit', methods = ['POST', 'GET'])(recent_app_submit_2)
 
 # /auth/history
 # ongoing 반영 필요
-app.route('/block_log')(recent_block_2)
-app.route('/block_log/<regex("user"):tool>/<name>')(recent_block_2)
-app.route('/block_log/<regex("admin"):tool>/<name>')(recent_block_2)
+app.route('/block_log')(recent_block)
+app.route('/block_log/<int:num>')(recent_block)
+app.route('/block_log/user/<name>', defaults = { 'tool' : 'user' })(recent_block)
+app.route('/block_log/user/<name>/<int:num>', defaults = { 'tool' : 'user' })(recent_block)
+app.route('/block_log/admin/<name>', defaults = { 'tool' : 'admin' })(recent_block)
+app.route('/block_log/admin/<name>/<int:num>', defaults = { 'tool' : 'admin' })(recent_block)
+app.route('/block_log/regex', defaults = { 'tool' : 'regex' })(recent_block)
+app.route('/block_log/regex/<int:num>', defaults = { 'tool' : 'regex' })(recent_block)
+app.route('/block_log/ongoing', defaults = { 'tool' : 'ongoing' })(recent_block)
+app.route('/block_log/ongoing/<int:num>', defaults = { 'tool' : 'ongoing' })(recent_block)
 
 # Func-history
 app.route('/recent_change', defaults = { 'tool' : 'recent' })(recent_change)
