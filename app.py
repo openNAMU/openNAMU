@@ -452,13 +452,9 @@ app.route('/list/user/check/<name>/<do_type>/<int:arg_num>/<plus_name>')(list_us
 app.route('/list/user/check/delete/<name>/<ip>/<time>/<do_type>', methods = ['POST', 'GET'])(list_user_check_delete)
 
 # Func-auth
-# /auth/give
-# /auth/give/<name>
 app.route('/auth/give', methods = ['POST', 'GET'])(give_auth)
 app.route('/auth/give/<name>', methods = ['POST', 'GET'])(give_auth)
 
-# /auth/give
-# /auth/give/<name>
 app.route('/auth/give/ban', methods = ['POST', 'GET'])(give_user_ban)
 app.route('/auth/give/ban/<everything:name>', methods = ['POST', 'GET'])(give_user_ban)
 app.route('/auth/give/ban_regex/<everything:name>', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'regex' })(give_user_ban)
@@ -477,9 +473,16 @@ app.route('/app_submit', methods = ['POST', 'GET'])(recent_app_submit_2)
 
 # /auth/history
 # ongoing 반영 필요
-app.route('/block_log')(recent_block_2)
-app.route('/block_log/<regex("user"):tool>/<name>')(recent_block_2)
-app.route('/block_log/<regex("admin"):tool>/<name>')(recent_block_2)
+app.route('/block_log')(recent_block)
+app.route('/block_log/<int:num>')(recent_block)
+app.route('/block_log/user/<name>', defaults = { 'tool' : 'user' })(recent_block)
+app.route('/block_log/user/<name>/<int:num>', defaults = { 'tool' : 'user' })(recent_block)
+app.route('/block_log/admin/<name>', defaults = { 'tool' : 'admin' })(recent_block)
+app.route('/block_log/admin/<name>/<int:num>', defaults = { 'tool' : 'admin' })(recent_block)
+app.route('/block_log/regex', defaults = { 'tool' : 'regex' })(recent_block)
+app.route('/block_log/regex/<int:num>', defaults = { 'tool' : 'regex' })(recent_block)
+app.route('/block_log/ongoing', defaults = { 'tool' : 'ongoing' })(recent_block)
+app.route('/block_log/ongoing/<int:num>', defaults = { 'tool' : 'ongoing' })(recent_block)
 
 # Func-history
 app.route('/recent_change', defaults = { 'tool' : 'recent' })(recent_change)
@@ -523,7 +526,6 @@ app.route('/down/<everything:name>')(view_down)
 app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_acl)
 
 # everything 다음에 추가 붙은 경우에 대해서 재검토 필요 (진행중)
-app.route('/w_rev/<int(signed = True):doc_rev>/<everything:name>')(view_read)
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_read)
 app.route('/w/<everything:name>')(view_read)
 
@@ -589,6 +591,8 @@ app.route('/user')(user_info)
 app.route('/user/<name>')(user_info)
 
 app.route('/challenge', methods = ['GET', 'POST'])(user_challenge)
+
+app.route('/edit_filter/<name>', methods = ['GET', 'POST'])(user_edit_filter)
 
 app.route('/count')(user_count)
 app.route('/count/<name>')(user_count)
@@ -662,15 +666,10 @@ app.route('/bbs/edit/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['PO
 app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_delete)
 
 # Func-api
-# 폐지 예정
-app.route('/api/w_rev/<int(signed = True):rev>/<tool>/<everything:name>', methods = ['GET', 'POST'])(api_w)
-app.route('/api/w_tool/<tool>/<everything:name>', methods = ['GET', 'POST'])(api_w)
-app.route('/api/w/<everything:name>', methods = ['GET', 'POST'])(api_w)
-
 # app.route('/api/render_tool/<tool>/<everything:name>', methods = ['POST'])(api_w_render)
 # app.route('/api/render_tool/<tool>', methods = ['POST'])(api_w_render)
-# app.route('/api/render/<everything:name>', methods = ['POST'])(api_w_render)
-# app.route('/api/render', methods = ['POST'])(api_w_render)
+app.route('/api/render/<everything:name>', methods = ['POST'])(api_w_render)
+app.route('/api/render', methods = ['POST'])(api_w_render)
 
 app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on' })(api_w_raw)
 app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>')(api_w_raw)
@@ -683,7 +682,7 @@ app.route('/api/bbs/w/comment_one/<sub_code>')(api_bbs_w_comment)
 app.route('/api/version', defaults = { 'version_list' : version_list })(api_version)
 app.route('/api/skin_info')(api_skin_info)
 app.route('/api/skin_info/<name>')(api_skin_info)
-app.route('/api/user_info/<name>', methods = ['POST', 'GET'])(api_user_info)
+app.route('/api/user_info/<user_name>')(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
 app.route('/api/thread/<int:topic_num>/<tool>/<int:num>/<render>')(api_topic)
@@ -703,11 +702,10 @@ app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss')(api_recent_discuss)
 
-app.route('/api/lang/<data>', methods = ['POST', 'GET'])(api_func_lang)
-app.route('/api/sha224/<everything:data>', methods = ['POST', 'GET'])(api_func_sha224)
+app.route('/api/lang/<data>')(api_func_lang)
+app.route('/api/sha224/<everything:data>')(api_func_sha224)
 
-app.route('/api/title_index')(api_title_index)
-app.route('/api/image/<everything:name>', methods = ['POST', 'GET'])(api_image_view)
+app.route('/api/image/<everything:name>')(api_image_view)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정

@@ -3,12 +3,9 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"time"
 )
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-
 	select_list := []string{
 		"PWD0ZbR7AOY", // Shanghai Teahouse ~ Chinese Tea
 		"HoU29ljOmTE", // Flawless Clothing of Celestials

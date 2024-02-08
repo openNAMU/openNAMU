@@ -53,13 +53,9 @@ def main_search_deep(name = 'Test', search_type = 'title', num = 1):
             '''
 
             if search_type == 'title':
-                curs.execute(db_change("select title from data where title like ? collate nocase order by title limit ?, 50"),
-                    ['%' + name + '%', sql_num]
-                )
+                curs.execute(db_change("select title from data where title like ? collate nocase order by title limit ?, 50"), ['%' + name + '%', sql_num])
             else:
-                curs.execute(db_change("select title from data where data like ? collate nocase order by title limit ?, 50"),
-                    ['%' + name + '%', sql_num]
-                )
+                curs.execute(db_change("select title from data where data like ? collate nocase order by title limit ?, 50"), ['%' + name + '%', sql_num])
 
             all_list = curs.fetchall()
             for data in all_list:

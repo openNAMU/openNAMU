@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
+def view_read(name = 'Test', do_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -18,7 +18,6 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
             
         uppage = re.sub(r"/([^/]+)$", '', name)
         uppage = 0 if uppage == name else uppage
-        num = str(doc_rev)
 
         curs.execute(db_change("select sub from rd where title = ? and not stop = 'O' order by date desc"), [name])
         topic = 1 if curs.fetchall() else 0
@@ -161,14 +160,7 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
         else:
             name_view = name
 
-        if num != '':
-            curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
-            if curs.fetchall() and admin_check(6) != 1:
-                return redirect('/history/' + url_pas(name))
-
-            curs.execute(db_change("select data from history where title = ? and id = ?"), [name, num])
-        else:
-            curs.execute(db_change("select data from data where title = ?"), [name])
+        curs.execute(db_change("select data from data where title = ?"), [name])
 
         data = curs.fetchall()
         end_data = render_set(
@@ -217,44 +209,39 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
         else:
             response_data = 200
 
-        if num != '':
-            menu += [['history/' + url_pas(name), load_lang('return')]]
-            sub = ' (r' + str(num) + ')'
-            acl = 0
-            r_date = 0
+        curs.execute(db_change("select title from acl where title = ?"), [name])
+        acl = 1 if curs.fetchall() else 0
+        menu_acl = 1 if acl_check(name) == 1 else 0
+        if response_data == 404:
+            menu += [['edit/' + url_pas(name), load_lang('create'), menu_acl]] 
         else:
-            curs.execute(db_change("select title from acl where title = ?"), [name])
-            acl = 1 if curs.fetchall() else 0
-            menu_acl = 1 if acl_check(name) == 1 else 0
-            if response_data == 404:
-                menu += [['edit/' + url_pas(name), load_lang('create'), menu_acl]] 
-            else:
-                menu += [['edit/' + url_pas(name), load_lang('edit'), menu_acl]]
+            menu += [['edit/' + url_pas(name), load_lang('edit'), menu_acl]]
 
-            menu += [
-                ['topic/' + url_pas(name), load_lang('discussion'), topic], 
-                ['history/' + url_pas(name), load_lang('history')], 
-                ['xref/' + url_pas(name), load_lang('backlink')], 
-                ['acl/' + url_pas(name), load_lang('setting'), acl],
-            ]
+        menu += [
+            ['topic/' + url_pas(name), load_lang('discussion'), topic], 
+            ['history/' + url_pas(name), load_lang('history')], 
+            ['xref/' + url_pas(name), load_lang('backlink')], 
+            ['acl/' + url_pas(name), load_lang('setting'), acl],
+        ]
 
-            if flask.session and 'lastest_document' in flask.session:
-                if type(flask.session['lastest_document']) != type([]):
-                    flask.session['lastest_document'] = []
-            else:
+        if flask.session and 'lastest_document' in flask.session:
+            if type(flask.session['lastest_document']) != type([]):
                 flask.session['lastest_document'] = []
+        else:
+            flask.session['lastest_document'] = []
 
-            if do_type == 'from':
-                menu += [['w/' + url_pas(name), load_lang('pass')]]
-                
-                last_page = ''
-                for for_a in reversed(range(0, len(flask.session['lastest_document']))):
-                    last_page = flask.session['lastest_document'][for_a]
+        if do_type == 'from':
+            menu += [['w/' + url_pas(name), load_lang('pass')]]
+            
+            last_page = ''
+            for for_a in reversed(range(0, len(flask.session['lastest_document']))):
+                last_page = flask.session['lastest_document'][for_a]
 
-                    curs.execute(db_change("select link from back where (title = ? or link = ?) and type = 'redirect' limit 1"), [last_page, last_page])
-                    if curs.fetchall():
-                        break
+                curs.execute(db_change("select link from back where (title = ? or link = ?) and type = 'redirect' limit 1"), [last_page, last_page])
+                if curs.fetchall():
+                    break
 
+            if last_page != name:
                 redirect_text = '{0} ➤ {1}'
 
                 curs.execute(db_change('select data from other where name = "redirect_text"'))
@@ -269,53 +256,46 @@ def view_read(name = 'Test', doc_rev = '', doc_from = '', do_type = ''):
                     redirect_text = redirect_text.format('<a href="/w_from/' + url_pas(last_page) + '">' + html.escape(last_page) + '</a>', '<b>' + html.escape(name) + '</b>')
 
                 end_data = '''
-                    <div id="redirect">
+                    <div class="opennamu_redirect" id="redirect">
                         ''' + redirect_text + '''
                     </div>
                     <hr class="main_hr">
                 ''' + end_data
-                    
-            if len(flask.session['lastest_document']) >= 10:
-                flask.session['lastest_document'] = flask.session['lastest_document'][-9:] + [name]
-            else:
-                flask.session['lastest_document'] += [name]
-            
-            flask.session['lastest_document'] = list(reversed(dict.fromkeys(reversed(flask.session['lastest_document']))))
+                
+        if len(flask.session['lastest_document']) >= 10:
+            flask.session['lastest_document'] = flask.session['lastest_document'][-9:] + [name]
+        else:
+            flask.session['lastest_document'] += [name]
+        
+        flask.session['lastest_document'] = list(reversed(dict.fromkeys(reversed(flask.session['lastest_document']))))
 
-            view_history_on = get_main_skin_set(curs, flask.session, 'main_css_view_history', ip)
-            if view_history_on == 'on':
-                end_data = '' + \
-                    '<div id="redirect">' + \
-                        load_lang('trace') + ' : ' + \
-                        ' ➥ '.join(
-                            [
-                                '<a href="/w/' + url_pas(for_a) + '">' + html.escape(for_a) + '</a>'
-                                for for_a in flask.session['lastest_document']
-                            ]
-                        ) + \
-                    '</div>' + \
-                    '<hr class="main_hr">' + \
-                '' + end_data
+        view_history_on = get_main_skin_set(curs, flask.session, 'main_css_view_history', ip)
+        if view_history_on == 'on':
+            end_data = '' + \
+                '<div class="opennamu_trace">' + \
+                    '<a class="opennamu_trace_button" href="javascript:opennamu_do_trace_spread();"> (+)</a>' + \
+                    load_lang('trace') + ' : ' + \
+                    ' ➥ '.join(
+                        [
+                            '<a href="/w/' + url_pas(for_a) + '">' + html.escape(for_a) + '</a>'
+                            for for_a in flask.session['lastest_document']
+                        ]
+                    ) + \
+                '</div>' + \
+                '<hr class="main_hr">' + \
+            '' + end_data
 
-            if uppage != 0:
-                menu += [['w/' + url_pas(uppage), load_lang('upper')]]
+        if uppage != 0:
+            menu += [['w/' + url_pas(uppage), load_lang('upper')]]
 
-            if down:
-                menu += [['down/' + url_pas(name), load_lang('sub')]]
+        if down:
+            menu += [['down/' + url_pas(name), load_lang('sub')]]
 
-            curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'last_edit'"), [name])
-            r_date = curs.fetchall()
-            r_date = r_date[0][0] if r_date else 0
+        curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'last_edit'"), [name])
+        r_date = curs.fetchall()
+        r_date = r_date[0][0] if r_date else 0
 
         div = file_data + user_doc + end_data + category_total
-
-        if num != '':
-            curs.execute(db_change('select data from other where name = "phrase_old_page_warning"'))
-            db_data = curs.fetchall()
-            if db_data and db_data[0][0] != '':
-                div = db_data[0][0] + '<hr class="main_hr">' + div
-
-            doc_type = 'rev'
         
         if doc_type == '':
             curs.execute(db_change('select data from other where name = "outdated_doc_warning_date"'))

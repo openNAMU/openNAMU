@@ -30,7 +30,4 @@ def main_view(name = ''):
                 else:
                     mime_type = 'text/' + mime_type
 
-            return flask.send_from_directory(
-                dir_name, file_name, 
-                mimetype = mime_type
-            )
+            return flask.send_from_directory(dir_name, file_name, mimetype = mime_type)

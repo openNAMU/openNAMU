@@ -1043,9 +1043,9 @@ def wiki_css(data):
     data += ['' for _ in range(0, 3 - len(data))]
     
     data_css = ''
-    data_css_add = ''
+    data_css_dark = ''
 
-    data_css_ver = '191'
+    data_css_ver = '194'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:
@@ -1081,16 +1081,23 @@ def wiki_css(data):
 
         # External CSS
         data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">'
+        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
     
         global_wiki_set['main_css'] = data_css
 
     # Darkmode
-    if flask.request.cookies.get('main_css_darkmode', '0') == '0':
-        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+    if 'dark_main_css' in global_wiki_set:
+        data_css_dark = global_wiki_set['dark_main_css']
     else:
-        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+        # Main CSS
+        data_css_dark += '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css' + data_css_ver + '">'
 
-    data = data[0:2] + ['', data_css_add + data_css] + data[2:]
+        # External CSS
+        data_css_dark += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+
+        global_wiki_set['dark_main_css'] = data_css_dark
+
+    data = data[0:2] + ['', data_css] + data[2:] + [data_css_dark]
 
     return data
 
@@ -1399,7 +1406,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', d
                     get_class_render[0] = '''
                         <style>
                             .opennamu_render_complete {
-                                font-size: 14.4px !important;
+                                font-size: 15px !important;
                                 line-height: 1.5;
                             }
 
@@ -1750,9 +1757,7 @@ def get_admin_list(num = None):
         curs = conn.cursor()
         
         if num == 'all':
-            curs.execute(db_change(
-                "select data from user_set where data != 'user' and name = 'acl'"
-            ))
+            curs.execute(db_change("select data from user_set where data != 'user' and name = 'acl'"))
             db_data = curs.fetchall()
             db_data = [db_data_in[0] for db_data_in in db_data] if db_data else []
             
@@ -1761,14 +1766,10 @@ def get_admin_list(num = None):
             check = get_admin_auth_list(num)
             admin_list = []
             
-            curs.execute(db_change(
-                'select name from alist where acl = ?'
-            ), [check])
+            curs.execute(db_change('select name from alist where acl = ?'), [check])
             db_data = curs.fetchall()
             for db_data_in in db_data:
-                curs.execute(db_change(
-                    "select id from user_set where data = ? and name = 'acl'"
-                ), [db_data_in[0]])
+                curs.execute(db_change("select id from user_set where data = ? and name = 'acl'"), [db_data_in[0]])
                 db_data_2 = curs.fetchall()
                 admin_list += [db_data_2_in[0] for db_data_2_in in db_data_2] if db_data_2 else []
                 
@@ -1834,9 +1835,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 if get_ban == 1:
                     return 1
                     
-                curs.execute(db_change(
-                    "select data from acl where title = ? and type = 'decu'"
-                ), [name])
+                curs.execute(db_change("select data from acl where title = ? and type = 'decu'"), [name])
                 acl_data = curs.fetchall()
                 if acl_data:
                     if acl_data[0][0] == 'all':
@@ -2300,6 +2299,7 @@ def do_edit_filter(data):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
+        ip = ip_check()
         if admin_check(1) != 1:
             curs.execute(db_change("select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''"))
             for data_list in curs.fetchall():
@@ -2314,9 +2314,12 @@ def do_edit_filter(data):
                         r_time = (time + plus).strftime("%Y-%m-%d %H:%M:%S")
                     else:
                         r_time = '0'
-                
+
+                    curs.execute(db_change('delete from user_set where name = "edit_filter" and id = ?'), [ip])
+                    curs.execute(db_change('insert into user_set (name, id, data) values ("edit_filter", ?, ?)'), [ip, data])
+
                     ban_insert(
-                        ip_check(),
+                        ip,
                         r_time,
                         'edit filter',
                         None,

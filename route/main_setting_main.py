@@ -26,7 +26,6 @@ def main_setting_main(db_set):
             22 : ['domain', ''],
             23 : ['ua_get', ''],
             24 : ['enable_comment', ''],
-            25 : ['enable_challenge', ''],
             26 : ['edit_bottom_compulsion', ''],
             27 : ['http_select', 'http'],
             28 : ['title_max_length', ''],
@@ -93,7 +92,7 @@ def main_setting_main(db_set):
                 else:
                     tls_select += '<option value="' + tls_select_one + '">' + tls_select_one + '</option>'
 
-            check_box_div = [7, 8, '', 20, 23, 24, 25, 26, 31, 33, 34, 35, 36, 37, 44, 45]
+            check_box_div = [7, 8, '', 20, 23, 24, '', 26, 31, 33, 34, 35, 36, 37, 44, 45]
             for i in range(0, len(check_box_div)):
                 acl_num = check_box_div[i]
                 if acl_num != '' and d_list[acl_num]:
@@ -154,11 +153,6 @@ def main_setting_main(db_set):
                         <hr class="main_hr">
                         <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
                         <hr class="main_hr">
-
-                        <span>''' + load_lang('encryption_method') + '''</span>
-                        <hr class="main_hr">
-                        <select name="encode">''' + encode_select + '''</select>
-                        <hr class="main_hr">
                         
                         <input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + load_lang('set_wiki_access_password_need') + ''' (''' + load_lang('restart_required') + ''')
                         <hr class="main_hr">
@@ -180,9 +174,6 @@ def main_setting_main(db_set):
                         <h3>''' + load_lang('communication_set') + '''</h3>
                         
                         <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + load_lang('enable_comment_function') + ''' (''' + load_lang('not_working') + ''')
-                        <hr class="main_hr">
-
-                        <input type="checkbox" name="enable_challenge" ''' + check_box_div[6] + '''> ''' + load_lang('enable_challenge_function') + ''' (''' + load_lang('not_working') + ''')
                         <hr class="main_hr">
 
                         <input type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + load_lang('display_level_in_user_name') + '''
@@ -219,6 +210,11 @@ def main_setting_main(db_set):
                         <span>''' + load_lang('password_min_length') + '''</span> (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="password_min_length" value="''' + html.escape(d_list[30]) + '''">
+                        <hr class="main_hr">
+
+                        <span>''' + load_lang('encryption_method') + '''</span>
+                        <hr class="main_hr">
+                        <select name="encode">''' + encode_select + '''</select>
 
                         <h3>''' + load_lang('ua') + '''</h3>
                         

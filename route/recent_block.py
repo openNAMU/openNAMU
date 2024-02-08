@@ -1,10 +1,9 @@
 from .tool.func import *
 
-def recent_block_2(name = 'Test', tool = 'all'):
+def recent_block(name = 'Test', tool = 'all', num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        num = int(number_check(flask.request.args.get('num', '1')))
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
         div = '''
@@ -17,80 +16,47 @@ def recent_block_2(name = 'Test', tool = 'all'):
                     </tr>
         '''
 
-        get_type = flask.request.args.get('type', '')
-        sub_type = flask.request.args.get('s_type', '')
+        div = '' + \
+            '<a href="/block_log">(' + load_lang('all') + ')</a> ' + \
+            '<a href="/manager/11">(' + load_lang('blocked') + ')</a> ' + \
+            '<a href="/manager/12">(' + load_lang('admin') + ')</a> ' + \
+            '<a href="/block_log/ongoing">(' + load_lang('in_progress') + ')</a> ' + \
+            '<a href="/block_log/regex">(' + load_lang('regex') + ')</a>' + \
+            '<hr class="main_hr">' + \
+        '' + div
+
         if tool == 'all':
-            if get_type == 'ongoing':
-                sub = ' (' + load_lang('in_progress') + ')'
+            sub = 0
+            menu = [['other', load_lang('return')]]
 
-                if sub_type == '':
-                    div = '' + \
-                        '<a href="?type=ongoing&s_type=regex">(' + load_lang('regex') + ')</a> ' + \
-                        '<a href="?type=ongoing&s_type=normal">(' + load_lang('normal') + ')</a>' + \
-                        '<hr class="main_hr">' + \
-                    '' + div
-                    menu = [['block_log', load_lang('return')]]
-                    plus_sql = ''
-                else:
-                    menu = [['block_log?type=ongoing', load_lang('return')]]
+            curs.execute(db_change("select why, block, blocker, end, today, band, ongoing from rb order by today desc limit ?, 50"), [sql_num])
+        elif tool == 'ongoing':
+            sub = '(' + load_lang('in_progress') + ')'
+            menu = [['other', load_lang('return')]]
 
-                    if sub_type == 'regex':
-                        sub += ' (' + load_lang('regex') + ')'
-                        plus_sql = 'and band = \'regex\' '
-                    else:
-                        sub += ' (' + load_lang('normal') + ')'
-                        plus_sql = 'and band = \'\' '
+            curs.execute(db_change("select why, block, blocker, end, today, band, ongoing from rb where ongoing = '1' order by end desc limit ?, 50"), [sql_num])
+        elif tool == 'regex':
+            sub = '(' + load_lang('regex') + ')'
+            menu = [['other', load_lang('return')]]
 
-                curs.execute(db_change("" + \
-                    "select why, block, blocker, end, today, band, ongoing from rb " + \
-                    "where ((end > ? and end like '2%') or end = '') and ongoing = '1' " + plus_sql + \
-                    "order by end desc limit ?, 50" + \
-                ""), [
-                    get_time(),
-                    sql_num
-                ])
-            else:
-                sub = 0
-                menu = 0
-
-                div = '' + \
-                    '<a href="/manager/11">(' + load_lang('blocked') + ')</a> ' + \
-                    '<a href="/manager/12">(' + load_lang('admin') + ')</a> ' + \
-                    '<a href="?type=ongoing">(' + load_lang('in_progress') + ')</a>' + \
-                    '<hr class="main_hr">' + \
-                '' + div
-
-                curs.execute(db_change("" + \
-                    "select why, block, blocker, end, today, band, ongoing " + \
-                    "from rb order by today desc limit ?, 50" + \
-                ""), [sql_num])
+            curs.execute(db_change("select why, block, blocker, end, today, band, ongoing from rb where band = 'regex' order by today desc limit ?, 50"), [sql_num])
         elif tool == 'user':
-            sub = ' (' + load_lang('blocked') + ')'
-            menu = [['block_log', load_lang('normal')]]
+            sub = '(' + load_lang('blocked') + ')'
+            menu = [['other', load_lang('return')]]
 
-            curs.execute(db_change("" + \
-                "select why, block, blocker, end, today, band, ongoing " + \
-                "from rb where block = ? order by today desc limit ?, 50" + \
-            ""), [
-                name, 
-                sql_num
-            ])
+            curs.execute(db_change("select why, block, blocker, end, today, band, ongoing from rb where block = ? order by today desc limit ?, 50"), [name, sql_num])
         else:
-            sub = ' (' + load_lang('admin') + ')'
-            menu = [['block_log', load_lang('normal')]]
+            sub = '(' + load_lang('admin') + ')'
+            menu = [['other', load_lang('return')]]
 
-            curs.execute(db_change("" + \
-                "select why, block, blocker, end, today, band, ongoing " + \
-                "from rb where blocker = ? order by today desc limit ?, 50" + \
-            ""), [
-                name, 
-                sql_num
-            ])
+            curs.execute(db_change("select why, block, blocker, end, today, band, ongoing from rb where blocker = ? order by today desc limit ?, 50"), [name, sql_num])
 
         data_list = curs.fetchall()
         all_ip = ip_pas([i[1] for i in data_list] + [i[2] for i in data_list])
         for data in data_list:
             why = '<br>' if data[0] == '' else html.escape(data[0])
+            if why == 'edit filter':
+                why = '<a href="/edit_filter/' + url_pas(data[1]) + '">edit filter</a>'
 
             if data[5] == 'regex':
                 ip = data[1]
@@ -135,9 +101,9 @@ def recent_block_2(name = 'Test', tool = 'all'):
         div += '</table>'
 
         if tool == 'all':
-            div += next_fix('/block_log?num=', num, data_list)
+            div += next_fix('/block_log/', num, data_list)
         else:
-            div += next_fix('/block_log/' + url_pas(tool) + '/' + url_pas(name) + '?num=', num, data_list)
+            div += next_fix('/block_log/' + url_pas(tool) + '/' + url_pas(name) + '/', num, data_list)
 
         return easy_minify(flask.render_template(skin_check(),
             imp = [load_lang('recent_ban'), wiki_set(), wiki_custom(), wiki_css([sub, 0])],
