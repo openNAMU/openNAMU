@@ -1,18 +1,15 @@
 from route.api_func_lang import api_func_lang
-from route.api_func_sha224 import api_func_sha224
 from route.api_image_view import api_image_view
 from route.api_w_raw import api_w_raw
-from route.api_w_render import api_w_render
 from route.api_recent_change import api_recent_change
 from route.api_recent_discuss import api_recent_discuss
 from route.api_search import api_search
 from route.api_setting import api_setting
 from route.api_skin_info import api_skin_info
-from route.api_title_index import api_title_index
 from route.api_topic import api_topic
 from route.api_user_info import api_user_info
 from route.api_version import api_version
-from route.api_w import api_w
+from route.api_w_render import api_w_render
 from route.api_bbs_w_post import api_bbs_w_post
 from route.api_bbs_w_comment import api_bbs_w_comment
 from route.api_bbs_w_comment_one import api_bbs_w_comment_one
@@ -77,7 +74,6 @@ from route.login_register_email import login_register_email_2
 from route.login_register_email_check import login_register_email_check_2
 from route.login_register_submit import login_register_submit_2
 
-from route.main_func_easter_egg import main_func_easter_egg
 from route.main_func_error_404 import main_func_error_404
 
 from route.main_search import main_search
@@ -111,7 +107,7 @@ from route.main_view_image import main_view_image
 
 from route.recent_app_submit import recent_app_submit_2
 
-from route.recent_block import recent_block_2
+from route.recent_block import recent_block
 from route.recent_change import recent_change
 from route.recent_discuss import recent_discuss
 from route.recent_history_add import recent_history_add
@@ -140,6 +136,7 @@ from route.user_alarm_delete import user_alarm_delete
 from route.user_challenge import user_challenge
 from route.user_count import user_count
 from route.user_info import user_info
+from route.user_edit_filter import user_edit_filter
 
 from route.user_setting import user_setting
 from route.user_setting_email import user_setting_email_2
@@ -161,7 +158,6 @@ from route.user_watch_list_name import user_watch_list_name
 from route.view_acl import view_acl
 from route.view_diff import view_diff
 from route.view_down import view_down
-from route.view_random import view_random
 from route.view_raw import view_raw_2
 from route.view_read import view_read
 from route.view_xref import view_xref
@@ -171,3 +167,9 @@ from route.vote_close import vote_close
 from route.vote_end import vote_end
 from route.vote_list import vote_list
 from route.vote_select import vote_select
+
+from route.go_api_func_sha224 import api_func_sha224
+
+from route.go_view_random import view_random
+
+from route.go_main_func_easter_egg import main_func_easter_egg
