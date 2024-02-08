@@ -1757,9 +1757,7 @@ def get_admin_list(num = None):
         curs = conn.cursor()
         
         if num == 'all':
-            curs.execute(db_change(
-                "select data from user_set where data != 'user' and name = 'acl'"
-            ))
+            curs.execute(db_change("select data from user_set where data != 'user' and name = 'acl'"))
             db_data = curs.fetchall()
             db_data = [db_data_in[0] for db_data_in in db_data] if db_data else []
             
@@ -1768,14 +1766,10 @@ def get_admin_list(num = None):
             check = get_admin_auth_list(num)
             admin_list = []
             
-            curs.execute(db_change(
-                'select name from alist where acl = ?'
-            ), [check])
+            curs.execute(db_change('select name from alist where acl = ?'), [check])
             db_data = curs.fetchall()
             for db_data_in in db_data:
-                curs.execute(db_change(
-                    "select id from user_set where data = ? and name = 'acl'"
-                ), [db_data_in[0]])
+                curs.execute(db_change("select id from user_set where data = ? and name = 'acl'"), [db_data_in[0]])
                 db_data_2 = curs.fetchall()
                 admin_list += [db_data_2_in[0] for db_data_2_in in db_data_2] if db_data_2 else []
                 
@@ -1841,9 +1835,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 if get_ban == 1:
                     return 1
                     
-                curs.execute(db_change(
-                    "select data from acl where title = ? and type = 'decu'"
-                ), [name])
+                curs.execute(db_change("select data from acl where title = ? and type = 'decu'"), [name])
                 acl_data = curs.fetchall()
                 if acl_data:
                     if acl_data[0][0] == 'all':
@@ -2307,6 +2299,7 @@ def do_edit_filter(data):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
+        ip = ip_check()
         if admin_check(1) != 1:
             curs.execute(db_change("select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''"))
             for data_list in curs.fetchall():
@@ -2321,9 +2314,12 @@ def do_edit_filter(data):
                         r_time = (time + plus).strftime("%Y-%m-%d %H:%M:%S")
                     else:
                         r_time = '0'
-                
+
+                    curs.execute(db_change('delete from user_set where name = "edit_filter" and id = ?'), [ip])
+                    curs.execute(db_change('insert into user_set (name, id, data) values ("edit_filter", ?, ?)'), [ip, data])
+
                     ban_insert(
-                        ip_check(),
+                        ip,
                         r_time,
                         'edit filter',
                         None,

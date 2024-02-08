@@ -91,6 +91,8 @@ def recent_block_2(name = 'Test', tool = 'all'):
         all_ip = ip_pas([i[1] for i in data_list] + [i[2] for i in data_list])
         for data in data_list:
             why = '<br>' if data[0] == '' else html.escape(data[0])
+            if why == 'edit filter':
+                why = '<a href="/edit_filter/' + url_pas(data[1]) + '">edit filter</a>'
 
             if data[5] == 'regex':
                 ip = data[1]
