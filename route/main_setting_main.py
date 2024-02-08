@@ -153,11 +153,6 @@ def main_setting_main(db_set):
                         <hr class="main_hr">
                         <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
                         <hr class="main_hr">
-
-                        <span>''' + load_lang('encryption_method') + '''</span>
-                        <hr class="main_hr">
-                        <select name="encode">''' + encode_select + '''</select>
-                        <hr class="main_hr">
                         
                         <input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + load_lang('set_wiki_access_password_need') + ''' (''' + load_lang('restart_required') + ''')
                         <hr class="main_hr">
@@ -215,6 +210,11 @@ def main_setting_main(db_set):
                         <span>''' + load_lang('password_min_length') + '''</span> (''' + load_lang('off') + ''' : ''' + load_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="password_min_length" value="''' + html.escape(d_list[30]) + '''">
+                        <hr class="main_hr">
+
+                        <span>''' + load_lang('encryption_method') + '''</span>
+                        <hr class="main_hr">
+                        <select name="encode">''' + encode_select + '''</select>
 
                         <h3>''' + load_lang('ua') + '''</h3>
                         
