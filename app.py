@@ -663,13 +663,10 @@ app.route('/bbs/edit/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['PO
 app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_delete)
 
 # Func-api
-# 폐지 예정
-app.route('/api/w_tool/<tool>/<everything:name>', methods = ['GET', 'POST'])(api_w)
-
 # app.route('/api/render_tool/<tool>/<everything:name>', methods = ['POST'])(api_w_render)
 # app.route('/api/render_tool/<tool>', methods = ['POST'])(api_w_render)
-# app.route('/api/render/<everything:name>', methods = ['POST'])(api_w_render)
-# app.route('/api/render', methods = ['POST'])(api_w_render)
+app.route('/api/render/<everything:name>', methods = ['POST'])(api_w_render)
+app.route('/api/render', methods = ['POST'])(api_w_render)
 
 app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on' })(api_w_raw)
 app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>')(api_w_raw)

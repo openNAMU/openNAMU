@@ -9,7 +9,7 @@ from route.api_skin_info import api_skin_info
 from route.api_topic import api_topic
 from route.api_user_info import api_user_info
 from route.api_version import api_version
-from route.api_w import api_w
+from route.api_w_render import api_w_render
 from route.api_bbs_w_post import api_bbs_w_post
 from route.api_bbs_w_comment import api_bbs_w_comment
 from route.api_bbs_w_comment_one import api_bbs_w_comment_one
