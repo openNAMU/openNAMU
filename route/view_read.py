@@ -275,10 +275,10 @@ def view_read(name = 'Test', do_type = ''):
                 '<div class="opennamu_trace">' + \
                     '<a class="opennamu_trace_button" href="javascript:opennamu_do_trace_spread();"> (+)</a>' + \
                     load_lang('trace') + ' : ' + \
-                    ' ➥ '.join(
+                    ' ← '.join(
                         [
                             '<a href="/w/' + url_pas(for_a) + '">' + html.escape(for_a) + '</a>'
-                            for for_a in flask.session['lastest_document']
+                            for for_a in reversed(flask.session['lastest_document'])
                         ]
                     ) + \
                 '</div>' + \
