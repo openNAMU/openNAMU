@@ -1045,7 +1045,7 @@ def wiki_css(data):
     data_css = ''
     data_css_dark = ''
 
-    data_css_ver = '195'
+    data_css_ver = '196'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:
@@ -1222,15 +1222,12 @@ def wiki_custom():
 
             if admin_check('all') == 1:
                 user_admin = '1'
-                user_acl_list = []
 
                 curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
                 curs.execute(db_change('select acl from alist where name = ?'), [curs.fetchall()[0][0]])
                 user_acl = curs.fetchall()
-                for i in user_acl:
-                    user_acl_list += [i[0]]
-
-                user_acl_list = user_acl_list if user_acl != [] else '0'
+                user_acl_list = [for_a[0] for for_a in user_acl]
+                user_acl_list = user_acl_list if user_acl_list != [] else '0'
             else:
                 user_admin = '0'
                 user_acl_list = '0'
@@ -1252,10 +1249,7 @@ def wiki_custom():
         user_topic = '1' if curs.fetchall() else '0'
         
         split_path = flask.request.path.split('/')
-        if len(split_path) > 1:
-            split_path = split_path[1:]
-        else:
-            split_path = 0
+        split_path = split_path[1:] if len(split_path) > 1 else 0
 
         return [
             '',
@@ -1270,7 +1264,8 @@ def wiki_custom():
             user_acl_list,
             ip,
             user_topic,
-            split_path
+            split_path,
+            level_check(ip)
         ]
 
 def load_skin(data = '', set_n = 0, default = 0):
@@ -1775,6 +1770,32 @@ def get_admin_list(num = None):
                 
             return admin_list
 
+def level_check(ip = ''):
+    with get_db_connect() as conn:
+        curs = conn.cursor()
+    
+        if ip == '':
+            ip = ip_check()
+
+        level = '0'
+        exp = '0'
+        max_exp = '0'
+
+        curs.execute(db_change("select data from user_set where id = ? and name = 'level'"), [ip])
+        db_data = curs.fetchall()
+        if db_data:
+            level = db_data[0][0]
+
+        curs.execute(db_change("select data from user_set where id = ? and name = 'experience'"), [ip])
+        db_data = curs.fetchall()
+        if db_data:
+            exp = db_data[0][0]
+
+        if exp != '0':
+            max_exp = str(500 + (int(level) * 50))
+
+        return [level, exp, max_exp]
+
 def admin_check(num = None, what = None, name = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -2171,14 +2192,9 @@ def ip_pas(raw_ip, type_data = 0):
                     curs.execute(db_change("select data from other where name = 'user_name_level'"))
                     db_data = curs.fetchall()
                     if db_data and db_data[0][0] != '':
-                        level = '0'
+                        level_data = level_check(raw_ip)
 
-                        curs.execute(db_change("select data from user_set where id = ? and name = 'level'"), [raw_ip])
-                        db_data = curs.fetchall()
-                        if db_data:
-                            level = db_data[0][0]
-
-                        ip += '<sup>' + level + '</sup>'
+                        ip += '<sup>' + level_data[0] + '</sup>'
 
                     ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + ip + '</a>'
                     
