@@ -1045,7 +1045,7 @@ def wiki_css(data):
     data_css = ''
     data_css_dark = ''
 
-    data_css_ver = '194'
+    data_css_ver = '195'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:
@@ -2379,19 +2379,9 @@ def do_reload_recent_thread(topic_num, date, name = None, sub = None):
 
         curs.execute(db_change("select code from rd where code = ?"), [topic_num])
         if curs.fetchall():
-            curs.execute(db_change("update rd set date = ? where code = ?"), [
-                date, 
-                topic_num
-            ])
+            curs.execute(db_change("update rd set date = ? where code = ?"), [date, topic_num])
         else:
-            curs.execute(db_change(
-                "insert into rd (title, sub, code, date, band, stop, agree, acl) values (?, ?, ?, ?, '', '', '', '')"
-            ), [
-                name, 
-                sub, 
-                topic_num, 
-                date
-            ])
+            curs.execute(db_change("insert into rd (title, sub, code, date, band, stop, agree, acl) values (?, ?, ?, ?, '', '', '', '')"), [name, sub, topic_num, date])
 
 def add_alarm(to_user, from_user, context):
     with get_db_connect() as conn:
@@ -2406,9 +2396,7 @@ def add_alarm(to_user, from_user, context):
             if db_data:
                 count = str(int(db_data[0][0]) + 1)
 
-            curs.execute(db_change(
-                'insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'
-            ), [count, to_user, context, get_time()])
+            curs.execute(db_change('insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'), [count, to_user, context, get_time()])
     
 def add_user(user_name, user_pw, user_email = '', user_encode = ''):
     with get_db_connect() as conn:
@@ -2430,28 +2418,13 @@ def add_user(user_name, user_pw, user_email = '', user_encode = ''):
         else:
             user_auth = 'user'
 
-        curs.execute(db_change("insert into user_set (id, name, data) values (?, 'pw', ?)"), [
-            user_name,
-            user_pw_hash
-        ])
-        curs.execute(db_change("insert into user_set (id, name, data) values (?, 'acl', ?)"), [
-            user_name,
-            user_auth
-        ])
-        curs.execute(db_change("insert into user_set (id, name, data) values (?, 'date', ?)"), [
-            user_name,
-            get_time()
-        ])
-        curs.execute(db_change("insert into user_set (id, name, data) values (?, 'encode', ?)"), [
-            user_name,
-            data_encode
-        ])
+        curs.execute(db_change("insert into user_set (id, name, data) values (?, 'pw', ?)"), [user_name, user_pw_hash])
+        curs.execute(db_change("insert into user_set (id, name, data) values (?, 'acl', ?)"), [user_name, user_auth])
+        curs.execute(db_change("insert into user_set (id, name, data) values (?, 'date', ?)"), [user_name, get_time()])
+        curs.execute(db_change("insert into user_set (id, name, data) values (?, 'encode', ?)"), [user_name, data_encode])
         
         if user_email != '':
-            curs.execute(db_change("insert into user_set (name, id, data) values ('email', ?, ?)"), [
-                user_name,
-                user_email
-            ])
+            curs.execute(db_change("insert into user_set (name, id, data) values ('email', ?, ?)"), [user_name, user_email])
     
 def ua_plus(u_id, u_ip, u_agent, time):
     with get_db_connect() as conn:
@@ -2462,9 +2435,7 @@ def ua_plus(u_id, u_ip, u_agent, time):
         if rep_data and rep_data[0][0] != '':
             pass
         else:
-            curs.execute(db_change(
-                "insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"
-            ), [
+            curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [
                 u_id, 
                 u_ip, 
                 u_agent, 

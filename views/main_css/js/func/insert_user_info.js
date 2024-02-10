@@ -36,9 +36,9 @@ function do_insert_user_info_sub(name, lang_data_list, lang_data = {}, for_a = 0
                 
                 get_data_ban += lang_data['type'] + ' : ';
                 if(data['data']['ban']['type'] === 'normal') {
-                    get_data_ban += lang_data['normal']; 
+                    get_data_ban += '<a href="/block_log/user/' + opennamu_do_url_encode(name) + '">' + lang_data['normal'] + '</a>'; 
                 } else {
-                    get_data_ban += lang_data['regex'];
+                    get_data_ban += '<a href="/block_log/regex">' + lang_data['regex'] + '</a>';
                 }
                 get_data_ban += '<br>';
                 
@@ -58,7 +58,11 @@ function do_insert_user_info_sub(name, lang_data_list, lang_data = {}, for_a = 0
                 }
                 get_data_ban += '<br>';
                 
-                get_data_ban += lang_data['why'] + ' : ' + data['data']['ban']['reason'];
+                if(data['data']['ban']['reason'] === 'edit filter') {
+                    get_data_ban += lang_data['why'] + ' : <a href="/edit_filter/' + opennamu_do_url_encode(name) + '">' + data['data']['ban']['reason'] + '</a>';
+                } else {
+                    get_data_ban += lang_data['why'] + ' : ' + data['data']['ban']['reason'];
+                }
             }
 
             let level = '0';
