@@ -31,19 +31,10 @@ def api_user_info(user_name = ''):
         else:
             data_result['auth_date'] = '0'
 
-        curs.execute(db_change("select data from user_set where id = ? and name = 'level'"), [user_name])
-        db_data = curs.fetchall()
-        if db_data:
-            data_result['level'] = db_data[0][0]
-        else:
-            data_result['level'] = '0'
-
-        curs.execute(db_change("select data from user_set where id = ? and name = 'experience'"), [user_name])
-        db_data = curs.fetchall()
-        if db_data:
-            data_result['exp'] = db_data[0][0]
-        else:
-            data_result['exp'] = '0'
+        level_data = level_check(user_name)
+        data_result['level'] = level_data[0]
+        data_result['exp'] = level_data[1]
+        data_result['max_exp'] = level_data[2]
             
         # ban part
         if ban_check(user_name) == 0:

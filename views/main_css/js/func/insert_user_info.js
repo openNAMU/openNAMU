@@ -64,15 +64,6 @@ function do_insert_user_info_sub(name, lang_data_list, lang_data = {}, for_a = 0
                     get_data_ban += lang_data['why'] + ' : ' + data['data']['ban']['reason'];
                 }
             }
-
-            let level = '0';
-            let exp = '0';
-            let max_exp = '0';
-            if(get_data_auth !== lang_data['ip']) {
-                level = data['data']['level'];
-                exp = data['data']['exp'];
-                max_exp = String(500 + (Number(data['data']['level']) * 50));
-            }
             
             let end_data = '' +
                 '<table class="user_info_table">' +
@@ -90,7 +81,7 @@ function do_insert_user_info_sub(name, lang_data_list, lang_data = {}, for_a = 0
                     '</tr>' +
                     '<tr>' +
                         '<td>' + lang_data['level'] + '</td>' +
-                        '<td>' + level + ' (' + exp + ' / ' + max_exp + ')</td>' +
+                        '<td>' + data['data']['level'] + ' (' + data['data']['exp'] + ' / ' + data['data']['max_exp'] + ')</td>' +
                     '</tr>' +
                 '</table>' +
             '';
