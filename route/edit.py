@@ -179,7 +179,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
             curs.execute(db_change("select data from other where name = 'edit_timeout'"))
             db_data_2 = curs.fetchall()
-            db_data_2 = '' if not db_data_2 else number_check(db_data_2[0][0])
+            db_data_2 = number_check(db_data_2[0][0]) if db_data_2 and db_data_2[0][0] != '' else ''
 
             if db_data_2 != '' and platform.system() == 'Linux':
                 timeout = edit_timeout(edit_render_set, (name, content), timeout = int(db_data_2))

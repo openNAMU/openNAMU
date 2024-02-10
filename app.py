@@ -721,7 +721,7 @@ app.route('/search/<int:num>/<everything:name>', methods = ['POST', 'GET'])(main
 app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
 app.route('/search_data/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
 app.route('/goto', methods=['POST'])(main_search_goto)
-app.route('/goto/<everything:name>', methods=['POST'])(main_search_goto)
+app.route('/goto/<everything:name>', methods=['GET', 'POST'])(main_search_goto)
 
 app.route('/setting')(main_setting)
 app.route('/setting/main', defaults = { 'db_set' : data_db_set['type'] }, methods = ['POST', 'GET'])(main_setting_main)
