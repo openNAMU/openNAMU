@@ -4,6 +4,7 @@ def give_auth(name):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
+        ip = ip_check()
         owner_auth = admin_check()
         admin_auth = admin_check(7)
 
@@ -19,7 +20,7 @@ def give_auth(name):
             if curs.fetchall():
                 return re_error('/error/3')
 
-            if ip_check() == name:
+            if ip == name:
                 return re_error('/error/3')
 
         if flask.request.method == 'POST':
@@ -40,6 +41,10 @@ def give_auth(name):
             time_limit = flask.request.form.get('date', '')
             if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', time_limit):
                 curs.execute(db_change("insert into user_set (id, name, data) values (?, 'auth_date', ?)"), [name, time_limit])
+            else:
+                time_limit = ''
+
+            add_alarm(name, ip, 'Auth change to ' + select_data + (' (' + time_limit + ')' if time_limit != '' else ''))
 
             conn.commit()
 
