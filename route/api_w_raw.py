@@ -6,7 +6,7 @@ def api_w_raw(name = 'Test', rev = '', exist_check = ''):
 
         if exist_check != '':
             curs.execute(db_change("select title from data where title = ?"), [name])
-            if data:
+            if curs.fetchall():
                 return flask.jsonify({ 'exist' : '1' })
             else:
                 return flask.jsonify({})
