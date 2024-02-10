@@ -2485,7 +2485,7 @@ def ban_insert(name, end, why, login, blocker, type_d = None, release = 0):
                 'release',
                 now_time,
                 blocker,
-                '',
+                why,
                 band
             ])
         else:
