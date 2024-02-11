@@ -2157,18 +2157,9 @@ def ip_pas(raw_ip, type_data = 0):
             if is_this_ip != 0:
                 # ip user
                 if ip_view != '' and my_ip != raw_ip:
-                    try:
-                        ip = ipaddress.ip_address(raw_ip)
-                        if type(ip) == ipaddress.IPv6Address:
-                            ip = ip.exploded
-                            ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', ip)
-                        else:
-                            ip = ip.exploded
-                            ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', ip)
+                    ip = pw_encode(raw_ip)[:15]
 
-                        change_ip = 1
-                    except:
-                        ip = raw_ip
+                    change_ip = 1
                 else:
                     ip = raw_ip
             else:
