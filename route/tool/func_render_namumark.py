@@ -1628,7 +1628,7 @@ class class_do_render_namumark:
                     elif table_parameter_name == 'tableclass':
                         table_parameter_all['class'] = table_parameter_split[1]
                     elif table_parameter_name == 'tabletextalign':
-                        table_parameter_all['table'] += 'text-align:' + table_parameter_data + ';'
+                        table_parameter_all['table'] += 'text-align:' + table_parameter_data + ' !important;'
                     elif table_parameter_name == 'tablecolor':
                         table_parameter_all['table'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
                     elif table_parameter_name == 'tablebordercolor':
@@ -1636,13 +1636,15 @@ class class_do_render_namumark:
                     elif table_parameter_name == 'rowbgcolor':
                         table_parameter_all['tr'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
                     elif table_parameter_name == 'rowtextalign':
-                        table_parameter_all['tr'] += 'text-align:' + table_parameter_data + ';'
+                        table_parameter_all['tr'] += 'text-align:' + table_parameter_data + ' !important;'
                     elif table_parameter_name == 'rowcolor':
                         table_parameter_all['tr'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
                     elif table_parameter_name == 'colcolor':
                         table_parameter_all['col'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
                     elif table_parameter_name == 'colbgcolor':
                         table_parameter_all['col'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'coltextalign':
+                        table_parameter_all['col'] += 'text-align:' + table_parameter_data + ' !important;'
                     elif table_parameter_name == 'bgcolor':
                         table_parameter_all['td'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
                     elif table_parameter_name == 'color':
@@ -1669,11 +1671,11 @@ class class_do_render_namumark:
                     elif table_parameter in ('(', ':', ')'):
                         table_align_auto = 0
                         if table_parameter == '(':
-                            table_parameter_all['td'] += 'text-align: left;'
+                            table_parameter_all['td'] += 'text-align: left !important;'
                         elif table_parameter == ':':
-                            table_parameter_all['td'] += 'text-align: center;'
+                            table_parameter_all['td'] += 'text-align: center !important;'
                         elif table_parameter == ')':
-                            table_parameter_all['td'] += 'text-align: right;'
+                            table_parameter_all['td'] += 'text-align: right !important;'
                     elif re.search(r'^(?:(?:#((?:[0-9a-f-A-F]{3}){1,2}))|(\w+))$', table_parameter):
                         table_parameter_data = self.get_tool_css_safe(table_parameter)
                         table_parameter_all['td'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
@@ -1692,6 +1694,7 @@ class class_do_render_namumark:
                     else:
                         table_parameter_all['td'] += 'text-align: right;'
                 else:
+                    table_parameter_all['td'] += 'text-align: left;'
                     if re.search(r' $', data):
                         data = re.sub(r' $', '', data)
 
