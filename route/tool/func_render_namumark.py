@@ -481,15 +481,23 @@ class class_do_render_namumark:
 
             macro_split_regex = r'(?:^|,) *([^,]+)'
             macro_split_sub_regex = r'(^[^=]+) *= *([^=]+)'
-            if name_data in ('youtube', 'nicovideo', 'navertv', 'kakaotv', 'vimeo'):
+            if name_data in ('youtube', 'nicovideo', 'navertv', 'kakaotv', 'vimeo', 'instagram', 'twitter'):
                 data = re.findall(macro_split_regex, match[1])
 
                 # get option
                 video_code = ''
                 video_start = ''
                 video_end = ''
+                
                 video_width = '640px'
                 video_height = '360px'
+                if name_data == 'instagram':
+                    video_width = '360px'
+                    video_height = '480px'
+                elif name_data == 'twitter':
+                    video_width = '480px'
+                    video_height = '480px'
+
                 for for_a in data:
                     data_sub = re.search(macro_split_sub_regex, for_a)
                     if data_sub:
@@ -523,6 +531,12 @@ class class_do_render_namumark:
                     else:
                         if video_end != '':
                             video_code += '?end=' + video_end
+                elif name_data == 'instagram':
+                    video_code = re.sub(r'^https:\/\/www\.instagram\.com\/p\/', '', video_code)
+
+                    video_code = 'https://www.instagram.com/p/' + video_code +'/embed/'
+                elif name_data == 'twitter':
+                    video_code = 'https://twitframe.com/show?url=' + video_code
                 elif name_data == 'kakaotv':
                     video_code = re.sub(r'^https:\/\/tv\.kakao\.com\/v\/', '', video_code)
 
