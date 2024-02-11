@@ -2157,7 +2157,7 @@ def ip_pas(raw_ip, type_data = 0):
             if is_this_ip != 0:
                 # ip user
                 if ip_view != '' and my_ip != raw_ip:
-                    ip = pw_encode(raw_ip)[:15]
+                    ip = pw_encode(raw_ip)[:10]
 
                     change_ip = 1
                 else:
