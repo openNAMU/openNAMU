@@ -515,15 +515,15 @@ app.route('/xref_page/<int:num>/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
-app.route('/raw/<everything:name>')(view_raw_2)
-app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 1 })(view_raw_2)
-app.route('/raw_rev/<int:num>/<everything:name>')(view_raw_2)
+app.route('/raw/<everything:name>')(view_raw)
+app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 1 })(view_raw)
+app.route('/raw_rev/<int:num>/<everything:name>')(view_raw)
 
 app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')(view_diff)
 
 app.route('/down/<everything:name>')(view_down)
 
-app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_acl)
+app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_set)
 
 # everything 다음에 추가 붙은 경우에 대해서 재검토 필요 (진행중)
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_read)
@@ -535,6 +535,11 @@ app.route('/random', defaults = { 'db_set' : db_set_str })(view_random)
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
 app.route('/edit_from/<everything:name>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'load' })(edit)
 app.route('/edit_section/<int:section>/<everything:name>', methods = ['POST', 'GET'])(edit)
+
+app.route('/edit_request/<everything:name>', methods = ['POST', 'GET'])(edit_request)
+app.route('/edit_request_from/<everything:name>', defaults = { 'do_type' : 'from' }, methods = ['POST', 'GET'])(edit_request)
+
+# app.route('/edit_request_rev/<int:rev>/<everything:name>', methods = ['POST', 'GET'])(edit_request)
 
 app.route('/upload', methods = ['POST', 'GET'])(edit_upload)
 
@@ -567,7 +572,7 @@ app.route('/thread/<int:topic_num>/change', methods = ['POST', 'GET'])(topic_too
 app.route('/thread/<int:topic_num>/comment/<int:num>/tool')(topic_comment_tool)
 app.route('/thread/<int:topic_num>/comment/<int:num>/notice')(topic_comment_notice)
 app.route('/thread/<int:topic_num>/comment/<int:num>/blind')(topic_comment_blind)
-app.route('/thread/<int:topic_num>/comment/<int:num>/raw')(view_raw_2)
+app.route('/thread/<int:topic_num>/comment/<int:num>/raw')(view_raw)
 app.route('/thread/<int:topic_num>/comment/<int:num>/delete', methods = ['POST', 'GET'])(topic_comment_delete)
 
 # Func-user
@@ -657,11 +662,11 @@ app.route('/bbs/w/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_
 # app.route('/bbs/blind/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_hide)
 app.route('/bbs/pinned/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_pinned)
 app.route('/bbs/delete/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_delete)
-app.route('/bbs/raw/<int:bbs_num>/<int:post_num>')(view_raw_2)
+app.route('/bbs/raw/<int:bbs_num>/<int:post_num>')(view_raw)
 app.route('/bbs/tool/<int:bbs_num>/<int:post_num>')(bbs_w_tool)
 app.route('/bbs/edit/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_edit)
 app.route('/bbs/tool/<int:bbs_num>/<int:post_num>/<comment_num>')(bbs_w_comment_tool)
-app.route('/bbs/raw/<int:bbs_num>/<int:post_num>/<comment_num>')(view_raw_2)
+app.route('/bbs/raw/<int:bbs_num>/<int:post_num>/<comment_num>')(view_raw)
 app.route('/bbs/edit/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_edit)
 app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_delete)
 

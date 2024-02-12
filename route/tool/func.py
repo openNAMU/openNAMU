@@ -752,7 +752,7 @@ def get_acl_list(type_d = 'normal'):
     if type_d == 'user':
         return ['', 'user', 'all']
     else:
-        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', 'ban_admin', 'not_all']
+        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', 'ban_admin', 'not_all', 'up_to_level_3', 'up_to_level_10']
 
 ## Func-simple-with_DB
 def get_user_title_list(ip = ''):
@@ -1066,10 +1066,8 @@ def wiki_css(data):
         
         # Route JS
         data_css += '<script src="/views/main_css/js/route/editor.js' + data_css_ver + '"></script>'
-        data_css += '<script src="/views/main_css/js/route/editor_sub.js' + data_css_ver + '"></script>'
         data_css += '<script src="/views/main_css/js/route/render.js' + data_css_ver + '"></script>'
         data_css += '<script src="/views/main_css/js/route/topic.js' + data_css_ver + '"></script>'
-        data_css += '<script src="/views/main_css/js/route/topic_sub.js' + data_css_ver + '"></script>'
         
         # Main CSS
         data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css' + data_css_ver + '">'
@@ -1868,7 +1866,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                     return 0
         
                 return 1
-        elif tool in ['document_edit', 'document_move', 'document_delete']:
+        elif tool in ['document_edit', 'document_edit_request', 'document_move', 'document_delete']:
             if acl_check(name, '') == 1:
                 return 1
         elif tool in ['bbs_edit', 'bbs_comment']:
@@ -1881,7 +1879,7 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
 
         if tool in ['topic']:
             end = 3
-        elif tool in ['render', 'vote', '', 'document_edit', 'document_move', 'document_delete', 'document_edit', 'bbs_edit', 'bbs_comment']:
+        elif tool in ['render', 'vote', '', 'document_edit', 'document_edit_request', 'document_move', 'document_delete', 'document_edit', 'bbs_edit', 'bbs_comment']:
             end = 2
         else:
             end = 1
@@ -1982,6 +1980,13 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 curs.execute(db_change('select data from other where name = "recaptcha_one_check_five_pass_acl"'))
 
                 num = 'all'
+            elif tool == 'document_edit_request':
+                if i == 0:
+                    curs.execute(db_change("select data from acl where title = ? and type = 'document_edit_request_acl'"), [name])
+                else:
+                    curs.execute(db_change('select data from other where name = "document_edit_request_acl"'))
+
+                num = 5
             else:
                 # tool == 'render'
                 if i == 0:
@@ -2065,6 +2070,12 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                         return 0
                 elif acl_data[0][0] == 'not_all':
                     return 1
+                elif acl_data[0][0] == 'up_to_level_3':
+                    if level_check(ip)[0] >= 3:
+                        return 0
+                elif acl_data[0][0] == 'up_to_level_10':
+                    if level_check(ip)[0] >= 10:
+                        return 0
 
                 return 1
             elif i == (end - 1):

@@ -35,6 +35,7 @@ from route.edit_delete_multiple import edit_delete_multiple
 from route.edit_move import edit_move
 from route.edit_revert import edit_revert
 from route.edit_upload import edit_upload
+from route.edit_request import edit_request
 
 from route.filter_all import filter_all
 from route.filter_all_add import filter_all_add
@@ -155,10 +156,10 @@ from route.user_setting_user_name import user_setting_user_name
 from route.user_watch_list import user_watch_list
 from route.user_watch_list_name import user_watch_list_name
 
-from route.view_acl import view_acl
+from route.view_set import view_set
 from route.view_diff import view_diff
 from route.view_down import view_down
-from route.view_raw import view_raw_2
+from route.view_raw import view_raw
 from route.view_read import view_read
 from route.view_xref import view_xref
 
