@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def view_acl(name):
+def view_set(name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -34,7 +34,7 @@ def view_acl(name):
                     check_ok = 'disabled'
 
         if flask.request.method == 'POST':
-            acl_data = ['decu', 'document_edit_acl', 'document_move_acl', 'document_delete_acl', 'dis', 'view', 'why']
+            acl_data = ['decu', 'document_edit_acl', 'document_edit_request_acl', 'document_move_acl', 'document_delete_acl', 'dis', 'view', 'why']
 
             for i in acl_data:
                 form_data = flask.request.form.get(i, '')
@@ -93,6 +93,7 @@ def view_acl(name):
                     [load_lang('view_acl'), 'view', '3'],
                     [load_lang('document_acl'), 'decu', '4'],
                     [load_lang('document_edit_acl'), 'document_edit_acl', '5'],
+                    [load_lang('document_edit_request_acl'), 'document_edit_request_acl', '5'],
                     [load_lang('document_move_acl'), 'document_move_acl', '5'],
                     [load_lang('document_delete_acl'), 'document_delete_acl', '5'],
                     [load_lang('discussion_acl'), 'dis', '3'],
@@ -105,7 +106,6 @@ def view_acl(name):
             for i in acl_get_list:
                 data += '' + \
                     '<h' + i[2] + '>' + i[0] + '</h' + i[2] + '>' + \
-                    '<hr class="main_hr">' + \
                     '<select name="' + i[1] + '" ' + check_ok + '>' + \
                 ''
 
@@ -154,8 +154,9 @@ def view_acl(name):
                     <li>ban_admin : ''' + load_lang('ban_admin_acl') + '''</li>
                     <li>not_all : ''' + load_lang('not_all_acl') + '''</li>
                     <li>90_day : ''' + load_lang('90_day_acl') + '''</li>
+                    <li>up_to_level_3 : ''' + load_lang('up_to_level_3') + '''</li>
+                    <li>up_to_level_10 : ''' + load_lang('up_to_level_10') + '''</li>
                 </ul>
-                <hr class="main_hr">
                 <h2>''' + load_lang('markup') + '''</h2>
             '''
 

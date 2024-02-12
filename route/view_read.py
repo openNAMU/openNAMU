@@ -211,7 +211,7 @@ def view_read(name = 'Test', do_type = ''):
 
         curs.execute(db_change("select title from acl where title = ?"), [name])
         acl = 1 if curs.fetchall() else 0
-        menu_acl = 1 if acl_check(name) == 1 else 0
+        menu_acl = 1 if acl_check(name, 'document_edit') == 1 else 0
         if response_data == 404:
             menu += [['edit/' + url_pas(name), load_lang('create'), menu_acl]] 
         else:

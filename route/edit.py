@@ -103,15 +103,26 @@ def edit(name = 'Test', section = 0, do_type = ''):
         curs = conn.cursor()
     
         ip = ip_check()
+
+        edit_req_mode = 0
         if acl_check(name, 'document_edit') == 1:
-            return redirect('/raw_acl/' + url_pas(name))
-        
+            edit_req_mode = 1
+            if acl_check(name, 'document_edit_request') == 1:
+                return redirect('/raw_acl/' + url_pas(name))
+            
         if do_title_length_check(name) == 1:
             return re_error('/error/38')
         
         curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
         doc_ver = curs.fetchall()
         doc_ver = doc_ver[0][0] if doc_ver else '0'
+
+        curs.execute(db_change("select set_data from data_set where doc_name = ? and doc_rev = ? and set_name = 'edit_request_data'"), [name, doc_ver])
+        if curs.fetchall():
+            if edit_req_mode == 0:
+                return redirect('/edit_request_from/' + url_pas(name))
+            else:
+                return redirect('/raw_acl/' + url_pas(name))
         
         section = '' if section == 0 else section
         post_ver = flask.request.form.get('ver', '')
@@ -180,7 +191,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
             curs.execute(db_change("select data from other where name = 'edit_timeout'"))
             db_data_2 = curs.fetchall()
             db_data_2 = number_check(db_data_2[0][0]) if db_data_2 and db_data_2[0][0] != '' else ''
-
             if db_data_2 != '' and platform.system() == 'Linux':
                 timeout = edit_timeout(edit_render_set, (name, content), timeout = int(db_data_2))
             else:
@@ -189,29 +199,39 @@ def edit(name = 'Test', section = 0, do_type = ''):
             if timeout == 1:
                 return re_error('/error/41')
             
-            if db_data:
-                curs.execute(db_change("update data set data = ? where title = ?"), [content, name])
-            else:    
+            if edit_req_mode == 0:
+                # 진짜 기록 부분
+                curs.execute(db_change("delete from data where title = ?"), [name])
                 curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, content])
-    
-            curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
-            for scan_user in curs.fetchall():
-                add_alarm(scan_user[0], ip, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
-                    
-            history_plus(
-                name,
-                content,
-                today,
-                ip,
-                send,
-                leng
-            )
-            
-            render_set(
-                doc_name = name,
-                doc_data = content,
-                data_type = 'backlink'
-            )
+        
+                curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
+                for scan_user in curs.fetchall():
+                    add_alarm(scan_user[0], ip, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
+                        
+                history_plus(
+                    name,
+                    content,
+                    today,
+                    ip,
+                    send,
+                    leng
+                )
+                
+                render_set(
+                    doc_name = name,
+                    doc_data = content,
+                    data_type = 'backlink'
+                )
+            else:
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_data', ?)"), [name, doc_ver, content])
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_user', ?)"), [name, doc_ver, ip])
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_date', ?)"), [name, doc_ver, today])
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_send', ?)"), [name, doc_ver, send])
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_leng', ?)"), [name, doc_ver, leng])
+
+                curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
+                for scan_user in curs.fetchall():
+                    add_alarm(scan_user[0], ip, '<a href="/edit_request/' + url_pas(name) + '">' + html.escape(name) + '</a> edit_request')
             
             conn.commit()
             
@@ -316,9 +336,10 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 editor_top_text += '<hr class="main_hr">'
 
             sub_menu = ' (' + str(section) + ')' if section != '' else ''
+            sub_title = '(' + load_lang('edit_request') + ')' if edit_req_mode == 1 else '(' + load_lang('edit') + ')'
 
             return easy_minify(flask.render_template(skin_check(), 
-                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('edit') + ')' + sub_menu, 0])],
+                imp = [name, wiki_set(), wiki_custom(), wiki_css([sub_title + sub_menu, 0])],
                 data = editor_top_text + '''
                     <form method="post">
                         <textarea style="display: none;" name="doc_section_data_where">''' + data_section_where + '''</textarea>
