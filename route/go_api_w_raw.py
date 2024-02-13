@@ -6,7 +6,7 @@ def api_w_raw(db_set, name = 'Test', rev = '', exist_check = ''):
         
         other_set = {}
         other_set["name"] = name
-        other_set["rev"] = rev
+        other_set["rev"] = str(rev)
         other_set["exist_check"] = exist_check
         other_set = json.dumps(other_set)
 
