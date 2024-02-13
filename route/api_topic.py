@@ -28,8 +28,9 @@ def api_topic_thread_make(user_id, date, data, code, color = '', blind = '', add
                     </td>
                 </tr>
                 <tr>
-                    <td class="''' + color_b + '''" id="opennamu_comment_data_main">
+                    <td class="''' + color_b + ''' opennamu_comment_data_main" id="thread_''' + code + '''">
                         ''' + data + '''
+                        <div id="opennamu_topic_req_''' + code + '''"></div>
                     </td>
                 </tr>
             </table>
