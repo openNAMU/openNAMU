@@ -147,6 +147,7 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                         }
                     </style>
                     <input type="checkbox" onclick="opennamu_do_remove_blind_thread();" checked> ''' + load_lang('remove_blind_thread') + '''
+                    <hr class="main_hr">
 
                     ''' + shortcut + '''
                     <h2 id="topic_top_title">''' + html.escape(sub) + '''</h2>
@@ -154,7 +155,8 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                     <div id="top_topic">''' + top_topic + '''</div>
                     <div id="main_topic">''' + main_topic + '''</div>
                     <div id="plus_topic"></div>
-                    
+                    <script>opennamu_thread_where();</script>
+
                     <a href="/thread/''' + topic_num + '/tool">(' + load_lang('topic_tool') + ''')</a>
                     <hr class="main_hr">
                     
