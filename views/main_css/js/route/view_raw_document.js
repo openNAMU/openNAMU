@@ -1,6 +1,6 @@
 "use strict";
 
-function opennamu_view_raw_document() {
+function opennamu_view_raw_document(render = '') {
     let name = "test";
     if(document.getElementById('opennamu_editor_doc_name')) {
         name = document.getElementById('opennamu_editor_doc_name').innerHTML;
@@ -25,6 +25,24 @@ function opennamu_view_raw_document() {
             if(data["data"]) {
                 document.getElementById("opennamu_edit_textarea").value = data["data"];
             }
+
+            if(render === 'do') {
+                opennamu_view_raw_document_preview();
+            }
         }
     });
+}
+
+function opennamu_view_raw_document_preview() {
+    let name = "test";
+    if(document.getElementById('opennamu_editor_doc_name')) {
+        name = document.getElementById('opennamu_editor_doc_name').innerHTML;
+    }
+
+    let data = "";
+    if(document.getElementById('opennamu_edit_textarea')) {
+        data = document.getElementById('opennamu_edit_textarea').value;
+    }
+
+    opennamu_do_render('opennamu_preview_area', name, data);
 }

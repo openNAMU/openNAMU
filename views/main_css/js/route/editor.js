@@ -230,10 +230,8 @@ function do_monaco_init(monaco_thema) {
     });
 }
 
-function opennamu_do_editor_preview(do_type = 'preview') {
-    if(do_type === 'preview') {
-        do_sync_monaco_and_textarea();
-    }
+function opennamu_do_editor_preview() {
+    do_sync_monaco_and_textarea();
 
     const input = document.querySelector('#opennamu_edit_textarea');
     if(input !== null) {
@@ -244,21 +242,7 @@ function opennamu_do_editor_preview(do_type = 'preview') {
             doc_name = doc_name_input.value;
         }
 
-        fetch("/api/render/" + (opennamu_do_url_encode(doc_name)), {
-            method : 'POST',
-            headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body : new URLSearchParams({
-                'data': input.value,
-            })
-        }).then(function(res) {
-            return res.json();
-        }).then(function(text) {
-            const preview = document.querySelector('#opennamu_preview_area');
-            if(preview !== null) {
-                preview.innerHTML = text.data;
-                eval(text.js_data);
-            }
-        });
+        opennamu_do_render('opennamu_preview_area', doc_name, input.value);
     }
 }
 

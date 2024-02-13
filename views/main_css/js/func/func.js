@@ -131,3 +131,24 @@ function opennamu_do_trace_spread() {
         '' + document.getElementsByClassName('opennamu_trace')[0].innerHTML
     }
 }
+
+function opennamu_do_render(to_obj, name, data, do_type = '') {
+    fetch("/api/render/" + (opennamu_do_url_encode(name)), {
+        method : 'POST',
+        headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body : new URLSearchParams({
+            'data': data,
+        })
+    }).then(function(res) {
+        return res.json();
+    }).then(function(text) {
+        if(document.getElementById(to_obj)) {
+            if(text["data"]) {
+                document.getElementById(to_obj).innerHTML = text.data;
+                eval(text.js_data);
+            } else {
+                document.getElementById(to_obj).innerHTML = '';
+            }
+        }
+    });
+}

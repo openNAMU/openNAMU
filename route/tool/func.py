@@ -1314,140 +1314,124 @@ def load_skin(data = '', set_n = 0, default = 0):
     return skin_return_data
 
 # Func-markup
-def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', doc_acl = '', markup = ''):
+def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', markup = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         # data_type in ['view', 'from', 'thread', 'raw', 'api_view', 'api_thread', 'backlink']
         # data_type을 list 형식으로 개편 필요할 듯
-        if doc_name != '':
-            doc_acl = acl_check(doc_name, 'render') if doc_acl == '' else doc_acl
-        else:
-            doc_acl = 0
 
         data_type = 'view' if data_type == '' else data_type
-        doc_data = 0 if doc_data == None else doc_data
+        doc_data = '' if doc_data == None else doc_data
 
         acl_dict = {}
-        acl_dict[doc_name] = doc_acl
-
         ip = ip_check()
-            
-        if doc_acl == 1:
-            return 'HTTP Request 401.3'
-        else:
-            if data_type == 'raw':
-                return doc_data
-            
-            if doc_data != 0:
-                render_lang_data = {
-                    'toc' : load_lang('toc'),
-                    'category' : load_lang('category')
-                }
+        render_lang_data = {
+            'toc' : load_lang('toc'),
+            'category' : load_lang('category')
+        }
 
-                curs.execute(db_change('select data from other where name = "category_text"'))
-                db_data = curs.fetchall()
-                if db_data and db_data[0][0] != '':
-                    render_lang_data['category'] = db_data[0][0]
+        curs.execute(db_change('select data from other where name = "category_text"'))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            render_lang_data['category'] = db_data[0][0]
 
-                get_class_render = class_do_render(conn, render_lang_data, markup).do_render(doc_name, doc_data, data_type, data_in)
-                
-                if 'include' in get_class_render[2]:
-                    for_a = 0
-                    while len(get_class_render[2]['include']) > for_a:
-                        include_data = get_class_render[2]['include'][for_a]
-                        if include_data[1] in acl_dict:
-                            acl_result = acl_dict[include_data[1]]
-                        else:
-                            acl_result = acl_check(include_data[1], 'render')
-                            acl_dict[include_data[1]] = acl_result
-
-                        if acl_result == 0:
-                            include_regex = re.compile('<div id="' + include_data[0] + '"><\\/div>')
-                            if re.search(include_regex, get_class_render[0]):
-                                include_data_render = class_do_render(conn, render_lang_data, markup).do_render(include_data[1], include_data[2], data_type, include_data[0] + data_in)
-                                if len(include_data) > 3:
-                                    include_data_render[0] = '<div id="' + include_data[0] + '" ' + include_data[3] + '>' + include_data_render[0] + '</div>'
-                                else:
-                                    include_data_render[0] = '<div id="' + include_data[0] + '">' + include_data_render[0] + '</div>'
-
-                                get_class_render[0] = re.sub(include_regex, include_data_render[0], get_class_render[0])
-                                get_class_render[1] += include_data_render[1]
-                                get_class_render[2]['include'] += include_data_render[2]['include']
-
-                        for_a += 1
-
-                if data_type == 'backlink':
-                    return ''
-
-                get_class_render[0] = '<div class="opennamu_render_complete">' + get_class_render[0] + '</div>'
-
-                font_size_set_data = get_main_skin_set(curs, flask.session, 'main_css_font_size', ip)
-                if font_size_set_data != 'default':
-                    font_size_set_data = number_check(font_size_set_data)
-
-                    get_class_render[0] = '''
-                        <style>
-                            .opennamu_render_complete {
-                                font-size: ''' + font_size_set_data + '''px !important;
-                            }
-                        </style>
-                    ''' + get_class_render[0]
-
-                curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
-                db_data = curs.fetchall()
-                if db_data and db_data[0][0] != '':
-                    get_class_render[0] = '''
-                        <style>
-                            .opennamu_render_complete {
-                                font-size: 15px !important;
-                                line-height: 1.5;
-                            }
-
-                            .opennamu_render_complete td {
-                                padding: 5px 10px !important;
-                            }
-
-                            .opennamu_render_complete summary {
-                                list-style: none !important;
-                                font-weight: bold !important;
-                            }
-                        </style>
-                    ''' + get_class_render[0]
-
-                table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip)
-                if table_set_data == 'on':
-                    get_class_render[0] = '<style>.table_safe { overflow-x: scroll; white-space: nowrap; }</style>' + get_class_render[0]
-
-                joke_set_data = get_main_skin_set(curs, flask.session, 'main_css_view_joke', ip)
-                if joke_set_data == 'off':
-                    get_class_render[0] = '<style>.opennamu_joke { display: none; }</style>' + get_class_render[0]
-
-                math_set_data = get_main_skin_set(curs, flask.session, 'main_css_math_scroll', ip)
-                if math_set_data == 'on':
-                    get_class_render[0] = '<style>.katex .base { overflow-x: scroll; }</style>' + get_class_render[0]
-
-                transparent_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_transparent', ip)
-                if transparent_set_data == 'on':
-                    get_class_render[0] = '''
-                        <style>
-                            .table_safe td {
-                                background: transparent !important;
-                                color: inherit !important;
-                            }
-                        </style>
-                    ''' + get_class_render[0]
-
-                if data_type == 'api_view' or data_type == 'api_thread':
-                    return [
-                        get_class_render[0], 
-                        get_class_render[1]
-                    ]
+        get_class_render = class_do_render(conn, render_lang_data, markup).do_render(doc_name, doc_data, data_type, data_in)
+        
+        if 'include' in get_class_render[2]:
+            for_a = 0
+            while len(get_class_render[2]['include']) > for_a:
+                include_data = get_class_render[2]['include'][for_a]
+                if include_data[1] in acl_dict:
+                    acl_result = acl_dict[include_data[1]]
                 else:
-                    return get_class_render[0] + '<script>' + get_class_render[1] + '</script>'
-            else:
-                return 'HTTP Request 404'
-            
+                    acl_result = acl_check(include_data[1], 'render')
+                    acl_dict[include_data[1]] = acl_result
+
+                if acl_result == 0:
+                    include_regex = re.compile('<div id="' + include_data[0] + '"><\\/div>')
+                    if re.search(include_regex, get_class_render[0]):
+                        include_data_render = class_do_render(conn, render_lang_data, markup).do_render(include_data[1], include_data[2], data_type, include_data[0] + data_in)
+                        if len(include_data) > 3:
+                            include_data_render[0] = '<div id="' + include_data[0] + '" ' + include_data[3] + '>' + include_data_render[0] + '</div>'
+                        else:
+                            include_data_render[0] = '<div id="' + include_data[0] + '">' + include_data_render[0] + '</div>'
+
+                        get_class_render[0] = re.sub(include_regex, include_data_render[0], get_class_render[0])
+                        get_class_render[1] += include_data_render[1]
+                        get_class_render[2]['include'] += include_data_render[2]['include']
+
+                for_a += 1
+
+        if data_type == 'backlink':
+            return ''
+
+        get_class_render[0] = '<div class="opennamu_render_complete">' + get_class_render[0] + '</div>'
+
+        font_size_set_data = get_main_skin_set(curs, flask.session, 'main_css_font_size', ip)
+        if font_size_set_data != 'default':
+            font_size_set_data = number_check(font_size_set_data)
+
+            get_class_render[0] = '''
+                <style>
+                    .opennamu_render_complete {
+                        font-size: ''' + font_size_set_data + '''px !important;
+                    }
+                </style>
+            ''' + get_class_render[0]
+
+        curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            get_class_render[0] = '''
+                <style>
+                    .opennamu_render_complete {
+                        font-size: 15px !important;
+                        line-height: 1.5;
+                    }
+
+                    .opennamu_render_complete td {
+                        padding: 5px 10px !important;
+                    }
+
+                    .opennamu_render_complete summary {
+                        list-style: none !important;
+                        font-weight: bold !important;
+                    }
+                </style>
+            ''' + get_class_render[0]
+
+        table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip)
+        if table_set_data == 'on':
+            get_class_render[0] = '<style>.table_safe { overflow-x: scroll; white-space: nowrap; }</style>' + get_class_render[0]
+
+        joke_set_data = get_main_skin_set(curs, flask.session, 'main_css_view_joke', ip)
+        if joke_set_data == 'off':
+            get_class_render[0] = '<style>.opennamu_joke { display: none; }</style>' + get_class_render[0]
+
+        math_set_data = get_main_skin_set(curs, flask.session, 'main_css_math_scroll', ip)
+        if math_set_data == 'on':
+            get_class_render[0] = '<style>.katex .base { overflow-x: scroll; }</style>' + get_class_render[0]
+
+        transparent_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_transparent', ip)
+        if transparent_set_data == 'on':
+            get_class_render[0] = '''
+                <style>
+                    .table_safe td {
+                        background: transparent !important;
+                        color: inherit !important;
+                    }
+                </style>
+            ''' + get_class_render[0]
+
+        if data_type == 'api_view' or data_type == 'api_thread':
+            return [
+                get_class_render[0], 
+                get_class_render[1]
+            ]
+        else:
+            return get_class_render[0] + '<script>' + get_class_render[1] + '</script>'
+        
 def render_simple_set(data):
     # without_DB
 
