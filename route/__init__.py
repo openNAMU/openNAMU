@@ -161,6 +161,7 @@ from route.view_raw import view_raw
 from route.view_raw_document import view_raw_document
 from route.view_read import view_read
 from route.view_xref import view_xref
+from route.view_random import view_random
 
 from route.vote_add import vote_add
 from route.vote_close import vote_close
@@ -173,7 +174,6 @@ from route.go_api_func_sha224 import api_func_sha224
 from route.go_api_search import api_search
 
 from route.go_api_w_raw import api_w_raw
-
-from route.go_view_random import view_random
+from route.go_api_w_random import api_w_random
 
 from route.go_main_func_easter_egg import main_func_easter_egg
