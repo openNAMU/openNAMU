@@ -15,4 +15,4 @@ def api_func_sha224(data = 'Test'):
 
         data = data.decode('utf8')
 
-        return flask.jsonify({ "data" : data })
+        return flask.Response(response = data, status = 200, mimetype = 'application/json')
