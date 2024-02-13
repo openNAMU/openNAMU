@@ -2,7 +2,6 @@ from route.api_func_lang import api_func_lang
 from route.api_image_view import api_image_view
 from route.api_recent_change import api_recent_change
 from route.api_recent_discuss import api_recent_discuss
-from route.api_search import api_search
 from route.api_setting import api_setting
 from route.api_skin_info import api_skin_info
 from route.api_topic import api_topic
@@ -170,6 +169,8 @@ from route.vote_list import vote_list
 from route.vote_select import vote_select
 
 from route.go_api_func_sha224 import api_func_sha224
+
+from route.go_api_search import api_search
 
 from route.go_api_w_raw import api_w_raw
 
