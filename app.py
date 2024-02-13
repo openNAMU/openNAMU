@@ -515,9 +515,9 @@ app.route('/xref_page/<int:num>/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
-app.route('/raw/<everything:name>')(view_raw)
-app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 1 })(view_raw)
-app.route('/raw_rev/<int:num>/<everything:name>')(view_raw)
+app.route('/raw/<everything:name>')(view_raw_document)
+app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 'on' })(view_raw_document)
+app.route('/raw_rev/<int:rev>/<everything:name>')(view_raw_document)
 
 app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')(view_diff)
 
