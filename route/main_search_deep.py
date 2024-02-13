@@ -11,9 +11,9 @@ def main_search_deep(name = 'Test', search_type = 'title', num = 1):
 
         if flask.request.method == 'POST':
             if search_type == 'title':
-                return redirect('/search/1/' + url_pas(flask.request.form.get('search', 'test')))
+                return redirect('/search_page/1/' + url_pas(flask.request.form.get('search', 'test')))
             else:
-                return redirect('/search_data/1/' + url_pas(flask.request.form.get('search', 'test')))
+                return redirect('/search_data_page/1/' + url_pas(flask.request.form.get('search', 'test')))
         else:
             div = '''
                 <form method="post">
@@ -24,9 +24,9 @@ def main_search_deep(name = 'Test', search_type = 'title', num = 1):
             '''
 
             if search_type == 'title':
-                div += '<a href="/search_data/1/' + url_pas(name) + '">(' + load_lang('search_document_data') + ')</a>'
+                div += '<a href="/search_data_page/1/' + url_pas(name) + '">(' + load_lang('search_document_data') + ')</a>'
             else:
-                div += '<a href="/search/1/' + url_pas(name) + '">(' + load_lang('search_document_name') + ')</a>'
+                div += '<a href="/search_page/1/' + url_pas(name) + '">(' + load_lang('search_document_name') + ')</a>'
 
             name_new = ''
             if re.search(r'^분류:', name):
@@ -37,7 +37,7 @@ def main_search_deep(name = 'Test', search_type = 'title', num = 1):
                 name_new = re.sub(r"^파일:", 'file:', name)
 
             if name_new != '':
-                div += ' <a href="/search/1/' + url_pas(name_new) + '">(' + name_new + ')</a>'
+                div += ' <a href="/search_page/1/' + url_pas(name_new) + '">(' + name_new + ')</a>'
 
             curs.execute(db_change("select title from data where title = ? collate nocase"), [name])
             link_id = '' if curs.fetchall() else 'class="opennamu_not_exist_link"'
@@ -64,9 +64,9 @@ def main_search_deep(name = 'Test', search_type = 'title', num = 1):
             div += '</ul>'
             
             if search_type == 'title':
-                div += get_next_page_bottom('/search/{}/' + url_pas(name), num, all_list)
+                div += get_next_page_bottom('/search_page/{}/' + url_pas(name), num, all_list)
             else:
-                div += get_next_page_bottom('/search_data/{}/' + url_pas(name), num, all_list)
+                div += get_next_page_bottom('/search_data_page/{}/' + url_pas(name), num, all_list)
 
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('search') + ')', 0])],
