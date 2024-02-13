@@ -160,16 +160,18 @@ def view_read(name = 'Test', do_type = ''):
         else:
             name_view = name
 
-        curs.execute(db_change("select data from data where title = ?"), [name])
+        end_data = '''
+            <div id="opennamu_preview_area">
+                <textarea id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
+                <textarea readonly id="opennamu_edit_textarea" class="opennamu_textarea_500"></textarea>
+                <script>opennamu_view_raw_document(render = 'do');</script>
+            </div>
+        '''
 
+        curs.execute(db_change("select title from data where title = ?"), [name])
         data = curs.fetchall()
-        end_data = render_set(
-            doc_name = name,
-            doc_data = data[0][0] if data else None,
-            data_type = 'from' if do_type == 'from' else 'view'
-        )
 
-        if end_data == 'HTTP Request 401.3':
+        if acl_check(name, 'render') == 1:
             response_data = 401
 
             curs.execute(db_change('select data from other where name = "error_401"'))
@@ -178,7 +180,7 @@ def view_read(name = 'Test', do_type = ''):
                 end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + sql_d[0][0] + '</li></ul>'
             else:
                 end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + load_lang('authority_error') + '</li></ul>'
-        elif end_data == 'HTTP Request 404':
+        elif not data:
             response_data = 404
 
             curs.execute(db_change('select data from other where name = "error_404"'))
@@ -188,10 +190,7 @@ def view_read(name = 'Test', do_type = ''):
             else:
                 end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + load_lang('decument_404_error') + '</li></ul>'
 
-            curs.execute(db_change('' + \
-                'select ip, date, leng, send, id from history ' + \
-                'where title = ? and hide != "O" order by id + 0 desc limit 3' + \
-            ''), [name])
+            curs.execute(db_change('select ip, date, leng, send, id from history where title = ? and hide != "O" order by id + 0 desc limit 3'), [name])
             sql_d = curs.fetchall()
             if sql_d:
                 end_data += '<h2>' + load_lang('history') + '</h2><ul class="opennamu_ul">'
