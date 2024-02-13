@@ -144,7 +144,7 @@ with get_db_connect() as conn:
     )
 
     app.config['JSON_AS_ASCII'] = False
-    app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+    app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
 
     log = logging.getLogger('waitress')
