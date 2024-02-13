@@ -695,8 +695,10 @@ app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic)
 app.route('/api/thread/<int:topic_num>/<tool>')(api_topic)
 app.route('/api/thread/<int:topic_num>')(api_topic)
 
-app.route('/api/search/<everything:name>/doc_num/<int:num>/<int:page>')(api_search)
-app.route('/api/search/<everything:name>')(api_search)
+app.route('/api/search/<everything:name>', defaults = { 'db_set' : db_set_str })(api_search)
+app.route('/api/search_page/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_search)
+app.route('/api/search_data/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str })(api_search)
+app.route('/api/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str })(api_search)
 
 app.route('/api/recent_change/<int:num>')(api_recent_change)
 app.route('/api/recent_change')(api_recent_change)

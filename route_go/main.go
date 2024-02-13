@@ -16,5 +16,7 @@ func main() {
 		route.Api_func_sha224(call_arg[1:])
 	} else if call_arg[0] == "view_random" {
 		route.View_random(call_arg[1:])
+	} else if call_arg[0] == "api_search" {
+		route.Api_search(call_arg[1:])
 	}
 }
