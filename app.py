@@ -723,10 +723,10 @@ app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(ma
 # app.route('/guide/<doc_name>')(main_tool_guide)
 
 app.route('/search', methods=['POST'])(main_search)
-app.route('/search/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
-app.route('/search_page/<int:num>/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
-app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
-app.route('/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search/<everything:name>', defaults = { 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search_page/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
 app.route('/goto', methods=['POST'])(main_search_goto)
 app.route('/goto/<everything:name>', methods=['GET', 'POST'])(main_search_goto)
 

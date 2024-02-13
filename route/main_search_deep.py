@@ -1,6 +1,8 @@
 from .tool.func import *
 
-def main_search_deep(name = 'Test', search_type = 'title', num = 1):
+from .go_api_search import api_search
+
+def main_search_deep(db_set, name = 'Test', search_type = 'title', num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -48,18 +50,12 @@ def main_search_deep(name = 'Test', search_type = 'title', num = 1):
                         <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + html.escape(name) + '''</a>
                     </li>
                 </ul>
-                <hr class="main_hr">
                 <ul class="opennamu_ul">
             '''
 
-            if search_type == 'title':
-                curs.execute(db_change("select title from data where title like ? collate nocase order by title limit ?, 50"), ['%' + name + '%', sql_num])
-            else:
-                curs.execute(db_change("select title from data where data like ? collate nocase order by title limit ?, 50"), ['%' + name + '%', sql_num])
-
-            all_list = curs.fetchall()
+            all_list = json.loads(api_search(db_set, name, search_type, num).data)
             for data in all_list:
-                div += '<li><a href="/w/' + url_pas(data[0]) + '">' + data[0] + '</a></li>'
+                div += '<li><a href="/w/' + url_pas(data) + '">' + data + '</a></li>'
 
             div += '</ul>'
             
