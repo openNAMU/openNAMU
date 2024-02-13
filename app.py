@@ -676,9 +676,9 @@ app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['
 app.route('/api/render/<everything:name>', methods = ['POST'])(api_w_render)
 app.route('/api/render', methods = ['POST'])(api_w_render)
 
-app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on' })(api_w_raw)
-app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>')(api_w_raw)
-app.route('/api/raw/<everything:name>')(api_w_raw)
+app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on', 'db_set' : db_set_str })(api_w_raw)
+app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_raw)
+app.route('/api/raw/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_raw)
 
 app.route('/api/bbs/w/<sub_code>')(api_bbs_w_post)
 app.route('/api/bbs/w/comment/<sub_code>')(api_bbs_w_comment)

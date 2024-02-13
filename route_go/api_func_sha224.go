@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"os"
 )
@@ -17,5 +18,9 @@ func main() {
 	hash_byte := hasher.Sum(nil)
 	hash_str := hex.EncodeToString(hash_byte)
 
-	fmt.Print(hash_str)
+	new_data := map[string]string{}
+	new_data["data"] = hash_str
+
+	json_data, _ := json.Marshal(new_data)
+	fmt.Print(string(json_data))
 }

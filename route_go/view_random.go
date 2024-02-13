@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -23,8 +24,11 @@ func main() {
 	var title string
 	err := db.QueryRow(tool.DB_change(db_set, "select title from data where title not like 'user:%' and title not like 'category:%' and title not like 'file:%' order by random() limit 1")).Scan(&title)
 	if err != nil {
-		fmt.Println(err)
-		return
+		if err == sql.ErrNoRows {
+			title = ""
+		} else {
+			return
+		}
 	}
 
 	fmt.Print(title)
