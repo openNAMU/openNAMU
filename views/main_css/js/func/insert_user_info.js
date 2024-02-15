@@ -44,9 +44,9 @@ function do_insert_user_info_sub(name, lang_data_list, lang_data = {}, for_a = 0
                 
                 get_data_ban += lang_data['period'] + ' : ';
                 if(data['data']['ban']['period'] === '0') {
-                    get_data_ban += lang_data['limitless']; 
+                    get_data_ban += '~ ' + lang_data['limitless']; 
                 } else {
-                    get_data_ban += data['data']['ban']['period'];
+                    get_data_ban += '~ ' + data['data']['ban']['period'];
                 }
                 get_data_ban += '<br>';
                 

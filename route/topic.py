@@ -9,7 +9,25 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
         curs = conn.cursor()
         topic_num = str(topic_num)
 
-        topic_acl = acl_check('', 'topic', topic_num)
+        if topic_num == '0':
+            name = load_lang('make_new_topic')
+            sub = load_lang('make_new_topic')
+
+            name_value = doc_name
+            sub_value = ''
+        else:
+            curs.execute(db_change("select title, sub from rd where code = ?"), [topic_num])
+            name = curs.fetchall()
+            if name:
+                sub = name[0][1]
+                name = name[0][0]
+
+                name_value = name
+                sub_value = sub
+            else:
+                return redirect('/')
+                
+        topic_acl = acl_check(name_value, 'topic', topic_num)
         topic_view_acl = acl_check('', 'topic_view', topic_num)
         if topic_view_acl == 1:
             return re_error('/ban')
@@ -99,26 +117,6 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
 
             return redirect('/thread/' + topic_num + '#' + num)
         else:
-            thread_data = ''
-
-            if topic_num == '0':
-                name = load_lang('make_new_topic')
-                sub = load_lang('make_new_topic')
-
-                name_value = doc_name
-                sub_value = ''
-            else:
-                curs.execute(db_change("select title, sub from rd where code = ?"), [topic_num])
-                name = curs.fetchall()
-                if name:
-                    sub = name[0][1]
-                    name = name[0][0]
-
-                    name_value = name
-                    sub_value = sub
-                else:
-                    return redirect('/')
-
             acl_display = 'display: none;' if topic_acl == 1 else ''
             name_display = 'display: none;' if topic_num != '0' else ''
 
@@ -168,7 +166,7 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                             <hr class="main_hr">
                         </div>
                         
-                        ''' + edit_editor(curs, ip, thread_data, 'thread') + '''
+                        ''' + edit_editor(curs, ip, '', 'thread') + '''
                     </form>
                 ''',
                 menu = [['topic/' + url_pas(name), load_lang('list')]]
