@@ -1819,14 +1819,17 @@ def admin_check(num = None, what = None, name = ''):
 
         return 0
 
-def acl_check(name = 'test', tool = '', topic_num = '1'):
+def acl_check(name = '', tool = '', topic_num = '1'):
     with get_db_connect() as conn:
         curs = conn.cursor()
+
+        if name == None:
+            name = ''
 
         ip = ip_check()
         get_ban = ban_check()
         
-        if tool == '' and name:
+        if tool == '' and name != '':
             if acl_check(name, 'render') == 1:
                 return 1
             
@@ -1858,9 +1861,10 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
             if acl_check(name, 'bbs_view') == 1:
                 return 1
         elif tool == 'topic':
-            curs.execute(db_change("select title from rd where code = ?"), [topic_num])
-            name = curs.fetchall()
-            name = name[0][0] if name else 'test'
+            if name == '':
+                curs.execute(db_change("select title from rd where code = ?"), [topic_num])
+                name = curs.fetchall()
+                name = name[0][0] if name else 'test'
 
         if tool in ['topic']:
             end = 3
