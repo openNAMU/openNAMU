@@ -133,7 +133,14 @@ function opennamu_do_trace_spread() {
 }
 
 function opennamu_do_render(to_obj, name, data, do_type = '') {
-    fetch("/api/render/" + (opennamu_do_url_encode(name)), {
+    let url;
+    if(do_type === '') {
+        url = "/api/render/" + opennamu_do_url_encode(name);
+    } else {
+        url = "/api/render_tool/thread/" + opennamu_do_url_encode(name);
+    }
+
+    fetch(url, {
         method : 'POST',
         headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
         body : new URLSearchParams({

@@ -41,12 +41,12 @@ def edit_request(name = 'Test', do_type = ''):
             if acl_check(name, 'document_edit') == 1:
                 return redirect('/w/' + url_pas(name))
             
-            curs.execute(db_change("delete from data where title = ?"), [name])
-            curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, edit_request_data])
-    
             curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
             for scan_user in curs.fetchall():
                 add_alarm(scan_user[0], edit_request_user, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
+
+            curs.execute(db_change("delete from data where title = ?"), [name])
+            curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, edit_request_data])
                     
             history_plus(
                 name,
