@@ -4,7 +4,6 @@ from route.api_recent_change import api_recent_change
 from route.api_recent_discuss import api_recent_discuss
 from route.api_setting import api_setting
 from route.api_skin_info import api_skin_info
-from route.api_topic import api_topic
 from route.api_user_info import api_user_info
 from route.api_version import api_version
 from route.api_w_render import api_w_render
@@ -170,8 +169,11 @@ from route.vote_list import vote_list
 from route.vote_select import vote_select
 
 from route.go_api_func_sha224 import api_func_sha224
+from route.go_api_func_ip import api_func_ip
 
 from route.go_api_search import api_search
+
+from route.go_api_topic import api_topic
 
 from route.go_api_w_raw import api_w_raw
 from route.go_api_w_random import api_w_random

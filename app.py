@@ -671,8 +671,8 @@ app.route('/bbs/edit/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['PO
 app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_delete)
 
 # Func-api
-# app.route('/api/render_tool/<tool>/<everything:name>', methods = ['POST'])(api_w_render)
-# app.route('/api/render_tool/<tool>', methods = ['POST'])(api_w_render)
+app.route('/api/render_tool/<tool>/<data_in>', methods = ['POST'])(api_w_render)
+app.route('/api/render_tool/<tool>', methods = ['POST'])(api_w_render)
 app.route('/api/render/<everything:name>', methods = ['POST'])(api_w_render)
 app.route('/api/render', methods = ['POST'])(api_w_render)
 
@@ -692,16 +692,16 @@ app.route('/api/skin_info/<name>')(api_skin_info)
 app.route('/api/user_info/<user_name>')(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
-app.route('/api/thread/<int:topic_num>/<tool>/<int:num>/<render>')(api_topic)
-app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic)
-app.route('/api/thread/<int:topic_num>/<tool>')(api_topic)
-app.route('/api/thread/<int:topic_num>')(api_topic)
+app.route('/api/thread/<int:topic_num>/<int:s_num>/<int:e_num>', defaults = { 'db_set' : db_set_str })(api_topic)
+app.route('/api/thread/<int:topic_num>/<tool>', defaults = { 'db_set' : db_set_str })(api_topic)
+app.route('/api/thread/<int:topic_num>', defaults = { 'db_set' : db_set_str })(api_topic)
 
 app.route('/api/search/<everything:name>', defaults = { 'db_set' : db_set_str })(api_search)
 app.route('/api/search_page/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_search)
 app.route('/api/search_data/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str })(api_search)
 app.route('/api/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str })(api_search)
 
+# 곧 개편 당할 곳
 app.route('/api/recent_change/<int:num>')(api_recent_change)
 app.route('/api/recent_change')(api_recent_change)
 # recent_changes -> recent_change
@@ -710,9 +710,11 @@ app.route('/api/recent_changes')(api_recent_change)
 app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss')(api_recent_discuss)
+##
 
 app.route('/api/lang/<data>')(api_func_lang)
 app.route('/api/sha224/<everything:data>')(api_func_sha224)
+app.route('/api/ip/<everything:data>', defaults = { 'db_set' : db_set_str })(api_func_ip)
 
 app.route('/api/image/<everything:name>')(api_image_view)
 

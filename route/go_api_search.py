@@ -2,8 +2,6 @@ from .tool.func import *
 
 def api_search(db_set, name = 'Test', search_type = 'title', num = 1):
     with get_db_connect() as conn:
-        curs = conn.cursor()
-
         other_set = {}
         other_set["name"] = name
         other_set["search_type"] = search_type

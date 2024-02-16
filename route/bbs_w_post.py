@@ -2,7 +2,7 @@ from .tool.func import *
 
 from .api_bbs_w_post import api_bbs_w_post
 from .api_bbs_w_comment import api_bbs_w_comment
-from .api_topic import api_topic_thread_make, api_topic_thread_pre_render
+from .go_api_topic import api_topic_thread_make, api_topic_thread_pre_render
 
 from .edit import edit_editor
 

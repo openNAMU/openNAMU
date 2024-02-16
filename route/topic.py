@@ -1,6 +1,6 @@
 from .tool.func import *
 
-from .api_topic import api_topic, api_topic_thread_pre_render
+from .go_api_topic import api_topic, api_topic_thread_pre_render
 
 from .edit import edit_editor
 
@@ -128,14 +128,6 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             
             shortcut += '</div>'
 
-            top_topic = ''
-            json_data = json.loads(api_topic(int(topic_num), 'top', '', 'render').data)
-            top_topic += json_data['data'] if 'data' in json_data else ''
-            
-            main_topic = ''
-            json_data = json.loads(api_topic(int(topic_num), 'normal', '', 'render').data)
-            main_topic += json_data['data'] if 'data' in json_data else ''
-
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('discussion') + ')', 0])],
                 data = '''
@@ -150,11 +142,15 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                     ''' + shortcut + '''
                     <h2 id="topic_top_title">''' + html.escape(sub) + '''</h2>
                     
-                    <div id="top_topic">''' + top_topic + '''</div>
-                    <div id="main_topic">''' + main_topic + '''</div>
-                    <div id="plus_topic"></div>
-                    <script>opennamu_thread_where();</script>
+                    <div id="opennamu_top_thread"></div>
+                    <div id="opennamu_main_thread"></div>
+                    <div id="opennamu_reload_thread"></div>
+                    <script>
+                        opennamu_get_thread("''' + topic_num + '''", "top");
+                        opennamu_get_thread("''' + topic_num + '''");
+                    </script>
 
+                    <a href="javascript:opennamu_thread_blind();">(''' + load_lang('hide') + ''' | ''' + load_lang('hide_release') + ''')</a>
                     <a href="/thread/''' + topic_num + '/tool">(' + load_lang('topic_tool') + ''')</a>
                     <hr class="main_hr">
                     
