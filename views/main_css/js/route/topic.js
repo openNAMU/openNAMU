@@ -93,18 +93,21 @@ function opennamu_get_thread(topic_num = "", do_type = "") {
             let end_data = '';
             let end_render = [];
 
+            console.log(data);
+
             data = data["data"];
             tool_lang = tool_lang["data"];
 
             let first = data[0]["ip"];
             for(let for_a = 0; for_a < data.length; for_a++) {
+                let real_color = color;
                 if(color !== 'red') {
                     if(data[for_a]["blind"] === '1') {
-                        color = 'blue';
+                        real_color = 'blue';
                     } else if(first === data[for_a]["ip"]) {
-                        color = 'green';
+                        real_color = 'green';
                     } else {
-                        color = 'default';
+                        real_color = 'default';
                     }
                 }
 
@@ -115,7 +118,7 @@ function opennamu_get_thread(topic_num = "", do_type = "") {
                     date, 
                     '<div id="opennamu_' + color + '_thread_render_' + data[for_a]["id"] + '"></div>',
                     data[for_a]["id"],
-                    color,
+                    real_color,
                     data[for_a]["blind"],
                     '',
                     topic_num
