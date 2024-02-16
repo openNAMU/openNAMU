@@ -93,8 +93,6 @@ function opennamu_get_thread(topic_num = "", do_type = "") {
             let end_data = '';
             let end_render = [];
 
-            console.log(data);
-
             data = data["data"];
             tool_lang = tool_lang["data"];
 
