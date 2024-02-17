@@ -64,14 +64,15 @@ func Api_recent_change(call_arg []string) {
 		var send string
 		var leng string
 		var hide string
+		var type_data string
 
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select date, ip, send, leng, hide from history where id = ? and title = ?"))
+		stmt, err := db.Prepare(tool.DB_change(db_set, "select date, ip, send, leng, hide, type from history where id = ? and title = ?"))
 		if err != nil {
 			return
 		}
 		defer stmt.Close()
 
-		err = stmt.QueryRow(id, title).Scan(&date, &ip, &send, &leng, &hide)
+		err = stmt.QueryRow(id, title).Scan(&date, &ip, &send, &leng, &hide, &type_data)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				date = ""
@@ -79,15 +80,16 @@ func Api_recent_change(call_arg []string) {
 				send = ""
 				leng = ""
 				hide = ""
+				type_data = ""
 			} else {
 				return
 			}
 		}
 
 		if hide == "" || admin_auth != "" {
-			data_list = append(data_list, []string{id, title, date, tool.IP_preprocess(db_set, ip, other_set["ip"])[0], send, leng, hide, tool.IP_parser(db_set, ip, other_set["ip"])})
+			data_list = append(data_list, []string{id, title, date, tool.IP_preprocess(db_set, ip, other_set["ip"])[0], send, leng, hide, tool.IP_parser(db_set, ip, other_set["ip"]), type_data})
 		} else {
-			data_list = append(data_list, []string{"", "", "", "", "", "", hide, ""})
+			data_list = append(data_list, []string{"", "", "", "", "", "", hide, "", ""})
 		}
 	}
 

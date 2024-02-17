@@ -199,7 +199,7 @@ func IP_parser(db_set map[string]string, ip string, my_ip string) string {
 		return ip_pre_data[0]
 	} else {
 		raw_ip := ip
-		ip = ip_pre_data[0]
+		ip = HTML_escape(ip_pre_data[0])
 
 		if !IP_or_user(raw_ip) {
 			var user_name_level string
