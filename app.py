@@ -486,9 +486,8 @@ app.route('/block_log/ongoing/<int:num>', defaults = { 'tool' : 'ongoing' })(rec
 
 # Func-history
 app.route('/recent_change', defaults = { 'tool' : 'recent' })(recent_change)
-app.route('/recent_change/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
 app.route('/recent_changes', defaults = { 'tool' : 'recent' })(recent_change)
-app.route('/recent_changes/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
+app.route('/recent_change/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
 
 app.route('/record/<name>', defaults = { 'tool' : 'record' })(recent_change)
 app.route('/record/<int:num>/<set_type>/<name>', defaults = { 'tool' : 'record' })(recent_change)
@@ -702,10 +701,10 @@ app.route('/api/search_data/<everything:name>', defaults = { 'search_type' : 'da
 app.route('/api/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str })(api_search)
 
 # 곧 개편 당할 곳
-app.route('/api/recent_change/<int:num>')(api_recent_change)
-app.route('/api/recent_change')(api_recent_change)
-# recent_changes -> recent_change
-app.route('/api/recent_changes')(api_recent_change)
+app.route('/api/recent_change', defaults = { 'db_set' : db_set_str })(api_recent_change)
+app.route('/api/recent_changes', defaults = { 'db_set' : db_set_str })(api_recent_change)
+app.route('/api/recent_change/<int:limit>', defaults = { 'db_set' : db_set_str })(api_recent_change)
+app.route('/api/recent_change/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_recent_change)
 
 app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)

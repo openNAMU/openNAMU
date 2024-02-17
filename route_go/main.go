@@ -22,5 +22,7 @@ func main() {
 		route.Api_thread(call_arg[1:])
 	} else if call_arg[0] == "api_func_ip" {
 		route.Api_func_ip(call_arg[1:])
+	} else if call_arg[0] == "api_recent_change" {
+		route.Api_recent_change(call_arg[1:])
 	}
 }
