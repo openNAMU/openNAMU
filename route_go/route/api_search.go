@@ -28,7 +28,7 @@ func Api_search(call_arg []string) {
 	defer db.Close()
 
 	if other_set["search_type"] == "title" {
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select title from data where title like ? collate nocase order by title limit ?, 50"))
+		stmt, err := db.Prepare(tool.DB_change(db_set, "select title from data where title collate nocase like ? order by title limit ?, 50"))
 		if err != nil {
 			return
 		}
@@ -59,7 +59,7 @@ func Api_search(call_arg []string) {
 			fmt.Print(string(json_data))
 		}
 	} else {
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select title from data where data like ? collate nocase order by title limit ?, 50"))
+		stmt, err := db.Prepare(tool.DB_change(db_set, "select title from data where data collate nocase like ? order by title limit ?, 50"))
 		if err != nil {
 			return
 		}
