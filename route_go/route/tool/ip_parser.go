@@ -132,7 +132,7 @@ func IP_preprocess(db_set map[string]string, ip string, my_ip string) []string {
 
 	ip_change := ""
 	if IP_or_user(ip) {
-		if ip_view != "" {
+		if ip_view != "" && ip != my_ip {
 			hash_ip := Sha224(ip)
 			ip = hash_ip[:10]
 			ip_change = "true"
