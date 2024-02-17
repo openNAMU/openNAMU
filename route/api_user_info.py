@@ -94,5 +94,25 @@ def api_user_info(user_name = ''):
             data_result['user_title'] = db_data[0][0]
         else:
             data_result['user_title'] = ''
+
+        lang_data_list = [
+            'user_name',
+            'authority',
+            'state',
+            'member',
+            'normal',
+            'blocked',
+            'type',
+            'regex',
+            'period',
+            'limitless',
+            'login_able',
+            'why',
+            'band_blocked',
+            'ip',
+            'ban',
+            'level'
+        ]
+        lang_data = { for_a : load_lang(for_a) for for_a in lang_data_list }
                 
-        return flask.jsonify({ 'data' : data_result })
+        return flask.jsonify({ 'data' : data_result, 'language' : lang_data })
