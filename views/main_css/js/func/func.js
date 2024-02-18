@@ -159,3 +159,22 @@ function opennamu_do_render(to_obj, name, data, do_type = '') {
         }
     });
 }
+
+function opennamu_xss_filter(str) {
+    return str.replace(/[&<>"'\/]/g, function(match) {
+        switch(match) {
+            case '&':
+                return '&amp;';
+            case '<':
+                return '&lt;';
+            case '>':
+                return '&gt;';
+            case "'":
+                return '&#x27;';
+            case '"':
+                return '&quot;';
+            case '/':
+                return '&#x2F;';
+        }
+    });
+}
