@@ -1,6 +1,6 @@
 "use strict";
 
-function opennamu_view_raw_document(render = '') {
+function opennamu_view_w_raw(render = '') {
     let name = "test";
     if(document.getElementById('opennamu_editor_doc_name')) {
         name = document.getElementById('opennamu_editor_doc_name').innerHTML;
@@ -27,13 +27,13 @@ function opennamu_view_raw_document(render = '') {
             }
 
             if(render === 'do') {
-                opennamu_view_raw_document_preview();
+                opennamu_view_w_raw_preview();
             }
         }
     });
 }
 
-function opennamu_view_raw_document_preview() {
+function opennamu_view_w_raw_preview() {
     let name = "test";
     if(document.getElementById('opennamu_editor_doc_name')) {
         name = document.getElementById('opennamu_editor_doc_name').innerHTML;
@@ -45,4 +45,19 @@ function opennamu_view_raw_document_preview() {
     }
 
     opennamu_do_render('opennamu_preview_area', name, data);
+}
+
+function opennamu_view_w() {
+    let name = "test";
+    if(document.getElementById('opennamu_editor_doc_name')) {
+        name = document.getElementById('opennamu_editor_doc_name').innerHTML;
+    }
+
+    fetch("/api/raw/" + opennamu_do_url_encode(name)).then(function(res) {
+        return res.json();
+    }).then(function(data) {
+        if(data["data"]) {
+            opennamu_do_render('opennamu_preview_area', name, data["data"]);
+        }
+    });
 }
