@@ -1372,19 +1372,19 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', m
         if font_size_set_data != 'default':
             font_size_set_data = number_check(font_size_set_data)
 
-            get_class_render[0] = '''
-                <style>
+            get_class_render[0] = '' + \
+                '''<style>
                     .opennamu_render_complete {
                         font-size: ''' + font_size_set_data + '''px !important;
                     }
-                </style>
-            ''' + get_class_render[0]
+                </style>''' + \
+            '' + get_class_render[0]
 
         curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
-            get_class_render[0] = '''
-                <style>
+            get_class_render[0] = '' + \
+                '''<style>
                     .opennamu_render_complete {
                         font-size: 15px !important;
                         line-height: 1.5;
@@ -1398,8 +1398,8 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', m
                         list-style: none !important;
                         font-weight: bold !important;
                     }
-                </style>
-            ''' + get_class_render[0]
+                </style>''' + \
+            '' + get_class_render[0]
 
         table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip)
         if table_set_data == 'on':
@@ -1415,14 +1415,14 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', m
 
         transparent_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_transparent', ip)
         if transparent_set_data == 'on':
-            get_class_render[0] = '''
-                <style>
+            get_class_render[0] = '' + \
+                '''<style>
                     .table_safe td {
                         background: transparent !important;
                         color: inherit !important;
                     }
-                </style>
-            ''' + get_class_render[0]
+                </style>''' + \
+            '' + get_class_render[0]
 
         if data_type == 'api_view' or data_type == 'api_thread':
             return [
