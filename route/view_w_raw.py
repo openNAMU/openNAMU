@@ -1,9 +1,7 @@
 from .tool.func import *
 
-def view_raw_document(name = '', rev = '', doc_acl = ''):
+def view_w_raw(name = '', rev = '', doc_acl = ''):
     with get_db_connect() as conn:
-        curs = conn.cursor()
-
         rev_str = str(rev)
 
         sub = '(' + load_lang('raw') + ')'
@@ -19,10 +17,10 @@ def view_raw_document(name = '', rev = '', doc_acl = ''):
             <div id="opennamu_preview_area">
                 <textarea id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
                 <textarea id="opennamu_editor_rev" style="display: none;">''' + rev_str + '''</textarea>
-                <button id="opennamu_preview_button" type="button" onclick="opennamu_view_raw_document_preview();">''' + load_lang('preview') + '''</button>
+                <button id="opennamu_preview_button" type="button" onclick="opennamu_view_w_raw_preview();">''' + load_lang('preview') + '''</button>
                 <hr class="main_hr">
                 <textarea readonly id="opennamu_edit_textarea" class="opennamu_textarea_500"></textarea>
-                <script>opennamu_view_raw_document();</script>
+                <script>opennamu_view_w_raw();</script>
             </div>
         '''
         

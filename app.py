@@ -514,9 +514,9 @@ app.route('/xref_page/<int:num>/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
-app.route('/raw/<everything:name>')(view_raw_document)
-app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 'on' })(view_raw_document)
-app.route('/raw_rev/<int:rev>/<everything:name>')(view_raw_document)
+app.route('/raw/<everything:name>')(view_w_raw)
+app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 'on' })(view_w_raw)
+app.route('/raw_rev/<int:rev>/<everything:name>')(view_w_raw)
 
 app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')(view_diff)
 
@@ -525,8 +525,8 @@ app.route('/down/<everything:name>')(view_down)
 app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_set)
 
 # everything 다음에 추가 붙은 경우에 대해서 재검토 필요 (진행중)
-app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_read)
-app.route('/w/<everything:name>')(view_read)
+app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_w)
+app.route('/w/<everything:name>')(view_w)
 
 app.route('/random', defaults = { 'db_set' : db_set_str })(view_random)
 

@@ -156,8 +156,8 @@ from route.view_set import view_set
 from route.view_diff import view_diff
 from route.view_down import view_down
 from route.view_raw import view_raw
-from route.view_raw_document import view_raw_document
-from route.view_read import view_read
+from route.view_w_raw import view_w_raw
+from route.view_w import view_w
 from route.view_xref import view_xref
 from route.view_random import view_random
 

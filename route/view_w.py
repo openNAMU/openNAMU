@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def view_read(name = 'Test', do_type = ''):
+def view_w(name = 'Test', do_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -83,10 +83,12 @@ def view_read(name = 'Test', do_type = ''):
         elif re.search(r"^user:([^/]*)", name):
             name_view = name
             doc_type = 'user'
+            user_name = ''
 
             match = re.search(r"^user:([^/]*)", name)
+            if match:
+                user_name = html.escape(match.group(1))
             
-            user_name = html.escape(match.group(1))
             user_doc = ''
             
             # S admin or owner 특수 틀 추가
@@ -163,8 +165,7 @@ def view_read(name = 'Test', do_type = ''):
         end_data = '''
             <div id="opennamu_preview_area">
                 <textarea id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
-                <textarea readonly id="opennamu_edit_textarea" class="opennamu_textarea_500"></textarea>
-                <script>opennamu_view_raw_document(render = 'do');</script>
+                <script>opennamu_view_w();</script>
             </div>
         '''
 
