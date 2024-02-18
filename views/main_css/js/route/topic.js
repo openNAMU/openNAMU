@@ -135,9 +135,9 @@ function opennamu_get_thread(topic_num = "", do_type = "") {
         for(let for_a = 0; for_a < end_render.length; for_a++) {
             document.getElementById('opennamu_' + color + '_thread_render_' + end_render[for_a][1] + '_button').addEventListener("click", function() {
                 opennamu_do_render(
-                    'opennamu_' + color + '_thread_render_' + end_render[for_a][1], 
-                    "thread_" + topic_num + "_" + color + "_" + end_render[for_a][1], 
+                    'opennamu_' + color + '_thread_render_' + end_render[for_a][1],
                     end_render[for_a][0], 
+                    '',
                     'thread'
                 );
             });

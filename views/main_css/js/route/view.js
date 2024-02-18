@@ -44,7 +44,7 @@ function opennamu_view_w_raw_preview() {
         data = document.getElementById('opennamu_edit_textarea').value;
     }
 
-    opennamu_do_render('opennamu_preview_area', name, data);
+    opennamu_do_render('opennamu_preview_area', data, name);
 }
 
 function opennamu_view_w() {
@@ -57,7 +57,7 @@ function opennamu_view_w() {
         return res.json();
     }).then(function(data) {
         if(data["data"]) {
-            opennamu_do_render('opennamu_preview_area', name, data["data"]);
+            opennamu_do_render('opennamu_preview_area', data["data"], name);
         }
     });
 }

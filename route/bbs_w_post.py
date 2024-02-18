@@ -36,10 +36,7 @@ def bbs_w_post_comment(user_id, sub_code, comment_num, bbs_num_str, post_num_str
             comment_data += api_topic_thread_make(
                 ip_pas(temp_dict['comment_user_id']),
                 date,
-                render_set(
-                    doc_data = temp_dict['comment'],
-                    data_in = 'bbs_comment_' + sub_code_check
-                ),
+                render_set(doc_data = temp_dict['comment']),
                 sub_code_check,
                 color = color,
                 add_style = 'width: calc(100% - ' + str(margin_count * 20) + 'px);'
@@ -132,11 +129,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                 data += api_topic_thread_make(
                     ip_pas(temp_dict['user_id']),
                     date,
-                    render_set(
-                        doc_data = temp_dict['data'],
-                        data_type = 'thread',
-                        data_in = 'bbs'
-                    ),
+                    render_set(doc_data = temp_dict['data'], data_type = 'thread'),
                     '0',
                     color = 'green'
                 )
@@ -159,11 +152,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                     data += api_topic_thread_make(
                         ip_pas(temp_dict['comment_user_id']),
                         date,
-                        render_set(
-                            doc_data = temp_dict['comment'],
-                            data_type = 'thread',
-                            data_in = 'bbs_comment_' + str(count)
-                        ),
+                        render_set(doc_data = temp_dict['comment'], data_type = 'thread'),
                         str(count),
                         color = color
                     )
@@ -262,10 +251,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                 data += api_topic_thread_make(
                     ip_pas(temp_dict['user_id']),
                     date,
-                    render_set(
-                        doc_data = temp_dict['data'],
-                        data_in = 'bbs'
-                    ),
+                    render_set(doc_data = temp_dict['data']),
                     '0',
                     color = 'red'
                 )

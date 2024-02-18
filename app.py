@@ -670,10 +670,8 @@ app.route('/bbs/edit/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['PO
 app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_delete)
 
 # Func-api
-app.route('/api/render_tool/<tool>/<data_in>', methods = ['POST'])(api_w_render)
-app.route('/api/render_tool/<tool>', methods = ['POST'])(api_w_render)
-app.route('/api/render/<everything:name>', methods = ['POST'])(api_w_render)
 app.route('/api/render', methods = ['POST'])(api_w_render)
+app.route('/api/render/<tool>', methods = ['POST'])(api_w_render)
 
 app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on', 'db_set' : db_set_str })(api_w_raw)
 app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_raw)

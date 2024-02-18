@@ -1045,7 +1045,7 @@ def wiki_css(data):
     data_css = ''
     data_css_dark = ''
 
-    data_css_ver = '205'
+    data_css_ver = '206'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:
@@ -1314,17 +1314,28 @@ def load_skin(data = '', set_n = 0, default = 0):
     return skin_return_data
 
 # Func-markup
-def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', markup = ''):
+def render_set(doc_name = '', doc_data = '', data_type = 'view', markup = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        # data_type in ['view', 'from', 'thread', 'raw', 'api_view', 'api_thread', 'backlink']
+        # data_type in ['view', 'from', 'thread', 'api_view', 'api_thread', 'api_include', 'backlink']
         # data_type을 list 형식으로 개편 필요할 듯
 
-        data_type = 'view' if data_type == '' else data_type
+        return_type = True
+        if data_type in ['api_view', 'api_thread', 'api_include']:
+            return_type = False
+
+        if data_type == '':
+            data_type = 'view'
+        elif data_type == 'api_view':
+            data_type = 'view'
+        elif data_type == 'api_thread':
+            data_type = 'thread'
+        elif data_type == 'api_include':
+            data_type = 'include'
+
         doc_data = '' if doc_data == None else doc_data
 
-        acl_dict = {}
         ip = ip_check()
         render_lang_data = {
             'toc' : load_lang('toc'),
@@ -1336,33 +1347,7 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', m
         if db_data and db_data[0][0] != '':
             render_lang_data['category'] = db_data[0][0]
 
-        get_class_render = class_do_render(conn, render_lang_data, markup).do_render(doc_name, doc_data, data_type, data_in)
-        
-        if 'include' in get_class_render[2]:
-            for_a = 0
-            while len(get_class_render[2]['include']) > for_a:
-                include_data = get_class_render[2]['include'][for_a]
-                if include_data[1] in acl_dict:
-                    acl_result = acl_dict[include_data[1]]
-                else:
-                    acl_result = acl_check(include_data[1], 'render')
-                    acl_dict[include_data[1]] = acl_result
-
-                if acl_result == 0:
-                    include_regex = re.compile('<div id="' + include_data[0] + '"><\\/div>')
-                    if re.search(include_regex, get_class_render[0]):
-                        include_data_render = class_do_render(conn, render_lang_data, markup).do_render(include_data[1], include_data[2], data_type, include_data[0] + data_in)
-                        if len(include_data) > 3:
-                            include_data_render[0] = '<div id="' + include_data[0] + '" ' + include_data[3] + '>' + include_data_render[0] + '</div>'
-                        else:
-                            include_data_render[0] = '<div id="' + include_data[0] + '">' + include_data_render[0] + '</div>'
-
-                        get_class_render[0] = re.sub(include_regex, include_data_render[0], get_class_render[0])
-                        get_class_render[1] += include_data_render[1]
-                        get_class_render[2]['include'] += include_data_render[2]['include']
-
-                for_a += 1
-
+        get_class_render = class_do_render(conn, render_lang_data, markup).do_render(doc_name, doc_data, data_type)
         if data_type == 'backlink':
             return ''
 
@@ -1424,11 +1409,8 @@ def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', m
                 </style>''' + \
             '' + get_class_render[0]
 
-        if data_type == 'api_view' or data_type == 'api_thread':
-            return [
-                get_class_render[0], 
-                get_class_render[1]
-            ]
+        if not return_type:
+            return [get_class_render[0], get_class_render[1]]
         else:
             return get_class_render[0] + '<script>' + get_class_render[1] + '</script>'
         
