@@ -63,7 +63,6 @@ function opennamu_get_thread_ui(user_id, date, data, code, color = '', blind = '
                 <tr>
                     <td class="` + color_b + ` opennamu_comment_data_main" id="thread_` + code + `">
                         ` + data + `
-                        <div id="opennamu_topic_req_` + code + `"></div>
                     </td>
                 </tr>
             </table>
@@ -93,8 +92,12 @@ function opennamu_get_thread(topic_num = "", do_type = "") {
         let lang = data["language"];
         data = data["data"];
 
-        let first = data[0]["ip"];
+        let first = '';
         for(let for_a = 0; for_a < data.length; for_a++) {
+            if(first === '') {
+                first = data[for_a]["ip"];
+            }
+
             let real_color = color;
             if(color !== 'red') {
                 if(data[for_a]["blind"] === '1') {
@@ -107,13 +110,13 @@ function opennamu_get_thread(topic_num = "", do_type = "") {
             }
 
             let date = '<a href="/thread/' + topic_num + '/comment/' + data[for_a]["id"] + '/tool">(' + lang["tool"] + ')</a> ' + data[for_a]["date"];
-            let render_button = ' <a href="javascript:void();" id="opennamu_' + color + '_thread_render_' + data[for_a]["id"] + '_button">(' + lang["render"] + ")</a>"
+            let render_button = ' <a href="javascript:void(0);" id="opennamu_' + color + '_thread_render_' + data[for_a]["id"] + '_button">(' + lang["render"] + ")</a>"
             let render_data = data[for_a]["data"] !== "" ? data[for_a]["data"] : "[br]";
 
             end_data += opennamu_get_thread_ui(
                 data[for_a]["ip_render"] + render_button, 
                 date, 
-                '<div id="opennamu_' + color + '_thread_render_' + data[for_a]["id"] + '">' + opennamu_xss_filter(render_data) + '</div>',
+                '<div class="opennamu_comment_scroll" id="opennamu_' + color + '_thread_render_' + data[for_a]["id"] + '">' + opennamu_xss_filter(render_data) + '</div>',
                 data[for_a]["id"],
                 real_color,
                 data[for_a]["blind"],

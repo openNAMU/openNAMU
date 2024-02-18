@@ -110,6 +110,8 @@ details summary {
 
 .opennamu_comment_scroll {
     max-height: 500px;
+
+    white-space: pre;
     
     overflow: scroll;
     -ms-overflow-style: none;
