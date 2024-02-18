@@ -87,57 +87,57 @@ function opennamu_get_thread(topic_num = "", do_type = "") {
     fetch(url).then(function(res) {
         return res.json();
     }).then(function(data) {
-        fetch("/api/lang/tool").then(function(res) {
-            return res.json();
-        }).then(function(tool_lang) {
-            let end_data = '';
-            let end_render = [];
+        let end_data = '';
+        let end_render = [];
 
-            data = data["data"];
-            tool_lang = tool_lang["data"];
+        let lang = data["language"];
+        data = data["data"];
 
-            let first = data[0]["ip"];
-            for(let for_a = 0; for_a < data.length; for_a++) {
-                let real_color = color;
-                if(color !== 'red') {
-                    if(data[for_a]["blind"] === '1') {
-                        real_color = 'blue';
-                    } else if(first === data[for_a]["ip"]) {
-                        real_color = 'green';
-                    } else {
-                        real_color = 'default';
-                    }
+        let first = data[0]["ip"];
+        for(let for_a = 0; for_a < data.length; for_a++) {
+            let real_color = color;
+            if(color !== 'red') {
+                if(data[for_a]["blind"] === '1') {
+                    real_color = 'blue';
+                } else if(first === data[for_a]["ip"]) {
+                    real_color = 'green';
+                } else {
+                    real_color = 'default';
                 }
-
-                let date = '<a href="/thread/' + topic_num + '/comment/' + data[for_a]["id"] + '/tool">(' + tool_lang + ')</a> ' + data[for_a]["date"];
-
-                end_data += opennamu_get_thread_ui(
-                    data[for_a]["ip_render"], 
-                    date, 
-                    '<div id="opennamu_' + color + '_thread_render_' + data[for_a]["id"] + '"></div>',
-                    data[for_a]["id"],
-                    real_color,
-                    data[for_a]["blind"],
-                    '',
-                    topic_num
-                )
-
-                end_render.push([
-                    data[for_a]["data"] !== "" ? data[for_a]["data"] : "[br]",
-                    data[for_a]["id"]
-                ]);
             }
 
-            document.getElementById(to_obj).innerHTML = end_data;
+            let date = '<a href="/thread/' + topic_num + '/comment/' + data[for_a]["id"] + '/tool">(' + lang["tool"] + ')</a> ' + data[for_a]["date"];
+            let render_button = ' <a href="javascript:void();" id="opennamu_' + color + '_thread_render_' + data[for_a]["id"] + '_button">(' + lang["render"] + ")</a>"
+            let render_data = data[for_a]["data"] !== "" ? data[for_a]["data"] : "[br]";
 
-            for(let for_a = 0; for_a < end_render.length; for_a++) {
+            end_data += opennamu_get_thread_ui(
+                data[for_a]["ip_render"] + render_button, 
+                date, 
+                '<div id="opennamu_' + color + '_thread_render_' + data[for_a]["id"] + '">' + opennamu_xss_filter(render_data) + '</div>',
+                data[for_a]["id"],
+                real_color,
+                data[for_a]["blind"],
+                '',
+                topic_num
+            )
+
+            end_render.push([
+                render_data,
+                data[for_a]["id"]
+            ]);
+        }
+
+        document.getElementById(to_obj).innerHTML = end_data;
+
+        for(let for_a = 0; for_a < end_render.length; for_a++) {
+            document.getElementById('opennamu_' + color + '_thread_render_' + end_render[for_a][1] + '_button').addEventListener("click", function() {
                 opennamu_do_render(
                     'opennamu_' + color + '_thread_render_' + end_render[for_a][1], 
                     "thread_" + topic_num + "_" + color + "_" + end_render[for_a][1], 
                     end_render[for_a][0], 
                     'thread'
                 );
-            }
-        });
+            });
+        }
     });
 }

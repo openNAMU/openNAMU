@@ -96,8 +96,9 @@ func Api_thread(call_arg []string) {
 			data_list = append(data_list, []string{id, data, date, ip, block, top})
 		}
 
-		new_data := map[string][]map[string]string{}
+		new_data := make(map[string]interface{})
 		new_data["data"] = []map[string]string{}
+		data_slice := []map[string]string{}
 
 		admin_auth := tool.Get_admin_auth(db_set, other_set["ip"])
 
@@ -107,7 +108,7 @@ func Api_thread(call_arg []string) {
 				data = data_list[for_a][1]
 			}
 
-			new_data["data"] = append(new_data["data"], map[string]string{
+			data_slice = append(data_slice, map[string]string{
 				"id":        data_list[for_a][0],
 				"data":      data,
 				"date":      data_list[for_a][2],
@@ -115,6 +116,12 @@ func Api_thread(call_arg []string) {
 				"ip_render": tool.IP_parser(db_set, data_list[for_a][3], other_set["ip"]),
 				"blind":     data_list[for_a][4],
 			})
+		}
+
+		new_data["data"] = data_slice
+		new_data["language"] = map[string]string{
+			"tool":   tool.Get_language(db_set, "tool", false),
+			"render": tool.Get_language(db_set, "render", false),
 		}
 
 		json_data, _ := json.Marshal(new_data)
