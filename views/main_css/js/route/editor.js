@@ -242,7 +242,7 @@ function opennamu_do_editor_preview() {
             doc_name = doc_name_input.value;
         }
 
-        opennamu_do_render('opennamu_preview_area', doc_name, input.value);
+        opennamu_do_render('opennamu_preview_area', input.value, doc_name);
     }
 }
 

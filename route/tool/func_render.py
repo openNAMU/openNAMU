@@ -17,18 +17,24 @@ class class_do_render:
         self.lang_data = lang_data
         self.markup = markup
 
-    def do_render(self, doc_name, doc_data, data_type, data_in):
+    def do_render(self, doc_name, doc_data, data_type):
         curs = self.conn.cursor()
 
         doc_set = {}
         if data_type == 'from':
             doc_set['doc_from'] = 'O'
             data_type = 'view'
-        
-        data_in = (data_in + '_') if data_in != '' else ''
-        doc_set['doc_include'] = data_in
-        rep_data = self.markup
+        else:
+            doc_set['doc_from'] = ''
 
+        if data_type == 'backlink':
+            doc_set['doc_type'] = 'view'
+        else:
+            doc_set['doc_type'] = data_type
+        
+        doc_set['doc_include'] = str(time.time_ns()) + '_'
+    
+        rep_data = self.markup
         if rep_data == '' and doc_name != '':
             curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [doc_name])
             db_data = curs.fetchall()
@@ -47,7 +53,7 @@ class class_do_render:
         else:
             data_end = [doc_data, '', {}]
 
-        if data_type == 'thread' or data_type == 'api_thread':
+        if data_type == 'thread':
             def do_thread_a_change(match):
                 data = match[2].replace('#', '')
                 data_split = data.split('-')
@@ -63,7 +69,7 @@ class class_do_render:
             data_end[0] = re.sub(r'&lt;(topic_a(?:_post|_thread)?)&gt;((?:(?!&lt;\/topic_a(?:_post|_thread)?&gt;).)+)&lt;\/topic_a(?:_post|_thread)?&gt;', do_thread_a_change, data_end[0])
             data_end[0] = re.sub(r'&lt;topic_call&gt;@(?P<in>(?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;', '<a href="/w/user:\\g<in>">@\\g<in></a>', data_end[0])
 
-        if data_type == 'backlink' and data_in == '':
+        if data_type == 'backlink':
             curs.execute(db_change("delete from back where link = ?"), [doc_name])
             curs.execute(db_change("delete from back where title = ? and type = 'no'"), [doc_name])
 

@@ -132,19 +132,21 @@ function opennamu_do_trace_spread() {
     }
 }
 
-function opennamu_do_render(to_obj, name, data, do_type = '') {
+function opennamu_do_render(to_obj, data, name = '', do_type = '', option = '') {
     let url;
     if(do_type === '') {
-        url = "/api/render/" + opennamu_do_url_encode(name);
+        url = "/api/render";
     } else {
-        url = "/api/render_tool/thread/" + opennamu_do_url_encode(name);
+        url = "/api/render/" + do_type;
     }
 
     fetch(url, {
         method : 'POST',
         headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
         body : new URLSearchParams({
+            'name' : name,
             'data': data,
+            'option' : option
         })
     }).then(function(res) {
         return res.json();
