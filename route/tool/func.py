@@ -2060,10 +2060,10 @@ def acl_check(name = '', tool = '', topic_num = '1'):
                 elif acl_data[0][0] == 'not_all':
                     return 1
                 elif acl_data[0][0] == 'up_to_level_3':
-                    if level_check(ip)[0] >= 3:
+                    if int(level_check(ip)[0]) >= 3:
                         return 0
                 elif acl_data[0][0] == 'up_to_level_10':
-                    if level_check(ip)[0] >= 10:
+                    if int(level_check(ip)[0]) >= 10:
                         return 0
 
                 return 1
