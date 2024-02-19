@@ -84,7 +84,7 @@ def edit_move(name):
                         ip, 
                         send, 
                         '0',
-                        t_check = 'merge <a>' + name + '</a> - <a>' + move_title + '</a> move',
+                        t_check = '<a>' + name + '</a> ↔ <a>' + move_title + '</a>',
                         mode = 'move'
                     )
                 elif move_option == 'reverse':
@@ -120,7 +120,7 @@ def edit_move(name):
                             ip, 
                             send, 
                             '0',
-                            t_check = '<a>' + title_name[0] + '</a> - <a>' + title_name[1] + '</a> move',
+                            t_check = '<a>' + title_name[0] + '</a> → <a>' + title_name[1] + '</a>',
                             mode = 'move'
                         )
                 elif move_option != 'none':
@@ -153,7 +153,7 @@ def edit_move(name):
                     ip, 
                     send,
                     '0',
-                    t_check = '<a>' + name + '</a> - <a>' + move_title + '</a> move',
+                    t_check = '<a>' + name + '</a> → <a>' + move_title + '</a>',
                     mode = 'move'
                 )
 

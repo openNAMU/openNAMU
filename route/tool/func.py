@@ -2492,7 +2492,7 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
             mode = 'r1' if id_data == '1' else mode
             mode = mode if not re.search('^user:', title) else 'user'
 
-        send = re.sub(r'\(|\)|<|>', '', send)
+        send = re.sub(r'<|>', '', send)
         send = send[:512] if len(send) > 512 else send
         send = send + ' (' + t_check + ')' if t_check != '' else send
 
@@ -2504,7 +2504,7 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
             history_plus_rc_max(curs, mode)
             curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [id_data, title, date, mode])
 
-            data_set_exist = '' if t_check != 'delete' else 'not_exist'
+            data_set_exist = '' if mode != 'delete' else 'not_exist'
 
             curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "last_edit"'), [title])
             curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'last_edit', ?)"), [title, date])
