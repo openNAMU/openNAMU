@@ -100,7 +100,7 @@ func Api_thread(call_arg []string) {
 		new_data["data"] = []map[string]string{}
 		data_slice := []map[string]string{}
 
-		admin_auth := tool.Get_admin_auth(db_set, other_set["ip"])
+		admin_auth := tool.Get_admin_auth(db, db_set, other_set["ip"])
 
 		for for_a := 0; for_a < len(data_list); for_a++ {
 			data := ""
@@ -112,16 +112,16 @@ func Api_thread(call_arg []string) {
 				"id":        data_list[for_a][0],
 				"data":      data,
 				"date":      data_list[for_a][2],
-				"ip":        tool.IP_preprocess(db_set, data_list[for_a][3], other_set["ip"])[0],
-				"ip_render": tool.IP_parser(db_set, data_list[for_a][3], other_set["ip"]),
+				"ip":        tool.IP_preprocess(db, db_set, data_list[for_a][3], other_set["ip"])[0],
+				"ip_render": tool.IP_parser(db, db_set, data_list[for_a][3], other_set["ip"]),
 				"blind":     data_list[for_a][4],
 			})
 		}
 
 		new_data["data"] = data_slice
 		new_data["language"] = map[string]string{
-			"tool":   tool.Get_language(db_set, "tool", false),
-			"render": tool.Get_language(db_set, "render", false),
+			"tool":   tool.Get_language(db, db_set, "tool", false),
+			"render": tool.Get_language(db, db_set, "render", false),
 		}
 
 		json_data, _ := json.Marshal(new_data)

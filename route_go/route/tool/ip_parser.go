@@ -15,13 +15,7 @@ func IP_or_user(ip string) bool {
 	}
 }
 
-func Get_level(db_set map[string]string, ip string) []string {
-	db := DB_connect(db_set)
-	if db == nil {
-		return []string{"", "", ""}
-	}
-	defer db.Close()
-
+func Get_level(db *sql.DB, db_set map[string]string, ip string) []string {
 	var level string
 	var exp string
 	var max_exp string
@@ -62,13 +56,7 @@ func Get_level(db_set map[string]string, ip string) []string {
 	return []string{level, exp, max_exp}
 }
 
-func Get_admin_auth(db_set map[string]string, ip string) string {
-	db := DB_connect(db_set)
-	if db == nil {
-		return ""
-	}
-	defer db.Close()
-
+func Get_admin_auth(db *sql.DB, db_set map[string]string, ip string) string {
 	if !IP_or_user(ip) {
 		var auth string
 
@@ -97,13 +85,7 @@ func Get_admin_auth(db_set map[string]string, ip string) string {
 	return ""
 }
 
-func IP_preprocess(db_set map[string]string, ip string, my_ip string) []string {
-	db := DB_connect(db_set)
-	if db == nil {
-		return []string{"", ""}
-	}
-	defer db.Close()
-
+func IP_preprocess(db *sql.DB, db_set map[string]string, ip string, my_ip string) []string {
 	var ip_view string
 	var user_name_view string
 
@@ -125,7 +107,7 @@ func IP_preprocess(db_set map[string]string, ip string, my_ip string) []string {
 		}
 	}
 
-	if Get_admin_auth(db_set, my_ip) != "" {
+	if Get_admin_auth(db, db_set, my_ip) != "" {
 		ip_view = ""
 		user_name_view = ""
 	}
@@ -183,14 +165,8 @@ func IP_preprocess(db_set map[string]string, ip string, my_ip string) []string {
 	return []string{ip, ip_change}
 }
 
-func IP_parser(db_set map[string]string, ip string, my_ip string) string {
-	db := DB_connect(db_set)
-	if db == nil {
-		return ""
-	}
-	defer db.Close()
-
-	ip_pre_data := IP_preprocess(db_set, ip, my_ip)
+func IP_parser(db *sql.DB, db_set map[string]string, ip string, my_ip string) string {
+	ip_pre_data := IP_preprocess(db, db_set, ip, my_ip)
 	if ip_pre_data[0] == "" {
 		return ""
 	}
@@ -215,7 +191,7 @@ func IP_parser(db_set map[string]string, ip string, my_ip string) string {
 			}
 
 			if user_name_level != "" {
-				level_data := Get_level(db_set, raw_ip)
+				level_data := Get_level(db, db_set, raw_ip)
 				ip += "<sup>" + level_data[0] + "</sup>"
 			}
 
@@ -236,14 +212,14 @@ func IP_parser(db_set map[string]string, ip string, my_ip string) string {
 				}
 			}
 
-			if Get_admin_auth(db_set, ip) != "" {
+			if Get_admin_auth(db, db_set, ip) != "" {
 				ip = "<b>" + ip + "</b>"
 			}
 
 			ip = user_title + ip
 		}
 
-		ip += " <a href=\"/user/" + Url_parser(raw_ip) + "\">(" + Get_language(db_set, "tool", false) + ")</a>"
+		ip += " <a href=\"/user/" + Url_parser(raw_ip) + "\">(" + Get_language(db, db_set, "tool", false) + ")</a>"
 
 		return ip
 	}

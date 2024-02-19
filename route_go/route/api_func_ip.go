@@ -14,7 +14,13 @@ func Api_func_ip(call_arg []string) {
 	other_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[1]), &other_set)
 
-	ip_data := tool.IP_parser(db_set, other_set["data"], other_set["ip"])
+	db := tool.DB_connect(db_set)
+	if db == nil {
+		return
+	}
+	defer db.Close()
+
+	ip_data := tool.IP_parser(db, db_set, other_set["data"], other_set["ip"])
 
 	new_data := map[string]string{}
 	new_data["data"] = ip_data
