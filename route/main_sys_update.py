@@ -23,7 +23,7 @@ def main_sys_update():
                 ok = []
                 ok += [os.system('git remote rm origin')]
                 ok += [os.system('git remote add origin https://github.com/opennamu/opennamu.git -b ' + up_data)]
-                ok += [os.system('git fetch origin ' + up_data)]
+                ok += [os.system('git fetch --depth=1 origin ' + up_data)]
                 ok += [os.system('git reset --hard origin/' + up_data)]
                 for for_a in ok:
                     if for_a != 0:
