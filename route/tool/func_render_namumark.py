@@ -2312,6 +2312,12 @@ class class_do_render_namumark:
 
         self.render_data = re.sub(r'<a fn_target="([^"]+)"', do_render_last_footnote, self.render_data)
 
+        self.render_data_js += '''
+            document.querySelectorAll('details').forEach((el) => {
+                new Accordion(el);
+            });
+        '''
+
     def __call__(self):
         self.do_render_remark()
         self.do_render_include_default()

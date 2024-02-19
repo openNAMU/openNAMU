@@ -78,12 +78,6 @@ class Accordion {
     }
 }
 
-window.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('details').forEach((el) => {
-        new Accordion(el);
-    });
-});
-
 function opennamu_do_id_check(data) {
     if(data.match(/\.|\:/)) {
         return 0;
