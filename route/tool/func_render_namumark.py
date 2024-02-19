@@ -2320,6 +2320,9 @@ class class_do_render_namumark:
             document.querySelectorAll('details').forEach((el) => {
                 new Accordion(el);
             });
+            if(window.location.hash !== '' && document.getElementById(window.location.hash.replace(/^#/, ''))) {
+                document.getElementById(window.location.hash.replace(/^#/, '')).focus();
+            }\n
         '''
 
     def __call__(self):
