@@ -24,7 +24,6 @@ def recent_history_add(name = 'Test', do_type = ''):
                 'Add:' + flask.request.form.get('get_ip', ''),
                 flask.request.form.get('send', ''),
                 leng,
-                t_check = 'add',
                 mode = 'add'
             )
 

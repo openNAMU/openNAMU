@@ -65,9 +65,9 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
 
                 set_type = '' if set_type == 'edit' else set_type
                 if set_type != 'normal':
-                    curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where title = ? and type = ? order by id + 0 desc limit ?, 50'), [name, set_type, sql_num])
+                    curs.execute(db_change('select id, title, date, ip, send, leng, hide, type from history where title = ? and type = ? order by id + 0 desc limit ?, 50'), [name, set_type, sql_num])
                 else:
-                    curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where title = ? order by id + 0 desc limit ?, 50'), [name, sql_num])
+                    curs.execute(db_change('select id, title, date, ip, send, leng, hide, type from history where title = ? order by id + 0 desc limit ?, 50'), [name, sql_num])
 
                 data_list = curs.fetchall()
             elif tool == 'record':
@@ -80,9 +80,9 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                 set_type = '' if set_type == 'edit' else set_type
 
                 if set_type != 'normal':
-                    curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where ip = ? and type = ? order by date desc limit ?, 50'), [name, set_type, sql_num])
+                    curs.execute(db_change('select id, title, date, ip, send, leng, hide, type from history where ip = ? and type = ? order by date desc limit ?, 50'), [name, set_type, sql_num])
                 else:
-                    curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where ip = ? order by date desc limit ?, 50'), [name, sql_num])
+                    curs.execute(db_change('select id, title, date, ip, send, leng, hide, type from history where ip = ? order by date desc limit ?, 50'), [name, sql_num])
                 
                 data_list = curs.fetchall()
             else:
@@ -99,13 +99,13 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                 if num == 1 or all_admin != 1:
                     curs.execute(db_change('select title, id from rc where type = ? order by date desc limit 50'), [set_type])
                     for for_a in curs.fetchall():
-                        curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where title = ? and id = ?'), for_a)
+                        curs.execute(db_change('select id, title, date, ip, send, leng, hide, type from history where title = ? and id = ?'), for_a)
                         data_list += curs.fetchall()
                 else:
                     if set_type != 'normal':
-                        curs.execute(db_change('select id, title, date, ip, send, leng, hide from history where type = ? order by date desc limit ?, 50'), [set_type, sql_num])
+                        curs.execute(db_change('select id, title, date, ip, send, leng, hide, type from history where type = ? order by date desc limit ?, 50'), [set_type, sql_num])
                     else:
-                        curs.execute(db_change('select id, title, date, ip, send, leng, hide from history order by date desc limit ?, 50'), [sql_num])
+                        curs.execute(db_change('select id, title, date, ip, send, leng, hide, type from history order by date desc limit ?, 50'), [sql_num])
 
                     data_list = curs.fetchall()
 
@@ -128,6 +128,15 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
 
                 style = ['', '']
                 date = data[2]
+
+                type_data = ''
+                if data[7] != '':
+                    if data[7] == 'r1':
+                        type_data = ' (' + data[7] + ')'
+                    else:
+                        type_data = ' (' + load_lang(data[7]) + ')'
+
+                send += type_data
 
                 if data[6] == 'O':
                     if admin == 1:

@@ -60,7 +60,6 @@ def edit_request(name = 'Test', do_type = ''):
                     edit_request_user,
                     edit_request_send,
                     edit_request_leng,
-                    t_check = 'approve',
                     mode = 'edit_request'
                 )
                 
@@ -77,7 +76,6 @@ def edit_request(name = 'Test', do_type = ''):
                     edit_request_user,
                     edit_request_send,
                     '0',
-                    t_check = 'decline',
                     mode = 'edit_request'
                 )
                 
@@ -90,10 +88,10 @@ def edit_request(name = 'Test', do_type = ''):
             db_data = curs.fetchall()
             old_data = db_data[0][0] if db_data else ''
 
-            result = view_diff_do(old_data, edit_request_data, 'r' + doc_ver, load_lang('edit_req'))
+            result = view_diff_do(old_data, edit_request_data, 'r' + doc_ver, load_lang('edit_request'))
 
             return easy_minify(flask.render_template(skin_check(), 
-                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('edit_req_check') + ')', 0])],
+                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('edit_request_check') + ')', 0])],
                 data = '''
                     <div id="opennamu_get_user_info">''' + html.escape(edit_request_user) + '''</div>
                     <hr class="main_hr">
