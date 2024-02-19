@@ -51,7 +51,7 @@ func Api_recent_change(call_arg []string) {
 	var title string
 
 	var data_list [][]string
-	admin_auth := tool.Get_admin_auth(db_set, other_set["ip"])
+	admin_auth := tool.Get_admin_auth(db, db_set, other_set["ip"])
 
 	for rows.Next() {
 		err := rows.Scan(&id, &title)
@@ -87,7 +87,17 @@ func Api_recent_change(call_arg []string) {
 		}
 
 		if hide == "" || admin_auth != "" {
-			data_list = append(data_list, []string{id, title, date, tool.IP_preprocess(db_set, ip, other_set["ip"])[0], send, leng, hide, tool.IP_parser(db_set, ip, other_set["ip"]), type_data})
+			data_list = append(data_list, []string{
+				id,
+				title,
+				date,
+				tool.IP_preprocess(db, db_set, ip, other_set["ip"])[0],
+				send,
+				leng,
+				hide,
+				tool.IP_parser(db, db_set, ip, other_set["ip"]),
+				type_data,
+			})
 		} else {
 			data_list = append(data_list, []string{"", "", "", "", "", "", hide, "", ""})
 		}

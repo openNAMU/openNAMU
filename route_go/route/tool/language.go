@@ -7,13 +7,7 @@ import (
 	"os"
 )
 
-func Get_language(db_set map[string]string, data string, safe bool) string {
-	db := DB_connect(db_set)
-	if db == nil {
-		return ""
-	}
-	defer db.Close()
-
+func Get_language(db *sql.DB, db_set map[string]string, data string, safe bool) string {
 	var language string
 
 	err := db.QueryRow(DB_change(db_set, "select data from other where name = 'language'")).Scan(&language)
