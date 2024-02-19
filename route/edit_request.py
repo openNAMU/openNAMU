@@ -6,9 +6,9 @@ def edit_request(name = 'Test', do_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        disable = ""
+        disabled = ""
         if acl_check(name, 'document_edit') == 1:
-            disabled = "disable"
+            disabled = "disabled"
 
         curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
         doc_ver = curs.fetchall()
@@ -102,8 +102,8 @@ def edit_request(name = 'Test', do_type = ''):
                     ''' + result + '''
                     <hr class="main_hr">
                     <form method="post">
-                        <button id="opennamu_save_button" type="submit" name="check" value="Y">''' + load_lang('approve') + '''</button>
-                        <button id="opennamu_preview_button" type="submit" name="check" value="">''' + load_lang('decline') + '''</button>
+                        <button ''' + disabled + ''' id="opennamu_save_button" type="submit" name="check" value="Y">''' + load_lang('approve') + '''</button>
+                        <button ''' + disabled + ''' id="opennamu_preview_button" type="submit" name="check" value="">''' + load_lang('decline') + '''</button>
                         <hr class="main_hr">
                         <textarea readonly class="opennamu_textarea_500">''' + html.escape(edit_request_data) + '''</textarea>
                     </form>

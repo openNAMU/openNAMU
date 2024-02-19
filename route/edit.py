@@ -107,8 +107,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
         edit_req_mode = 0
         if acl_check(name, 'document_edit') == 1:
             edit_req_mode = 1
-            if acl_check(name, 'document_edit_request') == 1:
-                return redirect('/raw_acl/' + url_pas(name))
             
         if do_title_length_check(name) == 1:
             return re_error('/error/38')
@@ -119,10 +117,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
         curs.execute(db_change("select set_data from data_set where doc_name = ? and doc_rev = ? and set_name = 'edit_request_data'"), [name, doc_ver])
         if curs.fetchall():
-            if edit_req_mode == 0:
-                return redirect('/edit_request_from/' + url_pas(name))
-            else:
-                return redirect('/raw_acl/' + url_pas(name))
+            return redirect('/edit_request_from/' + url_pas(name))
         
         section = '' if section == 0 else section
         post_ver = flask.request.form.get('ver', '')
