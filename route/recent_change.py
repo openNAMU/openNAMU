@@ -37,7 +37,8 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
             ['move', load_lang('move')],
             ['delete', load_lang('delete')],
             ['revert', load_lang('revert')],
-            ['r1', load_lang('new_doc')]
+            ['r1', load_lang('new_doc')],
+            ['edit_request', load_lang('edit_request')]
         ]
 
         if flask.request.method == 'POST':
