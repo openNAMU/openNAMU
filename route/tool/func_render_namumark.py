@@ -382,10 +382,14 @@ class class_do_render_namumark:
                     if heading_data[2]:
                         heading_folding = ['⊕', 'none', '0.5']
 
+                    heading_id_name = 'edit_load_' + str(heading_count)
+                    if self.doc_set["doc_type"] != "view":
+                        heading_id_name = self.doc_set['doc_include'] + 'edit_load_' + str(heading_count)
+
                     data_name = self.get_tool_data_storage(
                         '<h' + heading_level_str + '><span id="' + self.doc_set['doc_include'] + 'opennamu_heading_' + str(heading_count) + '_sub" style="opacity: ' + heading_folding[2] + '">', 
                             ' <sub>' + \
-                                '<a id="' + self.doc_set['doc_include'] + 'edit_load_' + str(heading_count) + '" href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a> ' + \
+                                '<a id="' + heading_id_name + '" href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a> ' + \
                                 '<a href="javascript:void(0);" onclick="javascript:opennamu_heading_folding(\'' + self.doc_set['doc_include'] + 'opennamu_heading_' + str(heading_count) + '\', this);">' + \
                                     heading_folding[0] + \
                                 '</a>'
