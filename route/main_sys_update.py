@@ -22,10 +22,10 @@ def main_sys_update():
             if platform.system() == 'Linux':
                 ok = []
                 ok += [os.system('git remote rm origin')]
-                ok += [os.system('git remote add origin https://github.com/opennamu/opennamu.git -b ' + up_data)]
+                ok += [os.system('git remote add origin https://github.com/opennamu/opennamu.git')]
                 ok += [os.system('git fetch --depth=1 origin ' + up_data)]
                 ok += [os.system('git reset --hard origin/' + up_data)]
-                for for_a in ok:
+                for for_a in ok[1:]:
                     if for_a != 0:
                         break
                 else:
