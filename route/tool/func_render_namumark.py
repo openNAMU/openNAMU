@@ -2164,7 +2164,6 @@ class class_do_render_namumark:
 
                     return '<li style="margin-left: ' + str((list_len - 1) * 20) + 'px;" class="opennamu_list_none">' + change_text + '. ' + list_data + '</li>'
 
-        # 숫자 리스트
         list_regex = r'((?:\n( *)(?:(\*)) ?([^\n]*))+|(?:\n( *)(?:(1|a|A|I|i)\.(?:#([0-9]*))?) ?([^\n]*)){2,})\n'
         list_count_max = len(re.findall(list_regex, self.render_data)) * 3
         while 1:
@@ -2180,7 +2179,7 @@ class class_do_render_namumark:
                 list_class = do_render_list_int_to(list_view_set)
                 list_data = re.sub(list_sub_regex, list_class, list_data)
 
-                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><div><ul class="opennamu_ul">' + list_data + '</ul></div><back_br>\n'), self.render_data, 1)
 
             list_count_max -= 1
 
