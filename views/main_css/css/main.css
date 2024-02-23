@@ -405,6 +405,10 @@ s:hover, strike:hover, del:hover {
     list-style: none;
 }
 
+.opennamu_folding {
+    margin-top: 10px;
+}
+
 /* 이 부분 이하로는 레거시 */
 #topic_color {
     background: #bbeabb;
