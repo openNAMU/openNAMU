@@ -71,7 +71,7 @@ def edit_request(name = 'Test', do_type = ''):
             else:
                 history_plus(
                     name,
-                    o_data,
+                    edit_request_data,
                     edit_request_date,
                     edit_request_user,
                     edit_request_send,
