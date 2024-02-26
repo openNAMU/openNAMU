@@ -45,7 +45,7 @@ def edit_request(name = 'Test', do_type = ''):
             db_data = curs.fetchall()
             o_data = db_data[0][0] if db_data else ''
             
-            curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
+            curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
             for scan_user in curs.fetchall():
                 add_alarm(scan_user[0], edit_request_user, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
 

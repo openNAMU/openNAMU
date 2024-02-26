@@ -7,27 +7,38 @@ def user_watch_list_name(tool, name = 'Test'):
         ip = ip_check()
         if ip_or_user(ip) != 0:
             return redirect('/login')
+        
+        name_from = 0
+        if tool == 'watch_list_from':
+            name_from = 1
+            tool = 'watch_list'
+        elif tool == 'star_doc_from':
+            name_from = 1
+            tool = 'star_doc'
 
         if tool == 'watch_list':
-            type_data = ''
+            type_data = 'watchlist'
         else:
-            type_data = 'star'
+            type_data = 'star_doc'
 
-        curs.execute(db_change("select title from scan where user = ? and title = ? and type = ?"), [ip, name, type_data])
+        curs.execute(db_change("select data from user_set where name = ? and id = ? and data = ?"), [type_data, ip, name])
         if curs.fetchall():
-            curs.execute(db_change("delete from scan where user = ? and title = ? and type = ?"), [ip, name, type_data])
+            curs.execute(db_change("delete from user_set where name = ? and id = ? and data = ?"), [type_data, ip, name])
         else:
             if tool == 'watch_list':
-                curs.execute(db_change("select count(*) from scan where user = ?"), [ip])
+                curs.execute(db_change("select count(*) from user_set where id = ? and name = ?"), [ip, type_data])
                 count = curs.fetchall()
                 if count and count[0][0] > 10:
                     return re_error('/error/28')
 
-            curs.execute(db_change("insert into scan (user, title, type) values (?, ?, ?)"), [ip, name, type_data])
+            curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [ip, type_data, name])
 
         conn.commit()
 
-        if tool == 'watch_list':
-            return redirect('/watch_list')
+        if name_from == 1:
+            return redirect('/w/' + url_pas(name))
         else:
-            return redirect('/star_doc')
+            if tool == 'watch_list':
+                return redirect('/watch_list')
+            else:
+                return redirect('/star_doc')

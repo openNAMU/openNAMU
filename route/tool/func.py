@@ -328,7 +328,6 @@ def get_db_table_list():
 
     # 폐지 예정 (user_set으로 통합)
     create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
-    create_data['scan'] = ['user', 'title', 'type']
 
     # 개편 예정 (wiki_set과 wiki_filter과 wiki_vote으로 변경)
     create_data['other'] = ['name', 'data', 'coverage']
@@ -594,6 +593,12 @@ def update(ver_num, set_data):
             # ban 오류 해결
             curs.execute(db_change("update rb set ongoing = '' where ongoing is null"))
             curs.execute(db_change("update rb set login = '' where login is null"))
+
+        if ver_num < 3500375:
+            curs.execute(db_change("select title, type, user from scan"))
+            for for_a in curs.fetchall():
+                type_data = 'watchlist' if for_a[1] == '' else 'star_doc'
+                curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [for_a[2], type_data, for_a[0]])
 
         conn.commit()
 
