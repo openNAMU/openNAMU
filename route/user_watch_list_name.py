@@ -9,11 +9,6 @@ def user_watch_list_name(tool, name = 'Test'):
             return redirect('/login')
 
         if tool == 'watch_list':
-            curs.execute(db_change("select count(*) from scan where user = ?"), [ip])
-            count = curs.fetchall()
-            if count and count[0][0] > 9:
-                return re_error('/error/28')
-
             type_data = ''
         else:
             type_data = 'star'
@@ -22,6 +17,12 @@ def user_watch_list_name(tool, name = 'Test'):
         if curs.fetchall():
             curs.execute(db_change("delete from scan where user = ? and title = ? and type = ?"), [ip, name, type_data])
         else:
+            if tool == 'watch_list':
+                curs.execute(db_change("select count(*) from scan where user = ?"), [ip])
+                count = curs.fetchall()
+                if count and count[0][0] > 10:
+                    return re_error('/error/28')
+
             curs.execute(db_change("insert into scan (user, title, type) values (?, ?, ?)"), [ip, name, type_data])
 
         conn.commit()
