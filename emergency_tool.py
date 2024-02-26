@@ -51,7 +51,7 @@ print('22. Delete body top')
 print('23. Delete body bottom')
 print('24. SQLite to MySQL')
 
-what_i_do = input('Select : ')
+what_i_do = input('Insert selection number (EX : 9) : ')
 if what_i_do == '1':
     go_num = input('All delete (Y) [Y, N] : ')
     if not go_num == 'N':
@@ -179,7 +179,7 @@ elif what_i_do == '18':
 
     curs.execute(db_change("update other set data = ? where name = 'wiki_access_password'"), [wiki_access_password])
 elif what_i_do == '19':
-    up_data = input('Insert branch (beta) [stable, beta, dev] : ')
+    up_data = input('Insert branch name (beta) [stable, beta, dev] : ')
 
     if not up_data in ['stable', 'beta', 'dev']:
         up_data = 'beta'
