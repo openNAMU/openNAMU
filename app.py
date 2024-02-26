@@ -607,9 +607,11 @@ app.route('/alarm/delete/<int:id>')(user_alarm_delete)
 
 app.route('/watch_list', defaults = { 'tool' : 'watch_list' })(user_watch_list)
 app.route('/watch_list/<everything:name>', defaults = { 'tool' : 'watch_list' })(user_watch_list_name)
+app.route('/watch_list_from/<everything:name>', defaults = { 'tool' : 'watch_list_from' })(user_watch_list_name)
 
 app.route('/star_doc', defaults = { 'tool' : 'star_doc' })(user_watch_list)
 app.route('/star_doc/<everything:name>', defaults = { 'tool' : 'star_doc' })(user_watch_list_name)
+app.route('/star_doc_from/<everything:name>', defaults = { 'tool' : 'star_doc_from' })(user_watch_list_name)
 
 # 개편 보류중 S
 app.route('/change/email', methods = ['POST', 'GET'])(user_setting_email_2)

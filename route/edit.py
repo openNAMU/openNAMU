@@ -199,7 +199,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 curs.execute(db_change("delete from data where title = ?"), [name])
                 curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, content])
         
-                curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
+                curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
                 for scan_user in curs.fetchall():
                     add_alarm(scan_user[0], ip, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
                         
@@ -224,7 +224,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_send', ?)"), [name, doc_ver, send])
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_leng', ?)"), [name, doc_ver, leng])
 
-                curs.execute(db_change("select user from scan where title = ? and type = ''"), [name])
+                curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
                 for scan_user in curs.fetchall():
                     add_alarm(scan_user[0], ip, '<a href="/edit_request/' + url_pas(name) + '">' + html.escape(name) + '</a> edit_request')
             

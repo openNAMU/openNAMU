@@ -317,8 +317,9 @@ def view_w(name = 'Test', do_type = ''):
         div += body[0][0] if body else ''
 
         if ip_or_user(ip) == 0:
-            curs.execute(db_change("select title from scan where user = ? and title = ?"), [ip, name])
+            curs.execute(db_change("select data from user_set where id = ? and data = ?"), [ip, name])
             watch_list = 2 if curs.fetchall() else 1
+            menu += [['star_doc_from/' + url_pas(name), ('☆' if watch_list == 1 else '★'), watch_list - 1]]
         else:
             watch_list = 0
 
