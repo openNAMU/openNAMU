@@ -600,6 +600,14 @@ def update(ver_num, set_data):
                 type_data = 'watchlist' if for_a[1] == '' else 'star_doc'
                 curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [for_a[2], type_data, for_a[0]])
 
+        if ver_num < 3500376:
+            curs.execute(db_change("select doc_name, doc_rev from data_set where set_name = 'edit_request_data'"))
+            for for_a in curs.fetchall():
+                curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [for_a[0]])
+                get_data = curs.fetchall()
+                if get_data and (int(get_data[0][0]) + 1) == int(for_a[1]):
+                    curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_doing', '1')"), [for_a[0], for_a[1]])
+
         conn.commit()
 
         print('Update completed')
