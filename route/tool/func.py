@@ -2511,6 +2511,8 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
 
             data_set_exist = '' if mode != 'delete' else 'not_exist'
 
+            curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "edit_request_doing"'), [title])
+
             curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "last_edit"'), [title])
             curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'last_edit', ?)"), [title, date])
 
