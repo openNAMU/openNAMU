@@ -1058,7 +1058,7 @@ def wiki_css(data):
     data_css = ''
     data_css_dark = ''
 
-    data_css_ver = '208'
+    data_css_ver = '209'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:
@@ -1822,7 +1822,10 @@ def acl_check(name = '', tool = '', topic_num = '1'):
             name = ''
 
         ip = ip_check()
-        get_ban = ban_check()
+        if tool == 'document_edit_request':
+            get_ban = ban_check(ip, 'edit_request')
+        else:
+            get_ban = ban_check(ip)
         
         if tool == '' and name != '':
             if acl_check(name, 'render') == 1:
@@ -2099,6 +2102,9 @@ def ban_check(ip = None, tool = ''):
                 if tool == 'login':
                     if test_r[0] != 'O':
                         return 1
+                elif tool == 'edit_request':
+                    if test_r[0][0] != 'E':
+                        return 1
                 else:
                     return 1
 
@@ -2107,6 +2113,9 @@ def ban_check(ip = None, tool = ''):
         if ban_d:
             if tool == 'login':
                 if ban_d[0][0] != 'O':
+                    return 1
+            elif tool == 'edit_request':
+                if ban_d[0][0] != 'E':
                     return 1
             else:
                 return 1
@@ -2324,7 +2333,7 @@ def do_edit_filter(data):
                         ip,
                         r_time,
                         'edit filter',
-                        None,
+                        '',
                         'tool:edit filter'
                     )
 
@@ -2462,7 +2471,7 @@ def ban_insert(name, end, why, login, blocker, type_d = None, release = 0):
                 band
             ])
         else:
-            login = 'O' if login != '' else ''
+            login = login if login != '' else ''
             r_time = end if end != '0' else ''
 
             curs.execute(db_change("insert into rb (block, end, today, blocker, why, band, ongoing, login) values (?, ?, ?, ?, ?, ?, '1', ?)"), [

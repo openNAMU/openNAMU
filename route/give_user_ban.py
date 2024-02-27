@@ -21,10 +21,18 @@ def give_user_ban(name = None, ban_type = ''):
                 end = '0'
             
             regex_get = flask.request.form.get('regex', None)
-            login = flask.request.form.get('login', '')
             why = flask.request.form.get('why', '')
 
-            release = flask.request.form.get('release', '')
+            release = ''
+            login = ''
+            
+            ban_option = flask.request.form.get('ban_option', '')
+            if ban_option == 'login_able':
+                login = 'O'
+            elif ban_option == 'edit_request_able':
+                login = 'E'
+            elif ban_option == 'release':
+                release = '1'
 
             if ban_type == 'multiple':
                 all_user = re.findall(r'([^\n]+)\n', flask.request.form.get('name', 'test').replace('\r', '') + '\n')
@@ -106,9 +114,12 @@ def give_user_ban(name = None, ban_type = ''):
                         <hr class="main_hr">
                         <input placeholder="''' + load_lang('why') + '''" name="why" type="text">
                         <hr class="main_hr">
-                        <input type="checkbox" name="login"> ''' + load_lang('login_able') + '''
-                        <hr class="main_hr">
-                        <input type="checkbox" name="release"> ''' + load_lang('release') + '''
+                        <select name="ban_option">
+                            <option value="">''' + load_lang('default') + '''</option>
+                            <option value="login_able">''' + load_lang('login_able') + '''</option>
+                            <option value="edit_request_able">''' + load_lang('edit_request_able') + '''</option>
+                            <option value="release">''' + load_lang('release') + '''</option>
+                        </select>
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
                     </form>
