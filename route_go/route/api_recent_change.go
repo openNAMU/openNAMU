@@ -103,6 +103,10 @@ func Api_recent_change(call_arg []string) {
 		}
 	}
 
-	json_data, _ := json.Marshal(data_list)
-	fmt.Print(string(json_data))
+	if len(data_list) == 0 {
+		fmt.Print("{}")
+	} else {
+		json_data, _ := json.Marshal(data_list)
+		fmt.Print(string(json_data))
+	}
 }

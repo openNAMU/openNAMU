@@ -223,7 +223,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_date', ?)"), [name, doc_ver, today])
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_send', ?)"), [name, doc_ver, send])
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_leng', ?)"), [name, doc_ver, leng])
-                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_doing', '1')"), [name, doc_ver])
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_doing', ?)"), [name, doc_ver, today])
 
                 curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
                 for scan_user in curs.fetchall():

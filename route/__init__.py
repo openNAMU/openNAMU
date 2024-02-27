@@ -106,6 +106,7 @@ from route.recent_app_submit import recent_app_submit_2
 
 from route.recent_block import recent_block
 from route.recent_change import recent_change
+from route.recent_edit_request import recent_edit_request
 from route.recent_discuss import recent_discuss
 from route.recent_history_add import recent_history_add
 from route.recent_history_delete import recent_history_delete
@@ -173,6 +174,7 @@ from route.go_api_func_ip import api_func_ip
 from route.go_api_search import api_search
 
 from route.go_api_recent_change import api_recent_change
+from route.go_api_recent_edit_request import api_recent_edit_request
 
 from route.go_api_topic import api_topic
 

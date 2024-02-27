@@ -224,7 +224,7 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                     '<hr class="main_hr">' + div + \
                 ''
 
-                menu = [['other', load_lang('return')]]
+                menu = [['other', load_lang('return')], ['recent_edit_request', load_lang('edit_request')]]
                 title = load_lang('recent_change')
 
                 if all_admin == 1:
