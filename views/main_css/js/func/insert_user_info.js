@@ -46,9 +46,11 @@ function do_insert_user_info() {
                 }
                 get_data_ban += '<br>';
                 
-                get_data_ban += lang_data['login_able'] + ' : ';
-                if(data['data']['ban']['login_able'] === '1') {
-                    get_data_ban += 'O'; 
+                get_data_ban += lang_data['option'] + ' : ';
+                if(data['data']['ban']['login_able'] === '2') {
+                    get_data_ban += lang_data['edit_request_able']; 
+                } else if(data['data']['ban']['login_able'] === '1') {
+                    get_data_ban += lang_data['login_able']; 
                 } else {
                     get_data_ban += 'X';
                 }
