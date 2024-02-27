@@ -1,6 +1,6 @@
 from .tool.func import *
 
-from .go_api_topic import api_topic, api_topic_thread_pre_render
+from .go_api_topic import api_topic_thread_pre_render
 
 from .edit import edit_editor
 

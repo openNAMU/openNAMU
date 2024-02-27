@@ -24,5 +24,7 @@ func main() {
 		route.Api_func_ip(call_arg[1:])
 	} else if call_arg[0] == "api_recent_change" {
 		route.Api_recent_change(call_arg[1:])
+	} else if call_arg[0] == "api_recent_edit_request" {
+		route.Api_recent_edit_request(call_arg[1:])
 	}
 }
