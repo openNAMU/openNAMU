@@ -110,11 +110,10 @@ function opennamu_get_thread(topic_num = "", do_type = "") {
             }
 
             let date = '<a href="/thread/' + topic_num + '/comment/' + data[for_a]["id"] + '/tool">(' + lang["tool"] + ')</a> ' + data[for_a]["date"];
-            let render_button = ' <a href="javascript:void(0);" id="opennamu_' + color + '_thread_render_' + data[for_a]["id"] + '_button">(' + lang["render"] + ")</a>"
             let render_data = data[for_a]["data"] !== "" ? data[for_a]["data"] : "[br]";
 
             end_data += opennamu_get_thread_ui(
-                data[for_a]["ip_render"] + render_button, 
+                data[for_a]["ip_render"], 
                 date, 
                 '<div class="opennamu_comment_scroll" id="opennamu_' + color + '_thread_render_' + data[for_a]["id"] + '">' + opennamu_xss_filter(render_data) + '</div>',
                 data[for_a]["id"],
@@ -148,7 +147,7 @@ function opennamu_get_thread(topic_num = "", do_type = "") {
                 });
             });
 
-            observer.observe(document.getElementById('opennamu_' + color + '_thread_render_' + end_render[for_a][1] + '_button'));
+            observer.observe(document.getElementById('opennamu_' + color + '_thread_render_' + end_render[for_a][1]));
         }
     });
 }
