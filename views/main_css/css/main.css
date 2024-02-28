@@ -271,9 +271,15 @@ code, pre {
     font-weight: initial;
 }
 
-@media ( max-width: 768px ) {
+@media(max-width: 768px) {
     .opennamu_popup_footnote {
         max-width: 100%;
+    }
+}
+
+@media(max-width: 420px) {
+    .table_safe {
+        float: none !important;
     }
 }
 
