@@ -133,14 +133,22 @@ function opennamu_get_thread(topic_num = "", do_type = "") {
         document.getElementById(to_obj).innerHTML = end_data;
 
         for(let for_a = 0; for_a < end_render.length; for_a++) {
-            document.getElementById('opennamu_' + color + '_thread_render_' + end_render[for_a][1] + '_button').addEventListener("click", function() {
-                opennamu_do_render(
-                    'opennamu_' + color + '_thread_render_' + end_render[for_a][1],
-                    end_render[for_a][0], 
-                    '',
-                    'thread'
-                );
+            let observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) {
+                        opennamu_do_render(
+                            'opennamu_' + color + '_thread_render_' + end_render[for_a][1],
+                            end_render[for_a][0], 
+                            '',
+                            'thread'
+                        );
+
+                        observer.unobserve(entry.target);
+                    }
+                });
             });
+
+            observer.observe(document.getElementById('opennamu_' + color + '_thread_render_' + end_render[for_a][1] + '_button'));
         }
     });
 }
