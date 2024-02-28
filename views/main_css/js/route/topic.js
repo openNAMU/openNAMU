@@ -71,14 +71,30 @@ function opennamu_get_thread_ui(user_id, date, data, code, color = '', blind = '
     `;
 }
 
-function opennamu_get_thread(topic_num = "", do_type = "") {
+function opennamu_get_new_thread(topic_num = "", thread_num = "") {
+    let get_thread = setInterval(function() {
+        if(!document.getElementById('opennamu_default_thread_render_' + thread_num)) {
+            opennamu_get_thread(topic_num, "", thread_num);
+        } else {
+            opennamu_get_new_thread(topic_num, String(Number(thread_num) + 1));
+            clearInterval(get_thread);
+        }
+    }, 3000);
+}
+
+function opennamu_get_thread(topic_num = "", do_type = "", thread_num = "") {
     let url, to_obj, color;    
     if(do_type === "top") {
         url = "/api/thread/" + topic_num + "/top";
         to_obj = 'opennamu_top_thread';
         color = 'red';
     } else {
-        url = "/api/thread/" + topic_num;
+        if(thread_num === "") {
+            url = "/api/thread/" + topic_num;
+        } else {
+            url = "/api/thread/" + topic_num + "/" + thread_num + "/" + thread_num;
+        }
+
         to_obj = 'opennamu_main_thread';
         color = 'default';
     }
@@ -86,68 +102,74 @@ function opennamu_get_thread(topic_num = "", do_type = "") {
     fetch(url).then(function(res) {
         return res.json();
     }).then(function(data) {
-        let end_data = '';
-        let end_render = [];
+        if(data["data"].length !== 0) {
+            let end_data = '';
+            let end_render = [];
 
-        let lang = data["language"];
-        data = data["data"];
+            let lang = data["language"];
+            data = data["data"];
 
-        let first = '';
-        for(let for_a = 0; for_a < data.length; for_a++) {
-            if(first === '') {
-                first = data[for_a]["ip"];
-            }
-
-            let real_color = color;
-            if(color !== 'red') {
-                if(data[for_a]["blind"] === '1') {
-                    real_color = 'blue';
-                } else if(first === data[for_a]["ip"]) {
-                    real_color = 'green';
-                } else {
-                    real_color = 'default';
+            let first = '';
+            for(let for_a = 0; for_a < data.length; for_a++) {
+                if(first === '') {
+                    first = data[for_a]["ip"];
                 }
+
+                let real_color = color;
+                if(color !== 'red') {
+                    if(data[for_a]["blind"] === '1') {
+                        real_color = 'blue';
+                    } else if(first === data[for_a]["ip"]) {
+                        real_color = 'green';
+                    } else {
+                        real_color = 'default';
+                    }
+                }
+
+                let date = '<a href="/thread/' + topic_num + '/comment/' + data[for_a]["id"] + '/tool">(' + lang["tool"] + ')</a> ' + data[for_a]["date"];
+                let render_data = data[for_a]["data"] !== "" ? data[for_a]["data"] : "[br]";
+
+                end_data += opennamu_get_thread_ui(
+                    data[for_a]["ip_render"], 
+                    date, 
+                    '<div class="opennamu_comment_scroll" id="opennamu_' + color + '_thread_render_' + data[for_a]["id"] + '">' + opennamu_xss_filter(render_data) + '</div>',
+                    data[for_a]["id"],
+                    real_color,
+                    data[for_a]["blind"],
+                    '',
+                    topic_num
+                )
+
+                end_render.push([
+                    render_data,
+                    data[for_a]["id"]
+                ]);
             }
 
-            let date = '<a href="/thread/' + topic_num + '/comment/' + data[for_a]["id"] + '/tool">(' + lang["tool"] + ')</a> ' + data[for_a]["date"];
-            let render_data = data[for_a]["data"] !== "" ? data[for_a]["data"] : "[br]";
+            if(do_type === "" && thread_num === "") {
+                opennamu_get_new_thread(topic_num, String(Number(data[data.length - 1]["id"]) + 1));
+            }
 
-            end_data += opennamu_get_thread_ui(
-                data[for_a]["ip_render"], 
-                date, 
-                '<div class="opennamu_comment_scroll" id="opennamu_' + color + '_thread_render_' + data[for_a]["id"] + '">' + opennamu_xss_filter(render_data) + '</div>',
-                data[for_a]["id"],
-                real_color,
-                data[for_a]["blind"],
-                '',
-                topic_num
-            )
+            document.getElementById(to_obj).innerHTML += end_data;
 
-            end_render.push([
-                render_data,
-                data[for_a]["id"]
-            ]);
-        }
+            for(let for_a = 0; for_a < end_render.length; for_a++) {
+                let observer = new IntersectionObserver(entries => {
+                    entries.forEach(entry => {
+                        if(entry.isIntersecting) {
+                            opennamu_do_render(
+                                'opennamu_' + color + '_thread_render_' + end_render[for_a][1],
+                                end_render[for_a][0], 
+                                '',
+                                'thread'
+                            );
 
-        document.getElementById(to_obj).innerHTML = end_data;
-
-        for(let for_a = 0; for_a < end_render.length; for_a++) {
-            let observer = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if(entry.isIntersecting) {
-                        opennamu_do_render(
-                            'opennamu_' + color + '_thread_render_' + end_render[for_a][1],
-                            end_render[for_a][0], 
-                            '',
-                            'thread'
-                        );
-
-                        observer.unobserve(entry.target);
-                    }
+                            observer.unobserve(entry.target);
+                        }
+                    });
                 });
-            });
 
-            observer.observe(document.getElementById('opennamu_' + color + '_thread_render_' + end_render[for_a][1]));
+                observer.observe(document.getElementById('opennamu_' + color + '_thread_render_' + end_render[for_a][1]));
+            }
         }
     });
 }
