@@ -2179,7 +2179,7 @@ class class_do_render_namumark:
                 list_class = do_render_list_int_to(list_view_set)
                 list_data = re.sub(list_sub_regex, list_class, list_data)
 
-                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><div><ul class="opennamu_ul">' + list_data + '</ul></div><back_br>\n'), self.render_data, 1)
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
 
             list_count_max -= 1
 
