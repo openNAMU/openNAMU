@@ -26,7 +26,6 @@ def edit_timeout(func, args = (), timeout = 3):
 def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = ''):
     monaco_editor_top = ''
     editor_display = ''
-    add_get_file = ''
     monaco_display = ''
 
     if do_type == 'edit':
@@ -51,11 +50,6 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = ''):
     
     monaco_editor_top += '<a href="javascript:opennamu_do_editor_temp_save();">(' + load_lang('load_temp_save') + ')</a> <a href="javascript:opennamu_do_editor_temp_save_load();">(' + load_lang('load_temp_save_load') + ')</a> '
     monaco_editor_top += '<a href="javascript:opennamu_edit_turn_off_monaco();">(' + load_lang('turn_off_monaco') + ')</a>'
-
-    add_get_file = '''
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.min.css" integrity="sha512-MFDhxgOYIqLdcYTXw7en/n5BshKoduTitYmX8TkQ+iJOGjrWusRi8+KmfZOrgaDrCjZSotH2d1U1e/Z1KT6nWw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.min.js" integrity="sha512-A+6SvPGkIN9Rf0mUXmW4xh7rDvALXf/f0VtOUiHlDUSPknu2kcfz1KzLpOJyL2pO+nZS13hhIjLqVgiQExLJrw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    '''
     
     darkmode = flask.request.cookies.get('main_css_darkmode', '0')
     monaco_thema = 'vs-dark' if darkmode == '1' else ''
@@ -70,7 +64,7 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = ''):
 
     textarea_size = 'opennamu_textarea_500' if do_type == 'edit' else 'opennamu_textarea_100'
 
-    return add_get_file + '''
+    return '''
         <textarea style="display: none;" id="opennamu_edit_origin" name="doc_data_org">''' + html.escape(data_main) + '''</textarea>
         <div>
             ''' + monaco_editor_top + '''
