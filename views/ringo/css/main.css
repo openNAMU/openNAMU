@@ -5,6 +5,7 @@ html {
 body {
     font-family: 'SUIT', sans-serif;
     font-size: 14px;
+    font-feature-settings: "ss18";
 
     margin: 0;
 }
@@ -17,10 +18,12 @@ h1, h2, h3, h4, h5, h6 {
 
 select {
     font-family: 'SUIT', sans-serif;
+    font-feature-settings: "ss18";
 }
 
 textarea {
     font-family: 'SUIT', monospace;
+    font-feature-settings: "ss18";
 }
 
 h1.blank, h2.blank, h3.blank, h4.blank, h5.blank, h6.blank {

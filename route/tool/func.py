@@ -328,7 +328,6 @@ def get_db_table_list():
 
     # 폐지 예정 (user_set으로 통합)
     create_data['rb'] = ['block', 'end', 'today', 'blocker', 'why', 'band', 'login', 'ongoing']
-    create_data['scan'] = ['user', 'title', 'type']
 
     # 개편 예정 (wiki_set과 wiki_filter과 wiki_vote으로 변경)
     create_data['other'] = ['name', 'data', 'coverage']
@@ -595,6 +594,20 @@ def update(ver_num, set_data):
             curs.execute(db_change("update rb set ongoing = '' where ongoing is null"))
             curs.execute(db_change("update rb set login = '' where login is null"))
 
+        if ver_num < 3500375:
+            curs.execute(db_change("select title, type, user from scan"))
+            for for_a in curs.fetchall():
+                type_data = 'watchlist' if for_a[1] == '' else 'star_doc'
+                curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [for_a[2], type_data, for_a[0]])
+
+        if ver_num < 3500376:
+            curs.execute(db_change("select doc_name, doc_rev from data_set where set_name = 'edit_request_data'"))
+            for for_a in curs.fetchall():
+                curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [for_a[0]])
+                get_data = curs.fetchall()
+                if get_data and (int(get_data[0][0]) + 1) == int(for_a[1]):
+                    curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_doing', '1')"), [for_a[0], for_a[1]])
+
         conn.commit()
 
         print('Update completed')
@@ -752,7 +765,7 @@ def get_acl_list(type_d = 'normal'):
     if type_d == 'user':
         return ['', 'user', 'all']
     else:
-        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', 'ban_admin', 'not_all']
+        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', 'ban_admin', 'not_all', 'up_to_level_3', 'up_to_level_10']
 
 ## Func-simple-with_DB
 def get_user_title_list(ip = ''):
@@ -1045,13 +1058,19 @@ def wiki_css(data):
     data_css = ''
     data_css_dark = ''
 
-    data_css_ver = '196'
+    data_css_ver = '212'
     data_css_ver = '.cache_v' + data_css_ver
 
     if 'main_css' in global_wiki_set:
         data_css = global_wiki_set['main_css']
     else:
         data_css += '<meta http-equiv="Cache-Control" content="max-age=3600">'
+
+        # External JS
+        data_css += '<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" integrity="sha512-LQNxIMR5rXv7o+b1l8+N1EZMfhG7iFZ9HhnbJkTp4zjNr5Wvst75AqUeFDxeRUa7l5vEDyUiAip//r+EFLLCyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+        data_css += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+        data_css += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+        data_css += '<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.min.js" integrity="sha512-A+6SvPGkIN9Rf0mUXmW4xh7rDvALXf/f0VtOUiHlDUSPknu2kcfz1KzLpOJyL2pO+nZS13hhIjLqVgiQExLJrw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
 
         # Func JS
         data_css += '<script src="/views/main_css/js/func/func.js' + data_css_ver + '"></script>'
@@ -1066,23 +1085,18 @@ def wiki_css(data):
         
         # Route JS
         data_css += '<script src="/views/main_css/js/route/editor.js' + data_css_ver + '"></script>'
-        data_css += '<script src="/views/main_css/js/route/editor_sub.js' + data_css_ver + '"></script>'
         data_css += '<script src="/views/main_css/js/route/render.js' + data_css_ver + '"></script>'
         data_css += '<script src="/views/main_css/js/route/topic.js' + data_css_ver + '"></script>'
-        data_css += '<script src="/views/main_css/js/route/topic_sub.js' + data_css_ver + '"></script>'
+        data_css += '<script src="/views/main_css/js/route/view.js' + data_css_ver + '"></script>'
         
         # Main CSS
         data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css' + data_css_ver + '">'
 
-        # External
-        data_css += '<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCct6O9ctzYFfFr4dgmgccOTx" crossorigin="anonymous"></script>'
-        data_css += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-        data_css += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-
         # External CSS
-        data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">'
+        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha512-fHwaWebuwA7NSF5Qg/af4UeDx9XqUpYpOGgubo3yWu+b2IQR4UeQwbb42Ti7gVAjNtVoI/I9TEoYeu9omwcC6g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
         data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-    
+        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.min.css" integrity="sha512-MFDhxgOYIqLdcYTXw7en/n5BshKoduTitYmX8TkQ+iJOGjrWusRi8+KmfZOrgaDrCjZSotH2d1U1e/Z1KT6nWw==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+
         global_wiki_set['main_css'] = data_css
 
     # Darkmode
@@ -1315,140 +1329,106 @@ def load_skin(data = '', set_n = 0, default = 0):
     return skin_return_data
 
 # Func-markup
-def render_set(doc_name = '', doc_data = '', data_type = 'view', data_in = '', doc_acl = '', markup = ''):
+def render_set(doc_name = '', doc_data = '', data_type = 'view', markup = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        # data_type in ['view', 'from', 'thread', 'raw', 'api_view', 'api_thread', 'backlink']
+        # data_type in ['view', 'from', 'thread', 'api_view', 'api_thread', 'api_include', 'backlink']
         # data_type을 list 형식으로 개편 필요할 듯
-        if doc_name != '':
-            doc_acl = acl_check(doc_name, 'render') if doc_acl == '' else doc_acl
-        else:
-            doc_acl = 0
 
-        data_type = 'view' if data_type == '' else data_type
-        doc_data = 0 if doc_data == None else doc_data
+        return_type = True
+        if data_type in ['api_view', 'api_thread', 'api_include']:
+            return_type = False
 
-        acl_dict = {}
-        acl_dict[doc_name] = doc_acl
+        if data_type == '':
+            data_type = 'view'
+        elif data_type == 'api_view':
+            data_type = 'view'
+        elif data_type == 'api_thread':
+            data_type = 'thread'
+        elif data_type == 'api_include':
+            data_type = 'include'
+
+        doc_data = '' if doc_data == None else doc_data
 
         ip = ip_check()
-            
-        if doc_acl == 1:
-            return 'HTTP Request 401.3'
+        render_lang_data = {
+            'toc' : load_lang('toc'),
+            'category' : load_lang('category')
+        }
+
+        curs.execute(db_change('select data from other where name = "category_text"'))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            render_lang_data['category'] = db_data[0][0]
+
+        get_class_render = class_do_render(conn, render_lang_data, markup).do_render(doc_name, doc_data, data_type)
+        if data_type == 'backlink':
+            return ''
+
+        get_class_render[0] = '<div class="opennamu_render_complete">' + get_class_render[0] + '</div>'
+
+        font_size_set_data = get_main_skin_set(curs, flask.session, 'main_css_font_size', ip)
+        if font_size_set_data != 'default':
+            font_size_set_data = number_check(font_size_set_data)
+
+            get_class_render[0] = '' + \
+                '''<style>
+                    .opennamu_render_complete {
+                        font-size: ''' + font_size_set_data + '''px !important;
+                    }
+                </style>''' + \
+            '' + get_class_render[0]
+
+        curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            get_class_render[0] = '' + \
+                '''<style>
+                    .opennamu_render_complete {
+                        font-size: 15px !important;
+                        line-height: 1.5;
+                    }
+
+                    .opennamu_render_complete td {
+                        padding: 5px 10px !important;
+                    }
+
+                    .opennamu_render_complete summary {
+                        list-style: none !important;
+                        font-weight: bold !important;
+                    }
+                </style>''' + \
+            '' + get_class_render[0]
+
+        table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip)
+        if table_set_data == 'on':
+            get_class_render[0] = '<style>.table_safe { overflow-x: scroll; white-space: nowrap; }</style>' + get_class_render[0]
+
+        joke_set_data = get_main_skin_set(curs, flask.session, 'main_css_view_joke', ip)
+        if joke_set_data == 'off':
+            get_class_render[0] = '<style>.opennamu_joke { display: none; }</style>' + get_class_render[0]
+
+        math_set_data = get_main_skin_set(curs, flask.session, 'main_css_math_scroll', ip)
+        if math_set_data == 'on':
+            get_class_render[0] = '<style>.katex .base { overflow-x: scroll; }</style>' + get_class_render[0]
+
+        transparent_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_transparent', ip)
+        if transparent_set_data == 'on':
+            get_class_render[0] = '' + \
+                '''<style>
+                    .table_safe td {
+                        background: transparent !important;
+                        color: inherit !important;
+                    }
+                </style>''' + \
+            '' + get_class_render[0]
+
+        if not return_type:
+            return [get_class_render[0], get_class_render[1]]
         else:
-            if data_type == 'raw':
-                return doc_data
-            
-            if doc_data != 0:
-                render_lang_data = {
-                    'toc' : load_lang('toc'),
-                    'category' : load_lang('category')
-                }
-
-                curs.execute(db_change('select data from other where name = "category_text"'))
-                db_data = curs.fetchall()
-                if db_data and db_data[0][0] != '':
-                    render_lang_data['category'] = db_data[0][0]
-
-                get_class_render = class_do_render(conn, render_lang_data, markup).do_render(doc_name, doc_data, data_type, data_in)
-                
-                if 'include' in get_class_render[2]:
-                    for_a = 0
-                    while len(get_class_render[2]['include']) > for_a:
-                        include_data = get_class_render[2]['include'][for_a]
-                        if include_data[1] in acl_dict:
-                            acl_result = acl_dict[include_data[1]]
-                        else:
-                            acl_result = acl_check(include_data[1], 'render')
-                            acl_dict[include_data[1]] = acl_result
-
-                        if acl_result == 0:
-                            include_regex = re.compile('<div id="' + include_data[0] + '"><\\/div>')
-                            if re.search(include_regex, get_class_render[0]):
-                                include_data_render = class_do_render(conn, render_lang_data, markup).do_render(include_data[1], include_data[2], data_type, include_data[0] + data_in)
-                                if len(include_data) > 3:
-                                    include_data_render[0] = '<div id="' + include_data[0] + '" ' + include_data[3] + '>' + include_data_render[0] + '</div>'
-                                else:
-                                    include_data_render[0] = '<div id="' + include_data[0] + '">' + include_data_render[0] + '</div>'
-
-                                get_class_render[0] = re.sub(include_regex, include_data_render[0], get_class_render[0])
-                                get_class_render[1] += include_data_render[1]
-                                get_class_render[2]['include'] += include_data_render[2]['include']
-
-                        for_a += 1
-
-                if data_type == 'backlink':
-                    return ''
-
-                get_class_render[0] = '<div class="opennamu_render_complete">' + get_class_render[0] + '</div>'
-
-                font_size_set_data = get_main_skin_set(curs, flask.session, 'main_css_font_size', ip)
-                if font_size_set_data != 'default':
-                    font_size_set_data = number_check(font_size_set_data)
-
-                    get_class_render[0] = '''
-                        <style>
-                            .opennamu_render_complete {
-                                font-size: ''' + font_size_set_data + '''px !important;
-                            }
-                        </style>
-                    ''' + get_class_render[0]
-
-                curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
-                db_data = curs.fetchall()
-                if db_data and db_data[0][0] != '':
-                    get_class_render[0] = '''
-                        <style>
-                            .opennamu_render_complete {
-                                font-size: 15px !important;
-                                line-height: 1.5;
-                            }
-
-                            .opennamu_render_complete td {
-                                padding: 5px 10px !important;
-                            }
-
-                            .opennamu_render_complete summary {
-                                list-style: none !important;
-                                font-weight: bold !important;
-                            }
-                        </style>
-                    ''' + get_class_render[0]
-
-                table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip)
-                if table_set_data == 'on':
-                    get_class_render[0] = '<style>.table_safe { overflow-x: scroll; white-space: nowrap; }</style>' + get_class_render[0]
-
-                joke_set_data = get_main_skin_set(curs, flask.session, 'main_css_view_joke', ip)
-                if joke_set_data == 'off':
-                    get_class_render[0] = '<style>.opennamu_joke { display: none; }</style>' + get_class_render[0]
-
-                math_set_data = get_main_skin_set(curs, flask.session, 'main_css_math_scroll', ip)
-                if math_set_data == 'on':
-                    get_class_render[0] = '<style>.katex .base { overflow-x: scroll; }</style>' + get_class_render[0]
-
-                transparent_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_transparent', ip)
-                if transparent_set_data == 'on':
-                    get_class_render[0] = '''
-                        <style>
-                            .table_safe td {
-                                background: transparent !important;
-                                color: inherit !important;
-                            }
-                        </style>
-                    ''' + get_class_render[0]
-
-                if data_type == 'api_view' or data_type == 'api_thread':
-                    return [
-                        get_class_render[0], 
-                        get_class_render[1]
-                    ]
-                else:
-                    return get_class_render[0] + '<script>' + get_class_render[1] + '</script>'
-            else:
-                return 'HTTP Request 404'
-            
+            return get_class_render[0] + '<script>' + get_class_render[1] + '</script>'
+        
 def render_simple_set(data):
     # without_DB
 
@@ -1836,14 +1816,20 @@ def admin_check(num = None, what = None, name = ''):
 
         return 0
 
-def acl_check(name = 'test', tool = '', topic_num = '1'):
+def acl_check(name = '', tool = '', topic_num = '1'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
+        if name == None:
+            name = ''
+
         ip = ip_check()
-        get_ban = ban_check()
+        if tool == 'document_edit_request':
+            get_ban = ban_check(ip, 'edit_request')
+        else:
+            get_ban = ban_check(ip)
         
-        if tool == '' and name:
+        if tool == '' and name != '':
             if acl_check(name, 'render') == 1:
                 return 1
             
@@ -1868,20 +1854,21 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                     return 0
         
                 return 1
-        elif tool in ['document_edit', 'document_move', 'document_delete']:
+        elif tool in ['document_edit', 'document_edit_request', 'document_move', 'document_delete']:
             if acl_check(name, '') == 1:
                 return 1
         elif tool in ['bbs_edit', 'bbs_comment']:
             if acl_check(name, 'bbs_view') == 1:
                 return 1
         elif tool == 'topic':
-            curs.execute(db_change("select title from rd where code = ?"), [topic_num])
-            name = curs.fetchall()
-            name = name[0][0] if name else 'test'
+            if name == '':
+                curs.execute(db_change("select title from rd where code = ?"), [topic_num])
+                name = curs.fetchall()
+                name = name[0][0] if name else 'test'
 
         if tool in ['topic']:
             end = 3
-        elif tool in ['render', 'vote', '', 'document_edit', 'document_move', 'document_delete', 'document_edit', 'bbs_edit', 'bbs_comment']:
+        elif tool in ['render', 'vote', '', 'document_edit', 'document_edit_request', 'document_move', 'document_delete', 'document_edit', 'bbs_edit', 'bbs_comment']:
             end = 2
         else:
             end = 1
@@ -1982,6 +1969,13 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                 curs.execute(db_change('select data from other where name = "recaptcha_one_check_five_pass_acl"'))
 
                 num = 'all'
+            elif tool == 'document_edit_request':
+                if i == 0:
+                    curs.execute(db_change("select data from acl where title = ? and type = 'document_edit_request_acl'"), [name])
+                else:
+                    curs.execute(db_change('select data from other where name = "document_edit_request_acl"'))
+
+                num = 5
             else:
                 # tool == 'render'
                 if i == 0:
@@ -2065,6 +2059,12 @@ def acl_check(name = 'test', tool = '', topic_num = '1'):
                         return 0
                 elif acl_data[0][0] == 'not_all':
                     return 1
+                elif acl_data[0][0] == 'up_to_level_3':
+                    if int(level_check(ip)[0]) >= 3:
+                        return 0
+                elif acl_data[0][0] == 'up_to_level_10':
+                    if int(level_check(ip)[0]) >= 10:
+                        return 0
 
                 return 1
             elif i == (end - 1):
@@ -2104,6 +2104,9 @@ def ban_check(ip = None, tool = ''):
                 if tool == 'login':
                     if test_r[0] != 'O':
                         return 1
+                elif tool == 'edit_request':
+                    if test_r[0][0] != 'E':
+                        return 1
                 else:
                     return 1
 
@@ -2112,6 +2115,9 @@ def ban_check(ip = None, tool = ''):
         if ban_d:
             if tool == 'login':
                 if ban_d[0][0] != 'O':
+                    return 1
+            elif tool == 'edit_request':
+                if ban_d[0][0] != 'E':
                     return 1
             else:
                 return 1
@@ -2157,18 +2163,9 @@ def ip_pas(raw_ip, type_data = 0):
             if is_this_ip != 0:
                 # ip user
                 if ip_view != '' and my_ip != raw_ip:
-                    try:
-                        ip = ipaddress.ip_address(raw_ip)
-                        if type(ip) == ipaddress.IPv6Address:
-                            ip = ip.exploded
-                            ip = re.sub(r':([^:]*):([^:]*)$', ':*:*', ip)
-                        else:
-                            ip = ip.exploded
-                            ip = re.sub(r'\.([^.]*)\.([^.]*)$', '.*.*', ip)
+                    ip = pw_encode(raw_ip)[:10]
 
-                        change_ip = 1
-                    except:
-                        ip = raw_ip
+                    change_ip = 1
                 else:
                     ip = raw_ip
             else:
@@ -2338,7 +2335,7 @@ def do_edit_filter(data):
                         ip,
                         r_time,
                         'edit filter',
-                        None,
+                        '',
                         'tool:edit filter'
                     )
 
@@ -2476,7 +2473,7 @@ def ban_insert(name, end, why, login, blocker, type_d = None, release = 0):
                 band
             ])
         else:
-            login = 'O' if login != '' else ''
+            login = login if login != '' else ''
             r_time = end if end != '0' else ''
 
             curs.execute(db_change("insert into rb (block, end, today, blocker, why, band, ongoing, login) values (?, ?, ?, ?, ?, ?, '1', ?)"), [
@@ -2519,7 +2516,7 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
             mode = 'r1' if id_data == '1' else mode
             mode = mode if not re.search('^user:', title) else 'user'
 
-        send = re.sub(r'\(|\)|<|>', '', send)
+        send = re.sub(r'<|>', '', send)
         send = send[:512] if len(send) > 512 else send
         send = send + ' (' + t_check + ')' if t_check != '' else send
 
@@ -2531,7 +2528,9 @@ def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
             history_plus_rc_max(curs, mode)
             curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [id_data, title, date, mode])
 
-            data_set_exist = '' if t_check != 'delete' else 'not_exist'
+            data_set_exist = '' if mode != 'delete' else 'not_exist'
+
+            curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "edit_request_doing"'), [title])
 
             curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "last_edit"'), [title])
             curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'last_edit', ?)"), [title, date])

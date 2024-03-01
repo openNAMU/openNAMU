@@ -171,3 +171,22 @@ function opennamu_do_category_spread() {
         '' + document.getElementsByClassName('opennamu_render_complete')[0].innerHTML
     }
 }
+
+function opennamu_do_include(name, render_name, to_obj, option_obj) {
+    let option = {};
+    if(option_obj !== '') {
+        if(document.getElementById(option_obj)) {
+            option = document.getElementById(option_obj).innerHTML;
+            option = decodeURIComponent(option);
+        }
+    }
+
+    fetch("/api/raw/" + opennamu_do_url_encode(name)).then(function(res) {
+        return res.json();
+    }).then(function(data) {
+        if(data["data"]) {
+            opennamu_do_render(to_obj, data["data"], render_name, 'include', option);
+            document.getElementById(option_obj).style.display = "inline";
+        }
+    });
+}

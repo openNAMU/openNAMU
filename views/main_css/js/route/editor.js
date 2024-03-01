@@ -170,8 +170,8 @@ class PlaceholderContentWidget {
     static ID = 'editor.widget.placeholderHint';
 
     constructor(placeholder, editor) {
-		this.placeholder = placeholder;
-		this.editor = editor;
+        this.placeholder = placeholder;
+        this.editor = editor;
         // register a listener for editor code changes
         editor.onDidChangeModelContent(() => this.onDidChangeModelContent());
         // ensure that on initial load the placeholder is shown
@@ -214,18 +214,93 @@ class PlaceholderContentWidget {
     }
 }
 
-function do_monaco_init(monaco_thema) {
-    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.40.0/min/vs' }});
-    require.config({ 'vs/nls': { availableLanguages: { '*': 'ko' } }});
+function do_monaco_init(monaco_thema, markup = "") {
+    require.config({ paths: { 'vs' : 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.40.0/min/vs' }});
+    require.config({ 'vs/nls' : { availableLanguages: { '*' : 'ko' } }});
     require(["vs/editor/editor.main"], function () {
+        monaco.languages.register({ id : "namumark" });
+        monaco.languages.setMonarchTokensProvider("namumark", {
+            tokenizer : {
+                root : [
+                    [/\[/, "namumark-color"],
+                    [/\]/, "namumark-color"],
+                    
+                    [/\{/, "namumark-color"],
+                    [/\}/, "namumark-color"],
+
+                    [/'/, "namumark-color"],
+                    [/-/, "namumark-color"],
+                    [/~/, "namumark-color"],
+                    [/=/, "namumark-color"],
+                    [/_/, "namumark-color"],
+                    [/\^/, "namumark-color"],
+                    [/,/, "namumark-color"],
+
+                    [/\\/, "namumark-color"],
+                    [/\*/, "namumark-color"],
+                ],
+            },
+        });
+
+        let thema_set = [["namumark", "vs"], ["namumark-vs-dark", "vs-dark"]]
+        for(let for_a = 0; for_a < thema_set.length; for_a++) {
+            monaco.editor.defineTheme(thema_set[for_a][0], {
+                base : thema_set[for_a][1],
+                inherit : true,
+                rules : [
+                    { token : "namumark-color", foreground : "d94844" },
+                ],
+                colors : {
+                    "editor.foreground" : "",
+                },
+            });
+        }
+
         window.editor = monaco.editor.create(document.getElementById('opennamu_monaco_editor'), {
-            value: document.getElementById('opennamu_edit_textarea').value,
-            language: 'plaintext',
-            automaticLayout: true,
-            wordWrap: true,
-            theme: monaco_thema
+            value : document.getElementById('opennamu_edit_textarea').value,
+            language : 'namumark',
+            automaticLayout : true,
+            wordWrap : true,
+            theme : "namumark" + (monaco_thema === "" ? "" : "-" + monaco_thema)
         });
 
         new PlaceholderContentWidget(document.getElementById('opennamu_edit_textarea').placeholder, window.editor);
     });
+}
+
+function opennamu_do_editor_preview() {
+    do_sync_monaco_and_textarea();
+
+    const input = document.querySelector('#opennamu_edit_textarea');
+    if(input !== null) {
+        let doc_name = 'test';
+
+        const doc_name_input = document.querySelector('#opennamu_editor_doc_name');
+        if(doc_name_input !== null) {
+            doc_name = doc_name_input.value;
+        }
+
+        opennamu_do_render('opennamu_preview_area', input.value, doc_name);
+    }
+}
+
+function opennamu_do_editor_temp_save() {
+    do_sync_monaco_and_textarea();
+
+    const input = document.querySelector('#opennamu_edit_textarea');
+    if(input !== null) {
+        localStorage.setItem("key", input.value);
+    }
+}
+
+function opennamu_do_editor_temp_save_load() {
+    const data = localStorage.getItem("key");
+    if(data !== null) {
+        const input = document.querySelector('#opennamu_edit_textarea');
+        if(input !== null) {
+            input.value = data;
+        }
+        
+        do_textarea_to_manaco();
+    }
 }

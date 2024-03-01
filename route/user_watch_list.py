@@ -15,26 +15,18 @@ def user_watch_list(tool):
             return redirect('/login')
 
         if tool == 'watch_list':
-            curs.execute(db_change("select title from scan where type = '' and user = ?"), [ip])
-
+            curs.execute(db_change("select data from user_set where name = 'watchlist' and id = ?"), [ip])
             title_name = load_lang('watchlist')
         else:
-            curs.execute(db_change("select title from scan where type = 'star' and user = ?"), [ip])
-
+            curs.execute(db_change("select data from user_set where name = 'star_doc' and id = ?"), [ip])
             title_name = load_lang('star_doc')
 
         data = curs.fetchall()
         for data_list in data:
-            if tool == 'star_doc':
-                curs.execute(db_change("select date from history where title = ? order by id + 0 desc limit 1"), [data_list[0]])
-                get_data = curs.fetchall()
-                if get_data:
-                    plus = '(' + get_data[0][0] + ') '
-                else:
-                    plus = ''
-            else:
-                plus = ''
-
+            curs.execute(db_change("select date from history where title = ? order by id + 0 desc limit 1"), [data_list[0]])
+            get_data = curs.fetchall()
+            plus = '(' + get_data[0][0] + ') ' if get_data else ''
+            
             div += '' + \
                 '<li>' + \
                     '<a href="/w/' + url_pas(data_list[0]) + '">' + html.escape(data_list[0]) + '</a> ' + \

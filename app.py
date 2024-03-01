@@ -144,7 +144,7 @@ with get_db_connect() as conn:
     )
 
     app.config['JSON_AS_ASCII'] = False
-    app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+    app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
 
     log = logging.getLogger('waitress')
@@ -486,9 +486,10 @@ app.route('/block_log/ongoing/<int:num>', defaults = { 'tool' : 'ongoing' })(rec
 
 # Func-history
 app.route('/recent_change', defaults = { 'tool' : 'recent' })(recent_change)
-app.route('/recent_change/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
 app.route('/recent_changes', defaults = { 'tool' : 'recent' })(recent_change)
-app.route('/recent_changes/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
+app.route('/recent_change/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
+
+app.route('/recent_edit_request', defaults = { 'db_set' : db_set_str })(recent_edit_request)
 
 app.route('/record/<name>', defaults = { 'tool' : 'record' })(recent_change)
 app.route('/record/<int:num>/<set_type>/<name>', defaults = { 'tool' : 'record' })(recent_change)
@@ -515,19 +516,19 @@ app.route('/xref_page/<int:num>/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
-app.route('/raw/<everything:name>')(view_raw_2)
-app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 1 })(view_raw_2)
-app.route('/raw_rev/<int:num>/<everything:name>')(view_raw_2)
+app.route('/raw/<everything:name>')(view_w_raw)
+app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 'on' })(view_w_raw)
+app.route('/raw_rev/<int:rev>/<everything:name>')(view_w_raw)
 
 app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')(view_diff)
 
 app.route('/down/<everything:name>')(view_down)
 
-app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_acl)
+app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_set)
 
 # everything 다음에 추가 붙은 경우에 대해서 재검토 필요 (진행중)
-app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_read)
-app.route('/w/<everything:name>')(view_read)
+app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_w)
+app.route('/w/<everything:name>')(view_w)
 
 app.route('/random', defaults = { 'db_set' : db_set_str })(view_random)
 
@@ -535,6 +536,11 @@ app.route('/random', defaults = { 'db_set' : db_set_str })(view_random)
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
 app.route('/edit_from/<everything:name>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'load' })(edit)
 app.route('/edit_section/<int:section>/<everything:name>', methods = ['POST', 'GET'])(edit)
+
+app.route('/edit_request/<everything:name>', methods = ['POST', 'GET'])(edit_request)
+app.route('/edit_request_from/<everything:name>', defaults = { 'do_type' : 'from' }, methods = ['POST', 'GET'])(edit_request)
+
+# app.route('/edit_request_rev/<int:rev>/<everything:name>', methods = ['POST', 'GET'])(edit_request)
 
 app.route('/upload', methods = ['POST', 'GET'])(edit_upload)
 
@@ -567,7 +573,7 @@ app.route('/thread/<int:topic_num>/change', methods = ['POST', 'GET'])(topic_too
 app.route('/thread/<int:topic_num>/comment/<int:num>/tool')(topic_comment_tool)
 app.route('/thread/<int:topic_num>/comment/<int:num>/notice')(topic_comment_notice)
 app.route('/thread/<int:topic_num>/comment/<int:num>/blind')(topic_comment_blind)
-app.route('/thread/<int:topic_num>/comment/<int:num>/raw')(view_raw_2)
+app.route('/thread/<int:topic_num>/comment/<int:num>/raw')(view_raw)
 app.route('/thread/<int:topic_num>/comment/<int:num>/delete', methods = ['POST', 'GET'])(topic_comment_delete)
 
 # Func-user
@@ -603,9 +609,11 @@ app.route('/alarm/delete/<int:id>')(user_alarm_delete)
 
 app.route('/watch_list', defaults = { 'tool' : 'watch_list' })(user_watch_list)
 app.route('/watch_list/<everything:name>', defaults = { 'tool' : 'watch_list' })(user_watch_list_name)
+app.route('/watch_list_from/<everything:name>', defaults = { 'tool' : 'watch_list_from' })(user_watch_list_name)
 
 app.route('/star_doc', defaults = { 'tool' : 'star_doc' })(user_watch_list)
 app.route('/star_doc/<everything:name>', defaults = { 'tool' : 'star_doc' })(user_watch_list_name)
+app.route('/star_doc_from/<everything:name>', defaults = { 'tool' : 'star_doc_from' })(user_watch_list_name)
 
 # 개편 보류중 S
 app.route('/change/email', methods = ['POST', 'GET'])(user_setting_email_2)
@@ -657,23 +665,32 @@ app.route('/bbs/w/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_
 # app.route('/bbs/blind/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_hide)
 app.route('/bbs/pinned/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_pinned)
 app.route('/bbs/delete/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_delete)
-app.route('/bbs/raw/<int:bbs_num>/<int:post_num>')(view_raw_2)
+app.route('/bbs/raw/<int:bbs_num>/<int:post_num>')(view_raw)
 app.route('/bbs/tool/<int:bbs_num>/<int:post_num>')(bbs_w_tool)
 app.route('/bbs/edit/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_edit)
 app.route('/bbs/tool/<int:bbs_num>/<int:post_num>/<comment_num>')(bbs_w_comment_tool)
-app.route('/bbs/raw/<int:bbs_num>/<int:post_num>/<comment_num>')(view_raw_2)
+app.route('/bbs/raw/<int:bbs_num>/<int:post_num>/<comment_num>')(view_raw)
 app.route('/bbs/edit/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_edit)
 app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_delete)
 
 # Func-api
-# app.route('/api/render_tool/<tool>/<everything:name>', methods = ['POST'])(api_w_render)
-# app.route('/api/render_tool/<tool>', methods = ['POST'])(api_w_render)
-app.route('/api/render/<everything:name>', methods = ['POST'])(api_w_render)
 app.route('/api/render', methods = ['POST'])(api_w_render)
+app.route('/api/render/<tool>', methods = ['POST'])(api_w_render)
 
-app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on' })(api_w_raw)
-app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>')(api_w_raw)
-app.route('/api/raw/<everything:name>')(api_w_raw)
+app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on', 'db_set' : db_set_str })(api_w_raw)
+app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_raw)
+app.route('/api/raw/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_raw)
+
+app.route('/api/xref/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_xref)
+app.route('/api/xref_page/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_xref)
+app.route('/api/xref_this/<everything:name>', defaults = { 'xref_type' : '2', 'db_set' : db_set_str })(api_w_xref)
+app.route('/api/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : '2', 'db_set' : db_set_str })(api_w_xref)
+
+app.route('/api/random', defaults = { 'db_set' : db_set_str })(api_w_random)
+
+app.route('/api/bbs/main', defaults = { 'db_set' : db_set_str })(api_bbs)
+app.route('/api/bbs/w/<int:bbs_num>', defaults = { 'db_set' : db_set_str })(api_bbs)
+app.route('/api/bbs/w/<int:bbs_num>/<int:page>', defaults = { 'db_set' : db_set_str })(api_bbs)
 
 app.route('/api/bbs/w/<sub_code>')(api_bbs_w_post)
 app.route('/api/bbs/w/comment/<sub_code>')(api_bbs_w_comment)
@@ -685,25 +702,32 @@ app.route('/api/skin_info/<name>')(api_skin_info)
 app.route('/api/user_info/<user_name>')(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
-app.route('/api/thread/<int:topic_num>/<tool>/<int:num>/<render>')(api_topic)
-app.route('/api/thread/<int:topic_num>/<tool>/<int:num>')(api_topic)
-app.route('/api/thread/<int:topic_num>/<tool>')(api_topic)
-app.route('/api/thread/<int:topic_num>')(api_topic)
+app.route('/api/thread/<int:topic_num>/<int:s_num>/<int:e_num>', defaults = { 'db_set' : db_set_str })(api_topic)
+app.route('/api/thread/<int:topic_num>/<tool>', defaults = { 'db_set' : db_set_str })(api_topic)
+app.route('/api/thread/<int:topic_num>', defaults = { 'db_set' : db_set_str })(api_topic)
 
-app.route('/api/search/<everything:name>/doc_num/<int:num>/<int:page>')(api_search)
-app.route('/api/search/<everything:name>')(api_search)
+app.route('/api/search/<everything:name>', defaults = { 'db_set' : db_set_str })(api_search)
+app.route('/api/search_page/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_search)
+app.route('/api/search_data/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str })(api_search)
+app.route('/api/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str })(api_search)
 
-app.route('/api/recent_change/<int:num>')(api_recent_change)
-app.route('/api/recent_change')(api_recent_change)
-# recent_changes -> recent_change
-app.route('/api/recent_changes')(api_recent_change)
+app.route('/api/recent_change', defaults = { 'db_set' : db_set_str })(api_recent_change)
+app.route('/api/recent_changes', defaults = { 'db_set' : db_set_str })(api_recent_change)
+app.route('/api/recent_change/<int:limit>', defaults = { 'db_set' : db_set_str })(api_recent_change)
+app.route('/api/recent_change/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_recent_change)
 
+app.route('/api/recent_edit_request', defaults = { 'db_set' : db_set_str })(api_recent_edit_request)
+app.route('/api/recent_edit_request/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_recent_edit_request)
+
+# 곧 개편 당할 곳
 app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss')(api_recent_discuss)
+##
 
 app.route('/api/lang/<data>')(api_func_lang)
 app.route('/api/sha224/<everything:data>')(api_func_sha224)
+app.route('/api/ip/<everything:data>', defaults = { 'db_set' : db_set_str })(api_func_ip)
 
 app.route('/api/image/<everything:name>')(api_image_view)
 
@@ -716,10 +740,10 @@ app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(ma
 # app.route('/guide/<doc_name>')(main_tool_guide)
 
 app.route('/search', methods=['POST'])(main_search)
-app.route('/search/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
-app.route('/search/<int:num>/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
-app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
-app.route('/search_data/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search/<everything:name>', defaults = { 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search_page/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
 app.route('/goto', methods=['POST'])(main_search_goto)
 app.route('/goto/<everything:name>', methods=['GET', 'POST'])(main_search_goto)
 

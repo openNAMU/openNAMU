@@ -1,6 +1,6 @@
 from .tool.func import *
 
-from .api_topic import api_topic, api_topic_thread_pre_render
+from .go_api_topic import api_topic_thread_pre_render
 
 from .edit import edit_editor
 
@@ -9,7 +9,25 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
         curs = conn.cursor()
         topic_num = str(topic_num)
 
-        topic_acl = acl_check('', 'topic', topic_num)
+        if topic_num == '0':
+            name = load_lang('make_new_topic')
+            sub = load_lang('make_new_topic')
+
+            name_value = doc_name
+            sub_value = ''
+        else:
+            curs.execute(db_change("select title, sub from rd where code = ?"), [topic_num])
+            name = curs.fetchall()
+            if name:
+                sub = name[0][1]
+                name = name[0][0]
+
+                name_value = name
+                sub_value = sub
+            else:
+                return redirect('/')
+                
+        topic_acl = acl_check(name_value, 'topic', topic_num)
         topic_view_acl = acl_check('', 'topic_view', topic_num)
         if topic_view_acl == 1:
             return re_error('/ban')
@@ -99,26 +117,6 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
 
             return redirect('/thread/' + topic_num + '#' + num)
         else:
-            thread_data = ''
-
-            if topic_num == '0':
-                name = load_lang('make_new_topic')
-                sub = load_lang('make_new_topic')
-
-                name_value = doc_name
-                sub_value = ''
-            else:
-                curs.execute(db_change("select title, sub from rd where code = ?"), [topic_num])
-                name = curs.fetchall()
-                if name:
-                    sub = name[0][1]
-                    name = name[0][0]
-
-                    name_value = name
-                    sub_value = sub
-                else:
-                    return redirect('/')
-
             acl_display = 'display: none;' if topic_acl == 1 else ''
             name_display = 'display: none;' if topic_num != '0' else ''
 
@@ -130,14 +128,6 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             
             shortcut += '</div>'
 
-            top_topic = ''
-            json_data = json.loads(api_topic(int(topic_num), 'top', '', 'render').data)
-            top_topic += json_data['data'] if 'data' in json_data else ''
-            
-            main_topic = ''
-            json_data = json.loads(api_topic(int(topic_num), 'normal', '', 'render').data)
-            main_topic += json_data['data'] if 'data' in json_data else ''
-
             return easy_minify(flask.render_template(skin_check(),
                 imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('discussion') + ')', 0])],
                 data = '''
@@ -147,14 +137,20 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                         }
                     </style>
                     <input type="checkbox" onclick="opennamu_do_remove_blind_thread();" checked> ''' + load_lang('remove_blind_thread') + '''
+                    <hr class="main_hr">
 
                     ''' + shortcut + '''
                     <h2 id="topic_top_title">''' + html.escape(sub) + '''</h2>
                     
-                    <div id="top_topic">''' + top_topic + '''</div>
-                    <div id="main_topic">''' + main_topic + '''</div>
-                    <div id="plus_topic"></div>
-                    
+                    <div id="opennamu_top_thread"></div>
+                    <div id="opennamu_main_thread"></div>
+                    <div id="opennamu_reload_thread"></div>
+                    <script>
+                        opennamu_get_thread("''' + topic_num + '''", "top");
+                        opennamu_get_thread("''' + topic_num + '''");
+                    </script>
+
+                    <a href="javascript:opennamu_thread_blind();">(''' + load_lang('hide') + ''' | ''' + load_lang('hide_release') + ''')</a>
                     <a href="/thread/''' + topic_num + '/tool">(' + load_lang('topic_tool') + ''')</a>
                     <hr class="main_hr">
                     
@@ -166,7 +162,7 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                             <hr class="main_hr">
                         </div>
                         
-                        ''' + edit_editor(curs, ip, thread_data, 'thread') + '''
+                        ''' + edit_editor(curs, ip, '', 'thread') + '''
                     </form>
                 ''',
                 menu = [['topic/' + url_pas(name), load_lang('list')]]

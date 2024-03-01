@@ -21,17 +21,20 @@ def main_sys_update():
             
             if platform.system() == 'Linux':
                 ok = []
-
                 ok += [os.system('git remote rm origin')]
                 ok += [os.system('git remote add origin https://github.com/opennamu/opennamu.git')]
-                ok += [os.system('git fetch origin ' + up_data)]
+                ok += [os.system('git fetch --depth=1 origin ' + up_data)]
                 ok += [os.system('git reset --hard origin/' + up_data)]
-                if (ok[0] and ok[1] and ok[2] and ok[3]) == 0:
-                    return redirect('/restart')
+                for for_a in ok[1:]:
+                    if for_a != 0:
+                        break
                 else:
-                    print('Error : update failed')
+                    return redirect('/restart')
+                
+                print('Error : update failed')
             elif platform.system() == 'Windows':
                 os.system('rd /s /q route')
+
                 urllib.request.urlretrieve('https://github.com/opennamu/opennamu/archive/' + up_data + '.zip', 'update.zip')
                 zipfile.ZipFile('update.zip').extractall('')
                 ok = os.system('xcopy /y /s /r opennamu-' + up_data + ' .')
