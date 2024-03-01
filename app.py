@@ -683,6 +683,10 @@ app.route('/api/raw/<everything:name>', defaults = { 'db_set' : db_set_str })(ap
 
 app.route('/api/random', defaults = { 'db_set' : db_set_str })(api_w_random)
 
+app.route('/api/bbs/main', defaults = { 'db_set' : db_set_str })(api_bbs)
+app.route('/api/bbs/w/<int:bbs_num>', defaults = { 'db_set' : db_set_str })(api_bbs)
+app.route('/api/bbs/w/<int:bbs_num>/<int:page>', defaults = { 'db_set' : db_set_str })(api_bbs)
+
 app.route('/api/bbs/w/<sub_code>')(api_bbs_w_post)
 app.route('/api/bbs/w/comment/<sub_code>')(api_bbs_w_comment)
 app.route('/api/bbs/w/comment_one/<sub_code>')(api_bbs_w_comment)

@@ -170,8 +170,8 @@ class PlaceholderContentWidget {
     static ID = 'editor.widget.placeholderHint';
 
     constructor(placeholder, editor) {
-		this.placeholder = placeholder;
-		this.editor = editor;
+        this.placeholder = placeholder;
+        this.editor = editor;
         // register a listener for editor code changes
         editor.onDidChangeModelContent(() => this.onDidChangeModelContent());
         // ensure that on initial load the placeholder is shown
