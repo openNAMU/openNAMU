@@ -92,6 +92,10 @@ func Api_bbs(call_arg []string) {
 		data_list = append(data_list, temp_data)
 	}
 
-	json_data, _ := json.Marshal(data_list)
-	fmt.Print(string(json_data))
+	if len(data_list) == 0 {
+		fmt.Print("{}")
+	} else {
+		json_data, _ := json.Marshal(data_list)
+		fmt.Print(string(json_data))
+	}
 }

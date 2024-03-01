@@ -182,5 +182,6 @@ from route.go_api_topic import api_topic
 
 from route.go_api_w_raw import api_w_raw
 from route.go_api_w_random import api_w_random
+from route.go_api_w_xref import api_w_xref
 
 from route.go_main_func_easter_egg import main_func_easter_egg
