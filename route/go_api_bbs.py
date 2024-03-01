@@ -3,7 +3,7 @@ from .tool.func import *
 def api_bbs(db_set, bbs_num = "", page = 1):
     with get_db_connect() as conn:
         other_set = {}
-        other_set["bbs_num"] = bbs_num
+        other_set["bbs_num"] = str(bbs_num)
         other_set["page"] = str(page)
         other_set["ip"] = ip_check()
         other_set = json.dumps(other_set)

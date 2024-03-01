@@ -681,6 +681,11 @@ app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on',
 app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_raw)
 app.route('/api/raw/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_raw)
 
+app.route('/api/xref/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_xref)
+app.route('/api/xref_page/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_xref)
+app.route('/api/xref_this/<everything:name>', defaults = { 'xref_type' : '2', 'db_set' : db_set_str })(api_w_xref)
+app.route('/api/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : '2', 'db_set' : db_set_str })(api_w_xref)
+
 app.route('/api/random', defaults = { 'db_set' : db_set_str })(api_w_random)
 
 app.route('/api/bbs/main', defaults = { 'db_set' : db_set_str })(api_bbs)
