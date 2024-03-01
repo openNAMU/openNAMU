@@ -176,6 +176,8 @@ from route.go_api_search import api_search
 from route.go_api_recent_change import api_recent_change
 from route.go_api_recent_edit_request import api_recent_edit_request
 
+from route.go_api_bbs import api_bbs
+
 from route.go_api_topic import api_topic
 
 from route.go_api_w_raw import api_w_raw
