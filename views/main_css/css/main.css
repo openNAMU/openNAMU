@@ -110,6 +110,8 @@ details summary {
 
 .opennamu_comment_scroll {
     max-height: 500px;
+
+    white-space: pre-wrap;
     
     overflow: scroll;
     -ms-overflow-style: none;
@@ -269,9 +271,15 @@ code, pre {
     font-weight: initial;
 }
 
-@media ( max-width: 768px ) {
+@media(max-width: 768px) {
     .opennamu_popup_footnote {
         max-width: 100%;
+    }
+}
+
+@media(max-width: 420px) {
+    .table_safe {
+        float: none !important;
     }
 }
 
@@ -401,6 +409,10 @@ s:hover, strike:hover, del:hover {
 
 .opennamu_list_none {
     list-style: none;
+}
+
+.opennamu_folding {
+    margin-top: 10px;
 }
 
 /* 이 부분 이하로는 레거시 */

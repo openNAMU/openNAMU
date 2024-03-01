@@ -105,7 +105,6 @@ def edit_upload():
                     ip,
                     '',
                     '0',
-                    t_check = 'upload',
                     mode = 'upload'
                 )
 

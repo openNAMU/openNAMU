@@ -1,12 +1,8 @@
 from route.api_func_lang import api_func_lang
 from route.api_image_view import api_image_view
-from route.api_w_raw import api_w_raw
-from route.api_recent_change import api_recent_change
 from route.api_recent_discuss import api_recent_discuss
-from route.api_search import api_search
 from route.api_setting import api_setting
 from route.api_skin_info import api_skin_info
-from route.api_topic import api_topic
 from route.api_user_info import api_user_info
 from route.api_version import api_version
 from route.api_w_render import api_w_render
@@ -35,6 +31,7 @@ from route.edit_delete_multiple import edit_delete_multiple
 from route.edit_move import edit_move
 from route.edit_revert import edit_revert
 from route.edit_upload import edit_upload
+from route.edit_request import edit_request
 
 from route.filter_all import filter_all
 from route.filter_all_add import filter_all_add
@@ -109,6 +106,7 @@ from route.recent_app_submit import recent_app_submit_2
 
 from route.recent_block import recent_block
 from route.recent_change import recent_change
+from route.recent_edit_request import recent_edit_request
 from route.recent_discuss import recent_discuss
 from route.recent_history_add import recent_history_add
 from route.recent_history_delete import recent_history_delete
@@ -155,12 +153,14 @@ from route.user_setting_user_name import user_setting_user_name
 from route.user_watch_list import user_watch_list
 from route.user_watch_list_name import user_watch_list_name
 
-from route.view_acl import view_acl
+from route.view_set import view_set
 from route.view_diff import view_diff
 from route.view_down import view_down
-from route.view_raw import view_raw_2
-from route.view_read import view_read
+from route.view_raw import view_raw
+from route.view_w_raw import view_w_raw
+from route.view_w import view_w
 from route.view_xref import view_xref
+from route.view_random import view_random
 
 from route.vote_add import vote_add
 from route.vote_close import vote_close
@@ -169,7 +169,19 @@ from route.vote_list import vote_list
 from route.vote_select import vote_select
 
 from route.go_api_func_sha224 import api_func_sha224
+from route.go_api_func_ip import api_func_ip
 
-from route.go_view_random import view_random
+from route.go_api_search import api_search
+
+from route.go_api_recent_change import api_recent_change
+from route.go_api_recent_edit_request import api_recent_edit_request
+
+from route.go_api_bbs import api_bbs
+
+from route.go_api_topic import api_topic
+
+from route.go_api_w_raw import api_w_raw
+from route.go_api_w_random import api_w_random
+from route.go_api_w_xref import api_w_xref
 
 from route.go_main_func_easter_egg import main_func_easter_egg

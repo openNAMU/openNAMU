@@ -77,8 +77,14 @@ def edit_move(name):
                         curs.execute(db_change("update rc set title = ?, id = ? where title = ? and id = ?"), [move_title, str(int(num) + int(move[0])), name, move[0]])
                         curs.execute(db_change("update history set title = ?, id = ? where title = ? and id = ?"), [move_title, str(int(num) + int(move[0])), name, move[0]])
 
-                    history_plus(move_title, data_in, time, ip, send, '0',
-                        t_check = 'merge <a>' + name + '</a> - <a>' + move_title + '</a> move',
+                    history_plus(
+                        move_title, 
+                        data_in, 
+                        time, 
+                        ip, 
+                        send, 
+                        '0',
+                        t_check = '<a>' + name + '</a> ↔ <a>' + move_title + '</a>',
                         mode = 'move'
                     )
                 elif move_option == 'reverse':
@@ -107,8 +113,14 @@ def edit_move(name):
                         data = curs.fetchall()
                         data_in = data[0][0] if data else ''
 
-                        history_plus(title_name[0], data_in, time, ip, send, '0',
-                            t_check = '<a>' + title_name[0] + '</a> - <a>' + title_name[1] + '</a> move',
+                        history_plus(
+                            title_name[0], 
+                            data_in, 
+                            time, 
+                            ip, 
+                            send, 
+                            '0',
+                            t_check = '<a>' + title_name[0] + '</a> → <a>' + title_name[1] + '</a>',
                             mode = 'move'
                         )
                 elif move_option != 'none':
@@ -134,8 +146,14 @@ def edit_move(name):
                 curs.execute(db_change("update rc set title = ? where title = ?"), [move_title, name])
                 # 역사와 최근 변경 이동 E
 
-                history_plus(move_title, data_in, time, ip, send, '0',
-                    t_check = '<a>' + name + '</a> - <a>' + move_title + '</a> move',
+                history_plus(
+                    move_title, 
+                    data_in, 
+                    time, 
+                    ip, 
+                    send,
+                    '0',
+                    t_check = '<a>' + name + '</a> → <a>' + move_title + '</a>',
                     mode = 'move'
                 )
 

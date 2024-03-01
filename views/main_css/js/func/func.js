@@ -78,12 +78,6 @@ class Accordion {
     }
 }
 
-window.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('details').forEach((el) => {
-        new Accordion(el);
-    });
-});
-
 function opennamu_do_id_check(data) {
     if(data.match(/\.|\:/)) {
         return 0;
@@ -130,4 +124,53 @@ function opennamu_do_trace_spread() {
             '<style>.opennamu_trace_button { display: none; } .opennamu_trace { white-space: pre-wrap; overflow-x: unset; text-overflow: unset; }</style>' +
         '' + document.getElementsByClassName('opennamu_trace')[0].innerHTML
     }
+}
+
+function opennamu_do_render(to_obj, data, name = '', do_type = '', option = '') {
+    let url;
+    if(do_type === '') {
+        url = "/api/render";
+    } else {
+        url = "/api/render/" + do_type;
+    }
+
+    fetch(url, {
+        method : 'POST',
+        headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body : new URLSearchParams({
+            'name' : name,
+            'data': data,
+            'option' : option
+        })
+    }).then(function(res) {
+        return res.json();
+    }).then(function(text) {
+        if(document.getElementById(to_obj)) {
+            if(text["data"]) {
+                document.getElementById(to_obj).innerHTML = text.data;
+                eval(text.js_data);
+            } else {
+                document.getElementById(to_obj).innerHTML = '';
+            }
+        }
+    });
+}
+
+function opennamu_xss_filter(str) {
+    return str.replace(/[&<>"'\/]/g, function(match) {
+        switch(match) {
+            case '&':
+                return '&amp;';
+            case '<':
+                return '&lt;';
+            case '>':
+                return '&gt;';
+            case "'":
+                return '&#x27;';
+            case '"':
+                return '&quot;';
+            case '/':
+                return '&#x2F;';
+        }
+    });
 }

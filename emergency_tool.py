@@ -51,7 +51,7 @@ print('22. Delete body top')
 print('23. Delete body bottom')
 print('24. SQLite to MySQL')
 
-what_i_do = input('Select : ')
+what_i_do = input('Insert selection number (EX : 9) : ')
 if what_i_do == '1':
     go_num = input('All delete (Y) [Y, N] : ')
     if not go_num == 'N':
@@ -179,7 +179,7 @@ elif what_i_do == '18':
 
     curs.execute(db_change("update other set data = ? where name = 'wiki_access_password'"), [wiki_access_password])
 elif what_i_do == '19':
-    up_data = input('Insert branch (beta) [stable, beta, dev] : ')
+    up_data = input('Insert branch name (beta) [stable, beta, dev] : ')
 
     if not up_data in ['stable', 'beta', 'dev']:
         up_data = 'beta'
@@ -189,7 +189,7 @@ elif what_i_do == '19':
 
         ok += [os.system('git remote rm origin')]
         ok += [os.system('git remote add origin https://github.com/opennamu/opennamu.git')]
-        ok += [os.system('git fetch origin ' + up_data)]
+        ok += [os.system('git fetch --depth=1 origin ' + up_data)]
         ok += [os.system('git reset --hard origin/' + up_data)]
         if (ok[0] and ok[1] and ok[2] and ok[3]) != 0:
             print('Error : update failed')

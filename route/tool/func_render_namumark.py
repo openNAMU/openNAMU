@@ -7,7 +7,7 @@ class class_do_render_namumark:
         self.doc_data = doc_data.replace('\r', '')
         self.doc_name = doc_name
         self.doc_set = doc_set
-        self.doc_include = self.doc_set['doc_include'] if 'doc_include' in self.doc_set else ''
+
         self.do_type = do_type
 
         self.lang_data = lang_data
@@ -35,7 +35,6 @@ class class_do_render_namumark:
         self.data_temp_storage_count = 0
 
         self.data_backlink = {}
-        self.data_include = []
 
         self.data_math_count = 0
         self.data_redirect = 0
@@ -78,13 +77,13 @@ class class_do_render_namumark:
     def get_tool_data_storage(self, data_A = '', data_B = '', data_C = '', do_type = 'render'):        
         self.data_temp_storage_count += 1
         if do_type == 'render':
-            data_name = 'render_' + str(self.data_temp_storage_count) + '_' + self.doc_include
+            data_name = 'render_' + str(self.data_temp_storage_count) + '_' + self.doc_set['doc_include']
 
             self.data_temp_storage[data_name] = data_A
             self.data_temp_storage['/' + data_name] = data_B
             self.data_temp_storage['revert_' + data_name] = data_C
         else:
-            data_name = 'slash_' + str(self.data_temp_storage_count) + '_' + self.doc_include
+            data_name = 'slash_' + str(self.data_temp_storage_count) + '_' + self.doc_set['doc_include']
 
             self.data_temp_storage[data_name] = data_A
 
@@ -167,11 +166,11 @@ class class_do_render_namumark:
                 data += '(' + for_a + ') '
 
                 for for_b in self.data_footnote[for_a]['list']:
-                    data += '<sup><a id="' + self.doc_include + 'fn_' + for_b + '" href="#' + self.doc_include + 'rfn_' + for_b + '">(' + for_b + ')</a></sup> '
+                    data += '<sup><a id="' + self.doc_set['doc_include'] + 'fn_' + for_b + '" href="#' + self.doc_set['doc_include'] + 'rfn_' + for_b + '">(' + for_b + ')</a></sup> '
             else:
-                data += '<a id="' + self.doc_include + 'fn_' + self.data_footnote[for_a]['list'][0] + '" href="#' + self.doc_include + 'rfn_' + self.data_footnote[for_a]['list'][0] + '">(' + for_a + ') </a> '
+                data += '<a id="' + self.doc_set['doc_include'] + 'fn_' + self.data_footnote[for_a]['list'][0] + '" href="#' + self.doc_set['doc_include'] + 'rfn_' + self.data_footnote[for_a]['list'][0] + '">(' + for_a + ') </a> '
 
-            data += '<footnote_title id="' + self.doc_include + 'fn_' + self.data_footnote[for_a]['list'][0] + '_title">' + self.data_footnote[for_a]['data'] + '</footnote_title>'
+            data += '<footnote_title id="' + self.doc_set['doc_include'] + 'fn_' + self.data_footnote[for_a]['list'][0] + '_title">' + self.data_footnote[for_a]['data'] + '</footnote_title>'
 
         if data != '':
             data += '</div>'
@@ -231,7 +230,6 @@ class class_do_render_namumark:
         data_end = class_do_render_namumark(self.curs, self.doc_name, data, doc_set, self.lang_data, do_type = 'inter')()
 
         self.render_data_js += data_end[1]
-        self.data_include += data_end[2]['include']
         self.data_category_list += data_end[2]['category']
         self.data_backlink = dict(self.data_backlink, **data_end[2]['backlink_dict'])
         self.data_temp_storage = dict(self.data_temp_storage, **data_end[2]['temp_storage'][0])
@@ -384,11 +382,15 @@ class class_do_render_namumark:
                     if heading_data[2]:
                         heading_folding = ['⊕', 'none', '0.5']
 
+                    heading_id_name = 'edit_load_' + str(heading_count)
+                    if self.doc_set["doc_type"] != "view":
+                        heading_id_name = self.doc_set['doc_include'] + 'edit_load_' + str(heading_count)
+
                     data_name = self.get_tool_data_storage(
-                        '<h' + heading_level_str + '><span id="' + self.doc_include + 'opennamu_heading_' + str(heading_count) + '_sub" style="opacity: ' + heading_folding[2] + '">', 
+                        '<h' + heading_level_str + '><span id="' + self.doc_set['doc_include'] + 'opennamu_heading_' + str(heading_count) + '_sub" style="opacity: ' + heading_folding[2] + '">', 
                             ' <sub>' + \
-                                '<a id="' + self.doc_include + 'edit_load_' + str(heading_count) + '" href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a> ' + \
-                                '<a href="javascript:void(0);" onclick="javascript:opennamu_heading_folding(\'' + self.doc_include + 'opennamu_heading_' + str(heading_count) + '\', this);">' + \
+                                '<a id="' + heading_id_name + '" href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a> ' + \
+                                '<a href="javascript:void(0);" onclick="javascript:opennamu_heading_folding(\'' + self.doc_set['doc_include'] + 'opennamu_heading_' + str(heading_count) + '\', this);">' + \
                                     heading_folding[0] + \
                                 '</a>'
                             '</sub>' + \
@@ -405,7 +407,7 @@ class class_do_render_namumark:
                             '</heading_stack>' + \
                             ' ' + heading_data_text + \
                         '</' + data_name + '>' + \
-                        '<div id="' + self.doc_include + 'opennamu_heading_' + str(heading_count) + '" style="display: ' + heading_folding[1] + ';">' + \
+                        '<div id="' + self.doc_set['doc_include'] + 'opennamu_heading_' + str(heading_count) + '" style="display: ' + heading_folding[1] + ';">' + \
                         '<back_br>\n' + \
                     ''
 
@@ -481,15 +483,23 @@ class class_do_render_namumark:
 
             macro_split_regex = r'(?:^|,) *([^,]+)'
             macro_split_sub_regex = r'(^[^=]+) *= *([^=]+)'
-            if name_data in ('youtube', 'nicovideo', 'navertv', 'kakaotv', 'vimeo'):
+            if name_data in ('youtube', 'nicovideo', 'navertv', 'kakaotv', 'vimeo', 'instagram', 'twitter'):
                 data = re.findall(macro_split_regex, match[1])
 
                 # get option
                 video_code = ''
                 video_start = ''
                 video_end = ''
+                
                 video_width = '640px'
                 video_height = '360px'
+                if name_data == 'instagram':
+                    video_width = '360px'
+                    video_height = '480px'
+                elif name_data == 'twitter':
+                    video_width = '480px'
+                    video_height = '480px'
+
                 for for_a in data:
                     data_sub = re.search(macro_split_sub_regex, for_a)
                     if data_sub:
@@ -523,6 +533,12 @@ class class_do_render_namumark:
                     else:
                         if video_end != '':
                             video_code += '?end=' + video_end
+                elif name_data == 'instagram':
+                    video_code = re.sub(r'^https:\/\/www\.instagram\.com\/p\/', '', video_code)
+
+                    video_code = 'https://www.instagram.com/p/' + video_code +'/embed/'
+                elif name_data == 'twitter':
+                    video_code = 'https://twitframe.com/show?url=' + video_code
                 elif name_data == 'kakaotv':
                     video_code = re.sub(r'^https:\/\/tv\.kakao\.com\/v\/', '', video_code)
 
@@ -780,7 +796,7 @@ class class_do_render_namumark:
             data = html.unescape(data)
             data = self.get_tool_js_safe(data)
 
-            name_ob = self.doc_include + 'opennamu_math_' + str(self.data_math_count)
+            name_ob = self.doc_set['doc_include'] + 'opennamu_math_' + str(self.data_math_count)
 
             data_name = self.get_tool_data_storage('<span id="' + name_ob + '">' + data_html, '</span>', match.group(0))
 
@@ -1244,33 +1260,10 @@ class class_do_render_namumark:
         self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)@', do_render_include_default_sub, self.render_data)
 
     def do_render_include(self):
-        def do_render_include_default_sub(match):
-            match_org = match.group(0)
-            match = match.groups()
-
-            if len(match) < 3:
-                match = list(match) + ['']
-
-            if match[2] == '\\':
-                return match_org
-            else:
-                slash_add = ''
-                if match[0]:
-                    if len(match[0]) % 2 == 1:
-                        slash_add = '\\' * (len(match[0]) - 1)
-                    else:
-                        slash_add = match[0]
-
-                if match[1] in include_change_list:
-                    return slash_add + include_change_list[match[1]]
-                else:
-                    return slash_add + match[2]
-
         include_num = 0
         include_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_include_link', self.ip)
         include_regex = re.compile(r'\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\](\n?)', re.I)
         include_count_max = len(re.findall(include_regex, self.render_data)) * 2
-        include_change_list = {}
         while 1:
             include_num += 1
             include_change_list = {}
@@ -1281,7 +1274,7 @@ class class_do_render_namumark:
             elif not match:
                 break
             else:
-                if re.search('opennamu_include_', self.doc_include):
+                if self.doc_set['doc_type'] == "include":
                     self.render_data = re.sub(include_regex, '', self.render_data, 1)
                 else:
                     match_org = match.group(0)
@@ -1320,28 +1313,21 @@ class class_do_render_namumark:
                     self.data_backlink[include_name]['include'] = ''
 
                     # load include db data
-                    self.curs.execute(db_change("select data from data where title = ?"), [include_name])
+                    self.curs.execute(db_change("select title from data where title = ?"), [include_name])
                     db_data = self.curs.fetchall()
                     if db_data:
-                        include_data = db_data[0][0].replace('\r', '')
-
                         # include link func
                         include_link = ''
                         if include_set_data == 'use':
                             include_link = '<div><a href="/w/' + url_pas(include_name) + '">(' + include_name_org + ')</a></div>'
 
-                        # parameter replace
-                        include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, include_data)
-                        include_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)@', do_render_include_default_sub, include_data)
-
-                        # remove end br
-                        include_data = re.sub('^\n+', '', include_data)
-
-                        self.data_include += [[self.doc_include + 'opennamu_include_' + str(include_num), self.doc_name, include_data, 'style="display: inline;"']]
-
+                        include_sub_name = self.doc_set['doc_include'] + 'opennamu_include_' + str(include_num)
+                        self.render_data_js += '''
+                            opennamu_do_include("''' + self.get_tool_js_safe(include_name) + '''", "''' + self.get_tool_js_safe(self.doc_name) + '''", "''' + self.get_tool_js_safe(include_sub_name) + '''", "''' + self.get_tool_js_safe(include_sub_name) + '''");\n
+                        '''
                         data_name = self.get_tool_data_storage('' + \
                             include_link + \
-                            '<div id="' + self.doc_include + 'opennamu_include_' + str(include_num) + '"></div>' + \
+                            '<div id="' + include_sub_name + '" style="display: none;">' + urllib.parse.quote(json.dumps(include_change_list)) + '</div>' + \
                         '', '', match_org)
                     else:
                         self.data_backlink[include_name]['no'] = ''
@@ -1405,8 +1391,8 @@ class class_do_render_namumark:
                             self.data_footnote[footnote_name]['data'] = footnote_text_data
                             footnote_first = self.data_footnote_all[footnote_name]['list'][0]
 
-                        fn = self.doc_include + 'fn_' + footnote_first
-                        rfn = self.doc_include + 'rfn_' + footnote_num_str
+                        fn = self.doc_set['doc_include'] + 'fn_' + footnote_first
+                        rfn = self.doc_set['doc_include'] + 'rfn_' + footnote_num_str
 
                         if footnote_number_set == 'only_number':
                             foot_v_name += footnote_first
@@ -1420,8 +1406,8 @@ class class_do_render_namumark:
                         self.data_footnote[footnote_name]['list'] = [footnote_num_str]
                         self.data_footnote[footnote_name]['data'] = footnote_text_data
 
-                        fn = self.doc_include + 'fn_' + footnote_num_str
-                        rfn = self.doc_include + 'rfn_' + footnote_num_str
+                        fn = self.doc_set['doc_include'] + 'fn_' + footnote_num_str
+                        rfn = self.doc_set['doc_include'] + 'rfn_' + footnote_num_str
 
                         if footnote_number_set == 'only_number':
                             foot_v_name += footnote_num_str
@@ -1476,7 +1462,7 @@ class class_do_render_namumark:
 
     def do_render_redirect(self):
         match = re.search(r'^<back_br>\n#(?:redirect|넘겨주기) ([^\n]+)', self.render_data, flags = re.I)
-        if match and self.doc_include == '':
+        if match and self.doc_set['doc_type'] == 'view':
             link_data_full = match.group(0)
             link_main = match.group(1)
 
@@ -1534,7 +1520,7 @@ class class_do_render_namumark:
 
                 self.data_redirect = 1
                 if link_exist == 1:
-                    if 'doc_from' in self.doc_set:
+                    if self.doc_set['doc_from'] != '':
                         data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
                     else:
                         data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', '', link_data_full)
@@ -1614,7 +1600,7 @@ class class_do_render_namumark:
                     elif table_parameter_name == 'tableclass':
                         table_parameter_all['class'] = table_parameter_split[1]
                     elif table_parameter_name == 'tabletextalign':
-                        table_parameter_all['table'] += 'text-align:' + table_parameter_data + ';'
+                        table_parameter_all['table'] += 'text-align:' + table_parameter_data + ' !important;'
                     elif table_parameter_name == 'tablecolor':
                         table_parameter_all['table'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
                     elif table_parameter_name == 'tablebordercolor':
@@ -1622,13 +1608,15 @@ class class_do_render_namumark:
                     elif table_parameter_name == 'rowbgcolor':
                         table_parameter_all['tr'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
                     elif table_parameter_name == 'rowtextalign':
-                        table_parameter_all['tr'] += 'text-align:' + table_parameter_data + ';'
+                        table_parameter_all['tr'] += 'text-align:' + table_parameter_data + ' !important;'
                     elif table_parameter_name == 'rowcolor':
                         table_parameter_all['tr'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
                     elif table_parameter_name == 'colcolor':
                         table_parameter_all['col'] += 'color:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
                     elif table_parameter_name == 'colbgcolor':
                         table_parameter_all['col'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
+                    elif table_parameter_name == 'coltextalign':
+                        table_parameter_all['col'] += 'text-align:' + table_parameter_data + ' !important;'
                     elif table_parameter_name == 'bgcolor':
                         table_parameter_all['td'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
                     elif table_parameter_name == 'color':
@@ -1655,11 +1643,11 @@ class class_do_render_namumark:
                     elif table_parameter in ('(', ':', ')'):
                         table_align_auto = 0
                         if table_parameter == '(':
-                            table_parameter_all['td'] += 'text-align: left;'
+                            table_parameter_all['td'] += 'text-align: left !important;'
                         elif table_parameter == ':':
-                            table_parameter_all['td'] += 'text-align: center;'
+                            table_parameter_all['td'] += 'text-align: center !important;'
                         elif table_parameter == ')':
-                            table_parameter_all['td'] += 'text-align: right;'
+                            table_parameter_all['td'] += 'text-align: right !important;'
                     elif re.search(r'^(?:(?:#((?:[0-9a-f-A-F]{3}){1,2}))|(\w+))$', table_parameter):
                         table_parameter_data = self.get_tool_css_safe(table_parameter)
                         table_parameter_all['td'] += 'background:' + self.get_tool_dark_mode_split(table_parameter_data) + ';'
@@ -1678,6 +1666,7 @@ class class_do_render_namumark:
                     else:
                         table_parameter_all['td'] += 'text-align: right;'
                 else:
+                    table_parameter_all['td'] += 'text-align: left;'
                     if re.search(r' $', data):
                         data = re.sub(r' $', '', data)
 
@@ -1825,7 +1814,7 @@ class class_do_render_namumark:
                         wiki_data = self.get_tool_data_revert(wiki_data)
                         wiki_data = re.sub('(^\n|\n$)', '', wiki_data)
 
-                        middle_data_pass = self.do_inter_render(wiki_data, self.doc_include + 'opennamu_wiki_' + str(wiki_count))
+                        middle_data_pass = self.do_inter_render(wiki_data, self.doc_set['doc_include'] + 'opennamu_wiki_' + str(wiki_count))
 
                         data_name = self.get_tool_data_storage('<div ' + wiki_data_style + '>', '</div>', middle_data_org)
                         wiki_count += 1
@@ -1839,9 +1828,9 @@ class class_do_render_namumark:
                         data_revert = re.sub(r'\n$', '', data_revert)
                         data_revert = data_revert.replace('&amp;nbsp;', '&nbsp;')
 
-                        self.render_data_js += 'opennamu_do_render_html("' + self.doc_include + 'opennamu_wiki_' + str(html_count) + '");\n'
+                        self.render_data_js += 'opennamu_do_render_html("' + self.doc_set['doc_include'] + 'opennamu_wiki_' + str(html_count) + '");\n'
 
-                        data_name = self.get_tool_data_storage('<span id="' + self.doc_include + 'opennamu_wiki_' + str(html_count) + '">' + data_revert, '</span>', middle_data_org)
+                        data_name = self.get_tool_data_storage('<span id="' + self.doc_set['doc_include'] + 'opennamu_wiki_' + str(html_count) + '">' + data_revert, '</span>', middle_data_org)
                         html_count += 1
                     elif middle_name == '#!folding':
                         if middle_slash:
@@ -1862,7 +1851,7 @@ class class_do_render_namumark:
                         wiki_data = self.get_tool_data_revert(wiki_data)
                         wiki_data = re.sub('(^\n|\n$)', '', wiki_data)
 
-                        wiki_data_end = self.do_inter_render(wiki_data, self.doc_include + 'opennamu_folding_' + str(folding_count))
+                        wiki_data_end = self.do_inter_render(wiki_data, self.doc_set['doc_include'] + 'opennamu_folding_' + str(folding_count))
 
                         middle_data_pass = wiki_data_folding
                         data_name = self.get_tool_data_storage('<details><summary>', '</summary><div class="opennamu_folding">', middle_data_org)
@@ -2058,7 +2047,7 @@ class class_do_render_namumark:
                 quote_data = re.sub(r'\n$', '', quote_data)
                 quote_data = self.get_tool_data_revert(quote_data)
 
-                quote_data_end = self.do_inter_render(quote_data, self.doc_include + 'opennamu_quote_' + str(quote_count))
+                quote_data_end = self.do_inter_render(quote_data, self.doc_set['doc_include'] + 'opennamu_quote_' + str(quote_count))
                 data_name = self.get_tool_data_storage('<div>', '</div>', quote_data_org)
 
                 self.render_data = re.sub(quote_regex, lambda x : ('\n<blockquote><back_br>\n<' + data_name + '>' + quote_data_end + '</' + data_name + '><front_br></blockquote>\n'), self.render_data, 1)
@@ -2175,7 +2164,6 @@ class class_do_render_namumark:
 
                     return '<li style="margin-left: ' + str((list_len - 1) * 20) + 'px;" class="opennamu_list_none">' + change_text + '. ' + list_data + '</li>'
 
-        # 숫자 리스트
         list_regex = r'((?:\n( *)(?:(\*)) ?([^\n]*))+|(?:\n( *)(?:(1|a|A|I|i)\.(?:#([0-9]*))?) ?([^\n]*)){2,})\n'
         list_count_max = len(re.findall(list_regex, self.render_data)) * 3
         while 1:
@@ -2203,7 +2191,7 @@ class class_do_render_namumark:
         self.render_data = self.render_data.replace('<no_td>', '||')
 
         # add category
-        if self.doc_include == '':
+        if self.doc_set["doc_type"] == 'view':
             if self.data_category != '':
                 data_name = self.get_tool_data_storage(self.data_category, '</div>', '')
 
@@ -2304,7 +2292,7 @@ class class_do_render_namumark:
                 self.render_data = self.render_data.replace('<toc_need_part>', self.data_toc, 20)
                 self.render_data = self.render_data.replace('<toc_need_part>', '')
 
-            if self.doc_include != '' or re.search(r'<toc_no_auto>', self.render_data) or toc_set_data == 'half_off' or toc_set_data == 'off' or toc_data_on == 1:
+            if self.doc_set["doc_type"] != 'view' or re.search(r'<toc_no_auto>', self.render_data) or toc_set_data == 'half_off' or toc_set_data == 'off' or toc_data_on == 1:
                 self.render_data = self.render_data.replace('<toc_no_auto>', '')
             else:
                 self.render_data = re.sub(r'(?P<in><h[1-6] id="[^"]*">)', '<br>' + self.data_toc + '\\g<in>', self.render_data, 1)
@@ -2326,6 +2314,15 @@ class class_do_render_namumark:
             return '<a title="' + find_data + '"'
 
         self.render_data = re.sub(r'<a fn_target="([^"]+)"', do_render_last_footnote, self.render_data)
+
+        self.render_data_js += '''
+            document.querySelectorAll('details').forEach((el) => {
+                new Accordion(el);
+            });
+            if(window.location.hash !== '' && document.getElementById(window.location.hash.replace(/^#/, ''))) {
+                document.getElementById(window.location.hash.replace(/^#/, '')).focus();
+            }\n
+        '''
 
     def __call__(self):
         self.do_render_remark()
@@ -2352,7 +2349,6 @@ class class_do_render_namumark:
             
         if self.do_type == 'exter':
             self.do_render_last()
-            self.data_include = list(reversed(self.data_include))
         else:
             self.render_data = self.render_data.replace(r'\|\|', '<no_td>')
             self.render_data = self.render_data.replace('\n', '<no_br>')
@@ -2367,7 +2363,6 @@ class class_do_render_namumark:
             {
                 'backlink' : self.data_backlink, # backlink
                 'backlink_dict' : data_backlink_dict,
-                'include' : self.data_include, # include data
                 'footnote' : self.data_footnote_all, # footnote
                 'category' : self.data_category_list,
                 'temp_storage' : [self.data_temp_storage, self.data_temp_storage_count],

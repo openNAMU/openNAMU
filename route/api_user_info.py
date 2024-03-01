@@ -49,7 +49,9 @@ def api_user_info(user_name = ''):
                     regex_ban = 1
                     
                     data_result['ban']['type'] = 'regex'
-                    if db_data[0] == 'O':
+                    if db_data[0] == 'E':
+                        data_result['ban']['login_able'] = '2'
+                    elif db_data[0] == 'O':
                         data_result['ban']['login_able'] = '1'
                     else:
                         data_result['ban']['login_able'] = '0'
@@ -68,7 +70,9 @@ def api_user_info(user_name = ''):
                 db_data = curs.fetchall()
                 if db_data:
                     data_result['ban']['type'] = 'normal'
-                    if db_data[0][0] == 'O':
+                    if db_data[0][0] == 'E':
+                        data_result['ban']['login_able'] = '2'
+                    elif db_data[0][0] == 'O':
                         data_result['ban']['login_able'] = '1'
                     else:
                         data_result['ban']['login_able'] = '0'
@@ -94,5 +98,27 @@ def api_user_info(user_name = ''):
             data_result['user_title'] = db_data[0][0]
         else:
             data_result['user_title'] = ''
+
+        lang_data_list = [
+            'user_name',
+            'authority',
+            'state',
+            'member',
+            'normal',
+            'blocked',
+            'type',
+            'regex',
+            'period',
+            'limitless',
+            'login_able',
+            'why',
+            'band_blocked',
+            'ip',
+            'ban',
+            'level',
+            'option',
+            'edit_request_able'
+        ]
+        lang_data = { for_a : load_lang(for_a) for for_a in lang_data_list }
                 
-        return flask.jsonify({ 'data' : data_result })
+        return flask.jsonify({ 'data' : data_result, 'language' : lang_data })

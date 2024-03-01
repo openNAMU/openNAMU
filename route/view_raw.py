@@ -3,7 +3,7 @@ from .tool.func import *
 from .api_bbs_w_post import api_bbs_w_post
 from .api_bbs_w_comment_one import api_bbs_w_comment_one
 
-def view_raw_2(name = None, topic_num = None, num = None, doc_acl = 0, bbs_num = '', post_num = '', comment_num = ''):
+def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', post_num = '', comment_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
         
@@ -12,10 +12,10 @@ def view_raw_2(name = None, topic_num = None, num = None, doc_acl = 0, bbs_num =
 
         if bbs_num != '' and post_num != '':
             if acl_check(bbs_num_str, 'bbs_view') == 1:
-                    return re_error('/ban')
+                return re_error('/ban')
                     
             name = ''
-        elif topic_num:
+        elif topic_num != '':
             topic_num = str(topic_num)
             
             if acl_check('', 'topic_view', topic_num) == 1:
@@ -37,7 +37,7 @@ def view_raw_2(name = None, topic_num = None, num = None, doc_acl = 0, bbs_num =
             
             if comment_num != '':
                 sub += ' (' + comment_num + ')'
-        elif not topic_num and num:
+        elif topic_num == '' and num != '':
             curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
             if curs.fetchall() and admin_check(6) != 1:
                 return re_error('/error/3')
@@ -47,7 +47,7 @@ def view_raw_2(name = None, topic_num = None, num = None, doc_acl = 0, bbs_num =
             sub += ' (r' + num + ')'
 
             menu = [['history_tool/' + url_pas(num) + '/' + url_pas(name), load_lang('return')]]
-        elif topic_num:
+        elif topic_num != '':
             if admin_check(6) != 1:
                 curs.execute(db_change("select data from topic where id = ? and code = ? and block = ''"), [num, topic_num])
             else:
@@ -84,7 +84,20 @@ def view_raw_2(name = None, topic_num = None, num = None, doc_acl = 0, bbs_num =
             data = curs.fetchall()
             
         if data:
-            p_data += '<textarea readonly class="opennamu_textarea_500">' + html.escape(data[0][0]) + '</textarea>'
+            doc_preview = ''
+            if bbs_num == '' and post_num == '' and topic_num == '':
+                doc_preview = '''
+                    <textarea id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
+                    <button id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview('raw');">''' + load_lang('preview') + '''</button>
+                    <hr class="main_hr">
+                '''
+
+            p_data += '''
+                <div id="opennamu_preview_area">
+                    ''' + doc_preview + '''
+                    <textarea readonly id="opennamu_edit_textarea" class="opennamu_textarea_500">''' + html.escape(data[0][0]) + '''</textarea>
+                </div>
+            '''
             
             if doc_acl == 1:
                 p_data = '' + \

@@ -1,3 +1,5 @@
+"use strict";
+
 function opennamu_change_comment(get_id) {
     const input = document.querySelector('#opennamu_comment_select');
     if(input !== null) {
