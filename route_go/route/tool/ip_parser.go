@@ -132,10 +132,14 @@ func IP_preprocess(db *sql.DB, db_set map[string]string, ip string, my_ip string
 			err = stmt.QueryRow(ip).Scan(&sub_user_name)
 			if err != nil {
 				if err == sql.ErrNoRows {
-					sub_user_name = "user"
+					sub_user_name = Get_language(db, db_set, "member", false)
 				} else {
 					return []string{"", ""}
 				}
+			}
+
+			if sub_user_name == "" {
+				sub_user_name = Get_language(db, db_set, "member", false)
 			}
 
 			ip = sub_user_name
@@ -156,6 +160,10 @@ func IP_preprocess(db *sql.DB, db_set map[string]string, ip string, my_ip string
 				} else {
 					return []string{"", ""}
 				}
+			}
+
+			if user_name == "" {
+				user_name = ip
 			}
 
 			ip = user_name
@@ -181,7 +189,7 @@ func IP_parser(db *sql.DB, db_set map[string]string, ip string, my_ip string) st
 			var user_name_level string
 			var user_title string
 
-			err := db.QueryRow(DB_change(db_set, "select data from other where name = 'user_name_view'")).Scan(&user_name_level)
+			err := db.QueryRow(DB_change(db_set, "select data from other where name = 'user_name_level'")).Scan(&user_name_level)
 			if err != nil {
 				if err == sql.ErrNoRows {
 					user_name_level = ""
