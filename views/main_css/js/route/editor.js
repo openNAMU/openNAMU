@@ -172,14 +172,12 @@ class PlaceholderContentWidget {
     constructor(placeholder, editor) {
         this.placeholder = placeholder;
         this.editor = editor;
-        // register a listener for editor code changes
         editor.onDidChangeModelContent(() => this.onDidChangeModelContent());
-        // ensure that on initial load the placeholder is shown
         this.onDidChangeModelContent();
     }
 
     onDidChangeModelContent() {
-        if (this.editor.getValue() === '') {
+        if(this.editor.getValue() === '') {
             this.editor.addContentWidget(this);
         } else {
             this.editor.removeContentWidget(this);
@@ -191,7 +189,7 @@ class PlaceholderContentWidget {
     }
 
     getDomNode() {
-        if (!this.domNode) {
+        if(!this.domNode) {
             this.domNode = document.createElement('div');
             this.domNode.style.width = 'max-content';
             this.domNode.textContent = this.placeholder;
@@ -250,9 +248,7 @@ function do_monaco_init(monaco_thema, markup = "") {
                 rules : [
                     { token : "namumark-color", foreground : "d94844" },
                 ],
-                colors : {
-                    "editor.foreground" : "",
-                },
+                colors : {},
             });
         }
 
