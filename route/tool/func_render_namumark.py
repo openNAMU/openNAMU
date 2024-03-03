@@ -539,6 +539,9 @@ class class_do_render_namumark:
                     video_code = 'https://www.instagram.com/p/' + video_code +'/embed/'
                 elif name_data == 'twitter':
                     video_code = 'https://twitframe.com/show?url=' + video_code
+
+                    if self.darkmode == '1':
+                        video_code += '&theme=dark'
                 elif name_data == 'kakaotv':
                     video_code = re.sub(r'^https:\/\/tv\.kakao\.com\/v\/', '', video_code)
 
