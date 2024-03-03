@@ -224,7 +224,7 @@ class class_do_render_namumark:
         return link_main
     
     def do_inter_render(self, data, doc_include):
-        doc_set = self.doc_set
+        doc_set = dict(self.doc_set)
         doc_set['doc_include'] = doc_include
 
         data_end = class_do_render_namumark(self.curs, self.doc_name, data, doc_set, self.lang_data, do_type = 'inter')()
