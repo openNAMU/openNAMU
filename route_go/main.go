@@ -30,5 +30,7 @@ func main() {
 		route.Api_bbs(call_arg[1:])
 	} else if call_arg[0] == "api_w_xref" {
 		route.Api_w_xref(call_arg[1:])
+	} else if call_arg[0] == "api_w_watch_list" {
+		route.Api_w_watch_list(call_arg[1:])
 	}
 }
