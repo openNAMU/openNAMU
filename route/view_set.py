@@ -189,7 +189,6 @@ def view_set(name = 'Test'):
                 ''',
                 menu = [
                     ['w/' + url_pas(name), load_lang('return')], 
-                    ['manager', load_lang('admin')], 
-                    ['list/admin/auth_use_page/1/' + url_pas('acl (' + name + ')'), load_lang('acl_record')]
+                    ['manager', load_lang('admin')]
                 ]
             ))
