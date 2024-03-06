@@ -1273,7 +1273,7 @@ def wiki_custom():
             email,
             user_name,
             user_admin,
-            str(ban_check()),
+            str(ban_check()[0]),
             user_notice,
             user_acl_list,
             ip,
@@ -1825,9 +1825,9 @@ def acl_check(name = '', tool = '', topic_num = '1'):
 
         ip = ip_check()
         if tool == 'document_edit_request':
-            get_ban = ban_check(ip, 'edit_request')
+            get_ban = ban_check(ip, 'edit_request')[0]
         else:
-            get_ban = ban_check(ip)
+            get_ban = ban_check(ip)[0]
         
         if tool == '' and name != '':
             if acl_check(name, 'render') == 1:
@@ -2086,6 +2086,14 @@ def acl_check(name = '', tool = '', topic_num = '1'):
 
         return 1
 
+def ban_type_check(data):
+    if data == 'O':
+        return '1'
+    elif data == 'E':
+        return '2'
+    else:
+        return ''
+
 def ban_check(ip = None, tool = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -2094,40 +2102,42 @@ def ban_check(ip = None, tool = ''):
         tool = '' if not tool else tool
 
         if admin_check(None, None, ip) == 1:
-            return 0
+            return [0, '']
 
         curs.execute(db_change("select login, block from rb where band = 'regex' and ongoing = '1'"))
         regex_d = curs.fetchall()
         for test_r in regex_d:
+            ban_type = ban_type_check(test_r[0])
             g_regex = re.compile(test_r[1])
             if g_regex.search(ip):
                 if tool == 'login':
-                    if test_r[0] != 'O':
-                        return 1
+                    if ban_type != '1':
+                        return [1, 'a' + ban_type]
                 elif tool == 'edit_request':
-                    if test_r[0][0] != 'E':
-                        return 1
+                    if ban_type != '2':
+                        return [1, 'a' + ban_type]
                 else:
-                    return 1
+                    return [1, 'a' + ban_type]
 
         curs.execute(db_change("select login from rb where block = ? and band = '' and ongoing = '1'"), [ip])
         ban_d = curs.fetchall()
         if ban_d:
+            ban_type = ban_type_check(ban_d[0][0])
             if tool == 'login':
-                if ban_d[0][0] != 'O':
-                    return 1
+                if ban_type != '1':
+                    return [1, ban_type]
             elif tool == 'edit_request':
-                if ban_d[0][0] != 'E':
-                    return 1
+                if ban_type != '2':
+                    return [1, ban_type]
             else:
-                return 1
+                return [1, ban_type]
 
         curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
         db_data = curs.fetchall()
         if db_data and db_data[0][0] == 'ban':
-            return 1
+            return [1, 'b']
 
-        return 0
+        return [0, '']
 
 def ip_pas(raw_ip, type_data = 0):
     with get_db_connect() as conn:
@@ -2203,11 +2213,9 @@ def ip_pas(raw_ip, type_data = 0):
                     if db_data:
                         ip = db_data[0][0] + ip
 
-                if ban_check(raw_ip) == 1:
-                    ip = '<s>' + ip + '</s>'
-
-                    if ban_check(raw_ip, 'login') == 1:
-                        ip = '<i>' + ip + '</i>'
+                ban = ban_check(raw_ip)
+                if ban[0] == 1:
+                    ip = '<sup>' + ban[1] + '</sup><s>' + ip + '</s>'
 
                 ip = ip + ' <a href="/user/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
 
@@ -2548,7 +2556,7 @@ def re_error(data):
         curs = conn.cursor()
 
         if data == '/ban':
-            if ban_check() == 1:
+            if ban_check()[0] == 1:
                 end = '<div id="opennamu_get_user_info">' + html.escape(ip_check()) + '</div>'
             else:
                 end = '<ul class="opennamu_ul"><li>' + load_lang('authority_error') + '</li></ul>'
