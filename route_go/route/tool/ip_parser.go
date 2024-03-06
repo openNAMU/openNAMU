@@ -75,7 +75,7 @@ func Get_admin_auth(db *sql.DB, db_set map[string]string, ip string) string {
 			}
 		}
 
-		if auth != "user" {
+		if auth != "user" && auth != "ban" {
 			return auth
 		} else {
 			return ""
