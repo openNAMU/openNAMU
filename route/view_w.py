@@ -316,6 +316,10 @@ def view_w(name = 'Test', do_type = ''):
         body = curs.fetchall()
         div += body[0][0] if body else ''
 
+        curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_top'"), [name])
+        body = curs.fetchall()
+        div = (body[0][0] + div) if body else div
+
         if ip_or_user(ip) == 0:
             curs.execute(db_change("select data from user_set where id = ? and data = ?"), [ip, name])
             watch_list = 2 if curs.fetchall() else 1
