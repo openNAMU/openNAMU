@@ -269,14 +269,12 @@ function opennamu_do_editor_preview() {
 
     const input = document.querySelector('#opennamu_edit_textarea');
     if(input !== null) {
-        let doc_name = 'test';
-
-        const doc_name_input = document.querySelector('#opennamu_editor_doc_name');
-        if(doc_name_input !== null) {
-            doc_name = doc_name_input.value;
+        let name = "test";
+        if(document.getElementById('opennamu_editor_doc_name')) {
+            name = document.getElementById('opennamu_editor_doc_name').value.replace(/&amp;/g, '&');
         }
 
-        opennamu_do_render('opennamu_preview_area', input.value, doc_name);
+        opennamu_do_render('opennamu_preview_area', input.value, name);
     }
 }
 
