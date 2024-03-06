@@ -4,7 +4,7 @@ def login_register_2():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if ban_check(None, 'login') == 1:
+        if ban_check(None, 'login')[0] == 1:
             return re_error('/ban')
 
         ip = ip_check()
