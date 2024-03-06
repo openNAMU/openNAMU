@@ -3,7 +3,7 @@
 function opennamu_view_w_raw(render = '') {
     let name = "test";
     if(document.getElementById('opennamu_editor_doc_name')) {
-        name = document.getElementById('opennamu_editor_doc_name').innerHTML;
+        name = document.getElementById('opennamu_editor_doc_name').innerHTML.replace(/&amp;/g, '&');
     }
 
     let rev = "";
@@ -36,13 +36,14 @@ function opennamu_view_w_raw(render = '') {
 function opennamu_view_w_raw_preview() {
     let name = "test";
     if(document.getElementById('opennamu_editor_doc_name')) {
-        name = document.getElementById('opennamu_editor_doc_name').innerHTML;
+        name = document.getElementById('opennamu_editor_doc_name').innerHTML.replace(/&amp;/g, '&');
     }
 
     let data = "";
     if(document.getElementById('opennamu_edit_textarea')) {
         data = document.getElementById('opennamu_edit_textarea').value;
     }
+    console.log(data);
 
     opennamu_do_render('opennamu_preview_area', data, name);
 }
@@ -50,7 +51,7 @@ function opennamu_view_w_raw_preview() {
 function opennamu_view_w() {
     let name = "test";
     if(document.getElementById('opennamu_editor_doc_name')) {
-        name = document.getElementById('opennamu_editor_doc_name').innerHTML;
+        name = document.getElementById('opennamu_editor_doc_name').innerHTML.replace(/&amp;/g, '&');
     }
 
     fetch("/api/raw/" + opennamu_do_url_encode(name)).then(function(res) {

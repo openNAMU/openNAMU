@@ -30,25 +30,22 @@ def topic_comment_tool(topic_num = 1, num = 1):
         '''
 
         if admin_check(3) == 1:
-            curs.execute(db_change("select id from topic where code = ? and id = ? and top = 'O'"), [topic_num, num])
-            top_topic_d = curs.fetchall()
-
             ban += '''
                 <h2>''' + load_lang('admin_tool') + '''</h2>
                 <ul class="opennamu_ul">
                     <li>
                         <a href="/auth/give/ban/''' + url_pas(data[0][1]) + '''">
-                            ''' + (load_lang('release') if ban_check(data[0][1]) == 1 else load_lang('ban')) + '''
+                            ''' + (load_lang('ban') + ' | ' + load_lang('release')) + '''
                         </a>
                     </li>
                     <li>
                         <a href="/thread/''' + topic_num + '''/comment/''' + num + '''/blind">
-                            ''' + (load_lang('hide_release') if data[0][0] == 'O' else load_lang('hide')) + '''
+                            ''' + (load_lang('hide') + ' | ' + load_lang('hide_release')) + '''
                         </a>
                     </li>
                     <li>
                         <a href="/thread/''' + topic_num + '''/comment/''' + num + '''/notice">
-                            ''' + (load_lang('pinned_release') if top_topic_d else load_lang('pinned')) + '''
+                            ''' + (load_lang('pinned') + ' | ' + load_lang('pinned_release')) + '''
                         </a>
                     </li>
                     <li>

@@ -4,7 +4,7 @@ def user_setting_pw():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if ban_check() == 1:
+        if ban_check()[0] == 1:
             return re_error('/ban')
 
         ip = ip_check()
