@@ -5,6 +5,7 @@ def view_w(name = 'Test', do_type = ''):
         curs = conn.cursor()
 
         sub = 0
+        history_color = 0
         menu = []
 
         user_doc = ''
@@ -185,27 +186,15 @@ def view_w(name = 'Test', do_type = ''):
             response_data = 404
 
             curs.execute(db_change('select data from other where name = "error_404"'))
-            sql_d = curs.fetchall()
-            if sql_d and sql_d[0][0] != '':
-                end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + sql_d[0][0] + '</li></ul>'
+            db_data = curs.fetchall()
+            if db_data and db_data[0][0] != '':
+                end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + db_data[0][0] + '</li></ul>'
             else:
                 end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + load_lang('decument_404_error') + '</li></ul>'
 
-            curs.execute(db_change('select ip, date, leng, send, id from history where title = ? and hide != "O" order by id + 0 desc limit 3'), [name])
-            sql_d = curs.fetchall()
-            if sql_d:
-                end_data += '<h2>' + load_lang('history') + '</h2><ul class="opennamu_ul">'
-                for i in sql_d:
-                    if re.search(r"\+", i[2]):
-                        leng = '<span style="color:green;">(' + i[2] + ')</span>'
-                    elif re.search(r"\-", i[2]):
-                        leng = '<span style="color:red;">(' + i[2] + ')</span>'
-                    else:
-                        leng = '<span style="color:gray;">(' + i[2] + ')</span>'
-
-                    end_data += '<li>' + i[1] + ' | r' + i[4] + ' | ' + ip_pas(i[0]) + ' | ' + leng + (' | ' + i[3] if i[3] != '' else '') + '</li>'
-
-                end_data += '<li><a href="/history/' + url_pas(name) + '">(...)</a></li></ul>'
+            curs.execute(db_change('select ip, date, leng, send, id from history where title = ? and hide != "O" order by id + 0 desc limit 1'), [name])
+            db_data = curs.fetchall()
+            history_color = 1 if db_data else 0
         else:
             response_data = 200
 
@@ -219,7 +208,7 @@ def view_w(name = 'Test', do_type = ''):
 
         menu += [
             ['topic/' + url_pas(name), load_lang('discussion'), topic], 
-            ['history/' + url_pas(name), load_lang('history')], 
+            ['history/' + url_pas(name), load_lang('history'), history_color], 
             ['xref/' + url_pas(name), load_lang('backlink')], 
             ['acl/' + url_pas(name), load_lang('setting'), acl],
         ]
