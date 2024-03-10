@@ -40,7 +40,7 @@ def view_w(name = 'Test', do_type = ''):
             category_sql = curs.fetchall()
             for data in category_sql:
                 link_view = data[0]
-                if get_main_skin_set(curs, flask.session, 'main_css_category_change_title', ip) != 'off':
+                if get_main_skin_set(conn, flask.session, 'main_css_category_change_title', ip) != 'off':
                     curs.execute(db_change("select data from back where title = ? and link = ? and type = 'cat_view' limit 1"), [name, data[0]])
                     db_data = curs.fetchall()
                     if db_data and db_data[0][0] != '':
@@ -264,7 +264,7 @@ def view_w(name = 'Test', do_type = ''):
         
         flask.session['lastest_document'] = list(reversed(dict.fromkeys(reversed(flask.session['lastest_document']))))
 
-        view_history_on = get_main_skin_set(curs, flask.session, 'main_css_view_history', ip)
+        view_history_on = get_main_skin_set(conn, flask.session, 'main_css_view_history', ip)
         if view_history_on == 'on':
             end_data = '' + \
                 '<div class="opennamu_trace">' + \

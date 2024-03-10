@@ -41,7 +41,7 @@ def recent_history_add(name = 'Test', do_type = ''):
                         <input placeholder="''' + get_lang(conn, 'name') + '''" name="get_ip">
                         <hr class="main_hr">
 
-                        ''' + edit_editor(curs, ip) + '''
+                        ''' + edit_editor(conn, ip) + '''
                     </form>
                 ''',
                 menu = [['history/' + url_pas(name), get_lang(conn, 'return')]]
