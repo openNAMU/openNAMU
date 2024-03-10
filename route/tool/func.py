@@ -963,7 +963,7 @@ def easy_minify(data, tool = None):
             return data
             
         return '''
-            <script src="/views/main_css/js/route/wiki_access_password.js"></script>
+            <script src="/views/main_css/js/route/wiki_access_password.js''' + cache_v() + '''"></script>
             <h2>''' + load_lang('error_password_require_for_wiki_access') + '''</h2>
             <input type="password" id="wiki_access">
             <input type="submit" onclick="opennamu_do_wiki_access();">
@@ -1049,6 +1049,9 @@ def skin_check(set_n = 0):
         else:
             return skin
     
+def cache_v():
+    return '.cache_v216'
+
 def wiki_css(data):
     global global_wiki_set
 
@@ -1058,8 +1061,7 @@ def wiki_css(data):
     data_css = ''
     data_css_dark = ''
 
-    data_css_ver = '216'
-    data_css_ver = '.cache_v' + data_css_ver
+    data_css_ver = cache_v()
 
     if 'main_css' in global_wiki_set:
         data_css = global_wiki_set['main_css']

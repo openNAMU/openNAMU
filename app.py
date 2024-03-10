@@ -516,6 +516,9 @@ app.route('/xref_page/<int:num>/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
+app.route('/doc_watch_list/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str, 'do_type' : 'watch_list' })(w_watch_list)
+app.route('/doc_star_doc/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str, 'do_type' : 'star_doc' })(w_watch_list)
+
 app.route('/raw/<everything:name>')(view_w_raw)
 app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 'on' })(view_w_raw)
 app.route('/raw_rev/<int:rev>/<everything:name>')(view_w_raw)
@@ -526,7 +529,6 @@ app.route('/down/<everything:name>')(view_down)
 
 app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_set)
 
-# everything 다음에 추가 붙은 경우에 대해서 재검토 필요 (진행중)
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_w)
 app.route('/w/<everything:name>')(view_w)
 
@@ -681,8 +683,8 @@ app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on',
 app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_raw)
 app.route('/api/raw/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_raw)
 
-app.route('/api/star_doc/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str, 'do_type' : 'star_doc' })(api_w_watch_list)
-app.route('/api/watch_list/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_watch_list)
+app.route('/api/doc_star_doc/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str, 'do_type' : 'star_doc' })(api_w_watch_list)
+app.route('/api/doc_watch_list/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_watch_list)
 
 app.route('/api/xref/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_xref)
 app.route('/api/xref_this/<int:num>/<everything:name>', defaults = { 'xref_type' : '2', 'db_set' : db_set_str })(api_w_xref)
