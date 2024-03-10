@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_tool_redirect(conn, num = 1, add_2 = ''):
+def main_tool_redirect(num = 1, add_2 = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
