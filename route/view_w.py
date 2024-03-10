@@ -322,6 +322,8 @@ def view_w(name = 'Test', do_type = ''):
         else:
             watch_list = 0
 
+        menu += [['doc_watch_list/1/' + url_pas(name), load_lang('watchlist')]]
+
         return easy_minify(flask.render_template(skin_check(),
             imp = [name_view, wiki_set(), wiki_custom(), wiki_css([sub, r_date, watch_list])],
             data = div,
