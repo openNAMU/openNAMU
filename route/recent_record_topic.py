@@ -10,13 +10,13 @@ def recent_record_topic(name = 'Test'):
         div = '''
             <table id="main_table_set">
                 <tr id="main_table_top_tr">
-                    <td id="main_table_width">''' + load_lang('discussion_name') + '''</td>
-                    <td id="main_table_width">''' + load_lang('writer') + '''</td>
-                    <td id="main_table_width">''' + load_lang('time') + '''</td>
+                    <td id="main_table_width">''' + get_lang(conn, 'discussion_name') + '''</td>
+                    <td id="main_table_width">''' + get_lang(conn, 'writer') + '''</td>
+                    <td id="main_table_width">''' + get_lang(conn, 'time') + '''</td>
                 </tr>
         '''
         sub = '(' + html.escape(name) + ')'
-        pas_name = ip_pas(name)
+        pas_name = ip_pas(conn, name)
 
         curs.execute(db_change("select code, id, date from topic where ip = ? order by date desc limit ?, 50"), [name, sql_num])
         data_list = curs.fetchall()
@@ -37,10 +37,10 @@ def recent_record_topic(name = 'Test'):
             ''
 
         div += '</table>'
-        div += next_fix('/record/topic/' + url_pas(name) + '?num=', num, data_list)
+        div += next_fix(conn, '/record/topic/' + url_pas(name) + '?num=', num, data_list)
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('discussion_record'), wiki_set(), wiki_custom(), wiki_css([sub, 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [get_lang(conn, 'discussion_record'), wiki_set(conn), wiki_custom(conn), wiki_css([sub, 0])],
             data = div,
-            menu = [['other', load_lang('other')], ['user/' + url_pas(name), load_lang('user_tool')]]
+            menu = [['other', get_lang(conn, 'other')], ['user/' + url_pas(name), get_lang(conn, 'user_tool')]]
         ))

@@ -6,4 +6,4 @@ def view_random(db_set):
     with get_db_connect() as conn:
         data = json.loads(api_w_random(db_set).data)["data"]
         
-        return redirect('/w/' + url_pas(data))
+        return redirect(conn, '/w/' + url_pas(data))

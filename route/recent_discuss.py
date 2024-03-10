@@ -5,30 +5,30 @@ def recent_discuss(tool):
         curs = conn.cursor()
 
         div = ''
-        admin_auth = admin_check(3)
+        admin_auth = admin_check(conn, 3)
 
         if tool == 'normal':
-            div += '<a href="/recent_discuss/close">(' + load_lang('close_discussion') + ')</a> '
-            div += '<a href="/recent_discuss/open">(' + load_lang('open_discussion_list') + ')</a>'
+            div += '<a href="/recent_discuss/close">(' + get_lang(conn, 'close_discussion') + ')</a> '
+            div += '<a href="/recent_discuss/open">(' + get_lang(conn, 'open_discussion_list') + ')</a>'
 
             m_sub = 0
         elif tool == 'close':
-            div += '<a href="/recent_discuss">(' + load_lang('normal') + ')</a>'
+            div += '<a href="/recent_discuss">(' + get_lang(conn, 'normal') + ')</a>'
 
-            m_sub = ' (' + load_lang('closed') + ')'
+            m_sub = ' (' + get_lang(conn, 'closed') + ')'
         else:
-            div += '<a href="/recent_discuss">(' + load_lang('normal') + ')</a>'
+            div += '<a href="/recent_discuss">(' + get_lang(conn, 'normal') + ')</a>'
 
-            m_sub = ' (' + load_lang('open_discussion_list') + ')'
+            m_sub = ' (' + get_lang(conn, 'open_discussion_list') + ')'
 
         div +=  '''
                 <hr class="main_hr">
                 <table id="main_table_set">
                     <tbody>
                         <tr id="main_table_top_tr">
-                            <td id="main_table_width">''' + load_lang('discussion_name') + '''</td>
-                            <td id="main_table_width">''' + load_lang('editor') + '''</td>
-                            <td id="main_table_width">''' + load_lang('time') + '''</td>
+                            <td id="main_table_width">''' + get_lang(conn, 'discussion_name') + '''</td>
+                            <td id="main_table_width">''' + get_lang(conn, 'editor') + '''</td>
+                            <td id="main_table_width">''' + get_lang(conn, 'time') + '''</td>
                         </tr>
                 '''
 
@@ -50,7 +50,7 @@ def recent_discuss(tool):
             else:
                 last_editor += ['']
 
-        last_editor_ip_pas = ip_pas(last_editor)
+        last_editor_ip_pas = ip_pas(conn, last_editor)
 
         count = 0
         for data in db_data:
@@ -59,7 +59,7 @@ def recent_discuss(tool):
                     '<td>' + \
                         '<a href="/thread/' + data[3] + '">' + html.escape(data[1]) + '</a> ' + \
                         '<a href="/topic/' + url_pas(data[0]) + '">(' + html.escape(data[0]) + ')</a>' + \
-                        (' <a href="/thread/' + data[3] + '/tool">(' + load_lang('tool') + ')</a>' if admin_auth == 1 else '') + \
+                        (' <a href="/thread/' + data[3] + '/tool">(' + get_lang(conn, 'tool') + ')</a>' if admin_auth == 1 else '') + \
                     '</td>' + \
                     '<td>' + last_editor_ip_pas[last_editor[count]] + '</td>' + \
                     '<td>' + data[2] + '</td>' + \
@@ -73,8 +73,8 @@ def recent_discuss(tool):
             '</table>' + \
         ''
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('recent_discussion'), wiki_set(), wiki_custom(), wiki_css([m_sub, 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [get_lang(conn, 'recent_discussion'), wiki_set(conn), wiki_custom(conn), wiki_css([m_sub, 0])],
             data = div,
-            menu = [['other', load_lang('return')]]
+            menu = [['other', get_lang(conn, 'return')]]
         ))

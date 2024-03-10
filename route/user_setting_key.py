@@ -16,4 +16,4 @@ def user_setting_key():
             curs.execute(db_change("insert into user_set (name, id, data) values ('random_key', ?, ?)"), [ip, key])
             conn.commit()
 
-        return redirect('/change')
+        return redirect(conn, '/change')

@@ -16,33 +16,33 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
 
         curs.execute(db_change('select set_id from bbs_set where set_id = ? and set_name = "bbs_name"'), [bbs_num_str])
         if not curs.fetchall():
-            return redirect('/bbs/main')
+            return redirect(conn, '/bbs/main')
         
         if comment_num != '':
             temp_dict = json.loads(api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num).data)
             if 'comment_user_id' in temp_dict:
-                if not temp_dict['comment_user_id'] == ip and admin_check() != 1:
-                    return re_error('/ban')
+                if not temp_dict['comment_user_id'] == ip and admin_check(conn) != 1:
+                    return re_error(conn, '/ban')
             else:
-                return redirect('/bbs/main')
+                return redirect(conn, '/bbs/main')
         elif post_num != '':
             temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
             if 'user_id' in temp_dict:
-                if not temp_dict['user_id'] == ip and admin_check() != 1:
-                    return re_error('/ban')
+                if not temp_dict['user_id'] == ip and admin_check(conn) != 1:
+                    return re_error(conn, '/ban')
             else:
-                return redirect('/bbs/main')
+                return redirect(conn, '/bbs/main')
             
-        if acl_check(bbs_num_str, 'bbs_edit') == 1:
-            return redirect('/bbs/set/' + bbs_num_str)
+        if acl_check(conn, bbs_num_str, 'bbs_edit') == 1:
+            return redirect(conn, '/bbs/set/' + bbs_num_str)
         
         i_list = ['post_view_acl', 'post_comment_acl']
 
         if flask.request.method == 'POST':
-            if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error('/error/13')
+            if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                return re_error(conn, '/error/13')
             else:
-                captcha_post('', 0)
+                captcha_post(conn, '', 0)
         
             if post_num == '':
                 curs.execute(db_change('select set_code from bbs_data where set_name = "title" and set_id = ? order by set_code + 0 desc'), [bbs_num_str])
@@ -56,7 +56,7 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
             data = flask.request.form.get('content', '')
             if data == '':
                 # re_error로 대체 예정
-                return redirect('/bbs/w/' + bbs_num_str)
+                return redirect(conn, '/bbs/w/' + bbs_num_str)
             
             date = get_time()
 
@@ -81,9 +81,9 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                 curs.execute(db_change("update bbs_data set set_data = ? where set_name = 'date' and set_code = ? and set_id = ?"), [date, id_data, bbs_num_str])
 
             if comment_num != '':
-                return redirect('/bbs/w/' + bbs_num_str + '/' + id_data + '#' + url_pas(comment_num))
+                return redirect(conn, '/bbs/w/' + bbs_num_str + '/' + id_data + '#' + url_pas(comment_num))
             else:
-                return redirect('/bbs/w/' + bbs_num_str + '/' + id_data)
+                return redirect(conn, '/bbs/w/' + bbs_num_str + '/' + id_data)
         else:
             option_display = ''
 
@@ -108,45 +108,45 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                 for data_list in acl_list:
                     acl_div[for_a] += '<option value="' + data_list + '">' + (data_list if data_list != '' else 'normal') + '</option>'
     
-            editor_top_text = '<a href="/filter/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
+            editor_top_text = '<a href="/filter/edit_filter">(' + get_lang(conn, 'edit_filter_rule') + ')</a>'
 
             if editor_top_text != '':
                 editor_top_text += '<hr class="main_hr">'
 
             if comment_num != '':
-                bbs_title = load_lang('bbs_comment_edit')
+                bbs_title = get_lang(conn, 'bbs_comment_edit')
             elif post_num == '':
-                bbs_title = load_lang('post_add')
+                bbs_title = get_lang(conn, 'post_add')
             else:
-                bbs_title = load_lang('post_edit')
+                bbs_title = get_lang(conn, 'post_edit')
     
-            return easy_minify(flask.render_template(skin_check(), 
-                imp = [bbs_title, wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn), 
+                imp = [bbs_title, wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data =  editor_top_text + '''
                     <form method="post">                        
-                        <input style="''' + option_display + '''" placeholder="''' + load_lang('title') + '''" name="title" value="''' + html.escape(title) + '''">
+                        <input style="''' + option_display + '''" placeholder="''' + get_lang(conn, 'title') + '''" name="title" value="''' + html.escape(title) + '''">
                         <hr style="''' + option_display + '''" class="main_hr">
 
                         ''' + edit_editor(curs, ip, data, 'bbs') + '''
 
                         <!--
                         <div style="''' + option_display + '''">
-                            ''' + render_simple_set('''
+                            ''' + render_simple_set(conn, '''
                                 <hr class="main_hr">
-                                <a href="/acl/TEST#exp">(''' + load_lang('reference') + ''')</a>
-                                <h2>''' + load_lang('acl') + '''</h2>
-                                <h3>''' + load_lang('post_view_acl') + '''</h3>
+                                <a href="/acl/TEST#exp">(''' + get_lang(conn, 'reference') + ''')</a>
+                                <h2>''' + get_lang(conn, 'acl') + '''</h2>
+                                <h3>''' + get_lang(conn, 'post_view_acl') + '''</h3>
                                 <select name="post_view_acl">''' + acl_div[0] + '''</select>
 
-                                <h4>''' + load_lang('post_comment_acl') + '''</h4>
+                                <h4>''' + get_lang(conn, 'post_comment_acl') + '''</h4>
                                 <select name="post_comment_acl">''' + acl_div[1] + '''</select>
 
-                                <h2>''' + load_lang('markup') + '''</h2>
-                                ''' + load_lang('not_working') + '''
+                                <h2>''' + get_lang(conn, 'markup') + '''</h2>
+                                ''' + get_lang(conn, 'not_working') + '''
                             ''') + '''
                         </div>
                         -->
                     </form>
                 ''',
-                menu = [['bbs/w/' + bbs_num_str, load_lang('return')]]
+                menu = [['bbs/w/' + bbs_num_str, get_lang(conn, 'return')]]
             ))

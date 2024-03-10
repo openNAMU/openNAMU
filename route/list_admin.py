@@ -11,7 +11,7 @@ def list_admin():
         ))
         for data in curs.fetchall():
             name = '' + \
-                ip_pas(data[0]) + ' ' + \
+                ip_pas(conn, data[0]) + ' ' + \
                 '<a href="/auth/list/add/' + url_pas(data[1]) + '">(' + data[1] + ')</a>' + \
             ''
 
@@ -19,8 +19,8 @@ def list_admin():
 
         div += '</ul>'
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('admin_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [get_lang(conn, 'admin_list'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
             data = div,
-            menu = [['other', load_lang('return')]]
+            menu = [['other', get_lang(conn, 'return')]]
         ))

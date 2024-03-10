@@ -10,7 +10,7 @@ def login_register_submit_2():
             for for_a in session_reset_list:
                 flask.session.pop(for_a, None)
 
-            return redirect('/register')
+            return redirect(conn, '/register')
 
         curs.execute(db_change('select data from other where name = "approval_question"'))
         sql_data = curs.fetchall()
@@ -18,15 +18,15 @@ def login_register_submit_2():
             for for_a in session_reset_list:
                 flask.session.pop(for_a, None)
 
-            return redirect('/register')
+            return redirect(conn, '/register')
 
         data_que = sql_data[0][0]
 
-        if do_user_name_check(flask.session['submit_id']) == 1:
+        if do_user_name_check(conn, flask.session['submit_id']) == 1:
             for for_a in session_reset_list:
                 flask.session.pop(for_a, None)
         
-            return redirect('/register')
+            return redirect(conn, '/register')
 
         if flask.request.method == 'POST':
             curs.execute(db_change('select data from other where name = "encode"'))
@@ -35,7 +35,7 @@ def login_register_submit_2():
 
             user_app_data = {}
             user_app_data['id'] = flask.session['submit_id']
-            user_app_data['pw'] = pw_encode(flask.session['submit_pw'])
+            user_app_data['pw'] = pw_encode(conn, flask.session['submit_pw'])
             user_app_data['encode'] = data_encode
             user_app_data['question'] = data_que
             user_app_data['answer'] = flask.request.form.get('answer', '')
@@ -51,21 +51,21 @@ def login_register_submit_2():
             curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [user_app_data['id'], 'application', json.dumps(user_app_data)])
             conn.commit()
 
-            for for_a in get_admin_list():
-                add_alarm(for_a, user_app_data['id'], '<a href="/app_submit">' + load_lang('new_application') + '</a>')
+            for for_a in get_admin_list(conn):
+                add_alarm(conn, for_a, user_app_data['id'], '<a href="/app_submit">' + get_lang(conn, 'new_application') + '</a>')
 
-            return re_error('/error/43')
+            return re_error(conn, '/error/43')
         else:
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('approval_question'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'approval_question'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        ''' + load_lang('approval_question') + ' : ' + data_que + '''
+                        ''' + get_lang(conn, 'approval_question') + ' : ' + data_que + '''
                         <hr class="main_hr">
-                        <input placeholder="''' + load_lang('approval_question') + '''" name="answer">
+                        <input placeholder="''' + get_lang(conn, 'approval_question') + '''" name="answer">
                         <hr class="main_hr">
-                        <button type="submit">''' + load_lang('save') + '''</button>
+                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 ''',
-                menu = [['user', load_lang('return')]]
+                menu = [['user', get_lang(conn, 'return')]]
             ))

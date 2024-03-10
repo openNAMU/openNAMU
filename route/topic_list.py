@@ -8,25 +8,25 @@ def topic_list(name = 'Test'):
         tool = flask.request.args.get('tool', '')
 
         plus = ''
-        menu = [['topic/' + url_pas(name), load_lang('return')]]
+        menu = [['topic/' + url_pas(name), get_lang(conn, 'return')]]
 
         if tool == 'close':
             curs.execute(db_change("select code, sub from rd where title = ? and stop = 'O' order by sub asc"), [name])
 
-            sub = load_lang('closed_discussion')
+            sub = get_lang(conn, 'closed_discussion')
         elif tool == 'agree':
             curs.execute(db_change("select code, sub from rd where title = ? and agree = 'O' order by sub asc"), [name])
 
-            sub = load_lang('agreed_discussion')
+            sub = get_lang(conn, 'agreed_discussion')
         else:
-            sub = load_lang('discussion_list')
-            menu = [['w/' + url_pas(name), load_lang('document')]]
+            sub = get_lang(conn, 'discussion_list')
+            menu = [['w/' + url_pas(name), get_lang(conn, 'document')]]
 
             plus = '''
-                <a href="/topic/''' + url_pas(name) + '?tool=close">(' + load_lang('closed_discussion') + ''')</a>
-                <a href="/topic/''' + url_pas(name) + '?tool=agree">(' + load_lang('agreed_discussion') + ''')</a>
+                <a href="/topic/''' + url_pas(name) + '?tool=close">(' + get_lang(conn, 'closed_discussion') + ''')</a>
+                <a href="/topic/''' + url_pas(name) + '?tool=agree">(' + get_lang(conn, 'agreed_discussion') + ''')</a>
                 <hr class="main_hr">
-                <a href="/thread/0/''' + url_pas(name) + '''">(''' + load_lang('make_new_topic') + ''')</a>
+                <a href="/thread/0/''' + url_pas(name) + '''">(''' + get_lang(conn, 'make_new_topic') + ''')</a>
             '''
 
             curs.execute(db_change("select code, sub from rd where title = ? and stop != 'O' order by date desc"), [name])
@@ -37,8 +37,8 @@ def topic_list(name = 'Test'):
         if div == '':
             plus = re.sub(r'^<br>', '', plus)
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + sub + ')', 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + sub + ')', 0])],
             data = div + plus,
             menu = menu
         ))

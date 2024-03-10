@@ -9,14 +9,14 @@ def vote_end(num = 1):
         curs.execute(db_change('select name, subject, data, type from vote where id = ? and user = ""'), [num])
         data_list = curs.fetchall()
         if not data_list:
-            return redirect('/vote')
+            return redirect(conn, '/vote')
 
         data = ''
-        if admin_check() == 1:
+        if admin_check(conn) == 1:
             if data_list[0][3] == 'open' or data_list[0][3] == 'n_open':
-                data += '<a href="/vote/close/' + num + '">(' + load_lang('close_vote') + ')</a>'
+                data += '<a href="/vote/close/' + num + '">(' + get_lang(conn, 'close_vote') + ')</a>'
             else:
-                data += '<a href="/vote/close/' + num + '">(' + load_lang('re_open_vote') + ')</a>'
+                data += '<a href="/vote/close/' + num + '">(' + get_lang(conn, 're_open_vote') + ')</a>'
         
         curs.execute(db_change('select data from vote where id = ? and name = "end_date" and type = "option"'), [num])
         db_data = curs.fetchall()
@@ -36,15 +36,15 @@ def vote_end(num = 1):
             curs.execute(db_change('select user from vote where id = ? and user != "" and data = ?'), [num, str(i)])
             data_list_2 = curs.fetchall()
             if data_list[0][3] == 'open' or data_list[0][3] == 'close':
-                all_ip = ip_pas([j[0] for j in data_list_2])
+                all_ip = ip_pas(conn, [j[0] for j in data_list_2])
                 for j in data_list_2:
                     data += '<li>' + all_ip[j[0]] + '</li>'
 
-            data += '<li>' + load_lang('result') + ' : ' + str(len(data_list_2)) + '</li>'
+            data += '<li>' + get_lang(conn, 'result') + ' : ' + str(len(data_list_2)) + '</li>'
             data += '</ul>'
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('result_vote'), wiki_set(), wiki_custom(), wiki_css(['(' + num + ')', 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [get_lang(conn, 'result_vote'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + num + ')', 0])],
             data = data,
-            menu = [['vote', load_lang('return')]]
+            menu = [['vote', get_lang(conn, 'return')]]
         ))

@@ -9,17 +9,17 @@ def vote_select(num = 1):
         curs.execute(db_change('select name, subject, data, type from vote where id = ? and user = ""'), [num])
         data_list = curs.fetchall()
         if not data_list:
-            return redirect('/vote')
+            return redirect(conn, '/vote')
 
         if data_list[0][3] == 'close' or data_list[0][3] == 'n_close':
-            return redirect('/vote/end/' + num)
+            return redirect(conn, '/vote/end/' + num)
 
-        if acl_check('', 'vote', num) == 1:
-            return redirect('/vote/end/' + num)
+        if acl_check(conn, '', 'vote', num) == 1:
+            return redirect(conn, '/vote/end/' + num)
 
         curs.execute(db_change('select user from vote where id = ? and user = ?'), [num, ip_check()])
         if curs.fetchall():
-            return redirect('/vote/end/' + num)
+            return redirect(conn, '/vote/end/' + num)
         
         curs.execute(db_change('select data from vote where id = ? and name = "end_date" and type = "option"'), [num])
         db_data = curs.fetchall()
@@ -31,7 +31,7 @@ def vote_select(num = 1):
             time_today = get_time().split()[0]
             
             if time_today > time_db:
-                return redirect('/vote/end/' + num)
+                return redirect(conn, '/vote/end/' + num)
 
         vote_data = re.findall(r'([^\n]+)', data_list[0][2].replace('\r', ''))
 
@@ -39,10 +39,10 @@ def vote_select(num = 1):
             try:
                 vaild_check = int(flask.request.form.get('vote_data', '0'))
             except:
-                return redirect('/vote/' + num)
+                return redirect(conn, '/vote/' + num)
 
             if len(vote_data) - 1 < vaild_check:
-                return redirect('/vote/' + num)
+                return redirect(conn, '/vote/' + num)
 
             curs.execute(db_change("insert into vote (name, id, subject, data, user, type) values ('', ?, '', ?, ?, 'select')"), [
                 num,
@@ -51,7 +51,7 @@ def vote_select(num = 1):
             ])
             conn.commit()
 
-            return redirect('/vote/end/' + num)
+            return redirect(conn, '/vote/end/' + num)
         else:
             data = '<h2>' + data_list[0][0] + '</h2>'
             data += '<b>' + data_list[0][1] + '</b><hr class="main_hr">' if data_list[0][1] != '' else ''
@@ -68,12 +68,12 @@ def vote_select(num = 1):
                 '<form method="post">' + \
                     select_data + \
                     '<hr class="main_hr">' + \
-                    '<button type="submit">' + load_lang('send') + '</buttom>' + \
+                    '<button type="submit">' + get_lang(conn, 'send') + '</buttom>' + \
                 '</form>' + \
             ''
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('vote'), wiki_set(), wiki_custom(), wiki_css(['(' + num + ')', 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'vote'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + num + ')', 0])],
                 data = data,
-                menu = [['vote', load_lang('return')], ['vote/end/' + num, load_lang('result')]]
+                menu = [['vote', get_lang(conn, 'return')], ['vote/end/' + num, get_lang(conn, 'result')]]
             ))

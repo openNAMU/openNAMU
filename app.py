@@ -118,11 +118,11 @@ with get_db_connect() as conn:
             pass
 
         if setup_tool == 'update':
-            update(int(ver_set_data[0][0]), set_data)
+            update(conn, int(ver_set_data[0][0]), set_data)
         else:
-            set_init()
+            set_init(conn)
 
-    set_init_always(version_list['beta']['c_ver'])
+    set_init_always(conn, version_list['beta']['c_ver'])
 
     # Init-Route
     class EverythingConverter(werkzeug.routing.PathConverter):

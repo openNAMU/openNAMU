@@ -8,20 +8,20 @@ def login_login_2fa_email_2():
         # pw 2fa
         # q_a 2fa
         if not (flask.session and 'login_id' in flask.session):
-            return redirect('/user')
+            return redirect(conn, '/user')
 
         ip = ip_check()
         if ip_or_user(ip) == 0:
-            return redirect('/user')
+            return redirect(conn, '/user')
 
-        if ban_check(None, 'login')[0] == 1:
-            return re_error('/ban')
+        if ban_check(conn, None, 'login')[0] == 1:
+            return re_error(conn, '/ban')
 
         if flask.request.method == 'POST':
-            if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error('/error/13')
+            if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                return re_error(conn, '/error/13')
             else:
-                captcha_post('', 0)
+                captcha_post(conn, '', 0)
 
             user_agent = flask.request.headers.get('User-Agent', '')
             user_id = flask.session['b_id']
@@ -34,29 +34,29 @@ def login_login_2fa_email_2():
                 user_1 = user_1[0][0]
                 user_2 = curs.fetchall()[0][0]
 
-                pw_check_d = pw_check(user_pw, user_1, user_2, user_id)
+                pw_check_d = pw_check(conn, user_pw, user_1, user_2, user_id)
                 if pw_check_d != 1:
-                    return re_error('/error/10')
+                    return re_error(conn, '/error/10')
 
             flask.session['id'] = user_id
 
-            ua_plus(user_id, ip, user_agent, get_time())
+            ua_plus(conn, user_id, ip, user_agent, get_time())
             conn.commit()
 
             flask.session.pop('b_id', None)
 
-            return redirect('/user')
+            return redirect(conn, '/user')
         else:
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('login'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'login'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data =  '''
                         <form method="post">
-                            <input placeholder="''' + load_lang('2fa_password') + '''" name="pw" type="password">
+                            <input placeholder="''' + get_lang(conn, '2fa_password') + '''" name="pw" type="password">
                             <hr class=\"main_hr\">
-                            ''' + captcha_get() + '''
-                            <button type="submit">''' + load_lang('login') + '''</button>
-                            ''' + http_warning() + '''
+                            ''' + captcha_get(conn) + '''
+                            <button type="submit">''' + get_lang(conn, 'login') + '''</button>
+                            ''' + http_warning(conn) + '''
                         </form>
                         ''',
-                menu = [['user', load_lang('return')]]
+                menu = [['user', get_lang(conn, 'return')]]
             ))
