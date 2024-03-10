@@ -605,6 +605,30 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage('<span id="' + main_text + '">', '</span>', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
+            elif name_data == 'username':
+                data = re.findall(macro_split_regex, match[1])
+
+                # get option
+                user_name = ''
+                render = 1
+                for for_a in data:
+                    data_sub = re.search(macro_split_sub_regex, for_a)
+                    if data_sub:
+                        data_sub = data_sub.groups()
+                        data_sub = [data_sub[0].lower(), data_sub[1]]
+
+                        if data_sub[0] == 'load_name':
+                            if data_sub[1] == '1':
+                                user_name = self.ip
+                        elif data_sub[0] == 'render':
+                            if data_sub[1] == '0':
+                                render = 0
+                    else:
+                        user_name = for_a
+
+                data_name = self.get_tool_data_storage('<span class="' + ('opennamu_render_ip' if render == 1 else '') + '">' + user_name + '</span>', '', match_org.group(0))
+
+                return '<' + data_name + '></' + data_name + '>'
             elif name_data == 'timeif':
                 data = re.findall(macro_split_regex, match[1])
 
@@ -2329,6 +2353,7 @@ class class_do_render_namumark:
             if(window.location.hash !== '' && document.getElementById(window.location.hash.replace(/^#/, ''))) {
                 document.getElementById(window.location.hash.replace(/^#/, '')).focus();
             }\n
+            opennamu_do_ip_render();\n
         '''
 
     def __call__(self):
