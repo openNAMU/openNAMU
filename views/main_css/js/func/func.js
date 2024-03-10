@@ -9,20 +9,17 @@ function opennamu_do_id_check(data) {
 }
 
 function opennamu_do_ip_render() {
-    let temp = {};
     for(let for_a = 0; for_a < document.getElementsByClassName('opennamu_render_ip').length; for_a++) {
         let ip = document.getElementsByClassName('opennamu_render_ip')[for_a].innerHTML.replace(/&amp;/g, '&');
 
-        if(temp[ip]) {
-            document.getElementsByClassName('opennamu_render_ip')[for_a].innerHTML = temp[ip];
-        } else {
-            fetch('/api/ip/' + opennamu_do_url_encode(ip)).then(function(res) {
-                return res.json();
-            }).then(function(data) {
+        fetch('/api/ip/' + opennamu_do_url_encode(ip)).then(function(res) {
+            return res.json();
+        }).then(function(data) {
+            if(document.getElementsByClassName('opennamu_render_ip')[for_a].id !== "opennamu_render_end") {
                 document.getElementsByClassName('opennamu_render_ip')[for_a].innerHTML = data["data"];
-                temp[ip] = data["data"];
-            });
-        }
+                document.getElementsByClassName('opennamu_render_ip')[for_a].id = "opennamu_render_end";
+            }
+        });
     }
 }
 
