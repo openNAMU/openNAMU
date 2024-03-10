@@ -58,20 +58,20 @@ def user_count(name = None):
             data_yesterday += 1
 
         # 한글 지원 필요
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('count'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [get_lang(conn, 'count'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
             data = '''
                 <ul class="opennamu_ul">
-                    <li><a href="/record/''' + url_pas(that) + '''">''' + load_lang('edit_record') + '''</a> : ''' + str(data) + '''</li>
-                    <li><a href="/record/topic/''' + url_pas(that) + '''">''' + load_lang('discussion_record') + '''</a> : ''' + str(data_topic) + '''</a></li>
+                    <li><a href="/record/''' + url_pas(that) + '''">''' + get_lang(conn, 'edit_record') + '''</a> : ''' + str(data) + '''</li>
+                    <li><a href="/record/topic/''' + url_pas(that) + '''">''' + get_lang(conn, 'discussion_record') + '''</a> : ''' + str(data_topic) + '''</a></li>
                     <hr>
-                    <li>(''' + load_lang('beta') + ''') TODAY : ''' + str(data_today) + '''</li>
-                    <li>(''' + load_lang('beta') + ''') TODAY LEN : ''' + str(data_today_len) + '''</li>
-                    <li>(''' + load_lang('beta') + ''') TODAY DIFF : ''' + str(data_today_len - data_yesterday_len) + '''</li>
+                    <li>(''' + get_lang(conn, 'beta') + ''') TODAY : ''' + str(data_today) + '''</li>
+                    <li>(''' + get_lang(conn, 'beta') + ''') TODAY LEN : ''' + str(data_today_len) + '''</li>
+                    <li>(''' + get_lang(conn, 'beta') + ''') TODAY DIFF : ''' + str(data_today_len - data_yesterday_len) + '''</li>
                     <hr>
-                    <li>(''' + load_lang('beta') + ''') YESTERDAY : ''' + str(data_yesterday) + '''</li>
-                    <li>(''' + load_lang('beta') + ''') YESTERDAY LEN : ''' + str(data_yesterday_len) + '''</li>
+                    <li>(''' + get_lang(conn, 'beta') + ''') YESTERDAY : ''' + str(data_yesterday) + '''</li>
+                    <li>(''' + get_lang(conn, 'beta') + ''') YESTERDAY LEN : ''' + str(data_yesterday_len) + '''</li>
                 </ul>
             ''',
-            menu = [['user', load_lang('return')]]
+            menu = [['user', get_lang(conn, 'return')]]
         ))

@@ -7,7 +7,7 @@ def edit_request(name = 'Test', do_type = ''):
         curs = conn.cursor()
 
         disabled = ""
-        if acl_check(name, 'document_edit') == 1:
+        if acl_check(conn, name, 'document_edit') == 1:
             disabled = "disabled"
 
         curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
@@ -17,7 +17,7 @@ def edit_request(name = 'Test', do_type = ''):
         curs.execute(db_change("select set_data from data_set where doc_name = ? and doc_rev = ? and set_name = 'edit_request_data'"), [name, doc_ver])
         db_data = curs.fetchall()
         if not db_data:
-            return redirect('/edit/' + url_pas(name))
+            return redirect(conn, '/edit/' + url_pas(name))
         
         edit_request_data = db_data[0][0]
 
@@ -38,8 +38,8 @@ def edit_request(name = 'Test', do_type = ''):
         edit_request_leng = db_data[0][0] if db_data else ''
 
         if flask.request.method == 'POST':
-            if acl_check(name, 'document_edit') == 1:
-                return redirect('/w/' + url_pas(name))
+            if acl_check(conn, name, 'document_edit') == 1:
+                return redirect(conn, '/w/' + url_pas(name))
             
             curs.execute(db_change("select data from data where title = ?"), [name])
             db_data = curs.fetchall()
@@ -47,13 +47,13 @@ def edit_request(name = 'Test', do_type = ''):
             
             curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
             for scan_user in curs.fetchall():
-                add_alarm(scan_user[0], edit_request_user, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
+                add_alarm(conn, scan_user[0], edit_request_user, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
 
             if flask.request.form.get('check', '') == 'Y':
                 curs.execute(db_change("delete from data where title = ?"), [name])
                 curs.execute(db_change("insert into data (title, data) values (?, ?)"), [name, edit_request_data])
                         
-                history_plus(
+                history_plus(conn, 
                     name,
                     edit_request_data,
                     edit_request_date,
@@ -63,13 +63,13 @@ def edit_request(name = 'Test', do_type = ''):
                     mode = 'edit_request'
                 )
                 
-                render_set(
+                render_set(conn, 
                     doc_name = name,
                     doc_data = edit_request_data,
                     data_type = 'backlink'
                 )
             else:
-                history_plus(
+                history_plus(conn, 
                     name,
                     edit_request_data,
                     edit_request_date,
@@ -80,18 +80,18 @@ def edit_request(name = 'Test', do_type = ''):
                 )
                 
             if do_type == 'from':
-                return redirect('/edit/' + url_pas(name))
+                return redirect(conn, '/edit/' + url_pas(name))
             else:
-                return redirect('/w/' + url_pas(name))
+                return redirect(conn, '/w/' + url_pas(name))
         else:
             curs.execute(db_change("select data from data where title = ?"), [name])
             db_data = curs.fetchall()
             old_data = db_data[0][0] if db_data else ''
 
-            result = view_diff_do(old_data, edit_request_data, 'r' + doc_ver, load_lang('edit_request'))
+            result = view_diff_do(old_data, edit_request_data, 'r' + doc_ver, get_lang(conn, 'edit_request'))
 
-            return easy_minify(flask.render_template(skin_check(), 
-                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('edit_request_check') + ')', 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn), 
+                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'edit_request_check') + ')', 0])],
                 data = '''
                     <div id="opennamu_get_user_info">''' + html.escape(edit_request_user) + '''</div>
                     <hr class="main_hr">
@@ -102,8 +102,8 @@ def edit_request(name = 'Test', do_type = ''):
                     ''' + result + '''
                     <hr class="main_hr">
                     <form method="post">
-                        <button ''' + disabled + ''' id="opennamu_save_button" type="submit" name="check" value="Y">''' + load_lang('approve') + '''</button>
-                        <button ''' + disabled + ''' id="opennamu_preview_button" type="submit" name="check" value="">''' + load_lang('decline') + '''</button>
+                        <button ''' + disabled + ''' id="opennamu_save_button" type="submit" name="check" value="Y">''' + get_lang(conn, 'approve') + '''</button>
+                        <button ''' + disabled + ''' id="opennamu_preview_button" type="submit" name="check" value="">''' + get_lang(conn, 'decline') + '''</button>
                         <hr class="main_hr">
                         <textarea readonly class="opennamu_textarea_500">''' + html.escape(edit_request_data) + '''</textarea>
                     </form>

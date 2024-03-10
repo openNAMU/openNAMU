@@ -9,26 +9,26 @@ def recent_app_submit_2():
         curs.execute(db_change('select data from other where name = "requires_approval"'))
         requires_approval = curs.fetchall()
         if requires_approval and requires_approval[0][0] != 'on':
-            div += load_lang('approval_requirement_disabled')
+            div += get_lang(conn, 'approval_requirement_disabled')
 
         if flask.request.method == 'GET':
             curs.execute(db_change('select data from user_set where name = "application"'))
             db_data = curs.fetchall()
             if db_data:
                 div += '' + \
-                    load_lang('all_register_num') + ' : ' + str(len(db_data)) + \
+                    get_lang(conn, 'all_register_num') + ' : ' + str(len(db_data)) + \
                     '<hr class="main_hr">' + \
                 ''
 
                 div += '''
                     <table id="main_table_set">
                         <tr id="main_table_top_tr">
-                            <td id="main_table_width_half">''' + load_lang('id') + '''</td>
-                            <td id="main_table_width_half">''' + load_lang('email') + '''</td>
+                            <td id="main_table_width_half">''' + get_lang(conn, 'id') + '''</td>
+                            <td id="main_table_width_half">''' + get_lang(conn, 'email') + '''</td>
                         </tr>
                         <tr id="main_table_top_tr">
-                            <td>''' + load_lang('approval_question') + '''</td>
-                            <td>''' + load_lang('answer') + '''</td>
+                            <td>''' + get_lang(conn, 'approval_question') + '''</td>
+                            <td>''' + get_lang(conn, 'answer') + '''</td>
                         </tr>                        
                 '''
 
@@ -70,12 +70,12 @@ def recent_app_submit_2():
                                             id="opennamu_save_button"
                                             name="approve" 
                                             value="''' + application['id'] + '''">
-                                        ''' + load_lang('approve') + '''
+                                        ''' + get_lang(conn, 'approve') + '''
                                     </button>
                                     <button type="submit" 
                                             name="decline" 
                                             value="''' + application['id'] + '''">
-                                        ''' + load_lang('decline') + '''
+                                        ''' + get_lang(conn, 'decline') + '''
                                     </button>
                                 </td>
                             </tr>
@@ -84,26 +84,26 @@ def recent_app_submit_2():
 
                 div += '</table>'
             else:
-                div += load_lang('no_applications_now')
+                div += get_lang(conn, 'no_applications_now')
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('application_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'application_list'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = div,
-                menu = [['other', load_lang('return')]]
+                menu = [['other', get_lang(conn, 'return')]]
             ))
         else:
-            if admin_check(None, 'app submit') != 1:
-                return re_error('/ban')
+            if admin_check(conn, None, 'app submit') != 1:
+                return re_error(conn, '/ban')
 
             if flask.request.form.get('approve', '') != '':
                 curs.execute(db_change('select data from user_set where id = ? and name = "application"'), [flask.request.form.get('approve', '')])
                 application = curs.fetchall()
                 if not application:
-                    return re_error('/error/26')
+                    return re_error(conn, '/error/26')
                 else:
                     application = json.loads(application[0][0])
 
-                add_user(application['id'], application['pw'], application['email'], application['encode'])
+                add_user(conn, application['id'], application['pw'], application['email'], application['encode'])
 
                 curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question', ?, ?)"), [application['id'], application['question']])
                 curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question_answer', ?, ?)"), [application['id'], application['answer']])
@@ -114,4 +114,4 @@ def recent_app_submit_2():
                 curs.execute(db_change('delete from user_set where id = ? and name = "application"'), [flask.request.form.get('decline', '')])
                 conn.commit()
 
-            return redirect('/app_submit')
+            return redirect(conn, '/app_submit')

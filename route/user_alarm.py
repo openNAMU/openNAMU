@@ -15,7 +15,7 @@ def user_alarm():
         data_list = curs.fetchall()
         if data_list:
             data = '' + \
-                '<a href="/alarm/delete">(' + load_lang('delete') + ')</a>' + \
+                '<a href="/alarm/delete">(' + get_lang(conn, 'delete') + ')</a>' + \
                 '<hr class="main_hr">' + \
                 data + \
             ''
@@ -28,9 +28,9 @@ def user_alarm():
                 
                 data += '' + \
                     '<li style="' + data_style + '">' + \
-                        ip_pas(data_split[0]) + (' | ' + ' | '.join(data_split[1:]) if len(data_split) > 1 else '') + \
+                        ip_pas(conn, data_split[0]) + (' | ' + ' | '.join(data_split[1:]) if len(data_split) > 1 else '') + \
                         ' | ' + data_one[1] + \
-                        ' <a href="/alarm/delete/' + url_pas(data_one[3]) + '">(' + load_lang('delete') + ')</a>' + \
+                        ' <a href="/alarm/delete/' + url_pas(data_one[3]) + '">(' + get_lang(conn, 'delete') + ')</a>' + \
                     '</li>' + \
                 ''
 
@@ -39,11 +39,11 @@ def user_alarm():
     
         data += '' + \
             '</ul>' + \
-            next_fix('/alarm?num=', num, data_list) + \
+            next_fix(conn, '/alarm?num=', num, data_list) + \
         ''
     
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('notice'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [get_lang(conn, 'notice'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
             data = data,
-            menu = [['user', load_lang('return')]]
+            menu = [['user', get_lang(conn, 'return')]]
         ))

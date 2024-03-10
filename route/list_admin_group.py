@@ -9,9 +9,9 @@ def list_admin_group_2():
 
         curs.execute(db_change("select distinct name from alist order by name asc"))
         for data in curs.fetchall():            
-            if  admin_check() == 1 and \
+            if  admin_check(conn) == 1 and \
                 not data[0] in org_acl_list:
-                delete_admin_group = ' <a href="/auth/list/delete/' + url_pas(data[0]) + '">(' + load_lang("delete") + ')</a>'
+                delete_admin_group = ' <a href="/auth/list/delete/' + url_pas(data[0]) + '">(' + get_lang(conn, "delete") + ')</a>'
             else:
                 delete_admin_group = ''
 
@@ -25,11 +25,11 @@ def list_admin_group_2():
         list_data += '' + \
             '</ul>' + \
             '<hr class="main_hr">' + \
-            '<a href="/manager/8">(' + load_lang('add') + ')</a>' + \
+            '<a href="/manager/8">(' + get_lang(conn, 'add') + ')</a>' + \
         ''
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('admin_group_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [get_lang(conn, 'admin_group_list'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
             data = list_data,
-            menu = [['manager', load_lang('return')]]
+            menu = [['manager', get_lang(conn, 'return')]]
         ))

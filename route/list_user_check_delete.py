@@ -4,8 +4,8 @@ def list_user_check_delete(name = None, ip = None, time = None, do_type = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check() != 1:
-            return re_error('/error/4')
+        if admin_check(conn) != 1:
+            return re_error(conn, '/error/4')
 
         user_id = name
         user_ip = ip
@@ -16,22 +16,22 @@ def list_user_check_delete(name = None, ip = None, time = None, do_type = 1):
                 curs.execute(db_change("delete from ua_d where name = ? and ip = ? and today = ?"), [user_id, user_ip, time])
                 conn.commit()
 
-                return redirect('/list/user/check/' + url_pas(user_id if return_type == '0' else user_ip))
+                return redirect(conn, '/list/user/check/' + url_pas(user_id if return_type == '0' else user_ip))
             else:
-                return easy_minify(flask.render_template(skin_check(),
-                    imp = [load_lang('check'), wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('delete') + ')', 0])],
+                return easy_minify(conn, flask.render_template(skin_check(conn),
+                    imp = [get_lang(conn, 'check'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'delete') + ')', 0])],
                     data = '''
-                        ''' + load_lang('name') + ''' : ''' + user_id + '''
+                        ''' + get_lang(conn, 'name') + ''' : ''' + user_id + '''
                         <hr class="main_hr">
-                        ''' + load_lang('ip') + ''' : ''' + user_ip + '''
+                        ''' + get_lang(conn, 'ip') + ''' : ''' + user_ip + '''
                         <hr class="main_hr">
-                        ''' + load_lang('time') + ''' : ''' + time + '''
+                        ''' + get_lang(conn, 'time') + ''' : ''' + time + '''
                         <hr class="main_hr">
                         <form method="post">
-                            <button type="submit">''' + load_lang('delete') + '''</button>
+                            <button type="submit">''' + get_lang(conn, 'delete') + '''</button>
                         </form>
                     ''',
-                    menu = [['check/' + url_pas(user_id if return_type == '0' else user_ip), load_lang('return')]]
+                    menu = [['check/' + url_pas(user_id if return_type == '0' else user_ip), get_lang(conn, 'return')]]
                 ))
         else:
-            return redirect()
+            return redirect(conn)

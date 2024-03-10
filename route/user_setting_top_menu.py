@@ -5,11 +5,11 @@ def user_setting_top_menu():
         curs = conn.cursor()
 
         ip = ip_check()
-        if ban_check(ip)[0] == 1:
-            return re_error('/ban')
+        if ban_check(conn, ip)[0] == 1:
+            return re_error(conn, '/ban')
 
         if ip_or_user(ip) == 1:
-            return redirect('/login')
+            return redirect(conn, '/login')
         
         if flask.request.method == 'POST':
             curs.execute(db_change("select data from user_set where name = 'top_menu' and id = ?"), [ip])
@@ -20,14 +20,14 @@ def user_setting_top_menu():
 
             conn.commit()
 
-            return redirect('/change/top_menu')
+            return redirect(conn, '/change/top_menu')
         else:
             curs.execute(db_change("select data from user_set where name = 'top_menu' and id = ?"), [ip])
             db_data = curs.fetchall()
             db_data = db_data[0][0] if db_data else ''
             
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('user_added_menu'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'user_added_menu'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <span>
                         EX)
@@ -41,13 +41,13 @@ def user_setting_top_menu():
                         /w/FrontPage
                     </span>
                     <hr class="main_hr">
-                    ''' + load_lang('not_support_skin_warning') + '''
+                    ''' + get_lang(conn, 'not_support_skin_warning') + '''
                     <hr class="main_hr">
                     <form method="post">
-                        <textarea class="opennamu_textarea_500" placeholder="''' + load_lang('enter_top_menu_setting') + '''" name="content" id="content">''' + html.escape(db_data) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" placeholder="''' + get_lang(conn, 'enter_top_menu_setting') + '''" name="content" id="content">''' + html.escape(db_data) + '''</textarea>
                         <hr class="main_hr">
-                        <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 ''',
-                menu = [['setting', load_lang('return')]]
+                menu = [['setting', get_lang(conn, 'return')]]
             ))

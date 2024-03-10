@@ -6,8 +6,8 @@ def main_setting_skin_set():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check() != 1:
-            return re_error('/ban')
+        if admin_check(conn) != 1:
+            return re_error(conn, '/ban')
             
         set_list = user_setting_skin_set_main_set_list()
 
@@ -21,9 +21,9 @@ def main_setting_skin_set():
             
             conn.commit()
 
-            admin_check(None, 'edit_set (skin_set)')
+            admin_check(conn, None, 'edit_set (skin_set)')
 
-            return redirect('/setting/skin_set')
+            return redirect(conn, '/setting/skin_set')
         else:
             set_data = {}
             for for_b in set_list:
@@ -41,130 +41,130 @@ def main_setting_skin_set():
 
             set_data_main = { for_b : '' for for_b in set_list }
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('main_skin_set_default'), wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('beta') + ')', 0])],
-                data = render_simple_set('''
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'main_skin_set_default'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'beta') + ')', 0])],
+                data = render_simple_set(conn, '''
                     <form method="post">
-                        <h2>''' + load_lang("render") + '''</h2>
-                        <h3>''' + load_lang("strike") + '''</h3>
+                        <h2>''' + get_lang(conn, "render") + '''</h2>
+                        <h3>''' + get_lang(conn, "strike") + '''</h3>
                         ''' + set_data_main["main_css_strike"] + '''
                         <select name="main_css_strike">
                             ''' + set_data["main_css_strike"] + '''
                         </select>
-                        <h3>''' + load_lang("bold") + '''</h3>
+                        <h3>''' + get_lang(conn, "bold") + '''</h3>
                         ''' + set_data_main["main_css_bold"] + '''
                         <select name="main_css_bold">
                             ''' + set_data["main_css_bold"] + '''
                         </select>
-                        <h3>''' + load_lang("category") + '''</h3>
-                        <h4>''' + load_lang("position") + '''</h4>
+                        <h3>''' + get_lang(conn, "category") + '''</h3>
+                        <h4>''' + get_lang(conn, "position") + '''</h4>
                         ''' + set_data_main["main_css_category_set"] + '''
                         <select name="main_css_category_set">
                             ''' + set_data["main_css_category_set"] + '''
                         </select>
-                        <h4>''' + load_lang("category_change_title") + '''</h4>
+                        <h4>''' + get_lang(conn, "category_change_title") + '''</h4>
                         ''' + set_data_main["main_css_category_change_title"] + '''
                         <select name="main_css_category_change_title">
                             ''' + set_data["main_css_category_change_title"] + '''
                         </select>
-                        <h3>''' + load_lang("footnote") + ''' (''' + load_lang('beta') + ''')</h3>
-                        <h4>''' + load_lang("footnote_render") + '''</h4>
+                        <h3>''' + get_lang(conn, "footnote") + ''' (''' + get_lang(conn, 'beta') + ''')</h3>
+                        <h4>''' + get_lang(conn, "footnote_render") + '''</h4>
                         ''' + set_data_main["main_css_footnote_set"] + '''
                         <select name="main_css_footnote_set">
                             ''' + set_data["main_css_footnote_set"] + '''
                         </select>
-                        <h4>''' + load_lang("footnote_number") + '''</h4>
+                        <h4>''' + get_lang(conn, "footnote_number") + '''</h4>
                         ''' + set_data_main["main_css_footnote_number"] + '''
                         <select name="main_css_footnote_number">
                             ''' + set_data["main_css_footnote_number"] + '''
                         </select>
-                        <h4>''' + load_lang("footnote_real_num_view") + '''</h4>
+                        <h4>''' + get_lang(conn, "footnote_real_num_view") + '''</h4>
                         ''' + set_data_main["main_css_view_real_footnote_num"] + '''
                         <select name="main_css_view_real_footnote_num">
                             ''' + set_data["main_css_view_real_footnote_num"] + '''
                         </select>
-                        <h3>''' + load_lang("include_link") + '''</h3>
+                        <h3>''' + get_lang(conn, "include_link") + '''</h3>
                         ''' + set_data_main["main_css_include_link"] + '''
                         <select name="main_css_include_link">
                             ''' + set_data["main_css_include_link"] + '''
                         </select>
-                        <h3>''' + load_lang("image") + ''' (''' + load_lang('beta') + ''')</h3>
+                        <h3>''' + get_lang(conn, "image") + ''' (''' + get_lang(conn, 'beta') + ''')</h3>
                         ''' + set_data_main["main_css_image_set"] + '''
                         <select name="main_css_image_set">
                             ''' + set_data["main_css_image_set"] + '''
                         </select>
-                        <h3>''' + load_lang("toc") + '''</h3>
+                        <h3>''' + get_lang(conn, "toc") + '''</h3>
                         ''' + set_data_main["main_css_toc_set"] + '''
                         <select name="main_css_toc_set">
                             ''' + set_data["main_css_toc_set"] + '''
                         </select>
-                        <h3>''' + load_lang("exter_link") + '''</h3>
+                        <h3>''' + get_lang(conn, "exter_link") + '''</h3>
                         ''' + set_data_main["main_css_exter_link"] + '''
                         <select name="main_css_exter_link">
                             ''' + set_data["main_css_exter_link"] + '''
                         </select>
-                        <h3>''' + load_lang("link_delimiter") + '''</h3>
+                        <h3>''' + get_lang(conn, "link_delimiter") + '''</h3>
                         ''' + set_data_main["main_css_link_delimiter"] + '''
                         <select name="main_css_link_delimiter">
                             ''' + set_data["main_css_link_delimiter"] + '''
                         </select>
-                        <h3>''' + load_lang("force_darkmode") + '''</h3>
+                        <h3>''' + get_lang(conn, "force_darkmode") + '''</h3>
                         ''' + set_data_main["main_css_darkmode"] + '''
                         <select name="main_css_darkmode">
                             ''' + set_data["main_css_darkmode"] + '''
                         </select>
-                        <h3>''' + load_lang("table") + '''</h3>
-                        <h4>''' + load_lang("table_scroll") + '''</h4>
+                        <h3>''' + get_lang(conn, "table") + '''</h3>
+                        <h4>''' + get_lang(conn, "table_scroll") + '''</h4>
                         ''' + set_data_main["main_css_table_scroll"] + '''
                         <select name="main_css_table_scroll">
                             ''' + set_data["main_css_table_scroll"] + '''
                         </select>
-                        <h4>''' + load_lang("table_transparent") + '''</h4>
+                        <h4>''' + get_lang(conn, "table_transparent") + '''</h4>
                         ''' + set_data_main["main_css_table_transparent"] + '''
                         <select name="main_css_table_transparent">
                             ''' + set_data["main_css_table_transparent"] + '''
                         </select>
-                        <h3>''' + load_lang("list_view_change") + '''</h3>
+                        <h3>''' + get_lang(conn, "list_view_change") + '''</h3>
                         ''' + set_data_main["main_css_list_view_change"] + '''
                         <select name="main_css_list_view_change">
                             ''' + set_data["main_css_list_view_change"] + '''
                         </select>
-                        <h3>''' + load_lang("view_joke") + '''</h3>
+                        <h3>''' + get_lang(conn, "view_joke") + '''</h3>
                         ''' + set_data_main["main_css_view_joke"] + '''
                         <select name="main_css_view_joke">
                             ''' + set_data["main_css_view_joke"] + '''
                         </select>
-                        <h3>''' + load_lang("math_scroll") + '''</h3>
+                        <h3>''' + get_lang(conn, "math_scroll") + '''</h3>
                         ''' + set_data_main["main_css_math_scroll"] + '''
                         <select name="main_css_math_scroll">
                             ''' + set_data["main_css_math_scroll"] + '''
                         </select>
-                        <h3>''' + load_lang("view_history") + '''</h3>
+                        <h3>''' + get_lang(conn, "view_history") + '''</h3>
                         ''' + set_data_main["main_css_view_history"] + '''
                         <select name="main_css_view_history">
                             ''' + set_data["main_css_view_history"] + '''
                         </select>
-                        <h3>''' + load_lang("font_size") + '''</h3>
+                        <h3>''' + get_lang(conn, "font_size") + '''</h3>
                         ''' + set_data_main["main_css_font_size"] + '''
                         <select name="main_css_font_size">
                             ''' + set_data["main_css_font_size"] + '''
                         </select>
-                        <h2>''' + load_lang("edit") + '''</h2>
-                        <h3>''' + load_lang("image_paste") + '''</h3>
-                        <sup>''' + load_lang('only_korean') + '''</sup> <sup>''' + load_lang('unavailable_in_monaco') + '''</sup>
+                        <h2>''' + get_lang(conn, "edit") + '''</h2>
+                        <h3>''' + get_lang(conn, "image_paste") + '''</h3>
+                        <sup>''' + get_lang(conn, 'only_korean') + '''</sup> <sup>''' + get_lang(conn, 'unavailable_in_monaco') + '''</sup>
                         <hr class="main_hr">
                         ''' + set_data_main["main_css_image_paste"] + '''
                         <select name="main_css_image_paste">
                             ''' + set_data["main_css_image_paste"] + '''
                         </select>
-                        <h3>''' + load_lang("monaco_editor") + '''</h3>
+                        <h3>''' + get_lang(conn, "monaco_editor") + '''</h3>
                         ''' + set_data_main["main_css_monaco"] + '''
                         <select name="main_css_monaco">
                             ''' + set_data["main_css_monaco"] + '''
                         </select>
                         <hr class="main_hr">
-                        <button type="submit">''' + load_lang('save') + '''</button>
+                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 '''),
-                menu = [['setting', load_lang('return')]]
+                menu = [['setting', get_lang(conn, 'return')]]
             ))

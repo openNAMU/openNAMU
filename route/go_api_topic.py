@@ -78,12 +78,12 @@ def api_topic_thread_pre_render(curs, data, num, ip, topic_num = '', name = '', 
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
                 if do_type == 'thread':
-                    add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                    add_alarm(conn, ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
                 else:
                     set_id = topic_num.split('-')
                     set_id = ['', ''] if len(set_id) < 2 else set_id
 
-                    add_alarm(ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                    add_alarm(conn, ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
 
             data = re.sub(call_thread_regex, rd_data[0] + '<topic_a_' + do_type + '>#' + view_data + '</topic_a_' + do_type + '>' + rd_data[3], data, 1)
 
@@ -108,10 +108,10 @@ def api_topic_thread_pre_render(curs, data, num, ip, topic_num = '', name = '', 
 
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
                 if do_type == 'thread':
-                    add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                    add_alarm(conn, ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
                 else:
                     set_id = topic_num.split('-')
-                    add_alarm(ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                    add_alarm(conn, ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
 
             data = re.sub(call_user_regex, rd_data[0] + '<topic_call>@' + rd_data[1] + '</topic_call>' + rd_data[2], data, 1)
 
@@ -131,7 +131,7 @@ def api_topic(db_set, topic_num = 1, tool = 'normal', s_num = '', e_num = ''):
         other_set["ip"] = ip_check()
         other_set = json.dumps(other_set)
 
-        if acl_check('', 'topic_view', topic_num) != 1:
+        if acl_check(conn, '', 'topic_view', topic_num) != 1:
             if platform.system() == 'Linux':
                 if platform.machine() in ["AMD64", "x86_64"]:
                     data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.bin"), sys._getframe().f_code.co_name, db_set, other_set], stdout = subprocess.PIPE).communicate()[0]

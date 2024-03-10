@@ -10,7 +10,7 @@ def api_w_raw(db_set, name = 'Test', rev = '', exist_check = ''):
         other_set["exist_check"] = exist_check
         other_set = json.dumps(other_set)
 
-        if acl_check(name, 'render') != 1:
+        if acl_check(conn, name, 'render') != 1:
             if platform.system() == 'Linux':
                 if platform.machine() in ["AMD64", "x86_64"]:
                     data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.bin"), sys._getframe().f_code.co_name, db_set, other_set], stdout = subprocess.PIPE).communicate()[0]

@@ -5,30 +5,30 @@ def edit_delete(name):
         curs = conn.cursor()
 
         ip = ip_check()
-        if acl_check(name, 'document_delete') == 1:
-            return re_error('/ban')
+        if acl_check(conn, name, 'document_delete') == 1:
+            return re_error(conn, '/ban')
 
         curs.execute(db_change("select title from data where title = ?"), [name])
         if not curs.fetchall():
-            return redirect('/w/' + url_pas(name))
+            return redirect(conn, '/w/' + url_pas(name))
 
         if flask.request.method == 'POST':
-            if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error('/error/13')
+            if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                return re_error(conn, '/error/13')
             else:
-                captcha_post('', 0)
+                captcha_post(conn, '', 0)
 
-            if do_edit_slow_check() == 1:
-                return re_error('/error/24')
+            if do_edit_slow_check(conn) == 1:
+                return re_error(conn, '/error/24')
             
             send = flask.request.form.get('send', '')
             agree = flask.request.form.get('copyright_agreement', '')
             
-            if do_edit_send_check(send) == 1:
-                return re_error('/error/37')
+            if do_edit_send_check(conn, send) == 1:
+                return re_error(conn, '/error/37')
             
-            if do_edit_text_bottom_check_box_check(agree) == 1:
-                return re_error('/error/29')
+            if do_edit_text_bottom_check_box_check(conn, agree) == 1:
+                return re_error(conn, '/error/29')
 
             curs.execute(db_change("select data from data where title = ?"), [name])
             data = curs.fetchall()
@@ -36,7 +36,7 @@ def edit_delete(name):
                 today = get_time()
                 leng = '-' + str(len(data[0][0]))
 
-                history_plus(
+                history_plus(conn, 
                     name,
                     '',
                     today,
@@ -55,17 +55,17 @@ def edit_delete(name):
 
                 conn.commit()
 
-            return redirect('/w/' + url_pas(name))
+            return redirect(conn, '/w/' + url_pas(name))
         else:            
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('delete') + ')', 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'delete') + ')', 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + load_lang('why') + '''" name="send">
+                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="send">
                         <hr class="main_hr">
-                        ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
-                        <button type="submit">''' + load_lang('delete') + '''</button>
+                        ''' + captcha_get(conn) + ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn)  + '''
+                        <button type="submit">''' + get_lang(conn, 'delete') + '''</button>
                     </form>
                 ''',
-                menu = [['w/' + url_pas(name), load_lang('return')]]
+                menu = [['w/' + url_pas(name), get_lang(conn, 'return')]]
             ))

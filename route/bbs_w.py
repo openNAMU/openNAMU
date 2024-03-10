@@ -9,36 +9,36 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
         sub = ''
         bbs_name_dict = {}
 
-        admin_auth = admin_check()
+        admin_auth = admin_check(conn)
 
         if tool == 'bbs':
             curs.execute(db_change('select set_data from bbs_set where set_id = ? and set_name = "bbs_name"'), [bbs_num])
             db_data = curs.fetchall()
             if not db_data:
-                return redirect('/bbs/main')
+                return redirect(conn, '/bbs/main')
         
             bbs_name = db_data[0][0]
             bbs_num_str = str(bbs_num)
 
             title_name = bbs_name
-            sub = '(' + load_lang('bbs') + ')'
-            menu = [['bbs/main', load_lang('return')], ['bbs/edit/' + bbs_num_str, load_lang('add')], ['bbs/set/' + bbs_num_str, load_lang('bbs_set')]]
+            sub = '(' + get_lang(conn, 'bbs') + ')'
+            menu = [['bbs/main', get_lang(conn, 'return')], ['bbs/edit/' + bbs_num_str, get_lang(conn, 'add')], ['bbs/set/' + bbs_num_str, get_lang(conn, 'bbs_set')]]
         elif tool == 'record':
             curs.execute(db_change('select set_data, set_id from bbs_set where set_name = "bbs_name"'))
             db_data = curs.fetchall()
             bbs_name_dict = { for_a[1] : for_a[0] for for_a in db_data } if db_data else {}
             
             title_name = name
-            sub = '(' + load_lang('bbs_record') + ')'
-            menu = [['user/' + url_pas(name), load_lang('user_tool')]]
+            sub = '(' + get_lang(conn, 'bbs_record') + ')'
+            menu = [['user/' + url_pas(name), get_lang(conn, 'user_tool')]]
         elif tool == 'comment_record':
             curs.execute(db_change('select set_data, set_id from bbs_set where set_name = "bbs_name"'))
             db_data = curs.fetchall()
             bbs_name_dict = { for_a[1] : for_a[0] for for_a in db_data } if db_data else {}
             
             title_name = name
-            sub = '(' + load_lang('bbs_comment_record') + ')'
-            menu = [['user/' + url_pas(name), load_lang('user_tool')]]
+            sub = '(' + get_lang(conn, 'bbs_comment_record') + ')'
+            menu = [['user/' + url_pas(name), get_lang(conn, 'user_tool')]]
         else:
             curs.execute(db_change('select set_data, set_id from bbs_set where set_name = "bbs_name"'))
             db_data = curs.fetchall()
@@ -52,9 +52,9 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
                     bbs_type = db_data_2[0][0] if db_data_2 else 'comment'
 
                     if bbs_type == 'thread':
-                        bbs_type = load_lang('thread_base')
+                        bbs_type = get_lang(conn, 'thread_base')
                     else:
-                        bbs_type = load_lang('comment_base')
+                        bbs_type = get_lang(conn, 'comment_base')
                     
                     curs.execute(db_change('select set_data from bbs_data where set_id = ? and set_name = "date" order by set_code + 0 desc limit 1'), [for_a[1]])
                     db_data_2 = curs.fetchall()
@@ -68,25 +68,25 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
             
             data += '<hr class="main_hr">'
 
-            title_name = load_lang('bbs_main')
-            menu = [['other', load_lang('other_tool')]] + ([['bbs/make', load_lang('add')]] if admin_auth == 1 else [])
+            title_name = get_lang(conn, 'bbs_main')
+            menu = [['other', get_lang(conn, 'other_tool')]] + ([['bbs/make', get_lang(conn, 'add')]] if admin_auth == 1 else [])
 
         if tool == 'comment_record':
             data += '''
                 <table id="main_table_set">
                     <tr id="main_table_top_tr">
-                        <td id="main_table_width">''' + load_lang('editor') + '''</td>
-                        <td id="main_table_width">''' + load_lang('time') + '''</td>
-                        <td id="main_table_width">''' + load_lang('comment') + '''</td>
+                        <td id="main_table_width">''' + get_lang(conn, 'editor') + '''</td>
+                        <td id="main_table_width">''' + get_lang(conn, 'time') + '''</td>
+                        <td id="main_table_width">''' + get_lang(conn, 'comment') + '''</td>
                     </tr>
             '''
         else:
             data += '''
                 <table id="main_table_set">
                     <tr id="main_table_top_tr">
-                        <td id="main_table_width">''' + load_lang('editor') + '''</td>
-                        <td id="main_table_width">''' + load_lang('time') + '''</td>
-                        <td id="main_table_width">''' + load_lang('last_comment_time') + '''</td>
+                        <td id="main_table_width">''' + get_lang(conn, 'editor') + '''</td>
+                        <td id="main_table_width">''' + get_lang(conn, 'time') + '''</td>
+                        <td id="main_table_width">''' + get_lang(conn, 'last_comment_time') + '''</td>
                     </tr>
             '''
 
@@ -150,7 +150,7 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
                     
                 data += '''
                     <tr>
-                        <td>''' + ip_pas(temp_dict['comment_user_id']) + '''</td>
+                        <td>''' + ip_pas(conn, temp_dict['comment_user_id']) + '''</td>
                         <td>''' + temp_dict['comment_date'] + '''</td>
                         <td>''' + ('#' + comment_link) + '''</td>
                     </tr>
@@ -172,7 +172,7 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
             
                 data += '''
                     <tr class="''' + ('opennamu_comment_color_red' if notice == 1 else '') + '''">
-                        <td>''' + ip_pas(temp_dict['user_id']) + '''</td>
+                        <td>''' + ip_pas(conn, temp_dict['user_id']) + '''</td>
                         <td>''' + temp_dict['date'] + '''</td>
                         <td>''' + last_comment_date + '''</td>
                     </tr>
@@ -187,8 +187,8 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
                 
         data += '</table>'
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [title_name, wiki_set(), wiki_custom(), wiki_css([sub, 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [title_name, wiki_set(conn), wiki_custom(conn), wiki_css([sub, 0])],
             data = data,
             menu = menu
         ))

@@ -13,14 +13,14 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
         num = arg_num
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
-        if admin_check('all', None, name) == 1 or (plus_id and admin_check('all', None, plus_id) == 1):
-            if admin_check() != 1:
-                return re_error('/error/4')
+        if admin_check(conn, 'all', None, name) == 1 or (plus_id and admin_check(conn, 'all', None, plus_id) == 1):
+            if admin_check(conn) != 1:
+                return re_error(conn, '/error/4')
 
         div = ''
 
-        if admin_check(4, (check_type + ' ' if check_type != '' else '') + 'check (' + name + ')') != 1:
-            return re_error('/error/3')
+        if admin_check(conn, 4, (check_type + ' ' if check_type != '' else '') + 'check (' + name + ')') != 1:
+            return re_error(conn, '/error/3')
 
         if check_type == '':
             if ip_or_user(name) == 0:
@@ -68,7 +68,7 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
                     b_ip_count = len(curs.fetchall())
 
                     if a_ip_count + b_ip_count != all_ip_count:
-                        div += load_lang('same_ip_exist') + '<hr class="main_hr">'    
+                        div += get_lang(conn, 'same_ip_exist') + '<hr class="main_hr">'    
             else:
                 plus = ''
                 set_list = [name, sql_num]
@@ -84,8 +84,8 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
             if record:
                 if not plus_id:
                     div = '' + \
-                        '<a href="/manager/14/' + url_pas(name) + '">(' + load_lang('compare') + ')</a> ' + \
-                        '<a href="/list/user/check/' + url_pas(name) + '/simple">(' + load_lang('simple_check') + ')</a>' + \
+                        '<a href="/manager/14/' + url_pas(name) + '">(' + get_lang(conn, 'compare') + ')</a> ' + \
+                        '<a href="/list/user/check/' + url_pas(name) + '/simple">(' + get_lang(conn, 'simple_check') + ')</a>' + \
                         '<hr class="main_hr">' + \
                     '' + div
                 else:
@@ -99,9 +99,9 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
                     <table id="main_table_set">
                         <tbody>
                             <tr id="main_table_top_tr">
-                                <td id="main_table_width">''' + load_lang('name') + '''</td>
-                                <td id="main_table_width">''' + load_lang('ip') + '''</td>
-                                <td id="main_table_width">''' + load_lang('time') + '''</td>
+                                <td id="main_table_width">''' + get_lang(conn, 'name') + '''</td>
+                                <td id="main_table_width">''' + get_lang(conn, 'ip') + '''</td>
+                                <td id="main_table_width">''' + get_lang(conn, 'time') + '''</td>
                             </tr>
                 '''
 
@@ -124,7 +124,7 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
                             <td>
                                 <a href="/list/user/check/''' + url_pas(data[0]) + '''">''' + data[0] + '''</a>
                                 <a href="/list/user/check/delete/''' + url_pas(data[0]) + '/' + url_pas(data[1]) + '/' + url_pas(data[3]) + '/' + ('0' if ip_or_user(name) == 0 else '1') + '''">
-                                    (''' + load_lang('delete') + ''')
+                                    (''' + get_lang(conn, 'delete') + ''')
                                 </a>
                             </td>
                             <td><a href="/list/user/check/''' + url_pas(data[1]) + '''">''' + data[1] + '''</a></td>
@@ -141,13 +141,13 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
                 '''
 
             if plus_id:
-                div += get_next_page_bottom(
+                div += get_next_page_bottom(conn, 
                     '/list/user/check/' + url_pas(name) + '/normal/{}/' + url_pas(plus_id), 
                     num, 
                     record
                 )
             else:
-                div += next_fix(
+                div += next_fix(conn, 
                     '/list/user/check/' + url_pas(name) + '/normal/', 
                     num, 
                     record
@@ -156,10 +156,10 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
             if plus_id:
                 name += ', ' + plus_id
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('check') + ')', 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'check') + ')', 0])],
                 data = div,
-                menu = [['manager', load_lang('return')]]
+                menu = [['manager', get_lang(conn, 'return')]]
             ))
         else:
             curs.execute(db_change("" + \
@@ -175,18 +175,18 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
 
             if div != '':
                 div = '<ul class="opennamu_ul">' + div + '</ul>'
-                div += next_fix(
+                div += next_fix(conn, 
                     '/list/user/check/' + url_pas(name) + '/' + check_type + '/', 
                     num, 
                     record
                 )
 
             div = '' + \
-                '<a href="/list/user/check/' + url_pas(name) + '/normal">(' + load_lang('check') + ')</a>' + \
+                '<a href="/list/user/check/' + url_pas(name) + '/normal">(' + get_lang(conn, 'check') + ')</a>' + \
             '' + div
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('simple_check') + ')', 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'simple_check') + ')', 0])],
                 data = div,
-                menu = [['check/' + url_pas(name), load_lang('return')]]
+                menu = [['check/' + url_pas(name), get_lang(conn, 'return')]]
             ))

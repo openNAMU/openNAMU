@@ -132,7 +132,7 @@ elif what_i_do == '7':
     user_name = input('User name : ')
     user_pw = input('User password : ')
 
-    hashed = pw_encode(user_pw)
+    hashed = pw_encode(conn, user_pw)
     curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [
         hashed,
         user_name

@@ -9,4 +9,4 @@ def user_setting_key_delete():
             curs.execute(db_change("delete from user_set where name = 'random_key' and id = ?"), [ip])
             conn.commit()
     
-        return redirect('/change')
+        return redirect(conn, '/change')

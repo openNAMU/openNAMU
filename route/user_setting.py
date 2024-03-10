@@ -16,14 +16,14 @@ def user_setting():
                     ['user_title', flask.request.form.get('user_title', '')],
                     ['sub_user_name' , flask.request.form.get('sub_user_name', '')]
                 ]
-                if not auto_list[2][1] in get_user_title_list(ip):
+                if not auto_list[2][1] in get_user_title_list(conn, ip):
                     auto_list[2][1] = ''
 
                 twofa_on = flask.request.form.get('2fa', '')
                 if twofa_on != '':
                     twofa_pw = flask.request.form.get('2fa_pw', '')
                     if twofa_pw != '':
-                        twofa_pw = pw_encode(twofa_pw)
+                        twofa_pw = pw_encode(conn, twofa_pw)
 
                         curs.execute(db_change("select data from user_set where id = ? and name = 'encode'"), [ip])
                         twofa_encode = curs.fetchall()[0][0]
@@ -43,7 +43,7 @@ def user_setting():
 
                 conn.commit()
 
-                return redirect('/change')
+                return redirect(conn, '/change')
             else:
                 curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
                 data = curs.fetchall()
@@ -55,14 +55,14 @@ def user_setting():
 
                 curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
                 data = curs.fetchall()
-                div2 = load_skin(data[0][0] if data else '', 0, 1)
+                div2 = load_skin(conn, data[0][0] if data else '', 0, 1)
 
                 curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip])
                 data = curs.fetchall()
                 data = [['default']] if not data else data
                 div3 = ''
                 for lang_data in support_language:
-                    see_data = lang_data if lang_data != 'default' else load_lang('default')
+                    see_data = lang_data if lang_data != 'default' else get_lang(conn, 'default')
 
                     if data and data[0][0] == lang_data:
                         div3 = '<option value="' + lang_data + '">' + see_data + '</option>' + div3
@@ -72,7 +72,7 @@ def user_setting():
                 curs.execute(db_change('select data from user_set where name = "user_title" and id = ?'), [ip])
                 data = curs.fetchall()
                 data = [['']] if not data else data
-                user_title_list = get_user_title_list(ip)
+                user_title_list = get_user_title_list(conn, ip)
                 div4 = ''
                 for user_title in user_title_list:                
                     if data and data[0][0] == user_title:
@@ -84,7 +84,7 @@ def user_setting():
                 fa_data = curs.fetchall()
                 fa_data = fa_data[0][0] if fa_data and fa_data[0][0] != '' else ''
                 fa_data_select = ''
-                fa_data_sp_list = [[load_lang('off'), ''], [load_lang('password'), 'on']]
+                fa_data_sp_list = [[get_lang(conn, 'off'), ''], [get_lang(conn, 'password'), 'on']]
                 for fa_data_get in fa_data_sp_list:
                     fa_data_selected = ''
                     if fa_data == fa_data_get[1]:
@@ -94,7 +94,7 @@ def user_setting():
 
                 curs.execute(db_change('select data from user_set where name = "2fa_pw" and id = ?'), [ip])
                 fa_data_pw = curs.fetchall()
-                fa_data_pw = load_lang('2fa_password_change') if fa_data_pw else load_lang('2fa_password')
+                fa_data_pw = get_lang(conn, '2fa_password_change') if fa_data_pw else get_lang(conn, '2fa_password')
 
                 curs.execute(db_change('select data from user_set where name = "user_name" and id = ?'), [ip])
                 db_data = curs.fetchall()
@@ -104,58 +104,58 @@ def user_setting():
                 db_data = curs.fetchall()
                 sub_user_name = db_data[0][0] if db_data else ''
 
-                return easy_minify(flask.render_template(skin_check(),
-                    imp = [load_lang('user_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                return easy_minify(conn, flask.render_template(skin_check(conn),
+                    imp = [get_lang(conn, 'user_setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
                             <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
                             <hr class="main_hr">
-                            <a href="/change/pw">(''' + load_lang('password_change') + ''')</a>
+                            <a href="/change/pw">(''' + get_lang(conn, 'password_change') + ''')</a>
                             <hr class="main_hr">
-                            <span>''' + load_lang('email') + ''' : ''' + email + '''</span> <a href="/change/email">(''' + load_lang('email_change') + ''')</a> <a href="/change/email/delete">(''' + load_lang('email_delete') + ''')</a>
+                            <span>''' + get_lang(conn, 'email') + ''' : ''' + email + '''</span> <a href="/change/email">(''' + get_lang(conn, 'email_change') + ''')</a> <a href="/change/email/delete">(''' + get_lang(conn, 'email_delete') + ''')</a>
                             <hr class="main_hr">
-                            <span>''' + load_lang('password_instead_key') + ''' : ''' + ramdom_key + ''' <a href="/change/key">(''' + load_lang('key_change') + ''')</a> <a href="/change/key/delete">(''' + load_lang('key_delete') + ''')</a></span>
-                            <h2>''' + load_lang('main') + '''</h2>
-                            <a href="/change/head">(''' + load_lang('user_head') + ''')</a> <a href="/change/top_menu">(''' + load_lang('user_added_menu') + ''')</a>
+                            <span>''' + get_lang(conn, 'password_instead_key') + ''' : ''' + ramdom_key + ''' <a href="/change/key">(''' + get_lang(conn, 'key_change') + ''')</a> <a href="/change/key/delete">(''' + get_lang(conn, 'key_delete') + ''')</a></span>
+                            <h2>''' + get_lang(conn, 'main') + '''</h2>
+                            <a href="/change/head">(''' + get_lang(conn, 'user_head') + ''')</a> <a href="/change/top_menu">(''' + get_lang(conn, 'user_added_menu') + ''')</a>
                             <hr class="main_hr">
-                            <span>''' + load_lang('skin') + '''</span>
+                            <span>''' + get_lang(conn, 'skin') + '''</span>
                             <hr class="main_hr">
                             <select name="skin">''' + div2 + '''</select>
                             <hr class="main_hr">
-                            <a href="/change/skin_set">(''' + load_lang('skin_set') + ''')</a> <a href="/change/skin_set/main">(''' + load_lang('main_skin_set') + ''')</a>
+                            <a href="/change/skin_set">(''' + get_lang(conn, 'skin_set') + ''')</a> <a href="/change/skin_set/main">(''' + get_lang(conn, 'main_skin_set') + ''')</a>
                             <hr class="main_hr">
-                            <span>''' + load_lang('language') + '''</span>
+                            <span>''' + get_lang(conn, 'language') + '''</span>
                             <hr class="main_hr">
                             <select name="lang">''' + div3 + '''</select>
                             <hr class="main_hr">
-                            <span>''' + load_lang('user_title') + '''</span>
+                            <span>''' + get_lang(conn, 'user_title') + '''</span>
                             <hr class="main_hr">
                             <select name="user_title">''' + div4 + '''</select>
-                            <h2>''' + load_lang('2fa') + '''</h2>
+                            <h2>''' + get_lang(conn, '2fa') + '''</h2>
                             <select name="2fa" id="twofa_check_input">''' + fa_data_select + '''</select>
                             <hr class="main_hr">
                             <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
-                            <h2>''' + load_lang('main_user_name') + '''</h2>
-                            <a href="/change/user_name">(''' + load_lang('change_user_name') + ''')</a>
+                            <h2>''' + get_lang(conn, 'main_user_name') + '''</h2>
+                            <a href="/change/user_name">(''' + get_lang(conn, 'change_user_name') + ''')</a>
                             <hr class="main_hr">
-                            ''' + load_lang('user_name') + ''' : ''' + html.escape(user_name) + '''
-                            <h2>''' + load_lang('sub_user_name') + '''</h2>
-                            <input name="sub_user_name" value="''' + html.escape(sub_user_name) + '''" placeholder="''' + load_lang('sub_user_name') + '''">
+                            ''' + get_lang(conn, 'user_name') + ''' : ''' + html.escape(user_name) + '''
+                            <h2>''' + get_lang(conn, 'sub_user_name') + '''</h2>
+                            <input name="sub_user_name" value="''' + html.escape(sub_user_name) + '''" placeholder="''' + get_lang(conn, 'sub_user_name') + '''">
                             <hr class="main_hr">
-                            <button type="submit">''' + load_lang('save') + '''</button>
-                            ''' + http_warning() + '''
+                            <button type="submit">''' + get_lang(conn, 'save') + '''</button>
+                            ''' + http_warning(conn) + '''
                         </form>
                     ''',
-                    menu = [['user', load_lang('return')]]
+                    menu = [['user', get_lang(conn, 'return')]]
                 ))
         else:
             if flask.request.method == 'POST':
                 flask.session['skin'] = flask.request.form.get('skin', '')
                 flask.session['lang'] = flask.request.form.get('lang', '')
 
-                return redirect('/change')
+                return redirect(conn, '/change')
             else:
-                div2 = load_skin(
+                div2 = load_skin(conn, 
                     ('' if not 'skin' in flask.session else flask.session['skin']), 
                     0, 
                     1
@@ -164,35 +164,35 @@ def user_setting():
                 data = [['default']] if not 'lang' in flask.session else [[flask.session['lang']]]
                 div3 = ''
                 for lang_data in support_language:
-                    see_data = lang_data if lang_data != 'default' else load_lang('default')
+                    see_data = lang_data if lang_data != 'default' else get_lang(conn, 'default')
 
                     if data and data[0][0] == lang_data:
                         div3 = '<option value="' + lang_data + '">' + see_data + '</option>' + div3
                     else:
                         div3 += '<option value="' + lang_data + '">' + see_data + '</option>'
 
-                return easy_minify(flask.render_template(skin_check(),
-                    imp = [load_lang('user_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                return easy_minify(conn, flask.render_template(skin_check(conn),
+                    imp = [get_lang(conn, 'user_setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
                             <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
                             <hr class="main_hr">
-                            <h2>''' + load_lang('main') + '''</h2>
-                            <span>''' + load_lang('skin') + '''</span>
+                            <h2>''' + get_lang(conn, 'main') + '''</h2>
+                            <span>''' + get_lang(conn, 'skin') + '''</span>
                             <hr class="main_hr">
                             <select name="skin">''' + div2 + '''</select>
                             <hr class="main_hr">
-                            <a href="/change/skin_set">(''' + load_lang('skin_set') + ''')</a> <a href="/change/skin_set/main">(''' + load_lang('main_skin_set') + ''')</a>
+                            <a href="/change/skin_set">(''' + get_lang(conn, 'skin_set') + ''')</a> <a href="/change/skin_set/main">(''' + get_lang(conn, 'main_skin_set') + ''')</a>
                             <hr class="main_hr">
-                            <span>''' + load_lang('language') + '''</span>
+                            <span>''' + get_lang(conn, 'language') + '''</span>
                             <hr class="main_hr">
                             <select name="lang">''' + div3 + '''</select>
                             <hr class="main_hr">
-                            <button type="submit">''' + load_lang('save') + '''</button>
-                            ''' + http_warning() + '''
+                            <button type="submit">''' + get_lang(conn, 'save') + '''</button>
+                            ''' + http_warning(conn) + '''
                             <hr class="main_hr">
-                            <span>''' + load_lang('user_head_warning') + '''</span>
+                            <span>''' + get_lang(conn, 'user_head_warning') + '''</span>
                         </form>
                     ''',
-                    menu = [['user', load_lang('return')]]
+                    menu = [['user', get_lang(conn, 'return')]]
                 ))

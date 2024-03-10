@@ -3,8 +3,8 @@ import multiprocessing
 from .tool.func import *
 
 
-def edit_render_set(name, content):
-    render_set(
+def edit_render_set(conn, name, content):
+    render_set(conn, 
         doc_name = name,
         doc_data = content
     )
@@ -51,10 +51,10 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = '', name = '
     elif do_type == 'bbs':
         do_type = 'edit'
             
-    p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else load_lang('default_edit_help')
+    p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else get_lang(conn, 'default_edit_help')
     
-    monaco_editor_top += '<a href="javascript:opennamu_do_editor_temp_save();">(' + load_lang('load_temp_save') + ')</a> <a href="javascript:opennamu_do_editor_temp_save_load();">(' + load_lang('load_temp_save_load') + ')</a> '
-    monaco_editor_top += '<a href="javascript:opennamu_edit_turn_off_monaco();">(' + load_lang('turn_off_monaco') + ')</a>'
+    monaco_editor_top += '<a href="javascript:opennamu_do_editor_temp_save();">(' + get_lang(conn, 'load_temp_save') + ')</a> <a href="javascript:opennamu_do_editor_temp_save_load();">(' + get_lang(conn, 'load_temp_save_load') + ')</a> '
+    monaco_editor_top += '<a href="javascript:opennamu_edit_turn_off_monaco();">(' + get_lang(conn, 'turn_off_monaco') + ')</a>'
     
     darkmode = flask.request.cookies.get('main_css_darkmode', '0')
     monaco_thema = 'vs-dark' if darkmode == '1' else ''
@@ -74,7 +74,7 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = '', name = '
         <div>
             ''' + monaco_editor_top + '''
             <hr class="main_hr">
-            ''' + edit_button() + '''
+            ''' + edit_button(conn) + '''
         </div>
         
         ''' + div + '''
@@ -83,7 +83,7 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = '', name = '
         <textarea id="opennamu_edit_textarea" ''' + editor_display + ''' class="''' + textarea_size + '''" name="content" placeholder="''' + p_text + '''">''' + html.escape(data_main) + '''</textarea>
         <hr class="main_hr">
         
-        ''' + captcha_get() + ip_warning() + addon + '''
+        ''' + captcha_get(conn) + ip_warning(conn) + addon + '''
         <hr class="main_hr">
 
         <script>
@@ -92,8 +92,8 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = '', name = '
             ''' + add_script + '''
         </script>
                         
-        <button id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">''' + load_lang('send') + '''</button>
-        <button id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview();">''' + load_lang('preview') + '''</button>
+        <button id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">''' + get_lang(conn, 'send') + '''</button>
+        <button id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview();">''' + get_lang(conn, 'preview') + '''</button>
         <hr class="main_hr">
 
         <div id="opennamu_preview_area"></div>
@@ -106,11 +106,11 @@ def edit(name = 'Test', section = 0, do_type = ''):
         ip = ip_check()
 
         edit_req_mode = 0
-        if acl_check(name, 'document_edit') == 1:
+        if acl_check(conn, name, 'document_edit') == 1:
             edit_req_mode = 1
             
-        if do_title_length_check(name) == 1:
-            return re_error('/error/38')
+        if do_title_length_check(conn, name) == 1:
+            return re_error(conn, '/error/38')
         
         curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
         doc_ver = curs.fetchall()
@@ -118,7 +118,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
         curs.execute(db_change("select set_data from data_set where doc_name = ? and doc_rev = ? and set_name = 'edit_request_data'"), [name, doc_ver])
         if curs.fetchall():
-            return redirect('/edit_request_from/' + url_pas(name))
+            return redirect(conn, '/edit_request_from/' + url_pas(name))
         
         section = '' if section == 0 else section
         post_ver = flask.request.form.get('ver', '')
@@ -128,27 +128,27 @@ def edit(name = 'Test', section = 0, do_type = ''):
             edit_repeat = 'get'
         
         if edit_repeat == 'post':
-            if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error('/error/13')
+            if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                return re_error(conn, '/error/13')
             else:
-                captcha_post('', 0)
+                captcha_post(conn, '', 0)
     
-            if do_edit_slow_check() == 1:
-                return re_error('/error/24')
+            if do_edit_slow_check(conn) == 1:
+                return re_error(conn, '/error/24')
     
             today = get_time()
             content = flask.request.form.get('content', '').replace('\r', '')
             send = flask.request.form.get('send', '')
             agree = flask.request.form.get('copyright_agreement', '')
             
-            if do_edit_filter(content) == 1:
-                return re_error('/error/21')
+            if do_edit_filter(conn, content) == 1:
+                return re_error(conn, '/error/21')
 
-            if do_edit_send_check(send) == 1:
-                return re_error('/error/37')
+            if do_edit_send_check(conn, send) == 1:
+                return re_error(conn, '/error/37')
 
-            if do_edit_text_bottom_check_box_check(agree) == 1:
-                return re_error('/error/29')
+            if do_edit_text_bottom_check_box_check(conn, agree) == 1:
+                return re_error(conn, '/error/29')
             
             curs.execute(db_change("select data from data where title = ?"), [name])
             db_data = curs.fetchall()
@@ -182,7 +182,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
             db_data_3 = curs.fetchall()
             if db_data_3 and db_data_3[0][0] != '':
                 if int(number_check(db_data_3[0][0])) < len(content):
-                    return re_error('/error/44')
+                    return re_error(conn, '/error/44')
 
             curs.execute(db_change("select data from other where name = 'edit_timeout'"))
             db_data_2 = curs.fetchall()
@@ -193,7 +193,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 timeout = 0
 
             if timeout == 1:
-                return re_error('/error/41')
+                return re_error(conn, '/error/41')
             
             if edit_req_mode == 0:
                 # 진짜 기록 부분
@@ -202,9 +202,9 @@ def edit(name = 'Test', section = 0, do_type = ''):
         
                 curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
                 for scan_user in curs.fetchall():
-                    add_alarm(scan_user[0], ip, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
+                    add_alarm(conn, scan_user[0], ip, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
                         
-                history_plus(
+                history_plus(conn, 
                     name,
                     content,
                     today,
@@ -213,7 +213,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                     leng
                 )
                 
-                render_set(
+                render_set(conn, 
                     doc_name = name,
                     doc_data = content,
                     data_type = 'backlink'
@@ -228,13 +228,13 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
                 curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
                 for scan_user in curs.fetchall():
-                    add_alarm(scan_user[0], ip, '<a href="/edit_request/' + url_pas(name) + '">' + html.escape(name) + '</a> edit_request')
+                    add_alarm(conn, scan_user[0], ip, '<a href="/edit_request/' + url_pas(name) + '">' + html.escape(name) + '</a> edit_request')
             
             conn.commit()
             
             section = (('#edit_load_' + str(section)) if section != '' else '')
             
-            return redirect('/w/' + url_pas(name) + section)
+            return redirect(conn, '/w/' + url_pas(name) + section)
         else:
             editor_top_text = ''
 
@@ -253,7 +253,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 
                 if load_title == 0 and section == '':
                     load_title = name
-                    editor_top_text += '<a href="/manager/15/' + url_pas(name) + '">(' + load_lang('load') + ')</a> '
+                    editor_top_text += '<a href="/manager/15/' + url_pas(name) + '">(' + get_lang(conn, 'load') + ')</a> '
                 elif section != '':
                     load_title = name
                     
@@ -310,7 +310,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
                 doc_ver = flask.request.form.get('ver', '')
 
-                warning_edit = load_lang('exp_edit_conflict') + ' '
+                warning_edit = get_lang(conn, 'exp_edit_conflict') + ' '
     
                 if flask.request.form.get('ver', '0') == '0':
                     warning_edit += '<a href="/raw/' + url_pas(name) + '">(r' + doc_ver + ')</a>'
@@ -327,16 +327,16 @@ def edit(name = 'Test', section = 0, do_type = ''):
             if data_section == '':
                 data_section = data
     
-            editor_top_text += '<a href="/filter/edit_filter">(' + load_lang('edit_filter_rule') + ')</a>'
+            editor_top_text += '<a href="/filter/edit_filter">(' + get_lang(conn, 'edit_filter_rule') + ')</a>'
     
             if editor_top_text != '':
                 editor_top_text += '<hr class="main_hr">'
 
             sub_menu = ' (' + str(section) + ')' if section != '' else ''
-            sub_title = '(' + load_lang('edit_request') + ')' if edit_req_mode == 1 else '(' + load_lang('edit') + ')'
+            sub_title = '(' + get_lang(conn, 'edit_request') + ')' if edit_req_mode == 1 else '(' + get_lang(conn, 'edit') + ')'
 
-            return easy_minify(flask.render_template(skin_check(), 
-                imp = [name, wiki_set(), wiki_custom(), wiki_css([sub_title + sub_menu, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn), 
+                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css([sub_title + sub_menu, 0])],
                 data = editor_top_text + '''
                     <form method="post">
                         <textarea style="display: none;" name="doc_section_data_where">''' + data_section_where + '''</textarea>
@@ -345,16 +345,16 @@ def edit(name = 'Test', section = 0, do_type = ''):
                         <input style="display: none;" id="opennamu_editor_doc_name" value="''' + html.escape(name) + '''">
                         <input style="display: none;" name="ver" value="''' + doc_ver + '''">
                         
-                        <input placeholder="''' + load_lang('why') + '''" name="send">
+                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="send">
                         <hr class="main_hr">
                         
-                        ''' + edit_editor(curs, ip, data_section, addon = get_edit_text_bottom_check_box() + get_edit_text_bottom(), name = name) + '''
+                        ''' + edit_editor(curs, ip, data_section, addon = get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn) , name = name) + '''
                     </form>
                 ''',
                 menu = [
-                    ['w/' + url_pas(name), load_lang('return')],
-                    ['delete/' + url_pas(name), load_lang('delete')], 
-                    ['move/' + url_pas(name), load_lang('move')], 
-                    ['upload', load_lang('upload')]
+                    ['w/' + url_pas(name), get_lang(conn, 'return')],
+                    ['delete/' + url_pas(name), get_lang(conn, 'delete')], 
+                    ['move/' + url_pas(name), get_lang(conn, 'move')], 
+                    ['upload', get_lang(conn, 'upload')]
                 ]
             ))

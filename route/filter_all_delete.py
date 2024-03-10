@@ -4,8 +4,8 @@ def filter_all_delete(tool, name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
         
-        if admin_check(None, 'del_' + tool) != 1:
-            return re_error('/error/3')
+        if admin_check(conn, None, 'del_' + tool) != 1:
+            return re_error(conn, '/error/3')
 
         if tool == 'inter_wiki':
             curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki'"), [name])
@@ -33,4 +33,4 @@ def filter_all_delete(tool, name = 'Test'):
 
         conn.commit()
 
-        return redirect('/filter/' + tool)
+        return redirect(conn, '/filter/' + tool)

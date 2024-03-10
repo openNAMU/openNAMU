@@ -6,12 +6,12 @@ def give_user_ban(name = None, ban_type = ''):
 
         ip = ip_check()
         
-        if ban_check(ip = ip, tool = 'login')[0] == 1:
-            if ip_or_user(ip) == 1 or admin_check('all', None, ip) == 0:
-                return re_error('/ban')
+        if ban_check(conn, ip = ip, tool = 'login')[0] == 1:
+            if ip_or_user(ip) == 1 or admin_check(conn, 'all', None, ip) == 0:
+                return re_error(conn, '/ban')
         else:
-            if admin_check(1, None, ip) != 1:
-                return re_error('/error/3')
+            if admin_check(conn, 1, None, ip) != 1:
+                return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
             time_limit = flask.request.form.get('date', '')
@@ -49,22 +49,22 @@ def give_user_ban(name = None, ban_type = ''):
                     try:
                         re.compile(name)
                     except:
-                        return re_error('/error/23')
+                        return re_error(conn, '/error/23')
                 else:
                     type_d = None
 
                 if type_d:
-                    if admin_check(None, 'ban' + (' ' + type_d if type_d else '') + ' (' + name + ')') != 1:
-                        return re_error('/error/3')
+                    if admin_check(conn, None, 'ban' + (' ' + type_d if type_d else '') + ' (' + name + ')') != 1:
+                        return re_error(conn, '/error/3')
                 else:
                     if name == ip:
-                        if admin_check('all', 'ban (' + name + ')') != 1:
-                            return re_error('/error/3')
+                        if admin_check(conn, 'all', 'ban (' + name + ')') != 1:
+                            return re_error(conn, '/error/3')
                     else:
-                        if admin_check(1, 'ban (' + name + ')') != 1:
-                            return re_error('/error/3')
+                        if admin_check(conn, 1, 'ban (' + name + ')') != 1:
+                            return re_error(conn, '/error/3')
 
-                ban_insert(
+                ban_insert(conn, 
                     name,
                     end,
                     why,
@@ -74,14 +74,14 @@ def give_user_ban(name = None, ban_type = ''):
                     1 if release != '' else 0
                 )
 
-            return redirect('/block_log')
+            return redirect(conn, '/block_log')
         else:
             if ban_type == 'multiple':
-                main_name = load_lang('multiple_ban')
-                n_name = '<textarea class="opennamu_textarea_500" placeholder="' + load_lang('name_or_ip_or_regex_multiple') + '" name="name"></textarea><hr class="main_hr">'
+                main_name = get_lang(conn, 'multiple_ban')
+                n_name = '<textarea class="opennamu_textarea_500" placeholder="' + get_lang(conn, 'name_or_ip_or_regex_multiple') + '" name="name"></textarea><hr class="main_hr">'
             else:
-                main_name = load_lang('ban')
-                n_name = '<input placeholder="' + load_lang('name_or_ip_or_regex') + '" value="' + (name if name else '') + '" name="name"><hr class="main_hr">'
+                main_name = get_lang(conn, 'ban')
+                n_name = '<input placeholder="' + get_lang(conn, 'name_or_ip_or_regex') + '" value="' + (name if name else '') + '" name="name"><hr class="main_hr">'
 
             now = 0
             
@@ -103,26 +103,26 @@ def give_user_ban(name = None, ban_type = ''):
                     <hr class="main_hr">
                 '''
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [main_name, wiki_set(), wiki_custom(), wiki_css([now, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [main_name, wiki_set(conn), wiki_custom(conn), wiki_css([now, 0])],
                 data = info_data + '''
                     <form method="post" ''' + action + '''>
                         ''' + n_name + '''
-                        <input type="checkbox" name="regex" ''' + ('checked' if ban_type == 'regex' else '') + '> ' + load_lang('regex') + '''
+                        <input type="checkbox" name="regex" ''' + ('checked' if ban_type == 'regex' else '') + '> ' + get_lang(conn, 'regex') + '''
                         <hr class="main_hr">
                         <input type="date" value="''' + date_value + '''" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">
                         <hr class="main_hr">
-                        <input placeholder="''' + load_lang('why') + '''" name="why" type="text">
+                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="why" type="text">
                         <hr class="main_hr">
                         <select name="ban_option">
-                            <option value="">''' + load_lang('default') + '''</option>
-                            <option value="login_able">''' + load_lang('login_able') + '''</option>
-                            <option value="edit_request_able">''' + load_lang('edit_request_able') + '''</option>
-                            <option value="release">''' + load_lang('release') + '''</option>
+                            <option value="">''' + get_lang(conn, 'default') + '''</option>
+                            <option value="login_able">''' + get_lang(conn, 'login_able') + '''</option>
+                            <option value="edit_request_able">''' + get_lang(conn, 'edit_request_able') + '''</option>
+                            <option value="release">''' + get_lang(conn, 'release') + '''</option>
                         </select>
                         <hr class="main_hr">
-                        <button type="submit">''' + load_lang('save') + '''</button>
+                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 ''',
-                menu = [['manager', load_lang('return')]]
+                menu = [['manager', get_lang(conn, 'return')]]
             ))   

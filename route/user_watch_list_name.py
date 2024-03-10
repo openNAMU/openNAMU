@@ -6,7 +6,7 @@ def user_watch_list_name(tool, name = 'Test'):
 
         ip = ip_check()
         if ip_or_user(ip) != 0:
-            return redirect('/login')
+            return redirect(conn, '/login')
         
         name_from = 0
         if tool == 'watch_list_from':
@@ -29,16 +29,16 @@ def user_watch_list_name(tool, name = 'Test'):
                 curs.execute(db_change("select count(*) from user_set where id = ? and name = ?"), [ip, type_data])
                 count = curs.fetchall()
                 if count and count[0][0] > 10:
-                    return re_error('/error/28')
+                    return re_error(conn, '/error/28')
 
             curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [ip, type_data, name])
 
         conn.commit()
 
         if name_from == 1:
-            return redirect('/w/' + url_pas(name))
+            return redirect(conn, '/w/' + url_pas(name))
         else:
             if tool == 'watch_list':
-                return redirect('/watch_list')
+                return redirect(conn, '/watch_list')
             else:
-                return redirect('/star_doc')
+                return redirect(conn, '/star_doc')

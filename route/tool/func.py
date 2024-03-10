@@ -349,332 +349,329 @@ def get_db_table_list():
     
     return create_data
 
-def update(ver_num, set_data):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def update(conn, ver_num, set_data):
+    curs = conn.cursor()
 
-        # 업데이트 하위 호환 유지 함수
-        if ver_num < 3160027:
-            print('Add init set')
-            set_init()
+    # 업데이트 하위 호환 유지 함수
+    if ver_num < 3160027:
+        print('Add init set')
+        set_init(conn)
 
-        if ver_num < 3170002:
-            curs.execute(db_change("select html from html_filter where kind = 'extension'"))
-            if not curs.fetchall():
-                for i in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']:
-                    curs.execute(db_change("insert into html_filter (html, kind) values (?, 'extension')"), [i])
-
-        if ver_num < 3170400:
-            curs.execute(db_change("select title, sub, code from topic where id = '1'"))
-            for i in curs.fetchall():
-                curs.execute(db_change("update topic set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
-                curs.execute(db_change("update rd set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
-
-        if ver_num < 3171800:
-            curs.execute(db_change("select data from other where name = 'recaptcha'"))
-            change_rec = curs.fetchall()
-            if change_rec and change_rec[0][0] != '':
-                new_rec = re.search(r'data-sitekey="([^"]+)"', change_rec[0][0])
-                if new_rec:
-                    curs.execute(db_change("update other set data = ? where name = 'recaptcha'"), [new_rec.group(1)])
-                else:
-                    curs.execute(db_change("update other set data = '' where name = 'recaptcha'"))
-                    curs.execute(db_change("update other set data = '' where name = 'sec_re'"))
-        
-        if  ver_num < 3172800 and \
-            set_data['db_type'] == 'mysql':
-            get_data_mysql = json.loads(open('data/mysql.json', encoding = 'utf8').read())
-            
-            with open('data/mysql.json', 'w') as f:
-                f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "localhost" }')
-
-        if ver_num < 3183603:
-            curs.execute(db_change("select block from ban where band = 'O'"))
-            for i in curs.fetchall():
-                curs.execute(db_change("update ban set block = ?, band = 'regex' where block = ? and band = 'O'"), ['^' + i[0].replace('.', '\\.'), i[0]])
-
-            curs.execute(db_change("select block from rb where band = 'O'"))
-            for i in curs.fetchall():
-                curs.execute(db_change("update rb set block = ?, band = 'regex' where block = ? and band = 'O'"), ['^' + i[0].replace('.', '\\.'), i[0]])
-
-        if ver_num < 3190201:
-            today_time = get_time()
-
-            curs.execute(db_change("select block, end, why, band, login from ban"))
-            for i in curs.fetchall():
-                curs.execute(db_change("insert into rb (block, end, today, why, band, login, ongoing) values (?, ?, ?, ?, ?, ?, ?)"), [i[0], i[1], today_time, i[2], i[3], i[4], '1'])
-
-        if ver_num < 3191301:
-            curs.execute(db_change('select id, title, date from history where not title like "user:%" order by date desc limit 50'))
-            data_list = curs.fetchall()
-            for get_data in data_list:
-                curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [get_data[0], get_data[1], get_data[2]])
-
-        if ver_num < 3202400:
-            curs.execute(db_change("select data from other where name = 'update'"))
-            get_data = curs.fetchall()
-            if get_data and get_data[0][0] == 'master':
-                curs.execute(db_change("update other set data = 'beta' where name = 'update'"), [])
-
-        if ver_num < 3202600:
-            curs.execute(db_change("select name, regex, sub from filter"))
-            for i in curs.fetchall():
-                curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'regex_filter', ?, ?)"), [i[0], i[1], i[2]])
-
-            curs.execute(db_change("select title, link, icon from inter"))
-            for i in curs.fetchall():
-                curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'inter_wiki', ?, ?)"), [i[0], i[1], i[2]])
-
-        if ver_num < 3203400:
-            curs.execute(db_change("select user, css from custom"))
-            for i in curs.fetchall():
-                curs.execute(db_change("insert into user_set (name, id, data) values ('custom_css', ?, ?)"), [re.sub(r' \(head\)$', '', i[0]), i[1]])
-
-        if ver_num < 3205500:
-            curs.execute(db_change("select title, decu, dis, view, why from acl"))
-            for i in curs.fetchall():
-                curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[1], 'decu'])
-                curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[2], 'dis'])
-                curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[3], 'view'])
-                curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[4], 'why'])
-
-        if ver_num < 3300101:
-            # 캐시 초기화
-            curs.execute(db_change('delete from cache_data'))
-        
-        if ver_num < 3300301:
-            # regex_filter 오류 해결
-            curs.execute(db_change('delete from html_filter where kind = "regex_filter" and html is null'))
-            
-        if ver_num < 3302302:
-            # user이랑 user_set 테이블의 통합
-            curs.execute(db_change('select id, pw, acl, date, encode from user'))
-            for i in curs.fetchall():
-                curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['pw', i[0], i[1]])
-                curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['acl', i[0], i[2]])
-                curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['date', i[0], i[3]])
-                curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['encode', i[0], i[4]])
-                
-        if ver_num < 3400101:
-            # user_set이랑 user_application 테이블의 통합
-            curs.execute(db_change('select id, pw, date, encode, question, answer, ip, ua, email from user_application'))
-            for i in curs.fetchall():
-                sql_data = {}
-                sql_data['id'] = i[0]
-                sql_data['pw'] = i[1]
-                sql_data['date'] = i[2]
-                sql_data['encode'] = i[3]
-                sql_data['question'] = i[4]
-                sql_data['answer'] = i[5]
-                sql_data['ip'] = i[6]
-                sql_data['ua'] = i[7]
-                sql_data['email'] = i[8]
-                
-                curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['application', i[0], json.dumps(sql_data)])
-        
-        if ver_num < 3500105:
-            curs.execute(db_change('delete from acl where title like "file:%" and data = "admin" and type like "decu%"'))
-            
-        if ver_num < 3500106:
-            curs.execute(db_change("select data from other where name = 'domain'"))
-            db_data = curs.fetchall()
-            if db_data and db_data[0][0] != '':
-                db_data = db_data[0][0]
-                db_data = re.match(r'[^/]+\/\/([^/]+)', db_data)
-                if db_data:
-                    db_data = db_data.group(1)
-                    curs.execute(db_change("update other set data = ? where name = 'domain'"), [db_data])
-                else:
-                    curs.execute(db_change("update other set data = '' where name = 'domain'"))
-
-        if ver_num < 3500107:
-            db_table_list = get_db_table_list()
-            for for_a in db_table_list:
-                for for_b in db_table_list[for_a]:
-                    curs.execute(db_change("update " + for_a + " set " + for_b + " = '' where " + for_b + " is null"))
-                    
-        if ver_num < 3500113:
-            db_table_list = get_db_table_list()
-            for for_a in db_table_list:
-                for for_b in db_table_list[for_a]:
-                    curs.execute(db_change("update " + for_a + " set " + for_b + " = '' where " + for_b + " is null"))
-
-        if ver_num < 3500114:
-            curs.execute(db_change('delete from alarm'))
-
-        if ver_num < 3500354:
-            curs.execute(db_change("select data from other where name = 'robot'"))
-            db_data = curs.fetchall()
-            if db_data:
-                robot_default = '' + \
-                    'User-agent: *\n' + \
-                    'Disallow: /\n' + \
-                    'Allow: /$\n' + \
-                    'Allow: /image/\n' + \
-                    'Allow: /views/\n' + \
-                    'Allow: /w/' + \
-                ''
-                if db_data[0][0] == robot_default:
-                    curs.execute(db_change("insert into other (name, data, coverage) values ('robot_default', 'on', '')"))
-
-        if ver_num < 3500355:
-            # other coverage 오류 해결
-            curs.execute(db_change("update other set coverage = '' where coverage is null"))
-
-        if ver_num < 3500358:
-            curs.execute(db_change("drop index history_index"))
-            curs.execute(db_change("create index history_index on history (title, ip)"))
-
-        if ver_num < 3500360:
-            # 마지막 편집 따로 기록하도록
-            # create_data['data_set'] = ['doc_name', 'doc_rev', 'set_name', 'set_data']
-            print("Update 3500360...")
-
-            curs.execute(db_change('delete from data_set where set_name = "last_edit"'))
-
-            curs.execute(db_change("select title from data"))
-            db_data = curs.fetchall()
-            for for_a in db_data:
-                curs.execute(db_change("select date from history where title = ? order by date desc limit 1"), [for_a[0]])
-                db_data_2 = curs.fetchall()
-                if db_data_2:
-                    curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'last_edit', ?)"), [for_a[0], db_data_2[0][0]])
-
-            curs.execute(db_change('delete from acl where title like "file:%" and data = "admin" and type like "decu%"'))
-
-            print("Update 3500360 complete")
-
-        if ver_num < 3500361:
-            # curs.execute(db_change('select id from user_set where name = "email" and data = ?'), [user_email])
-            curs.execute(db_change('select id from user_set where name = "email"'))
-            for db_data in curs.fetchall():
-                if ip_or_user(db_data[0]) == 1:
-                    curs.execute(db_change('delete from user_set where id = ? and name = "email"'), [db_data[0]])
-
-        # create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
-        # create_data['rc'] = ['id', 'title', 'date', 'type']
-        if ver_num == 3500362:
-            curs.execute(db_change("drop index history_index"))
-            curs.execute(db_change("create index history_index on history (title, ip)"))
-
-        if ver_num < 3500365:
-            curs.execute(db_change("update back set data = '' where data is null"))
-
-        if ver_num < 3500371:
-            curs.execute(db_change("delete from user_notice"))
-            user_alarm_count = {}
-
-            curs.execute(db_change("select name, data, date from alarm"))
-            for db_data in curs.fetchall():
-                if db_data[0] in user_alarm_count:
-                    user_alarm_count[db_data[0]] += 1
-                else:
-                    user_alarm_count[db_data[0]] = 1
-
-                curs.execute(db_change('insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'), [str(user_alarm_count[db_data[0]]), db_data[0], db_data[1], db_data[2]])
-
-        if ver_num < 3500372:
-            # ID 글자 확인 호환용
-            curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-힣0-9])', 'name', '', ''])
-
-        if ver_num < 3500373:
-            select_data = {}
-
-            curs.execute(db_change("select name, id, data from user_set where name = 'application'"))
-            for db_data in curs.fetchall():
-                select_data[db_data[1]] = db_data
-
-            curs.execute(db_change("delete from user_set where name = 'application'"))
-            
-            for db_data in select_data:
-                curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [select_data[db_data][1], select_data[db_data][0], select_data[db_data][2]])
-
-        if ver_num < 3500374:
-            # ban 오류 해결
-            curs.execute(db_change("update rb set ongoing = '' where ongoing is null"))
-            curs.execute(db_change("update rb set login = '' where login is null"))
-
-        if ver_num < 3500375:
-            curs.execute(db_change("select title, type, user from scan"))
-            for for_a in curs.fetchall():
-                type_data = 'watchlist' if for_a[1] == '' else 'star_doc'
-                curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [for_a[2], type_data, for_a[0]])
-
-        if ver_num < 3500376:
-            curs.execute(db_change("select doc_name, doc_rev from data_set where set_name = 'edit_request_data'"))
-            for for_a in curs.fetchall():
-                curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [for_a[0]])
-                get_data = curs.fetchall()
-                if get_data and (int(get_data[0][0]) + 1) == int(for_a[1]):
-                    curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_doing', '1')"), [for_a[0], for_a[1]])
-
-        conn.commit()
-
-        print('Update completed')
-
-def set_init_always(ver_num):
-    global global_wiki_set
-
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        curs.execute(db_change('delete from other where name = "ver"'))
-        curs.execute(db_change('insert into other (name, data, coverage) values ("ver", ?, "")'), [ver_num])
-        
-        curs.execute(db_change('delete from alist where name = "owner"'))
-        curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
-
-        if not os.path.exists(load_image_url()):
-            os.makedirs(load_image_url())
-
-        curs.execute(db_change('select data from other where name = "key"'))
-        if not curs.fetchall():
-            curs.execute(db_change('insert into other (name, data, coverage) values ("key", ?, "")'), [load_random_key()])
-            
-        curs.execute(db_change('select data from other where name = "salt_key"'))
-        if not curs.fetchall():
-            curs.execute(db_change('insert into other (name, data, coverage) values ("salt_key", ?, "")'), [load_random_key(4)])
-
-        curs.execute(db_change('select data from other where name = "count_all_title"'))
-        if not curs.fetchall():
-            curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", "0", "")'))
-            
-        curs.execute(db_change('select data from other where name = "wiki_access_password_need"'))
-        db_data = curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            curs.execute(db_change('select data from other where name = "wiki_access_password"'))
-            db_data = curs.fetchall()
-            if db_data:
-                global_wiki_set['wiki_access_password'] = db_data[0][0]
-    
-def set_init():
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        # 초기값 설정 함수    
-        curs.execute(db_change("select html from html_filter where kind = 'email'"))
-        if not curs.fetchall():
-            for i in ['naver.com', 'gmail.com', 'daum.net', 'kakao.com']:
-                curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'email', '', '')"), [i])
-
+    if ver_num < 3170002:
         curs.execute(db_change("select html from html_filter where kind = 'extension'"))
         if not curs.fetchall():
-            for i in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
-                curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'extension', '', '')"), [i])
+            for i in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']:
+                curs.execute(db_change("insert into html_filter (html, kind) values (?, 'extension')"), [i])
 
-        curs.execute(db_change('select data from other where name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
-        if not curs.fetchall():
-            for i in [['smtp_server', 'smtp.gmail.com'], ['smtp_port', '587'], ['smtp_security', 'starttls']]:
-                curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, '')"), [i[0], i[1]])
+    if ver_num < 3170400:
+        curs.execute(db_change("select title, sub, code from topic where id = '1'"))
+        for i in curs.fetchall():
+            curs.execute(db_change("update topic set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
+            curs.execute(db_change("update rd set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
 
+    if ver_num < 3171800:
+        curs.execute(db_change("select data from other where name = 'recaptcha'"))
+        change_rec = curs.fetchall()
+        if change_rec and change_rec[0][0] != '':
+            new_rec = re.search(r'data-sitekey="([^"]+)"', change_rec[0][0])
+            if new_rec:
+                curs.execute(db_change("update other set data = ? where name = 'recaptcha'"), [new_rec.group(1)])
+            else:
+                curs.execute(db_change("update other set data = '' where name = 'recaptcha'"))
+                curs.execute(db_change("update other set data = '' where name = 'sec_re'"))
+    
+    if  ver_num < 3172800 and \
+        set_data['db_type'] == 'mysql':
+        get_data_mysql = json.loads(open('data/mysql.json', encoding = 'utf8').read())
+        
+        with open('data/mysql.json', 'w') as f:
+            f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "localhost" }')
+
+    if ver_num < 3183603:
+        curs.execute(db_change("select block from ban where band = 'O'"))
+        for i in curs.fetchall():
+            curs.execute(db_change("update ban set block = ?, band = 'regex' where block = ? and band = 'O'"), ['^' + i[0].replace('.', '\\.'), i[0]])
+
+        curs.execute(db_change("select block from rb where band = 'O'"))
+        for i in curs.fetchall():
+            curs.execute(db_change("update rb set block = ?, band = 'regex' where block = ? and band = 'O'"), ['^' + i[0].replace('.', '\\.'), i[0]])
+
+    if ver_num < 3190201:
+        today_time = get_time()
+
+        curs.execute(db_change("select block, end, why, band, login from ban"))
+        for i in curs.fetchall():
+            curs.execute(db_change("insert into rb (block, end, today, why, band, login, ongoing) values (?, ?, ?, ?, ?, ?, ?)"), [i[0], i[1], today_time, i[2], i[3], i[4], '1'])
+
+    if ver_num < 3191301:
+        curs.execute(db_change('select id, title, date from history where not title like "user:%" order by date desc limit 50'))
+        data_list = curs.fetchall()
+        for get_data in data_list:
+            curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [get_data[0], get_data[1], get_data[2]])
+
+    if ver_num < 3202400:
+        curs.execute(db_change("select data from other where name = 'update'"))
+        get_data = curs.fetchall()
+        if get_data and get_data[0][0] == 'master':
+            curs.execute(db_change("update other set data = 'beta' where name = 'update'"), [])
+
+    if ver_num < 3202600:
+        curs.execute(db_change("select name, regex, sub from filter"))
+        for i in curs.fetchall():
+            curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'regex_filter', ?, ?)"), [i[0], i[1], i[2]])
+
+        curs.execute(db_change("select title, link, icon from inter"))
+        for i in curs.fetchall():
+            curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'inter_wiki', ?, ?)"), [i[0], i[1], i[2]])
+
+    if ver_num < 3203400:
+        curs.execute(db_change("select user, css from custom"))
+        for i in curs.fetchall():
+            curs.execute(db_change("insert into user_set (name, id, data) values ('custom_css', ?, ?)"), [re.sub(r' \(head\)$', '', i[0]), i[1]])
+
+    if ver_num < 3205500:
+        curs.execute(db_change("select title, decu, dis, view, why from acl"))
+        for i in curs.fetchall():
+            curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[1], 'decu'])
+            curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[2], 'dis'])
+            curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[3], 'view'])
+            curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[4], 'why'])
+
+    if ver_num < 3300101:
+        # 캐시 초기화
+        curs.execute(db_change('delete from cache_data'))
+    
+    if ver_num < 3300301:
+        # regex_filter 오류 해결
+        curs.execute(db_change('delete from html_filter where kind = "regex_filter" and html is null'))
+        
+    if ver_num < 3302302:
+        # user이랑 user_set 테이블의 통합
+        curs.execute(db_change('select id, pw, acl, date, encode from user'))
+        for i in curs.fetchall():
+            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['pw', i[0], i[1]])
+            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['acl', i[0], i[2]])
+            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['date', i[0], i[3]])
+            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['encode', i[0], i[4]])
+            
+    if ver_num < 3400101:
+        # user_set이랑 user_application 테이블의 통합
+        curs.execute(db_change('select id, pw, date, encode, question, answer, ip, ua, email from user_application'))
+        for i in curs.fetchall():
+            sql_data = {}
+            sql_data['id'] = i[0]
+            sql_data['pw'] = i[1]
+            sql_data['date'] = i[2]
+            sql_data['encode'] = i[3]
+            sql_data['question'] = i[4]
+            sql_data['answer'] = i[5]
+            sql_data['ip'] = i[6]
+            sql_data['ua'] = i[7]
+            sql_data['email'] = i[8]
+            
+            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['application', i[0], json.dumps(sql_data)])
+    
+    if ver_num < 3500105:
+        curs.execute(db_change('delete from acl where title like "file:%" and data = "admin" and type like "decu%"'))
+        
+    if ver_num < 3500106:
+        curs.execute(db_change("select data from other where name = 'domain'"))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            db_data = db_data[0][0]
+            db_data = re.match(r'[^/]+\/\/([^/]+)', db_data)
+            if db_data:
+                db_data = db_data.group(1)
+                curs.execute(db_change("update other set data = ? where name = 'domain'"), [db_data])
+            else:
+                curs.execute(db_change("update other set data = '' where name = 'domain'"))
+
+    if ver_num < 3500107:
+        db_table_list = get_db_table_list()
+        for for_a in db_table_list:
+            for for_b in db_table_list[for_a]:
+                curs.execute(db_change("update " + for_a + " set " + for_b + " = '' where " + for_b + " is null"))
+                
+    if ver_num < 3500113:
+        db_table_list = get_db_table_list()
+        for for_a in db_table_list:
+            for for_b in db_table_list[for_a]:
+                curs.execute(db_change("update " + for_a + " set " + for_b + " = '' where " + for_b + " is null"))
+
+    if ver_num < 3500114:
+        curs.execute(db_change('delete from alarm'))
+
+    if ver_num < 3500354:
+        curs.execute(db_change("select data from other where name = 'robot'"))
+        db_data = curs.fetchall()
+        if db_data:
+            robot_default = '' + \
+                'User-agent: *\n' + \
+                'Disallow: /\n' + \
+                'Allow: /$\n' + \
+                'Allow: /image/\n' + \
+                'Allow: /views/\n' + \
+                'Allow: /w/' + \
+            ''
+            if db_data[0][0] == robot_default:
+                curs.execute(db_change("insert into other (name, data, coverage) values ('robot_default', 'on', '')"))
+
+    if ver_num < 3500355:
+        # other coverage 오류 해결
+        curs.execute(db_change("update other set coverage = '' where coverage is null"))
+
+    if ver_num < 3500358:
+        curs.execute(db_change("drop index history_index"))
+        curs.execute(db_change("create index history_index on history (title, ip)"))
+
+    if ver_num < 3500360:
+        # 마지막 편집 따로 기록하도록
+        # create_data['data_set'] = ['doc_name', 'doc_rev', 'set_name', 'set_data']
+        print("Update 3500360...")
+
+        curs.execute(db_change('delete from data_set where set_name = "last_edit"'))
+
+        curs.execute(db_change("select title from data"))
+        db_data = curs.fetchall()
+        for for_a in db_data:
+            curs.execute(db_change("select date from history where title = ? order by date desc limit 1"), [for_a[0]])
+            db_data_2 = curs.fetchall()
+            if db_data_2:
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'last_edit', ?)"), [for_a[0], db_data_2[0][0]])
+
+        curs.execute(db_change('delete from acl where title like "file:%" and data = "admin" and type like "decu%"'))
+
+        print("Update 3500360 complete")
+
+    if ver_num < 3500361:
+        # curs.execute(db_change('select id from user_set where name = "email" and data = ?'), [user_email])
+        curs.execute(db_change('select id from user_set where name = "email"'))
+        for db_data in curs.fetchall():
+            if ip_or_user(db_data[0]) == 1:
+                curs.execute(db_change('delete from user_set where id = ? and name = "email"'), [db_data[0]])
+
+    # create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
+    # create_data['rc'] = ['id', 'title', 'date', 'type']
+    if ver_num == 3500362:
+        curs.execute(db_change("drop index history_index"))
+        curs.execute(db_change("create index history_index on history (title, ip)"))
+
+    if ver_num < 3500365:
+        curs.execute(db_change("update back set data = '' where data is null"))
+
+    if ver_num < 3500371:
+        curs.execute(db_change("delete from user_notice"))
+        user_alarm_count = {}
+
+        curs.execute(db_change("select name, data, date from alarm"))
+        for db_data in curs.fetchall():
+            if db_data[0] in user_alarm_count:
+                user_alarm_count[db_data[0]] += 1
+            else:
+                user_alarm_count[db_data[0]] = 1
+
+            curs.execute(db_change('insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'), [str(user_alarm_count[db_data[0]]), db_data[0], db_data[1], db_data[2]])
+
+    if ver_num < 3500372:
+        # ID 글자 확인 호환용
         curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-힣0-9])', 'name', '', ''])
+
+    if ver_num < 3500373:
+        select_data = {}
+
+        curs.execute(db_change("select name, id, data from user_set where name = 'application'"))
+        for db_data in curs.fetchall():
+            select_data[db_data[1]] = db_data
+
+        curs.execute(db_change("delete from user_set where name = 'application'"))
+        
+        for db_data in select_data:
+            curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [select_data[db_data][1], select_data[db_data][0], select_data[db_data][2]])
+
+    if ver_num < 3500374:
+        # ban 오류 해결
+        curs.execute(db_change("update rb set ongoing = '' where ongoing is null"))
+        curs.execute(db_change("update rb set login = '' where login is null"))
+
+    if ver_num < 3500375:
+        curs.execute(db_change("select title, type, user from scan"))
+        for for_a in curs.fetchall():
+            type_data = 'watchlist' if for_a[1] == '' else 'star_doc'
+            curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [for_a[2], type_data, for_a[0]])
+
+    if ver_num < 3500376:
+        curs.execute(db_change("select doc_name, doc_rev from data_set where set_name = 'edit_request_data'"))
+        for for_a in curs.fetchall():
+            curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [for_a[0]])
+            get_data = curs.fetchall()
+            if get_data and (int(get_data[0][0]) + 1) == int(for_a[1]):
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_doing', '1')"), [for_a[0], for_a[1]])
+
+    conn.commit()
+
+    print('Update completed')
+
+def set_init_always(conn, ver_num):
+    global global_wiki_set
+
+    curs = conn.cursor()
+
+    curs.execute(db_change('delete from other where name = "ver"'))
+    curs.execute(db_change('insert into other (name, data, coverage) values ("ver", ?, "")'), [ver_num])
+    
+    curs.execute(db_change('delete from alist where name = "owner"'))
+    curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
+
+    if not os.path.exists(load_image_url(conn)):
+        os.makedirs(load_image_url(conn))
+
+    curs.execute(db_change('select data from other where name = "key"'))
+    if not curs.fetchall():
+        curs.execute(db_change('insert into other (name, data, coverage) values ("key", ?, "")'), [load_random_key()])
+        
+    curs.execute(db_change('select data from other where name = "salt_key"'))
+    if not curs.fetchall():
+        curs.execute(db_change('insert into other (name, data, coverage) values ("salt_key", ?, "")'), [load_random_key(4)])
+
+    curs.execute(db_change('select data from other where name = "count_all_title"'))
+    if not curs.fetchall():
+        curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", "0", "")'))
+        
+    curs.execute(db_change('select data from other where name = "wiki_access_password_need"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        curs.execute(db_change('select data from other where name = "wiki_access_password"'))
+        db_data = curs.fetchall()
+        if db_data:
+            global_wiki_set['wiki_access_password'] = db_data[0][0]
+    
+def set_init(conn):
+    curs = conn.cursor()
+
+    # 초기값 설정 함수    
+    curs.execute(db_change("select html from html_filter where kind = 'email'"))
+    if not curs.fetchall():
+        for i in ['naver.com', 'gmail.com', 'daum.net', 'kakao.com']:
+            curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'email', '', '')"), [i])
+
+    curs.execute(db_change("select html from html_filter where kind = 'extension'"))
+    if not curs.fetchall():
+        for i in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
+            curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'extension', '', '')"), [i])
+
+    curs.execute(db_change('select data from other where name = "smtp_server" or name = "smtp_port" or name = "smtp_security"'))
+    if not curs.fetchall():
+        for i in [['smtp_server', 'smtp.gmail.com'], ['smtp_port', '587'], ['smtp_security', 'starttls']]:
+            curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, '')"), [i[0], i[1]])
+
+    curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-힣0-9])', 'name', '', ''])
 
 # Func-simple
 ## Func-simple-without_DB
 def get_default_admin_group():
     return ['owner', 'user', 'ban']
 
-def get_default_robots_txt():
+def get_default_robots_txt(conn):
     data = '' + \
         'User-agent: *\n' + \
         'Disallow: /\n' + \
@@ -687,7 +684,7 @@ def get_default_robots_txt():
     if os.path.exists('sitemap.xml'):
         data += '' + \
             '\n' + \
-            'Sitemap: ' + load_domain('full') + '/sitemap.xml' + \
+            'Sitemap: ' + load_domain(conn, 'full') + '/sitemap.xml' + \
         ''
 
     return data
@@ -695,53 +692,53 @@ def get_default_robots_txt():
 def load_random_key(long = 128):
     return ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(long))
 
-def http_warning():
+def http_warning(conn):
     return '''
         <div id="opennamu_http_warning_text"></div>
-        <span style="display: none;" id="opennamu_http_warning_text_lang">''' + load_lang('http_warning') + '''</span>
+        <span style="display: none;" id="opennamu_http_warning_text_lang">''' + get_lang(conn, 'http_warning') + '''</span>
     '''
 
-def get_next_page_bottom(link, num, page, end = 50):
+def get_next_page_bottom(conn, link, num, page, end = 50):
     list_data = ''
 
     if num == 1:
         if len(page) == end:
             list_data += '' + \
                 '<hr class="main_hr">' + \
-                '<a href="' + link.format(str(num + 1)) + '">(' + load_lang('next') + ')</a>' + \
+                '<a href="' + link.format(str(num + 1)) + '">(' + get_lang(conn, 'next') + ')</a>' + \
             ''
     elif len(page) != end:
         list_data += '' + \
             '<hr class="main_hr">' + \
-            '<a href="' + link.format(str(num - 1)) + '">(' + load_lang('previous') + ')</a>' + \
+            '<a href="' + link.format(str(num - 1)) + '">(' + get_lang(conn, 'previous') + ')</a>' + \
         ''
     else:
         list_data += '' + \
             '<hr class="main_hr">' + \
-            '<a href="' + link.format(str(num - 1)) + '">(' + load_lang('previous') + ')</a> ' + \
-            '<a href="' + link.format(str(num + 1)) + '">(' + load_lang('next') + ')</a>' + \
+            '<a href="' + link.format(str(num - 1)) + '">(' + get_lang(conn, 'previous') + ')</a> ' + \
+            '<a href="' + link.format(str(num + 1)) + '">(' + get_lang(conn, 'next') + ')</a>' + \
         ''
 
     return list_data
 
-def next_fix(link, num, page, end = 50):
+def next_fix(conn, link, num, page, end = 50):
     list_data = ''
 
     if num == 1:
         if len(page) == end:
             list_data += '' + \
                 '<hr class="main_hr">' + \
-                '<a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>' + \
+                '<a href="' + link + str(num + 1) + '">(' + get_lang(conn, 'next') + ')</a>' + \
             ''
     elif len(page) != end:
         list_data += '' + \
             '<hr class="main_hr">' + \
-            '<a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a>' + \
+            '<a href="' + link + str(num - 1) + '">(' + get_lang(conn, 'previous') + ')</a>' + \
         ''
     else:
         list_data += '' + \
             '<hr class="main_hr">' + \
-            '<a href="' + link + str(num - 1) + '">(' + load_lang('previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + load_lang('next') + ')</a>' + \
+            '<a href="' + link + str(num - 1) + '">(' + get_lang(conn, 'previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + get_lang(conn, 'next') + ')</a>' + \
         ''
 
     return list_data
@@ -758,8 +755,8 @@ def number_check(data, f = 0):
     except:
         return '1'
     
-def redirect(data = '/'):
-    return flask.redirect(load_domain('full') + data)
+def redirect(conn, data = '/'):
+    return flask.redirect(load_domain(conn, 'full') + data)
     
 def get_acl_list(type_d = 'normal'):
     if type_d == 'user':
@@ -768,95 +765,92 @@ def get_acl_list(type_d = 'normal'):
         return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', 'ban_admin', 'not_all', 'up_to_level_3', 'up_to_level_10']
 
 ## Func-simple-with_DB
-def get_user_title_list(ip = ''):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def get_user_title_list(conn, ip = ''):
+    curs = conn.cursor()
 
-        ip = ip_check() if ip == '' else ip
+    ip = ip_check() if ip == '' else ip
 
-        # default
-        user_title = {
-            '' : load_lang('default'),
-            '🌳' : '🌳 newbie',
-        }
+    # default
+    user_title = {
+        '' : get_lang(conn, 'default'),
+        '🌳' : '🌳 newbie',
+    }
 
-        curs.execute(db_change('select name from user_set where id = ? and name = ?'), [ip, 'get_🥚'])
-        if curs.fetchall():
-            user_title['🥚'] = '🥚 easter_egg'
+    curs.execute(db_change('select name from user_set where id = ? and name = ?'), [ip, 'get_🥚'])
+    if curs.fetchall():
+        user_title['🥚'] = '🥚 easter_egg'
 
-        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_first_contribute', ip])
-        if curs.fetchall():
-            user_title['🔰'] = '🔰 first_contribute'
+    curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_first_contribute', ip])
+    if curs.fetchall():
+        user_title['🔰'] = '🔰 first_contribute'
 
-        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_tenth_contribute', ip])
-        if curs.fetchall():
-            user_title['📝'] = '📝 tenth_contribute'
+    curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_tenth_contribute', ip])
+    if curs.fetchall():
+        user_title['📝'] = '📝 tenth_contribute'
 
-        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_hundredth_contribute', ip])
-        if curs.fetchall():
-            user_title['🖊️'] = '🖊️ hundredth_contribute'
+    curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_hundredth_contribute', ip])
+    if curs.fetchall():
+        user_title['🖊️'] = '🖊️ hundredth_contribute'
 
-        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_thousandth_contribute', ip])
-        if curs.fetchall():
-            user_title['🏅'] = '🏅 thousandth_contribute'
+    curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_thousandth_contribute', ip])
+    if curs.fetchall():
+        user_title['🏅'] = '🏅 thousandth_contribute'
 
-        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_first_discussion', ip])
-        if curs.fetchall():
-            user_title['💬'] = '💬 first_discussion'
+    curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_first_discussion', ip])
+    if curs.fetchall():
+        user_title['💬'] = '💬 first_discussion'
 
-        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_tenth_discussion', ip])
-        if curs.fetchall():
-            user_title['💡'] = '💡 tenth_discussion'
+    curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_tenth_discussion', ip])
+    if curs.fetchall():
+        user_title['💡'] = '💡 tenth_discussion'
 
-        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_hundredth_discussion', ip])
-        if curs.fetchall():
-            user_title['📢'] = '📢 hundredth_discussion'
+    curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_hundredth_discussion', ip])
+    if curs.fetchall():
+        user_title['📢'] = '📢 hundredth_discussion'
 
-        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_thousandth_discussion', ip])
-        if curs.fetchall():
-            user_title['📜'] = '📜 thousandth_discussion'
+    curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_thousandth_discussion', ip])
+    if curs.fetchall():
+        user_title['📜'] = '📜 thousandth_discussion'
 
-        curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_admin', ip])
-        if curs.fetchall():
-            user_title['✅'] = '✅ admin'
-        
-        return user_title
+    curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_admin', ip])
+    if curs.fetchall():
+        user_title['✅'] = '✅ admin'
     
-def load_image_url():
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+    return user_title
+    
+def load_image_url(conn):
+    curs = conn.cursor()
 
-        curs.execute(db_change('select data from other where name = "image_where"'))
-        image_where = curs.fetchall()
-        image_where = image_where[0][0] if image_where else os.path.join('data', 'images')
-        
-        return image_where
+    curs.execute(db_change('select data from other where name = "image_where"'))
+    image_where = curs.fetchall()
+    image_where = image_where[0][0] if image_where else os.path.join('data', 'images')
+    
+    return image_where
 
-def load_domain(data_type = 'normal'):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-        
-        domain = ''
-        try:
-            sys_host = flask.request.host
-        except:
-            sys_host = ''
-        
-        if data_type == 'full':
-            curs.execute(db_change("select data from other where name = 'http_select'"))
-            db_data = curs.fetchall()
-            domain += db_data[0][0] if db_data and db_data[0][0] != '' else 'http'
-            domain += '://'
+def load_domain(conn, data_type = 'normal'):
+    curs = conn.cursor()
+    
+    domain = ''
+    try:
+        sys_host = flask.request.host
+    except:
+        sys_host = ''
+    
+    if data_type == 'full':
+        curs.execute(db_change("select data from other where name = 'http_select'"))
+        db_data = curs.fetchall()
+        domain += db_data[0][0] if db_data and db_data[0][0] != '' else 'http'
+        domain += '://'
 
-            curs.execute(db_change("select data from other where name = 'domain'"))
-            db_data = curs.fetchall()
-            domain += db_data[0][0] if db_data and db_data[0][0] != '' else sys_host
-        else:
-            curs.execute(db_change("select data from other where name = 'domain'"))
-            db_data = curs.fetchall()
-            domain += db_data[0][0] if db_data and db_data[0][0] != '' else sys_host
+        curs.execute(db_change("select data from other where name = 'domain'"))
+        db_data = curs.fetchall()
+        domain += db_data[0][0] if db_data and db_data[0][0] != '' else sys_host
+    else:
+        curs.execute(db_change("select data from other where name = 'domain'"))
+        db_data = curs.fetchall()
+        domain += db_data[0][0] if db_data and db_data[0][0] != '' else sys_host
 
-        return domain
+    return domain
 
 def get_tool_js_safe(data):
     data = data.replace('\n', '\\\\n')
@@ -866,95 +860,91 @@ def get_tool_js_safe(data):
 
     return data
 
-def edit_button():
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def edit_button(conn):
+    curs = conn.cursor()
 
-        insert_list = []
+    insert_list = []
 
-        curs.execute(db_change("select html, plus from html_filter where kind = 'edit_top'"))
-        db_data = curs.fetchall()
-        for get_data in db_data:
-            insert_list += [[get_data[1], get_data[0]]]
+    curs.execute(db_change("select html, plus from html_filter where kind = 'edit_top'"))
+    db_data = curs.fetchall()
+    for get_data in db_data:
+        insert_list += [[get_data[1], get_data[0]]]
 
-        data = ''
-        for insert_data in insert_list:
-            data += '<a href="javascript:do_insert_data(\'' + get_tool_js_safe(insert_data[0]) + '\');">(' + html.escape(insert_data[1]) + ')</a> '
+    data = ''
+    for insert_data in insert_list:
+        data += '<a href="javascript:do_insert_data(\'' + get_tool_js_safe(insert_data[0]) + '\');">(' + html.escape(insert_data[1]) + ')</a> '
 
-        data += (' ' if data != '' else '') + '<a href="/filter/edit_top">(' + load_lang('add') + ')</a>'
-        data += '<hr class="main_hr">'
-        
-        return data
+    data += (' ' if data != '' else '') + '<a href="/filter/edit_top">(' + get_lang(conn, 'add') + ')</a>'
+    data += '<hr class="main_hr">'
+    
+    return data
 
-def ip_warning():
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def ip_warning(conn):
+    curs = conn.cursor()
 
-        if ip_or_user() != 0:
-            curs.execute(db_change('select data from other where name = "no_login_warning"'))
-            data = curs.fetchall()
-            if data and data[0][0] != '':
-                text_data = '' + \
-                    '<span>' + data[0][0] + '</span>' + \
-                    '<hr class="main_hr">' + \
-                ''
-            else:
-                text_data = '' + \
-                    '<span>' + load_lang('no_login_warning') + '</span>' + \
-                    '<hr class="main_hr">' + \
-                ''
+    if ip_or_user() != 0:
+        curs.execute(db_change('select data from other where name = "no_login_warning"'))
+        data = curs.fetchall()
+        if data and data[0][0] != '':
+            text_data = '' + \
+                '<span>' + data[0][0] + '</span>' + \
+                '<hr class="main_hr">' + \
+            ''
         else:
-            text_data = ''
+            text_data = '' + \
+                '<span>' + get_lang(conn, 'no_login_warning') + '</span>' + \
+                '<hr class="main_hr">' + \
+            ''
+    else:
+        text_data = ''
 
-        return text_data
+    return text_data
     
 # Func-login    
-def pw_encode(data, db_data_encode = ''):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def pw_encode(conn, data, db_data_encode = ''):
+    curs = conn.cursor()
 
-        if db_data_encode == '':
-            curs.execute(db_change('select data from other where name = "encode"'))
-            db_data = curs.fetchall()
-            db_data_encode = db_data[0][0] if db_data else 'sha3'
-
-        if db_data_encode == 'sha256':
-            return hashlib.sha256(bytes(data, 'utf-8')).hexdigest()
-        elif db_data_encode == 'sha3':
-            return hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
-        elif db_data_encode == 'sha3-512':
-            return hashlib.sha3_512(bytes(data, 'utf-8')).hexdigest()
-        else:
-            curs.execute(db_change('select data from other where name = "salt_key"'))
-            db_data = curs.fetchall()
-            db_data_salt = db_data[0][0] if db_data else ''
-            
-            if db_data_encode == 'sha3-salt':
-                return hashlib.sha3_256(bytes(data + db_data_salt, 'utf-8')).hexdigest()
-            else:
-                return hashlib.sha3_512(bytes(data + db_data_salt, 'utf-8')).hexdigest()
-
-def pw_check(data, data2, type_d = 'no', id_d = ''):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
+    if db_data_encode == '':
         curs.execute(db_change('select data from other where name = "encode"'))
         db_data = curs.fetchall()
-        load_set_data = db_data[0][0] if db_data and db_data[0][0] != '' else 'sha3'
+        db_data_encode = db_data[0][0] if db_data else 'sha3'
+
+    if db_data_encode == 'sha256':
+        return hashlib.sha256(bytes(data, 'utf-8')).hexdigest()
+    elif db_data_encode == 'sha3':
+        return hashlib.sha3_256(bytes(data, 'utf-8')).hexdigest()
+    elif db_data_encode == 'sha3-512':
+        return hashlib.sha3_512(bytes(data, 'utf-8')).hexdigest()
+    else:
+        curs.execute(db_change('select data from other where name = "salt_key"'))
+        db_data = curs.fetchall()
+        db_data_salt = db_data[0][0] if db_data else ''
         
-        set_data = load_set_data
-        if type_d != 'no':
-            set_data = 'sha3' if type_d == '' else type_d
+        if db_data_encode == 'sha3-salt':
+            return hashlib.sha3_256(bytes(data + db_data_salt, 'utf-8')).hexdigest()
+        else:
+            return hashlib.sha3_512(bytes(data + db_data_salt, 'utf-8')).hexdigest()
 
-        re_data = 1 if pw_encode(data, set_data) == data2 else 0
-        if load_set_data != set_data and re_data == 1 and id_d != '':
-            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [pw_encode(data), id_d])
-            curs.execute(db_change("update user_set set data = ? where id = ? and name = 'encode'"), [load_set_data, id_d])
+def pw_check(conn, data, data2, type_d = 'no', id_d = ''):
+    curs = conn.cursor()
 
-        return re_data
+    curs.execute(db_change('select data from other where name = "encode"'))
+    db_data = curs.fetchall()
+    load_set_data = db_data[0][0] if db_data and db_data[0][0] != '' else 'sha3'
+    
+    set_data = load_set_data
+    if type_d != 'no':
+        set_data = 'sha3' if type_d == '' else type_d
+
+    re_data = 1 if pw_encode(conn, data, set_data) == data2 else 0
+    if load_set_data != set_data and re_data == 1 and id_d != '':
+        curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [pw_encode(conn, data), id_d])
+        curs.execute(db_change("update user_set set data = ? where id = ? and name = 'encode'"), [load_set_data, id_d])
+
+    return re_data
         
 # Func-skin
-def easy_minify(data, tool = None):
+def easy_minify(conn, data, tool = None):
     # without_DB
     if 'wiki_access_password' in global_wiki_set:
         access_password = global_wiki_set['wiki_access_password']
@@ -964,90 +954,93 @@ def easy_minify(data, tool = None):
             
         return '''
             <script src="/views/main_css/js/route/wiki_access_password.js''' + cache_v() + '''"></script>
-            <h2>''' + load_lang('error_password_require_for_wiki_access') + '''</h2>
+            <h2>''' + get_lang(conn, 'error_password_require_for_wiki_access') + '''</h2>
             <input type="password" id="wiki_access">
             <input type="submit" onclick="opennamu_do_wiki_access();">
         '''
     else:
         return data
 
-def load_lang(data, safe = 0):
+def get_lang(conn, data, safe = 0):
     global global_lang
 
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+    curs = conn.cursor()
 
-        ip = ip_check()
-        if ip_or_user(ip) == 0:
-            curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip])
-            rep_data = curs.fetchall()                    
-        elif 'lang' in flask.session:
-            rep_data = [[flask.session['lang']]]
-        else:
-            curs.execute(db_change("select data from other where name = 'language'"))
-            rep_data = curs.fetchall()
+    ip = ip_check()
+    if ip_or_user(ip) == 0:
+        curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip])
+        rep_data = curs.fetchall()                    
+    elif 'lang' in flask.session:
+        rep_data = [[flask.session['lang']]]
+    else:
+        curs.execute(db_change("select data from other where name = 'language'"))
+        rep_data = curs.fetchall()
 
-        if not rep_data or rep_data[0][0] in ('', 'default'):
-            curs.execute(db_change("select data from other where name = 'language'"))
-            rep_data = curs.fetchall()
+    if not rep_data or rep_data[0][0] in ('', 'default'):
+        curs.execute(db_change("select data from other where name = 'language'"))
+        rep_data = curs.fetchall()
 
-        if rep_data:
-            lang_name = rep_data[0][0]
-        else:
-            lang_name = 'en-US'
-            
-        if lang_name in global_lang:
-            lang = global_lang[lang_name]
-        else:
-            lang_list = os.listdir('lang')
-            if (lang_name + '.json') in lang_list:
-                lang = json.loads(open(os.path.join('lang', lang_name + '.json'), encoding = 'utf8').read())
-                global_lang[lang_name] = lang
-            else:
-                lang = {}
-
-        if data in lang:
-            if safe == 1:
-                return lang[data] 
-            else:
-                return html.escape(lang[data])
-
-        return html.escape(data + ' (' + lang_name + ')')
-
-def skin_check(set_n = 0):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        # 개편 필요?
-        skin_list = load_skin('ringo', 1)
-        skin = skin_list[0]
-        ip = ip_check()
+    if rep_data:
+        lang_name = rep_data[0][0]
+    else:
+        lang_name = 'en-US'
         
-        user_need_skin = ''
-        if ip_or_user(ip) == 0:
-            curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
-            skin_exist = curs.fetchall()
-            if skin_exist:
-                user_need_skin = skin_exist[0][0]            
+    if lang_name in global_lang:
+        lang = global_lang[lang_name]
+    else:
+        lang_list = os.listdir('lang')
+        if (lang_name + '.json') in lang_list:
+            lang = json.loads(open(os.path.join('lang', lang_name + '.json'), encoding = 'utf8').read())
+            global_lang[lang_name] = lang
         else:
-            if 'skin' in flask.session:
-                user_need_skin = flask.session['skin']
+            lang = {}
 
-        user_need_skin = '' if user_need_skin == 'default' else user_need_skin
-
-        if user_need_skin == '':
-            curs.execute(db_change('select data from other where name = "skin"'))
-            skin_exist = curs.fetchall()
-            if skin_exist:
-                user_need_skin = skin_exist[0][0]
-        
-        if user_need_skin != '' and user_need_skin in skin_list:
-            skin = user_need_skin
-
-        if set_n == 0:
-            return './views/' + skin + '/index.html'
+    if data in lang:
+        if safe == 1:
+            return lang[data] 
         else:
-            return skin
+            return html.escape(lang[data])
+
+    return html.escape(data + ' (' + lang_name + ')')
+
+# 하위 호환용
+def load_lang(data, safe = 0):
+    with get_db_connect() as conn:
+        return get_lang(conn, data, safe)
+
+def skin_check(conn, set_n = 0):
+    curs = conn.cursor()
+
+    # 개편 필요?
+    skin_list = load_skin(conn, 'ringo', 1)
+    skin = skin_list[0]
+    ip = ip_check()
+    
+    user_need_skin = ''
+    if ip_or_user(ip) == 0:
+        curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
+        skin_exist = curs.fetchall()
+        if skin_exist:
+            user_need_skin = skin_exist[0][0]            
+    else:
+        if 'skin' in flask.session:
+            user_need_skin = flask.session['skin']
+
+    user_need_skin = '' if user_need_skin == 'default' else user_need_skin
+
+    if user_need_skin == '':
+        curs.execute(db_change('select data from other where name = "skin"'))
+        skin_exist = curs.fetchall()
+        if skin_exist:
+            user_need_skin = skin_exist[0][0]
+    
+    if user_need_skin != '' and user_need_skin in skin_list:
+        skin = user_need_skin
+
+    if set_n == 0:
+        return './views/' + skin + '/index.html'
+    else:
+        return skin
     
 def cache_v():
     return '.cache_v216'
@@ -1138,153 +1131,151 @@ def cut_100(data):
     else:
         return ''
 
-def wiki_set(num = 1):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def wiki_set(conn, num = 1):
+    curs = conn.cursor()
 
-        ip = ip_check()
-        skin_name = skin_check(1)
-        data_list = []
+    ip = ip_check()
+    skin_name = skin_check(conn, 1)
+    data_list = []
 
-        curs.execute(db_change('select data from other where name = ?'), ['name'])
+    curs.execute(db_change('select data from other where name = ?'), ['name'])
+    db_data = curs.fetchall()
+    data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['Wiki']
+
+    curs.execute(db_change('select data from other where name = "license"'))
+    db_data = curs.fetchall()
+    data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['ARR']
+
+    data_list += ['', '']
+
+    curs.execute(db_change('select data from other where name = "logo" and coverage = ?'), [skin_name])
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        data_list += [db_data[0][0]]
+    else:
+        curs.execute(db_change('select data from other where name = "logo" and coverage = ""'))
         db_data = curs.fetchall()
-        data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['Wiki']
+        data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else [data_list[0]]
 
-        curs.execute(db_change('select data from other where name = "license"'))
-        db_data = curs.fetchall()
-        data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['ARR']
+    head_data = ''
 
-        data_list += ['', '']
+    curs.execute(db_change("select data from other where name = 'head' and coverage = ''"))
+    db_data = curs.fetchall()
+    head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
 
-        curs.execute(db_change('select data from other where name = "logo" and coverage = ?'), [skin_name])
-        db_data = curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            data_list += [db_data[0][0]]
+    curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
+    db_data = curs.fetchall()
+    head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
+
+    data_list += [head_data]
+
+    curs.execute(db_change("select data from other where name = 'top_menu'"))
+    db_data = curs.fetchall()
+    db_data = db_data[0][0] if db_data else ''
+    db_data = db_data.replace('\r', '')
+    
+    curs.execute(db_change("select data from user_set where name = 'top_menu' and id = ?"), [ip])
+    db_data_2 = curs.fetchall()
+    db_data_2 = db_data_2[0][0] if db_data_2 else ''
+    db_data_2 = db_data_2.replace('\r', '')
+    if db_data_2 != '' and db_data != '':
+        db_data += '\n' + db_data_2
+    elif db_data_2 != '':
+        db_data += db_data_2
+    
+    if db_data != '':
+        db_data = db_data.split('\n')
+    
+        if len(db_data) % 2 != 0:
+            db_data += ['']
+
+        db_data = [[db_data[for_a], db_data[for_a + 1]] for for_a in range(0, len(db_data), 2)]
+
+    data_list += [db_data]
+
+    return data_list
+
+def wiki_custom(conn):
+    curs = conn.cursor()
+
+    ip = ip_check()
+    skin_name = '_' + skin_check(conn, 1)
+
+    if ip_or_user(ip) == 0:
+        user_icon = 1
+        user_name = ip
+
+        if 'head' in flask.session:
+            user_head = flask.session['head']
         else:
-            curs.execute(db_change('select data from other where name = "logo" and coverage = ""'))
+            curs.execute(db_change("select data from user_set where id = ? and name = 'custom_css'"), [ip])
             db_data = curs.fetchall()
-            data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else [data_list[0]]
+            user_head = db_data[0][0] if db_data else ''
 
-        head_data = ''
+            flask.session['head'] = db_data[0][0] if db_data else ''
 
-        curs.execute(db_change("select data from other where name = 'head' and coverage = ''"))
-        db_data = curs.fetchall()
-        head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
-
-        curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
-        db_data = curs.fetchall()
-        head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
-
-        data_list += [head_data]
-
-        curs.execute(db_change("select data from other where name = 'top_menu'"))
-        db_data = curs.fetchall()
-        db_data = db_data[0][0] if db_data else ''
-        db_data = db_data.replace('\r', '')
-        
-        curs.execute(db_change("select data from user_set where name = 'top_menu' and id = ?"), [ip])
-        db_data_2 = curs.fetchall()
-        db_data_2 = db_data_2[0][0] if db_data_2 else ''
-        db_data_2 = db_data_2.replace('\r', '')
-        if db_data_2 != '' and db_data != '':
-            db_data += '\n' + db_data_2
-        elif db_data_2 != '':
-            db_data += db_data_2
-        
-        if db_data != '':
-            db_data = db_data.split('\n')
-        
-            if len(db_data) % 2 != 0:
-                db_data += ['']
-
-            db_data = [[db_data[for_a], db_data[for_a + 1]] for for_a in range(0, len(db_data), 2)]
-
-        data_list += [db_data]
-
-        return data_list
-
-def wiki_custom():
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        ip = ip_check()
-        skin_name = '_' + skin_check(1)
-
-        if ip_or_user(ip) == 0:
-            user_icon = 1
-            user_name = ip
-
-            if 'head' in flask.session:
-                user_head = flask.session['head']
-            else:
-                curs.execute(db_change("select data from user_set where id = ? and name = 'custom_css'"), [ip])
-                db_data = curs.fetchall()
-                user_head = db_data[0][0] if db_data else ''
-
-                flask.session['head'] = db_data[0][0] if db_data else ''
-
-            if 'head' + skin_name in flask.session:
-                user_head += flask.session['head' + skin_name]
-            else:
-                curs.execute(db_change("select data from user_set where id = ? and name = ?"), [ip, 'custom_css' + skin_name])
-                db_data = curs.fetchall()
-                user_head += db_data[0][0] if db_data else ''
-
-                flask.session['head' + skin_name] = db_data[0][0] if db_data else ''
-            
-            curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
-            email = curs.fetchall()
-            email = email[0][0] if email else ''
-
-            if admin_check('all') == 1:
-                user_admin = '1'
-
-                curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
-                curs.execute(db_change('select acl from alist where name = ?'), [curs.fetchall()[0][0]])
-                user_acl = curs.fetchall()
-                user_acl_list = [for_a[0] for for_a in user_acl]
-                user_acl_list = user_acl_list if user_acl_list != [] else '0'
-            else:
-                user_admin = '0'
-                user_acl_list = '0'
-
-            curs.execute(db_change("select count(*) from user_notice where name = ? and readme = ''"), [ip])
-            count = curs.fetchall()
-            user_notice = str(count[0][0]) if count else '0'
+        if 'head' + skin_name in flask.session:
+            user_head += flask.session['head' + skin_name]
         else:
-            user_icon = 0
-            user_name = load_lang('user')
-            email = ''
+            curs.execute(db_change("select data from user_set where id = ? and name = ?"), [ip, 'custom_css' + skin_name])
+            db_data = curs.fetchall()
+            user_head += db_data[0][0] if db_data else ''
+
+            flask.session['head' + skin_name] = db_data[0][0] if db_data else ''
+        
+        curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
+        email = curs.fetchall()
+        email = email[0][0] if email else ''
+
+        if admin_check(conn, 'all') == 1:
+            user_admin = '1'
+
+            curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
+            curs.execute(db_change('select acl from alist where name = ?'), [curs.fetchall()[0][0]])
+            user_acl = curs.fetchall()
+            user_acl_list = [for_a[0] for for_a in user_acl]
+            user_acl_list = user_acl_list if user_acl_list != [] else '0'
+        else:
             user_admin = '0'
             user_acl_list = '0'
-            user_notice = '0'
-            user_head = flask.session['head'] if 'head' in flask.session else ''
-            user_head += flask.session['head' + skin_name] if 'head' + skin_name in flask.session else ''
 
-        curs.execute(db_change("select title from rd where title = ? and stop = ''"), ['user:' + ip])
-        user_topic = '1' if curs.fetchall() else '0'
-        
-        split_path = flask.request.path.split('/')
-        split_path = split_path[1:] if len(split_path) > 1 else 0
+        curs.execute(db_change("select count(*) from user_notice where name = ? and readme = ''"), [ip])
+        count = curs.fetchall()
+        user_notice = str(count[0][0]) if count else '0'
+    else:
+        user_icon = 0
+        user_name = get_lang(conn, 'user')
+        email = ''
+        user_admin = '0'
+        user_acl_list = '0'
+        user_notice = '0'
+        user_head = flask.session['head'] if 'head' in flask.session else ''
+        user_head += flask.session['head' + skin_name] if 'head' + skin_name in flask.session else ''
 
-        return [
-            '',
-            '',
-            user_icon,
-            user_head,
-            email,
-            user_name,
-            user_admin,
-            str(ban_check()[0]),
-            user_notice,
-            user_acl_list,
-            ip,
-            user_topic,
-            split_path,
-            level_check(ip)
-        ]
+    curs.execute(db_change("select title from rd where title = ? and stop = ''"), ['user:' + ip])
+    user_topic = '1' if curs.fetchall() else '0'
+    
+    split_path = flask.request.path.split('/')
+    split_path = split_path[1:] if len(split_path) > 1 else 0
 
-def load_skin(data = '', set_n = 0, default = 0):
+    return [
+        '',
+        '',
+        user_icon,
+        user_head,
+        email,
+        user_name,
+        user_admin,
+        str(ban_check(conn)[0]),
+        user_notice,
+        user_acl_list,
+        ip,
+        user_topic,
+        split_path,
+        level_check(conn, ip)
+    ]
+
+def load_skin(conn, data = '', set_n = 0, default = 0):
     # without_DB
 
     # data -> 가장 앞에 있을 스킨 이름
@@ -1306,7 +1297,7 @@ def load_skin(data = '', set_n = 0, default = 0):
         if skin_data != 'default':
             see_data = skin_data
         else:
-            see_data = load_lang('default')
+            see_data = get_lang(conn, 'default')
 
         if skin_data != 'main_css':
             if set_n == 0:
@@ -1331,107 +1322,106 @@ def load_skin(data = '', set_n = 0, default = 0):
     return skin_return_data
 
 # Func-markup
-def render_set(doc_name = '', doc_data = '', data_type = 'view', markup = ''):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = ''):
+    curs = conn.cursor()
 
-        # data_type in ['view', 'from', 'thread', 'api_view', 'api_thread', 'api_include', 'backlink']
-        # data_type을 list 형식으로 개편 필요할 듯
+    # data_type in ['view', 'from', 'thread', 'api_view', 'api_thread', 'api_include', 'backlink']
+    # data_type을 list 형식으로 개편 필요할 듯
 
-        return_type = True
-        if data_type in ['api_view', 'api_thread', 'api_include']:
-            return_type = False
+    return_type = True
+    if data_type in ['api_view', 'api_thread', 'api_include']:
+        return_type = False
 
-        if data_type == '':
-            data_type = 'view'
-        elif data_type == 'api_view':
-            data_type = 'view'
-        elif data_type == 'api_thread':
-            data_type = 'thread'
-        elif data_type == 'api_include':
-            data_type = 'include'
+    if data_type == '':
+        data_type = 'view'
+    elif data_type == 'api_view':
+        data_type = 'view'
+    elif data_type == 'api_thread':
+        data_type = 'thread'
+    elif data_type == 'api_include':
+        data_type = 'include'
 
-        doc_data = '' if doc_data == None else doc_data
+    doc_data = '' if doc_data == None else doc_data
 
-        ip = ip_check()
-        render_lang_data = {
-            'toc' : load_lang('toc'),
-            'category' : load_lang('category')
-        }
+    ip = ip_check()
+    render_lang_data = {
+        'toc' : get_lang(conn, 'toc'),
+        'category' : get_lang(conn, 'category')
+    }
 
-        curs.execute(db_change('select data from other where name = "category_text"'))
-        db_data = curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            render_lang_data['category'] = db_data[0][0]
+    curs.execute(db_change('select data from other where name = "category_text"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        render_lang_data['category'] = db_data[0][0]
 
-        get_class_render = class_do_render(conn, render_lang_data, markup).do_render(doc_name, doc_data, data_type)
-        if data_type == 'backlink':
-            return ''
+    get_class_render = class_do_render(conn, render_lang_data, markup).do_render(doc_name, doc_data, data_type)
+    if data_type == 'backlink':
+        return ''
 
-        get_class_render[0] = '<div class="opennamu_render_complete">' + get_class_render[0] + '</div>'
+    get_class_render[0] = '<div class="opennamu_render_complete">' + get_class_render[0] + '</div>'
 
-        font_size_set_data = get_main_skin_set(curs, flask.session, 'main_css_font_size', ip)
-        if font_size_set_data != 'default':
-            font_size_set_data = number_check(font_size_set_data)
+    font_size_set_data = get_main_skin_set(curs, flask.session, 'main_css_font_size', ip)
+    if font_size_set_data != 'default':
+        font_size_set_data = number_check(font_size_set_data)
 
-            get_class_render[0] = '' + \
-                '''<style>
-                    .opennamu_render_complete {
-                        font-size: ''' + font_size_set_data + '''px !important;
-                    }
-                </style>''' + \
-            '' + get_class_render[0]
+        get_class_render[0] = '' + \
+            '''<style>
+                .opennamu_render_complete {
+                    font-size: ''' + font_size_set_data + '''px !important;
+                }
+            </style>''' + \
+        '' + get_class_render[0]
 
-        curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
-        db_data = curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            get_class_render[0] = '' + \
-                '''<style>
-                    .opennamu_render_complete {
-                        font-size: 15px !important;
-                        line-height: 1.5;
-                    }
+    curs.execute(db_change("select data from other where name = 'namumark_compatible'"))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        get_class_render[0] = '' + \
+            '''<style>
+                .opennamu_render_complete {
+                    font-size: 15px !important;
+                    line-height: 1.5;
+                }
 
-                    .opennamu_render_complete td {
-                        padding: 5px 10px !important;
-                    }
+                .opennamu_render_complete td {
+                    padding: 5px 10px !important;
+                }
 
-                    .opennamu_render_complete summary {
-                        list-style: none !important;
-                        font-weight: bold !important;
-                    }
-                </style>''' + \
-            '' + get_class_render[0]
+                .opennamu_render_complete summary {
+                    list-style: none !important;
+                    font-weight: bold !important;
+                }
+            </style>''' + \
+        '' + get_class_render[0]
 
-        table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip)
-        if table_set_data == 'on':
-            get_class_render[0] = '<style>.table_safe { overflow-x: scroll; white-space: nowrap; }</style>' + get_class_render[0]
+    table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip)
+    if table_set_data == 'on':
+        get_class_render[0] = '<style>.table_safe { overflow-x: scroll; white-space: nowrap; }</style>' + get_class_render[0]
 
-        joke_set_data = get_main_skin_set(curs, flask.session, 'main_css_view_joke', ip)
-        if joke_set_data == 'off':
-            get_class_render[0] = '<style>.opennamu_joke { display: none; }</style>' + get_class_render[0]
+    joke_set_data = get_main_skin_set(curs, flask.session, 'main_css_view_joke', ip)
+    if joke_set_data == 'off':
+        get_class_render[0] = '<style>.opennamu_joke { display: none; }</style>' + get_class_render[0]
 
-        math_set_data = get_main_skin_set(curs, flask.session, 'main_css_math_scroll', ip)
-        if math_set_data == 'on':
-            get_class_render[0] = '<style>.katex .base { overflow-x: scroll; }</style>' + get_class_render[0]
+    math_set_data = get_main_skin_set(curs, flask.session, 'main_css_math_scroll', ip)
+    if math_set_data == 'on':
+        get_class_render[0] = '<style>.katex .base { overflow-x: scroll; }</style>' + get_class_render[0]
 
-        transparent_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_transparent', ip)
-        if transparent_set_data == 'on':
-            get_class_render[0] = '' + \
-                '''<style>
-                    .table_safe td {
-                        background: transparent !important;
-                        color: inherit !important;
-                    }
-                </style>''' + \
-            '' + get_class_render[0]
+    transparent_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_transparent', ip)
+    if transparent_set_data == 'on':
+        get_class_render[0] = '' + \
+            '''<style>
+                .table_safe td {
+                    background: transparent !important;
+                    color: inherit !important;
+                }
+            </style>''' + \
+        '' + get_class_render[0]
 
-        if not return_type:
-            return [get_class_render[0], get_class_render[1]]
-        else:
-            return get_class_render[0] + '<script>' + get_class_render[1] + '</script>'
+    if not return_type:
+        return [get_class_render[0], get_class_render[1]]
+    else:
+        return get_class_render[0] + '<script>' + get_class_render[1] + '</script>'
         
-def render_simple_set(data):
+def render_simple_set(conn, data):
     # without_DB
 
     toc_data = ''
@@ -1442,7 +1432,7 @@ def render_simple_set(data):
     if toc_search_data:
         toc_data += '''
             <div class="opennamu_TOC" id="toc">
-                <span class="opennamu_TOC_title">''' + load_lang('toc') + '''</span>
+                <span class="opennamu_TOC_title">''' + get_lang(conn, 'toc') + '''</span>
                 <br>
         '''
     
@@ -1497,215 +1487,211 @@ def render_simple_set(data):
     return data
 
 # Func-request
-def send_email(who, title, data):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def send_email(conn, who, title, data):
+    curs = conn.cursor()
 
-        curs.execute(db_change('' + \
-            'select name, data from other ' + \
-            'where name = "smtp_email" or name = "smtp_pass" or name = "smtp_server" or name = "smtp_port" or name = "smtp_security"' + \
-        ''))
-        rep_data = curs.fetchall()
+    curs.execute(db_change('' + \
+        'select name, data from other ' + \
+        'where name = "smtp_email" or name = "smtp_pass" or name = "smtp_server" or name = "smtp_port" or name = "smtp_security"' + \
+    ''))
+    rep_data = curs.fetchall()
 
-        smtp_email = ''
-        smtp_pass = ''
-        smtp_server = ''
-        smtp_security = ''
-        smtp_port = ''
-        smtp = ''
+    smtp_email = ''
+    smtp_pass = ''
+    smtp_server = ''
+    smtp_security = ''
+    smtp_port = ''
+    smtp = ''
 
-        for i in rep_data:
-            if i[0] == 'smtp_email':
-                smtp_email = i[1]
-            elif i[0] == 'smtp_pass':
-                smtp_pass = i[1]
-            elif i[0] == 'smtp_server':
-                smtp_server = i[1]
-            elif i[0] == 'smtp_security':
-                smtp_security = i[1]
-            elif i[0] == 'smtp_port':
-                smtp_port = i[1]
+    for i in rep_data:
+        if i[0] == 'smtp_email':
+            smtp_email = i[1]
+        elif i[0] == 'smtp_pass':
+            smtp_pass = i[1]
+        elif i[0] == 'smtp_server':
+            smtp_server = i[1]
+        elif i[0] == 'smtp_security':
+            smtp_security = i[1]
+        elif i[0] == 'smtp_port':
+            smtp_port = i[1]
+    
+    smtp_port = int(number_check(smtp_port))
+    if smtp_security == 'plain':
+        smtp = smtplib.SMTP(smtp_server, smtp_port)
+    elif smtp_security == 'starttls':
+        smtp = smtplib.SMTP(smtp_server, smtp_port)
+        smtp.starttls()
+    else:
+        # if smtp_security == 'tls':
+        smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
         
-        smtp_port = int(number_check(smtp_port))
-        if smtp_security == 'plain':
-            smtp = smtplib.SMTP(smtp_server, smtp_port)
-        elif smtp_security == 'starttls':
-            smtp = smtplib.SMTP(smtp_server, smtp_port)
-            smtp.starttls()
-        else:
-            # if smtp_security == 'tls':
-            smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
-            
-        domain = load_domain()
-        wiki_name = wiki_set()[0]
+    domain = load_domain(conn)
+    wiki_name = wiki_set(conn)[0]
+    
+    msg = email.mime.text.MIMEText(data)
+
+    msg['Subject'] = title
+    msg['From'] = wiki_name + ' <noreply@' + domain + '>'
+    msg['To'] = who
+
+    try:
+        smtp.login(smtp_email, smtp_pass)
         
-        msg = email.mime.text.MIMEText(data)
+        smtp.sendmail('openNAMU@' + domain, who, msg.as_string())
+        smtp.quit()
 
-        msg['Subject'] = title
-        msg['From'] = wiki_name + ' <noreply@' + domain + '>'
-        msg['To'] = who
+        return 1
+    except Exception as e:
+        print('Error : email send error')
+        print(e)
 
-        try:
-            smtp.login(smtp_email, smtp_pass)
-            
-            smtp.sendmail('openNAMU@' + domain, who, msg.as_string())
-            smtp.quit()
+        return 0
 
-            return 1
-        except Exception as e:
-            print('Error : email send error')
-            print(e)
+def captcha_get(conn):
+    curs = conn.cursor()
 
-            return 0
-
-def captcha_get():
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        data = ''
+    data = ''
+    
+    if acl_check(conn, None, 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
+        pass
+    elif acl_check(conn, None, 'recaptcha') == 1:
+        curs.execute(db_change('select data from other where name = "recaptcha"'))
+        recaptcha = curs.fetchall()
         
-        if acl_check(None, 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
-            pass
-        elif acl_check(None, 'recaptcha') == 1:
-            curs.execute(db_change('select data from other where name = "recaptcha"'))
-            recaptcha = curs.fetchall()
-            
-            curs.execute(db_change('select data from other where name = "sec_re"'))
-            sec_re = curs.fetchall()
-            
-            curs.execute(db_change('select data from other where name = "recaptcha_ver"'))
-            rec_ver = curs.fetchall()
-            if recaptcha and recaptcha[0][0] != '' and sec_re and sec_re[0][0] != '':
-                if not rec_ver or rec_ver[0][0] == '':
-                    data += '' + \
-                        '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + \
-                        '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
-                        '<hr class="main_hr">' + \
-                    ''
-                elif rec_ver[0][0] == 'v3':
-                    data += '' + \
-                        '<script src="https://www.google.com/recaptcha/api.js?render=' + recaptcha[0][0] + '"></script>' + \
-                        '<input type="hidden" id="g-recaptcha" name="g-recaptcha">' + \
-                        '<script type="text/javascript">' + \
-                            'grecaptcha.ready(function() {' + \
-                                'grecaptcha.execute(\'' + recaptcha[0][0] + '\', {action: \'homepage\'}).then(function(token) {' + \
-                                    'document.getElementById(\'g-recaptcha\').value = token;' + \
-                                '});' + \
+        curs.execute(db_change('select data from other where name = "sec_re"'))
+        sec_re = curs.fetchall()
+        
+        curs.execute(db_change('select data from other where name = "recaptcha_ver"'))
+        rec_ver = curs.fetchall()
+        if recaptcha and recaptcha[0][0] != '' and sec_re and sec_re[0][0] != '':
+            if not rec_ver or rec_ver[0][0] == '':
+                data += '' + \
+                    '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + \
+                    '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
+                    '<hr class="main_hr">' + \
+                ''
+            elif rec_ver[0][0] == 'v3':
+                data += '' + \
+                    '<script src="https://www.google.com/recaptcha/api.js?render=' + recaptcha[0][0] + '"></script>' + \
+                    '<input type="hidden" id="g-recaptcha" name="g-recaptcha">' + \
+                    '<script type="text/javascript">' + \
+                        'grecaptcha.ready(function() {' + \
+                            'grecaptcha.execute(\'' + recaptcha[0][0] + '\', {action: \'homepage\'}).then(function(token) {' + \
+                                'document.getElementById(\'g-recaptcha\').value = token;' + \
                             '});' + \
-                        '</script>' + \
-                    ''
-                elif rec_ver[0][0] == 'cf':
-                    data += '' + \
-                        '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha" async defer></script>' + \
-                        '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
-                        '<hr class="main_hr">' + \
-                    ''
-                else:
-                    # rec_ver[0][0] == 'h'
-                    data += '''
-                        <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-                        <div class="h-captcha" data-sitekey="''' + recaptcha[0][0] + '''"></div>
-                        <hr class="main_hr">
-                    '''
+                        '});' + \
+                    '</script>' + \
+                ''
+            elif rec_ver[0][0] == 'cf':
+                data += '' + \
+                    '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha" async defer></script>' + \
+                    '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
+                    '<hr class="main_hr">' + \
+                ''
+            else:
+                # rec_ver[0][0] == 'h'
+                data += '''
+                    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+                    <div class="h-captcha" data-sitekey="''' + recaptcha[0][0] + '''"></div>
+                    <hr class="main_hr">
+                '''
 
-        return data
+    return data
 
-def captcha_post(re_data, num = 1):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def captcha_post(conn, re_data, num = 1):
+    curs = conn.cursor()
 
-        if num != 1:
-            pass
-        elif acl_check(None, 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
-            pass
-        elif acl_check(None, 'recaptcha') == 1:
-            curs.execute(db_change('select data from other where name = "sec_re"'))
-            sec_re = curs.fetchall()
-            
-            curs.execute(db_change('select data from other where name = "recaptcha_ver"'))
-            rec_ver = curs.fetchall()
-            if captcha_get() != '':
-                if not rec_ver or rec_ver[0][0] in ('', 'v3'):
-                    data = requests.post(
-                        'https://www.google.com/recaptcha/api/siteverify',
-                        data = {
-                            "secret" : sec_re[0][0],
-                            "response" : re_data
-                        }
-                    )
-                elif rec_ver[0][0] == 'cf':
-                    data = requests.post(
-                        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-                        data = {
-                            "secret" : sec_re[0][0],
-                            "response" : re_data
-                        }
-                    )
-                else:
-                    # rec_ver[0][0] == 'h'
-                    data = requests.post(
-                        'https://hcaptcha.com/siteverify',
-                        data = {
-                            "secret" : sec_re[0][0],
-                            "response" : re_data
-                        }
-                    )
-                    
-                if data.status_code == 200:
-                    json_data = json.loads(data.text)
-                    if json_data['success'] != True:
-                        return 1
+    if num != 1:
+        pass
+    elif acl_check(conn, None, 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
+        pass
+    elif acl_check(conn, None, 'recaptcha') == 1:
+        curs.execute(db_change('select data from other where name = "sec_re"'))
+        sec_re = curs.fetchall()
+        
+        curs.execute(db_change('select data from other where name = "recaptcha_ver"'))
+        rec_ver = curs.fetchall()
+        if captcha_get(conn) != '':
+            if not rec_ver or rec_ver[0][0] in ('', 'v3'):
+                data = requests.post(
+                    'https://www.google.com/recaptcha/api/siteverify',
+                    data = {
+                        "secret" : sec_re[0][0],
+                        "response" : re_data
+                    }
+                )
+            elif rec_ver[0][0] == 'cf':
+                data = requests.post(
+                    'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                    data = {
+                        "secret" : sec_re[0][0],
+                        "response" : re_data
+                    }
+                )
+            else:
+                # rec_ver[0][0] == 'h'
+                data = requests.post(
+                    'https://hcaptcha.com/siteverify',
+                    data = {
+                        "secret" : sec_re[0][0],
+                        "response" : re_data
+                    }
+                )
+                
+            if data.status_code == 200:
+                json_data = json.loads(data.text)
+                if json_data['success'] != True:
+                    return 1
 
-        if num == 1:
-            if 'recapcha_pass' in flask.session:
-                if flask.session['recapcha_pass'] > 0:
-                    flask.session['recapcha_pass'] -= 1
-                else:
-                    flask.session['recapcha_pass'] = 5
+    if num == 1:
+        if 'recapcha_pass' in flask.session:
+            if flask.session['recapcha_pass'] > 0:
+                flask.session['recapcha_pass'] -= 1
             else:
                 flask.session['recapcha_pass'] = 5
+        else:
+            flask.session['recapcha_pass'] = 5
 
-        return 0
+    return 0
 
 # Func-user
-def do_user_name_check(user_name):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def do_user_name_check(conn, user_name):
+    curs = conn.cursor()
 
-        # XSS 필터
-        if html.escape(user_name) != user_name:
+    # XSS 필터
+    if html.escape(user_name) != user_name:
+        return 1
+
+    # IP와 혼동 방지 
+    if ip_or_user(user_name) == 1:
+        return 1
+    
+    # 슬래시 불가능
+    if user_name.find('/') != -1:
+        return 1
+
+    # ID 필터
+    curs.execute(db_change('select html from html_filter where kind = "name"'))
+    set_d = curs.fetchall()
+    for i in set_d:
+        check_r = re.compile(i[0], re.I)
+        if check_r.search(user_name):
             return 1
 
-        # IP와 혼동 방지 
-        if ip_or_user(user_name) == 1:
-            return 1
-        
-        # 슬래시 불가능
-        if user_name.find('/') != -1:
-            return 1
-
-        # ID 필터
-        curs.execute(db_change('select html from html_filter where kind = "name"'))
-        set_d = curs.fetchall()
-        for i in set_d:
-            check_r = re.compile(i[0], re.I)
-            if check_r.search(user_name):
-                return 1
-
-        # ID 길이 제한 (128글자)
-        if len(user_name) > 128:
-            return 1
-        
-        # 중복 확인
-        curs.execute(db_change("select id from user_set where name = 'user_name' and data = ?"), [user_name])
-        if curs.fetchall():
-            return 1
-        
-        curs.execute(db_change("select id from user_set where id = ?"), [user_name])
-        if curs.fetchall():
-            return 1
-        
-        return 0
+    # ID 길이 제한 (128글자)
+    if len(user_name) > 128:
+        return 1
+    
+    # 중복 확인
+    curs.execute(db_change("select id from user_set where name = 'user_name' and data = ?"), [user_name])
+    if curs.fetchall():
+        return 1
+    
+    curs.execute(db_change("select id from user_set where id = ?"), [user_name])
+    if curs.fetchall():
+        return 1
+    
+    return 0
 
 def get_admin_auth_list(num = None):
     # without_DB
@@ -1729,364 +1715,360 @@ def get_admin_auth_list(num = None):
         
     return check
 
-def get_admin_list(num = None):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-        
-        if num == 'all':
-            curs.execute(db_change("select data from user_set where data != 'user' and name = 'acl'"))
-            db_data = curs.fetchall()
-            db_data = [db_data_in[0] for db_data_in in db_data] if db_data else []
-            
-            return db_data
-        else:
-            check = get_admin_auth_list(num)
-            admin_list = []
-            
-            curs.execute(db_change('select name from alist where acl = ?'), [check])
-            db_data = curs.fetchall()
-            for db_data_in in db_data:
-                curs.execute(db_change("select id from user_set where data = ? and name = 'acl'"), [db_data_in[0]])
-                db_data_2 = curs.fetchall()
-                admin_list += [db_data_2_in[0] for db_data_2_in in db_data_2] if db_data_2 else []
-                
-            return admin_list
-
-def level_check(ip = ''):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def get_admin_list(conn, num = None):
+    curs = conn.cursor()
     
-        if ip == '':
-            ip = ip_check()
-
-        level = '0'
-        exp = '0'
-        max_exp = '0'
-
-        curs.execute(db_change("select data from user_set where id = ? and name = 'level'"), [ip])
+    if num == 'all':
+        curs.execute(db_change("select data from user_set where data != 'user' and name = 'acl'"))
         db_data = curs.fetchall()
-        if db_data:
-            level = db_data[0][0]
-
-        curs.execute(db_change("select data from user_set where id = ? and name = 'experience'"), [ip])
+        db_data = [db_data_in[0] for db_data_in in db_data] if db_data else []
+        
+        return db_data
+    else:
+        check = get_admin_auth_list(num)
+        admin_list = []
+        
+        curs.execute(db_change('select name from alist where acl = ?'), [check])
         db_data = curs.fetchall()
-        if db_data:
-            exp = db_data[0][0]
+        for db_data_in in db_data:
+            curs.execute(db_change("select id from user_set where data = ? and name = 'acl'"), [db_data_in[0]])
+            db_data_2 = curs.fetchall()
+            admin_list += [db_data_2_in[0] for db_data_2_in in db_data_2] if db_data_2 else []
+            
+        return admin_list
 
-        if exp != '0':
-            max_exp = str(500 + (int(level) * 50))
+def level_check(conn, ip = ''):
+    curs = conn.cursor()
 
-        return [level, exp, max_exp]
+    if ip == '':
+        ip = ip_check()
 
-def admin_check(num = None, what = None, name = ''):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+    level = '0'
+    exp = '0'
+    max_exp = '0'
 
-        ip = ip_check() if name == '' else name
-        time_data = get_time()
-        pass_ok = 0
+    curs.execute(db_change("select data from user_set where id = ? and name = 'level'"), [ip])
+    db_data = curs.fetchall()
+    if db_data:
+        level = db_data[0][0]
 
-        if ip_or_user(ip) == 0:
-            curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
-            user_auth = curs.fetchall()
-            if user_auth:
-                user_auth = user_auth[0][0]
-                check = get_admin_auth_list(num)
-                
-                curs.execute(db_change('select name from alist where name = ? and acl = "owner"'), [user_auth])
+    curs.execute(db_change("select data from user_set where id = ? and name = 'experience'"), [ip])
+    db_data = curs.fetchall()
+    if db_data:
+        exp = db_data[0][0]
+
+    if exp != '0':
+        max_exp = str(500 + (int(level) * 50))
+
+    return [level, exp, max_exp]
+
+def admin_check(conn, num = None, what = None, name = ''):
+    curs = conn.cursor()
+
+    ip = ip_check() if name == '' else name
+    time_data = get_time()
+    pass_ok = 0
+
+    if ip_or_user(ip) == 0:
+        curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
+        user_auth = curs.fetchall()
+        if user_auth:
+            user_auth = user_auth[0][0]
+            check = get_admin_auth_list(num)
+            
+            curs.execute(db_change('select name from alist where name = ? and acl = "owner"'), [user_auth])
+            if curs.fetchall():
+                pass_ok = 1
+            else:
+                if num == 'all':                    
+                    curs.execute(db_change('select name from alist where name = ?'), [user_auth])
+                else:
+                    curs.execute(db_change('select name from alist where name = ? and acl = ?'), [user_auth, check])
+                    
                 if curs.fetchall():
                     pass_ok = 1
-                else:
-                    if num == 'all':                    
-                        curs.execute(db_change('select name from alist where name = ?'), [user_auth])
+
+            if pass_ok == 1:
+                if what:
+                    curs.execute(db_change('select data from other where name = "auth_history_off"'))
+                    db_data = curs.fetchall()
+                    if db_data and db_data[0][0] != '':
+                        pass
                     else:
-                        curs.execute(db_change('select name from alist where name = ? and acl = ?'), [user_auth, check])
-                        
-                    if curs.fetchall():
-                        pass_ok = 1
+                        curs.execute(db_change("insert into re_admin (who, what, time) values (?, ?, ?)"), [ip, what, time_data])
 
-                if pass_ok == 1:
-                    if what:
-                        curs.execute(db_change('select data from other where name = "auth_history_off"'))
-                        db_data = curs.fetchall()
-                        if db_data and db_data[0][0] != '':
-                            pass
-                        else:
-                            curs.execute(db_change("insert into re_admin (who, what, time) values (?, ?, ?)"), [ip, what, time_data])
-
-                    return 1
-
-        return 0
-
-def acl_check(name = '', tool = '', topic_num = '1'):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        if name == None:
-            name = ''
-
-        ip = ip_check()
-        if tool == 'document_edit_request':
-            get_ban = ban_check(ip, 'edit_request')[0]
-        else:
-            get_ban = ban_check(ip)[0]
-        
-        if tool == '' and name != '':
-            if acl_check(name, 'render') == 1:
                 return 1
-            
-            user_page = re.search(r"^user:((?:(?!\/).)*)", name)
-            if user_page:
-                user_page = user_page.group(1)
-                if admin_check(5) == 1:
+
+    return 0
+
+def acl_check(conn, name = '', tool = '', topic_num = '1'):
+    curs = conn.cursor()
+
+    if name == None:
+        name = ''
+
+    ip = ip_check()
+    if tool == 'document_edit_request':
+        get_ban = ban_check(conn, ip, 'edit_request')[0]
+    else:
+        get_ban = ban_check(conn, ip)[0]
+    
+    if tool == '' and name != '':
+        if acl_check(conn, name, 'render') == 1:
+            return 1
+        
+        user_page = re.search(r"^user:((?:(?!\/).)*)", name)
+        if user_page:
+            user_page = user_page.group(1)
+            if admin_check(conn, 5) == 1:
+                return 0
+                
+            if get_ban == 1:
+                return 1
+                
+            curs.execute(db_change("select data from acl where title = ? and type = 'decu'"), [name])
+            acl_data = curs.fetchall()
+            if acl_data:
+                if acl_data[0][0] == 'all':
                     return 0
-                    
+                elif acl_data[0][0] == 'user' and not ip_or_user(ip) == 1:
+                    return 0
+            
+            if ip == user_page and not ip_or_user(ip) == 1:
+                return 0
+    
+            return 1
+    elif tool in ['document_edit', 'document_edit_request', 'document_move', 'document_delete']:
+        if acl_check(conn, name, '') == 1:
+            return 1
+    elif tool in ['bbs_edit', 'bbs_comment']:
+        if acl_check(conn, name, 'bbs_view') == 1:
+            return 1
+    elif tool == 'topic':
+        if name == '':
+            curs.execute(db_change("select title from rd where code = ?"), [topic_num])
+            name = curs.fetchall()
+            name = name[0][0] if name else 'test'
+
+    if tool in ['topic']:
+        end = 3
+    elif tool in ['render', 'vote', '', 'document_edit', 'document_edit_request', 'document_move', 'document_delete', 'document_edit', 'bbs_edit', 'bbs_comment']:
+        end = 2
+    else:
+        end = 1
+
+    for i in range(0, end):
+        if tool == '':
+            if i == 0:
+                curs.execute(db_change("select data from acl where title = ? and type = 'decu'"), [name])
+            else:
+                curs.execute(db_change('select data from other where name = "edit"'))
+
+            '''
+            elif i == 1:
+                curs.execute(db_change("select plus from html_filter where kind = 'document'"))
+            '''
+
+            num = 5
+        elif tool == 'document_move':
+            if i == 0:
+                curs.execute(db_change("select data from acl where title = ? and type = 'document_move_acl'"), [name])
+            else:
+                curs.execute(db_change('select data from other where name = "document_move_acl"'))
+
+            num = 5
+        elif tool == 'document_edit':
+            if i == 0:
+                curs.execute(db_change("select data from acl where title = ? and type = 'document_edit_acl'"), [name])
+            else:
+                curs.execute(db_change('select data from other where name = "document_edit_acl"'))
+
+            num = 5
+        elif tool == 'document_delete':
+            if i == 0:
+                curs.execute(db_change("select data from acl where title = ? and type = 'document_delete_acl'"), [name])
+            else:
+                curs.execute(db_change('select data from other where name = "document_delete_acl"'))
+
+            num = 5
+        elif tool == 'topic':
+            if i == 0:
+                curs.execute(db_change("select acl from rd where code = ?"), [topic_num])
+            elif i == 1:
+                curs.execute(db_change("select data from acl where title = ? and type = 'dis'"), [name])
+            else:
+                curs.execute(db_change('select data from other where name = "discussion"'))
+
+            num = 3
+        elif tool == 'topic_view':
+            curs.execute(db_change("select set_data from topic_set where thread_code = ? and set_name = 'thread_view_acl'"), [topic_num])
+            
+            num = 3
+        elif tool == 'upload':
+            curs.execute(db_change("select data from other where name = 'upload_acl'"))
+
+            num = 5
+        elif tool == 'many_upload':
+            curs.execute(db_change("select data from other where name = 'many_upload_acl'"))
+
+            num = 5
+        elif tool == 'vote':
+            if i == 0:
+                curs.execute(db_change('select acl from vote where id = ? and user = ""'), [topic_num])
+            else:
+                curs.execute(db_change('select data from other where name = "vote_acl"'))
+
+            num = None
+        elif tool == 'slow_edit':
+            curs.execute(db_change('select data from other where name = "slow_edit_acl"'))
+
+            num = 'all'
+        elif tool == 'edit_bottom_compulsion':
+            curs.execute(db_change('select data from other where name = "edit_bottom_compulsion_acl"'))
+
+            num = 'all'
+        elif tool == 'bbs_edit':
+            if i == 0:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_edit_acl" and set_id = ?'), [name])
+            else:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_acl" and set_id = ?'), [name])
+
+            num = 'all'
+        elif tool == 'bbs_comment':
+            if i == 0:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_comment_acl" and set_id = ?'), [name])
+            else:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_acl" and set_id = ?'), [name])
+
+            num = 'all'
+        elif tool == 'bbs_view':
+            curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_view_acl" and set_id = ?'), [name])
+
+            num = 'all'
+        elif tool == 'recaptcha':
+            curs.execute(db_change('select data from other where name = "recaptcha_pass_acl"'))
+
+            num = 'all'
+        elif tool == 'recaptcha_five_pass':
+            curs.execute(db_change('select data from other where name = "recaptcha_one_check_five_pass_acl"'))
+
+            num = 'all'
+        elif tool == 'document_edit_request':
+            if i == 0:
+                curs.execute(db_change("select data from acl where title = ? and type = 'document_edit_request_acl'"), [name])
+            else:
+                curs.execute(db_change('select data from other where name = "document_edit_request_acl"'))
+
+            num = 5
+        else:
+            # tool == 'render'
+            if i == 0:
+                curs.execute(db_change("select data from acl where title = ? and type = 'view'"), [name])
+            else:
+                curs.execute(db_change("select data from other where name = 'all_view_acl'"))
+
+            num = 5
+
+        acl_data = curs.fetchall()
+        if not acl_data or acl_data[0][0] == '':
+            if tool == 'recaptcha':
+                acl_data = [['admin']]
+            elif tool == 'slow_edit' or tool == 'edit_bottom_compulsion':
+                acl_data = [['not_all']]
+            else:
+                acl_data = [['normal']]
+
+        except_ban_tool_list = ['render', 'topic_view', 'bbs_view']
+        if acl_data[0][0] != 'normal':
+            if not acl_data[0][0] in ['ban', 'ban_admin'] and not tool in except_ban_tool_list:
                 if get_ban == 1:
                     return 1
-                    
-                curs.execute(db_change("select data from acl where title = ? and type = 'decu'"), [name])
-                acl_data = curs.fetchall()
-                if acl_data:
-                    if acl_data[0][0] == 'all':
-                        return 0
-                    elif acl_data[0][0] == 'user' and not ip_or_user(ip) == 1:
-                        return 0
-                
-                if ip == user_page and not ip_or_user(ip) == 1:
+            
+            if acl_data[0][0] in ['all', 'ban']:
+                return 0
+            elif acl_data[0][0] == 'user':
+                if ip_or_user(ip) != 1:
                     return 0
-        
-                return 1
-        elif tool in ['document_edit', 'document_edit_request', 'document_move', 'document_delete']:
-            if acl_check(name, '') == 1:
-                return 1
-        elif tool in ['bbs_edit', 'bbs_comment']:
-            if acl_check(name, 'bbs_view') == 1:
-                return 1
-        elif tool == 'topic':
-            if name == '':
-                curs.execute(db_change("select title from rd where code = ?"), [topic_num])
-                name = curs.fetchall()
-                name = name[0][0] if name else 'test'
-
-        if tool in ['topic']:
-            end = 3
-        elif tool in ['render', 'vote', '', 'document_edit', 'document_edit_request', 'document_move', 'document_delete', 'document_edit', 'bbs_edit', 'bbs_comment']:
-            end = 2
-        else:
-            end = 1
-
-        for i in range(0, end):
-            if tool == '':
-                if i == 0:
-                    curs.execute(db_change("select data from acl where title = ? and type = 'decu'"), [name])
-                else:
-                    curs.execute(db_change('select data from other where name = "edit"'))
-
-                '''
-                elif i == 1:
-                    curs.execute(db_change("select plus from html_filter where kind = 'document'"))
-                '''
-
-                num = 5
-            elif tool == 'document_move':
-                if i == 0:
-                    curs.execute(db_change("select data from acl where title = ? and type = 'document_move_acl'"), [name])
-                else:
-                    curs.execute(db_change('select data from other where name = "document_move_acl"'))
-
-                num = 5
-            elif tool == 'document_edit':
-                if i == 0:
-                    curs.execute(db_change("select data from acl where title = ? and type = 'document_edit_acl'"), [name])
-                else:
-                    curs.execute(db_change('select data from other where name = "document_edit_acl"'))
-
-                num = 5
-            elif tool == 'document_delete':
-                if i == 0:
-                    curs.execute(db_change("select data from acl where title = ? and type = 'document_delete_acl'"), [name])
-                else:
-                    curs.execute(db_change('select data from other where name = "document_delete_acl"'))
-
-                num = 5
-            elif tool == 'topic':
-                if i == 0:
-                    curs.execute(db_change("select acl from rd where code = ?"), [topic_num])
-                elif i == 1:
-                    curs.execute(db_change("select data from acl where title = ? and type = 'dis'"), [name])
-                else:
-                    curs.execute(db_change('select data from other where name = "discussion"'))
-
-                num = 3
-            elif tool == 'topic_view':
-                curs.execute(db_change("select set_data from topic_set where thread_code = ? and set_name = 'thread_view_acl'"), [topic_num])
-                
-                num = 3
-            elif tool == 'upload':
-                curs.execute(db_change("select data from other where name = 'upload_acl'"))
-
-                num = 5
-            elif tool == 'many_upload':
-                curs.execute(db_change("select data from other where name = 'many_upload_acl'"))
-
-                num = 5
-            elif tool == 'vote':
-                if i == 0:
-                    curs.execute(db_change('select acl from vote where id = ? and user = ""'), [topic_num])
-                else:
-                    curs.execute(db_change('select data from other where name = "vote_acl"'))
-
-                num = None
-            elif tool == 'slow_edit':
-                curs.execute(db_change('select data from other where name = "slow_edit_acl"'))
-
-                num = 'all'
-            elif tool == 'edit_bottom_compulsion':
-                curs.execute(db_change('select data from other where name = "edit_bottom_compulsion_acl"'))
-
-                num = 'all'
-            elif tool == 'bbs_edit':
-                if i == 0:
-                    curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_edit_acl" and set_id = ?'), [name])
-                else:
-                    curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_acl" and set_id = ?'), [name])
-
-                num = 'all'
-            elif tool == 'bbs_comment':
-                if i == 0:
-                    curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_comment_acl" and set_id = ?'), [name])
-                else:
-                    curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_acl" and set_id = ?'), [name])
-
-                num = 'all'
-            elif tool == 'bbs_view':
-                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_view_acl" and set_id = ?'), [name])
-
-                num = 'all'
-            elif tool == 'recaptcha':
-                curs.execute(db_change('select data from other where name = "recaptcha_pass_acl"'))
-
-                num = 'all'
-            elif tool == 'recaptcha_five_pass':
-                curs.execute(db_change('select data from other where name = "recaptcha_one_check_five_pass_acl"'))
-
-                num = 'all'
-            elif tool == 'document_edit_request':
-                if i == 0:
-                    curs.execute(db_change("select data from acl where title = ? and type = 'document_edit_request_acl'"), [name])
-                else:
-                    curs.execute(db_change('select data from other where name = "document_edit_request_acl"'))
-
-                num = 5
-            else:
-                # tool == 'render'
-                if i == 0:
-                    curs.execute(db_change("select data from acl where title = ? and type = 'view'"), [name])
-                else:
-                    curs.execute(db_change("select data from other where name = 'all_view_acl'"))
-
-                num = 5
-
-            acl_data = curs.fetchall()
-            if not acl_data or acl_data[0][0] == '':
-                if tool == 'recaptcha':
-                    acl_data = [['admin']]
-                elif tool == 'slow_edit' or tool == 'edit_bottom_compulsion':
-                    acl_data = [['not_all']]
-                else:
-                    acl_data = [['normal']]
-
-            except_ban_tool_list = ['render', 'topic_view', 'bbs_view']
-            if acl_data[0][0] != 'normal':
-                if not acl_data[0][0] in ['ban', 'ban_admin'] and not tool in except_ban_tool_list:
-                    if get_ban == 1:
-                        return 1
-                
-                if acl_data[0][0] in ['all', 'ban']:
-                    return 0
-                elif acl_data[0][0] == 'user':
-                    if ip_or_user(ip) != 1:
+            elif acl_data[0][0] == 'admin':
+                if ip_or_user(ip) != 1:
+                    if admin_check(conn, num) == 1:
                         return 0
-                elif acl_data[0][0] == 'admin':
-                    if ip_or_user(ip) != 1:
-                        if admin_check(num) == 1:
-                            return 0
-                elif acl_data[0][0] == '50_edit':
-                    if ip_or_user(ip) != 1:
-                        if admin_check(num) == 1:
-                            return 0
-                        else:
-                            curs.execute(db_change("select count(*) from history where ip = ?"), [ip])
-                            count = curs.fetchall()
-                            count = count[0][0] if count else 0
-                            if count >= 50:
-                                return 0
-                elif acl_data[0][0] == 'before':
-                    if ip_or_user(ip) != 1:
-                        if admin_check(num) == 1:
-                            return 0
-                    
-                    curs.execute(db_change("select ip from history where title = ? and ip = ?"), [name, ip])
-                    if curs.fetchall():
+            elif acl_data[0][0] == '50_edit':
+                if ip_or_user(ip) != 1:
+                    if admin_check(conn, num) == 1:
                         return 0
-                elif acl_data[0][0] == '30_day' or acl_data[0][0] == '90_day':
-                    if ip_or_user(ip) != 1:
-                        if admin_check(num) == 1:
-                            return 0
-                        else:
-                            curs.execute(db_change("select data from user_set where id = ? and name = 'date'"), [ip])
-                            user_date = curs.fetchall()[0][0]
-                            
-                            if acl_data[0][0] == '30_day':
-                                time_1 = datetime.datetime.strptime(user_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days = 30)
-                            else:
-                                time_1 = datetime.datetime.strptime(user_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days = 90)
-
-                            time_2 = datetime.datetime.strptime(get_time(), '%Y-%m-%d %H:%M:%S')
-                            if time_2 > time_1:
-                                return 0
-                elif acl_data[0][0] == 'email':
-                    if ip_or_user(ip) != 1:
-                        if admin_check(num) == 1:
-                            return 0
-                        else:
-                            curs.execute(db_change("select data from user_set where id = ? and name = 'email'"), [ip])
-                            if curs.fetchall():
-                                return 0
-                elif acl_data[0][0] == 'owner':
-                    if admin_check() == 1:
-                        return 0
-                elif acl_data[0][0] == 'ban_admin':
-                    if admin_check(1) == 1 or get_ban == 1:
-                        return 0
-                elif acl_data[0][0] == 'not_all':
-                    return 1
-                elif acl_data[0][0] == 'up_to_level_3':
-                    if int(level_check(ip)[0]) >= 3:
-                        return 0
-                elif acl_data[0][0] == 'up_to_level_10':
-                    if int(level_check(ip)[0]) >= 10:
-                        return 0
-
-                return 1
-            elif i == (end - 1):
-                if not tool in except_ban_tool_list:
-                    if get_ban == 1:
-                        return 1
-                
-                if tool == 'topic':
-                    curs.execute(db_change("select title from rd where code = ? and stop != ''"), [topic_num])
-                    if curs.fetchall():
-                        if admin_check(3, 'topic (code ' + topic_num + ')') == 1:
-                            return 0
-                        else:
-                            return 1
                     else:
+                        curs.execute(db_change("select count(*) from history where ip = ?"), [ip])
+                        count = curs.fetchall()
+                        count = count[0][0] if count else 0
+                        if count >= 50:
+                            return 0
+            elif acl_data[0][0] == 'before':
+                if ip_or_user(ip) != 1:
+                    if admin_check(conn, num) == 1:
                         return 0
-                else:
+                
+                curs.execute(db_change("select ip from history where title = ? and ip = ?"), [name, ip])
+                if curs.fetchall():
+                    return 0
+            elif acl_data[0][0] == '30_day' or acl_data[0][0] == '90_day':
+                if ip_or_user(ip) != 1:
+                    if admin_check(conn, num) == 1:
+                        return 0
+                    else:
+                        curs.execute(db_change("select data from user_set where id = ? and name = 'date'"), [ip])
+                        user_date = curs.fetchall()[0][0]
+                        
+                        if acl_data[0][0] == '30_day':
+                            time_1 = datetime.datetime.strptime(user_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days = 30)
+                        else:
+                            time_1 = datetime.datetime.strptime(user_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days = 90)
+
+                        time_2 = datetime.datetime.strptime(get_time(), '%Y-%m-%d %H:%M:%S')
+                        if time_2 > time_1:
+                            return 0
+            elif acl_data[0][0] == 'email':
+                if ip_or_user(ip) != 1:
+                    if admin_check(conn, num) == 1:
+                        return 0
+                    else:
+                        curs.execute(db_change("select data from user_set where id = ? and name = 'email'"), [ip])
+                        if curs.fetchall():
+                            return 0
+            elif acl_data[0][0] == 'owner':
+                if admin_check(conn) == 1:
+                    return 0
+            elif acl_data[0][0] == 'ban_admin':
+                if admin_check(conn, 1) == 1 or get_ban == 1:
+                    return 0
+            elif acl_data[0][0] == 'not_all':
+                return 1
+            elif acl_data[0][0] == 'up_to_level_3':
+                if int(level_check(conn, ip)[0]) >= 3:
+                    return 0
+            elif acl_data[0][0] == 'up_to_level_10':
+                if int(level_check(conn, ip)[0]) >= 10:
                     return 0
 
-        return 1
+            return 1
+        elif i == (end - 1):
+            if not tool in except_ban_tool_list:
+                if get_ban == 1:
+                    return 1
+            
+            if tool == 'topic':
+                curs.execute(db_change("select title from rd where code = ? and stop != ''"), [topic_num])
+                if curs.fetchall():
+                    if admin_check(conn, 3, 'topic (code ' + topic_num + ')') == 1:
+                        return 0
+                    else:
+                        return 1
+                else:
+                    return 0
+            else:
+                return 0
+
+    return 1
 
 def ban_type_check(data):
     if data == 'O':
@@ -2096,405 +2078,390 @@ def ban_type_check(data):
     else:
         return ''
 
-def ban_check(ip = None, tool = ''):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def ban_check(conn, ip = None, tool = ''):
+    curs = conn.cursor()
 
-        ip = ip_check() if not ip else ip
-        tool = '' if not tool else tool
+    ip = ip_check() if not ip else ip
+    tool = '' if not tool else tool
 
-        if admin_check(None, None, ip) == 1:
-            return [0, '']
-
-        curs.execute(db_change("select login, block from rb where band = 'regex' and ongoing = '1'"))
-        regex_d = curs.fetchall()
-        for test_r in regex_d:
-            ban_type = ban_type_check(test_r[0])
-            g_regex = re.compile(test_r[1])
-            if g_regex.search(ip):
-                if tool == 'login':
-                    if ban_type != '1':
-                        return [1, 'a' + ban_type]
-                elif tool == 'edit_request':
-                    if ban_type != '2':
-                        return [1, 'a' + ban_type]
-                else:
-                    return [1, 'a' + ban_type]
-
-        curs.execute(db_change("select login from rb where block = ? and band = '' and ongoing = '1'"), [ip])
-        ban_d = curs.fetchall()
-        if ban_d:
-            ban_type = ban_type_check(ban_d[0][0])
-            if tool == 'login':
-                if ban_type != '1':
-                    return [1, ban_type]
-            elif tool == 'edit_request':
-                if ban_type != '2':
-                    return [1, ban_type]
-            else:
-                return [1, ban_type]
-
-        curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
-        db_data = curs.fetchall()
-        if db_data and db_data[0][0] == 'ban':
-            return [1, 'b']
-
+    if admin_check(conn, None, None, ip) == 1:
         return [0, '']
 
-def ip_pas(raw_ip, type_data = 0):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        end_ip = {}
-        my_ip = ip_check()
-
-        return_data = 0
-        if type(raw_ip) != type([]):
-            get_ip = [raw_ip]
-            return_data = 1
-        else:
-            get_ip = raw_ip
-
-        admin_auth = admin_check(1)
-
-        curs.execute(db_change("select data from other where name = 'ip_view'"))
-        db_data = curs.fetchall()
-        ip_view = db_data[0][0] if db_data else ''
-        ip_view = '' if admin_auth == 1 else ip_view
-
-        curs.execute(db_change("select data from other where name = 'user_name_view'"))
-        db_data = curs.fetchall()
-        user_name_view = db_data[0][0] if db_data else ''
-        user_name_view = '' if admin_auth == 1 else user_name_view
-        
-        get_ip = list(set(get_ip))
-        
-        for raw_ip in get_ip:
-            change_ip = 0
-            is_this_ip = ip_or_user(raw_ip)
-            if is_this_ip != 0:
-                # ip user
-                if ip_view != '' and my_ip != raw_ip:
-                    ip = pw_encode(raw_ip)[:10]
-
-                    change_ip = 1
-                else:
-                    ip = raw_ip
+    curs.execute(db_change("select login, block from rb where band = 'regex' and ongoing = '1'"))
+    regex_d = curs.fetchall()
+    for test_r in regex_d:
+        ban_type = ban_type_check(test_r[0])
+        g_regex = re.compile(test_r[1])
+        if g_regex.search(ip):
+            if tool == 'login':
+                if ban_type != '1':
+                    return [1, 'a' + ban_type]
+            elif tool == 'edit_request':
+                if ban_type != '2':
+                    return [1, 'a' + ban_type]
             else:
-                # not ip user
-                if user_name_view != '':
-                    curs.execute(db_change("select data from user_set where id = ? and name = 'sub_user_name'"), [raw_ip])
-                    db_data = curs.fetchall()
-                    if db_data and db_data[0][0] != '':
-                        ip = db_data[0][0]
-                    else:
-                        ip = load_lang('member')
+                return [1, 'a' + ban_type]
 
-                    change_ip = 1
-                else:
-                    curs.execute(db_change('select data from user_set where name = "user_name" and id = ?'), [raw_ip])
-                    db_data = curs.fetchall()
-                    ip = db_data[0][0] if db_data and db_data[0][0] != '' else raw_ip
-                
-            if type_data == 0 and change_ip == 0:
-                if is_this_ip == 0:
-                    curs.execute(db_change("select data from other where name = 'user_name_level'"))
-                    db_data = curs.fetchall()
-                    if db_data and db_data[0][0] != '':
-                        level_data = level_check(raw_ip)
-
-                        ip += '<sup>' + level_data[0] + '</sup>'
-
-                    ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + ip + '</a>'
-                    
-                    if admin_check('all', None, raw_ip) == 1:
-                        ip = '<b>' + ip + '</b>'
-
-                    curs.execute(db_change('select data from user_set where name = "user_title" and id = ?'), [raw_ip])
-                    db_data = curs.fetchall()
-                    if db_data:
-                        ip = db_data[0][0] + ip
-
-                ban = ban_check(raw_ip)
-                if ban[0] == 1:
-                    ip = '<sup>' + ban[1] + '</sup><s>' + ip + '</s>'
-
-                ip = ip + ' <a href="/user/' + url_pas(raw_ip) + '">(' + load_lang('tool') + ')</a>'
-
-            end_ip[raw_ip] = ip
-        
-        if return_data == 1:
-            return end_ip[raw_ip]
+    curs.execute(db_change("select login from rb where block = ? and band = '' and ongoing = '1'"), [ip])
+    ban_d = curs.fetchall()
+    if ban_d:
+        ban_type = ban_type_check(ban_d[0][0])
+        if tool == 'login':
+            if ban_type != '1':
+                return [1, ban_type]
+        elif tool == 'edit_request':
+            if ban_type != '2':
+                return [1, ban_type]
         else:
-            return end_ip
+            return [1, ban_type]
+
+    curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] == 'ban':
+        return [1, 'b']
+
+    return [0, '']
+
+def ip_pas(conn, raw_ip, type_data = 0):
+    curs = conn.cursor()
+
+    end_ip = {}
+    my_ip = ip_check()
+
+    return_data = 0
+    if type(raw_ip) != type([]):
+        get_ip = [raw_ip]
+        return_data = 1
+    else:
+        get_ip = raw_ip
+
+    admin_auth = admin_check(conn, 1)
+
+    curs.execute(db_change("select data from other where name = 'ip_view'"))
+    db_data = curs.fetchall()
+    ip_view = db_data[0][0] if db_data else ''
+    ip_view = '' if admin_auth == 1 else ip_view
+
+    curs.execute(db_change("select data from other where name = 'user_name_view'"))
+    db_data = curs.fetchall()
+    user_name_view = db_data[0][0] if db_data else ''
+    user_name_view = '' if admin_auth == 1 else user_name_view
+    
+    get_ip = list(set(get_ip))
+    
+    for raw_ip in get_ip:
+        change_ip = 0
+        is_this_ip = ip_or_user(raw_ip)
+        if is_this_ip != 0:
+            # ip user
+            if ip_view != '' and my_ip != raw_ip:
+                ip = pw_encode(conn, raw_ip)[:10]
+
+                change_ip = 1
+            else:
+                ip = raw_ip
+        else:
+            # not ip user
+            if user_name_view != '':
+                curs.execute(db_change("select data from user_set where id = ? and name = 'sub_user_name'"), [raw_ip])
+                db_data = curs.fetchall()
+                if db_data and db_data[0][0] != '':
+                    ip = db_data[0][0]
+                else:
+                    ip = get_lang(conn, 'member')
+
+                change_ip = 1
+            else:
+                curs.execute(db_change('select data from user_set where name = "user_name" and id = ?'), [raw_ip])
+                db_data = curs.fetchall()
+                ip = db_data[0][0] if db_data and db_data[0][0] != '' else raw_ip
+            
+        if type_data == 0 and change_ip == 0:
+            if is_this_ip == 0:
+                curs.execute(db_change("select data from other where name = 'user_name_level'"))
+                db_data = curs.fetchall()
+                if db_data and db_data[0][0] != '':
+                    level_data = level_check(conn, raw_ip)
+
+                    ip += '<sup>' + level_data[0] + '</sup>'
+
+                ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + ip + '</a>'
+                
+                if admin_check(conn, 'all', None, raw_ip) == 1:
+                    ip = '<b>' + ip + '</b>'
+
+                curs.execute(db_change('select data from user_set where name = "user_title" and id = ?'), [raw_ip])
+                db_data = curs.fetchall()
+                if db_data:
+                    ip = db_data[0][0] + ip
+
+            ban = ban_check(conn, raw_ip)
+            if ban[0] == 1:
+                ip = '<sup>' + ban[1] + '</sup><s>' + ip + '</s>'
+
+            ip = ip + ' <a href="/user/' + url_pas(raw_ip) + '">(' + get_lang(conn, 'tool') + ')</a>'
+
+        end_ip[raw_ip] = ip
+    
+    if return_data == 1:
+        return end_ip[raw_ip]
+    else:
+        return end_ip
         
 # Func-edit
-def get_edit_text_bottom():
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-        
-        b_text = ''
-        
-        curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
-        db_data= curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            b_text = '' + \
-                db_data[0][0] + \
-                '<hr class="main_hr">' + \
-            ''
+def get_edit_text_bottom(conn) :
+    curs = conn.cursor()
+    
+    b_text = ''
+    
+    curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
+    db_data= curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        b_text = '' + \
+            db_data[0][0] + \
+            '<hr class="main_hr">' + \
+        ''
 
-        return b_text
+    return b_text
 
-def get_edit_text_bottom_check_box():
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def get_edit_text_bottom_check_box(conn):
+    curs = conn.cursor()
+    
+    cccb_text = ''
+
+    curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
+    sql_d = curs.fetchall()
+    if sql_d and sql_d[0][0] != '':
+        cccb_text = '' + \
+            '<input type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + \
+            '<hr class="main_hr">' + \
+        ''
         
-        cccb_text = ''
+    return cccb_text
 
-        curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
-        sql_d = curs.fetchall()
-        if sql_d and sql_d[0][0] != '':
-            cccb_text = '' + \
-                '<input type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + \
-                '<hr class="main_hr">' + \
-            ''
-            
-        return cccb_text
-
-def do_edit_text_bottom_check_box_check(data):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def do_edit_text_bottom_check_box_check(conn, data):
+    curs = conn.cursor()
+    
+    curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        if data != 'yes':
+            return 1
         
-        curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
-        db_data = curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            if data != 'yes':
+    return 0
+
+def do_edit_send_check(conn, data):
+    curs = conn.cursor()
+    
+    curs.execute(db_change('select data from other where name = "edit_bottom_compulsion"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        if acl_check(conn, None, 'edit_bottom_compulsion') == 1:
+            if data == '':
                 return 1
-            
-        return 0
+    
+    return 0
 
-def do_edit_send_check(data):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-        
-        curs.execute(db_change('select data from other where name = "edit_bottom_compulsion"'))
+def do_edit_slow_check(conn, do_type = 'edit'):
+    curs = conn.cursor()
+
+    if do_type == 'edit':
+        curs.execute(db_change("select data from other where name = 'slow_edit'"))
+    else:
+        # do_type == 'thread'
+        curs.execute(db_change("select data from other where name = 'slow_thread'"))
+    
+    slow_edit = curs.fetchall()
+    if slow_edit and slow_edit[0][0] != '':
+        if acl_check(conn, None, 'slow_edit') == 1:
+            slow_edit = int(number_check(slow_edit[0][0]))
+
+            if do_type == 'edit':
+                curs.execute(db_change("select date from history where ip = ? order by date desc limit 1"), [ip_check()])
+            else:
+                curs.execute(db_change("select date from topic where ip = ? order by date desc limit 1"), [ip_check()])
+            
+            last_edit_data = curs.fetchall()
+            if last_edit_data:
+                last_edit_data = int(re.sub(' |:|-', '', last_edit_data[0][0]))
+                now_edit_data = int((
+                    datetime.datetime.now() - datetime.timedelta(seconds = slow_edit)
+                ).strftime("%Y%m%d%H%M%S"))
+
+                if last_edit_data > now_edit_data:
+                    return 1
+
+    return 0
+
+def do_edit_filter(conn, data):
+    curs = conn.cursor()
+
+    ip = ip_check()
+    if admin_check(conn, 1) != 1:
+        curs.execute(db_change("select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''"))
+        for data_list in curs.fetchall():
+            match = re.compile(data_list[0], re.I)
+            if match.search(data):
+                end = '0' if data_list[1] == 'X' else data_list[1]
+
+                if end != '0':
+                    end = int(number_check(end))
+                    time = datetime.datetime.now()
+                    plus = datetime.timedelta(seconds = end)
+                    r_time = (time + plus).strftime("%Y-%m-%d %H:%M:%S")
+                else:
+                    r_time = '0'
+
+                curs.execute(db_change('delete from user_set where name = "edit_filter" and id = ?'), [ip])
+                curs.execute(db_change('insert into user_set (name, id, data) values ("edit_filter", ?, ?)'), [ip, data])
+
+                ban_insert(conn, 
+                    ip,
+                    r_time,
+                    'edit filter',
+                    '',
+                    'tool:edit filter'
+                )
+
+                return 1
+
+    return 0
+
+def do_title_length_check(conn, name, check_type = 'document'):
+    curs = conn.cursor()
+    
+    if check_type == 'topic':
+        curs.execute(db_change('select data from other where name = "title_topic_max_length"'))
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
-            if acl_check(None, 'edit_bottom_compulsion') == 1:
-                if data == '':
-                    return 1
-        
-        return 0
-
-def do_edit_slow_check(do_type = 'edit'):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        if do_type == 'edit':
-            curs.execute(db_change("select data from other where name = 'slow_edit'"))
-        else:
-            # do_type == 'thread'
-            curs.execute(db_change("select data from other where name = 'slow_thread'"))
-        
-        slow_edit = curs.fetchall()
-        if slow_edit and slow_edit[0][0] != '':
-            if acl_check(None, 'slow_edit') == 1:
-                slow_edit = int(number_check(slow_edit[0][0]))
-
-                if do_type == 'edit':
-                    curs.execute(db_change("select date from history where ip = ? order by date desc limit 1"), [ip_check()])
-                else:
-                    curs.execute(db_change("select date from topic where ip = ? order by date desc limit 1"), [ip_check()])
-                
-                last_edit_data = curs.fetchall()
-                if last_edit_data:
-                    last_edit_data = int(re.sub(' |:|-', '', last_edit_data[0][0]))
-                    now_edit_data = int((
-                        datetime.datetime.now() - datetime.timedelta(seconds = slow_edit)
-                    ).strftime("%Y%m%d%H%M%S"))
-
-                    if last_edit_data > now_edit_data:
-                        return 1
-
-        return 0
-
-def do_edit_filter(data):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        ip = ip_check()
-        if admin_check(1) != 1:
-            curs.execute(db_change("select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''"))
-            for data_list in curs.fetchall():
-                match = re.compile(data_list[0], re.I)
-                if match.search(data):
-                    end = '0' if data_list[1] == 'X' else data_list[1]
-
-                    if end != '0':
-                        end = int(number_check(end))
-                        time = datetime.datetime.now()
-                        plus = datetime.timedelta(seconds = end)
-                        r_time = (time + plus).strftime("%Y-%m-%d %H:%M:%S")
-                    else:
-                        r_time = '0'
-
-                    curs.execute(db_change('delete from user_set where name = "edit_filter" and id = ?'), [ip])
-                    curs.execute(db_change('insert into user_set (name, id, data) values ("edit_filter", ?, ?)'), [ip, data])
-
-                    ban_insert(
-                        ip,
-                        r_time,
-                        'edit filter',
-                        '',
-                        'tool:edit filter'
-                    )
-
-                    return 1
-
-        return 0
-
-def do_title_length_check(name, check_type = 'document'):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-        
-        if check_type == 'topic':
-            curs.execute(db_change('select data from other where name = "title_topic_max_length"'))
-            db_data = curs.fetchall()
-            if db_data and db_data[0][0] != '':
-                db_data = int(number_check(db_data[0][0]))
-                if len(name) > db_data:        
-                    return 1
-        else:
-            curs.execute(db_change('select data from other where name = "title_max_length"'))
-            db_data = curs.fetchall()
-            if db_data and db_data[0][0] != '':
-                db_data = int(number_check(db_data[0][0]))
-                if len(name) > db_data:        
-                    return 1
-        
-        return 0
+            db_data = int(number_check(db_data[0][0]))
+            if len(name) > db_data:        
+                return 1
+    else:
+        curs.execute(db_change('select data from other where name = "title_max_length"'))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            db_data = int(number_check(db_data[0][0]))
+            if len(name) > db_data:        
+                return 1
+    
+    return 0
 
 # Func-insert
-def do_add_thread(thread_code, thread_data, thread_top = '', thread_id = ''):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def do_add_thread(conn, thread_code, thread_data, thread_top = '', thread_id = ''):
+    curs = conn.cursor()
+    
+    if thread_id == '':
+        curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [thread_code])
+        db_data = curs.fetchall()
+        if db_data:
+            thread_id = str(int(db_data[0][0]) + 1)
+        else:
+            thread_id = '1'
         
-        if thread_id == '':
-            curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [thread_code])
-            db_data = curs.fetchall()
-            if db_data:
-                thread_id = str(int(db_data[0][0]) + 1)
-            else:
-                thread_id = '1'
-            
-        curs.execute(db_change("insert into topic (id, data, date, ip, block, top, code) values (?, ?, ?, ?, ?, '', ?)"), [
-            thread_id,
-            thread_data,
-            get_time(),
-            ip_check(),
-            thread_top,
-            thread_code
+    curs.execute(db_change("insert into topic (id, data, date, ip, block, top, code) values (?, ?, ?, ?, ?, '', ?)"), [
+        thread_id,
+        thread_data,
+        get_time(),
+        ip_check(),
+        thread_top,
+        thread_code
+    ])
+    
+def do_reload_recent_thread(conn, topic_num, date, name = None, sub = None):
+    curs = conn.cursor()
+
+    curs.execute(db_change("select code from rd where code = ?"), [topic_num])
+    if curs.fetchall():
+        curs.execute(db_change("update rd set date = ? where code = ?"), [date, topic_num])
+    else:
+        curs.execute(db_change("insert into rd (title, sub, code, date, band, stop, agree, acl) values (?, ?, ?, ?, '', '', '', '')"), [name, sub, topic_num, date])
+
+def add_alarm(conn, to_user, from_user, context):
+    curs = conn.cursor()
+
+    if to_user != from_user:
+        context = from_user + ' | ' + context
+
+        count = '1'
+        curs.execute(db_change("select id from user_notice where name = ? order by id + 0 desc"), [to_user])
+        db_data = curs.fetchall()
+        if db_data:
+            count = str(int(db_data[0][0]) + 1)
+
+        curs.execute(db_change('insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'), [count, to_user, context, get_time()])
+    
+def add_user(conn, user_name, user_pw, user_email = '', user_encode = ''):
+    curs = conn.cursor()
+
+    if user_encode == '':
+        user_pw_hash = pw_encode(conn, user_pw)
+
+        curs.execute(db_change('select data from other where name = "encode"'))
+        data_encode = curs.fetchall()
+        data_encode = data_encode[0][0]
+    else:
+        user_pw_hash = user_pw
+        data_encode = user_encode
+
+    curs.execute(db_change("select id from user_set limit 1"))
+    if not curs.fetchall():
+        user_auth = 'owner'
+    else:
+        user_auth = 'user'
+
+    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'pw', ?)"), [user_name, user_pw_hash])
+    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'acl', ?)"), [user_name, user_auth])
+    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'date', ?)"), [user_name, get_time()])
+    curs.execute(db_change("insert into user_set (id, name, data) values (?, 'encode', ?)"), [user_name, data_encode])
+    
+    if user_email != '':
+        curs.execute(db_change("insert into user_set (name, id, data) values ('email', ?, ?)"), [user_name, user_email])
+    
+def ua_plus(conn, u_id, u_ip, u_agent, time):
+    curs = conn.cursor()
+
+    curs.execute(db_change("select data from other where name = 'ua_get'"))
+    rep_data = curs.fetchall()
+    if rep_data and rep_data[0][0] != '':
+        pass
+    else:
+        curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [
+            u_id, 
+            u_ip, 
+            u_agent, 
+            time
         ])
-    
-def do_reload_recent_thread(topic_num, date, name = None, sub = None):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
 
-        curs.execute(db_change("select code from rd where code = ?"), [topic_num])
-        if curs.fetchall():
-            curs.execute(db_change("update rd set date = ? where code = ?"), [date, topic_num])
-        else:
-            curs.execute(db_change("insert into rd (title, sub, code, date, band, stop, agree, acl) values (?, ?, ?, ?, '', '', '', '')"), [name, sub, topic_num, date])
+def ban_insert(conn, name, end, why, login, blocker, type_d = None, release = 0):
+    curs = conn.cursor()
 
-def add_alarm(to_user, from_user, context):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+    now_time = get_time()
+    band = type_d if type_d else ''
 
-        if to_user != from_user:
-            context = from_user + ' | ' + context
+    curs.execute(db_change("update rb set ongoing = '' where block = ? and band = ? and ongoing = '1'"), [name, band])
+    if release == 1:
+        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band, ongoing, login) values (?, ?, ?, ?, ?, ?, '', '')"), [
+            name,
+            'release',
+            now_time,
+            blocker,
+            why,
+            band
+        ])
+    else:
+        login = login if login != '' else ''
+        r_time = end if end != '0' else ''
 
-            count = '1'
-            curs.execute(db_change("select id from user_notice where name = ? order by id + 0 desc"), [to_user])
-            db_data = curs.fetchall()
-            if db_data:
-                count = str(int(db_data[0][0]) + 1)
-
-            curs.execute(db_change('insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'), [count, to_user, context, get_time()])
-    
-def add_user(user_name, user_pw, user_email = '', user_encode = ''):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        if user_encode == '':
-            user_pw_hash = pw_encode(user_pw)
-
-            curs.execute(db_change('select data from other where name = "encode"'))
-            data_encode = curs.fetchall()
-            data_encode = data_encode[0][0]
-        else:
-            user_pw_hash = user_pw
-            data_encode = user_encode
-
-        curs.execute(db_change("select id from user_set limit 1"))
-        if not curs.fetchall():
-            user_auth = 'owner'
-        else:
-            user_auth = 'user'
-
-        curs.execute(db_change("insert into user_set (id, name, data) values (?, 'pw', ?)"), [user_name, user_pw_hash])
-        curs.execute(db_change("insert into user_set (id, name, data) values (?, 'acl', ?)"), [user_name, user_auth])
-        curs.execute(db_change("insert into user_set (id, name, data) values (?, 'date', ?)"), [user_name, get_time()])
-        curs.execute(db_change("insert into user_set (id, name, data) values (?, 'encode', ?)"), [user_name, data_encode])
-        
-        if user_email != '':
-            curs.execute(db_change("insert into user_set (name, id, data) values ('email', ?, ?)"), [user_name, user_email])
-    
-def ua_plus(u_id, u_ip, u_agent, time):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        curs.execute(db_change("select data from other where name = 'ua_get'"))
-        rep_data = curs.fetchall()
-        if rep_data and rep_data[0][0] != '':
-            pass
-        else:
-            curs.execute(db_change("insert into ua_d (name, ip, ua, today, sub) values (?, ?, ?, ?, '')"), [
-                u_id, 
-                u_ip, 
-                u_agent, 
-                time
-            ])
-
-def ban_insert(name, end, why, login, blocker, type_d = None, release = 0):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        now_time = get_time()
-        band = type_d if type_d else ''
-
-        curs.execute(db_change("update rb set ongoing = '' where block = ? and band = ? and ongoing = '1'"), [name, band])
-        if release == 1:
-            curs.execute(db_change("insert into rb (block, end, today, blocker, why, band, ongoing, login) values (?, ?, ?, ?, ?, ?, '', '')"), [
-                name,
-                'release',
-                now_time,
-                blocker,
-                why,
-                band
-            ])
-        else:
-            login = login if login != '' else ''
-            r_time = end if end != '0' else ''
-
-            curs.execute(db_change("insert into rb (block, end, today, blocker, why, band, ongoing, login) values (?, ?, ?, ?, ?, ?, '1', ?)"), [
-                name, 
-                r_time, 
-                now_time, 
-                blocker, 
-                why, 
-                band,
-                login
-            ])
+        curs.execute(db_change("insert into rb (block, end, today, blocker, why, band, ongoing, login) values (?, ?, ?, ?, ?, ?, '1', ?)"), [
+            name, 
+            r_time, 
+            now_time, 
+            blocker, 
+            why, 
+            band,
+            login
+        ])
 
 def history_plus_rc_max(curs, mode):
     curs.execute(db_change("select count(*) from rc where type = ?"), [mode])
@@ -2504,212 +2471,209 @@ def history_plus_rc_max(curs, mode):
         if rc_data:
             curs.execute(db_change('delete from rc where id = ? and title = ? and type = ?'), [rc_data[0][0], rc_data[0][1], mode])
 
-def history_plus(title, data, date, ip, send, leng, t_check = '', mode = ''):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
-        # 여기 좀 느린 듯
+def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = ''):
+    curs = conn.cursor()
+    
+    curs.execute(db_change('select data from other where name = "history_recording_off"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        return 0
+
+    if mode == 'add':
+        curs.execute(db_change("select id from history where title = ? order by id + 0 asc limit 1"), [title])
+        id_data = curs.fetchall()
+        id_data = str(int(id_data[0][0]) - 1) if id_data else '0'
+    else:
+        curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [title])
+        id_data = curs.fetchall()
+        id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
         
-        curs.execute(db_change('select data from other where name = "history_recording_off"'))
-        db_data = curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            return 0
+        mode = 'r1' if id_data == '1' else mode
+        mode = mode if not re.search('^user:', title) else 'user'
 
-        if mode == 'add':
-            curs.execute(db_change("select id from history where title = ? order by id + 0 asc limit 1"), [title])
-            id_data = curs.fetchall()
-            id_data = str(int(id_data[0][0]) - 1) if id_data else '0'
-        else:
-            curs.execute(db_change("select id from history where title = ? order by id + 0 desc limit 1"), [title])
-            id_data = curs.fetchall()
-            id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
-            
-            mode = 'r1' if id_data == '1' else mode
-            mode = mode if not re.search('^user:', title) else 'user'
+    send = re.sub(r'<|>', '', send)
+    send = send[:512] if len(send) > 512 else send
+    send = send + ' (' + t_check + ')' if t_check != '' else send
 
-        send = re.sub(r'<|>', '', send)
-        send = send[:512] if len(send) > 512 else send
-        send = send + ' (' + t_check + ')' if t_check != '' else send
+    if mode != 'add' and mode != 'user':
+        history_plus_rc_max(curs, 'normal')
+        curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [id_data, title, date])
+    
+    if mode != 'add':
+        history_plus_rc_max(curs, mode)
+        curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [id_data, title, date, mode])
 
-        if mode != 'add' and mode != 'user':
-            history_plus_rc_max(curs, 'normal')
-            curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [id_data, title, date])
-        
-        if mode != 'add':
-            history_plus_rc_max(curs, mode)
-            curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [id_data, title, date, mode])
+        data_set_exist = '' if mode != 'delete' else 'not_exist'
 
-            data_set_exist = '' if mode != 'delete' else 'not_exist'
+        curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "edit_request_doing"'), [title])
 
-            curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "edit_request_doing"'), [title])
+        curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "last_edit"'), [title])
+        curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'last_edit', ?)"), [title, date])
 
-            curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "last_edit"'), [title])
-            curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'last_edit', ?)"), [title, date])
+        curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "length"'), [title])
+        curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'length', ?)"), [title, len(data)])
 
-            curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "length"'), [title])
-            curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'length', ?)"), [title, len(data)])
+        curs.execute(db_change("update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')"), [data_set_exist, title])
 
-            curs.execute(db_change("update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')"), [data_set_exist, title])
-
-        curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide, type) values (?, ?, ?, ?, ?, ?, ?, '', ?)"), [id_data, title, data, date, ip, send, leng, mode])
+    curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide, type) values (?, ?, ?, ?, ?, ?, ?, '', ?)"), [id_data, title, data, date, ip, send, leng, mode])
 
 # Func-error
-def re_error(data):
-    with get_db_connect() as conn:
-        curs = conn.cursor()
+def re_error(conn, data):
+    curs = conn.cursor()
 
-        if data == '/ban':
-            if ban_check()[0] == 1:
-                end = '<div id="opennamu_get_user_info">' + html.escape(ip_check()) + '</div>'
-            else:
-                end = '<ul class="opennamu_ul"><li>' + load_lang('authority_error') + '</li></ul>'
-
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('error'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
-                data = '<h2>' + load_lang('error') + '</h2>' + end,
-                menu = 0
-            )), 401
+    if data == '/ban':
+        if ban_check(conn)[0] == 1:
+            end = '<div id="opennamu_get_user_info">' + html.escape(ip_check()) + '</div>'
         else:
-            title = load_lang('error')
+            end = '<ul class="opennamu_ul"><li>' + get_lang(conn, 'authority_error') + '</li></ul>'
+
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [get_lang(conn, 'error'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            data = '<h2>' + get_lang(conn, 'error') + '</h2>' + end,
+            menu = 0
+        )), 401
+    else:
+        title = get_lang(conn, 'error')
+        sub_title = title
+
+        num = int(number_check(data.replace('/error/', '')))
+        if num == 1:
+            data = get_lang(conn, 'no_login_error')
+        elif num == 2:
+            data = get_lang(conn, 'no_exist_user_error')
+        elif num == 3:
+            data = get_lang(conn, 'authority_error')
+        elif num == 4:
+            data = get_lang(conn, 'no_admin_block_error')
+        elif num == 5:
+            data = get_lang(conn, 'error_skin_set')
+        elif num == 8:
+            data = '' + \
+                get_lang(conn, 'long_id_error') + '<br>' + \
+                get_lang(conn, 'id_char_error') + ' <a href="/filter/name_filter">(' + get_lang(conn, 'id_filter_list') + ')</a><br>' + \
+                get_lang(conn, 'same_id_exist_error') + \
+            ''
+        elif num == 9:
+            data = get_lang(conn, 'file_exist_error')
+        elif num == 10:
+            data = get_lang(conn, 'password_error')
+        elif num == 11:
+            data = get_lang(conn, 'topic_long_error')
+        elif num == 12:
+            data = get_lang(conn, 'email_error')
+        elif num == 13:
+            data = get_lang(conn, 'recaptcha_error')
+        elif num == 14:
+            data = get_lang(conn, 'file_extension_error') + ' <a href="/filter/extension_filter">(' + get_lang(conn, 'extension_filter_list') + ')</a>'
+        elif num == 15:
+            data = get_lang(conn, 'edit_record_error')
+        elif num == 16:
+            data = get_lang(conn, 'same_file_error')
+        elif num == 17:
+            curs.execute(db_change('select data from other where name = "upload"'))
+            db_data = curs.fetchall()
+            file_max = number_check(db_data[0][0]) if db_data and db_data[0][0] != '' else '2'
+            data = get_lang(conn, 'file_capacity_error') + file_max
+        elif num == 18:
+            data = get_lang(conn, 'email_send_error')
+        elif num == 19:
+            data = get_lang(conn, 'move_error')
+        elif num == 20:
+            data = get_lang(conn, 'password_diffrent_error')
+        elif num == 21:
+            data = get_lang(conn, 'edit_filter_error')
+        elif num == 22:
+            data = get_lang(conn, 'file_name_error')
+        elif num == 23:
+            data = get_lang(conn, 'regex_error')
+        elif num == 24:
+            curs.execute(db_change("select data from other where name = 'slow_edit'"))
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = get_lang(conn, 'fast_edit_error') + db_data
+        elif num == 25:
+            data = get_lang(conn, 'too_many_dec_error')
+        elif num == 26:
+            data = get_lang(conn, 'application_not_found')
+        elif num == 27:
+            data = get_lang(conn, "invalid_password_error")
+        elif num == 28:
+            data = get_lang(conn, 'watchlist_overflow_error')
+        elif num == 29:
+            data = get_lang(conn, 'copyright_disagreed')
+        elif num == 30:
+            data = get_lang(conn, 'ie_wrong_callback')
+        elif num == 33:
+            data = get_lang(conn, 'restart_fail_error')
+        elif num == 34:
+            data = get_lang(conn, "update_error") + ' <a href="https://github.com/opennamu/opennamu">(Github)</a>'
+        elif num == 35:
+            data = get_lang(conn, 'same_email_error')
+        elif num == 36:
+            data = get_lang(conn, 'input_email_error')
+        elif num == 37:
+            data = get_lang(conn, 'error_edit_send_request')
+        elif num == 38:
+            curs.execute(db_change("select data from other where name = 'title_max_length'"))
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = get_lang(conn, 'error_title_length_too_long') + db_data
+        elif num == 39:
+            curs.execute(db_change("select data from other where name = 'title_topic_max_length'"))
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = get_lang(conn, 'error_title_length_too_long') + db_data
+        elif num == 40:
+            curs.execute(db_change("select data from other where name = 'password_min_length'"))
+            db_data = curs.fetchall()
+            password_min_length = '' if not db_data else db_data[0][0]
+            data = get_lang(conn, 'error_password_length_too_short') + password_min_length
+        elif num == 41:
+            curs.execute(db_change("select data from other where name = 'edit_timeout'"))
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = get_lang(conn, 'timeout_error') + db_data
+        elif num == 42:
+            curs.execute(db_change("select data from other where name = 'slow_thread'"))
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = get_lang(conn, 'fast_edit_error') + db_data
+        elif num == 43:
+            title = get_lang(conn, 'application_submitted')
             sub_title = title
+            data = get_lang(conn, 'waiting_for_approval')
+        elif num == 44:
+            curs.execute(db_change("select data from other where name = 'document_content_max_length'"))
+            db_data = curs.fetchall()
+            db_data = '' if not db_data else db_data[0][0]
+            data = get_lang(conn, 'error_content_length_too_long') + db_data
+        else:
+            data = '???'
 
-            num = int(number_check(data.replace('/error/', '')))
-            if num == 1:
-                data = load_lang('no_login_error')
-            elif num == 2:
-                data = load_lang('no_exist_user_error')
-            elif num == 3:
-                data = load_lang('authority_error')
-            elif num == 4:
-                data = load_lang('no_admin_block_error')
-            elif num == 5:
-                data = load_lang('error_skin_set')
-            elif num == 8:
+        if num == 5:
+            if flask.request.path != '/skin_set':
+                data += '<br>' + get_lang(conn, 'error_skin_set_old') + ' <a href="/skin_set">(' + get_lang(conn, 'go') + ')</a>'
+
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'skin_set'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '' + \
-                    load_lang('long_id_error') + '<br>' + \
-                    load_lang('id_char_error') + ' <a href="/filter/name_filter">(' + load_lang('id_filter_list') + ')</a><br>' + \
-                    load_lang('same_id_exist_error') + \
-                ''
-            elif num == 9:
-                data = load_lang('file_exist_error')
-            elif num == 10:
-                data = load_lang('password_error')
-            elif num == 11:
-                data = load_lang('topic_long_error')
-            elif num == 12:
-                data = load_lang('email_error')
-            elif num == 13:
-                data = load_lang('recaptcha_error')
-            elif num == 14:
-                data = load_lang('file_extension_error') + ' <a href="/filter/extension_filter">(' + load_lang('extension_filter_list') + ')</a>'
-            elif num == 15:
-                data = load_lang('edit_record_error')
-            elif num == 16:
-                data = load_lang('same_file_error')
-            elif num == 17:
-                curs.execute(db_change('select data from other where name = "upload"'))
-                db_data = curs.fetchall()
-                file_max = number_check(db_data[0][0]) if db_data and db_data[0][0] != '' else '2'
-                data = load_lang('file_capacity_error') + file_max
-            elif num == 18:
-                data = load_lang('email_send_error')
-            elif num == 19:
-                data = load_lang('move_error')
-            elif num == 20:
-                data = load_lang('password_diffrent_error')
-            elif num == 21:
-                data = load_lang('edit_filter_error')
-            elif num == 22:
-                data = load_lang('file_name_error')
-            elif num == 23:
-                data = load_lang('regex_error')
-            elif num == 24:
-                curs.execute(db_change("select data from other where name = 'slow_edit'"))
-                db_data = curs.fetchall()
-                db_data = '' if not db_data else db_data[0][0]
-                data = load_lang('fast_edit_error') + db_data
-            elif num == 25:
-                data = load_lang('too_many_dec_error')
-            elif num == 26:
-                data = load_lang('application_not_found')
-            elif num == 27:
-                data = load_lang("invalid_password_error")
-            elif num == 28:
-                data = load_lang('watchlist_overflow_error')
-            elif num == 29:
-                data = load_lang('copyright_disagreed')
-            elif num == 30:
-                data = load_lang('ie_wrong_callback')
-            elif num == 33:
-                data = load_lang('restart_fail_error')
-            elif num == 34:
-                data = load_lang("update_error") + ' <a href="https://github.com/opennamu/opennamu">(Github)</a>'
-            elif num == 35:
-                data = load_lang('same_email_error')
-            elif num == 36:
-                data = load_lang('input_email_error')
-            elif num == 37:
-                data = load_lang('error_edit_send_request')
-            elif num == 38:
-                curs.execute(db_change("select data from other where name = 'title_max_length'"))
-                db_data = curs.fetchall()
-                db_data = '' if not db_data else db_data[0][0]
-                data = load_lang('error_title_length_too_long') + db_data
-            elif num == 39:
-                curs.execute(db_change("select data from other where name = 'title_topic_max_length'"))
-                db_data = curs.fetchall()
-                db_data = '' if not db_data else db_data[0][0]
-                data = load_lang('error_title_length_too_long') + db_data
-            elif num == 40:
-                curs.execute(db_change("select data from other where name = 'password_min_length'"))
-                db_data = curs.fetchall()
-                password_min_length = '' if not db_data else db_data[0][0]
-                data = load_lang('error_password_length_too_short') + password_min_length
-            elif num == 41:
-                curs.execute(db_change("select data from other where name = 'edit_timeout'"))
-                db_data = curs.fetchall()
-                db_data = '' if not db_data else db_data[0][0]
-                data = load_lang('timeout_error') + db_data
-            elif num == 42:
-                curs.execute(db_change("select data from other where name = 'slow_thread'"))
-                db_data = curs.fetchall()
-                db_data = '' if not db_data else db_data[0][0]
-                data = load_lang('fast_edit_error') + db_data
-            elif num == 43:
-                title = load_lang('application_submitted')
-                sub_title = title
-                data = load_lang('waiting_for_approval')
-            elif num == 44:
-                curs.execute(db_change("select data from other where name = 'document_content_max_length'"))
-                db_data = curs.fetchall()
-                db_data = '' if not db_data else db_data[0][0]
-                data = load_lang('error_content_length_too_long') + db_data
-            else:
-                data = '???'
-
-            if num == 5:
-                if flask.request.path != '/skin_set':
-                    data += '<br>' + load_lang('error_skin_set_old') + ' <a href="/skin_set">(' + load_lang('go') + ')</a>'
-
-                return easy_minify(flask.render_template(skin_check(),
-                    imp = [load_lang('skin_set'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
-                    data = '' + \
-                        '<div id="main_skin_set">' + \
-                            '<h2>' + load_lang('error') + '</h2>' + \
-                            '<ul class="opennamu_ul">' + \
-                                '<li>' + data + '</a></li>' + \
-                            '</ul>' + \
-                        '</div>' + \
-                    '',
-                    menu = [['change', load_lang('user_setting')], ['change/skin_set/main', load_lang('main_skin_set')]]
-                ))
-            else:
-                return easy_minify(flask.render_template(skin_check(),
-                    imp = [title, wiki_set(), wiki_custom(), wiki_css([0, 0])],
-                    data = '' + \
-                        '<h2>' + sub_title + '</h2>' + \
+                    '<div id="main_skin_set">' + \
+                        '<h2>' + get_lang(conn, 'error') + '</h2>' + \
                         '<ul class="opennamu_ul">' + \
-                            '<li>' + data + '</li>' + \
+                            '<li>' + data + '</a></li>' + \
                         '</ul>' + \
-                    '',
-                    menu = 0
-                )), 400
+                    '</div>' + \
+                '',
+                menu = [['change', get_lang(conn, 'user_setting')], ['change/skin_set/main', get_lang(conn, 'main_skin_set')]]
+            ))
+        else:
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [title, wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                data = '' + \
+                    '<h2>' + sub_title + '</h2>' + \
+                    '<ul class="opennamu_ul">' + \
+                        '<li>' + data + '</li>' + \
+                    '</ul>' + \
+                '',
+                menu = 0
+            )), 400

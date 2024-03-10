@@ -4,8 +4,8 @@ def main_setting_sitemap_set():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check() != 1:
-            return re_error('/ban')
+        if admin_check(conn) != 1:
+            return re_error(conn, '/ban')
         
         setting_list = {
             0 : ['sitemap_auto_exclude_domain', ''],
@@ -24,9 +24,9 @@ def main_setting_sitemap_set():
 
             conn.commit()
 
-            admin_check(None, 'edit_set (sitemap)')
+            admin_check(conn, None, 'edit_set (sitemap)')
 
-            return redirect('/setting/sitemap_set')
+            return redirect(conn, '/setting/sitemap_set')
         else:
             d_list = {}
             for i in setting_list:
@@ -52,7 +52,7 @@ def main_setting_sitemap_set():
 
             sitemap_list = ''
             if os.path.exists('sitemap.xml'):
-                sitemap_list += '<a href="/sitemap.xml">(' + load_lang('view') + ')</a>'
+                sitemap_list += '<a href="/sitemap.xml">(' + get_lang(conn, 'view') + ')</a>'
 
                 for_a = 0
                 while os.path.exists('sitemap_' + str(for_a) + '.xml'):
@@ -60,32 +60,32 @@ def main_setting_sitemap_set():
 
                     for_a += 1
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('sitemap_management'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'sitemap_management'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     ''' + sitemap_list + '''
                     <hr class="main_hr">
                     <form method="post">
-                        <a href="/setting/sitemap">(''' + load_lang('sitemap_manual_create') + ''')</a>
+                        <a href="/setting/sitemap">(''' + get_lang(conn, 'sitemap_manual_create') + ''')</a>
                         <hr class="main_hr">
 
-                        <input type="checkbox" ''' + check_box_div[4] + ''' name="sitemap_auto_make"> ''' + load_lang('sitemap_auto_make') + '''
+                        <input type="checkbox" ''' + check_box_div[4] + ''' name="sitemap_auto_make"> ''' + get_lang(conn, 'sitemap_auto_make') + '''
                         <hr class="main_hr">
 
-                        <input type="checkbox" ''' + check_box_div[0] + ''' name="sitemap_auto_exclude_domain"> ''' + load_lang('stiemap_exclude_domain') + '''
+                        <input type="checkbox" ''' + check_box_div[0] + ''' name="sitemap_auto_exclude_domain"> ''' + get_lang(conn, 'stiemap_exclude_domain') + '''
                         <hr class="main_hr">
 
-                        <input type="checkbox" ''' + check_box_div[1] + ''' name="sitemap_auto_exclude_user_page"> ''' + load_lang('stiemap_exclude_user_page') + '''
+                        <input type="checkbox" ''' + check_box_div[1] + ''' name="sitemap_auto_exclude_user_page"> ''' + get_lang(conn, 'stiemap_exclude_user_page') + '''
                         <hr class="main_hr">
 
-                        <input type="checkbox" ''' + check_box_div[2] + ''' name="sitemap_auto_exclude_file_page"> ''' + load_lang('stiemap_exclude_file_page') + '''
+                        <input type="checkbox" ''' + check_box_div[2] + ''' name="sitemap_auto_exclude_file_page"> ''' + get_lang(conn, 'stiemap_exclude_file_page') + '''
                         <hr class="main_hr">
 
-                        <input type="checkbox" ''' + check_box_div[3] + ''' name="sitemap_auto_exclude_category_page"> ''' + load_lang('stiemap_exclude_category_page') + '''
+                        <input type="checkbox" ''' + check_box_div[3] + ''' name="sitemap_auto_exclude_category_page"> ''' + get_lang(conn, 'stiemap_exclude_category_page') + '''
                         <hr class="main_hr">
 
-                        <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 ''',
-                menu = [['setting', load_lang('return')]]
+                menu = [['setting', get_lang(conn, 'return')]]
             ))
