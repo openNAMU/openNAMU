@@ -79,8 +79,16 @@ def view_set(name = 'Test'):
 
             markup_data = markup_data if markup_data != '' else 'normal'
 
-            if user_page == 1:
-                admin_check(5, check_data + ' (' + all_d + ')' + ' (' + markup_data + ')')
+            if admin_check() == 1:
+                document_top = flask.request.form.get('document_top', '')
+                curs.execute(db_change("delete from data_set where doc_name = ? and set_name = 'document_top'"), [name])
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_top', ?)"), [name, document_top])
+                
+                document_editor_top = flask.request.form.get('document_editor_top', '')
+                curs.execute(db_change("delete from data_set where doc_name = ? and set_name = 'document_editor_top'"), [name])
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_editor_top', ?)"), [name, document_editor_top])
+
+            admin_check(5, check_data)
 
             conn.commit()
 
@@ -175,6 +183,27 @@ def view_set(name = 'Test'):
             markup_html = '<select name="document_markup" ' + check_ok + '>' + markup_html + '</select>'
 
             data += markup_html
+
+            save_button = '<button type="submit" ' + check_ok + '>' + load_lang('save') + '</button>'
+            if admin_check() != 1:
+                check_ok = 'disabled'
+
+            curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_top'"), [name])
+            db_data = curs.fetchall()
+            document_top = db_data[0][0] if db_data and db_data[0][0] != '' else ''
+
+            curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_editor_top'"), [name])
+            db_data = curs.fetchall()
+            document_editor_top = db_data[0][0] if db_data and db_data[0][0] != '' else ''
+
+            data += '''
+                <h2>''' + load_lang('document_top') + ''' (HTML)</h2>
+                <textarea ''' + check_ok + ''' class="opennamu_textarea_100" name="document_top">''' + html.escape(document_top) + '''</textarea>
+                
+                <h2>''' + load_lang('document_editor_top') + ''' (HTML)</h2>
+                <textarea ''' + check_ok + ''' class="opennamu_textarea_100" name="document_editor_top">''' + html.escape(document_editor_top) + '''</textarea>
+            '''
+            
             data += '<hr class="main_hr">'
 
             return easy_minify(flask.render_template(skin_check(),
@@ -184,7 +213,7 @@ def view_set(name = 'Test'):
                         <a href="/setting/acl">(''' + load_lang('main_acl_setting') + ''')</a>
                         <hr class="main_hr">
                         ''' + render_simple_set(data) + '''
-                        <button type="submit" ''' + check_ok + '''>''' + load_lang('save') + '''</button>
+                        ''' + save_button + '''
                     </form>
                 ''',
                 menu = [
