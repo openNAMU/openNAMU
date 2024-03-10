@@ -120,7 +120,7 @@ def edit_move(name):
                             ip, 
                             send, 
                             '0',
-                            t_check = '<a>' + title_name[0] + '</a> → <a>' + title_name[1] + '</a>',
+                            t_check = '<a>' + title_name[0] + '</a> ⇋ <a>' + title_name[1] + '</a>',
                             mode = 'move'
                         )
                 elif move_option != 'none':
