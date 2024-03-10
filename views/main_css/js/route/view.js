@@ -48,7 +48,7 @@ function opennamu_view_w_raw_preview() {
     opennamu_do_render('opennamu_preview_area', data, name);
 }
 
-function opennamu_view_w() {
+function opennamu_view_w(do_type = '') {
     let name = "test";
     if(document.getElementById('opennamu_editor_doc_name')) {
         name = document.getElementById('opennamu_editor_doc_name').innerHTML.replace(/&amp;/g, '&');
@@ -58,7 +58,7 @@ function opennamu_view_w() {
         return res.json();
     }).then(function(data) {
         if(data["data"]) {
-            opennamu_do_render('opennamu_preview_area', data["data"], name);
+            opennamu_do_render('opennamu_preview_area', data["data"], name, do_type);
         }
     });
 }

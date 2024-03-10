@@ -161,12 +161,18 @@ def view_w(name = 'Test', do_type = ''):
             else:
                 file_data = ''
         else:
+            curs.execute(db_change("select link from back where title = ? and type = 'include' limit 1"), [name])
+            doc_type = 'include' if curs.fetchall() else doc_type
+
+            curs.execute(db_change("select link from back where link = ? and type = 'redirect' limit 1"), [name])
+            doc_type = 'redirect' if curs.fetchall() else doc_type
+
             name_view = name
 
         end_data = '''
             <div id="opennamu_preview_area">
                 <textarea id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
-                <script>opennamu_view_w();</script>
+                <script>opennamu_view_w("''' + ('from' if do_type == 'from' else '') + '''");</script>
             </div>
         '''
 
@@ -192,7 +198,7 @@ def view_w(name = 'Test', do_type = ''):
             else:
                 end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + load_lang('decument_404_error') + '</li></ul>'
 
-            curs.execute(db_change('select ip, date, leng, send, id from history where title = ? and hide != "O" order by id + 0 desc limit 1'), [name])
+            curs.execute(db_change('select ip from history where title = ? limit 1'), [name])
             db_data = curs.fetchall()
             history_color = 1 if db_data else 0
         else:
