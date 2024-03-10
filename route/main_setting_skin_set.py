@@ -9,7 +9,7 @@ def main_setting_skin_set():
         if admin_check(conn) != 1:
             return re_error(conn, '/ban')
             
-        set_list = user_setting_skin_set_main_set_list()
+        set_list = user_setting_skin_set_main_set_list(conn)
 
         if flask.request.method == 'POST':
             for for_b in set_list:

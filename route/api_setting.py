@@ -7,7 +7,7 @@ def api_setting(name = 'markup'):
         
         # from other
         ok_list_1 = ['markup']
-        ok_list_1 += [for_a for for_a in user_setting_skin_set_main_set_list()]
+        ok_list_1 += [for_a for for_a in user_setting_skin_set_main_set_list(conn)]
 
         # from html_filter
         ok_list_2 = ['inter_wiki']

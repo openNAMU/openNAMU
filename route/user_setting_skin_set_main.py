@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def user_setting_skin_set_main_set_list():
+def user_setting_skin_set_main_set_list(conn):
     set_list = {
         'main_css_strike' : [
             ['default', get_lang(conn, 'default')],
@@ -114,7 +114,7 @@ def user_setting_skin_set_main():
         if ban_check(conn, ip)[0] == 1:
             return re_error(conn, '/ban')
             
-        set_list = user_setting_skin_set_main_set_list()
+        set_list = user_setting_skin_set_main_set_list(conn)
         use_cookie = ['main_css_image_paste', 'main_css_darkmode']
 
         if flask.request.method == 'POST':
