@@ -43,7 +43,6 @@ def edit_delete(name):
                     ip,
                     send,
                     leng,
-                    t_check = 'delete',
                     mode = 'delete'
                 )
 

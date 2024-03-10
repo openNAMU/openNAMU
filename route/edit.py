@@ -23,14 +23,19 @@ def edit_timeout(func, args = (), timeout = 3):
         pool.join()
         return 0
         
-def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = ''):
+def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = '', name = ''):
     monaco_editor_top = ''
     editor_display = ''
     monaco_display = ''
+    div = ''
 
     if do_type == 'edit':
         curs.execute(db_change('select data from other where name = "edit_help"'))
         sql_d = curs.fetchall()
+
+        curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_top'"), [name])
+        body = curs.fetchall()
+        div = body[0][0] if body else ''
     elif do_type == 'bbs':
         curs.execute(db_change('select data from other where name = "bbs_help"'))
         sql_d = curs.fetchall()
@@ -72,6 +77,8 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = ''):
             ''' + edit_button() + '''
         </div>
         
+        ''' + div + '''
+
         <div id="opennamu_monaco_editor" class="''' + textarea_size + '''" ''' + monaco_display + '''></div>
         <textarea id="opennamu_edit_textarea" ''' + editor_display + ''' class="''' + textarea_size + '''" name="content" placeholder="''' + p_text + '''">''' + html.escape(data_main) + '''</textarea>
         <hr class="main_hr">
@@ -341,7 +348,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                         <input placeholder="''' + load_lang('why') + '''" name="send">
                         <hr class="main_hr">
                         
-                        ''' + edit_editor(curs, ip, data_section, addon = get_edit_text_bottom_check_box() + get_edit_text_bottom()) + '''
+                        ''' + edit_editor(curs, ip, data_section, addon = get_edit_text_bottom_check_box() + get_edit_text_bottom(), name = name) + '''
                     </form>
                 ''',
                 menu = [

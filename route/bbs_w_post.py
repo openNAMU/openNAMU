@@ -297,7 +297,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                     <form method="post">
                         ''' + bbs_comment_form + '''
                     </form>
-                    <script src="/views/main_css/js/route/bbs_w_post.js"></script>
+                    <script src="/views/main_css/js/route/bbs_w_post.js''' + cache_v() + '''"></script>
                 '''
 
                 return easy_minify(flask.render_template(skin_check(),

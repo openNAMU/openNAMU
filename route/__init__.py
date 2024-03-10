@@ -168,6 +168,8 @@ from route.vote_end import vote_end
 from route.vote_list import vote_list
 from route.vote_select import vote_select
 
+from route.n_w_watch_list import w_watch_list
+
 from route.go_api_func_sha224 import api_func_sha224
 from route.go_api_func_ip import api_func_ip
 

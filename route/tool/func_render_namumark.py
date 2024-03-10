@@ -605,6 +605,30 @@ class class_do_render_namumark:
                 data_name = self.get_tool_data_storage('<span id="' + main_text + '">', '</span>', match_org.group(0))
 
                 return '<' + data_name + '></' + data_name + '>'
+            elif name_data == 'username':
+                data = re.findall(macro_split_regex, match[1])
+
+                # get option
+                user_name = ''
+                render = 1
+                for for_a in data:
+                    data_sub = re.search(macro_split_sub_regex, for_a)
+                    if data_sub:
+                        data_sub = data_sub.groups()
+                        data_sub = [data_sub[0].lower(), data_sub[1]]
+
+                        if data_sub[0] == 'load_name':
+                            if data_sub[1] == '1':
+                                user_name = self.ip
+                        elif data_sub[0] == 'render':
+                            if data_sub[1] == '0':
+                                render = 0
+                    else:
+                        user_name = for_a
+
+                data_name = self.get_tool_data_storage('<span class="' + ('opennamu_render_ip' if render == 1 else '') + '">' + user_name + '</span>', '', match_org.group(0))
+
+                return '<' + data_name + '></' + data_name + '>'
             elif name_data == 'timeif':
                 data = re.findall(macro_split_regex, match[1])
 
@@ -1465,103 +1489,107 @@ class class_do_render_namumark:
 
     def do_render_redirect(self):
         match = re.search(r'^<back_br>\n#(?:redirect|넘겨주기) ([^\n]+)', self.render_data, flags = re.I)
-        if match and self.doc_set['doc_type'] == 'view':
-            link_data_full = match.group(0)
-            link_main = match.group(1)
+        if match:
+            if self.doc_set['doc_type'] == 'view':
+                link_data_full = match.group(0)
+                link_main = match.group(1)
 
-            link_inter_name = ''
+                link_inter_name = ''
 
-            link_inter_regex = re.compile('^(?:inter|인터):([^:]+):', flags = re.I)
-            inter_check = re.search(link_inter_regex, link_main)
-            if not inter_check:
-                # under page & fix url
-                link_main = self.get_tool_link_fix(link_main, 'redirect')
-            else:
-                link_inter_name = inter_check.group(1)
-                link_main = re.sub(link_inter_regex, '', link_main)
-
-            # sharp
-            link_main = link_main.replace('&#x27;', '<link_single>')
-            link_data_sharp_regex = r'#([^#]+)$'
-            link_data_sharp = re.search(link_data_sharp_regex, link_main)
-            if link_data_sharp:
-                link_data_sharp = link_data_sharp.group(1)
-                link_data_sharp = html.unescape(link_data_sharp)
-                link_data_sharp = '#' + url_pas(link_data_sharp)
-
-                link_main = re.sub(link_data_sharp_regex, '', link_main)
-            else:
-                link_data_sharp = ''
-            
-            link_main = link_main.replace('<link_single>', '&#x27;')
-
-            if not inter_check:
-                # main link fix
-                link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
-                link_main = html.unescape(link_main)
-
-                link_exist = 1
-
-                self.curs.execute(db_change("select title from data where title = ?" + self.link_case_insensitive), [link_main])
-                db_data = self.curs.fetchall()
-                if not db_data:
-                    if not link_main in self.data_backlink:
-                        self.data_backlink[link_main] = {}
-
-                    self.data_backlink[link_main]['no'] = ''
-                    link_exist = 0
+                link_inter_regex = re.compile('^(?:inter|인터):([^:]+):', flags = re.I)
+                inter_check = re.search(link_inter_regex, link_main)
+                if not inter_check:
+                    # under page & fix url
+                    link_main = self.get_tool_link_fix(link_main, 'redirect')
                 else:
-                    link_main = db_data[0][0]
-                    if not link_main in self.data_backlink:
-                        self.data_backlink[link_main] = {}
+                    link_inter_name = inter_check.group(1)
+                    link_main = re.sub(link_inter_regex, '', link_main)
 
-                self.data_backlink[link_main]['redirect'] = ''
+                # sharp
+                link_main = link_main.replace('&#x27;', '<link_single>')
+                link_data_sharp_regex = r'#([^#]+)$'
+                link_data_sharp = re.search(link_data_sharp_regex, link_main)
+                if link_data_sharp:
+                    link_data_sharp = link_data_sharp.group(1)
+                    link_data_sharp = html.unescape(link_data_sharp)
+                    link_data_sharp = '#' + url_pas(link_data_sharp)
 
-                link_main = url_pas(link_main)
-                if link_main != '':
-                    link_main = '/w_from/' + link_main
-
-                self.data_redirect = 1
-                if link_exist == 1:
-                    if self.doc_set['doc_from'] != '':
-                        data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
-                    else:
-                        data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', '', link_data_full)
+                    link_main = re.sub(link_data_sharp_regex, '', link_main)
                 else:
-                    data_name = self.get_tool_data_storage('', '', link_data_full)
+                    link_data_sharp = ''
+                
+                link_main = link_main.replace('<link_single>', '&#x27;')
 
-                self.render_data = '<' + data_name + '></' + data_name + '>'
-            else:
-                self.curs.execute(db_change("select plus, plus_t from html_filter where kind = 'inter_wiki' and html = ?"), [link_inter_name])
-                db_data = self.curs.fetchall()
-                if db_data:
-                    link_main = url_pas(link_main)
-                    link_main = db_data[0][0] + link_main
+                if not inter_check:
+                    # main link fix
+                    link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
+                    link_main = html.unescape(link_main)
 
-                    link_sub_storage = match.group(1)
-                    link_sub_storage = re.sub(link_inter_regex, '', link_sub_storage)
+                    link_exist = 1
 
-                    link_inter_icon = link_inter_name + ':'
-                    if db_data[0][1] != '':
-                        link_inter_icon = db_data[0][1]
-
-                    link_sub_storage = link_inter_icon + link_sub_storage
-
-                    self.curs.execute(db_change("select plus_t from html_filter where kind = 'inter_wiki_sub' and html = ?"), [link_inter_name])
+                    self.curs.execute(db_change("select title from data where title = ?" + self.link_case_insensitive), [link_main])
                     db_data = self.curs.fetchall()
-                    if db_data and db_data[0][0] == 'under_bar':
-                        link_main = link_main.replace('%20', '_')
+                    if not db_data:
+                        if not link_main in self.data_backlink:
+                            self.data_backlink[link_main] = {}
+
+                        self.data_backlink[link_main]['no'] = ''
+                        link_exist = 0
+                    else:
+                        link_main = db_data[0][0]
+                        if not link_main in self.data_backlink:
+                            self.data_backlink[link_main] = {}
+
+                    self.data_backlink[link_main]['redirect'] = ''
+
+                    link_main = url_pas(link_main)
+                    if link_main != '':
+                        link_main = '/w_from/' + link_main
 
                     self.data_redirect = 1
-                    if 'doc_from' in self.doc_set:
-                        data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
+                    if link_exist == 1:
+                        if self.doc_set['doc_from'] != '':
+                            data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
+                        else:
+                            data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', '', link_data_full)
                     else:
-                        data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="5; url=' + link_main + link_data_sharp + '">', link_sub_storage + ' - After 5s', link_data_full)
-                
+                        data_name = self.get_tool_data_storage('', '', link_data_full)
+
                     self.render_data = '<' + data_name + '></' + data_name + '>'
                 else:
-                    self.data_redirect = 1
-                    self.render_data = ''
+                    self.curs.execute(db_change("select plus, plus_t from html_filter where kind = 'inter_wiki' and html = ?"), [link_inter_name])
+                    db_data = self.curs.fetchall()
+                    if db_data:
+                        link_main = url_pas(link_main)
+                        link_main = db_data[0][0] + link_main
+
+                        link_sub_storage = match.group(1)
+                        link_sub_storage = re.sub(link_inter_regex, '', link_sub_storage)
+
+                        link_inter_icon = link_inter_name + ':'
+                        if db_data[0][1] != '':
+                            link_inter_icon = db_data[0][1]
+
+                        link_sub_storage = link_inter_icon + link_sub_storage
+
+                        self.curs.execute(db_change("select plus_t from html_filter where kind = 'inter_wiki_sub' and html = ?"), [link_inter_name])
+                        db_data = self.curs.fetchall()
+                        if db_data and db_data[0][0] == 'under_bar':
+                            link_main = link_main.replace('%20', '_')
+
+                        self.data_redirect = 1
+                        if 'doc_from' in self.doc_set:
+                            data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
+                        else:
+                            data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="5; url=' + link_main + link_data_sharp + '">', link_sub_storage + ' - After 5s', link_data_full)
+                    
+                        self.render_data = '<' + data_name + '></' + data_name + '>'
+                    else:
+                        self.data_redirect = 1
+                        self.render_data = ''
+            else:
+                self.data_redirect = 1
+                self.render_data = ''
 
     def do_render_table(self):
         self.render_data = re.sub(r'\n +\|\|', '\n||', self.render_data)
@@ -2325,6 +2353,7 @@ class class_do_render_namumark:
             if(window.location.hash !== '' && document.getElementById(window.location.hash.replace(/^#/, ''))) {
                 document.getElementById(window.location.hash.replace(/^#/, '')).focus();
             }\n
+            opennamu_do_ip_render();\n
         '''
 
     def __call__(self):
