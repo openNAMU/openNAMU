@@ -1360,7 +1360,7 @@ def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = 
 
     get_class_render[0] = '<div class="opennamu_render_complete">' + get_class_render[0] + '</div>'
 
-    font_size_set_data = get_main_skin_set(curs, flask.session, 'main_css_font_size', ip)
+    font_size_set_data = get_main_skin_set(conn, flask.session, 'main_css_font_size', ip)
     if font_size_set_data != 'default':
         font_size_set_data = number_check(font_size_set_data)
 
@@ -1393,19 +1393,19 @@ def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = 
             </style>''' + \
         '' + get_class_render[0]
 
-    table_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_scroll', ip)
+    table_set_data = get_main_skin_set(conn, flask.session, 'main_css_table_scroll', ip)
     if table_set_data == 'on':
         get_class_render[0] = '<style>.table_safe { overflow-x: scroll; white-space: nowrap; }</style>' + get_class_render[0]
 
-    joke_set_data = get_main_skin_set(curs, flask.session, 'main_css_view_joke', ip)
+    joke_set_data = get_main_skin_set(conn, flask.session, 'main_css_view_joke', ip)
     if joke_set_data == 'off':
         get_class_render[0] = '<style>.opennamu_joke { display: none; }</style>' + get_class_render[0]
 
-    math_set_data = get_main_skin_set(curs, flask.session, 'main_css_math_scroll', ip)
+    math_set_data = get_main_skin_set(conn, flask.session, 'main_css_math_scroll', ip)
     if math_set_data == 'on':
         get_class_render[0] = '<style>.katex .base { overflow-x: scroll; }</style>' + get_class_render[0]
 
-    transparent_set_data = get_main_skin_set(curs, flask.session, 'main_css_table_transparent', ip)
+    transparent_set_data = get_main_skin_set(conn, flask.session, 'main_css_table_transparent', ip)
     if transparent_set_data == 'on':
         get_class_render[0] = '' + \
             '''<style>
@@ -2463,7 +2463,9 @@ def ban_insert(conn, name, end, why, login, blocker, type_d = None, release = 0)
             login
         ])
 
-def history_plus_rc_max(curs, mode):
+def history_plus_rc_max(conn, mode):
+    curs = conn.cursor()
+
     curs.execute(db_change("select count(*) from rc where type = ?"), [mode])
     if curs.fetchall()[0][0] >= 200:
         curs.execute(db_change("select id, title from rc where type = ? order by date asc limit 1"), [mode])
@@ -2496,11 +2498,11 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
     send = send + ' (' + t_check + ')' if t_check != '' else send
 
     if mode != 'add' and mode != 'user':
-        history_plus_rc_max(curs, 'normal')
+        history_plus_rc_max(conn, 'normal')
         curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [id_data, title, date])
     
     if mode != 'add':
-        history_plus_rc_max(curs, mode)
+        history_plus_rc_max(conn, mode)
         curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [id_data, title, date, mode])
 
         data_set_exist = '' if mode != 'delete' else 'not_exist'

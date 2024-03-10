@@ -98,7 +98,7 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                 add_alarm(conn, ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
 
             data = flask.request.form.get('content', 'Test').replace('\r', '')
-            data = api_topic_thread_pre_render(curs, data, num, ip, topic_num, name, sub)
+            data = api_topic_thread_pre_render(conn, data, num, ip, topic_num, name, sub)
 
             do_add_thread(conn, 
                 topic_num,
@@ -162,7 +162,7 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                             <hr class="main_hr">
                         </div>
                         
-                        ''' + edit_editor(curs, ip, '', 'thread') + '''
+                        ''' + edit_editor(conn, ip, '', 'thread') + '''
                     </form>
                 ''',
                 menu = [['topic/' + url_pas(name), get_lang(conn, 'list')]]

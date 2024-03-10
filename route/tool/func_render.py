@@ -47,7 +47,7 @@ class class_do_render:
             rep_data = db_data[0][0] if db_data else 'namumark'
 
         if rep_data == 'namumark' or rep_data == 'namumark_beta':
-            data_end = class_do_render_namumark(curs, doc_name, doc_data, doc_set, self.lang_data)()
+            data_end = class_do_render_namumark(self.conn, doc_name, doc_data, doc_set, self.lang_data)()
         elif rep_data == 'raw':
             data_end = [html.escape(doc_data).replace('\n', '<br>'), '', {}]
         else:

@@ -23,7 +23,9 @@ def edit_timeout(func, args = (), timeout = 3):
         pool.join()
         return 0
         
-def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = '', name = ''):
+def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = ''):
+    curs = conn.cursor()
+
     monaco_editor_top = ''
     editor_display = ''
     monaco_display = ''
@@ -61,7 +63,7 @@ def edit_editor(curs, ip, data_main = '', do_type = 'edit', addon = '', name = '
     
     add_script = 'do_monaco_init("' + monaco_thema + '");'
     
-    monaco_on = get_main_skin_set(curs, flask.session, 'main_css_monaco', ip)
+    monaco_on = get_main_skin_set(conn, flask.session, 'main_css_monaco', ip)
     if monaco_on == 'use':
         editor_display = 'style="display: none;"'
     else:
@@ -348,7 +350,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                         <input placeholder="''' + get_lang(conn, 'why') + '''" name="send">
                         <hr class="main_hr">
                         
-                        ''' + edit_editor(curs, ip, data_section, addon = get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn) , name = name) + '''
+                        ''' + edit_editor(conn, ip, data_section, addon = get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn) , name = name) + '''
                     </form>
                 ''',
                 menu = [

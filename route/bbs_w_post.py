@@ -102,7 +102,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                     return redirect(conn, '/bbs/w/' + bbs_num_str + '/' + post_num_str)
                 
                 data = data.replace('\r', '')
-                data = api_topic_thread_pre_render(curs, data, id_data, ip, set_id, bbs_name, temp_dict['title'], 'post')
+                data = api_topic_thread_pre_render(conn, data, id_data, ip, set_id, bbs_name, temp_dict['title'], 'post')
                 
                 date = get_time()
 
@@ -159,7 +159,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
 
                 data += '''
                     <form method="post">
-                        ''' + (edit_editor(curs, ip, text, 'bbs_comment') if bbs_comment_acl == 0 else '') + '''
+                        ''' + (edit_editor(conn, ip, text, 'bbs_comment') if bbs_comment_acl == 0 else '') + '''
                     </form>
                 '''
 
@@ -290,7 +290,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                         ''' + comment_select + ''' <a href="javascript:opennamu_return_comment();">(''' + get_lang(conn, 'return') + ''')</a>
                         <hr class="main_hr">
                         
-                        ''' + edit_editor(curs, ip, text, 'bbs_comment') + '''
+                        ''' + edit_editor(conn, ip, text, 'bbs_comment') + '''
                     '''
 
                 data += '''
