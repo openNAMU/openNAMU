@@ -4,7 +4,6 @@ from .tool.func import *
 
 def api_skin_info(name = ''):
     with get_db_connect() as conn:
-        curs = conn.cursor()
         name = skin_check(conn) if name == '' else './views/' + name + '/index.html'
 
         if not flask.request.args.get('all', None):

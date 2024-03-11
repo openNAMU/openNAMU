@@ -5,7 +5,6 @@ def view_set(name = 'Test'):
         curs = conn.cursor()
 
         check_ok = ''
-        user_page = 0
         ip = ip_check()
 
         if flask.request.method == 'POST':
@@ -24,8 +23,6 @@ def view_set(name = 'Test'):
                         return re_error(conn, '/error/3')
                     else:
                         check_ok = 'disabled'
-            else:
-                user_page = 1
         else:
             if admin_check(conn, 5) != 1:
                 if check_data:
@@ -47,17 +44,6 @@ def view_set(name = 'Test'):
                 time_limit = flask.request.form.get(i + '_date', '')
                 if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', time_limit):
                     curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'acl_date', ?)"), [name, i, time_limit])
-
-            all_d = ''
-            for i in acl_data[:-1]:
-                if flask.request.form.get(i, '') == '':
-                    all_d += 'normal'
-                    if i != 'view':
-                        all_d += ' | '
-                else:
-                    all_d += flask.request.form.get(i, '')
-                    if i != 'view':
-                        all_d += ' | '
 
             markup_data = flask.request.form.get('document_markup', '')
 

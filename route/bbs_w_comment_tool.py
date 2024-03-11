@@ -2,8 +2,6 @@ from .tool.func import *
 
 def bbs_w_comment_tool(bbs_num = '', post_num = '', comment_num = ''):
     with get_db_connect() as conn:
-        curs = conn.cursor()
-
         data = ''
         
         bbs_num_str = str(bbs_num)
