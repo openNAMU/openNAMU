@@ -2,8 +2,6 @@ from .tool.func import *
 
 def api_w_raw(db_set, name = 'Test', rev = '', exist_check = ''):
     with get_db_connect() as conn:
-        curs = conn.cursor()
-        
         other_set = {}
         other_set["name"] = name
         other_set["rev"] = str(rev)

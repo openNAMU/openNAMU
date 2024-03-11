@@ -4,9 +4,6 @@ from .edit_delete import edit_delete
 
 def edit_delete_multiple():
     with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        ip = ip_check()
         if admin_check(conn) != 1:
             return re_error(conn, '/ban')
 
