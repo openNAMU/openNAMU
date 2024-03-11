@@ -2481,7 +2481,7 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
     if db_data and db_data[0][0] != '':
         return 0
 
-    if mode == 'add':
+    if mode == 'add' or mode == 'setting':
         curs.execute(db_change("select id from history where title = ? order by id + 0 asc limit 1"), [title])
         id_data = curs.fetchall()
         id_data = str(int(id_data[0][0]) - 1) if id_data else '0'
@@ -2497,11 +2497,11 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
     send = send[:512] if len(send) > 512 else send
     send = send + ' (' + t_check + ')' if t_check != '' else send
 
-    if mode != 'add' and mode != 'user':
+    if mode != 'add' and mode != 'setting' and mode != 'user':
         history_plus_rc_max(conn, 'normal')
         curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [id_data, title, date])
     
-    if mode != 'add':
+    if mode != 'add' and mode != 'setting':
         history_plus_rc_max(conn, mode)
         curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [id_data, title, date, mode])
 
