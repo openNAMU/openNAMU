@@ -40,6 +40,8 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
             ['r1', get_lang(conn, 'new_doc')],
             ['edit_request', get_lang(conn, 'edit_request')]
         ]
+        if tool == 'history':
+            option_list += [['setting', get_lang(conn, 'setting')]]
 
         if flask.request.method == 'POST':
             return redirect(conn, '/diff/' + flask.request.form.get('b', '1') + '/' + flask.request.form.get('a', '1') + '/' + url_pas(name))

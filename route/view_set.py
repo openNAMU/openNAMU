@@ -6,6 +6,7 @@ def view_set(name = 'Test'):
 
         check_ok = ''
         ip = ip_check()
+        time = get_time()
 
         if flask.request.method == 'POST':
             check_data = 'document_set (' + name + ')'
@@ -32,9 +33,16 @@ def view_set(name = 'Test'):
 
         if flask.request.method == 'POST':
             acl_data = ['decu', 'document_edit_acl', 'document_edit_request_acl', 'document_move_acl', 'document_delete_acl', 'dis', 'view', 'why']
+            acl_result = []
+            acl_text = ''
 
             for i in acl_data:
                 form_data = flask.request.form.get(i, '')
+                
+                acl_result += [form_data]
+
+                acl_text += i + '\n'
+                acl_text += form_data + '\n'
             
                 curs.execute(db_change("delete from acl where title = ? and type = ?"), [name, i])
                 curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [name, form_data, i])
@@ -44,8 +52,15 @@ def view_set(name = 'Test'):
                 time_limit = flask.request.form.get(i + '_date', '')
                 if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', time_limit):
                     curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'acl_date', ?)"), [name, i, time_limit])
+                    
+                    acl_text += time_limit + '\n'
+
+                acl_text += '\n\n'
 
             markup_data = flask.request.form.get('document_markup', '')
+            
+            acl_text += 'document_markup\n'
+            acl_text += markup_data + '\n\n'
 
             curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [name])
             db_data = curs.fetchall()
@@ -67,14 +82,32 @@ def view_set(name = 'Test'):
 
             if admin_check(conn) == 1:
                 document_top = flask.request.form.get('document_top', '')
+
+                acl_text += 'document_top\n'
+                acl_text += document_top + '\n\n'
+
                 curs.execute(db_change("delete from data_set where doc_name = ? and set_name = 'document_top'"), [name])
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_top', ?)"), [name, document_top])
                 
                 document_editor_top = flask.request.form.get('document_editor_top', '')
+
+                acl_text += 'document_editor_top\n'
+                acl_text += document_editor_top + '\n\n'
+
                 curs.execute(db_change("delete from data_set where doc_name = ? and set_name = 'document_editor_top'"), [name])
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_editor_top', ?)"), [name, document_editor_top])
 
             admin_check(conn, 5, check_data)
+
+            history_plus(conn, 
+                name,
+                acl_text,
+                time,
+                ip,
+                acl_result[7],
+                '0',
+                mode = 'setting'
+            )
 
             conn.commit()
 
@@ -193,7 +226,7 @@ def view_set(name = 'Test'):
             data += '<hr class="main_hr">'
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'acl') + ')', 0])],
+                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'setting') + ')', 0])],
                 data = '''
                     <form method="post">
                         <a href="/setting/acl">(''' + get_lang(conn, 'main_acl_setting') + ''')</a>
