@@ -12,8 +12,8 @@ def view_down(name = 'Test'):
 
         div += '</ul>'
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('sub') + ')', 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'sub') + ')', 0])],
             data = div,
-            menu = [['w/' + url_pas(name), load_lang('return')]]
+            menu = [['w/' + url_pas(name), get_lang(conn, 'return')]]
         ))

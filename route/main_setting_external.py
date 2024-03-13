@@ -4,8 +4,8 @@ def main_setting_external():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check() != 1:
-            return re_error('/ban')
+        if admin_check(conn) != 1:
+            return re_error(conn, '/ban')
         
         i_list = [
             'recaptcha',
@@ -28,9 +28,9 @@ def main_setting_external():
 
             conn.commit()
 
-            admin_check(None, 'edit_set (external)')
+            admin_check(conn, None, 'edit_set (external)')
 
-            return redirect('/setting/external')
+            return redirect(conn, '/setting/external')
         else:
             d_list = []
 
@@ -69,78 +69,78 @@ def main_setting_external():
                 else:
                     re_ver += '<option value="' + i + '">' + re_ver_list[i] + '</option>'
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('ext_api_req_set'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
-                data = render_simple_set('''
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'ext_api_req_set'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                data = render_simple_set(conn, '''
                     <form method="post">
-                        <h2>''' + load_lang('captcha') + '''</h2>
-                        <a href="https://www.google.com/recaptcha/">(''' + load_lang('recaptcha') + ''')</a> <a href="https://www.hcaptcha.com/">(''' + load_lang('hcaptcha') + ''')</a>
+                        <h2>''' + get_lang(conn, 'captcha') + '''</h2>
+                        <a href="https://www.google.com/recaptcha/">(''' + get_lang(conn, 'recaptcha') + ''')</a> <a href="https://www.hcaptcha.com/">(''' + get_lang(conn, 'hcaptcha') + ''')</a>
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('public_key') + '''</span>
+                        <span>''' + get_lang(conn, 'public_key') + '''</span>
                         <hr class="main_hr">
                         <input name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('secret_key') + '''</span>
+                        <span>''' + get_lang(conn, 'secret_key') + '''</span>
                         <hr class="main_hr">
                         <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('version') + '''</span>
+                        <span>''' + get_lang(conn, 'version') + '''</span>
                         <hr class="main_hr">
                         <select name="recaptcha_ver">
                             ''' + re_ver + '''
                         </select>
 
-                        <h2>''' + load_lang('email_setting') + '''</h2>
-                        <a href="/setting/phrase#s-6">(''' + load_lang('text_setting') + ''')</a>
+                        <h2>''' + get_lang(conn, 'email_setting') + '''</h2>
+                        <a href="/setting/phrase#s-6">(''' + get_lang(conn, 'text_setting') + ''')</a>
                         <hr class="main_hr">
 
-                        <input type="checkbox" name="email_have" ''' + ('checked' if d_list[9] != '' else '')  + '''> ''' + load_lang('email_required') + '''
+                        <input type="checkbox" name="email_have" ''' + ('checked' if d_list[9] != '' else '')  + '''> ''' + get_lang(conn, 'email_required') + '''
 
-                        <h3>''' + load_lang('smtp_setting') + '''</h3>
+                        <h3>''' + get_lang(conn, 'smtp_setting') + '''</h3>
                         <a href="https://support.google.com/mail/answer/7126229">(Google)</a>
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('smtp_server') + '''</span>
+                        <span>''' + get_lang(conn, 'smtp_server') + '''</span>
                         <hr class="main_hr">
                         <input name="smtp_server" value="''' + html.escape(d_list[2]) + '''">
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('smtp_port') + '''</span>
+                        <span>''' + get_lang(conn, 'smtp_port') + '''</span>
                         <hr class="main_hr">
                         <input name="smtp_port" value="''' + html.escape(d_list[3]) + '''">
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('smtp_security') + '''</span>
+                        <span>''' + get_lang(conn, 'smtp_security') + '''</span>
                         <hr class="main_hr">
                         <select name="smtp_security">
                             ''' + security_radios + '''
                         </select>
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('smtp_username') + '''</span>
+                        <span>''' + get_lang(conn, 'smtp_username') + '''</span>
                         <hr class="main_hr">
                         <input name="smtp_email" value="''' + html.escape(d_list[5]) + '''">
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('smtp_password') + '''</span>
+                        <span>''' + get_lang(conn, 'smtp_password') + '''</span>
                         <hr class="main_hr">
                         <input type="password" name="smtp_pass" value="''' + html.escape(d_list[6]) + '''">
 
-                        <h2>''' + load_lang('oauth') + ''' (''' + load_lang('not_working') + ''')</h2>
+                        <h2>''' + get_lang(conn, 'oauth') + ''' (''' + get_lang(conn, 'not_working') + ''')</h2>
                         <a href="https://developers.google.com/identity/protocols/oauth2">(Google)</a>
                         <hr class="main_hr">
 
-                        <span>''' + load_lang('oauth_client_id') + '''</span>
+                        <span>''' + get_lang(conn, 'oauth_client_id') + '''</span>
                         <hr class="main_hr">
                         <input name="oauth_client_id" value="''' + html.escape(d_list[8]) + '''">
                         <hr class="main_hr">
 
                         <hr class="main_hr">
-                        <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 '''),
-                menu = [['setting', load_lang('return')]]
+                menu = [['setting', get_lang(conn, 'return')]]
             ))

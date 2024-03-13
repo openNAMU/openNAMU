@@ -7,8 +7,8 @@ def topic_comment_blind(topic_num = 1, num = 1):
         topic_num = str(topic_num)
         num = str(num)
         
-        if admin_check(3, 'blind (code ' + topic_num + '#' + num + ')') != 1:
-            return re_error('/error/3')
+        if admin_check(conn, 3, 'blind (code ' + topic_num + '#' + num + ')') != 1:
+            return re_error(conn, '/error/3')
 
         curs.execute(db_change("select block from topic where code = ? and id = ?"), [topic_num, num])
         block = curs.fetchall()
@@ -18,11 +18,11 @@ def topic_comment_blind(topic_num = 1, num = 1):
             else:
                 curs.execute(db_change("update topic set block = 'O' where code = ? and id = ?"), [topic_num, num])
 
-            do_reload_recent_thread(
+            do_reload_recent_thread(conn, 
                 topic_num, 
                 get_time()
             )
 
             conn.commit()
 
-        return redirect('/thread/' + topic_num + '#' + num)
+        return redirect(conn, '/thread/' + topic_num + '#' + num)

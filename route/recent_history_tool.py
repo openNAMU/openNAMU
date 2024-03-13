@@ -7,43 +7,43 @@ def recent_history_tool(name = 'Test', rev = 1):
         num = str(rev)
 
         data = '' + \
-            '<h2>' + load_lang('tool') + '</h2>' + \
+            '<h2>' + get_lang(conn, 'tool') + '</h2>' + \
             '<ul class="opennamu_ul">' + \
-                '<li><a href="/raw_rev/' + num + '/' + url_pas(name) + '">' + load_lang('raw') + '</a></li>' + \
+                '<li><a href="/raw_rev/' + num + '/' + url_pas(name) + '">' + get_lang(conn, 'raw') + '</a></li>' + \
         ''
 
-        data += '<li><a href="/revert/' + num + '/' + url_pas(name) + '">' + load_lang('revert') + ' (r' + num + ')</a></li>'
+        data += '<li><a href="/revert/' + num + '/' + url_pas(name) + '">' + get_lang(conn, 'revert') + ' (r' + num + ')</a></li>'
         if rev - 1 > 0:
-            data += '<li><a href="/revert/' + str(rev - 1) + '/' + url_pas(name) + '">' + load_lang('revert') + ' (r' + str(rev - 1) + ')</a></li>'
+            data += '<li><a href="/revert/' + str(rev - 1) + '/' + url_pas(name) + '">' + get_lang(conn, 'revert') + ' (r' + str(rev - 1) + ')</a></li>'
 
         if rev - 1 > 0:
-            data += '<li><a href="/diff/' + str(rev - 1) + '/' + num + '/' + url_pas(name) + '">' + load_lang('compare') + '</a></li>'
+            data += '<li><a href="/diff/' + str(rev - 1) + '/' + num + '/' + url_pas(name) + '">' + get_lang(conn, 'compare') + '</a></li>'
 
-        data += '<li><a href="/history/' + url_pas(name) + '">' + load_lang('history') + '</a></li>'
+        data += '<li><a href="/history/' + url_pas(name) + '">' + get_lang(conn, 'history') + '</a></li>'
         data += '</ul>'
 
-        if admin_check(6) == 1:
-            data += '<h3>' + load_lang('admin') + '</h3>'
+        if admin_check(conn, 6) == 1:
+            data += '<h3>' + get_lang(conn, 'admin') + '</h3>'
             data += '<ul class="opennamu_ul">'
             curs.execute(db_change('select title from history where title = ? and id = ? and hide = "O"'), [name, num])
             data += '<li><a href="/history_hidden/' + num + '/' + url_pas(name) + '">'
             if curs.fetchall():
-                data += load_lang('hide_release') 
+                data += get_lang(conn, 'hide_release') 
             else:
-                data += load_lang('hide')
+                data += get_lang(conn, 'hide')
 
             data += '</a></li>'
             data += '</ul>'
 
-        if admin_check() == 1:
-            data += '<h3>' + load_lang('owner') + '</h3>'
+        if admin_check(conn) == 1:
+            data += '<h3>' + get_lang(conn, 'owner') + '</h3>'
             data += '<ul class="opennamu_ul">'
-            data += '<li><a href="/history_delete/' + num + '/' + url_pas(name) + '">' + load_lang('history_delete') + '</a></li>'
-            data += '<li><a href="/history_send/' + num + '/' + url_pas(name) + '">' + load_lang('send_edit') + '</a></li>'
+            data += '<li><a href="/history_delete/' + num + '/' + url_pas(name) + '">' + get_lang(conn, 'history_delete') + '</a></li>'
+            data += '<li><a href="/history_send/' + num + '/' + url_pas(name) + '">' + get_lang(conn, 'send_edit') + '</a></li>'
             data += '</ul>'
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [name, wiki_set(), wiki_custom(), wiki_css(['(r' + num + ')', 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(r' + num + ')', 0])],
             data = data,
-            menu = [['history/' + url_pas(name), load_lang('return')]]
+            menu = [['history/' + url_pas(name), get_lang(conn, 'return')]]
         ))

@@ -9,4 +9,4 @@ def user_setting_email_delete():
             curs.execute(db_change("delete from user_set where name = 'email' and id = ?"), [ip])
             conn.commit()
     
-        return redirect('/change')
+        return redirect(conn, '/change')

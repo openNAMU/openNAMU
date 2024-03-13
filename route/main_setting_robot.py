@@ -4,8 +4,8 @@ def main_setting_robot():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check() != 1:
-            return re_error('/ban')
+        if admin_check(conn) != 1:
+            return re_error(conn, '/ban')
 
         curs.execute(db_change("select data from other where name = 'robot'"))
         db_data = curs.fetchall()
@@ -34,22 +34,22 @@ def main_setting_robot():
 
             conn.commit()
 
-            admin_check(None, 'edit_set (robot)')
+            admin_check(conn, None, 'edit_set (robot)')
 
-            return redirect('/setting/robot')
+            return redirect(conn, '/setting/robot')
         else:
-            return easy_minify(flask.render_template(skin_check(),
-                imp = ['robots.txt', wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = ['robots.txt', wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
-                    <a href="/robots.txt">(''' + load_lang('view') + ''')</a>
+                    <a href="/robots.txt">(''' + get_lang(conn, 'view') + ''')</a>
                     <hr class="main_hr">
                     <form method="post">
                         <textarea class="opennamu_textarea_500" name="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
-                        <input type="checkbox" name="default" ''' + default_data + '''> ''' + load_lang('default') + '''
+                        <input type="checkbox" name="default" ''' + default_data + '''> ''' + get_lang(conn, 'default') + '''
                         <hr class="main_hr">
-                        <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 ''',
-                menu = [['setting', load_lang('return')]]
+                menu = [['setting', get_lang(conn, 'return')]]
             ))

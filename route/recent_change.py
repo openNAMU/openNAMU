@@ -28,21 +28,23 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
         curs = conn.cursor()
 
         ip = ip_check()
-        all_admin = admin_check('all', None, ip)
-        owner = admin_check(None, None, ip)
+        all_admin = admin_check(conn, 'all', None, ip)
+        owner = admin_check(conn, None, None, ip)
 
         option_list = [
-            ['normal', load_lang('normal')],
-            ['edit', load_lang('edit')],
-            ['move', load_lang('move')],
-            ['delete', load_lang('delete')],
-            ['revert', load_lang('revert')],
-            ['r1', load_lang('new_doc')],
-            ['edit_request', load_lang('edit_request')]
+            ['normal', get_lang(conn, 'normal')],
+            ['edit', get_lang(conn, 'edit')],
+            ['move', get_lang(conn, 'move')],
+            ['delete', get_lang(conn, 'delete')],
+            ['revert', get_lang(conn, 'revert')],
+            ['r1', get_lang(conn, 'new_doc')],
+            ['edit_request', get_lang(conn, 'edit_request')]
         ]
+        if tool == 'history':
+            option_list += [['setting', get_lang(conn, 'setting')]]
 
         if flask.request.method == 'POST':
-            return redirect('/diff/' + flask.request.form.get('b', '1') + '/' + flask.request.form.get('a', '1') + '/' + url_pas(name))
+            return redirect(conn, '/diff/' + flask.request.form.get('b', '1') + '/' + flask.request.form.get('a', '1') + '/' + url_pas(name))
         else:
             ban = ''
             select = ''
@@ -58,11 +60,11 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
 
             if tool == 'history':
                 div += '''
-                    <td id="main_table_width">''' + load_lang('version') + '''</td>
-                    <td id="main_table_width">''' + load_lang('editor') + '''</td>
-                    <td id="main_table_width">''' + load_lang('time') + '''</td>
+                    <td id="main_table_width">''' + get_lang(conn, 'version') + '''</td>
+                    <td id="main_table_width">''' + get_lang(conn, 'editor') + '''</td>
+                    <td id="main_table_width">''' + get_lang(conn, 'time') + '''</td>
                 '''
-                sub = '(' + load_lang('history') + ')'
+                sub = '(' + get_lang(conn, 'history') + ')'
 
                 set_type = '' if set_type == 'edit' else set_type
                 if set_type != 'normal':
@@ -73,11 +75,11 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                 data_list = curs.fetchall()
             elif tool == 'record':
                 div +=  '''
-                    <td id="main_table_width">''' + load_lang('document_name') + '''</td>
-                    <td id="main_table_width">''' + load_lang('editor') + '''</td>
-                    <td id="main_table_width">''' + load_lang('time') + '''</td>
+                    <td id="main_table_width">''' + get_lang(conn, 'document_name') + '''</td>
+                    <td id="main_table_width">''' + get_lang(conn, 'editor') + '''</td>
+                    <td id="main_table_width">''' + get_lang(conn, 'time') + '''</td>
                 '''
-                sub = '(' + load_lang('edit_record') + ')'
+                sub = '(' + get_lang(conn, 'edit_record') + ')'
                 set_type = '' if set_type == 'edit' else set_type
 
                 if set_type != 'normal':
@@ -88,9 +90,9 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                 data_list = curs.fetchall()
             else:
                 div +=  '''
-                    <td id="main_table_width">''' + load_lang('document_name') + '''</td>
-                    <td id="main_table_width">''' + load_lang('editor') + '''</td>
-                    <td id="main_table_width">''' + load_lang('time') + '''</td>
+                    <td id="main_table_width">''' + get_lang(conn, 'document_name') + '''</td>
+                    <td id="main_table_width">''' + get_lang(conn, 'editor') + '''</td>
+                    <td id="main_table_width">''' + get_lang(conn, 'time') + '''</td>
                 '''
                 sub = ''
                 set_type = '' if set_type == 'edit' else set_type
@@ -112,7 +114,7 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
 
             div += '</tr>'
 
-            all_ip = ip_pas([i[3] for i in data_list])
+            all_ip = ip_pas(conn, [i[3] for i in data_list])
             for data in data_list:
                 select += '<option value="' + data[0] + '">' + data[0] + '</option>'
                 send = data[4]
@@ -125,7 +127,7 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                     leng = '<span style="color:gray;">(' + data[5] + ')</span>'
 
                 ip = all_ip[data[3]]
-                m_tool = '<a href="/history_tool/' + data[0] + '/' + url_pas(data[1]) + '">(' + load_lang('tool') + ')</a>'
+                m_tool = '<a href="/history_tool/' + data[0] + '/' + url_pas(data[1]) + '">(' + get_lang(conn, 'tool') + ')</a>'
 
                 style = ['', '']
                 date = data[2]
@@ -135,7 +137,7 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                     if data[7] == 'r1':
                         type_data = ' (' + data[7] + ')'
                     else:
-                        type_data = ' (' + load_lang(data[7]) + ')'
+                        type_data = ' (' + get_lang(conn, data[7]) + ')'
 
                 send += type_data
 
@@ -186,25 +188,25 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                     ' '.join(['<a href="/history_page/1/' + for_a[0] + '/' + url_pas(name) + '">(' + for_a[1] + ')</a> ' for for_a in option_list]) + \
                     '<hr class="main_hr">' + div + \
                 ''
-                menu = [['w/' + url_pas(name), load_lang('return')]]
+                menu = [['w/' + url_pas(name), get_lang(conn, 'return')]]
 
                 if set_type == 'normal':
                     div = '''
                         <form method="post">
                             <select name="a">''' + select + '''</select> <select name="b">''' + select + '''</select>
-                            <button type="submit">''' + load_lang('compare') + '''</button>
+                            <button type="submit">''' + get_lang(conn, 'compare') + '''</button>
                         </form>
                         <hr class="main_hr">
                     ''' + div
 
                 if admin == 1:
                     menu += [
-                        ['history_add/' + url_pas(name), load_lang('history_add')],
-                        ['history_reset/' + url_pas(name), load_lang('history_reset')]
+                        ['history_add/' + url_pas(name), get_lang(conn, 'history_add')],
+                        ['history_reset/' + url_pas(name), get_lang(conn, 'history_reset')]
                     ]
 
                 title = name
-                div += get_next_page_bottom('/history_page/{}/' + set_type + '/' + url_pas(name), num, data_list)
+                div += get_next_page_bottom(conn, '/history_page/{}/' + set_type + '/' + url_pas(name), num, data_list)
             elif tool == 'record':
                 div = '' + \
                     ' '.join(['<a href="/record/1/' + for_a[0] + '/' + url_pas(name) + '">(' + for_a[1] + ')</a> ' for for_a in option_list]) + \
@@ -212,29 +214,29 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                 ''
 
                 title = name
-                menu = [['user/' + url_pas(name), load_lang('user_tool')]]
+                menu = [['user/' + url_pas(name), get_lang(conn, 'user_tool')]]
                 if admin == 1:
-                    menu += [['record/reset/' + url_pas(name), load_lang('record_reset')]]
+                    menu += [['record/reset/' + url_pas(name), get_lang(conn, 'record_reset')]]
 
-                div += get_next_page_bottom('/record/{}/' + url_pas(name), num, data_list)
+                div += get_next_page_bottom(conn, '/record/{}/' + url_pas(name), num, data_list)
             else:
                 div = '' + \
                     ' '.join(['<a href="/recent_change/1/' + for_a[0] + '">(' + for_a[1] + ')</a> ' for for_a in option_list]) + \
-                    '<a href="/recent_change/1/user">(' + load_lang('user_document') + ')</a> ' + \
+                    '<a href="/recent_change/1/user">(' + get_lang(conn, 'user_document') + ')</a> ' + \
                     '<hr class="main_hr">' + div + \
                 ''
 
-                menu = [['other', load_lang('return')], ['recent_edit_request', load_lang('edit_request')]]
-                title = load_lang('recent_change')
+                menu = [['other', get_lang(conn, 'return')], ['recent_edit_request', get_lang(conn, 'edit_request')]]
+                title = get_lang(conn, 'recent_change')
 
                 if all_admin == 1:
-                    div += get_next_page_bottom('/recent_change/{}/' + set_type, num, data_list)
+                    div += get_next_page_bottom(conn, '/recent_change/{}/' + set_type, num, data_list)
 
             if sub == '':
                 sub = 0
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [title, wiki_set(), wiki_custom(), wiki_css([sub, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [title, wiki_set(conn), wiki_custom(conn), wiki_css([sub, 0])],
                 data = div,
                 menu = menu
             ))

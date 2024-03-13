@@ -4,8 +4,8 @@ def edit_upload():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check(None, 'upload') == 1:
-            return re_error('/ban')
+        if acl_check(conn, None, 'upload') == 1:
+            return re_error(conn, '/ban')
         
         curs.execute(db_change('select data from other where name = "upload"'))
         db_data = curs.fetchall()
@@ -13,35 +13,35 @@ def edit_upload():
         file_max = int(file_max)
 
         if flask.request.method == 'POST':
-            if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error('/error/13')
+            if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                return re_error(conn, '/error/13')
             else:
-                captcha_post('', 0)
+                captcha_post(conn, '', 0)
 
             file_data = flask.request.files.getlist("f_data[]", None)
             file_len = len(file_data)
 
             if (file_max * 1000 * 1000 * file_len) < flask.request.content_length:
-                return re_error('/error/17')
+                return re_error(conn, '/error/17')
 
             if file_len == 1:
                 file_num = None
             else:
-                if acl_check(None, 'many_upload') == 1:
-                    return re_error('/ban')
+                if acl_check(conn, None, 'many_upload') == 1:
+                    return re_error(conn, '/ban')
 
                 file_num = 1
 
             for data in file_data:
                 if data.filename == '':
-                    return re_error('/error/9')
+                    return re_error(conn, '/error/9')
                 
                 value = os.path.splitext(data.filename)[1]
 
                 curs.execute(db_change("select html from html_filter where kind = 'extension'"))
                 extension = [i[0].lower() for i in curs.fetchall()]
                 if not re.sub(r'^\.', '', value).lower() in extension:
-                    return re_error('/error/14')
+                    return re_error(conn, '/error/14')
 
                 if flask.request.form.get('f_name', None):
                     name = flask.request.form.get('f_name', None) + (' ' + str(file_num) if file_num else '') + value
@@ -50,24 +50,24 @@ def edit_upload():
 
                 piece = os.path.splitext(name)
                 if re.search(r'\.', piece[0]):
-                    return re_error('/error/22')
+                    return re_error(conn, '/error/22')
 
                 e_data = sha224_replace(piece[0]) + piece[1]
 
                 curs.execute(db_change("select title from data where title = ?"), ['file:' + name])
                 if curs.fetchall():
-                    return re_error('/error/16')
+                    return re_error(conn, '/error/16')
 
                 curs.execute(db_change("select html from html_filter where kind = 'file'"))
                 db_data = curs.fetchall()
                 for i in db_data:
                     t_re = re.compile(i[0])
                     if t_re.search(name):
-                        return redirect('/filter/file_filter')
+                        return redirect(conn, '/filter/file_filter')
 
-                data_url_image = load_image_url()
+                data_url_image = load_image_url(conn)
                 if os.path.exists(os.path.join(data_url_image, e_data)):
-                    return re_error('/error/16')
+                    return re_error(conn, '/error/16')
                 else:
                     data.save(os.path.join(data_url_image, e_data))
 
@@ -92,13 +92,13 @@ def edit_upload():
 
                 curs.execute(db_change("insert into data (title, data) values (?, ?)"), ['file:' + name, file_d])
 
-                render_set(
+                render_set(conn, 
                     doc_name = 'file:' + name,
                     doc_data = file_d,
                     data_type = 'backlink'
                 )
 
-                history_plus(
+                history_plus(conn, 
                     'file:' + name,
                     file_d,
                     get_time(),
@@ -113,9 +113,9 @@ def edit_upload():
 
                 conn.commit()
 
-            return redirect('/w/file:' + name)
+            return redirect(conn, '/w/file:' + name)
         else:
-            license_list = '<option value="direct_input">' + load_lang('direct_input') + '</option>'
+            license_list = '<option value="direct_input">' + get_lang(conn, 'direct_input') + '</option>'
             file_name = html.escape(flask.request.args.get('name', ''))
 
             curs.execute(db_change("select html from html_filter where kind = 'image_license'"))
@@ -130,28 +130,28 @@ def edit_upload():
             db_data = curs.fetchall()
             upload_default = html.escape(db_data[0][0]) if db_data and db_data[0][0] != '' else ''
             
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('upload'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'upload'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
-                    <a href="/filter/file_filter">(''' + load_lang('file_filter_list') + ''')</a> <a href="/filter/extension_filter">(''' + load_lang('extension_filter_list') + ''')</a>
+                    <a href="/filter/file_filter">(''' + get_lang(conn, 'file_filter_list') + ''')</a> <a href="/filter/extension_filter">(''' + get_lang(conn, 'extension_filter_list') + ''')</a>
                     ''' + upload_help + '''
                     <hr class="main_hr">
-                    ''' + load_lang('max_file_size') + ''' : ''' + str(file_max) + '''MB
+                    ''' + get_lang(conn, 'max_file_size') + ''' : ''' + str(file_max) + '''MB
                     <hr class="main_hr">
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
                         <input multiple="multiple" type="file" name="f_data[]">
                         <hr class="main_hr">
-                        <input placeholder="''' + load_lang('file_name') + '''" name="f_name" value="''' + file_name + '''">
+                        <input placeholder="''' + get_lang(conn, 'file_name') + '''" name="f_name" value="''' + file_name + '''">
                         <hr class="main_hr">
                         <select name="f_lice_sel">
                             ''' + license_list + '''
                         </select>
                         <hr class="main_hr">
-                        <textarea class="opennamu_textarea_100" placeholder="''' + load_lang('other') + '''" name="f_lice">''' + upload_default + '''</textarea>
+                        <textarea class="opennamu_textarea_100" placeholder="''' + get_lang(conn, 'other') + '''" name="f_lice">''' + upload_default + '''</textarea>
                         <hr class="main_hr">
-                        ''' + captcha_get() + '''
-                        <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
+                        ''' + captcha_get(conn) + '''
+                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 ''',
-                menu = [['other', load_lang('return')]]
+                menu = [['other', get_lang(conn, 'return')]]
             ))

@@ -40,26 +40,26 @@ def list_title_index(num = 1):
                 data += '''
                     </ul>
                     <ul class="opennamu_ul">
-                        <li>''' + load_lang('all') + ' : ' + str(count_end[0]) + '''</li>
+                        <li>''' + get_lang(conn, 'all') + ' : ' + str(count_end[0]) + '''</li>
                     </ul>
                     <ul class="opennamu_ul">
-                        <li>''' + load_lang('category') + ' : ' + str(count_end[1]) + '''</li>
-                        <li>''' + load_lang('user_document') + ' : ' + str(count_end[2]) + '''</li>
-                        <li>''' + load_lang('file') + ' : ' + str(count_end[3]) + '''</li>
-                        <li>''' + load_lang('other') + ' : ' + str(count_end[4]) + '''</li>
+                        <li>''' + get_lang(conn, 'category') + ' : ' + str(count_end[1]) + '''</li>
+                        <li>''' + get_lang(conn, 'user_document') + ' : ' + str(count_end[2]) + '''</li>
+                        <li>''' + get_lang(conn, 'file') + ' : ' + str(count_end[3]) + '''</li>
+                        <li>''' + get_lang(conn, 'other') + ' : ' + str(count_end[4]) + '''</li>
                 '''
             else:
                 data += '''
                     </ul>
                     <ul class="opennamu_ul">
-                        <li>''' + load_lang('all') + ' : ' + all_title[0][0] + '''</li>
+                        <li>''' + get_lang(conn, 'all') + ' : ' + all_title[0][0] + '''</li>
                 '''
 
-        data += '</ul>' + next_fix('/list/document/all/', num, title_list)
+        data += '</ul>' + next_fix(conn, '/list/document/all/', num, title_list)
         sub = ' (' + str(num) + ')'
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('all_document_list'), wiki_set(), wiki_custom(), wiki_css([sub, 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [get_lang(conn, 'all_document_list'), wiki_set(conn), wiki_custom(conn), wiki_css([sub, 0])],
             data = data,
-            menu = [['other', load_lang('return')]]
+            menu = [['other', get_lang(conn, 'return')]]
         ))

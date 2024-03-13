@@ -4,8 +4,8 @@ def bbs_make():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check() != 1:
-            return re_error('/error/3')
+        if admin_check(conn) != 1:
+            return re_error(conn, '/error/3')
         
         if flask.request.method == 'POST':
             
@@ -22,23 +22,23 @@ def bbs_make():
 
             conn.commit()
 
-            return redirect('/bbs/main')
+            return redirect(conn, '/bbs/main')
         else:
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('bbs_make'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'bbs_make'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + load_lang('bbs_name') + '''" name="bbs_name">
+                        <input placeholder="''' + get_lang(conn, 'bbs_name') + '''" name="bbs_name">
                         <hr class="main_hr">
                         
                         <select name="bbs_type">
-                            <option value="comment">''' + load_lang('comment_base') + '''</option>
-                            <option value="thread">''' + load_lang('thread_base') + '''</option>
+                            <option value="comment">''' + get_lang(conn, 'comment_base') + '''</option>
+                            <option value="thread">''' + get_lang(conn, 'thread_base') + '''</option>
                         </select>
                         <hr class="main_hr">
                         
-                        <button type="submit">''' + load_lang('save') + '''</button>
+                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 ''',
-                menu = [['bbs/main', load_lang('return')]]
+                menu = [['bbs/main', get_lang(conn, 'return')]]
             ))

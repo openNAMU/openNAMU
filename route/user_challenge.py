@@ -28,7 +28,7 @@ def user_challenge():
         
         ip = ip_check()
         if ip_or_user(ip) == 1:
-            return redirect('/user')
+            return redirect(conn, '/user')
 
         if flask.request.method == 'POST':
             user_exp = 0
@@ -89,7 +89,7 @@ def user_challenge():
 
             curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_admin', ip])
             db_data = curs.fetchall()
-            if admin_check('all') == 1 or db_data:
+            if admin_check(conn, 'all') == 1 or db_data:
                 curs.execute(db_change("delete from user_set where id = ? and name = 'challenge_admin'"), [ip])
                 curs.execute(db_change("insert into user_set (name, id, data) values ('challenge_admin', ?, '1')"), [ip])
                 user_exp += 10000
@@ -109,15 +109,15 @@ def user_challenge():
             curs.execute(db_change("delete from user_set where id = ? and name = 'experience'"), [ip])
             curs.execute(db_change("insert into user_set (name, id, data) values ('experience', ?, ?)"), [ip, exp])
 
-            return redirect('/challenge')
+            return redirect(conn, '/challenge')
         else:
             data_html_green = ''
             data_html_red = ''
             
             data_html_green += do_make_challenge_design(
                 '🌳',
-                load_lang('challenge_title_register'), 
-                load_lang('challenge_info_register', 1),
+                get_lang(conn, 'challenge_title_register'), 
+                get_lang(conn, 'challenge_info_register', 1),
                 1
             )
             
@@ -126,8 +126,8 @@ def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '🔰',
-                load_lang('challenge_title_first_contribute'), 
-                load_lang('challenge_info_first_contribute', 1),
+                get_lang(conn, 'challenge_title_first_contribute'), 
+                get_lang(conn, 'challenge_info_first_contribute', 1),
                 disable
             )
             if disable == 1:
@@ -140,8 +140,8 @@ def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '📝',
-                load_lang('challenge_title_tenth_contribute'), 
-                load_lang('challenge_info_tenth_contribute', 1),
+                get_lang(conn, 'challenge_title_tenth_contribute'), 
+                get_lang(conn, 'challenge_info_tenth_contribute', 1),
                 disable
             )
             if disable == 1:
@@ -154,8 +154,8 @@ def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '🖊️',
-                load_lang('challenge_title_hundredth_contribute'), 
-                load_lang('challenge_info_hundredth_contribute', 1),
+                get_lang(conn, 'challenge_title_hundredth_contribute'), 
+                get_lang(conn, 'challenge_info_hundredth_contribute', 1),
                 disable
             )
             if disable == 1:
@@ -168,8 +168,8 @@ def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '🏅',
-                load_lang('challenge_title_thousandth_contribute'), 
-                load_lang('challenge_info_thousandth_contribute', 1),
+                get_lang(conn, 'challenge_title_thousandth_contribute'), 
+                get_lang(conn, 'challenge_info_thousandth_contribute', 1),
                 disable
             )
             if disable == 1:
@@ -182,8 +182,8 @@ def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '💬',
-                load_lang('challenge_title_first_discussion'), 
-                load_lang('challenge_info_first_discussion', 1),
+                get_lang(conn, 'challenge_title_first_discussion'), 
+                get_lang(conn, 'challenge_info_first_discussion', 1),
                 disable
             )
             if disable == 1:
@@ -196,8 +196,8 @@ def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '💡',
-                load_lang('challenge_title_tenth_discussion'), 
-                load_lang('challenge_info_tenth_discussion', 1),
+                get_lang(conn, 'challenge_title_tenth_discussion'), 
+                get_lang(conn, 'challenge_info_tenth_discussion', 1),
                 disable
             )
             if disable == 1:
@@ -210,8 +210,8 @@ def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '📢',
-                load_lang('challenge_title_hundredth_discussion'), 
-                load_lang('challenge_info_hundredth_discussion', 1),
+                get_lang(conn, 'challenge_title_hundredth_discussion'), 
+                get_lang(conn, 'challenge_info_hundredth_discussion', 1),
                 disable
             )
             if disable == 1:
@@ -224,8 +224,8 @@ def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '📜',
-                load_lang('challenge_title_thousandth_discussion'), 
-                load_lang('challenge_info_thousandth_discussion', 1),
+                get_lang(conn, 'challenge_title_thousandth_discussion'), 
+                get_lang(conn, 'challenge_info_thousandth_discussion', 1),
                 disable
             )
             if disable == 1:
@@ -240,8 +240,8 @@ def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '✅',
-                load_lang('challenge_title_admin'), 
-                load_lang('challenge_info_admin', 1),
+                get_lang(conn, 'challenge_title_admin'), 
+                get_lang(conn, 'challenge_info_admin', 1),
                 disable
             )
             if disable == 1:
@@ -251,14 +251,14 @@ def user_challenge():
                 
             data_html = data_html_green + data_html_red
             
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('challenge_and_level_manage'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'challenge_and_level_manage'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = data_html + '''
                     <form method="post">
                         <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
                         <hr class="main_hr">
-                        <button id="opennamu_save_button" type="submit">''' + load_lang('reload') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'reload') + '''</button>
                     </form>
                 ''',
-                menu = [['user', load_lang('return')]]
+                menu = [['user', get_lang(conn, 'return')]]
             ))

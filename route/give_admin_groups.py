@@ -7,10 +7,10 @@ def give_admin_groups_2(name = 'test'):
         acl_name_list = ['ban', 'nothing', 'toron', 'check', 'acl', 'hidel', 'give', 'owner']
 
         if flask.request.method == 'POST':
-            if admin_check(None, 'auth list add (' + name + ')') != 1:
-                return re_error('/error/3')
+            if admin_check(conn, None, 'auth list add (' + name + ')') != 1:
+                return re_error(conn, '/error/3')
             elif name in get_default_admin_group():
-                return re_error('/error/3')
+                return re_error(conn, '/error/3')
 
             curs.execute(db_change("delete from alist where name = ?"), [name])
             for i in acl_name_list:
@@ -19,11 +19,11 @@ def give_admin_groups_2(name = 'test'):
 
             conn.commit()
 
-            return redirect('/auth/list/add/' + url_pas(name))
+            return redirect(conn, '/auth/list/add/' + url_pas(name))
         else:
             data = ''
             exist_list = ['', '', '', '', '', '', '', '']
-            state = 'disabled' if admin_check() != 1 else ''
+            state = 'disabled' if admin_check(conn) != 1 else ''
             state = 'disabled' if name in get_default_admin_group() else ''
 
             curs.execute(db_change('select acl from alist where name = ?'), [name])
@@ -43,25 +43,25 @@ def give_admin_groups_2(name = 'test'):
 
             data += ''
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('admin_group') + ')', 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'admin_group') + ')', 0])],
                 data = '''
                     <form method="post">
                         ''' + data + '''
                         <hr class="main_hr">
-                        <h2>''' + load_lang('explanation') + '''</h2>
+                        <h2>''' + get_lang(conn, 'explanation') + '''</h2>
                         <ul class="opennamu_ul">
-                            <li style="margin-left: 20px;">owner : ''' + load_lang('owner_authority') + '''</li>
-                            <li style="margin-left: 40px; list-style: circle;">ban : ''' + load_lang('ban_authority') + '''</li>
-                            <li style="margin-left: 40px; list-style: circle;">toron : ''' + load_lang('discussion_authority') + '''</li>
-                            <li style="margin-left: 40px; list-style: circle;">check : ''' + load_lang('user_check_authority') + '''</li>
-                            <li style="margin-left: 40px; list-style: circle;">acl : ''' + load_lang('document_acl_authority') + '''</li>
-                            <li style="margin-left: 40px; list-style: circle;">hidel : ''' + load_lang('history_hide_authority') + '''</li>
-                            <li style="margin-left: 40px; list-style: circle;">give : ''' + load_lang('authorization_authority') + '''</li>
+                            <li style="margin-left: 20px;">owner : ''' + get_lang(conn, 'owner_authority') + '''</li>
+                            <li style="margin-left: 40px; list-style: circle;">ban : ''' + get_lang(conn, 'ban_authority') + '''</li>
+                            <li style="margin-left: 40px; list-style: circle;">toron : ''' + get_lang(conn, 'discussion_authority') + '''</li>
+                            <li style="margin-left: 40px; list-style: circle;">check : ''' + get_lang(conn, 'user_check_authority') + '''</li>
+                            <li style="margin-left: 40px; list-style: circle;">acl : ''' + get_lang(conn, 'document_acl_authority') + '''</li>
+                            <li style="margin-left: 40px; list-style: circle;">hidel : ''' + get_lang(conn, 'history_hide_authority') + '''</li>
+                            <li style="margin-left: 40px; list-style: circle;">give : ''' + get_lang(conn, 'authorization_authority') + '''</li>
                         </ul>
                         <hr class="main_hr">
-                        <button ''' + state +  ''' type="submit">''' + load_lang('save') + '''</button>
+                        <button ''' + state +  ''' type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 ''',
-                menu = [['auth/list', load_lang('return')]]
+                menu = [['auth/list', get_lang(conn, 'return')]]
             ))

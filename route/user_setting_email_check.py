@@ -6,7 +6,7 @@ def user_setting_email_check_2():
 
         ip = ip_check()
         if ip_or_user(ip) != 0:
-            return redirect('/login')
+            return redirect(conn, '/login')
 
         re_set_list = ['c_key', 'c_email']
         if  not 'c_key' in flask.session or \
@@ -26,21 +26,21 @@ def user_setting_email_check_2():
             for i in re_set_list:
                 flask.session.pop(i, None)
 
-            return redirect('/change')
+            return redirect(conn, '/change')
         else:
             curs.execute(db_change('select data from other where name = "check_key_text"'))
             sql_d = curs.fetchall()
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('check_key'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'check_key'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         ''' + b_text + '''
-                        <input placeholder="''' + load_lang('key') + '''" name="key" type="text">
+                        <input placeholder="''' + get_lang(conn, 'key') + '''" name="key" type="text">
                         <hr class="main_hr">
-                        <button type="submit">''' + load_lang('save') + '''</button>
+                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 ''',
-                menu = [['user', load_lang('return')]]
+                menu = [['user', get_lang(conn, 'return')]]
             ))

@@ -2,11 +2,11 @@ from .tool.func import *
 
 def main_sys_restart():
     with get_db_connect() as conn:
-        if admin_check() != 1:
-            return re_error('/error/3')
+        if admin_check(conn) != 1:
+            return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
-            admin_check(None, 'restart')
+            admin_check(conn, None, 'restart')
 
             print('Restart')
 
@@ -30,14 +30,14 @@ def main_sys_restart():
                 except:
                     pass
             else:
-                return re_error('/error/33')
+                return re_error(conn, '/error/33')
         else:
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('wiki_restart'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'wiki_restart'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <button type="submit">''' + load_lang('restart') + '''</button>
+                        <button type="submit">''' + get_lang(conn, 'restart') + '''</button>
                     </form>
                 ''',
-                menu = [['manager', load_lang('return')]]
+                menu = [['manager', get_lang(conn, 'return')]]
             ))

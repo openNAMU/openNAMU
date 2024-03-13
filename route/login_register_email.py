@@ -5,7 +5,7 @@ def login_register_email_2():
         curs = conn.cursor()
 
         if not 'reg_id' in flask.session:
-            return redirect('/register')
+            return redirect(conn, '/register')
 
         if flask.request.method == 'POST':
             flask.session['reg_key'] = load_random_key(32)
@@ -19,14 +19,14 @@ def login_register_email_2():
                     "select html from html_filter where html = ? and kind = 'email'"
                 ), [email_data])
                 if not curs.fetchall():                
-                    return redirect('/filter/email_filter')
+                    return redirect(conn, '/filter/email_filter')
 
             curs.execute(db_change('select data from other where name = "email_title"'))
             sql_d = curs.fetchall()
             if sql_d and sql_d[0][0] != '':
                 t_text = html.escape(sql_d[0][0])
             else:
-                t_text = wiki_set()[0] + ' key'
+                t_text = wiki_set(conn)[0] + ' key'
 
             curs.execute(db_change('select data from other where name = "email_text"'))
             sql_d = curs.fetchall()
@@ -38,30 +38,30 @@ def login_register_email_2():
 
             curs.execute(db_change('select id from user_set where name = "email" and data = ?'), [user_email])
             if curs.fetchall():
-                return re_error('/error/35')
+                return re_error(conn, '/error/35')
 
-            if send_email(user_email, t_text, i_text) == 0:
-                return re_error('/error/18')
+            if send_email(conn, user_email, t_text, i_text) == 0:
+                return re_error(conn, '/error/18')
 
             flask.session['reg_email'] = user_email
 
-            return redirect('/register/email/check')
+            return redirect(conn, '/register/email/check')
         else:
             curs.execute(db_change('select data from other where name = "email_insert_text"'))
             sql_d = curs.fetchall()
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('email'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'email'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
-                    <a href="/filter/email_filter">(''' + load_lang('email_filter_list') + ''')</a>
+                    <a href="/filter/email_filter">(''' + get_lang(conn, 'email_filter_list') + ''')</a>
                     <hr class="main_hr">
                     ''' + b_text + '''
                     <form method="post">
-                        <input placeholder="''' + load_lang('email') + '''" name="email" type="text">
+                        <input placeholder="''' + get_lang(conn, 'email') + '''" name="email" type="text">
                         <hr class="main_hr">
-                        <button type="submit">''' + load_lang('save') + '''</button>
+                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 ''',
-                menu = [['user', load_lang('return')]]
+                menu = [['user', get_lang(conn, 'return')]]
             ))
