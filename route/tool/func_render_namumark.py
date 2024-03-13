@@ -484,7 +484,7 @@ class class_do_render_namumark:
 
             macro_split_regex = r'(?:^|,) *([^,]+)'
             macro_split_sub_regex = r'(^[^=]+) *= *([^=]+)'
-            if name_data in ('youtube', 'nicovideo', 'navertv', 'kakaotv', 'vimeo', 'instagram', 'twitter'):
+            if name_data in ('youtube', 'nicovideo', 'navertv', 'kakaotv', 'vimeo', 'instagram', 'twitter', 'tiktok', 'facebook'):
                 data = re.findall(macro_split_regex, match[1])
 
                 # get option
@@ -494,9 +494,12 @@ class class_do_render_namumark:
                 
                 video_width = '640px'
                 video_height = '360px'
-                if name_data == 'instagram':
+                if name_data == 'instagram'or name_data == 'tiktok':
                     video_width = '360px'
                     video_height = '480px'
+                elif name_data == 'facebook':
+                    video_width = '500px'
+                    video_height = '616px'
                 elif name_data == 'twitter':
                     video_width = '480px'
                     video_height = '480px'
@@ -538,6 +541,10 @@ class class_do_render_namumark:
                     video_code = re.sub(r'^https:\/\/www\.instagram\.com\/p\/', '', video_code)
 
                     video_code = 'https://www.instagram.com/p/' + video_code +'/embed/'
+                elif name_data == 'facebook':
+                    video_code = 'https://www.facebook.com/plugins/post.php?href=' + video_code + '&width=' + video_width + '&height=' + video_height
+                elif name_data == 'tiktok':
+                    video_code = 'https://www.tiktok.com/embed/v2/' + video_code
                 elif name_data == 'twitter':
                     video_code = 'https://twitframe.com/show?url=' + video_code
 
