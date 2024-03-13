@@ -1803,6 +1803,9 @@ class class_do_render_namumark:
         syntax_count = 0
         folding_count = 0
 
+        inter_count = 0
+        inter_data = {}
+
         middle_regex = r'{{{([^{](?:(?!{{{|}}}).|\n)*)?(?:}|<(\/?(?:slash)_(?:[0-9]+)(?:[^<>]+))>)}}'
         middle_count_all = len(re.findall(middle_regex, self.render_data)) * 10
         while 1:
@@ -1853,7 +1856,9 @@ class class_do_render_namumark:
                         wiki_data = self.get_tool_data_revert(wiki_data)
                         wiki_data = re.sub('(^\n|\n$)', '', wiki_data)
 
-                        middle_data_pass = self.do_inter_render(wiki_data, self.doc_set['doc_include'] + 'opennamu_wiki_' + str(wiki_count))
+                        inter_data["inter_data_" + str(inter_count)] = wiki_data
+                        middle_data_pass = '<inter_data_' + str(inter_count) + '>'
+                        inter_count += 1
 
                         data_name = self.get_tool_data_storage('<div ' + wiki_data_style + '>', '</div>', middle_data_org)
                         wiki_count += 1
@@ -1890,7 +1895,9 @@ class class_do_render_namumark:
                         wiki_data = self.get_tool_data_revert(wiki_data)
                         wiki_data = re.sub('(^\n|\n$)', '', wiki_data)
 
-                        wiki_data_end = self.do_inter_render(wiki_data, self.doc_set['doc_include'] + 'opennamu_folding_' + str(folding_count))
+                        inter_data["inter_data_" + str(inter_count)] = wiki_data
+                        wiki_data_end = '<inter_data_' + str(inter_count) + '>'
+                        inter_count += 1
 
                         middle_data_pass = wiki_data_folding
                         data_name = self.get_tool_data_storage('<details><summary>', '</summary><div class="opennamu_folding">', middle_data_org)
@@ -2051,6 +2058,30 @@ class class_do_render_namumark:
 
             middle_count_all -= 1
 
+        inter_data_regex = r'<(inter_data_[0-9]+)>'
+        class do_render_middle_replace_inter_class:
+            def __init__(self, func, doc_set):
+                self.inter_count = 0
+                self.do_inter_render = func
+                self.doc_set = doc_set
+
+            def replace_sub(match):
+                data = inter_data[match[1]]
+                data = re.sub(inter_data_regex, self.replace_sub, data)
+
+                return data
+
+            def replace(self, match):
+                data = inter_data[match[1]]
+                data = re.sub(inter_data_regex, self.replace_sub, data)
+                
+                data = self.do_inter_render(data, self.doc_set['doc_include'] + 'opennamu_inter_render_' + str(self.inter_count))
+                self.inter_count += 1
+
+                return data
+
+        replace_inter_data_top = do_render_middle_replace_inter_class(self.do_inter_render, self.doc_set)
+        self.render_data = re.sub(inter_data_regex, replace_inter_data_top.replace, self.render_data)
         self.render_data = re.sub(r'<temp_(?P<in>(?:slash)_(?:[0-9]+)(?:[^<>]+))>', '<\\g<in>>', self.render_data)
 
     def do_render_hr(self):
