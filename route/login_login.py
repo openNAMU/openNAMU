@@ -6,19 +6,19 @@ def login_login_2():
 
         ip = ip_check()
         if ip_or_user(ip) == 0:
-            return redirect('/user')
+            return redirect(conn, '/user')
 
-        if ban_check(None, 'login')[0] == 1:
-            return re_error('/ban')
+        if ban_check(conn, None, 'login')[0] == 1:
+            return re_error(conn, '/ban')
 
         if flask.request.method == 'POST':
             if 'login_count' in flask.session:
                 count = int(number_check(flask.session['login_count']))
                 if count > 3:
-                    if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                        return re_error('/error/13')
+                    if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                        return re_error(conn, '/error/13')
                     else:
-                        captcha_post('', 0)
+                        captcha_post(conn, '', 0)
 
             user_agent = flask.request.headers.get('User-Agent', '')
             user_id = flask.request.form.get('id', '')
@@ -27,59 +27,59 @@ def login_login_2():
             curs.execute(db_change("select data from user_set where id = ? and name = 'pw'"), [user_id])
             db_data = curs.fetchall()
             if not db_data:
-                return re_error('/error/2')
+                return re_error(conn, '/error/2')
             else:
                 db_user_pw = db_data[0][0]
                 
             curs.execute(db_change("select data from user_set where id = ? and name = 'encode'"), [user_id])
             db_data = curs.fetchall()
             if not db_data:
-                return re_error('/error/2')
+                return re_error(conn, '/error/2')
             else:
                 db_user_encode = db_data[0][0]
 
-            if pw_check(user_pw, db_user_pw, db_user_encode, user_id) != 1:
+            if pw_check(conn, user_pw, db_user_pw, db_user_encode, user_id) != 1:
                 if not 'login_count' in flask.session:
                     flask.session['login_count'] = 1
                 else:
                     flask.session['login_count'] = int(number_check(flask.session['login_count'])) + 1
 
-                return re_error('/error/10')
+                return re_error(conn, '/error/10')
 
             curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [user_id])
             fa_data = curs.fetchall()
             if fa_data and fa_data[0][0] != '':
                 flask.session['login_id'] = user_id
 
-                return redirect('/login/2fa')
+                return redirect(conn, '/login/2fa')
             else:
                 flask.session['id'] = user_id
 
-                ua_plus(user_id, ip, user_agent, get_time())
+                ua_plus(conn, user_id, ip, user_agent, get_time())
                 conn.commit()
 
-                return redirect('/user')
+                return redirect(conn, '/user')
         else:
             captcha_data = ''
             if 'login_count' in flask.session:
                 count = int(number_check(flask.session['login_count']))
                 if count > 3:
-                    captcha_data = captcha_get()
+                    captcha_data = captcha_get(conn)
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('login'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'login'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data =  '''
                         <form method="post">
-                            <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
+                            <input placeholder="''' + get_lang(conn, 'id') + '''" name="id" type="text">
                             <hr class="main_hr">
-                            <input placeholder="''' + load_lang('password') + '''" name="pw" type="password">
+                            <input placeholder="''' + get_lang(conn, 'password') + '''" name="pw" type="password">
                             <hr class="main_hr">
-                            <!-- <input type="checkbox" name="auto_login"> ''' + load_lang('auto_login') + ''' (''' + load_lang('not_working') + ''')
+                            <!-- <input type="checkbox" name="auto_login"> ''' + get_lang(conn, 'auto_login') + ''' (''' + get_lang(conn, 'not_working') + ''')
                             <hr class="main_hr"> -->
                             ''' + captcha_data + '''
-                            <button type="submit">''' + load_lang('login') + '''</button>
-                            ''' + http_warning() + '''
+                            <button type="submit">''' + get_lang(conn, 'login') + '''</button>
+                            ''' + http_warning(conn) + '''
                         </form>
                         ''',
-                menu = [['user', load_lang('return')]]
+                menu = [['user', get_lang(conn, 'return')]]
             ))

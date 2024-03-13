@@ -13,14 +13,14 @@ def list_user(arg_num = 1):
         for data in user_list:
             list_data += '' + \
                 '<li>' + \
-                    ip_pas(data[0]) + (' (' + data[1] + ')' if data[1] != '' else '') + \
+                    ip_pas(conn, data[0]) + (' (' + data[1] + ')' if data[1] != '' else '') + \
                 '</li>' + \
             ''
 
-        list_data += '</ul>' + next_fix('/list/user/', arg_num, user_list)
+        list_data += '</ul>' + next_fix(conn, '/list/user/', arg_num, user_list)
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('member_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [get_lang(conn, 'member_list'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
             data = list_data,
-            menu = [['other', load_lang('return')]]
+            menu = [['other', get_lang(conn, 'return')]]
         ))

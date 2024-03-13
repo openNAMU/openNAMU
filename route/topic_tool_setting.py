@@ -4,8 +4,8 @@ def topic_tool_setting(topic_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(3) != 1:
-            return re_error('/error/3')
+        if admin_check(conn, 3) != 1:
+            return re_error(conn, '/error/3')
 
         ip = ip_check()
         time = get_time()
@@ -14,10 +14,10 @@ def topic_tool_setting(topic_num = 1):
         curs.execute(db_change("select stop, agree from rd where code = ?"), [topic_num])
         rd_d = curs.fetchall()
         if not rd_d:
-            return redirect('/')
+            return redirect(conn, '/')
 
         if flask.request.method == 'POST':
-            admin_check(3, 'change_topic_set (code ' + topic_num + ')')
+            admin_check(conn, 3, 'change_topic_set (code ' + topic_num + ')')
 
             stop_d = flask.request.form.get('stop_d', '')
             why_d = flask.request.form.get('why', '')
@@ -36,9 +36,9 @@ def topic_tool_setting(topic_num = 1):
                 else:
                     t_state = 'topic_state_change_normal'
 
-                do_add_thread(
+                do_add_thread(conn, 
                     topic_num,
-                    load_lang(t_state),
+                    get_lang(conn, t_state),
                     '1'
                 )
 
@@ -53,32 +53,32 @@ def topic_tool_setting(topic_num = 1):
                 else:
                     t_state = 'topic_state_change_disagree'
 
-                do_add_thread(
+                do_add_thread(conn, 
                     topic_num,
-                    load_lang(t_state),
+                    get_lang(conn, t_state),
                     '1'
                 )
 
             if why_d != '':
-                do_add_thread(
+                do_add_thread(conn, 
                     topic_num,
-                    load_lang('why') + ' : ' + why_d,
+                    get_lang(conn, 'why') + ' : ' + why_d,
                     '1'
                 )
             
-            do_reload_recent_thread(
+            do_reload_recent_thread(conn, 
                 topic_num, 
                 time
             )
 
-            return redirect('/thread/' + topic_num)
+            return redirect(conn, '/thread/' + topic_num)
         else:
             stop_d_list = ''
             agree_check = ''
             for_list = [
-                ['O', load_lang('topic_close')],
-                ['S', load_lang('topic_stop')],
-                ['', load_lang('topic_normal')]
+                ['O', get_lang(conn, 'topic_close')],
+                ['S', get_lang(conn, 'topic_stop')],
+                ['', get_lang(conn, 'topic_normal')]
             ]
 
             for i in for_list:
@@ -89,28 +89,28 @@ def topic_tool_setting(topic_num = 1):
 
             agree_check = 'checked="checked"' if rd_d[0][1] == 'O' else ''
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('topic_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
-                data = render_simple_set('''
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'topic_setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                data = render_simple_set(conn, '''
                     <form method="post">
-                        <h2>''' + load_lang('topic_progress') + '''</h2>
+                        <h2>''' + get_lang(conn, 'topic_progress') + '''</h2>
                         <select name="stop_d">
                             ''' + stop_d_list + '''
                         </select>
                         <hr class="main_hr">
-                        <input type="checkbox" name="agree" value="O" ''' + agree_check + '''> ''' + load_lang('topic_change_agree') + '''
+                        <input type="checkbox" name="agree" value="O" ''' + agree_check + '''> ''' + get_lang(conn, 'topic_change_agree') + '''
 
-                        <h2>''' + load_lang('topic_associate') + '''</h2>
-                        ''' + load_lang('topic_link_vote') + ''' (''' + load_lang('not_working') + ''')
+                        <h2>''' + get_lang(conn, 'topic_associate') + '''</h2>
+                        ''' + get_lang(conn, 'topic_link_vote') + ''' (''' + get_lang(conn, 'not_working') + ''')
                         <hr class="main_hr">
-                        <input placeholder="''' + load_lang('topic_insert_vote_number') + '''" name="vote_number" type="number">
+                        <input placeholder="''' + get_lang(conn, 'topic_insert_vote_number') + '''" name="vote_number" type="number">
 
-                        <h2>''' + load_lang('why') + '''</h2>
-                        <input placeholder="''' + load_lang('why') + ''' (''' + load_lang('markup_enabled') + ''')" name="why" type="text">
+                        <h2>''' + get_lang(conn, 'why') + '''</h2>
+                        <input placeholder="''' + get_lang(conn, 'why') + ''' (''' + get_lang(conn, 'markup_enabled') + ''')" name="why" type="text">
                         
                         <hr class="main_hr">
-                        <button type="submit">''' + load_lang('save') + '''</button>
+                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 '''),
-                menu = [['thread/' + topic_num + '/tool', load_lang('return')]]
+                menu = [['thread/' + topic_num + '/tool', get_lang(conn, 'return')]]
             ))

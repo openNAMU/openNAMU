@@ -11,4 +11,4 @@ def user_alarm_delete(id = ''):
         
         conn.commit()
 
-        return redirect('/alarm')
+        return redirect(conn, '/alarm')

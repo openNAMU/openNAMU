@@ -70,6 +70,10 @@ blockquote {
     background-color: #313236;
 }
 
+.opennamu_history_blind {
+    background: #333;
+}
+
 /* 이 부분은 레거시 */
 #topic_color {
     background: #325a56;

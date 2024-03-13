@@ -17,7 +17,7 @@ def login_find_email_check(tool):
                 user_id = flask.session['c_id']
                 user_pw = flask.session['c_key']
             
-                curs.execute(db_change("update user_set set data = ? where name = 'pw' and id = ?"), [pw_encode(user_pw), user_id])
+                curs.execute(db_change("update user_set set data = ? where name = 'pw' and id = ?"), [pw_encode(conn, user_pw), user_id])
                 
                 curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [user_id])
                 if curs.fetchall():
@@ -32,15 +32,15 @@ def login_find_email_check(tool):
 
                 conn.commit()
         
-                return easy_minify(flask.render_template(skin_check(),
-                    imp = [load_lang('reset_user_ok'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                return easy_minify(conn, flask.render_template(skin_check(conn),
+                    imp = [get_lang(conn, 'reset_user_ok'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                     data = '' + \
                         b_text + \
-                        load_lang('id') + ' : ' + user_id + \
+                        get_lang(conn, 'id') + ' : ' + user_id + \
                         '<hr class="main_hr">' + \
-                        load_lang('password') + ' : ' + user_pw + \
+                        get_lang(conn, 'password') + ' : ' + user_pw + \
                     '',
-                    menu = [['user', load_lang('return')]]
+                    menu = [['user', get_lang(conn, 'return')]]
                 ))
             elif 'c_type' in flask.session and (flask.session['c_key'] == input_key or flask.session['c_key'] == 'email_pass'):
                 curs.execute(db_change('select data from other where name = "encode"'))
@@ -58,14 +58,14 @@ def login_find_email_check(tool):
                         for i in re_set_list:
                             flask.session.pop(i, None)
         
-                        return re_error('/error/8')
+                        return re_error(conn, '/error/8')
                 
                     curs.execute(db_change("select id from user_set where id = ? and name = 'application'"), [flask.session['c_id']])
                     if curs.fetchall():
                         for i in re_set_list:
                             flask.session.pop(i, None)
         
-                        return re_error('/error/8')
+                        return re_error(conn, '/error/8')
         
                     curs.execute(db_change('select data from other where name = "requires_approval"'))
                     requires_approval = curs.fetchall()
@@ -87,7 +87,7 @@ def login_find_email_check(tool):
                         for i in re_set_list:
                             flask.session.pop(i, None)
         
-                        return redirect('/application_submitted')
+                        return redirect(conn, '/application_submitted')
                     else:
                         if first == 0:
                             user_auth = 'user'
@@ -100,7 +100,7 @@ def login_find_email_check(tool):
                         curs.execute(db_change("insert into user_set (id, name, data) values (?, 'encode', ?)"), [flask.session['c_id'], db_data[0][0]])
         
                     curs.execute(db_change("insert into user_set (name, id, data) values ('email', ?, ?)"), [flask.session['c_id'], flask.session['c_email']])
-                    ua_plus(flask.session['c_id'], ip, user_agent, get_time())
+                    ua_plus(conn, flask.session['c_id'], ip, user_agent, get_time())
         
                     flask.session['id'] = flask.session['c_id']
                     flask.session['head'] = ''
@@ -115,26 +115,26 @@ def login_find_email_check(tool):
                 for i in re_set_list:
                     flask.session.pop(i, None)
         
-                return redirect('/change') if first == 0 else redirect('/setting') 
+                return redirect(conn, '/change') if first == 0 else redirect(conn, '/setting') 
             else:
                 for i in re_set_list:
                     flask.session.pop(i, None)
         
-                return redirect('/user')
+                return redirect(conn, '/user')
         else:
             curs.execute(db_change('select data from other where name = "check_key_text"'))
             sql_d = curs.fetchall()
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
         
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('check_key'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'check_key'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         ''' + b_text + '''
-                        <input placeholder="''' + load_lang('key') + '''" name="key" type="password">
+                        <input placeholder="''' + get_lang(conn, 'key') + '''" name="key" type="password">
                         <hr class="main_hr">
-                        <button type="submit">''' + load_lang('save') + '''</button>
+                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 ''',
-                menu = [['user', load_lang('return')]]
+                menu = [['user', get_lang(conn, 'return')]]
             ))

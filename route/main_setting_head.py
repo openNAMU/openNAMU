@@ -4,8 +4,8 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check() != 1:
-            return re_error('/ban')
+        if admin_check(conn) != 1:
+            return re_error(conn, '/ban')
         
         if flask.request.method == 'POST' and set_preview == 0:
             if num == 4:
@@ -32,12 +32,12 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
 
             conn.commit()
 
-            admin_check(None, 'edit_set (' + info_d + ')')
+            admin_check(conn, None, 'edit_set (' + info_d + ')')
 
             if skin_name == '':
-                return redirect('/setting/' + end_r)
+                return redirect(conn, '/setting/' + end_r)
             else:
-                return redirect('/setting/' + end_r + '/' + skin_name)
+                return redirect(conn, '/setting/' + end_r + '/' + skin_name)
         else:
             title = ''
             start = ''
@@ -51,7 +51,7 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
                 form_action = 'formaction="/setting/body/top"'
                 data_preview = flask.request.form.get('content', '') if set_preview == 1 else ''
                 plus = '''
-                    <button id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/top">''' + load_lang('preview') + '''</button>
+                    <button id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/top">''' + get_lang(conn, 'preview') + '''</button>
                     <hr class="main_hr">
                     <div id="opennamu_preview_area">''' + data_preview + '''</div>
                 '''
@@ -61,7 +61,7 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
                 data_preview = flask.request.form.get('content', '') if set_preview == 1 else ''
                 form_action = 'formaction="/setting/body/bottom"'
                 plus = '''
-                    <button id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/bottom">''' + load_lang('preview') + '''</button>
+                    <button id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/bottom">''' + get_lang(conn, 'preview') + '''</button>
                     <hr class="main_hr">
                     <div id="opennamu_preview_area">''' + data_preview + '''</div>
                 '''
@@ -69,8 +69,8 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
                 curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
                 title = '_head'
                 start = '' + \
-                    '<a href="/setting/head">(' + load_lang('all') + ')</a> ' + \
-                    ' '.join(['<a href="/setting/head/' + url_pas(i) + '">(' + html.escape(i) + ')</a>' for i in load_skin('', 1)]) + '''
+                    '<a href="/setting/head">(' + get_lang(conn, 'all') + ')</a> ' + \
+                    ' '.join(['<a href="/setting/head/' + url_pas(i) + '">(' + html.escape(i) + ')</a>' for i in load_skin(conn, '', 1)]) + '''
                     <hr class="main_hr">
                     <span>
                         &lt;style&gt;CSS&lt;/style&gt;
@@ -94,17 +94,17 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
             else:
                 sub_plus = ''
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang(data = 'main' + title, safe = 1), wiki_set(), wiki_custom(), wiki_css(['(HTML)' + sub_plus, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, data = 'main' + title, safe = 1), wiki_set(conn), wiki_custom(conn), wiki_css(['(HTML)' + sub_plus, 0])],
                 data = '''
                     <form method="post">
                         ''' + start + '''
-                        <textarea class="opennamu_textarea_500" placeholder="''' + load_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" placeholder="''' + get_lang(conn, 'enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
-                        ''' + (load_lang('main_css_warning') + '<hr class="main_hr">' if title == '_head' else '') + '''
-                        <button id="opennamu_save_button" type="submit" ''' + form_action + '''>''' + load_lang('save') + '''</button>
+                        ''' + (get_lang(conn, 'main_css_warning') + '<hr class="main_hr">' if title == '_head' else '') + '''
+                        <button id="opennamu_save_button" type="submit" ''' + form_action + '''>''' + get_lang(conn, 'save') + '''</button>
                         ''' + plus + '''
                     </form>
                 ''',
-                menu = [['setting', load_lang('return')]]
+                menu = [['setting', get_lang(conn, 'return')]]
             ))

@@ -7,7 +7,7 @@ def api_user_info(user_name = ''):
         data_result = {}
         
         # name part
-        data_result['render'] = ip_pas(user_name)
+        data_result['render'] = ip_pas(conn, user_name)
         
         # auth part
         curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [user_name])
@@ -31,13 +31,13 @@ def api_user_info(user_name = ''):
         else:
             data_result['auth_date'] = '0'
 
-        level_data = level_check(user_name)
+        level_data = level_check(conn, user_name)
         data_result['level'] = level_data[0]
         data_result['exp'] = level_data[1]
         data_result['max_exp'] = level_data[2]
             
         # ban part
-        if ban_check(user_name)[0] == 0:
+        if ban_check(conn, user_name)[0] == 0:
             data_result['ban'] = '0'
         else:
             data_result['ban'] = {}
@@ -119,6 +119,6 @@ def api_user_info(user_name = ''):
             'option',
             'edit_request_able'
         ]
-        lang_data = { for_a : load_lang(for_a) for for_a in lang_data_list }
+        lang_data = { for_a : get_lang(conn, for_a) for for_a in lang_data_list }
                 
         return flask.jsonify({ 'data' : data_result, 'language' : lang_data })

@@ -4,8 +4,8 @@ def topic_comment_delete(topic_num = 1, num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(None) != 1:
-            return re_error('/error/3')
+        if admin_check(conn, None) != 1:
+            return re_error(conn, '/error/3')
 
         topic_num = str(topic_num)
         num = str(num)
@@ -14,15 +14,15 @@ def topic_comment_delete(topic_num = 1, num = 1):
             curs.execute(db_change("delete from topic where code = ? and id = ?"), [topic_num, num])
             conn.commit()
 
-            return redirect('/thread/' + topic_num)
+            return redirect(conn, '/thread/' + topic_num)
         else:
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('topic_delete'), wiki_set(), wiki_custom(), wiki_css(['(#' + num + ')', 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'topic_delete'), wiki_set(conn), wiki_custom(conn), wiki_css(['(#' + num + ')', 0])],
                 data = '''
                     <hr class="main_hr">
                     <form method="post">
-                        <button type="submit">''' + load_lang('start') + '''</button>
+                        <button type="submit">''' + get_lang(conn, 'start') + '''</button>
                     </form>
                 ''',
-                menu = [['thread/' + topic_num + '/comment/' + num + '/tool', load_lang('return')]]
+                menu = [['thread/' + topic_num + '/comment/' + num + '/tool', get_lang(conn, 'return')]]
             ))

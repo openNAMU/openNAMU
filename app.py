@@ -118,11 +118,11 @@ with get_db_connect() as conn:
             pass
 
         if setup_tool == 'update':
-            update(int(ver_set_data[0][0]), set_data)
+            update(conn, int(ver_set_data[0][0]), set_data)
         else:
-            set_init()
+            set_init(conn)
 
-    set_init_always(version_list['beta']['c_ver'])
+    set_init_always(conn, version_list['beta']['c_ver'])
 
     # Init-Route
     class EverythingConverter(werkzeug.routing.PathConverter):
@@ -521,7 +521,7 @@ app.route('/doc_star_doc/<int:num>/<everything:name>', defaults = { 'db_set' : d
 
 app.route('/raw/<everything:name>')(view_w_raw)
 app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 'on' })(view_w_raw)
-app.route('/raw_rev/<int:rev>/<everything:name>')(view_w_raw)
+app.route('/raw_rev/<int(signed = True):rev>/<everything:name>')(view_w_raw)
 
 app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')(view_diff)
 

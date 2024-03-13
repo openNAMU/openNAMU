@@ -24,8 +24,8 @@ def main_func_easter_egg():
 
         data = data.decode('utf8')
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = ['Easter Egg', wiki_set(), wiki_custom(), wiki_css([0, 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = ['Easter Egg', wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
             data = data,
             menu = 0
         ))

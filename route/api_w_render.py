@@ -48,19 +48,19 @@ def api_w_render(name = '', tool = ''):
                 data_org = re.sub('^\n+', '', data_org)
 
             if tool == '':
-                data_pas = render_set(
+                data_pas = render_set(conn, 
                     doc_name = name, 
                     doc_data = data_org, 
                     data_type = 'api_view'
                 )
             elif tool == 'include':
-                data_pas = render_set(
+                data_pas = render_set(conn, 
                     doc_name = name, 
                     doc_data = data_org, 
                     data_type = 'api_include'
                 )
             else:
-                data_pas = render_set(
+                data_pas = render_set(conn, 
                     doc_name = name,
                     doc_data = data_org, 
                     data_type = 'api_thread'

@@ -6,16 +6,16 @@ def user_setting_user_name(user_name = ''):
 
         ip = ip_check()
         if user_name != '':
-            if admin_check() != 1:
-                return re_error('/error/3')
+            if admin_check(conn) != 1:
+                return re_error(conn, '/error/3')
             else:
                 ip = user_name
     
         if ip_or_user(ip) == 0:
             if flask.request.method == 'POST':
                 auto_data = ['user_name', flask.request.form.get('new_user_name', '')]
-                if do_user_name_check(auto_data[1]) == 1:
-                    return re_error('/error/8')
+                if do_user_name_check(conn, auto_data[1]) == 1:
+                    return re_error(conn, '/error/8')
 
                 curs.execute(db_change('select data from user_set where name = ? and id = ?'), [auto_data[0], ip])
                 if curs.fetchall():
@@ -24,9 +24,9 @@ def user_setting_user_name(user_name = ''):
                     curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), [auto_data[0], ip, auto_data[1]])
 
                 if user_name != '':
-                    return redirect('/change/user_name/' + url_pas(user_name))
+                    return redirect(conn, '/change/user_name/' + url_pas(user_name))
                 else:
-                    return redirect('/change/user_name')
+                    return redirect(conn, '/change/user_name')
             else:
                 user_name = ip
 
@@ -35,16 +35,16 @@ def user_setting_user_name(user_name = ''):
                 if db_data and db_data[0][0] != '':
                     user_name = db_data[0][0]
 
-                return easy_minify(flask.render_template(skin_check(),
-                    imp = [load_lang('change_user_name'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                return easy_minify(conn, flask.render_template(skin_check(conn),
+                    imp = [get_lang(conn, 'change_user_name'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
-                            <input name="new_user_name" placeholder="''' + load_lang('user_name') + '''" value="''' + html.escape(user_name) + '''">
+                            <input name="new_user_name" placeholder="''' + get_lang(conn, 'user_name') + '''" value="''' + html.escape(user_name) + '''">
                             <hr class="main_hr">
-                            <button id="opennamu_save_button" type="submit">''' + load_lang('save') + '''</button>
+                            <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
                         </form>
                     ''',
-                    menu = [['change', load_lang('return')]]
+                    menu = [['change', get_lang(conn, 'return')]]
                 ))
         else:
-            return redirect('/login')
+            return redirect(conn, '/login')

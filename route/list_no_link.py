@@ -21,10 +21,10 @@ def list_no_link(num = 1):
 
             div += '</li>'
         
-        div += '</ul>' + next_fix('/list/document/no_link/', num, n_list)
+        div += '</ul>' + next_fix(conn, '/list/document/no_link/', num, n_list)
         
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [load_lang('no_link_document_list'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [get_lang(conn, 'no_link_document_list'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
             data = div,
-            menu = [['other', load_lang('return')]]
+            menu = [['other', get_lang(conn, 'return')]]
         ))

@@ -40,7 +40,7 @@ def view_w(name = 'Test', do_type = ''):
             category_sql = curs.fetchall()
             for data in category_sql:
                 link_view = data[0]
-                if get_main_skin_set(curs, flask.session, 'main_css_category_change_title', ip) != 'off':
+                if get_main_skin_set(conn, flask.session, 'main_css_category_change_title', ip) != 'off':
                     curs.execute(db_change("select data from back where title = ? and link = ? and type = 'cat_view' limit 1"), [name, data[0]])
                     db_data = curs.fetchall()
                     if db_data and db_data[0][0] != '':
@@ -59,25 +59,25 @@ def view_w(name = 'Test', do_type = ''):
                     category_doc += '' + \
                         '<li>' + \
                             '<a class="' + link_blur + '" href="/w/' + url_pas(data[0]) + '">' + html.escape(link_view) + '</a> ' + \
-                            '<a class="opennamu_link_inter" href="/xref/' + url_pas(data[0]) + '">(' + load_lang('backlink') + ')</a>' + \
+                            '<a class="opennamu_link_inter" href="/xref/' + url_pas(data[0]) + '">(' + get_lang(conn, 'backlink') + ')</a>' + \
                         '</li>' + \
                     ''
                     count_category += 1
 
             if category_sub != '':
                 category_total += '' + \
-                    '<h2 id="cate_under">' + load_lang('under_category') + '</h2>' + \
+                    '<h2 id="cate_under">' + get_lang(conn, 'under_category') + '</h2>' + \
                     '<ul class="opennamu_ul">' + \
-                        '<li>' + load_lang('all') + ' : ' + str(count_sub_category) + '</li>' + \
+                        '<li>' + get_lang(conn, 'all') + ' : ' + str(count_sub_category) + '</li>' + \
                         category_sub + \
                     '</ul>' + \
                 ''
 
             if category_doc != '':
                 category_total += '' + \
-                    '<h2 id="cate_normal">' + load_lang('category_title') + '</h2>' + \
+                    '<h2 id="cate_normal">' + get_lang(conn, 'category_title') + '</h2>' + \
                     '<ul class="opennamu_ul">' + \
-                        '<li>' + load_lang('all') + ' : ' + str(count_category) + '</li>' + \
+                        '<li>' + get_lang(conn, 'all') + ' : ' + str(count_category) + '</li>' + \
                         category_doc + \
                     '</ul>' + \
                 ''
@@ -93,8 +93,8 @@ def view_w(name = 'Test', do_type = ''):
             user_doc = ''
             
             # S admin or owner 특수 틀 추가
-            if admin_check('all', None, user_name) == 1:
-                if admin_check(None, None, user_name) == 1:
+            if admin_check(conn, 'all', None, user_name) == 1:
+                if admin_check(conn, None, None, user_name) == 1:
                     curs.execute(db_change('select data from other where name = "phrase_user_page_owner"'))
                     db_data = curs.fetchall()
                     if db_data and db_data[0][0] != '':
@@ -116,7 +116,7 @@ def view_w(name = 'Test', do_type = ''):
                 <hr class="main_hr">
             '''
             if name == 'user:' + user_name:
-                menu += [['w/' + url_pas(name) + '/' + url_pas(now_time.split()[0]), load_lang('today_doc')]]
+                menu += [['w/' + url_pas(name) + '/' + url_pas(now_time.split()[0]), get_lang(conn, 'today_doc')]]
         elif re.search(r"^file:", name):
             curs.execute(db_change('select id from history where title = ? order by date desc limit 1'), [name])
             db_data = curs.fetchall()
@@ -135,7 +135,7 @@ def view_w(name = 'Test', do_type = ''):
             file_name = re.sub(r'^file:', '', file_name)
 
             file_all_name = sha224_replace(file_name) + '.' + mime_type
-            file_path_name = os.path.join(load_image_url(), file_all_name)
+            file_path_name = os.path.join(load_image_url(conn), file_all_name)
             if os.path.exists(file_path_name):
                 try:
                     img = Image.open(file_path_name)
@@ -148,16 +148,16 @@ def view_w(name = 'Test', do_type = ''):
                 
                 file_data = '''
                     <img src="/image/''' + url_pas(file_all_name) + '''.cache_v''' + rev + '''">
-                    <h2>''' + load_lang('data') + '''</h2>
+                    <h2>''' + get_lang(conn, 'data') + '''</h2>
                     <table>
-                        <tr><td>URL</td><td><a href="/image/''' + url_pas(file_all_name) + '''">''' + load_lang('link') + '''</a></td></tr>
-                        <tr><td>''' + load_lang('volume') + '''</td><td>''' + file_size + '''KB</td></tr>
-                        <tr><td>''' + load_lang('resolution') + '''</td><td>''' + file_res + '''</td></tr>
+                        <tr><td>URL</td><td><a href="/image/''' + url_pas(file_all_name) + '''">''' + get_lang(conn, 'link') + '''</a></td></tr>
+                        <tr><td>''' + get_lang(conn, 'volume') + '''</td><td>''' + file_size + '''KB</td></tr>
+                        <tr><td>''' + get_lang(conn, 'resolution') + '''</td><td>''' + file_res + '''</td></tr>
                     </table>
-                    <h2>''' + load_lang('content') + '''</h2>
+                    <h2>''' + get_lang(conn, 'content') + '''</h2>
                 '''
 
-                menu += [['delete_file/' + url_pas(name), load_lang('file_delete')]]
+                menu += [['delete_file/' + url_pas(name), get_lang(conn, 'file_delete')]]
             else:
                 file_data = ''
         else:
@@ -179,24 +179,24 @@ def view_w(name = 'Test', do_type = ''):
         curs.execute(db_change("select title from data where title = ?"), [name])
         data = curs.fetchall()
 
-        if acl_check(name, 'render') == 1:
+        if acl_check(conn, name, 'render') == 1:
             response_data = 401
 
             curs.execute(db_change('select data from other where name = "error_401"'))
             sql_d = curs.fetchall()
             if sql_d and sql_d[0][0] != '':
-                end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + sql_d[0][0] + '</li></ul>'
+                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul class="opennamu_ul"><li>' + sql_d[0][0] + '</li></ul>'
             else:
-                end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + load_lang('authority_error') + '</li></ul>'
+                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul class="opennamu_ul"><li>' + get_lang(conn, 'authority_error') + '</li></ul>'
         elif not data:
             response_data = 404
 
             curs.execute(db_change('select data from other where name = "error_404"'))
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
-                end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + db_data[0][0] + '</li></ul>'
+                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul class="opennamu_ul"><li>' + db_data[0][0] + '</li></ul>'
             else:
-                end_data = '<h2>' + load_lang('error') + '</h2><ul class="opennamu_ul"><li>' + load_lang('decument_404_error') + '</li></ul>'
+                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul class="opennamu_ul"><li>' + get_lang(conn, 'decument_404_error') + '</li></ul>'
 
             curs.execute(db_change('select ip from history where title = ? limit 1'), [name])
             db_data = curs.fetchall()
@@ -206,17 +206,17 @@ def view_w(name = 'Test', do_type = ''):
 
         curs.execute(db_change("select title from acl where title = ?"), [name])
         acl = 1 if curs.fetchall() else 0
-        menu_acl = 1 if acl_check(name, 'document_edit') == 1 else 0
+        menu_acl = 1 if acl_check(conn, name, 'document_edit') == 1 else 0
         if response_data == 404:
-            menu += [['edit/' + url_pas(name), load_lang('create'), menu_acl]] 
+            menu += [['edit/' + url_pas(name), get_lang(conn, 'create'), menu_acl]] 
         else:
-            menu += [['edit/' + url_pas(name), load_lang('edit'), menu_acl]]
+            menu += [['edit/' + url_pas(name), get_lang(conn, 'edit'), menu_acl]]
 
         menu += [
-            ['topic/' + url_pas(name), load_lang('discussion'), topic], 
-            ['history/' + url_pas(name), load_lang('history'), history_color], 
-            ['xref/' + url_pas(name), load_lang('backlink')], 
-            ['acl/' + url_pas(name), load_lang('setting'), acl],
+            ['topic/' + url_pas(name), get_lang(conn, 'discussion'), topic], 
+            ['history/' + url_pas(name), get_lang(conn, 'history'), history_color], 
+            ['xref/' + url_pas(name), get_lang(conn, 'backlink')], 
+            ['acl/' + url_pas(name), get_lang(conn, 'setting'), acl],
         ]
 
         if flask.session and 'lastest_document' in flask.session:
@@ -226,7 +226,7 @@ def view_w(name = 'Test', do_type = ''):
             flask.session['lastest_document'] = []
 
         if do_type == 'from':
-            menu += [['w/' + url_pas(name), load_lang('pass')]]
+            menu += [['w/' + url_pas(name), get_lang(conn, 'pass')]]
             
             last_page = ''
             for for_a in reversed(range(0, len(flask.session['lastest_document']))):
@@ -264,12 +264,12 @@ def view_w(name = 'Test', do_type = ''):
         
         flask.session['lastest_document'] = list(reversed(dict.fromkeys(reversed(flask.session['lastest_document']))))
 
-        view_history_on = get_main_skin_set(curs, flask.session, 'main_css_view_history', ip)
+        view_history_on = get_main_skin_set(conn, flask.session, 'main_css_view_history', ip)
         if view_history_on == 'on':
             end_data = '' + \
                 '<div class="opennamu_trace">' + \
                     '<a class="opennamu_trace_button" href="javascript:opennamu_do_trace_spread();"> (+)</a>' + \
-                    load_lang('trace') + ' : ' + \
+                    get_lang(conn, 'trace') + ' : ' + \
                     ' ← '.join(
                         [
                             '<a href="/w/' + url_pas(for_a) + '">' + html.escape(for_a) + '</a>'
@@ -281,10 +281,10 @@ def view_w(name = 'Test', do_type = ''):
             '' + end_data
 
         if uppage != 0:
-            menu += [['w/' + url_pas(uppage), load_lang('upper')]]
+            menu += [['w/' + url_pas(uppage), get_lang(conn, 'upper')]]
 
         if down:
-            menu += [['down/' + url_pas(name), load_lang('sub')]]
+            menu += [['down/' + url_pas(name), get_lang(conn, 'sub')]]
 
         curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'last_edit'"), [name])
         r_date = curs.fetchall()
@@ -301,7 +301,7 @@ def view_w(name = 'Test', do_type = ''):
                 if time_2 > time_1:
                     curs.execute(db_change('select data from other where name = "outdated_doc_warning"'))
                     db_data = curs.fetchall()
-                    div = (db_data[0][0] if db_data and db_data[0][0] != '' else load_lang('old_page_warning')) + '<hr class="main_hr">' + div
+                    div = (db_data[0][0] if db_data and db_data[0][0] != '' else get_lang(conn, 'old_page_warning')) + '<hr class="main_hr">' + div
 
         curs.execute(db_change("select data from other where name = 'body'"))
         body = curs.fetchall()
@@ -322,10 +322,10 @@ def view_w(name = 'Test', do_type = ''):
         else:
             watch_list = 0
 
-        menu += [['doc_watch_list/1/' + url_pas(name), load_lang('watchlist')]]
+        menu += [['doc_watch_list/1/' + url_pas(name), get_lang(conn, 'watchlist')]]
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [name_view, wiki_set(), wiki_custom(), wiki_css([sub, r_date, watch_list])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [name_view, wiki_set(conn), wiki_custom(conn), wiki_css([sub, r_date, watch_list])],
             data = div,
             menu = menu
         )), response_data

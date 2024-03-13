@@ -4,24 +4,24 @@ def edit_move(name):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check(name, 'document_move') == 1:
-            return re_error('/ban')
+        if acl_check(conn, name, 'document_move') == 1:
+            return re_error(conn, '/ban')
         
-        if do_title_length_check(name) == 1:
-            return re_error('/error/38')
+        if do_title_length_check(conn, name) == 1:
+            return re_error(conn, '/error/38')
 
         if flask.request.method == 'POST':
             move_title = flask.request.form.get('title', 'test')
-            if acl_check(move_title) == 1:
-                return re_error('/ban')
+            if acl_check(conn, move_title) == 1:
+                return re_error(conn, '/ban')
 
-            if captcha_post(flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error('/error/13')
+            if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                return re_error(conn, '/error/13')
             else:
-                captcha_post('', 0)
+                captcha_post(conn, '', 0)
 
-            if do_edit_slow_check() == 1:
-                return re_error('/error/24')
+            if do_edit_slow_check(conn) == 1:
+                return re_error(conn, '/error/24')
             
             send = flask.request.form.get('send', '')
             agree = flask.request.form.get('copyright_agreement', '')
@@ -35,18 +35,18 @@ def edit_move(name):
             move_option_topic = flask.request.form.get('move_topic_option', 'none')
             document_set_option = flask.request.form.get('document_set_option', 'none')
             
-            if do_edit_send_check(send) == 1:
-                return re_error('/error/37')
+            if do_edit_send_check(conn, send) == 1:
+                return re_error(conn, '/error/37')
             
-            if do_edit_text_bottom_check_box_check(agree) == 1:
-                return re_error('/error/29')
+            if do_edit_text_bottom_check_box_check(conn, agree) == 1:
+                return re_error(conn, '/error/29')
 
             # 역링크 관련 패치 해야할 듯
 
             # 문서 이동 파트 S
             curs.execute(db_change("select title from history where title = ?"), [move_title])
             if curs.fetchall():
-                if move_option == 'merge' and admin_check(None, 'merge documents (' + name + ') (' + move_title + ')') == 1:
+                if move_option == 'merge' and admin_check(conn, None, 'merge documents (' + name + ') (' + move_title + ')') == 1:
                     curs.execute(db_change("select data from data where title = ?"), [move_title])
                     data = curs.fetchall()
                     if data:
@@ -77,7 +77,7 @@ def edit_move(name):
                         curs.execute(db_change("update rc set title = ?, id = ? where title = ? and id = ?"), [move_title, str(int(num) + int(move[0])), name, move[0]])
                         curs.execute(db_change("update history set title = ?, id = ? where title = ? and id = ?"), [move_title, str(int(num) + int(move[0])), name, move[0]])
 
-                    history_plus(
+                    history_plus(conn, 
                         move_title, 
                         data_in, 
                         time, 
@@ -113,7 +113,7 @@ def edit_move(name):
                         data = curs.fetchall()
                         data_in = data[0][0] if data else ''
 
-                        history_plus(
+                        history_plus(conn, 
                             title_name[0], 
                             data_in, 
                             time, 
@@ -146,7 +146,7 @@ def edit_move(name):
                 curs.execute(db_change("update rc set title = ? where title = ?"), [move_title, name])
                 # 역사와 최근 변경 이동 E
 
-                history_plus(
+                history_plus(conn, 
                     move_title, 
                     data_in, 
                     time, 
@@ -162,7 +162,7 @@ def edit_move(name):
             # 토론 이동 파트 S
             curs.execute(db_change("select title from rd where title = ?"), [move_title])
             if curs.fetchall():
-                if move_option_topic == 'merge' and admin_check(None, 'merge document\'s topics (' + name + ') (' + move_title + ')') == 1:
+                if move_option_topic == 'merge' and admin_check(conn, None, 'merge document\'s topics (' + name + ') (' + move_title + ')') == 1:
                     curs.execute(db_change("update rd set title = ? where title = ?"), [move_title, name])
                 elif move_option_topic == 'reverse':
                     i = 0
@@ -210,59 +210,59 @@ def edit_move(name):
             conn.commit()
 
             if has_error == 0:
-                return redirect('/w/' + url_pas(move_title))
+                return redirect(conn, '/w/' + url_pas(move_title))
             else:
-                return re_error('/error/19')
+                return re_error(conn, '/error/19')
         else:
-            owner_auth = admin_check()
+            owner_auth = admin_check(conn)
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [name, wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('move') + ')', 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'move') + ')', 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + load_lang('document_name') + '''</span>
+                        <span>''' + get_lang(conn, 'document_name') + '''</span>
                         <hr class="main_hr">
                         <input value="''' + name + '''" name="title" type="text">
                         <hr class="main_hr">
                         
-                        <input placeholder="''' + load_lang('why') + '''" name="send" type="text">
+                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="send" type="text">
                         <hr class="main_hr">
                         
-                        <h2>''' + load_lang('document') + '''</h2>
+                        <h2>''' + get_lang(conn, 'document') + '''</h2>
                         <select name="move_option">
-                            <option value="none"> ''' + load_lang('dont_move') + '''</option>
-                            <option value="normal"> ''' + load_lang('normal') + '''</option>
-                            <option value="reverse"> ''' + load_lang('replace_move') + '''</option>
-                            ''' + ('<option value="merge"> ' + load_lang('merge_move') + '</option>' if owner_auth == 1 else '') + '''
+                            <option value="none"> ''' + get_lang(conn, 'dont_move') + '''</option>
+                            <option value="normal"> ''' + get_lang(conn, 'normal') + '''</option>
+                            <option value="reverse"> ''' + get_lang(conn, 'replace_move') + '''</option>
+                            ''' + ('<option value="merge"> ' + get_lang(conn, 'merge_move') + '</option>' if owner_auth == 1 else '') + '''
                         </select>
                         <hr class="main_hr">
-                        <!-- <input type="checkbox" name="move_redirect_make"> ''' + load_lang('move_redirect_make') + '''
+                        <!-- <input type="checkbox" name="move_redirect_make"> ''' + get_lang(conn, 'move_redirect_make') + '''
                         <hr class="main_hr"> -->
                         
-                        <h2>''' + load_lang('discussion') + '''</h2>
+                        <h2>''' + get_lang(conn, 'discussion') + '''</h2>
                         <select name="move_topic_option">
-                            <option value="none"> ''' + load_lang('dont_move') + '''</option>
-                            <option value="normal"> ''' + load_lang('normal') + '''</option>
-                            <option value="reverse"> ''' + load_lang('replace_move') + '''</option>
-                            ''' + ('<option value="merge"> ' + load_lang('merge_move') + '</option>' if owner_auth == 1 else '') + '''
+                            <option value="none"> ''' + get_lang(conn, 'dont_move') + '''</option>
+                            <option value="normal"> ''' + get_lang(conn, 'normal') + '''</option>
+                            <option value="reverse"> ''' + get_lang(conn, 'replace_move') + '''</option>
+                            ''' + ('<option value="merge"> ' + get_lang(conn, 'merge_move') + '</option>' if owner_auth == 1 else '') + '''
                         </select>
                         <hr class="main_hr">
 
                         ''' + ((
-                            '''<h2>''' + load_lang('document_set') + '''</h2>
+                            '''<h2>''' + get_lang(conn, 'document_set') + '''</h2>
                             <select name="document_set_option">
-                                <option value="none"> ''' + load_lang('dont_move') + '''</option>
-                                <option value="normal"> ''' + load_lang('normal') + '''</option>
-                                <option value="reverse"> ''' + load_lang('replace_move') + '''</option>
+                                <option value="none"> ''' + get_lang(conn, 'dont_move') + '''</option>
+                                <option value="normal"> ''' + get_lang(conn, 'normal') + '''</option>
+                                <option value="reverse"> ''' + get_lang(conn, 'replace_move') + '''</option>
                             </select>
                             <hr class="main_hr">
                             '''
                         ) if owner_auth == 1 else '') + '''
 
-                        ''' + captcha_get() + ip_warning() + get_edit_text_bottom_check_box() + get_edit_text_bottom() + '''
+                        ''' + captcha_get(conn) + ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn)  + '''
                         
-                        <button type="submit">''' + load_lang('move') + '''</button>
+                        <button type="submit">''' + get_lang(conn, 'move') + '''</button>
                     </form>
                 ''',
-                menu = [['w/' + url_pas(name), load_lang('return')]]
+                menu = [['w/' + url_pas(name), get_lang(conn, 'return')]]
             ))

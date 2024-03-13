@@ -1,8 +1,9 @@
 from .func_tool import *
 
 class class_do_render_namumark:
-    def __init__(self, curs, doc_name, doc_data, doc_set, lang_data, do_type = 'exter'):
-        self.curs = curs
+    def __init__(self, conn, doc_name, doc_data, doc_set, lang_data, do_type = 'exter'):
+        self.conn = conn
+        self.curs = self.conn.cursor()
 
         self.doc_data = doc_data.replace('\r', '')
         self.doc_name = doc_name
@@ -227,7 +228,7 @@ class class_do_render_namumark:
         doc_set = dict(self.doc_set)
         doc_set['doc_include'] = doc_include
 
-        data_end = class_do_render_namumark(self.curs, self.doc_name, data, doc_set, self.lang_data, do_type = 'inter')()
+        data_end = class_do_render_namumark(self.conn, self.doc_name, data, doc_set, self.lang_data, do_type = 'inter')()
 
         self.render_data_js += data_end[1]
         self.data_category_list += data_end[2]['category']
@@ -241,7 +242,7 @@ class class_do_render_namumark:
     # Render
     def do_render_text(self):
         # <b> function
-        bold_user_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_bold', self.ip)
+        bold_user_set = get_main_skin_set(self.conn, self.flask_session, 'main_css_bold', self.ip)
 
         def do_render_text_bold(match):
             data = match.group(1)
@@ -302,7 +303,7 @@ class class_do_render_namumark:
         self.render_data = re.sub(r",,((?:(?!,,).)+),,", do_render_text_sub, self.render_data)
 
         # <s> function
-        strike_user_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_strike', self.ip)
+        strike_user_set = get_main_skin_set(self.conn, self.flask_session, 'main_css_strike', self.ip)
 
         def do_render_text_strike(match):
             data = match.group(1)
@@ -483,7 +484,7 @@ class class_do_render_namumark:
 
             macro_split_regex = r'(?:^|,) *([^,]+)'
             macro_split_sub_regex = r'(^[^=]+) *= *([^=]+)'
-            if name_data in ('youtube', 'nicovideo', 'navertv', 'kakaotv', 'vimeo', 'instagram', 'twitter'):
+            if name_data in ('youtube', 'nicovideo', 'navertv', 'kakaotv', 'vimeo', 'instagram', 'twitter', 'tiktok', 'facebook'):
                 data = re.findall(macro_split_regex, match[1])
 
                 # get option
@@ -493,9 +494,12 @@ class class_do_render_namumark:
                 
                 video_width = '640px'
                 video_height = '360px'
-                if name_data == 'instagram':
+                if name_data == 'instagram'or name_data == 'tiktok':
                     video_width = '360px'
                     video_height = '480px'
+                elif name_data == 'facebook':
+                    video_width = '500px'
+                    video_height = '616px'
                 elif name_data == 'twitter':
                     video_width = '480px'
                     video_height = '480px'
@@ -537,6 +541,10 @@ class class_do_render_namumark:
                     video_code = re.sub(r'^https:\/\/www\.instagram\.com\/p\/', '', video_code)
 
                     video_code = 'https://www.instagram.com/p/' + video_code +'/embed/'
+                elif name_data == 'facebook':
+                    video_code = 'https://www.facebook.com/plugins/post.php?href=' + video_code + '&width=' + video_width + '&height=' + video_height
+                elif name_data == 'tiktok':
+                    video_code = 'https://www.tiktok.com/embed/v2/' + video_code
                 elif name_data == 'twitter':
                     video_code = 'https://twitframe.com/show?url=' + video_code
 
@@ -975,7 +983,7 @@ class class_do_render_namumark:
 
                     file_style = file_width + file_height + file_align_style + file_bgcolor + file_radius + file_rendering
 
-                    image_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_image_set', self.ip)
+                    image_set = get_main_skin_set(self.conn, self.flask_session, 'main_css_image_set', self.ip)
                     if image_set == 'new_click' or image_set == 'click':
                         file_end = '<img style="' + file_style + '" id="opennamu_image_' + str(image_count) + '" alt="' + link_sub + '" src="">'
                     else:
@@ -1288,7 +1296,7 @@ class class_do_render_namumark:
 
     def do_render_include(self):
         include_num = 0
-        include_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_include_link', self.ip)
+        include_set_data = get_main_skin_set(self.conn, self.flask_session, 'main_css_include_link', self.ip)
         include_regex = re.compile(r'\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\](\n?)', re.I)
         include_count_max = len(re.findall(include_regex, self.render_data)) * 2
         while 1:
@@ -1370,9 +1378,9 @@ class class_do_render_namumark:
     def do_redner_footnote(self):
         footnote_num = 0
 
-        footnote_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_set', self.ip)
-        footnote_number_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_footnote_number', self.ip)
-        footnote_number_view_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_view_real_footnote_num', self.ip)
+        footnote_set = get_main_skin_set(self.conn, self.flask_session, 'main_css_footnote_set', self.ip)
+        footnote_number_set = get_main_skin_set(self.conn, self.flask_session, 'main_css_footnote_number', self.ip)
+        footnote_number_view_set = get_main_skin_set(self.conn, self.flask_session, 'main_css_view_real_footnote_num', self.ip)
 
         footnote_regex = re.compile(r'(?:\[\*((?:(?!\[\*|\]| ).)+)?(?: ((?:(?!\[\*|\]).)+))?\]|\[(각주|footnote)\])', re.I)
         footnote_count_all = len(re.findall(footnote_regex, self.render_data)) * 4
@@ -1795,6 +1803,9 @@ class class_do_render_namumark:
         syntax_count = 0
         folding_count = 0
 
+        inter_count = 0
+        inter_data = {}
+
         middle_regex = r'{{{([^{](?:(?!{{{|}}}).|\n)*)?(?:}|<(\/?(?:slash)_(?:[0-9]+)(?:[^<>]+))>)}}'
         middle_count_all = len(re.findall(middle_regex, self.render_data)) * 10
         while 1:
@@ -1845,7 +1856,9 @@ class class_do_render_namumark:
                         wiki_data = self.get_tool_data_revert(wiki_data)
                         wiki_data = re.sub('(^\n|\n$)', '', wiki_data)
 
-                        middle_data_pass = self.do_inter_render(wiki_data, self.doc_set['doc_include'] + 'opennamu_wiki_' + str(wiki_count))
+                        inter_data["inter_data_" + str(inter_count)] = wiki_data
+                        middle_data_pass = '<inter_data_' + str(inter_count) + '>'
+                        inter_count += 1
 
                         data_name = self.get_tool_data_storage('<div ' + wiki_data_style + '>', '</div>', middle_data_org)
                         wiki_count += 1
@@ -1882,7 +1895,9 @@ class class_do_render_namumark:
                         wiki_data = self.get_tool_data_revert(wiki_data)
                         wiki_data = re.sub('(^\n|\n$)', '', wiki_data)
 
-                        wiki_data_end = self.do_inter_render(wiki_data, self.doc_set['doc_include'] + 'opennamu_folding_' + str(folding_count))
+                        inter_data["inter_data_" + str(inter_count)] = wiki_data
+                        wiki_data_end = '<inter_data_' + str(inter_count) + '>'
+                        inter_count += 1
 
                         middle_data_pass = wiki_data_folding
                         data_name = self.get_tool_data_storage('<details><summary>', '</summary><div class="opennamu_folding">', middle_data_org)
@@ -2043,6 +2058,30 @@ class class_do_render_namumark:
 
             middle_count_all -= 1
 
+        inter_data_regex = r'<(inter_data_[0-9]+)>'
+        class do_render_middle_replace_inter_class:
+            def __init__(self, func, doc_set):
+                self.inter_count = 0
+                self.do_inter_render = func
+                self.doc_set = doc_set
+
+            def replace_sub(match):
+                data = inter_data[match[1]]
+                data = re.sub(inter_data_regex, self.replace_sub, data)
+
+                return data
+
+            def replace(self, match):
+                data = inter_data[match[1]]
+                data = re.sub(inter_data_regex, self.replace_sub, data)
+                
+                data = self.do_inter_render(data, self.doc_set['doc_include'] + 'opennamu_inter_render_' + str(self.inter_count))
+                self.inter_count += 1
+
+                return data
+
+        replace_inter_data_top = do_render_middle_replace_inter_class(self.do_inter_render, self.doc_set)
+        self.render_data = re.sub(inter_data_regex, replace_inter_data_top.replace, self.render_data)
         self.render_data = re.sub(r'<temp_(?P<in>(?:slash)_(?:[0-9]+)(?:[^<>]+))>', '<\\g<in>>', self.render_data)
 
     def do_render_hr(self):
@@ -2117,7 +2156,7 @@ class class_do_render_namumark:
 
             return end_text
             
-        list_view_set = get_main_skin_set(self.curs, self.flask_session, 'main_css_list_view_change', self.ip)
+        list_view_set = get_main_skin_set(self.conn, self.flask_session, 'main_css_list_view_change', self.ip)
         
         list_style = {
             1 : 'opennamu_list_1',
@@ -2226,7 +2265,7 @@ class class_do_render_namumark:
             if self.data_category != '':
                 data_name = self.get_tool_data_storage(self.data_category, '</div>', '')
 
-                category_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_category_set', self.ip)
+                category_set_data = get_main_skin_set(self.conn, self.flask_session, 'main_css_category_set', self.ip)
                 if category_set_data == 'bottom':
                     if re.search(r'<footnote_category>', self.render_data):
                         self.render_data = self.render_data.replace('<footnote_category>', '<hr><' + data_name + '></' + data_name + '>', 1)
@@ -2311,7 +2350,7 @@ class class_do_render_namumark:
             self.data_toc = toc_data
             self.data_toc = re.sub(r'<toc_inside>((?:(?!<toc_inside>|<\/toc_inside>).)*)<\/toc_inside>', do_render_last_toc, self.data_toc)
 
-            toc_set_data = get_main_skin_set(self.curs, self.flask_session, 'main_css_toc_set', self.ip)
+            toc_set_data = get_main_skin_set(self.conn, self.flask_session, 'main_css_toc_set', self.ip)
 
             self.render_data = re.sub(toc_search_regex, '', self.render_data)
             if toc_set_data == 'off':

@@ -7,17 +7,17 @@ def recent_history_add(name = 'Test', do_type = ''):
         curs = conn.cursor()
 
         ip = ip_check()
-        if admin_check() != 1:
-            return re_error('/ban')
+        if admin_check(conn) != 1:
+            return re_error(conn, '/ban')
 
         if flask.request.method == 'POST':
-            admin_check(None, 'history_add (' + name + ')')
+            admin_check(conn, None, 'history_add (' + name + ')')
 
             today = get_time()
             content = flask.request.form.get('content', '')
             leng = '+' + str(len(content))
 
-            history_plus(
+            history_plus(conn, 
                 name,
                 content,
                 today,
@@ -29,20 +29,20 @@ def recent_history_add(name = 'Test', do_type = ''):
 
             conn.commit()
 
-            return redirect('/history/' + url_pas(name))
+            return redirect(conn, '/history/' + url_pas(name))
         else:            
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('history_add'), wiki_set(), wiki_custom(), wiki_css(['(' + name + ')', 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'history_add'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + name + ')', 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + load_lang('why') + '''" name="send">
+                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="send">
                         <hr class="main_hr">
                         
-                        <input placeholder="''' + load_lang('name') + '''" name="get_ip">
+                        <input placeholder="''' + get_lang(conn, 'name') + '''" name="get_ip">
                         <hr class="main_hr">
 
-                        ''' + edit_editor(curs, ip) + '''
+                        ''' + edit_editor(conn, ip) + '''
                     </form>
                 ''',
-                menu = [['history/' + url_pas(name), load_lang('return')]]
+                menu = [['history/' + url_pas(name), get_lang(conn, 'return')]]
             ))

@@ -5,12 +5,12 @@ def main_setting_sitemap(do_type = 0):
         curs = conn.cursor()
 
         if not do_type == 1:
-            if admin_check() != 1:
-                return re_error('/ban')
+            if admin_check(conn) != 1:
+                return re_error(conn, '/ban')
         
         if do_type == 1 or flask.request.method == 'POST':
             if not do_type == 1:
-                admin_check(None, 'make sitemap')
+                admin_check(conn, None, 'make sitemap')
 
             data = '' + \
                 '<?xml version="1.0" encoding="UTF-8"?>\n' + \
@@ -22,7 +22,7 @@ def main_setting_sitemap(do_type = 0):
             if db_data and db_data[0][0] != '':
                 domain = ''
             else:
-                domain = load_domain('full')
+                domain = load_domain(conn, 'full')
 
             sql_add = ''
 
@@ -90,16 +90,16 @@ def main_setting_sitemap(do_type = 0):
                 f.close()
 
             if not do_type == 1:
-                return redirect('/setting/sitemap')
+                return redirect(conn, '/setting/sitemap')
             else:
                 return ''
         else:
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('sitemap_manual_create'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'sitemap_manual_create'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <button id="opennamu_save_button" type="submit">''' + load_lang('create') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'create') + '''</button>
                     </form>
                 ''',
-                menu = [['setting/sitemap_set', load_lang('return')]]
+                menu = [['setting/sitemap_set', get_lang(conn, 'return')]]
             ))

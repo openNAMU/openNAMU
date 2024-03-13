@@ -13,40 +13,40 @@ def filter_all(tool):
 
         div += '</tr>'
 
-        admin = admin_check()
+        admin = admin_check(conn)
 
         if tool == 'inter_wiki':
-            title = load_lang('interwiki_list')
+            title = get_lang(conn, 'interwiki_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'inter_wiki'"))
         elif tool == 'email_filter':
-            title = load_lang('email_filter_list')
+            title = get_lang(conn, 'email_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'email'"))
         elif tool == 'name_filter':
-            title = load_lang('id_filter_list')
+            title = get_lang(conn, 'id_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'name'"))
         elif tool == 'edit_filter':
-            title = load_lang('edit_filter_list')
+            title = get_lang(conn, 'edit_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'regex_filter'"))
         elif tool == 'file_filter':
-            title = load_lang('file_filter_list')
+            title = get_lang(conn, 'file_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'file'"))
         elif tool == 'image_license':
-            title = load_lang('image_license_list')
+            title = get_lang(conn, 'image_license_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'image_license'"))
         elif tool == 'extension_filter':
-            title = load_lang('extension_filter_list')
+            title = get_lang(conn, 'extension_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'extension'"))
         elif tool == 'document':
-            title = load_lang('document_filter_list')
+            title = get_lang(conn, 'document_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'document'"))
         elif tool == 'outer_link':
-            title = load_lang('outer_link_filter_list')
+            title = get_lang(conn, 'outer_link_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'outer_link'"))
         elif tool == 'template':
-            title = load_lang('template_document_list')
+            title = get_lang(conn, 'template_document_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'template'"))
         else:
-            title = load_lang('edit_tool_list')
+            title = get_lang(conn, 'edit_tool_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'edit_top'"))
 
         db_data = curs.fetchall()
@@ -57,9 +57,9 @@ def filter_all(tool):
             div += html.escape(data[0])
             if admin == 1:
                 if tool in ('inter_wiki', 'outer_link', 'edit_filter', 'document', 'edit_top', 'template'):
-                    div += ' <a href="/filter/' + tool + '/add/' + url_pas(data[0]) + '">(' + load_lang('edit') + ')</a>'
+                    div += ' <a href="/filter/' + tool + '/add/' + url_pas(data[0]) + '">(' + get_lang(conn, 'edit') + ')</a>'
                     
-                div += ' <a href="/filter/' + tool + '/del/' + url_pas(data[0]) + '">(' + load_lang('delete') + ')</a>'
+                div += ' <a href="/filter/' + tool + '/del/' + url_pas(data[0]) + '">(' + get_lang(conn, 'delete') + ')</a>'
 
             div += '</td>'
 
@@ -80,10 +80,10 @@ def filter_all(tool):
 
         if admin == 1:
             div += '<hr class="main_hr">'
-            div += '<a href="/filter/' + tool + '/add">(' + load_lang('add') + ')</a>'
+            div += '<a href="/filter/' + tool + '/add">(' + get_lang(conn, 'add') + ')</a>'
 
-        return easy_minify(flask.render_template(skin_check(),
-            imp = [title, wiki_set(), wiki_custom(), wiki_css([0, 0])],
+        return easy_minify(conn, flask.render_template(skin_check(conn),
+            imp = [title, wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
             data = div,
-            menu = [['manager/1', load_lang('return')]]
+            menu = [['manager/1', get_lang(conn, 'return')]]
         ))

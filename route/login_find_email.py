@@ -21,7 +21,7 @@ def login_find_email(tool):
                 flask.session['c_type'] = 'pass_find'
             else:
                 if not 'c_type' in flask.session:
-                    return redirect('/register')
+                    return redirect(conn, '/register')
         
             if tool != 'pass_find':
                 user_email = flask.request.form.get('email', '')
@@ -32,16 +32,16 @@ def login_find_email(tool):
                         for i in re_set_list:
                             flask.session.pop(i, None)
                         
-                        return redirect('/filter/email_filter')
+                        return redirect(conn, '/filter/email_filter')
                 else:
                     for i in re_set_list:
                         flask.session.pop(i, None)
                     
-                    return re_error('/error/36')
+                    return re_error(conn, '/error/36')
         
             curs.execute(db_change('select data from other where name = "email_title"'))
             sql_d = curs.fetchall()
-            t_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else (wiki_set()[0] + ' key')
+            t_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else (wiki_set(conn)[0] + ' key')
         
             curs.execute(db_change('select data from other where name = "email_text"'))
             sql_d = curs.fetchall()
@@ -50,67 +50,67 @@ def login_find_email(tool):
             if tool == 'pass_find':
                 curs.execute(db_change("select id from user_set where id = ? and name = 'email' and data = ?"), [user_id, user_email])
                 if not curs.fetchall():
-                    return re_error('/error/12')
+                    return re_error(conn, '/error/12')
                     
-                if send_email(user_email, t_text, i_text) == 0:
-                    return re_error('/error/18')
+                if send_email(conn, user_email, t_text, i_text) == 0:
+                    return re_error(conn, '/error/18')
         
-                return redirect('/pass_find/email')
+                return redirect(conn, '/pass_find/email')
             else:
                 curs.execute(db_change('select id from user_set where name = "email" and data = ?'), [user_email])
                 if curs.fetchall():
                     for i in re_set_list:
                         flask.session.pop(i, None)
         
-                    return re_error('/error/35')
+                    return re_error(conn, '/error/35')
                 
-                if send_email(user_email, t_text, i_text) == 0:
+                if send_email(conn, user_email, t_text, i_text) == 0:
                     for i in re_set_list:
                         flask.session.pop(i, None)
         
-                    return re_error('/error/18')
+                    return re_error(conn, '/error/18')
         
                 flask.session['c_email'] = user_email
         
-                return redirect('/pass_find/email')
+                return redirect(conn, '/pass_find/email')
         else:
             if tool == 'pass_find':
                 curs.execute(db_change('select data from other where name = "password_search_text"'))
                 sql_d = curs.fetchall()
                 b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
         
-                return easy_minify(flask.render_template(skin_check(),
-                    imp = [load_lang('password_search'), wiki_set(), wiki_custom(), wiki_css(['(' + load_lang('email') + ')', 0])],
+                return easy_minify(conn, flask.render_template(skin_check(conn),
+                    imp = [get_lang(conn, 'password_search'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'email') + ')', 0])],
                     data = b_text + '''
                         <form method="post">
-                            <input placeholder="''' + load_lang('id') + '''" name="id" type="text">
+                            <input placeholder="''' + get_lang(conn, 'id') + '''" name="id" type="text">
                             <hr class="main_hr">
-                            <input placeholder="''' + load_lang('email') + '''" name="email" type="text">
+                            <input placeholder="''' + get_lang(conn, 'email') + '''" name="email" type="text">
                             <hr class="main_hr">
-                            <button type="submit">''' + load_lang('save') + '''</button>
+                            <button type="submit">''' + get_lang(conn, 'save') + '''</button>
                         </form>
                     ''',
-                    menu = [['user', load_lang('return')]]
+                    menu = [['user', get_lang(conn, 'return')]]
                 ))
             else:
                 if tool == 'need_email' and not 'c_type' in flask.session:
-                    return redirect('/register')
+                    return redirect(conn, '/register')
         
                 curs.execute(db_change('select data from other where name = "email_insert_text"'))
                 sql_d = curs.fetchall()
                 b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
         
-                return easy_minify(flask.render_template(skin_check(),
-                    imp = [load_lang('email'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+                return easy_minify(conn, flask.render_template(skin_check(conn),
+                    imp = [get_lang(conn, 'email'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                     data = '''
-                        <a href="/filter/email_filter">(''' + load_lang('email_filter_list') + ''')</a>
+                        <a href="/filter/email_filter">(''' + get_lang(conn, 'email_filter_list') + ''')</a>
                         <hr class="main_hr">
                         ''' + b_text + '''
                         <form method="post">
-                            <input placeholder="''' + load_lang('email') + '''" name="email" type="text">
+                            <input placeholder="''' + get_lang(conn, 'email') + '''" name="email" type="text">
                             <hr class="main_hr">
-                            <button type="submit">''' + load_lang('save') + '''</button>
+                            <button type="submit">''' + get_lang(conn, 'save') + '''</button>
                         </form>
                     ''',
-                    menu = [['user', load_lang('return')]]
+                    menu = [['user', get_lang(conn, 'return')]]
                 ))

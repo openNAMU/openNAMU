@@ -4,8 +4,8 @@ def topic_tool_acl(topic_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(3) != 1:
-            return re_error('/error/3')
+        if admin_check(conn, 3) != 1:
+            return re_error(conn, '/error/3')
 
         ip = ip_check()
         time = get_time()
@@ -14,10 +14,10 @@ def topic_tool_acl(topic_num = 1):
         curs.execute(db_change("select title, sub from rd where code = ?"), [topic_num])
         rd_d = curs.fetchall()
         if not rd_d:
-            return redirect('/')
+            return redirect(conn, '/')
 
         if flask.request.method == 'POST':
-            admin_check(3, 'topic_acl_set (code ' + topic_num + ')')
+            admin_check(conn, 3, 'topic_acl_set (code ' + topic_num + ')')
 
             curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [topic_num])
             topic_check = curs.fetchall()
@@ -43,17 +43,17 @@ def topic_tool_acl(topic_num = 1):
                         acl_data_view
                     ])
 
-                do_add_thread(
+                do_add_thread(conn, 
                     topic_num,
-                    load_lang('acl_thread_change') + ' : ' + acl_data,
+                    get_lang(conn, 'acl_thread_change') + ' : ' + acl_data,
                     '1'
                 )
-                do_reload_recent_thread(
+                do_reload_recent_thread(conn, 
                     topic_num, 
                     time
                 )
 
-            return redirect('/thread/' + topic_num)
+            return redirect(conn, '/thread/' + topic_num)
         else:
             acl_list = get_acl_list()
             acl_html_list = ''
@@ -79,22 +79,22 @@ def topic_tool_acl(topic_num = 1):
 
                 acl_html_list_view += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
 
-            return easy_minify(flask.render_template(skin_check(),
-                imp = [load_lang('topic_acl_setting'), wiki_set(), wiki_custom(), wiki_css([0, 0])],
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [get_lang(conn, 'topic_acl_setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <a href="/acl/TEST#exp">(''' + load_lang('reference') + ''')</a>
-                        <h2>''' + load_lang('thread_acl') + '''</h2>
+                        <a href="/acl/TEST#exp">(''' + get_lang(conn, 'reference') + ''')</a>
+                        <h2>''' + get_lang(conn, 'thread_acl') + '''</h2>
                         <select name="acl">
                             ''' + acl_html_list + '''
                         </select>
-                        <h2>''' + load_lang('view_acl') + ''' (''' + load_lang('beta') + ''')</h2>
+                        <h2>''' + get_lang(conn, 'view_acl') + ''' (''' + get_lang(conn, 'beta') + ''')</h2>
                         <select name="acl_view">
                             ''' + acl_html_list_view + '''
                         </select>
                         <hr class="main_hr">
-                        <button type="submit">''' + load_lang('save') + '''</button>
+                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 ''',
-                menu = [['thread/' + topic_num + '/tool', load_lang('return')]]
+                menu = [['thread/' + topic_num + '/tool', get_lang(conn, 'return')]]
             ))
