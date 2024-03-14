@@ -53,6 +53,12 @@ def api_w_render(name = '', tool = ''):
                     doc_data = data_org, 
                     data_type = 'api_view'
                 )
+            if tool == 'from':
+                data_pas = render_set(conn, 
+                    doc_name = name, 
+                    doc_data = data_org, 
+                    data_type = 'api_view'
+                )
             elif tool == 'include':
                 data_pas = render_set(conn, 
                     doc_name = name, 
