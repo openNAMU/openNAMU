@@ -1329,13 +1329,15 @@ def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = 
     # data_type을 list 형식으로 개편 필요할 듯
 
     return_type = True
-    if data_type in ['api_view', 'api_thread', 'api_include']:
+    if data_type in ['api_from', 'api_view', 'api_thread', 'api_include']:
         return_type = False
 
     if data_type == '':
         data_type = 'view'
     elif data_type == 'api_view':
         data_type = 'view'
+    elif data_type == 'api_from':
+        data_type = 'from'
     elif data_type == 'api_thread':
         data_type = 'thread'
     elif data_type == 'api_include':
