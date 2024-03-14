@@ -34,5 +34,7 @@ func main() {
 		route.Api_w_watch_list(call_arg[1:])
 	} else if call_arg[0] == "api_user_watch_list" {
 		route.Api_user_watch_list(call_arg[1:])
+	} else if call_arg[0] == "api_w_render" {
+		route.Api_w_render(call_arg[1:])
 	}
 }
