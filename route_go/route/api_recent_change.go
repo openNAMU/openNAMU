@@ -47,13 +47,13 @@ func Api_recent_change(call_arg []string) {
 	}
 	defer rows.Close()
 
-	var id string
-	var title string
-
 	var data_list [][]string
 	admin_auth := tool.Get_admin_auth(db, db_set, other_set["ip"])
 
 	for rows.Next() {
+		var id string
+		var title string
+
 		err := rows.Scan(&id, &title)
 		if err != nil {
 			return

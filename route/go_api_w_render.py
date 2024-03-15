@@ -54,6 +54,8 @@ def api_w_render(db_set, name = '', tool = ''):
                 data_type = 'api_from'
             elif tool == 'include':
                 data_type = 'api_include'
+            elif tool == 'backlink':
+                data_type = 'backlink'
             else:
                 data_type = 'api_thread'
 
@@ -99,7 +101,6 @@ def api_w_render(db_set, name = '', tool = ''):
                         data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.exe"), sys._getframe().f_code.co_name, db_set, other_set], stdout = subprocess.PIPE).communicate()[0]
 
                 data = data.decode('utf8')
-                print(data)
 
                 return flask.Response(response = data, status = 200, mimetype = 'application/json')
         else:
