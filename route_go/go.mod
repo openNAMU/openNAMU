@@ -8,6 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.8.0
 	github.com/microcosm-cc/bluemonday v1.0.26
 	github.com/russross/blackfriday/v2 v2.1.0
+	github.com/yuin/goldmark v1.7.0
 	modernc.org/sqlite v1.29.5
 )
 
