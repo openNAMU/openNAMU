@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"database/sql"
 	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
@@ -27,7 +29,27 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 
 	string_data := buf.String()
 
-	r := regexp.MustCompile(`\[([^\[\]]+)\]\(([^\(\)]*)\)`)
+	code_stack := []int{}
+	code_stack_idx := 0
+	code_stack_end := map[string]string{}
+
+	r := regexp.MustCompile(`(<code>|<\/code>)`)
+	for idx := r.FindStringIndex(string_data); len(idx) != 0; idx = r.FindStringIndex(string_data) {
+		if string_data[idx[0]:idx[1]] == "<code>" {
+			code_stack = []int{idx[0], idx[1]}
+			string_data = strings.Replace(string_data, "<code>", "<0001>", 1)
+		} else {
+			string_data = strings.Replace(string_data, "<0001>", "<code>", -1)
+
+			code_stack_idx_str := strconv.Itoa(code_stack_idx)
+			code_stack_end["code_"+code_stack_idx_str] = string_data[code_stack[0]:idx[1]]
+			code_stack_idx++
+
+			string_data = string_data[:code_stack[0]] + "<code_" + code_stack_idx_str + ">" + string_data[idx[1]:]
+		}
+	}
+
+	r = regexp.MustCompile(`\[([^\[\]]+)\]\(([^\(\)]*)\)`)
 	string_data = r.ReplaceAllStringFunc(string_data, func(m string) string {
 		match := r.FindStringSubmatch(m)
 
@@ -35,10 +57,18 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 	})
 
 	// p := bluemonday.UGCPolicy()
-	// result := p.Sanitize(string_data)
+	// string_data := p.Sanitize(string_data)
+
+	r = regexp.MustCompile(`<code_[0-9]+>`)
+	string_data = r.ReplaceAllStringFunc(string_data, func(m string) string {
+		m = strings.Replace(m, "<", "", 1)
+		m = strings.Replace(m, ">", "", 1)
+
+		return code_stack_end[m]
+	})
 
 	r = regexp.MustCompile(`<a href="([^"]+)"`)
-	result := r.ReplaceAllStringFunc(string_data, func(m string) string {
+	string_data = r.ReplaceAllStringFunc(string_data, func(m string) string {
 		match := r.FindStringSubmatch(m)
 
 		m1, _ := regexp.MatchString(`^https?:\/\/`, match[1])
@@ -87,7 +117,7 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 	}
 
 	end_data := make(map[string]interface{})
-	end_data["data"] = result
+	end_data["data"] = string_data
 	end_data["js_data"] = ""
 	end_data["backlink"] = end_backlink
 	end_data["link_count"] = link_count
