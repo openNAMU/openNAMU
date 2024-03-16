@@ -10,29 +10,37 @@ import (
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
-	"mvdan.cc/xurls/v2"
 )
 
 func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[string]interface{} {
-	input := []byte(data["data"])
 	backlink := map[string]map[string]string{}
 	link_count := 0
 
+	raw_input := data["data"]
+
+	r := regexp.MustCompile(`\[\]\(([^\(\)]+)\)`)
+	raw_input = r.ReplaceAllStringFunc(raw_input, func(m string) string {
+		match := r.FindStringSubmatch(m)
+
+		return "[" + match[1] + "](" + match[1] + ")"
+	})
+
+	r = regexp.MustCompile(`\[([^\[\]]+)\]\(\)`)
+	raw_input = r.ReplaceAllStringFunc(raw_input, func(m string) string {
+		match := r.FindStringSubmatch(m)
+
+		return "[" + match[1] + "](" + match[1] + ")"
+	})
+
+	input := []byte(raw_input)
 	markdown := goldmark.New(
 		goldmark.WithExtensions(
-			extension.NewLinkify(
-				extension.WithLinkifyAllowedProtocols([]string{
-					"http:",
-					"https:",
-				}),
-				extension.WithLinkifyURLRegexp(
-					xurls.Strict(),
-				),
-			),
 			extension.Strikethrough,
 			extension.Table,
 		),
-		goldmark.WithRendererOptions(html.WithHardWraps()),
+		goldmark.WithRendererOptions(
+			html.WithHardWraps(),
+		),
 	)
 
 	var buf bytes.Buffer
@@ -46,7 +54,7 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 	code_stack_idx := 0
 	code_stack_end := map[string]string{}
 
-	r := regexp.MustCompile(`(<code>|<\/code>)`)
+	r = regexp.MustCompile(`(<code>|<\/code>)`)
 	for idx := r.FindStringIndex(string_data); len(idx) != 0; idx = r.FindStringIndex(string_data) {
 		if string_data[idx[0]:idx[1]] == "<code>" {
 			code_stack = []int{idx[0], idx[1]}
@@ -62,6 +70,9 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 		}
 	}
 
+	// p := bluemonday.UGCPolicy()
+	// string_data := p.Sanitize(string_data)
+
 	r = regexp.MustCompile(`\[([^\[\]]+)\]\(([^\(\)]*)\)`)
 	string_data = r.ReplaceAllStringFunc(string_data, func(m string) string {
 		match := r.FindStringSubmatch(m)
@@ -73,9 +84,6 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 
 		return "<a href=\"" + link + "\">" + match[1] + "</a>"
 	})
-
-	// p := bluemonday.UGCPolicy()
-	// string_data := p.Sanitize(string_data)
 
 	r = regexp.MustCompile(`<code_[0-9]+>`)
 	string_data = r.ReplaceAllStringFunc(string_data, func(m string) string {
