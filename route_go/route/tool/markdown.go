@@ -3,6 +3,7 @@ package tool
 import (
 	"bytes"
 	"database/sql"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -101,8 +102,11 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 		if m1 {
 			return "<a href=\"" + match[1] + "\" class=\"opennamu_link_out\" target=\"_blank\""
 		} else {
-			if _, ok := backlink[match[1]]; !ok {
-				backlink[match[1]] = map[string]string{}
+			link := ""
+			link, _ = url.QueryUnescape(match[1])
+
+			if _, ok := backlink[link]; !ok {
+				backlink[link] = map[string]string{}
 			}
 
 			var exist string
@@ -113,12 +117,12 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 			}
 			defer stmt.Close()
 
-			err = stmt.QueryRow(match[1]).Scan(&exist)
+			err = stmt.QueryRow(link).Scan(&exist)
 			if err != nil {
 				exist = ""
 			}
 
-			backlink[match[1]][""] = ""
+			backlink[link][""] = ""
 			link_count += 1
 
 			class := ""
