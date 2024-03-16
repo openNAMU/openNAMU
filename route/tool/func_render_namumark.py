@@ -1839,19 +1839,39 @@ class class_do_render_namumark:
                             self.render_data = re.sub(middle_regex, lambda x : middle_data_org, self.render_data, 1)
                             continue
 
-                        wiki_regex = re.compile('^#!wiki(?:(?: style=(&quot;(?:(?:(?!&quot;).)*)&quot;|&#x27;(?:(?:(?!&#x27;).)*)&#x27;))| [^\n]*)?\n', re.I)
-                        wiki_data_style = re.search(wiki_regex, middle_data)
-                        wiki_data = re.sub(wiki_regex, '', middle_data)
-                        if wiki_data_style:
-                            wiki_data_style = wiki_data_style.group(1)
+                        wiki_data = re.sub(r'^#!wiki +', '', middle_data)
+
+                        wiki_regex = re.compile('^(?:(?:style=(&quot;(?:(?:(?!&quot;).)*)&quot;|&#x27;(?:(?:(?!&#x27;).)*)&#x27;)))(?:\n| +)', re.I)
+                        wiki_dark_regex = re.compile('^(?:(?:dark-style=(&quot;(?:(?:(?!&quot;).)*)&quot;|&#x27;(?:(?:(?!&#x27;).)*)&#x27;)))(?:\n| +)', re.I)
+
+                        wiki_data_style_data = ''
+                        while 1:
+                            dark_only = 0
+                            wiki_data_style = re.search(wiki_regex, wiki_data)
                             if wiki_data_style:
-                                wiki_data_style = wiki_data_style.replace('&#x27;', '\'')
-                                wiki_data_style = wiki_data_style.replace('&quot;', '"')
-                                wiki_data_style = 'style=' + wiki_data_style
+                                wiki_data = re.sub(wiki_regex, '', wiki_data)
+                            else:
+                                wiki_data_style = re.search(wiki_dark_regex, wiki_data)
+                                if wiki_data_style:
+                                    dark_only = 1
+                                    wiki_data = re.sub(wiki_dark_regex, '', wiki_data)
+                                else:
+                                    break
+                        
+                            if wiki_data_style:
+                                wiki_data_style = wiki_data_style.group(1)
+                                if wiki_data_style:
+                                    wiki_data_style = wiki_data_style.replace('&#x27;', '')
+                                    wiki_data_style = wiki_data_style.replace('&quot;', '')
+
+                                    if dark_only == 1 and self.darkmode == '1':
+                                        wiki_data_style_data += wiki_data_style
+                                    elif dark_only == 0:
+                                        wiki_data_style_data += wiki_data_style
+                                else:
+                                    wiki_data_style = ''
                             else:
                                 wiki_data_style = ''
-                        else:
-                            wiki_data_style = ''
 
                         wiki_data = self.get_tool_data_revert(wiki_data)
                         wiki_data = re.sub('(^\n|\n$)', '', wiki_data)
@@ -1860,7 +1880,7 @@ class class_do_render_namumark:
                         middle_data_pass = '<inter_data_' + str(inter_count) + '>'
                         inter_count += 1
 
-                        data_name = self.get_tool_data_storage('<div ' + wiki_data_style + '>', '</div>', middle_data_org)
+                        data_name = self.get_tool_data_storage('<div style="' + wiki_data_style_data + '">', '</div>', middle_data_org)
                         wiki_count += 1
                     elif middle_name == '#!html':
                         html_data = re.sub(r'^#!html( |\n)', '', middle_data)
