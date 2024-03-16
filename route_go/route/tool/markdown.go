@@ -10,6 +10,7 @@ import (
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
+	"mvdan.cc/xurls/v2"
 )
 
 func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[string]interface{} {
@@ -18,7 +19,19 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 	link_count := 0
 
 	markdown := goldmark.New(
-		goldmark.WithExtensions(extension.Strikethrough, extension.Table),
+		goldmark.WithExtensions(
+			extension.NewLinkify(
+				extension.WithLinkifyAllowedProtocols([]string{
+					"http:",
+					"https:",
+				}),
+				extension.WithLinkifyURLRegexp(
+					xurls.Strict(),
+				),
+			),
+			extension.Strikethrough,
+			extension.Table,
+		),
 		goldmark.WithRendererOptions(html.WithHardWraps()),
 	)
 
@@ -53,7 +66,12 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 	string_data = r.ReplaceAllStringFunc(string_data, func(m string) string {
 		match := r.FindStringSubmatch(m)
 
-		return "<a href=\"" + match[2] + "\">" + match[1] + "</a>"
+		link := match[2]
+		if link == "" {
+			link = match[1]
+		}
+
+		return "<a href=\"" + link + "\">" + match[1] + "</a>"
 	})
 
 	// p := bluemonday.UGCPolicy()
@@ -103,6 +121,8 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 			return "<a href=\"/w/" + match[1] + "\" class=\"" + class + "\""
 		}
 	})
+
+	string_data = strings.Replace(string_data, "<ul>", "<ul class=\"opennamu_ul\">", -1)
 
 	end_backlink := [][]string{}
 	for k1, v1 := range backlink {

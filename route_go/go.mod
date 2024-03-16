@@ -39,4 +39,5 @@ require (
 	modernc.org/opt v0.1.3 // indirect
 	modernc.org/strutil v1.2.0 // indirect
 	modernc.org/token v1.1.0 // indirect
+	mvdan.cc/xurls/v2 v2.5.0 // indirect
 )
