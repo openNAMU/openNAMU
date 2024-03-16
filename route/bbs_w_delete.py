@@ -40,8 +40,6 @@ def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
 
                 set_code = comment_num_split[len(comment_num_split) - 1]
 
-                print(set_id, set_code)
-
                 curs.execute(db_change("update bbs_data set set_data = '' where set_code = ? and set_id = ?"), [set_code, set_id])
                 
                 return redirect(conn, '/bbs/w/' + bbs_num_str + '/' + post_num_str)
