@@ -6,13 +6,13 @@ import (
 	"time"
 )
 
-func Get_render(db *sql.DB, db_set map[string]string, doc_name string, data string, render_type string) []string {
+func Get_render(db *sql.DB, db_set map[string]string, doc_name string, data string, render_type string) map[string]string {
 	var markup string
 
-	if render_type == "document" {
+	if render_type == "api_view" || render_type == "api_from" || render_type == "api_include" || render_type == "backlink" {
 		stmt, err := db.Prepare(DB_change(db_set, "select set_data from data_set where doc_name = ? and set_name = 'document_markup'"))
 		if err != nil {
-			return []string{"", ""}
+			return map[string]string{}
 		}
 		defer stmt.Close()
 
@@ -21,17 +21,19 @@ func Get_render(db *sql.DB, db_set map[string]string, doc_name string, data stri
 			if err == sql.ErrNoRows {
 				markup = ""
 			} else {
-				return []string{"", ""}
+				return map[string]string{}
 			}
 		}
 	}
 
-	err := db.QueryRow(DB_change(db_set, "select data from other where name = 'markup'")).Scan(&markup)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			markup = ""
-		} else {
-			return []string{"", ""}
+	if markup == "" {
+		err := db.QueryRow(DB_change(db_set, "select data from other where name = 'markup'")).Scan(&markup)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				markup = ""
+			} else {
+				return map[string]string{}
+			}
 		}
 	}
 
@@ -47,15 +49,126 @@ func Get_render(db *sql.DB, db_set map[string]string, doc_name string, data stri
 	return render_data
 }
 
-func Get_render_direct(db *sql.DB, db_set map[string]string, doc_name string, data string, markup string, render_name string, render_type string) []string {
+func Get_render_direct(db *sql.DB, db_set map[string]string, doc_name string, data string, markup string, render_name string, render_type string) map[string]string {
+	from := ""
+	include := ""
+	backlink := ""
+	if render_type == "api_include" {
+		include = "1"
+	} else if render_type == "api_from" {
+		from = "1"
+	} else if render_type == "backlink" {
+		backlink = "1"
+	}
+
+	if render_type == "api_view" || render_type == "api_from" || render_type == "api_include" || render_type == "backlink" {
+		render_type = "view"
+	}
+
+	doc_data_set := map[string]string{
+		"doc_name":    doc_name,
+		"data":        data,
+		"render_name": render_name,
+		"render_type": render_type,
+		"from":        from,
+		"include":     include,
+	}
+
 	render_data := make(map[string]interface{})
 	if markup == "namumark" {
 		render_data = Namumark()
+	} else if markup == "markdown" {
+		render_data = Markdown(db, db_set, doc_data_set)
 	} else {
-		render_data["data"] = data
+		render_data["data"] = "<div id=\"opennamu_render_complete\">" + data + "</div>"
 		render_data["js_data"] = ""
-		render_data["backlink"] = []string{}
+		render_data["backlink"] = [][]string{}
 	}
 
-	return []string{render_data["data"].(string), render_data["js_data"].(string)}
+	if backlink == "1" {
+		stmt, err := db.Prepare(DB_change(db_set, "delete from back where link = ?"))
+		if err != nil {
+			return map[string]string{}
+		}
+		defer stmt.Close()
+
+		_, err = stmt.Exec(doc_name)
+		if err != nil {
+			return map[string]string{}
+		}
+
+		stmt, err = db.Prepare(DB_change(db_set, "delete from back where title = ? and type = 'no'"))
+		if err != nil {
+			return map[string]string{}
+		}
+		defer stmt.Close()
+
+		_, err = stmt.Exec(doc_name)
+		if err != nil {
+			return map[string]string{}
+		}
+
+		stmt, err = db.Prepare(DB_change(db_set, "delete from data_set where doc_name = ? and set_name = 'link_count'"))
+		if err != nil {
+			return map[string]string{}
+		}
+		defer stmt.Close()
+
+		_, err = stmt.Exec(doc_name)
+		if err != nil {
+			return map[string]string{}
+		}
+
+		stmt, err = db.Prepare(DB_change(db_set, "delete from data_set where doc_name = ? and set_name = 'doc_type'"))
+		if err != nil {
+			return map[string]string{}
+		}
+		defer stmt.Close()
+
+		_, err = stmt.Exec(doc_name)
+		if err != nil {
+			return map[string]string{}
+		}
+
+		end_backlink := render_data["backlink"].([][]string)
+		for for_a := 0; for_a < len(end_backlink); for_a++ {
+			stmt, err := db.Prepare(DB_change(db_set, "insert into back (link, title, type, data) values (?, ?, ?, ?)"))
+			if err != nil {
+				return map[string]string{}
+			}
+			defer stmt.Close()
+
+			_, err = stmt.Exec(end_backlink[0], end_backlink[1], end_backlink[2])
+			if err != nil {
+				return map[string]string{}
+			}
+		}
+
+		stmt, err = db.Prepare(DB_change(db_set, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'link_count', ?)"))
+		if err != nil {
+			return map[string]string{}
+		}
+		defer stmt.Close()
+
+		_, err = stmt.Exec(doc_name, render_data["link_count"].(int))
+		if err != nil {
+			return map[string]string{}
+		}
+
+		stmt, err = db.Prepare(DB_change(db_set, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', ?)"))
+		if err != nil {
+			return map[string]string{}
+		}
+		defer stmt.Close()
+
+		_, err = stmt.Exec(doc_name, "")
+		if err != nil {
+			return map[string]string{}
+		}
+	}
+
+	return map[string]string{
+		"data":    render_data["data"].(string),
+		"data_js": render_data["js_data"].(string),
+	}
 }
