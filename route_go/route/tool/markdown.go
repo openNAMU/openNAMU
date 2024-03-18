@@ -3,7 +3,10 @@ package tool
 import (
 	"bytes"
 	"database/sql"
+	"net/url"
 	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
@@ -11,13 +14,34 @@ import (
 )
 
 func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[string]interface{} {
-	input := []byte(data["data"])
 	backlink := map[string]map[string]string{}
 	link_count := 0
 
+	raw_input := data["data"]
+
+	r := regexp.MustCompile(`\[\]\(([^\(\)]+)\)`)
+	raw_input = r.ReplaceAllStringFunc(raw_input, func(m string) string {
+		match := r.FindStringSubmatch(m)
+
+		return "[" + match[1] + "](" + match[1] + ")"
+	})
+
+	r = regexp.MustCompile(`\[([^\[\]]+)\]\(\)`)
+	raw_input = r.ReplaceAllStringFunc(raw_input, func(m string) string {
+		match := r.FindStringSubmatch(m)
+
+		return "[" + match[1] + "](" + match[1] + ")"
+	})
+
+	input := []byte(raw_input)
 	markdown := goldmark.New(
-		goldmark.WithExtensions(extension.Strikethrough, extension.Table),
-		goldmark.WithRendererOptions(html.WithHardWraps()),
+		goldmark.WithExtensions(
+			extension.Strikethrough,
+			extension.Table,
+		),
+		goldmark.WithRendererOptions(
+			html.WithHardWraps(),
+		),
 	)
 
 	var buf bytes.Buffer
@@ -27,26 +51,62 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 
 	string_data := buf.String()
 
-	r := regexp.MustCompile(`\[([^\[\]]+)\]\(([^\(\)]*)\)`)
+	code_stack := []int{}
+	code_stack_idx := 0
+	code_stack_end := map[string]string{}
+
+	r = regexp.MustCompile(`(<code>|<\/code>)`)
+	for idx := r.FindStringIndex(string_data); len(idx) != 0; idx = r.FindStringIndex(string_data) {
+		if string_data[idx[0]:idx[1]] == "<code>" {
+			code_stack = []int{idx[0], idx[1]}
+			string_data = strings.Replace(string_data, "<code>", "<0001>", 1)
+		} else {
+			string_data = strings.Replace(string_data, "<0001>", "<code>", -1)
+
+			code_stack_idx_str := strconv.Itoa(code_stack_idx)
+			code_stack_end["code_"+code_stack_idx_str] = string_data[code_stack[0]:idx[1]]
+			code_stack_idx++
+
+			string_data = string_data[:code_stack[0]] + "<code_" + code_stack_idx_str + ">" + string_data[idx[1]:]
+		}
+	}
+
+	// p := bluemonday.UGCPolicy()
+	// string_data := p.Sanitize(string_data)
+
+	r = regexp.MustCompile(`\[([^\[\]]+)\]\(([^\(\)]*)\)`)
 	string_data = r.ReplaceAllStringFunc(string_data, func(m string) string {
 		match := r.FindStringSubmatch(m)
 
-		return "<a href=\"" + match[2] + "\">" + match[1] + "</a>"
+		link := match[2]
+		if link == "" {
+			link = match[1]
+		}
+
+		return "<a href=\"" + link + "\">" + match[1] + "</a>"
 	})
 
-	// p := bluemonday.UGCPolicy()
-	// result := p.Sanitize(string_data)
+	r = regexp.MustCompile(`<code_[0-9]+>`)
+	string_data = r.ReplaceAllStringFunc(string_data, func(m string) string {
+		m = strings.Replace(m, "<", "", 1)
+		m = strings.Replace(m, ">", "", 1)
+
+		return code_stack_end[m]
+	})
 
 	r = regexp.MustCompile(`<a href="([^"]+)"`)
-	result := r.ReplaceAllStringFunc(string_data, func(m string) string {
+	string_data = r.ReplaceAllStringFunc(string_data, func(m string) string {
 		match := r.FindStringSubmatch(m)
 
 		m1, _ := regexp.MatchString(`^https?:\/\/`, match[1])
 		if m1 {
 			return "<a href=\"" + match[1] + "\" class=\"opennamu_link_out\" target=\"_blank\""
 		} else {
-			if _, ok := backlink[match[1]]; !ok {
-				backlink[match[1]] = map[string]string{}
+			link := ""
+			link, _ = url.QueryUnescape(match[1])
+
+			if _, ok := backlink[link]; !ok {
+				backlink[link] = map[string]string{}
 			}
 
 			var exist string
@@ -57,12 +117,12 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 			}
 			defer stmt.Close()
 
-			err = stmt.QueryRow(match[1]).Scan(&exist)
+			err = stmt.QueryRow(link).Scan(&exist)
 			if err != nil {
 				exist = ""
 			}
 
-			backlink[match[1]][""] = ""
+			backlink[link][""] = ""
 			link_count += 1
 
 			class := ""
@@ -73,6 +133,8 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 			return "<a href=\"/w/" + match[1] + "\" class=\"" + class + "\""
 		}
 	})
+
+	string_data = strings.Replace(string_data, "<ul>", "<ul class=\"opennamu_ul\">", -1)
 
 	end_backlink := [][]string{}
 	for k1, v1 := range backlink {
@@ -87,7 +149,7 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 	}
 
 	end_data := make(map[string]interface{})
-	end_data["data"] = result
+	end_data["data"] = string_data
 	end_data["js_data"] = ""
 	end_data["backlink"] = end_backlink
 	end_data["link_count"] = link_count

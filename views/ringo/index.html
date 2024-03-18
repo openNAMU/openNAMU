@@ -11,7 +11,7 @@
         <link href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT/fonts/static/woff2/SUIT.css" rel="stylesheet">
         <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
         <script src="/views/ringo/js/main.js.cache_v2"></script>
-        <script src="/views/ringo/js/sidebar.js.cache_v1"></script>
+        <script src="/views/ringo/js/sidebar.js.cache_v2"></script>
         <script src="/views/ringo/js/skin_set.js.cache_v5"></script>
         <link rel="stylesheet" href="/views/ringo/css/main.css.cache_v8">
         {% if request.cookies.get('main_css_darkmode', '') == '1' %}
@@ -220,7 +220,9 @@
                 </article>
             </header>
             <article class="main" id="main_data">
+                {{imp[1][7][0]|safe}}
                 {{data|safe}}
+                {{imp[1][7][2]|safe}}
             </article>
             <footer class="not_mobile">
                 <article class="main" id="footer">
@@ -233,13 +235,17 @@
         </section>
         <div class="aside_width">　</div>
         <aside class="do_fixed">
-            <button id="side_button_1" class="side_button selected">{{'edit'|load_lang}}</button><!--
-         --><button id="side_button_2" class="side_button">{{'discussion'|load_lang}}</button><!--
-         --><button id="side_button_3" class="side_button">{{'toc'|load_lang}}</button><!--
-         --><button id="side_button_4" class="side_button">{{'footnote'|load_lang}}</button>
-            <div id="side_content">
-                Loading...
-            </div>
+            {% if imp[1][7][1] == '' %}
+                <button id="side_button_1" class="side_button selected">{{'edit'|load_lang}}</button><!--
+             --><button id="side_button_2" class="side_button">{{'discussion'|load_lang}}</button><!--
+             --><button id="side_button_3" class="side_button">{{'toc'|load_lang}}</button><!--
+             --><button id="side_button_4" class="side_button">{{'footnote'|load_lang}}</button>
+                <div id="side_content">
+                    Loading...
+                </div>
+            {% else %}
+                {{imp[1][7][1]|safe}}
+            {% endif %}
         </aside>
         <div id="nav_bar">
             <div id="go_top">
