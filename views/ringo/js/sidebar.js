@@ -91,10 +91,12 @@ function ringo_do_side_button_4() {
 let temp_save = ['', '', '', ''];
 
 window.addEventListener('DOMContentLoaded', function() {
-    document.getElementById("side_button_1").addEventListener("click", ringo_do_side_button_1);
-    document.getElementById("side_button_2").addEventListener("click", ringo_do_side_button_2);
-    document.getElementById("side_button_3").addEventListener("click", ringo_do_side_button_3);
-    document.getElementById("side_button_4").addEventListener("click", ringo_do_side_button_4);
+    if(document.getElementById("side_button_1")) {
+        document.getElementById("side_button_1").addEventListener("click", ringo_do_side_button_1);
+        document.getElementById("side_button_2").addEventListener("click", ringo_do_side_button_2);
+        document.getElementById("side_button_3").addEventListener("click", ringo_do_side_button_3);
+        document.getElementById("side_button_4").addEventListener("click", ringo_do_side_button_4);
 
-    ringo_do_side_button_1();
+        ringo_do_side_button_1();
+    }
 });
