@@ -94,6 +94,8 @@ function pasteListener(e) {
                     '업로드 완료 : ' +
                     '[[파일:' + file_name + ']]'
                 );
+
+                do_insert_data('[[file:' + file_name + ']]');
             } else {
                 console.error("[ERROR] PasteUpload Fail :", res.statusText);
                 if(res.status === 400) {
