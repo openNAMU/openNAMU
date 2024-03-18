@@ -1197,7 +1197,7 @@ def wiki_set(conn):
     for for_a in range(1, 4):
         curs.execute(db_change("select data from other where name = ?"), ['template_var_' + str(for_a)])
         db_data = curs.fetchall()
-        template_var += [[db_data[0][0]]] if db_data else [['']]
+        template_var += [db_data[0][0]] if db_data else ['']
 
     data_list += [template_var]
 
