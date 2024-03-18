@@ -34,7 +34,10 @@ def main_setting_phrase():
             'outdated_doc_warning',
             'outdated_doc_warning_date',
             'category_text',
-            'redirect_text'
+            'redirect_text',
+            'template_var_1',
+            'template_var_2',
+            'template_var_3',
         ]
         if flask.request.method == 'POST':
             curs.executemany(db_change("update other set data = ? where name = ?"), [[flask.request.form.get(for_a, ''), for_a] for for_a in i_list])
@@ -145,6 +148,15 @@ def main_setting_phrase():
                         <span>EX : {0} ➤ {1}</span>
                         <hr class="main_hr">
                         <input name="''' + i_list[26] + '''" value="''' + html.escape(d_list[26]) + '''">
+
+                        <h2>''' + get_lang(conn, 'template_var_1') + ''' (''' + get_lang(conn, 'default') + ''' : ''' + get_lang(conn, 'top') + ''') (HTML)</h2>
+                        <textarea class="opennamu_textarea_100" name="''' + i_list[27] + '''">''' + html.escape(d_list[27]) + '''</textarea>
+
+                        <h2>''' + get_lang(conn, 'template_var_2') + ''' (''' + get_lang(conn, 'default') + ''' : ''' + get_lang(conn, 'sidebar') + ''') (HTML)</h2>
+                        <textarea class="opennamu_textarea_100" name="''' + i_list[28] + '''">''' + html.escape(d_list[28]) + '''</textarea>
+
+                        <h2>''' + get_lang(conn, 'template_var_3') + ''' (''' + get_lang(conn, 'default') + ''' : ''' + get_lang(conn, 'bottom') + ''') (HTML)</h2>
+                        <textarea class="opennamu_textarea_100" name="''' + i_list[29] + '''">''' + html.escape(d_list[29]) + '''</textarea>
 
                         <hr class="main_hr">
                         <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
