@@ -1131,7 +1131,7 @@ def cut_100(data):
     else:
         return ''
 
-def wiki_set(conn, num = 1):
+def wiki_set(conn):
     curs = conn.cursor()
 
     ip = ip_check()
@@ -1193,6 +1193,14 @@ def wiki_set(conn, num = 1):
 
     data_list += [db_data]
 
+    template_var = []
+    for for_a in range(1, 4):
+        curs.execute(db_change("select data from other where name = ?"), ['template_var_' + str(for_a)])
+        db_data = curs.fetchall()
+        template_var += [[db_data[0][0]]] if db_data else [['']]
+
+    data_list += [template_var]
+
     return data_list
 
 def wiki_custom(conn):
@@ -1252,7 +1260,7 @@ def wiki_custom(conn):
         user_head = flask.session['head'] if 'head' in flask.session else ''
         user_head += flask.session['head' + skin_name] if 'head' + skin_name in flask.session else ''
 
-    curs.execute(db_change("select title from rd where title = ? and stop = ''"), ['user:' + ip])
+    curs.execute(db_change("select title from rd where title = ? and stop = '' limit 1"), ['user:' + ip])
     user_topic = '1' if curs.fetchall() else '0'
     
     split_path = flask.request.path.split('/')
