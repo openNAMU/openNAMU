@@ -1,4 +1,5 @@
 from .tool.func import *
+
 from .main_func_error_404 import main_func_error_404
 
 def main_view(name = ''):
