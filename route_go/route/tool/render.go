@@ -80,7 +80,7 @@ func Get_render_direct(db *sql.DB, db_set map[string]string, doc_name string, da
 	} else if markup == "markdown" {
 		render_data = Markdown(db, db_set, doc_data_set)
 	} else {
-		render_data["data"] = "<div id=\"opennamu_render_complete\">" + data + "</div>"
+		render_data["data"] = data
 		render_data["js_data"] = ""
 		render_data["backlink"] = [][]string{}
 	}
@@ -168,7 +168,7 @@ func Get_render_direct(db *sql.DB, db_set map[string]string, doc_name string, da
 	}
 
 	return map[string]string{
-		"data":    render_data["data"].(string),
-		"data_js": render_data["js_data"].(string),
+		"data":    "<div id=\"opennamu_render_complete\">" + render_data["data"].(string) + "</div>",
+		"js_data": render_data["js_data"].(string),
 	}
 }

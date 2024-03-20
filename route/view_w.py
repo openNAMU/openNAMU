@@ -150,7 +150,7 @@ def view_w(name = 'Test', do_type = ''):
                     <img src="/image/''' + url_pas(file_all_name) + '''.cache_v''' + rev + '''">
                     <h2>''' + get_lang(conn, 'data') + '''</h2>
                     <table>
-                        <tr><td>URL</td><td><a href="/image/''' + url_pas(file_all_name) + '''">''' + get_lang(conn, 'link') + '''</a></td></tr>
+                        <tr><td>''' + get_lang(conn, 'url') + '''</td><td><a href="/image/''' + url_pas(file_all_name) + '''">''' + get_lang(conn, 'link') + '''</a></td></tr>
                         <tr><td>''' + get_lang(conn, 'volume') + '''</td><td>''' + file_size + '''KB</td></tr>
                         <tr><td>''' + get_lang(conn, 'resolution') + '''</td><td>''' + file_res + '''</td></tr>
                     </table>
