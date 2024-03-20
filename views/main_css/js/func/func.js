@@ -84,8 +84,8 @@ function opennamu_do_render(to_obj, data, name = '', do_type = '', option = '') 
     }).then(function(text) {
         if(document.getElementById(to_obj)) {
             if(text["data"]) {
-                document.getElementById(to_obj).innerHTML = text.data;
-                eval(text.js_data);
+                document.getElementById(to_obj).innerHTML = text["data"];
+                eval(text["js_data"]);
             } else {
                 document.getElementById(to_obj).innerHTML = '';
             }
