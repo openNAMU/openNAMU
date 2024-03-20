@@ -318,17 +318,6 @@ def do_every_day():
             
             curs.execute(db_change("delete from re_admin where time < ?"), [time_calc])
 
-        # 전체 문서 수 재계산
-        curs.execute(db_change("select count(*) from data"))
-        count_data = curs.fetchall()
-        if count_data:
-            count_data = count_data[0][0]
-        else:
-            count_data = 0
-
-        curs.execute(db_change('delete from other where name = "count_all_title"'))
-        curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", ?, "")'), [str(count_data)])
-
         # 사이트맵 생성 관리
         curs.execute(db_change('select data from other where name = "sitemap_auto_make"'))
         db_data = curs.fetchall()
