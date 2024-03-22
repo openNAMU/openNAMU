@@ -49,17 +49,27 @@ function opennamu_list_recent_change() {
 
             data_html += '<ul class="opennamu_ul">';
             for(let for_a = 0; for_a < data.length; for_a++) {
+                if(data[for_a][6] !== "" && data[for_a][1] === "") {
+                    data_html += '<li>----</li>';
+
+                    continue;
+                }
+
                 let doc_name = opennamu_do_url_encode(data[for_a][1]);
 
                 data_html += '<li>';
                 data_html += '<a href="/w/' + doc_name + '">' + data[for_a][1] + '</a> ';
 
-                let rev = Number(data[for_a][0]);
-                if(rev <= 1) {
-                    data_html += '<a href="/history/' + doc_name + '">(r' + data[for_a][0] + ')</a> ';
+                data_html += '<span id="opennamu_list_recent_change_' + String(for_a) + '_over">';
+                data_html += '<a id="opennamu_list_recent_change_' + String(for_a) + '" href="javascript:void(0);">';
+                if(data[for_a][6] !== "") {
+                    data_html += '<span style="color: red;">(r' + data[for_a][0] + ')</span> ';
                 } else {
-                    data_html += '<a href="/diff/' + String(rev - 1) + '/' + data[for_a][0] + '/' + doc_name + '">(r' + data[for_a][0] + ')</a> ';
+                    data_html += '(r' + data[for_a][0] + ') ';
                 }
+                data_html += '</a>';
+                data_html += '<span class="opennamu_popup_footnote" id="opennamu_list_recent_change_' + String(for_a) + '_load" style="display: none;"></span>';
+                data_html += '</span>';
                 
                 if(data[for_a][5] === '0') {
                     data_html += '<span style="color: gray;">(' + data[for_a][5] + ')</span> ';
@@ -69,17 +79,46 @@ function opennamu_list_recent_change() {
                     data_html += '<span style="color: red;">(' + data[for_a][5] + ')</span> ';
                 }
                 
-                data_html += '<a href="/history_tool/' + data[for_a][0] + '/' + doc_name + '">(' + lang[0] + ')</a> | ';
                 data_html += data[for_a][7] + ' | ';
                 data_html += data[for_a][2];
+                
+                data_html += '<span style="display: none;" id="opennamu_history_tool_' + String(for_a) + '"></span>';
+
                 data_html += '<br>'
                 data_html += data[for_a][4];
+
                 data_html += '</li>';
             }
 
             data_html += '</ul>';
 
             document.getElementById('opennamu_list_recent_change').innerHTML = data_html;
+
+            for(let for_a = 0; for_a < data.length; for_a++) {
+                if(data[for_a][6] !== "" && data[for_a][1] === "") {
+                    data_html += '<li>----</li>';
+
+                    continue;
+                }
+
+                let doc_name = opennamu_do_url_encode(data[for_a][1]);
+
+                fetch('/api/history_tool/' + data[for_a][0] + '/' + doc_name).then(function(res) {
+                    return res.json();
+                }).then(function(tool_list) {
+                    let tool_html = '';
+                    for(let for_b = 0; for_b < tool_list.length; for_b++) {
+                        tool_html += '<a href="' + tool_list[for_b][0] + '">' + tool_list[for_b][1] + '</a> | ';
+                    }
+
+                    tool_html = tool_html.replace(/ \| $/, '');
+                    
+                    document.getElementById('opennamu_history_tool_' + String(for_a)).innerHTML = tool_html;
+                    
+                    document.getElementById('opennamu_list_recent_change_' + String(for_a) + "_over").addEventListener("mouseenter", function() { opennamu_do_footnote_popover('opennamu_list_recent_change_' + String(for_a), '', 'opennamu_history_tool_' + String(for_a)); });
+                    document.getElementById('opennamu_list_recent_change_' + String(for_a) + "_over").addEventListener("mouseleave", function() { opennamu_do_footnote_popover('opennamu_list_recent_change_' + String(for_a), '', 'opennamu_history_tool_' + String(for_a)); });
+                });
+            }
         });
     });
 }

@@ -22,9 +22,9 @@ func main() {
 		route.Api_thread(call_arg[1:])
 	} else if call_arg[0] == "api_func_ip" {
 		route.Api_func_ip(call_arg[1:])
-	} else if call_arg[0] == "api_recent_change" {
+	} else if call_arg[0] == "api_list_recent_change" {
 		route.Api_list_recent_change(call_arg[1:])
-	} else if call_arg[0] == "api_recent_edit_request" {
+	} else if call_arg[0] == "api_list_recent_edit_request" {
 		route.Api_list_recent_edit_request(call_arg[1:])
 	} else if call_arg[0] == "api_bbs" {
 		route.Api_bbs(call_arg[1:])
@@ -40,5 +40,7 @@ func main() {
 		route.Api_func_llm(call_arg[1:])
 	} else if call_arg[0] == "api_func_language" {
 		route.Api_func_language(call_arg[1:])
+	} else if call_arg[0] == "api_list_history_tool" {
+		route.Api_list_history_tool(call_arg[1:])
 	}
 }

@@ -28,7 +28,7 @@ func Api_w_watch_list(call_arg []string) {
 	defer db.Close()
 
 	ip := other_set["ip"]
-	if tool.Get_admin_auth(db, db_set, ip) == "" {
+	if tool.Get_user_auth(db, db_set, ip) == "" {
 		fmt.Print("{}")
 		return
 	}
