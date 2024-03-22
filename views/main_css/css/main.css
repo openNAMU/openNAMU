@@ -416,6 +416,14 @@ s:hover, strike:hover, del:hover {
     margin-top: 10px;
 }
 
+.opennamu_recent_change {
+    padding: 10px;
+
+    border: 1px solid gainsboro;
+    
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 /* 이 부분 이하로는 레거시 */
 #topic_color {
     background: #bbeabb;
