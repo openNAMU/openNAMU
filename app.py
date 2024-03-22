@@ -703,13 +703,15 @@ app.route('/api/search_page/<int:num>/<everything:name>', defaults = { 'db_set' 
 app.route('/api/search_data/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str })(api_search)
 app.route('/api/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str })(api_search)
 
-app.route('/api/recent_change', defaults = { 'db_set' : db_set_str })(api_recent_change)
-app.route('/api/recent_changes', defaults = { 'db_set' : db_set_str })(api_recent_change)
-app.route('/api/recent_change/<int:limit>', defaults = { 'db_set' : db_set_str })(api_recent_change)
-app.route('/api/recent_change/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_recent_change)
+app.route('/api/recent_change', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
+app.route('/api/recent_changes', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
+app.route('/api/recent_change/<int:limit>', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
+app.route('/api/recent_change/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
 
-app.route('/api/recent_edit_request', defaults = { 'db_set' : db_set_str })(api_recent_edit_request)
-app.route('/api/recent_edit_request/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_recent_edit_request)
+app.route('/api/history_tool/<int(signed = True):rev>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_list_history_tool)
+
+app.route('/api/recent_edit_request', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
+app.route('/api/recent_edit_request/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
 
 # 곧 개편 당할 곳
 app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)

@@ -29,7 +29,7 @@ func Api_user_watch_list(call_arg []string) {
 
 	ip := other_set["ip"]
 	name := other_set["name"]
-	if ip != name && tool.Get_admin_auth(db, db_set, ip) == "" {
+	if ip != name && tool.Get_user_auth(db, db_set, ip) == "" {
 		fmt.Print("{}")
 		return
 	}
