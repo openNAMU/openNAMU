@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func Api_recent_change(call_arg []string) {
+func Api_list_recent_change(call_arg []string) {
 	db_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &db_set)
 
