@@ -230,8 +230,8 @@ def edit_move(name):
                         
                         <h2>''' + get_lang(conn, 'document') + '''</h2>
                         <select name="move_option">
-                            <option value="none"> ''' + get_lang(conn, 'dont_move') + '''</option>
                             <option value="normal"> ''' + get_lang(conn, 'normal') + '''</option>
+                            <option value="none"> ''' + get_lang(conn, 'dont_move') + '''</option>
                             <option value="reverse"> ''' + get_lang(conn, 'replace_move') + '''</option>
                             ''' + ('<option value="merge"> ' + get_lang(conn, 'merge_move') + '</option>' if owner_auth == 1 else '') + '''
                         </select>

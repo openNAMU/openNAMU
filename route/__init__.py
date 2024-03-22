@@ -1,4 +1,3 @@
-from route.api_func_lang import api_func_lang
 from route.api_image_view import api_image_view
 from route.api_recent_discuss import api_recent_discuss
 from route.api_setting import api_setting
@@ -167,8 +166,12 @@ from route.vote_end import vote_end
 from route.vote_list import vote_list
 from route.vote_select import vote_select
 
+from route.n_list_recent_change import list_recent_change
+
 from route.n_w_watch_list import w_watch_list
 
+from route.go_api_func_llm import api_func_llm
+from route.go_api_func_language import api_func_language
 from route.go_api_func_sha224 import api_func_sha224
 from route.go_api_func_ip import api_func_ip
 

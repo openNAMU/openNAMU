@@ -84,13 +84,33 @@ function opennamu_do_render(to_obj, data, name = '', do_type = '', option = '') 
     }).then(function(text) {
         if(document.getElementById(to_obj)) {
             if(text["data"]) {
-                document.getElementById(to_obj).innerHTML = text.data;
-                eval(text.js_data);
+                document.getElementById(to_obj).innerHTML = text["data"];
+                eval(text["js_data"]);
             } else {
                 document.getElementById(to_obj).innerHTML = '';
             }
         }
     });
+}
+
+function opennamu_page_control(url, page, data_length, data_length_max = 50) {
+    let next = function() {
+        if(data_length_max === data_length) {
+            return '<a href="' + url.replace('{}', String(page + 1)) + '">(-)</a>';
+        } else {
+            return '';
+        }
+    };
+
+    let back = function() {
+        if(page !== 1) {
+            return '<a href="' + url.replace('{}', String(page - 1)) + '">(-)</a>';
+        } else {
+            return '';
+        }
+    };
+
+    return (next() + ' ' + back()).replace(/^ /, '');
 }
 
 function opennamu_xss_filter(str) {
