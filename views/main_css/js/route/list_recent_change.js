@@ -45,7 +45,7 @@ function opennamu_list_recent_change() {
                     data_html += '<span style="color: red;">(' + data[for_a][5] + ')</span> ';
                 }
                 
-                data_html += '<a href="/history_tool/' + doc_name + '">(' + lang[0] + ')</a> | ';
+                data_html += '<a href="/history_tool/' + data[for_a][0] + '/' + doc_name + '">(' + lang[0] + ')</a> | ';
                 data_html += data[for_a][7] + ' | ';
                 data_html += data[for_a][2];
                 data_html += '<br>'
