@@ -36,5 +36,9 @@ func main() {
 		route.Api_user_watch_list(call_arg[1:])
 	} else if call_arg[0] == "api_w_render" {
 		route.Api_w_render(call_arg[1:])
+	} else if call_arg[0] == "api_func_llm" {
+		route.Api_func_llm(call_arg[1:])
+	} else if call_arg[0] == "api_func_language" {
+		route.Api_func_language(call_arg[1:])
 	}
 }

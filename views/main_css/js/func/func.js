@@ -93,6 +93,26 @@ function opennamu_do_render(to_obj, data, name = '', do_type = '', option = '') 
     });
 }
 
+function opennamu_page_control(url, page, data_length, data_length_max = 50) {
+    let next = function() {
+        if(data_length_max === data_length) {
+            return '<a href="' + url.replace('{}', String(page + 1)) + '">(-)</a>';
+        } else {
+            return '';
+        }
+    };
+
+    let back = function() {
+        if(page !== 1) {
+            return '<a href="' + url.replace('{}', String(page - 1)) + '">(-)</a>';
+        } else {
+            return '';
+        }
+    };
+
+    return (next() + ' ' + back()).replace(/^ /, '');
+}
+
 function opennamu_xss_filter(str) {
     return str.replace(/[&<>"'\/]/g, function(match) {
         switch(match) {
