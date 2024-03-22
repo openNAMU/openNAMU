@@ -474,8 +474,8 @@ app.route('/block_log/ongoing', defaults = { 'tool' : 'ongoing' })(recent_block)
 app.route('/block_log/ongoing/<int:num>', defaults = { 'tool' : 'ongoing' })(recent_block)
 
 # Func-history
-app.route('/recent_change', defaults = { 'tool' : 'recent' })(recent_change)
-app.route('/recent_changes', defaults = { 'tool' : 'recent' })(recent_change)
+app.route('/recent_change')(list_recent_change)
+app.route('/recent_changes')(list_recent_change)
 app.route('/recent_change/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
 
 app.route('/recent_edit_request', defaults = { 'db_set' : db_set_str })(recent_edit_request)
@@ -505,8 +505,8 @@ app.route('/xref_page/<int:num>/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
-app.route('/doc_watch_list/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str, 'do_type' : 'watch_list' })(w_watch_list)
-app.route('/doc_star_doc/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str, 'do_type' : 'star_doc' })(w_watch_list)
+app.route('/doc_watch_list/<int:num>/<everything:name>')(w_watch_list)
+app.route('/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(w_watch_list)
 
 app.route('/raw/<everything:name>')(view_w_raw)
 app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 'on' })(view_w_raw)
@@ -717,7 +717,8 @@ app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)
 app.route('/api/recent_discuss')(api_recent_discuss)
 ##
 
-app.route('/api/lang/<data>')(api_func_lang)
+app.route('/api/lang', methods = ['POST'], defaults = { 'db_set' : db_set_str })(api_func_language)
+app.route('/api/lang/<data>', defaults = { 'db_set' : db_set_str })(api_func_language)
 app.route('/api/sha224/<everything:data>')(api_func_sha224)
 app.route('/api/ip/<everything:data>', defaults = { 'db_set' : db_set_str })(api_func_ip)
 
