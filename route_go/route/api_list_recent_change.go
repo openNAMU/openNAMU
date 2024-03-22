@@ -49,6 +49,7 @@ func Api_list_recent_change(call_arg []string) {
 
 	var data_list [][]string
 	admin_auth := tool.Get_user_auth(db, db_set, other_set["ip"])
+	ip_parser_temp := map[string][]string{}
 
 	for rows.Next() {
 		var id string
@@ -86,16 +87,29 @@ func Api_list_recent_change(call_arg []string) {
 			}
 		}
 
+		var ip_pre string
+		var ip_render string
+
+		if _, ok := ip_parser_temp[ip]; ok {
+			ip_pre = ip_parser_temp[ip][0]
+			ip_render = ip_parser_temp[ip][1]
+		} else {
+			ip_pre = tool.IP_preprocess(db, db_set, ip, other_set["ip"])[0]
+			ip_render = tool.IP_parser(db, db_set, ip, other_set["ip"])
+
+			ip_parser_temp[ip] = []string{ip_pre, ip_render}
+		}
+
 		if hide == "" || admin_auth != "" {
 			data_list = append(data_list, []string{
 				id,
 				title,
 				date,
-				tool.IP_preprocess(db, db_set, ip, other_set["ip"])[0],
+				ip_pre,
 				send,
 				leng,
 				hide,
-				tool.IP_parser(db, db_set, ip, other_set["ip"]),
+				ip_render,
 				type_data,
 			})
 		} else {
