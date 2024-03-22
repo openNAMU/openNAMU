@@ -268,3 +268,47 @@ function opennamu_do_include(name, render_name, to_obj, option_obj) {
         }
     });
 }
+
+function opennamu_do_toc() {
+    let data = document.getElementById('opennamu_render_complete');
+    let h_tag = data.querySelectorAll("h1, h2, h3, h4, h5, h6");
+    let toc_count = [0, 0, 0, 0, 0, 0];
+    let toc_html = '';
+
+    for(let for_a = 0; for_a < h_tag.length; for_a++) {
+        let tag = h_tag[for_a].tagName.toLowerCase();
+        tag = tag.replace('h', '');
+        tag = Number(tag) - 1;
+
+        for(let for_b = tag + 1; for_b < 6; for_b++) {
+            toc_count[for_b] = 0;
+        }
+
+        toc_count[tag] += 1;
+
+        let toc_string = '';
+        let add_on = false;
+        for(let for_b = 5; for_b >= 0; for_b--) {
+            if(add_on == false && toc_count[for_b] != 0) {
+                add_on = true;
+            }
+
+            if(add_on == true) {
+                toc_string = String(toc_count[for_b]) + '.' + toc_string;
+            }
+        }
+
+        toc_string = toc_string.replace(/^(0\.)+/, '');
+
+        let toc_string_sub =  toc_string.replace(/\.$/, '');
+        let toc_margin = '<span style="margin-left: 10px;"></span>'.repeat(toc_string_sub.split('.').length - 1);
+
+        toc_html += toc_margin + '<a href="#s-' + toc_string_sub + '">' + toc_string + '</a> ' + h_tag[for_a].innerHTML + '<br>';
+        h_tag[for_a].innerHTML = '<a id="s-' + toc_string_sub + '" href="#toc">' + toc_string + '</a> ' + h_tag[for_a].innerHTML;
+    }
+
+    data.innerHTML = data.innerHTML.replace(/(<h[1-6]>)/, '<div class="opennamu_toc"></div>$1');
+    data.innerHTML = data.innerHTML.replace(/<div class="opennamu_toc"><\/div>/g, function(match) {
+        return '<div class="opennamu_TOC" id="toc"><div class="opennamu_TOC_title">TOC</div><br>' + toc_html + '</div>';
+    });
+}

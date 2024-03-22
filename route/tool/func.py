@@ -1043,7 +1043,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v219'
+    return '.cache_v221'
 
 def wiki_css(data):
     global global_wiki_set
@@ -2509,10 +2509,19 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
 
     if mode != 'add' and mode != 'setting' and mode != 'user':
         history_plus_rc_max(conn, 'normal')
+
         curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [id_data, title, date])
     
     if mode != 'add' and mode != 'setting':
         history_plus_rc_max(conn, mode)
+
+        curs.execute(db_change("select count(*) from data"))
+        count_data = curs.fetchall()
+        count_data = count_data[0][0] if count_data else 0
+
+        curs.execute(db_change('delete from other where name = "count_all_title"'))
+        curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", ?, "")'), [str(count_data)])
+
         curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [id_data, title, date, mode])
 
         data_set_exist = '' if mode != 'delete' else 'not_exist'
