@@ -547,9 +547,8 @@ app.route('/revert/<int:num>/<everything:name>', methods = ['POST', 'GET'])(edit
 app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
 
 # Func-topic
-app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(recent_discuss)
-app.route('/recent_discuss/close', defaults = { 'tool' : 'close' })(recent_discuss)
-app.route('/recent_discuss/open', defaults = { 'tool' : 'open' })(recent_discuss)
+app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(list_recent_discuss)
+app.route('/recent_discuss/<tool>')(list_recent_discuss)
 
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
 app.route('/thread/0/<everything:doc_name>', defaults = { 'topic_num' : '0' }, methods = ['POST', 'GET'])(topic)
@@ -713,11 +712,9 @@ app.route('/api/history_tool/<int(signed = True):rev>/<everything:name>', defaul
 app.route('/api/recent_edit_request', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
 app.route('/api/recent_edit_request/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
 
-# 곧 개편 당할 곳
-app.route('/api/recent_discuss/<get_type>/<int:num>')(api_recent_discuss)
-app.route('/api/recent_discuss/<int:num>')(api_recent_discuss)
-app.route('/api/recent_discuss')(api_recent_discuss)
-##
+app.route('/api/recent_discuss/<set_type>/<int:limit>', defaults = { 'db_set' : db_set_str })(api_list_recent_discuss)
+app.route('/api/recent_discuss/<int:limit>', defaults = { 'db_set' : db_set_str })(api_list_recent_discuss)
+app.route('/api/recent_discuss', defaults = { 'db_set' : db_set_str })(api_list_recent_discuss)
 
 app.route('/api/lang', methods = ['POST'], defaults = { 'db_set' : db_set_str })(api_func_language)
 app.route('/api/lang/<data>', defaults = { 'db_set' : db_set_str })(api_func_language)

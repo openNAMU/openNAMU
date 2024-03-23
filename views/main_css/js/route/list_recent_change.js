@@ -15,20 +15,6 @@ function opennamu_list_recent_change() {
         fetch('/api/recent_change/50').then(function(res) {
             return res.json();
         }).then(function(data) {
-            /*
-                data_list = append(data_list, []string{
-                    id,
-                    title,
-                    date,
-                    tool.IP_preprocess(db, db_set, ip, other_set["ip"])[0],
-                    send,
-                    leng,
-                    hide,
-                    tool.IP_parser(db, db_set, ip, other_set["ip"]),
-                    type_data,
-                })
-            */
-
             let data_html = '';
 
             let option_list = [
