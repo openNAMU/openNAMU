@@ -39,8 +39,10 @@ function opennamu_list_recent_discuss(tool = 'normal') {
 
                 data_html += data[for_a][6];
 
-                data_html += '</div>'
-                data_html += '</div>'
+                data_html += '</div>';
+                
+                data_html += '</div>';
+                data_html += '<hr class="main_hr">';
             }
 
             document.getElementById('opennamu_list_recent_discuss').innerHTML = data_html;
