@@ -72,7 +72,10 @@ func Api_list_history_tool(call_arg []string) {
 	auth_name := tool.Get_user_auth(db, db_set, other_set["ip"])
 	auth_info := tool.Get_auth_group_info(db, db_set, auth_name)
 
-	if auth_info["hidel"] || auth_info["owner"] {
+	_, ok := auth_info["hidel"]
+	_, ok2 := auth_info["owner"]
+
+	if ok || ok2 {
 		main_dict = append(
 			main_dict,
 			[]string{
@@ -82,7 +85,7 @@ func Api_list_history_tool(call_arg []string) {
 		)
 	}
 
-	if auth_info["owner"] {
+	if ok2 {
 		main_dict = append(
 			main_dict,
 			[]string{

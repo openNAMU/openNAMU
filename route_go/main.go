@@ -42,5 +42,7 @@ func main() {
 		route.Api_func_language(call_arg[1:])
 	} else if call_arg[0] == "api_list_history_tool" {
 		route.Api_list_history_tool(call_arg[1:])
+	} else if call_arg[0] == "api_list_recent_discuss" {
+		route.Api_list_recent_discuss(call_arg[1:])
 	}
 }
