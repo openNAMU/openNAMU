@@ -44,7 +44,7 @@ function opennamu_list_recent_change() {
                 let doc_name = opennamu_do_url_encode(data[for_a][1]);
 
                 data_html += '<div class="opennamu_recent_change">';
-                data_html += '<a href="/w/' + doc_name + '">' + data[for_a][1] + '</a> ';
+                data_html += '<a href="/w/' + doc_name + '">' + opennamu_xss_filter(data[for_a][1]) + '</a> ';
 
                 data_html += '<div style="float: right;">';
 
@@ -81,7 +81,7 @@ function opennamu_list_recent_change() {
 
                 if(data[for_a][4] !== "") {
                     data_html += '<hr>'
-                    data_html += data[for_a][4];
+                    data_html += opennamu_xss_filter(data[for_a][4]);
                 }
 
                 data_html += '</div>';
