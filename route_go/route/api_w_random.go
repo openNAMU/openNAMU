@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"opennamu/route/tool"
 )
@@ -25,7 +26,7 @@ func Api_w_random(call_arg []string) {
 		if err == sql.ErrNoRows {
 			title = ""
 		} else {
-			return
+			log.Fatal(err)
 		}
 	}
 

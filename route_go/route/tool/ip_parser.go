@@ -2,6 +2,7 @@ package tool
 
 import (
 	"database/sql"
+	"log"
 	"regexp"
 	"strconv"
 )
@@ -22,7 +23,7 @@ func Get_level(db *sql.DB, db_set map[string]string, ip string) []string {
 
 	stmt, err := db.Prepare(DB_change(db_set, "select data from user_set where id = ? and name = 'level'"))
 	if err != nil {
-		return []string{"", "", ""}
+		log.Fatal(err)
 	}
 	defer stmt.Close()
 
@@ -31,13 +32,13 @@ func Get_level(db *sql.DB, db_set map[string]string, ip string) []string {
 		if err == sql.ErrNoRows {
 			level = "0"
 		} else {
-			return []string{"", "", ""}
+			log.Fatal(err)
 		}
 	}
 
 	stmt, err = db.Prepare(DB_change(db_set, "select data from user_set where id = ? and name = 'experience'"))
 	if err != nil {
-		return []string{"", "", ""}
+		log.Fatal(err)
 	}
 	defer stmt.Close()
 
@@ -46,7 +47,7 @@ func Get_level(db *sql.DB, db_set map[string]string, ip string) []string {
 		if err == sql.ErrNoRows {
 			exp = "0"
 		} else {
-			return []string{"", "", ""}
+			log.Fatal(err)
 		}
 	}
 
@@ -62,7 +63,7 @@ func Get_user_auth(db *sql.DB, db_set map[string]string, ip string) string {
 
 		stmt, err := db.Prepare(DB_change(db_set, "select data from user_set where id = ? and name = 'acl'"))
 		if err != nil {
-			return ""
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
@@ -71,7 +72,7 @@ func Get_user_auth(db *sql.DB, db_set map[string]string, ip string) string {
 			if err == sql.ErrNoRows {
 				auth = "user"
 			} else {
-				return ""
+				log.Fatal(err)
 			}
 		}
 
@@ -88,13 +89,13 @@ func Get_user_auth(db *sql.DB, db_set map[string]string, ip string) string {
 func Get_auth_group_info(db *sql.DB, db_set map[string]string, auth string) map[string]bool {
 	stmt, err := db.Prepare(DB_change(db_set, "select name from alist where name = ?"))
 	if err != nil {
-		return map[string]bool{}
+		log.Fatal(err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(auth)
 	if err != nil {
-		return map[string]bool{}
+		log.Fatal(err)
 	}
 	defer rows.Close()
 
@@ -105,7 +106,7 @@ func Get_auth_group_info(db *sql.DB, db_set map[string]string, auth string) map[
 
 		err := rows.Scan(&name)
 		if err != nil {
-			return map[string]bool{}
+			log.Fatal(err)
 		}
 
 		data_list[name] = true
@@ -123,7 +124,7 @@ func IP_preprocess(db *sql.DB, db_set map[string]string, ip string, my_ip string
 		if err == sql.ErrNoRows {
 			ip_view = ""
 		} else {
-			return []string{"", ""}
+			log.Fatal(err)
 		}
 	}
 
@@ -132,7 +133,7 @@ func IP_preprocess(db *sql.DB, db_set map[string]string, ip string, my_ip string
 		if err == sql.ErrNoRows {
 			user_name_view = ""
 		} else {
-			return []string{"", ""}
+			log.Fatal(err)
 		}
 	}
 
@@ -154,7 +155,7 @@ func IP_preprocess(db *sql.DB, db_set map[string]string, ip string, my_ip string
 
 			stmt, err := db.Prepare(DB_change(db_set, "select data from user_set where id = ? and name = 'sub_user_name'"))
 			if err != nil {
-				return []string{"", ""}
+				log.Fatal(err)
 			}
 			defer stmt.Close()
 
@@ -163,7 +164,7 @@ func IP_preprocess(db *sql.DB, db_set map[string]string, ip string, my_ip string
 				if err == sql.ErrNoRows {
 					sub_user_name = Get_language(db, db_set, "member", false)
 				} else {
-					return []string{"", ""}
+					log.Fatal(err)
 				}
 			}
 
@@ -178,7 +179,7 @@ func IP_preprocess(db *sql.DB, db_set map[string]string, ip string, my_ip string
 
 			stmt, err := db.Prepare(DB_change(db_set, "select data from user_set where name = 'user_name' and id = ?"))
 			if err != nil {
-				return []string{"", ""}
+				log.Fatal(err)
 			}
 			defer stmt.Close()
 
@@ -187,7 +188,7 @@ func IP_preprocess(db *sql.DB, db_set map[string]string, ip string, my_ip string
 				if err == sql.ErrNoRows {
 					user_name = ip
 				} else {
-					return []string{"", ""}
+					log.Fatal(err)
 				}
 			}
 
@@ -223,7 +224,7 @@ func IP_parser(db *sql.DB, db_set map[string]string, ip string, my_ip string) st
 				if err == sql.ErrNoRows {
 					user_name_level = ""
 				} else {
-					return ""
+					log.Fatal(err)
 				}
 			}
 
@@ -236,7 +237,7 @@ func IP_parser(db *sql.DB, db_set map[string]string, ip string, my_ip string) st
 
 			stmt, err := db.Prepare(DB_change(db_set, "select data from user_set where name = 'user_title' and id = ?"))
 			if err != nil {
-				return ""
+				log.Fatal(err)
 			}
 			defer stmt.Close()
 
@@ -245,7 +246,7 @@ func IP_parser(db *sql.DB, db_set map[string]string, ip string, my_ip string) st
 				if err == sql.ErrNoRows {
 					user_title = ""
 				} else {
-					return ""
+					log.Fatal(err)
 				}
 			}
 
