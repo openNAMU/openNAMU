@@ -35,7 +35,7 @@ func Api_list_recent_discuss(call_arg []string) {
 
 	set_type := other_set["set_type"]
 	if set_type == "normal" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where order by date desc limit ?"))
+		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd order by date desc limit ?"))
 	} else if set_type == "close" {
 		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop = 'O' order by date desc limit ?"))
 	} else {
