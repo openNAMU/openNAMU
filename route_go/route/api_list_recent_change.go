@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"opennamu/route/tool"
 	"strconv"
 )
@@ -28,7 +29,7 @@ func Api_list_recent_change(call_arg []string) {
 
 	limit_int, err := strconv.Atoi(other_set["limit"])
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 
 	if limit_int > 50 || limit_int < 0 {
@@ -37,18 +38,19 @@ func Api_list_recent_change(call_arg []string) {
 
 	stmt, err := db.Prepare(tool.DB_change(db_set, "select id, title from rc where type = ? order by date desc limit ?"))
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(set_type, limit_int)
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer rows.Close()
 
 	var data_list [][]string
-	admin_auth := tool.Get_admin_auth(db, db_set, other_set["ip"])
+	admin_auth := tool.Get_user_auth(db, db_set, other_set["ip"])
+	ip_parser_temp := map[string][]string{}
 
 	for rows.Next() {
 		var id string
@@ -56,7 +58,7 @@ func Api_list_recent_change(call_arg []string) {
 
 		err := rows.Scan(&id, &title)
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 
 		var date string
@@ -68,7 +70,7 @@ func Api_list_recent_change(call_arg []string) {
 
 		stmt, err := db.Prepare(tool.DB_change(db_set, "select date, ip, send, leng, hide, type from history where id = ? and title = ?"))
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
@@ -82,8 +84,21 @@ func Api_list_recent_change(call_arg []string) {
 				hide = ""
 				type_data = ""
 			} else {
-				return
+				log.Fatal(err)
 			}
+		}
+
+		var ip_pre string
+		var ip_render string
+
+		if _, ok := ip_parser_temp[ip]; ok {
+			ip_pre = ip_parser_temp[ip][0]
+			ip_render = ip_parser_temp[ip][1]
+		} else {
+			ip_pre = tool.IP_preprocess(db, db_set, ip, other_set["ip"])[0]
+			ip_render = tool.IP_parser(db, db_set, ip, other_set["ip"])
+
+			ip_parser_temp[ip] = []string{ip_pre, ip_render}
 		}
 
 		if hide == "" || admin_auth != "" {
@@ -91,11 +106,11 @@ func Api_list_recent_change(call_arg []string) {
 				id,
 				title,
 				date,
-				tool.IP_preprocess(db, db_set, ip, other_set["ip"])[0],
+				ip_pre,
 				send,
 				leng,
 				hide,
-				tool.IP_parser(db, db_set, ip, other_set["ip"]),
+				ip_render,
 				type_data,
 			})
 		} else {

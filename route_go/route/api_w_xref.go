@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"opennamu/route/tool"
 	"strconv"
 )
@@ -34,7 +35,7 @@ func Api_w_xref(call_arg []string) {
 		if err == sql.ErrNoRows {
 			link_case_insensitive = ""
 		} else {
-			return
+			log.Fatal(err)
 		}
 	}
 
@@ -50,13 +51,13 @@ func Api_w_xref(call_arg []string) {
 	}
 
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(other_set["name"], num)
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer rows.Close()
 
@@ -68,7 +69,7 @@ func Api_w_xref(call_arg []string) {
 	for rows.Next() {
 		err := rows.Scan(&name, &type_data)
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 
 		data_list = append(data_list, []string{name, type_data})

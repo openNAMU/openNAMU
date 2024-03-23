@@ -1,5 +1,4 @@
 from route.api_image_view import api_image_view
-from route.api_recent_discuss import api_recent_discuss
 from route.api_setting import api_setting
 from route.api_skin_info import api_skin_info
 from route.api_user_info import api_user_info
@@ -167,6 +166,7 @@ from route.vote_list import vote_list
 from route.vote_select import vote_select
 
 from route.n_list_recent_change import list_recent_change
+from route.n_list_recent_discuss import list_recent_discuss
 
 from route.n_w_watch_list import w_watch_list
 
@@ -177,8 +177,10 @@ from route.go_api_func_ip import api_func_ip
 
 from route.go_api_search import api_search
 
-from route.go_api_recent_change import api_recent_change
-from route.go_api_recent_edit_request import api_recent_edit_request
+from route.go_api_list_history_tool import api_list_history_tool
+from route.go_api_list_recent_change import api_list_recent_change
+from route.go_api_list_recent_discuss import api_list_recent_discuss
+from route.go_api_list_recent_edit_request import api_list_recent_edit_request
 
 from route.go_api_bbs import api_bbs
 

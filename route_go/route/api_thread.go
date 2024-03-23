@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"opennamu/route/tool"
 )
@@ -24,7 +25,7 @@ func Api_thread(call_arg []string) {
 	if other_set["tool"] == "length" {
 		stmt, err := db.Prepare(tool.DB_change(db_set, "select id from topic where code = ? order by id + 0 desc limit 1"))
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
@@ -34,7 +35,7 @@ func Api_thread(call_arg []string) {
 			if err == sql.ErrNoRows {
 				length = "0"
 			} else {
-				return
+				log.Fatal(err)
 			}
 		}
 
@@ -49,36 +50,36 @@ func Api_thread(call_arg []string) {
 		if other_set["tool"] == "top" {
 			stmt, err := db.Prepare(tool.DB_change(db_set, "select id, data, date, ip, block, top from topic where code = ? and top = 'O' order by id + 0 asc"))
 			if err != nil {
-				return
+				log.Fatal(err)
 			}
 			defer stmt.Close()
 
 			rows, err = stmt.Query(other_set["topic_num"])
 			if err != nil {
-				return
+				log.Fatal(err)
 			}
 		} else {
 			if other_set["s_num"] != "" && other_set["e_num"] != "" {
 				stmt, err := db.Prepare(tool.DB_change(db_set, "select id, data, date, ip, block, top from topic where code = ? and ? + 0 <= id + 0 and id + 0 <= ? + 0 order by id + 0 asc"))
 				if err != nil {
-					return
+					log.Fatal(err)
 				}
 				defer stmt.Close()
 
 				rows, err = stmt.Query(other_set["topic_num"], other_set["s_num"], other_set["e_num"])
 				if err != nil {
-					return
+					log.Fatal(err)
 				}
 			} else {
 				stmt, err := db.Prepare(tool.DB_change(db_set, "select id, data, date, ip, block, top from topic where code = ? order by id + 0 asc"))
 				if err != nil {
-					return
+					log.Fatal(err)
 				}
 				defer stmt.Close()
 
 				rows, err = stmt.Query(other_set["topic_num"])
 				if err != nil {
-					return
+					log.Fatal(err)
 				}
 			}
 		}
@@ -90,7 +91,7 @@ func Api_thread(call_arg []string) {
 		for rows.Next() {
 			err := rows.Scan(&id, &data, &date, &ip, &block, &top)
 			if err != nil {
-				return
+				log.Fatal(err)
 			}
 
 			data_list = append(data_list, []string{id, data, date, ip, block, top})
@@ -100,7 +101,7 @@ func Api_thread(call_arg []string) {
 		new_data["data"] = []map[string]string{}
 		data_slice := []map[string]string{}
 
-		admin_auth := tool.Get_admin_auth(db, db_set, other_set["ip"])
+		admin_auth := tool.Get_user_auth(db, db_set, other_set["ip"])
 
 		for for_a := 0; for_a < len(data_list); for_a++ {
 			data := ""
