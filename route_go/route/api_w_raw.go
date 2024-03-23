@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"opennamu/route/tool"
 )
@@ -24,7 +25,7 @@ func Api_w_raw(call_arg []string) {
 	if other_set["exist_check"] != "" {
 		stmt, err := db.Prepare(tool.DB_change(db_set, "select title from data where title = ?"))
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
@@ -35,7 +36,7 @@ func Api_w_raw(call_arg []string) {
 		if err != nil {
 			if err == sql.ErrNoRows {
 			} else {
-				return
+				log.Fatal(err)
 			}
 		} else {
 			new_data["exist"] = "1"
@@ -50,7 +51,7 @@ func Api_w_raw(call_arg []string) {
 		if other_set["rev"] != "" {
 			stmt, err := db.Prepare(tool.DB_change(db_set, "select data from history where title = ? and id = ?"))
 			if err != nil {
-				return
+				log.Fatal(err)
 			}
 			defer stmt.Close()
 
@@ -58,7 +59,7 @@ func Api_w_raw(call_arg []string) {
 			if err != nil {
 				if err == sql.ErrNoRows {
 				} else {
-					return
+					log.Fatal(err)
 				}
 			} else {
 				new_data["title"] = other_set["name"]
@@ -70,7 +71,7 @@ func Api_w_raw(call_arg []string) {
 		} else {
 			stmt, err := db.Prepare(tool.DB_change(db_set, "select data from data where title = ?"))
 			if err != nil {
-				return
+				log.Fatal(err)
 			}
 			defer stmt.Close()
 
@@ -78,7 +79,7 @@ func Api_w_raw(call_arg []string) {
 			if err != nil {
 				if err == sql.ErrNoRows {
 				} else {
-					return
+					log.Fatal(err)
 				}
 			} else {
 				new_data["title"] = other_set["name"]

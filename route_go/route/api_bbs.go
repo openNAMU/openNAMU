@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"opennamu/route/tool"
 	"strconv"
 )
@@ -27,7 +28,7 @@ func Api_bbs(call_arg []string) {
 
 		rows, err = db.Query(tool.DB_change(db_set, "select set_code, set_id from bbs_data where set_name = 'date' order by set_data desc limit 50"))
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 	} else {
 		page, _ := strconv.Atoi(other_set["page"])
@@ -38,13 +39,13 @@ func Api_bbs(call_arg []string) {
 
 		stmt, err := db.Prepare(tool.DB_change(db_set, "select set_code, set_id from bbs_data where set_name = 'title' and set_id like ? order by set_code + 0 desc limit ?, 50"))
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
 		rows, err = stmt.Query(other_set["bbs_num"], num)
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 	}
 	defer rows.Close()
@@ -59,7 +60,7 @@ func Api_bbs(call_arg []string) {
 
 		err := rows.Scan(&set_code, &set_id)
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 
 		temp_data["set_code"] = set_code
@@ -67,13 +68,13 @@ func Api_bbs(call_arg []string) {
 
 		stmt, err := db.Prepare(tool.DB_change(db_set, "select set_name, set_data, set_code, set_id from bbs_data where set_code = ? and set_id = ?"))
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
 		rows, err := stmt.Query(set_code, set_id)
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer rows.Close()
 
@@ -83,7 +84,7 @@ func Api_bbs(call_arg []string) {
 
 			err := rows.Scan(&set_name, &set_data, &set_code, &set_id)
 			if err != nil {
-				return
+				log.Fatal(err)
 			}
 
 			temp_data[set_name] = set_data

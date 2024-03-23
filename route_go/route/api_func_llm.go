@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"opennamu/route/tool"
 
 	"github.com/google/generative-ai-go/genai"
@@ -28,7 +29,7 @@ func Api_func_llm(call_arg []string) {
 
 	stmt, err := db.Prepare(tool.DB_change(db_set, "select data from user_set where name = 'llm_api_key' and id = ?"))
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer stmt.Close()
 
@@ -37,7 +38,7 @@ func Api_func_llm(call_arg []string) {
 		if err == sql.ErrNoRows {
 			api_key = ""
 		} else {
-			return
+			log.Fatal(err)
 		}
 	}
 
@@ -45,14 +46,14 @@ func Api_func_llm(call_arg []string) {
 
 	client, err := genai.NewClient(ctx, option.WithAPIKey(api_key))
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer client.Close()
 
 	model := client.GenerativeModel("gemini-pro")
 	resp, err := model.GenerateContent(ctx, genai.Text(other_set["prompt"]))
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 
 	text := resp.Candidates[0].Content.Parts[0]

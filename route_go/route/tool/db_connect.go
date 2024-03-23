@@ -2,6 +2,7 @@ package tool
 
 import (
 	"database/sql"
+	"log"
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -12,14 +13,14 @@ func DB_connect(db_set map[string]string) *sql.DB {
 	if db_set["type"] == "sqlite" {
 		db, err := sql.Open("sqlite", db_set["name"]+".db")
 		if err != nil {
-			return nil
+			log.Fatal(err)
 		}
 
 		return db
 	} else {
 		db, err := sql.Open("mysql", db_set["mysql_user"]+":"+db_set["mysql_pw"]+"@tcp("+db_set["mysql_host"]+":"+db_set["mysql_port"]+")/"+db_set["name"])
 		if err != nil {
-			return nil
+			log.Fatal(err)
 		}
 
 		return db
