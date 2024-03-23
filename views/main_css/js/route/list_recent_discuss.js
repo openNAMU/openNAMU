@@ -32,15 +32,16 @@ function opennamu_list_recent_discuss(tool = 'normal') {
                 let doc_name = opennamu_do_url_encode(data[for_a][0]);
 
                 data_html += '<div class="opennamu_recent_change">';
-                data_html += '<a href="/thread/' + data[for_a][3] + '">' + data[for_a][1] + '</a> ';
-                data_html += '<a href="/w/' + doc_name + '">(' + data[for_a][0] + ')</a> ';
+                data_html += '<a href="/thread/' + data[for_a][3] + '">' + opennamu_xss_filter(data[for_a][1]) + '</a> ';
+                data_html += '<a href="/w/' + doc_name + '">(' + opennamu_xss_filter(data[for_a][0]) + ')</a> ';
 
                 data_html += '<div style="float: right;">';
 
                 data_html += data[for_a][6];
 
                 data_html += '</div>';
-                
+                data_html += '<div style="clear: both;"></div>';
+
                 data_html += '</div>';
                 data_html += '<hr class="main_hr">';
             }
