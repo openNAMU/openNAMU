@@ -3,6 +3,7 @@ package tool
 import (
 	"bytes"
 	"database/sql"
+	"log"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -113,13 +114,17 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 
 			stmt, err := db.Prepare(DB_change(db_set, "select title from data where title = ?"))
 			if err != nil {
-				exist = ""
+				log.Fatal(err)
 			}
 			defer stmt.Close()
 
 			err = stmt.QueryRow(link).Scan(&exist)
 			if err != nil {
-				exist = ""
+				if err == sql.ErrNoRows {
+					exist = ""
+				} else {
+					log.Fatal(err)
+				}
 			}
 
 			backlink[link][""] = ""

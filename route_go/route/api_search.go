@@ -3,6 +3,7 @@ package route
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strconv"
 
 	"opennamu/route/tool"
@@ -30,7 +31,7 @@ func Api_search(call_arg []string) {
 	if other_set["search_type"] == "title" {
 		stmt, err := db.Prepare(tool.DB_change(db_set, "select title from data where title collate nocase like ? order by title limit ?, 50"))
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
@@ -39,14 +40,14 @@ func Api_search(call_arg []string) {
 
 		rows, err := stmt.Query("%"+other_set["name"]+"%", num)
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer rows.Close()
 
 		for rows.Next() {
 			err := rows.Scan(&title)
 			if err != nil {
-				return
+				log.Fatal(err)
 			}
 
 			title_list = append(title_list, title)
@@ -61,7 +62,7 @@ func Api_search(call_arg []string) {
 	} else {
 		stmt, err := db.Prepare(tool.DB_change(db_set, "select title from data where data collate nocase like ? order by title limit ?, 50"))
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
@@ -70,14 +71,14 @@ func Api_search(call_arg []string) {
 
 		rows, err := stmt.Query("%"+other_set["name"]+"%", num)
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer rows.Close()
 
 		for rows.Next() {
 			err := rows.Scan(&title)
 			if err != nil {
-				return
+				log.Fatal(err)
 			}
 
 			title_list = append(title_list, title)

@@ -2,6 +2,7 @@ package tool
 
 import (
 	"database/sql"
+	"log"
 	"strconv"
 	"time"
 )
@@ -12,7 +13,7 @@ func Get_render(db *sql.DB, db_set map[string]string, doc_name string, data stri
 	if render_type == "api_view" || render_type == "api_from" || render_type == "api_include" || render_type == "backlink" {
 		stmt, err := db.Prepare(DB_change(db_set, "select set_data from data_set where doc_name = ? and set_name = 'document_markup'"))
 		if err != nil {
-			return map[string]string{}
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
@@ -21,7 +22,7 @@ func Get_render(db *sql.DB, db_set map[string]string, doc_name string, data stri
 			if err == sql.ErrNoRows {
 				markup = ""
 			} else {
-				return map[string]string{}
+				log.Fatal(err)
 			}
 		}
 	}
@@ -32,7 +33,7 @@ func Get_render(db *sql.DB, db_set map[string]string, doc_name string, data stri
 			if err == sql.ErrNoRows {
 				markup = ""
 			} else {
-				return map[string]string{}
+				log.Fatal(err)
 			}
 		}
 	}
@@ -88,82 +89,82 @@ func Get_render_direct(db *sql.DB, db_set map[string]string, doc_name string, da
 	if backlink == "1" {
 		stmt, err := db.Prepare(DB_change(db_set, "delete from back where link = ?"))
 		if err != nil {
-			return map[string]string{}
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
 		_, err = stmt.Exec(doc_name)
 		if err != nil {
-			return map[string]string{}
+			log.Fatal(err)
 		}
 
 		stmt, err = db.Prepare(DB_change(db_set, "delete from back where title = ? and type = 'no'"))
 		if err != nil {
-			return map[string]string{}
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
 		_, err = stmt.Exec(doc_name)
 		if err != nil {
-			return map[string]string{}
+			log.Fatal(err)
 		}
 
 		stmt, err = db.Prepare(DB_change(db_set, "delete from data_set where doc_name = ? and set_name = 'link_count'"))
 		if err != nil {
-			return map[string]string{}
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
 		_, err = stmt.Exec(doc_name)
 		if err != nil {
-			return map[string]string{}
+			log.Fatal(err)
 		}
 
 		stmt, err = db.Prepare(DB_change(db_set, "delete from data_set where doc_name = ? and set_name = 'doc_type'"))
 		if err != nil {
-			return map[string]string{}
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
 		_, err = stmt.Exec(doc_name)
 		if err != nil {
-			return map[string]string{}
+			log.Fatal(err)
 		}
 
 		end_backlink := render_data["backlink"].([][]string)
 		for for_a := 0; for_a < len(end_backlink); for_a++ {
 			stmt, err := db.Prepare(DB_change(db_set, "insert into back (link, title, type, data) values (?, ?, ?, ?)"))
 			if err != nil {
-				return map[string]string{}
+				log.Fatal(err)
 			}
 			defer stmt.Close()
 
 			_, err = stmt.Exec(end_backlink[0], end_backlink[1], end_backlink[2])
 			if err != nil {
-				return map[string]string{}
+				log.Fatal(err)
 			}
 		}
 
 		stmt, err = db.Prepare(DB_change(db_set, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'link_count', ?)"))
 		if err != nil {
-			return map[string]string{}
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
 		_, err = stmt.Exec(doc_name, render_data["link_count"].(int))
 		if err != nil {
-			return map[string]string{}
+			log.Fatal(err)
 		}
 
 		stmt, err = db.Prepare(DB_change(db_set, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', ?)"))
 		if err != nil {
-			return map[string]string{}
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
 		_, err = stmt.Exec(doc_name, "")
 		if err != nil {
-			return map[string]string{}
+			log.Fatal(err)
 		}
 	}
 

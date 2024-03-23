@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"opennamu/route/tool"
 	"strconv"
 )
@@ -28,7 +29,7 @@ func Api_list_recent_change(call_arg []string) {
 
 	limit_int, err := strconv.Atoi(other_set["limit"])
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 
 	if limit_int > 50 || limit_int < 0 {
@@ -37,13 +38,13 @@ func Api_list_recent_change(call_arg []string) {
 
 	stmt, err := db.Prepare(tool.DB_change(db_set, "select id, title from rc where type = ? order by date desc limit ?"))
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(set_type, limit_int)
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer rows.Close()
 
@@ -57,7 +58,7 @@ func Api_list_recent_change(call_arg []string) {
 
 		err := rows.Scan(&id, &title)
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 
 		var date string
@@ -69,7 +70,7 @@ func Api_list_recent_change(call_arg []string) {
 
 		stmt, err := db.Prepare(tool.DB_change(db_set, "select date, ip, send, leng, hide, type from history where id = ? and title = ?"))
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
@@ -83,7 +84,7 @@ func Api_list_recent_change(call_arg []string) {
 				hide = ""
 				type_data = ""
 			} else {
-				return
+				log.Fatal(err)
 			}
 		}
 

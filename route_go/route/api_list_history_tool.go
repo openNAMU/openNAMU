@@ -3,6 +3,7 @@ package route
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"opennamu/route/tool"
 	"strconv"
 )
@@ -39,7 +40,7 @@ func Api_list_history_tool(call_arg []string) {
 
 	rev_int, err := strconv.Atoi(other_set["rev"])
 	if err != nil {
-		rev_int = 0
+		log.Fatal(err)
 	}
 
 	if rev_int > 1 {

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"opennamu/route/tool"
 	"strconv"
 )
@@ -41,13 +42,13 @@ func Api_w_watch_list(call_arg []string) {
 		stmt, err = db.Prepare(tool.DB_change(db_set, "select id from user_set where name = 'watchlist' and data = ? limit ?, 50"))
 	}
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(other_set["name"], num)
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer rows.Close()
 
@@ -58,7 +59,7 @@ func Api_w_watch_list(call_arg []string) {
 
 		err := rows.Scan(&user_name)
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 
 		data_list = append(data_list, user_name)

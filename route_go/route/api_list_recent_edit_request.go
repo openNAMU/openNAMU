@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"opennamu/route/tool"
 	"strconv"
 )
@@ -23,7 +24,7 @@ func Api_list_recent_edit_request(call_arg []string) {
 
 	limit_int, err := strconv.Atoi(other_set["limit"])
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 
 	if limit_int > 50 || limit_int < 0 {
@@ -32,13 +33,13 @@ func Api_list_recent_edit_request(call_arg []string) {
 
 	stmt, err := db.Prepare(tool.DB_change(db_set, "select doc_name, doc_rev, set_data from data_set where set_name = 'edit_request_doing' order by set_data desc limit ?"))
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(limit_int)
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer rows.Close()
 
@@ -50,7 +51,7 @@ func Api_list_recent_edit_request(call_arg []string) {
 	for rows.Next() {
 		err := rows.Scan(&doc_name, &doc_rev, &date)
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 
 		var ip string
@@ -59,7 +60,7 @@ func Api_list_recent_edit_request(call_arg []string) {
 
 		stmt, err := db.Prepare(tool.DB_change(db_set, "select set_data from data_set where set_name = 'edit_request_user' and doc_rev = ? and doc_name = ?"))
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
@@ -68,13 +69,13 @@ func Api_list_recent_edit_request(call_arg []string) {
 			if err == sql.ErrNoRows {
 				ip = ""
 			} else {
-				return
+				log.Fatal(err)
 			}
 		}
 
 		stmt, err = db.Prepare(tool.DB_change(db_set, "select set_data from data_set where set_name = 'edit_request_send' and doc_rev = ? and doc_name = ?"))
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
@@ -83,13 +84,13 @@ func Api_list_recent_edit_request(call_arg []string) {
 			if err == sql.ErrNoRows {
 				send = ""
 			} else {
-				return
+				log.Fatal(err)
 			}
 		}
 
 		stmt, err = db.Prepare(tool.DB_change(db_set, "select set_data from data_set where set_name = 'edit_request_leng' and doc_rev = ? and doc_name = ?"))
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		defer stmt.Close()
 
@@ -98,7 +99,7 @@ func Api_list_recent_edit_request(call_arg []string) {
 			if err == sql.ErrNoRows {
 				leng = ""
 			} else {
-				return
+				log.Fatal(err)
 			}
 		}
 

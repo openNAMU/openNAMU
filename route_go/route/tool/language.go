@@ -3,7 +3,7 @@ package tool
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
+	"log"
 	"os"
 )
 
@@ -15,14 +15,13 @@ func Get_language(db *sql.DB, db_set map[string]string, data string, safe bool) 
 		if err == sql.ErrNoRows {
 			language = "ko-KR"
 		} else {
-			return ""
+			log.Fatal(err)
 		}
 	}
 
 	file, err := os.Open("./lang/" + language + ".json")
 	if err != nil {
-		fmt.Print(err)
-		return ""
+		log.Fatal(err)
 	}
 	defer file.Close()
 
