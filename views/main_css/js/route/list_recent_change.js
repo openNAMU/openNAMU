@@ -50,24 +50,25 @@ function opennamu_list_recent_change() {
 
                 data_html += '<span id="opennamu_list_recent_change_' + String(for_a) + '_over">';
                 data_html += '<a id="opennamu_list_recent_change_' + String(for_a) + '" href="javascript:void(0);">';
-                data_html += '⚒️'
+                data_html += '⚒️';
                 data_html += '</a>';
                 data_html += '<span class="opennamu_popup_footnote" id="opennamu_list_recent_change_' + String(for_a) + '_load" style="display: none;"></span>';
                 data_html += '</span>';
                 data_html += ' | '
 
                 if(data[for_a][6] !== "") {
-                    data_html += '<span style="color: red;">(r' + data[for_a][0] + ')</span> ';
+                    data_html += '<span style="color: red;">r' + data[for_a][0] + '</span>';
                 } else {
-                    data_html += '(r' + data[for_a][0] + ') ';
+                    data_html += 'r' + data[for_a][0];
                 }
+                data_html += ' | '
                 
                 if(data[for_a][5] === '0') {
-                    data_html += '<span style="color: gray;">(' + data[for_a][5] + ')</span>';
+                    data_html += '<span style="color: gray;">' + data[for_a][5] + '</span>';
                 } else if(data[for_a][5].match(/\+/)) {
-                    data_html += '<span style="color: green;">(' + data[for_a][5] + ')</span>';
+                    data_html += '<span style="color: green;">' + data[for_a][5] + '</span>';
                 } else {
-                    data_html += '<span style="color: red;">(' + data[for_a][5] + ')</span>';
+                    data_html += '<span style="color: red;">' + data[for_a][5] + '</span>';
                 }
                 data_html += ' | ';
                 

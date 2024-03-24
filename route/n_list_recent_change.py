@@ -9,5 +9,5 @@ def list_recent_change():
                 '<script src="/views/main_css/js/route/list_recent_change.js' + cache_v() + '"></script>' + \
                 '<script>opennamu_list_recent_change();</script>' + \
             '',
-            menu = [['other', get_lang(conn, 'return')]]
+            menu = [['other', get_lang(conn, 'return')], ['recent_edit_request', get_lang(conn, 'edit_request')]]
         ))
