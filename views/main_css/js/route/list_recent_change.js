@@ -82,7 +82,7 @@ function opennamu_list_recent_change() {
 
                 if(data[for_a][4] !== "") {
                     data_html += '<hr>'
-                    data_html += opennamu_xss_filter(data[for_a][4]);
+                    data_html += opennamu_send_render(opennamu_xss_filter(data[for_a][4]));
                 }
 
                 data_html += '</div>';
@@ -93,8 +93,6 @@ function opennamu_list_recent_change() {
 
             for(let for_a = 0; for_a < data.length; for_a++) {
                 if(data[for_a][6] !== "" && data[for_a][1] === "") {
-                    data_html += '<li>----</li>';
-
                     continue;
                 }
 
