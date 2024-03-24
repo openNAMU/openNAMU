@@ -37,7 +37,9 @@ function opennamu_list_recent_discuss(tool = 'normal') {
 
                 data_html += '<div style="float: right;">';
 
-                data_html += data[for_a][6];
+                data_html += '<a href="/thread/' + data[for_a][3] + '#' + data[for_a][7] + '">#' + data[for_a][7] + '</a> | ';
+                data_html += data[for_a][6] + ' | ';
+                data_html += data[for_a][2];
 
                 data_html += '</div>';
                 data_html += '<div style="clear: both;"></div>';
