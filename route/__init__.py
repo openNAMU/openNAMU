@@ -174,10 +174,10 @@ from route.go_api_func_llm import api_func_llm
 from route.go_api_func_language import api_func_language
 from route.go_api_func_sha224 import api_func_sha224
 from route.go_api_func_ip import api_func_ip
+from route.go_api_func_auth_list import api_func_auth_list
 
 from route.go_api_search import api_search
 
-from route.go_api_list_history_tool import api_list_history_tool
 from route.go_api_list_recent_change import api_list_recent_change
 from route.go_api_list_recent_discuss import api_list_recent_discuss
 from route.go_api_list_recent_edit_request import api_list_recent_edit_request
