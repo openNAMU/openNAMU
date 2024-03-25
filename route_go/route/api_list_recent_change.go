@@ -36,13 +36,24 @@ func Api_list_recent_change(call_arg []string) {
 		limit_int = 50
 	}
 
-	stmt, err := db.Prepare(tool.DB_change(db_set, "select id, title from rc where type = ? order by date desc limit ?"))
+	page_int, err := strconv.Atoi(other_set["num"])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if page_int > 0 {
+		page_int = (page_int * limit_int) - limit_int
+	} else {
+		page_int = 0
+	}
+
+	stmt, err := db.Prepare(tool.DB_change(db_set, "select id, title from rc where type = ? order by date desc limit ?, ?"))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(set_type, limit_int)
+	rows, err := stmt.Query(set_type, page_int, limit_int)
 	if err != nil {
 		log.Fatal(err)
 	}
