@@ -8,7 +8,6 @@ def bbs_make():
             return re_error(conn, '/error/3')
         
         if flask.request.method == 'POST':
-            
             curs.execute(db_change('select set_id from bbs_set where set_name = "bbs_name" order by set_id + 0 desc'))
             db_data = curs.fetchall()
 
