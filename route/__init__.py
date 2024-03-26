@@ -183,6 +183,7 @@ from route.go_api_list_recent_discuss import api_list_recent_discuss
 from route.go_api_list_recent_edit_request import api_list_recent_edit_request
 
 from route.go_api_bbs import api_bbs
+from route.go_api_bbs_list import api_bbs_list
 
 from route.go_api_topic import api_topic
 

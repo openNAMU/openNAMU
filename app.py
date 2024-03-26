@@ -678,6 +678,7 @@ app.route('/api/xref_this/<int:num>/<everything:name>', defaults = { 'xref_type'
 
 app.route('/api/random', defaults = { 'db_set' : db_set_str })(api_w_random)
 
+app.route('/api/bbs', defaults = { 'db_set' : db_set_str })(api_bbs_list)
 app.route('/api/bbs/main', defaults = { 'db_set' : db_set_str })(api_bbs)
 app.route('/api/bbs/w/<int:bbs_num>', defaults = { 'db_set' : db_set_str })(api_bbs)
 app.route('/api/bbs/w/<int:bbs_num>/<int:page>', defaults = { 'db_set' : db_set_str })(api_bbs)
