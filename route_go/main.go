@@ -1,12 +1,15 @@
 package main
 
 import (
+	"log"
 	"opennamu/route"
 	"os"
 )
 
 func main() {
 	call_arg := os.Args[1:]
+
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	if call_arg[0] == "main_func_easter_egg" {
 		route.Main_func_easter_egg()
@@ -40,9 +43,13 @@ func main() {
 		route.Api_func_llm(call_arg[1:])
 	} else if call_arg[0] == "api_func_language" {
 		route.Api_func_language(call_arg[1:])
-	} else if call_arg[0] == "api_list_history_tool" {
-		route.Api_list_history_tool(call_arg[1:])
+	} else if call_arg[0] == "api_func_auth_list" {
+		route.Api_func_auth_list(call_arg[1:])
 	} else if call_arg[0] == "api_list_recent_discuss" {
 		route.Api_list_recent_discuss(call_arg[1:])
+	} else if call_arg[0] == "api_bbs_list" {
+		route.Api_bbs_list(call_arg[1:])
+	} else {
+		log.Fatal("404")
 	}
 }

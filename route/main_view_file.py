@@ -1,5 +1,4 @@
 from .tool.func import *
-from .main_func_error_404 import main_func_error_404
 
 def main_view_file(data = ''):
     with get_db_connect() as conn:
@@ -23,4 +22,4 @@ def main_view_file(data = ''):
             else:
                 return flask.send_from_directory('./', data, mimetype = 'text/xml')
         else:
-            return main_func_error_404()
+            return ''

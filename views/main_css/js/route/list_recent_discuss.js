@@ -2,7 +2,7 @@
 
 function opennamu_list_recent_discuss(tool = 'normal') {
     let lang_data = new FormData();
-    lang_data.append('data', 'tool normal close_discussion open_discussion_list')
+    lang_data.append('data', 'tool normal close_discussion open_discussion_list closed')
 
     fetch('/api/lang', {
         method : 'post',
@@ -37,7 +37,13 @@ function opennamu_list_recent_discuss(tool = 'normal') {
 
                 data_html += '<div style="float: right;">';
 
-                data_html += data[for_a][6];
+                if(data[for_a][4] === 'O') {
+                    data_html += lang[4] + ' | ';
+                }
+
+                data_html += '<a href="/thread/' + data[for_a][3] + '#' + data[for_a][7] + '">#' + data[for_a][7] + '</a> | ';
+                data_html += data[for_a][6] + ' | ';
+                data_html += data[for_a][2];
 
                 data_html += '</div>';
                 data_html += '<div style="clear: both;"></div>';

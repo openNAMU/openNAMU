@@ -1,5 +1,4 @@
 from .tool.func import *
-from .main_func_error_404 import main_func_error_404
 
 def main_view_image(name = ''):
     with get_db_connect() as conn:
@@ -13,6 +12,6 @@ def main_view_image(name = ''):
 
                 return flask.send_from_directory('./' + load_image_url(conn), name, mimetype = 'image/' + mime_type)
             else:
-                return main_func_error_404()
+                return ''
         else:
             return re_error(conn, '/ban')
