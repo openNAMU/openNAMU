@@ -39,7 +39,7 @@ func Api_list_recent_discuss(call_arg []string) {
 	} else if set_type == "close" {
 		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop = 'O' order by date desc limit ?"))
 	} else {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop != 'O' order by date asc limit ?"))
+		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop != 'O' order by date desc limit ?"))
 	}
 
 	if err != nil {
@@ -68,15 +68,16 @@ func Api_list_recent_discuss(call_arg []string) {
 			log.Fatal(err)
 		}
 
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select ip from topic where code = ? order by id + 0 desc limit 1"))
+		stmt, err := db.Prepare(tool.DB_change(db_set, "select ip, id from topic where code = ? order by id + 0 desc limit 1"))
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer stmt.Close()
 
 		var ip string
+		var id string
 
-		err = stmt.QueryRow(code).Scan(&ip)
+		err = stmt.QueryRow(code).Scan(&ip, &id)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				ip = ""
@@ -106,6 +107,7 @@ func Api_list_recent_discuss(call_arg []string) {
 			stop,
 			ip_pre,
 			ip_render,
+			id,
 		})
 	}
 

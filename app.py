@@ -461,7 +461,6 @@ app.route('/auth/give/fix/<user_name>', methods = ['POST', 'GET'])(give_user_fix
 app.route('/app_submit', methods = ['POST', 'GET'])(recent_app_submit_2)
 
 # /auth/history
-# ongoing 반영 필요
 app.route('/block_log')(recent_block)
 app.route('/block_log/<int:num>')(recent_block)
 app.route('/block_log/user/<name>', defaults = { 'tool' : 'user' })(recent_block)
@@ -476,7 +475,7 @@ app.route('/block_log/ongoing/<int:num>', defaults = { 'tool' : 'ongoing' })(rec
 # Func-history
 app.route('/recent_change')(list_recent_change)
 app.route('/recent_changes')(list_recent_change)
-app.route('/recent_change/<int:num>/<set_type>', defaults = { 'tool' : 'recent' })(recent_change)
+app.route('/recent_change/<int:num>/<set_type>')(list_recent_change)
 
 app.route('/recent_edit_request', defaults = { 'db_set' : db_set_str })(recent_edit_request)
 
@@ -643,7 +642,7 @@ app.route('/vote/list/close/<int:num>', defaults = { 'list_type' : 'close' })(vo
 app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 
 # Func-bbs
-app.route('/bbs/main', defaults = { 'tool' : 'main' })(bbs_w)
+app.route('/bbs/main')(bbs_main)
 app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
 # app.route('/bbs/main/set')
 app.route('/bbs/w/<int:bbs_num>')(bbs_w)
@@ -679,6 +678,7 @@ app.route('/api/xref_this/<int:num>/<everything:name>', defaults = { 'xref_type'
 
 app.route('/api/random', defaults = { 'db_set' : db_set_str })(api_w_random)
 
+app.route('/api/bbs', defaults = { 'db_set' : db_set_str })(api_bbs_list)
 app.route('/api/bbs/main', defaults = { 'db_set' : db_set_str })(api_bbs)
 app.route('/api/bbs/w/<int:bbs_num>', defaults = { 'db_set' : db_set_str })(api_bbs)
 app.route('/api/bbs/w/<int:bbs_num>/<int:page>', defaults = { 'db_set' : db_set_str })(api_bbs)
@@ -693,6 +693,9 @@ app.route('/api/skin_info/<name>')(api_skin_info)
 app.route('/api/user_info/<user_name>')(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
+app.route('/api/auth_list', defaults = { 'db_set' : db_set_str })(api_func_auth_list)
+app.route('/api/auth_list/<user_name>', defaults = { 'db_set' : db_set_str })(api_func_auth_list)
+
 app.route('/api/thread/<int:topic_num>/<int:s_num>/<int:e_num>', defaults = { 'db_set' : db_set_str })(api_topic)
 app.route('/api/thread/<int:topic_num>/<tool>', defaults = { 'db_set' : db_set_str })(api_topic)
 app.route('/api/thread/<int:topic_num>', defaults = { 'db_set' : db_set_str })(api_topic)
@@ -706,8 +709,6 @@ app.route('/api/recent_change', defaults = { 'db_set' : db_set_str })(api_list_r
 app.route('/api/recent_changes', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
 app.route('/api/recent_change/<int:limit>', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
 app.route('/api/recent_change/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
-
-app.route('/api/history_tool/<int(signed = True):rev>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_list_history_tool)
 
 app.route('/api/recent_edit_request', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
 app.route('/api/recent_edit_request/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
@@ -764,7 +765,7 @@ app.route('/view/<path:name>')(main_view)
 app.route('/views/<path:name>')(main_view)
 app.route('/image/<path:name>')(main_view_image)
 # 조정 계획 중
-app.route('/<regex("[^.]+\\.(?:txt|xml)"):data>')(main_view_file)
+app.route('/<regex("[^.]+\\.(?:txt|xml|ico)"):data>')(main_view_file)
 
 app.route('/shutdown', methods = ['POST', 'GET'])(main_sys_shutdown)
 app.route('/restart', methods = ['POST', 'GET'])(main_sys_restart)

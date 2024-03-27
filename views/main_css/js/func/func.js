@@ -1,5 +1,39 @@
 "use strict";
 
+function opennamu_xss_filter(str) {
+    return str.replace(/[&<>"']/g, function(match) {
+        switch(match) {
+            case '&':
+                return '&amp;';
+            case '<':
+                return '&lt;';
+            case '>':
+                return '&gt;';
+            case "'":
+                return '&#x27;';
+            case '"':
+                return '&quot;';
+        }
+    });
+}
+
+function opennamu_xss_filter_decode(str) {
+    return str.replace(/&amp;|&lt;|&gt;|&#x27;|&quot;/g, function(match) {
+        switch(match) {
+            case '&amp;':
+                return '&';
+            case '&lt;':
+                return '<';
+            case '&gt;':
+                return '>';
+            case '&#x27;':
+                return "'";
+            case '&quot;':
+                return '"';
+        }
+    });
+}
+
 function opennamu_do_id_check(data) {
     if(data.match(/\.|\:/)) {
         return 0;
@@ -51,6 +85,26 @@ function opennamu_get_main_skin_set(set_name) {
     });
 }
 
+function opennamu_send_render(data) {
+    if(data == '&lt;br&gt;' || data == '' || data.match(/^ +$/)) {
+        data = '<br>';
+    } else {
+        data = data.replace(/( |^)(https?:\/\/(?:[^ ]+))/g, function(m0, m1, m2) {
+            let link_main = m2;
+            link_main = link_main.replace('"', '&quot;');
+
+            return m1 + '<a href="' + link_main + '">' + link_main + '</a>';
+        });
+        data = data.replace(/&lt;a(?:(?:(?!&gt;).)*)&gt;((?:(?!&lt;\/a&gt;).)+)&lt;\/a&gt;/g, function(m0, m1) {
+            let data_unescape = opennamu_xss_filter_decode(m1)
+
+            return '<a href="/w/' + opennamu_do_url_encode(data_unescape) + '">' + m1 + '</a>'
+        })
+    }
+
+    return data;
+}
+
 function opennamu_insert_v(name, data) {
     document.getElementById(name).value = data;
 }
@@ -96,7 +150,7 @@ function opennamu_do_render(to_obj, data, name = '', do_type = '', option = '') 
 function opennamu_page_control(url, page, data_length, data_length_max = 50) {
     let next = function() {
         if(data_length_max === data_length) {
-            return '<a href="' + url.replace('{}', String(page + 1)) + '">(-)</a>';
+            return '<a href="' + url.replace('{}', String(page + 1)) + '">(+)</a>';
         } else {
             return '';
         }
@@ -111,23 +165,4 @@ function opennamu_page_control(url, page, data_length, data_length_max = 50) {
     };
 
     return (next() + ' ' + back()).replace(/^ /, '');
-}
-
-function opennamu_xss_filter(str) {
-    return str.replace(/[&<>"'\/]/g, function(match) {
-        switch(match) {
-            case '&':
-                return '&amp;';
-            case '<':
-                return '&lt;';
-            case '>':
-                return '&gt;';
-            case "'":
-                return '&#x27;';
-            case '"':
-                return '&quot;';
-            case '/':
-                return '&#x2F;';
-        }
-    });
 }
