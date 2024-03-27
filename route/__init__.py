@@ -170,6 +170,8 @@ from route.n_list_recent_discuss import list_recent_discuss
 
 from route.n_w_watch_list import w_watch_list
 
+from route.n_bbs_main import bbs_main
+
 from route.go_api_func_llm import api_func_llm
 from route.go_api_func_language import api_func_language
 from route.go_api_func_sha224 import api_func_sha224

@@ -51,6 +51,7 @@ func Api_bbs(call_arg []string) {
 	defer rows.Close()
 
 	var data_list []map[string]string
+	ip_parser_temp := map[string][]string{}
 
 	for rows.Next() {
 		temp_data := make(map[string]string)
@@ -87,7 +88,27 @@ func Api_bbs(call_arg []string) {
 				log.Fatal(err)
 			}
 
-			temp_data[set_name] = set_data
+			if set_name == "user_id" {
+				var ip_pre string
+				var ip_render string
+
+				if _, ok := ip_parser_temp[set_data]; ok {
+					ip_pre = ip_parser_temp[set_data][0]
+					ip_render = ip_parser_temp[set_data][1]
+				} else {
+					ip_pre = tool.IP_preprocess(db, db_set, set_data, other_set["ip"])[0]
+					ip_render = tool.IP_parser(db, db_set, set_data, other_set["ip"])
+
+					ip_parser_temp[set_data] = []string{ip_pre, ip_render}
+				}
+
+				set_data = ip_pre
+				temp_data["user_id_render"] = ip_render
+			}
+
+			if set_name != "data" {
+				temp_data[set_name] = set_data
+			}
 		}
 
 		data_list = append(data_list, temp_data)
