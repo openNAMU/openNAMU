@@ -765,7 +765,7 @@ app.route('/view/<path:name>')(main_view)
 app.route('/views/<path:name>')(main_view)
 app.route('/image/<path:name>')(main_view_image)
 # 조정 계획 중
-app.route('/<regex("[^.]+\\.(?:txt|xml)"):data>')(main_view_file)
+app.route('/<regex("[^.]+\\.(?:txt|xml|ico)"):data>')(main_view_file)
 
 app.route('/shutdown', methods = ['POST', 'GET'])(main_sys_shutdown)
 app.route('/restart', methods = ['POST', 'GET'])(main_sys_restart)

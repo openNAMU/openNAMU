@@ -9,8 +9,8 @@ function opennamu_bbs_main() {
         }).then(function(data) {
             let data_html = '<ul class="opennamu_ul">';
 
-            for(let for_a = 0; for_a < bbs_list.length; for_a++) {
-                data_html += '<li><a href="/bbs/w/' + bbs_list[for_a][1] + '">' + bbs_list[for_a][0] + '</a></li>';
+            for(let key in bbs_list) {
+                data_html += '<li><a href="/bbs/w/' + bbs_list[key] + '">' + opennamu_xss_filter(key) + '</a></li>';
             }
     
             data_html += '</ul>';
