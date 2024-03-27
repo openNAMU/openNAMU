@@ -60,6 +60,7 @@ func Api_list_recent_change(call_arg []string) {
 	defer rows.Close()
 
 	var data_list [][]string
+
 	admin_auth := tool.Get_user_auth(db, db_set, other_set["ip"])
 	ip_parser_temp := map[string][]string{}
 
