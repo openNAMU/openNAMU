@@ -11,7 +11,6 @@ def recent_history_reset(name = 'Test'):
             admin_check(conn, None, 'history reset ' + name)
 
             curs.execute(db_change("delete from history where title = ?"), [name])
-            conn.commit()
 
             return redirect(conn, '/history/' + url_pas(name))
         else:

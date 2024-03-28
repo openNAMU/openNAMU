@@ -20,8 +20,6 @@ def recent_history_send(name = 'Test', rev = 1):
                     num
                 ])
 
-            conn.commit()
-
             return redirect(conn, '/history/' + url_pas(name))
         else:
             curs.execute(db_change("select send from history where title = ? and id = ?"), [name, num])

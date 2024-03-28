@@ -206,8 +206,6 @@ def edit_move(name):
                 curs.execute(db_change("update acl set title = ? where title = ?"), [move_title, name])
 
             # data_set 이동 파트 E
-                
-            conn.commit()
 
             if has_error == 0:
                 return redirect(conn, '/w/' + url_pas(move_title))

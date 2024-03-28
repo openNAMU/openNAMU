@@ -140,8 +140,6 @@ def user_setting_skin_set_main():
                 else:
                     flask.session[for_b] = flask.request.form.get(for_b, set_list[for_b][0][0])
 
-            conn.commit()
-
             return html_data
         else:
             set_data = {}

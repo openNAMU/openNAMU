@@ -13,7 +13,6 @@ def recent_history_delete(name = 'Test', rev = 1):
             admin_check(conn, None, 'history delete ' + name + ' r' + num)
 
             curs.execute(db_change("delete from history where id = ? and title = ?"), [num, name])
-            conn.commit()
 
             return redirect(conn, '/history/' + url_pas(name))
         else:

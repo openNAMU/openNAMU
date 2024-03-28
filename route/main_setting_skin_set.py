@@ -18,8 +18,6 @@ def main_setting_skin_set():
                     curs.execute(db_change("update other set data = ? where name = ?"), [flask.request.form.get(for_b, set_list[for_b][0][0]), for_b])
                 else:
                     curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [for_b, flask.request.form.get(for_b, set_list[for_b][0][0])])
-            
-            conn.commit()
 
             admin_check(conn, None, 'edit_set (skin_set)')
 

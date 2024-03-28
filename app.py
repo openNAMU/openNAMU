@@ -199,8 +199,6 @@ with get_db_connect() as conn:
 
         server_set[i] = server_set_val
 
-        conn.commit()
-
 def back_up(data_db_set):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -325,8 +323,6 @@ def do_every_day():
             main_setting_sitemap(1)
 
             print('Make sitemap')
-
-        conn.commit()
 
         threading.Timer(60 * 60 * 24, do_every_day).start()
 

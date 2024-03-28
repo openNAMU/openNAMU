@@ -20,8 +20,6 @@ def main_setting_main_logo():
                     i[1]
                 ])
 
-            conn.commit()
-
             admin_check(conn, None, 'edit_set (logo)')
 
             return redirect(conn, '/setting/main/logo')
@@ -36,8 +34,6 @@ def main_setting_main_logo():
                     curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, ?)'), [i[0], '', i[1]])
 
                     d_list += ['']
-
-            conn.commit()
 
             end_data = ''
             for i in range(0, len(skin_list)):

@@ -29,7 +29,6 @@ def main_setting_acl():
                 return re_error(conn, '/ban')
             else:
                 curs.executemany(db_change("update other set data = ? where name = ?"), [[flask.request.form.get(i_list[for_a], 'normal'), i_list[for_a]] for for_a in i_list])
-                conn.commit()
 
                 return redirect(conn, '/setting/acl')
         else:
@@ -46,8 +45,6 @@ def main_setting_acl():
                     default_data = 'normal' if not for_a in default_list else default_list[for_a]
                     curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [i_list[for_a], default_data])
                     d_list[for_a] = default_data
-
-            conn.commit()
 
             acl_list = get_acl_list()
             for for_a in range(0, len(i_list)):

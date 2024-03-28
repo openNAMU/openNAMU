@@ -157,7 +157,6 @@ class get_db_connect:
                 check_same_thread = False,
                 isolation_level = None
             )
-            self.conn.execute('pragma journal_mode = wal')
         else:
             self.conn = pymysql.connect(
                 host = self.db_set['mysql_host'],
@@ -607,7 +606,8 @@ def update(conn, ver_num, set_data):
             if get_data and (int(get_data[0][0]) + 1) == int(for_a[1]):
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_doing', '1')"), [for_a[0], for_a[1]])
 
-    conn.commit()
+    if ver_num < 3500377:
+        conn.execute('pragma journal_mode = delete')
 
     print('Update completed')
 

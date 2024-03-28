@@ -13,8 +13,6 @@ def give_delete_admin_group_2(name = 'test'):
             curs.execute(db_change("delete from alist where name = ?"), [name])
             curs.execute(db_change("update user_set set data = 'user' where name = 'acl' and data = ?"), [name])
 
-            conn.commit()
-
             return redirect(conn, '/auth/list')
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),

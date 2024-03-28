@@ -25,7 +25,6 @@ def vote_close(num = 1):
 
         curs.execute(db_change("update vote set type = ? where user = '' and id = ? and type = ?"), [type_set, num, data_list[0][0]])
         curs.execute(db_change('delete from vote where name = "end_date" and type = "option" and id = ?'), [num])
-        conn.commit()
 
         if data_list[0][0] == 'close' or data_list[0][0] == 'n_close':
             return redirect(conn, '/vote')

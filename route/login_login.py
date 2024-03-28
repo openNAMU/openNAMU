@@ -56,7 +56,6 @@ def login_login_2():
                 flask.session['id'] = user_id
 
                 ua_plus(conn, user_id, ip, user_agent, get_time())
-                conn.commit()
 
                 return redirect(conn, '/user')
         else:

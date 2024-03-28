@@ -49,8 +49,6 @@ def user_setting_pw():
                 return re_error(conn, '/error/10')
 
             curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [pw_encode(conn, user_pw), ip])
-            
-            conn.commit()
 
             return redirect(conn, '/user')
         else:
