@@ -606,7 +606,7 @@ def update(conn, ver_num, set_data):
             if get_data and (int(get_data[0][0]) + 1) == int(for_a[1]):
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_doing', '1')"), [for_a[0], for_a[1]])
 
-    if ver_num < 3500377:
+    if ver_num < 3500377 and set_data['db_type'] == 'sqlite':
         conn.execute('pragma journal_mode = delete')
 
     print('Update completed')
