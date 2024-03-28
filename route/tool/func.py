@@ -379,8 +379,7 @@ def update(conn, ver_num, set_data):
                 curs.execute(db_change("update other set data = '' where name = 'recaptcha'"))
                 curs.execute(db_change("update other set data = '' where name = 'sec_re'"))
     
-    if  ver_num < 3172800 and \
-        set_data['db_type'] == 'mysql':
+    if ver_num < 3172800 and set_data['db_type'] == 'mysql':
         get_data_mysql = json.loads(open('data/mysql.json', encoding = 'utf8').read())
         
         with open('data/mysql.json', 'w') as f:

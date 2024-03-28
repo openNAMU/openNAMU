@@ -118,7 +118,7 @@ with get_db_connect() as conn:
             pass
 
         if setup_tool == 'update':
-            update(conn, int(ver_set_data[0][0]), set_data)
+            update(conn, int(ver_set_data[0][0]), data_db_set)
         else:
             set_init(conn)
 
