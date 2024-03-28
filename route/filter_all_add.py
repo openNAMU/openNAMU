@@ -25,8 +25,11 @@ def filter_all_add(tool, name = None):
                 
                 admin_check(conn, None, tool + ' edit')
             elif tool == 'edit_filter':
-                sec = flask.request.form.get('second', '0')
-                end = 'X' if sec == '0' else sec
+                day = flask.request.form.get('day', '0')
+                end = 'X' if day == '0' else day
+                if end != 'X':
+                    end = re.sub(r'[^0-9]', '', end)
+                    end = str(int(number_check(end)) * 24 * 60 * 60)
 
                 content = flask.request.form.get('content', 'test')
                 try:
@@ -150,27 +153,17 @@ def filter_all_add(tool, name = None):
                 if exist:
                     textarea = exist[0][0]
                     time_data = '' if exist[0][1] == 'X' else exist[0][1]
+                    if time_data != '':
+                        time_data = re.sub(r'[^0-9]', '', time_data)
+                        time_data = str(int(int(number_check(time_data)) / (24 * 60 * 60)))
                 else:
                     textarea = ''
                     time_data = ''
 
-                insert_data = ''
-                if stat == '':
-                    t_data = [
-                        ['86400', get_lang(conn, '1_day')],
-                        ['432000', get_lang(conn, '5_day')],
-                        ['2592000', get_lang(conn, '30_day')],
-                        ['15552000', get_lang(conn, '180_day')],
-                        ['31104000', get_lang(conn, '360_day')],
-                        ['0', get_lang(conn, 'limitless')]
-                    ]
-                    insert_data += ''.join(['<a href="javascript:opennamu_insert_v(\'second\', \'' + for_a[0] + '\')">(' + for_a[1] + ')</a> ' for for_a in t_data])
-
                 title = get_lang(conn, 'edit_filter_add')
                 form_data = '''
-                    ''' + insert_data + '''
                     <hr class="main_hr">
-                    <input placeholder="''' + get_lang(conn, 'second') + '''" id="second" name="second" type="text" value="''' + html.escape(time_data) + '''">
+                    <input placeholder="''' + get_lang(conn, 'day') + '''" name="day" type="text" value="''' + html.escape(time_data) + '''">
                     <hr class="main_hr">
                     <input placeholder="''' + get_lang(conn, 'regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
                 '''
