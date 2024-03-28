@@ -17,8 +17,6 @@ def give_admin_groups_2(name = 'test'):
                 if flask.request.form.get(i, 0) != 0:
                     curs.execute(db_change("insert into alist (name, acl) values (?, ?)"), [name, i])
 
-            conn.commit()
-
             return redirect(conn, '/auth/list/add/' + url_pas(name))
         else:
             data = ''

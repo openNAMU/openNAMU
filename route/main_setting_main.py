@@ -55,8 +55,6 @@ def main_setting_main(db_set):
                     setting_list[i][0]
                 ])
 
-            conn.commit()
-
             admin_check(conn, None, 'edit_set (main)')
 
             return redirect(conn, '/setting/main')
@@ -69,8 +67,6 @@ def main_setting_main(db_set):
                     curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [setting_list[i][0], setting_list[i][1]])
 
                 d_list[i] = db_data[0][0] if db_data else setting_list[i][1]
-            else:
-                conn.commit()
 
             init_set_list = get_init_set_list()
                 

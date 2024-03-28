@@ -235,8 +235,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 for scan_user in curs.fetchall():
                     add_alarm(conn, scan_user[0], ip, '<a href="/edit_request/' + url_pas(name) + '">' + html.escape(name) + '</a> edit_request')
             
-            conn.commit()
-            
             section = (('#edit_load_' + str(section)) if section != '' else '')
             
             return redirect(conn, '/w/' + url_pas(name) + section)

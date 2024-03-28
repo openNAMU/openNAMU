@@ -23,6 +23,4 @@ def topic_comment_blind(topic_num = 1, num = 1):
                 get_time()
             )
 
-            conn.commit()
-
         return redirect(conn, '/thread/' + topic_num + '#' + num)

@@ -12,7 +12,6 @@ def topic_tool_delete(topic_num = 1):
         if flask.request.method == 'POST':
             curs.execute(db_change("delete from topic where code = ?"), [topic_num])
             curs.execute(db_change("delete from rd where code = ?"), [topic_num])
-            conn.commit()
 
             return redirect(conn, '/')
         else:

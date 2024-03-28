@@ -91,7 +91,5 @@ class class_do_render:
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', 'redirect')"), [doc_name])
             else:
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', '')"), [doc_name])
-            
-            self.conn.commit()
 
         return [data_end[0], data_end[1], data_end[2]]

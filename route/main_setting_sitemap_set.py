@@ -22,8 +22,6 @@ def main_setting_sitemap_set():
                     setting_list[i][0]
                 ])
 
-            conn.commit()
-
             admin_check(conn, None, 'edit_set (sitemap)')
 
             return redirect(conn, '/setting/sitemap_set')
@@ -39,8 +37,6 @@ def main_setting_sitemap_set():
                     ])
 
                 d_list[i] = db_data[0][0] if db_data else setting_list[i][1]
-            else:
-                conn.commit()
 
             check_box_div = [0, 1, 2, 3, 4, '']
             for i in range(0, len(check_box_div)):

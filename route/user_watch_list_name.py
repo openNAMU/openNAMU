@@ -33,8 +33,6 @@ def user_watch_list_name(tool, name = 'Test'):
 
             curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [ip, type_data, name])
 
-        conn.commit()
-
         if name_from == 1:
             return redirect(conn, '/w/' + url_pas(name))
         else:

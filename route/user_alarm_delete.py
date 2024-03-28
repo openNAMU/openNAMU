@@ -8,7 +8,5 @@ def user_alarm_delete(id = ''):
             curs.execute(db_change("delete from user_notice where name = ? and id = ?"), [ip_check(), str(id)])
         else:
             curs.execute(db_change("delete from user_notice where name = ?"), [ip_check()])
-        
-        conn.commit()
 
         return redirect(conn, '/alarm')

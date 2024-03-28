@@ -69,8 +69,6 @@ def edit_revert(name, num):
                 data_type = 'backlink'
             )
 
-            conn.commit()
-
             return redirect(conn, '/w/' + url_pas(name))
         else:
             if data:

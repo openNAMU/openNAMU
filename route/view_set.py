@@ -109,8 +109,6 @@ def view_set(name = 'Test'):
                 mode = 'setting'
             )
 
-            conn.commit()
-
             return redirect(conn, '/acl/' + url_pas(name))
         else:
             data = '<h2>' + get_lang(conn, 'acl') + '</h2>'

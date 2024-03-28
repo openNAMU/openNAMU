@@ -27,8 +27,6 @@ def recent_history_add(name = 'Test', do_type = ''):
                 mode = 'add'
             )
 
-            conn.commit()
-
             return redirect(conn, '/history/' + url_pas(name))
         else:            
             return easy_minify(conn, flask.render_template(skin_check(conn),
