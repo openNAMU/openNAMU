@@ -150,7 +150,8 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                         opennamu_get_thread("''' + topic_num + '''");
                     </script>
 
-                    <a href="javascript:opennamu_thread_blind();">(''' + get_lang(conn, 'hide') + ''' | ''' + get_lang(conn, 'hide_release') + ''')</a>
+                    <a href="javascript:opennamu_thread_blind();">(''' + get_lang(conn, 'hide') + ''' | ''' + get_lang(conn, 'hide_release') + ''')</a> 
+                    <a href="javascript:opennamu_thread_delete();">(''' + get_lang(conn, 'delete') + ''')</a>
                     <a href="/thread/''' + topic_num + '/tool">(' + get_lang(conn, 'topic_tool') + ''')</a>
                     <hr class="main_hr">
                     

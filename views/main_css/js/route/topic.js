@@ -15,6 +15,45 @@ function opennamu_do_remove_blind_thread() {
     }
 }
 
+function opennamu_thread_delete() {
+    let lang_data = new FormData();
+    lang_data.append('data', 'delete');
+
+    fetch('/api/lang', {
+        method : 'post',
+        body : lang_data,
+    }).then(function(res) {
+        return res.json();
+    }).then(function(lang) {
+        lang = lang["data"];
+
+        let check_list = [];
+        let check_list_str = '';
+        for(let for_a = 0; for_a < document.getElementsByClassName("opennamu_blind_button").length; for_a++) {
+            let id = document.getElementsByClassName("opennamu_blind_button")[for_a].id;
+            id = id.replace(/^opennamu_blind_/, '');
+            id = id.split('_');
+    
+            let checked = document.getElementsByClassName("opennamu_blind_button")[for_a].checked;
+            if(checked) {
+                check_list.push([id[0], id[1]]);
+                check_list_str += '#' + id[1] + ' ';
+            }
+        }
+
+        let check = confirm(check_list_str + lang[0]);
+        if(check === true) {
+            for(let for_a = 0; for_a < check_list.length; for_a++) {
+                fetch("/thread/" + check_list[for_a][0] + '/comment/' + check_list[for_a][1] + '/delete', { method : 'POST' });
+            }
+
+            if(check_list.length > 0) {
+                history.go(0);
+            }
+        }
+    });
+}
+
 function opennamu_thread_blind() {
     let do_true = 0;
     for(let for_a = 0; for_a < document.getElementsByClassName("opennamu_blind_button").length; for_a++) {
