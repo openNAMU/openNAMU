@@ -18,8 +18,6 @@ def user_setting_head(skin_name = ''):
                     curs.execute(db_change("update user_set set data = ? where id = ? and name = ?"), [get_data, ip, 'custom_css' + skin_name])
                 else:
                     curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [ip, 'custom_css' + skin_name, get_data])
-
-                conn.commit()
         
             flask.session['head' + skin_name] = get_data
 

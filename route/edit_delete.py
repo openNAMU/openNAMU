@@ -53,8 +53,6 @@ def edit_delete(name):
                 curs.execute(db_change("delete from back where link = ?"), [name])
                 curs.execute(db_change("delete from data where title = ?"), [name])
 
-                conn.commit()
-
             return redirect(conn, '/w/' + url_pas(name))
         else:            
             return easy_minify(conn, flask.render_template(skin_check(conn),

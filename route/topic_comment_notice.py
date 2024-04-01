@@ -24,7 +24,5 @@ def topic_comment_notice(topic_num = 1, num = 1):
                 topic_num, 
                 get_time()
             )
-            
-            conn.commit()
 
         return redirect(conn, '/thread/' + topic_num + '#' + num)

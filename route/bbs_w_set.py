@@ -26,8 +26,6 @@ def bbs_w_set(bbs_num = ''):
                         bbs_num
                     ])
 
-                conn.commit()
-
                 return redirect(conn, '/bbs/set/' + bbs_num_str)
         else:
             d_list = ['' for _ in range(0, len(i_list))]
@@ -47,8 +45,6 @@ def bbs_w_set(bbs_num = ''):
                 else:
                     curs.execute(db_change('insert into bbs_set (set_name, set_code, set_id, set_data) values (?, "", ?, ?)'), [i_list[for_a], bbs_num, 'normal'])
                     d_list[for_a] = 'normal'
-
-            conn.commit()
 
             acl_div = ['' for _ in range(0, len(i_list))]
             acl_list = get_acl_list()

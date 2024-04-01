@@ -35,7 +35,6 @@ def user_alarm():
                 ''
 
         curs.execute(db_change("update user_notice set readme = '1' where name = ?"), [ip])
-        conn.commit()
     
         data += '' + \
             '</ul>' + \

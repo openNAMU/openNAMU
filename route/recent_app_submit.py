@@ -109,9 +109,7 @@ def recent_app_submit_2():
                 curs.execute(db_change("insert into user_set (name, id, data) values ('approval_question_answer', ?, ?)"), [application['id'], application['answer']])
 
                 curs.execute(db_change('delete from user_set where id = ? and name = "application"'), [application['id']])
-                conn.commit()
             elif flask.request.form.get('decline', '') != '':
                 curs.execute(db_change('delete from user_set where id = ? and name = "application"'), [flask.request.form.get('decline', '')])
-                conn.commit()
 
             return redirect(conn, '/app_submit')

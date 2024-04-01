@@ -3,8 +3,12 @@ html, body {
     color: white;
 }
 
+a {
+    color: #A7C8FF;
+}
+
 a:hover {
-    color: cornflowerblue;
+    color: #A7C8FF;
 }
 
 textarea, input, button, select {

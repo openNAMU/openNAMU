@@ -118,7 +118,7 @@ with get_db_connect() as conn:
             pass
 
         if setup_tool == 'update':
-            update(conn, int(ver_set_data[0][0]), set_data)
+            update(conn, int(ver_set_data[0][0]), data_db_set)
         else:
             set_init(conn)
 
@@ -198,8 +198,6 @@ with get_db_connect() as conn:
         print(server_set_var[i]['display'] + ' : ' + server_set_val)
 
         server_set[i] = server_set_val
-
-        conn.commit()
 
 def back_up(data_db_set):
     with get_db_connect() as conn:
@@ -325,8 +323,6 @@ def do_every_day():
             main_setting_sitemap(1)
 
             print('Make sitemap')
-
-        conn.commit()
 
         threading.Timer(60 * 60 * 24, do_every_day).start()
 

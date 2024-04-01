@@ -49,7 +49,6 @@ def vote_select(num = 1):
                 str(vaild_check),
                 ip_check()
             ])
-            conn.commit()
 
             return redirect(conn, '/vote/end/' + num)
         else:

@@ -26,8 +26,6 @@ def main_setting_external():
 
                 curs.execute(db_change("update other set data = ? where name = ?"), [into_data, data])
 
-            conn.commit()
-
             admin_check(conn, None, 'edit_set (external)')
 
             return redirect(conn, '/setting/external')
@@ -46,8 +44,6 @@ def main_setting_external():
                     d_list += ['']
 
                 x += 1
-
-            conn.commit()
 
             security_radios = ''
             for i in ['tls', 'starttls', 'plain']:

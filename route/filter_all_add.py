@@ -95,8 +95,6 @@ def filter_all_add(tool, name = None):
 
                 curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [title, type_d, plus_d, ''])
 
-            conn.commit()
-
             return redirect(conn, '/filter/' + tool)
         else:
             get_sub = 0

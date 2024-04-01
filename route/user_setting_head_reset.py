@@ -22,8 +22,6 @@ def user_setting_head_reset():
                 else:
                     curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [ip, 'custom_css_' + skin_name, get_data])
 
-                conn.commit()
-
             flask.session['head'] = ''
             flask.session['head_' + skin_name] = ''
 

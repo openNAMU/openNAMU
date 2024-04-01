@@ -41,8 +41,6 @@ def user_setting():
                     else:
                         curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), [auto_data[0], ip, auto_data[1]])
 
-                conn.commit()
-
                 return redirect(conn, '/change')
             else:
                 curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
