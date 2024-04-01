@@ -45,8 +45,6 @@ def give_user_fix(user_name = ''):
                 if curs.fetchall():
                     curs.execute(db_change("update user_set set data = '' where name = '2fa' and id = ?"), [user_name])
 
-            conn.commit()
-
             return redirect(conn, '/user/' + url_pas(user_name))
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),

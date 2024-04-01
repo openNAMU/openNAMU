@@ -49,7 +49,6 @@ def login_register_submit_2():
                 flask.session.pop(for_a, None)
 
             curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [user_app_data['id'], 'application', json.dumps(user_app_data)])
-            conn.commit()
 
             for for_a in get_admin_list(conn):
                 add_alarm(conn, for_a, user_app_data['id'], '<a href="/app_submit">' + get_lang(conn, 'new_application') + '</a>')

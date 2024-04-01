@@ -111,8 +111,6 @@ def edit_upload():
                 if file_num:
                     file_num += 1
 
-                conn.commit()
-
             return redirect(conn, '/w/file:' + name)
         else:
             license_list = '<option value="direct_input">' + get_lang(conn, 'direct_input') + '</option>'

@@ -46,7 +46,6 @@ def login_login_2fa_2():
                 user_agent, 
                 get_time()
             )
-            conn.commit()
 
             flask.session.pop('b_id', None)
 

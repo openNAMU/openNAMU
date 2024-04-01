@@ -46,8 +46,6 @@ def give_auth(name):
 
             add_alarm(conn, name, ip, 'Auth change to ' + select_data + (' (' + time_limit + ')' if time_limit != '' else ''))
 
-            conn.commit()
-
             return redirect(conn, '/auth/give/' + url_pas(name))
         else:
             if admin_auth != 1:

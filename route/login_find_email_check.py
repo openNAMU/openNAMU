@@ -29,8 +29,6 @@ def login_find_email_check(tool):
                 curs.execute(db_change('select data from other where name = "reset_user_text"'))
                 sql_d = curs.fetchall()
                 b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
-
-                conn.commit()
         
                 return easy_minify(conn, flask.render_template(skin_check(conn),
                     imp = [get_lang(conn, 'reset_user_ok'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
@@ -82,7 +80,6 @@ def login_find_email_check(tool):
                         user_app_data['email'] = flask.session['c_email']
                         
                         curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [flask.session['c_id'], 'application', json.dumps(user_app_data)])
-                        conn.commit()
         
                         for i in re_set_list:
                             flask.session.pop(i, None)
@@ -104,8 +101,6 @@ def login_find_email_check(tool):
         
                     flask.session['id'] = flask.session['c_id']
                     flask.session['head'] = ''
-        
-                    conn.commit()
                 else:
                     curs.execute(db_change('delete from user_set where name = "email" and id = ?'), [ip])
                     curs.execute(db_change('insert into user_set (name, id, data) values ("email", ?, ?)'), [ip, flask.session['c_email']])

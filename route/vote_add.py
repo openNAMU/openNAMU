@@ -40,8 +40,6 @@ def vote_add():
                         id_data,
                         time_limit
                     ])
-                    
-            conn.commit()
 
             return redirect(conn, '/vote')
         else:

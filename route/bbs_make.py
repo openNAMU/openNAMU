@@ -19,8 +19,6 @@ def bbs_make():
             curs.execute(db_change("insert into bbs_set (set_name, set_code, set_id, set_data) values ('bbs_name', '', ?, ?)"), [bbs_num, bbs_name])
             curs.execute(db_change("insert into bbs_set (set_name, set_code, set_id, set_data) values ('bbs_type', '', ?, ?)"), [bbs_num, bbs_type])
 
-            conn.commit()
-
             return redirect(conn, '/bbs/main')
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),

@@ -9,7 +9,6 @@ def main_func_easter_egg():
             curs.execute(db_change('select name from user_set where id = ? and name = ?'), [ip, 'get_🥚'])
             if not curs.fetchall():
                 curs.execute(db_change('insert into user_set (name, id, data) values ("get_🥚", ?, "Y")'), [ip])
-                conn.commit()
     
         if platform.system() == 'Linux':
             if platform.machine() in ["AMD64", "x86_64"]:

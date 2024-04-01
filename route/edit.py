@@ -111,7 +111,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
         edit_req_mode = 0
         if acl_check(conn, name, 'document_edit') == 1:
             edit_req_mode = 1
-            if acl_check(name, 'document_edit_request') == 1:
+            if acl_check(conn, name, 'document_edit_request') == 1:
                 return redirect('/raw_acl/' + url_pas(name))
             
         if do_title_length_check(conn, name) == 1:
@@ -234,8 +234,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
                 for scan_user in curs.fetchall():
                     add_alarm(conn, scan_user[0], ip, '<a href="/edit_request/' + url_pas(name) + '">' + html.escape(name) + '</a> edit_request')
-            
-            conn.commit()
             
             section = (('#edit_load_' + str(section)) if section != '' else '')
             

@@ -11,7 +11,6 @@ def recent_record_reset(name = 'Test'):
             admin_check(conn, None, 'record reset ' + name)
 
             curs.execute(db_change("delete from history where ip = ?"), [name])
-            conn.commit()
 
             return redirect(conn, '/record/' + url_pas(name))
         else:

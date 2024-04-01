@@ -31,6 +31,4 @@ def filter_all_delete(tool, name = 'Test'):
         else:
             curs.execute(db_change("delete from html_filter where html = ? and kind = 'edit_top'"), [name])
 
-        conn.commit()
-
         return redirect(conn, '/filter/' + tool)

@@ -113,8 +113,6 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                 sub
             )
 
-            conn.commit()
-
             return redirect(conn, '/thread/' + topic_num + '#' + num)
         else:
             acl_display = 'display: none;' if topic_acl == 1 else ''

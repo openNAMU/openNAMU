@@ -12,7 +12,6 @@ def topic_comment_delete(topic_num = 1, num = 1):
 
         if flask.request.method == 'POST':
             curs.execute(db_change("delete from topic where code = ? and id = ?"), [topic_num, num])
-            conn.commit()
 
             return redirect(conn, '/thread/' + topic_num)
         else:

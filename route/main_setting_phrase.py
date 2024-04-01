@@ -41,7 +41,6 @@ def main_setting_phrase():
         ]
         if flask.request.method == 'POST':
             curs.executemany(db_change("update other set data = ? where name = ?"), [[flask.request.form.get(for_a, ''), for_a] for for_a in i_list])
-            conn.commit()
 
             admin_check(conn, None, 'edit_set (phrase)')
 
@@ -56,8 +55,6 @@ def main_setting_phrase():
                 else:
                     curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [i, ''])
                     d_list += ['']
-
-            conn.commit()
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
                 imp = [get_lang(conn, 'text_setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],

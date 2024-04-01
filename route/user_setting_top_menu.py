@@ -18,8 +18,6 @@ def user_setting_top_menu():
             else:
                 curs.execute(db_change("insert into user_set (name, data, id) values ('top_menu', ?, ?)"), [flask.request.form.get('content', ''), ip])
 
-            conn.commit()
-
             return redirect(conn, '/change/top_menu')
         else:
             curs.execute(db_change("select data from user_set where name = 'top_menu' and id = ?"), [ip])

@@ -70,8 +70,6 @@ def login_register_2():
             # 전부 아니면 바로 가입 후 /login으로 발송
             add_user(conn, user_id, user_pw)
 
-            conn.commit()
-
             return redirect(conn, '/login')
         else:
             curs.execute(db_change('select data from other where name = "contract"'))

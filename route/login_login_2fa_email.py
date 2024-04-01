@@ -41,7 +41,6 @@ def login_login_2fa_email_2():
             flask.session['id'] = user_id
 
             ua_plus(conn, user_id, ip, user_agent, get_time())
-            conn.commit()
 
             flask.session.pop('b_id', None)
 
