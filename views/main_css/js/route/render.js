@@ -89,7 +89,6 @@ function opennamu_heading_folding(data, element = '') {
     }
     
     if(element !== '') {
-        console.log(element.innerHTML);
         if(element.innerHTML !== '⊖') {
             element.innerHTML = '⊖';
         } else {
