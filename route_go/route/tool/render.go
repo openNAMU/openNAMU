@@ -38,7 +38,7 @@ func Get_render(db *sql.DB, db_set map[string]string, doc_name string, data stri
 		}
 	}
 
-	if markup == "" {
+	if markup == "" || markup == "namumark_beta" {
 		markup = "namumark"
 	}
 
@@ -65,8 +65,6 @@ func Get_render_direct(db *sql.DB, db_set map[string]string, doc_name string, da
 	if render_type == "api_view" || render_type == "api_from" || render_type == "api_include" || render_type == "backlink" {
 		render_type = "view"
 	}
-
-	log.Fatal(data)
 
 	doc_data_set := map[string]string{
 		"doc_name":    doc_name,
