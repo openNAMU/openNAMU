@@ -20,8 +20,6 @@ function opennamu_w_watch_list(page = 1) {
             do_type = 'watch_list'
         }
 
-        console.log();
-
         let split_url = url.split('/');
         let doc_name = split_url.slice(3, undefined);
 

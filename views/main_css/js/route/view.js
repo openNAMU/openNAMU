@@ -43,8 +43,8 @@ function opennamu_view_w_raw_preview() {
     if(document.getElementById('opennamu_edit_textarea')) {
         data = document.getElementById('opennamu_edit_textarea').value;
     }
-    console.log(data);
 
+    console.log(name);
     opennamu_do_render('opennamu_preview_area', data, name);
 }
 
