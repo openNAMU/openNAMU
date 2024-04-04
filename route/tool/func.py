@@ -128,7 +128,7 @@ def get_init_set_list(need = 'all'):
             'display' : 'Markup',
             'require' : 'select',
             'default' : 'namumark',
-            'list' : ['namumark', 'markdown', 'custom', 'raw']
+            'list' : ['namumark', 'namumark_beta', 'markdown', 'custom', 'raw']
         }, 'encode' : {
             'display' : 'Encryption method',
             'require' : 'select',
