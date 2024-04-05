@@ -104,7 +104,6 @@ from route.recent_app_submit import recent_app_submit_2
 from route.recent_block import recent_block
 from route.recent_change import recent_change
 from route.recent_edit_request import recent_edit_request
-from route.recent_discuss import recent_discuss
 from route.recent_history_add import recent_history_add
 from route.recent_history_delete import recent_history_delete
 from route.recent_history_hidden import recent_history_hidden

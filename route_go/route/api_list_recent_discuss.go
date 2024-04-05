@@ -111,10 +111,34 @@ func Api_list_recent_discuss(call_arg []string) {
 		})
 	}
 
-	if len(data_list) == 0 {
-		fmt.Print("{}")
+	if other_set["legacy"] != "" {
+		if len(data_list) == 0 {
+			fmt.Print("{}")
+		} else {
+			json_data, _ := json.Marshal(data_list)
+			fmt.Print(string(json_data))
+		}
 	} else {
-		json_data, _ := json.Marshal(data_list)
+		auth_name := tool.Get_user_auth(db, db_set, other_set["ip"])
+		auth_info := tool.Get_auth_group_info(db, db_set, auth_name)
+
+		return_data := make(map[string]interface{})
+		return_data["language"] = map[string]string{
+			"tool":             tool.Get_language(db, db_set, "tool", false),
+			"normal":           tool.Get_language(db, db_set, "normal", false),
+			"close_discussion": tool.Get_language(db, db_set, "close_discussion", false),
+			"open_discussion":  tool.Get_language(db, db_set, "open_discussion", false),
+			"closed":           tool.Get_language(db, db_set, "closed", false),
+		}
+		return_data["auth"] = auth_info
+
+		if len(data_list) == 0 {
+			return_data["data"] = map[string]string{}
+		} else {
+			return_data["data"] = data_list
+		}
+
+		json_data, _ := json.Marshal(return_data)
 		fmt.Print(string(json_data))
 	}
 }

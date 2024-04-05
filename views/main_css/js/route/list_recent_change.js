@@ -1,7 +1,7 @@
 "use strict";
 
 function opennamu_list_recent_change(num, set_type) {
-    fetch('/api/new/recent_change/50/' + set_type + '/' + String(num)).then(function(res) {
+    fetch('/api/v2/recent_change/50/' + set_type + '/' + String(num)).then(function(res) {
         return res.json();
     }).then(function(data) {
         let lang = data["language"];

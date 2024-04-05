@@ -471,7 +471,6 @@
                 "stiemap_exclude_file_page" : "Exclude file page(s)",
                 "stiemap_exclude_category_page" : "Exclude category page(s)",
         "_comment_2.3_" : "List",
-            "open_discussion_list" : "Open discussion(s) list",
             "discussion_list" : "Discussion(s) list",
             "admin_list" : "Administrator(s) list",
             "member_list" : "Member(s) list",

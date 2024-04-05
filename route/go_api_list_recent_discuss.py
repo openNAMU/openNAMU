@@ -1,9 +1,10 @@
 from .tool.func import *
 
-def api_list_recent_discuss(db_set, set_type = 'normal', limit = 10):
+def api_list_recent_discuss(db_set, set_type = 'normal', limit = 10, legacy = 'on'):
     other_set = {}
     other_set["limit"] = str(limit)
     other_set["set_type"] = set_type
+    other_set["legacy"] = legacy
     other_set["ip"] = ip_check()
     other_set = json.dumps(other_set)
 

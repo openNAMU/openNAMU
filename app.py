@@ -659,6 +659,7 @@ app.route('/bbs/edit/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['PO
 app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_delete)
 
 # Func-api
+## v1 API
 app.route('/api/render', methods = ['POST'], defaults = { 'db_set' : db_set_str })(api_w_render)
 app.route('/api/render/<tool>', methods = ['POST'], defaults = { 'db_set' : db_set_str })(api_w_render)
 
@@ -706,8 +707,6 @@ app.route('/api/recent_changes', defaults = { 'db_set' : db_set_str })(api_list_
 app.route('/api/recent_change/<int:limit>', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
 app.route('/api/recent_change/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
 
-app.route('/api/new/recent_change/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'legacy' : '' })(api_list_recent_change)
-
 app.route('/api/recent_edit_request', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
 app.route('/api/recent_edit_request/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
 
@@ -721,6 +720,11 @@ app.route('/api/sha224/<everything:data>')(api_func_sha224)
 app.route('/api/ip/<everything:data>', defaults = { 'db_set' : db_set_str })(api_func_ip)
 
 app.route('/api/image/<everything:name>')(api_image_view)
+
+## v2 API
+app.route('/api/v2/recent_edit_request/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
+app.route('/api/v2/recent_change/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'legacy' : '' })(api_list_recent_change)
+app.route('/api/v2/recent_discuss/<set_type>/<int:limit>', defaults = { 'db_set' : db_set_str, 'legacy' : '' })(api_list_recent_discuss)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정

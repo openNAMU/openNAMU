@@ -130,11 +130,13 @@ func Api_list_recent_change(call_arg []string) {
 		}
 	}
 
-	if len(data_list) == 0 {
-		fmt.Print("{}")
-	} else if other_set["legacy"] != "" {
-		json_data, _ := json.Marshal(data_list)
-		fmt.Print(string(json_data))
+	if other_set["legacy"] != "" {
+		if len(data_list) == 0 {
+			fmt.Print("{}")
+		} else {
+			json_data, _ := json.Marshal(data_list)
+			fmt.Print(string(json_data))
+		}
 	} else {
 		auth_name := tool.Get_user_auth(db, db_set, other_set["ip"])
 		auth_info := tool.Get_auth_group_info(db, db_set, auth_name)
@@ -158,7 +160,12 @@ func Api_list_recent_change(call_arg []string) {
 			"send_edit":      tool.Get_language(db, db_set, "send_edit", false),
 		}
 		return_data["auth"] = auth_info
-		return_data["data"] = data_list
+
+		if len(data_list) == 0 {
+			return_data["data"] = map[string]string{}
+		} else {
+			return_data["data"] = data_list
+		}
 
 		json_data, _ := json.Marshal(return_data)
 		fmt.Print(string(json_data))
