@@ -706,6 +706,8 @@ app.route('/api/recent_changes', defaults = { 'db_set' : db_set_str })(api_list_
 app.route('/api/recent_change/<int:limit>', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
 app.route('/api/recent_change/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
 
+app.route('/api/new/recent_change/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'legacy' : '' })(api_list_recent_change)
+
 app.route('/api/recent_edit_request', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
 app.route('/api/recent_edit_request/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
 

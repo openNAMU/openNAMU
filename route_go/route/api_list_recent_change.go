@@ -132,8 +132,35 @@ func Api_list_recent_change(call_arg []string) {
 
 	if len(data_list) == 0 {
 		fmt.Print("{}")
-	} else {
+	} else if other_set["legacy"] != "" {
 		json_data, _ := json.Marshal(data_list)
+		fmt.Print(string(json_data))
+	} else {
+		auth_name := tool.Get_user_auth(db, db_set, other_set["ip"])
+		auth_info := tool.Get_auth_group_info(db, db_set, auth_name)
+
+		return_data := make(map[string]interface{})
+		return_data["language"] = map[string]string{
+			"tool":           tool.Get_language(db, db_set, "tool", false),
+			"normal":         tool.Get_language(db, db_set, "normal", false),
+			"edit":           tool.Get_language(db, db_set, "edit", false),
+			"move":           tool.Get_language(db, db_set, "move", false),
+			"delete":         tool.Get_language(db, db_set, "delete", false),
+			"revert":         tool.Get_language(db, db_set, "revert", false),
+			"new_doc":        tool.Get_language(db, db_set, "new_doc", false),
+			"edit_request":   tool.Get_language(db, db_set, "edit_request", false),
+			"user_document":  tool.Get_language(db, db_set, "user_document", false),
+			"raw":            tool.Get_language(db, db_set, "raw", false),
+			"compare":        tool.Get_language(db, db_set, "compare", false),
+			"history":        tool.Get_language(db, db_set, "history", false),
+			"hide":           tool.Get_language(db, db_set, "hide", false),
+			"history_delete": tool.Get_language(db, db_set, "history_delete", false),
+			"send_edit":      tool.Get_language(db, db_set, "send_edit", false),
+		}
+		return_data["auth"] = auth_info
+		return_data["data"] = data_list
+
+		json_data, _ := json.Marshal(return_data)
 		fmt.Print(string(json_data))
 	}
 }
