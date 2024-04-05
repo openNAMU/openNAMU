@@ -6,10 +6,10 @@ def list_recent_discuss(tool = 'normal'):
         if tool == 'normal':
             pass
         elif tool == 'close':
-            m_sub = '(' + get_lang(conn, 'closed') + ')'
+            m_sub = '(' + get_lang(conn, 'close_discussion') + ')'
         else:
             tool = 'open'
-            m_sub = '(' + get_lang(conn, 'open_discussion_list') + ')'
+            m_sub = '(' + get_lang(conn, 'open_discussion') + ')'
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
             imp = [get_lang(conn, 'recent_discussion'), wiki_set(conn), wiki_custom(conn), wiki_css([m_sub, 0])],
