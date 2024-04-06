@@ -2502,9 +2502,12 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
         id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
         
         mode = 'r1' if id_data == '1' else mode
-        mode = mode if not re.search('^user:', title) else 'user'
-        mode = mode if not re.search('^file:', title) else 'file'
-        mode = mode if not re.search('^category:', title) else 'category'
+        if re.search('^user:', title):
+            mode = 'user'
+        elif re.search('^file:', title):
+            mode = 'file'
+        elif re.search('^category:', title):
+            mode = 'category'
 
     send = re.sub(r'<|>', '', send)
     send = send[:512] if len(send) > 512 else send
@@ -2538,14 +2541,6 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
 
         curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "length"'), [title])
         curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'length', ?)"), [title, len(data)])
-
-        if mode in ('file', 'user', 'category'):
-            doc_type = mode
-        else:
-            doc_type = ''
-        
-        curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "doc_type"'), [title])
-        curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', ?)"), [title, doc_type])
 
         curs.execute(db_change("update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')"), [data_set_exist, title])
 

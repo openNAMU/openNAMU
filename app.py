@@ -725,8 +725,8 @@ app.route('/api/image/<everything:name>')(api_image_view)
 app.route('/api/v2/recent_edit_request/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'limit' : 50 })(api_list_recent_edit_request)
 app.route('/api/v2/recent_change/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'legacy' : '', 'limit' : 50 })(api_list_recent_change)
 app.route('/api/v2/recent_discuss/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'legacy' : '', 'limit' : 50 })(api_list_recent_discuss)
-app.route('/api/v2/old_page/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
-app.route('/api/v2/new_page/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_discuss)
+app.route('/api/v2/old_page/<int:num>', defaults = { 'db_set' : db_set_str, 'set_type' : 'old' })(api_list_old_page)
+app.route('/api/v2/new_page/<int:num>', defaults = { 'db_set' : db_set_str, 'set_type' : 'new' })(api_list_old_page)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정
@@ -734,7 +734,6 @@ app.route('/other')(main_tool_other)
 app.route('/manager', methods = ['POST', 'GET'])(main_tool_admin)
 app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_redirect)
 app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(main_tool_redirect)
-# app.route('/guide/<doc_name>')(main_tool_guide)
 
 app.route('/search', methods=['POST'])(main_search)
 app.route('/search/<everything:name>', defaults = { 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
