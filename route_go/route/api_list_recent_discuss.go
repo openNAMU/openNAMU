@@ -31,15 +31,26 @@ func Api_list_recent_discuss(call_arg []string) {
 		limit_int = 50
 	}
 
+	page_int, err := strconv.Atoi(other_set["num"])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if page_int > 0 {
+		page_int = (page_int * limit_int) - limit_int
+	} else {
+		page_int = 0
+	}
+
 	var stmt *sql.Stmt
 
 	set_type := other_set["set_type"]
 	if set_type == "normal" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd order by date desc limit ?"))
+		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd order by date desc limit ?, ?"))
 	} else if set_type == "close" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop = 'O' order by date desc limit ?"))
+		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop = 'O' order by date desc limit ?, ?"))
 	} else {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop != 'O' order by date desc limit ?"))
+		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop != 'O' order by date desc limit ?, ?"))
 	}
 
 	if err != nil {
@@ -47,7 +58,7 @@ func Api_list_recent_discuss(call_arg []string) {
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(limit_int)
+	rows, err := stmt.Query(page_int, limit_int)
 	if err != nil {
 		log.Fatal(err)
 	}

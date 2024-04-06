@@ -1,14 +1,11 @@
 from .tool.func import *
 
-def list_recent_discuss(tool = 'normal'):
+def list_recent_discuss(num = 1, tool = 'normal'):
     with get_db_connect() as conn:
         m_sub = 0
-        if tool == 'normal':
-            pass
-        elif tool == 'close':
+        if tool == 'close':
             m_sub = '(' + get_lang(conn, 'close_discussion') + ')'
-        else:
-            tool = 'open'
+        elif tool == 'open':
             m_sub = '(' + get_lang(conn, 'open_discussion') + ')'
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
@@ -16,7 +13,7 @@ def list_recent_discuss(tool = 'normal'):
             data = '' + \
                 '<div id="opennamu_list_recent_discuss"></div>' + \
                 '<script src="/views/main_css/js/route/list_recent_discuss.js' + cache_v() + '"></script>' + \
-                '<script>opennamu_list_recent_discuss("' + tool + '");</script>' + \
+                '<script>opennamu_list_recent_discuss();</script>' + \
             '',
             menu = [['other', get_lang(conn, 'return')]]
         ))
