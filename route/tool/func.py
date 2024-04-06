@@ -294,12 +294,14 @@ class class_check_json:
     def __init__(self):
         self.data_db_set = {}
             
-    def __new__(self):
-        self.data_db_set = self.do_check_set_json(self)
-        if self.data_db_set['type'] == 'mysql':
-            self.data_db_set = self.do_check_mysql_json(self, self.data_db_set)
+    def __new__(cls):
+        instance = super().__new__(cls)
+
+        cls.data_db_set = instance.do_check_set_json()
+        if cls.data_db_set['type'] == 'mysql':
+            cls.data_db_set = instance.do_check_mysql_json(cls.data_db_set)
         
-        return self.data_db_set
+        return cls.data_db_set
 
 def get_db_table_list():
     # DB table
@@ -2501,6 +2503,8 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
         
         mode = 'r1' if id_data == '1' else mode
         mode = mode if not re.search('^user:', title) else 'user'
+        mode = mode if not re.search('^file:', title) else 'file'
+        mode = mode if not re.search('^category:', title) else 'category'
 
     send = re.sub(r'<|>', '', send)
     send = send[:512] if len(send) > 512 else send
@@ -2523,7 +2527,9 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
 
         curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [id_data, title, date, mode])
 
-        data_set_exist = '' if mode != 'delete' else 'not_exist'
+        data_set_exist = ''
+        if mode == 'delete':
+            data_set_exist = 'not_exist'
 
         curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "edit_request_doing"'), [title])
 
@@ -2532,6 +2538,14 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
 
         curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "length"'), [title])
         curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'length', ?)"), [title, len(data)])
+
+        if mode in ('file', 'user', 'category'):
+            doc_type = mode
+        else:
+            doc_type = ''
+        
+        curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "doc_type"'), [title])
+        curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', ?)"), [title, doc_type])
 
         curs.execute(db_change("update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')"), [data_set_exist, title])
 
