@@ -182,6 +182,7 @@ from route.go_api_search import api_search
 from route.go_api_list_recent_change import api_list_recent_change
 from route.go_api_list_recent_discuss import api_list_recent_discuss
 from route.go_api_list_recent_edit_request import api_list_recent_edit_request
+from route.go_api_list_old_page import api_list_old_page
 
 from route.go_api_bbs import api_bbs
 from route.go_api_bbs_list import api_bbs_list

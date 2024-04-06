@@ -49,6 +49,8 @@ func main() {
 		route.Api_list_recent_discuss(call_arg[1:])
 	} else if call_arg[0] == "api_bbs_list" {
 		route.Api_bbs_list(call_arg[1:])
+	} else if call_arg[0] == "api_list_old_page" {
+		route.Api_list_old_page(call_arg[1:])
 	} else {
 		log.Fatal("404")
 	}
