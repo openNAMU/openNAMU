@@ -1,7 +1,8 @@
 from .tool.func import *
 
-def api_list_recent_discuss(db_set, set_type = 'normal', limit = 10, legacy = 'on'):
+def api_list_recent_discuss(db_set, num = 1, set_type = 'normal', limit = 10, legacy = 'on'):
     other_set = {}
+    other_set["num"] = str(num)
     other_set["limit"] = str(limit)
     other_set["set_type"] = set_type
     other_set["legacy"] = legacy

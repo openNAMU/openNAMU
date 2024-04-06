@@ -468,11 +468,14 @@ app.route('/block_log/regex/<int:num>', defaults = { 'tool' : 'regex' })(recent_
 app.route('/block_log/ongoing', defaults = { 'tool' : 'ongoing' })(recent_block)
 app.route('/block_log/ongoing/<int:num>', defaults = { 'tool' : 'ongoing' })(recent_block)
 
-# Func-history
 app.route('/recent_change')(list_recent_change)
 app.route('/recent_changes')(list_recent_change)
 app.route('/recent_change/<int:num>/<set_type>')(list_recent_change)
 
+app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(list_recent_discuss)
+app.route('/recent_discuss/<int:num>/<tool>')(list_recent_discuss)
+
+# Func-history
 app.route('/recent_edit_request', defaults = { 'db_set' : db_set_str })(recent_edit_request)
 
 app.route('/record/<name>', defaults = { 'tool' : 'record' })(recent_change)
@@ -542,9 +545,6 @@ app.route('/revert/<int:num>/<everything:name>', methods = ['POST', 'GET'])(edit
 app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
 
 # Func-topic
-app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(list_recent_discuss)
-app.route('/recent_discuss/<tool>')(list_recent_discuss)
-
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
 app.route('/thread/0/<everything:doc_name>', defaults = { 'topic_num' : '0' }, methods = ['POST', 'GET'])(topic)
 app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
@@ -722,9 +722,11 @@ app.route('/api/ip/<everything:data>', defaults = { 'db_set' : db_set_str })(api
 app.route('/api/image/<everything:name>')(api_image_view)
 
 ## v2 API
-app.route('/api/v2/recent_edit_request/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
-app.route('/api/v2/recent_change/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'legacy' : '' })(api_list_recent_change)
-app.route('/api/v2/recent_discuss/<set_type>/<int:limit>', defaults = { 'db_set' : db_set_str, 'legacy' : '' })(api_list_recent_discuss)
+app.route('/api/v2/recent_edit_request/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'limit' : 50 })(api_list_recent_edit_request)
+app.route('/api/v2/recent_change/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'legacy' : '', 'limit' : 50 })(api_list_recent_change)
+app.route('/api/v2/recent_discuss/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'legacy' : '', 'limit' : 50 })(api_list_recent_discuss)
+app.route('/api/v2/old_page/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
+app.route('/api/v2/new_page/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_discuss)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정

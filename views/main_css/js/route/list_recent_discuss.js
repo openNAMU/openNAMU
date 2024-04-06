@@ -1,7 +1,20 @@
 "use strict";
 
-function opennamu_list_recent_discuss(tool = 'normal') {
-    fetch('/api/v2/recent_discuss/' + tool + '/50').then(function(res) {
+function opennamu_list_recent_discuss() {
+    const url = window.location.pathname;
+    const url_split = url.split('/')
+    
+    let set_type = '';
+    let num = '';
+    if(url_split.length == 2) {
+        set_type = 'normal';
+        num = '1';
+    } else {
+        set_type = url_split[3];
+        num = url_split[2];
+    }
+
+    fetch('/api/v2/recent_discuss/' + set_type + '/' + num).then(function(res) {
         return res.json();
     }).then(function(data) {
         let lang = data["language"];
@@ -15,7 +28,7 @@ function opennamu_list_recent_discuss(tool = 'normal') {
             ['open', lang['open_discussion']]
         ];
         for(let for_a = 0; for_a < option_list.length; for_a++) {
-            data_html += '<a href="/recent_discuss/' + option_list[for_a][0] + '">(' + option_list[for_a][1] + ')</a> ';
+            data_html += '<a href="/recent_discuss/1/' + option_list[for_a][0] + '">(' + option_list[for_a][1] + ')</a> ';
         }
 
         data_html += '<hr class="main_hr">'
@@ -43,6 +56,8 @@ function opennamu_list_recent_discuss(tool = 'normal') {
             data_html += '</div>';
             data_html += '<hr class="main_hr">';
         }
+
+        data_html += opennamu_page_control('/recent_discuss/{}/' + set_type, Number(num), data.length);
 
         document.getElementById('opennamu_list_recent_discuss').innerHTML = data_html;
     });

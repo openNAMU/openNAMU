@@ -14,7 +14,7 @@ function opennamu_list_recent_change() {
         num = url_split[2];
     }
 
-    fetch('/api/v2/recent_change/50/' + set_type + '/' + num).then(function(res) {
+    fetch('/api/v2/recent_change/' + set_type + '/' + num).then(function(res) {
         return res.json();
     }).then(function(data) {
         let lang = data["language"];
