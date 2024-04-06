@@ -1,7 +1,20 @@
 "use strict";
 
-function opennamu_list_recent_change(num, set_type) {
-    fetch('/api/v2/recent_change/50/' + set_type + '/' + String(num)).then(function(res) {
+function opennamu_list_recent_change() {
+    const url = window.location.pathname;
+    const url_split = url.split('/')
+    
+    let set_type = '';
+    let num = '';
+    if(url_split.length == 2) {
+        set_type = 'normal';
+        num = '1';
+    } else {
+        set_type = url_split[3];
+        num = url_split[2];
+    }
+
+    fetch('/api/v2/recent_change/50/' + set_type + '/' + num).then(function(res) {
         return res.json();
     }).then(function(data) {
         let lang = data["language"];
@@ -10,7 +23,7 @@ function opennamu_list_recent_change(num, set_type) {
 
         let data_html = '';
 
-        let option_list = ['normal', 'edit', 'move', 'delete', 'revert', 'r1', 'edit_request', 'user'];
+        let option_list = ['normal', 'edit', 'move', 'delete', 'revert', 'r1', 'edit_request', 'user', 'file', 'category'];
         for(let for_a = 0; for_a < option_list.length; for_a++) {
             let lang_in = option_list[for_a];
             if(lang_in === 'user') {
@@ -100,7 +113,7 @@ function opennamu_list_recent_change(num, set_type) {
             data_html += '<hr class="main_hr">';
         }
 
-        data_html += opennamu_page_control('/recent_change/{}/' + set_type, num, data.length);
+        data_html += opennamu_page_control('/recent_change/{}/' + set_type, Number(num), data.length);
 
         document.getElementById('opennamu_list_recent_change').innerHTML = data_html;
 
