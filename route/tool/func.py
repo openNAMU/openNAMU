@@ -610,6 +610,20 @@ def update(conn, ver_num, set_data):
     if ver_num < 3500377 and set_data['type'] == 'sqlite':
         conn.execute('pragma journal_mode = delete')
 
+    if ver_num < 3500378:
+        curs.execute(db_change("select title from data where title like 'category:%' or title like 'user:%' or title like 'file:%'"))
+        for for_a in curs.fetchall():
+            mode = ''
+            if re.search('^user:', for_a[0]):
+                mode = 'user'
+            elif re.search('^file:', for_a[0]):
+                mode = 'file'
+            elif re.search('^category:', for_a[0]):
+                mode = 'category'
+            
+            curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "doc_type"'), [for_a[0]])
+            curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', ?)"), [for_a[0], mode])
+
     print('Update completed')
 
 def set_init_always(conn, ver_num):
