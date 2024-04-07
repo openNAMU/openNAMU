@@ -164,5 +164,5 @@ function opennamu_page_control(url, page, data_length, data_length_max = 50) {
         }
     };
 
-    return (next() + ' ' + back()).replace(/^ /, '');
+    return (back() + ' ' + next()).replace(/^ /, '');
 }

@@ -28,6 +28,7 @@ def main_tool_other():
                     <li><a href="/list/document/long">''' + get_lang(conn, 'long_page') + '''</a></li>
                     <li><a href="/list/document/short">''' + get_lang(conn, 'short_page') + '''</a></li>
                     <li><a href="/list/document/old">''' + get_lang(conn, 'old_page') + '''</a></li>
+                    <li><a href="/list/document/new">''' + get_lang(conn, 'new_page') + '''</a></li>
                     <li><a href="/list/document/no_link">''' + get_lang(conn, 'no_link_document_list') + '''</a></li>
                 </ul>
                 <h3>''' + get_lang(conn, 'user') + '''</h3>

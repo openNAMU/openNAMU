@@ -46,7 +46,6 @@ from route.list_admin_auth_use import list_admin_auth_use
 from route.list_admin_group import list_admin_group_2
 from route.list_image_file import list_image_file
 from route.list_long_page import list_long_page
-from route.list_old_page import list_old_page
 from route.list_no_link import list_no_link
 from route.list_please import list_please
 from route.list_title_index import list_title_index
@@ -166,6 +165,7 @@ from route.vote_select import vote_select
 
 from route.n_list_recent_change import list_recent_change
 from route.n_list_recent_discuss import list_recent_discuss
+from route.n_list_old_page import list_old_page
 
 from route.n_w_watch_list import w_watch_list
 
