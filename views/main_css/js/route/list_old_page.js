@@ -24,16 +24,9 @@ function opennamu_list_old_page() {
         for(let for_a = 0; for_a < data.length; for_a++) {
             let doc_name = opennamu_do_url_encode(data[for_a][0]);
 
-            data_html += '<div class="opennamu_recent_change">';
-            data_html += '<a href="/w/' + doc_name + '">' + opennamu_xss_filter(data[for_a][0]) + '</a> ';
+            let right = '<a href="/w/' + doc_name + '">' + opennamu_xss_filter(data[for_a][0]) + '</a> ';
 
-            data_html += '<div style="float: right;">';
-            data_html += data[for_a][1];
-            data_html += '</div>';
-            data_html += '<div style="clear: both;"></div>';
-
-            data_html += '</div>';
-            data_html += '<hr class="main_hr">';
+            data_html += openamu_make_list(right, data[for_a][1]);
         }
 
         data_html += opennamu_page_control('/list/document/' + set_type + '/{}', Number(num), data.length);
