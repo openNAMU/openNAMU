@@ -50,6 +50,7 @@ print('21. Change TLS')
 print('22. Delete body top')
 print('23. Delete body bottom')
 print('24. SQLite to MySQL')
+print('25. Recalc exist data_set')
 
 what_i_do = input('Insert selection number (EX : 9) : ')
 if what_i_do == '1':
@@ -235,6 +236,16 @@ elif what_i_do == '24':
         db_data = sqlite_curs.fetchall()
         if db_data:
             mysql_curs.executemany("insert into " + create_table + " (" + create + ") values (" + create_r + ")", db_data)
+elif what_i_do == '25':
+    curs.execute(db_change("select distinct doc_name from data_set where doc_rev = 'not_exist' or doc_rev = ''"))
+    for for_a in curs.fetchall():
+        data_set_exist = ''
+        
+        curs.execute(db_change("select title from data where title = ?"), [for_a[0]])
+        if not curs.fetchall():
+            data_set_exist = 'not_exist'
+
+        curs.execute(db_change("update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')"), [data_set_exist, for_a[0]])
 else:
     raise ValueError(what_i_do)
 

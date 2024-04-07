@@ -624,6 +624,17 @@ def update(conn, ver_num, set_data):
             curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "doc_type"'), [for_a[0]])
             curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', ?)"), [for_a[0], mode])
 
+    if ver_num < 3500379:
+        curs.execute(db_change("select distinct doc_name from data_set where doc_rev = 'not_exist' or doc_rev = ''"))
+        for for_a in curs.fetchall():
+            data_set_exist = ''
+            
+            curs.execute(db_change("select title from data where title = ?"), [for_a[0]])
+            if not curs.fetchall():
+                data_set_exist = 'not_exist'
+
+            curs.execute(db_change("update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')"), [data_set_exist, for_a[0]])
+
     print('Update completed')
 
 def set_init_always(conn, ver_num):
