@@ -166,3 +166,24 @@ function opennamu_page_control(url, page, data_length, data_length_max = 50) {
 
     return (back() + ' ' + next()).replace(/^ /, '');
 }
+
+function openamu_make_list(left = '', right = '', bottom = '') {
+    let data_html = '<div class="opennamu_recent_change">';
+    data_html += left;
+    
+    data_html += '<div style="float: right;">';
+    data_html += right;
+    data_html += '</div>'
+
+    data_html += '<div style="clear: both;"></div>';
+
+    if(bottom !== "") {
+        data_html += '<hr>'
+        data_html += bottom;
+    }
+
+    data_html += '</div>';
+    data_html += '<hr class="main_hr">';
+
+    return data_html;
+}

@@ -36,25 +36,19 @@ function opennamu_list_recent_discuss() {
         for(let for_a = 0; for_a < data.length; for_a++) {
             let doc_name = opennamu_do_url_encode(data[for_a][0]);
 
-            data_html += '<div class="opennamu_recent_change">';
-            data_html += '<a href="/thread/' + data[for_a][3] + '">' + opennamu_xss_filter(data[for_a][1]) + '</a> ';
-            data_html += '<a href="/w/' + doc_name + '">(' + opennamu_xss_filter(data[for_a][0]) + ')</a> ';
+            let left = '<a href="/thread/' + data[for_a][3] + '">' + opennamu_xss_filter(data[for_a][1]) + '</a> ';
+            left += '<a href="/w/' + doc_name + '">(' + opennamu_xss_filter(data[for_a][0]) + ')</a> ';
 
-            data_html += '<div style="float: right;">';
-
+            let right = '';
             if(data[for_a][4] === 'O') {
-                data_html += lang['closed'] + ' | ';
+                right += lang['closed'] + ' | ';
             }
 
-            data_html += '<a href="/thread/' + data[for_a][3] + '#' + data[for_a][7] + '">#' + data[for_a][7] + '</a> | ';
-            data_html += data[for_a][6] + ' | ';
-            data_html += data[for_a][2];
+            right += '<a href="/thread/' + data[for_a][3] + '#' + data[for_a][7] + '">#' + data[for_a][7] + '</a> | ';
+            right += data[for_a][6] + ' | ';
+            right += data[for_a][2];
 
-            data_html += '</div>';
-            data_html += '<div style="clear: both;"></div>';
-
-            data_html += '</div>';
-            data_html += '<hr class="main_hr">';
+            data_html += openamu_make_list(left, right);
         }
 
         data_html += opennamu_page_control('/recent_discuss/{}/' + set_type, Number(num), data.length);
