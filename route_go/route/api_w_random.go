@@ -3,20 +3,16 @@ package route
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"opennamu/route/tool"
 )
 
-func Api_w_random(call_arg []string) {
+func Api_w_random(call_arg []string) string {
 	db_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &db_set)
 
 	db := tool.DB_connect(db_set)
-	if db == nil {
-		return
-	}
 	defer db.Close()
 
 	var title string
@@ -34,5 +30,5 @@ func Api_w_random(call_arg []string) {
 	new_data["data"] = title
 
 	json_data, _ := json.Marshal(new_data)
-	fmt.Print(string(json_data))
+	return string(json_data)
 }
