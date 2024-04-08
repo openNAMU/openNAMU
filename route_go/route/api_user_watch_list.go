@@ -3,13 +3,12 @@ package route
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"opennamu/route/tool"
 	"strconv"
 )
 
-func Api_user_watch_list(call_arg []string) {
+func Api_user_watch_list(call_arg []string) string {
 	db_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &db_set)
 
@@ -23,16 +22,12 @@ func Api_user_watch_list(call_arg []string) {
 	}
 
 	db := tool.DB_connect(db_set)
-	if db == nil {
-		return
-	}
 	defer db.Close()
 
 	ip := other_set["ip"]
 	name := other_set["name"]
 	if ip != name && tool.Get_user_auth(db, db_set, ip) == "" {
-		fmt.Print("{}")
-		return
+		return "{}"
 	}
 
 	var stmt *sql.Stmt
@@ -67,9 +62,9 @@ func Api_user_watch_list(call_arg []string) {
 	}
 
 	if len(data_list) == 0 {
-		fmt.Print("{}")
+		return "{}"
 	} else {
 		json_data, _ := json.Marshal(data_list)
-		fmt.Print(string(json_data))
+		return string(json_data)
 	}
 }

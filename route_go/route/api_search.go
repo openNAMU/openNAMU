@@ -2,14 +2,13 @@ package route
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"strconv"
 
 	"opennamu/route/tool"
 )
 
-func Api_search(call_arg []string) {
+func Api_search(call_arg []string) string {
 	db_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &db_set)
 
@@ -23,9 +22,6 @@ func Api_search(call_arg []string) {
 	}
 
 	db := tool.DB_connect(db_set)
-	if db == nil {
-		return
-	}
 	defer db.Close()
 
 	if other_set["search_type"] == "title" {
@@ -54,10 +50,10 @@ func Api_search(call_arg []string) {
 		}
 
 		if len(title_list) == 0 {
-			fmt.Print("{}")
+			return "{}"
 		} else {
 			json_data, _ := json.Marshal(title_list)
-			fmt.Print(string(json_data))
+			return string(json_data)
 		}
 	} else {
 		stmt, err := db.Prepare(tool.DB_change(db_set, "select title from data where data collate nocase like ? order by title limit ?, 50"))
@@ -85,10 +81,10 @@ func Api_search(call_arg []string) {
 		}
 
 		if len(title_list) == 0 {
-			fmt.Print("{}")
+			return "{}"
 		} else {
 			json_data, _ := json.Marshal(title_list)
-			fmt.Print(string(json_data))
+			return string(json_data)
 		}
 	}
 }
