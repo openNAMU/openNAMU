@@ -1426,6 +1426,14 @@ def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = 
                     list-style: none !important;
                     font-weight: bold !important;
                 }
+
+                .opennamu_render_complete .opennamu_folding {
+                    margin-bottom: 5px;
+                }
+
+                .opennamu_render_complete .opennamu_footnote {
+                    padding-bottom: 30px;
+                }
             </style>''' + \
         '' + get_class_render[0]
 
