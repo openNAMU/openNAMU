@@ -1434,6 +1434,10 @@ def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = 
                 .opennamu_render_complete .opennamu_footnote {
                     padding-bottom: 30px;
                 }
+
+                .opennamu_render_complete iframe {
+                    display: block;
+                }
             </style>''' + \
         '' + get_class_render[0]
 
