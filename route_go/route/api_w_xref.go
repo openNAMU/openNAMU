@@ -3,13 +3,12 @@ package route
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"opennamu/route/tool"
 	"strconv"
 )
 
-func Api_w_xref(call_arg []string) {
+func Api_w_xref(call_arg []string) string {
 	db_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &db_set)
 
@@ -17,9 +16,6 @@ func Api_w_xref(call_arg []string) {
 	json.Unmarshal([]byte(call_arg[1]), &other_set)
 
 	db := tool.DB_connect(db_set)
-	if db == nil {
-		return
-	}
 	defer db.Close()
 
 	page, _ := strconv.Atoi(other_set["page"])
@@ -76,9 +72,9 @@ func Api_w_xref(call_arg []string) {
 	}
 
 	if len(data_list) == 0 {
-		fmt.Print("{}")
+		return "{}"
 	} else {
 		json_data, _ := json.Marshal(data_list)
-		fmt.Print(string(json_data))
+		return string(json_data)
 	}
 }

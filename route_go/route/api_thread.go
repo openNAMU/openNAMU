@@ -3,13 +3,12 @@ package route
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"opennamu/route/tool"
 )
 
-func Api_thread(call_arg []string) {
+func Api_thread(call_arg []string) string {
 	db_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &db_set)
 
@@ -17,9 +16,6 @@ func Api_thread(call_arg []string) {
 	json.Unmarshal([]byte(call_arg[1]), &other_set)
 
 	db := tool.DB_connect(db_set)
-	if db == nil {
-		return
-	}
 	defer db.Close()
 
 	if other_set["tool"] == "length" {
@@ -43,7 +39,7 @@ func Api_thread(call_arg []string) {
 		new_data["length"] = length
 
 		json_data, _ := json.Marshal(new_data)
-		fmt.Print(string(json_data))
+		return string(json_data)
 	} else {
 		var rows *sql.Rows
 
@@ -126,6 +122,6 @@ func Api_thread(call_arg []string) {
 		}
 
 		json_data, _ := json.Marshal(new_data)
-		fmt.Print(string(json_data))
+		return string(json_data)
 	}
 }

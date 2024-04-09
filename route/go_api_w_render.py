@@ -59,19 +59,19 @@ def api_w_render(db_set, name = '', tool = ''):
             else:
                 data_type = 'api_thread'
 
-            if markup in ('', 'namumark', 'namumark_beta'):
-                if data_option != '':
-                    data_option = json.loads(data_option)
+            if markup in ('', 'namumark', 'namumark_beta') and data_option != '':
+                data_option = json.loads(data_option)
 
-                    data_option_func = api_w_render_include(data_option)
+                data_option_func = api_w_render_include(data_option)
 
-                    # parameter replace
-                    data_org = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)=((?:\\@|[^@\n])+)@', data_option_func, data_org)
-                    data_org = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)@', data_option_func, data_org)
+                # parameter replace
+                data_org = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)=((?:\\@|[^@\n])+)@', data_option_func, data_org)
+                data_org = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)@', data_option_func, data_org)
 
-                    # remove end br
-                    data_org = re.sub('^\n+', '', data_org)
+                # remove end br
+                data_org = re.sub('^\n+', '', data_org)
 
+            if markup in ('', 'namumark'):
                 data_pas = render_set(conn, 
                     doc_name = name, 
                     doc_data = data_org, 

@@ -1,58 +1,58 @@
 "use strict";
 
-function opennamu_list_recent_discuss(tool = 'normal') {
-    let lang_data = new FormData();
-    lang_data.append('data', 'tool normal close_discussion open_discussion_list closed')
+function opennamu_list_recent_discuss() {
+    const url = window.location.pathname;
+    const url_split = url.split('/')
+    
+    let set_type = '';
+    let num = '';
+    if(url_split.length == 2) {
+        set_type = 'normal';
+        num = '1';
+    } else {
+        set_type = url_split[3];
+        num = url_split[2];
+    }
 
-    fetch('/api/lang', {
-        method : 'post',
-        body : lang_data,
-    }).then(function(res) {
+    fetch('/api/v2/recent_discuss/' + set_type + '/' + num).then(function(res) {
         return res.json();
-    }).then(function(lang) {
-        lang = lang["data"];
+    }).then(function(data) {
+        let lang = data["language"];
+        data = data["data"];
 
-        fetch('/api/recent_discuss/' + tool + '/50').then(function(res) {
-            return res.json();
-        }).then(function(data) {
-            let data_html = '';
+        let data_html = '';
 
-            let option_list = [
-                ['normal', lang[1]],
-                ['close', lang[2]],
-                ['open', lang[3]]
-            ];
-            for(let for_a = 0; for_a < option_list.length; for_a++) {
-                data_html += '<a href="/recent_discuss/' + option_list[for_a][0] + '">(' + option_list[for_a][1] + ')</a> ';
+        let option_list = [
+            ['normal', lang['normal']],
+            ['close', lang['close_discussion']],
+            ['open', lang['open_discussion']]
+        ];
+        for(let for_a = 0; for_a < option_list.length; for_a++) {
+            data_html += '<a href="/recent_discuss/1/' + option_list[for_a][0] + '">(' + option_list[for_a][1] + ')</a> ';
+        }
+
+        data_html += '<hr class="main_hr">'
+
+        for(let for_a = 0; for_a < data.length; for_a++) {
+            let doc_name = opennamu_do_url_encode(data[for_a][0]);
+
+            let left = '<a href="/thread/' + data[for_a][3] + '">' + opennamu_xss_filter(data[for_a][1]) + '</a> ';
+            left += '<a href="/w/' + doc_name + '">(' + opennamu_xss_filter(data[for_a][0]) + ')</a> ';
+
+            let right = '';
+            if(data[for_a][4] === 'O') {
+                right += lang['closed'] + ' | ';
             }
 
-            data_html += '<hr class="main_hr">'
+            right += '<a href="/thread/' + data[for_a][3] + '#' + data[for_a][7] + '">#' + data[for_a][7] + '</a> | ';
+            right += data[for_a][6] + ' | ';
+            right += data[for_a][2];
 
-            for(let for_a = 0; for_a < data.length; for_a++) {
-                let doc_name = opennamu_do_url_encode(data[for_a][0]);
+            data_html += openamu_make_list(left, right);
+        }
 
-                data_html += '<div class="opennamu_recent_change">';
-                data_html += '<a href="/thread/' + data[for_a][3] + '">' + opennamu_xss_filter(data[for_a][1]) + '</a> ';
-                data_html += '<a href="/w/' + doc_name + '">(' + opennamu_xss_filter(data[for_a][0]) + ')</a> ';
+        data_html += opennamu_page_control('/recent_discuss/{}/' + set_type, Number(num), data.length);
 
-                data_html += '<div style="float: right;">';
-
-                if(data[for_a][4] === 'O') {
-                    data_html += lang[4] + ' | ';
-                }
-
-                data_html += '<a href="/thread/' + data[for_a][3] + '#' + data[for_a][7] + '">#' + data[for_a][7] + '</a> | ';
-                data_html += data[for_a][6] + ' | ';
-                data_html += data[for_a][2];
-
-                data_html += '</div>';
-                data_html += '<div style="clear: both;"></div>';
-
-                data_html += '</div>';
-                data_html += '<hr class="main_hr">';
-            }
-
-            document.getElementById('opennamu_list_recent_discuss').innerHTML = data_html;
-        });
+        document.getElementById('opennamu_list_recent_discuss').innerHTML = data_html;
     });
 }

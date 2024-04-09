@@ -3,13 +3,12 @@ package route
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"opennamu/route/tool"
 	"strconv"
 )
 
-func Api_list_recent_change(call_arg []string) {
+func Api_list_recent_change(call_arg []string) string {
 	db_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &db_set)
 
@@ -17,9 +16,6 @@ func Api_list_recent_change(call_arg []string) {
 	json.Unmarshal([]byte(call_arg[1]), &other_set)
 
 	db := tool.DB_connect(db_set)
-	if db == nil {
-		return
-	}
 	defer db.Close()
 
 	set_type := other_set["set_type"]
@@ -130,10 +126,47 @@ func Api_list_recent_change(call_arg []string) {
 		}
 	}
 
-	if len(data_list) == 0 {
-		fmt.Print("{}")
+	if other_set["legacy"] != "" {
+		if len(data_list) == 0 {
+			return "{}"
+		} else {
+			json_data, _ := json.Marshal(data_list)
+			return string(json_data)
+		}
 	} else {
-		json_data, _ := json.Marshal(data_list)
-		fmt.Print(string(json_data))
+		auth_name := tool.Get_user_auth(db, db_set, other_set["ip"])
+		auth_info := tool.Get_auth_group_info(db, db_set, auth_name)
+
+		return_data := make(map[string]interface{})
+		return_data["language"] = map[string]string{
+			"tool":           tool.Get_language(db, db_set, "tool", false),
+			"normal":         tool.Get_language(db, db_set, "normal", false),
+			"edit":           tool.Get_language(db, db_set, "edit", false),
+			"move":           tool.Get_language(db, db_set, "move", false),
+			"delete":         tool.Get_language(db, db_set, "delete", false),
+			"revert":         tool.Get_language(db, db_set, "revert", false),
+			"new_doc":        tool.Get_language(db, db_set, "new_doc", false),
+			"edit_request":   tool.Get_language(db, db_set, "edit_request", false),
+			"user_document":  tool.Get_language(db, db_set, "user_document", false),
+			"raw":            tool.Get_language(db, db_set, "raw", false),
+			"compare":        tool.Get_language(db, db_set, "compare", false),
+			"history":        tool.Get_language(db, db_set, "history", false),
+			"hide":           tool.Get_language(db, db_set, "hide", false),
+			"history_delete": tool.Get_language(db, db_set, "history_delete", false),
+			"send_edit":      tool.Get_language(db, db_set, "send_edit", false),
+			"file":           tool.Get_language(db, db_set, "file", false),
+			"category":       tool.Get_language(db, db_set, "category", false),
+			"setting":        tool.Get_language(db, db_set, "setting", false),
+		}
+		return_data["auth"] = auth_info
+
+		if len(data_list) == 0 {
+			return_data["data"] = map[string]string{}
+		} else {
+			return_data["data"] = data_list
+		}
+
+		json_data, _ := json.Marshal(return_data)
+		return string(json_data)
 	}
 }

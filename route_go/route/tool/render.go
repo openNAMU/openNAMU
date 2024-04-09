@@ -38,7 +38,7 @@ func Get_render(db *sql.DB, db_set map[string]string, doc_name string, data stri
 		}
 	}
 
-	if markup == "" {
+	if markup == "" || markup == "namumark_beta" {
 		markup = "namumark"
 	}
 
@@ -77,7 +77,8 @@ func Get_render_direct(db *sql.DB, db_set map[string]string, doc_name string, da
 
 	render_data := make(map[string]interface{})
 	if markup == "namumark" {
-		render_data = Namumark()
+		render_data_class := Namumark_new(db, db_set, doc_data_set)
+		render_data = render_data_class.main()
 	} else if markup == "markdown" {
 		render_data = Markdown(db, db_set, doc_data_set)
 	} else {

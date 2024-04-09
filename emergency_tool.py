@@ -50,50 +50,45 @@ print('21. Change TLS')
 print('22. Delete body top')
 print('23. Delete body bottom')
 print('24. SQLite to MySQL')
+print('25. Recalc exist data_set')
 
 what_i_do = input('Insert selection number (EX : 9) : ')
 if what_i_do == '1':
-    go_num = input('All delete (Y) [Y, N] : ')
-    if not go_num == 'N':
-        curs.execute(db_change("delete from back"))
-        conn.commit()
-
     try:
         go_num = int(input('Count (100) : '))
     except ValueError:
         go_num = 100
 
-    num = 0
+    curs.execute(db_change('select count(*) from data'))
+    count = curs.fetchall()
+    count = count[0][0] if count else 0
 
+    num = 0
+    title = []
     print('Load...')
 
-    curs.execute(
-        db_change(
-            "select title from data d "
-            "where not exists ("
-            "select title from back where link = d.title limit 1"
-            ")"
-            ""
-        )
-    )
-    title = curs.fetchall()
+    while num == 0 or len(title) == 100:
+        curs.execute(db_change('select title from data limit ?, 100'), [num])
+        title = curs.fetchall()
 
-    print('Rest : ' + str(len(title)))
-    print('Start : ' + title[0][0])
-    time.sleep(1)
+        print('Rest : ' + str(count - num))
+        print('Start : ' + title[0][0])
+        time.sleep(1)
 
-    for name in title:
-        num += 1
-        if num % go_num == 0:
-            print(str(num) + ' : ' + name[0])
+        for name in title:
+            num += 1
+            if num % go_num == 0:
+                print(str(num) + ' : ' + name[0])
 
-        if num % 100 == 0:
-            conn.commit()
+            curs.execute(db_change("select data from data where title = ?"), [name[0]])
+            data = curs.fetchall()
 
-        curs.execute(db_change("select data from data where title = ?"), [name[0]])
-        data = curs.fetchall()
+            render_lang_data = {
+                'toc' : 'toc',
+                'category' : 'category'
+            }
 
-        class_do_render(conn).do_render(name[0], data[0][0], 'backlink', '')
+            class_do_render(conn, render_lang_data, '').do_render(name[0], data[0][0], 'backlink')
 elif what_i_do == '2':
     curs.execute(db_change("delete from other where name = 'recaptcha'"))
     curs.execute(db_change("delete from other where name = 'sec_re'"))
@@ -241,6 +236,16 @@ elif what_i_do == '24':
         db_data = sqlite_curs.fetchall()
         if db_data:
             mysql_curs.executemany("insert into " + create_table + " (" + create + ") values (" + create_r + ")", db_data)
+elif what_i_do == '25':
+    curs.execute(db_change("select distinct doc_name from data_set where doc_rev = 'not_exist' or doc_rev = ''"))
+    for for_a in curs.fetchall():
+        data_set_exist = ''
+        
+        curs.execute(db_change("select title from data where title = ?"), [for_a[0]])
+        if not curs.fetchall():
+            data_set_exist = 'not_exist'
+
+        curs.execute(db_change("update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')"), [data_set_exist, for_a[0]])
 else:
     raise ValueError(what_i_do)
 

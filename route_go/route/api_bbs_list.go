@@ -3,7 +3,6 @@ package route
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"opennamu/route/tool"
 )
@@ -32,14 +31,11 @@ func bbs_list(db *sql.DB, db_set map[string]string) map[string]string {
 	return data_list
 }
 
-func Api_bbs_list(call_arg []string) {
+func Api_bbs_list(call_arg []string) string {
 	db_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &db_set)
 
 	db := tool.DB_connect(db_set)
-	if db == nil {
-		return
-	}
 	defer db.Close()
 
 	data_list := bbs_list(db, db_set)
@@ -84,9 +80,9 @@ func Api_bbs_list(call_arg []string) {
 	}
 
 	if len(data_list_sub) == 0 {
-		fmt.Print("{}")
+		return "{}"
 	} else {
 		json_data, _ := json.Marshal(data_list_sub)
-		fmt.Print(string(json_data))
+		return string(json_data)
 	}
 }
