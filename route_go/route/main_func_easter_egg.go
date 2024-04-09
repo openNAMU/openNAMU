@@ -1,11 +1,10 @@
 package route
 
 import (
-	"fmt"
 	"math/rand"
 )
 
-func Main_func_easter_egg() {
+func Main_func_easter_egg() string {
 	select_list := []string{
 		"PWD0ZbR7AOY", // Shanghai Teahouse ~ Chinese Tea
 		"HoU29ljOmTE", // Flawless Clothing of Celestials
@@ -30,5 +29,5 @@ func Main_func_easter_egg() {
 	}
 	select_str := select_list[rand.Intn(len(select_list)-1)]
 
-	fmt.Print("<iframe width=\"640\" height=\"360\" src=\"https://www.youtube.com/embed/" + select_str + "\" frameborder=\"0\" allowfullscreen></iframe>")
+	return "<iframe width=\"640\" height=\"360\" src=\"https://www.youtube.com/embed/" + select_str + "\" frameborder=\"0\" allowfullscreen></iframe>"
 }

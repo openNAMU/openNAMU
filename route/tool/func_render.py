@@ -70,6 +70,14 @@ class class_do_render:
             data_end[0] = re.sub(r'&lt;topic_call&gt;@(?P<in>(?:(?!&lt;\/topic_call&gt;).)+)&lt;\/topic_call&gt;', '<a href="/w/user:\\g<in>">@\\g<in></a>', data_end[0])
 
         if data_type == 'backlink':
+            mode = ''
+            if re.search('^user:', doc_name):
+                mode = 'user'
+            elif re.search('^file:', doc_name):
+                mode = 'file'
+            elif re.search('^category:', doc_name):
+                mode = 'category'
+
             curs.execute(db_change("delete from back where link = ?"), [doc_name])
             curs.execute(db_change("delete from back where title = ? and type = 'no'"), [doc_name])
 
@@ -87,7 +95,9 @@ class class_do_render:
 
             curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'link_count', ?)"), [doc_name, link_count])
 
-            if 'redirect' in data_end[2] and data_end[2]['redirect'] == 1:
+            if mode != '':
+                curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', ?)"), [doc_name, mode]) 
+            elif 'redirect' in data_end[2] and data_end[2]['redirect'] == 1:
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', 'redirect')"), [doc_name])
             else:
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', '')"), [doc_name])

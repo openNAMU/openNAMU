@@ -128,7 +128,7 @@ def get_init_set_list(need = 'all'):
             'display' : 'Markup',
             'require' : 'select',
             'default' : 'namumark',
-            'list' : ['namumark', 'markdown', 'custom', 'raw']
+            'list' : ['namumark', 'namumark_beta', 'markdown', 'custom', 'raw']
         }, 'encode' : {
             'display' : 'Encryption method',
             'require' : 'select',
@@ -294,12 +294,14 @@ class class_check_json:
     def __init__(self):
         self.data_db_set = {}
             
-    def __new__(self):
-        self.data_db_set = self.do_check_set_json(self)
-        if self.data_db_set['type'] == 'mysql':
-            self.data_db_set = self.do_check_mysql_json(self, self.data_db_set)
+    def __new__(cls):
+        instance = super().__new__(cls)
+
+        cls.data_db_set = instance.do_check_set_json()
+        if cls.data_db_set['type'] == 'mysql':
+            cls.data_db_set = instance.do_check_mysql_json(cls.data_db_set)
         
-        return self.data_db_set
+        return cls.data_db_set
 
 def get_db_table_list():
     # DB table
@@ -607,6 +609,31 @@ def update(conn, ver_num, set_data):
 
     if ver_num < 3500377 and set_data['type'] == 'sqlite':
         conn.execute('pragma journal_mode = delete')
+
+    if ver_num < 3500378:
+        curs.execute(db_change("select title from data where title like 'category:%' or title like 'user:%' or title like 'file:%'"))
+        for for_a in curs.fetchall():
+            mode = ''
+            if re.search('^user:', for_a[0]):
+                mode = 'user'
+            elif re.search('^file:', for_a[0]):
+                mode = 'file'
+            elif re.search('^category:', for_a[0]):
+                mode = 'category'
+            
+            curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "doc_type"'), [for_a[0]])
+            curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', ?)"), [for_a[0], mode])
+
+    if ver_num < 3500379:
+        curs.execute(db_change("select distinct doc_name from data_set where doc_rev = 'not_exist' or doc_rev = ''"))
+        for for_a in curs.fetchall():
+            data_set_exist = ''
+            
+            curs.execute(db_change("select title from data where title = ?"), [for_a[0]])
+            if not curs.fetchall():
+                data_set_exist = 'not_exist'
+
+            curs.execute(db_change("update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')"), [data_set_exist, for_a[0]])
 
     print('Update completed')
 
@@ -1042,7 +1069,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v233'
+    return '.cache_v237'
 
 def wiki_css(data):
     global global_wiki_set
@@ -1398,6 +1425,18 @@ def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = 
                 .opennamu_render_complete summary {
                     list-style: none !important;
                     font-weight: bold !important;
+                }
+
+                .opennamu_render_complete .opennamu_folding {
+                    margin-bottom: 5px;
+                }
+
+                .opennamu_render_complete .opennamu_footnote {
+                    padding-bottom: 30px;
+                }
+
+                .opennamu_render_complete iframe {
+                    display: block;
                 }
             </style>''' + \
         '' + get_class_render[0]
@@ -2500,7 +2539,12 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
         id_data = str(int(id_data[0][0]) + 1) if id_data else '1'
         
         mode = 'r1' if id_data == '1' else mode
-        mode = mode if not re.search('^user:', title) else 'user'
+        if re.search('^user:', title):
+            mode = 'user'
+        elif re.search('^file:', title):
+            mode = 'file'
+        elif re.search('^category:', title):
+            mode = 'category'
 
     send = re.sub(r'<|>', '', send)
     send = send[:512] if len(send) > 512 else send
@@ -2523,7 +2567,9 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
 
         curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, ?)"), [id_data, title, date, mode])
 
-        data_set_exist = '' if mode != 'delete' else 'not_exist'
+        data_set_exist = ''
+        if mode == 'delete':
+            data_set_exist = 'not_exist'
 
         curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "edit_request_doing"'), [title])
 

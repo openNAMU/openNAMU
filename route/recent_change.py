@@ -38,7 +38,9 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
             ['delete', get_lang(conn, 'delete')],
             ['revert', get_lang(conn, 'revert')],
             ['r1', get_lang(conn, 'new_doc')],
-            ['edit_request', get_lang(conn, 'edit_request')]
+            ['edit_request', get_lang(conn, 'edit_request')],
+            ['file', get_lang(conn, 'file')],
+            ['category', get_lang(conn, 'category')]
         ]
         if tool == 'history':
             option_list += [['setting', get_lang(conn, 'setting')]]

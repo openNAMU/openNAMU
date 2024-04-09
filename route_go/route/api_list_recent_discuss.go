@@ -3,13 +3,12 @@ package route
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"opennamu/route/tool"
 	"strconv"
 )
 
-func Api_list_recent_discuss(call_arg []string) {
+func Api_list_recent_discuss(call_arg []string) string {
 	db_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &db_set)
 
@@ -17,9 +16,6 @@ func Api_list_recent_discuss(call_arg []string) {
 	json.Unmarshal([]byte(call_arg[1]), &other_set)
 
 	db := tool.DB_connect(db_set)
-	if db == nil {
-		return
-	}
 	defer db.Close()
 
 	limit_int, err := strconv.Atoi(other_set["limit"])
@@ -31,15 +27,26 @@ func Api_list_recent_discuss(call_arg []string) {
 		limit_int = 50
 	}
 
+	page_int, err := strconv.Atoi(other_set["num"])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if page_int > 0 {
+		page_int = (page_int * limit_int) - limit_int
+	} else {
+		page_int = 0
+	}
+
 	var stmt *sql.Stmt
 
 	set_type := other_set["set_type"]
 	if set_type == "normal" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd order by date desc limit ?"))
+		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd order by date desc limit ?, ?"))
 	} else if set_type == "close" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop = 'O' order by date desc limit ?"))
+		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop = 'O' order by date desc limit ?, ?"))
 	} else {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop != 'O' order by date desc limit ?"))
+		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop != 'O' order by date desc limit ?, ?"))
 	}
 
 	if err != nil {
@@ -47,7 +54,7 @@ func Api_list_recent_discuss(call_arg []string) {
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(limit_int)
+	rows, err := stmt.Query(page_int, limit_int)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -111,10 +118,34 @@ func Api_list_recent_discuss(call_arg []string) {
 		})
 	}
 
-	if len(data_list) == 0 {
-		fmt.Print("{}")
+	if other_set["legacy"] != "" {
+		if len(data_list) == 0 {
+			return "{}"
+		} else {
+			json_data, _ := json.Marshal(data_list)
+			return string(json_data)
+		}
 	} else {
-		json_data, _ := json.Marshal(data_list)
-		fmt.Print(string(json_data))
+		auth_name := tool.Get_user_auth(db, db_set, other_set["ip"])
+		auth_info := tool.Get_auth_group_info(db, db_set, auth_name)
+
+		return_data := make(map[string]interface{})
+		return_data["language"] = map[string]string{
+			"tool":             tool.Get_language(db, db_set, "tool", false),
+			"normal":           tool.Get_language(db, db_set, "normal", false),
+			"close_discussion": tool.Get_language(db, db_set, "close_discussion", false),
+			"open_discussion":  tool.Get_language(db, db_set, "open_discussion", false),
+			"closed":           tool.Get_language(db, db_set, "closed", false),
+		}
+		return_data["auth"] = auth_info
+
+		if len(data_list) == 0 {
+			return_data["data"] = map[string]string{}
+		} else {
+			return_data["data"] = data_list
+		}
+
+		json_data, _ := json.Marshal(return_data)
+		return string(json_data)
 	}
 }

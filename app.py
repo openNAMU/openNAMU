@@ -396,8 +396,11 @@ app.route('/filter/extension_filter/add', methods = ['POST', 'GET'], defaults = 
 app.route('/filter/extension_filter/del/<everything:name>', defaults = { 'tool' : 'extension_filter' })(filter_all_delete)
 
 # Func-list
-app.route('/list/document/old')(list_old_page)
-app.route('/list/document/old/<int:num>')(list_old_page)
+app.route('/list/document/old', defaults = { 'set_type' : 'old' })(list_old_page)
+app.route('/list/document/old/<int:num>', defaults = { 'set_type' : 'old' })(list_old_page)
+
+app.route('/list/document/new', defaults = { 'set_type' : 'new' })(list_old_page)
+app.route('/list/document/new/<int:num>', defaults = { 'set_type' : 'new' })(list_old_page)
 
 app.route('/list/document/no_link')(list_no_link)
 app.route('/list/document/no_link/<int:num>')(list_no_link)
@@ -468,11 +471,14 @@ app.route('/block_log/regex/<int:num>', defaults = { 'tool' : 'regex' })(recent_
 app.route('/block_log/ongoing', defaults = { 'tool' : 'ongoing' })(recent_block)
 app.route('/block_log/ongoing/<int:num>', defaults = { 'tool' : 'ongoing' })(recent_block)
 
-# Func-history
 app.route('/recent_change')(list_recent_change)
 app.route('/recent_changes')(list_recent_change)
 app.route('/recent_change/<int:num>/<set_type>')(list_recent_change)
 
+app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(list_recent_discuss)
+app.route('/recent_discuss/<int:num>/<tool>')(list_recent_discuss)
+
+# Func-history
 app.route('/recent_edit_request', defaults = { 'db_set' : db_set_str })(recent_edit_request)
 
 app.route('/record/<name>', defaults = { 'tool' : 'record' })(recent_change)
@@ -542,9 +548,6 @@ app.route('/revert/<int:num>/<everything:name>', methods = ['POST', 'GET'])(edit
 app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
 
 # Func-topic
-app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(list_recent_discuss)
-app.route('/recent_discuss/<tool>')(list_recent_discuss)
-
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
 app.route('/thread/0/<everything:doc_name>', defaults = { 'topic_num' : '0' }, methods = ['POST', 'GET'])(topic)
 app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
@@ -659,6 +662,7 @@ app.route('/bbs/edit/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['PO
 app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['POST', 'GET'])(bbs_w_delete)
 
 # Func-api
+## v1 API
 app.route('/api/render', methods = ['POST'], defaults = { 'db_set' : db_set_str })(api_w_render)
 app.route('/api/render/<tool>', methods = ['POST'], defaults = { 'db_set' : db_set_str })(api_w_render)
 
@@ -720,13 +724,19 @@ app.route('/api/ip/<everything:data>', defaults = { 'db_set' : db_set_str })(api
 
 app.route('/api/image/<everything:name>')(api_image_view)
 
+## v2 API
+app.route('/api/v2/recent_edit_request/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'limit' : 50 })(api_list_recent_edit_request)
+app.route('/api/v2/recent_change/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'legacy' : '', 'limit' : 50 })(api_list_recent_change)
+app.route('/api/v2/recent_discuss/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'legacy' : '', 'limit' : 50 })(api_list_recent_discuss)
+app.route('/api/v2/list/document/old/<int:num>', defaults = { 'db_set' : db_set_str, 'set_type' : 'old' })(api_list_old_page)
+app.route('/api/v2/list/document/new/<int:num>', defaults = { 'db_set' : db_set_str, 'set_type' : 'new' })(api_list_old_page)
+
 # Func-main
 # 여기도 전반적인 조정 시행 예정
 app.route('/other')(main_tool_other)
 app.route('/manager', methods = ['POST', 'GET'])(main_tool_admin)
 app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_redirect)
 app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(main_tool_redirect)
-# app.route('/guide/<doc_name>')(main_tool_guide)
 
 app.route('/search', methods=['POST'])(main_search)
 app.route('/search/<everything:name>', defaults = { 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
