@@ -1,6 +1,16 @@
 "use strict";
 
 function opennamu_list_recent_change() {
+    const option_lang = function(lang_in, lang) {
+        if(lang_in === 'user') {
+            lang_in = lang['user_document'];
+        } else if(lang[lang_in] !== undefined) {
+            lang_in = lang[lang_in];
+        }
+    
+        return lang_in;
+    }
+
     const url = window.location.pathname;
     const url_split = url.split('/')
     
@@ -25,14 +35,7 @@ function opennamu_list_recent_change() {
 
         let option_list = ['normal', 'edit', 'move', 'delete', 'revert', 'r1', 'edit_request', 'user', 'file', 'category'];
         for(let for_a = 0; for_a < option_list.length; for_a++) {
-            let lang_in = option_list[for_a];
-            if(lang_in === 'user') {
-                lang_in = lang['user_document'];
-            } else if(lang_in !== 'r1') {
-                lang_in = lang[lang_in];
-            }
-
-            data_html += '<a href="/recent_change/1/' + option_list[for_a] + '">(' + lang_in + ')</a> ';
+            data_html += '<a href="/recent_change/1/' + option_list[for_a] + '">(' + option_lang(option_list[for_a], lang) + ')</a> ';
         }
 
         data_html += '<hr class="main_hr">'
@@ -75,6 +78,13 @@ function opennamu_list_recent_change() {
             right += ' | ';
             
             right += data[for_a][7] + ' | ';
+            
+            let edit_type = 'edit';
+            if(data[for_a][8] !== '') {
+                edit_type = data[for_a][8];
+            }
+
+            right += option_lang(edit_type, lang) + ' | ';
 
             let time_split = data[for_a][2].split(' ');
 
