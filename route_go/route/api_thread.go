@@ -83,6 +83,7 @@ func Api_thread(call_arg []string) string {
 
 		var id, data, date, ip, block, top string
 		var data_list [][]string
+		ip_parser_temp := map[string][]string{}
 
 		for rows.Next() {
 			err := rows.Scan(&id, &data, &date, &ip, &block, &top)
@@ -99,18 +100,31 @@ func Api_thread(call_arg []string) string {
 
 		admin_auth := tool.Get_user_auth(db, db_set, other_set["ip"])
 
+		var ip_pre string
+		var ip_render string
+
 		for for_a := 0; for_a < len(data_list); for_a++ {
 			data := ""
 			if data_list[for_a][4] != "O" || admin_auth != "" {
 				data = data_list[for_a][1]
 			}
 
+			if _, ok := ip_parser_temp[data_list[for_a][3]]; ok {
+				ip_pre = ip_parser_temp[data_list[for_a][3]][0]
+				ip_render = ip_parser_temp[data_list[for_a][3]][1]
+			} else {
+				ip_pre = tool.IP_preprocess(db, db_set, data_list[for_a][3], other_set["ip"])[0]
+				ip_render = tool.IP_parser(db, db_set, data_list[for_a][3], other_set["ip"])
+
+				ip_parser_temp[data_list[for_a][3]] = []string{ip_pre, ip_render}
+			}
+
 			data_slice = append(data_slice, map[string]string{
 				"id":        data_list[for_a][0],
 				"data":      data,
 				"date":      data_list[for_a][2],
-				"ip":        tool.IP_preprocess(db, db_set, data_list[for_a][3], other_set["ip"])[0],
-				"ip_render": tool.IP_parser(db, db_set, data_list[for_a][3], other_set["ip"]),
+				"ip":        ip_pre,
+				"ip_render": ip_render,
 				"blind":     data_list[for_a][4],
 			})
 		}
