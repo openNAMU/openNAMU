@@ -24,8 +24,7 @@ func Api_w_watch_list(call_arg []string) string {
 	db := tool.DB_connect(db_set)
 	defer db.Close()
 
-	ip := other_set["ip"]
-	if tool.Get_user_auth(db, db_set, ip) == "" {
+	if tool.Get_user_auth(db, db_set, other_set["ip"]) == "" {
 		return "{}"
 	}
 
@@ -47,7 +46,8 @@ func Api_w_watch_list(call_arg []string) string {
 	}
 	defer rows.Close()
 
-	var data_list []string
+	var data_list [][]string
+	ip_parser_temp := map[string][]string{}
 
 	for rows.Next() {
 		var user_name string
@@ -57,13 +57,34 @@ func Api_w_watch_list(call_arg []string) string {
 			log.Fatal(err)
 		}
 
-		data_list = append(data_list, user_name)
+		var ip_pre string
+		var ip_render string
+
+		if _, ok := ip_parser_temp[user_name]; ok {
+			ip_pre = ip_parser_temp[user_name][0]
+			ip_render = ip_parser_temp[user_name][1]
+		} else {
+			ip_pre = tool.IP_preprocess(db, db_set, user_name, other_set["ip"])[0]
+			ip_render = tool.IP_parser(db, db_set, user_name, other_set["ip"])
+
+			ip_parser_temp[user_name] = []string{ip_pre, ip_render}
+		}
+
+		data_list = append(data_list, []string{ip_pre, ip_render})
+	}
+
+	return_data := make(map[string]interface{})
+	return_data["language"] = map[string]string{
+		"watchlist": tool.Get_language(db, db_set, "watchlist", false),
+		"star_doc":  tool.Get_language(db, db_set, "star_doc", false),
 	}
 
 	if len(data_list) == 0 {
-		return "{}"
+		return_data["data"] = map[string]string{}
 	} else {
-		json_data, _ := json.Marshal(data_list)
-		return string(json_data)
+		return_data["data"] = data_list
 	}
+
+	json_data, _ := json.Marshal(return_data)
+	return string(json_data)
 }
