@@ -548,9 +548,11 @@ app.route('/revert/<int:num>/<everything:name>', methods = ['POST', 'GET'])(edit
 app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
 
 # Func-topic
+app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
+app.route('/topic_page/<int:page>/<everything:name>', methods = ['POST', 'GET'])(topic_list)
+
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
 app.route('/thread/0/<everything:doc_name>', defaults = { 'topic_num' : '0' }, methods = ['POST', 'GET'])(topic)
-app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
 
 app.route('/thread/<int:topic_num>/tool')(topic_tool)
 app.route('/thread/<int:topic_num>/setting', methods = ['POST', 'GET'])(topic_tool_setting)
@@ -730,6 +732,8 @@ app.route('/api/v2/recent_change/<set_type>/<int:num>', defaults = { 'db_set' : 
 app.route('/api/v2/recent_discuss/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'legacy' : '', 'limit' : 50 })(api_list_recent_discuss)
 app.route('/api/v2/list/document/old/<int:num>', defaults = { 'db_set' : db_set_str, 'set_type' : 'old' })(api_list_old_page)
 app.route('/api/v2/list/document/new/<int:num>', defaults = { 'db_set' : db_set_str, 'set_type' : 'new' })(api_list_old_page)
+
+app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_topic_list)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정
