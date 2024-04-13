@@ -1,8 +1,9 @@
 from .tool.func import *
 
-def api_topic_list(db_set, name = 'Test', num = 1):
+def api_topic_list(db_set, name = 'Test', set_type = 'normal', num = 1):
     other_set = {}
     other_set["name"] = str(name)
+    other_set["set_type"] = set_type
     other_set["num"] = str(num)
     other_set = json.dumps(other_set)
 
