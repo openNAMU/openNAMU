@@ -646,7 +646,8 @@ app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 app.route('/bbs/main')(bbs_main)
 app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
 # app.route('/bbs/main/set')
-app.route('/bbs/w/<int:bbs_num>')(bbs_w)
+app.route('/bbs/in/<int:bbs_num>')(bbs_in)
+app.route('/bbs/in/<int:bbs_num>/<int:page>')(bbs_in)
 # app.route('/bbs/blind/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_hide)
 app.route('/bbs/delete/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_delete)
 app.route('/bbs/set/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_set)
@@ -679,11 +680,6 @@ app.route('/api/xref/<int:num>/<everything:name>', defaults = { 'db_set' : db_se
 app.route('/api/xref_this/<int:num>/<everything:name>', defaults = { 'xref_type' : '2', 'db_set' : db_set_str })(api_w_xref)
 
 app.route('/api/random', defaults = { 'db_set' : db_set_str })(api_w_random)
-
-app.route('/api/bbs', defaults = { 'db_set' : db_set_str })(api_bbs_list)
-app.route('/api/bbs/main', defaults = { 'db_set' : db_set_str })(api_bbs)
-app.route('/api/bbs/w/<int:bbs_num>', defaults = { 'db_set' : db_set_str })(api_bbs)
-app.route('/api/bbs/w/<int:bbs_num>/<int:page>', defaults = { 'db_set' : db_set_str })(api_bbs)
 
 app.route('/api/bbs/w/<sub_code>')(api_bbs_w_post)
 app.route('/api/bbs/w/comment/<sub_code>')(api_bbs_w_comment)
@@ -734,6 +730,10 @@ app.route('/api/v2/list/document/old/<int:num>', defaults = { 'db_set' : db_set_
 app.route('/api/v2/list/document/new/<int:num>', defaults = { 'db_set' : db_set_str, 'set_type' : 'new' })(api_list_old_page)
 
 app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_topic_list)
+
+app.route('/api/v2/bbs', defaults = { 'db_set' : db_set_str })(api_bbs_list)
+app.route('/api/v2/bbs/main', defaults = { 'db_set' : db_set_str })(api_bbs)
+app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>', defaults = { 'db_set' : db_set_str })(api_bbs)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정

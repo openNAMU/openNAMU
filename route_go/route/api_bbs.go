@@ -110,10 +110,15 @@ func Api_bbs(call_arg []string) string {
 		data_list = append(data_list, temp_data)
 	}
 
+	return_data := make(map[string]interface{})
+	return_data["language"] = map[string]string{}
+
 	if len(data_list) == 0 {
-		return "{}"
+		return_data["data"] = map[string]string{}
 	} else {
-		json_data, _ := json.Marshal(data_list)
-		return string(json_data)
+		return_data["data"] = data_list
 	}
+
+	json_data, _ := json.Marshal(return_data)
+	return string(json_data)
 }
