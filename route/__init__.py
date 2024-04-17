@@ -166,6 +166,8 @@ from route.n_list_recent_change import list_recent_change
 from route.n_list_recent_discuss import list_recent_discuss
 from route.n_list_old_page import list_old_page
 
+from route.n_bbs_in import bbs_in
+
 from route.n_w_watch_list import w_watch_list
 
 from route.n_topic_list import topic_list

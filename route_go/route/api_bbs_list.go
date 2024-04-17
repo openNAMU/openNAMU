@@ -79,10 +79,18 @@ func Api_bbs_list(call_arg []string) string {
 		data_list_sub[k] = []string{v, bbs_type, bbs_date}
 	}
 
-	if len(data_list_sub) == 0 {
-		return "{}"
-	} else {
-		json_data, _ := json.Marshal(data_list_sub)
-		return string(json_data)
+	return_data := make(map[string]interface{})
+	return_data["language"] = map[string]string{
+		"thread_base":  tool.Get_language(db, db_set, "thread_base", false),
+		"comment_base": tool.Get_language(db, db_set, "comment_base", false),
 	}
+
+	if len(data_list_sub) == 0 {
+		return_data["data"] = map[string]string{}
+	} else {
+		return_data["data"] = data_list_sub
+	}
+
+	json_data, _ := json.Marshal(return_data)
+	return string(json_data)
 }
