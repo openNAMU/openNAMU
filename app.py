@@ -734,6 +734,7 @@ app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>', defaults = { '
 app.route('/api/v2/bbs', defaults = { 'db_set' : db_set_str })(api_bbs_list)
 app.route('/api/v2/bbs/main', defaults = { 'db_set' : db_set_str })(api_bbs)
 app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>', defaults = { 'db_set' : db_set_str })(api_bbs)
+app.route('/api/v2/bbs/w/comment/<int:bbs_num>/<int:post_num>/<tool>', defaults = { 'db_set' : db_set_str })(api_bbs_w_comment_n)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정

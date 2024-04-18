@@ -87,5 +87,5 @@ def bbs_w_set(bbs_num = ''):
                         <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 '''),
-                menu = [['bbs/w/' + bbs_num_str, get_lang(conn, 'return')]] + other_menu
+                menu = [['bbs/in/' + bbs_num_str, get_lang(conn, 'return')]] + other_menu
             ))

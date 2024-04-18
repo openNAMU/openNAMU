@@ -47,6 +47,8 @@ function opennamu_bbs_main() {
 
                 data_html += '<div style="float: right;">';
 
+                data_html += '<span id="opennamu_bbs_comment_' + String(for_a) + '"></span>';
+
                 data_html += '<a href="/bbs/in/' + data[for_a]['set_id'] + '">';
                 data_html += bbs_id_to_name[data[for_a]['set_id']]
                 data_html += '</a>';
@@ -63,6 +65,16 @@ function opennamu_bbs_main() {
             }
             
             document.getElementById('opennamu_bbs_main').innerHTML = data_html;
+
+            for(let for_a = 0; for_a < data.length; for_a++) {
+                fetch('/api/v2/bbs/w/comment/' + data[for_a]['set_id'] + '/' + data[for_a]['set_code'] + '/length').then(function(res) {
+                    return res.json();
+                }).then(function(comment_data) {
+                    if(comment_data) {
+                        document.getElementById('opennamu_bbs_comment_' + String(for_a)).innerText = comment_data['data'] + ' | ';
+                    }
+                });
+            }
         });
     });
 }
