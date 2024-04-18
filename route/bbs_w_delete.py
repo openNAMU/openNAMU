@@ -17,7 +17,7 @@ def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
         post_num_str = str(post_num)
 
         if admin_check(conn) != 1:
-            return redirect(conn, '/bbs/w/' + bbs_num_str)
+            return redirect(conn, '/bbs/in/' + bbs_num_str)
         
         temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
         if not 'user_id' in temp_dict:
@@ -29,7 +29,7 @@ def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
                 curs.execute(db_change('delete from bbs_set where set_code = ? and set_id = ?'), [post_num_str, bbs_num_str])
                 curs.execute(db_change('delete from bbs_data where set_id = ? or set_id like ?'), [bbs_num_str + '-' + post_num_str, bbs_num_str + '-' + post_num_str + '-%'])
                 
-                return redirect(conn, '/bbs/w/' + bbs_num_str)
+                return redirect(conn, '/bbs/in/' + bbs_num_str)
             else:
                 comment_num_split = comment_num.split('-')
                 

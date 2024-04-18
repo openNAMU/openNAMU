@@ -61,7 +61,7 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
                     last_date = ('(' + db_data_2[0][0] + ')') if db_data_2 else ''
 
                     data += '<li>'
-                    data += '<a href="/bbs/w/' + for_a[1] + '">' + html.escape(for_a[0]) + '</a> (' + bbs_type + ') ' + last_date
+                    data += '<a href="/bbs/in/' + for_a[1] + '">' + html.escape(for_a[0]) + '</a> (' + bbs_type + ') ' + last_date
                     data += '</li>'
 
                 data += '</ul>'
