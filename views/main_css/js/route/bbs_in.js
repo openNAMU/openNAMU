@@ -27,7 +27,13 @@ function opennamu_bbs_in() {
             data_html += '<div style="float: right;">';
 
             data_html += data[for_a]['user_id_render'] + ' | ';
-            data_html += data[for_a]['date'];
+
+            console.log(data);
+            if(data[for_a]['pinned'] === '1') {
+                data_html += '<span style="color: red;">' + data[for_a]['date'] + '</span>';
+            } else {
+                data_html += data[for_a]['date'];
+            }
 
             data_html += '</div>'
             data_html += '<div style="clear: both;"></div>';

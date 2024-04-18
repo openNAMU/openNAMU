@@ -14,14 +14,14 @@ def bbs_delete(bbs_num = ''):
         bbs_num_str = str(bbs_num)
 
         if admin_check(conn) != 1:
-            return redirect(conn, '/bbs/w/' + bbs_num_str)
+            return redirect(conn, '/bbs/in/' + bbs_num_str)
         
         if flask.request.method == 'POST':
             curs.execute(db_change('delete from bbs_data where set_id = ?'), [bbs_num_str])
             curs.execute(db_change('delete from bbs_set where set_id = ?'), [bbs_num_str])
             curs.execute(db_change('delete from bbs_data where set_id like ?'), [bbs_num_str + '-%'])
             
-            return redirect(conn, '/bbs/w/' + bbs_num_str)
+            return redirect(conn, '/bbs/in/' + bbs_num_str)
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
                 imp = [get_lang(conn, 'bbs_delete'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + bbs_name + ')', 0])],
