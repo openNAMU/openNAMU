@@ -32,8 +32,10 @@ function opennamu_bbs_main() {
                 }
                 data_html += ')';
 
-                data_html += ' (' + bbs_list[key][2] + ')';
-
+                if(bbs_list[key][2] !== '') {
+                    data_html += ' (' + bbs_list[key][2] + ')';
+                }
+                
                 data_html += '</li>';
             }
 
