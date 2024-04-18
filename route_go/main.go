@@ -55,6 +55,8 @@ func main() {
 		route_data = route.Api_list_old_page(call_arg[1:])
 	} else if call_arg[0] == "api_topic_list" {
 		route_data = route.Api_topic_list(call_arg[1:])
+	} else if call_arg[0] == "api_bbs_w_comment_n" {
+		route_data = route.Api_bbs_w_comment(call_arg[1:])
 	} else {
 		log.Fatal("404")
 	}

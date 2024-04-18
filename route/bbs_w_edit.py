@@ -148,5 +148,5 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                         -->
                     </form>
                 ''',
-                menu = [['bbs/w/' + bbs_num_str, get_lang(conn, 'return')]]
+                menu = [['bbs/in/' + bbs_num_str, get_lang(conn, 'return')]]
             ))

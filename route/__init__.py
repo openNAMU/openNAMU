@@ -189,6 +189,7 @@ from route.go_api_list_old_page import api_list_old_page
 
 from route.go_api_bbs import api_bbs
 from route.go_api_bbs_list import api_bbs_list
+from route.go_api_bbs_w_comment import api_bbs_w_comment_n
 
 from route.go_api_topic import api_topic
 from route.go_api_topic_list import api_topic_list
