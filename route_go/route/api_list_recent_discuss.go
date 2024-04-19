@@ -42,11 +42,11 @@ func Api_list_recent_discuss(call_arg []string) string {
 
 	set_type := other_set["set_type"]
 	if set_type == "normal" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd order by date desc limit ?, ?"))
+		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop, agree from rd order by date desc limit ?, ?"))
 	} else if set_type == "close" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop = 'O' order by date desc limit ?, ?"))
+		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop, agree from rd where stop = 'O' order by date desc limit ?, ?"))
 	} else {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop from rd where stop != 'O' order by date desc limit ?, ?"))
+		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop, agree from rd where stop != 'O' order by date desc limit ?, ?"))
 	}
 
 	if err != nil {
@@ -69,8 +69,9 @@ func Api_list_recent_discuss(call_arg []string) string {
 		var date string
 		var code string
 		var stop string
+		var agree string
 
-		err := rows.Scan(&title, &sub, &date, &code, &stop)
+		err := rows.Scan(&title, &sub, &date, &code, &stop, &agree)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -115,6 +116,7 @@ func Api_list_recent_discuss(call_arg []string) string {
 			ip_pre,
 			ip_render,
 			id,
+			agree,
 		})
 	}
 
@@ -131,11 +133,13 @@ func Api_list_recent_discuss(call_arg []string) string {
 
 		return_data := make(map[string]interface{})
 		return_data["language"] = map[string]string{
-			"tool":             tool.Get_language(db, db_set, "tool", false),
-			"normal":           tool.Get_language(db, db_set, "normal", false),
-			"close_discussion": tool.Get_language(db, db_set, "close_discussion", false),
-			"open_discussion":  tool.Get_language(db, db_set, "open_discussion", false),
-			"closed":           tool.Get_language(db, db_set, "closed", false),
+			"tool":              tool.Get_language(db, db_set, "tool", false),
+			"normal":            tool.Get_language(db, db_set, "normal", false),
+			"close_discussion":  tool.Get_language(db, db_set, "close_discussion", false),
+			"open_discussion":   tool.Get_language(db, db_set, "open_discussion", false),
+			"closed":            tool.Get_language(db, db_set, "closed", false),
+			"agreed_discussion": tool.Get_language(db, db_set, "agreed_discussion", false),
+			"stop":              tool.Get_language(db, db_set, "stop", false),
 		}
 		return_data["auth"] = auth_info
 
