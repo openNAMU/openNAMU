@@ -17,7 +17,7 @@ def bbs_w_pinned(bbs_num = '', post_num = ''):
         post_num_str = str(post_num)
 
         if admin_check(conn) != 1:
-            return redirect(conn, '/bbs/w/' + bbs_num_str)
+            return redirect(conn, '/bbs/in/' + bbs_num_str)
         
         temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
         if not 'user_id' in temp_dict:
@@ -30,7 +30,7 @@ def bbs_w_pinned(bbs_num = '', post_num = ''):
             else:
                 curs.execute(db_change('delete from bbs_data where set_code = ? and set_id = ? and set_name = "pinned"'), [post_num_str, bbs_num_str])
             
-            return redirect(conn, '/bbs/w/' + bbs_num_str)
+            return redirect(conn, '/bbs/in/' + bbs_num_str)
         else:
             curs.execute(db_change('select set_data from bbs_data where set_code = ? and set_id = ? and set_name = "pinned"'), [post_num_str, bbs_num_str])
             pinned = get_lang(conn, 'pinned') if not curs.fetchall() else get_lang(conn, 'pinned_release')

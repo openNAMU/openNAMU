@@ -2,7 +2,7 @@
 
 function opennamu_list_recent_discuss() {
     const url = window.location.pathname;
-    const url_split = url.split('/')
+    const url_split = url.split('/');
     
     let set_type = '';
     let num = '';
@@ -42,6 +42,12 @@ function opennamu_list_recent_discuss() {
             let right = '';
             if(data[for_a][4] === 'O') {
                 right += lang['closed'] + ' | ';
+            } else if(data[for_a][4] === 'S') {
+                right += lang['stop'] + ' | ';
+            }
+
+            if(data[for_a][8] !== '') {
+                right += lang['agreed_discussion'] + ' | ';
             }
 
             right += '<a href="/thread/' + data[for_a][3] + '#' + data[for_a][7] + '">#' + data[for_a][7] + '</a> | ';

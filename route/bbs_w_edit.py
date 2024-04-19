@@ -56,7 +56,7 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
             data = flask.request.form.get('content', '')
             if data == '':
                 # re_error로 대체 예정
-                return redirect(conn, '/bbs/w/' + bbs_num_str)
+                return redirect(conn, '/bbs/in/' + bbs_num_str)
             
             date = get_time()
 
@@ -148,5 +148,5 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                         -->
                     </form>
                 ''',
-                menu = [['bbs/w/' + bbs_num_str, get_lang(conn, 'return')]]
+                menu = [['bbs/in/' + bbs_num_str, get_lang(conn, 'return')]]
             ))

@@ -2,7 +2,7 @@
 
 function opennamu_list_old_page() {
     const url = window.location.pathname;
-    const url_split = url.split('/')
+    const url_split = url.split('/');
     
     let set_type = '';
     let num = '';
