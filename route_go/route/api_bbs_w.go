@@ -6,7 +6,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_bbs_post(call_arg []string) string {
+func Api_bbs_w(call_arg []string) string {
 	db_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &db_set)
 
