@@ -13,8 +13,9 @@ def view_w(name = 'Test', do_type = ''):
         file_data = ''
 
         doc_type = ''
-        now_time = get_time()
+        redirect_to = None
 
+        now_time = get_time()
         ip = ip_check()
             
         uppage = re.sub(r"/([^/]+)$", '', name)
@@ -164,10 +165,16 @@ def view_w(name = 'Test', do_type = ''):
             curs.execute(db_change("select link from back where title = ? and type = 'include' limit 1"), [name])
             doc_type = 'include' if curs.fetchall() else doc_type
 
-            curs.execute(db_change("select link from back where link = ? and type = 'redirect' limit 1"), [name])
-            doc_type = 'redirect' if curs.fetchall() else doc_type
+            curs.execute(db_change("select title, data from back where link = ? and type = 'redirect' limit 1"), [name])
+            db_data = curs.fetchall()
+            if db_data:
+                doc_type = 'redirect'
+                redirect_to = url_pas(db_data[0][0]) + db_data[0][1]
 
             name_view = name
+
+        if redirect_to:
+            return redirect(conn, '/w_from/' + redirect_to)
 
         end_data = '''
             <div id="opennamu_preview_area">

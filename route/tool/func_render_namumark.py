@@ -1,4 +1,5 @@
 from .func_tool import *
+from typing import Any
 
 class class_do_render_namumark:
     def __init__(self, conn, doc_name, doc_data, doc_set, lang_data, do_type = 'exter'):
@@ -35,7 +36,7 @@ class class_do_render_namumark:
         self.data_temp_storage = {}
         self.data_temp_storage_count = 0
 
-        self.data_backlink = {}
+        self.data_backlink : dict[str, Any] = {}
 
         self.data_math_count = 0
         self.data_redirect = 0
@@ -1087,7 +1088,10 @@ class class_do_render_namumark:
                     link_inter_regex = re.compile('^(?:inter|인터):([^:]+):', flags = re.I)
 
                     link_inter_name = re.search(link_inter_regex, link_main)
-                    link_inter_name = link_inter_name.group(1)
+                    if link_inter_name:
+                        link_inter_name = link_inter_name.group(1)
+                    else:
+                        link_inter_name = ''
 
                     link_main = re.sub(link_inter_regex, '', link_main)
                     link_title = link_inter_name + ':' + link_main
@@ -1140,7 +1144,11 @@ class class_do_render_namumark:
 
                         data_name = self.get_tool_data_storage('<a class="opennamu_link_inter" title="' + link_title + '" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
                     
-                        self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>' + link_data[2]), self.render_data, 1)
+                        add_str = ''
+                        if link_data[2]:
+                            add_str = link_data[2]
+
+                        self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>' + add_str), self.render_data, 1)
                     else:
                         self.render_data = re.sub(link_regex, link_data[2], self.render_data, 1)
                 # out link
@@ -1188,8 +1196,12 @@ class class_do_render_namumark:
                             link_inter_icon = db_data[0][0] + ':'
                             link_class = 'opennamu_link_inter'
 
+                    add_str = ''
+                    if link_data[2]:
+                        add_str = link_data[2]
+
                     data_name = self.get_tool_data_storage('<a class="' + link_class + '" target="_blank" title="' + link_title + '" href="' + link_main + '">' + link_inter_icon + link_sub_storage, '</a>', link_data_full)
-                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>' + link_data[2]), self.render_data, 1)
+                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>' + add_str), self.render_data, 1)
                 # in link
                 else:
                     # under page & fix url
@@ -1253,8 +1265,12 @@ class class_do_render_namumark:
 
                     self.link_count += 1
 
+                    add_str = ''
+                    if link_data[2]:
+                        add_str = link_data[2]
+
                     data_name = self.get_tool_data_storage('<a class="' + link_exist + ' ' + link_same + '" title="' + link_title + '" href="' + link_main + link_data_sharp + '">' + link_sub_storage, '</a>', link_data_full)
-                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>' + link_data[2]), self.render_data, 1)
+                    self.render_data = re.sub(link_regex, lambda x : ('<' + data_name + '>' + link_sub + '</' + data_name + '>' + add_str), self.render_data, 1)
 
             link_count_all -= 1
 
@@ -1532,8 +1548,6 @@ class class_do_render_namumark:
                     link_main = self.get_tool_data_restore(link_main, do_type = 'slash')
                     link_main = html.unescape(link_main)
 
-                    link_exist = 1
-
                     self.curs.execute(db_change("select title from data where title = ?" + self.link_case_insensitive), [link_main])
                     db_data = self.curs.fetchall()
                     if not db_data:
@@ -1541,26 +1555,19 @@ class class_do_render_namumark:
                             self.data_backlink[link_main] = {}
 
                         self.data_backlink[link_main]['no'] = ''
-                        link_exist = 0
                     else:
                         link_main = db_data[0][0]
                         if not link_main in self.data_backlink:
                             self.data_backlink[link_main] = {}
 
-                    self.data_backlink[link_main]['redirect'] = ''
+                    self.data_backlink[link_main]['redirect'] = link_data_sharp
 
                     link_main = url_pas(link_main)
                     if link_main != '':
                         link_main = '/w_from/' + link_main
 
                     self.data_redirect = 1
-                    if link_exist == 1:
-                        if self.doc_set['doc_from'] != '':
-                            data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
-                        else:
-                            data_name = self.get_tool_data_storage('<meta http-equiv="refresh" content="0; url=' + link_main + link_data_sharp + '">', '', link_data_full)
-                    else:
-                        data_name = self.get_tool_data_storage('', '', link_data_full)
+                    data_name = self.get_tool_data_storage('<a href="' + link_main + link_data_sharp + '">(GO)</a>', '', link_data_full)
 
                     self.render_data = '<' + data_name + '></' + data_name + '>'
                 else:
@@ -2084,7 +2091,7 @@ class class_do_render_namumark:
                 self.do_inter_render = func
                 self.doc_set = doc_set
 
-            def replace_sub(match):
+            def replace_sub(self, match):
                 data = inter_data[match[1]]
                 data = re.sub(inter_data_regex, self.replace_sub, data)
 
@@ -2266,9 +2273,9 @@ class class_do_render_namumark:
                 list_sub_regex = r'\n( *)(?:(1|a|A|I|i)\.(?:#([0-9]*))?|(\*)) ?([^\n]*)'
 
                 list_class = do_render_list_int_to(list_view_set)
-                list_data = re.sub(list_sub_regex, list_class, list_data)
+                list_data_str = re.sub(list_sub_regex, list_class, list_data)
 
-                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data + '</ul><back_br>\n'), self.render_data, 1)
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data_str + '</ul><back_br>\n'), self.render_data, 1)
 
             list_count_max -= 1
 
@@ -2444,14 +2451,14 @@ class class_do_render_namumark:
             self.render_data = self.render_data.replace('\n', '<no_br>')
 
         data_backlink_dict = self.data_backlink
-        self.data_backlink = [[self.doc_name, for_a, for_b, self.data_backlink[for_a][for_b]] for for_a in self.data_backlink for for_b in self.data_backlink[for_a]]
+        data_backlink_list = [[self.doc_name, for_a, for_b, self.data_backlink[for_a][for_b]] for for_a in self.data_backlink for for_b in self.data_backlink[for_a]]
 
         # 여기 수정시 do_inter_render도 수정 필요
         return [
             self.render_data, # html
             self.render_data_js, # js
             {
-                'backlink' : self.data_backlink, # backlink
+                'backlink' : data_backlink_list, # backlink
                 'backlink_dict' : data_backlink_dict,
                 'footnote' : self.data_footnote_all, # footnote
                 'category' : self.data_category_list,
