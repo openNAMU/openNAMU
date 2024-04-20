@@ -141,7 +141,7 @@
             "member" : "Member",
         "_comment_1.3_" : "Ban",
             "ban" : "Block",
-            "blocked" : "Blocked",
+            "blocked" : "Blocked user",
             "release" : "Unblock",
     "_comment_2_" : "Func",
         "wiki_restart" : "Restart wiki engine",

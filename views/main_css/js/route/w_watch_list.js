@@ -1,47 +1,32 @@
 "use strict";
 
-function opennamu_w_watch_list(page = 1) {
-    let lang_data = new FormData();
-    lang_data.append('data', 'watchlist star_doc');
+function opennamu_w_watch_list() {
+    const url = window.location.pathname;
+    const url_split = url.split('/');
 
-    fetch('/api/lang', {
-        method : 'POST',
-        body : lang_data
-    }).then(function(res) {
+    let do_type = url_split[1];
+    let page = url_split[2];
+    let doc_name = url_split.slice(3, undefined).join('/');
+
+    fetch('/api/v2/' + url).then(function(res) {
         return res.json();
-    }).then(function(lang) {
-        lang = lang["data"];
-        let url = window.location.pathname;
+    }).then(function(data) {
+        let lang = data["language"];
+        data = data["data"];
 
-        let do_type = url.match('star_doc');
-        if(do_type) {
-            do_type = 'star_doc';
-        } else {
-            do_type = 'watch_list'
+        let data_html = '<a href="/doc_watch_list/1/' + doc_name + '">(' + lang['watchlist'] + ')</a> <a href="/doc_star_doc/1/' + doc_name + '">(' + lang['star_doc'] + ')</a>';
+        data_html += '<hr class="main_hr">'
+
+        data_html += '<ul class="opennamu_ul">';
+        for(let for_a = 0; for_a < data.length; for_a++) {
+            data_html += '<li>' + data[for_a][1] + '</li>';
         }
 
-        let split_url = url.split('/');
-        let doc_name = split_url.slice(3, undefined);
+        data_html += '</ul>';
+        data_html += '<hr class="main_hr">'
+        
+        data_html += opennamu_page_control('/' + do_type + '/{}/' + doc_name, Number(page), data.length);
 
-        fetch('/api/' + url).then(function(res) {
-            return res.json();
-        }).then(function(data) {
-            let data_html = '<a href="/doc_watch_list/1/' + doc_name + '">(' + lang[0] + ')</a> <a href="/doc_star_doc/1/' + doc_name + '">(' + lang[1] + ')</a>';
-            data_html += '<hr class="main_hr">'
-
-            data_html += '<ul class="opennamu_ul">';
-            for(let for_a = 0; for_a < data.length; for_a++) {
-                data_html += '<li><span class="opennamu_render_ip">' + data[for_a] + '</span></li>';
-            }
-
-            data_html += '</ul>';
-            data_html += '<hr class="main_hr">'
-            
-            data_html += opennamu_page_control('/doc_' + do_type + '/{}/' + doc_name, page, data.length);
-
-            document.getElementById('opennamu_w_watch_list').innerHTML = data_html;
-
-            opennamu_do_ip_render();
-        });
+        document.getElementById('opennamu_w_watch_list').innerHTML = data_html;
     });
 }

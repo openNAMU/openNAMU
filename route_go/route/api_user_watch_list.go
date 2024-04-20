@@ -15,14 +15,14 @@ func Api_user_watch_list(call_arg []string) string {
 	other_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[1]), &other_set)
 
+	db := tool.DB_connect(db_set)
+	defer db.Close()
+
 	page, _ := strconv.Atoi(other_set["num"])
 	num := 0
 	if page*50 > 0 {
 		num = page*50 - 50
 	}
-
-	db := tool.DB_connect(db_set)
-	defer db.Close()
 
 	ip := other_set["ip"]
 	name := other_set["name"]
@@ -61,10 +61,18 @@ func Api_user_watch_list(call_arg []string) string {
 		data_list = append(data_list, title_data)
 	}
 
-	if len(data_list) == 0 {
-		return "{}"
-	} else {
-		json_data, _ := json.Marshal(data_list)
-		return string(json_data)
+	return_data := make(map[string]interface{})
+	return_data["language"] = map[string]string{
+		"watchlist": tool.Get_language(db, db_set, "watchlist", false),
+		"star_doc":  tool.Get_language(db, db_set, "star_doc", false),
 	}
+
+	if len(data_list) == 0 {
+		return_data["data"] = map[string]string{}
+	} else {
+		return_data["data"] = data_list
+	}
+
+	json_data, _ := json.Marshal(return_data)
+	return string(json_data)
 }
