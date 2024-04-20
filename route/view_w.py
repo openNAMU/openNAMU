@@ -173,9 +173,6 @@ def view_w(name = 'Test', do_type = ''):
 
             name_view = name
 
-        if redirect_to:
-            return redirect(conn, '/w_from/' + redirect_to)
-
         end_data = '''
             <div id="opennamu_preview_area">
                 <textarea id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
@@ -270,6 +267,9 @@ def view_w(name = 'Test', do_type = ''):
             flask.session['lastest_document'] += [name]
         
         flask.session['lastest_document'] = list(reversed(dict.fromkeys(reversed(flask.session['lastest_document']))))
+
+        if redirect_to and do_type != 'from':
+            return redirect(conn, '/w_from/' + redirect_to)
 
         view_history_on = get_main_skin_set(conn, flask.session, 'main_css_view_history', ip)
         if view_history_on == 'on':
