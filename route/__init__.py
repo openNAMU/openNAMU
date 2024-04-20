@@ -199,5 +199,6 @@ from route.go_api_w_random import api_w_random
 from route.go_api_w_xref import api_w_xref
 from route.go_api_w_watch_list import api_w_watch_list
 from route.go_api_w_render import api_w_render
+from route.go_api_w_set_reset import api_w_set_reset
 
 from route.go_main_func_easter_egg import main_func_easter_egg

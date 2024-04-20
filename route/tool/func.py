@@ -1103,12 +1103,8 @@ def wiki_css(data):
         
         data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js' + data_css_ver + '"></script>'
         data_css += '<script defer src="/views/main_css/js/func/shortcut.js' + data_css_ver + '"></script>'
-        
-        # Route JS
-        data_css += '<script src="/views/main_css/js/route/editor.js' + data_css_ver + '"></script>'
-        data_css += '<script src="/views/main_css/js/route/render.js' + data_css_ver + '"></script>'
-        data_css += '<script src="/views/main_css/js/route/topic.js' + data_css_ver + '"></script>'
-        data_css += '<script src="/views/main_css/js/route/view.js' + data_css_ver + '"></script>'
+        data_css += '<script src="/views/main_css/js/func/editor.js' + data_css_ver + '"></script>'
+        data_css += '<script src="/views/main_css/js/func/render.js' + data_css_ver + '"></script>'
         
         # Main CSS
         data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css' + data_css_ver + '">'

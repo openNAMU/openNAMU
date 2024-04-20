@@ -129,6 +129,7 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             return easy_minify(conn, flask.render_template(skin_check(conn),
                 imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'discussion') + ')', 0])],
                 data = '''
+                    <script src="/views/main_css/js/route/topic.js''' + cache_v() + '''"></script>
                     <style id="opennamu_remove_blind">
                         .opennamu_comment_blind_js {
                             display: none;
