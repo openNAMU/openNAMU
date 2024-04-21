@@ -59,7 +59,7 @@ function opennamu_list_recent_change() {
             right += '</a>';
             right += '<span class="opennamu_popup_footnote" id="opennamu_list_recent_change_' + String(for_a) + '_load" style="display: none;"></span>';
             right += '</span>';
-            right += ' | '
+            right += ' | ';
 
             let rev = '';
             if(data[for_a][6] !== "") {
@@ -70,7 +70,7 @@ function opennamu_list_recent_change() {
 
             if(Number(data[for_a][0]) > 1) {
                 let before_rev = String(Number(data[for_a][0]) - 1);
-                rev = '<a href="/diff/' + before_rev + '/' + data[for_a][0] + '/' + doc_name + '">' + rev + '</a>'
+                rev = '<a href="/diff/' + before_rev + '/' + data[for_a][0] + '/' + doc_name + '">' + rev + '</a>';
             }
 
             right += rev + ' | ';
