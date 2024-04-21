@@ -73,7 +73,7 @@ function opennamu_list_recent_change() {
                 rev = '<a href="/diff/' + before_rev + '/' + data[for_a][0] + '/' + doc_name + '">' + rev + '</a>'
             }
 
-            right += rev + ' | '
+            right += rev + ' | ';
             
             if(data[for_a][5] === '0') {
                 right += '<span style="color: gray;">' + data[for_a][5] + '</span>';
