@@ -38,7 +38,7 @@ function opennamu_list_recent_change() {
             data_html += '<a href="/recent_change/1/' + option_list[for_a] + '">(' + option_lang(option_list[for_a], lang) + ')</a> ';
         }
 
-        data_html += '<hr class="main_hr">'
+        data_html += '<hr class="main_hr">';
 
         let date_heading = '';
         for(let for_a = 0; for_a < data.length; for_a++) {
