@@ -66,6 +66,14 @@ def recent_block(name = 'Test', tool = 'all', num = 1):
                     ip += ' <a href="/auth/give/ban_regex/' + url_pas(data[1]) + '">(' + get_lang(conn, 'ban') + ')</a>'
 
                 ip += ' (' + get_lang(conn, 'regex') + ')'
+            elif data[5] == 'cidr':
+                ip = data[1]
+                if data[6] == '1':
+                    ip = '<s>' + ip + '</s> <a href="/auth/give/ban_cidr/' + url_pas(data[1]) + '">(' + get_lang(conn, 'release') + ')</a>'
+                else:
+                    ip += ' <a href="/auth/give/ban_cidr/' + url_pas(data[1]) + '">(' + get_lang(conn, 'ban') + ')</a>'
+
+                ip += ' (' + get_lang(conn, 'cidr') + ')'
             else:
                 ip = all_ip[data[1]]
 
