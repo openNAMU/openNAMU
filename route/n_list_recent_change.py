@@ -6,8 +6,8 @@ def list_recent_change(num = 1, set_type = 'normal'):
             imp = [get_lang(conn, 'recent_change'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, set_type) + ')', 0])],
             data = '' + \
                 '<div id="opennamu_list_recent_change"></div>' + \
-                '<script src="/views/main_css/js/route/list_recent_change.js' + cache_v() + '"></script>' + \
-                '<script>opennamu_list_recent_change();</script>' + \
+                '<script defer src="/views/main_css/js/route/list_recent_change.js' + cache_v() + '"></script>' + \
+                '<script>window.addEventListener("DOMContentLoaded", function() { opennamu_list_recent_change(); });</script>' + \
             '',
             menu = [['other', get_lang(conn, 'return')], ['recent_edit_request', get_lang(conn, 'edit_request')]]
         ))

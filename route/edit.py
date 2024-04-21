@@ -90,9 +90,11 @@ def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = '
         <hr class="main_hr">
 
         <script>
-            do_stop_exit();
-            do_paste_image();
-            ''' + add_script + '''
+            window.addEventListener('DOMContentLoaded', function() {
+                do_stop_exit();
+                do_paste_image();
+                ''' + add_script + '''
+            });
         </script>
                         
         <button id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">''' + get_lang(conn, 'send') + '''</button>
