@@ -11,7 +11,6 @@ def main_tool_admin():
                     <li><a href="/manager/3">''' + get_lang(conn, 'check_user') + '''</a></li>
                     <li><a href="/auth/give/ban">''' + get_lang(conn, 'ban') + '''</a></li>
                     <li><a href="/auth/give/ban_multiple">''' + get_lang(conn, 'multiple_ban') + '''</a></li>
-                    <li><a href="/manager/17">''' + get_lang(conn, 'release') + '''</a></li>
                     <li><a href="/manager/5">''' + get_lang(conn, 'authorize') + '''</a></li>
                 </ul>
                 <h2>''' + get_lang(conn, 'owner') + '''</h2>

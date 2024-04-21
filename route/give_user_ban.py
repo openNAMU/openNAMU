@@ -20,7 +20,7 @@ def give_user_ban(name = None, ban_type = ''):
             else:
                 end = '0'
             
-            regex_get = flask.request.form.get('regex', None)
+            regex_get = flask.request.form.get('do_ban_type', '')
             why = flask.request.form.get('why', '')
 
             release = ''
@@ -43,18 +43,25 @@ def give_user_ban(name = None, ban_type = ''):
                     all_user = [flask.request.form.get('name', 'test')]
 
             for name in all_user:
-                if regex_get or ban_type == 'regex':
-                    type_d = 'regex' if regex_get else ban_type
+                if regex_get == 'regex':
+                    type_d = 'regex'
 
                     try:
                         re.compile(name)
                     except:
                         return re_error(conn, '/error/23')
+                elif regex_get == 'cidr':
+                    type_d = 'cidr'
+
+                    try:
+                        ipaddress.IPv4Network(name, False)
+                    except:
+                        return re_error(conn, '/error/45')
                 else:
                     type_d = None
 
                 if type_d:
-                    if admin_check(conn, None, 'ban' + (' ' + type_d if type_d else '') + ' (' + name + ')') != 1:
+                    if admin_check(conn, None, 'ban ' + type_d + ' (' + name + ')') != 1:
                         return re_error(conn, '/error/3')
                 else:
                     if name == ip:
@@ -78,10 +85,10 @@ def give_user_ban(name = None, ban_type = ''):
         else:
             if ban_type == 'multiple':
                 main_name = get_lang(conn, 'multiple_ban')
-                n_name = '<textarea class="opennamu_textarea_500" placeholder="' + get_lang(conn, 'name_or_ip_or_regex_multiple') + '" name="name"></textarea><hr class="main_hr">'
+                n_name = '<textarea class="opennamu_textarea_500" placeholder="' + get_lang(conn, 'name_or_ip_or_regex_or_cidr_multiple') + '" name="name"></textarea><hr class="main_hr">'
             else:
                 main_name = get_lang(conn, 'ban')
-                n_name = '<input placeholder="' + get_lang(conn, 'name_or_ip_or_regex') + '" value="' + (name if name else '') + '" name="name"><hr class="main_hr">'
+                n_name = '<input placeholder="' + get_lang(conn, 'name_or_ip_or_regex_or_cidr') + '" value="' + (name if name else '') + '" name="name"><hr class="main_hr">'
 
             now = 0
             
@@ -108,7 +115,11 @@ def give_user_ban(name = None, ban_type = ''):
                 data = info_data + '''
                     <form method="post" ''' + action + '''>
                         ''' + n_name + '''
-                        <input type="checkbox" name="regex" ''' + ('checked' if ban_type == 'regex' else '') + '> ' + get_lang(conn, 'regex') + '''
+                        <select name="do_ban_type">
+                            <option value="normal">''' + get_lang(conn, 'normal') + '''</option>
+                            <option value="regex" ''' + ('selected' if ban_type == 'regex' else '') + '>' + get_lang(conn, 'regex') + '''</option>
+                            <option value="cidr" ''' + ('selected' if ban_type == 'cidr' else '') + '>' + get_lang(conn, 'cidr') + '''</option>
+                        </select>
                         <hr class="main_hr">
                         <input type="date" value="''' + date_value + '''" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">
                         <hr class="main_hr">

@@ -445,6 +445,7 @@ app.route('/auth/give/<name>', methods = ['POST', 'GET'])(give_auth)
 
 app.route('/auth/give/ban', methods = ['POST', 'GET'])(give_user_ban)
 app.route('/auth/give/ban/<everything:name>', methods = ['POST', 'GET'])(give_user_ban)
+app.route('/auth/give/ban_cidr/<everything:name>', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'cidr' })(give_user_ban)
 app.route('/auth/give/ban_regex/<everything:name>', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'regex' })(give_user_ban)
 app.route('/auth/give/ban_multiple', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'multiple' })(give_user_ban)
 

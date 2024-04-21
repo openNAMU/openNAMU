@@ -2135,6 +2135,7 @@ def ban_check(conn, ip = None, tool = ''):
     regex_d = curs.fetchall()
     for test_r in regex_d:
         ban_type = ban_type_check(test_r[0])
+
         g_regex = re.compile(test_r[1])
         if g_regex.search(ip):
             if tool == 'login':
@@ -2145,6 +2146,22 @@ def ban_check(conn, ip = None, tool = ''):
                     return [1, 'a' + ban_type]
             else:
                 return [1, 'a' + ban_type]
+            
+    curs.execute(db_change("select login, block from rb where band = 'cidr' and ongoing = '1'"))
+    regex_d = curs.fetchall()
+    for test_r in regex_d:
+        ban_type = ban_type_check(test_r[0])
+        
+        cidr_list = [str(ip) for ip in ipaddress.IPv4Network(test_r[1], False)]
+        if ip in cidr_list:
+            if tool == 'login':
+                if ban_type != '1':
+                    return [1, 'b' + ban_type]
+            elif tool == 'edit_request':
+                if ban_type != '2':
+                    return [1, 'b' + ban_type]
+            else:
+                return [1, 'b' + ban_type]
 
     curs.execute(db_change("select login from rb where block = ? and band = '' and ongoing = '1'"), [ip])
     ban_d = curs.fetchall()
@@ -2709,6 +2726,8 @@ def re_error(conn, data):
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
             data = get_lang(conn, 'error_content_length_too_long') + db_data
+        elif num == 45:
+            data = get_lang(conn, 'cidr_error')
         else:
             data = '???'
 

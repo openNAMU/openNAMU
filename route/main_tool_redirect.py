@@ -19,7 +19,6 @@ def main_tool_redirect(num = 1, add_2 = ''):
             12 : [get_lang(conn, 'compare_target'), '/list/user/check', get_lang(conn, 'compare_target')],
             13 : [get_lang(conn, 'document_name'), '/edit', get_lang(conn, 'load')],
             14 : [get_lang(conn, 'document_name'), '/star_doc', get_lang(conn, 'add_star_doc')],
-            15 : [get_lang(conn, 'name_or_ip_or_regex'), '/auth/give/ban', get_lang(conn, 'release')],
             16 : [0, '/auth/give/fix', get_lang(conn, 'user_fix')],
         }
         
@@ -36,8 +35,6 @@ def main_tool_redirect(num = 1, add_2 = ''):
                         return redirect(conn, '/edit_from/' + url_pas(add_2))
                     else:
                         return redirect(conn, title_list[num][1] + '/' + url_pas(add_2) + '/normal/1/' + url_pas(add_1))
-                elif flask.request.form.get('regex', '') != '':
-                    return redirect(conn, '/auth/give/ban_regex/' + url_pas(add_1))
                 else:
                     return redirect(conn, title_list[num][1] + '/' + url_pas(add_1))
             else:
@@ -45,10 +42,6 @@ def main_tool_redirect(num = 1, add_2 = ''):
                     placeholder = get_lang(conn, 'user_name')
                 else:
                     placeholder = title_list[num][0]
-
-                plus = ''
-                if num == 15:
-                    plus = '<input type="checkbox" name="regex"> ' + get_lang(conn, 'regex') + '<hr class="main_hr">'
 
                 top_plus = ''
                 if num == 13:
@@ -67,7 +60,6 @@ def main_tool_redirect(num = 1, add_2 = ''):
                             ''' + top_plus + '''
                             <input placeholder="''' + placeholder + '''" id="data_field" name="name" type="text">
                             <hr class="main_hr">
-                            ''' + plus + '''
                             <button type="submit">''' + get_lang(conn, 'go') + '''</button>
                         </form>
                     ''',
