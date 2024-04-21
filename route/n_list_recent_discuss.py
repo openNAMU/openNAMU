@@ -12,8 +12,8 @@ def list_recent_discuss(num = 1, tool = 'normal'):
             imp = [get_lang(conn, 'recent_discussion'), wiki_set(conn), wiki_custom(conn), wiki_css([m_sub, 0])],
             data = '' + \
                 '<div id="opennamu_list_recent_discuss"></div>' + \
-                '<script src="/views/main_css/js/route/list_recent_discuss.js' + cache_v() + '"></script>' + \
-                '<script>opennamu_list_recent_discuss();</script>' + \
+                '<script defer src="/views/main_css/js/route/list_recent_discuss.js' + cache_v() + '"></script>' + \
+                '<script>window.addEventListener("DOMContentLoaded", function() { opennamu_list_recent_discuss(); });</script>' + \
             '',
             menu = [['other', get_lang(conn, 'return')]]
         ))

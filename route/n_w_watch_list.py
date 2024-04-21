@@ -6,8 +6,8 @@ def w_watch_list(name, num = 1, do_type = 'watch_list'):
             imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, do_type if do_type == 'star_doc' else 'watchlist') + ')', 0])],
             data = '' + \
                 '<div id="opennamu_w_watch_list"></div>' + \
-                '<script src="/views/main_css/js/route/w_watch_list.js' + cache_v() + '"></script>' + \
-                '<script>opennamu_w_watch_list(' + str(num) + ');</script>' + \
+                '<script defer src="/views/main_css/js/route/w_watch_list.js' + cache_v() + '"></script>' + \
+                '<script>window.addEventListener("DOMContentLoaded", function() { opennamu_w_watch_list(); });</script>' + \
             '',
             menu = [['w/' + url_pas(name), get_lang(conn, 'return')]]
         ))

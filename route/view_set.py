@@ -230,7 +230,7 @@ def view_set(name = 'Test'):
                 imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'setting') + ')', 0])],
                 data = '''
                     <form method="post">
-                        <script src="/views/main_css/js/route/w_set.js''' + cache_v() + '''"></script>
+                        <script defer src="/views/main_css/js/route/w_set.js''' + cache_v() + '''"></script>
                         <a href="/setting/acl">(''' + get_lang(conn, 'main_acl_setting') + ''')</a>
                         <hr class="main_hr">
                         ''' + render_simple_set(conn, data) + '''

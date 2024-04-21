@@ -15,13 +15,13 @@ def view_w_raw(name = '', rev = '', doc_acl = ''):
         p_data = ''
         p_data += '''
             <div id="opennamu_preview_area">
-                <script src="/views/main_css/js/route/w_raw.js''' + cache_v() + '''"></script>
+                <script defer src="/views/main_css/js/route/w_raw.js''' + cache_v() + '''"></script>
                 <textarea id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
                 <textarea id="opennamu_editor_rev" style="display: none;">''' + rev_str + '''</textarea>
                 <button id="opennamu_preview_button" type="button" onclick="opennamu_w_raw_preview();">''' + get_lang(conn, 'preview') + '''</button>
                 <hr class="main_hr">
                 <textarea readonly id="opennamu_edit_textarea" class="opennamu_textarea_500"></textarea>
-                <script>opennamu_w_raw();</script>
+                <script>window.addEventListener("DOMContentLoaded", function() { opennamu_w_raw(); });</script>
             </div>
         '''
         

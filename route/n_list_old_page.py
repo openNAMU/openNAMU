@@ -12,8 +12,8 @@ def list_old_page(num = 1, set_type = 'old'):
             imp = [title, wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
             data = '' + \
                 '<div id="opennamu_list_old_page"></div>' + \
-                '<script src="/views/main_css/js/route/list_old_page.js' + cache_v() + '"></script>' + \
-                '<script>opennamu_list_old_page();</script>' + \
+                '<script defer src="/views/main_css/js/route/list_old_page.js' + cache_v() + '"></script>' + \
+                '<script>window.addEventListener("DOMContentLoaded", function() { opennamu_list_old_page(); });</script>' + \
             '',
             menu = [['other', get_lang(conn, 'return')]]
         ))

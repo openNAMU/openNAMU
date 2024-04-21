@@ -176,8 +176,8 @@ def view_w(name = 'Test', do_type = ''):
         end_data = '''
             <div id="opennamu_preview_area">
                 <textarea id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
-                <script src="/views/main_css/js/route/w.js''' + cache_v() + '''"></script>
-                <script>opennamu_w("''' + ('from' if do_type == 'from' else '') + '''");</script>
+                <script defer src="/views/main_css/js/route/w.js''' + cache_v() + '''"></script>
+                <script>window.addEventListener("DOMContentLoaded", function() { opennamu_w("''' + ('from' if do_type == 'from' else '') + '''"); });</script>
             </div>
         '''
 

@@ -979,7 +979,7 @@ def easy_minify(conn, data, tool = None):
             return data
             
         return '''
-            <script src="/views/main_css/js/route/wiki_access_password.js''' + cache_v() + '''"></script>
+            <script defer src="/views/main_css/js/route/wiki_access_password.js''' + cache_v() + '''"></script>
             <h2>''' + get_lang(conn, 'error_password_require_for_wiki_access') + '''</h2>
             <input type="password" id="wiki_access">
             <input type="submit" onclick="opennamu_do_wiki_access();">
@@ -1088,13 +1088,13 @@ def wiki_css(data):
         data_css += '<meta http-equiv="Cache-Control" content="max-age=3600">'
 
         # External JS
-        data_css += '<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" integrity="sha512-LQNxIMR5rXv7o+b1l8+N1EZMfhG7iFZ9HhnbJkTp4zjNr5Wvst75AqUeFDxeRUa7l5vEDyUiAip//r+EFLLCyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-        data_css += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-        data_css += '<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-        data_css += '<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.min.js" integrity="sha512-A+6SvPGkIN9Rf0mUXmW4xh7rDvALXf/f0VtOUiHlDUSPknu2kcfz1KzLpOJyL2pO+nZS13hhIjLqVgiQExLJrw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" integrity="sha512-LQNxIMR5rXv7o+b1l8+N1EZMfhG7iFZ9HhnbJkTp4zjNr5Wvst75AqUeFDxeRUa7l5vEDyUiAip//r+EFLLCyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.min.js" integrity="sha512-A+6SvPGkIN9Rf0mUXmW4xh7rDvALXf/f0VtOUiHlDUSPknu2kcfz1KzLpOJyL2pO+nZS13hhIjLqVgiQExLJrw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
 
         # Func JS
-        data_css += '<script src="/views/main_css/js/func/func.js' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/func.js' + data_css_ver + '"></script>'
         
         data_css += '<script defer src="/views/main_css/js/func/insert_version.js' + data_css_ver + '"></script>'
         data_css += '<script defer src="/views/main_css/js/func/insert_user_info.js' + data_css_ver + '"></script>'
@@ -1103,8 +1103,8 @@ def wiki_css(data):
         
         data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js' + data_css_ver + '"></script>'
         data_css += '<script defer src="/views/main_css/js/func/shortcut.js' + data_css_ver + '"></script>'
-        data_css += '<script src="/views/main_css/js/func/editor.js' + data_css_ver + '"></script>'
-        data_css += '<script src="/views/main_css/js/func/render.js' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/editor.js' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/render.js' + data_css_ver + '"></script>'
         
         # Main CSS
         data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css' + data_css_ver + '">'
@@ -1463,7 +1463,7 @@ def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = 
     if not return_type:
         return [get_class_render[0], get_class_render[1]]
     else:
-        return get_class_render[0] + '<script>' + get_class_render[1] + '</script>'
+        return get_class_render[0] + '<script>window.addEventListener("DOMContentLoaded", function() {' + get_class_render[1] + '});</script>'
         
 def render_simple_set(conn, data):
     # without_DB
