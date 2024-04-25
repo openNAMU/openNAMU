@@ -209,7 +209,7 @@ def view_w(name = 'Test', do_type = ''):
             history_color = 1 if db_data else 0
         else:
             response_data = 200
-            description = html.escape(data[0][0].replace('\r', '').replace('\n', ' ')[0:200])
+            description = data[0][0].replace('\r', '').replace('\n', ' ')[0:200]
 
         curs.execute(db_change("select title from acl where title = ?"), [name])
         acl = 1 if curs.fetchall() else 0
