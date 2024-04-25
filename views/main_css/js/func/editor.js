@@ -132,38 +132,53 @@ function do_stop_exit_release() {
 }
 
 function opennamu_edit_turn_off_monaco() {
-    do_sync_monaco_and_textarea();
+    let now_selected = get_select_editor();
+    let editor_list = [
+        ['opennamu_edit_textarea', 'none'], 
+        ['opennamu_monaco_editor', 'none']
+    ];
 
-    if(get_select_editor() === 'textarea') {
-        document.getElementById('opennamu_edit_textarea').style.display = 'none';
-        document.getElementById('opennamu_monaco_editor').style.display = 'block';
+    if(now_selected === 'textarea') {
+        editor_list[0][1] = 'block';
+    } else if(now_selected === 'monaco') {
+        editor_list[1][1] = 'block';
     } else {
-        document.getElementById('opennamu_edit_textarea').style.display = 'block';
-        document.getElementById('opennamu_monaco_editor').style.display = 'none';
+    }
+
+    for(let for_a = 0; for_a < editor_list.length; for_a++) {
+        document.getElementById(editor_list[for_a][0]).style.display = editor_list[for_a][1];
     }
 }
 
-function do_monaco_to_textarea() {
-    document.getElementById('opennamu_edit_textarea').value = window.editor.getValue();
+function do_monaco_to_textarea(set_value) {
+    document.getElementById('opennamu_edit_textarea').value = set_value;
 }
 
-function do_textarea_to_manaco() {
-    window.editor.setValue(document.getElementById('opennamu_edit_textarea').value);
+function do_textarea_to_manaco(set_value) {
+    window.editor.setValue(set_value);
 }
 
 function get_select_editor() {
-    if(document.getElementById('opennamu_monaco_editor').style.display === 'none') {
-        return 'textarea'
+    let now_selected = document.getElementById("opennamu_select_editor").value;
+    if(now_selected === 'default') {
+        return 'textarea';
+    } else if(now_selected === 'monaco') {
+        return 'monaco';
     } else {
-        return 'monaco'
+        return '';
     }
 }
 
 function do_sync_monaco_and_textarea(select = '') {
-    if(select === 'textarea_to_monaco' || get_select_editor() === 'textarea') {
-        do_textarea_to_manaco();
+    let now_selected = get_select_editor();
+    if(select === 'textarea_to' || now_selected === 'textarea') {
+        let set_value = document.getElementById('opennamu_edit_textarea').value;
+        do_textarea_to_manaco(set_value);
+    } else if(now_selected === 'monaco') {
+        let set_value = window.editor.getValue();
+        do_monaco_to_textarea(set_value);
     } else {
-        do_monaco_to_textarea();
+
     }
 }
 
@@ -297,6 +312,6 @@ function opennamu_do_editor_temp_save_load() {
             input.value = data;
         }
         
-        do_textarea_to_manaco();
+        do_sync_monaco_and_textarea('textarea_to');
     }
 }
