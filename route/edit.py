@@ -56,13 +56,18 @@ def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = '
             
     p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else get_lang(conn, 'default_edit_help')
     
-    monaco_editor_top += '<a href="javascript:opennamu_do_editor_temp_save();">(' + get_lang(conn, 'load_temp_save') + ')</a> <a href="javascript:opennamu_do_editor_temp_save_load();">(' + get_lang(conn, 'load_temp_save_load') + ')</a> '
-    monaco_editor_top += '<a href="javascript:opennamu_edit_turn_off_monaco();">(' + get_lang(conn, 'turn_off_monaco') + ')</a>'
+    monaco_editor_top += '<a href="javascript:opennamu_do_editor_temp_save();">(' + get_lang(conn, 'load_temp_save') + ')</a> <a href="javascript:opennamu_do_editor_temp_save_load();">(' + get_lang(conn, 'load_temp_save_load') + ')</a>'
+    monaco_editor_top += '<hr class="main_hr">'
+    
+    monaco_editor_top += '<select onclick="do_sync_monaco_and_textarea();" id="opennamu_select_editor" onchange="opennamu_edit_turn_off_monaco();">'
+    monaco_editor_top += '<option value="default">' + get_lang(conn, 'default') + '</option>'
+    monaco_editor_top += '<option value="monaco">' + get_lang(conn, 'monaco_editor') + '</option>'
+    monaco_editor_top += '<option value="new_ide">' + get_lang(conn, 'new_ide') + '</option>'
+    monaco_editor_top += '</select>'
+    
     
     darkmode = flask.request.cookies.get('main_css_darkmode', '0')
     monaco_thema = 'vs-dark' if darkmode == '1' else ''
-    
-    add_script = 'do_monaco_init("' + monaco_thema + '");'
     
     monaco_on = get_main_skin_set(conn, flask.session, 'main_css_monaco', ip)
     if monaco_on == 'use':
@@ -83,6 +88,7 @@ def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = '
         ''' + div + '''
 
         <div id="opennamu_monaco_editor" class="''' + textarea_size + '''" ''' + monaco_display + '''></div>
+        <textarea id="opennamu_simplemde" class="''' + textarea_size + '''" ''' + monaco_display + '''></textarea>
         <textarea id="opennamu_edit_textarea" ''' + editor_display + ''' class="''' + textarea_size + '''" name="content" placeholder="''' + p_text + '''">''' + html.escape(data_main) + '''</textarea>
         <hr class="main_hr">
         
@@ -93,7 +99,8 @@ def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = '
             window.addEventListener('DOMContentLoaded', function() {
                 do_stop_exit();
                 do_paste_image();
-                ''' + add_script + '''
+                do_monaco_init("''' + monaco_thema + '''");
+                do_simplemde_init();
             });
         </script>
                         
