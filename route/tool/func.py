@@ -1075,7 +1075,7 @@ def wiki_css(data):
     global global_wiki_set
 
     # without_DB
-    data += ['' for _ in range(0, 3 - len(data))]
+    data += ['' for _ in range(0, 4 - len(data))]
     
     data_css = ''
     data_css_dark = ''
@@ -1128,30 +1128,12 @@ def wiki_css(data):
 
         global_wiki_set['dark_main_css'] = data_css_dark
 
-    data = data[0:2] + ['', data_css] + data[2:] + [data_css_dark]
+    data = data[0:2] + ['', data_css] + data[2:3] + [data_css_dark] + data[3:]
 
     return data
 
 def cut_100(data):
-    # without_DB
-    if re.search(r'<div class="opennamu_render_complete">', data):
-        data = re.sub(r'(.|\r|\n)*<div class="opennamu_render_complete">', '', data, 1)
-
-        data = data.replace('<br>', ' ')
-        data = data.replace('\r', '') 
-        data = data.replace('\n', ' ')
-        data = re.sub(r'<[^<>]+>', ' ', data)
-        data = data.replace('\n', ' ')
-        data = re.sub(r' {2,}', ' ', data)
-        data = re.sub(r'(^ +| +$)', '', data)
-
-        data_len = len(data)
-        if data_len > 100:
-            return data[0:100]
-        else:
-            return data[0:data_len]
-    else:
-        return ''
+    return ''
 
 def wiki_set(conn):
     curs = conn.cursor()

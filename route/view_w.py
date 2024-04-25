@@ -181,9 +181,10 @@ def view_w(name = 'Test', do_type = ''):
             </div>
         '''
 
-        curs.execute(db_change("select title from data where title = ?"), [name])
+        curs.execute(db_change("select data from data where title = ?"), [name])
         data = curs.fetchall()
 
+        description = ''
         if acl_check(conn, name, 'render') == 1:
             response_data = 401
 
@@ -208,6 +209,7 @@ def view_w(name = 'Test', do_type = ''):
             history_color = 1 if db_data else 0
         else:
             response_data = 200
+            description = data[0][0].replace('\r', '').replace('\n', ' ')
 
         curs.execute(db_change("select title from acl where title = ?"), [name])
         acl = 1 if curs.fetchall() else 0
@@ -333,7 +335,7 @@ def view_w(name = 'Test', do_type = ''):
         menu += [['doc_watch_list/1/' + url_pas(name), get_lang(conn, 'watchlist')]]
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [name_view, wiki_set(conn), wiki_custom(conn), wiki_css([sub, r_date, watch_list])],
+            imp = [name_view, wiki_set(conn), wiki_custom(conn), wiki_css([sub, r_date, watch_list, description])],
             data = div,
             menu = menu
         )), response_data
