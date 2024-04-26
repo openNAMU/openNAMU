@@ -47,7 +47,7 @@ def main_search_deep(db_set, name = 'Test', search_type = 'title', num = 1):
             div += '''
                 <ul class="opennamu_ul">
                     <li>
-                        <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + html.escape(name) + '''</a>
+                        ''' + get_lang(conn, 'go') + ''' : <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + html.escape(name) + '''</a>
                     </li>
                 </ul>
                 <ul class="opennamu_ul">
