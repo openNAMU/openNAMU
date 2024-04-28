@@ -208,8 +208,8 @@ function opennamu_do_footnote_spread(set_name, load_name) {
     }
 }
 
-function opennamu_do_footnote_popover(set_name, load_name, sub_obj = undefined) {
-    if(document.getElementById(set_name + '_load').style.display === 'none') {
+function opennamu_do_footnote_popover(set_name, load_name, sub_obj = undefined, do_type = 'open') {
+    if(do_type === 'open') {
         if(sub_obj !== undefined) {
             document.getElementById(set_name + '_load').innerHTML = document.getElementById(sub_obj).innerHTML; 
         } else {
@@ -217,6 +217,7 @@ function opennamu_do_footnote_popover(set_name, load_name, sub_obj = undefined) 
             document.getElementById(set_name + '_load').innerHTML = '<a href="#' + load_name + '">(Go)</a> ' + document.getElementById(load_name + '_title').innerHTML;   
         }
         document.getElementById(set_name + '_load').style.display = "inline-block";
+        document.getElementById(set_name + '_load').count = 0;
 
         let width = document.getElementById(set_name + '_load').clientWidth;
         let screen_width = window.innerWidth;
@@ -241,7 +242,11 @@ function opennamu_do_footnote_popover(set_name, load_name, sub_obj = undefined) 
             }
         }
     } else {
-        document.getElementById(set_name + '_load').style.display = "none";
+        if(document.getElementById(set_name + '_load').count === 1) {
+            document.getElementById(set_name + '_load').style.display = "none";
+        } else {
+            document.getElementById(set_name + '_load').count = 1;
+        }
     }
 }
 

@@ -38,7 +38,7 @@ function ringo_opening(data) {
     }
 }
 
-document.onclick = function(event) {
+document.addEventListener("click", function() {
     let cel_list = [];
     for(for_a in ringo_menu_list) {
         cel_list.push(document.getElementById(ringo_menu_list[for_a]));
@@ -49,4 +49,4 @@ document.onclick = function(event) {
 
         setTimeout(function() { ringo_open = 0; }, 100);
     }
-}
+});
