@@ -61,6 +61,8 @@ func main() {
 		route_data = route.Api_bbs_w(call_arg[1:])
 	} else if call_arg[0] == "api_w_set_reset" {
 		route_data = route.Api_w_set_reset(call_arg[1:])
+	} else if call_arg[0] == "api_list_recent_block" {
+		route_data = route.Api_list_recent_block(call_arg[1:])
 	} else {
 		log.Fatal("404")
 	}

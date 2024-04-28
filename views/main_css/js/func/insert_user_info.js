@@ -32,9 +32,11 @@ function do_insert_user_info() {
                 
                 get_data_ban += lang_data['type'] + ' : ';
                 if(data['data']['ban']['type'] === 'normal') {
-                    get_data_ban += '<a href="/block_log/user/' + opennamu_do_url_encode(name) + '">' + lang_data['normal'] + '</a>'; 
+                    get_data_ban += '<a href="/recent_block/user/' + opennamu_do_url_encode(name) + '">' + lang_data['normal'] + '</a>'; 
+                } else if(data['data']['ban']['type'] === 'cidr') {
+                    get_data_ban += '<a href="/recent_block/cidr">' + lang_data['cidr'] + '</a>';
                 } else {
-                    get_data_ban += '<a href="/block_log/regex">' + lang_data['regex'] + '</a>';
+                    get_data_ban += '<a href="/recent_block/regex">' + lang_data['regex'] + '</a>';
                 }
                 get_data_ban += '<br>';
                 

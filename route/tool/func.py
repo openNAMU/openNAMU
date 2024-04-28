@@ -1069,7 +1069,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v246'
+    return '.cache_v247'
 
 def wiki_css(data):
     global global_wiki_set
@@ -2193,6 +2193,11 @@ def ip_pas(conn, raw_ip, type_data = 0):
     get_ip = list(set(get_ip))
     
     for raw_ip in get_ip:
+        if re.search(r"^tool:", raw_ip):
+            end_ip[raw_ip] = raw_ip
+
+            continue
+
         change_ip = 0
         is_this_ip = ip_or_user(raw_ip)
         if is_this_ip != 0:

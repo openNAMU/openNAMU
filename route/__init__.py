@@ -100,7 +100,6 @@ from route.main_view_image import main_view_image
 
 from route.recent_app_submit import recent_app_submit_2
 
-from route.recent_block import recent_block
 from route.recent_change import recent_change
 from route.recent_edit_request import recent_edit_request
 from route.recent_history_add import recent_history_add
@@ -164,6 +163,7 @@ from route.vote_select import vote_select
 
 from route.n_list_recent_change import list_recent_change
 from route.n_list_recent_discuss import list_recent_discuss
+from route.n_list_recent_block import list_recent_block
 from route.n_list_old_page import list_old_page
 
 from route.n_bbs_in import bbs_in
@@ -184,6 +184,7 @@ from route.go_api_search import api_search
 
 from route.go_api_list_recent_change import api_list_recent_change
 from route.go_api_list_recent_discuss import api_list_recent_discuss
+from route.go_api_list_recent_block import api_list_recent_block
 from route.go_api_list_recent_edit_request import api_list_recent_edit_request
 from route.go_api_list_old_page import api_list_old_page
 

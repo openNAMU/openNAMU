@@ -32,9 +32,13 @@ func Get_language(db *sql.DB, db_set map[string]string, data string, safe bool) 
 		return ""
 	}
 
-	if safe {
-		return lang_data[data]
+	if _, ok := lang_data[data]; ok {
+		if safe {
+			return lang_data[data]
+		} else {
+			return HTML_escape(lang_data[data])
+		}
 	} else {
-		return HTML_escape(lang_data[data])
+		return data + " (" + language + ")"
 	}
 }
