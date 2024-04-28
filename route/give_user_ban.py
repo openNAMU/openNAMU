@@ -81,7 +81,7 @@ def give_user_ban(name = None, ban_type = ''):
                     1 if release != '' else 0
                 )
 
-            return redirect(conn, '/block_log')
+            return redirect(conn, '/recent_block')
         else:
             if ban_type == 'multiple':
                 main_name = get_lang(conn, 'multiple_ban')
@@ -105,10 +105,11 @@ def give_user_ban(name = None, ban_type = ''):
                 if db_data and db_data[0][0] != '':
                     date_value = db_data[0][0].split()[0]
 
-                info_data = '''
-                    <div id="opennamu_get_user_info">''' + html.escape(name) + '''</div>
-                    <hr class="main_hr">
-                '''
+                if ban_type == '':
+                    info_data = '''
+                        <div id="opennamu_get_user_info">''' + html.escape(name) + '''</div>
+                        <hr class="main_hr">
+                    '''
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
                 imp = [main_name, wiki_set(conn), wiki_custom(conn), wiki_css([now, 0])],

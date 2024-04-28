@@ -5,6 +5,7 @@ import (
 	"log"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 func IP_or_user(ip string) bool {
@@ -118,6 +119,11 @@ func Get_auth_group_info(db *sql.DB, db_set map[string]string, auth string) map[
 func IP_preprocess(db *sql.DB, db_set map[string]string, ip string, my_ip string) []string {
 	var ip_view string
 	var user_name_view string
+
+	ip_split := strings.Split(ip, ":")
+	if len(ip_split) != 1 && ip_split[0] == "tool" {
+		return []string{ip, ""}
+	}
 
 	err := db.QueryRow(DB_change(db_set, "select data from other where name = 'ip_view'")).Scan(&ip_view)
 	if err != nil {

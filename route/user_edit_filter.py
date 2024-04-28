@@ -5,7 +5,7 @@ def user_edit_filter(name = ''):
         curs = conn.cursor()
 
         if admin_check(conn, 1, None) != 1:
-            return redirect(conn, '/block_log')
+            return redirect(conn, '/recent_block')
 
         if flask.request.method == 'POST':
             curs.execute(db_change('delete from user_set where name = "edit_filter" and id = ?'), [name])
@@ -25,5 +25,5 @@ def user_edit_filter(name = ''):
                         <button type="submit">''' + get_lang(conn, 'delete') + '''</button>
                     </form>
                 ''',
-                menu = [['block_log', get_lang(conn, 'return')]]
+                menu = [['recent_block', get_lang(conn, 'return')]]
             ))

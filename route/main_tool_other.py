@@ -33,7 +33,7 @@ def main_tool_other():
                 </ul>
                 <h3>''' + get_lang(conn, 'user') + '''</h3>
                 <ul class="opennamu_ul">
-                    <li><a href="/block_log">''' + get_lang(conn, 'recent_ban') + '''</a></li>
+                    <li><a href="/recent_block">''' + get_lang(conn, 'recent_ban') + '''</a></li>
                     <li><a href="/list/user">''' + get_lang(conn, 'member_list') + '''</a></li>
                 </ul>
                 <h3>''' + get_lang(conn, 'other') + '''</h3>

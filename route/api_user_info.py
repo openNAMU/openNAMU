@@ -117,7 +117,8 @@ def api_user_info(user_name = ''):
             'ban',
             'level',
             'option',
-            'edit_request_able'
+            'edit_request_able',
+            'cidr'
         ]
         lang_data = { for_a : get_lang(conn, for_a) for for_a in lang_data_list }
                 
