@@ -1499,7 +1499,8 @@ class class_do_render_namumark:
                             '',
                             footnote_data_org
                         )
-                        self.render_data_js += 'document.getElementById("' + rfn + '_over").addEventListener("click", function() { opennamu_do_footnote_popover("' + rfn + '", "' + fn + '"); });\n'
+                        self.render_data_js += 'document.getElementById("' + rfn + '_over").addEventListener("click", function() { opennamu_do_footnote_popover("' + rfn + '", "' + fn + '", undefined, "open"); });\n'
+                        self.render_data_js += 'document.addEventListener("click", function() { opennamu_do_footnote_popover("' + rfn + '", "' + fn + '", undefined, "close"); });\n'
                     else:
                         data_name = self.get_tool_data_storage('<sup><a fn_target="' + fn + '" id="' + rfn + '" href="#' + fn + '">(' + foot_v_name + ')</a></sup>', '', footnote_data_org)
 

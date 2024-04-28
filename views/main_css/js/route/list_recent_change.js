@@ -143,7 +143,8 @@ function opennamu_list_recent_change() {
                 continue;
             }
 
-            document.getElementById('opennamu_list_recent_change_' + String(for_a)).addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_list_recent_change_' + String(for_a), '', 'opennamu_history_tool_' + String(for_a)); });
+            document.getElementById('opennamu_list_recent_change_' + String(for_a)).addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_list_recent_change_' + String(for_a), '', 'opennamu_history_tool_' + String(for_a), 'open'); });
+            document.addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_list_recent_change_' + String(for_a), '', 'opennamu_history_tool_' + String(for_a), 'close'); });
         }
     });
 }
