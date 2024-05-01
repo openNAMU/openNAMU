@@ -81,6 +81,9 @@ def filter_all_add(tool, name = None):
                 elif tool == 'extension_filter':
                     admin_check(conn, None, 'extension_filter edit')
                     type_d = 'extension'
+                    plus_d = flask.request.form.get('max_file_size', '')
+                    if plus_d != '':
+                        plus_d = number_check(plus_d)
                 elif tool == 'template':
                     admin_check(conn, None, 'template_document edit')
                     type_d = 'template'
@@ -199,6 +202,10 @@ def filter_all_add(tool, name = None):
                     get_lang(conn, 'extension') + \
                     '<hr class="main_hr">' + \
                     '<input value="' + html.escape(name) + '" type="text" name="title">' + \
+                    '<hr class="main_hr">' + \
+                    get_lang(conn, 'max_file_size') + ' (MB) (' + get_lang(conn, 'default') + ' : ' + get_lang(conn, 'empty') + ')' + \
+                    '<hr class="main_hr">' + \
+                    '<input value="" type="text" name="max_file_size">' + \
                 ''
             elif tool == 'document':
                 acl_list = get_acl_list()
