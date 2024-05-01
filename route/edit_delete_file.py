@@ -13,7 +13,7 @@ def edit_delete_file(name = 'test.jpg'):
         mime_type = re.search(r'([^.]+)$', name)
         mime_type_str = 'jpg'
         if mime_type:
-            mime_type_str = mime_type.group(1).lower()
+            mime_type_str = mime_type.group(1)
 
         file_name = re.sub(r'\.([^.]+)$', '', name)
         file_name = re.sub(r'^file:', '', file_name)

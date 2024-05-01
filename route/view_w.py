@@ -128,7 +128,7 @@ def view_w(name = 'Test', do_type = ''):
 
             mime_type = re.search(r'([^.]+)$', name)
             if mime_type:
-                mime_type = mime_type.group(1).lower()
+                mime_type = mime_type.group(1)
             else:
                 mime_type = 'jpg'
 
