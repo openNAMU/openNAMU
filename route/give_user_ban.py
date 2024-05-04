@@ -14,11 +14,19 @@ def give_user_ban(name = None, ban_type = ''):
                 return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
-            time_limit = flask.request.form.get('date', '')
-            if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', time_limit):
-                end = time_limit + ' 00:00:00'
+            end = '0'
+
+            date_select = flask.request.form.get('date_type', 'days')
+            if date_select == 'date': 
+                time_limit = flask.request.form.get('date', '')
+                if re.search(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$', time_limit):
+                    end = time_limit + ' 00:00:00'
             else:
-                end = '0'
+                time_limit = int(number_check(flask.request.form.get('date_days', '1')))
+
+                time = datetime.datetime.now()
+                plus = datetime.timedelta(days = time_limit)
+                end = (time + plus).strftime("%Y-%m-%d %H:%M:%S")
             
             regex_get = flask.request.form.get('do_ban_type', '')
             why = flask.request.form.get('why', '')
@@ -106,33 +114,49 @@ def give_user_ban(name = None, ban_type = ''):
                     date_value = db_data[0][0].split()[0]
 
                 if ban_type == '':
-                    info_data = '''
-                        <div id="opennamu_get_user_info">''' + html.escape(name) + '''</div>
-                        <hr class="main_hr">
-                    '''
+                    info_data = '<div id="opennamu_get_user_info">' + html.escape(name) + '</div>'
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
                 imp = [main_name, wiki_set(conn), wiki_custom(conn), wiki_css([now, 0])],
                 data = info_data + '''
                     <form method="post" ''' + action + '''>
+                        <h2>''' + get_lang(conn, 'method') + '''</h2>
                         ''' + n_name + '''
+        
                         <select name="do_ban_type">
                             <option value="normal">''' + get_lang(conn, 'normal') + '''</option>
                             <option value="regex" ''' + ('selected' if ban_type == 'regex' else '') + '>' + get_lang(conn, 'regex') + '''</option>
                             <option value="cidr" ''' + ('selected' if ban_type == 'cidr' else '') + '>' + get_lang(conn, 'cidr') + '''</option>
                         </select>
                         <hr class="main_hr">
-                        <input type="date" value="''' + date_value + '''" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">
-                        <hr class="main_hr">
-                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="why" type="text">
-                        <hr class="main_hr">
+        
                         <select name="ban_option">
                             <option value="">''' + get_lang(conn, 'default') + '''</option>
                             <option value="login_able">''' + get_lang(conn, 'login_able') + '''</option>
                             <option value="edit_request_able">''' + get_lang(conn, 'edit_request_able') + '''</option>
                             <option value="release">''' + get_lang(conn, 'release') + '''</option>
                         </select>
+        
+                        <h2>''' + get_lang(conn, 'date') + '''</h2>
+                        <select name="date_type">
+                            <option value="date">''' + get_lang(conn, 'date') + '''</option>
+                            <option value="days">''' + get_lang(conn, 'day') + '''</option>
+                        </select>
                         <hr class="main_hr">
+        
+                        <span>''' + get_lang(conn, 'day') + '''</span>
+                        <hr class="main_hr">
+                        <input name="date_days">
+                        <hr class="main_hr">
+
+                        <span>''' + get_lang(conn, 'date') + '''</span>
+                        <hr class="main_hr">
+                        <input type="date" value="''' + date_value + '''" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">
+        
+                        <h2>''' + get_lang(conn, 'other') + '''</h2>
+                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="why" type="text">
+                        <hr class="main_hr">
+        
                         <button type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
                 ''',
