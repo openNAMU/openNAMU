@@ -4,7 +4,7 @@ def edit_upload():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check(conn, None, 'upload') == 1:
+        if acl_check(conn, '', 'upload') == 1:
             return re_error(conn, '/ban')
         
         curs.execute(db_change('select data from other where name = "upload"'))
@@ -18,25 +18,30 @@ def edit_upload():
             else:
                 captcha_post(conn, '', 0)
 
-            file_data = flask.request.files.getlist("f_data[]", None)
+            file_data = flask.request.files.getlist("f_data[]")
             file_len = len(file_data)
 
-            if (file_max * 1000 * 1000 * file_len) < flask.request.content_length:
+            file_size_all = flask.request.content_length
+            if file_size_all == None:
+                file_size_all = 0
+
+            if (file_max * 1000 * 1000 * file_len) < file_size_all or file_size_all == 0:
                 return re_error(conn, '/error/17')
 
             if file_len == 1:
                 file_num = None
             else:
-                if acl_check(conn, None, 'many_upload') == 1:
+                if acl_check(conn, '', 'many_upload') == 1:
                     return re_error(conn, '/ban')
 
                 file_num = 1
 
             for data in file_data:
+                file_name = data.filename if data.filename else ''
                 if data.filename == '':
                     return re_error(conn, '/error/9')
                 
-                value = os.path.splitext(data.filename)[1]
+                value = os.path.splitext(file_name)[1]
 
                 curs.execute(db_change("select html from html_filter where kind = 'extension'"))
                 extension = [i[0].lower() for i in curs.fetchall()]
@@ -44,9 +49,9 @@ def edit_upload():
                     return re_error(conn, '/error/14')
 
                 if flask.request.form.get('f_name', None):
-                    name = flask.request.form.get('f_name', None) + (' ' + str(file_num) if file_num else '') + value
+                    name = flask.request.form.get('f_name', '') + (' ' + str(file_num) if file_num else '') + value
                 else:
-                    name = data.filename
+                    name = file_name
 
                 piece = os.path.splitext(name)
                 if re.search(r'\.', piece[0]):
