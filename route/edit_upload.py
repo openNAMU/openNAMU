@@ -41,7 +41,10 @@ def edit_upload():
                 if file_name == '':
                     return re_error(conn, '/error/9')
                 
-                value = os.path.splitext(file_name)[1]
+                value_tmp = os.path.splitext(file_name)
+                value = ''
+                if len(value_tmp) >= 2:
+                    value = value_tmp[1]
 
                 curs.execute(db_change("select html from html_filter where kind = 'extension'"))
                 extension = [i[0].lower() for i in curs.fetchall()]
