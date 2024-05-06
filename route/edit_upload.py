@@ -38,7 +38,7 @@ def edit_upload():
 
             for data in file_data:
                 file_name = data.filename if data.filename else ''
-                if data.filename == '':
+                if file_name == '':
                     return re_error(conn, '/error/9')
                 
                 value = os.path.splitext(file_name)[1]
@@ -48,6 +48,7 @@ def edit_upload():
                 if not re.sub(r'^\.', '', value).lower() in extension:
                     return re_error(conn, '/error/14')
 
+                name = ''
                 if flask.request.form.get('f_name', None):
                     name = flask.request.form.get('f_name', '') + (' ' + str(file_num) if file_num else '') + value
                 else:
