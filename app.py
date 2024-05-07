@@ -731,6 +731,7 @@ app.route('/api/v2/recent_block/<set_type>/<int:num>', defaults = { 'db_set' : d
 app.route('/api/v2/recent_block/<set_type>/<int:num>/<user_name>', defaults = { 'db_set' : db_set_str })(api_list_recent_block)
 app.route('/api/v2/list/document/old/<int:num>', defaults = { 'db_set' : db_set_str, 'set_type' : 'old' })(api_list_old_page)
 app.route('/api/v2/list/document/new/<int:num>', defaults = { 'db_set' : db_set_str, 'set_type' : 'new' })(api_list_old_page)
+app.route('/api/v2/list/document/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_title_index)
 
 app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_topic_list)
 
