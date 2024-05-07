@@ -22,48 +22,46 @@ def main_tool_redirect(num = 1, add_2 = ''):
             16 : [0, '/auth/give/fix', get_lang(conn, 'user_fix')],
         }
         
-        if num == 1:
-            return redirect(conn, '/manager')
-        elif num - 1 <= len(title_list):
-            num -= 2
-
-            add_1 = flask.request.form.get('name', 'test')
-            if flask.request.method == 'POST':
-                if add_2 != '':
-                    if num != 12:
-                        flask.session['edit_load_document'] = add_1
-                        return redirect(conn, '/edit_from/' + url_pas(add_2))
-                    else:
-                        return redirect(conn, title_list[num][1] + '/' + url_pas(add_2) + '/normal/1/' + url_pas(add_1))
-                else:
-                    return redirect(conn, title_list[num][1] + '/' + url_pas(add_1))
-            else:
-                if title_list[num][0] == 0:
-                    placeholder = get_lang(conn, 'user_name')
-                else:
-                    placeholder = title_list[num][0]
-
-                top_plus = ''
-                if num == 13:
-                    curs.execute(db_change("select html, plus from html_filter where kind = 'template'"))
-                    db_data = curs.fetchall()
-                    for for_a in db_data:
-                        top_plus += '' + \
-                            '<a href="javascript:opennamu_insert_v(\'data_field\', \'' + get_tool_js_safe(for_a[0]) + '\')">' + html.escape(for_a[0]) + '</a> : ' + html.escape(for_a[1]) + \
-                            '<hr class="main_hr">' + \
-                        ''
-
-                return easy_minify(conn, flask.render_template(skin_check(conn),
-                    imp = [title_list[num][2], wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
-                    data = '''
-                        <form method="post">
-                            ''' + top_plus + '''
-                            <input placeholder="''' + placeholder + '''" id="data_field" name="name" type="text">
-                            <hr class="main_hr">
-                            <button type="submit">''' + get_lang(conn, 'go') + '''</button>
-                        </form>
-                    ''',
-                    menu = [['manager', get_lang(conn, 'return')]]
-                ))
-        else:
+        # 이전 버전 잔재로 -2부터 시작
+        num -= 2
+        if not num - 2 in title_list:
             return redirect(conn)
+
+        add_1 = flask.request.form.get('name', 'test')
+        if flask.request.method == 'POST':
+            if add_2 != '':
+                if num != 12:
+                    flask.session['edit_load_document'] = add_1
+                    return redirect(conn, '/edit_from/' + url_pas(add_2))
+                else:
+                    return redirect(conn, title_list[num][1] + '/' + url_pas(add_2) + '/normal/1/' + url_pas(add_1))
+            else:
+                return redirect(conn, title_list[num][1] + '/' + url_pas(add_1))
+        else:
+            if title_list[num][0] == 0:
+                placeholder = get_lang(conn, 'user_name')
+            else:
+                placeholder = title_list[num][0]
+
+            top_plus = ''
+            if num == 13:
+                curs.execute(db_change("select html, plus from html_filter where kind = 'template'"))
+                db_data = curs.fetchall()
+                for for_a in db_data:
+                    top_plus += '' + \
+                        '<a href="javascript:opennamu_insert_v(\'data_field\', \'' + get_tool_js_safe(for_a[0]) + '\')">' + html.escape(for_a[0]) + '</a> : ' + html.escape(for_a[1]) + \
+                        '<hr class="main_hr">' + \
+                    ''
+
+            return easy_minify(conn, flask.render_template(skin_check(conn),
+                imp = [title_list[num][2], wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                data = '''
+                    <form method="post">
+                        ''' + top_plus + '''
+                        <input placeholder="''' + placeholder + '''" id="data_field" name="name" type="text">
+                        <hr class="main_hr">
+                        <button type="submit">''' + get_lang(conn, 'go') + '''</button>
+                    </form>
+                ''',
+                menu = [['manager', get_lang(conn, 'return')]]
+            ))
