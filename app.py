@@ -744,6 +744,8 @@ app.route('/api/v2/doc_star_doc/<int:num>/<everything:name>', defaults = { 'db_s
 app.route('/api/v2/doc_watch_list/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_watch_list)
 app.route('/api/v2/set_reset/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_set_reset)
 
+app.route('/api/v2/user/setting/editor', methods = ['GET', 'POST', 'DELETE'], defaults = { 'db_set' : db_set_str })(api_user_setting_editor)
+
 # Func-main
 # 여기도 전반적인 조정 시행 예정
 app.route('/other')(main_tool_other)

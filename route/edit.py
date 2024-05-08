@@ -80,6 +80,7 @@ def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = '
             ''' + monaco_editor_top + '''
             <hr class="main_hr">
             ''' + edit_button(conn) + '''
+            <div id="opennamu_editor_user_button"></div>
         </div>
         
         ''' + div + '''
@@ -97,7 +98,7 @@ def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = '
                 do_stop_exit();
                 do_paste_image();
                 do_monaco_init("''' + monaco_thema + '''");
-                do_simplemde_init();
+                opennnamu_do_user_editor();
             });
         </script>
                         

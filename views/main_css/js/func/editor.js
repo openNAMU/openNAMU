@@ -315,3 +315,41 @@ function opennamu_do_editor_temp_save_load() {
         do_sync_monaco_and_textarea('textarea_to');
     }
 }
+
+function opennamu_do_user_editor_insert() {
+    let data = prompt();
+    if(data !== null && data !== "") {
+        let form_data = new FormData();
+        form_data.append('data', data);
+
+        fetch('/api/v2/user/setting/editor', {
+            method : 'post',
+            body : form_data,
+        }).then(function(res) {
+            return res.json();
+        }).then(function(data) {
+            console.log(data);
+            
+            opennnamu_do_user_editor();
+        });
+    }
+}
+
+function opennnamu_do_user_editor() {
+    fetch('/api/v2/user/setting/editor').then(function(res) {
+        return res.json();
+    }).then(function(data) {
+        if(data["response"] === "ok") {
+            let data_html = '';
+
+            for(let for_a = 0; for_a < data["data"].length; for_a++) {
+                data_html += '<a href="javascript:do_insert_data(\'' + opennamu_xss_filter(data["data"][for_a]) + '\');">(' + opennamu_xss_filter(data["data"][for_a]) + ')</a> ';
+            }
+
+            data_html += '<a href="javascript:opennamu_do_user_editor_insert();">(+)</a>';
+            data_html += '<hr class="main_hr">';
+
+            document.getElementById("opennamu_editor_user_button").innerHTML = data_html;
+        }
+    });
+}

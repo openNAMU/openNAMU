@@ -196,6 +196,8 @@ from route.go_api_bbs_w_comment import api_bbs_w_comment_n
 from route.go_api_topic import api_topic
 from route.go_api_topic_list import api_topic_list
 
+from route.go_api_user_setting_editor import api_user_setting_editor
+
 from route.go_api_w_raw import api_w_raw
 from route.go_api_w_random import api_w_random
 from route.go_api_w_xref import api_w_xref
