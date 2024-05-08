@@ -45,7 +45,7 @@ func Api_user_setting_editor(call_arg []string) string {
 
 		return_data := make(map[string]interface{})
 		return_data["response"] = "ok"
-		
+
 		if len(data_list) == 0 {
 			return_data["data"] = map[string]string{}
 		} else {

@@ -325,11 +325,22 @@ function opennamu_do_user_editor_insert() {
         fetch('/api/v2/user/setting/editor', {
             method : 'post',
             body : form_data,
-        }).then(function(res) {
-            return res.json();
-        }).then(function(data) {
-            console.log(data);
-            
+        }).then(function() {
+            opennnamu_do_user_editor();
+        });
+    }
+}
+
+function opennamu_do_user_editor_delete() {
+    let data = prompt();
+    if(data !== null && data !== "") {
+        let form_data = new FormData();
+        form_data.append('data', data);
+
+        fetch('/api/v2/user/setting/editor', {
+            method : 'delete',
+            body : form_data,
+        }).then(function() {
             opennnamu_do_user_editor();
         });
     }
@@ -346,7 +357,8 @@ function opennnamu_do_user_editor() {
                 data_html += '<a href="javascript:do_insert_data(\'' + opennamu_xss_filter(data["data"][for_a]) + '\');">(' + opennamu_xss_filter(data["data"][for_a]) + ')</a> ';
             }
 
-            data_html += '<a href="javascript:opennamu_do_user_editor_insert();">(+)</a>';
+            data_html += '<a href="javascript:opennamu_do_user_editor_insert();">(+)</a> ';
+            data_html += '<a href="javascript:opennamu_do_user_editor_delete();">(-)</a>';
             data_html += '<hr class="main_hr">';
 
             document.getElementById("opennamu_editor_user_button").innerHTML = data_html;

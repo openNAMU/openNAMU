@@ -22,6 +22,9 @@ def main_tool_redirect(num = 1, add_2 = ''):
             16 : [0, '/auth/give/fix', get_lang(conn, 'user_fix')],
         }
         
+        if num == 1:
+            return redirect(conn, '/manager')
+        
         # 이전 버전 잔재로 -2부터 시작
         num -= 2
         if not num - 2 in title_list:
