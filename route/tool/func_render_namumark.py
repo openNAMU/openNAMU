@@ -857,6 +857,8 @@ class class_do_render_namumark:
         self.render_data = re.sub(math_regex, do_render_math_sub, self.render_data)
 
     def do_render_link(self):
+        self.render_data = self.render_data.replace('[[]]', '')
+
         link_regex = r'\[\[((?:(?!\[\[|\]\]|\||<|>).|<(?:\/?(?:slash)_(?:[0-9]+)(?:[^<>]+))>)+)(?:\|((?:(?!\[\[|\]\]|\|).)+))?\]\](\n?)'
         image_count = 0
         link_count_all = len(re.findall(link_regex, self.render_data)) * 4
@@ -1307,8 +1309,8 @@ class class_do_render_namumark:
 
                 return slash_add + match[2]
 
-        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
-        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9_]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9_]+)@', do_render_include_default_sub, self.render_data)
 
     def do_render_include(self):
         include_num = 0

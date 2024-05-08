@@ -65,8 +65,8 @@ def api_w_render(db_set, name = '', tool = ''):
                 data_option_func = api_w_render_include(data_option)
 
                 # parameter replace
-                data_org = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)=((?:\\@|[^@\n])+)@', data_option_func, data_org)
-                data_org = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9]+)@', data_option_func, data_org)
+                data_org = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9_]+)=((?:\\@|[^@\n])+)@', data_option_func, data_org)
+                data_org = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9_]+)@', data_option_func, data_org)
 
                 # remove end br
                 data_org = re.sub('^\n+', '', data_org)
