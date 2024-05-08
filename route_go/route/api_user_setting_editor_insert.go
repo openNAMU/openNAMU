@@ -17,6 +17,10 @@ func Api_user_setting_editor_insert(call_arg []string) string {
 	defer db.Close()
 
 	ip := other_set["ip"]
+	
+	log.Fatal(tool.IP_or_user(ip))
+	log.Fatal(ip)
+
 	if !tool.IP_or_user(ip) {
 		stmt, err := db.Prepare(tool.DB_change(db_set, "insert into user_set (id, name, data) values (?, 'user_editor_top', ?)"))
 		if err != nil {
