@@ -18,7 +18,7 @@ func Api_user_setting_editor_delete(call_arg []string) string {
 
 	ip := other_set["ip"]
 	if !tool.IP_or_user(ip) {
-		stmt, err := db.Prepare(tool.DB_change(db_set, "delete from user_set where id = ? and user_editor_top = ?"))
+		stmt, err := db.Prepare(tool.DB_change(db_set, "delete from user_set where id = ? and name = 'user_editor_top' and data = ?"))
 		if err != nil {
 			log.Fatal(err)
 		}
