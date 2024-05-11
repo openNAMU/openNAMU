@@ -256,7 +256,7 @@ func IP_parser(db *sql.DB, db_set map[string]string, ip string, my_ip string) st
 				}
 			}
 
-			if Get_user_auth(db, db_set, ip) != "" {
+			if Get_user_auth(db, db_set, raw_ip) != "" {
 				ip = "<b>" + ip + "</b>"
 			}
 
