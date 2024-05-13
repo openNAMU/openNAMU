@@ -1072,7 +1072,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v250'
+    return '.cache_v252'
 
 def wiki_css(data):
     global global_wiki_set
@@ -1094,7 +1094,7 @@ def wiki_css(data):
         data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" integrity="sha512-LQNxIMR5rXv7o+b1l8+N1EZMfhG7iFZ9HhnbJkTp4zjNr5Wvst75AqUeFDxeRUa7l5vEDyUiAip//r+EFLLCyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
         data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
         data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/loader.min.js" integrity="sha512-A+6SvPGkIN9Rf0mUXmW4xh7rDvALXf/f0VtOUiHlDUSPknu2kcfz1KzLpOJyL2pO+nZS13hhIjLqVgiQExLJrw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.48.0/min/vs/loader.min.js" integrity="sha512-ZG31AN9z/CQD1YDDAK4RUAvogwbJHv6bHrumrnMLzdCrVu4HeAqrUX7Jsal/cbUwXGfaMUNmQU04tQ8XXl5Znw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
 
         # Func JS
         data_css += '<script defer src="/views/main_css/js/func/func.js' + data_css_ver + '"></script>'
@@ -2604,6 +2604,7 @@ def re_error(conn, data):
     else:
         title = get_lang(conn, 'error')
         sub_title = title
+        return_code = 400
 
         num = int(number_check(data.replace('/error/', '')))
         if num == 1:
@@ -2718,6 +2719,10 @@ def re_error(conn, data):
             data = get_lang(conn, 'error_content_length_too_long') + db_data
         elif num == 45:
             data = get_lang(conn, 'cidr_error')
+        elif num == 46:
+            data = get_lang(conn, 'func_404_error')
+            title = '404'
+            return_code = 404
         else:
             data = '???'
 
@@ -2747,4 +2752,4 @@ def re_error(conn, data):
                     '</ul>' + \
                 '',
                 menu = 0
-            )), 400
+            )), return_code
