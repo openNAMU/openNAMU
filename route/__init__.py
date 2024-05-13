@@ -172,6 +172,8 @@ from route.n_w_watch_list import w_watch_list
 
 from route.n_topic_list import topic_list
 
+from route.n_setting_404_page import setting_404_page
+
 from route.n_bbs_main import bbs_main
 
 from route.go_api_func_llm import api_func_llm
@@ -192,6 +194,8 @@ from route.go_api_list_title_index import api_list_title_index
 from route.go_api_bbs import api_bbs
 from route.go_api_bbs_list import api_bbs_list
 from route.go_api_bbs_w_comment import api_bbs_w_comment_n
+
+from route.go_api_setting import api_setting
 
 from route.go_api_topic import api_topic
 from route.go_api_topic_list import api_topic_list
