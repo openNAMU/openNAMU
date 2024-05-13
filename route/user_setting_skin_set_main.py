@@ -16,10 +16,6 @@ def user_setting_skin_set_main_set_list(conn):
             ['default', get_lang(conn, 'default')],
             ['normal', get_lang(conn, 'off')],
             ['use', get_lang(conn, 'use')]
-        ], 'main_css_image_paste' : [
-            ['default', get_lang(conn, 'default')],
-            ['normal', get_lang(conn, 'off')],
-            ['use', get_lang(conn, 'use')]
         ], 'main_css_category_set' : [
             ['default', get_lang(conn, 'default')],
             ['bottom', get_lang(conn, 'bottom')],
@@ -115,7 +111,7 @@ def user_setting_skin_set_main():
             return re_error(conn, '/ban')
             
         set_list = user_setting_skin_set_main_set_list(conn)
-        use_cookie = ['main_css_image_paste', 'main_css_darkmode']
+        use_cookie = ['main_css_darkmode']
 
         if flask.request.method == 'POST':
             html_data = flask.make_response(redirect(conn, '/change/skin_set/main'))
@@ -276,13 +272,6 @@ def user_setting_skin_set_main():
                             ''' + set_data["main_css_font_size"] + '''
                         </select>
                         <h2>''' + get_lang(conn, "edit") + '''</h2>
-                        <h3>''' + get_lang(conn, "image_paste") + '''</h3>
-                        <sup>''' + get_lang(conn, 'only_korean') + '''</sup> <sup>''' + get_lang(conn, 'unavailable_in_monaco') + '''</sup>
-                        <hr class="main_hr">
-                        ''' + set_data_main["main_css_image_paste"] + '''
-                        <select name="main_css_image_paste">
-                            ''' + set_data["main_css_image_paste"] + '''
-                        </select>
                         <h3>''' + get_lang(conn, "monaco_editor") + '''</h3>
                         ''' + set_data_main["main_css_monaco"] + '''
                         <select name="main_css_monaco">
