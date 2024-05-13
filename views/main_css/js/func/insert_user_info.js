@@ -59,7 +59,7 @@ function do_insert_user_info() {
                 get_data_ban += '<br>';
                 
                 if(data['data']['ban']['reason'] === 'edit filter') {
-                    get_data_ban += lang_data['why'] + ' : <a href="/edit_filter/' + opennamu_do_url_encode(name) + '">' + data['data']['ban']['reason'] + '</a>';
+                    get_data_ban += lang_data['why'] + ' : <a href="/edit_filter_check/' + opennamu_do_url_encode(name) + '">' + data['data']['ban']['reason'] + '</a>';
                 } else {
                     get_data_ban += lang_data['why'] + ' : ' + data['data']['ban']['reason'];
                 }

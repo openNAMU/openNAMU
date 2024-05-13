@@ -10,7 +10,7 @@ def user_edit_filter(name = ''):
         if flask.request.method == 'POST':
             curs.execute(db_change('delete from user_set where name = "edit_filter" and id = ?'), [name])
 
-            return redirect(conn, '/edit_filter/' + url_pas(name))
+            return redirect(conn, '/edit_filter_check/' + url_pas(name))
         else:
             curs.execute(db_change('select data from user_set where name = "edit_filter" and id = ?'), [name])
             db_data = curs.fetchall()

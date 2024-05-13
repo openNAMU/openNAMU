@@ -111,7 +111,7 @@ function opennamu_list_recent_block() {
             let bottom = '';
             if(data[for_a][0] !== "") {
                 if(data[for_a][0] === "edit filter") {
-                    bottom = '<a href="/edit_filter/' + opennamu_do_url_encode(data[for_a][1]) + '">edit filter</a>'
+                    bottom = '<a href="/edit_filter_check/' + opennamu_do_url_encode(data[for_a][1]) + '">edit filter</a>'
                 } else {
                     bottom = opennamu_send_render(opennamu_xss_filter(data[for_a][0]));
                 }
