@@ -239,7 +239,7 @@ def user_challenge():
             db_data = curs.fetchall()
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
-                '✅',
+                '☑️',
                 get_lang(conn, 'challenge_title_admin'), 
                 get_lang(conn, 'challenge_info_admin', 1),
                 disable
