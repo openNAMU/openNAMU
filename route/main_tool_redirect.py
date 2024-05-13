@@ -27,7 +27,7 @@ def main_tool_redirect(num = 1, add_2 = ''):
         
         # 이전 버전 잔재로 -2부터 시작
         num -= 2
-        if not num - 2 in title_list:
+        if not num in title_list:
             return redirect(conn)
 
         add_1 = flask.request.form.get('name', 'test')
