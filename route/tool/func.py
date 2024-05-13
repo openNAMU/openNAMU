@@ -635,6 +635,9 @@ def update(conn, ver_num, set_data):
 
             curs.execute(db_change("update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')"), [data_set_exist, for_a[0]])
 
+    if ver_num < 20240513:
+        curs.execute(db_change("update user_set set data = '☑️' where name = 'user_title' and data = '✅'"))
+
     print('Update completed')
 
 def set_init_always(conn, ver_num):
@@ -840,7 +843,7 @@ def get_user_title_list(conn, ip = ''):
 
     curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_admin', ip])
     if curs.fetchall():
-        user_title['✅'] = '✅ admin'
+        user_title['☑️'] = '☑️ admin'
     
     return user_title
     
@@ -1069,7 +1072,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v248'
+    return '.cache_v249'
 
 def wiki_css(data):
     global global_wiki_set

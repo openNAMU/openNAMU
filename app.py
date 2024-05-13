@@ -592,7 +592,7 @@ app.route('/user/<name>')(user_info)
 
 app.route('/challenge', methods = ['GET', 'POST'])(user_challenge)
 
-app.route('/edit_filter/<name>', methods = ['GET', 'POST'])(user_edit_filter)
+app.route('/edit_filter_check/<name>', methods = ['GET', 'POST'])(user_edit_filter)
 
 app.route('/count')(user_count)
 app.route('/count/<name>')(user_count)
