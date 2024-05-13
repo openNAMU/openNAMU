@@ -1072,7 +1072,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v249'
+    return '.cache_v250'
 
 def wiki_css(data):
     global global_wiki_set
