@@ -39,38 +39,24 @@ function do_insert_data(data) {
 
 // 아직 개편이 더 필요함
 function do_paste_image() {
-    const name = 'opennamu_edit_textarea';
-
-    window.addEventListener('DOMContentLoaded', async function() {
-        let set = await opennamu_get_main_skin_set("main_css_image_paste");
-        if(set === 'use') {
-            document.getElementById(name).addEventListener("paste", pasteListener);
-        }
-    });
+    document.getElementById('opennamu_edit_textarea').addEventListener("paste", pasteListener);
 }
 
 function pasteListener(e) {
-    // find file
+    let lang_data = new FormData();
+    lang_data.append('data', 'file_name empty save authority_error same_file_error error');
+
     if(e.clipboardData && e.clipboardData.items) {
         const items = e.clipboardData.items;
         const formData = new FormData();
 
         let haveImageInClipboard = false;
         let file_name = '';
+        let file;
         
         for(let i = 0; i < items.length; i++) {
             if(items[i].type.indexOf("image") !== -1) {
-                const file = items[i].getAsFile();
-                const customName = prompt("파일 이름 (확장자 제외)");
-                
-                if(!customName) {
-                    return alert("파일 이름 없음");
-                }
-                
-                file_name = customName + ".png";
-                
-                const customFile = new File([file], file_name, { type: file.type });
-                formData.append("f_data[]", customFile);
+                file = items[i].getAsFile();
                 
                 haveImageInClipboard = true;
                 e.preventDefault();
@@ -83,32 +69,48 @@ function pasteListener(e) {
             return;
         }
 
-        // send to server
-        fetch("/upload", {
-            method: "POST",
-            body: formData,
-        }).then((res) => {
-            if (res.status === 200 || res.status === 201) {
-                const url = res.url;
-                alert(
-                    '업로드 완료 : ' +
-                    '[[파일:' + file_name + ']]'
-                );
-
-                do_insert_data('[[file:' + file_name + ']]');
-            } else {
-                console.error("[ERROR] PasteUpload Fail :", res.statusText);
-                if(res.status === 400) {
-                    alert("파일 이름 중복");
-                } else if(res.status === 401) {
-                    alert("권한 부족");    
-                } else {
-                    alert("업로드 실패");        
-                }
+        fetch('/api/lang', {
+            method : 'post',
+            body : lang_data,
+        }).then(function(res) {
+            return res.json();
+        }).then(function(ajax_data) {
+            const customName = prompt(ajax_data['data'][0]);
+                
+            if(!customName) {
+                return alert(ajax_data['data'][1]);
             }
-        }).catch((err) => {
-            console.error("오류 내역 :", JSON.stringify(err), err);
-            alert("업로드 실패");
+            
+            file_name = customName + ".png";
+            
+            const customFile = new File([file], file_name, { type: file.type });
+            formData.append("f_data[]", customFile);
+
+            fetch("/upload", {
+                method: "POST",
+                body: formData,
+            }).then((res) => {
+                if (res.status === 200 || res.status === 201) {
+                    const url = res.url;
+                    alert(ajax_data['data'][2] + ' : [[file:' + file_name + ']]');
+
+                    do_insert_data('[[file:' + file_name + ']]');
+                } else {
+                    console.error("[ERROR] PasteUpload Fail :", res.statusText);
+
+                    if(res.status === 400) {
+                        alert(ajax_data['data'][4]);
+                    } else if(res.status === 401) {
+                        alert(ajax_data['data'][3]);    
+                    } else {
+                        alert(ajax_data['data'][5]);        
+                    }
+                }
+            }).catch((err) => {
+                console.error("[ERROR] PasteUpload Fail :", JSON.stringify(err), err);
+
+                alert(ajax_data['data'][5]);
+            });
         });
     }
 }
@@ -230,7 +232,7 @@ class PlaceholderContentWidget {
 }
 
 function do_monaco_init(monaco_thema, markup = "") {
-    require.config({ paths: { 'vs' : 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.40.0/min/vs' }});
+    require.config({ paths: { 'vs' : 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.48.0/min/vs' }});
     require.config({ 'vs/nls' : { availableLanguages: { '*' : 'ko' } }});
     require(["vs/editor/editor.main"], function () {
         monaco.languages.register({ id : "namumark" });

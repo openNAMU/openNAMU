@@ -148,13 +148,6 @@ def main_setting_skin_set():
                             ''' + set_data["main_css_font_size"] + '''
                         </select>
                         <h2>''' + get_lang(conn, "edit") + '''</h2>
-                        <h3>''' + get_lang(conn, "image_paste") + '''</h3>
-                        <sup>''' + get_lang(conn, 'only_korean') + '''</sup> <sup>''' + get_lang(conn, 'unavailable_in_monaco') + '''</sup>
-                        <hr class="main_hr">
-                        ''' + set_data_main["main_css_image_paste"] + '''
-                        <select name="main_css_image_paste">
-                            ''' + set_data["main_css_image_paste"] + '''
-                        </select>
                         <h3>''' + get_lang(conn, "monaco_editor") + '''</h3>
                         ''' + set_data_main["main_css_monaco"] + '''
                         <select name="main_css_monaco">
