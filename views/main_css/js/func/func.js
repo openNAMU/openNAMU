@@ -43,19 +43,42 @@ function opennamu_do_id_check(data) {
 }
 
 function opennamu_do_ip_click(obj) {
-    fetch('/api/v2/ip_menu/' + opennamu_do_url_encode('test')).then(function(res) {
-        return res.json();
-    }).then(function(data) {
-        data = data["data"];
+    if(obj.id === "") {
+        let user_name = obj.name;
 
-        let data_html = '';
+        fetch('/api/v2/ip_menu/' + user_name).then(function(res) {
+            return res.json();
+        }).then(function(data) {
+            data = data["data"];
 
-        for(let key in data) {
-            for(let for_a = 0; for_a < key.length; for_a++) {
-                data_html += data[key][for_a][1] + ' | ';
+            let data_html = '';
+
+            for(let key in data) {
+                for(let for_a = 0; for_a < data[key].length; for_a++) {
+                    data_html += '<a href="' + data[key][for_a][0] + '">' + data[key][for_a][1] + '</a> | ';
+                }
             }
-        }
-    });
+
+            data_html = data_html.replace(/ \| $/g, '');
+
+            let for_a;
+            for(for_a = 0; document.getElementById("opennamu_ip_render_" + String(for_a) + "_load"); for_a++) {}
+
+            let popup_html = '<span class="opennamu_popup_footnote" id="opennamu_ip_render_' + String(for_a) + '_load" style="display: none;"></span>';
+            popup_html += '<span style="display: none;" id="opennamu_ip_tool_' + String(for_a) + '">';
+            popup_html += data_html;
+            popup_html += '</span>';
+
+            obj.innerHTML += popup_html;
+            obj.id = 'opennamu_ip_render_' + String(for_a);
+            obj.onclick = '';
+    
+            document.getElementById('opennamu_ip_render_' + String(for_a)).addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_ip_render_' + String(for_a), '', 'opennamu_ip_tool_' + String(for_a), 'open'); });
+            document.addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_ip_render_' + String(for_a), '', 'opennamu_ip_tool_' + String(for_a), 'close'); });
+            
+            obj.click();
+        });
+    }
 }
 
 function opennamu_do_ip_render() {
