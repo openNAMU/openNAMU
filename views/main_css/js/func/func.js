@@ -42,11 +42,27 @@ function opennamu_do_id_check(data) {
     }
 }
 
+function opennamu_do_ip_click(obj) {
+    fetch('/api/v2/ip_menu/' + opennamu_do_url_encode('test')).then(function(res) {
+        return res.json();
+    }).then(function(data) {
+        data = data["data"];
+
+        let data_html = '';
+
+        for(let key in data) {
+            for(let for_a = 0; for_a < key.length; for_a++) {
+                data_html += data[key][for_a][1] + ' | ';
+            }
+        }
+    });
+}
+
 function opennamu_do_ip_render() {
     for(let for_a = 0; for_a < document.getElementsByClassName('opennamu_render_ip').length; for_a++) {
         let ip = document.getElementsByClassName('opennamu_render_ip')[for_a].innerHTML.replace(/&amp;/g, '&');
 
-        fetch('/api/ip/' + opennamu_do_url_encode(ip)).then(function(res) {
+        fetch('/api/v2/ip/' + opennamu_do_url_encode(ip)).then(function(res) {
             return res.json();
         }).then(function(data) {
             if(document.getElementsByClassName('opennamu_render_ip')[for_a].id !== "opennamu_render_end") {
