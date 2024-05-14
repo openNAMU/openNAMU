@@ -328,7 +328,7 @@ func IP_parser(db *sql.DB, db_set map[string]string, ip string, my_ip string) st
 			ip = user_title + ip
 		}
 
-		ip += " <a href=\"javascript:opennamu_do_ip_click(this);\">(" + Get_language(db, db_set, "tool", false) + ")</a>"
+		ip += "<a href=\"javascript:void(0);\" name=\"" + Url_parser(raw_ip) + "\" onclick=\"opennamu_do_ip_click(this);\">⚒️</a>"
 
 		return ip
 	}
