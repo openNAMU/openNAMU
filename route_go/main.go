@@ -75,6 +75,8 @@ func main() {
 		route_data = route.Api_setting(call_arg[1:])
 	} else if call_arg[0] == "api_setting_edit" {
 		route_data = route.Api_setting_edit(call_arg[1:])
+	} else if call_arg[0] == "api_func_ip_menu" {
+		route_data = route.Api_func_ip_menu(call_arg[1:])
 	} else {
 		log.Fatal(call_arg[0] + " is 404")
 	}
