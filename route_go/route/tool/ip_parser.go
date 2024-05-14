@@ -209,6 +209,71 @@ func IP_preprocess(db *sql.DB, db_set map[string]string, ip string, my_ip string
 	return []string{ip, ip_change}
 }
 
+func IP_menu(db *sql.DB, db_set map[string]string, ip string, my_ip string, option string) map[string][][]string {
+	menu := map[string][][]string{}
+
+	if ip == my_ip && option == "" {
+		stmt, err := db.Prepare(DB_change(db_set, "select count(*) from user_notice where name = ? and readme = ''"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer stmt.Close()
+
+		var alarm_count string
+
+		err = stmt.QueryRow(my_ip).Scan(&alarm_count)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				alarm_count = "0"
+			} else {
+				log.Fatal(err)
+			}
+		}
+
+		if IP_or_user(my_ip) {
+			menu[Get_language(db, db_set, "login", false)] = [][]string{
+				{"/login", Get_language(db, db_set, "login", false)},
+				{"/register", Get_language(db, db_set, "register", false)},
+				{"/change", Get_language(db, db_set, "user_setting", false)},
+				{"/login/find", Get_language(db, db_set, "password_search", false)},
+				{"/alarm" + Url_parser(my_ip), Get_language(db, db_set, "alarm", false) + " (" + alarm_count + ")"},
+			}
+		} else {
+			menu[Get_language(db, db_set, "login", false)] = [][]string{
+				{"/logout", Get_language(db, db_set, "logout", false)},
+				{"/change", Get_language(db, db_set, "user_setting", false)},
+			}
+
+			menu[Get_language(db, db_set, "tool", false)] = [][]string{
+				{"/watch_list", Get_language(db, db_set, "watchlist", false)},
+				{"/star_doc", Get_language(db, db_set, "star_doc", false)},
+				{"/challenge", Get_language(db, db_set, "challenge_and_level_manage", false)},
+				{"/acl/user:" + Url_parser(my_ip), Get_language(db, db_set, "user_document_acl", false)},
+				{"/alarm" + Url_parser(my_ip), Get_language(db, db_set, "alarm", false) + " (" + alarm_count + ")"},
+			}
+		}
+	}
+
+	auth_name := Get_user_auth(db, db_set, my_ip)
+	if auth_name != "" {
+		menu[Get_language(db, db_set, "admin", false)] = [][]string{
+			{"/auth/give/ban/" + Url_parser(ip), Get_language(db, db_set, "ban", false) + " | " + Get_language(db, db_set, "release", false)},
+			{"/list/user/check/" + Url_parser(ip), Get_language(db, db_set, "check", false)},
+		}
+	}
+
+	menu[Get_language(db, db_set, "other", false)] = [][]string{
+		{"/record/" + Url_parser(ip), Get_language(db, db_set, "edit_record", false)},
+		{"/record/topic/" + Url_parser(ip), Get_language(db, db_set, "discussion_record", false)},
+		{"/record/bbs/" + Url_parser(ip), Get_language(db, db_set, "bbs_record", false)},
+		{"/record/bbs_comment/" + Url_parser(ip), Get_language(db, db_set, "bbs_comment_record", false)},
+		{"/topic/user:" + Url_parser(ip), Get_language(db, db_set, "user_discussion", false)},
+		{"/count/" + Url_parser(ip), Get_language(db, db_set, "count", false)},
+	}
+
+	return menu
+}
+
 func IP_parser(db *sql.DB, db_set map[string]string, ip string, my_ip string) string {
 	ip_pre_data := IP_preprocess(db, db_set, ip, my_ip)
 	if ip_pre_data[0] == "" {
@@ -263,7 +328,7 @@ func IP_parser(db *sql.DB, db_set map[string]string, ip string, my_ip string) st
 			ip = user_title + ip
 		}
 
-		ip += " <a href=\"/user/" + Url_parser(raw_ip) + "\">(" + Get_language(db, db_set, "tool", false) + ")</a>"
+		ip += "<a href=\"javascript:void(0);\" name=\"" + Url_parser(raw_ip) + "\" onclick=\"opennamu_do_ip_click(this);\">⚒️</a>"
 
 		return ip
 	}

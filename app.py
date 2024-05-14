@@ -748,6 +748,10 @@ app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'], defaults = { 'db_s
 
 app.route('/api/v2/user/setting/editor', methods = ['GET', 'POST', 'DELETE'], defaults = { 'db_set' : db_set_str })(api_user_setting_editor)
 
+app.route('/api/v2/ip/<everything:data>', defaults = { 'db_set' : db_set_str })(api_func_ip)
+app.route('/api/v2/ip_menu/<everything:ip>', defaults = { 'db_set' : db_set_str, 'option' : 'user' })(api_func_ip_menu)
+app.route('/api/v2/user_menu/<everything:ip>', defaults = { 'db_set' : db_set_str })(api_func_ip_menu)
+
 # Func-main
 # 여기도 전반적인 조정 시행 예정
 app.route('/other')(main_tool_other)
