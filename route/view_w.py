@@ -169,7 +169,10 @@ def view_w(name = 'Test', do_type = ''):
             db_data = curs.fetchall()
             if db_data:
                 doc_type = 'redirect'
-                redirect_to = url_pas(db_data[0][0]) + db_data[0][1]
+
+                curs.execute(db_change("select title from data where title = ?"), [db_data[0][0]])
+                if curs.fetchall():
+                    redirect_to = url_pas(db_data[0][0]) + db_data[0][1]
 
             name_view = name
 
