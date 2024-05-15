@@ -49,11 +49,11 @@ def topic_tool_change(topic_num = 1):
                     <form method="post">
                         ''' + load_lang('document_name') + '''
                         <hr class="main_hr">
-                        <input value="''' + rd_d[0][0] + '''" name="title" type="text">
+                        <input value="''' + html.escape(rd_d[0][0]) + '''" name="title" type="text">
                         <hr class="main_hr">
                         ''' + load_lang('discussion_name') + '''
                         <hr class="main_hr">
-                        <input value="''' + rd_d[0][1] + '''" name="sub" type="text">
+                        <input value="''' + html.escape(rd_d[0][1]) + '''" name="sub" type="text">
                         <hr class="main_hr">
                         <button type="submit">''' + load_lang('save') + '''</button>
                     </form>
