@@ -42,6 +42,9 @@ def ip_check(d_type = 0):
             )
         )
 
+        if ip_or_user(ip) == 0:
+            ip = '::1'
+
     return ip
 
 def ip_or_user(data = ''):
