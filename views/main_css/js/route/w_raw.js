@@ -3,7 +3,7 @@
 function opennamu_w_raw(render = '') {
     let name = "test";
     if(document.getElementById('opennamu_editor_doc_name')) {
-        name = document.getElementById('opennamu_editor_doc_name').innerHTML.replace(/&amp;/g, '&');
+        name = opennamu_xss_filter_decode(document.getElementById('opennamu_editor_doc_name').innerHTML);
     }
 
     let rev = "";
@@ -36,7 +36,7 @@ function opennamu_w_raw(render = '') {
 function opennamu_w_raw_preview() {
     let name = "test";
     if(document.getElementById('opennamu_editor_doc_name')) {
-        name = document.getElementById('opennamu_editor_doc_name').innerHTML.replace(/&amp;/g, '&');
+        name = opennamu_xss_filter_decode(document.getElementById('opennamu_editor_doc_name').innerHTML);
     }
 
     let data = "";

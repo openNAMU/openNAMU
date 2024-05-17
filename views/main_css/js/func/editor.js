@@ -290,7 +290,7 @@ function opennamu_do_editor_preview() {
     if(input !== null) {
         let name = "test";
         if(document.getElementById('opennamu_editor_doc_name')) {
-            name = document.getElementById('opennamu_editor_doc_name').value.replace(/&amp;/g, '&');
+            name = opennamu_xss_filter_decode(document.getElementById('opennamu_editor_doc_name').value);
         }
 
         opennamu_do_render('opennamu_preview_area', input.value, name);

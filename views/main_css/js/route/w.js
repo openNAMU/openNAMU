@@ -3,7 +3,7 @@
 function opennamu_w(do_type = '') {
     let name = "test";
     if(document.getElementById('opennamu_editor_doc_name')) {
-        name = document.getElementById('opennamu_editor_doc_name').innerHTML.replace(/&amp;/g, '&');
+        name = opennamu_xss_filter_decode(document.getElementById('opennamu_editor_doc_name').innerHTML);
     }
 
     fetch("/api/raw/" + opennamu_do_url_encode(name)).then(function(res) {
