@@ -1,5 +1,30 @@
 from .tool.func import *
 
+def view_set_markup(conn, document_name = '', markup = '', addon = '', disable = ''):
+    curs = conn.cursor()
+
+    curs.execute(db_change('select data from other where name = "markup"'))
+    db_data = curs.fetchall()
+    default_markup = db_data[0][0] if db_data and db_data[0][0] != '' else 'namumark'
+
+    markup_load = markup
+    if markup == '':
+        curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [document_name])
+        db_data = curs.fetchall()
+        markup_load = db_data[0][0] if db_data and db_data[0][0] != '' else ''
+
+    markup_list = ['normal'] + get_init_set_list('markup')['list']
+    markup_html = ''
+    for for_a in markup_list:
+        if markup_load == for_a:
+            markup_html = '<option value="' + (for_a if for_a != 'normal' else default_markup) + '">' + for_a + '</option>' + markup_html
+        else:
+            markup_html += '<option value="' + (for_a if for_a != 'normal' else default_markup) + '">' + for_a + '</option>'
+    
+    markup_html = '<select name="document_markup" ' + disable + ' ' + addon + '>' + markup_html + '</select>'
+
+    return markup_html
+
 def view_set(name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -185,21 +210,7 @@ def view_set(name = 'Test'):
                 <h2>''' + get_lang(conn, 'markup') + '''</h2>
             '''
 
-            curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_markup'"), [name])
-            db_data = curs.fetchall()
-            markup_load = db_data[0][0] if db_data and db_data[0][0] != '' else ''
-
-            markup_list = ['normal'] + get_init_set_list('markup')['list']
-            markup_html = ''
-            for for_a in markup_list:
-                if markup_load == for_a:
-                    markup_html = '<option value="' + (for_a if for_a != 'normal' else '') + '">' + for_a + '</option>' + markup_html
-                else:
-                    markup_html += '<option value="' + (for_a if for_a != 'normal' else '') + '">' + for_a + '</option>'
-            
-            markup_html = '<select name="document_markup" ' + check_ok + '>' + markup_html + '</select>'
-
-            data += markup_html
+            data += view_set_markup(conn, document_name = name, disable = check_ok)
 
             save_button = '<button type="submit" ' + check_ok + '>' + get_lang(conn, 'save') + '</button>'
             if admin_check(conn) != 1:
