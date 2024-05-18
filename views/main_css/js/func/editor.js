@@ -156,7 +156,7 @@ function do_monaco_to_textarea(set_value) {
     document.getElementById('opennamu_edit_textarea').value = set_value;
 }
 
-function do_textarea_to_manaco(set_value) {
+function do_textarea_to_monaco(set_value) {
     window.editor.setValue(set_value);
 }
 
@@ -171,11 +171,22 @@ function get_select_editor() {
     }
 }
 
+function get_select_editor_markup() {
+    let now_selected = document.getElementById("opennamu_editor_markup").value;
+    if(now_selected === 'namumark' || now_selected === 'namumark_beta') {
+        return 'namumark';
+    } else if(now_selected === 'markdown') {
+        return 'markdown';
+    } else {
+        return 'plaintext';
+    }
+}
+
 function do_sync_monaco_and_textarea(select = '') {
     let now_selected = get_select_editor();
     if(select === 'textarea_to' || now_selected === 'textarea') {
         let set_value = document.getElementById('opennamu_edit_textarea').value;
-        do_textarea_to_manaco(set_value);
+        do_textarea_to_monaco(set_value);
     } else if(now_selected === 'monaco') {
         let set_value = window.editor.getValue();
         do_monaco_to_textarea(set_value);
@@ -231,7 +242,7 @@ class PlaceholderContentWidget {
     }
 }
 
-function do_monaco_init(monaco_thema, markup = "") {
+function do_monaco_init(monaco_thema) {
     require.config({ paths: { 'vs' : 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.48.0/min/vs' }});
     require.config({ 'vs/nls' : { availableLanguages: { '*' : 'ko' } }});
     require(["vs/editor/editor.main"], function () {
@@ -280,6 +291,8 @@ function do_monaco_init(monaco_thema, markup = "") {
         });
 
         new PlaceholderContentWidget(document.getElementById('opennamu_edit_textarea').placeholder, window.editor);
+
+        opennamu_do_sync_monaco_markup();
     });
 }
 
@@ -295,6 +308,11 @@ function opennamu_do_editor_preview() {
 
         opennamu_do_render('opennamu_preview_area', input.value, name);
     }
+}
+
+function opennamu_do_sync_monaco_markup() {
+    let now_selected = get_select_editor_markup();
+    monaco.editor.setModelLanguage(window.editor.getModel(), now_selected);
 }
 
 function opennamu_do_editor_temp_save() {

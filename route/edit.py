@@ -2,6 +2,7 @@ import multiprocessing
 
 from .tool.func import *
 
+from .view_set import view_set_markup
 
 def edit_render_set(name, content):
     with get_db_connect() as conn:
@@ -67,10 +68,17 @@ def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = '
     else:
         editor_display[0] = ''
 
+    # 에디터 선택창
     monaco_editor_top += '<select onclick="do_sync_monaco_and_textarea();" id="opennamu_select_editor" onchange="opennamu_edit_turn_off_monaco();">'
     monaco_editor_top += '<option value="default" ' + ('selected' if editor_display[0] == '' else '') + '>' + get_lang(conn, 'default') + '</option>'
     monaco_editor_top += '<option value="monaco" ' + ('selected' if editor_display[1] == '' else '') + '>' + get_lang(conn, 'monaco_editor') + '</option>'
-    monaco_editor_top += '</select>'
+    monaco_editor_top += '</select> '
+
+    # 문법 선택창
+    if do_type == 'edit':
+        monaco_editor_top += view_set_markup(conn, document_name = name, addon = 'id="opennamu_editor_markup" onclick="opennamu_do_sync_monaco_markup();"')
+    else:
+        monaco_editor_top += view_set_markup(conn, addon = 'id="opennamu_editor_markup" onclick="opennamu_do_sync_monaco_markup();"', disable = 'disabled')
 
     textarea_size = 'opennamu_textarea_500' if do_type == 'edit' else 'opennamu_textarea_100'
 
@@ -86,7 +94,6 @@ def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = '
         ''' + div + '''
 
         <div id="opennamu_monaco_editor" class="''' + textarea_size + '''" ''' + editor_display[1] + '''></div>
-        <textarea id="opennamu_simplemde" class="''' + textarea_size + '''" ''' + editor_display[2] + '''></textarea>
         <textarea id="opennamu_edit_textarea" class="''' + textarea_size + '''" ''' + editor_display[0] + ''' name="content" placeholder="''' + p_text + '''">''' + html.escape(data_main) + '''</textarea>
         <hr class="main_hr">
         
