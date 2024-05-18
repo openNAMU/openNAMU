@@ -8,13 +8,12 @@ def list_please(arg_num = 1):
 
         div = '<ul class="opennamu_ul">'
 
-        curs.execute(db_change("select distinct title, link from back where type = 'no' limit ?, 50"), [sql_num])
+        curs.execute(db_change("select distinct title from back where type = 'no' limit ?, 50"), [sql_num])
         data_list = curs.fetchall()
         for data in data_list:
             div += '' + \
                 '<li>' + \
                     '<a class="opennamu_not_exist_link" href="/w/' + url_pas(data[0]) + '">' + html.escape(data[0]) + '</a> ' + \
-                    '<a href="/w/' + url_pas(data[1]) + '">(' + html.escape(data[1]) + ')</a>' + \
                 '</li>' + \
             ''
 
