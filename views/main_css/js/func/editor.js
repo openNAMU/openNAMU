@@ -290,6 +290,10 @@ function do_monaco_init(monaco_thema) {
             theme : "namumark" + (monaco_thema === "" ? "" : "-" + monaco_thema)
         });
 
+        if(typeof opennamu_monaco_custom === 'function') {
+            opennamu_monaco_custom();
+        }
+
         new PlaceholderContentWidget(document.getElementById('opennamu_edit_textarea').placeholder, window.editor);
 
         opennamu_do_sync_monaco_markup();
