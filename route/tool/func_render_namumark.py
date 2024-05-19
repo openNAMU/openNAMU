@@ -1956,6 +1956,7 @@ class class_do_render_namumark:
 
                         if syntax_count == 0:
                             self.render_data_js += 'hljs.highlightAll();\n'
+                            self.render_data_js += 'hljs.initLineNumbersOnLoad();\n'
 
                         data_name = self.get_tool_data_storage('<pre id="syntax"><code class="' + wiki_data_syntax + '">' + wiki_data, '</code></pre>', middle_data_org)
                         syntax_count += 1
