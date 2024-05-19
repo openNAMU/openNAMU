@@ -35,7 +35,7 @@ function do_insert_user_info() {
                     get_data_ban += '<a href="/recent_block/user/' + opennamu_do_url_encode(name) + '">' + lang_data['normal'] + '</a>'; 
                 } else if(data['data']['ban'][1] === 'c') {
                     get_data_ban += lang_data['normal']; 
-                } else if(data['data']['ban'].match(/^b/)) {
+                } else if(data['data']['ban'][1].match(/^b/)) {
                     get_data_ban += '<a href="/recent_block/cidr">' + lang_data['cidr'] + '</a>';
                 } else {
                     get_data_ban += '<a href="/recent_block/regex">' + lang_data['regex'] + '</a>';

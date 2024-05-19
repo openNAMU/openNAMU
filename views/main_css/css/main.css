@@ -429,3 +429,9 @@ s:hover, strike:hover, del:hover {
 #topic_color {
     background: #bbeabb;
 }
+
+/* 외부 확장 기능 연관 */
+td.hljs-ln-line.hljs-ln-code, td.hljs-ln-line.hljs-ln-numbers {
+    padding: 0px !important;
+    border: 0;
+}
