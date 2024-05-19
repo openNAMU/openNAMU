@@ -31,9 +31,11 @@ function do_insert_user_info() {
                 get_data_ban += '<br>';
                 
                 get_data_ban += lang_data['type'] + ' : ';
-                if(data['data']['ban']['type'] === 'normal') {
+                if(data['data']['ban'][1].match(/^[0-9]+$/)) {
                     get_data_ban += '<a href="/recent_block/user/' + opennamu_do_url_encode(name) + '">' + lang_data['normal'] + '</a>'; 
-                } else if(data['data']['ban']['type'] === 'cidr') {
+                } else if(data['data']['ban'][1] === 'c') {
+                    get_data_ban += lang_data['normal']; 
+                } else if(data['data']['ban'].match(/^b/)) {
                     get_data_ban += '<a href="/recent_block/cidr">' + lang_data['cidr'] + '</a>';
                 } else {
                     get_data_ban += '<a href="/recent_block/regex">' + lang_data['regex'] + '</a>';
@@ -41,7 +43,13 @@ function do_insert_user_info() {
                 get_data_ban += '<br>';
                 
                 get_data_ban += lang_data['period'] + ' : ';
-                if(data['data']['ban']['period'] === '0') {
+                if(!data['data']['ban']['period']) {
+                    if(get_data_auth_date !== '0') {
+                        get_data_ban += '~ ' + get_data_auth_date;
+                    } else {
+                        get_data_ban += '~ ' + lang_data['limitless']; 
+                    }
+                } else if(data['data']['ban']['period'] === '0') {
                     get_data_ban += '~ ' + lang_data['limitless']; 
                 } else {
                     get_data_ban += '~ ' + data['data']['ban']['period'];
@@ -61,7 +69,9 @@ function do_insert_user_info() {
                 if(data['data']['ban']['reason'] === 'edit filter') {
                     get_data_ban += lang_data['why'] + ' : <a href="/edit_filter/' + opennamu_do_url_encode(name) + '">' + data['data']['ban']['reason'] + '</a>';
                 } else {
-                    get_data_ban += lang_data['why'] + ' : ' + data['data']['ban']['reason'];
+                    if(data['data']['ban']['reason']) {
+                        get_data_ban += lang_data['why'] + ' : ' + data['data']['ban']['reason'];
+                    }
                 }
             }
             

@@ -2164,7 +2164,7 @@ def ban_check(conn, ip = None, tool = ''):
     curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
     db_data = curs.fetchall()
     if db_data and db_data[0][0] == 'ban':
-        return [1, 'b']
+        return [1, 'c']
 
     return [0, '']
 
