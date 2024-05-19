@@ -5,6 +5,7 @@ go 1.21
 toolchain go1.22.0
 
 require (
+	github.com/3th1nk/cidr v0.2.0
 	github.com/dlclark/regexp2 v1.11.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/google/generative-ai-go v0.11.0

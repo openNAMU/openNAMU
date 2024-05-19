@@ -6,6 +6,9 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/3th1nk/cidr"
+	"github.com/dlclark/regexp2"
 )
 
 func IP_or_user(ip string) bool {
@@ -274,6 +277,144 @@ func IP_menu(db *sql.DB, db_set map[string]string, ip string, my_ip string, opti
 	return menu
 }
 
+func Get_user_ban_type(ban_type string) string {
+	if ban_type == "O" {
+		return "1"
+	} else if ban_type == "E" {
+		return "2"
+	} else {
+		return ""
+	}
+}
+
+func Get_user_ban(db *sql.DB, db_set map[string]string, ip string, tool string) []string {
+	if Get_user_auth(db, db_set, ip) != "" {
+		return []string{"", ""}
+	}
+
+	rows, err := db.Query(DB_change(db_set, "select login, block from rb where band = 'regex' and ongoing = '1'"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var login string
+		var block string
+
+		err := rows.Scan(&login, &block)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		ban_type := Get_user_ban_type(login)
+
+		r := regexp2.MustCompile(block, 0)
+		if m, _ := r.FindStringMatch(ip); m != nil {
+			if tool == "login" {
+				if ban_type != "1" {
+					return []string{"true", "a" + ban_type}
+				}
+			} else if tool == "edit_request" {
+				if ban_type != "2" {
+					return []string{"true", "a" + ban_type}
+				}
+			} else {
+				return []string{"true", "a" + ban_type}
+			}
+		}
+	}
+
+	if IP_or_user(ip) {
+		rows, err = db.Query(DB_change(db_set, "select login, block from rb where band = 'cidr' and ongoing = '1'"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var login string
+			var block string
+
+			err := rows.Scan(&login, &block)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			ban_type := Get_user_ban_type(login)
+
+			c, _ := cidr.Parse(block)
+			if c.Contains(ip) {
+				if tool == "login" {
+					if ban_type != "1" {
+						return []string{"true", "b" + ban_type}
+					}
+				} else if tool == "edit_request" {
+					if ban_type != "2" {
+						return []string{"true", "b" + ban_type}
+					}
+				} else {
+					return []string{"true", "b" + ban_type}
+				}
+			}
+		}
+	}
+
+	stmt, err := db.Prepare(DB_change(db_set, "select login from rb where block = ? and band = '' and ongoing = '1'"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	var login string
+
+	err = stmt.QueryRow(ip).Scan(&login)
+	if err != nil {
+		if err == sql.ErrNoRows {
+
+		} else {
+			log.Fatal(err)
+		}
+	} else {
+		ban_type := Get_user_ban_type(login)
+
+		if tool == "login" {
+			if ban_type != "1" {
+				return []string{"true", ban_type}
+			}
+		} else if tool == "edit_request" {
+			if ban_type != "2" {
+				return []string{"true", ban_type}
+			}
+		} else {
+			return []string{"true", ban_type}
+		}
+	}
+
+	stmt, err = db.Prepare(DB_change(db_set, "select data from user_set where id = ? and name = 'acl'"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	var data string
+
+	err = stmt.QueryRow(ip).Scan(&data)
+	if err != nil {
+		if err == sql.ErrNoRows {
+
+		} else {
+			log.Fatal(err)
+		}
+	} else {
+		if data == "ban" {
+			return []string{"true", "c"}
+		}
+	}
+
+	return []string{"", ""}
+}
+
 func IP_parser(db *sql.DB, db_set map[string]string, ip string, my_ip string) string {
 	ip_pre_data := IP_preprocess(db, db_set, ip, my_ip)
 	if ip_pre_data[0] == "" {
@@ -326,6 +467,11 @@ func IP_parser(db *sql.DB, db_set map[string]string, ip string, my_ip string) st
 			}
 
 			ip = user_title + ip
+		}
+
+		ban := Get_user_ban(db, db_set, raw_ip, "")
+		if ban[0] == "true" {
+			ip = "<sup>" + ban[1] + "</sup><s>" + ip + "</s>"
 		}
 
 		ip += "<a href=\"javascript:void(0);\" name=\"" + Url_parser(raw_ip) + "\" onclick=\"opennamu_do_ip_click(this);\">⚒️</a>"
