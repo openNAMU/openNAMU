@@ -1112,12 +1112,12 @@ def wiki_css(data):
         data_css += '<script defer src="/views/main_css/js/func/render.js' + data_css_ver + '"></script>'
         
         # Main CSS
-        data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css' + data_css_ver + '">'
+        data_css += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="/views/main_css/css/main.css' + data_css_ver + '">'
 
         # External CSS
-        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha512-fHwaWebuwA7NSF5Qg/af4UeDx9XqUpYpOGgubo3yWu+b2IQR4UeQwbb42Ti7gVAjNtVoI/I9TEoYeu9omwcC6g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.min.css" integrity="sha512-MFDhxgOYIqLdcYTXw7en/n5BshKoduTitYmX8TkQ+iJOGjrWusRi8+KmfZOrgaDrCjZSotH2d1U1e/Z1KT6nWw==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+        data_css += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha512-fHwaWebuwA7NSF5Qg/af4UeDx9XqUpYpOGgubo3yWu+b2IQR4UeQwbb42Ti7gVAjNtVoI/I9TEoYeu9omwcC6g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+        data_css += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+        data_css += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.min.css" integrity="sha512-MFDhxgOYIqLdcYTXw7en/n5BshKoduTitYmX8TkQ+iJOGjrWusRi8+KmfZOrgaDrCjZSotH2d1U1e/Z1KT6nWw==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
 
         global_wiki_set['main_css'] = data_css
 
@@ -1126,10 +1126,10 @@ def wiki_css(data):
         data_css_dark = global_wiki_set['dark_main_css']
     else:
         # Main CSS
-        data_css_dark += '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css' + data_css_ver + '">'
+        data_css_dark += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="/views/main_css/css/sub/dark.css' + data_css_ver + '">'
 
         # External CSS
-        data_css_dark += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+        data_css_dark += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
 
         global_wiki_set['dark_main_css'] = data_css_dark
 
