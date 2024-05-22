@@ -706,6 +706,7 @@ def get_default_robots_txt(conn):
         'Disallow: /\n' + \
         'Allow: /$\n' + \
         'Allow: /w/\n' + \
+        'Allow: /bbs/w/\n' + \
         'Allow: /sitemap.xml$\n' + \
         'Allow: /sitemap_*.xml$' + \
     ''
@@ -2308,7 +2309,7 @@ def do_edit_send_check(conn, data):
     curs.execute(db_change('select data from other where name = "edit_bottom_compulsion"'))
     db_data = curs.fetchall()
     if db_data and db_data[0][0] != '':
-        if acl_check(conn, None, 'edit_bottom_compulsion') == 1:
+        if acl_check(conn, '', 'edit_bottom_compulsion') == 1:
             if data == '':
                 return 1
     
