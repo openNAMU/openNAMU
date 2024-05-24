@@ -260,8 +260,8 @@ func IP_menu(db *sql.DB, db_set map[string]string, ip string, my_ip string, opti
 	auth_name := Get_user_auth(db, db_set, my_ip)
 	if auth_name != "" {
 		menu[Get_language(db, db_set, "admin", false)] = [][]string{
-			{"/auth/give/ban/" + Url_parser(ip), Get_language(db, db_set, "ban", false) + " | " + Get_language(db, db_set, "release", false)},
-			{"/list/user/check/" + Url_parser(ip), Get_language(db, db_set, "check", false)},
+			{"/auth/give/ban/" + Url_parser(ip), Get_language(db, db_set, "ban", false)},
+			{"/list/user/check_submit/" + Url_parser(ip), Get_language(db, db_set, "check", false)},
 		}
 	}
 

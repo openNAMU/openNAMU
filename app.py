@@ -433,6 +433,7 @@ app.route('/list/admin/auth_use_page/<int:arg_num>/<everything:arg_search>', met
 app.route('/list/user')(list_user)
 app.route('/list/user/<int:arg_num>')(list_user)
 
+app.route('/list/user/check_submit/<name>')(list_user_check_submit)
 app.route('/list/user/check/<name>')(list_user_check)
 app.route('/list/user/check/<name>/<do_type>')(list_user_check)
 app.route('/list/user/check/<name>/<do_type>/<int:arg_num>')(list_user_check)
