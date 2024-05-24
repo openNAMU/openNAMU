@@ -6,13 +6,19 @@ def vote_close(num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(conn) != 1:
+        if acl_check(conn, '', 'vote') == 1:
             return re_error(conn, '/ban')
 
         curs.execute(db_change('select type from vote where id = ? and user = ""'), [num])
         data_list = curs.fetchall()
         if not data_list:
             return redirect(conn, '/vote')
+
+        curs.execute(db_change('select data from vote where id = ? and name = "open_user" and type = "option"'), [num])
+        db_data = curs.fetchall()
+        open_user = db_data[0][0] if db_data else ''
+        if open_user != ip_check() and admin_check(conn) != 1:
+            return re_error(conn, '/ban')
 
         if data_list[0][0] == 'close':
             type_set = 'open'

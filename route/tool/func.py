@@ -1832,7 +1832,7 @@ def admin_check(conn, num = None, what = None, name = ''):
 
     return 0
 
-def acl_check(conn, name = '', tool = '', topic_num = '1'):
+def acl_check(conn, name = '', tool = '', topic_num = ''):
     curs = conn.cursor()
 
     if name == None:
@@ -1945,7 +1945,10 @@ def acl_check(conn, name = '', tool = '', topic_num = '1'):
             num = 5
         elif tool == 'vote':
             if i == 0:
-                curs.execute(db_change('select acl from vote where id = ? and user = ""'), [topic_num])
+                if topic_num != '':
+                    curs.execute(db_change('select acl from vote where id = ? and user = ""'), [topic_num])
+                else:
+                    continue
             else:
                 curs.execute(db_change('select data from other where name = "vote_acl"'))
 
@@ -2001,6 +2004,7 @@ def acl_check(conn, name = '', tool = '', topic_num = '1'):
             num = 5
 
         acl_data = curs.fetchall()
+        print(i, acl_data, topic_num)
         if not acl_data or acl_data[0][0] == '':
             if tool == 'recaptcha':
                 acl_data = [['admin']]
