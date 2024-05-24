@@ -55,7 +55,7 @@ function opennamu_list_recent_change() {
             let right = '<span id="opennamu_list_recent_change_' + String(for_a) + '_over">';
 
             right += '<a id="opennamu_list_recent_change_' + String(for_a) + '" href="javascript:void(0);">';
-            right += '⚒️';
+            right += '<span class="opennamu_svg opennamu_svg_tool">&nbsp;</span>';
             right += '</a>';
             right += '<span class="opennamu_popup_footnote" id="opennamu_list_recent_change_' + String(for_a) + '_load" style="display: none;"></span>';
             right += '</span>';

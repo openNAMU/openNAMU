@@ -474,7 +474,7 @@ func IP_parser(db *sql.DB, db_set map[string]string, ip string, my_ip string) st
 			ip = "<sup>" + ban[1] + "</sup><s>" + ip + "</s>"
 		}
 
-		ip += "<a href=\"javascript:void(0);\" name=\"" + Url_parser(raw_ip) + "\" onclick=\"opennamu_do_ip_click(this);\">⚒️</a>"
+		ip += "<a href=\"javascript:void(0);\" name=\"" + Url_parser(raw_ip) + "\" onclick=\"opennamu_do_ip_click(this);\"><span class=\"opennamu_svg opennamu_svg_tool\">&nbsp;</span></a>"
 
 		return ip
 	}
