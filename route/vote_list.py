@@ -28,8 +28,9 @@ def vote_list(list_type = 'normal', num = 1):
             data += '<li><a href="/vote/' + i[1] + '">' + i[1] + '. ' + html.escape(i[0]) + '</a> (' + open_select + ')</li>'
 
         data += '</ul>'
+        menu = []
         if list_type == 'normal':
-            data += ('<a href="/vote/add">(' + get_lang(conn, 'add_vote') + ')</a>') if admin_check(conn) == 1 else ''
+            menu = [["vote/add", get_lang(conn, 'add_vote')]] if acl_check(conn, '', 'vote') != 1 else []
             data += next_fix(conn, '/vote/list/', num, data_list)
         else:
             data += next_fix(conn, '/vote/list/close/', num, data_list)
@@ -37,5 +38,5 @@ def vote_list(list_type = 'normal', num = 1):
         return easy_minify(conn, flask.render_template(skin_check(conn),
             imp = [get_lang(conn, 'vote_list'), wiki_set(conn), wiki_custom(conn), wiki_css([sub, 0])],
             data = data,
-            menu = [['other', get_lang(conn, 'return')]]
+            menu = [['other', get_lang(conn, 'return')]] + menu
         ))

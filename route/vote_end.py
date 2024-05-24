@@ -12,11 +12,10 @@ def vote_end(num = 1):
             return redirect(conn, '/vote')
 
         data = ''
-        if admin_check(conn) == 1:
-            if data_list[0][3] == 'open' or data_list[0][3] == 'n_open':
-                data += '<a href="/vote/close/' + num + '">(' + get_lang(conn, 'close_vote') + ')</a>'
-            else:
-                data += '<a href="/vote/close/' + num + '">(' + get_lang(conn, 're_open_vote') + ')</a>'
+        if data_list[0][3] == 'open' or data_list[0][3] == 'n_open':
+            data += '<a href="/vote/close/' + num + '">(' + get_lang(conn, 'close_vote') + ')</a>'
+        else:
+            data += '<a href="/vote/close/' + num + '">(' + get_lang(conn, 're_open_vote') + ')</a>'
         
         curs.execute(db_change('select data from vote where id = ? and name = "end_date" and type = "option"'), [num])
         db_data = curs.fetchall()

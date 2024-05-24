@@ -1,7 +1,6 @@
 from .tool.func import *
 
 def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'normal'):
-    # 파라미터 to URL
     with get_db_connect() as conn:
         curs = conn.cursor()
 

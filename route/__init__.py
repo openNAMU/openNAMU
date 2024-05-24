@@ -165,6 +165,7 @@ from route.n_list_recent_change import list_recent_change
 from route.n_list_recent_discuss import list_recent_discuss
 from route.n_list_recent_block import list_recent_block
 from route.n_list_old_page import list_old_page
+from route.n_list_user_check_submit import list_user_check_submit
 
 from route.n_bbs_in import bbs_in
 
