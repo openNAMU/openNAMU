@@ -324,6 +324,12 @@ def do_every_day():
 
             print('Make sitemap')
 
+        # 칭호 관리
+        curs.execute(db_change("select id from user_set where name = 'user_title' and data = '✅'"))
+        for for_a in curs.fetchall():
+            if admin_check(conn, 'all', None, for_a[0]) != 1:
+                curs.execute(db_change("update user_set set data = '☑️' where name = 'user_title' and data = '✅' and id = ?"), [for_a[0]])
+
         threading.Timer(60 * 60 * 24, do_every_day).start()
 
 def auto_do_something(data_db_set):

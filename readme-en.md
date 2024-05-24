@@ -28,9 +28,11 @@ openNAMU is a complete open source project. Add new features and create pull req
 openNAMU is protected by [BSD 3-Clause License](./LICNESE). Please refer to the documentation for details.
 
 ### External Projects
- * Quotes icon [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672)
- * Syntax highlighting [highlightjs](https://highlightjs.org/)
- * Numerical expression [MathJax](https://www.mathjax.org/)
+ * [Quotes icon - Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672)
+ * [highlight.js](https://highlightjs.org/)
+ * [KaTeX](https://katex.org/)
+ * [Feather](https://feathericons.com/)
+ * [go.mod](https://github.com/openNAMU/openNAMU/blob/beta/route_go/go.mod)
 
 ## Etc.
  * Owner rights are granted to the first registor.

@@ -844,7 +844,10 @@ def get_user_title_list(conn, ip = ''):
 
     curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_admin', ip])
     if curs.fetchall():
-        user_title['☑️'] = '☑️ admin'
+        user_title['☑️'] = '☑️ before_admin'
+
+    if admin_check(conn, 'all') == 1:
+        user_title['✅'] = '✅ admin'
     
     return user_title
     
@@ -1073,7 +1076,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v256'
+    return '.cache_v257'
 
 def wiki_css(data):
     global global_wiki_set

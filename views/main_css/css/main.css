@@ -418,11 +418,9 @@ s:hover, strike:hover, del:hover {
 }
 
 .opennamu_recent_change {
-    padding: 10px;
+    padding-bottom: 10px;
 
-    border: 1px solid gainsboro;
-    
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-bottom: 2px solid gainsboro;
 }
 
 /* 이 부분 이하로는 레거시 */
