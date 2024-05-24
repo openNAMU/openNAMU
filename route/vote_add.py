@@ -4,7 +4,7 @@ def vote_add():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(conn) != 1:
+        if acl_check(conn, '', 'vote') == 1:
             return re_error(conn, '/ban')
 
         if flask.request.method == 'POST':
@@ -30,6 +30,10 @@ def vote_add():
                 flask.request.form.get('data', 'test'),
                 open_data,
                 flask.request.form.get('acl_select', '')
+            ])
+            curs.execute(db_change("insert into vote (name, id, subject, data, user, type, acl) values ('open_user', ?, '', ?, '', 'option', '')"), [
+                id_data,
+                ip_check()
             ])
             
             time_limitless = flask.request.form.get('limitless', '')
