@@ -28,9 +28,11 @@
 오픈나무 프로젝트는 [BSD 3-Clause License](./LICENSE) [(ko-KR)](https://www.olis.or.kr/license/Detailselect.do?lId=1092)이며, 오픈나무 프로젝트를 사용하고자 한다면 라이선스를 준수해야 합니다. 자세한 내용은 문서를 참고하세요.
 
 ### 포함된 외부 프로젝트
- * Quotes icon - [Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672)
- * Syntax highlighting - [highlightjs](https://highlightjs.org/)
- * Numerical expression - [MathJax](https://www.mathjax.org/)
+ * [Quotes icon - Dave Gandy](http://www.flaticon.com/free-icon/quote-left_25672)
+ * [highlight.js](https://highlightjs.org/)
+ * [KaTeX](https://katex.org/)
+ * [Feather](https://feathericons.com/)
+ * [go.mod](https://github.com/openNAMU/openNAMU/blob/beta/route_go/go.mod)
 
 ### 도움을 주신 분들
  * [Team Croatia](https://github.com/TeamCroatia)
