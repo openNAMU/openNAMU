@@ -844,7 +844,10 @@ def get_user_title_list(conn, ip = ''):
 
     curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_admin', ip])
     if curs.fetchall():
-        user_title['☑️'] = '☑️ admin'
+        user_title['☑️'] = '☑️ before_admin'
+
+    if admin_check(conn, 'all') == 1:
+        user_title['✅'] = '✅ admin'
     
     return user_title
     
