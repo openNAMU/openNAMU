@@ -200,22 +200,15 @@ aside {
     padding-top: 10px;
     padding-left: 20px;
     padding-right: 20px;
+    padding-bottom: 20px;
     
     background-color: #ffeaee;
     
     min-height: calc(100vh - (50px + 12px));
 }
 
-.aside_width {
-    width: 290px;
-
-    float: left;
-}
-
 .do_fixed {
-    position: fixed;
-    
-    top: 52px;
+    float: left;
 }
 
 aside button {
@@ -331,10 +324,8 @@ article.main#title h1 {
 
     .do_fixed {
         position: inherit;
-    }
 
-    .aside_width {
-        display: none;
+        margin-bottom: 20px;
     }
 }
 
