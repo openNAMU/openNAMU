@@ -31,12 +31,17 @@ function ringo_get_post() {
         window.localStorage.setItem('main_css_fixed_width', '');
     }
 
+    const check_5 = document.getElementById('sidebar_right');
+    if(check_5.checked === true) {
+        window.localStorage.setItem('main_css_sidebar_right', '1');
+    } else {
+        window.localStorage.setItem('main_css_sidebar_right', '0');
+    }
+
     history.go(0);
 }
 
 function ringo_do_skin_set() {
-    let cookies = document.cookie;
-    
     if(!window.localStorage.getItem('main_css_use_sys_darkmode') || window.localStorage.getItem('main_css_use_sys_darkmode') === '1') {
         if(window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.cookie = 'main_css_darkmode=1; path=/';
@@ -53,10 +58,6 @@ function ringo_do_skin_set() {
                 margin: auto;
             }
 
-            .aside_width {
-                display: none;
-            }
-
             .do_fixed {
                 display: none;
             }
@@ -68,6 +69,14 @@ function ringo_do_skin_set() {
         document.getElementById('ringo_add_style').innerHTML += `
             article.main {
                 max-width: ` + fixed_width_data + `px;
+            }
+        `;
+    }
+
+    if(window.localStorage.getItem('main_css_sidebar_right') && window.localStorage.getItem('main_css_sidebar_right') === '1') {
+        document.getElementById('ringo_add_style').innerHTML += `
+            .do_fixed {
+                float: right;
             }
         `;
     }
@@ -85,6 +94,7 @@ function ringo_load_skin_set() {
                 "off_sidebar" : "Turn off sidebar",
                 "fixed_width" : "Fixed width",
                 'default' : 'Default',
+                'sidebar_right' : 'Sidebar direction right'
             }, "ko-KR" : {
                 "save" : "저장",
                 "darkmode" : "다크모드",
@@ -92,6 +102,7 @@ function ringo_load_skin_set() {
                 "off_sidebar" : "사이드바 끄기",
                 "fixed_width" : "고정폭",
                 'default' : '기본값',
+                'sidebar_right' : '사이드바 방향 오른쪽'
             }
         }
 
@@ -141,6 +152,10 @@ function ringo_load_skin_set() {
         }
         select_fixed_width_html += '</select>';
 
+        if(window.localStorage.getItem('main_css_sidebar_right') && window.localStorage.getItem('main_css_sidebar_right') === '1') {
+            set_data["sidebar_right"] = "checked";
+        }
+
         document.getElementById("main_skin_set").innerHTML = ' \
             <input ' + set_data["use_sys_darkmode"] + ' type="checkbox" id="use_sys_darkmode" name="use_sys_darkmode" value="use_sys_darkmode"> ' + set_language[language]['use_sys_darkmode'] + ' \
             <hr class="main_hr"> \
@@ -149,6 +164,8 @@ function ringo_load_skin_set() {
             <input ' + set_data["off_sidebar"] + ' type="checkbox" id="off_sidebar" name="off_sidebar" value="off_sidebar"> ' + set_language[language]['off_sidebar'] + ' \
             <hr class="main_hr"> \
             ' + select_fixed_width_html + ' \
+            <hr class="main_hr"> \
+            <input ' + set_data["sidebar_right"] + ' type="checkbox" id="sidebar_right" name="sidebar_right" value="sidebar_right"> ' + set_language[language]['sidebar_right'] + ' \
             <hr class="main_hr"> \
             <button onclick="ringo_get_post();">' + set_language[language]['save'] + '</button> \
         ';
