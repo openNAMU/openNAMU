@@ -2007,7 +2007,6 @@ def acl_check(conn, name = '', tool = '', topic_num = ''):
             num = 5
 
         acl_data = curs.fetchall()
-        print(i, acl_data, topic_num)
         if not acl_data or acl_data[0][0] == '':
             if tool == 'recaptcha':
                 acl_data = [['admin']]
