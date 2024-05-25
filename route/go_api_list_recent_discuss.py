@@ -22,4 +22,9 @@ def api_list_recent_discuss(db_set, num = 1, set_type = 'normal', limit = 10, le
 
     data = data.decode('utf8')
 
-    return flask.Response(response = data, status = 200, mimetype = 'application/json')
+    response = flask.Response(response = data, status = 200, mimetype = 'application/json')
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add('Access-Control-Allow-Headers', "Content-Type")
+    response.headers.add('Access-Control-Allow-Methods', "GET")
+
+    return response
