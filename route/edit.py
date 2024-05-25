@@ -162,6 +162,9 @@ def edit(name = 'Test', section = 0, do_type = ''):
             
             if do_edit_filter(conn, content) == 1:
                 return re_error(conn, '/error/21')
+            
+            if do_edit_filter(conn, send) == 1:
+                return re_error(conn, '/error/21')
 
             if do_edit_send_check(conn, send) == 1:
                 return re_error(conn, '/error/37')

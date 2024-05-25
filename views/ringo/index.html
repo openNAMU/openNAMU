@@ -12,8 +12,8 @@
         <script defer src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
         <script defer src="/views/ringo/js/main.js.cache_v2"></script>
         <script defer src="/views/ringo/js/sidebar.js.cache_v3"></script>
-        <script defer src="/views/ringo/js/skin_set.js.cache_v5"></script>
-        <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/views/ringo/css/main.css.cache_v8">
+        <script defer src="/views/ringo/js/skin_set.js.cache_v6"></script>
+        <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/views/ringo/css/main.css.cache_v9">
         {% if request.cookies.get('main_css_darkmode', '') == '1' %}
             {{imp[3][5]|safe}}
             <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/views/ringo/css/dark.css.cache_v2">
@@ -231,7 +231,6 @@
                 </article>
             </footer>
         </section>
-        <div class="aside_width">　</div>
         <aside class="do_fixed">
             {% if imp[1][7][1] == '' %}
                 <button id="side_button_1" class="side_button selected">{{'edit'|load_lang}}</button><!--
