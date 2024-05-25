@@ -58,6 +58,12 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                 # re_error로 대체 예정
                 return redirect(conn, '/bbs/in/' + bbs_num_str)
             
+            if do_edit_filter(conn, title) == 1:
+                return re_error(conn, '/error/21')
+
+            if do_edit_filter(conn, data) == 1:
+                return re_error(conn, '/error/21')
+            
             date = get_time()
 
             if comment_num != '':

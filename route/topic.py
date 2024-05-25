@@ -40,12 +40,19 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
 
             name = flask.request.form.get('topic', 'Test')
             sub = flask.request.form.get('title', 'Test')
+            data = flask.request.form.get('content', 'Test').replace('\r', '')
             
             if do_title_length_check(conn, name) == 1:
                 return re_error(conn, '/error/38')
             
             if do_title_length_check(conn, sub, 'topic') == 1:
                 return re_error(conn, '/error/38')
+            
+            if do_edit_filter(conn, sub) == 1:
+                return re_error(conn, '/error/21')
+            
+            if do_edit_filter(conn, data) == 1:
+                return re_error(conn, '/error/21')
             
             if topic_num == '0':
                 curs.execute(db_change("select code from topic order by code + 0 desc limit 1"))
@@ -97,7 +104,6 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
                 add_alarm(conn, ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
 
-            data = flask.request.form.get('content', 'Test').replace('\r', '')
             data = api_topic_thread_pre_render(conn, data, num, ip, topic_num, name, sub)
 
             do_add_thread(conn, 
