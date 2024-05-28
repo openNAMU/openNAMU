@@ -433,3 +433,17 @@ td.hljs-ln-line.hljs-ln-code, td.hljs-ln-line.hljs-ln-numbers {
     padding: 0px !important;
     border: 0;
 }
+
+/* SVG */
+.opennamu_svg {
+    width: 14px;
+    display: inline-block;
+
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+}
+
+.opennamu_svg_tool {
+    background-image: url(/views/main_css/file/icon/tool.svg);
+}
