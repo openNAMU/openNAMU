@@ -1179,6 +1179,12 @@ def wiki_set(conn):
     db_data = curs.fetchall()
     head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
 
+    darkmode = flask.request.cookies.get('main_css_darkmode', '0')
+    if darkmode == '1':
+        curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name + '-cssdark'])
+        db_data = curs.fetchall()
+        head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
+
     data_list += [head_data]
 
     curs.execute(db_change("select data from other where name = 'top_menu'"))
