@@ -398,7 +398,7 @@
                 "wiki_host" : "Wiki host address",
                 "wiki_port" : "Wiki port number",
                 "wiki_secret_key" : "Wiki secret key",
-                "email_required" : "Enable email",
+                "email_required" : "Request e-mail when signing up",
                 "smtp_setting_required" : "Email SMTP setting required",
                 "update_branch" : "Branch to import updates",
                 "slow_edit" : "Continuous edit limit",
