@@ -64,11 +64,16 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
                     <div id="opennamu_preview_area">''' + data_preview + '''</div>
                 '''
             else:
+                skin_list = ''
+                for for_a in load_skin(conn, '', 1):
+                    skin_list += '<a href="/setting/head/' + url_pas(for_a) + '">(' + html.escape(for_a) + ')</a> '
+                    skin_list += '<a href="/setting/head/' + url_pas(for_a) + '-cssdark">(' + html.escape(for_a) + '-cssdark)</a> '
+
                 curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
                 title = '_head'
                 start = '' + \
                     '<a href="/setting/head">(' + get_lang(conn, 'all') + ')</a> ' + \
-                    ' '.join(['<a href="/setting/head/' + url_pas(i) + '">(' + html.escape(i) + ')</a>' for i in load_skin(conn, '', 1)]) + '''
+                    skin_list + '''
                     <hr class="main_hr">
                     <span>
                         &lt;style&gt;CSS&lt;/style&gt;
