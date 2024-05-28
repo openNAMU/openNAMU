@@ -262,5 +262,5 @@ def edit_move(name):
                         <button type="submit">''' + get_lang(conn, 'move') + '''</button>
                     </form>
                 ''',
-                menu = [['w/' + url_pas(name), get_lang(conn, 'return')]]
+                menu = [['w/' + url_pas(name), get_lang(conn, 'return')], ['move_all', get_lang(conn, 'multiple_move')]]
             ))

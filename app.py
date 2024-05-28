@@ -557,6 +557,7 @@ app.route('/delete_multiple', methods = ['POST', 'GET'])(edit_delete_multiple)
 app.route('/revert/<int:num>/<everything:name>', methods = ['POST', 'GET'])(edit_revert)
 
 app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
+app.route('/move_all')(edit_move_all)
 
 # Func-topic
 app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
