@@ -16,8 +16,6 @@ with open('version.json', encoding = 'utf8') as file_data:
 
 # Init-DB
 data_db_set = class_check_json()
-
-db_data_get(data_db_set['type'])
 do_db_set(data_db_set)
 
 with get_db_connect() as conn:
@@ -62,9 +60,11 @@ with get_db_connect() as conn:
                 except:
                     pass
 
+                field_text = 'longtext' if data_db_set['type'] == 'mysql' else 'text'
+
                 if db_pass == 0:
                     try:
-                        curs.execute(db_change('create table ' + create_table + '(test longtext default (""))'))
+                        curs.execute(db_change('create table ' + create_table + '(test ' + field_text + ' default (""))'))
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -72,7 +72,7 @@ with get_db_connect() as conn:
 
                 if db_pass == 0:
                     try:
-                        curs.execute(db_change('create table ' + create_table + '(test longtext default "")'))
+                        curs.execute(db_change('create table ' + create_table + '(test ' + field_text + ' default "")'))
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -80,7 +80,7 @@ with get_db_connect() as conn:
 
                 if db_pass == 0:
                     try:
-                        curs.execute(db_change('create table ' + create_table + '(test longtext)'))
+                        curs.execute(db_change('create table ' + create_table + '(test ' + field_text + ')'))
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -88,7 +88,7 @@ with get_db_connect() as conn:
 
                 if db_pass == 0:
                     try:
-                        curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ('')"))
+                        curs.execute(db_change("alter table " + create_table + " add column " + create + " " + field_text + " default ('')"))
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -96,7 +96,7 @@ with get_db_connect() as conn:
 
                 if db_pass == 0:
                     try:
-                        curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ''"))
+                        curs.execute(db_change("alter table " + create_table + " add column " + create + " " + field_text + " default ''"))
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -104,7 +104,7 @@ with get_db_connect() as conn:
 
                 if db_pass == 0:
                     try:
-                        curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext"))
+                        curs.execute(db_change("alter table " + create_table + " add column " + create + " " + field_text))
                         db_pass = 1
                     except Exception as e:
                         # print(e)
