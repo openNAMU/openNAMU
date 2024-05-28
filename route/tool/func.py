@@ -90,23 +90,24 @@ try:
 except:
     import pymysql
 
-import sqlite3
-
 if sys.version_info < (3, 6):
     import sha3
-
-# Init-Global
-global_lang = {}
-global_wiki_set = {}
-
-global_db_set = {}
 
 # Func
 # Func-main
 def do_db_set(db_set):
-    global global_db_set
+    with class_in_memory_db() as m_conn:
+        m_curs = m_conn.cursor()
 
-    global_db_set = db_set
+        m_curs.execute('drop table if exists temp')
+        m_curs.execute('create table if not exists temp(name text, data text)')
+
+        m_curs.execute('insert into temp (name, data) values ("db_set", ?)', [json.dumps(db_set)])
+        m_curs.execute('insert into temp (name, data) values ("db_set_type", ?)', [db_set['type']])
+
+        m_curs.execute('select data from temp where name = "db_set"')
+        db_data = m_curs.fetchall()
+        print(db_data)
     
 # Func-init
 def get_init_set_list(need = 'all'):
@@ -141,14 +142,14 @@ def get_init_set_list(need = 'all'):
         return init_set_list
     else:
         return init_set_list[need]
-
 class get_db_connect:
-    def __init__(self, db_type = ''):
-        global global_db_set
-        
-        self.db_set = global_db_set
-        if db_type != '':
-           self.db_set['type'] = db_type 
+    def __init__(self):
+        with class_in_memory_db() as m_conn:
+            m_curs = m_conn.cursor()
+
+            m_curs.execute('select data from temp where name = "db_set"')
+            db_data = m_curs.fetchall()
+            self.db_set = json.loads(db_data[0][0]) if db_data else {}
         
     def __enter__(self):
         if self.db_set['type'] == 'sqlite':
@@ -179,7 +180,6 @@ class get_db_connect:
         self.conn.close()
 
 # class get_whoosh_connect:
-    
 
 class class_check_json:
     def do_check_set_json(self):
@@ -641,38 +641,38 @@ def update(conn, ver_num, set_data):
     print('Update completed')
 
 def set_init_always(conn, ver_num):
-    global global_wiki_set
+    with class_in_memory_db() as m_conn:
+        m_curs = m_conn.cursor()
+        curs = conn.cursor()
 
-    curs = conn.cursor()
-
-    curs.execute(db_change('delete from other where name = "ver"'))
-    curs.execute(db_change('insert into other (name, data, coverage) values ("ver", ?, "")'), [ver_num])
-    
-    curs.execute(db_change('delete from alist where name = "owner"'))
-    curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
-
-    if not os.path.exists(load_image_url(conn)):
-        os.makedirs(load_image_url(conn))
-
-    curs.execute(db_change('select data from other where name = "key"'))
-    if not curs.fetchall():
-        curs.execute(db_change('insert into other (name, data, coverage) values ("key", ?, "")'), [load_random_key()])
+        curs.execute(db_change('delete from other where name = "ver"'))
+        curs.execute(db_change('insert into other (name, data, coverage) values ("ver", ?, "")'), [ver_num])
         
-    curs.execute(db_change('select data from other where name = "salt_key"'))
-    if not curs.fetchall():
-        curs.execute(db_change('insert into other (name, data, coverage) values ("salt_key", ?, "")'), [load_random_key(4)])
+        curs.execute(db_change('delete from alist where name = "owner"'))
+        curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
 
-    curs.execute(db_change('select data from other where name = "count_all_title"'))
-    if not curs.fetchall():
-        curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", "0", "")'))
-        
-    curs.execute(db_change('select data from other where name = "wiki_access_password_need"'))
-    db_data = curs.fetchall()
-    if db_data and db_data[0][0] != '':
-        curs.execute(db_change('select data from other where name = "wiki_access_password"'))
+        if not os.path.exists(load_image_url(conn)):
+            os.makedirs(load_image_url(conn))
+
+        curs.execute(db_change('select data from other where name = "key"'))
+        if not curs.fetchall():
+            curs.execute(db_change('insert into other (name, data, coverage) values ("key", ?, "")'), [load_random_key()])
+            
+        curs.execute(db_change('select data from other where name = "salt_key"'))
+        if not curs.fetchall():
+            curs.execute(db_change('insert into other (name, data, coverage) values ("salt_key", ?, "")'), [load_random_key(4)])
+
+        curs.execute(db_change('select data from other where name = "count_all_title"'))
+        if not curs.fetchall():
+            curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", "0", "")'))
+            
+        curs.execute(db_change('select data from other where name = "wiki_access_password_need"'))
         db_data = curs.fetchall()
-        if db_data:
-            global_wiki_set['wiki_access_password'] = db_data[0][0]
+        if db_data and db_data[0][0] != '':
+            curs.execute(db_change('select data from other where name = "wiki_access_password"'))
+            db_data = curs.fetchall()
+            if db_data:
+                m_curs.execute('insert into temp (name, data) values ("wiki_access_password", ?)', [db_data[0][0]])
     
 def set_init(conn):
     curs = conn.cursor()
@@ -979,62 +979,70 @@ def pw_check(conn, data, data2, type_d = 'no', id_d = ''):
 # Func-skin
 def easy_minify(conn, data, tool = None):
     # without_DB
-    if 'wiki_access_password' in global_wiki_set:
-        access_password = global_wiki_set['wiki_access_password']
-        input_password = flask.request.cookies.get('opennamu_wiki_access', ' ')
-        if url_pas(access_password) == input_password:
+    with class_in_memory_db() as m_conn:
+        m_curs = m_conn.cursor()
+        
+        m_curs.execute('select data from temp where name = "wiki_access_password"')
+        db_data = m_curs.fetchall()
+        if db_data:
+            access_password = db_data[0][0]
+            input_password = flask.request.cookies.get('opennamu_wiki_access', ' ')
+            if url_pas(access_password) == input_password:
+                return data
+                
+            return '''
+                <script defer src="/views/main_css/js/route/wiki_access_password.js''' + cache_v() + '''"></script>
+                <h2>''' + get_lang(conn, 'error_password_require_for_wiki_access') + '''</h2>
+                <input type="password" id="wiki_access">
+                <input type="submit" onclick="opennamu_do_wiki_access();">
+            '''
+        else:
             return data
-            
-        return '''
-            <script defer src="/views/main_css/js/route/wiki_access_password.js''' + cache_v() + '''"></script>
-            <h2>''' + get_lang(conn, 'error_password_require_for_wiki_access') + '''</h2>
-            <input type="password" id="wiki_access">
-            <input type="submit" onclick="opennamu_do_wiki_access();">
-        '''
-    else:
-        return data
 
 def get_lang(conn, data, safe = 0):
-    global global_lang
+    with class_in_memory_db() as m_conn:
+        m_curs = m_conn.cursor()
+        curs = conn.cursor()
 
-    curs = conn.cursor()
-
-    ip = ip_check()
-    if ip_or_user(ip) == 0:
-        curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip])
-        rep_data = curs.fetchall()                    
-    elif 'lang' in flask.session:
-        rep_data = [[flask.session['lang']]]
-    else:
-        curs.execute(db_change("select data from other where name = 'language'"))
-        rep_data = curs.fetchall()
-
-    if not rep_data or rep_data[0][0] in ('', 'default'):
-        curs.execute(db_change("select data from other where name = 'language'"))
-        rep_data = curs.fetchall()
-
-    if rep_data:
-        lang_name = rep_data[0][0]
-    else:
-        lang_name = 'en-US'
-        
-    if lang_name in global_lang:
-        lang = global_lang[lang_name]
-    else:
-        lang_list = os.listdir('lang')
-        if (lang_name + '.json') in lang_list:
-            lang = json.loads(open(os.path.join('lang', lang_name + '.json'), encoding = 'utf8').read())
-            global_lang[lang_name] = lang
+        ip = ip_check()
+        if ip_or_user(ip) == 0:
+            curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip])
+            rep_data = curs.fetchall()                    
+        elif 'lang' in flask.session:
+            rep_data = [[flask.session['lang']]]
         else:
-            lang = {}
+            curs.execute(db_change("select data from other where name = 'language'"))
+            rep_data = curs.fetchall()
 
-    if data in lang:
-        if safe == 1:
-            return lang[data] 
+        if not rep_data or rep_data[0][0] in ('', 'default'):
+            curs.execute(db_change("select data from other where name = 'language'"))
+            rep_data = curs.fetchall()
+
+        if rep_data:
+            lang_name = rep_data[0][0]
         else:
-            return html.escape(lang[data])
+            lang_name = 'en-US'
+            
+        m_curs.execute('select data from temp where name = ?', ['lang_' + lang_name])
+        db_data = m_curs.fetchall()
+        if db_data:
+            lang = json.loads(db_data[0][0])
+        else:
+            lang_list = os.listdir('lang')
+            if (lang_name + '.json') in lang_list:
+                lang = json.loads(open(os.path.join('lang', lang_name + '.json'), encoding = 'utf8').read())
+                
+                m_curs.execute('insert into temp (name, data) values (?, ?)', ['lang_' + lang_name, json.dumps(lang)])
+            else:
+                lang = {}
 
-    return html.escape(data + ' (' + lang_name + ')')
+        if data in lang:
+            if safe == 1:
+                return lang[data] 
+            else:
+                return html.escape(lang[data])
+
+        return html.escape(data + ' (' + lang_name + ')')
 
 # 하위 호환용
 def load_lang(data, safe = 0):
@@ -1079,66 +1087,71 @@ def cache_v():
     return '.cache_v258'
 
 def wiki_css(data):
-    global global_wiki_set
+    with class_in_memory_db() as m_conn:
+        m_curs = m_conn.cursor()
 
-    # without_DB
-    data += ['' for _ in range(0, 4 - len(data))]
-    
-    data_css = ''
-    data_css_dark = ''
-
-    data_css_ver = cache_v()
-
-    if 'main_css' in global_wiki_set:
-        data_css = global_wiki_set['main_css']
-    else:
-        data_css += '<meta http-equiv="Cache-Control" content="max-age=3600">'
-
-        # External JS
-        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" integrity="sha512-LQNxIMR5rXv7o+b1l8+N1EZMfhG7iFZ9HhnbJkTp4zjNr5Wvst75AqUeFDxeRUa7l5vEDyUiAip//r+EFLLCyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.48.0/min/vs/loader.min.js" integrity="sha512-ZG31AN9z/CQD1YDDAK4RUAvogwbJHv6bHrumrnMLzdCrVu4HeAqrUX7Jsal/cbUwXGfaMUNmQU04tQ8XXl5Znw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>'
-
-        # Func JS
-        data_css += '<script defer src="/views/main_css/js/func/func.js' + data_css_ver + '"></script>'
+        # without_DB
+        data += ['' for _ in range(0, 4 - len(data))]
         
-        data_css += '<script defer src="/views/main_css/js/func/insert_version.js' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/insert_user_info.js' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/insert_version_skin.js' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/insert_http_warning_text.js' + data_css_ver + '"></script>'
-        
-        data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/shortcut.js' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/editor.js' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/render.js' + data_css_ver + '"></script>'
-        
-        # Main CSS
-        data_css += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="/views/main_css/css/main.css' + data_css_ver + '">'
+        data_css = ''
+        data_css_dark = ''
 
-        # External CSS
-        data_css += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha512-fHwaWebuwA7NSF5Qg/af4UeDx9XqUpYpOGgubo3yWu+b2IQR4UeQwbb42Ti7gVAjNtVoI/I9TEoYeu9omwcC6g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-        data_css += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-        data_css += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.min.css" integrity="sha512-MFDhxgOYIqLdcYTXw7en/n5BshKoduTitYmX8TkQ+iJOGjrWusRi8+KmfZOrgaDrCjZSotH2d1U1e/Z1KT6nWw==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+        data_css_ver = cache_v()
 
-        global_wiki_set['main_css'] = data_css
+        m_curs.execute('select data from temp where name = "main_css"')
+        db_data = m_curs.fetchall()
+        if db_data:
+            data_css = db_data[0][0]
+        else:
+            data_css += '<meta http-equiv="Cache-Control" content="max-age=3600">'
 
-    # Darkmode
-    if 'dark_main_css' in global_wiki_set:
-        data_css_dark = global_wiki_set['dark_main_css']
-    else:
-        # Main CSS
-        data_css_dark += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="/views/main_css/css/sub/dark.css' + data_css_ver + '">'
+            # External JS
+            data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" integrity="sha512-LQNxIMR5rXv7o+b1l8+N1EZMfhG7iFZ9HhnbJkTp4zjNr5Wvst75AqUeFDxeRUa7l5vEDyUiAip//r+EFLLCyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+            data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+            data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+            data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.48.0/min/vs/loader.min.js" integrity="sha512-ZG31AN9z/CQD1YDDAK4RUAvogwbJHv6bHrumrnMLzdCrVu4HeAqrUX7Jsal/cbUwXGfaMUNmQU04tQ8XXl5Znw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+            data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>'
 
-        # External CSS
-        data_css_dark += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+            # Func JS
+            data_css += '<script defer src="/views/main_css/js/func/func.js' + data_css_ver + '"></script>'
+            
+            data_css += '<script defer src="/views/main_css/js/func/insert_version.js' + data_css_ver + '"></script>'
+            data_css += '<script defer src="/views/main_css/js/func/insert_user_info.js' + data_css_ver + '"></script>'
+            data_css += '<script defer src="/views/main_css/js/func/insert_version_skin.js' + data_css_ver + '"></script>'
+            data_css += '<script defer src="/views/main_css/js/func/insert_http_warning_text.js' + data_css_ver + '"></script>'
+            
+            data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js' + data_css_ver + '"></script>'
+            data_css += '<script defer src="/views/main_css/js/func/shortcut.js' + data_css_ver + '"></script>'
+            data_css += '<script defer src="/views/main_css/js/func/editor.js' + data_css_ver + '"></script>'
+            data_css += '<script defer src="/views/main_css/js/func/render.js' + data_css_ver + '"></script>'
+            
+            # Main CSS
+            data_css += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="/views/main_css/css/main.css' + data_css_ver + '">'
 
-        global_wiki_set['dark_main_css'] = data_css_dark
+            # External CSS
+            data_css += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha512-fHwaWebuwA7NSF5Qg/af4UeDx9XqUpYpOGgubo3yWu+b2IQR4UeQwbb42Ti7gVAjNtVoI/I9TEoYeu9omwcC6g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+            data_css += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+            data_css += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.min.css" integrity="sha512-MFDhxgOYIqLdcYTXw7en/n5BshKoduTitYmX8TkQ+iJOGjrWusRi8+KmfZOrgaDrCjZSotH2d1U1e/Z1KT6nWw==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
 
-    data = data[0:2] + ['', data_css] + data[2:3] + [data_css_dark] + data[3:]
+            m_curs.execute('insert into temp (name, data) values ("main_css", ?)', [data_css])
 
-    return data
+        # Darkmode
+        m_curs.execute('select data from temp where name = "dark_main_css"')
+        db_data = m_curs.fetchall()
+        if db_data:
+            data_css_dark = db_data[0][0]
+        else:
+            # Main CSS
+            data_css_dark += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="/views/main_css/css/sub/dark.css' + data_css_ver + '">'
+
+            # External CSS
+            data_css_dark += '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+
+            m_curs.execute('insert into temp (name, data) values ("dark_main_css", ?)', [data_css_dark])
+
+        data = data[0:2] + ['', data_css] + data[2:3] + [data_css_dark] + data[3:]
+
+        return data
 
 def cut_100(data):
     return ''
@@ -1310,10 +1323,8 @@ def load_skin(conn, data = '', set_n = 0, default = 0):
     # default == 0 -> 디폴트 미포함
     # default == 1 -> 디폴트 포함
 
-    if set_n == 0:
-        skin_return_data = ''
-    else:
-        skin_return_data = []
+    skin_return_data = []
+    skin_return_data_str = ''
 
     skin_list_get = os.listdir('views')
     if default == 1:
@@ -1328,13 +1339,13 @@ def load_skin(conn, data = '', set_n = 0, default = 0):
         if skin_data != 'main_css':
             if set_n == 0:
                 if skin_data == data:
-                    skin_return_data = '' + \
+                    skin_return_data_str = '' + \
                         '<option value="' + skin_data + '">' + \
                             see_data + \
                         '</option>' + \
-                    '' + skin_return_data
+                    '' + skin_return_data_str
                 else:
-                    skin_return_data += '' + \
+                    skin_return_data_str += '' + \
                         '<option value="' + skin_data + '">' + \
                             see_data + \
                         '</option>' + \
@@ -1345,7 +1356,10 @@ def load_skin(conn, data = '', set_n = 0, default = 0):
                 else:
                     skin_return_data += [skin_data]                    
 
-    return skin_return_data
+    if set_n == 0:
+        return skin_return_data_str
+    else:
+        return skin_return_data
 
 # Func-markup
 def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = ''):
@@ -1592,9 +1606,9 @@ def captcha_get(conn):
 
     data = ''
     
-    if acl_check(conn, None, 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
+    if acl_check(conn, '', 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
         pass
-    elif acl_check(conn, None, 'recaptcha') == 1:
+    elif acl_check(conn, '', 'recaptcha') == 1:
         curs.execute(db_change('select data from other where name = "recaptcha"'))
         recaptcha = curs.fetchall()
         
@@ -1643,9 +1657,9 @@ def captcha_post(conn, re_data, num = 1):
 
     if num != 1:
         pass
-    elif acl_check(conn, None, 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
+    elif acl_check(conn, '', 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
         pass
-    elif acl_check(conn, None, 'recaptcha') == 1:
+    elif acl_check(conn, '', 'recaptcha') == 1:
         curs.execute(db_change('select data from other where name = "sec_re"'))
         sec_re = curs.fetchall()
         
@@ -2338,7 +2352,7 @@ def do_edit_slow_check(conn, do_type = 'edit'):
     
     slow_edit = curs.fetchall()
     if slow_edit and slow_edit[0][0] != '':
-        if acl_check(conn, None, 'slow_edit') == 1:
+        if acl_check(conn, '', 'slow_edit') == 1:
             slow_edit = int(number_check(slow_edit[0][0]))
 
             if do_type == 'edit':
