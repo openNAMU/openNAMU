@@ -12,18 +12,15 @@ import (
 )
 
 func Api_func_llm(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	var api_key string
 
-	stmt, err := db.Prepare(tool.DB_change(db_set, "select data from user_set where name = 'llm_api_key' and id = ?"))
+	stmt, err := db.Prepare(tool.DB_change("select data from user_set where name = 'llm_api_key' and id = ?"))
 	if err != nil {
 		log.Fatal(err)
 	}

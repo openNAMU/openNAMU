@@ -12,9 +12,8 @@ import (
 )
 
 type namumark struct {
-	db     *sql.DB
-	db_set map[string]string
-	data   map[string]string
+	db   *sql.DB
+	data map[string]string
 
 	render_data    string
 	render_data_js string
@@ -27,7 +26,7 @@ type namumark struct {
 	link_count int
 }
 
-func Namumark_new(db *sql.DB, db_set map[string]string, data map[string]string) *namumark {
+func Namumark_new(db *sql.DB, data map[string]string) *namumark {
 	data_string := data["data"]
 	data_string = html.EscapeString(data_string)
 	data_string = strings.Replace(data_string, "\r", "", -1)
@@ -35,7 +34,6 @@ func Namumark_new(db *sql.DB, db_set map[string]string, data map[string]string) 
 
 	return &namumark{
 		db,
-		db_set,
 		data,
 
 		data_string,

@@ -9,13 +9,10 @@ import (
 )
 
 func Api_topic_list(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	page_int, err := strconv.Atoi(other_set["num"])
@@ -29,7 +26,7 @@ func Api_topic_list(call_arg []string) string {
 		page_int = 0
 	}
 
-	stmt, err := db.Prepare(tool.DB_change(db_set, "select code, sub, stop, agree, date from rd where title = ? order by sub asc limit ?, 50"))
+	stmt, err := db.Prepare(tool.DB_change("select code, sub, stop, agree, date from rd where title = ? order by sub asc limit ?, 50"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,7 +53,7 @@ func Api_topic_list(call_arg []string) string {
 			log.Fatal(err)
 		}
 
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select ip, id from topic where code = ? order by id + 0 desc limit 1"))
+		stmt, err := db.Prepare(tool.DB_change("select ip, id from topic where code = ? order by id + 0 desc limit 1"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -81,8 +78,8 @@ func Api_topic_list(call_arg []string) string {
 			ip_pre = ip_parser_temp[ip][0]
 			ip_render = ip_parser_temp[ip][1]
 		} else {
-			ip_pre = tool.IP_preprocess(db, db_set, ip, other_set["ip"])[0]
-			ip_render = tool.IP_parser(db, db_set, ip, other_set["ip"])
+			ip_pre = tool.IP_preprocess(db, ip, other_set["ip"])[0]
+			ip_render = tool.IP_parser(db, ip, other_set["ip"])
 
 			ip_parser_temp[ip] = []string{ip_pre, ip_render}
 		}
@@ -101,10 +98,10 @@ func Api_topic_list(call_arg []string) string {
 
 	return_data := make(map[string]interface{})
 	return_data["language"] = map[string]string{
-		"closed":            tool.Get_language(db, db_set, "closed", false),
-		"agreed_discussion": tool.Get_language(db, db_set, "agreed_discussion", false),
-		"make_new_topic":    tool.Get_language(db, db_set, "make_new_topic", false),
-		"stop":              tool.Get_language(db, db_set, "stop", false),
+		"closed":            tool.Get_language(db, "closed", false),
+		"agreed_discussion": tool.Get_language(db, "agreed_discussion", false),
+		"make_new_topic":    tool.Get_language(db, "make_new_topic", false),
+		"stop":              tool.Get_language(db, "stop", false),
 	}
 
 	if len(data_list) == 0 {

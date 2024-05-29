@@ -9,13 +9,10 @@ import (
 )
 
 func Api_list_recent_block(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	page_int, err := strconv.Atoi(other_set["num"])
@@ -32,7 +29,7 @@ func Api_list_recent_block(call_arg []string) string {
 	var stmt *sql.Stmt
 	var rows *sql.Rows
 	if other_set["set_type"] == "all" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select why, block, blocker, end, today, band, ongoing from rb order by today desc limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb order by today desc limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -42,7 +39,7 @@ func Api_list_recent_block(call_arg []string) string {
 			log.Fatal(err)
 		}
 	} else if other_set["set_type"] == "ongoing" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select why, block, blocker, end, today, band, ongoing from rb where ongoing = '1' order by end desc limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where ongoing = '1' order by end desc limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -52,7 +49,7 @@ func Api_list_recent_block(call_arg []string) string {
 			log.Fatal(err)
 		}
 	} else if other_set["set_type"] == "regex" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select why, block, blocker, end, today, band, ongoing from rb where band = 'regex' order by today desc limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where band = 'regex' order by today desc limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -62,7 +59,7 @@ func Api_list_recent_block(call_arg []string) string {
 			log.Fatal(err)
 		}
 	} else if other_set["set_type"] == "user" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select why, block, blocker, end, today, band, ongoing from rb where block = ? order by today desc limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where block = ? order by today desc limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -72,7 +69,7 @@ func Api_list_recent_block(call_arg []string) string {
 			log.Fatal(err)
 		}
 	} else if other_set["set_type"] == "cidr" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select why, block, blocker, end, today, band, ongoing from rb where band = 'cidr' order by today desc limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where band = 'cidr' order by today desc limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -82,7 +79,7 @@ func Api_list_recent_block(call_arg []string) string {
 			log.Fatal(err)
 		}
 	} else {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select why, block, blocker, end, today, band, ongoing from rb where blocker = ? order by today desc limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where blocker = ? order by today desc limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -120,8 +117,8 @@ func Api_list_recent_block(call_arg []string) string {
 			ip_pre_blocker = ip_parser_temp[blocker][0]
 			ip_render_blocker = ip_parser_temp[blocker][1]
 		} else {
-			ip_pre_blocker = tool.IP_preprocess(db, db_set, blocker, other_set["ip"])[0]
-			ip_render_blocker = tool.IP_parser(db, db_set, blocker, other_set["ip"])
+			ip_pre_blocker = tool.IP_preprocess(db, blocker, other_set["ip"])[0]
+			ip_render_blocker = tool.IP_parser(db, blocker, other_set["ip"])
 
 			ip_parser_temp[blocker] = []string{ip_pre_blocker, ip_render_blocker}
 		}
@@ -134,8 +131,8 @@ func Api_list_recent_block(call_arg []string) string {
 				ip_pre_block = ip_parser_temp[block][0]
 				ip_render_block = ip_parser_temp[block][1]
 			} else {
-				ip_pre_block = tool.IP_preprocess(db, db_set, block, other_set["ip"])[0]
-				ip_render_block = tool.IP_parser(db, db_set, block, other_set["ip"])
+				ip_pre_block = tool.IP_preprocess(db, block, other_set["ip"])[0]
+				ip_render_block = tool.IP_parser(db, block, other_set["ip"])
 
 				ip_parser_temp[block] = []string{ip_pre_block, ip_render_block}
 			}
@@ -159,17 +156,17 @@ func Api_list_recent_block(call_arg []string) string {
 
 	return_data := make(map[string]interface{})
 	return_data["language"] = map[string]string{
-		"all":         tool.Get_language(db, db_set, "all", false),
-		"regex":       tool.Get_language(db, db_set, "regex", false),
-		"cidr":        tool.Get_language(db, db_set, "cidr", false),
-		"in_progress": tool.Get_language(db, db_set, "in_progress", false),
-		"admin":       tool.Get_language(db, db_set, "admin", false),
-		"blocked":     tool.Get_language(db, db_set, "blocked", false),
-		"limitless":   tool.Get_language(db, db_set, "limitless", false),
-		"release":     tool.Get_language(db, db_set, "release", false),
-		"start":       tool.Get_language(db, db_set, "start", false),
-		"end":         tool.Get_language(db, db_set, "end", false),
-		"ban":         tool.Get_language(db, db_set, "ban", false),
+		"all":         tool.Get_language(db, "all", false),
+		"regex":       tool.Get_language(db, "regex", false),
+		"cidr":        tool.Get_language(db, "cidr", false),
+		"in_progress": tool.Get_language(db, "in_progress", false),
+		"admin":       tool.Get_language(db, "admin", false),
+		"blocked":     tool.Get_language(db, "blocked", false),
+		"limitless":   tool.Get_language(db, "limitless", false),
+		"release":     tool.Get_language(db, "release", false),
+		"start":       tool.Get_language(db, "start", false),
+		"end":         tool.Get_language(db, "end", false),
+		"ban":         tool.Get_language(db, "ban", false),
 	}
 
 	if len(data_list) == 0 {
@@ -178,8 +175,8 @@ func Api_list_recent_block(call_arg []string) string {
 		return_data["data"] = data_list
 	}
 
-	auth_name := tool.Get_user_auth(db, db_set, other_set["ip"])
-	auth_info := tool.Get_auth_group_info(db, db_set, auth_name)
+	auth_name := tool.Get_user_auth(db, other_set["ip"])
+	auth_info := tool.Get_auth_group_info(db, auth_name)
 
 	return_data["auth"] = auth_info
 

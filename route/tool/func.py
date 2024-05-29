@@ -96,7 +96,7 @@ if sys.version_info < (3, 6):
 # Func
 # Func-main
 def do_db_set(db_set):
-    with class_in_memory_db() as m_conn:
+    with class_temp_db() as m_conn:
         m_curs = m_conn.cursor()
 
         m_curs.execute('drop table if exists temp')
@@ -107,7 +107,6 @@ def do_db_set(db_set):
 
         m_curs.execute('select data from temp where name = "db_set"')
         db_data = m_curs.fetchall()
-        print(db_data)
     
 # Func-init
 def get_init_set_list(need = 'all'):
@@ -144,7 +143,7 @@ def get_init_set_list(need = 'all'):
         return init_set_list[need]
 class get_db_connect:
     def __init__(self):
-        with class_in_memory_db() as m_conn:
+        with class_temp_db() as m_conn:
             m_curs = m_conn.cursor()
 
             m_curs.execute('select data from temp where name = "db_set"')
@@ -641,7 +640,7 @@ def update(conn, ver_num, set_data):
     print('Update completed')
 
 def set_init_always(conn, ver_num):
-    with class_in_memory_db() as m_conn:
+    with class_temp_db() as m_conn:
         m_curs = m_conn.cursor()
         curs = conn.cursor()
 
@@ -979,7 +978,7 @@ def pw_check(conn, data, data2, type_d = 'no', id_d = ''):
 # Func-skin
 def easy_minify(conn, data, tool = None):
     # without_DB
-    with class_in_memory_db() as m_conn:
+    with class_temp_db() as m_conn:
         m_curs = m_conn.cursor()
         
         m_curs.execute('select data from temp where name = "wiki_access_password"')
@@ -1000,7 +999,7 @@ def easy_minify(conn, data, tool = None):
             return data
 
 def get_lang(conn, data, safe = 0):
-    with class_in_memory_db() as m_conn:
+    with class_temp_db() as m_conn:
         m_curs = m_conn.cursor()
         curs = conn.cursor()
 
@@ -1087,7 +1086,7 @@ def cache_v():
     return '.cache_v258'
 
 def wiki_css(data):
-    with class_in_memory_db() as m_conn:
+    with class_temp_db() as m_conn:
         m_curs = m_conn.cursor()
 
         # without_DB

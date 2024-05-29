@@ -15,10 +15,10 @@ import threading
 def get_time():
     return str(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
 
-class class_in_memory_db:
+class class_temp_db:
     def __enter__(self):
         self.conn = sqlite3.connect(
-            'file:cachedb?mode=memory&cache=shared',
+            os.path.join('.', 'data', 'temp.db'),
             check_same_thread = False,
             isolation_level = None
         )
@@ -30,7 +30,7 @@ class class_in_memory_db:
         self.conn.close()
 
 def db_change(data):
-    with class_in_memory_db() as m_conn:
+    with class_temp_db() as m_conn:
         m_curs = m_conn.cursor()
         
         m_curs.execute('select data from temp where name = "db_set_type"')

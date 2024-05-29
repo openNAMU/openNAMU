@@ -7,8 +7,8 @@ import (
 	"opennamu/route/tool"
 )
 
-func bbs_list(db *sql.DB, db_set map[string]string) map[string]string {
-	rows, err := db.Query(tool.DB_change(db_set, "select set_data, set_id from bbs_set where set_name = 'bbs_name'"))
+func bbs_list(db *sql.DB) map[string]string {
+	rows, err := db.Query(tool.DB_change("select set_data, set_id from bbs_set where set_name = 'bbs_name'"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,17 +32,14 @@ func bbs_list(db *sql.DB, db_set map[string]string) map[string]string {
 }
 
 func Api_bbs_list(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
-	data_list := bbs_list(db, db_set)
+	data_list := bbs_list(db)
 	data_list_sub := map[string][]string{}
 
 	for k, v := range data_list {
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select set_data from bbs_set where set_name = 'bbs_type' and set_id = ?"))
+		stmt, err := db.Prepare(tool.DB_change("select set_data from bbs_set where set_name = 'bbs_type' and set_id = ?"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -59,7 +56,7 @@ func Api_bbs_list(call_arg []string) string {
 			}
 		}
 
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select set_data from bbs_data where set_id = ? and set_name = 'date' order by set_code + 0 desc limit 1"))
+		stmt, err = db.Prepare(tool.DB_change("select set_data from bbs_data where set_id = ? and set_name = 'date' order by set_code + 0 desc limit 1"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -81,8 +78,8 @@ func Api_bbs_list(call_arg []string) string {
 
 	return_data := make(map[string]interface{})
 	return_data["language"] = map[string]string{
-		"thread_base":  tool.Get_language(db, db_set, "thread_base", false),
-		"comment_base": tool.Get_language(db, db_set, "comment_base", false),
+		"thread_base":  tool.Get_language(db, "thread_base", false),
+		"comment_base": tool.Get_language(db, "comment_base", false),
 	}
 
 	if len(data_list_sub) == 0 {
