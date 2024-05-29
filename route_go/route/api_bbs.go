@@ -9,20 +9,17 @@ import (
 )
 
 func Api_bbs(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	var rows []*sql.Rows
 	if other_set["bbs_num"] == "" {
 		var err error
 
-		row, err := db.Query(tool.DB_change(db_set, "select set_code, set_id, '0' from bbs_data where set_name = 'date' order by set_data desc limit 50"))
+		row, err := db.Query(tool.DB_change("select set_code, set_id, '0' from bbs_data where set_name = 'date' order by set_data desc limit 50"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -35,7 +32,7 @@ func Api_bbs(call_arg []string) string {
 			num = page*50 - 50
 		}
 
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select set_code, set_id, '1' from bbs_data where set_name = 'pinned' and set_id like ? order by set_data desc"))
+		stmt, err := db.Prepare(tool.DB_change("select set_code, set_id, '1' from bbs_data where set_name = 'pinned' and set_id like ? order by set_data desc"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -48,7 +45,7 @@ func Api_bbs(call_arg []string) string {
 
 		rows = append(rows, row)
 
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select set_code, set_id, '0' from bbs_data where set_name = 'title' and set_id like ? order by set_code + 0 desc limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select set_code, set_id, '0' from bbs_data where set_name = 'title' and set_id like ? order by set_code + 0 desc limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -84,7 +81,7 @@ func Api_bbs(call_arg []string) string {
 			temp_data["set_id"] = set_id
 			temp_data["pinned"] = pinned
 
-			stmt, err := db.Prepare(tool.DB_change(db_set, "select set_name, set_data, set_code, set_id from bbs_data where set_code = ? and set_id = ?"))
+			stmt, err := db.Prepare(tool.DB_change("select set_name, set_data, set_code, set_id from bbs_data where set_code = ? and set_id = ?"))
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -113,8 +110,8 @@ func Api_bbs(call_arg []string) string {
 						ip_pre = ip_parser_temp[set_data][0]
 						ip_render = ip_parser_temp[set_data][1]
 					} else {
-						ip_pre = tool.IP_preprocess(db, db_set, set_data, other_set["ip"])[0]
-						ip_render = tool.IP_parser(db, db_set, set_data, other_set["ip"])
+						ip_pre = tool.IP_preprocess(db, set_data, other_set["ip"])[0]
+						ip_render = tool.IP_parser(db, set_data, other_set["ip"])
 
 						ip_parser_temp[set_data] = []string{ip_pre, ip_render}
 					}

@@ -9,13 +9,10 @@ import (
 )
 
 func Api_list_recent_discuss(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	limit_int, err := strconv.Atoi(other_set["limit"])
@@ -42,11 +39,11 @@ func Api_list_recent_discuss(call_arg []string) string {
 
 	set_type := other_set["set_type"]
 	if set_type == "normal" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop, agree from rd order by date desc limit ?, ?"))
+		stmt, err = db.Prepare(tool.DB_change("select title, sub, date, code, stop, agree from rd order by date desc limit ?, ?"))
 	} else if set_type == "close" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop, agree from rd where stop = 'O' order by date desc limit ?, ?"))
+		stmt, err = db.Prepare(tool.DB_change("select title, sub, date, code, stop, agree from rd where stop = 'O' order by date desc limit ?, ?"))
 	} else {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select title, sub, date, code, stop, agree from rd where stop != 'O' order by date desc limit ?, ?"))
+		stmt, err = db.Prepare(tool.DB_change("select title, sub, date, code, stop, agree from rd where stop != 'O' order by date desc limit ?, ?"))
 	}
 
 	if err != nil {
@@ -76,7 +73,7 @@ func Api_list_recent_discuss(call_arg []string) string {
 			log.Fatal(err)
 		}
 
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select ip, id from topic where code = ? order by id + 0 desc limit 1"))
+		stmt, err := db.Prepare(tool.DB_change("select ip, id from topic where code = ? order by id + 0 desc limit 1"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -101,8 +98,8 @@ func Api_list_recent_discuss(call_arg []string) string {
 			ip_pre = ip_parser_temp[ip][0]
 			ip_render = ip_parser_temp[ip][1]
 		} else {
-			ip_pre = tool.IP_preprocess(db, db_set, ip, other_set["ip"])[0]
-			ip_render = tool.IP_parser(db, db_set, ip, other_set["ip"])
+			ip_pre = tool.IP_preprocess(db, ip, other_set["ip"])[0]
+			ip_render = tool.IP_parser(db, ip, other_set["ip"])
 
 			ip_parser_temp[ip] = []string{ip_pre, ip_render}
 		}
@@ -128,18 +125,18 @@ func Api_list_recent_discuss(call_arg []string) string {
 			return string(json_data)
 		}
 	} else {
-		auth_name := tool.Get_user_auth(db, db_set, other_set["ip"])
-		auth_info := tool.Get_auth_group_info(db, db_set, auth_name)
+		auth_name := tool.Get_user_auth(db, other_set["ip"])
+		auth_info := tool.Get_auth_group_info(db, auth_name)
 
 		return_data := make(map[string]interface{})
 		return_data["language"] = map[string]string{
-			"tool":              tool.Get_language(db, db_set, "tool", false),
-			"normal":            tool.Get_language(db, db_set, "normal", false),
-			"close_discussion":  tool.Get_language(db, db_set, "close_discussion", false),
-			"open_discussion":   tool.Get_language(db, db_set, "open_discussion", false),
-			"closed":            tool.Get_language(db, db_set, "closed", false),
-			"agreed_discussion": tool.Get_language(db, db_set, "agreed_discussion", false),
-			"stop":              tool.Get_language(db, db_set, "stop", false),
+			"tool":              tool.Get_language(db, "tool", false),
+			"normal":            tool.Get_language(db, "normal", false),
+			"close_discussion":  tool.Get_language(db, "close_discussion", false),
+			"open_discussion":   tool.Get_language(db, "open_discussion", false),
+			"closed":            tool.Get_language(db, "closed", false),
+			"agreed_discussion": tool.Get_language(db, "agreed_discussion", false),
+			"stop":              tool.Get_language(db, "stop", false),
 		}
 		return_data["auth"] = auth_info
 

@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_setting_main(db_set):
+def main_setting_main():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -104,77 +104,88 @@ def main_setting_main(db_set):
                 else:
                     branch_div += '<option value="' + i + '">' + i + '</option>'
 
-            sqlite_only = 'style="display:none;"' if db_set != 'sqlite' else ''
+            sqlite_only = ''
+            with class_temp_db() as m_conn:
+                m_curs = m_conn.cursor()
+
+                m_curs.execute('select data from temp where name = "db_set_type"')
+                db_data = m_curs.fetchall()
+                set_data = db_data[0][0] if db_data else 'sqlite'
+
+                sqlite_only = 'style="display:none;"' if set_data != 'sqlite' else ''
+
+            basic_set = '''
+                <h2>''' + get_lang(conn, 'basic_set') + '''</h2>
+                            
+                <span>''' + get_lang(conn, 'wiki_name') + '''</span>
+                <hr class="main_hr">
+                <input name="name" value="''' + html.escape(d_list[0]) + '''">
+                <hr class="main_hr">
+
+                <span><a href="/setting/main/logo">(''' + get_lang(conn, 'wiki_logo') + ''')</a></span>
+                <hr class="main_hr">
+
+                <span>''' + get_lang(conn, 'main_page') + '''</span>
+                <hr class="main_hr">
+                <input name="frontpage" value="''' + html.escape(d_list[2]) + '''">
+                <hr class="main_hr">
+
+                <span>''' + get_lang(conn, 'tls_method') + '''</span>
+                <hr class="main_hr">
+                <select name="http_select">''' + tls_select + '''</select>
+                <hr class="main_hr">
+
+                <span>''' + get_lang(conn, 'domain') + '''</span> (EX : 2du.pythonanywhere.com) (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
+                <hr class="main_hr">
+                <input name="domain" value="''' + html.escape(d_list[22]) + '''">
+                <hr class="main_hr">
+
+                <span>''' + get_lang(conn, 'wiki_host') + '''</span>
+                <hr class="main_hr">
+                <input name="host" value="''' + html.escape(d_list[16]) + '''">
+                <hr class="main_hr">
+
+                <span>''' + get_lang(conn, 'wiki_port') + '''</span>
+                <hr class="main_hr">
+                <input name="port" value="''' + html.escape(d_list[10]) + '''">
+                <hr class="main_hr">
+
+                <span>''' + get_lang(conn, 'wiki_secret_key') + '''</span>
+                <hr class="main_hr">
+                <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
+                <hr class="main_hr">
+                
+                <input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + get_lang(conn, 'set_wiki_access_password_need') + ''' (''' + get_lang(conn, 'restart_required') + ''')
+                <hr class="main_hr">
+                
+                <span>''' + get_lang(conn, 'set_wiki_access_password') + '''</span> (''' + get_lang(conn, 'restart_required') + ''')
+                <hr class="main_hr">
+                <input type="password" name="wiki_access_password" value="''' + html.escape(d_list[32]) + '''">
+                
+                <h3>''' + get_lang(conn, 'authority_use_list') + '''</h3>
+                
+                <input type="checkbox" name="auth_history_off" ''' + check_box_div[14] + '''> ''' + get_lang(conn, 'authority_use_list_off') + '''
+                <hr class="main_hr">
+                
+                <span>''' + get_lang(conn, 'authority_use_list_expiration_date') + '''</span> (''' + get_lang(conn, 'day') + ''') (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
+                <hr class="main_hr">
+                <input name="auth_history_expiration_date" value="''' + html.escape(d_list[43]) + '''">
+                <hr class="main_hr">
+
+                <h3>''' + get_lang(conn, 'communication_set') + '''</h3>
+                
+                <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + get_lang(conn, 'enable_comment_function') + ''' (''' + get_lang(conn, 'not_working') + ''')
+                <hr class="main_hr">
+
+                <input type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + get_lang(conn, 'display_level_in_user_name') + '''
+                <hr class="main_hr">
+            '''
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
                 imp = [get_lang(conn, 'main_setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = render_simple_set(conn, '''
                     <form method="post">
-                        <h2>''' + get_lang(conn, 'basic_set') + '''</h2>
-                        
-                        <span>''' + get_lang(conn, 'wiki_name') + '''</span>
-                        <hr class="main_hr">
-                        <input name="name" value="''' + html.escape(d_list[0]) + '''">
-                        <hr class="main_hr">
-
-                        <span><a href="/setting/main/logo">(''' + get_lang(conn, 'wiki_logo') + ''')</a></span>
-                        <hr class="main_hr">
-
-                        <span>''' + get_lang(conn, 'main_page') + '''</span>
-                        <hr class="main_hr">
-                        <input name="frontpage" value="''' + html.escape(d_list[2]) + '''">
-                        <hr class="main_hr">
-
-                        <span>''' + get_lang(conn, 'tls_method') + '''</span>
-                        <hr class="main_hr">
-                        <select name="http_select">''' + tls_select + '''</select>
-                        <hr class="main_hr">
-
-                        <span>''' + get_lang(conn, 'domain') + '''</span> (EX : 2du.pythonanywhere.com) (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
-                        <hr class="main_hr">
-                        <input name="domain" value="''' + html.escape(d_list[22]) + '''">
-                        <hr class="main_hr">
-
-                        <span>''' + get_lang(conn, 'wiki_host') + '''</span>
-                        <hr class="main_hr">
-                        <input name="host" value="''' + html.escape(d_list[16]) + '''">
-                        <hr class="main_hr">
-
-                        <span>''' + get_lang(conn, 'wiki_port') + '''</span>
-                        <hr class="main_hr">
-                        <input name="port" value="''' + html.escape(d_list[10]) + '''">
-                        <hr class="main_hr">
-
-                        <span>''' + get_lang(conn, 'wiki_secret_key') + '''</span>
-                        <hr class="main_hr">
-                        <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
-                        <hr class="main_hr">
-                        
-                        <input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + get_lang(conn, 'set_wiki_access_password_need') + ''' (''' + get_lang(conn, 'restart_required') + ''')
-                        <hr class="main_hr">
-                        
-                        <span>''' + get_lang(conn, 'set_wiki_access_password') + '''</span> (''' + get_lang(conn, 'restart_required') + ''')
-                        <hr class="main_hr">
-                        <input type="password" name="wiki_access_password" value="''' + html.escape(d_list[32]) + '''">
-                        
-                        <h3>''' + get_lang(conn, 'authority_use_list') + '''</h3>
-                        
-                        <input type="checkbox" name="auth_history_off" ''' + check_box_div[14] + '''> ''' + get_lang(conn, 'authority_use_list_off') + '''
-                        <hr class="main_hr">
-                        
-                        <span>''' + get_lang(conn, 'authority_use_list_expiration_date') + '''</span> (''' + get_lang(conn, 'day') + ''') (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
-                        <hr class="main_hr">
-                        <input name="auth_history_expiration_date" value="''' + html.escape(d_list[43]) + '''">
-                        <hr class="main_hr">
-
-                        <h3>''' + get_lang(conn, 'communication_set') + '''</h3>
-                        
-                        <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + get_lang(conn, 'enable_comment_function') + ''' (''' + get_lang(conn, 'not_working') + ''')
-                        <hr class="main_hr">
-
-                        <input type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + get_lang(conn, 'display_level_in_user_name') + '''
-                        <hr class="main_hr">
-
+                        ''' + basic_set + '''
                         <h2>''' + get_lang(conn, 'design_set') + '''</h2>
                         
                         <span>''' + get_lang(conn, 'wiki_skin') + '''</span>

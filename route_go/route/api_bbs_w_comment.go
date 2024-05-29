@@ -9,17 +9,14 @@ import (
 )
 
 func Api_bbs_w_comment(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	if other_set["tool"] == "length" {
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select count(*) from bbs_data where set_name = 'comment_date' and set_id = ? order by set_code + 0 desc"))
+		stmt, err := db.Prepare(tool.DB_change("select count(*) from bbs_data where set_name = 'comment_date' and set_id = ? order by set_code + 0 desc"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -37,7 +34,7 @@ func Api_bbs_w_comment(call_arg []string) string {
 			}
 		}
 
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select count(*) from bbs_data where set_name = 'comment_date' and set_id like ? order by set_code + 0 desc"))
+		stmt, err = db.Prepare(tool.DB_change("select count(*) from bbs_data where set_name = 'comment_date' and set_id like ? order by set_code + 0 desc"))
 		if err != nil {
 			log.Fatal(err)
 		}

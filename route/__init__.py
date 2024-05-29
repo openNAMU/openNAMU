@@ -177,6 +177,8 @@ from route.n_setting_404_page import setting_404_page
 
 from route.n_bbs_main import bbs_main
 
+from route.n_edit_move_all import edit_move_all
+
 from route.go_api_func_llm import api_func_llm
 from route.go_api_func_language import api_func_language
 from route.go_api_func_sha224 import api_func_sha224
