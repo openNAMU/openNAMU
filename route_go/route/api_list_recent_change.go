@@ -9,13 +9,10 @@ import (
 )
 
 func Api_list_recent_change(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	set_type := other_set["set_type"]
@@ -43,7 +40,7 @@ func Api_list_recent_change(call_arg []string) string {
 		page_int = 0
 	}
 
-	stmt, err := db.Prepare(tool.DB_change(db_set, "select id, title from rc where type = ? order by date desc limit ?, ?"))
+	stmt, err := db.Prepare(tool.DB_change("select id, title from rc where type = ? order by date desc limit ?, ?"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,7 +54,7 @@ func Api_list_recent_change(call_arg []string) string {
 
 	var data_list [][]string
 
-	admin_auth := tool.Get_user_auth(db, db_set, other_set["ip"])
+	admin_auth := tool.Get_user_auth(db, other_set["ip"])
 	ip_parser_temp := map[string][]string{}
 
 	for rows.Next() {
@@ -76,7 +73,7 @@ func Api_list_recent_change(call_arg []string) string {
 		var hide string
 		var type_data string
 
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select date, ip, send, leng, hide, type from history where id = ? and title = ?"))
+		stmt, err := db.Prepare(tool.DB_change("select date, ip, send, leng, hide, type from history where id = ? and title = ?"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -103,8 +100,8 @@ func Api_list_recent_change(call_arg []string) string {
 			ip_pre = ip_parser_temp[ip][0]
 			ip_render = ip_parser_temp[ip][1]
 		} else {
-			ip_pre = tool.IP_preprocess(db, db_set, ip, other_set["ip"])[0]
-			ip_render = tool.IP_parser(db, db_set, ip, other_set["ip"])
+			ip_pre = tool.IP_preprocess(db, ip, other_set["ip"])[0]
+			ip_render = tool.IP_parser(db, ip, other_set["ip"])
 
 			ip_parser_temp[ip] = []string{ip_pre, ip_render}
 		}
@@ -134,29 +131,29 @@ func Api_list_recent_change(call_arg []string) string {
 			return string(json_data)
 		}
 	} else {
-		auth_name := tool.Get_user_auth(db, db_set, other_set["ip"])
-		auth_info := tool.Get_auth_group_info(db, db_set, auth_name)
+		auth_name := tool.Get_user_auth(db, other_set["ip"])
+		auth_info := tool.Get_auth_group_info(db, auth_name)
 
 		return_data := make(map[string]interface{})
 		return_data["language"] = map[string]string{
-			"tool":           tool.Get_language(db, db_set, "tool", false),
-			"normal":         tool.Get_language(db, db_set, "normal", false),
-			"edit":           tool.Get_language(db, db_set, "edit", false),
-			"move":           tool.Get_language(db, db_set, "move", false),
-			"delete":         tool.Get_language(db, db_set, "delete", false),
-			"revert":         tool.Get_language(db, db_set, "revert", false),
-			"new_doc":        tool.Get_language(db, db_set, "new_doc", false),
-			"edit_request":   tool.Get_language(db, db_set, "edit_request", false),
-			"user_document":  tool.Get_language(db, db_set, "user_document", false),
-			"raw":            tool.Get_language(db, db_set, "raw", false),
-			"compare":        tool.Get_language(db, db_set, "compare", false),
-			"history":        tool.Get_language(db, db_set, "history", false),
-			"hide":           tool.Get_language(db, db_set, "hide", false),
-			"history_delete": tool.Get_language(db, db_set, "history_delete", false),
-			"send_edit":      tool.Get_language(db, db_set, "send_edit", false),
-			"file":           tool.Get_language(db, db_set, "file", false),
-			"category":       tool.Get_language(db, db_set, "category", false),
-			"setting":        tool.Get_language(db, db_set, "setting", false),
+			"tool":           tool.Get_language(db, "tool", false),
+			"normal":         tool.Get_language(db, "normal", false),
+			"edit":           tool.Get_language(db, "edit", false),
+			"move":           tool.Get_language(db, "move", false),
+			"delete":         tool.Get_language(db, "delete", false),
+			"revert":         tool.Get_language(db, "revert", false),
+			"new_doc":        tool.Get_language(db, "new_doc", false),
+			"edit_request":   tool.Get_language(db, "edit_request", false),
+			"user_document":  tool.Get_language(db, "user_document", false),
+			"raw":            tool.Get_language(db, "raw", false),
+			"compare":        tool.Get_language(db, "compare", false),
+			"history":        tool.Get_language(db, "history", false),
+			"hide":           tool.Get_language(db, "hide", false),
+			"history_delete": tool.Get_language(db, "history_delete", false),
+			"send_edit":      tool.Get_language(db, "send_edit", false),
+			"file":           tool.Get_language(db, "file", false),
+			"category":       tool.Get_language(db, "category", false),
+			"setting":        tool.Get_language(db, "setting", false),
 		}
 		return_data["auth"] = auth_info
 

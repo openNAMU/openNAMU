@@ -9,17 +9,14 @@ import (
 )
 
 func Api_w_raw(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	if other_set["exist_check"] != "" {
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select title from data where title = ?"))
+		stmt, err := db.Prepare(tool.DB_change("select title from data where title = ?"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -45,7 +42,7 @@ func Api_w_raw(call_arg []string) string {
 		var data string
 
 		if other_set["rev"] != "" {
-			stmt, err := db.Prepare(tool.DB_change(db_set, "select data from history where title = ? and id = ?"))
+			stmt, err := db.Prepare(tool.DB_change("select data from history where title = ? and id = ?"))
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -65,7 +62,7 @@ func Api_w_raw(call_arg []string) string {
 			json_data, _ := json.Marshal(new_data)
 			return string(json_data)
 		} else {
-			stmt, err := db.Prepare(tool.DB_change(db_set, "select data from data where title = ?"))
+			stmt, err := db.Prepare(tool.DB_change("select data from data where title = ?"))
 			if err != nil {
 				log.Fatal(err)
 			}

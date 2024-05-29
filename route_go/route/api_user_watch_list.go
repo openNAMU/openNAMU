@@ -9,13 +9,10 @@ import (
 )
 
 func Api_user_watch_list(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	page, _ := strconv.Atoi(other_set["num"])
@@ -26,16 +23,16 @@ func Api_user_watch_list(call_arg []string) string {
 
 	ip := other_set["ip"]
 	name := other_set["name"]
-	if ip != name && tool.Get_user_auth(db, db_set, ip) == "" {
+	if ip != name && tool.Get_user_auth(db, ip) == "" {
 		return "{}"
 	}
 
 	var stmt *sql.Stmt
 	var err error
 	if other_set["do_type"] == "star_doc" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select data from user_set where name = 'star_doc' and id = ? limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select data from user_set where name = 'star_doc' and id = ? limit ?, 50"))
 	} else {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select data from user_set where name = 'watchlist' and id = ? limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select data from user_set where name = 'watchlist' and id = ? limit ?, 50"))
 	}
 	if err != nil {
 		log.Fatal(err)
@@ -63,8 +60,8 @@ func Api_user_watch_list(call_arg []string) string {
 
 	return_data := make(map[string]interface{})
 	return_data["language"] = map[string]string{
-		"watchlist": tool.Get_language(db, db_set, "watchlist", false),
-		"star_doc":  tool.Get_language(db, db_set, "star_doc", false),
+		"watchlist": tool.Get_language(db, "watchlist", false),
+		"star_doc":  tool.Get_language(db, "star_doc", false),
 	}
 
 	if len(data_list) == 0 {

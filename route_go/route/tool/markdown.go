@@ -14,7 +14,7 @@ import (
 	"github.com/yuin/goldmark/renderer/html"
 )
 
-func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[string]interface{} {
+func Markdown(db *sql.DB, data map[string]string) map[string]interface{} {
 	backlink := map[string]map[string]string{}
 	link_count := 0
 
@@ -112,7 +112,7 @@ func Markdown(db *sql.DB, db_set map[string]string, data map[string]string) map[
 
 			var exist string
 
-			stmt, err := db.Prepare(DB_change(db_set, "select title from data where title = ?"))
+			stmt, err := db.Prepare(DB_change("select title from data where title = ?"))
 			if err != nil {
 				log.Fatal(err)
 			}

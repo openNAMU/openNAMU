@@ -419,16 +419,3 @@ input, textarea {
 pre#syntax, pre#syntax code {
     border: 0;
 }
-
-.opennamu_svg {
-    width: 14px;
-    display: inline-block;
-
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: contain;
-}
-
-.opennamu_svg_tool {
-    background-image: url(/views/main_css/file/icon/tool.svg);
-}

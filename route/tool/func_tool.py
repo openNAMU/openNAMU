@@ -7,28 +7,43 @@ import re
 
 import os
 import html
+import sqlite3
 import time
 import json
 import threading
 
-set_data = ''
-
 def get_time():
     return str(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
 
-def db_data_get(data):
-    global set_data
-    
-    set_data = data
+class class_temp_db:
+    def __enter__(self):
+        self.conn = sqlite3.connect(
+            os.path.join('.', 'data', 'temp.db'),
+            check_same_thread = False,
+            isolation_level = None
+        )
+
+        return self.conn
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.conn.commit()
+        self.conn.close()
 
 def db_change(data):
-    if set_data == 'mysql':
-        data = data.replace('random()', 'rand()')
-        data = data.replace('%', '%%')
-        data = data.replace('?', '%s')
-        data = data.replace('collate nocase', 'collate utf8mb4_general_ci')
+    with class_temp_db() as m_conn:
+        m_curs = m_conn.cursor()
+        
+        m_curs.execute('select data from temp where name = "db_set_type"')
+        db_data = m_curs.fetchall()
+        set_data = db_data[0][0] if db_data else 'sqlite'
 
-    return data
+        if set_data == 'mysql':
+            data = data.replace('random()', 'rand()')
+            data = data.replace('%', '%%')
+            data = data.replace('?', '%s')
+            data = data.replace('collate nocase', 'collate utf8mb4_general_ci')
+
+        return data
 
 def ip_check(d_type = 0):
     ip = ''

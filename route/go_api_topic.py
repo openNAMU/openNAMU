@@ -120,7 +120,7 @@ def api_topic_thread_pre_render(conn, data, num, ip, topic_num = '', name = '', 
 
     return data
 
-def api_topic(db_set, topic_num = 1, tool = 'normal', s_num = '', e_num = ''):
+def api_topic(topic_num = 1, tool = 'normal', s_num = '', e_num = ''):
     with get_db_connect() as conn:
         topic_num = str(topic_num)
 
@@ -135,14 +135,14 @@ def api_topic(db_set, topic_num = 1, tool = 'normal', s_num = '', e_num = ''):
         if acl_check(conn, '', 'topic_view', topic_num) != 1:
             if platform.system() == 'Linux':
                 if platform.machine() in ["AMD64", "x86_64"]:
-                    data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.bin"), sys._getframe().f_code.co_name, db_set, other_set], stdout = subprocess.PIPE).communicate()[0]
+                    data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.bin"), sys._getframe().f_code.co_name, other_set], stdout = subprocess.PIPE).communicate()[0]
                 else:
-                    data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.bin"), sys._getframe().f_code.co_name, db_set, other_set], stdout = subprocess.PIPE).communicate()[0]
+                    data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.bin"), sys._getframe().f_code.co_name, other_set], stdout = subprocess.PIPE).communicate()[0]
             else:
                 if platform.machine() in ["AMD64", "x86_64"]:
-                    data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.exe"), sys._getframe().f_code.co_name, db_set, other_set], stdout = subprocess.PIPE).communicate()[0]
+                    data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.exe"), sys._getframe().f_code.co_name, other_set], stdout = subprocess.PIPE).communicate()[0]
                 else:
-                    data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.exe"), sys._getframe().f_code.co_name, db_set, other_set], stdout = subprocess.PIPE).communicate()[0]
+                    data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.exe"), sys._getframe().f_code.co_name, other_set], stdout = subprocess.PIPE).communicate()[0]
 
             data = data.decode('utf8')
 

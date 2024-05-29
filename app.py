@@ -16,8 +16,6 @@ with open('version.json', encoding = 'utf8') as file_data:
 
 # Init-DB
 data_db_set = class_check_json()
-
-db_data_get(data_db_set['type'])
 do_db_set(data_db_set)
 
 with get_db_connect() as conn:
@@ -62,9 +60,11 @@ with get_db_connect() as conn:
                 except:
                     pass
 
+                field_text = 'longtext' if data_db_set['type'] == 'mysql' else 'text'
+
                 if db_pass == 0:
                     try:
-                        curs.execute(db_change('create table ' + create_table + '(test longtext default (""))'))
+                        curs.execute(db_change('create table ' + create_table + '(test ' + field_text + ' default (""))'))
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -72,7 +72,7 @@ with get_db_connect() as conn:
 
                 if db_pass == 0:
                     try:
-                        curs.execute(db_change('create table ' + create_table + '(test longtext default "")'))
+                        curs.execute(db_change('create table ' + create_table + '(test ' + field_text + ' default "")'))
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -80,7 +80,7 @@ with get_db_connect() as conn:
 
                 if db_pass == 0:
                     try:
-                        curs.execute(db_change('create table ' + create_table + '(test longtext)'))
+                        curs.execute(db_change('create table ' + create_table + '(test ' + field_text + ')'))
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -88,7 +88,7 @@ with get_db_connect() as conn:
 
                 if db_pass == 0:
                     try:
-                        curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ('')"))
+                        curs.execute(db_change("alter table " + create_table + " add column " + create + " " + field_text + " default ('')"))
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -96,7 +96,7 @@ with get_db_connect() as conn:
 
                 if db_pass == 0:
                     try:
-                        curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext default ''"))
+                        curs.execute(db_change("alter table " + create_table + " add column " + create + " " + field_text + " default ''"))
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -104,7 +104,7 @@ with get_db_connect() as conn:
 
                 if db_pass == 0:
                     try:
-                        curs.execute(db_change("alter table " + create_table + " add column " + create + " longtext"))
+                        curs.execute(db_change("alter table " + create_table + " add column " + create + " " + field_text))
                         db_pass = 1
                     except Exception as e:
                         # print(e)
@@ -347,8 +347,6 @@ if os.path.exists('custom.py'):
     from custom import custom_run
     custom_run('error', app)
 
-db_set_str = json.dumps(data_db_set)
-
 # Func
 # Func-inter_wiki
 app.route('/filter/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(filter_all)
@@ -490,7 +488,7 @@ app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(list_recent_discu
 app.route('/recent_discuss/<int:num>/<tool>')(list_recent_discuss)
 
 # Func-history
-app.route('/recent_edit_request', defaults = { 'db_set' : db_set_str })(recent_edit_request)
+app.route('/recent_edit_request')(recent_edit_request)
 
 app.route('/record/<name>', defaults = { 'tool' : 'record' })(recent_change)
 app.route('/record/<int:num>/<set_type>/<name>', defaults = { 'tool' : 'record' })(recent_change)
@@ -533,7 +531,7 @@ app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_set)
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_w)
 app.route('/w/<everything:name>')(view_w)
 
-app.route('/random', defaults = { 'db_set' : db_set_str })(view_random)
+app.route('/random')(view_random)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
@@ -557,6 +555,7 @@ app.route('/delete_multiple', methods = ['POST', 'GET'])(edit_delete_multiple)
 app.route('/revert/<int:num>/<everything:name>', methods = ['POST', 'GET'])(edit_revert)
 
 app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
+app.route('/move_all')(edit_move_all)
 
 # Func-topic
 app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
@@ -677,17 +676,17 @@ app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['
 
 # Func-api
 ## v1 API
-app.route('/api/render', methods = ['POST'], defaults = { 'db_set' : db_set_str })(api_w_render)
-app.route('/api/render/<tool>', methods = ['POST'], defaults = { 'db_set' : db_set_str })(api_w_render)
+app.route('/api/render', methods = ['POST'])(api_w_render)
+app.route('/api/render/<tool>', methods = ['POST'])(api_w_render)
 
-app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on', 'db_set' : db_set_str })(api_w_raw)
-app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_raw)
-app.route('/api/raw/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_raw)
+app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on' })(api_w_raw)
+app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>')(api_w_raw)
+app.route('/api/raw/<everything:name>')(api_w_raw)
 
-app.route('/api/xref/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_xref)
-app.route('/api/xref_this/<int:num>/<everything:name>', defaults = { 'xref_type' : '2', 'db_set' : db_set_str })(api_w_xref)
+app.route('/api/xref/<int:num>/<everything:name>')(api_w_xref)
+app.route('/api/xref_this/<int:num>/<everything:name>', defaults = { 'xref_type' : '2' })(api_w_xref)
 
-app.route('/api/random', defaults = { 'db_set' : db_set_str })(api_w_random)
+app.route('/api/random')(api_w_random)
 
 app.route('/api/bbs/w/<sub_code>')(api_bbs_w_post)
 app.route('/api/bbs/w/comment/<sub_code>')(api_bbs_w_comment)
@@ -699,65 +698,65 @@ app.route('/api/skin_info/<name>')(api_skin_info)
 app.route('/api/user_info/<user_name>')(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
-app.route('/api/auth_list', defaults = { 'db_set' : db_set_str })(api_func_auth_list)
-app.route('/api/auth_list/<user_name>', defaults = { 'db_set' : db_set_str })(api_func_auth_list)
+app.route('/api/auth_list')(api_func_auth_list)
+app.route('/api/auth_list/<user_name>')(api_func_auth_list)
 
-app.route('/api/thread/<int:topic_num>/<int:s_num>/<int:e_num>', defaults = { 'db_set' : db_set_str })(api_topic)
-app.route('/api/thread/<int:topic_num>/<tool>', defaults = { 'db_set' : db_set_str })(api_topic)
-app.route('/api/thread/<int:topic_num>', defaults = { 'db_set' : db_set_str })(api_topic)
+app.route('/api/thread/<int:topic_num>/<int:s_num>/<int:e_num>')(api_topic)
+app.route('/api/thread/<int:topic_num>/<tool>')(api_topic)
+app.route('/api/thread/<int:topic_num>')(api_topic)
 
-app.route('/api/search/<everything:name>', defaults = { 'db_set' : db_set_str })(api_search)
-app.route('/api/search_page/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_search)
-app.route('/api/search_data/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str })(api_search)
-app.route('/api/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str })(api_search)
+app.route('/api/search/<everything:name>')(api_search)
+app.route('/api/search_page/<int:num>/<everything:name>')(api_search)
+app.route('/api/search_data/<everything:name>', defaults = { 'search_type' : 'data' })(api_search)
+app.route('/api/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' })(api_search)
 
-app.route('/api/recent_change', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
-app.route('/api/recent_changes', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
-app.route('/api/recent_change/<int:limit>', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
-app.route('/api/recent_change/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_change)
+app.route('/api/recent_change')(api_list_recent_change)
+app.route('/api/recent_changes')(api_list_recent_change)
+app.route('/api/recent_change/<int:limit>')(api_list_recent_change)
+app.route('/api/recent_change/<int:limit>/<set_type>/<int:num>')(api_list_recent_change)
 
-app.route('/api/recent_edit_request', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
-app.route('/api/recent_edit_request/<int:limit>/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_edit_request)
+app.route('/api/recent_edit_request')(api_list_recent_edit_request)
+app.route('/api/recent_edit_request/<int:limit>/<set_type>/<int:num>')(api_list_recent_edit_request)
 
-app.route('/api/recent_discuss/<set_type>/<int:limit>', defaults = { 'db_set' : db_set_str })(api_list_recent_discuss)
-app.route('/api/recent_discuss/<int:limit>', defaults = { 'db_set' : db_set_str })(api_list_recent_discuss)
-app.route('/api/recent_discuss', defaults = { 'db_set' : db_set_str })(api_list_recent_discuss)
+app.route('/api/recent_discuss/<set_type>/<int:limit>')(api_list_recent_discuss)
+app.route('/api/recent_discuss/<int:limit>')(api_list_recent_discuss)
+app.route('/api/recent_discuss')(api_list_recent_discuss)
 
-app.route('/api/lang', methods = ['POST'], defaults = { 'db_set' : db_set_str })(api_func_language)
-app.route('/api/lang/<data>', defaults = { 'db_set' : db_set_str })(api_func_language)
+app.route('/api/lang', methods = ['POST'])(api_func_language)
+app.route('/api/lang/<data>')(api_func_language)
 app.route('/api/sha224/<everything:data>')(api_func_sha224)
-app.route('/api/ip/<everything:data>', defaults = { 'db_set' : db_set_str })(api_func_ip)
+app.route('/api/ip/<everything:data>')(api_func_ip)
 
 app.route('/api/image/<everything:name>')(api_image_view)
 
 ## v2 API
-app.route('/api/v2/recent_edit_request/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'limit' : 50 })(api_list_recent_edit_request)
-app.route('/api/v2/recent_change/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'legacy' : '', 'limit' : 50 })(api_list_recent_change)
-app.route('/api/v2/recent_discuss/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str, 'legacy' : '', 'limit' : 50 })(api_list_recent_discuss)
-app.route('/api/v2/recent_block/<set_type>/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_recent_block)
-app.route('/api/v2/recent_block/<set_type>/<int:num>/<user_name>', defaults = { 'db_set' : db_set_str })(api_list_recent_block)
-app.route('/api/v2/list/document/old/<int:num>', defaults = { 'db_set' : db_set_str, 'set_type' : 'old' })(api_list_old_page)
-app.route('/api/v2/list/document/new/<int:num>', defaults = { 'db_set' : db_set_str, 'set_type' : 'new' })(api_list_old_page)
-app.route('/api/v2/list/document/<int:num>', defaults = { 'db_set' : db_set_str })(api_list_title_index)
+app.route('/api/v2/recent_edit_request/<set_type>/<int:num>', defaults = { 'limit' : 50 })(api_list_recent_edit_request)
+app.route('/api/v2/recent_change/<set_type>/<int:num>', defaults = { 'legacy' : '', 'limit' : 50 })(api_list_recent_change)
+app.route('/api/v2/recent_discuss/<set_type>/<int:num>', defaults = { 'legacy' : '', 'limit' : 50 })(api_list_recent_discuss)
+app.route('/api/v2/recent_block/<set_type>/<int:num>')(api_list_recent_block)
+app.route('/api/v2/recent_block/<set_type>/<int:num>/<user_name>')(api_list_recent_block)
+app.route('/api/v2/list/document/old/<int:num>', defaults = { 'set_type' : 'old' })(api_list_old_page)
+app.route('/api/v2/list/document/new/<int:num>', defaults = { 'set_type' : 'new' })(api_list_old_page)
+app.route('/api/v2/list/document/<int:num>')(api_list_title_index)
 
-app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_topic_list)
+app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>')(api_topic_list)
 
-app.route('/api/v2/bbs', defaults = { 'db_set' : db_set_str })(api_bbs_list)
-app.route('/api/v2/bbs/main', defaults = { 'db_set' : db_set_str })(api_bbs)
-app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>', defaults = { 'db_set' : db_set_str })(api_bbs)
-app.route('/api/v2/bbs/w/comment/<int:bbs_num>/<int:post_num>/<tool>', defaults = { 'db_set' : db_set_str })(api_bbs_w_comment_n)
+app.route('/api/v2/bbs')(api_bbs_list)
+app.route('/api/v2/bbs/main')(api_bbs)
+app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs)
+app.route('/api/v2/bbs/w/comment/<int:bbs_num>/<int:post_num>/<tool>')(api_bbs_w_comment_n)
 
-app.route('/api/v2/doc_star_doc/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str, 'do_type' : 'star_doc' })(api_w_watch_list)
-app.route('/api/v2/doc_watch_list/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_watch_list)
-app.route('/api/v2/set_reset/<everything:name>', defaults = { 'db_set' : db_set_str })(api_w_set_reset)
+app.route('/api/v2/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(api_w_watch_list)
+app.route('/api/v2/doc_watch_list/<int:num>/<everything:name>')(api_w_watch_list)
+app.route('/api/v2/set_reset/<everything:name>')(api_w_set_reset)
 
-app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'], defaults = { 'db_set' : db_set_str })(api_setting)
+app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting)
 
-app.route('/api/v2/user/setting/editor', methods = ['GET', 'POST', 'DELETE'], defaults = { 'db_set' : db_set_str })(api_user_setting_editor)
+app.route('/api/v2/user/setting/editor', methods = ['GET', 'POST', 'DELETE'])(api_user_setting_editor)
 
-app.route('/api/v2/ip/<everything:data>', defaults = { 'db_set' : db_set_str })(api_func_ip)
-app.route('/api/v2/ip_menu/<everything:ip>', defaults = { 'db_set' : db_set_str, 'option' : 'user' })(api_func_ip_menu)
-app.route('/api/v2/user_menu/<everything:ip>', defaults = { 'db_set' : db_set_str })(api_func_ip_menu)
+app.route('/api/v2/ip/<everything:data>')(api_func_ip)
+app.route('/api/v2/ip_menu/<everything:ip>', defaults = { 'option' : 'user' })(api_func_ip_menu)
+app.route('/api/v2/user_menu/<everything:ip>')(api_func_ip_menu)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정
@@ -767,10 +766,10 @@ app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_redirect)
 app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(main_tool_redirect)
 
 app.route('/search', methods=['POST'])(main_search)
-app.route('/search/<everything:name>', defaults = { 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
-app.route('/search_page/<int:num>/<everything:name>', defaults = { 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
-app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
-app.route('/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data', 'db_set' : db_set_str }, methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search_page/<int:num>/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
+app.route('/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
 app.route('/goto', methods=['POST'])(main_search_goto)
 app.route('/goto/<everything:name>', methods=['GET', 'POST'])(main_search_goto)
 

@@ -9,11 +9,8 @@ import (
 )
 
 func Api_search(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
 	page, _ := strconv.Atoi(other_set["num"])
 	num := 0
@@ -21,11 +18,11 @@ func Api_search(call_arg []string) string {
 		num = page*50 - 50
 	}
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	if other_set["search_type"] == "title" {
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select title from data where title collate nocase like ? order by title limit ?, 50"))
+		stmt, err := db.Prepare(tool.DB_change("select title from data where title collate nocase like ? order by title limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -56,7 +53,7 @@ func Api_search(call_arg []string) string {
 			return string(json_data)
 		}
 	} else {
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select title from data where data collate nocase like ? order by title limit ?, 50"))
+		stmt, err := db.Prepare(tool.DB_change("select title from data where data collate nocase like ? order by title limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
 		}

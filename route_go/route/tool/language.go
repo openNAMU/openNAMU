@@ -7,10 +7,10 @@ import (
 	"os"
 )
 
-func Get_language(db *sql.DB, db_set map[string]string, data string, safe bool) string {
+func Get_language(db *sql.DB, data string, safe bool) string {
 	var language string
 
-	err := db.QueryRow(DB_change(db_set, "select data from other where name = 'language'")).Scan(&language)
+	err := db.QueryRow(DB_change("select data from other where name = 'language'")).Scan(&language)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			language = "ko-KR"
