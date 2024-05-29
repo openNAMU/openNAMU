@@ -6,13 +6,10 @@ import (
 )
 
 func Api_edit_move_all(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	if other_set["select"] == "include" {
@@ -22,4 +19,6 @@ func Api_edit_move_all(call_arg []string) string {
 	} else {
 
 	}
+
+	return ""
 }

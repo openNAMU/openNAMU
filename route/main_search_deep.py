@@ -2,7 +2,7 @@ from .tool.func import *
 
 from .go_api_search import api_search
 
-def main_search_deep(db_set, name = 'Test', search_type = 'title', num = 1):
+def main_search_deep(name = 'Test', search_type = 'title', num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -53,7 +53,7 @@ def main_search_deep(db_set, name = 'Test', search_type = 'title', num = 1):
                 <ul class="opennamu_ul">
             '''
 
-            all_list = json.loads(api_search(db_set, name, search_type, num).data)
+            all_list = json.loads(api_search(name, search_type, num).data)
             for data in all_list:
                 div += '<li><a href="/w/' + url_pas(data) + '">' + data + '</a></li>'
 

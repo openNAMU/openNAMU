@@ -9,13 +9,10 @@ import (
 )
 
 func Api_list_recent_edit_request(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	limit_int, err := strconv.Atoi(other_set["limit"])
@@ -27,7 +24,7 @@ func Api_list_recent_edit_request(call_arg []string) string {
 		limit_int = 50
 	}
 
-	stmt, err := db.Prepare(tool.DB_change(db_set, "select doc_name, doc_rev, set_data from data_set where set_name = 'edit_request_doing' order by set_data desc limit ?"))
+	stmt, err := db.Prepare(tool.DB_change("select doc_name, doc_rev, set_data from data_set where set_name = 'edit_request_doing' order by set_data desc limit ?"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,7 +51,7 @@ func Api_list_recent_edit_request(call_arg []string) string {
 		var send string
 		var leng string
 
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select set_data from data_set where set_name = 'edit_request_user' and doc_rev = ? and doc_name = ?"))
+		stmt, err := db.Prepare(tool.DB_change("select set_data from data_set where set_name = 'edit_request_user' and doc_rev = ? and doc_name = ?"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -69,7 +66,7 @@ func Api_list_recent_edit_request(call_arg []string) string {
 			}
 		}
 
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select set_data from data_set where set_name = 'edit_request_send' and doc_rev = ? and doc_name = ?"))
+		stmt, err = db.Prepare(tool.DB_change("select set_data from data_set where set_name = 'edit_request_send' and doc_rev = ? and doc_name = ?"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -84,7 +81,7 @@ func Api_list_recent_edit_request(call_arg []string) string {
 			}
 		}
 
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select set_data from data_set where set_name = 'edit_request_leng' and doc_rev = ? and doc_name = ?"))
+		stmt, err = db.Prepare(tool.DB_change("select set_data from data_set where set_name = 'edit_request_leng' and doc_rev = ? and doc_name = ?"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -103,10 +100,10 @@ func Api_list_recent_edit_request(call_arg []string) string {
 			doc_name,
 			doc_rev,
 			date,
-			tool.IP_preprocess(db, db_set, ip, other_set["ip"])[0],
+			tool.IP_preprocess(db, ip, other_set["ip"])[0],
 			send,
 			leng,
-			tool.IP_parser(db, db_set, ip, other_set["ip"]),
+			tool.IP_parser(db, ip, other_set["ip"]),
 		})
 	}
 
