@@ -792,7 +792,7 @@ def get_acl_list(type_d = 'normal'):
     if type_d == 'user':
         return ['', 'user', 'all']
     else:
-        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', 'ban_admin', 'not_all', 'up_to_level_3', 'up_to_level_10']
+        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', '90_day', 'ban_admin', 'not_all', 'up_to_level_3', 'up_to_level_10']
 
 ## Func-simple-with_DB
 def get_user_title_list(conn, ip = ''):
