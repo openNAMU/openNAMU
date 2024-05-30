@@ -9,17 +9,14 @@ import (
 )
 
 func Api_topic(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	if other_set["tool"] == "length" {
-		stmt, err := db.Prepare(tool.DB_change(db_set, "select id from topic where code = ? order by id + 0 desc limit 1"))
+		stmt, err := db.Prepare(tool.DB_change("select id from topic where code = ? order by id + 0 desc limit 1"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -44,7 +41,7 @@ func Api_topic(call_arg []string) string {
 		var rows *sql.Rows
 
 		if other_set["tool"] == "top" {
-			stmt, err := db.Prepare(tool.DB_change(db_set, "select id, data, date, ip, block, top from topic where code = ? and top = 'O' order by id + 0 asc"))
+			stmt, err := db.Prepare(tool.DB_change("select id, data, date, ip, block, top from topic where code = ? and top = 'O' order by id + 0 asc"))
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -56,7 +53,7 @@ func Api_topic(call_arg []string) string {
 			}
 		} else {
 			if other_set["s_num"] != "" && other_set["e_num"] != "" {
-				stmt, err := db.Prepare(tool.DB_change(db_set, "select id, data, date, ip, block, top from topic where code = ? and ? + 0 <= id + 0 and id + 0 <= ? + 0 order by id + 0 asc"))
+				stmt, err := db.Prepare(tool.DB_change("select id, data, date, ip, block, top from topic where code = ? and ? + 0 <= id + 0 and id + 0 <= ? + 0 order by id + 0 asc"))
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -67,7 +64,7 @@ func Api_topic(call_arg []string) string {
 					log.Fatal(err)
 				}
 			} else {
-				stmt, err := db.Prepare(tool.DB_change(db_set, "select id, data, date, ip, block, top from topic where code = ? order by id + 0 asc"))
+				stmt, err := db.Prepare(tool.DB_change("select id, data, date, ip, block, top from topic where code = ? order by id + 0 asc"))
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -98,7 +95,7 @@ func Api_topic(call_arg []string) string {
 		new_data["data"] = []map[string]string{}
 		data_slice := []map[string]string{}
 
-		admin_auth := tool.Get_user_auth(db, db_set, other_set["ip"])
+		admin_auth := tool.Get_user_auth(db, other_set["ip"])
 
 		var ip_pre string
 		var ip_render string
@@ -113,8 +110,8 @@ func Api_topic(call_arg []string) string {
 				ip_pre = ip_parser_temp[data_list[for_a][3]][0]
 				ip_render = ip_parser_temp[data_list[for_a][3]][1]
 			} else {
-				ip_pre = tool.IP_preprocess(db, db_set, data_list[for_a][3], other_set["ip"])[0]
-				ip_render = tool.IP_parser(db, db_set, data_list[for_a][3], other_set["ip"])
+				ip_pre = tool.IP_preprocess(db, data_list[for_a][3], other_set["ip"])[0]
+				ip_render = tool.IP_parser(db, data_list[for_a][3], other_set["ip"])
 
 				ip_parser_temp[data_list[for_a][3]] = []string{ip_pre, ip_render}
 			}
@@ -131,8 +128,8 @@ func Api_topic(call_arg []string) string {
 
 		new_data["data"] = data_slice
 		new_data["language"] = map[string]string{
-			"tool":   tool.Get_language(db, db_set, "tool", false),
-			"render": tool.Get_language(db, db_set, "render", false),
+			"tool":   tool.Get_language(db, "tool", false),
+			"render": tool.Get_language(db, "render", false),
 		}
 
 		json_data, _ := json.Marshal(new_data)

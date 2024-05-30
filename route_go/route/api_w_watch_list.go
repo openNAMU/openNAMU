@@ -9,11 +9,8 @@ import (
 )
 
 func Api_w_watch_list(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
 	page, _ := strconv.Atoi(other_set["num"])
 	num := 0
@@ -21,19 +18,19 @@ func Api_w_watch_list(call_arg []string) string {
 		num = page*50 - 50
 	}
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
-	if tool.Get_user_auth(db, db_set, other_set["ip"]) == "" {
+	if tool.Get_user_auth(db, other_set["ip"]) == "" {
 		return "{}"
 	}
 
 	var stmt *sql.Stmt
 	var err error
 	if other_set["do_type"] == "star_doc" {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select id from user_set where name = 'star_doc' and data = ? limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select id from user_set where name = 'star_doc' and data = ? limit ?, 50"))
 	} else {
-		stmt, err = db.Prepare(tool.DB_change(db_set, "select id from user_set where name = 'watchlist' and data = ? limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select id from user_set where name = 'watchlist' and data = ? limit ?, 50"))
 	}
 	if err != nil {
 		log.Fatal(err)
@@ -64,8 +61,8 @@ func Api_w_watch_list(call_arg []string) string {
 			ip_pre = ip_parser_temp[user_name][0]
 			ip_render = ip_parser_temp[user_name][1]
 		} else {
-			ip_pre = tool.IP_preprocess(db, db_set, user_name, other_set["ip"])[0]
-			ip_render = tool.IP_parser(db, db_set, user_name, other_set["ip"])
+			ip_pre = tool.IP_preprocess(db, user_name, other_set["ip"])[0]
+			ip_render = tool.IP_parser(db, user_name, other_set["ip"])
 
 			ip_parser_temp[user_name] = []string{ip_pre, ip_render}
 		}
@@ -75,8 +72,8 @@ func Api_w_watch_list(call_arg []string) string {
 
 	return_data := make(map[string]interface{})
 	return_data["language"] = map[string]string{
-		"watchlist": tool.Get_language(db, db_set, "watchlist", false),
-		"star_doc":  tool.Get_language(db, db_set, "star_doc", false),
+		"watchlist": tool.Get_language(db, "watchlist", false),
+		"star_doc":  tool.Get_language(db, "star_doc", false),
 	}
 
 	if len(data_list) == 0 {

@@ -8,13 +8,10 @@ import (
 )
 
 func Api_list_title_index(call_arg []string) string {
-	db_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[0]), &db_set)
-
 	other_set := map[string]string{}
-	json.Unmarshal([]byte(call_arg[1]), &other_set)
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	db := tool.DB_connect(db_set)
+	db := tool.DB_connect()
 	defer db.Close()
 
 	page_int, err := strconv.Atoi(other_set["num"])
@@ -28,7 +25,7 @@ func Api_list_title_index(call_arg []string) string {
 		page_int = 0
 	}
 
-	stmt, err := db.Prepare(tool.DB_change(db_set, "select title from data limit ?, 50"))
+	stmt, err := db.Prepare(tool.DB_change("select title from data limit ?, 50"))
 	if err != nil {
 		log.Fatal(err)
 	}

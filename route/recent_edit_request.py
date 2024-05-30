@@ -4,7 +4,7 @@ from .recent_change import recent_change_send_render
 
 from .go_api_list_recent_edit_request import api_list_recent_edit_request
 
-def recent_edit_request(db_set):
+def recent_edit_request():
     with get_db_connect() as conn:
         div = ''
         div += '''
@@ -17,7 +17,7 @@ def recent_edit_request(db_set):
                     </tr>
         '''
 
-        all_list = json.loads(api_list_recent_edit_request(db_set).data)
+        all_list = json.loads(api_list_recent_edit_request().data)
         for data in all_list:
             if re.search(r"\+", data[5]):
                 leng = '<span style="color:green;">(' + data[5] + ')</span>'
