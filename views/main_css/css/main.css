@@ -431,6 +431,8 @@ s:hover, strike:hover, del:hover {
 /* 외부 확장 기능 연관 */
 td.hljs-ln-line.hljs-ln-code, td.hljs-ln-line.hljs-ln-numbers {
     padding: 0px !important;
+    padding-right: 10px !important;
+    
     border: 0;
 }
 
