@@ -434,6 +434,10 @@ td.hljs-ln-line.hljs-ln-code, td.hljs-ln-line.hljs-ln-numbers {
     border: 0;
 }
 
+td.hljs-ln-line.hljs-ln-numbers {
+    padding-right: 9px !important;
+}
+
 /* SVG */
 .opennamu_svg {
     width: 14px;
