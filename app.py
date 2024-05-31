@@ -774,7 +774,7 @@ app.route('/goto', methods=['POST'])(main_search_goto)
 app.route('/goto/<everything:name>', methods=['GET', 'POST'])(main_search_goto)
 
 app.route('/setting')(main_setting)
-app.route('/setting/main', defaults = { 'db_set' : data_db_set['type'] }, methods = ['POST', 'GET'])(main_setting_main)
+app.route('/setting/main', methods = ['POST', 'GET'])(main_setting_main)
 app.route('/setting/main/logo', methods = ['POST', 'GET'])(main_setting_main_logo)
 app.route('/setting/top_menu', methods = ['POST', 'GET'])(main_setting_top_menu)
 app.route('/setting/phrase', methods = ['POST', 'GET'])(main_setting_phrase)
