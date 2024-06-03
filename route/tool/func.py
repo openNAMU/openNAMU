@@ -678,7 +678,7 @@ def set_init_always(conn, ver_num):
 
         curs.execute(db_change('select data from other where name = "update"'))
         up_data = curs.fetchall()
-        up_data = up_data[0][0] if up_data and up_data[0][0] in ['stable', 'beta', 'dev'] else 'stable'
+        up_data = up_data[0][0] if up_data else 'stable'
 
         exe_type = ''
         if platform.system() == 'Linux':
