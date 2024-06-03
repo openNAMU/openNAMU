@@ -49,6 +49,7 @@ print('22. Delete body top')
 print('23. Delete body bottom')
 print('24. SQLite to MySQL')
 print('25. Recalc exist data_set')
+print('26. Change update branch')
 
 what_i_do = input('Insert selection number (EX : 9) : ')
 if what_i_do == '1':
@@ -172,28 +173,41 @@ elif what_i_do == '18':
 
     curs.execute(db_change("update other set data = ? where name = 'wiki_access_password'"), [wiki_access_password])
 elif what_i_do == '19':
-    up_data = input('Insert branch name (beta) [stable, beta, dev] : ')
-
-    if not up_data in ['stable', 'beta', 'dev']:
-        up_data = 'beta'
+    curs.execute(db_change('select data from other where name = "update"'))
+    up_data = curs.fetchall()
+    up_data = up_data[0][0] if up_data and up_data[0][0] in ['stable', 'beta', 'dev', 'dont_use'] else 'stable'
 
     if platform.system() == 'Linux':
         ok = []
-
         ok += [os.system('git remote rm origin')]
         ok += [os.system('git remote add origin https://github.com/opennamu/opennamu.git')]
         ok += [os.system('git fetch --depth=1 origin ' + up_data)]
         ok += [os.system('git reset --hard origin/' + up_data)]
-        if (ok[0] and ok[1] and ok[2] and ok[3]) != 0:
-            print('Error : update failed')
+        for for_a in ok[1:]:
+            if for_a != 0:
+                print('Error : update failed')
+                
+                break
     elif platform.system() == 'Windows':
         os.system('rd /s /q route')
-        urllib.request.urlretrieve('https://github.com/opennamu/opennamu/archive/' + up_data + '.zip', 'update.zip')
-        zipfile.ZipFile('update.zip').extractall('')
-        ok = os.system('xcopy /y /s /r opennamu-' + up_data + ' .')
-        if ok == 0:
-            os.system('rd /s /q opennamu-' + up_data)
-            os.system('del update.zip')
+
+        url = 'https://github.com/opennamu/opennamu/archive/' + up_data + '.zip'
+        local_filename = 'update.zip'
+
+        response = requests.get(url, stream = True)
+        if response.status_code == 200:
+            with open(local_filename, 'wb') as f:
+                for chunk in response.iter_content(chunk_size = 1024 * 1024):
+                    if chunk:
+                        f.write(chunk)
+            
+            zipfile.ZipFile('update.zip').extractall('')
+            ok = os.system('xcopy /y /s /r opennamu-' + up_data + ' .')
+            if ok == 0:
+                os.system('rd /s /q opennamu-' + up_data)
+                os.system('del update.zip')
+            else:
+                print('Error : update failed')
         else:
             print('Error : update failed')
 elif what_i_do == '20':
@@ -244,6 +258,14 @@ elif what_i_do == '25':
             data_set_exist = 'not_exist'
 
         curs.execute(db_change("update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')"), [data_set_exist, for_a[0]])
+elif what_i_do == '26':
+    up_data = input('Insert branch name (beta) [stable, beta, dev] : ')
+
+    if not up_data in ['stable', 'beta', 'dev', 'dont_use']:
+        up_data = 'beta'
+
+    curs.execute(db_change('delete from other where name = "update"'))
+    curs.execute(db_change('insert into other (name, data, coverage) values ("update", ?, "")'), [up_data])
 else:
     raise ValueError(what_i_do)
 

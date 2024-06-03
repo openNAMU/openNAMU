@@ -15,7 +15,7 @@ def main_sys_update():
 
             curs.execute(db_change('select data from other where name = "update"'))
             up_data = curs.fetchall()
-            up_data = up_data[0][0] if up_data and up_data[0][0] in ['stable', 'beta', 'dev'] else 'stable'
+            up_data = up_data[0][0] if up_data and up_data[0][0] in ['stable', 'beta', 'dev', 'dont_use'] else 'stable'
 
             print('Update')
             
