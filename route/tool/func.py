@@ -142,13 +142,16 @@ def get_init_set_list(need = 'all'):
     else:
         return init_set_list[need]
 class get_db_connect:
-    def __init__(self):
+    def __init__(self, db_type = ''):
         with class_temp_db() as m_conn:
             m_curs = m_conn.cursor()
 
             m_curs.execute('select data from temp where name = "db_set"')
             db_data = m_curs.fetchall()
             self.db_set = json.loads(db_data[0][0]) if db_data else {}
+
+            if db_type != '':
+                self.db_set['type'] = db_type
         
     def __enter__(self):
         if self.db_set['type'] == 'sqlite':
