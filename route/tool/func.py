@@ -707,6 +707,8 @@ def set_init_always(conn, ver_num):
                 for chunk in response.iter_content(chunk_size = 1024 * 1024):
                     if chunk:
                         f.write(chunk)
+        else:
+            print('Connect error')
         
         if platform.system() == 'Linux':
             os.system('chmod +x ./route_go/bin/' + exe_type)
