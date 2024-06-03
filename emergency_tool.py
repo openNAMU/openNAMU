@@ -190,24 +190,15 @@ elif what_i_do == '19':
                 break
     elif platform.system() == 'Windows':
         os.system('rd /s /q route')
-
-        url = 'https://github.com/opennamu/opennamu/archive/' + up_data + '.zip'
-        local_filename = 'update.zip'
-
-        response = requests.get(url, stream = True)
-        if response.status_code == 200:
-            with open(local_filename, 'wb') as f:
-                for chunk in response.iter_content(chunk_size = 1024 * 1024):
-                    if chunk:
-                        f.write(chunk)
-            
-            zipfile.ZipFile('update.zip').extractall('')
-            ok = os.system('xcopy /y /s /r opennamu-' + up_data + ' .')
-            if ok == 0:
-                os.system('rd /s /q opennamu-' + up_data)
-                os.system('del update.zip')
-            else:
-                print('Error : update failed')
+        
+        urllib.request.urlretrieve('https://github.com/opennamu/opennamu/archive/' + up_data + '.zip', 'update.zip')
+        
+        zipfile.ZipFile('update.zip').extractall('')
+        
+        ok = os.system('xcopy /y /s /r opennamu-' + up_data + ' .')
+        if ok == 0:
+            os.system('rd /s /q opennamu-' + up_data)
+            os.system('del update.zip')
         else:
             print('Error : update failed')
 elif what_i_do == '20':
