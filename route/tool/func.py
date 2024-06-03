@@ -678,7 +678,17 @@ def set_init_always(conn, ver_num):
 
         curs.execute(db_change('select data from other where name = "update"'))
         up_data = curs.fetchall()
-        up_data = up_data[0][0] if up_data else 'stable'
+        if up_data:
+            up_data = up_data[0][0]
+        else:
+            print('Select branch (beta) [stable, beta, dev] : ', end = '')
+            up_data = input()
+            
+            if not up_data in ['stable', 'beta', 'dev', 'dont_use']:
+                up_data = 'beta'
+
+            curs.execute(db_change('delete from other where name = "update"'))
+            curs.execute(db_change('insert into other (name, data, coverage) values ("update", ?, "")'), [up_data])
 
         exe_type = ''
         if platform.system() == 'Linux':
