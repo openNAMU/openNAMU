@@ -16,8 +16,6 @@ while True:
 
 if data_db_load == 'Y':
     data_db_set = class_check_json()
-
-    db_data_get(data_db_set['type'])
     do_db_set(data_db_set)
 
     load_db = get_db_connect()
