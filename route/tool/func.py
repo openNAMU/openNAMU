@@ -699,6 +699,7 @@ def set_init_always(conn, ver_num):
         
         # https://raw.githubusercontent.com/openNAMU/GopenNAMU/beta/route_go/bin/main.amd64.bin
         url = 'https://raw.githubusercontent.com/openNAMU/GopenNAMU/' + up_data + '/route_go/bin/' + exe_type
+        print('Download ' + up_data + ' ' + exe_type)
 
         response = requests.get(url, stream = True)
         if response.status_code == 200:
@@ -709,6 +710,8 @@ def set_init_always(conn, ver_num):
         
         if platform.system() == 'Linux':
             os.system('chmod +x ./route_go/bin/' + exe_type)
+
+        print('Complete')
 
 def set_init(conn):
     curs = conn.cursor()
