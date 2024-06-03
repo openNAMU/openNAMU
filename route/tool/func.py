@@ -672,7 +672,41 @@ def set_init_always(conn, ver_num):
             db_data = curs.fetchall()
             if db_data:
                 m_curs.execute('insert into temp (name, data) values ("wiki_access_password", ?)', [db_data[0][0]])
-    
+
+        curs.execute(db_change('select data from other where name = "update"'))
+        up_data = curs.fetchall()
+        up_data = up_data[0][0] if up_data and up_data[0][0] in ['stable', 'beta', 'dev'] else 'stable'
+
+        exe_type = ''
+        if platform.system() == 'Linux':
+            if platform.machine() in ["AMD64", "x86_64"]:
+                exe_type = 'main.amd64.bin'
+            else:
+                exe_type = 'main.arm64.bin'
+        else:
+            if platform.machine() in ["AMD64", "x86_64"]:
+                exe_type = 'main.amd64.exe'
+            else:
+                exe_type = 'main.arm64.exe'
+
+        exe_path = os.path.join('.', 'route_go', 'bin', exe_type)
+
+        if os.path.exists(exe_path):
+            os.remove(exe_path)
+        
+        # https://raw.githubusercontent.com/openNAMU/GopenNAMU/beta/route_go/bin/main.amd64.bin
+        url = 'https://raw.githubusercontent.com/openNAMU/GopenNAMU/' + up_data + '/route_go/bin/' + exe_type
+
+        response = requests.get(url, stream = True)
+        if response.status_code == 200:
+            with open(exe_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size = 1024 * 1024):
+                    if chunk:
+                        f.write(chunk)
+        
+        if platform.system() == 'Linux':
+            os.system('chmod +x ./route_go/bin/' + exe_type)
+
 def set_init(conn):
     curs = conn.cursor()
 
