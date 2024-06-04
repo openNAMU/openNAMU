@@ -95,6 +95,15 @@ if sys.version_info < (3, 6):
 
 # Func
 # Func-main
+original_render_template = flask.render_template
+
+def custom_render_template(template_name_or_list, **context):
+    context['data'] = '<div class="opennamu_main">' + context['data'] + '</div>'
+
+    return original_render_template(template_name_or_list, **context)
+
+flask.render_template = custom_render_template
+
 def do_db_set(db_set):
     with class_temp_db() as m_conn:
         m_curs = m_conn.cursor()
@@ -104,9 +113,6 @@ def do_db_set(db_set):
 
         m_curs.execute('insert into temp (name, data) values ("db_set", ?)', [json.dumps(db_set)])
         m_curs.execute('insert into temp (name, data) values ("db_set_type", ?)', [db_set['type']])
-
-        m_curs.execute('select data from temp where name = "db_set"')
-        db_data = m_curs.fetchall()
     
 # Func-init
 def get_init_set_list(need = 'all'):
@@ -141,6 +147,7 @@ def get_init_set_list(need = 'all'):
         return init_set_list
     else:
         return init_set_list[need]
+    
 class get_db_connect:
     def __init__(self, db_type = ''):
         with class_temp_db() as m_conn:
