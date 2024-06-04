@@ -1,9 +1,19 @@
 /* 기본 전체 옵션 */
-body, html, video, table, iframe, input, textarea, img, hr, blockquote, pre, iframe, .table_safe {
+.opennamu_main video, 
+.opennamu_main table, 
+.opennamu_main iframe, 
+.opennamu_main input, 
+.opennamu_main textarea, 
+.opennamu_main img, 
+.opennamu_main hr, 
+.opennamu_main blockquote, 
+.opennamu_main pre, 
+.opennamu_main iframe, 
+.table_safe {
     max-width: 100%;
 }
 
-body {
+.opennamu_main {
     word-break: break-all;
     
     overflow: auto;
@@ -12,26 +22,28 @@ body {
 }
 
 /* 텍스트 필드 */
-textarea, input {
+.opennamu_main textarea,
+.opennamu_main input {
     width: 100%;
 }
 
-input {
+.opennamu_main input {
     box-sizing: border-box;
 }
 
-input[type="checkbox"], input[type="radio"] {
+.opennamu_main input[type="checkbox"], 
+.opennamu_main input[type="radio"] {
     width: auto;
 }
 
 /* 테이블 */
-table {
+.opennamu_main table {
     overflow-x: scroll;
 
     border-collapse: collapse;
 }
 
-td {
+.opennamu_main td {
     border: 0.5px solid gainsboro;
     border-width: 0.5px;
 
@@ -39,14 +51,14 @@ td {
 }
 
 @supports (-webkit-touch-callout: none) {
-    td {
+    .opennamu_main td {
         border: 1px solid gainsboro;
         border-width: 1px;
     }
 }
 
 /* 폴딩 */
-details summary {
+.opennamu_main details summary {
     cursor: pointer;
     user-select: none;
     
@@ -125,13 +137,13 @@ details summary {
 
 /* render */
 /* - link */
-a {
+.opennamu_main a {
     color: dodgerblue;
     
     text-decoration: none;
 }
 
-a:hover {
+.opennamu_main a:hover {
     color: darkblue;
 }
 
@@ -216,19 +228,20 @@ a:hover {
     margin-top: 10px;
 }
 
-pre, .opennamu_redirect {
+.opennamu_main pre, .opennamu_redirect {
     border: 1px solid gainsboro;
     
     padding: 10px;
 }
 
-pre {    
+.opennamu_main pre {    
     white-space: pre-wrap;
 
     margin: 0;
 }
 
-code, pre {
+.opennamu_main code,
+.opennamu_main pre {
     font-family: Consolas, Monaco, monospace;
 }
 
@@ -285,7 +298,7 @@ code, pre {
     }
 }
 
-hr {
+.opennamu_main hr {
     margin-top: 10px;
     margin-bottom: 10px;
 
@@ -305,7 +318,7 @@ hr {
     vertical-align: middle;
 }
 
-blockquote {
+.opennamu_main blockquote {
     padding: 15px;
     
     margin: 0;
@@ -319,11 +332,15 @@ blockquote {
 }
 
 /* 취소선 */
-s, strike, del {
+.opennamu_main s,
+.opennamu_main strike,
+.opennamu_main del {
     color: gray;
 }
 
-s:hover, strike:hover, del:hover {
+.opennamu_main s:hover,
+.opennamu_main strike:hover,
+.opennamu_main del:hover {
     text-decoration: none;
 }
 

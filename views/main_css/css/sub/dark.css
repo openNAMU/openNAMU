@@ -1,22 +1,28 @@
-html, body {
+.opennamu_main html,
+.opennamu_main body {
     background: black;
     color: white;
 }
 
-a {
+.opennamu_main a {
     color: #A7C8FF;
 }
 
-a:hover {
+.opennamu_main a:hover {
     color: #A7C8FF;
 }
 
-textarea, input, button, select {
+.opennamu_main textarea, 
+.opennamu_main input, 
+.opennamu_main button, 
+.opennamu_main select {
     background: #1f2023;
     color: white;
 }
 
-input::placeholder, textarea::placeholder, select::placeholder {
+.opennamu_main input::placeholder,
+.opennamu_main textarea::placeholder,
+.opennamu_main select::placeholder {
     color: white;
 }
 
@@ -60,7 +66,7 @@ pre#syntax, pre#syntax code {
     color: white;
 }
 
-blockquote {
+.opennamu_main blockquote {
     background-color: #313236;
     border-left: 4px solid #eee;
 }
