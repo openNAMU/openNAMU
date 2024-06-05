@@ -1111,7 +1111,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v259'
+    return '.cache_v260'
 
 def wiki_css(data):
     with class_temp_db() as m_conn:
