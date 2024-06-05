@@ -9,11 +9,11 @@
 .opennamu_main blockquote, 
 .opennamu_main pre, 
 .opennamu_main iframe, 
-.table_safe {
+.opennamu_main .table_safe {
     max-width: 100%;
 }
 
-.opennamu_main {
+.opennamu_main .opennamu_main {
     word-break: break-all;
     
     overflow: auto;
@@ -66,20 +66,20 @@
 }
 
 /* diff */
-.opennamu_diff_green {
+.opennamu_main .opennamu_diff_green {
     background: #eaf2c2;
 }
 
-.opennamu_diff_red {
+.opennamu_main .opennamu_diff_red {
     background: #fadad7;
 }
 
 /* list */
-.opennamu_ul {
+.opennamu_main .opennamu_ul {
     padding-left: 20px;
 }
 
-.opennamu_ul li {
+.opennamu_main .opennamu_ul li {
     margin-left: 20px;
 
     margin-top: 5px;
@@ -87,40 +87,40 @@
 }
 
 /* thread */
-.opennamu_comment {
+.opennamu_main .opennamu_comment {
     display: inline-table;
     width: 100%;
 }
 
-.opennamu_comment_color_green {
+.opennamu_main .opennamu_comment_color_green {
     background: palegreen;
 }
 
-.opennamu_comment_color_blue {
+.opennamu_main .opennamu_comment_color_blue {
     background: paleturquoise;
 }
 
-.opennamu_comment_color_red {
+.opennamu_main .opennamu_comment_color_red {
     background: pink;
 }
 
-.opennamu_comment_color_default {
+.opennamu_main .opennamu_comment_color_default {
     background: palegoldenrod;
 }
 
-.opennamu_comment_color_gray {
+.opennamu_main .opennamu_comment_color_gray {
     background: gainsboro;
 }
 
-.opennamu_comment_blind {
+.opennamu_main .opennamu_comment_blind {
     display: none;
 }
 
-.opennamu_comment_blind_admin {
+.opennamu_main .opennamu_comment_blind_admin {
     background: gainsboro;
 }
 
-.opennamu_comment_scroll {
+.opennamu_main .opennamu_comment_scroll {
     max-height: 500px;
 
     white-space: pre-wrap;
@@ -131,7 +131,7 @@
     scrollbar-width: none;
 }
 
-.opennamu_comment_scroll::-webkit-scrollbar {
+.opennamu_main .opennamu_comment_scroll::-webkit-scrollbar {
     display: none;
 }
 
@@ -147,27 +147,27 @@
     color: darkblue;
 }
 
-.opennamu_not_exist_link {
+.opennamu_main .opennamu_not_exist_link {
     color: red;
 }
 
-.opennamu_not_exist_link:hover {
+.opennamu_main .opennamu_not_exist_link:hover {
     color: darkred;
 }
 
-.opennamu_same_link {
+.opennamu_main .opennamu_same_link {
     font-weight: bold;
 }
 
-.opennamu_link_out, .opennamu_link_inter {
+.opennamu_main .opennamu_link_out, .opennamu_link_inter {
     color: green;
 }
 
-.opennamu_link_out:hover, .opennamu_link_inter:hover {
+.opennamu_main .opennamu_link_out:hover, .opennamu_link_inter:hover {
     color: darkgreen;
 }
 
-.opennamu_link_out::before {
+.opennamu_main .opennamu_link_out::before {
     content: '🅴';
     
     font-weight: lighter;
@@ -176,7 +176,7 @@
 }
 
 /* - toc */
-.opennamu_TOC {
+.opennamu_main .opennamu_TOC {
     border: 1px solid gainsboro;
     padding: 20px;
     
@@ -190,12 +190,13 @@
     margin-top: 10px;
 }
 
-.opennamu_TOC_title {
+.opennamu_main .opennamu_TOC_title {
     font-size: 18px;
 }
 
 /* - category */
-.opennamu_category, .opennamu_trace {
+.opennamu_main .opennamu_category,
+.opennamu_main .opennamu_trace {
     border: 1px solid gainsboro;
     
     padding: 10px;
@@ -205,22 +206,23 @@
     text-overflow: ellipsis;
 }
 
-.opennamu_category_button, .opennamu_trace_button {
+.opennamu_main .opennamu_category_button,
+.opennamu_main .opennamu_trace_button {
     float: right;
     z-index: 100;
     position: relative;
 }
 
-.opennamu_category_blur {
+.opennamu_main .opennamu_category_blur {
     filter: blur(5px);
 }
 
-.opennamu_category_blur:hover {
+.opennamu_main .opennamu_category_blur:hover {
     filter: none;
 }
 
 /* - footnote */
-.opennamu_footnote {
+.opennamu_main .opennamu_footnote {
     border-top: 1px solid gainsboro;
 
     padding-top: 10px;
@@ -228,7 +230,8 @@
     margin-top: 10px;
 }
 
-.opennamu_main pre, .opennamu_redirect {
+.opennamu_main pre,
+.opennamu_main .opennamu_redirect {
     border: 1px solid gainsboro;
     
     padding: 10px;
@@ -245,19 +248,19 @@
     font-family: Consolas, Monaco, monospace;
 }
 
-#syntax {
+.opennamu_main #syntax {
     padding: 0;
 }
 
-.opennamu_textarea_500 {
+.opennamu_main .opennamu_textarea_500 {
     height: 500px;
 }
 
-.opennamu_textarea_100 {
+.opennamu_main .opennamu_textarea_100 {
     height: 100px;
 }
 
-.opennamu_spead_footnote {
+.opennamu_main .opennamu_spead_footnote {
     color: #555;
     background-color: #efefef;
     
@@ -267,7 +270,7 @@
     font-weight: initial;
 }
 
-.opennamu_popup_footnote {
+.opennamu_main .opennamu_popup_footnote {
     position: absolute;
 
     z-index: 10000;
@@ -287,13 +290,13 @@
 }
 
 @media(max-width: 768px) {
-    .opennamu_popup_footnote {
+    .opennamu_main .opennamu_popup_footnote {
         max-width: 100%;
     }
 }
 
 @media(max-width: 420px) {
-    .table_safe {
+    .opennamu_main .table_safe {
         float: none !important;
     }
 }
@@ -306,7 +309,7 @@
     border-top: 1px solid gainsboro;
 }
 
-.opennamu_render_complete {
+.opennamu_main .opennamu_render_complete {
     white-space: pre-wrap;
     
     line-break: anywhere;
@@ -314,7 +317,7 @@
     display: inline;
 }
 
-.opennamu_render_complete img {
+.opennamu_main .opennamu_render_complete img {
     vertical-align: middle;
 }
 
@@ -345,34 +348,34 @@
 }
 
 /* 최근 변경 관련 테이블 */
-#main_table_set {
+.opennamu_main #main_table_set {
     width: 100%;
     
     text-align: center;
 }
 
-#main_table_width {
+.opennamu_main #main_table_width {
     width: 33.3%;
 }
 
-#main_table_width_half {
+.opennamu_main #main_table_width_half {
     width: 50%;
 }
 
-#main_table_width_quarter {
+.opennamu_main #main_table_width_quarter {
     width: 25%;
 }
 
-#main_table_top_tr {
+.opennamu_main #main_table_top_tr {
     background: gainsboro;
 }
 
-.opennamu_history_blind {
+.opennamu_main .opennamu_history_blind {
     background: gainsboro;
 }
 
 /* 기타 */
-.main_hr {
+.opennamu_main .main_hr {
     border: none;
     
     padding-top: 6px;
@@ -385,71 +388,72 @@
     white-space: pre-line;
 }
 
-.katex .base {
+.opennamu_main .katex .base {
     max-width: 100%;
     overflow-x: hidden;
     overflow-y: hidden;
 }
 
-.opennamu_width_200 {
+.opennamu_main .opennamu_width_200 {
     width: 200px;
 }
 
-.opennamu_list_1 {
+.opennamu_main .opennamu_list_1 {
     list-style: disc;
 }
 
-.opennamu_list_2 {
+.opennamu_main .opennamu_list_2 {
     list-style: circle;
 }
 
-.opennamu_list_3 {
+.opennamu_main .opennamu_list_3 {
     list-style: square;
 }
 
-.opennamu_list_4 {
+.opennamu_main .opennamu_list_4 {
     list-style: none;
 }
 
-.opennamu_list_4::before {
+.opennamu_main .opennamu_list_4::before {
     display: inline-block;
     content: "⬦";
     width: 1.2em;
     margin-left: -1.2em;
 }
 
-.opennamu_list_5 {
+.opennamu_main .opennamu_list_5 {
     list-style: none;
 }
 
-.opennamu_list_5::before {
+.opennamu_main .opennamu_list_5::before {
     display: inline-block;
     content: "⬥";
     width: 1.2em;
     margin-left: -1.2em;
 }
 
-.opennamu_list_none {
+.opennamu_main .opennamu_list_none {
     list-style: none;
 }
 
-.opennamu_folding {
+.opennamu_main .opennamu_folding {
     margin-top: 10px;
 }
 
-.opennamu_recent_change {
+.opennamu_main .opennamu_recent_change {
     padding-bottom: 10px;
 
     border-bottom: 2px solid gainsboro;
 }
 
 /* 이 부분 이하로는 레거시 */
-#topic_color {
+.opennamu_main #topic_color {
     background: #bbeabb;
 }
 
 /* 외부 확장 기능 연관 */
-td.hljs-ln-line.hljs-ln-code, td.hljs-ln-line.hljs-ln-numbers {
+.opennamu_main td.hljs-ln-line.hljs-ln-code,
+.opennamu_main td.hljs-ln-line.hljs-ln-numbers {
     padding: 0px !important;
     padding-right: 10px !important;
     

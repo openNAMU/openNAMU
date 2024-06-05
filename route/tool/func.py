@@ -683,20 +683,6 @@ def set_init_always(conn, ver_num):
             if db_data:
                 m_curs.execute('insert into temp (name, data) values ("wiki_access_password", ?)', [db_data[0][0]])
 
-        curs.execute(db_change('select data from other where name = "update"'))
-        up_data = curs.fetchall()
-        if up_data:
-            up_data = up_data[0][0]
-        else:
-            print('Select branch (beta) [stable, beta, dev] : ', end = '')
-            up_data = input()
-            
-            if not up_data in ['stable', 'beta', 'dev', 'dont_use']:
-                up_data = 'beta'
-
-            curs.execute(db_change('delete from other where name = "update"'))
-            curs.execute(db_change('insert into other (name, data, coverage) values ("update", ?, "")'), [up_data])
-
         exe_type = ''
         if platform.system() == 'Linux':
             if platform.machine() in ["AMD64", "x86_64"]:
@@ -714,10 +700,10 @@ def set_init_always(conn, ver_num):
         if os.path.exists(exe_path):
             os.remove(exe_path)
         
-        print('Download ' + up_data + ' ' + exe_type)
+        print('Download dev ' + exe_type)
 
         # https://raw.githubusercontent.com/openNAMU/GopenNAMU/beta/route_go/bin/main.amd64.bin
-        urllib.request.urlretrieve('https://raw.githubusercontent.com/openNAMU/GopenNAMU/' + up_data + '/route_go/bin/' + exe_type, exe_path)
+        urllib.request.urlretrieve('https://raw.githubusercontent.com/openNAMU/GopenNAMU/dev/route_go/bin/' + exe_type, exe_path)
         
         if platform.system() == 'Linux':
             os.system('chmod +x ./route_go/bin/' + exe_type)
