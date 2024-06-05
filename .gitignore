@@ -33,10 +33,5 @@ views/sl_open
 views/nitori
 views/jsonnamu
 
-route_go/bin/main.amd64.bin
-route_go/bin/main.arm64.bin
-route_go/bin/main.amd64.exe
-route_go/bin/main.arm64.exe
-
 sitemap.xml
 sitemap_0.xml
