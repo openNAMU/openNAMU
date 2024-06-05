@@ -4,14 +4,6 @@
     color: white;
 }
 
-.opennamu_main a {
-    color: #A7C8FF;
-}
-
-.opennamu_main a:hover {
-    color: #A7C8FF;
-}
-
 .opennamu_main textarea, 
 .opennamu_main input, 
 .opennamu_main button, 

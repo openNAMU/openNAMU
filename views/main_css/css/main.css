@@ -137,16 +137,6 @@
 
 /* render */
 /* - link */
-.opennamu_main a {
-    color: dodgerblue;
-    
-    text-decoration: none;
-}
-
-.opennamu_main a:hover {
-    color: darkblue;
-}
-
 .opennamu_main .opennamu_not_exist_link {
     color: red;
 }
