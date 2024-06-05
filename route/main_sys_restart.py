@@ -35,9 +35,9 @@ def main_sys_restart():
             return easy_minify(conn, flask.render_template(skin_check(conn),
                 imp = [get_lang(conn, 'wiki_restart'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
-                    <form method="post">
-                        <button type="submit">''' + get_lang(conn, 'restart') + '''</button>
-                    </form>
+                    <div id="opennamu_main_sys_restart"></div>
+                    <script defer src="/views/main_css/js/route/main_sys_restart.js''' + cache_v() + '''"></script>
+                    <script>window.addEventListener("DOMContentLoaded", function() { opennamu_main_sys_restart(); });</script>
                 ''',
                 menu = [['manager', get_lang(conn, 'return')]]
             ))
