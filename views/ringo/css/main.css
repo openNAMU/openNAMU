@@ -126,6 +126,8 @@ div#menu {
 
 .menu_item_link {
     border: 0;
+
+    color: black;
     background-color: white;
     
     padding: 10px;
@@ -422,8 +424,10 @@ pre#syntax, pre#syntax code {
 
 a {
     text-decoration: none;
+
+    color: dodgerblue;
 }
 
-a {
-    color: dodgerblue;
+a:hover {
+    color: #105292;
 }
