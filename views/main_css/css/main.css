@@ -460,6 +460,10 @@
     border: 0;
 }
 
+.opennamu_main .hljs-ln-n:before {
+    white-space: nowrap;
+}
+
 /* SVG */
 .opennamu_svg {
     width: 14px;
