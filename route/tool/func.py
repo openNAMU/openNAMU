@@ -701,6 +701,9 @@ def set_init_always(conn, ver_num):
             if for_a != exe_type:
                 os.remove(os.path.join(exe_path, for_a))
 
+        if platform.system() == 'Linux':
+            os.system('chmod +x ./route_go/bin/' + exe_type)
+
 def set_init(conn):
     curs = conn.cursor()
 
