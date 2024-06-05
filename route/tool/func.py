@@ -111,8 +111,8 @@ def do_db_set(db_set):
         m_curs.execute('drop table if exists temp')
         m_curs.execute('create table if not exists temp(name text, data text)')
 
-        m_curs.execute('insert into temp (name, data) values ("db_set", ?)', [json.dumps(db_set)])
-        m_curs.execute('insert into temp (name, data) values ("db_set_type", ?)', [db_set['type']])
+        for for_a in db_set:
+            m_curs.execute('insert into temp (name, data) values (?, ?)', ['db_' + for_a, db_set[for_a]])
     
 # Func-init
 def get_init_set_list(need = 'all'):
@@ -153,32 +153,41 @@ class get_db_connect:
         with class_temp_db() as m_conn:
             m_curs = m_conn.cursor()
 
-            m_curs.execute('select data from temp where name = "db_set"')
+            self.db_set = {}
+
+            m_curs.execute('select name, data from temp where name in ("db_type", "db_name")')
             db_data = m_curs.fetchall()
-            self.db_set = json.loads(db_data[0][0]) if db_data else {}
+            for for_a in db_data:
+                self.db_set[for_a[0]] = for_a[1]
 
             if db_type != '':
-                self.db_set['type'] = db_type
+                self.db_set['db_type'] = db_type
+
+            if db_type == 'mysql':
+                m_curs.execute('select name, data from temp where name in ("db_mysql_host", "db_mysql_user", "db_mysql_pw", "db_mysql_port")')
+                db_data = m_curs.fetchall()
+                for for_a in db_data:
+                    self.db_set[for_a[0]] = for_a[1]
         
     def __enter__(self):
-        if self.db_set['type'] == 'sqlite':
+        if self.db_set['db_type'] == 'sqlite':
             self.conn = sqlite3.connect(
-                self.db_set['name'] + '.db',
+                self.db_set['db_name'] + '.db',
                 check_same_thread = False,
                 isolation_level = None
             )
         else:
             self.conn = pymysql.connect(
-                host = self.db_set['mysql_host'],
-                user = self.db_set['mysql_user'],
-                password = self.db_set['mysql_pw'],
+                host = self.db_set['db_mysql_host'],
+                user = self.db_set['db_mysql_user'],
+                password = self.db_set['db_mysql_pw'],
                 charset = 'utf8mb4',
-                port = int(self.db_set['mysql_port']),
+                port = int(self.db_set['db_mysql_port']),
                 autocommit = True
             )
 
             try:
-                self.conn.select_db(self.db_set['name'])
+                self.conn.select_db(self.db_set['db_name'])
             except:
                 pass
 
