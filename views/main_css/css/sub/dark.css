@@ -26,43 +26,46 @@
     color: white;
 }
 
-.opennamu_TOC, .opennamu_redirect {
+.opennamu_main .opennamu_TOC,
+.opennamu_main .opennamu_redirect {
     background: #1f2023;
 }
 
-.opennamu_comment_color_gray {
+.opennamu_main .opennamu_comment_color_gray {
     background: #4a4a4a;
 }
 
-.opennamu_comment_color_green {
+.opennamu_main .opennamu_comment_color_green {
     background: #2e4a2e;
 }
 
-.opennamu_comment_color_red {
+.opennamu_main .opennamu_comment_color_red {
     background: #803737;
 }
 
-.opennamu_comment_color_default {
+.opennamu_main .opennamu_comment_color_default {
     background: #38340e;
 }
 
-.opennamu_comment_color_blue {
+.opennamu_main .opennamu_comment_color_blue {
     background: #314c56;
 }
 
-.opennamu_comment_blind_admin {
+.opennamu_main .opennamu_comment_blind_admin {
     background: #2f2f2f;
 }
 
-#main_table_top_tr {
+.opennamu_main #main_table_top_tr {
     background: #2e5f4e;
 }
 
-pre#syntax, pre#syntax code {
+.opennamu_main pre#syntax,
+.opennamu_main pre#syntax code {
     background: #313236;
 }
 
-.hljs, .hljs-subst {
+.opennamu_main .hljs,
+.opennamu_main .hljs-subst {
     color: white;
 }
 
@@ -71,30 +74,30 @@ pre#syntax, pre#syntax code {
     border-left: 4px solid #eee;
 }
 
-.opennamu_spead_footnote {
+.opennamu_main .opennamu_spead_footnote {
     background-color: #313236;
     color: white;
 }
 
-.opennamu_popup_footnote {
+.opennamu_main .opennamu_popup_footnote {
     background-color: #313236;
     color: white;
 }
 
-.opennamu_history_blind {
+.opennamu_main .opennamu_history_blind {
     background: #333;
 }
 
 /* 이 부분은 레거시 */
-#topic_color {
+.opennamu_main #topic_color {
     background: #325a56;
 }
 
 /* diff */
-.opennamu_diff_green {
+.opennamu_main .opennamu_diff_green {
     background: #2e4a2e;
 }
 
-.opennamu_diff_red {
+.opennamu_main .opennamu_diff_red {
     background: #803737;
 }

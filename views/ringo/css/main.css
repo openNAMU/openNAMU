@@ -419,3 +419,11 @@ input, textarea {
 pre#syntax, pre#syntax code {
     border: 0;
 }
+
+a {
+    text-decoration: none;
+}
+
+a {
+    color: dodgerblue;
+}
