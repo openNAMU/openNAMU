@@ -163,7 +163,7 @@ class get_db_connect:
             if db_type != '':
                 self.db_set['db_type'] = db_type
 
-            if db_type == 'mysql':
+            if self.db_set['db_type'] == 'mysql':
                 m_curs.execute('select name, data from temp where name in ("db_mysql_host", "db_mysql_user", "db_mysql_pw", "db_mysql_port")')
                 db_data = m_curs.fetchall()
                 for for_a in db_data:
