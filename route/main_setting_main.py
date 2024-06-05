@@ -108,7 +108,7 @@ def main_setting_main():
             with class_temp_db() as m_conn:
                 m_curs = m_conn.cursor()
 
-                m_curs.execute('select data from temp where name = "db_set_type"')
+                m_curs.execute('select data from temp where name = "db_type"')
                 db_data = m_curs.fetchall()
                 set_data = db_data[0][0] if db_data else 'sqlite'
 
