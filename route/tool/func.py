@@ -695,20 +695,11 @@ def set_init_always(conn, ver_num):
             else:
                 exe_type = 'main.arm64.exe'
 
-        exe_path = os.path.join('.', 'route_go', 'bin', exe_type)
+        exe_path = os.path.join('.', 'route_go', 'bin')
 
-        if os.path.exists(exe_path):
-            os.remove(exe_path)
-        
-        print('Download dev ' + exe_type)
-
-        # https://raw.githubusercontent.com/openNAMU/GopenNAMU/beta/route_go/bin/main.amd64.bin
-        urllib.request.urlretrieve('https://raw.githubusercontent.com/openNAMU/GopenNAMU/dev/route_go/bin/' + exe_type, exe_path)
-        
-        if platform.system() == 'Linux':
-            os.system('chmod +x ./route_go/bin/' + exe_type)
-
-        print('Complete')
+        for for_a in os.listdir(exe_path):
+            if for_a != exe_type:
+                os.remove(os.path.join(exe_path, for_a))
 
 def set_init(conn):
     curs = conn.cursor()
