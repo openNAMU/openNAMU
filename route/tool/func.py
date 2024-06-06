@@ -75,12 +75,11 @@ from .func_render import class_do_render
 
 from diff_match_patch import diff_match_patch
 
-import waitress
-
 import werkzeug.routing
 import werkzeug.debug
 
 import flask
+import asyncio
 
 import requests
 from PIL import Image
@@ -114,7 +113,7 @@ def do_db_set(db_set):
         for for_a in db_set:
             m_curs.execute('insert into temp (name, data) values (?, ?)', ['db_' + for_a, db_set[for_a]])
 
-def python_to_golang(func_name, other_set = {}):
+async def python_to_golang(func_name, other_set = {}):
     if other_set == {}:
         other_set = '{}'
     else:
@@ -122,16 +121,23 @@ def python_to_golang(func_name, other_set = {}):
 
     if platform.system() == 'Linux':
         if platform.machine() in ["AMD64", "x86_64"]:
-            data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.bin"), func_name, other_set], stdout = subprocess.PIPE).communicate()[0]
+            cmd = [os.path.join(".", "route_go", "bin", "main.amd64.bin"), func_name, other_set]
         else:
-            data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.bin"), func_name, other_set], stdout = subprocess.PIPE).communicate()[0]
+            cmd = [os.path.join(".", "route_go", "bin", "main.arm64.bin"), func_name, other_set]
     else:
         if platform.machine() in ["AMD64", "x86_64"]:
-            data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.exe"), func_name, other_set], stdout = subprocess.PIPE).communicate()[0]
+            cmd = [os.path.join(".", "route_go", "bin", "main.amd64.exe"), func_name, other_set]
         else:
-            data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.exe"), func_name, other_set], stdout = subprocess.PIPE).communicate()[0]
+            cmd = [os.path.join(".", "route_go", "bin", "main.arm64.exe"), func_name, other_set]
 
-    data = data.decode('utf8')
+    process = await asyncio.create_subprocess_exec(
+        *cmd,
+        stdout = asyncio.subprocess.PIPE,
+        stderr = asyncio.subprocess.PIPE
+    )
+
+    stdout, stderr = await process.communicate()
+    data = stdout.decode('utf8')
 
     return data
 
