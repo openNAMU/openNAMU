@@ -87,21 +87,7 @@ def api_w_render(name = '', tool = ''):
                 other_set["doc_name"] = name
                 other_set["render_type"] = data_type
                 other_set["data"] = data_org
-                other_set = json.dumps(other_set)
-
-                if platform.system() == 'Linux':
-                    if platform.machine() in ["AMD64", "x86_64"]:
-                        data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.bin"), sys._getframe().f_code.co_name, other_set], stdout = subprocess.PIPE).communicate()[0]
-                    else:
-                        data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.bin"), sys._getframe().f_code.co_name, other_set], stdout = subprocess.PIPE).communicate()[0]
-                else:
-                    if platform.machine() in ["AMD64", "x86_64"]:
-                        data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.exe"), sys._getframe().f_code.co_name, other_set], stdout = subprocess.PIPE).communicate()[0]
-                    else:
-                        data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.exe"), sys._getframe().f_code.co_name, other_set], stdout = subprocess.PIPE).communicate()[0]
-
-                data = data.decode('utf8')
-
-                return flask.Response(response = data, status = 200, mimetype = 'application/json')
+                
+                return flask.Response(response = python_to_golang(sys._getframe().f_code.co_name, other_set), status = 200, mimetype = 'application/json')
         else:
             return flask.jsonify({})

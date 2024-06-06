@@ -124,28 +124,14 @@ def api_topic(topic_num = 1, tool = 'normal', s_num = '', e_num = ''):
     with get_db_connect() as conn:
         topic_num = str(topic_num)
 
-        other_set = {}
-        other_set["topic_num"] = topic_num
-        other_set["tool"] = tool
-        other_set["s_num"] = str(s_num)
-        other_set["e_num"] = str(e_num)
-        other_set["ip"] = ip_check()
-        other_set = json.dumps(other_set)
-
         if acl_check(conn, '', 'topic_view', topic_num) != 1:
-            if platform.system() == 'Linux':
-                if platform.machine() in ["AMD64", "x86_64"]:
-                    data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.bin"), sys._getframe().f_code.co_name, other_set], stdout = subprocess.PIPE).communicate()[0]
-                else:
-                    data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.bin"), sys._getframe().f_code.co_name, other_set], stdout = subprocess.PIPE).communicate()[0]
-            else:
-                if platform.machine() in ["AMD64", "x86_64"]:
-                    data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.exe"), sys._getframe().f_code.co_name, other_set], stdout = subprocess.PIPE).communicate()[0]
-                else:
-                    data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.exe"), sys._getframe().f_code.co_name, other_set], stdout = subprocess.PIPE).communicate()[0]
+            other_set = {}
+            other_set["topic_num"] = topic_num
+            other_set["tool"] = tool
+            other_set["s_num"] = str(s_num)
+            other_set["e_num"] = str(e_num)
+            other_set["ip"] = ip_check()
 
-            data = data.decode('utf8')
-
-            return flask.Response(response = data, status = 200, mimetype = 'application/json')
+            return flask.Response(response = python_to_golang(sys._getframe().f_code.co_name, other_set), status = 200, mimetype = 'application/json')
         else:
             return flask.jsonify({})

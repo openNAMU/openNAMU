@@ -7,9 +7,10 @@ import (
 )
 
 func Api_func_sha224(call_arg []string) string {
-	data := call_arg[0]
+	other_set := map[string]string{}
+	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
-	hash_str := tool.Sha224(data)
+	hash_str := tool.Sha224(other_set["data"])
 
 	new_data := map[string]string{}
 	new_data["data"] = hash_str
