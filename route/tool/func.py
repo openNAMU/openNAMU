@@ -113,7 +113,28 @@ def do_db_set(db_set):
 
         for for_a in db_set:
             m_curs.execute('insert into temp (name, data) values (?, ?)', ['db_' + for_a, db_set[for_a]])
-    
+
+def python_to_golang(func_name, other_set = {}):
+    if other_set == {}:
+        other_set = '{}'
+    else:
+        other_set = json.dumps(other_set)
+
+    if platform.system() == 'Linux':
+        if platform.machine() in ["AMD64", "x86_64"]:
+            data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.bin"), func_name, other_set], stdout = subprocess.PIPE).communicate()[0]
+        else:
+            data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.bin"), func_name, other_set], stdout = subprocess.PIPE).communicate()[0]
+    else:
+        if platform.machine() in ["AMD64", "x86_64"]:
+            data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.exe"), func_name, other_set], stdout = subprocess.PIPE).communicate()[0]
+        else:
+            data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.exe"), func_name, other_set], stdout = subprocess.PIPE).communicate()[0]
+
+    data = data.decode('utf8')
+
+    return data
+
 # Func-init
 def get_init_set_list(need = 'all'):
     init_set_list = {
