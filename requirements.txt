@@ -5,6 +5,7 @@ flask[async]
 hypercorn
 
 requests
+typing_extensions
 diff-match-patch
 
 pillow
