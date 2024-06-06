@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def api_func_language(data = 'Test'):
+async def api_func_language(data = 'Test'):
     other_set = {}
     if flask.request.method == 'POST':
         other_set["data"] = flask.request.form.get('data', '')
@@ -8,4 +8,4 @@ def api_func_language(data = 'Test'):
     else:
         other_set["data"] = [data]
 
-    return flask.Response(response = python_to_golang(sys._getframe().f_code.co_name, other_set), status = 200, mimetype = 'application/json')
+    return flask.Response(response = await python_to_golang(sys._getframe().f_code.co_name, other_set), status = 200, mimetype = 'application/json')

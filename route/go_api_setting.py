@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def api_setting(name = 'Test'):
+async def api_setting(name = 'Test'):
     other_set = {}
     other_set["set_name"] = name
     other_set["ip"] = ip_check()
@@ -10,4 +10,4 @@ def api_setting(name = 'Test'):
         func_name += '_edit'
         other_set['data'] = flask.request.form.get('data', 'Test')
     
-    return flask.Response(response = python_to_golang(func_name, other_set), status = 200, mimetype = 'application/json')
+    return flask.Response(response = await python_to_golang(func_name, other_set), status = 200, mimetype = 'application/json')

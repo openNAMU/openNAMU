@@ -6,6 +6,9 @@ import logging
 from route.tool.func import *
 from route import *
 
+from hypercorn.asyncio import serve
+from hypercorn.config import Config
+
 # Init-Version
 with open('version.json', encoding = 'utf8') as file_data:
     version_list = json.loads(file_data.read())
@@ -143,7 +146,7 @@ with get_db_connect() as conn:
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
 
-    log = logging.getLogger('waitress')
+    log = logging.getLogger('hypercorn')
     log.setLevel(logging.ERROR)
 
     app.jinja_env.filters['md5_replace'] = md5_replace
@@ -805,10 +808,8 @@ app.route('/update', methods = ['POST', 'GET'])(main_sys_update)
 app.errorhandler(404)(main_func_error_404)
 
 if __name__ == "__main__":
-    waitress.serve(
-        app,
-        host = server_set['host'],
-        port = int(server_set['port']),
-        clear_untrusted_proxy_headers = True,
-        threads = os.cpu_count()
-    )
+    config = Config()
+    config.bind = [f"{server_set['host']}:{server_set['port']}"]
+    
+    # hypercorn 서버 실행
+    asyncio.run(serve(app, config))

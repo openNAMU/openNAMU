@@ -120,7 +120,7 @@ def api_topic_thread_pre_render(conn, data, num, ip, topic_num = '', name = '', 
 
     return data
 
-def api_topic(topic_num = 1, tool = 'normal', s_num = '', e_num = ''):
+async def api_topic(topic_num = 1, tool = 'normal', s_num = '', e_num = ''):
     with get_db_connect() as conn:
         topic_num = str(topic_num)
 
@@ -132,6 +132,6 @@ def api_topic(topic_num = 1, tool = 'normal', s_num = '', e_num = ''):
             other_set["e_num"] = str(e_num)
             other_set["ip"] = ip_check()
 
-            return flask.Response(response = python_to_golang(sys._getframe().f_code.co_name, other_set), status = 200, mimetype = 'application/json')
+            return flask.Response(response = await python_to_golang(sys._getframe().f_code.co_name, other_set), status = 200, mimetype = 'application/json')
         else:
             return flask.jsonify({})
