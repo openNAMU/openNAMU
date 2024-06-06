@@ -522,7 +522,7 @@ app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everythi
 
 app.route('/down/<everything:name>')(view_down)
 
-app.route('/acl', methods = ['POST', 'GET'])(view_set)
+app.route('/acl_multiple', defaults = { 'multiple' : True }, methods = ['POST', 'GET'])(view_set)
 app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_set)
 
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_w)

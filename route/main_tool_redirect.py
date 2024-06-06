@@ -5,7 +5,7 @@ def main_tool_redirect(num = 1, add_2 = ''):
         curs = conn.cursor()
 
         title_list = {
-            0 : [get_lang(conn, 'document_name'), '/acl', get_lang(conn, 'acl')],
+            0 : [get_lang(conn, 'document_name'), '/acl', get_lang(conn, 'document_setting')],
             1 : [0, '/list/user/check', get_lang(conn, 'check')],
             2 : [get_lang(conn, 'file_name'), '/filter/file_filter/add', get_lang(conn, 'file_filter_add')],
             3 : [0, '/auth/give', get_lang(conn, 'authorize')],

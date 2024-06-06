@@ -2,7 +2,7 @@
 
 function w_set_reset() {
     let lang_data = new FormData();
-    lang_data.append('data', 'reset');
+    lang_data.append('data', 'reset end');
 
     fetch('/api/lang', {
         method : 'post',
@@ -26,7 +26,7 @@ function w_set_reset() {
                     if(data["response"] === "require auth") {
                         alert(data["language"]["authority_error"]);
                     } else {
-                        alert(lang[0]);
+                        alert(lang[1]);
                     }
 
                     history.go(0);
