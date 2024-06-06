@@ -25,7 +25,7 @@ def view_set_markup(conn, document_name = '', markup = '', addon = '', disable =
 
     return markup_html
 
-def view_set(name = 'Test'):
+def view_set(name = 'Test', multiple = False):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -33,28 +33,35 @@ def view_set(name = 'Test'):
         ip = ip_check()
         time = get_time()
 
-        if flask.request.method == 'POST':
-            check_data = 'document_set (' + name + ')'
+        if multiple and flask.request.method == 'POST':
+            all_title = re.findall(r'([^\n]+)\n', flask.request.form.get('title_name', '').replace('\r', '') + '\n')
+            for name in all_title:
+                view_set(name, False)
+
+            return redirect(conn, '/list/document/acl')
         else:
-            check_data = None
+            if flask.request.method == 'POST':
+                check_data = 'document_set (' + name + ')'
+            else:
+                check_data = None
 
-        user_data = re.search(r'^user:(.+)$', name)
-        if user_data:
-            if check_data and ip_or_user(ip) != 0:
-                return redirect(conn, '/login')
+            user_data = re.search(r'^user:(.+)$', name)
+            if user_data:
+                if check_data and ip_or_user(ip) != 0:
+                    return redirect(conn, '/login')
 
-            if user_data.group(1) != ip:
+                if user_data.group(1) != ip:
+                    if admin_check(conn, 5) != 1:
+                        if check_data:
+                            return re_error(conn, '/error/3')
+                        else:
+                            check_ok = 'disabled'
+            else:
                 if admin_check(conn, 5) != 1:
                     if check_data:
                         return re_error(conn, '/error/3')
                     else:
                         check_ok = 'disabled'
-        else:
-            if admin_check(conn, 5) != 1:
-                if check_data:
-                    return re_error(conn, '/error/3')
-                else:
-                    check_ok = 'disabled'
 
         if flask.request.method == 'POST':
             acl_data = ['decu', 'document_edit_acl', 'document_edit_request_acl', 'document_move_acl', 'document_delete_acl', 'dis', 'view', 'why']
@@ -231,25 +238,37 @@ def view_set(name = 'Test'):
                 <h2>''' + get_lang(conn, 'document_editor_top') + ''' (HTML)</h2>
                 <textarea ''' + check_ok + ''' class="opennamu_textarea_100" name="document_editor_top">''' + html.escape(document_editor_top) + '''</textarea>
             '''
-            
             data += '<hr class="main_hr">'
 
-
-            save_button += ' <button type="button" onclick="w_set_reset();" ' + check_ok + '>' + get_lang(conn, 'reset') + '</button>'
+            text_area = ''
+            if multiple == True:
+                text_area = '<textarea class="opennamu_textarea_500" placeholder="' + get_lang(conn, 'many_delete_help') + '" name="title_name"></textarea><hr class="main_hr">'
+                menu = [
+                    ['manager', get_lang(conn, 'admin')]
+                ]
+                title = get_lang(conn, 'mutiple_document_setting')
+                sub = 0
+            else:
+                menu = [
+                    ['w/' + url_pas(name), get_lang(conn, 'return')], 
+                    ['acl_multiple', get_lang(conn, 'mutiple_document_setting')],
+                    ['manager', get_lang(conn, 'admin')]
+                ]
+                title = name
+                sub = '(' + get_lang(conn, 'document_setting') + ')'
+                save_button += ' <button type="button" onclick="w_set_reset();" ' + check_ok + '>' + get_lang(conn, 'reset') + '</button>'
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'setting') + ')', 0])],
+                imp = [title, wiki_set(conn), wiki_custom(conn), wiki_css([sub, 0])],
                 data = '''
                     <form method="post">
                         <script defer src="/views/main_css/js/route/w_set.js''' + cache_v() + '''"></script>
                         <a href="/setting/acl">(''' + get_lang(conn, 'main_acl_setting') + ''')</a>
                         <hr class="main_hr">
+                        ''' + text_area + '''
                         ''' + render_simple_set(conn, data) + '''
                         ''' + save_button + '''
                     </form>
                 ''',
-                menu = [
-                    ['w/' + url_pas(name), get_lang(conn, 'return')], 
-                    ['manager', get_lang(conn, 'admin')]
-                ]
+                menu = menu
             ))

@@ -7,7 +7,8 @@ def main_tool_admin():
             data = render_simple_set(conn, '''
                 <h2>''' + get_lang(conn, 'admin') + '''</h2>
                 <ul class="opennamu_ul">
-                    <li><a href="/manager/2">''' + get_lang(conn, 'acl_change') + '''</a></li>
+                    <li><a href="/manager/2">''' + get_lang(conn, 'document_setting') + '''</a></li>
+                    <li><a href="/acl_multiple">''' + get_lang(conn, 'mutiple_document_setting') + '''</a></li>
                     <li><a href="/manager/3">''' + get_lang(conn, 'check_user') + '''</a></li>
                     <li><a href="/auth/give/ban">''' + get_lang(conn, 'ban') + '''</a></li>
                     <li><a href="/auth/give/ban_multiple">''' + get_lang(conn, 'multiple_ban') + '''</a></li>
