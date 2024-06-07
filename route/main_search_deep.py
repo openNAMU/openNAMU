@@ -2,14 +2,12 @@ from .tool.func import *
 
 from .go_api_search import api_search
 
-def main_search_deep(name = 'Test', search_type = 'title', num = 1):
+async def main_search_deep(name = 'Test', search_type = 'title', num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         if name == '':
             return redirect(conn)
-
-        sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
         if flask.request.method == 'POST':
             if search_type == 'title':
@@ -53,7 +51,7 @@ def main_search_deep(name = 'Test', search_type = 'title', num = 1):
                 <ul class="opennamu_ul">
             '''
 
-            all_list = json.loads(api_search(name, search_type, num).data)
+            all_list = json.loads((await api_search(name, search_type, num)).get_data(as_text = True))
             for data in all_list:
                 div += '<li><a href="/w/' + url_pas(data) + '">' + data + '</a></li>'
 
