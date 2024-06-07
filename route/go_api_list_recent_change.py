@@ -8,7 +8,7 @@ async def api_list_recent_change(num = 1, set_type = 'normal', limit = 10, legac
     other_set["legacy"] = legacy
     other_set["ip"] = ip_check()
 
-    response = flask.Response(response = await python_to_golang(sys._getframe().f_code.co_name, other_set), status = 200, mimetype = 'application/json')
+    response = flask.Response(response = (await python_to_golang(sys._getframe().f_code.co_name, other_set)), status = 200, mimetype = 'application/json')
     
     response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers.add('Access-Control-Allow-Headers', "Content-Type")

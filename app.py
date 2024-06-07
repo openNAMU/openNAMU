@@ -662,7 +662,7 @@ app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 # Func-bbs
 app.route('/bbs/main')(bbs_main)
 app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
-# app.route('/bbs/main/set')
+app.route('/bbs/set')(bbs_set)
 app.route('/bbs/in/<int:bbs_num>')(bbs_in)
 app.route('/bbs/in/<int:bbs_num>/<int:page>')(bbs_in)
 # app.route('/bbs/blind/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_hide)
@@ -750,6 +750,7 @@ app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>')(api_topic_list
 
 app.route('/api/v2/bbs')(api_bbs_list)
 app.route('/api/v2/bbs/main')(api_bbs)
+app.route('/api/v2/bbs/set', methods = ['PUT'])(api_bbs_set)
 app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs)
 app.route('/api/v2/bbs/w/comment/<int:bbs_num>/<int:post_num>/<tool>')(api_bbs_w_comment_n)
 

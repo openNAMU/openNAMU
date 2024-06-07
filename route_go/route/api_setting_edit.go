@@ -6,7 +6,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_setting_edit(call_arg []string) string {
+func Api_setting_put(call_arg []string) string {
 	other_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
