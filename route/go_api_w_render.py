@@ -88,6 +88,6 @@ async def api_w_render(name = '', tool = ''):
                 other_set["render_type"] = data_type
                 other_set["data"] = data_org
 
-                return flask.Response(response = await python_to_golang(sys._getframe().f_code.co_name, other_set), status = 200, mimetype = 'application/json')
+                return flask.Response(response = (await python_to_golang(sys._getframe().f_code.co_name, other_set)), status = 200, mimetype = 'application/json')
         else:
             return flask.jsonify({})

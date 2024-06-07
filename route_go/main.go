@@ -65,16 +65,16 @@ func main() {
 		route_data = route.Api_list_recent_block(call_arg[1:])
 	} else if call_arg[0] == "api_list_title_index" {
 		route_data = route.Api_list_title_index(call_arg[1:])
-	} else if call_arg[0] == "api_user_setting_editor_insert" {
-		route_data = route.Api_user_setting_editor_insert(call_arg[1:])
+	} else if call_arg[0] == "api_user_setting_editor_post" {
+		route_data = route.Api_user_setting_editor_post(call_arg[1:])
 	} else if call_arg[0] == "api_user_setting_editor_delete" {
 		route_data = route.Api_user_setting_editor_delete(call_arg[1:])
 	} else if call_arg[0] == "api_user_setting_editor" {
 		route_data = route.Api_user_setting_editor(call_arg[1:])
 	} else if call_arg[0] == "api_setting" {
 		route_data = route.Api_setting(call_arg[1:])
-	} else if call_arg[0] == "api_setting_edit" {
-		route_data = route.Api_setting_edit(call_arg[1:])
+	} else if call_arg[0] == "api_setting_put" {
+		route_data = route.Api_setting_put(call_arg[1:])
 	} else if call_arg[0] == "api_func_ip_menu" {
 		route_data = route.Api_func_ip_menu(call_arg[1:])
 	} else {
