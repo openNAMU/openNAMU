@@ -9,6 +9,14 @@ from route import *
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
 
+args = sys.argv
+run_mode = ''
+if len(args) > 1:
+    run_mode = args[1]
+
+    if not run_mode in ('dev'):
+        run_mode = ''
+
 # Init-Version
 with open('version.json', encoding = 'utf8') as file_data:
     version_list = json.loads(file_data.read())
@@ -121,7 +129,7 @@ with get_db_connect() as conn:
         else:
             set_init(conn)
 
-    set_init_always(conn, version_list['beta']['c_ver'])
+    set_init_always(conn, version_list['beta']['c_ver'], run_mode)
 
     # Init-Route
     class EverythingConverter(werkzeug.routing.PathConverter):
@@ -137,14 +145,13 @@ with get_db_connect() as conn:
             super(RegexConverter, self).__init__(url_map)
             self.regex = items[0]
 
-    app = flask.Flask(
-        __name__, 
-        template_folder = './'
-    )
+    app = flask.Flask(__name__, template_folder = './')
 
     app.config['JSON_AS_ASCII'] = False
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
+    if run_mode == 'dev':
+        app.config['DEBUG'] = True
 
     log = logging.getLogger('hypercorn')
     log.setLevel(logging.ERROR)
