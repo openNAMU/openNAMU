@@ -1,3 +1,5 @@
+"use strict";
+
 function opennamu_topic_list() {
     const url = window.location.pathname;
     const url_split = url.split('/');
@@ -8,7 +10,6 @@ function opennamu_topic_list() {
     } else {
         num = url_split[2];
     }
-
     
     let doc_name;
     if(url_split[1] === 'topic') {

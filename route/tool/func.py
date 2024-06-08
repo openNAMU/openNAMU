@@ -113,6 +113,37 @@ def do_db_set(db_set):
         for for_a in db_set:
             m_curs.execute('insert into temp (name, data) values (?, ?)', ['db_' + for_a, db_set[for_a]])
 
+def python_to_golang_sync(func_name, other_set = {}):
+    if other_set == {}:
+        other_set = '{}'
+    else:
+        other_set = json.dumps(other_set)
+
+    if platform.system() == 'Linux':
+        if platform.machine() in ["AMD64", "x86_64"]:
+            cmd = [os.path.join(".", "route_go", "bin", "main.amd64.bin"), func_name, other_set]
+        else:
+            cmd = [os.path.join(".", "route_go", "bin", "main.arm64.bin"), func_name, other_set]
+    else:
+        if platform.machine() in ["AMD64", "x86_64"]:
+            cmd = [os.path.join(".", "route_go", "bin", "main.amd64.exe"), func_name, other_set]
+        else:
+            cmd = [os.path.join(".", "route_go", "bin", "main.arm64.exe"), func_name, other_set]
+
+    process = subprocess.Popen(
+        cmd,
+        stdout = subprocess.PIPE,
+        stderr = asyncio.subprocess.PIPE
+    )
+    stdout, stderr = process.communicate()
+    
+    data = stdout.decode('utf8')
+    err = stderr.decode('utf8')
+    if err != '':
+        print(err)
+
+    return data
+
 async def python_to_golang(func_name, other_set = {}):
     if other_set == {}:
         other_set = '{}'
@@ -130,14 +161,26 @@ async def python_to_golang(func_name, other_set = {}):
         else:
             cmd = [os.path.join(".", "route_go", "bin", "main.arm64.exe"), func_name, other_set]
 
-    process = await asyncio.create_subprocess_exec(
-        *cmd,
-        stdout = asyncio.subprocess.PIPE,
-        stderr = asyncio.subprocess.PIPE
-    )
+    while 1:
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout = asyncio.subprocess.PIPE,
+                stderr = asyncio.subprocess.PIPE
+            )
+            stdout, stderr = await process.communicate()
 
-    stdout, stderr = await process.communicate()
-    data = stdout.decode('utf8')
+            data = stdout.decode('utf8')
+            err = stderr.decode('utf8')
+            if err != '':
+                if 'database is locked' in err:
+                    raise
+                else:
+                    print(err)
+
+            break
+        except:
+            await asyncio.sleep(0.1)
 
     return data
 
@@ -855,11 +898,18 @@ def number_check(data, f = 0):
 def redirect(conn, data = '/'):
     return flask.redirect(load_domain(conn, 'full') + data)
     
-def get_acl_list(type_d = 'normal'):
-    if type_d == 'user':
-        return ['', 'user', 'all']
-    else:
-        return ['', 'all', 'user', 'admin', 'owner', '50_edit', 'email', 'ban', 'before', '30_day', '90_day', 'ban_admin', 'not_all', 'up_to_level_3', 'up_to_level_10']
+# Golang 의존
+def get_acl_list(type_data = 'normal'):
+    if type_data == 'user':
+        type_data = 'user_document'
+
+    other_set = {}
+    other_set['type'] = type_data
+
+    data_str = python_to_golang_sync('api_func_acl_list', other_set)
+    data = json.loads(data_str)
+
+    return data["data"]
 
 ## Func-simple-with_DB
 def get_user_title_list(conn, ip = ''):
@@ -1151,7 +1201,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v262'
+    return '.cache_v263'
 
 def wiki_css(data):
     with class_temp_db() as m_conn:
@@ -1971,9 +2021,11 @@ def acl_check(conn, name = '', tool = '', topic_num = ''):
             name = curs.fetchall()
             name = name[0][0] if name else 'test'
 
-    if tool in ['topic']:
+    if tool in ['bbs_edit', 'bbs_comment']:
+        end = 4
+    elif tool in ['topic']:
         end = 3
-    elif tool in ['render', 'vote', '', 'document_edit', 'document_edit_request', 'document_move', 'document_delete', 'document_edit', 'bbs_edit', 'bbs_comment']:
+    elif tool in ['render', 'vote', '', 'document_edit', 'document_edit_request', 'document_move', 'document_delete', 'document_edit', 'bbs_view']:
         end = 2
     else:
         end = 1
@@ -2054,19 +2106,30 @@ def acl_check(conn, name = '', tool = '', topic_num = ''):
         elif tool == 'bbs_edit':
             if i == 0:
                 curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_edit_acl" and set_id = ?'), [name])
-            else:
+            elif i == 1:
                 curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_acl" and set_id = ?'), [name])
+            elif i == 2:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_edit_acl_all" and set_id = ?'), [name])
+            else:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_acl_all" and set_id = ?'), [name])
 
             num = 'all'
         elif tool == 'bbs_comment':
             if i == 0:
                 curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_comment_acl" and set_id = ?'), [name])
-            else:
+            elif i == 1:
                 curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_acl" and set_id = ?'), [name])
+            elif i == 2:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_comment_acl_all" and set_id = ?'), [name])
+            else:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_acl_all" and set_id = ?'), [name])
 
             num = 'all'
         elif tool == 'bbs_view':
-            curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_view_acl" and set_id = ?'), [name])
+            if i == 0:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_view_acl" and set_id = ?'), [name])
+            else:
+                curs.execute(db_change('select set_data from bbs_set where set_name = "bbs_view_acl_all" and set_id = ?'), [name])
 
             num = 'all'
         elif tool == 'recaptcha':
@@ -2263,12 +2326,10 @@ def ban_check(conn, ip = None, tool = ''):
 
     return [0, '']
 
-def ip_pas(conn, raw_ip, type_data = 0):
-    curs = conn.cursor()
-
-    end_ip = {}
-    my_ip = ip_check()
-
+def ip_pas(raw_ip):
+    other_set = {}
+    other_set["ip"] = ip_check()
+    
     return_data = 0
     if type(raw_ip) != type([]):
         get_ip = [raw_ip]
@@ -2276,83 +2337,16 @@ def ip_pas(conn, raw_ip, type_data = 0):
     else:
         get_ip = raw_ip
 
-    admin_auth = admin_check(conn, 1)
+    for for_a in range(1, len(get_ip) + 1):
+        other_set["data_" + str(for_a)] = get_ip[for_a - 1]
 
-    curs.execute(db_change("select data from other where name = 'ip_view'"))
-    db_data = curs.fetchall()
-    ip_view = db_data[0][0] if db_data else ''
-    ip_view = '' if admin_auth == 1 else ip_view
+    data_str = python_to_golang_sync('api_func_ip_post', other_set)
+    data = json.loads(data_str)
 
-    curs.execute(db_change("select data from other where name = 'user_name_view'"))
-    db_data = curs.fetchall()
-    user_name_view = db_data[0][0] if db_data else ''
-    user_name_view = '' if admin_auth == 1 else user_name_view
-    
-    get_ip = list(set(get_ip))
-    
-    for raw_ip in get_ip:
-        if re.search(r"^tool:", raw_ip):
-            end_ip[raw_ip] = raw_ip
-
-            continue
-
-        change_ip = 0
-        is_this_ip = ip_or_user(raw_ip)
-        if is_this_ip != 0:
-            # ip user
-            if ip_view != '' and my_ip != raw_ip:
-                ip = pw_encode(conn, raw_ip)[:10]
-
-                change_ip = 1
-            else:
-                ip = raw_ip
-        else:
-            # not ip user
-            if user_name_view != '':
-                curs.execute(db_change("select data from user_set where id = ? and name = 'sub_user_name'"), [raw_ip])
-                db_data = curs.fetchall()
-                if db_data and db_data[0][0] != '':
-                    ip = db_data[0][0]
-                else:
-                    ip = get_lang(conn, 'member')
-
-                change_ip = 1
-            else:
-                curs.execute(db_change('select data from user_set where name = "user_name" and id = ?'), [raw_ip])
-                db_data = curs.fetchall()
-                ip = db_data[0][0] if db_data and db_data[0][0] != '' else raw_ip
-            
-        if type_data == 0 and change_ip == 0:
-            if is_this_ip == 0:
-                curs.execute(db_change("select data from other where name = 'user_name_level'"))
-                db_data = curs.fetchall()
-                if db_data and db_data[0][0] != '':
-                    level_data = level_check(conn, raw_ip)
-
-                    ip += '<sup>' + level_data[0] + '</sup>'
-
-                ip = '<a href="/w/' + url_pas('user:' + raw_ip) + '">' + ip + '</a>'
-                
-                if admin_check(conn, 'all', None, raw_ip) == 1:
-                    ip = '<b>' + ip + '</b>'
-
-                curs.execute(db_change('select data from user_set where name = "user_title" and id = ?'), [raw_ip])
-                db_data = curs.fetchall()
-                if db_data:
-                    ip = db_data[0][0] + ip
-
-            ban = ban_check(conn, raw_ip)
-            if ban[0] == 1:
-                ip = '<sup>' + ban[1] + '</sup><s>' + ip + '</s>'
-
-            ip = ip + ' <a href="/user/' + url_pas(raw_ip) + '">(' + get_lang(conn, 'tool') + ')</a>'
-
-        end_ip[raw_ip] = ip
-    
     if return_data == 1:
-        return end_ip[raw_ip]
+        return data["data"][raw_ip]
     else:
-        return end_ip
+        return data["data"]
         
 # Func-edit
 def get_edit_text_bottom(conn) :

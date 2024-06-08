@@ -28,7 +28,7 @@ def user_alarm():
                 
                 data += '' + \
                     '<li style="' + data_style + '">' + \
-                        ip_pas(conn, data_split[0]) + (' | ' + ' | '.join(data_split[1:]) if len(data_split) > 1 else '') + \
+                        ip_pas(data_split[0]) + (' | ' + ' | '.join(data_split[1:]) if len(data_split) > 1 else '') + \
                         ' | ' + data_one[1] + \
                         ' <a href="/alarm/delete/' + url_pas(data_one[3]) + '">(' + get_lang(conn, 'delete') + ')</a>' + \
                     '</li>' + \

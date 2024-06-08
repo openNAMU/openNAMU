@@ -16,7 +16,7 @@ def recent_record_topic(name = 'Test'):
                 </tr>
         '''
         sub = '(' + html.escape(name) + ')'
-        pas_name = ip_pas(conn, name)
+        pas_name = ip_pas(name)
 
         curs.execute(db_change("select code, id, date from topic where ip = ? order by date desc limit ?, 50"), [name, sql_num])
         data_list = curs.fetchall()

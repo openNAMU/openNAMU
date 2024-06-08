@@ -1,3 +1,5 @@
+"use strict";
+
 function opennamu_list_user_check_submit_post() {
     window.location.pathname = window.location.pathname.replace('/check_submit/', '/check/');
 }

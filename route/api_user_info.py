@@ -7,7 +7,7 @@ def api_user_info(user_name = ''):
         data_result = {}
         
         # name part
-        data_result['render'] = ip_pas(conn, user_name)
+        data_result['render'] = ip_pas(user_name)
         
         # auth part
         curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [user_name])

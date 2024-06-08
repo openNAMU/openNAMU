@@ -1,3 +1,5 @@
+"use strict";
+
 function opennamu_edit_move_all() {
     let lang_data = new FormData();
     lang_data.append('data', 'title_start_document title_end_document title_include_document move document_name');
