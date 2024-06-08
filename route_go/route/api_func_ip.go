@@ -15,7 +15,8 @@ func Api_func_ip(call_arg []string) string {
 
 	ip_data := tool.IP_parser(db, other_set["data"], other_set["ip"])
 
-	new_data := map[string]string{}
+	new_data := make(map[string]interface{})
+	new_data["response"] = "ok"
 	new_data["data"] = ip_data
 
 	json_data, _ := json.Marshal(new_data)

@@ -150,7 +150,7 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
                     
                 data += '''
                     <tr>
-                        <td>''' + ip_pas(conn, temp_dict['comment_user_id']) + '''</td>
+                        <td>''' + ip_pas(temp_dict['comment_user_id']) + '''</td>
                         <td>''' + temp_dict['comment_date'] + '''</td>
                         <td>''' + ('#' + comment_link) + '''</td>
                     </tr>
@@ -172,7 +172,7 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
             
                 data += '''
                     <tr class="''' + ('opennamu_comment_color_red' if notice == 1 else '') + '''">
-                        <td>''' + ip_pas(conn, temp_dict['user_id']) + '''</td>
+                        <td>''' + ip_pas(temp_dict['user_id']) + '''</td>
                         <td>''' + temp_dict['date'] + '''</td>
                         <td>''' + last_comment_date + '''</td>
                     </tr>

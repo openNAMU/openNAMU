@@ -750,7 +750,6 @@ app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>')(api_topic_list
 
 app.route('/api/v2/bbs')(api_bbs_list)
 app.route('/api/v2/bbs/main')(api_bbs)
-app.route('/api/v2/bbs/set', methods = ['PUT'])(api_bbs_set)
 app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs)
 app.route('/api/v2/bbs/w/comment/<int:bbs_num>/<int:post_num>/<tool>')(api_bbs_w_comment_n)
 
@@ -762,9 +761,11 @@ app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting)
 
 app.route('/api/v2/user/setting/editor', methods = ['GET', 'POST', 'DELETE'])(api_user_setting_editor)
 
-app.route('/api/v2/ip/<everything:data>')(api_func_ip)
-app.route('/api/v2/ip_menu/<everything:ip>', defaults = { 'option' : 'user' })(api_func_ip_menu)
+app.route('/api/v2/ip/<everything:data>', methods = ['GET', 'POST'])(api_func_ip)
+app.route('/api/v2/ip_menu/<everything:ip>', defaults = { 'option' : 'user' }, methods = ['GET', 'POST'])(api_func_ip_menu)
 app.route('/api/v2/user_menu/<everything:ip>')(api_func_ip_menu)
+app.route('/api/v2/acl_list/<data_type>')(api_func_acl_list)
+app.route('/api/v2/lang', defaults = { 'legacy' : '' }, methods = ['POST'])(api_func_language)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정

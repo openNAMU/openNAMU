@@ -13,7 +13,7 @@ def list_user(arg_num = 1):
         for data in user_list:
             list_data += '' + \
                 '<li>' + \
-                    ip_pas(conn, data[0]) + (' (' + data[1] + ')' if data[1] != '' else '') + \
+                    ip_pas(data[0]) + (' (' + data[1] + ')' if data[1] != '' else '') + \
                 '</li>' + \
             ''
 

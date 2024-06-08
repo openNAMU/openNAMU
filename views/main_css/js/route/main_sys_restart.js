@@ -1,3 +1,5 @@
+"use strict";
+
 function opennamu_main_sys_restart() {
     let lang_data = new FormData();
     lang_data.append('data', 'restart');

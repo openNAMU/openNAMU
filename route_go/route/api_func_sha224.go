@@ -12,9 +12,10 @@ func Api_func_sha224(call_arg []string) string {
 
 	hash_str := tool.Sha224(other_set["data"])
 
-	new_data := map[string]string{}
-	new_data["data"] = hash_str
+	return_data := make(map[string]interface{})
+	return_data["response"] = "ok"
+	return_data["data"] = hash_str
 
-	json_data, _ := json.Marshal(new_data)
+	json_data, _ := json.Marshal(return_data)
 	return string(json_data)
 }

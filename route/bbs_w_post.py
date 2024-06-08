@@ -35,7 +35,7 @@ def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, post_n
 
             comment_data += '<span style="padding-left: 20px;"></span>' * margin_count
             comment_data += api_topic_thread_make(
-                ip_pas(conn, temp_dict['comment_user_id']),
+                ip_pas(temp_dict['comment_user_id']),
                 date,
                 render_set(conn, doc_data = temp_dict['comment']),
                 sub_code_check,
@@ -126,7 +126,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                 data = ''
                 data += '<h2>' + html.escape(temp_dict['title']) + '</h2>'
                 data += api_topic_thread_make(
-                    ip_pas(conn, temp_dict['user_id']),
+                    ip_pas(temp_dict['user_id']),
                     date,
                     render_set(conn, doc_data = temp_dict['data'], data_type = 'thread'),
                     '0',
@@ -149,7 +149,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                     date += temp_dict['comment_date']
 
                     data += api_topic_thread_make(
-                        ip_pas(conn, temp_dict['comment_user_id']),
+                        ip_pas(temp_dict['comment_user_id']),
                         date,
                         render_set(conn, doc_data = temp_dict['comment'], data_type = 'thread'),
                         str(count),
@@ -246,7 +246,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                 data = ''
                 data += '<h2>' + html.escape(temp_dict['title']) + '</h2>'
                 data += api_topic_thread_make(
-                    ip_pas(conn, temp_dict['user_id']),
+                    ip_pas(temp_dict['user_id']),
                     date,
                     render_set(conn, doc_data = temp_dict['data']),
                     '0',

@@ -7,6 +7,20 @@ import (
 	"opennamu/route/tool"
 )
 
+func Setting_list() map[string]string {
+	setting_acl := map[string]string{}
+
+	setting_acl["manage_404_page"] = ""
+	setting_acl["manage_404_page_content"] = ""
+
+	setting_acl["bbs_view_acl_all"] = ""
+	setting_acl["bbs_acl_all"] = ""
+	setting_acl["bbs_edit_acl_all"] = ""
+	setting_acl["bbs_comment_acl_all"] = ""
+
+	return setting_acl
+}
+
 func Api_setting(call_arg []string) string {
 	other_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &other_set)
@@ -14,10 +28,7 @@ func Api_setting(call_arg []string) string {
 	db := tool.DB_connect()
 	defer db.Close()
 
-	setting_acl := map[string]string{}
-
-	setting_acl["manage_404_page"] = ""
-	setting_acl["manage_404_page_content"] = ""
+	setting_acl := Setting_list()
 
 	if val, ok := setting_acl[other_set["set_name"]]; ok {
 		if val != "" {

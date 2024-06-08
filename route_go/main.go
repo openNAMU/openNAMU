@@ -77,6 +77,10 @@ func main() {
 		route_data = route.Api_setting_put(call_arg[1:])
 	} else if call_arg[0] == "api_func_ip_menu" {
 		route_data = route.Api_func_ip_menu(call_arg[1:])
+	} else if call_arg[0] == "api_func_ip_post" {
+		route_data = route.Api_func_ip_post(call_arg[1:])
+	} else if call_arg[0] == "api_func_acl_list" {
+		route_data = route.Api_func_acl_list(call_arg[1:])
 	} else {
 		log.Fatal(call_arg[0] + " is 404")
 	}

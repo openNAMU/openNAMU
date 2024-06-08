@@ -16,6 +16,7 @@ func Api_func_ip_menu(call_arg []string) string {
 	ip_data := tool.IP_menu(db, other_set["ip"], other_set["my_ip"], other_set["option"])
 
 	new_data := make(map[string]interface{})
+	new_data["response"] = "ok"
 	new_data["data"] = ip_data
 
 	json_data, _ := json.Marshal(new_data)

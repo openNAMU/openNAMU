@@ -186,6 +186,7 @@ from route.go_api_func_sha224 import api_func_sha224
 from route.go_api_func_ip import api_func_ip
 from route.go_api_func_ip_menu import api_func_ip_menu
 from route.go_api_func_auth_list import api_func_auth_list
+from route.go_api_func_acl_list import api_func_acl_list
 
 from route.go_api_search import api_search
 
@@ -197,7 +198,6 @@ from route.go_api_list_old_page import api_list_old_page
 from route.go_api_list_title_index import api_list_title_index
 
 from route.go_api_bbs import api_bbs
-from route.go_api_bbs_set import api_bbs_set
 from route.go_api_bbs_list import api_bbs_list
 from route.go_api_bbs_w_comment import api_bbs_w_comment_n
 

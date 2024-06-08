@@ -22,14 +22,17 @@ def list_admin_auth_use(arg_num = 1, arg_search = 'normal'):
             for data in get_list:
                 do_data = data[1]
 
-                if ip_pas(conn, '127.0.0.1', 1) != '127.0.0.1': 
-                    do_data = do_data.split(' ')
-                    if do_data[0] in ('ban'):
-                        do_data = do_data[0]
-                    else:
-                        do_data = data[1]
+                if ip_or_user(data[0]) != 0:
+                    curs.execute(db_change("select data from other where name = 'ip_view'"))
+                    db_data = curs.fetchall()
+                    ip_view = db_data[0][0] if db_data else ''
+                    ip_view = '' if admin_check(conn, 1) == 1 else ip_view
+                    
+                    if ip_view != '':
+                        do_data = do_data.split(' ')
+                        do_data = do_data[0] if do_data[0] in ('ban') else data[1]
 
-                list_data += '<li>' + ip_pas(conn, data[0]) + ' | ' + html.escape(do_data) + ' | ' + data[2] + '</li>'
+                list_data += '<li>' + ip_pas(data[0]) + ' | ' + html.escape(do_data) + ' | ' + data[2] + '</li>'
 
             list_data += '</ul>'
             list_data += get_next_page_bottom(conn, '/list/admin/auth_use_page/{}/' + url_pas(arg_search), arg_num, get_list)

@@ -116,7 +116,7 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
 
             div += '</tr>'
 
-            all_ip = ip_pas(conn, [i[3] for i in data_list])
+            all_ip = ip_pas([i[3] for i in data_list])
             for data in data_list:
                 select += '<option value="' + data[0] + '">' + data[0] + '</option>'
                 send = data[4]
