@@ -24,14 +24,10 @@ function opennamu_bbs_set_post() {
 }
 
 function opennamu_bbs_set() {
-    let acl_set_list = [
-        "bbs_view_acl_all",
-        "bbs_acl_all",
-        "bbs_edit_acl_all",
-        "bbs_comment_acl_all"
-    ];
+    let acl_set_list = ["bbs_view_acl_all", "bbs_acl_all", "bbs_edit_acl_all", "bbs_comment_acl_all"];
+    let acl_set_list_h = [2, 3, 4, 4];
     
-    let lang_str = 'save';
+    let lang_str = 'save reference';
     for(let for_a = 0; for_a < acl_set_list.length; for_a++) {
         lang_str += ' ' + acl_set_list[for_a];
     }
@@ -52,10 +48,10 @@ function opennamu_bbs_set() {
         }).then(function(acl_list) {
             acl_list = acl_list["data"];
 
-            let acl_set_html = '';
+            let acl_set_html = '<a href="/acl/TEST#exp">(' + lang['reference'] + ')</a>';
 
             for(let for_b = 0; for_b < acl_set_list.length; for_b++) {
-                acl_set_html += '<h2>' + lang[acl_set_list[for_b]] + '</h2>';
+                acl_set_html += '<h' + acl_set_list_h[for_b] + '>' + lang[acl_set_list[for_b]] + '</h' + acl_set_list_h[for_b] + '>';
                 acl_set_html += '<select id="opennamu_' + acl_set_list[for_b] + '">';
                 
                 let select = '';
@@ -70,11 +66,11 @@ function opennamu_bbs_set() {
                 acl_set_html += '</select>';
             }
 
-            document.getElementById('opennamu_bbs_set').innerHTML = '' +
+            document.getElementById('opennamu_bbs_set').innerHTML = renderSimpleSet('' +
                 acl_set_html +
                 '<hr class="main_hr">' + 
                 '<button onclick="opennamu_bbs_set_post();">' + lang['save'] + '</button>' +
-            '';
+            '');
 
             for(let for_a = 0; for_a < acl_set_list.length; for_a++) {
                 fetch('/api/v2/setting/' + acl_set_list[for_a]).then(function(res) {
