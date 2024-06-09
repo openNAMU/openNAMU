@@ -1095,26 +1095,7 @@ def pw_check(conn, data, data2, type_d = 'no', id_d = ''):
         
 # Func-skin
 def easy_minify(conn, data, tool = None):
-    # without_DB
-    with class_temp_db() as m_conn:
-        m_curs = m_conn.cursor()
-        
-        m_curs.execute('select data from temp where name = "wiki_access_password"')
-        db_data = m_curs.fetchall()
-        if db_data:
-            access_password = db_data[0][0]
-            input_password = flask.request.cookies.get('opennamu_wiki_access', ' ')
-            if url_pas(access_password) == input_password:
-                return data
-                
-            return '''
-                <script defer src="/views/main_css/js/route/wiki_access_password.js''' + cache_v() + '''"></script>
-                <h2>''' + get_lang(conn, 'error_password_require_for_wiki_access') + '''</h2>
-                <input type="password" id="wiki_access">
-                <input type="submit" onclick="opennamu_do_wiki_access();">
-            '''
-        else:
-            return data
+    return data
 
 def get_lang(conn, data, safe = 0):
     with class_temp_db() as m_conn:

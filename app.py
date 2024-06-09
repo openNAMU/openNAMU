@@ -347,7 +347,33 @@ def auto_do_something(data_db_set):
 auto_do_something(data_db_set)
 
 print('Now running... http://localhost:' + server_set['port'])
-    
+
+@app.before_request
+def before_request_func():
+    with class_temp_db() as m_conn:
+        m_curs = m_conn.cursor()
+        
+        m_curs.execute('select data from temp where name = "wiki_access_password"')
+        db_data = m_curs.fetchall()
+        if db_data:
+            access_password = db_data[0][0]
+            input_password = flask.request.cookies.get('opennamu_wiki_access', ' ')
+            if url_pas(access_password) != input_password:
+                with get_db_connect() as conn:
+                    return '''
+                        <script>
+                            "use strict";
+                            function opennamu_do_wiki_access() {
+                                let password = document.getElementById('wiki_access').value;
+                                document.cookie = 'opennamu_wiki_access=' + encodeURIComponent(password) + '; path=/;';
+                                history.go(0);
+                            }
+                        </script>
+                        <h2>''' + get_lang(conn, 'error_password_require_for_wiki_access') + '''</h2>
+                        <input type="password" id="wiki_access">
+                        <input type="submit" onclick="opennamu_do_wiki_access();">
+                    '''
+
 # Init-custom
 if os.path.exists('custom.py'):
     from custom import custom_run
