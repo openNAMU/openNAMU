@@ -317,6 +317,6 @@ function opennamu_do_toc() {
 
     data.innerHTML = data.innerHTML.replace(/(<h[1-6]>)/, '<div class="opennamu_toc"></div>$1');
     data.innerHTML = data.innerHTML.replace(/<div class="opennamu_toc"><\/div>/g, function(match) {
-        return '<div class="opennamu_TOC" id="toc"><div class="opennamu_TOC_title">TOC</div><br>' + toc_html + '</div>';
+        return '<div class="opennamu_TOC" id="toc"><div class="opennamu_TOC_title">TOC</div><br><br>' + toc_html + '</div>';
     });
 }

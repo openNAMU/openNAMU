@@ -51,8 +51,8 @@
     background: #2e5f4e;
 }
 
-.opennamu_main pre#syntax,
-.opennamu_main pre#syntax code {
+.opennamu_main code,
+.opennamu_main pre {
     background: #313236;
 }
 
