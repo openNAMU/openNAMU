@@ -220,7 +220,7 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                 if admin == 1:
                     menu += [['record/reset/' + url_pas(name), get_lang(conn, 'record_reset')]]
 
-                div += get_next_page_bottom(conn, '/record/{}/' + url_pas(name), num, data_list)
+                div += get_next_page_bottom(conn, '/record/{}/' + url_pas(set_type) + '/' + url_pas(name), num, data_list)
             else:
                 div = '' + \
                     ' '.join(['<a href="/recent_change/1/' + for_a[0] + '">(' + for_a[1] + ')</a> ' for for_a in option_list]) + \
