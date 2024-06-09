@@ -2147,6 +2147,10 @@ def acl_check(conn, name = '', tool = '', topic_num = ''):
                 curs.execute(db_change('select data from other where name = "document_edit_request_acl"'))
 
             num = 5
+        elif tool == 'document_make_acl':
+            curs.execute(db_change('select data from other where name = "document_make_acl"'))
+
+            num = 5
         else:
             # tool == 'render'
             if i == 0:
@@ -2247,7 +2251,7 @@ def acl_check(conn, name = '', tool = '', topic_num = ''):
                         if count >= 50:
                             curs.execute(db_change("select data from user_set where id = ? and name = 'date'"), [ip])
                             user_date = curs.fetchall()[0][0]
-                            
+
                             time_1 = datetime.datetime.strptime(user_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days = 30)
                             time_2 = datetime.datetime.strptime(get_time(), '%Y-%m-%d %H:%M:%S')
                             if time_2 > time_1:

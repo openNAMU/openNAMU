@@ -135,6 +135,10 @@ def edit(name = 'Test', section = 0, do_type = ''):
         doc_ver = curs.fetchall()
         doc_ver = doc_ver[0][0] if doc_ver else '0'
 
+        if doc_ver == '0':
+            if acl_check(conn, name, 'document_make_acl') == 1:
+                edit_req_mode = 1
+
         curs.execute(db_change("select set_data from data_set where doc_name = ? and doc_rev = ? and set_name = 'edit_request_data'"), [name, doc_ver])
         if curs.fetchall():
             return redirect(conn, '/edit_request_from/' + url_pas(name))
@@ -240,6 +244,9 @@ def edit(name = 'Test', section = 0, do_type = ''):
                     doc_data = content,
                     data_type = 'backlink'
                 )
+                
+                section = (('#edit_load_' + str(section)) if section != '' else '')
+                return redirect(conn, '/w/' + url_pas(name) + section)
             else:
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_data', ?)"), [name, doc_ver, content])
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_user', ?)"), [name, doc_ver, ip])
@@ -252,9 +259,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 for scan_user in curs.fetchall():
                     add_alarm(conn, scan_user[0], ip, '<a href="/edit_request/' + url_pas(name) + '">' + html.escape(name) + '</a> edit_request')
             
-            section = (('#edit_load_' + str(section)) if section != '' else '')
-            
-            return redirect(conn, '/w/' + url_pas(name) + section)
+                return redirect(conn, '/edit_request_from/' + url_pas(name))
         else:
             editor_top_text = ''
 

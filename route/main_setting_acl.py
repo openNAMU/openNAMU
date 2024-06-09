@@ -18,7 +18,8 @@ def main_setting_acl():
             11 : 'edit_bottom_compulsion_acl',
             12 : 'recaptcha_pass_acl',
             13 : 'recaptcha_one_check_five_pass_acl',
-            14 : 'document_edit_request_acl'
+            14 : 'document_edit_request_acl',
+            15 : 'document_make_acl'
         }
         default_list = {
             12 : 'user'
@@ -60,6 +61,9 @@ def main_setting_acl():
                         
                         <h2>''' + get_lang(conn, 'document_acl') + '''</h2>
                         <select ''' + disable + ''' name="edit">''' + acl_div[0] + '''</select>
+
+                        <h3>''' + get_lang(conn, 'document_make_acl') + '''</h3>
+                        <select ''' + disable + ''' name="document_make_acl">''' + acl_div[14] + '''</select>
 
                         <h3>''' + get_lang(conn, 'document_edit_acl') + '''</h3>
                         <select ''' + disable + ''' name="document_edit_acl">''' + acl_div[6] + '''</select>
