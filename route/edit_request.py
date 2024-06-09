@@ -14,6 +14,10 @@ def edit_request(name = 'Test', do_type = ''):
         doc_ver = curs.fetchall()
         doc_ver = doc_ver[0][0] if doc_ver else '0'
 
+        if doc_ver == '0':
+            if acl_check(conn, name, 'document_make_acl') == 1:
+                disabled = "disabled"
+
         curs.execute(db_change("select set_data from data_set where doc_name = ? and doc_rev = ? and set_name = 'edit_request_data'"), [name, doc_ver])
         db_data = curs.fetchall()
         if not db_data:
@@ -38,12 +42,8 @@ def edit_request(name = 'Test', do_type = ''):
         edit_request_leng = db_data[0][0] if db_data else ''
 
         if flask.request.method == 'POST':
-            if acl_check(conn, name, 'document_edit') == 1:
+            if disabled != "":
                 return redirect(conn, '/w/' + url_pas(name))
-            
-            curs.execute(db_change("select data from data where title = ?"), [name])
-            db_data = curs.fetchall()
-            o_data = db_data[0][0] if db_data else ''
             
             curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
             for scan_user in curs.fetchall():
