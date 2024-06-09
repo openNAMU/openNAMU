@@ -2236,6 +2236,22 @@ def acl_check(conn, name = '', tool = '', topic_num = ''):
             elif acl_data[0][0] == 'up_to_level_10':
                 if int(level_check(conn, ip)[0]) >= 10:
                     return 0
+            elif acl_data[0][0] == '30_day_50_edit':
+                if ip_or_user(ip) != 1:
+                    if admin_check(conn, num) == 1:
+                        return 0
+                    else:
+                        curs.execute(db_change("select count(*) from history where ip = ?"), [ip])
+                        count = curs.fetchall()
+                        count = count[0][0] if count else 0
+                        if count >= 50:
+                            curs.execute(db_change("select data from user_set where id = ? and name = 'date'"), [ip])
+                            user_date = curs.fetchall()[0][0]
+                            
+                            time_1 = datetime.datetime.strptime(user_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days = 30)
+                            time_2 = datetime.datetime.strptime(get_time(), '%Y-%m-%d %H:%M:%S')
+                            if time_2 > time_1:
+                                return 0
 
             return 1
         elif i == (end - 1):
