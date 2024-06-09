@@ -34,6 +34,88 @@ function opennamu_xss_filter_decode(str) {
     });
 }
 
+function renderSimpleSet(data) {
+    let tocData = '';
+    const tocRegexAll = /<h([1-6])>([^<>]+)<\/h[1-6]>/g;
+    const tocRegex = /<h([1-6])>([^<>]+)<\/h[1-6]>/;
+    const tocSearchData = [...data.matchAll(tocRegexAll)];
+    let headingStack = [0, 0, 0, 0, 0, 0];
+
+    if (tocSearchData.length > 0) {
+        tocData += `
+            <div class="opennamu_TOC" id="toc">
+                <span class="opennamu_TOC_title">TOC</span>
+                <br>
+        `;
+    }
+
+    tocSearchData.forEach((tocSearchIn) => {
+        const headingLevel = parseInt(tocSearchIn[1]);
+        const headingLevelStr = headingLevel.toString();
+
+        headingStack[headingLevel - 1] += 1;
+        for (let i = headingLevel; i < 6; i++) {
+            headingStack[i] = 0;
+        }
+
+        const headingStackStr = headingStack
+            .map((val) => (val !== 0 ? val + '.' : ''))
+            .join('')
+            .replace(/\.$/, '');
+
+        tocData += `
+            <br>
+            <span class="opennamu_TOC_list">
+                ${'<span style="margin-left: 10px;"></span>'.repeat(headingStackStr.split('.').length - 1)}
+                <a href="#s-${headingStackStr}">${headingStackStr}.</a>
+                ${tocSearchIn[2]}
+            </span>
+        `;
+
+        data = data.replace(
+            tocRegex,
+            `<h${tocSearchIn[1]} id="s-${headingStackStr}"><a href="#toc">${headingStackStr}.</a> ${tocSearchIn[2]}</h${tocSearchIn[1]}>`
+        );
+    });
+
+    if (tocData !== '') {
+        tocData += '</div><hr class="main_hr">';
+    }
+
+    let footnoteData = '';
+    const footnoteRegex = /<sup>((?:(?!<sup>|<\/sup>).)+)<\/sup>/g;
+    const footnoteSearchData = [...data.matchAll(footnoteRegex)];
+    let footnoteCount = 1;
+
+    if (footnoteSearchData.length > 0) {
+        footnoteData += '<div class="opennamu_footnote">';
+    }
+
+    footnoteSearchData.forEach((footnoteSearch) => {
+        const footnoteCountStr = footnoteCount.toString();
+
+        if (footnoteCount !== 1) {
+            footnoteData += '<br>';
+        }
+
+        footnoteData += `<a id="fn-${footnoteCountStr}" href="#rfn-${footnoteCountStr}">(${footnoteCountStr})</a> ${footnoteSearch[1]}`;
+        data = data.replace(
+            footnoteRegex,
+            `<sup id="rfn-${footnoteCountStr}"><a href="#fn-${footnoteCountStr}">(${footnoteCountStr})</a></sup>`
+        );
+
+        footnoteCount += 1;
+    });
+
+    if (footnoteData !== '') {
+        footnoteData += '</div>';
+    }
+
+    data = tocData + data + footnoteData;
+
+    return data;
+}
+
 function opennamu_do_id_check(data) {
     if(data.match(/\.|\:/)) {
         return 0;
