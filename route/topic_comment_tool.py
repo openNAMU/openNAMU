@@ -34,7 +34,7 @@ def topic_comment_tool(topic_num = 1, num = 1):
                 <h2>''' + get_lang(conn, 'admin_tool') + '''</h2>
                 <ul class="opennamu_ul">
                     <li>
-                        <a href="/auth/give/ban/''' + url_pas(data[0][1]) + '''">
+                        <a href="/auth/ban/''' + url_pas(data[0][1]) + '''">
                             ''' + (get_lang(conn, 'ban') + ' | ' + get_lang(conn, 'release')) + '''
                         </a>
                     </li>

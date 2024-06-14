@@ -29,7 +29,7 @@ func Get_language(db *sql.DB, data string, safe bool) string {
 
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&lang_data); err != nil {
-		return ""
+		log.Fatal(err)
 	}
 
 	if _, ok := lang_data[data]; ok {

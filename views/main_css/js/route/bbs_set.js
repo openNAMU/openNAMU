@@ -76,7 +76,7 @@ function opennamu_bbs_set() {
                 fetch('/api/v2/setting/' + acl_set_list[for_a]).then(function(res) {
                     return res.json();
                 }).then(function(data) {
-                    data = data["data"];
+                    data = data["data"][0];
 
                     let select_element = document.getElementById('opennamu_' + acl_set_list[for_a]);
                     select_element.querySelector('option[value="' + data + '"]').selected = true;

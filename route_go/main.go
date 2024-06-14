@@ -81,6 +81,8 @@ func main() {
 		route_data = route.Api_func_ip_post(call_arg[1:])
 	} else if call_arg[0] == "api_func_acl_list" {
 		route_data = route.Api_func_acl_list(call_arg[1:])
+	} else if call_arg[0] == "api_user_rankup" {
+		route_data = route.Api_user_rankup(call_arg[1:])
 	} else {
 		log.Fatal(call_arg[0] + " is 404")
 	}

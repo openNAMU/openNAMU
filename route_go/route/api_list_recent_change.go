@@ -52,7 +52,7 @@ func Api_list_recent_change(call_arg []string) string {
 	}
 	defer rows.Close()
 
-	var data_list [][]string
+	data_list := [][]string{}
 
 	admin_auth := tool.Get_user_auth(db, other_set["ip"])
 	ip_parser_temp := map[string][]string{}
@@ -124,12 +124,8 @@ func Api_list_recent_change(call_arg []string) string {
 	}
 
 	if other_set["legacy"] != "" {
-		if len(data_list) == 0 {
-			return "{}"
-		} else {
-			json_data, _ := json.Marshal(data_list)
-			return string(json_data)
-		}
+		json_data, _ := json.Marshal(data_list)
+		return string(json_data)
 	} else {
 		auth_name := tool.Get_user_auth(db, other_set["ip"])
 		auth_info := tool.Get_auth_group_info(db, auth_name)
@@ -156,12 +152,7 @@ func Api_list_recent_change(call_arg []string) string {
 			"setting":        tool.Get_language(db, "setting", false),
 		}
 		return_data["auth"] = auth_info
-
-		if len(data_list) == 0 {
-			return_data["data"] = map[string]string{}
-		} else {
-			return_data["data"] = data_list
-		}
+		return_data["data"] = data_list
 
 		json_data, _ := json.Marshal(return_data)
 		return string(json_data)

@@ -48,7 +48,7 @@ def user_info(name = ''):
             admin_menu = '''
                 <h2>''' + get_lang(conn, 'admin') + '''</h2>
                 <ul class="opennamu_ul">
-                    <li><a href="/auth/give/ban/''' + url_pas(ip) + '''">''' + ban_name + '''</a></li>
+                    <li><a href="/auth/ban/''' + url_pas(ip) + '''">''' + ban_name + '''</a></li>
                     <li><a href="/list/user/check_submit/''' + url_pas(ip) + '''">''' + get_lang(conn, 'check') + '''</a></li>
                 </ul>
             '''

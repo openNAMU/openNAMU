@@ -10,7 +10,7 @@ function opennamu_do_insert_version_skin(
 
     xhr.onreadystatechange = function() {
         if(this.readyState === 4 && this.status === 200) {
-            var json_data = JSON.parse(this.responseText);
+            let json_data = JSON.parse(this.responseText);
             for(let key in json_data) {
                 document.getElementById(dom_name_version).innerHTML += '<li>' +
                     json_data[key]['name'] + ' : ' + json_data[key]['skin_ver'] +

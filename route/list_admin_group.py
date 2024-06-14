@@ -8,9 +8,8 @@ def list_admin_group_2():
         org_acl_list = get_default_admin_group()
 
         curs.execute(db_change("select distinct name from alist order by name asc"))
-        for data in curs.fetchall():            
-            if  admin_check(conn) == 1 and \
-                not data[0] in org_acl_list:
+        for data in curs.fetchall():
+            if admin_check(conn) == 1 and not data[0] in org_acl_list:
                 delete_admin_group = ' <a href="/auth/list/delete/' + url_pas(data[0]) + '">(' + get_lang(conn, "delete") + ')</a>'
             else:
                 delete_admin_group = ''

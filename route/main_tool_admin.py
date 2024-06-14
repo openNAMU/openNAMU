@@ -10,8 +10,8 @@ def main_tool_admin():
                     <li><a href="/manager/2">''' + get_lang(conn, 'document_setting') + '''</a></li>
                     <li><a href="/acl_multiple">''' + get_lang(conn, 'mutiple_document_setting') + '''</a></li>
                     <li><a href="/manager/3">''' + get_lang(conn, 'check_user') + '''</a></li>
-                    <li><a href="/auth/give/ban">''' + get_lang(conn, 'ban') + '''</a></li>
-                    <li><a href="/auth/give/ban_multiple">''' + get_lang(conn, 'multiple_ban') + '''</a></li>
+                    <li><a href="/auth/ban">''' + get_lang(conn, 'ban') + '''</a></li>
+                    <li><a href="/auth/ban/multiple">''' + get_lang(conn, 'multiple_ban') + '''</a></li>
                     <li><a href="/manager/5">''' + get_lang(conn, 'authorize') + '''</a></li>
                 </ul>
                 <h2>''' + get_lang(conn, 'owner') + '''</h2>

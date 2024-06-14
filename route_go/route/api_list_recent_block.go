@@ -93,7 +93,7 @@ func Api_list_recent_block(call_arg []string) string {
 	defer stmt.Close()
 	defer rows.Close()
 
-	var data_list [][]string
+	data_list := [][]string{}
 	ip_parser_temp := map[string][]string{}
 
 	for rows.Next() {
@@ -168,12 +168,7 @@ func Api_list_recent_block(call_arg []string) string {
 		"end":         tool.Get_language(db, "end", false),
 		"ban":         tool.Get_language(db, "ban", false),
 	}
-
-	if len(data_list) == 0 {
-		return_data["data"] = map[string]string{}
-	} else {
-		return_data["data"] = data_list
-	}
+	return_data["data"] = data_list
 
 	auth_name := tool.Get_user_auth(db, other_set["ip"])
 	auth_info := tool.Get_auth_group_info(db, auth_name)

@@ -733,27 +733,40 @@ def set_init_always(conn, ver_num, run_mode):
         m_curs = m_conn.cursor()
         curs = conn.cursor()
 
+        # 버전 기입
         curs.execute(db_change('delete from other where name = "ver"'))
         curs.execute(db_change('insert into other (name, data, coverage) values ("ver", ?, "")'), [ver_num])
         
+        # 기본 권한 그룹 설정
         curs.execute(db_change('delete from alist where name = "owner"'))
         curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
 
+        curs.execute(db_change('delete from alist where name = "user"'))
+        curs.execute(db_change('insert into alist (name, acl) values ("user", "user")'))
+
+        curs.execute(db_change('delete from alist where name = "ip"'))
+        curs.execute(db_change('insert into alist (name, acl) values ("ip", "ip")'))
+
+        # 이미지 폴더 없으면 생성
         if not os.path.exists(load_image_url(conn)):
             os.makedirs(load_image_url(conn))
 
+        # 비밀키 없으면 생성
         curs.execute(db_change('select data from other where name = "key"'))
         if not curs.fetchall():
             curs.execute(db_change('insert into other (name, data, coverage) values ("key", ?, "")'), [load_random_key()])
-            
+
+        # 솔트키 없으면 생성
         curs.execute(db_change('select data from other where name = "salt_key"'))
         if not curs.fetchall():
             curs.execute(db_change('insert into other (name, data, coverage) values ("salt_key", ?, "")'), [load_random_key(4)])
 
+        # 문서 전체 갯수 없으면 생성
         curs.execute(db_change('select data from other where name = "count_all_title"'))
         if not curs.fetchall():
             curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", "0", "")'))
             
+        # 위키 접근 비밀번호 있으면 temp DB로 넘겨줌
         curs.execute(db_change('select data from other where name = "wiki_access_password_need"'))
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
@@ -762,19 +775,20 @@ def set_init_always(conn, ver_num, run_mode):
             if db_data:
                 m_curs.execute('insert into temp (name, data) values ("wiki_access_password", ?)', [db_data[0][0]])
 
-        if run_mode == '':
-            exe_type = ''
-            if platform.system() == 'Linux':
-                if platform.machine() in ["AMD64", "x86_64"]:
-                    exe_type = 'main.amd64.bin'
-                else:
-                    exe_type = 'main.arm64.bin'
+        # OS마다 실행 파일 설정
+        exe_type = ''
+        if platform.system() == 'Linux':
+            if platform.machine() in ["AMD64", "x86_64"]:
+                exe_type = 'main.amd64.bin'
             else:
-                if platform.machine() in ["AMD64", "x86_64"]:
-                    exe_type = 'main.amd64.exe'
-                else:
-                    exe_type = 'main.arm64.exe'
+                exe_type = 'main.arm64.bin'
+        else:
+            if platform.machine() in ["AMD64", "x86_64"]:
+                exe_type = 'main.amd64.exe'
+            else:
+                exe_type = 'main.arm64.exe'
 
+        if run_mode == '':
             exe_path = os.path.join('.', 'route_go', 'bin')
 
             for for_a in os.listdir(exe_path):
@@ -808,7 +822,7 @@ def set_init(conn):
 # Func-simple
 ## Func-simple-without_DB
 def get_default_admin_group():
-    return ['owner', 'user', 'ban']
+    return ['owner', 'user', 'ip', 'ban']
 
 def get_default_robots_txt(conn):
     data = '' + \
@@ -1182,7 +1196,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v264'
+    return '.cache_v266'
 
 def wiki_css(data):
     with class_temp_db() as m_conn:

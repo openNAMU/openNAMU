@@ -37,7 +37,7 @@ func Api_list_title_index(call_arg []string) string {
 	}
 	defer rows.Close()
 
-	var data_list []string
+	data_list := []string{}
 
 	for rows.Next() {
 		var title string
@@ -51,12 +51,7 @@ func Api_list_title_index(call_arg []string) string {
 	}
 
 	return_data := make(map[string]interface{})
-
-	if len(data_list) == 0 {
-		return_data["data"] = map[string]string{}
-	} else {
-		return_data["data"] = data_list
-	}
+	return_data["data"] = data_list
 
 	json_data, _ := json.Marshal(return_data)
 	return string(json_data)

@@ -45,7 +45,7 @@ func Api_user_watch_list(call_arg []string) string {
 	}
 	defer rows.Close()
 
-	var data_list []string
+	data_list := []string{}
 
 	for rows.Next() {
 		var title_data string
@@ -63,12 +63,7 @@ func Api_user_watch_list(call_arg []string) string {
 		"watchlist": tool.Get_language(db, "watchlist", false),
 		"star_doc":  tool.Get_language(db, "star_doc", false),
 	}
-
-	if len(data_list) == 0 {
-		return_data["data"] = map[string]string{}
-	} else {
-		return_data["data"] = data_list
-	}
+	return_data["data"] = data_list
 
 	json_data, _ := json.Marshal(return_data)
 	return string(json_data)

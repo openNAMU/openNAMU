@@ -101,9 +101,9 @@ def give_user_ban(name = None, ban_type = ''):
             now = 0
             
             if ban_type == 'multiple':
-                action = 'action="/auth/give/ban_multiple"'
+                action = 'action="/auth/ban/multiple"'
             else:
-                action = 'action="/auth/give/ban"'
+                action = 'action="/auth/ban"'
                 
             date_value = ''
             info_data = ''

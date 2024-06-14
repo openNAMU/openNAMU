@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"strconv"
@@ -21,67 +22,40 @@ func Api_search(call_arg []string) string {
 	db := tool.DB_connect()
 	defer db.Close()
 
+	var stmt *sql.Stmt
+	var err error
 	if other_set["search_type"] == "title" {
-		stmt, err := db.Prepare(tool.DB_change("select title from data where title collate nocase like ? order by title limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select title from data where title collate nocase like ? order by title limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
-		}
-		defer stmt.Close()
-
-		var title string
-		var title_list []string
-
-		rows, err := stmt.Query("%"+other_set["name"]+"%", num)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			err := rows.Scan(&title)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			title_list = append(title_list, title)
-		}
-
-		if len(title_list) == 0 {
-			return "{}"
-		} else {
-			json_data, _ := json.Marshal(title_list)
-			return string(json_data)
 		}
 	} else {
-		stmt, err := db.Prepare(tool.DB_change("select title from data where data collate nocase like ? order by title limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select title from data where data collate nocase like ? order by title limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
-		}
-		defer stmt.Close()
-
-		var title string
-		var title_list []string
-
-		rows, err := stmt.Query("%"+other_set["name"]+"%", num)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			err := rows.Scan(&title)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			title_list = append(title_list, title)
-		}
-
-		if len(title_list) == 0 {
-			return "{}"
-		} else {
-			json_data, _ := json.Marshal(title_list)
-			return string(json_data)
 		}
 	}
+	defer stmt.Close()
+
+	title_list := []string{}
+
+	rows, err := stmt.Query("%"+other_set["name"]+"%", num)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var title string
+
+		err := rows.Scan(&title)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		title_list = append(title_list, title)
+	}
+
+	json_data, _ := json.Marshal(title_list)
+	return string(json_data)
 }

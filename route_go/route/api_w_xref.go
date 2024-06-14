@@ -54,12 +54,12 @@ func Api_w_xref(call_arg []string) string {
 	}
 	defer rows.Close()
 
-	var name string
-	var type_data string
-
-	var data_list [][]string
+	data_list := [][]string{}
 
 	for rows.Next() {
+		var name string
+		var type_data string
+
 		err := rows.Scan(&name, &type_data)
 		if err != nil {
 			log.Fatal(err)

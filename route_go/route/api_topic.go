@@ -78,11 +78,12 @@ func Api_topic(call_arg []string) string {
 		}
 		defer rows.Close()
 
-		var id, data, date, ip, block, top string
-		var data_list [][]string
+		data_list := [][]string{}
 		ip_parser_temp := map[string][]string{}
 
 		for rows.Next() {
+			var id, data, date, ip, block, top string
+
 			err := rows.Scan(&id, &data, &date, &ip, &block, &top)
 			if err != nil {
 				log.Fatal(err)

@@ -34,7 +34,7 @@ from route.filter_all import filter_all
 from route.filter_all_add import filter_all_add
 from route.filter_all_delete import filter_all_delete
 
-from route.give_admin_groups import give_admin_groups_2
+from route.give_admin_groups import give_admin_groups
 from route.give_auth import give_auth
 from route.give_delete_admin_group import give_delete_admin_group_2
 from route.give_user_ban import give_user_ban
@@ -172,6 +172,8 @@ from route.n_bbs_set import bbs_set
 
 from route.n_w_watch_list import w_watch_list
 
+from route.n_user_rankup import user_rankup
+
 from route.n_topic_list import topic_list
 
 from route.n_setting_404_page import setting_404_page
@@ -206,6 +208,7 @@ from route.go_api_setting import api_setting
 from route.go_api_topic import api_topic
 from route.go_api_topic_list import api_topic_list
 
+from route.go_api_user_rankup import api_user_rankup
 from route.go_api_user_setting_editor import api_user_setting_editor
 
 from route.go_api_w_raw import api_w_raw

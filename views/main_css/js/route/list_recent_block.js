@@ -67,7 +67,7 @@ function opennamu_list_recent_block() {
             let ip = data[for_a][1];
             if(data[for_a][7] === '') {
                 if(ban_auth) {
-                    ip = '<a href="/auth/give/ban/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
+                    ip = '<a href="/auth/ban/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
                 }
                 
                 if(data[for_a][8] === '1') {
@@ -75,7 +75,7 @@ function opennamu_list_recent_block() {
                 }
             } else if(data[for_a][7] === 'cidr') {
                 if(ban_auth) {
-                    ip = '<a href="/auth/give/ban_cidr/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
+                    ip = '<a href="/auth/ban_cidr/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
                 }
 
                 if(data[for_a][8] === '1') {
@@ -85,7 +85,7 @@ function opennamu_list_recent_block() {
                 ip += ' (' + lang['cidr'] + ')';
             } else {
                 if(ban_auth) {
-                    ip = '<a href="/auth/give/ban_regex/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
+                    ip = '<a href="/auth/ban_regex/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
                 }
 
                 if(data[for_a][8] === '1') {

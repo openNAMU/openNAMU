@@ -1,7 +1,6 @@
 package route
 
 import (
-	"database/sql"
 	"encoding/json"
 	"log"
 	"opennamu/route/tool"
@@ -17,6 +16,8 @@ func Setting_list() map[string]string {
 	setting_acl["bbs_acl_all"] = ""
 	setting_acl["bbs_edit_acl_all"] = ""
 	setting_acl["bbs_comment_acl_all"] = ""
+
+	setting_acl["rankup_condition"] = ""
 
 	return setting_acl
 }
@@ -44,26 +45,36 @@ func Api_setting(call_arg []string) string {
 			}
 		}
 
-		stmt, err := db.Prepare(tool.DB_change("select data from other where name = ?"))
+		stmt, err := db.Prepare(tool.DB_change("select data, coverage from other where name = ? and coverage = ?"))
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		defer stmt.Close()
 
-		var set_data string
-
-		err = stmt.QueryRow(other_set["set_name"]).Scan(&set_data)
+		rows, err := stmt.Query(other_set["set_name"], val)
 		if err != nil {
-			if err == sql.ErrNoRows {
-				set_data = ""
-			} else {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+
+		data_list := [][]string{}
+
+		for rows.Next() {
+			var set_data string
+			var set_coverage string
+
+			err := rows.Scan(&set_data, &set_coverage)
+			if err != nil {
 				log.Fatal(err)
 			}
+
+			data_list = append(data_list, []string{set_data, set_coverage})
 		}
 
 		return_data := make(map[string]interface{})
 		return_data["response"] = "ok"
-		return_data["data"] = set_data
+		return_data["data"] = data_list
 
 		json_data, _ := json.Marshal(return_data)
 		return string(json_data)

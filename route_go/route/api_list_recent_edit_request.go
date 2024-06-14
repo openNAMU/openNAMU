@@ -40,7 +40,8 @@ func Api_list_recent_edit_request(call_arg []string) string {
 	var doc_rev string
 	var date string
 
-	var data_list [][]string
+	data_list := [][]string{}
+
 	for rows.Next() {
 		err := rows.Scan(&doc_name, &doc_rev, &date)
 		if err != nil {
@@ -107,10 +108,6 @@ func Api_list_recent_edit_request(call_arg []string) string {
 		})
 	}
 
-	if len(data_list) == 0 {
-		return "{}"
-	} else {
-		json_data, _ := json.Marshal(data_list)
-		return string(json_data)
-	}
+	json_data, _ := json.Marshal(data_list)
+	return string(json_data)
 }

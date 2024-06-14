@@ -152,6 +152,7 @@ with get_db_connect() as conn:
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
     if run_mode == 'dev':
         app.config['DEBUG'] = True
+        app.config['ENV'] = 'development'
 
     log = logging.getLogger('hypercorn')
     log.setLevel(logging.ERROR)
@@ -480,17 +481,17 @@ app.route('/list/user/check/delete/<name>/<ip>/<time>/<do_type>', methods = ['PO
 app.route('/auth/give', methods = ['POST', 'GET'])(give_auth)
 app.route('/auth/give/<name>', methods = ['POST', 'GET'])(give_auth)
 
-app.route('/auth/give/ban', methods = ['POST', 'GET'])(give_user_ban)
-app.route('/auth/give/ban/<everything:name>', methods = ['POST', 'GET'])(give_user_ban)
-app.route('/auth/give/ban_cidr/<everything:name>', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'cidr' })(give_user_ban)
-app.route('/auth/give/ban_regex/<everything:name>', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'regex' })(give_user_ban)
-app.route('/auth/give/ban_multiple', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'multiple' })(give_user_ban)
+app.route('/auth/ban', methods = ['POST', 'GET'])(give_user_ban)
+app.route('/auth/ban/multiple', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'multiple' })(give_user_ban)
+app.route('/auth/ban/<everything:name>', methods = ['POST', 'GET'])(give_user_ban)
+app.route('/auth/ban_cidr/<everything:name>', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'cidr' })(give_user_ban)
+app.route('/auth/ban_regex/<everything:name>', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'regex' })(give_user_ban)
 
 # /auth/list
 # /auth/list/add/<name>
 # /auth/list/delete/<name>
 app.route('/auth/list')(list_admin_group_2)
-app.route('/auth/list/add/<name>', methods = ['POST', 'GET'])(give_admin_groups_2)
+app.route('/auth/list/add/<name>', methods = ['POST', 'GET'])(give_admin_groups)
 app.route('/auth/list/delete/<name>', methods = ['POST', 'GET'])(give_delete_admin_group_2)
 
 app.route('/auth/give/fix/<user_name>', methods = ['POST', 'GET'])(give_user_fix)
@@ -630,6 +631,7 @@ app.route('/user')(user_info)
 app.route('/user/<name>')(user_info)
 
 app.route('/challenge', methods = ['GET', 'POST'])(user_challenge)
+app.route('/rankup')(user_rankup)
 
 app.route('/edit_filter/<name>', methods = ['GET', 'POST'])(user_edit_filter)
 
@@ -785,6 +787,7 @@ app.route('/api/v2/set_reset/<everything:name>')(api_w_set_reset)
 
 app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting)
 
+app.route('/api/v2/user/rankup', methods = ['GET', 'PATCH'])(api_user_rankup)
 app.route('/api/v2/user/setting/editor', methods = ['GET', 'POST', 'DELETE'])(api_user_setting_editor)
 
 app.route('/api/v2/ip/<everything:data>', methods = ['GET', 'POST'])(api_func_ip)
@@ -846,5 +849,4 @@ if __name__ == "__main__":
     config = Config()
     config.bind = [f"{server_set['host']}:{server_set['port']}"]
     
-    # hypercorn 서버 실행
     asyncio.run(serve(app, config))
