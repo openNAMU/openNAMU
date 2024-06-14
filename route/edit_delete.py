@@ -5,7 +5,7 @@ def edit_delete(name):
         curs = conn.cursor()
 
         ip = ip_check()
-        if acl_check(conn, name, 'document_delete') == 1:
+        if acl_check(name, 'document_delete') == 1:
             return re_error(conn, '/ban')
 
         curs.execute(db_change("select title from data where title = ?"), [name])

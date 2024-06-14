@@ -4,7 +4,7 @@ def view_xref(name = 'Test', xref_type = 1, num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check(conn, name, 'render') == 1:
+        if acl_check(name, 'render') == 1:
             return re_error(conn, '/ban')
 
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0

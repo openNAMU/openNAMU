@@ -5,7 +5,7 @@ def user_setting_top_menu():
         curs = conn.cursor()
 
         ip = ip_check()
-        if ban_check(conn, ip)[0] == 1:
+        if ban_check(ip)[0] == 1:
             return re_error(conn, '/ban')
 
         if ip_or_user(ip) == 1:

@@ -27,8 +27,8 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             else:
                 return redirect(conn, '/')
                 
-        topic_acl = acl_check(conn, name_value, 'topic', topic_num)
-        topic_view_acl = acl_check(conn, '', 'topic_view', topic_num)
+        topic_acl = acl_check(name_value, 'topic', topic_num)
+        topic_view_acl = acl_check('', 'topic_view', topic_num)
         if topic_view_acl == 1:
             return re_error(conn, '/ban')
 

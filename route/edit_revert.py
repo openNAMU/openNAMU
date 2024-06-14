@@ -8,7 +8,7 @@ def edit_revert(name, num):
         if curs.fetchall() and admin_check(conn, 6) != 1:
             return re_error(conn, '/error/3')
 
-        if acl_check(conn, name, 'document_edit') == 1:
+        if acl_check(name, 'document_edit') == 1:
             return re_error(conn, '/ban')
         
         curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])

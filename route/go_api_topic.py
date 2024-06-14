@@ -124,7 +124,7 @@ async def api_topic(topic_num = 1, tool = 'normal', s_num = '', e_num = ''):
     with get_db_connect() as conn:
         topic_num = str(topic_num)
 
-        if acl_check(conn, '', 'topic_view', topic_num) != 1:
+        if acl_check('', 'topic_view', topic_num) != 1:
             other_set = {}
             other_set["topic_num"] = topic_num
             other_set["tool"] = tool

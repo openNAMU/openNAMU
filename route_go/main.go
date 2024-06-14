@@ -83,6 +83,10 @@ func main() {
 		route_data = route.Api_func_acl_list(call_arg[1:])
 	} else if call_arg[0] == "api_user_rankup" {
 		route_data = route.Api_user_rankup(call_arg[1:])
+	} else if call_arg[0] == "api_func_acl" {
+		route_data = route.Api_func_acl(call_arg[1:])
+	} else if call_arg[0] == "api_func_ban" {
+		route_data = route.Api_func_ban(call_arg[1:])
 	} else {
 		log.Fatal(call_arg[0] + " is 404")
 	}

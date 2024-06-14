@@ -11,17 +11,17 @@ def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', pos
         post_num_str = str(post_num)
 
         if bbs_num != '' and post_num != '':
-            if acl_check(conn, bbs_num_str, 'bbs_view') == 1:
+            if acl_check(bbs_num_str, 'bbs_view') == 1:
                 return re_error(conn, '/ban')
                     
             name = ''
         elif topic_num != '':
             topic_num = str(topic_num)
             
-            if acl_check(conn, '', 'topic_view', topic_num) == 1:
+            if acl_check('', 'topic_view', topic_num) == 1:
                 return re_error(conn, '/ban')
         else:
-            if acl_check(conn, name, 'render') == 1:
+            if acl_check(name, 'render') == 1:
                 return re_error(conn, '/ban')
 
         if num:

@@ -69,7 +69,7 @@ def view_diff(name = 'Test', num_a = 1, num_b = 1):
         first = str(num_a)
         second = str(num_b)
 
-        if acl_check(conn, name, 'render') == 1:
+        if acl_check(name, 'render') == 1:
             return re_error(conn, '/ban')
 
         curs.execute(db_change("select title from history where title = ? and (id = ? or id = ?) and hide = 'O'"), [name, first, second])

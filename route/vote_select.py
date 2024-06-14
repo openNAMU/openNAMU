@@ -14,7 +14,7 @@ def vote_select(num = 1):
         if data_list[0][3] == 'close' or data_list[0][3] == 'n_close':
             return redirect(conn, '/vote/end/' + num)
 
-        if acl_check(conn, '', 'vote', num) == 1:
+        if acl_check('', 'vote', num) == 1:
             return redirect(conn, '/vote/end/' + num)
 
         curs.execute(db_change('select user from vote where id = ? and user = ?'), [num, ip_check()])

@@ -37,7 +37,7 @@ def api_user_info(user_name = ''):
         data_result['max_exp'] = level_data[2]
             
         # ban part
-        ban = ban_check(conn, user_name)
+        ban = ban_check(user_name)
         if ban[0] == 0:
             data_result['ban'] = '0'
         else:

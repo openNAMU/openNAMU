@@ -6,7 +6,7 @@ def give_user_ban(name = None, ban_type = ''):
 
         ip = ip_check()
         
-        if ban_check(conn, ip = ip, tool = 'login')[0] == 1:
+        if ban_check(ip = ip, tool = 'login')[0] == 1:
             if ip_or_user(ip) == 1 or admin_check(conn, 'all', None, ip) == 0:
                 return re_error(conn, '/ban')
         else:

@@ -188,7 +188,7 @@ def view_w(name = 'Test', do_type = ''):
         data = curs.fetchall()
 
         description = ''
-        if acl_check(conn, name, 'render') == 1:
+        if acl_check(name, 'render') == 1:
             response_data = 401
 
             curs.execute(db_change('select data from other where name = "error_401"'))
@@ -216,7 +216,7 @@ def view_w(name = 'Test', do_type = ''):
 
         curs.execute(db_change("select title from acl where title = ?"), [name])
         acl = 1 if curs.fetchall() else 0
-        menu_acl = 1 if acl_check(conn, name, 'document_edit') == 1 else 0
+        menu_acl = 1 if acl_check(name, 'document_edit') == 1 else 0
         if response_data == 404:
             menu += [['edit/' + url_pas(name), get_lang(conn, 'create'), menu_acl]] 
         else:

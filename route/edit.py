@@ -123,9 +123,9 @@ def edit(name = 'Test', section = 0, do_type = ''):
         ip = ip_check()
 
         edit_req_mode = 0
-        if acl_check(conn, name, 'document_edit') == 1:
+        if acl_check(name, 'document_edit') == 1:
             edit_req_mode = 1
-            if acl_check(conn, name, 'document_edit_request') == 1:
+            if acl_check(name, 'document_edit_request') == 1:
                 return redirect(conn, '/raw_acl/' + url_pas(name))
             
         if do_title_length_check(conn, name) == 1:
@@ -136,7 +136,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
         doc_ver = doc_ver[0][0] if doc_ver else '0'
 
         if doc_ver == '0':
-            if acl_check(conn, name, 'document_make_acl') == 1:
+            if acl_check(name, 'document_make_acl') == 1:
                 edit_req_mode = 1
 
         curs.execute(db_change("select set_data from data_set where doc_name = ? and doc_rev = ? and set_name = 'edit_request_data'"), [name, doc_ver])

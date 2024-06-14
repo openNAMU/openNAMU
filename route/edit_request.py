@@ -7,7 +7,7 @@ def edit_request(name = 'Test', do_type = ''):
         curs = conn.cursor()
 
         disabled = ""
-        if acl_check(conn, name, 'document_edit') == 1:
+        if acl_check(name, 'document_edit') == 1:
             disabled = "disabled"
 
         curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
@@ -15,7 +15,7 @@ def edit_request(name = 'Test', do_type = ''):
         doc_ver = doc_ver[0][0] if doc_ver else '0'
 
         if doc_ver == '0':
-            if acl_check(conn, name, 'document_make_acl') == 1:
+            if acl_check(name, 'document_make_acl') == 1:
                 disabled = "disabled"
 
         curs.execute(db_change("select set_data from data_set where doc_name = ? and doc_rev = ? and set_name = 'edit_request_data'"), [name, doc_ver])

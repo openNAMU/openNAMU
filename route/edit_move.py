@@ -4,7 +4,7 @@ def edit_move(name):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check(conn, name, 'document_move') == 1:
+        if acl_check(name, 'document_move') == 1:
             return re_error(conn, '/ban')
         
         if do_title_length_check(conn, name) == 1:
@@ -12,7 +12,7 @@ def edit_move(name):
 
         if flask.request.method == 'POST':
             move_title = flask.request.form.get('title', 'test')
-            if acl_check(conn, move_title) == 1:
+            if acl_check(move_title) == 1:
                 return re_error(conn, '/ban')
 
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:

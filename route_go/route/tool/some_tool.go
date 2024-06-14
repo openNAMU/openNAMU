@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"html/template"
 	"net/url"
+	"time"
 )
 
 func Sha224(data string) string {
@@ -22,4 +23,18 @@ func Url_parser(data string) string {
 
 func HTML_escape(data string) string {
 	return template.HTMLEscapeString(data)
+}
+
+func Arr_in_str(arr []string, data string) bool {
+	for _, v := range arr {
+		if v == data {
+			return true
+		}
+	}
+
+	return false
+}
+
+func Get_time() string {
+	return time.Now().Format("2006-01-02 15:04:05")
 }

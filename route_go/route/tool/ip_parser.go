@@ -61,64 +61,6 @@ func Get_level(db *sql.DB, ip string) []string {
 	return []string{level, exp, max_exp}
 }
 
-func Get_user_auth(db *sql.DB, ip string) string {
-	if !IP_or_user(ip) {
-		var auth string
-
-		stmt, err := db.Prepare(DB_change("select data from user_set where id = ? and name = 'acl'"))
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer stmt.Close()
-
-		err = stmt.QueryRow(ip).Scan(&auth)
-		if err != nil {
-			if err == sql.ErrNoRows {
-				auth = "user"
-			} else {
-				log.Fatal(err)
-			}
-		}
-
-		if auth != "user" && auth != "ban" {
-			return auth
-		} else {
-			return ""
-		}
-	}
-
-	return ""
-}
-
-func Get_auth_group_info(db *sql.DB, auth string) map[string]bool {
-	stmt, err := db.Prepare(DB_change("select name from alist where name = ?"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(auth)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-
-	data_list := map[string]bool{}
-
-	for rows.Next() {
-		var name string
-
-		err := rows.Scan(&name)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		data_list[name] = true
-	}
-
-	return data_list
-}
-
 func IP_preprocess(db *sql.DB, ip string, my_ip string) []string {
 	var ip_view string
 	var user_name_view string

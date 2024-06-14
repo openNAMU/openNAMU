@@ -2,7 +2,7 @@ from .tool.func import *
 
 async def api_w_raw(name = 'Test', rev = '', exist_check = ''):
     with get_db_connect() as conn:
-        if acl_check(conn, name, 'render') != 1:
+        if acl_check(name, 'render') != 1:
             other_set = {}
             other_set["name"] = name
             other_set["rev"] = str(rev)

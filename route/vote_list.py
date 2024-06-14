@@ -30,7 +30,7 @@ def vote_list(list_type = 'normal', num = 1):
         data += '</ul>'
         menu = []
         if list_type == 'normal':
-            menu = [["vote/add", get_lang(conn, 'add_vote')]] if acl_check(conn, '', 'vote') != 1 else []
+            menu = [["vote/add", get_lang(conn, 'add_vote')]] if acl_check('', 'vote') != 1 else []
             data += next_fix(conn, '/vote/list/', num, data_list)
         else:
             data += next_fix(conn, '/vote/list/close/', num, data_list)

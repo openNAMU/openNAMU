@@ -70,7 +70,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
 
         bbs_num_str = str(bbs_num)
         post_num_str = str(post_num)
-        bbs_comment_acl = acl_check(conn, bbs_num_str, 'bbs_comment')
+        bbs_comment_acl = acl_check(bbs_num_str, 'bbs_comment')
         ip = ip_check()
 
         temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
@@ -115,7 +115,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
 
                 return redirect(conn, '/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + id_data)
             else:
-                if acl_check(conn, bbs_num_str, 'bbs_view') == 1:
+                if acl_check(bbs_num_str, 'bbs_view') == 1:
                     return re_error(conn, '/ban')
 
                 text = ''
@@ -233,7 +233,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
 
                 return redirect(conn, '/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id)
             else:
-                if acl_check(conn, bbs_num_str, 'bbs_view') == 1:
+                if acl_check(bbs_num_str, 'bbs_view') == 1:
                     return re_error(conn, '/ban')
                     
                 text = ''

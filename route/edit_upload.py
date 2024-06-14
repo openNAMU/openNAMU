@@ -4,7 +4,7 @@ def edit_upload():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check(conn, '', 'upload') == 1:
+        if acl_check('', 'upload') == 1:
             return re_error(conn, '/ban')
         
         curs.execute(db_change('select data from other where name = "upload"'))
@@ -31,7 +31,7 @@ def edit_upload():
             if file_len == 1:
                 file_num = None
             else:
-                if acl_check(conn, '', 'many_upload') == 1:
+                if acl_check('', 'many_upload') == 1:
                     return re_error(conn, '/ban')
 
                 file_num = 1

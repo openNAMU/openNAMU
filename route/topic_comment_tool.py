@@ -7,7 +7,7 @@ def topic_comment_tool(topic_num = 1, num = 1):
         num = str(num)
         topic_num = str(topic_num)
         
-        if acl_check(conn, '', 'topic_view', topic_num) == 1:
+        if acl_check('', 'topic_view', topic_num) == 1:
             return re_error(conn, '/ban')
 
         curs.execute(db_change("select block, ip, date from topic where code = ? and id = ?"), [topic_num, num])

@@ -33,7 +33,7 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
             else:
                 return redirect(conn, '/bbs/main')
             
-        if acl_check(conn, bbs_num_str, 'bbs_edit') == 1:
+        if acl_check(bbs_num_str, 'bbs_edit') == 1:
             return redirect(conn, '/bbs/set/' + bbs_num_str)
         
         i_list = ['post_view_acl', 'post_comment_acl']

@@ -4,7 +4,7 @@ def vote_add():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check(conn, '', 'vote') == 1:
+        if acl_check('', 'vote') == 1:
             return re_error(conn, '/ban')
 
         if flask.request.method == 'POST':
