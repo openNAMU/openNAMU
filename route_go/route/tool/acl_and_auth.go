@@ -740,39 +740,180 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			}
+		}
 
-			if acl_data == "" {
-				if tool == "recaptcha" {
-					acl_data = "admin"
-				} else if tool == "slow_edit" || tool == "edit_bottom_compulsion" {
-					acl_data = "not_all"
-				} else {
-					acl_data = "normal"
+		if acl_data == "" {
+			if tool == "recaptcha" {
+				acl_data = "admin"
+			} else if tool == "slow_edit" || tool == "edit_bottom_compulsion" {
+				acl_data = "not_all"
+			} else {
+				acl_data = "normal"
+			}
+		}
+
+		except_ban_tool_list := []string{"render", "topic_view", "bbs_view"}
+		if acl_data != "normal" {
+			if !(acl_data == "ban" || acl_data == "ban_admin") && !Arr_in_str(except_ban_tool_list, tool) {
+				if get_ban == "true" {
+					return false
 				}
 			}
 
-			except_ban_tool_list := []string{"render", "topic_view", "bbs_view"}
-			if acl_data != "normal" {
-				if !(acl_data == "ban" || acl_data == "ban_admin") && !Arr_in_str(except_ban_tool_list, tool) {
-					if get_ban == "true" {
-						return false
+			if auth_info[acl_pass_auth] {
+				return true
+			} else if acl_data == "all" || acl_data == "ban" {
+				return true
+			} else if acl_data == "user" {
+				if !ip_or_user {
+					return true
+				}
+			} else if acl_data == "admin" {
+				if auth_info["admin_default_feature"] {
+					return true
+				}
+			} else if acl_data == "50_edit" {
+				if !ip_or_user {
+					stmt, err := db.Prepare(DB_change("select count(*) from history where ip = ?"))
+					if err != nil {
+						log.Fatal(err)
+					}
+					defer stmt.Close()
+
+					var count int
+
+					err = stmt.QueryRow(ip).Scan(&count)
+					if err != nil {
+						if err == sql.ErrNoRows {
+							count = 0
+						} else {
+							log.Fatal(err)
+						}
+					}
+
+					if count >= 50 {
+						return true
+					}
+				}
+			} else if acl_data == "before" {
+				stmt, err := db.Prepare(DB_change("select ip from history where title = ? and ip = ?"))
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer stmt.Close()
+
+				var exist string
+
+				err = stmt.QueryRow(name, ip).Scan(&exist)
+				if err != nil {
+					if err == sql.ErrNoRows {
+						exist = ""
+					} else {
+						log.Fatal(err)
 					}
 				}
 
-				if auth_info[acl_pass_auth] {
+				if exist != "" {
 					return true
-				} else if acl_data == "all" || acl_data == "ban" {
-					return true
-				} else if acl_data == "user" {
-					if !ip_or_user {
+				}
+			} else if acl_data == "30_day" || acl_data == "90_day" {
+				if !ip_or_user {
+					stmt, err := db.Prepare(DB_change("select data from user_set where id = ? and name = 'date'"))
+					if err != nil {
+						log.Fatal(err)
+					}
+					defer stmt.Close()
+
+					var signup_date string
+
+					err = stmt.QueryRow(ip).Scan(&signup_date)
+					if err != nil {
+						if err == sql.ErrNoRows {
+							signup_date = Get_time()
+						} else {
+							log.Fatal(err)
+						}
+					}
+
+					time_1, _ := time.Parse("2006-01-02 15:04:05", signup_date)
+					if acl_data == "30_day" {
+						time_1 = time_1.AddDate(0, 0, 30)
+					} else {
+						time_1 = time_1.AddDate(0, 0, 90)
+					}
+
+					time_2, _ := time.Parse("2006-01-02 15:04:05", Get_time())
+					if time_2.After(time_1) {
 						return true
 					}
-				} else if acl_data == "admin" {
-					if auth_info["admin_default_feature"] {
+				}
+			} else if acl_data == "email" {
+				if !ip_or_user {
+					stmt, err := db.Prepare(DB_change("select data from user_set where id = ? and name = 'email'"))
+					if err != nil {
+						log.Fatal(err)
+					}
+					defer stmt.Close()
+
+					var exist string
+
+					err = stmt.QueryRow(ip).Scan(&exist)
+					if err != nil {
+						if err == sql.ErrNoRows {
+							exist = ""
+						} else {
+							log.Fatal(err)
+						}
+					}
+
+					if exist != "" {
 						return true
 					}
-				} else if acl_data == "50_edit" {
-					if !ip_or_user {
+				}
+			} else if acl_data == "owner" {
+				if auth_info["owner"] {
+					return true
+				}
+			} else if acl_data == "ban_admin" {
+				if auth_info["admin_default_feature"] || get_ban == "true" {
+					return true
+				}
+			} else if acl_data == "not_all" {
+				return false
+			} else if acl_data == "up_to_level_3" || acl_data == "up_to_level_10" {
+				if acl_data == "up_to_level_3" {
+					if level_int >= 3 {
+						return true
+					}
+				} else if acl_data == "up_to_level_10" {
+					if level_int >= 10 {
+						return true
+					}
+				}
+			} else if acl_data == "30_day_50_edit" {
+				if !ip_or_user {
+					stmt, err := db.Prepare(DB_change("select data from user_set where id = ? and name = 'date'"))
+					if err != nil {
+						log.Fatal(err)
+					}
+					defer stmt.Close()
+
+					var signup_date string
+
+					err = stmt.QueryRow(ip).Scan(&signup_date)
+					if err != nil {
+						if err == sql.ErrNoRows {
+							signup_date = Get_time()
+						} else {
+							log.Fatal(err)
+						}
+					}
+
+					time_1, _ := time.Parse("2006-01-02 15:04:05", signup_date)
+					time_1 = time_1.AddDate(0, 0, 30)
+
+					time_2, _ := time.Parse("2006-01-02 15:04:05", Get_time())
+					if time_2.After(time_1) {
 						stmt, err := db.Prepare(DB_change("select count(*) from history where ip = ?"))
 						if err != nil {
 							log.Fatal(err)
@@ -794,187 +935,46 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 							return true
 						}
 					}
-				} else if acl_data == "before" {
-					stmt, err := db.Prepare(DB_change("select ip from history where title = ? and ip = ?"))
-					if err != nil {
-						log.Fatal(err)
-					}
-					defer stmt.Close()
+				}
+			}
 
-					var exist string
-
-					err = stmt.QueryRow(name, ip).Scan(&exist)
-					if err != nil {
-						if err == sql.ErrNoRows {
-							exist = ""
-						} else {
-							log.Fatal(err)
-						}
-					}
-
-					if exist != "" {
-						return true
-					}
-				} else if acl_data == "30_day" || acl_data == "90_day" {
-					if !ip_or_user {
-						stmt, err := db.Prepare(DB_change("select data from user_set where id = ? and name = 'date'"))
-						if err != nil {
-							log.Fatal(err)
-						}
-						defer stmt.Close()
-
-						var signup_date string
-
-						err = stmt.QueryRow(ip).Scan(&signup_date)
-						if err != nil {
-							if err == sql.ErrNoRows {
-								signup_date = Get_time()
-							} else {
-								log.Fatal(err)
-							}
-						}
-
-						time_1, _ := time.Parse("2006-01-02 15:04:05", signup_date)
-						if acl_data == "30_day" {
-							time_1 = time_1.AddDate(0, 0, 30)
-						} else {
-							time_1 = time_1.AddDate(0, 0, 90)
-						}
-
-						time_2, _ := time.Parse("2006-01-02 15:04:05", Get_time())
-						if time_2.After(time_1) {
-							return true
-						}
-					}
-				} else if acl_data == "email" {
-					if !ip_or_user {
-						stmt, err := db.Prepare(DB_change("select data from user_set where id = ? and name = 'email'"))
-						if err != nil {
-							log.Fatal(err)
-						}
-						defer stmt.Close()
-
-						var exist string
-
-						err = stmt.QueryRow(ip).Scan(&exist)
-						if err != nil {
-							if err == sql.ErrNoRows {
-								exist = ""
-							} else {
-								log.Fatal(err)
-							}
-						}
-
-						if exist != "" {
-							return true
-						}
-					}
-				} else if acl_data == "owner" {
-					if auth_info["owner"] {
-						return true
-					}
-				} else if acl_data == "ban_admin" {
-					if auth_info["admin_default_feature"] || get_ban == "true" {
-						return true
-					}
-				} else if acl_data == "not_all" {
+			return false
+		} else if for_a == end_number-1 {
+			if !Arr_in_str(except_ban_tool_list, tool) {
+				if get_ban == "true" {
 					return false
-				} else if acl_data == "up_to_level_3" || acl_data == "up_to_level_10" {
-					if acl_data == "up_to_level_3" {
-						if level_int >= 3 {
-							return true
-						}
-					} else if acl_data == "up_to_level_10" {
-						if level_int >= 10 {
-							return true
-						}
-					}
-				} else if acl_data == "30_day_50_edit" {
-					if !ip_or_user {
-						stmt, err := db.Prepare(DB_change("select data from user_set where id = ? and name = 'date'"))
-						if err != nil {
-							log.Fatal(err)
-						}
-						defer stmt.Close()
-
-						var signup_date string
-
-						err = stmt.QueryRow(ip).Scan(&signup_date)
-						if err != nil {
-							if err == sql.ErrNoRows {
-								signup_date = Get_time()
-							} else {
-								log.Fatal(err)
-							}
-						}
-
-						time_1, _ := time.Parse("2006-01-02 15:04:05", signup_date)
-						time_1 = time_1.AddDate(0, 0, 30)
-
-						time_2, _ := time.Parse("2006-01-02 15:04:05", Get_time())
-						if time_2.After(time_1) {
-							stmt, err := db.Prepare(DB_change("select count(*) from history where ip = ?"))
-							if err != nil {
-								log.Fatal(err)
-							}
-							defer stmt.Close()
-
-							var count int
-
-							err = stmt.QueryRow(ip).Scan(&count)
-							if err != nil {
-								if err == sql.ErrNoRows {
-									count = 0
-								} else {
-									log.Fatal(err)
-								}
-							}
-
-							if count >= 50 {
-								return true
-							}
-						}
-					}
 				}
+			}
 
-				return false
-			} else if for_a == end_number-1 {
-				if !Arr_in_str(except_ban_tool_list, tool) {
-					if get_ban == "true" {
-						return false
-					}
+			if tool == "topic" {
+				stmt, err := db.Prepare(DB_change("select title from rd where code = ? and stop != ''"))
+				if err != nil {
+					log.Fatal(err)
 				}
+				defer stmt.Close()
 
-				if tool == "topic" {
-					stmt, err := db.Prepare(DB_change("select title from rd where code = ? and stop != ''"))
-					if err != nil {
+				var topic_state string
+
+				err = stmt.QueryRow(topic_number).Scan(&topic_state)
+				if err != nil {
+					if err == sql.ErrNoRows {
+						topic_state = ""
+					} else {
 						log.Fatal(err)
 					}
-					defer stmt.Close()
+				}
 
-					var topic_state string
-
-					err = stmt.QueryRow(topic_number).Scan(&topic_state)
-					if err != nil {
-						if err == sql.ErrNoRows {
-							topic_state = ""
-						} else {
-							log.Fatal(err)
-						}
-					}
-
-					if topic_state != "" {
-						if auth_info["topic"] {
-							return true
-						} else {
-							return false
-						}
-					} else {
+				if topic_state != "" {
+					if auth_info["topic"] {
 						return true
+					} else {
+						return false
 					}
 				} else {
 					return true
 				}
+			} else {
+				return true
 			}
 		}
 	}
