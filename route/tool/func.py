@@ -137,10 +137,19 @@ def python_to_golang_sync(func_name, other_set = {}):
     )
     stdout, stderr = process.communicate()
     
-    data = stdout.decode('utf8')
-    err = stderr.decode('utf8')
-    if err != '':
-        print(err)
+    while 1:
+        try:
+            data = stdout.decode('utf8')
+            err = stderr.decode('utf8')
+            if err != '':
+                if 'database is locked' in err:
+                    raise
+                else:
+                    print(err)
+
+            break
+        except:
+            time.sleep(0.01)
 
     return data
 
@@ -161,15 +170,16 @@ async def python_to_golang(func_name, other_set = {}):
         else:
             cmd = [os.path.join(".", "route_go", "bin", "main.arm64.exe"), func_name, other_set]
 
+    
+    process = await asyncio.create_subprocess_exec(
+        *cmd,
+        stdout = asyncio.subprocess.PIPE,
+        stderr = asyncio.subprocess.PIPE
+    )
+    stdout, stderr = await process.communicate()
+
     while 1:
         try:
-            process = await asyncio.create_subprocess_exec(
-                *cmd,
-                stdout = asyncio.subprocess.PIPE,
-                stderr = asyncio.subprocess.PIPE
-            )
-            stdout, stderr = await process.communicate()
-
             data = stdout.decode('utf8')
             err = stderr.decode('utf8')
             if err != '':
@@ -180,7 +190,7 @@ async def python_to_golang(func_name, other_set = {}):
 
             break
         except:
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.01)
 
     return data
 
