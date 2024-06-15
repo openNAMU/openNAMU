@@ -81,12 +81,7 @@ func Api_bbs_list(call_arg []string) string {
 		"thread_base":  tool.Get_language(db, "thread_base", false),
 		"comment_base": tool.Get_language(db, "comment_base", false),
 	}
-
-	if len(data_list_sub) == 0 {
-		return_data["data"] = map[string]string{}
-	} else {
-		return_data["data"] = data_list_sub
-	}
+	return_data["data"] = data_list_sub
 
 	json_data, _ := json.Marshal(return_data)
 	return string(json_data)

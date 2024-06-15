@@ -68,10 +68,6 @@ func Api_w_xref(call_arg []string) string {
 		data_list = append(data_list, []string{name, type_data})
 	}
 
-	if len(data_list) == 0 {
-		return "{}"
-	} else {
-		json_data, _ := json.Marshal(data_list)
-		return string(json_data)
-	}
+	json_data, _ := json.Marshal(data_list)
+	return string(json_data)
 }
