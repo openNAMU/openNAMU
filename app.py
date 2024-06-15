@@ -718,8 +718,8 @@ app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on' 
 app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>')(api_w_raw)
 app.route('/api/raw/<everything:name>')(api_w_raw)
 
-app.route('/api/xref/<int:num>/<everything:name>')(api_w_xref)
-app.route('/api/xref_this/<int:num>/<everything:name>', defaults = { 'xref_type' : '2' })(api_w_xref)
+app.route('/api/xref/<int:page>/<everything:name>')(api_w_xref)
+app.route('/api/xref_this/<int:page>/<everything:name>', defaults = { 'xref_type' : '2' })(api_w_xref)
 
 app.route('/api/random')(api_w_random)
 
