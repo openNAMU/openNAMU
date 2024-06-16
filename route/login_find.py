@@ -5,7 +5,7 @@ def login_find():
         return easy_minify(conn, flask.render_template(skin_check(conn),
             imp = [get_lang(conn, 'password_search'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
             data = '''
-                <ul class="opennamu_ul">
+                <ul>
                     <li><a href="/login/find/email">''' + get_lang(conn, 'email') + '''</a></li>
                     <li><a href="/login/find/key">''' + get_lang(conn, 'key') + '''</a></li>
                 </ul>

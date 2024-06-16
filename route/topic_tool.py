@@ -45,14 +45,14 @@ def topic_tool(topic_num = 1):
         if admin_check(conn, 3) == 1:
             data = '''
                 <h2>''' + get_lang(conn, 'admin_tool') + '''</h2>
-                <ul class="opennamu_ul">
+                <ul>
                     <li><a href="/thread/''' + topic_num + '/setting">' + get_lang(conn, 'topic_setting') + '''</a></li>
                     <li><a href="/thread/''' + topic_num + '/acl">' + get_lang(conn, 'topic_acl_setting') + '''</a></li>
                 </ul>
             '''
         data += '''
             <h2>''' + get_lang(conn, 'tool') + '''</h2>
-            <ul class="opennamu_ul">
+            <ul>
                 <li>''' + get_lang(conn, 'topic_state') + ''' : ''' + t_state + '''</li>
                 <li>''' + get_lang(conn, 'topic_acl') + ''' : <a href="/acl/TEST#exp">''' + acl_state + '''</a></li>
                 <li>''' + get_lang(conn, 'topic_view_acl') + ''' : <a href="/acl/TEST#exp">''' + acl_view_state + '''</a></li>
@@ -62,7 +62,7 @@ def topic_tool(topic_num = 1):
         if admin_check(conn, None) == 1:
             data += '''
                 <h2>''' + get_lang(conn, 'owner') + '''</h2>
-                <ul class="opennamu_ul">
+                <ul>
                     <li>
                         <a href="/thread/''' + topic_num + '''/delete">
                             ''' + get_lang(conn, 'topic_delete') + '''

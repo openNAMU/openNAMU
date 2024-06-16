@@ -6,7 +6,7 @@ def list_no_link(num = 1):
         
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
         
-        div = '<ul class="opennamu_ul">'
+        div = '<ul>'
         
         curs.execute(db_change("select doc_name, set_data from data_set where set_name = 'link_count' and doc_rev = '' and set_data = '0' limit ?, 50"), [sql_num])
         n_list = curs.fetchall()

@@ -9,7 +9,7 @@ def bbs_w_comment_tool(bbs_num = '', post_num = '', comment_num = ''):
         
         data += '''
             <h2>''' + get_lang(conn, 'tool') + '''</h2>
-            <ul class="opennamu_ul">
+            <ul>
                 <li><a href="/bbs/raw/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '/' + url_pas(comment_num) + '">' + get_lang(conn, 'raw') + '''</a></li>
                 <li><a href="/bbs/edit/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '/' + url_pas(comment_num) + '">' + get_lang(conn, 'edit') + '''</a></li>
             </ul>
@@ -18,7 +18,7 @@ def bbs_w_comment_tool(bbs_num = '', post_num = '', comment_num = ''):
         if admin_check(conn) == 1:
             data += '''
                 <h3>''' + get_lang(conn, 'owner') + '''</h2>
-                <ul class="opennamu_ul">
+                <ul>
                     <li><a href="/bbs/delete/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '/' + url_pas(comment_num) + '">' + get_lang(conn, 'delete') + '''</a></li>
                 </ul>
             '''

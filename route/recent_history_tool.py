@@ -8,7 +8,7 @@ def recent_history_tool(name = 'Test', rev = 1):
 
         data = '' + \
             '<h2>' + get_lang(conn, 'tool') + '</h2>' + \
-            '<ul class="opennamu_ul">' + \
+            '<ul>' + \
                 '<li><a href="/raw_rev/' + num + '/' + url_pas(name) + '">' + get_lang(conn, 'raw') + '</a></li>' + \
         ''
 
@@ -24,7 +24,7 @@ def recent_history_tool(name = 'Test', rev = 1):
 
         if admin_check(conn, 6) == 1:
             data += '<h3>' + get_lang(conn, 'admin') + '</h3>'
-            data += '<ul class="opennamu_ul">'
+            data += '<ul>'
             curs.execute(db_change('select title from history where title = ? and id = ? and hide = "O"'), [name, num])
             data += '<li><a href="/history_hidden/' + num + '/' + url_pas(name) + '">'
             if curs.fetchall():
@@ -37,7 +37,7 @@ def recent_history_tool(name = 'Test', rev = 1):
 
         if admin_check(conn) == 1:
             data += '<h3>' + get_lang(conn, 'owner') + '</h3>'
-            data += '<ul class="opennamu_ul">'
+            data += '<ul>'
             data += '<li><a href="/history_delete/' + num + '/' + url_pas(name) + '">' + get_lang(conn, 'history_delete') + '</a></li>'
             data += '<li><a href="/history_send/' + num + '/' + url_pas(name) + '">' + get_lang(conn, 'send_edit') + '</a></li>'
             data += '</ul>'

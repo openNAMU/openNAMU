@@ -75,11 +75,11 @@
 }
 
 /* list */
-.opennamu_main .opennamu_ul {
+.opennamu_main ul {
     padding-left: 20px;
 }
 
-.opennamu_main .opennamu_ul li {
+.opennamu_main ul li {
     margin-left: 20px;
 
     margin-top: 5px;

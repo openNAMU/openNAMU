@@ -16,7 +16,7 @@ def view_xref(name = 'Test', xref_type = 1, num = 1):
             div = '<a href="/xref/' + url_pas(name) + '">(' + get_lang(conn, 'normal') + ')</a><hr class="main_hr">'
             data_sub = '(' + get_lang(conn, 'link_in_this') + ')'
 
-        div += '<ul class="opennamu_ul">'
+        div += '<ul>'
 
         curs.execute(db_change('select data from other where name = "link_case_insensitive"'))
         db_data = curs.fetchall()

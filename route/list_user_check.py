@@ -173,7 +173,7 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
                 div += '<li><a href="/list/user/check/' + url_pas(for_a[0]) + '/simple">' + for_a[0] + '</a></li>'
 
             if div != '':
-                div = '<ul class="opennamu_ul">' + div + '</ul>'
+                div = '<ul>' + div + '</ul>'
                 div += next_fix(conn, 
                     '/list/user/check/' + url_pas(name) + '/' + check_type + '/', 
                     num, 

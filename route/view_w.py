@@ -68,7 +68,7 @@ def view_w(name = 'Test', do_type = ''):
             if category_sub != '':
                 category_total += '' + \
                     '<h2 id="cate_under">' + get_lang(conn, 'under_category') + '</h2>' + \
-                    '<ul class="opennamu_ul">' + \
+                    '<ul>' + \
                         '<li>' + get_lang(conn, 'all') + ' : ' + str(count_sub_category) + '</li>' + \
                         category_sub + \
                     '</ul>' + \
@@ -77,7 +77,7 @@ def view_w(name = 'Test', do_type = ''):
             if category_doc != '':
                 category_total += '' + \
                     '<h2 id="cate_normal">' + get_lang(conn, 'category_title') + '</h2>' + \
-                    '<ul class="opennamu_ul">' + \
+                    '<ul>' + \
                         '<li>' + get_lang(conn, 'all') + ' : ' + str(count_category) + '</li>' + \
                         category_doc + \
                     '</ul>' + \
@@ -194,18 +194,18 @@ def view_w(name = 'Test', do_type = ''):
             curs.execute(db_change('select data from other where name = "error_401"'))
             sql_d = curs.fetchall()
             if sql_d and sql_d[0][0] != '':
-                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul class="opennamu_ul"><li>' + sql_d[0][0] + '</li></ul>'
+                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul><li>' + sql_d[0][0] + '</li></ul>'
             else:
-                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul class="opennamu_ul"><li>' + get_lang(conn, 'authority_error') + '</li></ul>'
+                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul><li>' + get_lang(conn, 'authority_error') + '</li></ul>'
         elif not data:
             response_data = 404
 
             curs.execute(db_change('select data from other where name = "error_404"'))
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
-                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul class="opennamu_ul"><li>' + db_data[0][0] + '</li></ul>'
+                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul><li>' + db_data[0][0] + '</li></ul>'
             else:
-                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul class="opennamu_ul"><li>' + get_lang(conn, 'decument_404_error') + '</li></ul>'
+                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul><li>' + get_lang(conn, 'decument_404_error') + '</li></ul>'
 
             curs.execute(db_change('select ip from history where title = ? limit 1'), [name])
             db_data = curs.fetchall()

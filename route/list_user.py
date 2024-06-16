@@ -6,7 +6,7 @@ def list_user(arg_num = 1):
 
         sql_num = (arg_num * 50 - 50) if arg_num * 50 > 0 else 0
 
-        list_data = '<ul class="opennamu_ul">'
+        list_data = '<ul>'
 
         curs.execute(db_change("select id, data from user_set where name = 'date' order by data desc limit ?, 50"), [sql_num])
         user_list = curs.fetchall()

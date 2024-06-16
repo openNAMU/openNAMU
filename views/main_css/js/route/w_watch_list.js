@@ -17,7 +17,7 @@ function opennamu_w_watch_list() {
         let data_html = '<a href="/doc_watch_list/1/' + doc_name + '">(' + lang['watchlist'] + ')</a> <a href="/doc_star_doc/1/' + doc_name + '">(' + lang['star_doc'] + ')</a>';
         data_html += '<hr class="main_hr">'
 
-        data_html += '<ul class="opennamu_ul">';
+        data_html += '<ul>';
         for(let for_a = 0; for_a < data.length; for_a++) {
             data_html += '<li>' + data[for_a][1] + '</li>';
         }

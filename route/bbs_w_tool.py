@@ -11,7 +11,7 @@ def bbs_w_tool(bbs_num = '', post_num = ''):
         
         data += '''
             <h2>''' + get_lang(conn, 'tool') + '''</h2>
-            <ul class="opennamu_ul">
+            <ul>
                 <li><a href="/bbs/raw/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + get_lang(conn, 'raw') + '''</a></li>
             </ul>
         '''
@@ -22,7 +22,7 @@ def bbs_w_tool(bbs_num = '', post_num = ''):
 
             data += '''
                 <h3>''' + get_lang(conn, 'admin') + '''</h3>
-                <ul class="opennamu_ul">
+                <ul>
                     <!-- <li><a href="/bbs/blind/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + get_lang(conn, 'hide') + '''</a></li> -->
                     <li><a href="/bbs/pinned/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + pinned + '''</a></li>
                 </ul>
@@ -30,7 +30,7 @@ def bbs_w_tool(bbs_num = '', post_num = ''):
 
             data += '''
                 <h3>''' + get_lang(conn, 'owner') + '''</h2>
-                <ul class="opennamu_ul">
+                <ul>
                     <li><a href="/bbs/delete/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + get_lang(conn, 'delete') + '''</a></li>
                 </ul>
             '''

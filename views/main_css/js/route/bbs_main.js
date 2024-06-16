@@ -12,7 +12,7 @@ function opennamu_bbs_main() {
         }).then(function(data) {
             data = data["data"];
 
-            let data_html = '<ul class="opennamu_ul">';
+            let data_html = '<ul>';
             let bbs_id_to_name = {};
 
             for(let key in bbs_list) {
