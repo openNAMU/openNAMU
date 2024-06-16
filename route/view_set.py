@@ -197,7 +197,7 @@ def view_set(name = 'Test', multiple = False):
             data += '''
                 <h3>''' + get_lang(conn, 'explanation') + '''</h3>
                 <span id="exp"></span>
-                <ul class="opennamu_ul">
+                <ul>
                     <li>normal : ''' + get_lang(conn, 'unset') + '''</li>
                     <li>admin : ''' + get_lang(conn, 'admin_acl') + '''</li>
                     <li>user : ''' + get_lang(conn, 'member_acl') + '''</li>

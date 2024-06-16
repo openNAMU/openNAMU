@@ -1206,7 +1206,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v266'
+    return '.cache_v267'
 
 def wiki_css(data):
     with class_temp_db() as m_conn:
@@ -2360,7 +2360,7 @@ def re_error(conn, data):
         if ban_check()[0] == 1:
             end = '<div id="opennamu_get_user_info">' + html.escape(ip_check()) + '</div>'
         else:
-            end = '<ul class="opennamu_ul"><li>' + get_lang(conn, 'authority_error') + '</li></ul>'
+            end = '<ul><li>' + get_lang(conn, 'authority_error') + '</li></ul>'
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
             imp = [get_lang(conn, 'error'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
@@ -2501,7 +2501,7 @@ def re_error(conn, data):
                 data = '' + \
                     '<div id="main_skin_set">' + \
                         '<h2>' + get_lang(conn, 'error') + '</h2>' + \
-                        '<ul class="opennamu_ul">' + \
+                        '<ul>' + \
                             '<li>' + data + '</a></li>' + \
                         '</ul>' + \
                     '</div>' + \
@@ -2513,7 +2513,7 @@ def re_error(conn, data):
                 imp = [title, wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = '' + \
                     '<h2>' + sub_title + '</h2>' + \
-                    '<ul class="opennamu_ul">' + \
+                    '<ul>' + \
                         '<li>' + data + '</li>' + \
                     '</ul>' + \
                 '',

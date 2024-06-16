@@ -43,12 +43,12 @@ async def main_search_deep(name = 'Test', search_type = 'title', num = 1):
             link_id = '' if curs.fetchall() else 'class="opennamu_not_exist_link"'
 
             div += '''
-                <ul class="opennamu_ul">
+                <ul>
                     <li>
                         ''' + get_lang(conn, 'go') + ''' : <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + html.escape(name) + '''</a>
                     </li>
                 </ul>
-                <ul class="opennamu_ul">
+                <ul>
             '''
 
             all_list = json.loads((await api_search(name, search_type, num)).get_data(as_text = True))

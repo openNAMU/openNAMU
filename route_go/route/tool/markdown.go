@@ -139,8 +139,6 @@ func Markdown(db *sql.DB, data map[string]string) map[string]interface{} {
 		}
 	})
 
-	string_data = strings.Replace(string_data, "<ul>", "<ul class=\"opennamu_ul\">", -1)
-
 	end_backlink := [][]string{}
 	for k1, v1 := range backlink {
 		for k2, v2 := range v1 {

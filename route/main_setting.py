@@ -21,6 +21,6 @@ def main_setting():
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
             imp = [get_lang(conn, 'setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
-            data = '<h2>' + get_lang(conn, 'list') + '</h2><ul class="opennamu_ul">' + li_data + '</ul>',
+            data = '<h2>' + get_lang(conn, 'list') + '</h2><ul>' + li_data + '</ul>',
             menu = [['manager', get_lang(conn, 'return')]]
         ))

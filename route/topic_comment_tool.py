@@ -17,12 +17,12 @@ def topic_comment_tool(topic_num = 1, num = 1):
 
         ban = '''
             <h2>''' + get_lang(conn, 'state') + '''</h2>
-            <ul class="opennamu_ul">
+            <ul>
                 <li>''' + get_lang(conn, 'writer') + ' : ''' + ip_pas(data[0][1]) + '''</li>
                 <li>''' + get_lang(conn, 'time') + ' : ' + data[0][2] + '''</li>
             </ul>
             <h2>''' + get_lang(conn, 'other_tool') + '''</h2>
-            <ul class="opennamu_ul">
+            <ul>
                 <li>
                     <a href="/thread/''' + topic_num + '/comment/' + num + '''/raw">''' + get_lang(conn, 'raw') + '''</a>
                 </li>
@@ -32,7 +32,7 @@ def topic_comment_tool(topic_num = 1, num = 1):
         if admin_check(conn, 3) == 1:
             ban += '''
                 <h2>''' + get_lang(conn, 'admin_tool') + '''</h2>
-                <ul class="opennamu_ul">
+                <ul>
                     <li>
                         <a href="/auth/ban/''' + url_pas(data[0][1]) + '''">
                             ''' + (get_lang(conn, 'ban') + ' | ' + get_lang(conn, 'release')) + '''

@@ -43,7 +43,7 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
             curs.execute(db_change('select set_data, set_id from bbs_set where set_name = "bbs_name"'))
             db_data = curs.fetchall()
             if db_data:
-                data += '<ul class="opennamu_ul">'
+                data += '<ul>'
                 for for_a in db_data:
                     bbs_name_dict[for_a[1]] = for_a[0]
 
