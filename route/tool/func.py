@@ -786,27 +786,30 @@ def set_init_always(conn, ver_num, run_mode):
                 m_curs.execute('insert into temp (name, data) values ("wiki_access_password", ?)', [db_data[0][0]])
 
         # OS마다 실행 파일 설정
-        exe_type = ''
-        if platform.system() == 'Linux':
-            if platform.machine() in ["AMD64", "x86_64"]:
-                exe_type = 'main.amd64.bin'
-            else:
-                exe_type = 'main.arm64.bin'
-        else:
-            if platform.machine() in ["AMD64", "x86_64"]:
-                exe_type = 'main.amd64.exe'
-            else:
-                exe_type = 'main.arm64.exe'
-
+        exe_type = linux_exe_chmod()
         if run_mode == '':
             exe_path = os.path.join('.', 'route_go', 'bin')
-
             for for_a in os.listdir(exe_path):
                 if for_a != exe_type:
                     os.remove(os.path.join(exe_path, for_a))
 
-        if platform.system() == 'Linux':
-            os.system('chmod +x ./route_go/bin/' + exe_type)
+def linux_exe_chmod():
+    exe_type = ''
+    if platform.system() == 'Linux':
+        if platform.machine() in ["AMD64", "x86_64"]:
+            exe_type = 'main.amd64.bin'
+        else:
+            exe_type = 'main.arm64.bin'
+    else:
+        if platform.machine() in ["AMD64", "x86_64"]:
+            exe_type = 'main.amd64.exe'
+        else:
+            exe_type = 'main.arm64.exe'
+
+    if platform.system() == 'Linux':
+        os.system('chmod +x ./route_go/bin/' + exe_type)
+
+    return exe_type
 
 def set_init(conn):
     curs = conn.cursor()

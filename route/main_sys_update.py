@@ -29,6 +29,8 @@ def main_sys_update():
                     if for_a != 0:
                         break
                 else:
+                    linux_exe_chmod()
+                    
                     return redirect(conn, '/restart')
                 
                 print('Error : update failed')
