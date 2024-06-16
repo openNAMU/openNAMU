@@ -1955,12 +1955,13 @@ def admin_check(conn, num = None, what = None, name = ''):
             curs.execute(db_change('select name from alist where name = ? and acl = "owner"'), [user_auth])
             if curs.fetchall():
                 pass_ok = 1
+            elif num == 'all':                    
+                curs.execute(db_change('select acl from alist where name = ?'), [user_auth])
+                db_data = curs.fetchall()
+                if db_data and db_data[0][0] in check:
+                    pass_ok = 1
             else:
-                if num == 'all':                    
-                    curs.execute(db_change('select name from alist where name = ?'), [user_auth])
-                else:
-                    curs.execute(db_change('select name from alist where name = ? and acl = ?'), [user_auth, check])
-                    
+                curs.execute(db_change('select name from alist where name = ? and acl = ?'), [user_auth, check])
                 if curs.fetchall():
                     pass_ok = 1
 
