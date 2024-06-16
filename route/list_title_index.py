@@ -12,7 +12,7 @@ def list_title_index(num = 1):
         curs.execute(db_change("select title from data order by title asc limit ?, 50"), [sql_num])
         title_list = curs.fetchall()
         if title_list:
-            data += '<hr class="main_hr"><ul class="opennamu_ul">'
+            data += '<hr class="main_hr"><ul>'
 
         for list_data in title_list:
             data += '<li>' + str(all_list) + '. <a href="/w/' + url_pas(list_data[0]) + '">' + html.escape(list_data[0]) + '</a></li>'
@@ -39,10 +39,10 @@ def list_title_index(num = 1):
 
                 data += '''
                     </ul>
-                    <ul class="opennamu_ul">
+                    <ul>
                         <li>''' + get_lang(conn, 'all') + ' : ' + str(count_end[0]) + '''</li>
                     </ul>
-                    <ul class="opennamu_ul">
+                    <ul>
                         <li>''' + get_lang(conn, 'category') + ' : ' + str(count_end[1]) + '''</li>
                         <li>''' + get_lang(conn, 'user_document') + ' : ' + str(count_end[2]) + '''</li>
                         <li>''' + get_lang(conn, 'file') + ' : ' + str(count_end[3]) + '''</li>
@@ -51,7 +51,7 @@ def list_title_index(num = 1):
             else:
                 data += '''
                     </ul>
-                    <ul class="opennamu_ul">
+                    <ul>
                         <li>''' + get_lang(conn, 'all') + ' : ' + all_title[0][0] + '''</li>
                 '''
 

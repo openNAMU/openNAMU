@@ -6,7 +6,7 @@ def list_please(arg_num = 1):
 
         sql_num = (arg_num * 50 - 50) if arg_num * 50 > 0 else 0
 
-        div = '<ul class="opennamu_ul">'
+        div = '<ul>'
 
         curs.execute(db_change("select distinct title from back where type = 'no' limit ?, 50"), [sql_num])
         data_list = curs.fetchall()

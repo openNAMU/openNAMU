@@ -44,7 +44,7 @@ def list_image_file(arg_num = 1, do_type = 0):
             )
             list_data += end_data
         else:
-            list_data += '<ul class="opennamu_ul">'
+            list_data += '<ul>'
 
             curs.execute(db_change("select title from data where title like 'file:%' limit ?, 50"), [sql_num])
             data_list = curs.fetchall()

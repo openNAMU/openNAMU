@@ -6,7 +6,7 @@ def list_long_page(tool = 'long_page', arg_num = 1):
 
         sql_num = (arg_num * 50 - 50) if arg_num * 50 > 0 else 0
 
-        div = '<ul class="opennamu_ul">'
+        div = '<ul>'
         select_data = 'desc' if tool == 'long_page' else 'asc'
         title = 'long_page' if tool == 'long_page' else 'short_page'
 

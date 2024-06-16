@@ -1882,6 +1882,17 @@ class class_do_render_namumark:
                             else:
                                 wiki_data_style = ''
 
+                        find_regex = [
+                            r" *box-shadow *: *(([^,;]*)(,|;|$)){10,}",
+                            r" *url\([^()]*\)",
+                            r" *linear-gradient\((([^(),]+)(,|\))){10,}",
+                            r" *position *: *"
+                        ]
+                        for for_a in find_regex:
+                            if re.search(for_a, wiki_data_style_data, flags = re.I):
+                                wiki_data_style_data = ""
+                                break
+
                         wiki_data = self.get_tool_data_revert(wiki_data)
                         wiki_data = re.sub('(^\n|\n$)', '', wiki_data)
 
@@ -2279,7 +2290,7 @@ class class_do_render_namumark:
                 list_class = do_render_list_int_to(list_view_set)
                 list_data_str = re.sub(list_sub_regex, list_class, list_data)
 
-                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul class="opennamu_ul">' + list_data_str + '</ul><back_br>\n'), self.render_data, 1)
+                self.render_data = re.sub(list_regex, lambda x : ('\n<front_br><ul>' + list_data_str + '</ul><back_br>\n'), self.render_data, 1)
 
             list_count_max -= 1
 

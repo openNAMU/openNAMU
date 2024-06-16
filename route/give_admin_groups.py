@@ -57,7 +57,7 @@ def give_admin_groups(name = 'test'):
             state = 'disabled' if admin_check(conn) != 1 else ''
             state = 'disabled' if name in get_default_admin_group() else ''
 
-            data = '<ul class="opennamu_ul">'
+            data = '<ul>'
             for for_a in acl_name_list:
                 curs.execute(db_change('select acl from alist where name = ?'), [name])
                 acl_list = curs.fetchall()

@@ -7,7 +7,7 @@ def user_alarm():
         num = int(number_check(flask.request.args.get('num', '1')))
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
     
-        data = '<ul class="opennamu_ul">'
+        data = '<ul>'
 
         ip = ip_check()
     

@@ -61,7 +61,7 @@ def user_count(name = None):
         return easy_minify(conn, flask.render_template(skin_check(conn),
             imp = [get_lang(conn, 'count'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
             data = '''
-                <ul class="opennamu_ul">
+                <ul>
                     <li><a href="/record/''' + url_pas(that) + '''">''' + get_lang(conn, 'edit_record') + '''</a> : ''' + str(data) + '''</li>
                     <li><a href="/record/topic/''' + url_pas(that) + '''">''' + get_lang(conn, 'discussion_record') + '''</a> : ''' + str(data_topic) + '''</a></li>
                     <hr>

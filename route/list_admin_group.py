@@ -4,7 +4,7 @@ def list_admin_group_2():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        list_data = '<ul class="opennamu_ul">'
+        list_data = '<ul>'
         org_acl_list = get_default_admin_group()
 
         curs.execute(db_change("select distinct name from alist order by name asc"))

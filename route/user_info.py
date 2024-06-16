@@ -38,8 +38,8 @@ def user_info(name = ''):
                     <li><a href="/login/find">''' + get_lang(conn, 'password_search') + '''</a></li>
                 '''
                 
-            login_menu = '<h2>' + get_lang(conn, 'login') + '</h2><ul class="opennamu_ul">' + login_menu + '</ul>'
-            tool_menu = '<h2>' + get_lang(conn, 'tool') + '</h2><ul class="opennamu_ul">' + tool_menu + '</ul>'
+            login_menu = '<h2>' + get_lang(conn, 'login') + '</h2><ul>' + login_menu + '</ul>'
+            tool_menu = '<h2>' + get_lang(conn, 'tool') + '</h2><ul>' + tool_menu + '</ul>'
     
         if admin_check(conn, 1) == 1:
             curs.execute(db_change("select block from rb where block = ? and ongoing = '1'"), [ip])
@@ -47,7 +47,7 @@ def user_info(name = ''):
             
             admin_menu = '''
                 <h2>''' + get_lang(conn, 'admin') + '''</h2>
-                <ul class="opennamu_ul">
+                <ul>
                     <li><a href="/auth/ban/''' + url_pas(ip) + '''">''' + ban_name + '''</a></li>
                     <li><a href="/list/user/check_submit/''' + url_pas(ip) + '''">''' + get_lang(conn, 'check') + '''</a></li>
                 </ul>
@@ -63,7 +63,7 @@ def user_info(name = ''):
                 ''' + login_menu + '''
                 ''' + tool_menu + '''
                 <h2>''' + get_lang(conn, 'other') + '''</h2>
-                <ul class="opennamu_ul">
+                <ul>
                     <li><a href="/record/''' + url_pas(ip) + '''">''' + get_lang(conn, 'edit_record') + '''</a></li>
                     <li><a href="/record/topic/''' + url_pas(ip) + '''">''' + get_lang(conn, 'discussion_record') + '''</a></li>
                     <li><a href="/record/bbs/''' + url_pas(ip) + '''">''' + get_lang(conn, 'bbs_record') + '''</a></li>

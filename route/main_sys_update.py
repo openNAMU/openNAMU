@@ -54,7 +54,7 @@ def main_sys_update():
                 imp = [get_lang(conn, 'update'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
                 data = get_lang(conn, 'update_warning') + '''
                     <hr class="main_hr">
-                    <ul class="opennamu_ul">
+                    <ul>
                         <li id="ver_send_2">''' + get_lang(conn, 'version') + ''' : </li>
                         <li id="ver_send">''' + get_lang(conn, 'lastest') + ''' : </li>
                     </ul>

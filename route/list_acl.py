@@ -6,7 +6,7 @@ def list_acl(arg_num = 1):
 
         sql_num = (arg_num * 50 - 50) if arg_num * 50 > 0 else 0
 
-        div = '<ul class="opennamu_ul">'
+        div = '<ul>'
 
         curs.execute(db_change(
             "select distinct title, data, type from acl where data != '' and not title like 'user:%' order by title desc limit ?, 50"

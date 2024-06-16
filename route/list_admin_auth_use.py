@@ -16,7 +16,7 @@ def list_admin_auth_use(arg_num = 1, arg_search = 'normal'):
             else:
                 curs.execute(db_change("select who, what, time from re_admin where what like ? order by time desc limit ?, 50"), [arg_search + "%", sql_num])
 
-            list_data = '<ul class="opennamu_ul">'
+            list_data = '<ul>'
 
             get_list = curs.fetchall()
             for data in get_list:
