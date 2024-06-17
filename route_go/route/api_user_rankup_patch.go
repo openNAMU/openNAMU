@@ -12,5 +12,5 @@ func Api_user_rankup_patch(call_arg []string) string {
 	db := tool.DB_connect()
 	defer db.Close()
 
-	return ""
+	return "{}"
 }

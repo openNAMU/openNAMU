@@ -6,6 +6,7 @@ def give_admin_groups(name = 'test'):
 
         acl_name_list = [
             [1, 'owner', get_lang(conn, 'owner_authority')],
+            [2, 'all_function', get_lang(conn, 'all_function_authority')],
             [2, 'admin', get_lang(conn, 'admin_authority')],
             [3, 'ban', get_lang(conn, 'ban_authority')],
             [4, '', get_lang(conn, 'admin_default_feature_authority'), True],
@@ -18,6 +19,8 @@ def give_admin_groups(name = 'test'):
             [3, 'hidel', get_lang(conn, 'history_hide_authority')],
             [4, '', get_lang(conn, 'admin_default_feature_authority'), True],
             [3, 'give', get_lang(conn, 'authorization_authority')],
+            [4, '', get_lang(conn, 'admin_default_feature_authority'), True],
+            [3, 'bbs', get_lang(conn, 'bbs_authority')],
             [4, '', get_lang(conn, 'admin_default_feature_authority'), True],
             [3, 'admin_default_feature', get_lang(conn, 'admin_default_feature_authority')],
             [4, 'user_name_bold', get_lang(conn, 'user_name_bold_authority')],

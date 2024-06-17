@@ -137,19 +137,18 @@ def python_to_golang_sync(func_name, other_set = {}):
     )
     stdout, stderr = process.communicate()
     
-    while 1:
-        try:
-            data = stdout.decode('utf8')
-            err = stderr.decode('utf8')
-            if err != '':
-                if 'database is locked' in err:
-                    raise
-                else:
-                    print(err)
+    data = ''
+    while data == '':
+        data = stdout.decode('utf8')
+        err = stderr.decode('utf8')
+        if err != '':
+            if 'database is locked' in err:
+                pass
+            else:
+                print(err)
+                break
 
-            break
-        except:
-            time.sleep(0.01)
+        time.sleep(0.01)
 
     return data
 
@@ -178,19 +177,18 @@ async def python_to_golang(func_name, other_set = {}):
     )
     stdout, stderr = await process.communicate()
 
-    while 1:
-        try:
-            data = stdout.decode('utf8')
-            err = stderr.decode('utf8')
-            if err != '':
-                if 'database is locked' in err:
-                    raise
-                else:
-                    print(err)
+    data = ''
+    while data == '':
+        data = stdout.decode('utf8')
+        err = stderr.decode('utf8')
+        if err != '':
+            if 'database is locked' in err:
+                pass
+            else:
+                print(err)
+                break
 
-            break
-        except:
-            await asyncio.sleep(0.01)
+        await asyncio.sleep(0.01)
 
     return data
 
@@ -229,11 +227,12 @@ def get_init_set_list(need = 'all'):
         return init_set_list[need]
     
 class get_db_connect:
-    def __init__(self, db_type = ''):
+    def __init__(self, db_type = '', init_mode = False):
         with class_temp_db() as m_conn:
             m_curs = m_conn.cursor()
 
             self.db_set = {}
+            self.init_mode = init_mode
 
             m_curs.execute('select name, data from temp where name in ("db_type", "db_name")')
             db_data = m_curs.fetchall()
@@ -257,19 +256,25 @@ class get_db_connect:
                 isolation_level = None
             )
         else:
-            self.conn = pymysql.connect(
-                host = self.db_set['db_mysql_host'],
-                user = self.db_set['db_mysql_user'],
-                password = self.db_set['db_mysql_pw'],
-                charset = 'utf8mb4',
-                port = int(self.db_set['db_mysql_port']),
-                autocommit = True
-            )
-
-            try:
-                self.conn.select_db(self.db_set['db_name'])
-            except:
-                pass
+            if self.init_mode:
+                self.conn = pymysql.connect(
+                    host = self.db_set['db_mysql_host'],
+                    user = self.db_set['db_mysql_user'],
+                    password = self.db_set['db_mysql_pw'],
+                    charset = 'utf8mb4',
+                    port = int(self.db_set['db_mysql_port']),
+                    autocommit = True
+                )
+            else:
+                self.conn = pymysql.connect(
+                    host = self.db_set['db_mysql_host'],
+                    user = self.db_set['db_mysql_user'],
+                    password = self.db_set['db_mysql_pw'],
+                    charset = 'utf8mb4',
+                    port = int(self.db_set['db_mysql_port']),
+                    autocommit = True,
+                    db = self.db_set['db_name']
+                )
 
         return self.conn
     
@@ -1209,7 +1214,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v268'
+    return '.cache_v269'
 
 def wiki_css(data):
     with class_temp_db() as m_conn:
@@ -1228,7 +1233,7 @@ def wiki_css(data):
         if db_data:
             data_css = db_data[0][0]
         else:
-            data_css += '<meta http-equiv="Cache-Control" content="max-age=3600">'
+            data_css += '<meta http-equiv="Cache-Control" content="max-age=31536000">'
 
             # External JS
             data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" integrity="sha512-LQNxIMR5rXv7o+b1l8+N1EZMfhG7iFZ9HhnbJkTp4zjNr5Wvst75AqUeFDxeRUa7l5vEDyUiAip//r+EFLLCyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'

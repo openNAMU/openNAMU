@@ -20,5 +20,5 @@ func Api_edit_move_all(call_arg []string) string {
 
 	}
 
-	return ""
+	return "{}"
 }

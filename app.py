@@ -25,7 +25,7 @@ with open('version.json', encoding = 'utf8') as file_data:
 data_db_set = class_check_json()
 do_db_set(data_db_set)
 
-with get_db_connect() as conn:
+with get_db_connect(init_mode = True) as conn:
     curs = conn.cursor()
 
     setup_tool = ''
