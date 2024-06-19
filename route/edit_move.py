@@ -17,8 +17,6 @@ def edit_move(name):
 
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
                 return re_error(conn, '/error/13')
-            else:
-                captcha_post(conn, '', 0)
 
             if do_edit_slow_check(conn) == 1:
                 return re_error(conn, '/error/24')

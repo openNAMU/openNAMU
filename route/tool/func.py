@@ -1782,12 +1782,10 @@ def captcha_get(conn):
 
     return data
 
-def captcha_post(conn, re_data, num = 1):
+def captcha_post(conn, re_data):
     curs = conn.cursor()
 
-    if num != 1:
-        pass
-    elif acl_check('', 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
+    if acl_check('', 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
         pass
     elif acl_check('', 'recaptcha') == 1:
         curs.execute(db_change('select data from other where name = "sec_re"'))
@@ -1827,14 +1825,13 @@ def captcha_post(conn, re_data, num = 1):
                 if json_data['success'] != True:
                     return 1
 
-    if num == 1:
-        if 'recapcha_pass' in flask.session:
-            if flask.session['recapcha_pass'] > 0:
-                flask.session['recapcha_pass'] -= 1
-            else:
-                flask.session['recapcha_pass'] = 5
+    if 'recapcha_pass' in flask.session:
+        if flask.session['recapcha_pass'] > 0:
+            flask.session['recapcha_pass'] -= 1
         else:
             flask.session['recapcha_pass'] = 5
+    else:
+        flask.session['recapcha_pass'] = 5
 
     return 0
 
