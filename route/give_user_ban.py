@@ -39,6 +39,10 @@ def give_user_ban(name = None, ban_type = ''):
                 login = 'O'
             elif ban_option == 'edit_request_able':
                 login = 'E'
+            elif ban_option == 'completely_ban':
+                login = 'A'
+            elif ban_option == 'dont_come_this_site':
+                login = 'D'
             elif ban_option == 'release':
                 release = '1'
 
@@ -134,6 +138,8 @@ def give_user_ban(name = None, ban_type = ''):
                             <option value="">''' + get_lang(conn, 'default') + '''</option>
                             <option value="login_able">''' + get_lang(conn, 'login_able') + '''</option>
                             <option value="edit_request_able">''' + get_lang(conn, 'edit_request_able') + '''</option>
+                            <option value="completely_ban">''' + get_lang(conn, 'completely_ban') + '''</option>
+                            <option value="dont_come_this_site">''' + get_lang(conn, 'dont_come_this_site') + '''</option>
                             <option value="release">''' + get_lang(conn, 'release') + '''</option>
                         </select>
         

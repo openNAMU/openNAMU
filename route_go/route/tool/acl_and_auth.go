@@ -174,10 +174,26 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 	level_int, _ := strconv.Atoi(level)
 
 	get_ban := ""
+	ban_type := ""
 	if tool == "document_edit_request" {
-		get_ban = Get_user_ban(db, ip, "edit_request")[0]
+		temp_arr := Get_user_ban(db, ip, "edit_request")
+
+		get_ban = temp_arr[0]
+		ban_type = temp_arr[1]
 	} else {
-		get_ban = Get_user_ban(db, ip, "")[0]
+		temp_arr := Get_user_ban(db, ip, "")
+
+		get_ban = temp_arr[0]
+		ban_type = temp_arr[1]
+	}
+
+	if ban_type != "" {
+		ban_type_len := len(ban_type)
+		if ban_type_len == 1 {
+			ban_type = string(ban_type[0])
+		} else if ban_type_len == 2 {
+			ban_type = string(ban_type[1])
+		}
 	}
 
 	if tool == "" && name != "" {
@@ -770,6 +786,12 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			}
 		}
 
+		if auth_info[acl_pass_auth] {
+			return true
+		} else if ban_type == "4" {
+			return false
+		}
+
 		if acl_data == "" {
 			if tool == "recaptcha" {
 				acl_data = "admin"
@@ -782,22 +804,22 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 
 		except_ban_tool_list := []string{"render", "topic_view", "bbs_view"}
 		if acl_data != "normal" {
-			if !(acl_data == "ban" || acl_data == "ban_admin") && !Arr_in_str(except_ban_tool_list, tool) {
-				if get_ban == "true" {
-					return false
+			if !(acl_data == "ban" || acl_data == "ban_admin") || ban_type == "3" {
+				if !Arr_in_str(except_ban_tool_list, tool) {
+					if get_ban == "true" {
+						return false
+					}
 				}
 			}
 
-			if auth_info[acl_pass_auth] {
-				return true
-			} else if acl_data == "all" || acl_data == "ban" {
+			if acl_data == "all" || acl_data == "ban" {
 				return true
 			} else if acl_data == "user" {
 				if !ip_or_user {
 					return true
 				}
 			} else if acl_data == "admin" {
-				if auth_info["admin_default_feature"] {
+				if auth_info["treat_as_admin"] {
 					return true
 				}
 			} else if acl_data == "50_edit" {
@@ -903,7 +925,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					return true
 				}
 			} else if acl_data == "ban_admin" {
-				if auth_info["admin_default_feature"] || get_ban == "true" {
+				if auth_info["treat_as_admin"] || get_ban == "true" {
 					return true
 				}
 			} else if acl_data == "not_all" {
