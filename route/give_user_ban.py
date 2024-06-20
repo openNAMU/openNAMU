@@ -7,10 +7,10 @@ def give_user_ban(name = None, ban_type = ''):
         ip = ip_check()
         
         if ban_check(ip = ip, tool = 'login')[0] == 1:
-            if ip_or_user(ip) == 1 or admin_check(conn, 'all', None, ip) == 0:
+            if ip_or_user(ip) == 1 or admin_check('all', None, ip) == 0:
                 return re_error(conn, '/ban')
         else:
-            if admin_check(conn, 1, None, ip) != 1:
+            if admin_check(1, None, ip) != 1:
                 return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
@@ -69,14 +69,14 @@ def give_user_ban(name = None, ban_type = ''):
                     type_d = None
 
                 if type_d:
-                    if admin_check(conn, None, 'ban ' + type_d + ' (' + name + ')') != 1:
+                    if admin_check(None, 'ban ' + type_d + ' (' + name + ')') != 1:
                         return re_error(conn, '/error/3')
                 else:
                     if name == ip:
-                        if admin_check(conn, 'all', 'ban (' + name + ')') != 1:
+                        if admin_check('all', 'ban (' + name + ')') != 1:
                             return re_error(conn, '/error/3')
                     else:
-                        if admin_check(conn, 1, 'ban (' + name + ')') != 1:
+                        if admin_check(1, 'ban (' + name + ')') != 1:
                             return re_error(conn, '/error/3')
 
                 ban_insert(conn, 

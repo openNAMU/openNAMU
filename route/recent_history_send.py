@@ -6,11 +6,11 @@ def recent_history_send(name = 'Test', rev = 1):
 
         num = str(rev)
 
-        if admin_check(conn) != 1:
+        if admin_check() != 1:
             return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
-            admin_check(conn, None, 'send edit ' + name + ' r' + num)
+            admin_check(None, 'send edit ' + name + ' r' + num)
 
             curs.execute(db_change("select send from history where title = ? and id = ?"), [name, num])
             if curs.fetchall():

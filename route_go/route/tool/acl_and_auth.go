@@ -37,6 +37,34 @@ func List_acl(func_type string) []string {
 	}
 }
 
+func Do_insert_auth_history(db *sql.DB, ip string, what string) {
+	var log_off string
+
+	err := db.QueryRow(DB_change("select data from other where name = 'auth_history_off'")).Scan(&log_off)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log_off = ""
+		} else {
+			log.Fatal(err)
+		}
+	}
+
+	if log_off == "" {
+		stmt, err := db.Prepare(DB_change("insert into re_admin (who, what, time) values (?, ?, ?)"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer stmt.Close()
+
+		time := Get_time()
+
+		_, err = stmt.Exec(ip, what, time)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
 func Get_user_auth(db *sql.DB, ip string) string {
 	if !IP_or_user(ip) {
 		var auth string
@@ -120,7 +148,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["admin_default_feature"] = true
 	}
 
-	admin_default_feature := []string{"user_name_bold", "multiple_upload", "slow_edit_pass", "edit_bottom_compulsion_pass"}
+	admin_default_feature := []string{"treat_as_admin", "user_name_bold", "multiple_upload", "slow_edit_pass", "edit_bottom_compulsion_pass"}
 
 	if _, ok := auth_info["admin_default_feature"]; ok {
 		for _, v := range admin_default_feature {

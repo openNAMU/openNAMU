@@ -29,7 +29,7 @@ def topic_comment_tool(topic_num = 1, num = 1):
             </ul>
         '''
 
-        if admin_check(conn, 3) == 1:
+        if admin_check(3) == 1:
             ban += '''
                 <h2>''' + get_lang(conn, 'admin_tool') + '''</h2>
                 <ul>

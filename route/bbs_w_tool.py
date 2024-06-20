@@ -16,7 +16,7 @@ def bbs_w_tool(bbs_num = '', post_num = ''):
             </ul>
         '''
 
-        if admin_check(conn) == 1:
+        if admin_check() == 1:
             curs.execute(db_change('select set_data from bbs_data where set_code = ? and set_id = ? and set_name = "pinned"'), [post_num_str, bbs_num_str])
             pinned = get_lang(conn, 'pinned') if not curs.fetchall() else get_lang(conn, 'pinned_release')
 

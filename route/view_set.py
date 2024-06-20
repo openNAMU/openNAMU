@@ -51,13 +51,13 @@ def view_set(name = 'Test', multiple = False):
                     return redirect(conn, '/login')
 
                 if user_data.group(1) != ip:
-                    if admin_check(conn, 5) != 1:
+                    if admin_check(5) != 1:
                         if check_data:
                             return re_error(conn, '/error/3')
                         else:
                             check_ok = 'disabled'
             else:
-                if admin_check(conn, 5) != 1:
+                if admin_check(5) != 1:
                     if check_data:
                         return re_error(conn, '/error/3')
                     else:
@@ -112,7 +112,7 @@ def view_set(name = 'Test', multiple = False):
 
             markup_data = markup_data if markup_data != '' else 'normal'
 
-            if admin_check(conn) == 1:
+            if admin_check() == 1:
                 document_top = flask.request.form.get('document_top', '')
 
                 acl_text += 'document_top\n'
@@ -129,7 +129,7 @@ def view_set(name = 'Test', multiple = False):
                 curs.execute(db_change("delete from data_set where doc_name = ? and set_name = 'document_editor_top'"), [name])
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_editor_top', ?)"), [name, document_editor_top])
 
-            admin_check(conn, 5, check_data)
+            admin_check(5, check_data)
 
             history_plus(conn, 
                 name,
@@ -220,7 +220,7 @@ def view_set(name = 'Test', multiple = False):
             data += view_set_markup(conn, document_name = name, disable = check_ok)
 
             save_button = '<button type="submit" ' + check_ok + '>' + get_lang(conn, 'save') + '</button>'
-            if admin_check(conn) != 1:
+            if admin_check() != 1:
                 check_ok = 'disabled'
 
             curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_top'"), [name])

@@ -14,7 +14,7 @@ def bbs_w_hide(bbs_num = '', post_num = ''):
         bbs_num_str = str(bbs_num)
         post_num_str = str(post_num)
 
-        if admin_check(conn) != 1:
+        if admin_check() != 1:
             return redirect(conn, '/bbs/in/' + bbs_num_str)
         
         if flask.request.method == 'POST':

@@ -4,7 +4,7 @@ def main_setting_main():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(conn) != 1:
+        if admin_check() != 1:
             return re_error(conn, '/ban')
         
         setting_list = {
@@ -55,7 +55,7 @@ def main_setting_main():
                     setting_list[i][0]
                 ])
 
-            admin_check(conn, None, 'edit_set (main)')
+            admin_check(None, 'edit_set (main)')
 
             return redirect(conn, '/setting/main')
         else:

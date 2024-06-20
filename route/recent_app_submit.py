@@ -92,7 +92,7 @@ def recent_app_submit_2():
                 menu = [['other', get_lang(conn, 'return')]]
             ))
         else:
-            if admin_check(conn, None, 'app submit') != 1:
+            if admin_check(None, 'app submit') != 1:
                 return re_error(conn, '/ban')
 
             if flask.request.form.get('approve', '') != '':

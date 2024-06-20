@@ -4,11 +4,11 @@ def recent_record_reset(name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(conn) != 1:
+        if admin_check() != 1:
             return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
-            admin_check(conn, None, 'record reset ' + name)
+            admin_check(None, 'record reset ' + name)
 
             curs.execute(db_change("delete from history where ip = ?"), [name])
 

@@ -8,7 +8,7 @@ def login_register_2():
             return re_error(conn, '/ban')
 
         ip = ip_check()
-        admin = admin_check(conn)
+        admin = admin_check()
         if admin != 1 and ip_or_user(ip) == 0:
             return redirect(conn, '/user')
 

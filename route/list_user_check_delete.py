@@ -4,7 +4,7 @@ def list_user_check_delete(name = None, ip = None, time = None, do_type = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(conn) != 1:
+        if admin_check() != 1:
             return re_error(conn, '/error/4')
 
         user_id = name

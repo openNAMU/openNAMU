@@ -23,6 +23,7 @@ def give_admin_groups(name = 'test'):
             [3, 'bbs', get_lang(conn, 'bbs_authority')],
             [4, '', get_lang(conn, 'admin_default_feature_authority'), True],
             [3, 'admin_default_feature', get_lang(conn, 'admin_default_feature_authority')],
+            [4, 'treat_as_admin', get_lang(conn, 'treat_as_admin_authority')],
             [4, 'user_name_bold', get_lang(conn, 'user_name_bold_authority')],
             [4, 'multiple_upload', get_lang(conn, 'multiple_upload_authority')],
             [4, 'slow_edit_pass', get_lang(conn, 'slow_edit_pass_authority')],
@@ -45,7 +46,7 @@ def give_admin_groups(name = 'test'):
         ]
 
         if flask.request.method == 'POST':
-            if admin_check(conn, None, 'auth list add (' + name + ')') != 1:
+            if admin_check(None, 'auth list add (' + name + ')') != 1:
                 return re_error(conn, '/error/3')
             elif name in get_default_admin_group():
                 return re_error(conn, '/error/3')
@@ -57,7 +58,7 @@ def give_admin_groups(name = 'test'):
 
             return redirect(conn, '/auth/list/add/' + url_pas(name))
         else:
-            state = 'disabled' if admin_check(conn) != 1 else ''
+            state = 'disabled' if admin_check() != 1 else ''
             state = 'disabled' if name in get_default_admin_group() else ''
 
             data = '<ul>'

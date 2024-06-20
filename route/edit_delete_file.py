@@ -7,7 +7,7 @@ def edit_delete_file(name = 'test.jpg'):
         curs = conn.cursor()
 
         ip = ip_check()
-        if admin_check(conn) == 0:
+        if admin_check() == 0:
             return re_error(conn, '/ban')
 
         mime_type = re.search(r'([^.]+)$', name)
@@ -25,7 +25,7 @@ def edit_delete_file(name = 'test.jpg'):
             return redirect(conn, '/w/' + url_pas(name))
 
         if flask.request.method == 'POST':
-            admin_check(conn, None, 'file del (' + name + ')')
+            admin_check(None, 'file del (' + name + ')')
             os.remove(file_directory)
 
             if flask.request.form.get('with_doc', '') != '':

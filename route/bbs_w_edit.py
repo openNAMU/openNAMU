@@ -21,14 +21,14 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
         if comment_num != '':
             temp_dict = json.loads(api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num).data)
             if 'comment_user_id' in temp_dict:
-                if not temp_dict['comment_user_id'] == ip and admin_check(conn) != 1:
+                if not temp_dict['comment_user_id'] == ip and admin_check() != 1:
                     return re_error(conn, '/ban')
             else:
                 return redirect(conn, '/bbs/main')
         elif post_num != '':
             temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
             if 'user_id' in temp_dict:
-                if not temp_dict['user_id'] == ip and admin_check(conn) != 1:
+                if not temp_dict['user_id'] == ip and admin_check() != 1:
                     return re_error(conn, '/ban')
             else:
                 return redirect(conn, '/bbs/main')
