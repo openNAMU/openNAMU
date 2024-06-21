@@ -68,7 +68,10 @@ def give_user_ban(name = None, ban_type = ''):
                     try:
                         ipaddress.IPv4Network(name, False)
                     except:
-                        return re_error(conn, '/error/45')
+                        try:
+                            ipaddress.IPv6Network(name, False)
+                        except:
+                            return re_error(conn, '/error/45')
                 else:
                     type_d = None
 
