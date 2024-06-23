@@ -26,7 +26,7 @@ def main_setting_acl():
         }
 
         if flask.request.method == 'POST':
-            if admin_check(conn, None, 'edit_set (acl)') != 1:
+            if admin_check(None, 'edit_set (acl)') != 1:
                 return re_error(conn, '/ban')
             else:
                 curs.executemany(db_change("update other set data = ? where name = ?"), [[flask.request.form.get(i_list[for_a], 'normal'), i_list[for_a]] for for_a in i_list])
@@ -34,7 +34,7 @@ def main_setting_acl():
                 return redirect(conn, '/setting/acl')
         else:
             d_list = {}
-            disable = 'disabled' if admin_check(conn) != 1 else ''
+            disable = 'disabled' if admin_check() != 1 else ''
             acl_div = ['' for _ in range(0, len(i_list))]
 
             for for_a in i_list:

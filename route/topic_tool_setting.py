@@ -4,7 +4,7 @@ def topic_tool_setting(topic_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(conn, 3) != 1:
+        if admin_check(3) != 1:
             return re_error(conn, '/error/3')
 
         ip = ip_check()
@@ -17,7 +17,7 @@ def topic_tool_setting(topic_num = 1):
             return redirect(conn, '/')
 
         if flask.request.method == 'POST':
-            admin_check(conn, 3, 'change_topic_set (code ' + topic_num + ')')
+            admin_check(3, 'change_topic_set (code ' + topic_num + ')')
 
             stop_d = flask.request.form.get('stop_d', '')
             why_d = flask.request.form.get('why', '')

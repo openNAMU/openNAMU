@@ -7,10 +7,10 @@ def give_user_ban(name = None, ban_type = ''):
         ip = ip_check()
         
         if ban_check(ip = ip, tool = 'login')[0] == 1:
-            if ip_or_user(ip) == 1 or admin_check(conn, 'all', None, ip) == 0:
+            if ip_or_user(ip) == 1 or admin_check('all', None, ip) == 0:
                 return re_error(conn, '/ban')
         else:
-            if admin_check(conn, 1, None, ip) != 1:
+            if admin_check(1, None, ip) != 1:
                 return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
@@ -39,6 +39,10 @@ def give_user_ban(name = None, ban_type = ''):
                 login = 'O'
             elif ban_option == 'edit_request_able':
                 login = 'E'
+            elif ban_option == 'completely_ban':
+                login = 'A'
+            elif ban_option == 'dont_come_this_site':
+                login = 'D'
             elif ban_option == 'release':
                 release = '1'
 
@@ -64,19 +68,22 @@ def give_user_ban(name = None, ban_type = ''):
                     try:
                         ipaddress.IPv4Network(name, False)
                     except:
-                        return re_error(conn, '/error/45')
+                        try:
+                            ipaddress.IPv6Network(name, False)
+                        except:
+                            return re_error(conn, '/error/45')
                 else:
                     type_d = None
 
                 if type_d:
-                    if admin_check(conn, None, 'ban ' + type_d + ' (' + name + ')') != 1:
+                    if admin_check(None, 'ban ' + type_d + ' (' + name + ')') != 1:
                         return re_error(conn, '/error/3')
                 else:
                     if name == ip:
-                        if admin_check(conn, 'all', 'ban (' + name + ')') != 1:
+                        if admin_check('all', 'ban (' + name + ')') != 1:
                             return re_error(conn, '/error/3')
                     else:
-                        if admin_check(conn, 1, 'ban (' + name + ')') != 1:
+                        if admin_check(1, 'ban (' + name + ')') != 1:
                             return re_error(conn, '/error/3')
 
                 ban_insert(conn, 
@@ -134,6 +141,8 @@ def give_user_ban(name = None, ban_type = ''):
                             <option value="">''' + get_lang(conn, 'default') + '''</option>
                             <option value="login_able">''' + get_lang(conn, 'login_able') + '''</option>
                             <option value="edit_request_able">''' + get_lang(conn, 'edit_request_able') + '''</option>
+                            <option value="completely_ban">''' + get_lang(conn, 'completely_ban') + '''</option>
+                            <option value="dont_come_this_site">''' + get_lang(conn, 'dont_come_this_site') + '''</option>
                             <option value="release">''' + get_lang(conn, 'release') + '''</option>
                         </select>
         

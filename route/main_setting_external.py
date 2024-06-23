@@ -4,7 +4,7 @@ def main_setting_external():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(conn) != 1:
+        if admin_check() != 1:
             return re_error(conn, '/ban')
         
         i_list = [
@@ -26,7 +26,7 @@ def main_setting_external():
 
                 curs.execute(db_change("update other set data = ? where name = ?"), [into_data, data])
 
-            admin_check(conn, None, 'edit_set (external)')
+            admin_check(None, 'edit_set (external)')
 
             return redirect(conn, '/setting/external')
         else:

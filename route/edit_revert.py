@@ -5,7 +5,7 @@ def edit_revert(name, num):
         curs = conn.cursor()
 
         curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, str(num)])
-        if curs.fetchall() and admin_check(conn, 6) != 1:
+        if curs.fetchall() and admin_check(6) != 1:
             return re_error(conn, '/error/3')
 
         if acl_check(name, 'document_edit') == 1:
@@ -19,8 +19,6 @@ def edit_revert(name, num):
         if flask.request.method == 'POST':
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
                 return re_error(conn, '/error/13')
-            else:
-                captcha_post(conn, '', 0)
 
             if do_edit_slow_check(conn) == 1:
                 return re_error(conn, '/error/24')

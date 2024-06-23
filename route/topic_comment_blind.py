@@ -7,7 +7,7 @@ def topic_comment_blind(topic_num = 1, num = 1):
         topic_num = str(topic_num)
         num = str(num)
         
-        if admin_check(conn, 3, 'blind (code ' + topic_num + '#' + num + ')') != 1:
+        if admin_check(3, 'blind (code ' + topic_num + '#' + num + ')') != 1:
             return re_error(conn, '/error/3')
 
         curs.execute(db_change("select block from topic where code = ? and id = ?"), [topic_num, num])

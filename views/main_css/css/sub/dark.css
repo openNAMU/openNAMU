@@ -93,3 +93,11 @@
 .opennamu_main .opennamu_diff_red {
     background: #803737;
 }
+
+.opennamu_main a {
+    color: #A7C8FF;
+}
+
+.opennamu_main a:hover {
+    color: #7e97c1;
+}

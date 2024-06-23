@@ -224,6 +224,10 @@ func Get_user_ban_type(ban_type string) string {
 		return "1"
 	} else if ban_type == "E" {
 		return "2"
+	} else if ban_type == "A" {
+		return "3"
+	} else if ban_type == "D" {
+		return "4"
 	} else {
 		return ""
 	}

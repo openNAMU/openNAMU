@@ -145,6 +145,8 @@
     "ban" : "Block",
     "blocked" : "Blocked user",
     "release" : "Unblock",
+    "completely_ban" : "Completely block",
+    "dont_come_this_site" : "Site access block",
     
     "_comment_" : "Func",
     "wiki_restart" : "Restart wiki engine",

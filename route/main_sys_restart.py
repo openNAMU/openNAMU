@@ -2,11 +2,11 @@ from .tool.func import *
 
 def main_sys_restart():
     with get_db_connect() as conn:
-        if admin_check(conn) != 1:
+        if admin_check() != 1:
             return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
-            admin_check(conn, None, 'restart')
+            admin_check(None, 'restart')
 
             print('Restart')
 

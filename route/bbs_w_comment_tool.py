@@ -15,7 +15,7 @@ def bbs_w_comment_tool(bbs_num = '', post_num = '', comment_num = ''):
             </ul>
         '''
 
-        if admin_check(conn) == 1:
+        if admin_check() == 1:
             data += '''
                 <h3>''' + get_lang(conn, 'owner') + '''</h2>
                 <ul>

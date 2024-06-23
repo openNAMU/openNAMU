@@ -4,7 +4,7 @@ def main_setting_robot():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(conn) != 1:
+        if admin_check() != 1:
             return re_error(conn, '/ban')
 
         curs.execute(db_change("select data from other where name = 'robot'"))
@@ -32,7 +32,7 @@ def main_setting_robot():
             else:
                 curs.execute(db_change("insert into other (name, data, coverage) values ('robot_default', ?, '')"), [flask.request.form.get('default', '')])
 
-            admin_check(conn, None, 'edit_set (robot)')
+            admin_check(None, 'edit_set (robot)')
 
             return redirect(conn, '/setting/robot')
         else:

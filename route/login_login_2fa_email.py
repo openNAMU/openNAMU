@@ -20,8 +20,6 @@ def login_login_2fa_email_2():
         if flask.request.method == 'POST':
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
                 return re_error(conn, '/error/13')
-            else:
-                captcha_post(conn, '', 0)
 
             user_agent = flask.request.headers.get('User-Agent', '')
             user_id = flask.session['b_id']

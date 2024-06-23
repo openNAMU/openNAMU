@@ -88,8 +88,6 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                 
                 if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
                     return re_error(conn, '/error/13')
-                else:
-                    captcha_post(conn, '', 0)
 
                 set_id = bbs_num_str + '-' + post_num_str
 
@@ -175,8 +173,6 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                 
                 if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
                     return re_error(conn, '/error/13')
-                else:
-                    captcha_post(conn, '', 0)
                 
                 select = flask.request.form.get('comment_select', '0')
                 select = '' if select == '0' else select

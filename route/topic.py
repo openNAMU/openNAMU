@@ -64,8 +64,6 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
 
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
                 return re_error(conn, '/error/13')
-            else:
-                captcha_post(conn, '', 0)
 
             today = get_time()
 

@@ -7,11 +7,11 @@ def main_sys_update():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(conn) != 1:
+        if admin_check() != 1:
             return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
-            admin_check(conn, None, 'update')
+            admin_check(None, 'update')
 
             curs.execute(db_change('select data from other where name = "update"'))
             up_data = curs.fetchall()

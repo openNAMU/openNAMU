@@ -4,7 +4,7 @@ def main_setting_sitemap_set():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(conn) != 1:
+        if admin_check() != 1:
             return re_error(conn, '/ban')
         
         setting_list = {
@@ -22,7 +22,7 @@ def main_setting_sitemap_set():
                     setting_list[i][0]
                 ])
 
-            admin_check(conn, None, 'edit_set (sitemap)')
+            admin_check(None, 'edit_set (sitemap)')
 
             return redirect(conn, '/setting/sitemap_set')
         else:

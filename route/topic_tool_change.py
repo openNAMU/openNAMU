@@ -4,7 +4,7 @@ def topic_tool_change(topic_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(conn, None) != 1:
+        if admin_check(None) != 1:
             return re_error(conn, '/error/3')
 
         time = get_time()
@@ -16,7 +16,7 @@ def topic_tool_change(topic_num = 1):
             return redirect(conn, '/')
 
         if flask.request.method == 'POST':
-            admin_check(conn, None, 'move_topic (code ' + topic_num + ')')
+            admin_check(None, 'move_topic (code ' + topic_num + ')')
 
             title_d = flask.request.form.get('title', 'test')
             sub_d = flask.request.form.get('sub', 'test')

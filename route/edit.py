@@ -153,8 +153,6 @@ def edit(name = 'Test', section = 0, do_type = ''):
         if edit_repeat == 'post':
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
                 return re_error(conn, '/error/13')
-            else:
-                captcha_post(conn, '', 0)
     
             if do_edit_slow_check(conn) == 1:
                 return re_error(conn, '/error/24')

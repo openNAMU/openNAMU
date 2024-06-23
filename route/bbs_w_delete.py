@@ -16,7 +16,7 @@ def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
         bbs_num_str = str(bbs_num)
         post_num_str = str(post_num)
 
-        if admin_check(conn) != 1:
+        if admin_check() != 1:
             return redirect(conn, '/bbs/in/' + bbs_num_str)
         
         temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)

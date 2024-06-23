@@ -28,8 +28,8 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
         curs = conn.cursor()
 
         ip = ip_check()
-        all_admin = admin_check(conn, 'all', None, ip)
-        owner = admin_check(conn, None, None, ip)
+        all_admin = admin_check('all', None, ip)
+        owner = admin_check(None, None, ip)
 
         option_list = [
             ['normal', get_lang(conn, 'normal')],
