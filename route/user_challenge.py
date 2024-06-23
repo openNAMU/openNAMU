@@ -89,7 +89,7 @@ def user_challenge():
 
             curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_admin', ip])
             db_data = curs.fetchall()
-            if admin_check(conn, 'all') == 1 or db_data:
+            if admin_check('all') == 1 or db_data:
                 curs.execute(db_change("delete from user_set where id = ? and name = 'challenge_admin'"), [ip])
                 curs.execute(db_change("insert into user_set (name, id, data) values ('challenge_admin', ?, '1')"), [ip])
                 user_exp += 10000

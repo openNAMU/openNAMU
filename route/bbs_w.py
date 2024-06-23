@@ -9,7 +9,7 @@ def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
         sub = ''
         bbs_name_dict = {}
 
-        admin_auth = admin_check(conn)
+        admin_auth = admin_check()
 
         if tool == 'bbs':
             curs.execute(db_change('select set_data from bbs_set where set_id = ? and set_name = "bbs_name"'), [bbs_num])

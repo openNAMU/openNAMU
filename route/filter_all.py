@@ -13,7 +13,7 @@ def filter_all(tool):
 
         div += '</tr>'
 
-        admin = admin_check(conn)
+        admin = admin_check()
 
         if tool == 'inter_wiki':
             title = get_lang(conn, 'interwiki_list')

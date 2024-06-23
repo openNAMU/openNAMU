@@ -110,7 +110,7 @@ function opennamu_do_render_html(name = '') {
         ];
         for(let key in t_data) {
             let patt = new RegExp(
-                '&lt;' + t_data[key] + '( (?:(?:(?!&gt;).)+))?&gt;((?:(?!&lt;\/' + t_data[key] + '&gt;).)*)&lt;\/' + t_data[key] + '&gt;',
+                '&lt;' + t_data[key] + '( (?:(?:(?!&gt;).)+))?&gt;((?:(?!&lt;\/' + t_data[key] + '&gt;).)*)(&lt;\/' + t_data[key] + '&gt;|$)',
                 'ig'
             );
             
@@ -120,7 +120,20 @@ function opennamu_do_render_html(name = '') {
                 } else if(t_data[key] === 'div' || t_data[key] === 'span') {
                     let style_data = in_data.match(/ style=['"]([^'"]*)['"]/);
                     if(style_data) {
-                        style_data = style_data[1].replace(/position/ig, '');
+                        style_data = style_data[1];
+
+                        const find_regex = [
+                            / *box-shadow *: *(([^,;]*)(,|;|$)){10,}/i,
+                            / *url\([^()]*\)/i,
+                            / *linear-gradient\((([^(),]+)(,|\))){10,}/i,
+                            / *position *: */i
+                        ];
+                        for(let regex of find_regex) {
+                            if(regex.test(style_data)) {
+                                style_data = "";
+                                break;
+                            }
+                        }
                     } else {
                         style_data = '';
                     }

@@ -15,8 +15,6 @@ def edit_upload():
         if flask.request.method == 'POST':
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
                 return re_error(conn, '/error/13')
-            else:
-                captcha_post(conn, '', 0)
 
             file_data = flask.request.files.getlist("f_data[]")
             file_len = len(file_data)

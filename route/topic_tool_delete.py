@@ -4,7 +4,7 @@ def topic_tool_delete(topic_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(conn, None) != 1:
+        if admin_check(None) != 1:
             return re_error(conn, '/error/3')
 
         topic_num = str(topic_num)

@@ -8,7 +8,7 @@ def login_register_2():
             return re_error(conn, '/ban')
 
         ip = ip_check()
-        admin = admin_check(conn)
+        admin = admin_check()
         if admin != 1 and ip_or_user(ip) == 0:
             return redirect(conn, '/user')
 
@@ -22,8 +22,6 @@ def login_register_2():
             # 리캡차
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
                 return re_error(conn, '/error/13')
-            else:
-                captcha_post(conn, '', 0)
 
             user_id = flask.request.form.get('id', '')
             user_pw = flask.request.form.get('pw', '')

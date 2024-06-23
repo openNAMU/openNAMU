@@ -66,6 +66,6 @@ func Api_bbs_w_comment(call_arg []string) string {
 		json_data, _ := json.Marshal(data_list)
 		return string(json_data)
 	} else {
-		return ""
+		return "{}"
 	}
 }

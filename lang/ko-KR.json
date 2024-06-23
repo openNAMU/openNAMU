@@ -646,5 +646,7 @@
     "edit_bottom_compulsion_pass_authority": "편집 사유 필수 넘기기 권한",
     "404_page_setting": "404 페이지 설정",
     "404_page": "아래의 입력을 404 페이지로 사용",
-    "404_file": "루트 폴더 안의 404.html 사용"
+    "404_file": "루트 폴더 안의 404.html 사용",
+    "completely_ban": "완전 차단",
+    "dont_come_this_site": "사이트 접근 차단"
 }

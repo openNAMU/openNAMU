@@ -4,7 +4,7 @@ def user_edit_filter(name = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        owner_auth = admin_check(conn, 1, None)
+        owner_auth = admin_check(1, None)
         if ip_check() != name:
             if owner_auth != 1:
                 return redirect(conn, '/recent_block')

@@ -6,7 +6,7 @@ def user_setting_user_name(user_name = ''):
 
         ip = ip_check()
         if user_name != '':
-            if admin_check(conn) != 1:
+            if admin_check() != 1:
                 return re_error(conn, '/error/3')
             else:
                 ip = user_name

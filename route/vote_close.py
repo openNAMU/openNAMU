@@ -17,7 +17,7 @@ def vote_close(num = 1):
         curs.execute(db_change('select data from vote where id = ? and name = "open_user" and type = "option"'), [num])
         db_data = curs.fetchall()
         open_user = db_data[0][0] if db_data else ''
-        if open_user != ip_check() and admin_check(conn) != 1:
+        if open_user != ip_check() and admin_check() != 1:
             return re_error(conn, '/ban')
 
         if data_list[0][0] == 'close':

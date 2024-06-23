@@ -25,7 +25,7 @@ with open('version.json', encoding = 'utf8') as file_data:
 data_db_set = class_check_json()
 do_db_set(data_db_set)
 
-with get_db_connect() as conn:
+with get_db_connect(init_mode = True) as conn:
     curs = conn.cursor()
 
     setup_tool = ''
@@ -334,7 +334,7 @@ def do_every_day():
         # 칭호 관리
         curs.execute(db_change("select id from user_set where name = 'user_title' and data = '✅'"))
         for for_a in curs.fetchall():
-            if admin_check(conn, 'all', None, for_a[0]) != 1:
+            if admin_check('all', None, for_a[0]) != 1:
                 curs.execute(db_change("update user_set set data = '☑️' where name = 'user_title' and data = '✅' and id = ?"), [for_a[0]])
 
         threading.Timer(60 * 60 * 24, do_every_day).start()

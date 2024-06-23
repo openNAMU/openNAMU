@@ -137,19 +137,18 @@ def python_to_golang_sync(func_name, other_set = {}):
     )
     stdout, stderr = process.communicate()
     
-    while 1:
-        try:
-            data = stdout.decode('utf8')
-            err = stderr.decode('utf8')
-            if err != '':
-                if 'database is locked' in err:
-                    raise
-                else:
-                    print(err)
+    data = ''
+    while data == '':
+        data = stdout.decode('utf8')
+        err = stderr.decode('utf8')
+        if err != '':
+            if 'database is locked' in err:
+                pass
+            else:
+                print(err)
+                break
 
-            break
-        except:
-            time.sleep(0.01)
+        time.sleep(0.01)
 
     return data
 
@@ -178,19 +177,18 @@ async def python_to_golang(func_name, other_set = {}):
     )
     stdout, stderr = await process.communicate()
 
-    while 1:
-        try:
-            data = stdout.decode('utf8')
-            err = stderr.decode('utf8')
-            if err != '':
-                if 'database is locked' in err:
-                    raise
-                else:
-                    print(err)
+    data = ''
+    while data == '':
+        data = stdout.decode('utf8')
+        err = stderr.decode('utf8')
+        if err != '':
+            if 'database is locked' in err:
+                pass
+            else:
+                print(err)
+                break
 
-            break
-        except:
-            await asyncio.sleep(0.01)
+        await asyncio.sleep(0.01)
 
     return data
 
@@ -229,11 +227,12 @@ def get_init_set_list(need = 'all'):
         return init_set_list[need]
     
 class get_db_connect:
-    def __init__(self, db_type = ''):
+    def __init__(self, db_type = '', init_mode = False):
         with class_temp_db() as m_conn:
             m_curs = m_conn.cursor()
 
             self.db_set = {}
+            self.init_mode = init_mode
 
             m_curs.execute('select name, data from temp where name in ("db_type", "db_name")')
             db_data = m_curs.fetchall()
@@ -257,19 +256,25 @@ class get_db_connect:
                 isolation_level = None
             )
         else:
-            self.conn = pymysql.connect(
-                host = self.db_set['db_mysql_host'],
-                user = self.db_set['db_mysql_user'],
-                password = self.db_set['db_mysql_pw'],
-                charset = 'utf8mb4',
-                port = int(self.db_set['db_mysql_port']),
-                autocommit = True
-            )
-
-            try:
-                self.conn.select_db(self.db_set['db_name'])
-            except:
-                pass
+            if self.init_mode:
+                self.conn = pymysql.connect(
+                    host = self.db_set['db_mysql_host'],
+                    user = self.db_set['db_mysql_user'],
+                    password = self.db_set['db_mysql_pw'],
+                    charset = 'utf8mb4',
+                    port = int(self.db_set['db_mysql_port']),
+                    autocommit = True
+                )
+            else:
+                self.conn = pymysql.connect(
+                    host = self.db_set['db_mysql_host'],
+                    user = self.db_set['db_mysql_user'],
+                    password = self.db_set['db_mysql_pw'],
+                    charset = 'utf8mb4',
+                    port = int(self.db_set['db_mysql_port']),
+                    autocommit = True,
+                    db = self.db_set['db_name']
+                )
 
         return self.conn
     
@@ -990,7 +995,7 @@ def get_user_title_list(conn, ip = ''):
     if curs.fetchall():
         user_title['☑️'] = '☑️ before_admin'
 
-    if admin_check(conn, 'all') == 1:
+    if admin_check('all') == 1:
         user_title['✅'] = '✅ admin'
     
     return user_title
@@ -1209,7 +1214,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v267'
+    return '.cache_v269'
 
 def wiki_css(data):
     with class_temp_db() as m_conn:
@@ -1228,7 +1233,7 @@ def wiki_css(data):
         if db_data:
             data_css = db_data[0][0]
         else:
-            data_css += '<meta http-equiv="Cache-Control" content="max-age=3600">'
+            data_css += '<meta http-equiv="Cache-Control" content="max-age=31536000">'
 
             # External JS
             data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" integrity="sha512-LQNxIMR5rXv7o+b1l8+N1EZMfhG7iFZ9HhnbJkTp4zjNr5Wvst75AqUeFDxeRUa7l5vEDyUiAip//r+EFLLCyA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
@@ -1391,7 +1396,7 @@ def wiki_custom(conn):
         email = curs.fetchall()
         email = email[0][0] if email else ''
 
-        if admin_check(conn, 'all') == 1:
+        if admin_check('all') == 1:
             user_admin = '1'
 
             curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
@@ -1777,12 +1782,10 @@ def captcha_get(conn):
 
     return data
 
-def captcha_post(conn, re_data, num = 1):
+def captcha_post(conn, re_data):
     curs = conn.cursor()
 
-    if num != 1:
-        pass
-    elif acl_check('', 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
+    if acl_check('', 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
         pass
     elif acl_check('', 'recaptcha') == 1:
         curs.execute(db_change('select data from other where name = "sec_re"'))
@@ -1822,14 +1825,13 @@ def captcha_post(conn, re_data, num = 1):
                 if json_data['success'] != True:
                     return 1
 
-    if num == 1:
-        if 'recapcha_pass' in flask.session:
-            if flask.session['recapcha_pass'] > 0:
-                flask.session['recapcha_pass'] -= 1
-            else:
-                flask.session['recapcha_pass'] = 5
+    if 'recapcha_pass' in flask.session:
+        if flask.session['recapcha_pass'] > 0:
+            flask.session['recapcha_pass'] -= 1
         else:
             flask.session['recapcha_pass'] = 5
+    else:
+        flask.session['recapcha_pass'] = 5
 
     return 0
 
@@ -1941,45 +1943,32 @@ def level_check(conn, ip = ''):
 
     return [level, exp, max_exp]
 
-def admin_check(conn, num = None, what = None, name = ''):
-    curs = conn.cursor()
-
+def admin_check(num = None, what = None, name = ''):
     ip = ip_check() if name == '' else name
-    time_data = get_time()
     pass_ok = 0
 
-    if ip_or_user(ip) == 0:
-        curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
-        user_auth = curs.fetchall()
-        if user_auth:
-            user_auth = user_auth[0][0]
-            check = get_admin_auth_list(num)
-            
-            curs.execute(db_change('select name from alist where name = ? and acl = "owner"'), [user_auth])
-            if curs.fetchall():
-                pass_ok = 1
-            elif num == 'all':                    
-                curs.execute(db_change('select acl from alist where name = ?'), [user_auth])
-                db_data = curs.fetchall()
-                if db_data and db_data[0][0] in check:
-                    pass_ok = 1
-            else:
-                curs.execute(db_change('select name from alist where name = ? and acl = ?'), [user_auth, check])
-                if curs.fetchall():
-                    pass_ok = 1
+    other_set = {}
+    other_set['ip'] = ip
 
-            if pass_ok == 1:
-                if what:
-                    curs.execute(db_change('select data from other where name = "auth_history_off"'))
-                    db_data = curs.fetchall()
-                    if db_data and db_data[0][0] != '':
-                        pass
-                    else:
-                        curs.execute(db_change("insert into re_admin (who, what, time) values (?, ?, ?)"), [ip, what, time_data])
+    data_str = python_to_golang_sync('api_func_auth_list', other_set)
+    data = json.loads(data_str)
 
-                return 1
+    if num == 'all':
+        if "treat_as_admin" in data:
+            pass_ok = 1
+    else:
+        auth_name = get_admin_auth_list(num)
+        if auth_name in data:
+            pass_ok = 1
 
-    return 0
+    if pass_ok == 1:
+        if what:
+            other_set['what'] = what
+            python_to_golang_sync('api_func_auth_post', other_set)
+
+        return 1
+    else:
+        return 0
 
 def acl_check(name = '', tool = '', topic_num = ''):
     name = '' if name == None else name
@@ -2118,7 +2107,7 @@ def do_edit_filter(conn, data):
     curs = conn.cursor()
 
     ip = ip_check()
-    if admin_check(conn, 1) != 1:
+    if admin_check(1) != 1:
         curs.execute(db_change("select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''"))
         for data_list in curs.fetchall():
             match = re.compile(data_list[0], re.I)

@@ -4,7 +4,7 @@ def main_setting_top_menu():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(conn) != 1:
+        if admin_check() != 1:
             return re_error(conn, '/ban')
         
         if flask.request.method == 'POST':
@@ -14,7 +14,7 @@ def main_setting_top_menu():
             else:
                 curs.execute(db_change("insert into other (name, data, coverage) values ('top_menu', ?, '')"), [flask.request.form.get('content', '')])
 
-            admin_check(conn, None, 'edit_set (top_menu)')
+            admin_check(None, 'edit_set (top_menu)')
 
             return redirect(conn, '/setting/top_menu')
         else:
