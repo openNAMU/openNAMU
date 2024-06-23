@@ -4,7 +4,7 @@ from .edit_delete import edit_delete
 
 def edit_delete_multiple():
     with get_db_connect() as conn:
-        if admin_check() != 1:
+        if acl_check('', 'acl_auth', '', '') == 1:
             return re_error(conn, '/ban')
 
         if flask.request.method == 'POST':

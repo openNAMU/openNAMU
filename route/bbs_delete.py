@@ -13,7 +13,7 @@ def bbs_delete(bbs_num = ''):
         
         bbs_num_str = str(bbs_num)
 
-        if admin_check() != 1:
+        if acl_check('', 'owner_auth', '', '') == 1:
             return redirect(conn, '/bbs/in/' + bbs_num_str)
         
         if flask.request.method == 'POST':

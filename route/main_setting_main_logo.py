@@ -4,7 +4,7 @@ def main_setting_main_logo():
     with get_db_connect() as conn:
         curs = conn.cursor()
         
-        if admin_check() != 1:
+        if acl_check('', 'owner_auth', '', '') == 1:
             return re_error(conn, '/ban')
 
         skin_list = [0] + load_skin(conn, '', 1)

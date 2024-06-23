@@ -9,7 +9,7 @@ def list_admin_group_2():
 
         curs.execute(db_change("select distinct name from alist order by name asc"))
         for data in curs.fetchall():
-            if admin_check() == 1 and not data[0] in org_acl_list:
+            if acl_check('', 'owner_auth', '', '') != 1 and not data[0] in org_acl_list:
                 delete_admin_group = ' <a href="/auth/list/delete/' + url_pas(data[0]) + '">(' + get_lang(conn, "delete") + ')</a>'
             else:
                 delete_admin_group = ''

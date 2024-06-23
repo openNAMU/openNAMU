@@ -4,7 +4,7 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check() != 1:
+        if acl_check('', 'owner_auth', '', '') == 1:
             return re_error(conn, '/ban')
         
         if flask.request.method == 'POST' and set_preview == 0:

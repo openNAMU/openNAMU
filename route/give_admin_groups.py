@@ -46,7 +46,7 @@ def give_admin_groups(name = 'test'):
         ]
 
         if flask.request.method == 'POST':
-            if admin_check(None, 'auth list add (' + name + ')') != 1:
+            if acl_check(tool = 'owner_auth', memo = 'auth list add (' + name + ')') != 1:
                 return re_error(conn, '/error/3')
             elif name in get_default_admin_group():
                 return re_error(conn, '/error/3')
@@ -58,7 +58,7 @@ def give_admin_groups(name = 'test'):
 
             return redirect(conn, '/auth/list/add/' + url_pas(name))
         else:
-            state = 'disabled' if admin_check() != 1 else ''
+            state = 'disabled' if acl_check('', 'owner_auth', '', '') == 1 else ''
             state = 'disabled' if name in get_default_admin_group() else ''
 
             data = '<ul>'

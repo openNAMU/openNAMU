@@ -13,7 +13,7 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
         if admin_check('all', None, name) == 1 or (plus_id and admin_check('all', None, plus_id) == 1):
-            if admin_check() != 1:
+            if acl_check('', 'owner_auth', '', '') == 1:
                 return re_error(conn, '/error/4')
 
         div = ''

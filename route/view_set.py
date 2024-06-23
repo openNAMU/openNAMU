@@ -112,7 +112,7 @@ def view_set(name = 'Test', multiple = False):
 
             markup_data = markup_data if markup_data != '' else 'normal'
 
-            if admin_check() == 1:
+            if acl_check('', 'owner_auth', '', '') != 1:
                 document_top = flask.request.form.get('document_top', '')
 
                 acl_text += 'document_top\n'
@@ -220,7 +220,7 @@ def view_set(name = 'Test', multiple = False):
             data += view_set_markup(conn, document_name = name, disable = check_ok)
 
             save_button = '<button type="submit" ' + check_ok + '>' + get_lang(conn, 'save') + '</button>'
-            if admin_check() != 1:
+            if acl_check('', 'owner_auth', '', '') == 1:
                 check_ok = 'disabled'
 
             curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'document_top'"), [name])

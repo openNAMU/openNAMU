@@ -7,7 +7,7 @@ def main_sys_update():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check() != 1:
+        if acl_check('', 'owner_auth', '', '') == 1:
             return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':

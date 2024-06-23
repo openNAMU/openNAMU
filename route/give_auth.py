@@ -5,8 +5,12 @@ def give_auth(name):
         curs = conn.cursor()
 
         ip = ip_check()
-        owner_auth = admin_check()
-        admin_auth = admin_check(7)
+        
+        owner_auth = acl_check(tool = 'owner_auth')
+        owner_auth = 1 if owner_auth == 0 else 1
+
+        admin_auth = acl_check(tool = 'give_auth')
+        admin_auth = 1 if admin_auth == 0 else 1
 
         curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [name])
         user_acl = curs.fetchall()
@@ -24,7 +28,7 @@ def give_auth(name):
                 return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
-            if admin_check(7, 'admin (' + name + ')') != 1:
+            if acl_check(tool = 'give_auth', memo = 'admin (' + name + ')') != 1:
                 return re_error(conn, '/error/3')
 
             select_data = flask.request.form.get('select', 'X')

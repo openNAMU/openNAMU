@@ -8,7 +8,7 @@ def filter_all_add(tool, name = None):
             return redirect(conn, '/manager/9')
 
         if flask.request.method == 'POST':
-            if admin_check() != 1:
+            if acl_check('', 'owner_auth', '', '') == 1:
                 return re_error(conn, '/error/3')
 
             title = flask.request.form.get('title', 'test')
@@ -23,7 +23,7 @@ def filter_all_add(tool, name = None):
                     curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki_sub'"), [title])
                     curs.execute(db_change('insert into html_filter (html, plus, plus_t, kind) values (?, "inter_wiki_type", ?, "inter_wiki_sub")'), [title, inter_type])
                 
-                admin_check(None, tool + ' edit')
+                acl_check(tool = 'owner_auth', memo = tool + ' edit')
             elif tool == 'edit_filter':
                 day = flask.request.form.get('day', '0')
                 end = 'X' if day == '0' else day
@@ -101,7 +101,7 @@ def filter_all_add(tool, name = None):
             return redirect(conn, '/filter/' + tool)
         else:
             get_sub = 0
-            stat = 'disabled' if admin_check() != 1 else ''
+            stat = 'disabled' if acl_check('', 'owner_auth', '', '') == 1 else ''
             name = name if name else ''
 
             if tool in ('inter_wiki', 'outer_link'):

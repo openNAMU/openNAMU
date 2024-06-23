@@ -8,7 +8,7 @@ def give_user_fix(user_name = ''):
         if not curs.fetchall():
             return re_error(conn, '/error/2')
 
-        if admin_check() != 1:
+        if acl_check('', 'owner_auth', '', '') == 1:
             return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':

@@ -2,7 +2,7 @@ from .tool.func import *
 
 def main_sys_restart():
     with get_db_connect() as conn:
-        if admin_check() != 1:
+        if acl_check('', 'owner_auth', '', '') == 1:
             return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':

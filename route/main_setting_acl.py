@@ -34,7 +34,7 @@ def main_setting_acl():
                 return redirect(conn, '/setting/acl')
         else:
             d_list = {}
-            disable = 'disabled' if admin_check() != 1 else ''
+            disable = 'disabled' if acl_check('', 'owner_auth', '', '') == 1 else ''
             acl_div = ['' for _ in range(0, len(i_list))]
 
             for for_a in i_list:
