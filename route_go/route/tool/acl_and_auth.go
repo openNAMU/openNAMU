@@ -95,7 +95,7 @@ func Get_user_auth(db *sql.DB, ip string) string {
 }
 
 func Get_auth_group_info(db *sql.DB, auth string) map[string]bool {
-	stmt, err := db.Prepare(DB_change("select name from alist where name = ?"))
+	stmt, err := db.Prepare(DB_change("select acl from alist where name = ?"))
 	if err != nil {
 		log.Fatal(err)
 	}
