@@ -22,6 +22,8 @@ def give_admin_groups(name = 'test'):
             [4, '', get_lang(conn, 'admin_default_feature_authority'), True],
             [3, 'bbs', get_lang(conn, 'bbs_authority')],
             [4, '', get_lang(conn, 'admin_default_feature_authority'), True],
+            [3, 'vote', get_lang(conn, 'vote_authority')],
+            [4, '', get_lang(conn, 'admin_default_feature_authority'), True],
             [3, 'admin_default_feature', get_lang(conn, 'admin_default_feature_authority')],
             [4, 'treat_as_admin', get_lang(conn, 'treat_as_admin_authority')],
             [4, 'user_name_bold', get_lang(conn, 'user_name_bold_authority')],

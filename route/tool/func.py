@@ -1900,7 +1900,6 @@ def level_check(conn, ip = ''):
     return [level, exp, max_exp]
 
 def acl_check(name = '', tool = '', topic_num = '', ip = '', memo = ''):
-    name = '' if name == None else name
     ip = ip_check() if ip == '' else ip
 
     other_set = {}

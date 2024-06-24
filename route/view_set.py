@@ -43,7 +43,7 @@ def view_set(name = 'Test', multiple = False):
             if flask.request.method == 'POST':
                 check_data = 'document_set (' + name + ')'
             else:
-                check_data = None
+                check_data = ''
 
             user_data = re.search(r'^user:(.+)$', name)
             if user_data:
