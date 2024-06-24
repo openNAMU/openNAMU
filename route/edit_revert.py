@@ -5,7 +5,7 @@ def edit_revert(name, num):
         curs = conn.cursor()
 
         curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, str(num)])
-        if curs.fetchall() and acl_check(tool = 'hidel_auth') != 1:
+        if curs.fetchall() and acl_check(tool = 'hidel_auth') == 1:
             return re_error(conn, '/error/3')
 
         if acl_check(name, 'document_edit') == 1:

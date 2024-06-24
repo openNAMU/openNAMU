@@ -14,7 +14,7 @@ def give_user_fix(user_name = ''):
         if flask.request.method == 'POST':
             select = flask.request.form.get('select', '')
 
-            admin_check(None, 'user_fix (' + user_name + ') (' + select + ')')
+            acl_check(tool = 'owner_auth', memo = 'user_fix (' + user_name + ') (' + select + ')')
             if select == 'password_change':
                 password = flask.request.form.get('new_password', '')
                 check_password = flask.request.form.get('password_check', '')

@@ -20,7 +20,7 @@ def main_setting_main_logo():
                     i[1]
                 ])
 
-            admin_check(None, 'edit_set (logo)')
+            acl_check(tool = 'owner_auth', memo = 'edit_set (logo)')
 
             return redirect(conn, '/setting/main/logo')
         else:

@@ -6,7 +6,7 @@ def main_sys_restart():
             return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
-            admin_check(None, 'restart')
+            acl_check(tool = 'owner_auth', memo = 'restart')
 
             print('Restart')
 

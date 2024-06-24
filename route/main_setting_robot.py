@@ -32,7 +32,7 @@ def main_setting_robot():
             else:
                 curs.execute(db_change("insert into other (name, data, coverage) values ('robot_default', ?, '')"), [flask.request.form.get('default', '')])
 
-            admin_check(None, 'edit_set (robot)')
+            acl_check(tool = 'owner_auth', memo = 'edit_set (robot)')
 
             return redirect(conn, '/setting/robot')
         else:

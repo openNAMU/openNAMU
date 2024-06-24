@@ -30,7 +30,7 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
             else:
                 curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, ?)"), [info_d, flask.request.form.get('content', ''), coverage])
 
-            admin_check(None, 'edit_set (' + info_d + ')')
+            acl_check(tool = 'owner_auth', memo = 'edit_set (' + info_d + ')')
 
             if skin_name == '':
                 return redirect(conn, '/setting/' + end_r)

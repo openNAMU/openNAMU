@@ -8,7 +8,7 @@ def recent_record_reset(name = 'Test'):
             return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
-            admin_check(None, 'record reset ' + name)
+            acl_check(tool = 'owner_auth', memo = 'record reset ' + name)
 
             curs.execute(db_change("delete from history where ip = ?"), [name])
 

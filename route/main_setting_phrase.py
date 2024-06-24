@@ -42,7 +42,7 @@ def main_setting_phrase():
         if flask.request.method == 'POST':
             curs.executemany(db_change("update other set data = ? where name = ?"), [[flask.request.form.get(for_a, ''), for_a] for for_a in i_list])
 
-            admin_check(None, 'edit_set (phrase)')
+            acl_check(tool = 'owner_auth', memo = 'edit_set (phrase)')
 
             return redirect(conn, '/setting/phrase')
         else:

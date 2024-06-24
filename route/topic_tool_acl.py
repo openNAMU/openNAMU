@@ -4,7 +4,7 @@ def topic_tool_acl(topic_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(3) != 1:
+        if acl_check(tool = 'toron_auth') == 1:
             return re_error(conn, '/error/3')
 
         ip = ip_check()
@@ -17,7 +17,7 @@ def topic_tool_acl(topic_num = 1):
             return redirect(conn, '/')
 
         if flask.request.method == 'POST':
-            admin_check(3, 'topic_acl_set (code ' + topic_num + ')')
+            acl_check(tool = 'toron_auth', memo = 'topic_acl_set (code ' + topic_num + ')')
 
             curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [topic_num])
             topic_check = curs.fetchall()

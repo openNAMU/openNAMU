@@ -22,7 +22,7 @@ def main_setting_sitemap_set():
                     setting_list[i][0]
                 ])
 
-            admin_check(None, 'edit_set (sitemap)')
+            acl_check(tool = 'owner_auth', memo = 'edit_set (sitemap)')
 
             return redirect(conn, '/setting/sitemap_set')
         else:

@@ -26,7 +26,7 @@ def main_setting_acl():
         }
 
         if flask.request.method == 'POST':
-            if admin_check(None, 'edit_set (acl)') != 1:
+            if acl_check(tool = 'owner_auth', memo = 'edit_set (acl)') == 1:
                 return re_error(conn, '/ban')
             else:
                 curs.executemany(db_change("update other set data = ? where name = ?"), [[flask.request.form.get(i_list[for_a], 'normal'), i_list[for_a]] for for_a in i_list])

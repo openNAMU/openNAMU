@@ -11,7 +11,7 @@ def recent_history_add(name = 'Test', do_type = ''):
             return re_error(conn, '/ban')
 
         if flask.request.method == 'POST':
-            admin_check(None, 'history_add (' + name + ')')
+            acl_check(tool = 'owner_auth', memo = 'history_add (' + name + ')')
 
             today = get_time()
             content = flask.request.form.get('content', '')

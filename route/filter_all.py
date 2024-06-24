@@ -14,7 +14,7 @@ def filter_all(tool):
         div += '</tr>'
 
         admin = acl_check(tool = 'owner_auth')
-        admin = 1 if admin == 0 else 1
+        admin = 1 if admin == 0 else 0
 
         if tool == 'inter_wiki':
             title = get_lang(conn, 'interwiki_list')

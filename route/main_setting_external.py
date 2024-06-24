@@ -26,7 +26,7 @@ def main_setting_external():
 
                 curs.execute(db_change("update other set data = ? where name = ?"), [into_data, data])
 
-            admin_check(None, 'edit_set (external)')
+            acl_check(tool = 'owner_auth', memo = 'edit_set (external)')
 
             return redirect(conn, '/setting/external')
         else:

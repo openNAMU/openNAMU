@@ -995,7 +995,7 @@ def get_user_title_list(conn, ip = ''):
     if curs.fetchall():
         user_title['☑️'] = '☑️ before_admin'
 
-    if admin_check('all') == 1:
+    if acl_check(tool = 'all_admin_auth') != 1:
         user_title['✅'] = '✅ admin'
     
     return user_title
@@ -1396,7 +1396,7 @@ def wiki_custom(conn):
         email = curs.fetchall()
         email = email[0][0] if email else ''
 
-        if admin_check('all') == 1:
+        if acl_check(tool = 'all_admin_auth') != 1:
             user_admin = '1'
 
             curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
@@ -2045,7 +2045,7 @@ def do_edit_filter(conn, data):
     curs = conn.cursor()
 
     ip = ip_check()
-    if admin_check(1) != 1:
+    if acl_check(tool = 'ban_auth') == 1:
         curs.execute(db_change("select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''"))
         for data_list in curs.fetchall():
             match = re.compile(data_list[0], re.I)

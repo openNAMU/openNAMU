@@ -51,13 +51,13 @@ def view_set(name = 'Test', multiple = False):
                     return redirect(conn, '/login')
 
                 if user_data.group(1) != ip:
-                    if admin_check(5) != 1:
+                    if acl_check(tool = 'acl_auth') == 1:
                         if check_data:
                             return re_error(conn, '/error/3')
                         else:
                             check_ok = 'disabled'
             else:
-                if admin_check(5) != 1:
+                if acl_check(tool = 'acl_auth') == 1:
                     if check_data:
                         return re_error(conn, '/error/3')
                     else:
@@ -129,7 +129,7 @@ def view_set(name = 'Test', multiple = False):
                 curs.execute(db_change("delete from data_set where doc_name = ? and set_name = 'document_editor_top'"), [name])
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_editor_top', ?)"), [name, document_editor_top])
 
-            admin_check(5, check_data)
+            acl_check(tool = 'acl_auth', memo = check_data)
 
             history_plus(conn, 
                 name,

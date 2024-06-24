@@ -8,7 +8,9 @@ def login_register_2():
             return re_error(conn, '/ban')
 
         ip = ip_check()
-        admin = admin_check()
+        admin = acl_check(tool = 'owner_auth')
+        admin = 1 if admin == 0 else 0
+
         if admin != 1 and ip_or_user(ip) == 0:
             return redirect(conn, '/user')
 

@@ -11,7 +11,7 @@ def main_sys_update():
             return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
-            admin_check(None, 'update')
+            acl_check(tool = 'owner_auth', memo = 'update')
 
             curs.execute(db_change('select data from other where name = "update"'))
             up_data = curs.fetchall()

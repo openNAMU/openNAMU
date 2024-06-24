@@ -6,7 +6,7 @@ def recent_history_hidden(name = 'Test', rev = 1):
 
         num = str(rev)
 
-        if admin_check(6, 'history_hidden (' + name + '#' + num + ')') == 1:
+        if acl_check(tool = 'hidel_auth', memo = 'history_hidden (' + name + '#' + num + ')') != 1:
             curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
             if curs.fetchall():
                 curs.execute(db_change("update history set hide = '' where title = ? and id = ?"), [name, num])

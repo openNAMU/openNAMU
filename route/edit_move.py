@@ -160,7 +160,7 @@ def edit_move(name):
             # 토론 이동 파트 S
             curs.execute(db_change("select title from rd where title = ?"), [move_title])
             if curs.fetchall():
-                if move_option_topic == 'merge' and acl_check(tool = 'owner_auth', memo = 'merge document\'s topics (' + name + ') (' + move_title + ')') == 1:
+                if move_option_topic == 'merge' and acl_check(tool = 'owner_auth', memo = 'merge document\'s topics (' + name + ') (' + move_title + ')') != 1:
                     curs.execute(db_change("update rd set title = ? where title = ?"), [move_title, name])
                 elif move_option_topic == 'reverse':
                     i = 0
@@ -211,7 +211,7 @@ def edit_move(name):
                 return re_error(conn, '/error/19')
         else:
             owner_auth = acl_check(tool = 'owner_auth')
-            owner_auth = 1 if owner_auth == 0 else 1
+            owner_auth = 1 if owner_auth == 0 else 0
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
                 imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'move') + ')', 0])],

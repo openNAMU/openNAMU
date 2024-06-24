@@ -14,7 +14,7 @@ def main_setting_top_menu():
             else:
                 curs.execute(db_change("insert into other (name, data, coverage) values ('top_menu', ?, '')"), [flask.request.form.get('content', '')])
 
-            admin_check(None, 'edit_set (top_menu)')
+            acl_check(tool = 'owner_auth', memo = 'edit_set (top_menu)')
 
             return redirect(conn, '/setting/top_menu')
         else:

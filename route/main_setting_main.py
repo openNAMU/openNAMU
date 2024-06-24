@@ -55,7 +55,7 @@ def main_setting_main():
                     setting_list[i][0]
                 ])
 
-            admin_check(None, 'edit_set (main)')
+            acl_check(tool = 'owner_auth', memo = 'edit_set (main)')
 
             return redirect(conn, '/setting/main')
         else:
