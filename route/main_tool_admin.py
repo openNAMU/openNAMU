@@ -13,12 +13,12 @@ def main_tool_admin():
                     <li><a href="/auth/ban">''' + get_lang(conn, 'ban') + '''</a></li>
                     <li><a href="/auth/ban/multiple">''' + get_lang(conn, 'multiple_ban') + '''</a></li>
                     <li><a href="/manager/5">''' + get_lang(conn, 'authorize') + '''</a></li>
+                    <li><a href="/delete_multiple">''' + get_lang(conn, 'many_delete') + '''</a></li>
+                    <li><a href="/app_submit">''' + get_lang(conn, 'application_list') + '''</a></li>
                 </ul>
                 <h2>''' + get_lang(conn, 'owner') + '''</h2>
                 <ul>
                     <li><a href="/auth/list">''' + get_lang(conn, 'admin_group_list') + '''</a></li>
-                    <li><a href="/delete_multiple">''' + get_lang(conn, 'many_delete') + '''</a></li>
-                    <li><a href="/app_submit">''' + get_lang(conn, 'application_list') + '''</a></li>
                     <li><a href="/register">''' + get_lang(conn, 'add_user') + '''</a></li>
                     <li><a href="/setting">''' + get_lang(conn, 'setting') + '''</a></li>
                     <li><a href="/manager/18">''' + get_lang(conn, 'user_fix') + '''</a></li>

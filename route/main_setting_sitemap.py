@@ -5,12 +5,12 @@ def main_setting_sitemap(do_type = 0):
         curs = conn.cursor()
 
         if not do_type == 1:
-            if admin_check() != 1:
+            if acl_check('', 'owner_auth', '', '') == 1:
                 return re_error(conn, '/ban')
         
         if do_type == 1 or flask.request.method == 'POST':
             if not do_type == 1:
-                admin_check(None, 'make sitemap')
+                acl_check(tool = 'owner_auth', memo = 'make sitemap')
 
             data = '' + \
                 '<?xml version="1.0" encoding="UTF-8"?>\n' + \

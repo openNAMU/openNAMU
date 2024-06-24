@@ -6,7 +6,7 @@ def main_setting_skin_set():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check() != 1:
+        if acl_check('', 'owner_auth', '', '') == 1:
             return re_error(conn, '/ban')
             
         set_list = user_setting_skin_set_main_set_list(conn)
@@ -19,7 +19,7 @@ def main_setting_skin_set():
                 else:
                     curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [for_b, flask.request.form.get(for_b, set_list[for_b][0][0])])
 
-            admin_check(None, 'edit_set (skin_set)')
+            acl_check(tool = 'owner_auth', memo = 'edit_set (skin_set)')
 
             return redirect(conn, '/setting/skin_set')
         else:

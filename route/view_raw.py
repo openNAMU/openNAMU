@@ -39,7 +39,7 @@ def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', pos
                 sub += ' (' + comment_num + ')'
         elif topic_num == '' and num != '':
             curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
-            if curs.fetchall() and admin_check(6) != 1:
+            if curs.fetchall() and acl_check(tool = 'hidel_auth') == 1:
                 return re_error(conn, '/error/3')
 
             curs.execute(db_change("select data from history where title = ? and id = ?"), [name, num])
@@ -48,7 +48,7 @@ def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', pos
 
             menu = [['history_tool/' + url_pas(num) + '/' + url_pas(name), get_lang(conn, 'return')]]
         elif topic_num != '':
-            if admin_check(6) != 1:
+            if acl_check(tool = 'hidel_auth') == 1:
                 curs.execute(db_change("select data from topic where id = ? and code = ? and block = ''"), [num, topic_num])
             else:
                 curs.execute(db_change("select data from topic where id = ? and code = ?"), [num, topic_num])

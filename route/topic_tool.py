@@ -42,7 +42,7 @@ def topic_tool(topic_num = 1):
         else:
             acl_view_state = 'normal'
 
-        if admin_check(3) == 1:
+        if acl_check(tool = 'toron_auth') != 1:
             data = '''
                 <h2>''' + get_lang(conn, 'admin_tool') + '''</h2>
                 <ul>
@@ -59,7 +59,7 @@ def topic_tool(topic_num = 1):
             </ul>
         '''
 
-        if admin_check(None) == 1:
+        if acl_check(tool = 'owner_auth') != 1:
             data += '''
                 <h2>''' + get_lang(conn, 'owner') + '''</h2>
                 <ul>

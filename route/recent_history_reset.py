@@ -4,11 +4,11 @@ def recent_history_reset(name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check() != 1:
+        if acl_check('', 'owner_auth', '', '') == 1:
             return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
-            admin_check(None, 'history reset ' + name)
+            acl_check(tool = 'owner_auth', memo = 'history reset ' + name)
 
             curs.execute(db_change("delete from history where title = ?"), [name])
 

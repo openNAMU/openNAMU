@@ -7,11 +7,11 @@ def recent_history_add(name = 'Test', do_type = ''):
         curs = conn.cursor()
 
         ip = ip_check()
-        if admin_check() != 1:
+        if acl_check('', 'owner_auth', '', '') == 1:
             return re_error(conn, '/ban')
 
         if flask.request.method == 'POST':
-            admin_check(None, 'history_add (' + name + ')')
+            acl_check(tool = 'owner_auth', memo = 'history_add (' + name + ')')
 
             today = get_time()
             content = flask.request.form.get('content', '')

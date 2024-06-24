@@ -4,12 +4,14 @@ def topic_tool_delete(topic_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if admin_check(None) != 1:
+        if acl_check(tool = 'owner_auth') == 1:
             return re_error(conn, '/error/3')
 
         topic_num = str(topic_num)
 
         if flask.request.method == 'POST':
+            acl_check(tool = 'owner_auth', memo = 'delete topic (' + topic_num + ')')
+
             curs.execute(db_change("delete from topic where code = ?"), [topic_num])
             curs.execute(db_change("delete from rd where code = ?"), [topic_num])
 

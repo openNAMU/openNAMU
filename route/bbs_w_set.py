@@ -16,7 +16,7 @@ def bbs_w_set(bbs_num = ''):
         i_list = ['bbs_acl', 'bbs_edit_acl', 'bbs_comment_acl', 'bbs_view_acl', 'bbs_markup']
 
         if flask.request.method == 'POST':
-            if admin_check(None, 'bbs_set (acl)') != 1:
+            if acl_check('', 'owner_auth', '', '', 'bbs_set (acl)') == 1:
                 return re_error(conn, '/ban')
             else:
                 for for_a in range(len(i_list)):
@@ -31,7 +31,7 @@ def bbs_w_set(bbs_num = ''):
             d_list = ['' for _ in range(0, len(i_list))]
 
             other_menu = []
-            if admin_check() != 1:
+            if acl_check('', 'bbs_auth', '', '') == 1:
                 disable = 'disabled'
             else:
                 disable = ''

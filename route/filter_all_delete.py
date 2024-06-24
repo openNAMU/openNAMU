@@ -4,7 +4,7 @@ def filter_all_delete(tool, name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
         
-        if admin_check(None, 'del_' + tool) != 1:
+        if acl_check(tool = 'owner_auth', memo = 'del_' + tool) == 1:
             return re_error(conn, '/error/3')
 
         if tool == 'inter_wiki':

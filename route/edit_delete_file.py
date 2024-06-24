@@ -4,10 +4,7 @@ from .edit_delete import edit_delete
 
 def edit_delete_file(name = 'test.jpg'):
     with get_db_connect() as conn:
-        curs = conn.cursor()
-
-        ip = ip_check()
-        if admin_check() == 0:
+        if acl_check('', 'owner_auth', '', '') != 0:
             return re_error(conn, '/ban')
 
         mime_type = re.search(r'([^.]+)$', name)
@@ -25,7 +22,7 @@ def edit_delete_file(name = 'test.jpg'):
             return redirect(conn, '/w/' + url_pas(name))
 
         if flask.request.method == 'POST':
-            admin_check(None, 'file del (' + name + ')')
+            acl_check(tool = 'owner_auth', memo = 'file del (' + name + ')')
             os.remove(file_directory)
 
             if flask.request.form.get('with_doc', '') != '':

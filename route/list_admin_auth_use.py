@@ -26,7 +26,7 @@ def list_admin_auth_use(arg_num = 1, arg_search = 'normal'):
                     curs.execute(db_change("select data from other where name = 'ip_view'"))
                     db_data = curs.fetchall()
                     ip_view = db_data[0][0] if db_data else ''
-                    ip_view = '' if admin_check(1) == 1 else ip_view
+                    ip_view = '' if acl_check(tool = 'ban_auth') != 1 else ip_view
                     
                     if ip_view != '':
                         do_data = do_data.split(' ')

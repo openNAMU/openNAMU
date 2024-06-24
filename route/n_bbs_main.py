@@ -9,5 +9,5 @@ def bbs_main():
                 '<script defer src="/views/main_css/js/route/bbs_main.js' + cache_v() + '"></script>' + \
                 '<script>window.addEventListener("DOMContentLoaded", function() { opennamu_bbs_main(); });</script>' + \
             '',
-            menu = [['other', get_lang(conn, 'other_tool')]] + ([['bbs/make', get_lang(conn, 'add')], ['bbs/set', get_lang(conn, 'bbs_set')]] if admin_check() == 1 else [])
+            menu = [['other', get_lang(conn, 'other_tool')]] + ([['bbs/make', get_lang(conn, 'add')], ['bbs/set', get_lang(conn, 'bbs_set')]] if acl_check('', 'owner_auth', '', '') != 1 else [])
         ))

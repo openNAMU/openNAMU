@@ -2,11 +2,11 @@ from .tool.func import *
 
 def main_sys_shutdown():
     with get_db_connect() as conn:
-        if admin_check() != 1:
+        if acl_check('', 'owner_auth', '', '') == 1:
             return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
-            admin_check(None, 'shutdown')
+            acl_check(tool = 'owner_auth', memo = 'shutdown')
 
             print('Shutdown')
 
