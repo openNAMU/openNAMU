@@ -94,8 +94,8 @@ def view_w(name = 'Test', do_type = ''):
             user_doc = ''
             
             # S admin or owner 특수 틀 추가
-            if admin_check('all', None, user_name) == 1:
-                if admin_check(None, None, user_name) == 1:
+            if acl_check(tool = 'all_admin_auth', ip = user_name) != 1:
+                if acl_check(tool = 'owner_auth', ip = user_name) != 1:
                     curs.execute(db_change('select data from other where name = "phrase_user_page_owner"'))
                     db_data = curs.fetchall()
                     if db_data and db_data[0][0] != '':

@@ -8,7 +8,7 @@ def filter_all_add(tool, name = None):
             return redirect(conn, '/manager/9')
 
         if flask.request.method == 'POST':
-            if admin_check() != 1:
+            if acl_check('', 'owner_auth', '', '') == 1:
                 return re_error(conn, '/error/3')
 
             title = flask.request.form.get('title', 'test')
@@ -23,7 +23,7 @@ def filter_all_add(tool, name = None):
                     curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki_sub'"), [title])
                     curs.execute(db_change('insert into html_filter (html, plus, plus_t, kind) values (?, "inter_wiki_type", ?, "inter_wiki_sub")'), [title, inter_type])
                 
-                admin_check(None, tool + ' edit')
+                acl_check(tool = 'owner_auth', memo = tool + ' edit')
             elif tool == 'edit_filter':
                 day = flask.request.form.get('day', '0')
                 end = 'X' if day == '0' else day
@@ -39,7 +39,7 @@ def filter_all_add(tool, name = None):
                 
                 curs.execute(db_change("delete from html_filter where html = ? and kind = 'regex_filter'"), [name])
                 curs.execute(db_change("insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, 'regex_filter')"), [name, content, end])
-                admin_check(None, 'edit_filter edit')
+                acl_check(tool = 'owner_auth', memo = 'edit_filter edit')
             elif tool == 'document':
                 post_name = flask.request.form.get('name', '')
                 if post_name == '':
@@ -53,7 +53,7 @@ def filter_all_add(tool, name = None):
                     return re_error(conn, '/error/23')
                 
                 curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, "document", ?, ?)'), [post_name, post_regex, post_acl])
-                admin_check(None, 'document_filter edit')
+                acl_check(tool = 'owner_auth', memo = 'document_filter edit')
             else:
                 plus_d = ''
                 if tool == 'name_filter':
@@ -62,7 +62,7 @@ def filter_all_add(tool, name = None):
                     except:
                         return re_error(conn, '/error/23')
 
-                    admin_check(None, 'name_filter edit')
+                    acl_check(tool = 'owner_auth', memo = 'name_filter edit')
                     type_d = 'name'
                 elif tool == 'file_filter':
                     try:
@@ -70,26 +70,26 @@ def filter_all_add(tool, name = None):
                     except:
                         return re_error(conn, '/error/23')
 
-                    admin_check(None, 'file_filter edit')
+                    acl_check(tool = 'owner_auth', memo = 'file_filter edit')
                     type_d = 'file'
                 elif tool == 'email_filter':
-                    admin_check(None, 'email_filter edit')
+                    acl_check(tool = 'owner_auth', memo = 'email_filter edit')
                     type_d = 'email'
                 elif tool == 'image_license':
-                    admin_check(None, 'image_license edit')
+                    acl_check(tool = 'owner_auth', memo = 'image_license edit')
                     type_d = 'image_license'
                 elif tool == 'extension_filter':
-                    admin_check(None, 'extension_filter edit')
+                    acl_check(tool = 'owner_auth', memo = 'extension_filter edit')
                     type_d = 'extension'
                     plus_d = flask.request.form.get('max_file_size', '')
                     if plus_d != '':
                         plus_d = number_check(plus_d)
                 elif tool == 'template':
-                    admin_check(None, 'template_document edit')
+                    acl_check(tool = 'owner_auth', memo = 'template_document edit')
                     type_d = 'template'
                     plus_d = flask.request.form.get('exp', 'test')
                 else:
-                    admin_check(None, 'edit_top edit')
+                    acl_check(tool = 'owner_auth', memo = 'edit_top edit')
                     type_d = 'edit_top'
                     plus_d = flask.request.form.get('markup', 'test')
 
@@ -101,7 +101,7 @@ def filter_all_add(tool, name = None):
             return redirect(conn, '/filter/' + tool)
         else:
             get_sub = 0
-            stat = 'disabled' if admin_check() != 1 else ''
+            stat = 'disabled' if acl_check('', 'owner_auth', '', '') == 1 else ''
             name = name if name else ''
 
             if tool in ('inter_wiki', 'outer_link'):

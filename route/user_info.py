@@ -41,7 +41,7 @@ def user_info(name = ''):
             login_menu = '<h2>' + get_lang(conn, 'login') + '</h2><ul>' + login_menu + '</ul>'
             tool_menu = '<h2>' + get_lang(conn, 'tool') + '</h2><ul>' + tool_menu + '</ul>'
     
-        if admin_check(1) == 1:
+        if acl_check(tool = 'ban_auth') != 1:
             curs.execute(db_change("select block from rb where block = ? and ongoing = '1'"), [ip])
             ban_name = get_lang(conn, 'release') if curs.fetchall() else get_lang(conn, 'ban')
             

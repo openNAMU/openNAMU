@@ -16,8 +16,6 @@ def vote_add():
             id_data = curs.fetchall()
             id_data = str((int(id_data[0][0]) + 1) if id_data else 1)
 
-            admin_check(None, 'add vote ' + id_data)
-
             if flask.request.form.get('open_select', 'N') == 'Y':
                 open_data = 'open'
             else:

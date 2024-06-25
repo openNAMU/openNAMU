@@ -6,11 +6,11 @@ def recent_history_delete(name = 'Test', rev = 1):
 
         num = str(rev)
 
-        if admin_check() != 1:
+        if acl_check('', 'owner_auth', '', '') == 1:
             return re_error(conn, '/error/3')
 
         if flask.request.method == 'POST':
-            admin_check(None, 'history delete ' + name + ' r' + num)
+            acl_check(tool = 'owner_auth', memo = 'history delete ' + name + ' r' + num)
 
             curs.execute(db_change("delete from history where id = ? and title = ?"), [num, name])
 

@@ -22,7 +22,7 @@ def recent_history_tool(name = 'Test', rev = 1):
         data += '<li><a href="/history/' + url_pas(name) + '">' + get_lang(conn, 'history') + '</a></li>'
         data += '</ul>'
 
-        if admin_check(6) == 1:
+        if acl_check(tool = 'hidel_auth') != 1:
             data += '<h3>' + get_lang(conn, 'admin') + '</h3>'
             data += '<ul>'
             curs.execute(db_change('select title from history where title = ? and id = ? and hide = "O"'), [name, num])
@@ -35,7 +35,7 @@ def recent_history_tool(name = 'Test', rev = 1):
             data += '</a></li>'
             data += '</ul>'
 
-        if admin_check() == 1:
+        if acl_check('', 'owner_auth', '', '') != 1:
             data += '<h3>' + get_lang(conn, 'owner') + '</h3>'
             data += '<ul>'
             data += '<li><a href="/history_delete/' + num + '/' + url_pas(name) + '">' + get_lang(conn, 'history_delete') + '</a></li>'

@@ -995,7 +995,7 @@ def get_user_title_list(conn, ip = ''):
     if curs.fetchall():
         user_title['☑️'] = '☑️ before_admin'
 
-    if admin_check('all') == 1:
+    if acl_check(tool = 'all_admin_auth') != 1:
         user_title['✅'] = '✅ admin'
     
     return user_title
@@ -1396,7 +1396,7 @@ def wiki_custom(conn):
         email = curs.fetchall()
         email = email[0][0] if email else ''
 
-        if admin_check('all') == 1:
+        if acl_check(tool = 'all_admin_auth') != 1:
             user_admin = '1'
 
             curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
@@ -1874,50 +1874,6 @@ def do_user_name_check(conn, user_name):
     
     return 0
 
-def get_admin_auth_list(num = None):
-    # without_DB
-
-    check = {
-        0 : 'owner',
-        1 : 'ban',
-        2 : 'nothing',
-        3 : 'toron',
-        4 : 'check',
-        5 : 'acl',
-        6 : 'hidel',
-        7 : 'give'
-    }
-    if not num:
-        check = check[0]
-    elif num == 'all':
-        check = [check[i] for i in check]
-    else:
-        check = check[num]
-        
-    return check
-
-def get_admin_list(conn, num = None):
-    curs = conn.cursor()
-    
-    if num == 'all':
-        curs.execute(db_change("select data from user_set where data != 'user' and name = 'acl'"))
-        db_data = curs.fetchall()
-        db_data = [db_data_in[0] for db_data_in in db_data] if db_data else []
-        
-        return db_data
-    else:
-        check = get_admin_auth_list(num)
-        admin_list = []
-        
-        curs.execute(db_change('select name from alist where acl = ?'), [check])
-        db_data = curs.fetchall()
-        for db_data_in in db_data:
-            curs.execute(db_change("select id from user_set where data = ? and name = 'acl'"), [db_data_in[0]])
-            db_data_2 = curs.fetchall()
-            admin_list += [db_data_2_in[0] for db_data_2_in in db_data_2] if db_data_2 else []
-            
-        return admin_list
-
 def level_check(conn, ip = ''):
     curs = conn.cursor()
 
@@ -1943,36 +1899,8 @@ def level_check(conn, ip = ''):
 
     return [level, exp, max_exp]
 
-def admin_check(num = None, what = None, name = ''):
-    ip = ip_check() if name == '' else name
-    pass_ok = 0
-
-    other_set = {}
-    other_set['ip'] = ip
-
-    data_str = python_to_golang_sync('api_func_auth_list', other_set)
-    data = json.loads(data_str)
-
-    if num == 'all':
-        if "treat_as_admin" in data:
-            pass_ok = 1
-    else:
-        auth_name = get_admin_auth_list(num)
-        if auth_name in data:
-            pass_ok = 1
-
-    if pass_ok == 1:
-        if what:
-            other_set['what'] = what
-            python_to_golang_sync('api_func_auth_post', other_set)
-
-        return 1
-    else:
-        return 0
-
-def acl_check(name = '', tool = '', topic_num = ''):
-    name = '' if name == None else name
-    ip = ip_check()
+def acl_check(name = '', tool = '', topic_num = '', ip = '', memo = ''):
+    ip = ip_check() if ip == '' else ip
 
     other_set = {}
     other_set['ip'] = ip
@@ -1983,7 +1911,16 @@ def acl_check(name = '', tool = '', topic_num = ''):
     data_str = python_to_golang_sync('api_func_acl', other_set)
     data = json.loads(data_str)
 
-    return 0 if data["data"] else 1
+    result = 0 if data["data"] else 1
+
+    if memo != '' and result == 0:
+        other_set = {}
+        other_set['ip'] = ip
+        other_set['what'] = memo
+
+        python_to_golang_sync('api_func_auth_post', other_set)
+
+    return result
 
 def ban_check(ip = None, tool = ''):
     ip = ip_check() if not ip else ip
@@ -2107,7 +2044,7 @@ def do_edit_filter(conn, data):
     curs = conn.cursor()
 
     ip = ip_check()
-    if admin_check(1) != 1:
+    if acl_check(tool = 'ban_auth') == 1:
         curs.execute(db_change("select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''"))
         for data_list in curs.fetchall():
             match = re.compile(data_list[0], re.I)

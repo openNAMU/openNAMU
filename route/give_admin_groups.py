@@ -6,7 +6,7 @@ def give_admin_groups(name = 'test'):
 
         acl_name_list = [
             [1, 'owner', get_lang(conn, 'owner_authority')],
-            [2, 'all_function', get_lang(conn, 'all_function_authority')],
+            [2, '', get_lang(conn, 'all_function_authority'), True],
             [2, 'admin', get_lang(conn, 'admin_authority')],
             [3, 'ban', get_lang(conn, 'ban_authority')],
             [4, '', get_lang(conn, 'admin_default_feature_authority'), True],
@@ -21,6 +21,8 @@ def give_admin_groups(name = 'test'):
             [3, 'give', get_lang(conn, 'authorization_authority')],
             [4, '', get_lang(conn, 'admin_default_feature_authority'), True],
             [3, 'bbs', get_lang(conn, 'bbs_authority')],
+            [4, '', get_lang(conn, 'admin_default_feature_authority'), True],
+            [3, 'vote', get_lang(conn, 'vote_authority')],
             [4, '', get_lang(conn, 'admin_default_feature_authority'), True],
             [3, 'admin_default_feature', get_lang(conn, 'admin_default_feature_authority')],
             [4, 'treat_as_admin', get_lang(conn, 'treat_as_admin_authority')],
@@ -46,7 +48,7 @@ def give_admin_groups(name = 'test'):
         ]
 
         if flask.request.method == 'POST':
-            if admin_check(None, 'auth list add (' + name + ')') != 1:
+            if acl_check(tool = 'owner_auth', memo = 'auth list add (' + name + ')') == 1:
                 return re_error(conn, '/error/3')
             elif name in get_default_admin_group():
                 return re_error(conn, '/error/3')
@@ -58,7 +60,7 @@ def give_admin_groups(name = 'test'):
 
             return redirect(conn, '/auth/list/add/' + url_pas(name))
         else:
-            state = 'disabled' if admin_check() != 1 else ''
+            state = 'disabled' if acl_check('', 'owner_auth', '', '') == 1 else ''
             state = 'disabled' if name in get_default_admin_group() else ''
 
             data = '<ul>'

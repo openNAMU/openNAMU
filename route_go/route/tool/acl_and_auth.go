@@ -128,7 +128,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["admin"] = true
 	}
 
-	admin_auth := []string{"ban", "toron", "check", "acl", "hidel", "give", "bbs"}
+	admin_auth := []string{"ban", "toron", "check", "acl", "hidel", "give", "bbs", "vote"}
 
 	if _, ok := auth_info["admin"]; ok {
 		for _, v := range admin_auth {
@@ -282,7 +282,34 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 		acl_data := ""
 		acl_pass_auth := ""
 
-		if tool == "" {
+		if tool == "all_admin_auth" {
+			acl_pass_auth = "treat_as_admin"
+			acl_data = "owner"
+		} else if tool == "owner_auth" {
+			acl_pass_auth = "owner"
+			acl_data = "owner"
+		} else if tool == "ban_auth" {
+			acl_pass_auth = "bbs"
+			acl_data = "owner"
+		} else if tool == "toron_auth" {
+			acl_pass_auth = "toron"
+			acl_data = "owner"
+		} else if tool == "check_auth" {
+			acl_pass_auth = "check"
+			acl_data = "owner"
+		} else if tool == "acl_auth" {
+			acl_pass_auth = "acl"
+			acl_data = "owner"
+		} else if tool == "hidel_auth" {
+			acl_pass_auth = "hidel"
+			acl_data = "owner"
+		} else if tool == "give_auth" {
+			acl_pass_auth = "give"
+			acl_data = "owner"
+		} else if tool == "vote_auth" {
+			acl_pass_auth = "vote_fix"
+			acl_data = "owner"
+		} else if tool == "" {
 			acl_pass_auth = "acl"
 
 			if for_a == 0 {
@@ -489,7 +516,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 				}
 			}
 		} else if tool == "vote" {
-			acl_pass_auth = "owner"
+			acl_pass_auth = "vote_fix"
 
 			if for_a == 0 {
 				end_number += 1
@@ -691,7 +718,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 				}
 			}
 		} else if tool == "recaptcha" {
-			acl_pass_auth = "admin_default_feature"
+			acl_pass_auth = "captcha_pass"
 
 			err := db.QueryRow(DB_change("select data from other where name = 'recaptcha_pass_acl'")).Scan(&acl_data)
 			if err != nil {
@@ -702,7 +729,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 				}
 			}
 		} else if tool == "recaptcha_five_pass" {
-			acl_pass_auth = "admin_default_feature"
+			acl_pass_auth = "captcha_one_check_five_pass"
 
 			err := db.QueryRow(DB_change("select data from other where name = 'recaptcha_one_check_five_pass_acl'")).Scan(&acl_data)
 			if err != nil {
