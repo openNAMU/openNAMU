@@ -187,7 +187,7 @@ from route.go_api_func_language import api_func_language
 from route.go_api_func_sha224 import api_func_sha224
 from route.go_api_func_ip import api_func_ip
 from route.go_api_func_ip_menu import api_func_ip_menu
-from route.go_api_func_auth_list import api_func_auth_list
+from route.go_api_func_auth import api_func_auth
 from route.go_api_func_acl_list import api_func_acl_list
 
 from route.go_api_search import api_search

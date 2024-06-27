@@ -5,7 +5,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_func_auth_list(call_arg []string) string {
+func Api_func_auth(call_arg []string) string {
 	other_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
