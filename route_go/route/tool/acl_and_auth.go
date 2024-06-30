@@ -461,7 +461,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 				}
 				defer stmt.Close()
 
-				err = stmt.QueryRow(topic_number).Scan(&acl_data)
+				err = stmt.QueryRow(name).Scan(&acl_data)
 				if err != nil {
 					if err == sql.ErrNoRows {
 						acl_data = ""
