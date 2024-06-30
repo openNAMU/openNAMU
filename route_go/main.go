@@ -45,8 +45,8 @@ func main() {
 		route_data = route.Api_func_llm(call_arg[1:])
 	} else if call_arg[0] == "api_func_language" {
 		route_data = route.Api_func_language(call_arg[1:])
-	} else if call_arg[0] == "api_func_auth_list" {
-		route_data = route.Api_func_auth_list(call_arg[1:])
+	} else if call_arg[0] == "api_func_auth" {
+		route_data = route.Api_func_auth(call_arg[1:])
 	} else if call_arg[0] == "api_list_recent_discuss" {
 		route_data = route.Api_list_recent_discuss(call_arg[1:])
 	} else if call_arg[0] == "api_bbs_list" {

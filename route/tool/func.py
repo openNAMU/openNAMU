@@ -438,7 +438,7 @@ def get_db_table_list():
     create_data['html_filter'] = ['html', 'kind', 'plus', 'plus_t']
     create_data['vote'] = ['name', 'id', 'subject', 'data', 'user', 'type', 'acl']
 
-    # 개편 예정 (auth_list와 auth_log로 변경)
+    # 개편 예정 (auth와 auth_log로 변경)
     create_data['alist'] = ['name', 'acl']
     create_data['re_admin'] = ['who', 'what', 'time']
 

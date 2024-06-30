@@ -75,16 +75,12 @@ def give_user_ban(name = None, ban_type = ''):
                 else:
                     type_d = None
 
-                if type_d:
-                    if acl_check(tool = 'owner_auth', memo = 'ban ' + type_d + ' (' + name + ')') == 1:
+                if name == ip:
+                    if acl_check(tool = 'all_admin_auth', memo = 'ban (' + name + ')') == 1:
                         return re_error(conn, '/error/3')
                 else:
-                    if name == ip:
-                        if acl_check(tool = 'all_admin_auth', memo = 'ban (' + name + ')') == 1:
-                            return re_error(conn, '/error/3')
-                    else:
-                        if acl_check(tool = 'ban_auth', memo = 'ban (' + name + ')') == 1:
-                            return re_error(conn, '/error/3')
+                    if acl_check(tool = 'ban_auth', memo = 'ban (' + name + ')') == 1:
+                        return re_error(conn, '/error/3')
 
                 ban_insert(conn, 
                     name,
