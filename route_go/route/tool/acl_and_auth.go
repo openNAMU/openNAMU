@@ -289,6 +289,9 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			acl_pass_auth = "owner"
 			acl_data = "owner"
 		} else if tool == "ban_auth" {
+			acl_pass_auth = "ban"
+			acl_data = "owner"
+		} else if tool == "bbs_auth" {
 			acl_pass_auth = "bbs"
 			acl_data = "owner"
 		} else if tool == "toron_auth" {
