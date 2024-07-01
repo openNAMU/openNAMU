@@ -30,18 +30,6 @@ function do_insert_user_info() {
                 get_data_ban = lang_data['ban'];
                 get_data_ban += '<br>';
                 
-                get_data_ban += lang_data['type'] + ' : ';
-                if(data['data']['ban'][1].match(/^[0-9]+$/) || data['data']['ban'][1] == '') {
-                    get_data_ban += '<a href="/recent_block/user/' + opennamu_do_url_encode(name) + '">' + lang_data['normal'] + '</a>'; 
-                } else if(data['data']['ban'][1] === 'c') {
-                    get_data_ban += lang_data['normal']; 
-                } else if(data['data']['ban'][1].match(/^b/)) {
-                    get_data_ban += '<a href="/recent_block/cidr">' + lang_data['cidr'] + '</a>';
-                } else {
-                    get_data_ban += '<a href="/recent_block/regex">' + lang_data['regex'] + '</a>';
-                }
-                get_data_ban += '<br>';
-                
                 get_data_ban += lang_data['period'] + ' : ';
                 if(!data['data']['ban']['period']) {
                     if(get_data_auth_date !== '0') {
@@ -53,16 +41,6 @@ function do_insert_user_info() {
                     get_data_ban += '~ ' + lang_data['limitless']; 
                 } else {
                     get_data_ban += '~ ' + data['data']['ban']['period'];
-                }
-                get_data_ban += '<br>';
-                
-                get_data_ban += lang_data['option'] + ' : ';
-                if(data['data']['ban']['login_able'] === '2') {
-                    get_data_ban += lang_data['edit_request_able']; 
-                } else if(data['data']['ban']['login_able'] === '1') {
-                    get_data_ban += lang_data['login_able']; 
-                } else {
-                    get_data_ban += 'X';
                 }
                 get_data_ban += '<br>';
                 
