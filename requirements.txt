@@ -2,7 +2,7 @@ pip
 
 flask
 flask[async]
-hypercorn
+waitress
 
 requests
 typing_extensions
