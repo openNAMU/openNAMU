@@ -67,10 +67,10 @@ def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', pos
 
         if bbs_num != '' and post_num != '':
             if comment_num != '':
-                data = json.loads(api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num).data)
-                sub_data = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
+                data = orjson.loads(api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num).data)
+                sub_data = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
             else:
-                data = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
+                data = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
                 
             if 'comment' in data:
                 v_name = sub_data["title"]

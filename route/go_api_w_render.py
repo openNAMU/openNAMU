@@ -60,7 +60,7 @@ async def api_w_render(name = '', tool = ''):
                 data_type = 'api_thread'
 
             if markup in ('', 'namumark', 'namumark_beta') and data_option != '':
-                data_option = json.loads(data_option)
+                data_option = orjson.loads(data_option)
 
                 data_option_func = api_w_render_include(data_option)
 

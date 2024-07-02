@@ -2,7 +2,7 @@
 import os
 import sys
 import platform
-import json
+import orjson
 import smtplib
 import random
 import shutil
@@ -16,7 +16,7 @@ import email.header
 
 # Init-Version
 with open('version.json', encoding = 'utf8') as file_data:
-    version_list = json.loads(file_data.read())
+    version_list = orjson.loads(file_data.read())
 
 print('Version : ' + version_list['beta']['r_ver'])
 print('DB set version : ' + version_list['beta']['c_ver'])
@@ -117,7 +117,7 @@ def python_to_golang_sync(func_name, other_set = {}):
     if other_set == {}:
         other_set = '{}'
     else:
-        other_set = json.dumps(other_set)
+        other_set = orjson.dumps(other_set)
 
     if platform.system() == 'Linux':
         if platform.machine() in ["AMD64", "x86_64"]:
@@ -156,7 +156,7 @@ async def python_to_golang(func_name, other_set = {}):
     if other_set == {}:
         other_set = '{}'
     else:
-        other_set = json.dumps(other_set)
+        other_set = orjson.dumps(other_set)
 
     if platform.system() == 'Linux':
         if platform.machine() in ["AMD64", "x86_64"]:
@@ -294,7 +294,7 @@ class class_check_json:
             if os.path.exists(os.path.join('data', 'set.json')):
                 db_set_list = ['db', 'db_type']
                 with open(os.path.join('data', 'set.json'), encoding = 'utf8') as file_data:
-                    set_data = json.loads(file_data.read())
+                    set_data = orjson.loads(file_data.read())
 
                 for i in db_set_list:
                     if not i in set_data:
@@ -329,7 +329,7 @@ class class_check_json:
                     set_data['db'] = data_get
 
                 with open(os.path.join('data', 'set.json'), 'w', encoding = 'utf8') as f:
-                    f.write(json.dumps(set_data))
+                    f.write(orjson.dumps(set_data))
 
         print('DB name : ' + set_data['db'])
         print('DB type : ' + set_data['db_type'])
@@ -344,7 +344,7 @@ class class_check_json:
         if os.path.exists(os.path.join('data', 'mysql.json')):
             db_set_list = ['user', 'password', 'host', 'port']
             with open(os.path.join('data', 'mysql.json'), encoding = 'utf8') as file_data:
-                set_data = json.loads(file_data.read())
+                set_data = orjson.loads(file_data.read())
 
             for i in db_set_list:
                 if not i in set_data:
@@ -378,7 +378,7 @@ class class_check_json:
                 'w', 
                 encoding = 'utf8'
             ) as f:
-                f.write(json.dumps(set_data_mysql))
+                f.write(orjson.dumps(set_data_mysql))
 
         data_db_set['mysql_user'] = set_data_mysql['user']
         data_db_set['mysql_pw'] = set_data_mysql['password']
@@ -485,7 +485,7 @@ def update(conn, ver_num, set_data):
                 curs.execute(db_change("update other set data = '' where name = 'sec_re'"))
     
     if ver_num < 3172800 and set_data['type'] == 'mysql':
-        get_data_mysql = json.loads(open('data/mysql.json', encoding = 'utf8').read())
+        get_data_mysql = orjson.loads(open('data/mysql.json', encoding = 'utf8').read())
         
         with open('data/mysql.json', 'w') as f:
             f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "localhost" }')
@@ -572,7 +572,7 @@ def update(conn, ver_num, set_data):
             sql_data['ua'] = i[7]
             sql_data['email'] = i[8]
             
-            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['application', i[0], json.dumps(sql_data)])
+            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['application', i[0], orjson.dumps(sql_data)])
     
     if ver_num < 3500105:
         curs.execute(db_change('delete from acl where title like "file:%" and data = "admin" and type like "decu%"'))
@@ -939,7 +939,7 @@ def get_acl_list(type_data = 'normal'):
     other_set['type'] = type_data
 
     data_str = python_to_golang_sync('api_func_acl_list', other_set)
-    data = json.loads(data_str)
+    data = orjson.loads(data_str)
 
     return data["data"]
 
@@ -1163,7 +1163,7 @@ def get_lang(conn, data, safe = 0):
         else:
             lang_list = os.listdir('lang')
             if (lang_name + '.json') in lang_list:
-                lang = json.loads(open(os.path.join('lang', lang_name + '.json'), encoding = 'utf8').read())
+                lang = orjson.loads(open(os.path.join('lang', lang_name + '.json'), encoding = 'utf8').read())
             else:
                 lang = {}
 
@@ -1824,7 +1824,7 @@ def captcha_post(conn, re_data):
                 )
                 
             if data.status_code == 200:
-                json_data = json.loads(data.text)
+                json_data = orjson.loads(data.text)
                 if json_data['success'] != True:
                     return 1
 
@@ -1912,7 +1912,7 @@ def acl_check(name = '', tool = '', topic_num = '', ip = '', memo = ''):
     other_set['tool'] = tool
 
     data_str = python_to_golang_sync('api_func_acl', other_set)
-    data = json.loads(data_str)
+    data = orjson.loads(data_str)
 
     result = 0 if data["data"] else 1
 
@@ -1934,7 +1934,7 @@ def ban_check(ip = None, tool = ''):
     other_set['type'] = tool
 
     data_str = python_to_golang_sync('api_func_ban', other_set)
-    data = json.loads(data_str)
+    data = orjson.loads(data_str)
     data["ban"] = 1 if data["ban"] == "true" else 0
 
     return [data["ban"], data["ban_type"]]
@@ -1954,7 +1954,7 @@ def ip_pas(raw_ip):
         other_set["data_" + str(for_a)] = get_ip[for_a - 1]
 
     data_str = python_to_golang_sync('api_func_ip_post', other_set)
-    data = json.loads(data_str)
+    data = orjson.loads(data_str)
 
     return data["data"][raw_ip] if return_data == 1 else data["data"]
         

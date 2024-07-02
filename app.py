@@ -17,7 +17,7 @@ if len(args) > 1:
 
 # Init-Version
 with open('version.json', encoding = 'utf8') as file_data:
-    version_list = json.loads(file_data.read())
+    version_list = orjson.loads(file_data.read())
 
 # Init-DB
 data_db_set = class_check_json()

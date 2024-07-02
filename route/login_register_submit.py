@@ -48,7 +48,7 @@ def login_register_submit_2():
             for for_a in session_reset_list:
                 flask.session.pop(for_a, None)
 
-            curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [user_app_data['id'], 'application', json.dumps(user_app_data)])
+            curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [user_app_data['id'], 'application', orjson.dumps(user_app_data)])
 
             return re_error(conn, '/error/43')
         else:

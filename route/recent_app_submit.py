@@ -33,7 +33,7 @@ def recent_app_submit_2():
                 '''
 
                 for application in db_data:
-                    application = json.loads(application[0])
+                    application = orjson.loads(application[0])
 
                     if 'question' in application:
                         question = html.escape(application['question'])
@@ -101,7 +101,7 @@ def recent_app_submit_2():
                 if not application:
                     return re_error(conn, '/error/26')
                 else:
-                    application = json.loads(application[0][0])
+                    application = orjson.loads(application[0][0])
 
                 add_user(conn, application['id'], application['pw'], application['email'], application['encode'])
 
