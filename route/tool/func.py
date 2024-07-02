@@ -117,7 +117,7 @@ def python_to_golang_sync(func_name, other_set = {}):
     if other_set == {}:
         other_set = '{}'
     else:
-        other_set = orjson.dumps(other_set).decode('utf-8')
+        other_set = orjson.dumps(other_set)
 
     if platform.system() == 'Linux':
         if platform.machine() in ["AMD64", "x86_64"]:
@@ -156,7 +156,7 @@ async def python_to_golang(func_name, other_set = {}):
     if other_set == {}:
         other_set = '{}'
     else:
-        other_set = orjson.dumps(other_set).decode('utf-8')
+        other_set = orjson.dumps(other_set)
 
     if platform.system() == 'Linux':
         if platform.machine() in ["AMD64", "x86_64"]:
