@@ -79,7 +79,7 @@ def login_find_email_check(tool):
                         user_app_data['ua'] = user_agent
                         user_app_data['email'] = flask.session['c_email']
                         
-                        curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [flask.session['c_id'], 'application', orjson.dumps(user_app_data)])
+                        curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [flask.session['c_id'], 'application', orjson.dumps(user_app_data).decode('utf-8')])
         
                         for i in re_set_list:
                             flask.session.pop(i, None)

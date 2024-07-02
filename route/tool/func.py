@@ -117,7 +117,7 @@ def python_to_golang_sync(func_name, other_set = {}):
     if other_set == {}:
         other_set = '{}'
     else:
-        other_set = orjson.dumps(other_set)
+        other_set = orjson.dumps(other_set).decode('utf-8')
 
     if platform.system() == 'Linux':
         if platform.machine() in ["AMD64", "x86_64"]:
@@ -156,7 +156,7 @@ async def python_to_golang(func_name, other_set = {}):
     if other_set == {}:
         other_set = '{}'
     else:
-        other_set = orjson.dumps(other_set)
+        other_set = orjson.dumps(other_set).decode('utf-8')
 
     if platform.system() == 'Linux':
         if platform.machine() in ["AMD64", "x86_64"]:
@@ -329,7 +329,7 @@ class class_check_json:
                     set_data['db'] = data_get
 
                 with open(os.path.join('data', 'set.json'), 'w', encoding = 'utf8') as f:
-                    f.write(orjson.dumps(set_data))
+                    f.write(orjson.dumps(set_data).decode('utf-8'))
 
         print('DB name : ' + set_data['db'])
         print('DB type : ' + set_data['db_type'])
@@ -378,7 +378,7 @@ class class_check_json:
                 'w', 
                 encoding = 'utf8'
             ) as f:
-                f.write(orjson.dumps(set_data_mysql))
+                f.write(orjson.dumps(set_data_mysql).decode('utf-8'))
 
         data_db_set['mysql_user'] = set_data_mysql['user']
         data_db_set['mysql_pw'] = set_data_mysql['password']
@@ -572,7 +572,7 @@ def update(conn, ver_num, set_data):
             sql_data['ua'] = i[7]
             sql_data['email'] = i[8]
             
-            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['application', i[0], orjson.dumps(sql_data)])
+            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['application', i[0], orjson.dumps(sql_data).decode('utf-8')])
     
     if ver_num < 3500105:
         curs.execute(db_change('delete from acl where title like "file:%" and data = "admin" and type like "decu%"'))

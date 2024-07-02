@@ -1,4 +1,5 @@
 import re
+import json
 import orjson
 
 o_json = orjson.loads(open('en-US.json', encoding = 'utf8').read())
@@ -23,7 +24,7 @@ for i in list(o_json):
 
             n_json = {**n_json, **{i : n_text}}
 
-n_data = orjson.dumps(n_json, indent = 4, ensure_ascii = False)
+n_data = json.dumps(n_json, indent = 4, ensure_ascii = False)
 
 f = open(n_name + '.json', "w", encoding='utf8')
 f.write(n_data)
