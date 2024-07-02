@@ -1153,24 +1153,27 @@ def get_lang(conn, data, safe = 0):
         else:
             lang_name = 'en-US'
             
-        m_curs.execute('select data from temp where name = ?', ['lang_' + lang_name])
+        m_curs.execute('select data from temp where name = ?', ['lang_' + lang_name + '_' + data])
         db_data = m_curs.fetchall()
         if db_data:
-            lang = json.loads(db_data[0][0])
+            if safe == 1:
+                return db_data[0][0]
+            else:
+                return html.escape(db_data[0][0])
         else:
             lang_list = os.listdir('lang')
             if (lang_name + '.json') in lang_list:
                 lang = json.loads(open(os.path.join('lang', lang_name + '.json'), encoding = 'utf8').read())
-                
-                m_curs.execute('insert into temp (name, data) values (?, ?)', ['lang_' + lang_name, json.dumps(lang)])
             else:
                 lang = {}
 
-        if data in lang:
-            if safe == 1:
-                return lang[data] 
-            else:
-                return html.escape(lang[data])
+            if data in lang:
+                m_curs.execute('insert into temp (name, data) values (?, ?)', ['lang_' + lang_name + '_' + data, lang[data]])
+
+                if safe == 1:
+                    return lang[data] 
+                else:
+                    return html.escape(lang[data])
 
         return html.escape(data + ' (' + lang_name + ')')
 
