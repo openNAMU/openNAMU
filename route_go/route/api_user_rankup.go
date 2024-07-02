@@ -1,10 +1,11 @@
 package route
 
 import (
-	"encoding/json"
 	"opennamu/route/tool"
 	"strconv"
 	"strings"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 func User_rankup_condition(data string) string {
@@ -21,6 +22,8 @@ func User_rankup_condition(data string) string {
 }
 
 func Api_user_rankup(call_arg []string) string {
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 	other_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &other_set)
 

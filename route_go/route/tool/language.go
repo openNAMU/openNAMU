@@ -2,12 +2,15 @@ package tool
 
 import (
 	"database/sql"
-	"encoding/json"
 	"log"
 	"os"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 func Get_language(db *sql.DB, data string, safe bool) string {
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 	var language string
 
 	err := db.QueryRow(DB_change("select data from other where name = 'language'")).Scan(&language)

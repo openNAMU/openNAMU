@@ -3,15 +3,17 @@ package route
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"log"
 	"opennamu/route/tool"
 
 	"github.com/google/generative-ai-go/genai"
+	jsoniter "github.com/json-iterator/go"
 	"google.golang.org/api/option"
 )
 
 func Api_func_llm(call_arg []string) string {
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 	other_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
