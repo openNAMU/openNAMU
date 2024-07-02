@@ -2,12 +2,10 @@
 import os
 import re
 import logging
+import waitress
 
 from route.tool.func import *
 from route import *
-
-from hypercorn.asyncio import serve
-from hypercorn.config import Config
 
 args = sys.argv
 run_mode = ''
@@ -846,7 +844,10 @@ app.route('/update', methods = ['POST', 'GET'])(main_sys_update)
 app.errorhandler(404)(main_func_error_404)
 
 if __name__ == "__main__":
-    config = Config()
-    config.bind = [f"{server_set['host']}:{server_set['port']}"]
-    
-    asyncio.run(serve(app, config))
+    waitress.serve(
+        app,
+        host = server_set['host'],
+        port = int(server_set['port']),
+        clear_untrusted_proxy_headers = True,
+        threads = os.cpu_count()
+    )
