@@ -41,47 +41,6 @@ function ringo_get_post() {
     history.go(0);
 }
 
-function ringo_do_skin_set() {
-    if(!window.localStorage.getItem('main_css_use_sys_darkmode') || window.localStorage.getItem('main_css_use_sys_darkmode') === '1') {
-        if(window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.cookie = 'main_css_darkmode=1; path=/';
-        } else {
-            document.cookie = 'main_css_darkmode=0; path=/';
-        }
-    }
-
-    if(window.localStorage.getItem('main_css_off_sidebar') && window.localStorage.getItem('main_css_off_sidebar') === '1') {
-        document.getElementById('ringo_add_style').innerHTML += `
-            section {
-                width: auto;
-                display: block;
-                margin: auto;
-            }
-
-            .do_fixed {
-                display: none;
-            }
-        `;
-    }
-
-    if(window.localStorage.getItem('main_css_fixed_width') && window.localStorage.getItem('main_css_fixed_width') !== '') {
-        let fixed_width_data = window.localStorage.getItem('main_css_fixed_width');
-        document.getElementById('ringo_add_style').innerHTML += `
-            article.main {
-                max-width: ` + fixed_width_data + `px;
-            }
-        `;
-    }
-
-    if(window.localStorage.getItem('main_css_sidebar_right') && window.localStorage.getItem('main_css_sidebar_right') === '1') {
-        document.getElementById('ringo_add_style').innerHTML += `
-            .do_fixed {
-                float: right;
-            }
-        `;
-    }
-}
-
 function ringo_load_skin_set() {
     let cookies = document.cookie;
     
@@ -172,5 +131,4 @@ function ringo_load_skin_set() {
     }
 }
 
-window.addEventListener('DOMContentLoaded', ringo_do_skin_set);
 window.addEventListener('DOMContentLoaded', ringo_load_skin_set);
