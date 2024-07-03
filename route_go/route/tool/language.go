@@ -69,6 +69,8 @@ func Get_language(db *sql.DB, data string, safe bool) string {
 				return HTML_escape(lang_data[data])
 			}
 		} else {
+			log.Default().Println(data + " (" + language + ")")
+
 			return data + " (" + language + ")"
 		}
 	}

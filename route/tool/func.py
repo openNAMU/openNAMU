@@ -762,6 +762,9 @@ def set_init_always(conn, ver_num, run_mode):
         curs.execute(db_change('delete from alist where name = "ip"'))
         curs.execute(db_change('insert into alist (name, acl) values ("ip", "ip")'))
 
+        curs.execute(db_change('delete from alist where name = "ban"'))
+        curs.execute(db_change('insert into alist (name, acl) values ("ban", "view")'))
+
         # 이미지 폴더 없으면 생성
         if not os.path.exists(load_image_url(conn)):
             os.makedirs(load_image_url(conn))
@@ -1174,6 +1177,8 @@ def get_lang(conn, data, safe = 0):
                     return lang[data] 
                 else:
                     return html.escape(lang[data])
+
+        print(data + ' (' + lang_name + ')')
 
         return html.escape(data + ' (' + lang_name + ')')
 
