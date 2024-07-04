@@ -823,7 +823,6 @@ app.route('/setting/body/bottom', defaults = { 'num' : 7 }, methods = ['POST', '
 app.route('/setting_preview/body/bottom', defaults = { 'num' : 7, 'set_preview' : 1 }, methods = ['POST'])(main_setting_head)
 app.route('/setting/robot', methods = ['POST', 'GET'])(main_setting_robot)
 app.route('/setting/external', methods = ['POST', 'GET'])(main_setting_external)
-app.route('/setting/acl', methods = ['POST', 'GET'])(main_setting_acl)
 app.route('/setting/sitemap', methods = ['POST', 'GET'])(main_setting_sitemap)
 app.route('/setting/sitemap_set', methods = ['POST', 'GET'])(main_setting_sitemap_set)
 app.route('/setting/skin_set', methods = ['POST', 'GET'])(main_setting_skin_set)

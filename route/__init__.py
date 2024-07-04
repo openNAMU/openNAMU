@@ -74,7 +74,6 @@ from route.main_search_deep import main_search_deep
 from route.main_search_goto import main_search_goto
 
 from route.main_setting import main_setting
-from route.main_setting_acl import main_setting_acl
 from route.main_setting_external import main_setting_external
 from route.main_setting_head import main_setting_head
 from route.main_setting_main import main_setting_main

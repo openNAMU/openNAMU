@@ -263,8 +263,6 @@ def view_set(name = 'Test', multiple = False):
                 data = '''
                     <form method="post">
                         <script defer src="/views/main_css/js/route/w_set.js''' + cache_v() + '''"></script>
-                        <a href="/setting/acl">(''' + get_lang(conn, 'main_acl_setting') + ''')</a>
-                        <hr class="main_hr">
                         ''' + text_area + '''
                         ''' + render_simple_set(conn, data) + '''
                         ''' + save_button + '''

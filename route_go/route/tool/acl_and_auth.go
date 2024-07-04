@@ -164,12 +164,52 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		}
 	}
 
-	ip_default = []string{"document", "discuss", "upload", "vote", "captcha_one_check_five_pass"}
+	ip_default := []string{"document", "discuss", "upload", "vote", "bbs", "captcha_one_check_five_pass"}
 
 	if _, ok := auth_info["ip"]; ok {
 		for _, v := range ip_default {
 			auth_info[v] = true
 		}
+	}
+
+	document_default := []string{"edit", "edit_request", "move", "new_make", "delete"}
+
+	if _, ok := auth_info["document"]; ok {
+		for _, v := range document_default {
+			auth_info[v] = true
+		}
+	}
+
+	check = false
+	for _, v := range document_default {
+		if _, ok := auth_info[v]; ok {
+			check = true
+			break
+		}
+	}
+
+	if check {
+		auth_info["view"] = true
+	}
+
+	bbs_default := []string{"bbs_edit", "bbs_comment"}
+
+	if _, ok := auth_info["bbs_use"]; ok {
+		for _, v := range bbs_default {
+			auth_info[v] = true
+		}
+	}
+
+	check = false
+	for _, v := range bbs_default {
+		if _, ok := auth_info[v]; ok {
+			check = true
+			break
+		}
+	}
+
+	if check {
+		auth_info["bbs_view"] = true
 	}
 
 	return auth_info
@@ -347,13 +387,10 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'edit'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["document"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "document_move" {
@@ -377,13 +414,10 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'document_move_acl'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["move"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "document_edit" {
@@ -407,16 +441,13 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'document_edit_acl'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["edit"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
-		} else if tool == "document_edit" {
+		} else if tool == "document_delete" {
 			acl_pass_auth = "acl"
 
 			if for_a == 0 {
@@ -437,13 +468,10 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'document_delete_acl'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["delete"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "topic" {
@@ -484,53 +512,35 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'discussion'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["discuss"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "topic_view" {
 			acl_pass_auth = "topic"
 
-			stmt, err := db.Prepare(DB_change("select set_data from topic_set where thread_code = ? and set_name = 'thread_view_acl'"))
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer stmt.Close()
-
-			err = stmt.QueryRow(topic_number).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["discuss_view"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "upload" {
-			acl_pass_auth = "multiple_upload"
+			acl_pass_auth = "admin_default_feature"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'upload_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["upload"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "many_upload" {
-			acl_pass_auth = "multiple_upload"
+			acl_pass_auth = "admin_default_feature"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'many_upload_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["multiple_upload"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "vote" {
 			acl_pass_auth = "vote_fix"
@@ -557,36 +567,27 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					continue
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'vote_acl'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["vote"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "slow_edit" {
-			acl_pass_auth = "slow_edit_pass"
+			acl_pass_auth = "admin_default_feature"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'slow_edit_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["slow_edit_pass"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "edit_bottom_compulsion" {
-			acl_pass_auth = "edit_bottom_compulsion_pass"
+			acl_pass_auth = "admin_default_feature"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'edit_bottom_compulsion_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["edit_bottom_compulsion_pass"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "bbs_edit" {
 			acl_pass_auth = "bbs"
@@ -637,13 +638,10 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select set_data from bbs_set where set_name = 'bbs_acl_all'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["bbs_edit"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "bbs_comment" {
@@ -695,13 +693,10 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select set_data from bbs_set where set_name = 'bbs_acl_all'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["bbs_comment"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "bbs_view" {
@@ -725,36 +720,27 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select set_data from bbs_set where set_name = 'bbs_view_acl_all'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["bbs_view"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "recaptcha" {
-			acl_pass_auth = "captcha_pass"
+			acl_pass_auth = "admin_default_feature"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'recaptcha_pass_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["captcha_pass"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "recaptcha_five_pass" {
-			acl_pass_auth = "captcha_one_check_five_pass"
+			acl_pass_auth = "admin_default_feature"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'recaptcha_one_check_five_pass_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["captcha_one_check_five_pass"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "document_edit_request" {
 			acl_pass_auth = "acl"
@@ -777,25 +763,19 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'document_edit_request_acl'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["edit_request"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "document_make_acl" {
 			acl_pass_auth = "acl"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'document_make_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["new_make"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else {
 			// tool == "render"
@@ -819,13 +799,10 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'all_view_acl'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["view"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		}
@@ -837,13 +814,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 		}
 
 		if acl_data == "" {
-			if tool == "recaptcha" {
-				acl_data = "admin"
-			} else if tool == "slow_edit" || tool == "edit_bottom_compulsion" {
-				acl_data = "not_all"
-			} else {
-				acl_data = "normal"
-			}
+			acl_data = "normal"
 		}
 
 		except_ban_tool_list := []string{"render", "topic_view", "bbs_view"}

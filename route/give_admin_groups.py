@@ -47,8 +47,15 @@ def give_admin_groups(name = 'test'):
                             [5, '', get_lang(conn, 'view_authority')],
                         [4, 'view', get_lang(conn, 'view_authority')],
                     [3, 'discuss', get_lang(conn, 'discuss_authority')],
+                        [4, 'discuss_view', get_lang(conn, 'discuss_authority')],
                     [3, 'upload', get_lang(conn, 'upload_authority')],
                     [3, 'vote', get_lang(conn, 'vote_authority')],
+                    [3, 'bbs_use', get_lang(conn, 'bbs_authority')],
+                        [4, 'bbs_edit', get_lang(conn, 'bbs_edit_authority')],
+                            [5, '', get_lang(conn, 'bbs_view_authority')],
+                        [4, 'bbs_comment', get_lang(conn, 'bbs_comment_authority')],
+                            [5, '', get_lang(conn, 'bbs_view_authority')],
+                        [4, 'bbs_view', get_lang(conn, 'bbs_view_authority')],
                     [3, 'captcha_one_check_five_pass', get_lang(conn, 'captcha_one_check_five_pass_authority')]
         ]
 
