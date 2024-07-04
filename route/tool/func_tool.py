@@ -9,7 +9,7 @@ import os
 import html
 import sqlite3
 import time
-import json
+import orjson
 import threading
 
 def get_time():

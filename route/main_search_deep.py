@@ -51,7 +51,7 @@ async def main_search_deep(name = 'Test', search_type = 'title', num = 1):
                 <ul>
             '''
 
-            all_list = json.loads((await api_search(name, search_type, num)).get_data(as_text = True))
+            all_list = orjson.loads((await api_search(name, search_type, num)).get_data(as_text = True))
             for data in all_list:
                 div += '<li><a href="/w/' + url_pas(data) + '">' + data + '</a></li>'
 

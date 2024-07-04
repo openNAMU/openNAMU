@@ -2,13 +2,16 @@ package route
 
 import (
 	"database/sql"
-	"encoding/json"
 	"log"
 
 	"opennamu/route/tool"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 func Api_w_random(call_arg []string) string {
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 	db := tool.DB_connect()
 	defer db.Close()
 

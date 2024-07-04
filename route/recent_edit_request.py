@@ -17,7 +17,7 @@ async def recent_edit_request():
                     </tr>
         '''
 
-        all_list = json.loads((await api_list_recent_edit_request()).get_data(as_text = True))
+        all_list = orjson.loads((await api_list_recent_edit_request()).get_data(as_text = True))
         for data in all_list:
             if re.search(r"\+", data[5]):
                 leng = '<span style="color:green;">(' + data[5] + ')</span>'

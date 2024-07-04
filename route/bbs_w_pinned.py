@@ -19,7 +19,7 @@ def bbs_w_pinned(bbs_num = '', post_num = ''):
         if acl_check('', 'bbs_auth', '', '') == 1:
             return redirect(conn, '/bbs/in/' + bbs_num_str)
         
-        temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
+        temp_dict = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
         if not 'user_id' in temp_dict:
             return redirect(conn, '/bbs/main')
         

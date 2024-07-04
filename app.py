@@ -1,6 +1,7 @@
 # Init
 import os
 import re
+import signal
 import logging
 import waitress
 
@@ -17,7 +18,7 @@ if len(args) > 1:
 
 # Init-Version
 with open('version.json', encoding = 'utf8') as file_data:
-    version_list = json.loads(file_data.read())
+    version_list = orjson.loads(file_data.read())
 
 # Init-DB
 data_db_set = class_check_json()
@@ -842,6 +843,11 @@ app.route('/restart', methods = ['POST', 'GET'])(main_sys_restart)
 app.route('/update', methods = ['POST', 'GET'])(main_sys_update)
 
 app.errorhandler(404)(main_func_error_404)
+
+def signal_handler(signal, frame):
+    os._exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
 
 if __name__ == "__main__":
     waitress.serve(

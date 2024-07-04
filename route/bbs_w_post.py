@@ -14,7 +14,7 @@ def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, post_n
     comment_count = 0
     comment_add_count = 0
 
-    thread_data = json.loads(api_bbs_w_comment(sub_code).data)
+    thread_data = orjson.loads(api_bbs_w_comment(sub_code).data)
     
     comment_count += len(thread_data)
     comment_add_count += comment_count
@@ -73,7 +73,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
         bbs_comment_acl = acl_check(bbs_num_str, 'bbs_comment')
         ip = ip_check()
 
-        temp_dict = json.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
+        temp_dict = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
         if temp_dict == {}:
             return redirect(conn, '/bbs/main')
         
@@ -134,7 +134,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                 user_id = temp_dict['user_id']
                 count = 0
 
-                thread_data = json.loads(api_bbs_w_comment(bbs_num_str + '-' + post_num_str).data)
+                thread_data = orjson.loads(api_bbs_w_comment(bbs_num_str + '-' + post_num_str).data)
                 for temp_dict in thread_data:
                     count += 1
                     if user_id == temp_dict['comment_user_id']:
