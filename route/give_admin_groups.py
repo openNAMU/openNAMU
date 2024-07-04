@@ -66,7 +66,7 @@ def give_admin_groups(name = 'test'):
             return redirect(conn, '/auth/list/add/' + url_pas(name))
         else:
             state = 'disabled' if acl_check('', 'owner_auth', '', '') == 1 else ''
-            state = 'disabled' if name in get_default_admin_group() else ''
+            state = 'disabled' if name in get_default_admin_group() else state
 
             data = '<ul>'
             for for_a in acl_name_list:

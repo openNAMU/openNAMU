@@ -148,14 +148,28 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["admin_default_feature"] = true
 	}
 
-	admin_default_feature := []string{"treat_as_admin", "user_name_bold", "multiple_upload", "slow_edit_pass", "edit_bottom_compulsion_pass"}
+	admin_default_feature := []string{"treat_as_admin", "user_name_bold", "multiple_upload", "slow_edit_pass", "edit_bottom_compulsion_pass", "user"}
 
 	if _, ok := auth_info["admin_default_feature"]; ok {
 		for _, v := range admin_default_feature {
 			auth_info[v] = true
 		}
+	}
 
-		auth_info["user"] = true
+	user_default := []string{"captcha_pass", "ip"}
+
+	if _, ok := auth_info["user"]; ok {
+		for _, v := range user_default {
+			auth_info[v] = true
+		}
+	}
+
+	ip_default = []string{"document", "discuss", "upload", "vote", "captcha_one_check_five_pass"}
+
+	if _, ok := auth_info["ip"]; ok {
+		for _, v := range ip_default {
+			auth_info[v] = true
+		}
 	}
 
 	return auth_info
