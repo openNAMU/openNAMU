@@ -793,6 +793,11 @@ def set_init_always(conn, ver_num, run_mode):
             if db_data:
                 m_curs.execute('insert into temp (name, data) values ("wiki_access_password", ?)', [db_data[0][0]])
 
+        curs.execute(db_change('select data from other where name = "load_ip_select"'))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            m_curs.execute('insert into temp (name, data) values ("load_ip_select", ?)', [db_data[0][0]])
+
         # OS마다 실행 파일 설정
         exe_type = linux_exe_chmod()
         if run_mode == '':

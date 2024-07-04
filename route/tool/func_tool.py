@@ -46,20 +46,30 @@ def db_change(data):
         return data
 
 def ip_check(d_type = 0):
-    ip = ''
+    ip = '::1'
     if d_type == 0 and (flask.session and 'id' in flask.session):
         ip = flask.session['id']
-    else:        
-        ip = flask.request.environ.get('HTTP_X_REAL_IP',
-            flask.request.environ.get('HTTP_CF_CONNECTING_IP',
-                flask.request.environ.get('REMOTE_ADDR',
-                    '::1'
-                )
-            )
-        )
+    else:
+        with class_temp_db() as m_conn:
+            m_curs = m_conn.cursor()
 
-        if ip_or_user(ip) == 0:
-            ip = '::1'
+            m_curs.execute('select data from temp where name = "load_ip_select"')
+            db_data = m_curs.fetchall()
+            set_data = db_data[0][0] if db_data else 'default'
+        
+            if set_data == "default":
+                ip = flask.request.environ.get('HTTP_X_REAL_IP',
+                    flask.request.environ.get('HTTP_CF_CONNECTING_IP',
+                        flask.request.environ.get('REMOTE_ADDR',
+                            '::1'
+                        )
+                    )
+                )
+            else:
+                ip = flask.request.environ.get(set_data, '::1')
+            
+            if ip_or_user(ip) == 0:
+                ip = '::1'
 
     return ip
 

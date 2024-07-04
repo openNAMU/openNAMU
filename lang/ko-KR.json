@@ -357,7 +357,7 @@
     "empty": "빈칸",
     "email_send_error": "이메일 전송이 실패했습니다.",
     "sitemap_management": "sitemap.xml 관리",
-    "same_ip_exist": "동일한 아이피가 존재합니다.",
+    "same_ip_exist": "동일한 IP가 존재합니다.",
     "restart_fail_error": "재시작이 실패했습니다. 수동 재시작을 이용해주세요.",
     "domain": "도메인",
     "simple_check": "간편 검사",
@@ -667,5 +667,7 @@
     "cidr": "CIDR",
     "option": "옵션",
     "edit_request_able": "편집 요청 가능",
-    "date": "날짜"
+    "date": "날짜",
+    "wiki_load_ip_select" : "IP를 가져올 헤더",
+    "auto_login" : "자동 로그인"
 }

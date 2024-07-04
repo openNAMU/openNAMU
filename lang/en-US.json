@@ -21,6 +21,8 @@
     "option" : "Option",
     "edit_request_able" : "Edit request available",
     "date" : "Date",
+    "wiki_load_ip_select" : "Header to get IP",
+    "auto_login" : "Auto login",
 
     "_comment_" : "Common",
     "data" : "Data",
