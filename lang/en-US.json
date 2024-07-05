@@ -23,6 +23,7 @@
     "date" : "Date",
     "wiki_load_ip_select" : "Header to get IP",
     "auto_login" : "Auto login",
+    "view_hide_user_name_authority" : "View hidden username and IP",
 
     "_comment_" : "Common",
     "data" : "Data",

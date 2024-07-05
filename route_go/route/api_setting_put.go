@@ -16,14 +16,13 @@ func Api_setting_put(call_arg []string) string {
 	db := tool.DB_connect()
 	defer db.Close()
 
-	auth_name := tool.Get_user_auth(db, other_set["ip"])
-	auth_info := tool.Get_auth_group_info(db, auth_name)
+	auth_info := tool.Check_acl(db, "", "", "owner_auth", other_set["ip"])
 
 	setting_acl := Setting_list()
 	return_data := make(map[string]interface{})
 
 	if _, ok := setting_acl[other_set["set_name"]]; ok {
-		if _, ok := auth_info["owner"]; ok {
+		if auth_info {
 			if _, ok := other_set["coverage"]; !ok {
 				stmt, err := db.Prepare(tool.DB_change("delete from other where name = ?"))
 				if err != nil {

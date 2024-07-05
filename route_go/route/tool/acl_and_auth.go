@@ -136,6 +136,10 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		}
 	}
 
+	if _, ok := auth_info["check"]; ok {
+		auth_info["view_user_watchlist"] = true
+	}
+
 	check := false
 	for _, v := range admin_auth {
 		if _, ok := auth_info[v]; ok {
@@ -148,7 +152,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["admin_default_feature"] = true
 	}
 
-	admin_default_feature := []string{"treat_as_admin", "user_name_bold", "multiple_upload", "slow_edit_pass", "edit_bottom_compulsion_pass", "user"}
+	admin_default_feature := []string{"treat_as_admin", "user_name_bold", "multiple_upload", "slow_edit_pass", "edit_bottom_compulsion_pass", "view_hide_user_name", "doc_watch_list_view", "user"}
 
 	if _, ok := auth_info["admin_default_feature"]; ok {
 		for _, v := range admin_default_feature {
@@ -738,6 +742,30 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			acl_pass_auth = "admin_default_feature"
 
 			if auth_info["captcha_one_check_five_pass"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
+			}
+		} else if tool == "view_hide_user_name" {
+			acl_pass_auth = "admin_default_feature"
+
+			if auth_info["view_hide_user_name"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
+			}
+		} else if tool == "user_name_bold" {
+			acl_pass_auth = "admin_default_feature"
+
+			if auth_info["user_name_bold"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
+			}
+		} else if tool == "doc_watch_list_view" {
+			acl_pass_auth = "admin_default_feature"
+
+			if auth_info["doc_watch_list_view"] {
 				acl_data = ""
 			} else {
 				acl_data = "owner"
