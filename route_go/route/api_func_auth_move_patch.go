@@ -15,9 +15,13 @@ func Api_func_auth_move_patch(call_arg []string) string {
 	db := tool.DB_connect()
 	defer db.Close()
 
-	new_data := make(map[string]interface{})
-	new_data["response"] = "ok"
+	if tool.Check_acl() {
+		new_data := make(map[string]interface{})
+		new_data["response"] = "ok"
 
-	json_data, _ := json.Marshal(new_data)
-	return string(json_data)
+		json_data, _ := json.Marshal(new_data)
+		return string(json_data)
+	} else {
+
+	}
 }
