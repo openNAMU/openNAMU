@@ -670,5 +670,11 @@
     "date": "날짜",
     "wiki_load_ip_select" : "IP를 가져올 헤더",
     "auto_login" : "자동 로그인",
-    "view_hide_user_name_authority" : "숨겨진 사용자 이름과 IP 보기"
+    "view_hide_user_name_authority" : "숨겨진 사용자 이름과 IP 보기",
+    "view_user_watchlist_authority" : "사용자 주시 목록 보기",
+    "doc_watch_list_view_authority" : "문서를 주시 목록에 추가한 사람 목록 보기",
+    "bbs_view_authority" : "BBS 보기 권한",
+    "bbs_comment_authority" : "BBS 댓글 권한",
+    "bbs_edit_authority" : "BBS 수정 권한",
+    "user_analyze_authority" : "사용자 분석 권한"
 }
