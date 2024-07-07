@@ -37,6 +37,35 @@ func List_acl(func_type string) []string {
 	}
 }
 
+func List_auth(db *sql.DB) []string {
+	stmt, err := db.Prepare(DB_change("select distinct name from alist"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	data_list := []string{}
+
+	for rows.Next() {
+		var name string
+
+		err := rows.Scan(&name)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		data_list = append(data_list, name)
+	}
+
+	return data_list
+}
+
 func Do_insert_auth_history(db *sql.DB, ip string, what string) {
 	var log_off string
 
@@ -66,32 +95,28 @@ func Do_insert_auth_history(db *sql.DB, ip string, what string) {
 }
 
 func Get_user_auth(db *sql.DB, ip string) string {
-	if !IP_or_user(ip) {
-		var auth string
+	stmt, err := db.Prepare(DB_change("select data from user_set where id = ? and name = 'acl'"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
 
-		stmt, err := db.Prepare(DB_change("select data from user_set where id = ? and name = 'acl'"))
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer stmt.Close()
+	var auth string
 
-		err = stmt.QueryRow(ip).Scan(&auth)
-		if err != nil {
-			if err == sql.ErrNoRows {
+	err = stmt.QueryRow(ip).Scan(&auth)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			if !IP_or_user(ip) {
 				auth = "user"
 			} else {
-				log.Fatal(err)
+				auth = "ip"
 			}
-		}
-
-		if auth != "user" && auth != "ban" {
-			return auth
 		} else {
-			return ""
+			log.Fatal(err)
 		}
 	}
 
-	return ""
+	return auth
 }
 
 func Get_auth_group_info(db *sql.DB, auth string) map[string]bool {
@@ -120,7 +145,21 @@ func Get_auth_group_info(db *sql.DB, auth string) map[string]bool {
 		data_list[name] = true
 	}
 
-	return Check_auth(data_list)
+	if len(data_list) == 0 {
+		data_list["not_exist"] = true
+
+		return data_list
+	} else {
+		return Check_auth(data_list)
+	}
+}
+
+func Auth_include_upper_auth(auth_info map[string]bool) bool {
+	if auth_info["owner"] {
+		return true
+	}
+
+	return false
 }
 
 func Check_auth(auth_info map[string]bool) map[string]bool {

@@ -946,7 +946,7 @@ def get_acl_list(type_data = 'normal'):
     other_set = {}
     other_set['type'] = type_data
 
-    data_str = python_to_golang_sync('api_func_acl_list', other_set)
+    data_str = python_to_golang_sync('api_list_acl', other_set)
     data = orjson.loads(data_str)
 
     return data["data"]

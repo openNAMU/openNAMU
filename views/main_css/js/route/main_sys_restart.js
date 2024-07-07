@@ -17,9 +17,9 @@ function opennamu_main_sys_restart() {
         document.getElementById('opennamu_main_sys_restart_button').addEventListener('click', function() {
             fetch('/restart', {
                 method: 'post'
-            }).catch(function(e) {
-                window.location.href = '/';
             });
+
+            window.location.href = '/';
         });
     });
 }

@@ -478,7 +478,8 @@ app.route('/list/user/check/delete/<name>/<ip>/<time>/<do_type>', methods = ['PO
 
 # Func-auth
 app.route('/auth/give', methods = ['POST', 'GET'])(give_auth)
-app.route('/auth/give/<name>', methods = ['POST', 'GET'])(give_auth)
+app.route('/auth/give_total', methods = ['POST', 'GET'])(give_auth)
+app.route('/auth/give/<user_name>', methods = ['POST', 'GET'])(give_auth)
 
 app.route('/auth/ban', methods = ['POST', 'GET'])(give_user_ban)
 app.route('/auth/ban/multiple', methods = ['POST', 'GET'], defaults = { 'ban_type' : 'multiple' })(give_user_ban)
@@ -739,10 +740,10 @@ app.route('/api/thread/<int:topic_num>/<int:s_num>/<int:e_num>')(api_topic)
 app.route('/api/thread/<int:topic_num>/<tool>')(api_topic)
 app.route('/api/thread/<int:topic_num>')(api_topic)
 
-app.route('/api/search/<everything:name>')(api_search)
-app.route('/api/search_page/<int:num>/<everything:name>')(api_search)
-app.route('/api/search_data/<everything:name>', defaults = { 'search_type' : 'data' })(api_search)
-app.route('/api/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' })(api_search)
+app.route('/api/search/<everything:name>')(api_func_search)
+app.route('/api/search_page/<int:num>/<everything:name>')(api_func_search)
+app.route('/api/search_data/<everything:name>', defaults = { 'search_type' : 'data' })(api_func_search)
+app.route('/api/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' })(api_func_search)
 
 app.route('/api/recent_change')(api_list_recent_change)
 app.route('/api/recent_changes')(api_list_recent_change)
@@ -772,6 +773,8 @@ app.route('/api/v2/recent_block/<set_type>/<int:num>/<user_name>')(api_list_rece
 app.route('/api/v2/list/document/old/<int:num>', defaults = { 'set_type' : 'old' })(api_list_old_page)
 app.route('/api/v2/list/document/new/<int:num>', defaults = { 'set_type' : 'new' })(api_list_old_page)
 app.route('/api/v2/list/document/<int:num>')(api_list_title_index)
+app.route('/api/v2/list/auth')(api_list_auth)
+app.route('/api/v2/list/acl/<data_type>')(api_list_acl)
 
 app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>')(api_topic_list)
 
@@ -786,13 +789,14 @@ app.route('/api/v2/set_reset/<everything:name>')(api_w_set_reset)
 
 app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting)
 
+app.route('/api/v2/auth/give', methods = ['PATCH'])(api_give_auth)
+
 app.route('/api/v2/user/rankup', methods = ['GET', 'PATCH'])(api_user_rankup)
 app.route('/api/v2/user/setting/editor', methods = ['GET', 'POST', 'DELETE'])(api_user_setting_editor)
 
 app.route('/api/v2/ip/<everything:data>', methods = ['GET', 'POST'])(api_func_ip)
 app.route('/api/v2/ip_menu/<everything:ip>', defaults = { 'option' : 'user' }, methods = ['GET', 'POST'])(api_func_ip_menu)
 app.route('/api/v2/user_menu/<everything:ip>')(api_func_ip_menu)
-app.route('/api/v2/acl_list/<data_type>')(api_func_acl_list)
 app.route('/api/v2/lang', defaults = { 'legacy' : '' }, methods = ['POST'])(api_func_language)
 
 # Func-main

@@ -310,11 +310,11 @@ function opennamu_do_toc() {
         let toc_string = '';
         let add_on = false;
         for(let for_b = 5; for_b >= 0; for_b--) {
-            if(add_on == false && toc_count[for_b] != 0) {
+            if(add_on === false && toc_count[for_b] != 0) {
                 add_on = true;
             }
 
-            if(add_on == true) {
+            if(add_on === true) {
                 toc_string = String(toc_count[for_b]) + '.' + toc_string;
             }
         }

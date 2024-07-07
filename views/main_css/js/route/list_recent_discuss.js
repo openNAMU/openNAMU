@@ -6,7 +6,7 @@ function opennamu_list_recent_discuss() {
     
     let set_type = '';
     let num = '';
-    if(url_split.length == 2) {
+    if(url_split.length === 2) {
         set_type = 'normal';
         num = '1';
     } else {

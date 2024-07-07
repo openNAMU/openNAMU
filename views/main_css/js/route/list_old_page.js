@@ -6,7 +6,7 @@ function opennamu_list_old_page() {
     
     let set_type = '';
     let num = '';
-    if(url_split.length == 4) {
+    if(url_split.length === 4) {
         set_type = url_split[3];
         num = '1';
     } else {

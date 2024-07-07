@@ -75,8 +75,8 @@ function opennamu_thread_blind() {
 
 function opennamu_get_thread_ui(user_id, date, data, code, color = '', blind = '', add_style = '', topic_num = '') {
     let color_b, class_b;
-    if(blind == 'O') {
-        color_b = data == '' ? 'opennamu_comment_blind' : 'opennamu_comment_blind_admin';
+    if(blind === 'O') {
+        color_b = data === '' ? 'opennamu_comment_blind' : 'opennamu_comment_blind_admin';
         class_b = 'opennamu_comment_blind_js';
     } else {
         color_b = 'opennamu_comment_blind_not';

@@ -193,7 +193,7 @@ function opennamu_get_main_skin_set(set_name) {
 }
 
 function opennamu_send_render(data) {
-    if(data == '&lt;br&gt;' || data == '' || data.match(/^ +$/)) {
+    if(data === '&lt;br&gt;' || data === '' || data.match(/^ +$/)) {
         data = '<br>';
     } else {
         data = data.replace(/( |^)(https?:\/\/(?:[^ ]+))/g, function(m0, m1, m2) {

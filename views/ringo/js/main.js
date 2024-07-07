@@ -16,7 +16,7 @@ function ringo_opening(data) {
         }
     }
 
-    if((document.getElementById(element[0]).style.display == 'none' && ringo_open == 0) || ringo_save_data !== data) {
+    if((document.getElementById(element[0]).style.display === 'none' && ringo_open === 0) || ringo_save_data !== data) {
         document.getElementById(element[0]).style.display = 'block';
 
         for(for_a in element) {
@@ -44,7 +44,7 @@ document.addEventListener("click", function() {
         cel_list.push(document.getElementById(ringo_menu_list[for_a]));
     }
 
-    if(ringo_save_data !== '' && ringo_open == 2) {
+    if(ringo_save_data !== '' && ringo_open === 2) {
         document.getElementById(ringo_save_data).style.display = 'none';
 
         setTimeout(function() { ringo_open = 0; }, 100);

@@ -12,7 +12,7 @@ function do_insert_data(data) {
             sel.text = data;
         } else if(
             document.getElementById(name).selectionStart || 
-            document.getElementById(name).selectionStart == '0'
+            document.getElementById(name).selectionStart === '0'
         ) {
             let startPos = document.getElementById(name).selectionStart;
             let endPos = document.getElementById(name).selectionEnd;
