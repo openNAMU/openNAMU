@@ -2,13 +2,16 @@ package route
 
 import (
 	"database/sql"
-	"encoding/json"
 	"log"
 	"opennamu/route/tool"
 	"strconv"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 func Api_topic_list(call_arg []string) string {
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 	other_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &other_set)
 

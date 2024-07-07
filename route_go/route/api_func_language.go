@@ -1,11 +1,14 @@
 package route
 
 import (
-	"encoding/json"
 	"opennamu/route/tool"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 func Api_func_language(call_arg []string) string {
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 	other_set := make(map[string]interface{})
 	json.Unmarshal([]byte(call_arg[0]), &other_set)
 

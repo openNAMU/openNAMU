@@ -1380,7 +1380,7 @@ class class_do_render_namumark:
                         '''
                         data_name = self.get_tool_data_storage('' + \
                             include_link + \
-                            '<div id="' + include_sub_name + '" style="display: none;">' + urllib.parse.quote(json.dumps(include_change_list)) + '</div>' + \
+                            '<div id="' + include_sub_name + '" style="display: none;">' + urllib.parse.quote(orjson.dumps(include_change_list).decode('utf-8')) + '</div>' + \
                         '', '', match_org)
                     else:
                         self.data_backlink[include_name]['no'] = ''
