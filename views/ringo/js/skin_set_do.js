@@ -24,13 +24,13 @@ function ringo_do_skin_set() {
     if(window.localStorage.getItem('main_css_off_sidebar') && window.localStorage.getItem('main_css_off_sidebar') === '1') {
         document.getElementById('ringo_add_style').innerHTML += `
             section {
-                width: auto;
-                display: block;
-                margin: auto;
+                width: auto !important;
+                display: block !important;
+                margin: auto !important;
             }
 
             .do_fixed {
-                display: none;
+                display: none !important;
             }
         `;
     }
@@ -39,7 +39,7 @@ function ringo_do_skin_set() {
         let fixed_width_data = window.localStorage.getItem('main_css_fixed_width');
         document.getElementById('ringo_add_style').innerHTML += `
             article.main {
-                max-width: ` + fixed_width_data + `px;
+                max-width: ` + fixed_width_data + `px !important;
             }
         `;
     }
@@ -47,7 +47,7 @@ function ringo_do_skin_set() {
     if(window.localStorage.getItem('main_css_sidebar_right') && window.localStorage.getItem('main_css_sidebar_right') === '1') {
         document.getElementById('ringo_add_style').innerHTML += `
             .do_fixed {
-                float: right;
+                float: right !important;
             }
         `;
     }
