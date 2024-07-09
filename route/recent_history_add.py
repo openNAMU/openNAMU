@@ -8,7 +8,7 @@ def recent_history_add(name = 'Test', do_type = ''):
 
         ip = ip_check()
         if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
 
         if flask.request.method == 'POST':
             acl_check(tool = 'owner_auth', memo = 'history_add (' + name + ')')

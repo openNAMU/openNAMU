@@ -65,9 +65,9 @@ def give_admin_groups(name = 'test'):
 
         if flask.request.method == 'POST':
             if acl_check(tool = 'owner_auth', memo = 'auth list add (' + name + ')') == 1:
-                return re_error(conn, '/error/3')
+                return re_error(conn, 3)
             elif name in get_default_admin_group():
-                return re_error(conn, '/error/3')
+                return re_error(conn, 3)
 
             curs.execute(db_change("delete from alist where name = ?"), [name])
             for for_a in acl_name_list:

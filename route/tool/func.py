@@ -2299,7 +2299,7 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
 def re_error(conn, data):
     curs = conn.cursor()
 
-    if data == '/ban':
+    if data == 0:
         if ban_check()[0] == 1:
             end = '<div id="opennamu_get_user_info">' + html.escape(ip_check()) + '</div>'
         else:
@@ -2315,7 +2315,7 @@ def re_error(conn, data):
         sub_title = title
         return_code = 400
 
-        num = int(number_check(data.replace('/error/', '')))
+        num = data
         if num == 1:
             data = get_lang(conn, 'no_login_error')
         elif num == 2:
@@ -2432,6 +2432,8 @@ def re_error(conn, data):
             data = get_lang(conn, 'func_404_error')
             title = '404'
             return_code = 404
+        elif num == 47:
+            data = get_lang(conn, 'still_use_auth_error')
         else:
             data = '???'
 

@@ -676,5 +676,6 @@
     "bbs_view_authority" : "BBS 보기 권한",
     "bbs_comment_authority" : "BBS 댓글 권한",
     "bbs_edit_authority" : "BBS 수정 권한",
-    "user_analyze_authority" : "사용자 분석 권한"
+    "user_analyze_authority" : "사용자 분석 권한",
+    "still_use_auth_error" : "이 권한을 보유한 사람이 아직 존재합니다."
 }

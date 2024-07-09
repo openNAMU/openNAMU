@@ -29,4 +29,4 @@ def main_func_error_404(e = ''):
                         menu = 0
                     )), 404
                 else:
-                    return re_error(conn, '/error/46')
+                    return re_error(conn, 46)

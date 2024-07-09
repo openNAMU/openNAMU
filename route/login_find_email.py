@@ -37,7 +37,7 @@ def login_find_email(tool):
                     for i in re_set_list:
                         flask.session.pop(i, None)
                     
-                    return re_error(conn, '/error/36')
+                    return re_error(conn, 36)
         
             curs.execute(db_change('select data from other where name = "email_title"'))
             sql_d = curs.fetchall()
@@ -50,10 +50,10 @@ def login_find_email(tool):
             if tool == 'pass_find':
                 curs.execute(db_change("select id from user_set where id = ? and name = 'email' and data = ?"), [user_id, user_email])
                 if not curs.fetchall():
-                    return re_error(conn, '/error/12')
+                    return re_error(conn, 12)
                     
                 if send_email(conn, user_email, t_text, i_text) == 0:
-                    return re_error(conn, '/error/18')
+                    return re_error(conn, 18)
         
                 return redirect(conn, '/pass_find/email')
             else:
@@ -62,13 +62,13 @@ def login_find_email(tool):
                     for i in re_set_list:
                         flask.session.pop(i, None)
         
-                    return re_error(conn, '/error/35')
+                    return re_error(conn, 35)
                 
                 if send_email(conn, user_email, t_text, i_text) == 0:
                     for i in re_set_list:
                         flask.session.pop(i, None)
         
-                    return re_error(conn, '/error/18')
+                    return re_error(conn, 18)
         
                 flask.session['c_email'] = user_email
         

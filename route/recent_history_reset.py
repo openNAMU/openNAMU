@@ -5,7 +5,7 @@ def recent_history_reset(name = 'Test'):
         curs = conn.cursor()
 
         if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, '/error/3')
+            return re_error(conn, 3)
 
         if flask.request.method == 'POST':
             acl_check(tool = 'owner_auth', memo = 'history reset ' + name)

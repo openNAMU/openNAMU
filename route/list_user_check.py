@@ -14,12 +14,12 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
 
         if acl_check(tool = 'all_admin_auth', ip = name) != 1 or (plus_id and acl_check(tool = 'all_admin_auth', ip = plus_id) != 1):
             if acl_check('', 'owner_auth', '', '') == 1:
-                return re_error(conn, '/error/4')
+                return re_error(conn, 4)
 
         div = ''
 
         if acl_check(tool = 'check_auth', memo = (check_type + ' ' if check_type != '' else '') + 'check (' + name + ')') == 1:
-            return re_error(conn, '/error/3')
+            return re_error(conn, 3)
 
         if check_type == '':
             if ip_or_user(name) == 0:

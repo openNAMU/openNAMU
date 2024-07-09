@@ -30,6 +30,7 @@
     "bbs_comment_authority" : "BBS comment authority",
     "bbs_edit_authority" : "BBS edit authority",
     "user_analyze_authority" : "Analyze user authority",
+    "still_use_auth_error" : "Someone still has this authority",
 
     "_comment_" : "Common",
     "data" : "Data",

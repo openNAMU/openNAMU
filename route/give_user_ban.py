@@ -8,10 +8,10 @@ def give_user_ban(name = None, ban_type = ''):
         
         if ban_check(ip = ip, tool = 'login')[0] == 1:
             if ip_or_user(ip) == 1 or acl_check(tool = 'all_admin_auth', ip = ip) != 0:
-                return re_error(conn, '/ban')
+                return re_error(conn, 0)
         else:
             if acl_check(tool = 'ban_auth', ip = ip) == 1:
-                return re_error(conn, '/error/3')
+                return re_error(conn, 3)
 
         if flask.request.method == 'POST':
             end = '0'
@@ -61,7 +61,7 @@ def give_user_ban(name = None, ban_type = ''):
                     try:
                         re.compile(name)
                     except:
-                        return re_error(conn, '/error/23')
+                        return re_error(conn, 23)
                 elif regex_get == 'cidr':
                     type_d = 'cidr'
 
@@ -71,16 +71,16 @@ def give_user_ban(name = None, ban_type = ''):
                         try:
                             ipaddress.IPv6Network(name, False)
                         except:
-                            return re_error(conn, '/error/45')
+                            return re_error(conn, 45)
                 else:
                     type_d = None
 
                 if name == ip:
                     if acl_check(tool = 'all_admin_auth', memo = 'ban (' + name + ')') == 1:
-                        return re_error(conn, '/error/3')
+                        return re_error(conn, 3)
                 else:
                     if acl_check(tool = 'ban_auth', memo = 'ban (' + name + ')') == 1:
-                        return re_error(conn, '/error/3')
+                        return re_error(conn, 3)
 
                 ban_insert(conn, 
                     name,

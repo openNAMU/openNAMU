@@ -58,7 +58,7 @@ def view_set(name = 'Test', multiple = False):
             if need_admin:
                 if acl_check(tool = 'acl_auth') == 1:
                     if flask.request.method == 'POST':
-                        return re_error(conn, '/error/3')
+                        return re_error(conn, 3)
                     else:
                         check_ok = 'disabled'
 

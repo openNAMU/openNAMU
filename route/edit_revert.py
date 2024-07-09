@@ -6,10 +6,10 @@ def edit_revert(name, num):
 
         curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, str(num)])
         if curs.fetchall() and acl_check(tool = 'hidel_auth') == 1:
-            return re_error(conn, '/error/3')
+            return re_error(conn, 3)
 
         if acl_check(name, 'document_edit') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
         
         curs.execute(db_change("select data from history where title = ? and id = ?"), [name, str(num)])
         data = curs.fetchall()
@@ -18,28 +18,28 @@ def edit_revert(name, num):
 
         if flask.request.method == 'POST':
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, '/error/13')
+                return re_error(conn, 13)
 
             if do_edit_slow_check(conn) == 1:
-                return re_error(conn, '/error/24')
+                return re_error(conn, 24)
             
             send = flask.request.form.get('send', '')
             agree = flask.request.form.get('copyright_agreement', '')
             
             if do_edit_send_check(conn, send) == 1:
-                return re_error(conn, '/error/37')
+                return re_error(conn, 37)
             
             if do_edit_text_bottom_check_box_check(conn, agree) == 1:
-                return re_error(conn, '/error/29')
+                return re_error(conn, 29)
 
             if do_edit_filter(conn, data[0][0]) == 1:
-                return re_error(conn, '/error/21')
+                return re_error(conn, 21)
             
             curs.execute(db_change("select data from other where name = 'document_content_max_length'"))
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
                 if int(number_check(db_data[0][0])) < len(data[0][0]):
-                    return re_error(conn, '/error/44')
+                    return re_error(conn, 44)
 
             curs.execute(db_change("select data from data where title = ?"), [name])
             data_old = curs.fetchall()

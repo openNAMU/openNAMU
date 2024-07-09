@@ -5,7 +5,7 @@ def main_setting_main():
         curs = conn.cursor()
 
         if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
         
         setting_list = {
             0 : ['name', 'Wiki'],

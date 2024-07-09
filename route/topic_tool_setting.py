@@ -5,7 +5,7 @@ def topic_tool_setting(topic_num = 1):
         curs = conn.cursor()
 
         if acl_check(tool = 'toron_auth') == 1:
-            return re_error(conn, '/error/3')
+            return re_error(conn, 3)
 
         ip = ip_check()
         time = get_time()

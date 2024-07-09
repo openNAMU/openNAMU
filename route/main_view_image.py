@@ -14,4 +14,4 @@ def main_view_image(name = ''):
             else:
                 return ''
         else:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
