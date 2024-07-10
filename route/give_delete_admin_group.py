@@ -4,6 +4,9 @@ def give_delete_admin_group_2(name = 'test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
+        if name in get_default_admin_group():
+            return redirect(conn, '/auth/list')
+
         if acl_check('', 'owner_auth', '', '') == 1:
             return re_error(conn, 3)
 

@@ -274,7 +274,7 @@ function opennamu_page_control(url, page, data_length, data_length_max = 50) {
     return (back() + ' ' + next()).replace(/^ /, '');
 }
 
-function openamu_make_list(left = '', right = '', bottom = '') {
+function opennamu_make_list(left = '', right = '', bottom = '') {
     let data_html = '<div class="opennamu_recent_change">';
     data_html += left;
     

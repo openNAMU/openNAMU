@@ -60,13 +60,15 @@ def give_admin_groups(name = 'test'):
                         [4, 'bbs_comment', get_lang(conn, 'bbs_comment_authority')],
                             [5, '', get_lang(conn, 'bbs_view_authority')],
                         [4, 'bbs_view', get_lang(conn, 'bbs_view_authority')],
-                    [3, 'captcha_one_check_five_pass', get_lang(conn, 'captcha_one_check_five_pass_authority')]
+                    [3, 'captcha_one_check_five_pass', get_lang(conn, 'captcha_one_check_five_pass_authority')],
+                    [3, 'nothing', get_lang(conn, 'nothing_authority')]
         ]
+
+        if html.escape(name) != name:
+            return re_error(conn, 48)
 
         if flask.request.method == 'POST':
             if acl_check(tool = 'owner_auth', memo = 'auth list add (' + name + ')') == 1:
-                return re_error(conn, 3)
-            elif name in get_default_admin_group():
                 return re_error(conn, 3)
 
             curs.execute(db_change("delete from alist where name = ?"), [name])
@@ -74,23 +76,25 @@ def give_admin_groups(name = 'test'):
                 if flask.request.form.get(for_a[1], 0) != 0:
                     curs.execute(db_change("insert into alist (name, acl) values (?, ?)"), [name, for_a[1]])
 
+            curs.execute(db_change("insert into alist (name, acl) values (?, 'nothing')"), [name])
+
             return redirect(conn, '/auth/list/add/' + url_pas(name))
         else:
             state = 'disabled' if acl_check('', 'owner_auth', '', '') == 1 else ''
-            state = 'disabled' if name in get_default_admin_group() else state
+
+            curs.execute(db_change('select acl from alist where name = ?'), [name])
+            acl_list = curs.fetchall()
+            acl_list = [for_b[0] for for_b in acl_list]
 
             data = '<ul>'
-            for for_a in acl_name_list:
-                curs.execute(db_change('select acl from alist where name = ?'), [name])
-                acl_list = curs.fetchall()
-                acl_list = [for_a[0] for for_a in acl_list]
-                
+            for for_a in acl_name_list:                
                 checked = ''
+                if for_a[1] in acl_list:
+                    checked = 'checked'
+                    
                 choice = '<input type="checkbox" ' + state + ' name="' + for_a[1] + '" ' + checked + '> ' + for_a[2]
                 if for_a[1] == '':
                     choice = for_a[2]
-                elif for_a[1] in acl_list:
-                    checked = 'checked'
 
                 data += '' + \
                     '<li class="opennamu_list_1" style="margin-left: ' + str(int(for_a[0]) * 20) + 'px;">' + \

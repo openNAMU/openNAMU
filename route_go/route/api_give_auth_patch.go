@@ -61,7 +61,7 @@ func Api_give_auth_patch(call_arg []string) string {
 				}
 				defer stmt.Close()
 
-				_, err = stmt.Exec()
+				_, err = stmt.Exec(user_name)
 				if err != nil {
 					log.Fatal(err)
 				}

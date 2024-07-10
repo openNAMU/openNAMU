@@ -10,14 +10,6 @@ function do_insert_user_info() {
             let lang_data = data["language"];
 
             let get_data_auth = data['data']['auth'];
-            if(get_data_auth === '0') {
-                get_data_auth = lang_data['ip'];
-            } else if(get_data_auth === '1') {
-                get_data_auth = lang_data['member'];
-            } else {
-                get_data_auth = data['data']['auth'];
-            }
-
             let get_data_auth_date = data['data']['auth_date'];
             if(get_data_auth_date !== '0') {
                 get_data_auth += ' (~' + get_data_auth_date + ')'

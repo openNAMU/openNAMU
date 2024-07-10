@@ -13,16 +13,11 @@ def api_user_info(user_name = ''):
         curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [user_name])
         db_data = curs.fetchall()
         if db_data:
-            if db_data[0][0] != 'user':
-                curs.execute(db_change("select name from alist where name = ?"), [db_data[0][0]])
-                if curs.fetchall() or db_data[0][0] in get_default_admin_group():
-                    data_result['auth'] = db_data[0][0]
-                else:
-                    data_result['auth'] = '1'
-            else:
-                data_result['auth'] = '1'
+            data_result['auth'] = db_data[0][0]
+        elif ip_or_user(user_name) == 1:
+            data_result['auth'] = 'user'
         else:
-            data_result['auth'] = '0'
+            data_result['auth'] = 'ip'
 
         curs.execute(db_change("select data from user_set where id = ? and name = 'auth_date'"), [user_name])
         db_data = curs.fetchall()

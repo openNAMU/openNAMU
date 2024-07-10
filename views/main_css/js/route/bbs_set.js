@@ -13,7 +13,7 @@ function opennamu_bbs_set_post() {
         post_data.append('data', document.getElementById('opennamu_' + acl_set_list[for_a]).value);
         
         fetch('/api/v2/setting/' + acl_set_list[for_a], {
-            method : 'put',
+            method : 'PUT',
             body : post_data,
         }).then(function(res) {
             return res.json();
@@ -36,7 +36,7 @@ function opennamu_bbs_set() {
     lang_data.append('data', lang_str);
 
     fetch('/api/v2/lang', {
-        method : 'post',
+        method : 'POST',
         body : lang_data,
     }).then(function(res) {
         return res.json();

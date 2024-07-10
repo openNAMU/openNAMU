@@ -13,6 +13,10 @@ func Api_list_auth(call_arg []string) string {
 
 	return_data := make(map[string]interface{})
 	return_data["response"] = "ok"
+	return_data["language"] = map[string]string{
+		"send":             tool.Get_language(db, "send", false),
+		"many_delete_help": tool.Get_language(db, "many_delete_help", false),
+	}
 	return_data["data"] = data
 
 	json_data, _ := json.Marshal(return_data)

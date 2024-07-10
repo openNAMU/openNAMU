@@ -356,8 +356,9 @@ input, textarea, button, select {
     background-color: white;
 }
 
-input, textarea {
-    width: calc(100% - 20px);
+.opennamu_main input,
+.opennamu_main textarea {
+    width: calc(100% - 22px);
 }
 
 #main_data button:hover {

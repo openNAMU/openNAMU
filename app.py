@@ -733,9 +733,6 @@ app.route('/api/skin_info/<name>')(api_skin_info)
 app.route('/api/user_info/<user_name>')(api_user_info)
 app.route('/api/setting/<name>')(api_setting)
 
-app.route('/api/auth')(api_func_auth)
-app.route('/api/auth/<user_name>')(api_func_auth)
-
 app.route('/api/thread/<int:topic_num>/<int:s_num>/<int:e_num>')(api_topic)
 app.route('/api/thread/<int:topic_num>/<tool>')(api_topic)
 app.route('/api/thread/<int:topic_num>')(api_topic)
@@ -789,6 +786,8 @@ app.route('/api/v2/set_reset/<everything:name>')(api_w_set_reset)
 
 app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting)
 
+app.route('/api/v2/auth')(api_func_auth)
+app.route('/api/v2/auth/<user_name>')(api_func_auth)
 app.route('/api/v2/auth/give', methods = ['PATCH'])(api_give_auth)
 
 app.route('/api/v2/user/rankup', methods = ['GET', 'PATCH'])(api_user_rankup)

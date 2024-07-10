@@ -43,7 +43,7 @@ function opennamu_list_recent_change() {
         let date_heading = '';
         for(let for_a = 0; for_a < data.length; for_a++) {
             if(data[for_a][6] !== "" && data[for_a][1] === "") {
-                data_html += openamu_make_list('----');
+                data_html += opennamu_make_list('----');
 
                 continue;
             }
@@ -131,7 +131,7 @@ function opennamu_list_recent_change() {
                 bottom = opennamu_send_render(opennamu_xss_filter(data[for_a][4]));
             }
 
-            data_html += openamu_make_list(left, right, bottom);
+            data_html += opennamu_make_list(left, right, bottom);
         }
 
         data_html += opennamu_page_control('/recent_change/{}/' + set_type, Number(num), data.length);

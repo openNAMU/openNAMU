@@ -297,7 +297,7 @@
     "edit_help": "편집 창 문구",
     "default_edit_help": "이곳에 내용을 입력해주세요.",
     "many_delete": "다중 문서 삭제",
-    "many_delete_help": "한 줄에 문서명을 한 개씩 적어주세요.",
+    "many_delete_help": "한 줄에 이름을 한 개씩 적어주세요.",
     "content": "내용",
     "upload_acl": "파일 올리기 ACL",
     "topic_delete": "토론 삭제",
@@ -677,5 +677,9 @@
     "bbs_comment_authority" : "BBS 댓글 권한",
     "bbs_edit_authority" : "BBS 수정 권한",
     "user_analyze_authority" : "사용자 분석 권한",
-    "still_use_auth_error" : "이 권한을 보유한 사람이 아직 존재합니다."
+    "still_use_auth_error" : "이 권한을 보유한 사람이 아직 존재합니다.",
+    "xss_data_include_error" : "XSS에 이용될 수 있는 문자는 입력할 수 없습니다.",
+    "nothing_authority" : "아무 기능 없는 권한",
+    "multiple_authorize" : "다중 권한 부여",
+    "auth_to_auth" : "권한 그룹에서 권한 그룹으로"
 }

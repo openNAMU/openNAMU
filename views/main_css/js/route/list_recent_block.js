@@ -117,7 +117,7 @@ function opennamu_list_recent_block() {
                 }
             }
 
-            data_html += openamu_make_list(left, right, bottom);
+            data_html += opennamu_make_list(left, right, bottom);
         }
 
         data_html += opennamu_page_control('/recent_block/' + tool + user_name + '/{}', Number(page), data.length);

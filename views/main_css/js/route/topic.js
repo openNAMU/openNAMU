@@ -20,7 +20,7 @@ function opennamu_thread_delete() {
     lang_data.append('data', 'delete');
 
     fetch('/api/lang', {
-        method : 'post',
+        method : 'POST',
         body : lang_data,
     }).then(function(res) {
         return res.json();

@@ -11,11 +11,10 @@ def list_user(arg_num = 1):
         curs.execute(db_change("select id, data from user_set where name = 'date' order by data desc limit ?, 50"), [sql_num])
         user_list = curs.fetchall()
         for data in user_list:
-            list_data += '' + \
-                '<li>' + \
-                    ip_pas(data[0]) + (' (' + data[1] + ')' if data[1] != '' else '') + \
-                '</li>' + \
-            ''
+            list_data += '<li>'
+            list_data += ip_pas(data[0])
+            list_data += ' | ' + data[1] if data[1] != '' else ''
+            list_data += '</li>'
 
         list_data += '</ul>' + next_fix(conn, '/list/user/', arg_num, user_list)
 

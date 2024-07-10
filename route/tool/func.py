@@ -756,14 +756,17 @@ def set_init_always(conn, ver_num, run_mode):
         curs.execute(db_change('delete from alist where name = "owner"'))
         curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
 
-        curs.execute(db_change('delete from alist where name = "user"'))
-        curs.execute(db_change('insert into alist (name, acl) values ("user", "user")'))
+        curs.execute(db_change("select name from alist where name = 'user' limit 1"))
+        if not curs.fetchall():
+            curs.execute(db_change('insert into alist (name, acl) values ("user", "user")'))
 
-        curs.execute(db_change('delete from alist where name = "ip"'))
-        curs.execute(db_change('insert into alist (name, acl) values ("ip", "ip")'))
+        curs.execute(db_change("select name from alist where name = 'ip' limit 1"))
+        if not curs.fetchall():
+            curs.execute(db_change('insert into alist (name, acl) values ("ip", "ip")'))
 
-        curs.execute(db_change('delete from alist where name = "ban"'))
-        curs.execute(db_change('insert into alist (name, acl) values ("ban", "view")'))
+        curs.execute(db_change("select name from alist where name = 'ban' limit 1"))
+        if not curs.fetchall():
+            curs.execute(db_change('insert into alist (name, acl) values ("ban", "view")'))
 
         # 이미지 폴더 없으면 생성
         if not os.path.exists(load_image_url(conn)):
@@ -2434,6 +2437,8 @@ def re_error(conn, data):
             return_code = 404
         elif num == 47:
             data = get_lang(conn, 'still_use_auth_error')
+        elif num == 48:
+            data = get_lang(conn, 'xss_data_include_error')
         else:
             data = '???'
 
