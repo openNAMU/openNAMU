@@ -37,6 +37,7 @@
     "auth_to_auth" : "Auth group to auth group",
     "vote_management_authority" : "Vote management authority",
     "bbs_management_authority" : "BBS management authority",
+    "discuss_view_authority" : "Discussion view authority",
 
     "_comment_" : "Common",
     "data" : "Data",

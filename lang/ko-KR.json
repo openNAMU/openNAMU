@@ -683,5 +683,6 @@
     "multiple_authorize" : "다중 권한 부여",
     "auth_to_auth" : "권한 그룹에서 권한 그룹으로",
     "vote_management_authority" : "투표 관리 권한",
-    "bbs_management_authority" : "BBS 관리 권한"
+    "bbs_management_authority" : "BBS 관리 권한",
+    "discuss_view_authority" : "토론 보기 권한"
 }

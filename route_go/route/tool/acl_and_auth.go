@@ -146,20 +146,14 @@ func Get_auth_group_info(db *sql.DB, auth string) map[string]bool {
 	}
 
 	if len(data_list) == 0 {
-		data_list["not_exist"] = true
-
-		return data_list
-	} else {
-		return Check_auth(data_list)
+		data_list["nothing"] = true
 	}
+
+	return Check_auth(data_list)
 }
 
 func Auth_include_upper_auth(auth_info map[string]bool) bool {
-	if auth_info["owner"] {
-		return true
-	}
-
-	return false
+	return auth_info["owner"]
 }
 
 func Check_auth(auth_info map[string]bool) map[string]bool {
@@ -167,7 +161,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["admin"] = true
 	}
 
-	admin_auth := []string{"ban", "toron", "check", "acl", "hidel", "give", "bbs", "vote"}
+	admin_auth := []string{"ban", "toron", "check", "acl", "hidel", "give", "bbs", "vote_fix"}
 
 	if _, ok := auth_info["admin"]; ok {
 		for _, v := range admin_auth {
@@ -207,7 +201,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		}
 	}
 
-	ip_default := []string{"document", "discuss", "upload", "vote", "bbs", "captcha_one_check_five_pass"}
+	ip_default := []string{"document", "discuss", "upload", "vote", "bbs_use", "captcha_one_check_five_pass"}
 
 	if _, ok := auth_info["ip"]; ok {
 		for _, v := range ip_default {
