@@ -15,9 +15,9 @@ def api_user_info(user_name = ''):
         if db_data:
             data_result['auth'] = db_data[0][0]
         elif ip_or_user(user_name) == 1:
-            data_result['auth'] = 'user'
-        else:
             data_result['auth'] = 'ip'
+        else:
+            data_result['auth'] = 'user'
 
         curs.execute(db_change("select data from user_set where id = ? and name = 'auth_date'"), [user_name])
         db_data = curs.fetchall()

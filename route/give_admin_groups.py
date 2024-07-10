@@ -51,7 +51,7 @@ def give_admin_groups(name = 'test'):
                             [5, '', get_lang(conn, 'view_authority')],
                         [4, 'view', get_lang(conn, 'view_authority')],
                     [3, 'discuss', get_lang(conn, 'discuss_authority')],
-                        [4, 'discuss_view', get_lang(conn, 'discuss_authority')],
+                        [4, 'discuss_view', get_lang(conn, 'discuss_view_authority')],
                     [3, 'upload', get_lang(conn, 'upload_authority')],
                     [3, 'vote', get_lang(conn, 'vote_authority')],
                     [3, 'bbs_use', get_lang(conn, 'bbs_authority')],
