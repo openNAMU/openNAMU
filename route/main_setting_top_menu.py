@@ -5,7 +5,7 @@ def main_setting_top_menu():
         curs = conn.cursor()
 
         if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
         
         if flask.request.method == 'POST':
             curs.execute(db_change("select name from other where name = 'top_menu'"))

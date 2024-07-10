@@ -5,7 +5,7 @@ def login_register_2():
         curs = conn.cursor()
 
         if ban_check(None, 'login')[0] == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
 
         ip = ip_check()
         admin = acl_check(tool = 'owner_auth')
@@ -18,12 +18,12 @@ def login_register_2():
             curs.execute(db_change('select data from other where name = "reg"'))
             set_d = curs.fetchall()
             if set_d and set_d[0][0] == 'on':
-                return re_error(conn, '/ban')
+                return re_error(conn, 0)
 
         if flask.request.method == 'POST':
             # 리캡차
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, '/error/13')
+                return re_error(conn, 13)
 
             user_id = flask.request.form.get('id', '')
             user_pw = flask.request.form.get('pw', '')
@@ -31,10 +31,10 @@ def login_register_2():
 
             # PW 검증
             if user_id == '' or user_pw == '':
-                return re_error(conn, '/error/27')
+                return re_error(conn, 27)
 
             if user_pw != user_repeat:
-                return re_error(conn, '/error/20')
+                return re_error(conn, 20)
 
             # PW 길이 제한
             curs.execute(db_change("select data from other where name = 'password_min_length'"))
@@ -42,10 +42,10 @@ def login_register_2():
             if db_data and db_data[0][0] != '':
                 password_min_length = int(number_check(db_data[0][0]))
                 if password_min_length > len(user_pw):
-                    return re_error(conn, '/error/40')
+                    return re_error(conn, 40)
 
             if do_user_name_check(conn, user_id) == 1:
-                return re_error(conn, '/error/8')
+                return re_error(conn, 8)
 
             if admin != 1:
                 # 이메일 필요시 /register/email로 발송

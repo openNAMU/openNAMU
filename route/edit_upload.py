@@ -5,7 +5,7 @@ def edit_upload():
         curs = conn.cursor()
 
         if acl_check('', 'upload') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
         
         curs.execute(db_change('select data from other where name = "upload"'))
         db_data = curs.fetchall()
@@ -14,7 +14,7 @@ def edit_upload():
 
         if flask.request.method == 'POST':
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, '/error/13')
+                return re_error(conn, 13)
 
             file_data = flask.request.files.getlist("f_data[]")
             file_len = len(file_data)
@@ -24,20 +24,20 @@ def edit_upload():
                 file_size_all = 0
 
             if (file_max * 1000 * 1000 * file_len) < file_size_all or file_size_all == 0:
-                return re_error(conn, '/error/17')
+                return re_error(conn, 17)
 
             if file_len == 1:
                 file_num = None
             else:
                 if acl_check('', 'many_upload') == 1:
-                    return re_error(conn, '/ban')
+                    return re_error(conn, 0)
 
                 file_num = 1
 
             for data in file_data:
                 file_name = data.filename if data.filename else ''
                 if file_name == '':
-                    return re_error(conn, '/error/9')
+                    return re_error(conn, 9)
                 
                 value_tmp = os.path.splitext(file_name)
                 value = ''
@@ -47,7 +47,7 @@ def edit_upload():
                 curs.execute(db_change("select html from html_filter where kind = 'extension'"))
                 extension = [i[0].lower() for i in curs.fetchall()]
                 if not re.sub(r'^\.', '', value).lower() in extension:
-                    return re_error(conn, '/error/14')
+                    return re_error(conn, 14)
 
                 name = ''
                 if flask.request.form.get('f_name', None):
@@ -57,13 +57,13 @@ def edit_upload():
 
                 piece = os.path.splitext(name)
                 if re.search(r'\.', piece[0]):
-                    return re_error(conn, '/error/22')
+                    return re_error(conn, 22)
 
                 e_data = sha224_replace(piece[0]) + piece[1]
 
                 curs.execute(db_change("select title from data where title = ?"), ['file:' + name])
                 if curs.fetchall():
-                    return re_error(conn, '/error/16')
+                    return re_error(conn, 16)
 
                 curs.execute(db_change("select html from html_filter where kind = 'file'"))
                 db_data = curs.fetchall()
@@ -74,7 +74,7 @@ def edit_upload():
 
                 data_url_image = load_image_url(conn)
                 if os.path.exists(os.path.join(data_url_image, e_data)):
-                    return re_error(conn, '/error/16')
+                    return re_error(conn, 16)
                 else:
                     data.save(os.path.join(data_url_image, e_data))
 

@@ -5,7 +5,7 @@ def topic_tool_change(topic_num = 1):
         curs = conn.cursor()
 
         if acl_check(tool = 'owner_auth') == 1:
-            return re_error(conn, '/error/3')
+            return re_error(conn, 3)
 
         time = get_time()
         topic_num = str(topic_num)

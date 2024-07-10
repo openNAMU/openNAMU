@@ -70,11 +70,11 @@ def view_diff(name = 'Test', num_a = 1, num_b = 1):
         second = str(num_b)
 
         if acl_check(name, 'render') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
 
         curs.execute(db_change("select title from history where title = ? and (id = ? or id = ?) and hide = 'O'"), [name, first, second])
         if curs.fetchall() and acl_check(tool = 'hidel_auth') == 1:
-            return re_error(conn, '/error/3')
+            return re_error(conn, 3)
 
         curs.execute(db_change("select data from history where id = ? and title = ?"), [first, name])
         first_raw_data = curs.fetchall()

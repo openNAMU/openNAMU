@@ -13,7 +13,7 @@ function opennamu_bbs_set_post() {
         post_data.append('data', document.getElementById('opennamu_' + acl_set_list[for_a]).value);
         
         fetch('/api/v2/setting/' + acl_set_list[for_a], {
-            method : 'put',
+            method : 'PUT',
             body : post_data,
         }).then(function(res) {
             return res.json();
@@ -36,14 +36,14 @@ function opennamu_bbs_set() {
     lang_data.append('data', lang_str);
 
     fetch('/api/v2/lang', {
-        method : 'post',
+        method : 'POST',
         body : lang_data,
     }).then(function(res) {
         return res.json();
     }).then(function(lang) {
         lang = lang["data"];
 
-        fetch('/api/v2/acl_list/normal').then(function(res) {
+        fetch('/api/v2/list/acl/normal').then(function(res) {
             return res.json();
         }).then(function(acl_list) {
             acl_list = acl_list["data"];
@@ -57,7 +57,7 @@ function opennamu_bbs_set() {
                 let select = '';
                 for(let for_a = 0; for_a < acl_list.length; for_a++) {
                     let acl_list_view = acl_list[for_a];
-                    acl_list_view = acl_list_view == "" ? "normal" : acl_list_view;
+                    acl_list_view = acl_list_view === "" ? "normal" : acl_list_view;
 
                     select += '<option value="' + acl_list[for_a] + '">' + acl_list_view + '</option>';
                 }

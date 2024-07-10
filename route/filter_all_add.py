@@ -9,7 +9,7 @@ def filter_all_add(tool, name = None):
 
         if flask.request.method == 'POST':
             if acl_check('', 'owner_auth', '', '') == 1:
-                return re_error(conn, '/error/3')
+                return re_error(conn, 3)
 
             title = flask.request.form.get('title', 'test')
             if tool in ('inter_wiki', 'outer_link'):
@@ -35,7 +35,7 @@ def filter_all_add(tool, name = None):
                 try:
                     re.compile(content)
                 except:
-                    return re_error(conn, '/error/23')
+                    return re_error(conn, 23)
                 
                 curs.execute(db_change("delete from html_filter where html = ? and kind = 'regex_filter'"), [name])
                 curs.execute(db_change("insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, 'regex_filter')"), [name, content, end])
@@ -50,7 +50,7 @@ def filter_all_add(tool, name = None):
                 try:
                     re.compile(post_regex)
                 except:
-                    return re_error(conn, '/error/23')
+                    return re_error(conn, 23)
                 
                 curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, "document", ?, ?)'), [post_name, post_regex, post_acl])
                 acl_check(tool = 'owner_auth', memo = 'document_filter edit')
@@ -60,7 +60,7 @@ def filter_all_add(tool, name = None):
                     try:
                         re.compile(title)
                     except:
-                        return re_error(conn, '/error/23')
+                        return re_error(conn, 23)
 
                     acl_check(tool = 'owner_auth', memo = 'name_filter edit')
                     type_d = 'name'
@@ -68,7 +68,7 @@ def filter_all_add(tool, name = None):
                     try:
                         re.compile(title)
                     except:
-                        return re_error(conn, '/error/23')
+                        return re_error(conn, 23)
 
                     acl_check(tool = 'owner_auth', memo = 'file_filter edit')
                     type_d = 'file'

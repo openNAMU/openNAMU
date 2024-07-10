@@ -13,7 +13,6 @@ def main_setting():
             ['sitemap_set', get_lang(conn, 'sitemap_management')],
             ['top_menu', get_lang(conn, 'top_menu_setting')],
             ['skin_set', get_lang(conn, 'main_skin_set_default')],
-            ['acl', get_lang(conn, 'main_acl_setting')],
             ['404_page', get_lang(conn, '404_page_setting')]
         ]
 

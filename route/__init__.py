@@ -35,7 +35,6 @@ from route.filter_all_add import filter_all_add
 from route.filter_all_delete import filter_all_delete
 
 from route.give_admin_groups import give_admin_groups
-from route.give_auth import give_auth
 from route.give_delete_admin_group import give_delete_admin_group_2
 from route.give_user_ban import give_user_ban
 from route.give_user_fix import give_user_fix
@@ -74,7 +73,6 @@ from route.main_search_deep import main_search_deep
 from route.main_search_goto import main_search_goto
 
 from route.main_setting import main_setting
-from route.main_setting_acl import main_setting_acl
 from route.main_setting_external import main_setting_external
 from route.main_setting_head import main_setting_head
 from route.main_setting_main import main_setting_main
@@ -166,6 +164,8 @@ from route.n_list_recent_discuss import list_recent_discuss
 from route.n_list_recent_block import list_recent_block
 from route.n_list_old_page import list_old_page
 from route.n_list_user_check_submit import list_user_check_submit
+from route.go_api_list_acl import api_list_acl
+from route.go_api_list_auth import api_list_auth
 
 from route.n_bbs_in import bbs_in
 from route.n_bbs_set import bbs_set
@@ -175,6 +175,8 @@ from route.n_w_watch_list import w_watch_list
 from route.n_user_rankup import user_rankup
 
 from route.n_topic_list import topic_list
+
+from route.n_give_auth import give_auth
 
 from route.n_setting_404_page import setting_404_page
 
@@ -188,9 +190,10 @@ from route.go_api_func_sha224 import api_func_sha224
 from route.go_api_func_ip import api_func_ip
 from route.go_api_func_ip_menu import api_func_ip_menu
 from route.go_api_func_auth import api_func_auth
-from route.go_api_func_acl_list import api_func_acl_list
 
-from route.go_api_search import api_search
+from route.go_api_func_search import api_func_search
+
+from route.go_api_give_auth import api_give_auth
 
 from route.go_api_list_recent_change import api_list_recent_change
 from route.go_api_list_recent_discuss import api_list_recent_discuss

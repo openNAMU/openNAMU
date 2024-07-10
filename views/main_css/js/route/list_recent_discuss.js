@@ -6,7 +6,7 @@ function opennamu_list_recent_discuss() {
     
     let set_type = '';
     let num = '';
-    if(url_split.length == 2) {
+    if(url_split.length === 2) {
         set_type = 'normal';
         num = '1';
     } else {
@@ -54,7 +54,7 @@ function opennamu_list_recent_discuss() {
             right += data[for_a][6] + ' | ';
             right += data[for_a][2];
 
-            data_html += openamu_make_list(left, right);
+            data_html += opennamu_make_list(left, right);
         }
 
         data_html += opennamu_page_control('/recent_discuss/{}/' + set_type, Number(num), data.length);

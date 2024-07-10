@@ -37,6 +37,35 @@ func List_acl(func_type string) []string {
 	}
 }
 
+func List_auth(db *sql.DB) []string {
+	stmt, err := db.Prepare(DB_change("select distinct name from alist"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	data_list := []string{}
+
+	for rows.Next() {
+		var name string
+
+		err := rows.Scan(&name)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		data_list = append(data_list, name)
+	}
+
+	return data_list
+}
+
 func Do_insert_auth_history(db *sql.DB, ip string, what string) {
 	var log_off string
 
@@ -66,32 +95,28 @@ func Do_insert_auth_history(db *sql.DB, ip string, what string) {
 }
 
 func Get_user_auth(db *sql.DB, ip string) string {
-	if !IP_or_user(ip) {
-		var auth string
+	stmt, err := db.Prepare(DB_change("select data from user_set where id = ? and name = 'acl'"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
 
-		stmt, err := db.Prepare(DB_change("select data from user_set where id = ? and name = 'acl'"))
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer stmt.Close()
+	var auth string
 
-		err = stmt.QueryRow(ip).Scan(&auth)
-		if err != nil {
-			if err == sql.ErrNoRows {
+	err = stmt.QueryRow(ip).Scan(&auth)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			if !IP_or_user(ip) {
 				auth = "user"
 			} else {
-				log.Fatal(err)
+				auth = "ip"
 			}
-		}
-
-		if auth != "user" && auth != "ban" {
-			return auth
 		} else {
-			return ""
+			log.Fatal(err)
 		}
 	}
 
-	return ""
+	return auth
 }
 
 func Get_auth_group_info(db *sql.DB, auth string) map[string]bool {
@@ -120,7 +145,21 @@ func Get_auth_group_info(db *sql.DB, auth string) map[string]bool {
 		data_list[name] = true
 	}
 
-	return Check_auth(data_list)
+	if len(data_list) == 0 {
+		data_list["not_exist"] = true
+
+		return data_list
+	} else {
+		return Check_auth(data_list)
+	}
+}
+
+func Auth_include_upper_auth(auth_info map[string]bool) bool {
+	if auth_info["owner"] {
+		return true
+	}
+
+	return false
 }
 
 func Check_auth(auth_info map[string]bool) map[string]bool {
@@ -136,6 +175,10 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		}
 	}
 
+	if _, ok := auth_info["check"]; ok {
+		auth_info["view_user_watchlist"] = true
+	}
+
 	check := false
 	for _, v := range admin_auth {
 		if _, ok := auth_info[v]; ok {
@@ -148,14 +191,68 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["admin_default_feature"] = true
 	}
 
-	admin_default_feature := []string{"treat_as_admin", "user_name_bold", "multiple_upload", "slow_edit_pass", "edit_bottom_compulsion_pass"}
+	admin_default_feature := []string{"treat_as_admin", "user_name_bold", "multiple_upload", "slow_edit_pass", "edit_bottom_compulsion_pass", "view_hide_user_name", "doc_watch_list_view", "user"}
 
 	if _, ok := auth_info["admin_default_feature"]; ok {
 		for _, v := range admin_default_feature {
 			auth_info[v] = true
 		}
+	}
 
-		auth_info["user"] = true
+	user_default := []string{"captcha_pass", "ip"}
+
+	if _, ok := auth_info["user"]; ok {
+		for _, v := range user_default {
+			auth_info[v] = true
+		}
+	}
+
+	ip_default := []string{"document", "discuss", "upload", "vote", "bbs", "captcha_one_check_five_pass"}
+
+	if _, ok := auth_info["ip"]; ok {
+		for _, v := range ip_default {
+			auth_info[v] = true
+		}
+	}
+
+	document_default := []string{"edit", "edit_request", "move", "new_make", "delete"}
+
+	if _, ok := auth_info["document"]; ok {
+		for _, v := range document_default {
+			auth_info[v] = true
+		}
+	}
+
+	check = false
+	for _, v := range document_default {
+		if _, ok := auth_info[v]; ok {
+			check = true
+			break
+		}
+	}
+
+	if check {
+		auth_info["view"] = true
+	}
+
+	bbs_default := []string{"bbs_edit", "bbs_comment"}
+
+	if _, ok := auth_info["bbs_use"]; ok {
+		for _, v := range bbs_default {
+			auth_info[v] = true
+		}
+	}
+
+	check = false
+	for _, v := range bbs_default {
+		if _, ok := auth_info[v]; ok {
+			check = true
+			break
+		}
+	}
+
+	if check {
+		auth_info["bbs_view"] = true
 	}
 
 	return auth_info
@@ -333,13 +430,10 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'edit'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["document"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "document_move" {
@@ -363,13 +457,10 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'document_move_acl'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["move"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "document_edit" {
@@ -393,16 +484,13 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'document_edit_acl'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["edit"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
-		} else if tool == "document_edit" {
+		} else if tool == "document_delete" {
 			acl_pass_auth = "acl"
 
 			if for_a == 0 {
@@ -423,13 +511,10 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'document_delete_acl'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["delete"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "topic" {
@@ -470,53 +555,35 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'discussion'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["discuss"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "topic_view" {
 			acl_pass_auth = "topic"
 
-			stmt, err := db.Prepare(DB_change("select set_data from topic_set where thread_code = ? and set_name = 'thread_view_acl'"))
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer stmt.Close()
-
-			err = stmt.QueryRow(topic_number).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["discuss_view"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "upload" {
-			acl_pass_auth = "multiple_upload"
+			acl_pass_auth = "admin_default_feature"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'upload_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["upload"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "many_upload" {
-			acl_pass_auth = "multiple_upload"
+			acl_pass_auth = "admin_default_feature"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'many_upload_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["multiple_upload"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "vote" {
 			acl_pass_auth = "vote_fix"
@@ -543,36 +610,27 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					continue
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'vote_acl'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["vote"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "slow_edit" {
-			acl_pass_auth = "slow_edit_pass"
+			acl_pass_auth = "admin_default_feature"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'slow_edit_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["slow_edit_pass"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "edit_bottom_compulsion" {
-			acl_pass_auth = "edit_bottom_compulsion_pass"
+			acl_pass_auth = "admin_default_feature"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'edit_bottom_compulsion_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["edit_bottom_compulsion_pass"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "bbs_edit" {
 			acl_pass_auth = "bbs"
@@ -623,13 +681,10 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select set_data from bbs_set where set_name = 'bbs_acl_all'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["bbs_edit"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "bbs_comment" {
@@ -681,13 +736,10 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select set_data from bbs_set where set_name = 'bbs_acl_all'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["bbs_comment"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "bbs_view" {
@@ -711,36 +763,51 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select set_data from bbs_set where set_name = 'bbs_view_acl_all'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["bbs_view"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "recaptcha" {
-			acl_pass_auth = "captcha_pass"
+			acl_pass_auth = "admin_default_feature"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'recaptcha_pass_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["captcha_pass"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "recaptcha_five_pass" {
-			acl_pass_auth = "captcha_one_check_five_pass"
+			acl_pass_auth = "admin_default_feature"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'recaptcha_one_check_five_pass_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["captcha_one_check_five_pass"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
+			}
+		} else if tool == "view_hide_user_name" {
+			acl_pass_auth = "admin_default_feature"
+
+			if auth_info["view_hide_user_name"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
+			}
+		} else if tool == "user_name_bold" {
+			acl_pass_auth = "admin_default_feature"
+
+			if auth_info["user_name_bold"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
+			}
+		} else if tool == "doc_watch_list_view" {
+			acl_pass_auth = "admin_default_feature"
+
+			if auth_info["doc_watch_list_view"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "document_edit_request" {
 			acl_pass_auth = "acl"
@@ -763,25 +830,19 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'document_edit_request_acl'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["edit_request"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		} else if tool == "document_make_acl" {
 			acl_pass_auth = "acl"
 
-			err := db.QueryRow(DB_change("select data from other where name = 'document_make_acl'")).Scan(&acl_data)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					acl_data = ""
-				} else {
-					log.Fatal(err)
-				}
+			if auth_info["new_make"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else {
 			// tool == "render"
@@ -805,13 +866,10 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else {
-				err := db.QueryRow(DB_change("select data from other where name = 'all_view_acl'")).Scan(&acl_data)
-				if err != nil {
-					if err == sql.ErrNoRows {
-						acl_data = ""
-					} else {
-						log.Fatal(err)
-					}
+				if auth_info["view"] {
+					acl_data = ""
+				} else {
+					acl_data = "owner"
 				}
 			}
 		}
@@ -823,13 +881,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 		}
 
 		if acl_data == "" {
-			if tool == "recaptcha" {
-				acl_data = "admin"
-			} else if tool == "slow_edit" || tool == "edit_bottom_compulsion" {
-				acl_data = "not_all"
-			} else {
-				acl_data = "normal"
-			}
+			acl_data = "normal"
 		}
 
 		except_ban_tool_list := []string{"render", "topic_view", "bbs_view"}

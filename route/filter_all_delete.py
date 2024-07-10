@@ -5,7 +5,7 @@ def filter_all_delete(tool, name = 'Test'):
         curs = conn.cursor()
         
         if acl_check(tool = 'owner_auth', memo = 'del_' + tool) == 1:
-            return re_error(conn, '/error/3')
+            return re_error(conn, 3)
 
         if tool == 'inter_wiki':
             curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki'"), [name])

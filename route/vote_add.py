@@ -5,12 +5,12 @@ def vote_add():
         curs = conn.cursor()
 
         if acl_check('', 'vote') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
 
         if flask.request.method == 'POST':
             vote_data = flask.request.form.get('data', 'test\ntest_2')
             if vote_data.count('\n') < 1:
-                return re_error(conn, '/ban')
+                return re_error(conn, 0)
 
             curs.execute(db_change('select id from vote where not type = "option" order by id + 0 desc limit 1'))
             id_data = curs.fetchall()

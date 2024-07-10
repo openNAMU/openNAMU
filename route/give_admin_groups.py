@@ -12,7 +12,9 @@ def give_admin_groups(name = 'test'):
                         [4, '', get_lang(conn, 'admin_default_feature_authority')],
                     [3, 'toron', get_lang(conn, 'discussion_authority')],
                         [4, '', get_lang(conn, 'admin_default_feature_authority')],
-                    [3, 'check', get_lang(conn, 'user_check_authority')],
+                    [3, 'check', get_lang(conn, 'user_analyze_authority')],
+                        [4, 'view_user_watchlist', get_lang(conn, 'view_user_watchlist_authority')],
+                        [4, '', get_lang(conn, 'user_check_authority')],
                         [4, '', get_lang(conn, 'admin_default_feature_authority')],
                     [3, 'acl', get_lang(conn, 'document_acl_authority')],
                         [4, '', get_lang(conn, 'admin_default_feature_authority')],
@@ -25,7 +27,9 @@ def give_admin_groups(name = 'test'):
                     [3, 'vote', get_lang(conn, 'vote_authority')],
                         [4, '', get_lang(conn, 'admin_default_feature_authority')],
                     [3, 'admin_default_feature', get_lang(conn, 'admin_default_feature_authority')],
+                        [4, 'doc_watch_list_view', get_lang(conn, 'doc_watch_list_view_authority')],
                         [4, 'treat_as_admin', get_lang(conn, 'treat_as_admin_authority')],
+                        [4, 'view_hide_user_name', get_lang(conn, 'view_hide_user_name_authority')],
                         [4, 'user_name_bold', get_lang(conn, 'user_name_bold_authority')],
                         [4, 'multiple_upload', get_lang(conn, 'multiple_upload_authority')],
                         [4, 'slow_edit_pass', get_lang(conn, 'slow_edit_pass_authority')],
@@ -47,39 +51,50 @@ def give_admin_groups(name = 'test'):
                             [5, '', get_lang(conn, 'view_authority')],
                         [4, 'view', get_lang(conn, 'view_authority')],
                     [3, 'discuss', get_lang(conn, 'discuss_authority')],
+                        [4, 'discuss_view', get_lang(conn, 'discuss_authority')],
                     [3, 'upload', get_lang(conn, 'upload_authority')],
                     [3, 'vote', get_lang(conn, 'vote_authority')],
-                    [3, 'captcha_one_check_five_pass', get_lang(conn, 'captcha_one_check_five_pass_authority')]
+                    [3, 'bbs_use', get_lang(conn, 'bbs_authority')],
+                        [4, 'bbs_edit', get_lang(conn, 'bbs_edit_authority')],
+                            [5, '', get_lang(conn, 'bbs_view_authority')],
+                        [4, 'bbs_comment', get_lang(conn, 'bbs_comment_authority')],
+                            [5, '', get_lang(conn, 'bbs_view_authority')],
+                        [4, 'bbs_view', get_lang(conn, 'bbs_view_authority')],
+                    [3, 'captcha_one_check_five_pass', get_lang(conn, 'captcha_one_check_five_pass_authority')],
+                    [3, 'nothing', get_lang(conn, 'nothing_authority')]
         ]
+
+        if html.escape(name) != name:
+            return re_error(conn, 48)
 
         if flask.request.method == 'POST':
             if acl_check(tool = 'owner_auth', memo = 'auth list add (' + name + ')') == 1:
-                return re_error(conn, '/error/3')
-            elif name in get_default_admin_group():
-                return re_error(conn, '/error/3')
+                return re_error(conn, 3)
 
             curs.execute(db_change("delete from alist where name = ?"), [name])
             for for_a in acl_name_list:
                 if flask.request.form.get(for_a[1], 0) != 0:
                     curs.execute(db_change("insert into alist (name, acl) values (?, ?)"), [name, for_a[1]])
 
+            curs.execute(db_change("insert into alist (name, acl) values (?, 'nothing')"), [name])
+
             return redirect(conn, '/auth/list/add/' + url_pas(name))
         else:
             state = 'disabled' if acl_check('', 'owner_auth', '', '') == 1 else ''
-            state = 'disabled' if name in get_default_admin_group() else ''
+
+            curs.execute(db_change('select acl from alist where name = ?'), [name])
+            acl_list = curs.fetchall()
+            acl_list = [for_b[0] for for_b in acl_list]
 
             data = '<ul>'
-            for for_a in acl_name_list:
-                curs.execute(db_change('select acl from alist where name = ?'), [name])
-                acl_list = curs.fetchall()
-                acl_list = [for_a[0] for for_a in acl_list]
-                
+            for for_a in acl_name_list:                
                 checked = ''
+                if for_a[1] in acl_list:
+                    checked = 'checked'
+                    
                 choice = '<input type="checkbox" ' + state + ' name="' + for_a[1] + '" ' + checked + '> ' + for_a[2]
                 if for_a[1] == '':
                     choice = for_a[2]
-                elif for_a[1] in acl_list:
-                    checked = 'checked'
 
                 data += '' + \
                     '<li class="opennamu_list_1" style="margin-left: ' + str(int(for_a[0]) * 20) + 'px;">' + \

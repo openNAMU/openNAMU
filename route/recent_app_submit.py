@@ -93,13 +93,13 @@ def recent_app_submit_2():
             ))
         else:
             if acl_check(tool = 'ban_auth', memo = 'app submit') == 1:
-                return re_error(conn, '/ban')
+                return re_error(conn, 0)
 
             if flask.request.form.get('approve', '') != '':
                 curs.execute(db_change('select data from user_set where id = ? and name = "application"'), [flask.request.form.get('approve', '')])
                 application = curs.fetchall()
                 if not application:
-                    return re_error(conn, '/error/26')
+                    return re_error(conn, 26)
                 else:
                     application = orjson.loads(application[0][0])
 

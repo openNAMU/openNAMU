@@ -6,7 +6,7 @@ def edit_delete(name):
 
         ip = ip_check()
         if acl_check(name, 'document_delete') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
 
         curs.execute(db_change("select title from data where title = ?"), [name])
         if not curs.fetchall():
@@ -14,19 +14,19 @@ def edit_delete(name):
 
         if flask.request.method == 'POST':
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, '/error/13')
+                return re_error(conn, 13)
 
             if do_edit_slow_check(conn) == 1:
-                return re_error(conn, '/error/24')
+                return re_error(conn, 24)
             
             send = flask.request.form.get('send', '')
             agree = flask.request.form.get('copyright_agreement', '')
             
             if do_edit_send_check(conn, send) == 1:
-                return re_error(conn, '/error/37')
+                return re_error(conn, 37)
             
             if do_edit_text_bottom_check_box_check(conn, agree) == 1:
-                return re_error(conn, '/error/29')
+                return re_error(conn, 29)
 
             curs.execute(db_change("select data from data where title = ?"), [name])
             data = curs.fetchall()

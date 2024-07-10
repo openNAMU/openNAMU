@@ -44,7 +44,7 @@ function opennamu_topic_list() {
             right += data[for_a][5] + ' | ';
             right += data[for_a][6];
 
-            data_html += openamu_make_list(left, right);
+            data_html += opennamu_make_list(left, right);
         }
 
         if(data_html !== '') {

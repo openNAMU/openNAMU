@@ -12,7 +12,7 @@ function do_insert_data(data) {
             sel.text = data;
         } else if(
             document.getElementById(name).selectionStart || 
-            document.getElementById(name).selectionStart == '0'
+            document.getElementById(name).selectionStart === '0'
         ) {
             let startPos = document.getElementById(name).selectionStart;
             let endPos = document.getElementById(name).selectionEnd;
@@ -70,7 +70,7 @@ function pasteListener(e) {
         }
 
         fetch('/api/lang', {
-            method : 'post',
+            method : 'POST',
             body : lang_data,
         }).then(function(res) {
             return res.json();
@@ -87,8 +87,8 @@ function pasteListener(e) {
             formData.append("f_data[]", customFile);
 
             fetch("/upload", {
-                method: "POST",
-                body: formData,
+                method : "POST",
+                body : formData,
             }).then((res) => {
                 if (res.status === 200 || res.status === 201) {
                     const url = res.url;
@@ -347,7 +347,7 @@ function opennamu_do_user_editor_insert() {
         form_data.append('data', data);
 
         fetch('/api/v2/user/setting/editor', {
-            method : 'post',
+            method : 'POST',
             body : form_data,
         }).then(function() {
             opennnamu_do_user_editor();
@@ -362,7 +362,7 @@ function opennamu_do_user_editor_delete() {
         form_data.append('data', data);
 
         fetch('/api/v2/user/setting/editor', {
-            method : 'delete',
+            method : 'DELETE',
             body : form_data,
         }).then(function() {
             opennnamu_do_user_editor();

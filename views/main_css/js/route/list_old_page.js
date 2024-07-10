@@ -6,7 +6,7 @@ function opennamu_list_old_page() {
     
     let set_type = '';
     let num = '';
-    if(url_split.length == 4) {
+    if(url_split.length === 4) {
         set_type = url_split[3];
         num = '1';
     } else {
@@ -26,7 +26,7 @@ function opennamu_list_old_page() {
 
             let right = '<a href="/w/' + doc_name + '">' + opennamu_xss_filter(data[for_a][0]) + '</a> ';
 
-            data_html += openamu_make_list(right, data[for_a][1]);
+            data_html += opennamu_make_list(right, data[for_a][1]);
         }
 
         data_html += opennamu_page_control('/list/document/' + set_type + '/{}', Number(num), data.length);

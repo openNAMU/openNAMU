@@ -7,7 +7,7 @@ function opennamu_setting_404_page_post() {
     put_data_select.append('data', select);
     
     fetch('/api/v2/setting/manage_404_page', {
-        method : 'put',
+        method : 'PUT',
         body : put_data_select,
     }).then(function(data) {
         let content = document.getElementById('opennamu_setting_404_page_textarea').value;
@@ -16,7 +16,7 @@ function opennamu_setting_404_page_post() {
         put_data_content.append('data', content);
     
         fetch('/api/v2/setting/manage_404_page_content', {
-            method : 'put',
+            method : 'PUT',
             body : put_data_content,
         });
     
@@ -38,7 +38,7 @@ function opennamu_setting_404_page() {
     lang_data.append('data', 'save 404_file 404_page preview');
 
     fetch('/api/lang', {
-        method : 'post',
+        method : 'POST',
         body : lang_data,
     }).then(function(res) {
         return res.json();

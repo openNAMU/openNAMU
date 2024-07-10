@@ -30,29 +30,29 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
         topic_acl = acl_check(name_value, 'topic', topic_num)
         topic_view_acl = acl_check('', 'topic_view', topic_num)
         if topic_view_acl == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
 
         ip = ip_check()
 
         if flask.request.method == 'POST' and do_type == '':
             if do_edit_slow_check(conn, 'thread') == 1:
-                return re_error(conn, '/error/42')
+                return re_error(conn, 42)
 
             name = flask.request.form.get('topic', 'Test')
             sub = flask.request.form.get('title', 'Test')
             data = flask.request.form.get('content', 'Test').replace('\r', '')
             
             if do_title_length_check(conn, name) == 1:
-                return re_error(conn, '/error/38')
+                return re_error(conn, 38)
             
             if do_title_length_check(conn, sub, 'topic') == 1:
-                return re_error(conn, '/error/38')
+                return re_error(conn, 38)
             
             if do_edit_filter(conn, sub) == 1:
-                return re_error(conn, '/error/21')
+                return re_error(conn, 21)
             
             if do_edit_filter(conn, data) == 1:
-                return re_error(conn, '/error/21')
+                return re_error(conn, 21)
             
             if topic_num == '0':
                 curs.execute(db_change("select code from topic order by code + 0 desc limit 1"))
@@ -63,12 +63,12 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                 return redirect(conn, '/thread/' + topic_num)
 
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, '/error/13')
+                return re_error(conn, 13)
 
             today = get_time()
 
             if topic_acl == 1:
-                return re_error(conn, '/ban')
+                return re_error(conn, 0)
 
             curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [topic_num])
             old_num = curs.fetchall()

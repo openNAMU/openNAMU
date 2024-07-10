@@ -9,7 +9,7 @@ function opennamu_list_user_check_submit() {
     lang_data.append('data', 'check');
     
     fetch('/api/lang', {
-        method : 'post',
+        method : 'POST',
         body : lang_data,
     }).then(function(res) {
         return res.json();

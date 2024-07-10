@@ -8,7 +8,7 @@ def topic_comment_tool(topic_num = 1, num = 1):
         topic_num = str(topic_num)
         
         if acl_check('', 'topic_view', topic_num) == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
 
         curs.execute(db_change("select block, ip, date from topic where code = ? and id = ?"), [topic_num, num])
         data = curs.fetchall()

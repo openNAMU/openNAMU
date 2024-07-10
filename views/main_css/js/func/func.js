@@ -193,7 +193,7 @@ function opennamu_get_main_skin_set(set_name) {
 }
 
 function opennamu_send_render(data) {
-    if(data == '&lt;br&gt;' || data == '' || data.match(/^ +$/)) {
+    if(data === '&lt;br&gt;' || data === '' || data.match(/^ +$/)) {
         data = '<br>';
     } else {
         data = data.replace(/( |^)(https?:\/\/(?:[^ ]+))/g, function(m0, m1, m2) {
@@ -274,7 +274,7 @@ function opennamu_page_control(url, page, data_length, data_length_max = 50) {
     return (back() + ' ' + next()).replace(/^ /, '');
 }
 
-function openamu_make_list(left = '', right = '', bottom = '') {
+function opennamu_make_list(left = '', right = '', bottom = '') {
     let data_html = '<div class="opennamu_recent_change">';
     data_html += left;
     

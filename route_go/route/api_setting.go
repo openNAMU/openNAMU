@@ -36,10 +36,7 @@ func Api_setting(call_arg []string) string {
 
 	if val, ok := setting_acl[other_set["set_name"]]; ok {
 		if val != "" {
-			auth_name := tool.Get_user_auth(db, other_set["ip"])
-			auth_info := tool.Get_auth_group_info(db, auth_name)
-
-			if _, ok := auth_info["owner"]; !ok {
+			if tool.Check_acl(db, "", "", "owner_auth", other_set["ip"]) {
 				return_data := make(map[string]interface{})
 				return_data["response"] = "require auth"
 

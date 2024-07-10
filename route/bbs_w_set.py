@@ -17,7 +17,7 @@ def bbs_w_set(bbs_num = ''):
 
         if flask.request.method == 'POST':
             if acl_check('', 'owner_auth', '', '', 'bbs_set (acl)') == 1:
-                return re_error(conn, '/ban')
+                return re_error(conn, 0)
             else:
                 for for_a in range(len(i_list)):
                     curs.execute(db_change("update bbs_set set set_data = ? where set_name = ? and set_id = ?"), [

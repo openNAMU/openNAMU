@@ -7,7 +7,7 @@ def recent_history_send(name = 'Test', rev = 1):
         num = str(rev)
 
         if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, '/error/3')
+            return re_error(conn, 3)
 
         if flask.request.method == 'POST':
             acl_check(tool = 'owner_auth', memo = 'send edit ' + name + ' r' + num)

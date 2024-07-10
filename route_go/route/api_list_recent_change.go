@@ -57,7 +57,7 @@ func Api_list_recent_change(call_arg []string) string {
 
 	data_list := [][]string{}
 
-	admin_auth := tool.Get_user_auth(db, other_set["ip"])
+	admin_auth := tool.Check_acl(db, "", "", "hidel_auth", other_set["ip"])
 	ip_parser_temp := map[string][]string{}
 
 	for rows.Next() {
@@ -109,7 +109,7 @@ func Api_list_recent_change(call_arg []string) string {
 			ip_parser_temp[ip] = []string{ip_pre, ip_render}
 		}
 
-		if hide == "" || admin_auth != "" {
+		if hide == "" || admin_auth {
 			data_list = append(data_list, []string{
 				id,
 				title,

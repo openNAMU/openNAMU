@@ -5,7 +5,7 @@ function opennamu_edit_move_all() {
     lang_data.append('data', 'title_start_document title_end_document title_include_document move document_name');
 
     fetch('/api/lang', {
-        method : 'post',
+        method : 'POST',
         body : lang_data,
     }).then(function(res) {
         return res.json();

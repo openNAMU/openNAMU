@@ -5,7 +5,7 @@ def user_setting_pw():
         curs = conn.cursor()
 
         if ban_check()[0] == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
 
         ip = ip_check()
         if ip_or_user(ip) != 0:
@@ -18,10 +18,10 @@ def user_setting_pw():
         
             # PW 검증
             if user_pw == '':
-                return re_error(conn, '/error/27')
+                return re_error(conn, 27)
 
             if user_pw != user_repeat:
-                return re_error(conn, '/error/20')
+                return re_error(conn, 20)
     
             # PW 길이 제한
             curs.execute(db_change("select data from other where name = 'password_min_length'"))
@@ -29,24 +29,24 @@ def user_setting_pw():
             if db_data and db_data[0][0] != '':
                 password_min_length = int(number_check(db_data[0][0]))
                 if password_min_length > len(user_pw):
-                    return re_error(conn, '/error/40')
+                    return re_error(conn, 40)
 
             curs.execute(db_change("select data from user_set where id = ? and name = 'pw'"), [ip])
             db_data = curs.fetchall()
             if not db_data:
-                return re_error(conn, '/error/2')
+                return re_error(conn, 2)
             else:
                 db_user_pw = db_data[0][0]
                 
             curs.execute(db_change("select data from user_set where id = ? and name = 'encode'"), [ip])
             db_data = curs.fetchall()
             if not db_data:
-                return re_error(conn, '/error/2')
+                return re_error(conn, 2)
             else:
                 db_user_encode = db_data[0][0]
                 
             if pw_check(conn, user_pw_now, db_user_pw, db_user_encode, ip) != 1:
-                return re_error(conn, '/error/10')
+                return re_error(conn, 10)
 
             curs.execute(db_change("update user_set set data = ? where id = ? and name = 'pw'"), [pw_encode(conn, user_pw), ip])
 

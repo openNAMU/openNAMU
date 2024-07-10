@@ -8,7 +8,7 @@ def topic_comment_blind(topic_num = 1, num = 1):
         num = str(num)
         
         if acl_check(tool = 'toron_auth', memo = 'blind (code ' + topic_num + '#' + num + ')') == 1:
-            return re_error(conn, '/error/3')
+            return re_error(conn, 3)
 
         curs.execute(db_change("select block from topic where code = ? and id = ?"), [topic_num, num])
         block = curs.fetchall()

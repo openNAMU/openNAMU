@@ -5,7 +5,7 @@ def bbs_make():
         curs = conn.cursor()
 
         if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, '/error/3')
+            return re_error(conn, 3)
         
         if flask.request.method == 'POST':
             curs.execute(db_change('select set_id from bbs_set where set_name = "bbs_name" order by set_id + 0 desc'))

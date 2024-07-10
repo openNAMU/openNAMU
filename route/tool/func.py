@@ -756,14 +756,17 @@ def set_init_always(conn, ver_num, run_mode):
         curs.execute(db_change('delete from alist where name = "owner"'))
         curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
 
-        curs.execute(db_change('delete from alist where name = "user"'))
-        curs.execute(db_change('insert into alist (name, acl) values ("user", "user")'))
+        curs.execute(db_change("select name from alist where name = 'user' limit 1"))
+        if not curs.fetchall():
+            curs.execute(db_change('insert into alist (name, acl) values ("user", "user")'))
 
-        curs.execute(db_change('delete from alist where name = "ip"'))
-        curs.execute(db_change('insert into alist (name, acl) values ("ip", "ip")'))
+        curs.execute(db_change("select name from alist where name = 'ip' limit 1"))
+        if not curs.fetchall():
+            curs.execute(db_change('insert into alist (name, acl) values ("ip", "ip")'))
 
-        curs.execute(db_change('delete from alist where name = "ban"'))
-        curs.execute(db_change('insert into alist (name, acl) values ("ban", "view")'))
+        curs.execute(db_change("select name from alist where name = 'ban' limit 1"))
+        if not curs.fetchall():
+            curs.execute(db_change('insert into alist (name, acl) values ("ban", "view")'))
 
         # 이미지 폴더 없으면 생성
         if not os.path.exists(load_image_url(conn)):
@@ -792,6 +795,11 @@ def set_init_always(conn, ver_num, run_mode):
             db_data = curs.fetchall()
             if db_data:
                 m_curs.execute('insert into temp (name, data) values ("wiki_access_password", ?)', [db_data[0][0]])
+
+        curs.execute(db_change('select data from other where name = "load_ip_select"'))
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            m_curs.execute('insert into temp (name, data) values ("load_ip_select", ?)', [db_data[0][0]])
 
         # OS마다 실행 파일 설정
         exe_type = linux_exe_chmod()
@@ -941,7 +949,7 @@ def get_acl_list(type_data = 'normal'):
     other_set = {}
     other_set['type'] = type_data
 
-    data_str = python_to_golang_sync('api_func_acl_list', other_set)
+    data_str = python_to_golang_sync('api_list_acl', other_set)
     data = orjson.loads(data_str)
 
     return data["data"]
@@ -2294,7 +2302,7 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
 def re_error(conn, data):
     curs = conn.cursor()
 
-    if data == '/ban':
+    if data == 0:
         if ban_check()[0] == 1:
             end = '<div id="opennamu_get_user_info">' + html.escape(ip_check()) + '</div>'
         else:
@@ -2310,7 +2318,7 @@ def re_error(conn, data):
         sub_title = title
         return_code = 400
 
-        num = int(number_check(data.replace('/error/', '')))
+        num = data
         if num == 1:
             data = get_lang(conn, 'no_login_error')
         elif num == 2:
@@ -2427,6 +2435,10 @@ def re_error(conn, data):
             data = get_lang(conn, 'func_404_error')
             title = '404'
             return_code = 404
+        elif num == 47:
+            data = get_lang(conn, 'still_use_auth_error')
+        elif num == 48:
+            data = get_lang(conn, 'xss_data_include_error')
         else:
             data = '???'
 

@@ -6,7 +6,7 @@ def main_setting_sitemap(do_type = 0):
 
         if not do_type == 1:
             if acl_check('', 'owner_auth', '', '') == 1:
-                return re_error(conn, '/ban')
+                return re_error(conn, 0)
         
         if do_type == 1 or flask.request.method == 'POST':
             if not do_type == 1:
