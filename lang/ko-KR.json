@@ -681,5 +681,7 @@
     "xss_data_include_error" : "XSS에 이용될 수 있는 문자는 입력할 수 없습니다.",
     "nothing_authority" : "아무 기능 없는 권한",
     "multiple_authorize" : "다중 권한 부여",
-    "auth_to_auth" : "권한 그룹에서 권한 그룹으로"
+    "auth_to_auth" : "권한 그룹에서 권한 그룹으로",
+    "vote_management_authority" : "투표 관리 권한",
+    "bbs_management_authority" : "BBS 관리 권한"
 }
