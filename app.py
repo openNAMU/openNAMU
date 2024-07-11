@@ -783,6 +783,7 @@ app.route('/api/v2/bbs/w/comment/<int:bbs_num>/<int:post_num>/<tool>')(api_bbs_w
 app.route('/api/v2/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(api_w_watch_list)
 app.route('/api/v2/doc_watch_list/<int:num>/<everything:name>')(api_w_watch_list)
 app.route('/api/v2/set_reset/<everything:name>')(api_w_set_reset)
+app.route('/api/v2/page_view/<everything:name>')(api_w_page_view)
 
 app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting)
 

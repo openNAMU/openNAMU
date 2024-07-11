@@ -38,6 +38,7 @@
     "vote_management_authority" : "Vote management authority",
     "bbs_management_authority" : "BBS management authority",
     "discuss_view_authority" : "Discussion view authority",
+    "page_view" : "Page views",
 
     "_comment_" : "Common",
     "data" : "Data",

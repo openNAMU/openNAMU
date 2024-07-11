@@ -86,7 +86,7 @@ func Api_w_raw(call_arg []string) string {
 				check_pass = true
 			}
 
-			if check_pass == true {
+			if check_pass {
 				new_data["title"] = other_set["name"]
 				new_data["data"] = data
 
