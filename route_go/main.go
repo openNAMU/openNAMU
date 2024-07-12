@@ -93,6 +93,8 @@ func main() {
 		route_data = route.Api_give_auth_patch(call_arg[1:])
 	} else if call_arg[0] == "api_list_auth" {
 		route_data = route.Api_list_auth(call_arg[1:])
+	} else if call_arg[0] == "api_w_page_view" {
+		route_data = route.Api_w_page_view(call_arg[1:])
 	} else {
 		log.Fatal(call_arg[0] + " is 404")
 	}

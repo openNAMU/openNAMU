@@ -31,6 +31,9 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
         topic_view_acl = acl_check('', 'topic_view', topic_num)
         if topic_view_acl == 1:
             return re_error(conn, 0)
+        elif topic_num == '0':
+            if acl_check('', 'discuss_make_new_thread', topic_num) == 1:
+                return re_error(conn, 0)
 
         ip = ip_check()
 

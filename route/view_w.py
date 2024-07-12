@@ -180,7 +180,7 @@ def view_w(name = 'Test', do_type = ''):
             <div id="opennamu_preview_area">
                 <textarea id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
                 <script defer src="/views/main_css/js/route/w.js''' + cache_v() + '''"></script>
-                <script>window.addEventListener("DOMContentLoaded", function() { opennamu_w("''' + ('from' if do_type == 'from' else '') + '''"); });</script>
+                <script>window.addEventListener("DOMContentLoaded", function() { opennamu_w("''' + ('from' if do_type == 'from' else '') + '''"); opennamu_w_page_view(); });</script>
             </div>
         '''
 
@@ -303,6 +303,10 @@ def view_w(name = 'Test', do_type = ''):
         r_date = curs.fetchall()
         r_date = r_date[0][0] if r_date else 0
 
+        curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'view_count'"), [name])
+        view_count = curs.fetchall()
+        view_count = view_count[0][0] if view_count else 0
+
         div = file_data + user_doc + end_data + category_total
         
         if doc_type == '':
@@ -338,7 +342,7 @@ def view_w(name = 'Test', do_type = ''):
         menu += [['doc_watch_list/1/' + url_pas(name), get_lang(conn, 'watchlist')]]
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [name_view, wiki_set(conn), wiki_custom(conn), wiki_css([sub, r_date, watch_list, description])],
+            imp = [name_view, wiki_set(conn), wiki_custom(conn), wiki_css([sub, r_date, watch_list, description, view_count])],
             data = div,
             menu = menu
         )), response_data

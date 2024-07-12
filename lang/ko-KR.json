@@ -684,5 +684,7 @@
     "auth_to_auth" : "권한 그룹에서 권한 그룹으로",
     "vote_management_authority" : "투표 관리 권한",
     "bbs_management_authority" : "BBS 관리 권한",
-    "discuss_view_authority" : "토론 보기 권한"
+    "discuss_view_authority" : "토론 보기 권한",
+    "page_view" : "조회수",
+    "discuss_make_new_thread_authority" : "새 토론 만들기 권한"
 }

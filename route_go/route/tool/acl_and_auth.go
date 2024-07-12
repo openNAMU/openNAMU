@@ -229,6 +229,14 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["view"] = true
 	}
 
+	topic_default := []string{"discuss_view", "discuss_make_new_thread"}
+
+	if _, ok := auth_info["discuss"]; ok {
+		for _, v := range topic_default {
+			auth_info[v] = true
+		}
+	}
+
 	bbs_default := []string{"bbs_edit", "bbs_comment"}
 
 	if _, ok := auth_info["bbs_use"]; ok {
@@ -762,6 +770,14 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 				} else {
 					acl_data = "owner"
 				}
+			}
+		} else if tool == "discuss_make_new_thread" {
+			acl_pass_auth = "toron"
+
+			if auth_info["discuss_make_new_thread"] {
+				acl_data = ""
+			} else {
+				acl_data = "owner"
 			}
 		} else if tool == "recaptcha" {
 			acl_pass_auth = "admin_default_feature"
