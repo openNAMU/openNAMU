@@ -39,6 +39,7 @@
     "bbs_management_authority" : "BBS management authority",
     "discuss_view_authority" : "Discussion view authority",
     "page_view" : "Page views",
+    "discuss_make_new_thread_authority" : "Create a new discussion authority",
 
     "_comment_" : "Common",
     "data" : "Data",
