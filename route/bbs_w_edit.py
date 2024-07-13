@@ -1,11 +1,11 @@
 from .tool.func import *
 
 from .api_bbs_w_post import api_bbs_w_post
-from .api_bbs_w_comment_one import api_bbs_w_comment_one
+from .go_api_bbs_w_comment_one import api_bbs_w_comment_one
 
 from .edit import edit_editor
 
-def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
+async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -19,7 +19,7 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
             return redirect(conn, '/bbs/main')
         
         if comment_num != '':
-            temp_dict = orjson.loads(api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num).data)
+            temp_dict = orjson.loads((await api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num)).get_data(as_text = True))
             if 'comment_user_id' in temp_dict:
                 if not temp_dict['comment_user_id'] == ip and acl_check('', 'owner_auth', '', '') == 1:
                     return re_error(conn, 0)
@@ -92,7 +92,7 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
             option_display = ''
 
             if comment_num != '':
-                temp_dict = orjson.loads(api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num).data)
+                temp_dict = orjson.loads((await api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num)).get_data(as_text = True))
 
                 title = ''
                 data = temp_dict['comment']

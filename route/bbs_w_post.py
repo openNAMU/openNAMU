@@ -1,23 +1,20 @@
 from .tool.func import *
 
 from .api_bbs_w_post import api_bbs_w_post
-from .api_bbs_w_comment import api_bbs_w_comment
+from .go_api_bbs_w_comment import api_bbs_w_comment
 
 from .go_api_topic import api_topic_thread_make, api_topic_thread_pre_render
 
 from .edit import edit_editor
 
-def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, post_num_str):
+async def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, post_num_str):
     comment_data = ''
     comment_select = ''
 
     comment_count = 0
     comment_add_count = 0
 
-    thread_data = orjson.loads(api_bbs_w_comment(sub_code).data)
-    
-    comment_count += len(thread_data)
-    comment_add_count += comment_count
+    thread_data = orjson.loads((await api_bbs_w_comment(sub_code)).get_data(as_text = True))
 
     for temp_dict in thread_data:
         if temp_dict['comment_user_id'] != '':
@@ -25,8 +22,13 @@ def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, post_n
             if user_id == temp_dict['comment_user_id']:
                 color = 'green'
 
-            sub_code_check = re.sub(r'^[0-9]+-[0-9]+-', '', sub_code + '-' + temp_dict['code'])
+            sub_code_check = re.sub(r'^[0-9]+-[0-9]+-', '', temp_dict['id'] + '-' + temp_dict['code'])
             margin_count = sub_code_check.count('-')
+
+            if margin_count == 0:
+                comment_count += 1
+            else:
+                comment_add_count += 1
 
             date = ''
             date += '<a href="javascript:opennamu_change_comment(\'' + sub_code_check + '\');">(' + get_lang(conn, 'comment') + ')</a> '
@@ -49,15 +51,9 @@ def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, post_n
 
             comment_select += '<option value="' + sub_code_check + '" ' + comment_default + '>' + sub_code_check + '</option>'
 
-        temp_data = bbs_w_post_comment(conn, user_id, sub_code + '-' + temp_dict['code'], comment_num, bbs_num_str, post_num_str)
-
-        comment_data += temp_data[0]
-        comment_select += temp_data[1]
-        comment_add_count += temp_data[3]
-
     return (comment_data, comment_select, comment_count, comment_add_count)
 
-def bbs_w_post(bbs_num = '', post_num = ''):
+async def bbs_w_post(bbs_num = '', post_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -134,7 +130,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                 user_id = temp_dict['user_id']
                 count = 0
 
-                thread_data = orjson.loads(api_bbs_w_comment(bbs_num_str + '-' + post_num_str).data)
+                thread_data = orjson.loads((await api_bbs_w_comment(bbs_num_str + '-' + post_num_str)).get_data(as_text = True))
                 for temp_dict in thread_data:
                     count += 1
                     if user_id == temp_dict['comment_user_id']:
@@ -258,13 +254,12 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                 comment_count = 0
                 comment_add_count = 0
 
-                temp_data = bbs_w_post_comment(conn, user_id, bbs_num_str + '-' + post_num_str, comment_num, bbs_num_str, post_num_str)
+                temp_data = await bbs_w_post_comment(conn, user_id, bbs_num_str + '-' + post_num_str, comment_num, bbs_num_str, post_num_str)
 
                 comment_data += temp_data[0]
                 comment_select += temp_data[1]
                 comment_count += temp_data[2]
                 comment_add_count += temp_data[3]
-                comment_add_count -= comment_count
 
                 if comment_data != '':
                     data += '<hr>'

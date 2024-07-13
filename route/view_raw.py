@@ -1,9 +1,9 @@
 from .tool.func import *
 
 from .api_bbs_w_post import api_bbs_w_post
-from .api_bbs_w_comment_one import api_bbs_w_comment_one
+from .go_api_bbs_w_comment_one import api_bbs_w_comment_one
 
-def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', post_num = '', comment_num = ''):
+async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', post_num = '', comment_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
         
@@ -67,7 +67,7 @@ def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', pos
 
         if bbs_num != '' and post_num != '':
             if comment_num != '':
-                data = orjson.loads(api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num).data)
+                data = orjson.loads((await api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num)).get_data(as_text = True))
                 sub_data = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
             else:
                 data = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
