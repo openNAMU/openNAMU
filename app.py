@@ -150,10 +150,11 @@ with get_db_connect(init_mode = True) as conn:
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
     if run_mode == 'dev':
+        app.config['TEMPLATES_AUTO_RELOAD'] = True
         app.config['DEBUG'] = True
         app.config['ENV'] = 'development'
 
-    log = logging.getLogger('hypercorn')
+    log = logging.getLogger('waitress')
     log.setLevel(logging.ERROR)
 
     app.jinja_env.filters['md5_replace'] = md5_replace
