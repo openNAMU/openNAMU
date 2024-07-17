@@ -938,7 +938,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					}
 				}
 			} else if acl_data == "before" {
-				stmt, err := db.Prepare(DB_change("select ip from history where title = ? and ip = ?"))
+				stmt, err := db.Prepare(DB_change("select ip from history where title = ? and ip = ? and type != 'edit_request'"))
 				if err != nil {
 					log.Fatal(err)
 				}
