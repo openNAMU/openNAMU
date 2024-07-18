@@ -289,8 +289,10 @@ func Get_user_ban(db *sql.DB, ip string, tool string) []string {
 
 			ban_type := Get_user_ban_type(login)
 
-			c, _ := cidr.Parse(block)
-			if c.Contains(ip) {
+			c, err := cidr.Parse(block)
+			if err != nil {
+				continue
+			} else if c.Contains(ip) {
 				if tool == "login" {
 					if ban_type != "1" {
 						return []string{"true", "b" + ban_type}
