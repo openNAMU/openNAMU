@@ -40,6 +40,10 @@
     "discuss_view_authority" : "Discussion view authority",
     "page_view" : "Page views",
     "discuss_make_new_thread_authority" : "Create a new discussion authority",
+    "multiple_move" : "Multiple move documents",
+    "url" : "URL",
+    "resolution" : "Resolution",
+    "file_delete_with_document" : "Delete document and file at the same time",
 
     "_comment_" : "Common",
     "data" : "Data",
