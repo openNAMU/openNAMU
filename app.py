@@ -150,10 +150,11 @@ with get_db_connect(init_mode = True) as conn:
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
     if run_mode == 'dev':
+        app.config['TEMPLATES_AUTO_RELOAD'] = True
         app.config['DEBUG'] = True
         app.config['ENV'] = 'development'
 
-    log = logging.getLogger('hypercorn')
+    log = logging.getLogger('waitress')
     log.setLevel(logging.ERROR)
 
     app.jinja_env.filters['md5_replace'] = md5_replace
@@ -725,7 +726,7 @@ app.route('/api/random')(api_w_random)
 
 app.route('/api/bbs/w/<sub_code>')(api_bbs_w_post)
 app.route('/api/bbs/w/comment/<sub_code>')(api_bbs_w_comment)
-app.route('/api/bbs/w/comment_one/<sub_code>')(api_bbs_w_comment)
+app.route('/api/bbs/w/comment_one/<sub_code>')(api_bbs_w_comment_one)
 
 app.route('/api/version', defaults = { 'version_list' : version_list })(api_version)
 app.route('/api/skin_info')(api_skin_info)
@@ -778,7 +779,8 @@ app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>')(api_topic_list
 app.route('/api/v2/bbs')(api_bbs_list)
 app.route('/api/v2/bbs/main')(api_bbs)
 app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs)
-app.route('/api/v2/bbs/w/comment/<int:bbs_num>/<int:post_num>/<tool>')(api_bbs_w_comment_n)
+app.route('/api/v2/bbs/w/comment/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment)
+app.route('/api/v2/bbs/w/comment_one/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment_one)
 
 app.route('/api/v2/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(api_w_watch_list)
 app.route('/api/v2/doc_watch_list/<int:num>/<everything:name>')(api_w_watch_list)

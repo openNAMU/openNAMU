@@ -686,5 +686,9 @@
     "bbs_management_authority" : "BBS 관리 권한",
     "discuss_view_authority" : "토론 보기 권한",
     "page_view" : "조회수",
-    "discuss_make_new_thread_authority" : "새 토론 만들기 권한"
+    "discuss_make_new_thread_authority" : "새 토론 만들기 권한",
+    "multiple_move" : "다중 문서 이동",
+    "file_delete_with_document" : "문서와 파일 동시 삭제",
+    "url" : "URL",
+    "resolution" : "해상도"
 }

@@ -4,8 +4,6 @@ from route.api_skin_info import api_skin_info
 from route.api_user_info import api_user_info
 from route.api_version import api_version
 from route.api_bbs_w_post import api_bbs_w_post
-from route.api_bbs_w_comment import api_bbs_w_comment
-from route.api_bbs_w_comment_one import api_bbs_w_comment_one
 
 from route.bbs_w_edit import bbs_w_edit
 from route.bbs_make import bbs_make
@@ -204,7 +202,8 @@ from route.go_api_list_title_index import api_list_title_index
 
 from route.go_api_bbs import api_bbs
 from route.go_api_bbs_list import api_bbs_list
-from route.go_api_bbs_w_comment import api_bbs_w_comment_n
+from route.go_api_bbs_w_comment import api_bbs_w_comment
+from route.go_api_bbs_w_comment_one import api_bbs_w_comment_one
 
 from route.go_api_setting import api_setting
 

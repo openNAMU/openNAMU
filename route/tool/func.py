@@ -150,6 +150,9 @@ def python_to_golang_sync(func_name, other_set = {}):
 
         time.sleep(0.01)
 
+    if data == '':
+        data = '{}'
+
     return data
 
 async def python_to_golang(func_name, other_set = {}):
@@ -189,6 +192,9 @@ async def python_to_golang(func_name, other_set = {}):
                 break
 
         await asyncio.sleep(0.01)
+
+    if data == '':
+        data = '{}'
 
     return data
 
@@ -1230,7 +1236,7 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v271'
+    return '.cache_v272'
 
 def wiki_css(data):
     with class_temp_db() as m_conn:

@@ -55,8 +55,6 @@ func main() {
 		route_data = route.Api_list_old_page(call_arg[1:])
 	} else if call_arg[0] == "api_topic_list" {
 		route_data = route.Api_topic_list(call_arg[1:])
-	} else if call_arg[0] == "api_bbs_w_comment_n" {
-		route_data = route.Api_bbs_w_comment(call_arg[1:])
 	} else if call_arg[0] == "api_bbs_w_n" {
 		route_data = route.Api_bbs_w(call_arg[1:])
 	} else if call_arg[0] == "api_w_set_reset" {
@@ -95,6 +93,10 @@ func main() {
 		route_data = route.Api_list_auth(call_arg[1:])
 	} else if call_arg[0] == "api_w_page_view" {
 		route_data = route.Api_w_page_view(call_arg[1:])
+	} else if call_arg[0] == "api_bbs_w_comment_one" {
+		route_data = route.Api_bbs_w_comment_one(call_arg[1:])
+	} else if call_arg[0] == "api_bbs_w_comment" {
+		route_data = route.Api_bbs_w_comment(call_arg[1:])
 	} else {
 		log.Fatal(call_arg[0] + " is 404")
 	}
