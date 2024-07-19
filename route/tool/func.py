@@ -4,7 +4,6 @@ import sys
 import platform
 import orjson
 import smtplib
-import random
 import shutil
 import datetime
 import ipaddress
