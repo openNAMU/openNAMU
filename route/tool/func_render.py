@@ -17,7 +17,7 @@ class class_do_render:
         self.lang_data = lang_data
         self.markup = markup
 
-    def generate_random_string(length = 32):
+    def generate_random_string(self, length = 32):
         characters = string.ascii_letters + string.digits
 
         random_string = ''.join(random.choice(characters) for _ in range(length))
