@@ -97,6 +97,8 @@ func main() {
 		route_data = route.Api_bbs_w_comment_one(call_arg[1:])
 	} else if call_arg[0] == "api_bbs_w_comment" {
 		route_data = route.Api_bbs_w_comment(call_arg[1:])
+	} else if call_arg[0] == "api_list_history" {
+		route_data = route.Api_list_history(call_arg[1:])
 	} else {
 		log.Fatal(call_arg[0] + " is 404")
 	}

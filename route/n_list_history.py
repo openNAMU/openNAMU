@@ -2,8 +2,6 @@ from .tool.func import *
 
 def list_history(num = 1, set_type = 'normal', doc_name = 'Test'):
     with get_db_connect() as conn:
-        
-
         return easy_minify(conn, flask.render_template(skin_check(conn),
             imp = [doc_name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'history') + ')', 0])],
             data = '' + \

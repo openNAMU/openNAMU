@@ -1,6 +1,23 @@
 "use strict";
 
-function opennamu_list_recent_change() {
+function opennamu_list_history_post() {
+    const url = window.location.pathname;
+    const url_split = url.split('/');
+
+    let doc_name = '';
+    if(url_split[1] === 'history') {
+        doc_name = url_split.slice(2).join('/');
+    } else {
+        doc_name = url_split.slice(4).join('/');
+    }
+
+    let a = document.getElementById('opennamu_list_history_a').value;
+    let b = document.getElementById('opennamu_list_history_b').value;
+
+    window.location.pathname = '/diff/' + b + '/' + a + '/' + doc_name;
+}
+
+function opennamu_list_history() {
     const option_lang = function(lang_in, lang) {
         if(lang_in === 'user') {
             lang_in = lang['user_document'];
@@ -16,15 +33,18 @@ function opennamu_list_recent_change() {
     
     let set_type = '';
     let num = '';
-    if(url_split.length === 2) {
+    let doc_name = '';
+    if(url_split[1] === 'history') {
         set_type = 'normal';
         num = '1';
+        doc_name = url_split.slice(2).join('/');
     } else {
         set_type = url_split[3];
         num = url_split[2];
+        doc_name = url_split.slice(4).join('/');
     }
 
-    fetch('/api/v2/recent_change/' + set_type + '/' + num).then(function(res) {
+    fetch('/api/v2/history/' + num + '/' + set_type + '/' + doc_name).then(function(res) {
         return res.json();
     }).then(function(data) {
         let lang = data["language"];
@@ -33,14 +53,13 @@ function opennamu_list_recent_change() {
 
         let data_html = '';
 
-        let option_list = ['normal', 'edit', 'move', 'delete', 'revert', 'r1', 'edit_request', 'user', 'file', 'category'];
+        let option_list = ['normal', 'edit', 'move', 'delete', 'revert', 'r1', 'setting'];
         for(let for_a = 0; for_a < option_list.length; for_a++) {
-            data_html += '<a href="/recent_change/1/' + option_list[for_a] + '">(' + option_lang(option_list[for_a], lang) + ')</a> ';
+            data_html += '<a href="/history_page/1/' + option_list[for_a] + '/' + doc_name + '">(' + option_lang(option_list[for_a], lang) + ')</a> ';
         }
 
-        data_html += '<hr class="main_hr">';
-
         let date_heading = '';
+        let select = '';
         for(let for_a = 0; for_a < data.length; for_a++) {
             if(data[for_a][6] !== "" && data[for_a][1] === "") {
                 data_html += opennamu_make_list('----');
@@ -48,19 +67,7 @@ function opennamu_list_recent_change() {
                 continue;
             }
 
-            let doc_name = opennamu_do_url_encode(data[for_a][1]);
-            
-            let left = '<a href="/w/' + doc_name + '">' + opennamu_xss_filter(data[for_a][1]) + '</a> ';
-
-            let right = '<span id="opennamu_list_recent_change_' + String(for_a) + '_over">';
-
-            right += '<a id="opennamu_list_recent_change_' + String(for_a) + '" href="javascript:void(0);">';
-            right += '<span class="opennamu_svg opennamu_svg_tool">&nbsp;</span>';
-            right += '</a>';
-            right += '<span class="opennamu_popup_footnote" id="opennamu_list_recent_change_' + String(for_a) + '_load" style="display: none;"></span>';
-            right += '</span>';
-            right += ' | ';
-
+            let left = '';
             let rev = '';
             if(data[for_a][6] !== "") {
                 rev += '<span style="color: red;">r' + data[for_a][0] + '</span>';
@@ -68,12 +75,23 @@ function opennamu_list_recent_change() {
                 rev += 'r' + data[for_a][0];
             }
 
+            select += '<option value="' + data[for_a][0] + '">' + data[for_a][0] + '</option>';
+
             if(Number(data[for_a][0]) > 1) {
                 let before_rev = String(Number(data[for_a][0]) - 1);
                 rev = '<a href="/diff/' + before_rev + '/' + data[for_a][0] + '/' + doc_name + '">' + rev + '</a>';
             }
 
-            right += rev + ' | ';
+            left += rev;
+
+            let right = '<span id="opennamu_list_history_' + String(for_a) + '_over">';
+
+            right += '<a id="opennamu_list_history_' + String(for_a) + '" href="javascript:void(0);">';
+            right += '<span class="opennamu_svg opennamu_svg_tool">&nbsp;</span>';
+            right += '</a>';
+            right += '<span class="opennamu_popup_footnote" id="opennamu_list_history_' + String(for_a) + '_load" style="display: none;"></span>';
+            right += '</span>';
+            right += ' | ';
             
             if(data[for_a][5] === '0') {
                 right += '<span style="color: gray;">' + data[for_a][5] + '</span>';
@@ -135,16 +153,23 @@ function opennamu_list_recent_change() {
         }
 
         data_html += opennamu_page_control('/recent_change/{}/' + set_type, Number(num), data.length);
+        data_html = '' +
+            '<form method="post">' +
+                '<select id="opennamu_list_history_a">' + select + '</select> <select id="opennamu_list_history_b">' + select + '</select> ' +
+                '<button onclick="opennamu_list_history_post();" type="button">' + lang["compare"] + '</button>' +
+            '</form>' +
+            '<hr class="main_hr"></hr>' +
+        '' + data_html;
 
-        document.getElementById('opennamu_list_recent_change').innerHTML = data_html;
+        document.getElementById('opennamu_list_history').innerHTML = data_html;
 
         for(let for_a = 0; for_a < data.length; for_a++) {
             if(data[for_a][6] !== "" && data[for_a][1] === "") {
                 continue;
             }
 
-            document.getElementById('opennamu_list_recent_change_' + String(for_a)).addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_list_recent_change_' + String(for_a), '', 'opennamu_history_tool_' + String(for_a), 'open'); });
-            document.addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_list_recent_change_' + String(for_a), '', 'opennamu_history_tool_' + String(for_a), 'close'); });
+            document.getElementById('opennamu_list_history_' + String(for_a)).addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_list_history_' + String(for_a), '', 'opennamu_history_tool_' + String(for_a), 'open'); });
+            document.addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_list_history_' + String(for_a), '', 'opennamu_history_tool_' + String(for_a), 'close'); });
         }
     });
 }
