@@ -533,8 +533,8 @@ app.route('/record/topic/<name>')(recent_record_topic)
 app.route('/record/bbs/<name>', defaults = { 'tool' : 'record' })(bbs_w)
 app.route('/record/bbs_comment/<name>', defaults = { 'tool' : 'comment_record' })(bbs_w)
 
-app.route('/history/<everything:name>', defaults = { 'tool' : 'history' }, methods = ['POST', 'GET'])(recent_change)
-app.route('/history_page/<int:num>/<set_type>/<everything:name>', defaults = { 'tool' : 'history' }, methods = ['POST', 'GET'])(recent_change)
+app.route('/history/<everything:doc_name>', methods = ['POST', 'GET'])(list_history)
+app.route('/history_page/<int:num>/<set_type>/<everything:doc_name>', methods = ['POST', 'GET'])(list_history)
 
 app.route('/history_tool/<int(signed = True):rev>/<everything:name>')(recent_history_tool)
 app.route('/history_delete/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])(recent_history_delete)
@@ -773,6 +773,7 @@ app.route('/api/v2/list/document/new/<int:num>', defaults = { 'set_type' : 'new'
 app.route('/api/v2/list/document/<int:num>')(api_list_title_index)
 app.route('/api/v2/list/auth')(api_list_auth)
 app.route('/api/v2/list/acl/<data_type>')(api_list_acl)
+app.route('/api/v2/history/<int:num>/<set_type>/<everything:doc_name>')(api_list_history)
 
 app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>')(api_topic_list)
 
