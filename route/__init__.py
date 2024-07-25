@@ -162,8 +162,6 @@ from route.n_list_recent_discuss import list_recent_discuss
 from route.n_list_recent_block import list_recent_block
 from route.n_list_old_page import list_old_page
 from route.n_list_user_check_submit import list_user_check_submit
-from route.go_api_list_acl import api_list_acl
-from route.go_api_list_auth import api_list_auth
 
 from route.n_bbs_in import bbs_in
 from route.n_bbs_set import bbs_set
@@ -199,6 +197,9 @@ from route.go_api_list_recent_block import api_list_recent_block
 from route.go_api_list_recent_edit_request import api_list_recent_edit_request
 from route.go_api_list_old_page import api_list_old_page
 from route.go_api_list_title_index import api_list_title_index
+from route.go_api_list_acl import api_list_acl
+from route.go_api_list_auth import api_list_auth
+from route.go_api_list_history import api_list_history
 
 from route.go_api_bbs import api_bbs
 from route.go_api_bbs_list import api_bbs_list

@@ -773,6 +773,7 @@ app.route('/api/v2/list/document/new/<int:num>', defaults = { 'set_type' : 'new'
 app.route('/api/v2/list/document/<int:num>')(api_list_title_index)
 app.route('/api/v2/list/auth')(api_list_auth)
 app.route('/api/v2/list/acl/<data_type>')(api_list_acl)
+app.route('/api/v2/history/<int:num>/<set_type>/<everything:doc_name>')(api_list_history)
 
 app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>')(api_topic_list)
 
