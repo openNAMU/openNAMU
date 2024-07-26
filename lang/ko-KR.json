@@ -690,5 +690,6 @@
     "multiple_move" : "다중 문서 이동",
     "file_delete_with_document" : "문서와 파일 동시 삭제",
     "url" : "URL",
-    "resolution" : "해상도"
+    "resolution" : "해상도",
+    "method" : "방법"
 }

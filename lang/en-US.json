@@ -44,6 +44,7 @@
     "url" : "URL",
     "resolution" : "Resolution",
     "file_delete_with_document" : "Delete document and file at the same time",
+    "method" : "Method",
 
     "_comment_" : "Common",
     "data" : "Data",
