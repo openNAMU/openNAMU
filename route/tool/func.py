@@ -2065,7 +2065,7 @@ def do_edit_filter(conn, data):
     curs = conn.cursor()
 
     ip = ip_check()
-    if acl_check(tool = 'ban_auth') == 1:
+    if acl_check(tool = 'edit_filter_pass') == 1:
         curs.execute(db_change("select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''"))
         for data_list in curs.fetchall():
             match = re.compile(data_list[0], re.I)
