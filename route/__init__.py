@@ -1,5 +1,4 @@
 from route.api_image_view import api_image_view
-from route.api_setting import api_setting
 from route.api_skin_info import api_skin_info
 from route.api_user_info import api_user_info
 from route.api_version import api_version
@@ -14,7 +13,6 @@ from route.bbs_w import bbs_w
 from route.bbs_delete import bbs_delete
 # from route.bbs_hide import bbs_hide
 from route.bbs_w_post import bbs_w_post
-from route.bbs_w_set import bbs_w_set
 from route.bbs_w_comment_tool import bbs_w_comment_tool
 from route.bbs_w_tool import bbs_w_tool
 
@@ -164,9 +162,6 @@ from route.n_list_old_page import list_old_page
 from route.n_list_user_check_submit import list_user_check_submit
 from route.n_list_history import list_history
 
-from route.n_bbs_in import bbs_in
-from route.n_bbs_set import bbs_set
-
 from route.n_w_watch_list import w_watch_list
 
 from route.n_user_rankup import user_rankup
@@ -178,6 +173,8 @@ from route.n_give_auth import give_auth
 from route.n_setting_404_page import setting_404_page
 
 from route.n_bbs_main import bbs_main
+from route.n_bbs_in import bbs_in
+from route.n_bbs_w_set import bbs_w_set
 
 from route.n_edit_move_all import edit_move_all
 
@@ -200,10 +197,12 @@ from route.go_api_list_old_page import api_list_old_page
 from route.go_api_list_title_index import api_list_title_index
 from route.go_api_list_acl import api_list_acl
 from route.go_api_list_auth import api_list_auth
+from route.go_api_list_markup import api_list_markup
 from route.go_api_list_history import api_list_history
 
 from route.go_api_bbs import api_bbs
 from route.go_api_bbs_list import api_bbs_list
+from route.go_api_bbs_w_set import api_bbs_w_set
 from route.go_api_bbs_w_comment import api_bbs_w_comment
 from route.go_api_bbs_w_comment_one import api_bbs_w_comment_one
 

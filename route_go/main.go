@@ -99,6 +99,12 @@ func main() {
 		route_data = route.Api_bbs_w_comment(call_arg[1:])
 	} else if call_arg[0] == "api_list_history" {
 		route_data = route.Api_list_history(call_arg[1:])
+	} else if call_arg[0] == "api_list_markup" {
+		route_data = route.Api_list_markup(call_arg[1:])
+	} else if call_arg[0] == "api_bbs_w_set" {
+		route_data = route.Api_bbs_w_set(call_arg[1:])
+	} else if call_arg[0] == "api_bbs_w_set_put" {
+		route_data = route.Api_bbs_w_set_put(call_arg[1:])
 	} else {
 		log.Fatal(call_arg[0] + " is 404")
 	}

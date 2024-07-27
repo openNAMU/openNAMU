@@ -34,7 +34,7 @@ def give_admin_groups(name = 'test'):
                         [4, 'multiple_upload', get_lang(conn, 'multiple_upload_authority')],
                         [4, 'slow_edit_pass', get_lang(conn, 'slow_edit_pass_authority')],
                         [4, 'edit_bottom_compulsion_pass', get_lang(conn, 'edit_bottom_compulsion_pass_authority')],
-                        [3, 'edit_filter_pass', get_lang(conn, 'edit_filter_pass_authority')],
+                        [4, 'edit_filter_pass', get_lang(conn, 'edit_filter_pass_authority')],
                         [4, '', get_lang(conn, 'user_authority')],
             [1, 'user', get_lang(conn, 'user_authority')],
                 [2, 'captcha_pass', get_lang(conn, 'captcha_pass_authority')],

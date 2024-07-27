@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"log"
 	"opennamu/route/tool"
 
@@ -45,16 +46,37 @@ func Api_setting(call_arg []string) string {
 			}
 		}
 
-		stmt, err := db.Prepare(tool.DB_change("select data, coverage from other where name = ? and coverage = ?"))
-		if err != nil {
-			log.Fatal(err)
+		data_coverage := ""
+		if val, ok := other_set["coverage"]; ok {
+			data_coverage = val
 		}
 
-		defer stmt.Close()
+		var rows *sql.Rows
 
-		rows, err := stmt.Query(other_set["set_name"], val)
-		if err != nil {
-			log.Fatal(err)
+		if data_coverage != "" {
+			stmt, err := db.Prepare(tool.DB_change("select data, coverage from other where name = ? and coverage = ?"))
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			defer stmt.Close()
+
+			rows, err = stmt.Query(other_set["set_name"], data_coverage)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			stmt, err := db.Prepare(tool.DB_change("select data, coverage from other where name = ?"))
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			defer stmt.Close()
+
+			rows, err = stmt.Query(other_set["set_name"])
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 		defer rows.Close()
 
