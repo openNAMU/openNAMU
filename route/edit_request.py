@@ -47,7 +47,7 @@ def edit_request(name = 'Test', do_type = ''):
             
             curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
             for scan_user in curs.fetchall():
-                add_alarm(conn, scan_user[0], edit_request_user, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
+                add_alarm(scan_user[0], edit_request_user, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
 
             if flask.request.form.get('check', '') == 'Y':
                 curs.execute(db_change("delete from data where title = ?"), [name])
