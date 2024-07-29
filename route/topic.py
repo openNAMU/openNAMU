@@ -137,12 +137,8 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                 imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'discussion') + ')', 0])],
                 data = '''
                     <script defer src="/views/main_css/js/route/topic.js''' + cache_v() + '''"></script>
-                    <style id="opennamu_remove_blind">
-                        .opennamu_comment_blind_js {
-                            display: none;
-                        }
-                    </style>
-                    <input type="checkbox" onclick="opennamu_do_remove_blind_thread();" checked> ''' + get_lang(conn, 'remove_blind_thread') + '''
+                    <style id="opennamu_list_hidden_style">.opennamu_list_hidden { display: none; }</style>
+                    <input type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ''' + get_lang(conn, 'remove_hidden') + '''
                     <hr class="main_hr">
 
                     ''' + shortcut + '''

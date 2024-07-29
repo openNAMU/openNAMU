@@ -50,8 +50,13 @@ function opennamu_list_history() {
         let lang = data["language"];
         let auth = data["auth"];
         data = data["data"];
+        console.log(auth);
 
         let data_html = '';
+
+        data_html += '<style id="opennamu_list_hidden_style">.opennamu_list_hidden { display: none; }</style>';
+        data_html += '<input type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ' + lang['remove_hidden'];
+        data_html += '<hr class="main_hr">';
 
         let option_list = ['normal', 'edit', 'move', 'delete', 'revert', 'r1', 'setting'];
         for(let for_a = 0; for_a < option_list.length; for_a++) {
@@ -62,7 +67,12 @@ function opennamu_list_history() {
         let select = '';
         for(let for_a = 0; for_a < data.length; for_a++) {
             if(data[for_a][6] !== "" && data[for_a][1] === "") {
-                data_html += opennamu_make_list('----');
+                if(date_heading !== '----') {
+                    data_html += '<h2 class="opennamu_list_hidden">----</h2>';
+                    date_heading = '----';
+                }
+
+                data_html += opennamu_make_list('----', '', '', 'opennamu_list_hidden');
 
                 continue;
             }

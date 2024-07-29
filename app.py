@@ -691,7 +691,6 @@ app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 # Func-bbs
 app.route('/bbs/main')(bbs_main)
 app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
-app.route('/bbs/set')(bbs_set)
 app.route('/bbs/in/<int:bbs_num>')(bbs_in)
 app.route('/bbs/in/<int:bbs_num>/<int:page>')(bbs_in)
 # app.route('/bbs/blind/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_hide)
@@ -732,7 +731,6 @@ app.route('/api/version', defaults = { 'version_list' : version_list })(api_vers
 app.route('/api/skin_info')(api_skin_info)
 app.route('/api/skin_info/<name>')(api_skin_info)
 app.route('/api/user_info/<user_name>')(api_user_info)
-app.route('/api/setting/<name>')(api_setting)
 
 app.route('/api/thread/<int:topic_num>/<int:s_num>/<int:e_num>')(api_topic)
 app.route('/api/thread/<int:topic_num>/<tool>')(api_topic)
@@ -772,6 +770,7 @@ app.route('/api/v2/list/document/old/<int:num>', defaults = { 'set_type' : 'old'
 app.route('/api/v2/list/document/new/<int:num>', defaults = { 'set_type' : 'new' })(api_list_old_page)
 app.route('/api/v2/list/document/<int:num>')(api_list_title_index)
 app.route('/api/v2/list/auth')(api_list_auth)
+app.route('/api/v2/list/markup')(api_list_markup)
 app.route('/api/v2/list/acl/<data_type>')(api_list_acl)
 app.route('/api/v2/history/<int:num>/<set_type>/<everything:doc_name>')(api_list_history)
 
@@ -779,6 +778,7 @@ app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>')(api_topic_list
 
 app.route('/api/v2/bbs')(api_bbs_list)
 app.route('/api/v2/bbs/main')(api_bbs)
+app.route('/api/v2/bbs/set/<int:bbs_num>/<name>', methods = ['GET', 'PUT'])(api_bbs_w_set)
 app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs)
 app.route('/api/v2/bbs/w/comment/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment)
 app.route('/api/v2/bbs/w/comment_one/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment_one)

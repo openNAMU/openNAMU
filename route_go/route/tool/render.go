@@ -7,6 +7,16 @@ import (
 	"time"
 )
 
+func List_markup() []string {
+	return []string{
+		"namumark",
+		"namumark_beta",
+		"markdown",
+		"custom",
+		"raw",
+	}
+}
+
 func Get_render(db *sql.DB, doc_name string, data string, render_type string) map[string]string {
 	var markup string
 

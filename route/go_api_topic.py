@@ -7,7 +7,7 @@ def api_topic_thread_make(user_id, date, data, code, color = '', blind = '', add
         else:
             color_b = 'opennamu_comment_blind_admin'
 
-        class_b = 'opennamu_comment_blind_js'
+        class_b = 'opennamu_comment_blind_js opennamu_list_hidden'
     else:
         color_b = 'opennamu_comment_blind_not'
         class_b = ''

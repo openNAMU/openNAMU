@@ -587,7 +587,6 @@
     "list_view_change": "숫자 리스트의 보기 방식 변경",
     "view_joke": "농담 매크로 내용 보이기",
     "math_scroll": "Math 매크로에서 스크롤 사용",
-    "remove_blind_thread": "숨겨진 토론 보이지 않기",
     "trace": "추적",
     "view_history": "문서 열람 추적 사용",
     "start_with_search": "첫 글자부터 검색",
@@ -675,7 +674,7 @@
     "doc_watch_list_view_authority" : "문서를 주시 목록에 추가한 사람 목록 보기",
     "bbs_view_authority" : "BBS 보기 권한",
     "bbs_comment_authority" : "BBS 댓글 권한",
-    "bbs_edit_authority" : "BBS 수정 권한",
+    "bbs_edit_authority" : "BBS 편집 권한",
     "user_analyze_authority" : "사용자 분석 권한",
     "still_use_auth_error" : "이 권한을 보유한 사람이 아직 존재합니다.",
     "xss_data_include_error" : "XSS에 이용될 수 있는 문자는 입력할 수 없습니다.",
@@ -691,5 +690,10 @@
     "file_delete_with_document" : "문서와 파일 동시 삭제",
     "url" : "URL",
     "resolution" : "해상도",
-    "method" : "방법"
+    "method" : "방법",
+    "edit_filter_pass_authority" : "편집 필터 통과 권한",
+    "edit_filter_view_authority" : "편집 필터 보기 권한",
+    "post_view_acl" : "게시글 보기 ACL",
+    "post_comment_acl" : "게시글 댓글 ACL",
+    "remove_hidden": "숨겨진 내용 보이지 않기"
 }
