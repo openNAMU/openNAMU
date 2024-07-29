@@ -746,6 +746,17 @@ def update(conn, ver_num, set_data):
     if ver_num < 20240513:
         curs.execute(db_change("update user_set set data = '☑️' where name = 'user_title' and data = '✅'"))
 
+    if ver_num < 20240732:
+        curs.execute(db_change("select distinct name from alist where acl = 'owner'"))
+        for for_a in curs.fetchall():
+            curs.execute(db_change("select distinct id from user_set where name = 'acl' and data = ?"), [for_a[0]])
+            for for_b in curs.fetchall():
+                lang_name = get_lang_name(conn, tool = 'inter')
+                if lang_name == 'ko-KR':
+                    add_alarm(for_b[0], 'tool:system', '메인 ACL이 권한으로 개편되면서 기존 설정 값이 날라갔으니 권한으로 재설정 해주세요.')
+                else:
+                    add_alarm(for_b[0], 'tool:system', 'As the main ACL has been reorganized into the auth, the existing setting values have been lost, so please reset it to the auth.')
+
     print('Update completed')
 
 def set_init_always(conn, ver_num, run_mode):
@@ -1145,11 +1156,10 @@ def pw_check(conn, data, data2, type_d = 'no', id_d = ''):
 def easy_minify(conn, data, tool = None):
     return data
 
-def get_lang(conn, data, safe = 0):
-    with class_temp_db() as m_conn:
-        m_curs = m_conn.cursor()
-        curs = conn.cursor()
+def get_lang_name(conn, tool = ''):
+    curs = conn.cursor()
 
+    if tool != 'inter':
         ip = ip_check()
         if ip_or_user(ip) == 0:
             curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip])
@@ -1159,16 +1169,27 @@ def get_lang(conn, data, safe = 0):
         else:
             curs.execute(db_change("select data from other where name = 'language'"))
             rep_data = curs.fetchall()
+    else:
+        curs.execute(db_change("select data from other where name = 'language'"))
+        rep_data = curs.fetchall()
 
-        if not rep_data or rep_data[0][0] in ('', 'default'):
-            curs.execute(db_change("select data from other where name = 'language'"))
-            rep_data = curs.fetchall()
+    if not rep_data or rep_data[0][0] in ('', 'default'):
+        curs.execute(db_change("select data from other where name = 'language'"))
+        rep_data = curs.fetchall()
 
-        if rep_data:
-            lang_name = rep_data[0][0]
-        else:
-            lang_name = 'en-US'
-            
+    if rep_data:
+        lang_name = rep_data[0][0]
+    else:
+        lang_name = 'en-US'
+
+    return lang_name
+
+def get_lang(conn, data, safe = 0):
+    with class_temp_db() as m_conn:
+        m_curs = m_conn.cursor()
+
+        lang_name = get_lang_name(conn)
+        
         m_curs.execute('select data from temp where name = ?', ['lang_' + lang_name + '_' + data])
         db_data = m_curs.fetchall()
         if db_data:
@@ -2145,20 +2166,14 @@ def do_reload_recent_thread(conn, topic_num, date, name = None, sub = None):
     else:
         curs.execute(db_change("insert into rd (title, sub, code, date, band, stop, agree, acl) values (?, ?, ?, ?, '', '', '', '')"), [name, sub, topic_num, date])
 
-def add_alarm(conn, to_user, from_user, context):
-    curs = conn.cursor()
+def add_alarm(to_user, from_user, context):
+    other_set = {}
+    other_set['to'] = to_user
+    other_set['from'] = from_user
+    other_set['data'] = context
 
-    if to_user != from_user:
-        context = from_user + ' | ' + context
+    python_to_golang_sync('api_func_alarm_post', other_set)
 
-        count = '1'
-        curs.execute(db_change("select id from user_notice where name = ? order by id + 0 desc"), [to_user])
-        db_data = curs.fetchall()
-        if db_data:
-            count = str(int(db_data[0][0]) + 1)
-
-        curs.execute(db_change('insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'), [count, to_user, context, get_time()])
-    
 def add_user(conn, user_name, user_pw, user_email = '', user_encode = ''):
     curs = conn.cursor()
 

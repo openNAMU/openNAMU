@@ -98,12 +98,12 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                         y_check = 1
 
                 if y_check == 1:
-                    add_alarm(conn, match, ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                    add_alarm(match, ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
             
             curs.execute(db_change("select ip from topic where code = ? and id = '1'"), [topic_num])
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
-                add_alarm(conn, ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
 
             data = api_topic_thread_pre_render(conn, data, num, ip, topic_num, name, sub)
 
