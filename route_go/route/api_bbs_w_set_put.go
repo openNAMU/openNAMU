@@ -42,7 +42,7 @@ func Api_bbs_w_set_put(call_arg []string) string {
 			}
 			defer stmt.Close()
 
-			_, err = stmt.Exec(other_set["set_name"], other_set["data"], other_set["set_id"])
+			_, err = stmt.Exec(other_set["set_name"], other_set["set_id"], other_set["data"])
 			if err != nil {
 				log.Fatal(err)
 			}
