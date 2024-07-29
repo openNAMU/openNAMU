@@ -43,7 +43,7 @@ func Api_bbs_w_set(call_arg []string) string {
 			}
 		}
 
-		stmt, err := db.Prepare(tool.DB_change("select set_data, set_code from other where set_name = ? and set_id = ?"))
+		stmt, err := db.Prepare(tool.DB_change("select set_data, set_code from bbs_set where set_name = ? and set_id = ?"))
 		if err != nil {
 			log.Fatal(err)
 		}

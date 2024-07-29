@@ -6,14 +6,20 @@ function opennamu_bbs_w_set_post() {
         "bbs_acl",
         "bbs_edit_acl",
         "bbs_comment_acl",
-        "bbs_markup"
+        "bbs_markup",
+        "bbs_name"
     ];
+
+    const url = window.location.pathname;
+    const url_split = url.split('/');
+
+    let set_id = url_split[3];
 
     for(let for_a = 0; for_a < acl_set_list.length; for_a++) {
         let post_data = new FormData();
         post_data.append('data', document.getElementById('opennamu_' + acl_set_list[for_a]).value);
         
-        fetch('/api/v2/setting/' + acl_set_list[for_a], {
+        fetch('/api/v2/bbs/set/' + set_id + '/' + acl_set_list[for_a], {
             method : 'PUT',
             body : post_data,
         }).then(function(res) {
@@ -107,23 +113,33 @@ function opennamu_bbs_w_set() {
             document.getElementById('opennamu_bbs_w_set').innerHTML = renderSimpleSet('' +
                 make_html +
                 '<hr class="main_hr">' + 
+                '<input id="opennamu_bbs_name">' +
+                '<hr class="main_hr">' + 
                 '<button onclick="opennamu_bbs_w_set_post();">' + lang['save'] + '</button>' +
             '');
 
             let total_set_list = [];
-            total_set_list.concat(acl_set_list);
-            total_set_list.concat(markup_set_list);
+            total_set_list = total_set_list.concat(acl_set_list);
+            total_set_list = total_set_list.concat(markup_set_list);
 
             for(let for_a = 0; for_a < total_set_list.length; for_a++) {
                 fetch('/api/v2/bbs/set/' + set_id + '/' + total_set_list[for_a]).then(function(res) {
                     return res.json();
                 }).then(function(data) {
-                    data = data["data"][0];
+                    data = data["data"][0][0];
 
                     let select_element = document.getElementById('opennamu_' + total_set_list[for_a]);
                     select_element.querySelector('option[value="' + data + '"]').selected = true;
                 });
             }
+
+            fetch('/api/v2/bbs/set/' + set_id + '/bbs_name').then(function(res) {
+                return res.json();
+            }).then(function(data) {
+                data = data["data"][0][0];
+
+                document.getElementById('opennamu_bbs_name').value = data;
+            });
         });
     });
 }
