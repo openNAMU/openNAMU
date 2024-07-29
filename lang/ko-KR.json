@@ -587,7 +587,6 @@
     "list_view_change": "숫자 리스트의 보기 방식 변경",
     "view_joke": "농담 매크로 내용 보이기",
     "math_scroll": "Math 매크로에서 스크롤 사용",
-    "remove_blind_thread": "숨겨진 토론 보이지 않기",
     "trace": "추적",
     "view_history": "문서 열람 추적 사용",
     "start_with_search": "첫 글자부터 검색",
@@ -695,5 +694,6 @@
     "edit_filter_pass_authority" : "편집 필터 통과 권한",
     "edit_filter_view_authority" : "편집 필터 보기 권한",
     "post_view_acl" : "게시글 보기 ACL",
-    "post_comment_acl" : "게시글 댓글 ACL"
+    "post_comment_acl" : "게시글 댓글 ACL",
+    "remove_hidden": "숨겨진 내용 보이지 않기"
 }

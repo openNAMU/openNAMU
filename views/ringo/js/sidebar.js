@@ -23,9 +23,6 @@ function ringo_do_side_button_1() {
                 if(text[for_a][6] === '') {
                     data += '<a href="/w/' + ringo_do_url_encode(text[for_a][1]) + '">' + ringo_do_xss_encode(text[for_a][1]) + '</a><br>';
                     data += text[for_a][2] + ' | ' + ringo_do_xss_encode(text[for_a][3]) + '<br>';
-                } else {
-                    data += '---<br>';
-                    data += '--- | ---<br>';
                 }
             }
 

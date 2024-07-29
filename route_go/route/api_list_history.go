@@ -133,6 +133,7 @@ func Api_list_history(call_arg []string) string {
 		"file":           tool.Get_language(db, "file", false),
 		"category":       tool.Get_language(db, "category", false),
 		"setting":        tool.Get_language(db, "setting", false),
+		"remove_hidden":  tool.Get_language(db, "remove_hidden", false),
 	}
 	return_data["data"] = data_list
 	return_data["auth"] = auth_info

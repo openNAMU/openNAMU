@@ -49,6 +49,7 @@
     "edit_filter_view_authority" : "Contents filter view authority",
     "post_view_acl" : "Post view ACL",
     "post_comment_acl" : "Post comment ACL",
+    "remove_hidden" : "Don't show hide content",
 
     "_comment_" : "Common",
     "data" : "Data",
@@ -604,7 +605,6 @@
     "discussion_record" : "Discussion record",
     
     "_comment_" : "Topic",
-    "remove_blind_thread" : "Hide blind thread",
     "make_new_topic" : "Make new discussion",
     "topic_tool" : "Discussion management tools",
     "topic_state" : "Discussion status",
