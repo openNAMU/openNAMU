@@ -2,12 +2,41 @@ package route
 
 import (
 	"database/sql"
+	"encoding/json"
 	"log"
 	"opennamu/route/tool"
 	"strconv"
 
 	jsoniter "github.com/json-iterator/go"
 )
+
+func Api_bbs_w_comment_all(sub_code string) []map[string]string {
+	end_data := []map[string]string{}
+
+	inter_other_set := map[string]string{}
+	inter_other_set["sub_code"] = sub_code
+	inter_other_set["tool"] = "around"
+	inter_other_set["legacy"] = "on"
+
+	json_data, _ := json.Marshal(inter_other_set)
+	return_data := Api_bbs_w_comment_one([]string{string(json_data)})
+
+	return_data_api := []map[string]string{}
+	json.Unmarshal([]byte(return_data), &return_data_api)
+
+	for for_a := 0; for_a < len(return_data_api); for_a++ {
+		end_data = append(end_data, return_data_api[for_a])
+
+		temp := Api_bbs_w_comment_all(sub_code + "-" + return_data_api[for_a]["code"])
+		if len(temp) > 0 {
+			for for_b := 0; for_b < len(temp); for_b++ {
+				end_data = append(end_data, temp[for_b])
+			}
+		}
+	}
+
+	return end_data
+}
 
 func Api_bbs_w_comment(call_arg []string) string {
 	var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -26,7 +55,7 @@ func Api_bbs_w_comment(call_arg []string) string {
 		defer stmt.Close()
 
 		var comment_length string
-		bbs_and_post_num := other_set["bbs_num"] + "-" + other_set["post_num"]
+		bbs_and_post_num := other_set["sub_code"]
 
 		err = stmt.QueryRow(bbs_and_post_num).Scan(&comment_length)
 		if err != nil {
@@ -69,6 +98,17 @@ func Api_bbs_w_comment(call_arg []string) string {
 		json_data, _ := json.Marshal(data_list)
 		return string(json_data)
 	} else {
-		return "{}"
+		temp := Api_bbs_w_comment_all(other_set["sub_code"])
+
+		if other_set["legacy"] != "" {
+			json_data, _ := json.Marshal(temp)
+			return string(json_data)
+		} else {
+			return_data := make(map[string]interface{})
+			return_data["data"] = temp
+
+			json_data, _ := json.Marshal(return_data)
+			return string(json_data)
+		}
 	}
 }

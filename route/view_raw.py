@@ -1,9 +1,9 @@
 from .tool.func import *
 
 from .api_bbs_w_post import api_bbs_w_post
-from .api_bbs_w_comment_one import api_bbs_w_comment_one
+from .go_api_bbs_w_comment_one import api_bbs_w_comment_one
 
-def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', post_num = '', comment_num = ''):
+async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', post_num = '', comment_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
         
@@ -12,17 +12,17 @@ def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', pos
 
         if bbs_num != '' and post_num != '':
             if acl_check(bbs_num_str, 'bbs_view') == 1:
-                return re_error(conn, '/ban')
+                return re_error(conn, 0)
                     
             name = ''
         elif topic_num != '':
             topic_num = str(topic_num)
             
             if acl_check('', 'topic_view', topic_num) == 1:
-                return re_error(conn, '/ban')
+                return re_error(conn, 0)
         else:
             if acl_check(name, 'render') == 1:
-                return re_error(conn, '/ban')
+                return re_error(conn, 0)
 
         if num:
             num = str(num)
@@ -40,7 +40,7 @@ def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', pos
         elif topic_num == '' and num != '':
             curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
             if curs.fetchall() and acl_check(tool = 'hidel_auth') == 1:
-                return re_error(conn, '/error/3')
+                return re_error(conn, 3)
 
             curs.execute(db_change("select data from history where title = ? and id = ?"), [name, num])
 
@@ -67,7 +67,7 @@ def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', pos
 
         if bbs_num != '' and post_num != '':
             if comment_num != '':
-                data = orjson.loads(api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num).data)
+                data = orjson.loads((await api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num)).get_data(as_text = True))
                 sub_data = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
             else:
                 data = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
@@ -113,4 +113,4 @@ def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', pos
                 menu = menu
             ))
         else:
-            return re_error(conn, '/error/3')
+            return re_error(conn, 3)

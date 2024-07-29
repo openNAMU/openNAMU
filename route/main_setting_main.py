@@ -5,7 +5,7 @@ def main_setting_main():
         curs = conn.cursor()
 
         if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
         
         setting_list = {
             0 : ['name', 'Wiki'],
@@ -45,7 +45,8 @@ def main_setting_main():
             42 : ['ua_expiration_date', ''],
             43 : ['auth_history_expiration_date', ''],
             44 : ['auth_history_off', ''],
-            45 : ['user_name_level', '']
+            45 : ['user_name_level', ''],
+            46 : ['load_ip_select', '']
         }
 
         if flask.request.method == 'POST':
@@ -114,6 +115,18 @@ def main_setting_main():
 
                 sqlite_only = 'style="display:none;"' if set_data != 'sqlite' else ''
 
+            ip_load_select_data = ''
+            ip_load_option = ['default', 'HTTP_X_REAL_IP', 'HTTP_CF_CONNECTING_IP', 'REMOTE_ADDR']
+            for for_a in ip_load_option:
+                view_ip_option = for_a
+                if for_a == 'default':
+                    view_ip_option = get_lang(conn, 'default')
+
+                if d_list[46] == for_a:
+                    ip_load_select_data = '<option value="' + for_a + '">' + view_ip_option + '</option>' + ip_load_select_data
+                else:
+                    ip_load_select_data += '<option value="' + for_a + '">' + view_ip_option + '</option>'
+
             basic_set = '''
                 <h2>''' + get_lang(conn, 'basic_set') + '''</h2>
                             
@@ -161,6 +174,11 @@ def main_setting_main():
                 <span>''' + get_lang(conn, 'set_wiki_access_password') + '''</span> (''' + get_lang(conn, 'restart_required') + ''')
                 <hr class="main_hr">
                 <input type="password" name="wiki_access_password" value="''' + html.escape(d_list[32]) + '''">
+                <hr class="main_hr">
+
+                <span>''' + get_lang(conn, 'wiki_load_ip_select') + '''</span> (''' + get_lang(conn, 'restart_required') + ''')
+                <hr class="main_hr">
+                <select name="load_ip_select">''' + ip_load_select_data + '''</select>
                 
                 <h3>''' + get_lang(conn, 'authority_use_list') + '''</h3>
                 

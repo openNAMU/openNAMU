@@ -17,6 +17,12 @@ class class_do_render:
         self.lang_data = lang_data
         self.markup = markup
 
+    def generate_random_string(self, length = 32):
+        characters = string.ascii_letters + string.digits
+
+        random_string = ''.join(random.choice(characters) for _ in range(length))
+        return random_string
+
     def do_render(self, doc_name, doc_data, data_type):
         curs = self.conn.cursor()
 
@@ -32,7 +38,7 @@ class class_do_render:
         else:
             doc_set['doc_type'] = data_type
         
-        doc_set['doc_include'] = str(time.time_ns()) + '_'
+        doc_set['doc_include'] = self.generate_random_string() + '_'
     
         rep_data = self.markup
         if rep_data == '' and doc_name != '':

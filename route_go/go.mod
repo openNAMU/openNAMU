@@ -9,6 +9,7 @@ require (
 	github.com/dlclark/regexp2 v1.11.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/google/generative-ai-go v0.11.0
+	github.com/json-iterator/go v1.1.12
 	github.com/yuin/goldmark v1.7.1
 	google.golang.org/api v0.175.0
 	modernc.org/sqlite v1.29.8
@@ -33,7 +34,6 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.3 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
-	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect

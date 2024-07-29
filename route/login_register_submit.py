@@ -50,7 +50,7 @@ def login_register_submit_2():
 
             curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [user_app_data['id'], 'application', orjson.dumps(user_app_data).decode('utf-8')])
 
-            return re_error(conn, '/error/43')
+            return re_error(conn, 43)
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
                 imp = [get_lang(conn, 'approval_question'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],

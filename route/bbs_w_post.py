@@ -1,23 +1,20 @@
 from .tool.func import *
 
 from .api_bbs_w_post import api_bbs_w_post
-from .api_bbs_w_comment import api_bbs_w_comment
+from .go_api_bbs_w_comment import api_bbs_w_comment
 
 from .go_api_topic import api_topic_thread_make, api_topic_thread_pre_render
 
 from .edit import edit_editor
 
-def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, post_num_str):
+async def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, post_num_str):
     comment_data = ''
     comment_select = ''
 
     comment_count = 0
     comment_add_count = 0
 
-    thread_data = orjson.loads(api_bbs_w_comment(sub_code).data)
-    
-    comment_count += len(thread_data)
-    comment_add_count += comment_count
+    thread_data = orjson.loads((await api_bbs_w_comment(sub_code)).get_data(as_text = True))
 
     for temp_dict in thread_data:
         if temp_dict['comment_user_id'] != '':
@@ -25,8 +22,13 @@ def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, post_n
             if user_id == temp_dict['comment_user_id']:
                 color = 'green'
 
-            sub_code_check = re.sub(r'^[0-9]+-[0-9]+-', '', sub_code + '-' + temp_dict['code'])
+            sub_code_check = re.sub(r'^[0-9]+-[0-9]+-', '', temp_dict['id'] + '-' + temp_dict['code'])
             margin_count = sub_code_check.count('-')
+
+            if margin_count == 0:
+                comment_count += 1
+            else:
+                comment_add_count += 1
 
             date = ''
             date += '<a href="javascript:opennamu_change_comment(\'' + sub_code_check + '\');">(' + get_lang(conn, 'comment') + ')</a> '
@@ -49,15 +51,9 @@ def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, post_n
 
             comment_select += '<option value="' + sub_code_check + '" ' + comment_default + '>' + sub_code_check + '</option>'
 
-        temp_data = bbs_w_post_comment(conn, user_id, sub_code + '-' + temp_dict['code'], comment_num, bbs_num_str, post_num_str)
-
-        comment_data += temp_data[0]
-        comment_select += temp_data[1]
-        comment_add_count += temp_data[3]
-
     return (comment_data, comment_select, comment_count, comment_add_count)
 
-def bbs_w_post(bbs_num = '', post_num = ''):
+async def bbs_w_post(bbs_num = '', post_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -87,7 +83,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                     return redirect(conn, '/bbs/set/' + bbs_num_str)
                 
                 if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                    return re_error(conn, '/error/13')
+                    return re_error(conn, 13)
 
                 set_id = bbs_num_str + '-' + post_num_str
 
@@ -109,12 +105,12 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                 curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('comment_date', ?, ?, ?)"), [id_data, set_id, date])
                 curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('comment_user_id', ?, ?, ?)"), [id_data, set_id, ip])
 
-                add_alarm(conn, temp_dict['user_id'], ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + id_data + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + id_data + '</a>')
+                add_alarm(temp_dict['user_id'], ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + id_data + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + id_data + '</a>')
 
                 return redirect(conn, '/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + id_data)
             else:
                 if acl_check(bbs_num_str, 'bbs_view') == 1:
-                    return re_error(conn, '/ban')
+                    return re_error(conn, 0)
 
                 text = ''
 
@@ -134,7 +130,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                 user_id = temp_dict['user_id']
                 count = 0
 
-                thread_data = orjson.loads(api_bbs_w_comment(bbs_num_str + '-' + post_num_str).data)
+                thread_data = orjson.loads((await api_bbs_w_comment(bbs_num_str + '-' + post_num_str)).get_data(as_text = True))
                 for temp_dict in thread_data:
                     count += 1
                     if user_id == temp_dict['comment_user_id']:
@@ -172,7 +168,7 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                     return redirect(conn, '/bbs/set/' + bbs_num_str)
                 
                 if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                    return re_error(conn, '/error/13')
+                    return re_error(conn, 13)
                 
                 select = flask.request.form.get('comment_select', '0')
                 select = '' if select == '0' else select
@@ -223,14 +219,14 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                     set_id += '-' if set_id != '' else ''
                     end_id = set_id + id_data
 
-                add_alarm(conn, temp_dict['user_id'], ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + end_id + '</a>')
+                add_alarm(temp_dict['user_id'], ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + end_id + '</a>')
                 if comment_user_name != '':
-                    add_alarm(conn, comment_user_name, ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + end_id + '</a>')
+                    add_alarm(comment_user_name, ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + end_id + '</a>')
 
                 return redirect(conn, '/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id)
             else:
                 if acl_check(bbs_num_str, 'bbs_view') == 1:
-                    return re_error(conn, '/ban')
+                    return re_error(conn, 0)
                     
                 text = ''
                 comment_num = ''
@@ -258,13 +254,12 @@ def bbs_w_post(bbs_num = '', post_num = ''):
                 comment_count = 0
                 comment_add_count = 0
 
-                temp_data = bbs_w_post_comment(conn, user_id, bbs_num_str + '-' + post_num_str, comment_num, bbs_num_str, post_num_str)
+                temp_data = await bbs_w_post_comment(conn, user_id, bbs_num_str + '-' + post_num_str, comment_num, bbs_num_str, post_num_str)
 
                 comment_data += temp_data[0]
                 comment_select += temp_data[1]
                 comment_count += temp_data[2]
                 comment_add_count += temp_data[3]
-                comment_add_count -= comment_count
 
                 if comment_data != '':
                     data += '<hr>'

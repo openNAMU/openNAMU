@@ -99,14 +99,14 @@ func Api_topic(call_arg []string) string {
 		new_data["data"] = []map[string]string{}
 		data_slice := []map[string]string{}
 
-		admin_auth := tool.Get_user_auth(db, other_set["ip"])
+		admin_auth := tool.Check_acl(db, "", "", "toron_auth", other_set["ip"])
 
 		var ip_pre string
 		var ip_render string
 
 		for for_a := 0; for_a < len(data_list); for_a++ {
 			data := ""
-			if data_list[for_a][4] != "O" || admin_auth != "" {
+			if data_list[for_a][4] != "O" || admin_auth {
 				data = data_list[for_a][1]
 			}
 

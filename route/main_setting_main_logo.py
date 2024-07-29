@@ -5,7 +5,7 @@ def main_setting_main_logo():
         curs = conn.cursor()
         
         if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
 
         skin_list = [0] + load_skin(conn, '', 1)
         i_list = []

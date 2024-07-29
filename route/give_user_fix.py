@@ -6,10 +6,10 @@ def give_user_fix(user_name = ''):
 
         curs.execute(db_change("select data from user_set where id = ? and name = 'pw'"), [user_name])
         if not curs.fetchall():
-            return re_error(conn, '/error/2')
+            return re_error(conn, 2)
 
         if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, '/error/3')
+            return re_error(conn, 3)
 
         if flask.request.method == 'POST':
             select = flask.request.form.get('select', '')
@@ -26,7 +26,7 @@ def give_user_fix(user_name = ''):
                         user_name
                     ])
                 else:
-                    return re_error(conn, '/error/20')
+                    return re_error(conn, 20)
             elif select == '2fa_password_change':
                 password = flask.request.form.get('new_password', '')
                 check_password = flask.request.form.get('password_check', '')
@@ -39,7 +39,7 @@ def give_user_fix(user_name = ''):
                     else:
                         curs.execute(db_change("insert into user_set (name, id, data) values ('2fa_pw', ?, ?)"), [user_name, hashed])
                 else:
-                    return re_error(conn, '/error/20')
+                    return re_error(conn, 20)
             elif select == '2fa_off':
                 curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [user_name])
                 if curs.fetchall():

@@ -13,11 +13,9 @@
     max-width: 100%;
 }
 
-.opennamu_main .opennamu_main {
+.opennamu_main {
     word-break: break-all;
-    
     overflow: auto;
-
     font-size: 14px;
 }
 
@@ -149,11 +147,13 @@
     font-weight: bold;
 }
 
-.opennamu_main .opennamu_link_out, .opennamu_link_inter {
+.opennamu_main .opennamu_link_out,
+.opennamu_main .opennamu_link_inter {
     color: green;
 }
 
-.opennamu_main .opennamu_link_out:hover, .opennamu_link_inter:hover {
+.opennamu_main .opennamu_link_out:hover,
+.opennamu_main .opennamu_link_inter:hover {
     color: darkgreen;
 }
 
@@ -455,7 +455,7 @@
 }
 
 /* SVG */
-.opennamu_svg {
+.opennamu_main .opennamu_svg {
     width: 14px;
     display: inline-block;
 
@@ -464,6 +464,6 @@
     background-size: contain;
 }
 
-.opennamu_svg_tool {
+.opennamu_main .opennamu_svg_tool {
     background-image: url(/views/main_css/file/icon/tool.svg);
 }

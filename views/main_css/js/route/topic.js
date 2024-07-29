@@ -1,26 +1,11 @@
 "use strict";
 
-function opennamu_do_remove_blind_thread() {
-    const style = document.querySelector('#opennamu_remove_blind');
-    if(style !== null) {
-        if(style.innerHTML !== "") {
-            style.innerHTML = '';
-        } else {
-            style.innerHTML = `
-                .opennamu_comment_blind_js {
-                    display: none;
-                }
-            `;
-        }
-    }
-}
-
 function opennamu_thread_delete() {
     let lang_data = new FormData();
     lang_data.append('data', 'delete');
 
     fetch('/api/lang', {
-        method : 'post',
+        method : 'POST',
         body : lang_data,
     }).then(function(res) {
         return res.json();
@@ -75,9 +60,9 @@ function opennamu_thread_blind() {
 
 function opennamu_get_thread_ui(user_id, date, data, code, color = '', blind = '', add_style = '', topic_num = '') {
     let color_b, class_b;
-    if(blind == 'O') {
-        color_b = data == '' ? 'opennamu_comment_blind' : 'opennamu_comment_blind_admin';
-        class_b = 'opennamu_comment_blind_js';
+    if(blind === 'O') {
+        color_b = data === '' ? 'opennamu_comment_blind' : 'opennamu_comment_blind_admin';
+        class_b = 'opennamu_comment_blind_js opennamu_list_hidden';
     } else {
         color_b = 'opennamu_comment_blind_not';
         class_b = '';

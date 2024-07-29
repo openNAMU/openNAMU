@@ -129,7 +129,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 return redirect(conn, '/raw_acl/' + url_pas(name))
             
         if do_title_length_check(conn, name) == 1:
-            return re_error(conn, '/error/38')
+            return re_error(conn, 38)
         
         curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
         doc_ver = curs.fetchall()
@@ -152,10 +152,10 @@ def edit(name = 'Test', section = 0, do_type = ''):
         
         if edit_repeat == 'post':
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, '/error/13')
+                return re_error(conn, 13)
     
             if do_edit_slow_check(conn) == 1:
-                return re_error(conn, '/error/24')
+                return re_error(conn, 24)
     
             today = get_time()
             content = flask.request.form.get('content', '').replace('\r', '')
@@ -163,16 +163,16 @@ def edit(name = 'Test', section = 0, do_type = ''):
             agree = flask.request.form.get('copyright_agreement', '')
             
             if do_edit_filter(conn, content) == 1:
-                return re_error(conn, '/error/21')
+                return re_error(conn, 21)
             
             if do_edit_filter(conn, send) == 1:
-                return re_error(conn, '/error/21')
+                return re_error(conn, 21)
 
             if do_edit_send_check(conn, send) == 1:
-                return re_error(conn, '/error/37')
+                return re_error(conn, 37)
 
             if do_edit_text_bottom_check_box_check(conn, agree) == 1:
-                return re_error(conn, '/error/29')
+                return re_error(conn, 29)
             
             curs.execute(db_change("select data from data where title = ?"), [name])
             db_data = curs.fetchall()
@@ -206,7 +206,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
             db_data_3 = curs.fetchall()
             if db_data_3 and db_data_3[0][0] != '':
                 if int(number_check(db_data_3[0][0])) < len(content):
-                    return re_error(conn, '/error/44')
+                    return re_error(conn, 44)
 
             curs.execute(db_change("select data from other where name = 'edit_timeout'"))
             db_data_2 = curs.fetchall()
@@ -217,7 +217,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 timeout = 0
 
             if timeout == 1:
-                return re_error(conn, '/error/41')
+                return re_error(conn, 41)
             
             if edit_req_mode == 0:
                 # 진짜 기록 부분
@@ -226,7 +226,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
         
                 curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
                 for scan_user in curs.fetchall():
-                    add_alarm(conn, scan_user[0], ip, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
+                    add_alarm(scan_user[0], ip, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
                         
                 history_plus(conn, 
                     name,
@@ -255,7 +255,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
                 curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
                 for scan_user in curs.fetchall():
-                    add_alarm(conn, scan_user[0], ip, '<a href="/edit_request/' + url_pas(name) + '">' + html.escape(name) + '</a> edit_request')
+                    add_alarm(scan_user[0], ip, '<a href="/edit_request/' + url_pas(name) + '">' + html.escape(name) + '</a> edit_request')
             
                 return redirect(conn, '/edit_request_from/' + url_pas(name))
         else:

@@ -108,7 +108,7 @@ def user_setting_skin_set_main():
 
         ip = ip_check()
         if ban_check(ip)[0] == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
             
         set_list = user_setting_skin_set_main_set_list(conn)
         use_cookie = ['main_css_darkmode']

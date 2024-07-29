@@ -56,14 +56,14 @@ def login_find_email_check(tool):
                         for i in re_set_list:
                             flask.session.pop(i, None)
         
-                        return re_error(conn, '/error/8')
+                        return re_error(conn, 8)
                 
                     curs.execute(db_change("select id from user_set where id = ? and name = 'application'"), [flask.session['c_id']])
                     if curs.fetchall():
                         for i in re_set_list:
                             flask.session.pop(i, None)
         
-                        return re_error(conn, '/error/8')
+                        return re_error(conn, 8)
         
                     curs.execute(db_change('select data from other where name = "requires_approval"'))
                     requires_approval = curs.fetchall()

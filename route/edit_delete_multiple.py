@@ -5,17 +5,17 @@ from .edit_delete import edit_delete
 def edit_delete_multiple():
     with get_db_connect() as conn:
         if acl_check('', 'acl_auth', '', '') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
 
         if flask.request.method == 'POST':
             send = flask.request.form.get('send', '')
             agree = flask.request.form.get('copyright_agreement', '')
             
             if do_edit_send_check(conn, send) == 1:
-                return re_error(conn, '/error/37')
+                return re_error(conn, 37)
             
             if do_edit_text_bottom_check_box_check(conn, agree) == 1:
-                return re_error(conn, '/error/29')
+                return re_error(conn, 29)
             
             all_title = re.findall(r'([^\n]+)\n', flask.request.form.get('content', '').replace('\r', '') + '\n')
             for name in all_title:

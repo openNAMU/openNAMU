@@ -5,7 +5,7 @@ function w_set_reset() {
     lang_data.append('data', 'reset end');
 
     fetch('/api/lang', {
-        method : 'post',
+        method : 'POST',
         body : lang_data,
     }).then(function(res) {
         return res.json();

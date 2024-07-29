@@ -15,11 +15,11 @@ def login_login_2fa_email_2():
             return redirect(conn, '/user')
 
         if ban_check(None, 'login')[0] == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
 
         if flask.request.method == 'POST':
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, '/error/13')
+                return re_error(conn, 13)
 
             user_agent = flask.request.headers.get('User-Agent', '')
             user_id = flask.session['b_id']
@@ -34,7 +34,7 @@ def login_login_2fa_email_2():
 
                 pw_check_d = pw_check(conn, user_pw, user_1, user_2, user_id)
                 if pw_check_d != 1:
-                    return re_error(conn, '/error/10')
+                    return re_error(conn, 10)
 
             flask.session['id'] = user_id
 

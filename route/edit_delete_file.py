@@ -5,7 +5,7 @@ from .edit_delete import edit_delete
 def edit_delete_file(name = 'test.jpg'):
     with get_db_connect() as conn:
         if acl_check('', 'owner_auth', '', '') != 0:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
 
         mime_type = re.search(r'([^.]+)$', name)
         mime_type_str = 'jpg'

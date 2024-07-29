@@ -1,11 +1,11 @@
 from .tool.func import *
 
 from .api_bbs_w_post import api_bbs_w_post
-from .api_bbs_w_comment_one import api_bbs_w_comment_one
+from .go_api_bbs_w_comment_one import api_bbs_w_comment_one
 
 from .edit import edit_editor
 
-def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
+async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -19,17 +19,17 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
             return redirect(conn, '/bbs/main')
         
         if comment_num != '':
-            temp_dict = orjson.loads(api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num).data)
+            temp_dict = orjson.loads((await api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num)).get_data(as_text = True))
             if 'comment_user_id' in temp_dict:
                 if not temp_dict['comment_user_id'] == ip and acl_check('', 'owner_auth', '', '') == 1:
-                    return re_error(conn, '/ban')
+                    return re_error(conn, 0)
             else:
                 return redirect(conn, '/bbs/main')
         elif post_num != '':
             temp_dict = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
             if 'user_id' in temp_dict:
                 if not temp_dict['user_id'] == ip and acl_check('', 'owner_auth', '', '') == 1:
-                    return re_error(conn, '/ban')
+                    return re_error(conn, 0)
             else:
                 return redirect(conn, '/bbs/main')
             
@@ -40,7 +40,7 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
 
         if flask.request.method == 'POST':
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, '/error/13')
+                return re_error(conn, 13)
         
             if post_num == '':
                 curs.execute(db_change('select set_code from bbs_data where set_name = "title" and set_id = ? order by set_code + 0 desc'), [bbs_num_str])
@@ -57,10 +57,10 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                 return redirect(conn, '/bbs/in/' + bbs_num_str)
             
             if do_edit_filter(conn, title) == 1:
-                return re_error(conn, '/error/21')
+                return re_error(conn, 21)
 
             if do_edit_filter(conn, data) == 1:
-                return re_error(conn, '/error/21')
+                return re_error(conn, 21)
             
             date = get_time()
 
@@ -92,7 +92,7 @@ def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
             option_display = ''
 
             if comment_num != '':
-                temp_dict = orjson.loads(api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num).data)
+                temp_dict = orjson.loads((await api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num)).get_data(as_text = True))
 
                 title = ''
                 data = temp_dict['comment']

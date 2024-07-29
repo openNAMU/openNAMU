@@ -5,7 +5,7 @@ def main_setting_phrase():
         curs = conn.cursor()
 
         if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
         
         i_list = [
             'contract',

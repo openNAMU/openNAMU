@@ -5,7 +5,7 @@ function opennamu_main_sys_restart() {
     lang_data.append('data', 'restart');
     
     fetch('/api/lang', {
-        method : 'post',
+        method : 'POST',
         body : lang_data,
     }).then(function(res) {
         return res.json();
@@ -16,10 +16,10 @@ function opennamu_main_sys_restart() {
 
         document.getElementById('opennamu_main_sys_restart_button').addEventListener('click', function() {
             fetch('/restart', {
-                method: 'post'
-            }).catch(function(e) {
-                window.location.href = '/';
+                method : 'POST'
             });
+
+            window.location.href = '/';
         });
     });
 }

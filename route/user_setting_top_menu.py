@@ -6,7 +6,7 @@ def user_setting_top_menu():
 
         ip = ip_check()
         if ban_check(ip)[0] == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
 
         if ip_or_user(ip) == 1:
             return redirect(conn, '/login')

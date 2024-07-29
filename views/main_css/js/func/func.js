@@ -186,14 +186,8 @@ function opennamu_cookie_split_regex(data) {
     return new RegExp('(?:^|; )' + data + '=([^;]*)');
 }
 
-function opennamu_get_main_skin_set(set_name) {
-    return fetch("/api/setting/" + opennamu_do_url_encode(set_name)).then(function(res) {
-        return res.json();
-    });
-}
-
 function opennamu_send_render(data) {
-    if(data == '&lt;br&gt;' || data == '' || data.match(/^ +$/)) {
+    if(data === '&lt;br&gt;' || data === '' || data.match(/^ +$/)) {
         data = '<br>';
     } else {
         data = data.replace(/( |^)(https?:\/\/(?:[^ ]+))/g, function(m0, m1, m2) {
@@ -274,8 +268,20 @@ function opennamu_page_control(url, page, data_length, data_length_max = 50) {
     return (back() + ' ' + next()).replace(/^ /, '');
 }
 
-function openamu_make_list(left = '', right = '', bottom = '') {
-    let data_html = '<div class="opennamu_recent_change">';
+function opennamu_list_hidden_remove() {
+    const style = document.querySelector('#opennamu_list_hidden_style');
+    if(style !== null) {
+        if(style.innerHTML !== "") {
+            style.innerHTML = '';
+        } else {
+            style.innerHTML = '.opennamu_list_hidden { display: none; }';
+        }
+    }
+}
+
+function opennamu_make_list(left = '', right = '', bottom = '', class_name = '') {
+    let data_html = '<span class="' + class_name + '">';
+    data_html += '<div class="opennamu_recent_change">';
     data_html += left;
     
     data_html += '<div style="float: right;">';
@@ -291,6 +297,7 @@ function openamu_make_list(left = '', right = '', bottom = '') {
 
     data_html += '</div>';
     data_html += '<hr class="main_hr">';
+    data_html += '</span>';
 
     return data_html;
 }

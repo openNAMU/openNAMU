@@ -45,21 +45,20 @@ def view_set(name = 'Test', multiple = False):
             else:
                 check_data = ''
 
-            user_data = re.search(r'^user:(.+)$', name)
+            need_admin = True
+
+            user_data = re.search(r'^user:([^/]+)', name)
             if user_data:
-                if check_data and ip_or_user(ip) != 0:
+                if ip_or_user(ip) != 0:
                     return redirect(conn, '/login')
 
-                if user_data.group(1) != ip:
-                    if acl_check(tool = 'acl_auth') == 1:
-                        if check_data:
-                            return re_error(conn, '/error/3')
-                        else:
-                            check_ok = 'disabled'
-            else:
+                if user_data.group(1) == ip:
+                    need_admin = False
+            
+            if need_admin:
                 if acl_check(tool = 'acl_auth') == 1:
-                    if check_data:
-                        return re_error(conn, '/error/3')
+                    if flask.request.method == 'POST':
+                        return re_error(conn, 3)
                     else:
                         check_ok = 'disabled'
 
@@ -129,7 +128,8 @@ def view_set(name = 'Test', multiple = False):
                 curs.execute(db_change("delete from data_set where doc_name = ? and set_name = 'document_editor_top'"), [name])
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_editor_top', ?)"), [name, document_editor_top])
 
-            acl_check(tool = 'acl_auth', memo = check_data)
+            if need_admin:
+                acl_check(tool = 'acl_auth', memo = check_data)
 
             history_plus(conn, 
                 name,
@@ -144,21 +144,16 @@ def view_set(name = 'Test', multiple = False):
             return redirect(conn, '/acl/' + url_pas(name))
         else:
             data = '<h2>' + get_lang(conn, 'acl') + '</h2>'
-            acl_list = get_acl_list('user') if re.search(r'^user:', name) else get_acl_list()
-            if not re.search(r'^user:', name):
-                acl_get_list = [
-                    [get_lang(conn, 'view_acl'), 'view', '3'],
-                    [get_lang(conn, 'document_acl'), 'decu', '4'],
-                    [get_lang(conn, 'document_edit_acl'), 'document_edit_acl', '5'],
-                    [get_lang(conn, 'document_edit_request_acl'), 'document_edit_request_acl', '5'],
-                    [get_lang(conn, 'document_move_acl'), 'document_move_acl', '5'],
-                    [get_lang(conn, 'document_delete_acl'), 'document_delete_acl', '5'],
-                    [get_lang(conn, 'discussion_acl'), 'dis', '3'],
-                ]
-            else:
-                acl_get_list = [
-                    [get_lang(conn, 'document_acl'), 'decu', '2']
-                ]
+            acl_list = get_acl_list()
+            acl_get_list = [
+                [get_lang(conn, 'view_acl'), 'view', '3'],
+                [get_lang(conn, 'document_acl'), 'decu', '4'],
+                [get_lang(conn, 'document_edit_acl'), 'document_edit_acl', '5'],
+                [get_lang(conn, 'document_edit_request_acl'), 'document_edit_request_acl', '5'],
+                [get_lang(conn, 'document_move_acl'), 'document_move_acl', '5'],
+                [get_lang(conn, 'document_delete_acl'), 'document_delete_acl', '5'],
+                [get_lang(conn, 'discussion_acl'), 'dis', '3'],
+            ]
 
             for i in acl_get_list:
                 data += '' + \
@@ -263,8 +258,6 @@ def view_set(name = 'Test', multiple = False):
                 data = '''
                     <form method="post">
                         <script defer src="/views/main_css/js/route/w_set.js''' + cache_v() + '''"></script>
-                        <a href="/setting/acl">(''' + get_lang(conn, 'main_acl_setting') + ''')</a>
-                        <hr class="main_hr">
                         ''' + text_area + '''
                         ''' + render_simple_set(conn, data) + '''
                         ''' + save_button + '''

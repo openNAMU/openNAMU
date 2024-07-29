@@ -10,46 +10,33 @@ function do_insert_user_info() {
             let lang_data = data["language"];
 
             let get_data_auth = data['data']['auth'];
-            if(get_data_auth === '0') {
-                get_data_auth = lang_data['ip'];
-            } else if(get_data_auth === '1') {
-                get_data_auth = lang_data['member'];
-            } else {
-                get_data_auth = data['data']['auth'];
-            }
-
             let get_data_auth_date = data['data']['auth_date'];
             if(get_data_auth_date !== '0') {
-                get_data_auth += ' (~' + get_data_auth_date + ')'
+                get_data_auth += ' (~' + get_data_auth_date + ')';
             }
             
             let get_data_ban = data['data']['ban'];
+            let ban_state = '';
+            
             if(get_data_ban === '0') {
-                get_data_ban = lang_data['normal'];
+                ban_state = lang_data['normal'];
             } else {
-                get_data_ban = lang_data['ban'];
-                get_data_ban += '<br>';
-                
-                get_data_ban += lang_data['period'] + ' : ';
-                if(!data['data']['ban']['period']) {
-                    if(get_data_auth_date !== '0') {
-                        get_data_ban += '~ ' + get_data_auth_date;
-                    } else {
-                        get_data_ban += '~ ' + lang_data['limitless']; 
-                    }
-                } else if(data['data']['ban']['period'] === '0') {
-                    get_data_ban += '~ ' + lang_data['limitless']; 
+                let get_ban_do_type = get_data_ban[1].replace(/[a-zA-Z]/g, '');
+                let get_ban_range_type = get_data_ban[1].replace(/[0-9]/g, '');
+
+                if(get_ban_range_type === 'a') {
+                    ban_state = '<a href="/recent_block/regex">' + lang_data['ban'] + '</a>';
+                } else if(get_ban_range_type === 'b') {
+                    ban_state = '<a href="/recent_block/cidr">' + lang_data['ban'] + '</a>';
+                } else if(get_ban_range_type === 'c') {
+                    ban_state = data['data']['auth'];
                 } else {
-                    get_data_ban += '~ ' + data['data']['ban']['period'];
+                    ban_state = '<a href="/recent_block/user/' + opennamu_do_url_encode(name) + '">' + lang_data['ban'] + '</a>';
                 }
-                get_data_ban += '<br>';
-                
-                if(data['data']['ban']['reason'] === 'edit filter') {
-                    get_data_ban += lang_data['why'] + ' : <a href="/edit_filter/' + opennamu_do_url_encode(name) + '">' + data['data']['ban']['reason'] + '</a>';
-                } else {
-                    if(data['data']['ban']['reason']) {
-                        get_data_ban += lang_data['why'] + ' : ' + data['data']['ban']['reason'];
-                    }
+
+                if(get_data_ban[1] !== '') {
+                    ban_state += '<br>'
+                    ban_state += lang_data['type'] + ' : ' + get_data_ban[1];
                 }
             }
             
@@ -65,7 +52,7 @@ function do_insert_user_info() {
                     '</tr>' +
                     '<tr>' +
                         '<td>' + lang_data['state'] + '</td>' +
-                        '<td>' + get_data_ban + '</td>' +
+                        '<td>' + ban_state + '</td>' +
                     '</tr>' +
                     '<tr>' +
                         '<td>' + lang_data['level'] + '</td>' +

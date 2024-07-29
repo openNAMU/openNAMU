@@ -21,8 +21,8 @@ func main() {
 		route_data = route.Api_func_sha224(call_arg[1:])
 	} else if call_arg[0] == "api_w_random" {
 		route_data = route.Api_w_random(call_arg[1:])
-	} else if call_arg[0] == "api_search" {
-		route_data = route.Api_search(call_arg[1:])
+	} else if call_arg[0] == "api_func_search" {
+		route_data = route.Api_func_search(call_arg[1:])
 	} else if call_arg[0] == "api_topic" {
 		route_data = route.Api_topic(call_arg[1:])
 	} else if call_arg[0] == "api_func_ip" {
@@ -55,8 +55,6 @@ func main() {
 		route_data = route.Api_list_old_page(call_arg[1:])
 	} else if call_arg[0] == "api_topic_list" {
 		route_data = route.Api_topic_list(call_arg[1:])
-	} else if call_arg[0] == "api_bbs_w_comment_n" {
-		route_data = route.Api_bbs_w_comment(call_arg[1:])
 	} else if call_arg[0] == "api_bbs_w_n" {
 		route_data = route.Api_bbs_w(call_arg[1:])
 	} else if call_arg[0] == "api_w_set_reset" {
@@ -79,8 +77,8 @@ func main() {
 		route_data = route.Api_func_ip_menu(call_arg[1:])
 	} else if call_arg[0] == "api_func_ip_post" {
 		route_data = route.Api_func_ip_post(call_arg[1:])
-	} else if call_arg[0] == "api_func_acl_list" {
-		route_data = route.Api_func_acl_list(call_arg[1:])
+	} else if call_arg[0] == "api_list_acl" {
+		route_data = route.Api_list_acl(call_arg[1:])
 	} else if call_arg[0] == "api_user_rankup" {
 		route_data = route.Api_user_rankup(call_arg[1:])
 	} else if call_arg[0] == "api_func_acl" {
@@ -89,6 +87,26 @@ func main() {
 		route_data = route.Api_func_ban(call_arg[1:])
 	} else if call_arg[0] == "api_func_auth_post" {
 		route_data = route.Api_func_auth_post(call_arg[1:])
+	} else if call_arg[0] == "api_give_auth_patch" {
+		route_data = route.Api_give_auth_patch(call_arg[1:])
+	} else if call_arg[0] == "api_list_auth" {
+		route_data = route.Api_list_auth(call_arg[1:])
+	} else if call_arg[0] == "api_w_page_view" {
+		route_data = route.Api_w_page_view(call_arg[1:])
+	} else if call_arg[0] == "api_bbs_w_comment_one" {
+		route_data = route.Api_bbs_w_comment_one(call_arg[1:])
+	} else if call_arg[0] == "api_bbs_w_comment" {
+		route_data = route.Api_bbs_w_comment(call_arg[1:])
+	} else if call_arg[0] == "api_list_history" {
+		route_data = route.Api_list_history(call_arg[1:])
+	} else if call_arg[0] == "api_list_markup" {
+		route_data = route.Api_list_markup(call_arg[1:])
+	} else if call_arg[0] == "api_bbs_w_set" {
+		route_data = route.Api_bbs_w_set(call_arg[1:])
+	} else if call_arg[0] == "api_bbs_w_set_put" {
+		route_data = route.Api_bbs_w_set_put(call_arg[1:])
+	} else if call_arg[0] == "api_func_alarm_post" {
+		route_data = route.Api_func_alarm_post(call_arg[1:])
 	} else {
 		log.Fatal(call_arg[0] + " is 404")
 	}

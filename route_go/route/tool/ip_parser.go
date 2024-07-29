@@ -88,7 +88,7 @@ func IP_preprocess(db *sql.DB, ip string, my_ip string) []string {
 		}
 	}
 
-	if Get_user_auth(db, my_ip) != "" {
+	if Check_acl(db, "", "", "view_hide_user_name", my_ip) {
 		ip_view = ""
 		user_name_view = ""
 	}
@@ -199,8 +199,8 @@ func IP_menu(db *sql.DB, ip string, my_ip string, option string) map[string][][]
 		}
 	}
 
-	auth_name := Get_user_auth(db, my_ip)
-	if auth_name != "" {
+	auth_name := Check_acl(db, "", "", "ban_auth", my_ip)
+	if auth_name {
 		menu[Get_language(db, "admin", false)] = [][]string{
 			{"/auth/ban/" + Url_parser(ip), Get_language(db, "ban", false)},
 			{"/list/user/check_submit/" + Url_parser(ip), Get_language(db, "check", false)},
@@ -234,10 +234,6 @@ func Get_user_ban_type(ban_type string) string {
 }
 
 func Get_user_ban(db *sql.DB, ip string, tool string) []string {
-	if Get_user_auth(db, ip) != "" {
-		return []string{"", ""}
-	}
-
 	rows, err := db.Query(DB_change("select login, block from rb where band = 'regex' and ongoing = '1'"))
 	if err != nil {
 		log.Fatal(err)
@@ -410,7 +406,7 @@ func IP_parser(db *sql.DB, ip string, my_ip string) string {
 				}
 			}
 
-			if Get_user_auth(db, raw_ip) != "" {
+			if Check_acl(db, "", "", "user_name_bold", raw_ip) {
 				ip = "<b>" + ip + "</b>"
 			}
 

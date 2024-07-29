@@ -16,6 +16,10 @@ def filter_all(tool):
         admin = acl_check(tool = 'owner_auth')
         admin = 1 if admin == 0 else 0
 
+        if tool == 'edit_filter':
+            if acl_check('', 'edit_filter_view', '', '') == 1:
+                return re_error(conn, 0)
+
         if tool == 'inter_wiki':
             title = get_lang(conn, 'interwiki_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'inter_wiki'"))

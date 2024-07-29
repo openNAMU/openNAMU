@@ -10,7 +10,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-func Api_search(call_arg []string) string {
+func Api_func_search(call_arg []string) string {
 	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 	other_set := map[string]string{}

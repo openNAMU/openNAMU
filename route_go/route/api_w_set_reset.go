@@ -18,10 +18,8 @@ func Api_w_set_reset(call_arg []string) string {
 
 	doc_name := other_set["name"]
 	ip := other_set["ip"]
-	auth_name := tool.Get_user_auth(db, ip)
-	auth_info := tool.Get_auth_group_info(db, auth_name)
 
-	if auth_info["owner"] {
+	if tool.Check_acl(db, "", "", "owner_auth", ip) {
 		stmt, err := db.Prepare(tool.DB_change("delete from acl where title = ?"))
 		if err != nil {
 			log.Fatal(err)

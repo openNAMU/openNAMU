@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"log"
 	"opennamu/route/tool"
 
@@ -36,10 +37,7 @@ func Api_setting(call_arg []string) string {
 
 	if val, ok := setting_acl[other_set["set_name"]]; ok {
 		if val != "" {
-			auth_name := tool.Get_user_auth(db, other_set["ip"])
-			auth_info := tool.Get_auth_group_info(db, auth_name)
-
-			if _, ok := auth_info["owner"]; !ok {
+			if tool.Check_acl(db, "", "", "owner_auth", other_set["ip"]) {
 				return_data := make(map[string]interface{})
 				return_data["response"] = "require auth"
 
@@ -48,16 +46,37 @@ func Api_setting(call_arg []string) string {
 			}
 		}
 
-		stmt, err := db.Prepare(tool.DB_change("select data, coverage from other where name = ? and coverage = ?"))
-		if err != nil {
-			log.Fatal(err)
+		data_coverage := ""
+		if val, ok := other_set["coverage"]; ok {
+			data_coverage = val
 		}
 
-		defer stmt.Close()
+		var rows *sql.Rows
 
-		rows, err := stmt.Query(other_set["set_name"], val)
-		if err != nil {
-			log.Fatal(err)
+		if data_coverage != "" {
+			stmt, err := db.Prepare(tool.DB_change("select data, coverage from other where name = ? and coverage = ?"))
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			defer stmt.Close()
+
+			rows, err = stmt.Query(other_set["set_name"], data_coverage)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			stmt, err := db.Prepare(tool.DB_change("select data, coverage from other where name = ?"))
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			defer stmt.Close()
+
+			rows, err = stmt.Query(other_set["set_name"])
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 		defer rows.Close()
 

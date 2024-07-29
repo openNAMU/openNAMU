@@ -38,10 +38,10 @@ def login_register_email_2():
 
             curs.execute(db_change('select id from user_set where name = "email" and data = ?'), [user_email])
             if curs.fetchall():
-                return re_error(conn, '/error/35')
+                return re_error(conn, 35)
 
             if send_email(conn, user_email, t_text, i_text) == 0:
-                return re_error(conn, '/error/18')
+                return re_error(conn, 18)
 
             flask.session['reg_email'] = user_email
 

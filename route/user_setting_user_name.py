@@ -7,7 +7,7 @@ def user_setting_user_name(user_name = ''):
         ip = ip_check()
         if user_name != '':
             if acl_check('', 'owner_auth', '', '') == 1:
-                return re_error(conn, '/error/3')
+                return re_error(conn, 3)
             else:
                 ip = user_name
     
@@ -15,7 +15,7 @@ def user_setting_user_name(user_name = ''):
             if flask.request.method == 'POST':
                 auto_data = ['user_name', flask.request.form.get('new_user_name', '')]
                 if do_user_name_check(conn, auto_data[1]) == 1:
-                    return re_error(conn, '/error/8')
+                    return re_error(conn, 8)
 
                 curs.execute(db_change('select data from user_set where name = ? and id = ?'), [auto_data[0], ip])
                 if curs.fetchall():

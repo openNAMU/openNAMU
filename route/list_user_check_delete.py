@@ -5,7 +5,7 @@ def list_user_check_delete(name = None, ip = None, time = None, do_type = 1):
         curs = conn.cursor()
 
         if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, '/error/4')
+            return re_error(conn, 4)
 
         user_id = name
         user_ip = ip

@@ -7,7 +7,7 @@ def main_setting_skin_set():
         curs = conn.cursor()
 
         if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
             
         set_list = user_setting_skin_set_main_set_list(conn)
 

@@ -5,7 +5,7 @@ def login_find_key():
         curs = conn.cursor()
         if flask.request.method == 'POST':
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, '/error/13')
+                return re_error(conn, 13)
             
             input_key = flask.request.form.get('key', '')
             curs.execute(db_change('select id from user_set where name = "random_key" and data = ?'), [input_key])

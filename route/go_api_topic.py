@@ -7,7 +7,7 @@ def api_topic_thread_make(user_id, date, data, code, color = '', blind = '', add
         else:
             color_b = 'opennamu_comment_blind_admin'
 
-        class_b = 'opennamu_comment_blind_js'
+        class_b = 'opennamu_comment_blind_js opennamu_list_hidden'
     else:
         color_b = 'opennamu_comment_blind_not'
         class_b = ''
@@ -79,12 +79,12 @@ def api_topic_thread_pre_render(conn, data, num, ip, topic_num = '', name = '', 
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
                 if do_type == 'thread':
-                    add_alarm(conn, ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                    add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
                 else:
                     set_id = topic_num.split('-')
                     set_id = ['', ''] if len(set_id) < 2 else set_id
 
-                    add_alarm(conn, ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                    add_alarm(ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
 
             data = re.sub(call_thread_regex, rd_data[0] + '<topic_a_' + do_type + '>#' + view_data + '</topic_a_' + do_type + '>' + rd_data[3], data, 1)
 
@@ -109,10 +109,10 @@ def api_topic_thread_pre_render(conn, data, num, ip, topic_num = '', name = '', 
 
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
                 if do_type == 'thread':
-                    add_alarm(conn, ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                    add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
                 else:
                     set_id = topic_num.split('-')
-                    add_alarm(conn, ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                    add_alarm(ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
 
             data = re.sub(call_user_regex, rd_data[0] + '<topic_call>@' + rd_data[1] + '</topic_call>' + rd_data[2], data, 1)
 

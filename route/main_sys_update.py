@@ -8,7 +8,7 @@ def main_sys_update():
         curs = conn.cursor()
 
         if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, '/error/3')
+            return re_error(conn, 3)
 
         if flask.request.method == 'POST':
             acl_check(tool = 'owner_auth', memo = 'update')
@@ -50,7 +50,7 @@ def main_sys_update():
             
             print('Error : update failed')
 
-            return re_error(conn, '/error/34')
+            return re_error(conn, 34)
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
                 imp = [get_lang(conn, 'update'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],

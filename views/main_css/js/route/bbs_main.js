@@ -69,7 +69,7 @@ function opennamu_bbs_main() {
             document.getElementById('opennamu_bbs_main').innerHTML = data_html;
 
             for(let for_a = 0; for_a < data.length; for_a++) {
-                fetch('/api/v2/bbs/w/comment/' + data[for_a]['set_id'] + '/' + data[for_a]['set_code'] + '/length').then(function(res) {
+                fetch('/api/v2/bbs/w/comment/' + data[for_a]['set_id'] + '-' + data[for_a]['set_code'] + '/length').then(function(res) {
                     return res.json();
                 }).then(function(comment_data) {
                     if(comment_data) {

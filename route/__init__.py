@@ -1,11 +1,8 @@
 from route.api_image_view import api_image_view
-from route.api_setting import api_setting
 from route.api_skin_info import api_skin_info
 from route.api_user_info import api_user_info
 from route.api_version import api_version
 from route.api_bbs_w_post import api_bbs_w_post
-from route.api_bbs_w_comment import api_bbs_w_comment
-from route.api_bbs_w_comment_one import api_bbs_w_comment_one
 
 from route.bbs_w_edit import bbs_w_edit
 from route.bbs_make import bbs_make
@@ -16,7 +13,6 @@ from route.bbs_w import bbs_w
 from route.bbs_delete import bbs_delete
 # from route.bbs_hide import bbs_hide
 from route.bbs_w_post import bbs_w_post
-from route.bbs_w_set import bbs_w_set
 from route.bbs_w_comment_tool import bbs_w_comment_tool
 from route.bbs_w_tool import bbs_w_tool
 
@@ -35,7 +31,6 @@ from route.filter_all_add import filter_all_add
 from route.filter_all_delete import filter_all_delete
 
 from route.give_admin_groups import give_admin_groups
-from route.give_auth import give_auth
 from route.give_delete_admin_group import give_delete_admin_group_2
 from route.give_user_ban import give_user_ban
 from route.give_user_fix import give_user_fix
@@ -74,7 +69,6 @@ from route.main_search_deep import main_search_deep
 from route.main_search_goto import main_search_goto
 
 from route.main_setting import main_setting
-from route.main_setting_acl import main_setting_acl
 from route.main_setting_external import main_setting_external
 from route.main_setting_head import main_setting_head
 from route.main_setting_main import main_setting_main
@@ -166,9 +160,7 @@ from route.n_list_recent_discuss import list_recent_discuss
 from route.n_list_recent_block import list_recent_block
 from route.n_list_old_page import list_old_page
 from route.n_list_user_check_submit import list_user_check_submit
-
-from route.n_bbs_in import bbs_in
-from route.n_bbs_set import bbs_set
+from route.n_list_history import list_history
 
 from route.n_w_watch_list import w_watch_list
 
@@ -176,9 +168,13 @@ from route.n_user_rankup import user_rankup
 
 from route.n_topic_list import topic_list
 
+from route.n_give_auth import give_auth
+
 from route.n_setting_404_page import setting_404_page
 
 from route.n_bbs_main import bbs_main
+from route.n_bbs_in import bbs_in
+from route.n_bbs_w_set import bbs_w_set
 
 from route.n_edit_move_all import edit_move_all
 
@@ -188,9 +184,10 @@ from route.go_api_func_sha224 import api_func_sha224
 from route.go_api_func_ip import api_func_ip
 from route.go_api_func_ip_menu import api_func_ip_menu
 from route.go_api_func_auth import api_func_auth
-from route.go_api_func_acl_list import api_func_acl_list
 
-from route.go_api_search import api_search
+from route.go_api_func_search import api_func_search
+
+from route.go_api_give_auth import api_give_auth
 
 from route.go_api_list_recent_change import api_list_recent_change
 from route.go_api_list_recent_discuss import api_list_recent_discuss
@@ -198,10 +195,16 @@ from route.go_api_list_recent_block import api_list_recent_block
 from route.go_api_list_recent_edit_request import api_list_recent_edit_request
 from route.go_api_list_old_page import api_list_old_page
 from route.go_api_list_title_index import api_list_title_index
+from route.go_api_list_acl import api_list_acl
+from route.go_api_list_auth import api_list_auth
+from route.go_api_list_markup import api_list_markup
+from route.go_api_list_history import api_list_history
 
 from route.go_api_bbs import api_bbs
 from route.go_api_bbs_list import api_bbs_list
-from route.go_api_bbs_w_comment import api_bbs_w_comment_n
+from route.go_api_bbs_w_set import api_bbs_w_set
+from route.go_api_bbs_w_comment import api_bbs_w_comment
+from route.go_api_bbs_w_comment_one import api_bbs_w_comment_one
 
 from route.go_api_setting import api_setting
 
@@ -217,5 +220,6 @@ from route.go_api_w_xref import api_w_xref
 from route.go_api_w_watch_list import api_w_watch_list
 from route.go_api_w_render import api_w_render
 from route.go_api_w_set_reset import api_w_set_reset
+from route.go_api_w_page_view import api_w_page_view
 
 from route.go_main_func_easter_egg import main_func_easter_egg

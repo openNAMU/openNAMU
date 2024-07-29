@@ -5,21 +5,21 @@ def edit_move(name):
         curs = conn.cursor()
 
         if acl_check(name, 'document_move') == 1:
-            return re_error(conn, '/ban')
+            return re_error(conn, 0)
         
         if do_title_length_check(conn, name) == 1:
-            return re_error(conn, '/error/38')
+            return re_error(conn, 38)
 
         if flask.request.method == 'POST':
             move_title = flask.request.form.get('title', 'test')
             if acl_check(move_title) == 1:
-                return re_error(conn, '/ban')
+                return re_error(conn, 0)
 
             if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, '/error/13')
+                return re_error(conn, 13)
 
             if do_edit_slow_check(conn) == 1:
-                return re_error(conn, '/error/24')
+                return re_error(conn, 24)
             
             send = flask.request.form.get('send', '')
             agree = flask.request.form.get('copyright_agreement', '')
@@ -34,10 +34,10 @@ def edit_move(name):
             document_set_option = flask.request.form.get('document_set_option', 'none')
             
             if do_edit_send_check(conn, send) == 1:
-                return re_error(conn, '/error/37')
+                return re_error(conn, 37)
             
             if do_edit_text_bottom_check_box_check(conn, agree) == 1:
-                return re_error(conn, '/error/29')
+                return re_error(conn, 29)
 
             # 역링크 관련 패치 해야할 듯
 
@@ -208,7 +208,7 @@ def edit_move(name):
             if has_error == 0:
                 return redirect(conn, '/w/' + url_pas(move_title))
             else:
-                return re_error(conn, '/error/19')
+                return re_error(conn, 19)
         else:
             owner_auth = acl_check(tool = 'owner_auth')
             owner_auth = 1 if owner_auth == 0 else 0
