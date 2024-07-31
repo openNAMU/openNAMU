@@ -5,7 +5,6 @@ flask[async]
 waitress
 
 requests
-orjson
 typing_extensions
 diff-match-patch
 

@@ -10,8 +10,12 @@ import os
 import html
 import sqlite3
 import time
-import orjson
 import threading
+
+try:
+  import orjson
+except:
+  import json as orjson
 
 def get_time():
     return str(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
