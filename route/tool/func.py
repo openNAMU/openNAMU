@@ -2,9 +2,9 @@
 import os
 import sys
 import platform
-import orjson
 import smtplib
 import shutil
+import json
 import datetime
 import ipaddress
 import subprocess
@@ -15,7 +15,7 @@ import email.header
 
 # Init-Version
 with open('version.json', encoding = 'utf8') as file_data:
-    version_list = orjson.loads(file_data.read())
+    version_list = json.loads(file_data.read())
 
 print('Version : ' + version_list['beta']['r_ver'])
 print('DB set version : ' + version_list['beta']['c_ver'])
