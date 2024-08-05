@@ -50,6 +50,8 @@
     "post_view_acl" : "Post view ACL",
     "post_comment_acl" : "Post comment ACL",
     "remove_hidden" : "Don't show hide content",
+    "link_count" : "Number of links",
+    "data_missing" : "No information",
 
     "_comment_" : "Common",
     "data" : "Data",
