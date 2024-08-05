@@ -45,6 +45,10 @@ func Get_date() string {
 	return time.Now().Format("2006-01-02")
 }
 
+func Get_month() string {
+	return time.Now().Format("2006-01")
+}
+
 func Get_setting(db *sql.DB, set_name string, data_coverage string) [][]string {
 	var rows *sql.Rows
 
