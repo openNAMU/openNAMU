@@ -46,7 +46,8 @@ def main_setting_main():
             43 : ['auth_history_expiration_date', ''],
             44 : ['auth_history_off', ''],
             45 : ['user_name_level', ''],
-            46 : ['load_ip_select', '']
+            46 : ['load_ip_select', ''],
+            47 : ['not_use_view_count', '']
         }
 
         if flask.request.method == 'POST':
@@ -89,7 +90,7 @@ def main_setting_main():
                 else:
                     tls_select += '<option value="' + tls_select_one + '">' + tls_select_one + '</option>'
 
-            check_box_div = [7, 8, '', 20, 23, 24, '', 26, 31, 33, 34, 35, 36, 37, 44, 45]
+            check_box_div = [7, 8, '', 20, 23, 24, '', 26, 31, 33, 34, 35, 36, 37, 44, 45, 47]
             for i in range(0, len(check_box_div)):
                 acl_num = check_box_div[i]
                 if acl_num != '' and d_list[acl_num]:
@@ -196,6 +197,9 @@ def main_setting_main():
                 <hr class="main_hr">
 
                 <input type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + get_lang(conn, 'display_level_in_user_name') + '''
+                <hr class="main_hr">
+
+                <input type="checkbox" name="not_use_view_count" ''' + check_box_div[16] + '''> ''' + get_lang(conn, 'not_use_view_count') + '''
                 <hr class="main_hr">
             '''
 

@@ -32,26 +32,18 @@ func Api_user_rankup(call_arg []string) string {
 
 	ip := other_set["ip"]
 	if !tool.IP_or_user(ip) {
-		inter_other_set := map[string]string{}
-		inter_other_set["set_name"] = "rankup_condition"
+		coverage := ""
 		if val, ok := other_set["rankup_name"]; ok {
-			inter_other_set["coverage"] = val
+			coverage = val
 		}
 
-		json_data, _ := json.Marshal(inter_other_set)
-		return_data := Api_setting([]string{string(json_data)})
-
-		return_data_api := make(map[string]interface{})
-		json.Unmarshal([]byte(return_data), &return_data_api)
+		return_data_api := tool.Get_setting(db, "rankup_condition", coverage)
 
 		end_data := make(map[string]interface{})
-		response := return_data_api["response"].(string)
-		if response != "not exist" {
-			return_data_arr := return_data_api["data"].([][]string)
-
-			for k := range return_data_arr {
-				rank_name := string(return_data_arr[k][0])
-				rank_data := string(return_data_arr[k][1])
+		if len(return_data_api) != 0 {
+			for k := range return_data_api {
+				rank_name := string(return_data_api[k][0])
+				rank_data := string(return_data_api[k][1])
 
 				split_data := strings.Split(rank_data, " ")
 				if len(split_data) == 2 {

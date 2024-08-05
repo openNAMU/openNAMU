@@ -52,6 +52,7 @@
     "remove_hidden" : "Don't show hide content",
     "link_count" : "Number of links",
     "data_missing" : "No information",
+    "not_use_view_count" : "Disable page view",
 
     "_comment_" : "Common",
     "data" : "Data",
