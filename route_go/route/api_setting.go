@@ -1,8 +1,6 @@
 package route
 
 import (
-	"database/sql"
-	"log"
 	"opennamu/route/tool"
 
 	jsoniter "github.com/json-iterator/go"
@@ -51,52 +49,9 @@ func Api_setting(call_arg []string) string {
 			data_coverage = val
 		}
 
-		var rows *sql.Rows
-
-		if data_coverage != "" {
-			stmt, err := db.Prepare(tool.DB_change("select data, coverage from other where name = ? and coverage = ?"))
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			defer stmt.Close()
-
-			rows, err = stmt.Query(other_set["set_name"], data_coverage)
-			if err != nil {
-				log.Fatal(err)
-			}
-		} else {
-			stmt, err := db.Prepare(tool.DB_change("select data, coverage from other where name = ?"))
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			defer stmt.Close()
-
-			rows, err = stmt.Query(other_set["set_name"])
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-		defer rows.Close()
-
-		data_list := [][]string{}
-
-		for rows.Next() {
-			var set_data string
-			var set_coverage string
-
-			err := rows.Scan(&set_data, &set_coverage)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			data_list = append(data_list, []string{set_data, set_coverage})
-		}
-
 		return_data := make(map[string]interface{})
 		return_data["response"] = "ok"
-		return_data["data"] = data_list
+		return_data["data"] = tool.Get_setting(db, other_set["set_name"], data_coverage)
 
 		json_data, _ := json.Marshal(return_data)
 		return string(json_data)

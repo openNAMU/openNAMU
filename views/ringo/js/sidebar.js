@@ -1,3 +1,5 @@
+"use strict";
+
 // func
 function ringo_do_xss_encode(data) {
     data = data.replace(/'/g, '&#x27;');
@@ -14,10 +16,10 @@ function ringo_do_url_encode(data) {
 
 // event
 function ringo_do_side_button_1() {
-    fetch("/api/recent_change/10").then(function(res) {
-        return res.json();
-    }).then(function(text) {
-        if(temp_save[0] === '') {
+    if(temp_save[0] === '') {
+        fetch("/api/recent_change/10").then(function(res) {
+            return res.json();
+        }).then(function(text) {
             let data = '';
             for(let for_a = 0; for_a < text.length; for_a++) {
                 if(text[for_a][6] === '') {
@@ -28,19 +30,19 @@ function ringo_do_side_button_1() {
 
             document.getElementById('side_content').innerHTML = data;
             temp_save[0] = data;
-        } else {
-            document.getElementById('side_content').innerHTML = temp_save[0];
-        }
-    }).catch(function(error) {
-        document.getElementById('side_content').innerHTML = 'Error';
-    });
+        }).catch(function(error) {
+            document.getElementById('side_content').innerHTML = 'Error';
+        });
+    } else {
+        document.getElementById('side_content').innerHTML = temp_save[0];
+    }
 }
 
 function ringo_do_side_button_2() {
-    fetch("/api/recent_discuss/10").then(function(res) {
-        return res.json();
-    }).then(function(text) {
-        if(temp_save[1] === '') {
+    if(temp_save[1] === '') {
+        fetch("/api/recent_discuss/10").then(function(res) {
+            return res.json();
+        }).then(function(text) {
             let data = '';
             for(let for_a = 0; for_a < text.length; for_a++) {
                 data += '<a href="/thread/' + ringo_do_url_encode(text[for_a][3]) + '">' + ringo_do_xss_encode(text[for_a][1]) + '</a><br>';
@@ -49,50 +51,43 @@ function ringo_do_side_button_2() {
 
             document.getElementById('side_content').innerHTML = data;
             temp_save[1] = data;
-        } else {
-            document.getElementById('side_content').innerHTML = temp_save[1];
-        }
-    }).catch(function(error) {
-        document.getElementById('side_content').innerHTML = 'Error';
-    });
+        }).catch(function(error) {
+            document.getElementById('side_content').innerHTML = 'Error';
+        });
+    } else {
+        document.getElementById('side_content').innerHTML = temp_save[1];
+    }
 }
 
 function ringo_do_side_button_3() {
     if(temp_save[2] === '') {
-        if(document.getElementsByClassName('opennamu_TOC').length > 0) {
-            temp_save[2] = document.getElementsByClassName('opennamu_TOC')[0].innerHTML;
-            document.getElementById('side_content').innerHTML = temp_save[2];
-        }
+        fetch("/api/v2/bbs/main").then(function(res) {
+            return res.json();
+        }).then(function(data) {
+            let end_data = '';
+
+            let text = data['data'];
+            for(let for_a = 0; for_a < text.length; for_a++) {
+                end_data += '<a href="/bbs/w/' + text[for_a].set_id + '/' + text[for_a].set_code + '">' + ringo_do_xss_encode(text[for_a].title) + '</a><br>';
+                end_data += text[for_a].date + ' | ' + text[for_a].user_id +'<br>';
+            }
+
+            document.getElementById('side_content').innerHTML = end_data;
+            temp_save[2] = end_data;
+        });
     } else {
         document.getElementById('side_content').innerHTML = temp_save[2];
     }
 }
 
-function ringo_do_side_button_4() {
-    if(temp_save[3] === '') {
-        if(document.getElementsByClassName('opennamu_footnote').length > 0) {
-            let data = '';
-            for(let for_a = 0; for_a < document.getElementsByClassName('opennamu_footnote').length; for_a++) {
-                data += document.getElementsByClassName('opennamu_footnote')[for_a].innerHTML + '<br>';
-            }
-
-            document.getElementById('side_content').innerHTML = data;
-            temp_save[3] = data;
-        }
-    } else {
-        document.getElementById('side_content').innerHTML = temp_save[3];
-    }
-}
-
 // init
-let temp_save = ['', '', '', ''];
+let temp_save = ['', '', ''];
 
 window.addEventListener('DOMContentLoaded', function() {
     if(document.getElementById("side_button_1")) {
         document.getElementById("side_button_1").addEventListener("click", ringo_do_side_button_1);
         document.getElementById("side_button_2").addEventListener("click", ringo_do_side_button_2);
         document.getElementById("side_button_3").addEventListener("click", ringo_do_side_button_3);
-        document.getElementById("side_button_4").addEventListener("click", ringo_do_side_button_4);
 
         ringo_do_side_button_1();
     }

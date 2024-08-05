@@ -1,3 +1,5 @@
+"use strict";
+
 function ringo_do_regex_data(data) {
     return new RegExp('(?:^|; )' + data + '=([^;]*)');
 }

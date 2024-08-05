@@ -214,7 +214,7 @@ aside {
 }
 
 aside button {
-    width: 25%;
+    width: 33.33%;
 }
 
 aside .side_button {
@@ -235,10 +235,6 @@ aside .side_button:hover {
 
 #side_button_2 {
     border-left: 0;
-    border-right: 0;
-}
-
-#side_button_3 {
     border-right: 0;
 }
 
