@@ -695,5 +695,8 @@
     "edit_filter_view_authority" : "편집 필터 보기 권한",
     "post_view_acl" : "게시글 보기 ACL",
     "post_comment_acl" : "게시글 댓글 ACL",
-    "remove_hidden": "숨겨진 내용 보이지 않기"
+    "remove_hidden": "숨겨진 내용 보이지 않기",
+    "link_count" : "링크 갯수",
+    "data_missing" : "정보 없음",
+    "not_use_view_count" : "조회수 기능 사용 안함"
 }

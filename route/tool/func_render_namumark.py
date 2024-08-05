@@ -2360,7 +2360,10 @@ class class_do_render_namumark:
         def do_render_last_toc_filter(match):
             data = match.group(1).split(' ')
             if data[0] == 'a' or data[0] == '/a':
-                return '<' + match[1] + '>'
+                if len(data) > 3 and data[3] != 'href="javascript:void(0);"':
+                    return '<' + match[1] + '>'
+                else:
+                    return ''
             else:
                 return ''
 
