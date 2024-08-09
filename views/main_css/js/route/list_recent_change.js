@@ -58,6 +58,10 @@ function opennamu_list_recent_change() {
             let doc_name = opennamu_do_url_encode(data[for_a][1]);
             
             let left = '<a href="/w/' + doc_name + '">' + opennamu_xss_filter(data[for_a][1]) + '</a> ';
+            
+            if(auth["hidel"] === true) {
+                left = '<input type="checkbox"> ' + left;
+            }
 
             let right = '<span id="opennamu_list_recent_change_' + String(for_a) + '_over">';
 
@@ -122,7 +126,7 @@ function opennamu_list_recent_change() {
             }
             right += ' | <a href="/history/' + doc_name + '">' + lang['history'] + '</a>';
 
-            if(auth["owner"] === true || auth["hidel"] === true) {
+            if(auth["hidel"] === true) {
                 right += ' | <a href="/history_hidden/' + data[for_a][0] + '/' + doc_name + '">' + lang['hide'] + '</a>';
             }
 
