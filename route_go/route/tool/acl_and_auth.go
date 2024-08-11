@@ -348,7 +348,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 	}
 
 	if Arr_in_str([]string{"document_edit", "document_edit_request", "document_move", "document_delete"}, tool) {
-		if !Check_acl(db, name, topic_number, "", ip) {
+		if !Check_acl(db, name, topic_number, "render", ip) {
 			return false
 		}
 	} else if Arr_in_str([]string{"bbs_edit", "bbs_comment"}, tool) {

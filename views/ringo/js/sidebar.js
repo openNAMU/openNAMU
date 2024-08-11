@@ -89,6 +89,9 @@ window.addEventListener('DOMContentLoaded', function() {
         document.getElementById("side_button_2").addEventListener("click", ringo_do_side_button_2);
         document.getElementById("side_button_3").addEventListener("click", ringo_do_side_button_3);
 
-        ringo_do_side_button_1();
+        if(window.localStorage.getItem('main_css_off_sidebar') && window.localStorage.getItem('main_css_off_sidebar') === '1') {
+        } else {
+            ringo_do_side_button_1();
+        }
     }
 });

@@ -22,7 +22,7 @@ func Api_w_comment_post(call_arg []string) string {
 	db := tool.DB_connect()
 	defer db.Close()
 
-	ip := other_set["ip"]
+	// ip := other_set["ip"]
 
 	stmt, err := db.Prepare(tool.DB_change("select doc_rev from data_set where set_name = 'comment' and doc_name = ? order by doc_rev asc limit 1"))
 	if err != nil {
