@@ -19,8 +19,6 @@ function opennamu_setting_404_page_post() {
             method : 'PUT',
             body : put_data_content,
         });
-    
-        console.log(select, content);
 
         history.go(0);
     });
@@ -73,7 +71,7 @@ function opennamu_setting_404_page() {
         data_html += '</select>';
         data_html += '<hr class="main_hr">';
 
-        data_html += '<textarea class="opennamu_textarea_500" id="opennamu_setting_404_page_textarea">' + data[2]['data'][0] + '</textarea>';
+        data_html += '<textarea class="opennamu_textarea_500" id="opennamu_setting_404_page_textarea">' + data[2]['data'][0][0] + '</textarea>';
         data_html += '<hr class="main_hr">';
 
         data_html += '<button id="opennamu_save_button" onclick="opennamu_setting_404_page_post();">' + data[0]['data'][0] + '</button> ';
@@ -81,8 +79,6 @@ function opennamu_setting_404_page() {
         data_html += '<hr class="main_hr">';
 
         data_html += '<div id="opennamu_setting_404_page_preview"></div>';
-
-        console.log();
 
         return data_html;
     }).then(function(end_data) {
