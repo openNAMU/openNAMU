@@ -154,6 +154,7 @@ func Api_list_recent_change(call_arg []string) string {
 			"category":       tool.Get_language(db, "category", false),
 			"setting":        tool.Get_language(db, "setting", false),
 			"remove_hidden":  tool.Get_language(db, "remove_hidden", false),
+			"admin_tool":     tool.Get_language(db, "admin_tool", false),
 		}
 		return_data["auth"] = auth_info
 		return_data["data"] = data_list

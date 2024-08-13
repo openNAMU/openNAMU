@@ -136,7 +136,7 @@ func Api_list_recent_discuss(call_arg []string) string {
 			"closed":            tool.Get_language(db, "closed", false),
 			"agreed_discussion": tool.Get_language(db, "agreed_discussion", false),
 			"stop":              tool.Get_language(db, "stop", false),
-			"topic_tool":        tool.Get_language(db, "topic_tool", false),
+			"admin_tool":        tool.Get_language(db, "admin_tool", false),
 		}
 		return_data["auth"] = auth_info
 		return_data["data"] = data_list

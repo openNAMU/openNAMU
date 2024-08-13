@@ -18,6 +18,7 @@ function opennamu_list_recent_discuss() {
         return res.json();
     }).then(function(data) {
         let lang = data["language"];
+        let auth = data["auth"];
         data = data["data"];
 
         let data_html = '';
@@ -31,13 +32,30 @@ function opennamu_list_recent_discuss() {
             data_html += '<a href="/recent_discuss/1/' + option_list[for_a][0] + '">(' + option_list[for_a][1] + ')</a> ';
         }
 
-        data_html += '<hr class="main_hr">'
+        data_html += '<hr class="main_hr">';
+
+        if(auth["hidel"] === true) {
+            data_html += '<a id="opennamu_list_admin_tool_button" href="javascript:void(0);">(' + lang["admin_tool"] + ')</a>';
+
+            data_html += '<span id="opennamu_list_admin_tool" style="display: none;">';
+            data_html += 'test';
+            data_html += '</span>';
+
+            data_html += '<span class="opennamu_popup_footnote" style="display: none;" id="opennamu_list_admin_tool_button_load">';
+            data_html += '</span>';
+
+            data_html += '<hr class="main_hr">';
+        }
 
         for(let for_a = 0; for_a < data.length; for_a++) {
             let doc_name = opennamu_do_url_encode(data[for_a][0]);
 
             let left = '<a href="/thread/' + data[for_a][3] + '">' + opennamu_xss_filter(data[for_a][1]) + '</a> ';
             left += '<a href="/w/' + doc_name + '">(' + opennamu_xss_filter(data[for_a][0]) + ')</a> ';
+
+            if(auth["hidel"] === true) {
+                left = '<input type="checkbox"> ' + left;
+            }
 
             let right = '';
             if(data[for_a][4] === 'O') {
@@ -60,5 +78,8 @@ function opennamu_list_recent_discuss() {
         data_html += opennamu_page_control('/recent_discuss/{}/' + set_type, Number(num), data.length);
 
         document.getElementById('opennamu_list_recent_discuss').innerHTML = data_html;
+
+        document.getElementById('opennamu_list_admin_tool_button').addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_list_admin_tool_button', '', 'opennamu_list_admin_tool', 'open'); });
+        document.addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_list_admin_tool_button', '', 'opennamu_list_admin_tool', 'close'); });
     });
 }

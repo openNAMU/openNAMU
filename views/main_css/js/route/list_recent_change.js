@@ -42,6 +42,19 @@ function opennamu_list_recent_change() {
             data_html += '<a href="/recent_change/1/' + option_list[for_a] + '">(' + option_lang(option_list[for_a], lang) + ')</a> ';
         }
 
+        if(auth["hidel"] === true) {
+            data_html += '<hr class="main_hr">';
+            
+            data_html += '<a id="opennamu_list_admin_tool_button" href="javascript:void(0);">(' + lang["admin_tool"] + ')</a>';
+
+            data_html += '<span id="opennamu_list_admin_tool" style="display: none;">';
+            data_html += 'test';
+            data_html += '</span>';
+
+            data_html += '<span class="opennamu_popup_footnote" style="display: none;" id="opennamu_list_admin_tool_button_load">';
+            data_html += '</span>';
+        }
+
         let date_heading = '';
         for(let for_a = 0; for_a < data.length; for_a++) {
             if(data[for_a][6] !== "" && data[for_a][1] === "") {
@@ -157,5 +170,8 @@ function opennamu_list_recent_change() {
             document.getElementById('opennamu_list_recent_change_' + String(for_a)).addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_list_recent_change_' + String(for_a), '', 'opennamu_history_tool_' + String(for_a), 'open'); });
             document.addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_list_recent_change_' + String(for_a), '', 'opennamu_history_tool_' + String(for_a), 'close'); });
         }
+
+        document.getElementById('opennamu_list_admin_tool_button').addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_list_admin_tool_button', '', 'opennamu_list_admin_tool', 'open'); });
+        document.addEventListener("click", function() { opennamu_do_footnote_popover('opennamu_list_admin_tool_button', '', 'opennamu_list_admin_tool', 'close'); });
     });
 }
