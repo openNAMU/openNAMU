@@ -218,7 +218,7 @@ function opennamu_do_trace_spread() {
     }
 }
 
-function opennamu_do_render(to_obj, data, name = '', do_type = '', option = '') {
+function opennamu_do_render(to_obj, data, name = '', do_type = '', option = '', callback = undefined) {
     let url;
     if(do_type === '') {
         url = "/api/render";
@@ -243,6 +243,10 @@ function opennamu_do_render(to_obj, data, name = '', do_type = '', option = '') 
                 eval(text["js_data"]);
             } else {
                 document.getElementById(to_obj).innerHTML = '';
+            }
+
+            if(callback) {
+                callback();
             }
         }
     });

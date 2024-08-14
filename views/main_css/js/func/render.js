@@ -284,8 +284,9 @@ function opennamu_do_include(name, render_name, to_obj, option_obj) {
         return res.json();
     }).then(function(data) {
         if(data["data"]) {
-            opennamu_do_render(to_obj, data["data"], render_name, 'include', option);
-            document.getElementById(option_obj).style.display = "inline";
+            opennamu_do_render(to_obj, data["data"], render_name, 'include', option, function() {
+                document.getElementById(option_obj).style.display = "inline";
+            });
         }
     });
 }
