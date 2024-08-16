@@ -193,7 +193,7 @@ def main_setting_main():
 
                 <h3>''' + get_lang(conn, 'communication_set') + '''</h3>
                 
-                <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + get_lang(conn, 'enable_comment_function') + ''' (''' + get_lang(conn, 'not_working') + ''')
+                <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + get_lang(conn, 'enable_comment_function') + '''
                 <hr class="main_hr">
 
                 <input type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + get_lang(conn, 'display_level_in_user_name') + '''

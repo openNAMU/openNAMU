@@ -26,7 +26,10 @@ func Api_w_comment_post(call_arg []string) string {
 
 	return_data := make(map[string]interface{})
 
-	if !tool.Check_acl(db, "", "", "comment_write", other_set["ip"]) {
+	comment_enable := tool.Get_setting(db, "enable_comment", "")
+	if len(comment_enable) == 0 || comment_enable[0][0] == "" {
+		return_data["response"] = "disable"
+	} else if !tool.Check_acl(db, "", "", "comment_write", other_set["ip"]) {
 		return_data["response"] = "require auth"
 	} else {
 		return_data["response"] = "ok"
@@ -39,7 +42,7 @@ func Api_w_comment_post(call_arg []string) string {
 
 		var view_count string
 
-		err = stmt.QueryRow(other_set["doc_name"]).Scan()
+		err = stmt.QueryRow(other_set["doc_name"]).Scan(&view_count)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				view_count = "0"

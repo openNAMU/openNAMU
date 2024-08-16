@@ -19,7 +19,10 @@ func Api_w_comment(call_arg []string) string {
 
 	return_data := make(map[string]interface{})
 
-	if !tool.Check_acl(db, "", "", "comment_view", other_set["ip"]) {
+	comment_enable := tool.Get_setting(db, "enable_comment", "")
+	if len(comment_enable) == 0 || comment_enable[0][0] == "" {
+		return_data["response"] = "disable"
+	} else if !tool.Check_acl(db, "", "", "comment_view", other_set["ip"]) {
 		return_data["response"] = "require auth"
 	} else {
 		return_data["response"] = "ok"

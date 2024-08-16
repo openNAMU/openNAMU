@@ -82,6 +82,10 @@ def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = '
 
     textarea_size = 'opennamu_textarea_500' if do_type == 'edit' else 'opennamu_textarea_100'
 
+    out_field = captcha_get(conn) + ip_warning(conn) + addon
+    if out_field != '':
+        out_field += '<hr class="main_hr">'
+
     return '''
         <textarea style="display: none;" id="opennamu_edit_origin" name="doc_data_org">''' + html.escape(data_main) + '''</textarea>
         <div>
@@ -96,10 +100,8 @@ def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = '
         <div id="opennamu_monaco_editor" class="''' + textarea_size + '''" ''' + editor_display[1] + '''></div>
         <textarea id="opennamu_edit_textarea" class="''' + textarea_size + '''" ''' + editor_display[0] + ''' name="content" placeholder="''' + p_text + '''">''' + html.escape(data_main) + '''</textarea>
         <hr class="main_hr">
+        ''' + out_field + '''
         
-        ''' + captcha_get(conn) + ip_warning(conn) + addon + '''
-        <hr class="main_hr">
-
         <script>
             window.addEventListener('DOMContentLoaded', function() {
                 do_stop_exit();

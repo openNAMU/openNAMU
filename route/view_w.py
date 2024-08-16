@@ -177,11 +177,11 @@ def view_w(name = 'Test', do_type = ''):
             name_view = name
 
         end_data = '''
-            <div id="opennamu_preview_area">
-                <textarea id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
-                <script defer src="/views/main_css/js/route/w.js''' + cache_v() + '''"></script>
-                <script>window.addEventListener("DOMContentLoaded", function() { opennamu_w("''' + ('from' if do_type == 'from' else '') + '''"); opennamu_w_page_view(); });</script>
-            </div>
+            <div id="opennamu_preview_area"></div>
+            <textarea id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
+            <div id="opennamu_w_comment"></div>
+            <script defer src="/views/main_css/js/route/w.js''' + cache_v() + '''"></script>
+            <script>window.addEventListener("DOMContentLoaded", function() { opennamu_w("''' + ('from' if do_type == 'from' else '') + '''"); opennamu_w_page_view(); opennamu_w_comment(); });</script>
         '''
 
         curs.execute(db_change("select data from data where title = ?"), [name])

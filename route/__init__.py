@@ -221,5 +221,6 @@ from route.go_api_w_watch_list import api_w_watch_list
 from route.go_api_w_render import api_w_render
 from route.go_api_w_set_reset import api_w_set_reset
 from route.go_api_w_page_view import api_w_page_view
+from route.go_api_w_comment import api_w_comment
 
 from route.go_main_func_easter_egg import main_func_easter_egg
