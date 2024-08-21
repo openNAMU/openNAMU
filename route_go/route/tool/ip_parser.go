@@ -228,6 +228,8 @@ func Get_user_ban_type(ban_type string) string {
 		return "3"
 	} else if ban_type == "D" {
 		return "4"
+	} else if ban_type == "L" {
+		return "5"
 	} else {
 		return ""
 	}
@@ -254,7 +256,11 @@ func Get_user_ban(db *sql.DB, ip string, tool string) []string {
 		r := regexp2.MustCompile(block, 0)
 		if m, _ := r.FindStringMatch(ip); m != nil {
 			if tool == "login" {
-				if ban_type != "1" {
+				if ban_type != "1" && ban_type != "5" {
+					return []string{"true", "a" + ban_type}
+				}
+			} else if tool == "register" {
+				if ban_type != "5" {
 					return []string{"true", "a" + ban_type}
 				}
 			} else if tool == "edit_request" {
@@ -290,7 +296,11 @@ func Get_user_ban(db *sql.DB, ip string, tool string) []string {
 				continue
 			} else if c.Contains(ip) {
 				if tool == "login" {
-					if ban_type != "1" {
+					if ban_type != "1" && ban_type != "5" {
+						return []string{"true", "b" + ban_type}
+					}
+				} else if tool == "register" {
+					if ban_type != "5" {
 						return []string{"true", "b" + ban_type}
 					}
 				} else if tool == "edit_request" {
@@ -323,7 +333,11 @@ func Get_user_ban(db *sql.DB, ip string, tool string) []string {
 		ban_type := Get_user_ban_type(login)
 
 		if tool == "login" {
-			if ban_type != "1" {
+			if ban_type != "1" && ban_type != "5" {
+				return []string{"true", ban_type}
+			}
+		} else if tool == "register" {
+			if ban_type != "5" {
 				return []string{"true", ban_type}
 			}
 		} else if tool == "edit_request" {

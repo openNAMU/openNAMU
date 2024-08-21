@@ -25,7 +25,7 @@ function opennamu_w_page_view() {
 }
 
 function opennamu_w_comment_post() {
-    
+    let data = document.getElementById('opennamu_textarea').value;
 }
 
 function opennamu_w_comment_delete(num) {
@@ -56,7 +56,7 @@ function opennamu_w_comment() {
             data_html += '<hr>';
             data_html += '<textarea class="opennamu_textarea_100" id="opennamu_textarea"></textarea>';
             data_html += '<hr class="main_hr">';
-            data_html += '<button id="opennamu_save_button" type="submit">전송</button>';
+            data_html += '<button id="opennamu_save_button" type="submit" onclick="opennamu_w_comment_post();">전송</button>';
 
             if(data.data.length > 0) {
                 data_html += '<hr>';

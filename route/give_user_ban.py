@@ -35,8 +35,10 @@ def give_user_ban(name = None, ban_type = ''):
             login = ''
             
             ban_option = flask.request.form.get('ban_option', '')
-            if ban_option == 'login_able':
+            if ban_option == 'login_able_and_regsiter_disable':
                 login = 'O'
+            elif ban_option == 'login_able':
+                login = 'L'
             elif ban_option == 'edit_request_able':
                 login = 'E'
             elif ban_option == 'completely_ban':
@@ -136,6 +138,7 @@ def give_user_ban(name = None, ban_type = ''):
                         <select name="ban_option">
                             <option value="">''' + get_lang(conn, 'default') + '''</option>
                             <option value="login_able">''' + get_lang(conn, 'login_able') + '''</option>
+                            <option value="login_able_and_regsiter_disable">''' + get_lang(conn, 'login_able_and_regsiter_disable') + '''</option>
                             <option value="edit_request_able">''' + get_lang(conn, 'edit_request_able') + '''</option>
                             <option value="completely_ban">''' + get_lang(conn, 'completely_ban') + '''</option>
                             <option value="dont_come_this_site">''' + get_lang(conn, 'dont_come_this_site') + '''</option>
