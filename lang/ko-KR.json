@@ -698,5 +698,6 @@
     "remove_hidden": "숨겨진 내용 보이지 않기",
     "link_count" : "링크 갯수",
     "data_missing" : "정보 없음",
-    "not_use_view_count" : "조회수 기능 사용 안함"
+    "not_use_view_count" : "조회수 기능 사용 안함",
+    "login_able_and_regsiter_disable" : "로그인 허용 및 회원가입 비허용"
 }
