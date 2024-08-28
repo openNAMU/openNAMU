@@ -14,3 +14,8 @@ function opennamu_return_comment() {
         document.getElementById(input.value)?.focus();
     }
 }
+
+function opennamu_load_comment() {
+    const url = window.location.pathname;
+    const url_split = url.split('/');
+}

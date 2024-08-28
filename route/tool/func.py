@@ -780,6 +780,14 @@ def set_init_always(conn, ver_num, run_mode):
         if not curs.fetchall():
             curs.execute(db_change('insert into alist (name, acl) values ("ban", "view")'))
 
+        # 문서 댓글용 게시판 생성
+        bbs_num = '0'
+        bbs_name = 'document_comment'
+        bbs_type = 'comment'
+
+        curs.execute(db_change("insert into bbs_set (set_name, set_code, set_id, set_data) values ('bbs_name', '', ?, ?)"), [bbs_num, bbs_name])
+        curs.execute(db_change("insert into bbs_set (set_name, set_code, set_id, set_data) values ('bbs_type', '', ?, ?)"), [bbs_num, bbs_type])
+
         # 이미지 폴더 없으면 생성
         if not os.path.exists(load_image_url(conn)):
             os.makedirs(load_image_url(conn))
