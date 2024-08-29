@@ -82,12 +82,13 @@ def give_user_ban(name = None, ban_type = ''):
                 else:
                     type_d = None
 
-                if name == ip:
-                    if acl_check(tool = 'all_admin_auth', memo = 'ban (' + name + ')') == 1:
-                        return re_error(conn, 3)
-                else:
-                    if acl_check(tool = 'ban_auth', memo = 'ban (' + name + ')') == 1:
-                        return re_error(conn, 3)
+                if regex_get != 'private':
+                    if name == ip:
+                        if acl_check(tool = 'all_admin_auth', memo = 'ban (' + name + ')') == 1:
+                            return re_error(conn, 3)
+                    else:
+                        if acl_check(tool = 'ban_auth', memo = 'ban (' + name + ')') == 1:
+                            return re_error(conn, 3)
 
                 ban_insert(conn, 
                     name,
