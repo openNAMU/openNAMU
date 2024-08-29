@@ -25,7 +25,6 @@ function opennamu_list_recent_block() {
         }
     }
 
-    console.log('/api/v2/recent_block/' + tool + '/' + page + user_name);
     fetch('/api/v2/recent_block/' + tool + '/' + page + user_name).then(function(res) {
         return res.json();
     }).then(function(data) {
@@ -35,7 +34,7 @@ function opennamu_list_recent_block() {
 
         let data_html = '';
 
-        let option_list = [['all', 'all'], ['regex', 'regex'], ['cidr', 'cidr'], ['ongoing', 'in_progress']];
+        let option_list = [['all', 'all'], ['regex', 'regex'], ['cidr', 'cidr'], ['private', 'private'], ['ongoing', 'in_progress']];
         for(let for_a = 0; for_a < option_list.length; for_a++) {
             data_html += '<a href="/recent_block/' + option_list[for_a][0] + '">(' + lang[option_list[for_a][1]] + ')</a> ';
         }
@@ -73,6 +72,16 @@ function opennamu_list_recent_block() {
                 if(data[for_a][8] === '1') {
                     ip = '<s>' + ip + '</s>';
                 }
+            } else if(data[for_a][7] === 'private') {
+                if(ban_auth) {
+                    ip = '<a href="/auth/ban/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
+                }
+
+                if(data[for_a][8] === '1') {
+                    ip = '<s>' + ip + '</s>';
+                }
+
+                ip += ' (' + lang['private'] + ')';
             } else if(data[for_a][7] === 'cidr') {
                 if(ban_auth) {
                     ip = '<a href="/auth/ban_cidr/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';

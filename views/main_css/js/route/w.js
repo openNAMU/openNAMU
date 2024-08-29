@@ -39,6 +39,7 @@ function opennamu_w_comment_delete(num) {
     });
 }
 
+/*
 function opennamu_w_comment() {
     let name = "test";
     if(document.getElementById('opennamu_editor_doc_name')) {
@@ -66,3 +67,4 @@ function opennamu_w_comment() {
         }
     });
 }
+*/

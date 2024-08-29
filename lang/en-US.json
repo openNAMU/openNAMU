@@ -54,6 +54,7 @@
     "data_missing" : "No information",
     "not_use_view_count" : "Disable page view",
     "login_able_and_regsiter_disable" : "Login-able and Registration-disable",
+    "private" : "Private",
 
     "_comment_" : "Common",
     "data" : "Data",

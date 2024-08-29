@@ -29,10 +29,11 @@ func Api_list_recent_block(call_arg []string) string {
 		page_int = 0
 	}
 
+	// private 공개 안되도록 조심할 것
 	var stmt *sql.Stmt
 	var rows *sql.Rows
 	if other_set["set_type"] == "all" {
-		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb order by today desc limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where band != 'private' order by today desc limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -42,7 +43,7 @@ func Api_list_recent_block(call_arg []string) string {
 			log.Fatal(err)
 		}
 	} else if other_set["set_type"] == "ongoing" {
-		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where ongoing = '1' order by end desc limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where ongoing = '1' and band != 'private' order by end desc limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -61,8 +62,18 @@ func Api_list_recent_block(call_arg []string) string {
 		if err != nil {
 			log.Fatal(err)
 		}
+	} else if other_set["set_type"] == "private" {
+		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where band = 'private' order by today desc limit ?, 50"))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		rows, err = stmt.Query(page_int)
+		if err != nil {
+			log.Fatal(err)
+		}
 	} else if other_set["set_type"] == "user" {
-		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where block = ? order by today desc limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where block = ? and band != 'private' order by today desc limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -82,7 +93,7 @@ func Api_list_recent_block(call_arg []string) string {
 			log.Fatal(err)
 		}
 	} else {
-		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where blocker = ? order by today desc limit ?, 50"))
+		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where blocker = ? and band != 'private' order by today desc limit ?, 50"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -157,11 +168,18 @@ func Api_list_recent_block(call_arg []string) string {
 		})
 	}
 
+	if other_set["set_type"] == "private" {
+		if !tool.Check_acl(db, "", "", "owner_auth", other_set["ip"]) {
+			data_list = [][]string{}
+		}
+	}
+
 	return_data := make(map[string]interface{})
 	return_data["language"] = map[string]string{
 		"all":         tool.Get_language(db, "all", false),
 		"regex":       tool.Get_language(db, "regex", false),
 		"cidr":        tool.Get_language(db, "cidr", false),
+		"private":     tool.Get_language(db, "private", false),
 		"in_progress": tool.Get_language(db, "in_progress", false),
 		"admin":       tool.Get_language(db, "admin", false),
 		"blocked":     tool.Get_language(db, "blocked", false),

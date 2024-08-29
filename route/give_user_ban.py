@@ -74,6 +74,11 @@ def give_user_ban(name = None, ban_type = ''):
                             ipaddress.IPv6Network(name, False)
                         except:
                             return re_error(conn, 45)
+                elif regex_get == 'private':
+                    type_d = 'private'
+
+                    if acl_check(tool = 'owner_auth', ip = ip) == 1:
+                        return re_error(conn, 0)
                 else:
                     type_d = None
 
@@ -121,6 +126,10 @@ def give_user_ban(name = None, ban_type = ''):
                 if ban_type == '':
                     info_data = '<div id="opennamu_get_user_info">' + html.escape(name) + '</div>'
 
+            owner_option = ''
+            if acl_check(tool = 'owner_auth', ip = ip) != 1:
+                owner_option = '<option value="private" ' + ('selected' if ban_type == 'private' else '') + '>' + get_lang(conn, 'private') + '</option>'
+
             return easy_minify(conn, flask.render_template(skin_check(conn),
                 imp = [main_name, wiki_set(conn), wiki_custom(conn), wiki_css([now, 0])],
                 data = info_data + '''
@@ -132,6 +141,7 @@ def give_user_ban(name = None, ban_type = ''):
                             <option value="normal">''' + get_lang(conn, 'normal') + '''</option>
                             <option value="regex" ''' + ('selected' if ban_type == 'regex' else '') + '>' + get_lang(conn, 'regex') + '''</option>
                             <option value="cidr" ''' + ('selected' if ban_type == 'cidr' else '') + '>' + get_lang(conn, 'cidr') + '''</option>
+                            ''' + owner_option + '''
                         </select>
                         <hr class="main_hr">
         

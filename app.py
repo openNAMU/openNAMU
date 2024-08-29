@@ -511,6 +511,8 @@ app.route('/recent_block/regex', defaults = { 'tool' : 'regex' })(list_recent_bl
 app.route('/recent_block/regex/<int:num>', defaults = { 'tool' : 'regex' })(list_recent_block)
 app.route('/recent_block/cidr', defaults = { 'tool' : 'cidr' })(list_recent_block)
 app.route('/recent_block/cidr/<int:num>', defaults = { 'tool' : 'cidr' })(list_recent_block)
+app.route('/recent_block/private', defaults = { 'tool' : 'private' })(list_recent_block)
+app.route('/recent_block/private/<int:num>', defaults = { 'tool' : 'private' })(list_recent_block)
 app.route('/recent_block/ongoing', defaults = { 'tool' : 'ongoing' })(list_recent_block)
 app.route('/recent_block/ongoing/<int:num>', defaults = { 'tool' : 'ongoing' })(list_recent_block)
 
@@ -787,7 +789,6 @@ app.route('/api/v2/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_t
 app.route('/api/v2/doc_watch_list/<int:num>/<everything:name>')(api_w_watch_list)
 app.route('/api/v2/set_reset/<everything:name>')(api_w_set_reset)
 app.route('/api/v2/page_view/<everything:name>')(api_w_page_view)
-app.route('/api/v2/comment/<int:page>/<everything:name>', methods = ['GET', 'POST'])(api_w_comment)
 
 app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting)
 

@@ -314,7 +314,7 @@ func Get_user_ban(db *sql.DB, ip string, tool string) []string {
 		}
 	}
 
-	stmt, err := db.Prepare(DB_change("select login from rb where block = ? and band = '' and ongoing = '1'"))
+	stmt, err := db.Prepare(DB_change("select login from rb where block = ? and (band = '' or band = 'private') and ongoing = '1'"))
 	if err != nil {
 		log.Fatal(err)
 	}
