@@ -1,6 +1,6 @@
 from .tool.func import *
 
-from .api_bbs_w_post import api_bbs_w_post
+from .go_api_bbs_w import api_bbs_w
 
 def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
     with get_db_connect() as conn:
@@ -19,7 +19,7 @@ def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
         if acl_check('', 'owner_auth', '') == 1:
             return redirect(conn, '/bbs/in/' + bbs_num_str)
         
-        temp_dict = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
+        temp_dict = orjson.loads(api_bbs_w(bbs_num_str + '-' + post_num_str).data)
         if not 'user_id' in temp_dict:
             return redirect(conn, '/bbs/main')
         

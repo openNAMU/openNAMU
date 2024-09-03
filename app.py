@@ -725,7 +725,7 @@ app.route('/api/xref_this/<int:page>/<everything:name>', defaults = { 'xref_type
 
 app.route('/api/random')(api_w_random)
 
-app.route('/api/bbs/w/<sub_code>')(api_bbs_w_post)
+app.route('/api/bbs/w/<sub_code>')(api_bbs_w)
 app.route('/api/bbs/w/comment/<sub_code>')(api_bbs_w_comment)
 app.route('/api/bbs/w/comment_one/<sub_code>')(api_bbs_w_comment_one)
 
@@ -782,6 +782,7 @@ app.route('/api/v2/bbs')(api_bbs_list)
 app.route('/api/v2/bbs/main')(api_bbs)
 app.route('/api/v2/bbs/set/<int:bbs_num>/<name>', methods = ['GET', 'PUT'])(api_bbs_w_set)
 app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs)
+app.route('/api/v2/bbs/w/<sub_code>', defaults = { 'legacy' : '' })(api_bbs_w)
 app.route('/api/v2/bbs/w/comment/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment)
 app.route('/api/v2/bbs/w/comment_one/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment_one)
 

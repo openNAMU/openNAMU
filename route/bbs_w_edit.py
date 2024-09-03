@@ -1,6 +1,6 @@
 from .tool.func import *
 
-from .api_bbs_w_post import api_bbs_w_post
+from .go_api_bbs_w import api_bbs_w
 from .go_api_bbs_w_comment_one import api_bbs_w_comment_one
 
 from .edit import edit_editor
@@ -26,7 +26,7 @@ async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
             else:
                 return redirect(conn, '/bbs/main')
         elif post_num != '':
-            temp_dict = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
+            temp_dict = orjson.loads(api_bbs_w(bbs_num_str + '-' + post_num_str).data)
             if 'user_id' in temp_dict:
                 if not temp_dict['user_id'] == ip and acl_check('', 'owner_auth', '', '') == 1:
                     return re_error(conn, 0)
@@ -101,7 +101,7 @@ async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                 title = ''
                 data = ''
             else:
-                temp_dict = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
+                temp_dict = orjson.loads(api_bbs_w(bbs_num_str + '-' + post_num_str).data)
 
                 title = temp_dict['title']
                 data = temp_dict['data']

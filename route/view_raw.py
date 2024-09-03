@@ -1,6 +1,6 @@
 from .tool.func import *
 
-from .api_bbs_w_post import api_bbs_w_post
+from .go_api_bbs_w import api_bbs_w
 from .go_api_bbs_w_comment_one import api_bbs_w_comment_one
 
 async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '', post_num = '', comment_num = ''):
@@ -68,9 +68,9 @@ async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '
         if bbs_num != '' and post_num != '':
             if comment_num != '':
                 data = orjson.loads((await api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num)).get_data(as_text = True))
-                sub_data = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
+                sub_data = orjson.loads(api_bbs_w(bbs_num_str + '-' + post_num_str).data)
             else:
-                data = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
+                data = orjson.loads(api_bbs_w(bbs_num_str + '-' + post_num_str).data)
                 
             if 'comment' in data:
                 v_name = sub_data["title"]

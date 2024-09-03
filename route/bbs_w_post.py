@@ -1,6 +1,6 @@
 from .tool.func import *
 
-from .api_bbs_w_post import api_bbs_w_post
+from .go_api_bbs_w import api_bbs_w
 from .go_api_bbs_w_comment import api_bbs_w_comment
 
 from .go_api_topic import api_topic_thread_make, api_topic_thread_pre_render
@@ -69,7 +69,7 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
         bbs_comment_acl = acl_check(bbs_num_str, 'bbs_comment')
         ip = ip_check()
 
-        temp_dict = orjson.loads(api_bbs_w_post(bbs_num_str + '-' + post_num_str).data)
+        temp_dict = orjson.loads(api_bbs_w(bbs_num_str + '-' + post_num_str).data)
         if temp_dict == {}:
             return redirect(conn, '/bbs/main')
         
@@ -189,8 +189,10 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                 )
 
                 data += '' + \
+                    '<div id="opennamu_bbs_w_post"></div>' + \
+                    '<script defer src="/views/main_css/js/route/topic.js' + cache_v() + '"></script>' + \
                     '<script defer src="/views/main_css/js/route/bbs_w_post.js' + cache_v() + '"></script>' + \
-                    '<script>window.addEventListener("DOMContentLoaded", function() { opennamu_list_recent_block(); });</script>' + \
+                    '<script>window.addEventListener("DOMContentLoaded", function() { opennamu_load_comment(); });</script>' + \
                 ''
 
                 return easy_minify(conn, flask.render_template(skin_check(conn),

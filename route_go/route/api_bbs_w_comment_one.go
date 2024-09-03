@@ -62,6 +62,7 @@ func Api_bbs_w_comment_one(call_arg []string) string {
 
 	data_list := []map[string]string{}
 	temp_dict := map[string]string{}
+	ip_parser_temp := map[string][]string{}
 	before_set_code := ""
 
 	for rows.Next() {
@@ -87,7 +88,25 @@ func Api_bbs_w_comment_one(call_arg []string) string {
 			before_set_code = set_code
 		}
 
-		temp_dict[set_name] = set_data
+		if set_name == "comment_user_id" {
+			var ip_pre string
+			var ip_render string
+
+			if _, ok := ip_parser_temp[set_data]; ok {
+				ip_pre = ip_parser_temp[set_data][0]
+				ip_render = ip_parser_temp[set_data][1]
+			} else {
+				ip_pre = tool.IP_preprocess(db, set_data, other_set["ip"])[0]
+				ip_render = tool.IP_parser(db, set_data, other_set["ip"])
+
+				ip_parser_temp[set_data] = []string{ip_pre, ip_render}
+			}
+
+			temp_dict["comment_user_id"] = ip_pre
+			temp_dict["comment_user_id_render"] = ip_render
+		} else {
+			temp_dict[set_name] = set_data
+		}
 	}
 
 	if before_set_code != "" {

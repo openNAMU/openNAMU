@@ -3,13 +3,14 @@ package route
 import (
 	"log"
 	"opennamu/route/tool"
+	"strings"
 
 	jsoniter "github.com/json-iterator/go"
 )
 
 func Api_bbs_w(call_arg []string) string {
 	var json = jsoniter.ConfigCompatibleWithStandardLibrary
-	
+
 	other_set := map[string]string{}
 	json.Unmarshal([]byte(call_arg[0]), &other_set)
 
@@ -22,7 +23,18 @@ func Api_bbs_w(call_arg []string) string {
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(other_set["bbs_num"], other_set["post_num"])
+	sub_code := other_set["sub_code"]
+	sub_code_parts := strings.Split(sub_code, "-")
+
+	bbs_num := ""
+	post_num := ""
+
+	if len(sub_code_parts) > 1 {
+		bbs_num = sub_code_parts[0]
+		post_num = sub_code_parts[1]
+	}
+
+	rows, err := stmt.Query(bbs_num, post_num)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,13 +45,29 @@ func Api_bbs_w(call_arg []string) string {
 		var set_name string
 		var set_data string
 
-		data_list[set_name] = set_data
+		if set_name == "user_id" {
+			var ip_pre string
+			var ip_render string
+
+			ip_pre = tool.IP_preprocess(db, set_data, other_set["ip"])[0]
+			ip_render = tool.IP_parser(db, set_data, other_set["ip"])
+
+			data_list["user_id"] = ip_pre
+			data_list["user_id_render"] = ip_render
+		} else {
+			data_list[set_name] = set_data
+		}
 	}
 
-	return_data := make(map[string]interface{})
-	return_data["language"] = map[string]string{}
-	return_data["data"] = data_list
+	if other_set["legacy"] != "" {
+		json_data, _ := json.Marshal(data_list)
+		return string(json_data)
+	} else {
+		return_data := make(map[string]interface{})
+		return_data["language"] = map[string]string{}
+		return_data["data"] = data_list
 
-	json_data, _ := json.Marshal(return_data)
-	return string(json_data)
+		json_data, _ := json.Marshal(return_data)
+		return string(json_data)
+	}
 }
