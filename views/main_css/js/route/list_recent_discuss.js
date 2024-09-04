@@ -54,7 +54,7 @@ function opennamu_list_recent_discuss() {
             left += '<a href="/w/' + doc_name + '">(' + opennamu_xss_filter(data[for_a][0]) + ')</a> ';
 
             if(auth["hidel"] === true) {
-                left = '<input type="checkbox"> ' + left;
+                left = '<label><input type="checkbox"> ' + left + '</label>';
             }
 
             let right = '';

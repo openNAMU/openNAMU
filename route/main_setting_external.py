@@ -93,7 +93,7 @@ def main_setting_external():
                         <a href="/setting/phrase#s-6">(''' + get_lang(conn, 'text_setting') + ''')</a>
                         <hr class="main_hr">
 
-                        <input type="checkbox" name="email_have" ''' + ('checked' if d_list[9] != '' else '')  + '''> ''' + get_lang(conn, 'email_required') + '''
+                        <label><input type="checkbox" name="email_have" ''' + ('checked' if d_list[9] != '' else '')  + '''> ''' + get_lang(conn, 'email_required') + '''</label>
 
                         <h3>''' + get_lang(conn, 'smtp_setting') + '''</h3>
                         <a href="https://support.google.com/mail/answer/7126229">(Google)</a>

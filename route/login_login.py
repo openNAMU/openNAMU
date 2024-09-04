@@ -57,7 +57,7 @@ def login_login_2():
                             <hr class="main_hr">
                             <input placeholder="''' + get_lang(conn, 'password') + '''" name="pw" type="password">
                             <hr class="main_hr">
-                            <!-- <input type="checkbox" name="auto_login"> ''' + get_lang(conn, 'auto_login') + ''' (''' + get_lang(conn, 'not_working') + ''')
+                            <!-- <label><input type="checkbox" name="auto_login"> ''' + get_lang(conn, 'auto_login') + ''' (''' + get_lang(conn, 'not_working') + ''')</label>
                             <hr class="main_hr"> -->
                             ''' + captcha_get(conn) + '''
                             <button type="submit">''' + get_lang(conn, 'login') + '''</button>

@@ -233,7 +233,7 @@ def edit_move(name):
                             ''' + ('<option value="merge"> ' + get_lang(conn, 'merge_move') + '</option>' if owner_auth == 1 else '') + '''
                         </select>
                         <hr class="main_hr">
-                        <!-- <input type="checkbox" name="move_redirect_make"> ''' + get_lang(conn, 'move_redirect_make') + '''
+                        <!-- <label><input type="checkbox" name="move_redirect_make"> ''' + get_lang(conn, 'move_redirect_make') + '''</label>
                         <hr class="main_hr"> -->
                         
                         <h2>''' + get_lang(conn, 'discussion') + '''</h2>

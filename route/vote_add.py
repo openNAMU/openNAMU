@@ -62,11 +62,11 @@ def vote_add():
                         '<hr class="main_hr">' + \
                         '<textarea class="opennamu_textarea_500" name="data" placeholder="' + get_lang(conn, '1_line_1_q') + '"></textarea>' + \
                         '<hr class="main_hr">' + \
-                        '<input type="checkbox" value="Y" name="open_select"> ' + get_lang(conn, 'open_vote') + \
+                        '<label><input type="checkbox" value="Y" name="open_select"> ' + get_lang(conn, 'open_vote') + '</label>' + \
                         '<h2>' + get_lang(conn, 'period') + '</h2>'
                         '<input type="date" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">' + \
                         '<hr class="main_hr">' + \
-                        '<input type="checkbox" value="Y" name="limitless"> ' + get_lang(conn, 'limitless') + \
+                        '<label><input type="checkbox" value="Y" name="limitless"> ' + get_lang(conn, 'limitless') + '</label>' + \
                         '<h2>' + get_lang(conn, 'acl') + '</h2>' + \
                         acl_data + ' <a href="/acl/TEST#exp">(' + get_lang(conn, 'explanation') + ')</a>' + \
                         '<hr class="main_hr">' + \

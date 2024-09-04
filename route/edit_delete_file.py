@@ -38,7 +38,7 @@ def edit_delete_file(name = 'test.jpg'):
                         <hr class="main_hr">
                         <a href="/image/''' + url_pas(file_all_name) + '''">/image/''' + url_pas(file_all_name) + '''</a>
                         <hr class="main_hr">
-                        <input name="with_doc" type="checkbox" checked> ''' + get_lang(conn, 'file_delete_with_document') + '''
+                        <label><input name="with_doc" type="checkbox" checked> ''' + get_lang(conn, 'file_delete_with_document') + '''</label>
                         <hr class="main_hr">
                         <button type="submit">''' + get_lang(conn, 'file_delete') + '''</button>
                     </form>

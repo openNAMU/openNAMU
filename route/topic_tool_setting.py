@@ -98,7 +98,7 @@ def topic_tool_setting(topic_num = 1):
                             ''' + stop_d_list + '''
                         </select>
                         <hr class="main_hr">
-                        <input type="checkbox" name="agree" value="O" ''' + agree_check + '''> ''' + get_lang(conn, 'topic_change_agree') + '''
+                        <label><input type="checkbox" name="agree" value="O" ''' + agree_check + '''> ''' + get_lang(conn, 'topic_change_agree') + '''</label>
 
                         <h2>''' + get_lang(conn, 'topic_associate') + '''</h2>
                         ''' + get_lang(conn, 'topic_link_vote') + ''' (''' + get_lang(conn, 'not_working') + ''')

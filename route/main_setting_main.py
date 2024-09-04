@@ -169,7 +169,7 @@ def main_setting_main():
                 <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
                 <hr class="main_hr">
                 
-                <input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + get_lang(conn, 'set_wiki_access_password_need') + ''' (''' + get_lang(conn, 'restart_required') + ''')
+                <label><input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + get_lang(conn, 'set_wiki_access_password_need') + ''' (''' + get_lang(conn, 'restart_required') + ''')</label>
                 <hr class="main_hr">
                 
                 <span>''' + get_lang(conn, 'set_wiki_access_password') + '''</span> (''' + get_lang(conn, 'restart_required') + ''')
@@ -183,7 +183,7 @@ def main_setting_main():
                 
                 <h3>''' + get_lang(conn, 'authority_use_list') + '''</h3>
                 
-                <input type="checkbox" name="auth_history_off" ''' + check_box_div[14] + '''> ''' + get_lang(conn, 'authority_use_list_off') + '''
+                <label><input type="checkbox" name="auth_history_off" ''' + check_box_div[14] + '''> ''' + get_lang(conn, 'authority_use_list_off') + '''</label>
                 <hr class="main_hr">
                 
                 <span>''' + get_lang(conn, 'authority_use_list_expiration_date') + '''</span> (''' + get_lang(conn, 'day') + ''') (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
@@ -193,13 +193,13 @@ def main_setting_main():
 
                 <h3>''' + get_lang(conn, 'communication_set') + '''</h3>
                 
-                <input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + get_lang(conn, 'enable_comment_function') + '''
+                <label><input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + get_lang(conn, 'enable_comment_function') + '''</label>
                 <hr class="main_hr">
 
-                <input type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + get_lang(conn, 'display_level_in_user_name') + '''
+                <label><input type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + get_lang(conn, 'display_level_in_user_name') + '''</label>
                 <hr class="main_hr">
 
-                <input type="checkbox" name="not_use_view_count" ''' + check_box_div[16] + '''> ''' + get_lang(conn, 'not_use_view_count') + '''
+                <label><input type="checkbox" name="not_use_view_count" ''' + check_box_div[16] + '''> ''' + get_lang(conn, 'not_use_view_count') + '''</label>
                 <hr class="main_hr">
             '''
 
@@ -216,24 +216,24 @@ def main_setting_main():
 
                         <h2>''' + get_lang(conn, 'render_set') + '''</h2>
                         
-                        <input type="checkbox" name="namumark_compatible" ''' + check_box_div[10] + '''> ''' + get_lang(conn, 'namumark_fully_compatible_mode') + '''
+                        <label><input type="checkbox" name="namumark_compatible" ''' + check_box_div[10] + '''> ''' + get_lang(conn, 'namumark_fully_compatible_mode') + '''</label>
                         <hr class="main_hr">
                         
-                        <input type="checkbox" name="link_case_insensitive" ''' + check_box_div[12] + '''> ''' + get_lang(conn, 'link_case_insensitive') + '''
+                        <label><input type="checkbox" name="link_case_insensitive" ''' + check_box_div[12] + '''> ''' + get_lang(conn, 'link_case_insensitive') + '''</label>
                         <hr class="main_hr">
 
                         <h2>''' + get_lang(conn, 'login_set') + '''</h2>
                         
-                        <input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + get_lang(conn, 'no_register') + '''
+                        <label><input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + get_lang(conn, 'no_register') + '''</label>
                         <hr class="main_hr">
 
-                        <input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + get_lang(conn, 'hide_ip') + '''
+                        <label><input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + get_lang(conn, 'hide_ip') + '''</label>
                         <hr class="main_hr">
 
-                        <input type="checkbox" name="user_name_view" ''' + check_box_div[11] + '''> ''' + get_lang(conn, 'hide_user_name') + '''
+                        <label><input type="checkbox" name="user_name_view" ''' + check_box_div[11] + '''> ''' + get_lang(conn, 'hide_user_name') + '''</label>
                         <hr class="main_hr">
 
-                        <input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + get_lang(conn, 'requires_approval') + '''
+                        <label><input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + get_lang(conn, 'requires_approval') + '''</label>
                         <hr class="main_hr">
 
                         <span>''' + get_lang(conn, 'password_min_length') + '''</span> (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
@@ -247,7 +247,7 @@ def main_setting_main():
 
                         <h3>''' + get_lang(conn, 'ua') + '''</h3>
                         
-                        <input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + get_lang(conn, 'ua_get_off') + '''
+                        <label><input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + get_lang(conn, 'ua_get_off') + '''</label>
                         <hr class="main_hr">
                         
                         <span>''' + get_lang(conn, 'ua_expiration_date') + '''</span> (''' + get_lang(conn, 'day') + ''') (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
@@ -291,7 +291,7 @@ def main_setting_main():
                         <input name="slow_edit" value="''' + html.escape(d_list[19]) + '''">
                         <hr class="main_hr">
                         
-                        <input type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + get_lang(conn, 'edit_bottom_compulsion') + '''
+                        <label><input type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + get_lang(conn, 'edit_bottom_compulsion') + '''</label>
                         <hr class="main_hr">
                         
                         <span>''' + get_lang(conn, 'title_max_length') + '''</span> (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
@@ -309,10 +309,10 @@ def main_setting_main():
                         <input name="upload" value="''' + html.escape(d_list[4]) + '''">
                         <hr class="main_hr">
                         
-                        <input type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + get_lang(conn, 'set_history_recording_off') + '''
+                        <label><input type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + get_lang(conn, 'set_history_recording_off') + '''</label>
                         <hr class="main_hr">
 
-                        <input type="checkbox" name="move_with_redirect" ''' + check_box_div[13] + '''> ''' + get_lang(conn, 'move_with_redirect') + ''' (''' + get_lang(conn, 'not_working') + ''')
+                        <label><input type="checkbox" name="move_with_redirect" ''' + check_box_div[13] + '''> ''' + get_lang(conn, 'move_with_redirect') + ''' (''' + get_lang(conn, 'not_working') + ''')</label>
                         <hr class="main_hr">
 
                         <span>''' + get_lang(conn, 'slow_thread') + '''</span> (''' + get_lang(conn, 'second') + ''') (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')

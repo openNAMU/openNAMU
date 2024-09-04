@@ -2026,7 +2026,7 @@ def get_edit_text_bottom_check_box(conn):
     sql_d = curs.fetchall()
     if sql_d and sql_d[0][0] != '':
         cccb_text = '' + \
-            '<input type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + \
+            '<label><input type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + '</label>' + \
             '<hr class="main_hr">' + \
         ''
         

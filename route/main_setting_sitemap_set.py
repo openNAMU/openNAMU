@@ -65,19 +65,19 @@ def main_setting_sitemap_set():
                         <a href="/setting/sitemap">(''' + get_lang(conn, 'sitemap_manual_create') + ''')</a>
                         <hr class="main_hr">
 
-                        <input type="checkbox" ''' + check_box_div[4] + ''' name="sitemap_auto_make"> ''' + get_lang(conn, 'sitemap_auto_make') + '''
+                        <label><input type="checkbox" ''' + check_box_div[4] + ''' name="sitemap_auto_make"> ''' + get_lang(conn, 'sitemap_auto_make') + '''</label>
                         <hr class="main_hr">
 
-                        <input type="checkbox" ''' + check_box_div[0] + ''' name="sitemap_auto_exclude_domain"> ''' + get_lang(conn, 'stiemap_exclude_domain') + '''
+                        <label><input type="checkbox" ''' + check_box_div[0] + ''' name="sitemap_auto_exclude_domain"> ''' + get_lang(conn, 'stiemap_exclude_domain') + '''</label>
                         <hr class="main_hr">
 
-                        <input type="checkbox" ''' + check_box_div[1] + ''' name="sitemap_auto_exclude_user_page"> ''' + get_lang(conn, 'stiemap_exclude_user_page') + '''
+                        <label><input type="checkbox" ''' + check_box_div[1] + ''' name="sitemap_auto_exclude_user_page"> ''' + get_lang(conn, 'stiemap_exclude_user_page') + '''</label>
                         <hr class="main_hr">
 
-                        <input type="checkbox" ''' + check_box_div[2] + ''' name="sitemap_auto_exclude_file_page"> ''' + get_lang(conn, 'stiemap_exclude_file_page') + '''
+                        <label><input type="checkbox" ''' + check_box_div[2] + ''' name="sitemap_auto_exclude_file_page"> ''' + get_lang(conn, 'stiemap_exclude_file_page') + '''</label>
                         <hr class="main_hr">
 
-                        <input type="checkbox" ''' + check_box_div[3] + ''' name="sitemap_auto_exclude_category_page"> ''' + get_lang(conn, 'stiemap_exclude_category_page') + '''
+                        <label><input type="checkbox" ''' + check_box_div[3] + ''' name="sitemap_auto_exclude_category_page"> ''' + get_lang(conn, 'stiemap_exclude_category_page') + '''</label>
                         <hr class="main_hr">
 
                         <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>

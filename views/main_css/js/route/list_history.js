@@ -55,7 +55,7 @@ function opennamu_list_history() {
         let data_html = '';
 
         data_html += '<style id="opennamu_list_hidden_style">.opennamu_list_hidden { display: none; }</style>';
-        data_html += '<input type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ' + lang['remove_hidden'];
+        data_html += '<label><input type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ' + lang['remove_hidden'] + '</label>';
         data_html += '<hr class="main_hr">';
 
         let option_list = ['normal', 'edit', 'move', 'delete', 'revert', 'r1', 'setting'];

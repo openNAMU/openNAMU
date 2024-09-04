@@ -118,15 +118,15 @@ function ringo_load_skin_set() {
         }
 
         document.getElementById("main_skin_set").innerHTML = ' \
-            <input ' + set_data["use_sys_darkmode"] + ' type="checkbox" id="use_sys_darkmode" name="use_sys_darkmode" value="use_sys_darkmode"> ' + set_language[language]['use_sys_darkmode'] + ' \
+            <label><input ' + set_data["use_sys_darkmode"] + ' type="checkbox" id="use_sys_darkmode" name="use_sys_darkmode" value="use_sys_darkmode"> ' + set_language[language]['use_sys_darkmode'] + '</label> \
             <hr class="main_hr"> \
-            <input ' + set_data["invert"] + ' type="checkbox" id="invert" name="invert" value="invert"> ' + set_language[language]['darkmode'] + ' \
+            <label><input ' + set_data["invert"] + ' type="checkbox" id="invert" name="invert" value="invert"> ' + set_language[language]['darkmode'] + '</label> \
             <hr class="main_hr"> \
-            <input ' + set_data["off_sidebar"] + ' type="checkbox" id="off_sidebar" name="off_sidebar" value="off_sidebar"> ' + set_language[language]['off_sidebar'] + ' \
+            <label><input ' + set_data["off_sidebar"] + ' type="checkbox" id="off_sidebar" name="off_sidebar" value="off_sidebar"> ' + set_language[language]['off_sidebar'] + '</label> \
             <hr class="main_hr"> \
             ' + select_fixed_width_html + ' \
             <hr class="main_hr"> \
-            <input ' + set_data["sidebar_right"] + ' type="checkbox" id="sidebar_right" name="sidebar_right" value="sidebar_right"> ' + set_language[language]['sidebar_right'] + ' \
+            <label><input ' + set_data["sidebar_right"] + ' type="checkbox" id="sidebar_right" name="sidebar_right" value="sidebar_right"> ' + set_language[language]['sidebar_right'] + '</label> \
             <hr class="main_hr"> \
             <button onclick="ringo_get_post();">' + set_language[language]['save'] + '</button> \
         ';

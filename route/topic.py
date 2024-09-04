@@ -138,7 +138,7 @@ def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                 data = '''
                     <script defer src="/views/main_css/js/route/topic.js''' + cache_v() + '''"></script>
                     <style id="opennamu_list_hidden_style">.opennamu_list_hidden { display: none; }</style>
-                    <input type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ''' + get_lang(conn, 'remove_hidden') + '''
+                    <label><input type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ''' + get_lang(conn, 'remove_hidden') + '''</label>
                     <hr class="main_hr">
 
                     ''' + shortcut + '''

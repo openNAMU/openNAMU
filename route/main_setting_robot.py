@@ -44,7 +44,7 @@ def main_setting_robot():
                     <form method="post">
                         <textarea class="opennamu_textarea_500" name="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
-                        <input type="checkbox" name="default" ''' + default_data + '''> ''' + get_lang(conn, 'default') + '''
+                        <label><input type="checkbox" name="default" ''' + default_data + '''> ''' + get_lang(conn, 'default') + '''</label>
                         <hr class="main_hr">
                         <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
                     </form>
