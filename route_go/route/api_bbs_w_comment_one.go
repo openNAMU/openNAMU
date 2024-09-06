@@ -115,10 +115,10 @@ func Api_bbs_w_comment_one(call_arg []string) string {
 
 	if other_set["legacy"] != "" {
 		var json_data []byte
-		if len(data_list) == 1 {
-			json_data, _ = json.Marshal(data_list[0])
-		} else {
+		if other_set["tool"] == "around" {
 			json_data, _ = json.Marshal(data_list)
+		} else {
+			json_data, _ = json.Marshal(data_list[0])
 		}
 
 		return string(json_data)
