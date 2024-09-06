@@ -105,6 +105,12 @@ func Api_bbs_w_comment(call_arg []string) string {
 			return string(json_data)
 		} else {
 			return_data := make(map[string]interface{})
+			return_data["language"] = map[string]string{
+				"normal":  tool.Get_language(db, "normal", false),
+				"comment": tool.Get_language(db, "comment", false),
+				"tool":    tool.Get_language(db, "tool", false),
+				"return":  tool.Get_language(db, "return", false),
+			}
 			return_data["data"] = temp
 
 			json_data, _ := json.Marshal(return_data)

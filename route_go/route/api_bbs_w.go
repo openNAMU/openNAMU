@@ -45,6 +45,11 @@ func Api_bbs_w(call_arg []string) string {
 		var set_name string
 		var set_data string
 
+		err := rows.Scan(&set_name, &set_data)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		if set_name == "user_id" {
 			var ip_pre string
 			var ip_render string

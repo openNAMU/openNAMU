@@ -114,7 +114,13 @@ func Api_bbs_w_comment_one(call_arg []string) string {
 	}
 
 	if other_set["legacy"] != "" {
-		json_data, _ := json.Marshal(data_list)
+		var json_data []byte
+		if len(data_list) == 1 {
+			json_data, _ = json.Marshal(data_list[0])
+		} else {
+			json_data, _ = json.Marshal(data_list)
+		}
+
 		return string(json_data)
 	} else {
 		return_data := make(map[string]interface{})

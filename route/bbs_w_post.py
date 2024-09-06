@@ -195,6 +195,19 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                     '<script>window.addEventListener("DOMContentLoaded", function() { opennamu_load_comment(); });</script>' + \
                 ''
 
+                bbs_comment_form = ''
+                if bbs_comment_acl == 0:
+                    bbs_comment_form += '''
+                        <div id="opennamu_bbs_w_post_select"></div>
+                        ''' + edit_editor(conn, ip, '', 'bbs_comment') + '''
+                    '''
+
+                data += '''
+                    <form method="post">
+                        ''' + bbs_comment_form + '''
+                    </form>
+                '''
+
                 return easy_minify(conn, flask.render_template(skin_check(conn),
                     imp = [bbs_name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'bbs') + ')', 0])],
                     data = data,

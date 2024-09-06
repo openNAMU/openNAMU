@@ -23,18 +23,3 @@ function opennamu_w_page_view() {
 
     fetch("/api/v2/page_view/" + opennamu_do_url_encode(name));
 }
-
-function opennamu_w_comment_post() {
-    let data = document.getElementById('opennamu_textarea').value;
-}
-
-function opennamu_w_comment_delete(num) {
-    let name = "test";
-    if(document.getElementById('opennamu_editor_doc_name')) {
-        name = opennamu_xss_filter_decode(document.getElementById('opennamu_editor_doc_name').innerHTML);
-    }
-
-    fetch("/api/v2/comment/" + num + "/" + opennamu_do_url_encode(name), {
-        method : 'DELETE'
-    });
-}
