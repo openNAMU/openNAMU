@@ -23,3 +23,7 @@ function opennamu_w_page_view() {
 
     fetch("/api/v2/page_view/" + opennamu_do_url_encode(name));
 }
+
+function opennamu_w_comment() {
+    
+}
