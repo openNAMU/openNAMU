@@ -33,12 +33,22 @@ func Api_list_recent_block(call_arg []string) string {
 	var stmt *sql.Stmt
 	var rows *sql.Rows
 	if other_set["set_type"] == "all" {
-		stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where band != 'private' order by today desc limit ?, 50"))
+		if other_set["why"] != "" {
+			stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where band != 'private' and why like ? order by today desc limit ?, 50"))
+		} else {
+			stmt, err = db.Prepare(tool.DB_change("select why, block, blocker, end, today, band, ongoing from rb where band != 'private' order by today desc limit ?, 50"))
+		}
+
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		rows, err = stmt.Query(page_int)
+		if other_set["why"] != "" {
+			rows, err = stmt.Query(page_int, other_set["why"]+"%")
+		} else {
+			rows, err = stmt.Query(page_int)
+		}
+
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -188,6 +198,7 @@ func Api_list_recent_block(call_arg []string) string {
 		"start":       tool.Get_language(db, "start", false),
 		"end":         tool.Get_language(db, "end", false),
 		"ban":         tool.Get_language(db, "ban", false),
+		"why":         tool.Get_language(db, "why", false),
 	}
 	return_data["data"] = data_list
 

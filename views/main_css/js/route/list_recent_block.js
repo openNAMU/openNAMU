@@ -39,7 +39,7 @@ function opennamu_list_recent_block() {
             data_html += '<a href="/recent_block/' + option_list[for_a][0] + '">(' + lang[option_list[for_a][1]] + ')</a> ';
         }
 
-        option_list = [['/manager/11', 'blocked'], ['/manager/12', 'admin']];
+        option_list = [['/manager/11', 'blocked'], ['/manager/12', 'admin'], ['/redirect_to/1', 'why']];
         for(let for_a = 0; for_a < option_list.length; for_a++) {
             data_html += '<a href="' + option_list[for_a][0] + '">(' + lang[option_list[for_a][1]] + ')</a> ';
         }

@@ -811,6 +811,7 @@ app.route('/other')(main_tool_other)
 app.route('/manager', methods = ['POST', 'GET'])(main_tool_admin)
 app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_redirect)
 app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(main_tool_redirect)
+app.route('/redirect_to/<int:n>')(main_redirect)
 
 app.route('/search', methods=['POST'])(main_search)
 app.route('/search/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)

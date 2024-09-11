@@ -169,6 +169,8 @@ from route.n_topic_list import topic_list
 
 from route.n_give_auth import give_auth
 
+from route.n_main_redirect import main_redirect
+
 from route.n_setting_404_page import setting_404_page
 
 from route.n_bbs_main import bbs_main
