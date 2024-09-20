@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def list_recent_block(user_name = 'Test', tool = 'all', num = 1):
+def list_recent_block(user_name = 'Test', tool = 'all', num = 1, why = ''):
     with get_db_connect() as conn:
         sub = 0
         if tool == 'ongoing':

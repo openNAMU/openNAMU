@@ -7,10 +7,14 @@ function opennamu_list_recent_block() {
     let tool = 'all';
     let page = '1';
     let user_name = '';
+    let why = '';
+    let add_path = '';
     if(url_split.length > 2) {
         tool = url_split[2];
 
         if(tool === 'user' || tool === 'admin') {
+            add_path = '_user';
+
             if(url_split.length > 3) {
                 user_name = '/' + url_split[3];
 
@@ -21,11 +25,15 @@ function opennamu_list_recent_block() {
         } else {
             if(url_split.length > 3) {
                 page = url_split[3];
+
+                if(url_split.length > 4) {
+                    why = '/' + url_split.slice(4).join('/');
+                }
             }
         }
     }
 
-    fetch('/api/v2/recent_block/' + tool + '/' + page + user_name).then(function(res) {
+    fetch('/api/v2/recent_block' + add_path + '/' + tool + '/' + page + user_name + why).then(function(res) {
         return res.json();
     }).then(function(data) {
         let lang = data["language"];
@@ -129,7 +137,7 @@ function opennamu_list_recent_block() {
             data_html += opennamu_make_list(left, right, bottom);
         }
 
-        data_html += opennamu_page_control('/recent_block/' + tool + user_name + '/{}', Number(page), data.length);
+        data_html += opennamu_page_control('/recent_block/' + tool + user_name + '/{}' + why, Number(page), data.length);
 
         document.getElementById('opennamu_list_recent_block').innerHTML = data_html;
     });

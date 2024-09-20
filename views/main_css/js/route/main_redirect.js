@@ -22,7 +22,7 @@ function opennamu_main_redirect_send() {
     const data = document.getElementById('opennamu_main_redirect_input').value;
 
     if(n === '1') {
-        window.location.pathname = '/recent_block/all/' + opennamu_do_url_encode(data);
+        window.location.pathname = '/recent_block/all/1/' + opennamu_do_url_encode(data);
     }
 }
 

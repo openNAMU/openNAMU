@@ -44,7 +44,7 @@ func Api_list_recent_block(call_arg []string) string {
 		}
 
 		if other_set["why"] != "" {
-			rows, err = stmt.Query(page_int, other_set["why"]+"%")
+			rows, err = stmt.Query(other_set["why"]+"%", page_int)
 		} else {
 			rows, err = stmt.Query(page_int)
 		}
