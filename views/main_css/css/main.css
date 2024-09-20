@@ -448,6 +448,8 @@
     padding-right: 10px !important;
     
     border: 0;
+    
+    vertical-align: baseline;
 }
 
 .opennamu_main .hljs-ln-n:before {

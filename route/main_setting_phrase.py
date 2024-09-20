@@ -38,6 +38,10 @@ def main_setting_phrase():
             'template_var_1',
             'template_var_2',
             'template_var_3',
+            'edit_only_bottom_text',
+            'move_bottom_text',
+            'delete_bottom_text',
+            'revert_bottom_text',
         ]
         if flask.request.method == 'POST':
             curs.executemany(db_change("update other set data = ? where name = ?"), [[flask.request.form.get(for_a, ''), for_a] for for_a in i_list])
@@ -65,9 +69,6 @@ def main_setting_phrase():
 
                         <h2>''' + get_lang(conn, 'non_login_alert') + ''' (HTML)</h2>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[1] + '''">''' + html.escape(d_list[1]) + '''</textarea>
-
-                        <h2>''' + get_lang(conn, 'edit_bottom_text') + ''' (HTML)</h2>
-                        <textarea class="opennamu_textarea_100" name="''' + i_list[2] + '''">''' + html.escape(d_list[2]) + '''</textarea>
 
                         <h2>''' + get_lang(conn, 'copyright_checkbox_text') + ''' (HTML)</h2>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[3] + '''">''' + html.escape(d_list[3]) + '''</textarea>
@@ -146,14 +147,30 @@ def main_setting_phrase():
                         <hr class="main_hr">
                         <input name="''' + i_list[26] + '''" value="''' + html.escape(d_list[26]) + '''">
 
-                        <h2>''' + get_lang(conn, 'template_var_1') + ''' (''' + get_lang(conn, 'default') + ''' : ''' + get_lang(conn, 'top') + ''') (HTML)</h2>
+                        <h2>''' + get_lang(conn, 'template_var') + '''</h2>
+                        <h3>''' + get_lang(conn, 'template_var_1') + ''' (''' + get_lang(conn, 'default') + ''' : ''' + get_lang(conn, 'top') + ''') (HTML)</h3>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[27] + '''">''' + html.escape(d_list[27]) + '''</textarea>
 
-                        <h2>''' + get_lang(conn, 'template_var_2') + ''' (''' + get_lang(conn, 'default') + ''' : ''' + get_lang(conn, 'sidebar') + ''') (HTML)</h2>
+                        <h3>''' + get_lang(conn, 'template_var_2') + ''' (''' + get_lang(conn, 'default') + ''' : ''' + get_lang(conn, 'sidebar') + ''') (HTML)</h3>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[28] + '''">''' + html.escape(d_list[28]) + '''</textarea>
 
-                        <h2>''' + get_lang(conn, 'template_var_3') + ''' (''' + get_lang(conn, 'default') + ''' : ''' + get_lang(conn, 'bottom') + ''') (HTML)</h2>
+                        <h3>''' + get_lang(conn, 'template_var_3') + ''' (''' + get_lang(conn, 'default') + ''' : ''' + get_lang(conn, 'bottom') + ''') (HTML)</h3>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[29] + '''">''' + html.escape(d_list[29]) + '''</textarea>
+
+                        <h3>''' + get_lang(conn, 'edit_bottom_text') + ''' (HTML)</h3>
+                        <textarea class="opennamu_textarea_100" name="''' + i_list[2] + '''">''' + html.escape(d_list[2]) + '''</textarea>
+
+                        <h2>''' + get_lang(conn, 'edit_only_bottom_text') + ''' (HTML)</h2>
+                        <textarea class="opennamu_textarea_100" name="''' + i_list[30] + '''">''' + html.escape(d_list[30]) + '''</textarea>
+
+                        <h3>''' + get_lang(conn, 'edit_bottom_text') + ''' (HTML)</h3>
+                        <textarea class="opennamu_textarea_100" name="''' + i_list[31] + '''">''' + html.escape(d_list[31]) + '''</textarea>
+
+                        <h3>''' + get_lang(conn, 'edit_bottom_text') + ''' (HTML)</h3>
+                        <textarea class="opennamu_textarea_100" name="''' + i_list[32] + '''">''' + html.escape(d_list[32]) + '''</textarea>
+
+                        <h3>''' + get_lang(conn, 'edit_bottom_text') + ''' (HTML)</h3>
+                        <textarea class="opennamu_textarea_100" name="''' + i_list[33] + '''">''' + html.escape(d_list[33]) + '''</textarea>
 
                         <hr class="main_hr">
                         <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
