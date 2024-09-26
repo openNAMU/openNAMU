@@ -47,7 +47,6 @@ func Api_bbs_w_set(call_arg []string) string {
 		if err != nil {
 			log.Fatal(err)
 		}
-
 		defer stmt.Close()
 
 		rows, err := stmt.Query(other_set["set_name"], other_set["set_id"])
