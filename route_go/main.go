@@ -109,6 +109,8 @@ func main() {
 		route_data = route.Api_func_alarm_post(call_arg[1:])
 	} else if call_arg[0] == "api_bbs_w" {
 		route_data = route.Api_bbs_w(call_arg[1:])
+	} else if call_arg[0] == "api_bbs_w_post" {
+		route_data = route.Api_bbs_w_post(call_arg[1:])
 	} else {
 		log.Fatal(call_arg[0] + " is 404")
 	}
