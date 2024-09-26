@@ -49,7 +49,7 @@ func Api_bbs_w_post(call_arg []string) string {
 		[]string{"title", other_set["title"]},
 		[]string{"data", other_set["data"]},
 		[]string{"date", date_now},
-		[]string{"user_id", other_set["user_id"]},
+		[]string{"user_id", other_set["ip"]},
 	}
 	for _, v := range insert_db {
 		stmt, err := db.Prepare(tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)"))
