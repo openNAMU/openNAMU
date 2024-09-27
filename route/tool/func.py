@@ -1343,9 +1343,9 @@ def wiki_set(conn):
     db_data = curs.fetchall()
     data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['Wiki']
 
-    curs.execute(db_change('select data from other where name = "license"'))
+    curs.execute(db_change('select data from other where name = ?'), ['license'])
     db_data = curs.fetchall()
-    data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['ARR']
+    data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['']
 
     data_list += ['', '']
 
