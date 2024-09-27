@@ -837,7 +837,7 @@ def linux_exe_chmod():
         else:
             exe_type = 'main.arm64.bin'
     elif platform.system() == 'Darwin':
-        exc_type = 'main.mac.amd64.bin'
+        exe_type = 'main.mac.arm64.bin'
     else:
         if platform.machine() in ["AMD64", "x86_64"]:
             exe_type = 'main.amd64.exe'
