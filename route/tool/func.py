@@ -844,7 +844,7 @@ def linux_exe_chmod():
         else:
             exe_type = 'main.arm64.exe'
 
-    if platform.system() == 'Linux' and platform.system() == 'Darwin':
+    if platform.system() == 'Linux' or platform.system() == 'Darwin':
         os.system('chmod +x ./route_go/bin/' + exe_type)
 
     return exe_type
