@@ -51,6 +51,6 @@ if($to -eq "mac_arm64" -or $to -eq "all") {
     $env:GOARCH = "arm64"
     $env:CGO_ENABLED = 0
     go build $file_name.go
-    Remove-Item ".\bin\$file_name.arm64.exe"
+    Remove-Item ".\bin\$file_name.mac.arm64.bin"
     Move-Item "opennamu" ".\bin\$file_name.mac.arm64.bin"
 }
