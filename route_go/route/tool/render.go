@@ -11,6 +11,7 @@ func List_markup() []string {
 	return []string{
 		"namumark",
 		"namumark_beta",
+		"macromark",
 		"markdown",
 		"custom",
 		"raw",
@@ -91,6 +92,9 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 		render_data = render_data_class.main()
 	} else if markup == "markdown" {
 		render_data = Markdown(db, doc_data_set)
+	} else if markup == "macromark" {
+		render_data_class := Macromark_new(db, doc_data_set)
+		render_data = render_data_class.main()
 	} else {
 		render_data["data"] = data
 		render_data["js_data"] = ""

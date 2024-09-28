@@ -177,7 +177,7 @@ elif what_i_do == '19':
     up_data = curs.fetchall()
     up_data = up_data[0][0] if up_data and up_data[0][0] in ['stable', 'beta', 'dev', 'dont_use'] else 'stable'
 
-    if platform.system() == 'Linux':
+    if platform.system() == 'Linux' or platform.system() == 'Darwin':
         ok = []
         ok += [os.system('git remote rm origin')]
         ok += [os.system('git remote add origin https://github.com/opennamu/opennamu.git')]
