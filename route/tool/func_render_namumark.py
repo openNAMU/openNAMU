@@ -1968,9 +1968,12 @@ class class_do_render_namumark:
 
                         if syntax_count == 0:
                             self.render_data_js += 'hljs.highlightAll();\n'
-                            self.render_data_js += 'hljs.initLineNumbersOnLoad();\n'
+                            
+                        if wiki_data.count('\n') > 10:
+                            self.render_data_js += 'hljs.lineNumbersBlock(document.getElementById("opennamu_syntax_' + str(syntax_count) + '"));\n'
 
-                        data_name = self.get_tool_data_storage('<pre id="syntax"><code class="' + wiki_data_syntax + '">' + wiki_data, '</code></pre>', middle_data_org)
+                        data_name = self.get_tool_data_storage('<pre id="syntax"><code class="' + wiki_data_syntax + '" id="opennamu_syntax_' + str(syntax_count) + '">' + wiki_data, '</code></pre>', middle_data_org)
+                        
                         syntax_count += 1
                     elif middle_name in ('#!dark', '#!white'):
                         if middle_slash:
