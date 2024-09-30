@@ -19,7 +19,7 @@ def main_sys_update():
 
             print('Update')
             
-            if platform.system() == 'Linux':
+            if platform.system() == 'Linux' or platform.system() == 'Darwin':
                 ok = []
                 ok += [os.system('git remote rm origin')]
                 ok += [os.system('git remote add origin https://github.com/opennamu/opennamu.git')]

@@ -34,7 +34,7 @@ if data_up_date == 1:
     with open(os.path.join('data', 'version.json'), 'w', encoding = 'utf8') as f:
         f.write(version_list['beta']['r_ver'])
     
-    if platform.system() in ('Linux', 'Windows'):
+    if platform.system() in ('Linux', 'Windows', 'Darwin'):
         python_ver = ''
         python_ver = str(sys.version_info.major) + '.' + str(sys.version_info.minor)
 
@@ -123,6 +123,8 @@ def python_to_golang_sync(func_name, other_set = {}):
             cmd = [os.path.join(".", "route_go", "bin", "main.amd64.bin"), func_name, other_set]
         else:
             cmd = [os.path.join(".", "route_go", "bin", "main.arm64.bin"), func_name, other_set]
+    elif platform.system() == 'Darwin':
+        cmd = [os.path.join(".", "route_go", "bin", "main.mac.arm64.bin"), func_name, other_set]
     else:
         if platform.machine() in ["AMD64", "x86_64"]:
             cmd = [os.path.join(".", "route_go", "bin", "main.amd64.exe"), func_name, other_set]
@@ -165,6 +167,8 @@ async def python_to_golang(func_name, other_set = {}):
             cmd = [os.path.join(".", "route_go", "bin", "main.amd64.bin"), func_name, other_set]
         else:
             cmd = [os.path.join(".", "route_go", "bin", "main.arm64.bin"), func_name, other_set]
+    elif platform.system() == 'Darwin':
+        cmd = [os.path.join(".", "route_go", "bin", "main.mac.arm64.bin"), func_name, other_set]
     else:
         if platform.machine() in ["AMD64", "x86_64"]:
             cmd = [os.path.join(".", "route_go", "bin", "main.amd64.exe"), func_name, other_set]
@@ -832,13 +836,15 @@ def linux_exe_chmod():
             exe_type = 'main.amd64.bin'
         else:
             exe_type = 'main.arm64.bin'
+    elif platform.system() == 'Darwin':
+        exe_type = 'main.mac.arm64.bin'
     else:
         if platform.machine() in ["AMD64", "x86_64"]:
             exe_type = 'main.amd64.exe'
         else:
             exe_type = 'main.arm64.exe'
 
-    if platform.system() == 'Linux':
+    if platform.system() == 'Linux' or platform.system() == 'Darwin':
         os.system('chmod +x ./route_go/bin/' + exe_type)
 
     return exe_type
