@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/url"
 	"time"
+	"html"
 )
 
 func Sha224(data string) string {
@@ -25,6 +26,10 @@ func Url_parser(data string) string {
 
 func HTML_escape(data string) string {
 	return template.HTMLEscapeString(data)
+}
+
+func HTML_unescape(data string) string {
+	return html.UnescapeString(data)
 }
 
 func Arr_in_str(arr []string, data string) bool {

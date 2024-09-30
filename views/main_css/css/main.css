@@ -23,6 +23,8 @@
 .opennamu_main textarea,
 .opennamu_main input {
     width: 100%;
+
+    font-family: Consolas, Monaco, "Courier New", Courier, "Lucida Console", monospace;
 }
 
 .opennamu_main input {
@@ -235,7 +237,7 @@
 
 .opennamu_main code,
 .opennamu_main pre {
-    font-family: Consolas, Monaco, monospace;
+    font-family: Consolas, Monaco, "Courier New", Courier, "Lucida Console", monospace;
 }
 
 .opennamu_main #syntax {

@@ -78,7 +78,7 @@ func (class macromark) func_temp_restore(data string, to_raw bool) string {
 func (class *macromark) render_text() {
 	string_data := class.render_data
 
-	r := regexp2.MustCompile(`\[([^[(\]]+)\(((?:(?!\(|\)\]).)+)?\)\]`, 0)
+	r := regexp2.MustCompile(`\[([^[(\]]+)\(((?:(?!\(|\)\])[\s\S])+)?\)\]`, 0)
 	for {
 		if m, _ := r.FindStringMatch(string_data); m != nil {
 			gps := m.Groups()
@@ -111,6 +111,29 @@ func (class *macromark) render_text() {
 					string_data = strings.Replace(string_data, m_string, temp_name, 1)
 				case "h6":
 					temp_name := class.func_temp_save("<h6>" + macro_data + "</h6><back_br>", m_string)
+					string_data = strings.Replace(string_data, m_string, temp_name, 1)
+				case "ul":
+					temp_name := class.func_temp_save("<ul><back_br>" + macro_data + "</ul><back_br>", m_string)
+					string_data = strings.Replace(string_data, m_string, temp_name, 1)
+				case "li":
+					temp_name := class.func_temp_save("<li>" + macro_data + "</li><back_br>", m_string)
+					string_data = strings.Replace(string_data, m_string, temp_name, 1)
+				case "a":
+					a_data := class.func_temp_restore(macro_data, true)
+					a_data = strings.ReplaceAll(a_data, ",,", "<temp>")
+
+					part := strings.SplitN(a_data, ",", 2)
+
+					a_data_link := HTML_unescape(part[0])
+					a_data_view := a_data_link
+					if len(part) > 1 {
+						a_data_view = part[1]
+					}
+					
+					a_data_link = strings.ReplaceAll(a_data_link, "<temp>", ",")
+					a_data_view = strings.ReplaceAll(a_data_view, "<temp>", ",")
+
+					temp_name := class.func_temp_save("<a href=\"/w/" + Url_parser(a_data_link) + "\">" + a_data_view + "</a>", m_string)
 					string_data = strings.Replace(string_data, m_string, temp_name, 1)
 				case "b":
 					temp_name := class.func_temp_save("<b>" + macro_data + "</b>", m_string)
