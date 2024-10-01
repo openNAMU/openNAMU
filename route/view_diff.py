@@ -4,7 +4,11 @@ def view_diff_do(first_raw_data, second_raw_data, first, second):
     if first_raw_data == second_raw_data:
         result = ''
     else:
-        diff_data = diff_match_patch().diff_main(first_raw_data, second_raw_data)
+        dmp = diff_match_patch()
+
+        diff_data = dmp.diff_main(first_raw_data, second_raw_data)
+        dmp.diff_cleanupSemantic(diff_data)
+
         diff_data += [[0, '\n']]
         
         diff_data_2 = []
