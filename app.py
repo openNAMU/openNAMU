@@ -173,6 +173,7 @@ with get_db_connect(init_mode = True) as conn:
     server_set_var = get_init_set_list()
     server_set_env = {
         'host' : os.getenv('NAMU_HOST'),
+        'golang_port' : os.getenv('NAMU_GOLANGPORT'),
         'port' : os.getenv('NAMU_PORT'),
         'language' : os.getenv('NAMU_LANG'),
         'markup' : os.getenv('NAMU_MARKUP'),

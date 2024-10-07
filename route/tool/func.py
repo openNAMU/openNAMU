@@ -212,6 +212,10 @@ def get_init_set_list(need = 'all'):
             'display' : 'Port',
             'require' : 'conv',
             'default' : '3000'
+        }, 'golang_port' : {
+            'display' : 'Golang port',
+            'require' : 'conv',
+            'default' : '3001'
         }, 'language' : {
             'display' : 'Language',
             'require' : 'select',
