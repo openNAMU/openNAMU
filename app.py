@@ -3,7 +3,6 @@ import os
 import re
 import signal
 import logging
-import waitress
 
 from route.tool.func import *
 from route import *

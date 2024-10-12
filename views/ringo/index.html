@@ -193,7 +193,10 @@
                         {% endif %}
                     </h1>
                     {% if imp[3][1] != 0 %}
-                        {{'last_edit_time'|load_lang}} : {{imp[3][1]}} | {{'page_view'|load_lang}} : {{imp[3][7]}}
+                        {{'last_edit_time'|load_lang}} : {{imp[3][1]}}
+                        {% if imp[3][7] != 0 %}
+                            | {{'page_view'|load_lang}} : {{imp[3][7]}}
+                        {% endif %}
                     {% endif %}
                     {% if menu != 0 %}
                         <div id="menu">

@@ -303,9 +303,14 @@ def view_w(name = 'Test', do_type = ''):
         r_date = curs.fetchall()
         r_date = r_date[0][0] if r_date else 0
 
-        curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'view_count' and doc_rev = ''"), [name])
-        view_count = curs.fetchall()
-        view_count = view_count[0][0] if view_count else 0
+        curs.execute(db_change("select data from other where name = 'not_use_view_count'"))
+        view_count_set = curs.fetchall()
+        if view_count_set and view_count_set[0][0] != "":
+            view_count = 0
+        else:
+            curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'view_count' and doc_rev = ''"), [name])
+            view_count = curs.fetchall()
+            view_count = view_count[0][0] if view_count else 0
 
         div = file_data + user_doc + end_data + category_total
         
