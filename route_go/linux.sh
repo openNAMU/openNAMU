@@ -1,7 +1,6 @@
 #!/bin/bash
 
 read -p "file_name: " file_name
-
 to="${1:-all}"
 
 build() {
@@ -10,17 +9,24 @@ build() {
     local ext=$3
 
     echo "$os $arch"
-    GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build -o "bin/$file_name.$arch$ext" "$file_name.go"
+    
+    GOOS=$os
+    GOARCH=$arch
+    
+    if [[ "$arch" == "darwin" ]]; then
+        local arch="mac.$arch"
+    fi
+    
+    CGO_ENABLED=0
+    go build -o "bin/$file_name.$arch$ext" "$file_name.go"
 }
 
-mkdir -p bin
-
 if [[ "$to" == "linux_amd64" || "$to" == "all" ]]; then
-    build "linux" "amd64" ""
+    build "linux" "amd64" ".bin"
 fi
 
 if [[ "$to" == "linux_arm64" || "$to" == "all" ]]; then
-    build "linux" "arm64" ""
+    build "linux" "arm64" ".bin"
 fi
 
 if [[ "$to" == "windows_amd64" || "$to" == "all" ]]; then
@@ -32,5 +38,5 @@ if [[ "$to" == "windows_arm64" || "$to" == "all" ]]; then
 fi
 
 if [[ "$to" == "mac_arm64" || "$to" == "all" ]]; then
-    build "darwin" "arm64" ""
+    build "darwin" "arm64" ".bin"
 fi
