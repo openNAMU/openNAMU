@@ -13,12 +13,12 @@ build() {
     GOOS=$os
     GOARCH=$arch
     
-    if [[ "$arch" == "darwin" ]]; then
-        local arch="mac.$arch"
-    fi
-    
     CGO_ENABLED=0
-    go build -o "bin/$file_name.$arch$ext" "$file_name.go"
+    if [[ "$os" != "darwin" ]]; then
+        go build -o "bin/$file_name.$arch$ext" "$file_name.go"
+    else
+        go build -o "bin/$file_name.mac.$arch$ext" "$file_name.go"
+    fi
 }
 
 if [[ "$to" == "linux_amd64" || "$to" == "all" ]]; then
