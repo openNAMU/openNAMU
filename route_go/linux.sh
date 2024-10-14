@@ -10,10 +10,10 @@ build() {
 
     echo "$os $arch"
     
-    GOOS=$os
-    GOARCH=$arch
+    export GOOS=$os
+    export GOARCH=$arch
+    export CGO_ENABLED=0
     
-    CGO_ENABLED=0
     if [[ "$os" != "darwin" ]]; then
         go build -o "bin/$file_name.$arch$ext" "$file_name.go"
     else
