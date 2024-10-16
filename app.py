@@ -207,6 +207,25 @@ with get_db_connect(init_mode = True) as conn:
 
         server_set[i] = server_set_val
 
+###
+
+if platform.system() == 'Linux':
+    if platform.machine() in ["AMD64", "x86_64"]:
+        cmd = [os.path.join(".", "route_go", "bin", "main.amd64.bin")]
+    else:
+        cmd = [os.path.join(".", "route_go", "bin", "main.arm64.bin")]
+elif platform.system() == 'Darwin':
+    cmd = [os.path.join(".", "route_go", "bin", "main.mac.arm64.bin")]
+else:
+    if platform.machine() in ["AMD64", "x86_64"]:
+        cmd = [os.path.join(".", "route_go", "bin", "main.amd64.exe")]
+    else:
+        cmd = [os.path.join(".", "route_go", "bin", "main.arm64.exe")]
+
+golang_process = subprocess.Popen(cmd)
+
+###
+
 def back_up(data_db_set):
     with get_db_connect() as conn:
         curs = conn.cursor()
@@ -375,21 +394,6 @@ def before_request_func():
                         <input type="password" id="wiki_access">
                         <input type="submit" onclick="opennamu_do_wiki_access();">
                     '''
-
-if platform.system() == 'Linux':
-    if platform.machine() in ["AMD64", "x86_64"]:
-        cmd = [os.path.join(".", "route_go", "bin", "main.amd64.bin")]
-    else:
-        cmd = [os.path.join(".", "route_go", "bin", "main.arm64.bin")]
-elif platform.system() == 'Darwin':
-    cmd = [os.path.join(".", "route_go", "bin", "main.mac.arm64.bin")]
-else:
-    if platform.machine() in ["AMD64", "x86_64"]:
-        cmd = [os.path.join(".", "route_go", "bin", "main.amd64.exe")]
-    else:
-        cmd = [os.path.join(".", "route_go", "bin", "main.arm64.exe")]
-
-golang_process = subprocess.Popen(cmd)
 
 # Init-custom
 if os.path.exists('custom.py'):
