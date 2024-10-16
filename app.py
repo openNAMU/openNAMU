@@ -2,6 +2,7 @@
 import os
 import re
 import signal
+import atexit
 import logging
 
 from route.tool.func import *
@@ -374,6 +375,21 @@ def before_request_func():
                         <input type="password" id="wiki_access">
                         <input type="submit" onclick="opennamu_do_wiki_access();">
                     '''
+
+if platform.system() == 'Linux':
+    if platform.machine() in ["AMD64", "x86_64"]:
+        cmd = [os.path.join(".", "route_go", "bin", "main.amd64.bin")]
+    else:
+        cmd = [os.path.join(".", "route_go", "bin", "main.arm64.bin")]
+elif platform.system() == 'Darwin':
+    cmd = [os.path.join(".", "route_go", "bin", "main.mac.arm64.bin")]
+else:
+    if platform.machine() in ["AMD64", "x86_64"]:
+        cmd = [os.path.join(".", "route_go", "bin", "main.amd64.exe")]
+    else:
+        cmd = [os.path.join(".", "route_go", "bin", "main.arm64.exe")]
+
+golang_process = subprocess.Popen(cmd)
 
 # Init-custom
 if os.path.exists('custom.py'):
@@ -857,10 +873,18 @@ app.route('/update', methods = ['POST', 'GET'])(main_sys_update)
 
 app.errorhandler(404)(main_func_error_404)
 
+def terminate_golang():
+    if golang_process.poll() is None:
+        golang_process.terminate()
+
 def signal_handler(signal, frame):
+    terminate_golang()
     os._exit(0)
 
+signal.signal(signal.SIGTERM, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
+
+atexit.register(terminate_golang)
 
 if __name__ == "__main__":
     waitress.serve(

@@ -115,92 +115,17 @@ def do_db_set(db_set):
 
 def python_to_golang_sync(func_name, other_set = {}):
     if other_set == {}:
-        other_set = '{}'
+        other_set = func_name + ' {}'
     else:
-        other_set = json.dumps(other_set)
-
-    if platform.system() == 'Linux':
-        if platform.machine() in ["AMD64", "x86_64"]:
-            cmd = [os.path.join(".", "route_go", "bin", "main.amd64.bin"), func_name, other_set]
-        else:
-            cmd = [os.path.join(".", "route_go", "bin", "main.arm64.bin"), func_name, other_set]
-    elif platform.system() == 'Darwin':
-        cmd = [os.path.join(".", "route_go", "bin", "main.mac.arm64.bin"), func_name, other_set]
-    else:
-        if platform.machine() in ["AMD64", "x86_64"]:
-            cmd = [os.path.join(".", "route_go", "bin", "main.amd64.exe"), func_name, other_set]
-        else:
-            cmd = [os.path.join(".", "route_go", "bin", "main.arm64.exe"), func_name, other_set]
-
-    process = subprocess.Popen(
-        cmd,
-        stdout = subprocess.PIPE,
-        stderr = asyncio.subprocess.PIPE
-    )
-    stdout, stderr = process.communicate()
-    
-    data = ''
-    while data == '':
-        data = stdout.decode('utf8')
-        err = stderr.decode('utf8')
-        if err != '':
-            if 'database is locked' in err:
-                pass
-            else:
-                print(err)
-                break
-
-        time.sleep(0.01)
-
-    if data == '':
-        data = '{}'
+        other_set = func_name + ' ' + json.dumps(other_set)
+        
+    res = requests.post('http://localhost:3001/', data = other_set)
+    data = res.text
 
     return data
 
 async def python_to_golang(func_name, other_set = {}):
-    if other_set == {}:
-        other_set = '{}'
-    else:
-        other_set = json.dumps(other_set)
-
-    if platform.system() == 'Linux':
-        if platform.machine() in ["AMD64", "x86_64"]:
-            cmd = [os.path.join(".", "route_go", "bin", "main.amd64.bin"), func_name, other_set]
-        else:
-            cmd = [os.path.join(".", "route_go", "bin", "main.arm64.bin"), func_name, other_set]
-    elif platform.system() == 'Darwin':
-        cmd = [os.path.join(".", "route_go", "bin", "main.mac.arm64.bin"), func_name, other_set]            
-    else:
-        if platform.machine() in ["AMD64", "x86_64"]:
-            cmd = [os.path.join(".", "route_go", "bin", "main.amd64.exe"), func_name, other_set]
-        else:
-            cmd = [os.path.join(".", "route_go", "bin", "main.arm64.exe"), func_name, other_set]
-
-    
-    process = await asyncio.create_subprocess_exec(
-        *cmd,
-        stdout = asyncio.subprocess.PIPE,
-        stderr = asyncio.subprocess.PIPE
-    )
-    stdout, stderr = await process.communicate()
-
-    data = ''
-    while data == '':
-        data = stdout.decode('utf8')
-        err = stderr.decode('utf8')
-        if err != '':
-            if 'database is locked' in err:
-                pass
-            else:
-                print(err)
-                break
-
-        await asyncio.sleep(0.01)
-
-    if data == '':
-        data = '{}'
-
-    return data
+    return python_to_golang_sync(func_name, other_set)
 
 # Func-init
 def get_init_set_list(need = 'all'):
