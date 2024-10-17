@@ -4,8 +4,9 @@ flask
 flask[async]
 waitress
 
-requests
-typing_extensions
+aiohttp
+asyncio
+
 diff-match-patch
 
 pillow

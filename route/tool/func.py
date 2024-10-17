@@ -79,6 +79,7 @@ import werkzeug.debug
 
 import flask
 import asyncio
+import aiohttp
 import waitress
 
 import requests
@@ -125,7 +126,17 @@ def python_to_golang_sync(func_name, other_set = {}):
     return data
 
 async def python_to_golang(func_name, other_set = {}):
-    return python_to_golang_sync(func_name, other_set)
+    if other_set == {}:
+        other_set = func_name + ' {}'
+    else:
+        other_set = func_name + ' ' + json.dumps(other_set)
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post('http://localhost:3001/', data = other_set) as res:
+            data = await res.text()
+            print(data)
+
+            return data
 
 # Func-init
 def get_init_set_list(need = 'all'):
