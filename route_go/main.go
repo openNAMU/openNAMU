@@ -5,15 +5,18 @@ import (
 	"sync"
 	"io/ioutil"
 	"strings"
+	"runtime"
 	"opennamu/route"
 	
 	"net/http"
     "github.com/gin-gonic/gin"
 )
 
-var mu sync.Mutex
-
 func main() {
+	runtime.GOMAXPROCS(1)
+	
+	var mu sync.Mutex
+
     log.SetFlags(log.LstdFlags | log.Lshortfile)
 
     r := gin.Default()
