@@ -23,7 +23,8 @@ function ringo_do_skin_set() {
         }
     }
 
-    if(window.localStorage.getItem('main_css_off_sidebar') && window.localStorage.getItem('main_css_off_sidebar') === '1') {
+    if(window.localStorage.getItem('main_css_off_sidebar') && window.localStorage.getItem('main_css_off_sidebar') === '0') {
+    } else {
         document.getElementById('ringo_add_style').innerHTML += `
             section {
                 width: auto !important;

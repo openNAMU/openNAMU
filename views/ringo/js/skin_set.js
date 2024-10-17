@@ -87,7 +87,9 @@ function ringo_load_skin_set() {
             set_data["use_sys_darkmode"] = "checked";
         }
 
-        if(window.localStorage.getItem('main_css_off_sidebar') && window.localStorage.getItem('main_css_off_sidebar') === '1') {
+        if(window.localStorage.getItem('main_css_off_sidebar') && window.localStorage.getItem('main_css_off_sidebar') === '0') {
+            set_data["off_sidebar"] = "";
+        } else {
             set_data["off_sidebar"] = "checked";
         }
 
