@@ -221,8 +221,22 @@ else:
         cmd = [os.path.join(".", "route_go", "bin", "main.amd64.exe")]
     else:
         cmd = [os.path.join(".", "route_go", "bin", "main.arm64.exe")]
+        
+if run_mode != '':
+    cmd += [run_mode]
 
 golang_process = subprocess.Popen(cmd)
+
+while True:
+    try:
+        response = requests.post('http://localhost:3001/', data = "test {}")
+        if response.status_code == 200:
+            print('Golang turn on')
+            
+            break
+    except requests.ConnectionError:
+        print('Wait golang...')
+        time.sleep(1)
 
 ###
 

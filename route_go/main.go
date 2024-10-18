@@ -1,6 +1,7 @@
 package main
 
 import (
+    "os"
     "log"
     "sync"
     "io/ioutil"
@@ -13,14 +14,17 @@ import (
 )
 
 func main() {
+    if len(os.Args) > 1 && os.Args[1] == "dev" {
+    } else {
+        gin.SetMode(gin.ReleaseMode)
+    }
+
     runtime.GOMAXPROCS(1)
-    
     var mu sync.Mutex
 
     log.SetFlags(log.LstdFlags | log.Lshortfile)
 
     r := gin.Default()
-    
     r.POST("/", func(c *gin.Context) {
         mu.Lock()
         defer mu.Unlock()
@@ -36,7 +40,9 @@ func main() {
         
         call_arg := []string{ word[0], strings.Join(word[1:], " ") }
         
-        if call_arg[0] == "main_func_easter_egg" {
+        if call_arg[0] == "test" {
+            route_data = "ok"
+        } else if call_arg[0] == "main_func_easter_egg" {
             route_data = route.Main_func_easter_egg()
         } else if call_arg[0] == "api_w_raw" {
             route_data = route.Api_w_raw(call_arg[1:])
