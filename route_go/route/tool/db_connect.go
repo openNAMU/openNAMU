@@ -15,6 +15,11 @@ func Temp_DB_connect() *sql.DB {
         log.Fatal(err)
     }
 
+    _, err = db.Exec("pragma journal_mode = WAL")
+    if err != nil {
+        log.Fatal(err)
+    }
+
     return db
 }
 
@@ -44,6 +49,11 @@ func DB_connect() *sql.DB {
 
     if db_set["db_type"] == "sqlite" {
         db, err := sql.Open("sqlite", db_set["db_name"]+".db")
+        if err != nil {
+            log.Fatal(err)
+        }
+
+        _, err = db.Exec("pragma journal_mode = WAL")
         if err != nil {
             log.Fatal(err)
         }

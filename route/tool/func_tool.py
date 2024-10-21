@@ -28,6 +28,7 @@ class class_temp_db:
             check_same_thread = False,
             isolation_level = None
         )
+        self.conn.execute('pragma journal_mode = WAL')
 
         return self.conn
 
