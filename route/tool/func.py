@@ -204,7 +204,6 @@ class get_db_connect:
                 check_same_thread = False,
                 isolation_level = None
             )
-            self.conn.execute('pragma journal_mode = WAL')
         else:
             if self.init_mode:
                 self.conn = pymysql.connect(

@@ -24,6 +24,9 @@ with open('version.json', encoding = 'utf8') as file_data:
 data_db_set = class_check_json()
 do_db_set(data_db_set)
 
+with class_temp_db() as m_conn:
+    m_conn.execute('pragma journal_mode = WAL')
+
 with get_db_connect(init_mode = True) as conn:
     curs = conn.cursor()
 
@@ -53,6 +56,8 @@ with get_db_connect(init_mode = True) as conn:
                 pass
 
         conn.select_db(data_db_set['name'])
+    else:
+        conn.execute('pragma journal_mode = WAL')
 
     if setup_tool != 'normal':
         create_data = get_db_table_list()
