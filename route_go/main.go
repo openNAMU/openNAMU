@@ -8,26 +8,35 @@ import (
     "strings"
     "runtime"
     "opennamu/route"
+    "opennamu/route/tool"
     
     "net/http"
     "github.com/gin-gonic/gin"
 )
 
 func main() {
+    log.SetFlags(log.LstdFlags | log.Lshortfile)
+        
     if len(os.Args) > 1 && os.Args[1] == "dev" {
     } else {
         gin.SetMode(gin.ReleaseMode)
     }
 
-    runtime.GOMAXPROCS(1)
-    var mu sync.Mutex
+    tool.DB_init()
 
-    log.SetFlags(log.LstdFlags | log.Lshortfile)
+    db_type := tool.Get_DB_type()
+    if db_type == "sqlite" {
+        runtime.GOMAXPROCS(1)
+    }
+
+    var mu sync.Mutex
 
     r := gin.Default()
     r.POST("/", func(c *gin.Context) {
-        mu.Lock()
-        defer mu.Unlock()
+        if db_type == "sqlite" {
+            mu.Lock()
+            defer mu.Unlock()
+        }
         
         route_data := ""
         body, err := ioutil.ReadAll(c.Request.Body)
