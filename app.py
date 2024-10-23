@@ -911,9 +911,6 @@ app.errorhandler(404)(main_func_error_404)
 def terminate_golang():
     if golang_process.poll() is None:
         golang_process.terminate()
-        
-    if golang_process.poll() is None:
-        os.killpg(os.getpgid(golang_process.pid), signal.SIGTERM)
 
 def signal_handler(signal, frame):
     terminate_golang()
