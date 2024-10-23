@@ -50,6 +50,7 @@ print('23. Delete body bottom')
 print('24. SQLite to MySQL')
 print('25. Recalc exist data_set')
 print('26. Change update branch')
+print('27. Change golang port')
 
 what_i_do = input('Insert selection number (EX : 9) : ')
 if what_i_do == '1':
@@ -257,6 +258,10 @@ elif what_i_do == '26':
 
     curs.execute(db_change('delete from other where name = "update"'))
     curs.execute(db_change('insert into other (name, data, coverage) values ("update", ?, "")'), [up_data])
+elif what_i_do == '27':
+    port = int(input('Port : '))
+
+    curs.execute(db_change("update other set data = ? where name = 'golang_port'"), [port])
 else:
     raise ValueError(what_i_do)
 

@@ -65,6 +65,10 @@ func Get_DB_type() string {
     return db_set["db_type"]
 }
 
+func Get_port() string {
+    return db_set["setup_golang_port"]
+}
+
 func DB_change(data string) string {
     if Get_DB_type() == "mysql" {
         data = strings.Replace(data, "random()", "rand()", -1)
