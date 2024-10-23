@@ -110,32 +110,46 @@ def do_db_set(db_set):
 
         m_curs.execute('drop table if exists temp')
         m_curs.execute('create table if not exists temp(name text, data text)')
-
+        
         for for_a in db_set:
             m_curs.execute('insert into temp (name, data) values (?, ?)', ['db_' + for_a, db_set[for_a]])
 
 def python_to_golang_sync(func_name, other_set = {}):
-    if other_set == {}:
-        other_set = func_name + ' {}'
-    else:
-        other_set = func_name + ' ' + json.dumps(other_set)
+    with class_temp_db() as m_conn:
+        m_curs = m_conn.cursor()
         
-    res = requests.post('http://localhost:3001/', data = other_set)
-    data = res.text
-
-    return data
+        if other_set == {}:
+            other_set = func_name + ' {}'
+        else:
+            other_set = func_name + ' ' + json.dumps(other_set)
+    
+        m_curs.execute('select data from temp where name = "setup_golang_port"')
+        db_data = m_curs.fetchall()
+        db_data = db_data[0][0] if db_data else "3001"
+    
+        res = requests.post('http://localhost:' + db_data + '/', data = other_set)
+        data = res.text
+    
+        return data
 
 async def python_to_golang(func_name, other_set = {}):
-    if other_set == {}:
-        other_set = func_name + ' {}'
-    else:
-        other_set = func_name + ' ' + json.dumps(other_set)
-
-    async with aiohttp.ClientSession() as session:
-        async with session.post('http://localhost:3001/', data = other_set) as res:
-            data = await res.text()
-
-            return data
+    with class_temp_db() as m_conn:
+        m_curs = m_conn.cursor()
+    
+        if other_set == {}:
+            other_set = func_name + ' {}'
+        else:
+            other_set = func_name + ' ' + json.dumps(other_set)
+    
+        m_curs.execute('select data from temp where name = "setup_golang_port"')
+        db_data = m_curs.fetchall()
+        db_data = db_data[0][0] if db_data else "3001"
+    
+        async with aiohttp.ClientSession() as session:
+            async with session.post('http://localhost:' + db_data + '/', data = other_set) as res:
+                data = await res.text()
+    
+                return data
 
 # Func-init
 def get_init_set_list(need = 'all'):
@@ -248,7 +262,6 @@ class class_check_json:
                 for i in db_set_list:
                     if not i in set_data:
                         os.remove(os.path.join('data', 'set.json'))
-                        
                         break
             
             if not os.path.exists(os.path.join('data', 'set.json')):

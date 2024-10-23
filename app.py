@@ -211,6 +211,12 @@ with get_db_connect(init_mode = True) as conn:
         print(server_set_var[i]['display'] + ' : ' + server_set_val)
 
         server_set[i] = server_set_val
+        
+with class_temp_db() as m_conn:
+    m_curs = m_conn.cursor()
+        
+    for for_a in server_set:
+        m_curs.execute('insert into temp (name, data) values (?, ?)', ['setup_' + for_a, server_set[for_a]])
 
 ###
 
@@ -232,16 +238,22 @@ if run_mode != '':
 
 golang_process = subprocess.Popen(cmd)
 
-while True:
-    try:
-        response = requests.post('http://localhost:3001/', data = "test {}")
-        if response.status_code == 200:
-            print('Golang turn on')
-            
-            break
-    except requests.ConnectionError:
-        print('Wait golang...')
-        time.sleep(1)
+with class_temp_db() as m_conn:
+    m_curs = m_conn.cursor()
+    
+    m_curs.execute('select data from temp where name = "setup_golang_port"')
+    db_data = m_curs.fetchall()
+    db_data = db_data[0][0] if db_data else "3001"
+    
+    while True:
+        try:
+            response = requests.post('http://localhost:' + db_data + '/', data = "test {}")
+            if response.status_code == 200:
+                print('Golang turn on')
+                break
+        except requests.ConnectionError:
+            print('Wait golang...')
+            time.sleep(1)
 
 ###
 
@@ -899,6 +911,9 @@ app.errorhandler(404)(main_func_error_404)
 def terminate_golang():
     if golang_process.poll() is None:
         golang_process.terminate()
+        
+    if golang_process.poll() is None:
+        os.killpg(os.getpgid(golang_process.pid), signal.SIGTERM)
 
 def signal_handler(signal, frame):
     terminate_golang()

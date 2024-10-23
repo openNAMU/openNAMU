@@ -156,5 +156,5 @@ func main() {
         c.String(http.StatusOK, route_data)  
     })
     
-    r.Run(":3001")
+    r.Run(":" + tool.Get_port())
 }
