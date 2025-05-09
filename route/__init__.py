@@ -81,6 +81,7 @@ from route.main_setting_sitemap_set import main_setting_sitemap_set
 from route.main_setting_skin_set import main_setting_skin_set
 from route.main_setting_top_menu import main_setting_top_menu
 from route.main_setting_email_test import main_setting_email_test
+from route.main_setting_404_page import main_setting_404_page
 
 from route.main_sys_restart import main_sys_restart
 from route.main_sys_shutdown import main_sys_shutdown
@@ -167,8 +168,6 @@ from route.n_topic_list import topic_list
 
 from route.n_give_auth import give_auth
 
-from route.n_setting_404_page import setting_404_page
-
 from route.n_bbs_main import bbs_main
 from route.n_bbs_in import bbs_in
 from route.n_bbs_w_set import bbs_w_set
@@ -176,7 +175,7 @@ from route.n_bbs_w_set import bbs_w_set
 from route.n_edit_move_all import edit_move_all
 
 from route.go_api_func_llm import api_func_llm
-from route.go_api_func_language import api_func_language
+from route.go_api_func_language import api_func_language, api_func_language_exter
 from route.go_api_func_sha224 import api_func_sha224
 from route.go_api_func_ip import api_func_ip
 from route.go_api_func_ip_menu import api_func_ip_menu
@@ -205,7 +204,7 @@ from route.go_api_bbs_w_tabom import api_bbs_w_tabom
 from route.go_api_bbs_w_comment import api_bbs_w_comment, api_bbs_w_comment_exter
 from route.go_api_bbs_w_comment_one import api_bbs_w_comment_one, api_bbs_w_comment_one_exter
 
-from route.go_api_setting import api_setting
+from route.go_api_setting import api_setting, api_setting_exter
 
 from route.go_api_topic import api_topic
 from route.go_api_topic_list import api_topic_list

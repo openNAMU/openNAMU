@@ -847,8 +847,8 @@ app.route('/api/recent_discuss/<set_type>/<int:limit>')(api_list_recent_discuss)
 app.route('/api/recent_discuss/<int:limit>')(api_list_recent_discuss)
 app.route('/api/recent_discuss')(api_list_recent_discuss)
 
-app.route('/api/lang', methods = ['POST'])(api_func_language)
-app.route('/api/lang/<data>')(api_func_language)
+app.route('/api/lang', methods = ['POST'])(api_func_language_exter)
+app.route('/api/lang/<data>')(api_func_language_exter)
 app.route('/api/sha224/<everything:data>')(api_func_sha224)
 app.route('/api/ip/<everything:data>')(api_func_ip)
 
@@ -886,7 +886,7 @@ app.route('/api/v2/doc_watch_list/<int:num>/<everything:name>')(api_w_watch_list
 app.route('/api/v2/set_reset/<everything:name>')(api_w_set_reset)
 app.route('/api/v2/page_view/<everything:name>')(api_w_page_view)
 
-app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting)
+app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting_exter)
 
 app.route('/api/v2/auth')(api_func_auth)
 app.route('/api/v2/auth/<user_name>')(api_func_auth)
@@ -898,7 +898,7 @@ app.route('/api/v2/user/setting/editor', methods = ['GET', 'POST', 'DELETE'])(ap
 app.route('/api/v2/ip/<everything:data>', methods = ['GET', 'POST'])(api_func_ip)
 app.route('/api/v2/ip_menu/<everything:ip>', defaults = { 'option' : 'user' }, methods = ['GET', 'POST'])(api_func_ip_menu)
 app.route('/api/v2/user_menu/<everything:ip>')(api_func_ip_menu)
-app.route('/api/v2/lang', defaults = { 'legacy' : '' }, methods = ['POST'])(api_func_language)
+app.route('/api/v2/lang', defaults = { 'legacy' : '' }, methods = ['POST'])(api_func_language_exter)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정
@@ -931,7 +931,7 @@ app.route('/setting/external', methods = ['POST', 'GET'])(main_setting_external)
 app.route('/setting/sitemap', methods = ['POST', 'GET'])(main_setting_sitemap)
 app.route('/setting/sitemap_set', methods = ['POST', 'GET'])(main_setting_sitemap_set)
 app.route('/setting/skin_set', methods = ['POST', 'GET'])(main_setting_skin_set)
-app.route('/setting/404_page', methods = ['POST', 'GET'])(setting_404_page)
+app.route('/setting/404_page', methods = ['POST', 'GET'])(main_setting_404_page)
 app.route('/setting/email_test', methods = ['POST', 'GET'])(main_setting_email_test)
 
 app.route('/easter_egg')(main_func_easter_egg)
