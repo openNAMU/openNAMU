@@ -56,6 +56,12 @@
     "login_able_and_regsiter_disable": "Login-able and Registration-disable",
     "private": "Private",
     "upvote": "Upvote",
+    "template_var" : "Template variable",
+    "edit_only_bottom_text" : "Editing only textarea bottom notice",
+    "move_bottom_text" : "Move textarea bottom notice",
+    "delete_bottom_text" : "Delete textarea bottom notice",
+    "revert_bottom_text" : "Revert textarea bottom notice",
+    "warning_restart" : "Restarting... Press Refresh (F5)",
 
     "_comment_": "Common",
     "data": "Data",

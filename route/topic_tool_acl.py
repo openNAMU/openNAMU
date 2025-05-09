@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def topic_tool_acl(topic_num = 1):
+async def topic_tool_acl(topic_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check(tool = 'toron_auth') == 1:
-            return re_error(conn, 3)
+        if await acl_check(tool = 'toron_auth') == 1:
+            return await re_error(conn, 3)
 
         ip = ip_check()
         time = get_time()
@@ -17,7 +17,7 @@ def topic_tool_acl(topic_num = 1):
             return redirect(conn, '/')
 
         if flask.request.method == 'POST':
-            acl_check(tool = 'toron_auth', memo = 'topic_acl_set (code ' + topic_num + ')')
+            await acl_check(tool = 'toron_auth', memo = 'topic_acl_set (code ' + topic_num + ')')
 
             curs.execute(db_change("select id from topic where code = ? order by id + 0 desc limit 1"), [topic_num])
             topic_check = curs.fetchall()
@@ -55,7 +55,7 @@ def topic_tool_acl(topic_num = 1):
 
             return redirect(conn, '/thread/' + topic_num)
         else:
-            acl_list = get_acl_list()
+            acl_list = await get_acl_list()
             acl_html_list = ''
             acl_html_list_view = ''
 
@@ -80,7 +80,7 @@ def topic_tool_acl(topic_num = 1):
                 acl_html_list_view += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'topic_acl_setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'topic_acl_setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <a href="/acl/TEST#exp">(''' + get_lang(conn, 'reference') + ''')</a>

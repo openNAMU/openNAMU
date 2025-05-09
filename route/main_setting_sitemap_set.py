@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def main_setting_sitemap_set():
+async def main_setting_sitemap_set():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, 0)
+        if await acl_check('', 'owner_auth', '', '') == 1:
+            return await re_error(conn, 0)
         
         setting_list = {
             0 : ['sitemap_auto_exclude_domain', ''],
@@ -22,7 +22,7 @@ def main_setting_sitemap_set():
                     setting_list[i][0]
                 ])
 
-            acl_check(tool = 'owner_auth', memo = 'edit_set (sitemap)')
+            await acl_check(tool = 'owner_auth', memo = 'edit_set (sitemap)')
 
             return redirect(conn, '/setting/sitemap_set')
         else:
@@ -57,7 +57,7 @@ def main_setting_sitemap_set():
                     for_a += 1
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'sitemap_management'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'sitemap_management'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     ''' + sitemap_list + '''
                     <hr class="main_hr">

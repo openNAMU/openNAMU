@@ -1,10 +1,10 @@
 from .tool.func import *
 
-def user_setting_skin_set():
+async def user_setting_skin_set():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        data = flask.make_response(re_error(conn, 5))
+        data = flask.make_response(await re_error(conn, 5))
 
         curs.execute(db_change("select data from other where name = 'language'"))
         main_data = curs.fetchall()

@@ -1,25 +1,25 @@
 from .tool.func import *
 
-def edit_move(name):
+async def edit_move(name):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check(name, 'document_move') == 1:
-            return re_error(conn, 0)
+        if await acl_check(name, 'document_move') == 1:
+            return await re_error(conn, 0)
         
         if do_title_length_check(conn, name) == 1:
-            return re_error(conn, 38)
+            return await re_error(conn, 38)
 
         if flask.request.method == 'POST':
             move_title = flask.request.form.get('title', 'test')
-            if acl_check(move_title) == 1:
-                return re_error(conn, 0)
+            if await acl_check(move_title) == 1:
+                return await re_error(conn, 0)
 
-            if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, 13)
+            if await captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                return await re_error(conn, 13)
 
-            if do_edit_slow_check(conn) == 1:
-                return re_error(conn, 24)
+            if await do_edit_slow_check(conn) == 1:
+                return await re_error(conn, 24)
             
             send = flask.request.form.get('send', '')
             agree = flask.request.form.get('copyright_agreement', '')
@@ -33,18 +33,18 @@ def edit_move(name):
             move_option_topic = flask.request.form.get('move_topic_option', 'none')
             document_set_option = flask.request.form.get('document_set_option', 'none')
             
-            if do_edit_send_check(conn, send) == 1:
-                return re_error(conn, 37)
+            if await do_edit_send_check(conn, send) == 1:
+                return await re_error(conn, 37)
             
             if do_edit_text_bottom_check_box_check(conn, agree) == 1:
-                return re_error(conn, 29)
+                return await re_error(conn, 29)
 
             # 역링크 관련 패치 해야할 듯
 
             # 문서 이동 파트 S
             curs.execute(db_change("select title from history where title = ?"), [move_title])
             if curs.fetchall():
-                if move_option == 'merge' and acl_check(tool = 'owner_auth', memo = 'merge documents (' + name + ') (' + move_title + ')') != 1:
+                if move_option == 'merge' and await acl_check(tool = 'owner_auth', memo = 'merge documents (' + name + ') (' + move_title + ')') != 1:
                     curs.execute(db_change("select data from data where title = ?"), [move_title])
                     data = curs.fetchall()
                     if data:
@@ -160,7 +160,7 @@ def edit_move(name):
             # 토론 이동 파트 S
             curs.execute(db_change("select title from rd where title = ?"), [move_title])
             if curs.fetchall():
-                if move_option_topic == 'merge' and acl_check(tool = 'owner_auth', memo = 'merge document\'s topics (' + name + ') (' + move_title + ')') != 1:
+                if move_option_topic == 'merge' and await acl_check(tool = 'owner_auth', memo = 'merge document\'s topics (' + name + ') (' + move_title + ')') != 1:
                     curs.execute(db_change("update rd set title = ? where title = ?"), [move_title, name])
                 elif move_option_topic == 'reverse':
                     i = 0
@@ -208,13 +208,13 @@ def edit_move(name):
             if has_error == 0:
                 return redirect(conn, '/w/' + url_pas(move_title))
             else:
-                return re_error(conn, 19)
+                return await re_error(conn, 19)
         else:
-            owner_auth = acl_check(tool = 'owner_auth')
+            owner_auth = await acl_check(tool = 'owner_auth')
             owner_auth = 1 if owner_auth == 0 else 0
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'move') + ')', 0])],
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'move') + ')', 0])],
                 data = '''
                     <form method="post">
                         <span>''' + get_lang(conn, 'document_name') + '''</span>
@@ -256,7 +256,7 @@ def edit_move(name):
                             '''
                         ) if owner_auth == 1 else '') + '''
 
-                        ''' + captcha_get(conn) + ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn)  + '''
+                        ''' + await captcha_get(conn) + ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'move')  + '''
                         
                         <button type="submit">''' + get_lang(conn, 'move') + '''</button>
                     </form>

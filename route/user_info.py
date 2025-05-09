@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def user_info(name = ''):
+async def user_info(name = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
     
@@ -41,7 +41,7 @@ def user_info(name = ''):
             login_menu = '<h2>' + get_lang(conn, 'login') + '</h2><ul>' + login_menu + '</ul>'
             tool_menu = '<h2>' + get_lang(conn, 'tool') + '</h2><ul>' + tool_menu + '</ul>'
     
-        if acl_check(tool = 'ban_auth') != 1:
+        if await acl_check(tool = 'ban_auth') != 1:
             curs.execute(db_change("select block from rb where block = ? and ongoing = '1'"), [ip])
             ban_name = get_lang(conn, 'release') if curs.fetchall() else get_lang(conn, 'ban')
             
@@ -56,7 +56,7 @@ def user_info(name = ''):
             admin_menu = ''
                 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'user_tool'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [get_lang(conn, 'user_tool'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = '''
                 <h2>''' + get_lang(conn, 'state') + '''</h2>
                 <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>

@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def main_setting_main():
+async def main_setting_main():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, 0)
+        if await acl_check('', 'owner_auth', '', '') == 1:
+            return await re_error(conn, 0)
         
         setting_list = {
             0 : ['name', 'Wiki'],
@@ -57,7 +57,7 @@ def main_setting_main():
                     setting_list[i][0]
                 ])
 
-            acl_check(tool = 'owner_auth', memo = 'edit_set (main)')
+            await acl_check(tool = 'owner_auth', memo = 'edit_set (main)')
 
             return redirect(conn, '/setting/main')
         else:
@@ -106,15 +106,11 @@ def main_setting_main():
                 else:
                     branch_div += '<option value="' + i + '">' + i + '</option>'
 
+            set_data = global_some_set_do('db_type')
+            
             sqlite_only = ''
-            with class_temp_db() as m_conn:
-                m_curs = m_conn.cursor()
-
-                m_curs.execute('select data from temp where name = "db_type"')
-                db_data = m_curs.fetchall()
-                set_data = db_data[0][0] if db_data else 'sqlite'
-
-                sqlite_only = 'style="display:none;"' if set_data != 'sqlite' else ''
+            if set_data != 'sqlite':
+                sqlite_only = 'style="display:none;"'
 
             ip_load_select_data = ''
             ip_load_option = ['default', 'HTTP_X_REAL_IP', 'HTTP_CF_CONNECTING_IP', 'REMOTE_ADDR']
@@ -204,7 +200,7 @@ def main_setting_main():
             '''
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'main_setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'main_setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = render_simple_set(conn, '''
                     <form method="post">
                         ''' + basic_set + '''

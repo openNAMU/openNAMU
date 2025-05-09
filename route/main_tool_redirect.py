@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_tool_redirect(num = 1, add_2 = ''):
+async def main_tool_redirect(num = 1, add_2 = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -20,6 +20,7 @@ def main_tool_redirect(num = 1, add_2 = ''):
             13 : [get_lang(conn, 'document_name'), '/edit', get_lang(conn, 'load')],
             14 : [get_lang(conn, 'document_name'), '/star_doc', get_lang(conn, 'add_star_doc')],
             16 : [0, '/auth/give/fix', get_lang(conn, 'user_fix')],
+            17 : [get_lang(conn, 'search'), '/recent_block/all/1', get_lang(conn, 'search')],
         }
         
         if num == 1:
@@ -57,7 +58,7 @@ def main_tool_redirect(num = 1, add_2 = ''):
                     ''
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [title_list[num][2], wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [title_list[num][2], await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         ''' + top_plus + '''

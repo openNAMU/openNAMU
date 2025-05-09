@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def user_alarm():
+async def user_alarm():
     with get_db_connect() as conn:
         curs = conn.cursor()
     
@@ -28,7 +28,7 @@ def user_alarm():
                 
                 data += '' + \
                     '<li style="' + data_style + '">' + \
-                        ip_pas(data_split[0]) + (' | ' + ' | '.join(data_split[1:]) if len(data_split) > 1 else '') + \
+                        await ip_pas(data_split[0]) + (' | ' + ' | '.join(data_split[1:]) if len(data_split) > 1 else '') + \
                         ' | ' + data_one[1] + \
                         ' <a href="/alarm/delete/' + url_pas(data_one[3]) + '">(' + get_lang(conn, 'delete') + ')</a>' + \
                     '</li>' + \
@@ -38,11 +38,11 @@ def user_alarm():
     
         data += '' + \
             '</ul>' + \
-            next_fix(conn, '/alarm?num=', num, data_list) + \
+            get_next_page_bottom(conn, '/alarm?num={}', num, data_list) + \
         ''
     
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'notice'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [get_lang(conn, 'notice'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = data,
             menu = [['user', get_lang(conn, 'return')]]
         ))

@@ -1,17 +1,17 @@
 from .tool.func import *
 
-def give_user_ban(name = None, ban_type = ''):
+async def give_user_ban(name = None, ban_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         ip = ip_check()
         
-        if ban_check(ip = ip, tool = 'login')[0] == 1:
-            if ip_or_user(ip) == 1 or acl_check(tool = 'all_admin_auth', ip = ip) != 0:
-                return re_error(conn, 0)
+        if (await ban_check(ip = ip, tool = 'login'))[0] == 1:
+            if ip_or_user(ip) == 1 or await acl_check(tool = 'all_admin_auth', ip = ip) != 0:
+                return await re_error(conn, 0)
         else:
-            if acl_check(tool = 'ban_auth', ip = ip) == 1:
-                return re_error(conn, 3)
+            if await acl_check(tool = 'ban_auth', ip = ip) == 1:
+                return await re_error(conn, 3)
 
         if flask.request.method == 'POST':
             end = '0'
@@ -63,7 +63,7 @@ def give_user_ban(name = None, ban_type = ''):
                     try:
                         re.compile(name)
                     except:
-                        return re_error(conn, 23)
+                        return await re_error(conn, 23)
                 elif regex_get == 'cidr':
                     type_d = 'cidr'
 
@@ -73,22 +73,22 @@ def give_user_ban(name = None, ban_type = ''):
                         try:
                             ipaddress.IPv6Network(name, False)
                         except:
-                            return re_error(conn, 45)
+                            return await re_error(conn, 45)
                 elif regex_get == 'private':
                     type_d = 'private'
 
-                    if acl_check(tool = 'owner_auth', ip = ip) == 1:
-                        return re_error(conn, 0)
+                    if await acl_check(tool = 'owner_auth', ip = ip) == 1:
+                        return await re_error(conn, 0)
                 else:
                     type_d = None
 
                 if regex_get != 'private':
                     if name == ip:
-                        if acl_check(tool = 'all_admin_auth', memo = 'ban (' + name + ')') == 1:
-                            return re_error(conn, 3)
+                        if await acl_check(tool = 'all_admin_auth', memo = 'ban (' + name + ')') == 1:
+                            return await re_error(conn, 3)
                     else:
-                        if acl_check(tool = 'ban_auth', memo = 'ban (' + name + ')') == 1:
-                            return re_error(conn, 3)
+                        if await acl_check(tool = 'ban_auth', memo = 'ban (' + name + ')') == 1:
+                            return await re_error(conn, 3)
 
                 ban_insert(conn, 
                     name,
@@ -128,11 +128,11 @@ def give_user_ban(name = None, ban_type = ''):
                     info_data = '<div id="opennamu_get_user_info">' + html.escape(name) + '</div>'
 
             owner_option = ''
-            if acl_check(tool = 'owner_auth', ip = ip) != 1:
+            if await acl_check(tool = 'owner_auth', ip = ip) != 1:
                 owner_option = '<option value="private" ' + ('selected' if ban_type == 'private' else '') + '>' + get_lang(conn, 'private') + '</option>'
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [main_name, wiki_set(conn), wiki_custom(conn), wiki_css([now, 0])],
+                imp = [main_name, await wiki_set(), await wiki_custom(conn), wiki_css([now, 0])],
                 data = info_data + '''
                     <form method="post" ''' + action + '''>
                         <h2>''' + get_lang(conn, 'method') + '''</h2>

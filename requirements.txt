@@ -2,7 +2,7 @@ pip
 
 flask
 flask[async]
-waitress
+hypercorn
 
 aiohttp
 asyncio

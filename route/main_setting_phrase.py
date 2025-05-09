@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def main_setting_phrase():
+async def main_setting_phrase():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, 0)
+        if await acl_check('', 'owner_auth', '', '') == 1:
+            return await re_error(conn, 0)
         
         i_list = [
             'contract',
@@ -46,7 +46,7 @@ def main_setting_phrase():
         if flask.request.method == 'POST':
             curs.executemany(db_change("update other set data = ? where name = ?"), [[flask.request.form.get(for_a, ''), for_a] for for_a in i_list])
 
-            acl_check(tool = 'owner_auth', memo = 'edit_set (phrase)')
+            await acl_check(tool = 'owner_auth', memo = 'edit_set (phrase)')
 
             return redirect(conn, '/setting/phrase')
         else:
@@ -61,7 +61,7 @@ def main_setting_phrase():
                     d_list += ['']
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'text_setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'text_setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = render_simple_set(conn, '''
                     <form method="post">
                         <h2>''' + get_lang(conn, 'register_text') + ''' (HTML)</h2>
@@ -157,19 +157,19 @@ def main_setting_phrase():
                         <h3>''' + get_lang(conn, 'template_var_3') + ''' (''' + get_lang(conn, 'default') + ''' : ''' + get_lang(conn, 'bottom') + ''') (HTML)</h3>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[29] + '''">''' + html.escape(d_list[29]) + '''</textarea>
 
-                        <h3>''' + get_lang(conn, 'edit_bottom_text') + ''' (HTML)</h3>
+                        <h2>''' + get_lang(conn, 'edit_bottom_text') + ''' (HTML)</h2>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[2] + '''">''' + html.escape(d_list[2]) + '''</textarea>
 
-                        <h2>''' + get_lang(conn, 'edit_only_bottom_text') + ''' (HTML)</h2>
+                        <h3>''' + get_lang(conn, 'edit_only_bottom_text') + ''' (HTML)</h3>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[30] + '''">''' + html.escape(d_list[30]) + '''</textarea>
 
-                        <h3>''' + get_lang(conn, 'edit_bottom_text') + ''' (HTML)</h3>
+                        <h3>''' + get_lang(conn, 'move_bottom_text') + ''' (HTML)</h3>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[31] + '''">''' + html.escape(d_list[31]) + '''</textarea>
 
-                        <h3>''' + get_lang(conn, 'edit_bottom_text') + ''' (HTML)</h3>
+                        <h3>''' + get_lang(conn, 'delete_bottom_text') + ''' (HTML)</h3>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[32] + '''">''' + html.escape(d_list[32]) + '''</textarea>
 
-                        <h3>''' + get_lang(conn, 'edit_bottom_text') + ''' (HTML)</h3>
+                        <h3>''' + get_lang(conn, 'revert_bottom_text') + ''' (HTML)</h3>
                         <textarea class="opennamu_textarea_100" name="''' + i_list[33] + '''">''' + html.escape(d_list[33]) + '''</textarea>
 
                         <hr class="main_hr">

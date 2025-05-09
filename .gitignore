@@ -19,7 +19,6 @@ goorm.manifest
 *.db-shm
 *.db-wal
 *.db-journal
-file
 
 robots.txt
 custom.py

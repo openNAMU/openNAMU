@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def filter_all_delete(tool, name = 'Test'):
+async def filter_all_delete(tool, name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
         
-        if acl_check(tool = 'owner_auth', memo = 'del_' + tool) == 1:
-            return re_error(conn, 3)
+        if await acl_check(tool = 'owner_auth', memo = 'del_' + tool) == 1:
+            return await re_error(conn, 3)
 
         if tool == 'inter_wiki':
             curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki'"), [name])

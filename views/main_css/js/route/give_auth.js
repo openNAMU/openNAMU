@@ -17,7 +17,11 @@ function opennamu_give_auth_submit() {
             fetch('/api/v2/auth/give', {
                 method : 'PATCH',
                 body : send_data,
-            });
+            }).then(() => {
+                history.go(0);
+            }).catch(err => {
+                console.error(err);
+            });;
         } else {
             let change_auth = document.getElementById('opennamu_give_auth_select').value;
             let user_name_data = document.getElementById('opennamu_give_auth_user_name').value;
@@ -33,7 +37,11 @@ function opennamu_give_auth_submit() {
                 fetch('/api/v2/auth/give', {
                     method : 'PATCH',
                     body : send_data,
-                });
+                }).then(() => {
+                    history.go(0);
+                }).catch(err => {
+                    console.error(err);
+                });;
             }
         }
     } else {
@@ -48,10 +56,12 @@ function opennamu_give_auth_submit() {
         fetch('/api/v2/auth/give', {
             method : 'PATCH',
             body : send_data,
+        }).then(() => {
+            history.go(0);
+        }).catch(err => {
+            console.error(err);
         });
     }
-
-    history.go(0);
 }
 
 function opennamu_give_auth() {

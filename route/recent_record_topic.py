@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def recent_record_topic(name = 'Test'):
+async def recent_record_topic(name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -16,7 +16,7 @@ def recent_record_topic(name = 'Test'):
                 </tr>
         '''
         sub = '(' + html.escape(name) + ')'
-        pas_name = ip_pas(name)
+        pas_name = await ip_pas(name)
 
         curs.execute(db_change("select code, id, date from topic where ip = ? order by date desc limit ?, 50"), [name, sql_num])
         data_list = curs.fetchall()
@@ -37,10 +37,10 @@ def recent_record_topic(name = 'Test'):
             ''
 
         div += '</table>'
-        div += next_fix(conn, '/record/topic/' + url_pas(name) + '?num=', num, data_list)
+        div += get_next_page_bottom(conn, '/record/topic/' + url_pas(name) + '?num={}', num, data_list)
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'discussion_record'), wiki_set(conn), wiki_custom(conn), wiki_css([sub, 0])],
+            imp = [get_lang(conn, 'discussion_record'), await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
             data = div,
             menu = [['other', get_lang(conn, 'other')], ['user/' + url_pas(name), get_lang(conn, 'user_tool')]]
         ))

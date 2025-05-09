@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def user_watch_list_name(tool, name = 'Test'):
+async def user_watch_list_name(tool, name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -29,7 +29,7 @@ def user_watch_list_name(tool, name = 'Test'):
                 curs.execute(db_change("select count(*) from user_set where id = ? and name = ?"), [ip, type_data])
                 count = curs.fetchall()
                 if count and count[0][0] > 10:
-                    return re_error(conn, 28)
+                    return await re_error(conn, 28)
 
             curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [ip, type_data, name])
 

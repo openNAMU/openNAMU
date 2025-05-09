@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def bbs_w_tool(bbs_num = '', post_num = ''):
+async def bbs_w_tool(bbs_num = '', post_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -16,7 +16,7 @@ def bbs_w_tool(bbs_num = '', post_num = ''):
             </ul>
         '''
 
-        if acl_check('', 'bbs_auth', '', '') != 1:
+        if await acl_check('', 'bbs_auth', '', '') != 1:
             curs.execute(db_change('select set_data from bbs_data where set_code = ? and set_id = ? and set_name = "pinned"'), [post_num_str, bbs_num_str])
             pinned = get_lang(conn, 'pinned') if not curs.fetchall() else get_lang(conn, 'pinned_release')
 
@@ -36,7 +36,7 @@ def bbs_w_tool(bbs_num = '', post_num = ''):
             '''
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'bbs_post_tool'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [get_lang(conn, 'bbs_post_tool'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = data,
             menu = [['bbs/w/' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str), get_lang(conn, 'return')]]
         ))

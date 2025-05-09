@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def user_setting_head_reset():
+async def user_setting_head_reset():
     with get_db_connect() as conn:
         curs = conn.cursor()
 

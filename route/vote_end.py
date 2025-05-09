@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def vote_end(num = 1):
+async def vote_end(num = 1):
     num = str(num)
     
     with get_db_connect() as conn:
@@ -35,7 +35,7 @@ def vote_end(num = 1):
             curs.execute(db_change('select user from vote where id = ? and user != "" and data = ?'), [num, str(i)])
             data_list_2 = curs.fetchall()
             if data_list[0][3] == 'open' or data_list[0][3] == 'close':
-                all_ip = ip_pas([j[0] for j in data_list_2])
+                all_ip = await ip_pas([j[0] for j in data_list_2])
                 for j in data_list_2:
                     data += '<li>' + all_ip[j[0]] + '</li>'
 
@@ -43,7 +43,7 @@ def vote_end(num = 1):
             data += '</ul>'
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'result_vote'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + num + ')', 0])],
+            imp = [get_lang(conn, 'result_vote'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + num + ')', 0])],
             data = data,
             menu = [['vote', get_lang(conn, 'return')]]
         ))

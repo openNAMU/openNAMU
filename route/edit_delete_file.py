@@ -2,10 +2,10 @@ from .tool.func import *
 
 from .edit_delete import edit_delete
 
-def edit_delete_file(name = 'test.jpg'):
+async def edit_delete_file(name = 'test.jpg'):
     with get_db_connect() as conn:
-        if acl_check('', 'owner_auth', '', '') != 0:
-            return re_error(conn, 0)
+        if await acl_check('', 'owner_auth', '', '') != 0:
+            return await re_error(conn, 0)
 
         mime_type = re.search(r'([^.]+)$', name)
         mime_type_str = 'jpg'
@@ -22,16 +22,16 @@ def edit_delete_file(name = 'test.jpg'):
             return redirect(conn, '/w/' + url_pas(name))
 
         if flask.request.method == 'POST':
-            acl_check(tool = 'owner_auth', memo = 'file del (' + name + ')')
+            await acl_check(tool = 'owner_auth', memo = 'file del (' + name + ')')
             os.remove(file_directory)
 
             if flask.request.form.get('with_doc', '') != '':
-                edit_delete(name)
+                await edit_delete(name)
 
             return redirect(conn, '/w/' + url_pas(name))
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'file_delete') + ')', 0])],
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'file_delete') + ')', 0])],
                 data = '''
                     <form method="post">
                         <img src="/image/''' + url_pas(file_all_name) + '''">

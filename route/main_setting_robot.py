@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def main_setting_robot():
+async def main_setting_robot():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, 0)
+        if await acl_check('', 'owner_auth', '', '') == 1:
+            return await re_error(conn, 0)
 
         curs.execute(db_change("select data from other where name = 'robot'"))
         db_data = curs.fetchall()
@@ -32,12 +32,12 @@ def main_setting_robot():
             else:
                 curs.execute(db_change("insert into other (name, data, coverage) values ('robot_default', ?, '')"), [flask.request.form.get('default', '')])
 
-            acl_check(tool = 'owner_auth', memo = 'edit_set (robot)')
+            await acl_check(tool = 'owner_auth', memo = 'edit_set (robot)')
 
             return redirect(conn, '/setting/robot')
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = ['robots.txt', wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = ['robots.txt', await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <a href="/robots.txt">(''' + get_lang(conn, 'view') + ''')</a>
                     <hr class="main_hr">

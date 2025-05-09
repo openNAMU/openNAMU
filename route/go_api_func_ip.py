@@ -2,7 +2,6 @@ from .tool.func import *
 
 async def api_func_ip(data = 'Test'):
     other_set = {}
-    other_set["ip"] = ip_check()
 
     func_name = sys._getframe().f_code.co_name
     if flask.request.method == 'POST':
@@ -21,4 +20,4 @@ async def api_func_ip(data = 'Test'):
     else:
         other_set["data"] = data
 
-    return flask.Response(response = (await python_to_golang(func_name, other_set)), status = 200, mimetype = 'application/json')
+    return flask.jsonify(await python_to_golang(func_name, other_set))

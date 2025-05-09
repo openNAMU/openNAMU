@@ -1,20 +1,20 @@
 from .tool.func import *
 
-def give_user_fix(user_name = ''):
+async def give_user_fix(user_name = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         curs.execute(db_change("select data from user_set where id = ? and name = 'pw'"), [user_name])
         if not curs.fetchall():
-            return re_error(conn, 2)
+            return await re_error(conn, 2)
 
-        if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, 3)
+        if await acl_check('', 'owner_auth', '', '') == 1:
+            return await re_error(conn, 3)
 
         if flask.request.method == 'POST':
             select = flask.request.form.get('select', '')
 
-            acl_check(tool = 'owner_auth', memo = 'user_fix (' + user_name + ') (' + select + ')')
+            await acl_check(tool = 'owner_auth', memo = 'user_fix (' + user_name + ') (' + select + ')')
             if select == 'password_change':
                 password = flask.request.form.get('new_password', '')
                 check_password = flask.request.form.get('password_check', '')
@@ -26,7 +26,7 @@ def give_user_fix(user_name = ''):
                         user_name
                     ])
                 else:
-                    return re_error(conn, 20)
+                    return await re_error(conn, 20)
             elif select == '2fa_password_change':
                 password = flask.request.form.get('new_password', '')
                 check_password = flask.request.form.get('password_check', '')
@@ -39,7 +39,7 @@ def give_user_fix(user_name = ''):
                     else:
                         curs.execute(db_change("insert into user_set (name, id, data) values ('2fa_pw', ?, ?)"), [user_name, hashed])
                 else:
-                    return re_error(conn, 20)
+                    return await re_error(conn, 20)
             elif select == '2fa_off':
                 curs.execute(db_change('select data from user_set where name = "2fa" and id = ?'), [user_name])
                 if curs.fetchall():
@@ -48,7 +48,7 @@ def give_user_fix(user_name = ''):
             return redirect(conn, '/user/' + url_pas(user_name))
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'user_fix'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'user_fix'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <div id="opennamu_get_user_info">''' + html.escape(user_name) + '''</div>

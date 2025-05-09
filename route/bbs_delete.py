@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def bbs_delete(bbs_num = ''):
+async def bbs_delete(bbs_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -13,7 +13,7 @@ def bbs_delete(bbs_num = ''):
         
         bbs_num_str = str(bbs_num)
 
-        if acl_check('', 'owner_auth', '', '') == 1:
+        if await acl_check('', 'owner_auth', '', '') == 1:
             return redirect(conn, '/bbs/in/' + bbs_num_str)
         
         if bbs_num_str == 0:
@@ -27,7 +27,7 @@ def bbs_delete(bbs_num = ''):
             return redirect(conn, '/bbs/main')
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'bbs_delete'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + bbs_name + ')', 0])],
+                imp = [get_lang(conn, 'bbs_delete'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + bbs_name + ')', 0])],
                 data = render_simple_set(conn, '''
                     <form method="post">
                         <span>''' + get_lang(conn, 'delete_warning') + '''</span>

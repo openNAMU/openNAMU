@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def main_setting_head(num, skin_name = '', set_preview = 0):
+async def main_setting_head(num, skin_name = '', set_preview = 0):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, 0)
+        if await acl_check('', 'owner_auth', '', '') == 1:
+            return await re_error(conn, 0)
         
         if flask.request.method == 'POST' and set_preview == 0:
             if num == 4:
@@ -30,7 +30,7 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
             else:
                 curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, ?)"), [info_d, flask.request.form.get('content', ''), coverage])
 
-            acl_check(tool = 'owner_auth', memo = 'edit_set (' + info_d + ')')
+            await acl_check(tool = 'owner_auth', memo = 'edit_set (' + info_d + ')')
 
             if skin_name == '':
                 return redirect(conn, '/setting/' + end_r)
@@ -98,7 +98,7 @@ def main_setting_head(num, skin_name = '', set_preview = 0):
                 sub_plus = ''
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, data = 'main' + title, safe = 1), wiki_set(conn), wiki_custom(conn), wiki_css(['(HTML)' + sub_plus, 0])],
+                imp = [get_lang(conn, data = 'main' + title, safe = 1), await wiki_set(), await wiki_custom(conn), wiki_css(['(HTML)' + sub_plus, 0])],
                 data = '''
                     <form method="post">
                         ''' + start + '''

@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'normal'):
+async def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'normal'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -12,14 +12,14 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
         num = arg_num
         sql_num = (num * 50 - 50) if num * 50 > 0 else 0
 
-        if acl_check(tool = 'all_admin_auth', ip = name) != 1 or (plus_id and acl_check(tool = 'all_admin_auth', ip = plus_id) != 1):
-            if acl_check('', 'owner_auth', '', '') == 1:
-                return re_error(conn, 4)
+        if await acl_check(tool = 'all_admin_auth', ip = name) != 1 or (plus_id and await acl_check(tool = 'all_admin_auth', ip = plus_id) != 1):
+            if await acl_check('', 'owner_auth', '', '') == 1:
+                return await re_error(conn, 4)
 
         div = ''
 
-        if acl_check(tool = 'check_auth', memo = (check_type + ' ' if check_type != '' else '') + 'check (' + name + ')') == 1:
-            return re_error(conn, 3)
+        if await acl_check(tool = 'check_auth', memo = (check_type + ' ' if check_type != '' else '') + 'check (' + name + ')') == 1:
+            return await re_error(conn, 3)
 
         if check_type == '':
             if ip_or_user(name) == 0:
@@ -146,8 +146,8 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
                     record
                 )
             else:
-                div += next_fix(conn, 
-                    '/list/user/check/' + url_pas(name) + '/normal/', 
+                div += get_next_page_bottom(conn, 
+                    '/list/user/check/' + url_pas(name) + '/normal/{}', 
                     num, 
                     record
                 )
@@ -156,7 +156,7 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
                 name += ', ' + plus_id
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'check') + ')', 0])],
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'check') + ')', 0])],
                 data = div,
                 menu = [['manager', get_lang(conn, 'return')]]
             ))
@@ -174,8 +174,8 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
 
             if div != '':
                 div = '<ul>' + div + '</ul>'
-                div += next_fix(conn, 
-                    '/list/user/check/' + url_pas(name) + '/' + check_type + '/', 
+                div += get_next_page_bottom(conn, 
+                    '/list/user/check/' + url_pas(name) + '/' + check_type + '/{}', 
                     num, 
                     record
                 )
@@ -185,7 +185,7 @@ def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type = 'nor
             '' + div
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'simple_check') + ')', 0])],
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'simple_check') + ')', 0])],
                 data = div,
                 menu = [['check/' + url_pas(name), get_lang(conn, 'return')]]
             ))

@@ -5,7 +5,7 @@ from .func_render_namumark import class_do_render_namumark
 # 커스텀 마크 언젠간 다시 추가 예정
 
 class class_do_render:
-    def __init__(self, conn, lang_data = {}, markup = ''):
+    def __init__(self, conn, lang_data = {}, markup = '', parameter = {}, parent = None):
         self.conn = conn
 
         if lang_data == '{}':
@@ -16,6 +16,8 @@ class class_do_render:
 
         self.lang_data = lang_data
         self.markup = markup
+        self.parameter = parameter
+        self.parent = parent
 
     def generate_random_string(self, length = 32):
         characters = string.ascii_letters + string.digits
@@ -53,7 +55,15 @@ class class_do_render:
             rep_data = db_data[0][0] if db_data else 'namumark'
 
         if rep_data == 'namumark' or rep_data == 'namumark_beta':
-            data_end = class_do_render_namumark(self.conn, doc_name, doc_data, doc_set, self.lang_data)()
+            data_end = class_do_render_namumark(
+                self.conn,
+                doc_name,
+                doc_data,
+                doc_set,
+                self.lang_data,
+                parameter = self.parameter,
+                parent = self.parent
+            )()
         elif rep_data == 'raw':
             data_end = [html.escape(doc_data).replace('\n', '<br>'), '', {}]
         else:

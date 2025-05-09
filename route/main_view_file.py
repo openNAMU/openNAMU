@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_view_file(data = ''):
+async def main_view_file(data = ''):
     with get_db_connect() as conn:
         if data == 'robots.txt':
             curs = conn.cursor()

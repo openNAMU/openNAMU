@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def edit_backlink_reset(name = 'Test'):
+async def edit_backlink_reset(name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 

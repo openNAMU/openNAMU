@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def user_alarm_delete(id = ''):
+async def user_alarm_delete(id = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
     

@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def bbs_w_hide(bbs_num = '', post_num = ''):
+async def bbs_w_hide(bbs_num = '', post_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -14,14 +14,14 @@ def bbs_w_hide(bbs_num = '', post_num = ''):
         bbs_num_str = str(bbs_num)
         post_num_str = str(post_num)
 
-        if acl_check('', 'bbs_auth', '', '') == 1:
+        if await acl_check('', 'bbs_auth', '', '') == 1:
             return redirect(conn, '/bbs/in/' + bbs_num_str)
         
         if flask.request.method == 'POST':
             pass
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'bbs_post_hide'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + bbs_name + ')' + ' (' + post_num_str + ')', 0])],
+                imp = [get_lang(conn, 'bbs_post_hide'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + bbs_name + ')' + ' (' + post_num_str + ')', 0])],
                 data = render_simple_set(conn, '''
                     <form method="post">
                         <button type="submit">''' + get_lang(conn, 'hide') + '''</button>

@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def bbs_w_comment_tool(bbs_num = '', post_num = '', comment_num = ''):
+async def bbs_w_comment_tool(bbs_num = '', post_num = '', comment_num = ''):
     with get_db_connect() as conn:
         data = ''
         
@@ -15,7 +15,7 @@ def bbs_w_comment_tool(bbs_num = '', post_num = '', comment_num = ''):
             </ul>
         '''
 
-        if acl_check('', 'owner_auth', '', '') != 1:
+        if await acl_check('', 'owner_auth', '', '') != 1:
             data += '''
                 <h3>''' + get_lang(conn, 'owner') + '''</h2>
                 <ul>
@@ -24,7 +24,7 @@ def bbs_w_comment_tool(bbs_num = '', post_num = '', comment_num = ''):
             '''
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'bbs_comment_tool'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [get_lang(conn, 'bbs_comment_tool'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = data,
             menu = [['bbs/w/' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '#' + url_pas(comment_num), get_lang(conn, 'return')]]
         ))

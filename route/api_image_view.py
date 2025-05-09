@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def api_image_view(name = 'Test'):
+async def api_image_view(name = 'Test'):
     with get_db_connect() as conn:
         if os.path.exists(os.path.join(load_image_url(conn), name)):
             return flask.jsonify({ "exist" : "1" })

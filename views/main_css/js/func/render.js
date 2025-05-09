@@ -118,7 +118,7 @@ function opennamu_do_render_html(name = '') {
                 if(['b', 'i', 's', 'del', 'strong', 'bold', 'em', 'sub', 'sup'].includes(t_data[key])) {
                     return '<' + t_data[key] + '>' + in_data_2 + '</' + t_data[key] + '>'
                 } else if(t_data[key] === 'div' || t_data[key] === 'span') {
-                    let style_data = in_data.match(/ style=['"]([^'"]*)['"]/);
+                    let style_data = in_data?.match(/ style=['"]([^'"]*)['"]/);
                     if(style_data) {
                         style_data = style_data[1];
 
@@ -140,7 +140,7 @@ function opennamu_do_render_html(name = '') {
 
                     return '<' + t_data[key] + ' style="' + style_data + '">' + in_data_2 + '</' + t_data[key] + '>';
                 } else if(t_data[key] === 'a') {
-                    let link_data = in_data.match(/ href=['"]([^'"]*)['"]/);
+                    let link_data = in_data?.match(/ href=['"]([^'"]*)['"]/);
                     if(link_data) {
                         link_data = link_data[1].replace(/^javascript:/ig, '');
                     } else {
@@ -149,7 +149,7 @@ function opennamu_do_render_html(name = '') {
 
                     return '<' + t_data[key] + ' class="opennamu_link_out" href="' + link_data + '">' + in_data_2 + '</' + t_data[key] + '>';
                 } else if(t_data[key] === 'iframe') {
-                    let src_data = in_data.match(/ src=['"]([^'"]*)['"]/);
+                    let src_data = in_data?.match(/ src=['"]([^'"]*)['"]/);
                     if(src_data) {
                         src_data = src_data[1];
 
@@ -165,14 +165,14 @@ function opennamu_do_render_html(name = '') {
                         src_data = '';
                     }
 
-                    let width_data = in_data.match(/ width=['"]([^'"]*)['"]/);
+                    let width_data = in_data?.match(/ width=['"]([^'"]*)['"]/);
                     if(width_data) {
                         width_data = width_data[1];
                     } else {
                         width_data = '';
                     }
 
-                    let height_data = in_data.match(/ height=['"]([^'"]*)['"]/);
+                    let height_data = in_data?.match(/ height=['"]([^'"]*)['"]/);
                     if(height_data) {
                         height_data = height_data[1];
                     } else {
@@ -181,21 +181,21 @@ function opennamu_do_render_html(name = '') {
 
                     return '<' + t_data[key] + ' src="' + src_data + '" width="' + width_data + '" height="' + height_data + '" allowfullscreen frameborder="0">' + in_data_2 + '</' + t_data[key] + '>';
                 } else {
-                    let src_data = in_data.match(/ src=['"]([^'"]*)['"]/);
+                    let src_data = in_data?.match(/ src=['"]([^'"]*)['"]/);
                     if(src_data) {
                         src_data = src_data[1];
                     } else {
                         src_data = '';
                     }
 
-                    let width_data = in_data.match(/ width=['"]([^'"]*)['"]/);
+                    let width_data = in_data?.match(/ width=['"]([^'"]*)['"]/);
                     if(width_data) {
                         width_data = width_data[1];
                     } else {
                         width_data = '';
                     }
 
-                    let height_data = in_data.match(/ height=['"]([^'"]*)['"]/);
+                    let height_data = in_data?.match(/ height=['"]([^'"]*)['"]/);
                     if(height_data) {
                         height_data = height_data[1];
                     } else {
@@ -271,26 +271,6 @@ function opennamu_do_category_spread() {
             '<style>.opennamu_main .opennamu_category_button { display: none; } .opennamu_main .opennamu_category { white-space: pre-wrap; overflow-x: unset; text-overflow: unset; }</style>' +
         '' + document.getElementsByClassName('opennamu_render_complete')[0].innerHTML;
     }
-}
-
-function opennamu_do_include(name, render_name, to_obj, option_obj) {
-    let option = {};
-    if(option_obj !== '') {
-        if(document.getElementById(option_obj)) {
-            option = document.getElementById(option_obj).innerHTML;
-            option = decodeURIComponent(option);
-        }
-    }
-
-    fetch("/api/raw/" + opennamu_do_url_encode(name)).then(function(res) {
-        return res.json();
-    }).then(function(data) {
-        if(data["data"]) {
-            opennamu_do_render(to_obj, data["data"], render_name, 'include', option, function() {
-                document.getElementById(option_obj).style.display = "inline";
-            });
-        }
-    });
 }
 
 function opennamu_do_toc() {

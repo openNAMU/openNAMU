@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def login_find_key():
+async def login_find_key():
     with get_db_connect() as conn:
         curs = conn.cursor()
         if flask.request.method == 'POST':
-            if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, 13)
+            if await captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                return await re_error(conn, 13)
             
             input_key = flask.request.form.get('key', '')
             curs.execute(db_change('select id from user_set where name = "random_key" and data = ?'), [input_key])
@@ -30,7 +30,7 @@ def login_find_key():
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
             
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                    imp = [get_lang(conn, 'reset_user_ok'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                    imp = [get_lang(conn, 'reset_user_ok'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                     data = '' + \
                         b_text + \
                         get_lang(conn, 'id') + ' : ' + user_id + \
@@ -41,12 +41,12 @@ def login_find_key():
                 ))
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'password_search'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'password_search'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <input placeholder="''' + get_lang(conn, 'key') + '''" name="key" type="password">
                         <hr class="main_hr">
-                        ''' + captcha_get(conn) + '''
+                        ''' + await captcha_get(conn) + '''
                         <button type="submit">''' + get_lang(conn, 'send') + '''</button>
                     </form>
                 ''',

@@ -14,7 +14,7 @@ async def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, 
     comment_count = 0
     comment_add_count = 0
 
-    thread_data = orjson.loads((await api_bbs_w_comment(sub_code)).get_data(as_text = True))
+    thread_data = await api_bbs_w_comment(sub_code)
 
     for temp_dict in thread_data:
         if temp_dict['comment_user_id'] != '':
@@ -37,7 +37,7 @@ async def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, 
 
             comment_data += '<span style="padding-left: 20px;"></span>' * margin_count
             comment_data += api_topic_thread_make(
-                ip_pas(temp_dict['comment_user_id']),
+                await ip_pas(temp_dict['comment_user_id']),
                 date,
                 render_set(conn, doc_data = temp_dict['comment']),
                 sub_code_check,
@@ -66,10 +66,10 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
 
         bbs_num_str = str(bbs_num)
         post_num_str = str(post_num)
-        bbs_comment_acl = acl_check(bbs_num_str, 'bbs_comment')
+        bbs_comment_acl = await acl_check(bbs_num_str, 'bbs_comment')
         ip = ip_check()
 
-        temp_dict = orjson.loads(api_bbs_w(bbs_num_str + '-' + post_num_str).data)
+        temp_dict = await api_bbs_w(bbs_num_str + '-' + post_num_str)
         if temp_dict == {}:
             return redirect(conn, '/bbs/main')
         
@@ -83,8 +83,8 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                     if bbs_comment_acl == 1:
                         return redirect(conn, '/bbs/set/' + bbs_num_str)
                     
-                    if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                        return re_error(conn, 13)
+                    if await captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                        return await re_error(conn, 13)
 
                     set_id = bbs_num_str + '-' + post_num_str
 
@@ -98,7 +98,7 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                         return redirect(conn, '/bbs/w/' + bbs_num_str + '/' + post_num_str)
                     
                     data = data.replace('\r', '')
-                    data = api_topic_thread_pre_render(conn, data, id_data, ip, set_id, bbs_name, temp_dict['title'], 'post')
+                    data = await api_topic_thread_pre_render(conn, data, id_data, ip, set_id, bbs_name, temp_dict['title'], 'post')
                     
                     date = get_time()
 
@@ -106,15 +106,15 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                     curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('comment_date', ?, ?, ?)"), [id_data, set_id, date])
                     curs.execute(db_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('comment_user_id', ?, ?, ?)"), [id_data, set_id, ip])
 
-                    add_alarm(temp_dict['user_id'], ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + id_data + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + id_data + '</a>')
+                    await add_alarm(temp_dict['user_id'], ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + id_data + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + id_data + '</a>')
 
                     return redirect(conn, '/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + id_data)
                 else:
                     if bbs_comment_acl == 1:
                         return redirect(conn, '/bbs/set/' + bbs_num_str)
                     
-                    if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                        return re_error(conn, 13)
+                    if await captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                        return await re_error(conn, 13)
                     
                     select = flask.request.form.get('comment_select', '0')
                     select = '' if select == '0' else select
@@ -165,14 +165,14 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                         set_id += '-' if set_id != '' else ''
                         end_id = set_id + id_data
 
-                    add_alarm(temp_dict['user_id'], ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + end_id + '</a>')
+                    await add_alarm(temp_dict['user_id'], ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + end_id + '</a>')
                     if comment_user_name != '':
-                        add_alarm(comment_user_name, ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + end_id + '</a>')
+                        await add_alarm(comment_user_name, ip, 'BBS <a href="/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id + '">' + html.escape(bbs_name) + ' - ' + html.escape(temp_dict['title']) + '#' + end_id + '</a>')
 
                     return redirect(conn, '/bbs/w/' + bbs_num_str + '/' + post_num_str + '#' + end_id)
             else:
-                if acl_check(bbs_num_str, 'bbs_view') == 1:
-                    return re_error(conn, 0)
+                if await acl_check(bbs_num_str, 'bbs_view') == 1:
+                    return await re_error(conn, 0)
 
                 date = ''
                 date += '<a href="javascript:opennamu_change_comment(\'0\');">(' + get_lang(conn, 'comment') + ')</a> '
@@ -181,7 +181,7 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                 data = ''
                 data += '<h2>' + html.escape(temp_dict['title']) + '</h2>'
                 data += api_topic_thread_make(
-                    ip_pas(temp_dict['user_id']),
+                    await ip_pas(temp_dict['user_id']),
                     date,
                     render_set(conn, doc_data = temp_dict['data']),
                     '0',
@@ -200,7 +200,7 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                     bbs_comment_form += '''
                         <div id="opennamu_bbs_w_post_tabom"></div>
                         <div id="opennamu_bbs_w_post_select"></div>
-                        ''' + edit_editor(conn, ip, '', 'bbs_comment') + '''
+                        ''' + await edit_editor(conn, ip, '', 'bbs_comment') + '''
                     '''
 
                 data += '''
@@ -210,7 +210,7 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                 '''
 
                 return easy_minify(conn, flask.render_template(skin_check(conn),
-                    imp = [bbs_name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'bbs') + ')', 0])],
+                    imp = [bbs_name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'bbs') + ')', 0])],
                     data = data,
                     menu = [['bbs/in/' + bbs_num_str, get_lang(conn, 'return')], ['bbs/edit/' + bbs_num_str + '/' + post_num_str, get_lang(conn, 'edit')], ['bbs/tool/' + bbs_num_str + '/' + post_num_str, get_lang(conn, 'tool')]]
                 ))

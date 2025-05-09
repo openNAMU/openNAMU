@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def main_setting_main_logo():
+async def main_setting_main_logo():
     with get_db_connect() as conn:
         curs = conn.cursor()
         
-        if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, 0)
+        if await acl_check('', 'owner_auth', '', '') == 1:
+            return await re_error(conn, 0)
 
         skin_list = [0] + load_skin(conn, '', 1)
         i_list = []
@@ -20,7 +20,7 @@ def main_setting_main_logo():
                     i[1]
                 ])
 
-            acl_check(tool = 'owner_auth', memo = 'edit_set (logo)')
+            await acl_check(tool = 'owner_auth', memo = 'edit_set (logo)')
 
             return redirect(conn, '/setting/main/logo')
         else:
@@ -45,7 +45,7 @@ def main_setting_main_logo():
                 ''
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'wiki_logo'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'wiki_logo'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         ''' + end_data + '''

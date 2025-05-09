@@ -2,12 +2,12 @@ from .tool.func import *
 
 from .user_setting_skin_set_main import user_setting_skin_set_main_set_list
 
-def main_setting_skin_set():
+async def main_setting_skin_set():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, 0)
+        if await acl_check('', 'owner_auth', '', '') == 1:
+            return await re_error(conn, 0)
             
         set_list = user_setting_skin_set_main_set_list(conn)
 
@@ -19,7 +19,7 @@ def main_setting_skin_set():
                 else:
                     curs.execute(db_change('insert into other (name, data, coverage) values (?, ?, "")'), [for_b, flask.request.form.get(for_b, set_list[for_b][0][0])])
 
-            acl_check(tool = 'owner_auth', memo = 'edit_set (skin_set)')
+            await acl_check(tool = 'owner_auth', memo = 'edit_set (skin_set)')
 
             return redirect(conn, '/setting/skin_set')
         else:
@@ -40,7 +40,7 @@ def main_setting_skin_set():
             set_data_main = { for_b : '' for for_b in set_list }
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'main_skin_set_default'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'beta') + ')', 0])],
+                imp = [get_lang(conn, 'main_skin_set_default'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'beta') + ')', 0])],
                 data = render_simple_set(conn, '''
                     <form method="post">
                         <h2>''' + get_lang(conn, "render") + '''</h2>

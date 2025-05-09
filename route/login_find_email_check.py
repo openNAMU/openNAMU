@@ -1,7 +1,7 @@
 from .tool.func import *
 
 # 개편 필요
-def login_find_email_check(tool):
+async def login_find_email_check(tool):
     with get_db_connect() as conn:
         curs = conn.cursor()
         
@@ -31,7 +31,7 @@ def login_find_email_check(tool):
                 b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
         
                 return easy_minify(conn, flask.render_template(skin_check(conn),
-                    imp = [get_lang(conn, 'reset_user_ok'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                    imp = [get_lang(conn, 'reset_user_ok'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                     data = '' + \
                         b_text + \
                         get_lang(conn, 'id') + ' : ' + user_id + \
@@ -56,14 +56,14 @@ def login_find_email_check(tool):
                         for i in re_set_list:
                             flask.session.pop(i, None)
         
-                        return re_error(conn, 8)
+                        return await re_error(conn, 8)
                 
                     curs.execute(db_change("select id from user_set where id = ? and name = 'application'"), [flask.session['c_id']])
                     if curs.fetchall():
                         for i in re_set_list:
                             flask.session.pop(i, None)
         
-                        return re_error(conn, 8)
+                        return await re_error(conn, 8)
         
                     curs.execute(db_change('select data from other where name = "requires_approval"'))
                     requires_approval = curs.fetchall()
@@ -79,7 +79,7 @@ def login_find_email_check(tool):
                         user_app_data['ua'] = user_agent
                         user_app_data['email'] = flask.session['c_email']
                         
-                        curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [flask.session['c_id'], 'application', json.dumps(user_app_data)])
+                        curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [flask.session['c_id'], 'application', json_dumps(user_app_data)])
         
                         for i in re_set_list:
                             flask.session.pop(i, None)
@@ -122,7 +122,7 @@ def login_find_email_check(tool):
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
         
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'check_key'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'check_key'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         ''' + b_text + '''

@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_func_error_404(e = ''):
+async def main_func_error_404(e = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -24,9 +24,9 @@ def main_func_error_404(e = ''):
 
                 if db_data != '':
                     return easy_minify(conn, flask.render_template(skin_check(conn),
-                        imp = ['404', wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                        imp = ['404', await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                         data = db_data,
                         menu = 0
                     )), 404
                 else:
-                    return re_error(conn, 46)
+                    return await re_error(conn, 46)

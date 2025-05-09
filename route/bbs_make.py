@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def bbs_make():   
+async def bbs_make():   
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, 3)
+        if await acl_check('', 'owner_auth', '', '') == 1:
+            return await re_error(conn, 3)
         
         if flask.request.method == 'POST':
             curs.execute(db_change('select set_id from bbs_set where set_name = "bbs_name" order by set_id + 0 desc'))
@@ -22,7 +22,7 @@ def bbs_make():
             return redirect(conn, '/bbs/main')
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'bbs_make'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'bbs_make'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <input placeholder="''' + get_lang(conn, 'bbs_name') + '''" name="bbs_name">

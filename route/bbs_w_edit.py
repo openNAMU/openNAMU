@@ -19,28 +19,28 @@ async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
             return redirect(conn, '/bbs/main')
         
         if comment_num != '':
-            temp_dict = orjson.loads((await api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num)).get_data(as_text = True))
+            temp_dict = await api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num)
             if 'comment_user_id' in temp_dict:
-                if not temp_dict['comment_user_id'] == ip and acl_check('', 'owner_auth', '', '') == 1:
-                    return re_error(conn, 0)
+                if not temp_dict['comment_user_id'] == ip and await acl_check('', 'owner_auth', '', '') == 1:
+                    return await re_error(conn, 0)
             else:
                 return redirect(conn, '/bbs/main')
         elif post_num != '':
-            temp_dict = orjson.loads(api_bbs_w(bbs_num_str + '-' + post_num_str).data)
+            temp_dict = await api_bbs_w(bbs_num_str + '-' + post_num_str)
             if 'user_id' in temp_dict:
-                if not temp_dict['user_id'] == ip and acl_check('', 'owner_auth', '', '') == 1:
-                    return re_error(conn, 0)
+                if not temp_dict['user_id'] == ip and await acl_check('', 'owner_auth', '', '') == 1:
+                    return await re_error(conn, 0)
             else:
                 return redirect(conn, '/bbs/main')
             
-        if acl_check(bbs_num_str, 'bbs_edit') == 1:
+        if await acl_check(bbs_num_str, 'bbs_edit') == 1:
             return redirect(conn, '/bbs/set/' + bbs_num_str)
         
         i_list = ['post_view_acl', 'post_comment_acl']
 
         if flask.request.method == 'POST':
-            if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, 13)
+            if await captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                return await re_error(conn, 13)
         
             if post_num == '':
                 curs.execute(db_change('select set_code from bbs_data where set_name = "title" and set_id = ? order by set_code + 0 desc'), [bbs_num_str])
@@ -56,11 +56,11 @@ async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                 # re_error로 대체 예정
                 return redirect(conn, '/bbs/in/' + bbs_num_str)
             
-            if do_edit_filter(conn, title) == 1:
-                return re_error(conn, 21)
+            if await do_edit_filter(conn, title) == 1:
+                return await re_error(conn, 21)
 
-            if do_edit_filter(conn, data) == 1:
-                return re_error(conn, 21)
+            if await do_edit_filter(conn, data) == 1:
+                return await re_error(conn, 21)
             
             date = get_time()
 
@@ -92,7 +92,7 @@ async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
             option_display = ''
 
             if comment_num != '':
-                temp_dict = orjson.loads((await api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num)).get_data(as_text = True))
+                temp_dict = await api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num)
 
                 title = ''
                 data = temp_dict['comment']
@@ -101,13 +101,13 @@ async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                 title = ''
                 data = ''
             else:
-                temp_dict = orjson.loads(api_bbs_w(bbs_num_str + '-' + post_num_str).data)
+                temp_dict = await api_bbs_w(bbs_num_str + '-' + post_num_str)
 
                 title = temp_dict['title']
                 data = temp_dict['data']
 
             acl_div = ['' for _ in range(0, len(i_list))]
-            acl_list = get_acl_list()
+            acl_list = await get_acl_list()
             for for_a in range(0, len(i_list)):
                 for data_list in acl_list:
                     acl_div[for_a] += '<option value="' + data_list + '">' + (data_list if data_list != '' else 'normal') + '</option>'
@@ -125,13 +125,13 @@ async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                 bbs_title = get_lang(conn, 'post_edit')
     
             return easy_minify(conn, flask.render_template(skin_check(conn), 
-                imp = [bbs_title, wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [bbs_title, await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data =  editor_top_text + '''
                     <form method="post">                        
                         <input style="''' + option_display + '''" placeholder="''' + get_lang(conn, 'title') + '''" name="title" value="''' + html.escape(title) + '''">
                         <hr style="''' + option_display + '''" class="main_hr">
 
-                        ''' + edit_editor(conn, ip, data, 'bbs') + '''
+                        ''' + await edit_editor(conn, ip, data, 'bbs') + '''
 
                         <!--
                         <div style="''' + option_display + '''">

@@ -2,7 +2,7 @@ from .tool.func import *
 
 from .go_api_bbs_w import api_bbs_w
 
-def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
+async def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -16,10 +16,10 @@ def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
         bbs_num_str = str(bbs_num)
         post_num_str = str(post_num)
 
-        if acl_check('', 'owner_auth', '') == 1:
+        if await acl_check('', 'owner_auth', '') == 1:
             return redirect(conn, '/bbs/in/' + bbs_num_str)
         
-        temp_dict = orjson.loads(api_bbs_w(bbs_num_str + '-' + post_num_str).data)
+        temp_dict = await api_bbs_w(bbs_num_str + '-' + post_num_str)
         if not 'user_id' in temp_dict:
             return redirect(conn, '/bbs/main')
         
@@ -54,7 +54,7 @@ def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
                 sub += ' (' + comment_num + ')'
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css([sub, 0])],
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
                 data = render_simple_set(conn, '''
                     <form method="post">
                         <span>''' + get_lang(conn, 'delete_warning') + '''</span>

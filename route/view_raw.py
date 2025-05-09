@@ -11,18 +11,18 @@ async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '
         post_num_str = str(post_num)
 
         if bbs_num != '' and post_num != '':
-            if acl_check(bbs_num_str, 'bbs_view') == 1:
-                return re_error(conn, 0)
+            if await acl_check(bbs_num_str, 'bbs_view') == 1:
+                return await re_error(conn, 0)
                     
             name = ''
         elif topic_num != '':
             topic_num = str(topic_num)
             
-            if acl_check('', 'topic_view', topic_num) == 1:
-                return re_error(conn, 0)
+            if await acl_check('', 'topic_view', topic_num) == 1:
+                return await re_error(conn, 0)
         else:
-            if acl_check(name, 'render') == 1:
-                return re_error(conn, 0)
+            if await acl_check(name, 'render') == 1:
+                return await re_error(conn, 0)
 
         if num:
             num = str(num)
@@ -39,8 +39,8 @@ async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '
                 sub += ' (' + comment_num + ')'
         elif topic_num == '' and num != '':
             curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
-            if curs.fetchall() and acl_check(tool = 'hidel_auth') == 1:
-                return re_error(conn, 3)
+            if curs.fetchall() and await acl_check(tool = 'hidel_auth') == 1:
+                return await re_error(conn, 3)
 
             curs.execute(db_change("select data from history where title = ? and id = ?"), [name, num])
 
@@ -48,7 +48,7 @@ async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '
 
             menu = [['history_tool/' + url_pas(num) + '/' + url_pas(name), get_lang(conn, 'return')]]
         elif topic_num != '':
-            if acl_check(tool = 'hidel_auth') == 1:
+            if await acl_check(tool = 'hidel_auth') == 1:
                 curs.execute(db_change("select data from topic where id = ? and code = ? and block = ''"), [num, topic_num])
             else:
                 curs.execute(db_change("select data from topic where id = ? and code = ?"), [num, topic_num])
@@ -67,10 +67,10 @@ async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '
 
         if bbs_num != '' and post_num != '':
             if comment_num != '':
-                data = orjson.loads((await api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num)).get_data(as_text = True))
-                sub_data = orjson.loads(api_bbs_w(bbs_num_str + '-' + post_num_str).data)
+                data = await api_bbs_w_comment_one(bbs_num_str + '-' + post_num_str + '-' + comment_num)
+                sub_data = await api_bbs_w(bbs_num_str + '-' + post_num_str)
             else:
-                data = orjson.loads(api_bbs_w(bbs_num_str + '-' + post_num_str).data)
+                data = await api_bbs_w(bbs_num_str + '-' + post_num_str)
                 
             if 'comment' in data:
                 v_name = sub_data["title"]
@@ -108,9 +108,9 @@ async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '
                 sub = ' (' + get_lang(conn, 'edit') + ')'
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [v_name, wiki_set(conn), wiki_custom(conn), wiki_css([sub, 0])],
+                imp = [v_name, await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
                 data = p_data,
                 menu = menu
             ))
         else:
-            return re_error(conn, 3)
+            return await re_error(conn, 3)

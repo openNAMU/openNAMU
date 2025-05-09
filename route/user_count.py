@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def user_count(name = None):
+async def user_count(name = None):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -59,7 +59,7 @@ def user_count(name = None):
 
         # 한글 지원 필요
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'count'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [get_lang(conn, 'count'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = '''
                 <ul>
                     <li><a href="/record/''' + url_pas(that) + '''">''' + get_lang(conn, 'edit_record') + '''</a> : ''' + str(data) + '''</li>

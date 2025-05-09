@@ -1,14 +1,14 @@
 from .tool.func import *
 
-def topic_comment_blind(topic_num = 1, num = 1):
+async def topic_comment_blind(topic_num = 1, num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
         
         topic_num = str(topic_num)
         num = str(num)
         
-        if acl_check(tool = 'toron_auth', memo = 'blind (code ' + topic_num + '#' + num + ')') == 1:
-            return re_error(conn, 3)
+        if await acl_check(tool = 'toron_auth', memo = 'blind (code ' + topic_num + '#' + num + ')') == 1:
+            return await re_error(conn, 3)
 
         curs.execute(db_change("select block from topic where code = ? and id = ?"), [topic_num, num])
         block = curs.fetchall()

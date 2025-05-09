@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def give_admin_groups(name = 'test'):
+async def give_admin_groups(name = 'test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -69,11 +69,11 @@ def give_admin_groups(name = 'test'):
         ]
 
         if html.escape(name) != name:
-            return re_error(conn, 48)
+            return await re_error(conn, 48)
 
         if flask.request.method == 'POST':
-            if acl_check(tool = 'owner_auth', memo = 'auth list add (' + name + ')') == 1:
-                return re_error(conn, 3)
+            if await acl_check(tool = 'owner_auth', memo = 'auth list add (' + name + ')') == 1:
+                return await re_error(conn, 3)
 
             curs.execute(db_change("delete from alist where name = ?"), [name])
             for for_a in acl_name_list:
@@ -84,7 +84,7 @@ def give_admin_groups(name = 'test'):
 
             return redirect(conn, '/auth/list/add/' + url_pas(name))
         else:
-            state = 'disabled' if acl_check('', 'owner_auth', '', '') == 1 else ''
+            state = 'disabled' if await acl_check('', 'owner_auth', '', '') == 1 else ''
 
             curs.execute(db_change('select acl from alist where name = ?'), [name])
             acl_list = curs.fetchall()
@@ -101,7 +101,7 @@ def give_admin_groups(name = 'test'):
                     choice = for_a[2]
 
                 data += '' + \
-                    '<li class="opennamu_list_1" style="margin-left: ' + str(int(for_a[0]) * 20) + 'px;">' + \
+                    '<li class="opennamu_list_1" style="margin-left: ' + str((int(for_a[0]) - 1) * 20) + 'px;">' + \
                         choice + \
                     '</li>'
                 ''
@@ -109,7 +109,7 @@ def give_admin_groups(name = 'test'):
             data += '</ul>'
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'admin_group') + ')', 0])],
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'admin_group') + ')', 0])],
                 data = '''
                     <form method="post">
                         ''' + data + '''

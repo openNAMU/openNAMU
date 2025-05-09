@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def bbs_w_set(bbs_num = ''):
+async def bbs_w_set(bbs_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -14,7 +14,7 @@ def bbs_w_set(bbs_num = ''):
         bbs_num_str = str(bbs_num)
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'bbs_set'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + bbs_name + ')', 0])],
+            imp = [get_lang(conn, 'bbs_set'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + bbs_name + ')', 0])],
             data = '' + \
                 '<div id="opennamu_bbs_w_set"></div>' + \
                 '<script defer src="/views/main_css/js/route/bbs_w_set.js' + cache_v() + '"></script>' + \

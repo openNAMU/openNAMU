@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def main_setting_top_menu():
+async def main_setting_top_menu():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, 0)
+        if await acl_check('', 'owner_auth', '', '') == 1:
+            return await re_error(conn, 0)
         
         if flask.request.method == 'POST':
             curs.execute(db_change("select name from other where name = 'top_menu'"))
@@ -14,7 +14,7 @@ def main_setting_top_menu():
             else:
                 curs.execute(db_change("insert into other (name, data, coverage) values ('top_menu', ?, '')"), [flask.request.form.get('content', '')])
 
-            acl_check(tool = 'owner_auth', memo = 'edit_set (top_menu)')
+            await acl_check(tool = 'owner_auth', memo = 'edit_set (top_menu)')
 
             return redirect(conn, '/setting/top_menu')
         else:
@@ -23,7 +23,7 @@ def main_setting_top_menu():
             db_data = db_data[0][0] if db_data else ''
             
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'top_menu_setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'top_menu_setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <span>
                         EX)

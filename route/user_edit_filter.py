@@ -1,10 +1,10 @@
 from .tool.func import *
 
-def user_edit_filter(name = ''):
+async def user_edit_filter(name = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        owner_auth = acl_check(tool = 'ban_auth')
+        owner_auth = await acl_check(tool = 'ban_auth')
         owner_auth = 1 if owner_auth == 0 else 0
 
         if ip_check() != name:
@@ -44,7 +44,7 @@ def user_edit_filter(name = ''):
                 ''
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'edit_filter') + ')', 0])],
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'edit_filter') + ')', 0])],
                 data = '' + \
                     '<a href="/filter/edit_filter">(' + get_lang(conn, 'edit_filter_rule') + ')</a>' + \
                     '<hr class="main_hr">' + \

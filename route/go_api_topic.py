@@ -38,7 +38,7 @@ def api_topic_thread_make(user_id, date, data, code, color = '', blind = '', add
         </span>
     '''
 
-def api_topic_thread_pre_render(conn, data, num, ip, topic_num = '', name = '', sub = '', do_type = 'thread'):
+async def api_topic_thread_pre_render(conn, data, num, ip, topic_num = '', name = '', sub = '', do_type = 'thread'):
     curs = conn.cursor()
 
     # 이거 좀 엉성해서 언젠간 손 보고 싶음
@@ -79,12 +79,12 @@ def api_topic_thread_pre_render(conn, data, num, ip, topic_num = '', name = '', 
             ip_data = curs.fetchall()
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
                 if do_type == 'thread':
-                    add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                    await add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
                 else:
                     set_id = topic_num.split('-')
                     set_id = ['', ''] if len(set_id) < 2 else set_id
 
-                    add_alarm(ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                    await add_alarm(ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
 
             data = re.sub(call_thread_regex, rd_data[0] + '<topic_a_' + do_type + '>#' + view_data + '</topic_a_' + do_type + '>' + rd_data[3], data, 1)
 
@@ -109,10 +109,10 @@ def api_topic_thread_pre_render(conn, data, num, ip, topic_num = '', name = '', 
 
             if ip_data and ip_or_user(ip_data[0][0]) == 0:
                 if do_type == 'thread':
-                    add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                    await add_alarm(ip_data[0][0], ip, '<a href="/thread/' + topic_num + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
                 else:
                     set_id = topic_num.split('-')
-                    add_alarm(ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
+                    await add_alarm(ip_data[0][0], ip, 'BBS <a href="/bbs/w/' + set_id[0] + '/' + set_id[1] + '#' + num + '">' + html.escape(name) + ' - ' + html.escape(sub) + '#' + num + '</a>')
 
             data = re.sub(call_user_regex, rd_data[0] + '<topic_call>@' + rd_data[1] + '</topic_call>' + rd_data[2], data, 1)
 
@@ -124,14 +124,13 @@ async def api_topic(topic_num = 1, tool = 'normal', s_num = '', e_num = ''):
     with get_db_connect() as conn:
         topic_num = str(topic_num)
 
-        if acl_check('', 'topic_view', topic_num) != 1:
+        if await acl_check('', 'topic_view', topic_num) != 1:
             other_set = {}
             other_set["topic_num"] = topic_num
             other_set["tool"] = tool
             other_set["s_num"] = str(s_num)
             other_set["e_num"] = str(e_num)
-            other_set["ip"] = ip_check()
 
-            return flask.Response(response = (await python_to_golang(sys._getframe().f_code.co_name, other_set)), status = 200, mimetype = 'application/json')
+            return flask.jsonify(await python_to_golang(sys._getframe().f_code.co_name, other_set))
         else:
             return flask.jsonify({})

@@ -1,16 +1,16 @@
 from .tool.func import *
 
-def main_setting_sitemap(do_type = 0):
+async def main_setting_sitemap(do_type = 0):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         if not do_type == 1:
-            if acl_check('', 'owner_auth', '', '') == 1:
-                return re_error(conn, 0)
+            if await acl_check('', 'owner_auth', '', '') == 1:
+                return await re_error(conn, 0)
         
         if do_type == 1 or flask.request.method == 'POST':
             if not do_type == 1:
-                acl_check(tool = 'owner_auth', memo = 'make sitemap')
+                await acl_check(tool = 'owner_auth', memo = 'make sitemap')
 
             data = '' + \
                 '<?xml version="1.0" encoding="UTF-8"?>\n' + \
@@ -95,7 +95,7 @@ def main_setting_sitemap(do_type = 0):
                 return ''
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'sitemap_manual_create'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'sitemap_manual_create'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'create') + '''</button>

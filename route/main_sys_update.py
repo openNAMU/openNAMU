@@ -3,21 +3,34 @@ import urllib.request
 
 from .tool.func import *
 
-def main_sys_update():
+from .main_sys_restart import main_sys_restart_do
+
+async def main_sys_update(golang_process):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, 3)
+        if await acl_check('', 'owner_auth', '', '') == 1:
+            return await re_error(conn, 3)
 
         if flask.request.method == 'POST':
-            acl_check(tool = 'owner_auth', memo = 'update')
+            await acl_check(tool = 'owner_auth', memo = 'update')
 
             curs.execute(db_change('select data from other where name = "update"'))
             up_data = curs.fetchall()
             up_data = up_data[0][0] if up_data and up_data[0][0] in ['stable', 'beta', 'dev', 'dont_use'] else 'stable'
 
             print('Update')
+            
+            if golang_process.poll() is None:
+                golang_process.terminate()
+                try:
+                    golang_process.wait(timeout = 5)
+                except subprocess.TimeoutExpired:
+                    golang_process.kill()
+                    try:
+                        golang_process.wait(timeout = 5)
+                    except subprocess.TimeoutExpired:
+                        print('Golang process not terminated properly.')
             
             if platform.system() == 'Linux' or platform.system() == 'Darwin':
                 ok = []
@@ -30,8 +43,9 @@ def main_sys_update():
                         break
                 else:
                     linux_exe_chmod()
-                    
-                    return redirect(conn, '/restart')
+
+                    threading.Thread(target = main_sys_restart_do).start()
+                    return flask.Response(get_lang(conn, "warning_restart"), status = 200)
                 
                 print('Error : update failed')
             elif platform.system() == 'Windows':
@@ -45,15 +59,16 @@ def main_sys_update():
                 if ok == 0:
                     os.system('rd /s /q opennamu-' + up_data)
                     os.system('del update.zip')
-
-                    return redirect(conn, '/restart')
+                    
+                    threading.Thread(target = main_sys_restart_do).start()
+                    return flask.Response(get_lang(conn, "warning_restart"), status = 200)
             
             print('Error : update failed')
 
-            return re_error(conn, 34)
+            return await re_error(conn, 34)
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'update'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'update'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = get_lang(conn, 'update_warning') + '''
                     <hr class="main_hr">
                     <ul>

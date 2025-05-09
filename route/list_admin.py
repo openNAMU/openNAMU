@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def list_admin():
+async def list_admin():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -11,7 +11,7 @@ def list_admin():
         ))
         for data in curs.fetchall():
             name = '' + \
-                ip_pas(data[0]) + ' ' + \
+                await ip_pas(data[0]) + ' ' + \
                 '<a href="/auth/list/add/' + url_pas(data[1]) + '">(' + data[1] + ')</a>' + \
             ''
 
@@ -20,7 +20,7 @@ def list_admin():
         div += '</ul>'
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'admin_list'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [get_lang(conn, 'admin_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = div,
             menu = [['other', get_lang(conn, 'return')]]
         ))

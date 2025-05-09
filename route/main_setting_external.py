@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def main_setting_external():
+async def main_setting_external():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, 0)
+        if await acl_check('', 'owner_auth', '', '') == 1:
+            return await re_error(conn, 0)
         
         i_list = [
             'recaptcha',
@@ -26,7 +26,7 @@ def main_setting_external():
 
                 curs.execute(db_change("update other set data = ? where name = ?"), [into_data, data])
 
-            acl_check(tool = 'owner_auth', memo = 'edit_set (external)')
+            await acl_check(tool = 'owner_auth', memo = 'edit_set (external)')
 
             return redirect(conn, '/setting/external')
         else:
@@ -66,7 +66,7 @@ def main_setting_external():
                     re_ver += '<option value="' + i + '">' + re_ver_list[i] + '</option>'
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'ext_api_req_set'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'ext_api_req_set'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = render_simple_set(conn, '''
                     <form method="post">
                         <h2>''' + get_lang(conn, 'captcha') + '''</h2>
@@ -97,6 +97,8 @@ def main_setting_external():
 
                         <h3>''' + get_lang(conn, 'smtp_setting') + '''</h3>
                         <a href="https://support.google.com/mail/answer/7126229">(Google)</a>
+                        <hr class="main_hr">
+                        <a href="/setting/email_test">(''' + get_lang(conn, 'test') + ''')</a>
                         <hr class="main_hr">
 
                         <span>''' + get_lang(conn, 'smtp_server') + '''</span>

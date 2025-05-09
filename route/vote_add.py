@@ -1,16 +1,16 @@
 from .tool.func import *
 
-def vote_add():
+async def vote_add():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check('', 'vote') == 1:
-            return re_error(conn, 0)
+        if await acl_check('', 'vote') == 1:
+            return await re_error(conn, 0)
 
         if flask.request.method == 'POST':
             vote_data = flask.request.form.get('data', 'test\ntest_2')
             if vote_data.count('\n') < 1:
-                return re_error(conn, 0)
+                return await re_error(conn, 0)
 
             curs.execute(db_change('select id from vote where not type = "option" order by id + 0 desc limit 1'))
             id_data = curs.fetchall()
@@ -46,14 +46,14 @@ def vote_add():
             return redirect(conn, '/vote')
         else:
             acl_data = '<select name="acl_select">'
-            acl_list = get_acl_list()
+            acl_list = await get_acl_list()
             for data_list in acl_list:
                 acl_data += '<option value="' + data_list + '">' + (data_list if data_list != '' else 'normal') + '</option>'
 
             acl_data += '</select>'
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'add_vote'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'add_vote'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '' + \
                     '<form method="post">' + \
                         '<input name="name" placeholder="' + get_lang(conn, 'name') + '">' + \

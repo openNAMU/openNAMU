@@ -22,7 +22,7 @@ def do_make_challenge_design(img, title, info, disable = 0):
         <hr class="main_hr">
     '''
 
-def user_challenge():    
+async def user_challenge():    
     with get_db_connect() as conn:
         curs = conn.cursor()
         
@@ -89,7 +89,7 @@ def user_challenge():
 
             curs.execute(db_change('select data from user_set where name = ? and id = ?'), ['challenge_admin', ip])
             db_data = curs.fetchall()
-            if acl_check(tool = 'all_admin_auth') != 1 or db_data:
+            if await acl_check(tool = 'all_admin_auth') != 1 or db_data:
                 curs.execute(db_change("delete from user_set where id = ? and name = 'challenge_admin'"), [ip])
                 curs.execute(db_change("insert into user_set (name, id, data) values ('challenge_admin', ?, '1')"), [ip])
                 user_exp += 10000
@@ -252,7 +252,7 @@ def user_challenge():
             data_html = data_html_green + data_html_red
             
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'challenge_and_level_manage'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'challenge_and_level_manage'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = data_html + '''
                     <form method="post">
                         <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>

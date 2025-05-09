@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def filter_all_add(tool, name = None):
+async def filter_all_add(tool, name = None):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -8,8 +8,8 @@ def filter_all_add(tool, name = None):
             return redirect(conn, '/manager/9')
 
         if flask.request.method == 'POST':
-            if acl_check('', 'owner_auth', '', '') == 1:
-                return re_error(conn, 3)
+            if await acl_check('', 'owner_auth', '', '') == 1:
+                return await re_error(conn, 3)
 
             title = flask.request.form.get('title', 'test')
             if tool in ('inter_wiki', 'outer_link'):
@@ -23,7 +23,7 @@ def filter_all_add(tool, name = None):
                     curs.execute(db_change("delete from html_filter where html = ? and kind = 'inter_wiki_sub'"), [title])
                     curs.execute(db_change('insert into html_filter (html, plus, plus_t, kind) values (?, "inter_wiki_type", ?, "inter_wiki_sub")'), [title, inter_type])
                 
-                acl_check(tool = 'owner_auth', memo = tool + ' edit')
+                await acl_check(tool = 'owner_auth', memo = tool + ' edit')
             elif tool == 'edit_filter':
                 day = flask.request.form.get('day', '0')
                 end = 'X' if day == '0' else day
@@ -35,11 +35,11 @@ def filter_all_add(tool, name = None):
                 try:
                     re.compile(content)
                 except:
-                    return re_error(conn, 23)
+                    return await re_error(conn, 23)
                 
                 curs.execute(db_change("delete from html_filter where html = ? and kind = 'regex_filter'"), [name])
                 curs.execute(db_change("insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, 'regex_filter')"), [name, content, end])
-                acl_check(tool = 'owner_auth', memo = 'edit_filter edit')
+                await acl_check(tool = 'owner_auth', memo = 'edit_filter edit')
             elif tool == 'document':
                 post_name = flask.request.form.get('name', '')
                 if post_name == '':
@@ -50,46 +50,46 @@ def filter_all_add(tool, name = None):
                 try:
                     re.compile(post_regex)
                 except:
-                    return re_error(conn, 23)
+                    return await re_error(conn, 23)
                 
                 curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, "document", ?, ?)'), [post_name, post_regex, post_acl])
-                acl_check(tool = 'owner_auth', memo = 'document_filter edit')
+                await acl_check(tool = 'owner_auth', memo = 'document_filter edit')
             else:
                 plus_d = ''
                 if tool == 'name_filter':
                     try:
                         re.compile(title)
                     except:
-                        return re_error(conn, 23)
+                        return await re_error(conn, 23)
 
-                    acl_check(tool = 'owner_auth', memo = 'name_filter edit')
+                    await acl_check(tool = 'owner_auth', memo = 'name_filter edit')
                     type_d = 'name'
                 elif tool == 'file_filter':
                     try:
                         re.compile(title)
                     except:
-                        return re_error(conn, 23)
+                        return await re_error(conn, 23)
 
-                    acl_check(tool = 'owner_auth', memo = 'file_filter edit')
+                    await acl_check(tool = 'owner_auth', memo = 'file_filter edit')
                     type_d = 'file'
                 elif tool == 'email_filter':
-                    acl_check(tool = 'owner_auth', memo = 'email_filter edit')
+                    await acl_check(tool = 'owner_auth', memo = 'email_filter edit')
                     type_d = 'email'
                 elif tool == 'image_license':
-                    acl_check(tool = 'owner_auth', memo = 'image_license edit')
+                    await acl_check(tool = 'owner_auth', memo = 'image_license edit')
                     type_d = 'image_license'
                 elif tool == 'extension_filter':
-                    acl_check(tool = 'owner_auth', memo = 'extension_filter edit')
+                    await acl_check(tool = 'owner_auth', memo = 'extension_filter edit')
                     type_d = 'extension'
                     plus_d = flask.request.form.get('max_file_size', '')
                     if plus_d != '':
                         plus_d = number_check(plus_d)
                 elif tool == 'template':
-                    acl_check(tool = 'owner_auth', memo = 'template_document edit')
+                    await acl_check(tool = 'owner_auth', memo = 'template_document edit')
                     type_d = 'template'
                     plus_d = flask.request.form.get('exp', 'test')
                 else:
-                    acl_check(tool = 'owner_auth', memo = 'edit_top edit')
+                    await acl_check(tool = 'owner_auth', memo = 'edit_top edit')
                     type_d = 'edit_top'
                     plus_d = flask.request.form.get('markup', 'test')
 
@@ -101,7 +101,7 @@ def filter_all_add(tool, name = None):
             return redirect(conn, '/filter/' + tool)
         else:
             get_sub = 0
-            stat = 'disabled' if acl_check('', 'owner_auth', '', '') == 1 else ''
+            stat = 'disabled' if await acl_check('', 'owner_auth', '', '') == 1 else ''
             name = name if name else ''
 
             if tool in ('inter_wiki', 'outer_link'):
@@ -208,7 +208,7 @@ def filter_all_add(tool, name = None):
                     '<input value="" type="text" name="max_file_size">' + \
                 ''
             elif tool == 'document':
-                acl_list = get_acl_list()
+                acl_list = await get_acl_list()
                 
                 curs.execute(db_change("select plus, plus_t from html_filter where html = ? and kind = 'document'"), [name])
                 db_data = curs.fetchall()
@@ -269,7 +269,7 @@ def filter_all_add(tool, name = None):
                 '''
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [title, wiki_set(conn), wiki_custom(conn), wiki_css([get_sub, 0])],
+                imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([get_sub, 0])],
                 data =  '''
                         <form method="post">
                             ''' + form_data + '''

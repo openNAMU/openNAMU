@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def recent_history_tool(name = 'Test', rev = 1):
+async def recent_history_tool(name = 'Test', rev = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -22,7 +22,7 @@ def recent_history_tool(name = 'Test', rev = 1):
         data += '<li><a href="/history/' + url_pas(name) + '">' + get_lang(conn, 'history') + '</a></li>'
         data += '</ul>'
 
-        if acl_check(tool = 'hidel_auth') != 1:
+        if await acl_check(tool = 'hidel_auth') != 1:
             data += '<h3>' + get_lang(conn, 'admin') + '</h3>'
             data += '<ul>'
             curs.execute(db_change('select title from history where title = ? and id = ? and hide = "O"'), [name, num])
@@ -35,7 +35,7 @@ def recent_history_tool(name = 'Test', rev = 1):
             data += '</a></li>'
             data += '</ul>'
 
-        if acl_check('', 'owner_auth', '', '') != 1:
+        if await acl_check('', 'owner_auth', '', '') != 1:
             data += '<h3>' + get_lang(conn, 'owner') + '</h3>'
             data += '<ul>'
             data += '<li><a href="/history_delete/' + num + '/' + url_pas(name) + '">' + get_lang(conn, 'history_delete') + '</a></li>'
@@ -43,7 +43,7 @@ def recent_history_tool(name = 'Test', rev = 1):
             data += '</ul>'
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(r' + num + ')', 0])],
+            imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(r' + num + ')', 0])],
             data = data,
             menu = [['history/' + url_pas(name), get_lang(conn, 'return')]]
         ))

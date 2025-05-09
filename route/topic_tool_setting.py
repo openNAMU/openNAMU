@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def topic_tool_setting(topic_num = 1):
+async def topic_tool_setting(topic_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check(tool = 'toron_auth') == 1:
-            return re_error(conn, 3)
+        if await acl_check(tool = 'toron_auth') == 1:
+            return await re_error(conn, 3)
 
         ip = ip_check()
         time = get_time()
@@ -17,7 +17,7 @@ def topic_tool_setting(topic_num = 1):
             return redirect(conn, '/')
 
         if flask.request.method == 'POST':
-            acl_check(tool = 'toron_auth', memo = 'change_topic_set (code ' + topic_num + ')')
+            await acl_check(tool = 'toron_auth', memo = 'change_topic_set (code ' + topic_num + ')')
 
             stop_d = flask.request.form.get('stop_d', '')
             why_d = flask.request.form.get('why', '')
@@ -90,7 +90,7 @@ def topic_tool_setting(topic_num = 1):
             agree_check = 'checked="checked"' if rd_d[0][1] == 'O' else ''
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'topic_setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'topic_setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = render_simple_set(conn, '''
                     <form method="post">
                         <h2>''' + get_lang(conn, 'topic_progress') + '''</h2>

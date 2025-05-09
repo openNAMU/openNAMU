@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def filter_all(tool):
+async def filter_all(tool):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -13,12 +13,12 @@ def filter_all(tool):
 
         div += '</tr>'
 
-        admin = acl_check(tool = 'owner_auth')
+        admin = await acl_check(tool = 'owner_auth')
         admin = 1 if admin == 0 else 0
 
         if tool == 'edit_filter':
-            if acl_check('', 'edit_filter_view', '', '') == 1:
-                return re_error(conn, 0)
+            if await acl_check('', 'edit_filter_view', '', '') == 1:
+                return await re_error(conn, 0)
 
         if tool == 'inter_wiki':
             title = get_lang(conn, 'interwiki_list')
@@ -88,7 +88,7 @@ def filter_all(tool):
             div += '<a href="/filter/' + tool + '/add">(' + get_lang(conn, 'add') + ')</a>'
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [title, wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = div,
             menu = [['manager/1', get_lang(conn, 'return')]]
         ))

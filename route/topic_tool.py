@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def topic_tool(topic_num = 1):
+async def topic_tool(topic_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -42,7 +42,7 @@ def topic_tool(topic_num = 1):
         else:
             acl_view_state = 'normal'
 
-        if acl_check(tool = 'toron_auth') != 1:
+        if await acl_check(tool = 'toron_auth') != 1:
             data = '''
                 <h2>''' + get_lang(conn, 'admin_tool') + '''</h2>
                 <ul>
@@ -59,7 +59,7 @@ def topic_tool(topic_num = 1):
             </ul>
         '''
 
-        if acl_check(tool = 'owner_auth') != 1:
+        if await acl_check(tool = 'owner_auth') != 1:
             data += '''
                 <h2>''' + get_lang(conn, 'owner') + '''</h2>
                 <ul>
@@ -77,7 +77,7 @@ def topic_tool(topic_num = 1):
             '''
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'topic_tool'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [get_lang(conn, 'topic_tool'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = data,
             menu = [['thread/' + topic_num, get_lang(conn, 'return')]]
         ))

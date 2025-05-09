@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def view_down(name = 'Test'):
+async def view_down(name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -13,7 +13,7 @@ def view_down(name = 'Test'):
         div += '</ul>'
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'sub') + ')', 0])],
+            imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'sub') + ')', 0])],
             data = div,
             menu = [['w/' + url_pas(name), get_lang(conn, 'return')]]
         ))

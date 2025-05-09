@@ -51,7 +51,7 @@ async def main_search_deep(name = 'Test', search_type = 'title', num = 1):
                 <ul>
             '''
 
-            all_list = orjson.loads((await api_func_search(name, search_type, num)).get_data(as_text = True))
+            all_list = await api_func_search(name, search_type, num)
             for data in all_list:
                 div += '<li><a href="/w/' + url_pas(data) + '">' + data + '</a></li>'
 
@@ -63,7 +63,7 @@ async def main_search_deep(name = 'Test', search_type = 'title', num = 1):
                 div += get_next_page_bottom(conn, '/search_data_page/{}/' + url_pas(name), num, all_list)
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'search') + ')', 0])],
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'search') + ')', 0])],
                 data = div,
                 menu = 0
             ))

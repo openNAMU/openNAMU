@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def login_login_2fa_email_2():
+async def login_login_2fa_email():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -14,12 +14,12 @@ def login_login_2fa_email_2():
         if ip_or_user(ip) == 0:
             return redirect(conn, '/user')
 
-        if ban_check(None, 'login')[0] == 1:
-            return re_error(conn, 0)
+        if (await ban_check(None, 'login'))[0] == 1:
+            return await re_error(conn, 0)
 
         if flask.request.method == 'POST':
-            if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, 13)
+            if await captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                return await re_error(conn, 13)
 
             user_agent = flask.request.headers.get('User-Agent', '')
             user_id = flask.session['b_id']
@@ -34,7 +34,7 @@ def login_login_2fa_email_2():
 
                 pw_check_d = pw_check(conn, user_pw, user_1, user_2, user_id)
                 if pw_check_d != 1:
-                    return re_error(conn, 10)
+                    return await re_error(conn, 10)
 
             flask.session['id'] = user_id
 
@@ -45,12 +45,12 @@ def login_login_2fa_email_2():
             return redirect(conn, '/user')
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'login'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'login'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data =  '''
                         <form method="post">
                             <input placeholder="''' + get_lang(conn, '2fa_password') + '''" name="pw" type="password">
                             <hr class=\"main_hr\">
-                            ''' + captcha_get(conn) + '''
+                            ''' + await captcha_get(conn) + '''
                             <button type="submit">''' + get_lang(conn, 'login') + '''</button>
                             ''' + http_warning(conn) + '''
                         </form>

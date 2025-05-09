@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def user_setting_head(skin_name = ''):
+async def user_setting_head(skin_name = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -61,7 +61,7 @@ def user_setting_head(skin_name = ''):
             ''
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, data = 'user_head', safe = 1), wiki_set(conn), wiki_custom(conn), wiki_css(['(HTML)' + sub_name, 0])],
+                imp = [get_lang(conn, data = 'user_head', safe = 1), await wiki_set(), await wiki_custom(conn), wiki_css(['(HTML)' + sub_name, 0])],
                 data = start + '''
                     <form method="post">
                         <textarea class="opennamu_textarea_500" cols="100" name="content">''' + html.escape(data) + '''</textarea>

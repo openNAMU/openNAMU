@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def api_version(version_list):
+async def api_version(version_list):
     with get_db_connect() as conn:
         curs = conn.cursor()
 

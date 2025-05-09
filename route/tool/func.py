@@ -13,9 +13,11 @@ import email.mime.text
 import email.utils
 import email.header
 
+from .func_tool import *
+
 # Init-Version
 with open('version.json', encoding = 'utf8') as file_data:
-    version_list = json.loads(file_data.read())
+    version_list = json_loads(file_data.read())
 
 print('Version : ' + version_list['r_ver'])
 print('DB set version : ' + version_list['c_ver'])
@@ -38,25 +40,24 @@ if data_up_date == 1:
         python_ver = ''
         python_ver = str(sys.version_info.major) + '.' + str(sys.version_info.minor)
 
-        run_list = [sys.executable, 'python' + python_ver, 'python3', 'python', 'py -' + python_ver]
+        run_list = [
+            sys.executable,
+            'python' + python_ver,
+            'python3',
+            'python',
+            'py -' + python_ver
+        ]
+        
         for exe_name in run_list:
             try:
+                subprocess.check_call([exe_name, "-m", "pip", "install", "--upgrade", "--user", "-r", "requirements-optional.txt"])
+            except:
+                pass
+
+            try:
                 subprocess.check_call([exe_name, "-m", "pip", "install", "--upgrade", "--user", "-r", "requirements.txt"])
-
-                try:
-                    os.execl(exe_name, sys.executable, *sys.argv)
-                except:
-                    pass
-
-                try:
-                    os.execl(exe_name, '"' + sys.executable + '"', *sys.argv)
-                except:
-                    pass
-
-                try:
-                    os.execl(exe_name, os.path.abspath(__file__), *sys.argv)
-                except:
-                    pass
+                subprocess.Popen([exe_name] + sys.argv)
+                os._exit(0)
             except:
                 pass
         else:
@@ -69,7 +70,6 @@ else:
     print('PIP check pass')
 
 # Init-Load
-from .func_tool import *
 from .func_render import class_do_render
 
 from diff_match_patch import diff_match_patch
@@ -80,7 +80,6 @@ import werkzeug.debug
 import flask
 import asyncio
 import aiohttp
-import waitress
 
 import requests
 from PIL import Image
@@ -104,15 +103,13 @@ def custom_render_template(template_name_or_list, **context):
 
 flask.render_template = custom_render_template
 
-def do_db_set(db_set):
-    with class_temp_db() as m_conn:
-        m_curs = m_conn.cursor()
+global_lang_data = {}
+global_some_set = {}
 
-        m_curs.execute('drop table if exists temp')
-        m_curs.execute('create table if not exists temp(name text, data text)')
-        
-        for for_a in db_set:
-            m_curs.execute('insert into temp (name, data) values (?, ?)', ['db_' + for_a, db_set[for_a]])
+def do_db_set(db_set):
+    for for_a in db_set:
+        global_func_some_set_do('db_' + for_a, db_set[for_a])
+        global_some_set_do('db_' + for_a, db_set[for_a])
 
 class flask_data_or_variable:
     def __init__(self, flask_data, var_dict):
@@ -132,54 +129,69 @@ class flask_data_or_variable:
             else:
                 return replace_data
 
-def python_to_golang_sync(func_name, other_set = {}):
-    with class_temp_db() as m_conn:
-        m_curs = m_conn.cursor()
-        
-        if other_set == {}:
-            other_set = func_name + ' {}'
+def global_some_set_do(set_name, data = None):
+    global global_some_set
+
+    if data != None:
+        global_some_set[set_name] = data
+
+    if set_name in global_some_set:
+        return global_some_set[set_name]
+    else:
+        return None
+
+async def python_to_golang(func_name, other_set = {}):    
+    other_set = {
+        "url" : func_name,
+        "data" : json_dumps(other_set)
+    }
+
+    if flask.has_request_context():
+        other_set["session"] = json_dumps(dict(flask.session))
+
+        if "Cookie" in flask.request.headers:
+            other_set["cookie"] = flask.request.headers["Cookie"]
         else:
-            other_set = func_name + ' ' + json.dumps(other_set)
-    
-        m_curs.execute('select data from temp where name = "setup_golang_port"')
-        db_data = m_curs.fetchall()
-        db_data = db_data[0][0] if db_data else "3001"
-    
+            other_set["cookie"] = ""
+
+        other_set["ip"] = ip_check()
+    else:
+        other_set["session"] = "{}"
+        other_set["cookie"] = ""
+        other_set["ip"] = "127.0.0.1"
+
+    port_data = global_some_set_do("setup_golang_port")
+
+    async with aiohttp.ClientSession() as session:
         while 1:
-            res = requests.post('http://localhost:' + db_data + '/', data = other_set)
-            data = res.text
+            async with session.post('http://localhost:' + port_data + '/', data = json_dumps(other_set)) as res:
+                data = await res.json()
 
-            if "database is locked" == data:
-                pass
-            elif "error" == data:
-                raise
-            else:
-                return data
+                if "response" in data and data["response"] == "error":
+                    raise Exception(f"API returned error: {data}")
+                else:
+                    return data
+                
+async def opennamu_make_list(left = '', right = '', bottom = '', class_name = ''):
+    data_html = f'<span class="{class_name}">'
+    data_html += '<div class="opennamu_recent_change">'
+    data_html += left
 
-async def python_to_golang(func_name, other_set = {}):
-    with class_temp_db() as m_conn:
-        m_curs = m_conn.cursor()
-    
-        if other_set == {}:
-            other_set = func_name + ' {}'
-        else:
-            other_set = func_name + ' ' + json.dumps(other_set)
-    
-        m_curs.execute('select data from temp where name = "setup_golang_port"')
-        db_data = m_curs.fetchall()
-        db_data = db_data[0][0] if db_data else "3001"
-    
-        async with aiohttp.ClientSession() as session:
-            while 1:
-                async with session.post('http://localhost:' + db_data + '/', data = other_set) as res:
-                    data = await res.text()
+    data_html += '<div style="float: right;">'
+    data_html += right
+    data_html += '</div>'
 
-                    if "database is locked" == data:
-                        pass
-                    elif "error" == data:
-                        raise
-                    else:
-                        return data
+    data_html += '<div style="clear: both;"></div>'
+
+    if bottom != '':
+        data_html += '<hr>'
+        data_html += bottom
+
+    data_html += '</div>'
+    data_html += '<hr class="main_hr">'
+    data_html += '</span>'
+
+    return data_html
 
 # Func-init
 def get_init_set_list(need = 'all'):
@@ -221,25 +233,18 @@ def get_init_set_list(need = 'all'):
     
 class get_db_connect:
     def __init__(self, db_type = '', init_mode = False):
-        with class_temp_db() as m_conn:
-            m_curs = m_conn.cursor()
+        self.db_set = {}
+        self.init_mode = init_mode
 
-            self.db_set = {}
-            self.init_mode = init_mode
+        for for_a in ("db_type", "db_name"):
+            self.db_set[for_a] = global_some_set_do(for_a)
 
-            m_curs.execute('select name, data from temp where name in ("db_type", "db_name")')
-            db_data = m_curs.fetchall()
-            for for_a in db_data:
-                self.db_set[for_a[0]] = for_a[1]
+        if db_type != '':
+            self.db_set['db_type'] = db_type
 
-            if db_type != '':
-                self.db_set['db_type'] = db_type
-
-            if self.db_set['db_type'] == 'mysql':
-                m_curs.execute('select name, data from temp where name in ("db_mysql_host", "db_mysql_user", "db_mysql_pw", "db_mysql_port")')
-                db_data = m_curs.fetchall()
-                for for_a in db_data:
-                    self.db_set[for_a[0]] = for_a[1]
+        if self.db_set['db_type'] == 'mysql':
+            for for_a in ("db_mysql_host", "db_mysql_user", "db_mysql_pw", "db_mysql_port"):
+                self.db_set[for_a] = global_some_set_do(for_a)
         
     def __enter__(self):
         if self.db_set['db_type'] == 'sqlite':
@@ -287,7 +292,7 @@ class class_check_json:
             if os.path.exists(os.path.join('data', 'set.json')):
                 db_set_list = ['db', 'db_type']
                 with open(os.path.join('data', 'set.json'), encoding = 'utf8') as file_data:
-                    set_data = orjson.loads(file_data.read())
+                    set_data = json_loads(file_data.read())
 
                 for i in db_set_list:
                     if not i in set_data:
@@ -321,7 +326,7 @@ class class_check_json:
                     set_data['db'] = data_get
 
                 with open(os.path.join('data', 'set.json'), 'w', encoding = 'utf8') as f:
-                    f.write(json.dumps(set_data))
+                    f.write(json_dumps(set_data))
 
         print('DB name : ' + set_data['db'])
         print('DB type : ' + set_data['db_type'])
@@ -336,7 +341,7 @@ class class_check_json:
         if os.path.exists(os.path.join('data', 'mysql.json')):
             db_set_list = ['user', 'password', 'host', 'port']
             with open(os.path.join('data', 'mysql.json'), encoding = 'utf8') as file_data:
-                set_data = orjson.loads(file_data.read())
+                set_data = json_loads(file_data.read())
 
             for i in db_set_list:
                 if not i in set_data:
@@ -366,7 +371,7 @@ class class_check_json:
                 set_data_mysql['port'] = '3306'
 
             with open(os.path.join('data', 'mysql.json'), 'w', encoding = 'utf8') as f:
-                f.write(json.dumps(set_data_mysql))
+                f.write(json_dumps(set_data_mysql))
 
         data_db_set['mysql_user'] = set_data_mysql['user']
         data_db_set['mysql_pw'] = set_data_mysql['password']
@@ -441,7 +446,7 @@ def get_db_table_list():
     
     return create_data
 
-def update(conn, ver_num, set_data):
+async def update(conn, ver_num, set_data):
     curs = conn.cursor()
 
     # 업데이트 하위 호환 유지 함수
@@ -473,7 +478,7 @@ def update(conn, ver_num, set_data):
                 curs.execute(db_change("update other set data = '' where name = 'sec_re'"))
     
     if ver_num < 3172800 and set_data['type'] == 'mysql':
-        get_data_mysql = orjson.loads(open('data/mysql.json', encoding = 'utf8').read())
+        get_data_mysql = json_loads(open('data/mysql.json', encoding = 'utf8').read())
         
         with open('data/mysql.json', 'w') as f:
             f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "localhost" }')
@@ -560,7 +565,7 @@ def update(conn, ver_num, set_data):
             sql_data['ua'] = i[7]
             sql_data['email'] = i[8]
             
-            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['application', i[0], json.dumps(sql_data)])
+            curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['application', i[0], json_dumps(sql_data)])
     
     if ver_num < 3500105:
         curs.execute(db_change('delete from acl where title like "file:%" and data = "admin" and type like "decu%"'))
@@ -736,82 +741,80 @@ def update(conn, ver_num, set_data):
             for for_b in curs.fetchall():
                 lang_name = get_lang_name(conn, tool = 'inter')
                 if lang_name == 'ko-KR':
-                    add_alarm(for_b[0], 'tool:system', '메인 ACL이 권한으로 개편되면서 기존 설정 값이 날라갔으니 권한으로 재설정 해주세요.')
+                    await add_alarm(for_b[0], 'tool:system', '메인 ACL이 권한으로 개편되면서 기존 설정 값이 날라갔으니 권한으로 재설정 해주세요.')
                 else:
-                    add_alarm(for_b[0], 'tool:system', 'As the main ACL has been reorganized into the auth, the existing setting values have been lost, so please reset it to the auth.')
+                    await add_alarm(for_b[0], 'tool:system', 'As the main ACL has been reorganized into the auth, the existing setting values have been lost, so please reset it to the auth.')
 
     print('Update completed')
 
 def set_init_always(conn, ver_num, run_mode):
-    with class_temp_db() as m_conn:
-        m_curs = m_conn.cursor()
-        curs = conn.cursor()
+    curs = conn.cursor()
 
-        # 버전 기입
-        curs.execute(db_change('delete from other where name = "ver"'))
-        curs.execute(db_change('insert into other (name, data, coverage) values ("ver", ?, "")'), [ver_num])
+    # 버전 기입
+    curs.execute(db_change('delete from other where name = "ver"'))
+    curs.execute(db_change('insert into other (name, data, coverage) values ("ver", ?, "")'), [ver_num])
+    
+    # 기본 권한 그룹 설정
+    curs.execute(db_change('delete from alist where name = "owner"'))
+    curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
+
+    curs.execute(db_change("select name from alist where name = 'user' limit 1"))
+    if not curs.fetchall():
+        curs.execute(db_change('insert into alist (name, acl) values ("user", "user")'))
+
+    curs.execute(db_change("select name from alist where name = 'ip' limit 1"))
+    if not curs.fetchall():
+        curs.execute(db_change('insert into alist (name, acl) values ("ip", "ip")'))
+
+    curs.execute(db_change("select name from alist where name = 'ban' limit 1"))
+    if not curs.fetchall():
+        curs.execute(db_change('insert into alist (name, acl) values ("ban", "view")'))
+
+    # 문서 댓글용 게시판 생성
+    bbs_num = '0'
+    bbs_name = 'document_comment'
+    bbs_type = 'comment'
+
+    curs.execute(db_change("insert into bbs_set (set_name, set_code, set_id, set_data) values ('bbs_name', '', ?, ?)"), [bbs_num, bbs_name])
+    curs.execute(db_change("insert into bbs_set (set_name, set_code, set_id, set_data) values ('bbs_type', '', ?, ?)"), [bbs_num, bbs_type])
+
+    # 이미지 폴더 없으면 생성
+    if not os.path.exists(load_image_url(conn)):
+        os.makedirs(load_image_url(conn))
+
+    # 비밀키 없으면 생성
+    curs.execute(db_change('select data from other where name = "key"'))
+    if not curs.fetchall():
+        curs.execute(db_change('insert into other (name, data, coverage) values ("key", ?, "")'), [load_random_key()])
+
+    # 솔트키 없으면 생성
+    curs.execute(db_change('select data from other where name = "salt_key"'))
+    if not curs.fetchall():
+        curs.execute(db_change('insert into other (name, data, coverage) values ("salt_key", ?, "")'), [load_random_key(4)])
+
+    # 문서 전체 갯수 없으면 생성
+    curs.execute(db_change('select data from other where name = "count_all_title"'))
+    if not curs.fetchall():
+        curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", "0", "")'))
         
-        # 기본 권한 그룹 설정
-        curs.execute(db_change('delete from alist where name = "owner"'))
-        curs.execute(db_change('insert into alist (name, acl) values ("owner", "owner")'))
-
-        curs.execute(db_change("select name from alist where name = 'user' limit 1"))
-        if not curs.fetchall():
-            curs.execute(db_change('insert into alist (name, acl) values ("user", "user")'))
-
-        curs.execute(db_change("select name from alist where name = 'ip' limit 1"))
-        if not curs.fetchall():
-            curs.execute(db_change('insert into alist (name, acl) values ("ip", "ip")'))
-
-        curs.execute(db_change("select name from alist where name = 'ban' limit 1"))
-        if not curs.fetchall():
-            curs.execute(db_change('insert into alist (name, acl) values ("ban", "view")'))
-
-        # 문서 댓글용 게시판 생성
-        bbs_num = '0'
-        bbs_name = 'document_comment'
-        bbs_type = 'comment'
-
-        curs.execute(db_change("insert into bbs_set (set_name, set_code, set_id, set_data) values ('bbs_name', '', ?, ?)"), [bbs_num, bbs_name])
-        curs.execute(db_change("insert into bbs_set (set_name, set_code, set_id, set_data) values ('bbs_type', '', ?, ?)"), [bbs_num, bbs_type])
-
-        # 이미지 폴더 없으면 생성
-        if not os.path.exists(load_image_url(conn)):
-            os.makedirs(load_image_url(conn))
-
-        # 비밀키 없으면 생성
-        curs.execute(db_change('select data from other where name = "key"'))
-        if not curs.fetchall():
-            curs.execute(db_change('insert into other (name, data, coverage) values ("key", ?, "")'), [load_random_key()])
-
-        # 솔트키 없으면 생성
-        curs.execute(db_change('select data from other where name = "salt_key"'))
-        if not curs.fetchall():
-            curs.execute(db_change('insert into other (name, data, coverage) values ("salt_key", ?, "")'), [load_random_key(4)])
-
-        # 문서 전체 갯수 없으면 생성
-        curs.execute(db_change('select data from other where name = "count_all_title"'))
-        if not curs.fetchall():
-            curs.execute(db_change('insert into other (name, data, coverage) values ("count_all_title", "0", "")'))
-            
-        # 위키 접근 비밀번호 있으면 temp DB로 넘겨줌
-        curs.execute(db_change('select data from other where name = "wiki_access_password_need"'))
+    # 위키 접근 비밀번호 있으면 temp DB로 넘겨줌
+    curs.execute(db_change('select data from other where name = "wiki_access_password_need"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        curs.execute(db_change('select data from other where name = "wiki_access_password"'))
         db_data = curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            curs.execute(db_change('select data from other where name = "wiki_access_password"'))
-            db_data = curs.fetchall()
-            if db_data:
-                m_curs.execute('insert into temp (name, data) values ("wiki_access_password", ?)', [db_data[0][0]])
+        if db_data:
+            global_some_set_do("wiki_access_password", db_data[0][0])
 
-        curs.execute(db_change('select data from other where name = "load_ip_select"'))
-        db_data = curs.fetchall()
-        if db_data and db_data[0][0] != '':
-            m_curs.execute('insert into temp (name, data) values ("load_ip_select", ?)', [db_data[0][0]])
+    curs.execute(db_change('select data from other where name = "load_ip_select"'))
+    db_data = curs.fetchall()
+    if db_data and db_data[0][0] != '':
+        global_func_some_set_do("load_ip_select", db_data[0][0])
 
-        # OS마다 실행 파일 설정
-        exe_type = linux_exe_chmod()
-        if platform.system() == 'Linux' or platform.system() == 'Darwin':
-            os.system('chmod +x ./route_go/bin/' + exe_type)
+    # OS마다 실행 파일 설정
+    exe_type = linux_exe_chmod()
+    if platform.system() == 'Linux' or platform.system() == 'Darwin':
+        os.system('chmod +x ./route_go/bin/' + exe_type)
 
 def linux_exe_chmod():
     exe_type = ''
@@ -907,28 +910,6 @@ def get_next_page_bottom(conn, link, num, page, end = 50):
 
     return list_data
 
-def next_fix(conn, link, num, page, end = 50):
-    list_data = ''
-
-    if num == 1:
-        if len(page) == end:
-            list_data += '' + \
-                '<hr class="main_hr">' + \
-                '<a href="' + link + str(num + 1) + '">(' + get_lang(conn, 'next') + ')</a>' + \
-            ''
-    elif len(page) != end:
-        list_data += '' + \
-            '<hr class="main_hr">' + \
-            '<a href="' + link + str(num - 1) + '">(' + get_lang(conn, 'previous') + ')</a>' + \
-        ''
-    else:
-        list_data += '' + \
-            '<hr class="main_hr">' + \
-            '<a href="' + link + str(num - 1) + '">(' + get_lang(conn, 'previous') + ')</a> <a href="' + link + str(num + 1) + '">(' + get_lang(conn, 'next') + ')</a>' + \
-        ''
-
-    return list_data
-
 def leng_check(A, B):
     # B -> new
     # A -> old
@@ -945,20 +926,19 @@ def redirect(conn, data = '/'):
     return flask.redirect(load_domain(conn, 'full') + data)
     
 # Golang 의존
-def get_acl_list(type_data = 'normal'):
+async def get_acl_list(type_data = 'normal'):
     if type_data == 'user':
         type_data = 'user_document'
 
     other_set = {}
     other_set['type'] = type_data
 
-    data_str = python_to_golang_sync('api_list_acl', other_set)
-    data = orjson.loads(data_str)
+    data = await python_to_golang('api_list_acl', other_set)
 
     return data["data"]
 
 ## Func-simple-with_DB
-def get_user_title_list(conn, ip = ''):
+async def get_user_title_list(conn, ip = ''):
     curs = conn.cursor()
 
     ip = ip_check() if ip == '' else ip
@@ -1009,7 +989,7 @@ def get_user_title_list(conn, ip = ''):
     if curs.fetchall():
         user_title['☑️'] = '☑️ before_admin'
 
-    if acl_check(tool = 'all_admin_auth') != 1:
+    if await acl_check(tool = 'all_admin_auth') != 1:
         user_title['✅'] = '✅ admin'
     
     return user_title
@@ -1172,36 +1152,31 @@ def get_lang_name(conn, tool = ''):
     return lang_name
 
 def get_lang(conn, data, safe = 0):
-    with class_temp_db() as m_conn:
-        m_curs = m_conn.cursor()
+    lang_name = get_lang_name(conn)
 
-        lang_name = get_lang_name(conn)
-        
-        m_curs.execute('select data from temp where name = ?', ['lang_' + lang_name + '_' + data])
-        db_data = m_curs.fetchall()
-        if db_data:
-            if safe == 1:
-                return db_data[0][0]
-            else:
-                return html.escape(db_data[0][0])
+    if (lang_name + '_' + data) in global_lang_data:
+        if safe == 1:
+            return global_lang_data[lang_name + '_' + data]
         else:
-            lang_list = os.listdir('lang')
-            if (lang_name + '.json') in lang_list:
-                lang = orjson.loads(open(os.path.join('lang', lang_name + '.json'), encoding = 'utf8').read())
+            return html.escape(global_lang_data[lang_name + '_' + data])
+    else:
+        lang_list = os.listdir('lang')
+        if (lang_name + '.json') in lang_list:
+            lang = json_loads(open(os.path.join('lang', lang_name + '.json'), encoding = 'utf8').read())
+            
+            for title in lang:
+                global_lang_data[lang_name + '_' + title] = lang[title] 
+        else:
+            lang = {}
+
+        if data in lang:
+            if safe == 1:
+                return lang[data] 
             else:
-                lang = {}
+                return html.escape(lang[data])
 
-            if data in lang:
-                m_curs.execute('insert into temp (name, data) values (?, ?)', ['lang_' + lang_name + '_' + data, lang[data]])
-
-                if safe == 1:
-                    return lang[data] 
-                else:
-                    return html.escape(lang[data])
-
-        print(data + ' (' + lang_name + ')')
-
-        return html.escape(data + ' (' + lang_name + ')')
+    print(data + ' (' + lang_name + ')')
+    return html.escape(data + ' (' + lang_name + ')')
 
 # 하위 호환용
 def load_lang(data, safe = 0):
@@ -1243,157 +1218,81 @@ def skin_check(conn, set_n = 0):
         return skin
     
 def cache_v():
-    return '.cache_v283'
+    return '.cache_v288'
 
 def wiki_css(data):
-    with class_temp_db() as m_conn:
-        m_curs = m_conn.cursor()
+    # without_DB
+    data += ['' for _ in range(0, 4 - len(data))]
+    
+    data_css = ''
+    data_css_dark = ''
 
-        # without_DB
-        data += ['' for _ in range(0, 4 - len(data))]
+    data_css_ver = cache_v()
+
+    db_data = global_some_set_do("main_css")
+    if db_data:
+        data_css = db_data
+    else:
+        data_css += '<meta http-equiv="Cache-Control" content="max-age=31536000">'
+
+        # External JS
+        data_css += '<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>'
+        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.48.0/min/vs/loader.min.js" integrity="sha512-ZG31AN9z/CQD1YDDAK4RUAvogwbJHv6bHrumrnMLzdCrVu4HeAqrUX7Jsal/cbUwXGfaMUNmQU04tQ8XXl5Znw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>'
+
+        # Func JS
+        data_css += '<script defer src="/views/main_css/js/func/func.js' + data_css_ver + '"></script>'
         
-        data_css = ''
-        data_css_dark = ''
+        data_css += '<script defer src="/views/main_css/js/func/insert_version.js' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/insert_user_info.js' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/insert_version_skin.js' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/insert_http_warning_text.js' + data_css_ver + '"></script>'
+        
+        data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/shortcut.js' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/editor.js' + data_css_ver + '"></script>'
+        data_css += '<script defer src="/views/main_css/js/func/render.js' + data_css_ver + '"></script>'
+        
+        # Main CSS
+        data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css' + data_css_ver + '">'
 
-        data_css_ver = cache_v()
+        # External CSS
+        data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">'
+        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.min.css" integrity="sha512-MFDhxgOYIqLdcYTXw7en/n5BshKoduTitYmX8TkQ+iJOGjrWusRi8+KmfZOrgaDrCjZSotH2d1U1e/Z1KT6nWw==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
 
-        m_curs.execute('select data from temp where name = "main_css"')
-        db_data = m_curs.fetchall()
-        if db_data:
-            data_css = db_data[0][0]
-        else:
-            data_css += '<meta http-equiv="Cache-Control" content="max-age=31536000">'
+        global_some_set_do("main_css", data_css)
 
-            # External JS
-            data_css += '<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>'
-            data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-            data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-            data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.48.0/min/vs/loader.min.js" integrity="sha512-ZG31AN9z/CQD1YDDAK4RUAvogwbJHv6bHrumrnMLzdCrVu4HeAqrUX7Jsal/cbUwXGfaMUNmQU04tQ8XXl5Znw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-            data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>'
+    # Darkmode
+    db_data = global_some_set_do("dark_main_css")
+    if db_data:
+        data_css_dark = db_data
+    else:
+        # Main CSS
+        data_css_dark += '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css' + data_css_ver + '">'
 
-            # Func JS
-            data_css += '<script defer src="/views/main_css/js/func/func.js' + data_css_ver + '"></script>'
-            
-            data_css += '<script defer src="/views/main_css/js/func/insert_version.js' + data_css_ver + '"></script>'
-            data_css += '<script defer src="/views/main_css/js/func/insert_user_info.js' + data_css_ver + '"></script>'
-            data_css += '<script defer src="/views/main_css/js/func/insert_version_skin.js' + data_css_ver + '"></script>'
-            data_css += '<script defer src="/views/main_css/js/func/insert_http_warning_text.js' + data_css_ver + '"></script>'
-            
-            data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js' + data_css_ver + '"></script>'
-            data_css += '<script defer src="/views/main_css/js/func/shortcut.js' + data_css_ver + '"></script>'
-            data_css += '<script defer src="/views/main_css/js/func/editor.js' + data_css_ver + '"></script>'
-            data_css += '<script defer src="/views/main_css/js/func/render.js' + data_css_ver + '"></script>'
-            
-            # Main CSS
-            data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css' + data_css_ver + '">'
+        # External CSS
+        data_css_dark += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
 
-            # External CSS
-            data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">'
-            data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-            data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.min.css" integrity="sha512-MFDhxgOYIqLdcYTXw7en/n5BshKoduTitYmX8TkQ+iJOGjrWusRi8+KmfZOrgaDrCjZSotH2d1U1e/Z1KT6nWw==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+        global_some_set_do("dark_main_css", data_css_dark)
 
-            m_curs.execute('insert into temp (name, data) values ("main_css", ?)', [data_css])
+    data = data[0:2] + ['', data_css] + data[2:3] + [data_css_dark] + data[3:]
 
-        # Darkmode
-        m_curs.execute('select data from temp where name = "dark_main_css"')
-        db_data = m_curs.fetchall()
-        if db_data:
-            data_css_dark = db_data[0][0]
-        else:
-            # Main CSS
-            data_css_dark += '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css' + data_css_ver + '">'
-
-            # External CSS
-            data_css_dark += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-
-            m_curs.execute('insert into temp (name, data) values ("dark_main_css", ?)', [data_css_dark])
-
-        data = data[0:2] + ['', data_css] + data[2:3] + [data_css_dark] + data[3:]
-
-        return data
+    return data
 
 def cut_100(data):
     return ''
 
-def wiki_set(conn):
-    curs = conn.cursor()
+async def wiki_set():
+    other_set = {}
 
-    ip = ip_check()
-    skin_name = skin_check(conn, 1)
-    data_list = []
+    data = await python_to_golang('api_func_wiki_set', other_set)
 
-    curs.execute(db_change('select data from other where name = ?'), ['name'])
-    db_data = curs.fetchall()
-    data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['Wiki']
+    return data["data"]
 
-    curs.execute(db_change('select data from other where name = ?'), ['license'])
-    db_data = curs.fetchall()
-    data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else ['']
-
-    data_list += ['', '']
-
-    curs.execute(db_change('select data from other where name = "logo" and coverage = ?'), [skin_name])
-    db_data = curs.fetchall()
-    if db_data and db_data[0][0] != '':
-        data_list += [db_data[0][0]]
-    else:
-        curs.execute(db_change('select data from other where name = "logo" and coverage = ""'))
-        db_data = curs.fetchall()
-        data_list += [db_data[0][0]] if db_data and db_data[0][0] != '' else [data_list[0]]
-
-    head_data = ''
-
-    curs.execute(db_change("select data from other where name = 'head' and coverage = ''"))
-    db_data = curs.fetchall()
-    head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
-
-    curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
-    db_data = curs.fetchall()
-    head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
-
-    darkmode = flask.request.cookies.get('main_css_darkmode', '0')
-    if darkmode == '1':
-        curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name + '-cssdark'])
-        db_data = curs.fetchall()
-        head_data += db_data[0][0] if db_data and db_data[0][0] != '' else ''
-
-    data_list += [head_data]
-
-    curs.execute(db_change("select data from other where name = 'top_menu'"))
-    db_data = curs.fetchall()
-    db_data = db_data[0][0] if db_data else ''
-    db_data = db_data.replace('\r', '')
-    
-    curs.execute(db_change("select data from user_set where name = 'top_menu' and id = ?"), [ip])
-    db_data_2 = curs.fetchall()
-    db_data_2 = db_data_2[0][0] if db_data_2 else ''
-    db_data_2 = db_data_2.replace('\r', '')
-    if db_data_2 != '' and db_data != '':
-        db_data += '\n' + db_data_2
-    elif db_data_2 != '':
-        db_data += db_data_2
-    
-    if db_data != '':
-        db_data = db_data.split('\n')
-    
-        if len(db_data) % 2 != 0:
-            db_data += ['']
-
-        db_data = [[db_data[for_a], db_data[for_a + 1]] for for_a in range(0, len(db_data), 2)]
-
-    data_list += [db_data]
-
-    template_var = []
-    for for_a in range(1, 4):
-        curs.execute(db_change("select data from other where name = ?"), ['template_var_' + str(for_a)])
-        db_data = curs.fetchall()
-        template_var += [db_data[0][0]] if db_data else ['']
-
-    data_list += [template_var]
-
-    return data_list
-
-def wiki_custom(conn):
+async def wiki_custom(conn):
     curs = conn.cursor()
 
     ip = ip_check()
@@ -1425,7 +1324,7 @@ def wiki_custom(conn):
         email = curs.fetchall()
         email = email[0][0] if email else ''
 
-        if acl_check(tool = 'all_admin_auth') != 1:
+        if await acl_check(tool = 'all_admin_auth') != 1:
             user_admin = '1'
 
             curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
@@ -1464,13 +1363,13 @@ def wiki_custom(conn):
         email,
         user_name,
         user_admin,
-        str(ban_check()[0]),
+        str((await ban_check())[0]),
         user_notice,
         user_acl_list,
         ip,
         user_topic,
         split_path,
-        level_check(conn, ip)
+        await level_check(ip)
     ]
 
 def load_skin(conn, data = '', set_n = 0, default = 0):
@@ -1521,7 +1420,7 @@ def load_skin(conn, data = '', set_n = 0, default = 0):
         return skin_return_data
 
 # Func-markup
-def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = ''):
+def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = '', parameter = {}):
     curs = conn.cursor()
 
     # data_type in ['view', 'from', 'thread', 'api_view', 'api_thread', 'api_include', 'backlink']
@@ -1555,7 +1454,17 @@ def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = 
     if db_data and db_data[0][0] != '':
         render_lang_data['category'] = db_data[0][0]
 
-    get_class_render = class_do_render(conn, render_lang_data, markup).do_render(doc_name, doc_data, data_type)
+    get_class_render = class_do_render(
+        conn,
+        render_lang_data,
+        markup,
+        parameter,
+        render_set
+    ).do_render(
+        doc_name,
+        doc_data,
+        data_type
+    )
     if data_type == 'backlink':
         return ''
 
@@ -1585,6 +1494,7 @@ def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = 
 
                 .opennamu_render_complete td {
                     padding: 5px 10px !important;
+                    word-break: break-all;
                 }
 
                 .opennamu_render_complete summary {
@@ -1700,7 +1610,7 @@ def render_simple_set(conn, data):
     return data
 
 # Func-request
-def send_email(conn, who, title, data):
+async def send_email(conn, who, title, data):
     curs = conn.cursor()
 
     curs.execute(db_change('' + \
@@ -1739,7 +1649,7 @@ def send_email(conn, who, title, data):
         smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
         
     domain = load_domain(conn)
-    wiki_name = wiki_set(conn)[0]
+    wiki_name = (await wiki_set())[0]
     
     msg = email.mime.text.MIMEText(data)
 
@@ -1760,14 +1670,14 @@ def send_email(conn, who, title, data):
 
         return 0
 
-def captcha_get(conn):
+async def captcha_get(conn):
     curs = conn.cursor()
 
     data = ''
     
-    if acl_check('', 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
+    if await acl_check('', 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
         pass
-    elif acl_check('', 'recaptcha') == 1:
+    elif await acl_check('', 'recaptcha') == 1:
         curs.execute(db_change('select data from other where name = "recaptcha"'))
         recaptcha = curs.fetchall()
         
@@ -1811,48 +1721,36 @@ def captcha_get(conn):
 
     return data
 
-def captcha_post(conn, re_data):
+async def captcha_post(conn, re_data):
     curs = conn.cursor()
 
-    if acl_check('', 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
+    if await acl_check('', 'recaptcha_five_pass') == 0 and 'recapcha_pass' in flask.session and flask.session['recapcha_pass'] > 0:
         pass
-    elif acl_check('', 'recaptcha') == 1:
+    elif await acl_check('', 'recaptcha') == 1:
         curs.execute(db_change('select data from other where name = "sec_re"'))
         sec_re = curs.fetchall()
         
         curs.execute(db_change('select data from other where name = "recaptcha_ver"'))
         rec_ver = curs.fetchall()
-        if captcha_get(conn) != '':
+        if await captcha_get(conn) != '':
+            url = ''
             if not rec_ver or rec_ver[0][0] in ('', 'v3'):
-                data = requests.post(
-                    'https://www.google.com/recaptcha/api/siteverify',
-                    data = {
-                        "secret" : sec_re[0][0],
-                        "response" : re_data
-                    }
-                )
+                url = 'https://www.google.com/recaptcha/api/siteverify'
             elif rec_ver[0][0] == 'cf':
-                data = requests.post(
-                    'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-                    data = {
-                        "secret" : sec_re[0][0],
-                        "response" : re_data
-                    }
-                )
+                url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
             else:
                 # rec_ver[0][0] == 'h'
-                data = requests.post(
-                    'https://hcaptcha.com/siteverify',
-                    data = {
-                        "secret" : sec_re[0][0],
-                        "response" : re_data
-                    }
-                )
-                
-            if data.status_code == 200:
-                json_data = orjson.loads(data.text)
-                if json_data['success'] != True:
-                    return 1
+                url = 'https://hcaptcha.com/siteverify'
+
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, data = {
+                    "secret": sec_re[0][0],
+                    "response": re_data
+                }) as res:
+                    if res.status == 200:
+                        json_data = await res.json()
+                        if json_data['success'] != True:
+                            return 1
 
     if 'recapcha_pass' in flask.session:
         if flask.session['recapcha_pass'] > 0:
@@ -1903,32 +1801,17 @@ def do_user_name_check(conn, user_name):
     
     return 0
 
-def level_check(conn, ip = ''):
-    curs = conn.cursor()
+async def level_check(ip = ''):
+    ip = ip_check() if ip == '' else ip
 
-    if ip == '':
-        ip = ip_check()
+    other_set = {}
+    other_set['ip'] = ip
 
-    level = '0'
-    exp = '0'
-    max_exp = '0'
+    data = await python_to_golang('api_func_level', other_set)
 
-    curs.execute(db_change("select data from user_set where id = ? and name = 'level'"), [ip])
-    db_data = curs.fetchall()
-    if db_data:
-        level = db_data[0][0]
+    return data["data"]
 
-    curs.execute(db_change("select data from user_set where id = ? and name = 'experience'"), [ip])
-    db_data = curs.fetchall()
-    if db_data:
-        exp = db_data[0][0]
-
-    if exp != '0':
-        max_exp = str(500 + (int(level) * 50))
-
-    return [level, exp, max_exp]
-
-def acl_check(name = '', tool = '', topic_num = '', ip = '', memo = ''):
+async def acl_check(name = '', tool = '', topic_num = '', ip = '', memo = ''):
     ip = ip_check() if ip == '' else ip
 
     other_set = {}
@@ -1937,8 +1820,7 @@ def acl_check(name = '', tool = '', topic_num = '', ip = '', memo = ''):
     other_set['topic_number'] = topic_num
     other_set['tool'] = tool
 
-    data_str = python_to_golang_sync('api_func_acl', other_set)
-    data = orjson.loads(data_str)
+    data = await python_to_golang('api_func_acl', other_set)
 
     result = 0 if data["data"] else 1
 
@@ -1947,11 +1829,11 @@ def acl_check(name = '', tool = '', topic_num = '', ip = '', memo = ''):
         other_set['ip'] = ip
         other_set['what'] = memo
 
-        python_to_golang_sync('api_func_auth_post', other_set)
+        await python_to_golang('api_func_auth_post', other_set)
 
     return result
 
-def ban_check(ip = None, tool = ''):
+async def ban_check(ip = None, tool = ''):
     ip = ip_check() if not ip else ip
     tool = '' if not tool else tool
 
@@ -1959,15 +1841,13 @@ def ban_check(ip = None, tool = ''):
     other_set['ip'] = ip
     other_set['type'] = tool
 
-    data_str = python_to_golang_sync('api_func_ban', other_set)
-    data = orjson.loads(data_str)
+    data = await python_to_golang('api_func_ban', other_set)
     data["ban"] = 1 if data["ban"] == "true" else 0
 
     return [data["ban"], data["ban_type"]]
 
-def ip_pas(raw_ip):
+async def ip_pas(raw_ip):
     other_set = {}
-    other_set["ip"] = ip_check()
     
     return_data = 0
     if type(raw_ip) != type([]):
@@ -1979,24 +1859,33 @@ def ip_pas(raw_ip):
     for for_a in range(1, len(get_ip) + 1):
         other_set["data_" + str(for_a)] = get_ip[for_a - 1]
 
-    data_str = python_to_golang_sync('api_func_ip_post', other_set)
-    data = orjson.loads(data_str)
-
+    data = await python_to_golang('api_func_ip_post', other_set)
     return data["data"][raw_ip] if return_data == 1 else data["data"]
         
 # Func-edit
-def get_edit_text_bottom(conn) :
+def get_edit_text_bottom(conn, tool = '') :
     curs = conn.cursor()
     
     b_text = ''
     
     curs.execute(db_change('select data from other where name = "edit_bottom_text"'))
-    db_data= curs.fetchall()
+    db_data = curs.fetchall()
     if db_data and db_data[0][0] != '':
-        b_text = '' + \
-            db_data[0][0] + \
-            '<hr class="main_hr">' + \
-        ''
+        b_text = db_data[0][0] + '<hr class="main_hr">'
+
+    if tool != '':
+        if tool == 'edit':
+            curs.execute(db_change('select data from other where name = "edit_only_bottom_text"'))
+        elif tool == 'move':
+            curs.execute(db_change('select data from other where name = "move_bottom_text"'))
+        elif tool == 'delete':
+            curs.execute(db_change('select data from other where name = "delete_bottom_text"'))
+        else:
+            curs.execute(db_change('select data from other where name = "revert_bottom_text"'))
+
+        db_data = curs.fetchall()
+        if db_data and db_data[0][0] != '':
+            b_text = db_data[0][0] + '<hr class="main_hr">'
 
     return b_text
 
@@ -2042,19 +1931,19 @@ def do_edit_text_bottom_check_box_check(conn, data):
         
     return 0
 
-def do_edit_send_check(conn, data):
+async def do_edit_send_check(conn, data):
     curs = conn.cursor()
     
     curs.execute(db_change('select data from other where name = "edit_bottom_compulsion"'))
     db_data = curs.fetchall()
     if db_data and db_data[0][0] != '':
-        if acl_check('', 'edit_bottom_compulsion') == 1:
+        if await acl_check('', 'edit_bottom_compulsion') == 1:
             if data == '':
                 return 1
     
     return 0
 
-def do_edit_slow_check(conn, do_type = 'edit'):
+async def do_edit_slow_check(conn, do_type = 'edit'):
     curs = conn.cursor()
 
     if do_type == 'edit':
@@ -2065,7 +1954,7 @@ def do_edit_slow_check(conn, do_type = 'edit'):
     
     slow_edit = curs.fetchall()
     if slow_edit and slow_edit[0][0] != '':
-        if acl_check('', 'slow_edit') == 1:
+        if await acl_check('', 'slow_edit') == 1:
             slow_edit = int(number_check(slow_edit[0][0]))
 
             if do_type == 'edit':
@@ -2085,11 +1974,11 @@ def do_edit_slow_check(conn, do_type = 'edit'):
 
     return 0
 
-def do_edit_filter(conn, data):
+async def do_edit_filter(conn, data):
     curs = conn.cursor()
 
     ip = ip_check()
-    if acl_check(tool = 'edit_filter_pass') == 1:
+    if await acl_check(tool = 'edit_filter_pass') == 1:
         curs.execute(db_change("select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''"))
         for data_list in curs.fetchall():
             match = re.compile(data_list[0], re.I)
@@ -2169,13 +2058,13 @@ def do_reload_recent_thread(conn, topic_num, date, name = None, sub = None):
     else:
         curs.execute(db_change("insert into rd (title, sub, code, date, band, stop, agree, acl) values (?, ?, ?, ?, '', '', '', '')"), [name, sub, topic_num, date])
 
-def add_alarm(to_user, from_user, context):
+async def add_alarm(to_user, from_user, context):
     other_set = {}
     other_set['to'] = to_user
     other_set['from'] = from_user
     other_set['data'] = context
 
-    python_to_golang_sync('api_func_alarm_post', other_set)
+    await python_to_golang('api_func_alarm_post', other_set)
 
 def add_user(conn, user_name, user_pw, user_email = '', user_encode = ''):
     curs = conn.cursor()
@@ -2322,17 +2211,17 @@ def history_plus(conn, title, data, date, ip, send, leng, t_check = '', mode = '
     curs.execute(db_change("insert into history (id, title, data, date, ip, send, leng, hide, type) values (?, ?, ?, ?, ?, ?, ?, '', ?)"), [id_data, title, data, date, ip, send, leng, mode])
 
 # Func-error
-def re_error(conn, data):
+async def re_error(conn, data):
     curs = conn.cursor()
 
     if data == 0:
-        if ban_check()[0] == 1:
+        if (await ban_check())[0] == 1:
             end = '<div id="opennamu_get_user_info">' + html.escape(ip_check()) + '</div>'
         else:
             end = '<ul><li>' + get_lang(conn, 'authority_error') + '</li></ul>'
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'error'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [get_lang(conn, 'error'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = '<h2>' + get_lang(conn, 'error') + '</h2>' + end,
             menu = 0
         )), 401
@@ -2472,7 +2361,7 @@ def re_error(conn, data):
                 data += '<br>' + get_lang(conn, 'error_skin_set_old') + ' <a href="/skin_set">(' + get_lang(conn, 'go') + ')</a>'
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'skin_set'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'skin_set'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '' + \
                     '<div id="main_skin_set">' + \
                         '<h2>' + get_lang(conn, 'error') + '</h2>' + \
@@ -2485,7 +2374,7 @@ def re_error(conn, data):
             ))
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [title, wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '' + \
                     '<h2>' + sub_title + '</h2>' + \
                     '<ul>' + \

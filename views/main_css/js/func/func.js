@@ -175,8 +175,6 @@ function opennamu_do_ip_click(obj) {
     }
 }
 
-
-
 function opennamu_do_ip_render() {
     for (let for_a = 0; for_a < document.getElementsByClassName('opennamu_render_ip').length; for_a++) {
         let ip = document.getElementsByClassName('opennamu_render_ip')[for_a].innerHTML.replace(/&amp;/g, '&');

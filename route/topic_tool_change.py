@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def topic_tool_change(topic_num = 1):
+async def topic_tool_change(topic_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check(tool = 'owner_auth') == 1:
-            return re_error(conn, 3)
+        if await acl_check(tool = 'owner_auth') == 1:
+            return await re_error(conn, 3)
 
         time = get_time()
         topic_num = str(topic_num)
@@ -16,7 +16,7 @@ def topic_tool_change(topic_num = 1):
             return redirect(conn, '/')
 
         if flask.request.method == 'POST':
-            acl_check(tool = 'owner_auth', memo = 'move_topic (code ' + topic_num + ')')
+            await acl_check(tool = 'owner_auth', memo = 'move_topic (code ' + topic_num + ')')
 
             title_d = flask.request.form.get('title', 'test')
             sub_d = flask.request.form.get('sub', 'test')
@@ -29,7 +29,7 @@ def topic_tool_change(topic_num = 1):
             return redirect(conn, '/thread/' + topic_num)
         else:
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'topic_name_change'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'topic_name_change'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         ''' + get_lang(conn, 'document_name') + '''

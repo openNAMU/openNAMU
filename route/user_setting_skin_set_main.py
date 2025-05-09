@@ -102,13 +102,13 @@ def user_setting_skin_set_main_set_list(conn):
 
     return set_list
 
-def user_setting_skin_set_main():
+async def user_setting_skin_set_main():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         ip = ip_check()
-        if ban_check(ip)[0] == 1:
-            return re_error(conn, 0)
+        if (await ban_check(ip))[0] == 1:
+            return await re_error(conn, 0)
             
         set_list = user_setting_skin_set_main_set_list(conn)
         use_cookie = ['main_css_darkmode']
@@ -164,7 +164,7 @@ def user_setting_skin_set_main():
                 set_data_main[for_b] = get_lang(conn, 'default') + ' : ' + ''.join([for_a[1] for for_a in set_list[for_b] if for_a[0] == server_default]) + '<hr class="main_hr">'
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'main_skin_set'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'main_skin_set'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = render_simple_set(conn, '''
                     <form method="post">
                         <h2>''' + get_lang(conn, "render") + '''</h2>

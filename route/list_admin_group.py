@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def list_admin_group_2():
+async def list_admin_group():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -9,7 +9,7 @@ def list_admin_group_2():
 
         curs.execute(db_change("select distinct name from alist order by name asc"))
         for data in curs.fetchall():
-            if acl_check('', 'owner_auth', '', '') != 1 and not data[0] in org_acl_list:
+            if await acl_check('', 'owner_auth', '', '') != 1 and not data[0] in org_acl_list:
                 delete_admin_group = ' <a href="/auth/list/delete/' + url_pas(data[0]) + '">(' + get_lang(conn, "delete") + ')</a>'
             else:
                 delete_admin_group = ''
@@ -28,7 +28,7 @@ def list_admin_group_2():
         ''
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'admin_group_list'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [get_lang(conn, 'admin_group_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = list_data,
             menu = [['manager', get_lang(conn, 'return')]]
         ))

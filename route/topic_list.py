@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def topic_list(name = 'Test'):
+async def topic_list(name = 'Test'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -38,7 +38,7 @@ def topic_list(name = 'Test'):
             plus = re.sub(r'^<br>', '', plus)
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + sub + ')', 0])],
+            imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + sub + ')', 0])],
             data = div + plus,
             menu = menu
         ))

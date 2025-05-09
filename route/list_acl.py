@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def list_acl(arg_num = 1):
+async def list_acl(arg_num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -30,10 +30,10 @@ def list_acl(arg_num = 1):
             ''
 
         div += '</ul>'
-        div += next_fix(conn, '/list/document/acl/', arg_num, list_data)
+        div += get_next_page_bottom(conn, '/list/document/acl/{}', arg_num, list_data)
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'acl_document_list'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [get_lang(conn, 'acl_document_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = div,
             menu = [['other', get_lang(conn, 'return')]]
         ))

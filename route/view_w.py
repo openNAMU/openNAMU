@@ -96,10 +96,10 @@ async def view_w(name = 'Test', do_type = ''):
                 user_name = html.escape(match.group(1))
             
             user_doc = ''
-            
+
             # S admin or owner 특수 틀 추가
-            if acl_check(tool = 'all_admin_auth', ip = user_name) != 1:
-                if acl_check(tool = 'owner_auth', ip = user_name) != 1:
+            if await acl_check(tool = 'all_admin_auth', ip = user_name) != 1:
+                if await acl_check(tool = 'owner_auth', ip = user_name) != 1:
                     curs.execute(db_change('select data from other where name = "phrase_user_page_owner"'))
                     db_data = curs.fetchall()
                     if db_data and db_data[0][0] != '':
@@ -180,23 +180,23 @@ async def view_w(name = 'Test', do_type = ''):
 
             name_view = name
 
-        doc_data = json.loads((await api_w_raw(name)).data)
-        if doc_data["response"] != "not exist":
-            render_data = json.loads((await api_w_render(name, request_method = 'POST', request_data = {
+        doc_data = await api_w_raw(name)
+        if doc_data["response"] == "ok":
+            render_data = await api_w_render(name, request_method = 'POST', request_data = {
                 'name' : name,
                 'data' : doc_data["data"]
-            })).data)
+            })
             end_data = render_data["data"] + '<script>document.addEventListener("DOMContentLoaded", function() {' + render_data["js_data"] + '});</script>'
         else:
             end_data = ''
 
-        await api_w_page_view(name)
+        asyncio.create_task(api_w_page_view(name))
 
         curs.execute(db_change("select data from data where title = ?"), [name])
         data = curs.fetchall()
 
         description = ''
-        if acl_check(name, 'render') == 1:
+        if await acl_check(name, 'render') == 1:
             response_data = 401
 
             curs.execute(db_change('select data from other where name = "error_401"'))
@@ -224,7 +224,7 @@ async def view_w(name = 'Test', do_type = ''):
 
         curs.execute(db_change("select title from acl where title = ?"), [name])
         acl = 1 if curs.fetchall() else 0
-        menu_acl = 1 if acl_check(name, 'document_edit') == 1 else 0
+        menu_acl = 1 if await acl_check(name, 'document_edit') == 1 else 0
         if response_data == 404:
             menu += [['edit/' + url_pas(name), get_lang(conn, 'create'), menu_acl]] 
         else:
@@ -355,7 +355,7 @@ async def view_w(name = 'Test', do_type = ''):
         menu += [['doc_watch_list/1/' + url_pas(name), get_lang(conn, 'watchlist')]]
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [name_view, wiki_set(conn), wiki_custom(conn), wiki_css([sub, r_date, watch_list, description, view_count])],
+            imp = [name_view, await wiki_set(), await wiki_custom(conn), wiki_css([sub, r_date, watch_list, description, view_count])],
             data = div,
             menu = menu
         )), response_data

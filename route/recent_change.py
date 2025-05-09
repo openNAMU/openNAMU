@@ -23,16 +23,16 @@ def recent_change_send_render(data):
 
     return data
 
-def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
+async def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         ip = ip_check()
         
-        all_admin = acl_check(tool = 'all_admin_auth', ip = ip)
+        all_admin = await acl_check(tool = 'all_admin_auth', ip = ip)
         all_admin = 1 if all_admin == 0 else 0
 
-        owner = acl_check(tool = 'owner_auth', ip = ip)
+        owner = await acl_check(tool = 'owner_auth', ip = ip)
         owner = 1 if owner == 0 else 0
 
         option_list = [
@@ -120,7 +120,7 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
 
             div += '</tr>'
 
-            all_ip = ip_pas([i[3] for i in data_list])
+            all_ip = await ip_pas([i[3] for i in data_list])
             for data in data_list:
                 select += '<option value="' + data[0] + '">' + data[0] + '</option>'
                 send = data[4]
@@ -242,7 +242,7 @@ def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                 sub = 0
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [title, wiki_set(conn), wiki_custom(conn), wiki_css([sub, 0])],
+                imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
                 data = div,
                 menu = menu
             ))

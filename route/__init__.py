@@ -31,14 +31,15 @@ from route.filter_all_add import filter_all_add
 from route.filter_all_delete import filter_all_delete
 
 from route.give_admin_groups import give_admin_groups
-from route.give_delete_admin_group import give_delete_admin_group_2
+from route.give_delete_admin_group import give_delete_admin_group
 from route.give_user_ban import give_user_ban
 from route.give_user_fix import give_user_fix
 
 from route.list_acl import list_acl
 from route.list_admin import list_admin
 from route.list_admin_auth_use import list_admin_auth_use
-from route.list_admin_group import list_admin_group_2
+from route.list_old_page import list_old_page
+from route.list_admin_group import list_admin_group
 from route.list_image_file import list_image_file
 from route.list_long_page import list_long_page
 from route.list_no_link import list_no_link
@@ -47,20 +48,21 @@ from route.list_title_index import list_title_index
 from route.list_user import list_user
 from route.list_user_check import list_user_check
 from route.list_user_check_delete import list_user_check_delete
+from route.list_history import list_history
 
 from route.login_find import login_find
 from route.login_find_email import login_find_email
 from route.login_find_email_check import login_find_email_check
 from route.login_find_key import login_find_key
-from route.login_login import login_login_2
-from route.login_login_2fa import login_login_2fa_2
-from route.login_login_2fa_email import login_login_2fa_email_2
+from route.login_login import login_login
+from route.login_login_2fa import login_login_2fa
+from route.login_login_2fa_email import login_login_2fa_email
 from route.login_logout import login_logout
 
-from route.login_register import login_register_2
-from route.login_register_email import login_register_email_2
-from route.login_register_email_check import login_register_email_check_2
-from route.login_register_submit import login_register_submit_2
+from route.login_register import login_register
+from route.login_register_email import login_register_email
+from route.login_register_email_check import login_register_email_check
+from route.login_register_submit import login_register_submit
 
 from route.main_func_error_404 import main_func_error_404
 
@@ -79,6 +81,8 @@ from route.main_setting_sitemap import main_setting_sitemap
 from route.main_setting_sitemap_set import main_setting_sitemap_set
 from route.main_setting_skin_set import main_setting_skin_set
 from route.main_setting_top_menu import main_setting_top_menu
+from route.main_setting_email_test import main_setting_email_test
+from route.main_setting_404_page import main_setting_404_page
 
 from route.main_sys_restart import main_sys_restart
 from route.main_sys_shutdown import main_sys_shutdown
@@ -92,7 +96,7 @@ from route.main_view import main_view
 from route.main_view_file import main_view_file
 from route.main_view_image import main_view_image
 
-from route.recent_app_submit import recent_app_submit_2
+from route.recent_app_submit import recent_app_submit
 
 from route.recent_change import recent_change
 from route.recent_edit_request import recent_edit_request
@@ -124,8 +128,8 @@ from route.user_info import user_info
 from route.user_edit_filter import user_edit_filter
 
 from route.user_setting import user_setting
-from route.user_setting_email import user_setting_email_2
-from route.user_setting_email_check import user_setting_email_check_2
+from route.user_setting_email import user_setting_email
+from route.user_setting_email_check import user_setting_email_check
 from route.user_setting_email_delete import user_setting_email_delete
 from route.user_setting_head import user_setting_head
 from route.user_setting_head_reset import user_setting_head_reset
@@ -155,24 +159,15 @@ from route.vote_end import vote_end
 from route.vote_list import vote_list
 from route.vote_select import vote_select
 
-from route.n_list_recent_change import list_recent_change
 from route.n_list_recent_discuss import list_recent_discuss
 from route.n_list_recent_block import list_recent_block
-from route.n_list_old_page import list_old_page
 from route.n_list_user_check_submit import list_user_check_submit
-from route.n_list_history import list_history
 
 from route.n_w_watch_list import w_watch_list
-
-from route.n_user_rankup import user_rankup
 
 from route.n_topic_list import topic_list
 
 from route.n_give_auth import give_auth
-
-from route.n_main_redirect import main_redirect
-
-from route.n_setting_404_page import setting_404_page
 
 from route.n_bbs_main import bbs_main
 from route.n_bbs_in import bbs_in
@@ -181,36 +176,36 @@ from route.n_bbs_w_set import bbs_w_set
 from route.n_edit_move_all import edit_move_all
 
 from route.go_api_func_llm import api_func_llm
-from route.go_api_func_language import api_func_language
+from route.go_api_func_language import api_func_language, api_func_language_exter
 from route.go_api_func_sha224 import api_func_sha224
 from route.go_api_func_ip import api_func_ip
 from route.go_api_func_ip_menu import api_func_ip_menu
 from route.go_api_func_auth import api_func_auth
-
-from route.go_api_func_search import api_func_search
+from route.go_api_func_email import api_func_email, api_func_email_exter
+from route.go_api_func_search import api_func_search, api_func_search_exter
 
 from route.go_api_give_auth import api_give_auth
 
-from route.go_api_list_recent_change import api_list_recent_change
+from route.go_api_list_recent_change import api_list_recent_change, api_list_recent_change_exter
 from route.go_api_list_recent_discuss import api_list_recent_discuss
 from route.go_api_list_recent_block import api_list_recent_block
-from route.go_api_list_recent_edit_request import api_list_recent_edit_request
-from route.go_api_list_old_page import api_list_old_page
+from route.go_api_list_recent_edit_request import api_list_recent_edit_request, api_list_recent_edit_request_exter
+from route.go_api_list_old_page import api_list_old_page, api_list_old_page_exter
 from route.go_api_list_title_index import api_list_title_index
 from route.go_api_list_acl import api_list_acl
 from route.go_api_list_auth import api_list_auth
 from route.go_api_list_markup import api_list_markup
-from route.go_api_list_history import api_list_history
+from route.go_api_list_history import api_list_history, api_list_history_exter
 
 from route.go_api_bbs import api_bbs
 from route.go_api_bbs_list import api_bbs_list
 from route.go_api_bbs_w import api_bbs_w
 from route.go_api_bbs_w_set import api_bbs_w_set
 from route.go_api_bbs_w_tabom import api_bbs_w_tabom
-from route.go_api_bbs_w_comment import api_bbs_w_comment
-from route.go_api_bbs_w_comment_one import api_bbs_w_comment_one
+from route.go_api_bbs_w_comment import api_bbs_w_comment, api_bbs_w_comment_exter
+from route.go_api_bbs_w_comment_one import api_bbs_w_comment_one, api_bbs_w_comment_one_exter
 
-from route.go_api_setting import api_setting
+from route.go_api_setting import api_setting, api_setting_exter
 
 from route.go_api_topic import api_topic
 from route.go_api_topic_list import api_topic_list
@@ -218,11 +213,11 @@ from route.go_api_topic_list import api_topic_list
 from route.go_api_user_rankup import api_user_rankup
 from route.go_api_user_setting_editor import api_user_setting_editor
 
-from route.go_api_w_raw import api_w_raw
-from route.go_api_w_random import api_w_random
+from route.go_api_w_raw import api_w_raw, api_w_raw_exter
+from route.go_api_w_random import api_w_random, api_w_random_exter
 from route.go_api_w_xref import api_w_xref
 from route.go_api_w_watch_list import api_w_watch_list
-from route.go_api_w_render import api_w_render
+from route.go_api_w_render import api_w_render, api_w_render_exter
 from route.go_api_w_set_reset import api_w_set_reset
 from route.go_api_w_page_view import api_w_page_view
 

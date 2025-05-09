@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def user_setting():
+async def user_setting():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -16,7 +16,7 @@ def user_setting():
                     ['user_title', flask.request.form.get('user_title', '')],
                     ['sub_user_name' , flask.request.form.get('sub_user_name', '')]
                 ]
-                if not auto_list[2][1] in get_user_title_list(conn, ip):
+                if not auto_list[2][1] in await get_user_title_list(conn, ip):
                     auto_list[2][1] = ''
 
                 twofa_on = flask.request.form.get('2fa', '')
@@ -70,7 +70,7 @@ def user_setting():
                 curs.execute(db_change('select data from user_set where name = "user_title" and id = ?'), [ip])
                 data = curs.fetchall()
                 data = [['']] if not data else data
-                user_title_list = get_user_title_list(conn, ip)
+                user_title_list = await get_user_title_list(conn, ip)
                 div4 = ''
                 for user_title in user_title_list:                
                     if data and data[0][0] == user_title:
@@ -103,7 +103,7 @@ def user_setting():
                 sub_user_name = db_data[0][0] if db_data else ''
 
                 return easy_minify(conn, flask.render_template(skin_check(conn),
-                    imp = [get_lang(conn, 'user_setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                    imp = [get_lang(conn, 'user_setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
                             <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
@@ -170,7 +170,7 @@ def user_setting():
                         div3 += '<option value="' + lang_data + '">' + see_data + '</option>'
 
                 return easy_minify(conn, flask.render_template(skin_check(conn),
-                    imp = [get_lang(conn, 'user_setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                    imp = [get_lang(conn, 'user_setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
                             <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>

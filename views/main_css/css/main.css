@@ -381,6 +381,15 @@
     margin: 0;
 }
 
+.opennamu_main .mini_hr {
+    border: none;
+    
+    padding-top: 0px;
+    padding-bottom: 0px;
+    
+    margin: 0;
+}
+
 .change_space {
     white-space: pre-line;
 }

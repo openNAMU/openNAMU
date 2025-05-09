@@ -17,7 +17,7 @@ async def recent_edit_request():
                     </tr>
         '''
 
-        all_list = orjson.loads((await api_list_recent_edit_request()).get_data(as_text = True))
+        all_list = await api_list_recent_edit_request()
         for data in all_list:
             if re.search(r"\+", data[5]):
                 leng = '<span style="color:green;">(' + data[5] + ')</span>'
@@ -50,7 +50,7 @@ async def recent_edit_request():
         ''
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'recent_edit_request'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [get_lang(conn, 'recent_edit_request'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = div,
             menu = [['recent_change', get_lang(conn, 'return')]]
         ))

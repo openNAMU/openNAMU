@@ -1,14 +1,14 @@
 from .tool.func import *
 
-def login_register_2():
+async def login_register():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if ban_check(None, 'register')[0] == 1:
-            return re_error(conn, 0)
+        if (await ban_check(None, 'register'))[0] == 1:
+            return await re_error(conn, 0)
 
         ip = ip_check()
-        admin = acl_check(tool = 'owner_auth')
+        admin = await acl_check(tool = 'owner_auth')
         admin = 1 if admin == 0 else 0
 
         if admin != 1 and ip_or_user(ip) == 0:
@@ -18,12 +18,12 @@ def login_register_2():
             curs.execute(db_change('select data from other where name = "reg"'))
             set_d = curs.fetchall()
             if set_d and set_d[0][0] == 'on':
-                return re_error(conn, 0)
+                return await re_error(conn, 0)
 
         if flask.request.method == 'POST':
             # 리캡차
-            if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, 13)
+            if await captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                return await re_error(conn, 13)
 
             user_id = flask.request.form.get('id', '')
             user_pw = flask.request.form.get('pw', '')
@@ -31,14 +31,14 @@ def login_register_2():
 
             # PW 검증
             if user_id == '' or user_pw == '':
-                return re_error(conn, 27)
+                return await re_error(conn, 27)
 
             if user_pw != user_repeat:
-                return re_error(conn, 20)
+                return await re_error(conn, 20)
             
             # ID와 PW 동일성 검증
             if user_id == user_pw:
-                return re_error(conn, 49)
+                return await re_error(conn, 49)
 
             # PW 길이 제한
             curs.execute(db_change("select data from other where name = 'password_min_length'"))
@@ -46,10 +46,10 @@ def login_register_2():
             if db_data and db_data[0][0] != '':
                 password_min_length = int(number_check(db_data[0][0]))
                 if password_min_length > len(user_pw):
-                    return re_error(conn, 40)
+                    return await re_error(conn, 40)
 
             if do_user_name_check(conn, user_id) == 1:
-                return re_error(conn, 8)
+                return await re_error(conn, 8)
 
             if admin != 1:
                 # 이메일 필요시 /register/email로 발송
@@ -88,7 +88,7 @@ def login_register_2():
                 password_min_length = ''
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'register'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+                imp = [get_lang(conn, 'register'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         ''' + contract + '''
@@ -102,7 +102,7 @@ def login_register_2():
                         <input placeholder="''' + get_lang(conn, 'password_confirm') + '''" name="pw2" type="password">
                         <hr class="main_hr">
 
-                        ''' + captcha_get(conn) + '''
+                        ''' + await captcha_get(conn) + '''
 
                         <button type="submit">''' + get_lang(conn, 'save') + '''</button>
 

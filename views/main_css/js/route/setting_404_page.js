@@ -71,7 +71,12 @@ function opennamu_setting_404_page() {
         data_html += '</select>';
         data_html += '<hr class="main_hr">';
 
-        data_html += '<textarea class="opennamu_textarea_500" id="opennamu_setting_404_page_textarea">' + data[2]['data'][0][0] + '</textarea>';
+        let set_data = '';
+        if(data[2]['data'].length > 0) {
+            set_data = data[2]['data'][0][0];
+        }
+
+        data_html += '<textarea class="opennamu_textarea_500" id="opennamu_setting_404_page_textarea">' + set_data + '</textarea>';
         data_html += '<hr class="main_hr">';
 
         data_html += '<button id="opennamu_save_button" onclick="opennamu_setting_404_page_post();">' + data[0]['data'][0] + '</button> ';

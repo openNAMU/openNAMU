@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def main_setting():
+async def main_setting():
     with get_db_connect() as conn:
         li_list = [
             ['main', get_lang(conn, 'main_setting')],
@@ -19,7 +19,7 @@ def main_setting():
         li_data = ''.join(['<li><a href="/setting/' + str(li[0]) + '">' + li[1] + '</a></li>' for li in li_list])
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'setting'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [get_lang(conn, 'setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = '<h2>' + get_lang(conn, 'list') + '</h2><ul>' + li_data + '</ul>',
             menu = [['manager', get_lang(conn, 'return')]]
         ))

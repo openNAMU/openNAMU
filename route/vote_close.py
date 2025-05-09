@@ -1,13 +1,13 @@
 from .tool.func import *
 
-def vote_close(num = 1):
+async def vote_close(num = 1):
     num = str(num)
     
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check('', 'vote') == 1:
-            return re_error(conn, 0)
+        if await acl_check('', 'vote') == 1:
+            return await re_error(conn, 0)
 
         curs.execute(db_change('select type from vote where id = ? and user = ""'), [num])
         data_list = curs.fetchall()
@@ -17,8 +17,8 @@ def vote_close(num = 1):
         curs.execute(db_change('select data from vote where id = ? and name = "open_user" and type = "option"'), [num])
         db_data = curs.fetchall()
         open_user = db_data[0][0] if db_data else ''
-        if open_user != ip_check() and acl_check('', 'vote_auth', '', '') == 1:
-            return re_error(conn, 0)
+        if open_user != ip_check() and await acl_check('', 'vote_auth', '', '') == 1:
+            return await re_error(conn, 0)
 
         if data_list[0][0] == 'close':
             type_set = 'open'

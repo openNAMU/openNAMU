@@ -1,9 +1,9 @@
 from .tool.func import *
 
-def main_tool_other():
+async def main_tool_other():
     with get_db_connect() as conn:
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'other_tool'), wiki_set(conn), wiki_custom(conn), wiki_css([0, 0])],
+            imp = [get_lang(conn, 'other_tool'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = render_simple_set(conn, '''
                 <h2>''' + get_lang(conn, 'user_tool') + '''</h2>
                 <ul>

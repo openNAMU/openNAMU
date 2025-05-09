@@ -2,12 +2,12 @@ from .tool.func import *
 
 from .view_diff import view_diff_do
 
-def edit_request(name = 'Test', do_type = ''):
+async def edit_request(name = 'Test', do_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         disabled = ""
-        if acl_check(name, 'document_edit') == 1:
+        if await acl_check(name, 'document_edit') == 1:
             disabled = "disabled"
 
         curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
@@ -15,7 +15,7 @@ def edit_request(name = 'Test', do_type = ''):
         doc_ver = doc_ver[0][0] if doc_ver else '0'
 
         if doc_ver == '0':
-            if acl_check(name, 'document_make_acl') == 1:
+            if await acl_check(name, 'document_make_acl') == 1:
                 disabled = "disabled"
 
         curs.execute(db_change("select set_data from data_set where doc_name = ? and doc_rev = ? and set_name = 'edit_request_data'"), [name, doc_ver])
@@ -47,7 +47,7 @@ def edit_request(name = 'Test', do_type = ''):
             
             curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
             for scan_user in curs.fetchall():
-                add_alarm(scan_user[0], edit_request_user, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
+                await add_alarm(scan_user[0], edit_request_user, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
 
             if flask.request.form.get('check', '') == 'Y':
                 curs.execute(db_change("delete from data where title = ?"), [name])
@@ -91,7 +91,7 @@ def edit_request(name = 'Test', do_type = ''):
             result = view_diff_do(old_data, edit_request_data, 'r' + doc_ver, get_lang(conn, 'edit_request'))
 
             return easy_minify(conn, flask.render_template(skin_check(conn), 
-                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'edit_request_check') + ')', 0])],
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'edit_request_check') + ')', 0])],
                 data = '''
                     <div id="opennamu_get_user_info">''' + html.escape(edit_request_user) + '''</div>
                     <hr class="main_hr">

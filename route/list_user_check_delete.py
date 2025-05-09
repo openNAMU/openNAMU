@@ -1,11 +1,11 @@
 from .tool.func import *
 
-def list_user_check_delete(name = None, ip = None, time = None, do_type = 1):
+async def list_user_check_delete(name = None, ip = None, time = None, do_type = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        if acl_check('', 'owner_auth', '', '') == 1:
-            return re_error(conn, 4)
+        if await acl_check('', 'owner_auth', '', '') == 1:
+            return await re_error(conn, 4)
 
         user_id = name
         user_ip = ip
@@ -18,7 +18,7 @@ def list_user_check_delete(name = None, ip = None, time = None, do_type = 1):
                 return redirect(conn, '/list/user/check/' + url_pas(user_id if return_type == '0' else user_ip))
             else:
                 return easy_minify(conn, flask.render_template(skin_check(conn),
-                    imp = [get_lang(conn, 'check'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'delete') + ')', 0])],
+                    imp = [get_lang(conn, 'check'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'delete') + ')', 0])],
                     data = '''
                         ''' + get_lang(conn, 'name') + ''' : ''' + user_id + '''
                         <hr class="main_hr">

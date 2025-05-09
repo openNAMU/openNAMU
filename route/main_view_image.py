@@ -1,8 +1,8 @@
 from .tool.func import *
 
-def main_view_image(name = ''):
+async def main_view_image(name = ''):
     with get_db_connect() as conn:
-        if acl_check('', 'render') != 1:
+        if await acl_check('', 'render') != 1:
             name = re.sub(r'\.cache_v(?:[0-9]+)$', '', name)
             mime_type = re.search(r'([^.]+)$', name)
             if mime_type:
@@ -14,4 +14,4 @@ def main_view_image(name = ''):
             else:
                 return ''
         else:
-            return re_error(conn, 0)
+            return await re_error(conn, 0)

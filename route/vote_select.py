@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def vote_select(num = 1):
+async def vote_select(num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
         
@@ -14,7 +14,7 @@ def vote_select(num = 1):
         if data_list[0][3] == 'close' or data_list[0][3] == 'n_close':
             return redirect(conn, '/vote/end/' + num)
 
-        if acl_check('', 'vote', num) == 1:
+        if await acl_check('', 'vote', num) == 1:
             return redirect(conn, '/vote/end/' + num)
 
         curs.execute(db_change('select user from vote where id = ? and user = ?'), [num, ip_check()])
@@ -72,7 +72,7 @@ def vote_select(num = 1):
             ''
 
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'vote'), wiki_set(conn), wiki_custom(conn), wiki_css(['(' + num + ')', 0])],
+                imp = [get_lang(conn, 'vote'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + num + ')', 0])],
                 data = data,
                 menu = [['vote', get_lang(conn, 'return')], ['vote/end/' + num, get_lang(conn, 'result')]]
             ))

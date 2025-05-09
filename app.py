@@ -1,6 +1,5 @@
 # Init
 import os
-import re
 import signal
 import atexit
 import logging
@@ -8,24 +7,26 @@ import logging
 from route.tool.func import *
 from route import *
 
+from hypercorn.asyncio import serve
+from hypercorn.config import Config
+
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 args = sys.argv
 run_mode = ''
 if len(args) > 1:
     run_mode = args[1]
 
-    if not run_mode in ('dev'):
+    if not run_mode in ['dev']:
         run_mode = ''
 
 # Init-Version
 with open('version.json', encoding = 'utf8') as file_data:
-    version_list = orjson.loads(file_data.read())
+    version_list = json_loads(file_data.read())
 
 # Init-DB
 data_db_set = class_check_json()
 do_db_set(data_db_set)
-
-with class_temp_db() as m_conn:
-    m_conn.execute('pragma journal_mode = DELETE')
 
 with get_db_connect(init_mode = True) as conn:
     curs = conn.cursor()
@@ -46,24 +47,25 @@ with get_db_connect(init_mode = True) as conn:
         else:
             setup_tool = 'init'
 
-    if setup_tool != 'normal' and run_mode != 'dev':
+    if run_mode != 'dev':
         file_name = linux_exe_chmod()
         local_file_path = os.path.join("route_go", "bin", file_name)
 
-        if os.path.exists(local_file_path):
-            print('Remove Old Binary')
-            os.remove(local_file_path)
+        if not (setup_tool == "normal" and os.path.exists(local_file_path)):
+            if os.path.exists(local_file_path):
+                print('Remove Old Binary')
+                os.remove(local_file_path)
 
-        download_url = version_list["bin_link"] + file_name
+            download_url = version_list["bin_link"] + file_name
 
-        print('Download New Binary File')
-        response = requests.get(download_url, stream = True)
-        if response.status_code == 200:
-            with open(local_file_path, 'wb') as file:
-                for chunk in response.iter_content(chunk_size = 8192):
-                    file.write(chunk)
+            print('Download New Binary File')
+            response = requests.get(download_url, stream = True)
+            if response.status_code == 200:
+                with open(local_file_path, 'wb') as file:
+                    for chunk in response.iter_content(chunk_size = 8192):
+                        file.write(chunk)
 
-            print('Complete Download')
+                print('Complete Download')
 
     if data_db_set['type'] == 'mysql':
         try:
@@ -76,7 +78,7 @@ with get_db_connect(init_mode = True) as conn:
 
         conn.select_db(data_db_set['name'])
     else:
-        conn.execute('pragma journal_mode = DELETE')
+        conn.execute('pragma journal_mode = WAL')
 
     if setup_tool != 'normal':
         create_data = get_db_table_list()
@@ -148,7 +150,13 @@ with get_db_connect(init_mode = True) as conn:
             pass
 
         if setup_tool == 'update':
-            update(conn, int(ver_set_data[0][0]), data_db_set)
+            try:
+                loop = asyncio.get_running_loop()
+                loop.create_task(update(conn, int(ver_set_data[0][0]), data_db_set))
+            except RuntimeError:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(update(conn, int(ver_set_data[0][0]), data_db_set))
         else:
             set_init(conn)
 
@@ -178,7 +186,7 @@ with get_db_connect(init_mode = True) as conn:
         app.config['DEBUG'] = True
         app.config['ENV'] = 'development'
 
-    log = logging.getLogger('waitress')
+    log = logging.getLogger('hypercorn')
     log.setLevel(logging.ERROR)
 
     app.jinja_env.filters['md5_replace'] = md5_replace
@@ -231,11 +239,8 @@ with get_db_connect(init_mode = True) as conn:
 
         server_set[i] = server_set_val
         
-with class_temp_db() as m_conn:
-    m_curs = m_conn.cursor()
-        
-    for for_a in server_set:
-        m_curs.execute('insert into temp (name, data) values (?, ?)', ['setup_' + for_a, server_set[for_a]])
+for for_a in server_set:
+    global_some_set_do('setup_' + for_a, server_set[for_a])
 
 ###
 
@@ -252,29 +257,42 @@ else:
     else:
         cmd = [os.path.join(".", "route_go", "bin", "main.arm64.exe")]
         
+cmd += [server_set["golang_port"]]
 if run_mode != '':
     cmd += [run_mode]
 
-def golang_process_check():
-    with class_temp_db() as m_conn:
-        m_curs = m_conn.cursor()
-        
-        m_curs.execute('select data from temp where name = "setup_golang_port"')
-        db_data = m_curs.fetchall()
-        db_data = db_data[0][0] if db_data else "3001"
-        
-        while True:
-            try:
-                response = requests.post('http://localhost:' + db_data + '/', data = "test {}")
-                if response.status_code == 200:
-                    print('Golang turn on')
-                    break
-            except requests.ConnectionError:
-                print('Wait golang...')
-                time.sleep(1)
+async def golang_process_check():
+    while True:
+        try:
+            other_set_temp = {}
+            for k in data_db_set:
+                other_set_temp["db_" + k] = data_db_set[k]
+
+            other_set = {
+                "url" : "test",
+                "data" : json_dumps(other_set_temp),
+                "session" : "{}",
+                "cookie" : "",
+                "ip" : "127.0.0.1"
+            }
+
+            response = requests.post('http://localhost:' + server_set["golang_port"] + '/', data = json_dumps(other_set))
+            if response.status_code == 200:
+                print('Golang turn on')
+                break
+        except requests.ConnectionError:
+            print('Wait golang...')
+            time.sleep(1)
 
 golang_process = subprocess.Popen(cmd)
-golang_process_check()
+
+try:
+    loop = asyncio.get_running_loop()
+    loop.create_task(golang_process_check())
+except RuntimeError:
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(golang_process_check())
 
 ###
 
@@ -335,7 +353,7 @@ def back_up(data_db_set):
 
         threading.Timer(60 * 60 * back_time, back_up, [data_db_set]).start()
 
-def do_every_day():
+async def do_every_day():
     with get_db_connect() as conn:
         curs = conn.cursor()
         
@@ -399,14 +417,14 @@ def do_every_day():
         curs.execute(db_change('select data from other where name = "sitemap_auto_make"'))
         db_data = curs.fetchall()
         if db_data and db_data[0][0] != '':
-            main_setting_sitemap(1)
+            await main_setting_sitemap(1)
 
             print('Make sitemap')
 
         # 칭호 관리
         curs.execute(db_change("select id from user_set where name = 'user_title' and data = '✅'"))
         for for_a in curs.fetchall():
-            if acl_check('', 'all_admin_auth', '', for_a[0]) == 1:
+            if await acl_check('', 'all_admin_auth', '', for_a[0]) == 1:
                 curs.execute(db_change("update user_set set data = '☑️' where name = 'user_title' and data = '✅' and id = ?"), [for_a[0]])
 
         threading.Timer(60 * 60 * 24, do_every_day).start()
@@ -415,7 +433,13 @@ def auto_do_something(data_db_set):
     if data_db_set['type'] == 'sqlite':
         back_up(data_db_set)
 
-    do_every_day()
+    try:
+        loop = asyncio.get_running_loop()
+        loop.create_task(do_every_day())
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(do_every_day())
 
 auto_do_something(data_db_set)
 
@@ -423,29 +447,25 @@ print('Now running... http://localhost:' + server_set['port'])
 
 @app.before_request
 def before_request_func():
-    with class_temp_db() as m_conn:
-        m_curs = m_conn.cursor()
-        
-        m_curs.execute('select data from temp where name = "wiki_access_password"')
-        db_data = m_curs.fetchall()
-        if db_data:
-            access_password = db_data[0][0]
-            input_password = flask.request.cookies.get('opennamu_wiki_access', ' ')
-            if url_pas(access_password) != input_password:
-                with get_db_connect() as conn:
-                    return '''
-                        <script>
-                            "use strict";
-                            function opennamu_do_wiki_access() {
-                                let password = document.getElementById('wiki_access').value;
-                                document.cookie = 'opennamu_wiki_access=' + encodeURIComponent(password) + '; path=/;';
-                                history.go(0);
-                            }
-                        </script>
-                        <h2>''' + get_lang(conn, 'error_password_require_for_wiki_access') + '''</h2>
-                        <input type="password" id="wiki_access">
-                        <input type="submit" onclick="opennamu_do_wiki_access();">
-                    '''
+    db_data = global_some_set_do('wiki_access_password')
+    if db_data and db_data != '':
+        access_password = db_data
+        input_password = flask.request.cookies.get('opennamu_wiki_access', ' ')
+        if url_pas(access_password) != input_password:
+            with get_db_connect() as conn:
+                return '''
+                    <script>
+                        "use strict";
+                        function opennamu_do_wiki_access() {
+                            let password = document.getElementById('wiki_access').value;
+                            document.cookie = 'opennamu_wiki_access=' + encodeURIComponent(password) + '; path=/;';
+                            history.go(0);
+                        }
+                    </script>
+                    <h2>''' + get_lang(conn, 'error_password_require_for_wiki_access') + '''</h2>
+                    <input type="password" id="wiki_access">
+                    <input type="submit" onclick="opennamu_do_wiki_access();">
+                '''
 
 # Init-custom
 if os.path.exists('custom.py'):
@@ -563,13 +583,13 @@ app.route('/auth/ban_regex/<everything:name>', methods = ['POST', 'GET'], defaul
 # /auth/list
 # /auth/list/add/<name>
 # /auth/list/delete/<name>
-app.route('/auth/list')(list_admin_group_2)
+app.route('/auth/list')(list_admin_group)
 app.route('/auth/list/add/<name>', methods = ['POST', 'GET'])(give_admin_groups)
-app.route('/auth/list/delete/<name>', methods = ['POST', 'GET'])(give_delete_admin_group_2)
+app.route('/auth/list/delete/<name>', methods = ['POST', 'GET'])(give_delete_admin_group)
 
 app.route('/auth/give/fix/<user_name>', methods = ['POST', 'GET'])(give_user_fix)
 
-app.route('/app_submit', methods = ['POST', 'GET'])(recent_app_submit_2)
+app.route('/app_submit', methods = ['POST', 'GET'])(recent_app_submit)
 
 # /auth/history
 app.route('/recent_block')(list_recent_block)
@@ -589,9 +609,9 @@ app.route('/recent_block/private/<int:num>', defaults = { 'tool' : 'private' })(
 app.route('/recent_block/ongoing', defaults = { 'tool' : 'ongoing' })(list_recent_block)
 app.route('/recent_block/ongoing/<int:num>', defaults = { 'tool' : 'ongoing' })(list_recent_block)
 
-app.route('/recent_change')(list_recent_change)
-app.route('/recent_changes')(list_recent_change)
-app.route('/recent_change/<int:num>/<set_type>')(list_recent_change)
+app.route('/recent_change', defaults = { 'tool' : 'recent_change' })(list_history)
+app.route('/recent_changes', defaults = { 'tool' : 'recent_change' })(list_history)
+app.route('/recent_change/<int:num>/<set_type>', defaults = { 'tool' : 'recent_change' })(list_history)
 
 app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(list_recent_discuss)
 app.route('/recent_discuss/<int:num>/<tool>')(list_recent_discuss)
@@ -708,7 +728,6 @@ app.route('/user')(user_info)
 app.route('/user/<name>')(user_info)
 
 app.route('/challenge', methods = ['GET', 'POST'])(user_challenge)
-app.route('/rankup')(user_rankup)
 
 app.route('/edit_filter/<name>', methods = ['GET', 'POST'])(user_edit_filter)
 
@@ -728,9 +747,9 @@ app.route('/star_doc/<everything:name>', defaults = { 'tool' : 'star_doc' })(use
 app.route('/star_doc_from/<everything:name>', defaults = { 'tool' : 'star_doc_from' })(user_watch_list_name)
 
 # 개편 보류중 S
-app.route('/change/email', methods = ['POST', 'GET'])(user_setting_email_2)
+app.route('/change/email', methods = ['POST', 'GET'])(user_setting_email)
 app.route('/change/email/delete')(user_setting_email_delete)
-app.route('/change/email/check', methods = ['POST', 'GET'])(user_setting_email_check_2)
+app.route('/change/email/check', methods = ['POST', 'GET'])(user_setting_email_check)
 # 개편 보류중 E
 
 # Func-login
@@ -740,12 +759,12 @@ app.route('/change/email/check', methods = ['POST', 'GET'])(user_setting_email_c
 # register -> register/email -> regiter/email/check with reg_id
 # pass_find -> pass_find/email with find_id
 
-app.route('/login', methods = ['POST', 'GET'])(login_login_2)
-app.route('/login/2fa', methods = ['POST', 'GET'])(login_login_2fa_2)
-app.route('/register', methods = ['POST', 'GET'])(login_register_2)
-app.route('/register/email', methods = ['POST', 'GET'])(login_register_email_2)
-app.route('/register/email/check', methods = ['POST', 'GET'])(login_register_email_check_2)
-app.route('/register/submit', methods = ['POST', 'GET'])(login_register_submit_2)
+app.route('/login', methods = ['POST', 'GET'])(login_login)
+app.route('/login/2fa', methods = ['POST', 'GET'])(login_login_2fa)
+app.route('/register', methods = ['POST', 'GET'])(login_register)
+app.route('/register/email', methods = ['POST', 'GET'])(login_register_email)
+app.route('/register/email/check', methods = ['POST', 'GET'])(login_register_email_check)
+app.route('/register/submit', methods = ['POST', 'GET'])(login_register_submit)
 
 app.route('/login/find')(login_find)
 app.route('/login/find/key', methods = ['POST', 'GET'])(login_find_key)
@@ -787,8 +806,8 @@ app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['
 
 # Func-api
 ## v1 API
-app.route('/api/render', methods = ['POST'])(api_w_render)
-app.route('/api/render/<tool>', methods = ['POST'])(api_w_render)
+app.route('/api/render', methods = ['POST'])(api_w_render_exter)
+app.route('/api/render/<tool>', methods = ['POST'])(api_w_render_exter)
 
 app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on' })(api_w_raw)
 app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>')(api_w_raw)
@@ -800,8 +819,8 @@ app.route('/api/xref_this/<int:page>/<everything:name>', defaults = { 'xref_type
 app.route('/api/random')(api_w_random)
 
 app.route('/api/bbs/w/<sub_code>')(api_bbs_w)
-app.route('/api/bbs/w/comment/<sub_code>')(api_bbs_w_comment)
-app.route('/api/bbs/w/comment_one/<sub_code>')(api_bbs_w_comment_one)
+app.route('/api/bbs/w/comment/<sub_code>')(api_bbs_w_comment_exter)
+app.route('/api/bbs/w/comment_one/<sub_code>')(api_bbs_w_comment_one_exter)
 
 app.route('/api/version', defaults = { 'version_list' : version_list })(api_version)
 app.route('/api/skin_info')(api_skin_info)
@@ -812,25 +831,25 @@ app.route('/api/thread/<int:topic_num>/<int:s_num>/<int:e_num>')(api_topic)
 app.route('/api/thread/<int:topic_num>/<tool>')(api_topic)
 app.route('/api/thread/<int:topic_num>')(api_topic)
 
-app.route('/api/search/<everything:name>')(api_func_search)
-app.route('/api/search_page/<int:num>/<everything:name>')(api_func_search)
-app.route('/api/search_data/<everything:name>', defaults = { 'search_type' : 'data' })(api_func_search)
-app.route('/api/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' })(api_func_search)
+app.route('/api/search/<everything:name>')(api_func_search_exter)
+app.route('/api/search_page/<int:num>/<everything:name>')(api_func_search_exter)
+app.route('/api/search_data/<everything:name>', defaults = { 'search_type' : 'data' })(api_func_search_exter)
+app.route('/api/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' })(api_func_search_exter)
 
-app.route('/api/recent_change')(api_list_recent_change)
-app.route('/api/recent_changes')(api_list_recent_change)
-app.route('/api/recent_change/<int:limit>')(api_list_recent_change)
-app.route('/api/recent_change/<int:limit>/<set_type>/<int:num>')(api_list_recent_change)
+app.route('/api/recent_change')(api_list_recent_change_exter)
+app.route('/api/recent_changes')(api_list_recent_change_exter)
+app.route('/api/recent_change/<int:limit>')(api_list_recent_change_exter)
+app.route('/api/recent_change/<int:limit>/<set_type>/<int:num>')(api_list_recent_change_exter)
 
-app.route('/api/recent_edit_request')(api_list_recent_edit_request)
-app.route('/api/recent_edit_request/<int:limit>/<set_type>/<int:num>')(api_list_recent_edit_request)
+app.route('/api/recent_edit_request')(api_list_recent_edit_request_exter)
+app.route('/api/recent_edit_request/<int:limit>/<set_type>/<int:num>')(api_list_recent_edit_request_exter)
 
 app.route('/api/recent_discuss/<set_type>/<int:limit>')(api_list_recent_discuss)
 app.route('/api/recent_discuss/<int:limit>')(api_list_recent_discuss)
 app.route('/api/recent_discuss')(api_list_recent_discuss)
 
-app.route('/api/lang', methods = ['POST'])(api_func_language)
-app.route('/api/lang/<data>')(api_func_language)
+app.route('/api/lang', methods = ['POST'])(api_func_language_exter)
+app.route('/api/lang/<data>')(api_func_language_exter)
 app.route('/api/sha224/<everything:data>')(api_func_sha224)
 app.route('/api/ip/<everything:data>')(api_func_ip)
 
@@ -838,19 +857,19 @@ app.route('/api/image/<everything:name>')(api_image_view)
 
 ## v2 API
 app.route('/api/v2/recent_edit_request/<set_type>/<int:num>', defaults = { 'limit' : 50 })(api_list_recent_edit_request)
-app.route('/api/v2/recent_change/<set_type>/<int:num>', defaults = { 'legacy' : '', 'limit' : 50 })(api_list_recent_change)
+app.route('/api/v2/recent_change/<set_type>/<int:num>', defaults = { 'legacy' : '', 'limit' : 50 })(api_list_recent_change_exter)
 app.route('/api/v2/recent_discuss/<set_type>/<int:num>', defaults = { 'legacy' : '', 'limit' : 50 })(api_list_recent_discuss)
 app.route('/api/v2/recent_block/<set_type>/<int:num>')(api_list_recent_block)
 app.route('/api/v2/recent_block/<set_type>/<int:num>/<everything:why>')(api_list_recent_block)
 app.route('/api/v2/recent_block_user/<set_type>/<int:num>/<user_name>')(api_list_recent_block)
 app.route('/api/v2/recent_block_user/<set_type>/<int:num>/<user_name>/<everything:why>')(api_list_recent_block)
-app.route('/api/v2/list/document/old/<int:num>', defaults = { 'set_type' : 'old' })(api_list_old_page)
-app.route('/api/v2/list/document/new/<int:num>', defaults = { 'set_type' : 'new' })(api_list_old_page)
+app.route('/api/v2/list/document/old/<int:num>', defaults = { 'set_type' : 'old' })(api_list_old_page_exter)
+app.route('/api/v2/list/document/new/<int:num>', defaults = { 'set_type' : 'new' })(api_list_old_page_exter)
 app.route('/api/v2/list/document/<int:num>')(api_list_title_index)
 app.route('/api/v2/list/auth')(api_list_auth)
 app.route('/api/v2/list/markup')(api_list_markup)
 app.route('/api/v2/list/acl/<data_type>')(api_list_acl)
-app.route('/api/v2/history/<int:num>/<set_type>/<everything:doc_name>')(api_list_history)
+app.route('/api/v2/history/<int:num>/<set_type>/<everything:doc_name>')(api_list_history_exter)
 
 app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>')(api_topic_list)
 
@@ -860,15 +879,15 @@ app.route('/api/v2/bbs/set/<int:bbs_num>/<name>', methods = ['GET', 'PUT'])(api_
 app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs)
 app.route('/api/v2/bbs/w/<sub_code>', defaults = { 'legacy' : '' })(api_bbs_w)
 app.route('/api/v2/bbs/w/tabom/<sub_code>', methods = ['GET', 'POST'])(api_bbs_w_tabom)
-app.route('/api/v2/bbs/w/comment/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment)
-app.route('/api/v2/bbs/w/comment_one/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment_one)
+app.route('/api/v2/bbs/w/comment/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment_exter)
+app.route('/api/v2/bbs/w/comment_one/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment_one_exter)
 
 app.route('/api/v2/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(api_w_watch_list)
 app.route('/api/v2/doc_watch_list/<int:num>/<everything:name>')(api_w_watch_list)
 app.route('/api/v2/set_reset/<everything:name>')(api_w_set_reset)
 app.route('/api/v2/page_view/<everything:name>')(api_w_page_view)
 
-app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting)
+app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting_exter)
 
 app.route('/api/v2/auth')(api_func_auth)
 app.route('/api/v2/auth/<user_name>')(api_func_auth)
@@ -880,7 +899,7 @@ app.route('/api/v2/user/setting/editor', methods = ['GET', 'POST', 'DELETE'])(ap
 app.route('/api/v2/ip/<everything:data>', methods = ['GET', 'POST'])(api_func_ip)
 app.route('/api/v2/ip_menu/<everything:ip>', defaults = { 'option' : 'user' }, methods = ['GET', 'POST'])(api_func_ip_menu)
 app.route('/api/v2/user_menu/<everything:ip>')(api_func_ip_menu)
-app.route('/api/v2/lang', defaults = { 'legacy' : '' }, methods = ['POST'])(api_func_language)
+app.route('/api/v2/lang', defaults = { 'legacy' : '' }, methods = ['POST'])(api_func_language_exter)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정
@@ -888,7 +907,6 @@ app.route('/other')(main_tool_other)
 app.route('/manager', methods = ['POST', 'GET'])(main_tool_admin)
 app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_redirect)
 app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(main_tool_redirect)
-app.route('/redirect_to/<int:n>')(main_redirect)
 
 app.route('/search', methods=['POST'])(main_search)
 app.route('/search/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
@@ -914,7 +932,8 @@ app.route('/setting/external', methods = ['POST', 'GET'])(main_setting_external)
 app.route('/setting/sitemap', methods = ['POST', 'GET'])(main_setting_sitemap)
 app.route('/setting/sitemap_set', methods = ['POST', 'GET'])(main_setting_sitemap_set)
 app.route('/setting/skin_set', methods = ['POST', 'GET'])(main_setting_skin_set)
-app.route('/setting/404_page', methods = ['POST', 'GET'])(setting_404_page)
+app.route('/setting/404_page', methods = ['POST', 'GET'])(main_setting_404_page)
+app.route('/setting/email_test', methods = ['POST', 'GET'])(main_setting_email_test)
 
 app.route('/easter_egg')(main_func_easter_egg)
 
@@ -926,14 +945,22 @@ app.route('/image/<path:name>')(main_view_image)
 app.route('/<regex("[^.]+\\.(?:txt|xml|ico)"):data>')(main_view_file)
 
 app.route('/shutdown', methods = ['POST', 'GET'])(main_sys_shutdown)
-app.route('/restart', methods = ['POST', 'GET'])(main_sys_restart)
-app.route('/update', methods = ['POST', 'GET'])(main_sys_update)
+app.route('/restart', defaults = { 'golang_process' : golang_process }, methods = ['POST', 'GET'])(main_sys_restart)
+app.route('/update', defaults = { 'golang_process' : golang_process }, methods = ['POST', 'GET'])(main_sys_update)
 
 app.errorhandler(404)(main_func_error_404)
 
 def terminate_golang():
     if golang_process.poll() is None:
         golang_process.terminate()
+        try:
+            golang_process.wait(timeout = 5)
+        except subprocess.TimeoutExpired:
+            golang_process.kill()
+            try:
+                golang_process.wait(timeout = 5)
+            except subprocess.TimeoutExpired:
+                print('Golang process not terminated properly.')
 
 def signal_handler(signal, frame):
     terminate_golang()
@@ -944,10 +971,13 @@ signal.signal(signal.SIGINT, signal_handler)
 
 atexit.register(terminate_golang)
 
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for = 1, x_proto = 1)
+
 if __name__ == "__main__":
-    waitress.serve(
-        app,
-        host = server_set['host'],
-        port = int(server_set['port']),
-        clear_untrusted_proxy_headers = True
-    )
+    if run_mode in ['dev']:
+        app.run(host = server_set['host'], port = int(server_set['port']), use_reloader = False)
+    else:
+        config = Config()
+        config.bind = [server_set['host'] + ":" + server_set['port']]
+
+        asyncio.run(serve(app, config))

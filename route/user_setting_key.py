@@ -1,6 +1,6 @@
 from .tool.func import *
 
-def user_setting_key():
+async def user_setting_key():
     with get_db_connect() as conn:
         curs = conn.cursor()
 

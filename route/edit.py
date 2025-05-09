@@ -25,7 +25,7 @@ def edit_timeout(func, args = (), timeout = 3):
         pool.join()
         return 0
         
-def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = ''):
+async def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = ''):
     curs = conn.cursor()
 
     monaco_editor_top = ''
@@ -82,7 +82,7 @@ def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = '
 
     textarea_size = 'opennamu_textarea_500' if do_type == 'edit' else 'opennamu_textarea_100'
 
-    out_field = captcha_get(conn) + ip_warning(conn) + addon
+    out_field = await captcha_get(conn) + ip_warning(conn) + addon
     if out_field != '':
         out_field += '<hr class="main_hr">'
 
@@ -118,27 +118,27 @@ def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = '
         <div id="opennamu_preview_area"></div>
     '''
 
-def edit(name = 'Test', section = 0, do_type = ''):
+async def edit(name = 'Test', section = 0, do_type = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
     
         ip = ip_check()
 
         edit_req_mode = 0
-        if acl_check(name, 'document_edit') == 1:
+        if await acl_check(name, 'document_edit') == 1:
             edit_req_mode = 1
-            if acl_check(name, 'document_edit_request') == 1:
+            if await acl_check(name, 'document_edit_request') == 1:
                 return redirect(conn, '/raw_acl/' + url_pas(name))
             
         if do_title_length_check(conn, name) == 1:
-            return re_error(conn, 38)
+            return await re_error(conn, 38)
         
         curs.execute(db_change("select id from history where title = ? order by id + 0 desc"), [name])
         doc_ver = curs.fetchall()
         doc_ver = doc_ver[0][0] if doc_ver else '0'
 
         if doc_ver == '0':
-            if acl_check(name, 'document_make_acl') == 1:
+            if await acl_check(name, 'document_make_acl') == 1:
                 edit_req_mode = 1
 
         curs.execute(db_change("select set_data from data_set where doc_name = ? and doc_rev = ? and set_name = 'edit_request_data'"), [name, doc_ver])
@@ -153,28 +153,28 @@ def edit(name = 'Test', section = 0, do_type = ''):
             edit_repeat = 'get'
         
         if edit_repeat == 'post':
-            if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, 13)
+            if await captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                return await re_error(conn, 13)
     
-            if do_edit_slow_check(conn) == 1:
-                return re_error(conn, 24)
+            if await do_edit_slow_check(conn) == 1:
+                return await re_error(conn, 24)
     
             today = get_time()
             content = flask.request.form.get('content', '').replace('\r', '')
             send = flask.request.form.get('send', '')
             agree = flask.request.form.get('copyright_agreement', '')
             
-            if do_edit_filter(conn, content) == 1:
-                return re_error(conn, 21)
+            if await do_edit_filter(conn, content) == 1:
+                return await re_error(conn, 21)
             
-            if do_edit_filter(conn, send) == 1:
-                return re_error(conn, 21)
+            if await do_edit_filter(conn, send) == 1:
+                return await re_error(conn, 21)
 
-            if do_edit_send_check(conn, send) == 1:
-                return re_error(conn, 37)
+            if await do_edit_send_check(conn, send) == 1:
+                return await re_error(conn, 37)
 
             if do_edit_text_bottom_check_box_check(conn, agree) == 1:
-                return re_error(conn, 29)
+                return await re_error(conn, 29)
             
             curs.execute(db_change("select data from data where title = ?"), [name])
             db_data = curs.fetchall()
@@ -208,7 +208,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
             db_data_3 = curs.fetchall()
             if db_data_3 and db_data_3[0][0] != '':
                 if int(number_check(db_data_3[0][0])) < len(content):
-                    return re_error(conn, 44)
+                    return await re_error(conn, 44)
 
             curs.execute(db_change("select data from other where name = 'edit_timeout'"))
             db_data_2 = curs.fetchall()
@@ -219,7 +219,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                 timeout = 0
 
             if timeout == 1:
-                return re_error(conn, 41)
+                return await re_error(conn, 41)
             
             if edit_req_mode == 0:
                 # 진짜 기록 부분
@@ -228,7 +228,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
         
                 curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
                 for scan_user in curs.fetchall():
-                    add_alarm(scan_user[0], ip, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
+                    await add_alarm(scan_user[0], ip, '<a href="/w/' + url_pas(name) + '">' + html.escape(name) + '</a>')
                         
                 history_plus(conn, 
                     name,
@@ -257,7 +257,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
 
                 curs.execute(db_change("select id from user_set where name = 'watchlist' and data = ?"), [name])
                 for scan_user in curs.fetchall():
-                    add_alarm(scan_user[0], ip, '<a href="/edit_request/' + url_pas(name) + '">' + html.escape(name) + '</a> edit_request')
+                    await add_alarm(scan_user[0], ip, '<a href="/edit_request/' + url_pas(name) + '">' + html.escape(name) + '</a> edit_request')
             
                 return redirect(conn, '/edit_request_from/' + url_pas(name))
         else:
@@ -361,7 +361,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
             sub_title = '(' + get_lang(conn, 'edit_request') + ')' if edit_req_mode == 1 else '(' + get_lang(conn, 'edit') + ')'
 
             return easy_minify(conn, flask.render_template(skin_check(conn), 
-                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css([sub_title + sub_menu, 0])],
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css([sub_title + sub_menu, 0])],
                 data = editor_top_text + '''
                     <form method="post">
                         <textarea style="display: none;" name="doc_section_data_where">''' + data_section_where + '''</textarea>
@@ -373,7 +373,7 @@ def edit(name = 'Test', section = 0, do_type = ''):
                         <input placeholder="''' + get_lang(conn, 'why') + '''" name="send">
                         <hr class="main_hr">
                         
-                        ''' + edit_editor(conn, ip, data_section, addon = get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn) , name = name) + '''
+                        ''' + await edit_editor(conn, ip, data_section, addon = get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'edit') , name = name) + '''
                     </form>
                 ''',
                 menu = [

@@ -1,14 +1,14 @@
 from .tool.func import *
 
-def topic_comment_tool(topic_num = 1, num = 1):
+async def topic_comment_tool(topic_num = 1, num = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
         
         num = str(num)
         topic_num = str(topic_num)
         
-        if acl_check('', 'topic_view', topic_num) == 1:
-            return re_error(conn, 0)
+        if await acl_check('', 'topic_view', topic_num) == 1:
+            return await re_error(conn, 0)
 
         curs.execute(db_change("select block, ip, date from topic where code = ? and id = ?"), [topic_num, num])
         data = curs.fetchall()
@@ -18,7 +18,7 @@ def topic_comment_tool(topic_num = 1, num = 1):
         ban = '''
             <h2>''' + get_lang(conn, 'state') + '''</h2>
             <ul>
-                <li>''' + get_lang(conn, 'writer') + ' : ''' + ip_pas(data[0][1]) + '''</li>
+                <li>''' + get_lang(conn, 'writer') + ' : ''' + await ip_pas(data[0][1]) + '''</li>
                 <li>''' + get_lang(conn, 'time') + ' : ' + data[0][2] + '''</li>
             </ul>
             <h2>''' + get_lang(conn, 'other_tool') + '''</h2>
@@ -29,7 +29,7 @@ def topic_comment_tool(topic_num = 1, num = 1):
             </ul>
         '''
 
-        if acl_check(tool = 'toron_auth') != 1:
+        if await acl_check(tool = 'toron_auth') != 1:
             ban += '''
                 <h2>''' + get_lang(conn, 'admin_tool') + '''</h2>
                 <ul>
@@ -56,7 +56,7 @@ def topic_comment_tool(topic_num = 1, num = 1):
             '''
 
         return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'discussion_tool'), wiki_set(conn), wiki_custom(conn), wiki_css(['(#' + num + ')', 0])],
+            imp = [get_lang(conn, 'discussion_tool'), await wiki_set(), await wiki_custom(conn), wiki_css(['(#' + num + ')', 0])],
             data = ban,
             menu = [['thread/' + topic_num + '#' + num, get_lang(conn, 'return')]]
         ))

@@ -1,12 +1,12 @@
 from .tool.func import *
 
-def recent_history_hidden(name = 'Test', rev = 1):
+async def recent_history_hidden(name = 'Test', rev = 1):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         num = str(rev)
 
-        if acl_check(tool = 'hidel_auth', memo = 'history_hidden (' + name + '#' + num + ')') != 1:
+        if await acl_check(tool = 'hidel_auth', memo = 'history_hidden (' + name + '#' + num + ')') != 1:
             curs.execute(db_change("select title from history where title = ? and id = ? and hide = 'O'"), [name, num])
             if curs.fetchall():
                 curs.execute(db_change("update history set hide = '' where title = ? and id = ?"), [name, num])

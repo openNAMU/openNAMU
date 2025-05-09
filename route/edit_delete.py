@@ -1,32 +1,32 @@
 from .tool.func import *
 
-def edit_delete(name):
+async def edit_delete(name):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
         ip = ip_check()
-        if acl_check(name, 'document_delete') == 1:
-            return re_error(conn, 0)
+        if await acl_check(name, 'document_delete') == 1:
+            return await re_error(conn, 0)
 
         curs.execute(db_change("select title from data where title = ?"), [name])
         if not curs.fetchall():
             return redirect(conn, '/w/' + url_pas(name))
 
         if flask.request.method == 'POST':
-            if captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
-                return re_error(conn, 13)
+            if await captcha_post(conn, flask.request.form.get('g-recaptcha-response', flask.request.form.get('g-recaptcha', ''))) == 1:
+                return await re_error(conn, 13)
 
-            if do_edit_slow_check(conn) == 1:
-                return re_error(conn, 24)
+            if await do_edit_slow_check(conn) == 1:
+                return await re_error(conn, 24)
             
             send = flask.request.form.get('send', '')
             agree = flask.request.form.get('copyright_agreement', '')
             
-            if do_edit_send_check(conn, send) == 1:
-                return re_error(conn, 37)
+            if await do_edit_send_check(conn, send) == 1:
+                return await re_error(conn, 37)
             
             if do_edit_text_bottom_check_box_check(conn, agree) == 1:
-                return re_error(conn, 29)
+                return await re_error(conn, 29)
 
             curs.execute(db_change("select data from data where title = ?"), [name])
             data = curs.fetchall()
@@ -54,12 +54,12 @@ def edit_delete(name):
             return redirect(conn, '/w/' + url_pas(name))
         else:            
             return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, wiki_set(conn), wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'delete') + ')', 0])],
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'delete') + ')', 0])],
                 data = '''
                     <form method="post">
                         <input placeholder="''' + get_lang(conn, 'why') + '''" name="send">
                         <hr class="main_hr">
-                        ''' + captcha_get(conn) + ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn)  + '''
+                        ''' + await captcha_get(conn) + ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'delete')  + '''
                         <button type="submit">''' + get_lang(conn, 'delete') + '''</button>
                     </form>
                 ''',
