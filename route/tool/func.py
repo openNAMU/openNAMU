@@ -304,7 +304,13 @@ class class_check_json:
                 normal_db_type = ['sqlite', 'mysql']
 
                 print('DB type (' + normal_db_type[0] + ') [' + ', '.join(normal_db_type) + '] : ', end = '')
-                data_get = str(input())
+                try:
+                    data_get = str(input())
+                except EOFError:
+                    print("\nInput is not available. You can set the environment variable NAMU_DB_TYPE instead.")
+                    print("No input detected. Using default value.")
+                    data_get = ''
+
                 if data_get == '' or not data_get in normal_db_type:
                     set_data['db_type'] = 'sqlite'
                 else:
