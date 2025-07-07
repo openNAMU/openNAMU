@@ -11,9 +11,9 @@ async def recent_edit_request():
             <table id="main_table_set">
                 <tbody>
                     <tr id="main_table_top_tr">
-                        <td id="main_table_width">''' + get_lang(conn, 'discussion_name') + '''</td>
-                        <td id="main_table_width">''' + get_lang(conn, 'editor') + '''</td>
-                        <td id="main_table_width">''' + get_lang(conn, 'time') + '''</td>
+                        <td id="main_table_width">''' + await get_lang('discussion_name') + '''</td>
+                        <td id="main_table_width">''' + await get_lang('editor') + '''</td>
+                        <td id="main_table_width">''' + await get_lang('time') + '''</td>
                     </tr>
         '''
 
@@ -49,8 +49,8 @@ async def recent_edit_request():
             '</table>' + \
         ''
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'recent_edit_request'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+        return easy_minify(flask.render_template(await skin_check(conn),
+            imp = [await get_lang('recent_edit_request'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = div,
-            menu = [['recent_change', get_lang(conn, 'return')]]
+            menu = [['recent_change', await get_lang('return')]]
         ))

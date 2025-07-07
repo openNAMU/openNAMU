@@ -21,21 +21,21 @@ async def bbs_make():
 
             return redirect(conn, '/bbs/main')
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'bbs_make'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('bbs_make'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + get_lang(conn, 'bbs_name') + '''" name="bbs_name">
+                        <input placeholder="''' + await get_lang('bbs_name') + '''" name="bbs_name">
                         <hr class="main_hr">
                         
                         <select name="bbs_type">
-                            <option value="comment">''' + get_lang(conn, 'comment_base') + '''</option>
-                            <option value="thread">''' + get_lang(conn, 'thread_base') + '''</option>
+                            <option value="comment">''' + await get_lang('comment_base') + '''</option>
+                            <option value="thread">''' + await get_lang('thread_base') + '''</option>
                         </select>
                         <hr class="main_hr">
                         
-                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
+                        <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['bbs/main', get_lang(conn, 'return')]]
+                menu = [['bbs/main', await get_lang('return')]]
             ))

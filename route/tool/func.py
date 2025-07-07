@@ -79,6 +79,7 @@ import werkzeug.debug
 
 import flask
 import asyncio
+import nest_asyncio
 import aiohttp
 
 import requests
@@ -887,31 +888,31 @@ def get_default_robots_txt(conn):
 def load_random_key(long = 128):
     return ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(long))
 
-def http_warning(conn):
+async def http_warning():
     return '''
         <div id="opennamu_http_warning_text"></div>
-        <span style="display: none;" id="opennamu_http_warning_text_lang">''' + get_lang(conn, 'http_warning') + '''</span>
+        <span style="display: none;" id="opennamu_http_warning_text_lang">''' + await get_lang('http_warning') + '''</span>
     '''
 
-def get_next_page_bottom(conn, link, num, page, end = 50):
+async def get_next_page_bottom(link, num, page, end = 50):
     list_data = ''
 
     if num == 1:
         if len(page) == end:
             list_data += '' + \
                 '<hr class="main_hr">' + \
-                '<a href="' + link.format(str(num + 1)) + '">(' + get_lang(conn, 'next') + ')</a>' + \
+                '<a href="' + link.format(str(num + 1)) + '">(' + await get_lang('next') + ')</a>' + \
             ''
     elif len(page) != end:
         list_data += '' + \
             '<hr class="main_hr">' + \
-            '<a href="' + link.format(str(num - 1)) + '">(' + get_lang(conn, 'previous') + ')</a>' + \
+            '<a href="' + link.format(str(num - 1)) + '">(' + await get_lang('previous') + ')</a>' + \
         ''
     else:
         list_data += '' + \
             '<hr class="main_hr">' + \
-            '<a href="' + link.format(str(num - 1)) + '">(' + get_lang(conn, 'previous') + ')</a> ' + \
-            '<a href="' + link.format(str(num + 1)) + '">(' + get_lang(conn, 'next') + ')</a>' + \
+            '<a href="' + link.format(str(num - 1)) + '">(' + await get_lang('previous') + ')</a> ' + \
+            '<a href="' + link.format(str(num + 1)) + '">(' + await get_lang('next') + ')</a>' + \
         ''
 
     return list_data
@@ -951,7 +952,7 @@ async def get_user_title_list(conn, ip = ''):
 
     # default
     user_title = {
-        '' : get_lang(conn, 'default'),
+        '' : await get_lang('default'),
         '🌳' : '🌳 newbie',
     }
 
@@ -1042,7 +1043,7 @@ def get_tool_js_safe(data):
 
     return data
 
-def edit_button(conn):
+async def edit_button(conn):
     curs = conn.cursor()
 
     insert_list = []
@@ -1056,12 +1057,12 @@ def edit_button(conn):
     for insert_data in insert_list:
         data += '<a href="javascript:do_insert_data(\'' + get_tool_js_safe(insert_data[0]) + '\');">(' + html.escape(insert_data[1]) + ')</a> '
 
-    data += (' ' if data != '' else '') + '<a href="/filter/edit_top">(' + get_lang(conn, 'add') + ')</a>'
+    data += (' ' if data != '' else '') + '<a href="/filter/edit_top">(' + await get_lang('add') + ')</a>'
     data += '<hr class="main_hr">'
     
     return data
 
-def ip_warning(conn):
+async def ip_warning(conn):
     curs = conn.cursor()
 
     if ip_or_user() != 0:
@@ -1074,7 +1075,7 @@ def ip_warning(conn):
             ''
         else:
             text_data = '' + \
-                '<span>' + get_lang(conn, 'no_login_warning') + '</span>' + \
+                '<span>' + await get_lang('no_login_warning') + '</span>' + \
                 '<hr class="main_hr">' + \
             ''
     else:
@@ -1126,7 +1127,7 @@ def pw_check(conn, data, data2, type_d = 'no', id_d = ''):
     return re_data
         
 # Func-skin
-def easy_minify(conn, data, tool = None):
+def easy_minify(data, tool = None):
     return data
 
 def get_lang_name(conn, tool = ''):
@@ -1157,43 +1158,32 @@ def get_lang_name(conn, tool = ''):
 
     return lang_name
 
-def get_lang(conn, data, safe = 0):
-    lang_name = get_lang_name(conn)
+async def get_lang(data, safe = 0):
+    other_set = {}
+    other_set["data"] = data
+    other_set["legacy"] = ""
 
-    if (lang_name + '_' + data) in global_lang_data:
-        if safe == 1:
-            return global_lang_data[lang_name + '_' + data]
-        else:
-            return html.escape(global_lang_data[lang_name + '_' + data])
+    res = await python_to_golang('api_func_language', other_set)
+    if res['response'] == 'ok':
+        return res['data'][data]
     else:
-        lang_list = os.listdir('lang')
-        if (lang_name + '.json') in lang_list:
-            lang = json_loads(open(os.path.join('lang', lang_name + '.json'), encoding = 'utf8').read())
-            
-            for title in lang:
-                global_lang_data[lang_name + '_' + title] = lang[title] 
-        else:
-            lang = {}
-
-        if data in lang:
-            if safe == 1:
-                return lang[data] 
-            else:
-                return html.escape(lang[data])
-
-    print(data + ' (' + lang_name + ')')
-    return html.escape(data + ' (' + lang_name + ')')
+        return data + ' (M)'
 
 # 하위 호환용
 def load_lang(data, safe = 0):
-    with get_db_connect() as conn:
-        return get_lang(conn, data, safe)
+    try:
+        loop = asyncio.get_running_loop()
+        if loop.is_running():
+            nest_asyncio.apply()
+            return loop.run_until_complete(get_lang(data, safe))
+    except RuntimeError:
+        return asyncio.run(get_lang(data, safe))
 
-def skin_check(conn, set_n = 0):
+async def skin_check(conn, set_n = 0):
     curs = conn.cursor()
 
     # 개편 필요?
-    skin_list = load_skin(conn, 'ringo', 1)
+    skin_list = await load_skin('ringo', 1)
     skin = skin_list[0]
     ip = ip_check()
     
@@ -1302,7 +1292,7 @@ async def wiki_custom(conn):
     curs = conn.cursor()
 
     ip = ip_check()
-    skin_name = '_' + skin_check(conn, 1)
+    skin_name = '_' + await skin_check(conn, 1)
 
     if ip_or_user(ip) == 0:
         user_icon = 1
@@ -1347,7 +1337,7 @@ async def wiki_custom(conn):
         user_notice = str(count[0][0]) if count else '0'
     else:
         user_icon = 0
-        user_name = get_lang(conn, 'user')
+        user_name = await get_lang('user')
         email = ''
         user_admin = '0'
         user_acl_list = '0'
@@ -1378,7 +1368,7 @@ async def wiki_custom(conn):
         await level_check(ip)
     ]
 
-def load_skin(conn, data = '', set_n = 0, default = 0):
+async def load_skin(data = '', set_n = 0, default = 0):
     # without_DB
 
     # data -> 가장 앞에 있을 스킨 이름
@@ -1398,7 +1388,7 @@ def load_skin(conn, data = '', set_n = 0, default = 0):
         if skin_data != 'default':
             see_data = skin_data
         else:
-            see_data = get_lang(conn, 'default')
+            see_data = await get_lang('default')
 
         if skin_data != 'main_css':
             if set_n == 0:
@@ -1426,7 +1416,7 @@ def load_skin(conn, data = '', set_n = 0, default = 0):
         return skin_return_data
 
 # Func-markup
-def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = '', parameter = {}):
+async def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = '', parameter = {}):
     curs = conn.cursor()
 
     # data_type in ['view', 'from', 'thread', 'api_view', 'api_thread', 'api_include', 'backlink']
@@ -1451,8 +1441,8 @@ def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = 
 
     ip = ip_check()
     render_lang_data = {
-        'toc' : get_lang(conn, 'toc'),
-        'category' : get_lang(conn, 'category')
+        'toc' : await get_lang('toc'),
+        'category' : await get_lang('category')
     }
 
     curs.execute(db_change('select data from other where name = "category_text"'))
@@ -1550,7 +1540,7 @@ def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = 
     else:
         return get_class_render[0] + '<script>window.addEventListener("DOMContentLoaded", function() {' + get_class_render[1] + '});</script>'
         
-def render_simple_set(conn, data):
+async def render_simple_set(data):
     # without_DB
 
     toc_data = ''
@@ -1561,7 +1551,7 @@ def render_simple_set(conn, data):
     if toc_search_data:
         toc_data += '''
             <div class="opennamu_TOC" id="toc">
-                <span class="opennamu_TOC_title">''' + get_lang(conn, 'toc') + '''</span>
+                <span class="opennamu_TOC_title">''' + await get_lang('toc') + '''</span>
                 <br>
         '''
     
@@ -2224,162 +2214,162 @@ async def re_error(conn, data):
         if (await ban_check())[0] == 1:
             end = '<div id="opennamu_get_user_info">' + html.escape(ip_check()) + '</div>'
         else:
-            end = '<ul><li>' + get_lang(conn, 'authority_error') + '</li></ul>'
+            end = '<ul><li>' + await get_lang('authority_error') + '</li></ul>'
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'error'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
-            data = '<h2>' + get_lang(conn, 'error') + '</h2>' + end,
+        return easy_minify(flask.render_template(await skin_check(conn),
+            imp = [await get_lang('error'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            data = '<h2>' + await get_lang('error') + '</h2>' + end,
             menu = 0
         )), 401
     else:
-        title = get_lang(conn, 'error')
+        title = await get_lang('error')
         sub_title = title
         return_code = 400
 
         num = data
         if num == 1:
-            data = get_lang(conn, 'no_login_error')
+            data = await get_lang('no_login_error')
         elif num == 2:
-            data = get_lang(conn, 'no_exist_user_error')
+            data = await get_lang('no_exist_user_error')
         elif num == 3:
-            data = get_lang(conn, 'authority_error')
+            data = await get_lang('authority_error')
         elif num == 4:
-            data = get_lang(conn, 'no_admin_block_error')
+            data = await get_lang('no_admin_block_error')
         elif num == 5:
-            data = get_lang(conn, 'error_skin_set')
+            data = await get_lang('error_skin_set')
         elif num == 8:
             data = '' + \
-                get_lang(conn, 'long_id_error') + '<br>' + \
-                get_lang(conn, 'id_char_error') + ' <a href="/filter/name_filter">(' + get_lang(conn, 'id_filter_list') + ')</a><br>' + \
-                get_lang(conn, 'same_id_exist_error') + \
+                await get_lang('long_id_error') + '<br>' + \
+                await get_lang('id_char_error') + ' <a href="/filter/name_filter">(' + await get_lang('id_filter_list') + ')</a><br>' + \
+                await get_lang('same_id_exist_error') + \
             ''
         elif num == 9:
-            data = get_lang(conn, 'file_exist_error')
+            data = await get_lang('file_exist_error')
         elif num == 10:
-            data = get_lang(conn, 'password_error')
+            data = await get_lang('password_error')
         elif num == 11:
-            data = get_lang(conn, 'topic_long_error')
+            data = await get_lang('topic_long_error')
         elif num == 12:
-            data = get_lang(conn, 'email_error')
+            data = await get_lang('email_error')
         elif num == 13:
-            data = get_lang(conn, 'recaptcha_error')
+            data = await get_lang('recaptcha_error')
         elif num == 14:
-            data = get_lang(conn, 'file_extension_error') + ' <a href="/filter/extension_filter">(' + get_lang(conn, 'extension_filter_list') + ')</a>'
+            data = await get_lang('file_extension_error') + ' <a href="/filter/extension_filter">(' + await get_lang('extension_filter_list') + ')</a>'
         elif num == 15:
-            data = get_lang(conn, 'edit_record_error')
+            data = await get_lang('edit_record_error')
         elif num == 16:
-            data = get_lang(conn, 'same_file_error')
+            data = await get_lang('same_file_error')
         elif num == 17:
             curs.execute(db_change('select data from other where name = "upload"'))
             db_data = curs.fetchall()
             file_max = number_check(db_data[0][0]) if db_data and db_data[0][0] != '' else '2'
-            data = get_lang(conn, 'file_capacity_error') + file_max
+            data = await get_lang('file_capacity_error') + file_max
         elif num == 18:
-            data = get_lang(conn, 'email_send_error')
+            data = await get_lang('email_send_error')
         elif num == 19:
-            data = get_lang(conn, 'move_error')
+            data = await get_lang('move_error')
         elif num == 20:
-            data = get_lang(conn, 'password_diffrent_error')
+            data = await get_lang('password_diffrent_error')
         elif num == 21:
-            data = get_lang(conn, 'edit_filter_error')
+            data = await get_lang('edit_filter_error')
         elif num == 22:
-            data = get_lang(conn, 'file_name_error')
+            data = await get_lang('file_name_error')
         elif num == 23:
-            data = get_lang(conn, 'regex_error')
+            data = await get_lang('regex_error')
         elif num == 24:
             curs.execute(db_change("select data from other where name = 'slow_edit'"))
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'fast_edit_error') + db_data
+            data = await get_lang('fast_edit_error') + db_data
         elif num == 25:
-            data = get_lang(conn, 'too_many_dec_error')
+            data = await get_lang('too_many_dec_error')
         elif num == 26:
-            data = get_lang(conn, 'application_not_found')
+            data = await get_lang('application_not_found')
         elif num == 27:
-            data = get_lang(conn, "invalid_password_error")
+            data = await get_lang("invalid_password_error")
         elif num == 28:
-            data = get_lang(conn, 'watchlist_overflow_error')
+            data = await get_lang('watchlist_overflow_error')
         elif num == 29:
-            data = get_lang(conn, 'copyright_disagreed')
+            data = await get_lang('copyright_disagreed')
         elif num == 30:
-            data = get_lang(conn, 'ie_wrong_callback')
+            data = await get_lang('ie_wrong_callback')
         elif num == 33:
-            data = get_lang(conn, 'restart_fail_error')
+            data = await get_lang('restart_fail_error')
         elif num == 34:
-            data = get_lang(conn, "update_error") + ' <a href="https://github.com/opennamu/opennamu">(Github)</a>'
+            data = await get_lang("update_error") + ' <a href="https://github.com/opennamu/opennamu">(Github)</a>'
         elif num == 35:
-            data = get_lang(conn, 'same_email_error')
+            data = await get_lang('same_email_error')
         elif num == 36:
-            data = get_lang(conn, 'input_email_error')
+            data = await get_lang('input_email_error')
         elif num == 37:
-            data = get_lang(conn, 'error_edit_send_request')
+            data = await get_lang('error_edit_send_request')
         elif num == 38:
             curs.execute(db_change("select data from other where name = 'title_max_length'"))
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'error_title_length_too_long') + db_data
+            data = await get_lang('error_title_length_too_long') + db_data
         elif num == 39:
             curs.execute(db_change("select data from other where name = 'title_topic_max_length'"))
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'error_title_length_too_long') + db_data
+            data = await get_lang('error_title_length_too_long') + db_data
         elif num == 40:
             curs.execute(db_change("select data from other where name = 'password_min_length'"))
             db_data = curs.fetchall()
             password_min_length = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'error_password_length_too_short') + password_min_length
+            data = await get_lang('error_password_length_too_short') + password_min_length
         elif num == 41:
             curs.execute(db_change("select data from other where name = 'edit_timeout'"))
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'timeout_error') + db_data
+            data = await get_lang('timeout_error') + db_data
         elif num == 42:
             curs.execute(db_change("select data from other where name = 'slow_thread'"))
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'fast_edit_error') + db_data
+            data = await get_lang('fast_edit_error') + db_data
         elif num == 43:
-            title = get_lang(conn, 'application_submitted')
+            title = await get_lang('application_submitted')
             sub_title = title
-            data = get_lang(conn, 'waiting_for_approval')
+            data = await get_lang('waiting_for_approval')
         elif num == 44:
             curs.execute(db_change("select data from other where name = 'document_content_max_length'"))
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'error_content_length_too_long') + db_data
+            data = await get_lang('error_content_length_too_long') + db_data
         elif num == 45:
-            data = get_lang(conn, 'cidr_error')
+            data = await get_lang('cidr_error')
         elif num == 46:
-            data = get_lang(conn, 'func_404_error')
+            data = await get_lang('func_404_error')
             title = '404'
             return_code = 404
         elif num == 47:
-            data = get_lang(conn, 'still_use_auth_error')
+            data = await get_lang('still_use_auth_error')
         elif num == 48:
-            data = get_lang(conn, 'xss_data_include_error')
+            data = await get_lang('xss_data_include_error')
         elif num == 49:
-            data = get_lang(conn, 'password_same_as_id_error')
+            data = await get_lang('password_same_as_id_error')
         else:
             data = '???'
 
         if num == 5:
             if flask.request.path != '/skin_set':
-                data += '<br>' + get_lang(conn, 'error_skin_set_old') + ' <a href="/skin_set">(' + get_lang(conn, 'go') + ')</a>'
+                data += '<br>' + await get_lang('error_skin_set_old') + ' <a href="/skin_set">(' + await get_lang('go') + ')</a>'
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'skin_set'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('skin_set'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '' + \
                     '<div id="main_skin_set">' + \
-                        '<h2>' + get_lang(conn, 'error') + '</h2>' + \
+                        '<h2>' + await get_lang('error') + '</h2>' + \
                         '<ul>' + \
                             '<li>' + data + '</a></li>' + \
                         '</ul>' + \
                     '</div>' + \
                 '',
-                menu = [['change', get_lang(conn, 'user_setting')], ['change/skin_set/main', get_lang(conn, 'main_skin_set')]]
+                menu = [['change', await get_lang('user_setting')], ['change/skin_set/main', await get_lang('main_skin_set')]]
             ))
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(conn),
                 imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '' + \
                     '<h2>' + sub_title + '</h2>' + \

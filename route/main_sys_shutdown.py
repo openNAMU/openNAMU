@@ -12,12 +12,12 @@ async def main_sys_shutdown():
 
             sys.exit()
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'wiki_shutdown'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('wiki_shutdown'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <button type="submit">''' + get_lang(conn, 'shutdown') + '''</button>
+                        <button type="submit">''' + await get_lang('shutdown') + '''</button>
                     </form>
                 ''',
-                menu = [['manager', get_lang(conn, 'return')]]
+                menu = [['manager', await get_lang('return')]]
             ))

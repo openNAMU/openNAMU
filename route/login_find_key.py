@@ -29,26 +29,26 @@ async def login_find_key():
             sql_d = curs.fetchall()
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
             
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                    imp = [get_lang(conn, 'reset_user_ok'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                    imp = [await get_lang('reset_user_ok'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                     data = '' + \
                         b_text + \
-                        get_lang(conn, 'id') + ' : ' + user_id + \
+                        await get_lang('id') + ' : ' + user_id + \
                         '<hr class="main_hr">' + \
-                        get_lang(conn, 'password') + ' : ' + key + \
+                        await get_lang('password') + ' : ' + key + \
                     '',
-                    menu = [['user', get_lang(conn, 'return')]]
+                    menu = [['user', await get_lang('return')]]
                 ))
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'password_search'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('password_search'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + get_lang(conn, 'key') + '''" name="key" type="password">
+                        <input placeholder="''' + await get_lang('key') + '''" name="key" type="password">
                         <hr class="main_hr">
                         ''' + await captcha_get(conn) + '''
-                        <button type="submit">''' + get_lang(conn, 'send') + '''</button>
+                        <button type="submit">''' + await get_lang('send') + '''</button>
                     </form>
                 ''',
-                menu = [['user', get_lang(conn, 'return')]]
+                menu = [['user', await get_lang('return')]]
             ))

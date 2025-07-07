@@ -196,7 +196,7 @@ from route.go_api_list_auth import api_list_auth
 from route.go_api_list_markup import api_list_markup
 from route.go_api_list_history import api_list_history, api_list_history_exter
 
-from route.go_api_bbs import api_bbs
+from route.go_api_bbs import api_bbs, api_bbs_exter
 from route.go_api_bbs_list import api_bbs_list
 from route.go_api_bbs_w import api_bbs_w
 from route.go_api_bbs_w_set import api_bbs_w_set

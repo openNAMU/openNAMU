@@ -10,8 +10,8 @@ async def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
         topic_num = str(topic_num)
 
         if topic_num == '0':
-            name = get_lang(conn, 'make_new_topic')
-            sub = get_lang(conn, 'make_new_topic')
+            name = await get_lang('make_new_topic')
+            sub = await get_lang('make_new_topic')
 
             name_value = doc_name
             sub_value = ''
@@ -133,12 +133,12 @@ async def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             
             shortcut += '</div>'
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'discussion') + ')', 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('discussion') + ')', 0])],
                 data = '''
                     <script defer src="/views/main_css/js/route/topic.js''' + cache_v() + '''"></script>
                     <style id="opennamu_list_hidden_style">.opennamu_list_hidden { display: none; }</style>
-                    <label><input type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ''' + get_lang(conn, 'remove_hidden') + '''</label>
+                    <label><input type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ''' + await get_lang('remove_hidden') + '''</label>
                     <hr class="main_hr">
 
                     ''' + shortcut + '''
@@ -154,21 +154,21 @@ async def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                         });
                     </script>
 
-                    <a href="javascript:opennamu_thread_blind();">(''' + get_lang(conn, 'hide') + ''' | ''' + get_lang(conn, 'hide_release') + ''')</a> 
-                    <a href="javascript:opennamu_thread_delete();">(''' + get_lang(conn, 'delete') + ''')</a>
-                    <a href="/thread/''' + topic_num + '/tool">(' + get_lang(conn, 'topic_tool') + ''')</a>
+                    <a href="javascript:opennamu_thread_blind();">(''' + await get_lang('hide') + ''' | ''' + await get_lang('hide_release') + ''')</a> 
+                    <a href="javascript:opennamu_thread_delete();">(''' + await get_lang('delete') + ''')</a>
+                    <a href="/thread/''' + topic_num + '/tool">(' + await get_lang('topic_tool') + ''')</a>
                     <hr class="main_hr">
                     
                     <form style="''' + acl_display + '''" method="post">
                         <div style="''' + name_display + '''">
-                            <input placeholder="''' + get_lang(conn, 'document_name') + '''" name="topic" value="''' + html.escape(name_value) + '''">
+                            <input placeholder="''' + await get_lang('document_name') + '''" name="topic" value="''' + html.escape(name_value) + '''">
                             <hr class="main_hr">
-                            <input placeholder="''' + get_lang(conn, 'discussion_name') + '''" name="title" value="''' + html.escape(sub_value) + '''">
+                            <input placeholder="''' + await get_lang('discussion_name') + '''" name="title" value="''' + html.escape(sub_value) + '''">
                             <hr class="main_hr">
                         </div>
                         
                         ''' + await edit_editor(conn, ip, '', 'thread') + '''
                     </form>
                 ''',
-                menu = [['topic/' + url_pas(name), get_lang(conn, 'list')]]
+                menu = [['topic/' + url_pas(name), await get_lang('list')]]
             ))

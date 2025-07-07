@@ -7,7 +7,7 @@ async def main_setting_main_logo():
         if await acl_check('', 'owner_auth', '', '') == 1:
             return await re_error(conn, 0)
 
-        skin_list = [0] + load_skin(conn, '', 1)
+        skin_list = [0] + await load_skin('', 1)
         i_list = []
         for i in skin_list:
             i_list += [['logo', '' if i == 0 else i]]
@@ -38,19 +38,19 @@ async def main_setting_main_logo():
             end_data = ''
             for i in range(0, len(skin_list)):
                 end_data += '' + \
-                    '<span>' + get_lang(conn, 'wiki_logo') + ' ' + ('(' + skin_list[i] + ')' if skin_list[i] != 0 else '') + ' (HTML)' + \
+                    '<span>' + await get_lang('wiki_logo') + ' ' + ('(' + skin_list[i] + ')' if skin_list[i] != 0 else '') + ' (HTML)' + \
                     '<hr class="main_hr">' + \
                     '<input name="' + (skin_list[i] if skin_list[i] != 0 else 'main_css') + '" value="' + html.escape(d_list[i]) + '">' + \
                     '<hr class="main_hr">' + \
                 ''
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'wiki_logo'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('wiki_logo'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         ''' + end_data + '''
-                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['setting/main', get_lang(conn, 'return')]]
+                menu = [['setting/main', await get_lang('return')]]
             ))

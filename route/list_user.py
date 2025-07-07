@@ -16,10 +16,10 @@ async def list_user(arg_num = 1):
             list_data += ' | ' + data[1] if data[1] != '' else ''
             list_data += '</li>'
 
-        list_data += '</ul>' + get_next_page_bottom(conn, '/list/user/{}', arg_num, user_list)
+        list_data += '</ul>' + await get_next_page_bottom('/list/user/{}', arg_num, user_list)
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'member_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+        return easy_minify(flask.render_template(await skin_check(conn),
+            imp = [await get_lang('member_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = list_data,
-            menu = [['other', get_lang(conn, 'return')]]
+            menu = [['other', await get_lang('return')]]
         ))

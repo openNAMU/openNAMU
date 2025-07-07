@@ -29,18 +29,18 @@ async def recent_history_add(name = 'Test', do_type = ''):
 
             return redirect(conn, '/history/' + url_pas(name))
         else:            
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'history_add'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + name + ')', 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('history_add'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + name + ')', 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="send">
+                        <input placeholder="''' + await get_lang('why') + '''" name="send">
                         <hr class="main_hr">
                         
-                        <input placeholder="''' + get_lang(conn, 'name') + '''" name="get_ip">
+                        <input placeholder="''' + await get_lang('name') + '''" name="get_ip">
                         <hr class="main_hr">
 
                         ''' + await edit_editor(conn, ip) + '''
                     </form>
                 ''',
-                menu = [['history/' + url_pas(name), get_lang(conn, 'return')]]
+                menu = [['history/' + url_pas(name), await get_lang('return')]]
             ))

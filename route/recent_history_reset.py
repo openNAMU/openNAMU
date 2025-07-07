@@ -14,14 +14,14 @@ async def recent_history_reset(name = 'Test'):
 
             return redirect(conn, '/history/' + url_pas(name))
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'history_reset') + ')', 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('history_reset') + ')', 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + get_lang(conn, 'delete_warning') + '''</span>
+                        <span>''' + await get_lang('delete_warning') + '''</span>
                         <hr class="main_hr">
-                        <button type="submit">''' + get_lang(conn, 'reset') + '''</button>
+                        <button type="submit">''' + await get_lang('reset') + '''</button>
                     </form>
                 ''',
-                menu = [['history/' + url_pas(name), get_lang(conn, 'return')]]
+                menu = [['history/' + url_pas(name), await get_lang('return')]]
             ))

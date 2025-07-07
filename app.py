@@ -462,7 +462,7 @@ def before_request_func():
                             history.go(0);
                         }
                     </script>
-                    <h2>''' + get_lang(conn, 'error_password_require_for_wiki_access') + '''</h2>
+                    <h2>''' + load_lang('error_password_require_for_wiki_access') + '''</h2>
                     <input type="password" id="wiki_access">
                     <input type="submit" onclick="opennamu_do_wiki_access();">
                 '''
@@ -873,9 +873,9 @@ app.route('/api/v2/history/<int:num>/<set_type>/<everything:doc_name>')(api_list
 app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>')(api_topic_list)
 
 app.route('/api/v2/bbs')(api_bbs_list)
-app.route('/api/v2/bbs/main')(api_bbs)
+app.route('/api/v2/bbs/main')(api_bbs_exter)
 app.route('/api/v2/bbs/set/<int:bbs_num>/<name>', methods = ['GET', 'PUT'])(api_bbs_w_set)
-app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs)
+app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs_exter)
 app.route('/api/v2/bbs/w/<sub_code>', defaults = { 'legacy' : '' })(api_bbs_w)
 app.route('/api/v2/bbs/w/tabom/<sub_code>', methods = ['GET', 'POST'])(api_bbs_w_tabom)
 app.route('/api/v2/bbs/w/comment/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment_exter)

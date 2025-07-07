@@ -5,7 +5,7 @@ async def user_watch_list(tool):
         curs = conn.cursor()
 
         if tool == 'watch_list':
-            div = get_lang(conn, "msg_whatchlist_lmt") + ' : 10 <hr class="main_hr">'
+            div = await get_lang("msg_whatchlist_lmt") + ' : 10 <hr class="main_hr">'
         else:
             div = ''
 
@@ -16,10 +16,10 @@ async def user_watch_list(tool):
 
         if tool == 'watch_list':
             curs.execute(db_change("select data from user_set where name = 'watchlist' and id = ?"), [ip])
-            title_name = get_lang(conn, 'watchlist')
+            title_name = await get_lang('watchlist')
         else:
             curs.execute(db_change("select data from user_set where name = 'star_doc' and id = ?"), [ip])
-            title_name = get_lang(conn, 'star_doc')
+            title_name = await get_lang('star_doc')
 
         data = curs.fetchall()
         for data_list in data:
@@ -31,7 +31,7 @@ async def user_watch_list(tool):
                 '<li>' + \
                     '<a href="/w/' + url_pas(data_list[0]) + '">' + html.escape(data_list[0]) + '</a> ' + \
                     plus + \
-                    '<a href="/' + ('star_doc' if tool == 'star_doc' else 'watch_list') + '/' + url_pas(data_list[0]) + '">(' + get_lang(conn, 'delete') + ')</a>' + \
+                    '<a href="/' + ('star_doc' if tool == 'star_doc' else 'watch_list') + '/' + url_pas(data_list[0]) + '">(' + await get_lang('delete') + ')</a>' + \
                 '</li>' + \
             ''
 
@@ -41,10 +41,10 @@ async def user_watch_list(tool):
                 '<hr class="main_hr">' + \
             ''
 
-        div += '<a href="/manager/' + ('13' if tool == 'watch_list' else '16') + '">(' + get_lang(conn, 'add') + ')</a>'
+        div += '<a href="/manager/' + ('13' if tool == 'watch_list' else '16') + '">(' + await get_lang('add') + ')</a>'
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(conn),
             imp = [title_name, await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = div,
-            menu = [['user', get_lang(conn, 'return')]]
+            menu = [['user', await get_lang('return')]]
         ))

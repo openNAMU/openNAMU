@@ -5,22 +5,22 @@ async def main_tool_redirect(num = 1, add_2 = ''):
         curs = conn.cursor()
 
         title_list = {
-            0 : [get_lang(conn, 'document_name'), '/acl', get_lang(conn, 'document_setting')],
-            1 : [0, '/list/user/check', get_lang(conn, 'check')],
-            2 : [get_lang(conn, 'file_name'), '/filter/file_filter/add', get_lang(conn, 'file_filter_add')],
-            3 : [0, '/auth/give', get_lang(conn, 'authorize')],
-            4 : [0, '/user', get_lang(conn, 'user_tool')],
-            6 : [get_lang(conn, 'name'), '/auth/list/add', get_lang(conn, 'add_admin_group')],
-            7 : [get_lang(conn, 'name'), '/filter/edit_filter/add', get_lang(conn, 'edit_filter_add')],
-            8 : [get_lang(conn, 'document_name'), '/search', get_lang(conn, 'search')],
-            9 : [0, '/recent_block/user', get_lang(conn, 'blocked_user')],
-            10 : [0, '/recent_block/admin', get_lang(conn, 'blocked_admin')],
-            11 : [get_lang(conn, 'document_name'), '/watch_list', get_lang(conn, 'add_watchlist')],
-            12 : [get_lang(conn, 'compare_target'), '/list/user/check', get_lang(conn, 'compare_target')],
-            13 : [get_lang(conn, 'document_name'), '/edit', get_lang(conn, 'load')],
-            14 : [get_lang(conn, 'document_name'), '/star_doc', get_lang(conn, 'add_star_doc')],
-            16 : [0, '/auth/give/fix', get_lang(conn, 'user_fix')],
-            17 : [get_lang(conn, 'search'), '/recent_block/all/1', get_lang(conn, 'search')],
+            0 : [await get_lang('document_name'), '/acl', await get_lang('document_setting')],
+            1 : [0, '/list/user/check', await get_lang('check')],
+            2 : [await get_lang('file_name'), '/filter/file_filter/add', await get_lang('file_filter_add')],
+            3 : [0, '/auth/give', await get_lang('authorize')],
+            4 : [0, '/user', await get_lang('user_tool')],
+            6 : [await get_lang('name'), '/auth/list/add', await get_lang('add_admin_group')],
+            7 : [await get_lang('name'), '/filter/edit_filter/add', await get_lang('edit_filter_add')],
+            8 : [await get_lang('document_name'), '/search', await get_lang('search')],
+            9 : [0, '/recent_block/user', await get_lang('blocked_user')],
+            10 : [0, '/recent_block/admin', await get_lang('blocked_admin')],
+            11 : [await get_lang('document_name'), '/watch_list', await get_lang('add_watchlist')],
+            12 : [await get_lang('compare_target'), '/list/user/check', await get_lang('compare_target')],
+            13 : [await get_lang('document_name'), '/edit', await get_lang('load')],
+            14 : [await get_lang('document_name'), '/star_doc', await get_lang('add_star_doc')],
+            16 : [0, '/auth/give/fix', await get_lang('user_fix')],
+            17 : [await get_lang('search'), '/recent_block/all/1', await get_lang('search')],
         }
         
         if num == 1:
@@ -43,7 +43,7 @@ async def main_tool_redirect(num = 1, add_2 = ''):
                 return redirect(conn, title_list[num][1] + '/' + url_pas(add_1))
         else:
             if title_list[num][0] == 0:
-                placeholder = get_lang(conn, 'user_name')
+                placeholder = await get_lang('user_name')
             else:
                 placeholder = title_list[num][0]
 
@@ -57,15 +57,15 @@ async def main_tool_redirect(num = 1, add_2 = ''):
                         '<hr class="main_hr">' + \
                     ''
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(conn),
                 imp = [title_list[num][2], await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         ''' + top_plus + '''
                         <input placeholder="''' + placeholder + '''" id="data_field" name="name" type="text">
                         <hr class="main_hr">
-                        <button type="submit">''' + get_lang(conn, 'go') + '''</button>
+                        <button type="submit">''' + await get_lang('go') + '''</button>
                     </form>
                 ''',
-                menu = [['manager', get_lang(conn, 'return')]]
+                menu = [['manager', await get_lang('return')]]
             ))

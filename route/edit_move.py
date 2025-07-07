@@ -213,53 +213,53 @@ async def edit_move(name):
             owner_auth = await acl_check(tool = 'owner_auth')
             owner_auth = 1 if owner_auth == 0 else 0
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'move') + ')', 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('move') + ')', 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + get_lang(conn, 'document_name') + '''</span>
+                        <span>''' + await get_lang('document_name') + '''</span>
                         <hr class="main_hr">
                         <input value="''' + name + '''" name="title" type="text">
                         <hr class="main_hr">
                         
-                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="send" type="text">
+                        <input placeholder="''' + await get_lang('why') + '''" name="send" type="text">
                         <hr class="main_hr">
                         
-                        <h2>''' + get_lang(conn, 'document') + '''</h2>
+                        <h2>''' + await get_lang('document') + '''</h2>
                         <select name="move_option">
-                            <option value="normal"> ''' + get_lang(conn, 'normal') + '''</option>
-                            <option value="none"> ''' + get_lang(conn, 'dont_move') + '''</option>
-                            <option value="reverse"> ''' + get_lang(conn, 'replace_move') + '''</option>
-                            ''' + ('<option value="merge"> ' + get_lang(conn, 'merge_move') + '</option>' if owner_auth == 1 else '') + '''
+                            <option value="normal"> ''' + await get_lang('normal') + '''</option>
+                            <option value="none"> ''' + await get_lang('dont_move') + '''</option>
+                            <option value="reverse"> ''' + await get_lang('replace_move') + '''</option>
+                            ''' + ('<option value="merge"> ' + await get_lang('merge_move') + '</option>' if owner_auth == 1 else '') + '''
                         </select>
                         <hr class="main_hr">
-                        <!-- <label><input type="checkbox" name="move_redirect_make"> ''' + get_lang(conn, 'move_redirect_make') + '''</label>
+                        <!-- <label><input type="checkbox" name="move_redirect_make"> ''' + await get_lang('move_redirect_make') + '''</label>
                         <hr class="main_hr"> -->
                         
-                        <h2>''' + get_lang(conn, 'discussion') + '''</h2>
+                        <h2>''' + await get_lang('discussion') + '''</h2>
                         <select name="move_topic_option">
-                            <option value="none"> ''' + get_lang(conn, 'dont_move') + '''</option>
-                            <option value="normal"> ''' + get_lang(conn, 'normal') + '''</option>
-                            <option value="reverse"> ''' + get_lang(conn, 'replace_move') + '''</option>
-                            ''' + ('<option value="merge"> ' + get_lang(conn, 'merge_move') + '</option>' if owner_auth == 1 else '') + '''
+                            <option value="none"> ''' + await get_lang('dont_move') + '''</option>
+                            <option value="normal"> ''' + await get_lang('normal') + '''</option>
+                            <option value="reverse"> ''' + await get_lang('replace_move') + '''</option>
+                            ''' + ('<option value="merge"> ' + await get_lang('merge_move') + '</option>' if owner_auth == 1 else '') + '''
                         </select>
                         <hr class="main_hr">
 
                         ''' + ((
-                            '''<h2>''' + get_lang(conn, 'document_set') + '''</h2>
+                            '''<h2>''' + await get_lang('document_set') + '''</h2>
                             <select name="document_set_option">
-                                <option value="none"> ''' + get_lang(conn, 'dont_move') + '''</option>
-                                <option value="normal"> ''' + get_lang(conn, 'normal') + '''</option>
-                                <option value="reverse"> ''' + get_lang(conn, 'replace_move') + '''</option>
+                                <option value="none"> ''' + await get_lang('dont_move') + '''</option>
+                                <option value="normal"> ''' + await get_lang('normal') + '''</option>
+                                <option value="reverse"> ''' + await get_lang('replace_move') + '''</option>
                             </select>
                             <hr class="main_hr">
                             '''
                         ) if owner_auth == 1 else '') + '''
 
-                        ''' + await captcha_get(conn) + ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'move')  + '''
+                        ''' + await captcha_get(conn) + await ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'move')  + '''
                         
-                        <button type="submit">''' + get_lang(conn, 'move') + '''</button>
+                        <button type="submit">''' + await get_lang('move') + '''</button>
                     </form>
                 ''',
-                menu = [['w/' + url_pas(name), get_lang(conn, 'return')], ['move_all', get_lang(conn, 'multiple_move')]]
+                menu = [['w/' + url_pas(name), await get_lang('return')], ['move_all', await get_lang('multiple_move')]]
             ))

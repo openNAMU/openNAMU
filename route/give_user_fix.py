@@ -47,28 +47,28 @@ async def give_user_fix(user_name = ''):
 
             return redirect(conn, '/user/' + url_pas(user_name))
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'user_fix'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('user_fix'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <div id="opennamu_get_user_info">''' + html.escape(user_name) + '''</div>
                         <hr class="main_hr">
-                        <a href="/change/user_name/''' + url_pas(user_name) + '''">(''' + get_lang(conn, 'change_user_name') + ''')</a>
+                        <a href="/change/user_name/''' + url_pas(user_name) + '''">(''' + await get_lang('change_user_name') + ''')</a>
                         <hr class="main_hr">
                         <select name="select">
-                            <option value="password_change">''' + get_lang(conn, 'password_change') + '''</option>
-                            <option value="2fa_password_change">''' + get_lang(conn, '2fa_password_change') + '''</option>
-                            <option value="2fa_off">''' + get_lang(conn, '2fa_off') + '''</option>
+                            <option value="password_change">''' + await get_lang('password_change') + '''</option>
+                            <option value="2fa_password_change">''' + await get_lang('2fa_password_change') + '''</option>
+                            <option value="2fa_off">''' + await get_lang('2fa_off') + '''</option>
                         </select>
                         <hr class="main_hr">
-                        ''' + get_lang(conn, 'password_change') + ''' | ''' + get_lang(conn, '2fa_password_change') + '''
+                        ''' + await get_lang('password_change') + ''' | ''' + await get_lang('2fa_password_change') + '''
                         <hr class="main_hr">
-                        <input placeholder="''' + get_lang(conn, 'new_password') + '''" name="new_password" type="password">
+                        <input placeholder="''' + await get_lang('new_password') + '''" name="new_password" type="password">
                         <hr class="main_hr">
-                        <input placeholder="''' + get_lang(conn, 'password_confirm') + '''" name="password_check" type="password">
+                        <input placeholder="''' + await get_lang('password_confirm') + '''" name="password_check" type="password">
                         <hr class="main_hr">
-                        <button type="submit">''' + get_lang(conn, 'go') + '''</button>
+                        <button type="submit">''' + await get_lang('go') + '''</button>
                     </form>
                 ''',
-                menu = [['manager', get_lang(conn, 'return')]]
+                menu = [['manager', await get_lang('return')]]
             ))

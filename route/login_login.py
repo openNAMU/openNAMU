@@ -49,20 +49,20 @@ async def login_login():
 
                 return redirect(conn, '/user')
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'login'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('login'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data =  '''
                         <form method="post">
-                            <input placeholder="''' + get_lang(conn, 'id') + '''" name="id" type="text">
+                            <input placeholder="''' + await get_lang('id') + '''" name="id" type="text">
                             <hr class="main_hr">
-                            <input placeholder="''' + get_lang(conn, 'password') + '''" name="pw" type="password">
+                            <input placeholder="''' + await get_lang('password') + '''" name="pw" type="password">
                             <hr class="main_hr">
-                            <!-- <label><input type="checkbox" name="auto_login"> ''' + get_lang(conn, 'auto_login') + ''' (''' + get_lang(conn, 'not_working') + ''')</label>
+                            <!-- <label><input type="checkbox" name="auto_login"> ''' + await get_lang('auto_login') + ''' (''' + await get_lang('not_working') + ''')</label>
                             <hr class="main_hr"> -->
                             ''' + await captcha_get(conn) + '''
-                            <button type="submit">''' + get_lang(conn, 'login') + '''</button>
-                            ''' + http_warning(conn) + '''
+                            <button type="submit">''' + await get_lang('login') + '''</button>
+                            ''' + await http_warning() + '''
                         </form>
                         ''',
-                menu = [['user', get_lang(conn, 'return')]]
+                menu = [['user', await get_lang('return')]]
             ))

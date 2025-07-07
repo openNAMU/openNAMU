@@ -22,24 +22,24 @@ async def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
             bbs_num_str = str(bbs_num)
 
             title_name = bbs_name
-            sub = '(' + get_lang(conn, 'bbs') + ')'
-            menu = [['bbs/main', get_lang(conn, 'return')], ['bbs/edit/' + bbs_num_str, get_lang(conn, 'add')], ['bbs/set/' + bbs_num_str, get_lang(conn, 'bbs_set')]]
+            sub = '(' + await get_lang('bbs') + ')'
+            menu = [['bbs/main', await get_lang('return')], ['bbs/edit/' + bbs_num_str, await get_lang('add')], ['bbs/set/' + bbs_num_str, await get_lang('bbs_set')]]
         elif tool == 'record':
             curs.execute(db_change('select set_data, set_id from bbs_set where set_name = "bbs_name"'))
             db_data = curs.fetchall()
             bbs_name_dict = { for_a[1] : for_a[0] for for_a in db_data } if db_data else {}
             
             title_name = name
-            sub = '(' + get_lang(conn, 'bbs_record') + ')'
-            menu = [['user/' + url_pas(name), get_lang(conn, 'user_tool')]]
+            sub = '(' + await get_lang('bbs_record') + ')'
+            menu = [['user/' + url_pas(name), await get_lang('user_tool')]]
         elif tool == 'comment_record':
             curs.execute(db_change('select set_data, set_id from bbs_set where set_name = "bbs_name"'))
             db_data = curs.fetchall()
             bbs_name_dict = { for_a[1] : for_a[0] for for_a in db_data } if db_data else {}
             
             title_name = name
-            sub = '(' + get_lang(conn, 'bbs_comment_record') + ')'
-            menu = [['user/' + url_pas(name), get_lang(conn, 'user_tool')]]
+            sub = '(' + await get_lang('bbs_comment_record') + ')'
+            menu = [['user/' + url_pas(name), await get_lang('user_tool')]]
         else:
             curs.execute(db_change('select set_data, set_id from bbs_set where set_name = "bbs_name"'))
             db_data = curs.fetchall()
@@ -53,9 +53,9 @@ async def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
                     bbs_type = db_data_2[0][0] if db_data_2 else 'comment'
 
                     if bbs_type == 'thread':
-                        bbs_type = get_lang(conn, 'thread_base')
+                        bbs_type = await get_lang('thread_base')
                     else:
-                        bbs_type = get_lang(conn, 'comment_base')
+                        bbs_type = await get_lang('comment_base')
                     
                     curs.execute(db_change('select set_data from bbs_data where set_id = ? and set_name = "date" order by set_code + 0 desc limit 1'), [for_a[1]])
                     db_data_2 = curs.fetchall()
@@ -69,25 +69,25 @@ async def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
             
             data += '<hr class="main_hr">'
 
-            title_name = get_lang(conn, 'bbs_main')
-            menu = [['other', get_lang(conn, 'other_tool')]] + ([['bbs/make', get_lang(conn, 'add')]] if admin_auth == 1 else [])
+            title_name = await get_lang('bbs_main')
+            menu = [['other', await get_lang('other_tool')]] + ([['bbs/make', await get_lang('add')]] if admin_auth == 1 else [])
 
         if tool == 'comment_record':
             data += '''
                 <table id="main_table_set">
                     <tr id="main_table_top_tr">
-                        <td id="main_table_width">''' + get_lang(conn, 'editor') + '''</td>
-                        <td id="main_table_width">''' + get_lang(conn, 'time') + '''</td>
-                        <td id="main_table_width">''' + get_lang(conn, 'comment') + '''</td>
+                        <td id="main_table_width">''' + await get_lang('editor') + '''</td>
+                        <td id="main_table_width">''' + await get_lang('time') + '''</td>
+                        <td id="main_table_width">''' + await get_lang('comment') + '''</td>
                     </tr>
             '''
         else:
             data += '''
                 <table id="main_table_set">
                     <tr id="main_table_top_tr">
-                        <td id="main_table_width">''' + get_lang(conn, 'editor') + '''</td>
-                        <td id="main_table_width">''' + get_lang(conn, 'time') + '''</td>
-                        <td id="main_table_width">''' + get_lang(conn, 'last_comment_time') + '''</td>
+                        <td id="main_table_width">''' + await get_lang('editor') + '''</td>
+                        <td id="main_table_width">''' + await get_lang('time') + '''</td>
+                        <td id="main_table_width">''' + await get_lang('last_comment_time') + '''</td>
                     </tr>
             '''
 
@@ -188,7 +188,7 @@ async def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
                 
         data += '</table>'
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(conn),
             imp = [title_name, await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
             data = data,
             menu = menu

@@ -17,14 +17,14 @@ async def topic_tool_delete(topic_num = 1):
 
             return redirect(conn, '/')
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'topic_delete'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('topic_delete'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <span>''' + get_lang(conn, 'delete_warning') + '''</span>
+                        <span>''' + await get_lang('delete_warning') + '''</span>
                         <hr class="main_hr">
-                        <button type="submit">''' + get_lang(conn, 'delete') + '''</button>
+                        <button type="submit">''' + await get_lang('delete') + '''</button>
                     </form>
                 ''',
-                menu = [['thread/' + topic_num + '/tool', get_lang(conn, 'return')]]
+                menu = [['thread/' + topic_num + '/tool', await get_lang('return')]]
             ))

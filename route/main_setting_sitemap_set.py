@@ -48,7 +48,7 @@ async def main_setting_sitemap_set():
 
             sitemap_list = ''
             if os.path.exists('sitemap.xml'):
-                sitemap_list += '<a href="/sitemap.xml">(' + get_lang(conn, 'view') + ')</a>'
+                sitemap_list += '<a href="/sitemap.xml">(' + await get_lang('view') + ')</a>'
 
                 for_a = 0
                 while os.path.exists('sitemap_' + str(for_a) + '.xml'):
@@ -56,32 +56,32 @@ async def main_setting_sitemap_set():
 
                     for_a += 1
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'sitemap_management'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('sitemap_management'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     ''' + sitemap_list + '''
                     <hr class="main_hr">
                     <form method="post">
-                        <a href="/setting/sitemap">(''' + get_lang(conn, 'sitemap_manual_create') + ''')</a>
+                        <a href="/setting/sitemap">(''' + await get_lang('sitemap_manual_create') + ''')</a>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" ''' + check_box_div[4] + ''' name="sitemap_auto_make"> ''' + get_lang(conn, 'sitemap_auto_make') + '''</label>
+                        <label><input type="checkbox" ''' + check_box_div[4] + ''' name="sitemap_auto_make"> ''' + await get_lang('sitemap_auto_make') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" ''' + check_box_div[0] + ''' name="sitemap_auto_exclude_domain"> ''' + get_lang(conn, 'stiemap_exclude_domain') + '''</label>
+                        <label><input type="checkbox" ''' + check_box_div[0] + ''' name="sitemap_auto_exclude_domain"> ''' + await get_lang('stiemap_exclude_domain') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" ''' + check_box_div[1] + ''' name="sitemap_auto_exclude_user_page"> ''' + get_lang(conn, 'stiemap_exclude_user_page') + '''</label>
+                        <label><input type="checkbox" ''' + check_box_div[1] + ''' name="sitemap_auto_exclude_user_page"> ''' + await get_lang('stiemap_exclude_user_page') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" ''' + check_box_div[2] + ''' name="sitemap_auto_exclude_file_page"> ''' + get_lang(conn, 'stiemap_exclude_file_page') + '''</label>
+                        <label><input type="checkbox" ''' + check_box_div[2] + ''' name="sitemap_auto_exclude_file_page"> ''' + await get_lang('stiemap_exclude_file_page') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" ''' + check_box_div[3] + ''' name="sitemap_auto_exclude_category_page"> ''' + get_lang(conn, 'stiemap_exclude_category_page') + '''</label>
+                        <label><input type="checkbox" ''' + check_box_div[3] + ''' name="sitemap_auto_exclude_category_page"> ''' + await get_lang('stiemap_exclude_category_page') + '''</label>
                         <hr class="main_hr">
 
-                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['setting', get_lang(conn, 'return')]]
+                menu = [['setting', await get_lang('return')]]
             ))

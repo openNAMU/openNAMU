@@ -4,7 +4,7 @@ async def user_setting_head_reset():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        skin_name = skin_check(conn, 1)
+        skin_name = await skin_check(conn, 1)
         ip = ip_check()
 
         if flask.request.method == 'POST':
@@ -42,7 +42,7 @@ async def user_setting_head_reset():
             return '''
                 <form method="post">
                     <style>.main_hr { border: none; }</style>
-                    ''' + get_lang(conn, 'all') + '''
+                    ''' + await get_lang('all') + '''
                     <hr class="main_hr">
                     <pre>''' + html.escape(data) + '''</pre>
                     <hr class="main_hr">
@@ -50,6 +50,6 @@ async def user_setting_head_reset():
                     <hr class="main_hr">
                     <pre>''' + html.escape(data_skin) + '''</pre>
                     <hr class="main_hr">
-                    <button type="submit">''' + get_lang(conn, 'reset') + '''</button>
+                    <button type="submit">''' + await get_lang('reset') + '''</button>
                 </form>
             '''

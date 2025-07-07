@@ -53,15 +53,15 @@ async def edit_delete(name):
 
             return redirect(conn, '/w/' + url_pas(name))
         else:            
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'delete') + ')', 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('delete') + ')', 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="send">
+                        <input placeholder="''' + await get_lang('why') + '''" name="send">
                         <hr class="main_hr">
-                        ''' + await captcha_get(conn) + ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'delete')  + '''
-                        <button type="submit">''' + get_lang(conn, 'delete') + '''</button>
+                        ''' + await captcha_get(conn) + await ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'delete')  + '''
+                        <button type="submit">''' + await get_lang('delete') + '''</button>
                     </form>
                 ''',
-                menu = [['w/' + url_pas(name), get_lang(conn, 'return')]]
+                menu = [['w/' + url_pas(name), await get_lang('return')]]
             ))

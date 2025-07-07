@@ -117,7 +117,7 @@ async def main_setting_main():
             for for_a in ip_load_option:
                 view_ip_option = for_a
                 if for_a == 'default':
-                    view_ip_option = get_lang(conn, 'default')
+                    view_ip_option = await get_lang('default')
 
                 if d_list[46] == for_a:
                     ip_load_select_data = '<option value="' + for_a + '">' + view_ip_option + '</option>' + ip_load_select_data
@@ -125,209 +125,209 @@ async def main_setting_main():
                     ip_load_select_data += '<option value="' + for_a + '">' + view_ip_option + '</option>'
 
             basic_set = '''
-                <h2>''' + get_lang(conn, 'basic_set') + '''</h2>
+                <h2>''' + await get_lang('basic_set') + '''</h2>
                             
-                <span>''' + get_lang(conn, 'wiki_name') + '''</span>
+                <span>''' + await get_lang('wiki_name') + '''</span>
                 <hr class="main_hr">
                 <input name="name" value="''' + html.escape(d_list[0]) + '''">
                 <hr class="main_hr">
 
-                <span><a href="/setting/main/logo">(''' + get_lang(conn, 'wiki_logo') + ''')</a></span>
+                <span><a href="/setting/main/logo">(''' + await get_lang('wiki_logo') + ''')</a></span>
                 <hr class="main_hr">
 
-                <span>''' + get_lang(conn, 'main_page') + '''</span>
+                <span>''' + await get_lang('main_page') + '''</span>
                 <hr class="main_hr">
                 <input name="frontpage" value="''' + html.escape(d_list[2]) + '''">
                 <hr class="main_hr">
 
-                <span>''' + get_lang(conn, 'tls_method') + '''</span>
+                <span>''' + await get_lang('tls_method') + '''</span>
                 <hr class="main_hr">
                 <select name="http_select">''' + tls_select + '''</select>
                 <hr class="main_hr">
 
-                <span>''' + get_lang(conn, 'domain') + '''</span> (EX : 2du.pythonanywhere.com) (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
+                <span>''' + await get_lang('domain') + '''</span> (EX : 2du.pythonanywhere.com) (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                 <hr class="main_hr">
                 <input name="domain" value="''' + html.escape(d_list[22]) + '''">
                 <hr class="main_hr">
 
-                <span>''' + get_lang(conn, 'wiki_host') + '''</span>
+                <span>''' + await get_lang('wiki_host') + '''</span>
                 <hr class="main_hr">
                 <input name="host" value="''' + html.escape(d_list[16]) + '''">
                 <hr class="main_hr">
 
-                <span>''' + get_lang(conn, 'wiki_port') + '''</span>
+                <span>''' + await get_lang('wiki_port') + '''</span>
                 <hr class="main_hr">
                 <input name="port" value="''' + html.escape(d_list[10]) + '''">
                 <hr class="main_hr">
 
-                <span>''' + get_lang(conn, 'wiki_secret_key') + '''</span>
+                <span>''' + await get_lang('wiki_secret_key') + '''</span>
                 <hr class="main_hr">
                 <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
                 <hr class="main_hr">
                 
-                <label><input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + get_lang(conn, 'set_wiki_access_password_need') + ''' (''' + get_lang(conn, 'restart_required') + ''')</label>
+                <label><input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + await get_lang('set_wiki_access_password_need') + ''' (''' + await get_lang('restart_required') + ''')</label>
                 <hr class="main_hr">
                 
-                <span>''' + get_lang(conn, 'set_wiki_access_password') + '''</span> (''' + get_lang(conn, 'restart_required') + ''')
+                <span>''' + await get_lang('set_wiki_access_password') + '''</span> (''' + await get_lang('restart_required') + ''')
                 <hr class="main_hr">
                 <input type="password" name="wiki_access_password" value="''' + html.escape(d_list[32]) + '''">
                 <hr class="main_hr">
 
-                <span>''' + get_lang(conn, 'wiki_load_ip_select') + '''</span> (''' + get_lang(conn, 'restart_required') + ''')
+                <span>''' + await get_lang('wiki_load_ip_select') + '''</span> (''' + await get_lang('restart_required') + ''')
                 <hr class="main_hr">
                 <select name="load_ip_select">''' + ip_load_select_data + '''</select>
                 
-                <h3>''' + get_lang(conn, 'authority_use_list') + '''</h3>
+                <h3>''' + await get_lang('authority_use_list') + '''</h3>
                 
-                <label><input type="checkbox" name="auth_history_off" ''' + check_box_div[14] + '''> ''' + get_lang(conn, 'authority_use_list_off') + '''</label>
+                <label><input type="checkbox" name="auth_history_off" ''' + check_box_div[14] + '''> ''' + await get_lang('authority_use_list_off') + '''</label>
                 <hr class="main_hr">
                 
-                <span>''' + get_lang(conn, 'authority_use_list_expiration_date') + '''</span> (''' + get_lang(conn, 'day') + ''') (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
+                <span>''' + await get_lang('authority_use_list_expiration_date') + '''</span> (''' + await get_lang('day') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                 <hr class="main_hr">
                 <input name="auth_history_expiration_date" value="''' + html.escape(d_list[43]) + '''">
                 <hr class="main_hr">
 
-                <h3>''' + get_lang(conn, 'communication_set') + '''</h3>
+                <h3>''' + await get_lang('communication_set') + '''</h3>
                 
-                <label><input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + get_lang(conn, 'enable_comment_function') + '''</label>
+                <label><input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + await get_lang('enable_comment_function') + '''</label>
                 <hr class="main_hr">
 
-                <label><input type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + get_lang(conn, 'display_level_in_user_name') + '''</label>
+                <label><input type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + await get_lang('display_level_in_user_name') + '''</label>
                 <hr class="main_hr">
 
-                <label><input type="checkbox" name="not_use_view_count" ''' + check_box_div[16] + '''> ''' + get_lang(conn, 'not_use_view_count') + '''</label>
+                <label><input type="checkbox" name="not_use_view_count" ''' + check_box_div[16] + '''> ''' + await get_lang('not_use_view_count') + '''</label>
                 <hr class="main_hr">
             '''
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'main_setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
-                data = render_simple_set(conn, '''
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('main_setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                data = await render_simple_set('''
                     <form method="post">
                         ''' + basic_set + '''
-                        <h2>''' + get_lang(conn, 'design_set') + '''</h2>
+                        <h2>''' + await get_lang('design_set') + '''</h2>
                         
-                        <span>''' + get_lang(conn, 'wiki_skin') + '''</span>
+                        <span>''' + await get_lang('wiki_skin') + '''</span>
                         <hr class="main_hr">
-                        <select name="skin">''' + load_skin(conn, d_list[5] if d_list[5] != '' else 'ringo') + '''</select>
+                        <select name="skin">''' + await load_skin(d_list[5] if d_list[5] != '' else 'ringo') + '''</select>
 
-                        <h2>''' + get_lang(conn, 'render_set') + '''</h2>
+                        <h2>''' + await get_lang('render_set') + '''</h2>
                         
-                        <label><input type="checkbox" name="namumark_compatible" ''' + check_box_div[10] + '''> ''' + get_lang(conn, 'namumark_fully_compatible_mode') + '''</label>
+                        <label><input type="checkbox" name="namumark_compatible" ''' + check_box_div[10] + '''> ''' + await get_lang('namumark_fully_compatible_mode') + '''</label>
                         <hr class="main_hr">
                         
-                        <label><input type="checkbox" name="link_case_insensitive" ''' + check_box_div[12] + '''> ''' + get_lang(conn, 'link_case_insensitive') + '''</label>
+                        <label><input type="checkbox" name="link_case_insensitive" ''' + check_box_div[12] + '''> ''' + await get_lang('link_case_insensitive') + '''</label>
                         <hr class="main_hr">
 
-                        <h2>''' + get_lang(conn, 'login_set') + '''</h2>
+                        <h2>''' + await get_lang('login_set') + '''</h2>
                         
-                        <label><input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + get_lang(conn, 'no_register') + '''</label>
+                        <label><input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + await get_lang('no_register') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + get_lang(conn, 'hide_ip') + '''</label>
+                        <label><input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + await get_lang('hide_ip') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" name="user_name_view" ''' + check_box_div[11] + '''> ''' + get_lang(conn, 'hide_user_name') + '''</label>
+                        <label><input type="checkbox" name="user_name_view" ''' + check_box_div[11] + '''> ''' + await get_lang('hide_user_name') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + get_lang(conn, 'requires_approval') + '''</label>
+                        <label><input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + await get_lang('requires_approval') + '''</label>
                         <hr class="main_hr">
 
-                        <span>''' + get_lang(conn, 'password_min_length') + '''</span> (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
+                        <span>''' + await get_lang('password_min_length') + '''</span> (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="password_min_length" value="''' + html.escape(d_list[30]) + '''">
                         <hr class="main_hr">
 
-                        <span>''' + get_lang(conn, 'encryption_method') + '''</span>
+                        <span>''' + await get_lang('encryption_method') + '''</span>
                         <hr class="main_hr">
                         <select name="encode">''' + encode_select + '''</select>
 
-                        <h3>''' + get_lang(conn, 'ua') + '''</h3>
+                        <h3>''' + await get_lang('ua') + '''</h3>
                         
-                        <label><input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + get_lang(conn, 'ua_get_off') + '''</label>
+                        <label><input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + await get_lang('ua_get_off') + '''</label>
                         <hr class="main_hr">
                         
-                        <span>''' + get_lang(conn, 'ua_expiration_date') + '''</span> (''' + get_lang(conn, 'day') + ''') (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
+                        <span>''' + await get_lang('ua_expiration_date') + '''</span> (''' + await get_lang('day') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="ua_expiration_date" value="''' + html.escape(d_list[42]) + '''">
                         <hr class="main_hr">
                         
-                        <h2>''' + get_lang(conn, 'server_set') + '''</h2>
+                        <h2>''' + await get_lang('server_set') + '''</h2>
 
-                        <span>''' + get_lang(conn, 'update_branch') + '''</span>
+                        <span>''' + await get_lang('update_branch') + '''</span>
                         <hr class="main_hr">
                         <select name="update">''' + branch_div + '''</select>
 
                         <span ''' + sqlite_only + '''>
-                            <h3>''' + get_lang(conn, 'backup') + ''' (''' + get_lang(conn, 'sqlite_only') + ''')</h3>
+                            <h3>''' + await get_lang('backup') + ''' (''' + await get_lang('sqlite_only') + ''')</h3>
                             
-                            <span>''' + get_lang(conn, 'backup_warning') + ''' (EX : data_YYYYMMDDHHMMSS.db)</span>
+                            <span>''' + await get_lang('backup_warning') + ''' (EX : data_YYYYMMDDHHMMSS.db)</span>
                             <hr class="main_hr">
                             <hr class="main_hr">
                             
-                            <span>''' + get_lang(conn, 'backup_interval') + '''</span> (''' + get_lang(conn, 'hour') + ''') (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
+                            <span>''' + await get_lang('backup_interval') + '''</span> (''' + await get_lang('hour') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                             <hr class="main_hr">
                             <input name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr class="main_hr">
                             
-                            <span>''' + get_lang(conn, 'backup_where') + '''</span> (''' + get_lang(conn, 'default') + ''' : ''' + get_lang(conn, 'empty') + ''') (''' + get_lang(conn, 'example') + ''' : ./data/backup.db)
+                            <span>''' + await get_lang('backup_where') + '''</span> (''' + await get_lang('default') + ''' : ''' + await get_lang('empty') + ''') (''' + await get_lang('example') + ''' : ./data/backup.db)
                             <hr class="main_hr">
                             <input name="backup_where" value="''' + html.escape(d_list[21]) + '''">
                             <hr class="main_hr">
 
-                            <span>''' + get_lang(conn, 'backup_count') + '''</span> (''' + get_lang(conn, 'default') + ''' : ''' + get_lang(conn, 'empty') + ''')
+                            <span>''' + await get_lang('backup_count') + '''</span> (''' + await get_lang('default') + ''' : ''' + await get_lang('empty') + ''')
                             <hr class="main_hr">
                             <input name="backup_count" value="''' + html.escape(d_list[41]) + '''">
                             <hr class="main_hr">
                         </span>
 
-                        <h2>''' + get_lang(conn, 'edit_set') + '''</h2>
+                        <h2>''' + await get_lang('edit_set') + '''</h2>
                         
-                        <span>''' + get_lang(conn, 'slow_edit') + '''</span> (''' + get_lang(conn, 'second') + ''') (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
+                        <span>''' + await get_lang('slow_edit') + '''</span> (''' + await get_lang('second') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="slow_edit" value="''' + html.escape(d_list[19]) + '''">
                         <hr class="main_hr">
                         
-                        <label><input type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + get_lang(conn, 'edit_bottom_compulsion') + '''</label>
+                        <label><input type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + await get_lang('edit_bottom_compulsion') + '''</label>
                         <hr class="main_hr">
                         
-                        <span>''' + get_lang(conn, 'title_max_length') + '''</span> (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
+                        <span>''' + await get_lang('title_max_length') + '''</span> (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="title_max_length" value="''' + html.escape(d_list[28]) + '''">
                         <hr class="main_hr">
                         
-                        <span>''' + get_lang(conn, 'title_topic_max_length') + '''</span> (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
+                        <span>''' + await get_lang('title_topic_max_length') + '''</span> (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="title_topic_max_length" value="''' + html.escape(d_list[29]) + '''">
                         <hr class="main_hr">
                         
-                        <span>''' + get_lang(conn, 'max_file_size') + ''' (MB)</span>
+                        <span>''' + await get_lang('max_file_size') + ''' (MB)</span>
                         <hr class="main_hr">
                         <input name="upload" value="''' + html.escape(d_list[4]) + '''">
                         <hr class="main_hr">
                         
-                        <label><input type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + get_lang(conn, 'set_history_recording_off') + '''</label>
+                        <label><input type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + await get_lang('set_history_recording_off') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" name="move_with_redirect" ''' + check_box_div[13] + '''> ''' + get_lang(conn, 'move_with_redirect') + ''' (''' + get_lang(conn, 'not_working') + ''')</label>
+                        <label><input type="checkbox" name="move_with_redirect" ''' + check_box_div[13] + '''> ''' + await get_lang('move_with_redirect') + ''' (''' + await get_lang('not_working') + ''')</label>
                         <hr class="main_hr">
 
-                        <span>''' + get_lang(conn, 'slow_thread') + '''</span> (''' + get_lang(conn, 'second') + ''') (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
+                        <span>''' + await get_lang('slow_thread') + '''</span> (''' + await get_lang('second') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="slow_thread" value="''' + html.escape(d_list[38]) + '''">
                         <hr class="main_hr">
 
-                        <span>''' + get_lang(conn, 'edit_timeout') + '''</span> (''' + get_lang(conn, 'second') + ''') (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''') (''' + get_lang(conn, 'linux_only') + ''')
+                        <span>''' + await get_lang('edit_timeout') + '''</span> (''' + await get_lang('second') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''') (''' + await get_lang('linux_only') + ''')
                         <hr class="main_hr">
                         <input name="edit_timeout" value="''' + html.escape(d_list[39]) + '''">
                         <hr class="main_hr">
 
-                        <span>''' + get_lang(conn, 'document_content_max_length') + '''</span> (''' + get_lang(conn, 'off') + ''' : ''' + get_lang(conn, 'empty') + ''')
+                        <span>''' + await get_lang('document_content_max_length') + '''</span> (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
                         <input name="document_content_max_length" value="''' + html.escape(d_list[40]) + '''">
                         <hr class="main_hr">
 
-                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 '''),
-                menu = [['setting', get_lang(conn, 'return')]]
+                menu = [['setting', await get_lang('return')]]
             ))

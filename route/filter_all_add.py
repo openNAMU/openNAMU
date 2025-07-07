@@ -123,7 +123,7 @@ async def filter_all_add(tool, name = None):
 
                     select = '''
                         <hr class="main_hr">
-                        ''' + get_lang(conn, 'inter_wiki_space_change') + '''
+                        ''' + await get_lang('inter_wiki_space_change') + '''
                         <hr class="main_hr">
                         <select name="inter_type">
                             <option ''' + select[0] + ''' value="url_encode">%20</option>
@@ -133,17 +133,17 @@ async def filter_all_add(tool, name = None):
                 else:
                     ex = 'youtube.com'
 
-                title = get_lang(conn, 'interwiki_add') if tool == 'inter_wiki' else get_lang(conn, 'outer_link_add')
+                title = await get_lang('interwiki_add') if tool == 'inter_wiki' else await get_lang('outer_link_add')
                 form_data = '''
-                    ''' + get_lang(conn, 'name') + '''
+                    ''' + await get_lang('name') + '''
                     <hr class="main_hr">
                     <input value="''' + html.escape(value[0]) + '''" type="text" name="title">
                     <hr class="main_hr">
-                    ''' + get_lang(conn, 'link') + ''' (EX : ''' + ex + ''')
+                    ''' + await get_lang('link') + ''' (EX : ''' + ex + ''')
                     <hr class="main_hr">
                     <input value="''' + html.escape(value[1]) + '''" type="text" name="link">
                     <hr class="main_hr">
-                    ''' + get_lang(conn, 'icon') + ''' (''' + ('HTML' if tool == 'inter_wiki' else get_lang(conn, 'html_or_link')) + ''') (''' + get_lang(conn, 'link') + ' - EX' + ''' : /image/Test.svg)
+                    ''' + await get_lang('icon') + ''' (''' + ('HTML' if tool == 'inter_wiki' else await get_lang('html_or_link')) + ''') (''' + await get_lang('link') + ' - EX' + ''' : /image/Test.svg)
                     <hr class="main_hr">
                     <input value="''' + html.escape(value[2]) + '''" type="text" name="icon">
                     ''' + select + '''
@@ -161,49 +161,49 @@ async def filter_all_add(tool, name = None):
                     textarea = ''
                     time_data = ''
 
-                title = get_lang(conn, 'edit_filter_add')
+                title = await get_lang('edit_filter_add')
                 form_data = '''
                     <hr class="main_hr">
-                    <input placeholder="''' + get_lang(conn, 'day') + '''" name="day" type="text" value="''' + html.escape(time_data) + '''">
+                    <input placeholder="''' + await get_lang('day') + '''" name="day" type="text" value="''' + html.escape(time_data) + '''">
                     <hr class="main_hr">
-                    <input placeholder="''' + get_lang(conn, 'regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
+                    <input placeholder="''' + await get_lang('regex') + '''" name="content" value="''' + html.escape(textarea) + '''" type="text">
                 '''
             elif tool == 'name_filter':
-                title = get_lang(conn, 'id_filter_add')
+                title = await get_lang('id_filter_add')
                 form_data = '' + \
-                    get_lang(conn, 'regex') + \
+                    await get_lang('regex') + \
                     '<hr class="main_hr">' + \
                     '<input value="' + html.escape(name) + '" type="text" name="title">' + \
                 ''
             elif tool == 'file_filter':
-                title = get_lang(conn, 'file_filter_add')
+                title = await get_lang('file_filter_add')
                 form_data = '' + \
-                    get_lang(conn, 'regex') + \
+                    await get_lang('regex') + \
                     '<hr class="main_hr">' + \
                     '<input value="' + html.escape(name) + '" type="text" name="title">' + \
                 ''
             elif tool == 'email_filter':
-                title = get_lang(conn, 'email_filter_add')
+                title = await get_lang('email_filter_add')
                 form_data = '' + \
-                    get_lang(conn, 'email') + \
+                    await get_lang('email') + \
                     '<hr class="main_hr">' + \
                     '<input value="' + html.escape(name) + '" type="text" name="title">' + \
                 ''
             elif tool == 'image_license':
-                title = get_lang(conn, 'image_license_add')
+                title = await get_lang('image_license_add')
                 form_data = '' + \
-                    get_lang(conn, 'license') + \
+                    await get_lang('license') + \
                     '<hr class="main_hr">' + \
                     '<input value="' + html.escape(name) + '" type="text" name="title">' + \
                 ''
             elif tool == 'extension_filter':
-                title = get_lang(conn, 'extension_filter_add')
+                title = await get_lang('extension_filter_add')
                 form_data = '' + \
-                    get_lang(conn, 'extension') + \
+                    await get_lang('extension') + \
                     '<hr class="main_hr">' + \
                     '<input value="' + html.escape(name) + '" type="text" name="title">' + \
                     '<hr class="main_hr">' + \
-                    get_lang(conn, 'max_file_size') + ' (MB) (' + get_lang(conn, 'default') + ' : ' + get_lang(conn, 'empty') + ')' + \
+                    await get_lang('max_file_size') + ' (MB) (' + await get_lang('default') + ' : ' + await get_lang('empty') + ')' + \
                     '<hr class="main_hr">' + \
                     '<input value="" type="text" name="max_file_size">' + \
                 ''
@@ -214,24 +214,24 @@ async def filter_all_add(tool, name = None):
                 db_data = curs.fetchall()
                 acl_list = [['selected' if db_data and db_data[0][1] == for_a else '', for_a] for for_a in acl_list]
 
-                title = get_lang(conn, 'document_filter_add')
+                title = await get_lang('document_filter_add')
                 form_data = '''
-                    ''' + get_lang(conn, 'name') + '''
+                    ''' + await get_lang('name') + '''
                     <hr class="main_hr">
                     <input value="''' + html.escape(name) + '''" type="text" name="name">
                     <hr class="main_hr">
-                    ''' + get_lang(conn, 'regex') + '''
+                    ''' + await get_lang('regex') + '''
                     <hr class="main_hr">
                     <input value="''' + (html.escape(db_data[0][0]) if db_data else '') + '''" type="text" name="regex">
                     <hr class="main_hr">
-                    <a href="/acl/Test#exp">''' + get_lang(conn, 'acl') + '''</a>
+                    <a href="/acl/Test#exp">''' + await get_lang('acl') + '''</a>
                     <hr class="main_hr">
                     <select name="acl">
                         ''' + ''.join(['<option ' + for_a[0] + ' value=' + for_a[1] + '>' + ('normal' if for_a[1] == '' else for_a[1]) + '</option>' for for_a in acl_list]) + '''
                     </select>
                 '''
             elif tool == 'template':
-                title = get_lang(conn, 'template_document_add')
+                title = await get_lang('template_document_add')
 
                 value = ''
                 if name:
@@ -240,17 +240,17 @@ async def filter_all_add(tool, name = None):
                     value = exist[0][0] if exist else '' 
 
                 form_data = '' + \
-                    get_lang(conn, 'template') + \
+                    await get_lang('template') + \
                     '<hr class="main_hr">' + \
                     '<input value="' + html.escape(name) + '" type="text" name="title">' + \
                     '<hr class="main_hr">' + \
-                    get_lang(conn, 'explanation') + \
+                    await get_lang('explanation') + \
                     '<hr class="main_hr">' + \
                     '<input value="' + html.escape(value) + '" type="text" name="exp">' + \
                     '<hr class="main_hr">' + \
                 ''
             else:
-                title = get_lang(conn, 'edit_tool_add')
+                title = await get_lang('edit_tool_add')
                 
                 value = ''
                 if name:
@@ -259,23 +259,23 @@ async def filter_all_add(tool, name = None):
                     value = exist[0][0] if exist else ''    
 
                 form_data = '''
-                    ''' + get_lang(conn, 'title') + '''
+                    ''' + await get_lang('title') + '''
                     <hr class="main_hr">
                     <input value="''' + html.escape(name) + '''" type="text" name="title">
                     <hr class="main_hr">
-                    ''' + get_lang(conn, 'markup') + '''
+                    ''' + await get_lang('markup') + '''
                     <hr class="main_hr">
                     <input value="''' + html.escape(value) + '''" type="text" name="markup">
                 '''
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(conn),
                 imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([get_sub, 0])],
                 data =  '''
                         <form method="post">
                             ''' + form_data + '''
                             <hr class="main_hr">
-                            <button ''' + stat + ''' type="submit">''' + get_lang(conn, 'add') + '''</button>
+                            <button ''' + stat + ''' type="submit">''' + await get_lang('add') + '''</button>
                         </form>
                         ''',
-                menu = [['filter/' + tool, get_lang(conn, 'return')]]
+                menu = [['filter/' + tool, await get_lang('return')]]
             ))

@@ -21,37 +21,37 @@ async def filter_all(tool):
                 return await re_error(conn, 0)
 
         if tool == 'inter_wiki':
-            title = get_lang(conn, 'interwiki_list')
+            title = await get_lang('interwiki_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'inter_wiki'"))
         elif tool == 'email_filter':
-            title = get_lang(conn, 'email_filter_list')
+            title = await get_lang('email_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'email'"))
         elif tool == 'name_filter':
-            title = get_lang(conn, 'id_filter_list')
+            title = await get_lang('id_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'name'"))
         elif tool == 'edit_filter':
-            title = get_lang(conn, 'edit_filter_list')
+            title = await get_lang('edit_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'regex_filter'"))
         elif tool == 'file_filter':
-            title = get_lang(conn, 'file_filter_list')
+            title = await get_lang('file_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'file'"))
         elif tool == 'image_license':
-            title = get_lang(conn, 'image_license_list')
+            title = await get_lang('image_license_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'image_license'"))
         elif tool == 'extension_filter':
-            title = get_lang(conn, 'extension_filter_list')
+            title = await get_lang('extension_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'extension'"))
         elif tool == 'document':
-            title = get_lang(conn, 'document_filter_list')
+            title = await get_lang('document_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'document'"))
         elif tool == 'outer_link':
-            title = get_lang(conn, 'outer_link_filter_list')
+            title = await get_lang('outer_link_filter_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'outer_link'"))
         elif tool == 'template':
-            title = get_lang(conn, 'template_document_list')
+            title = await get_lang('template_document_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'template'"))
         else:
-            title = get_lang(conn, 'edit_tool_list')
+            title = await get_lang('edit_tool_list')
             curs.execute(db_change("select html, plus, plus_t from html_filter where kind = 'edit_top'"))
 
         db_data = curs.fetchall()
@@ -62,9 +62,9 @@ async def filter_all(tool):
             div += html.escape(data[0])
             if admin == 1:
                 if tool in ('inter_wiki', 'outer_link', 'edit_filter', 'document', 'edit_top', 'template'):
-                    div += ' <a href="/filter/' + tool + '/add/' + url_pas(data[0]) + '">(' + get_lang(conn, 'edit') + ')</a>'
+                    div += ' <a href="/filter/' + tool + '/add/' + url_pas(data[0]) + '">(' + await get_lang('edit') + ')</a>'
                     
-                div += ' <a href="/filter/' + tool + '/del/' + url_pas(data[0]) + '">(' + get_lang(conn, 'delete') + ')</a>'
+                div += ' <a href="/filter/' + tool + '/del/' + url_pas(data[0]) + '">(' + await get_lang('delete') + ')</a>'
 
             div += '</td>'
 
@@ -85,10 +85,10 @@ async def filter_all(tool):
 
         if admin == 1:
             div += '<hr class="main_hr">'
-            div += '<a href="/filter/' + tool + '/add">(' + get_lang(conn, 'add') + ')</a>'
+            div += '<a href="/filter/' + tool + '/add">(' + await get_lang('add') + ')</a>'
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(conn),
             imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = div,
-            menu = [['manager/1', get_lang(conn, 'return')]]
+            menu = [['manager/1', await get_lang('return')]]
         ))

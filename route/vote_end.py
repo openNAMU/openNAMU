@@ -13,9 +13,9 @@ async def vote_end(num = 1):
 
         data = ''
         if data_list[0][3] == 'open' or data_list[0][3] == 'n_open':
-            data += '<a href="/vote/close/' + num + '">(' + get_lang(conn, 'close_vote') + ')</a>'
+            data += '<a href="/vote/close/' + num + '">(' + await get_lang('close_vote') + ')</a>'
         else:
-            data += '<a href="/vote/close/' + num + '">(' + get_lang(conn, 're_open_vote') + ')</a>'
+            data += '<a href="/vote/close/' + num + '">(' + await get_lang('re_open_vote') + ')</a>'
         
         curs.execute(db_change('select data from vote where id = ? and name = "end_date" and type = "option"'), [num])
         db_data = curs.fetchall()
@@ -39,11 +39,11 @@ async def vote_end(num = 1):
                 for j in data_list_2:
                     data += '<li>' + all_ip[j[0]] + '</li>'
 
-            data += '<li>' + get_lang(conn, 'result') + ' : ' + str(len(data_list_2)) + '</li>'
+            data += '<li>' + await get_lang('result') + ' : ' + str(len(data_list_2)) + '</li>'
             data += '</ul>'
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'result_vote'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + num + ')', 0])],
+        return easy_minify(flask.render_template(await skin_check(conn),
+            imp = [await get_lang('result_vote'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + num + ')', 0])],
             data = data,
-            menu = [['vote', get_lang(conn, 'return')]]
+            menu = [['vote', await get_lang('return')]]
         ))

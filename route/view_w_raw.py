@@ -6,13 +6,13 @@ async def view_w_raw(name = '', rev = '', doc_acl = ''):
     with get_db_connect() as conn:
         rev_str = str(rev)
 
-        sub = '(' + get_lang(conn, 'raw') + ')'
+        sub = '(' + await get_lang('raw') + ')'
         sub += ' (' + rev_str + ')' if rev != '' else ''
 
         if rev != '':
-            menu = [['history_tool/' + rev_str + '/' + url_pas(name), get_lang(conn, 'return')]]
+            menu = [['history_tool/' + rev_str + '/' + url_pas(name), await get_lang('return')]]
         else:
-            menu = [['w/' + url_pas(name), get_lang(conn, 'return')]]
+            menu = [['w/' + url_pas(name), await get_lang('return')]]
 
         data = await api_w_raw(name, rev)
         if data["response"] == "ok":
@@ -29,14 +29,14 @@ async def view_w_raw(name = '', rev = '', doc_acl = ''):
         
         if doc_acl == 'on':
             p_data = '' + \
-                get_lang(conn, 'authority_error') + \
+                await get_lang('authority_error') + \
                 '<hr class="main_hr">' + \
                 p_data
             ''
             
-            sub = ' (' + get_lang(conn, 'edit') + ')'
+            sub = ' (' + await get_lang('edit') + ')'
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(conn),
             imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
             data = p_data,
             menu = menu

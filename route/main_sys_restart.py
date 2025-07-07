@@ -45,14 +45,14 @@ async def main_sys_restart(golang_process):
                         print('Golang process not terminated properly.')
 
             threading.Thread(target = main_sys_restart_do).start()
-            return flask.Response(get_lang(conn, "warning_restart"), status = 200)
+            return flask.Response(await get_lang("warning_restart"), status = 200)
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'wiki_restart'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('wiki_restart'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <button type="submit">''' + get_lang(conn, 'restart') + '''</button>
+                        <button type="submit">''' + await get_lang('restart') + '''</button>
                     </form>
                 ''',
-                menu = [['manager', get_lang(conn, 'return')]]
+                menu = [['manager', await get_lang('return')]]
             ))

@@ -23,17 +23,17 @@ async def edit_delete_multiple():
 
             return redirect(conn, '/recent_change')
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'many_delete'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('many_delete'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <textarea class="opennamu_textarea_500" placeholder="''' + get_lang(conn, 'many_delete_help') + '''" name="content"></textarea>
+                        <textarea class="opennamu_textarea_500" placeholder="''' + await get_lang('many_delete_help') + '''" name="content"></textarea>
                         <hr class="main_hr">
-                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="send" type="text">
+                        <input placeholder="''' + await get_lang('why') + '''" name="send" type="text">
                         <hr class="main_hr">
-                        ''' + await captcha_get(conn) + ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'edit')  + '''
-                        <button type="submit">''' + get_lang(conn, 'delete') + '''</button>
+                        ''' + await captcha_get(conn) + await ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'edit')  + '''
+                        <button type="submit">''' + await get_lang('delete') + '''</button>
                     </form>
                 ''',
-                menu = [['manager/1', get_lang(conn, 'return')]]
+                menu = [['manager/1', await get_lang('return')]]
             ))

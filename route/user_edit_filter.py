@@ -38,17 +38,17 @@ async def user_edit_filter(name = ''):
             if owner_auth == 1:
                 delete = '' + \
                     '<form method="post">' + \
-                        '<button type="submit">' + get_lang(conn, 'delete') + '</button>' + \
+                        '<button type="submit">' + await get_lang('delete') + '</button>' + \
                     '</form>' + \
                     '<hr class="main_hr">' + \
                 ''
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'edit_filter') + ')', 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('edit_filter') + ')', 0])],
                 data = '' + \
-                    '<a href="/filter/edit_filter">(' + get_lang(conn, 'edit_filter_rule') + ')</a>' + \
+                    '<a href="/filter/edit_filter">(' + await get_lang('edit_filter_rule') + ')</a>' + \
                     '<hr class="main_hr">' + \
                     p_data + search_list + delete + \
                 '',
-                menu = [['recent_block', get_lang(conn, 'return')], ]
+                menu = [['recent_block', await get_lang('return')], ]
             ))

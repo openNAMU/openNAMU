@@ -29,11 +29,11 @@ async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '
 
         v_name = name
         p_data = ''
-        sub = '(' + get_lang(conn, 'raw') + ')'
+        sub = '(' + await get_lang('raw') + ')'
 
         if bbs_num != '' and post_num != '':
-            sub += ' (' + get_lang(conn, 'bbs') + ')'
-            menu = [['bbs/tool/' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str), get_lang(conn, 'return')]]
+            sub += ' (' + await get_lang('bbs') + ')'
+            menu = [['bbs/tool/' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str), await get_lang('return')]]
             
             if comment_num != '':
                 sub += ' (' + comment_num + ')'
@@ -46,24 +46,24 @@ async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '
 
             sub += ' (r' + num + ')'
 
-            menu = [['history_tool/' + url_pas(num) + '/' + url_pas(name), get_lang(conn, 'return')]]
+            menu = [['history_tool/' + url_pas(num) + '/' + url_pas(name), await get_lang('return')]]
         elif topic_num != '':
             if await acl_check(tool = 'hidel_auth') == 1:
                 curs.execute(db_change("select data from topic where id = ? and code = ? and block = ''"), [num, topic_num])
             else:
                 curs.execute(db_change("select data from topic where id = ? and code = ?"), [num, topic_num])
 
-            v_name = get_lang(conn, 'discussion_raw')
+            v_name = await get_lang('discussion_raw')
             sub = ' (#' + num + ')'
 
             menu = [
-                ['thread/' + topic_num + '#' + num, get_lang(conn, 'discussion')], 
-                ['thread/' + topic_num + '/comment/' + num + '/tool', get_lang(conn, 'return')]
+                ['thread/' + topic_num + '#' + num, await get_lang('discussion')], 
+                ['thread/' + topic_num + '/comment/' + num + '/tool', await get_lang('return')]
             ]
         else:
             curs.execute(db_change("select data from data where title = ?"), [name])
 
-            menu = [['w/' + url_pas(name), get_lang(conn, 'return')]]
+            menu = [['w/' + url_pas(name), await get_lang('return')]]
 
         if bbs_num != '' and post_num != '':
             if comment_num != '':
@@ -88,7 +88,7 @@ async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '
             if bbs_num == '' and post_num == '' and topic_num == '':
                 doc_preview = '''
                     <textarea id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
-                    <button id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview('raw');">''' + get_lang(conn, 'preview') + '''</button>
+                    <button id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview('raw');">''' + await get_lang('preview') + '''</button>
                     <hr class="main_hr">
                 '''
 
@@ -101,13 +101,13 @@ async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '
             
             if doc_acl == 1:
                 p_data = '' + \
-                    get_lang(conn, 'authority_error') + \
+                    await get_lang('authority_error') + \
                     '<hr class="main_hr">' + \
                     p_data
                 ''
-                sub = ' (' + get_lang(conn, 'edit') + ')'
+                sub = ' (' + await get_lang('edit') + ')'
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(conn),
                 imp = [v_name, await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
                 data = p_data,
                 menu = menu

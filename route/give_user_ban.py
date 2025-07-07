@@ -103,11 +103,11 @@ async def give_user_ban(name = None, ban_type = ''):
             return redirect(conn, '/recent_block')
         else:
             if ban_type == 'multiple':
-                main_name = get_lang(conn, 'multiple_ban')
-                n_name = '<textarea class="opennamu_textarea_500" placeholder="' + get_lang(conn, 'name_or_ip_or_regex_or_cidr_multiple') + '" name="name"></textarea><hr class="main_hr">'
+                main_name = await get_lang('multiple_ban')
+                n_name = '<textarea class="opennamu_textarea_500" placeholder="' + await get_lang('name_or_ip_or_regex_or_cidr_multiple') + '" name="name"></textarea><hr class="main_hr">'
             else:
-                main_name = get_lang(conn, 'ban')
-                n_name = '<input placeholder="' + get_lang(conn, 'name_or_ip_or_regex_or_cidr') + '" value="' + (name if name else '') + '" name="name"><hr class="main_hr">'
+                main_name = await get_lang('ban')
+                n_name = '<input placeholder="' + await get_lang('name_or_ip_or_regex_or_cidr') + '" value="' + (name if name else '') + '" name="name"><hr class="main_hr">'
 
             now = 0
             
@@ -129,55 +129,55 @@ async def give_user_ban(name = None, ban_type = ''):
 
             owner_option = ''
             if await acl_check(tool = 'owner_auth', ip = ip) != 1:
-                owner_option = '<option value="private" ' + ('selected' if ban_type == 'private' else '') + '>' + get_lang(conn, 'private') + '</option>'
+                owner_option = '<option value="private" ' + ('selected' if ban_type == 'private' else '') + '>' + await get_lang('private') + '</option>'
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(conn),
                 imp = [main_name, await wiki_set(), await wiki_custom(conn), wiki_css([now, 0])],
                 data = info_data + '''
                     <form method="post" ''' + action + '''>
-                        <h2>''' + get_lang(conn, 'method') + '''</h2>
+                        <h2>''' + await get_lang('method') + '''</h2>
                         ''' + n_name + '''
         
                         <select name="do_ban_type">
-                            <option value="normal">''' + get_lang(conn, 'normal') + '''</option>
-                            <option value="regex" ''' + ('selected' if ban_type == 'regex' else '') + '>' + get_lang(conn, 'regex') + '''</option>
-                            <option value="cidr" ''' + ('selected' if ban_type == 'cidr' else '') + '>' + get_lang(conn, 'cidr') + '''</option>
+                            <option value="normal">''' + await get_lang('normal') + '''</option>
+                            <option value="regex" ''' + ('selected' if ban_type == 'regex' else '') + '>' + await get_lang('regex') + '''</option>
+                            <option value="cidr" ''' + ('selected' if ban_type == 'cidr' else '') + '>' + await get_lang('cidr') + '''</option>
                             ''' + owner_option + '''
                         </select>
                         <hr class="main_hr">
         
                         <select name="ban_option">
-                            <option value="">''' + get_lang(conn, 'default') + '''</option>
-                            <option value="login_able">''' + get_lang(conn, 'login_able') + '''</option>
-                            <option value="login_able_and_regsiter_disable">''' + get_lang(conn, 'login_able_and_regsiter_disable') + '''</option>
-                            <option value="edit_request_able">''' + get_lang(conn, 'edit_request_able') + '''</option>
-                            <option value="completely_ban">''' + get_lang(conn, 'completely_ban') + '''</option>
-                            <option value="dont_come_this_site">''' + get_lang(conn, 'dont_come_this_site') + '''</option>
-                            <option value="release">''' + get_lang(conn, 'release') + '''</option>
+                            <option value="">''' + await get_lang('default') + '''</option>
+                            <option value="login_able">''' + await get_lang('login_able') + '''</option>
+                            <option value="login_able_and_regsiter_disable">''' + await get_lang('login_able_and_regsiter_disable') + '''</option>
+                            <option value="edit_request_able">''' + await get_lang('edit_request_able') + '''</option>
+                            <option value="completely_ban">''' + await get_lang('completely_ban') + '''</option>
+                            <option value="dont_come_this_site">''' + await get_lang('dont_come_this_site') + '''</option>
+                            <option value="release">''' + await get_lang('release') + '''</option>
                         </select>
         
-                        <h2>''' + get_lang(conn, 'date') + '''</h2>
+                        <h2>''' + await get_lang('date') + '''</h2>
                         <select name="date_type">
-                            <option value="date">''' + get_lang(conn, 'date') + '''</option>
-                            <option value="days">''' + get_lang(conn, 'day') + '''</option>
+                            <option value="date">''' + await get_lang('date') + '''</option>
+                            <option value="days">''' + await get_lang('day') + '''</option>
                         </select>
                         <hr class="main_hr">
         
-                        <span>''' + get_lang(conn, 'day') + '''</span>
+                        <span>''' + await get_lang('day') + '''</span>
                         <hr class="main_hr">
                         <input name="date_days">
                         <hr class="main_hr">
 
-                        <span>''' + get_lang(conn, 'date') + '''</span>
+                        <span>''' + await get_lang('date') + '''</span>
                         <hr class="main_hr">
                         <input type="date" value="''' + date_value + '''" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">
         
-                        <h2>''' + get_lang(conn, 'other') + '''</h2>
-                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="why" type="text">
+                        <h2>''' + await get_lang('other') + '''</h2>
+                        <input placeholder="''' + await get_lang('why') + '''" name="why" type="text">
                         <hr class="main_hr">
         
-                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
+                        <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['manager', get_lang(conn, 'return')]]
+                menu = [['manager', await get_lang('return')]]
             ))   

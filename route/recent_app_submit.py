@@ -9,26 +9,26 @@ async def recent_app_submit():
         curs.execute(db_change('select data from other where name = "requires_approval"'))
         requires_approval = curs.fetchall()
         if requires_approval and requires_approval[0][0] != 'on':
-            div += get_lang(conn, 'approval_requirement_disabled')
+            div += await get_lang('approval_requirement_disabled')
 
         if flask.request.method == 'GET':
             curs.execute(db_change('select data from user_set where name = "application"'))
             db_data = curs.fetchall()
             if db_data:
                 div += '' + \
-                    get_lang(conn, 'all_register_num') + ' : ' + str(len(db_data)) + \
+                    await get_lang('all_register_num') + ' : ' + str(len(db_data)) + \
                     '<hr class="main_hr">' + \
                 ''
 
                 div += '''
                     <table id="main_table_set">
                         <tr id="main_table_top_tr">
-                            <td id="main_table_width_half">''' + get_lang(conn, 'id') + '''</td>
-                            <td id="main_table_width_half">''' + get_lang(conn, 'email') + '''</td>
+                            <td id="main_table_width_half">''' + await get_lang('id') + '''</td>
+                            <td id="main_table_width_half">''' + await get_lang('email') + '''</td>
                         </tr>
                         <tr id="main_table_top_tr">
-                            <td>''' + get_lang(conn, 'approval_question') + '''</td>
-                            <td>''' + get_lang(conn, 'answer') + '''</td>
+                            <td>''' + await get_lang('approval_question') + '''</td>
+                            <td>''' + await get_lang('answer') + '''</td>
                         </tr>                        
                 '''
 
@@ -70,12 +70,12 @@ async def recent_app_submit():
                                             id="opennamu_save_button"
                                             name="approve" 
                                             value="''' + application['id'] + '''">
-                                        ''' + get_lang(conn, 'approve') + '''
+                                        ''' + await get_lang('approve') + '''
                                     </button>
                                     <button type="submit" 
                                             name="decline" 
                                             value="''' + application['id'] + '''">
-                                        ''' + get_lang(conn, 'decline') + '''
+                                        ''' + await get_lang('decline') + '''
                                     </button>
                                 </td>
                             </tr>
@@ -84,12 +84,12 @@ async def recent_app_submit():
 
                 div += '</table>'
             else:
-                div += get_lang(conn, 'no_applications_now')
+                div += await get_lang('no_applications_now')
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'application_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(conn),
+                imp = [await get_lang('application_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = div,
-                menu = [['other', get_lang(conn, 'return')]]
+                menu = [['other', await get_lang('return')]]
             ))
         else:
             if await acl_check(tool = 'ban_auth', memo = 'app submit') == 1:

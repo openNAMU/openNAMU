@@ -8,9 +8,9 @@ async def list_image_file(arg_num = 1, do_type = 0):
 
         list_data = ''
         if do_type == 0:
-            list_data += '<a href="/list/image">(' + get_lang(conn, 'image') + ')</a>'
+            list_data += '<a href="/list/image">(' + await get_lang('image') + ')</a>'
         else:
-            list_data += '<a href="/list/file">(' + get_lang(conn, 'normal') + ')</a>'
+            list_data += '<a href="/list/file">(' + await get_lang('normal') + ')</a>'
         
         list_data += '<hr class="main_hr">'
 
@@ -36,7 +36,7 @@ async def list_image_file(arg_num = 1, do_type = 0):
                 render_data += '||\n'
                 render_data += sub_data + '||'
 
-            end_data = render_set(conn, 
+            end_data = await render_set(conn, 
                 doc_name = '',
                 doc_data = render_data,
                 data_type = 'view',
@@ -54,12 +54,12 @@ async def list_image_file(arg_num = 1, do_type = 0):
             list_data += '</ul>'
 
         if do_type == 0:
-            list_data += get_next_page_bottom(conn, '/list/file/{}', arg_num, data_list)
+            list_data += await get_next_page_bottom('/list/file/{}', arg_num, data_list)
         else:
-            list_data += get_next_page_bottom(conn, '/list/image/{}', arg_num, data_list)
+            list_data += await get_next_page_bottom('/list/image/{}', arg_num, data_list)
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'image_file_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+        return easy_minify(flask.render_template(await skin_check(conn),
+            imp = [await get_lang('image_file_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = list_data,
-            menu = [['other', get_lang(conn, 'return')]]
+            menu = [['other', await get_lang('return')]]
         ))

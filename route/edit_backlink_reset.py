@@ -7,7 +7,7 @@ async def edit_backlink_reset(name = 'Test'):
         curs.execute(db_change("select data from data where title = ?"), [name])
         old = curs.fetchall()
         if old:
-            render_set(conn, 
+            await render_set(conn, 
                 doc_name = name,
                 doc_data = old[0][0],
                 data_type = 'backlink'
