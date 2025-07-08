@@ -65,7 +65,7 @@ async def main_setting_external():
                 else:
                     re_ver += '<option value="' + i + '">' + re_ver_list[i] + '</option>'
 
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [await get_lang('ext_api_req_set'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = await render_simple_set('''
                     <form method="post">

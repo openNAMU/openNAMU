@@ -4,7 +4,7 @@ from .tool.func import *
 
 async def api_skin_info(name = ''):
     with get_db_connect() as conn:
-        name = await skin_check(conn) if name == '' else './views/' + name + '/index.html'
+        name = await skin_check() if name == '' else './views/' + name + '/index.html'
 
         if not flask.request.args.get('all', None):
             json_address = re.sub(r"(((?!\.|\/).)+)\.html$", "info.json", name)
@@ -25,7 +25,7 @@ async def api_skin_info(name = ''):
                 "Before Namu" : "https://raw.githubusercontent.com/openNAMU/openNAMU-Skin-Before_Namu/master/info.json"
             }
 
-            for i in await load_skin(await skin_check(conn, 1), 1):
+            for i in await load_skin(await skin_check(1), 1):
                 json_address = re.sub(r"(((?!\.|\/).)+)\.html$", "info.json", './views/' + i + '/index.html')
                 try:
                     json_data = json_loads(open(json_address, encoding='utf8').read())
@@ -33,7 +33,7 @@ async def api_skin_info(name = ''):
                     json_data = None
 
                 if json_data:
-                    if i == await skin_check(conn, 1):
+                    if i == await skin_check(1):
                         json_data = {**json_data, **{ "main" : "true" }}
 
                     if "info_link" in json_data:

@@ -4,7 +4,7 @@ async def user_setting_head_reset():
     with get_db_connect() as conn:
         curs = conn.cursor()
 
-        skin_name = await skin_check(conn, 1)
+        skin_name = await skin_check(1)
         ip = ip_check()
 
         if flask.request.method == 'POST':

@@ -35,7 +35,7 @@ async def vote_list(list_type = 'normal', num = 1):
         else:
             data += await get_next_page_bottom('/vote/list/close/{}', num, data_list)
 
-        return easy_minify(flask.render_template(await skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(),
             imp = [await get_lang('vote_list'), await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
             data = data,
             menu = [['other', await get_lang('return')]] + menu

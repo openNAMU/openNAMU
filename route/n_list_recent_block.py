@@ -16,7 +16,7 @@ async def list_recent_block(user_name = 'Test', tool = 'all', num = 1, why = '')
         elif tool == 'admin':
             sub = '(' + await get_lang('admin') + ')'
 
-        return easy_minify(flask.render_template(await skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(),
             imp = [await get_lang('recent_ban'), await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
             data = '' + \
                 '<div id="opennamu_list_recent_block"></div>' + \

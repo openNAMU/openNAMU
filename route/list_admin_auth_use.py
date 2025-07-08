@@ -39,7 +39,7 @@ async def list_admin_auth_use(arg_num = 1, arg_search = 'normal'):
 
             arg_search = html.escape(arg_search) if arg_search != 'normal' else ''
 
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [await get_lang('authority_use_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">

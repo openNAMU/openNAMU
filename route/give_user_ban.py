@@ -131,7 +131,7 @@ async def give_user_ban(name = None, ban_type = ''):
             if await acl_check(tool = 'owner_auth', ip = ip) != 1:
                 owner_option = '<option value="private" ' + ('selected' if ban_type == 'private' else '') + '>' + await get_lang('private') + '</option>'
 
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [main_name, await wiki_set(), await wiki_custom(conn), wiki_css([now, 0])],
                 data = info_data + '''
                     <form method="post" ''' + action + '''>

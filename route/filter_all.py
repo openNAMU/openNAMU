@@ -87,7 +87,7 @@ async def filter_all(tool):
             div += '<hr class="main_hr">'
             div += '<a href="/filter/' + tool + '/add">(' + await get_lang('add') + ')</a>'
 
-        return easy_minify(flask.render_template(await skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(),
             imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = div,
             menu = [['manager/1', await get_lang('return')]]

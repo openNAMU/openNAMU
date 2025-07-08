@@ -354,7 +354,7 @@ async def edit(name = 'Test', section = 0, do_type = ''):
             sub_menu = ' (' + str(section) + ')' if section != '' else ''
             sub_title = '(' + await get_lang('edit_request') + ')' if edit_req_mode == 1 else '(' + await get_lang('edit') + ')'
 
-            return easy_minify(flask.render_template(await skin_check(conn), 
+            return easy_minify(flask.render_template(await skin_check(), 
                 imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css([sub_title + sub_menu, 0])],
                 data = editor_top_text + '''
                     <form method="post">

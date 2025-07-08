@@ -15,7 +15,7 @@ async def bbs_in(bbs_num = 1, page = 1):
     
         bbs_name = db_data[0][0]
 
-        return easy_minify(flask.render_template(await skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(),
             imp = [bbs_name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('bbs') + ') (' + str(page) + ')', 0])],
             data = '' + \
                 '<div id="opennamu_bbs_in"></div>' + \

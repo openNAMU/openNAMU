@@ -213,7 +213,7 @@ async def edit_move(name):
             owner_auth = await acl_check(tool = 'owner_auth')
             owner_auth = 1 if owner_auth == 0 else 0
 
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('move') + ')', 0])],
                 data = '''
                     <form method="post">

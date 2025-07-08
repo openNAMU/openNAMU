@@ -25,7 +25,7 @@ async def list_long_page(tool = 'long_page', arg_num = 1):
 
         div += '</ul>' + await get_next_page_bottom('/list/document/' + ('long' if title == 'long_page' else 'short') + '/{}', arg_num, n_list)
 
-        return easy_minify(flask.render_template(await skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(),
             imp = [await get_lang(title), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = div,
             menu = [['other', await get_lang('return')]]

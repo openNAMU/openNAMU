@@ -155,7 +155,7 @@ async def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type 
             if plus_id:
                 name += ', ' + plus_id
 
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('check') + ')', 0])],
                 data = div,
                 menu = [['manager', await get_lang('return')]]
@@ -184,7 +184,7 @@ async def list_user_check(name = 'test', plus_name = None, arg_num = 1, do_type 
                 '<a href="/list/user/check/' + url_pas(name) + '/normal">(' + await get_lang('check') + ')</a>' + \
             '' + div
 
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('simple_check') + ')', 0])],
                 data = div,
                 menu = [['check/' + url_pas(name), await get_lang('return')]]

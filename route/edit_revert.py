@@ -74,7 +74,7 @@ async def edit_revert(name, num):
             else:
                 preview = ''
             
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(r' + str(num) + ') (' + await get_lang('revert') + ')', 0])],
                 data = '''
                     <form method="post">

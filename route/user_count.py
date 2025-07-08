@@ -58,7 +58,7 @@ async def user_count(name = None):
             data_yesterday += 1
 
         # 한글 지원 필요
-        return easy_minify(flask.render_template(await skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(),
             imp = [await get_lang('count'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = '''
                 <ul>

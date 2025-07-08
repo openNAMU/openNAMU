@@ -60,7 +60,7 @@ async def user_setting_head(skin_name = ''):
                 start + \
             ''
 
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [await get_lang(data = 'user_head', safe = 1), await wiki_set(), await wiki_custom(conn), wiki_css(['(HTML)' + sub_name, 0])],
                 data = start + '''
                     <form method="post">

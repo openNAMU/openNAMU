@@ -124,7 +124,7 @@ async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
             else:
                 bbs_title = await get_lang('post_edit')
     
-            return easy_minify(flask.render_template(await skin_check(conn), 
+            return easy_minify(flask.render_template(await skin_check(), 
                 imp = [bbs_title, await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data =  editor_top_text + '''
                     <form method="post">                        

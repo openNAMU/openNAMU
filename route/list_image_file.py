@@ -58,7 +58,7 @@ async def list_image_file(arg_num = 1, do_type = 0):
         else:
             list_data += await get_next_page_bottom('/list/image/{}', arg_num, data_list)
 
-        return easy_minify(flask.render_template(await skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(),
             imp = [await get_lang('image_file_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = list_data,
             menu = [['other', await get_lang('return')]]

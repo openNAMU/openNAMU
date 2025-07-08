@@ -53,7 +53,7 @@ async def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
             else:
                 sub += ' (' + comment_num + ')'
 
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
                 data = await render_simple_set('''
                     <form method="post">

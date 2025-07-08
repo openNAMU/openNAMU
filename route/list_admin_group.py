@@ -27,7 +27,7 @@ async def list_admin_group():
             '<a href="/manager/8">(' + await get_lang('add') + ')</a>' + \
         ''
 
-        return easy_minify(flask.render_template(await skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(),
             imp = [await get_lang('admin_group_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = list_data,
             menu = [['manager', await get_lang('return')]]

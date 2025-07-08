@@ -56,7 +56,7 @@ async def main_setting_sitemap_set():
 
                     for_a += 1
 
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [await get_lang('sitemap_management'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     ''' + sitemap_list + '''

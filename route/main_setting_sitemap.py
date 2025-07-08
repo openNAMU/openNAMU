@@ -94,7 +94,7 @@ async def main_setting_sitemap(do_type = 0):
             else:
                 return ''
         else:
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [await get_lang('sitemap_manual_create'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">

@@ -28,7 +28,7 @@ async def topic_tool_change(topic_num = 1):
 
             return redirect(conn, '/thread/' + topic_num)
         else:
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [await get_lang('topic_name_change'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <form method="post">

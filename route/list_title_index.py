@@ -58,7 +58,7 @@ async def list_title_index(num = 1):
         data += '</ul>' + await get_next_page_bottom('/list/document/all/{}', num, title_list)
         sub = ' (' + str(num) + ')'
 
-        return easy_minify(flask.render_template(await skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(),
             imp = [await get_lang('all_document_list'), await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
             data = data,
             menu = [['other', await get_lang('return')]]

@@ -90,7 +90,7 @@ async def edit_request(name = 'Test', do_type = ''):
 
             result = view_diff_do(old_data, edit_request_data, 'r' + doc_ver, await get_lang('edit_request'))
 
-            return easy_minify(flask.render_template(await skin_check(conn), 
+            return easy_minify(flask.render_template(await skin_check(), 
                 imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('edit_request_check') + ')', 0])],
                 data = '''
                     <div id="opennamu_get_user_info">''' + html.escape(edit_request_user) + '''</div>

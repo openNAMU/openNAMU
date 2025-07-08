@@ -16,7 +16,7 @@ async def recent_history_delete(name = 'Test', rev = 1):
 
             return redirect(conn, '/history/' + url_pas(name))
         else:
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('history_delete') + ') (r' + num + ')', 0])],
                 data = '''
                     <form method="post">

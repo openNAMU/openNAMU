@@ -268,7 +268,7 @@ async def filter_all_add(tool, name = None):
                     <input value="''' + html.escape(value) + '''" type="text" name="markup">
                 '''
 
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([get_sub, 0])],
                 data =  '''
                         <form method="post">

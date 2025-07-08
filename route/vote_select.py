@@ -71,7 +71,7 @@ async def vote_select(num = 1):
                 '</form>' + \
             ''
 
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [await get_lang('vote'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + num + ')', 0])],
                 data = data,
                 menu = [['vote', await get_lang('return')], ['vote/end/' + num, await get_lang('result')]]

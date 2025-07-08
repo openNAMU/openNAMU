@@ -251,7 +251,7 @@ async def user_challenge():
                 
             data_html = data_html_green + data_html_red
             
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [await get_lang('challenge_and_level_manage'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = data_html + '''
                     <form method="post">

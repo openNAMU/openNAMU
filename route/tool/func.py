@@ -1179,39 +1179,12 @@ def load_lang(data, safe = 0):
     except RuntimeError:
         return asyncio.run(get_lang(data, safe))
 
-async def skin_check(conn, set_n = 0):
-    curs = conn.cursor()
+async def skin_check(set_n = 0):
+    other_set = {}
+    other_set["set_n"] = str(set_n)
 
-    # 개편 필요?
-    skin_list = await load_skin('ringo', 1)
-    skin = skin_list[0]
-    ip = ip_check()
-    
-    user_need_skin = ''
-    if ip_or_user(ip) == 0:
-        curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
-        skin_exist = curs.fetchall()
-        if skin_exist:
-            user_need_skin = skin_exist[0][0]            
-    else:
-        if 'skin' in flask.session:
-            user_need_skin = flask.session['skin']
-
-    user_need_skin = '' if user_need_skin == 'default' else user_need_skin
-
-    if user_need_skin == '':
-        curs.execute(db_change('select data from other where name = "skin"'))
-        skin_exist = curs.fetchall()
-        if skin_exist:
-            user_need_skin = skin_exist[0][0]
-    
-    if user_need_skin != '' and user_need_skin in skin_list:
-        skin = user_need_skin
-
-    if set_n == 0:
-        return './views/' + skin + '/index.html'
-    else:
-        return skin
+    res = await python_to_golang('api_func_skin_name', other_set)
+    return res["data"]
     
 def cache_v():
     return '.cache_v288'
@@ -1292,7 +1265,7 @@ async def wiki_custom(conn):
     curs = conn.cursor()
 
     ip = ip_check()
-    skin_name = '_' + await skin_check(conn, 1)
+    skin_name = '_' + await skin_check(1)
 
     if ip_or_user(ip) == 0:
         user_icon = 1
@@ -2216,7 +2189,7 @@ async def re_error(conn, data):
         else:
             end = '<ul><li>' + await get_lang('authority_error') + '</li></ul>'
 
-        return easy_minify(flask.render_template(await skin_check(conn),
+        return easy_minify(flask.render_template(await skin_check(),
             imp = [await get_lang('error'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
             data = '<h2>' + await get_lang('error') + '</h2>' + end,
             menu = 0
@@ -2356,7 +2329,7 @@ async def re_error(conn, data):
             if flask.request.path != '/skin_set':
                 data += '<br>' + await get_lang('error_skin_set_old') + ' <a href="/skin_set">(' + await get_lang('go') + ')</a>'
 
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [await get_lang('skin_set'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '' + \
                     '<div id="main_skin_set">' + \
@@ -2369,7 +2342,7 @@ async def re_error(conn, data):
                 menu = [['change', await get_lang('user_setting')], ['change/skin_set/main', await get_lang('main_skin_set')]]
             ))
         else:
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '' + \
                     '<h2>' + sub_title + '</h2>' + \

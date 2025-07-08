@@ -60,7 +60,7 @@ async def user_setting_email():
             sql_d = curs.fetchall()
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
 
-            return easy_minify(flask.render_template(await skin_check(conn),
+            return easy_minify(flask.render_template(await skin_check(),
                 imp = [await get_lang('email'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                 data = '''
                     <a href="/filter/email_filter">(''' + await get_lang('email_filter_list') + ''')</a>

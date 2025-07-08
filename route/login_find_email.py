@@ -79,7 +79,7 @@ async def login_find_email(tool):
                 sql_d = curs.fetchall()
                 b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
         
-                return easy_minify(flask.render_template(await skin_check(conn),
+                return easy_minify(flask.render_template(await skin_check(),
                     imp = [await get_lang('password_search'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('email') + ')', 0])],
                     data = b_text + '''
                         <form method="post">
@@ -100,7 +100,7 @@ async def login_find_email(tool):
                 sql_d = curs.fetchall()
                 b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
         
-                return easy_minify(flask.render_template(await skin_check(conn),
+                return easy_minify(flask.render_template(await skin_check(),
                     imp = [await get_lang('email'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
                     data = '''
                         <a href="/filter/email_filter">(''' + await get_lang('email_filter_list') + ''')</a>

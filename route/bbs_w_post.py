@@ -209,7 +209,7 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                     </form>
                 '''
 
-                return easy_minify(flask.render_template(await skin_check(conn),
+                return easy_minify(flask.render_template(await skin_check(),
                     imp = [bbs_name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('bbs') + ')', 0])],
                     data = data,
                     menu = [['bbs/in/' + bbs_num_str, await get_lang('return')], ['bbs/edit/' + bbs_num_str + '/' + post_num_str, await get_lang('edit')], ['bbs/tool/' + bbs_num_str + '/' + post_num_str, await get_lang('tool')]]
