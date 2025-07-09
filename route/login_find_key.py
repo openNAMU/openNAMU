@@ -30,7 +30,7 @@ async def login_find_key():
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
             
             return easy_minify(flask.render_template(await skin_check(),
-                    imp = [await get_lang('reset_user_ok'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                    imp = [await get_lang('reset_user_ok'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                     data = '' + \
                         b_text + \
                         await get_lang('id') + ' : ' + user_id + \
@@ -41,7 +41,7 @@ async def login_find_key():
                 ))
         else:
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('password_search'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                imp = [await get_lang('password_search'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <input placeholder="''' + await get_lang('key') + '''" name="key" type="password">

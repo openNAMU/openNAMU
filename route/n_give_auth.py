@@ -9,7 +9,7 @@ async def give_auth(user_name = ''):
             sub = '(' + await get_lang('authorize') + ')'
 
         return easy_minify(flask.render_template(await skin_check(),
-            imp = [user_name, await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
+            imp = [user_name, await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],
             data = '' + \
                 '<div id="opennamu_give_auth"></div>' + \
                 '<script defer src="/views/main_css/js/route/give_auth.js' + cache_v() + '"></script>' + \

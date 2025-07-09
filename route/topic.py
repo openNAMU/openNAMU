@@ -134,7 +134,7 @@ async def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             shortcut += '</div>'
 
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('discussion') + ')', 0])],
+                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('discussion') + ')', 0])],
                 data = '''
                     <script defer src="/views/main_css/js/route/topic.js''' + cache_v() + '''"></script>
                     <style id="opennamu_list_hidden_style">.opennamu_list_hidden { display: none; }</style>

@@ -30,7 +30,7 @@ async def recent_history_add(name = 'Test', do_type = ''):
             return redirect(conn, '/history/' + url_pas(name))
         else:            
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('history_add'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + name + ')', 0])],
+                imp = [await get_lang('history_add'), await wiki_set(), await wiki_custom(), wiki_css(['(' + name + ')', 0])],
                 data = '''
                     <form method="post">
                         <input placeholder="''' + await get_lang('why') + '''" name="send">

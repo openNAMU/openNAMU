@@ -56,7 +56,7 @@ async def user_info(name = ''):
             admin_menu = ''
                 
         return easy_minify(flask.render_template(await skin_check(),
-            imp = [await get_lang('user_tool'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            imp = [await get_lang('user_tool'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <h2>''' + await get_lang('state') + '''</h2>
                 <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>

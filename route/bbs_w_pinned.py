@@ -36,7 +36,7 @@ async def bbs_w_pinned(bbs_num = '', post_num = ''):
             pinned = await get_lang('pinned') if not curs.fetchall() else await get_lang('pinned_release')
 
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('bbs_post_pinned'), await wiki_set(), await wiki_custom(conn), wiki_css(['(' + bbs_name + ')' + ' (' + post_num_str + ')', 0])],
+                imp = [await get_lang('bbs_post_pinned'), await wiki_set(), await wiki_custom(), wiki_css(['(' + bbs_name + ')' + ' (' + post_num_str + ')', 0])],
                 data = await render_simple_set('''
                     <form method="post">
                         <button type="submit">''' + pinned + '''</button>

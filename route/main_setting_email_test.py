@@ -15,13 +15,13 @@ async def main_setting_email_test():
                 data = await get_lang("error")
 
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang("email_test"), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                imp = [await get_lang("email_test"), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = data,
                 menu = [["setting/external", await get_lang('return')]]
             ))
         else:
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang("email_test"), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                imp = [await get_lang("email_test"), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <input name="title" placeholder="''' + await get_lang("title") + '''">

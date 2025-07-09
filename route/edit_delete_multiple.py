@@ -24,7 +24,7 @@ async def edit_delete_multiple():
             return redirect(conn, '/recent_change')
         else:
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('many_delete'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                imp = [await get_lang('many_delete'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <textarea class="opennamu_textarea_500" placeholder="''' + await get_lang('many_delete_help') + '''" name="content"></textarea>

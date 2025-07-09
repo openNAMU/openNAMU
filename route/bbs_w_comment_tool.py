@@ -24,7 +24,7 @@ async def bbs_w_comment_tool(bbs_num = '', post_num = '', comment_num = ''):
             '''
 
         return easy_minify(flask.render_template(await skin_check(),
-            imp = [await get_lang('bbs_comment_tool'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            imp = [await get_lang('bbs_comment_tool'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
             data = data,
             menu = [['bbs/w/' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '#' + url_pas(comment_num), await get_lang('return')]]
         ))

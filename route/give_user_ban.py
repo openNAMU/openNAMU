@@ -132,7 +132,7 @@ async def give_user_ban(name = None, ban_type = ''):
                 owner_option = '<option value="private" ' + ('selected' if ban_type == 'private' else '') + '>' + await get_lang('private') + '</option>'
 
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [main_name, await wiki_set(), await wiki_custom(conn), wiki_css([now, 0])],
+                imp = [main_name, await wiki_set(), await wiki_custom(), wiki_css([now, 0])],
                 data = info_data + '''
                     <form method="post" ''' + action + '''>
                         <h2>''' + await get_lang('method') + '''</h2>

@@ -103,7 +103,7 @@ async def user_setting():
                 sub_user_name = db_data[0][0] if db_data else ''
 
                 return easy_minify(flask.render_template(await skin_check(),
-                    imp = [await get_lang('user_setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                    imp = [await get_lang('user_setting'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
                             <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
@@ -170,7 +170,7 @@ async def user_setting():
                         div3 += '<option value="' + lang_data + '">' + see_data + '</option>'
 
                 return easy_minify(flask.render_template(await skin_check(),
-                    imp = [await get_lang('user_setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                    imp = [await get_lang('user_setting'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
                             <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>

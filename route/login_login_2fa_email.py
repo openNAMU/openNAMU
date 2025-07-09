@@ -45,7 +45,7 @@ async def login_login_2fa_email():
             return redirect(conn, '/user')
         else:
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('login'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                imp = [await get_lang('login'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data =  '''
                         <form method="post">
                             <input placeholder="''' + await get_lang('2fa_password') + '''" name="pw" type="password">

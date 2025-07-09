@@ -1261,85 +1261,12 @@ async def wiki_set():
 
     return data["data"]
 
-async def wiki_custom(conn):
-    curs = conn.cursor()
+async def wiki_custom():
+    other_set = {}
 
-    ip = ip_check()
-    skin_name = '_' + await skin_check(1)
+    data = await python_to_golang('api_func_wiki_custom', other_set)
 
-    if ip_or_user(ip) == 0:
-        user_icon = 1
-        user_name = ip
-
-        if 'head' in flask.session:
-            user_head = flask.session['head']
-        else:
-            curs.execute(db_change("select data from user_set where id = ? and name = 'custom_css'"), [ip])
-            db_data = curs.fetchall()
-            user_head = db_data[0][0] if db_data else ''
-
-            flask.session['head'] = db_data[0][0] if db_data else ''
-
-        if 'head' + skin_name in flask.session:
-            user_head += flask.session['head' + skin_name]
-        else:
-            curs.execute(db_change("select data from user_set where id = ? and name = ?"), [ip, 'custom_css' + skin_name])
-            db_data = curs.fetchall()
-            user_head += db_data[0][0] if db_data else ''
-
-            flask.session['head' + skin_name] = db_data[0][0] if db_data else ''
-        
-        curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
-        email = curs.fetchall()
-        email = email[0][0] if email else ''
-
-        if await acl_check(tool = 'all_admin_auth') != 1:
-            user_admin = '1'
-
-            curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
-            curs.execute(db_change('select acl from alist where name = ?'), [curs.fetchall()[0][0]])
-            user_acl = curs.fetchall()
-            user_acl_list = [for_a[0] for for_a in user_acl]
-            user_acl_list = user_acl_list if user_acl_list != [] else '0'
-        else:
-            user_admin = '0'
-            user_acl_list = '0'
-
-        curs.execute(db_change("select count(*) from user_notice where name = ? and readme = ''"), [ip])
-        count = curs.fetchall()
-        user_notice = str(count[0][0]) if count else '0'
-    else:
-        user_icon = 0
-        user_name = await get_lang('user')
-        email = ''
-        user_admin = '0'
-        user_acl_list = '0'
-        user_notice = '0'
-        user_head = flask.session['head'] if 'head' in flask.session else ''
-        user_head += flask.session['head' + skin_name] if 'head' + skin_name in flask.session else ''
-
-    curs.execute(db_change("select title from rd where title = ? and stop = '' limit 1"), ['user:' + ip])
-    user_topic = '1' if curs.fetchall() else '0'
-    
-    split_path = flask.request.path.split('/')
-    split_path = split_path[1:] if len(split_path) > 1 else 0
-
-    return [
-        '',
-        '',
-        user_icon,
-        user_head,
-        email,
-        user_name,
-        user_admin,
-        str((await ban_check())[0]),
-        user_notice,
-        user_acl_list,
-        ip,
-        user_topic,
-        split_path,
-        await level_check(ip)
-    ]
+    return data["data"]
 
 async def load_skin(data = '', set_n = 0, default = 0):
     # without_DB
@@ -2190,7 +2117,7 @@ async def re_error(conn, data):
             end = '<ul><li>' + await get_lang('authority_error') + '</li></ul>'
 
         return easy_minify(flask.render_template(await skin_check(),
-            imp = [await get_lang('error'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            imp = [await get_lang('error'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
             data = '<h2>' + await get_lang('error') + '</h2>' + end,
             menu = 0
         )), 401
@@ -2330,7 +2257,7 @@ async def re_error(conn, data):
                 data += '<br>' + await get_lang('error_skin_set_old') + ' <a href="/skin_set">(' + await get_lang('go') + ')</a>'
 
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('skin_set'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                imp = [await get_lang('skin_set'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '' + \
                     '<div id="main_skin_set">' + \
                         '<h2>' + await get_lang('error') + '</h2>' + \
@@ -2343,7 +2270,7 @@ async def re_error(conn, data):
             ))
         else:
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                imp = [title, await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '' + \
                     '<h2>' + sub_title + '</h2>' + \
                     '<ul>' + \

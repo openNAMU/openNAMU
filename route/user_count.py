@@ -59,7 +59,7 @@ async def user_count(name = None):
 
         # 한글 지원 필요
         return easy_minify(flask.render_template(await skin_check(),
-            imp = [await get_lang('count'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            imp = [await get_lang('count'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
             data = '''
                 <ul>
                     <li><a href="/record/''' + url_pas(that) + '''">''' + await get_lang('edit_record') + '''</a> : ''' + str(data) + '''</li>

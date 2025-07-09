@@ -189,7 +189,7 @@ async def bbs_w(bbs_num = '', tool = 'bbs', page = 1, name = ''):
         data += '</table>'
 
         return easy_minify(flask.render_template(await skin_check(),
-            imp = [title_name, await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
+            imp = [title_name, await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],
             data = data,
             menu = menu
         ))

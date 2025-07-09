@@ -15,7 +15,7 @@ async def recent_history_reset(name = 'Test'):
             return redirect(conn, '/history/' + url_pas(name))
         else:
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('history_reset') + ')', 0])],
+                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('history_reset') + ')', 0])],
                 data = '''
                     <form method="post">
                         <span>''' + await get_lang('delete_warning') + '''</span>

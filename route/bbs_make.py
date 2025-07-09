@@ -22,7 +22,7 @@ async def bbs_make():
             return redirect(conn, '/bbs/main')
         else:
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('bbs_make'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                imp = [await get_lang('bbs_make'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         <input placeholder="''' + await get_lang('bbs_name') + '''" name="bbs_name">

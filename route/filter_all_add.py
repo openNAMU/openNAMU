@@ -269,7 +269,7 @@ async def filter_all_add(tool, name = None):
                 '''
 
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([get_sub, 0])],
+                imp = [title, await wiki_set(), await wiki_custom(), wiki_css([get_sub, 0])],
                 data =  '''
                         <form method="post">
                             ''' + form_data + '''

@@ -109,7 +109,7 @@ async def give_admin_groups(name = 'test'):
             data += '</ul>'
 
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('admin_group') + ')', 0])],
+                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('admin_group') + ')', 0])],
                 data = '''
                     <form method="post">
                         ''' + data + '''

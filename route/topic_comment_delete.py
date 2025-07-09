@@ -16,7 +16,7 @@ async def topic_comment_delete(topic_num = 1, num = 1):
             return redirect(conn, '/thread/' + topic_num)
         else:
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('topic_delete'), await wiki_set(), await wiki_custom(conn), wiki_css(['(#' + num + ')', 0])],
+                imp = [await get_lang('topic_delete'), await wiki_set(), await wiki_custom(), wiki_css(['(#' + num + ')', 0])],
                 data = '''
                     <hr class="main_hr">
                     <form method="post">

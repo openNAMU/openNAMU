@@ -44,7 +44,7 @@ async def user_edit_filter(name = ''):
                 ''
 
             return easy_minify(flask.render_template(await skin_check(),
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + await get_lang('edit_filter') + ')', 0])],
+                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('edit_filter') + ')', 0])],
                 data = '' + \
                     '<a href="/filter/edit_filter">(' + await get_lang('edit_filter_rule') + ')</a>' + \
                     '<hr class="main_hr">' + \
