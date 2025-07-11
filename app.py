@@ -662,6 +662,7 @@ app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_w
 app.route('/w/<everything:name>')(view_w)
 
 app.route('/random')(view_random)
+app.route('/test')(view_render)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)

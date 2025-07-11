@@ -221,3 +221,5 @@ from route.go_api_w_set_reset import api_w_set_reset
 from route.go_api_w_page_view import api_w_page_view
 
 from route.go_main_func_easter_egg import main_func_easter_egg
+
+from route.go_view_render import view_render
