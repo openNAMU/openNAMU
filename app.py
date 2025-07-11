@@ -272,7 +272,7 @@ async def golang_process_check():
                 "url" : "test",
                 "data" : json_dumps(other_set_temp),
                 "session" : "{}",
-                "cookie" : "",
+                "cookies" : "",
                 "ip" : "127.0.0.1"
             }
 

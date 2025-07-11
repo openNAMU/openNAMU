@@ -151,14 +151,14 @@ async def python_to_golang(func_name, other_set = {}):
         other_set["session"] = json_dumps(dict(flask.session))
 
         if "Cookie" in flask.request.headers:
-            other_set["cookie"] = flask.request.headers["Cookie"]
+            other_set["cookies"] = flask.request.headers["Cookie"]
         else:
-            other_set["cookie"] = ""
+            other_set["cookies"] = ""
 
         other_set["ip"] = ip_check()
     else:
         other_set["session"] = "{}"
-        other_set["cookie"] = ""
+        other_set["cookies"] = ""
         other_set["ip"] = "127.0.0.1"
 
     port_data = global_some_set_do("setup_golang_port")
@@ -1235,17 +1235,18 @@ def wiki_css(data):
         global_some_set_do("main_css", data_css)
 
     # Darkmode
-    db_data = global_some_set_do("dark_main_css")
-    if db_data:
-        data_css_dark = db_data
-    else:
-        # Main CSS
-        data_css_dark += '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css' + data_css_ver + '">'
+    if flask.request.cookies.get('main_css_darkmode', '') == '1':
+        db_data = global_some_set_do("dark_main_css")
+        if db_data:
+            data_css_dark = db_data
+        else:
+            # Main CSS
+            data_css_dark += '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css' + data_css_ver + '">'
 
-        # External CSS
-        data_css_dark += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+            # External CSS
+            data_css_dark += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
 
-        global_some_set_do("dark_main_css", data_css_dark)
+            global_some_set_do("dark_main_css", data_css_dark)
 
     data = data[0:2] + ['', data_css] + data[2:3] + [data_css_dark] + data[3:]
 
