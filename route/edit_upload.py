@@ -144,7 +144,7 @@ async def edit_upload():
                     ''' + await get_lang('max_file_size') + ''' : ''' + str(file_max) + '''MB
                     <hr class="main_hr">
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
-                        <input multiple="multiple" type="file" name="f_data[]">
+                        <input multiple="multiple" type="file" name="f_data[]" id="file_input">
                         <hr class="main_hr">
                         <input placeholder="''' + await get_lang('file_name') + '''" name="f_name" value="''' + file_name + '''">
                         <hr class="main_hr">
@@ -157,6 +157,10 @@ async def edit_upload():
                         ''' + await captcha_get(conn) + '''
                         <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
+                    <hr class="main_hr">
+                    <div id="preview"></div>
+                    <script defer src="/views/main_css/js/func/file_preview.js''' + cache_v() + '''"></script>
+                    <script>window.addEventListener("DOMContentLoaded", function() { opennamu_file_preview(); });</script>
                 ''',
                 menu = [['other', await get_lang('return')]]
             ))
