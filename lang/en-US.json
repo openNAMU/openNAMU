@@ -62,6 +62,7 @@
     "delete_bottom_text" : "Delete textarea bottom notice",
     "revert_bottom_text" : "Revert textarea bottom notice",
     "warning_restart" : "Restarting... Press Refresh (F5)",
+    "random_list" : "Random document(s) list",
 
     "_comment_": "Common",
     "data": "Data",

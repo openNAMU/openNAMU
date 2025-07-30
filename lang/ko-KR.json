@@ -709,5 +709,6 @@
     "move_bottom_text" : "이동 하단 문구",
     "delete_bottom_text" : "삭제 하단 문구",
     "revert_bottom_text" : "되돌리기 하단 문구",
-    "warning_restart" : "재시작 중... 새로고침(F5)를 눌러주세요"
+    "warning_restart" : "재시작 중... 새로고침(F5)를 눌러주세요",
+    "random_list" : "랜덤 문서 목록"
 }
