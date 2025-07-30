@@ -140,7 +140,6 @@ from route.user_setting_skin_set_main import user_setting_skin_set_main
 from route.user_setting_top_menu import user_setting_top_menu
 from route.user_setting_user_name import user_setting_user_name
 
-from route.user_watch_list import user_watch_list
 from route.user_watch_list_name import user_watch_list_name
 
 from route.view_set import view_set
@@ -161,8 +160,6 @@ from route.vote_select import vote_select
 from route.n_list_recent_discuss import list_recent_discuss
 from route.n_list_recent_block import list_recent_block
 from route.n_list_user_check_submit import list_user_check_submit
-
-from route.n_w_watch_list import w_watch_list
 
 from route.n_topic_list import topic_list
 
@@ -223,3 +220,7 @@ from route.go_api_w_page_view import api_w_page_view
 from route.go_main_func_easter_egg import main_func_easter_egg
 
 from route.go_view_list_random import view_list_random
+
+from route.go_view_w_watch_list import view_w_watch_list
+
+from route.go_view_user_watch_list import view_user_watch_list

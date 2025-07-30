@@ -644,8 +644,8 @@ app.route('/xref_page/<int:num>/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
-app.route('/doc_watch_list/<int:num>/<everything:name>')(w_watch_list)
-app.route('/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(w_watch_list)
+app.route('/doc_watch_list/<int:num>/<everything:name>')(view_w_watch_list)
+app.route('/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(view_w_watch_list)
 
 app.route('/raw/<everything:name>')(view_w_raw)
 app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 'on' })(view_w_raw)
@@ -738,11 +738,11 @@ app.route('/alarm')(user_alarm)
 app.route('/alarm/delete')(user_alarm_delete)
 app.route('/alarm/delete/<int:id>')(user_alarm_delete)
 
-app.route('/watch_list', defaults = { 'tool' : 'watch_list' })(user_watch_list)
+app.route('/watch_list', defaults = { 'do_type' : 'watch_list' })(view_user_watch_list)
 app.route('/watch_list/<everything:name>', defaults = { 'tool' : 'watch_list' })(user_watch_list_name)
 app.route('/watch_list_from/<everything:name>', defaults = { 'tool' : 'watch_list_from' })(user_watch_list_name)
 
-app.route('/star_doc', defaults = { 'tool' : 'star_doc' })(user_watch_list)
+app.route('/star_doc', defaults = { 'do_type' : 'star_doc' })(view_user_watch_list)
 app.route('/star_doc/<everything:name>', defaults = { 'tool' : 'star_doc' })(user_watch_list_name)
 app.route('/star_doc_from/<everything:name>', defaults = { 'tool' : 'star_doc_from' })(user_watch_list_name)
 
