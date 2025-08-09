@@ -32,7 +32,7 @@ openNAMU is protected by [BSD 3-Clause License](./LICNESE). Please refer to the 
  * [highlight.js](https://highlightjs.org/)
  * [KaTeX](https://katex.org/)
  * [Feather](https://feathericons.com/)
- * [go.mod](https://github.com/openNAMU/openNAMU/blob/beta/route_go/go.mod)
+ * [GopenNAMU](https://github.com/openNAMU/GopenNAMU)
 
 ## Etc.
  * Owner rights are granted to the first registor.

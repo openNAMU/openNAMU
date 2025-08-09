@@ -32,7 +32,7 @@
  * [highlight.js](https://highlightjs.org/)
  * [KaTeX](https://katex.org/)
  * [Feather](https://feathericons.com/)
- * [go.mod](https://github.com/openNAMU/openNAMU/blob/beta/route_go/go.mod)
+ * [GopenNAMU](https://github.com/openNAMU/GopenNAMU)
 
 ### 도움을 주신 분들
  * [Team Croatia](https://github.com/TeamCroatia)
