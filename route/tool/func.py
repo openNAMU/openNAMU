@@ -1586,32 +1586,34 @@ async def captcha_get(conn):
         if recaptcha and recaptcha[0][0] != '' and sec_re and sec_re[0][0] != '':
             if not rec_ver or rec_ver[0][0] == '':
                 data += '' + \
-                    '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + \
+                    '<script defer src="https://www.google.com/recaptcha/api.js"></script>' + \
                     '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
                     '<hr class="main_hr">' + \
                 ''
             elif rec_ver[0][0] == 'v3':
                 data += '' + \
-                    '<script src="https://www.google.com/recaptcha/api.js?render=' + recaptcha[0][0] + '"></script>' + \
+                    '<script defer src="https://www.google.com/recaptcha/api.js?render=' + recaptcha[0][0] + '"></script>' + \
                     '<input type="hidden" id="g-recaptcha" name="g-recaptcha">' + \
                     '<script type="text/javascript">' + \
-                        'grecaptcha.ready(function() {' + \
-                            'grecaptcha.execute(\'' + recaptcha[0][0] + '\', {action: \'homepage\'}).then(function(token) {' + \
-                                'document.getElementById(\'g-recaptcha\').value = token;' + \
+                        'document.addEventListener(\'DOMContentLoaded\', function () {' + \
+                            'grecaptcha.ready(function() {' + \
+                                'grecaptcha.execute(\'' + recaptcha[0][0] + '\', {action: \'homepage\'}).then(function(token) {' + \
+                                    'document.getElementById(\'g-recaptcha\').value = token;' + \
+                                '});' + \
                             '});' + \
                         '});' + \
                     '</script>' + \
                 ''
             elif rec_ver[0][0] == 'cf':
                 data += '' + \
-                    '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha" async defer></script>' + \
+                    '<script defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha"></script>' + \
                     '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
                     '<hr class="main_hr">' + \
                 ''
             else:
                 # rec_ver[0][0] == 'h'
                 data += '''
-                    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+                    <script defer src="https://js.hcaptcha.com/1/api.js"></script>
                     <div class="h-captcha" data-sitekey="''' + recaptcha[0][0] + '''"></div>
                     <hr class="main_hr">
                 '''
