@@ -290,7 +290,7 @@ async def edit(name = 'Test', section = 0, do_type = ''):
                         data_section = '\n' + data + '\n'
                         
                         while 1:
-                            data_match_re = r'\n((={1,6})(#?) ?([^\n]+))\n'
+                            data_match_re = r'\n((={1,6})(#?) ?([^\n]+)=)\n'
                             data_match = re.search(data_match_re, data_section)
                             if not data_match:
                                 data_section = ''
