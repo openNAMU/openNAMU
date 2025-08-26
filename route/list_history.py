@@ -110,7 +110,8 @@ async def list_history(tool = 'history', num = 1, set_type = 'normal', doc_name 
 
                 right += f'<span style="display: none;" id="opennamu_history_tool_{for_a}">'
 
-                right += f'<a href="/raw_rev/{data[for_a][0]}/{doc_name}">{lang["raw"]}</a>'
+                right += f'<a href="/render/{data[for_a][0]}/{doc_name}">{lang["view"]}</a>'
+                right += f' | <a href="/raw_rev/{data[for_a][0]}/{doc_name}">{lang["raw"]}</a>'
                 right += f' | <a href="/revert/{data[for_a][0]}/{doc_name}">{lang["revert"]} (r{data[for_a][0]})</a>'
 
                 if int(data[for_a][0]) > 1:

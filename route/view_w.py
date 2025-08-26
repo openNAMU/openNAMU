@@ -4,7 +4,7 @@ from .go_api_w_raw import api_w_raw
 from .go_api_w_render import api_w_render
 from .go_api_w_page_view import api_w_page_view
 
-async def view_w(name = 'Test', do_type = ''):
+async def view_w(name = 'Test', do_type = '', doc_rev = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -180,7 +180,11 @@ async def view_w(name = 'Test', do_type = ''):
 
             name_view = name
 
-        doc_data = await api_w_raw(name)
+        if doc_rev == '':
+            doc_data = await api_w_raw(name)
+        else:
+            doc_data = await api_w_raw(name, str(doc_rev))
+
         if doc_data["response"] == "ok":
             render_data = await api_w_render(name, request_method = 'POST', request_data = {
                 'name' : name,
@@ -190,9 +194,12 @@ async def view_w(name = 'Test', do_type = ''):
         else:
             end_data = ''
 
-        asyncio.create_task(api_w_page_view(name))
-
-        curs.execute(db_change("select data from data where title = ?"), [name])
+        if doc_rev == '':
+            asyncio.create_task(api_w_page_view(name))
+            curs.execute(db_change("select data from data where title = ?"), [name])
+        else:
+            curs.execute(db_change("select data from history where title = ? and id = ?"), [name, doc_rev])
+            
         data = curs.fetchall()
 
         description = ''
@@ -353,6 +360,9 @@ async def view_w(name = 'Test', do_type = ''):
             watch_list = 0
 
         menu += [['doc_watch_list/1/' + url_pas(name), await get_lang('watchlist')]]
+
+        if doc_rev != '':
+            sub = '(' + str(doc_rev) + ')'
 
         return easy_minify(flask.render_template(await skin_check(),
             imp = [name_view, await wiki_set(), await wiki_custom(), wiki_css([sub, r_date, watch_list, description, view_count])],

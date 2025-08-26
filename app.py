@@ -658,6 +658,8 @@ app.route('/down/<everything:name>')(view_down)
 app.route('/acl_multiple', defaults = { 'multiple' : True }, methods = ['POST', 'GET'])(view_set)
 app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_set)
 
+app.route('/render/<int:doc_rev>/<everything:name>')(view_w)
+
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_w)
 app.route('/w/<everything:name>')(view_w)
 
