@@ -2077,6 +2077,8 @@ class class_do_render_namumark:
                             else:
                                 if wiki_data_syntax == 'asm' or wiki_data_syntax == 'assembly':
                                     wiki_data_syntax = 'x86arm'
+                                elif wiki_data_syntax == 'sh':
+                                    wiki_data_syntax = 'bash'
                         else:
                             wiki_data_syntax = 'python'
 
