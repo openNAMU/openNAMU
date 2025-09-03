@@ -338,7 +338,31 @@ class class_check_json:
         return data_db_set
 
     def do_check_mysql_json(self, data_db_set):
-        if os.path.exists(os.path.join('data', 'mysql.json')):
+        
+        def do_check_mysql_env():
+            env_keys = ['NAMU_DB_HOST', 'NAMU_DB_PORT', 'NAMU_DB_USER', 'NAMU_DB_PASSWORD']
+            vaild = False
+            for key in env_keys:
+                if os.getenv(key):
+                    vaild = True
+                    break
+            return vaild
+        
+        if do_check_mysql_env():
+            # ['user', 'password', 'host', 'port']
+            set_data_mysql = {}
+            set_data_mysql['host'] = os.getenv('NAMU_DB_HOST') if os.getenv('NAMU_DB_HOST') else 'localhost'
+            set_data_mysql['port'] = os.getenv('NAMU_DB_PORT') if os.getenv('NAMU_DB_PORT') else 3306
+
+            if not os.getenv('NAMU_DB_USER'):
+                raise Exception('Error : NAMU_DB_USER env not set')
+            else: 
+                set_data_mysql['user'] = os.getenv('NAMU_DB_USER')
+            if not os.getenv('NAMU_DB_PASSWORD'):
+                raise Exception('Error : NAMU_DB_PASSWORD env not set')
+            else:
+                set_data_mysql['password'] = os.getenv('NAMU_DB_PASSWORD')
+        elif os.path.exists(os.path.join('data', 'mysql.json')):
             db_set_list = ['user', 'password', 'host', 'port']
             with open(os.path.join('data', 'mysql.json'), encoding = 'utf8') as file_data:
                 set_data = json_loads(file_data.read())

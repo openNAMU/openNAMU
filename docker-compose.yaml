@@ -1,0 +1,39 @@
+services:
+    opennamu:
+        container_name: opennamu
+        image: opennamu:latest
+        build:
+            context: .
+            dockerfile: Dockerfile.ko
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./data:/app/data
+        environment:
+            NAMU_DB_TYPE: mysql
+            NAMU_DB: data
+            NAMU_DB_HOST: db
+            NAMU_DB_PORT: 3306
+            NAMU_DB_USER: opennamu
+            NAMU_DB_PASSWORD: opennamu_password
+            NAMU_HOST: 0.0.0.0
+            NAMU_PORT: 3000
+            NAMU_GOLANGPORT: 3001
+            NAMU_LANG: ko-KR
+            NAMU_MARKUP: namumark
+            NAMU_ENCRYPT: sha3
+            NAMU_DOCKER: O
+        depends_on:
+            - db
+
+    db:
+        container_name: opennamu_db
+        image: mysql:8.0
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: root_password
+            MYSQL_DATABASE: data
+            MYSQL_USER: opennamu
+            MYSQL_PASSWORD: opennamu_password
+        volumes:
+            - ./db_data:/var/lib/mysql
