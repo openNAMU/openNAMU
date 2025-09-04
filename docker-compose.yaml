@@ -18,11 +18,6 @@ services:
             NAMU_DB_PASSWORD: opennamu_password
             NAMU_LANG: ko-KR
             NAMU_MARKUP: namumark
-            # NAMU_HOST: 0.0.0.0
-            # NAMU_PORT: 3000
-            # NAMU_GOLANGPORT: 3001
-            # NAMU_ENCRYPT: sha3
-            # NAMU_DOCKER: O
         networks:
             - opennamu
         depends_on:
