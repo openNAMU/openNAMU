@@ -263,7 +263,7 @@ class get_db_connect:
             self.conn = None
             try_cnt = 1
             max_try = 30
-            while (self.conn == None and not (self.conn.open() if self.conn != None else False)) and try_cnt <= max_try:
+            while self.conn == None and try_cnt <= max_try:
                 try:
                     if self.init_mode:
                         self.conn = pymysql.connect(
@@ -287,15 +287,16 @@ class get_db_connect:
                 except pymysql.err.OperationalError as err:
                     if try_cnt + 1 > max_try:
                         raise err
-                    else:
-                        continue
                 finally:
-                    try_cnt += 1
-                    time.sleep(1)
+                    if self.conn == None:
+                        try_cnt += 1
+                        time.sleep(1)
 
             
             if self.conn == None:
                 raise Exception("Unable to connect database")
+
+        print('DB connected')
 
         return self.conn
     
