@@ -13,3 +13,4 @@ diff-match-patch
 pillow
 
 pymysql
+cryptography
