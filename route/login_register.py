@@ -83,31 +83,31 @@ async def login_register():
             curs.execute(db_change("select data from other where name = 'password_min_length'"))
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
-                password_min_length = ' (' + get_lang(conn, 'password_min_length') + ' : ' + db_data[0][0] + ')'
+                password_min_length = ' (' + await get_lang('password_min_length') + ' : ' + db_data[0][0] + ')'
             else:
                 password_min_length = ''
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'register'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang('register'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         ''' + contract + '''
 
-                        <input placeholder="''' + get_lang(conn, 'id') + '''" name="id" type="text">
+                        <input placeholder="''' + await get_lang('id') + '''" name="id" type="text">
                         <hr class="main_hr">
 
-                        <input placeholder="''' + get_lang(conn, 'password') + password_min_length + '''" name="pw" type="password">
+                        <input placeholder="''' + await get_lang('password') + password_min_length + '''" name="pw" type="password">
                         <hr class="main_hr">
 
-                        <input placeholder="''' + get_lang(conn, 'password_confirm') + '''" name="pw2" type="password">
+                        <input placeholder="''' + await get_lang('password_confirm') + '''" name="pw2" type="password">
                         <hr class="main_hr">
 
                         ''' + await captcha_get(conn) + '''
 
-                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
+                        <button type="submit">''' + await get_lang('save') + '''</button>
 
-                        ''' + http_warning(conn) + '''
+                        ''' + await http_warning() + '''
                     </form>
                 ''',
-                menu = [['user', get_lang(conn, 'return')]]
+                menu = [['user', await get_lang('return')]]
             ))

@@ -38,7 +38,7 @@ async def topic_tool_setting(topic_num = 1):
 
                 do_add_thread(conn, 
                     topic_num,
-                    get_lang(conn, t_state),
+                    await get_lang(t_state),
                     '1'
                 )
 
@@ -55,14 +55,14 @@ async def topic_tool_setting(topic_num = 1):
 
                 do_add_thread(conn, 
                     topic_num,
-                    get_lang(conn, t_state),
+                    await get_lang(t_state),
                     '1'
                 )
 
             if why_d != '':
                 do_add_thread(conn, 
                     topic_num,
-                    get_lang(conn, 'why') + ' : ' + why_d,
+                    await get_lang('why') + ' : ' + why_d,
                     '1'
                 )
             
@@ -76,9 +76,9 @@ async def topic_tool_setting(topic_num = 1):
             stop_d_list = ''
             agree_check = ''
             for_list = [
-                ['O', get_lang(conn, 'topic_close')],
-                ['S', get_lang(conn, 'topic_stop')],
-                ['', get_lang(conn, 'topic_normal')]
+                ['O', await get_lang('topic_close')],
+                ['S', await get_lang('topic_stop')],
+                ['', await get_lang('topic_normal')]
             ]
 
             for i in for_list:
@@ -89,28 +89,28 @@ async def topic_tool_setting(topic_num = 1):
 
             agree_check = 'checked="checked"' if rd_d[0][1] == 'O' else ''
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'topic_setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
-                data = render_simple_set(conn, '''
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang('topic_setting'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
+                data = await render_simple_set('''
                     <form method="post">
-                        <h2>''' + get_lang(conn, 'topic_progress') + '''</h2>
+                        <h2>''' + await get_lang('topic_progress') + '''</h2>
                         <select name="stop_d">
                             ''' + stop_d_list + '''
                         </select>
                         <hr class="main_hr">
-                        <label><input type="checkbox" name="agree" value="O" ''' + agree_check + '''> ''' + get_lang(conn, 'topic_change_agree') + '''</label>
+                        <label><input type="checkbox" name="agree" value="O" ''' + agree_check + '''> ''' + await get_lang('topic_change_agree') + '''</label>
 
-                        <h2>''' + get_lang(conn, 'topic_associate') + '''</h2>
-                        ''' + get_lang(conn, 'topic_link_vote') + ''' (''' + get_lang(conn, 'not_working') + ''')
+                        <h2>''' + await get_lang('topic_associate') + '''</h2>
+                        ''' + await get_lang('topic_link_vote') + ''' (''' + await get_lang('not_working') + ''')
                         <hr class="main_hr">
-                        <input placeholder="''' + get_lang(conn, 'topic_insert_vote_number') + '''" name="vote_number" type="number">
+                        <input placeholder="''' + await get_lang('topic_insert_vote_number') + '''" name="vote_number" type="number">
 
-                        <h2>''' + get_lang(conn, 'why') + '''</h2>
-                        <input placeholder="''' + get_lang(conn, 'why') + ''' (''' + get_lang(conn, 'markup_enabled') + ''')" name="why" type="text">
+                        <h2>''' + await get_lang('why') + '''</h2>
+                        <input placeholder="''' + await get_lang('why') + ''' (''' + await get_lang('markup_enabled') + ''')" name="why" type="text">
                         
                         <hr class="main_hr">
-                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
+                        <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 '''),
-                menu = [['thread/' + topic_num + '/tool', get_lang(conn, 'return')]]
+                menu = [['thread/' + topic_num + '/tool', await get_lang('return')]]
             ))

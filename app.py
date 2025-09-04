@@ -272,7 +272,7 @@ async def golang_process_check():
                 "url" : "test",
                 "data" : json_dumps(other_set_temp),
                 "session" : "{}",
-                "cookie" : "",
+                "cookies" : "",
                 "ip" : "127.0.0.1"
             }
 
@@ -462,7 +462,7 @@ def before_request_func():
                             history.go(0);
                         }
                     </script>
-                    <h2>''' + get_lang(conn, 'error_password_require_for_wiki_access') + '''</h2>
+                    <h2>''' + load_lang('error_password_require_for_wiki_access') + '''</h2>
                     <input type="password" id="wiki_access">
                     <input type="submit" onclick="opennamu_do_wiki_access();">
                 '''
@@ -644,8 +644,8 @@ app.route('/xref_page/<int:num>/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
-app.route('/doc_watch_list/<int:num>/<everything:name>')(w_watch_list)
-app.route('/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(w_watch_list)
+app.route('/doc_watch_list/<int:num>/<everything:name>')(view_w_watch_list)
+app.route('/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(view_w_watch_list)
 
 app.route('/raw/<everything:name>')(view_w_raw)
 app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 'on' })(view_w_raw)
@@ -658,10 +658,13 @@ app.route('/down/<everything:name>')(view_down)
 app.route('/acl_multiple', defaults = { 'multiple' : True }, methods = ['POST', 'GET'])(view_set)
 app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_set)
 
+app.route('/render/<int:doc_rev>/<everything:name>')(view_w)
+
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_w)
 app.route('/w/<everything:name>')(view_w)
 
 app.route('/random')(view_random)
+app.route('/list/random')(view_list_random)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
@@ -738,11 +741,11 @@ app.route('/alarm')(user_alarm)
 app.route('/alarm/delete')(user_alarm_delete)
 app.route('/alarm/delete/<int:id>')(user_alarm_delete)
 
-app.route('/watch_list', defaults = { 'tool' : 'watch_list' })(user_watch_list)
+app.route('/watch_list', defaults = { 'do_type' : 'watch_list' })(view_user_watch_list)
 app.route('/watch_list/<everything:name>', defaults = { 'tool' : 'watch_list' })(user_watch_list_name)
 app.route('/watch_list_from/<everything:name>', defaults = { 'tool' : 'watch_list_from' })(user_watch_list_name)
 
-app.route('/star_doc', defaults = { 'tool' : 'star_doc' })(user_watch_list)
+app.route('/star_doc', defaults = { 'do_type' : 'star_doc' })(view_user_watch_list)
 app.route('/star_doc/<everything:name>', defaults = { 'tool' : 'star_doc' })(user_watch_list_name)
 app.route('/star_doc_from/<everything:name>', defaults = { 'tool' : 'star_doc_from' })(user_watch_list_name)
 
@@ -874,9 +877,9 @@ app.route('/api/v2/history/<int:num>/<set_type>/<everything:doc_name>')(api_list
 app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>')(api_topic_list)
 
 app.route('/api/v2/bbs')(api_bbs_list)
-app.route('/api/v2/bbs/main')(api_bbs)
+app.route('/api/v2/bbs/main')(api_bbs_exter)
 app.route('/api/v2/bbs/set/<int:bbs_num>/<name>', methods = ['GET', 'PUT'])(api_bbs_w_set)
-app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs)
+app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs_exter)
 app.route('/api/v2/bbs/w/<sub_code>', defaults = { 'legacy' : '' })(api_bbs_w)
 app.route('/api/v2/bbs/w/tabom/<sub_code>', methods = ['GET', 'POST'])(api_bbs_w_tabom)
 app.route('/api/v2/bbs/w/comment/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment_exter)

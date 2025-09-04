@@ -15,7 +15,7 @@ async def user_alarm():
         data_list = curs.fetchall()
         if data_list:
             data = '' + \
-                '<a href="/alarm/delete">(' + get_lang(conn, 'delete') + ')</a>' + \
+                '<a href="/alarm/delete">(' + await get_lang('delete') + ')</a>' + \
                 '<hr class="main_hr">' + \
                 data + \
             ''
@@ -30,7 +30,7 @@ async def user_alarm():
                     '<li style="' + data_style + '">' + \
                         await ip_pas(data_split[0]) + (' | ' + ' | '.join(data_split[1:]) if len(data_split) > 1 else '') + \
                         ' | ' + data_one[1] + \
-                        ' <a href="/alarm/delete/' + url_pas(data_one[3]) + '">(' + get_lang(conn, 'delete') + ')</a>' + \
+                        ' <a href="/alarm/delete/' + url_pas(data_one[3]) + '">(' + await get_lang('delete') + ')</a>' + \
                     '</li>' + \
                 ''
 
@@ -38,11 +38,11 @@ async def user_alarm():
     
         data += '' + \
             '</ul>' + \
-            get_next_page_bottom(conn, '/alarm?num={}', num, data_list) + \
+            await get_next_page_bottom('/alarm?num={}', num, data_list) + \
         ''
     
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'notice'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+        return easy_minify(flask.render_template(await skin_check(),
+            imp = [await get_lang('notice'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
             data = data,
-            menu = [['user', get_lang(conn, 'return')]]
+            menu = [['user', await get_lang('return')]]
         ))

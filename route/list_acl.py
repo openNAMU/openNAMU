@@ -30,10 +30,10 @@ async def list_acl(arg_num = 1):
             ''
 
         div += '</ul>'
-        div += get_next_page_bottom(conn, '/list/document/acl/{}', arg_num, list_data)
+        div += await get_next_page_bottom('/list/document/acl/{}', arg_num, list_data)
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'acl_document_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+        return easy_minify(flask.render_template(await skin_check(),
+            imp = [await get_lang('acl_document_list'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
             data = div,
-            menu = [['other', get_lang(conn, 'return')]]
+            menu = [['other', await get_lang('return')]]
         ))

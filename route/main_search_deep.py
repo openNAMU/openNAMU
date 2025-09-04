@@ -18,15 +18,15 @@ async def main_search_deep(name = 'Test', search_type = 'title', num = 1):
             div = '''
                 <form method="post">
                     <input class="opennamu_width_200" name="search" value="''' + html.escape(name) + '''">
-                    <button type="submit">''' + get_lang(conn, 'search') + '''</button>
+                    <button type="submit">''' + await get_lang('search') + '''</button>
                 </form>
                 <hr class="main_hr">
             '''
 
             if search_type == 'title':
-                div += '<a href="/search_data_page/1/' + url_pas(name) + '">(' + get_lang(conn, 'search_document_data') + ')</a>'
+                div += '<a href="/search_data_page/1/' + url_pas(name) + '">(' + await get_lang('search_document_data') + ')</a>'
             else:
-                div += '<a href="/search_page/1/' + url_pas(name) + '">(' + get_lang(conn, 'search_document_name') + ')</a>'
+                div += '<a href="/search_page/1/' + url_pas(name) + '">(' + await get_lang('search_document_name') + ')</a>'
 
             name_new = ''
             if re.search(r'^분류:', name):
@@ -45,7 +45,7 @@ async def main_search_deep(name = 'Test', search_type = 'title', num = 1):
             div += '''
                 <ul>
                     <li>
-                        ''' + get_lang(conn, 'go') + ''' : <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + html.escape(name) + '''</a>
+                        ''' + await get_lang('go') + ''' : <a ''' + link_id + ' href="/w/' + url_pas(name) + '">' + html.escape(name) + '''</a>
                     </li>
                 </ul>
                 <ul>
@@ -58,12 +58,12 @@ async def main_search_deep(name = 'Test', search_type = 'title', num = 1):
             div += '</ul>'
             
             if search_type == 'title':
-                div += get_next_page_bottom(conn, '/search_page/{}/' + url_pas(name), num, all_list)
+                div += await get_next_page_bottom('/search_page/{}/' + url_pas(name), num, all_list)
             else:
-                div += get_next_page_bottom(conn, '/search_data_page/{}/' + url_pas(name), num, all_list)
+                div += await get_next_page_bottom('/search_data_page/{}/' + url_pas(name), num, all_list)
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'search') + ')', 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('search') + ')', 0])],
                 data = div,
                 menu = 0
             ))

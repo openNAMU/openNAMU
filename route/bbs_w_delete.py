@@ -47,20 +47,20 @@ async def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
             sub = '(' + bbs_name + ')'
             sub += ' (' + post_num_str + ')'
             
-            name = get_lang(conn, 'bbs_comment_delete')
+            name = await get_lang('bbs_comment_delete')
             if comment_num == '':
-                name = get_lang(conn, 'bbs_post_delete')
+                name = await get_lang('bbs_post_delete')
             else:
                 sub += ' (' + comment_num + ')'
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
-                data = render_simple_set(conn, '''
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [name, await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],
+                data = await render_simple_set('''
                     <form method="post">
-                        <span>''' + get_lang(conn, 'delete_warning') + '''</span>
+                        <span>''' + await get_lang('delete_warning') + '''</span>
                         <hr class="main_hr">
-                        <button type="submit">''' + get_lang(conn, 'delete') + '''</button>
+                        <button type="submit">''' + await get_lang('delete') + '''</button>
                     </form>
                 '''),
-                menu = [['bbs/w/' + bbs_num_str + '/' + post_num_str, get_lang(conn, 'return')]]
+                menu = [['bbs/w/' + bbs_num_str + '/' + post_num_str, await get_lang('return')]]
             ))

@@ -17,10 +17,10 @@ async def list_please(arg_num = 1):
                 '</li>' + \
             ''
 
-        div += '</ul>' + get_next_page_bottom(conn, '/list/document/need/{}', arg_num, data_list)
+        div += '</ul>' + await get_next_page_bottom('/list/document/need/{}', arg_num, data_list)
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'need_document'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+        return easy_minify(flask.render_template(await skin_check(),
+            imp = [await get_lang('need_document'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
             data = div,
-            menu = [['other', get_lang(conn, 'return')]]
+            menu = [['other', await get_lang('return')]]
         ))

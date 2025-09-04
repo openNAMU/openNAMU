@@ -10,33 +10,33 @@ async def bbs_w_tool(bbs_num = '', post_num = ''):
         post_num_str = str(post_num)
         
         data += '''
-            <h2>''' + get_lang(conn, 'tool') + '''</h2>
+            <h2>''' + await get_lang('tool') + '''</h2>
             <ul>
-                <li><a href="/bbs/raw/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + get_lang(conn, 'raw') + '''</a></li>
+                <li><a href="/bbs/raw/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + await get_lang('raw') + '''</a></li>
             </ul>
         '''
 
         if await acl_check('', 'bbs_auth', '', '') != 1:
             curs.execute(db_change('select set_data from bbs_data where set_code = ? and set_id = ? and set_name = "pinned"'), [post_num_str, bbs_num_str])
-            pinned = get_lang(conn, 'pinned') if not curs.fetchall() else get_lang(conn, 'pinned_release')
+            pinned = await get_lang('pinned') if not curs.fetchall() else await get_lang('pinned_release')
 
             data += '''
-                <h3>''' + get_lang(conn, 'admin') + '''</h3>
+                <h3>''' + await get_lang('admin') + '''</h3>
                 <ul>
-                    <!-- <li><a href="/bbs/blind/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + get_lang(conn, 'hide') + '''</a></li> -->
+                    <!-- <li><a href="/bbs/blind/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + await get_lang('hide') + '''</a></li> -->
                     <li><a href="/bbs/pinned/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + pinned + '''</a></li>
                 </ul>
             '''
 
             data += '''
-                <h3>''' + get_lang(conn, 'owner') + '''</h2>
+                <h3>''' + await get_lang('owner') + '''</h2>
                 <ul>
-                    <li><a href="/bbs/delete/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + get_lang(conn, 'delete') + '''</a></li>
+                    <li><a href="/bbs/delete/''' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str) + '">' + await get_lang('delete') + '''</a></li>
                 </ul>
             '''
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'bbs_post_tool'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+        return easy_minify(flask.render_template(await skin_check(),
+            imp = [await get_lang('bbs_post_tool'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
             data = data,
-            menu = [['bbs/w/' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str), get_lang(conn, 'return')]]
+            menu = [['bbs/w/' + url_pas(bbs_num_str) + '/' + url_pas(post_num_str), await get_lang('return')]]
         ))

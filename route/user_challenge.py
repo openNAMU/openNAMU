@@ -116,8 +116,8 @@ async def user_challenge():
             
             data_html_green += do_make_challenge_design(
                 '🌳',
-                get_lang(conn, 'challenge_title_register'), 
-                get_lang(conn, 'challenge_info_register', 1),
+                await get_lang('challenge_title_register'), 
+                await get_lang('challenge_info_register', 1),
                 1
             )
             
@@ -126,8 +126,8 @@ async def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '🔰',
-                get_lang(conn, 'challenge_title_first_contribute'), 
-                get_lang(conn, 'challenge_info_first_contribute', 1),
+                await get_lang('challenge_title_first_contribute'), 
+                await get_lang('challenge_info_first_contribute', 1),
                 disable
             )
             if disable == 1:
@@ -140,8 +140,8 @@ async def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '📝',
-                get_lang(conn, 'challenge_title_tenth_contribute'), 
-                get_lang(conn, 'challenge_info_tenth_contribute', 1),
+                await get_lang('challenge_title_tenth_contribute'), 
+                await get_lang('challenge_info_tenth_contribute', 1),
                 disable
             )
             if disable == 1:
@@ -154,8 +154,8 @@ async def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '🖊️',
-                get_lang(conn, 'challenge_title_hundredth_contribute'), 
-                get_lang(conn, 'challenge_info_hundredth_contribute', 1),
+                await get_lang('challenge_title_hundredth_contribute'), 
+                await get_lang('challenge_info_hundredth_contribute', 1),
                 disable
             )
             if disable == 1:
@@ -168,8 +168,8 @@ async def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '🏅',
-                get_lang(conn, 'challenge_title_thousandth_contribute'), 
-                get_lang(conn, 'challenge_info_thousandth_contribute', 1),
+                await get_lang('challenge_title_thousandth_contribute'), 
+                await get_lang('challenge_info_thousandth_contribute', 1),
                 disable
             )
             if disable == 1:
@@ -182,8 +182,8 @@ async def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '💬',
-                get_lang(conn, 'challenge_title_first_discussion'), 
-                get_lang(conn, 'challenge_info_first_discussion', 1),
+                await get_lang('challenge_title_first_discussion'), 
+                await get_lang('challenge_info_first_discussion', 1),
                 disable
             )
             if disable == 1:
@@ -196,8 +196,8 @@ async def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '💡',
-                get_lang(conn, 'challenge_title_tenth_discussion'), 
-                get_lang(conn, 'challenge_info_tenth_discussion', 1),
+                await get_lang('challenge_title_tenth_discussion'), 
+                await get_lang('challenge_info_tenth_discussion', 1),
                 disable
             )
             if disable == 1:
@@ -210,8 +210,8 @@ async def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '📢',
-                get_lang(conn, 'challenge_title_hundredth_discussion'), 
-                get_lang(conn, 'challenge_info_hundredth_discussion', 1),
+                await get_lang('challenge_title_hundredth_discussion'), 
+                await get_lang('challenge_info_hundredth_discussion', 1),
                 disable
             )
             if disable == 1:
@@ -224,8 +224,8 @@ async def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '📜',
-                get_lang(conn, 'challenge_title_thousandth_discussion'), 
-                get_lang(conn, 'challenge_info_thousandth_discussion', 1),
+                await get_lang('challenge_title_thousandth_discussion'), 
+                await get_lang('challenge_info_thousandth_discussion', 1),
                 disable
             )
             if disable == 1:
@@ -240,8 +240,8 @@ async def user_challenge():
             disable = 1 if db_data else 0
             data_html = do_make_challenge_design(
                 '☑️',
-                get_lang(conn, 'challenge_title_admin'), 
-                get_lang(conn, 'challenge_info_admin', 1),
+                await get_lang('challenge_title_admin'), 
+                await get_lang('challenge_info_admin', 1),
                 disable
             )
             if disable == 1:
@@ -251,14 +251,14 @@ async def user_challenge():
                 
             data_html = data_html_green + data_html_red
             
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'challenge_and_level_manage'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang('challenge_and_level_manage'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = data_html + '''
                     <form method="post">
                         <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
                         <hr class="main_hr">
-                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'reload') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + await get_lang('reload') + '''</button>
                     </form>
                 ''',
-                menu = [['user', get_lang(conn, 'return')]]
+                menu = [['user', await get_lang('return')]]
             ))

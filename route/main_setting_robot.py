@@ -36,18 +36,18 @@ async def main_setting_robot():
 
             return redirect(conn, '/setting/robot')
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = ['robots.txt', await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = ['robots.txt', await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
-                    <a href="/robots.txt">(''' + get_lang(conn, 'view') + ''')</a>
+                    <a href="/robots.txt">(''' + await get_lang('view') + ''')</a>
                     <hr class="main_hr">
                     <form method="post">
                         <textarea class="opennamu_textarea_500" name="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
-                        <label><input type="checkbox" name="default" ''' + default_data + '''> ''' + get_lang(conn, 'default') + '''</label>
+                        <label><input type="checkbox" name="default" ''' + default_data + '''> ''' + await get_lang('default') + '''</label>
                         <hr class="main_hr">
-                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['setting', get_lang(conn, 'return')]]
+                menu = [['setting', await get_lang('return')]]
             ))

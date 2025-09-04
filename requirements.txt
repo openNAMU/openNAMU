@@ -1,11 +1,13 @@
 pip
 
+h11
 flask
 flask[async]
 hypercorn
 
 aiohttp
 asyncio
+nest_asyncio
 requests
 
 diff-match-patch
