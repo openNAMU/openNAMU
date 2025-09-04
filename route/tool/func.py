@@ -254,25 +254,43 @@ class get_db_connect:
                 isolation_level = None
             )
         else:
-            if self.init_mode:
-                self.conn = pymysql.connect(
-                    host = self.db_set['db_mysql_host'],
-                    user = self.db_set['db_mysql_user'],
-                    password = self.db_set['db_mysql_pw'],
-                    charset = 'utf8mb4',
-                    port = int(self.db_set['db_mysql_port']),
-                    autocommit = True
-                )
-            else:
-                self.conn = pymysql.connect(
-                    host = self.db_set['db_mysql_host'],
-                    user = self.db_set['db_mysql_user'],
-                    password = self.db_set['db_mysql_pw'],
-                    charset = 'utf8mb4',
-                    port = int(self.db_set['db_mysql_port']),
-                    autocommit = True,
-                    db = self.db_set['db_name']
-                )
+            # try connect
+            print('Wait for DB connection...')
+
+            self.conn = None
+            try_cnt = 1
+            while (self.conn == None and not (self.conn.open() if self.conn != None else False)) and try_cnt <= 5:
+                try:
+                    if self.init_mode:
+                        self.conn = pymysql.connect(
+                            host = self.db_set['db_mysql_host'],
+                            user = self.db_set['db_mysql_user'],
+                            password = self.db_set['db_mysql_pw'],
+                            charset = 'utf8mb4',
+                            port = int(self.db_set['db_mysql_port']),
+                            autocommit = True
+                        )
+                    else:
+                        self.conn = pymysql.connect(
+                            host = self.db_set['db_mysql_host'],
+                            user = self.db_set['db_mysql_user'],
+                            password = self.db_set['db_mysql_pw'],
+                            charset = 'utf8mb4',
+                            port = int(self.db_set['db_mysql_port']),
+                            autocommit = True,
+                            db = self.db_set['db_name']
+                        )
+                except pymysql.err.OperationalError as err:
+                    if try_cnt + 1 > 5:
+                        raise err
+                    else:
+                        time.sleep(0.5)
+                        continue
+                finally:
+                    try_cnt += 1
+            
+            if self.conn == None:
+                raise Exception("Unable to connect database")
 
         return self.conn
     
@@ -374,8 +392,7 @@ class class_check_json:
                     break
 
             set_data_mysql = set_data
-
-        if not os.path.exists(os.path.join('data', 'mysql.json')):
+        elif not os.path.exists(os.path.join('data', 'mysql.json')):
             set_data_mysql = {}
 
             print('DB user ID : ', end = '')
