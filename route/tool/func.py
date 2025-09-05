@@ -142,36 +142,35 @@ def global_some_set_do(set_name, data = None):
         return None
 
 async def python_to_golang(func_name, other_set = {}):    
-    other_set = {
-        "url" : func_name,
-        "data" : json_dumps(other_set)
-    }
-
+    headers = {}
     if flask.has_request_context():
-        other_set["session"] = json_dumps(dict(flask.session))
-
         if "Cookie" in flask.request.headers:
-            other_set["cookies"] = flask.request.headers["Cookie"]
-        else:
-            other_set["cookies"] = ""
+            headers["Cookie"] = flask.request.headers["Cookie"]
 
-        other_set["ip"] = ip_check()
-    else:
-        other_set["session"] = "{}"
-        other_set["cookies"] = ""
-        other_set["ip"] = "127.0.0.1"
+        headers["X-Forwarded-For"] = ip_check()
 
     port_data = global_some_set_do("setup_golang_port")
 
-    async with aiohttp.ClientSession() as session:
-        while 1:
-            async with session.post('http://localhost:' + port_data + '/', data = json_dumps(other_set)) as res:
-                data = await res.json()
+    func_to_normal_url = {
+        "view_list_random" : "/list/random",
+    }
 
-                if "response" in data and data["response"] == "error":
-                    raise Exception(f"API returned error: {data}")
-                else:
-                    return data
+    if func_name in func_to_normal_url:
+        async with aiohttp.ClientSession() as session:
+            async with session.post('http://localhost:' + port_data + '/' + func_name, data = json_dumps(other_set), headers = headers) as res:
+                data = await res.texts()
+
+                return data
+    else:
+        async with aiohttp.ClientSession() as session:
+            while 1:
+                async with session.post('http://localhost:' + port_data + '/' + func_name, data = json_dumps(other_set), headers = headers) as res:
+                    data = await res.json()
+
+                    if "response" in data and data["response"] == "error":
+                        raise Exception(f"API returned error: {data}")
+                    else:
+                        return data
                 
 async def opennamu_make_list(left = '', right = '', bottom = '', class_name = ''):
     data_html = f'<span class="{class_name}">'
