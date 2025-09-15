@@ -25,12 +25,15 @@ print('Skin set version : ' + version_list['s_ver'])
 
 # Init-PIP_Install
 data_up_date = 1
-if os.path.exists(os.path.join('data', 'version.json')):
+if os.path.exists(os.path.join('data', 'version.json')): 
     with open(os.path.join('data', 'version.json'), encoding = 'utf8') as file_data:
         data_load_ver = file_data.read()
     
     if data_load_ver == version_list['r_ver']:
         data_up_date = 0
+
+if os.getenv('NAMU_DOCKER') == 'O': # skip update check when run at docker
+    data_up_date = 0
 
 if data_up_date == 1:
     with open(os.path.join('data', 'version.json'), 'w', encoding = 'utf8') as f:
@@ -254,25 +257,46 @@ class get_db_connect:
                 isolation_level = None
             )
         else:
-            if self.init_mode:
-                self.conn = pymysql.connect(
-                    host = self.db_set['db_mysql_host'],
-                    user = self.db_set['db_mysql_user'],
-                    password = self.db_set['db_mysql_pw'],
-                    charset = 'utf8mb4',
-                    port = int(self.db_set['db_mysql_port']),
-                    autocommit = True
-                )
-            else:
-                self.conn = pymysql.connect(
-                    host = self.db_set['db_mysql_host'],
-                    user = self.db_set['db_mysql_user'],
-                    password = self.db_set['db_mysql_pw'],
-                    charset = 'utf8mb4',
-                    port = int(self.db_set['db_mysql_port']),
-                    autocommit = True,
-                    db = self.db_set['db_name']
-                )
+            # try connect
+            print('Wait for DB connection...')
+
+            self.conn = None
+            try_cnt = 1
+            max_try = 30
+            while self.conn == None and try_cnt <= max_try:
+                try:
+                    if self.init_mode:
+                        self.conn = pymysql.connect(
+                            host = self.db_set['db_mysql_host'],
+                            user = self.db_set['db_mysql_user'],
+                            password = self.db_set['db_mysql_pw'],
+                            charset = 'utf8mb4',
+                            port = int(self.db_set['db_mysql_port']),
+                            autocommit = True
+                        )
+                    else:
+                        self.conn = pymysql.connect(
+                            host = self.db_set['db_mysql_host'],
+                            user = self.db_set['db_mysql_user'],
+                            password = self.db_set['db_mysql_pw'],
+                            charset = 'utf8mb4',
+                            port = int(self.db_set['db_mysql_port']),
+                            autocommit = True,
+                            db = self.db_set['db_name']
+                        )
+                except pymysql.err.OperationalError as err:
+                    if try_cnt + 1 > max_try:
+                        raise err
+                finally:
+                    if self.conn == None:
+                        try_cnt += 1
+                        time.sleep(1)
+
+            
+            if self.conn == None:
+                raise Exception("Unable to connect database")
+
+        print('DB connected')
 
         return self.conn
     
@@ -344,7 +368,31 @@ class class_check_json:
         return data_db_set
 
     def do_check_mysql_json(self, data_db_set):
-        if os.path.exists(os.path.join('data', 'mysql.json')):
+        
+        def do_check_mysql_env():
+            env_keys = ['NAMU_DB_HOST', 'NAMU_DB_PORT', 'NAMU_DB_USER', 'NAMU_DB_PASSWORD']
+            vaild = False
+            for key in env_keys:
+                if os.getenv(key):
+                    vaild = True
+                    break
+            return vaild
+        
+        if do_check_mysql_env():
+            # ['user', 'password', 'host', 'port']
+            set_data_mysql = {}
+            set_data_mysql['host'] = os.getenv('NAMU_DB_HOST') if os.getenv('NAMU_DB_HOST') else 'localhost'
+            set_data_mysql['port'] = os.getenv('NAMU_DB_PORT') if os.getenv('NAMU_DB_PORT') else 3306
+
+            if not os.getenv('NAMU_DB_USER'):
+                raise Exception('Error : NAMU_DB_USER env not set')
+            else: 
+                set_data_mysql['user'] = os.getenv('NAMU_DB_USER')
+            if not os.getenv('NAMU_DB_PASSWORD'):
+                raise Exception('Error : NAMU_DB_PASSWORD env not set')
+            else:
+                set_data_mysql['password'] = os.getenv('NAMU_DB_PASSWORD')
+        elif os.path.exists(os.path.join('data', 'mysql.json')):
             db_set_list = ['user', 'password', 'host', 'port']
             with open(os.path.join('data', 'mysql.json'), encoding = 'utf8') as file_data:
                 set_data = json_loads(file_data.read())
@@ -356,8 +404,7 @@ class class_check_json:
                     break
 
             set_data_mysql = set_data
-
-        if not os.path.exists(os.path.join('data', 'mysql.json')):
+        elif not os.path.exists(os.path.join('data', 'mysql.json')):
             set_data_mysql = {}
 
             print('DB user ID : ', end = '')

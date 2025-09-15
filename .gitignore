@@ -37,3 +37,8 @@ route_go/bin/*
 
 sitemap.xml
 sitemap_0.xml
+
+*_data
+
+venv
+.env

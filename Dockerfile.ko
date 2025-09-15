@@ -1,22 +1,26 @@
-FROM python:3.11.10-slim
+FROM python:3.11
 
 MAINTAINER 2du <min08101@naver.com>
 MAINTAINER hoparkgo9ma <me@ho9.me>
 
-ENV NAMU_DB_TYPE sqlite
-ENV NAMU_DB data
-ENV NAMU_HOST 0.0.0.0
-ENV NAMU_PORT 3000
-ENV NAMU_GOLANGPORT 3001
-ENV NAMU_LANG ko-KR
-ENV NAMU_MARKUP namumark
-ENV NAMU_ENCRYPT sha3
-ENV NAMU_DOCKER O
+
+ENV NAMU_DB_TYPE=sqlite
+ENV NAMU_DB=data
+ENV NAMU_HOST=0.0.0.0
+ENV NAMU_PORT=3000
+ENV NAMU_GOLANGPORT=3001
+ENV NAMU_LANG=ko-KR
+ENV NAMU_MARKUP=namumark
+ENV NAMU_ENCRYPT=sha3
+ENV NAMU_DOCKER=O
 
 ADD . /app
 WORKDIR /app
 
+# RUN echo "nameserver 1.1.1.1" >> /etc/resolv.conf
 RUN pip install -r requirements.txt
+RUN pip install -r requirements-optional.txt
+
 EXPOSE 3000
 
 CMD [ "python", "./app.py" ]
