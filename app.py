@@ -49,7 +49,7 @@ with get_db_connect(init_mode = True) as conn:
 
     if run_mode != 'dev':
         file_name = linux_exe_chmod()
-        local_file_path = os.path.join("route_go", "bin", file_name)
+        local_file_path = os.path.join("bin", file_name)
 
         if not (setup_tool == "normal" and os.path.exists(local_file_path)):
             if os.path.exists(local_file_path):
@@ -246,16 +246,16 @@ for for_a in server_set:
 
 if platform.system() == 'Linux':
     if platform.machine() in ["AMD64", "x86_64"]:
-        cmd = [os.path.join(".", "route_go", "bin", "main.amd64.bin")]
+        cmd = [os.path.join(".", "bin", "main.amd64.bin")]
     else:
-        cmd = [os.path.join(".", "route_go", "bin", "main.arm64.bin")]
+        cmd = [os.path.join(".", "bin", "main.arm64.bin")]
 elif platform.system() == 'Darwin':
-    cmd = [os.path.join(".", "route_go", "bin", "main.mac.arm64.bin")]
+    cmd = [os.path.join(".", "bin", "main.mac.arm64.bin")]
 else:
     if platform.machine() in ["AMD64", "x86_64"]:
-        cmd = [os.path.join(".", "route_go", "bin", "main.amd64.exe")]
+        cmd = [os.path.join(".", "bin", "main.amd64.exe")]
     else:
-        cmd = [os.path.join(".", "route_go", "bin", "main.arm64.exe")]
+        cmd = [os.path.join(".", "bin", "main.arm64.exe")]
         
 cmd += [server_set["golang_port"]]
 if run_mode != '':

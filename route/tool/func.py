@@ -867,7 +867,7 @@ def set_init_always(conn, ver_num, run_mode):
     # OS마다 실행 파일 설정
     exe_type = linux_exe_chmod()
     if platform.system() == 'Linux' or platform.system() == 'Darwin':
-        os.system('chmod +x ./route_go/bin/' + exe_type)
+        os.system('chmod +x ./bin/' + exe_type)
 
 def linux_exe_chmod():
     exe_type = ''
