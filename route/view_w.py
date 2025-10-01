@@ -220,7 +220,7 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
             if db_data and db_data[0][0] != '':
                 end_data = '<h2>' + await get_lang('error') + '</h2><ul><li>' + db_data[0][0] + '</li></ul>'
             else:
-                end_data = '<h2>' + await get_lang('error') + '</h2><ul><li>' + await get_lang('decument_404_error') + '</li></ul>'
+                end_data = '<h2>' + await get_lang('error') + '</h2><ul><li>' + await get_lang('document_404_error') + '</li></ul>'
 
             curs.execute(db_change('select ip from history where title = ? limit 1'), [name])
             db_data = curs.fetchall()

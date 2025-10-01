@@ -745,7 +745,7 @@
     "topic_long_error": "The discussions topic must not exceed 256 characters.",
     "email_error": "No one has this email.",
     "regex_error": "There is an error in the regular expression.",
-    "decument_404_error": "This document does not exist.",
+    "document_404_error": "This document does not exist.",
     "func_404_error": "This URL does not have the correct function.",
     "fast_edit_error": "You can edit another document after this period (Second(s)): ",
     "too_many_dec_error": "This feature is not supported because there are too many documents.",
