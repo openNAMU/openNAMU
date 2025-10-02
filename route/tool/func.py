@@ -723,7 +723,7 @@ async def update(conn, ver_num, set_data):
 
     if ver_num < 3500372:
         # ID 글자 확인 호환용
-        curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-힣0-9])', 'name', '', ''])
+        curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-ㅣ가-힣0-9])', 'name', '', ''])
 
     if ver_num < 3500373:
         select_data = {}
@@ -905,7 +905,7 @@ def set_init(conn):
         for i in [['smtp_server', 'smtp.gmail.com'], ['smtp_port', '587'], ['smtp_security', 'starttls']]:
             curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, '')"), [i[0], i[1]])
 
-    curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-힣0-9])', 'name', '', ''])
+    curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-ㅣ가-힣0-9])', 'name', '', ''])
 
 # Func-simple
 ## Func-simple-without_DB
