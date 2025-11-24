@@ -2,7 +2,7 @@ pip
 
 flask
 flask[async]
-hypercorn
+hypercorn==0.17.3
 
 aiohttp
 asyncio
