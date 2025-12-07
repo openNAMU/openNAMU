@@ -52,26 +52,26 @@ async def vote_add():
 
             acl_data += '</select>'
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'add_vote'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang('add_vote'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '' + \
                     '<form method="post">' + \
-                        '<input name="name" placeholder="' + get_lang(conn, 'name') + '">' + \
+                        '<input name="name" placeholder="' + await get_lang('name') + '">' + \
                         '<hr class="main_hr">' + \
-                        '<textarea class="opennamu_textarea_100" name="subject" placeholder="' + get_lang(conn, 'explanation') + '"></textarea>' + \
+                        '<textarea class="opennamu_textarea_100" name="subject" placeholder="' + await get_lang('explanation') + '"></textarea>' + \
                         '<hr class="main_hr">' + \
-                        '<textarea class="opennamu_textarea_500" name="data" placeholder="' + get_lang(conn, '1_line_1_q') + '"></textarea>' + \
+                        '<textarea class="opennamu_textarea_500" name="data" placeholder="' + await get_lang('1_line_1_q') + '"></textarea>' + \
                         '<hr class="main_hr">' + \
-                        '<label><input type="checkbox" value="Y" name="open_select"> ' + get_lang(conn, 'open_vote') + '</label>' + \
-                        '<h2>' + get_lang(conn, 'period') + '</h2>'
+                        '<label><input type="checkbox" value="Y" name="open_select"> ' + await get_lang('open_vote') + '</label>' + \
+                        '<h2>' + await get_lang('period') + '</h2>'
                         '<input type="date" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">' + \
                         '<hr class="main_hr">' + \
-                        '<label><input type="checkbox" value="Y" name="limitless"> ' + get_lang(conn, 'limitless') + '</label>' + \
-                        '<h2>' + get_lang(conn, 'acl') + '</h2>' + \
-                        acl_data + ' <a href="/acl/TEST#exp">(' + get_lang(conn, 'explanation') + ')</a>' + \
+                        '<label><input type="checkbox" value="Y" name="limitless"> ' + await get_lang('limitless') + '</label>' + \
+                        '<h2>' + await get_lang('acl') + '</h2>' + \
+                        acl_data + ' <a href="/acl/TEST#exp">(' + await get_lang('explanation') + ')</a>' + \
                         '<hr class="main_hr">' + \
-                        '<button type="submit">' + get_lang(conn, 'send') + '</buttom>' + \
+                        '<button type="submit">' + await get_lang('send') + '</buttom>' + \
                     '</form>' + \
                 '',
-                menu = [['vote', get_lang(conn, 'return')]]
+                menu = [['vote', await get_lang('return')]]
             ))

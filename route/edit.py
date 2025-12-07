@@ -4,26 +4,20 @@ from .tool.func import *
 
 from .view_set import view_set_markup
 
-def edit_render_set(name, content):
-    with get_db_connect() as conn:
-        render_set(conn, 
-            doc_name = name,
-            doc_data = content
+async def edit_timeout(conn, name, content, timeout = 3):
+    try:
+        await asyncio.wait_for(
+            render_set(
+                conn,
+                doc_name = name,
+                doc_data = content
+            ),
+            timeout = timeout
         )
 
-# https://stackoverflow.com/questions/13821156/timeout-function-using-threading-in-python-does-not-work
-def edit_timeout(func, args = (), timeout = 3):
-    pool = multiprocessing.Pool(processes = 1)
-    result = pool.apply_async(func, args = args)
-    try:
-        result.get(timeout = timeout)
-    except multiprocessing.TimeoutError:
-        pool.terminate()
-        return 1
-    else:
-        pool.close()
-        pool.join()
         return 0
+    except asyncio.TimeoutError:
+        return 1
         
 async def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', name = ''):
     curs = conn.cursor()
@@ -53,9 +47,9 @@ async def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', na
     elif do_type == 'bbs':
         do_type = 'edit'
             
-    p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else get_lang(conn, 'default_edit_help')
+    p_text = html.escape(sql_d[0][0]) if sql_d and sql_d[0][0] != '' else await get_lang('default_edit_help')
     
-    monaco_editor_top += '<a href="javascript:opennamu_do_editor_temp_save();">(' + get_lang(conn, 'load_temp_save') + ')</a> <a href="javascript:opennamu_do_editor_temp_save_load();">(' + get_lang(conn, 'load_temp_save_load') + ')</a>'
+    monaco_editor_top += '<a href="javascript:opennamu_do_editor_temp_save();">(' + await get_lang('load_temp_save') + ')</a> <a href="javascript:opennamu_do_editor_temp_save_load();">(' + await get_lang('load_temp_save_load') + ')</a>'
     monaco_editor_top += '<hr class="main_hr">'
     
     darkmode = flask.request.cookies.get('main_css_darkmode', '0')
@@ -70,8 +64,8 @@ async def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', na
 
     # 에디터 선택창
     monaco_editor_top += '<select onclick="do_sync_monaco_and_textarea();" id="opennamu_select_editor" onchange="opennamu_edit_turn_off_monaco();">'
-    monaco_editor_top += '<option value="default" ' + ('selected' if editor_display[0] == '' else '') + '>' + get_lang(conn, 'default') + '</option>'
-    monaco_editor_top += '<option value="monaco" ' + ('selected' if editor_display[1] == '' else '') + '>' + get_lang(conn, 'monaco_editor') + '</option>'
+    monaco_editor_top += '<option value="default" ' + ('selected' if editor_display[0] == '' else '') + '>' + await get_lang('default') + '</option>'
+    monaco_editor_top += '<option value="monaco" ' + ('selected' if editor_display[1] == '' else '') + '>' + await get_lang('monaco_editor') + '</option>'
     monaco_editor_top += '</select> '
 
     # 문법 선택창
@@ -82,7 +76,7 @@ async def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', na
 
     textarea_size = 'opennamu_textarea_500' if do_type == 'edit' else 'opennamu_textarea_100'
 
-    out_field = await captcha_get(conn) + ip_warning(conn) + addon
+    out_field = await captcha_get(conn) + await ip_warning(conn) + addon
     if out_field != '':
         out_field += '<hr class="main_hr">'
 
@@ -91,7 +85,7 @@ async def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', na
         <div>
             ''' + monaco_editor_top + '''
             <hr class="main_hr">
-            ''' + edit_button(conn) + '''
+            ''' + await edit_button(conn) + '''
             <div id="opennamu_editor_user_button"></div>
         </div>
         
@@ -111,8 +105,8 @@ async def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', na
             });
         </script>
                         
-        <button id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">''' + get_lang(conn, 'send') + '''</button>
-        <button id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview();">''' + get_lang(conn, 'preview') + '''</button>
+        <button id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">''' + await get_lang('send') + '''</button>
+        <button id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview();">''' + await get_lang('preview') + '''</button>
         <hr class="main_hr">
 
         <div id="opennamu_preview_area"></div>
@@ -214,7 +208,7 @@ async def edit(name = 'Test', section = 0, do_type = ''):
             db_data_2 = curs.fetchall()
             db_data_2 = number_check(db_data_2[0][0]) if db_data_2 and db_data_2[0][0] != '' else ''
             if db_data_2 != '' and platform.system() in ('Linux', 'Darwin'):
-                timeout = edit_timeout(edit_render_set, (name, content), timeout = int(db_data_2))
+                timeout = await edit_timeout(conn, name, content, int(db_data_2))
             else:
                 timeout = 0
 
@@ -239,7 +233,7 @@ async def edit(name = 'Test', section = 0, do_type = ''):
                     leng
                 )
                 
-                render_set(conn, 
+                await render_set(conn, 
                     doc_name = name,
                     doc_data = content,
                     data_type = 'backlink'
@@ -278,7 +272,7 @@ async def edit(name = 'Test', section = 0, do_type = ''):
                 
                 if load_title == 0 and section == '':
                     load_title = name
-                    editor_top_text += '<a href="/manager/15/' + url_pas(name) + '">(' + get_lang(conn, 'load') + ')</a> '
+                    editor_top_text += '<a href="/manager/15/' + url_pas(name) + '">(' + await get_lang('load') + ')</a> '
                 elif section != '':
                     load_title = name
                     
@@ -296,7 +290,7 @@ async def edit(name = 'Test', section = 0, do_type = ''):
                         data_section = '\n' + data + '\n'
                         
                         while 1:
-                            data_match_re = r'\n((={1,6})(#?) ?([^\n]+))\n'
+                            data_match_re = r'\n((={1,6})(#?) ?([^\n]+)=)\n'
                             data_match = re.search(data_match_re, data_section)
                             if not data_match:
                                 data_section = ''
@@ -335,7 +329,7 @@ async def edit(name = 'Test', section = 0, do_type = ''):
 
                 doc_ver = flask.request.form.get('ver', '')
 
-                warning_edit = get_lang(conn, 'exp_edit_conflict') + ' '
+                warning_edit = await get_lang('exp_edit_conflict') + ' '
     
                 if flask.request.form.get('ver', '0') == '0':
                     warning_edit += '<a href="/raw/' + url_pas(name) + '">(r' + doc_ver + ')</a>'
@@ -352,16 +346,16 @@ async def edit(name = 'Test', section = 0, do_type = ''):
             if data_section == '':
                 data_section = data
     
-            editor_top_text += '<a href="/filter/edit_filter">(' + get_lang(conn, 'edit_filter_rule') + ')</a>'
+            editor_top_text += '<a href="/filter/edit_filter">(' + await get_lang('edit_filter_rule') + ')</a>'
     
             if editor_top_text != '':
                 editor_top_text += '<hr class="main_hr">'
 
             sub_menu = ' (' + str(section) + ')' if section != '' else ''
-            sub_title = '(' + get_lang(conn, 'edit_request') + ')' if edit_req_mode == 1 else '(' + get_lang(conn, 'edit') + ')'
+            sub_title = '(' + await get_lang('edit_request') + ')' if edit_req_mode == 1 else '(' + await get_lang('edit') + ')'
 
-            return easy_minify(conn, flask.render_template(skin_check(conn), 
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css([sub_title + sub_menu, 0])],
+            return easy_minify(flask.render_template(await skin_check(), 
+                imp = [name, await wiki_set(), await wiki_custom(), wiki_css([sub_title + sub_menu, 0])],
                 data = editor_top_text + '''
                     <form method="post">
                         <textarea style="display: none;" name="doc_section_data_where">''' + data_section_where + '''</textarea>
@@ -370,16 +364,16 @@ async def edit(name = 'Test', section = 0, do_type = ''):
                         <input style="display: none;" id="opennamu_editor_doc_name" value="''' + html.escape(name) + '''">
                         <input style="display: none;" name="ver" value="''' + doc_ver + '''">
                         
-                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="send">
+                        <input placeholder="''' + await get_lang('why') + '''" name="send">
                         <hr class="main_hr">
                         
                         ''' + await edit_editor(conn, ip, data_section, addon = get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'edit') , name = name) + '''
                     </form>
                 ''',
                 menu = [
-                    ['w/' + url_pas(name), get_lang(conn, 'return')],
-                    ['delete/' + url_pas(name), get_lang(conn, 'delete')], 
-                    ['move/' + url_pas(name), get_lang(conn, 'move')], 
-                    ['upload', get_lang(conn, 'upload')]
+                    ['w/' + url_pas(name), await get_lang('return')],
+                    ['delete/' + url_pas(name), await get_lang('delete')], 
+                    ['move/' + url_pas(name), await get_lang('move')], 
+                    ['upload', await get_lang('upload')]
                 ]
             ))

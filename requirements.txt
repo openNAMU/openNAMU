@@ -1,11 +1,13 @@
 pip
 
+h11
 flask
 flask[async]
 hypercorn==0.17.3
 
 aiohttp
 asyncio
+nest_asyncio
 requests
 
 diff-match-patch
@@ -13,3 +15,4 @@ diff-match-patch
 pillow
 
 pymysql
+cryptography

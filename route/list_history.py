@@ -25,14 +25,14 @@ async def list_history(tool = 'history', num = 1, set_type = 'normal', doc_name 
                 data = await api_list_history(num, set_type, doc_name)
 
                 title = doc_name
-                sub = '(' + get_lang(conn, 'history') + ') (' + get_lang(conn, set_type) + ')'
-                menu = [['w/' + url_pas(doc_name), get_lang(conn, 'return')], ['history_add/' + url_pas(doc_name), get_lang(conn, 'history_add')], ['history_reset/' + url_pas(doc_name), get_lang(conn, 'history_reset')]]
+                sub = '(' + await get_lang('history') + ') (' + await get_lang(set_type) + ')'
+                menu = [['w/' + url_pas(doc_name), await get_lang('return')], ['history_add/' + url_pas(doc_name), await get_lang('history_add')], ['history_reset/' + url_pas(doc_name), await get_lang('history_reset')]]
             else:
                 data = await api_list_recent_change(num, set_type, 50, '')
 
-                title = get_lang(conn, 'recent_change')
-                sub = '(' + get_lang(conn, set_type) + ')'
-                menu = [['other', get_lang(conn, 'return')], ['recent_edit_request', get_lang(conn, 'edit_request')]]
+                title = await get_lang('recent_change')
+                sub = '(' + await get_lang(set_type) + ')'
+                menu = [['other', await get_lang('return')], ['recent_edit_request', await get_lang('edit_request')]]
 
             lang = data["language"]
             auth = data["auth"]
@@ -110,7 +110,8 @@ async def list_history(tool = 'history', num = 1, set_type = 'normal', doc_name 
 
                 right += f'<span style="display: none;" id="opennamu_history_tool_{for_a}">'
 
-                right += f'<a href="/raw_rev/{data[for_a][0]}/{doc_name}">{lang["raw"]}</a>'
+                right += f'<a href="/render/{data[for_a][0]}/{doc_name}">{lang["view"]}</a>'
+                right += f' | <a href="/raw_rev/{data[for_a][0]}/{doc_name}">{lang["raw"]}</a>'
                 right += f' | <a href="/revert/{data[for_a][0]}/{doc_name}">{lang["revert"]} (r{data[for_a][0]})</a>'
 
                 if int(data[for_a][0]) > 1:
@@ -147,7 +148,7 @@ async def list_history(tool = 'history', num = 1, set_type = 'normal', doc_name 
                 '''
 
             if tool == "history":
-                data_html += get_next_page_bottom(conn, f'/history_page/{{}}/{set_type}/{doc_name}', num, data)
+                data_html += await get_next_page_bottom(f'/history_page/{{}}/{set_type}/{doc_name}', num, data)
                 data_html = (
                     '<form method="post">'
                     f'<select name="a">{select}</select> '
@@ -157,10 +158,10 @@ async def list_history(tool = 'history', num = 1, set_type = 'normal', doc_name 
                     '<hr class="main_hr"></hr>' + data_html
                 )
             else:
-                data_html += get_next_page_bottom(conn, f'/recent_change/{{}}/{set_type}', num, data)
+                data_html += await get_next_page_bottom(f'/recent_change/{{}}/{set_type}', num, data)
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [title, await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],
                 data = data_html,
                 menu = menu
             ))

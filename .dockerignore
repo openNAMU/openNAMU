@@ -8,6 +8,8 @@ data/version.json
 
 route/tool/set_mark/custom.py
 
+*_data
+
 images
 
 .vscode

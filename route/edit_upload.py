@@ -99,7 +99,7 @@ async def edit_upload():
 
                 curs.execute(db_change("insert into data (title, data) values (?, ?)"), ['file:' + name, file_d])
 
-                render_set(conn, 
+                await render_set(conn, 
                     doc_name = 'file:' + name,
                     doc_data = file_d,
                     data_type = 'backlink'
@@ -120,7 +120,7 @@ async def edit_upload():
 
             return redirect(conn, '/w/file:' + name)
         else:
-            license_list = '<option value="direct_input">' + get_lang(conn, 'direct_input') + '</option>'
+            license_list = '<option value="direct_input">' + await get_lang('direct_input') + '</option>'
             file_name = html.escape(flask.request.args.get('name', ''))
 
             curs.execute(db_change("select html from html_filter where kind = 'image_license'"))
@@ -135,28 +135,32 @@ async def edit_upload():
             db_data = curs.fetchall()
             upload_default = html.escape(db_data[0][0]) if db_data and db_data[0][0] != '' else ''
             
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'upload'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang('upload'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
-                    <a href="/filter/file_filter">(''' + get_lang(conn, 'file_filter_list') + ''')</a> <a href="/filter/extension_filter">(''' + get_lang(conn, 'extension_filter_list') + ''')</a>
+                    <a href="/filter/file_filter">(''' + await get_lang('file_filter_list') + ''')</a> <a href="/filter/extension_filter">(''' + await get_lang('extension_filter_list') + ''')</a>
                     ''' + upload_help + '''
                     <hr class="main_hr">
-                    ''' + get_lang(conn, 'max_file_size') + ''' : ''' + str(file_max) + '''MB
+                    ''' + await get_lang('max_file_size') + ''' : ''' + str(file_max) + '''MB
                     <hr class="main_hr">
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
-                        <input multiple="multiple" type="file" name="f_data[]">
+                        <input multiple="multiple" type="file" name="f_data[]" id="file_input">
                         <hr class="main_hr">
-                        <input placeholder="''' + get_lang(conn, 'file_name') + '''" name="f_name" value="''' + file_name + '''">
+                        <input placeholder="''' + await get_lang('file_name') + '''" name="f_name" value="''' + file_name + '''">
                         <hr class="main_hr">
                         <select name="f_lice_sel">
                             ''' + license_list + '''
                         </select>
                         <hr class="main_hr">
-                        <textarea class="opennamu_textarea_100" placeholder="''' + get_lang(conn, 'other') + '''" name="f_lice">''' + upload_default + '''</textarea>
+                        <textarea class="opennamu_textarea_100" placeholder="''' + await get_lang('other') + '''" name="f_lice">''' + upload_default + '''</textarea>
                         <hr class="main_hr">
                         ''' + await captcha_get(conn) + '''
-                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
+                    <hr class="main_hr">
+                    <div id="preview"></div>
+                    <script defer src="/views/main_css/js/func/file_preview.js''' + cache_v() + '''"></script>
+                    <script>window.addEventListener("DOMContentLoaded", function() { opennamu_file_preview(); });</script>
                 ''',
-                menu = [['other', get_lang(conn, 'return')]]
+                menu = [['other', await get_lang('return')]]
             ))

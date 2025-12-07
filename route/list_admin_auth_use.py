@@ -35,18 +35,18 @@ async def list_admin_auth_use(arg_num = 1, arg_search = 'normal'):
                 list_data += '<li>' + await ip_pas(data[0]) + ' | ' + html.escape(do_data) + ' | ' + data[2] + '</li>'
 
             list_data += '</ul>'
-            list_data += get_next_page_bottom(conn, '/list/admin/auth_use_page/{}/' + url_pas(arg_search), arg_num, get_list)
+            list_data += await get_next_page_bottom('/list/admin/auth_use_page/{}/' + url_pas(arg_search), arg_num, get_list)
 
             arg_search = html.escape(arg_search) if arg_search != 'normal' else ''
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'authority_use_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang('authority_use_list'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input class="opennamu_width_200" name="search" placeholder="''' + get_lang(conn, 'start_with_search') + '''" value="''' + arg_search + '''">
-                        <button type="submit">''' + get_lang(conn, 'search') + '''</button>
+                        <input class="opennamu_width_200" name="search" placeholder="''' + await get_lang('start_with_search') + '''" value="''' + arg_search + '''">
+                        <button type="submit">''' + await get_lang('search') + '''</button>
                     </form>
                     <hr class="main_hr">
                 ''' + list_data,
-                menu = [['other', get_lang(conn, 'return')]]
+                menu = [['other', await get_lang('return')]]
             ))

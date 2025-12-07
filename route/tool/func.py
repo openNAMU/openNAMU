@@ -25,12 +25,15 @@ print('Skin set version : ' + version_list['s_ver'])
 
 # Init-PIP_Install
 data_up_date = 1
-if os.path.exists(os.path.join('data', 'version.json')):
+if os.path.exists(os.path.join('data', 'version.json')): 
     with open(os.path.join('data', 'version.json'), encoding = 'utf8') as file_data:
         data_load_ver = file_data.read()
     
     if data_load_ver == version_list['r_ver']:
         data_up_date = 0
+
+if os.getenv('NAMU_DOCKER') == 'O': # skip update check when run at docker
+    data_up_date = 0
 
 if data_up_date == 1:
     with open(os.path.join('data', 'version.json'), 'w', encoding = 'utf8') as f:
@@ -79,6 +82,7 @@ import werkzeug.debug
 
 import flask
 import asyncio
+import nest_asyncio
 import aiohttp
 
 import requests
@@ -141,36 +145,35 @@ def global_some_set_do(set_name, data = None):
         return None
 
 async def python_to_golang(func_name, other_set = {}):    
-    other_set = {
-        "url" : func_name,
-        "data" : json_dumps(other_set)
-    }
-
+    headers = {}
     if flask.has_request_context():
-        other_set["session"] = json_dumps(dict(flask.session))
-
         if "Cookie" in flask.request.headers:
-            other_set["cookie"] = flask.request.headers["Cookie"]
-        else:
-            other_set["cookie"] = ""
+            headers["Cookie"] = flask.request.headers["Cookie"]
 
-        other_set["ip"] = ip_check()
-    else:
-        other_set["session"] = "{}"
-        other_set["cookie"] = ""
-        other_set["ip"] = "127.0.0.1"
+        headers["X-Forwarded-For"] = ip_check()
 
     port_data = global_some_set_do("setup_golang_port")
 
-    async with aiohttp.ClientSession() as session:
-        while 1:
-            async with session.post('http://localhost:' + port_data + '/', data = json_dumps(other_set)) as res:
-                data = await res.json()
+    func_to_normal_url = {
+        "view_list_random" : "/list/random",
+    }
 
-                if "response" in data and data["response"] == "error":
-                    raise Exception(f"API returned error: {data}")
-                else:
-                    return data
+    if func_name in func_to_normal_url:
+        async with aiohttp.ClientSession() as session:
+            async with session.post('http://localhost:' + port_data + '/' + func_name, data = json_dumps(other_set), headers = headers) as res:
+                data = await res.texts()
+
+                return data
+    else:
+        async with aiohttp.ClientSession() as session:
+            while 1:
+                async with session.post('http://localhost:' + port_data + '/' + func_name, data = json_dumps(other_set), headers = headers) as res:
+                    data = await res.json()
+
+                    if "response" in data and data["response"] == "error":
+                        raise Exception(f"API returned error: {data}")
+                    else:
+                        return data
                 
 async def opennamu_make_list(left = '', right = '', bottom = '', class_name = ''):
     data_html = f'<span class="{class_name}">'
@@ -254,25 +257,46 @@ class get_db_connect:
                 isolation_level = None
             )
         else:
-            if self.init_mode:
-                self.conn = pymysql.connect(
-                    host = self.db_set['db_mysql_host'],
-                    user = self.db_set['db_mysql_user'],
-                    password = self.db_set['db_mysql_pw'],
-                    charset = 'utf8mb4',
-                    port = int(self.db_set['db_mysql_port']),
-                    autocommit = True
-                )
-            else:
-                self.conn = pymysql.connect(
-                    host = self.db_set['db_mysql_host'],
-                    user = self.db_set['db_mysql_user'],
-                    password = self.db_set['db_mysql_pw'],
-                    charset = 'utf8mb4',
-                    port = int(self.db_set['db_mysql_port']),
-                    autocommit = True,
-                    db = self.db_set['db_name']
-                )
+            # try connect
+            print('Wait for DB connection...')
+
+            self.conn = None
+            try_cnt = 1
+            max_try = 30
+            while self.conn == None and try_cnt <= max_try:
+                try:
+                    if self.init_mode:
+                        self.conn = pymysql.connect(
+                            host = self.db_set['db_mysql_host'],
+                            user = self.db_set['db_mysql_user'],
+                            password = self.db_set['db_mysql_pw'],
+                            charset = 'utf8mb4',
+                            port = int(self.db_set['db_mysql_port']),
+                            autocommit = True
+                        )
+                    else:
+                        self.conn = pymysql.connect(
+                            host = self.db_set['db_mysql_host'],
+                            user = self.db_set['db_mysql_user'],
+                            password = self.db_set['db_mysql_pw'],
+                            charset = 'utf8mb4',
+                            port = int(self.db_set['db_mysql_port']),
+                            autocommit = True,
+                            db = self.db_set['db_name']
+                        )
+                except pymysql.err.OperationalError as err:
+                    if try_cnt + 1 > max_try:
+                        raise err
+                finally:
+                    if self.conn == None:
+                        try_cnt += 1
+                        time.sleep(1)
+
+            
+            if self.conn == None:
+                raise Exception("Unable to connect database")
+
+        print('DB connected')
 
         return self.conn
     
@@ -304,7 +328,13 @@ class class_check_json:
                 normal_db_type = ['sqlite', 'mysql']
 
                 print('DB type (' + normal_db_type[0] + ') [' + ', '.join(normal_db_type) + '] : ', end = '')
-                data_get = str(input())
+                try:
+                    data_get = str(input())
+                except EOFError:
+                    print("\nInput is not available. You can set the environment variable NAMU_DB_TYPE instead.")
+                    print("No input detected. Using default value.")
+                    data_get = ''
+
                 if data_get == '' or not data_get in normal_db_type:
                     set_data['db_type'] = 'sqlite'
                 else:
@@ -338,7 +368,31 @@ class class_check_json:
         return data_db_set
 
     def do_check_mysql_json(self, data_db_set):
-        if os.path.exists(os.path.join('data', 'mysql.json')):
+        
+        def do_check_mysql_env():
+            env_keys = ['NAMU_DB_HOST', 'NAMU_DB_PORT', 'NAMU_DB_USER', 'NAMU_DB_PASSWORD']
+            vaild = False
+            for key in env_keys:
+                if os.getenv(key):
+                    vaild = True
+                    break
+            return vaild
+        
+        if do_check_mysql_env():
+            # ['user', 'password', 'host', 'port']
+            set_data_mysql = {}
+            set_data_mysql['host'] = os.getenv('NAMU_DB_HOST') if os.getenv('NAMU_DB_HOST') else 'localhost'
+            set_data_mysql['port'] = os.getenv('NAMU_DB_PORT') if os.getenv('NAMU_DB_PORT') else 3306
+
+            if not os.getenv('NAMU_DB_USER'):
+                raise Exception('Error : NAMU_DB_USER env not set')
+            else: 
+                set_data_mysql['user'] = os.getenv('NAMU_DB_USER')
+            if not os.getenv('NAMU_DB_PASSWORD'):
+                raise Exception('Error : NAMU_DB_PASSWORD env not set')
+            else:
+                set_data_mysql['password'] = os.getenv('NAMU_DB_PASSWORD')
+        elif os.path.exists(os.path.join('data', 'mysql.json')):
             db_set_list = ['user', 'password', 'host', 'port']
             with open(os.path.join('data', 'mysql.json'), encoding = 'utf8') as file_data:
                 set_data = json_loads(file_data.read())
@@ -350,8 +404,7 @@ class class_check_json:
                     break
 
             set_data_mysql = set_data
-
-        if not os.path.exists(os.path.join('data', 'mysql.json')):
+        elif not os.path.exists(os.path.join('data', 'mysql.json')):
             set_data_mysql = {}
 
             print('DB user ID : ', end = '')
@@ -670,7 +723,7 @@ async def update(conn, ver_num, set_data):
 
     if ver_num < 3500372:
         # ID 글자 확인 호환용
-        curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-힣0-9])', 'name', '', ''])
+        curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-ㅣ가-힣0-9])', 'name', '', ''])
 
     if ver_num < 3500373:
         select_data = {}
@@ -814,7 +867,7 @@ def set_init_always(conn, ver_num, run_mode):
     # OS마다 실행 파일 설정
     exe_type = linux_exe_chmod()
     if platform.system() == 'Linux' or platform.system() == 'Darwin':
-        os.system('chmod +x ./route_go/bin/' + exe_type)
+        os.system('chmod +x ./bin/' + exe_type)
 
 def linux_exe_chmod():
     exe_type = ''
@@ -852,7 +905,7 @@ def set_init(conn):
         for i in [['smtp_server', 'smtp.gmail.com'], ['smtp_port', '587'], ['smtp_security', 'starttls']]:
             curs.execute(db_change("insert into other (name, data, coverage) values (?, ?, '')"), [i[0], i[1]])
 
-    curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-힣0-9])', 'name', '', ''])
+    curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-ㅣ가-힣0-9])', 'name', '', ''])
 
 # Func-simple
 ## Func-simple-without_DB
@@ -881,31 +934,31 @@ def get_default_robots_txt(conn):
 def load_random_key(long = 128):
     return ''.join(random.choice("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(long))
 
-def http_warning(conn):
+async def http_warning():
     return '''
         <div id="opennamu_http_warning_text"></div>
-        <span style="display: none;" id="opennamu_http_warning_text_lang">''' + get_lang(conn, 'http_warning') + '''</span>
+        <span style="display: none;" id="opennamu_http_warning_text_lang">''' + await get_lang('http_warning') + '''</span>
     '''
 
-def get_next_page_bottom(conn, link, num, page, end = 50):
+async def get_next_page_bottom(link, num, page, end = 50):
     list_data = ''
 
     if num == 1:
         if len(page) == end:
             list_data += '' + \
                 '<hr class="main_hr">' + \
-                '<a href="' + link.format(str(num + 1)) + '">(' + get_lang(conn, 'next') + ')</a>' + \
+                '<a href="' + link.format(str(num + 1)) + '">(' + await get_lang('next') + ')</a>' + \
             ''
     elif len(page) != end:
         list_data += '' + \
             '<hr class="main_hr">' + \
-            '<a href="' + link.format(str(num - 1)) + '">(' + get_lang(conn, 'previous') + ')</a>' + \
+            '<a href="' + link.format(str(num - 1)) + '">(' + await get_lang('previous') + ')</a>' + \
         ''
     else:
         list_data += '' + \
             '<hr class="main_hr">' + \
-            '<a href="' + link.format(str(num - 1)) + '">(' + get_lang(conn, 'previous') + ')</a> ' + \
-            '<a href="' + link.format(str(num + 1)) + '">(' + get_lang(conn, 'next') + ')</a>' + \
+            '<a href="' + link.format(str(num - 1)) + '">(' + await get_lang('previous') + ')</a> ' + \
+            '<a href="' + link.format(str(num + 1)) + '">(' + await get_lang('next') + ')</a>' + \
         ''
 
     return list_data
@@ -945,7 +998,7 @@ async def get_user_title_list(conn, ip = ''):
 
     # default
     user_title = {
-        '' : get_lang(conn, 'default'),
+        '' : await get_lang('default'),
         '🌳' : '🌳 newbie',
     }
 
@@ -1036,7 +1089,7 @@ def get_tool_js_safe(data):
 
     return data
 
-def edit_button(conn):
+async def edit_button(conn):
     curs = conn.cursor()
 
     insert_list = []
@@ -1050,12 +1103,12 @@ def edit_button(conn):
     for insert_data in insert_list:
         data += '<a href="javascript:do_insert_data(\'' + get_tool_js_safe(insert_data[0]) + '\');">(' + html.escape(insert_data[1]) + ')</a> '
 
-    data += (' ' if data != '' else '') + '<a href="/filter/edit_top">(' + get_lang(conn, 'add') + ')</a>'
+    data += (' ' if data != '' else '') + '<a href="/filter/edit_top">(' + await get_lang('add') + ')</a>'
     data += '<hr class="main_hr">'
     
     return data
 
-def ip_warning(conn):
+async def ip_warning(conn):
     curs = conn.cursor()
 
     if ip_or_user() != 0:
@@ -1068,7 +1121,7 @@ def ip_warning(conn):
             ''
         else:
             text_data = '' + \
-                '<span>' + get_lang(conn, 'no_login_warning') + '</span>' + \
+                '<span>' + await get_lang('no_login_warning') + '</span>' + \
                 '<hr class="main_hr">' + \
             ''
     else:
@@ -1120,7 +1173,7 @@ def pw_check(conn, data, data2, type_d = 'no', id_d = ''):
     return re_data
         
 # Func-skin
-def easy_minify(conn, data, tool = None):
+def easy_minify(data, tool = None):
     return data
 
 def get_lang_name(conn, tool = ''):
@@ -1151,71 +1204,33 @@ def get_lang_name(conn, tool = ''):
 
     return lang_name
 
-def get_lang(conn, data, safe = 0):
-    lang_name = get_lang_name(conn)
+async def get_lang(data, safe = 0):
+    other_set = {}
+    other_set["data"] = data
+    other_set["legacy"] = ""
 
-    if (lang_name + '_' + data) in global_lang_data:
-        if safe == 1:
-            return global_lang_data[lang_name + '_' + data]
-        else:
-            return html.escape(global_lang_data[lang_name + '_' + data])
+    res = await python_to_golang('api_func_language', other_set)
+    if res['response'] == 'ok':
+        return res['data'][data]
     else:
-        lang_list = os.listdir('lang')
-        if (lang_name + '.json') in lang_list:
-            lang = json_loads(open(os.path.join('lang', lang_name + '.json'), encoding = 'utf8').read())
-            
-            for title in lang:
-                global_lang_data[lang_name + '_' + title] = lang[title] 
-        else:
-            lang = {}
-
-        if data in lang:
-            if safe == 1:
-                return lang[data] 
-            else:
-                return html.escape(lang[data])
-
-    print(data + ' (' + lang_name + ')')
-    return html.escape(data + ' (' + lang_name + ')')
+        return data + ' (M)'
 
 # 하위 호환용
 def load_lang(data, safe = 0):
-    with get_db_connect() as conn:
-        return get_lang(conn, data, safe)
+    try:
+        loop = asyncio.get_running_loop()
+        if loop.is_running():
+            nest_asyncio.apply()
+            return loop.run_until_complete(get_lang(data, safe))
+    except RuntimeError:
+        return asyncio.run(get_lang(data, safe))
 
-def skin_check(conn, set_n = 0):
-    curs = conn.cursor()
+async def skin_check(set_n = 0):
+    other_set = {}
+    other_set["set_n"] = str(set_n)
 
-    # 개편 필요?
-    skin_list = load_skin(conn, 'ringo', 1)
-    skin = skin_list[0]
-    ip = ip_check()
-    
-    user_need_skin = ''
-    if ip_or_user(ip) == 0:
-        curs.execute(db_change('select data from user_set where name = "skin" and id = ?'), [ip])
-        skin_exist = curs.fetchall()
-        if skin_exist:
-            user_need_skin = skin_exist[0][0]            
-    else:
-        if 'skin' in flask.session:
-            user_need_skin = flask.session['skin']
-
-    user_need_skin = '' if user_need_skin == 'default' else user_need_skin
-
-    if user_need_skin == '':
-        curs.execute(db_change('select data from other where name = "skin"'))
-        skin_exist = curs.fetchall()
-        if skin_exist:
-            user_need_skin = skin_exist[0][0]
-    
-    if user_need_skin != '' and user_need_skin in skin_list:
-        skin = user_need_skin
-
-    if set_n == 0:
-        return './views/' + skin + '/index.html'
-    else:
-        return skin
+    res = await python_to_golang('api_func_skin_name', other_set)
+    return res["data"]
     
 def cache_v():
     return '.cache_v288'
@@ -1239,6 +1254,8 @@ def wiki_css(data):
         data_css += '<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>'
         data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
         data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js" integrity="sha512-10MAbvV683nchyNnutInZDUUmwsAF8IpMc8V+qUNPv9wb26Bv9inyKzAdMfmbFdSIgxxjQhBsZq6sEP+UgsqWg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
+
         data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.48.0/min/vs/loader.min.js" integrity="sha512-ZG31AN9z/CQD1YDDAK4RUAvogwbJHv6bHrumrnMLzdCrVu4HeAqrUX7Jsal/cbUwXGfaMUNmQU04tQ8XXl5Znw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
         data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>'
 
@@ -1266,17 +1283,18 @@ def wiki_css(data):
         global_some_set_do("main_css", data_css)
 
     # Darkmode
-    db_data = global_some_set_do("dark_main_css")
-    if db_data:
-        data_css_dark = db_data
-    else:
-        # Main CSS
-        data_css_dark += '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css' + data_css_ver + '">'
+    if flask.request.cookies.get('main_css_darkmode', '') == '1':
+        db_data = global_some_set_do("dark_main_css")
+        if db_data:
+            data_css_dark = db_data
+        else:
+            # Main CSS
+            data_css_dark += '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css' + data_css_ver + '">'
 
-        # External CSS
-        data_css_dark += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
+            # External CSS
+            data_css_dark += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
 
-        global_some_set_do("dark_main_css", data_css_dark)
+            global_some_set_do("dark_main_css", data_css_dark)
 
     data = data[0:2] + ['', data_css] + data[2:3] + [data_css_dark] + data[3:]
 
@@ -1292,87 +1310,14 @@ async def wiki_set():
 
     return data["data"]
 
-async def wiki_custom(conn):
-    curs = conn.cursor()
+async def wiki_custom():
+    other_set = {}
 
-    ip = ip_check()
-    skin_name = '_' + skin_check(conn, 1)
+    data = await python_to_golang('api_func_wiki_custom', other_set)
 
-    if ip_or_user(ip) == 0:
-        user_icon = 1
-        user_name = ip
+    return data["data"]
 
-        if 'head' in flask.session:
-            user_head = flask.session['head']
-        else:
-            curs.execute(db_change("select data from user_set where id = ? and name = 'custom_css'"), [ip])
-            db_data = curs.fetchall()
-            user_head = db_data[0][0] if db_data else ''
-
-            flask.session['head'] = db_data[0][0] if db_data else ''
-
-        if 'head' + skin_name in flask.session:
-            user_head += flask.session['head' + skin_name]
-        else:
-            curs.execute(db_change("select data from user_set where id = ? and name = ?"), [ip, 'custom_css' + skin_name])
-            db_data = curs.fetchall()
-            user_head += db_data[0][0] if db_data else ''
-
-            flask.session['head' + skin_name] = db_data[0][0] if db_data else ''
-        
-        curs.execute(db_change('select data from user_set where name = "email" and id = ?'), [ip])
-        email = curs.fetchall()
-        email = email[0][0] if email else ''
-
-        if await acl_check(tool = 'all_admin_auth') != 1:
-            user_admin = '1'
-
-            curs.execute(db_change("select data from user_set where id = ? and name = 'acl'"), [ip])
-            curs.execute(db_change('select acl from alist where name = ?'), [curs.fetchall()[0][0]])
-            user_acl = curs.fetchall()
-            user_acl_list = [for_a[0] for for_a in user_acl]
-            user_acl_list = user_acl_list if user_acl_list != [] else '0'
-        else:
-            user_admin = '0'
-            user_acl_list = '0'
-
-        curs.execute(db_change("select count(*) from user_notice where name = ? and readme = ''"), [ip])
-        count = curs.fetchall()
-        user_notice = str(count[0][0]) if count else '0'
-    else:
-        user_icon = 0
-        user_name = get_lang(conn, 'user')
-        email = ''
-        user_admin = '0'
-        user_acl_list = '0'
-        user_notice = '0'
-        user_head = flask.session['head'] if 'head' in flask.session else ''
-        user_head += flask.session['head' + skin_name] if 'head' + skin_name in flask.session else ''
-
-    curs.execute(db_change("select title from rd where title = ? and stop = '' limit 1"), ['user:' + ip])
-    user_topic = '1' if curs.fetchall() else '0'
-    
-    split_path = flask.request.path.split('/')
-    split_path = split_path[1:] if len(split_path) > 1 else 0
-
-    return [
-        '',
-        '',
-        user_icon,
-        user_head,
-        email,
-        user_name,
-        user_admin,
-        str((await ban_check())[0]),
-        user_notice,
-        user_acl_list,
-        ip,
-        user_topic,
-        split_path,
-        await level_check(ip)
-    ]
-
-def load_skin(conn, data = '', set_n = 0, default = 0):
+async def load_skin(data = '', set_n = 0, default = 0):
     # without_DB
 
     # data -> 가장 앞에 있을 스킨 이름
@@ -1392,7 +1337,7 @@ def load_skin(conn, data = '', set_n = 0, default = 0):
         if skin_data != 'default':
             see_data = skin_data
         else:
-            see_data = get_lang(conn, 'default')
+            see_data = await get_lang('default')
 
         if skin_data != 'main_css':
             if set_n == 0:
@@ -1420,7 +1365,7 @@ def load_skin(conn, data = '', set_n = 0, default = 0):
         return skin_return_data
 
 # Func-markup
-def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = '', parameter = {}):
+async def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = '', parameter = {}):
     curs = conn.cursor()
 
     # data_type in ['view', 'from', 'thread', 'api_view', 'api_thread', 'api_include', 'backlink']
@@ -1445,8 +1390,8 @@ def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = 
 
     ip = ip_check()
     render_lang_data = {
-        'toc' : get_lang(conn, 'toc'),
-        'category' : get_lang(conn, 'category')
+        'toc' : await get_lang('toc'),
+        'category' : await get_lang('category')
     }
 
     curs.execute(db_change('select data from other where name = "category_text"'))
@@ -1544,7 +1489,7 @@ def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', markup = 
     else:
         return get_class_render[0] + '<script>window.addEventListener("DOMContentLoaded", function() {' + get_class_render[1] + '});</script>'
         
-def render_simple_set(conn, data):
+async def render_simple_set(data):
     # without_DB
 
     toc_data = ''
@@ -1555,7 +1500,7 @@ def render_simple_set(conn, data):
     if toc_search_data:
         toc_data += '''
             <div class="opennamu_TOC" id="toc">
-                <span class="opennamu_TOC_title">''' + get_lang(conn, 'toc') + '''</span>
+                <span class="opennamu_TOC_title">''' + await get_lang('toc') + '''</span>
                 <br>
         '''
     
@@ -1689,32 +1634,34 @@ async def captcha_get(conn):
         if recaptcha and recaptcha[0][0] != '' and sec_re and sec_re[0][0] != '':
             if not rec_ver or rec_ver[0][0] == '':
                 data += '' + \
-                    '<script src="https://www.google.com/recaptcha/api.js" async defer></script>' + \
+                    '<script defer src="https://www.google.com/recaptcha/api.js"></script>' + \
                     '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
                     '<hr class="main_hr">' + \
                 ''
             elif rec_ver[0][0] == 'v3':
                 data += '' + \
-                    '<script src="https://www.google.com/recaptcha/api.js?render=' + recaptcha[0][0] + '"></script>' + \
+                    '<script defer src="https://www.google.com/recaptcha/api.js?render=' + recaptcha[0][0] + '"></script>' + \
                     '<input type="hidden" id="g-recaptcha" name="g-recaptcha">' + \
                     '<script type="text/javascript">' + \
-                        'grecaptcha.ready(function() {' + \
-                            'grecaptcha.execute(\'' + recaptcha[0][0] + '\', {action: \'homepage\'}).then(function(token) {' + \
-                                'document.getElementById(\'g-recaptcha\').value = token;' + \
+                        'document.addEventListener(\'DOMContentLoaded\', function () {' + \
+                            'grecaptcha.ready(function() {' + \
+                                'grecaptcha.execute(\'' + recaptcha[0][0] + '\', {action: \'homepage\'}).then(function(token) {' + \
+                                    'document.getElementById(\'g-recaptcha\').value = token;' + \
+                                '});' + \
                             '});' + \
                         '});' + \
                     '</script>' + \
                 ''
             elif rec_ver[0][0] == 'cf':
                 data += '' + \
-                    '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha" async defer></script>' + \
+                    '<script defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha"></script>' + \
                     '<div class="g-recaptcha" data-sitekey="' + recaptcha[0][0] + '"></div>' + \
                     '<hr class="main_hr">' + \
                 ''
             else:
                 # rec_ver[0][0] == 'h'
                 data += '''
-                    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+                    <script defer src="https://js.hcaptcha.com/1/api.js"></script>
                     <div class="h-captcha" data-sitekey="''' + recaptcha[0][0] + '''"></div>
                     <hr class="main_hr">
                 '''
@@ -2218,163 +2165,163 @@ async def re_error(conn, data):
         if (await ban_check())[0] == 1:
             end = '<div id="opennamu_get_user_info">' + html.escape(ip_check()) + '</div>'
         else:
-            end = '<ul><li>' + get_lang(conn, 'authority_error') + '</li></ul>'
+            end = '<ul><li>' + await get_lang('authority_error') + '</li></ul>'
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'error'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
-            data = '<h2>' + get_lang(conn, 'error') + '</h2>' + end,
+        return easy_minify(flask.render_template(await skin_check(),
+            imp = [await get_lang('error'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
+            data = '<h2>' + await get_lang('error') + '</h2>' + end,
             menu = 0
         )), 401
     else:
-        title = get_lang(conn, 'error')
+        title = await get_lang('error')
         sub_title = title
         return_code = 400
 
         num = data
         if num == 1:
-            data = get_lang(conn, 'no_login_error')
+            data = await get_lang('no_login_error')
         elif num == 2:
-            data = get_lang(conn, 'no_exist_user_error')
+            data = await get_lang('no_exist_user_error')
         elif num == 3:
-            data = get_lang(conn, 'authority_error')
+            data = await get_lang('authority_error')
         elif num == 4:
-            data = get_lang(conn, 'no_admin_block_error')
+            data = await get_lang('no_admin_block_error')
         elif num == 5:
-            data = get_lang(conn, 'error_skin_set')
+            data = await get_lang('error_skin_set')
         elif num == 8:
             data = '' + \
-                get_lang(conn, 'long_id_error') + '<br>' + \
-                get_lang(conn, 'id_char_error') + ' <a href="/filter/name_filter">(' + get_lang(conn, 'id_filter_list') + ')</a><br>' + \
-                get_lang(conn, 'same_id_exist_error') + \
+                await get_lang('long_id_error') + '<br>' + \
+                await get_lang('id_char_error') + ' <a href="/filter/name_filter">(' + await get_lang('id_filter_list') + ')</a><br>' + \
+                await get_lang('same_id_exist_error') + \
             ''
         elif num == 9:
-            data = get_lang(conn, 'file_exist_error')
+            data = await get_lang('file_exist_error')
         elif num == 10:
-            data = get_lang(conn, 'password_error')
+            data = await get_lang('password_error')
         elif num == 11:
-            data = get_lang(conn, 'topic_long_error')
+            data = await get_lang('topic_long_error')
         elif num == 12:
-            data = get_lang(conn, 'email_error')
+            data = await get_lang('email_error')
         elif num == 13:
-            data = get_lang(conn, 'recaptcha_error')
+            data = await get_lang('recaptcha_error')
         elif num == 14:
-            data = get_lang(conn, 'file_extension_error') + ' <a href="/filter/extension_filter">(' + get_lang(conn, 'extension_filter_list') + ')</a>'
+            data = await get_lang('file_extension_error') + ' <a href="/filter/extension_filter">(' + await get_lang('extension_filter_list') + ')</a>'
         elif num == 15:
-            data = get_lang(conn, 'edit_record_error')
+            data = await get_lang('edit_record_error')
         elif num == 16:
-            data = get_lang(conn, 'same_file_error')
+            data = await get_lang('same_file_error')
         elif num == 17:
             curs.execute(db_change('select data from other where name = "upload"'))
             db_data = curs.fetchall()
             file_max = number_check(db_data[0][0]) if db_data and db_data[0][0] != '' else '2'
-            data = get_lang(conn, 'file_capacity_error') + file_max
+            data = await get_lang('file_capacity_error') + file_max
         elif num == 18:
-            data = get_lang(conn, 'email_send_error')
+            data = await get_lang('email_send_error')
         elif num == 19:
-            data = get_lang(conn, 'move_error')
+            data = await get_lang('move_error')
         elif num == 20:
-            data = get_lang(conn, 'password_diffrent_error')
+            data = await get_lang('password_diffrent_error')
         elif num == 21:
-            data = get_lang(conn, 'edit_filter_error')
+            data = await get_lang('edit_filter_error')
         elif num == 22:
-            data = get_lang(conn, 'file_name_error')
+            data = await get_lang('file_name_error')
         elif num == 23:
-            data = get_lang(conn, 'regex_error')
+            data = await get_lang('regex_error')
         elif num == 24:
             curs.execute(db_change("select data from other where name = 'slow_edit'"))
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'fast_edit_error') + db_data
+            data = await get_lang('fast_edit_error') + db_data
         elif num == 25:
-            data = get_lang(conn, 'too_many_dec_error')
+            data = await get_lang('too_many_dec_error')
         elif num == 26:
-            data = get_lang(conn, 'application_not_found')
+            data = await get_lang('application_not_found')
         elif num == 27:
-            data = get_lang(conn, "invalid_password_error")
+            data = await get_lang("invalid_password_error")
         elif num == 28:
-            data = get_lang(conn, 'watchlist_overflow_error')
+            data = await get_lang('watchlist_overflow_error')
         elif num == 29:
-            data = get_lang(conn, 'copyright_disagreed')
+            data = await get_lang('copyright_disagreed')
         elif num == 30:
-            data = get_lang(conn, 'ie_wrong_callback')
+            data = await get_lang('ie_wrong_callback')
         elif num == 33:
-            data = get_lang(conn, 'restart_fail_error')
+            data = await get_lang('restart_fail_error')
         elif num == 34:
-            data = get_lang(conn, "update_error") + ' <a href="https://github.com/opennamu/opennamu">(Github)</a>'
+            data = await get_lang("update_error") + ' <a href="https://github.com/opennamu/opennamu">(Github)</a>'
         elif num == 35:
-            data = get_lang(conn, 'same_email_error')
+            data = await get_lang('same_email_error')
         elif num == 36:
-            data = get_lang(conn, 'input_email_error')
+            data = await get_lang('input_email_error')
         elif num == 37:
-            data = get_lang(conn, 'error_edit_send_request')
+            data = await get_lang('error_edit_send_request')
         elif num == 38:
             curs.execute(db_change("select data from other where name = 'title_max_length'"))
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'error_title_length_too_long') + db_data
+            data = await get_lang('error_title_length_too_long') + db_data
         elif num == 39:
             curs.execute(db_change("select data from other where name = 'title_topic_max_length'"))
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'error_title_length_too_long') + db_data
+            data = await get_lang('error_title_length_too_long') + db_data
         elif num == 40:
             curs.execute(db_change("select data from other where name = 'password_min_length'"))
             db_data = curs.fetchall()
             password_min_length = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'error_password_length_too_short') + password_min_length
+            data = await get_lang('error_password_length_too_short') + password_min_length
         elif num == 41:
             curs.execute(db_change("select data from other where name = 'edit_timeout'"))
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'timeout_error') + db_data
+            data = await get_lang('timeout_error') + db_data
         elif num == 42:
             curs.execute(db_change("select data from other where name = 'slow_thread'"))
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'fast_edit_error') + db_data
+            data = await get_lang('fast_edit_error') + db_data
         elif num == 43:
-            title = get_lang(conn, 'application_submitted')
+            title = await get_lang('application_submitted')
             sub_title = title
-            data = get_lang(conn, 'waiting_for_approval')
+            data = await get_lang('waiting_for_approval')
         elif num == 44:
             curs.execute(db_change("select data from other where name = 'document_content_max_length'"))
             db_data = curs.fetchall()
             db_data = '' if not db_data else db_data[0][0]
-            data = get_lang(conn, 'error_content_length_too_long') + db_data
+            data = await get_lang('error_content_length_too_long') + db_data
         elif num == 45:
-            data = get_lang(conn, 'cidr_error')
+            data = await get_lang('cidr_error')
         elif num == 46:
-            data = get_lang(conn, 'func_404_error')
+            data = await get_lang('func_404_error')
             title = '404'
             return_code = 404
         elif num == 47:
-            data = get_lang(conn, 'still_use_auth_error')
+            data = await get_lang('still_use_auth_error')
         elif num == 48:
-            data = get_lang(conn, 'xss_data_include_error')
+            data = await get_lang('xss_data_include_error')
         elif num == 49:
-            data = get_lang(conn, 'password_same_as_id_error')
+            data = await get_lang('password_same_as_id_error')
         else:
             data = '???'
 
         if num == 5:
             if flask.request.path != '/skin_set':
-                data += '<br>' + get_lang(conn, 'error_skin_set_old') + ' <a href="/skin_set">(' + get_lang(conn, 'go') + ')</a>'
+                data += '<br>' + await get_lang('error_skin_set_old') + ' <a href="/skin_set">(' + await get_lang('go') + ')</a>'
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'skin_set'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang('skin_set'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '' + \
                     '<div id="main_skin_set">' + \
-                        '<h2>' + get_lang(conn, 'error') + '</h2>' + \
+                        '<h2>' + await get_lang('error') + '</h2>' + \
                         '<ul>' + \
                             '<li>' + data + '</a></li>' + \
                         '</ul>' + \
                     '</div>' + \
                 '',
-                menu = [['change', get_lang(conn, 'user_setting')], ['change/skin_set/main', get_lang(conn, 'main_skin_set')]]
+                menu = [['change', await get_lang('user_setting')], ['change/skin_set/main', await get_lang('main_skin_set')]]
             ))
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [title, await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '' + \
                     '<h2>' + sub_title + '</h2>' + \
                     '<ul>' + \

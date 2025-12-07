@@ -112,45 +112,45 @@ async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                 for data_list in acl_list:
                     acl_div[for_a] += '<option value="' + data_list + '">' + (data_list if data_list != '' else 'normal') + '</option>'
     
-            editor_top_text = '<a href="/filter/edit_filter">(' + get_lang(conn, 'edit_filter_rule') + ')</a>'
+            editor_top_text = '<a href="/filter/edit_filter">(' + await get_lang('edit_filter_rule') + ')</a>'
 
             if editor_top_text != '':
                 editor_top_text += '<hr class="main_hr">'
 
             if comment_num != '':
-                bbs_title = get_lang(conn, 'bbs_comment_edit')
+                bbs_title = await get_lang('bbs_comment_edit')
             elif post_num == '':
-                bbs_title = get_lang(conn, 'post_add')
+                bbs_title = await get_lang('post_add')
             else:
-                bbs_title = get_lang(conn, 'post_edit')
+                bbs_title = await get_lang('post_edit')
     
-            return easy_minify(conn, flask.render_template(skin_check(conn), 
-                imp = [bbs_title, await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(), 
+                imp = [bbs_title, await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data =  editor_top_text + '''
                     <form method="post">                        
-                        <input style="''' + option_display + '''" placeholder="''' + get_lang(conn, 'title') + '''" name="title" value="''' + html.escape(title) + '''">
+                        <input style="''' + option_display + '''" placeholder="''' + await get_lang('title') + '''" name="title" value="''' + html.escape(title) + '''">
                         <hr style="''' + option_display + '''" class="main_hr">
 
                         ''' + await edit_editor(conn, ip, data, 'bbs') + '''
 
                         <!--
                         <div style="''' + option_display + '''">
-                            ''' + render_simple_set(conn, '''
+                            ''' + await render_simple_set('''
                                 <hr class="main_hr">
-                                <a href="/acl/TEST#exp">(''' + get_lang(conn, 'reference') + ''')</a>
-                                <h2>''' + get_lang(conn, 'acl') + '''</h2>
-                                <h3>''' + get_lang(conn, 'post_view_acl') + '''</h3>
+                                <a href="/acl/TEST#exp">(''' + await get_lang('reference') + ''')</a>
+                                <h2>''' + await get_lang('acl') + '''</h2>
+                                <h3>''' + await get_lang('post_view_acl') + '''</h3>
                                 <select name="post_view_acl">''' + acl_div[0] + '''</select>
 
-                                <h4>''' + get_lang(conn, 'post_comment_acl') + '''</h4>
+                                <h4>''' + await get_lang('post_comment_acl') + '''</h4>
                                 <select name="post_comment_acl">''' + acl_div[1] + '''</select>
 
-                                <h2>''' + get_lang(conn, 'markup') + '''</h2>
-                                ''' + get_lang(conn, 'not_working') + '''
+                                <h2>''' + await get_lang('markup') + '''</h2>
+                                ''' + await get_lang('not_working') + '''
                             ''') + '''
                         </div>
                         -->
                     </form>
                 ''',
-                menu = [['bbs/in/' + bbs_num_str, get_lang(conn, 'return')]]
+                menu = [['bbs/in/' + bbs_num_str, await get_lang('return')]]
             ))

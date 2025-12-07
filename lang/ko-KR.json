@@ -110,7 +110,7 @@
     "user_document": "사용자 문서",
     "id": "아이디",
     "no_login_warning": "비로그인 상태입니다. 편집 시 지금 접속한 IP가 기록됩니다.",
-    "decument_404_error": "이 문서는 존재하지 않습니다.",
+    "document_404_error": "이 문서는 존재하지 않습니다.",
     "key": "키",
     "lastest": "최신",
     "now_password": "현재 비밀번호",
@@ -709,5 +709,6 @@
     "move_bottom_text" : "이동 하단 문구",
     "delete_bottom_text" : "삭제 하단 문구",
     "revert_bottom_text" : "되돌리기 하단 문구",
-    "warning_restart" : "재시작 중... 새로고침(F5)를 눌러주세요"
+    "warning_restart" : "재시작 중... 새로고침(F5)를 눌러주세요",
+    "random_list" : "랜덤 문서 목록"
 }

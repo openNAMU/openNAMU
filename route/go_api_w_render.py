@@ -45,7 +45,7 @@ async def api_w_render(name = '', tool = '', request_method = '', request_data =
                 data_org = re.sub('^\n+', '', data_org)
 
             if markup in ('', 'namumark'):
-                data_pas = render_set(conn, 
+                data_pas = await render_set(conn, 
                     doc_name = name, 
                     doc_data = data_org, 
                     data_type = data_type,

@@ -35,16 +35,16 @@ async def user_setting_user_name(user_name = ''):
                 if db_data and db_data[0][0] != '':
                     user_name = db_data[0][0]
 
-                return easy_minify(conn, flask.render_template(skin_check(conn),
-                    imp = [get_lang(conn, 'change_user_name'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                return easy_minify(flask.render_template(await skin_check(),
+                    imp = [await get_lang('change_user_name'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                     data = '''
                         <form method="post">
-                            <input name="new_user_name" placeholder="''' + get_lang(conn, 'user_name') + '''" value="''' + html.escape(user_name) + '''">
+                            <input name="new_user_name" placeholder="''' + await get_lang('user_name') + '''" value="''' + html.escape(user_name) + '''">
                             <hr class="main_hr">
-                            <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
+                            <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                         </form>
                     ''',
-                    menu = [['change', get_lang(conn, 'return')]]
+                    menu = [['change', await get_lang('return')]]
                 ))
         else:
             return redirect(conn, '/login')

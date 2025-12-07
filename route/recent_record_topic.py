@@ -10,9 +10,9 @@ async def recent_record_topic(name = 'Test'):
         div = '''
             <table id="main_table_set">
                 <tr id="main_table_top_tr">
-                    <td id="main_table_width">''' + get_lang(conn, 'discussion_name') + '''</td>
-                    <td id="main_table_width">''' + get_lang(conn, 'writer') + '''</td>
-                    <td id="main_table_width">''' + get_lang(conn, 'time') + '''</td>
+                    <td id="main_table_width">''' + await get_lang('discussion_name') + '''</td>
+                    <td id="main_table_width">''' + await get_lang('writer') + '''</td>
+                    <td id="main_table_width">''' + await get_lang('time') + '''</td>
                 </tr>
         '''
         sub = '(' + html.escape(name) + ')'
@@ -37,10 +37,10 @@ async def recent_record_topic(name = 'Test'):
             ''
 
         div += '</table>'
-        div += get_next_page_bottom(conn, '/record/topic/' + url_pas(name) + '?num={}', num, data_list)
+        div += await get_next_page_bottom('/record/topic/' + url_pas(name) + '?num={}', num, data_list)
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'discussion_record'), await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
+        return easy_minify(flask.render_template(await skin_check(),
+            imp = [await get_lang('discussion_record'), await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],
             data = div,
-            menu = [['other', get_lang(conn, 'other')], ['user/' + url_pas(name), get_lang(conn, 'user_tool')]]
+            menu = [['other', await get_lang('other')], ['user/' + url_pas(name), await get_lang('user_tool')]]
         ))

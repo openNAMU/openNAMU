@@ -45,7 +45,7 @@ async def main_sys_update(golang_process):
                     linux_exe_chmod()
 
                     threading.Thread(target = main_sys_restart_do).start()
-                    return flask.Response(get_lang(conn, "warning_restart"), status = 200)
+                    return flask.Response(await get_lang("warning_restart"), status = 200)
                 
                 print('Error : update failed')
             elif platform.system() == 'Windows':
@@ -61,27 +61,27 @@ async def main_sys_update(golang_process):
                     os.system('del update.zip')
                     
                     threading.Thread(target = main_sys_restart_do).start()
-                    return flask.Response(get_lang(conn, "warning_restart"), status = 200)
+                    return flask.Response(await get_lang("warning_restart"), status = 200)
             
             print('Error : update failed')
 
             return await re_error(conn, 34)
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'update'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
-                data = get_lang(conn, 'update_warning') + '''
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang('update'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
+                data = await get_lang('update_warning') + '''
                     <hr class="main_hr">
                     <ul>
-                        <li id="ver_send_2">''' + get_lang(conn, 'version') + ''' : </li>
-                        <li id="ver_send">''' + get_lang(conn, 'lastest') + ''' : </li>
+                        <li id="ver_send_2">''' + await get_lang('version') + ''' : </li>
+                        <li id="ver_send">''' + await get_lang('lastest') + ''' : </li>
                     </ul>
                     <a href="https://github.com/openNAMU/openNAMU">(Beta)</a> <a href="https://github.com/openNAMU/openNAMU/tree/stable">(Stable)</a>
                     <hr class="main_hr">
                     <form method="post">
-                        <button type="submit">''' + get_lang(conn, 'update') + '''</button>
+                        <button type="submit">''' + await get_lang('update') + '''</button>
                     </form>
                     <!-- JS : opennamu_do_insert_version -->
                 ''',
-                menu = [['manager', get_lang(conn, 'return')]]
+                menu = [['manager', await get_lang('return')]]
             ))
 

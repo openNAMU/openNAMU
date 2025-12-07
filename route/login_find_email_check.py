@@ -30,15 +30,15 @@ async def login_find_email_check(tool):
                 sql_d = curs.fetchall()
                 b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
         
-                return easy_minify(conn, flask.render_template(skin_check(conn),
-                    imp = [get_lang(conn, 'reset_user_ok'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+                return easy_minify(flask.render_template(await skin_check(),
+                    imp = [await get_lang('reset_user_ok'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                     data = '' + \
                         b_text + \
-                        get_lang(conn, 'id') + ' : ' + user_id + \
+                        await get_lang('id') + ' : ' + user_id + \
                         '<hr class="main_hr">' + \
-                        get_lang(conn, 'password') + ' : ' + user_pw + \
+                        await get_lang('password') + ' : ' + user_pw + \
                     '',
-                    menu = [['user', get_lang(conn, 'return')]]
+                    menu = [['user', await get_lang('return')]]
                 ))
             elif 'c_type' in flask.session and (flask.session['c_key'] == input_key or flask.session['c_key'] == 'email_pass'):
                 curs.execute(db_change('select data from other where name = "encode"'))
@@ -121,15 +121,15 @@ async def login_find_email_check(tool):
             sql_d = curs.fetchall()
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
         
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'check_key'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang('check_key'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
                         ''' + b_text + '''
-                        <input placeholder="''' + get_lang(conn, 'key') + '''" name="key" type="password">
+                        <input placeholder="''' + await get_lang('key') + '''" name="key" type="password">
                         <hr class="main_hr">
-                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
+                        <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['user', get_lang(conn, 'return')]]
+                menu = [['user', await get_lang('return')]]
             ))

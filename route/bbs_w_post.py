@@ -31,15 +31,15 @@ async def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, 
                 comment_add_count += 1
 
             date = ''
-            date += '<a href="javascript:opennamu_change_comment(\'' + sub_code_check + '\');">(' + get_lang(conn, 'comment') + ')</a> '
-            date += '<a href="/bbs/tool/' + bbs_num_str + '/' + post_num_str + '/' + sub_code_check + '">(' + get_lang(conn, 'tool') + ')</a> '
+            date += '<a href="javascript:opennamu_change_comment(\'' + sub_code_check + '\');">(' + await get_lang('comment') + ')</a> '
+            date += '<a href="/bbs/tool/' + bbs_num_str + '/' + post_num_str + '/' + sub_code_check + '">(' + await get_lang('tool') + ')</a> '
             date += temp_dict['comment_date']
 
             comment_data += '<span style="padding-left: 20px;"></span>' * margin_count
             comment_data += api_topic_thread_make(
                 await ip_pas(temp_dict['comment_user_id']),
                 date,
-                render_set(conn, doc_data = temp_dict['comment']),
+                await render_set(conn, doc_data = temp_dict['comment']),
                 sub_code_check,
                 color = color,
                 add_style = 'width: calc(100% - ' + str(margin_count * 20) + 'px);'
@@ -175,7 +175,7 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                     return await re_error(conn, 0)
 
                 date = ''
-                date += '<a href="javascript:opennamu_change_comment(\'0\');">(' + get_lang(conn, 'comment') + ')</a> '
+                date += '<a href="javascript:opennamu_change_comment(\'0\');">(' + await get_lang('comment') + ')</a> '
                 date += temp_dict['date']
 
                 data = ''
@@ -183,7 +183,7 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                 data += api_topic_thread_make(
                     await ip_pas(temp_dict['user_id']),
                     date,
-                    render_set(conn, doc_data = temp_dict['data']),
+                    await render_set(conn, doc_data = temp_dict['data']),
                     '0',
                     color = 'red'
                 )
@@ -209,8 +209,8 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                     </form>
                 '''
 
-                return easy_minify(conn, flask.render_template(skin_check(conn),
-                    imp = [bbs_name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'bbs') + ')', 0])],
+                return easy_minify(flask.render_template(await skin_check(),
+                    imp = [bbs_name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('bbs') + ')', 0])],
                     data = data,
-                    menu = [['bbs/in/' + bbs_num_str, get_lang(conn, 'return')], ['bbs/edit/' + bbs_num_str + '/' + post_num_str, get_lang(conn, 'edit')], ['bbs/tool/' + bbs_num_str + '/' + post_num_str, get_lang(conn, 'tool')]]
+                    menu = [['bbs/in/' + bbs_num_str, await get_lang('return')], ['bbs/edit/' + bbs_num_str + '/' + post_num_str, await get_lang('edit')], ['bbs/tool/' + bbs_num_str + '/' + post_num_str, await get_lang('tool')]]
                 ))

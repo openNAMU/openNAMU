@@ -49,7 +49,7 @@ with get_db_connect(init_mode = True) as conn:
 
     if run_mode != 'dev':
         file_name = linux_exe_chmod()
-        local_file_path = os.path.join("route_go", "bin", file_name)
+        local_file_path = os.path.join("bin", file_name)
 
         if not (setup_tool == "normal" and os.path.exists(local_file_path)):
             if os.path.exists(local_file_path):
@@ -246,16 +246,16 @@ for for_a in server_set:
 
 if platform.system() == 'Linux':
     if platform.machine() in ["AMD64", "x86_64"]:
-        cmd = [os.path.join(".", "route_go", "bin", "main.amd64.bin")]
+        cmd = [os.path.join(".", "bin", "main.amd64.bin")]
     else:
-        cmd = [os.path.join(".", "route_go", "bin", "main.arm64.bin")]
+        cmd = [os.path.join(".", "bin", "main.arm64.bin")]
 elif platform.system() == 'Darwin':
-    cmd = [os.path.join(".", "route_go", "bin", "main.mac.arm64.bin")]
+    cmd = [os.path.join(".", "bin", "main.mac.arm64.bin")]
 else:
     if platform.machine() in ["AMD64", "x86_64"]:
-        cmd = [os.path.join(".", "route_go", "bin", "main.amd64.exe")]
+        cmd = [os.path.join(".", "bin", "main.amd64.exe")]
     else:
-        cmd = [os.path.join(".", "route_go", "bin", "main.arm64.exe")]
+        cmd = [os.path.join(".", "bin", "main.arm64.exe")]
         
 cmd += [server_set["golang_port"]]
 if run_mode != '':
@@ -272,7 +272,7 @@ async def golang_process_check():
                 "url" : "test",
                 "data" : json_dumps(other_set_temp),
                 "session" : "{}",
-                "cookie" : "",
+                "cookies" : "",
                 "ip" : "127.0.0.1"
             }
 
@@ -462,7 +462,7 @@ def before_request_func():
                             history.go(0);
                         }
                     </script>
-                    <h2>''' + get_lang(conn, 'error_password_require_for_wiki_access') + '''</h2>
+                    <h2>''' + load_lang('error_password_require_for_wiki_access') + '''</h2>
                     <input type="password" id="wiki_access">
                     <input type="submit" onclick="opennamu_do_wiki_access();">
                 '''
@@ -644,8 +644,8 @@ app.route('/xref_page/<int:num>/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
-app.route('/doc_watch_list/<int:num>/<everything:name>')(w_watch_list)
-app.route('/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(w_watch_list)
+app.route('/doc_watch_list/<int:num>/<everything:name>')(view_w_watch_list)
+app.route('/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(view_w_watch_list)
 
 app.route('/raw/<everything:name>')(view_w_raw)
 app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 'on' })(view_w_raw)
@@ -658,10 +658,13 @@ app.route('/down/<everything:name>')(view_down)
 app.route('/acl_multiple', defaults = { 'multiple' : True }, methods = ['POST', 'GET'])(view_set)
 app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_set)
 
+app.route('/render/<int:doc_rev>/<everything:name>')(view_w)
+
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_w)
 app.route('/w/<everything:name>')(view_w)
 
 app.route('/random')(view_random)
+app.route('/list/random')(view_list_random)
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
@@ -737,11 +740,11 @@ app.route('/alarm')(user_alarm)
 app.route('/alarm/delete')(user_alarm_delete)
 app.route('/alarm/delete/<int:id>')(user_alarm_delete)
 
-app.route('/watch_list', defaults = { 'tool' : 'watch_list' })(user_watch_list)
+app.route('/watch_list', defaults = { 'do_type' : 'watch_list' })(view_user_watch_list)
 app.route('/watch_list/<everything:name>', defaults = { 'tool' : 'watch_list' })(user_watch_list_name)
 app.route('/watch_list_from/<everything:name>', defaults = { 'tool' : 'watch_list_from' })(user_watch_list_name)
 
-app.route('/star_doc', defaults = { 'tool' : 'star_doc' })(user_watch_list)
+app.route('/star_doc', defaults = { 'do_type' : 'star_doc' })(view_user_watch_list)
 app.route('/star_doc/<everything:name>', defaults = { 'tool' : 'star_doc' })(user_watch_list_name)
 app.route('/star_doc_from/<everything:name>', defaults = { 'tool' : 'star_doc_from' })(user_watch_list_name)
 
@@ -847,8 +850,8 @@ app.route('/api/recent_discuss/<set_type>/<int:limit>')(api_list_recent_discuss)
 app.route('/api/recent_discuss/<int:limit>')(api_list_recent_discuss)
 app.route('/api/recent_discuss')(api_list_recent_discuss)
 
-app.route('/api/lang', methods = ['POST'])(api_func_language)
-app.route('/api/lang/<data>')(api_func_language)
+app.route('/api/lang', methods = ['POST'])(api_func_language_exter)
+app.route('/api/lang/<data>')(api_func_language_exter)
 app.route('/api/sha224/<everything:data>')(api_func_sha224)
 app.route('/api/ip/<everything:data>')(api_func_ip)
 
@@ -873,9 +876,9 @@ app.route('/api/v2/history/<int:num>/<set_type>/<everything:doc_name>')(api_list
 app.route('/api/v2/topic/<int:num>/<set_type>/<everything:name>')(api_topic_list)
 
 app.route('/api/v2/bbs')(api_bbs_list)
-app.route('/api/v2/bbs/main')(api_bbs)
+app.route('/api/v2/bbs/main')(api_bbs_exter)
 app.route('/api/v2/bbs/set/<int:bbs_num>/<name>', methods = ['GET', 'PUT'])(api_bbs_w_set)
-app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs)
+app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs_exter)
 app.route('/api/v2/bbs/w/<sub_code>', defaults = { 'legacy' : '' })(api_bbs_w)
 app.route('/api/v2/bbs/w/tabom/<sub_code>', methods = ['GET', 'POST'])(api_bbs_w_tabom)
 app.route('/api/v2/bbs/w/comment/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment_exter)
@@ -886,7 +889,7 @@ app.route('/api/v2/doc_watch_list/<int:num>/<everything:name>')(api_w_watch_list
 app.route('/api/v2/set_reset/<everything:name>')(api_w_set_reset)
 app.route('/api/v2/page_view/<everything:name>')(api_w_page_view)
 
-app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting)
+app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting_exter)
 
 app.route('/api/v2/auth')(api_func_auth)
 app.route('/api/v2/auth/<user_name>')(api_func_auth)
@@ -898,7 +901,7 @@ app.route('/api/v2/user/setting/editor', methods = ['GET', 'POST', 'DELETE'])(ap
 app.route('/api/v2/ip/<everything:data>', methods = ['GET', 'POST'])(api_func_ip)
 app.route('/api/v2/ip_menu/<everything:ip>', defaults = { 'option' : 'user' }, methods = ['GET', 'POST'])(api_func_ip_menu)
 app.route('/api/v2/user_menu/<everything:ip>')(api_func_ip_menu)
-app.route('/api/v2/lang', defaults = { 'legacy' : '' }, methods = ['POST'])(api_func_language)
+app.route('/api/v2/lang', defaults = { 'legacy' : '' }, methods = ['POST'])(api_func_language_exter)
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정
@@ -931,7 +934,7 @@ app.route('/setting/external', methods = ['POST', 'GET'])(main_setting_external)
 app.route('/setting/sitemap', methods = ['POST', 'GET'])(main_setting_sitemap)
 app.route('/setting/sitemap_set', methods = ['POST', 'GET'])(main_setting_sitemap_set)
 app.route('/setting/skin_set', methods = ['POST', 'GET'])(main_setting_skin_set)
-app.route('/setting/404_page', methods = ['POST', 'GET'])(setting_404_page)
+app.route('/setting/404_page', methods = ['POST', 'GET'])(main_setting_404_page)
 app.route('/setting/email_test', methods = ['POST', 'GET'])(main_setting_email_test)
 
 app.route('/easter_egg')(main_func_easter_egg)
