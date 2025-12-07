@@ -4,7 +4,7 @@ from .go_api_w_raw import api_w_raw
 from .go_api_w_render import api_w_render
 from .go_api_w_page_view import api_w_page_view
 
-async def view_w(name = 'Test', do_type = ''):
+async def view_w(name = 'Test', do_type = '', doc_rev = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
 
@@ -64,25 +64,25 @@ async def view_w(name = 'Test', do_type = ''):
                     category_doc += '' + \
                         '<li>' + \
                             '<a class="' + link_blur + '" href="/w/' + url_pas(data[0]) + '">' + html.escape(link_view) + '</a> ' + \
-                            '<a class="opennamu_link_inter" href="/xref/' + url_pas(data[0]) + '">(' + get_lang(conn, 'backlink') + ')</a>' + \
+                            '<a class="opennamu_link_inter" href="/xref/' + url_pas(data[0]) + '">(' + await get_lang('backlink') + ')</a>' + \
                         '</li>' + \
                     ''
                     count_category += 1
 
             if category_sub != '':
                 category_total += '' + \
-                    '<h2 id="cate_under">' + get_lang(conn, 'under_category') + '</h2>' + \
+                    '<h2 id="cate_under">' + await get_lang('under_category') + '</h2>' + \
                     '<ul>' + \
-                        '<li>' + get_lang(conn, 'all') + ' : ' + str(count_sub_category) + '</li>' + \
+                        '<li>' + await get_lang('all') + ' : ' + str(count_sub_category) + '</li>' + \
                         category_sub + \
                     '</ul>' + \
                 ''
 
             if category_doc != '':
                 category_total += '' + \
-                    '<h2 id="cate_normal">' + get_lang(conn, 'category_title') + '</h2>' + \
+                    '<h2 id="cate_normal">' + await get_lang('category_title') + '</h2>' + \
                     '<ul>' + \
-                        '<li>' + get_lang(conn, 'all') + ' : ' + str(count_category) + '</li>' + \
+                        '<li>' + await get_lang('all') + ' : ' + str(count_category) + '</li>' + \
                         category_doc + \
                     '</ul>' + \
                 ''
@@ -121,7 +121,7 @@ async def view_w(name = 'Test', do_type = ''):
                 <hr class="main_hr">
             '''
             if name == 'user:' + user_name:
-                menu += [['w/' + url_pas(name) + '/' + url_pas(now_time.split()[0]), get_lang(conn, 'today_doc')]]
+                menu += [['w/' + url_pas(name) + '/' + url_pas(now_time.split()[0]), await get_lang('today_doc')]]
         elif re.search(r"^file:", name):
             curs.execute(db_change('select id from history where title = ? order by date desc limit 1'), [name])
             db_data = curs.fetchall()
@@ -153,16 +153,16 @@ async def view_w(name = 'Test', do_type = ''):
                 
                 file_data = '''
                     <img src="/image/''' + url_pas(file_all_name) + '''.cache_v''' + rev + '''">
-                    <h2>''' + get_lang(conn, 'data') + '''</h2>
+                    <h2>''' + await get_lang('data') + '''</h2>
                     <table>
-                        <tr><td>''' + get_lang(conn, 'url') + '''</td><td><a href="/image/''' + url_pas(file_all_name) + '''">''' + get_lang(conn, 'link') + '''</a></td></tr>
-                        <tr><td>''' + get_lang(conn, 'volume') + '''</td><td>''' + file_size + '''KB</td></tr>
-                        <tr><td>''' + get_lang(conn, 'resolution') + '''</td><td>''' + file_res + '''</td></tr>
+                        <tr><td>''' + await get_lang('url') + '''</td><td><a href="/image/''' + url_pas(file_all_name) + '''">''' + await get_lang('link') + '''</a></td></tr>
+                        <tr><td>''' + await get_lang('volume') + '''</td><td>''' + file_size + '''KB</td></tr>
+                        <tr><td>''' + await get_lang('resolution') + '''</td><td>''' + file_res + '''</td></tr>
                     </table>
-                    <h2>''' + get_lang(conn, 'content') + '''</h2>
+                    <h2>''' + await get_lang('content') + '''</h2>
                 '''
 
-                menu += [['delete_file/' + url_pas(name), get_lang(conn, 'file_delete')]]
+                menu += [['delete_file/' + url_pas(name), await get_lang('file_delete')]]
             else:
                 file_data = ''
         else:
@@ -180,7 +180,11 @@ async def view_w(name = 'Test', do_type = ''):
 
             name_view = name
 
-        doc_data = await api_w_raw(name)
+        if doc_rev == '':
+            doc_data = await api_w_raw(name)
+        else:
+            doc_data = await api_w_raw(name, str(doc_rev))
+
         if doc_data["response"] == "ok":
             render_data = await api_w_render(name, request_method = 'POST', request_data = {
                 'name' : name,
@@ -190,9 +194,12 @@ async def view_w(name = 'Test', do_type = ''):
         else:
             end_data = ''
 
-        asyncio.create_task(api_w_page_view(name))
-
-        curs.execute(db_change("select data from data where title = ?"), [name])
+        if doc_rev == '':
+            asyncio.create_task(api_w_page_view(name))
+            curs.execute(db_change("select data from data where title = ?"), [name])
+        else:
+            curs.execute(db_change("select data from history where title = ? and id = ?"), [name, doc_rev])
+            
         data = curs.fetchall()
 
         description = ''
@@ -202,18 +209,18 @@ async def view_w(name = 'Test', do_type = ''):
             curs.execute(db_change('select data from other where name = "error_401"'))
             sql_d = curs.fetchall()
             if sql_d and sql_d[0][0] != '':
-                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul><li>' + sql_d[0][0] + '</li></ul>'
+                end_data = '<h2>' + await get_lang('error') + '</h2><ul><li>' + sql_d[0][0] + '</li></ul>'
             else:
-                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul><li>' + get_lang(conn, 'authority_error') + '</li></ul>'
+                end_data = '<h2>' + await get_lang('error') + '</h2><ul><li>' + await get_lang('authority_error') + '</li></ul>'
         elif not data:
             response_data = 404
 
             curs.execute(db_change('select data from other where name = "error_404"'))
             db_data = curs.fetchall()
             if db_data and db_data[0][0] != '':
-                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul><li>' + db_data[0][0] + '</li></ul>'
+                end_data = '<h2>' + await get_lang('error') + '</h2><ul><li>' + db_data[0][0] + '</li></ul>'
             else:
-                end_data = '<h2>' + get_lang(conn, 'error') + '</h2><ul><li>' + get_lang(conn, 'decument_404_error') + '</li></ul>'
+                end_data = '<h2>' + await get_lang('error') + '</h2><ul><li>' + await get_lang('document_404_error') + '</li></ul>'
 
             curs.execute(db_change('select ip from history where title = ? limit 1'), [name])
             db_data = curs.fetchall()
@@ -226,15 +233,15 @@ async def view_w(name = 'Test', do_type = ''):
         acl = 1 if curs.fetchall() else 0
         menu_acl = 1 if await acl_check(name, 'document_edit') == 1 else 0
         if response_data == 404:
-            menu += [['edit/' + url_pas(name), get_lang(conn, 'create'), menu_acl]] 
+            menu += [['edit/' + url_pas(name), await get_lang('create'), menu_acl]] 
         else:
-            menu += [['edit/' + url_pas(name), get_lang(conn, 'edit'), menu_acl]]
+            menu += [['edit/' + url_pas(name), await get_lang('edit'), menu_acl]]
 
         menu += [
-            ['topic/' + url_pas(name), get_lang(conn, 'discussion'), topic], 
-            ['history/' + url_pas(name), get_lang(conn, 'history'), history_color], 
-            ['xref/' + url_pas(name), get_lang(conn, 'backlink')], 
-            ['acl/' + url_pas(name), get_lang(conn, 'setting'), acl],
+            ['topic/' + url_pas(name), await get_lang('discussion'), topic], 
+            ['history/' + url_pas(name), await get_lang('history'), history_color], 
+            ['xref/' + url_pas(name), await get_lang('backlink')], 
+            ['acl/' + url_pas(name), await get_lang('setting'), acl],
         ]
 
         if flask.session and 'lastest_document' in flask.session:
@@ -244,7 +251,7 @@ async def view_w(name = 'Test', do_type = ''):
             flask.session['lastest_document'] = []
 
         if do_type == 'from':
-            menu += [['w/' + url_pas(name), get_lang(conn, 'pass')]]
+            menu += [['w/' + url_pas(name), await get_lang('pass')]]
             
             last_page = ''
             for for_a in reversed(range(0, len(flask.session['lastest_document']))):
@@ -290,7 +297,7 @@ async def view_w(name = 'Test', do_type = ''):
             end_data = '' + \
                 '<div class="opennamu_trace">' + \
                     '<a class="opennamu_trace_button" href="javascript:opennamu_do_trace_spread();"> (+)</a>' + \
-                    get_lang(conn, 'trace') + ' : ' + \
+                    await get_lang('trace') + ' : ' + \
                     ' ← '.join(
                         [
                             '<a href="/w/' + url_pas(for_a) + '">' + html.escape(for_a) + '</a>'
@@ -302,10 +309,10 @@ async def view_w(name = 'Test', do_type = ''):
             '' + end_data
 
         if uppage != 0:
-            menu += [['w/' + url_pas(uppage), get_lang(conn, 'upper')]]
+            menu += [['w/' + url_pas(uppage), await get_lang('upper')]]
 
         if down:
-            menu += [['down/' + url_pas(name), get_lang(conn, 'sub')]]
+            menu += [['down/' + url_pas(name), await get_lang('sub')]]
 
         curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'last_edit'"), [name])
         r_date = curs.fetchall()
@@ -331,7 +338,7 @@ async def view_w(name = 'Test', do_type = ''):
                 if time_2 > time_1:
                     curs.execute(db_change('select data from other where name = "outdated_doc_warning"'))
                     db_data = curs.fetchall()
-                    div = (db_data[0][0] if db_data and db_data[0][0] != '' else get_lang(conn, 'old_page_warning')) + '<hr class="main_hr">' + div
+                    div = (db_data[0][0] if db_data and db_data[0][0] != '' else await get_lang('old_page_warning')) + '<hr class="main_hr">' + div
 
         curs.execute(db_change("select data from other where name = 'body'"))
         body = curs.fetchall()
@@ -352,10 +359,13 @@ async def view_w(name = 'Test', do_type = ''):
         else:
             watch_list = 0
 
-        menu += [['doc_watch_list/1/' + url_pas(name), get_lang(conn, 'watchlist')]]
+        menu += [['doc_watch_list/1/' + url_pas(name), await get_lang('watchlist')]]
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [name_view, await wiki_set(), await wiki_custom(conn), wiki_css([sub, r_date, watch_list, description, view_count])],
+        if doc_rev != '':
+            sub = '(' + str(doc_rev) + ')'
+
+        return easy_minify(flask.render_template(await skin_check(),
+            imp = [name_view, await wiki_set(), await wiki_custom(), wiki_css([sub, r_date, watch_list, description, view_count])],
             data = div,
             menu = menu
         )), response_data

@@ -35,7 +35,6 @@ async def login_register_email():
             else:
                 i_text = 'Key : ' + str(flask.session.get('reg_key'))
 
-
             curs.execute(db_change('select id from user_set where name = "email" and data = ?'), [user_email])
             if curs.fetchall():
                 return await re_error(conn, 35)
@@ -51,17 +50,17 @@ async def login_register_email():
             sql_d = curs.fetchall()
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'email'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang('email'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
-                    <a href="/filter/email_filter">(''' + get_lang(conn, 'email_filter_list') + ''')</a>
+                    <a href="/filter/email_filter">(''' + await get_lang('email_filter_list') + ''')</a>
                     <hr class="main_hr">
                     ''' + b_text + '''
                     <form method="post">
-                        <input placeholder="''' + get_lang(conn, 'email') + '''" name="email" type="text">
+                        <input placeholder="''' + await get_lang('email') + '''" name="email" type="text">
                         <hr class="main_hr">
-                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
+                        <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['user', get_lang(conn, 'return')]]
+                menu = [['user', await get_lang('return')]]
             ))

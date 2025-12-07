@@ -10,28 +10,28 @@ async def main_setting_email_test():
         if flask.request.method == 'POST':
             render_data = await api_func_email()
             if render_data["response"] == "ok":
-                data = get_lang(conn, "ok")
+                data = await get_lang("ok")
             else:
-                data = get_lang(conn, "error")
+                data = await get_lang("error")
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, "email_test"), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang("email_test"), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = data,
-                menu = [["setting/external", get_lang(conn, 'return')]]
+                menu = [["setting/external", await get_lang('return')]]
             ))
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, "email_test"), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang("email_test"), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input name="title" placeholder="''' + get_lang(conn, "title") + '''">
+                        <input name="title" placeholder="''' + await get_lang("title") + '''">
                         <hr class="main_hr">
-                        <input name="email" placeholder="''' + get_lang(conn, "email") + '''">
+                        <input name="email" placeholder="''' + await get_lang("email") + '''">
                         <hr class="main_hr">
-                        <textarea  name="data" class="opennamu_textarea_500" placeholder="''' + get_lang(conn, "content") + '''"></textarea>
+                        <textarea  name="data" class="opennamu_textarea_500" placeholder="''' + await get_lang("content") + '''"></textarea>
                         <hr class="main_hr">
-                        <button type="submit">''' + get_lang(conn, "send") + '''</button>
+                        <button type="submit">''' + await get_lang("send") + '''</button>
                     </form>
                 ''',
-                menu = [["setting/external", get_lang(conn, 'return')]]
+                menu = [["setting/external", await get_lang('return')]]
             ))

@@ -63,7 +63,7 @@ async def edit_request(name = 'Test', do_type = ''):
                     mode = 'edit_request'
                 )
                 
-                render_set(conn, 
+                await render_set(conn, 
                     doc_name = name,
                     doc_data = edit_request_data,
                     data_type = 'backlink'
@@ -88,10 +88,10 @@ async def edit_request(name = 'Test', do_type = ''):
             db_data = curs.fetchall()
             old_data = db_data[0][0] if db_data else ''
 
-            result = view_diff_do(old_data, edit_request_data, 'r' + doc_ver, get_lang(conn, 'edit_request'))
+            result = view_diff_do(old_data, edit_request_data, 'r' + doc_ver, await get_lang('edit_request'))
 
-            return easy_minify(conn, flask.render_template(skin_check(conn), 
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'edit_request_check') + ')', 0])],
+            return easy_minify(flask.render_template(await skin_check(), 
+                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('edit_request_check') + ')', 0])],
                 data = '''
                     <div id="opennamu_get_user_info">''' + html.escape(edit_request_user) + '''</div>
                     <hr class="main_hr">
@@ -102,8 +102,8 @@ async def edit_request(name = 'Test', do_type = ''):
                     ''' + result + '''
                     <hr class="main_hr">
                     <form method="post">
-                        <button ''' + disabled + ''' id="opennamu_save_button" type="submit" name="check" value="Y">''' + get_lang(conn, 'approve') + '''</button>
-                        <button ''' + disabled + ''' id="opennamu_preview_button" type="submit" name="check" value="">''' + get_lang(conn, 'decline') + '''</button>
+                        <button ''' + disabled + ''' id="opennamu_save_button" type="submit" name="check" value="Y">''' + await get_lang('approve') + '''</button>
+                        <button ''' + disabled + ''' id="opennamu_preview_button" type="submit" name="check" value="">''' + await get_lang('decline') + '''</button>
                         <hr class="main_hr">
                         <textarea readonly class="opennamu_textarea_500">''' + html.escape(edit_request_data) + '''</textarea>
                     </form>

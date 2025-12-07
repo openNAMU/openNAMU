@@ -49,7 +49,7 @@ async def main_setting_head(num, skin_name = '', set_preview = 0):
                 form_action = 'formaction="/setting/body/top"'
                 data_preview = flask.request.form.get('content', '') if set_preview == 1 else ''
                 plus = '''
-                    <button id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/top">''' + get_lang(conn, 'preview') + '''</button>
+                    <button id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/top">''' + await get_lang('preview') + '''</button>
                     <hr class="main_hr">
                     <div id="opennamu_preview_area">''' + data_preview + '''</div>
                 '''
@@ -59,20 +59,20 @@ async def main_setting_head(num, skin_name = '', set_preview = 0):
                 data_preview = flask.request.form.get('content', '') if set_preview == 1 else ''
                 form_action = 'formaction="/setting/body/bottom"'
                 plus = '''
-                    <button id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/bottom">''' + get_lang(conn, 'preview') + '''</button>
+                    <button id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/bottom">''' + await get_lang('preview') + '''</button>
                     <hr class="main_hr">
                     <div id="opennamu_preview_area">''' + data_preview + '''</div>
                 '''
             else:
                 skin_list = ''
-                for for_a in load_skin(conn, '', 1):
+                for for_a in await load_skin('', 1):
                     skin_list += '<a href="/setting/head/' + url_pas(for_a) + '">(' + html.escape(for_a) + ')</a> '
                     skin_list += '<a href="/setting/head/' + url_pas(for_a) + '-cssdark">(' + html.escape(for_a) + '-cssdark)</a> '
 
                 curs.execute(db_change("select data from other where name = 'head' and coverage = ?"), [skin_name])
                 title = '_head'
                 start = '' + \
-                    '<a href="/setting/head">(' + get_lang(conn, 'all') + ')</a> ' + \
+                    '<a href="/setting/head">(' + await get_lang('all') + ')</a> ' + \
                     skin_list + '''
                     <hr class="main_hr">
                     <span>
@@ -97,17 +97,17 @@ async def main_setting_head(num, skin_name = '', set_preview = 0):
             else:
                 sub_plus = ''
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, data = 'main' + title, safe = 1), await wiki_set(), await wiki_custom(conn), wiki_css(['(HTML)' + sub_plus, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang(data = 'main' + title, safe = 1), await wiki_set(), await wiki_custom(), wiki_css(['(HTML)' + sub_plus, 0])],
                 data = '''
                     <form method="post">
                         ''' + start + '''
-                        <textarea class="opennamu_textarea_500" placeholder="''' + get_lang(conn, 'enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
+                        <textarea class="opennamu_textarea_500" placeholder="''' + await get_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
-                        ''' + (get_lang(conn, 'main_css_warning') + '<hr class="main_hr">' if title == '_head' else '') + '''
-                        <button id="opennamu_save_button" type="submit" ''' + form_action + '''>''' + get_lang(conn, 'save') + '''</button>
+                        ''' + (await get_lang('main_css_warning') + '<hr class="main_hr">' if title == '_head' else '') + '''
+                        <button id="opennamu_save_button" type="submit" ''' + form_action + '''>''' + await get_lang('save') + '''</button>
                         ''' + plus + '''
                     </form>
                 ''',
-                menu = [['setting', get_lang(conn, 'return')]]
+                menu = [['setting', await get_lang('return')]]
             ))

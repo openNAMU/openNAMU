@@ -32,8 +32,13 @@ views/sl_open
 views/nitori
 views/jsonnamu
 
-route_go/bin/*
-!route_go/bin/test
+bin/*
+!bin/test
 
 sitemap.xml
 sitemap_0.xml
+
+*_data
+
+venv
+.env

@@ -21,10 +21,10 @@ async def list_no_link(num = 1):
 
             div += '</li>'
         
-        div += '</ul>' + get_next_page_bottom(conn, '/list/document/no_link/{}', num, n_list)
+        div += '</ul>' + await get_next_page_bottom('/list/document/no_link/{}', num, n_list)
         
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'no_link_document_list'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+        return easy_minify(flask.render_template(await skin_check(),
+            imp = [await get_lang('no_link_document_list'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
             data = div,
-            menu = [['other', get_lang(conn, 'return')]]
+            menu = [['other', await get_lang('return')]]
         ))

@@ -61,7 +61,7 @@ async def edit_revert(name, num):
                 mode = 'revert'
             )
 
-            render_set(conn, 
+            await render_set(conn, 
                 doc_name = name,
                 doc_data = data[0][0],
                 data_type = 'backlink'
@@ -74,15 +74,15 @@ async def edit_revert(name, num):
             else:
                 preview = ''
             
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(r' + str(num) + ') (' + get_lang(conn, 'revert') + ')', 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(r' + str(num) + ') (' + await get_lang('revert') + ')', 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + get_lang(conn, 'why') + '''" name="send" type="text">
+                        <input placeholder="''' + await get_lang('why') + '''" name="send" type="text">
                         <hr class="main_hr">
-                        ''' + await captcha_get(conn) + ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'revert')  + '''
-                        <button type="submit">''' + get_lang(conn, 'revert') + '''</button>
+                        ''' + await captcha_get(conn) + await ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'revert')  + '''
+                        <button type="submit">''' + await get_lang('revert') + '''</button>
                     </form>
                 ''' + preview,
-                menu = [['history/' + url_pas(name), get_lang(conn, 'history')], ['recent_changes', get_lang(conn, 'recent_change')]]
+                menu = [['history/' + url_pas(name), await get_lang('history')], ['recent_changes', await get_lang('recent_change')]]
             ))

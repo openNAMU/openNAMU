@@ -34,7 +34,7 @@ async def user_setting_head(skin_name = ''):
                 data = head_data[0][0] if head_data else ''
             else:
                 start = '' + \
-                    '<span>' + get_lang(conn, 'user_head_warning') + '</span>' + \
+                    '<span>' + await get_lang('user_head_warning') + '</span>' + \
                     '<hr class="main_hr">' + \
                 ''
                 data = flask.session['head' + skin_name] if 'head' + skin_name in flask.session else ''
@@ -54,22 +54,22 @@ async def user_setting_head(skin_name = ''):
                 sub_name = ' (' + skin_name_org + ')'
 
             start = '' + \
-                '<a href="/change/head">(' + get_lang(conn, 'all') + ')</a> ' + \
-                ' '.join(['<a href="/change/head/' + url_pas(i) + '">(' + html.escape(i) + ')</a>' for i in load_skin(conn, '', 1)]) + \
+                '<a href="/change/head">(' + await get_lang('all') + ')</a> ' + \
+                ' '.join(['<a href="/change/head/' + url_pas(i) + '">(' + html.escape(i) + ')</a>' for i in await load_skin('', 1)]) + \
                 '<hr class="main_hr">' + \
                 start + \
             ''
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, data = 'user_head', safe = 1), await wiki_set(), await wiki_custom(conn), wiki_css(['(HTML)' + sub_name, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang(data = 'user_head', safe = 1), await wiki_set(), await wiki_custom(), wiki_css(['(HTML)' + sub_name, 0])],
                 data = start + '''
                     <form method="post">
                         <textarea class="opennamu_textarea_500" cols="100" name="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
-                        ''' + get_lang(conn, 'user_css_warning') + ''' : <a href="/change/head_reset">/change/head_reset</a>
+                        ''' + await get_lang('user_css_warning') + ''' : <a href="/change/head_reset">/change/head_reset</a>
                         <hr class="main_hr">
-                        <button id="opennamu_save_button" type="submit">''' + get_lang(conn, 'save') + '''</button>
+                        <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['change', get_lang(conn, 'return')]]
+                menu = [['change', await get_lang('return')]]
             ))

@@ -103,7 +103,7 @@ async def view_set(name = 'Test', multiple = False):
                 curs.execute(db_change("select data from data where title = ?"), [name])
                 db_data_2 = curs.fetchall()
                 if db_data_2:
-                    render_set(conn, 
+                    await render_set(conn, 
                         doc_name = name,
                         doc_data = db_data_2[0][0],
                         data_type = 'backlink'
@@ -143,16 +143,16 @@ async def view_set(name = 'Test', multiple = False):
 
             return redirect(conn, '/acl/' + url_pas(name))
         else:
-            data = '<h2>' + get_lang(conn, 'acl') + '</h2>'
+            data = '<h2>' + await get_lang('acl') + '</h2>'
             acl_list = await get_acl_list()
             acl_get_list = [
-                [get_lang(conn, 'view_acl'), 'view', '3'],
-                [get_lang(conn, 'document_acl'), 'decu', '4'],
-                [get_lang(conn, 'document_edit_acl'), 'document_edit_acl', '5'],
-                [get_lang(conn, 'document_edit_request_acl'), 'document_edit_request_acl', '5'],
-                [get_lang(conn, 'document_move_acl'), 'document_move_acl', '5'],
-                [get_lang(conn, 'document_delete_acl'), 'document_delete_acl', '5'],
-                [get_lang(conn, 'discussion_acl'), 'dis', '3'],
+                [await get_lang('view_acl'), 'view', '3'],
+                [await get_lang('document_acl'), 'decu', '4'],
+                [await get_lang('document_edit_acl'), 'document_edit_acl', '5'],
+                [await get_lang('document_edit_request_acl'), 'document_edit_request_acl', '5'],
+                [await get_lang('document_move_acl'), 'document_move_acl', '5'],
+                [await get_lang('document_delete_acl'), 'document_delete_acl', '5'],
+                [await get_lang('discussion_acl'), 'dis', '3'],
             ]
 
             for i in acl_get_list:
@@ -184,37 +184,37 @@ async def view_set(name = 'Test', multiple = False):
             acl_data = curs.fetchall()
             acl_why = html.escape(acl_data[0][0]) if acl_data else ''
             data += '' + \
-                '<h3>' + get_lang(conn, 'why') + '</h3>' + \
-                '<input value="' + acl_why + '" ' + check_ok + ' placeholder="' + get_lang(conn, 'why') + '" name="why" ' + check_ok + '>' + \
+                '<h3>' + await get_lang('why') + '</h3>' + \
+                '<input value="' + acl_why + '" ' + check_ok + ' placeholder="' + await get_lang('why') + '" name="why" ' + check_ok + '>' + \
                 '<hr class="main_hr">' + \
             ''
 
             data += '''
-                <h3>''' + get_lang(conn, 'explanation') + '''</h3>
+                <h3>''' + await get_lang('explanation') + '''</h3>
                 <span id="exp"></span>
                 <ul>
-                    <li>normal : ''' + get_lang(conn, 'unset') + '''</li>
-                    <li>admin : ''' + get_lang(conn, 'admin_acl') + '''</li>
-                    <li>user : ''' + get_lang(conn, 'member_acl') + '''</li>
-                    <li>50_edit : ''' + get_lang(conn, '50_edit_acl') + '''</li>
-                    <li>all : ''' + get_lang(conn, 'all_acl') + '''</li>
-                    <li>email : ''' + get_lang(conn, 'email_acl') + '''</li>
-                    <li>owner : ''' + get_lang(conn, 'owner_acl') + '''</li>
-                    <li>ban : ''' + get_lang(conn, 'ban_acl') + '''</li>
-                    <li>before : ''' + get_lang(conn, 'before_acl') + '''</li>
-                    <li>30_day : ''' + get_lang(conn, '30_day_acl') + '''</li>
-                    <li>ban_admin : ''' + get_lang(conn, 'ban_admin_acl') + '''</li>
-                    <li>not_all : ''' + get_lang(conn, 'not_all_acl') + '''</li>
-                    <li>90_day : ''' + get_lang(conn, '90_day_acl') + '''</li>
-                    <li>up_to_level_3 : ''' + get_lang(conn, 'up_to_level_3') + '''</li>
-                    <li>up_to_level_10 : ''' + get_lang(conn, 'up_to_level_10') + '''</li>
+                    <li>normal : ''' + await get_lang('unset') + '''</li>
+                    <li>admin : ''' + await get_lang('admin_acl') + '''</li>
+                    <li>user : ''' + await get_lang('member_acl') + '''</li>
+                    <li>50_edit : ''' + await get_lang('50_edit_acl') + '''</li>
+                    <li>all : ''' + await get_lang('all_acl') + '''</li>
+                    <li>email : ''' + await get_lang('email_acl') + '''</li>
+                    <li>owner : ''' + await get_lang('owner_acl') + '''</li>
+                    <li>ban : ''' + await get_lang('ban_acl') + '''</li>
+                    <li>before : ''' + await get_lang('before_acl') + '''</li>
+                    <li>30_day : ''' + await get_lang('30_day_acl') + '''</li>
+                    <li>ban_admin : ''' + await get_lang('ban_admin_acl') + '''</li>
+                    <li>not_all : ''' + await get_lang('not_all_acl') + '''</li>
+                    <li>90_day : ''' + await get_lang('90_day_acl') + '''</li>
+                    <li>up_to_level_3 : ''' + await get_lang('up_to_level_3') + '''</li>
+                    <li>up_to_level_10 : ''' + await get_lang('up_to_level_10') + '''</li>
                 </ul>
-                <h2>''' + get_lang(conn, 'markup') + '''</h2>
+                <h2>''' + await get_lang('markup') + '''</h2>
             '''
 
             data += view_set_markup(conn, document_name = name, disable = check_ok)
 
-            save_button = '<button type="submit" ' + check_ok + '>' + get_lang(conn, 'save') + '</button>'
+            save_button = '<button type="submit" ' + check_ok + '>' + await get_lang('save') + '</button>'
             if await acl_check('', 'owner_auth', '', '') == 1:
                 check_ok = 'disabled'
 
@@ -227,39 +227,39 @@ async def view_set(name = 'Test', multiple = False):
             document_editor_top = db_data[0][0] if db_data and db_data[0][0] != '' else ''
 
             data += '''
-                <h2>''' + get_lang(conn, 'document_top') + ''' (HTML)</h2>
+                <h2>''' + await get_lang('document_top') + ''' (HTML)</h2>
                 <textarea ''' + check_ok + ''' class="opennamu_textarea_100" name="document_top">''' + html.escape(document_top) + '''</textarea>
                 
-                <h2>''' + get_lang(conn, 'document_editor_top') + ''' (HTML)</h2>
+                <h2>''' + await get_lang('document_editor_top') + ''' (HTML)</h2>
                 <textarea ''' + check_ok + ''' class="opennamu_textarea_100" name="document_editor_top">''' + html.escape(document_editor_top) + '''</textarea>
             '''
             data += '<hr class="main_hr">'
 
             text_area = ''
             if multiple == True:
-                text_area = '<textarea class="opennamu_textarea_500" placeholder="' + get_lang(conn, 'many_delete_help') + '" name="title_name"></textarea><hr class="main_hr">'
+                text_area = '<textarea class="opennamu_textarea_500" placeholder="' + await get_lang('many_delete_help') + '" name="title_name"></textarea><hr class="main_hr">'
                 menu = [
-                    ['manager', get_lang(conn, 'admin')]
+                    ['manager', await get_lang('admin')]
                 ]
-                title = get_lang(conn, 'mutiple_document_setting')
+                title = await get_lang('mutiple_document_setting')
                 sub = 0
             else:
                 menu = [
-                    ['w/' + url_pas(name), get_lang(conn, 'return')], 
-                    ['acl_multiple', get_lang(conn, 'mutiple_document_setting')],
-                    ['manager', get_lang(conn, 'admin')]
+                    ['w/' + url_pas(name), await get_lang('return')], 
+                    ['acl_multiple', await get_lang('mutiple_document_setting')],
+                    ['manager', await get_lang('admin')]
                 ]
                 title = name
-                sub = '(' + get_lang(conn, 'document_setting') + ')'
-                save_button += ' <button type="button" onclick="w_set_reset();" ' + check_ok + '>' + get_lang(conn, 'reset') + '</button>'
+                sub = '(' + await get_lang('document_setting') + ')'
+                save_button += ' <button type="button" onclick="w_set_reset();" ' + check_ok + '>' + await get_lang('reset') + '</button>'
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [title, await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [title, await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],
                 data = '''
                     <form method="post">
                         <script defer src="/views/main_css/js/route/w_set.js''' + cache_v() + '''"></script>
                         ''' + text_area + '''
-                        ''' + render_simple_set(conn, data) + '''
+                        ''' + await render_simple_set(data) + '''
                         ''' + save_button + '''
                     </form>
                 ''',

@@ -1355,8 +1355,8 @@ class class_do_render_namumark:
                 else:
                     return slash_add + match[2]
 
-        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9_]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
-        self.render_data = re.sub(r'(\\+)?@([ㄱ-힣a-zA-Z0-9_]+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([ㄱ-ㅣ가-힣a-zA-Z0-9_]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
+        self.render_data = re.sub(r'(\\+)?@([ㄱ-ㅣ가-힣a-zA-Z0-9_]+)@', do_render_include_default_sub, self.render_data)
 
     def do_render_include(self):
         include_num = 0
@@ -2077,6 +2077,8 @@ class class_do_render_namumark:
                             else:
                                 if wiki_data_syntax == 'asm' or wiki_data_syntax == 'assembly':
                                     wiki_data_syntax = 'x86arm'
+                                elif wiki_data_syntax == 'sh':
+                                    wiki_data_syntax = 'bash'
                         else:
                             wiki_data_syntax = 'python'
 

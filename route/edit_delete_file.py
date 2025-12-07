@@ -30,18 +30,18 @@ async def edit_delete_file(name = 'test.jpg'):
 
             return redirect(conn, '/w/' + url_pas(name))
         else:
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [name, await wiki_set(), await wiki_custom(conn), wiki_css(['(' + get_lang(conn, 'file_delete') + ')', 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('file_delete') + ')', 0])],
                 data = '''
                     <form method="post">
                         <img src="/image/''' + url_pas(file_all_name) + '''">
                         <hr class="main_hr">
                         <a href="/image/''' + url_pas(file_all_name) + '''">/image/''' + url_pas(file_all_name) + '''</a>
                         <hr class="main_hr">
-                        <label><input name="with_doc" type="checkbox" checked> ''' + get_lang(conn, 'file_delete_with_document') + '''</label>
+                        <label><input name="with_doc" type="checkbox" checked> ''' + await get_lang('file_delete_with_document') + '''</label>
                         <hr class="main_hr">
-                        <button type="submit">''' + get_lang(conn, 'file_delete') + '''</button>
+                        <button type="submit">''' + await get_lang('file_delete') + '''</button>
                     </form>
                 ''',
-                menu = [['w/' + url_pas(name), get_lang(conn, 'return')]]
+                menu = [['w/' + url_pas(name), await get_lang('return')]]
             ))

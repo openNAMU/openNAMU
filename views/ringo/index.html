@@ -1,41 +1,49 @@
+{% set imp0 = imp[0] %}
+{% set imp1 = imp[1] %}
+{% set imp2 = imp[2] %}
+{% set imp3 = imp[3] %}
+{% set imp1_7 = imp1[7] %}
+{% set imp1_7_0 = imp1_7[0] %}
+{% set imp1_7_1 = imp1_7[1] %}
+{% set imp1_7_2 = imp1_7[2] %}
 <!DOCTYPE html>
 <html lang="{{'language_tag'|load_lang}}">
     <head>
         <style id="ringo_add_style"></style>
         <script src="/views/ringo/js/skin_set_do.js.cache_v4"></script>
         <meta charset="utf-8">
-        {% if imp[3][0] != 0 %}
-            <title>{{imp[0]}} {{imp[3][0]}} - {{imp[1][0]}}</title>
+        {% if imp3[0] != 0 %}
+            <title>{{imp0}} {{imp3[0]}} - {{imp1[0]}}</title>
         {% else %}
-            <title>{{imp[0]}} - {{imp[1][0]}}</title>
+            <title>{{imp0}} - {{imp1[0]}}</title>
         {% endif %}
-        {{imp[3][3]|safe}}
+        {{imp3[3]|safe}}
         <link href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT/fonts/static/woff2/SUIT.css" rel="stylesheet">
         <script defer src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
         <script defer src="/views/ringo/js/main.js.cache_v3"></script>
         <script defer src="/views/ringo/js/sidebar.js.cache_v7"></script>
         <script defer src="/views/ringo/js/skin_set.js.cache_v9"></script>
         <link rel="stylesheet" href="/views/ringo/css/main.css.cache_v13">
-        {% if request.cookies.get('main_css_darkmode', '') == '1' %}
-            {{imp[3][5]|safe}}
+        {% if imp3[5] != '' %}
+            {{imp3[5]|safe}}
             <link rel="stylesheet" href="/views/ringo/css/dark.css.cache_v3">
         {% endif %}
         <link rel="shortcut icon" href="/views/main_css/file/favicon.ico.cache_v1">
-        {{imp[1][5]|safe}}
-        {{imp[2][3]|safe}}
-        {% if imp[3][0] != 0 %}
-            <meta name="title" content="{{imp[0]}}{{imp[3][0]}} - {{imp[1][0]}}">
+        {{imp1[5]|safe}}
+        {{imp2[3]|safe}}
+        {% if imp3[0] != 0 %}
+            <meta name="title" content="{{imp0}}{{imp3[0]}} - {{imp1[0]}}">
         {% else %}
-            <meta name="title" content="{{imp[0]}} - {{imp[1][0]}}">
+            <meta name="title" content="{{imp0}} - {{imp1[0]}}">
         {% endif %}
-        <meta name="keywords" content="{{imp[0]}}">
-        <meta name="description" content="{{imp[3][6]}}">
+        <meta name="keywords" content="{{imp0}}">
+        <meta name="description" content="{{imp3[6]}}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
         <header id="main">
             <span id="left">
-                <a id="logo" href="/">{{imp[1][4]|safe}}</a>
+                <a id="logo" href="/">{{imp1[4]|safe}}</a>
             </span>
             <span id="right">
                 <div class="top_cel" id="recent_cel">
@@ -78,7 +86,7 @@
                             <span class="iconify" data-icon="ic:baseline-build" data-inline="true"></span>
                             {{'other_tool'|load_lang}}
                         </a>
-                        {% if imp[2][9] != '0' %}
+                        {% if imp2[9] != '0' %}
                             <a href="/manager">
                                 <span class="iconify" data-icon="ic:baseline-how-to-reg" data-inline="true"></span>
                                 {{'admin_tool'|load_lang}}
@@ -96,8 +104,8 @@
                 </div>
                 <div class="top_cel" id="user_cel">
                     <a href="javascript:ringo_opening('user_cel_in');">
-                        {% if imp[2][2] == 1 %}
-                            {% if imp[2][8] != '0' %}
+                        {% if imp2[2] == 1 %}
+                            {% if imp2[8] != '0' %}
                                 <span class="iconify" data-icon="ic:baseline-add-alert" data-inline="true"></span>
                             {% else %}
                                 <span class="iconify" data-icon="ic:baseline-person-add" data-inline="true"></span>
@@ -105,7 +113,7 @@
                         {% else %}
                             <span class="iconify" data-icon="ic:round-person-search" data-inline="true"></span>
                         {% endif %}
-                        <span class="not_mobile">{{imp[2][5]}}</span>
+                        <span class="not_mobile">{{imp2[5]}}</span>
                         <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                     </a>
                     <div class="top_cel_in" id="user_cel_in" style="display: none;">
@@ -117,10 +125,10 @@
                             <span class="iconify" data-icon="ic:baseline-manage-accounts" data-inline="true"></span>
                             {{'user_setting'|load_lang}}
                         </a>
-                        {% if imp[2][2] == 1 %}
+                        {% if imp2[2] == 1 %}
                             <a href="/alarm">
                                 <span class="iconify" data-icon="ic:baseline-contact-mail" data-inline="true"></span>
-                                {{'alarm'|load_lang}} ({{imp[2][8]}})
+                                {{'alarm'|load_lang}} ({{imp2[8]}})
                             </a>
                             <a href="/watch_list">
                                 <span class="iconify" data-icon="ic:round-preview" data-inline="true"></span>
@@ -146,7 +154,7 @@
                         {% endif %}
                     </div>
                 </div>
-                {% if imp[1][6] != '' %}
+                {% if imp1[6] != '' %}
                     <div class="top_cel" id="add_cel">
                         <a href="javascript:ringo_opening('add_cel_in');">
                             <span class="iconify" data-icon="ic:baseline-playlist-add" data-inline="true"></span>
@@ -154,7 +162,7 @@
                             <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                         </a>
                         <div class="top_cel_in" id="add_cel_in" style="display: none;">
-                            {% for added_top_menu in imp[1][6] %}
+                            {% for added_top_menu in imp1[6] %}
                                 <a href="{{added_top_menu[1]}}">
                                     <span class="iconify" data-icon="ic:baseline-plus" data-inline="true"></span>
                                     {{added_top_menu[0]}}
@@ -187,15 +195,15 @@
             <header id="section">
                 <article class="main" id="title">
                     <h1 class="blank">
-                        <span class="change_space">{{imp[0]}}</span>
-                        {% if imp[3][0] != 0 %}
-                            <sub>{{imp[3][0]}}</sub>
+                        <span class="change_space">{{imp0}}</span>
+                        {% if imp3[0] != 0 %}
+                            <sub>{{imp3[0]}}</sub>
                         {% endif %}
                     </h1>
-                    {% if imp[3][1] != 0 %}
-                        {{'last_edit_time'|load_lang}} : {{imp[3][1]}}
-                        {% if imp[3][7] != 0 %}
-                            | {{'page_view'|load_lang}} : {{imp[3][7]}}
+                    {% if imp3[1] != 0 %}
+                        {{'last_edit_time'|load_lang}} : {{imp3[1]}}
+                        {% if imp3[7] != 0 %}
+                            | {{'page_view'|load_lang}} : {{imp3[7]}}
                         {% endif %}
                     {% endif %}
                     {% if menu != 0 %}
@@ -222,13 +230,13 @@
                 </article>
             </header>
             <article class="main" id="main_data">
-                {{imp[1][7][0]|safe}}
+                {{imp1_7_0|safe}}
                 {{data|safe}}
-                {{imp[1][7][2]|safe}}
+                {{imp1_7_2|safe}}
             </article>
             <footer class="not_mobile">
                 <article class="main" id="footer">
-                    {{imp[1][1]|safe}}
+                    {{imp1[1]|safe}}
                     <br>
                     <br>
                     <a href="https://github.com/openNAMU/openNAMU"><img alt="b_logo" id="b_logo" src="/views/main_css/file/s_logo.png"></a>
@@ -236,7 +244,7 @@
             </footer>
         </section>
         <aside class="do_fixed">
-            {% if imp[1][7][1] == '' %}
+            {% if imp1_7_1 == '' %}
                 <button id="side_button_1" class="side_button selected">{{'edit'|load_lang}}</button><!--
              --><button id="side_button_2" class="side_button">{{'discussion'|load_lang}}</button><!--
              --><button id="side_button_3" class="side_button">{{'bbs'|load_lang}}</button>
@@ -244,7 +252,7 @@
                     Loading...
                 </div>
             {% else %}
-                {{imp[1][7][1]|safe}}
+                {{imp1_7_1|safe}}
             {% endif %}
         </aside>
         <div id="nav_bar">
@@ -265,7 +273,7 @@
             </div>
         </div>
         <footer class="only_mobile" id="footer">
-            {{imp[1][1]|safe}}
+            {{imp1[1]|safe}}
             <br>
             <br>
             <a href="https://github.com/openNAMU/openNAMU"><img alt="b_logo" id="b_logo" src="/views/main_css/file/logo.svg"></a>

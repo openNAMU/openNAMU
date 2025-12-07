@@ -81,6 +81,7 @@ from route.main_setting_sitemap_set import main_setting_sitemap_set
 from route.main_setting_skin_set import main_setting_skin_set
 from route.main_setting_top_menu import main_setting_top_menu
 from route.main_setting_email_test import main_setting_email_test
+from route.main_setting_404_page import main_setting_404_page
 
 from route.main_sys_restart import main_sys_restart
 from route.main_sys_shutdown import main_sys_shutdown
@@ -139,7 +140,6 @@ from route.user_setting_skin_set_main import user_setting_skin_set_main
 from route.user_setting_top_menu import user_setting_top_menu
 from route.user_setting_user_name import user_setting_user_name
 
-from route.user_watch_list import user_watch_list
 from route.user_watch_list_name import user_watch_list_name
 
 from route.view_set import view_set
@@ -161,13 +161,9 @@ from route.n_list_recent_discuss import list_recent_discuss
 from route.n_list_recent_block import list_recent_block
 from route.n_list_user_check_submit import list_user_check_submit
 
-from route.n_w_watch_list import w_watch_list
-
 from route.n_topic_list import topic_list
 
 from route.n_give_auth import give_auth
-
-from route.n_setting_404_page import setting_404_page
 
 from route.n_bbs_main import bbs_main
 from route.n_bbs_in import bbs_in
@@ -176,7 +172,7 @@ from route.n_bbs_w_set import bbs_w_set
 from route.n_edit_move_all import edit_move_all
 
 from route.go_api_func_llm import api_func_llm
-from route.go_api_func_language import api_func_language
+from route.go_api_func_language import api_func_language, api_func_language_exter
 from route.go_api_func_sha224 import api_func_sha224
 from route.go_api_func_ip import api_func_ip
 from route.go_api_func_ip_menu import api_func_ip_menu
@@ -197,7 +193,7 @@ from route.go_api_list_auth import api_list_auth
 from route.go_api_list_markup import api_list_markup
 from route.go_api_list_history import api_list_history, api_list_history_exter
 
-from route.go_api_bbs import api_bbs
+from route.go_api_bbs import api_bbs, api_bbs_exter
 from route.go_api_bbs_list import api_bbs_list
 from route.go_api_bbs_w import api_bbs_w
 from route.go_api_bbs_w_set import api_bbs_w_set
@@ -205,7 +201,7 @@ from route.go_api_bbs_w_tabom import api_bbs_w_tabom
 from route.go_api_bbs_w_comment import api_bbs_w_comment, api_bbs_w_comment_exter
 from route.go_api_bbs_w_comment_one import api_bbs_w_comment_one, api_bbs_w_comment_one_exter
 
-from route.go_api_setting import api_setting
+from route.go_api_setting import api_setting, api_setting_exter
 
 from route.go_api_topic import api_topic
 from route.go_api_topic_list import api_topic_list
@@ -222,3 +218,9 @@ from route.go_api_w_set_reset import api_w_set_reset
 from route.go_api_w_page_view import api_w_page_view
 
 from route.go_main_func_easter_egg import main_func_easter_egg
+
+from route.go_view_list_random import view_list_random
+
+from route.go_view_w_watch_list import view_w_watch_list
+
+from route.go_view_user_watch_list import view_user_watch_list

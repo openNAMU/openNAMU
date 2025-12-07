@@ -45,7 +45,7 @@ async def topic_tool_acl(topic_num = 1):
 
                 do_add_thread(conn, 
                     topic_num,
-                    get_lang(conn, 'acl_thread_change') + ' : ' + acl_data,
+                    await get_lang('acl_thread_change') + ' : ' + acl_data,
                     '1'
                 )
                 do_reload_recent_thread(conn, 
@@ -79,22 +79,22 @@ async def topic_tool_acl(topic_num = 1):
 
                 acl_html_list_view += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
 
-            return easy_minify(conn, flask.render_template(skin_check(conn),
-                imp = [get_lang(conn, 'topic_acl_setting'), await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+            return easy_minify(flask.render_template(await skin_check(),
+                imp = [await get_lang('topic_acl_setting'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <a href="/acl/TEST#exp">(''' + get_lang(conn, 'reference') + ''')</a>
-                        <h2>''' + get_lang(conn, 'thread_acl') + '''</h2>
+                        <a href="/acl/TEST#exp">(''' + await get_lang('reference') + ''')</a>
+                        <h2>''' + await get_lang('thread_acl') + '''</h2>
                         <select name="acl">
                             ''' + acl_html_list + '''
                         </select>
-                        <h2>''' + get_lang(conn, 'view_acl') + ''' (''' + get_lang(conn, 'beta') + ''')</h2>
+                        <h2>''' + await get_lang('view_acl') + ''' (''' + await get_lang('beta') + ''')</h2>
                         <select name="acl_view">
                             ''' + acl_html_list_view + '''
                         </select>
                         <hr class="main_hr">
-                        <button type="submit">''' + get_lang(conn, 'save') + '''</button>
+                        <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['thread/' + topic_num + '/tool', get_lang(conn, 'return')]]
+                menu = [['thread/' + topic_num + '/tool', await get_lang('return')]]
             ))

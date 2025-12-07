@@ -40,26 +40,26 @@ async def list_title_index(num = 1):
                 data += '''
                     </ul>
                     <ul>
-                        <li>''' + get_lang(conn, 'all') + ' : ' + str(count_end[0]) + '''</li>
+                        <li>''' + await get_lang('all') + ' : ' + str(count_end[0]) + '''</li>
                     </ul>
                     <ul>
-                        <li>''' + get_lang(conn, 'category') + ' : ' + str(count_end[1]) + '''</li>
-                        <li>''' + get_lang(conn, 'user_document') + ' : ' + str(count_end[2]) + '''</li>
-                        <li>''' + get_lang(conn, 'file') + ' : ' + str(count_end[3]) + '''</li>
-                        <li>''' + get_lang(conn, 'other') + ' : ' + str(count_end[4]) + '''</li>
+                        <li>''' + await get_lang('category') + ' : ' + str(count_end[1]) + '''</li>
+                        <li>''' + await get_lang('user_document') + ' : ' + str(count_end[2]) + '''</li>
+                        <li>''' + await get_lang('file') + ' : ' + str(count_end[3]) + '''</li>
+                        <li>''' + await get_lang('other') + ' : ' + str(count_end[4]) + '''</li>
                 '''
             else:
                 data += '''
                     </ul>
                     <ul>
-                        <li>''' + get_lang(conn, 'all') + ' : ' + all_title[0][0] + '''</li>
+                        <li>''' + await get_lang('all') + ' : ' + all_title[0][0] + '''</li>
                 '''
 
-        data += '</ul>' + get_next_page_bottom(conn, '/list/document/all/{}', num, title_list)
+        data += '</ul>' + await get_next_page_bottom('/list/document/all/{}', num, title_list)
         sub = ' (' + str(num) + ')'
 
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = [get_lang(conn, 'all_document_list'), await wiki_set(), await wiki_custom(conn), wiki_css([sub, 0])],
+        return easy_minify(flask.render_template(await skin_check(),
+            imp = [await get_lang('all_document_list'), await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],
             data = data,
-            menu = [['other', get_lang(conn, 'return')]]
+            menu = [['other', await get_lang('return')]]
         ))

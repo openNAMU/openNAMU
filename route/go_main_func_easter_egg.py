@@ -10,25 +10,10 @@ async def main_func_easter_egg():
             if not curs.fetchall():
                 curs.execute(db_change('insert into user_set (name, id, data) values ("get_🥚", ?, "Y")'), [ip])
     
-        if platform.system() == 'Linux':
-            if platform.machine() in ["AMD64", "x86_64"]:
-                data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.bin"), sys._getframe().f_code.co_name], stdout = subprocess.PIPE).communicate()[0]
-            else:
-                data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.bin"), sys._getframe().f_code.co_name], stdout = subprocess.PIPE).communicate()[0]
+        data = ''
 
-            data = data.decode('utf8')
-        elif platform.system() == 'Windows':
-            if platform.machine() in ["AMD64", "x86_64"]:
-                data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.amd64.exe"), sys._getframe().f_code.co_name], stdout = subprocess.PIPE).communicate()[0]
-            else:
-                data = subprocess.Popen([os.path.join(".", "route_go", "bin", "main.arm64.exe"), sys._getframe().f_code.co_name], stdout = subprocess.PIPE).communicate()[0]
-
-            data = data.decode('utf8')
-        else:
-            data = ''
-
-        return easy_minify(conn, flask.render_template(skin_check(conn),
-            imp = ['Easter Egg', await wiki_set(), await wiki_custom(conn), wiki_css([0, 0])],
+        return easy_minify(flask.render_template(await skin_check(),
+            imp = ['Easter Egg', await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
             data = data,
             menu = 0
         ))
