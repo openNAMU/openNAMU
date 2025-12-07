@@ -160,14 +160,14 @@ async def python_to_golang(func_name, other_set = {}):
 
     if func_name in func_to_normal_url:
         async with aiohttp.ClientSession() as session:
-            async with session.post('http://localhost:' + port_data + '/' + func_name, data = json_dumps(other_set), headers = headers) as res:
-                data = await res.texts()
+            async with session.post('http://localhost:' + port_data + '/compatible_api/' + func_name, data = json_dumps(other_set), headers = headers) as res:
+                data = await res.text()
 
                 return data
     else:
         async with aiohttp.ClientSession() as session:
             while 1:
-                async with session.post('http://localhost:' + port_data + '/' + func_name, data = json_dumps(other_set), headers = headers) as res:
+                async with session.post('http://localhost:' + port_data + '/compatible_api/' + func_name, data = json_dumps(other_set), headers = headers) as res:
                     data = await res.json()
 
                     if "response" in data and data["response"] == "error":
@@ -1230,7 +1230,19 @@ async def skin_check(set_n = 0):
     other_set["set_n"] = str(set_n)
 
     res = await python_to_golang('api_func_skin_name', other_set)
-    return res["data"]
+    raw = res["data"]
+
+    norm = os.path.normpath(raw)
+    parts = norm.split(os.sep)
+    if "views" in parts:
+        idx = parts.index("views")
+        rel_parts = parts[idx + 1:]
+    else:
+        rel_parts = parts
+
+    data = "/".join(rel_parts)
+
+    return data
     
 def cache_v():
     return '.cache_v288'

@@ -3,7 +3,7 @@ pip
 h11
 flask
 flask[async]
-hypercorn==0.17.3
+waitress
 
 aiohttp
 asyncio

@@ -2,6 +2,7 @@ from .tool.func import *
 
 from .go_api_list_history import api_list_history
 from .go_api_list_recent_change import api_list_recent_change
+from .go_api_func_auth import api_func_auth
 
 from .recent_change import recent_change_send_render
 
@@ -9,7 +10,7 @@ async def option_lang(lang_in, lang):
     if lang_in == 'user':
         lang_in = lang.get('user_document')
     elif lang_in in lang:
-        lang_in = lang[lang_in]
+        lang_in = get_lang(lang_in)
     
     return lang_in
 
@@ -34,8 +35,9 @@ async def list_history(tool = 'history', num = 1, set_type = 'normal', doc_name 
                 sub = '(' + await get_lang(set_type) + ')'
                 menu = [['other', await get_lang('return')], ['recent_edit_request', await get_lang('edit_request')]]
 
-            lang = data["language"]
-            auth = data["auth"]
+            auth = await api_func_auth()
+            print(auth)
+
             data = data["data"]
             
             data_html = ''
@@ -43,12 +45,12 @@ async def list_history(tool = 'history', num = 1, set_type = 'normal', doc_name 
             if tool == "history":
                 option_list = ['normal', 'edit', 'move', 'delete', 'revert', 'r1', 'setting']
                 for option in option_list:
-                    label = await option_lang(option, lang)
+                    label = await get_lang(option)
                     data_html += f'<a href="/history_page/1/{option}/{doc_name}">({label})</a> '
             else:
                 option_list = ['normal', 'edit', 'move', 'delete', 'revert', 'r1', 'edit_request', 'user', 'file', 'category']
                 for option in option_list:
-                    label = await option_lang(option, lang)
+                    label = await get_lang(option)
                     data_html += f'<a href="/recent_change/1/{option}">({label})</a> '
 
             date_heading = ''
@@ -98,7 +100,7 @@ async def list_history(tool = 'history', num = 1, set_type = 'normal', doc_name 
                 right += f'{data[for_a][7]} | '
 
                 edit_type = data[for_a][8] if data[for_a][8] != '' else 'edit'
-                right += f'{await option_lang(edit_type, lang)} | '
+                right += f'{await get_lang(edit_type)} | '
 
                 time_split = data[for_a][2].split(' ')
                 if date_heading != time_split[0]:
@@ -110,23 +112,23 @@ async def list_history(tool = 'history', num = 1, set_type = 'normal', doc_name 
 
                 right += f'<span style="display: none;" id="opennamu_history_tool_{for_a}">'
 
-                right += f'<a href="/render/{data[for_a][0]}/{doc_name}">{lang["view"]}</a>'
-                right += f' | <a href="/raw_rev/{data[for_a][0]}/{doc_name}">{lang["raw"]}</a>'
-                right += f' | <a href="/revert/{data[for_a][0]}/{doc_name}">{lang["revert"]} (r{data[for_a][0]})</a>'
+                right += f'<a href="/render/{data[for_a][0]}/{doc_name}">{get_lang("view")}</a>'
+                right += f' | <a href="/raw_rev/{data[for_a][0]}/{doc_name}">{get_lang("raw")}</a>'
+                right += f' | <a href="/revert/{data[for_a][0]}/{doc_name}">{get_lang("revert")} (r{data[for_a][0]})</a>'
 
                 if int(data[for_a][0]) > 1:
                     before_rev = str(int(data[for_a][0]) - 1)
-                    right += f' | <a href="/revert/{before_rev}/{doc_name}">{lang["revert"]} (r{before_rev})</a>'
-                    right += f' | <a href="/diff/{before_rev}/{data[for_a][0]}/{doc_name}">{lang["compare"]}</a>'
+                    right += f' | <a href="/revert/{before_rev}/{doc_name}">{get_lang("revert")} (r{before_rev})</a>'
+                    right += f' | <a href="/diff/{before_rev}/{data[for_a][0]}/{doc_name}">{get_lang("compare")}</a>'
 
-                right += f' | <a href="/history/{doc_name}">{lang["history"]}</a>'
+                right += f' | <a href="/history/{doc_name}">{get_lang("history")}</a>'
 
                 if auth.get("owner") or auth.get("hidel"):
-                    right += f' | <a href="/history_hidden/{data[for_a][0]}/{doc_name}">{lang["hide"]}</a>'
+                    right += f' | <a href="/history_hidden/{data[for_a][0]}/{doc_name}">{get_lang("hide")}</a>'
 
                 if auth.get("owner"):
-                    right += f' | <a href="/history_delete/{data[for_a][0]}/{doc_name}">{lang["history_delete"]}</a>'
-                    right += f' | <a href="/history_send/{data[for_a][0]}/{doc_name}">{lang["send_edit"]}</a>'
+                    right += f' | <a href="/history_delete/{data[for_a][0]}/{doc_name}">{get_lang("history_delete")}</a>'
+                    right += f' | <a href="/history_send/{data[for_a][0]}/{doc_name}">{get_lang("send_edit")}</a>'
 
                 right += '</span>'
 
@@ -153,12 +155,14 @@ async def list_history(tool = 'history', num = 1, set_type = 'normal', doc_name 
                     '<form method="post">'
                     f'<select name="a">{select}</select> '
                     f'<select name="b">{select}</select> '
-                    f'<button type="submit">{lang["compare"]}</button>'
+                    f'<button type="submit">{get_lang("compare")}</button>'
                     '</form>'
                     '<hr class="main_hr"></hr>' + data_html
                 )
             else:
                 data_html += await get_next_page_bottom(f'/recent_change/{{}}/{set_type}', num, data)
+
+            print(await wiki_custom())
 
             return easy_minify(flask.render_template(await skin_check(),
                 imp = [title, await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],

@@ -7,8 +7,7 @@ import logging
 from route.tool.func import *
 from route import *
 
-from hypercorn.asyncio import serve
-from hypercorn.config import Config
+from waitress import serve
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -176,7 +175,8 @@ with get_db_connect(init_mode = True) as conn:
             super(RegexConverter, self).__init__(url_map)
             self.regex = items[0]
 
-    app = flask.Flask(__name__, template_folder = './')
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    app = flask.Flask(__name__, template_folder = os.path.join(BASE_DIR, "views"))
 
     app.config['JSON_AS_ASCII'] = False
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
@@ -186,7 +186,7 @@ with get_db_connect(init_mode = True) as conn:
         app.config['DEBUG'] = True
         app.config['ENV'] = 'development'
 
-    log = logging.getLogger('hypercorn')
+    log = logging.getLogger('waitress')
     log.setLevel(logging.ERROR)
 
     app.jinja_env.filters['md5_replace'] = md5_replace
@@ -244,23 +244,6 @@ for for_a in server_set:
 
 ###
 
-if platform.system() == 'Linux':
-    if platform.machine() in ["AMD64", "x86_64"]:
-        cmd = [os.path.join(".", "bin", "main.amd64.bin")]
-    else:
-        cmd = [os.path.join(".", "bin", "main.arm64.bin")]
-elif platform.system() == 'Darwin':
-    cmd = [os.path.join(".", "bin", "main.mac.arm64.bin")]
-else:
-    if platform.machine() in ["AMD64", "x86_64"]:
-        cmd = [os.path.join(".", "bin", "main.amd64.exe")]
-    else:
-        cmd = [os.path.join(".", "bin", "main.arm64.exe")]
-        
-cmd += [server_set["golang_port"]]
-if run_mode != '':
-    cmd += [run_mode]
-
 async def golang_process_check():
     while True:
         try:
@@ -276,7 +259,7 @@ async def golang_process_check():
                 "ip" : "127.0.0.1"
             }
 
-            response = requests.post('http://localhost:' + server_set["golang_port"] + '/', data = json_dumps(other_set))
+            response = requests.post('http://localhost:' + server_set["golang_port"] + '/compatible_api/test', data = json_dumps(other_set))
             if response.status_code == 200:
                 print('Golang turn on')
                 break
@@ -284,7 +267,14 @@ async def golang_process_check():
             print('Wait golang...')
             time.sleep(1)
 
-golang_process = subprocess.Popen(cmd)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BIN_DIR = os.path.join(BASE_DIR, "bin")
+
+exe_name = linux_exe_chmod()
+exe_path = os.path.join(BIN_DIR, exe_name)
+
+cmd = [exe_path, server_set["golang_port"], run_mode, 'api']
+golang_process = subprocess.Popen(cmd, cwd = BIN_DIR)
 
 try:
     loop = asyncio.get_running_loop()
@@ -891,8 +881,8 @@ app.route('/api/v2/page_view/<everything:name>')(api_w_page_view)
 
 app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting_exter)
 
-app.route('/api/v2/auth')(api_func_auth)
-app.route('/api/v2/auth/<user_name>')(api_func_auth)
+app.route('/api/v2/auth')(api_func_auth_exter)
+app.route('/api/v2/auth/<user_name>')(api_func_auth_exter)
 app.route('/api/v2/auth/give', methods = ['PATCH'])(api_give_auth)
 
 app.route('/api/v2/user/rankup', methods = ['GET', 'PATCH'])(api_user_rankup)
@@ -977,9 +967,15 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for = 1, x_proto = 1)
 
 if __name__ == "__main__":
     if run_mode in ['dev']:
-        app.run(host = server_set['host'], port = int(server_set['port']), use_reloader = False)
+        app.run(
+            host = server_set['host'],
+            port = int(server_set['port']),
+            use_reloader = False
+        )
     else:
-        config = Config()
-        config.bind = [server_set['host'] + ":" + server_set['port']]
-
-        asyncio.run(serve(app, config))
+        serve(
+            app,
+            host = server_set['host'],
+            port = int(server_set['port']),
+            threads = 1,
+        )
