@@ -1,12 +1,3 @@
----
-name: Bug report
-about: 버그 제보 템플릿입니다.
-title: ""
-labels: []
-assignees: []
----
-
-<!-- 여기 아래부터는 bug_report.md 내용 -->
 ## 환경 (Environment)
 * 운영체제 (OS) :
 * 파이썬 버전 (Python version) :
