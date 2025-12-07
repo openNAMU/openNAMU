@@ -22,6 +22,10 @@ window.addEventListener("keydown", e => {
         return;
     }
 
+    if(e.ctrlKey || e.metaKey || e.altKey) {
+        return;
+    }
+
     shortcut_key_list[e.code] = 1;
     if(Object.keys(shortcut_key_list).length === 1) {
         let doc_shortcut = /^\/(w|w_from|history|edit|acl|topic|xref)\//i;
