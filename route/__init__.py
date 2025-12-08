@@ -47,7 +47,7 @@ from route.list_title_index import list_title_index
 from route.list_user import list_user
 from route.list_user_check import list_user_check
 from route.list_user_check_delete import list_user_check_delete
-from route.list_history import list_history
+from route.go_view_list_history import list_history
 
 from route.login_find import login_find
 from route.login_find_email import login_find_email

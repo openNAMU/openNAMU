@@ -158,9 +158,17 @@ async def python_to_golang(func_name, other_set = {}):
         "view_list_random" : "/list/random",
     }
 
-    if func_name in func_to_normal_url:
+    print(func_name, other_set)
+
+    if func_name == "same":
         async with aiohttp.ClientSession() as session:
-            async with session.post('http://localhost:' + port_data + '/compatible_api/' + func_name, data = json_dumps(other_set), headers = headers) as res:
+            async with session.get('http://localhost:' + port_data + flask.request.path, headers = headers) as res:
+                data = await res.text()
+
+                return data
+    elif func_name in func_to_normal_url:
+        async with aiohttp.ClientSession() as session:
+            async with session.post('http://localhost:' + port_data + func_to_normal_url[func_name], data = json_dumps(other_set), headers = headers) as res:
                 data = await res.text()
 
                 return data
@@ -292,7 +300,6 @@ class get_db_connect:
                         try_cnt += 1
                         time.sleep(1)
 
-            
             if self.conn == None:
                 raise Exception("Unable to connect database")
 

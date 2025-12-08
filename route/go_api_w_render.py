@@ -44,7 +44,7 @@ async def api_w_render(name = '', tool = '', request_method = '', request_data =
                 # remove end br
                 data_org = re.sub('^\n+', '', data_org)
 
-            if markup in ('', 'namumark'):
+            if markup in ('', 'namumark', 'namumark_beta'):
                 data_pas = await render_set(conn, 
                     doc_name = name, 
                     doc_data = data_org, 
@@ -60,7 +60,7 @@ async def api_w_render(name = '', tool = '', request_method = '', request_data =
                 other_set = {}
                 other_set["doc_name"] = name
                 other_set["render_type"] = data_type
-                other_set["data"] = data_org
+                other_set["raw_data"] = data_org
 
                 return await python_to_golang(sys._getframe().f_code.co_name, other_set)
         else:
