@@ -462,6 +462,21 @@ if os.path.exists('custom.py'):
     from custom import custom_run
     custom_run('error', app)
 
+# Route_Go_Func
+
+import itertools
+
+_golang_view_seq = itertools.count()
+
+def golang_view():
+    idx = next(_golang_view_seq)
+
+    async def _view(**_):
+        return await python_to_golang("same")
+    
+    _view.__name__ = f"_golang_view_{idx}"
+    return _view
+
 # Func
 # Func-inter_wiki
 app.route('/filter/inter_wiki', defaults = { 'tool' : 'inter_wiki' })(filter_all)
@@ -599,9 +614,9 @@ app.route('/recent_block/private/<int:num>', defaults = { 'tool' : 'private' })(
 app.route('/recent_block/ongoing', defaults = { 'tool' : 'ongoing' })(list_recent_block)
 app.route('/recent_block/ongoing/<int:num>', defaults = { 'tool' : 'ongoing' })(list_recent_block)
 
-app.route('/recent_change', defaults = { 'tool' : 'recent_change' })(list_history)
-app.route('/recent_changes', defaults = { 'tool' : 'recent_change' })(list_history)
-app.route('/recent_change/<int:num>/<set_type>', defaults = { 'tool' : 'recent_change' })(list_history)
+app.route('/recent_change')(golang_view())
+app.route('/recent_changes')(golang_view())
+app.route('/recent_change/<int:num>/<set_type>')(golang_view())
 
 app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(list_recent_discuss)
 app.route('/recent_discuss/<int:num>/<tool>')(list_recent_discuss)
@@ -618,8 +633,8 @@ app.route('/record/topic/<name>')(recent_record_topic)
 app.route('/record/bbs/<name>', defaults = { 'tool' : 'record' })(bbs_w)
 app.route('/record/bbs_comment/<name>', defaults = { 'tool' : 'comment_record' })(bbs_w)
 
-app.route('/history/<everything:doc_name>', methods = ['POST', 'GET'])(list_history)
-app.route('/history_page/<int:num>/<set_type>/<everything:doc_name>', methods = ['POST', 'GET'])(list_history)
+app.route('/history/<everything:doc_name>', methods = ['POST', 'GET'])(golang_view())
+app.route('/history_page/<int:num>/<set_type>/<everything:doc_name>', methods = ['POST', 'GET'])(golang_view())
 
 app.route('/history_tool/<int(signed = True):rev>/<everything:name>')(recent_history_tool)
 app.route('/history_delete/<int(signed = True):rev>/<everything:name>', methods = ['POST', 'GET'])(recent_history_delete)
