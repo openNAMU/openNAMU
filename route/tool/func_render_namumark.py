@@ -2245,17 +2245,24 @@ class class_do_render_namumark:
 
                 return data
 
-            def replace_sync(self, match):
-                try:
-                    loop = asyncio.get_running_loop()
-                    if loop.is_running():
-                        nest_asyncio.apply()
-                        return loop.run_until_complete(self.replace(match))
-                except RuntimeError:
-                    return asyncio.run(self.replace(match))
+            async def async_re_sub(self, pattern, repl_async, text):
+                result_parts = []
+                last_end = 0
+
+                for m in re.finditer(pattern, text):
+                    result_parts.append(text[last_end:m.start()])
+
+                    replaced = await repl_async(m)
+                    result_parts.append(replaced)
+
+                    last_end = m.end()
+
+                result_parts.append(text[last_end:])
+
+                return "".join(result_parts)
 
         replace_inter_data_top = do_render_middle_replace_inter_class(self.do_inter_render, self.doc_set)
-        self.render_data = re.sub(inter_data_regex, replace_inter_data_top.replace_sync, self.render_data)
+        self.render_data = await replace_inter_data_top.async_re_sub(inter_data_regex, replace_inter_data_top.replace, self.render_data)
         self.render_data = re.sub(r'<temp_(?P<in>(?:slash)_(?:[0-9]+)(?:[^<>]+))>', '<\\g<in>>', self.render_data)
 
     def do_render_hr(self):
