@@ -268,11 +268,11 @@ class class_do_render_namumark:
 
         return link_main
     
-    def do_inter_render(self, data, doc_include):
+    async def do_inter_render(self, data, doc_include):
         doc_set = dict(self.doc_set)
         doc_set['doc_include'] = doc_include
 
-        data_end = class_do_render_namumark(self.conn, self.doc_name, data, doc_set, self.lang_data, do_type = 'inter')()
+        data_end = await class_do_render_namumark(self.conn, self.doc_name, data, doc_set, self.lang_data, do_type = 'inter')()
 
         self.render_data_js += data_end[1]
         self.data_category_list += data_end[2]['category']
@@ -1358,7 +1358,7 @@ class class_do_render_namumark:
         self.render_data = re.sub(r'(\\+)?@([ㄱ-ㅣ가-힣a-zA-Z0-9_]+)=((?:\\@|[^@\n])+)@', do_render_include_default_sub, self.render_data)
         self.render_data = re.sub(r'(\\+)?@([ㄱ-ㅣ가-힣a-zA-Z0-9_]+)@', do_render_include_default_sub, self.render_data)
 
-    def do_render_include(self):
+    async def do_render_include(self):
         include_num = 0
         include_set_data = get_main_skin_set(self.conn, self.flask_session, 'main_css_include_link', self.ip)
         include_regex = re.compile(r'\[include\(((?:(?!\[include\(|\)\]|<\/div>).)+)\)\](\n?)', re.I)
@@ -1422,7 +1422,7 @@ class class_do_render_namumark:
 
                         include_data = ''
                         if self.parent:
-                            include_data_tmp = self.parent(
+                            include_data_tmp = await self.parent(
                                 self.conn,
                                 doc_name = self.doc_name,
                                 doc_data = db_data[0][0], 
@@ -1865,7 +1865,7 @@ class class_do_render_namumark:
 
             table_count_all -= 1
     
-    def do_render_middle(self):
+    async def do_render_middle(self):
         wiki_count = 0
         html_count = 0
         syntax_count = 0
@@ -2232,18 +2232,18 @@ class class_do_render_namumark:
 
                 return data
 
-            def replace(self, match):
+            async def replace(self, match):
                 data = inter_data[match[1]]
                 data = re.sub(inter_data_regex, self.replace_sub, data)
                 
-                data = self.do_inter_render(data, self.doc_set['doc_include'] + 'opennamu_inter_render_' + str(self.inter_count))
+                data = await self.do_inter_render(data, self.doc_set['doc_include'] + 'opennamu_inter_render_' + str(self.inter_count))
                 data = re.sub(r'\|\|', '<no_td>', data)
                 
                 self.inter_count += 1
 
                 return data
 
-        replace_inter_data_top = do_render_middle_replace_inter_class(self.do_inter_render, self.doc_set)
+        replace_inter_data_top = await do_render_middle_replace_inter_class(self.do_inter_render, self.doc_set)
         self.render_data = re.sub(inter_data_regex, replace_inter_data_top.replace, self.render_data)
         self.render_data = re.sub(r'<temp_(?P<in>(?:slash)_(?:[0-9]+)(?:[^<>]+))>', '<\\g<in>>', self.render_data)
 
@@ -2280,7 +2280,7 @@ class class_do_render_namumark:
                 quote_data = re.sub(r'\n$', '', quote_data)
                 quote_data = self.get_tool_data_revert(quote_data)
 
-                quote_data_end = self.do_inter_render(quote_data, self.doc_set['doc_include'] + 'opennamu_quote_' + str(quote_count))
+                quote_data_end = await self.do_inter_render(quote_data, self.doc_set['doc_include'] + 'opennamu_quote_' + str(quote_count))
                 data_name = self.get_tool_data_storage('<div>', '</div>', quote_data_org)
 
                 self.render_data = re.sub(quote_regex, lambda x : ('\n<front_br><hr class="mini_hr"><blockquote><back_br>\n<' + data_name + '>' + quote_data_end + '</' + data_name + '><front_br></blockquote><hr class="mini_hr"><back_br>\n'), self.render_data, 1)
@@ -2561,7 +2561,7 @@ class class_do_render_namumark:
             opennamu_do_ip_render();\n
         '''
 
-    def __call__(self):
+    async def __call__(self):
         self.do_render_remark()
         self.do_render_include_default()
         self.do_render_slash()
@@ -2570,8 +2570,8 @@ class class_do_render_namumark:
             self.do_render_redirect()
         
         if self.data_redirect == 0:
-            self.do_render_middle()
-            self.do_render_include()
+            await self.do_render_middle()
+            await self.do_render_include()
             self.do_render_math()
             self.do_render_table()
             self.do_render_list()

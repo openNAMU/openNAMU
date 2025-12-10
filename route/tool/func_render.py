@@ -25,7 +25,7 @@ class class_do_render:
         random_string = ''.join(random.choice(characters) for _ in range(length))
         return random_string
 
-    def do_render(self, doc_name, doc_data, data_type):
+    async def do_render(self, doc_name, doc_data, data_type):
         curs = self.conn.cursor()
 
         doc_set = {}
@@ -55,7 +55,7 @@ class class_do_render:
             rep_data = db_data[0][0] if db_data else 'namumark'
 
         if rep_data == 'namumark' or rep_data == 'namumark_beta':
-            data_end = class_do_render_namumark(
+            data_end = await class_do_render_namumark(
                 self.conn,
                 doc_name,
                 doc_data,
