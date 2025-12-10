@@ -47,7 +47,7 @@ function opennamu_load_comment() {
     let lang_data = new FormData();
     lang_data.append('data', 'normal comment tool return upvote');
 
-    fetch('/api/lang', {
+    fetch('/api/v2/lang', {
         method : 'POST',
         body : lang_data,
     }).then(function(res) {

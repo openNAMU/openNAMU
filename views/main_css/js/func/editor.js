@@ -43,9 +43,6 @@ function do_paste_image() {
 }
 
 function pasteListener(e) {
-    let lang_data = new FormData();
-    lang_data.append('data', 'file_name empty save authority_error same_file_error error');
-
     if(e.clipboardData && e.clipboardData.items) {
         const items = e.clipboardData.items;
         const formData = new FormData();
@@ -69,16 +66,21 @@ function pasteListener(e) {
             return;
         }
 
-        fetch('/api/lang', {
+        let lang_data = new FormData();
+        lang_data.append('data', 'file_name empty save authority_error same_file_error error');
+
+        fetch('/api/v2/lang', {
             method : 'POST',
             body : lang_data,
         }).then(function(res) {
             return res.json();
-        }).then(function(ajax_data) {
-            const customName = prompt(ajax_data['data'][0]);
+        }).then(function(lang) {
+            lang = lang["data"];
+
+            const customName = prompt(lang['file_name']);
                 
             if(!customName) {
-                return alert(ajax_data['data'][1]);
+                return alert(lang['empty']);
             }
             
             file_name = customName + ".png";
@@ -92,24 +94,24 @@ function pasteListener(e) {
             }).then((res) => {
                 if (res.status === 200 || res.status === 201) {
                     const url = res.url;
-                    alert(ajax_data['data'][2] + ' : [[file:' + file_name + ']]');
+                    alert(lang['save'] + ' : [[file:' + file_name + ']]');
 
                     do_insert_data('[[file:' + file_name + ']]');
                 } else {
                     console.error("[ERROR] PasteUpload Fail :", res.statusText);
 
                     if(res.status === 400) {
-                        alert(ajax_data['data'][4]);
+                        alert(lang['same_file_error']);
                     } else if(res.status === 401) {
-                        alert(ajax_data['data'][3]);    
+                        alert(lang['authority_error']);    
                     } else {
-                        alert(ajax_data['data'][5]);        
+                        alert(lang['error']);        
                     }
                 }
             }).catch((err) => {
                 console.error("[ERROR] PasteUpload Fail :", JSON.stringify(err), err);
 
-                alert(ajax_data['data'][5]);
+                alert(lang['error']);
             });
         });
     }

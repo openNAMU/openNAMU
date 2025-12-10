@@ -35,7 +35,7 @@ function opennamu_setting_404_page() {
     let lang_data = new FormData();
     lang_data.append('data', 'save 404_file 404_page preview');
 
-    fetch('/api/lang', {
+    fetch('/api/v2/lang', {
         method : 'POST',
         body : lang_data,
     }).then(function(res) {
@@ -55,8 +55,8 @@ function opennamu_setting_404_page() {
 
         let data_html = '';
         let select_list = [
-            ['404_page', data[0]['data'][1]],
-            ['404_file', data[0]['data'][2]],
+            ['404_page', data[0]['data']['404_file']],
+            ['404_file', data[0]['data']['404_page']],
         ];
 
         data_html += '<select id="opennamu_setting_404_page_select">';
@@ -79,8 +79,8 @@ function opennamu_setting_404_page() {
         data_html += '<textarea class="opennamu_textarea_500" id="opennamu_setting_404_page_textarea">' + set_data + '</textarea>';
         data_html += '<hr class="main_hr">';
 
-        data_html += '<button id="opennamu_save_button" onclick="opennamu_setting_404_page_post();">' + data[0]['data'][0] + '</button> ';
-        data_html += '<button onclick="opennamu_setting_404_page_preview();">' + data[0]['data'][3] + '</button>';
+        data_html += '<button id="opennamu_save_button" onclick="opennamu_setting_404_page_post();">' + data[0]['data']['save'] + '</button> ';
+        data_html += '<button onclick="opennamu_setting_404_page_preview();">' + data[0]['data']['preview'] + '</button>';
         data_html += '<hr class="main_hr">';
 
         data_html += '<div id="opennamu_setting_404_page_preview"></div>';

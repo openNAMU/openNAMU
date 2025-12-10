@@ -1212,15 +1212,21 @@ def get_lang_name(conn, tool = ''):
     return lang_name
 
 async def get_lang(data, safe = 0):
-    other_set = {}
-    other_set["data"] = data
-    other_set["legacy"] = ""
-
-    res = await python_to_golang('api_func_language', other_set)
-    if res['response'] == 'ok':
-        return res['data'][data]
+    if data in global_lang_data:
+        return global_lang_data[data]
     else:
-        return data + ' (M)'
+        lang = json_loads(open(os.path.join('lang', 'en-US.json'), encoding = 'utf-8').read())
+
+        other_set = {}
+        other_set["data"] = ' '.join([title for title in lang if title[0] != '_'])
+        other_set["legacy"] = ""
+
+        res = await python_to_golang('api_func_language', other_set)
+        if res['response'] == 'ok':
+            for load_data in res['data']:
+                global_lang_data[load_data] = res['data'][load_data]
+        
+        return global_lang_data[data]
 
 # 하위 호환용
 def load_lang(data, safe = 0):
@@ -1252,7 +1258,7 @@ async def skin_check(set_n = 0):
     return data
     
 def cache_v():
-    return '.cache_v288'
+    return '.cache_v289'
 
 def wiki_css(data):
     # without_DB

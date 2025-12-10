@@ -2,9 +2,9 @@
 
 function w_set_reset() {
     let lang_data = new FormData();
-    lang_data.append('data', 'reset end');
+    lang_data.append('data', 'reset end authority_error');
 
-    fetch('/api/lang', {
+    fetch('/api/v2/lang', {
         method : 'POST',
         body : lang_data,
     }).then(function(res) {
@@ -12,7 +12,7 @@ function w_set_reset() {
     }).then(function(lang) {
         lang = lang["data"];
         
-        let check = confirm(lang[0]);
+        let check = confirm(lang['reset']);
         if(check === true) {
             const url = window.location.pathname;
             const url_split = url.split('/');
@@ -24,9 +24,9 @@ function w_set_reset() {
             }).then(function(data) {
                 if(data) {
                     if(data["response"] === "require auth") {
-                        alert(data["language"]["authority_error"]);
+                        alert(lang["authority_error"]);
                     } else {
-                        alert(lang[1]);
+                        alert(lang['end']);
                     }
 
                     history.go(0);

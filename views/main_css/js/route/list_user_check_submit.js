@@ -8,7 +8,7 @@ function opennamu_list_user_check_submit() {
     let lang_data = new FormData();
     lang_data.append('data', 'check');
     
-    fetch('/api/lang', {
+    fetch('/api/v2/lang', {
         method : 'POST',
         body : lang_data,
     }).then(function(res) {
@@ -16,6 +16,6 @@ function opennamu_list_user_check_submit() {
     }).then(function(lang) {
         lang = lang["data"];
 
-        document.getElementById('opennamu_list_user_check_submit').innerHTML = '<button onclick="opennamu_list_user_check_submit_post();">' + lang[0] + '</button>';
+        document.getElementById('opennamu_list_user_check_submit').innerHTML = '<button onclick="opennamu_list_user_check_submit_post();">' + lang['check'] + '</button>';
     });
 }

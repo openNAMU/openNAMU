@@ -33,112 +33,123 @@ function opennamu_list_recent_block() {
         }
     }
 
-    fetch('/api/v2/recent_block' + add_path + '/' + tool + '/' + page + user_name + why).then(function(res) {
+    let lang_data = new FormData();
+    lang_data.append('data', ["data", 'private', 'cidr', 'regex', "release", "limitless"].join(' '));
+
+    fetch('/api/v2/lang', {
+        method : 'POST',
+        body : lang_data,
+    }).then(function(res) {
         return res.json();
-    }).then(function(data) {
-        let lang = data["language"];
-        let auth = data["auth"];
-        data = data["data"];
+    }).then(function(lang) {
+        lang = lang["data"];
 
-        let data_html = '';
+        fetch('/api/v2/recent_block' + add_path + '/' + tool + '/' + page + user_name + why).then(function(res) {
+            return res.json();
+        }).then(function(data) {
+            let auth = data["auth"];
+            data = data["data"];
 
-        let option_list = [['all', 'all'], ['regex', 'regex'], ['cidr', 'cidr'], ['private', 'private'], ['ongoing', 'in_progress']];
-        for(let for_a = 0; for_a < option_list.length; for_a++) {
-            data_html += '<a href="/recent_block/' + option_list[for_a][0] + '">(' + lang[option_list[for_a][1]] + ')</a> ';
-        }
+            let data_html = '';
 
-        option_list = [['/manager/11', 'blocked'], ['/manager/12', 'admin'], ['/manager/19', 'why']];
-        for(let for_a = 0; for_a < option_list.length; for_a++) {
-            data_html += '<a href="' + option_list[for_a][0] + '">(' + lang[option_list[for_a][1]] + ')</a> ';
-        }
+            let option_list = [['all', 'all'], ['regex', 'regex'], ['cidr', 'cidr'], ['private', 'private'], ['ongoing', 'in_progress']];
+            for(let for_a = 0; for_a < option_list.length; for_a++) {
+                data_html += '<a href="/recent_block/' + option_list[for_a][0] + '">(' + lang[option_list[for_a][1]] + ')</a> ';
+            }
 
-        data_html += '<hr class="main_hr">';
+            option_list = [['/manager/11', 'blocked'], ['/manager/12', 'admin'], ['/manager/19', 'why']];
+            for(let for_a = 0; for_a < option_list.length; for_a++) {
+                data_html += '<a href="' + option_list[for_a][0] + '">(' + lang[option_list[for_a][1]] + ')</a> ';
+            }
 
-        /*
-            data_list = append(data_list, []string{
-                why,
-                ip_pre_block,
-                ip_render_block,
-                ip_pre_blocker,
-                ip_render_blocker,
-                end,
-                today,
-                band,
-                ongoing,
-            })
-        */
-        for(let for_a = 0; for_a < data.length; for_a++) {
-            let left = '';
+            data_html += '<hr class="main_hr">';
 
-            let ban_auth = (auth["owner"] === true || auth["ban"] === true);
-            let ip = data[for_a][1];
-            if(data[for_a][7] === '') {
-                if(ban_auth) {
-                    ip = '<a href="/auth/ban/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
+            /*
+                data_list = append(data_list, []string{
+                    why,
+                    ip_pre_block,
+                    ip_render_block,
+                    ip_pre_blocker,
+                    ip_render_blocker,
+                    end,
+                    today,
+                    band,
+                    ongoing,
+                })
+            */
+            for(let for_a = 0; for_a < data.length; for_a++) {
+                let left = '';
+
+                let ban_auth = (auth["owner"] === true || auth["ban"] === true);
+                let ip = data[for_a][1];
+                if(data[for_a][7] === '') {
+                    if(ban_auth) {
+                        ip = '<a href="/auth/ban/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
+                    }
+                    
+                    if(data[for_a][8] === '1') {
+                        ip = '<s>' + ip + '</s>';
+                    }
+                } else if(data[for_a][7] === 'private') {
+                    if(ban_auth) {
+                        ip = '<a href="/auth/ban/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
+                    }
+
+                    if(data[for_a][8] === '1') {
+                        ip = '<s>' + ip + '</s>';
+                    }
+
+                    ip += ' (' + lang['private'] + ')';
+                } else if(data[for_a][7] === 'cidr') {
+                    if(ban_auth) {
+                        ip = '<a href="/auth/ban_cidr/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
+                    }
+
+                    if(data[for_a][8] === '1') {
+                        ip = '<s>' + ip + '</s>';
+                    }
+
+                    ip += ' (' + lang['cidr'] + ')';
+                } else {
+                    if(ban_auth) {
+                        ip = '<a href="/auth/ban_regex/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
+                    }
+
+                    if(data[for_a][8] === '1') {
+                        ip = '<s>' + ip + '</s>';
+                    }
+
+                    ip += ' (' + lang['regex'] + ')';
                 }
                 
-                if(data[for_a][8] === '1') {
-                    ip = '<s>' + ip + '</s>';
-                }
-            } else if(data[for_a][7] === 'private') {
-                if(ban_auth) {
-                    ip = '<a href="/auth/ban/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
-                }
+                left += ip + ' ← ' + data[for_a][4];
 
-                if(data[for_a][8] === '1') {
-                    ip = '<s>' + ip + '</s>';
-                }
-
-                ip += ' (' + lang['private'] + ')';
-            } else if(data[for_a][7] === 'cidr') {
-                if(ban_auth) {
-                    ip = '<a href="/auth/ban_cidr/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
-                }
-
-                if(data[for_a][8] === '1') {
-                    ip = '<s>' + ip + '</s>';
-                }
-
-                ip += ' (' + lang['cidr'] + ')';
-            } else {
-                if(ban_auth) {
-                    ip = '<a href="/auth/ban_regex/' + opennamu_do_url_encode(data[for_a][1]) + '">' + ip + '</a>';
-                }
-
-                if(data[for_a][8] === '1') {
-                    ip = '<s>' + ip + '</s>';
-                }
-
-                ip += ' (' + lang['regex'] + ')';
-            }
-            
-            left += ip + ' ← ' + data[for_a][4];
-
-            let end = "";
-            if(data[for_a][5] === "release") {
-                end = lang["release"];
-            } else if(data[for_a][5] === "") {
-                end = lang["limitless"];
-            } else {
-                end = data[for_a][5];
-            }
-
-            let right = end + '<br>' + data[for_a][6];
-
-            let bottom = '';
-            if(data[for_a][0] !== "") {
-                if(data[for_a][0] === "edit filter") {
-                    bottom = '<a href="/edit_filter/' + opennamu_do_url_encode(data[for_a][1]) + '">edit filter</a>'
+                let end = "";
+                if(data[for_a][5] === "release") {
+                    end = lang["release"];
+                } else if(data[for_a][5] === "") {
+                    end = lang["limitless"];
                 } else {
-                    bottom = opennamu_send_render(opennamu_xss_filter(data[for_a][0]));
+                    end = data[for_a][5];
                 }
+
+                let right = end + '<br>' + data[for_a][6];
+
+                let bottom = '';
+                if(data[for_a][0] !== "") {
+                    if(data[for_a][0] === "edit filter") {
+                        bottom = '<a href="/edit_filter/' + opennamu_do_url_encode(data[for_a][1]) + '">edit filter</a>'
+                    } else {
+                        bottom = opennamu_send_render(opennamu_xss_filter(data[for_a][0]));
+                    }
+                }
+
+                data_html += opennamu_make_list(left, right, bottom);
             }
 
-            data_html += opennamu_make_list(left, right, bottom);
-        }
+            data_html += opennamu_page_control('/recent_block/' + tool + user_name + '/{}' + why, Number(page), data.length);
 
-        data_html += opennamu_page_control('/recent_block/' + tool + user_name + '/{}' + why, Number(page), data.length);
-
-        document.getElementById('opennamu_list_recent_block').innerHTML = data_html;
+            document.getElementById('opennamu_list_recent_block').innerHTML = data_html;
+        });
     });
 }

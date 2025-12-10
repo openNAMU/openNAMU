@@ -78,50 +78,61 @@ function opennamu_give_auth() {
     let html_data = '';
     let user_name = '';
 
-    fetch('/api/v2/list/auth').then(function(res) {
-        return res.json();
-    }).then(function(data) {
-        let lang = data["language"];
-        let data_list = data["data"];
+    let lang_data = new FormData();
+    lang_data.append('data', ["data", "many_delete_help", "send", ].join(' '));
 
-        if(mode === 0) {
-            if(url_split.length === 3) {
-                html_data += '<textarea id="opennamu_give_auth_user_name" class="opennamu_textarea_100" placeholder="' + lang["many_delete_help"] + '"></textarea>';
-                html_data += '<hr class="main_hr">';
+    fetch('/api/v2/lang', {
+        method : 'POST',
+        body : lang_data,
+    }).then(function(res) {
+        return res.json();
+    }).then(function(lang) {
+        lang = lang["data"];
+
+        fetch('/api/v2/list/auth').then(function(res) {
+            return res.json();
+        }).then(function(data) {
+            let data_list = data["data"];
+
+            if(mode === 0) {
+                if(url_split.length === 3) {
+                    html_data += '<textarea id="opennamu_give_auth_user_name" class="opennamu_textarea_100" placeholder="' + lang["many_delete_help"] + '"></textarea>';
+                    html_data += '<hr class="main_hr">';
+                } else {
+                    user_name = url_split[3];
+        
+                    html_data += '<div id="opennamu_get_user_info">' + opennamu_xss_filter(user_name) + '</div>';
+                    html_data += '<hr class="main_hr">';
+                }
             } else {
-                user_name = url_split[3];
-    
-                html_data += '<div id="opennamu_get_user_info">' + opennamu_xss_filter(user_name) + '</div>';
+                html_data += '<select id="opennamu_give_auth_select_org">';
+                for(let for_a = 0; for_a < data_list.length; for_a++) {
+                    html_data += '<option value="' + data_list[for_a] + '">' + data_list[for_a] + '</option>';
+                }
+                html_data += '</select>';
                 html_data += '<hr class="main_hr">';
             }
-        } else {
-            html_data += '<select id="opennamu_give_auth_select_org">';
+
+            html_data += '<select id="opennamu_give_auth_select">';
             for(let for_a = 0; for_a < data_list.length; for_a++) {
                 html_data += '<option value="' + data_list[for_a] + '">' + data_list[for_a] + '</option>';
             }
             html_data += '</select>';
             html_data += '<hr class="main_hr">';
-        }
 
-        html_data += '<select id="opennamu_give_auth_select">';
-        for(let for_a = 0; for_a < data_list.length; for_a++) {
-            html_data += '<option value="' + data_list[for_a] + '">' + data_list[for_a] + '</option>';
-        }
-        html_data += '</select>';
-        html_data += '<hr class="main_hr">';
+            html_data += '<button onclick="opennamu_give_auth_submit();">' + lang["send"] + '</button>';
 
-        html_data += '<button onclick="opennamu_give_auth_submit();">' + lang["send"] + '</button>';
+            document.getElementById('opennamu_give_auth').innerHTML = html_data;
 
-        document.getElementById('opennamu_give_auth').innerHTML = html_data;
+            if(user_name !== '') {
+                fetch('/api/v2/auth/' + opennamu_do_url_encode(user_name)).then(function(res) {
+                    return res.json();
+                }).then(function(data) {
+                    document.getElementById('opennamu_give_auth_select').value = data["name"];
+                });
+            }
 
-        if(user_name !== '') {
-            fetch('/api/v2/auth/' + opennamu_do_url_encode(user_name)).then(function(res) {
-                return res.json();
-            }).then(function(data) {
-                document.getElementById('opennamu_give_auth_select').value = data["name"];
-            });
-        }
-
-        do_insert_user_info();
+            do_insert_user_info();
+        });
     });
 }

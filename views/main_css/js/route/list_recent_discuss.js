@@ -17,7 +17,7 @@ function opennamu_list_recent_discuss() {
     let lang_data = new FormData();
     lang_data.append('data', 'normal close_discussion open_discussion admin_tool closed stop agreed_discussion');
 
-    fetch('/api/lang', {
+    fetch('/api/v2/lang', {
         method : 'POST',
         body : lang_data,
     }).then(function(res) {
