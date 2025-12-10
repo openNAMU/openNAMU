@@ -185,7 +185,7 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
         else:
             doc_data = await api_w_raw(name, str(doc_rev))
 
-        print([name, doc_data, doc_rev])
+        # print([name, doc_data, doc_rev])
 
         if doc_data["response"] == "ok":
             render_data = await api_w_render(name, request_method = 'POST', request_data = {
