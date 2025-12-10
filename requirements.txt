@@ -7,7 +7,7 @@ waitress
 
 aiohttp
 asyncio
-nest_asyncio
+nest-asyncio
 requests
 
 diff-match-patch
