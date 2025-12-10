@@ -2261,7 +2261,7 @@ class class_do_render_namumark:
 
             hr_count_max -= 1
 
-    def do_render_list(self):
+    async def do_render_list(self):
         # 인용문
         quote_regex = r'((?:\n&gt; *[^\n]*)+)\n'
         quote_count = 0
@@ -2574,7 +2574,7 @@ class class_do_render_namumark:
             await self.do_render_include()
             self.do_render_math()
             self.do_render_table()
-            self.do_render_list()
+            await self.do_render_list()
             self.do_render_macro()
             self.do_render_link()
             self.do_render_text()
