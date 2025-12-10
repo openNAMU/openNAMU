@@ -13,11 +13,9 @@ import email.mime.text
 import email.utils
 import email.header
 
-from .func_tool import *
-
 # Init-Version
 with open('version.json', encoding = 'utf8') as file_data:
-    version_list = json_loads(file_data.read())
+    version_list = json.loads(file_data.read())
 
 print('Version : ' + version_list['r_ver'])
 print('DB set version : ' + version_list['c_ver'])
@@ -38,7 +36,7 @@ if os.getenv('NAMU_DOCKER') == 'O': # skip update check when run at docker
 if data_up_date == 1:
     with open(os.path.join('data', 'version.json'), 'w', encoding = 'utf8') as f:
         f.write(version_list['r_ver'])
-    
+
     if platform.system() in ('Linux', 'Darwin', 'Windows'):
         python_ver = ''
         python_ver = str(sys.version_info.major) + '.' + str(sys.version_info.minor)
@@ -60,6 +58,7 @@ if data_up_date == 1:
             try:
                 subprocess.check_call([exe_name, "-m", "pip", "install", "--upgrade", "--user", "-r", "requirements.txt"])
                 subprocess.Popen([exe_name] + sys.argv)
+
                 os._exit(0)
             except:
                 pass
@@ -73,6 +72,7 @@ else:
     print('PIP check pass')
 
 # Init-Load
+from .func_tool import *
 from .func_render import class_do_render
 
 from diff_match_patch import diff_match_patch

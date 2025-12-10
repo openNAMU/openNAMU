@@ -8,7 +8,6 @@ from route.tool.func import *
 from route import *
 
 from waitress import serve
-
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 args = sys.argv
