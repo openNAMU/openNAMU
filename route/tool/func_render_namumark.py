@@ -2,6 +2,9 @@ from .func_tool import *
 
 from typing import Any
 
+import asyncio
+import nest_asyncio
+
 class class_do_render_namumark:
     def __init__(
         self,
@@ -2242,8 +2245,17 @@ class class_do_render_namumark:
 
                 return data
 
-        replace_inter_data_top = await do_render_middle_replace_inter_class(self.do_inter_render, self.doc_set)
-        self.render_data = re.sub(inter_data_regex, replace_inter_data_top.replace, self.render_data)
+            def replace_sync(self, match):
+                try:
+                    loop = asyncio.get_running_loop()
+                    if loop.is_running():
+                        nest_asyncio.apply()
+                        return loop.run_until_complete(self.replace(match))
+                except RuntimeError:
+                    return asyncio.run(self.replace(match))
+
+        replace_inter_data_top = do_render_middle_replace_inter_class(self.do_inter_render, self.doc_set)
+        self.render_data = re.sub(inter_data_regex, replace_inter_data_top.replace_sync, self.render_data)
         self.render_data = re.sub(r'<temp_(?P<in>(?:slash)_(?:[0-9]+)(?:[^<>]+))>', '<\\g<in>>', self.render_data)
 
     def do_render_hr(self):
