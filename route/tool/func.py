@@ -158,7 +158,7 @@ async def python_to_golang(func_name, other_set = {}):
         "view_list_random" : "/list/random",
     }
 
-    print(func_name, other_set)
+    # print(func_name, other_set)
 
     if func_name == "same":
         async with aiohttp.ClientSession() as session:
