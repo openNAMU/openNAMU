@@ -174,14 +174,13 @@ async def python_to_golang(func_name, other_set = {}):
                 return data
     else:
         async with aiohttp.ClientSession() as session:
-            while 1:
-                async with session.post('http://localhost:' + port_data + '/compatible_api/' + func_name, data = json_dumps(other_set), headers = headers) as res:
-                    data = await res.json()
+            async with session.post('http://localhost:' + port_data + '/compatible_api/' + func_name, data = json_dumps(other_set), headers = headers) as res:
+                data = await res.json()
 
-                    if "response" in data and data["response"] == "error":
-                        raise Exception(f"API returned error: {data}")
-                    else:
-                        return data
+                if "response" in data and data["response"] == "error":
+                    raise Exception(f"API returned error: {data}")
+                else:
+                    return data
                 
 async def opennamu_make_list(left = '', right = '', bottom = '', class_name = ''):
     data_html = f'<span class="{class_name}">'
