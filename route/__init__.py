@@ -47,7 +47,6 @@ from route.list_title_index import list_title_index
 from route.list_user import list_user
 from route.list_user_check import list_user_check
 from route.list_user_check_delete import list_user_check_delete
-from route.go_view_list_history import list_history
 
 from route.login_find import login_find
 from route.login_find_email import login_find_email
@@ -165,7 +164,6 @@ from route.n_topic_list import topic_list
 
 from route.n_give_auth import give_auth
 
-from route.n_bbs_main import bbs_main
 from route.n_bbs_in import bbs_in
 from route.n_bbs_w_set import bbs_w_set
 
@@ -218,9 +216,3 @@ from route.go_api_w_set_reset import api_w_set_reset
 from route.go_api_w_page_view import api_w_page_view
 
 from route.go_main_func_easter_egg import main_func_easter_egg
-
-from route.go_view_list_random import view_list_random
-
-from route.go_view_w_watch_list import view_w_watch_list
-
-from route.go_view_user_watch_list import view_user_watch_list

@@ -154,24 +154,20 @@ async def python_to_golang(func_name, other_set = {}):
 
     port_data = global_some_set_do("setup_golang_port")
 
-    func_to_normal_url = {
-        "view_list_random" : "/list/random",
-    }
-
     # print(func_name, other_set)
 
     if func_name == "same":
         async with aiohttp.ClientSession() as session:
-            async with session.get('http://localhost:' + port_data + flask.request.path, headers = headers) as res:
-                data = await res.text()
+            if flask.request.method == 'POST':
+                async with session.post('http://localhost:' + port_data + flask.request.path, data = json_dumps(other_set), headers = headers) as res:
+                    data = await res.text()
 
-                return data
-    elif func_name in func_to_normal_url:
-        async with aiohttp.ClientSession() as session:
-            async with session.post('http://localhost:' + port_data + func_to_normal_url[func_name], data = json_dumps(other_set), headers = headers) as res:
-                data = await res.text()
+                    return data
+            else:
+                async with session.get('http://localhost:' + port_data + flask.request.path, headers = headers) as res:
+                    data = await res.text()
 
-                return data
+                    return data
     else:
         async with aiohttp.ClientSession() as session:
             async with session.post('http://localhost:' + port_data + '/compatible_api/' + func_name, data = json_dumps(other_set), headers = headers) as res:

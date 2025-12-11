@@ -648,8 +648,8 @@ app.route('/xref_page/<int:num>/<everything:name>')(view_xref)
 app.route('/xref_this/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type' : 2 })(view_xref)
 
-app.route('/doc_watch_list/<int:num>/<everything:name>')(view_w_watch_list)
-app.route('/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(view_w_watch_list)
+app.route('/doc_watch_list/<int:num>/<everything:name>')(golang_view())
+app.route('/doc_star_doc/<int:num>/<everything:name>')(golang_view())
 
 app.route('/raw/<everything:name>')(view_w_raw)
 app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 'on' })(view_w_raw)
@@ -667,8 +667,8 @@ app.route('/render/<int:doc_rev>/<everything:name>')(view_w)
 app.route('/w_from/<everything:name>', defaults = { 'do_type' : 'from' })(view_w)
 app.route('/w/<everything:name>')(view_w)
 
-app.route('/random')(view_random)
-app.route('/list/random')(view_list_random)
+app.route('/random')(golang_view())
+app.route('/list/random')(golang_view())
 
 # Func-edit
 app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
@@ -744,13 +744,13 @@ app.route('/alarm')(user_alarm)
 app.route('/alarm/delete')(user_alarm_delete)
 app.route('/alarm/delete/<int:id>')(user_alarm_delete)
 
-app.route('/watch_list', defaults = { 'do_type' : 'watch_list' })(view_user_watch_list)
-app.route('/watch_list/<everything:name>', defaults = { 'tool' : 'watch_list' })(user_watch_list_name)
-app.route('/watch_list_from/<everything:name>', defaults = { 'tool' : 'watch_list_from' })(user_watch_list_name)
+app.route('/watch_list')(golang_view())
+app.route('/watch_list/<everything:name>')(golang_view())
+app.route('/watch_list_from/<everything:name>')(golang_view())
 
-app.route('/star_doc', defaults = { 'do_type' : 'star_doc' })(view_user_watch_list)
-app.route('/star_doc/<everything:name>', defaults = { 'tool' : 'star_doc' })(user_watch_list_name)
-app.route('/star_doc_from/<everything:name>', defaults = { 'tool' : 'star_doc_from' })(user_watch_list_name)
+app.route('/star_doc')(golang_view())
+app.route('/star_doc/<everything:name>')(golang_view())
+app.route('/star_doc_from/<everything:name>')(golang_view())
 
 # 개편 보류중 S
 app.route('/change/email', methods = ['POST', 'GET'])(user_setting_email)
@@ -790,7 +790,7 @@ app.route('/vote/list/close/<int:num>', defaults = { 'list_type' : 'close' })(vo
 app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 
 # Func-bbs
-app.route('/bbs/main')(bbs_main)
+app.route('/bbs/main')(golang_view())
 app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
 app.route('/bbs/in/<int:bbs_num>')(bbs_in)
 app.route('/bbs/in/<int:bbs_num>/<int:page>')(bbs_in)
