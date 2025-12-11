@@ -1221,7 +1221,10 @@ async def get_lang(data, safe = 0):
             for load_data in res['data']:
                 global_lang_data[load_data] = res['data'][load_data]
         
-        return global_lang_data[data]
+        if data in global_lang_data:
+            return global_lang_data[data]
+        else:
+            return data + ' (M)'
 
 # 하위 호환용
 def load_lang(data, safe = 0):

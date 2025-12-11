@@ -64,6 +64,8 @@
     "warning_restart" : "Restarting... Press Refresh (F5)",
     "random_list" : "Random document(s) list",
     "r1" : "r1",
+    "test" : "Test",
+    "email_test" : "Send test email",
 
     "_comment_": "Common",
     "data": "Data",
