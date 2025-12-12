@@ -99,7 +99,7 @@ async def main_setting_main():
                     check_box_div[i] = ''
 
             branch_div = ''
-            branch_list = ['stable', 'dev', 'beta']
+            branch_list = ['stable', 'beta']
             for i in branch_list:
                 if d_list[12] == i:
                     branch_div = '<option value="' + i + '">' + i + '</option>' + branch_div
