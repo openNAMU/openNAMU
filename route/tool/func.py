@@ -261,7 +261,7 @@ class get_db_connect:
             )
         else:
             # try connect
-            print('Wait for DB connection...')
+            # print('Wait for DB connection...')
 
             self.conn = None
             try_cnt = 1
@@ -298,7 +298,7 @@ class get_db_connect:
             if self.conn == None:
                 raise Exception("Unable to connect database")
 
-        print('DB connected')
+        # print('DB connected')
 
         return self.conn
     

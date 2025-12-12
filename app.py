@@ -969,6 +969,8 @@ def terminate_golang():
                 print('Golang process not terminated properly.')
 
 def signal_handler(signal, frame):
+    print("EXIT SIGNAL RECEIVED")
+    
     terminate_golang()
     os._exit(0)
 
@@ -984,7 +986,9 @@ if __name__ == "__main__":
         app.run(
             host = server_set['host'],
             port = int(server_set['port']),
-            use_reloader = False
+            use_reloader = False,
+            threaded = False,
+            debug = True,
         )
     else:
         serve(
