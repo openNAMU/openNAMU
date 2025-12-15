@@ -745,12 +745,12 @@ app.route('/alarm/delete')(user_alarm_delete)
 app.route('/alarm/delete/<int:id>')(user_alarm_delete)
 
 app.route('/watch_list')(golang_view())
-app.route('/watch_list/<everything:name>')(golang_view())
-app.route('/watch_list_from/<everything:name>')(golang_view())
+app.route('/watch_list/<everything:name>', methods = ['POST', 'GET'])(golang_view())
+app.route('/watch_list_from/<everything:name>', methods = ['POST', 'GET'])(golang_view())
 
 app.route('/star_doc')(golang_view())
-app.route('/star_doc/<everything:name>')(golang_view())
-app.route('/star_doc_from/<everything:name>')(golang_view())
+app.route('/star_doc/<everything:name>', methods = ['POST', 'GET'])(golang_view())
+app.route('/star_doc_from/<everything:name>', methods = ['POST', 'GET'])(golang_view())
 
 # 개편 보류중 S
 app.route('/change/email', methods = ['POST', 'GET'])(user_setting_email)

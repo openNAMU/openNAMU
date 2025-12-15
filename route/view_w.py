@@ -197,7 +197,7 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
             end_data = ''
 
         if doc_rev == '':
-            asyncio.create_task(api_w_page_view(name))
+            await api_w_page_view(name)
             curs.execute(db_change("select data from data where title = ?"), [name])
         else:
             curs.execute(db_change("select data from history where title = ? and id = ?"), [name, doc_rev])
