@@ -24,13 +24,9 @@ robots.txt
 custom.py
 404.html
 
-views/liberty
-views/buma
-views/before_namu
-views/acme
-views/sl_open
-views/nitori
-views/jsonnamu
+views/*
+!views/ringo
+!views/main_css
 
 bin/*
 !bin/test
