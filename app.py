@@ -993,7 +993,7 @@ if __name__ == "__main__":
         app.run(
             host = server_set['host'],
             port = int(server_set['port']),
-            use_reloader = True,
+            use_reloader = False,
             threaded = False,
             debug = True,
         )
