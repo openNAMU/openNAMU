@@ -77,6 +77,8 @@
 /* list */
 .opennamu_main ul {
     padding-left: 20px;
+    
+    margin-inline-start: 0;
 }
 
 .opennamu_main ul li {
@@ -379,6 +381,8 @@
     padding-bottom: 6px;
     
     margin: 0;
+
+    background-color: transparent;
 }
 
 .opennamu_main .mini_hr {

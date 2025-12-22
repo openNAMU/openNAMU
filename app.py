@@ -188,10 +188,6 @@ with get_db_connect(init_mode = True) as conn:
     log = logging.getLogger('waitress')
     log.setLevel(logging.ERROR)
 
-    app.jinja_env.filters['md5_replace'] = md5_replace
-    app.jinja_env.filters['load_lang'] = load_lang
-    app.jinja_env.filters['cut_100'] = cut_100
-
     app.url_map.converters['everything'] = EverythingConverter
     app.url_map.converters['regex'] = RegexConverter
 
@@ -983,14 +979,29 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for = 1, x_proto = 1)
 
 if __name__ == "__main__":
     if run_mode in ['dev']:
+        app.config['TEMPLATES_AUTO_RELOAD'] = True
+        app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
+        app.jinja_options["cache_size"] = 0
+        app.jinja_options["auto_reload"] = True
+        app.jinja_options["bytecode_cache"] = None
+
+        app.jinja_env.filters['md5_replace'] = md5_replace
+        app.jinja_env.filters['load_lang'] = load_lang
+        app.jinja_env.filters['cut_100'] = cut_100
+
         app.run(
             host = server_set['host'],
             port = int(server_set['port']),
-            use_reloader = False,
+            use_reloader = True,
             threaded = False,
             debug = True,
         )
     else:
+        app.jinja_env.filters['md5_replace'] = md5_replace
+        app.jinja_env.filters['load_lang'] = load_lang
+        app.jinja_env.filters['cut_100'] = cut_100
+
         serve(
             app,
             host = server_set['host'],
