@@ -102,7 +102,7 @@ async def main_setting_head(num, skin_name = '', set_preview = 0):
                 '''
                     <form method="post">
                         ''' + start + '''
-                        <textarea class="opennamu_textarea_500" placeholder="''' + await get_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
+                        <textarea class="opennamu_textarea_500 __ON_TEXTAREA__" placeholder="''' + await get_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
                         ''' + (await get_lang('main_css_warning') + '<hr class="main_hr">' if title == '_head' else '') + '''
                         <button id="opennamu_save_button" type="submit" ''' + form_action + '''>''' + await get_lang('save') + '''</button>

@@ -64,7 +64,7 @@ async def user_setting_head(skin_name = ''):
                 await get_lang(data = 'user_head', safe = 1),
                 start + '''
                     <form method="post">
-                        <textarea class="opennamu_textarea_500" cols="100" name="content">''' + html.escape(data) + '''</textarea>
+                        <textarea class="opennamu_textarea_500 __ON_TEXTAREA__" cols="100" name="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
                         ''' + await get_lang('user_css_warning') + ''' : <a href="/change/head_reset">/change/head_reset</a>
                         <hr class="main_hr">

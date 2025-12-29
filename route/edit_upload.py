@@ -152,7 +152,7 @@ async def edit_upload():
                             ''' + license_list + '''
                         </select>
                         <hr class="main_hr">
-                        <textarea class="opennamu_textarea_100" placeholder="''' + await get_lang('other') + '''" name="f_lice">''' + upload_default + '''</textarea>
+                        <textarea class="opennamu_textarea_100 __ON_TEXTAREA__" placeholder="''' + await get_lang('other') + '''" name="f_lice">''' + upload_default + '''</textarea>
                         <hr class="main_hr">
                         ''' + await captcha_get(conn) + '''
                         <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>

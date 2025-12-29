@@ -40,7 +40,7 @@ async def main_setting_top_menu():
                     ''' + await get_lang('not_support_skin_warning') + '''
                     <hr class="main_hr">
                     <form method="post">
-                        <textarea class="opennamu_textarea_500" placeholder="''' + await get_lang('enter_top_menu_setting') + '''" name="content" id="content">''' + html.escape(db_data) + '''</textarea>
+                        <textarea class="opennamu_textarea_500 __ON_TEXTAREA__" placeholder="''' + await get_lang('enter_top_menu_setting') + '''" name="content" id="content">''' + html.escape(db_data) + '''</textarea>
                         <hr class="main_hr">
                         <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>

@@ -105,7 +105,7 @@ async def edit_request(name = 'Test', do_type = ''):
                         <button ''' + disabled + ''' id="opennamu_save_button" type="submit" name="check" value="Y">''' + await get_lang('approve') + '''</button>
                         <button ''' + disabled + ''' id="opennamu_preview_button" type="submit" name="check" value="">''' + await get_lang('decline') + '''</button>
                         <hr class="main_hr">
-                        <textarea readonly class="opennamu_textarea_500">''' + html.escape(edit_request_data) + '''</textarea>
+                        <textarea readonly class="opennamu_textarea_500 __ON_TEXTAREA__">''' + html.escape(edit_request_data) + '''</textarea>
                     </form>
                 ''',
                 '(' + await get_lang('edit_request_check') + ')',

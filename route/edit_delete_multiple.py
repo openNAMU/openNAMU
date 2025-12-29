@@ -27,7 +27,7 @@ async def edit_delete_multiple():
                 await get_lang('many_delete'),
                 '''
                     <form method="post">
-                        <textarea class="opennamu_textarea_500" placeholder="''' + await get_lang('many_delete_help') + '''" name="content"></textarea>
+                        <textarea class="opennamu_textarea_500 __ON_TEXTAREA__" placeholder="''' + await get_lang('many_delete_help') + '''" name="content"></textarea>
                         <hr class="main_hr">
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + '''" name="send" type="text">
                         <hr class="main_hr">

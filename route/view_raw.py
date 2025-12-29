@@ -87,7 +87,7 @@ async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '
             doc_preview = ''
             if bbs_num == '' and post_num == '' and topic_num == '':
                 doc_preview = '''
-                    <textarea id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
+                    <textarea class="__ON_TEXTAREA__" id="opennamu_editor_doc_name" style="display: none;">''' + html.escape(name) + '''</textarea>
                     <button id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview('raw');">''' + await get_lang('preview') + '''</button>
                     <hr class="main_hr">
                 '''
@@ -95,7 +95,7 @@ async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '
             p_data += '''
                 <div id="opennamu_preview_area">
                     ''' + doc_preview + '''
-                    <textarea readonly id="opennamu_edit_textarea" class="opennamu_textarea_500">''' + html.escape(data[0][0]) + '''</textarea>
+                    <textarea readonly id="opennamu_edit_textarea" class="opennamu_textarea_500 __ON_TEXTAREA__">''' + html.escape(data[0][0]) + '''</textarea>
                 </div>
             '''
             

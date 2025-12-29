@@ -29,7 +29,7 @@ async def main_setting_email_test():
                         <hr class="main_hr">
                         <input class="__ON_INPUT__" name="email" placeholder="''' + await get_lang("email") + '''">
                         <hr class="main_hr">
-                        <textarea  name="data" class="opennamu_textarea_500" placeholder="''' + await get_lang("content") + '''"></textarea>
+                        <textarea  name="data" class="opennamu_textarea_500 __ON_TEXTAREA__" placeholder="''' + await get_lang("content") + '''"></textarea>
                         <hr class="main_hr">
                         <button type="submit">''' + await get_lang("send") + '''</button>
                     </form>

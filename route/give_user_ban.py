@@ -104,7 +104,7 @@ async def give_user_ban(name = None, ban_type = ''):
         else:
             if ban_type == 'multiple':
                 main_name = await get_lang('multiple_ban')
-                n_name = '<textarea class="opennamu_textarea_500" placeholder="' + await get_lang('name_or_ip_or_regex_or_cidr_multiple') + '" name="name"></textarea><hr class="main_hr">'
+                n_name = '<textarea class="opennamu_textarea_500 __ON_TEXTAREA__" placeholder="' + await get_lang('name_or_ip_or_regex_or_cidr_multiple') + '" name="name"></textarea><hr class="main_hr">'
             else:
                 main_name = await get_lang('ban')
                 n_name = '<input class="__ON_INPUT__" placeholder="' + await get_lang('name_or_ip_or_regex_or_cidr') + '" value="' + (name if name else '') + '" name="name"><hr class="main_hr">'

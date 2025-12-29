@@ -228,16 +228,16 @@ async def view_set(name = 'Test', multiple = False):
 
             data += '''
                 <h2>''' + await get_lang('document_top') + ''' (HTML)</h2>
-                <textarea ''' + check_ok + ''' class="opennamu_textarea_100" name="document_top">''' + html.escape(document_top) + '''</textarea>
+                <textarea ''' + check_ok + ''' class="opennamu_textarea_100 __ON_TEXTAREA__" name="document_top">''' + html.escape(document_top) + '''</textarea>
                 
                 <h2>''' + await get_lang('document_editor_top') + ''' (HTML)</h2>
-                <textarea ''' + check_ok + ''' class="opennamu_textarea_100" name="document_editor_top">''' + html.escape(document_editor_top) + '''</textarea>
+                <textarea ''' + check_ok + ''' class="opennamu_textarea_100 __ON_TEXTAREA__" name="document_editor_top">''' + html.escape(document_editor_top) + '''</textarea>
             '''
             data += '<hr class="main_hr">'
 
             text_area = ''
             if multiple == True:
-                text_area = '<textarea class="opennamu_textarea_500" placeholder="' + await get_lang('many_delete_help') + '" name="title_name"></textarea><hr class="main_hr">'
+                text_area = '<textarea class="opennamu_textarea_500 __ON_TEXTAREA__" placeholder="' + await get_lang('many_delete_help') + '" name="title_name"></textarea><hr class="main_hr">'
                 menu = [
                     ['manager', await get_lang('admin')]
                 ]

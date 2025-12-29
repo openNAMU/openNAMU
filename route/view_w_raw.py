@@ -23,7 +23,7 @@ async def view_w_raw(name = '', rev = '', doc_acl = ''):
         p_data = ''
         p_data += '''
             <div id="opennamu_preview_area">
-                <textarea readonly id="opennamu_edit_textarea" class="opennamu_textarea_500">''' + html.escape(data_in) + '''</textarea>
+                <textarea readonly id="opennamu_edit_textarea" class="opennamu_textarea_500 __ON_TEXTAREA__">''' + html.escape(data_in) + '''</textarea>
             </div>
         '''
         

@@ -19,7 +19,7 @@ async def user_edit_filter(name = ''):
             curs.execute(db_change('select data from user_set where name = "edit_filter" and id = ?'), [name])
             db_data = curs.fetchall()
             p_data = db_data[0][0] if db_data else ''
-            p_data = '<textarea readonly class="opennamu_textarea_500">' + html.escape(p_data) + '</textarea>'
+            p_data = '<textarea readonly class="opennamu_textarea_500 __ON_TEXTAREA__">' + html.escape(p_data) + '</textarea>'
 
             search_list = '<ul>'
 

@@ -81,7 +81,7 @@ async def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', na
         out_field += '<hr class="main_hr">'
 
     return '''
-        <textarea style="display: none;" id="opennamu_edit_origin" name="doc_data_org">''' + html.escape(data_main) + '''</textarea>
+        <textarea class="__ON_TEXTAREA__" style="display: none;" id="opennamu_edit_origin" name="doc_data_org">''' + html.escape(data_main) + '''</textarea>
         <div>
             ''' + monaco_editor_top + '''
             <hr class="main_hr">
@@ -92,7 +92,7 @@ async def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', na
         ''' + div + '''
 
         <div id="opennamu_monaco_editor" class="''' + textarea_size + '''" ''' + editor_display[1] + '''></div>
-        <textarea id="opennamu_edit_textarea" class="''' + textarea_size + '''" ''' + editor_display[0] + ''' name="content" placeholder="''' + p_text + '''">''' + html.escape(data_main) + '''</textarea>
+        <textarea id="opennamu_edit_textarea" class="''' + textarea_size + ''' __ON_TEXTAREA__" ''' + editor_display[0] + ''' name="content" placeholder="''' + p_text + '''">''' + html.escape(data_main) + '''</textarea>
         <hr class="main_hr">
         ''' + out_field + '''
         
@@ -358,7 +358,7 @@ async def edit(name = 'Test', section = 0, do_type = ''):
                 name,
                 editor_top_text + '''
                     <form method="post">
-                        <textarea style="display: none;" name="doc_section_data_where">''' + data_section_where + '''</textarea>
+                        <textarea class="__ON_TEXTAREA__" style="display: none;" name="doc_section_data_where">''' + data_section_where + '''</textarea>
                         <input class="__ON_INPUT__" style="display: none;" name="doc_section_edit_apply" value="''' + doc_section_edit_apply + '''">
 
                         <input class="__ON_INPUT__" style="display: none;" id="opennamu_editor_doc_name" value="''' + html.escape(name) + '''">

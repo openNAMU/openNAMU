@@ -58,9 +58,9 @@ async def vote_add():
                     '<form method="post">' + \
                         '<input class="__ON_INPUT__" name="name" placeholder="' + await get_lang('name') + '">' + \
                         '<hr class="main_hr">' + \
-                        '<textarea class="opennamu_textarea_100" name="subject" placeholder="' + await get_lang('explanation') + '"></textarea>' + \
+                        '<textarea class="opennamu_textarea_100 __ON_TEXTAREA__" name="subject" placeholder="' + await get_lang('explanation') + '"></textarea>' + \
                         '<hr class="main_hr">' + \
-                        '<textarea class="opennamu_textarea_500" name="data" placeholder="' + await get_lang('1_line_1_q') + '"></textarea>' + \
+                        '<textarea class="opennamu_textarea_500 __ON_TEXTAREA__" name="data" placeholder="' + await get_lang('1_line_1_q') + '"></textarea>' + \
                         '<hr class="main_hr">' + \
                         '<label><input class="__ON_INPUT__" type="checkbox" value="Y" name="open_select"> ' + await get_lang('open_vote') + '</label>' + \
                         '<h2>' + await get_lang('period') + '</h2>'
