@@ -57,7 +57,7 @@ async def login_login():
                             <hr class="main_hr">
                             <input class="__ON_INPUT__" placeholder="''' + await get_lang('password') + '''" name="pw" type="password">
                             <hr class="main_hr">
-                            <!-- <label><input class="__ON_INPUT__" type="checkbox" name="auto_login"> ''' + await get_lang('auto_login') + ''' (''' + await get_lang('not_working') + ''')</label>
+                            <!-- <label><input class="__ON_CHECKBOX__" type="checkbox" name="auto_login"> ''' + await get_lang('auto_login') + ''' (''' + await get_lang('not_working') + ''')</label>
                             <hr class="main_hr"> -->
                             ''' + await captcha_get(conn) + '''
                             <button class="__ON_BUTTON__" type="submit">''' + await get_lang('login') + '''</button>

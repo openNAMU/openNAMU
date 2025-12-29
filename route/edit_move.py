@@ -233,7 +233,7 @@ async def edit_move(name):
                             ''' + ('<option value="merge"> ' + await get_lang('merge_move') + '</option>' if owner_auth == 1 else '') + '''
                         </select></span>
                         <hr class="main_hr">
-                        <!-- <label><input class="__ON_INPUT__" type="checkbox" name="move_redirect_make"> ''' + await get_lang('move_redirect_make') + '''</label>
+                        <!-- <label><input class="__ON_CHECKBOX__" type="checkbox" name="move_redirect_make"> ''' + await get_lang('move_redirect_make') + '''</label>
                         <hr class="main_hr"> -->
                         
                         <h2>''' + await get_lang('discussion') + '''</h2>

@@ -44,7 +44,7 @@ async def main_setting_robot():
                     <form method="post">
                         <textarea class="opennamu_textarea_500 __ON_TEXTAREA__" name="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
-                        <label><input class="__ON_INPUT__" type="checkbox" name="default" ''' + default_data + '''> ''' + await get_lang('default') + '''</label>
+                        <label><input class="__ON_CHECKBOX__" type="checkbox" name="default" ''' + default_data + '''> ''' + await get_lang('default') + '''</label>
                         <hr class="main_hr">
                         <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>

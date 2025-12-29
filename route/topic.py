@@ -138,7 +138,7 @@ async def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                 '''
                     <script defer src="/views/main_css/js/route/topic.js''' + cache_v() + '''"></script>
                     <style id="opennamu_list_hidden_style">.opennamu_list_hidden { display: none; }</style>
-                    <label><input class="__ON_INPUT__" type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ''' + await get_lang('remove_hidden') + '''</label>
+                    <label><input class="__ON_CHECKBOX__" type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ''' + await get_lang('remove_hidden') + '''</label>
                     <hr class="main_hr">
 
                     ''' + shortcut + '''

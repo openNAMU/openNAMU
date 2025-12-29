@@ -1880,7 +1880,7 @@ def get_edit_text_bottom_check_box(conn):
             ''
         else:
             cccb_text = '' + \
-                '<label><input class="__ON_INPUT__" type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + '</label>' + \
+                '<label><input class="__ON_CHECKBOX__" type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + '</label>' + \
                 '<hr class="main_hr">' + \
             ''
         

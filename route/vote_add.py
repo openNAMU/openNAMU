@@ -62,11 +62,11 @@ async def vote_add():
                         '<hr class="main_hr">' + \
                         '<textarea class="opennamu_textarea_500 __ON_TEXTAREA__" name="data" placeholder="' + await get_lang('1_line_1_q') + '"></textarea>' + \
                         '<hr class="main_hr">' + \
-                        '<label><input class="__ON_INPUT__" type="checkbox" value="Y" name="open_select"> ' + await get_lang('open_vote') + '</label>' + \
+                        '<label><input class="__ON_CHECKBOX__" type="checkbox" value="Y" name="open_select"> ' + await get_lang('open_vote') + '</label>' + \
                         '<h2>' + await get_lang('period') + '</h2>'
                         '<input class="__ON_INPUT__" type="date" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">' + \
                         '<hr class="main_hr">' + \
-                        '<label><input class="__ON_INPUT__" type="checkbox" value="Y" name="limitless"> ' + await get_lang('limitless') + '</label>' + \
+                        '<label><input class="__ON_CHECKBOX__" type="checkbox" value="Y" name="limitless"> ' + await get_lang('limitless') + '</label>' + \
                         '<h2>' + await get_lang('acl') + '</h2>' + \
                         acl_data + ' <a href="/acl/TEST#exp">(' + await get_lang('explanation') + ')</a>' + \
                         '<hr class="main_hr">' + \

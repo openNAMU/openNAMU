@@ -96,7 +96,7 @@ async def give_admin_groups(name = 'test'):
                 if for_a[1] in acl_list:
                     checked = 'checked'
                     
-                choice = '<label><input class="__ON_INPUT__" type="checkbox" ' + state + ' name="' + for_a[1] + '" ' + checked + '> ' + for_a[2] + '</label>'
+                choice = '<label><input class="__ON_CHECKBOX__" type="checkbox" ' + state + ' name="' + for_a[1] + '" ' + checked + '> ' + for_a[2] + '</label>'
                 if for_a[1] == '':
                     choice = for_a[2]
 
