@@ -118,19 +118,19 @@ async def user_setting():
                             <hr class="main_hr">
                             <span>''' + await get_lang('skin') + '''</span>
                             <hr class="main_hr">
-                            <select name="skin">''' + div2 + '''</select>
+                            <select class="__ON_SELECT__" name="skin">''' + div2 + '''</select>
                             <hr class="main_hr">
                             <a href="/change/skin_set">(''' + await get_lang('skin_set') + ''')</a> <a href="/change/skin_set/main">(''' + await get_lang('main_skin_set') + ''')</a>
                             <hr class="main_hr">
                             <span>''' + await get_lang('language') + '''</span>
                             <hr class="main_hr">
-                            <select name="lang">''' + div3 + '''</select>
+                            <select class="__ON_SELECT__" name="lang">''' + div3 + '''</select>
                             <hr class="main_hr">
                             <span>''' + await get_lang('user_title') + '''</span>
                             <hr class="main_hr">
-                            <select name="user_title">''' + div4 + '''</select>
+                            <select class="__ON_SELECT__" name="user_title">''' + div4 + '''</select>
                             <h2>''' + await get_lang('2fa') + '''</h2>
-                            <select name="2fa" id="twofa_check_input">''' + fa_data_select + '''</select>
+                            <select class="__ON_SELECT__" name="2fa" id="twofa_check_input">''' + fa_data_select + '''</select>
                             <hr class="main_hr">
                             <input class="__ON_INPUT__" type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
                             <h2>''' + await get_lang('main_user_name') + '''</h2>
@@ -179,13 +179,13 @@ async def user_setting():
                             <h2>''' + await get_lang('main') + '''</h2>
                             <span>''' + await get_lang('skin') + '''</span>
                             <hr class="main_hr">
-                            <select name="skin">''' + div2 + '''</select>
+                            <select class="__ON_SELECT__" name="skin">''' + div2 + '''</select>
                             <hr class="main_hr">
                             <a href="/change/skin_set">(''' + await get_lang('skin_set') + ''')</a> <a href="/change/skin_set/main">(''' + await get_lang('main_skin_set') + ''')</a>
                             <hr class="main_hr">
                             <span>''' + await get_lang('language') + '''</span>
                             <hr class="main_hr">
-                            <select name="lang">''' + div3 + '''</select>
+                            <select class="__ON_SELECT__" name="lang">''' + div3 + '''</select>
                             <hr class="main_hr">
                             <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
                             ''' + await http_warning() + '''

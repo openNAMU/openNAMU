@@ -85,11 +85,11 @@ async def topic_tool_acl(topic_num = 1):
                     <form method="post">
                         <a href="/acl/TEST#exp">(''' + await get_lang('reference') + ''')</a>
                         <h2>''' + await get_lang('thread_acl') + '''</h2>
-                        <select name="acl">
+                        <select class="__ON_SELECT__" name="acl">
                             ''' + acl_html_list + '''
                         </select>
                         <h2>''' + await get_lang('view_acl') + ''' (''' + await get_lang('beta') + ''')</h2>
-                        <select name="acl_view">
+                        <select class="__ON_SELECT__" name="acl_view">
                             ''' + acl_html_list_view + '''
                         </select>
                         <hr class="main_hr">

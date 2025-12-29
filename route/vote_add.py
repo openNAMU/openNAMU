@@ -45,7 +45,7 @@ async def vote_add():
 
             return redirect(conn, '/vote')
         else:
-            acl_data = '<select name="acl_select">'
+            acl_data = '<select class="__ON_SELECT__" name="acl_select">'
             acl_list = await get_acl_list()
             for data_list in acl_list:
                 acl_data += '<option value="' + data_list + '">' + (data_list if data_list != '' else 'normal') + '</option>'

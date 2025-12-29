@@ -138,7 +138,7 @@ async def give_user_ban(name = None, ban_type = ''):
                         <h2>''' + await get_lang('method') + '''</h2>
                         ''' + n_name + '''
         
-                        <select name="do_ban_type">
+                        <select class="__ON_SELECT__" name="do_ban_type">
                             <option value="normal">''' + await get_lang('normal') + '''</option>
                             <option value="regex" ''' + ('selected' if ban_type == 'regex' else '') + '>' + await get_lang('regex') + '''</option>
                             <option value="cidr" ''' + ('selected' if ban_type == 'cidr' else '') + '>' + await get_lang('cidr') + '''</option>
@@ -146,7 +146,7 @@ async def give_user_ban(name = None, ban_type = ''):
                         </select>
                         <hr class="main_hr">
         
-                        <select name="ban_option">
+                        <select class="__ON_SELECT__" name="ban_option">
                             <option value="">''' + await get_lang('default') + '''</option>
                             <option value="login_able">''' + await get_lang('login_able') + '''</option>
                             <option value="login_able_and_regsiter_disable">''' + await get_lang('login_able_and_regsiter_disable') + '''</option>
@@ -157,7 +157,7 @@ async def give_user_ban(name = None, ban_type = ''):
                         </select>
         
                         <h2>''' + await get_lang('date') + '''</h2>
-                        <select name="date_type">
+                        <select class="__ON_SELECT__" name="date_type">
                             <option value="date">''' + await get_lang('date') + '''</option>
                             <option value="days">''' + await get_lang('day') + '''</option>
                         </select>

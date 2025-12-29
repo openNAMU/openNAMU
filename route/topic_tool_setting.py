@@ -94,7 +94,7 @@ async def topic_tool_setting(topic_num = 1):
                 await render_simple_set('''
                     <form method="post">
                         <h2>''' + await get_lang('topic_progress') + '''</h2>
-                        <select name="stop_d">
+                        <select class="__ON_SELECT__" name="stop_d">
                             ''' + stop_d_list + '''
                         </select>
                         <hr class="main_hr">

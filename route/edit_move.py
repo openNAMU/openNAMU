@@ -226,7 +226,7 @@ async def edit_move(name):
                         <hr class="main_hr">
                         
                         <h2>''' + await get_lang('document') + '''</h2>
-                        <select name="move_option">
+                        <select class="__ON_SELECT__" name="move_option">
                             <option value="normal"> ''' + await get_lang('normal') + '''</option>
                             <option value="none"> ''' + await get_lang('dont_move') + '''</option>
                             <option value="reverse"> ''' + await get_lang('replace_move') + '''</option>
@@ -237,7 +237,7 @@ async def edit_move(name):
                         <hr class="main_hr"> -->
                         
                         <h2>''' + await get_lang('discussion') + '''</h2>
-                        <select name="move_topic_option">
+                        <select class="__ON_SELECT__" name="move_topic_option">
                             <option value="none"> ''' + await get_lang('dont_move') + '''</option>
                             <option value="normal"> ''' + await get_lang('normal') + '''</option>
                             <option value="reverse"> ''' + await get_lang('replace_move') + '''</option>
@@ -247,7 +247,7 @@ async def edit_move(name):
 
                         ''' + ((
                             '''<h2>''' + await get_lang('document_set') + '''</h2>
-                            <select name="document_set_option">
+                            <select class="__ON_SELECT__" name="document_set_option">
                                 <option value="none"> ''' + await get_lang('dont_move') + '''</option>
                                 <option value="normal"> ''' + await get_lang('normal') + '''</option>
                                 <option value="reverse"> ''' + await get_lang('replace_move') + '''</option>

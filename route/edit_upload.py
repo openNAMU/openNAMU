@@ -148,7 +148,7 @@ async def edit_upload():
                         <hr class="main_hr">
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('file_name') + '''" name="f_name" value="''' + file_name + '''">
                         <hr class="main_hr">
-                        <select name="f_lice_sel">
+                        <select class="__ON_SELECT__" name="f_lice_sel">
                             ''' + license_list + '''
                         </select>
                         <hr class="main_hr">

@@ -85,7 +85,7 @@ async def main_setting_external():
 
                         <span>''' + await get_lang('version') + '''</span>
                         <hr class="main_hr">
-                        <select name="recaptcha_ver">
+                        <select class="__ON_SELECT__" name="recaptcha_ver">
                             ''' + re_ver + '''
                         </select>
 
@@ -113,7 +113,7 @@ async def main_setting_external():
 
                         <span>''' + await get_lang('smtp_security') + '''</span>
                         <hr class="main_hr">
-                        <select name="smtp_security">
+                        <select class="__ON_SELECT__" name="smtp_security">
                             ''' + security_radios + '''
                         </select>
                         <hr class="main_hr">

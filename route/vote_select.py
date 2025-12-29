@@ -56,7 +56,7 @@ async def vote_select(num = 1):
             data += '<b>' + data_list[0][1] + '</b><hr class="main_hr">' if data_list[0][1] != '' else ''
             data += '<span>~ ' + time_limit + '</span><hr class="main_hr">' if time_limit != '' else ''
 
-            select_data = '<select name="vote_data">'
+            select_data = '<select class="__ON_SELECT__" name="vote_data">'
             line_num = 0
             for i in vote_data:
                 select_data += '<option value="' + str(line_num) + '">' + i + '</option>'
