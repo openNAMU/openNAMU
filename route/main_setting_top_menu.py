@@ -22,9 +22,9 @@ async def main_setting_top_menu():
             db_data = curs.fetchall()
             db_data = db_data[0][0] if db_data else ''
             
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('top_menu_setting'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang('top_menu_setting'),
+                '''
                     <span>
                         EX)
                         <br>
@@ -45,5 +45,6 @@ async def main_setting_top_menu():
                         <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['setting', await get_lang('return')]]
-            ))
+                0,
+                [['setting', await get_lang('return')]]
+            )

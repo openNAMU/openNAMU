@@ -62,8 +62,9 @@ async def main_search_deep(name = 'Test', search_type = 'title', num = 1):
             else:
                 div += await get_next_page_bottom('/search_data_page/{}/' + url_pas(name), num, all_list)
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('search') + ')', 0])],
-                data = div,
-                menu = 0
-            ))
+            return await render_template(
+                name,
+                div,
+                '(' + await get_lang('search') + ')',
+                0
+            )

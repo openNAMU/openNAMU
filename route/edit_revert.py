@@ -74,9 +74,9 @@ async def edit_revert(name, num):
             else:
                 preview = ''
             
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(r' + str(num) + ') (' + await get_lang('revert') + ')', 0])],
-                data = '''
+            return await render_template(
+                name,
+                '''
                     <form method="post">
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + '''" name="send" type="text">
                         <hr class="main_hr">
@@ -84,5 +84,6 @@ async def edit_revert(name, num):
                         <button type="submit">''' + await get_lang('revert') + '''</button>
                     </form>
                 ''' + preview,
-                menu = [['history/' + url_pas(name), await get_lang('history')], ['recent_changes', await get_lang('recent_change')]]
-            ))
+                '(r' + str(num) + ') (' + await get_lang('revert') + ')',
+                [['history/' + url_pas(name), await get_lang('history')], ['recent_changes', await get_lang('recent_change')]]
+            )

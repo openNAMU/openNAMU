@@ -65,9 +65,9 @@ async def main_setting_external():
                 else:
                     re_ver += '<option value="' + i + '">' + re_ver_list[i] + '</option>'
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('ext_api_req_set'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = await render_simple_set('''
+            return await render_template(
+                await get_lang('ext_api_req_set'),
+                await render_simple_set('''
                     <form method="post">
                         <h2>''' + await get_lang('captcha') + '''</h2>
                         <a href="https://www.google.com/recaptcha/">(''' + await get_lang('recaptcha') + ''')</a> <a href="https://www.hcaptcha.com/">(''' + await get_lang('hcaptcha') + ''')</a>
@@ -140,5 +140,6 @@ async def main_setting_external():
                         <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 '''),
-                menu = [['setting', await get_lang('return')]]
-            ))
+                0,
+                [['setting', await get_lang('return')]]
+            )

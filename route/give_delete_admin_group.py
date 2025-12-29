@@ -21,12 +21,13 @@ async def give_delete_admin_group(name = 'test'):
             else:
                 return await re_error(conn, 47)
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang("delete_admin_group"), await wiki_set(), await wiki_custom(), wiki_css(['(' + name + ')', 0])],
-                data = '' + \
+            return await render_template(
+                await get_lang("delete_admin_group"),
+                '' + \
                     '<form method="post">' + \
                         '<button type="submit">' + await get_lang('delete') + '</button>' + \
                     '</form>' + \
                 '',
-                menu = [['auth/list', await get_lang('return')]]
-            ))
+                '(' + name + ')',
+                [['auth/list', await get_lang('return')]]
+            )

@@ -18,8 +18,9 @@ async def list_user(arg_num = 1):
 
         list_data += '</ul>' + await get_next_page_bottom('/list/user/{}', arg_num, user_list)
 
-        return easy_minify(flask.render_template(await skin_check(),
-            imp = [await get_lang('member_list'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-            data = list_data,
-            menu = [['other', await get_lang('return')]]
-        ))
+        return await render_template(
+            await get_lang('member_list'),
+            list_data,
+            0,
+            [['other', await get_lang('return')]]
+        )

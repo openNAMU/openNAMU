@@ -36,9 +36,9 @@ async def main_setting_robot():
 
             return redirect(conn, '/setting/robot')
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = ['robots.txt', await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                'robots.txt',
+                '''
                     <a href="/robots.txt">(''' + await get_lang('view') + ''')</a>
                     <hr class="main_hr">
                     <form method="post">
@@ -49,5 +49,6 @@ async def main_setting_robot():
                         <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['setting', await get_lang('return')]]
-            ))
+                0,
+                [['setting', await get_lang('return')]]
+            )

@@ -36,8 +36,9 @@ async def view_w_raw(name = '', rev = '', doc_acl = ''):
             
             sub = ' (' + await get_lang('edit') + ')'
 
-        return easy_minify(flask.render_template(await skin_check(),
-            imp = [name, await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],
-            data = p_data,
-            menu = menu
-        ))
+        return await render_template(
+            name,
+            p_data,
+            sub,
+            menu
+        )

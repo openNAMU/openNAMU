@@ -97,9 +97,9 @@ async def main_setting_head(num, skin_name = '', set_preview = 0):
             else:
                 sub_plus = ''
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang(data = 'main' + title, safe = 1), await wiki_set(), await wiki_custom(), wiki_css(['(HTML)' + sub_plus, 0])],
-                data = '''
+            return await render_template(
+                await get_lang(data = 'main' + title, safe = 1),
+                '''
                     <form method="post">
                         ''' + start + '''
                         <textarea class="opennamu_textarea_500" placeholder="''' + await get_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
@@ -109,5 +109,6 @@ async def main_setting_head(num, skin_name = '', set_preview = 0):
                         ''' + plus + '''
                     </form>
                 ''',
-                menu = [['setting', await get_lang('return')]]
-            ))
+                '(HTML)' + sub_plus,
+                [['setting', await get_lang('return')]]
+            )

@@ -163,9 +163,9 @@ async def user_setting_skin_set_main():
                 server_default = db_data[0][0] if db_data else 'default'
                 set_data_main[for_b] = await get_lang('default') + ' : ' + ''.join([for_a[1] for for_a in set_list[for_b] if for_a[0] == server_default]) + '<hr class="main_hr">'
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('main_skin_set'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = await render_simple_set('''
+            return await render_template(
+                await get_lang('main_skin_set'),
+                await render_simple_set('''
                     <form method="post">
                         <h2>''' + await get_lang("render") + '''</h2>
                         <h3>''' + await get_lang("strike") + '''</h3>
@@ -281,5 +281,6 @@ async def user_setting_skin_set_main():
                         <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 '''),
-                menu = [['change', await get_lang('user_setting')], ['change/skin_set', await get_lang('skin_set')], ['setting/skin_set', await get_lang('main_skin_set_default')]]
-            ))
+                0,
+                [['change', await get_lang('user_setting')], ['change/skin_set', await get_lang('skin_set')], ['setting/skin_set', await get_lang('main_skin_set_default')]]
+            )

@@ -92,10 +92,11 @@ async def view_diff(name = 'Test', num_a = 1, num_b = 1):
 
             result = view_diff_do(first_raw_data, second_raw_data, 'r' + first, 'r' + second)
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('compare') + ')', 0])],
-                data = result,
-                menu = [['history/' + url_pas(name), await get_lang('return')]]
-            ))
+            return await render_template(
+                name,
+                result,
+                '(' + await get_lang('compare') + ')',
+                [['history/' + url_pas(name), await get_lang('return')]]
+            )
         else:
             return redirect(conn, '/history/' + url_pas(name))

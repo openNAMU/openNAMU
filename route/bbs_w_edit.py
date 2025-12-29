@@ -124,9 +124,9 @@ async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
             else:
                 bbs_title = await get_lang('post_edit')
     
-            return easy_minify(flask.render_template(await skin_check(), 
-                imp = [bbs_title, await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data =  editor_top_text + '''
+            return await render_template(
+                bbs_title,
+                editor_top_text + '''
                     <form method="post">                        
                         <input class="__ON_INPUT__" style="''' + option_display + '''" placeholder="''' + await get_lang('title') + '''" name="title" value="''' + html.escape(title) + '''">
                         <hr style="''' + option_display + '''" class="main_hr">
@@ -152,5 +152,6 @@ async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                         -->
                     </form>
                 ''',
-                menu = [['bbs/in/' + bbs_num_str, await get_lang('return')]]
-            ))
+                0,
+                [['bbs/in/' + bbs_num_str, await get_lang('return')]]
+            )

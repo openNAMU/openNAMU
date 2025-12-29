@@ -12,8 +12,9 @@ async def main_func_easter_egg():
     
         data = ''
 
-        return easy_minify(flask.render_template(await skin_check(),
-            imp = ['Easter Egg', await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-            data = data,
-            menu = 0
-        ))
+        return await render_template(
+            'Easter Egg',
+            data,
+            0,
+            0
+        )

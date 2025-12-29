@@ -52,9 +52,9 @@ async def login_register_submit():
 
             return await re_error(conn, 43)
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('approval_question'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang('approval_question'),
+                '''
                     <form method="post">
                         ''' + await get_lang('approval_question') + ' : ' + data_que + '''
                         <hr class="main_hr">
@@ -63,5 +63,6 @@ async def login_register_submit():
                         <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['user', await get_lang('return')]]
-            ))
+                0,
+                [['user', await get_lang('return')]]
+            )

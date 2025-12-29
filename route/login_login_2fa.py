@@ -49,9 +49,9 @@ async def login_login_2fa():
 
             return redirect(conn, '/user')
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('login'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data =  '''
+            return await render_template(
+                await get_lang('login'),
+                '''
                         <form method="post">
                             <input class="__ON_INPUT__" placeholder="''' + await get_lang('2fa_password') + '''" name="pw" type="password">
                             <hr class="main_hr">
@@ -60,5 +60,6 @@ async def login_login_2fa():
                             ''' + await http_warning() + '''
                         </form>
                         ''',
-                menu = [['user', await get_lang('return')]]
-            ))
+                0,
+                [['user', await get_lang('return')]]
+            )

@@ -18,8 +18,9 @@ async def main_setting():
 
         li_data = ''.join(['<li><a href="/setting/' + str(li[0]) + '">' + li[1] + '</a></li>' for li in li_list])
 
-        return easy_minify(flask.render_template(await skin_check(),
-            imp = [await get_lang('setting'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-            data = '<h2>' + await get_lang('list') + '</h2><ul>' + li_data + '</ul>',
-            menu = [['manager', await get_lang('return')]]
-        ))
+        return await render_template(
+            await get_lang('setting'),
+            '<h2>' + await get_lang('list') + '</h2><ul>' + li_data + '</ul>',
+            0,
+            [['manager', await get_lang('return')]]
+        )

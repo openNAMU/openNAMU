@@ -42,8 +42,9 @@ async def recent_history_tool(name = 'Test', rev = 1):
             data += '<li><a href="/history_send/' + num + '/' + url_pas(name) + '">' + await get_lang('send_edit') + '</a></li>'
             data += '</ul>'
 
-        return easy_minify(flask.render_template(await skin_check(),
-            imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(r' + num + ')', 0])],
-            data = data,
-            menu = [['history/' + url_pas(name), await get_lang('return')]]
-        ))
+        return await render_template(
+            name,
+            data,
+            '(r' + num + ')',
+            [['history/' + url_pas(name), await get_lang('return')]]
+        )

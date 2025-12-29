@@ -60,9 +60,9 @@ async def user_setting_head(skin_name = ''):
                 start + \
             ''
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang(data = 'user_head', safe = 1), await wiki_set(), await wiki_custom(), wiki_css(['(HTML)' + sub_name, 0])],
-                data = start + '''
+            return await render_template(
+                await get_lang(data = 'user_head', safe = 1),
+                start + '''
                     <form method="post">
                         <textarea class="opennamu_textarea_500" cols="100" name="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
@@ -71,5 +71,6 @@ async def user_setting_head(skin_name = ''):
                         <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['change', await get_lang('return')]]
-            ))
+                '(HTML)' + sub_name,
+                [['change', await get_lang('return')]]
+            )

@@ -39,8 +39,9 @@ async def recent_record_topic(name = 'Test'):
         div += '</table>'
         div += await get_next_page_bottom('/record/topic/' + url_pas(name) + '?num={}', num, data_list)
 
-        return easy_minify(flask.render_template(await skin_check(),
-            imp = [await get_lang('discussion_record'), await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],
-            data = div,
-            menu = [['other', await get_lang('other')], ['user/' + url_pas(name), await get_lang('user_tool')]]
-        ))
+        return await render_template(
+            await get_lang('discussion_record'),
+            div,
+            sub,
+            [['other', await get_lang('other')], ['user/' + url_pas(name), await get_lang('user_tool')]]
+        )

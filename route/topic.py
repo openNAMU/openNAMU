@@ -133,9 +133,9 @@ async def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
             
             shortcut += '</div>'
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('discussion') + ')', 0])],
-                data = '''
+            return await render_template(
+                name,
+                '''
                     <script defer src="/views/main_css/js/route/topic.js''' + cache_v() + '''"></script>
                     <style id="opennamu_list_hidden_style">.opennamu_list_hidden { display: none; }</style>
                     <label><input class="__ON_INPUT__" type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ''' + await get_lang('remove_hidden') + '''</label>
@@ -170,5 +170,6 @@ async def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                         ''' + await edit_editor(conn, ip, '', 'thread') + '''
                     </form>
                 ''',
-                menu = [['topic/' + url_pas(name), await get_lang('list')]]
-            ))
+                '(' + await get_lang('discussion') + ')',
+                [['topic/' + url_pas(name), await get_lang('list')]]
+            )

@@ -58,9 +58,9 @@ async def user_count(name = None):
             data_yesterday += 1
 
         # 한글 지원 필요
-        return easy_minify(flask.render_template(await skin_check(),
-            imp = [await get_lang('count'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-            data = '''
+        return await render_template(
+            await get_lang('count'),
+            '''
                 <ul>
                     <li><a href="/record/''' + url_pas(that) + '''">''' + await get_lang('edit_record') + '''</a> : ''' + str(data) + '''</li>
                     <li><a href="/record/topic/''' + url_pas(that) + '''">''' + await get_lang('discussion_record') + '''</a> : ''' + str(data_topic) + '''</a></li>
@@ -73,5 +73,6 @@ async def user_count(name = None):
                     <li>(''' + await get_lang('beta') + ''') YESTERDAY LEN : ''' + str(data_yesterday_len) + '''</li>
                 </ul>
             ''',
-            menu = [['user', await get_lang('return')]]
-        ))
+            0,
+            [['user', await get_lang('return')]]
+        )

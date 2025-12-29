@@ -21,9 +21,9 @@ async def bbs_make():
 
             return redirect(conn, '/bbs/main')
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('bbs_make'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang('bbs_make'),
+                '''
                     <form method="post">
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('bbs_name') + '''" name="bbs_name">
                         <hr class="main_hr">
@@ -37,5 +37,6 @@ async def bbs_make():
                         <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['bbs/main', await get_lang('return')]]
-            ))
+                0,
+                [['bbs/main', await get_lang('return')]]
+            )

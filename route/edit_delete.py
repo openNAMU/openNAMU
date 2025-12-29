@@ -53,9 +53,9 @@ async def edit_delete(name):
 
             return redirect(conn, '/w/' + url_pas(name))
         else:            
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('delete') + ')', 0])],
-                data = '''
+            return await render_template(
+                name,
+                '''
                     <form method="post">
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + '''" name="send">
                         <hr class="main_hr">
@@ -63,5 +63,6 @@ async def edit_delete(name):
                         <button type="submit">''' + await get_lang('delete') + '''</button>
                     </form>
                 ''',
-                menu = [['w/' + url_pas(name), await get_lang('return')]]
-            ))
+                '(' + await get_lang('delete') + ')',
+                [['w/' + url_pas(name), await get_lang('return')]]
+            )

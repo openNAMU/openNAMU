@@ -366,8 +366,9 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
         if doc_rev != '':
             sub = '(' + str(doc_rev) + ')'
 
-        return easy_minify(flask.render_template(await skin_check(),
-            imp = [name_view, await wiki_set(), await wiki_custom(), wiki_css([sub, r_date, watch_list, description, view_count])],
-            data = div,
-            menu = menu
-        )), response_data
+        return await render_template(
+            name_view,
+            div,
+            sub,
+            menu
+        ), response_data

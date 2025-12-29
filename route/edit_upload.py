@@ -135,9 +135,9 @@ async def edit_upload():
             db_data = curs.fetchall()
             upload_default = html.escape(db_data[0][0]) if db_data and db_data[0][0] != '' else ''
             
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('upload'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang('upload'),
+                '''
                     <a href="/filter/file_filter">(''' + await get_lang('file_filter_list') + ''')</a> <a href="/filter/extension_filter">(''' + await get_lang('extension_filter_list') + ''')</a>
                     ''' + upload_help + '''
                     <hr class="main_hr">
@@ -162,5 +162,6 @@ async def edit_upload():
                     <script defer src="/views/main_css/js/func/file_preview.js''' + cache_v() + '''"></script>
                     <script>window.addEventListener("DOMContentLoaded", function() { opennamu_file_preview(); });</script>
                 ''',
-                menu = [['other', await get_lang('return')]]
-            ))
+                0,
+                [['other', await get_lang('return')]]
+            )

@@ -102,9 +102,9 @@ async def user_setting():
                 db_data = curs.fetchall()
                 sub_user_name = db_data[0][0] if db_data else ''
 
-                return easy_minify(flask.render_template(await skin_check(),
-                    imp = [await get_lang('user_setting'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                    data = '''
+                return await render_template(
+                    await get_lang('user_setting'),
+                    '''
                         <form method="post">
                             <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
                             <hr class="main_hr">
@@ -144,8 +144,9 @@ async def user_setting():
                             ''' + await http_warning() + '''
                         </form>
                     ''',
-                    menu = [['user', await get_lang('return')]]
-                ))
+                    0,
+                    [['user', await get_lang('return')]]
+                )
         else:
             if flask.request.method == 'POST':
                 flask.session['skin'] = flask.request.form.get('skin', '')
@@ -169,9 +170,9 @@ async def user_setting():
                     else:
                         div3 += '<option value="' + lang_data + '">' + see_data + '</option>'
 
-                return easy_minify(flask.render_template(await skin_check(),
-                    imp = [await get_lang('user_setting'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                    data = '''
+                return await render_template(
+                    await get_lang('user_setting'),
+                    '''
                         <form method="post">
                             <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
                             <hr class="main_hr">
@@ -192,5 +193,6 @@ async def user_setting():
                             <span>''' + await get_lang('user_head_warning') + '''</span>
                         </form>
                     ''',
-                    menu = [['user', await get_lang('return')]]
-                ))
+                    0,
+                    [['user', await get_lang('return')]]
+                )

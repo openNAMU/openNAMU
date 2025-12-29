@@ -53,14 +53,15 @@ async def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
             else:
                 sub += ' (' + comment_num + ')'
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [name, await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],
-                data = await render_simple_set('''
+            return await render_template(
+                name,
+                await render_simple_set('''
                     <form method="post">
                         <span>''' + await get_lang('delete_warning') + '''</span>
                         <hr class="main_hr">
                         <button type="submit">''' + await get_lang('delete') + '''</button>
                     </form>
                 '''),
-                menu = [['bbs/w/' + bbs_num_str + '/' + post_num_str, await get_lang('return')]]
-            ))
+                sub,
+                [['bbs/w/' + bbs_num_str + '/' + post_num_str, await get_lang('return')]]
+            )

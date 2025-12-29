@@ -15,15 +15,16 @@ async def bbs_in(bbs_num = 1, page = 1):
     
         bbs_name = db_data[0][0]
 
-    return easy_minify(flask.render_template(await skin_check(),
-        imp = [bbs_name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('bbs') + ') (' + str(page) + ')', 0])],
-        data = '' + \
+    return await render_template(
+        bbs_name,
+        '' + \
             '<div id="opennamu_bbs_in"></div>' + \
             '<script defer src="/views/main_css/js/route/bbs_in.js' + cache_v() + '"></script>' + \
             '<script>window.addEventListener("DOMContentLoaded", function() { opennamu_bbs_in(); });</script>' + \
         '',
-        menu = [['bbs/main', await get_lang('return')], ['bbs/edit/' + bbs_num_str, await get_lang('add')], ['bbs/set/' + bbs_num_str, await get_lang('bbs_set')]]
-    ))
+        '(' + await get_lang('bbs') + ') (' + str(page) + ')',
+        [['bbs/main', await get_lang('return')], ['bbs/edit/' + bbs_num_str, await get_lang('add')], ['bbs/set/' + bbs_num_str, await get_lang('bbs_set')]]
+    )
 
 '''
 async def bbs_in(bbs_num = 1, page = 1):

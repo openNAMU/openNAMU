@@ -354,9 +354,9 @@ async def edit(name = 'Test', section = 0, do_type = ''):
             sub_menu = ' (' + str(section) + ')' if section != '' else ''
             sub_title = '(' + await get_lang('edit_request') + ')' if edit_req_mode == 1 else '(' + await get_lang('edit') + ')'
 
-            return easy_minify(flask.render_template(await skin_check(), 
-                imp = [name, await wiki_set(), await wiki_custom(), wiki_css([sub_title + sub_menu, 0])],
-                data = editor_top_text + '''
+            return await render_template(
+                name,
+                editor_top_text + '''
                     <form method="post">
                         <textarea style="display: none;" name="doc_section_data_where">''' + data_section_where + '''</textarea>
                         <input class="__ON_INPUT__" style="display: none;" name="doc_section_edit_apply" value="''' + doc_section_edit_apply + '''">
@@ -370,10 +370,11 @@ async def edit(name = 'Test', section = 0, do_type = ''):
                         ''' + await edit_editor(conn, ip, data_section, addon = get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'edit') , name = name) + '''
                     </form>
                 ''',
-                menu = [
+                sub_title + sub_menu,
+                [
                     ['w/' + url_pas(name), await get_lang('return')],
                     ['delete/' + url_pas(name), await get_lang('delete')], 
                     ['move/' + url_pas(name), await get_lang('move')], 
                     ['upload', await get_lang('upload')]
                 ]
-            ))
+            )

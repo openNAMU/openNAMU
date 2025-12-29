@@ -32,9 +32,9 @@ async def user_setting_email_check():
             sql_d = curs.fetchall()
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('check_key'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang('check_key'),
+                '''
                     <form method="post">
                         ''' + b_text + '''
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('key') + '''" name="key" type="text">
@@ -42,5 +42,6 @@ async def user_setting_email_check():
                         <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['user', await get_lang('return')]]
-            ))
+                0,
+                [['user', await get_lang('return')]]
+            )

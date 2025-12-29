@@ -15,12 +15,13 @@ async def list_recent_block(user_name = 'Test', tool = 'all', num = 1, why = '')
     elif tool == 'admin':
         sub = '(' + await get_lang('admin') + ')'
 
-    return easy_minify(flask.render_template(await skin_check(),
-        imp = [await get_lang('recent_ban'), await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],
-        data = '' + \
+    return await render_template(
+        await get_lang('recent_ban'),
+        '' + \
             '<div id="opennamu_list_recent_block"></div>' + \
             '<script defer src="/views/main_css/js/route/list_recent_block.js' + cache_v() + '"></script>' + \
             '<script>window.addEventListener("DOMContentLoaded", function() { opennamu_list_recent_block(); });</script>' + \
         '',
-        menu = [['other', await get_lang('return')]]
-    ))
+        sub,
+        [['other', await get_lang('return')]]
+    )

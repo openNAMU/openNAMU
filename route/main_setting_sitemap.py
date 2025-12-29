@@ -94,12 +94,13 @@ async def main_setting_sitemap(do_type = 0):
             else:
                 return ''
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('sitemap_manual_create'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang('sitemap_manual_create'),
+                '''
                     <form method="post">
                         <button id="opennamu_save_button" type="submit">''' + await get_lang('create') + '''</button>
                     </form>
                 ''',
-                menu = [['setting/sitemap_set', await get_lang('return')]]
-            ))
+                0,
+                [['setting/sitemap_set', await get_lang('return')]]
+            )

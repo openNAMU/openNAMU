@@ -98,14 +98,14 @@ if sys.version_info < (3, 6):
 
 # Func
 # Func-main
-original_render_template = flask.render_template
+async def render_template(name, data, sub, menu):
+    other_set = {}
+    other_set["name"] = name
+    other_set["data"] = data
+    other_set["sub"] = sub
+    other_set["menu"] = menu
 
-def custom_render_template(template_name_or_list, **context):
-    context['data'] = '<div class="opennamu_main">' + context['data'] + '</div>'
-
-    return original_render_template(template_name_or_list, **context)
-
-flask.render_template = custom_render_template
+    return await python_to_golang("template", other_set)
 
 global_lang_data = {}
 global_some_set = {}
@@ -168,6 +168,12 @@ async def python_to_golang(func_name, other_set = {}):
                     data = await res.text()
 
                     return data
+    elif func_name == "template":
+        async with aiohttp.ClientSession() as session:
+            async with session.post('http://localhost:' + port_data + "/api/template", data = json_dumps(other_set), headers = headers) as res:
+                data = await res.text()
+
+                return data
     else:
         async with aiohttp.ClientSession() as session:
             async with session.post('http://localhost:' + port_data + '/compatible_api/' + func_name, data = json_dumps(other_set), headers = headers) as res:
@@ -2190,11 +2196,12 @@ async def re_error(conn, data):
         else:
             end = '<ul><li>' + await get_lang('authority_error') + '</li></ul>'
 
-        return easy_minify(flask.render_template(await skin_check(),
-            imp = [await get_lang('error'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-            data = '<h2>' + await get_lang('error') + '</h2>' + end,
-            menu = 0
-        )), 401
+        return await render_template(
+            await get_lang('error'),
+            '<h2>' + await get_lang('error') + '</h2>' + end,
+            0,
+            0
+        ), 401
     else:
         title = await get_lang('error')
         sub_title = title
@@ -2330,9 +2337,9 @@ async def re_error(conn, data):
             if flask.request.path != '/skin_set':
                 data += '<br>' + await get_lang('error_skin_set_old') + ' <a href="/skin_set">(' + await get_lang('go') + ')</a>'
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('skin_set'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '' + \
+            return await render_template(
+                await get_lang('skin_set'),
+                '' + \
                     '<div id="main_skin_set">' + \
                         '<h2>' + await get_lang('error') + '</h2>' + \
                         '<ul>' + \
@@ -2340,16 +2347,18 @@ async def re_error(conn, data):
                         '</ul>' + \
                     '</div>' + \
                 '',
-                menu = [['change', await get_lang('user_setting')], ['change/skin_set/main', await get_lang('main_skin_set')]]
-            ))
+                0,
+                [['change', await get_lang('user_setting')], ['change/skin_set/main', await get_lang('main_skin_set')]]
+            )
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [title, await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '' + \
+            return await render_template(
+                title,
+                '' + \
                     '<h2>' + sub_title + '</h2>' + \
                     '<ul>' + \
                         '<li>' + data + '</li>' + \
                     '</ul>' + \
                 '',
-                menu = 0
-            )), return_code
+                0,
+                0
+            ), return_code

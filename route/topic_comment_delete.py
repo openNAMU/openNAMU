@@ -15,13 +15,14 @@ async def topic_comment_delete(topic_num = 1, num = 1):
 
             return redirect(conn, '/thread/' + topic_num)
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('topic_delete'), await wiki_set(), await wiki_custom(), wiki_css(['(#' + num + ')', 0])],
-                data = '''
+            return await render_template(
+                await get_lang('topic_delete'),
+                '''
                     <hr class="main_hr">
                     <form method="post">
                         <button type="submit">''' + await get_lang('start') + '''</button>
                     </form>
                 ''',
-                menu = [['thread/' + topic_num + '/comment/' + num + '/tool', await get_lang('return')]]
-            ))
+                '(#' + num + ')',
+                [['thread/' + topic_num + '/comment/' + num + '/tool', await get_lang('return')]]
+            )

@@ -23,10 +23,11 @@ async def main_func_error_404(e = ''):
                 db_data = db_data[0][0] if db_data and db_data[0][0] != '' else ''
 
                 if db_data != '':
-                    return easy_minify(flask.render_template(await skin_check(),
-                        imp = ['404', await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                        data = db_data,
-                        menu = 0
-                    )), 404
+                    return await render_template(
+                        '404',
+                        db_data,
+                        0,
+                        0
+                    ), 404
                 else:
                     return await re_error(conn, 46)

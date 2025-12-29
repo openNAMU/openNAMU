@@ -30,16 +30,17 @@ async def login_find_email_check(tool):
                 sql_d = curs.fetchall()
                 b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
         
-                return easy_minify(flask.render_template(await skin_check(),
-                    imp = [await get_lang('reset_user_ok'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                    data = '' + \
+                return await render_template(
+                    await get_lang('reset_user_ok'),
+                    '' + \
                         b_text + \
                         await get_lang('id') + ' : ' + user_id + \
                         '<hr class="main_hr">' + \
                         await get_lang('password') + ' : ' + user_pw + \
                     '',
-                    menu = [['user', await get_lang('return')]]
-                ))
+                    0,
+                    [['user', await get_lang('return')]]
+                )
             elif 'c_type' in flask.session and (flask.session['c_key'] == input_key or flask.session['c_key'] == 'email_pass'):
                 curs.execute(db_change('select data from other where name = "encode"'))
                 db_data = curs.fetchall()
@@ -121,9 +122,9 @@ async def login_find_email_check(tool):
             sql_d = curs.fetchall()
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
         
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('check_key'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang('check_key'),
+                '''
                     <form method="post">
                         ''' + b_text + '''
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('key') + '''" name="key" type="password">
@@ -131,5 +132,6 @@ async def login_find_email_check(tool):
                         <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['user', await get_lang('return')]]
-            ))
+                0,
+                [['user', await get_lang('return')]]
+            )

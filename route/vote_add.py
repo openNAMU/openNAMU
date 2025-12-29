@@ -52,9 +52,9 @@ async def vote_add():
 
             acl_data += '</select>'
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('add_vote'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '' + \
+            return await render_template(
+                await get_lang('add_vote'),
+                '' + \
                     '<form method="post">' + \
                         '<input class="__ON_INPUT__" name="name" placeholder="' + await get_lang('name') + '">' + \
                         '<hr class="main_hr">' + \
@@ -73,5 +73,6 @@ async def vote_add():
                         '<button type="submit">' + await get_lang('send') + '</buttom>' + \
                     '</form>' + \
                 '',
-                menu = [['vote', await get_lang('return')]]
-            ))
+                0,
+                [['vote', await get_lang('return')]]
+            )

@@ -30,9 +30,9 @@ async def edit_delete_file(name = 'test.jpg'):
 
             return redirect(conn, '/w/' + url_pas(name))
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('file_delete') + ')', 0])],
-                data = '''
+            return await render_template(
+                name,
+                '''
                     <form method="post">
                         <img src="/image/''' + url_pas(file_all_name) + '''">
                         <hr class="main_hr">
@@ -43,5 +43,6 @@ async def edit_delete_file(name = 'test.jpg'):
                         <button type="submit">''' + await get_lang('file_delete') + '''</button>
                     </form>
                 ''',
-                menu = [['w/' + url_pas(name), await get_lang('return')]]
-            ))
+                '(' + await get_lang('file_delete') + ')',
+                [['w/' + url_pas(name), await get_lang('return')]]
+            )

@@ -26,14 +26,15 @@ async def bbs_delete(bbs_num = ''):
             
             return redirect(conn, '/bbs/main')
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('bbs_delete'), await wiki_set(), await wiki_custom(), wiki_css(['(' + bbs_name + ')', 0])],
-                data = await render_simple_set('''
+            return await render_template(
+                await get_lang('bbs_delete'),
+                await render_simple_set('''
                     <form method="post">
                         <span>''' + await get_lang('delete_warning') + '''</span>
                         <hr class="main_hr">
                         <button type="submit">''' + await get_lang('delete') + '''</button>
                     </form>
                 '''),
-                menu = [['bbs/set/' + bbs_num_str, await get_lang('return')]]
-            ))
+                '(' + bbs_name + ')',
+                [['bbs/set/' + bbs_num_str, await get_lang('return')]]
+            )

@@ -17,9 +17,9 @@ async def list_user_check_delete(name = None, ip = None, time = None, do_type = 
 
                 return redirect(conn, '/list/user/check/' + url_pas(user_id if return_type == '0' else user_ip))
             else:
-                return easy_minify(flask.render_template(await skin_check(),
-                    imp = [await get_lang('check'), await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('delete') + ')', 0])],
-                    data = '''
+                return await render_template(
+                    await get_lang('check'),
+                    '''
                         ''' + await get_lang('name') + ''' : ''' + user_id + '''
                         <hr class="main_hr">
                         ''' + await get_lang('ip') + ''' : ''' + user_ip + '''
@@ -30,7 +30,8 @@ async def list_user_check_delete(name = None, ip = None, time = None, do_type = 
                             <button type="submit">''' + await get_lang('delete') + '''</button>
                         </form>
                     ''',
-                    menu = [['check/' + url_pas(user_id if return_type == '0' else user_ip), await get_lang('return')]]
-                ))
+                    '(' + await get_lang('delete') + ')',
+                    [['check/' + url_pas(user_id if return_type == '0' else user_ip), await get_lang('return')]]
+                )
         else:
             return redirect(conn)

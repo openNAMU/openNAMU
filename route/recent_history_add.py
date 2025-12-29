@@ -29,9 +29,9 @@ async def recent_history_add(name = 'Test', do_type = ''):
 
             return redirect(conn, '/history/' + url_pas(name))
         else:            
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('history_add'), await wiki_set(), await wiki_custom(), wiki_css(['(' + name + ')', 0])],
-                data = '''
+            return await render_template(
+                await get_lang('history_add'),
+                '''
                     <form method="post">
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + '''" name="send">
                         <hr class="main_hr">
@@ -42,5 +42,6 @@ async def recent_history_add(name = 'Test', do_type = ''):
                         ''' + await edit_editor(conn, ip) + '''
                     </form>
                 ''',
-                menu = [['history/' + url_pas(name), await get_lang('return')]]
-            ))
+                '(' + name + ')',
+                [['history/' + url_pas(name), await get_lang('return')]]
+            )

@@ -19,8 +19,9 @@ async def list_please(arg_num = 1):
 
         div += '</ul>' + await get_next_page_bottom('/list/document/need/{}', arg_num, data_list)
 
-        return easy_minify(flask.render_template(await skin_check(),
-            imp = [await get_lang('need_document'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-            data = div,
-            menu = [['other', await get_lang('return')]]
-        ))
+        return await render_template(
+            await get_lang('need_document'),
+            div,
+            0,
+            [['other', await get_lang('return')]]
+        )

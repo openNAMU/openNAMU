@@ -1,9 +1,9 @@
 from .tool.func import *
 
 async def main_tool_other():
-    return easy_minify(flask.render_template(await skin_check(),
-        imp = [await get_lang('other_tool'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-        data = await render_simple_set('''
+    return await render_template(
+        await get_lang('other_tool'),
+        await render_simple_set('''
             <h2>''' + await get_lang('user_tool') + '''</h2>
             <ul>
                 <li><a href="/manager/6">''' + await get_lang('user_tool') + '''</a></li>
@@ -51,5 +51,6 @@ async def main_tool_other():
                 <li><a href="/manager/1">''' + await get_lang('admin_tool') + '''</a></li>
             </ul>
         '''),
-        menu = 0
-    ))
+        0,
+        0
+    )

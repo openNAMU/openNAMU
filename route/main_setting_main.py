@@ -199,9 +199,9 @@ async def main_setting_main():
                 <hr class="main_hr">
             '''
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('main_setting'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = await render_simple_set('''
+            return await render_template(
+                await get_lang('main_setting'),
+                await render_simple_set('''
                     <form method="post">
                         ''' + basic_set + '''
                         <h2>''' + await get_lang('design_set') + '''</h2>
@@ -329,5 +329,6 @@ async def main_setting_main():
                         <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 '''),
-                menu = [['setting', await get_lang('return')]]
-            ))
+                0,
+                [['setting', await get_lang('return')]]
+            )

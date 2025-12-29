@@ -55,9 +55,9 @@ async def user_info(name = ''):
         else:
             admin_menu = ''
                 
-        return easy_minify(flask.render_template(await skin_check(),
-            imp = [await get_lang('user_tool'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-            data = '''
+        return await render_template(
+            await get_lang('user_tool'),
+            '''
                 <h2>''' + await get_lang('state') + '''</h2>
                 <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
                 ''' + login_menu + '''
@@ -73,5 +73,6 @@ async def user_info(name = ''):
                 </ul>
                 ''' + admin_menu + '''
             ''',
-            menu = [['other', await get_lang('other_tool')]]
-        ))
+            0,
+            [['other', await get_lang('other_tool')]]
+        )

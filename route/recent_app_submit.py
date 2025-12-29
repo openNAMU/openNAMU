@@ -86,11 +86,12 @@ async def recent_app_submit():
             else:
                 div += await get_lang('no_applications_now')
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('application_list'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = div,
-                menu = [['other', await get_lang('return')]]
-            ))
+            return await render_template(
+                await get_lang('application_list'),
+                div,
+                0,
+                [['other', await get_lang('return')]]
+            )
         else:
             if await acl_check(tool = 'ban_auth', memo = 'app submit') == 1:
                 return await re_error(conn, 0)

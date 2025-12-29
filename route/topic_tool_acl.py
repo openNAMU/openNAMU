@@ -79,9 +79,9 @@ async def topic_tool_acl(topic_num = 1):
 
                 acl_html_list_view += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('topic_acl_setting'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang('topic_acl_setting'),
+                '''
                     <form method="post">
                         <a href="/acl/TEST#exp">(''' + await get_lang('reference') + ''')</a>
                         <h2>''' + await get_lang('thread_acl') + '''</h2>
@@ -96,5 +96,6 @@ async def topic_tool_acl(topic_num = 1):
                         <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['thread/' + topic_num + '/tool', await get_lang('return')]]
-            ))
+                0,
+                [['thread/' + topic_num + '/tool', await get_lang('return')]]
+            )

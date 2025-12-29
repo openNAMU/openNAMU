@@ -57,9 +57,9 @@ async def main_tool_redirect(num = 1, add_2 = ''):
                         '<hr class="main_hr">' + \
                     ''
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [title_list[num][2], await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                title_list[num][2],
+                '''
                     <form method="post">
                         ''' + top_plus + '''
                         <input class="__ON_INPUT__" placeholder="''' + placeholder + '''" id="data_field" name="name" type="text">
@@ -67,5 +67,6 @@ async def main_tool_redirect(num = 1, add_2 = ''):
                         <button type="submit">''' + await get_lang('go') + '''</button>
                     </form>
                 ''',
-                menu = [['manager', await get_lang('return')]]
-            ))
+                0,
+                [['manager', await get_lang('return')]]
+            )

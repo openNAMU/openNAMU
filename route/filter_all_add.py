@@ -268,14 +268,15 @@ async def filter_all_add(tool, name = None):
                     <input class="__ON_INPUT__" value="''' + html.escape(value) + '''" type="text" name="markup">
                 '''
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [title, await wiki_set(), await wiki_custom(), wiki_css([get_sub, 0])],
-                data =  '''
+            return await render_template(
+                title,
+                '''
                         <form method="post">
                             ''' + form_data + '''
                             <hr class="main_hr">
                             <button ''' + stat + ''' type="submit">''' + await get_lang('add') + '''</button>
                         </form>
                         ''',
-                menu = [['filter/' + tool, await get_lang('return')]]
-            ))
+                get_sub,
+                [['filter/' + tool, await get_lang('return')]]
+            )

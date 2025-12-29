@@ -20,12 +20,13 @@ async def bbs_w_hide(bbs_num = '', post_num = ''):
         if flask.request.method == 'POST':
             pass
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('bbs_post_hide'), await wiki_set(), await wiki_custom(), wiki_css(['(' + bbs_name + ')' + ' (' + post_num_str + ')', 0])],
-                data = await render_simple_set('''
+            return await render_template(
+                await get_lang('bbs_post_hide'),
+                await render_simple_set('''
                     <form method="post">
                         <button type="submit">''' + await get_lang('hide') + '''</button>
                     </form>
                 '''),
-                menu = [['bbs/w/' + bbs_num_str + '/' + post_num_str, await get_lang('return')]]
-            ))
+                '(' + bbs_name + ')' + ' (' + post_num_str + ')',
+                [['bbs/w/' + bbs_num_str + '/' + post_num_str, await get_lang('return')]]
+            )

@@ -42,8 +42,9 @@ async def vote_end(num = 1):
             data += '<li>' + await get_lang('result') + ' : ' + str(len(data_list_2)) + '</li>'
             data += '</ul>'
 
-        return easy_minify(flask.render_template(await skin_check(),
-            imp = [await get_lang('result_vote'), await wiki_set(), await wiki_custom(), wiki_css(['(' + num + ')', 0])],
-            data = data,
-            menu = [['vote', await get_lang('return')]]
-        ))
+        return await render_template(
+            await get_lang('result_vote'),
+            data,
+            '(' + num + ')',
+            [['vote', await get_lang('return')]]
+        )

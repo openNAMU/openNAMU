@@ -47,9 +47,9 @@ async def give_user_fix(user_name = ''):
 
             return redirect(conn, '/user/' + url_pas(user_name))
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('user_fix'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang('user_fix'),
+                '''
                     <form method="post">
                         <div id="opennamu_get_user_info">''' + html.escape(user_name) + '''</div>
                         <hr class="main_hr">
@@ -70,5 +70,6 @@ async def give_user_fix(user_name = ''):
                         <button type="submit">''' + await get_lang('go') + '''</button>
                     </form>
                 ''',
-                menu = [['manager', await get_lang('return')]]
-            ))
+                0,
+                [['manager', await get_lang('return')]]
+            )

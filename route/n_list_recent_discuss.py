@@ -7,12 +7,13 @@ async def list_recent_discuss(num = 1, tool = 'normal'):
     elif tool == 'open':
         m_sub = '(' + await get_lang('open_discussion') + ')'
 
-    return easy_minify(flask.render_template(await skin_check(),
-        imp = [await get_lang('recent_discussion'), await wiki_set(), await wiki_custom(), wiki_css([m_sub, 0])],
-        data = '' + \
+    return await render_template(
+        await get_lang('recent_discussion'),
+        '' + \
             '<div id="opennamu_list_recent_discuss"></div>' + \
             '<script defer src="/views/main_css/js/route/list_recent_discuss.js' + cache_v() + '"></script>' + \
             '<script>window.addEventListener("DOMContentLoaded", function() { opennamu_list_recent_discuss(); });</script>' + \
         '',
-        menu = [['other', await get_lang('return')]]
-    ))
+        m_sub,
+        [['other', await get_lang('return')]]
+    )

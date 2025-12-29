@@ -29,20 +29,21 @@ async def login_find_key():
             sql_d = curs.fetchall()
             b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
             
-            return easy_minify(flask.render_template(await skin_check(),
-                    imp = [await get_lang('reset_user_ok'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                    data = '' + \
+            return await render_template(
+                    await get_lang('reset_user_ok'),
+                    '' + \
                         b_text + \
                         await get_lang('id') + ' : ' + user_id + \
                         '<hr class="main_hr">' + \
                         await get_lang('password') + ' : ' + key + \
                     '',
-                    menu = [['user', await get_lang('return')]]
-                ))
+                    0,
+                    [['user', await get_lang('return')]]
+            )
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('password_search'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang('password_search'),
+                '''
                     <form method="post">
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('key') + '''" name="key" type="password">
                         <hr class="main_hr">
@@ -50,5 +51,6 @@ async def login_find_key():
                         <button type="submit">''' + await get_lang('send') + '''</button>
                     </form>
                 ''',
-                menu = [['user', await get_lang('return')]]
-            ))
+                0,
+                [['user', await get_lang('return')]]
+            )

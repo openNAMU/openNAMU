@@ -13,12 +13,13 @@ async def bbs_w_set(bbs_num = ''):
 
         bbs_num_str = str(bbs_num)
 
-        return easy_minify(flask.render_template(await skin_check(),
-            imp = [await get_lang('bbs_set'), await wiki_set(), await wiki_custom(), wiki_css(['(' + bbs_name + ')', 0])],
-            data = '' + \
+        return await render_template(
+            await get_lang('bbs_set'),
+            '' + \
                 '<div id="opennamu_bbs_w_set"></div>' + \
                 '<script defer src="/views/main_css/js/route/bbs_w_set.js' + cache_v() + '"></script>' + \
                 '<script>window.addEventListener("DOMContentLoaded", function() { opennamu_bbs_w_set(); });</script>' + \
             '',
-            menu = [['bbs/in/' + bbs_num_str, await get_lang('return')]]
-        ))
+            '(' + bbs_name + ')',
+            [['bbs/in/' + bbs_num_str, await get_lang('return')]]
+        )

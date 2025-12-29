@@ -1,9 +1,9 @@
 from .tool.func import *
 
 async def main_tool_admin():
-    return easy_minify(flask.render_template(await skin_check(),
-        imp = [await get_lang('admin_tool'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-        data = await render_simple_set('''
+    return await render_template(
+        await get_lang('admin_tool'),
+        await render_simple_set('''
             <h2>''' + await get_lang('admin') + '''</h2>
             <ul>
                 <li><a href="/manager/2">''' + await get_lang('document_setting') + '''</a></li>
@@ -57,5 +57,6 @@ async def main_tool_admin():
             <!-- JS : opennamu_do_insert_version -->
             <!-- JS : opennamu_do_insert_version_skin -->
         '''),
-        menu = [['other', await get_lang('return')]]
-    ))
+        0,
+        [['other', await get_lang('return')]]
+    )

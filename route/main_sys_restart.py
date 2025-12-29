@@ -47,12 +47,13 @@ async def main_sys_restart(golang_process):
             threading.Thread(target = main_sys_restart_do).start()
             return flask.Response(await get_lang("warning_restart"), status = 200)
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('wiki_restart'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang('wiki_restart'),
+                '''
                     <form method="post">
                         <button type="submit">''' + await get_lang('restart') + '''</button>
                     </form>
                 ''',
-                menu = [['manager', await get_lang('return')]]
-            ))
+                0,
+                [['manager', await get_lang('return')]]
+            )

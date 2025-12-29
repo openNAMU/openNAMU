@@ -67,9 +67,9 @@ async def main_sys_update(golang_process):
 
             return await re_error(conn, 34)
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('update'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = await get_lang('update_warning') + '''
+            return await render_template(
+                await get_lang('update'),
+                await get_lang('update_warning') + '''
                     <hr class="main_hr">
                     <ul>
                         <li id="ver_send_2">''' + await get_lang('version') + ''' : </li>
@@ -82,6 +82,7 @@ async def main_sys_update(golang_process):
                     </form>
                     <!-- JS : opennamu_do_insert_version -->
                 ''',
-                menu = [['manager', await get_lang('return')]]
-            ))
+                0,
+                [['manager', await get_lang('return')]]
+            )
 

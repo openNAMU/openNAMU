@@ -59,9 +59,9 @@ async def user_setting_pw():
             else:
                 password_min_length = ''
             
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('password_change'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang('password_change'),
+                '''
                     <form method="post">
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('now_password') + '''" name="password_now" type="password">
                         <hr class="main_hr">
@@ -77,5 +77,6 @@ async def user_setting_pw():
                         ''' + await http_warning() + '''
                     </form>
                 ''',
-                menu = [['change', await get_lang('return')]]
-            ))
+                0,
+                [['change', await get_lang('return')]]
+            )

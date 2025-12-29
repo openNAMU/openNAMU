@@ -107,10 +107,11 @@ async def view_raw(name = '', topic_num = '', num = '', doc_acl = 0, bbs_num = '
                 ''
                 sub = ' (' + await get_lang('edit') + ')'
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [v_name, await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],
-                data = p_data,
-                menu = menu
-            ))
+            return await render_template(
+                v_name,
+                p_data,
+                sub,
+                menu
+            )
         else:
             return await re_error(conn, 3)

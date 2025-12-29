@@ -53,8 +53,9 @@ async def main_setting_404_page():
                 '</form>'
             )
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('404_page_setting'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = data_html,
-                menu = [['setting', await get_lang('return')]]
-            ))
+            return await render_template(
+                await get_lang('404_page_setting'),
+                data_html,
+                0,
+                [['setting', await get_lang('return')]]
+            )

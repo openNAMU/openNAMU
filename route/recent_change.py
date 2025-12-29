@@ -241,8 +241,9 @@ async def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
             if sub == '':
                 sub = 0
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [title, await wiki_set(), await wiki_custom(), wiki_css([sub, 0])],
-                data = div,
-                menu = menu
-            ))
+            return await render_template(
+                title,
+                div,
+                sub,
+                menu
+            )

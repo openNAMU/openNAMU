@@ -14,15 +14,16 @@ async def main_setting_email_test():
             else:
                 data = await get_lang("error")
 
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang("email_test"), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = data,
-                menu = [["setting/external", await get_lang('return')]]
-            ))
+            return await render_template(
+                await get_lang("email_test"),
+                data,
+                0,
+                [["setting/external", await get_lang('return')]]
+            )
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang("email_test"), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang("email_test"),
+                '''
                     <form method="post">
                         <input class="__ON_INPUT__" name="title" placeholder="''' + await get_lang("title") + '''">
                         <hr class="main_hr">
@@ -33,5 +34,6 @@ async def main_setting_email_test():
                         <button type="submit">''' + await get_lang("send") + '''</button>
                     </form>
                 ''',
-                menu = [["setting/external", await get_lang('return')]]
-            ))
+                0,
+                [["setting/external", await get_lang('return')]]
+            )

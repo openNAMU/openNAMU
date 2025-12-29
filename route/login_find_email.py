@@ -79,9 +79,9 @@ async def login_find_email(tool):
                 sql_d = curs.fetchall()
                 b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
         
-                return easy_minify(flask.render_template(await skin_check(),
-                    imp = [await get_lang('password_search'), await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('email') + ')', 0])],
-                    data = b_text + '''
+                return await render_template(
+                    await get_lang('password_search'),
+                    b_text + '''
                         <form method="post">
                             <input class="__ON_INPUT__" placeholder="''' + await get_lang('id') + '''" name="id" type="text">
                             <hr class="main_hr">
@@ -90,8 +90,9 @@ async def login_find_email(tool):
                             <button type="submit">''' + await get_lang('save') + '''</button>
                         </form>
                     ''',
-                    menu = [['user', await get_lang('return')]]
-                ))
+                    '(' + await get_lang('email') + ')',
+                    [['user', await get_lang('return')]]
+                )
             else:
                 if tool == 'need_email' and not 'c_type' in flask.session:
                     return redirect(conn, '/register')
@@ -100,9 +101,9 @@ async def login_find_email(tool):
                 sql_d = curs.fetchall()
                 b_text = (sql_d[0][0] + '<hr class="main_hr">') if sql_d and sql_d[0][0] != '' else ''
         
-                return easy_minify(flask.render_template(await skin_check(),
-                    imp = [await get_lang('email'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                    data = '''
+                return await render_template(
+                    await get_lang('email'),
+                    '''
                         <a href="/filter/email_filter">(''' + await get_lang('email_filter_list') + ''')</a>
                         <hr class="main_hr">
                         ''' + b_text + '''
@@ -112,5 +113,6 @@ async def login_find_email(tool):
                             <button type="submit">''' + await get_lang('save') + '''</button>
                         </form>
                     ''',
-                    menu = [['user', await get_lang('return')]]
-                ))
+                    0,
+                    [['user', await get_lang('return')]]
+                )

@@ -90,9 +90,9 @@ async def edit_request(name = 'Test', do_type = ''):
 
             result = view_diff_do(old_data, edit_request_data, 'r' + doc_ver, await get_lang('edit_request'))
 
-            return easy_minify(flask.render_template(await skin_check(), 
-                imp = [name, await wiki_set(), await wiki_custom(), wiki_css(['(' + await get_lang('edit_request_check') + ')', 0])],
-                data = '''
+            return await render_template(
+                name,
+                '''
                     <div id="opennamu_get_user_info">''' + html.escape(edit_request_user) + '''</div>
                     <hr class="main_hr">
                     ''' + edit_request_date + '''
@@ -108,5 +108,6 @@ async def edit_request(name = 'Test', do_type = ''):
                         <textarea readonly class="opennamu_textarea_500">''' + html.escape(edit_request_data) + '''</textarea>
                     </form>
                 ''',
-                menu = 0
-            ))
+                '(' + await get_lang('edit_request_check') + ')',
+                0
+            )

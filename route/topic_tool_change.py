@@ -28,9 +28,9 @@ async def topic_tool_change(topic_num = 1):
 
             return redirect(conn, '/thread/' + topic_num)
         else:
-            return easy_minify(flask.render_template(await skin_check(),
-                imp = [await get_lang('topic_name_change'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
-                data = '''
+            return await render_template(
+                await get_lang('topic_name_change'),
+                '''
                     <form method="post">
                         ''' + await get_lang('document_name') + '''
                         <hr class="main_hr">
@@ -43,5 +43,6 @@ async def topic_tool_change(topic_num = 1):
                         <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
-                menu = [['thread/' + topic_num + '/tool', await get_lang('return')]]
-            ))
+                0,
+                [['thread/' + topic_num + '/tool', await get_lang('return')]]
+            )
