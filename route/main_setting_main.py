@@ -108,9 +108,9 @@ async def main_setting_main():
 
             set_data = global_some_set_do('db_type')
             
-            sqlite_only = ''
+            sqlite_only = True
             if set_data != 'sqlite':
-                sqlite_only = 'style="display:none;"'
+                sqlite_only = False
 
             ip_load_select_data = ''
             ip_load_option = ['default', 'HTTP_X_REAL_IP', 'HTTP_CF_CONNECTING_IP', 'REMOTE_ADDR']
@@ -257,28 +257,28 @@ async def main_setting_main():
                         <hr class="main_hr">
                         <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="update">''' + branch_div + '''</select></span>
 
-                        <span ''' + sqlite_only + '''>
-                            <h3>''' + await get_lang('backup') + ''' (''' + await get_lang('sqlite_only') + ''')</h3>
-                            
-                            <span>''' + await get_lang('backup_warning') + ''' (EX : data_YYYYMMDDHHMMSS.db)</span>
-                            <hr class="main_hr">
-                            <hr class="main_hr">
-                            
-                            <span>''' + await get_lang('backup_interval') + '''</span> (''' + await get_lang('hour') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
-                            <hr class="main_hr">
-                            <input class="__ON_INPUT__" name="back_up" value="''' + html.escape(d_list[9]) + '''">
-                            <hr class="main_hr">
-                            
-                            <span>''' + await get_lang('backup_where') + '''</span> (''' + await get_lang('default') + ''' : ''' + await get_lang('empty') + ''') (''' + await get_lang('example') + ''' : ./data/backup.db)
-                            <hr class="main_hr">
-                            <input class="__ON_INPUT__" name="backup_where" value="''' + html.escape(d_list[21]) + '''">
-                            <hr class="main_hr">
+                        ''' + (
+                        '''<h3>''' + await get_lang('backup') + ''' (''' + await get_lang('sqlite_only') + ''')</h3>
+                        
+                        <span>''' + await get_lang('backup_warning') + ''' (EX : data_YYYYMMDDHHMMSS.db)</span>
+                        <hr class="main_hr">
+                        <hr class="main_hr">
+                        
+                        <span>''' + await get_lang('backup_interval') + '''</span> (''' + await get_lang('hour') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
+                        <hr class="main_hr">
+                        <input class="__ON_INPUT__" name="back_up" value="''' + html.escape(d_list[9]) + '''">
+                        <hr class="main_hr">
+                        
+                        <span>''' + await get_lang('backup_where') + '''</span> (''' + await get_lang('default') + ''' : ''' + await get_lang('empty') + ''') (''' + await get_lang('example') + ''' : ./data/backup.db)
+                        <hr class="main_hr">
+                        <input class="__ON_INPUT__" name="backup_where" value="''' + html.escape(d_list[21]) + '''">
+                        <hr class="main_hr">
 
-                            <span>''' + await get_lang('backup_count') + '''</span> (''' + await get_lang('default') + ''' : ''' + await get_lang('empty') + ''')
-                            <hr class="main_hr">
-                            <input class="__ON_INPUT__" name="backup_count" value="''' + html.escape(d_list[41]) + '''">
-                            <hr class="main_hr">
-                        </span>
+                        <span>''' + await get_lang('backup_count') + '''</span> (''' + await get_lang('default') + ''' : ''' + await get_lang('empty') + ''')
+                        <hr class="main_hr">
+                        <input class="__ON_INPUT__" name="backup_count" value="''' + html.escape(d_list[41]) + '''">
+                        <hr class="main_hr">''' if sqlite_only else ''
+                        ) + '''
 
                         <h2>''' + await get_lang('edit_set') + '''</h2>
                         
