@@ -65,19 +65,19 @@ async def main_setting_sitemap_set():
                         <a href="/setting/sitemap">(''' + await get_lang('sitemap_manual_create') + ''')</a>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" ''' + check_box_div[4] + ''' name="sitemap_auto_make"> ''' + await get_lang('sitemap_auto_make') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" ''' + check_box_div[4] + ''' name="sitemap_auto_make"> ''' + await get_lang('sitemap_auto_make') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" ''' + check_box_div[0] + ''' name="sitemap_auto_exclude_domain"> ''' + await get_lang('stiemap_exclude_domain') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" ''' + check_box_div[0] + ''' name="sitemap_auto_exclude_domain"> ''' + await get_lang('stiemap_exclude_domain') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" ''' + check_box_div[1] + ''' name="sitemap_auto_exclude_user_page"> ''' + await get_lang('stiemap_exclude_user_page') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" ''' + check_box_div[1] + ''' name="sitemap_auto_exclude_user_page"> ''' + await get_lang('stiemap_exclude_user_page') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" ''' + check_box_div[2] + ''' name="sitemap_auto_exclude_file_page"> ''' + await get_lang('stiemap_exclude_file_page') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" ''' + check_box_div[2] + ''' name="sitemap_auto_exclude_file_page"> ''' + await get_lang('stiemap_exclude_file_page') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" ''' + check_box_div[3] + ''' name="sitemap_auto_exclude_category_page"> ''' + await get_lang('stiemap_exclude_category_page') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" ''' + check_box_div[3] + ''' name="sitemap_auto_exclude_category_page"> ''' + await get_lang('stiemap_exclude_category_page') + '''</label>
                         <hr class="main_hr">
 
                         <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>

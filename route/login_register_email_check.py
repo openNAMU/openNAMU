@@ -39,7 +39,7 @@ async def login_register_email_check():
                 data = '''
                     <form method="post">
                         ''' + b_text + '''
-                        <input placeholder="''' + await get_lang('key') + '''" name="key" type="text">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('key') + '''" name="key" type="text">
                         <hr class="main_hr">
                         <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>

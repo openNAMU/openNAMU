@@ -17,7 +17,7 @@ async def main_search_deep(name = 'Test', search_type = 'title', num = 1):
         else:
             div = '''
                 <form method="post">
-                    <input class="opennamu_width_200" name="search" value="''' + html.escape(name) + '''">
+                    <input class="opennamu_width_200 __ON_INPUT__" name="search" value="''' + html.escape(name) + '''">
                     <button type="submit">''' + await get_lang('search') + '''</button>
                 </form>
                 <hr class="main_hr">

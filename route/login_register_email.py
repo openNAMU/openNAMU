@@ -57,7 +57,7 @@ async def login_register_email():
                     <hr class="main_hr">
                     ''' + b_text + '''
                     <form method="post">
-                        <input placeholder="''' + await get_lang('email') + '''" name="email" type="text">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('email') + '''" name="email" type="text">
                         <hr class="main_hr">
                         <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>

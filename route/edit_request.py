@@ -97,7 +97,7 @@ async def edit_request(name = 'Test', do_type = ''):
                     <hr class="main_hr">
                     ''' + edit_request_date + '''
                     <hr class="main_hr">
-                    <input readonly value="''' + html.escape(edit_request_send) + '''">
+                    <input class="__ON_INPUT__" readonly value="''' + html.escape(edit_request_send) + '''">
                     <hr class="main_hr">
                     ''' + result + '''
                     <hr class="main_hr">

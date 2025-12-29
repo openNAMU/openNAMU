@@ -1664,7 +1664,7 @@ async def captcha_get(conn):
             elif rec_ver[0][0] == 'v3':
                 data += '' + \
                     '<script defer src="https://www.google.com/recaptcha/api.js?render=' + recaptcha[0][0] + '"></script>' + \
-                    '<input type="hidden" id="g-recaptcha" name="g-recaptcha">' + \
+                    '<input class="__ON_INPUT__" type="hidden" id="g-recaptcha" name="g-recaptcha">' + \
                     '<script type="text/javascript">' + \
                         'document.addEventListener(\'DOMContentLoaded\', function () {' + \
                             'grecaptcha.ready(function() {' + \
@@ -1874,7 +1874,7 @@ def get_edit_text_bottom_check_box(conn):
             ''
         else:
             cccb_text = '' + \
-                '<label><input type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + '</label>' + \
+                '<label><input class="__ON_INPUT__" type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + '</label>' + \
                 '<hr class="main_hr">' + \
             ''
         

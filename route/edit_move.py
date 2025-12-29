@@ -219,10 +219,10 @@ async def edit_move(name):
                     <form method="post">
                         <span>''' + await get_lang('document_name') + '''</span>
                         <hr class="main_hr">
-                        <input value="''' + name + '''" name="title" type="text">
+                        <input class="__ON_INPUT__" value="''' + name + '''" name="title" type="text">
                         <hr class="main_hr">
                         
-                        <input placeholder="''' + await get_lang('why') + '''" name="send" type="text">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + '''" name="send" type="text">
                         <hr class="main_hr">
                         
                         <h2>''' + await get_lang('document') + '''</h2>
@@ -233,7 +233,7 @@ async def edit_move(name):
                             ''' + ('<option value="merge"> ' + await get_lang('merge_move') + '</option>' if owner_auth == 1 else '') + '''
                         </select>
                         <hr class="main_hr">
-                        <!-- <label><input type="checkbox" name="move_redirect_make"> ''' + await get_lang('move_redirect_make') + '''</label>
+                        <!-- <label><input class="__ON_INPUT__" type="checkbox" name="move_redirect_make"> ''' + await get_lang('move_redirect_make') + '''</label>
                         <hr class="main_hr"> -->
                         
                         <h2>''' + await get_lang('discussion') + '''</h2>

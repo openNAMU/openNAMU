@@ -53,11 +53,11 @@ async def login_login():
                 imp = [await get_lang('login'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data =  '''
                         <form method="post">
-                            <input placeholder="''' + await get_lang('id') + '''" name="id" type="text">
+                            <input class="__ON_INPUT__" placeholder="''' + await get_lang('id') + '''" name="id" type="text">
                             <hr class="main_hr">
-                            <input placeholder="''' + await get_lang('password') + '''" name="pw" type="password">
+                            <input class="__ON_INPUT__" placeholder="''' + await get_lang('password') + '''" name="pw" type="password">
                             <hr class="main_hr">
-                            <!-- <label><input type="checkbox" name="auto_login"> ''' + await get_lang('auto_login') + ''' (''' + await get_lang('not_working') + ''')</label>
+                            <!-- <label><input class="__ON_INPUT__" type="checkbox" name="auto_login"> ''' + await get_lang('auto_login') + ''' (''' + await get_lang('not_working') + ''')</label>
                             <hr class="main_hr"> -->
                             ''' + await captcha_get(conn) + '''
                             <button type="submit">''' + await get_lang('login') + '''</button>

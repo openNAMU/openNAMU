@@ -29,7 +29,7 @@ async def edit_delete_multiple():
                     <form method="post">
                         <textarea class="opennamu_textarea_500" placeholder="''' + await get_lang('many_delete_help') + '''" name="content"></textarea>
                         <hr class="main_hr">
-                        <input placeholder="''' + await get_lang('why') + '''" name="send" type="text">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + '''" name="send" type="text">
                         <hr class="main_hr">
                         ''' + await captcha_get(conn) + await ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'edit')  + '''
                         <button type="submit">''' + await get_lang('delete') + '''</button>

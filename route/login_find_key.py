@@ -44,7 +44,7 @@ async def login_find_key():
                 imp = [await get_lang('password_search'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + await get_lang('key') + '''" name="key" type="password">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('key') + '''" name="key" type="password">
                         <hr class="main_hr">
                         ''' + await captcha_get(conn) + '''
                         <button type="submit">''' + await get_lang('send') + '''</button>

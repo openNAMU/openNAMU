@@ -34,11 +34,11 @@ async def topic_tool_change(topic_num = 1):
                     <form method="post">
                         ''' + await get_lang('document_name') + '''
                         <hr class="main_hr">
-                        <input value="''' + html.escape(rd_d[0][0]) + '''" name="title" type="text">
+                        <input class="__ON_INPUT__" value="''' + html.escape(rd_d[0][0]) + '''" name="title" type="text">
                         <hr class="main_hr">
                         ''' + await get_lang('discussion_name') + '''
                         <hr class="main_hr">
-                        <input value="''' + html.escape(rd_d[0][1]) + '''" name="sub" type="text">
+                        <input class="__ON_INPUT__" value="''' + html.escape(rd_d[0][1]) + '''" name="sub" type="text">
                         <hr class="main_hr">
                         <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>

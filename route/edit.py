@@ -359,12 +359,12 @@ async def edit(name = 'Test', section = 0, do_type = ''):
                 data = editor_top_text + '''
                     <form method="post">
                         <textarea style="display: none;" name="doc_section_data_where">''' + data_section_where + '''</textarea>
-                        <input style="display: none;" name="doc_section_edit_apply" value="''' + doc_section_edit_apply + '''">
+                        <input class="__ON_INPUT__" style="display: none;" name="doc_section_edit_apply" value="''' + doc_section_edit_apply + '''">
 
-                        <input style="display: none;" id="opennamu_editor_doc_name" value="''' + html.escape(name) + '''">
-                        <input style="display: none;" name="ver" value="''' + doc_ver + '''">
+                        <input class="__ON_INPUT__" style="display: none;" id="opennamu_editor_doc_name" value="''' + html.escape(name) + '''">
+                        <input class="__ON_INPUT__" style="display: none;" name="ver" value="''' + doc_ver + '''">
                         
-                        <input placeholder="''' + await get_lang('why') + '''" name="send">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + '''" name="send">
                         <hr class="main_hr">
                         
                         ''' + await edit_editor(conn, ip, data_section, addon = get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'edit') , name = name) + '''

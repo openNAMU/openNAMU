@@ -75,12 +75,12 @@ async def main_setting_external():
 
                         <span>''' + await get_lang('public_key') + '''</span>
                         <hr class="main_hr">
-                        <input name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
+                        <input class="__ON_INPUT__" name="recaptcha" value="''' + html.escape(d_list[0]) + '''">
                         <hr class="main_hr">
 
                         <span>''' + await get_lang('secret_key') + '''</span>
                         <hr class="main_hr">
-                        <input name="sec_re" value="''' + html.escape(d_list[1]) + '''">
+                        <input class="__ON_INPUT__" name="sec_re" value="''' + html.escape(d_list[1]) + '''">
                         <hr class="main_hr">
 
                         <span>''' + await get_lang('version') + '''</span>
@@ -93,7 +93,7 @@ async def main_setting_external():
                         <a href="/setting/phrase#s-6">(''' + await get_lang('text_setting') + ''')</a>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" name="email_have" ''' + ('checked' if d_list[9] != '' else '')  + '''> ''' + await get_lang('email_required') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" name="email_have" ''' + ('checked' if d_list[9] != '' else '')  + '''> ''' + await get_lang('email_required') + '''</label>
 
                         <h3>''' + await get_lang('smtp_setting') + '''</h3>
                         <a href="https://support.google.com/mail/answer/7126229">(Google)</a>
@@ -103,12 +103,12 @@ async def main_setting_external():
 
                         <span>''' + await get_lang('smtp_server') + '''</span>
                         <hr class="main_hr">
-                        <input name="smtp_server" value="''' + html.escape(d_list[2]) + '''">
+                        <input class="__ON_INPUT__" name="smtp_server" value="''' + html.escape(d_list[2]) + '''">
                         <hr class="main_hr">
 
                         <span>''' + await get_lang('smtp_port') + '''</span>
                         <hr class="main_hr">
-                        <input name="smtp_port" value="''' + html.escape(d_list[3]) + '''">
+                        <input class="__ON_INPUT__" name="smtp_port" value="''' + html.escape(d_list[3]) + '''">
                         <hr class="main_hr">
 
                         <span>''' + await get_lang('smtp_security') + '''</span>
@@ -120,12 +120,12 @@ async def main_setting_external():
 
                         <span>''' + await get_lang('smtp_username') + '''</span>
                         <hr class="main_hr">
-                        <input name="smtp_email" value="''' + html.escape(d_list[5]) + '''">
+                        <input class="__ON_INPUT__" name="smtp_email" value="''' + html.escape(d_list[5]) + '''">
                         <hr class="main_hr">
 
                         <span>''' + await get_lang('smtp_password') + '''</span>
                         <hr class="main_hr">
-                        <input type="password" name="smtp_pass" value="''' + html.escape(d_list[6]) + '''">
+                        <input class="__ON_INPUT__" type="password" name="smtp_pass" value="''' + html.escape(d_list[6]) + '''">
 
                         <h2>''' + await get_lang('oauth') + ''' (''' + await get_lang('not_working') + ''')</h2>
                         <a href="https://developers.google.com/identity/protocols/oauth2">(Google)</a>
@@ -133,7 +133,7 @@ async def main_setting_external():
 
                         <span>''' + await get_lang('oauth_client_id') + '''</span>
                         <hr class="main_hr">
-                        <input name="oauth_client_id" value="''' + html.escape(d_list[8]) + '''">
+                        <input class="__ON_INPUT__" name="oauth_client_id" value="''' + html.escape(d_list[8]) + '''">
                         <hr class="main_hr">
 
                         <hr class="main_hr">

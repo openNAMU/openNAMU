@@ -177,7 +177,7 @@ async def view_set(name = 'Test', multiple = False):
                 if db_data:
                     date_value = db_data[0][0]
                 
-                data += '<input type="date" ' + check_ok + ' value="' + date_value + '" name="' + i[1] + '_date" pattern="\\d{4}-\\d{2}-\\d{2}">'
+                data += '<input class="__ON_INPUT__" type="date" ' + check_ok + ' value="' + date_value + '" name="' + i[1] + '_date" pattern="\\d{4}-\\d{2}-\\d{2}">'
                 data += '<hr class="main_hr">'
 
             curs.execute(db_change("select data from acl where title = ? and type = ?"), [name, 'why'])
@@ -185,7 +185,7 @@ async def view_set(name = 'Test', multiple = False):
             acl_why = html.escape(acl_data[0][0]) if acl_data else ''
             data += '' + \
                 '<h3>' + await get_lang('why') + '</h3>' + \
-                '<input value="' + acl_why + '" ' + check_ok + ' placeholder="' + await get_lang('why') + '" name="why" ' + check_ok + '>' + \
+                '<input class="__ON_INPUT__" value="' + acl_why + '" ' + check_ok + ' placeholder="' + await get_lang('why') + '" name="why" ' + check_ok + '>' + \
                 '<hr class="main_hr">' + \
             ''
 

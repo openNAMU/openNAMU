@@ -48,7 +48,7 @@ async def login_login_2fa_email():
                 imp = [await get_lang('login'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data =  '''
                         <form method="post">
-                            <input placeholder="''' + await get_lang('2fa_password') + '''" name="pw" type="password">
+                            <input class="__ON_INPUT__" placeholder="''' + await get_lang('2fa_password') + '''" name="pw" type="password">
                             <hr class=\"main_hr\">
                             ''' + await captcha_get(conn) + '''
                             <button type="submit">''' + await get_lang('login') + '''</button>

@@ -129,7 +129,7 @@ async def main_setting_main():
                             
                 <span>''' + await get_lang('wiki_name') + '''</span>
                 <hr class="main_hr">
-                <input name="name" value="''' + html.escape(d_list[0]) + '''">
+                <input class="__ON_INPUT__" name="name" value="''' + html.escape(d_list[0]) + '''">
                 <hr class="main_hr">
 
                 <span><a href="/setting/main/logo">(''' + await get_lang('wiki_logo') + ''')</a></span>
@@ -137,7 +137,7 @@ async def main_setting_main():
 
                 <span>''' + await get_lang('main_page') + '''</span>
                 <hr class="main_hr">
-                <input name="frontpage" value="''' + html.escape(d_list[2]) + '''">
+                <input class="__ON_INPUT__" name="frontpage" value="''' + html.escape(d_list[2]) + '''">
                 <hr class="main_hr">
 
                 <span>''' + await get_lang('tls_method') + '''</span>
@@ -147,30 +147,30 @@ async def main_setting_main():
 
                 <span>''' + await get_lang('domain') + '''</span> (EX : 2du.pythonanywhere.com) (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                 <hr class="main_hr">
-                <input name="domain" value="''' + html.escape(d_list[22]) + '''">
+                <input class="__ON_INPUT__" name="domain" value="''' + html.escape(d_list[22]) + '''">
                 <hr class="main_hr">
 
                 <span>''' + await get_lang('wiki_host') + '''</span>
                 <hr class="main_hr">
-                <input name="host" value="''' + html.escape(d_list[16]) + '''">
+                <input class="__ON_INPUT__" name="host" value="''' + html.escape(d_list[16]) + '''">
                 <hr class="main_hr">
 
                 <span>''' + await get_lang('wiki_port') + '''</span>
                 <hr class="main_hr">
-                <input name="port" value="''' + html.escape(d_list[10]) + '''">
+                <input class="__ON_INPUT__" name="port" value="''' + html.escape(d_list[10]) + '''">
                 <hr class="main_hr">
 
                 <span>''' + await get_lang('wiki_secret_key') + '''</span>
                 <hr class="main_hr">
-                <input type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
+                <input class="__ON_INPUT__" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
                 <hr class="main_hr">
                 
-                <label><input type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + await get_lang('set_wiki_access_password_need') + ''' (''' + await get_lang('restart_required') + ''')</label>
+                <label><input class="__ON_INPUT__" type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + await get_lang('set_wiki_access_password_need') + ''' (''' + await get_lang('restart_required') + ''')</label>
                 <hr class="main_hr">
                 
                 <span>''' + await get_lang('set_wiki_access_password') + '''</span> (''' + await get_lang('restart_required') + ''')
                 <hr class="main_hr">
-                <input type="password" name="wiki_access_password" value="''' + html.escape(d_list[32]) + '''">
+                <input class="__ON_INPUT__" type="password" name="wiki_access_password" value="''' + html.escape(d_list[32]) + '''">
                 <hr class="main_hr">
 
                 <span>''' + await get_lang('wiki_load_ip_select') + '''</span> (''' + await get_lang('restart_required') + ''')
@@ -179,23 +179,23 @@ async def main_setting_main():
                 
                 <h3>''' + await get_lang('authority_use_list') + '''</h3>
                 
-                <label><input type="checkbox" name="auth_history_off" ''' + check_box_div[14] + '''> ''' + await get_lang('authority_use_list_off') + '''</label>
+                <label><input class="__ON_INPUT__" type="checkbox" name="auth_history_off" ''' + check_box_div[14] + '''> ''' + await get_lang('authority_use_list_off') + '''</label>
                 <hr class="main_hr">
                 
                 <span>''' + await get_lang('authority_use_list_expiration_date') + '''</span> (''' + await get_lang('day') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                 <hr class="main_hr">
-                <input name="auth_history_expiration_date" value="''' + html.escape(d_list[43]) + '''">
+                <input class="__ON_INPUT__" name="auth_history_expiration_date" value="''' + html.escape(d_list[43]) + '''">
                 <hr class="main_hr">
 
                 <h3>''' + await get_lang('communication_set') + '''</h3>
                 
-                <label><input type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + await get_lang('enable_comment_function') + '''</label>
+                <label><input class="__ON_INPUT__" type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + await get_lang('enable_comment_function') + '''</label>
                 <hr class="main_hr">
 
-                <label><input type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + await get_lang('display_level_in_user_name') + '''</label>
+                <label><input class="__ON_INPUT__" type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + await get_lang('display_level_in_user_name') + '''</label>
                 <hr class="main_hr">
 
-                <label><input type="checkbox" name="not_use_view_count" ''' + check_box_div[16] + '''> ''' + await get_lang('not_use_view_count') + '''</label>
+                <label><input class="__ON_INPUT__" type="checkbox" name="not_use_view_count" ''' + check_box_div[16] + '''> ''' + await get_lang('not_use_view_count') + '''</label>
                 <hr class="main_hr">
             '''
 
@@ -212,29 +212,29 @@ async def main_setting_main():
 
                         <h2>''' + await get_lang('render_set') + '''</h2>
                         
-                        <label><input type="checkbox" name="namumark_compatible" ''' + check_box_div[10] + '''> ''' + await get_lang('namumark_fully_compatible_mode') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" name="namumark_compatible" ''' + check_box_div[10] + '''> ''' + await get_lang('namumark_fully_compatible_mode') + '''</label>
                         <hr class="main_hr">
                         
-                        <label><input type="checkbox" name="link_case_insensitive" ''' + check_box_div[12] + '''> ''' + await get_lang('link_case_insensitive') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" name="link_case_insensitive" ''' + check_box_div[12] + '''> ''' + await get_lang('link_case_insensitive') + '''</label>
                         <hr class="main_hr">
 
                         <h2>''' + await get_lang('login_set') + '''</h2>
                         
-                        <label><input type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + await get_lang('no_register') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + await get_lang('no_register') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + await get_lang('hide_ip') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + await get_lang('hide_ip') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" name="user_name_view" ''' + check_box_div[11] + '''> ''' + await get_lang('hide_user_name') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" name="user_name_view" ''' + check_box_div[11] + '''> ''' + await get_lang('hide_user_name') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + await get_lang('requires_approval') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + await get_lang('requires_approval') + '''</label>
                         <hr class="main_hr">
 
                         <span>''' + await get_lang('password_min_length') + '''</span> (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
-                        <input name="password_min_length" value="''' + html.escape(d_list[30]) + '''">
+                        <input class="__ON_INPUT__" name="password_min_length" value="''' + html.escape(d_list[30]) + '''">
                         <hr class="main_hr">
 
                         <span>''' + await get_lang('encryption_method') + '''</span>
@@ -243,12 +243,12 @@ async def main_setting_main():
 
                         <h3>''' + await get_lang('ua') + '''</h3>
                         
-                        <label><input type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + await get_lang('ua_get_off') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + await get_lang('ua_get_off') + '''</label>
                         <hr class="main_hr">
                         
                         <span>''' + await get_lang('ua_expiration_date') + '''</span> (''' + await get_lang('day') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
-                        <input name="ua_expiration_date" value="''' + html.escape(d_list[42]) + '''">
+                        <input class="__ON_INPUT__" name="ua_expiration_date" value="''' + html.escape(d_list[42]) + '''">
                         <hr class="main_hr">
                         
                         <h2>''' + await get_lang('server_set') + '''</h2>
@@ -266,17 +266,17 @@ async def main_setting_main():
                             
                             <span>''' + await get_lang('backup_interval') + '''</span> (''' + await get_lang('hour') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                             <hr class="main_hr">
-                            <input name="back_up" value="''' + html.escape(d_list[9]) + '''">
+                            <input class="__ON_INPUT__" name="back_up" value="''' + html.escape(d_list[9]) + '''">
                             <hr class="main_hr">
                             
                             <span>''' + await get_lang('backup_where') + '''</span> (''' + await get_lang('default') + ''' : ''' + await get_lang('empty') + ''') (''' + await get_lang('example') + ''' : ./data/backup.db)
                             <hr class="main_hr">
-                            <input name="backup_where" value="''' + html.escape(d_list[21]) + '''">
+                            <input class="__ON_INPUT__" name="backup_where" value="''' + html.escape(d_list[21]) + '''">
                             <hr class="main_hr">
 
                             <span>''' + await get_lang('backup_count') + '''</span> (''' + await get_lang('default') + ''' : ''' + await get_lang('empty') + ''')
                             <hr class="main_hr">
-                            <input name="backup_count" value="''' + html.escape(d_list[41]) + '''">
+                            <input class="__ON_INPUT__" name="backup_count" value="''' + html.escape(d_list[41]) + '''">
                             <hr class="main_hr">
                         </span>
 
@@ -284,46 +284,46 @@ async def main_setting_main():
                         
                         <span>''' + await get_lang('slow_edit') + '''</span> (''' + await get_lang('second') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
-                        <input name="slow_edit" value="''' + html.escape(d_list[19]) + '''">
+                        <input class="__ON_INPUT__" name="slow_edit" value="''' + html.escape(d_list[19]) + '''">
                         <hr class="main_hr">
                         
-                        <label><input type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + await get_lang('edit_bottom_compulsion') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + await get_lang('edit_bottom_compulsion') + '''</label>
                         <hr class="main_hr">
                         
                         <span>''' + await get_lang('title_max_length') + '''</span> (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
-                        <input name="title_max_length" value="''' + html.escape(d_list[28]) + '''">
+                        <input class="__ON_INPUT__" name="title_max_length" value="''' + html.escape(d_list[28]) + '''">
                         <hr class="main_hr">
                         
                         <span>''' + await get_lang('title_topic_max_length') + '''</span> (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
-                        <input name="title_topic_max_length" value="''' + html.escape(d_list[29]) + '''">
+                        <input class="__ON_INPUT__" name="title_topic_max_length" value="''' + html.escape(d_list[29]) + '''">
                         <hr class="main_hr">
                         
                         <span>''' + await get_lang('max_file_size') + ''' (MB)</span>
                         <hr class="main_hr">
-                        <input name="upload" value="''' + html.escape(d_list[4]) + '''">
+                        <input class="__ON_INPUT__" name="upload" value="''' + html.escape(d_list[4]) + '''">
                         <hr class="main_hr">
                         
-                        <label><input type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + await get_lang('set_history_recording_off') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + await get_lang('set_history_recording_off') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input type="checkbox" name="move_with_redirect" ''' + check_box_div[13] + '''> ''' + await get_lang('move_with_redirect') + ''' (''' + await get_lang('not_working') + ''')</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" name="move_with_redirect" ''' + check_box_div[13] + '''> ''' + await get_lang('move_with_redirect') + ''' (''' + await get_lang('not_working') + ''')</label>
                         <hr class="main_hr">
 
                         <span>''' + await get_lang('slow_thread') + '''</span> (''' + await get_lang('second') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
-                        <input name="slow_thread" value="''' + html.escape(d_list[38]) + '''">
+                        <input class="__ON_INPUT__" name="slow_thread" value="''' + html.escape(d_list[38]) + '''">
                         <hr class="main_hr">
 
                         <span>''' + await get_lang('edit_timeout') + '''</span> (''' + await get_lang('second') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''') (''' + await get_lang('linux_only') + ''')
                         <hr class="main_hr">
-                        <input name="edit_timeout" value="''' + html.escape(d_list[39]) + '''">
+                        <input class="__ON_INPUT__" name="edit_timeout" value="''' + html.escape(d_list[39]) + '''">
                         <hr class="main_hr">
 
                         <span>''' + await get_lang('document_content_max_length') + '''</span> (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
-                        <input name="document_content_max_length" value="''' + html.escape(d_list[40]) + '''">
+                        <input class="__ON_INPUT__" name="document_content_max_length" value="''' + html.escape(d_list[40]) + '''">
                         <hr class="main_hr">
 
                         <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>

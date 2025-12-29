@@ -93,13 +93,13 @@ async def login_register():
                     <form method="post">
                         ''' + contract + '''
 
-                        <input placeholder="''' + await get_lang('id') + '''" name="id" type="text">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('id') + '''" name="id" type="text">
                         <hr class="main_hr">
 
-                        <input placeholder="''' + await get_lang('password') + password_min_length + '''" name="pw" type="password">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('password') + password_min_length + '''" name="pw" type="password">
                         <hr class="main_hr">
 
-                        <input placeholder="''' + await get_lang('password_confirm') + '''" name="pw2" type="password">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('password_confirm') + '''" name="pw2" type="password">
                         <hr class="main_hr">
 
                         ''' + await captcha_get(conn) + '''

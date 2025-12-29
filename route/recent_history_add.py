@@ -33,10 +33,10 @@ async def recent_history_add(name = 'Test', do_type = ''):
                 imp = [await get_lang('history_add'), await wiki_set(), await wiki_custom(), wiki_css(['(' + name + ')', 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + await get_lang('why') + '''" name="send">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + '''" name="send">
                         <hr class="main_hr">
                         
-                        <input placeholder="''' + await get_lang('name') + '''" name="get_ip">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('name') + '''" name="get_ip">
                         <hr class="main_hr">
 
                         ''' + await edit_editor(conn, ip) + '''

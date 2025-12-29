@@ -135,17 +135,17 @@ async def main_setting_phrase():
                         <h2>''' + await get_lang('outdated_doc_warning') + '''  (HTML)</h2>
                         <span>''' + await get_lang('period') + '''</span> (''' + await get_lang('day') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
                         <hr class="main_hr">
-                        <input name="''' + i_list[24] + '''" value="''' + html.escape(d_list[24]) + '''">
+                        <input class="__ON_INPUT__" name="''' + i_list[24] + '''" value="''' + html.escape(d_list[24]) + '''">
                         <hr class="main_hr">
                         <textarea class="opennamu_textarea_100" name="''' + i_list[23] + '''" placeholder="''' + await get_lang('old_page_warning') + '''">''' + html.escape(d_list[23]) + '''</textarea>
 
                         <h2>''' + await get_lang('category') + '''</h2>
-                        <input name="''' + i_list[25] + '''" value="''' + html.escape(d_list[25]) + '''">
+                        <input class="__ON_INPUT__" name="''' + i_list[25] + '''" value="''' + html.escape(d_list[25]) + '''">
 
                         <h2>''' + await get_lang('redirect') + '''</h2>
                         <span>EX : {0} ➤ {1}</span>
                         <hr class="main_hr">
-                        <input name="''' + i_list[26] + '''" value="''' + html.escape(d_list[26]) + '''">
+                        <input class="__ON_INPUT__" name="''' + i_list[26] + '''" value="''' + html.escape(d_list[26]) + '''">
 
                         <h2>''' + await get_lang('template_var') + '''</h2>
                         <h3>''' + await get_lang('template_var_1') + ''' (''' + await get_lang('default') + ''' : ''' + await get_lang('top') + ''') (HTML)</h3>

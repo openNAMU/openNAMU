@@ -98,15 +98,15 @@ async def topic_tool_setting(topic_num = 1):
                             ''' + stop_d_list + '''
                         </select>
                         <hr class="main_hr">
-                        <label><input type="checkbox" name="agree" value="O" ''' + agree_check + '''> ''' + await get_lang('topic_change_agree') + '''</label>
+                        <label><input class="__ON_INPUT__" type="checkbox" name="agree" value="O" ''' + agree_check + '''> ''' + await get_lang('topic_change_agree') + '''</label>
 
                         <h2>''' + await get_lang('topic_associate') + '''</h2>
                         ''' + await get_lang('topic_link_vote') + ''' (''' + await get_lang('not_working') + ''')
                         <hr class="main_hr">
-                        <input placeholder="''' + await get_lang('topic_insert_vote_number') + '''" name="vote_number" type="number">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('topic_insert_vote_number') + '''" name="vote_number" type="number">
 
                         <h2>''' + await get_lang('why') + '''</h2>
-                        <input placeholder="''' + await get_lang('why') + ''' (''' + await get_lang('markup_enabled') + ''')" name="why" type="text">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + ''' (''' + await get_lang('markup_enabled') + ''')" name="why" type="text">
                         
                         <hr class="main_hr">
                         <button type="submit">''' + await get_lang('save') + '''</button>

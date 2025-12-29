@@ -58,7 +58,7 @@ async def login_register_submit():
                     <form method="post">
                         ''' + await get_lang('approval_question') + ' : ' + data_que + '''
                         <hr class="main_hr">
-                        <input placeholder="''' + await get_lang('approval_question') + '''" name="answer">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('approval_question') + '''" name="answer">
                         <hr class="main_hr">
                         <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>

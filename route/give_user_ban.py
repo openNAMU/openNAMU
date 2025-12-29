@@ -107,7 +107,7 @@ async def give_user_ban(name = None, ban_type = ''):
                 n_name = '<textarea class="opennamu_textarea_500" placeholder="' + await get_lang('name_or_ip_or_regex_or_cidr_multiple') + '" name="name"></textarea><hr class="main_hr">'
             else:
                 main_name = await get_lang('ban')
-                n_name = '<input placeholder="' + await get_lang('name_or_ip_or_regex_or_cidr') + '" value="' + (name if name else '') + '" name="name"><hr class="main_hr">'
+                n_name = '<input class="__ON_INPUT__" placeholder="' + await get_lang('name_or_ip_or_regex_or_cidr') + '" value="' + (name if name else '') + '" name="name"><hr class="main_hr">'
 
             now = 0
             
@@ -165,15 +165,15 @@ async def give_user_ban(name = None, ban_type = ''):
         
                         <span>''' + await get_lang('day') + '''</span>
                         <hr class="main_hr">
-                        <input name="date_days">
+                        <input class="__ON_INPUT__" name="date_days">
                         <hr class="main_hr">
 
                         <span>''' + await get_lang('date') + '''</span>
                         <hr class="main_hr">
-                        <input type="date" value="''' + date_value + '''" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">
+                        <input class="__ON_INPUT__" type="date" value="''' + date_value + '''" name="date" pattern="\\d{4}-\\d{2}-\\d{2}">
         
                         <h2>''' + await get_lang('other') + '''</h2>
-                        <input placeholder="''' + await get_lang('why') + '''" name="why" type="text">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + '''" name="why" type="text">
                         <hr class="main_hr">
         
                         <button type="submit">''' + await get_lang('save') + '''</button>

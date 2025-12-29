@@ -63,13 +63,13 @@ async def user_setting_pw():
                 imp = [await get_lang('password_change'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + await get_lang('now_password') + '''" name="password_now" type="password">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('now_password') + '''" name="password_now" type="password">
                         <hr class="main_hr">
                         
-                        <input placeholder="''' + await get_lang('new_password') + password_min_length + '''" name="password_new" type="password">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('new_password') + password_min_length + '''" name="password_new" type="password">
                         <hr class="main_hr">
                         
-                        <input placeholder="''' + await get_lang('password_confirm') + '''" name="password_new_repeat" type="password">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('password_confirm') + '''" name="password_new_repeat" type="password">
                         <hr class="main_hr">
                         
                         <button type="submit">''' + await get_lang('save') + '''</button>

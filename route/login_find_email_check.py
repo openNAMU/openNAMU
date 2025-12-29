@@ -126,7 +126,7 @@ async def login_find_email_check(tool):
                 data = '''
                     <form method="post">
                         ''' + b_text + '''
-                        <input placeholder="''' + await get_lang('key') + '''" name="key" type="password">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('key') + '''" name="key" type="password">
                         <hr class="main_hr">
                         <button type="submit">''' + await get_lang('save') + '''</button>
                     </form>

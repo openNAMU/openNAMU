@@ -24,9 +24,9 @@ async def main_setting_email_test():
                 imp = [await get_lang("email_test"), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input name="title" placeholder="''' + await get_lang("title") + '''">
+                        <input class="__ON_INPUT__" name="title" placeholder="''' + await get_lang("title") + '''">
                         <hr class="main_hr">
-                        <input name="email" placeholder="''' + await get_lang("email") + '''">
+                        <input class="__ON_INPUT__" name="email" placeholder="''' + await get_lang("email") + '''">
                         <hr class="main_hr">
                         <textarea  name="data" class="opennamu_textarea_500" placeholder="''' + await get_lang("content") + '''"></textarea>
                         <hr class="main_hr">

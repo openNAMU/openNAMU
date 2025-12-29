@@ -40,7 +40,7 @@ async def main_setting_main_logo():
                 end_data += '' + \
                     '<span>' + await get_lang('wiki_logo') + ' ' + ('(' + skin_list[i] + ')' if skin_list[i] != 0 else '') + ' (HTML)' + \
                     '<hr class="main_hr">' + \
-                    '<input name="' + (skin_list[i] if skin_list[i] != 0 else 'main_css') + '" value="' + html.escape(d_list[i]) + '">' + \
+                    '<input class="__ON_INPUT__" name="' + (skin_list[i] if skin_list[i] != 0 else 'main_css') + '" value="' + html.escape(d_list[i]) + '">' + \
                     '<hr class="main_hr">' + \
                 ''
 

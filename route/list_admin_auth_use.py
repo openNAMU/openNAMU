@@ -43,7 +43,7 @@ async def list_admin_auth_use(arg_num = 1, arg_search = 'normal'):
                 imp = [await get_lang('authority_use_list'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input class="opennamu_width_200" name="search" placeholder="''' + await get_lang('start_with_search') + '''" value="''' + arg_search + '''">
+                        <input class="opennamu_width_200 __ON_INPUT__" name="search" placeholder="''' + await get_lang('start_with_search') + '''" value="''' + arg_search + '''">
                         <button type="submit">''' + await get_lang('search') + '''</button>
                     </form>
                     <hr class="main_hr">

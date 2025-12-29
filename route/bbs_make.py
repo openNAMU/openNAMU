@@ -25,7 +25,7 @@ async def bbs_make():
                 imp = [await get_lang('bbs_make'), await wiki_set(), await wiki_custom(), wiki_css([0, 0])],
                 data = '''
                     <form method="post">
-                        <input placeholder="''' + await get_lang('bbs_name') + '''" name="bbs_name">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('bbs_name') + '''" name="bbs_name">
                         <hr class="main_hr">
                         
                         <select name="bbs_type">

@@ -144,9 +144,9 @@ async def edit_upload():
                     ''' + await get_lang('max_file_size') + ''' : ''' + str(file_max) + '''MB
                     <hr class="main_hr">
                     <form method="post" enctype="multipart/form-data" accept-charset="utf8">
-                        <input multiple="multiple" type="file" name="f_data[]" id="file_input">
+                        <input class="__ON_INPUT__" multiple="multiple" type="file" name="f_data[]" id="file_input">
                         <hr class="main_hr">
-                        <input placeholder="''' + await get_lang('file_name') + '''" name="f_name" value="''' + file_name + '''">
+                        <input class="__ON_INPUT__" placeholder="''' + await get_lang('file_name') + '''" name="f_name" value="''' + file_name + '''">
                         <hr class="main_hr">
                         <select name="f_lice_sel">
                             ''' + license_list + '''

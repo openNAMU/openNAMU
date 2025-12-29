@@ -448,8 +448,8 @@ def before_request_func():
                         }
                     </script>
                     <h2>''' + load_lang('error_password_require_for_wiki_access') + '''</h2>
-                    <input type="password" id="wiki_access">
-                    <input type="submit" onclick="opennamu_do_wiki_access();">
+                    <input class="__ON_INPUT__" type="password" id="wiki_access">
+                    <input class="__ON_INPUT__" type="submit" onclick="opennamu_do_wiki_access();">
                 '''
 
 # Init-custom

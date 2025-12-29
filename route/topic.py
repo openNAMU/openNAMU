@@ -138,7 +138,7 @@ async def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                 data = '''
                     <script defer src="/views/main_css/js/route/topic.js''' + cache_v() + '''"></script>
                     <style id="opennamu_list_hidden_style">.opennamu_list_hidden { display: none; }</style>
-                    <label><input type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ''' + await get_lang('remove_hidden') + '''</label>
+                    <label><input class="__ON_INPUT__" type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ''' + await get_lang('remove_hidden') + '''</label>
                     <hr class="main_hr">
 
                     ''' + shortcut + '''
@@ -161,9 +161,9 @@ async def topic(topic_num = 0, do_type = '', doc_name = 'Test'):
                     
                     <form style="''' + acl_display + '''" method="post">
                         <div style="''' + name_display + '''">
-                            <input placeholder="''' + await get_lang('document_name') + '''" name="topic" value="''' + html.escape(name_value) + '''">
+                            <input class="__ON_INPUT__" placeholder="''' + await get_lang('document_name') + '''" name="topic" value="''' + html.escape(name_value) + '''">
                             <hr class="main_hr">
-                            <input placeholder="''' + await get_lang('discussion_name') + '''" name="title" value="''' + html.escape(sub_value) + '''">
+                            <input class="__ON_INPUT__" placeholder="''' + await get_lang('discussion_name') + '''" name="title" value="''' + html.escape(sub_value) + '''">
                             <hr class="main_hr">
                         </div>
                         

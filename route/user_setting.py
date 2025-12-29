@@ -132,13 +132,13 @@ async def user_setting():
                             <h2>''' + await get_lang('2fa') + '''</h2>
                             <select name="2fa" id="twofa_check_input">''' + fa_data_select + '''</select>
                             <hr class="main_hr">
-                            <input type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
+                            <input class="__ON_INPUT__" type="password" name="2fa_pw" placeholder="''' + fa_data_pw + '''">
                             <h2>''' + await get_lang('main_user_name') + '''</h2>
                             <a href="/change/user_name">(''' + await get_lang('change_user_name') + ''')</a>
                             <hr class="main_hr">
                             ''' + await get_lang('user_name') + ''' : ''' + html.escape(user_name) + '''
                             <h2>''' + await get_lang('sub_user_name') + '''</h2>
-                            <input name="sub_user_name" value="''' + html.escape(sub_user_name) + '''" placeholder="''' + await get_lang('sub_user_name') + '''">
+                            <input class="__ON_INPUT__" name="sub_user_name" value="''' + html.escape(sub_user_name) + '''" placeholder="''' + await get_lang('sub_user_name') + '''">
                             <hr class="main_hr">
                             <button type="submit">''' + await get_lang('save') + '''</button>
                             ''' + await http_warning() + '''
