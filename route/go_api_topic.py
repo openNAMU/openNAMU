@@ -14,7 +14,7 @@ def api_topic_thread_make(user_id, date, data, code, color = '', blind = '', add
 
     admin_check_box = ''
     if admin_check == 1 and topic_num != '':
-        admin_check_box = '<label><input type="checkbox" class="opennamu_blind_button __ON_CHECKBOX__" id="opennamu_blind_' + topic_num + '_' + code + '"></label>'
+        admin_check_box = '<label class="__ON_CHECKLABEL__"><input type="checkbox" class="opennamu_blind_button __ON_CHECKBOX__" id="opennamu_blind_' + topic_num + '_' + code + '"></label>'
 
     return '''
         <span class="''' + class_b + '''">

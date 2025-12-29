@@ -93,7 +93,7 @@ async def main_setting_external():
                         <a href="/setting/phrase#s-6">(''' + await get_lang('text_setting') + ''')</a>
                         <hr class="main_hr">
 
-                        <label><input class="__ON_CHECKBOX__" type="checkbox" name="email_have" ''' + ('checked' if d_list[9] != '' else '')  + '''> ''' + await get_lang('email_required') + '''</label>
+                        <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="email_have" ''' + ('checked' if d_list[9] != '' else '')  + '''> ''' + await get_lang('email_required') + '''</label>
 
                         <h3>''' + await get_lang('smtp_setting') + '''</h3>
                         <a href="https://support.google.com/mail/answer/7126229">(Google)</a>

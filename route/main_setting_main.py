@@ -165,7 +165,7 @@ async def main_setting_main():
                 <input class="__ON_INPUT__" type="password" name="key" value="''' + html.escape(d_list[11]) + '''">
                 <hr class="main_hr">
                 
-                <label><input class="__ON_CHECKBOX__" type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + await get_lang('set_wiki_access_password_need') + ''' (''' + await get_lang('restart_required') + ''')</label>
+                <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="wiki_access_password_need" ''' + check_box_div[8] + '''> ''' + await get_lang('set_wiki_access_password_need') + ''' (''' + await get_lang('restart_required') + ''')</label>
                 <hr class="main_hr">
                 
                 <span>''' + await get_lang('set_wiki_access_password') + '''</span> (''' + await get_lang('restart_required') + ''')
@@ -179,7 +179,7 @@ async def main_setting_main():
                 
                 <h3>''' + await get_lang('authority_use_list') + '''</h3>
                 
-                <label><input class="__ON_CHECKBOX__" type="checkbox" name="auth_history_off" ''' + check_box_div[14] + '''> ''' + await get_lang('authority_use_list_off') + '''</label>
+                <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="auth_history_off" ''' + check_box_div[14] + '''> ''' + await get_lang('authority_use_list_off') + '''</label>
                 <hr class="main_hr">
                 
                 <span>''' + await get_lang('authority_use_list_expiration_date') + '''</span> (''' + await get_lang('day') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
@@ -189,13 +189,13 @@ async def main_setting_main():
 
                 <h3>''' + await get_lang('communication_set') + '''</h3>
                 
-                <label><input class="__ON_CHECKBOX__" type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + await get_lang('enable_comment_function') + '''</label>
+                <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="enable_comment" ''' + check_box_div[5] + '''> ''' + await get_lang('enable_comment_function') + '''</label>
                 <hr class="main_hr">
 
-                <label><input class="__ON_CHECKBOX__" type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + await get_lang('display_level_in_user_name') + '''</label>
+                <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="user_name_level" ''' + check_box_div[15] + '''> ''' + await get_lang('display_level_in_user_name') + '''</label>
                 <hr class="main_hr">
 
-                <label><input class="__ON_CHECKBOX__" type="checkbox" name="not_use_view_count" ''' + check_box_div[16] + '''> ''' + await get_lang('not_use_view_count') + '''</label>
+                <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="not_use_view_count" ''' + check_box_div[16] + '''> ''' + await get_lang('not_use_view_count') + '''</label>
                 <hr class="main_hr">
             '''
 
@@ -212,24 +212,24 @@ async def main_setting_main():
 
                         <h2>''' + await get_lang('render_set') + '''</h2>
                         
-                        <label><input class="__ON_CHECKBOX__" type="checkbox" name="namumark_compatible" ''' + check_box_div[10] + '''> ''' + await get_lang('namumark_fully_compatible_mode') + '''</label>
+                        <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="namumark_compatible" ''' + check_box_div[10] + '''> ''' + await get_lang('namumark_fully_compatible_mode') + '''</label>
                         <hr class="main_hr">
                         
-                        <label><input class="__ON_CHECKBOX__" type="checkbox" name="link_case_insensitive" ''' + check_box_div[12] + '''> ''' + await get_lang('link_case_insensitive') + '''</label>
+                        <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="link_case_insensitive" ''' + check_box_div[12] + '''> ''' + await get_lang('link_case_insensitive') + '''</label>
                         <hr class="main_hr">
 
                         <h2>''' + await get_lang('login_set') + '''</h2>
                         
-                        <label><input class="__ON_CHECKBOX__" type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + await get_lang('no_register') + '''</label>
+                        <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="reg" ''' + check_box_div[0] + '''> ''' + await get_lang('no_register') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input class="__ON_CHECKBOX__" type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + await get_lang('hide_ip') + '''</label>
+                        <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="ip_view" ''' + check_box_div[1] + '''> ''' + await get_lang('hide_ip') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input class="__ON_CHECKBOX__" type="checkbox" name="user_name_view" ''' + check_box_div[11] + '''> ''' + await get_lang('hide_user_name') + '''</label>
+                        <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="user_name_view" ''' + check_box_div[11] + '''> ''' + await get_lang('hide_user_name') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input class="__ON_CHECKBOX__" type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + await get_lang('requires_approval') + '''</label>
+                        <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="requires_approval" ''' + check_box_div[3] + '''> ''' + await get_lang('requires_approval') + '''</label>
                         <hr class="main_hr">
 
                         <span>''' + await get_lang('password_min_length') + '''</span> (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
@@ -243,7 +243,7 @@ async def main_setting_main():
 
                         <h3>''' + await get_lang('ua') + '''</h3>
                         
-                        <label><input class="__ON_CHECKBOX__" type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + await get_lang('ua_get_off') + '''</label>
+                        <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="ua_get" ''' + check_box_div[4] + '''> ''' + await get_lang('ua_get_off') + '''</label>
                         <hr class="main_hr">
                         
                         <span>''' + await get_lang('ua_expiration_date') + '''</span> (''' + await get_lang('day') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
@@ -287,7 +287,7 @@ async def main_setting_main():
                         <input class="__ON_INPUT__" name="slow_edit" value="''' + html.escape(d_list[19]) + '''">
                         <hr class="main_hr">
                         
-                        <label><input class="__ON_CHECKBOX__" type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + await get_lang('edit_bottom_compulsion') + '''</label>
+                        <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="edit_bottom_compulsion" ''' + check_box_div[7] + '''> ''' + await get_lang('edit_bottom_compulsion') + '''</label>
                         <hr class="main_hr">
                         
                         <span>''' + await get_lang('title_max_length') + '''</span> (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
@@ -305,10 +305,10 @@ async def main_setting_main():
                         <input class="__ON_INPUT__" name="upload" value="''' + html.escape(d_list[4]) + '''">
                         <hr class="main_hr">
                         
-                        <label><input class="__ON_CHECKBOX__" type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + await get_lang('set_history_recording_off') + '''</label>
+                        <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="history_recording_off" ''' + check_box_div[9] + '''> ''' + await get_lang('set_history_recording_off') + '''</label>
                         <hr class="main_hr">
 
-                        <label><input class="__ON_CHECKBOX__" type="checkbox" name="move_with_redirect" ''' + check_box_div[13] + '''> ''' + await get_lang('move_with_redirect') + ''' (''' + await get_lang('not_working') + ''')</label>
+                        <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="move_with_redirect" ''' + check_box_div[13] + '''> ''' + await get_lang('move_with_redirect') + ''' (''' + await get_lang('not_working') + ''')</label>
                         <hr class="main_hr">
 
                         <span>''' + await get_lang('slow_thread') + '''</span> (''' + await get_lang('second') + ''') (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')

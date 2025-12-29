@@ -98,7 +98,7 @@ async def topic_tool_setting(topic_num = 1):
                             ''' + stop_d_list + '''
                         </select></span>
                         <hr class="main_hr">
-                        <label><input class="__ON_CHECKBOX__" type="checkbox" name="agree" value="O" ''' + agree_check + '''> ''' + await get_lang('topic_change_agree') + '''</label>
+                        <label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="agree" value="O" ''' + agree_check + '''> ''' + await get_lang('topic_change_agree') + '''</label>
 
                         <h2>''' + await get_lang('topic_associate') + '''</h2>
                         ''' + await get_lang('topic_link_vote') + ''' (''' + await get_lang('not_working') + ''')
