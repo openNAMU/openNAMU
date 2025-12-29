@@ -32,7 +32,7 @@ async def edit_delete_multiple():
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + '''" name="send" type="text">
                         <hr class="main_hr">
                         ''' + await captcha_get(conn) + await ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'edit')  + '''
-                        <button type="submit">''' + await get_lang('delete') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('delete') + '''</button>
                     </form>
                 ''',
                 0,

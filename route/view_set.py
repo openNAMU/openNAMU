@@ -214,7 +214,7 @@ async def view_set(name = 'Test', multiple = False):
 
             data += view_set_markup(conn, document_name = name, disable = check_ok)
 
-            save_button = '<button type="submit" ' + check_ok + '>' + await get_lang('save') + '</button>'
+            save_button = '<button class="__ON_BUTTON__" type="submit" ' + check_ok + '>' + await get_lang('save') + '</button>'
             if await acl_check('', 'owner_auth', '', '') == 1:
                 check_ok = 'disabled'
 
@@ -251,7 +251,7 @@ async def view_set(name = 'Test', multiple = False):
                 ]
                 title = name
                 sub = '(' + await get_lang('document_setting') + ')'
-                save_button += ' <button type="button" onclick="w_set_reset();" ' + check_ok + '>' + await get_lang('reset') + '</button>'
+                save_button += ' <button class="__ON_BUTTON__" type="button" onclick="w_set_reset();" ' + check_ok + '>' + await get_lang('reset') + '</button>'
 
             return await render_template(
                 title,

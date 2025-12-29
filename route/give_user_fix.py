@@ -67,7 +67,7 @@ async def give_user_fix(user_name = ''):
                         <hr class="main_hr">
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('password_confirm') + '''" name="password_check" type="password">
                         <hr class="main_hr">
-                        <button type="submit">''' + await get_lang('go') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('go') + '''</button>
                     </form>
                 ''',
                 0,

@@ -51,7 +51,7 @@ async def login_login_2fa_email():
                             <input class="__ON_INPUT__" placeholder="''' + await get_lang('2fa_password') + '''" name="pw" type="password">
                             <hr class=\"main_hr\">
                             ''' + await captcha_get(conn) + '''
-                            <button type="submit">''' + await get_lang('login') + '''</button>
+                            <button class="__ON_BUTTON__" type="submit">''' + await get_lang('login') + '''</button>
                             ''' + await http_warning() + '''
                         </form>
                         ''',

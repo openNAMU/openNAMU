@@ -68,7 +68,7 @@ async def user_setting_head(skin_name = ''):
                         <hr class="main_hr">
                         ''' + await get_lang('user_css_warning') + ''' : <a href="/change/head_reset">/change/head_reset</a>
                         <hr class="main_hr">
-                        <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
                 '(HTML)' + sub_name,

@@ -98,7 +98,7 @@ async def main_setting_sitemap(do_type = 0):
                 await get_lang('sitemap_manual_create'),
                 '''
                     <form method="post">
-                        <button id="opennamu_save_button" type="submit">''' + await get_lang('create') + '''</button>
+                        <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">''' + await get_lang('create') + '''</button>
                     </form>
                 ''',
                 0,

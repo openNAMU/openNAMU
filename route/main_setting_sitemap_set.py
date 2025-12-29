@@ -80,7 +80,7 @@ async def main_setting_sitemap_set():
                         <label><input class="__ON_INPUT__" type="checkbox" ''' + check_box_div[3] + ''' name="sitemap_auto_exclude_category_page"> ''' + await get_lang('stiemap_exclude_category_page') + '''</label>
                         <hr class="main_hr">
 
-                        <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
                 0,

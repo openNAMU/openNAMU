@@ -137,7 +137,7 @@ async def main_setting_external():
                         <hr class="main_hr">
 
                         <hr class="main_hr">
-                        <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 '''),
                 0,

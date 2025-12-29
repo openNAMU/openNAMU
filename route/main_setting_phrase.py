@@ -173,7 +173,7 @@ async def main_setting_phrase():
                         <textarea class="opennamu_textarea_100 __ON_TEXTAREA__" name="''' + i_list[33] + '''">''' + html.escape(d_list[33]) + '''</textarea>
 
                         <hr class="main_hr">
-                        <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 '''),
                 0,

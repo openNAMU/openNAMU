@@ -39,7 +39,7 @@ async def bbs_w_pinned(bbs_num = '', post_num = ''):
                 await get_lang('bbs_post_pinned'),
                 await render_simple_set('''
                     <form method="post">
-                        <button type="submit">''' + pinned + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + pinned + '''</button>
                     </form>
                 '''),
                 '(' + bbs_name + ')' + ' (' + post_num_str + ')',

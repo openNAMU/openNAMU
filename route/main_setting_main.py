@@ -326,7 +326,7 @@ async def main_setting_main():
                         <input class="__ON_INPUT__" name="document_content_max_length" value="''' + html.escape(d_list[40]) + '''">
                         <hr class="main_hr">
 
-                        <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 '''),
                 0,

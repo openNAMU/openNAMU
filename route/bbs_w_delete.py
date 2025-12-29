@@ -59,7 +59,7 @@ async def bbs_w_delete(bbs_num = '', post_num = '', comment_num = ''):
                     <form method="post">
                         <span>''' + await get_lang('delete_warning') + '''</span>
                         <hr class="main_hr">
-                        <button type="submit">''' + await get_lang('delete') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('delete') + '''</button>
                     </form>
                 '''),
                 sub,

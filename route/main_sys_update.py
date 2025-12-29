@@ -78,7 +78,7 @@ async def main_sys_update(golang_process):
                     <a href="https://github.com/openNAMU/openNAMU">(Beta)</a> <a href="https://github.com/openNAMU/openNAMU/tree/stable">(Stable)</a>
                     <hr class="main_hr">
                     <form method="post">
-                        <button type="submit">''' + await get_lang('update') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('update') + '''</button>
                     </form>
                     <!-- JS : opennamu_do_insert_version -->
                 ''',

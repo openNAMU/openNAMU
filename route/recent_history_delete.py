@@ -22,7 +22,7 @@ async def recent_history_delete(name = 'Test', rev = 1):
                     <form method="post">
                         <span>''' + await get_lang('delete_warning') + '''</span>
                         <hr class="main_hr">
-                        <button type="submit">''' + await get_lang('delete') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('delete') + '''</button>
                     </form>
                 ''',
                 '(' + await get_lang('history_delete') + ') (r' + num + ')',

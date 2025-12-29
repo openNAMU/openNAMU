@@ -27,7 +27,7 @@ async def list_user_check_delete(name = None, ip = None, time = None, do_type = 
                         ''' + await get_lang('time') + ''' : ''' + time + '''
                         <hr class="main_hr">
                         <form method="post">
-                            <button type="submit">''' + await get_lang('delete') + '''</button>
+                            <button class="__ON_BUTTON__" type="submit">''' + await get_lang('delete') + '''</button>
                         </form>
                     ''',
                     '(' + await get_lang('delete') + ')',

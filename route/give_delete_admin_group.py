@@ -25,7 +25,7 @@ async def give_delete_admin_group(name = 'test'):
                 await get_lang("delete_admin_group"),
                 '' + \
                     '<form method="post">' + \
-                        '<button type="submit">' + await get_lang('delete') + '</button>' + \
+                        '<button class="__ON_BUTTON__" type="submit">' + await get_lang('delete') + '</button>' + \
                     '</form>' + \
                 '',
                 '(' + name + ')',

@@ -176,7 +176,7 @@ async def give_user_ban(name = None, ban_type = ''):
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + '''" name="why" type="text">
                         <hr class="main_hr">
         
-                        <button type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
                 now,

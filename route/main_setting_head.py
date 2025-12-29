@@ -49,7 +49,7 @@ async def main_setting_head(num, skin_name = '', set_preview = 0):
                 form_action = 'formaction="/setting/body/top"'
                 data_preview = flask.request.form.get('content', '') if set_preview == 1 else ''
                 plus = '''
-                    <button id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/top">''' + await get_lang('preview') + '''</button>
+                    <button class="__ON_BUTTON__" id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/top">''' + await get_lang('preview') + '''</button>
                     <hr class="main_hr">
                     <div id="opennamu_preview_area">''' + data_preview + '''</div>
                 '''
@@ -59,7 +59,7 @@ async def main_setting_head(num, skin_name = '', set_preview = 0):
                 data_preview = flask.request.form.get('content', '') if set_preview == 1 else ''
                 form_action = 'formaction="/setting/body/bottom"'
                 plus = '''
-                    <button id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/bottom">''' + await get_lang('preview') + '''</button>
+                    <button class="__ON_BUTTON__" id="opennamu_preview_button" type="submit" formaction="/setting_preview/body/bottom">''' + await get_lang('preview') + '''</button>
                     <hr class="main_hr">
                     <div id="opennamu_preview_area">''' + data_preview + '''</div>
                 '''
@@ -105,7 +105,7 @@ async def main_setting_head(num, skin_name = '', set_preview = 0):
                         <textarea class="opennamu_textarea_500 __ON_TEXTAREA__" placeholder="''' + await get_lang('enter_html') + '''" name="content" id="content">''' + html.escape(data) + '''</textarea>
                         <hr class="main_hr">
                         ''' + (await get_lang('main_css_warning') + '<hr class="main_hr">' if title == '_head' else '') + '''
-                        <button id="opennamu_save_button" type="submit" ''' + form_action + '''>''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit" ''' + form_action + '''>''' + await get_lang('save') + '''</button>
                         ''' + plus + '''
                     </form>
                 ''',

@@ -66,13 +66,13 @@ async def recent_app_submit():
                             </tr>
                             <tr>
                                 <td colspan="3">
-                                    <button type="submit" 
+                                    <button class="__ON_BUTTON__" type="submit" 
                                             id="opennamu_save_button"
                                             name="approve" 
                                             value="''' + application['id'] + '''">
                                         ''' + await get_lang('approve') + '''
                                     </button>
-                                    <button type="submit" 
+                                    <button class="__ON_BUTTON__" type="submit" 
                                             name="decline" 
                                             value="''' + application['id'] + '''">
                                         ''' + await get_lang('decline') + '''

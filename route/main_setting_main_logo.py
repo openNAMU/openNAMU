@@ -49,7 +49,7 @@ async def main_setting_main_logo():
                 '''
                     <form method="post">
                         ''' + end_data + '''
-                        <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
                 0,

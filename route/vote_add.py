@@ -70,7 +70,7 @@ async def vote_add():
                         '<h2>' + await get_lang('acl') + '</h2>' + \
                         acl_data + ' <a href="/acl/TEST#exp">(' + await get_lang('explanation') + ')</a>' + \
                         '<hr class="main_hr">' + \
-                        '<button type="submit">' + await get_lang('send') + '</buttom>' + \
+                        '<button class="__ON_BUTTON__" type="submit">' + await get_lang('send') + '</buttom>' + \
                     '</form>' + \
                 '',
                 0,

@@ -109,7 +109,7 @@ async def topic_tool_setting(topic_num = 1):
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + ''' (''' + await get_lang('markup_enabled') + ''')" name="why" type="text">
                         
                         <hr class="main_hr">
-                        <button type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 '''),
                 0,

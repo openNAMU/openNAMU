@@ -50,6 +50,6 @@ async def user_setting_head_reset():
                     <hr class="main_hr">
                     <pre>''' + html.escape(data_skin) + '''</pre>
                     <hr class="main_hr">
-                    <button type="submit">''' + await get_lang('reset') + '''</button>
+                    <button class="__ON_BUTTON__" type="submit">''' + await get_lang('reset') + '''</button>
                 </form>
             '''

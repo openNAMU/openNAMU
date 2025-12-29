@@ -16,7 +16,7 @@ async def main_sys_shutdown():
                 await get_lang('wiki_shutdown'),
                 '''
                     <form method="post">
-                        <button type="submit">''' + await get_lang('shutdown') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('shutdown') + '''</button>
                     </form>
                 ''',
                 0,

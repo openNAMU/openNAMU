@@ -64,7 +64,7 @@ async def main_tool_redirect(num = 1, add_2 = ''):
                         ''' + top_plus + '''
                         <input class="__ON_INPUT__" placeholder="''' + placeholder + '''" id="data_field" name="name" type="text">
                         <hr class="main_hr">
-                        <button type="submit">''' + await get_lang('go') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('go') + '''</button>
                     </form>
                 ''',
                 0,

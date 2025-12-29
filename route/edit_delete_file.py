@@ -40,7 +40,7 @@ async def edit_delete_file(name = 'test.jpg'):
                         <hr class="main_hr">
                         <label><input class="__ON_INPUT__" name="with_doc" type="checkbox" checked> ''' + await get_lang('file_delete_with_document') + '''</label>
                         <hr class="main_hr">
-                        <button type="submit">''' + await get_lang('file_delete') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('file_delete') + '''</button>
                     </form>
                 ''',
                 '(' + await get_lang('file_delete') + ')',

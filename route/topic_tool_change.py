@@ -40,7 +40,7 @@ async def topic_tool_change(topic_num = 1):
                         <hr class="main_hr">
                         <input class="__ON_INPUT__" value="''' + html.escape(rd_d[0][1]) + '''" name="sub" type="text">
                         <hr class="main_hr">
-                        <button type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
                 0,

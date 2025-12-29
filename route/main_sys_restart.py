@@ -51,7 +51,7 @@ async def main_sys_restart(golang_process):
                 await get_lang('wiki_restart'),
                 '''
                     <form method="post">
-                        <button type="submit">''' + await get_lang('restart') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('restart') + '''</button>
                     </form>
                 ''',
                 0,

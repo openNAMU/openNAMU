@@ -87,7 +87,7 @@ async def login_find_email(tool):
                             <hr class="main_hr">
                             <input class="__ON_INPUT__" placeholder="''' + await get_lang('email') + '''" name="email" type="text">
                             <hr class="main_hr">
-                            <button type="submit">''' + await get_lang('save') + '''</button>
+                            <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
                         </form>
                     ''',
                     '(' + await get_lang('email') + ')',
@@ -110,7 +110,7 @@ async def login_find_email(tool):
                         <form method="post">
                             <input class="__ON_INPUT__" placeholder="''' + await get_lang('email') + '''" name="email" type="text">
                             <hr class="main_hr">
-                            <button type="submit">''' + await get_lang('save') + '''</button>
+                            <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
                         </form>
                     ''',
                     0,

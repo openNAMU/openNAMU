@@ -20,7 +20,7 @@ async def topic_comment_delete(topic_num = 1, num = 1):
                 '''
                     <hr class="main_hr">
                     <form method="post">
-                        <button type="submit">''' + await get_lang('start') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('start') + '''</button>
                     </form>
                 ''',
                 '(#' + num + ')',

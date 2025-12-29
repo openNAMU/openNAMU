@@ -278,7 +278,7 @@ async def user_setting_skin_set_main():
                             ''' + set_data["main_css_monaco"] + '''
                         </select>
                         <hr class="main_hr">
-                        <button type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 '''),
                 0,

@@ -105,8 +105,8 @@ async def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', na
             });
         </script>
                         
-        <button id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">''' + await get_lang('send') + '''</button>
-        <button id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview();">''' + await get_lang('preview') + '''</button>
+        <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">''' + await get_lang('send') + '''</button>
+        <button class="__ON_BUTTON__" id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview();">''' + await get_lang('preview') + '''</button>
         <hr class="main_hr">
 
         <div id="opennamu_preview_area"></div>

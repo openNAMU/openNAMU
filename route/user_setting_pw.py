@@ -72,7 +72,7 @@ async def user_setting_pw():
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('password_confirm') + '''" name="password_new_repeat" type="password">
                         <hr class="main_hr">
                         
-                        <button type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
                         
                         ''' + await http_warning() + '''
                     </form>

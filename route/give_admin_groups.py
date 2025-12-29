@@ -114,7 +114,7 @@ async def give_admin_groups(name = 'test'):
                     <form method="post">
                         ''' + data + '''
                         <hr class="main_hr">
-                        <button ''' + state +  ''' type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" ''' + state +  ''' type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
                 '(' + await get_lang('admin_group') + ')',

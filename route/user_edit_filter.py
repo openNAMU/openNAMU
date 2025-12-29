@@ -38,7 +38,7 @@ async def user_edit_filter(name = ''):
             if owner_auth == 1:
                 delete = '' + \
                     '<form method="post">' + \
-                        '<button type="submit">' + await get_lang('delete') + '</button>' + \
+                        '<button class="__ON_BUTTON__" type="submit">' + await get_lang('delete') + '</button>' + \
                     '</form>' + \
                     '<hr class="main_hr">' + \
                 ''

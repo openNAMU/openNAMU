@@ -274,7 +274,7 @@ async def filter_all_add(tool, name = None):
                         <form method="post">
                             ''' + form_data + '''
                             <hr class="main_hr">
-                            <button ''' + stat + ''' type="submit">''' + await get_lang('add') + '''</button>
+                            <button class="__ON_BUTTON__" ''' + stat + ''' type="submit">''' + await get_lang('add') + '''</button>
                         </form>
                         ''',
                 get_sub,

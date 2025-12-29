@@ -257,7 +257,7 @@ async def user_challenge():
                     <form method="post">
                         <div id="opennamu_get_user_info">''' + html.escape(ip) + '''</div>
                         <hr class="main_hr">
-                        <button id="opennamu_save_button" type="submit">''' + await get_lang('reload') + '''</button>
+                        <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">''' + await get_lang('reload') + '''</button>
                     </form>
                 ''',
                 0,

@@ -20,7 +20,7 @@ async def recent_record_reset(name = 'Test'):
                     <form method="post">
                         <span>''' + await get_lang('delete_warning') + '''</span>
                         <hr class="main_hr">
-                        <button type="submit">''' + await get_lang('reset') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('reset') + '''</button>
                     </form>
                 ''',
                 '(' + await get_lang('record_reset') + ')',

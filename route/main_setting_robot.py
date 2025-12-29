@@ -46,7 +46,7 @@ async def main_setting_robot():
                         <hr class="main_hr">
                         <label><input class="__ON_INPUT__" type="checkbox" name="default" ''' + default_data + '''> ''' + await get_lang('default') + '''</label>
                         <hr class="main_hr">
-                        <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
                 0,

@@ -258,7 +258,7 @@ async def edit_move(name):
 
                         ''' + await captcha_get(conn) + await ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'move')  + '''
                         
-                        <button type="submit">''' + await get_lang('move') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('move') + '''</button>
                     </form>
                 ''',
                 '(' + await get_lang('move') + ')',

@@ -200,7 +200,7 @@ async def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                     div = '''
                         <form method="post">
                             <select name="a">''' + select + '''</select> <select name="b">''' + select + '''</select>
-                            <button type="submit">''' + await get_lang('compare') + '''</button>
+                            <button class="__ON_BUTTON__" type="submit">''' + await get_lang('compare') + '''</button>
                         </form>
                         <hr class="main_hr">
                     ''' + div

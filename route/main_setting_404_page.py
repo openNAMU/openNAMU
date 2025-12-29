@@ -49,7 +49,7 @@ async def main_setting_404_page():
                 '<form method="post">' +
                     '<textarea class="opennamu_textarea_500 __ON_TEXTAREA__" name="data" placeholder="' + lang['data']['enter_html'] + '">' + html.escape(form_data) + '</textarea>' +
                     '<hr class="main_hr">' +
-                    '<button id="opennamu_save_button" type="submit">' + lang['data']['save'] + '</button>' +
+                    '<button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">' + lang['data']['save'] + '</button>' +
                 '</form>'
             )
 

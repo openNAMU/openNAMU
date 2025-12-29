@@ -34,7 +34,7 @@ async def bbs_make():
                         </select>
                         <hr class="main_hr">
                         
-                        <button type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
                 0,

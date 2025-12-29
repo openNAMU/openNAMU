@@ -67,7 +67,7 @@ async def vote_select(num = 1):
                 '<form method="post">' + \
                     select_data + \
                     '<hr class="main_hr">' + \
-                    '<button type="submit">' + await get_lang('send') + '</buttom>' + \
+                    '<button class="__ON_BUTTON__" type="submit">' + await get_lang('send') + '</buttom>' + \
                 '</form>' + \
             ''
 

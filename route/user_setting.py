@@ -140,7 +140,7 @@ async def user_setting():
                             <h2>''' + await get_lang('sub_user_name') + '''</h2>
                             <input class="__ON_INPUT__" name="sub_user_name" value="''' + html.escape(sub_user_name) + '''" placeholder="''' + await get_lang('sub_user_name') + '''">
                             <hr class="main_hr">
-                            <button type="submit">''' + await get_lang('save') + '''</button>
+                            <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
                             ''' + await http_warning() + '''
                         </form>
                     ''',
@@ -187,7 +187,7 @@ async def user_setting():
                             <hr class="main_hr">
                             <select name="lang">''' + div3 + '''</select>
                             <hr class="main_hr">
-                            <button type="submit">''' + await get_lang('save') + '''</button>
+                            <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
                             ''' + await http_warning() + '''
                             <hr class="main_hr">
                             <span>''' + await get_lang('user_head_warning') + '''</span>

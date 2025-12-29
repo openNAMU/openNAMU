@@ -48,7 +48,7 @@ async def login_find_key():
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('key') + '''" name="key" type="password">
                         <hr class="main_hr">
                         ''' + await captcha_get(conn) + '''
-                        <button type="submit">''' + await get_lang('send') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('send') + '''</button>
                     </form>
                 ''',
                 0,

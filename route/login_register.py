@@ -104,7 +104,7 @@ async def login_register():
 
                         ''' + await captcha_get(conn) + '''
 
-                        <button type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
 
                         ''' + await http_warning() + '''
                     </form>

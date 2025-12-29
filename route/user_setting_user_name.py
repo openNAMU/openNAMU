@@ -41,7 +41,7 @@ async def user_setting_user_name(user_name = ''):
                         <form method="post">
                             <input class="__ON_INPUT__" name="new_user_name" placeholder="''' + await get_lang('user_name') + '''" value="''' + html.escape(user_name) + '''">
                             <hr class="main_hr">
-                            <button id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
+                            <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">''' + await get_lang('save') + '''</button>
                         </form>
                     ''',
                     0,

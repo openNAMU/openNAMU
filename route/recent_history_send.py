@@ -35,7 +35,7 @@ async def recent_history_send(name = 'Test', rev = 1):
                             <hr class="main_hr">
                             <input class="__ON_INPUT__" value="''' + html.escape(send) + '''" name="send">
                             <hr class="main_hr">
-                            <button type="submit">''' + await get_lang('edit') + '''</button>
+                            <button class="__ON_BUTTON__" type="submit">''' + await get_lang('edit') + '''</button>
                         </form>
                     ''',
                     '(' + await get_lang('send_edit') + ') (r' + num + ')',

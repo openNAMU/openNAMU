@@ -81,7 +81,7 @@ async def edit_revert(name, num):
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('why') + '''" name="send" type="text">
                         <hr class="main_hr">
                         ''' + await captcha_get(conn) + await ip_warning(conn) + get_edit_text_bottom_check_box(conn) + get_edit_text_bottom(conn, 'revert')  + '''
-                        <button type="submit">''' + await get_lang('revert') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('revert') + '''</button>
                     </form>
                 ''' + preview,
                 '(r' + str(num) + ') (' + await get_lang('revert') + ')',

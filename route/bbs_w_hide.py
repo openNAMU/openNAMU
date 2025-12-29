@@ -24,7 +24,7 @@ async def bbs_w_hide(bbs_num = '', post_num = ''):
                 await get_lang('bbs_post_hide'),
                 await render_simple_set('''
                     <form method="post">
-                        <button type="submit">''' + await get_lang('hide') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('hide') + '''</button>
                     </form>
                 '''),
                 '(' + bbs_name + ')' + ' (' + post_num_str + ')',

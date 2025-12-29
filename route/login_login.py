@@ -60,7 +60,7 @@ async def login_login():
                             <!-- <label><input class="__ON_INPUT__" type="checkbox" name="auto_login"> ''' + await get_lang('auto_login') + ''' (''' + await get_lang('not_working') + ''')</label>
                             <hr class="main_hr"> -->
                             ''' + await captcha_get(conn) + '''
-                            <button type="submit">''' + await get_lang('login') + '''</button>
+                            <button class="__ON_BUTTON__" type="submit">''' + await get_lang('login') + '''</button>
                             ''' + await http_warning() + '''
                         </form>
                         ''',

@@ -39,7 +39,7 @@ async def user_setting_email_check():
                         ''' + b_text + '''
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('key') + '''" name="key" type="text">
                         <hr class="main_hr">
-                        <button type="submit">''' + await get_lang('save') + '''</button>
+                        <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
                     </form>
                 ''',
                 0,
