@@ -30,7 +30,7 @@ async def main_setting_404_page():
                 ['404_file', lang['data']['404_file']]
             ]
 
-            data_html += '<select class="__ON_SELECT__" name="select">'
+            data_html += '<span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="select">'
             for for_a in select_list:
                 selected = ''
                 if set_type['data'] == for_a[0]:
@@ -38,7 +38,7 @@ async def main_setting_404_page():
                     
                 data_html += '<option value="' + for_a[0] + '" ' + selected + '>' + for_a[1] + '</option>'
 
-            data_html += '</select>'
+            data_html += '</select></span>'
             data_html += '<hr class="main_hr">'
 
             form_data = ''

@@ -63,10 +63,10 @@ async def edit_editor(conn, ip, data_main = '', do_type = 'edit', addon = '', na
         editor_display[0] = ''
 
     # 에디터 선택창
-    monaco_editor_top += '<select class="__ON_SELECT__" onclick="do_sync_monaco_and_textarea();" id="opennamu_select_editor" onchange="opennamu_edit_turn_off_monaco();">'
+    monaco_editor_top += '<span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" onclick="do_sync_monaco_and_textarea();" id="opennamu_select_editor" onchange="opennamu_edit_turn_off_monaco();">'
     monaco_editor_top += '<option value="default" ' + ('selected' if editor_display[0] == '' else '') + '>' + await get_lang('default') + '</option>'
     monaco_editor_top += '<option value="monaco" ' + ('selected' if editor_display[1] == '' else '') + '>' + await get_lang('monaco_editor') + '</option>'
-    monaco_editor_top += '</select> '
+    monaco_editor_top += '</select></span> '
 
     # 문법 선택창
     if do_type == 'edit':

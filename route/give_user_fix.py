@@ -55,11 +55,11 @@ async def give_user_fix(user_name = ''):
                         <hr class="main_hr">
                         <a href="/change/user_name/''' + url_pas(user_name) + '''">(''' + await get_lang('change_user_name') + ''')</a>
                         <hr class="main_hr">
-                        <select class="__ON_SELECT__" name="select">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="select">
                             <option value="password_change">''' + await get_lang('password_change') + '''</option>
                             <option value="2fa_password_change">''' + await get_lang('2fa_password_change') + '''</option>
                             <option value="2fa_off">''' + await get_lang('2fa_off') + '''</option>
-                        </select>
+                        </select></span>
                         <hr class="main_hr">
                         ''' + await get_lang('password_change') + ''' | ''' + await get_lang('2fa_password_change') + '''
                         <hr class="main_hr">

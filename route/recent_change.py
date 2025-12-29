@@ -199,7 +199,7 @@ async def recent_change(name = '', tool = '', num = 1, set_type = 'normal'):
                 if set_type == 'normal':
                     div = '''
                         <form method="post">
-                            <select class="__ON_SELECT__" name="a">''' + select + '''</select> <select class="__ON_SELECT__" name="b">''' + select + '''</select>
+                            <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="a">''' + select + '''</select></span> <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="b">''' + select + '''</select></span>
                             <button class="__ON_BUTTON__" type="submit">''' + await get_lang('compare') + '''</button>
                         </form>
                         <hr class="main_hr">

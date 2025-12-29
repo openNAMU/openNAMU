@@ -140,10 +140,10 @@ async def bbs_w_edit(bbs_num = '', post_num = '', comment_num = ''):
                                 <a href="/acl/TEST#exp">(''' + await get_lang('reference') + ''')</a>
                                 <h2>''' + await get_lang('acl') + '''</h2>
                                 <h3>''' + await get_lang('post_view_acl') + '''</h3>
-                                <select class="__ON_SELECT__" name="post_view_acl">''' + acl_div[0] + '''</select>
+                                <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="post_view_acl">''' + acl_div[0] + '''</select></span>
 
                                 <h4>''' + await get_lang('post_comment_acl') + '''</h4>
-                                <select class="__ON_SELECT__" name="post_comment_acl">''' + acl_div[1] + '''</select>
+                                <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="post_comment_acl">''' + acl_div[1] + '''</select></span>
 
                                 <h2>''' + await get_lang('markup') + '''</h2>
                                 ''' + await get_lang('not_working') + '''

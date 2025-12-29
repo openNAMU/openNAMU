@@ -125,10 +125,10 @@ async def filter_all_add(tool, name = None):
                         <hr class="main_hr">
                         ''' + await get_lang('inter_wiki_space_change') + '''
                         <hr class="main_hr">
-                        <select class="__ON_SELECT__" name="inter_type">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="inter_type">
                             <option ''' + select[0] + ''' value="url_encode">%20</option>
                             <option ''' + select[1] + ''' value="under_bar">_</option>
-                        </select>
+                        </select></span>
                     '''
                 else:
                     ex = 'youtube.com'
@@ -226,9 +226,9 @@ async def filter_all_add(tool, name = None):
                     <hr class="main_hr">
                     <a href="/acl/Test#exp">''' + await get_lang('acl') + '''</a>
                     <hr class="main_hr">
-                    <select class="__ON_SELECT__" name="acl">
+                    <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="acl">
                         ''' + ''.join(['<option ' + for_a[0] + ' value=' + for_a[1] + '>' + ('normal' if for_a[1] == '' else for_a[1]) + '</option>' for for_a in acl_list]) + '''
-                    </select>
+                    </select></span>
                 '''
             elif tool == 'template':
                 title = await get_lang('template_document_add')

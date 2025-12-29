@@ -21,7 +21,7 @@ def view_set_markup(conn, document_name = '', markup = '', addon = '', disable =
         else:
             markup_html += '<option value="' + (for_a if for_a != 'normal' else default_markup) + '">' + for_a + '</option>'
     
-    markup_html = '<select class="__ON_SELECT__" name="document_markup" ' + disable + ' ' + addon + '>' + markup_html + '</select>'
+    markup_html = '<span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="document_markup" ' + disable + ' ' + addon + '>' + markup_html + '</select></span>'
 
     return markup_html
 
@@ -158,7 +158,7 @@ async def view_set(name = 'Test', multiple = False):
             for i in acl_get_list:
                 data += '' + \
                     '<h' + i[2] + '>' + i[0] + '</h' + i[2] + '>' + \
-                    '<select class="__ON_SELECT__" name="' + i[1] + '" ' + check_ok + '>' + \
+                    '<span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="' + i[1] + '" ' + check_ok + '>' + \
                 ''
 
                 curs.execute(db_change("select data from acl where title = ? and type = ?"), [name, i[1]])
@@ -167,7 +167,7 @@ async def view_set(name = 'Test', multiple = False):
                     check = 'selected="selected"' if acl_data and acl_data[0][0] == data_list else ''
                     data += '<option value="' + data_list + '" ' + check + '>' + (data_list if data_list != '' else 'normal') + '</option>'
 
-                data += '</select>'
+                data += '</select></span>'
                 data += '<hr class="main_hr">'
                 
                 date_value = ''

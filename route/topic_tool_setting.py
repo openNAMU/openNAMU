@@ -94,9 +94,9 @@ async def topic_tool_setting(topic_num = 1):
                 await render_simple_set('''
                     <form method="post">
                         <h2>''' + await get_lang('topic_progress') + '''</h2>
-                        <select class="__ON_SELECT__" name="stop_d">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="stop_d">
                             ''' + stop_d_list + '''
-                        </select>
+                        </select></span>
                         <hr class="main_hr">
                         <label><input class="__ON_INPUT__" type="checkbox" name="agree" value="O" ''' + agree_check + '''> ''' + await get_lang('topic_change_agree') + '''</label>
 

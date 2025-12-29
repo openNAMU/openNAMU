@@ -28,10 +28,10 @@ async def bbs_make():
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('bbs_name') + '''" name="bbs_name">
                         <hr class="main_hr">
                         
-                        <select class="__ON_SELECT__" name="bbs_type">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="bbs_type">
                             <option value="comment">''' + await get_lang('comment_base') + '''</option>
                             <option value="thread">''' + await get_lang('thread_base') + '''</option>
-                        </select>
+                        </select></span>
                         <hr class="main_hr">
                         
                         <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>

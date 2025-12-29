@@ -226,32 +226,32 @@ async def edit_move(name):
                         <hr class="main_hr">
                         
                         <h2>''' + await get_lang('document') + '''</h2>
-                        <select class="__ON_SELECT__" name="move_option">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="move_option">
                             <option value="normal"> ''' + await get_lang('normal') + '''</option>
                             <option value="none"> ''' + await get_lang('dont_move') + '''</option>
                             <option value="reverse"> ''' + await get_lang('replace_move') + '''</option>
                             ''' + ('<option value="merge"> ' + await get_lang('merge_move') + '</option>' if owner_auth == 1 else '') + '''
-                        </select>
+                        </select></span>
                         <hr class="main_hr">
                         <!-- <label><input class="__ON_INPUT__" type="checkbox" name="move_redirect_make"> ''' + await get_lang('move_redirect_make') + '''</label>
                         <hr class="main_hr"> -->
                         
                         <h2>''' + await get_lang('discussion') + '''</h2>
-                        <select class="__ON_SELECT__" name="move_topic_option">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="move_topic_option">
                             <option value="none"> ''' + await get_lang('dont_move') + '''</option>
                             <option value="normal"> ''' + await get_lang('normal') + '''</option>
                             <option value="reverse"> ''' + await get_lang('replace_move') + '''</option>
                             ''' + ('<option value="merge"> ' + await get_lang('merge_move') + '</option>' if owner_auth == 1 else '') + '''
-                        </select>
+                        </select></span>
                         <hr class="main_hr">
 
                         ''' + ((
                             '''<h2>''' + await get_lang('document_set') + '''</h2>
-                            <select class="__ON_SELECT__" name="document_set_option">
+                            <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="document_set_option">
                                 <option value="none"> ''' + await get_lang('dont_move') + '''</option>
                                 <option value="normal"> ''' + await get_lang('normal') + '''</option>
                                 <option value="reverse"> ''' + await get_lang('replace_move') + '''</option>
-                            </select>
+                            </select></span>
                             <hr class="main_hr">
                             '''
                         ) if owner_auth == 1 else '') + '''

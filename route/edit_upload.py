@@ -148,9 +148,9 @@ async def edit_upload():
                         <hr class="main_hr">
                         <input class="__ON_INPUT__" placeholder="''' + await get_lang('file_name') + '''" name="f_name" value="''' + file_name + '''">
                         <hr class="main_hr">
-                        <select class="__ON_SELECT__" name="f_lice_sel">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="f_lice_sel">
                             ''' + license_list + '''
-                        </select>
+                        </select></span>
                         <hr class="main_hr">
                         <textarea class="opennamu_textarea_100 __ON_TEXTAREA__" placeholder="''' + await get_lang('other') + '''" name="f_lice">''' + upload_default + '''</textarea>
                         <hr class="main_hr">

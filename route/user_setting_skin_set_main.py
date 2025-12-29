@@ -170,113 +170,113 @@ async def user_setting_skin_set_main():
                         <h2>''' + await get_lang("render") + '''</h2>
                         <h3>''' + await get_lang("strike") + '''</h3>
                         ''' + set_data_main["main_css_strike"] + '''
-                        <select class="__ON_SELECT__" name="main_css_strike">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_strike">
                             ''' + set_data["main_css_strike"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("bold") + '''</h3>
                         ''' + set_data_main["main_css_bold"] + '''
-                        <select class="__ON_SELECT__" name="main_css_bold">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_bold">
                             ''' + set_data["main_css_bold"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("category") + '''</h3>
                         <h4>''' + await get_lang("position") + '''</h4>
                         ''' + set_data_main["main_css_category_set"] + '''
-                        <select class="__ON_SELECT__" name="main_css_category_set">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_category_set">
                             ''' + set_data["main_css_category_set"] + '''
-                        </select>
+                        </select></span>
                         <h4>''' + await get_lang("category_change_title") + '''</h4>
                         ''' + set_data_main["main_css_category_change_title"] + '''
-                        <select class="__ON_SELECT__" name="main_css_category_change_title">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_category_change_title">
                             ''' + set_data["main_css_category_change_title"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("footnote") + ''' (''' + await get_lang('beta') + ''')</h3>
                         <h4>''' + await get_lang("footnote_render") + '''</h4>
                         ''' + set_data_main["main_css_footnote_set"] + '''
-                        <select class="__ON_SELECT__" name="main_css_footnote_set">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_footnote_set">
                             ''' + set_data["main_css_footnote_set"] + '''
-                        </select>
+                        </select></span>
                         <h4>''' + await get_lang("footnote_number") + '''</h4>
                         ''' + set_data_main["main_css_footnote_number"] + '''
-                        <select class="__ON_SELECT__" name="main_css_footnote_number">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_footnote_number">
                             ''' + set_data["main_css_footnote_number"] + '''
-                        </select>
+                        </select></span>
                         <h4>''' + await get_lang("footnote_real_num_view") + '''</h4>
                         ''' + set_data_main["main_css_view_real_footnote_num"] + '''
-                        <select class="__ON_SELECT__" name="main_css_view_real_footnote_num">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_view_real_footnote_num">
                             ''' + set_data["main_css_view_real_footnote_num"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("include_link") + '''</h3>
                         ''' + set_data_main["main_css_include_link"] + '''
-                        <select class="__ON_SELECT__" name="main_css_include_link">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_include_link">
                             ''' + set_data["main_css_include_link"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("image") + ''' (''' + await get_lang('beta') + ''')</h3>
                         ''' + set_data_main["main_css_image_set"] + '''
-                        <select class="__ON_SELECT__" name="main_css_image_set">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_image_set">
                             ''' + set_data["main_css_image_set"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("toc") + '''</h3>
                         ''' + set_data_main["main_css_toc_set"] + '''
-                        <select class="__ON_SELECT__" name="main_css_toc_set">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_toc_set">
                             ''' + set_data["main_css_toc_set"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("exter_link") + '''</h3>
                         ''' + set_data_main["main_css_exter_link"] + '''
-                        <select class="__ON_SELECT__" name="main_css_exter_link">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_exter_link">
                             ''' + set_data["main_css_exter_link"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("link_delimiter") + '''</h3>
                         ''' + set_data_main["main_css_link_delimiter"] + '''
-                        <select class="__ON_SELECT__" name="main_css_link_delimiter">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_link_delimiter">
                             ''' + set_data["main_css_link_delimiter"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("force_darkmode") + '''</h3>
                         ''' + set_data_main["main_css_darkmode"] + '''
-                        <select class="__ON_SELECT__" name="main_css_darkmode">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_darkmode">
                             ''' + set_data["main_css_darkmode"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("table") + '''</h3>
                         <h4>''' + await get_lang("table_scroll") + '''</h4>
                         ''' + set_data_main["main_css_table_scroll"] + '''
-                        <select class="__ON_SELECT__" name="main_css_table_scroll">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_table_scroll">
                             ''' + set_data["main_css_table_scroll"] + '''
-                        </select>
+                        </select></span>
                         <h4>''' + await get_lang("table_transparent") + '''</h4>
                         ''' + set_data_main["main_css_table_transparent"] + '''
-                        <select class="__ON_SELECT__" name="main_css_table_transparent">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_table_transparent">
                             ''' + set_data["main_css_table_transparent"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("list_view_change") + '''</h3>
                         ''' + set_data_main["main_css_list_view_change"] + '''
-                        <select class="__ON_SELECT__" name="main_css_list_view_change">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_list_view_change">
                             ''' + set_data["main_css_list_view_change"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("view_joke") + '''</h3>
                         ''' + set_data_main["main_css_view_joke"] + '''
-                        <select class="__ON_SELECT__" name="main_css_view_joke">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_view_joke">
                             ''' + set_data["main_css_view_joke"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("math_scroll") + '''</h3>
                         ''' + set_data_main["main_css_math_scroll"] + '''
-                        <select class="__ON_SELECT__" name="main_css_math_scroll">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_math_scroll">
                             ''' + set_data["main_css_math_scroll"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("view_history") + '''</h3>
                         ''' + set_data_main["main_css_view_history"] + '''
-                        <select class="__ON_SELECT__" name="main_css_view_history">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_view_history">
                             ''' + set_data["main_css_view_history"] + '''
-                        </select>
+                        </select></span>
                         <h3>''' + await get_lang("font_size") + '''</h3>
                         ''' + set_data_main["main_css_font_size"] + '''
-                        <select class="__ON_SELECT__" name="main_css_font_size">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_font_size">
                             ''' + set_data["main_css_font_size"] + '''
-                        </select>
+                        </select></span>
                         <h2>''' + await get_lang("edit") + '''</h2>
                         <h3>''' + await get_lang("monaco_editor") + '''</h3>
                         ''' + set_data_main["main_css_monaco"] + '''
-                        <select class="__ON_SELECT__" name="main_css_monaco">
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="main_css_monaco">
                             ''' + set_data["main_css_monaco"] + '''
-                        </select>
+                        </select></span>
                         <hr class="main_hr">
                         <button class="__ON_BUTTON__" type="submit">''' + await get_lang('save') + '''</button>
                     </form>

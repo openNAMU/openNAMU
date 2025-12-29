@@ -142,7 +142,7 @@ async def main_setting_main():
 
                 <span>''' + await get_lang('tls_method') + '''</span>
                 <hr class="main_hr">
-                <select class="__ON_SELECT__" name="http_select">''' + tls_select + '''</select>
+                <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="http_select">''' + tls_select + '''</select></span>
                 <hr class="main_hr">
 
                 <span>''' + await get_lang('domain') + '''</span> (EX : 2du.pythonanywhere.com) (''' + await get_lang('off') + ''' : ''' + await get_lang('empty') + ''')
@@ -175,7 +175,7 @@ async def main_setting_main():
 
                 <span>''' + await get_lang('wiki_load_ip_select') + '''</span> (''' + await get_lang('restart_required') + ''')
                 <hr class="main_hr">
-                <select class="__ON_SELECT__" name="load_ip_select">''' + ip_load_select_data + '''</select>
+                <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="load_ip_select">''' + ip_load_select_data + '''</select></span>
                 
                 <h3>''' + await get_lang('authority_use_list') + '''</h3>
                 
@@ -208,7 +208,7 @@ async def main_setting_main():
                         
                         <span>''' + await get_lang('wiki_skin') + '''</span>
                         <hr class="main_hr">
-                        <select class="__ON_SELECT__" name="skin">''' + await load_skin(d_list[5] if d_list[5] != '' else 'ringo') + '''</select>
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="skin">''' + await load_skin(d_list[5] if d_list[5] != '' else 'ringo') + '''</select></span>
 
                         <h2>''' + await get_lang('render_set') + '''</h2>
                         
@@ -239,7 +239,7 @@ async def main_setting_main():
 
                         <span>''' + await get_lang('encryption_method') + '''</span>
                         <hr class="main_hr">
-                        <select class="__ON_SELECT__" name="encode">''' + encode_select + '''</select>
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="encode">''' + encode_select + '''</select></span>
 
                         <h3>''' + await get_lang('ua') + '''</h3>
                         
@@ -255,7 +255,7 @@ async def main_setting_main():
 
                         <span>''' + await get_lang('update_branch') + '''</span>
                         <hr class="main_hr">
-                        <select class="__ON_SELECT__" name="update">''' + branch_div + '''</select>
+                        <span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="update">''' + branch_div + '''</select></span>
 
                         <span ''' + sqlite_only + '''>
                             <h3>''' + await get_lang('backup') + ''' (''' + await get_lang('sqlite_only') + ''')</h3>
