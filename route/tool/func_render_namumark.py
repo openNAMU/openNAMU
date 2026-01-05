@@ -1426,7 +1426,7 @@ class class_do_render_namumark:
                         include_data = ''
                         if self.parent:
                             include_data_tmp = await self.parent(self.conn,
-                                doc_name = self.doc_name,
+                                doc_name = include_name,
                                 doc_data = db_data[0][0], 
                                 data_type = 'api_include',
                                 parameter = include_change_list

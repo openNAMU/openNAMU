@@ -98,11 +98,11 @@ if sys.version_info < (3, 6):
 
 # Func
 # Func-main
-async def render_template(name, data, sub, menu):
+async def render_template(name, data, sub, menu, other = []):
     other_set = {}
     other_set["name"] = name
     other_set["data"] = data
-    other_set["sub"] = sub
+    other_set["sub"] = [sub] + other
     other_set["menu"] = menu
 
     return await python_to_golang("template", other_set)
@@ -1403,6 +1403,12 @@ async def render_set(conn, doc_name = '', doc_data = '', data_type = 'view', mar
     return_type = True
     if data_type in ['api_from', 'api_view', 'api_thread', 'api_include']:
         return_type = False
+
+    if await acl_check(doc_name, 'render') == 1:
+        if not return_type:
+            return ["", ""]
+        else:
+            return ''
 
     if data_type == '':
         data_type = 'view'

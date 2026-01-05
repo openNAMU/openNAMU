@@ -370,5 +370,6 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
             name_view,
             div,
             sub,
-            menu
+            menu,
+            [r_date, watch_list, description, view_count],
         ), response_data
