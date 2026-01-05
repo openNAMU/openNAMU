@@ -412,19 +412,38 @@ async def do_every_day():
             if await acl_check('', 'all_admin_auth', '', for_a[0]) == 1:
                 curs.execute(db_change("update user_set set data = '☑️' where name = 'user_title' and data = '✅' and id = ?"), [for_a[0]])
 
-        threading.Timer(60 * 60 * 24, do_every_day).start()
+async def daily_loop():
+    while True:
+        await do_every_day()
+        await asyncio.sleep(60 * 60 * 24)
+
+def _run_bg_loop_forever():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.create_task(daily_loop())
+    loop.run_forever()
+
+_daily_task = None
+_daily_thread = None
+
+def start_daily_scheduler():
+    global _daily_task, _daily_thread
+
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        if _daily_thread is None or not _daily_thread.is_alive():
+            _daily_thread = threading.Thread(target = _run_bg_loop_forever, daemon = True)
+            _daily_thread.start()
+    else:
+        if _daily_task is None or _daily_task.done():
+            _daily_task = loop.create_task(daily_loop())
 
 def auto_do_something(data_db_set):
     if data_db_set['type'] == 'sqlite':
         back_up(data_db_set)
 
-    try:
-        loop = asyncio.get_running_loop()
-        loop.create_task(do_every_day())
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(do_every_day())
+    start_daily_scheduler()
 
 auto_do_something(data_db_set)
 
