@@ -1879,16 +1879,14 @@ def get_edit_text_bottom_check_box(conn):
     curs.execute(db_change('select data from other where name = "copyright_checkbox_text"'))
     sql_d = curs.fetchall()
     if sql_d and sql_d[0][0] != '':
+        checked = ''
         if 'bottom_check_box_pass' in flask.session and flask.session['bottom_check_box_pass'] > 0:
-            cccb_text = '' + \
-                sql_d[0][0] + \
-                '<hr class="main_hr">' + \
-            ''
-        else:
-            cccb_text = '' + \
-                '<label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + '</label>' + \
-                '<hr class="main_hr">' + \
-            ''
+            checked = 'checked'
+
+        cccb_text = '' + \
+            '<label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + '</label>' + \
+            '<hr class="main_hr">' + \
+        ''
         
     return cccb_text
 

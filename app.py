@@ -924,7 +924,7 @@ app.route('/api/v2/lang', defaults = { 'legacy' : '' }, methods = ['POST'])(api_
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정
-app.route('/other')(main_tool_other)
+app.route('/other')(golang_view())
 app.route('/manager', methods = ['POST', 'GET'])(main_tool_admin)
 app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_redirect)
 app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(main_tool_redirect)
