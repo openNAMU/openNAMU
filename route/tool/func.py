@@ -1880,11 +1880,11 @@ def get_edit_text_bottom_check_box(conn):
     sql_d = curs.fetchall()
     if sql_d and sql_d[0][0] != '':
         checked = ''
-        if 'bottom_check_box_pass' in flask.session and flask.session['bottom_check_box_pass'] > 0:
+        if flask.session and 'bottom_check_box_pass' in flask.session:
             checked = 'checked'
 
         cccb_text = '' + \
-            '<label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="copyright_agreement" value="yes"> ' + sql_d[0][0] + '</label>' + \
+            '<label class="__ON_CHECKLABEL__"><input class="__ON_CHECKBOX__" type="checkbox" name="copyright_agreement" value="yes" ' + checked + '> ' + sql_d[0][0] + '</label>' + \
             '<hr class="main_hr">' + \
         ''
         
@@ -1901,13 +1901,8 @@ def do_edit_text_bottom_check_box_check(conn, data):
         elif data != 'yes':
             return 1
 
-    if 'bottom_check_box_pass' in flask.session:
-        if flask.session['bottom_check_box_pass'] > 0:
-            flask.session['bottom_check_box_pass'] -= 1
-        else:
-            flask.session['bottom_check_box_pass'] = 5
-    else:
-        flask.session['bottom_check_box_pass'] = 5
+    if not 'bottom_check_box_pass' in flask.session:
+        flask.session['bottom_check_box_pass'] = 1
         
     return 0
 
