@@ -49,14 +49,16 @@ if data_up_date == 1:
             'py -' + python_ver
         ]
         
+        user_opt = [] if getattr(sys, "base_prefix", sys.prefix) != sys.prefix else ["--user"]
+
         for exe_name in run_list:
             try:
-                subprocess.check_call([exe_name, "-m", "pip", "install", "--upgrade", "--user", "-r", "requirements-optional.txt"])
+                subprocess.check_call([exe_name, "-m", "pip", "install", "--upgrade", *user_opt, "-r", "requirements-optional.txt"])
             except:
                 pass
 
             try:
-                subprocess.check_call([exe_name, "-m", "pip", "install", "--upgrade", "--user", "-r", "requirements.txt"])
+                subprocess.check_call([exe_name, "-m", "pip", "install", "--upgrade", *user_opt, "-r", "requirements.txt"])
                 subprocess.Popen([exe_name] + sys.argv)
 
                 os._exit(0)
