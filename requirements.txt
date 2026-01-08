@@ -10,6 +10,7 @@ asyncio
 nest-asyncio
 requests
 
+psutil
 diff-match-patch
 
 pillow

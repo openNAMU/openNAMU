@@ -86,6 +86,7 @@ import nest_asyncio
 import aiohttp
 
 import requests
+import psutil
 from PIL import Image
 
 try:
