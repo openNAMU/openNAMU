@@ -803,7 +803,7 @@ async def update(conn, ver_num, set_data):
         for for_a in curs.fetchall():
             curs.execute(db_change("select distinct id from user_set where name = 'acl' and data = ?"), [for_a[0]])
             for for_b in curs.fetchall():
-                lang_name = get_lang_name(conn, tool = 'inter')
+                lang_name = 'en-US'
                 if lang_name == 'ko-KR':
                     await add_alarm(for_b[0], 'tool:system', '메인 ACL이 권한으로 개편되면서 기존 설정 값이 날라갔으니 권한으로 재설정 해주세요.')
                 else:
@@ -1184,37 +1184,6 @@ def pw_check(conn, data, data2, type_d = 'no', id_d = ''):
     return re_data
         
 # Func-skin
-def easy_minify(data, tool = None):
-    return data
-
-def get_lang_name(conn, tool = ''):
-    curs = conn.cursor()
-
-    if tool != 'inter':
-        ip = ip_check()
-        if ip_or_user(ip) == 0:
-            curs.execute(db_change('select data from user_set where name = "lang" and id = ?'), [ip])
-            rep_data = curs.fetchall()                    
-        elif 'lang' in flask.session:
-            rep_data = [[flask.session['lang']]]
-        else:
-            curs.execute(db_change("select data from other where name = 'language'"))
-            rep_data = curs.fetchall()
-    else:
-        curs.execute(db_change("select data from other where name = 'language'"))
-        rep_data = curs.fetchall()
-
-    if not rep_data or rep_data[0][0] in ('', 'default'):
-        curs.execute(db_change("select data from other where name = 'language'"))
-        rep_data = curs.fetchall()
-
-    if rep_data:
-        lang_name = rep_data[0][0]
-    else:
-        lang_name = 'en-US'
-
-    return lang_name
-
 async def get_lang(data, safe = 0):
     if data in global_lang_data:
         return global_lang_data[data]
@@ -1266,71 +1235,6 @@ async def skin_check(set_n = 0):
     
 def cache_v():
     return '.cache_v289'
-
-def wiki_css(data):
-    # without_DB
-    data += ['' for _ in range(0, 4 - len(data))]
-    
-    data_css = ''
-    data_css_dark = ''
-
-    data_css_ver = cache_v()
-
-    db_data = global_some_set_do("main_css")
-    if db_data:
-        data_css = db_data
-    else:
-        data_css += '<meta http-equiv="Cache-Control" content="max-age=31536000">'
-
-        # External JS
-        data_css += '<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>'
-        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js" integrity="sha512-10MAbvV683nchyNnutInZDUUmwsAF8IpMc8V+qUNPv9wb26Bv9inyKzAdMfmbFdSIgxxjQhBsZq6sEP+UgsqWg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-
-        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.48.0/min/vs/loader.min.js" integrity="sha512-ZG31AN9z/CQD1YDDAK4RUAvogwbJHv6bHrumrnMLzdCrVu4HeAqrUX7Jsal/cbUwXGfaMUNmQU04tQ8XXl5Znw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>'
-        data_css += '<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>'
-
-        # Func JS
-        data_css += '<script defer src="/views/main_css/js/func/func.js' + data_css_ver + '"></script>'
-        
-        data_css += '<script defer src="/views/main_css/js/func/insert_version.js' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/insert_user_info.js' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/insert_version_skin.js' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/insert_http_warning_text.js' + data_css_ver + '"></script>'
-        
-        data_css += '<script defer src="/views/main_css/js/func/ie_end_of_life.js' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/shortcut.js' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/editor.js' + data_css_ver + '"></script>'
-        data_css += '<script defer src="/views/main_css/js/func/render.js' + data_css_ver + '"></script>'
-        
-        # Main CSS
-        data_css += '<link rel="stylesheet" href="/views/main_css/css/main.css' + data_css_ver + '">'
-
-        # External CSS
-        data_css += '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">'
-        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" integrity="sha512-hasIneQUHlh06VNBe7f6ZcHmeRTLIaQWFd43YriJ0UND19bvYRauxthDg8E4eVNPm9bRUhr5JGeqH7FRFXQu5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-        data_css += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.41.0/min/vs/editor/editor.main.min.css" integrity="sha512-MFDhxgOYIqLdcYTXw7en/n5BshKoduTitYmX8TkQ+iJOGjrWusRi8+KmfZOrgaDrCjZSotH2d1U1e/Z1KT6nWw==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-
-        global_some_set_do("main_css", data_css)
-
-    # Darkmode
-    if flask.request.cookies.get('main_css_darkmode', '') == '1':
-        db_data = global_some_set_do("dark_main_css")
-        if db_data:
-            data_css_dark = db_data
-        else:
-            # Main CSS
-            data_css_dark += '<link rel="stylesheet" href="/views/main_css/css/sub/dark.css' + data_css_ver + '">'
-
-            # External CSS
-            data_css_dark += '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/dark.min.css" integrity="sha512-bfLTSZK4qMP/TWeS1XJAR/VDX0Uhe84nN5YmpKk5x8lMkV0D+LwbuxaJMYTPIV13FzEv4CUOhHoc+xZBDgG9QA==" crossorigin="anonymous" referrerpolicy="no-referrer" />'
-
-            global_some_set_do("dark_main_css", data_css_dark)
-
-    data = data[0:2] + ['', data_css] + data[2:3] + [data_css_dark] + data[3:]
-
-    return data
 
 def cut_100(data):
     return ''

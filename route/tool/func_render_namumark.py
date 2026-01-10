@@ -592,11 +592,6 @@ class class_do_render_namumark:
                     video_code = 'https://www.facebook.com/plugins/post.php?href=' + video_code + '&width=' + video_width + '&height=' + video_height
                 elif name_data == 'tiktok':
                     video_code = 'https://www.tiktok.com/embed/v2/' + video_code
-                elif name_data == 'twitter':
-                    video_code = 'https://twitframe.com/show?url=' + video_code
-
-                    if self.darkmode == '1':
-                        video_code += '&theme=dark'
                 elif name_data == 'kakaotv':
                     video_code = re.sub(r'^https:\/\/tv\.kakao\.com\/v\/', '', video_code)
 
@@ -613,11 +608,18 @@ class class_do_render_namumark:
                 video_width = self.get_tool_css_safe(video_width)
                 video_height = self.get_tool_css_safe(video_height)
 
-                data_name = self.get_tool_data_storage(
-                    '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen>',
-                    '</iframe>',
-                    match_org.group(0)
-                )
+                if name_data == "twitter":
+                    data_name = self.get_tool_data_storage(
+                        '<blockquote class="twitter-tweet"><a href="' + video_code + '"></a>',
+                        '</blockquote>',
+                        match_org.group(0)
+                    )
+                else:
+                    data_name = self.get_tool_data_storage(
+                        '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen>',
+                        '</iframe>',
+                        match_org.group(0)
+                    )
 
                 return '<' + data_name + '></' + data_name + '>'
             elif name_data == 'toc':
