@@ -21,7 +21,7 @@
             <link rel="stylesheet" href="/views/ringo/css/dark.css.cache_v3">
         {% endif %}
         <link rel="shortcut icon" href="/views/main_css/file/favicon.ico.cache_v1">
-        {{template_var_1|safe}}
+        {{global_head|safe}}
         {{user_head|safe}}
         {% if sub_title != 0 %}
             <meta name="title" content="{{title}}{{sub_title}} - {{wiki_name}}">
@@ -35,7 +35,7 @@
     <body>
         <header id="main">
             <span id="left">
-                <a id="logo" href="/">{{add_menu|safe}}</a>
+                <a id="logo" href="/">{{wiki_logo|safe}}</a>
             </span>
             <span id="right">
                 <div class="top_cel" id="recent_cel">
@@ -146,7 +146,7 @@
                         {% endif %}
                     </div>
                 </div>
-                {% if template_var_2 != '' %}
+                {% if add_menu != '' %}
                     <div class="top_cel" id="add_cel">
                         <a href="javascript:ringo_opening('add_cel_in');">
                             <span class="iconify" data-icon="ic:baseline-playlist-add" data-inline="true"></span>
@@ -154,7 +154,7 @@
                             <span class="iconify" data-icon="ic:baseline-arrow-drop-down" data-inline="true"></span>
                         </a>
                         <div class="top_cel_in" id="add_cel_in" style="display: none;">
-                            {% for added_top_menu in template_var_2 %}
+                            {% for added_top_menu in add_menu %}
                                 <a href="{{added_top_menu[1]}}">
                                     <span class="iconify" data-icon="ic:baseline-plus" data-inline="true"></span>
                                     {{added_top_menu[0]}}
@@ -222,9 +222,9 @@
                 </article>
             </header>
             <article class="main" id="main_data">
-                {{imp1_7_0|safe}}
+                {{template_var_1|safe}}
                 {{data|safe}}
-                {{imp1_7_2|safe}}
+                {{template_var_3|safe}}
             </article>
             <footer class="not_mobile">
                 <article class="main" id="footer">
@@ -236,7 +236,7 @@
             </footer>
         </section>
         <aside class="do_fixed">
-            {% if imp1_7_1 == '' %}
+            {% if template_var_2 == '' %}
                 <button id="side_button_1" class="side_button selected">{{'edit'|load_lang}}</button><!--
              --><button id="side_button_2" class="side_button">{{'discussion'|load_lang}}</button><!--
              --><button id="side_button_3" class="side_button">{{'bbs'|load_lang}}</button>
@@ -244,7 +244,7 @@
                     Loading...
                 </div>
             {% else %}
-                {{imp1_7_1|safe}}
+                {{template_var_2|safe}}
             {% endif %}
         </aside>
         <div id="nav_bar">
