@@ -933,15 +933,21 @@ app.route('/api/v2/bbs')(api_bbs_list)
 app.route('/api/v2/bbs/main')(api_bbs_exter)
 app.route('/api/v2/bbs/set/<int:bbs_num>/<name>', methods = ['GET', 'PUT'])(api_bbs_w_set)
 app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs_exter)
+
 app.route('/api/v2/bbs/w/<sub_code>', defaults = { 'legacy' : '' })(api_bbs_w)
 app.route('/api/v2/bbs/w/tabom/<sub_code>', methods = ['GET', 'POST'])(api_bbs_w_tabom)
 app.route('/api/v2/bbs/w/comment/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment_exter)
 app.route('/api/v2/bbs/w/comment_one/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment_one_exter)
 
+app.route('/api/v2/bbs/w/page_view/<set_id>/<set_code>')(golang_view())
+app.route('/api/v2/bbs/w/page_view_post/<set_id>/<set_code>')(golang_view())
+
 app.route('/api/v2/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(api_w_watch_list)
 app.route('/api/v2/doc_watch_list/<int:num>/<everything:name>')(api_w_watch_list)
 app.route('/api/v2/set_reset/<everything:name>')(api_w_set_reset)
-app.route('/api/v2/page_view/<everything:name>')(api_w_page_view)
+
+app.route('/api/v2/page_view/<everything:name>')(golang_view())
+app.route('/api/v2/page_view_post/<everything:name>')(golang_view())
 
 app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting_exter)
 

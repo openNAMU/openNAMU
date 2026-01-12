@@ -208,10 +208,16 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                         ''' + bbs_comment_form + '''
                     </form>
                 '''
+                
+                await python_to_golang("get_json", path = "v2/bbs/w/page_view_post/" + url_pas(bbs_num_str) + "/" + url_pas(post_num_str))
+
+                view_count_data = await python_to_golang("get_json", path = "v2/bbs/w/page_view/" + url_pas(bbs_num_str) + "/" + url_pas(post_num_str))
+                view_count = view_count_data['data']
 
                 return await render_template(
                     bbs_name,
                     data,
                     '(' + await get_lang('bbs') + ')',
-                    [['bbs/in/' + bbs_num_str, await get_lang('return')], ['bbs/edit/' + bbs_num_str + '/' + post_num_str, await get_lang('edit')], ['bbs/tool/' + bbs_num_str + '/' + post_num_str, await get_lang('tool')]]
+                    [['bbs/in/' + bbs_num_str, await get_lang('return')], ['bbs/edit/' + bbs_num_str + '/' + post_num_str, await get_lang('edit')], ['bbs/tool/' + bbs_num_str + '/' + post_num_str, await get_lang('tool')]],
+                    [temp_dict['date'], 0, 0, view_count],
                 )

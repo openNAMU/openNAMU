@@ -2,7 +2,6 @@ from .tool.func import *
 
 from .go_api_w_raw import api_w_raw
 from .go_api_w_render import api_w_render
-from .go_api_w_page_view import api_w_page_view
 
 async def view_w(name = 'Test', do_type = '', doc_rev = ''):
     with get_db_connect() as conn:
@@ -197,7 +196,7 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
             end_data = ''
 
         if doc_rev == '':
-            await api_w_page_view(name)
+            await python_to_golang("get_json", path = "v2/page_view_post/" + url_pas(name))
             curs.execute(db_change("select data from data where title = ?"), [name])
         else:
             curs.execute(db_change("select data from history where title = ? and id = ?"), [name, doc_rev])
@@ -320,15 +319,6 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
         r_date = curs.fetchall()
         r_date = r_date[0][0] if r_date else 0
 
-        curs.execute(db_change("select data from other where name = 'not_use_view_count'"))
-        view_count_set = curs.fetchall()
-        if view_count_set and view_count_set[0][0] != "":
-            view_count = 0
-        else:
-            curs.execute(db_change("select set_data from data_set where doc_name = ? and set_name = 'view_count' and doc_rev = ''"), [name])
-            view_count = curs.fetchall()
-            view_count = view_count[0][0] if view_count else 0
-
         div = file_data + user_doc + end_data + category_total
         
         if doc_type == '':
@@ -365,6 +355,9 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
 
         if doc_rev != '':
             sub = '(' + str(doc_rev) + ')'
+
+        view_count_data = await python_to_golang("get_json", path = "v2/page_view/" + url_pas(name))
+        view_count = view_count_data['data']
 
         return await render_template(
             name_view,

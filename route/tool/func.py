@@ -108,7 +108,7 @@ async def render_template(name, data, sub, menu, other = []):
     other_set["sub"] = [sub] + other
     other_set["menu"] = menu
 
-    return await python_to_golang("template", other_set)
+    return await python_to_golang("post", other_set = other_set, path = "template")
 
 global_lang_data = {}
 global_some_set = {}
@@ -147,7 +147,7 @@ def global_some_set_do(set_name, data = None):
     else:
         return None
 
-async def python_to_golang(func_name, other_set = {}):    
+async def python_to_golang(func_name, other_set = {}, path = ''):    
     headers = {}
     if flask.has_request_context():
         if "Cookie" in flask.request.headers:
@@ -171,12 +171,31 @@ async def python_to_golang(func_name, other_set = {}):
                     data = await res.text()
 
                     return data
-    elif func_name == "template":
-        async with aiohttp.ClientSession() as session:
-            async with session.post('http://localhost:' + port_data + "/api/template", data = json_dumps(other_set), headers = headers) as res:
-                data = await res.text()
+    elif path != "":
+        if func_name == "get":
+            async with aiohttp.ClientSession() as session:
+                async with session.get('http://localhost:' + port_data + "/api/" + path, headers = headers) as res:
+                    data = await res.text()
 
-                return data
+                    return data
+        elif func_name == "post":
+            async with aiohttp.ClientSession() as session:
+                async with session.post('http://localhost:' + port_data + "/api/" + path, data = json_dumps(other_set), headers = headers) as res:
+                    data = await res.text()
+
+                    return data
+        elif func_name == "get_json":
+            async with aiohttp.ClientSession() as session:
+                async with session.get('http://localhost:' + port_data + "/api/" + path, headers = headers) as res:
+                    data = await res.json()
+
+                    return data
+        else:
+            async with aiohttp.ClientSession() as session:
+                async with session.post('http://localhost:' + port_data + "/api/" + path, data = json_dumps(other_set), headers = headers) as res:
+                    data = await res.json()
+
+                    return data
     else:
         async with aiohttp.ClientSession() as session:
             async with session.post('http://localhost:' + port_data + '/compatible_api/' + func_name, data = json_dumps(other_set), headers = headers) as res:
