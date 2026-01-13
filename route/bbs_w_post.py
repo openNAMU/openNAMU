@@ -178,17 +178,20 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                 date += '<a href="javascript:opennamu_change_comment(\'0\');">(' + await get_lang('comment') + ')</a> '
                 date += temp_dict['date']
 
-                data = ''
-                data += '<h2>' + html.escape(temp_dict['title']) + '</h2>'
-                data += api_topic_thread_make(
-                    await ip_pas(temp_dict['user_id']),
-                    date,
-                    await render_set(conn, doc_data = temp_dict['data']),
-                    '0',
-                    color = 'red'
-                )
+                data = '<div class="opennamu_bbs_w_post_tab">'
+                data += '<big><big><big>' + html.escape(temp_dict['title']) + '</big></big></big>'
+                data += '<hr class="main_hr">'
+                data += await ip_pas(temp_dict['user_id']) + '<span style="float: right;">' + date + '</span>'
+                data += '<hr>'
+                data += '<div class="opennamu_bbs_w_post_tab_content">' + await render_set(conn, doc_data = temp_dict['data']) + '</div>'
+                data += '</div>'
+
+                if bbs_comment_acl == 0:
+                    data += '<hr class="main_hr">'
+                    data += '<div id="opennamu_bbs_w_post_tabom"></div>'
 
                 data += '' + \
+                    '<hr>' + \
                     '<div id="opennamu_bbs_w_post"></div>' + \
                     '<script defer src="/views/main_css/js/route/topic.js' + cache_v() + '"></script>' + \
                     '<script defer src="/views/main_css/js/route/bbs_w_post.js' + cache_v() + '"></script>' + \
@@ -198,7 +201,6 @@ async def bbs_w_post(bbs_num = '', post_num = ''):
                 bbs_comment_form = ''
                 if bbs_comment_acl == 0:
                     bbs_comment_form += '''
-                        <div id="opennamu_bbs_w_post_tabom"></div>
                         <div id="opennamu_bbs_w_post_select"></div>
                         ''' + await edit_editor(conn, ip, '', 'bbs_comment') + '''
                     '''
