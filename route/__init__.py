@@ -164,7 +164,6 @@ from route.n_topic_list import topic_list
 
 from route.n_give_auth import give_auth
 
-from route.n_bbs_in import bbs_in
 from route.n_bbs_w_set import bbs_w_set
 
 from route.n_edit_move_all import edit_move_all

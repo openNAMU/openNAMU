@@ -1205,21 +1205,28 @@ def pw_check(conn, data, data2, type_d = 'no', id_d = ''):
 # Func-skin
 async def get_lang(data, safe = 0):
     if data in global_lang_data:
-        return global_lang_data[data]
+        if safe == 1:
+            return html.unescape(global_lang_data[data])
+        else:
+            return global_lang_data[data]
     else:
         lang = json_loads(open(os.path.join('lang', 'en-US.json'), encoding = 'utf-8').read())
 
         other_set = {}
         other_set["data"] = ' '.join([title for title in lang if title[0] != '_'])
         other_set["legacy"] = ""
+        other_set["safe"] = ""
 
         res = await python_to_golang('api_func_language', other_set)
         if res['response'] == 'ok':
             for load_data in res['data']:
                 global_lang_data[load_data] = res['data'][load_data]
-        
+
         if data in global_lang_data:
-            return global_lang_data[data]
+            if safe == 1:
+                return html.unescape(global_lang_data[data])
+            else:
+                return global_lang_data[data]
         else:
             return data + ' (M)'
 

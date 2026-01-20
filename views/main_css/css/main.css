@@ -510,6 +510,8 @@
 
     background-size: 100% 100%;
     background-origin: content-box;
+    
+    box-sizing: content-box;
 }
 
 .opennamu_main .opennamu_bbs_w_post_tab {
