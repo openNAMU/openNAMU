@@ -162,7 +162,9 @@ async def python_to_golang(func_name, other_set = {}, path = ''):
     if func_name == "same":
         async with aiohttp.ClientSession() as session:
             if flask.request.method == 'POST':
-                async with session.post('http://localhost:' + port_data + flask.request.path, data = json_dumps(other_set), headers = headers) as res:
+                form_data = flask.request.form.to_dict(flat = False)
+
+                async with session.post('http://localhost:' + port_data + flask.request.path, data = form_data, headers = headers) as res:
                     data = await res.text()
 
                     return data

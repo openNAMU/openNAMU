@@ -667,8 +667,8 @@ app.route('/recent_change')(golang_view())
 app.route('/recent_changes')(golang_view())
 app.route('/recent_change/<int:num>/<set_type>')(golang_view())
 
-app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(list_recent_discuss)
-app.route('/recent_discuss/<int:num>/<tool>')(list_recent_discuss)
+app.route('/recent_discuss')(golang_view())
+app.route('/recent_discuss/<int:num>/<tool>')(golang_view())
 
 # Func-history
 app.route('/recent_edit_request')(recent_edit_request)

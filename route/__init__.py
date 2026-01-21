@@ -156,7 +156,6 @@ from route.vote_end import vote_end
 from route.vote_list import vote_list
 from route.vote_select import vote_select
 
-from route.n_list_recent_discuss import list_recent_discuss
 from route.n_list_recent_block import list_recent_block
 from route.n_list_user_check_submit import list_user_check_submit
 
