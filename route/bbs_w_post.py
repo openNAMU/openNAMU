@@ -7,52 +7,6 @@ from .go_api_topic import api_topic_thread_make, api_topic_thread_pre_render
 
 from .edit import edit_editor
 
-async def bbs_w_post_comment(conn, user_id, sub_code, comment_num, bbs_num_str, post_num_str):
-    comment_data = ''
-    comment_select = ''
-
-    comment_count = 0
-    comment_add_count = 0
-
-    thread_data = await api_bbs_w_comment(sub_code)
-
-    for temp_dict in thread_data:
-        if temp_dict['comment_user_id'] != '':
-            color = 'default'
-            if user_id == temp_dict['comment_user_id']:
-                color = 'green'
-
-            sub_code_check = re.sub(r'^[0-9]+-[0-9]+-', '', temp_dict['id'] + '-' + temp_dict['code'])
-            margin_count = sub_code_check.count('-')
-
-            if margin_count == 0:
-                comment_count += 1
-            else:
-                comment_add_count += 1
-
-            date = ''
-            date += '<a href="javascript:opennamu_change_comment(\'' + sub_code_check + '\');">(' + await get_lang('comment') + ')</a> '
-            date += '<a href="/bbs/tool/' + bbs_num_str + '/' + post_num_str + '/' + sub_code_check + '">(' + await get_lang('tool') + ')</a> '
-            date += temp_dict['comment_date']
-
-            comment_data += '<span style="padding-left: 20px;"></span>' * margin_count
-            comment_data += api_topic_thread_make(
-                await ip_pas(temp_dict['comment_user_id']),
-                date,
-                await render_set(conn, doc_data = temp_dict['comment']),
-                sub_code_check,
-                color = color,
-                add_style = 'width: calc(100% - ' + str(margin_count * 20) + 'px);'
-            )
-
-            comment_default = ''
-            if comment_num == sub_code_check:
-                comment_default = 'selected'
-
-            comment_select += '<option value="' + sub_code_check + '" ' + comment_default + '>' + sub_code_check + '</option>'
-
-    return (comment_data, comment_select, comment_count, comment_add_count)
-
 async def bbs_w_post(bbs_num = '', post_num = ''):
     with get_db_connect() as conn:
         curs = conn.cursor()
