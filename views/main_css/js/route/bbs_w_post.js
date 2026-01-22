@@ -55,7 +55,7 @@ function opennamu_load_comment() {
     }).then(function(lang) {
         lang = lang["data"];
 
-        fetch('/api/v2/bbs/w/comment/' + bbs_id + '-' + bbs_code + '/normal').then(function(res) {
+        fetch('/api/v2/bbs/w/comment/' + bbs_id + '-' + bbs_code + '/around').then(function(res) {
             return res.json();
         }).then(function(data) {
             let data_html = '';
