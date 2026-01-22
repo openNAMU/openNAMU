@@ -254,7 +254,7 @@ async def golang_process_check():
                 "ip" : "127.0.0.1"
             }
 
-            response = requests.post('http://localhost:' + server_set["golang_port"] + '/compatible_api/test', data = json_dumps(other_set))
+            response = requests.post('http://127.0.0.1:' + server_set["golang_port"] + '/compatible_api/test', data = json_dumps(other_set))
             if response.status_code == 200:
                 print('Golang turn on')
                 break
@@ -482,7 +482,7 @@ def auto_do_something(data_db_set):
 
 auto_do_something(data_db_set)
 
-print('Now running... http://localhost:' + server_set['port'])
+print('Now running... http://127.0.0.1:' + server_set['port'])
 
 @app.before_request
 def before_request_func():

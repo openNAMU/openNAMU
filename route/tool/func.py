@@ -164,43 +164,43 @@ async def python_to_golang(func_name, other_set = {}, path = ''):
             if flask.request.method == 'POST':
                 form_data = flask.request.form.to_dict(flat = False)
 
-                async with session.post('http://localhost:' + port_data + flask.request.path, data = form_data, headers = headers) as res:
+                async with session.post('http://127.0.0.1:' + port_data + flask.request.path, data = form_data, headers = headers) as res:
                     data = await res.text()
 
                     return data
             else:
-                async with session.get('http://localhost:' + port_data + flask.request.path, headers = headers) as res:
+                async with session.get('http://127.0.0.1:' + port_data + flask.request.path, headers = headers) as res:
                     data = await res.text()
 
                     return data
     elif path != "":
         if func_name == "get":
             async with aiohttp.ClientSession() as session:
-                async with session.get('http://localhost:' + port_data + "/api/" + path, headers = headers) as res:
+                async with session.get('http://127.0.0.1:' + port_data + "/api/" + path, headers = headers) as res:
                     data = await res.text()
 
                     return data
         elif func_name == "post":
             async with aiohttp.ClientSession() as session:
-                async with session.post('http://localhost:' + port_data + "/api/" + path, data = json_dumps(other_set), headers = headers) as res:
+                async with session.post('http://127.0.0.1:' + port_data + "/api/" + path, data = json_dumps(other_set), headers = headers) as res:
                     data = await res.text()
 
                     return data
         elif func_name == "get_json":
             async with aiohttp.ClientSession() as session:
-                async with session.get('http://localhost:' + port_data + "/api/" + path, headers = headers) as res:
+                async with session.get('http://127.0.0.1:' + port_data + "/api/" + path, headers = headers) as res:
                     data = await res.json()
 
                     return data
         else:
             async with aiohttp.ClientSession() as session:
-                async with session.post('http://localhost:' + port_data + "/api/" + path, data = json_dumps(other_set), headers = headers) as res:
+                async with session.post('http://127.0.0.1:' + port_data + "/api/" + path, data = json_dumps(other_set), headers = headers) as res:
                     data = await res.json()
 
                     return data
     else:
         async with aiohttp.ClientSession() as session:
-            async with session.post('http://localhost:' + port_data + '/compatible_api/' + func_name, data = json_dumps(other_set), headers = headers) as res:
+            async with session.post('http://127.0.0.1:' + port_data + '/compatible_api/' + func_name, data = json_dumps(other_set), headers = headers) as res:
                 data = await res.json()
 
                 if "response" in data and data["response"] == "error":
@@ -413,7 +413,7 @@ class class_check_json:
         if do_check_mysql_env():
             # ['user', 'password', 'host', 'port']
             set_data_mysql = {}
-            set_data_mysql['host'] = os.getenv('NAMU_DB_HOST') if os.getenv('NAMU_DB_HOST') else 'localhost'
+            set_data_mysql['host'] = os.getenv('NAMU_DB_HOST') if os.getenv('NAMU_DB_HOST') else '127.0.0.1'
             set_data_mysql['port'] = os.getenv('NAMU_DB_PORT') if os.getenv('NAMU_DB_PORT') else 3306
 
             if not os.getenv('NAMU_DB_USER'):
@@ -445,10 +445,10 @@ class class_check_json:
             print('DB password : ', end = '')
             set_data_mysql['password'] = str(input())
 
-            print('DB host (localhost) : ', end = '')
+            print('DB host (127.0.0.1) : ', end = '')
             set_data_mysql['host'] = str(input())
             if set_data_mysql['host'] == '':
-                set_data_mysql['host'] = 'localhost'
+                set_data_mysql['host'] = '127.0.0.1'
 
             print('DB port (3306) : ', end = '')
             set_data_mysql['port'] = str(input())
@@ -463,7 +463,7 @@ class class_check_json:
         if 'host' in set_data_mysql:
             data_db_set['mysql_host'] = set_data_mysql['host']
         else:
-            data_db_set['mysql_host'] = 'localhost'
+            data_db_set['mysql_host'] = '127.0.0.1'
 
         if 'port' in set_data_mysql:
             data_db_set['mysql_port'] = set_data_mysql['port']
@@ -566,7 +566,7 @@ async def update(conn, ver_num, set_data):
         get_data_mysql = json_loads(open('data/mysql.json', encoding = 'utf8').read())
         
         with open('data/mysql.json', 'w') as f:
-            f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "localhost" }')
+            f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "127.0.0.1" }')
 
     if ver_num < 3183603:
         curs.execute(db_change("select block from ban where band = 'O'"))
