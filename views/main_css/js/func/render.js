@@ -316,3 +316,89 @@ function opennamu_do_toc() {
         return '<div class="opennamu_TOC" id="toc"><div class="opennamu_TOC_title">TOC</div><br>' + toc_html + '</div>';
     });
 }
+
+function opennamu_do_render(to_obj, data, name = '', do_type = '', option = '', callback = undefined) {
+    let url;
+    if (do_type === '') {
+        url = "/api/render";
+    } else {
+        url = "/api/render/" + do_type;
+    }
+
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            'name': name,
+            'data': data,
+            'option': option
+        })
+    }).then(response => {
+        if(!response.ok) {
+            throw new Error(`API 호출 실패: ${response.status}`);
+        }
+
+        return response.json();
+    }).then(text => {
+        if(document.getElementById(to_obj)) {
+            if(text["data"]) {
+                document.getElementById(to_obj).innerHTML = text["data"];
+                eval(text["js_data"]);
+            } else {
+                document.getElementById(to_obj).innerHTML = '';
+            }
+
+            if(callback) {
+                callback();
+            }
+        }
+    }).catch(err => {
+        console.error('렌더링 호출 중 오류 발생:', err);
+        if(document.getElementById(to_obj)) {
+            document.getElementById(to_obj).innerHTML = '렌더링에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+        }
+    });
+}
+
+function opennamu_do_render_with_dom(to_obj, from_obj, name = '', do_type = '', option = '', callback = undefined) {
+    let url;
+    if (do_type === '') {
+        url = "/api/render";
+    } else {
+        url = "/api/render/" + do_type;
+    }
+
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            'name': name,
+            'data': opennamu_xss_filter_decode(document.getElementById(from_obj).innerHTML),
+            'option': option
+        })
+    }).then(response => {
+        if(!response.ok) {
+            throw new Error(`API 호출 실패: ${response.status}`);
+        }
+
+        return response.json();
+    }).then(text => {
+        if(document.getElementById(to_obj)) {
+            if(text["data"]) {
+                document.getElementById(to_obj).innerHTML = text["data"];
+                eval(text["js_data"]);
+            } else {
+                document.getElementById(to_obj).innerHTML = '';
+            }
+
+            if(callback) {
+                callback();
+            }
+        }
+    }).catch(err => {
+        console.error('렌더링 호출 중 오류 발생:', err);
+        if(document.getElementById(to_obj)) {
+            document.getElementById(to_obj).innerHTML = '렌더링에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+        }
+    });
+}

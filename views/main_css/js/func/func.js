@@ -240,52 +240,6 @@ function opennamu_do_trace_spread() {
     }
 }
 
-function opennamu_do_render(to_obj, data, name = '', do_type = '', option = '', callback = undefined) {
-    let url;
-    if (do_type === '') {
-        url = "/api/render";
-    } else {
-        url = "/api/render/" + do_type;
-    }
-
-    fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-            'name': name,
-            'data': data,
-            'option': option
-        })
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`API 호출 실패: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(text => {
-            if (document.getElementById(to_obj)) {
-                if (text["data"]) {
-                    document.getElementById(to_obj).innerHTML = text["data"];
-                    eval(text["js_data"]);
-                } else {
-                    document.getElementById(to_obj).innerHTML = '';
-                }
-
-                if (callback) {
-                    callback();
-                }
-            }
-        })
-        .catch(err => {
-            console.error('렌더링 호출 중 오류 발생:', err);
-            if (document.getElementById(to_obj)) {
-                document.getElementById(to_obj).innerHTML = '렌더링에 실패했습니다. 잠시 후 다시 시도해 주세요.';
-            }
-        });
-}
-
-
 function opennamu_page_control(url, page, data_length, data_length_max = 50) {
     let next = function() {
         if(data_length_max === data_length) {

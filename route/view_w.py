@@ -359,6 +359,14 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
         view_count_data = await python_to_golang("get_json", path = "v2/page_view/" + url_pas(name))
         view_count = view_count_data['data']
 
+        other_set = {}
+        other_set['doc_name'] = name
+
+        comment_api = await python_to_golang("api_w_comment", other_set = other_set)
+        comment = comment_api['data']
+
+        div += comment
+
         return await render_template(
             name_view,
             div,
