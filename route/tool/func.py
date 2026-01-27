@@ -299,14 +299,25 @@ class get_db_connect:
             while self.conn == None and try_cnt <= max_try:
                 try:
                     if self.init_mode:
-                        self.conn = pymysql.connect(
-                            host = self.db_set['db_mysql_host'],
-                            user = self.db_set['db_mysql_user'],
-                            password = self.db_set['db_mysql_pw'],
-                            charset = 'utf8mb4',
-                            port = int(self.db_set['db_mysql_port']),
-                            autocommit = True
-                        )
+                        try:
+                            self.conn = pymysql.connect(
+                                host = self.db_set['db_mysql_host'],
+                                user = self.db_set['db_mysql_user'],
+                                password = self.db_set['db_mysql_pw'],
+                                charset = 'utf8mb4',
+                                port = int(self.db_set['db_mysql_port']),
+                                autocommit = True,
+                                db = self.db_set['db_name']
+                            )
+                        except pymysql.err.OperationalError:
+                            self.conn = pymysql.connect(
+                                host = self.db_set['db_mysql_host'],
+                                user = self.db_set['db_mysql_user'],
+                                password = self.db_set['db_mysql_pw'],
+                                charset = 'utf8mb4',
+                                port = int(self.db_set['db_mysql_port']),
+                                autocommit = True
+                            )
                     else:
                         self.conn = pymysql.connect(
                             host = self.db_set['db_mysql_host'],
@@ -323,6 +334,7 @@ class get_db_connect:
                 finally:
                     if self.conn == None:
                         try_cnt += 1
+                        
                         time.sleep(1)
 
             if self.conn == None:
