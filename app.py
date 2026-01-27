@@ -35,15 +35,22 @@ with get_db_connect(init_mode = True) as conn:
     except:
         setup_tool = 'init'
 
+    old_ver = ""
+
     if setup_tool != 'init':
         ver_set_data = curs.fetchall()
         if ver_set_data:
-            if int(version_list['c_ver']) > int(ver_set_data[0][0]):
+            old_ver = ver_set_data[0][0]
+            if int(version_list['c_ver']) > int(old_ver):
                 setup_tool = 'update'
             else:
                 setup_tool = 'normal'
         else:
             setup_tool = 'init'
+
+    print("Run Mode : " + run_mode)
+    print("Setup Tool : " + setup_tool)
+    print("Old Version : " + old_ver)
 
     if run_mode != 'dev':
         file_name = linux_exe_chmod()
