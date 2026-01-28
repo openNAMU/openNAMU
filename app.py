@@ -708,9 +708,9 @@ app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type
 app.route('/doc_watch_list/<int:num>/<everything:name>')(golang_view())
 app.route('/doc_star_doc/<int:num>/<everything:name>')(golang_view())
 
-app.route('/raw/<everything:name>')(view_w_raw)
-app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 'on' })(view_w_raw)
-app.route('/raw_rev/<int(signed = True):rev>/<everything:name>')(view_w_raw)
+app.route('/raw/<everything:name>')(golang_view())
+app.route('/raw_acl/<everything:name>')(golang_view())
+app.route('/raw_rev/<int(signed = True):rev>/<everything:name>')(golang_view())
 
 app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')(view_diff)
 
