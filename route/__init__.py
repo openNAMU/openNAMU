@@ -144,6 +144,7 @@ from route.user_watch_list_name import user_watch_list_name
 from route.view_set import view_set
 from route.view_diff import view_diff
 from route.view_w import view_w
+from route.view_raw import view_raw
 from route.view_xref import view_xref
 
 from route.vote_add import vote_add
