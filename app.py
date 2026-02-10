@@ -714,7 +714,7 @@ app.route('/raw_rev/<int(signed = True):rev>/<everything:name>')(golang_view())
 
 app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')(view_diff)
 
-app.route('/down/<everything:name>')(view_down)
+app.route('/down/<everything:name>')(golang_view())
 
 app.route('/acl_multiple', defaults = { 'multiple' : True }, methods = ['POST', 'GET'])(view_set)
 app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_set)
