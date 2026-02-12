@@ -35,15 +35,22 @@ with get_db_connect(init_mode = True) as conn:
     except:
         setup_tool = 'init'
 
+    old_ver = ""
+
     if setup_tool != 'init':
         ver_set_data = curs.fetchall()
         if ver_set_data:
-            if int(version_list['c_ver']) > int(ver_set_data[0][0]):
+            old_ver = ver_set_data[0][0]
+            if int(version_list['c_ver']) > int(old_ver):
                 setup_tool = 'update'
             else:
                 setup_tool = 'normal'
         else:
             setup_tool = 'init'
+
+    print("Run Mode : " + run_mode)
+    print("Setup Tool : " + setup_tool)
+    print("Old Version : " + old_ver)
 
     if run_mode != 'dev':
         file_name = linux_exe_chmod()
@@ -254,7 +261,7 @@ async def golang_process_check():
                 "ip" : "127.0.0.1"
             }
 
-            response = requests.post('http://localhost:' + server_set["golang_port"] + '/compatible_api/test', data = json_dumps(other_set))
+            response = requests.post('http://127.0.0.1:' + server_set["golang_port"] + '/compatible_api/test', data = json_dumps(other_set))
             if response.status_code == 200:
                 print('Golang turn on')
                 break
@@ -482,7 +489,7 @@ def auto_do_something(data_db_set):
 
 auto_do_something(data_db_set)
 
-print('Now running... http://localhost:' + server_set['port'])
+print('Now running... http://127.0.0.1:' + server_set['port'])
 
 @app.before_request
 def before_request_func():
@@ -646,29 +653,29 @@ app.route('/auth/give/fix/<user_name>', methods = ['POST', 'GET'])(give_user_fix
 app.route('/app_submit', methods = ['POST', 'GET'])(recent_app_submit)
 
 # /auth/history
-app.route('/recent_block')(list_recent_block)
-app.route('/recent_block/all')(list_recent_block)
-app.route('/recent_block/all/<int:num>')(list_recent_block)
-app.route('/recent_block/all/<int:num>/<everything:why>')(list_recent_block)
-app.route('/recent_block/user/<user_name>', defaults = { 'tool' : 'user' })(list_recent_block)
-app.route('/recent_block/user/<user_name>/<int:num>', defaults = { 'tool' : 'user' })(list_recent_block)
-app.route('/recent_block/admin/<user_name>', defaults = { 'tool' : 'admin' })(list_recent_block)
-app.route('/recent_block/admin/<user_name>/<int:num>', defaults = { 'tool' : 'admin' })(list_recent_block)
-app.route('/recent_block/regex', defaults = { 'tool' : 'regex' })(list_recent_block)
-app.route('/recent_block/regex/<int:num>', defaults = { 'tool' : 'regex' })(list_recent_block)
-app.route('/recent_block/cidr', defaults = { 'tool' : 'cidr' })(list_recent_block)
-app.route('/recent_block/cidr/<int:num>', defaults = { 'tool' : 'cidr' })(list_recent_block)
-app.route('/recent_block/private', defaults = { 'tool' : 'private' })(list_recent_block)
-app.route('/recent_block/private/<int:num>', defaults = { 'tool' : 'private' })(list_recent_block)
-app.route('/recent_block/ongoing', defaults = { 'tool' : 'ongoing' })(list_recent_block)
-app.route('/recent_block/ongoing/<int:num>', defaults = { 'tool' : 'ongoing' })(list_recent_block)
+app.route('/recent_block')(golang_view())
+app.route('/recent_block/all')(golang_view())
+app.route('/recent_block/all/<int:num>')(golang_view())
+app.route('/recent_block/all/<int:num>/<everything:why>')(golang_view())
+app.route('/recent_block/user/<user_name>')(golang_view())
+app.route('/recent_block/user/<user_name>/<int:num>')(golang_view())
+app.route('/recent_block/admin/<user_name>')(golang_view())
+app.route('/recent_block/admin/<user_name>/<int:num>')(golang_view())
+app.route('/recent_block/regex')(golang_view())
+app.route('/recent_block/regex/<int:num>')(golang_view())
+app.route('/recent_block/cidr')(golang_view())
+app.route('/recent_block/cidr/<int:num>')(golang_view())
+app.route('/recent_block/private')(golang_view())
+app.route('/recent_block/private/<int:num>')(golang_view())
+app.route('/recent_block/ongoing')(golang_view())
+app.route('/recent_block/ongoing/<int:num>')(golang_view())
 
 app.route('/recent_change')(golang_view())
 app.route('/recent_changes')(golang_view())
 app.route('/recent_change/<int:num>/<set_type>')(golang_view())
 
-app.route('/recent_discuss', defaults = { 'tool' : 'normal' })(list_recent_discuss)
-app.route('/recent_discuss/<int:num>/<tool>')(list_recent_discuss)
+app.route('/recent_discuss')(golang_view())
+app.route('/recent_discuss/<int:num>/<tool>')(golang_view())
 
 # Func-history
 app.route('/recent_edit_request')(recent_edit_request)
@@ -701,13 +708,13 @@ app.route('/xref_this_page/<int:num>/<everything:name>', defaults = { 'xref_type
 app.route('/doc_watch_list/<int:num>/<everything:name>')(golang_view())
 app.route('/doc_star_doc/<int:num>/<everything:name>')(golang_view())
 
-app.route('/raw/<everything:name>')(view_w_raw)
-app.route('/raw_acl/<everything:name>', defaults = { 'doc_acl' : 'on' })(view_w_raw)
-app.route('/raw_rev/<int(signed = True):rev>/<everything:name>')(view_w_raw)
+app.route('/raw/<everything:name>')(golang_view())
+app.route('/raw_acl/<everything:name>')(golang_view())
+app.route('/raw_rev/<int(signed = True):rev>/<everything:name>')(golang_view())
 
 app.route('/diff/<int(signed = True):num_a>/<int(signed = True):num_b>/<everything:name>')(view_diff)
 
-app.route('/down/<everything:name>')(view_down)
+app.route('/down/<everything:name>')(golang_view())
 
 app.route('/acl_multiple', defaults = { 'multiple' : True }, methods = ['POST', 'GET'])(view_set)
 app.route('/acl/<everything:name>', methods = ['POST', 'GET'])(view_set)
@@ -842,13 +849,14 @@ app.route('/vote/add', methods = ['POST', 'GET'])(vote_add)
 # Func-bbs
 app.route('/bbs/main')(golang_view())
 app.route('/bbs/make', methods = ['POST', 'GET'])(bbs_make)
-app.route('/bbs/in/<int:bbs_num>')(bbs_in)
-app.route('/bbs/in/<int:bbs_num>/<int:page>')(bbs_in)
+app.route('/bbs/in/<int:bbs_num>')(golang_view())
+app.route('/bbs/in/<int:bbs_num>/<int:page>')(golang_view())
 # app.route('/bbs/blind/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_hide)
 app.route('/bbs/delete/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_delete)
 app.route('/bbs/set/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_set)
 app.route('/bbs/edit/<int:bbs_num>', methods = ['POST', 'GET'])(bbs_w_edit)
-app.route('/bbs/w/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_post)
+app.route('/bbs/w/<int:bbs_num>/<int:post_num>', methods = ['POST'])(bbs_w_post)
+app.route('/bbs/w/<int:bbs_num>/<int:post_num>', methods = ['GET'])(golang_view())
 # app.route('/bbs/blind/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_hide)
 app.route('/bbs/pinned/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_pinned)
 app.route('/bbs/delete/<int:bbs_num>/<int:post_num>', methods = ['POST', 'GET'])(bbs_w_delete)
@@ -933,15 +941,21 @@ app.route('/api/v2/bbs')(api_bbs_list)
 app.route('/api/v2/bbs/main')(api_bbs_exter)
 app.route('/api/v2/bbs/set/<int:bbs_num>/<name>', methods = ['GET', 'PUT'])(api_bbs_w_set)
 app.route('/api/v2/bbs/in/<int:bbs_num>/<int:page>')(api_bbs_exter)
+
 app.route('/api/v2/bbs/w/<sub_code>', defaults = { 'legacy' : '' })(api_bbs_w)
 app.route('/api/v2/bbs/w/tabom/<sub_code>', methods = ['GET', 'POST'])(api_bbs_w_tabom)
 app.route('/api/v2/bbs/w/comment/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment_exter)
 app.route('/api/v2/bbs/w/comment_one/<sub_code>/<tool>', defaults = { 'legacy' : '' })(api_bbs_w_comment_one_exter)
 
+app.route('/api/v2/bbs/w/page_view/<set_id>/<set_code>')(golang_view())
+app.route('/api/v2/bbs/w/page_view_post/<set_id>/<set_code>')(golang_view())
+
 app.route('/api/v2/doc_star_doc/<int:num>/<everything:name>', defaults = { 'do_type' : 'star_doc' })(api_w_watch_list)
 app.route('/api/v2/doc_watch_list/<int:num>/<everything:name>')(api_w_watch_list)
 app.route('/api/v2/set_reset/<everything:name>')(api_w_set_reset)
-app.route('/api/v2/page_view/<everything:name>')(api_w_page_view)
+
+app.route('/api/v2/page_view/<everything:name>')(golang_view())
+app.route('/api/v2/page_view_post/<everything:name>')(golang_view())
 
 app.route('/api/v2/setting/<name>', methods = ['GET', 'PUT'])(api_setting_exter)
 
@@ -964,13 +978,18 @@ app.route('/manager', methods = ['POST', 'GET'])(main_tool_admin)
 app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_redirect)
 app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(main_tool_redirect)
 
-app.route('/search', methods=['POST'])(main_search)
-app.route('/search/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
-app.route('/search_page/<int:num>/<everything:name>', methods = ['POST', 'GET'])(main_search_deep)
-app.route('/search_data/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
-app.route('/search_data_page/<int:num>/<everything:name>', defaults = { 'search_type' : 'data' }, methods = ['POST', 'GET'])(main_search_deep)
-app.route('/goto', methods=['POST'])(main_search_goto)
-app.route('/goto/<everything:name>', methods=['GET', 'POST'])(main_search_goto)
+app.route('/goto', methods = ['POST'])(golang_view())
+app.route('/goto/<everything:name>', methods = ['GET', 'POST'])(golang_view())
+app.route('/search', methods = ['POST'])(golang_view())
+app.route('/search/<everything:name>', methods = ['POST'])(golang_view())
+app.route('/search_page/<int:num>/<everything:name>', methods = ['POST'])(golang_view())
+app.route('/search_data/<everything:name>', methods = ['POST'])(golang_view())
+app.route('/search_data_page/<int:num>/<everything:name>', methods = ['POST'])(golang_view())
+
+app.route('/search/<everything:name>', methods = ['GET'])(golang_view())
+app.route('/search_page/<int:num>/<everything:name>', methods = ['GET'])(golang_view())
+app.route('/search_data/<everything:name>', methods = ['GET'])(golang_view())
+app.route('/search_data_page/<int:num>/<everything:name>', methods = ['GET'])(golang_view())
 
 app.route('/setting')(main_setting)
 app.route('/setting/main', methods = ['POST', 'GET'])(main_setting_main)

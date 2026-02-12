@@ -143,12 +143,9 @@ from route.user_watch_list_name import user_watch_list_name
 
 from route.view_set import view_set
 from route.view_diff import view_diff
-from route.view_down import view_down
-from route.view_raw import view_raw
-from route.view_w_raw import view_w_raw
 from route.view_w import view_w
+from route.view_raw import view_raw
 from route.view_xref import view_xref
-from route.view_random import view_random
 
 from route.vote_add import vote_add
 from route.vote_close import vote_close
@@ -156,15 +153,12 @@ from route.vote_end import vote_end
 from route.vote_list import vote_list
 from route.vote_select import vote_select
 
-from route.n_list_recent_discuss import list_recent_discuss
-from route.n_list_recent_block import list_recent_block
 from route.n_list_user_check_submit import list_user_check_submit
 
 from route.n_topic_list import topic_list
 
 from route.n_give_auth import give_auth
 
-from route.n_bbs_in import bbs_in
 from route.n_bbs_w_set import bbs_w_set
 
 from route.n_edit_move_all import edit_move_all
@@ -213,6 +207,5 @@ from route.go_api_w_xref import api_w_xref
 from route.go_api_w_watch_list import api_w_watch_list
 from route.go_api_w_render import api_w_render, api_w_render_exter
 from route.go_api_w_set_reset import api_w_set_reset
-from route.go_api_w_page_view import api_w_page_view
 
 from route.go_main_func_easter_egg import main_func_easter_egg

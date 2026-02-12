@@ -108,7 +108,7 @@ async def render_template(name, data, sub, menu, other = []):
     other_set["sub"] = [sub] + other
     other_set["menu"] = menu
 
-    return await python_to_golang("template", other_set)
+    return await python_to_golang("post", other_set = other_set, path = "template")
 
 global_lang_data = {}
 global_some_set = {}
@@ -147,7 +147,7 @@ def global_some_set_do(set_name, data = None):
     else:
         return None
 
-async def python_to_golang(func_name, other_set = {}):    
+async def python_to_golang(func_name, other_set = {}, path = ''):    
     headers = {}
     if flask.has_request_context():
         if "Cookie" in flask.request.headers:
@@ -162,24 +162,45 @@ async def python_to_golang(func_name, other_set = {}):
     if func_name == "same":
         async with aiohttp.ClientSession() as session:
             if flask.request.method == 'POST':
-                async with session.post('http://localhost:' + port_data + flask.request.path, data = json_dumps(other_set), headers = headers) as res:
+                form_data = flask.request.form.to_dict(flat = False)
+
+                async with session.post('http://127.0.0.1:' + port_data + flask.request.path, data = form_data, headers = headers) as res:
                     data = await res.text()
 
                     return data
             else:
-                async with session.get('http://localhost:' + port_data + flask.request.path, headers = headers) as res:
+                async with session.get('http://127.0.0.1:' + port_data + flask.request.path, headers = headers) as res:
                     data = await res.text()
 
                     return data
-    elif func_name == "template":
-        async with aiohttp.ClientSession() as session:
-            async with session.post('http://localhost:' + port_data + "/api/template", data = json_dumps(other_set), headers = headers) as res:
-                data = await res.text()
+    elif path != "":
+        if func_name == "get":
+            async with aiohttp.ClientSession() as session:
+                async with session.get('http://127.0.0.1:' + port_data + "/api/" + path, headers = headers) as res:
+                    data = await res.text()
 
-                return data
+                    return data
+        elif func_name == "post":
+            async with aiohttp.ClientSession() as session:
+                async with session.post('http://127.0.0.1:' + port_data + "/api/" + path, data = json_dumps(other_set), headers = headers) as res:
+                    data = await res.text()
+
+                    return data
+        elif func_name == "get_json":
+            async with aiohttp.ClientSession() as session:
+                async with session.get('http://127.0.0.1:' + port_data + "/api/" + path, headers = headers) as res:
+                    data = await res.json()
+
+                    return data
+        else:
+            async with aiohttp.ClientSession() as session:
+                async with session.post('http://127.0.0.1:' + port_data + "/api/" + path, data = json_dumps(other_set), headers = headers) as res:
+                    data = await res.json()
+
+                    return data
     else:
         async with aiohttp.ClientSession() as session:
-            async with session.post('http://localhost:' + port_data + '/compatible_api/' + func_name, data = json_dumps(other_set), headers = headers) as res:
+            async with session.post('http://127.0.0.1:' + port_data + '/compatible_api/' + func_name, data = json_dumps(other_set), headers = headers) as res:
                 data = await res.json()
 
                 if "response" in data and data["response"] == "error":
@@ -278,14 +299,25 @@ class get_db_connect:
             while self.conn == None and try_cnt <= max_try:
                 try:
                     if self.init_mode:
-                        self.conn = pymysql.connect(
-                            host = self.db_set['db_mysql_host'],
-                            user = self.db_set['db_mysql_user'],
-                            password = self.db_set['db_mysql_pw'],
-                            charset = 'utf8mb4',
-                            port = int(self.db_set['db_mysql_port']),
-                            autocommit = True
-                        )
+                        try:
+                            self.conn = pymysql.connect(
+                                host = self.db_set['db_mysql_host'],
+                                user = self.db_set['db_mysql_user'],
+                                password = self.db_set['db_mysql_pw'],
+                                charset = 'utf8mb4',
+                                port = int(self.db_set['db_mysql_port']),
+                                autocommit = True,
+                                db = self.db_set['db_name']
+                            )
+                        except pymysql.err.OperationalError:
+                            self.conn = pymysql.connect(
+                                host = self.db_set['db_mysql_host'],
+                                user = self.db_set['db_mysql_user'],
+                                password = self.db_set['db_mysql_pw'],
+                                charset = 'utf8mb4',
+                                port = int(self.db_set['db_mysql_port']),
+                                autocommit = True
+                            )
                     else:
                         self.conn = pymysql.connect(
                             host = self.db_set['db_mysql_host'],
@@ -302,6 +334,7 @@ class get_db_connect:
                 finally:
                     if self.conn == None:
                         try_cnt += 1
+                        
                         time.sleep(1)
 
             if self.conn == None:
@@ -392,7 +425,7 @@ class class_check_json:
         if do_check_mysql_env():
             # ['user', 'password', 'host', 'port']
             set_data_mysql = {}
-            set_data_mysql['host'] = os.getenv('NAMU_DB_HOST') if os.getenv('NAMU_DB_HOST') else 'localhost'
+            set_data_mysql['host'] = os.getenv('NAMU_DB_HOST') if os.getenv('NAMU_DB_HOST') else '127.0.0.1'
             set_data_mysql['port'] = os.getenv('NAMU_DB_PORT') if os.getenv('NAMU_DB_PORT') else 3306
 
             if not os.getenv('NAMU_DB_USER'):
@@ -424,10 +457,10 @@ class class_check_json:
             print('DB password : ', end = '')
             set_data_mysql['password'] = str(input())
 
-            print('DB host (localhost) : ', end = '')
+            print('DB host (127.0.0.1) : ', end = '')
             set_data_mysql['host'] = str(input())
             if set_data_mysql['host'] == '':
-                set_data_mysql['host'] = 'localhost'
+                set_data_mysql['host'] = '127.0.0.1'
 
             print('DB port (3306) : ', end = '')
             set_data_mysql['port'] = str(input())
@@ -442,7 +475,7 @@ class class_check_json:
         if 'host' in set_data_mysql:
             data_db_set['mysql_host'] = set_data_mysql['host']
         else:
-            data_db_set['mysql_host'] = 'localhost'
+            data_db_set['mysql_host'] = '127.0.0.1'
 
         if 'port' in set_data_mysql:
             data_db_set['mysql_port'] = set_data_mysql['port']
@@ -553,7 +586,7 @@ async def update(conn, ver_num, set_data):
         get_data_mysql = json_loads(open('data/mysql.json', encoding = 'utf8').read())
         
         with open('data/mysql.json', 'w') as f:
-            f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "localhost" }')
+            f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "127.0.0.1" }')
 
         ver_num = 3172800
 
@@ -1261,21 +1294,28 @@ def pw_check(conn, data, data2, type_d = 'no', id_d = ''):
 # Func-skin
 async def get_lang(data, safe = 0):
     if data in global_lang_data:
-        return global_lang_data[data]
+        if safe == 1:
+            return html.unescape(global_lang_data[data])
+        else:
+            return global_lang_data[data]
     else:
         lang = json_loads(open(os.path.join('lang', 'en-US.json'), encoding = 'utf-8').read())
 
         other_set = {}
         other_set["data"] = ' '.join([title for title in lang if title[0] != '_'])
         other_set["legacy"] = ""
+        other_set["safe"] = ""
 
         res = await python_to_golang('api_func_language', other_set)
         if res['response'] == 'ok':
             for load_data in res['data']:
                 global_lang_data[load_data] = res['data'][load_data]
-        
+
         if data in global_lang_data:
-            return global_lang_data[data]
+            if safe == 1:
+                return html.unescape(global_lang_data[data])
+            else:
+                return global_lang_data[data]
         else:
             return data + ' (M)'
 
