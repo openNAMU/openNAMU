@@ -551,17 +551,23 @@ async def update(conn, ver_num, set_data):
         print('Add init set')
         set_init(conn)
 
+        ver_num = 3160027
+
     if ver_num < 3170002:
         curs.execute(db_change("select html from html_filter where kind = 'extension'"))
         if not curs.fetchall():
             for i in ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']:
                 curs.execute(db_change("insert into html_filter (html, kind) values (?, 'extension')"), [i])
+        
+        ver_num = 3170002
 
     if ver_num < 3170400:
         curs.execute(db_change("select title, sub, code from topic where id = '1'"))
         for i in curs.fetchall():
             curs.execute(db_change("update topic set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
             curs.execute(db_change("update rd set code = ? where title = ? and sub = ?"), [i[2], i[0], i[1]])
+
+        ver_num = 3170400
 
     if ver_num < 3171800:
         curs.execute(db_change("select data from other where name = 'recaptcha'"))
@@ -573,12 +579,16 @@ async def update(conn, ver_num, set_data):
             else:
                 curs.execute(db_change("update other set data = '' where name = 'recaptcha'"))
                 curs.execute(db_change("update other set data = '' where name = 'sec_re'"))
+
+        ver_num = 3171800
     
     if ver_num < 3172800 and set_data['type'] == 'mysql':
         get_data_mysql = json_loads(open('data/mysql.json', encoding = 'utf8').read())
         
         with open('data/mysql.json', 'w') as f:
             f.write('{ "user" : "' + get_data_mysql['user'] + '", "password" : "' + get_data_mysql['password'] + '", "host" : "127.0.0.1" }')
+
+        ver_num = 3172800
 
     if ver_num < 3183603:
         curs.execute(db_change("select block from ban where band = 'O'"))
@@ -588,6 +598,8 @@ async def update(conn, ver_num, set_data):
         curs.execute(db_change("select block from rb where band = 'O'"))
         for i in curs.fetchall():
             curs.execute(db_change("update rb set block = ?, band = 'regex' where block = ? and band = 'O'"), ['^' + i[0].replace('.', '\\.'), i[0]])
+        
+        ver_num = 3183603
 
     if ver_num < 3190201:
         today_time = get_time()
@@ -595,18 +607,24 @@ async def update(conn, ver_num, set_data):
         curs.execute(db_change("select block, end, why, band, login from ban"))
         for i in curs.fetchall():
             curs.execute(db_change("insert into rb (block, end, today, why, band, login, ongoing) values (?, ?, ?, ?, ?, ?, ?)"), [i[0], i[1], today_time, i[2], i[3], i[4], '1'])
+        
+        ver_num = 3190201
 
     if ver_num < 3191301:
         curs.execute(db_change('select id, title, date from history where not title like "user:%" order by date desc limit 50'))
         data_list = curs.fetchall()
         for get_data in data_list:
             curs.execute(db_change("insert into rc (id, title, date, type) values (?, ?, ?, 'normal')"), [get_data[0], get_data[1], get_data[2]])
+        
+        ver_num = 3191301
 
     if ver_num < 3202400:
         curs.execute(db_change("select data from other where name = 'update'"))
         get_data = curs.fetchall()
         if get_data and get_data[0][0] == 'master':
             curs.execute(db_change("update other set data = 'beta' where name = 'update'"), [])
+        
+        ver_num = 3202400
 
     if ver_num < 3202600:
         curs.execute(db_change("select name, regex, sub from filter"))
@@ -616,11 +634,15 @@ async def update(conn, ver_num, set_data):
         curs.execute(db_change("select title, link, icon from inter"))
         for i in curs.fetchall():
             curs.execute(db_change("insert into html_filter (html, kind, plus, plus_t) values (?, 'inter_wiki', ?, ?)"), [i[0], i[1], i[2]])
+        
+        ver_num = 3202600
 
     if ver_num < 3203400:
         curs.execute(db_change("select user, css from custom"))
         for i in curs.fetchall():
             curs.execute(db_change("insert into user_set (name, id, data) values ('custom_css', ?, ?)"), [re.sub(r' \(head\)$', '', i[0]), i[1]])
+        
+        ver_num = 3203400
 
     if ver_num < 3205500:
         curs.execute(db_change("select title, decu, dis, view, why from acl"))
@@ -629,14 +651,20 @@ async def update(conn, ver_num, set_data):
             curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[2], 'dis'])
             curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[3], 'view'])
             curs.execute(db_change("insert into acl (title, data, type) values (?, ?, ?)"), [i[0], i[4], 'why'])
+        
+        ver_num = 3205500
 
     if ver_num < 3300101:
         # 캐시 초기화
         curs.execute(db_change('delete from cache_data'))
+        
+        ver_num = 3300101
     
     if ver_num < 3300301:
         # regex_filter 오류 해결
         curs.execute(db_change('delete from html_filter where kind = "regex_filter" and html is null'))
+        
+        ver_num = 3300301
         
     if ver_num < 3302302:
         # user이랑 user_set 테이블의 통합
@@ -646,6 +674,8 @@ async def update(conn, ver_num, set_data):
             curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['acl', i[0], i[2]])
             curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['date', i[0], i[3]])
             curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['encode', i[0], i[4]])
+        
+        ver_num = 3302302
             
     if ver_num < 3400101:
         # user_set이랑 user_application 테이블의 통합
@@ -663,9 +693,13 @@ async def update(conn, ver_num, set_data):
             sql_data['email'] = i[8]
             
             curs.execute(db_change("insert into user_set (name, id, data) values (?, ?, ?)"), ['application', i[0], json_dumps(sql_data)])
+        
+        ver_num = 3400101
     
     if ver_num < 3500105:
         curs.execute(db_change('delete from acl where title like "file:%" and data = "admin" and type like "decu%"'))
+        
+        ver_num = 3500105
         
     if ver_num < 3500106:
         curs.execute(db_change("select data from other where name = 'domain'"))
@@ -678,21 +712,29 @@ async def update(conn, ver_num, set_data):
                 curs.execute(db_change("update other set data = ? where name = 'domain'"), [db_data])
             else:
                 curs.execute(db_change("update other set data = '' where name = 'domain'"))
+        
+        ver_num = 3500106
 
     if ver_num < 3500107:
         db_table_list = get_db_table_list()
         for for_a in db_table_list:
             for for_b in db_table_list[for_a]:
                 curs.execute(db_change("update " + for_a + " set " + for_b + " = '' where " + for_b + " is null"))
+        
+        ver_num = 3500107
                 
     if ver_num < 3500113:
         db_table_list = get_db_table_list()
         for for_a in db_table_list:
             for for_b in db_table_list[for_a]:
                 curs.execute(db_change("update " + for_a + " set " + for_b + " = '' where " + for_b + " is null"))
+        
+        ver_num = 3500113
 
     if ver_num < 3500114:
         curs.execute(db_change('delete from alarm'))
+        
+        ver_num = 3500114
 
     if ver_num < 3500354:
         curs.execute(db_change("select data from other where name = 'robot'"))
@@ -708,14 +750,20 @@ async def update(conn, ver_num, set_data):
             ''
             if db_data[0][0] == robot_default:
                 curs.execute(db_change("insert into other (name, data, coverage) values ('robot_default', 'on', '')"))
+        
+        ver_num = 3500354
 
     if ver_num < 3500355:
         # other coverage 오류 해결
         curs.execute(db_change("update other set coverage = '' where coverage is null"))
+        
+        ver_num = 3500355
 
     if ver_num < 3500358:
         curs.execute(db_change("drop index history_index"))
         curs.execute(db_change("create index history_index on history (title, ip)"))
+        
+        ver_num = 3500358
 
     if ver_num < 3500360:
         # 마지막 편집 따로 기록하도록
@@ -735,6 +783,7 @@ async def update(conn, ver_num, set_data):
         curs.execute(db_change('delete from acl where title like "file:%" and data = "admin" and type like "decu%"'))
 
         print("Update 3500360 complete")
+        ver_num = 3500360
 
     if ver_num < 3500361:
         # curs.execute(db_change('select id from user_set where name = "email" and data = ?'), [user_email])
@@ -742,6 +791,8 @@ async def update(conn, ver_num, set_data):
         for db_data in curs.fetchall():
             if ip_or_user(db_data[0]) == 1:
                 curs.execute(db_change('delete from user_set where id = ? and name = "email"'), [db_data[0]])
+        
+        ver_num = 3500361
 
     # create_data['history'] = ['id', 'title', 'data', 'date', 'ip', 'send', 'leng', 'hide', 'type']
     # create_data['rc'] = ['id', 'title', 'date', 'type']
@@ -751,6 +802,8 @@ async def update(conn, ver_num, set_data):
 
     if ver_num < 3500365:
         curs.execute(db_change("update back set data = '' where data is null"))
+        
+        ver_num = 3500365
 
     if ver_num < 3500371:
         curs.execute(db_change("delete from user_notice"))
@@ -764,10 +817,14 @@ async def update(conn, ver_num, set_data):
                 user_alarm_count[db_data[0]] = 1
 
             curs.execute(db_change('insert into user_notice (id, name, data, date, readme) values (?, ?, ?, ?, "")'), [str(user_alarm_count[db_data[0]]), db_data[0], db_data[1], db_data[2]])
+        
+        ver_num = 3500371
 
     if ver_num < 3500372:
         # ID 글자 확인 호환용
         curs.execute(db_change('insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, ?)'), [r'(?:[^A-Za-zㄱ-ㅣ가-힣0-9])', 'name', '', ''])
+        
+        ver_num = 3500372
 
     if ver_num < 3500373:
         select_data = {}
@@ -780,17 +837,23 @@ async def update(conn, ver_num, set_data):
         
         for db_data in select_data:
             curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [select_data[db_data][1], select_data[db_data][0], select_data[db_data][2]])
+        
+        ver_num = 3500373
 
     if ver_num < 3500374:
         # ban 오류 해결
         curs.execute(db_change("update rb set ongoing = '' where ongoing is null"))
         curs.execute(db_change("update rb set login = '' where login is null"))
+        
+        ver_num = 3500374
 
     if ver_num < 3500375:
         curs.execute(db_change("select title, type, user from scan"))
         for for_a in curs.fetchall():
             type_data = 'watchlist' if for_a[1] == '' else 'star_doc'
             curs.execute(db_change("insert into user_set (id, name, data) values (?, ?, ?)"), [for_a[2], type_data, for_a[0]])
+        
+        ver_num = 3500375
 
     if ver_num < 3500376:
         curs.execute(db_change("select doc_name, doc_rev from data_set where set_name = 'edit_request_data'"))
@@ -799,9 +862,13 @@ async def update(conn, ver_num, set_data):
             get_data = curs.fetchall()
             if get_data and (int(get_data[0][0]) + 1) == int(for_a[1]):
                 curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, 'edit_request_doing', '1')"), [for_a[0], for_a[1]])
+        
+        ver_num = 3500376
 
     if ver_num < 3500377 and set_data['type'] == 'sqlite':
         conn.execute('pragma journal_mode = delete')
+        
+        ver_num = 3500377
 
     if ver_num < 3500378:
         curs.execute(db_change("select title from data where title like 'category:%' or title like 'user:%' or title like 'file:%'"))
@@ -816,6 +883,8 @@ async def update(conn, ver_num, set_data):
             
             curs.execute(db_change('delete from data_set where doc_name = ? and set_name = "doc_type"'), [for_a[0]])
             curs.execute(db_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', ?)"), [for_a[0], mode])
+        
+        ver_num = 3500378
 
     if ver_num < 3500379:
         curs.execute(db_change("select distinct doc_name from data_set where doc_rev = 'not_exist' or doc_rev = ''"))
@@ -827,9 +896,13 @@ async def update(conn, ver_num, set_data):
                 data_set_exist = 'not_exist'
 
             curs.execute(db_change("update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')"), [data_set_exist, for_a[0]])
+        
+        ver_num = 3500379
 
     if ver_num < 20240513:
         curs.execute(db_change("update user_set set data = '☑️' where name = 'user_title' and data = '✅'"))
+        
+        ver_num = 20240513
 
     if ver_num < 20240732:
         curs.execute(db_change("select distinct name from alist where acl = 'owner'"))
@@ -838,9 +911,11 @@ async def update(conn, ver_num, set_data):
             for for_b in curs.fetchall():
                 lang_name = 'en-US'
                 if lang_name == 'ko-KR':
-                    await add_alarm(for_b[0], 'tool:system', '메인 ACL이 권한으로 개편되면서 기존 설정 값이 날라갔으니 권한으로 재설정 해주세요.')
+                    print('메인 ACL이 권한으로 개편되면서 기존 설정 값이 날라갔으니 권한으로 재설정 해주세요.')
                 else:
-                    await add_alarm(for_b[0], 'tool:system', 'As the main ACL has been reorganized into the auth, the existing setting values have been lost, so please reset it to the auth.')
+                    print('As the main ACL has been reorganized into the auth, the existing setting values have been lost, so please reset it to the auth.')
+        
+        ver_num = 20240732
 
     print('Update completed')
 
