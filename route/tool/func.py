@@ -805,9 +805,9 @@ async def update(conn, ver_num, set_data):
             for for_b in curs.fetchall():
                 lang_name = 'en-US'
                 if lang_name == 'ko-KR':
-                    await add_alarm(for_b[0], 'tool:system', '메인 ACL이 권한으로 개편되면서 기존 설정 값이 날라갔으니 권한으로 재설정 해주세요.')
+                    print('메인 ACL이 권한으로 개편되면서 기존 설정 값이 날라갔으니 권한으로 재설정 해주세요.')
                 else:
-                    await add_alarm(for_b[0], 'tool:system', 'As the main ACL has been reorganized into the auth, the existing setting values have been lost, so please reset it to the auth.')
+                    print('As the main ACL has been reorganized into the auth, the existing setting values have been lost, so please reset it to the auth.')
 
     print('Update completed')
 
