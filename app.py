@@ -527,7 +527,7 @@ _golang_view_seq = itertools.count()
 def golang_view():
     idx = next(_golang_view_seq)
 
-    async def _view(**_):
+    async def _view(*args, **kwargs):
         return await python_to_golang("same")
     
     _view.__name__ = f"_golang_view_{idx}"
@@ -978,18 +978,19 @@ app.route('/manager', methods = ['POST', 'GET'])(main_tool_admin)
 app.route('/manager/<int:num>', methods = ['POST', 'GET'])(main_tool_redirect)
 app.route('/manager/<int:num>/<everything:add_2>', methods = ['POST', 'GET'])(main_tool_redirect)
 
+app.route('/search/<everything:name>', methods = ['GET'])(golang_view())
+app.route('/goto/<everything:name>', methods = ['GET'])(golang_view())
+app.route('/search_page/<int:num>/<everything:name>', methods = ['GET'])(golang_view())
+app.route('/search_data/<everything:name>', methods = ['GET'])(golang_view())
+app.route('/search_data_page/<int:num>/<everything:name>', methods = ['GET'])(golang_view())
+
 app.route('/goto', methods = ['POST'])(golang_view())
-app.route('/goto/<everything:name>', methods = ['GET', 'POST'])(golang_view())
+app.route('/goto/<everything:name>', methods = ['POST'])(golang_view())
 app.route('/search', methods = ['POST'])(golang_view())
 app.route('/search/<everything:name>', methods = ['POST'])(golang_view())
 app.route('/search_page/<int:num>/<everything:name>', methods = ['POST'])(golang_view())
 app.route('/search_data/<everything:name>', methods = ['POST'])(golang_view())
 app.route('/search_data_page/<int:num>/<everything:name>', methods = ['POST'])(golang_view())
-
-app.route('/search/<everything:name>', methods = ['GET'])(golang_view())
-app.route('/search_page/<int:num>/<everything:name>', methods = ['GET'])(golang_view())
-app.route('/search_data/<everything:name>', methods = ['GET'])(golang_view())
-app.route('/search_data_page/<int:num>/<everything:name>', methods = ['GET'])(golang_view())
 
 app.route('/setting')(main_setting)
 app.route('/setting/main', methods = ['POST', 'GET'])(main_setting_main)
@@ -1023,7 +1024,7 @@ app.route('/shutdown', methods = ['POST', 'GET'])(main_sys_shutdown)
 app.route('/restart', defaults = { 'golang_process' : golang_process }, methods = ['POST', 'GET'])(main_sys_restart)
 app.route('/update', defaults = { 'golang_process' : golang_process }, methods = ['POST', 'GET'])(main_sys_update)
 
-app.errorhandler(404)(main_func_error_404)
+app.errorhandler(404)(golang_view())
 
 def terminate_golang():
     if golang_process.poll() is None:
