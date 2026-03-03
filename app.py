@@ -752,8 +752,10 @@ app.route('/move/<everything:name>', methods = ['POST', 'GET'])(edit_move)
 app.route('/move_all')(edit_move_all)
 
 # Func-topic
-app.route('/topic/<everything:name>', methods = ['POST', 'GET'])(topic_list)
-app.route('/topic_page/<int:page>/<everything:name>', methods = ['POST', 'GET'])(topic_list)
+app.route('/topic/<everything:name>')(golang_view())
+app.route('/topic_page/<int:page>/<everything:name>')(golang_view())
+app.route('/topic_close/<int:page>/<everything:name>')(golang_view())
+app.route('/topic_agree/<int:page>/<everything:name>')(golang_view())
 
 app.route('/thread/<int:topic_num>', methods = ['POST', 'GET'])(topic)
 app.route('/thread/0/<everything:doc_name>', defaults = { 'topic_num' : '0' }, methods = ['POST', 'GET'])(topic)

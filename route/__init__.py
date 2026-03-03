@@ -149,8 +149,6 @@ from route.vote_select import vote_select
 
 from route.n_list_user_check_submit import list_user_check_submit
 
-from route.n_topic_list import topic_list
-
 from route.n_give_auth import give_auth
 
 from route.n_bbs_w_set import bbs_w_set
