@@ -3,7 +3,7 @@ html {
 }
 
 body {
-    font-family: 'SUIT', sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "Nanum Gothic", sans-serif;
     font-size: 14px;
     font-feature-settings: "ss18";
     text-size-adjust: 100%;
@@ -18,12 +18,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 select {
-    font-family: 'SUIT', sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "Nanum Gothic", sans-serif;
     font-feature-settings: "ss18";
 }
 
 textarea {
-    font-family: 'SUIT', monospace;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "Nanum Gothic", monospace;
     font-feature-settings: "ss18";
 }
 
