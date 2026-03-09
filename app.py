@@ -186,7 +186,7 @@ with get_db_connect(init_mode = True) as conn:
 
     app.config['JSON_AS_ASCII'] = False
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
-    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 4233600
     if run_mode == 'dev':
         app.config['TEMPLATES_AUTO_RELOAD'] = True
         app.config['DEBUG'] = True
