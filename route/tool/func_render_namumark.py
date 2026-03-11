@@ -602,6 +602,14 @@ class class_do_render_namumark:
                     video_code = 'https://tv.naver.com/embed/' + video_code
                 elif name_data == 'nicovideo':
                     video_code = 'https://embed.nicovideo.jp/watch/' + video_code
+                elif name_data == 'twitter':
+                    video_code = video_code.strip()
+                    video_code = re.sub(r'^https?://(www\.)?x\.com/', 'https://twitter.com/', video_code)
+
+                    if re.match(r'^https?:\/\/(www\.)?twitter\.com\/', video_code):
+                        pass
+                    else:
+                        video_code = ''
                 else:
                     video_code = 'https://player.vimeo.com/video/' + video_code
 
@@ -614,6 +622,10 @@ class class_do_render_namumark:
                         '</blockquote>',
                         match_org.group(0)
                     )
+
+                    self.render_data_js += '''
+                        window.twttr && window.twttr.widgets && window.twttr.widgets.load(document.body);\n
+                    '''
                 else:
                     data_name = self.get_tool_data_storage(
                         '<iframe style="width: ' + video_width + '; height: ' + video_height + ';" src="' + video_code + '" frameborder="0" allowfullscreen>',
