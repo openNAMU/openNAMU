@@ -519,3 +519,7 @@
 
     border: 1px solid gainsboro;
 }
+
+.opennamu_main .opennamu_clearfix {
+    clear: both;
+}

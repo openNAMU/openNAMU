@@ -362,6 +362,8 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
         other_set = {}
         other_set['doc_name'] = name
 
+        div += '<div class="opennamu_clearfix"></div>'
+
         comment_api = await python_to_golang("api_w_comment", other_set = other_set)
         comment = comment_api['data']
 
