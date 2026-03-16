@@ -107,6 +107,9 @@ async def render_template(name, data, sub, menu, other = []):
     other_set["data"] = data
     other_set["sub"] = [sub] + other
     other_set["menu"] = menu
+    other_set["option"] = {
+        "path" : flask.request.path
+    }
 
     return await python_to_golang("post", other_set = other_set, path = "template")
 
