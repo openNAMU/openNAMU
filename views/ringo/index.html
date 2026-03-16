@@ -130,12 +130,12 @@
                                 <span class="iconify" data-icon="ic:twotone-stars" data-inline="true"></span>
                                 {{'star_doc'|load_lang}}
                             </a>
-                            <a href="/logout">
+                            <a href="/logout?return={{user_path}}">
                                 <span class="iconify" data-icon="ic:baseline-logout" data-inline="true"></span>
                                 {{'logout'|load_lang}}
                             </a>
                         {% else %}
-                            <a href="/login">
+                            <a href="/login?return={{user_path}}">
                                 <span class="iconify" data-icon="ic:baseline-login" data-inline="true"></span>
                                 {{'login'|load_lang}}
                             </a>
