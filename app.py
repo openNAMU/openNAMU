@@ -586,11 +586,11 @@ app.route('/filter/extension_filter/add', methods = ['POST', 'GET'], defaults = 
 app.route('/filter/extension_filter/del/<everything:name>', defaults = { 'tool' : 'extension_filter' })(filter_all_delete)
 
 # Func-list
-app.route('/list/document/old', defaults = { 'set_type' : 'old' })(list_old_page)
-app.route('/list/document/old/<int:num>', defaults = { 'set_type' : 'old' })(list_old_page)
+app.route('/list/document/old')(golang_view())
+app.route('/list/document/old/<int:num>')(golang_view())
 
-app.route('/list/document/new', defaults = { 'set_type' : 'new' })(list_old_page)
-app.route('/list/document/new/<int:num>', defaults = { 'set_type' : 'new' })(list_old_page)
+app.route('/list/document/new')(golang_view())
+app.route('/list/document/new/<int:num>')(golang_view())
 
 app.route('/list/document/no_link')(list_no_link)
 app.route('/list/document/no_link/<int:num>')(list_no_link)
@@ -604,11 +604,11 @@ app.route('/list/document/need/<int:arg_num>')(list_please)
 app.route('/list/document/all')(list_title_index)
 app.route('/list/document/all/<int:num>')(list_title_index)
 
-app.route('/list/document/long')(list_long_page)
-app.route('/list/document/long/<int:arg_num>')(list_long_page)
+app.route('/list/document/long')(golang_view())
+app.route('/list/document/long/<int:arg_num>')(golang_view())
 
-app.route('/list/document/short', defaults = { 'tool' : 'short_page' })(list_long_page)
-app.route('/list/document/short/<int:arg_num>', defaults = { 'tool' : 'short_page' })(list_long_page)
+app.route('/list/document/short')(golang_view())
+app.route('/list/document/short/<int:arg_num>')(golang_view())
 
 app.route('/list/file')(list_image_file)
 app.route('/list/file/<int:arg_num>')(list_image_file)
