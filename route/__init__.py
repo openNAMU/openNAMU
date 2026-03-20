@@ -1,6 +1,5 @@
 from route.api_image_view import api_image_view
 from route.api_skin_info import api_skin_info
-from route.api_user_info import api_user_info
 from route.api_version import api_version
 
 from route.bbs_w_edit import bbs_w_edit
@@ -153,49 +152,23 @@ from route.n_bbs_w_set import bbs_w_set
 
 from route.n_edit_move_all import edit_move_all
 
-from route.go_api_func_llm import api_func_llm
 from route.go_api_func_language import api_func_language, api_func_language_exter
-from route.go_api_func_sha224 import api_func_sha224
 from route.go_api_func_ip import api_func_ip
 from route.go_api_func_ip_menu import api_func_ip_menu
 from route.go_api_func_auth import api_func_auth, api_func_auth_exter
 from route.go_api_func_email import api_func_email, api_func_email_exter
-from route.go_api_func_search import api_func_search, api_func_search_exter
 
-from route.go_api_give_auth import api_give_auth
-
-from route.go_api_list_recent_change import api_list_recent_change, api_list_recent_change_exter
-from route.go_api_list_recent_discuss import api_list_recent_discuss
-from route.go_api_list_recent_block import api_list_recent_block
 from route.go_api_list_recent_edit_request import api_list_recent_edit_request, api_list_recent_edit_request_exter
-from route.go_api_list_old_page import api_list_old_page, api_list_old_page_exter
-from route.go_api_list_title_index import api_list_title_index
 from route.go_api_list_acl import api_list_acl
-from route.go_api_list_auth import api_list_auth
-from route.go_api_list_markup import api_list_markup
-from route.go_api_list_history import api_list_history, api_list_history_exter
 
-from route.go_api_bbs import api_bbs, api_bbs_exter
-from route.go_api_bbs_list import api_bbs_list
 from route.go_api_bbs_w import api_bbs_w
 from route.go_api_bbs_w_set import api_bbs_w_set
-from route.go_api_bbs_w_tabom import api_bbs_w_tabom
 from route.go_api_bbs_w_comment import api_bbs_w_comment, api_bbs_w_comment_exter
 from route.go_api_bbs_w_comment_one import api_bbs_w_comment_one, api_bbs_w_comment_one_exter
 
 from route.go_api_setting import api_setting, api_setting_exter
 
 from route.go_api_topic import api_topic
-from route.go_api_topic_list import api_topic_list
-
-from route.go_api_user_rankup import api_user_rankup
-from route.go_api_user_setting_editor import api_user_setting_editor
 
 from route.go_api_w_raw import api_w_raw, api_w_raw_exter
-from route.go_api_w_random import api_w_random, api_w_random_exter
-from route.go_api_w_xref import api_w_xref
-from route.go_api_w_watch_list import api_w_watch_list
 from route.go_api_w_render import api_w_render, api_w_render_exter
-from route.go_api_w_set_reset import api_w_set_reset
-
-from route.go_main_func_easter_egg import main_func_easter_egg
