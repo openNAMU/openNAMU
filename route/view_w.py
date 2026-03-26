@@ -186,12 +186,14 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
 
         # print([name, doc_data, doc_rev])
 
+        length_doc_data = 0
         if doc_data["response"] == "ok":
             render_data = await api_w_render(name, request_method = 'POST', request_data = {
                 'name' : name,
                 'data' : doc_data["data"]
             })
             end_data = render_data["data"] + '<script>document.addEventListener("DOMContentLoaded", function() {' + render_data["js_data"] + '});</script>'
+            length_doc_data = len(doc_data["data"])
         else:
             end_data = ''
 
@@ -375,4 +377,8 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
             sub,
             menu,
             [r_date, watch_list, description, view_count],
+            [],
+            {
+                "length_doc" : str(length_doc_data),
+            }
         ), response_data

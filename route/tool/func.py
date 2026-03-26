@@ -101,7 +101,7 @@ if sys.version_info < (3, 6):
 
 # Func
 # Func-main
-async def render_template(name, data, sub, menu, other = []):
+async def render_template(name, data, sub, menu, other = [], option = {}):
     other_set = {}
     other_set["name"] = name
     other_set["data"] = data
@@ -110,6 +110,9 @@ async def render_template(name, data, sub, menu, other = []):
     other_set["option"] = {
         "path" : flask.request.path
     }
+
+    for for_a in option:
+        other_set["option"][for_a] = option[for_a]
 
     return await python_to_golang("post", other_set = other_set, path = "template")
 
