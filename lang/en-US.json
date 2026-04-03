@@ -66,6 +66,7 @@
     "r1" : "r1",
     "test" : "Test",
     "email_test" : "Send test email",
+    "length_doc" : "Length of document",
 
     "_comment_": "Common",
     "data": "Data",

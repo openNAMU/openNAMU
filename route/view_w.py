@@ -377,7 +377,6 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
             sub,
             menu,
             [r_date, watch_list, description, view_count],
-            [],
             {
                 "length_doc" : str(length_doc_data),
             }

@@ -197,6 +197,9 @@
                         {% if view_count != 0 %}
                             | {{'page_view'|load_lang}} : {{view_count}}
                         {% endif %}
+                        {% if length_doc != "" %}
+                            | {{'length_doc'|load_lang}} : {{length_doc}}
+                        {% endif %}
                     {% endif %}
                     {% if menu != 0 %}
                         <div id="menu">

@@ -713,5 +713,6 @@
     "random_list" : "랜덤 문서 목록",
     "test" : "테스트",
     "email_test" : "이메일 전송 테스트",
-    "r1" : "r1"
+    "r1" : "r1",
+    "length_doc" : "문서 길이"
 }
