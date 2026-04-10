@@ -437,7 +437,6 @@ class class_do_render_namumark:
                     data_name = self.get_tool_data_storage(
                         '<h' + heading_level_str + '><span id="' + self.doc_set['doc_include'] + 'opennamu_heading_' + str(heading_count) + '_sub" style="opacity: ' + heading_folding[2] + '">', 
                             ' <sub>' + \
-                                '<a id="' + heading_id_name + '" href="/edit_section/' + str(heading_count) + '/' + url_pas(self.doc_name) + '">✎</a> ' + \
                                 '<a href="javascript:void(0);" onclick="javascript:opennamu_heading_folding(\'' + self.doc_set['doc_include'] + 'opennamu_heading_' + str(heading_count) + '\', this);">' + \
                                     heading_folding[0] + \
                                 '</a>'
