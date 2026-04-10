@@ -728,9 +728,8 @@ app.route('/random')(golang_view())
 app.route('/list/random')(golang_view())
 
 # Func-edit
-app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(edit)
-app.route('/edit_from/<everything:name>', methods = ['POST', 'GET'], defaults = { 'do_type' : 'load' })(edit)
-app.route('/edit_section/<int:section>/<everything:name>', methods = ['POST', 'GET'])(edit)
+app.route('/edit/<everything:name>', methods = ['POST', 'GET'])(golang_view())
+app.route('/edit_from/<everything:name>', methods = ['POST', 'GET'])(golang_view())
 
 app.route('/edit_request/<everything:name>', methods = ['POST', 'GET'])(edit_request)
 app.route('/edit_request_from/<everything:name>', defaults = { 'do_type' : 'from' }, methods = ['POST', 'GET'])(edit_request)
