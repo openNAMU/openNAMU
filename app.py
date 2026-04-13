@@ -788,8 +788,8 @@ app.route('/skin_set')(user_setting_skin_set)
 # 하위 호환용 E
 app.route('/change/skin_set/main', methods = ['POST', 'GET'])(user_setting_skin_set_main)
 
-app.route('/user')(user_info)
-app.route('/user/<name>')(user_info)
+app.route('/user')(golang_view())
+app.route('/user/<name>')(golang_view())
 
 app.route('/challenge', methods = ['GET', 'POST'])(user_challenge)
 

@@ -113,7 +113,6 @@ from route.user_alarm import user_alarm
 from route.user_alarm_delete import user_alarm_delete
 from route.user_challenge import user_challenge
 from route.user_count import user_count
-from route.user_info import user_info
 from route.user_edit_filter import user_edit_filter
 
 from route.user_setting import user_setting
