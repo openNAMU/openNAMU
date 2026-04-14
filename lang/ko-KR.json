@@ -714,5 +714,6 @@
     "test" : "테스트",
     "email_test" : "이메일 전송 테스트",
     "r1" : "r1",
-    "length_doc" : "문서 길이"
+    "length_doc" : "문서 길이",
+    "document_content_max_length_error": "문서 내용이 너무 깁니다. 최대 문자 수:"
 }

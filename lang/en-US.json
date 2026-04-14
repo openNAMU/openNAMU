@@ -514,6 +514,7 @@
     "display_level_in_user_name": "Displaying levels in username",
     "ua_expiration_date": "UA expiration deadline",
     "document_content_max_length": "Maximum document length",
+    "document_content_max_length_error": "Document content is too long. Maximum characters:",
     
     "_comment_": "Text",
     "register_text": "Terms of registration",
