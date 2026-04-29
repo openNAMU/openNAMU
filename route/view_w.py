@@ -1,6 +1,5 @@
 from .tool.func import *
 
-from .go_api_w_raw import api_w_raw
 from .go_api_w_render import api_w_render
 
 async def view_w(name = 'Test', do_type = '', doc_rev = ''):
@@ -180,9 +179,9 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
             name_view = name
 
         if doc_rev == '':
-            doc_data = await api_w_raw(name)
+            doc_data = await python_to_golang("get", path = "v2/raw/" + url_pas(name))
         else:
-            doc_data = await api_w_raw(name, str(doc_rev))
+            doc_data = await python_to_golang("get", path = "v2/raw_rev/" + str(doc_rev) + '/' + url_pas(name))
 
         # print([name, doc_data, doc_rev])
 

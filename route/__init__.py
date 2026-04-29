@@ -169,5 +169,4 @@ from route.go_api_setting import api_setting, api_setting_exter
 
 from route.go_api_topic import api_topic
 
-from route.go_api_w_raw import api_w_raw, api_w_raw_exter
 from route.go_api_w_render import api_w_render, api_w_render_exter

@@ -1,7 +1,5 @@
 from .tool.func import *
 
-from .go_api_w_raw import api_w_raw
-
 async def api_w_render(name = '', tool = '', request_method = '', request_data = {}):
     with get_db_connect() as conn:
         curs = conn.cursor()
