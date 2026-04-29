@@ -53,11 +53,6 @@ if data_up_date == 1:
 
         for exe_name in run_list:
             try:
-                subprocess.check_call([exe_name, "-m", "pip", "install", "--upgrade", *user_opt, "-r", "requirements-optional.txt"])
-            except:
-                pass
-
-            try:
                 subprocess.check_call([exe_name, "-m", "pip", "install", "--upgrade", *user_opt, "-r", "requirements.txt"])
                 subprocess.Popen([exe_name] + sys.argv)
 

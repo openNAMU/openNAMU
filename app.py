@@ -270,36 +270,40 @@ async def golang_process_check():
             time.sleep(1)
 
 def kill_port(port, timeout = 1.5, force = True):
-    pids = {
-        c.pid for c in psutil.net_connections(kind = "inet")
-        if c.pid and c.laddr and c.laddr.port == port and c.status == psutil.CONN_LISTEN
-    }
-    procs = []
-    for pid in pids:
-        try:
-            p = psutil.Process(pid)
-            p.terminate()
-            procs.append(p)
-        except psutil.NoSuchProcess:
-            pass
-        except psutil.AccessDenied:
-            print("Golang PID is not dying, please shut down manually by sudo.")
-            raise
+    try:
+        pids = {
+            c.pid for c in psutil.net_connections(kind = "inet")
+            if c.pid and c.laddr and c.laddr.port == port and c.status == psutil.CONN_LISTEN
+        }
 
-    _, alive = psutil.wait_procs(procs, timeout = timeout)
-    if force:
-        for p in alive:
+        procs = []
+        for pid in pids:
             try:
-                p.kill()
+                p = psutil.Process(pid)
+                p.terminate()
+                procs.append(p)
             except psutil.NoSuchProcess:
                 pass
             except psutil.AccessDenied:
                 print("Golang PID is not dying, please shut down manually by sudo.")
                 raise
 
-        psutil.wait_procs(alive, timeout = timeout)
+        _, alive = psutil.wait_procs(procs, timeout = timeout)
+        if force:
+            for p in alive:
+                try:
+                    p.kill()
+                except psutil.NoSuchProcess:
+                    pass
+                except psutil.AccessDenied:
+                    print("Golang PID is not dying, please shut down manually by sudo.")
+                    raise
 
-    return sorted(pids)
+            psutil.wait_procs(alive, timeout = timeout)
+
+        return sorted(pids)
+    except PermissionError:
+        return []
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BIN_DIR = os.path.join(BASE_DIR, "bin")
