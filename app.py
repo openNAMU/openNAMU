@@ -878,10 +878,6 @@ app.route('/bbs/delete/<int:bbs_num>/<int:post_num>/<comment_num>', methods = ['
 app.route('/api/render', methods = ['POST'])(api_w_render_exter)
 app.route('/api/render/<tool>', methods = ['POST'])(api_w_render_exter)
 
-app.route('/api/raw_exist/<everything:name>', defaults = { 'exist_check' : 'on' })(api_w_raw)
-app.route('/api/raw_rev/<int(signed = True):rev>/<everything:name>')(api_w_raw)
-app.route('/api/raw/<everything:name>')(api_w_raw)
-
 app.route('/api/xref/<int:page>/<everything:name>')(golang_view())
 app.route('/api/xref_this/<int:page>/<everything:name>')(golang_view())
 
@@ -975,6 +971,10 @@ app.route('/api/v2/ip/<everything:data>', methods = ['GET', 'POST'])(api_func_ip
 app.route('/api/v2/ip_menu/<everything:ip>', defaults = { 'option' : 'user' }, methods = ['GET', 'POST'])(api_func_ip_menu)
 app.route('/api/v2/user_menu/<everything:ip>')(api_func_ip_menu)
 app.route('/api/v2/lang', defaults = { 'legacy' : '' }, methods = ['POST'])(api_func_language_exter)
+
+app.route('/api/v2/raw_exist/<everything:name>')(golang_view())
+app.route('/api/v2/raw_rev/<int(signed = True):rev>/<everything:name>')(golang_view())
+app.route('/api/v2/raw/<everything:name>')(golang_view())
 
 # Func-main
 # 여기도 전반적인 조정 시행 예정
