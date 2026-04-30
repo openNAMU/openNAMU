@@ -179,11 +179,9 @@ async def view_w(name = 'Test', do_type = '', doc_rev = ''):
             name_view = name
 
         if doc_rev == '':
-            doc_data = await python_to_golang("get", path = "v2/raw/" + url_pas(name))
+            doc_data = await python_to_golang("get_json", path = "v2/raw/" + url_pas(name))
         else:
-            doc_data = await python_to_golang("get", path = "v2/raw_rev/" + str(doc_rev) + '/' + url_pas(name))
-
-        # print([name, doc_data, doc_rev])
+            doc_data = await python_to_golang("get_json", path = "v2/raw_rev/" + str(doc_rev) + '/' + url_pas(name))
 
         length_doc_data = 0
         if doc_data["response"] == "ok":
