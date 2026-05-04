@@ -165,12 +165,12 @@ async def python_to_golang(func_name, other_set = {}, path = ''):
             if flask.request.method == 'POST':
                 form_data = flask.request.form.to_dict(flat = False)
 
-                async with session.post('http://127.0.0.1:' + port_data + flask.request.path, data = form_data, headers = headers) as res:
+                async with session.post('http://127.0.0.1:' + port_data + flask.request.full_path, data = form_data, headers = headers) as res:
                     data = await res.text()
 
                     return data
             else:
-                async with session.get('http://127.0.0.1:' + port_data + flask.request.path, headers = headers) as res:
+                async with session.get('http://127.0.0.1:' + port_data + flask.request.full_path, headers = headers) as res:
                     data = await res.text()
 
                     return data

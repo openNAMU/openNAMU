@@ -35,8 +35,7 @@ async def main_tool_redirect(num = 1, add_2 = ''):
         if flask.request.method == 'POST':
             if add_2 != '':
                 if num != 12:
-                    flask.session['edit_load_document'] = add_1
-                    return redirect(conn, '/edit_from/' + url_pas(add_2))
+                    return redirect(conn, '/edit/' + url_pas(add_2) + '?load=' + url_pas(add_1))
                 else:
                     return redirect(conn, title_list[num][1] + '/' + url_pas(add_2) + '/normal/1/' + url_pas(add_1))
             else:
