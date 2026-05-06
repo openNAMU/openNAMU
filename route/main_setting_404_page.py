@@ -1,6 +1,5 @@
 from .tool.func import *
 
-from .go_api_func_language import api_func_language
 from .go_api_setting import api_setting
 
 async def main_setting_404_page():
@@ -19,15 +18,13 @@ async def main_setting_404_page():
 
             return redirect(conn, '/setting/404_page')
         else:
-            lang = await api_func_language('', 'enter_html save 404_file 404_page preview')
-
             set_type = await api_setting('manage_404_page')
             set_data = await api_setting('manage_404_page_content')
 
             data_html = ''
             select_list = [
-                ['404_page', lang['data']['404_page']],
-                ['404_file', lang['data']['404_file']]
+                ['404_page', await get_lang('404_page')],
+                ['404_file', await get_lang('404_file')]
             ]
 
             data_html += '<span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="select">'
@@ -47,9 +44,9 @@ async def main_setting_404_page():
 
             data_html += (
                 '<form method="post">' +
-                    '<textarea class="opennamu_textarea_500 __ON_TEXTAREA__" name="data" placeholder="' + lang['data']['enter_html'] + '">' + html.escape(form_data) + '</textarea>' +
+                    '<textarea class="opennamu_textarea_500 __ON_TEXTAREA__" name="data" placeholder="' + await get_lang('enter_html') + '">' + html.escape(form_data) + '</textarea>' +
                     '<hr class="main_hr">' +
-                    '<button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">' + lang['data']['save'] + '</button>' +
+                    '<button class="__ON_BUTTON__" id="opennamu_save_button" type="submit">' + await get_lang('save') + '</button>' +
                 '</form>'
             )
 

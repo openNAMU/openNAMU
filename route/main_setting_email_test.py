@@ -1,14 +1,12 @@
 from .tool.func import *
 
-from .go_api_func_email import api_func_email
-
 async def main_setting_email_test():
     with get_db_connect() as conn:
         if await acl_check('', 'owner_auth', '', '') == 1:
             return await re_error(conn, 0)
         
         if flask.request.method == 'POST':
-            render_data = await api_func_email()
+            render_data = await python_to_golang("api_func_email", other_set = {})
             if render_data["response"] == "ok":
                 data = await get_lang("ok")
             else:

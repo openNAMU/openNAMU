@@ -6,7 +6,6 @@ from route.bbs_w_edit import bbs_w_edit
 from route.bbs_make import bbs_make
 # from route.bbs_w_hide import bbs_w_hide
 from route.bbs_w_pinned import bbs_w_pinned
-from route.bbs_w_delete import bbs_w_delete
 from route.bbs_w import bbs_w
 from route.bbs_delete import bbs_delete
 # from route.bbs_hide import bbs_hide
@@ -144,21 +143,9 @@ from route.vote_list import vote_list
 from route.vote_select import vote_select
 
 from route.n_list_user_check_submit import list_user_check_submit
-
 from route.n_give_auth import give_auth
-
 from route.n_bbs_w_set import bbs_w_set
-
 from route.n_edit_move_all import edit_move_all
-
-from route.go_api_func_language import api_func_language, api_func_language_exter
-from route.go_api_func_ip import api_func_ip
-from route.go_api_func_ip_menu import api_func_ip_menu
-from route.go_api_func_auth import api_func_auth, api_func_auth_exter
-from route.go_api_func_email import api_func_email, api_func_email_exter
-
-from route.go_api_list_recent_edit_request import api_list_recent_edit_request, api_list_recent_edit_request_exter
-from route.go_api_list_acl import api_list_acl
 
 from route.go_api_bbs_w import api_bbs_w
 from route.go_api_bbs_w_set import api_bbs_w_set
@@ -166,7 +153,5 @@ from route.go_api_bbs_w_comment import api_bbs_w_comment, api_bbs_w_comment_exte
 from route.go_api_bbs_w_comment_one import api_bbs_w_comment_one, api_bbs_w_comment_one_exter
 
 from route.go_api_setting import api_setting, api_setting_exter
-
 from route.go_api_topic import api_topic
-
 from route.go_api_w_render import api_w_render, api_w_render_exter
