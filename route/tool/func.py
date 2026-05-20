@@ -194,8 +194,9 @@ async def python_to_golang(func_name, other_set = {}, path = ''):
 
                     return data
         else:
+            # post_json
             async with aiohttp.ClientSession() as session:
-                async with session.post('http://127.0.0.1:' + port_data + "/api/" + path, data = json_dumps(other_set), headers = headers) as res:
+                async with session.post('http://127.0.0.1:' + port_data + "/api/" + path, data = other_set, headers = headers) as res:
                     data = await res.json()
 
                     return data
@@ -1307,7 +1308,8 @@ async def get_lang(data, safe = 0):
         other_set["legacy"] = ""
         other_set["safe"] = ""
 
-        res = await python_to_golang('api_func_language', other_set)
+        res = await python_to_golang('post_json', other_set, 'v2/lang')
+        print(res)
         if res['response'] == 'ok':
             for load_data in res['data']:
                 global_lang_data[load_data] = res['data'][load_data]

@@ -690,10 +690,14 @@ app.route('/record/<int:num>/<set_type>/<name>', defaults = { 'tool' : 'record' 
 app.route('/record/reset/<name>', methods = ['POST', 'GET'])(recent_record_reset)
 app.route('/record/topic/<name>')(recent_record_topic)
 
-app.route('/record/bbs/<name>')(golang_view())
-app.route('/record/bbs/<name>/<int:page>')(golang_view())
-app.route('/record/bbs_comment/<name>')(golang_view())
-app.route('/record/bbs_comment/<name>/<int:page>')(golang_view())
+app.route('/record_bbs/<name>')(golang_view())
+app.route('/record_bbs/<name>/<int:page>')(golang_view())
+app.route('/record_bbs_in/<bbs_name>/<name>')(golang_view())
+app.route('/record_bbs_in/<bbs_name>/<name>/<int:page>')(golang_view())
+app.route('/record_bbs_comment/<name>')(golang_view())
+app.route('/record_bbs_comment/<name>/<int:page>')(golang_view())
+app.route('/record_bbs_comment_in/<bbs_name>/<name>')(golang_view())
+app.route('/record_bbs_comment_in/<bbs_name>/<name>/<int:page>')(golang_view())
 
 app.route('/history/<everything:doc_name>', methods = ['POST', 'GET'])(golang_view())
 app.route('/history_page/<int:num>/<set_type>/<everything:doc_name>', methods = ['POST', 'GET'])(golang_view())
