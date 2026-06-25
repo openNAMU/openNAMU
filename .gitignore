@@ -1,40 +1,10 @@
-__pycache__
-/app_session
+go.sum
 
-data/set.json
-data/mysql.json
-data/oauthsettings.json
-data/version.json
-
-route/tool/set_mark/custom.py
-
-images
-
-.vscode
-.vs
-goorm.manifest
-.DS_Store
+/bin/*
+!/bin/test
 
 *.db
-*.db-shm
-*.db-wal
-*.db-journal
 
-robots.txt
-custom.py
-404.html
+views/liberty
 
-views/*
-!views/ringo
-!views/main_css
-
-bin/*
-!bin/test
-
-sitemap.xml
-sitemap_0.xml
-
-*_data
-
-venv
-.env
+data/*.json
