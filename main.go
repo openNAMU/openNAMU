@@ -90,8 +90,8 @@ func main() {
 
 	var r *gin.Engine
 	if len(os.Args) > 2 && os.Args[2] == "dev" {
+    	dev_mode = true
 		r = gin.Default()
-    dev_mode = true
 	} else {
 		gin.SetMode(gin.ReleaseMode)
 		r = gin.New()
