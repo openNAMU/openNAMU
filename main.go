@@ -23,6 +23,7 @@ import (
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
+var dev_mode = false
 
 func error_handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -35,11 +36,17 @@ func error_handler() gin.HandlerFunc {
 
 				stackTrace := debug.Stack()
 
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-					"response" : "error",
-					"error" : err.Error(),
-					"stack" : string(stackTrace),
-				})
+        if dev_mode {
+  			  c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+  					"response" : "error",
+  					"error" : err.Error(),
+  					"stack" : string(stackTrace),
+  				})
+        } else {
+          c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+  					"response" : "error",
+  				})
+        }
 			}
 		}()
 
@@ -82,13 +89,10 @@ func main() {
 	var r *gin.Engine
 	if len(os.Args) > 2 && os.Args[2] == "dev" {
 		r = gin.Default()
+    dev_mode = true
 	} else {
 		gin.SetMode(gin.ReleaseMode)
 		r = gin.New()
-	}
-
-	if len(os.Args) <= 3 || os.Args[3] != "api" {
-		tool.IN_mod_OUT_mod(true)
 	}
 
 	r.Use(error_handler())
