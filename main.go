@@ -35,18 +35,20 @@ func error_handler() gin.HandlerFunc {
 				}
 
 				stackTrace := debug.Stack()
+				log.Printf("Panic recovered: %v\n%s", err, stackTrace)
 
-        if dev_mode {
-  			  c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-  					"response" : "error",
-  					"error" : err.Error(),
-  					"stack" : string(stackTrace),
-  				})
-        } else {
-          c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-  					"response" : "error",
-  				})
-        }
+				if dev_mode {
+					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+						"response": "error",
+						"error"    : "Internal Server Error",
+					})
+				} else {
+					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+						"response": "error",
+						"error"    : err.Error(),
+						"stack"    : string(stackTrace),
+					})
+				}
 			}
 		}()
 
