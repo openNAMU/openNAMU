@@ -145,7 +145,7 @@ func Get_setting(db *sql.DB, set_name string, data_coverage string) [][]string {
 }
 
 func Get_skin_list(data string, default_flag bool) []string {
-    entries, err := os.ReadDir(filepath.Join("..", "views"))
+    entries, err := List_view_dir("")
     if err != nil {
         return nil
     }
@@ -157,6 +157,10 @@ func Get_skin_list(data string, default_flag bool) []string {
     }
 
     for _, entry := range entries {
+        if !entry.IsDir() {
+            continue
+        }
+
         skin_list = append(skin_list, entry.Name())
     }
 

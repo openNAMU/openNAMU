@@ -1,8 +1,10 @@
 package route
 
 import (
+	"errors"
+	"io/fs"
 	"net/http"
-	"os"
+	"opennamu/route/tool"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -56,9 +58,10 @@ func View_view_file(c *gin.Context) {
         }
     }
 
-    final_path := filepath.Join("..", "views", dir_name, file_name)
-    if _, err := os.Stat(final_path); err != nil {
-        if os.IsNotExist(err) {
+    final_path := path.Join(dir_name, file_name)
+    file_data, err := tool.Read_view_file(final_path)
+    if err != nil {
+        if errors.Is(err, fs.ErrNotExist) {
             c.String(http.StatusOK, "")
             return
         }
@@ -67,11 +70,12 @@ func View_view_file(c *gin.Context) {
         return
     }
 
+    content_type := mime_type
     if strings.HasPrefix(mime_type, "image/") && mime_type != "image/svg+xml" {
-        c.Header("Content-Type", mime_type)
+        content_type = mime_type
     } else {
-        c.Header("Content-Type", mime_type+"; charset=utf-8")
+        content_type = mime_type + "; charset=utf-8"
     }
 
-    c.File(final_path)
+    c.Data(http.StatusOK, content_type, file_data)
 }

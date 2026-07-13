@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"html"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -13,19 +12,14 @@ import (
 )
 
 func Get_skin_route(skin_name string, route string) string {
-    return filepath.Join("..", "views", skin_name, route)
+    return filepath.ToSlash(filepath.Join(skin_name, route))
 }
 
 func Get_template_set(skin_name string) map[string]string {
-    set_file_path := Get_skin_route(skin_name, "set.json")
-    if _, err := os.Stat(set_file_path); err == nil {
-        data, err := os.ReadFile(set_file_path)
-        if err != nil {
-            panic(err)
-        }
-
+    data, err := Read_view_file(Get_skin_route(skin_name, "set.json"))
+    if err == nil {
         set_json := map[string]string{}
-        json.Unmarshal([]byte(data), &set_json)
+        json.Unmarshal(data, &set_json)
 
         return set_json
     }
@@ -190,7 +184,12 @@ func Get_template(db *sql.DB, config Config, name string, data string, other []a
         "length_doc" : doc_length,
     }
 
-    tpl, err := pongo2.FromFile(Get_skin_route(skin_name, "index.html"))
+    template_data, err := Read_view_file(Get_skin_route(skin_name, "index.html"))
+    if err != nil {
+        panic(err)
+    }
+
+    tpl, err := pongo2.FromString(string(template_data))
     if err != nil {
         panic(err)
     }
