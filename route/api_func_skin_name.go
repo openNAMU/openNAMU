@@ -18,7 +18,7 @@ func Api_func_skin_name(config tool.Config) string {
     new_data["response"] = "ok"
 
     if other_set["set_n"] == "0" {
-        new_data["data"] = filepath.Join("..", "views", skin_name, "index.html")
+        new_data["data"] = filepath.Join("views", skin_name, "index.html")
     } else {
         new_data["data"] = skin_name
     }

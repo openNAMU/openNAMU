@@ -32,7 +32,6 @@ func Read_view_file(data string) ([]byte, error) {
 
 	for _, base := range []string{
 		"views",
-		filepath.Join("..", "views"),
 	} {
 		raw, err := os.ReadFile(filepath.Join(base, filepath.FromSlash(data)))
 		if err == nil {
@@ -52,7 +51,6 @@ func List_view_dir(data string) ([]fs.DirEntry, error) {
 	entry_map := map[string]fs.DirEntry{}
 	for _, base := range []string{
 		"views",
-		filepath.Join("..", "views"),
 	} {
 		entries, err := os.ReadDir(filepath.Join(base, filepath.FromSlash(data)))
 		if err == nil {

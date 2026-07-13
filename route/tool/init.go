@@ -216,7 +216,7 @@ func Main_init() {
 }
 
 func Get_last_version() map[string]string {
-    version_file_path := filepath.Join("..", "version.json")
+    version_file_path := filepath.Join("version.json")
     if _, err := os.Stat(version_file_path); err == nil {
         data, err := os.ReadFile(version_file_path)
         if err != nil {

@@ -1,9 +1,6 @@
 package route
 
-import (
-	"opennamu/route/tool"
-	"path/filepath"
-)
+import "opennamu/route/tool"
 
 func View_main_404_page(config tool.Config, url string) string {
     db := tool.DB_connect()
@@ -30,7 +27,7 @@ func View_main_404_page(config tool.Config, url string) string {
 
     data_html := ""
 
-    page_404_dir := filepath.Join("..", "404.html")
+    page_404_dir := "404.html"
     if tool.File_exist_check(page_404_dir) && page_404_set == "404_file" {
         data_html = tool.File_text_read(page_404_dir)
     } else {

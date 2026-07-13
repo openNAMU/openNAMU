@@ -651,7 +651,7 @@ func Get_image_url(db *sql.DB) string {
     )
 
     if image_url == "" {
-        image_url = filepath.Join("..", "data", "images")
+        image_url = filepath.Join("data", "images")
     }
 
     return image_url

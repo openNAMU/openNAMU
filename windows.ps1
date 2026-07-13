@@ -11,9 +11,7 @@ if($to -eq "linux_amd64" -or $to -eq "all") {
     $env:GOARCH = "amd64"
     $env:CGO_ENABLED = 0
     $env:GOFLAGS = "-trimpath"
-    go build $file_name.go
-    Remove-Item ".\bin\$file_name.amd64.bin"
-    Move-Item "opennamu" ".\bin\$file_name.amd64.bin"
+    go build -o "$file_name.amd64.bin" "$file_name.go"
 }
 
 if($to -eq "linux_arm64" -or $to -eq "all") {
@@ -22,9 +20,7 @@ if($to -eq "linux_arm64" -or $to -eq "all") {
     $env:GOARCH = "arm64"
     $env:CGO_ENABLED = 0
     $env:GOFLAGS = "-trimpath"
-    go build $file_name.go
-    Remove-Item ".\bin\$file_name.arm64.bin"
-    Move-Item "opennamu" ".\bin\$file_name.arm64.bin"
+    go build -o "$file_name.arm64.bin" "$file_name.go"
 }
 
 if($to -eq "windows_amd64" -or $to -eq "all") {
@@ -33,9 +29,7 @@ if($to -eq "windows_amd64" -or $to -eq "all") {
     $env:GOARCH = "amd64"
     $env:CGO_ENABLED = 0
     $env:GOFLAGS = "-trimpath"
-    go build $file_name.go
-    Remove-Item ".\bin\$file_name.amd64.exe"
-    Move-Item "opennamu.exe" ".\bin\$file_name.amd64.exe"
+    go build -o "$file_name.amd64.exe" "$file_name.go"
 }
 
 if($to -eq "windows_arm64" -or $to -eq "all") {
@@ -44,9 +38,7 @@ if($to -eq "windows_arm64" -or $to -eq "all") {
     $env:GOARCH = "arm64"
     $env:CGO_ENABLED = 0
     $env:GOFLAGS = "-trimpath"
-    go build $file_name.go
-    Remove-Item ".\bin\$file_name.arm64.exe"
-    Move-Item "opennamu.exe" ".\bin\$file_name.arm64.exe"
+    go build -o "$file_name.arm64.exe" "$file_name.go"
 }
 
 if($to -eq "mac_arm64" -or $to -eq "all") {
@@ -55,7 +47,5 @@ if($to -eq "mac_arm64" -or $to -eq "all") {
     $env:GOARCH = "arm64"
     $env:CGO_ENABLED = 0
     $env:GOFLAGS = "-trimpath"
-    go build $file_name.go
-    Remove-Item ".\bin\$file_name.mac.arm64.bin"
-    Move-Item "opennamu" ".\bin\$file_name.mac.arm64.bin"
+    go build -o "$file_name.mac.arm64.bin" "$file_name.go"
 }

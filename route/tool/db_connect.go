@@ -25,7 +25,7 @@ func Get_DB_set() map[string]string {
         return new_db_set
     }
     
-    path_dir := filepath.Join("..", "data", "set.json")
+    path_dir := filepath.Join("data", "set.json")
     if File_exist_check(path_dir) {
         raw, err := os.ReadFile(path_dir)
         if err == nil {
@@ -55,7 +55,7 @@ func Get_DB_set() map[string]string {
 }
 
 func Get_DB_set_MySQL(new_db_set map[string]string) map[string]string {
-    path := filepath.Join("..", "data", "mysql.json")
+    path := filepath.Join("data", "mysql.json")
     if !File_exist_check(path) {
         return new_db_set
     }
@@ -184,7 +184,7 @@ func DB_boot() map[string]string {
 
 func DB_connect_init() (*sql.DB, error) {
     if db_set["db_type"] == "sqlite" {
-        db, err := sql.Open("sqlite", filepath.Join("..", db_set["db_name"] + ".db") + "?_journal_mode=WAL&_busy_timeout=5000")
+        db, err := sql.Open("sqlite", filepath.Join(db_set["db_name"] + ".db") + "?_journal_mode=WAL&_busy_timeout=5000")
         if err != nil {
             return nil, err
         }
@@ -214,7 +214,7 @@ func DB_connect() *sql.DB {
     // log.Default().Println("DB open")
 
     if db_set["db_type"] == "sqlite" {
-        db, err := sql.Open("sqlite", filepath.Join("..", db_set["db_name"] + ".db") + "?_journal_mode=WAL&_busy_timeout=5000")
+        db, err := sql.Open("sqlite", filepath.Join(db_set["db_name"] + ".db") + "?_journal_mode=WAL&_busy_timeout=5000")
         if err != nil {
             panic(err)
         }

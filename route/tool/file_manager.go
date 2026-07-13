@@ -35,7 +35,7 @@ func Get_file_main_dir(db *sql.DB) string {
     )
 
     if data == "" {
-        data = filepath.Join("..", "data", "images")
+        data = filepath.Join("data", "images")
     } else {
         data = filepath.Clean(data)
     }
