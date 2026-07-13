@@ -5,8 +5,13 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 )
+
+var builtin_version_data []byte
+
+func Set_builtin_version_data(data []byte) {
+    builtin_version_data = data
+}
 
 func DB_table_list() map[string][]string {
     create_data := map[string][]string{}
@@ -216,20 +221,16 @@ func Main_init() {
 }
 
 func Get_last_version() map[string]string {
-    version_file_path := filepath.Join("version.json")
-    if _, err := os.Stat(version_file_path); err == nil {
-        data, err := os.ReadFile(version_file_path)
-        if err != nil {
-            panic(err)
-        }
+    if len(builtin_version_data) == 0 {
+        panic("builtin version data is empty")
+    }
 
-        version_json := map[string]string{}
-        json.Unmarshal([]byte(data), &version_json)
-
-        return version_json
-    } else {
+    version_json := map[string]string{}
+    if err := json.Unmarshal(builtin_version_data, &version_json); err != nil {
         panic(err)
     }
+
+    return version_json
 }
 
 func First_init(db *sql.DB) {

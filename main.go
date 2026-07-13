@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"runtime/debug"
 	"strings"
+	_ "embed"
 
 	"opennamu/route"
 	"opennamu/route/tool"
@@ -24,6 +25,9 @@ import (
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 var dev_mode = false
+
+//go:embed version.json
+var builtin_version_json []byte
 
 func error_handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -100,6 +104,7 @@ func main() {
 	r.Use(error_handler())
 	pongo_init()
 	
+	tool.Set_builtin_version_data(builtin_version_json)
 	tool.Main_init()
 
 	r.GET("/api/user_info/:user_name", func(c *gin.Context) {

@@ -8,3 +8,6 @@ go.sum
 views/liberty
 
 data/*.json
+
+*.exe
+*.bin
