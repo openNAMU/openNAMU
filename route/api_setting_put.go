@@ -4,7 +4,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_setting_put(config tool.Config) string {
+func Api_setting_put(config tool.Config) map[string]any {
     db := tool.DB_connect()
     defer tool.DB_close(db)
 
@@ -45,6 +45,5 @@ func Api_setting_put(config tool.Config) string {
         return_data["response"] = "not exist"
     }
 
-    json_data, _ := json.Marshal(return_data)
-    return string(json_data)
+    return return_data
 }
