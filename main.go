@@ -941,6 +941,16 @@ func main() {
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.GET("/vote", func(c *gin.Context) {
+		route_data := route.View_vote_list(tool.Config{
+			Other_set: "",
+			IP:        tool.Get_IP(c),
+			Cookies:   tool.Get_Cookies(c),
+			Session:   "",
+		}, "open", "1")
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/bbs/main", func(c *gin.Context) {
 		route_data := route.View_bbs_main(tool.Config{
 			Other_set: "",

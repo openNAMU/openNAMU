@@ -1,6 +1,6 @@
 #!/bin/bash
 
-read -p "file_name: " file_name
+file_name="main"
 to="${1:-all}"
 
 build() {
