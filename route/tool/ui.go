@@ -331,6 +331,20 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
         data = Get_language(db, "authority_error", true)
     case "password error":
         data = Get_language(db, "password_error", true)
+    case "password different":
+        data = Get_language(db, "password_diffrent_error", true)
+    case "empty password":
+        data = Get_language(db, "invalid_password_error", true)
+    case "password too short":
+        password_length_limit := ""
+        QueryRow_DB(
+            db,
+            `select data from other where name = 'password_min_length'`,
+            []any{ &password_length_limit },
+        )
+        data = Get_language(db, "error_password_length_too_short", true) + " " + password_length_limit
+    case "user name error":
+        data = Get_language(db, "input_email_error", true)
     case "ban":
         data = Get_language(db, "blocked", true)
     case "slow edit limit":
