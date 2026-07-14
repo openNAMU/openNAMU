@@ -1,0 +1,178 @@
+github.com/lib/pq @ v1.10.9
+
+----- LICENSE.md -----
+
+Copyright (c) 2011-2013, 'pq' Contributors
+Portions Copyright (C) 2011 Blake Mizerany
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+----- notice.go -----
+
+//go:build go1.10
+// +build go1.10
+
+package pq
+
+import (
+	"context"
+	"database/sql/driver"
+)
+
+// NoticeHandler returns the notice handler on the given connection, if any. A
+// runtime panic occurs if c is not a pq connection. This is rarely used
+// directly, use ConnectorNoticeHandler and ConnectorWithNoticeHandler instead.
+func NoticeHandler(c driver.Conn) func(*Error) {
+	return c.(*conn).noticeHandler
+}
+
+// SetNoticeHandler sets the given notice handler on the given connection. A
+// runtime panic occurs if c is not a pq connection. A nil handler may be used
+// to unset it. This is rarely used directly, use ConnectorNoticeHandler and
+// ConnectorWithNoticeHandler instead.
+//
+// Note: Notice handlers are executed synchronously by pq meaning commands
+// won't continue to be processed until the handler returns.
+func SetNoticeHandler(c driver.Conn, handler func(*Error)) {
+	c.(*conn).noticeHandler = handler
+}
+
+// NoticeHandlerConnector wraps a regular connector and sets a notice handler
+// on it.
+type NoticeHandlerConnector struct {
+	driver.Connector
+	noticeHandler func(*Error)
+}
+
+// Connect calls the underlying connector's connect method and then sets the
+// notice handler.
+func (n *NoticeHandlerConnector) Connect(ctx context.Context) (driver.Conn, error) {
+	c, err := n.Connector.Connect(ctx)
+	if err == nil {
+		SetNoticeHandler(c, n.noticeHandler)
+	}
+	return c, err
+}
+
+// ConnectorNoticeHandler returns the currently set notice handler, if any. If
+// the given connector is not a result of ConnectorWithNoticeHandler, nil is
+// returned.
+func ConnectorNoticeHandler(c driver.Connector) func(*Error) {
+	if c, ok := c.(*NoticeHandlerConnector); ok {
+		return c.noticeHandler
+	}
+	return nil
+}
+
+// ConnectorWithNoticeHandler creates or sets the given handler for the given
+// connector. If the given connector is a result of calling this function
+// previously, it is simply set on the given connector and returned. Otherwise,
+// this returns a new connector wrapping the given one and setting the notice
+// handler. A nil notice handler may be used to unset it.
+//
+// The returned connector is intended to be used with database/sql.OpenDB.
+//
+// Note: Notice handlers are executed synchronously by pq meaning commands
+// won't continue to be processed until the handler returns.
+func ConnectorWithNoticeHandler(c driver.Connector, handler func(*Error)) *NoticeHandlerConnector {
+	if c, ok := c.(*NoticeHandlerConnector); ok {
+		c.noticeHandler = handler
+		return c
+	}
+	return &NoticeHandlerConnector{Connector: c, noticeHandler: handler}
+}
+
+----- notice_example_test.go -----
+
+//go:build go1.10
+// +build go1.10
+
+package pq_test
+
+import (
+	"database/sql"
+	"fmt"
+	"log"
+
+	"github.com/lib/pq"
+)
+
+func ExampleConnectorWithNoticeHandler() {
+	name := ""
+	// Base connector to wrap
+	base, err := pq.NewConnector(name)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Wrap the connector to simply print out the message
+	connector := pq.ConnectorWithNoticeHandler(base, func(notice *pq.Error) {
+		fmt.Println("Notice sent: " + notice.Message)
+	})
+	db := sql.OpenDB(connector)
+	defer db.Close()
+	// Raise a notice
+	sql := "DO language plpgsql $$ BEGIN RAISE NOTICE 'test notice'; END $$"
+	if _, err := db.Exec(sql); err != nil {
+		log.Fatal(err)
+	}
+	// Output:
+	// Notice sent: test notice
+}
+
+----- notice_test.go -----
+
+//go:build go1.10
+// +build go1.10
+
+package pq
+
+import (
+	"database/sql"
+	"database/sql/driver"
+	"testing"
+)
+
+func TestConnectorWithNoticeHandler_Simple(t *testing.T) {
+	b, err := NewConnector("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var notice *Error
+	// Make connector w/ handler to set the local var
+	c := ConnectorWithNoticeHandler(b, func(n *Error) { notice = n })
+	raiseNotice(c, t, "Test notice #1")
+	if notice == nil || notice.Message != "Test notice #1" {
+		t.Fatalf("Expected notice w/ message, got %v", notice)
+	}
+	// Unset the handler on the same connector
+	prevC := c
+	if c = ConnectorWithNoticeHandler(c, nil); c != prevC {
+		t.Fatalf("Expected to not create new connector but did")
+	}
+	raiseNotice(c, t, "Test notice #2")
+	if notice == nil || notice.Message != "Test notice #1" {
+		t.Fatalf("Expected notice to not change, got %v", notice)
+	}
+	// Set it back on the same connector
+	if c = ConnectorWithNoticeHandler(c, func(n *Error) { notice = n }); c != prevC {
+		t.Fatal("Expected to not create new connector but did")
+	}
+	raiseNotice(c, t, "Test notice #3")
+	if notice == nil || notice.Message != "Test notice #3" {
+		t.Fatalf("Expected notice w/ message, got %v", notice)
+	}
+}
+
+func raiseNotice(c driver.Connector, t *testing.T, escapedNotice string) {
+	db := sql.OpenDB(c)
+	defer db.Close()
+	sql := "DO language plpgsql $$ BEGIN RAISE NOTICE '" + escapedNotice + "'; END $$"
+	if _, err := db.Exec(sql); err != nil {
+		t.Fatal(err)
+	}
+}
+
