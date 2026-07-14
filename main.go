@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/md5"
+	_ "embed"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
@@ -11,7 +12,6 @@ import (
 	"path/filepath"
 	"runtime/debug"
 	"strings"
-	_ "embed"
 
 	"opennamu/route"
 	"opennamu/route/tool"
@@ -87,7 +87,7 @@ func pongo_init() {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	port := "3001"
+	port := "3000"
 	if len(os.Args) > 1 {
 		port = os.Args[1]
 	}
