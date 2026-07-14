@@ -66,6 +66,11 @@ func Get_month() string {
 }
 
 func Get_IP(c *gin.Context) string {
+	user_id, ok := Get_session(c).Get("id").(string)
+	if ok && user_id != "" {
+		return user_id
+	}
+
     return c.ClientIP()
 }
 
