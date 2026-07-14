@@ -1137,6 +1137,21 @@ func main() {
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.GET("/diff/:before_rev/:after_rev/*doc_name", func(c *gin.Context) {
+		route_data := route.View_w_diff(
+			tool.Config{
+				Other_set: "",
+				IP:        tool.Get_IP(c),
+				Cookies:   tool.Get_Cookies(c),
+				Session:   tool.Get_session(c),
+			},
+			strings.TrimPrefix(c.Param("doc_name"), "/"),
+			c.Param("before_rev"),
+			c.Param("after_rev"),
+		)
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/edit/*doc_name", func(c *gin.Context) {
 		route_data := route.View_edit(tool.Config{
 			Other_set: "",
