@@ -674,3 +674,10 @@ func Get_random_key(long int) string {
 
 	return string(result)
 }
+
+func Get_http_warning(db *sql.DB) string {
+    return `
+        <div id="opennamu_http_warning_text"></div>
+        <span style="display: none;" id="opennamu_http_warning_text_lang">` + Get_language(db, "http_warning", true) + `</span>
+    `
+}

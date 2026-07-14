@@ -617,6 +617,40 @@ func main() {
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.GET("/login", func(c *gin.Context) {
+		route_data := route.View_login_login(tool.Config{
+			Other_set: "",
+			IP:        tool.Get_IP(c),
+			Cookies:   tool.Get_Cookies(c),
+			Session:   tool.Get_session(c),
+		})
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.POST("/login", func(c *gin.Context) {
+		route_data := route.View_login_login_post(
+			tool.Config{
+				Other_set: "",
+				IP:        tool.Get_IP(c),
+				Cookies:   tool.Get_Cookies(c),
+				Session:   tool.Get_session(c),
+			},
+			c.PostForm("id"),
+			c.PostForm("password"),
+		)
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/logout", func(c *gin.Context) {
+		route_data := route.View_login_logout(tool.Config{
+			Other_set: "",
+			IP:        tool.Get_IP(c),
+			Cookies:   tool.Get_Cookies(c),
+			Session:   tool.Get_session(c),
+		})
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/user", func(c *gin.Context) {
 		route_data := route.View_user(tool.Config{
 			Other_set: "",
