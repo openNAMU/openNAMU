@@ -20,6 +20,79 @@ func IP_or_user(ip string) bool {
     }
 }
 
+// PASS is TRUE
+func Get_user_name_check(db *sql.DB, user_name string) bool {
+    if user_name == "" {
+        return false
+    }
+
+    if HTML_escape(user_name) != user_name {
+        return false
+    }
+
+    if IP_or_user(user_name) {
+        return false
+    }
+
+    user_name_arr := strings.Split(user_name, "")
+    if Arr_in_str(user_name_arr, "/") {
+        return false
+    }
+
+    rows := Query_DB(
+        db,
+        `select html from html_filter where kind = "name"`,
+    )
+    defer rows.Close() 
+    
+    for rows.Next() {
+        var html string
+
+        err := rows.Scan(&html)
+        if err != nil {
+            panic(err)
+        }
+
+        check_regex, err := regexp.Compile("(?i)" + html)
+        if err != nil {
+            panic(err)
+        }
+
+        if check_regex.MatchString(user_name) {
+            return false
+        }
+    }
+
+    if len(user_name) > 128 {
+        return false
+    }
+
+    data := ""
+    QueryRow_DB(
+        db,
+        `select id from user_set where name = 'user_name' and data = ?`,
+        []any{ &data },
+        user_name,
+    )
+
+    if data != "" {
+        return false
+    }
+
+    QueryRow_DB(
+        db,
+        `select id from user_set where id = ?`,
+        []any{ &data },
+        user_name,
+    )
+
+    if data != "" {
+        return false
+    }
+
+    return true
+}
+
 func Get_user_document(db *sql.DB, user_name string) bool {
     data := ""
 

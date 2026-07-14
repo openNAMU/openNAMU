@@ -7,17 +7,24 @@ import (
 	"encoding/hex"
 )
 
-func Password_encode(db *sql.DB, password string, encode string) string {
-    if encode == "" {
-        QueryRow_DB(
-            db,
-            `select data from other where name = "encode"`,
-            []any{ &encode },
-        )
-    }
+func Get_main_encode(db *sql.DB) string {
+    encode := ""
+    QueryRow_DB(
+        db,
+        `select data from other where name = "encode"`,
+        []any{ &encode },
+    )
 
     if encode == "" {
         encode = "sha3"
+    }
+
+    return encode
+}
+
+func Password_encode(db *sql.DB, password string, encode string) string {
+    if encode == "" {
+        encode = Get_main_encode(db)
     }
 
     switch encode {

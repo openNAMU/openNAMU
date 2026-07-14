@@ -43,6 +43,7 @@ func HTML_unescape(data string) string {
     return html.UnescapeString(data)
 }
 
+// return true if data is in arr
 func Arr_in_str(arr []string, data string) bool {
     for _, v := range arr {
         if v == data {
