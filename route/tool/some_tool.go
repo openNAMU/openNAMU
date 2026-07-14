@@ -16,6 +16,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -70,10 +71,6 @@ func Get_IP(c *gin.Context) string {
 
 func Get_Cookies(c *gin.Context) string {
     return c.Request.Header.Get("Cookie")
-}
-
-func Get_session(c *gin.Context) string {
-    return ""
 }
 
 func Get_document_setting(db *sql.DB, doc_name string, set_name string, doc_rev string) [][]string {
@@ -227,10 +224,7 @@ func Get_domain(db *sql.DB, full_string bool) string {
     return domain
 }
 
-func Get_wiki_custom(db *sql.DB, ip string, session_str string, cookies string) []any {
-    session := map[string]string{}
-    json.Unmarshal([]byte(session_str), &session)
-
+func Get_wiki_custom(db *sql.DB, ip string, _ sessions.Session, cookies string) []any {
     skin_name := "_" + Get_use_skin_name(db, ip)
 
     user_icon := 1
@@ -519,7 +513,7 @@ type Config struct {
     Other_set string
     IP string
     Cookies string
-    Session string
+    Session sessions.Session
 }
 
 func Deep_copy_config(src Config) Config {
@@ -527,7 +521,7 @@ func Deep_copy_config(src Config) Config {
         Other_set : strings.Clone(src.Other_set),
         IP : strings.Clone(src.IP),
         Cookies : strings.Clone(src.Cookies),
-        Session : strings.Clone(src.Session),
+        Session : src.Session,
     }
 }
 
