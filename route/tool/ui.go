@@ -331,6 +331,8 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
         data = Get_language(db, "authority_error", true)
     case "password error":
         data = Get_language(db, "password_error", true)
+    case "ban":
+        data = Get_language(db, "blocked", true)
     case "slow edit limit":
         data = Get_language(db, "fast_edit_error", true)
     case "edit filter (content)":
