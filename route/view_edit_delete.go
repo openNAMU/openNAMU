@@ -8,11 +8,15 @@ func View_edit_delete(config tool.Config, doc_name string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	api_data := Api_edit_delete(config, doc_name)
-	response := api_data["response"].(string)
+	if !tool.Check_acl(db, doc_name, "", "document_delete", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
+	raw_data := Api_w_raw(config, doc_name, "true", "")
+	response := raw_data["response"].(string)
 	if response == "require auth" {
 		return tool.Get_error_page(db, config, "auth")
-	} else if response != "ok" {
+	} else if response != "ok" || !raw_data["exist"].(bool) {
 		return tool.Get_redirect("/w/" + tool.Url_parser(doc_name))
 	}
 
