@@ -348,6 +348,7 @@
     "image_file_list": "이미지 파일 목록",
     "many_upload_acl": "다중 파일 올리기 ACL",
     "reset_backlink": "역링크 초기화",
+    "reset_all_backlink": "전체 역링크 재생성",
     "link_in_this": "이 문서의 링크",
     "star_doc": "관심 문서",
     "add_star_doc": "관심 문서 추가",

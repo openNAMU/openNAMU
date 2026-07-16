@@ -566,6 +566,18 @@ func Get_except_document_name_SQL(col_title string) string {
     return col_title + ` not like 'file:%' and ` + col_title + ` not like 'category:%' and ` + col_title + ` not like 'user:%'`
 }
 
+func Get_document_type(doc_name string) string {
+	if strings.HasPrefix(doc_name, "user:") {
+		return "user"
+	} else if strings.HasPrefix(doc_name, "file:") {
+		return "file"
+	} else if strings.HasPrefix(doc_name, "category:") {
+		return "category"
+	}
+
+	return ""
+}
+
 func Get_except_set_id_SQL() string {
     return `not set_id = "0"`
 }

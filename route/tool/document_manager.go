@@ -244,13 +244,10 @@ func Do_add_history(db *sql.DB, doc_name string, data string, date string, ip st
             mode = "r1"
         }
 
-        if strings.HasPrefix(doc_name, "user:") {
-            mode = "user"
-        } else if strings.HasPrefix(doc_name, "category:") {
-            mode = "category"
-        } else if strings.HasPrefix(doc_name, "file:") {
-            mode = "file"
-        }
+		doc_type := Get_document_type(doc_name)
+		if doc_type != "" {
+			mode = doc_type
+		}
     }
 
     send = strings.ReplaceAll(send, "<", "")

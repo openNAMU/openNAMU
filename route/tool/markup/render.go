@@ -101,12 +101,6 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 			doc_name,
 		)
 
-		tool.Exec_DB(
-			db,
-			"delete from data_set where doc_name = ? and set_name = 'doc_type'",
-			doc_name,
-		)
-
 		for link, link_type_list := range backlink_list {
 			for _, link_type := range link_type_list {
 				tool.Exec_DB(
@@ -123,12 +117,6 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 			db,
 			"insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'link_count', ?)",
 			doc_name, backlink_count,
-		)
-
-		tool.Exec_DB(
-			db,
-			"insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', ?)",
-			doc_name, "",
 		)
 	}
 

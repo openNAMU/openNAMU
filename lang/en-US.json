@@ -297,6 +297,7 @@
     "delete_admin_group": "Delete auth group",
     "main_skin_set": "Main skin settings",
     "reset_backlink": "Reset backlink",
+    "reset_all_backlink": "Rebuild all backlinks",
     "link_in_this": "Links in this document",
     "star_doc": "Document(s) of interest",
     "add_star_doc": "Add document(s) of interest",

@@ -4,14 +4,11 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_list_title_index(config tool.Config) string {
+func Api_list_title_index(config tool.Config, num string) map[string]any {
     db := tool.DB_connect()
     defer tool.DB_close(db)
 
-    other_set := map[string]string{}
-    json.Unmarshal([]byte(config.Other_set), &other_set)
-
-    page_int := tool.Str_to_int(other_set["num"])
+    page_int := tool.Str_to_int(num)
     if page_int > 0 {
         page_int = (page_int * 50) - 50
     } else {
@@ -41,6 +38,5 @@ func Api_list_title_index(config tool.Config) string {
     return_data := make(map[string]any)
     return_data["data"] = data_list
 
-    json_data, _ := json.Marshal(return_data)
-    return string(json_data)
+    return return_data
 }
