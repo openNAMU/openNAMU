@@ -66,6 +66,23 @@ func register_history_edit_routes(r *gin.Engine) {
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.GET("/delete/*doc_name", func(c *gin.Context) {
+		doc_name := strings.TrimPrefix(c.Param("doc_name"), "/")
+		route_data := route.View_edit_delete(make_route_config(c), doc_name)
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.POST("/delete/*doc_name", func(c *gin.Context) {
+		doc_name := strings.TrimPrefix(c.Param("doc_name"), "/")
+		route_data := route.View_edit_delete_post(
+			make_route_config(c),
+			doc_name,
+			c.PostForm("send"),
+			c.PostForm("copyright_agreement"),
+		)
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.POST("/upload", func(c *gin.Context) {
 		form, err := c.MultipartForm()
 		if err != nil || form == nil {
