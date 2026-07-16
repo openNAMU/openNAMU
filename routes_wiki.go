@@ -8,6 +8,36 @@ import (
 )
 
 func register_wiki_routes(r *gin.Engine) {
+	r.GET("/xref/*doc_name", func(c *gin.Context) {
+		route_data := route.View_w_xref(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), "1", "1")
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/xref_page/:num/*doc_name", func(c *gin.Context) {
+		route_data := route.View_w_xref(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), "1", c.Param("num"))
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/xref_this/*doc_name", func(c *gin.Context) {
+		route_data := route.View_w_xref(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), "2", "1")
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/xref_this_page/:num/*doc_name", func(c *gin.Context) {
+		route_data := route.View_w_xref(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), "2", c.Param("num"))
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/xref_reset/*doc_name", func(c *gin.Context) {
+		route_data := route.View_w_xref_reset(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"))
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.POST("/xref_reset/*doc_name", func(c *gin.Context) {
+		route_data := route.View_w_xref_reset_post(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"))
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/upload", func(c *gin.Context) {
 		route_data := route.View_edit_file_upload(make_route_config(c))
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
