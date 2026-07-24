@@ -9,9 +9,9 @@ func Api_bbs_w_comment_one_delete(config tool.Config, set_id string, set_code st
     return_data := make(map[string]any)
 
     api_data := Api_bbs_w_comment_one(config, false, "", set_id + "-" + set_code)
-    api_data_in := api_data["data"].(map[string]string)
+    api_data_in, ok := api_data["data"].([]map[string]string)
     
-    if len(api_data_in) == 0 {
+    if !ok || len(api_data_in) == 0 {
         return_data["response"] = "error"
         return_data["data"] = "no data"
 
@@ -24,8 +24,8 @@ func Api_bbs_w_comment_one_delete(config tool.Config, set_id string, set_code st
         return return_data
     }
 
-    new_id := api_data_in["id"]
-    new_code := api_data_in["code"]
+    new_id := api_data_in[0]["id"]
+    new_code := api_data_in[0]["code"]
 
     tool.Exec_DB(
         db,
