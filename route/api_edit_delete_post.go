@@ -52,7 +52,7 @@ func Api_edit_delete_post(config tool.Config, doc_name string, send string, agre
 		tool.Get_time(),
 		config.IP,
 		send,
-		"-"+strconv.Itoa(len(raw_data)),
+		"-"+strconv.Itoa(tool.Get_len(raw_data)),
 		"delete",
 		"",
 	)

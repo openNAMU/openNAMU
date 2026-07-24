@@ -150,12 +150,12 @@ func Do_edit_max_length_check(db *sql.DB, config Config, data string) bool {
         return true
     }
 
-    return len(data) <= Str_to_int(check)
+    return Get_len(data) <= Str_to_int(check)
 }
 
 func Get_edit_length_diff(A string, B string) string {
-    A_len := len(A)
-    B_len := len(B)
+    A_len := Get_len(A)
+    B_len := Get_len(B)
 
     if A_len > B_len {
         diff_len := A_len - B_len
@@ -253,8 +253,8 @@ func Do_add_history(db *sql.DB, doc_name string, data string, date string, ip st
     send = strings.ReplaceAll(send, "<", "")
     send = strings.ReplaceAll(send, ">", "")
 
-    if len(send) > 512 {
-        send = send[:512]
+    if Get_len(send) > 512 {
+        send = string([]rune(send)[:512])
     }
 
     if type_check != "" {
@@ -320,7 +320,7 @@ func Do_add_history(db *sql.DB, doc_name string, data string, date string, ip st
             db,
             `insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'length', ?)`,
             doc_name,
-            len(data),
+            Get_len(data),
         )
 
         Exec_DB(

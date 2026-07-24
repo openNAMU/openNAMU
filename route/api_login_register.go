@@ -46,7 +46,7 @@ func Api_login_register(config tool.Config, id string, password string, password
     )
 
     password_length_limit := tool.Str_to_int(password_length_limit_str)
-    if len(password) < password_length_limit {
+    if tool.Get_len(password) < password_length_limit {
         return_data["response"] = "error"
         return_data["data"] = "password too short"
 

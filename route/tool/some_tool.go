@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 	"unicode"
+	"unicode/utf8"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -693,4 +694,8 @@ func Get_http_warning(db *sql.DB) string {
         <div id="opennamu_http_warning_text"></div>
         <span style="display: none;" id="opennamu_http_warning_text_lang">` + Get_language(db, "http_warning", true) + `</span>
     `
+}
+
+func Get_len(data string) int {
+	return utf8.RuneCountInString(data)
 }

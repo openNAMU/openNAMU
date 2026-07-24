@@ -63,7 +63,7 @@ func Get_user_name_check(db *sql.DB, user_name string) bool {
         }
     }
 
-    if len(user_name) > 128 {
+    if Get_len(user_name) > 128 {
         return false
     }
 

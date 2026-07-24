@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"opennamu/route/tool"
+
 	"github.com/dlclark/regexp2"
 )
 
@@ -80,7 +82,7 @@ func (class *namumark) render_heading() {
 
         heading_data := r_sub.ReplaceAllString(match[3], "")
 
-        heading_len := strconv.Itoa(len(match[1]))
+        heading_len := strconv.Itoa(tool.Get_len(match[1]))
         heading_render := "[h" + heading_len + "(" + heading_data + ")]"
 
         return heading_render
