@@ -68,12 +68,12 @@ func pongo_init() {
 	})
 
 	pongo2.RegisterFilter("cut_100", func(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-		s := in.String()
-		if len(s) > 100 {
-			s = s[:100]
+		runes := []rune(in.String())
+		if len(runes) > 100 {
+			runes = runes[:100]
 		}
 
-		return pongo2.AsValue(s), nil
+		return pongo2.AsValue(string(runes)), nil
 	})
 }
 
