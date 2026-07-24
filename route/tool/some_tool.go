@@ -8,6 +8,7 @@ import (
 	"html"
 	"html/template"
 	"math/big"
+	"net"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -22,6 +23,8 @@ import (
 )
 
 var standalone_mode = true
+
+var load_ip_select = "default"
 
 func Sha224(data string) string {
     hasher := sha256.New224()
@@ -67,13 +70,77 @@ func Get_month() string {
     return time.Now().Format("2006-01")
 }
 
+func Get_ip_select(db *sql.DB) {
+    setting := ""
+    QueryRow_DB(
+        db,
+        `select data from other where name = "load_ip_select"`,
+        []any{ &setting },
+    )
+
+    setting = strings.TrimSpace(setting)
+    if setting == "" {
+        setting = "default"
+    }
+
+    load_ip_select = setting
+}
+
 func Get_IP(c *gin.Context) string {
 	user_id, ok := Get_session(c).Get("id").(string)
 	if ok && user_id != "" {
 		return user_id
 	}
 
-    return c.ClientIP()
+    setting := strings.TrimSpace(load_ip_select)
+    header_names := []string{ "X-Real-IP", "CF-Connecting-IP" }
+
+    if setting != "" && !strings.EqualFold(setting, "default") {
+        if strings.EqualFold(setting, "REMOTE_ADDR") {
+            header_names = []string{}
+        } else {
+            if len(setting) > len("HTTP_") && strings.EqualFold(setting[:len("HTTP_")], "HTTP_") {
+                setting = setting[len("HTTP_"):]
+                setting = strings.ReplaceAll(setting, "_", "-")
+            }
+
+            header_names = []string{ setting }
+        }
+    }
+
+    parse_ip := func(raw_ip string) string {
+        for _, value := range strings.Split(raw_ip, ",") {
+            value = strings.TrimSpace(value)
+            if value == "" {
+                continue
+            }
+
+            if ip := net.ParseIP(value); ip != nil {
+                return ip.String()
+            }
+
+            host, _, err := net.SplitHostPort(value)
+            if err == nil {
+                if ip := net.ParseIP(host); ip != nil {
+                    return ip.String()
+                }
+            }
+        }
+
+        return ""
+    }
+
+    for _, header_name := range header_names {
+        if ip := parse_ip(c.GetHeader(header_name)); ip != "" {
+            return ip
+        }
+    }
+
+    if ip := parse_ip(c.Request.RemoteAddr); ip != "" {
+        return ip
+    }
+
+    return "::1"
 }
 
 func Get_Cookies(c *gin.Context) string {
