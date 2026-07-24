@@ -8,6 +8,10 @@ import (
 )
 
 func register_search_routes(r *gin.Engine) {
+	r.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusFound, route.Get_frontpage_url())
+	})
+
 	r.POST("/goto", func(c *gin.Context) {
 		route_data := route.View_main_search_post(make_route_config(c), "", true, c.PostForm("search"))
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))

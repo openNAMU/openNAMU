@@ -80,7 +80,7 @@ func View_main_search(config tool.Config, keyword string, num string, search_typ
             num_int,
             len(data_api_in),
             50,
-            "/search_page/{}/" + tool.Url_parser(keyword),
+            "/search_data_page/{}/" + tool.Url_parser(keyword),
         )
     }
 
