@@ -37,13 +37,13 @@ func error_handler() gin.HandlerFunc {
 				if dev_mode {
 					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 						"response": "error",
-						"error":    "Internal Server Error",
+						"error":    err.Error(),
+						"stack":    string(stackTrace),
 					})
 				} else {
 					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 						"response": "error",
-						"error":    err.Error(),
-						"stack":    string(stackTrace),
+						"error":    "Internal Server Error",
 					})
 				}
 			}
