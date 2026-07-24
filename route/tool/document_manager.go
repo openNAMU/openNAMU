@@ -253,9 +253,7 @@ func Do_add_history(db *sql.DB, doc_name string, data string, date string, ip st
     send = strings.ReplaceAll(send, "<", "")
     send = strings.ReplaceAll(send, ">", "")
 
-    if Get_len(send) > 512 {
-        send = string([]rune(send)[:512])
-    }
+    send = Get_slice(send, 0, 512)
 
     if type_check != "" {
         send = send + " (" + type_check + ")"

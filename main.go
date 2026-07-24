@@ -69,9 +69,7 @@ func pongo_init() {
 
 	pongo2.RegisterFilter("cut_100", func(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 		data := in.String()
-		if tool.Get_len(data) > 100 {
-			data = string([]rune(data)[:100])
-		}
+		data = tool.Get_slice(data, 0, 100)
 
 		return pongo2.AsValue(data), nil
 	})

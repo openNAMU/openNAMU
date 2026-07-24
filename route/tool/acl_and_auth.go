@@ -278,13 +278,12 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
     }
 
     if ban_type != "" {
-        ban_type_runes := []rune(ban_type)
         ban_type_len := Get_len(ban_type)
         switch ban_type_len {
         case 1:
-            ban_type = string(ban_type_runes[0])
+            ban_type = Get_slice(ban_type, 0, 1)
         case 2:
-            ban_type = string(ban_type_runes[1])
+            ban_type = Get_slice(ban_type, 1, 2)
         }
     }
 

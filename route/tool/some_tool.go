@@ -699,3 +699,32 @@ func Get_http_warning(db *sql.DB) string {
 func Get_len(data string) int {
 	return utf8.RuneCountInString(data)
 }
+
+// Get_slice returns the substring between start and end rune indexes.
+func Get_slice(data string, start int, end int) string {
+	if start < 0 {
+		start = 0
+	}
+	if end <= start {
+		return ""
+	}
+
+	start_byte := -1
+	rune_index := 0
+
+	for byte_index := range data {
+		if rune_index == start {
+			start_byte = byte_index
+		}
+		if rune_index == end {
+			return data[start_byte:byte_index]
+		}
+		rune_index++
+	}
+
+	if start_byte == -1 {
+		return ""
+	}
+
+	return data[start_byte:]
+}
