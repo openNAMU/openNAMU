@@ -23,6 +23,7 @@ func Api_setting_delete(config tool.Config) map[string]any {
                 "delete from other where name = ?",
                 other_set["set_name"],
             )
+            return_data["response"] = "ok"
         } else {
             return_data["response"] = "require auth"
         }
