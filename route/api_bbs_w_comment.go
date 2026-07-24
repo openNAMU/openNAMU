@@ -42,7 +42,7 @@ func Api_bbs_w_comment(config tool.Config, do_type string, sub_code string) map[
         reply_length := "0"
         tool.QueryRow_DB(
             db,
-            "select count(*) from bbs_data where set_name = 'comment_date' and set_id = ? order by set_code + 0 desc",
+            "select count(*) from bbs_data where set_name = 'comment_date' and set_id like ? order by set_code + 0 desc",
             []any{ &reply_length },
             bbs_and_post_num + "-%",
         )
