@@ -8,12 +8,9 @@ import (
 	"google.golang.org/api/option"
 )
 
-func Api_func_llm(config tool.Config) string {
+func Api_func_llm(config tool.Config, prompt string) map[string]any {
     db := tool.DB_connect()
     defer tool.DB_close(db)
-
-    other_set := map[string]string{}
-    json.Unmarshal([]byte(config.Other_set), &other_set)
 
     api_key := ""
     tool.QueryRow_DB(
@@ -32,13 +29,14 @@ func Api_func_llm(config tool.Config) string {
     defer client.Close()
 
     model := client.GenerativeModel("gemini-pro")
-    resp, err := model.GenerateContent(ctx, genai.Text(other_set["prompt"]))
+    resp, err := model.GenerateContent(ctx, genai.Text(prompt))
     if err != nil {
         panic(err)
     }
 
     text := resp.Candidates[0].Content.Parts[0]
 
-    json_data, _ := json.Marshal(map[string]genai.Part{"data": text})
-    return string(json_data)
+    return_data := make(map[string]any)
+    return_data["data"] = text
+    return return_data
 }

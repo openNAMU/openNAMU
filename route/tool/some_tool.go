@@ -584,7 +584,6 @@ func Get_cookie_header(cookie_header string) map[string]string {
 }
 
 type Config struct {
-    Other_set string
     IP string
     Cookies string
     Session sessions.Session
@@ -592,7 +591,6 @@ type Config struct {
 
 func Deep_copy_config(src Config) Config {
     return Config{
-        Other_set : strings.Clone(src.Other_set),
         IP : strings.Clone(src.IP),
         Cookies : strings.Clone(src.Cookies),
         Session : src.Session,

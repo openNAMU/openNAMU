@@ -4,7 +4,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_func_wiki_custom(config tool.Config) string {
+func Api_func_wiki_custom(config tool.Config) map[string]any {
     db := tool.DB_connect()
     defer tool.DB_close(db)
 
@@ -14,6 +14,5 @@ func Api_func_wiki_custom(config tool.Config) string {
     new_data["response"] = "ok"
     new_data["data"] = wiki_custom_set
 
-    json_data, _ := json.Marshal(new_data)
-    return string(json_data)
+    return new_data
 }

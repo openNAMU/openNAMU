@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/base64"
 	"github.com/gin-gonic/gin"
-	jsoniter "github.com/json-iterator/go"
 	"io"
 	"net/http"
 	"opennamu/route"
@@ -97,7 +96,7 @@ func register_history_edit_routes(r *gin.Engine) {
 		}
 
 		posted_name := strings.TrimSpace(c.PostForm("f_name"))
-		other_set_arr := []map[string]string{}
+		upload_files := []map[string]string{}
 
 		count := 1
 		for _, fh := range files {
@@ -121,24 +120,21 @@ func register_history_edit_routes(r *gin.Engine) {
 
 			b64 := base64.StdEncoding.EncodeToString(b)
 
-			other_set := map[string]string{
+			upload_file := map[string]string{
 				"file_name": name,
 				"file_ext":  ext,
 				"file_data": b64,
 			}
 
-			other_set_arr = append(other_set_arr, other_set)
+			upload_files = append(upload_files, upload_file)
 			count += 1
 		}
-
-		other_set_arr_str, _ := jsoniter.ConfigCompatibleWithStandardLibrary.MarshalToString(other_set_arr)
 
 		route_data := route.View_edit_file_upload_post(tool.Config{
 			IP:        tool.Get_IP(c),
 			Cookies:   tool.Get_Cookies(c),
 			Session:   tool.Get_session(c),
-			Other_set: other_set_arr_str,
-		})
+		}, upload_files)
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 

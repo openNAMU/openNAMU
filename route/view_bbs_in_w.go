@@ -14,7 +14,7 @@ func View_bbs_in_w(c *gin.Context, config tool.Config, set_id string, set_code s
         return tool.Get_error_page(db, config, "auth")
     }
 
-    bbs_name := Api_bbs_num_to_name(db, set_id)
+    bbs_name := Api_bbs_num_to_name(db, set_id)["data"].(string)
 
     data_api := Api_bbs_w(config, set_id, set_code)
     data_api_in := data_api["data"].(map[string]string)

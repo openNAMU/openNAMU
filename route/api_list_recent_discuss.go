@@ -8,9 +8,6 @@ func Api_list_recent_discuss(config tool.Config, limit string, num string, set_t
     db := tool.DB_connect()
     defer tool.DB_close(db)
 
-    other_set := map[string]string{}
-    json.Unmarshal([]byte(config.Other_set), &other_set)
-
     limit_int := tool.Str_to_int(limit)
     if limit_int > 50 || limit_int < 0 {
         limit_int = 50

@@ -15,41 +15,35 @@ func Api_file_upload_make_document(db *sql.DB) {
     
 }
 
-func Api_file_upload_post(config tool.Config) string {
+func Api_file_upload_post(config tool.Config, file_name string, file_data string, file_ext string) map[string]any {
     db := tool.DB_connect()
     defer tool.DB_close(db)
-    
-    other_set := map[string]string{}
-    json.Unmarshal([]byte(config.Other_set), &other_set)
 
-    file_name := strings.TrimSpace(other_set["file_name"])
-    file_data := strings.TrimSpace(other_set["file_data"])
-    file_ext := strings.TrimSpace(other_set["file_ext"])
+    file_name = strings.TrimSpace(file_name)
+    file_data = strings.TrimSpace(file_data)
+    file_ext = strings.TrimSpace(file_ext)
     file_ext = strings.TrimPrefix(strings.ToLower(file_ext), ".")
 
     allowed_ext := tool.Get_ext_allow_list(db)
     // file_max_size := tool.Get_file_max_size(db)
 
-    return_value := make(map[string]string)
+    return_value := make(map[string]any)
 
     if file_data == "" || file_name == "" || file_ext == "" {
         return_value["response"] = "error"
         return_value["data"] = "invalid data"
 
-        json_data, _ := json.Marshal(return_value)
-        return string(json_data)
+        return return_value
     } else if _, ok := allowed_ext[file_ext]; !ok {
         return_value["response"] = "error"
         return_value["data"] = "unallowed ext"
         
-        json_data, _ := json.Marshal(return_value)
-        return string(json_data)
+        return return_value
     } else if tool.Get_file_name_unallow_check(db, file_name) {
         return_value["response"] = "error"
         return_value["data"] = "unallowed file name"
         
-        json_data, _ := json.Marshal(return_value)
-        return string(json_data)
+        return return_value
     }
 
     main_dir := tool.Get_file_main_dir(db)
@@ -58,8 +52,7 @@ func Api_file_upload_post(config tool.Config) string {
         return_value["response"] = "error"
         return_value["data"] = "directory create fail"
         
-        json_data, _ := json.Marshal(return_value)
-        return string(json_data)
+        return return_value
     }
 
     file_full_dir := tool.File_name_to_dir(file_name, file_ext)
@@ -69,14 +62,12 @@ func Api_file_upload_post(config tool.Config) string {
         return_value["response"] = "error"
         return_value["data"] = "already exist"
 
-        json_data, _ := json.Marshal(return_value)
-        return string(json_data)
+        return return_value
     } else if !errors.Is(err, os.ErrNotExist) {
         return_value["response"] = "error"
         return_value["data"] = "exist check fail"
 
-        json_data, _ := json.Marshal(return_value)
-        return string(json_data)
+        return return_value
     }
 
     out, err := os.Create(dst_path)
@@ -84,8 +75,7 @@ func Api_file_upload_post(config tool.Config) string {
         return_value["response"] = "error"
         return_value["data"] = "file create fail"
 
-        json_data, _ := json.Marshal(return_value)
-        return string(json_data)
+        return return_value
     }
     defer out.Close()
 
@@ -96,12 +86,10 @@ func Api_file_upload_post(config tool.Config) string {
         return_value["response"] = "error"
         return_value["data"] = "file write fail"
 
-        json_data, _ := json.Marshal(return_value)
-        return string(json_data)
+        return return_value
     }
 
     return_value["response"] = "ok"
     
-    json_data, _ := json.Marshal(return_value)
-    return string(json_data)
+    return return_value
 }

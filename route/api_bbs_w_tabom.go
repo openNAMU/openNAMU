@@ -4,11 +4,11 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_bbs_w_tabom(config tool.Config, set_id string, set_code string) map[string]string {
+func Api_bbs_w_tabom(config tool.Config, set_id string, set_code string) map[string]any {
     db := tool.DB_connect()
     defer tool.DB_close(db)
     
-    return_data := make(map[string]string)
+    return_data := make(map[string]any)
 
     if !tool.Check_acl(db, "", "", "bbs_comment", config.IP) {
         return_data["response"] = "require auth"

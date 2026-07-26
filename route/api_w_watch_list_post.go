@@ -4,7 +4,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_w_watch_list_post(config tool.Config, name string, do_type string) map[string]string {
+func Api_w_watch_list_post(config tool.Config, name string, do_type string) map[string]any {
     db := tool.DB_connect()
     defer tool.DB_close(db)
 
@@ -40,7 +40,7 @@ func Api_w_watch_list_post(config tool.Config, name string, do_type string) map[
         )
     }
 
-    return_data := make(map[string]string)
+    return_data := make(map[string]any)
     return_data["response"] = "ok"
 
     return return_data

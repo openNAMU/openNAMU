@@ -4,22 +4,17 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_func_acl(config tool.Config) string {
+func Api_func_acl(config tool.Config, name string, topic_number string, tool_name string, ip string) map[string]any {
     db := tool.DB_connect()
     defer tool.DB_close(db)
 
-    other_set := map[string]string{}
-    json.Unmarshal([]byte(config.Other_set), &other_set)
-
-    ip := config.IP
-    if _, exist := other_set["ip"]; exist {
-        ip = other_set["ip"]
+    if ip == "" {
+        ip = config.IP
     }
 
     new_data := make(map[string]any)
     new_data["response"] = "ok"
-    new_data["data"] = tool.Check_acl(db, other_set["name"], other_set["topic_number"], other_set["tool"], ip)
+    new_data["data"] = tool.Check_acl(db, name, topic_number, tool_name, ip)
 
-    json_data, _ := json.Marshal(new_data)
-    return string(json_data)
+    return new_data
 }

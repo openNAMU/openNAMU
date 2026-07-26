@@ -8,7 +8,7 @@ func View_bbs_in(config tool.Config, set_id string, page_num string) string {
     db := tool.DB_connect()
     defer tool.DB_close(db)
 
-    bbs_name := Api_bbs_num_to_name(db, set_id)
+    bbs_name := Api_bbs_num_to_name(db, set_id)["data"].(string)
 
     data_api := Api_bbs(config, set_id, page_num)
     data_api_in := data_api["data"].([]map[string]string)

@@ -5,12 +5,12 @@ import (
 	"strconv"
 )
 
-func Api_bbs_w_post(config tool.Config, set_id string, title string, data string) map[string]string {
+func Api_bbs_w_post(config tool.Config, set_id string, title string, data string) map[string]any {
     db := tool.DB_connect()
     defer tool.DB_close(db)
 
     if !tool.Check_acl(db, "", "", "bbs_comment", config.IP) {
-        return_data := make(map[string]string)
+        return_data := make(map[string]any)
         return_data["response"] = "require auth"
 
         return return_data
@@ -48,7 +48,7 @@ func Api_bbs_w_post(config tool.Config, set_id string, title string, data string
         )
     }
 
-    return_data := make(map[string]string)
+    return_data := make(map[string]any)
     return_data["response"] = "ok"
     return_data["data"] = set_code_str
 

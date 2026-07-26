@@ -6,48 +6,44 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_topic(config tool.Config) string {
+func Api_topic(config tool.Config, tool_name string, topic_num string, s_num string, e_num string) map[string]any {
     db := tool.DB_connect()
     defer tool.DB_close(db)
-    
-    other_set := map[string]string{}
-    json.Unmarshal([]byte(config.Other_set), &other_set)
 
-    if other_set["tool"] == "length" {
+    if tool_name == "length" {
         length := "0"
         tool.QueryRow_DB(
             db,
             "select id from topic where code = ? order by id + 0 desc limit 1",
             []any{ &length },
-            other_set["topic_num"],
+            topic_num,
         )
 
-        new_data := map[string]string{}
+        new_data := map[string]any{}
         new_data["length"] = length
 
-        json_data, _ := json.Marshal(new_data)
-        return string(json_data)
+        return new_data
     } else {
         var rows *sql.Rows
 
-        if other_set["tool"] == "top" {
+        if tool_name == "top" {
             rows = tool.Query_DB(
                 db,
                 "select id, data, date, ip, block, top from topic where code = ? and top = 'O' order by id + 0 asc",
-                other_set["topic_num"],
+                topic_num,
             )
         } else {
-            if other_set["s_num"] != "" && other_set["e_num"] != "" {
+            if s_num != "" && e_num != "" {
                 rows = tool.Query_DB(
                     db,
                     "select id, data, date, ip, block, top from topic where code = ? and ? + 0 <= id + 0 and id + 0 <= ? + 0 order by id + 0 asc",
-                    other_set["topic_num"], other_set["s_num"], other_set["e_num"],
+                    topic_num, s_num, e_num,
                 )
             } else {
                 rows = tool.Query_DB(
                     db,
                     "select id, data, date, ip, block, top from topic where code = ? order by id + 0 asc",
-                    other_set["topic_num"],
+                    topic_num,
                 )
             }
         }
@@ -108,7 +104,6 @@ func Api_topic(config tool.Config) string {
             "render": tool.Get_language(db, "render", false),
         }
 
-        json_data, _ := json.Marshal(new_data)
-        return string(json_data)
+        return new_data
     }
 }

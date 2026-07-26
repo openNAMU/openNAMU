@@ -18,7 +18,7 @@ func View_record_bbs_comment_in(config tool.Config, user_name string, set_id str
     data_list := api_data["data"].([][]string)
     data_html := ""
 
-    bbs_name := Api_bbs_num_to_name(db, set_id)
+    bbs_name := Api_bbs_num_to_name(db, set_id)["data"].(string)
 
     for _, data := range data_list {
         bbs_id := data[0]

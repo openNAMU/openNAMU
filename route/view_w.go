@@ -41,7 +41,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string) (string, int) {
 		status = http.StatusOK
 
 		render_data_api := Api_w_render(config, doc_name, raw_data, "normal")
-		render_data = render_data_api["data"]
+		render_data = render_data_api["data"].(string)
 	}
 
 	out := tool.Get_template(

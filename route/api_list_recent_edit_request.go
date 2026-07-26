@@ -4,14 +4,11 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_list_recent_edit_request(config tool.Config) string {
+func Api_list_recent_edit_request(config tool.Config, limit string) map[string]any {
     db := tool.DB_connect()
     defer tool.DB_close(db)
 
-    other_set := map[string]string{}
-    json.Unmarshal([]byte(config.Other_set), &other_set)
-
-    limit_int := tool.Str_to_int(other_set["limit"])
+    limit_int := tool.Str_to_int(limit)
     if limit_int > 50 || limit_int < 0 {
         limit_int = 50
     }
@@ -70,6 +67,8 @@ func Api_list_recent_edit_request(config tool.Config) string {
         })
     }
 
-    json_data, _ := json.Marshal(data_list)
-    return string(json_data)
+    return_data := make(map[string]any)
+    return_data["response"] = "ok"
+    return_data["data"] = data_list
+    return return_data
 }

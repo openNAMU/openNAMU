@@ -4,17 +4,13 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_give_auth_patch(config tool.Config) string {
+func Api_give_auth_patch(config tool.Config, auth string, change_auth string, user_name string) map[string]any {
     db := tool.DB_connect()
     defer tool.DB_close(db)
-
-    other_set := map[string]string{}
-    json.Unmarshal([]byte(config.Other_set), &other_set)
 
     new_data := make(map[string]any)
 
     ip := config.IP
-    user_name := other_set["user_name"]
 
     if user_name != "" {
         auth_check := false
@@ -35,7 +31,7 @@ func Api_give_auth_patch(config tool.Config) string {
             new_data["response"] = "require auth"
         } else {
             auth_check = false
-            auth_data = tool.Get_auth_group_info(db, other_set["change_auth"])
+            auth_data = tool.Get_auth_group_info(db, change_auth)
 
             if tool.Auth_include_upper_auth(auth_data) {
                 if tool.Check_acl(db, "", "", "owner_auth", ip) {
@@ -59,7 +55,7 @@ func Api_give_auth_patch(config tool.Config) string {
                 tool.Exec_DB(
                     db,
                     "insert into user_set (id, name, data) values (?, 'acl', ?)",
-                    user_name, other_set["change_auth"],
+                    user_name, change_auth,
                 )
                 
                 new_data["response"] = "ok"
@@ -67,7 +63,7 @@ func Api_give_auth_patch(config tool.Config) string {
         }
     } else {
         auth_check := false
-        auth_data := tool.Get_auth_group_info(db, other_set["auth"])
+        auth_data := tool.Get_auth_group_info(db, auth)
 
         if tool.Auth_include_upper_auth(auth_data) {
             if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
@@ -83,7 +79,7 @@ func Api_give_auth_patch(config tool.Config) string {
             new_data["response"] = "require auth"
         } else {
             auth_check = false
-            auth_data = tool.Get_auth_group_info(db, other_set["change_auth"])
+            auth_data = tool.Get_auth_group_info(db, change_auth)
 
             if tool.Auth_include_upper_auth(auth_data) {
                 if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
@@ -101,7 +97,7 @@ func Api_give_auth_patch(config tool.Config) string {
                 tool.Exec_DB(
                     db,
                     "update user_set set data = ? where name = 'acl' and data = ?",
-                    other_set["change_auth"], other_set["auth"],
+                    change_auth, auth,
                 )
 
                 new_data["response"] = "ok"
@@ -109,6 +105,5 @@ func Api_give_auth_patch(config tool.Config) string {
         }
     }
 
-    json_data, _ := json.Marshal(new_data)
-    return string(json_data)
+    return new_data
 }

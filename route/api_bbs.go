@@ -5,7 +5,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_bbs_num_to_name(db *sql.DB, set_id string) string {
+func Api_bbs_num_to_name(db *sql.DB, set_id string) map[string]any {
     bbs_name := ""
 
     tool.QueryRow_DB(
@@ -15,7 +15,9 @@ func Api_bbs_num_to_name(db *sql.DB, set_id string) string {
         set_id,
     )
 
-    return bbs_name
+    return map[string]any{
+        "data": bbs_name,
+    }
 }
 
 func Api_bbs(config tool.Config, bbs_num string, page string) map[string]any {

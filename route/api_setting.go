@@ -20,17 +20,14 @@ func Setting_list() map[string]string {
     return setting_acl
 }
 
-func Api_setting(config tool.Config) map[string]any {
+func Api_setting(config tool.Config, set_name string, coverage string) map[string]any {
     db := tool.DB_connect()
     defer tool.DB_close(db)
-
-    other_set := map[string]string{}
-    json.Unmarshal([]byte(config.Other_set), &other_set)
 
     setting_acl := Setting_list()
     return_data := make(map[string]any)
 
-    if val, ok := setting_acl[other_set["set_name"]]; ok {
+    if val, ok := setting_acl[set_name]; ok {
         if val != "" {
             if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
                 return_data["response"] = "require auth"
@@ -39,13 +36,8 @@ func Api_setting(config tool.Config) map[string]any {
             }
         }
 
-        data_coverage := ""
-        if val, ok := other_set["coverage"]; ok {
-            data_coverage = val
-        }
-
         return_data["response"] = "ok"
-        return_data["data"] = tool.Get_setting(db, other_set["set_name"], data_coverage)
+        return_data["data"] = tool.Get_setting(db, set_name, coverage)
 
         return return_data
     } else {

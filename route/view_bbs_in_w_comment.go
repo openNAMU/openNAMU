@@ -20,8 +20,8 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, user_name string, set
     `
     data_html := ""
 
-    tabom_count_api := Api_bbs_w_tabom(config, set_id, set_code)
-    tabom_count := tabom_count_api["data"]
+	tabom_count_api := Api_bbs_w_tabom(config, set_id, set_code)
+	tabom_count := tabom_count_api["data"].(string)
 
     if bbs_comment_acl {
         data_html += `
