@@ -21,12 +21,18 @@ func Api_bbs_w_set_put(config tool.Config, set_id string, set_name string, data 
                     "delete from bbs_set where set_name = ? and set_id = ?",
                     set_name, set_id,
                 )
+            } else {
+                tool.Exec_DB(
+                    db,
+                    "delete from bbs_set where set_name = ? and set_code = ? and set_id = ?",
+                    set_name, coverage, set_id,
+                )
             }
 
             tool.Exec_DB(
                 db,
-                "insert into bbs_set (set_name, set_code, set_id, set_data) values (?, '', ?, ?)",
-                set_name, set_id, data,
+                "insert into bbs_set (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)",
+                set_name, coverage, set_id, data,
             )
 
             return_data["response"] = "ok"

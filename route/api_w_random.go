@@ -16,6 +16,7 @@ func Api_w_random(config tool.Config) map[string]any {
     )
 
     new_data := map[string]any{}
+    new_data["response"] = "ok"
     new_data["data"] = title
 
     return new_data
