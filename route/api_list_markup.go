@@ -5,7 +5,7 @@ import (
 	"opennamu/route/tool/markup"
 )
 
-func Api_list_markup(config tool.Config) string {
+func Api_list_markup(config tool.Config) map[string]any {
     other_set := map[string]string{}
     json.Unmarshal([]byte(config.Other_set), &other_set)
 
@@ -15,6 +15,5 @@ func Api_list_markup(config tool.Config) string {
     return_data["response"] = "ok"
     return_data["data"] = data
 
-    json_data, _ := json.Marshal(return_data)
-    return string(json_data)
+    return return_data
 }

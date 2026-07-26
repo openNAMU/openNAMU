@@ -13,6 +13,19 @@ func register_api_routes(r *gin.Engine) {
 		c.JSON(http.StatusOK, route_data)
 	})
 
+	r.GET("/api/v2/set_reset/*doc_name", func(c *gin.Context) {
+		route_data := route.Api_w_set_reset(
+			make_route_config(c),
+			strings.TrimPrefix(c.Param("doc_name"), "/"),
+		)
+		c.JSON(http.StatusOK, route_data)
+	})
+
+	r.GET("/api/v2/list/markup", func(c *gin.Context) {
+		route_data := route.Api_list_markup(make_route_config(c))
+		c.JSON(http.StatusOK, route_data)
+	})
+
 	r.GET("/api/user_info/:user_name", func(c *gin.Context) {
 		route_data := route.Api_user_info(make_route_config(c), c.Param("user_name"))
 		c.JSON(http.StatusOK, route_data)
