@@ -12,7 +12,7 @@ func View_w_down(config tool.Config, doc_name string) string {
     data_html := "<ul>"
 
     for _, v := range data_api_in {
-        data_html += `<li><a href="/w/` + tool.Url_parser(v) + `">` + v + `</a></li>`
+        data_html += `<li><a href="/w/` + tool.Url_parser(v) + `">` + tool.HTML_escape(v) + `</a></li>`
     }
 
     data_html += "</ul>"

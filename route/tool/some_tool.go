@@ -322,7 +322,7 @@ func Get_wiki_custom(db *sql.DB, ip string, _ sessions.Session, cookies string) 
         QueryRow_DB(
             db,
             "select data from user_set where id = ? and name = ?",
-            []any{ &user_head_main },
+            []any{ &user_head_skin },
             ip,
             "custom_css" + skin_name,
         )
