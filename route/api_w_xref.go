@@ -46,6 +46,7 @@ func Api_w_xref(config tool.Config, num_str string, doc_name string, do_type str
 		doc_name,
 		num,
 	)
+	defer rows.Close()
 
 	data_list := [][]string{}
 	for rows.Next() {
@@ -59,8 +60,6 @@ func Api_w_xref(config tool.Config, num_str string, doc_name string, do_type str
 
 		data_list = append(data_list, []string{name, type_data})
 	}
-	rows.Close()
-
 	for i, data := range data_list {
 		include_doc_name := ""
 		tool.QueryRow_DB(

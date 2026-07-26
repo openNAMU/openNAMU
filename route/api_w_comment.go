@@ -12,6 +12,7 @@ func Api_bbs_w_comment_make(config tool.Config, doc_name string) map[string]any 
     data_api_in, _ := data_api["data"].(string)
 
     return map[string]any{
+        "response": "ok",
         "data": data_api_in,
     }
 }

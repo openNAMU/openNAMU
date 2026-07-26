@@ -12,6 +12,7 @@ func Api_w_render(config tool.Config, doc_name string, raw_data string, render_t
     data := markup.Get_render(db, doc_name, raw_data, render_type)
 
     return_data := make(map[string]any)
+    return_data["response"] = "ok"
     for key, value := range data {
         return_data[key] = value
     }

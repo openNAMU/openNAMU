@@ -42,6 +42,7 @@ func Api_list_long_page(config tool.Config, num string, set_type string) map[str
     }
 
     return_data := make(map[string]any)
+    return_data["response"] = "ok"
     return_data["data"] = data_list
 
     return return_data

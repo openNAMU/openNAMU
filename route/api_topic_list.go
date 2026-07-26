@@ -93,6 +93,7 @@ func Api_topic_list(config tool.Config, num string, doc_name string, do_type str
     }
 
     return_data := make(map[string]any)
+    return_data["response"] = "ok"
     return_data["data"] = data_list
 
     return return_data

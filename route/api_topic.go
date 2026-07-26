@@ -20,6 +20,7 @@ func Api_topic(config tool.Config, tool_name string, topic_num string, s_num str
         )
 
         new_data := map[string]any{}
+        new_data["response"] = "ok"
         new_data["length"] = length
 
         return new_data
@@ -99,6 +100,7 @@ func Api_topic(config tool.Config, tool_name string, topic_num string, s_num str
         }
 
         new_data["data"] = data_slice
+        new_data["response"] = "ok"
         new_data["language"] = map[string]string{
             "tool":   tool.Get_language(db, "tool", false),
             "render": tool.Get_language(db, "render", false),

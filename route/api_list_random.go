@@ -15,6 +15,7 @@ func Api_list_random(config tool.Config, list_count int) map[string]any {
         "select title from data where title not like 'user:%' and title not like 'category:%' and title not like 'file:%' order by random() limit ?",
         list_count,
     )
+    defer rows.Close()
 
     for rows.Next() {
         var title string

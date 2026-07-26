@@ -62,6 +62,7 @@ func Api_edit_delete_post(config tool.Config, doc_name string, send string, agre
 		"select title, link from back where title = ? and not type = 'cat' and not type = 'no'",
 		doc_name,
 	)
+	defer rows.Close()
 	link_list := [][]string{}
 	for rows.Next() {
 		title := ""
@@ -74,8 +75,6 @@ func Api_edit_delete_post(config tool.Config, doc_name string, send string, agre
 
 		link_list = append(link_list, []string{title, link})
 	}
-	rows.Close()
-
 	for _, link_data := range link_list {
 		tool.Exec_DB(
 			db,

@@ -11,6 +11,7 @@ func Api_w_down(config tool.Config, doc_name string) map[string]any {
         "select title from data where title like ?",
         doc_name,
     )
+    defer rows.Close()
 
     title_list := []string{}
 

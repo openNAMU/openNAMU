@@ -36,6 +36,7 @@ func Api_list_title_index(config tool.Config, num string) map[string]any {
     }
 
     return_data := make(map[string]any)
+    return_data["response"] = "ok"
     return_data["data"] = data_list
 
     return return_data

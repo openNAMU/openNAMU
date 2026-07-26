@@ -33,6 +33,7 @@ func Api_vote_list(config tool.Config, set_type string, num_str string) map[stri
             num,
         )
     }
+    defer rows.Close()
 
     data_list := [][]string{}
     for rows.Next() {

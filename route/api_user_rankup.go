@@ -58,6 +58,7 @@ func Api_user_rankup(config tool.Config, rankup_name string) map[string]any {
             }
         }
 
+        end_data["response"] = "ok"
         return end_data
     } else {
         return_data := make(map[string]any)

@@ -16,6 +16,7 @@ func Api_bbs_num_to_name(db *sql.DB, set_id string) map[string]any {
     )
 
     return map[string]any{
+        "response": "ok",
         "data": bbs_name,
     }
 }
@@ -118,7 +119,6 @@ func Api_bbs(config tool.Config, bbs_num string, page string) map[string]any {
                     temp_data[set_name] = set_data
                 }
             }
-
             data_list = append(data_list, temp_data)
         }
     }
