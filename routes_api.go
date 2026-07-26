@@ -8,6 +8,11 @@ import (
 )
 
 func register_api_routes(r *gin.Engine) {
+	r.GET("/api/version", func(c *gin.Context) {
+		route_data := route.Api_version(make_route_config(c))
+		c.JSON(http.StatusOK, route_data)
+	})
+
 	r.GET("/api/user_info/:user_name", func(c *gin.Context) {
 		route_data := route.Api_user_info(make_route_config(c), c.Param("user_name"))
 		c.JSON(http.StatusOK, route_data)
