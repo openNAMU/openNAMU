@@ -105,12 +105,12 @@ func register_api_routes(r *gin.Engine) {
 	})
 
 	r.GET("/api/v2/bbs/w/page_view_post/:set_id/:set_code", func(c *gin.Context) {
-		route_data := route.Api_bbs_w_page_view_post(make_route_config(c), strings.TrimPrefix(c.Param("set_id"), "/"), strings.TrimPrefix(c.Param("set_code"), "/"))
+		route_data := route.Api_bbs_w_page_view_post(make_route_config(c), c.Param("set_id"), c.Param("set_code"))
 		c.JSON(http.StatusOK, route_data)
 	})
 
 	r.GET("/api/v2/bbs/w/page_view/:set_id/:set_code", func(c *gin.Context) {
-		route_data := route.Api_bbs_w_page_view(make_route_config(c), strings.TrimPrefix(c.Param("set_id"), "/"), strings.TrimPrefix(c.Param("set_code"), "/"))
+		route_data := route.Api_bbs_w_page_view(make_route_config(c), c.Param("set_id"), c.Param("set_code"))
 		c.JSON(http.StatusOK, route_data)
 	})
 

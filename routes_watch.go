@@ -19,12 +19,12 @@ func register_watch_routes(r *gin.Engine) {
 	})
 
 	r.GET("/doc_watch_list/:count/*doc_name", func(c *gin.Context) {
-		route_data := route.View_w_watch_list(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), strings.TrimPrefix(c.Param("count"), "/"), "watchlist")
+		route_data := route.View_w_watch_list(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Param("count"), "watchlist")
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
 	r.GET("/doc_star_doc/:count/*doc_name", func(c *gin.Context) {
-		route_data := route.View_w_watch_list(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), strings.TrimPrefix(c.Param("count"), "/"), "star_doc")
+		route_data := route.View_w_watch_list(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Param("count"), "star_doc")
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 

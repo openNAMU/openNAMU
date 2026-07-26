@@ -27,7 +27,7 @@ func register_history_edit_routes(r *gin.Engine) {
 	})
 
 	r.GET("/history_page/:num/:set_type/*doc_name", func(c *gin.Context) {
-		route_data := route.View_list_history(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), strings.TrimPrefix(c.Param("set_type"), "/"), strings.TrimPrefix(c.Param("num"), "/"))
+		route_data := route.View_list_history(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Param("set_type"), c.Param("num"))
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
