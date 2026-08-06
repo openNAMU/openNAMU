@@ -12,7 +12,7 @@ var namumark_link_regex = regexp2.MustCompile(
 )
 
 var markdown_link_regex = regexp2.MustCompile(
-	`\[[^\]\r\n]*\]\((?<link>[^)\r\n]+)\)`,
+	`(?<image>!)?\[[^\]\r\n]*\]\((?<link>(?:[^()\r\n]+|\([^()\r\n]*\))+?)\)`,
 	regexp2.None,
 )
 
@@ -42,7 +42,17 @@ func Get_backlink(raw_data string, markup string) (map[string][]string, int, boo
 
 	match, err := link_regex.FindStringMatch(raw_data)
 	for err == nil && match != nil {
-		link := normalize_link(match.GroupByName("link").String())
+		if markup == "markdown" && match.GroupByName("image").String() != "" {
+			match, err = link_regex.FindNextMatch(match)
+			continue
+		}
+
+		link := match.GroupByName("link").String()
+		if markup == "markdown" {
+			link = normalize_markdown_link(link)
+		} else {
+			link = normalize_link(link)
+		}
 		if link == "" {
 			match, err = link_regex.FindNextMatch(match)
 			continue
@@ -74,6 +84,21 @@ func add_backlink(
 	}
 
 	backlink_list[link] = append(backlink_list[link], link_type)
+}
+
+func normalize_markdown_link(raw_link string) string {
+	link := strings.TrimSpace(raw_link)
+	if strings.HasPrefix(link, "<") && strings.Contains(link, ">") {
+		link = link[1:strings.Index(link, ">")]
+	} else if index := strings.IndexAny(link, " \t\r\n"); index >= 0 {
+		link = link[:index]
+	}
+
+	if strings.HasPrefix(link, "./") || strings.HasPrefix(link, "../") {
+		return ""
+	}
+
+	return normalize_link(link)
 }
 
 func normalize_link(raw_link string) string {
