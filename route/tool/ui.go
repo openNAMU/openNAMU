@@ -3,7 +3,6 @@ package tool
 import (
 	"database/sql"
 	"fmt"
-	"html"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -203,7 +202,7 @@ func Get_template(db *sql.DB, config Config, name string, data string, other []a
 }
 
 func Get_redirect(target string) string {
-    attrURL := html.EscapeString(target)
+    attrURL := HTML_escape(target)
     jsURL := strconv.Quote(target)
 
     return fmt.Sprintf(`<!doctype html>
@@ -382,14 +381,14 @@ func Get_page_control(db *sql.DB, page int, count int, max_count int, url string
 
     if page > 1 {
         prev_page := page - 1
-        before_url := strings.ReplaceAll(url, "{}", strconv.Itoa(prev_page))
+        before_url := HTML_escape(strings.ReplaceAll(url, "{}", strconv.Itoa(prev_page)))
 
         data_html += `<a href="` + before_url + `">(` + Get_language(db, "previous", true) + `)</a> `
     }
     
     if count == max_count {
         prev_page := page + 1
-        after_url := strings.ReplaceAll(url, "{}", strconv.Itoa(prev_page))
+        after_url := HTML_escape(strings.ReplaceAll(url, "{}", strconv.Itoa(prev_page)))
 
         data_html += `<a href="` + after_url + `">(` + Get_language(db, "next", true) + `)</a> `
     }

@@ -12,7 +12,6 @@ require (
 	github.com/google/generative-ai-go v0.11.0
 	github.com/json-iterator/go v1.1.12
 	github.com/sergi/go-diff v1.4.0
-	github.com/yuin/goldmark v1.7.1
 	google.golang.org/api v0.175.0
 	modernc.org/sqlite v1.29.8
 )
