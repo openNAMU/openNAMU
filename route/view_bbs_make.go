@@ -3,10 +3,10 @@ package route
 import "opennamu/route/tool"
 
 func View_bbs_make(config tool.Config) string {
-    db := tool.DB_connect()
-    defer tool.DB_close(db)
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
 
-    data_html := `
+	data_html := `
         <form method="post">
             <input class="__ON_INPUT__" placeholder="` + tool.Get_language(db, "bbs_name", true) + `" name="bbs_name">
             <hr class="main_hr">
@@ -23,15 +23,15 @@ func View_bbs_make(config tool.Config) string {
         </form>
     `
 
-    return tool.Get_template(
-        db,
-        config,
-        tool.Get_language(db, "bbs_make", true),
-        data_html,
-        []any{},
-        [][]any{
-            { "bbs/main", tool.Get_language(db, "return", true) },
-        },
-        map[string]string{},
-    )
+	return tool.Get_template(
+		db,
+		config,
+		tool.Get_language(db, "bbs_make", true),
+		data_html,
+		[]any{},
+		[][]any{
+			{"bbs/main", tool.Get_language(db, "return", true)},
+		},
+		map[string]string{},
+	)
 }

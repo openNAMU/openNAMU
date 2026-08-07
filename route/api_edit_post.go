@@ -1,9 +1,10 @@
 package route
 
 import (
+	"strings"
+
 	"opennamu/route/tool"
 	"opennamu/route/tool/markup"
-	"strings"
 )
 
 func Api_edit_post(config tool.Config, doc_name string, data string, send string, agree string) map[string]any {

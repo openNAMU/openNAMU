@@ -8,8 +8,8 @@ import (
 
 func make_route_config(c *gin.Context) tool.Config {
 	return tool.Config{
-		IP:        tool.Get_IP(c),
-		Cookies:   tool.Get_Cookies(c),
-		Session:   tool.Get_session(c),
+		IP:      tool.Get_IP(c),
+		Cookies: tool.Get_Cookies(c),
+		Session: tool.Get_session(c),
 	}
 }

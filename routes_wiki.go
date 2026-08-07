@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
-	"opennamu/route"
 	"strings"
+
+	"opennamu/route"
+
+	"github.com/gin-gonic/gin"
 )
 
 func register_wiki_routes(r *gin.Engine) {

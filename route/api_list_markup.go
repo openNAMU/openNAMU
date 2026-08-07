@@ -6,11 +6,11 @@ import (
 )
 
 func Api_list_markup(config tool.Config) map[string]any {
-    data := markup.List_markup()
+	data := markup.List_markup()
 
-    return_data := make(map[string]any)
-    return_data["response"] = "ok"
-    return_data["data"] = data
+	return_data := make(map[string]any)
+	return_data["response"] = "ok"
+	return_data["data"] = data
 
-    return return_data
+	return return_data
 }

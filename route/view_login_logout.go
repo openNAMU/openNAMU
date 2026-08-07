@@ -3,24 +3,24 @@ package route
 import "opennamu/route/tool"
 
 func View_login_logout(config tool.Config) string {
-    db := tool.DB_connect()
-    defer tool.DB_close(db)
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
 
-    if tool.IP_or_user(config.IP) {
-        return tool.Get_redirect("/user")
-    }
+	if tool.IP_or_user(config.IP) {
+		return tool.Get_redirect("/user")
+	}
 
-    return tool.Get_template(
-        db,
-        config,
-        tool.Get_language(db, "register", true),
-        `<form method="post">
-            <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "save", true) + `</button>
+	return tool.Get_template(
+		db,
+		config,
+		tool.Get_language(db, "register", true),
+		`<form method="post">
+            <button class="__ON_BUTTON__" type="submit">`+tool.Get_language(db, "save", true)+`</button>
         </form>`,
-        []any{},
-        [][]any{
-            { "user", tool.Get_language(db, "return", true) },
-        },
-        map[string]string{},
-    )
+		[]any{},
+		[][]any{
+			{"user", tool.Get_language(db, "return", true)},
+		},
+		map[string]string{},
+	)
 }

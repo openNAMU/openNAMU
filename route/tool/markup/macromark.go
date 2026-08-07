@@ -11,484 +11,482 @@ import (
 )
 
 type macromark struct {
-    db *sql.DB
-    data map[string]string
+	db   *sql.DB
+	data map[string]string
 
-    render_data string
-    render_data_js string
+	render_data    string
+	render_data_js string
 
-    temp_data [][]string
-    temp_data_raw [][]string
-    temp_data_count int
+	temp_data       [][]string
+	temp_data_raw   [][]string
+	temp_data_count int
 
-    toc_struct []int
-    toc_result map[string]string
+	toc_struct []int
+	toc_result map[string]string
 
-    backlink [][]string
-    link_count int
+	backlink   [][]string
+	link_count int
 
-    result_markup string
+	result_markup string
 }
 
 func Macromark_new(db *sql.DB, data map[string]string, result_markup string) *macromark {
-    data_string := data["data"]
-    data_string = tool.HTML_escape(data_string)
-    data_string = strings.Replace(data_string, "\r", "", -1)
-    data_string = "\n" + data_string + "\n"
+	data_string := data["data"]
+	data_string = tool.HTML_escape(data_string)
+	data_string = strings.Replace(data_string, "\r", "", -1)
+	data_string = "\n" + data_string + "\n"
 
-    return &macromark{
-        db,
-        data,
+	return &macromark{
+		db,
+		data,
 
-        data_string,
-        "",
+		data_string,
+		"",
 
-        [][]string{},
-        [][]string{},
-        0,
+		[][]string{},
+		[][]string{},
+		0,
 
-        []int{0, 0, 0, 0, 0, 0},
-        map[string]string{},
+		[]int{0, 0, 0, 0, 0, 0},
+		map[string]string{},
 
-        [][]string{},
-        0,
+		[][]string{},
+		0,
 
-        result_markup,
-    }
+		result_markup,
+	}
 }
 
 func (class *macromark) func_temp_save(data string, data_raw string) string {
-    name := "<temp_save_" + strconv.Itoa(class.temp_data_count) + ">"
+	name := "<temp_save_" + strconv.Itoa(class.temp_data_count) + ">"
 
-    class.temp_data = append(class.temp_data, []string{name, data})
-    class.temp_data_raw = append(class.temp_data_raw, []string{name, data_raw})
+	class.temp_data = append(class.temp_data, []string{name, data})
+	class.temp_data_raw = append(class.temp_data_raw, []string{name, data_raw})
 
-    class.temp_data_count += 1
+	class.temp_data_count += 1
 
-    return name
+	return name
 }
 
 func (class macromark) func_temp_restore(data string, to_raw bool) string {
-    string_data := data
- 
-    if to_raw {
-        for for_a := len(class.temp_data_raw) - 1; for_a >= 0; for_a-- {
-            string_data = strings.Replace(string_data, class.temp_data_raw[for_a][0], class.temp_data_raw[for_a][1], 1)
-        }
-    } else {
-        for for_a := len(class.temp_data) - 1; for_a >= 0; for_a-- {
-            string_data = strings.Replace(string_data, class.temp_data[for_a][0], class.temp_data[for_a][1], 1)
-        }
-    }
+	string_data := data
 
-    return string_data
+	if to_raw {
+		for for_a := len(class.temp_data_raw) - 1; for_a >= 0; for_a-- {
+			string_data = strings.Replace(string_data, class.temp_data_raw[for_a][0], class.temp_data_raw[for_a][1], 1)
+		}
+	} else {
+		for for_a := len(class.temp_data) - 1; for_a >= 0; for_a-- {
+			string_data = strings.Replace(string_data, class.temp_data[for_a][0], class.temp_data[for_a][1], 1)
+		}
+	}
+
+	return string_data
 }
 
 type macro_data struct {
-    function map[string]macro_transform_func    
+	function map[string]macro_transform_func
 }
 
 type macro_transform_func func(class *macromark, macro_name string, macro_data string, m_string string)
 
 var heading_markdown = func(class *macromark, macro_name string, macro_data string, m_string string) {
-    temp_name := class.func_temp_save("\n## " + macro_data + "\n", m_string)
-    class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+	temp_name := class.func_temp_save("\n## "+macro_data+"\n", m_string)
+	class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
 }
 
 var heading_html = func(class *macromark, macro_name string, macro_data string, m_string string) {
-    heading_n := macro_name[1:]
-    heading_n_int := tool.Str_to_int(heading_n)
+	heading_n := macro_name[1:]
+	heading_n_int := tool.Str_to_int(heading_n)
 
-    class.toc_struct[heading_n_int - 1] += 1
-    for for_a := heading_n_int; for_a < 6; for_a++ {
-        class.toc_struct[for_a] = 0
-    }
+	class.toc_struct[heading_n_int-1] += 1
+	for for_a := heading_n_int; for_a < 6; for_a++ {
+		class.toc_struct[for_a] = 0
+	}
 
-    toc_string := ""
-    temp_string := ""
-    for for_a := 0; for_a < 6; for_a++ {
-        heading_str := strconv.Itoa(class.toc_struct[for_a])
-        
-        if class.toc_struct[for_a] == 0 {
-            temp_string += "0."
-            continue
-        } 
-        
-        if toc_string == "" {
-            toc_string += heading_str + "."
-            temp_string = ""
-        } else {
-            toc_string += temp_string + heading_str + "."
-            temp_string = ""
-        }
-    }
+	toc_string := ""
+	temp_string := ""
+	for for_a := 0; for_a < 6; for_a++ {
+		heading_str := strconv.Itoa(class.toc_struct[for_a])
 
-    if toc_string != "" {
-        toc_string = toc_string[:len(toc_string) - 1]
-    }
+		if class.toc_struct[for_a] == 0 {
+			temp_string += "0."
+			continue
+		}
 
-    class.toc_result[toc_string] = macro_data
+		if toc_string == "" {
+			toc_string += heading_str + "."
+			temp_string = ""
+		} else {
+			toc_string += temp_string + heading_str + "."
+			temp_string = ""
+		}
+	}
 
-    temp_name := class.func_temp_save("<" + macro_name + "><a href=\"#toc\">" + toc_string + ". </a>" + macro_data + "</" + macro_name + "><back_br>", m_string)
-    class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+	if toc_string != "" {
+		toc_string = toc_string[:len(toc_string)-1]
+	}
+
+	class.toc_result[toc_string] = macro_data
+
+	temp_name := class.func_temp_save("<"+macro_name+"><a href=\"#toc\">"+toc_string+". </a>"+macro_data+"</"+macro_name+"><back_br>", m_string)
+	class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
 }
 var simple_html = func(class *macromark, macro_name string, macro_data string, m_string string) {
-    temp_name := class.func_temp_save("<" + macro_name + ">" + macro_data + "</" + macro_name + ">", m_string)
-    class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+	temp_name := class.func_temp_save("<"+macro_name+">"+macro_data+"</"+macro_name+">", m_string)
+	class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
 }
 
-
 func macromark_split_macro_data(class *macromark, macro_data string, count int) []string {
-    data := class.func_temp_restore(macro_data, false)
-    data = strings.ReplaceAll(data, ",,", "<temp>")
+	data := class.func_temp_restore(macro_data, false)
+	data = strings.ReplaceAll(data, ",,", "<temp>")
 
-    parts := strings.SplitN(data, ",", count)
-    for index := range parts {
-        parts[index] = strings.ReplaceAll(parts[index], "<temp>", ",")
-    }
+	parts := strings.SplitN(data, ",", count)
+	for index := range parts {
+		parts[index] = strings.ReplaceAll(parts[index], "<temp>", ",")
+	}
 
-    return parts
+	return parts
 }
 
 func macromark_safe_url(data string) string {
-    lower := strings.ToLower(strings.TrimSpace(data))
-    if strings.HasPrefix(lower, "javascript:") ||
-        strings.HasPrefix(lower, "vbscript:") ||
-        strings.HasPrefix(lower, "data:") {
-        return "#"
-    }
+	lower := strings.ToLower(strings.TrimSpace(data))
+	if strings.HasPrefix(lower, "javascript:") ||
+		strings.HasPrefix(lower, "vbscript:") ||
+		strings.HasPrefix(lower, "data:") {
+		return "#"
+	}
 
-    return data
+	return data
 }
 
 var block_html = func(class *macromark, macro_name string, macro_data string, m_string string) {
-    temp_name := class.func_temp_save(
-        "<"+macro_name+"><back_br>"+macro_data+"</"+macro_name+"><back_br>",
-        m_string,
-    )
-    class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+	temp_name := class.func_temp_save(
+		"<"+macro_name+"><back_br>"+macro_data+"</"+macro_name+"><back_br>",
+		m_string,
+	)
+	class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
 }
 
 var markdown_image_html = func(class *macromark, macro_name string, macro_data string, m_string string) {
-    parts := macromark_split_macro_data(class, macro_data, 2)
-    if len(parts) == 0 {
-        class.render_data = strings.Replace(class.render_data, m_string, "", 1)
-        return
-    }
+	parts := macromark_split_macro_data(class, macro_data, 2)
+	if len(parts) == 0 {
+		class.render_data = strings.Replace(class.render_data, m_string, "", 1)
+		return
+	}
 
-    source := macromark_safe_url(tool.HTML_unescape(parts[0]))
-    alt := ""
-    if len(parts) > 1 {
-        alt = parts[1]
-    }
+	source := macromark_safe_url(tool.HTML_unescape(parts[0]))
+	alt := ""
+	if len(parts) > 1 {
+		alt = parts[1]
+	}
 
-    temp_name := class.func_temp_save(
-        "<img src=\""+tool.HTML_escape(source)+"\" alt=\""+alt+"\">",
-        m_string,
-    )
-    class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+	temp_name := class.func_temp_save(
+		"<img src=\""+tool.HTML_escape(source)+"\" alt=\""+alt+"\">",
+		m_string,
+	)
+	class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
 }
 
 func macromark_render_direct_link(class *macromark, target string, label string, m_string string) {
-    temp_name := class.func_temp_save(
-        "<a href=\""+tool.HTML_escape(target)+"\">"+label+"</a>",
-        m_string,
-    )
-    class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+	temp_name := class.func_temp_save(
+		"<a href=\""+tool.HTML_escape(target)+"\">"+label+"</a>",
+		m_string,
+	)
+	class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
 }
 
 var anchor_html = func(class *macromark, macro_name string, macro_data string, m_string string) {
-    parts := macromark_split_macro_data(class, macro_data, 2)
-    if len(parts) < 2 {
-        class.render_data = strings.Replace(class.render_data, m_string, "", 1)
-        return
-    }
+	parts := macromark_split_macro_data(class, macro_data, 2)
+	if len(parts) < 2 {
+		class.render_data = strings.Replace(class.render_data, m_string, "", 1)
+		return
+	}
 
-    target := tool.HTML_unescape(parts[0])
-    if !strings.HasPrefix(target, "#") {
-        target = "#" + target
-    }
+	target := tool.HTML_unescape(parts[0])
+	if !strings.HasPrefix(target, "#") {
+		target = "#" + target
+	}
 
-    macromark_render_direct_link(class, target, parts[1], m_string)
+	macromark_render_direct_link(class, target, parts[1], m_string)
 }
 
 var internal_html = func(class *macromark, macro_name string, macro_data string, m_string string) {
-    parts := macromark_split_macro_data(class, macro_data, 2)
-    if len(parts) < 2 {
-        class.render_data = strings.Replace(class.render_data, m_string, "", 1)
-        return
-    }
+	parts := macromark_split_macro_data(class, macro_data, 2)
+	if len(parts) < 2 {
+		class.render_data = strings.Replace(class.render_data, m_string, "", 1)
+		return
+	}
 
-    target := macromark_safe_url(tool.HTML_unescape(parts[0]))
-    macromark_render_direct_link(class, target, parts[1], m_string)
+	target := macromark_safe_url(tool.HTML_unescape(parts[0]))
+	macromark_render_direct_link(class, target, parts[1], m_string)
 }
 
 type macromark_match struct {
-    start      int
-    end        int
-    macro_name string
-    macro_data string
-    text       string
+	start      int
+	end        int
+	macro_name string
+	macro_data string
+	text       string
 }
 
 func find_macromark(data string) *macromark_match {
-    var result *macromark_match
+	var result *macromark_match
 
-    for start := 0; start < len(data); start++ {
-        if data[start] != '[' {
-            continue
-        }
+	for start := 0; start < len(data); start++ {
+		if data[start] != '[' {
+			continue
+		}
 
-        open_offset := strings.IndexByte(data[start+1:], '(')
-        if open_offset < 0 {
-            continue
-        }
+		open_offset := strings.IndexByte(data[start+1:], '(')
+		if open_offset < 0 {
+			continue
+		}
 
-        open := start + 1 + open_offset
-        macro_name := data[start+1 : open]
-        if macro_name == "" || strings.ContainsAny(macro_name, "[]() \t\r\n") {
-            continue
-        }
+		open := start + 1 + open_offset
+		macro_name := data[start+1 : open]
+		if macro_name == "" || strings.ContainsAny(macro_name, "[]() \t\r\n") {
+			continue
+		}
 
-        depth := 1
-        close := -1
-        for index := open + 1; index < len(data); index++ {
-            switch data[index] {
-            case '(':
-                depth++
-            case ')':
-                depth--
-                if depth == 0 {
-                    if index+1 < len(data) && data[index+1] == ']' {
-                        close = index
-                    }
-                    break
-                }
-            }
+		depth := 1
+		close := -1
+		for index := open + 1; index < len(data); index++ {
+			switch data[index] {
+			case '(':
+				depth++
+			case ')':
+				depth--
+				if depth == 0 {
+					if index+1 < len(data) && data[index+1] == ']' {
+						close = index
+					}
+					break
+				}
+			}
 
-            if close >= 0 || depth == 0 {
-                break
-            }
-        }
+			if close >= 0 || depth == 0 {
+				break
+			}
+		}
 
-        if close < 0 {
-            continue
-        }
+		if close < 0 {
+			continue
+		}
 
-        candidate := &macromark_match{
-            start:      start,
-            end:        close + 2,
-            macro_name: macro_name,
-            macro_data: data[open+1 : close],
-            text:       data[start : close+2],
-        }
+		candidate := &macromark_match{
+			start:      start,
+			end:        close + 2,
+			macro_name: macro_name,
+			macro_data: data[open+1 : close],
+			text:       data[start : close+2],
+		}
 
-        // Select the innermost/rightmost macro first so nested macros can be
-        // replaced with placeholders before their parent is transformed.
-        if result == nil || candidate.start > result.start {
-            result = candidate
-        }
-    }
+		// Select the innermost/rightmost macro first so nested macros can be
+		// replaced with placeholders before their parent is transformed.
+		if result == nil || candidate.start > result.start {
+			result = candidate
+		}
+	}
 
-    return result
+	return result
 }
 
 var macro_transform_map = map[string]macro_data{
-    "namumark" : {
-    },
-    "markdown" : {
-        function : map[string]macro_transform_func{
-            "h1" : heading_markdown,
-            "h2" : heading_markdown,
-            "h3" : heading_markdown,            
-            "h4" : heading_markdown,
-            "h5" : heading_markdown,
-            "h6" : heading_markdown,
-        },
-    },
-    "html" : {
-        function : map[string]macro_transform_func{
-            "nowiki" : func(class *macromark, macro_name string, macro_data string, m_string string) {
-                temp_name := class.func_temp_save(class.func_temp_restore(macro_data, true), m_string)
-                class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
-            },
-            "h1" : heading_html,
-            "h2" : heading_html,
-            "h3" : heading_html,
-            "h4" : heading_html,
-            "h5" : heading_html,
-            "h6" : heading_html,
-            "ol" : func(class *macromark, macro_name string, macro_data string, m_string string) {
-                temp_name := class.func_temp_save("<ol><back_br>" + macro_data + "</ol><back_br>", m_string)
-                class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
-            },
-            "q" : block_html,
-            "table" : block_html,
-            "tr" : block_html,
-            "th" : simple_html,
-            "td" : simple_html,
-            "hr" : func(class *macromark, macro_name string, macro_data string, m_string string) {
-                temp_name := class.func_temp_save("<hr><back_br>", m_string)
-                class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
-            },
-            "img" : markdown_image_html,
-            "an" : anchor_html,
-            "in" : internal_html,
-            "ul" : func(class *macromark, macro_name string, macro_data string, m_string string) {
-                temp_name := class.func_temp_save("<ul><back_br>" + macro_data + "</ul><back_br>", m_string)
-                class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
-            },
-            "li" : func(class *macromark, macro_name string, macro_data string, m_string string) {
-                temp_name := class.func_temp_save("<li>" + macro_data + "</li><back_br>", m_string)
-                class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
-            },
-            "a" : func(class *macromark, macro_name string, macro_data string, m_string string) {
-                a_data := class.func_temp_restore(macro_data, false)
-                a_data = strings.ReplaceAll(a_data, ",,", "<temp>")
+	"namumark": {},
+	"markdown": {
+		function: map[string]macro_transform_func{
+			"h1": heading_markdown,
+			"h2": heading_markdown,
+			"h3": heading_markdown,
+			"h4": heading_markdown,
+			"h5": heading_markdown,
+			"h6": heading_markdown,
+		},
+	},
+	"html": {
+		function: map[string]macro_transform_func{
+			"nowiki": func(class *macromark, macro_name string, macro_data string, m_string string) {
+				temp_name := class.func_temp_save(class.func_temp_restore(macro_data, true), m_string)
+				class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+			},
+			"h1": heading_html,
+			"h2": heading_html,
+			"h3": heading_html,
+			"h4": heading_html,
+			"h5": heading_html,
+			"h6": heading_html,
+			"ol": func(class *macromark, macro_name string, macro_data string, m_string string) {
+				temp_name := class.func_temp_save("<ol><back_br>"+macro_data+"</ol><back_br>", m_string)
+				class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+			},
+			"q":     block_html,
+			"table": block_html,
+			"tr":    block_html,
+			"th":    simple_html,
+			"td":    simple_html,
+			"hr": func(class *macromark, macro_name string, macro_data string, m_string string) {
+				temp_name := class.func_temp_save("<hr><back_br>", m_string)
+				class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+			},
+			"img": markdown_image_html,
+			"an":  anchor_html,
+			"in":  internal_html,
+			"ul": func(class *macromark, macro_name string, macro_data string, m_string string) {
+				temp_name := class.func_temp_save("<ul><back_br>"+macro_data+"</ul><back_br>", m_string)
+				class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+			},
+			"li": func(class *macromark, macro_name string, macro_data string, m_string string) {
+				temp_name := class.func_temp_save("<li>"+macro_data+"</li><back_br>", m_string)
+				class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+			},
+			"a": func(class *macromark, macro_name string, macro_data string, m_string string) {
+				a_data := class.func_temp_restore(macro_data, false)
+				a_data = strings.ReplaceAll(a_data, ",,", "<temp>")
 
-                part := strings.SplitN(a_data, ",", 3)
+				part := strings.SplitN(a_data, ",", 3)
 
-                a_data_link := tool.HTML_unescape(part[0])
-                a_data_view := a_data_link
-                if len(part) > 1 {
-                    a_data_view = part[1]
-                }
+				a_data_link := tool.HTML_unescape(part[0])
+				a_data_view := a_data_link
+				if len(part) > 1 {
+					a_data_view = part[1]
+				}
 
-                a_data_hash := ""
-                if len(part) > 2 {
-                    a_data_hash = part[2]
-                }
-                
-                a_data_link = strings.ReplaceAll(a_data_link, "<temp>", ",")
-                a_data_view = strings.ReplaceAll(a_data_view, "<temp>", ",")
-                a_data_hash = strings.ReplaceAll(a_data_hash, "<temp>", ",")
+				a_data_hash := ""
+				if len(part) > 2 {
+					a_data_hash = part[2]
+				}
 
-                temp := ""
-                exist := tool.QueryRow_DB(
-                    class.db,
-                    "select title from data where title = ?",
-                    []any{ &temp },
-                    a_data_link,
-                )
+				a_data_link = strings.ReplaceAll(a_data_link, "<temp>", ",")
+				a_data_view = strings.ReplaceAll(a_data_view, "<temp>", ",")
+				a_data_hash = strings.ReplaceAll(a_data_hash, "<temp>", ",")
 
-                exist_link := ""
-                if !exist {
-                    exist_link = "class=\"opennamu_not_exist_link\""
-                }
+				temp := ""
+				exist := tool.QueryRow_DB(
+					class.db,
+					"select title from data where title = ?",
+					[]any{&temp},
+					a_data_link,
+				)
 
-                temp_name := class.func_temp_save("<a " + exist_link + " href=\"/w/" + tool.Url_parser(a_data_link) + a_data_hash + "\">" + a_data_view + "</a>", m_string)
-                class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
-            },
-            "ex" : func(class *macromark, macro_name string, macro_data string, m_string string) {
-                a_data := class.func_temp_restore(macro_data, false)
-                a_data = strings.ReplaceAll(a_data, ",,", "<temp>")
+				exist_link := ""
+				if !exist {
+					exist_link = "class=\"opennamu_not_exist_link\""
+				}
 
-                part := strings.SplitN(a_data, ",", 2)
+				temp_name := class.func_temp_save("<a "+exist_link+" href=\"/w/"+tool.Url_parser(a_data_link)+a_data_hash+"\">"+a_data_view+"</a>", m_string)
+				class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+			},
+			"ex": func(class *macromark, macro_name string, macro_data string, m_string string) {
+				a_data := class.func_temp_restore(macro_data, false)
+				a_data = strings.ReplaceAll(a_data, ",,", "<temp>")
 
-                a_data_link := tool.HTML_unescape(part[0])
-                a_data_view := a_data_link
-                if len(part) > 1 {
-                    a_data_view = part[1]
-                }
+				part := strings.SplitN(a_data, ",", 2)
 
-                a_data_link = strings.ReplaceAll(a_data_link, "<temp>", ",")
-                a_data_view = strings.ReplaceAll(a_data_view, "<temp>", ",")
-                
-                if strings.HasPrefix(strings.ToLower(a_data_link), "mailto:") {
-                    class.render_data = strings.Replace(class.render_data, m_string, a_data_view, 1)
-                    return
-                }
+				a_data_link := tool.HTML_unescape(part[0])
+				a_data_view := a_data_link
+				if len(part) > 1 {
+					a_data_view = part[1]
+				}
 
-                temp_name := class.func_temp_save("<a class=\"opennamu_link_out\" href=\"" + tool.HTML_escape(a_data_link) + "\">" + a_data_view + "</a>", m_string)
-                class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
-            },
-            "b" : simple_html,
-            "i" : simple_html,
-            "u" : simple_html,
-            "s" : simple_html,
-            "sup" : simple_html,
-            "sub" : simple_html,
-            "toc" : func(class *macromark, macro_name string, macro_data string, m_string string) {
-                temp_name := class.func_temp_save("<toc_data>", m_string)
-                class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
-            },
-        },
-    },
+				a_data_link = strings.ReplaceAll(a_data_link, "<temp>", ",")
+				a_data_view = strings.ReplaceAll(a_data_view, "<temp>", ",")
+
+				if strings.HasPrefix(strings.ToLower(a_data_link), "mailto:") {
+					class.render_data = strings.Replace(class.render_data, m_string, a_data_view, 1)
+					return
+				}
+
+				temp_name := class.func_temp_save("<a class=\"opennamu_link_out\" href=\""+tool.HTML_escape(a_data_link)+"\">"+a_data_view+"</a>", m_string)
+				class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+			},
+			"b":   simple_html,
+			"i":   simple_html,
+			"u":   simple_html,
+			"s":   simple_html,
+			"sup": simple_html,
+			"sub": simple_html,
+			"toc": func(class *macromark, macro_name string, macro_data string, m_string string) {
+				temp_name := class.func_temp_save("<toc_data>", m_string)
+				class.render_data = strings.Replace(class.render_data, m_string, temp_name, 1)
+			},
+		},
+	},
 }
 
 func (class *macromark) render_text() {
-    for {
-        match := find_macromark(class.render_data)
-        if match == nil {
-            break
-        }
+	for {
+		match := find_macromark(class.render_data)
+		if match == nil {
+			break
+		}
 
-        reg, ok := macro_transform_map[class.result_markup]
-        if !ok || reg.function == nil {
-            class.render_data = strings.Replace(class.render_data, match.text, match.macro_data, 1)
-            continue
-        }
+		reg, ok := macro_transform_map[class.result_markup]
+		if !ok || reg.function == nil {
+			class.render_data = strings.Replace(class.render_data, match.text, match.macro_data, 1)
+			continue
+		}
 
-        fn, ok := reg.function[match.macro_name]
-        if !ok {
-            class.render_data = strings.Replace(class.render_data, match.text, match.macro_data, 1)
-            continue
-        }
+		fn, ok := reg.function[match.macro_name]
+		if !ok {
+			class.render_data = strings.Replace(class.render_data, match.text, match.macro_data, 1)
+			continue
+		}
 
-        fn(class, match.macro_name, match.macro_data, match.text)
-    }
+		fn(class, match.macro_name, match.macro_data, match.text)
+	}
 }
 
 func (class *macromark) render_last() {
-    string_data := class.render_data
+	string_data := class.render_data
 
-    string_data = class.func_temp_restore(string_data, false)
+	string_data = class.func_temp_restore(string_data, false)
 
-    r := regexp.MustCompile(`(\n| )+$`)
-    string_data = r.ReplaceAllString(string_data, "")
+	r := regexp.MustCompile(`(\n| )+$`)
+	string_data = r.ReplaceAllString(string_data, "")
 
-    r = regexp.MustCompile(`^(\n| )+`)
-    string_data = r.ReplaceAllString(string_data, "")
+	r = regexp.MustCompile(`^(\n| )+`)
+	string_data = r.ReplaceAllString(string_data, "")
 
-    r = regexp.MustCompile(`\n?<front_br>`)
-    string_data = r.ReplaceAllString(string_data, "")
+	r = regexp.MustCompile(`\n?<front_br>`)
+	string_data = r.ReplaceAllString(string_data, "")
 
-    r = regexp.MustCompile(`<back_br>\n?`)
-    string_data = r.ReplaceAllString(string_data, "")
+	r = regexp.MustCompile(`<back_br>\n?`)
+	string_data = r.ReplaceAllString(string_data, "")
 
-    toc_data := ""
-    for k, v := range class.toc_result {
-        toc_data += "<br>"
-        
-        count_comma := strings.Count(k, ".")
-        toc_space := strings.Repeat("<span style=\"margin-left: 10px;\"></span>", count_comma)
+	toc_data := ""
+	for k, v := range class.toc_result {
+		toc_data += "<br>"
 
-        toc_data += "<span class=\"opennamu_TOC_list\">" + toc_space + "<a href=\"#s-" + k + "\">" + k + ". </a>" + v + "</span>"
-    }
+		count_comma := strings.Count(k, ".")
+		toc_space := strings.Repeat("<span style=\"margin-left: 10px;\"></span>", count_comma)
 
-    if toc_data != "" {
-        toc_data = "<div class=\"opennamu_TOC\" id=\"toc\"><span class=\"opennamu_TOC_title\">" + tool.Get_language(class.db, "toc", true) + "</span><br>" + toc_data + "</div>"
-    }
+		toc_data += "<span class=\"opennamu_TOC_list\">" + toc_space + "<a href=\"#s-" + k + "\">" + k + ". </a>" + v + "</span>"
+	}
 
-    r = regexp.MustCompile(`<toc_data>`)
-    string_data = r.ReplaceAllString(string_data, toc_data)
+	if toc_data != "" {
+		toc_data = "<div class=\"opennamu_TOC\" id=\"toc\"><span class=\"opennamu_TOC_title\">" + tool.Get_language(class.db, "toc", true) + "</span><br>" + toc_data + "</div>"
+	}
 
-    string_data = strings.Replace(string_data, "\n", "<br>", -1)
+	r = regexp.MustCompile(`<toc_data>`)
+	string_data = r.ReplaceAllString(string_data, toc_data)
 
-    class.render_data = string_data
+	string_data = strings.Replace(string_data, "\n", "<br>", -1)
+
+	class.render_data = string_data
 }
 
 func (class macromark) main() map[string]any {
-    class.render_text()
-    class.render_last()
+	class.render_text()
+	class.render_last()
 
-    log.Default().Println(class.toc_result)
+	log.Default().Println(class.toc_result)
 
-    end_data := make(map[string]any)
-    end_data["data"] = class.render_data
-    end_data["js_data"] = class.render_data_js
-    end_data["backlink"] = class.backlink
-    end_data["link_count"] = class.link_count
+	end_data := make(map[string]any)
+	end_data["data"] = class.render_data
+	end_data["js_data"] = class.render_data_js
+	end_data["backlink"] = class.backlink
+	end_data["link_count"] = class.link_count
 
-    return end_data
+	return end_data
 }

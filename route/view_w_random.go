@@ -5,13 +5,13 @@ import (
 )
 
 func View_w_random(config tool.Config) string {
-    db := tool.DB_connect()
-    defer tool.DB_close(db)
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
 
 	api_data := Api_w_random(config)
 	title := api_data["data"].(string)
 
-    redirect := tool.Get_redirect("/w/" + tool.Url_parser(title))
+	redirect := tool.Get_redirect("/w/" + tool.Url_parser(title))
 
-    return redirect
+	return redirect
 }

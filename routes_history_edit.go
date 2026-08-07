@@ -2,13 +2,15 @@ package main
 
 import (
 	"encoding/base64"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
-	"opennamu/route"
-	"opennamu/route/tool"
 	"path/filepath"
 	"strings"
+
+	"opennamu/route"
+	"opennamu/route/tool"
+
+	"github.com/gin-gonic/gin"
 )
 
 func register_history_edit_routes(r *gin.Engine) {
@@ -151,9 +153,9 @@ func register_history_edit_routes(r *gin.Engine) {
 		}
 
 		route_data := route.View_edit_file_upload_post(tool.Config{
-			IP:        tool.Get_IP(c),
-			Cookies:   tool.Get_Cookies(c),
-			Session:   tool.Get_session(c),
+			IP:      tool.Get_IP(c),
+			Cookies: tool.Get_Cookies(c),
+			Session: tool.Get_session(c),
 		}, upload_files)
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})

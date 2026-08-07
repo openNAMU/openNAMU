@@ -2,9 +2,10 @@ package route
 
 import (
 	"fmt"
-	"opennamu/route/tool"
 	"os"
 	"strings"
+
+	"opennamu/route/tool"
 )
 
 func Api_setting_sitemap_post(config tool.Config) map[string]any {
@@ -25,7 +26,7 @@ func Api_setting_sitemap_post(config tool.Config) map[string]any {
 	tool.QueryRow_DB(
 		db,
 		"select data from other where name = 'sitemap_auto_exclude_domain'",
-		[]any{ &sitemap_auto_exclude_domain },
+		[]any{&sitemap_auto_exclude_domain},
 	)
 	if sitemap_auto_exclude_domain == "" {
 		domain = tool.Get_domain(db, true)
@@ -37,7 +38,7 @@ func Api_setting_sitemap_post(config tool.Config) map[string]any {
 	tool.QueryRow_DB(
 		db,
 		"select data from other where name = 'sitemap_auto_exclude_user_page'",
-		[]any{ &sitemap_auto_exclude_user_page },
+		[]any{&sitemap_auto_exclude_user_page},
 	)
 	if sitemap_auto_exclude_user_page != "" {
 		sql_add += " title not like 'user:%'"
@@ -47,7 +48,7 @@ func Api_setting_sitemap_post(config tool.Config) map[string]any {
 	tool.QueryRow_DB(
 		db,
 		"select data from other where name = 'sitemap_auto_exclude_file_page'",
-		[]any{ &sitemap_auto_exclude_file_page },
+		[]any{&sitemap_auto_exclude_file_page},
 	)
 	if sitemap_auto_exclude_file_page != "" {
 		if sql_add != "" {
@@ -61,7 +62,7 @@ func Api_setting_sitemap_post(config tool.Config) map[string]any {
 	tool.QueryRow_DB(
 		db,
 		"select data from other where name = 'sitemap_auto_exclude_category_page'",
-		[]any{ &sitemap_auto_exclude_category_page },
+		[]any{&sitemap_auto_exclude_category_page},
 	)
 	if sitemap_auto_exclude_category_page != "" {
 		if sql_add != "" {
@@ -75,18 +76,18 @@ func Api_setting_sitemap_post(config tool.Config) map[string]any {
 		sql_add = " where" + sql_add
 	}
 
-	rows := tool.Query_DB(db, "select title from data" + sql_add)
+	rows := tool.Query_DB(db, "select title from data"+sql_add)
 	defer rows.Close()
 
 	all_data := []string{}
 
 	for rows.Next() {
 		title := ""
-	
-        err := rows.Scan(&title)
-        if err != nil {
-            panic(err)
-        }
+
+		err := rows.Scan(&title)
+		if err != nil {
+			panic(err)
+		}
 
 		all_data = append(all_data, title)
 	}
@@ -155,7 +156,7 @@ func Api_setting_sitemap_post(config tool.Config) map[string]any {
 		data.WriteString("</urlset>")
 
 		err = os.WriteFile(
-			"sitemap_" + fmt.Sprint(i) + ".xml",
+			"sitemap_"+fmt.Sprint(i)+".xml",
 			[]byte(data.String()),
 			0644,
 		)

@@ -71,7 +71,7 @@ func Load_lang_data(language string) {
 	defer global_lang_lock.Unlock()
 
 	for k, v := range lang_json {
-		global_lang_data[language + "_" + k] = v
+		global_lang_data[language+"_"+k] = v
 	}
 	global_lang_load[language] = true
 }
