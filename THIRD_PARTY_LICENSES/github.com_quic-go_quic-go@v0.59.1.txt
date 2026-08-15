@@ -1,10 +1,10 @@
-github.com/yuin/goldmark @ v1.7.1
+github.com/quic-go/quic-go @ v0.59.1
 
 ----- LICENSE -----
 
 MIT License
 
-Copyright (c) 2019 Yusuke Inuzuka
+Copyright (c) 2016 the quic-go authors & Google, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

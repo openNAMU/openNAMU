@@ -1,4 +1,4 @@
-gonum.org/v1/gonum @ v0.16.0
+gonum.org/v1/gonum @ v0.17.0
 
 ----- LICENSE -----
 
