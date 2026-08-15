@@ -4,6 +4,8 @@ go.sum
 !/bin/test
 
 *.db
+*.db-shm
+*.db-wal
 
 views/liberty
 
