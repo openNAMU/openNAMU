@@ -5,6 +5,42 @@ import (
 	"opennamu/route/tool"
 )
 
+func api_history_language(db *sql.DB) map[string]string {
+	language_name_list := []string{
+		"normal",
+		"edit",
+		"move",
+		"delete",
+		"revert",
+		"r1",
+		"setting",
+		"user",
+		"user_document",
+		"file",
+		"category",
+		"view",
+		"raw",
+		"compare",
+		"history",
+		"hide",
+		"history_delete",
+		"send_edit",
+	}
+	language_data := map[string]string{}
+	for _, name := range language_name_list {
+		language_data[name] = tool.Get_language(db, name, false)
+	}
+	return language_data
+}
+
+func api_history_auth(db *sql.DB, ip string) map[string]bool {
+	auth_info := tool.Get_auth_group_info(db, tool.Get_user_auth(db, ip))
+	return map[string]bool{
+		"owner": auth_info["owner"],
+		"hidel": auth_info["hidel"],
+	}
+}
+
 func Api_list_history(config tool.Config, doc_name string, set_type string, num string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
@@ -89,6 +125,8 @@ func Api_list_history(config tool.Config, doc_name string, set_type string, num 
 
 	return_data := make(map[string]any)
 	return_data["response"] = "ok"
+	return_data["language"] = api_history_language(db)
+	return_data["auth"] = api_history_auth(db, config.IP)
 	return_data["data"] = data_list
 
 	return return_data

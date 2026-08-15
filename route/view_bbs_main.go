@@ -50,7 +50,11 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 		right += bbs_user_id + " | "
 		right += bbs_date
 
-		data_html += tool.Get_list_ui(left, right, "", "")
+		class_name := ""
+		if in_data["pinned"] == "1" {
+			class_name = "opennamu_comment_color_red"
+		}
+		data_html += tool.Get_list_ui(left, right, "", class_name)
 	}
 
 	return data_html
@@ -96,16 +100,18 @@ func View_bbs_main(config tool.Config, page string) string {
 	bbs_api_data := Api_bbs(config, "", page)
 	data_html += Get_bbs_list_ui(config, bbs_api_data["data"].([]map[string]string), bbs_id_to_name)
 
+	menu := [][]any{{"other", tool.Get_language(db, "other_tool", false)}}
+	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+		menu = append(menu, []any{"bbs/make", tool.Get_language(db, "add", false)})
+	}
+
 	out := tool.Get_template(
 		db,
 		config,
 		tool.Get_language(db, "bbs_main", true),
 		data_html,
 		[]any{},
-		[][]any{
-			{"other", tool.Get_language(db, "other_tool", false)},
-			{"bbs/make", tool.Get_language(db, "add", false)},
-		},
+		menu,
 		map[string]string{},
 	)
 

@@ -26,7 +26,7 @@ func Api_topic_list(config tool.Config, num string, doc_name string, do_type str
 			doc_name,
 			page_int,
 		)
-	case "open":
+	case "agree", "open":
 		rows = tool.Query_DB(
 			db,
 			"select code, sub, stop, agree, date from rd where title = ? and agree = 'O' order by sub asc limit ?, 50",
@@ -36,7 +36,7 @@ func Api_topic_list(config tool.Config, num string, doc_name string, do_type str
 	default:
 		rows = tool.Query_DB(
 			db,
-			"select code, sub, stop, agree, date from rd where title = ? order by sub asc limit ?, 50",
+			"select code, sub, stop, agree, date from rd where title = ? and stop != 'O' order by date desc limit ?, 50",
 			doc_name,
 			page_int,
 		)

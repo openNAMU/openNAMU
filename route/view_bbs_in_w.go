@@ -23,6 +23,9 @@ func View_bbs_in_w(c *gin.Context, config tool.Config, set_id string, set_code s
 		return tool.Get_redirect("/bbs/main")
 	}
 
+	post_data := get_render_setting_css(db, config) + Get_bbs_render(db, set_id, data_api_in["data"], "bbs", config)
+	post_data = render_topic_reference(post_data, set_code, set_id, set_code, "bbs")
+
 	data_html := `
         <div class="opennamu_bbs_w_post_tab">
             <big><big><big>` + tool.HTML_escape(data_api_in["title"]) + `</big></big></big>
@@ -30,7 +33,7 @@ func View_bbs_in_w(c *gin.Context, config tool.Config, set_id string, set_code s
             ` + data_api_in["user_id_render"] + ` <span style="float: right;">` + data_api_in["date"] + `</span>
             <hr>
             <div class="opennamu_bbs_w_post_tab_content">
-                ` + tool.HTML_escape(data_api_in["data"]) + `
+                ` + post_data + `
             </div>
         </div>
     `
@@ -40,7 +43,7 @@ func View_bbs_in_w(c *gin.Context, config tool.Config, set_id string, set_code s
 	view_count_api := Api_bbs_w_page_view(config, set_id, set_code)
 	view_count_api_data := view_count_api["data"].(int)
 
-	data_html += View_bbs_in_w_comment(db, config, data_api_in["user_id"], set_id, set_code)
+	data_html += View_bbs_in_w_comment(db, config, set_id, set_code, c.Query("comment_select"))
 
 	out := tool.Get_template(
 		db,

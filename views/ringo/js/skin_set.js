@@ -4,6 +4,14 @@ function ringo_do_regex_data(data) {
     return new RegExp('(?:^|; )' + data + '=([^;]*)');
 }
 
+function ringo_get_cookie(data) {
+    const result = document.cookie.match(ringo_do_regex_data(data));
+    if(result) {
+        return result[1];
+    }
+    return '';
+}
+
 function ringo_get_post() {
     const check = document.getElementById('invert');
     if(check.checked === true) {
@@ -67,13 +75,19 @@ function ringo_load_skin_set() {
             }
         }
 
-        let language = cookies.match(ringo_do_regex_data('language'))[1];
-        let user_language = cookies.match(ringo_do_regex_data('user_language'))[1];
+        let language = ringo_get_cookie('language');
+        let user_language = ringo_get_cookie('user_language');
+        if(!language) {
+            language = document.documentElement.lang || 'ko-KR';
+        }
+        if(!user_language) {
+            user_language = language;
+        }
         if(user_language in set_language) {
             language = user_language;
         }
 
-        if(!language in set_language) {
+        if(!(language in set_language)) {
             language = "en-US";
         }
 

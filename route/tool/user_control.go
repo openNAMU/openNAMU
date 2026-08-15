@@ -283,7 +283,7 @@ func Get_user_ban_type(ban_type string) string {
 	}
 }
 
-// Get_user_ban : login, register, edit_request, ""
+// Get_user_ban : login, register, ""
 // Return : []string{"true", "a" + ban_type}
 func Get_user_ban(db *sql.DB, ip string, tool string) []string {
 	rows := Query_DB(
@@ -312,10 +312,6 @@ func Get_user_ban(db *sql.DB, ip string, tool string) []string {
 				}
 			case "register":
 				if ban_type != "5" {
-					return []string{"true", "a" + ban_type}
-				}
-			case "edit_request":
-				if ban_type != "2" {
 					return []string{"true", "a" + ban_type}
 				}
 			default:
@@ -355,10 +351,6 @@ func Get_user_ban(db *sql.DB, ip string, tool string) []string {
 					if ban_type != "5" {
 						return []string{"true", "b" + ban_type}
 					}
-				case "edit_request":
-					if ban_type != "2" {
-						return []string{"true", "b" + ban_type}
-					}
 				default:
 					return []string{"true", "b" + ban_type}
 				}
@@ -384,10 +376,6 @@ func Get_user_ban(db *sql.DB, ip string, tool string) []string {
 			}
 		case "register":
 			if ban_type != "5" {
-				return []string{"true", ban_type}
-			}
-		case "edit_request":
-			if ban_type != "2" {
 				return []string{"true", ban_type}
 			}
 		default:
@@ -508,6 +496,8 @@ func Get_main_skin_set(db *sql.DB, config Config, set_name string) string {
 			set_name,
 			config.IP,
 		)
+	} else if config.Session != nil {
+		set_data, _ = config.Session.Get(set_name).(string)
 	}
 
 	if set_data == "default" || set_data == "" {

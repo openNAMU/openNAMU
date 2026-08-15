@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/flosch/pongo2/v6"
+	"github.com/gin-contrib/sessions"
 )
 
 func Get_skin_route(skin_name string, route string) string {
@@ -28,7 +29,7 @@ func Get_template_set(skin_name string) map[string]string {
 	return map[string]string{}
 }
 
-func Get_use_skin_name(db *sql.DB, ip string) string {
+func Get_use_skin_name_session(db *sql.DB, ip string, session sessions.Session) string {
 	skin_list := Get_skin_list("ringo", true)
 	skin := skin_list[0]
 
@@ -36,10 +37,12 @@ func Get_use_skin_name(db *sql.DB, ip string) string {
 	if !IP_or_user(ip) {
 		QueryRow_DB(
 			db,
-			"select data from user_set where name = 'skin' and id = ?",
+			"select data from user_set where name = \"skin\" and id = ?",
 			[]any{&user_skin_name},
 			ip,
 		)
+	} else if session != nil {
+		user_skin_name, _ = session.Get("skin").(string)
 	}
 
 	if user_skin_name == "default" {
@@ -49,7 +52,7 @@ func Get_use_skin_name(db *sql.DB, ip string) string {
 	if user_skin_name == "" {
 		QueryRow_DB(
 			db,
-			"select data from other where name = 'skin'",
+			"select data from other where name = \"skin\"",
 			[]any{&user_skin_name},
 		)
 	}
@@ -61,8 +64,13 @@ func Get_use_skin_name(db *sql.DB, ip string) string {
 	return skin
 }
 
+func Get_use_skin_name(db *sql.DB, ip string) string {
+	return Get_use_skin_name_session(db, ip, nil)
+}
+
 func Get_template(db *sql.DB, config Config, name string, data string, other []any, menu [][]any, option map[string]string) string {
-	skin_name := Get_use_skin_name(db, config.IP)
+	skin_name := Get_use_skin_name_session(db, config.IP, config.Session)
+	data = Replace_user_info_ui(db, config, data)
 
 	template_set := Get_template_set(skin_name)
 	for k, v := range template_set {
@@ -107,9 +115,16 @@ func Get_template(db *sql.DB, config Config, name string, data string, other []a
 		}
 	}
 
-	imp_1 := Get_wiki_set(db, config.IP, config.Cookies)
+	imp_1 := Get_wiki_set(db, config.IP, config.Session, config.Cookies)
 	imp_2 := Get_wiki_custom(db, config.IP, config.Session, config.Cookies)
-	imp_3 := Get_wiki_css(other, config.Cookies)
+	template_cookies := config.Cookies
+	cookie_data := Get_cookie_header(template_cookies)
+	if _, exists := cookie_data["main_css_darkmode"]; !exists && config.Session != nil {
+		if dark_mode, ok := config.Session.Get("main_css_darkmode").(string); ok && dark_mode != "" {
+			template_cookies += "; main_css_darkmode=" + dark_mode
+		}
+	}
+	imp_3 := Get_wiki_css(other, template_cookies)
 
 	if len(imp_3) < 8 {
 		imp_3 = append(imp_3, 0)
@@ -203,11 +218,13 @@ func Get_template(db *sql.DB, config Config, name string, data string, other []a
 	return out
 }
 
-func Get_redirect(target string) string {
-	attrURL := HTML_escape(target)
-	jsURL := strconv.Quote(target)
+const redirect_marker = "<!--opennamu_redirect:"
 
-	return fmt.Sprintf(`<!doctype html>
+func Get_redirect(target string) string {
+	attr_url := HTML_escape(target)
+	js_url := strconv.Quote(target)
+
+	return redirect_marker + strconv.Quote(target) + "-->" + fmt.Sprintf(`<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
@@ -222,7 +239,22 @@ location.replace(%s);
 <body>
 <p>Redirecting… <a href="%s">continue</a></p>
 </body>
-</html>`, jsURL, attrURL, attrURL)
+</html>`, js_url, attr_url, attr_url)
+}
+
+func Get_redirect_target(data string) (string, bool) {
+	if !strings.HasPrefix(data, redirect_marker) {
+		return "", false
+	}
+
+	data = strings.TrimPrefix(data, redirect_marker)
+	end := strings.Index(data, "-->")
+	if end < 0 {
+		return "", false
+	}
+
+	target, err := strconv.Unquote(data[:end])
+	return target, err == nil
 }
 
 func Cache_v() string {
@@ -252,14 +284,9 @@ func Get_wiki_css(data []any, cookies string) []any {
 
 	// Func JS
 	data_css += `<script defer src="/views/main_css/js/func/func.js` + data_css_ver + `"></script>`
-	data_css += `<script defer src="/views/main_css/js/func/insert_version.js` + data_css_ver + `"></script>`
-	data_css += `<script defer src="/views/main_css/js/func/insert_user_info.js` + data_css_ver + `"></script>`
-	data_css += `<script defer src="/views/main_css/js/func/insert_version_skin.js` + data_css_ver + `"></script>`
-	data_css += `<script defer src="/views/main_css/js/func/insert_http_warning_text.js` + data_css_ver + `"></script>`
 	data_css += `<script defer src="/views/main_css/js/func/ie_end_of_life.js` + data_css_ver + `"></script>`
 	data_css += `<script defer src="/views/main_css/js/func/shortcut.js` + data_css_ver + `"></script>`
 	data_css += `<script defer src="/views/main_css/js/func/editor.js` + data_css_ver + `"></script>`
-	data_css += `<script defer src="/views/main_css/js/func/render.js` + data_css_ver + `"></script>`
 
 	// Main CSS
 	data_css += `<link rel="stylesheet" href="/views/main_css/css/main.css` + data_css_ver + `">`
@@ -334,8 +361,12 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
 		data = Get_language(db, "password_error", true)
 	case "password different":
 		data = Get_language(db, "password_diffrent_error", true)
-	case "empty password":
+	case "empty password", "password empty":
 		data = Get_language(db, "invalid_password_error", true)
+	case "password same as id":
+		data = Get_language(db, "password_same_as_id_error", true)
+	case "register disabled":
+		data = Get_language(db, "login_able_and_regsiter_disable", true)
 	case "password too short":
 		password_length_limit := ""
 		QueryRow_DB(
@@ -346,20 +377,55 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
 		data = Get_language(db, "error_password_length_too_short", true) + " " + password_length_limit
 	case "user name error":
 		data = Get_language(db, "input_email_error", true)
+	case "empty title", "empty data", "invalid data", "key error":
+		data = Get_language(db, "input_email_error", true)
+	case "permission denied":
+		data = Get_language(db, "authority_error", true)
 	case "ban":
 		data = Get_language(db, "blocked", true)
+	case "recaptcha", "recaptcha_error":
+		data = Get_language(db, "recaptcha_error", true)
+	case "not found":
+		data = Get_language(db, "email_error", true)
+	case "email already exist":
+		data = Get_language(db, "same_email_error", true)
+	case "email error":
+		data = Get_language(db, "email_send_error", true)
+	case "unallowed file name":
+		data = Get_language(db, "file_name_error", true)
+	case "unallowed ext":
+		data = Get_language(db, "file_extension_error", true) + ` <a href="/filter/extension_filter">(` + Get_language(db, "extension_filter_list", true) + `)</a>`
+	case "file too large":
+		file_max := "2"
+		QueryRow_DB(db, `select data from other where name = 'upload'`, []any{&file_max})
+		if file_max == "" {
+			file_max = "2"
+		}
+		data = Get_language(db, "file_capacity_error", true) + file_max
+	case "already exist":
+		data = Get_language(db, "same_file_error", true)
+	case "invalid file":
+		data = Get_language(db, "file_exist_error", true)
 	case "slow edit limit":
 		data = Get_language(db, "fast_edit_error", true)
 	case "edit filter (content)":
 		data = Get_language(db, "edit_filter_error", true) + " (content)"
 	case "edit filter (send)":
 		data = Get_language(db, "edit_filter_error", true) + " (send)"
+	case "edit filter (title)":
+		data = Get_language(db, "edit_filter_error", true) + " (title)"
 	case "send require":
 		data = Get_language(db, "error_edit_send_request", true)
 	case "checkbox check require":
 		data = Get_language(db, "copyright_disagreed", true)
 	case "overflow max length":
 		data = Get_language(db, "document_content_max_length_error", true)
+	case "title length":
+		data = Get_language(db, "error_title_length_too_long", true) + " " + Get_title_length_limit(db, "document")
+	case "topic title length":
+		data = Get_language(db, "error_title_length_too_long", true) + " " + Get_title_length_limit(db, "topic")
+	case "edit conflict":
+		data = Get_language(db, "exp_edit_conflict", true)
 	default:
 		data = Get_language(db, "inter_error", true)
 	}
@@ -455,7 +521,14 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
 
 	dark_mode := false
 
-	cookie_map := Get_cookie_header(config.Cookies)
+	editor_cookies := config.Cookies
+	editor_cookie_data := Get_cookie_header(editor_cookies)
+	if _, exists := editor_cookie_data["main_css_darkmode"]; !exists && config.Session != nil {
+		if dark_mode, ok := config.Session.Get("main_css_darkmode").(string); ok && dark_mode != "" {
+			editor_cookies += "; main_css_darkmode=" + dark_mode
+		}
+	}
+	cookie_map := Get_cookie_header(editor_cookies)
 	if cookie_map["main_css_darkmode"] == "1" {
 		dark_mode = true
 	}
@@ -534,10 +607,7 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
         </script>
 
         <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">` + Get_language(db, "send", true) + `</button>
-        <button class="__ON_BUTTON__" id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview();">` + Get_language(db, "preview", true) + `</button>
         <hr class="main_hr">
-
-        <div id="opennamu_preview_area"></div>
     `
 }
 
@@ -702,54 +772,6 @@ func Get_editor_button_ui(db *sql.DB) string {
 	data_html += `<a href="/filter/edit_top">(` + Get_language(db, "add", true) + `)</a><hr class="main_hr">`
 
 	return data_html
-}
-
-func Get_thread_ui(user_name string, date string, data string, code string, color string, blind string, add_style string, topic_num string) string {
-	color_b := ""
-	class_b := ""
-
-	if blind == "O" {
-		if data == "" {
-			color_b = "opennamu_comment_blind"
-		} else {
-			color_b = "opennamu_comment_blind_admin"
-		}
-
-		class_b = "opennamu_comment_blind_js opennamu_list_hidden"
-	} else {
-		color_b = "opennamu_comment_blind_not"
-	}
-
-	admin_check_box := ""
-	if topic_num != "" {
-		admin_check_box = `<input type="checkbox" class="opennamu_blind_button" id="opennamu_blind_` + topic_num + `_` + code + `">`
-	}
-
-	return `
-        <span class="` + class_b + `">
-            <table class="opennamu_comment" style="` + add_style + `">
-                <tr>
-                    <td class="opennamu_comment_color_` + color + `">
-                        ` + admin_check_box + `
-                        <a href="#thread_shortcut" id="` + code + `">#` + code + `</a>
-                        ` + user_name + `
-                        <span style="float: right;">` + date + `</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="` + color_b + ` opennamu_comment_data_main" id="thread_` + code + `">
-                        <div class="opennamu_comment_scroll" id="opennamu_thread_render_` + code + `">` + HTML_escape(data) + `</div>
-                    </td>
-                    <script>
-                        window.addEventListener('DOMContentLoaded', function() {
-                            opennamu_do_render_with_dom("opennamu_thread_render_` + code + `", "opennamu_thread_render_` + code + `", "", "thread");
-                        })
-                    </script>
-                </tr>
-            </table>
-            <hr class="main_hr">
-        </span>
-    `
 }
 
 func Get_edit_check_box_ui(db *sql.DB) string {

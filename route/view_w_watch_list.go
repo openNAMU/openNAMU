@@ -19,11 +19,23 @@ func View_w_watch_list(config tool.Config, doc_name string, num string, do_type 
 		return tool.Get_error_page(db, config, "auth")
 	} else {
 		data_html += "<ul>"
-		for _, user_data := range api_data["data"].([][]string) {
+		data_list := api_data["data"].([][]string)
+		for _, user_data := range data_list {
 			data_html += "<li>" + user_data[1] + "</li>"
 		}
 
 		data_html += "</ul>"
+		route_name := "doc_watch_list"
+		if do_type == "star_doc" {
+			route_name = "doc_star_doc"
+		}
+		data_html += tool.Get_page_control(
+			db,
+			tool.Str_to_int(num),
+			len(data_list),
+			50,
+			"/"+route_name+"/{}/"+tool.Url_parser(doc_name),
+		)
 	}
 
 	title := tool.Get_language(db, "watchlist", true)

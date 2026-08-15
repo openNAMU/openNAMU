@@ -7,6 +7,9 @@ import (
 func View_login_register(config tool.Config) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
+	if error_name := user_register_access(db, config); error_name != "" {
+		return tool.Get_error_page(db, config, error_name)
+	}
 
 	contract := ""
 	tool.QueryRow_DB(

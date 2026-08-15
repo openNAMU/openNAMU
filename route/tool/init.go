@@ -425,6 +425,20 @@ func Always_init(db *sql.DB, version string) {
 		)
 	}
 
+	session_key := ""
+	exists = QueryRow_DB(
+		db,
+		`select data from other where name = "session_key"`,
+		[]any{&session_key},
+	)
+	if !exists {
+		Exec_DB(
+			db,
+			`insert into other (name, data, coverage) values ("session_key", ?, "")`,
+			Get_random_key(128),
+		)
+	}
+
 	salt := ""
 	exists = QueryRow_DB(
 		db,

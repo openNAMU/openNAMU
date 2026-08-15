@@ -94,7 +94,7 @@ func Get_DB_set_MySQL(new_db_set map[string]string) map[string]string {
 }
 
 func Exec_DB(db *sql.DB, query string, values ...any) {
-	const retryDelay = 10 * time.Millisecond
+	const retry_delay = 10 * time.Millisecond
 
 	stmt, err := db.Prepare(DB_change(query))
 	if err != nil {
@@ -109,7 +109,7 @@ func Exec_DB(db *sql.DB, query string, values ...any) {
 		}
 
 		if strings.Contains(err.Error(), "database is locked") {
-			time.Sleep(retryDelay)
+			time.Sleep(retry_delay)
 			continue
 		}
 
@@ -118,7 +118,7 @@ func Exec_DB(db *sql.DB, query string, values ...any) {
 }
 
 func Query_DB(db *sql.DB, query string, values ...any) *sql.Rows {
-	const retryDelay = 10 * time.Millisecond
+	const retry_delay = 10 * time.Millisecond
 
 	stmt, err := db.Prepare(DB_change(query))
 	if err != nil {
@@ -133,7 +133,7 @@ func Query_DB(db *sql.DB, query string, values ...any) *sql.Rows {
 		}
 
 		if strings.Contains(err.Error(), "database is locked") {
-			time.Sleep(retryDelay)
+			time.Sleep(retry_delay)
 			continue
 		}
 
@@ -143,7 +143,7 @@ func Query_DB(db *sql.DB, query string, values ...any) *sql.Rows {
 
 // QueryRow_DB 이래서 포인터를 배우는구나...
 func QueryRow_DB(db *sql.DB, query string, var_list []any, values ...any) bool {
-	const retryDelay = 10 * time.Millisecond
+	const retry_delay = 10 * time.Millisecond
 
 	stmt, err := db.Prepare(DB_change(query))
 	if err != nil {
@@ -163,7 +163,7 @@ func QueryRow_DB(db *sql.DB, query string, var_list []any, values ...any) bool {
 		}
 
 		if strings.Contains(err.Error(), "database is locked") {
-			time.Sleep(retryDelay)
+			time.Sleep(retry_delay)
 			continue
 		}
 
@@ -196,7 +196,7 @@ func DB_connect_init() (*sql.DB, error) {
 
 		return db, nil
 	} else {
-		db, err := sql.Open("mysql", db_set["db_mysql_user"]+":"+db_set["db_mysql_pw"]+"@tcp("+db_set["db_mysql_host"]+":"+db_set["db_mysql_port"]+")")
+		db, err := sql.Open("mysql", db_set["db_mysql_user"]+":"+db_set["db_mysql_pw"]+"@tcp("+db_set["db_mysql_host"]+":"+db_set["db_mysql_port"]+")/")
 		if err != nil {
 			return nil, err
 		}

@@ -95,7 +95,7 @@ func Send_email(db *sql.DB, ip string, recipient string, title string, body stri
 	}
 
 	domain := Get_domain(db, false)
-	wiki_name := Get_wiki_set(db, ip, "")[0]
+	wiki_name := Get_wiki_set(db, ip, nil, "")[0]
 
 	message := fmt.Sprintf("from: %s <noreply@%s>\r\nto: %s\r\nsubject: %s\r\n\r\n%s", wiki_name, domain, recipient, title, body)
 

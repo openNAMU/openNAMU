@@ -1,9 +1,10 @@
 package tool
 
 import (
-	"crypto/rand"
-	"fmt"
+	"crypto/sha256"
+	"crypto/sha512"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-contrib/sessions"
@@ -14,17 +15,19 @@ import (
 const session_cookie_name = "opennamu_session"
 
 func Session_middleware() gin.HandlerFunc {
-	auth_key := make([]byte, 64)
-	encryption_key := make([]byte, 32)
-
-	if _, err := rand.Read(auth_key); err != nil {
-		panic(fmt.Errorf("session authentication key generation failed: %w", err))
+	secret := os.Getenv("NAMU_SESSION_KEY")
+	if secret == "" {
+		db := DB_connect()
+		QueryRow_DB(db, `select data from other where name = "session_key"`, []any{&secret})
+		DB_close(db)
 	}
-	if _, err := rand.Read(encryption_key); err != nil {
-		panic(fmt.Errorf("session encryption key generation failed: %w", err))
+	if secret == "" {
+		secret = Get_random_key(128)
 	}
+	auth_key := sha512.Sum512([]byte(secret))
+	encryption_key := sha256.Sum256([]byte("opennamu-session:" + secret))
 
-	store := memstore.NewStore(auth_key, encryption_key)
+	store := memstore.NewStore(auth_key[:], encryption_key[:])
 	store.Options(session_options(false))
 
 	return sessions.Sessions(session_cookie_name, store)

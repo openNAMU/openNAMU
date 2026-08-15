@@ -21,6 +21,38 @@ var macromark_link_regex = regexp2.MustCompile(
 	regexp2.None,
 )
 
+func backlink_redirect_target(raw_data string) string {
+
+	for _, line := range strings.Split(raw_data, "\n") {
+		line = strings.TrimSpace(line)
+		line_lower := strings.ToLower(line)
+		prefix := ""
+		if strings.HasPrefix(line_lower, "#redirect ") {
+			prefix = "#redirect "
+		} else if strings.HasPrefix(line_lower, "#넘겨주기 ") {
+			prefix = "#넘겨주기 "
+		}
+		if prefix == "" {
+			continue
+		}
+
+		target := strings.TrimSpace(line[len(prefix):])
+		if strings.HasPrefix(target, "[[") && strings.HasSuffix(target, "]]") {
+			target = strings.TrimSuffix(strings.TrimPrefix(target, "[["), "]]")
+			if pipe_index := strings.Index(target, "|"); pipe_index >= 0 {
+				target = target[:pipe_index]
+			}
+		}
+		return normalize_link(target)
+	}
+
+	return ""
+}
+func backlink_redirect_line(line string) bool {
+	line = strings.ToLower(strings.TrimSpace(line))
+	return strings.HasPrefix(line, "#redirect ") || strings.HasPrefix(line, "#넘겨주기 ")
+}
+
 func Get_backlink(raw_data string, markup string) (map[string][]string, int, bool) {
 	var link_regex *regexp2.Regexp
 
@@ -39,6 +71,18 @@ func Get_backlink(raw_data string, markup string) (map[string][]string, int, boo
 
 	backlink_list := map[string][]string{}
 	link_count := 0
+	if markup == "" || markup == "namumark" || markup == "namumark_beta" {
+		if redirect_target := backlink_redirect_target(raw_data); redirect_target != "" {
+			add_backlink(backlink_list, redirect_target, "redirect")
+			lines := strings.Split(raw_data, "\n")
+			for index, line := range lines {
+				if backlink_redirect_line(line) {
+					lines[index] = ""
+				}
+			}
+			raw_data = strings.Join(lines, "\n")
+		}
+	}
 
 	match, err := link_regex.FindStringMatch(raw_data)
 	for err == nil && match != nil {
@@ -59,6 +103,9 @@ func Get_backlink(raw_data string, markup string) (map[string][]string, int, boo
 		}
 
 		link_type := ""
+		if strings.HasPrefix(strings.ToLower(link), "category:") {
+			link_type = "cat"
+		}
 		if markup == "macromark" && match.GroupByName("type").String() == "include" {
 			link_type = "include"
 		}
@@ -119,6 +166,10 @@ func normalize_link(raw_link string) string {
 		strings.HasPrefix(link_lower, "https://") ||
 		strings.HasPrefix(link_lower, "mailto:") {
 		return ""
+	}
+
+	if strings.HasPrefix(link, "분류:") {
+		link = "category:" + strings.TrimPrefix(link, "분류:")
 	}
 
 	return link

@@ -26,7 +26,7 @@ func Api_w_comment_ui(config tool.Config, doc_name string) map[string]any {
 
 	return_data = make(map[string]any)
 	return_data["response"] = "ok"
-	return_data["data"] = View_bbs_in_w_comment(db, config, "", "0", db_code_str)
+	return_data["data"] = View_bbs_in_w_comment(db, config, "0", db_code_str, "")
 
 	return return_data
 }

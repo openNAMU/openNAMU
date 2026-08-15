@@ -22,8 +22,11 @@ func View_w_watch_list_add_post(config tool.Config, doc_name string, do_type str
 
 	api_data := Api_w_watch_list_post(config, doc_name, do_type)
 
+	response, _ := api_data["response"].(string)
 	out := ""
-	if api_data["response"] != "ok" {
+	if response == "require auth" {
+		out = tool.Get_redirect("/login")
+	} else if response != "ok" {
 		out = tool.Get_error_page(db, config, "error")
 	} else {
 		if name_from {

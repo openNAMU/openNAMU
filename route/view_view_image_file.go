@@ -1,6 +1,7 @@
 package route
 
 import (
+	"mime"
 	"net/http"
 	"os"
 	"path"
@@ -18,6 +19,15 @@ func View_view_image_file(c *gin.Context) {
 	defer tool.DB_close(db)
 
 	c.Header("X-Content-Type-Options", "nosniff")
+	config := tool.Config{
+		IP:      tool.Get_IP(c),
+		Cookies: tool.Get_Cookies(c),
+		Session: tool.Get_session(c),
+	}
+	if !tool.Check_acl(db, "", "", "render", config.IP) {
+		c.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte(tool.Get_error_page(db, config, "auth")))
+		return
+	}
 
 	raw_path := strings.TrimPrefix(c.Param("name"), "/")
 	if raw_path == "" {
@@ -35,6 +45,10 @@ func View_view_image_file(c *gin.Context) {
 
 	re_cache := regexp.MustCompile(`\.cache_v[0-9]+$`)
 	file_name = re_cache.ReplaceAllString(file_name, "")
+	if file_name == "" || file_name == "." || file_name == ".." || file_name == "/" || strings.ContainsAny(file_name, `/\\`) {
+		c.String(http.StatusBadRequest, "")
+		return
+	}
 
 	parts := strings.Split(file_name, ".")
 	mime_type := "application/octet-stream"
@@ -158,7 +172,8 @@ func View_view_image_file(c *gin.Context) {
 	}
 
 	final_path := filepath.Join(tool.Get_file_main_dir(db), file_name)
-	if _, err := os.Stat(final_path); err != nil {
+	file_info, err := os.Stat(final_path)
+	if err != nil {
 		if os.IsNotExist(err) {
 			c.String(http.StatusNotFound, "")
 			return
@@ -167,11 +182,20 @@ func View_view_image_file(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "read error")
 		return
 	}
+	if file_info.IsDir() {
+		c.String(http.StatusNotFound, "")
+		return
+	}
 
-	if strings.HasPrefix(mime_type, "text/") || mime_type == "application/javascript" || strings.HasPrefix(mime_type, "application/xml") {
-		c.Header("Content-Type", mime_type+"; charset=utf-8")
-	} else {
+	is_inline := strings.HasPrefix(mime_type, "image/") || strings.HasPrefix(mime_type, "video/") || strings.HasPrefix(mime_type, "audio/")
+	if is_inline {
 		c.Header("Content-Type", mime_type)
+	} else {
+		c.Header("Content-Type", "application/octet-stream")
+		content_disposition := mime.FormatMediaType("attachment", map[string]string{"filename": file_name})
+		if content_disposition != "" {
+			c.Header("Content-Disposition", content_disposition)
+		}
 	}
 
 	c.File(final_path)

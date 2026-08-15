@@ -302,19 +302,6 @@ function do_monaco_init(monaco_thema) {
     });
 }
 
-function opennamu_do_editor_preview() {
-    do_sync_monaco_and_textarea();
-
-    const input = document.querySelector('#opennamu_edit_textarea');
-    if(input !== null) {
-        let name = "test";
-        if(document.getElementById('opennamu_editor_doc_name')) {
-            name = opennamu_xss_filter_decode(document.getElementById('opennamu_editor_doc_name').value);
-        }
-
-        opennamu_do_render('opennamu_preview_area', input.value, name);
-    }
-}
 
 function opennamu_do_sync_monaco_markup() {
     let now_selected = get_select_editor_markup();

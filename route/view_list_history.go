@@ -20,7 +20,7 @@ func View_list_history(config tool.Config, doc_name string, set_type string, num
 	menu_option := []string{"normal", "edit", "move", "delete", "revert", "r1", "setting"}
 	for _, option := range menu_option {
 		label := tool.Get_language(db, option, true)
-		data_html += `<a href="/recent_change/1/` + option + `">(` + label + `)</a> `
+		data_html += `<a href="/history_page/1/` + option + `/` + tool.Url_parser(doc_name) + `">(` + label + `)</a> `
 	}
 
 	api_data := Api_list_history(config, doc_name, set_type, num)
@@ -38,13 +38,21 @@ func View_list_history(config tool.Config, doc_name string, set_type string, num
 	)
 
 	data_html = `
-        <form method="post">
-            <select name="a">` + select_ui + `</select> 
-            <select name="b">` + select_ui + `</select> 
-            <button type="submit">` + tool.Get_language(db, "compare", true) + `</button>
-        </form>
-        <hr class="main_hr">
-    ` + data_html
+	        <form method="post">
+	            <select name="a">` + select_ui + `</select>
+	            <select name="b">` + select_ui + `</select>
+	            <button type="submit">` + tool.Get_language(db, "compare", true) + `</button>
+	        </form>
+	        <hr class="main_hr">
+	    ` + data_html
+
+	menu := [][]any{
+		{"w/" + tool.Url_parser(doc_name), tool.Get_language(db, "return", true)},
+	}
+	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+		menu = append(menu, []any{"history_add/" + tool.Url_parser(doc_name), tool.Get_language(db, "history_add", true)})
+		menu = append(menu, []any{"history_reset/" + tool.Url_parser(doc_name), tool.Get_language(db, "history_reset", true)})
+	}
 
 	out := tool.Get_template(
 		db,
@@ -52,9 +60,7 @@ func View_list_history(config tool.Config, doc_name string, set_type string, num
 		doc_name,
 		data_html,
 		[]any{"(" + tool.Get_language(db, "history", true) + ")" + sub},
-		[][]any{
-			{"w/" + tool.Url_parser(doc_name), tool.Get_language(db, "return", true)},
-		},
+		menu,
 		map[string]string{},
 	)
 

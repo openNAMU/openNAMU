@@ -10,6 +10,10 @@ func Api_topic(config tool.Config, tool_name string, topic_num string, s_num str
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_acl(db, "", topic_num, "topic_view", config.IP) {
+		return map[string]any{}
+	}
+
 	if tool_name == "length" {
 		length := "0"
 		tool.QueryRow_DB(

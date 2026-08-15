@@ -48,6 +48,10 @@ func View_list_recent_discuss(config tool.Config, limit string, num string, set_
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if set_type == "" {
+		set_type = "normal"
+	}
+
 	data_html := ""
 	sub := ""
 

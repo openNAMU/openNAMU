@@ -199,7 +199,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		}
 	}
 
-	document_default := []string{"edit", "edit_request", "move", "new_make", "delete"}
+	document_default := []string{"edit", "move", "new_make", "delete"}
 
 	if _, ok := auth_info["document"]; ok {
 		for _, v := range document_default {
@@ -263,19 +263,9 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 
 	level_int := Str_to_int(level)
 
-	get_ban := ""
-	ban_type := ""
-	if tool == "document_edit_request" {
-		temp_arr := Get_user_ban(db, ip, "edit_request")
-
-		get_ban = temp_arr[0]
-		ban_type = temp_arr[1]
-	} else {
-		temp_arr := Get_user_ban(db, ip, "")
-
-		get_ban = temp_arr[0]
-		ban_type = temp_arr[1]
-	}
+	temp_arr := Get_user_ban(db, ip, "")
+	get_ban := temp_arr[0]
+	ban_type := temp_arr[1]
 
 	if ban_type != "" {
 		ban_type_len := Get_len(ban_type)
@@ -330,7 +320,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 		}
 	}
 
-	if Arr_in_str([]string{"document_edit", "document_edit_request", "document_move", "document_delete"}, tool) {
+	if Arr_in_str([]string{"document_edit", "document_move", "document_delete"}, tool) {
 		if !Check_acl(db, name, topic_number, "render", ip) {
 			return false
 		} else if !Check_acl(db, name, topic_number, "", ip) {
@@ -743,26 +733,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 				acl_data = ""
 			} else {
 				acl_data = "owner"
-			}
-		} else if tool == "document_edit_request" {
-			acl_pass_auth = "acl"
-
-			if for_a == 0 {
-				end_number += 1
-
-				acl_data = ""
-				QueryRow_DB(
-					db,
-					"select data from acl where title = ? and type = 'document_edit_request_acl'",
-					[]any{&acl_data},
-					name,
-				)
-			} else {
-				if auth_info["edit_request"] {
-					acl_data = ""
-				} else {
-					acl_data = "owner"
-				}
 			}
 		} else if tool == "document_make_acl" {
 			acl_pass_auth = "acl"

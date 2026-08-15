@@ -32,6 +32,10 @@ func Api_bbs_w_comment(config tool.Config, do_type string, sub_code string) map[
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if do_type == "" || do_type == "normal" {
+		do_type = "around"
+	}
+
 	if do_type == "length" {
 		bbs_and_post_num := sub_code
 

@@ -9,11 +9,21 @@ func View_bbs_in(config tool.Config, set_id string, page_num string) string {
 	defer tool.DB_close(db)
 
 	bbs_name := Api_bbs_num_to_name(db, set_id)["data"].(string)
+	if bbs_name == "" {
+		return tool.Get_redirect("/bbs/main")
+	}
 
 	data_api := Api_bbs(config, set_id, page_num)
 	data_api_in := data_api["data"].([]map[string]string)
 
 	data_html := Get_bbs_list_ui(config, data_api_in, map[string]string{})
+	data_html += tool.Get_page_control(
+		db,
+		tool.Str_to_int(page_num),
+		len(data_api_in),
+		50,
+		"/bbs/in/"+tool.Url_parser(set_id)+"/{}",
+	)
 
 	out := tool.Get_template(
 		db,

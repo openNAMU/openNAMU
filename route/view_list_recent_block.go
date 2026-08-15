@@ -127,7 +127,7 @@ func View_list_recent_block(config tool.Config, num string, set_type string, why
 		base_url += "/" + tool.Url_parser(user_name)
 	}
 
-	base_url += "/{}/"
+	base_url += "/{}"
 
 	if why != "" {
 		base_url += "/" + tool.Url_parser(why)

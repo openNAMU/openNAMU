@@ -6,6 +6,10 @@ func View_bbs_make(config tool.Config) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	data_html := `
         <form method="post">
             <input class="__ON_INPUT__" placeholder="` + tool.Get_language(db, "bbs_name", true) + `" name="bbs_name">

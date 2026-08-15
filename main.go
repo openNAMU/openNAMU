@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"runtime/debug"
+	"strconv"
+	"time"
 
 	"opennamu/route/tool"
 
@@ -30,14 +32,14 @@ func error_handler() gin.HandlerFunc {
 					err = fmt.Errorf("%v", r)
 				}
 
-				stackTrace := debug.Stack()
-				log.Printf("Panic recovered: %v\n%s", err, stackTrace)
+				stack_trace := debug.Stack()
+				log.Printf("Panic recovered: %v\n%s", err, stack_trace)
 
 				if dev_mode {
 					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 						"response": "error",
 						"error":    err.Error(),
-						"stack":    string(stackTrace),
+						"stack":    string(stack_trace),
 					})
 				} else {
 					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -74,7 +76,23 @@ func pongo_init() {
 	})
 }
 
+func wait_startup_delay() {
+	delay_text := os.Getenv("NAMU_START_DELAY_MS")
+	os.Unsetenv("NAMU_START_DELAY_MS")
+
+	delay, err := strconv.Atoi(delay_text)
+	if err != nil || delay <= 0 {
+		return
+	}
+	if delay > 10000 {
+		delay = 10000
+	}
+
+	time.Sleep(time.Duration(delay) * time.Millisecond)
+}
+
 func main() {
+	wait_startup_delay()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	port := "3000"
@@ -91,12 +109,13 @@ func main() {
 		r = gin.New()
 	}
 
-	r.Use(error_handler())
-	r.Use(tool.Session_middleware())
-	pongo_init()
-
 	tool.Set_builtin_version_data(builtin_version_json)
 	tool.Main_init()
+
+	r.Use(error_handler())
+	r.Use(tool.Session_middleware())
+	r.Use(wiki_access_middleware())
+	pongo_init()
 
 	register_routes(r)
 

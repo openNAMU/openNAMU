@@ -42,7 +42,7 @@ func Api_setting_backlink_reset_post(config tool.Config) map[string]any {
 				continue
 			}
 
-			Api_w_render(config, doc_name, raw_data["data"].(string), "backlink")
+			Api_w_render(config, doc_name, raw_data["data"].(string), "backlink", "")
 			document_count++
 		}
 

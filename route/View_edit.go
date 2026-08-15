@@ -8,6 +8,10 @@ func View_edit(config tool.Config, doc_name string, load_doc_name string) string
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Do_title_length_check(db, doc_name, "document") {
+		return tool.Get_error_page(db, config, "title length")
+	}
+
 	var raw_data map[string]any
 	raw_data_get := ""
 	if load_doc_name == "" {
@@ -32,7 +36,9 @@ func View_edit(config tool.Config, doc_name string, load_doc_name string) string
 		editor_top_text += `<hr class="main_hr">`
 	}
 
+	revision := tool.Get_document_revision(db, doc_name)
 	form_data := editor_top_text + `<form action="/edit/` + tool.Url_parser(doc_name) + `" method="post">
+        <input type="hidden" name="ver" value="` + tool.HTML_escape(revision) + `">
         <input class="__ON_INPUT__" type="text" name="send" placeholder="` + tool.Get_language(db, "why", true) + `">
         <hr class="main_hr">
         ` + tool.Get_editor_ui(db, config, raw_data_get, "edit", check_box+bottom_text, doc_name) + `

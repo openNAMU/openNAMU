@@ -57,9 +57,24 @@ func Password_encode(db *sql.DB, password string, encode string) string {
 	return hex.EncodeToString(hash_data[:])
 }
 
+func Get_user_encode(db *sql.DB, id string) string {
+	encode := ""
+	QueryRow_DB(
+		db,
+		`select data from user_set where id = ? and name = "encode"`,
+		[]any{&encode},
+		id,
+	)
+
+	if encode == "" {
+		encode = Get_main_encode(db)
+	}
+
+	return encode
+}
+
 func Password_check(db *sql.DB, id string, password string) bool {
 	db_password := ""
-	db_encode := ""
 
 	QueryRow_DB(
 		db,
@@ -68,14 +83,7 @@ func Password_check(db *sql.DB, id string, password string) bool {
 		id,
 	)
 
-	QueryRow_DB(
-		db,
-		`select data from user_set where id = ? and name = 'encode'`,
-		[]any{&db_encode},
-		id,
-	)
-
-	password_encode := Password_encode(db, password, db_encode)
+	password_encode := Password_encode(db, password, Get_user_encode(db, id))
 
 	return db_password == password_encode
 }

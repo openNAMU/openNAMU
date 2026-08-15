@@ -7,7 +7,7 @@ import (
 	"opennamu/route/tool/markup"
 )
 
-func Api_edit_post(config tool.Config, doc_name string, data string, send string, agree string) map[string]any {
+func Api_edit_post(config tool.Config, doc_name string, data string, send string, agree string, expected_revision string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -15,15 +15,31 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 
 	date := tool.Get_time()
 	data = strings.ReplaceAll(data, "\r", "")
+	current_revision := tool.Get_document_revision(db, doc_name)
 
 	if doc_name == "" {
 		return_data["response"] = "error"
 		return_data["data"] = "empty title"
 
 		return return_data
+	} else if !tool.Do_title_length_check(db, doc_name, "document") {
+		return_data["response"] = "error"
+		return_data["data"] = "title length"
+
+		return return_data
 	} else if !tool.Check_acl(db, doc_name, "", "document_edit", config.IP) {
 		return_data["response"] = "error"
 		return_data["data"] = "permission denied"
+
+		return return_data
+	} else if current_revision == "0" && !tool.Check_acl(db, doc_name, "", "document_make_acl", config.IP) {
+		return_data["response"] = "error"
+		return_data["data"] = "permission denied"
+
+		return return_data
+	} else if expected_revision != "" && expected_revision != current_revision {
+		return_data["response"] = "error"
+		return_data["data"] = "edit conflict"
 
 		return return_data
 	} else if !tool.Do_edit_slow_check(db, config, "edit") {
@@ -80,6 +96,8 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 		doc_name,
 		data,
 	)
+
+	tool.Do_watchlist_alarm_send(db, config, doc_name)
 
 	tool.Do_add_history(
 		db,

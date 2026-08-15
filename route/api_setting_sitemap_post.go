@@ -96,6 +96,9 @@ func Api_setting_sitemap_post(config tool.Config) map[string]any {
 
 	len_all_data := len(all_data)
 	count := (len_all_data + sitemap_max_count - 1) / sitemap_max_count
+	if count == 0 {
+		count = 1
+	}
 	other_count := len_all_data % sitemap_max_count
 
 	// 현재 로직에서는 직접 사용하지 않음

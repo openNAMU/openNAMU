@@ -32,6 +32,7 @@ func Api_login_login(config tool.Config, id string, password string) map[string]
 
 		return return_data
 	}
+	tool.Record_user_agent(db, id, config.IP, config.UserAgent, tool.Get_time())
 
 	return_data["response"] = "ok"
 

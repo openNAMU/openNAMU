@@ -17,113 +17,6 @@ function opennamu_xss_filter(str) {
     });
 }
 
-function opennamu_xss_filter_decode(str) {
-    return str.replace(/&amp;|&lt;|&gt;|&#x27;|&quot;/g, function(match) {
-        switch(match) {
-            case '&amp;':
-                return '&';
-            case '&lt;':
-                return '<';
-            case '&gt;':
-                return '>';
-            case '&#x27;':
-                return "'";
-            case '&quot;':
-                return '"';
-        }
-    });
-}
-
-function renderSimpleSet(data) {
-    let tocData = '';
-    const tocRegexAll = /<h([1-6])>([^<>]+)<\/h[1-6]>/g;
-    const tocRegex = /<h([1-6])>([^<>]+)<\/h[1-6]>/;
-    const tocSearchData = [...data.matchAll(tocRegexAll)];
-    let headingStack = [0, 0, 0, 0, 0, 0];
-
-    if (tocSearchData.length > 0) {
-        tocData += `
-            <div class="opennamu_TOC" id="toc">
-                <span class="opennamu_TOC_title">TOC</span>
-                <br>
-        `;
-    }
-
-    tocSearchData.forEach((tocSearchIn) => {
-        const headingLevel = parseInt(tocSearchIn[1]);
-        const headingLevelStr = headingLevel.toString();
-
-        headingStack[headingLevel - 1] += 1;
-        for (let i = headingLevel; i < 6; i++) {
-            headingStack[i] = 0;
-        }
-
-        const headingStackStr = headingStack
-            .map((val) => (val !== 0 ? val + '.' : ''))
-            .join('')
-            .replace(/\.$/, '');
-
-        tocData += `
-            <br>
-            <span class="opennamu_TOC_list">
-                ${'<span style="margin-left: 10px;"></span>'.repeat(headingStackStr.split('.').length - 1)}
-                <a href="#s-${headingStackStr}">${headingStackStr}.</a>
-                ${tocSearchIn[2]}
-            </span>
-        `;
-
-        data = data.replace(
-            tocRegex,
-            `<h${tocSearchIn[1]} id="s-${headingStackStr}"><a href="#toc">${headingStackStr}.</a> ${tocSearchIn[2]}</h${tocSearchIn[1]}>`
-        );
-    });
-
-    if (tocData !== '') {
-        tocData += '</div><hr class="main_hr">';
-    }
-
-    let footnoteData = '';
-    const footnoteRegex = /<sup>((?:(?!<sup>|<\/sup>).)+)<\/sup>/g;
-    const footnoteSearchData = [...data.matchAll(footnoteRegex)];
-    let footnoteCount = 1;
-
-    if (footnoteSearchData.length > 0) {
-        footnoteData += '<div class="opennamu_footnote">';
-    }
-
-    footnoteSearchData.forEach((footnoteSearch) => {
-        const footnoteCountStr = footnoteCount.toString();
-
-        if (footnoteCount !== 1) {
-            footnoteData += '<br>';
-        }
-
-        footnoteData += `<a id="fn-${footnoteCountStr}" href="#rfn-${footnoteCountStr}">(${footnoteCountStr})</a> ${footnoteSearch[1]}`;
-        data = data.replace(
-            footnoteRegex,
-            `<sup id="rfn-${footnoteCountStr}"><a href="#fn-${footnoteCountStr}">(${footnoteCountStr})</a></sup>`
-        );
-
-        footnoteCount += 1;
-    });
-
-    if (footnoteData !== '') {
-        footnoteData += '</div>';
-    }
-
-    data = tocData + data + footnoteData;
-
-    return data;
-}
-
-function opennamu_do_id_check(data) {
-    if(data.match(/\.|\:/)) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
-
 function opennamu_do_ip_click(obj) {
     if (obj.id === "") {
         let user_name = obj.name;
@@ -173,89 +66,12 @@ function opennamu_do_ip_click(obj) {
     }
 }
 
-function opennamu_do_ip_render() {
-    for (let for_a = 0; for_a < document.getElementsByClassName('opennamu_render_ip').length; for_a++) {
-        let ip = document.getElementsByClassName('opennamu_render_ip')[for_a].innerHTML.replace(/&amp;/g, '&');
-
-        fetch('/api/v2/ip/' + opennamu_do_url_encode(ip))
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`API 호출 실패: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (document.getElementsByClassName('opennamu_render_ip')[for_a].id !== "opennamu_render_end") {
-                    document.getElementsByClassName('opennamu_render_ip')[for_a].innerHTML = data["data"];
-                    document.getElementsByClassName('opennamu_render_ip')[for_a].id = "opennamu_render_end";
-                }
-            })
-            .catch(err => {
-                console.error('IP 렌더링 호출 중 오류 발생:', err);
-                document.getElementsByClassName('opennamu_render_ip')[for_a].innerHTML = 'IP 정보를 불러오는 데 실패했습니다.';
-            });
-    }
-}
-
-
-function opennamu_do_url_encode(data) {
-    return encodeURIComponent(data);
-}
-
-function opennamu_cookie_split_regex(data) {
-    return new RegExp('(?:^|; )' + data + '=([^;]*)');
-}
-
-function opennamu_send_render(data) {
-    if(data === '&lt;br&gt;' || data === '' || data.match(/^ +$/)) {
-        data = '<br>';
-    } else {
-        data = data.replace(/( |^)(https?:\/\/(?:[^ ]+))/g, function(m0, m1, m2) {
-            let link_main = m2;
-            link_main = link_main.replace('"', '&quot;');
-
-            return m1 + '<a href="' + link_main + '">' + link_main + '</a>';
-        });
-        data = data.replace(/&lt;a(?:(?:(?!&gt;).)*)&gt;((?:(?!&lt;\/a&gt;).)+)&lt;\/a&gt;/g, function(m0, m1) {
-            let data_unescape = opennamu_xss_filter_decode(m1)
-
-            return '<a href="/w/' + opennamu_do_url_encode(data_unescape) + '">' + m1 + '</a>'
-        })
-    }
-
-    return data;
-}
-
-function opennamu_insert_v(name, data) {
-    document.getElementById(name).value = data;
-}
-
 function opennamu_do_trace_spread() {
     if(document.getElementsByClassName('opennamu_trace')) {
         document.getElementsByClassName('opennamu_trace')[0].innerHTML = '' +
             '<style>.opennamu_trace_button { display: none; } .opennamu_trace { white-space: pre-wrap; overflow-x: unset; text-overflow: unset; }</style>' +
         '' + document.getElementsByClassName('opennamu_trace')[0].innerHTML
     }
-}
-
-function opennamu_page_control(url, page, data_length, data_length_max = 50) {
-    let next = function() {
-        if(data_length_max === data_length) {
-            return '<a href="' + url.replace('{}', String(page + 1)) + '">(+)</a>';
-        } else {
-            return '';
-        }
-    };
-
-    let back = function() {
-        if(page !== 1) {
-            return '<a href="' + url.replace('{}', String(page - 1)) + '">(-)</a>';
-        } else {
-            return '';
-        }
-    };
-
-    return (back() + ' ' + next()).replace(/^ /, '');
 }
 
 function opennamu_list_hidden_remove() {
@@ -269,28 +85,46 @@ function opennamu_list_hidden_remove() {
     }
 }
 
-function opennamu_make_list(left = '', right = '', bottom = '', class_name = '') {
-    let data_html = '<span class="' + class_name + '">';
-    data_html += '<div class="opennamu_recent_change">';
-    data_html += left;
-    
-    data_html += '<div style="float: right;">';
-    data_html += right;
-    data_html += '</div>'
+function opennamu_do_footnote_popover(set_name, load_name, sub_obj = undefined, do_type = 'open') {
+    if(document.getElementById(set_name + '_load')) {
+        if(do_type === 'open') {
+            if(sub_obj !== undefined) {
+                document.getElementById(set_name + '_load').innerHTML = document.getElementById(sub_obj).innerHTML;
+            } else {
+                document.getElementById(set_name).title = '';
+                document.getElementById(set_name + '_load').innerHTML = '<a href="#' + load_name + '">(Go)</a> ' + document.getElementById(load_name + '_title').innerHTML;
+            }
+            document.getElementById(set_name + '_load').style.display = "inline-block";
+            document.getElementById(set_name + '_load').count = 0;
 
-    data_html += '<div style="clear: both;"></div>';
+            let width = document.getElementById(set_name + '_load').clientWidth;
+            let screen_width = window.innerWidth;
+            let left = document.getElementById(set_name).getBoundingClientRect().left;
+            let top = window.pageYOffset + document.getElementById(set_name).getBoundingClientRect().top;
 
-    if(bottom !== "") {
-        data_html += '<hr>'
-        data_html += bottom;
+            document.getElementById(set_name + '_load').style.top = String(top) + "px";
+            if(screen_width - (left + width) < 50) {
+                if(left > 350) {
+                    document.getElementById(set_name + '_load').style.left = String(left - 300) + "px";
+                } else {
+                    document.getElementById(set_name + '_load').style.left = "0px";
+                }
+
+                left = document.getElementById(set_name + '_load').getBoundingClientRect().left;
+                width = document.getElementById(set_name + '_load').clientWidth;
+                if(300 > width) {
+                    document.getElementById(set_name + '_load').style.left = String(left + (300 - width)) + "px";
+                } else {
+                    document.getElementById(set_name + '_load').style.marginTop = "20px";
+                }
+            }
+        } else {
+            if(document.getElementById(set_name + '_load').count === 1) {
+                document.getElementById(set_name + '_load').style.display = "none";
+            } else {
+                document.getElementById(set_name + '_load').count = 1;
+            }
+        }
     }
-
-    data_html += '</div>';
-    data_html += '<hr class="main_hr">';
-    data_html += '</span>';
-
-    return data_html;
 }
-
-
 

@@ -37,7 +37,15 @@ func Api_setting(config tool.Config, set_name string, coverage string) map[strin
 		}
 
 		return_data["response"] = "ok"
-		return_data["data"] = tool.Get_setting(db, set_name, coverage)
+		setting_data := tool.Get_setting(db, set_name, coverage)
+		if len(setting_data) == 0 {
+			default_value := ""
+			if set_name == "manage_404_page" {
+				default_value = "404_page"
+			}
+			setting_data = [][]string{{default_value, coverage}}
+		}
+		return_data["data"] = setting_data
 
 		return return_data
 	} else {

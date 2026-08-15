@@ -5,7 +5,7 @@ function ringo_do_xss_encode(data) {
     data = data.replace(/'/g, '&#x27;');
     data = data.replace(/"/g, '&quot;');
     data = data.replace(/</g, '&lt;');
-    data = data.replace(/</g, '&gt;');
+    data = data.replace(/>/g, '&gt;');
 
     return data;
 }
@@ -20,11 +20,12 @@ function ringo_do_side_button_1() {
         fetch("/api/recent_change/10").then(function(res) {
             return res.json();
         }).then(function(text) {
+            let list = Array.isArray(text) ? text : text.data || [];
             let data = '';
-            for(let for_a = 0; for_a < text.length; for_a++) {
-                if(text[for_a][6] === '') {
-                    data += '<a href="/w/' + ringo_do_url_encode(text[for_a][1]) + '">' + ringo_do_xss_encode(text[for_a][1]) + '</a><br>';
-                    data += text[for_a][2] + ' | ' + ringo_do_xss_encode(text[for_a][3]) + '<br>';
+            for(let for_a = 0; for_a < list.length; for_a++) {
+                if(list[for_a][6] === '') {
+                    data += '<a href="/w/' + ringo_do_url_encode(list[for_a][1]) + '">' + ringo_do_xss_encode(list[for_a][1]) + '</a><br>';
+                    data += list[for_a][2] + ' | ' + ringo_do_xss_encode(list[for_a][3]) + '<br>';
                 }
             }
 
@@ -43,10 +44,11 @@ function ringo_do_side_button_2() {
         fetch("/api/recent_discuss/10").then(function(res) {
             return res.json();
         }).then(function(text) {
+            let list = Array.isArray(text) ? text : text.data || [];
             let data = '';
-            for(let for_a = 0; for_a < text.length; for_a++) {
-                data += '<a href="/thread/' + ringo_do_url_encode(text[for_a][3]) + '">' + ringo_do_xss_encode(text[for_a][1]) + '</a><br>';
-                data += text[for_a][2] + ' | ' + text[for_a][5] +'<br>';
+            for(let for_a = 0; for_a < list.length; for_a++) {
+                data += '<a href="/thread/' + ringo_do_url_encode(list[for_a][3]) + '">' + ringo_do_xss_encode(list[for_a][1]) + '</a><br>';
+                data += list[for_a][2] + ' | ' + list[for_a][5] +'<br>';
             }
 
             document.getElementById('side_content').innerHTML = data;

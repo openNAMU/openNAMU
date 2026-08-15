@@ -298,8 +298,8 @@ func Get_domain(db *sql.DB, full_string bool) string {
 	return domain
 }
 
-func Get_wiki_custom(db *sql.DB, ip string, _ sessions.Session, cookies string) []any {
-	skin_name := "_" + Get_use_skin_name(db, ip)
+func Get_wiki_custom(db *sql.DB, ip string, session sessions.Session, cookies string) []any {
+	skin_name := "_" + Get_use_skin_name_session(db, ip, session)
 
 	user_icon := 1
 	user_name := ip
@@ -311,21 +311,21 @@ func Get_wiki_custom(db *sql.DB, ip string, _ sessions.Session, cookies string) 
 
 	if !IP_or_user(ip) {
 		user_head_main := ""
-		QueryRow_DB(
-			db,
-			"select data from user_set where id = ? and name = 'custom_css'",
-			[]any{&user_head_main},
-			ip,
-		)
+		if value, ok := session.Get("head").(string); ok {
+			user_head_main = value
+		} else {
+			QueryRow_DB(db, "select data from user_set where id = ? and name = ?", []any{&user_head_main}, ip, "custom_css")
+			if user_head_main == "" {
+				QueryRow_DB(db, "select data from user_set where id = ? and name = ?", []any{&user_head_main}, ip, "head")
+			}
+		}
 
 		user_head_skin := ""
-		QueryRow_DB(
-			db,
-			"select data from user_set where id = ? and name = ?",
-			[]any{&user_head_skin},
-			ip,
-			"custom_css"+skin_name,
-		)
+		if value, ok := session.Get("head" + skin_name).(string); ok {
+			user_head_skin = value
+		} else {
+			QueryRow_DB(db, "select data from user_set where id = ? and name = ?", []any{&user_head_skin}, ip, "custom_css"+skin_name)
+		}
 
 		user_head += user_head_main + user_head_skin
 
@@ -382,7 +382,9 @@ func Get_wiki_custom(db *sql.DB, ip string, _ sessions.Session, cookies string) 
 		user_email = ""
 		user_acl_list = []string{}
 		user_notice_count = "0"
-		user_head = ""
+		user_head, _ = session.Get("head").(string)
+		user_head_skin, _ := session.Get("head" + skin_name).(string)
+		user_head += user_head_skin
 	}
 
 	user_ban := "0"
@@ -428,8 +430,8 @@ func Get_wiki_custom(db *sql.DB, ip string, _ sessions.Session, cookies string) 
 	}
 }
 
-func Get_wiki_set(db *sql.DB, ip string, cookies string) []any {
-	skin_name := Get_use_skin_name(db, ip)
+func Get_wiki_set(db *sql.DB, ip string, session sessions.Session, cookies string) []any {
+	skin_name := Get_use_skin_name_session(db, ip, session)
 	data_list := []any{}
 
 	set_wiki_name := "Wiki"
@@ -484,6 +486,9 @@ func Get_wiki_set(db *sql.DB, ip string, cookies string) []any {
 	set_head_dark := ""
 
 	cookie_map := Get_cookie_header(cookies)
+	if _, exists := cookie_map["main_css_darkmode"]; !exists && session != nil {
+		cookie_map["main_css_darkmode"], _ = session.Get("main_css_darkmode").(string)
+	}
 	if cookie_map["main_css_darkmode"] == "1" {
 		QueryRow_DB(
 			db,
@@ -584,16 +589,18 @@ func Get_cookie_header(cookie_header string) map[string]string {
 }
 
 type Config struct {
-	IP      string
-	Cookies string
-	Session sessions.Session
+	IP        string
+	Cookies   string
+	UserAgent string
+	Session   sessions.Session
 }
 
 func Deep_copy_config(src Config) Config {
 	return Config{
-		IP:      strings.Clone(src.IP),
-		Cookies: strings.Clone(src.Cookies),
-		Session: src.Session,
+		IP:        strings.Clone(src.IP),
+		Cookies:   strings.Clone(src.Cookies),
+		UserAgent: src.UserAgent,
+		Session:   src.Session,
 	}
 }
 
@@ -739,10 +746,10 @@ func Get_random_key(long int) string {
 	const letters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	result := make([]byte, long)
 
-	lettersLen := big.NewInt(int64(len(letters)))
+	letters_len := big.NewInt(int64(len(letters)))
 
 	for i := 0; i < long; i++ {
-		num, err := rand.Int(rand.Reader, lettersLen)
+		num, err := rand.Int(rand.Reader, letters_len)
 		if err != nil {
 			result[i] = letters[0]
 			continue
@@ -755,10 +762,7 @@ func Get_random_key(long int) string {
 }
 
 func Get_http_warning(db *sql.DB) string {
-	return `
-        <div id="opennamu_http_warning_text"></div>
-        <span style="display: none;" id="opennamu_http_warning_text_lang">` + Get_language(db, "http_warning", true) + `</span>
-    `
+	return `<div id="opennamu_http_warning_text" style="margin: 10px 0px 0px 0px;">` + Get_language(db, "http_warning", false) + `</div>`
 }
 
 func Get_len(data string) int {

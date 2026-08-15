@@ -1,8 +1,6 @@
 package route
 
-import (
-	"opennamu/route/tool"
-)
+import "opennamu/route/tool"
 
 func Api_list_recent_change(config tool.Config, set_type string, limit string, num string) map[string]any {
 	db := tool.DB_connect()
@@ -92,6 +90,8 @@ func Api_list_recent_change(config tool.Config, set_type string, limit string, n
 
 	return_data := make(map[string]any)
 	return_data["response"] = "ok"
+	return_data["language"] = api_history_language(db)
+	return_data["auth"] = api_history_auth(db, config.IP)
 	return_data["data"] = data_list
 
 	return return_data

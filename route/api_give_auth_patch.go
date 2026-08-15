@@ -57,6 +57,7 @@ func Api_give_auth_patch(config tool.Config, auth string, change_auth string, us
 					"insert into user_set (id, name, data) values (?, 'acl', ?)",
 					user_name, change_auth,
 				)
+				tool.Do_insert_auth_history(db, ip, "give_auth ("+user_name+") -> "+change_auth)
 
 				new_data["response"] = "ok"
 			}
@@ -99,6 +100,7 @@ func Api_give_auth_patch(config tool.Config, auth string, change_auth string, us
 					"update user_set set data = ? where name = 'acl' and data = ?",
 					change_auth, auth,
 				)
+				tool.Do_insert_auth_history(db, ip, "give_auth ("+auth+") -> "+change_auth)
 
 				new_data["response"] = "ok"
 			}

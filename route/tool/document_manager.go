@@ -153,6 +153,53 @@ func Do_edit_max_length_check(db *sql.DB, config Config, data string) bool {
 	return Get_len(data) <= Str_to_int(check)
 }
 
+func Get_title_length_limit(db *sql.DB, type_check string) string {
+	setting_name := "title_max_length"
+	if type_check == "topic" {
+		setting_name = "title_topic_max_length"
+	}
+
+	limit := ""
+	QueryRow_DB(
+		db,
+		"select data from other where name = ? and coverage = ''",
+		[]any{&limit},
+		setting_name,
+	)
+
+	return limit
+}
+
+func Do_title_length_check(db *sql.DB, title string, type_check string) bool {
+	limit := Get_title_length_limit(db, type_check)
+	if limit == "" {
+		return true
+	}
+
+	limit_int := Str_to_int(limit)
+	if limit_int <= 0 {
+		return true
+	}
+
+	return Get_len(title) <= limit_int
+}
+
+func Get_document_revision(db *sql.DB, doc_name string) string {
+	revision := "0"
+	QueryRow_DB(
+		db,
+		"select id from history where title = ? order by id + 0 desc limit 1",
+		[]any{&revision},
+		doc_name,
+	)
+
+	if revision == "" {
+		return "0"
+	}
+
+	return revision
+}
+
 func Get_edit_length_diff(A string, B string) string {
 	A_len := Get_len(A)
 	B_len := Get_len(B)
@@ -290,12 +337,6 @@ func Do_add_history(db *sql.DB, doc_name string, data string, date string, ip st
 		if mode == "delete" {
 			data_set_exist = "not_exist"
 		}
-
-		Exec_DB(
-			db,
-			`delete from data_set where doc_name = ? and set_name = "edit_request_doing"`,
-			doc_name,
-		)
 
 		Exec_DB(
 			db,

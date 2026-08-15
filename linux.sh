@@ -16,9 +16,9 @@ build() {
     export GOFLAGS="-trimpath"
     
     if [[ "$os" != "darwin" ]]; then
-        go build -o "$file_name.$arch$ext" "$file_name.go"
+        go build -o "$file_name.$arch$ext" .
     else
-        go build -o "$file_name.mac.$arch$ext" "$file_name.go"
+        go build -o "$file_name.mac.$arch$ext" .
     fi
 }
 

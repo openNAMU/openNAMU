@@ -10,20 +10,39 @@ import (
 	"opennamu/route/tool"
 )
 
-var re_esc_a = regexp.MustCompile(`&lt;a&gt;\s*([^\r\n]*?)\s*&lt;/a&gt;`)
+var re_esc_a = regexp.MustCompile(`&lt;a(([^&]|&[^;]+;)*)&gt;([^\r\n]*?)&lt;/a&gt;`)
+var re_safe_url = regexp.MustCompile(`(^| )(https?://[^ ]+)`)
 
 func Get_safe_send_data(data string) string {
-	escaped_data := tool.HTML_escape(data)
+	data = tool.HTML_escape(data)
+	if data == "&lt;br&gt;" || data == "" || strings.TrimSpace(data) == "" {
+		return "<br>"
+	}
 
-	return re_esc_a.ReplaceAllStringFunc(escaped_data, func(match string) string {
-		inner_esc := re_esc_a.FindStringSubmatch(match)[1]
-		inner_text := strings.TrimSpace(html.UnescapeString(inner_esc))
+	data = strings.ReplaceAll(data, "javascript:", "")
+	data = re_safe_url.ReplaceAllStringFunc(data, func(match string) string {
+		prefix := ""
+		url := match
+		if strings.HasPrefix(match, " ") {
+			prefix = " "
+			url = match[1:]
+		}
+		return prefix + "<a href=\"" + url + "\">" + url + "</a>"
+	})
 
+	return re_esc_a.ReplaceAllStringFunc(data, func(match string) string {
+		parts := re_esc_a.FindStringSubmatch(match)
+		if len(parts) < 4 {
+			return match
+		}
+
+		inner_escaped := parts[3]
+		inner_text := strings.TrimSpace(html.UnescapeString(inner_escaped))
 		if inner_text == "" || strings.ContainsAny(inner_text, "<>") {
 			return match
 		}
 
-		return `<a href="/w/` + tool.Url_parser(inner_text) + `">` + strings.TrimSpace(inner_esc) + `</a>`
+		return "<a href=\"/w/" + tool.Url_parser(inner_text) + "\">" + strings.TrimSpace(inner_escaped) + "</a>"
 	})
 }
 
@@ -34,13 +53,11 @@ func Get_ui_history(db *sql.DB, config tool.Config, data_all [][]string) (string
 	date_heading := ""
 	data_html := ""
 	data_select := ""
-
 	for_count := 1
+
 	for _, in_data := range data_all {
 		for_count_str := strconv.Itoa(for_count)
 		for_count += 1
-
-		data_select = `<option value="` + for_count_str + `">` + for_count_str + `</option>` + data_select
 
 		if in_data[6] != "" && in_data[1] == "" {
 			if date_heading != "----" {
@@ -52,6 +69,7 @@ func Get_ui_history(db *sql.DB, config tool.Config, data_all [][]string) (string
 			continue
 		}
 
+		data_select += `<option value="` + in_data[0] + `">` + in_data[0] + `</option>`
 		doc_name := in_data[1]
 		doc_name_url := tool.Url_parser(doc_name)
 		rev_str := in_data[0]
@@ -111,7 +129,6 @@ func Get_ui_history(db *sql.DB, config tool.Config, data_all [][]string) (string
 		}
 
 		right += `<span style="display: none;" id="opennamu_history_tool_` + for_count_str + `">`
-
 		right += `<a href="/render/` + rev_str + `/` + doc_name_url + `">` + tool.Get_language(db, "view", true) + `</a>`
 		right += ` | <a href="/raw_rev/` + rev_str + `/` + doc_name_url + `">` + tool.Get_language(db, "raw", true) + `</a>`
 		right += ` | <a href="/revert/` + rev_str + `/` + doc_name_url + `">` + tool.Get_language(db, "revert", true) + ` (r` + rev_str + `)</a>`
@@ -142,15 +159,15 @@ func Get_ui_history(db *sql.DB, config tool.Config, data_all [][]string) (string
 		}
 
 		data_html += tool.Get_list_ui(left, right, bottom, "")
-
 		data_html += `<script>
-            document.getElementById('opennamu_list_history_` + for_count_str + `').addEventListener("click", function() {{
+            document.getElementById('opennamu_list_history_` + for_count_str + `').addEventListener("click", function() {
                 opennamu_do_footnote_popover('opennamu_list_history_` + for_count_str + `', '', 'opennamu_history_tool_` + for_count_str + `', 'open');
-            }});
-            document.addEventListener("click", function() {{
+            });
+            document.addEventListener("click", function() {
                 opennamu_do_footnote_popover('opennamu_list_history_` + for_count_str + `', '', 'opennamu_history_tool_` + for_count_str + `', 'close');
-            }});
+            });
         </script>`
+
 	}
 
 	return data_html, data_select
@@ -169,11 +186,12 @@ func View_list_recent_change(config tool.Config, set_type string, limit string, 
 
 	data_html := ""
 
-	menu_option := []string{"normal", "edit", "move", "delete", "revert", "r1", "edit_request", "user", "file", "category"}
+	menu_option := []string{"normal", "edit", "move", "delete", "revert", "r1", "file", "category"}
 	for _, option := range menu_option {
 		label := tool.Get_language(db, option, true)
 		data_html += `<a href="/recent_change/1/` + option + `">(` + label + `)</a> `
 	}
+	data_html += `<a href="/recent_change/1/user">(` + tool.Get_language(db, "user_document", true) + `)</a> `
 
 	api_data := Api_list_recent_change(config, set_type, limit, num)
 	api_data_list := api_data["data"].([][]string)
@@ -195,7 +213,7 @@ func View_list_recent_change(config tool.Config, set_type string, limit string, 
 		tool.Get_language(db, "recent_change", true),
 		data_html,
 		[]any{sub},
-		[][]any{},
+		[][]any{{"other", tool.Get_language(db, "return", true)}},
 		map[string]string{},
 	)
 

@@ -16,7 +16,7 @@ func View_w_xref_reset_post(config tool.Config, doc_name string) string {
 		return tool.Get_redirect("/w/" + tool.Url_parser(doc_name))
 	}
 
-	Api_w_render(config, doc_name, api_data["data"].(string), "backlink")
+	Api_w_render(config, doc_name, api_data["data"].(string), "backlink", "")
 
 	return tool.Get_redirect("/xref/" + tool.Url_parser(doc_name))
 }

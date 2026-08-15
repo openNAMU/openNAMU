@@ -2,7 +2,6 @@ package markup
 
 import (
 	"database/sql"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -479,8 +478,6 @@ func (class *macromark) render_last() {
 func (class macromark) main() map[string]any {
 	class.render_text()
 	class.render_last()
-
-	log.Default().Println(class.toc_result)
 
 	end_data := make(map[string]any)
 	end_data["data"] = class.render_data
