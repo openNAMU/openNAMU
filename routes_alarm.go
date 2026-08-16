@@ -17,14 +17,17 @@ func register_alarm_routes(r *gin.Engine) {
 		_ = c.Request.ParseForm()
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm(make_route_config(c), "", c.Request.PostForm)))
 	})
+	r.POST("/alarm/read", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm_read(make_route_config(c), "")))
+	})
 	r.GET("/alarm/delete", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm(make_route_config(c), "", url.Values{"all": {"1"}})))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm_delete(make_route_config(c), "")))
 	})
 	r.POST("/alarm/delete", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm(make_route_config(c), "", url.Values{"all": {"1"}})))
 	})
 	r.GET("/alarm/delete/:id", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm(make_route_config(c), "", url.Values{"delete": {c.Param("id")}})))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm_delete(make_route_config(c), "")))
 	})
 	r.POST("/alarm/delete/:id", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm(make_route_config(c), "", url.Values{"delete": {c.Param("id")}})))
@@ -38,15 +41,17 @@ func register_alarm_routes(r *gin.Engine) {
 		name := c.Param("user_name")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm(make_route_config(c), name, c.Request.PostForm)))
 	})
+	r.POST("/alarm/:user_name/read", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm_read(make_route_config(c), c.Param("user_name"))))
+	})
 	r.GET("/alarm/:user_name/delete", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm(make_route_config(c), c.Param("user_name"), url.Values{"all": {"1"}})))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm_delete(make_route_config(c), c.Param("user_name"))))
 	})
 	r.POST("/alarm/:user_name/delete", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm(make_route_config(c), c.Param("user_name"), url.Values{"all": {"1"}})))
 	})
 	r.GET("/alarm/:user_name/delete/:id", func(c *gin.Context) {
-		values := url.Values{"delete": {c.Param("id")}}
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm(make_route_config(c), c.Param("user_name"), values)))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm_delete(make_route_config(c), c.Param("user_name"))))
 	})
 	r.POST("/alarm/:user_name/delete/:id", func(c *gin.Context) {
 		values := url.Values{"delete": {c.Param("id")}}

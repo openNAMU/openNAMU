@@ -130,7 +130,7 @@ func View_vote_end(config tool.Config, id string) string {
 	return vote_page(db, config, tool.Get_language(db, "result_vote", true), body)
 }
 
-func View_vote_close(config tool.Config, id string) string {
+func View_vote_close(config tool.Config, id string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 	if !tool.Check_acl(db, "", "", "vote", config.IP) {
@@ -152,6 +152,14 @@ func View_vote_close(config tool.Config, id string) string {
 		next = "open"
 	} else if type_data == "open" {
 		next = "close"
+	}
+	if values == nil {
+		action := "close_vote"
+		if next == "open" || next == "n_open" {
+			action = "open_vote"
+		}
+		body := `<form method="post"><button type="submit">` + tool.Get_language(db, action, true) + `</button></form>`
+		return vote_page(db, config, tool.Get_language(db, action, true), body)
 	}
 	tool.Exec_DB(db, "update vote set type = ? where id = ? and user = ''", next, id)
 	if next == "open" || next == "n_open" {

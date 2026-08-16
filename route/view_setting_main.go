@@ -167,7 +167,7 @@ func view_setting_main_data(db *sql.DB, config tool.Config, values map[string]st
 
 	data.WriteString(`<h2>` + lang("server_set") + `</h2>`)
 	data.WriteString(`<span>` + lang("update_branch") + `</span>` + setting_hr())
-	data.WriteString(`<select name="update">` + setting_options(values["update"], []string{"stable", "dev", "beta"}, nil) + `</select>` + setting_hr())
+	data.WriteString(`<select name="update">` + setting_options(values["update"], []string{"stable", "beta"}, nil) + `</select>` + setting_hr())
 	data.WriteString(`<span` + sqlite_only + `>`)
 	data.WriteString(`<h3>` + lang("backup") + ` (` + lang("sqlite_only") + `)</h3>`)
 	data.WriteString(`<span>` + lang("backup_warning") + ` (EX : data_YYYYMMDDHHMMSS.db)</span>` + setting_hr())

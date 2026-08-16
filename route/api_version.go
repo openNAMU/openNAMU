@@ -13,19 +13,19 @@ import (
 func get_version_branch(db *sql.DB) string {
 	branch := ""
 	tool.QueryRow_DB(db, `select data from other where name = "update"`, []any{&branch})
-	if branch != "stable" && branch != "beta" && branch != "dev" {
+	if branch != "stable" && branch != "beta" {
 		branch = "stable"
 	}
 	return branch
 }
 
 func get_remote_version(branch string) string {
-	if branch != "stable" && branch != "beta" && branch != "dev" {
+	if branch != "stable" && branch != "beta" {
 		return ""
 	}
 
 	client := http.Client{Timeout: 3 * time.Second}
-	response, err := client.Get("https://raw.githubusercontent.com/openNAMU/openNAMU/" + branch + "/version.json")
+	response, err := client.Get("https://raw.githubusercontent.com/openNAMU/openNAMU/refs/heads/" + branch + "/version.json")
 	if err != nil {
 		return ""
 	}
@@ -39,9 +39,11 @@ func get_remote_version(branch string) string {
 	if err := decoder.Decode(&version_data); err != nil {
 		return ""
 	}
-	if beta_data, ok := version_data["beta"].(map[string]any); ok {
-		if version, ok := beta_data["r_ver"].(string); ok {
-			return version
+	if branch == "beta" {
+		if beta_data, ok := version_data["beta"].(map[string]any); ok {
+			if version, ok := beta_data["r_ver"].(string); ok {
+				return version
+			}
 		}
 	}
 	version, _ := version_data["r_ver"].(string)

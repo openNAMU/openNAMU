@@ -65,7 +65,12 @@ func register_list_routes(r *gin.Engine) {
 	})
 
 	r.GET("/easter_egg", func(c *gin.Context) {
-		route_data := route.View_easter_egg(make_route_config(c))
+		route_data := route.View_easter_egg(make_route_config(c), nil)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+	r.POST("/easter_egg", func(c *gin.Context) {
+		_ = c.Request.ParseForm()
+		route_data := route.View_easter_egg(make_route_config(c), c.Request.PostForm)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 }

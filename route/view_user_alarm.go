@@ -9,6 +9,19 @@ import (
 	"opennamu/route/tool"
 )
 
+func View_alarm_read(config tool.Config, user_name string) string {
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
+	if user_name == "" {
+		user_name = config.IP
+	}
+	if user_name != config.IP && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+	tool.Exec_DB(db, "update user_notice set readme = '1' where name = ?", user_name)
+	return tool.Get_redirect("/alarm/" + tool.Url_parser(user_name))
+}
+
 func View_alarm(config tool.Config, user_name string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
@@ -60,10 +73,16 @@ func View_alarm(config tool.Config, user_name string, values url.Values) string 
 		body += `<li` + data_style + `>` + data_html + ` | ` + tool.HTML_escape(date) + ` <a href="` + delete_url + `/` + tool.Url_parser(id) + `">(` + tool.Get_language(db, "delete", true) + `)</a></li>`
 	}
 	rows.Close()
-	tool.Exec_DB(db, "update user_notice set readme = '1' where name = ?", user_name)
 	body += `</ul>`
+	read_url := "/alarm/read"
+	if user_name != config.IP {
+		read_url = "/alarm/" + tool.Url_parser(user_name) + "/read"
+	}
+	read_form := `<form method="post" action="` + read_url + `"><button type="submit">` + tool.Get_language(db, "read_all", true) + `</button></form><hr class="main_hr">`
 	if row_count > 0 {
-		body = `<a href="` + delete_url + `">(` + tool.Get_language(db, "delete", true) + `)</a><hr class="main_hr">` + body
+		body = read_form + `<a href="` + delete_url + `">(` + tool.Get_language(db, "delete", true) + `)</a><hr class="main_hr">` + body
+	} else {
+		body = read_form + body
 	}
 	page_url := "/alarm?num={}"
 	if user_name != config.IP {
@@ -71,6 +90,32 @@ func View_alarm(config tool.Config, user_name string, values url.Values) string 
 	}
 	body += tool.Get_page_control(db, page, row_count, 50, page_url)
 	return user_form_page(db, config, tool.Get_language(db, "alarm", true), body)
+}
+
+func View_alarm_delete(config tool.Config, user_name string) string {
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
+	if user_name == "" {
+		user_name = config.IP
+	}
+	if user_name != config.IP && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
+	return_path := "/alarm"
+	if user_name != config.IP {
+		return_path = "/alarm/" + tool.Url_parser(user_name)
+	}
+	body := `<form method="post"><span>` + tool.Get_language(db, "delete_warning", true) + `</span><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
+	return tool.Get_template(
+		db,
+		config,
+		tool.Get_language(db, "delete", true),
+		body,
+		[]any{},
+		[][]any{{return_path, tool.Get_language(db, "return", true)}},
+		map[string]string{},
+	)
 }
 
 func challenge_count(db *sql.DB, query string, id string) int {

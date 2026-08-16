@@ -6,12 +6,15 @@ import platform
 import stat
 import subprocess
 import sys
+import time
 from pathlib import Path
 from urllib.error import HTTPError, URLError
+from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 download_timeout = 60
 download_chunk_size = 1024 * 1024
+default_update_branch = "beta"
 
 binary_name_map = {
     "linux": {
@@ -28,16 +31,34 @@ binary_name_map = {
 }
 
 
-def get_release_tag(version_path):
+def get_update_branch(arguments):
+    if arguments and arguments[0] in ("stable", "beta"):
+        return arguments[0], arguments[1:]
+    return default_update_branch, arguments
+
+
+def get_release_tag(branch):
+    version_url = "https://raw.githubusercontent.com/openNAMU/openNAMU/refs/heads/" + branch + "/version.json"
+    request = Request(
+        version_url,
+        headers={"User-Agent": "openNAMU-launcher"},
+    )
+
     try:
-        with version_path.open("r", encoding="utf-8") as file_data:
-            version_data = json.load(file_data)
-    except (OSError, json.JSONDecodeError) as error:
-        raise RuntimeError("version.json을 읽을 수 없습니다: " + str(error))
+        with urlopen(request, timeout=download_timeout) as response:
+            if response.status != 200:
+                raise RuntimeError("version.json 요청에 실패했습니다: " + str(response.status))
+            version_data = json.load(response)
+    except (HTTPError, URLError, OSError, json.JSONDecodeError) as error:
+        raise RuntimeError("최신 version.json을 읽을 수 없습니다: " + str(error))
 
     release_tag = version_data.get("r_ver")
+    if branch == "beta" and not isinstance(release_tag, str):
+        beta_data = version_data.get("beta")
+        if isinstance(beta_data, dict):
+            release_tag = beta_data.get("r_ver")
     if not isinstance(release_tag, str) or not release_tag:
-        raise RuntimeError("version.json에 r_ver이 없습니다.")
+        raise RuntimeError("최신 version.json에 r_ver이 없습니다.")
 
     return release_tag
 
@@ -86,7 +107,14 @@ def download_binary(binary_path, binary_url):
         if not temporary_path.exists() or temporary_path.stat().st_size == 0:
             raise RuntimeError("다운로드된 바이너리가 비어 있습니다.")
 
-        os.replace(temporary_path, binary_path)
+        for attempt in range(20):
+            try:
+                os.replace(temporary_path, binary_path)
+                break
+            except PermissionError:
+                if attempt == 19:
+                    raise
+                time.sleep(0.25)
 
         if os.name != "nt":
             mode = binary_path.stat().st_mode
@@ -109,15 +137,17 @@ def run_binary(binary_path, arguments, base_dir):
 
 def main():
     base_dir = Path(__file__).resolve().parent
+    arguments = sys.argv[1:]
     try:
-        release_tag = get_release_tag(base_dir / "version.json")
+        update_branch, arguments = get_update_branch(arguments)
+        release_tag = get_release_tag(update_branch)
         binary_name = get_binary_name()
     except RuntimeError as error:
         print(str(error), file=sys.stderr)
         return 1
 
     binary_path = base_dir / binary_name
-    binary_url = "https://github.com/openNAMU/openNAMU/releases/download/" + release_tag + "/" + binary_name
+    binary_url = "https://github.com/openNAMU/openNAMU/releases/download/" + quote(release_tag, safe="") + "/" + binary_name
 
     print("바이너리 다운로드: " + binary_name)
 
@@ -131,7 +161,7 @@ def main():
         print("다운로드에 실패하여 기존 바이너리를 실행합니다: " + str(error), file=sys.stderr)
 
     try:
-        return run_binary(binary_path, sys.argv[1:], base_dir)
+        return run_binary(binary_path, arguments, base_dir)
     except OSError as error:
         print("바이너리 실행에 실패했습니다: " + str(error), file=sys.stderr)
         return 1

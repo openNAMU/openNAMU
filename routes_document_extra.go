@@ -25,7 +25,12 @@ func register_document_extra_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	})
 	r.GET("/history_hidden/:rev/*doc_name", func(c *gin.Context) {
-		data := route.View_history_hidden_safe(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Param("rev"))
+		data := route.View_history_hidden_safe(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Param("rev"), nil)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
+	})
+	r.POST("/history_hidden/:rev/*doc_name", func(c *gin.Context) {
+		_ = c.Request.ParseForm()
+		data := route.View_history_hidden_safe(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Param("rev"), c.Request.PostForm)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	})
 	r.GET("/history_send/:rev/*doc_name", func(c *gin.Context) {

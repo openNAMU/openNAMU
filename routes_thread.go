@@ -29,11 +29,21 @@ func register_thread_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	})
 	r.GET("/thread/:topic_num/comment/:num/notice", func(c *gin.Context) {
-		data := route.View_thread_comment_notice(make_route_config(c), c.Param("topic_num"), c.Param("num"))
+		data := route.View_thread_comment_notice(make_route_config(c), c.Param("topic_num"), c.Param("num"), nil)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
+	})
+	r.POST("/thread/:topic_num/comment/:num/notice", func(c *gin.Context) {
+		_ = c.Request.ParseForm()
+		data := route.View_thread_comment_notice(make_route_config(c), c.Param("topic_num"), c.Param("num"), c.Request.PostForm)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	})
 	r.GET("/thread/:topic_num/comment/:num/blind", func(c *gin.Context) {
-		data := route.View_thread_comment_blind(make_route_config(c), c.Param("topic_num"), c.Param("num"))
+		data := route.View_thread_comment_blind(make_route_config(c), c.Param("topic_num"), c.Param("num"), nil)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
+	})
+	r.POST("/thread/:topic_num/comment/:num/blind", func(c *gin.Context) {
+		_ = c.Request.ParseForm()
+		data := route.View_thread_comment_blind(make_route_config(c), c.Param("topic_num"), c.Param("num"), c.Request.PostForm)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	})
 	r.GET("/thread/:topic_num/comment/:num/delete", func(c *gin.Context) {

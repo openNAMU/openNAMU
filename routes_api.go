@@ -51,7 +51,7 @@ func register_api_routes(r *gin.Engine) {
 		compat_api_data(c, route.Api_vote_add_post(make_route_config(c), c.Request.PostForm.Encode()))
 	})
 
-	r.GET("/api/v2/set_reset/*doc_name", func(c *gin.Context) {
+	r.POST("/api/v2/set_reset/*doc_name", func(c *gin.Context) {
 		route_data := route.Api_w_set_reset(
 			make_route_config(c),
 			strings.TrimPrefix(c.Param("doc_name"), "/"),

@@ -48,6 +48,10 @@ func register_vote_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_vote_end(make_route_config(c), c.Param("id"))))
 	})
 	r.GET("/vote/close/:id", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_vote_close(make_route_config(c), c.Param("id"))))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_vote_close(make_route_config(c), c.Param("id"), nil)))
+	})
+	r.POST("/vote/close/:id", func(c *gin.Context) {
+		_ = c.Request.ParseForm()
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_vote_close(make_route_config(c), c.Param("id"), c.Request.PostForm)))
 	})
 }

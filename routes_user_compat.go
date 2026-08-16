@@ -26,16 +26,16 @@ func register_user_compat_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	})
 	r.GET("/change/key/delete", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_user_key_delete(make_route_config(c))))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_user_key_delete(make_route_config(c), nil)))
 	})
 	r.POST("/change/key/delete", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_user_key_delete(make_route_config(c))))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_user_key_delete(make_route_config(c), user_compat_values(c))))
 	})
 	r.GET("/change/email/delete", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_user_field_delete(make_route_config(c), "email")))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_user_field_delete(make_route_config(c), "email", nil)))
 	})
 	r.POST("/change/email/delete", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_user_field_delete(make_route_config(c), "email")))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_user_field_delete(make_route_config(c), "email", user_compat_values(c))))
 	})
 	r.GET("/change/email/check", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_user_email_check(make_route_config(c), nil)))

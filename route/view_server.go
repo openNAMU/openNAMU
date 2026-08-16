@@ -14,8 +14,6 @@ import (
 	"opennamu/route/tool"
 )
 
-const server_update_remote = "https://github.com/opennamu/opennamu.git"
-
 var server_action_mutex sync.Mutex
 var server_action_started bool
 
@@ -71,142 +69,44 @@ func start_server_process(executable string) error {
 	return nil
 }
 
+func start_server_launcher(branch string) error {
+	working_dir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	launcher_path := filepath.Join(working_dir, "app.py")
+	if _, err := os.Stat(launcher_path); err != nil {
+		return fmt.Errorf("app.py not found: %w", err)
+	}
+
+	python_path, err := exec.LookPath("python3")
+	if err != nil {
+		python_path, err = exec.LookPath("python")
+	}
+	if err != nil {
+		return fmt.Errorf("python not found: %w", err)
+	}
+
+	arguments := append([]string{launcher_path, branch}, os.Args[1:]...)
+	command := exec.Command(python_path, arguments...)
+	command.Dir = working_dir
+	command.Env = server_process_environment()
+	detach_server_process(command)
+	command.Stdout = os.Stdout
+	command.Stderr = os.Stderr
+	if err := command.Start(); err != nil {
+		return fmt.Errorf("start update launcher: %w", err)
+	}
+	return nil
+}
+
 func current_server_executable() (string, error) {
 	executable, err := os.Executable()
 	if err != nil {
 		return "", err
 	}
 	return filepath.Abs(executable)
-}
-
-func find_server_repo_root() (string, error) {
-	current, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-
-	for {
-		if _, err := os.Stat(filepath.Join(current, ".git")); err == nil {
-			return current, nil
-		}
-		parent := filepath.Dir(current)
-		if parent == current {
-			break
-		}
-		current = parent
-	}
-
-	return "", fmt.Errorf("repository root not found")
-}
-
-func run_server_git(repo_root string, arguments ...string) ([]byte, error) {
-	git_path, err := exec.LookPath("git")
-	if err != nil {
-		return nil, err
-	}
-
-	command := exec.Command(git_path, arguments...)
-	command.Dir = repo_root
-	output, err := command.CombinedOutput()
-	if err != nil {
-		return output, fmt.Errorf("git %s: %w: %s", strings.Join(arguments, " "), err, strings.TrimSpace(string(output)))
-	}
-	return output, nil
-}
-
-func clone_server_update(repo_root string, branch string) (string, error) {
-	clone_root, err := os.MkdirTemp("", "opennamu-update-source-*")
-	if err != nil {
-		return "", err
-	}
-
-	_, err = run_server_git(
-		repo_root,
-		"clone",
-		"--depth=1",
-		"--no-tags",
-		"--branch",
-		branch,
-		server_update_remote,
-		clone_root,
-	)
-	if err != nil {
-		os.RemoveAll(clone_root)
-		return "", err
-	}
-	return clone_root, nil
-}
-
-func build_server_update(repo_root string) (string, error) {
-	go_path, err := exec.LookPath("go")
-	if err != nil {
-		return "", err
-	}
-
-	temporary, err := os.CreateTemp("", "opennamu-update-*")
-	if err != nil {
-		return "", err
-	}
-	temporary_path := temporary.Name()
-	if err := temporary.Close(); err != nil {
-		os.Remove(temporary_path)
-		return "", err
-	}
-	if err := os.Remove(temporary_path); err != nil {
-		return "", err
-	}
-
-	command := exec.Command(go_path, "build", "-o", temporary_path, ".")
-	command.Dir = repo_root
-	output, err := command.CombinedOutput()
-	if err != nil {
-		os.Remove(temporary_path)
-		return "", fmt.Errorf("go build: %w: %s", err, strings.TrimSpace(string(output)))
-	}
-	return temporary_path, nil
-}
-
-func update_server_source(db *sql.DB) (string, error) {
-	repo_root, err := find_server_repo_root()
-	if err != nil {
-		return "", err
-	}
-
-	status, err := run_server_git(repo_root, "status", "--porcelain", "--untracked-files=all")
-	if err != nil {
-		return "", err
-	}
-	if strings.TrimSpace(string(status)) != "" {
-		return "", fmt.Errorf("working tree is not clean")
-	}
-
-	branch := ""
-	tool.QueryRow_DB(db, `select data from other where name = "update"`, []any{&branch})
-	if branch != "stable" && branch != "beta" && branch != "dev" {
-		branch = "stable"
-	}
-
-	clone_root, err := clone_server_update(repo_root, branch)
-	if err != nil {
-		return "", err
-	}
-	defer os.RemoveAll(clone_root)
-
-	executable, err := build_server_update(clone_root)
-	if err != nil {
-		return "", err
-	}
-
-	if _, err := run_server_git(repo_root, "fetch", "--depth=1", "--no-tags", server_update_remote, branch); err != nil {
-		os.Remove(executable)
-		return "", err
-	}
-	if _, err := run_server_git(repo_root, "merge", "--ff-only", "FETCH_HEAD"); err != nil {
-		os.Remove(executable)
-		return "", err
-	}
-
-	return executable, nil
 }
 
 func server_action_error(db *sql.DB, config tool.Config, action string, err error) string {
@@ -236,22 +136,23 @@ func View_server_action(config tool.Config, action string, post bool) string {
 			return tool.Get_language(db, "wiki_shutdown", true)
 		}
 
-		executable := ""
-		var err error
 		if action == "update" {
-			executable, err = update_server_source(db)
-		} else {
-			executable, err = current_server_executable()
-		}
-		if err == nil {
-			err = start_server_process(executable)
-		}
-		if err != nil {
-			if action == "update" && executable != "" {
-				os.Remove(executable)
+			err := start_server_launcher(get_version_branch(db))
+			if err != nil {
+				cancel_server_action()
+				return server_action_error(db, config, action, err)
 			}
-			cancel_server_action()
-			return server_action_error(db, config, action, err)
+		} else {
+			executable, err := current_server_executable()
+			if err != nil {
+				cancel_server_action()
+				return server_action_error(db, config, action, err)
+			}
+			err = start_server_process(executable)
+			if err != nil {
+				cancel_server_action()
+				return server_action_error(db, config, action, err)
+			}
 		}
 
 		schedule_server_exit()
