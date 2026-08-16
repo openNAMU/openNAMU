@@ -69,38 +69,6 @@ func start_server_process(executable string) error {
 	return nil
 }
 
-func start_server_launcher(branch string) error {
-	working_dir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	launcher_path := filepath.Join(working_dir, "app.py")
-	if _, err := os.Stat(launcher_path); err != nil {
-		return fmt.Errorf("app.py not found: %w", err)
-	}
-
-	python_path, err := exec.LookPath("python3")
-	if err != nil {
-		python_path, err = exec.LookPath("python")
-	}
-	if err != nil {
-		return fmt.Errorf("python not found: %w", err)
-	}
-
-	arguments := append([]string{launcher_path, branch}, os.Args[1:]...)
-	command := exec.Command(python_path, arguments...)
-	command.Dir = working_dir
-	command.Env = server_process_environment()
-	detach_server_process(command)
-	command.Stdout = os.Stdout
-	command.Stderr = os.Stderr
-	if err := command.Start(); err != nil {
-		return fmt.Errorf("start update launcher: %w", err)
-	}
-	return nil
-}
-
 func current_server_executable() (string, error) {
 	executable, err := os.Executable()
 	if err != nil {
@@ -137,7 +105,7 @@ func View_server_action(config tool.Config, action string, post bool) string {
 		}
 
 		if action == "update" {
-			err := start_server_launcher(get_version_branch(db))
+			err := start_server_update(get_version_branch(db))
 			if err != nil {
 				cancel_server_action()
 				return server_action_error(db, config, action, err)

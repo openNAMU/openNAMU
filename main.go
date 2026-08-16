@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"time"
 
+	"opennamu/route"
 	"opennamu/route/tool"
 
 	"github.com/flosch/pongo2/v6"
@@ -92,6 +93,10 @@ func wait_startup_delay() {
 }
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "--opennamu-update" {
+		os.Exit(route.Run_server_update(os.Args[2:]))
+	}
+
 	wait_startup_delay()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
