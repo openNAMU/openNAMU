@@ -62,6 +62,9 @@ func view_w_redirect_trace(db *sql.DB, doc_name string, documents []string) stri
 
 	redirect_text := "{0} ➤ {1}"
 	tool.QueryRow_DB(db, "select data from other where name = 'redirect_text'", []any{&redirect_text})
+	if redirect_text == "" {
+		redirect_text = "{0} ➤ {1}"
+	}
 	redirect_text = strings.ReplaceAll(redirect_text, "{0}", `<a href="/w_from/`+tool.Url_parser(last_page)+`">`+tool.HTML_escape(last_page)+`</a>`)
 	redirect_text = strings.ReplaceAll(redirect_text, "{1}", `<b>`+tool.HTML_escape(doc_name)+`</b>`)
 	return `<div class="opennamu_redirect" id="redirect">` + redirect_text + `</div><hr class="main_hr">`

@@ -303,6 +303,39 @@ function do_monaco_init(monaco_thema) {
 }
 
 
+function opennamu_do_editor_preview() {
+    do_sync_monaco_and_textarea();
+
+    const input = document.getElementById('opennamu_edit_textarea');
+    const preview = document.getElementById('opennamu_preview_area');
+    const doc_name = document.getElementById('opennamu_editor_doc_name');
+    if(input === null || preview === null) {
+        return;
+    }
+
+    const body = new URLSearchParams({
+        name: doc_name === null ? 'test' : doc_name.value,
+        data: input.value,
+        option: '',
+    });
+
+    fetch('/api/render', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: body,
+    }).then(function(response) {
+        if(!response.ok) {
+            throw new Error('render failed: ' + response.status);
+        }
+        return response.json();
+    }).then(function(result) {
+        preview.innerHTML = result.data || '';
+    }).catch(function(error) {
+        console.error('Preview failed:', error);
+        preview.textContent = 'Preview failed.';
+    });
+}
+
 function opennamu_do_sync_monaco_markup() {
     let now_selected = get_select_editor_markup();
     monaco.editor.setModelLanguage(window.editor.getModel(), now_selected);

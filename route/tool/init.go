@@ -130,12 +130,41 @@ func DB_alter_add_column(db *sql.DB, table_name string, column_name string, fiel
 	)
 }
 
-func DB_create_history_index(db *sql.DB) {
-	_, err := db.Exec(DB_change(
-		`create index history_index on history (title, ip)`,
-	))
-	if err != nil {
-		return
+func DB_create_index(db *sql.DB) {
+	queries := []string{
+		"create index history_index on history (title, ip)",
+		"create index history_title_id_index on history (title, id)",
+		"create index history_ip_date_index on history (ip, date)",
+		"create index bbs_data_index on bbs_data (set_id, set_code, set_name)",
+		"create index data_set_document_index on data_set (doc_name, set_name, doc_rev)",
+		"create index data_set_list_index on data_set (set_name, doc_rev)",
+		"create index data_title_index on data (title)",
+		"create index back_title_type_index on back (title, type)",
+		"create index back_link_type_index on back (link, type)",
+		"create index user_set_id_name_index on user_set (id, name)",
+		"create index topic_code_id_index on topic (code, id)",
+	}
+	if Get_DB_type() == "mysql" {
+		queries = []string{
+			"create index history_index on history (title(191), ip(191))",
+			"create index history_title_id_index on history (title(191), id(191))",
+			"create index history_ip_date_index on history (ip(191), date(191))",
+			"create index bbs_data_index on bbs_data (set_id(191), set_code(191), set_name(191))",
+			"create index data_set_document_index on data_set (doc_name(191), set_name(191), doc_rev(191))",
+			"create index data_set_list_index on data_set (set_name(191), doc_rev(191))",
+			"create index data_title_index on data (title(191))",
+			"create index back_title_type_index on back (title(191), type(191))",
+			"create index back_link_type_index on back (link(191), type(191))",
+			"create index user_set_id_name_index on user_set (id(191), name(191))",
+			"create index topic_code_id_index on topic (code(191), id(191))",
+		}
+	}
+
+	for _, query := range queries {
+		_, err := db.Exec(DB_change(query))
+		if err != nil {
+			continue
+		}
 	}
 }
 
@@ -173,7 +202,7 @@ func DB_make(db *sql.DB, new_db_set map[string]string) error {
 		}
 	}
 
-	DB_create_history_index(db)
+	DB_create_index(db)
 
 	return nil
 }

@@ -258,7 +258,7 @@ func Get_redirect_target(data string) (string, bool) {
 }
 
 func Cache_v() string {
-	return ".cache_v288"
+	return ".cache_v289"
 }
 
 func Get_wiki_css(data []any, cookies string) []any {
@@ -582,6 +582,7 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
 	out_field := Get_captcha_ui(db, config) + Get_IP_warning_ui(db, config) + add_on
 
 	return `
+        <input type="hidden" id="opennamu_editor_doc_name" value="` + HTML_escape(doc_name) + `">
         <textarea class="__ON_TEXTAREA__" style="display: none;" id="opennamu_edit_origin" name="doc_data_org">` + HTML_escape(data) + `</textarea>
         <div>
             ` + monaco_editor_top + `
@@ -607,7 +608,9 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
         </script>
 
         <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">` + Get_language(db, "send", true) + `</button>
+        <button class="__ON_BUTTON__" id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview();">` + Get_language(db, "preview", true) + `</button>
         <hr class="main_hr">
+        <div id="opennamu_preview_area"></div>
     `
 }
 

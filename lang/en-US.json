@@ -344,6 +344,7 @@
     "outer_link_filter_list": "External link auto image list",
     "html_or_link": "HTML or link",
     "template_document_list": "Template document(s) list",
+    "no_link_document": "Document(s) without link",
     "no_link_document_list": "List of document(s) without link",
     "new_page": "List of new document(s)",
     
@@ -768,7 +769,7 @@
     "password_same_as_id_error": "The password cannot be the same as the user ID.",
     
     "_comment_": "Warning",
-    "http_warning": "Warning: If you are not on HTTPS connection, your information can be leaked. The users themselves have responsibility to any problems that happen because of this.",
+    "http_warning": "Please check the site and address carefully before entering your login or password. Even with HTTPS, a site may be fraudulent, so avoid entering personal information on suspicious sites.",
     "user_head_warning": "User data will be deleted if you close the browser or when you login.",
     "no_login_warning": "You are not logged in. Your current IP address will be logged within editing or discussing until you log in.",
     "update_warning": "Manual updates are recommended if your version is 0.2 or lower than the latest version. For Windows, the contents of the route folder will be deleted.",

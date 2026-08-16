@@ -25,7 +25,7 @@ func View_setting(config tool.Config) string {
 		{"backlink_reset", tool.Get_language(db, "reset_all_backlink", true)},
 	}
 
-	set_data := ""
+	set_data := "<ul>"
 	for _, li := range set_list {
 		set_data += `<li><a href="/setting/` +
 			li[0] +
@@ -33,6 +33,8 @@ func View_setting(config tool.Config) string {
 			li[1] +
 			`</a></li>`
 	}
+	
+	set_data += "</ul>"
 
 	return tool.Get_template(
 		db,

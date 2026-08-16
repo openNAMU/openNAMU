@@ -50,7 +50,7 @@ func view_w_user_data(db *sql.DB, doc_name string) string {
 	}
 
 	phrase := ""
-	if !tool.Check_acl(db, "", "", "all_admin_auth", user_name) {
+	if tool.Get_user_document(db, user_name) && !tool.Check_acl(db, "", "", "all_admin_auth", user_name) {
 		phrase_name := "phrase_user_page_owner"
 		if tool.Check_acl(db, "", "", "owner_auth", user_name) {
 			phrase_name = "phrase_user_page_admin"

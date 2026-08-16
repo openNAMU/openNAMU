@@ -30,9 +30,15 @@ func Read_view_file(data string) ([]byte, error) {
 		return nil, fs.ErrNotExist
 	}
 
-	for _, base := range []string{
-		"views",
-	} {
+	raw, err := builtin_views.Read(data)
+	if err == nil {
+		return raw, nil
+	}
+	if !errors.Is(err, fs.ErrNotExist) {
+		return nil, err
+	}
+
+	for _, base := range []string{"views"} {
 		raw, err := os.ReadFile(filepath.Join(base, filepath.FromSlash(data)))
 		if err == nil {
 			return raw, nil
@@ -42,23 +48,13 @@ func Read_view_file(data string) ([]byte, error) {
 		}
 	}
 
-	return builtin_views.Read(data)
+	return nil, fs.ErrNotExist
 }
 
 func List_view_dir(data string) ([]fs.DirEntry, error) {
 	data = Clean_view_path(data)
 
 	entry_map := map[string]fs.DirEntry{}
-	for _, base := range []string{
-		"views",
-	} {
-		entries, err := os.ReadDir(filepath.Join(base, filepath.FromSlash(data)))
-		if err == nil {
-			for _, entry := range entries {
-				entry_map[entry.Name()] = entry
-			}
-		}
-	}
 
 	builtin_path := data
 	if builtin_path == "" {
@@ -68,8 +64,17 @@ func List_view_dir(data string) ([]fs.DirEntry, error) {
 	entries, err := builtin_views.ReadDir(builtin_path)
 	if err == nil {
 		for _, entry := range entries {
-			if _, ok := entry_map[entry.Name()]; !ok {
-				entry_map[entry.Name()] = entry
+			entry_map[entry.Name()] = entry
+		}
+	}
+
+	for _, base := range []string{"views"} {
+		entries, external_err := os.ReadDir(filepath.Join(base, filepath.FromSlash(data)))
+		if external_err == nil {
+			for _, entry := range entries {
+				if _, ok := entry_map[entry.Name()]; !ok {
+					entry_map[entry.Name()] = entry
+				}
 			}
 		}
 	}
