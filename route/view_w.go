@@ -155,8 +155,6 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	watch_list := 0
 	menu := [][]any{
 		{"edit/" + tool.Url_parser(doc_name), tool.Get_language(db, "edit", true), menu_acl},
-		{"delete/" + tool.Url_parser(doc_name), tool.Get_language(db, "delete", true)},
-		{"move/" + tool.Url_parser(doc_name), tool.Get_language(db, "move", true)},
 		{"topic/" + tool.Url_parser(doc_name), tool.Get_language(db, "discussion", true), topic},
 		{"history/" + tool.Url_parser(doc_name), tool.Get_language(db, "history", true), history_color},
 		{"xref/" + tool.Url_parser(doc_name), tool.Get_language(db, "backlink", true)},
@@ -195,7 +193,8 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	}
 	menu = append(menu, []any{"doc_watch_list/1/" + tool.Url_parser(doc_name), tool.Get_language(db, "watchlist", true)})
 
-	if status == http.StatusOK {
+	enable_comment := tool.Get_setting(db, "enable_comment", "")
+	if status == http.StatusOK && len(enable_comment) > 0 && enable_comment[0][0] != "" {
 		comment_api := Api_w_comment_ui(config, doc_name)
 		if comment_data, ok := comment_api["data"].(string); ok && comment_data != "" {
 			render_data += `<div class="opennamu_clearfix"></div>` + comment_data

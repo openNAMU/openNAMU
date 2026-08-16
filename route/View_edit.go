@@ -50,7 +50,11 @@ func View_edit(config tool.Config, doc_name string, load_doc_name string) string
 		doc_name,
 		form_data,
 		[]any{"(" + tool.Get_language(db, "edit", true) + ")"},
-		[][]any{},
+		[][]any{
+			{"w/" + tool.Url_parser(doc_name), tool.Get_language(db, "return", true)},
+			{"delete/" + tool.Url_parser(doc_name), tool.Get_language(db, "delete", true)},
+			{"move/" + tool.Url_parser(doc_name), tool.Get_language(db, "move", true)},
+		},
 		map[string]string{},
 	)
 
