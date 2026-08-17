@@ -41,7 +41,7 @@ func View_user_safe(config tool.Config, user_name string) string {
 		user_name = config.IP
 	}
 
-	body := `<h2>` + tool.Get_language(db, "state", true) + `</h2><div>` + tool.IP_parser(db, user_name, config.IP) + `</div>`
+	body := `<h2>` + tool.Get_language(db, "state", true) + `</h2><div id="opennamu_get_user_info">` + tool.HTML_escape(user_name) + `</div>`
 	if is_self {
 		alarm_count := "0"
 		tool.QueryRow_DB(db, "select count(*) from user_notice where name = ? and readme = ''", []any{&alarm_count}, config.IP)
