@@ -56,6 +56,7 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 		class_name := ""
 		if in_data["pinned"] == "1" {
 			class_name = "opennamu_comment_color_red"
+			left = "<strong>" + left + "</strong>"
 		}
 
 		bottom := ""

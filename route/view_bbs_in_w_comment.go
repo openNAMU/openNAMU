@@ -44,6 +44,10 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	var re = regexp.MustCompile(`^[0-9]+-[0-9]+-`)
 
 	for _, v := range data_api_in {
+		if v["comment"] == "" {
+			continue
+		}
+
 		code_id := v["id"] + "-" + v["code"]
 		code_id = re.ReplaceAllString(code_id, "")
 
