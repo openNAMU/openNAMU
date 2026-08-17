@@ -21,5 +21,5 @@ func View_list_user(config tool.Config) string {
 		}
 	}
 	rows.Close()
-	return list_extra_page(db, config, tool.Get_language(db, "user_list", true), body.String())
+	return list_extra_page(db, config, tool.Get_language(db, "member_list", true), body.String())
 }

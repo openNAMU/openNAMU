@@ -26,5 +26,5 @@ func View_list_user_page(config tool.Config, page string) string {
 	}
 	rows.Close()
 	body.WriteString(tool.Get_page_control(db, page_num, count, 50, "/list/user/{}"))
-	return list_extra_page(db, config, tool.Get_language(db, "user_list", true), body.String())
+	return list_extra_page(db, config, tool.Get_language(db, "member_list", true), body.String())
 }

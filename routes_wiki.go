@@ -41,7 +41,7 @@ func register_wiki_routes(r *gin.Engine) {
 	})
 
 	r.GET("/upload", func(c *gin.Context) {
-		route_data := route.View_edit_file_upload(make_route_config(c))
+		route_data := route.View_edit_file_upload(make_route_config(c), c.Query("name"))
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
