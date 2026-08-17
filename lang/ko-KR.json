@@ -547,6 +547,7 @@
     "bbs_main": "게시판 메인",
     "bbs_name": "게시판 이름",
     "bbs_prefix": "말머리",
+    "tag": "태그",
     "bbs_make": "게시판 생성",
     "order": "순번",
     "comment_base": "댓글 기반",

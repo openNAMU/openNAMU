@@ -48,6 +48,21 @@ func bbs_prefix_check(db *sql.DB, set_id string, prefix string) string {
 	return ""
 }
 
+func bbs_tag_list(data string) []string {
+	data = strings.ReplaceAll(data, "\r", "")
+	data = strings.ReplaceAll(data, "\n", ",")
+
+	tag_list := []string{}
+	for _, tag := range strings.Split(data, ",") {
+		tag = strings.TrimSpace(tag)
+		if tag != "" && !tool.Arr_in_str(tag_list, tag) {
+			tag_list = append(tag_list, tag)
+		}
+	}
+
+	return tag_list
+}
+
 func bbs_set_select(db *sql.DB, name string, selected string, values []string) string {
 	data := `<select name="` + tool.HTML_escape(name) + `">`
 	for _, value := range values {

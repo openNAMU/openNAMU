@@ -36,6 +36,11 @@ func Api_bbs_w(config tool.Config, set_id string, set_code string) map[string]an
 
 			data_list["user_id"] = ip_pre
 			data_list["user_id_render"] = ip_render
+		} else if set_name == "tag" {
+			if data_list["tags"] != "" {
+				data_list["tags"] += ", "
+			}
+			data_list["tags"] += set_data
 		} else {
 			data_list[set_name] = set_data
 		}

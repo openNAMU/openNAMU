@@ -46,6 +46,7 @@ func register_bbs_routes(r *gin.Engine) {
 			c.PostForm("title"),
 			c.PostForm("content"),
 			c.PostForm("prefix"),
+			c.PostForm("tags"),
 			captcha_response(c),
 		)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
@@ -65,6 +66,7 @@ func register_bbs_routes(r *gin.Engine) {
 			c.PostForm("title"),
 			c.PostForm("content"),
 			c.PostForm("prefix"),
+			c.PostForm("tags"),
 			captcha_response(c),
 		)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
@@ -88,6 +90,7 @@ func register_bbs_routes(r *gin.Engine) {
 			c.Param("comment_code"),
 			c.PostForm("title"),
 			c.PostForm("content"),
+			"",
 			"",
 			captcha_response(c),
 		)

@@ -99,6 +99,14 @@ func Api_bbs(config tool.Config, bbs_num string, page string) map[string]any {
 					temp_data["user_id_render"] = ip_render
 				}
 
+				if set_name == "tag" {
+					if temp_data["tags"] != "" {
+						temp_data["tags"] += ", "
+					}
+					temp_data["tags"] += set_data
+					continue
+				}
+
 				if set_name != "data" && set_name != "pinned" {
 					temp_data[set_name] = set_data
 				}

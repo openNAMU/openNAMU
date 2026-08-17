@@ -34,6 +34,7 @@ func Api_bbs_w_edit_view(config tool.Config, set_id string, set_code string, com
 		"title":  "",
 		"data":   "",
 		"prefix": "",
+		"tags":   "",
 	}
 
 	if comment_code != "" {
@@ -155,6 +156,21 @@ func Api_bbs_w_edit_view(config tool.Config, set_id string, set_code string, com
 		set_code,
 	)
 	data["prefix"] = prefix
+	rows := tool.Query_DB(
+		db,
+		"select set_data from bbs_data where set_name = 'tag' and set_id = ? and set_code = ?",
+		set_id,
+		set_code,
+	)
+	tag_list := []string{}
+	for rows.Next() {
+		var tag string
+		if rows.Scan(&tag) == nil {
+			tag_list = append(tag_list, tag)
+		}
+	}
+	rows.Close()
+	data["tags"] = strings.Join(tag_list, ", ")
 	return_data["response"] = "ok"
 	return_data["data"] = data
 
