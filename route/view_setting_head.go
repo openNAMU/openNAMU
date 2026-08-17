@@ -7,19 +7,6 @@ import (
 	"opennamu/route/tool"
 )
 
-func setting_head_info(kind string, skin_name string) (string, string, string, string, bool) {
-	switch kind {
-	case "body/top":
-		return "body", "", "main_body", "/setting/body/top", true
-	case "body/bottom":
-		return "bottom_body", "", "main_bottom_body", "/setting/body/bottom", true
-	case "head":
-		return "head", skin_name, "main_head", "/setting/head", true
-	default:
-		return "", "", "", "", false
-	}
-}
-
 func View_setting_head(config tool.Config, kind string, skin_name string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
@@ -36,43 +23,17 @@ func View_setting_head(config tool.Config, kind string, skin_name string) string
 	return view_setting_head_data(db, config, kind, skin_name, name, coverage, title_key, action, setting_value(db, name, coverage, ""), "", false)
 }
 
-func View_setting_head_post(config tool.Config, kind string, skin_name string, content string) string {
-	db := tool.DB_connect()
-	defer tool.DB_close(db)
-
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
-		return tool.Get_error_page(db, config, "auth")
+func setting_head_info(kind string, skin_name string) (string, string, string, string, bool) {
+	switch kind {
+	case "body/top":
+		return "body", "", "main_body", "/setting/body/top", true
+	case "body/bottom":
+		return "bottom_body", "", "main_bottom_body", "/setting/body/bottom", true
+	case "head":
+		return "head", skin_name, "main_head", "/setting/head", true
+	default:
+		return "", "", "", "", false
 	}
-
-	name, coverage, _, action, ok := setting_head_info(kind, skin_name)
-	if !ok {
-		return tool.Get_error_page(db, config, "error")
-	}
-
-	setting_save_value(db, name, coverage, content)
-	tool.Do_insert_auth_history(db, config.IP, "edit_set ("+name+")")
-
-	if skin_name != "" {
-		action += "/" + tool.Url_parser(skin_name)
-	}
-
-	return tool.Get_redirect(action)
-}
-
-func View_setting_head_preview(config tool.Config, kind string, content string) string {
-	db := tool.DB_connect()
-	defer tool.DB_close(db)
-
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
-		return tool.Get_error_page(db, config, "auth")
-	}
-
-	name, coverage, title_key, action, ok := setting_head_info(kind, "")
-	if !ok || (kind != "body/top" && kind != "body/bottom") {
-		return tool.Get_error_page(db, config, "error")
-	}
-
-	return view_setting_head_data(db, config, kind, "", name, coverage, title_key, action, setting_value(db, name, coverage, ""), content, true)
 }
 
 func view_setting_head_data(db *sql.DB, config tool.Config, kind string, skin_name string, name string, coverage string, title_key string, action string, value string, preview string, is_preview bool) string {

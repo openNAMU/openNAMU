@@ -15,6 +15,10 @@ func Get_skin_route(skin_name string, route string) string {
 	return filepath.ToSlash(filepath.Join(skin_name, route))
 }
 
+func Get_use_skin_name(db *sql.DB, ip string) string {
+	return Get_use_skin_name_session(db, ip, nil)
+}
+
 func Get_template_set(skin_name string) map[string]string {
 	data, err := Read_view_file(Get_skin_route(skin_name, "set.json"))
 	if err == nil {
@@ -62,10 +66,6 @@ func Get_use_skin_name_session(db *sql.DB, ip string, session sessions.Session) 
 	}
 
 	return skin
-}
-
-func Get_use_skin_name(db *sql.DB, ip string) string {
-	return Get_use_skin_name_session(db, ip, nil)
 }
 
 func Get_template(db *sql.DB, config Config, name string, data string, other []any, menu [][]any, option map[string]string) string {

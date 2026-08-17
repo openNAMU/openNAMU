@@ -12,6 +12,10 @@ import (
 	"opennamu/route/tool/markup"
 )
 
+func Api_file_upload_post(config tool.Config, file_name string, file_data string, file_ext string) map[string]any {
+	return api_file_upload_post(config, file_name, file_data, file_ext, "direct_input", "", "", false)
+}
+
 func api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string, ip string) bool {
 	if db == nil {
 		return false
@@ -24,14 +28,6 @@ func api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string,
 	tool.Do_add_history(db, doc_name, doc_data, tool.Get_time(), ip, "", "0", "upload", "")
 
 	return true
-}
-
-func Api_file_upload_post(config tool.Config, file_name string, file_data string, file_ext string) map[string]any {
-	return api_file_upload_post(config, file_name, file_data, file_ext, "direct_input", "", "", false)
-}
-
-func Api_file_upload_post_secure(config tool.Config, file_name string, file_data string, file_ext string, license string, license_text string, captcha string) map[string]any {
-	return api_file_upload_post(config, file_name, file_data, file_ext, license, license_text, captcha, true)
 }
 
 func api_file_upload_post(config tool.Config, file_name string, file_data string, file_ext string, license string, license_text string, captcha string, check_captcha bool) map[string]any {

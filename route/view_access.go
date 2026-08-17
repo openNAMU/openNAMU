@@ -1,6 +1,8 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"opennamu/route/tool"
+)
 
 func View_wiki_access(config tool.Config) string {
 	db := tool.DB_connect()

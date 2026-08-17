@@ -5,6 +5,43 @@ import (
 	"opennamu/route/tool"
 )
 
+func Api_user_setting_skin_set_main_post(config tool.Config, user_set_list map[string]string) map[string]any {
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
+
+	return_data := make(map[string]any)
+
+	if tool.IP_or_user(config.IP) {
+		return_data["response"] = "require auth"
+
+		return return_data
+	}
+
+	return_data["response"] = "ok"
+
+	set_list := Get_main_skin_set_list(db)
+	for k := range set_list {
+		if val, ok := user_set_list[k]; ok {
+			tool.Exec_DB(
+				db,
+				"delete from user_set where id = ? and name = ? and data = ?",
+				config.IP,
+				k,
+				val,
+			)
+			tool.Exec_DB(
+				db,
+				"insert into user_set (name, id, data) values (?, ?, ?)",
+				k,
+				config.IP,
+				val,
+			)
+		}
+	}
+
+	return return_data
+}
+
 func Get_main_skin_set_list(db *sql.DB) map[string][][]string {
 	need_keys := []string{
 		"default", "off", "change_to_normal", "delete", "use",
@@ -140,41 +177,4 @@ func Get_main_skin_set_list(db *sql.DB) map[string][][]string {
 	}
 
 	return set_list
-}
-
-func Api_user_setting_skin_set_main_post(config tool.Config, user_set_list map[string]string) map[string]any {
-	db := tool.DB_connect()
-	defer tool.DB_close(db)
-
-	return_data := make(map[string]any)
-
-	if tool.IP_or_user(config.IP) {
-		return_data["response"] = "require auth"
-
-		return return_data
-	}
-
-	return_data["response"] = "ok"
-
-	set_list := Get_main_skin_set_list(db)
-	for k := range set_list {
-		if val, ok := user_set_list[k]; ok {
-			tool.Exec_DB(
-				db,
-				"delete from user_set where id = ? and name = ? and data = ?",
-				config.IP,
-				k,
-				val,
-			)
-			tool.Exec_DB(
-				db,
-				"insert into user_set (name, id, data) values (?, ?, ?)",
-				k,
-				config.IP,
-				val,
-			)
-		}
-	}
-
-	return return_data
 }

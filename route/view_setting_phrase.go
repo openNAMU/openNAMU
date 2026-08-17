@@ -7,6 +7,23 @@ import (
 	"opennamu/route/tool"
 )
 
+func View_setting_phrase(config tool.Config) string {
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
+
+	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
+	fields := setting_phrase_fields()
+	values := make([]setting_field, 0, len(fields))
+	for _, field := range fields {
+		values = append(values, setting_field{name: field.name})
+	}
+
+	return view_setting_phrase_data(db, config, setting_load_fields(db, values))
+}
+
 type setting_phrase_field struct {
 	name       string
 	label      string
@@ -51,40 +68,6 @@ func setting_phrase_fields() []setting_phrase_field {
 		{name: "delete_bottom_text", label: "delete_bottom_text"},
 		{name: "revert_bottom_text", label: "revert_bottom_text"},
 	}
-}
-
-func View_setting_phrase(config tool.Config) string {
-	db := tool.DB_connect()
-	defer tool.DB_close(db)
-
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
-		return tool.Get_error_page(db, config, "auth")
-	}
-
-	fields := setting_phrase_fields()
-	values := make([]setting_field, 0, len(fields))
-	for _, field := range fields {
-		values = append(values, setting_field{name: field.name})
-	}
-
-	return view_setting_phrase_data(db, config, setting_load_fields(db, values))
-}
-
-func View_setting_phrase_post(config tool.Config, form map[string]string) string {
-	db := tool.DB_connect()
-	defer tool.DB_close(db)
-
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
-		return tool.Get_error_page(db, config, "auth")
-	}
-
-	fields := setting_phrase_fields()
-	for _, field := range fields {
-		setting_save_value(db, field.name, "", setting_form_value(form, field.name, ""))
-	}
-	tool.Do_insert_auth_history(db, config.IP, "edit_set (phrase)")
-
-	return tool.Get_redirect("/setting/phrase")
 }
 
 func view_setting_phrase_data(db *sql.DB, config tool.Config, values map[string]string) string {

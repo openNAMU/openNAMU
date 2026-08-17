@@ -7,77 +7,6 @@ import (
 	"opennamu/route/tool"
 )
 
-type auth_choice struct {
-	level int
-	key   string
-	lang  string
-}
-
-func auth_choices() []auth_choice {
-	return []auth_choice{
-		{1, "owner", "owner_authority"},
-		{1, "user", "user_authority"},
-		{2, "captcha_pass", "captcha_pass_authority"},
-		{2, "ip", "ip_authority"},
-		{3, "document", "document_authority"},
-		{4, "edit", "edit_authority"},
-		{4, "move", "move_authority"},
-		{4, "new_make", "new_make_authority"},
-		{4, "delete", "delete_authority"},
-		{4, "view", "view_authority"},
-		{3, "discuss", "discuss_authority"},
-		{4, "discuss_make_new_thread", "discuss_make_new_thread_authority"},
-		{4, "discuss_view", "discuss_view_authority"},
-		{3, "upload", "upload_authority"},
-		{3, "vote", "vote_authority"},
-		{3, "bbs_use", "bbs_authority"},
-		{4, "bbs_edit", "bbs_edit_authority"},
-		{4, "bbs_comment", "bbs_comment_authority"},
-		{4, "bbs_view", "bbs_view_authority"},
-		{3, "captcha_one_check_five_pass", "captcha_one_check_five_pass_authority"},
-		{3, "edit_filter_view", "edit_filter_view_authority"},
-		{1, "admin", "admin_authority"},
-		{2, "ban", "ban_authority"},
-		{2, "toron", "discussion_authority"},
-		{2, "check", "user_analyze_authority"},
-		{2, "view_user_watchlist", "view_user_watchlist_authority"},
-		{2, "acl", "document_acl_authority"},
-		{2, "hidel", "history_hide_authority"},
-		{2, "give", "authorization_authority"},
-		{2, "bbs", "bbs_management_authority"},
-		{2, "vote_fix", "vote_management_authority"},
-		{2, "admin_default_feature", "admin_default_feature_authority"},
-		{3, "doc_watch_list_view", "doc_watch_list_view_authority"},
-		{3, "treat_as_admin", "treat_as_admin_authority"},
-		{3, "view_hide_user_name", "view_hide_user_name_authority"},
-		{3, "user_name_bold", "user_name_bold_authority"},
-		{3, "multiple_upload", "multiple_upload_authority"},
-		{3, "slow_edit_pass", "slow_edit_pass_authority"},
-		{3, "edit_bottom_compulsion_pass", "edit_bottom_compulsion_pass_authority"},
-		{3, "edit_filter_pass", "edit_filter_pass_authority"},
-		{3, "nothing", "nothing_authority"},
-	}
-}
-
-func View_auth_list(config tool.Config) string {
-	db := tool.DB_connect()
-	defer tool.DB_close(db)
-
-	can_edit := tool.Check_acl(db, "", "", "owner_auth", config.IP)
-	default_groups := map[string]bool{"owner": true, "user": true, "ip": true, "ban": true}
-	data := `<ul>`
-	for _, group := range auth_groups(db) {
-		data += `<li><a href="/auth/list/add/` + tool.Url_parser(group) + `">` + tool.HTML_escape(group) + `</a>`
-		if can_edit && !default_groups[group] {
-			data += ` <a href="/auth/list/delete/` + tool.Url_parser(group) + `">(` + tool.Get_language(db, "delete", true) + `)</a>`
-		}
-		data += `</li>`
-	}
-	data += `</ul><hr class="main_hr"><a href="/auth/list/add">(` + tool.Get_language(db, "add", true) + `)</a>`
-
-	return tool.Get_template(db, config, tool.Get_language(db, "admin_group_list", true), data, []any{}, [][]any{{"manager", tool.Get_language(db, "return", true)}}, map[string]string{})
-}
-
 func View_auth_group(config tool.Config, name string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
@@ -132,27 +61,54 @@ func View_auth_group(config tool.Config, name string, values url.Values) string 
 	return tool.Get_template(db, config, name, data, []any{"(" + tool.Get_language(db, "admin_group", true) + ")"}, [][]any{{"auth/list", tool.Get_language(db, "return", true)}}, map[string]string{})
 }
 
-func View_auth_group_delete(config tool.Config, name string, values url.Values) string {
-	db := tool.DB_connect()
-	defer tool.DB_close(db)
+type auth_choice struct {
+	level int
+	key   string
+	lang  string
+}
 
-	default_groups := map[string]bool{"owner": true, "user": true, "ip": true, "ban": true}
-	if default_groups[name] {
-		return tool.Get_redirect("/auth/list")
+func auth_choices() []auth_choice {
+	return []auth_choice{
+		{1, "owner", "owner_authority"},
+		{1, "user", "user_authority"},
+		{2, "captcha_pass", "captcha_pass_authority"},
+		{2, "ip", "ip_authority"},
+		{3, "document", "document_authority"},
+		{4, "edit", "edit_authority"},
+		{4, "move", "move_authority"},
+		{4, "new_make", "new_make_authority"},
+		{4, "delete", "delete_authority"},
+		{4, "view", "view_authority"},
+		{3, "discuss", "discuss_authority"},
+		{4, "discuss_make_new_thread", "discuss_make_new_thread_authority"},
+		{4, "discuss_view", "discuss_view_authority"},
+		{3, "upload", "upload_authority"},
+		{3, "vote", "vote_authority"},
+		{3, "bbs_use", "bbs_authority"},
+		{4, "bbs_edit", "bbs_edit_authority"},
+		{4, "bbs_comment", "bbs_comment_authority"},
+		{4, "bbs_view", "bbs_view_authority"},
+		{3, "captcha_one_check_five_pass", "captcha_one_check_five_pass_authority"},
+		{3, "edit_filter_view", "edit_filter_view_authority"},
+		{1, "admin", "admin_authority"},
+		{2, "ban", "ban_authority"},
+		{2, "toron", "discussion_authority"},
+		{2, "check", "user_analyze_authority"},
+		{2, "view_user_watchlist", "view_user_watchlist_authority"},
+		{2, "acl", "document_acl_authority"},
+		{2, "hidel", "history_hide_authority"},
+		{2, "give", "authorization_authority"},
+		{2, "bbs", "bbs_management_authority"},
+		{2, "vote_fix", "vote_management_authority"},
+		{2, "admin_default_feature", "admin_default_feature_authority"},
+		{3, "doc_watch_list_view", "doc_watch_list_view_authority"},
+		{3, "treat_as_admin", "treat_as_admin_authority"},
+		{3, "view_hide_user_name", "view_hide_user_name_authority"},
+		{3, "user_name_bold", "user_name_bold_authority"},
+		{3, "multiple_upload", "multiple_upload_authority"},
+		{3, "slow_edit_pass", "slow_edit_pass_authority"},
+		{3, "edit_bottom_compulsion_pass", "edit_bottom_compulsion_pass_authority"},
+		{3, "edit_filter_pass", "edit_filter_pass_authority"},
+		{3, "nothing", "nothing_authority"},
 	}
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
-		return tool.Get_error_page(db, config, "auth")
-	}
-	if values != nil {
-		used := ""
-		if tool.QueryRow_DB(db, "select id from user_set where name = 'acl' and data = ? limit 1", []any{&used}, name) {
-			return tool.Get_error_page(db, config, "error")
-		}
-		tool.Exec_DB(db, "delete from alist where name = ?", name)
-		tool.Do_insert_auth_history(db, config.IP, "auth_group_delete ("+name+")")
-		return tool.Get_redirect("/auth/list")
-	}
-
-	data := `<form method="post"><button type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
-	return tool.Get_template(db, config, tool.Get_language(db, "delete_admin_group", true), data, []any{"(" + tool.HTML_escape(name) + ")"}, [][]any{{"auth/list", tool.Get_language(db, "return", true)}}, map[string]string{})
 }

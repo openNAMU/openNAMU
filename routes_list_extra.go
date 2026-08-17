@@ -23,19 +23,19 @@ func register_list_extra_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_no_link_page(make_route_config(c), "1")))
 	})
 	r.GET("/list/file", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_file_page(make_route_config(c), "1", false)))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_file_page(make_route_config(c), "1")))
 	})
 	r.GET("/list/image", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_file_page(make_route_config(c), "1", true)))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_image_page(make_route_config(c), "1")))
 	})
 	r.GET("/list/user", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_user_page(make_route_config(c), "1")))
 	})
 	r.GET("/list/admin", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_admin_page(make_route_config(c), "1", false, "")))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_admin_page(make_route_config(c), "1")))
 	})
 	r.GET("/list/admin/auth_use", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_admin_page(make_route_config(c), "1", true, "")))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_admin_auth_use_page(make_route_config(c), "1", "")))
 	})
 	r.GET("/list/user/check_submit/:user_name", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_user_check_submit(make_route_config(c), c.Param("user_name"))))

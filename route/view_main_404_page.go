@@ -1,21 +1,8 @@
 package route
 
-import "opennamu/route/tool"
-
-func Get_frontpage_url() string {
-	db := tool.DB_connect()
-	defer tool.DB_close(db)
-
-	frontpage := "FrontPage"
-
-	tool.QueryRow_DB(
-		db,
-		`select data from other where name = "frontpage"`,
-		[]any{&frontpage},
-	)
-
-	return "/w/" + tool.Url_parser(frontpage)
-}
+import (
+	"opennamu/route/tool"
+)
 
 func View_main_404_page(config tool.Config, url string) string {
 	if url == "/" {
@@ -74,4 +61,19 @@ func View_main_404_page(config tool.Config, url string) string {
 	}
 
 	return data_html
+}
+
+func Get_frontpage_url() string {
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
+
+	frontpage := "FrontPage"
+
+	tool.QueryRow_DB(
+		db,
+		`select data from other where name = "frontpage"`,
+		[]any{&frontpage},
+	)
+
+	return "/w/" + tool.Url_parser(frontpage)
 }

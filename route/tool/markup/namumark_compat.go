@@ -348,6 +348,7 @@ var namumark_compat_single_macro_regex = regexp.MustCompile(`(?is)\[([a-zA-Z가-
 
 var namumark_compat_heading_regex = regexp.MustCompile(`(?s)<h([1-6])><a href="#toc">([0-9.]+)\. </a>(.*?)</h[1-6]>`)
 var namumark_compat_toc_regex = regexp.MustCompile(`(?s)<div class="opennamu_TOC" id="toc">.*?</div>`)
+
 var namumark_compat_bold_regex = regexp.MustCompile(`(?s)<b>(.*?)</b>`)
 var namumark_compat_strike_regex = regexp.MustCompile(`(?s)<s>(.*?)</s>`)
 

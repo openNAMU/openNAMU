@@ -1,0 +1,42 @@
+package route
+
+import "opennamu/route/tool"
+
+func View_thread_comment_tool(config tool.Config, topic_num string, comment_num string) string {
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
+
+	if !tool.Check_acl(db, "", topic_num, "topic_view", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
+	block := ""
+	ip := ""
+	date := ""
+	if !tool.QueryRow_DB(
+		db,
+		"select block, ip, date from topic where code = ? and id = ?",
+		[]any{&block, &ip, &date},
+		topic_num,
+		comment_num,
+	) {
+		return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
+	}
+
+	data := `<h2>` + tool.Get_language(db, "state", true) + `</h2><ul><li>` + tool.Get_language(db, "writer", true) + ` : ` + tool.IP_parser(db, ip, config.IP) + `</li><li>` + tool.Get_language(db, "time", true) + ` : ` + tool.HTML_escape(date) + `</li></ul>`
+	data += `<h2>` + tool.Get_language(db, "other_tool", true) + `</h2><ul><li><a href="/thread/` + tool.Url_parser(topic_num) + `/comment/` + tool.Url_parser(comment_num) + `/raw">` + tool.Get_language(db, "raw", true) + `</a></li></ul>`
+
+	if tool.Check_acl(db, "", "", "toron_auth", config.IP) {
+		data += `<h2>` + tool.Get_language(db, "admin_tool", true) + `</h2><ul><li><a href="/auth/ban/` + tool.Url_parser(ip) + `">` + tool.Get_language(db, "ban", true) + ` | ` + tool.Get_language(db, "release", true) + `</a></li><li><a href="/thread/` + tool.Url_parser(topic_num) + `/comment/` + tool.Url_parser(comment_num) + `/blind">` + tool.Get_language(db, "hide", true) + ` | ` + tool.Get_language(db, "hide_release", true) + `</a></li><li><a href="/thread/` + tool.Url_parser(topic_num) + `/comment/` + tool.Url_parser(comment_num) + `/notice">` + tool.Get_language(db, "pinned", true) + ` | ` + tool.Get_language(db, "pinned_release", true) + `</a></li><li><a href="/thread/` + tool.Url_parser(topic_num) + `/comment/` + tool.Url_parser(comment_num) + `/delete">` + tool.Get_language(db, "delete", true) + `</a></li></ul>`
+	}
+
+	return tool.Get_template(
+		db,
+		config,
+		tool.Get_language(db, "discussion_tool", true),
+		data,
+		[]any{"(#" + tool.HTML_escape(comment_num) + ")"},
+		[][]any{{"thread/" + tool.Url_parser(topic_num) + "#" + tool.Url_parser(comment_num), tool.Get_language(db, "return", true)}},
+		map[string]string{},
+	)
+}
