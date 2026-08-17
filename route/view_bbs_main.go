@@ -36,6 +36,9 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 		}
 
 		left := ""
+		if in_data["prefix"] != "" {
+			left += "[" + tool.HTML_escape(in_data["prefix"]) + "] "
+		}
 		left += `<a href="/bbs/w/` + bbs_id + `/` + bbs_code + `">` + tool.HTML_escape(bbs_title) + `</a>`
 
 		if bbs_name != "" {

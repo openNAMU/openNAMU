@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, comment_code string, title string, data string) map[string]any {
+func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, comment_code string, title string, data string, prefix string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -116,6 +116,8 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 		return return_data
 	}
 
+	prefix = bbs_prefix_check(db, set_id, prefix)
+
 	if set_code == "" {
 		last_code := ""
 		tool.QueryRow_DB(
@@ -133,6 +135,9 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 			{"data", data},
 			{"date", date},
 			{"user_id", config.IP},
+		}
+		if prefix != "" {
+			insert_db = append(insert_db, []string{"prefix", prefix})
 		}
 		for _, v := range insert_db {
 			tool.Exec_DB(
@@ -196,6 +201,10 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'title' and set_code = ? and set_id = ?", title, set_code, set_id)
 	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'data' and set_code = ? and set_id = ?", data, set_code, set_id)
 	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_code = ? and set_id = ?", date, set_code, set_id)
+	tool.Exec_DB(db, "delete from bbs_data where set_name = 'prefix' and set_code = ? and set_id = ?", set_code, set_id)
+	if prefix != "" {
+		tool.Exec_DB(db, "insert into bbs_data (set_name, set_code, set_id, set_data) values ('prefix', ?, ?, ?)", set_code, set_id, prefix)
+	}
 
 	return_data["response"] = "ok"
 	return_data["data"] = set_code

@@ -25,10 +25,14 @@ func View_bbs_in_w(c *gin.Context, config tool.Config, set_id string, set_code s
 
 	post_data := get_render_setting_css(db, config) + Get_bbs_render(db, set_id, data_api_in["data"], "bbs", config)
 	post_data = render_topic_reference(post_data, set_code, set_id, set_code, "bbs")
+	post_title := tool.HTML_escape(data_api_in["title"])
+	if data_api_in["prefix"] != "" {
+		post_title = "[" + tool.HTML_escape(data_api_in["prefix"]) + "] " + post_title
+	}
 
 	data_html := `
         <div class="opennamu_bbs_w_post_tab">
-            <big><big><big>` + tool.HTML_escape(data_api_in["title"]) + `</big></big></big>
+            <big><big><big>` + post_title + `</big></big></big>
             <hr class="main_hr">
             ` + data_api_in["user_id_render"] + ` <span style="float: right;">` + data_api_in["date"] + `</span>
             <hr>

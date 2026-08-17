@@ -3,6 +3,7 @@ package route
 import (
 	"database/sql"
 	"net/url"
+	"strings"
 
 	"opennamu/route/tool"
 	"opennamu/route/tool/markup"
@@ -25,6 +26,26 @@ func bbs_set_value(db *sql.DB, set_id string, set_name string) string {
 		set_name,
 	)
 	return value
+}
+
+func bbs_prefix_list(db *sql.DB, set_id string) []string {
+	value := strings.ReplaceAll(bbs_set_value(db, set_id, "bbs_prefix"), "\r", "")
+	prefix_list := []string{}
+	for _, prefix := range strings.Split(value, "\n") {
+		prefix = strings.TrimSpace(prefix)
+		if prefix != "" && !tool.Arr_in_str(prefix_list, prefix) {
+			prefix_list = append(prefix_list, prefix)
+		}
+	}
+	return prefix_list
+}
+
+func bbs_prefix_check(db *sql.DB, set_id string, prefix string) string {
+	prefix = strings.TrimSpace(prefix)
+	if tool.Arr_in_str(bbs_prefix_list(db, set_id), prefix) {
+		return prefix
+	}
+	return ""
 }
 
 func bbs_set_select(db *sql.DB, name string, selected string, values []string) string {
@@ -60,6 +81,7 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 		}
 		Api_bbs_w_set_put(config, set_id, "bbs_markup", values.Get("bbs_markup"), "")
 		Api_bbs_w_set_put(config, set_id, "bbs_name", values.Get("bbs_name"), "")
+		Api_bbs_w_set_put(config, set_id, "bbs_prefix", values.Get("bbs_prefix"), "")
 		return tool.Get_redirect("/bbs/set/" + tool.Url_parser(set_id))
 	}
 
@@ -76,6 +98,8 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 	data += bbs_set_select(db, "bbs_markup", bbs_set_value(db, set_id, "bbs_markup"), markup_values)
 	data += `<hr class="main_hr"><h3>` + tool.Get_language(db, "bbs_name", true) + `</h3>`
 	data += `<input name="bbs_name" value="` + tool.HTML_escape(bbs_name) + `"><hr class="main_hr">`
+	data += "<h3>" + tool.Get_language(db, "bbs_prefix", true) + "</h3>"
+	data += "<textarea class=\"opennamu_textarea_100\" name=\"bbs_prefix\">" + tool.HTML_escape(bbs_set_value(db, set_id, "bbs_prefix")) + "</textarea><hr class=\"main_hr\">"
 	data += `<button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 
 	return tool.Get_template(

@@ -353,6 +353,7 @@
     "bbs": "BBS",
     "bbs_main": "BBS main",
     "bbs_name": "BBS name",
+    "bbs_prefix": "Post prefix",
     "bbs_make": "Create BBS",
     "order": "Order",
     "comment_base": "Comment based",

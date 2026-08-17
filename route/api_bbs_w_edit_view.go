@@ -31,8 +31,9 @@ func Api_bbs_w_edit_view(config tool.Config, set_id string, set_code string, com
 	}
 
 	data := map[string]string{
-		"title": "",
-		"data":  "",
+		"title":  "",
+		"data":   "",
+		"prefix": "",
 	}
 
 	if comment_code != "" {
@@ -145,6 +146,15 @@ func Api_bbs_w_edit_view(config tool.Config, set_id string, set_code string, com
 
 	data["title"] = title
 	data["data"] = content
+	prefix := ""
+	tool.QueryRow_DB(
+		db,
+		"select set_data from bbs_data where set_name = 'prefix' and set_id = ? and set_code = ?",
+		[]any{&prefix},
+		set_id,
+		set_code,
+	)
+	data["prefix"] = prefix
 	return_data["response"] = "ok"
 	return_data["data"] = data
 
