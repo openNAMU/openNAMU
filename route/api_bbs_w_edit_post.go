@@ -118,6 +118,23 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 
 	prefix = bbs_prefix_check(db, set_id, prefix)
 	tag_list := bbs_tag_list(tags)
+	if tool.Get_len(title) > bbs_title_max_length {
+		return_data["response"] = "error"
+		return_data["data"] = "bbs title length"
+
+		return return_data
+	}
+
+	tag_length := 0
+	for _, tag := range tag_list {
+		tag_length += tool.Get_len(tag)
+	}
+	if tag_length > bbs_tag_max_length {
+		return_data["response"] = "error"
+		return_data["data"] = "bbs tag length"
+
+		return return_data
+	}
 
 	if set_code == "" {
 		last_code := ""

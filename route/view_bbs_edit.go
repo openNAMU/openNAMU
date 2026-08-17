@@ -61,7 +61,7 @@ func View_bbs_edit(config tool.Config, set_id string, set_code string, comment_c
 
 	data_html := `<a href="/filter/edit_filter">(` + tool.Get_language(db, "edit_filter_rule", true) + `)</a><hr class="main_hr">
         <form action="` + path + `" method="post">
-            <input class="__ON_INPUT__"` + title_style + ` placeholder="` + tool.Get_language(db, "title", true) + `" name="title" value="` + tool.HTML_escape(data["title"]) + `">
+            <input class="__ON_INPUT__"` + title_style + ` maxlength="128" placeholder="` + tool.Get_language(db, "title", true) + `" name="title" value="` + tool.HTML_escape(data["title"]) + `">
             <hr` + title_style + ` class="main_hr">
             ` + prefix_html + tag_html + tool.Get_editor_ui(db, config, data["data"], "bbs", "", "") + `
         </form>`
