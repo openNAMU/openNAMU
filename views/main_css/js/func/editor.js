@@ -4,24 +4,14 @@ function do_insert_data(data) {
     const name = 'opennamu_edit_textarea';
 
     if(get_select_editor() === 'textarea') {
-        // https://stackoverflow.com/questions/11076975/insert-text-into-textarea-at-cursor-position-javascript
-        if(document.selection) {
-            document.getElementById(name).focus();
+        let textarea = document.getElementById(name);
+        textarea.focus();
 
-            let sel = document.selection.createRange();
-            sel.text = data;
-        } else if(
-            document.getElementById(name).selectionStart || 
-            document.getElementById(name).selectionStart === '0'
-        ) {
-            let startPos = document.getElementById(name).selectionStart;
-            let endPos = document.getElementById(name).selectionEnd;
-            let myPos = document.getElementById(name).value;
+        let startPos = textarea.selectionStart;
+        let endPos = textarea.selectionEnd;
+        let myPos = textarea.value;
 
-            document.getElementById(name).value = myPos.substring(0, startPos) + data + myPos.substring(endPos, myPos.length);
-        } else {
-            document.getElementById(name).value += data;
-        }
+        textarea.value = myPos.substring(0, startPos) + data + myPos.substring(endPos, myPos.length);
     } else {
         let selection = editor.getSelection();
         let id = { major: 1, minor: 1 };             

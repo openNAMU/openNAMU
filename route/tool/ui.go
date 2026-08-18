@@ -284,7 +284,6 @@ func Get_wiki_css(data []any, cookies string) []any {
 
 	// Func JS
 	data_css += `<script defer src="/views/main_css/js/func/func.js` + data_css_ver + `"></script>`
-	data_css += `<script defer src="/views/main_css/js/func/ie_end_of_life.js` + data_css_ver + `"></script>`
 	data_css += `<script defer src="/views/main_css/js/func/shortcut.js` + data_css_ver + `"></script>`
 	data_css += `<script defer src="/views/main_css/js/func/editor.js` + data_css_ver + `"></script>`
 
