@@ -64,7 +64,7 @@ func bbs_tag_list(data string) []string {
 }
 
 const bbs_title_max_length = 128
-const bbs_tag_max_length = 32
+const bbs_tag_max_length = 64
 
 func bbs_set_select(db *sql.DB, name string, selected string, values []string) string {
 	data := `<select name="` + tool.HTML_escape(name) + `">`

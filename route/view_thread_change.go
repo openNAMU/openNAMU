@@ -26,6 +26,12 @@ func View_thread_change(config tool.Config, topic_num string, values url.Values)
 		if new_sub == "" {
 			new_sub = sub
 		}
+		if !tool.Do_title_length_check(db, new_title, "document") {
+			return tool.Get_error_page(db, config, "title length")
+		}
+		if !tool.Do_title_length_check(db, new_sub, "topic") {
+			return tool.Get_error_page(db, config, "topic title length")
+		}
 		tool.Exec_DB(db, "update rd set title = ?, sub = ?, date = ? where code = ?", new_title, new_sub, tool.Get_time(), topic_num)
 		thread_add(db, topic_num, thread_next_id(db, topic_num), tool.Get_language(db, "topic_name_change", true)+" : "+sub+" ("+title+") → "+new_sub+" ("+new_title+")", config.IP, "1")
 		tool.Do_insert_auth_history(db, config.IP, "change_topic_name (code "+topic_num+")")

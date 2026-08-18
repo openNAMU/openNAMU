@@ -507,7 +507,7 @@
     "title_max_length": "Documents title maximum length",
     "title_topic_max_length": "Discussions topic maximum length",
     "bbs_title_length_error": "The BBS post title is too long. The maximum is 128 characters.",
-    "bbs_tag_length_error": "The total tag length is too long. The maximum is 32 characters.",
+    "bbs_tag_length_error": "The total tag length is too long. The maximum is 64 characters.",
     "password_min_length": "Password minimum length",
     "set_wiki_access_password_need": "Password required for wiki access",
     "set_wiki_access_password": "Wiki access password",
