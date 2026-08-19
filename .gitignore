@@ -1,4 +1,5 @@
 go.sum
+__pycache__
 
 /bin/*
 !/bin/test

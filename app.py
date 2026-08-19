@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import http.client
 import json
 import os
 import platform
@@ -114,6 +115,132 @@ def run_binary(binary_path, arguments, base_dir):
         os.execv(str(binary_path), command)
 
     return subprocess.call(command, cwd=str(base_dir))
+
+
+def wsgi_request_body(environ):
+    content_length = environ.get("CONTENT_LENGTH", "")
+    if content_length:
+        try:
+            content_length = int(content_length)
+        except ValueError:
+            return b""
+
+        if content_length > 0:
+            return environ["wsgi.input"].read(content_length)
+
+    if environ.get("wsgi.input_terminated"):
+        return environ["wsgi.input"].read()
+
+    return b""
+
+
+def wsgi_path(environ):
+    raw_uri = environ.get("RAW_URI", "")
+    if raw_uri.startswith("/"):
+        return raw_uri
+
+    path = environ.get("PATH_INFO", "/") or "/"
+    path = quote(path, safe="/%:@-._~!$&'()*+,;=")
+    query = environ.get("QUERY_STRING", "")
+    if query:
+        path += "?" + query
+    return path
+
+
+def wsgi_headers(environ, target_host, target_port):
+    headers = {}
+    excluded = {
+        "connection",
+        "content-length",
+        "host",
+        "keep-alive",
+        "proxy-authenticate",
+        "proxy-authorization",
+        "te",
+        "trailer",
+        "transfer-encoding",
+        "upgrade",
+    }
+
+    for key, value in environ.items():
+        if key.startswith("HTTP_"):
+            header_name = key[5:].replace("_", "-")
+        elif key == "CONTENT_TYPE":
+            header_name = "Content-Type"
+        else:
+            continue
+
+        if header_name.lower() not in excluded:
+            headers[header_name] = value
+
+    headers["Host"] = environ.get("HTTP_HOST", target_host + ":" + str(target_port))
+    headers["X-Real-IP"] = environ.get("HTTP_X_REAL_IP", environ.get("REMOTE_ADDR", ""))
+    headers["X-Forwarded-Proto"] = environ.get(
+        "HTTP_X_FORWARDED_PROTO",
+        environ.get("wsgi.url_scheme", "http"),
+    )
+    return headers
+
+
+def wsgi_application(environ, start_response):
+    target_host = os.environ.get("NAMU_WSGI_HOST", "127.0.0.1")
+    target_port = os.environ.get("NAMU_WSGI_PORT", "3000")
+    try:
+        target_port = int(target_port)
+    except ValueError:
+        target_port = 3000
+
+    connection = http.client.HTTPConnection(target_host, target_port, timeout=download_timeout)
+    try:
+        connection.request(
+            environ.get("REQUEST_METHOD", "GET"),
+            wsgi_path(environ),
+            body=wsgi_request_body(environ),
+            headers=wsgi_headers(environ, target_host, target_port),
+        )
+        response = connection.getresponse()
+    except (OSError, http.client.HTTPException) as error:
+        connection.close()
+        body = ("openNAMU backend is not running: " + str(error)).encode("utf-8")
+        start_response(
+            "503 Service Unavailable",
+            [("Content-Type", "text/plain; charset=utf-8"), ("Content-Length", str(len(body)))],
+        )
+        return [body]
+
+    hop_by_hop_headers = {
+        "connection",
+        "keep-alive",
+        "proxy-authenticate",
+        "proxy-authorization",
+        "te",
+        "trailer",
+        "transfer-encoding",
+        "upgrade",
+    }
+    response_headers = [
+        (name, value)
+        for name, value in response.getheaders()
+        if name.lower() not in hop_by_hop_headers
+    ]
+    start_response(str(response.status) + " " + (response.reason or ""), response_headers)
+
+    def response_body():
+        try:
+            while True:
+                data = response.read(download_chunk_size)
+                if not data:
+                    break
+                yield data
+        finally:
+            response.close()
+            connection.close()
+
+    return response_body()
+
+
+app = wsgi_application
+application = app
 
 
 def main():
