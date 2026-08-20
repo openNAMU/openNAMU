@@ -2764,7 +2764,7 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 }
 
 func (class *namumark_compat_renderer) process_macros(data string) string {
-	data = compat_replace_regex2(data, `(?is)(?<!\[)\[([^[(\]]+)\(((?:(?!\[\[|\)\]).)+)\)\]`, func(match regexp2.Match) string {
+	data = compat_replace_regex2(data, `(?is)(?<!\[)\[(?!\*)([^[(\]]+)\(((?:(?!\[\[|\)\]).)+)\)\]`, func(match regexp2.Match) string {
 		return class.process_macro_double(match.GroupByNumber(1).String(), match.GroupByNumber(2).String(), match.String())
 	})
 	return namumark_compat_single_macro_regex.ReplaceAllStringFunc(data, func(raw string) string {
