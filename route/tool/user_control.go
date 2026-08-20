@@ -228,7 +228,7 @@ func IP_menu(db *sql.DB, ip string, my_ip string, option string) map[string][][]
 				{"/register", Get_language(db, "register", false)},
 				{"/change", Get_language(db, "user_setting", false)},
 				{"/login/find", Get_language(db, "password_search", false)},
-				{"/alarm" + Url_parser(my_ip), Get_language(db, "alarm", false) + " (" + alarm_count + ")"},
+				{"/alarm", Get_language(db, "alarm", false) + " (" + alarm_count + ")"},
 			}
 		} else {
 			menu[Get_language(db, "login", false)] = [][]string{
@@ -241,7 +241,7 @@ func IP_menu(db *sql.DB, ip string, my_ip string, option string) map[string][][]
 				{"/star_doc", Get_language(db, "star_doc", false)},
 				{"/challenge", Get_language(db, "challenge_and_level_manage", false)},
 				{"/acl/user:" + Url_parser(my_ip), Get_language(db, "user_document_acl", false)},
-				{"/alarm" + Url_parser(my_ip), Get_language(db, "alarm", false) + " (" + alarm_count + ")"},
+				{"/alarm", Get_language(db, "alarm", false) + " (" + alarm_count + ")"},
 			}
 		}
 	}

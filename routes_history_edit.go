@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"net/http"
 	"strings"
 
@@ -64,7 +65,17 @@ func register_history_edit_routes(r *gin.Engine) {
 	})
 
 	r.GET("/edit/*doc_name", func(c *gin.Context) {
-		route_data := route.View_edit(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Query("load"))
+		route_data := route.View_edit(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), "")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/edit_load/:load/*doc_name", func(c *gin.Context) {
+		load_data, err := base64.RawURLEncoding.DecodeString(c.Param("load"))
+		if err != nil {
+			c.Redirect(http.StatusFound, "/manager")
+			return
+		}
+		route_data := route.View_edit(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), string(load_data))
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 

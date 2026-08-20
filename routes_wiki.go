@@ -41,7 +41,12 @@ func register_wiki_routes(r *gin.Engine) {
 	})
 
 	r.GET("/upload", func(c *gin.Context) {
-		route_data := route.View_edit_file_upload(make_route_config(c), c.Query("name"))
+		route_data := route.View_edit_file_upload(make_route_config(c), "")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+	r.GET("/upload/*name", func(c *gin.Context) {
+		file_name := strings.TrimPrefix(c.Param("name"), "/")
+		route_data := route.View_edit_file_upload(make_route_config(c), file_name)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
@@ -71,11 +76,11 @@ func register_wiki_routes(r *gin.Engine) {
 	})
 
 	r.GET("/topic/*doc_name", func(c *gin.Context) {
-		route_data := route.View_topic_list(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Query("tool"), "1")
+		route_data := route.View_topic_list(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), "", "1")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 	r.POST("/topic/*doc_name", func(c *gin.Context) {
-		route_data := route.View_topic_list(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Query("tool"), "1")
+		route_data := route.View_topic_list(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), "", "1")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 

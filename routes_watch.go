@@ -11,12 +11,22 @@ import (
 
 func register_watch_routes(r *gin.Engine) {
 	r.GET("/watch_list", func(c *gin.Context) {
-		route_data := route.View_user_watch_list(make_route_config(c), c.DefaultQuery("num", "1"), "watchlist")
+		route_data := route.View_user_watch_list(make_route_config(c), "1", "watchlist")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/watch_list_page/:num", func(c *gin.Context) {
+		route_data := route.View_user_watch_list(make_route_config(c), c.Param("num"), "watchlist")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
 	r.GET("/star_doc", func(c *gin.Context) {
-		route_data := route.View_user_watch_list(make_route_config(c), c.DefaultQuery("num", "1"), "star_doc")
+		route_data := route.View_user_watch_list(make_route_config(c), "1", "star_doc")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/star_doc_page/:num", func(c *gin.Context) {
+		route_data := route.View_user_watch_list(make_route_config(c), c.Param("num"), "star_doc")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 

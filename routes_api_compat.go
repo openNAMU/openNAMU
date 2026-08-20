@@ -39,8 +39,8 @@ func register_api_compat_routes(r *gin.Engine) {
 	r.GET("/api/lang/*data", func(c *gin.Context) {
 		compat_api_data(c, route.Api_func_language(make_route_config(c), compat_doc_name(c, "data"), "", "on"))
 	})
-	r.GET("/api/lang", func(c *gin.Context) {
-		compat_api_data(c, route.Api_func_language(make_route_config(c), c.Query("data"), c.Query("safe"), "on"))
+	r.GET("/api/lang_safe/*data", func(c *gin.Context) {
+		compat_api_data(c, route.Api_func_language(make_route_config(c), compat_doc_name(c, "data"), "on", "on"))
 	})
 	r.POST("/api/lang", func(c *gin.Context) {
 		compat_api_data(c, route.Api_func_language(make_route_config(c), c.PostForm("data"), c.PostForm("safe"), "on"))
@@ -76,10 +76,10 @@ func register_api_compat_routes(r *gin.Engine) {
 		compat_api_data_cors(c, route.Api_list_recent_change(make_route_config(c), c.Param("set_type"), c.Param("limit"), c.Param("num")))
 	})
 	r.GET("/api/search/*keyword", func(c *gin.Context) {
-		compat_api_data(c, route.Api_func_search(make_route_config(c), compat_doc_name(c, "keyword"), "1", compat_search_type(c)))
+		compat_api_data(c, route.Api_func_search(make_route_config(c), compat_doc_name(c, "keyword"), "1", "title"))
 	})
 	r.GET("/api/search_page/:num/*keyword", func(c *gin.Context) {
-		compat_api_data(c, route.Api_func_search(make_route_config(c), compat_doc_name(c, "keyword"), c.Param("num"), compat_search_type(c)))
+		compat_api_data(c, route.Api_func_search(make_route_config(c), compat_doc_name(c, "keyword"), c.Param("num"), "title"))
 	})
 	r.GET("/api/search_data/*keyword", func(c *gin.Context) {
 		compat_api_data(c, route.Api_func_search(make_route_config(c), compat_doc_name(c, "keyword"), "1", "data"))
@@ -95,10 +95,10 @@ func register_api_compat_routes(r *gin.Engine) {
 		compat_api_data_cors(c, route.Api_list_recent_discuss(make_route_config(c), "50", c.Param("num"), c.Param("set_type")))
 	})
 	r.GET("/api/v2/recent_block/:set_type/:num", func(c *gin.Context) {
-		compat_api_data(c, route.Api_list_recent_block(make_route_config(c), c.Param("num"), c.Param("set_type"), c.Query("why"), ""))
+		compat_api_data(c, route.Api_list_recent_block(make_route_config(c), c.Param("num"), c.Param("set_type"), "", ""))
 	})
 	r.GET("/api/v2/recent_block_user/:set_type/:num/:user_name", func(c *gin.Context) {
-		compat_api_data(c, route.Api_list_recent_block(make_route_config(c), c.Param("num"), c.Param("set_type"), c.Query("why"), c.Param("user_name")))
+		compat_api_data(c, route.Api_list_recent_block(make_route_config(c), c.Param("num"), c.Param("set_type"), "", c.Param("user_name")))
 	})
 	r.GET("/api/v2/list/document/old/:num", func(c *gin.Context) {
 		compat_api_data(c, route.Api_list_old_page(make_route_config(c), c.Param("num"), "old"))
@@ -122,7 +122,10 @@ func register_api_compat_routes(r *gin.Engine) {
 		compat_api_data(c, route.Api_w_watch_list(make_route_config(c), compat_doc_name(c, "doc_name"), c.Param("num"), "watchlist"))
 	})
 	r.GET("/api/v2/user/rankup", func(c *gin.Context) {
-		compat_api_data(c, route.Api_user_rankup(make_route_config(c), c.Query("name")))
+		compat_api_data(c, route.Api_user_rankup(make_route_config(c), ""))
+	})
+	r.GET("/api/v2/user/rankup/:name", func(c *gin.Context) {
+		compat_api_data(c, route.Api_user_rankup(make_route_config(c), c.Param("name")))
 	})
 	r.PATCH("/api/v2/user/rankup", func(c *gin.Context) {
 		_ = c.Request.ParseForm()
@@ -133,16 +136,8 @@ func register_api_compat_routes(r *gin.Engine) {
 	})
 }
 
-func compat_search_type(c *gin.Context) string {
-	search_type := c.Query("type")
-	if search_type == "" {
-		search_type = "title"
-	}
-	return search_type
-}
-
 func compat_skin_info(c *gin.Context) {
-	if c.Query("all") != "" {
+	if c.Param("name") == "all" {
 		data, ok := route.Api_skin_info_all(make_route_config(c))
 		if ok {
 			write_data(c, http.StatusOK, "application/json; charset=utf-8", data)

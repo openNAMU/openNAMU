@@ -889,7 +889,7 @@ func (class *namumark_compat_renderer) process_file(target string, label string)
 	class.add_backlink(file_target, "file", "")
 	if !exists {
 		class.add_backlink(file_target, "no", "")
-		return class.reserve(`<a class="opennamu_not_exist_link" title="` + compat_html_escape(alt) + `" href="/upload?name=` + class.compat_url_parser(base_name) + `">(` + compat_html_escape(alt) + `)</a>`)
+		return class.reserve(`<a class="opennamu_not_exist_link" title="` + compat_html_escape(alt) + `" href="/upload/` + class.compat_url_parser(base_name) + `">(` + compat_html_escape(alt) + `)</a>`)
 	}
 	if !class.file_theme_visible(theme) {
 		return class.reserve("")

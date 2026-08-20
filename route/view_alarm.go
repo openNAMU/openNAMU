@@ -21,12 +21,16 @@ func View_alarm(config tool.Config, user_name string, values url.Values) string 
 		} else if id := values.Get("delete"); id != "" {
 			tool.Exec_DB(db, "delete from user_notice where name = ? and id = ?", user_name, id)
 		}
-		return tool.Get_redirect("/alarm/" + tool.Url_parser(user_name))
+		return_path := "/alarm"
+		if user_name != config.IP {
+			return_path = "/alarm_user/" + tool.Url_parser(user_name)
+		}
+		return tool.Get_redirect(return_path)
 	}
 
 	delete_url := "/alarm/delete"
 	if user_name != config.IP {
-		delete_url = "/alarm/" + tool.Url_parser(user_name) + "/delete"
+		delete_url = "/alarm_user/" + tool.Url_parser(user_name) + "/delete"
 	}
 	page := 1
 	if values != nil {
@@ -60,7 +64,7 @@ func View_alarm(config tool.Config, user_name string, values url.Values) string 
 	body += `</ul>`
 	read_url := "/alarm/read"
 	if user_name != config.IP {
-		read_url = "/alarm/" + tool.Url_parser(user_name) + "/read"
+		read_url = "/alarm_user/" + tool.Url_parser(user_name) + "/read"
 	}
 	read_form := `<form method="post" action="` + read_url + `"><button type="submit">` + tool.Get_language(db, "read_all", true) + `</button></form><hr class="main_hr">`
 	if row_count > 0 {
@@ -68,9 +72,9 @@ func View_alarm(config tool.Config, user_name string, values url.Values) string 
 	} else {
 		body = read_form + body
 	}
-	page_url := "/alarm?num={}"
+	page_url := "/alarm/page/{}"
 	if user_name != config.IP {
-		page_url = "/alarm/" + tool.Url_parser(user_name) + "?num={}"
+		page_url = "/alarm_user/" + tool.Url_parser(user_name) + "/page/{}"
 	}
 	body += tool.Get_page_control(db, page, row_count, 50, page_url)
 	return user_form_page(db, config, tool.Get_language(db, "alarm", true), body)

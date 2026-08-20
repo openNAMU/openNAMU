@@ -131,7 +131,11 @@ func register_setting_routes(r *gin.Engine) {
 	})
 
 	r.GET("/api/v2/setting/:set_name", func(c *gin.Context) {
-		data := route.Api_setting(make_route_config(c), c.Param("set_name"), c.Query("coverage"))
+		data := route.Api_setting(make_route_config(c), c.Param("set_name"), "")
+		c.JSON(http.StatusOK, data)
+	})
+	r.GET("/api/v2/setting/:set_name/:coverage", func(c *gin.Context) {
+		data := route.Api_setting(make_route_config(c), c.Param("set_name"), c.Param("coverage"))
 		c.JSON(http.StatusOK, data)
 	})
 	r.PUT("/api/v2/setting/:set_name", func(c *gin.Context) {

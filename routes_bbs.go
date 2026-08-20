@@ -198,6 +198,11 @@ func register_bbs_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.GET("/bbs/w/:set_id/:set_code/comment/:comment_select", func(c *gin.Context) {
+		route_data := route.View_bbs_in_w(c, make_route_config(c), c.Param("set_id"), c.Param("set_code"))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.POST("/bbs/w/:set_id/:set_code", func(c *gin.Context) {
 		route_data := route.View_bbs_in_w_post_secure(
 			make_route_config(c),

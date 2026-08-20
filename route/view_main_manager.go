@@ -60,7 +60,7 @@ func View_main_manager(config tool.Config) string {
 	latest_version := get_remote_version(get_version_branch(db))
 	data += `<h2>` + lang("version") + `</h2><ul><li>` + lang("version") + ` : ` + tool.HTML_escape(version_list["r_ver"]) + `</li><li>` + lang("lastest") + ` : ` + tool.HTML_escape(latest_version) + `</li></ul>`
 
-	skin_html := `<h3>` + lang("skin_info") + `</h3><ul><li><a href="/api/skin_info?all=true">` + lang("skin_info") + `</a></li>`
+	skin_html := `<h3>` + lang("skin_info") + `</h3><ul><li><a href="/api/skin_info/all">` + lang("skin_info") + `</a></li>`
 	if raw_skin_data, ok := Api_skin_info_all(config); ok {
 		skin_data := map[string]map[string]any{}
 		if stdjson.Unmarshal(raw_skin_data, &skin_data) == nil {

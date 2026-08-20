@@ -2,7 +2,6 @@ package route
 
 import (
 	"database/sql"
-	"net/url"
 
 	"opennamu/route/tool"
 )
@@ -55,7 +54,7 @@ func View_manager_redirect(config tool.Config, num int, add_2 string, name strin
 			return tool.Get_redirect(item[1] + "/" + tool.Url_parser(add_2) + "/normal/1/" + tool.Url_parser(name))
 		}
 		if add_2 != "" {
-			return tool.Get_redirect("/edit_from/" + tool.Url_parser(add_2) + "?load=" + url.QueryEscape(name))
+			return tool.Get_redirect("/edit_from_load/" + tool.Base64_encode(name) + "/" + tool.Url_parser(add_2))
 		}
 
 		return tool.Get_redirect(item[1] + "/" + tool.Url_parser(name))

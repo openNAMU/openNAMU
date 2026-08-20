@@ -35,9 +35,9 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 		data_html += "</ul><hr class=\"main_hr\">"
 	}
 
-	page_url := "/star_doc?num={}"
+	page_url := "/star_doc_page/{}"
 	if do_type == "watchlist" {
-		page_url = "/watch_list?num={}"
+		page_url = "/watch_list_page/{}"
 	}
 	data_html += tool.Get_page_control(db, tool.Str_to_int(num), len(data_list), 50, page_url)
 

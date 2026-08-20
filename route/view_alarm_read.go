@@ -12,5 +12,9 @@ func View_alarm_read(config tool.Config, user_name string) string {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	tool.Exec_DB(db, "update user_notice set readme = '1' where name = ?", user_name)
-	return tool.Get_redirect("/alarm/" + tool.Url_parser(user_name))
+	return_path := "/alarm"
+	if user_name != config.IP {
+		return_path = "/alarm_user/" + tool.Url_parser(user_name)
+	}
+	return tool.Get_redirect(return_path)
 }

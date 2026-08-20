@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"database/sql"
+	"encoding/base64"
 	"encoding/hex"
 	"html"
 	"html/template"
@@ -33,6 +34,10 @@ func Sha224(data string) string {
 	hash_str := hex.EncodeToString(hash_byte)
 
 	return hash_str
+}
+
+func Base64_encode(data string) string {
+	return base64.RawURLEncoding.EncodeToString([]byte(data))
 }
 
 func Url_parser(data string) string {

@@ -65,7 +65,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 			color = "green"
 		}
 
-		date += `<a href="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `?comment_select=` + tool.Url_parser(code_id) + `#opennamu_comment_select">(` + tool.Get_language(db, "comment", true) + `)</a> `
+		date += `<a href="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/comment/` + tool.Url_parser(code_id) + `#opennamu_comment_select">(` + tool.Get_language(db, "comment", true) + `)</a> `
 		date += `<a href="/bbs/tool/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/` + tool.Url_parser(code_id) + `">(` + tool.Get_language(db, "tool", true) + `)</a> `
 		date += v["comment_date"]
 
