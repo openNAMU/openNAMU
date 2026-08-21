@@ -235,7 +235,7 @@ class PlaceholderContentWidget {
 }
 
 function do_monaco_init(monaco_thema) {
-    require.config({ paths: { 'vs' : 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.48.0/min/vs' }});
+    require.config({ paths: { 'vs' : 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.56.0/min/vs' }});
     require.config({ 'vs/nls' : { availableLanguages: { '*' : 'ko' } }});
     require(["vs/editor/editor.main"], function () {
         monaco.languages.register({ id : "namumark" });
