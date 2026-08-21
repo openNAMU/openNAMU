@@ -25,6 +25,7 @@ func register_routes(r *gin.Engine) {
 	register_recent_routes(r)
 	register_vote_routes(r)
 	register_bbs_routes(r)
+	register_bbs_search_routes(r)
 	register_thread_routes(r)
 	register_history_edit_routes(r)
 	register_document_extra_routes(r)

@@ -33,6 +33,7 @@ func View_bbs_in(config tool.Config, set_id string, page_num string) string {
 		[]any{},
 		[][]any{
 			{"bbs/main", tool.Get_language(db, "return", true)},
+			{"bbs/search/" + tool.Url_parser(set_id), tool.Get_language(db, "search", true)},
 			{"bbs/edit/" + tool.Url_parser(set_id), tool.Get_language(db, "add", true)},
 			{"bbs/set/" + tool.Url_parser(set_id), tool.Get_language(db, "bbs_set", true)},
 		},
