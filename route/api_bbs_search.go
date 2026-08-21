@@ -6,18 +6,31 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_bbs_search(config tool.Config, keyword string, set_id string) map[string]any {
+func Api_bbs_search(config tool.Config, keyword string, set_id string, page string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
 	data_list := []map[string]string{}
 	keyword = strings.TrimSpace(keyword)
 	if keyword != "" {
+		page_num := tool.Str_to_int(page)
+		if page_num < 1 {
+			page_num = 1
+		}
+		offset := (page_num - 1) * 50
+
+		where_data := "b.set_id = ?"
+		values := []any{set_id}
+		if set_id == "" {
+			where_data = "not b.set_id = \"0\""
+			values = []any{}
+		}
+		values = append(values, "%"+keyword+"%", offset)
+
 		rows := tool.Query_DB(
 			db,
-			"select set_code, set_id from bbs_data where set_id = ? and set_name in ('title', 'prefix', 'tag') and set_data like ? group by set_code, set_id order by set_code + 0 desc limit 50",
-			set_id,
-			"%"+keyword+"%",
+			"select b.set_code, b.set_id from bbs_data b left join bbs_data d on d.set_code = b.set_code and d.set_id = b.set_id and d.set_name = 'date' where "+where_data+" and b.set_name in ('title', 'prefix', 'tag') and b.set_data like ? group by b.set_code, b.set_id order by max(d.set_data) desc limit ?, 50",
+			values...,
 		)
 		defer rows.Close()
 

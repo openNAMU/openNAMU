@@ -112,7 +112,10 @@ func View_bbs_main(config tool.Config, page string) string {
 	bbs_api_data := Api_bbs(config, "", page)
 	data_html += Get_bbs_list_ui(config, bbs_api_data["data"].([]map[string]string), bbs_id_to_name)
 
-	menu := [][]any{{"other", tool.Get_language(db, "other_tool", false)}}
+	menu := [][]any{
+		{"other", tool.Get_language(db, "other_tool", false)},
+		{"bbs/search", tool.Get_language(db, "search", false)},
+	}
 	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
 		menu = append(menu, []any{"bbs/make", tool.Get_language(db, "add", false)})
 	}
