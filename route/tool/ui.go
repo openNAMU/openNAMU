@@ -60,6 +60,10 @@ func Get_use_skin_name_session(db *sql.DB, ip string, session sessions.Session) 
 			[]any{&user_skin_name},
 		)
 	}
+	
+	if user_skin_name == "default" {
+		user_skin_name = ""
+	}
 
 	if user_skin_name != "" && Arr_in_str(skin_list, user_skin_name) {
 		skin = user_skin_name
