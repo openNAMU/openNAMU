@@ -51,5 +51,5 @@ func View_user_head_skin(config tool.Config, skin_name string, values url.Values
 	}
 	body += `<hr class="main_hr"><span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr class="main_hr">`
 	body += `<form method="post"><textarea class="opennamu_textarea_500" cols="100" name="content">` + tool.HTML_escape(content) + `</textarea><hr class="main_hr">` + tool.Get_language(db, "user_css_warning", true) + ` : <a href="/change/head_reset">/change/head_reset</a><hr class="main_hr"><button id="opennamu_save_button" type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
-	return user_form_page(db, config, tool.Get_language(db, "user_head", true)+sub_name, body)
+	return user_form_page(db, config, tool.Get_language(db, "user_head", false)+sub_name, body)
 }

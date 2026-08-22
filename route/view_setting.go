@@ -15,7 +15,7 @@ func View_setting(config tool.Config) string {
 		{"phrase", tool.Get_language(db, "text_setting", true)},
 		{"robot", "robots.txt"},
 		{"external", tool.Get_language(db, "ext_api_req_set", true)},
-		{"head", tool.Get_language(db, "main_head", true)},
+		{"head", tool.Get_language(db, "main_head", false)},
 		{"body/top", tool.Get_language(db, "main_body", true)},
 		{"body/bottom", tool.Get_language(db, "main_bottom_body", true)},
 		{"sitemap_set", tool.Get_language(db, "sitemap_management", true)},

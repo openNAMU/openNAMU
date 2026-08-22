@@ -78,7 +78,7 @@ func view_setting_head_data(db *sql.DB, config tool.Config, kind string, skin_na
 	}
 	data.WriteString(`</form>`)
 
-	title := lang(title_key)
+	title := tool.Get_language(db, title_key, false)
 	if skin_name != "" {
 		title += " (" + tool.HTML_escape(skin_name) + ")"
 	}
