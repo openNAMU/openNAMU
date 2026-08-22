@@ -187,6 +187,12 @@ function opennamu_edit_turn_off_monaco() {
     for(let for_a = 0; for_a < editor_list.length; for_a++) {
         document.getElementById(editor_list[for_a][0]).style.display = editor_list[for_a][1];
     }
+
+    if(now_selected === 'monaco' && window.editor !== undefined && window.editor !== null) {
+        window.requestAnimationFrame(function() {
+            window.editor.layout();
+        });
+    }
 }
 
 function do_monaco_to_textarea(set_value) {

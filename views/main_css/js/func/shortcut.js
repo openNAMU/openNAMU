@@ -16,7 +16,7 @@ document.addEventListener("visibilitychange", () => {
 
 window.addEventListener("keydown", e => {
     let shortcut_check = e.target.tagName.toLowerCase();
-    if(shortcut_check === 'input' || shortcut_check === 'textarea') {
+    if(shortcut_check === 'input' || shortcut_check === 'textarea' || e.target.closest('#opennamu_monaco_editor') !== null) {
         return;
     } else if(e.repeat) {
         return;
