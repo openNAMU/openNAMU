@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 
+import contextlib
+import errno
 import http.client
 import json
 import os
 import platform
+import socket
 import subprocess
 import sys
+import time
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
@@ -117,6 +121,175 @@ def run_binary(binary_path, arguments, base_dir):
     return subprocess.call(command, cwd=str(base_dir))
 
 
+def wsgi_log(message):
+    print("[openNAMU WSGI] " + message, file=sys.stderr, flush=True)
+
+
+
+
+
+
+def wsgi_autostart_enabled(target_host):
+    enabled = os.environ.get("NAMU_WSGI_AUTOSTART", "1").lower()
+    local_host = target_host.lower() in {"127.0.0.1", "localhost", "::1"}
+    return local_host and enabled not in {"0", "false", "no", "off"}
+
+
+def wsgi_connection_refused(error):
+    return isinstance(error, ConnectionRefusedError) or getattr(error, "errno", None) == errno.ECONNREFUSED
+
+
+def wsgi_backend_is_listening(target_host, target_port):
+    try:
+        with socket.create_connection((target_host, target_port), timeout=0.25):
+            return True
+    except OSError:
+        return False
+
+
+def wsgi_runtime_dir(base_dir):
+    runtime_dir = Path(os.environ.get("NAMU_WSGI_RUNTIME_DIR", str(base_dir))).expanduser()
+    runtime_dir.mkdir(parents=True, exist_ok=True)
+    return runtime_dir
+
+
+@contextlib.contextmanager
+def wsgi_backend_lock(lock_path):
+    lock_file = lock_path.open("a+")
+    try:
+        if os.name != "nt":
+            import fcntl
+
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+        yield
+    finally:
+        if os.name != "nt":
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+        lock_file.close()
+
+
+def wsgi_backend_log_path(base_dir):
+    log_path = Path(os.environ.get("NAMU_WSGI_LOG", str(base_dir / "backend.log"))).expanduser()
+    if not log_path.is_absolute():
+        log_path = base_dir / log_path
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    return log_path
+
+
+def wsgi_backend_wait(target_host, target_port, process, log_path):
+    try:
+        timeout = float(os.environ.get("NAMU_WSGI_START_TIMEOUT", "15"))
+    except ValueError:
+        timeout = 15
+    timeout = max(1, min(timeout, 60))
+    deadline = time.monotonic() + timeout
+
+    while time.monotonic() < deadline:
+        if wsgi_backend_is_listening(target_host, target_port):
+            return
+        return_code = process.poll()
+        if return_code is not None:
+            raise RuntimeError(
+                "backend exited with code " + str(return_code) + "; see " + str(log_path)
+            )
+        time.sleep(0.1)
+
+    raise RuntimeError(
+        "backend did not start listening on "
+        + target_host
+        + ":"
+        + str(target_port)
+        + " within "
+        + str(timeout)
+        + " seconds; see "
+        + str(log_path)
+    )
+
+
+def wsgi_start_backend(target_host, target_port):
+    base_dir = Path(__file__).resolve().parent
+    runtime_dir = wsgi_runtime_dir(base_dir)
+    lock_path = Path(
+        os.environ.get("NAMU_WSGI_LOCK", str(runtime_dir / ".opennamu-wsgi.lock"))
+    ).expanduser()
+    if not lock_path.is_absolute():
+        lock_path = runtime_dir / lock_path
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    log_path = wsgi_backend_log_path(base_dir)
+
+    with wsgi_backend_lock(lock_path):
+        if wsgi_backend_is_listening(target_host, target_port):
+            return
+
+        binary_path = base_dir / get_binary_name()
+        if not binary_path.is_file():
+            wsgi_log("backend binary is missing; downloading " + binary_path.name)
+            download_binary(binary_path)
+
+        if os.name != "nt":
+            binary_path.chmod(0o755)
+
+        command = [str(binary_path), str(target_port)]
+        environment = os.environ.copy()
+        environment.pop("NAMU_START_DELAY_MS", None)
+        with log_path.open("ab", buffering=0) as log_file:
+            log_file.write(
+                ("\n[openNAMU WSGI] starting: " + " ".join(command) + "\n").encode("utf-8")
+            )
+            process_options = {
+                "cwd": str(base_dir),
+                "env": environment,
+                "stdin": subprocess.DEVNULL,
+                "stdout": log_file,
+                "stderr": subprocess.STDOUT,
+            }
+            if os.name != "nt":
+                process_options["start_new_session"] = True
+            process = subprocess.Popen(command, **process_options)
+
+        wsgi_log("started backend process " + str(process.pid) + "; see " + str(log_path))
+        wsgi_backend_wait(target_host, target_port, process, log_path)
+
+
+def wsgi_backend_request(environ, target_host, target_port, request_body):
+    connection = http.client.HTTPConnection(target_host, target_port, timeout=download_timeout)
+    try:
+        connection.request(
+            environ.get("REQUEST_METHOD", "GET"),
+            wsgi_path(environ),
+            body=request_body,
+            headers=wsgi_headers(environ, target_host, target_port),
+        )
+        return connection, connection.getresponse()
+    except Exception:
+        connection.close()
+        raise
+
+
+def wsgi_backend_error(start_response, target_host, target_port, error, start_error=None):
+    message = (
+        "openNAMU backend is not running: "
+        + str(error)
+        + " (target "
+        + target_host
+        + ":"
+        + str(target_port)
+        + ")"
+    )
+    if start_error is not None:
+        message += "\nbackend auto-start failed: " + str(start_error)
+    wsgi_log(message.replace("\n", " | "))
+    body = message.encode("utf-8")
+    start_response(
+        "503 Service Unavailable",
+        [
+            ("Content-Type", "text/plain; charset=utf-8"),
+            ("Content-Length", str(len(body))),
+        ],
+    )
+    return [body]
+
+
 def wsgi_request_body(environ):
     content_length = environ.get("CONTENT_LENGTH", "")
     if content_length:
@@ -190,23 +363,28 @@ def wsgi_application(environ, start_response):
     except ValueError:
         target_port = 3000
 
-    connection = http.client.HTTPConnection(target_host, target_port, timeout=download_timeout)
+    request_body = wsgi_request_body(environ)
     try:
-        connection.request(
-            environ.get("REQUEST_METHOD", "GET"),
-            wsgi_path(environ),
-            body=wsgi_request_body(environ),
-            headers=wsgi_headers(environ, target_host, target_port),
+        connection, response = wsgi_backend_request(
+            environ, target_host, target_port, request_body
         )
-        response = connection.getresponse()
     except (OSError, http.client.HTTPException) as error:
-        connection.close()
-        body = ("openNAMU backend is not running: " + str(error)).encode("utf-8")
-        start_response(
-            "503 Service Unavailable",
-            [("Content-Type", "text/plain; charset=utf-8"), ("Content-Length", str(len(body)))],
-        )
-        return [body]
+        if not wsgi_connection_refused(error) or not wsgi_autostart_enabled(target_host):
+            return wsgi_backend_error(start_response, target_host, target_port, error)
+
+        try:
+            wsgi_start_backend(target_host, target_port)
+        except Exception as start_error:
+            return wsgi_backend_error(
+                start_response, target_host, target_port, error, start_error
+            )
+
+        try:
+            connection, response = wsgi_backend_request(
+                environ, target_host, target_port, request_body
+            )
+        except Exception as retry_error:
+            return wsgi_backend_error(start_response, target_host, target_port, retry_error)
 
     hop_by_hop_headers = {
         "connection",

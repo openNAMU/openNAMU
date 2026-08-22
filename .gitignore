@@ -1,4 +1,6 @@
 __pycache__
+backend.log
+.opennamu-wsgi.lock
 
 /bin/*
 !/bin/test
