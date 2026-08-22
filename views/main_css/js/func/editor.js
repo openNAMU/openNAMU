@@ -1,9 +1,54 @@
 "use strict";
 
+const opennamu_monaco_worker_base = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.56.0/esm/vs';
+
+if(document.getElementById('opennamu_monaco_editor') !== null) {
+    window.MonacoEnvironment = window.MonacoEnvironment || {};
+    window.MonacoEnvironment.getWorker = function(module_id, label) {
+        let worker_path = '/editor/editor.worker.js';
+
+        if(label === 'json') {
+            worker_path = '/language/json/json.worker.js';
+        } else if(label === 'css' || label === 'scss' || label === 'less') {
+            worker_path = '/language/css/css.worker.js';
+        } else if(label === 'html' || label === 'handlebars' || label === 'razor') {
+            worker_path = '/language/html/html.worker.js';
+        } else if(label === 'typescript' || label === 'javascript') {
+            worker_path = '/language/typescript/ts.worker.js';
+        }
+
+        const worker_name = label || 'editorWorkerService';
+        const worker_url = opennamu_monaco_worker_base + worker_path;
+        const worker_blob = URL.createObjectURL(new Blob([
+            'import ' + JSON.stringify(worker_url) + ';'
+        ], {
+            type: 'text/javascript',
+        }));
+        const worker = new Worker(worker_blob, {
+            type: 'module',
+            name: worker_name,
+        });
+
+        setTimeout(function() {
+            URL.revokeObjectURL(worker_blob);
+        }, 60000);
+
+        return worker;
+    };
+
+    window.opennamu_monaco_ready = import('https://cdn.jsdelivr.net/npm/monaco-editor@0.56.0/+esm').then(function(monaco) {
+        window.monaco = monaco;
+        return monaco;
+    }).catch(function(error) {
+        console.error('Monaco ESM load failed:', error);
+        throw error;
+    });
+}
+
 function do_insert_data(data) {
     const name = 'opennamu_edit_textarea';
 
-    if(get_select_editor() === 'textarea') {
+    if(get_select_editor() === 'textarea' || window.editor === undefined || window.editor === null) {
         let textarea = document.getElementById(name);
         textarea.focus();
 
@@ -149,6 +194,9 @@ function do_monaco_to_textarea(set_value) {
 }
 
 function do_textarea_to_monaco(set_value) {
+    if(window.editor === undefined || window.editor === null) {
+        return;
+    }
     window.editor.setValue(set_value);
 }
 
@@ -176,6 +224,9 @@ function get_select_editor_markup() {
 
 function do_sync_monaco_and_textarea(select = '') {
     let now_selected = get_select_editor();
+    if(window.editor === undefined || window.editor === null) {
+        return;
+    }
     if(select === 'textarea_to' || now_selected === 'textarea') {
         let set_value = document.getElementById('opennamu_edit_textarea').value;
         do_textarea_to_monaco(set_value);
@@ -189,7 +240,7 @@ function do_sync_monaco_and_textarea(select = '') {
 
 // https://github.com/microsoft/monaco-editor/issues/568
 class PlaceholderContentWidget {
-    static ID = 'editor.widget.placeholderHint';
+    static ID = 'opennamu.editor.widget.placeholderHint';
 
     constructor(placeholder, editor) {
         this.placeholder = placeholder;
@@ -235,9 +286,12 @@ class PlaceholderContentWidget {
 }
 
 function do_monaco_init(monaco_thema) {
-    require.config({ paths: { 'vs' : 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.56.0/min/vs' }});
-    require.config({ 'vs/nls' : { availableLanguages: { '*' : 'ko' } }});
-    require(["vs/editor/editor.main"], function () {
+    if(window.opennamu_monaco_ready === undefined || window.opennamu_monaco_ready === null) {
+        console.error('Monaco ESM loader is not available.');
+        return;
+    }
+
+    window.opennamu_monaco_ready.then(function(monaco) {
         monaco.languages.register({ id : "namumark" });
         monaco.languages.setMonarchTokensProvider("namumark", {
             tokenizer : {
@@ -289,6 +343,8 @@ function do_monaco_init(monaco_thema) {
         new PlaceholderContentWidget(document.getElementById('opennamu_edit_textarea').placeholder, window.editor);
 
         opennamu_do_sync_monaco_markup();
+    }).catch(function(error) {
+        console.error('Monaco ESM initialization failed:', error);
     });
 }
 
@@ -327,6 +383,9 @@ function opennamu_do_editor_preview() {
 }
 
 function opennamu_do_sync_monaco_markup() {
+    if(window.editor === undefined || window.editor === null || window.monaco === undefined) {
+        return;
+    }
     let now_selected = get_select_editor_markup();
     monaco.editor.setModelLanguage(window.editor.getModel(), now_selected);
 }

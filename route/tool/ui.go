@@ -262,7 +262,7 @@ func Get_redirect_target(data string) (string, bool) {
 }
 
 func Cache_v() string {
-	return ".cache_v290"
+	return ".cache_v291"
 }
 
 func Get_wiki_css(data []any, cookies string) []any {
@@ -282,7 +282,6 @@ func Get_wiki_css(data []any, cookies string) []any {
 	data_css += `<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.38/dist/katex.min.js" integrity="sha384-H6s1ZrH2CKpFpqR680poRdStIRJGXty7fSkxAcIfxwl9iu6A4BOPtTk7vQ58Ovio" crossorigin="anonymous"></script>`
 	data_css += `<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" integrity="sha512-rdhY3cbXURo13l/WU9VlaRyaIYeJ/KBakckXIvJNAQde8DgpOmE+eZf7ha4vdqVjTtwQt69bD2wH2LXob/LB7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>`
 	data_css += `<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>`
-	data_css += `<script defer src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.56.0/min/vs/loader.min.js" integrity="sha512-2DJ/UX0VmkE/Cq9bjrRet/01ETdenJ5zu2QVeI9PDN/n5s7kTSh9c1Rhr3E7ZQJOnm4N4ONBTXamiX7Ec9FQlA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>`
 	data_css += `<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>`
 	data_css += `<script defer src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`
 
