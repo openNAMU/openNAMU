@@ -1,0 +1,65 @@
+name: Release binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run tests
+        run: go test ./...
+
+      - name: Build release binaries
+        shell: bash
+        run: |
+          ./linux.sh all
+          mkdir -p dist
+          mv main.amd64.bin main.arm64.bin main.amd64.exe main.arm64.exe main.mac.arm64.bin dist/
+
+          test -f dist/main.amd64.bin
+          test -f dist/main.arm64.bin
+          test -f dist/main.amd64.exe
+          test -f dist/main.arm64.exe
+          test -f dist/main.mac.arm64.bin
+
+          (
+            cd dist
+            sha256sum main.amd64.bin main.arm64.bin main.amd64.exe main.arm64.exe main.mac.arm64.bin > SHA256SUMS
+          )
+
+      - name: Create GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          release_args=(
+            "$GITHUB_REF_NAME"
+            dist/*
+            --verify-tag
+            --generate-notes
+            --title "$GITHUB_REF_NAME"
+          )
+
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+            release_args+=(--prerelease)
+          fi
+
+          gh release create "${release_args[@]}"
