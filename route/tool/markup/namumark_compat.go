@@ -1178,7 +1178,7 @@ func (class *namumark_compat_renderer) process_footnotes(data string) string {
 			return class.reserve(`<sup><a title="` + title + `" id="` + rfn + `" href="javascript:void(0);">(` + footnote_label + `)</a></sup><span class="opennamu_spead_footnote" id="` + rfn + `_load" style="display: none;"></span>`)
 		}
 		if footnote_set == "popover" {
-			return class.reserve(`<span id="` + rfn + `_over"><sup><a title="` + title + `" id="` + rfn + `" href="javascript:void(0);">(` + footnote_label + `)</a></sup><span class="opennamu_popup_footnote" id="` + rfn + `_load" style="display: none;"></span></span>`)
+			return class.reserve(`<span id="` + rfn + `_over" onclick="opennamu_do_footnote_popover('` + rfn + `', '` + fn + `', undefined, 'open');"><sup><a title="` + title + `" id="` + rfn + `" href="javascript:void(0);">(` + footnote_label + `)</a></sup><span class="opennamu_popup_footnote" id="` + rfn + `_load" style="display: none;"></span></span>`)
 		}
 		return class.reserve(`<sup><a title="` + title + `" id="` + rfn + `" href="#` + fn + `">(` + footnote_label + `)</a></sup>`)
 	})

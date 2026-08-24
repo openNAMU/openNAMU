@@ -128,3 +128,9 @@ function opennamu_do_footnote_popover(set_name, load_name, sub_obj = undefined, 
     }
 }
 
+document.addEventListener("click", function () {
+    document.querySelectorAll('span[id$="_over"] > .opennamu_popup_footnote').forEach(function (obj) {
+        opennamu_do_footnote_popover(obj.id.slice(0, -5), '', undefined, 'close');
+    });
+});
+
