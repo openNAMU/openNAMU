@@ -183,15 +183,19 @@ def wsgi_backend_wait(target_host, target_port, process, log_path):
         timeout = 15
     timeout = max(1, min(timeout, 60))
     deadline = time.monotonic() + timeout
+    process_exit_deadline = 0
 
     while time.monotonic() < deadline:
         if wsgi_backend_is_listening(target_host, target_port):
             return
         return_code = process.poll()
         if return_code is not None:
-            raise RuntimeError(
-                "backend exited with code " + str(return_code) + "; see " + str(log_path)
-            )
+            if process_exit_deadline == 0:
+                process_exit_deadline = min(deadline, time.monotonic() + 2)
+            if time.monotonic() >= process_exit_deadline:
+                raise RuntimeError(
+                    "backend exited with code " + str(return_code) + "; see " + str(log_path)
+                )
         time.sleep(0.1)
 
     raise RuntimeError(
@@ -357,11 +361,11 @@ def wsgi_headers(environ, target_host, target_port):
 
 def wsgi_application(environ, start_response):
     target_host = os.environ.get("NAMU_WSGI_HOST", "127.0.0.1")
-    target_port = os.environ.get("NAMU_WSGI_PORT", "3000")
+    target_port = os.environ.get("NAMU_WSGI_PORT", "3001")
     try:
         target_port = int(target_port)
     except ValueError:
-        target_port = 3000
+        target_port = 3001
 
     request_body = wsgi_request_body(environ)
     try:
