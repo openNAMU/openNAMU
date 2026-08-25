@@ -56,7 +56,7 @@ func View_edit_file_delete(config tool.Config, doc_name string, values url.Value
 	}
 
 	body := "<p><a href='/image/" + tool.Url_parser(filepath.Base(file_path)) + "'>" + tool.HTML_escape(doc_name) + "</a></p>"
-	body += "<form method='post'><input type='checkbox' name='with_doc' value='1' checked> delete document too"
+	body += "<form method='post'><input type='checkbox' name='with_doc' value='1' checked> " + tool.Get_language(db, "file_delete_with_document", true)
 	body += "<input name='send' placeholder='" + tool.Get_language(db, "why", true) + "'><hr class='main_hr'>"
 	body += tool.Get_edit_check_box_ui(db) + "<button type='submit'>" + tool.Get_language(db, "delete", true) + "</button></form>"
 	return tool.Get_template(db, config, doc_name, body, []any{"(" + tool.Get_language(db, "delete", true) + ")"}, [][]any{{"w/" + tool.Url_parser(doc_name), tool.Get_language(db, "return", true)}}, map[string]string{})

@@ -36,6 +36,6 @@ func View_login_2fa(config tool.Config, values url.Values) string {
 		_ = config.Session.Save()
 		return tool.Get_redirect("/user")
 	}
-	body := "<form method='post'><input type='password' name='pw'>" + tool.Get_captcha_ui(db, config) + "<button type='submit'>login</button>" + tool.Get_http_warning(db) + "</form>"
-	return user_form_page(db, config, "2FA", body)
+	body := "<form method='post'><input type='password' name='pw'>" + tool.Get_captcha_ui(db, config) + "<button type='submit'>" + tool.Get_language(db, "login", true) + "</button>" + tool.Get_http_warning(db) + "</form>"
+	return user_form_page(db, config, tool.Get_language(db, "2fa", true), body)
 }
