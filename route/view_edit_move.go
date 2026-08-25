@@ -44,12 +44,11 @@ func move_temporary_title(db *sql.DB) string {
 	}
 }
 
-func move_document_exists(db *sql.DB, title string) bool {
+func move_document_exists(db *sql.DB, title string) (bool, bool) {
 	var value string
-	if tool.QueryRow_DB(db, "select title from data where title = ? limit 1", []any{&value}, title) {
-		return true
-	}
-	return tool.QueryRow_DB(db, "select title from history where title = ? limit 1", []any{&value}, title)
+	data_exists := tool.QueryRow_DB(db, "select title from data where title = ? limit 1", []any{&value}, title)
+	history_exists := tool.QueryRow_DB(db, "select title from history where title = ? limit 1", []any{&value}, title)
+	return data_exists || history_exists, history_exists && !data_exists
 }
 
 func move_topic_exists(db *sql.DB, title string) bool {
@@ -208,10 +207,13 @@ func move_document_options(config tool.Config, db *sql.DB, old_name string, new_
 		return "auth"
 	}
 
-	target_exists := move_document_exists(db, new_name)
+	target_exists, target_history_only := move_document_exists(db, new_name)
 	if target_exists {
 		switch move_option {
 		case "normal":
+			if target_history_only {
+				return "document history exist"
+			}
 			return "document already exist"
 		case "merge":
 			source_history := move_history_rows(db, old_name)

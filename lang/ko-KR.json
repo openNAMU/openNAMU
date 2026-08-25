@@ -171,6 +171,7 @@
     "authority": "권한",
     "document": "문서",
     "move_error": "이동하는 과정 중 오류가 발생하였습니다. 전부 또는 일부가 이동되지 않았습니다.",
+    "document_history_exist_error": "이동하려는 문서는 존재하지 않지만 편집 역사가 남아 있습니다. 먼저 해당 문서의 역사를 삭제해주세요.",
     "skin_setting": "스킨 설정",
     "discussion_list": "토론 목록",
     "restart_required": "재시작 필요",

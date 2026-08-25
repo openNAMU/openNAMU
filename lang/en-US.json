@@ -749,6 +749,7 @@
     "same_file_error": "A file with the same name exists.",
     "file_capacity_error": "Maximum file capacity (MB): ",
     "move_error": "An error occurred while moving. All or part of it has not been moved.",
+    "document_history_exist_error": "The document you are trying to move does not exist, but its edit history remains. Delete the document history first.",
     "password_diffrent_error": "Reconfirm password and input password are different.",
     "edit_filter_error": "Censored by contents filter.",
     "file_name_error": "You cannot use dots in the file name.",

@@ -406,6 +406,8 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
 		data = Get_language(db, "file_capacity_error", true) + file_max
 	case "already exist":
 		data = Get_language(db, "same_file_error", true)
+	case "document history exist":
+		data = Get_language(db, "document_history_exist_error", true)
 	case "invalid file":
 		data = Get_language(db, "file_exist_error", true)
 	case "slow edit limit":
