@@ -10,6 +10,7 @@ import (
 
 var topic_reference_regex = regexp.MustCompile(`(^|[ \n])#([0-9]+)(?:-([0-9]+))?($|[ \n])`)
 var topic_call_regex = regexp.MustCompile(`(^|[ \n])@([^ \n]+)($|[ \n])`)
+var topic_legacy_thread_regex = regexp.MustCompile(`(?:&lt;|<)topic_a_thread(?:&gt;|>)#([0-9]+)(?:&lt;|<)/topic_a_thread(?:&gt;|>)`)
 
 func topic_reference_notify(db *sql.DB, config tool.Config, data string, num string, topic_num string, set_id string, name string, sub string, do_type string) {
 	if data == "" {
@@ -74,6 +75,11 @@ func topic_reference_notify(db *sql.DB, config tool.Config, data string, num str
 }
 
 func render_topic_reference(data string, topic_num string, set_id string, set_code string, do_type string) string {
+	data = topic_legacy_thread_regex.ReplaceAllStringFunc(data, func(value string) string {
+		match := topic_legacy_thread_regex.FindStringSubmatch(value)
+		return `<a href="#` + tool.Url_parser(match[1]) + `">#` + tool.HTML_escape(match[1]) + `</a>`
+	})
+
 	data = topic_reference_regex.ReplaceAllStringFunc(data, func(value string) string {
 		match := topic_reference_regex.FindStringSubmatch(value)
 		if len(match) < 5 {
