@@ -189,9 +189,11 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		if watch_list == 2 {
 			star_text = "★"
 		}
-		menu = append(menu, []any{"star_doc_from/" + tool.Url_parser(doc_name), star_text, watch_list - 1})
+		menu = append(menu, []any{"star_doc_from/" + tool.Url_parser(doc_name), star_text + " " + tool.Get_language(db, "star_doc", true), watch_list - 1})
 	}
-	menu = append(menu, []any{"doc_watch_list/1/" + tool.Url_parser(doc_name), tool.Get_language(db, "watchlist", true)})
+	if tool.Check_acl(db, "", "", "doc_watch_list_view", config.IP) {
+		menu = append(menu, []any{"doc_watch_list/1/" + tool.Url_parser(doc_name), tool.Get_language(db, "watch_user_list", true)})
+	}
 
 	enable_comment := tool.Get_setting(db, "enable_comment", "")
 	if status == http.StatusOK && len(enable_comment) > 0 && enable_comment[0][0] != "" {

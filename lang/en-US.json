@@ -580,6 +580,7 @@
     "admin_group_list": "Auth group(s) list",
     "all_document_list": "All document(s) list",
     "watchlist": "Watchlist",
+    "watch_user_list": "Users watching this document",
     "image_file_list": "Image file(s) list",
     "file_list": "File(s) list",
     "image_list": "Image(s) list",
