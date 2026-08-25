@@ -1330,8 +1330,12 @@ func (class *namumark_compat_renderer) process_middle_block(middle_data string) 
 		expected := strings.TrimSpace(condition_match[3])
 		expected = strings.Trim(expected, "\"'")
 		matches := false
+		parameter_is_null := !parameter_exists || parameter_value == nil
+		if !parameter_is_null && compat_render_parameter_value(parameter_value) == "" {
+			parameter_is_null = true
+		}
 		if strings.EqualFold(expected, "null") {
-			matches = !parameter_exists || parameter_value == nil
+			matches = parameter_is_null
 		} else if parameter_exists && parameter_value != nil {
 			matches = compat_render_parameter_value(parameter_value) == expected
 		}
