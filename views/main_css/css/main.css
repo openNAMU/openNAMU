@@ -200,8 +200,12 @@
     text-overflow: ellipsis;
 }
 
-.opennamu_main .opennamu_category_button,
-.opennamu_main .opennamu_trace_button {
+.opennamu_main .opennamu_trace {
+    overflow: auto;
+    text-overflow: unset;
+}
+
+.opennamu_main .opennamu_category_button {
     float: right;
     z-index: 100;
     position: relative;

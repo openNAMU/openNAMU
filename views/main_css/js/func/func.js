@@ -66,14 +66,6 @@ function opennamu_do_ip_click(obj) {
     }
 }
 
-function opennamu_do_trace_spread() {
-    if(document.getElementsByClassName('opennamu_trace')) {
-        document.getElementsByClassName('opennamu_trace')[0].innerHTML = '' +
-            '<style>.opennamu_trace_button { display: none; } .opennamu_trace { white-space: pre-wrap; overflow-x: unset; text-overflow: unset; }</style>' +
-        '' + document.getElementsByClassName('opennamu_trace')[0].innerHTML
-    }
-}
-
 function opennamu_list_hidden_remove() {
     const style = document.querySelector('#opennamu_list_hidden_style');
     if(style !== null) {

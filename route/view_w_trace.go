@@ -79,5 +79,5 @@ func view_w_trace(db *sql.DB, config tool.Config, documents []string) string {
 	for index := len(documents) - 1; index >= 0; index-- {
 		trace_list = append(trace_list, `<a href="/w/`+tool.Url_parser(documents[index])+`">`+tool.HTML_escape(documents[index])+`</a>`)
 	}
-	return `<div class="opennamu_trace"><a class="opennamu_trace_button" href="javascript:opennamu_do_trace_spread();"> (+)</a> ` + tool.Get_language(db, "trace", true) + ` : ` + strings.Join(trace_list, " ← ") + `</div><hr class="main_hr">`
+	return `<div class="opennamu_trace">` + tool.Get_language(db, "trace", true) + ` : ` + strings.Join(trace_list, " ← ") + `</div><hr class="main_hr">`
 }
