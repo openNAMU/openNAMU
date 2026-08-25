@@ -40,7 +40,7 @@ func View_w_watch_list(config tool.Config, doc_name string, num string, do_type 
 
 	title := tool.Get_language(db, "watch_user_list", true)
 	if do_type == "star_doc" {
-		title = tool.Get_language(db, "star_doc", true)
+		title = tool.Get_language(db, "star_user_list", true)
 	}
 
 	out := tool.Get_template(
@@ -52,7 +52,7 @@ func View_w_watch_list(config tool.Config, doc_name string, num string, do_type 
 		[][]any{
 			{"w/" + tool.Url_parser(doc_name), tool.Get_language(db, "return", false)},
 			{"doc_watch_list/1/" + tool.Url_parser(doc_name), tool.Get_language(db, "watch_user_list", false)},
-			{"doc_star_doc/1/" + tool.Url_parser(doc_name), tool.Get_language(db, "star_doc", false)},
+			{"doc_star_doc/1/" + tool.Url_parser(doc_name), tool.Get_language(db, "star_user_list", false)},
 		},
 		map[string]string{},
 	)

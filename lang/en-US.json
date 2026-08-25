@@ -300,6 +300,7 @@
     "reset_all_backlink": "Rebuild all backlinks",
     "link_in_this": "Links in this document",
     "star_doc": "Document(s) of interest",
+    "star_user_list": "Users interested in this document",
     "add_star_doc": "Add document(s) of interest",
     "simple_check": "Simple check",
     "add_user": "Add user",
