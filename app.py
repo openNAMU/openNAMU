@@ -147,10 +147,62 @@ def wsgi_backend_is_listening(target_host, target_port):
         return False
 
 
+def wsgi_backend_port_available(target_port):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+            server.bind(("0.0.0.0", target_port))
+        return True
+    except OSError:
+        return False
+
+
+def wsgi_backend_free_port():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+        server.bind(("127.0.0.1", 0))
+        return server.getsockname()[1]
+
+
 def wsgi_runtime_dir(base_dir):
     runtime_dir = Path(os.environ.get("NAMU_WSGI_RUNTIME_DIR", str(base_dir))).expanduser()
     runtime_dir.mkdir(parents=True, exist_ok=True)
     return runtime_dir
+
+
+def wsgi_backend_port_path(base_dir):
+    runtime_dir = wsgi_runtime_dir(base_dir)
+    port_path = Path(
+        os.environ.get("NAMU_WSGI_PORT_FILE", str(runtime_dir / ".opennamu-wsgi.port"))
+    ).expanduser()
+    if not port_path.is_absolute():
+        port_path = runtime_dir / port_path
+    port_path.parent.mkdir(parents=True, exist_ok=True)
+    return port_path
+
+
+def wsgi_backend_read_port(port_path, default_port):
+    try:
+        target_port = int(port_path.read_text(encoding="ascii").strip())
+    except (OSError, ValueError):
+        return default_port
+
+    if target_port < 1 or target_port > 65535:
+        return default_port
+    return target_port
+
+
+def wsgi_backend_write_port(port_path, target_port):
+    temporary_path = port_path.with_name(port_path.name + ".tmp")
+    temporary_path.write_text(str(target_port), encoding="ascii")
+    os.replace(temporary_path, port_path)
+
+
+def wsgi_backend_wait_existing(target_host, target_port):
+    deadline = time.monotonic() + 2
+    while time.monotonic() < deadline:
+        if wsgi_backend_is_listening(target_host, target_port):
+            return True
+        time.sleep(0.1)
+    return False
 
 
 @contextlib.contextmanager
@@ -213,6 +265,7 @@ def wsgi_backend_wait(target_host, target_port, process, log_path):
 def wsgi_start_backend(target_host, target_port):
     base_dir = Path(__file__).resolve().parent
     runtime_dir = wsgi_runtime_dir(base_dir)
+    port_path = wsgi_backend_port_path(base_dir)
     lock_path = Path(
         os.environ.get("NAMU_WSGI_LOCK", str(runtime_dir / ".opennamu-wsgi.lock"))
     ).expanduser()
@@ -222,8 +275,11 @@ def wsgi_start_backend(target_host, target_port):
     log_path = wsgi_backend_log_path(base_dir)
 
     with wsgi_backend_lock(lock_path):
+        target_port = wsgi_backend_read_port(port_path, target_port)
         if wsgi_backend_is_listening(target_host, target_port):
-            return
+            return target_port
+        if port_path.is_file() and wsgi_backend_wait_existing(target_host, target_port):
+            return target_port
 
         binary_path = base_dir / get_binary_name()
         if not binary_path.is_file():
@@ -233,26 +289,48 @@ def wsgi_start_backend(target_host, target_port):
         if os.name != "nt":
             binary_path.chmod(0o755)
 
-        command = [str(binary_path), str(target_port)]
-        environment = os.environ.copy()
-        environment.pop("NAMU_START_DELAY_MS", None)
-        with log_path.open("ab", buffering=0) as log_file:
-            log_file.write(
-                ("\n[openNAMU WSGI] starting: " + " ".join(command) + "\n").encode("utf-8")
-            )
-            process_options = {
-                "cwd": str(base_dir),
-                "env": environment,
-                "stdin": subprocess.DEVNULL,
-                "stdout": log_file,
-                "stderr": subprocess.STDOUT,
-            }
-            if os.name != "nt":
-                process_options["start_new_session"] = True
-            process = subprocess.Popen(command, **process_options)
+        last_error = None
+        for _ in range(3):
+            if not wsgi_backend_port_available(target_port):
+                target_port = wsgi_backend_free_port()
+                wsgi_log("backend port is in use; trying " + str(target_port))
+                continue
 
-        wsgi_log("started backend process " + str(process.pid) + "; see " + str(log_path))
-        wsgi_backend_wait(target_host, target_port, process, log_path)
+            command = [str(binary_path), str(target_port)]
+            environment = os.environ.copy()
+            environment.pop("NAMU_START_DELAY_MS", None)
+            with log_path.open("ab", buffering=0) as log_file:
+                log_file.write(
+                    ("\n[openNAMU WSGI] starting: " + " ".join(command) + "\n").encode("utf-8")
+                )
+                process_options = {
+                    "cwd": str(base_dir),
+                    "env": environment,
+                    "stdin": subprocess.DEVNULL,
+                    "stdout": log_file,
+                    "stderr": subprocess.STDOUT,
+                }
+                if os.name != "nt":
+                    process_options["start_new_session"] = True
+                process = subprocess.Popen(command, **process_options)
+
+            wsgi_log("started backend process " + str(process.pid) + "; see " + str(log_path))
+            try:
+                wsgi_backend_wait(target_host, target_port, process, log_path)
+                wsgi_backend_write_port(port_path, target_port)
+                return target_port
+            except RuntimeError as error:
+                if wsgi_backend_is_listening(target_host, target_port):
+                    wsgi_backend_write_port(port_path, target_port)
+                    return target_port
+                if wsgi_backend_port_available(target_port):
+                    raise
+                last_error = error
+                target_port = wsgi_backend_free_port()
+
+        if last_error is not None:
+            raise last_error
+        raise RuntimeError("backend port is not available")
 
 
 def wsgi_backend_request(environ, target_host, target_port, request_body):
@@ -360,12 +438,14 @@ def wsgi_headers(environ, target_host, target_port):
 
 
 def wsgi_application(environ, start_response):
+    base_dir = Path(__file__).resolve().parent
     target_host = os.environ.get("NAMU_WSGI_HOST", "127.0.0.1")
     target_port = os.environ.get("NAMU_WSGI_PORT", "3001")
     try:
         target_port = int(target_port)
     except ValueError:
         target_port = 3001
+    target_port = wsgi_backend_read_port(wsgi_backend_port_path(base_dir), target_port)
 
     request_body = wsgi_request_body(environ)
     try:
@@ -377,7 +457,7 @@ def wsgi_application(environ, start_response):
             return wsgi_backend_error(start_response, target_host, target_port, error)
 
         try:
-            wsgi_start_backend(target_host, target_port)
+            target_port = wsgi_start_backend(target_host, target_port)
         except Exception as start_error:
             return wsgi_backend_error(
                 start_response, target_host, target_port, error, start_error
