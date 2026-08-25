@@ -27,15 +27,9 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	if bbs_comment_acl {
 		data_html += `
             <hr class="main_hr">
-            <div id="opennamu_bbs_w_post_tabom">
-                <form method="post" action="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/tabom">
-                    <button type="submit" style="border: 0; padding: 0; background: transparent;">
-                    <span class="opennamu_bbs_w_post_tabom opennamu_svg opennamu_svg_tabom">&nbsp;</span>
-                    </button>
-                </form>
-                <hr class="main_hr">
-                <span>` + tool.Get_language(db, "upvote", true) + `</span> <span class="opennamu_tabom_count">` + tabom_count + `</span>
-            </div>
+            <form method="post" action="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/tabom">
+                <button type="submit">` + tool.Get_language(db, "upvote", true) + ` ` + tool.HTML_escape(tabom_count) + `</button>
+            </form>
         `
 	}
 

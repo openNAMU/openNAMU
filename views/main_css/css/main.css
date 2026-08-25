@@ -490,30 +490,6 @@
     background-image: url(/views/main_css/file/icon/tool.svg);
 }
 
-.opennamu_main .opennamu_svg_tabom {
-    width: 50px;
-    height: 50px;
-
-    background-image: url(/views/main_css/file/icon/thumbs-up.svg);
-}
-
-.opennamu_main #opennamu_bbs_w_post_tabom {
-    text-align: center;
-
-    margin: auto;
-
-    width: 50px;
-
-    padding: 15px;
-    
-    border: 4px solid gray;
-
-    background-size: 100% 100%;
-    background-origin: content-box;
-    
-    box-sizing: content-box;
-}
-
 .opennamu_main .opennamu_bbs_w_post_tab {
     padding: 20px;
 
