@@ -79,6 +79,9 @@ function opennamu_list_hidden_remove() {
 
 function opennamu_do_footnote_popover(set_name, load_name, sub_obj = undefined, do_type = 'open') {
     if(document.getElementById(set_name + '_load')) {
+        document.getElementById(set_name + '_load').onclick = function (event) {
+            event.stopPropagation();
+        };
         if(do_type === 'open') {
             if(sub_obj !== undefined) {
                 document.getElementById(set_name + '_load').innerHTML = document.getElementById(sub_obj).innerHTML;
