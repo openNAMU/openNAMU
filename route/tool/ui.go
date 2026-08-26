@@ -60,7 +60,7 @@ func Get_use_skin_name_session(db *sql.DB, ip string, session sessions.Session) 
 			[]any{&user_skin_name},
 		)
 	}
-	
+
 	if user_skin_name == "default" {
 		user_skin_name = ""
 	}
@@ -351,6 +351,25 @@ func Get_list_ui(left string, right string, bottom string, class_name string) st
 	data_html += "</span>"
 
 	return data_html
+}
+
+func Get_date_list_ui(date string, previous_date string) (string, string, string) {
+	date_split := strings.SplitN(date, " ", 2)
+	date_heading := ""
+	date_text := date
+	date_value := ""
+
+	if len(date_split) > 0 {
+		date_value = date_split[0]
+	}
+	if len(date_split) > 1 {
+		date_text = date_split[1]
+	}
+	if date_value != "" && date_value != previous_date {
+		date_heading = "<h2>" + HTML_escape(date_value) + "</h2>"
+	}
+
+	return date_heading, HTML_escape(date_text), date_value
 }
 
 // Get_error_page : auth, slow edit limit, edit filter (content), edit filter (send), send require, checkbox check require, overflow max length

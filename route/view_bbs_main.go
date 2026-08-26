@@ -9,6 +9,7 @@ import (
 func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_id_to_name map[string]string) string {
 	count := 0
 	data_html := ""
+	date_heading := ""
 
 	for _, in_data := range bbs_all_data {
 		count_str := strconv.Itoa(count)
@@ -51,7 +52,9 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 		right += `<span id="opennamu_bbs_comment_` + count_str + `"></span>`
 		right += bbs_view_count + " | "
 		right += bbs_user_id + " | "
-		right += bbs_date
+		date_ui, date_text, new_date_heading := tool.Get_date_list_ui(bbs_date, date_heading)
+		date_heading = new_date_heading
+		right += date_text
 
 		class_name := ""
 		if in_data["pinned"] == "1" {
@@ -66,6 +69,7 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 			}
 			bottom += "#" + tool.HTML_escape(tag)
 		}
+		data_html += date_ui
 		data_html += tool.Get_list_ui(left, right, bottom, class_name)
 	}
 

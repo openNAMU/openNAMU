@@ -118,15 +118,10 @@ func Get_ui_history(db *sql.DB, config tool.Config, data_all [][]string) (string
 
 		right += tool.Get_language(db, edit_type, true) + " | "
 
-		time_split := strings.Split(in_data[2], " ")
-		if date_heading != time_split[0] {
-			data_html += "<h2>" + time_split[0] + "</h2>"
-			date_heading = time_split[0]
-		}
-
-		if len(time_split) > 1 {
-			right += time_split[1]
-		}
+		date_ui, date_text, new_date_heading := tool.Get_date_list_ui(in_data[2], date_heading)
+		date_heading = new_date_heading
+		data_html += date_ui
+		right += date_text
 
 		right += `<span style="display: none;" id="opennamu_history_tool_` + for_count_str + `">`
 		right += `<a href="/render/` + rev_str + `/` + doc_name_url + `">` + tool.Get_language(db, "view", true) + `</a>`

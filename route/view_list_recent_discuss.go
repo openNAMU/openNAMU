@@ -10,6 +10,7 @@ func Get_ui_recent_discuss(db *sql.DB, config tool.Config, data_all [][]string) 
 	auth_info := tool.Get_auth_group_info(db, auth_name)
 
 	data_html := ""
+	date_heading := ""
 
 	for_count := 1
 	for _, in_data := range data_all {
@@ -36,8 +37,11 @@ func Get_ui_recent_discuss(db *sql.DB, config tool.Config, data_all [][]string) 
 		}
 
 		right += `<a href="/thread/` + in_data[3] + `#` + in_data[7] + `">#` + in_data[7] + `</a> | `
-		right += in_data[6] + " | " + in_data[2]
+		date_ui, date_text, new_date_heading := tool.Get_date_list_ui(in_data[2], date_heading)
+		date_heading = new_date_heading
+		right += in_data[6] + " | " + date_text
 
+		data_html += date_ui
 		data_html += tool.Get_list_ui(left, right, "", "")
 	}
 
