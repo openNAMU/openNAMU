@@ -1462,6 +1462,13 @@ func (class *namumark_compat_renderer) process_middle_block(middle_data string) 
 		}
 		return class.reserve(`<span style="`+style+`">`) + color_body + class.reserve("</span>")
 	}
+	code := strings.TrimSpace(middle_data)
+	if code != "" {
+		if class.collect_only {
+			return code
+		}
+		return class.reserve(`<code>` + code + `</code>`)
+	}
 	return class.reserve_literal(class.middle_literal(strings.Trim(middle_data, "\n")))
 }
 
