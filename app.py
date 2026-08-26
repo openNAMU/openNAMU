@@ -390,11 +390,15 @@ def wsgi_request_body(environ):
 
 
 def wsgi_path(environ):
-    raw_uri = environ.get("RAW_URI", "")
+    raw_uri = environ.get("RAW_URI", "") or environ.get("REQUEST_URI", "")
     if raw_uri.startswith("/"):
         return raw_uri
 
     path = environ.get("PATH_INFO", "/") or "/"
+    try:
+        path = path.encode("latin-1").decode("utf-8")
+    except UnicodeError:
+        pass
     path = quote(path, safe="/%:@-._~!$&'()*+,;=")
     query = environ.get("QUERY_STRING", "")
     if query:
