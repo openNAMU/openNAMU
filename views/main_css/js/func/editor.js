@@ -106,7 +106,7 @@ function pasteListener(e) {
         }
 
         let lang_data = new FormData();
-        lang_data.append('data', 'file_name empty save authority_error same_file_error error');
+        lang_data.append('data', 'file_name empty save error');
 
         fetch('/api/v2/lang', {
             method : 'POST',
@@ -131,21 +131,17 @@ function pasteListener(e) {
                 method : "POST",
                 body : formData,
             }).then((res) => {
-                if (res.status === 200 || res.status === 201) {
+                if (res.ok) {
                     const url = res.url;
                     alert(lang['save'] + ' : [[file:' + file_name + ']]');
 
                     do_insert_data('[[file:' + file_name + ']]');
                 } else {
-                    console.error("[ERROR] PasteUpload Fail :", res.statusText);
-
-                    if(res.status === 400) {
-                        alert(lang['same_file_error']);
-                    } else if(res.status === 401) {
-                        alert(lang['authority_error']);    
-                    } else {
-                        alert(lang['error']);        
-                    }
+                    return res.text().then(function(data) {
+                        const body = new DOMParser().parseFromString(data, 'text/html');
+                        const error = body.querySelector('.opennamu_main li');
+                        alert(error ? error.textContent.trim() : data.trim() || lang['error']);
+                    });
                 }
             }).catch((err) => {
                 console.error("[ERROR] PasteUpload Fail :", JSON.stringify(err), err);

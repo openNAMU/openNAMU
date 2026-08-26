@@ -90,5 +90,9 @@ func upload_post(c *gin.Context) {
 	}
 
 	route_data := route.View_edit_file_upload_post(make_route_config(c), upload_files)
-	write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	status := http.StatusOK
+	if _, ok := tool.Get_redirect_target(route_data); !ok {
+		status = http.StatusBadRequest
+	}
+	write_data(c, status, "text/html; charset=utf-8", []byte(route_data))
 }
