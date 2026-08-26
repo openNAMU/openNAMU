@@ -627,6 +627,7 @@
     "new_doc": "새 문서",
     "table": "표",
     "table_transparent": "표 투명화",
+    "table_auto_color": "배경색에 맞춰 글자색 자동 변경",
     "recaptcha_pass_acl": "CAPTCHA 통과 ACL",
     "recaptcha_one_check_five_pass_acl": "CAPTCHA 1회 통과시 5회 미시행 ACL",
     "func_404_error": "이 URL에 맞는 기능이 없습니다.",

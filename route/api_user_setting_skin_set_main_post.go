@@ -164,6 +164,11 @@ func Get_main_skin_set_list(db *sql.DB) map[string][][]string {
 			{"off", lang["off"]},
 			{"on", lang["use"]},
 		},
+		"main_css_table_auto_color": {
+			{"default", lang["default"]},
+			{"off", lang["off"]},
+			{"on", lang["use"]},
+		},
 		"main_css_font_size": {
 			{"default", lang["default"]},
 			{"10", "10"},

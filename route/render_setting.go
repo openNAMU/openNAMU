@@ -71,6 +71,7 @@ func get_render_setting_parameter(db *sql.DB, config tool.Config) map[string]str
 		"main_css_footnote_number",
 		"main_css_view_real_footnote_num",
 		"main_css_list_view_change",
+		"main_css_table_auto_color",
 	} {
 		setting[name] = tool.Get_main_skin_set(db, config, name)
 	}

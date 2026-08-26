@@ -111,6 +111,7 @@ func View_user_skin_main(config tool.Config, values url.Values) string {
 	body.WriteString(`<h3>` + tool.Get_language(db, "table", true) + `</h3>`)
 	body.WriteString(field_data("main_css_table_scroll", "table_scroll", "h4"))
 	body.WriteString(field_data("main_css_table_transparent", "table_transparent", "h4"))
+	body.WriteString(field_data("main_css_table_auto_color", "table_auto_color", "h4"))
 	body.WriteString(field_data("main_css_list_view_change", "list_view_change", "h3"))
 	body.WriteString(field_data("main_css_view_joke", "view_joke", "h3"))
 	body.WriteString(field_data("main_css_math_scroll", "math_scroll", "h3"))

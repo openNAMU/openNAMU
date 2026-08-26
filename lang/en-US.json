@@ -328,6 +328,7 @@
     "new_doc": "New document(s)",
     "table": "Table",
     "table_transparent": "Table transparency",
+    "table_auto_color": "Automatically change text color based on background",
     "recaptcha_pass_acl": "CAPTCHA Pass ACL",
     "recaptcha_one_check_five_pass_acl": "Passing the CAPTCHA once will result in 5 unimplemented ACL",
     "user_fix": "Fix user",

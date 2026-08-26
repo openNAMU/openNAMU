@@ -47,6 +47,7 @@ func setting_skin_fields(db *sql.DB) ([]setting_skin_field, map[string][][]strin
 		{name: "main_css_darkmode", label: "force_darkmode"},
 		{name: "main_css_table_scroll", label: "table_scroll"},
 		{name: "main_css_table_transparent", label: "table_transparent"},
+		{name: "main_css_table_auto_color", label: "table_auto_color"},
 		{name: "main_css_list_view_change", label: "list_view_change"},
 		{name: "main_css_view_joke", label: "view_joke"},
 		{name: "main_css_math_scroll", label: "math_scroll"},

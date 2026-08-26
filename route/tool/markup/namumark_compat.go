@@ -1796,6 +1796,33 @@ func (class *namumark_compat_renderer) render_inline(data string) string {
 	return class.render_text(data)
 }
 
+func compat_table_auto_text_color(value string) string {
+	value = strings.TrimSpace(strings.TrimPrefix(strings.ToLower(value), "#"))
+	if len(value) == 4 {
+		value = value[:3]
+	} else if len(value) == 8 {
+		value = value[:6]
+	}
+	if len(value) == 3 {
+		value = string([]byte{value[0], value[0], value[1], value[1], value[2], value[2]})
+	}
+	if len(value) != 6 {
+		return ""
+	}
+
+	red, red_err := strconv.ParseUint(value[0:2], 16, 8)
+	green, green_err := strconv.ParseUint(value[2:4], 16, 8)
+	blue, blue_err := strconv.ParseUint(value[4:6], 16, 8)
+	if red_err != nil || green_err != nil || blue_err != nil {
+		return ""
+	}
+
+	if (red+green+blue)/3 >= 127 {
+		return "#000"
+	}
+	return "#fff"
+}
+
 func (class *namumark_compat_renderer) render_table(lines []string) string {
 	table_style := ""
 	table_class := ""
@@ -1824,6 +1851,14 @@ func (class *namumark_compat_renderer) render_table(lines []string) string {
 		value = color_value(value)
 		if value != "" {
 			*target += property + ":" + value + ";"
+		}
+	}
+	auto_color_style := func(target *string, value string) {
+		if class.get_render_setting("main_css_table_auto_color") != "on" || strings.Contains(*target, "color:") {
+			return
+		}
+		if text_color := compat_table_auto_text_color(color_value(value)); text_color != "" {
+			*target += "color:" + text_color + ";"
 		}
 	}
 	known_parameter := map[string]bool{
@@ -1855,6 +1890,7 @@ func (class *namumark_compat_renderer) render_table(lines []string) string {
 			switch name {
 			case "tablebgcolor":
 				add_color_style(table, "background", value)
+				auto_color_style(table, value)
 			case "tablewidth":
 				add_style(div, "width", compat_file_px(value))
 				*table += "width:100%;"
@@ -1880,6 +1916,7 @@ func (class *namumark_compat_renderer) render_table(lines []string) string {
 				}
 			case "rowbgcolor":
 				add_color_style(row, "background", value)
+				auto_color_style(row, value)
 			case "rowtextalign":
 				add_style(row, "text-align", value)
 			case "rowcolor":
@@ -1888,10 +1925,12 @@ func (class *namumark_compat_renderer) render_table(lines []string) string {
 				add_color_style(col, "color", value)
 			case "colbgcolor":
 				add_color_style(col, "background", value)
+				auto_color_style(col, value)
 			case "coltextalign":
 				add_style(col, "text-align", value)
 			case "bgcolor":
 				add_color_style(cell, "background", value)
+				auto_color_style(cell, value)
 			case "color":
 				add_color_style(cell, "color", value)
 			case "width":
@@ -1925,6 +1964,7 @@ func (class *namumark_compat_renderer) render_table(lines []string) string {
 				} else if len(parts) == 1 && !html_tag_name[name] && len(name) > 2 && regexp.MustCompile(`^(?:#?[0-9a-fA-F]{3,8}|[a-zA-Z][a-zA-Z0-9_-]*)$`).MatchString(name) {
 					recognized = true
 					add_color_style(cell, "background", name)
+					auto_color_style(cell, name)
 				}
 			}
 		}
