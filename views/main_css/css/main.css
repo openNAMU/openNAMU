@@ -65,6 +65,17 @@
     display: list-item;
 }
 
+.opennamu_main details.opennamu_heading_folding > summary > h1,
+.opennamu_main details.opennamu_heading_folding > summary > h2,
+.opennamu_main details.opennamu_heading_folding > summary > h3,
+.opennamu_main details.opennamu_heading_folding > summary > h4,
+.opennamu_main details.opennamu_heading_folding > summary > h5,
+.opennamu_main details.opennamu_heading_folding > summary > h6 {
+    display: inline-block;
+    width: calc(100% - 1.5em);
+    vertical-align: middle;
+}
+
 /* diff */
 .opennamu_main .opennamu_diff_green {
     background: #eaf2c2;
@@ -448,10 +459,6 @@
 
 .opennamu_main .opennamu_list_none {
     list-style: none;
-}
-
-.opennamu_main .opennamu_folding {
-    margin-top: 10px;
 }
 
 .opennamu_main .opennamu_recent_change {

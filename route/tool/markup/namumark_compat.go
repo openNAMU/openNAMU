@@ -3055,6 +3055,18 @@ func compat_remove_nested_links(data string) string {
 
 func (class *namumark_compat_renderer) render_output() string {
 	data := class.data
+	for token, token_data := range class.tokens {
+		if strings.Contains(token_data, `<div class="opennamu_folding">`) {
+			for strings.Contains(data, token+"\n") {
+				data = strings.ReplaceAll(data, token+"\n", token)
+			}
+		}
+		if strings.HasSuffix(token_data, `</div></details>`) {
+			for strings.Contains(data, "\n"+token) {
+				data = strings.ReplaceAll(data, "\n"+token, token)
+			}
+		}
+	}
 	data = strings.ReplaceAll(data, "\n", "<br>")
 	data = class.restore(data)
 	data = compat_remove_nested_links(data)
