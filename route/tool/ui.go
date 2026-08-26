@@ -449,6 +449,8 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
 		data = Get_language(db, "bbs_title_length_error", true)
 	case "bbs tag length":
 		data = Get_language(db, "bbs_tag_length_error", true)
+	case "comment_closed":
+		data = Get_language(db, "comment_closed", true)
 	case "topic title length":
 		data = Get_language(db, "error_title_length_too_long", true) + " " + Get_title_length_limit(db, "topic")
 	case "edit conflict":

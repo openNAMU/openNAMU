@@ -11,6 +11,17 @@ import (
 
 var bbs_comment_code_regex = regexp.MustCompile(`^[0-9]+(?:-[0-9]+)*$`)
 
+func bbs_comment_closed(db *sql.DB, set_id string, set_code string) bool {
+	closed := ""
+	return tool.QueryRow_DB(
+		db,
+		"select set_data from bbs_data where set_name = 'comment_close' and set_id = ? and set_code = ?",
+		[]any{&closed},
+		set_id,
+		set_code,
+	) && closed == "1"
+}
+
 func bbs_comment_parent(db *sql.DB, set_id string, set_code string, comment_select string) (string, string, bool) {
 	base_id := set_id + "-" + set_code
 	if comment_select == "" || comment_select == "0" {
@@ -81,6 +92,11 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 
 	if !tool.Check_acl(db, set_id, "", "bbs_comment", config.IP) {
 		return_data["response"] = "require auth"
+		return return_data
+	}
+	if bbs_comment_closed(db, set_id, set_code) {
+		return_data["response"] = "error"
+		return_data["data"] = "comment_closed"
 		return return_data
 	}
 

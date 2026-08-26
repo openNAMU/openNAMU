@@ -14,6 +14,8 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	data_api_in := data_api["data"].([]map[string]string)
 
 	bbs_comment_acl := tool.Check_acl(db, set_id, "", "bbs_comment", config.IP)
+	comment_closed := bbs_comment_closed(db, set_id, set_code)
+	can_comment := bbs_comment_acl && !comment_closed
 
 	select_html := `
         <select id="opennamu_comment_select" name="comment_select">
@@ -34,6 +36,9 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	}
 
 	data_html += "<hr>"
+	if comment_closed {
+		data_html += `<span>` + tool.Get_language(db, "comment_closed", true) + `</span><hr>`
+	}
 
 	var re = regexp.MustCompile(`^[0-9]+-[0-9]+-`)
 
@@ -88,7 +93,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	select_html += `</select> <a href="#` + tool.Url_parser(return_anchor) + `">(` + tool.Get_language(db, "return", true) + `)</a>`
 	select_html += `<hr class="main_hr">`
 
-	if bbs_comment_acl {
+	if can_comment {
 		data_html += `
             <form method="post" action="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">
                 <div id="opennamu_bbs_w_post_select">` + select_html + `</div>

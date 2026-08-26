@@ -123,6 +123,17 @@ func register_bbs_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.POST("/bbs/tool/:set_id/:set_code", func(c *gin.Context) {
+		_ = c.Request.ParseForm()
+		route_data := route.View_bbs_in_w_tool_post(
+			make_route_config(c),
+			c.Param("set_id"),
+			c.Param("set_code"),
+			c.Request.PostForm,
+		)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/bbs/tool/:set_id/:set_code/:comment_code", func(c *gin.Context) {
 		route_data := route.View_bbs_in_w_comment_tool(
 			make_route_config(c),
