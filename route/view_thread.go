@@ -60,8 +60,8 @@ func thread_save_post(config tool.Config, topic_num string, doc_name string, val
 	if !tool.Do_edit_filter(db, config, "", data) {
 		return tool.Get_error_page(db, config, "edit filter (content)")
 	}
-	if !tool.Do_edit_max_length_check(db, config, data) {
-		return tool.Get_error_page(db, config, "overflow max length")
+	if !tool.Do_bbs_max_length_check(db, config, data) {
+		return tool.Get_error_page(db, config, "bbs overflow max length")
 	}
 
 	name := doc_name

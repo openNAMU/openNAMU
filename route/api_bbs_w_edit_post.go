@@ -48,6 +48,12 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 
 		return return_data
 	}
+	if !tool.Do_bbs_max_length_check(db, config, data) {
+		return_data["response"] = "error"
+		return_data["data"] = "bbs overflow max length"
+
+		return return_data
+	}
 
 	if comment_code != "" {
 		comment_code_split := strings.Split(comment_code, "-")

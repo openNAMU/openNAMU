@@ -531,7 +531,9 @@
     "display_level_in_user_name": "Displaying levels in username",
     "ua_expiration_date": "UA expiration deadline",
     "document_content_max_length": "Maximum document length",
+    "bbs_content_max_length": "Maximum BBS and discussion content length",
     "document_content_max_length_error": "Document content is too long. Maximum characters:",
+    "bbs_content_max_length_error": "BBS or discussion content is too long. Maximum characters:",
     
     "_comment_": "Text",
     "register_text": "Terms of registration",

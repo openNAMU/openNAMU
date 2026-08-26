@@ -209,6 +209,7 @@ func setting_main_fields() []setting_field {
 		{name: "slow_thread", default_value: ""},
 		{name: "edit_timeout", default_value: "5"},
 		{name: "document_content_max_length", default_value: ""},
+		{name: "bbs_content_max_length", default_value: ""},
 		{name: "backup_count", default_value: ""},
 		{name: "ua_expiration_date", default_value: ""},
 		{name: "auth_history_expiration_date", default_value: ""},
@@ -338,6 +339,8 @@ func view_setting_main_data(db *sql.DB, config tool.Config, values map[string]st
 	data.WriteString(setting_input("edit_timeout", values["edit_timeout"], "text") + setting_hr())
 	data.WriteString(`<span>` + lang("document_content_max_length") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + setting_hr())
 	data.WriteString(setting_input("document_content_max_length", values["document_content_max_length"], "text") + setting_hr())
+	data.WriteString(`<span>` + lang("bbs_content_max_length") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + setting_hr())
+	data.WriteString(setting_input("bbs_content_max_length", values["bbs_content_max_length"], "text") + setting_hr())
 
 	data.WriteString(`<button id="opennamu_save_button" type="submit">` + lang("save") + `</button></form>`)
 

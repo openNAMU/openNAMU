@@ -613,6 +613,7 @@
     "ua_expiration_date": "UA 만료 기한",
     "backup": "백업",
     "document_content_max_length": "문서 최대 길이",
+    "bbs_content_max_length": "게시판·토론 내용 최대 길이",
     "bbs_record": "게시판 작성글 목록",
     "bbs_comment_record": "게시판 작성댓글 목록",
     "load_temp_save": "임시 저장",
@@ -732,5 +733,6 @@
     "email_test" : "이메일 전송 테스트",
     "r1" : "r1",
     "length_doc" : "문서 길이",
-    "document_content_max_length_error": "문서 내용이 너무 깁니다. 최대 문자 수:"
+    "document_content_max_length_error": "문서 내용이 너무 깁니다. 최대 문자 수:",
+    "bbs_content_max_length_error": "게시판 또는 토론 내용이 너무 깁니다. 최대 문자 수:"
 }

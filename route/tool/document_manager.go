@@ -138,12 +138,21 @@ func Do_edit_slow_check(db *sql.DB, config Config, do_type string) bool {
 
 // Do_edit_max_length_check : over is false, under is true
 func Do_edit_max_length_check(db *sql.DB, config Config, data string) bool {
+	return do_max_length_check(db, "document_content_max_length", data)
+}
+
+func Do_bbs_max_length_check(db *sql.DB, config Config, data string) bool {
+	return do_max_length_check(db, "bbs_content_max_length", data)
+}
+
+func do_max_length_check(db *sql.DB, name string, data string) bool {
 	var check string
 
 	exist := QueryRow_DB(
 		db,
-		"select data from other where name = 'document_content_max_length'",
+		"select data from other where name = ?",
 		[]any{&check},
+		name,
 	)
 
 	if !exist || check == "" {
