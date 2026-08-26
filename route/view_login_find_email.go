@@ -23,7 +23,8 @@ func View_login_find_email(config tool.Config, values url.Values) string {
 		config.Session.Set("email_reset_key", key)
 		config.Session.Set("email_reset_id", user_id)
 		_ = config.Session.Save()
-		if err := tool.Send_email(db, config.IP, email, "password reset", key); err != nil {
+		body := tool.Get_language(db, "id", true) + " : " + user_id + "\n\n" + tool.Get_language(db, "key", true) + " : " + key
+		if err := tool.Send_email(db, config.IP, email, "password reset", body); err != nil {
 			config.Session.Delete("email_reset_key")
 			config.Session.Delete("email_reset_id")
 			_ = config.Session.Save()
