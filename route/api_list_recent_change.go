@@ -22,28 +22,78 @@ func Api_list_recent_change(config tool.Config, set_type string, limit string, n
 		page_int = 0
 	}
 
-	rows := tool.Query_DB(
+	var rc_count int
+	tool.QueryRow_DB(
 		db,
-		"select id, title from rc where type = ? order by date desc limit ?, ?",
+		"select count(*) from rc where type = ?",
+		[]any{&rc_count},
 		set_type,
-		page_int,
-		limit_int,
 	)
-	defer rows.Close()
+	all_admin_auth := tool.Check_acl(db, "", "", "all_admin_auth", config.IP)
+
+	id_title_list := [][]string{}
+	if page_int < rc_count {
+		rc_limit := limit_int
+		if page_int+rc_limit > rc_count {
+			rc_limit = rc_count - page_int
+		}
+
+		rows := tool.Query_DB(
+			db,
+			"select id, title from rc where type = ? order by date desc limit ?, ?",
+			set_type,
+			page_int,
+			rc_limit,
+		)
+		for rows.Next() {
+			var id string
+			var title string
+			if err := rows.Scan(&id, &title); err != nil {
+				panic(err)
+			}
+			id_title_list = append(id_title_list, []string{id, title})
+		}
+		rows.Close()
+	}
+
+	history_offset := page_int - rc_count
+	if history_offset < 0 {
+		history_offset = 0
+	}
+	history_limit := limit_int - len(id_title_list)
+	if all_admin_auth && history_limit > 0 {
+		history_query := `select h.id, h.title from history h where `
+		history_values := []any{}
+		if set_type != "normal" {
+			history_query += "h.type = ? and "
+			history_values = append(history_values, set_type)
+		}
+		history_query += `not exists (
+			select 1 from rc r
+			where r.type = ? and r.id = h.id and r.title = h.title
+		) order by h.date desc limit ?, ?`
+		history_values = append(history_values, set_type, history_offset, history_limit)
+
+		rows := tool.Query_DB(db, history_query, history_values...)
+		for rows.Next() {
+			var id string
+			var title string
+			if err := rows.Scan(&id, &title); err != nil {
+				panic(err)
+			}
+			id_title_list = append(id_title_list, []string{id, title})
+		}
+		rows.Close()
+	}
 
 	data_list := [][]string{}
 
 	admin_auth := tool.Check_acl(db, "", "", "hidel_auth", config.IP)
 	ip_parser_temp := map[string][]string{}
 
-	for rows.Next() {
-		var id string
-		var title string
-
-		err := rows.Scan(&id, &title)
-		if err != nil {
-			panic(err)
-		}
+	for _, id_title := range id_title_list {
+		id := id_title[0]
+		title := id_title[1]
 
 		date := ""
 		ip := ""
