@@ -89,6 +89,12 @@ func register_history_edit_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.POST("/edit_preview/:mode/*doc_name", func(c *gin.Context) {
+		doc_name := strings.TrimPrefix(c.Param("doc_name"), "/")
+		route_data := route.View_edit_preview(make_route_config(c), doc_name, c.PostForm("content"), c.Param("mode"))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/move/*doc_name", func(c *gin.Context) {
 		route_data := route.View_edit_move(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), nil)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))

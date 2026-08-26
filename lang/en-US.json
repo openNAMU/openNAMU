@@ -117,6 +117,8 @@
     "why": "Reason",
     "edit": "Edit",
     "preview": "Preview",
+    "preview_normal": "Normal mode preview",
+    "preview_dark": "Dark mode preview",
     "move": "Move",
     "upload": "Upload",
     "version": "Version",

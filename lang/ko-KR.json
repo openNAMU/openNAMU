@@ -61,6 +61,8 @@
     "connect": "연결",
     "edit_record": "편집 기록",
     "preview": "미리보기",
+    "preview_normal": "일반모드 미리보기",
+    "preview_dark": "다크모드 미리보기",
     "view": "보기",
     "no_login_error": "비로그인 상태입니다.",
     "upload": "파일 올리기",
