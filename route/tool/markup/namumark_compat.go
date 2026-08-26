@@ -2331,6 +2331,7 @@ func (class *namumark_compat_renderer) process_headings(data string) string {
 	heading_stack := [6]int{}
 	toc_requested := strings.Contains(data, "[toc]")
 	first_heading_index := -1
+	last_heading := -1
 	for index, line := range lines {
 		line = strings.TrimSpace(line)
 		if line == "" {
@@ -2385,11 +2386,26 @@ func (class *namumark_compat_renderer) process_headings(data string) string {
 		class.toc_items = append(class.toc_items, namumark_compat_toc_item{number, rendered_heading})
 		heading_id := regexp.MustCompile(`<[^<>]*>`).ReplaceAllString(class.restore(rendered_heading), "")
 		heading_id = tool.HTML_unescape(heading_id)
-		lines[index] = class.reserve(`<h` + strconv.Itoa(level) + ` id="` + compat_html_escape(heading_id) + `"><a href="#toc" id="s-` + compat_html_escape(number) + `">` + number + `.</a> ` + rendered_heading + `</h` + strconv.Itoa(level) + `>`)
+		heading_html := `<details class="opennamu_heading_folding"`
+		if !heading_folding {
+			heading_html += ` open`
+		}
+		heading_html += `><summary><h` + strconv.Itoa(level) + ` id="` + compat_html_escape(heading_id) + `"><a href="#toc" id="s-` + compat_html_escape(number) + `">` + number + `.</a> ` + rendered_heading + `</h` + strconv.Itoa(level) + `></summary><div class="opennamu_folding">`
+		if last_heading >= 0 {
+			lines[index] = class.reserve(`</div></details>`) + class.reserve(heading_html)
+		} else {
+			lines[index] = class.reserve(heading_html)
+		}
+		last_heading = index
 	}
 
+	heading_close := ""
+	if last_heading >= 0 {
+		heading_close = class.reserve(`</div></details>`)
+	}
+	data = strings.Join(lines, "\n") + heading_close
+
 	toc_set := class.get_render_setting("main_css_toc_set")
-	data = strings.Join(lines, "\n")
 	if toc_requested {
 		if toc_set == "off" {
 			data = strings.ReplaceAll(data, "[toc]", "")
@@ -2404,7 +2420,7 @@ func (class *namumark_compat_renderer) process_headings(data string) string {
 			toc_lines = []string{"", toc_data}
 		}
 		lines = append(lines[:first_heading_index], append(toc_lines, lines[first_heading_index:]...)...)
-		data = strings.Join(lines, "\n")
+		data = strings.Join(lines, "\n") + heading_close
 	}
 	return data
 }
