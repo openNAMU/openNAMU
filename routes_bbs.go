@@ -98,12 +98,17 @@ func register_bbs_routes(r *gin.Engine) {
 	})
 
 	r.GET("/bbs/in/:set_id", func(c *gin.Context) {
-		route_data := route.View_bbs_in(make_route_config(c), c.Param("set_id"), "1")
+		route_data := route.View_bbs_in(make_route_config(c), c.Param("set_id"), "1", "")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
 	r.GET("/bbs/in/:set_id/:page_num", func(c *gin.Context) {
-		route_data := route.View_bbs_in(make_route_config(c), c.Param("set_id"), c.Param("page_num"))
+		route_data := route.View_bbs_in(make_route_config(c), c.Param("set_id"), c.Param("page_num"), "")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/bbs/in/:set_id/view/:page_num", func(c *gin.Context) {
+		route_data := route.View_bbs_in(make_route_config(c), c.Param("set_id"), c.Param("page_num"), "view")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 

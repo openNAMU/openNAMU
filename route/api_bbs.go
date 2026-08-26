@@ -5,7 +5,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_bbs(config tool.Config, bbs_num string, page string) map[string]any {
+func Api_bbs(config tool.Config, bbs_num string, page string, sort_type string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -32,12 +32,21 @@ func Api_bbs(config tool.Config, bbs_num string, page string) map[string]any {
 
 		rows_arr = append(rows_arr, rows)
 
-		rows = tool.Query_DB(
-			db,
-			"select set_code, set_id, '0' from bbs_data where set_name = 'title' and set_id like ? order by set_code + 0 desc limit ?, 50",
-			bbs_num,
-			num,
-		)
+		if sort_type == "view" {
+			rows = tool.Query_DB(
+				db,
+				"select title.set_code, title.set_id, '0' from bbs_data title left join bbs_data view_data on view_data.set_name = 'view_count' and view_data.set_id = title.set_id and view_data.set_code = title.set_code where title.set_name = 'title' and title.set_id like ? order by coalesce(view_data.set_data, '0') + 0 desc, title.set_code + 0 desc limit ?, 50",
+				bbs_num,
+				num,
+			)
+		} else {
+			rows = tool.Query_DB(
+				db,
+				"select set_code, set_id, '0' from bbs_data where set_name = 'title' and set_id like ? order by set_code + 0 desc limit ?, 50",
+				bbs_num,
+				num,
+			)
+		}
 
 		rows_arr = append(rows_arr, rows)
 	}

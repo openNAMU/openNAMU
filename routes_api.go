@@ -144,7 +144,7 @@ func register_api_routes(r *gin.Engine) {
 	})
 
 	r.GET("/api/v2/bbs/main", func(c *gin.Context) {
-		route_data := route.Api_bbs(make_route_config(c), "", "1")
+		route_data := route.Api_bbs(make_route_config(c), "", "1", "")
 		c.JSON(http.StatusOK, route_data)
 	})
 
@@ -154,7 +154,12 @@ func register_api_routes(r *gin.Engine) {
 	})
 
 	r.GET("/api/v2/bbs/in/:set_id/:page", func(c *gin.Context) {
-		route_data := route.Api_bbs(make_route_config(c), c.Param("set_id"), c.Param("page"))
+		route_data := route.Api_bbs(make_route_config(c), c.Param("set_id"), c.Param("page"), "")
+		c.JSON(http.StatusOK, route_data)
+	})
+
+	r.GET("/api/v2/bbs/in/:set_id/view/:page", func(c *gin.Context) {
+		route_data := route.Api_bbs(make_route_config(c), c.Param("set_id"), c.Param("page"), "view")
 		c.JSON(http.StatusOK, route_data)
 	})
 
