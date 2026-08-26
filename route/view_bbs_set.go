@@ -120,13 +120,20 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 	data += "<textarea class=\"opennamu_textarea_100\" name=\"bbs_prefix\">" + tool.HTML_escape(bbs_set_value(db, set_id, "bbs_prefix")) + "</textarea><hr class=\"main_hr\">"
 	data += `<button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 
+	menu := [][]any{
+		{"bbs/in/" + tool.Url_parser(set_id), tool.Get_language(db, "return", true)},
+	}
+	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+		menu = append(menu, []any{"bbs/delete/" + tool.Url_parser(set_id), tool.Get_language(db, "delete", true)})
+	}
+
 	return tool.Get_template(
 		db,
 		config,
 		tool.Get_language(db, "bbs_set", true),
 		data,
 		[]any{"(" + bbs_name + ")"},
-		[][]any{{"bbs/in/" + tool.Url_parser(set_id), tool.Get_language(db, "return", true)}},
+		menu,
 		map[string]string{},
 	)
 }
