@@ -38,6 +38,12 @@ The default port is `3000`. It can be changed with the first argument.
 ./main.amd64.bin 3000
 ```
 
+If the server cannot start normally, run the emergency tool mode.
+
+```bash
+./main.amd64.bin em
+```
+
 ## For developers
 
 Use this section when modifying the source code or building the project yourself.

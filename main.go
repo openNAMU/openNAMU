@@ -96,6 +96,9 @@ func main() {
 	if len(os.Args) > 1 && os.Args[1] == "--opennamu-update" {
 		os.Exit(route.Run_server_update(os.Args[2:]))
 	}
+	if len(os.Args) > 1 && os.Args[1] == "em" {
+		os.Exit(route.Run_emergency_tool(os.Args[2:]))
+	}
 
 	wait_startup_delay()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
