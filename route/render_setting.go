@@ -28,7 +28,7 @@ func move_render_category_top(data string) string {
 		return data
 	}
 
-	return data[:opening_end+1] + data[category_start:category_end] + `<hr class="main_hr">` + data[opening_end+1:separator] + data[category_end:]
+	return data[:opening_end+1] + data[category_start:category_end] + data[opening_end+1:separator] + data[category_end:]
 }
 
 func add_render_external_link_target(data string) string {
