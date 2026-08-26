@@ -1039,10 +1039,16 @@ func (class *namumark_compat_renderer) merge_child(child *namumark_compat_render
 }
 
 func (class *namumark_compat_renderer) process_includes(data string) string {
+	include_count_max := strings.Count(strings.ToLower(data), "[include(") * 2
+	include_count := map[string]int{}
 	for {
 		previous := data
 		data = compat_replace_regex2(data, `(?i)\[include\(((?:(?!\[include\(|\)\]|</div>).)+)\)\](\n?)`, func(match regexp2.Match) string {
 			suffix := match.GroupByNumber(2).String()
+			if include_count_max <= 0 {
+				return match.String()
+			}
+			include_count_max--
 			if class.render_type == "include" {
 				return ""
 			}
@@ -1074,7 +1080,11 @@ func (class *namumark_compat_renderer) process_includes(data string) string {
 			if include_name == "" {
 				return suffix
 			}
-
+			include_count_key := strings.ToLower(include_name)
+			if include_count[include_count_key] >= 10 {
+				return suffix
+			}
+			include_count[include_count_key]++
 			actual, exists := class.find_document(include_name)
 			if exists {
 				include_name = actual
