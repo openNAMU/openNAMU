@@ -346,6 +346,7 @@
     "bbs_post_delete": "Delete BBS post",
     "outer_link_filter_list": "External link auto image list",
     "external_image_filter_list": "Allowed external image domain(s)",
+    "html_filter_list": "HTML tag filter list",
     "html_or_link": "HTML or link",
     "template_document_list": "Template document(s) list",
     "no_link_document": "Document(s) without link",

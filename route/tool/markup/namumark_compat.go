@@ -98,6 +98,12 @@ var namumark_compat_html_tags = map[string]bool{
 	"sub": true, "sup": true, "bold": true,
 }
 
+var namumark_compat_html_tag_regex = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9-]*$`)
+
+var namumark_compat_html_blocked_tags = map[string]bool{
+	"embed": true, "object": true, "script": true, "style": true,
+}
+
 var namumark_compat_html_style_properties = map[string]bool{
 	"background":       true,
 	"background-color": true,
@@ -230,7 +236,31 @@ func compat_html_dimension(value string) string {
 	return value
 }
 
-func compat_sanitize_html_node(node *html.Node) string {
+func compat_html_allowed_tags(db *sql.DB) map[string]bool {
+	allowed_tags := map[string]bool{}
+	for tag_name := range namumark_compat_html_tags {
+		allowed_tags[tag_name] = true
+	}
+	if db == nil {
+		return allowed_tags
+	}
+
+	rows := tool.Query_DB(db, "select html from html_filter where kind = 'html'")
+	defer rows.Close()
+	for rows.Next() {
+		tag_name := ""
+		if rows.Scan(&tag_name) == nil {
+			tag_name = strings.ToLower(strings.TrimSpace(tag_name))
+			if !namumark_compat_html_tag_regex.MatchString(tag_name) || namumark_compat_html_blocked_tags[tag_name] {
+				continue
+			}
+			allowed_tags[tag_name] = true
+		}
+	}
+	return allowed_tags
+}
+
+func compat_sanitize_html_node(node *html.Node, allowed_tags map[string]bool) string {
 	if node == nil {
 		return ""
 	}
@@ -240,16 +270,16 @@ func compat_sanitize_html_node(node *html.Node) string {
 	if node.Type != html.ElementNode {
 		data := ""
 		for child := node.FirstChild; child != nil; child = child.NextSibling {
-			data += compat_sanitize_html_node(child)
+			data += compat_sanitize_html_node(child, allowed_tags)
 		}
 		return data
 	}
 
 	tag_name := strings.ToLower(node.Data)
-	if !namumark_compat_html_tags[tag_name] {
+	if !allowed_tags[tag_name] {
 		data := ""
 		for child := node.FirstChild; child != nil; child = child.NextSibling {
-			data += compat_sanitize_html_node(child)
+			data += compat_sanitize_html_node(child, allowed_tags)
 		}
 		return data
 	}
@@ -302,12 +332,12 @@ func compat_sanitize_html_node(node *html.Node) string {
 
 	data := "<" + tag_name + attributes + ">"
 	for child := node.FirstChild; child != nil; child = child.NextSibling {
-		data += compat_sanitize_html_node(child)
+		data += compat_sanitize_html_node(child, allowed_tags)
 	}
 	return data + "</" + tag_name + ">"
 }
 
-func compat_sanitize_html(data string) string {
+func compat_sanitize_html(data string, allowed_tags map[string]bool) string {
 	nodes, err := html.ParseFragment(strings.NewReader(data), nil)
 	if err != nil {
 		return compat_html_escape(data)
@@ -315,7 +345,7 @@ func compat_sanitize_html(data string) string {
 
 	result := ""
 	for _, node := range nodes {
-		result += compat_sanitize_html_node(node)
+		result += compat_sanitize_html_node(node, allowed_tags)
 	}
 	return result
 }
@@ -1406,7 +1436,7 @@ func (class *namumark_compat_renderer) process_middle_block(middle_data string) 
 		body = class.restore_inter_literal(body)
 		body = tool.HTML_unescape(body)
 		body = strings.ReplaceAll(body, "&amp;nbsp;", "&nbsp;")
-		return class.reserve(compat_sanitize_html(strings.Trim(body, "\n")))
+		return class.reserve(compat_sanitize_html(strings.Trim(body, "\n"), compat_html_allowed_tags(class.db)))
 
 	case middle_name == "#!syntax":
 		language := "python"

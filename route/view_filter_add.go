@@ -30,7 +30,7 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 		if title == "" {
 			title = name
 		}
-		if title == "" && kind != "external_image" {
+		if title == "" && kind != "external_image" && kind != "html" {
 			title = "test"
 		}
 
@@ -38,6 +38,16 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 			title = strings.ToLower(strings.TrimSpace(title))
 			parsed, err := url.Parse("https://" + title)
 			if title == "" || err != nil || parsed.Host != title || parsed.Hostname() == "" || parsed.Port() != "" || parsed.User != nil {
+				return tool.Get_error_page(db, config, "error")
+			}
+			if name != "" && name != title {
+				tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
+			}
+			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", title, spec.db_kind)
+			tool.Exec_DB(db, "insert into html_filter (html, kind, plus, plus_t) values (?, ?, '', '')", title, spec.db_kind)
+		} else if kind == "html" {
+			title = strings.ToLower(strings.TrimSpace(title))
+			if !html_filter_tag_regex.MatchString(title) || html_filter_blocked_tags[title] {
 				return tool.Get_error_page(db, config, "error")
 			}
 			if name != "" && name != title {
@@ -130,6 +140,8 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 		}
 	case "external_image":
 		form += filter_input(tool.Get_language(db, "domain", true), "title", value[0])
+	case "html":
+		form += filter_input(tool.Get_language(db, "tag", true), "title", value[0])
 	case "edit_filter":
 		end := ""
 		if value[2] != "" && value[2] != "X" {
@@ -178,6 +190,7 @@ func get_filter_spec(kind string) (filter_spec, bool) {
 		"inter_wiki":       {"inter_wiki", "interwiki_list"},
 		"outer_link":       {"outer_link", "outer_link_filter_list"},
 		"external_image":   {"external_image", "external_image_filter_list"},
+		"html":             {"html", "html_filter_list"},
 		"document":         {"document", "document_filter_list"},
 		"edit_top":         {"edit_top", "edit_tool_list"},
 		"image_license":    {"image_license", "image_license_list"},
@@ -191,6 +204,12 @@ func get_filter_spec(kind string) (filter_spec, bool) {
 
 	spec, ok := list[kind]
 	return spec, ok
+}
+
+var html_filter_tag_regex = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9-]*$`)
+
+var html_filter_blocked_tags = map[string]bool{
+	"embed": true, "object": true, "script": true, "style": true,
 }
 
 func filter_value(db *sql.DB, kind string, name string) []string {

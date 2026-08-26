@@ -15,8 +15,12 @@ func View_filter(config tool.Config, kind string) string {
 	}
 
 	data := `<table id="main_table_set">`
-	if kind == "external_image" {
-		data += `<tr id="main_table_top_tr"><td>` + tool.Get_language(db, "domain", true) + `</td></tr>`
+	if kind == "external_image" || kind == "html" {
+		header := "domain"
+		if kind == "html" {
+			header = "tag"
+		}
+		data += `<tr id="main_table_top_tr"><td>` + tool.Get_language(db, header, true) + `</td></tr>`
 	} else {
 		data += `<tr id="main_table_top_tr">` +
 			`<td id="main_table_width">A</td><td id="main_table_width">B</td><td id="main_table_width">C</td></tr>`
@@ -40,7 +44,7 @@ func View_filter(config tool.Config, kind string) string {
 		if can_edit {
 			data += ` <a href="/filter/` + kind + `/del/` + tool.Url_parser(name) + `">(` + tool.Get_language(db, "delete", true) + `)</a>`
 		}
-		if kind == "external_image" {
+		if kind == "external_image" || kind == "html" {
 			data += `</td></tr>`
 			continue
 		}
