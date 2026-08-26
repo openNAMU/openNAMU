@@ -29,10 +29,14 @@ func View_register_email(config tool.Config, values url.Values) string {
 			title = tool.Get_language(db, "register", true)
 		}
 		body := user_other(db, "email_text")
-		if body != "" {
-			body += "\n\n"
+		if strings.Contains(body, "{}") {
+			body = strings.ReplaceAll(body, "{}", key)
+		} else {
+			if body != "" {
+				body += "\n\n"
+			}
+			body += tool.Get_language(db, "key", true) + " : " + key
 		}
-		body += "Key : " + key
 		if err := tool.Send_email(db, config.IP, email, title, body); err != nil {
 			return tool.Get_error_page(db, config, "email error")
 		}
