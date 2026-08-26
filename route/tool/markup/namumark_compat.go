@@ -1149,14 +1149,29 @@ func (class *namumark_compat_renderer) process_footnotes(data string) string {
 		text := match.GroupByNumber(2).String()
 		text = class.process_macros(text)
 		named := name != ""
-		if name == "" {
-			name = strconv.Itoa(class.footnote_count)
+		index := -1
+		if !named {
+			for footnote_index, footnote := range class.footnotes {
+				if !footnote.named && footnote.text != "" && footnote.text == text {
+					index = footnote_index
+					break
+				}
+			}
 		}
-		index, exists := class.footnote_map[name]
-		if !exists {
-			class.footnotes = append(class.footnotes, namumark_compat_footnote{name: name, text: text, named: named})
-			index = len(class.footnotes) - 1
-			class.footnote_map[name] = index
+		if index < 0 {
+			if name == "" {
+				name = strconv.Itoa(class.footnote_count)
+			}
+			var exists bool
+			index, exists = class.footnote_map[name]
+			if exists && class.footnotes[index].named != named {
+				exists = false
+			}
+			if !exists {
+				class.footnotes = append(class.footnotes, namumark_compat_footnote{name: name, text: text, named: named})
+				index = len(class.footnotes) - 1
+				class.footnote_map[name] = index
+			}
 		}
 		number := strconv.Itoa(class.footnote_count)
 		class.footnotes[index].numbers = append(class.footnotes[index].numbers, number)
