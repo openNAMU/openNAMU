@@ -78,12 +78,18 @@ function do_insert_data(data) {
 
 // 아직 개편이 더 필요함
 function do_paste_image() {
-    document.getElementById('opennamu_edit_textarea').addEventListener("paste", pasteListener);
+    const textarea = document.getElementById('opennamu_edit_textarea');
+    textarea.addEventListener("paste", pasteListener);
+    textarea.addEventListener("dragover", function(e) {
+        e.preventDefault();
+    });
+    textarea.addEventListener("drop", pasteListener);
 }
 
 function pasteListener(e) {
-    if(e.clipboardData && e.clipboardData.items) {
-        const items = e.clipboardData.items;
+    const clipboard_data = e.clipboardData || e.dataTransfer;
+    if(clipboard_data && clipboard_data.items) {
+        const items = clipboard_data.items;
         const formData = new FormData();
 
         let haveImageInClipboard = false;
