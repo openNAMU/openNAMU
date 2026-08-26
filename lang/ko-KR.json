@@ -614,6 +614,7 @@
     "bbs_post_pinned": "게시판 게시글 고정",
     "bbs_post_delete": "게시판 게시글 삭제",
     "outer_link_filter_list": "외부 링크 자동 이미지 목록",
+    "external_image_filter_list": "외부 이미지 허용 도메인 목록",
     "html_or_link": "HTML 혹은 링크",
     "template_document_list": "템플릿 문서 목록",
     "no_link_document": "링크가 없는 문서",

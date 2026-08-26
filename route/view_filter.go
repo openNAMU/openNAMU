@@ -14,8 +14,13 @@ func View_filter(config tool.Config, kind string) string {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	data := `<table id="main_table_set"><tr id="main_table_top_tr">` +
-		`<td id="main_table_width">A</td><td id="main_table_width">B</td><td id="main_table_width">C</td></tr>`
+	data := `<table id="main_table_set">`
+	if kind == "external_image" {
+		data += `<tr id="main_table_top_tr"><td>` + tool.Get_language(db, "domain", true) + `</td></tr>`
+	} else {
+		data += `<tr id="main_table_top_tr">` +
+			`<td id="main_table_width">A</td><td id="main_table_width">B</td><td id="main_table_width">C</td></tr>`
+	}
 	rows := tool.Query_DB(db, "select html, plus, plus_t from html_filter where kind = ?", spec.db_kind)
 	defer rows.Close()
 
@@ -34,6 +39,10 @@ func View_filter(config tool.Config, kind string) string {
 		}
 		if can_edit {
 			data += ` <a href="/filter/` + kind + `/del/` + tool.Url_parser(name) + `">(` + tool.Get_language(db, "delete", true) + `)</a>`
+		}
+		if kind == "external_image" {
+			data += `</td></tr>`
+			continue
 		}
 		data += `</td><td>`
 		if kind == "inter_wiki" {

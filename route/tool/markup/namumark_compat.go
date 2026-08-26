@@ -842,6 +842,25 @@ func (class *namumark_compat_renderer) file_theme_visible(theme string) bool {
 	return (theme == "dark" && darkmode == "1") || (theme == "light" && darkmode != "1")
 }
 
+func (class *namumark_compat_renderer) external_image_allowed(target string) bool {
+	if class.db == nil {
+		return true
+	}
+
+	parsed, err := url.Parse(target)
+	if err != nil || parsed.Hostname() == "" {
+		return false
+	}
+
+	var domain_count int
+	if !tool.QueryRow_DB(class.db, "select count(*) from html_filter where kind = 'external_image'", []any{&domain_count}) || domain_count == 0 {
+		return true
+	}
+
+	domain := ""
+	return tool.QueryRow_DB(class.db, "select html from html_filter where kind = 'external_image' and html = ? limit 1", []any{&domain}, strings.ToLower(parsed.Hostname()))
+}
+
 func (class *namumark_compat_renderer) process_file(target string, label string) string {
 	lower_target := strings.ToLower(target)
 	external := strings.HasPrefix(lower_target, "out:") || strings.HasPrefix(lower_target, "외부:")
@@ -869,6 +888,9 @@ func (class *namumark_compat_renderer) process_file(target string, label string)
 			return class.reserve("")
 		}
 		if !strings.HasPrefix(strings.ToLower(file_name), "http://") && !strings.HasPrefix(strings.ToLower(file_name), "https://") {
+			return class.reserve(compat_html_escape(alt))
+		}
+		if !class.external_image_allowed(file_name) {
 			return class.reserve(compat_html_escape(alt))
 		}
 		image := `<img style="` + compat_html_escape(style) + `" alt="` + compat_html_escape(alt) + `" src="` + compat_html_escape(file_name) + `">`

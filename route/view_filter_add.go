@@ -30,11 +30,22 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 		if title == "" {
 			title = name
 		}
-		if title == "" {
+		if title == "" && kind != "external_image" {
 			title = "test"
 		}
 
-		if kind == "inter_wiki" || kind == "outer_link" {
+		if kind == "external_image" {
+			title = strings.ToLower(strings.TrimSpace(title))
+			parsed, err := url.Parse("https://" + title)
+			if title == "" || err != nil || parsed.Host != title || parsed.Hostname() == "" || parsed.Port() != "" || parsed.User != nil {
+				return tool.Get_error_page(db, config, "error")
+			}
+			if name != "" && name != title {
+				tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
+			}
+			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", title, spec.db_kind)
+			tool.Exec_DB(db, "insert into html_filter (html, kind, plus, plus_t) values (?, ?, '', '')", title, spec.db_kind)
+		} else if kind == "inter_wiki" || kind == "outer_link" {
 			if name != "" && name != title {
 				tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
 			}
@@ -117,6 +128,8 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 			}
 			form += `<hr class="main_hr">` + filter_select("inter_type", []string{"url_encode", "under_bar"}, inter_type)
 		}
+	case "external_image":
+		form += filter_input(tool.Get_language(db, "domain", true), "title", value[0])
 	case "edit_filter":
 		end := ""
 		if value[2] != "" && value[2] != "X" {
@@ -164,6 +177,7 @@ func get_filter_spec(kind string) (filter_spec, bool) {
 	list := map[string]filter_spec{
 		"inter_wiki":       {"inter_wiki", "interwiki_list"},
 		"outer_link":       {"outer_link", "outer_link_filter_list"},
+		"external_image":   {"external_image", "external_image_filter_list"},
 		"document":         {"document", "document_filter_list"},
 		"edit_top":         {"edit_top", "edit_tool_list"},
 		"image_license":    {"image_license", "image_license_list"},
