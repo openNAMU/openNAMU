@@ -71,6 +71,25 @@ func Api_list_recent_block(config tool.Config, num string, set_type string, why 
 			"select why, block, blocker, end, today, band, ongoing from rb where band = 'cidr' order by today desc limit ?, 50",
 			page_int,
 		)
+	case "normal", "login_able", "login_able_and_regsiter_disable", "edit_request_able", "completely_ban", "dont_come_this_site":
+		login := ""
+		switch set_type {
+		case "login_able":
+			login = "L"
+		case "login_able_and_regsiter_disable":
+			login = "O"
+		case "edit_request_able":
+			login = "E"
+		case "completely_ban":
+			login = "A"
+		case "dont_come_this_site":
+			login = "D"
+		}
+		rows = tool.Query_DB(
+			db,
+			"select why, block, blocker, end, today, band, ongoing from rb where login = ? and band != 'private' order by today desc limit ?, 50",
+			login, page_int,
+		)
 	default:
 		rows = tool.Query_DB(
 			db,

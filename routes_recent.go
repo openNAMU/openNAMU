@@ -90,6 +90,16 @@ func register_recent_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.GET("/recent_block/login/:login_type", func(c *gin.Context) {
+		route_data := route.View_list_recent_block(make_route_config(c), "1", c.Param("login_type"), "", "")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/recent_block/login/:login_type/:num", func(c *gin.Context) {
+		route_data := route.View_list_recent_block(make_route_config(c), c.Param("num"), c.Param("login_type"), "", "")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/recent_change", func(c *gin.Context) {
 		route_data := route.View_list_recent_change(make_route_config(c), "", "50", "1")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))

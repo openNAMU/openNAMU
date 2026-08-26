@@ -3,6 +3,7 @@ package route
 import (
 	"database/sql"
 	"opennamu/route/tool"
+	"strings"
 )
 
 func Get_ui_recent_block(db *sql.DB, config tool.Config, data_all [][]string) string {
@@ -114,6 +115,22 @@ func View_list_recent_block(config tool.Config, num string, set_type string, why
 		data_html += `<a href="` + option[0] + `">(` + option[1] + `)</a> `
 	}
 
+	login_menu_option := [][]string{
+		{"normal", tool.Get_language(db, "normal", true)},
+		{"login_able", tool.Get_language(db, "login_able", true)},
+		{"login_able_and_regsiter_disable", tool.Get_language(db, "login_able_and_regsiter_disable", true)},
+		{"edit_request_able", tool.Get_language(db, "edit_request_able", true)},
+		{"completely_ban", tool.Get_language(db, "completely_ban", true)},
+		{"dont_come_this_site", tool.Get_language(db, "dont_come_this_site", true)},
+	}
+	for _, option := range login_menu_option {
+		data_html += `<a href="/recent_block/login/` + option[0] + `/1">(` + option[1] + `)</a> `
+
+		if set_type == option[0] {
+			sub = "(" + option[1] + ")"
+		}
+	}
+
 	data_html += "<hr class=\"main_hr\">"
 
 	api_data := Api_list_recent_block(config, num, set_type, why, user_name)
@@ -122,8 +139,9 @@ func View_list_recent_block(config tool.Config, num string, set_type string, why
 	data_html += Get_ui_recent_block(db, config, api_data_list)
 
 	base_url := "/recent_block/" + tool.Url_parser(set_type)
-
-	if user_name != "" {
+	if set_type == "normal" || strings.HasPrefix(set_type, "login_") {
+		base_url = "/recent_block/login/" + tool.Url_parser(set_type)
+	} else if user_name != "" {
 		base_url += "/" + tool.Url_parser(user_name)
 	}
 
