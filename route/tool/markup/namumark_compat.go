@@ -2760,6 +2760,8 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 			return ""
 		}
 		return class.reserve(`<span id="`+compat_html_escape(anchor)+`">`) + class.reserve("</span>")
+	case "comment":
+		return ""
 	case "age", "dday", "dmonth", "dyear":
 		return compat_macro_date(data, name)
 	case "timeif":
@@ -2856,6 +2858,9 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 }
 
 func (class *namumark_compat_renderer) process_macros(data string) string {
+	data = compat_replace_regex2(data, `(?i)(?<!\[)\[comment\(\)\]`, func(match regexp2.Match) string {
+		return ""
+	})
 	data = compat_replace_regex2(data, `(?is)(?<!\[)\[(?!\*)([^[(\]]+)\(((?:(?!\[\[|\)\]).)+)\)\]`, func(match regexp2.Match) string {
 		return class.process_macro_double(match.GroupByNumber(1).String(), match.GroupByNumber(2).String(), match.String())
 	})
