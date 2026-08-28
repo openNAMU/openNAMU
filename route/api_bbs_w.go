@@ -50,7 +50,7 @@ func Api_bbs_w(config tool.Config, set_id string, set_code string) map[string]an
 
 	return_data := make(map[string]any)
 
-	if !tool.Check_acl(db, "", "", "bbs_view", config.IP) || !bbs_post_view_allowed(db, set_id, user_id, config.IP, nil) {
+	if !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) || !bbs_post_view_allowed(db, set_id, user_id, config.IP, nil) {
 		return_data["response"] = "require auth"
 		return_data["data"] = map[string]string{}
 	} else {

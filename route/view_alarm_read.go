@@ -8,10 +8,13 @@ func View_alarm_read(config tool.Config, user_name string) string {
 	if user_name == "" {
 		user_name = config.IP
 	}
-	if user_name != config.IP && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	result := Api_alarm_read_post(config, user_name)
+	if result["response"] == "require auth" {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	tool.Exec_DB(db, "update user_notice set readme = '1' where name = ?", user_name)
+	if result["response"] != "ok" {
+		return tool.Get_error_page(db, config, "error")
+	}
 	return_path := "/alarm"
 	if user_name != config.IP {
 		return_path = "/alarm_user/" + tool.Url_parser(user_name)

@@ -45,6 +45,10 @@ func Api_list_history(config tool.Config, doc_name string, set_type string, num 
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_acl(db, doc_name, "", "render", config.IP) {
+		return map[string]any{"response": "require auth", "data": [][]string{}}
+	}
+
 	page_int := tool.Str_to_int(num)
 	if page_int > 0 {
 		page_int = (page_int * 50) - 50

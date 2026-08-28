@@ -79,6 +79,10 @@ func Api_bbs(config tool.Config, bbs_num string, page string, sort_type string) 
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if bbs_num != "" && !tool.Check_acl(db, bbs_num, "", "bbs_view", config.IP) {
+		return map[string]any{"response": "require auth", "data": []map[string]string{}}
+	}
+
 	rows_arr := []*sql.Rows{}
 	if bbs_num == "" {
 		view_sql, view_values := bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")

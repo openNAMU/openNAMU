@@ -2,7 +2,6 @@ package route
 
 import (
 	"net/url"
-	"strings"
 
 	"opennamu/route/tool"
 )
@@ -11,30 +10,21 @@ func View_delete_multiple(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "acl_auth", config.IP) {
-		return tool.Get_error_page(db, config, "auth")
-	}
 	if values != nil {
 		if !tool.Captcha_check(db, config.Session, config.IP, tool.Captcha_response(values.Get("g-recaptcha"), values.Get("g-recaptcha-response"), values.Get("h-captcha-response"), values.Get("cf-turnstile-response"))) {
 			return tool.Get_error_page(db, config, "recaptcha")
 		}
-		content := strings.Split(strings.ReplaceAll(values.Get("content"), "\r", ""), "\n")
-		for _, doc_name := range content {
-			doc_name = strings.TrimSpace(doc_name)
-			if doc_name == "" {
-				continue
+		api_data := Api_edit_delete_multiple_post(config, values.Get("content"), values.Get("send"), values.Get("copyright_agreement"))
+		response, _ := api_data["response"].(string)
+		if response == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
+		}
+		if response != "ok" {
+			error_name, _ := api_data["data"].(string)
+			if error_name == "" {
+				error_name = "error"
 			}
-			result := Api_edit_delete_post(config, doc_name, values.Get("send"), values.Get("copyright_agreement"))
-			if result["response"] == "require auth" {
-				return tool.Get_error_page(db, config, "auth")
-			}
-			if result["response"] == "error" {
-				error_name, ok := result["data"].(string)
-				if !ok {
-					error_name = "error"
-				}
-				return tool.Get_error_page(db, config, error_name)
-			}
+			return tool.Get_error_page(db, config, error_name)
 		}
 		return tool.Get_redirect("/recent_change")
 	}

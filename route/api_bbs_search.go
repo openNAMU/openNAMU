@@ -10,6 +10,10 @@ func Api_bbs_search(config tool.Config, keyword string, set_id string, page stri
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if set_id != "" && !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
+		return map[string]any{"response": "require auth", "data": []map[string]string{}}
+	}
+
 	data_list := []map[string]string{}
 	keyword = strings.TrimSpace(keyword)
 	if keyword != "" {
@@ -45,6 +49,10 @@ func Api_bbs_search(config tool.Config, keyword string, set_id string, page stri
 			var set_id_data string
 			if err := rows.Scan(&set_code_data, &set_id_data); err != nil {
 				panic(err)
+			}
+
+			if !tool.Check_acl(db, set_id_data, "", "bbs_view", config.IP) {
+				continue
 			}
 
 			temp_data := map[string]string{

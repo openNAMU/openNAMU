@@ -24,6 +24,6 @@ func View_login_login_post_full(config tool.Config, id string, password string, 
 	}
 	config.Session.Set("id", id)
 	_ = config.Session.Save()
-	tool.Record_user_agent(db, id, config.IP, config.UserAgent, tool.Get_time())
+        Api_record_user_agent_post(config, id)
 	return tool.Get_redirect("/user")
 }

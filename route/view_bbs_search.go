@@ -10,6 +10,10 @@ func View_bbs_search(config tool.Config, set_id string, keyword string, page str
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if set_id != "" && !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	page_int := tool.Str_to_int(page)
 	if page_int < 1 {
 		page_int = 1

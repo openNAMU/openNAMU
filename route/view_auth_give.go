@@ -60,7 +60,7 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 	if target_type == "private" {
 		required_auth = "owner_auth"
 	}
-	if !tool.Check_acl(db, "", "", required_auth, config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", required_auth, config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

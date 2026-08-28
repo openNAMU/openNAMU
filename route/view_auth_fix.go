@@ -14,38 +14,21 @@ func View_auth_fix(config tool.Config, user_name string, values url.Values) stri
 	if !tool.QueryRow_DB(db, "select data from user_set where id = ? and name = 'pw'", []any{&password}, user_name) {
 		return tool.Get_error_page(db, config, "error")
 	}
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
 	if values != nil {
-		choice := values.Get("select")
-		if choice == "password_change" || choice == "2fa_password_change" {
-			if values.Get("new_password") != values.Get("password_check") {
-				return tool.Get_error_page(db, config, "password different")
-			}
-			encode := tool.Get_user_encode(db, user_name)
-			hash := tool.Password_encode(db, values.Get("new_password"), encode)
-			set_name := "pw"
-			if choice == "2fa_password_change" {
-				set_name = "2fa_pw"
-			}
-			old := ""
-			if tool.QueryRow_DB(db, "select data from user_set where id = ? and name = ?", []any{&old}, user_name, set_name) {
-				tool.Exec_DB(db, "update user_set set data = ? where id = ? and name = ?", hash, user_name, set_name)
-			} else {
-				tool.Exec_DB(db, "insert into user_set (id, name, data) values (?, ?, ?)", user_name, set_name, hash)
-			}
-			if choice == "2fa_password_change" {
-				user_save(db, user_name, "2fa_pw_encode", encode)
-				user_save(db, user_name, "2fa", "on")
-			}
-		} else if choice == "2fa_off" {
-			user_delete(db, user_name, "2fa")
-			user_delete(db, user_name, "2fa_pw")
-			user_delete(db, user_name, "2fa_pw_encode")
+		result := Api_auth_fix_post(config, user_name, values)
+		if result["response"] == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
 		}
-		tool.Do_insert_auth_history(db, config.IP, "user_fix ("+user_name+")")
+		if result["response"] == "password different" {
+			return tool.Get_error_page(db, config, "password different")
+		}
+		if result["response"] != "ok" {
+			return tool.Get_error_page(db, config, "error")
+		}
 		return tool.Get_redirect("/user/" + tool.Url_parser(user_name))
 	}
 

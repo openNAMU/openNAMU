@@ -8,7 +8,7 @@ import (
 func View_user_password(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if !user_auth(db, config) {
+	if values == nil && !user_auth(db, config) {
 		return tool.Get_redirect("/user")
 	}
 	if values != nil {
@@ -21,22 +21,21 @@ func View_user_password(config tool.Config, values url.Values) string {
 		if password_repeat == "" && values.Has("password_check") {
 			password_repeat = values.Get("password_check")
 		}
-		if password == "" {
-			return tool.Get_error_page(db, config, "password empty")
+		api_data := Api_user_password_post(config, current_password, password, password_repeat)
+		response, _ := api_data["response"].(string)
+		if response == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
 		}
-		if password != password_repeat {
-			return tool.Get_error_page(db, config, "password different")
+		if response != "ok" {
+			error_name, _ := api_data["data"].(string)
+			if error_name == "" {
+				error_name = "error"
+			}
+			return tool.Get_error_page(db, config, error_name)
 		}
-		minimum := user_other(db, "password_min_length")
-		if minimum != "" && tool.Get_len(password) < tool.Str_to_int(minimum) {
-			return tool.Get_error_page(db, config, "password too short")
-		}
-		if !tool.Password_check(db, config.IP, current_password) {
-			return tool.Get_error_page(db, config, "password error")
-		}
-		user_save(db, config.IP, "pw", tool.Password_encode(db, password, tool.Get_user_encode(db, config.IP)))
 		return tool.Get_redirect("/user")
 	}
+
 	minimum := user_other(db, "password_min_length")
 	minimum_text := ""
 	if minimum != "" {

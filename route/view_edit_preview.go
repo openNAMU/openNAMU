@@ -10,6 +10,10 @@ func View_edit_preview(config tool.Config, doc_name string, data string, mode st
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_acl(db, doc_name, "", "document_edit", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	darkmode := "0"
 	preview_name := "preview_normal"
 	if mode == "dark" {

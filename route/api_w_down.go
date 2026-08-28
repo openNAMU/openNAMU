@@ -6,6 +6,10 @@ func Api_w_down(config tool.Config, doc_name string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_acl(db, doc_name, "", "render", config.IP) {
+		return map[string]any{"response": "require auth", "data": []string{}}
+	}
+
 	rows := tool.Query_DB(
 		db,
 		"select title from data where title like ?",
@@ -21,6 +25,10 @@ func Api_w_down(config tool.Config, doc_name string) map[string]any {
 		err := rows.Scan(&title)
 		if err != nil {
 			panic(err)
+		}
+
+		if !tool.Check_acl(db, title, "", "render", config.IP) {
+			continue
 		}
 
 		title_list = append(title_list, title)

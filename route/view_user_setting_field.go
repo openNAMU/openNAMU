@@ -8,20 +8,17 @@ import (
 func View_user_setting_field(config tool.Config, field string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if !user_auth(db, config) {
+	if values == nil && !user_auth(db, config) {
 		return tool.Get_redirect("/user")
 	}
 	if values != nil {
-		value := values.Get("data")
-		if field == "user_name" {
-			if !tool.Get_user_name_check(db, value) && value != user_value(db, config.IP, "user_name") {
-				return tool.Get_error_page(db, config, "user name error")
-			}
+		api_data := Api_user_setting_field_post(config, field, values.Get("data"))
+		response, _ := api_data["response"].(string)
+		if response == "require auth" {
+			return tool.Get_redirect("/user")
 		}
-		if field == "email" && value == "" {
-			user_delete(db, config.IP, field)
-		} else {
-			user_save(db, config.IP, field, value)
+		if response != "ok" {
+			return tool.Get_error_page(db, config, "user name error")
 		}
 		return tool.Get_redirect("/change")
 	}

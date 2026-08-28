@@ -2,7 +2,6 @@ package route
 
 import (
 	"net/url"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -26,7 +25,7 @@ func View_edit_file_delete(config tool.Config, doc_name string, values url.Value
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	var stored_name string
@@ -39,16 +38,16 @@ func View_edit_file_delete(config tool.Config, doc_name string, values url.Value
 		return tool.Get_error_page(db, config, "invalid file")
 	}
 	if values != nil {
-		if values.Get("with_doc") != "" {
-			result := Api_edit_delete_post(config, doc_name, values.Get("send"), values.Get("copyright_agreement"))
-			if result["response"] != "ok" {
+		result := Api_edit_file_delete_post(config, doc_name, values)
+		if result["response"] == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
+		}
+		if result["response"] != "ok" {
+			if result["data"] == "delete error" {
 				return tool.Get_error_page(db, config, "delete error")
 			}
-		}
-		if err := os.Remove(file_path); err != nil && !os.IsNotExist(err) {
 			return tool.Get_error_page(db, config, "file delete error")
 		}
-		tool.Do_insert_auth_history(db, config.IP, "file_delete ("+doc_name+")")
 		if values.Get("with_doc") != "" {
 			return tool.Get_redirect("/w/" + tool.Url_parser(doc_name))
 		}

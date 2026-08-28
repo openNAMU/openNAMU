@@ -9,7 +9,7 @@ func View_thread_acl(config tool.Config, topic_num string, values url.Values) st
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "toron_auth", config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", "toron_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	title := ""
@@ -18,16 +18,21 @@ func View_thread_acl(config tool.Config, topic_num string, values url.Values) st
 		return tool.Get_redirect("/")
 	}
 	if values != nil {
-		acl := values.Get("acl")
-		acl_view := values.Get("acl_view")
-		if !acl_value_valid(db, acl) || !acl_value_valid(db, acl_view) {
-			return tool.Get_error_page(db, config, "error")
+		api_data := Api_thread_acl_post(config, topic_num, values.Get("acl"), values.Get("acl_view"))
+		response, _ := api_data["response"].(string)
+		if response == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
 		}
-		tool.Exec_DB(db, "update rd set acl = ?, date = ? where code = ?", acl, tool.Get_time(), topic_num)
-		tool.Exec_DB(db, "delete from topic_set where thread_code = ? and set_name = 'thread_view_acl'", topic_num)
-		tool.Exec_DB(db, "insert into topic_set (thread_code, set_name, set_id, set_data) values (?, 'thread_view_acl', '1', ?)", topic_num, acl_view)
-		thread_add(db, topic_num, thread_next_id(db, topic_num), tool.Get_language(db, "acl_thread_change", true)+" : "+acl, config.IP, "1")
-		tool.Do_insert_auth_history(db, config.IP, "change_topic_acl (code "+topic_num+")")
+		if response == "not exist" {
+			return tool.Get_redirect("/")
+		}
+		if response != "ok" {
+			error_name, _ := api_data["data"].(string)
+			if error_name == "" {
+				error_name = "error"
+			}
+			return tool.Get_error_page(db, config, error_name)
+		}
 		return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
 	}
 

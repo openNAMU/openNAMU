@@ -19,7 +19,11 @@ func View_user_skin(config tool.Config, values url.Values) string {
 			config.Session.Set("skin", skin)
 			_ = config.Session.Save()
 		} else {
-			user_save(db, config.IP, "skin", skin)
+			api_data := Api_user_skin_post(config, skin)
+			response, _ := api_data["response"].(string)
+			if response != "ok" {
+				return tool.Get_error_page(db, config, "error")
+			}
 		}
 		return tool.Get_redirect("/change")
 	}

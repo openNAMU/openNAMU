@@ -14,7 +14,7 @@ func View_vote_select(config tool.Config, id string, values url.Values) string {
 	if !tool.QueryRow_DB(db, "select name, subject, data, type from vote where id = ? and user = ''", []any{&name, &subject, &data, &type_data}, id) {
 		return tool.Get_redirect("/vote")
 	}
-	if type_data == "close" || type_data == "n_close" || !tool.Check_acl(db, "", id, "vote", config.IP) {
+	if type_data == "close" || type_data == "n_close" || (values == nil && !tool.Check_acl(db, "", id, "vote", config.IP)) {
 		return tool.Get_redirect("/vote/end/" + tool.Url_parser(id))
 	}
 	voted := ""
@@ -27,11 +27,14 @@ func View_vote_select(config tool.Config, id string, values url.Values) string {
 	}
 	options := vote_options(data)
 	if values != nil {
-		choice, err := strconv.Atoi(values.Get("vote_data"))
-		if err != nil || choice < 0 || choice >= len(options) {
+		api_data := Api_vote_select_post(config, id, values.Get("vote_data"))
+		response, _ := api_data["response"].(string)
+		if response == "not exist" {
+			return tool.Get_redirect("/vote")
+		}
+		if response == "error" {
 			return tool.Get_redirect("/vote/" + tool.Url_parser(id))
 		}
-		tool.Exec_DB(db, "insert into vote (name, id, subject, data, user, type) values ('', ?, '', ?, ?, 'select')", id, strconv.Itoa(choice), config.IP)
 		return tool.Get_redirect("/vote/end/" + tool.Url_parser(id))
 	}
 	body := `<h2>` + tool.HTML_escape(name) + `</h2>`

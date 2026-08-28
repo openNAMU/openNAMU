@@ -30,7 +30,7 @@ func View_login_2fa(config tool.Config, values url.Values) string {
 		}
 		config.Session.Delete("login_id")
 		config.Session.Delete("b_id")
-		tool.Record_user_agent(db, login_id, config.IP, config.UserAgent, tool.Get_time())
+                Api_record_user_agent_post(config, login_id)
 		config.Session.Set("id", login_id)
 		_ = config.Session.Save()
 		return tool.Get_redirect("/user")

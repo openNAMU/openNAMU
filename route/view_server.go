@@ -86,7 +86,7 @@ func View_server_action(config tool.Config, action string, post bool) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !post && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if action != "restart" && action != "shutdown" && action != "update" {
@@ -94,11 +94,16 @@ func View_server_action(config tool.Config, action string, post bool) string {
 	}
 
 	if post {
+		result := Api_server_action_post(config, action)
+		if result["response"] == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
+		}
+		if result["response"] != "ok" {
+			return server_action_error(db, config, action, fmt.Errorf("server action rejected"))
+		}
 		if !begin_server_action() {
 			return tool.Get_error_page(db, config, "error")
 		}
-		tool.Do_insert_auth_history(db, config.IP, "server_"+action)
-
 		if action == "shutdown" {
 			schedule_server_exit()
 			return tool.Get_language(db, "wiki_shutdown", true)

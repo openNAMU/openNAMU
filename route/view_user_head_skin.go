@@ -24,7 +24,11 @@ func View_user_head_skin(config tool.Config, skin_name string, values url.Values
 			content = values.Get("data")
 		}
 		if user_auth(db, config) {
-			user_save(db, config.IP, storage_name, content)
+			api_data := Api_user_head_skin_post(config, storage_name, content)
+			response, _ := api_data["response"].(string)
+			if response != "ok" {
+				return tool.Get_error_page(db, config, "error")
+			}
 		}
 		config.Session.Set(session_name, content)
 		_ = config.Session.Save()

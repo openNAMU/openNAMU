@@ -9,7 +9,7 @@ func View_thread_comment_delete(config tool.Config, topic_num string, comment_nu
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
@@ -18,9 +18,17 @@ func View_thread_comment_delete(config tool.Config, topic_num string, comment_nu
 		return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
 	}
 	if values != nil {
-		tool.Exec_DB(db, "delete from topic where code = ? and id = ?", topic_num, comment_num)
-		tool.Exec_DB(db, "update rd set date = ? where code = ?", tool.Get_time(), topic_num)
-		tool.Do_insert_auth_history(db, config.IP, "delete_topic_comment (code "+topic_num+"#"+comment_num+")")
+		api_data := Api_thread_comment_delete_post(config, topic_num, comment_num)
+		response, _ := api_data["response"].(string)
+		if response == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
+		}
+		if response == "not exist" {
+			return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
+		}
+		if response != "ok" {
+			return tool.Get_error_page(db, config, "error")
+		}
 		return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
 	}
 

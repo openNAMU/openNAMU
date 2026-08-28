@@ -11,9 +11,11 @@ func View_user_head_reset(config tool.Config, values url.Values) string {
 	skin_name := tool.Get_use_skin_name_session(db, config.IP, config.Session)
 	if values != nil {
 		if user_auth(db, config) {
-			user_save(db, config.IP, "custom_css", "")
-			user_save(db, config.IP, "custom_css_"+skin_name, "")
-			user_delete(db, config.IP, "head")
+			api_data := Api_user_head_reset_post(config, skin_name)
+			response, _ := api_data["response"].(string)
+			if response != "ok" {
+				return tool.Get_error_page(db, config, "error")
+			}
 		}
 		config.Session.Set("head", "")
 		config.Session.Set("head_"+skin_name, "")

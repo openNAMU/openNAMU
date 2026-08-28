@@ -18,6 +18,7 @@ func View_user_skin_main(config tool.Config, values url.Values) string {
 	anonymous := tool.IP_or_user(config.IP)
 	set_list := Get_main_skin_set_list(db)
 	if values != nil {
+		user_set_list := map[string]string{}
 		if config.Session != nil {
 			config.Session.Delete("main_css_darkmode")
 		}
@@ -37,7 +38,14 @@ func View_user_skin_main(config tool.Config, values url.Values) string {
 					config.Session.Set(field, value)
 				}
 			} else {
-				user_save(db, config.IP, field, value)
+				user_set_list[field] = value
+			}
+		}
+		if !anonymous {
+			api_data := Api_user_setting_skin_set_main_post(config, user_set_list)
+			response, _ := api_data["response"].(string)
+			if response != "ok" {
+				return tool.Get_error_page(db, config, "error")
 			}
 		}
 		if config.Session != nil {

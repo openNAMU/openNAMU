@@ -21,11 +21,10 @@ func View_login_find_key(config tool.Config, values url.Values) string {
 		if password == "" || password != values.Get("password_check") {
 			return tool.Get_error_page(db, config, "password different")
 		}
-		user_save(db, user_id, "pw", tool.Password_encode(db, password, tool.Get_user_encode(db, user_id)))
-		user_delete(db, user_id, "2fa")
-		user_delete(db, user_id, "2fa_pw")
-		user_delete(db, user_id, "2fa_pw_encode")
-		user_delete(db, user_id, "random_key")
+		result := Api_login_find_key_post(config, user_id, password)
+		if result["response"] != "ok" {
+			return tool.Get_error_page(db, config, "error")
+		}
 		config.Session.Delete("reset_id")
 		_ = config.Session.Save()
 		return tool.Get_redirect("/login")

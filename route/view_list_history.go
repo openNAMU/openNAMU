@@ -8,6 +8,10 @@ func View_list_history(config tool.Config, doc_name string, set_type string, num
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_acl(db, doc_name, "", "render", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	sub := ""
 	if set_type == "" {
 		set_type = "normal"

@@ -12,6 +12,10 @@ func Api_w_render(config tool.Config, doc_name string, raw_data string, render_t
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if render_type == "backlink" && !tool.Check_acl(db, doc_name, "", "document_edit", config.IP) {
+		return map[string]any{"response": "require auth"}
+	}
+
 	parameter_data := map[string]any{}
 	if option != "" {
 		_ = stdjson.Unmarshal([]byte(option), &parameter_data)

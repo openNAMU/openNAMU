@@ -6,13 +6,6 @@ func View_edit_file_upload_post(config tool.Config, upload_files []map[string]st
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "upload", config.IP) {
-		return tool.Get_error_page(db, config, "auth")
-	}
-	if len(upload_files) > 1 && !tool.Check_acl(db, "", "", "many_upload", config.IP) {
-		return tool.Get_error_page(db, config, "auth")
-	}
-
 	captcha := ""
 	if len(upload_files) > 0 {
 		captcha = upload_files[0]["captcha"]
@@ -32,6 +25,7 @@ func View_edit_file_upload_post(config tool.Config, upload_files []map[string]st
 			v["license_text"],
 			"",
 			false,
+			len(upload_files) > 1,
 		)
 		if data["response"] != "ok" {
 			error_name, _ := data["data"].(string)

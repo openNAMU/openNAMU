@@ -13,7 +13,7 @@ import (
 )
 
 func Api_file_upload_post(config tool.Config, file_name string, file_data string, file_ext string) map[string]any {
-	return api_file_upload_post(config, file_name, file_data, file_ext, "direct_input", "", "", false)
+	return api_file_upload_post(config, file_name, file_data, file_ext, "direct_input", "", "", false, false)
 }
 
 func api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string, ip string) bool {
@@ -30,7 +30,7 @@ func api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string,
 	return true
 }
 
-func api_file_upload_post(config tool.Config, file_name string, file_data string, file_ext string, license string, license_text string, captcha string, check_captcha bool) map[string]any {
+func api_file_upload_post(config tool.Config, file_name string, file_data string, file_ext string, license string, license_text string, captcha string, check_captcha bool, many_upload bool) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -57,7 +57,7 @@ func api_file_upload_post(config tool.Config, file_name string, file_data string
 		return_value["response"] = "error"
 		return_value["data"] = "unallowed file name"
 		return return_value
-	} else if !tool.Check_acl(db, "", "", "upload", config.IP) {
+	} else if !tool.Check_acl(db, "", "", "upload", config.IP) || (many_upload && !tool.Check_acl(db, "", "", "many_upload", config.IP)) {
 		return_value["response"] = "require auth"
 		return return_value
 	} else if check_captcha && !tool.Captcha_check(db, config.Session, config.IP, captcha) {

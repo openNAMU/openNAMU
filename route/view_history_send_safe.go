@@ -2,17 +2,25 @@ package route
 
 import (
 	"net/url"
+
 	"opennamu/route/tool"
 )
 
 func View_history_send_safe(config tool.Config, doc_name string, rev string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if values != nil {
-		tool.Exec_DB(db, "update history set send = ? where title = ? and id = ?", values.Get("send"), doc_name, rev)
+		api_data := Api_history_send_post(config, doc_name, rev, values.Get("send"))
+		response, _ := api_data["response"].(string)
+		if response == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
+		}
+		if response != "ok" {
+			return tool.Get_error_page(db, config, "error")
+		}
 		return tool.Get_redirect("/history/" + tool.Url_parser(doc_name))
 	}
 	send := ""

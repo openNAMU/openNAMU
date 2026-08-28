@@ -1,7 +1,6 @@
 package route
 
 import (
-	stdjson "encoding/json"
 	"net/url"
 	"opennamu/route/tool"
 )
@@ -25,17 +24,10 @@ func View_register_submit(config tool.Config, values url.Values) string {
 		return tool.Get_redirect("/register")
 	}
 	if values != nil {
-		encode := tool.Get_main_encode(db)
-		application, _ := stdjson.Marshal(map[string]string{
-			"id":       id,
-			"pw_hash":  tool.Password_encode(db, pw, encode),
-			"email":    email,
-			"encode":   encode,
-			"question": question,
-			"answer":   values.Get("answer"),
-		})
-		tool.Exec_DB(db, "delete from user_set where id = ? and name = 'application'", id)
-		tool.Exec_DB(db, "insert into user_set (id, name, data) values (?, 'application', ?)", id, string(application))
+		result := Api_register_submit_post(config, id, pw, email, question, values.Get("answer"))
+		if result["response"] != "ok" {
+			return tool.Get_error_page(db, config, "error")
+		}
 		for _, name := range []string{"submit_id", "submit_pw", "submit_email"} {
 			config.Session.Delete(name)
 		}

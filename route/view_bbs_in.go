@@ -8,6 +8,10 @@ func View_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	bbs_name := Api_bbs_num_to_name(db, set_id)["data"].(string)
 	if bbs_name == "" {
 		return tool.Get_redirect("/bbs/main")

@@ -2,13 +2,14 @@ package route
 
 import (
 	"net/url"
+
 	"opennamu/route/tool"
 )
 
 func View_vote_close(config tool.Config, id string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if !tool.Check_acl(db, "", "", "vote", config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", "vote", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	type_data := ""
@@ -17,7 +18,7 @@ func View_vote_close(config tool.Config, id string, values url.Values) string {
 	}
 	owner := ""
 	tool.QueryRow_DB(db, "select data from vote where id = ? and name = 'open_user' and type = 'option'", []any{&owner}, id)
-	if owner != config.IP && !tool.Check_acl(db, "", "", "vote_auth", config.IP) {
+	if values == nil && owner != config.IP && !tool.Check_acl(db, "", "", "vote_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	next := "n_close"
@@ -36,10 +37,14 @@ func View_vote_close(config tool.Config, id string, values url.Values) string {
 		body := `<form method="post"><button type="submit">` + tool.Get_language(db, action, true) + `</button></form>`
 		return vote_page(db, config, tool.Get_language(db, action, true), body)
 	}
-	tool.Exec_DB(db, "update vote set type = ? where id = ? and user = ''", next, id)
-	if next == "open" || next == "n_open" {
-		tool.Exec_DB(db, "delete from vote where id = ? and name = 'end_date' and type = 'option'", id)
+	api_data := Api_vote_close_post(config, id)
+	if api_data["response"] == "require auth" {
+		return tool.Get_error_page(db, config, "auth")
 	}
+	if api_data["response"] != "ok" {
+		return tool.Get_redirect("/vote")
+	}
+	next, _ = api_data["data"].(string)
 	if next == "open" || next == "n_open" {
 		return tool.Get_redirect("/vote/end/" + tool.Url_parser(id))
 	}

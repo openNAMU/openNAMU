@@ -8,7 +8,7 @@ import (
 func View_user_email_check(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if !user_auth(db, config) {
+	if values == nil && !user_auth(db, config) {
 		return tool.Get_redirect("/login")
 	}
 	key, _ := config.Session.Get("c_key").(string)
@@ -17,11 +17,14 @@ func View_user_email_check(config tool.Config, values url.Values) string {
 		return tool.Get_redirect("/change/email")
 	}
 	if values != nil {
-		if values.Get("key") != key {
+		api_data := Api_user_email_check_post(config, key, email, values.Get("key"))
+		response, _ := api_data["response"].(string)
+		if response == "require auth" {
+			return tool.Get_redirect("/login")
+		}
+		if response != "ok" {
 			return tool.Get_error_page(db, config, "key error")
 		}
-		user_delete(db, config.IP, "email")
-		user_save(db, config.IP, "email", email)
 		config.Session.Delete("c_key")
 		config.Session.Delete("c_email")
 		_ = config.Session.Save()

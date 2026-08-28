@@ -10,10 +10,6 @@ func View_setting_email_test_post(config tool.Config, form map[string]string) st
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
-		return tool.Get_error_page(db, config, "auth")
-	}
-
 	api_data := Api_func_email_post(
 		config,
 		setting_form_value(form, "email", ""),
@@ -21,6 +17,9 @@ func View_setting_email_test_post(config tool.Config, form map[string]string) st
 		setting_form_value(form, "data", ""),
 	)
 	response, _ := api_data["response"].(string)
+	if response == "require auth" {
+		return tool.Get_error_page(db, config, "auth")
+	}
 	message := tool.Get_language(db, "error", true)
 	if response == "ok" {
 		message = tool.Get_language(db, "ok", true)

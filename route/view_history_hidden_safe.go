@@ -2,24 +2,27 @@ package route
 
 import (
 	"net/url"
+
 	"opennamu/route/tool"
 )
 
 func View_history_hidden_safe(config tool.Config, doc_name string, rev string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if !tool.Check_acl(db, "", "", "hidel_auth", config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", "hidel_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	hide := ""
 	tool.QueryRow_DB(db, "select hide from history where title = ? and id = ?", []any{&hide}, doc_name, rev)
 	if values != nil {
-		if hide == "" {
-			hide = "O"
-		} else {
-			hide = ""
+		api_data := Api_history_hidden_post(config, doc_name, rev)
+		response, _ := api_data["response"].(string)
+		if response == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
 		}
-		tool.Exec_DB(db, "update history set hide = ? where title = ? and id = ?", hide, doc_name, rev)
+		if response != "ok" {
+			return tool.Get_error_page(db, config, "error")
+		}
 		return tool.Get_redirect("/history/" + tool.Url_parser(doc_name))
 	}
 

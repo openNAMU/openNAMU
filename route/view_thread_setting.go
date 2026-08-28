@@ -2,7 +2,6 @@ package route
 
 import (
 	"net/url"
-	"strings"
 
 	"opennamu/route/tool"
 )
@@ -11,7 +10,7 @@ func View_thread_setting(config tool.Config, topic_num string, values url.Values
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "toron_auth", config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", "toron_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	name := ""
@@ -22,41 +21,21 @@ func View_thread_setting(config tool.Config, topic_num string, values url.Values
 	}
 
 	if values != nil {
-		old_stop := stop
-		old_agree := agree
-		new_stop := values.Get("stop")
-		if new_stop == "" {
-			new_stop = values.Get("stop_d")
+		stop_value := values.Get("stop")
+		if stop_value == "" {
+			stop_value = values.Get("stop_d")
 		}
-		if new_stop != "" && new_stop != "S" && new_stop != "O" {
-			new_stop = ""
+		api_data := Api_thread_setting_post(config, topic_num, stop_value, values.Get("agree"), values.Get("why"))
+		response, _ := api_data["response"].(string)
+		if response == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
 		}
-		new_agree := ""
-		if values.Get("agree") != "" {
-			new_agree = "O"
+		if response == "not exist" {
+			return tool.Get_redirect("/")
 		}
-		tool.Exec_DB(db, "update rd set stop = ?, agree = ? where code = ?", new_stop, new_agree, topic_num)
-		if old_stop != new_stop {
-			state_key := "topic_state_change_normal"
-			if new_stop == "S" {
-				state_key = "topic_state_change_stop"
-			} else if new_stop == "O" {
-				state_key = "topic_state_change_close"
-			}
-			thread_add(db, topic_num, thread_next_id(db, topic_num), tool.Get_language(db, state_key, true), config.IP, "1")
+		if response != "ok" {
+			return tool.Get_error_page(db, config, "error")
 		}
-		if old_agree != new_agree {
-			state_key := "topic_state_change_disagree"
-			if new_agree == "O" {
-				state_key = "topic_state_change_agree"
-			}
-			thread_add(db, topic_num, thread_next_id(db, topic_num), tool.Get_language(db, state_key, true), config.IP, "1")
-		}
-		if why := strings.TrimSpace(values.Get("why")); why != "" {
-			thread_add(db, topic_num, thread_next_id(db, topic_num), tool.Get_language(db, "why", true)+" : "+why, config.IP, "1")
-		}
-		tool.Exec_DB(db, "update rd set date = ? where code = ?", tool.Get_time(), topic_num)
-		tool.Do_insert_auth_history(db, config.IP, "change_topic_set (code "+topic_num+")")
 		return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
 	}
 

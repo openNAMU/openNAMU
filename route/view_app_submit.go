@@ -11,41 +11,17 @@ func View_app_submit(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "application_auth", config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", "application_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
 	if values != nil {
-		approved := values.Get("approve")
-		declined := values.Get("decline")
-		if approved != "" {
-			raw := ""
-			if !tool.QueryRow_DB(db, "select data from user_set where id = ? and name = 'application'", []any{&raw}, approved) {
-				return tool.Get_error_page(db, config, "error")
-			}
-			application := map[string]string{}
-			if err := json.Unmarshal([]byte(raw), &application); err != nil {
-				return tool.Get_error_page(db, config, "error")
-			}
-			user_id := application["id"]
-			result := map[string]any{}
-			if application["pw_hash"] != "" {
-				result = Api_add_user_hash(config, user_id, application["pw_hash"], application["email"], application["encode"])
-			} else if application["pw"] != "" {
-				result = Api_add_user(config, user_id, application["pw"], application["email"], application["encode"])
-			} else {
-				return tool.Get_error_page(db, config, "error")
-			}
-			if result["response"] != "ok" {
-				return tool.Get_error_page(db, config, "error")
-			}
-			tool.Exec_DB(db, "insert into user_set (name, id, data) values ('approval_question', ?, ?)", user_id, application["question"])
-			tool.Exec_DB(db, "insert into user_set (name, id, data) values ('approval_question_answer', ?, ?)", user_id, application["answer"])
-			tool.Exec_DB(db, "delete from user_set where id = ? and name = 'application'", approved)
-			tool.Do_insert_auth_history(db, config.IP, "application_approve ("+approved+")")
-		} else if declined != "" {
-			tool.Exec_DB(db, "delete from user_set where id = ? and name = 'application'", declined)
-			tool.Do_insert_auth_history(db, config.IP, "application_decline ("+declined+")")
+		result := Api_app_submit_post(config, values)
+		if result["response"] == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
+		}
+		if result["response"] != "ok" {
+			return tool.Get_error_page(db, config, "error")
 		}
 		return tool.Get_redirect("/app_submit")
 	}

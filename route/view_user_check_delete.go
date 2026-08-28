@@ -9,12 +9,15 @@ func View_user_check_delete(config tool.Config, user_name string, user_ip string
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if values != nil {
-		tool.Exec_DB(db, "delete from ua_d where name = ? and ip = ? and today = ?", user_name, user_ip, today)
-		tool.Do_insert_auth_history(db, config.IP, "user_check_delete ("+user_name+")")
+		api_data := Api_user_check_delete_post(config, user_name, user_ip, today)
+		response, _ := api_data["response"].(string)
+		if response != "ok" {
+			return tool.Get_error_page(db, config, "error")
+		}
 		return tool.Get_redirect("/list/user/check/" + tool.Url_parser(func() string {
 			if return_type == "0" {
 				return user_name

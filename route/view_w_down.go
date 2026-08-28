@@ -7,6 +7,9 @@ func View_w_down(config tool.Config, doc_name string) string {
 	defer tool.DB_close(db)
 
 	data_api := Api_w_down(config, doc_name)
+	if data_api["response"] != "ok" {
+		return tool.Get_error_page(db, config, "auth")
+	}
 	data_api_in := data_api["data"].([]string)
 
 	data_html := "<ul>"

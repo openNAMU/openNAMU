@@ -116,9 +116,6 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 	if bbs_name == "" {
 		return tool.Get_redirect("/bbs/main")
 	}
-	if values != nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
-		return tool.Get_error_page(db, config, "auth")
-	}
 	if values != nil {
 		for _, field := range bbs_set_fields {
 			Api_bbs_w_set_put(config, set_id, field, values.Get(field), "")

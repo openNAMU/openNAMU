@@ -13,14 +13,18 @@ func View_user_edit_filter(config tool.Config, user_name string, values url.Valu
 	if user_name == "" {
 		user_name = config.IP
 	}
-	if user_name != config.IP && !tool.Check_acl(db, "", "", "edit_filter_auth", config.IP) {
+	if values == nil && user_name != config.IP && !tool.Check_acl(db, "", "", "edit_filter_auth", config.IP) {
 		return tool.Get_redirect("/auth/give_list")
 	}
 	if values != nil {
-		if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+		api_data := Api_user_edit_filter_delete_post(config, user_name)
+		response, _ := api_data["response"].(string)
+		if response == "require auth" {
 			return tool.Get_error_page(db, config, "auth")
 		}
-		tool.Exec_DB(db, "delete from user_set where name = 'edit_filter' and id = ?", user_name)
+		if response != "ok" {
+			return tool.Get_error_page(db, config, "error")
+		}
 		return tool.Get_redirect("/edit_filter/" + tool.Url_parser(user_name))
 	}
 

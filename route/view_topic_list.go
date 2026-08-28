@@ -6,6 +6,10 @@ func View_topic_list(config tool.Config, doc_name string, do_type string, num st
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_acl(db, doc_name, "", "render", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	data_api := Api_topic_list(config, num, doc_name, do_type)
 	data_api_in := data_api["data"].([][]string)
 

@@ -13,15 +13,14 @@ func View_auth_group_delete(config tool.Config, name string, values url.Values) 
 	if default_groups[name] {
 		return tool.Get_redirect("/auth/list")
 	}
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if values != nil {
-		if tool.Auth_group_in_use(db, name) {
+		result := Api_auth_group_delete_post(config, name)
+		if result["response"] != "ok" {
 			return tool.Get_error_page(db, config, "error")
 		}
-		tool.Exec_DB(db, "delete from alist where name = ?", name)
-		tool.Do_insert_auth_history(db, config.IP, "auth_group_delete ("+name+")")
 		return tool.Get_redirect("/auth/list")
 	}
 

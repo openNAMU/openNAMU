@@ -8,6 +8,10 @@ func Api_func_email_post(config tool.Config, who string, title string, data stri
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+		return map[string]any{"response": "require auth"}
+	}
+
 	err := tool.Send_email(db, config.IP, who, title, data)
 	if err == nil {
 		new_data := make(map[string]any)

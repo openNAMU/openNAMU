@@ -12,14 +12,17 @@ func View_alarm(config tool.Config, user_name string, values url.Values) string 
 	if user_name == "" {
 		user_name = config.IP
 	}
-	if user_name != config.IP && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	is_change := values != nil && (values.Get("all") != "" || values.Get("delete") != "")
+	if !is_change && user_name != config.IP && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	if values != nil && (values.Get("all") != "" || values.Get("delete") != "") {
-		if values.Get("all") != "" {
-			tool.Exec_DB(db, "delete from user_notice where name = ?", user_name)
-		} else if id := values.Get("delete"); id != "" {
-			tool.Exec_DB(db, "delete from user_notice where name = ? and id = ?", user_name, id)
+	if is_change {
+		result := Api_alarm_delete_post(config, user_name, values.Get("delete"), values.Get("all") != "")
+		if result["response"] == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
+		}
+		if result["response"] != "ok" {
+			return tool.Get_error_page(db, config, "error")
 		}
 		return_path := "/alarm"
 		if user_name != config.IP {

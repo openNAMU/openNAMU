@@ -13,7 +13,7 @@ func View_auth_group(config tool.Config, name string, values url.Values) string 
 
 	new_group := name == ""
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if name == "" && values == nil {
@@ -28,14 +28,10 @@ func View_auth_group(config tool.Config, name string, values url.Values) string 
 	}
 
 	if values != nil {
-		tool.Exec_DB(db, "delete from alist where name = ?", name)
-		for _, choice := range tool.Auth_choices() {
-			if values.Get(choice.Key) != "" {
-				tool.Exec_DB(db, "insert into alist (name, acl) values (?, ?)", name, choice.Key)
-			}
+		result := Api_auth_group_post(config, name, values)
+		if result["response"] != "ok" {
+			return tool.Get_error_page(db, config, "error")
 		}
-		tool.Exec_DB(db, "insert into alist (name, acl) values (?, 'nothing')", name)
-		tool.Do_insert_auth_history(db, config.IP, "auth_group_save ("+name+")")
 		return tool.Get_redirect("/auth/list/add/" + tool.Url_parser(name))
 	}
 

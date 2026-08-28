@@ -8,7 +8,7 @@ import (
 func View_user_top_menu(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if !user_auth(db, config) {
+	if values == nil && !user_auth(db, config) {
 		return tool.Get_redirect("/user")
 	}
 	if values != nil {
@@ -16,7 +16,14 @@ func View_user_top_menu(config tool.Config, values url.Values) string {
 		if !values.Has("content") {
 			content = values.Get("data")
 		}
-		user_save(db, config.IP, "top_menu", content)
+		api_data := Api_user_top_menu_post(config, content)
+		response, _ := api_data["response"].(string)
+		if response == "require auth" {
+			return tool.Get_redirect("/user")
+		}
+		if response != "ok" {
+			return tool.Get_error_page(db, config, "error")
+		}
 		return tool.Get_redirect("/change/top_menu")
 	}
 	content := user_value(db, config.IP, "top_menu")

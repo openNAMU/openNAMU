@@ -66,60 +66,13 @@ func View_user_setting(config tool.Config, values url.Values) string {
 	}
 
 	if values != nil {
-		if values.Has("skin") {
-			skin := values.Get("skin")
-			if tool.Arr_in_str(tool.Get_skin_list("", true), skin) {
-				user_save(db, config.IP, "skin", skin)
-			}
+		api_data := Api_user_setting_post(config, values)
+		response, _ := api_data["response"].(string)
+		if response == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
 		}
-		if values.Has("lang") {
-			for _, language := range language_list {
-				if language.value == values.Get("lang") {
-					user_save(db, config.IP, "lang", language.value)
-					break
-				}
-			}
-		}
-		if values.Has("user_title") {
-			title := ""
-			for _, choice := range user_title_list(db, config.IP) {
-				if choice.value == values.Get("user_title") {
-					title = choice.value
-					break
-				}
-			}
-			user_save(db, config.IP, "user_title", title)
-		}
-		for _, name := range []string{"sub_user_name", "top_menu"} {
-			if values.Has(name) {
-				user_save(db, config.IP, name, values.Get(name))
-			}
-		}
-		if values.Has("2fa") {
-			if values.Get("2fa") == "" {
-				user_delete(db, config.IP, "2fa")
-				user_delete(db, config.IP, "2fa_pw")
-				user_delete(db, config.IP, "2fa_pw_encode")
-			} else {
-				user_save(db, config.IP, "2fa", "on")
-				if password := values.Get("2fa_pw"); password != "" {
-					encode := tool.Get_user_encode(db, config.IP)
-					user_save(db, config.IP, "2fa_pw", tool.Password_encode(db, password, encode))
-					user_save(db, config.IP, "2fa_pw_encode", encode)
-				}
-			}
-		} else if values.Has("2fa_pw") {
-			password := values.Get("2fa_pw")
-			if password == "" {
-				user_delete(db, config.IP, "2fa_pw")
-				user_delete(db, config.IP, "2fa_pw_encode")
-				user_delete(db, config.IP, "2fa")
-			} else {
-				encode := tool.Get_user_encode(db, config.IP)
-				user_save(db, config.IP, "2fa_pw", tool.Password_encode(db, password, encode))
-				user_save(db, config.IP, "2fa_pw_encode", encode)
-				user_save(db, config.IP, "2fa", "on")
-			}
+		if response != "ok" {
+			return tool.Get_error_page(db, config, "error")
 		}
 		return tool.Get_redirect("/change")
 	}

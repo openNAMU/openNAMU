@@ -10,11 +10,11 @@ func View_user_name_for(config tool.Config, target string, values url.Values) st
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 	if target == "" {
-		if !user_auth(db, config) {
+		if values == nil && !user_auth(db, config) {
 			return tool.Get_redirect("/login")
 		}
 		target = config.IP
-	} else if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	} else if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
@@ -23,11 +23,17 @@ func View_user_name_for(config tool.Config, target string, values url.Values) st
 		if value == "" {
 			value = values.Get("data")
 		}
-		current := user_value(db, target, "user_name")
-		if value == "" || (!tool.Get_user_name_check(db, value) && value != current) {
+		api_data := Api_user_name_post(config, target, value)
+		response, _ := api_data["response"].(string)
+		if response == "require auth" {
+			if target == config.IP {
+				return tool.Get_redirect("/login")
+			}
+			return tool.Get_error_page(db, config, "auth")
+		}
+		if response != "ok" {
 			return tool.Get_error_page(db, config, "user name error")
 		}
-		user_save(db, target, "user_name", value)
 		if target != config.IP {
 			return tool.Get_redirect("/change/user_name/" + tool.Url_parser(target))
 		}

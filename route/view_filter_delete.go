@@ -9,19 +9,18 @@ func View_filter_delete(config tool.Config, kind string, name string, values url
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	spec, ok := get_filter_spec(kind)
+        _, ok := get_filter_spec(kind)
 	if !ok {
 		return tool.Get_error_page(db, config, "error")
 	}
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if values != nil {
-		tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
-		if kind == "inter_wiki" {
-			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = 'inter_wiki_sub'", name)
+		result := Api_filter_delete_post(config, kind, name)
+		if result["response"] != "ok" {
+			return tool.Get_error_page(db, config, "error")
 		}
-		tool.Do_insert_auth_history(db, config.IP, "filter_delete ("+kind+")")
 		return tool.Get_redirect("/filter/" + kind)
 	}
 
