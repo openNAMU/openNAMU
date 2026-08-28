@@ -34,7 +34,7 @@ func api_history_language(db *sql.DB) map[string]string {
 }
 
 func api_history_auth(db *sql.DB, ip string) map[string]bool {
-	auth_info := tool.Get_auth_group_info(db, tool.Get_user_auth(db, ip))
+	auth_info := tool.Get_auth_info(db, ip)
 	return map[string]bool{
 		"owner": auth_info["owner"],
 		"hidel": auth_info["hidel"],

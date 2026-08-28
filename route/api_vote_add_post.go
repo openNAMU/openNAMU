@@ -51,6 +51,13 @@ func Api_vote_add_post(config tool.Config, data string) map[string]any {
 		}
 	}
 
+	acl := strings.TrimSpace(values.Get("acl_select"))
+	if !acl_value_valid(db, acl) {
+		return_data["response"] = "error"
+		return_data["data"] = "invalid acl"
+		return return_data
+	}
+
 	date := strings.TrimSpace(values.Get("date"))
 	if date != "" {
 		if parsed_date, err := time.Parse("2006-01-02", date); err != nil || parsed_date.Before(time.Now().AddDate(0, 0, -1)) {
@@ -68,7 +75,7 @@ func Api_vote_add_post(config tool.Config, data string) map[string]any {
 		type_data = "open"
 	}
 
-	tool.Exec_DB(db, "insert into vote (name, id, subject, data, user, type, acl) values (?, ?, ?, ?, '', ?, ?)", name, id, subject, strings.Join(options, "\n"), type_data, values.Get("acl_select"))
+	tool.Exec_DB(db, "insert into vote (name, id, subject, data, user, type, acl) values (?, ?, ?, ?, '', ?, ?)", name, id, subject, strings.Join(options, "\n"), type_data, acl)
 	tool.Exec_DB(db, "insert into vote (name, id, subject, data, user, type, acl) values ('open_user', ?, '', ?, '', 'option', '')", id, config.IP)
 	if values.Get("limitless") == "" && values.Get("limitless") != "Y" && date != "" {
 		tool.Exec_DB(db, "insert into vote (name, id, subject, data, user, type, acl) values ('end_date', ?, '', ?, '', 'option', '')", id, date)

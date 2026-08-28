@@ -84,6 +84,9 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = 'regex_filter'", filter_name)
 			tool.Exec_DB(db, "insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, 'regex_filter')", filter_name, content, end)
 		} else if kind == "document" {
+			if !acl_value_valid(db, values.Get("acl")) {
+				return tool.Get_error_page(db, config, "error")
+			}
 			doc_name := values.Get("name")
 			if doc_name == "" {
 				return tool.Get_redirect("/filter/document")
@@ -158,7 +161,7 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 	case "document":
 		form += filter_input(tool.Get_language(db, "name", true), "name", name)
 		form += `<hr class="main_hr">` + filter_input(tool.Get_language(db, "regex", true), "regex", value[1])
-		form += `<hr class="main_hr">` + filter_select("acl", tool.List_acl("normal"), value[2])
+		form += `<hr class="main_hr">` + filter_select("acl", acl_value_list(db, value[2]), value[2])
 	case "name_filter", "file_filter":
 		form += filter_input(tool.Get_language(db, "regex", true), "title", name)
 	case "email_filter":

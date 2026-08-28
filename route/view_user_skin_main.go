@@ -10,8 +10,8 @@ func View_user_skin_main(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	ban_data := tool.Get_user_ban(db, config.IP, "")
-	if len(ban_data) > 0 && ban_data[0] == "true" {
+	auth_name := tool.Get_user_auth(db, config.IP)
+	if tool.Auth_group_name_ban(auth_name) {
 		return tool.Get_error_page(db, config, "ban")
 	}
 

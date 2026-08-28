@@ -38,6 +38,13 @@ The default port is `3000`. It can be changed with the first argument.
 ./main.amd64.bin 3000
 ```
 
+Add `--localhost` when the server should only be accessible from the same computer.
+
+```bash
+./main.amd64.bin --localhost
+./main.amd64.bin 3000 --localhost
+```
+
 If the server cannot start normally, run the emergency tool mode.
 
 ```bash

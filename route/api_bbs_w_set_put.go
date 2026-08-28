@@ -14,6 +14,11 @@ func Api_bbs_w_set_put(config tool.Config, set_id string, set_name string, data 
 	return_data := make(map[string]any)
 
 	if _, ok := setting_acl[set_name]; ok {
+		if tool.Arr_in_str(bbs_set_fields, set_name) && !acl_value_valid(db, data) {
+			return_data["response"] = "error"
+			return_data["data"] = "invalid acl"
+			return return_data
+		}
 		if auth_info {
 			if coverage == "" {
 				tool.Exec_DB(

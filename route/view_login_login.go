@@ -10,8 +10,7 @@ func View_login_login(config tool.Config) string {
 		return tool.Get_redirect("/user")
 	}
 
-	ban_data := tool.Get_user_ban(db, config.IP, "login")
-	if ban_data[0] == "true" {
+	if !tool.Get_auth_info(db, config.IP)["login_available"] {
 		return tool.Get_error_page(db, config, "ban")
 	}
 

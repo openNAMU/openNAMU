@@ -13,8 +13,7 @@ func user_register_access(db *sql.DB, config tool.Config) string {
 	if !owner_auth && user_other(db, "reg") == "on" {
 		return "register disabled"
 	}
-	ban_data := tool.Get_user_ban(db, config.IP, "register")
-	if len(ban_data) > 0 && ban_data[0] == "true" {
+	if !tool.Get_auth_info(db, config.IP)["register_available"] {
 		return "ban"
 	}
 	return ""

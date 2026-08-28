@@ -74,3 +74,17 @@ func wiki_access_middleware() gin.HandlerFunc {
 		c.Abort()
 	}
 }
+
+func site_view_middleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		db := tool.DB_connect()
+		defer tool.DB_close(db)
+
+		if !tool.Get_auth_info(db, tool.Get_IP(c))["site_view"] {
+			c.AbortWithStatus(http.StatusForbidden)
+			return
+		}
+
+		c.Next()
+	}
+}

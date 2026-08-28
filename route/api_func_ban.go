@@ -12,12 +12,23 @@ func Api_func_ban(config tool.Config, ip string, ban_type string) map[string]any
 		ip = config.IP
 	}
 
-	ip_data := tool.Get_user_ban(db, ip, ban_type)
+	auth_name := tool.Get_user_auth(db, ip)
+	auth_info := tool.Get_auth_info(db, ip)
+	blocked := tool.Auth_group_name_ban(auth_name)
+	if ban_type == "login" {
+		blocked = !auth_info["login_available"]
+	} else if ban_type == "register" {
+		blocked = !auth_info["register_available"]
+	}
 
 	new_data := make(map[string]any)
 	new_data["response"] = "ok"
-	new_data["ban"] = ip_data[0]
-	new_data["ban_type"] = ip_data[1]
+	new_data["ban"] = ""
+	new_data["ban_type"] = ""
+	if blocked {
+		new_data["ban"] = "true"
+		new_data["ban_type"] = auth_name
+	}
 
 	return new_data
 }

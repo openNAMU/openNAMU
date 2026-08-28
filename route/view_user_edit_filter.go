@@ -13,7 +13,7 @@ func View_user_edit_filter(config tool.Config, user_name string, values url.Valu
 	if user_name == "" {
 		user_name = config.IP
 	}
-	if user_name != config.IP && !tool.Check_acl(db, "", "", "ban_auth", config.IP) {
+	if user_name != config.IP && !tool.Check_acl(db, "", "", "edit_filter_auth", config.IP) {
 		return tool.Get_redirect("/recent_block")
 	}
 	if values != nil {

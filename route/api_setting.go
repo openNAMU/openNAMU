@@ -4,6 +4,13 @@ import (
 	"opennamu/route/tool"
 )
 
+var bbs_global_acl_fields = []string{
+	"bbs_view_acl_all",
+	"bbs_acl_all",
+	"bbs_edit_acl_all",
+	"bbs_comment_acl_all",
+}
+
 func Setting_list() map[string]string {
 	setting_acl := map[string]string{}
 

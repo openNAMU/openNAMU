@@ -20,7 +20,7 @@ func View_thread_acl(config tool.Config, topic_num string, values url.Values) st
 	if values != nil {
 		acl := values.Get("acl")
 		acl_view := values.Get("acl_view")
-		if !tool.Arr_in_str(tool.List_acl("normal"), acl) || !tool.Arr_in_str(tool.List_acl("normal"), acl_view) {
+		if !acl_value_valid(db, acl) || !acl_value_valid(db, acl_view) {
 			return tool.Get_error_page(db, config, "error")
 		}
 		tool.Exec_DB(db, "update rd set acl = ?, date = ? where code = ?", acl, tool.Get_time(), topic_num)
@@ -33,6 +33,8 @@ func View_thread_acl(config tool.Config, topic_num string, values url.Values) st
 
 	acl_view := ""
 	tool.QueryRow_DB(db, "select set_data from topic_set where thread_code = ? and set_name = 'thread_view_acl'", []any{&acl_view}, topic_num)
-	data := `<form method="post"><a href="/acl/TEST#exp">(` + tool.Get_language(db, "reference", true) + `)</a><h2>` + tool.Get_language(db, "thread_acl", true) + `</h2>` + bbs_set_select(db, "acl", thread_acl, tool.List_acl("normal")) + `<h2>` + tool.Get_language(db, "view_acl", true) + ` (` + tool.Get_language(db, "beta", true) + `)</h2>` + bbs_set_select(db, "acl_view", acl_view, tool.List_acl("normal")) + `<hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
+	acl_values := acl_value_list(db, thread_acl)
+	acl_view_values := acl_value_list(db, acl_view)
+	data := `<form method="post"><a href="/acl/TEST#exp">(` + tool.Get_language(db, "reference", true) + `)</a><h2>` + tool.Get_language(db, "thread_acl", true) + `</h2>` + bbs_set_select(db, "acl", thread_acl, acl_values) + `<h2>` + tool.Get_language(db, "view_acl", true) + ` (` + tool.Get_language(db, "beta", true) + `)</h2>` + bbs_set_select(db, "acl_view", acl_view, acl_view_values) + `<hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 	return tool.Get_template(db, config, tool.Get_language(db, "topic_acl_setting", true), data, []any{"(" + tool.HTML_escape(title) + ")"}, [][]any{{"thread/" + tool.Url_parser(topic_num) + "/tool", tool.Get_language(db, "return", true)}}, map[string]string{})
 }

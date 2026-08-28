@@ -26,6 +26,10 @@ func register_admin_api_routes(r *gin.Engine) {
 			c.PostForm("auth"),
 			c.PostForm("change_auth"),
 			c.PostForm("user_name"),
+			c.PostForm("end_date"),
+			c.PostForm("target_type"),
+			c.PostForm("why"),
+			c.PostForm("action") == "release",
 		)
 		c.JSON(http.StatusOK, data)
 	})

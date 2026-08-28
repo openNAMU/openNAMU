@@ -82,6 +82,31 @@ func bbs_set_select(db *sql.DB, name string, selected string, values []string) s
 	return data + `</select>`
 }
 
+func acl_value_valid(db *sql.DB, value string) bool {
+	if tool.Arr_in_str(tool.List_acl("normal"), value) {
+		return true
+	}
+	return tool.Auth_group_exists(db, value) || tool.Auth_permission_name(value)
+}
+
+func acl_value_list(db *sql.DB, selected string) []string {
+	values := tool.List_acl("normal")
+	for _, choice := range tool.Auth_choices() {
+		if !tool.Arr_in_str(values, choice.Key) {
+			values = append(values, choice.Key)
+		}
+	}
+	for _, group := range tool.List_auth(db) {
+		if !tool.Arr_in_str(values, group) {
+			values = append(values, group)
+		}
+	}
+	if selected != "" && !tool.Arr_in_str(values, selected) {
+		values = append([]string{selected}, values...)
+	}
+	return values
+}
+
 func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
@@ -103,11 +128,11 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 		return tool.Get_redirect("/bbs/set/" + tool.Url_parser(set_id))
 	}
 
-	acl_values := tool.List_acl("normal")
 	data := `<form method="post">`
 	for _, field := range bbs_set_fields {
+		selected := bbs_set_value(db, set_id, field)
 		data += `<h3>` + tool.Get_language(db, field, true) + `</h3>`
-		data += bbs_set_select(db, field, bbs_set_value(db, set_id, field), acl_values)
+		data += bbs_set_select(db, field, selected, acl_value_list(db, selected))
 		data += `<hr class="main_hr">`
 	}
 

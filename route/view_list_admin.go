@@ -26,14 +26,10 @@ func View_list_admin(config tool.Config, auth_use bool) string {
 		rows.Close()
 		return list_extra_page(db, config, tool.Get_language(db, "auth_use", true), body.String())
 	}
-	rows := tool.Query_DB(db, "select id, data from user_set where name = 'acl' and data != 'user' order by id")
-	for rows.Next() {
-		name, auth := "", ""
-		if rows.Scan(&name, &auth) == nil {
-			body.WriteString(tool.Get_list_ui(`<a href="/user/`+tool.Url_parser(name)+`">`+tool.IP_parser(db, name, config.IP)+`</a>`, tool.HTML_escape(auth), "", ""))
-		}
+	for _, auth_data := range tool.Get_auth_user_list(db, 0, 0) {
+		name, auth := auth_data[0], auth_data[1]
+		body.WriteString(tool.Get_list_ui(`<a href="/user/`+tool.Url_parser(name)+`">`+tool.IP_parser(db, name, config.IP)+`</a>`, tool.HTML_escape(auth), "", ""))
 	}
-	rows.Close()
 	return list_extra_page(db, config, tool.Get_language(db, "admin_list", true), body.String())
 }
 

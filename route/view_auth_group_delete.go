@@ -9,7 +9,7 @@ func View_auth_group_delete(config tool.Config, name string, values url.Values) 
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	default_groups := map[string]bool{"owner": true, "user": true, "ip": true, "ban": true}
+	default_groups := map[string]bool{"owner": true, "admin": true, "user": true, "ip": true, "ban": true, "ban_without_login": true, "ban_without_site": true, "email_verified": true, "up_to_level_10": true, "up_to_level_3": true, "trust_a": true, "trust_b": true, "trust_c": true, "trust_d": true}
 	if default_groups[name] {
 		return tool.Get_redirect("/auth/list")
 	}
@@ -17,8 +17,7 @@ func View_auth_group_delete(config tool.Config, name string, values url.Values) 
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if values != nil {
-		used := ""
-		if tool.QueryRow_DB(db, "select id from user_set where name = 'acl' and data = ? limit 1", []any{&used}, name) {
+		if tool.Auth_group_in_use(db, name) {
 			return tool.Get_error_page(db, config, "error")
 		}
 		tool.Exec_DB(db, "delete from alist where name = ?", name)

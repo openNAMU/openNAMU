@@ -17,8 +17,7 @@ func View_login_2fa(config tool.Config, values url.Values) string {
 		if !tool.Captcha_check(db, config.Session, config.IP, tool.Captcha_response(values.Get("g-recaptcha"), values.Get("g-recaptcha-response"), values.Get("h-captcha-response"), values.Get("cf-turnstile-response"))) {
 			return tool.Get_error_page(db, config, "recaptcha")
 		}
-		ban_data := tool.Get_user_ban(db, config.IP, "login")
-		if len(ban_data) > 0 && ban_data[0] == "true" {
+		if !tool.Get_auth_info(db, config.IP)["login_available"] || !tool.Get_auth_info(db, login_id)["login_available"] {
 			return tool.Get_error_page(db, config, "ban")
 		}
 		stored := user_value(db, login_id, "2fa_pw")

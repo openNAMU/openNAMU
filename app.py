@@ -296,7 +296,7 @@ def wsgi_start_backend(target_host, target_port):
                 wsgi_log("backend port is in use; trying " + str(target_port))
                 continue
 
-            command = [str(binary_path), str(target_port)]
+            command = [str(binary_path), str(target_port), "--localhost"]
             environment = os.environ.copy()
             environment.pop("NAMU_START_DELAY_MS", None)
             with log_path.open("ab", buffering=0) as log_file:

@@ -8,11 +8,9 @@ func Api_login_login(config tool.Config, id string, password string) map[string]
 
 	return_data := make(map[string]any)
 
-	ban_data := tool.Get_user_ban(db, config.IP, "login")
-	if ban_data[0] == "true" {
+	if !tool.Get_auth_info(db, config.IP)["login_available"] {
 		return_data["response"] = "error"
 		return_data["data"] = "ban"
-		return_data["ban_type"] = ban_data[1]
 
 		return return_data
 	}
@@ -20,6 +18,12 @@ func Api_login_login(config tool.Config, id string, password string) map[string]
 	if !tool.Password_check(db, id, password) {
 		return_data["response"] = "error"
 		return_data["data"] = "password error"
+
+		return return_data
+	}
+	if !tool.Get_auth_info(db, id)["login_available"] {
+		return_data["response"] = "error"
+		return_data["data"] = "ban"
 
 		return return_data
 	}

@@ -47,8 +47,7 @@ func Get_safe_send_data(data string) string {
 }
 
 func Get_ui_history(db *sql.DB, config tool.Config, data_all [][]string) (string, string) {
-	auth_name := tool.Get_user_auth(db, config.IP)
-	auth_info := tool.Get_auth_group_info(db, auth_name)
+	auth_info := tool.Get_auth_info(db, config.IP)
 
 	date_heading := ""
 	data_html := ""

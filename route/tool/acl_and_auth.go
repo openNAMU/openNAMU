@@ -4,34 +4,38 @@ import (
 	"database/sql"
 	"strings"
 	"time"
+
+	"github.com/3th1nk/cidr"
+	"github.com/dlclark/regexp2"
 )
 
 func List_acl(func_type string) []string {
 	if func_type == "user_document" {
 		return []string{
 			"",
-			"user",
-			"all",
-		}
-	} else {
-		return []string{
-			"",
-			"all",
-			"user",
-			"admin",
 			"owner",
-			"50_edit",
-			"email",
-			"ban",
-			"before",
-			"30_day",
-			"90_day",
-			"ban_admin",
-			"not_all",
-			"up_to_level_3",
-			"up_to_level_10",
-			"30_day_50_edit",
+			"admin",
+			"user",
+			"ip",
 		}
+	}
+
+	return []string{
+		"",
+		"owner",
+		"admin",
+		"user",
+		"ip",
+		"ban",
+		"ban_without_login",
+		"ban_without_site",
+		"email_verified",
+		"up_to_level_10",
+		"up_to_level_3",
+		"trust_a",
+		"trust_b",
+		"trust_c",
+		"trust_d",
 	}
 }
 
@@ -50,6 +54,9 @@ func List_auth(db *sql.DB) []string {
 		err := rows.Scan(&name)
 		if err != nil {
 			panic(err)
+		}
+		if Auth_group_name_reserved(name) && !Auth_group_name_default(name) {
+			continue
 		}
 
 		data_list = append(data_list, name)
@@ -77,15 +84,40 @@ func Do_insert_auth_history(db *sql.DB, ip string, what string) {
 	}
 }
 
-func Get_user_auth(db *sql.DB, ip string) string {
+func auth_end_active(end string) bool {
+	if end == "" || end == "0" {
+		return true
+	}
+
+	end_time, end_err := time.Parse("2006-01-02 15:04:05", end)
+	if end_err != nil {
+		end_time, end_err = time.Parse("2006-01-02", end)
+	}
+	now_time, now_err := time.Parse("2006-01-02 15:04:05", Get_time())
+	if end_err != nil || now_err != nil {
+		return true
+	}
+
+	return now_time.Before(end_time)
+}
+
+func get_user_auth_raw(db *sql.DB, ip string) string {
 	auth := "ip"
+	acl_end := ""
 	exist := QueryRow_DB(
 		db,
-		"select data from user_set where id = ? and name = 'acl'",
-		[]any{&auth},
+		"select user_set.data, coalesce(acl_end.data, '') from user_set inner join alist on alist.name = user_set.data left join user_set as acl_end on acl_end.id = user_set.id and acl_end.name = 'acl_end' where user_set.id = ? and user_set.name = 'acl' limit 1",
+		[]any{&auth, &acl_end},
 		ip,
 	)
 
+	if exist && !auth_end_active(acl_end) {
+		exist = false
+	}
+
+	if exist && Auth_group_name_reserved(auth) && !Auth_group_name_default(auth) {
+		exist = false
+	}
 	if !exist {
 		if !IP_or_user(ip) {
 			auth = "user"
@@ -97,7 +129,105 @@ func Get_user_auth(db *sql.DB, ip string) string {
 	return auth
 }
 
-func Get_auth_group_info(db *sql.DB, auth string) map[string]bool {
+func get_ban_auth_group(db *sql.DB, login string) string {
+	switch login {
+	case "L", "O", "ban":
+		return "ban"
+	case "D", "ban_without_site":
+		return "ban_without_site"
+	case "A", "E", "ban_without_login":
+		return "ban_without_login"
+	}
+	if Auth_group_exists(db, login) {
+		return login
+	}
+	return "ban_without_login"
+}
+
+func Get_auth_target_group(db *sql.DB, target string, target_type string) string {
+	if target_type == "" || target_type == "normal" {
+		return Get_user_auth(db, target)
+	}
+
+	auth := ""
+	end := ""
+	QueryRow_DB(
+		db,
+		"select login, end from rb where block = ? and band = ? and ongoing = '1' order by today desc limit 1",
+		[]any{&auth, &end},
+		target,
+		target_type,
+	)
+	if auth == "" || !auth_end_active(end) {
+		return "ip"
+	}
+
+	return get_ban_auth_group(db, auth)
+}
+
+func get_pattern_auth_group(db *sql.DB, ip string) string {
+	rows := Query_DB(
+		db,
+		"select login, block, end from rb where band = 'regex' and ongoing = '1'",
+	)
+	for rows.Next() {
+		login := ""
+		block := ""
+		end := ""
+		if rows.Scan(&login, &block, &end) != nil {
+			continue
+		}
+		if !auth_end_active(end) {
+			continue
+		}
+		r, err := regexp2.Compile(block, 0)
+		if err == nil {
+			if match, _ := r.FindStringMatch(ip); match != nil {
+				rows.Close()
+				return get_ban_auth_group(db, login)
+			}
+		}
+	}
+	rows.Close()
+
+	if IP_or_user(ip) {
+		rows := Query_DB(
+			db,
+			"select login, block, end from rb where band = 'cidr' and ongoing = '1'",
+		)
+		for rows.Next() {
+			login := ""
+			block := ""
+			end := ""
+			if rows.Scan(&login, &block, &end) != nil {
+				continue
+			}
+			if !auth_end_active(end) {
+				continue
+			}
+			c, err := cidr.Parse(block)
+			if err == nil && c.Contains(ip) {
+				rows.Close()
+				return get_ban_auth_group(db, login)
+			}
+		}
+		rows.Close()
+	}
+	return ""
+}
+
+func Get_user_auth(db *sql.DB, ip string) string {
+	auth := get_user_auth_raw(db, ip)
+	if Auth_group_name_ban(auth) {
+		return auth
+	}
+	if pattern_auth := get_pattern_auth_group(db, ip); pattern_auth != "" {
+		return pattern_auth
+	}
+	return auth
+}
+
+func Get_auth_permission_list(db *sql.DB, auth string) []string {
 	rows := Query_DB(
 		db,
 		"select acl from alist where name = ?",
@@ -105,24 +235,177 @@ func Get_auth_group_info(db *sql.DB, auth string) map[string]bool {
 	)
 	defer rows.Close()
 
-	data_list := map[string]bool{}
-
+	data_list := []string{}
 	for rows.Next() {
-		var name string
-
-		err := rows.Scan(&name)
-		if err != nil {
+		name := ""
+		if err := rows.Scan(&name); err != nil {
 			panic(err)
 		}
+		data_list = append(data_list, name)
+	}
+	return data_list
+}
 
+func Get_auth_user_list(db *sql.DB, offset int, limit int) [][]string {
+	query := "select id, data from user_set where name = 'acl' and data != 'user' order by id"
+	args := []any{}
+	if limit > 0 {
+		query += " limit ?, ?"
+		args = append(args, offset, limit)
+	}
+
+	rows := Query_DB(db, query, args...)
+	defer rows.Close()
+
+	data_list := [][]string{}
+	for rows.Next() {
+		data := []string{"", ""}
+		if rows.Scan(&data[0], &data[1]) != nil {
+			continue
+		}
+		auth := Get_user_auth(db, data[0])
+		if auth == "user" {
+			continue
+		}
+		data[1] = auth
+		data_list = append(data_list, data)
+	}
+	return data_list
+}
+
+func Get_auth_group_info(db *sql.DB, auth string) map[string]bool {
+	data_list := map[string]bool{}
+
+	for _, name := range Get_auth_permission_list(db, auth) {
 		data_list[name] = true
 	}
 
 	if len(data_list) == 0 {
 		data_list["nothing"] = true
 	}
+	if auth != "" {
+		data_list["group:"+auth] = true
+	}
 
 	return Check_auth(data_list)
+}
+
+func Get_acl_data_list(db *sql.DB, title string, acl_type string) []string {
+	rows := Query_DB(
+		db,
+		"select data from acl where title = ? and type = ? and data != '' and data != 'normal'",
+		title, acl_type,
+	)
+	defer rows.Close()
+
+	data_list := []string{}
+	seen := map[string]bool{}
+	for rows.Next() {
+		data := ""
+		if rows.Scan(&data) == nil && !seen[data] {
+			seen[data] = true
+			data_list = append(data_list, data)
+		}
+	}
+
+	return data_list
+}
+
+func Check_acl_group(db *sql.DB, acl_data string, auth_info map[string]bool) bool {
+	if acl_data == "" || acl_data == "normal" || acl_data == "nothing" {
+		return false
+	}
+	if Auth_group_exists(db, acl_data) && auth_info["group:"+acl_data] {
+		return true
+	}
+	if Auth_permission_name(acl_data) {
+		return auth_info[acl_data]
+	}
+	return false
+}
+
+func Get_rankup_auth_info(db *sql.DB, ip string) map[string]bool {
+	auth_info := map[string]bool{}
+	if IP_or_user(ip) {
+		return auth_info
+	}
+
+	edit_count := 0
+	QueryRow_DB(
+		db,
+		"select count(*) from history where ip = ?",
+		[]any{&edit_count},
+		ip,
+	)
+
+	signup_date := ""
+	QueryRow_DB(
+		db,
+		"select data from user_set where id = ? and name = 'date'",
+		[]any{&signup_date},
+		ip,
+	)
+
+	time_30 := false
+	time_90 := false
+	date, date_err := time.Parse("2006-01-02 15:04:05", signup_date)
+	now, now_err := time.Parse("2006-01-02 15:04:05", Get_time())
+	if date_err == nil && now_err == nil {
+		time_30 = !now.Before(date.AddDate(0, 0, 30))
+		time_90 = !now.Before(date.AddDate(0, 0, 90))
+	}
+
+	if edit_count >= 50 {
+		auth_info["trust_a"] = true
+	}
+	if time_30 {
+		auth_info["trust_b"] = true
+	}
+	if auth_info["trust_a"] && auth_info["trust_b"] {
+		auth_info["trust_c"] = true
+	}
+	if edit_count >= 100 && time_90 {
+		auth_info["trust_d"] = true
+		auth_info["trust_c"] = true
+		auth_info["trust_a"] = true
+		auth_info["trust_b"] = true
+	}
+
+	return auth_info
+}
+
+func Get_auth_info(db *sql.DB, ip string) map[string]bool {
+	auth_name := Get_user_auth(db, ip)
+	auth_info := Get_auth_group_info(db, auth_name)
+	if Auth_group_name_ban(auth_name) {
+		return auth_info
+	}
+	if !IP_or_user(ip) && auth_info["do_email_verified"] && !auth_info["email_verified"] {
+		email := ""
+		QueryRow_DB(
+			db,
+			"select data from user_set where id = ? and name = 'email'",
+			[]any{&email},
+			ip,
+		)
+		if email != "" {
+			auth_info["email_verified"] = true
+		}
+	}
+	if IP_or_user(ip) || auth_info["admin"] || auth_info["owner"] {
+		return auth_info
+	}
+
+	if auth_info["rankup"] {
+		for auth := range Get_rankup_auth_info(db, ip) {
+			auth_info[auth] = true
+			for name := range Get_auth_group_info(db, auth) {
+				auth_info[name] = true
+			}
+		}
+	}
+
+	return Check_auth(auth_info)
 }
 
 func Get_auth_date(db *sql.DB, user_name string) string {
@@ -142,8 +425,128 @@ func Get_auth_date(db *sql.DB, user_name string) string {
 	return data
 }
 
-func Auth_include_upper_auth(auth_info map[string]bool) bool {
-	return auth_info["owner"]
+func Get_auth_level(auth_info map[string]bool) int {
+	if auth_info["owner"] {
+		return 7
+	}
+	if auth_info["admin"] {
+		return 6
+	}
+	if auth_info["up_to_level_10"] {
+		return 5
+	}
+	if auth_info["trust_d"] {
+		return 5
+	}
+	if auth_info["trust_c"] {
+		return 4
+	}
+	if auth_info["up_to_level_3"] {
+		return 3
+	}
+	if auth_info["trust_a"] || auth_info["trust_b"] || auth_info["email_verified"] {
+		return 3
+	}
+	if auth_info["user"] {
+		return 2
+	}
+	if auth_info["ip"] {
+		return 1
+	}
+	return 0
+}
+
+func Auth_group_name_default(name string) bool {
+	return Arr_in_str([]string{
+		"owner",
+		"admin",
+		"user",
+		"ip",
+		"ban",
+		"ban_without_login",
+		"ban_without_site",
+		"email_verified",
+		"up_to_level_10",
+		"up_to_level_3",
+		"trust_a",
+		"trust_b",
+		"trust_c",
+		"trust_d",
+	}, name)
+}
+
+func Auth_group_name_ban(name string) bool {
+	return name == "ban" || name == "ban_without_login" || name == "ban_without_site"
+}
+
+func Auth_permission_name(name string) bool {
+	for _, choice := range Auth_choices() {
+		if choice.Key == name {
+			return true
+		}
+	}
+	return false
+}
+
+func Auth_group_name_reserved(name string) bool {
+	return name == "normal" || Auth_permission_name(name)
+}
+
+func Auth_group_exists(db *sql.DB, auth string) bool {
+	if auth == "" || (Auth_group_name_reserved(auth) && !Auth_group_name_default(auth)) {
+		return false
+	}
+
+	name := ""
+	return QueryRow_DB(
+		db,
+		"select name from alist where name = ? limit 1",
+		[]any{&name},
+		auth,
+	)
+}
+
+func Auth_group_in_use(db *sql.DB, auth string) bool {
+	queries := []string{
+		"select id from user_set where name = 'acl' and data = ? limit 1",
+		"select title from acl where data = ? limit 1",
+		"select code from rd where acl = ? limit 1",
+		"select thread_code from topic_set where set_name = 'thread_view_acl' and set_data = ? limit 1",
+		"select set_id from bbs_set where set_name in ('bbs_view_acl', 'bbs_acl', 'bbs_edit_acl', 'bbs_comment_acl', 'bbs_view_acl_all', 'bbs_acl_all', 'bbs_edit_acl_all', 'bbs_comment_acl_all') and set_data = ? limit 1",
+		"select name from other where name in ('bbs_view_acl_all', 'bbs_acl_all', 'bbs_edit_acl_all', 'bbs_comment_acl_all') and coverage = '' and data = ? limit 1",
+		"select id from vote where user = '' and acl = ? limit 1",
+	}
+
+	for _, query := range queries {
+		value := ""
+		if QueryRow_DB(db, query, []any{&value}, auth) {
+			return true
+		}
+	}
+	return false
+}
+
+func Auth_can_change_auth(db *sql.DB, ip string, before_auth string, after_auth string) bool {
+	if !Auth_group_exists(db, before_auth) || !Auth_group_exists(db, after_auth) {
+		return false
+	}
+	if !Check_acl(db, "", "", "give_auth", ip) {
+		return false
+	}
+	if before_auth == after_auth {
+		return true
+	}
+
+	auth_info := Get_auth_info(db, ip)
+	if auth_info["owner"] {
+		return true
+	}
+
+	auth_level := Get_auth_level(auth_info)
+	if auth_level <= Get_auth_level(Get_auth_group_info(db, before_auth)) {
+		return false
+	}
+	return auth_level > Get_auth_level(Get_auth_group_info(db, after_auth))
 }
 
 func Check_auth(auth_info map[string]bool) map[string]bool {
@@ -151,12 +554,45 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["admin"] = true
 	}
 
-	admin_auth := []string{"ban", "toron", "check", "acl", "hidel", "give", "bbs", "vote_fix"}
+	if _, ok := auth_info["admin"]; ok {
+		auth_info["email_verified"] = true
+		auth_info["up_to_level_10"] = true
+		auth_info["trust_d"] = true
+	}
+
+	if _, ok := auth_info["up_to_level_10"]; ok {
+		auth_info["up_to_level_3"] = true
+	}
+
+	if _, ok := auth_info["email_verified"]; ok {
+		auth_info["user"] = true
+	}
+
+	if _, ok := auth_info["up_to_level_3"]; ok {
+		auth_info["user"] = true
+	}
+
+	if _, ok := auth_info["trust_d"]; ok {
+		auth_info["trust_c"] = true
+	}
+
+	if _, ok := auth_info["trust_c"]; ok {
+		auth_info["trust_a"] = true
+		auth_info["trust_b"] = true
+	}
+
+	if auth_info["trust_a"] || auth_info["trust_b"] {
+		auth_info["user"] = true
+	}
+
+	admin_auth := []string{"toron", "check", "acl", "hidel", "give", "bbs", "vote_fix"}
 
 	if _, ok := auth_info["admin"]; ok {
 		for _, v := range admin_auth {
 			auth_info[v] = true
 		}
+		auth_info["edit_filter_manage"] = true
+		auth_info["application_manage"] = true
 	}
 
 	if _, ok := auth_info["check"]; ok {
@@ -183,7 +619,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		}
 	}
 
-	user_default := []string{"captcha_pass", "ip"}
+	user_default := []string{"rankup", "do_email_verified", "captcha_pass", "ip"}
 
 	if _, ok := auth_info["user"]; ok {
 		for _, v := range user_default {
@@ -191,7 +627,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		}
 	}
 
-	ip_default := []string{"document", "discuss", "upload", "vote", "bbs_use", "captcha_one_check_five_pass", "edit_filter_view"}
+	ip_default := []string{"document", "discuss", "upload", "vote", "bbs_use", "captcha_one_check_five_pass", "edit_filter_view", "login_available", "register_available"}
 
 	if _, ok := auth_info["ip"]; ok {
 		for _, v := range ip_default {
@@ -217,6 +653,10 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 
 	if check {
 		auth_info["view"] = true
+	}
+
+	if auth_info["view"] {
+		auth_info["site_view"] = true
 	}
 
 	topic_default := []string{"discuss_view", "discuss_make_new_thread"}
@@ -252,29 +692,11 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 
 // PASS is TRUE
 func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip string) bool {
-	auth_name := Get_user_auth(db, ip)
-	auth_info := Get_auth_group_info(db, auth_name)
+	auth_info := Get_auth_info(db, ip)
 
 	ip_or_user := IP_or_user(ip)
-	level := "0"
-	if !ip_or_user {
-		level = Get_level(db, ip)[0]
-	}
-
-	level_int := Str_to_int(level)
-
-	temp_arr := Get_user_ban(db, ip, "")
-	get_ban := temp_arr[0]
-	ban_type := temp_arr[1]
-
-	if ban_type != "" {
-		ban_type_len := Get_len(ban_type)
-		switch ban_type_len {
-		case 1:
-			ban_type = Get_slice(ban_type, 0, 1)
-		case 2:
-			ban_type = Get_slice(ban_type, 1, 2)
-		}
+	if !auth_info["site_view"] {
+		return false
 	}
 
 	if tool == "" && name != "" {
@@ -292,26 +714,16 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 				return true
 			}
 
-			if get_ban == "true" {
+			acl_data_list := Get_acl_data_list(db, name, "decu")
+			if len(acl_data_list) == 0 {
 				return false
 			}
 
-			acl_data := ""
-			QueryRow_DB(
-				db,
-				"select data from acl where title = ? and type = 'decu'",
-				[]any{&acl_data},
-				name,
-			)
-
-			if acl_data == "all" {
-				return true
-			} else if acl_data == "user" {
-				if !ip_or_user {
+			for _, acl_data := range acl_data_list {
+				if Check_acl_group(db, acl_data, auth_info) {
 					return true
 				}
-			} else if ip == user_page_str {
-				if !ip_or_user {
+				if ip == user_page_str && !ip_or_user {
 					return true
 				}
 			}
@@ -351,6 +763,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 	end_number := 1
 	for for_a := 0; for_a < end_number; for_a++ {
 		acl_data := ""
+		acl_data_list := []string{}
 		acl_pass_auth := ""
 
 		if tool == "all_admin_auth" {
@@ -359,8 +772,11 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 		} else if tool == "owner_auth" {
 			acl_pass_auth = "owner"
 			acl_data = "owner"
-		} else if tool == "ban_auth" {
-			acl_pass_auth = "ban"
+		} else if tool == "edit_filter_auth" {
+			acl_pass_auth = "edit_filter_manage"
+			acl_data = "owner"
+		} else if tool == "application_auth" {
+			acl_pass_auth = "application_manage"
 			acl_data = "owner"
 		} else if tool == "bbs_auth" {
 			acl_pass_auth = "bbs"
@@ -389,13 +805,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			if for_a == 0 {
 				end_number += 1
 
-				acl_data = ""
-				QueryRow_DB(
-					db,
-					"select data from acl where title = ? and type = 'decu'",
-					[]any{&acl_data},
-					name,
-				)
+				acl_data_list = Get_acl_data_list(db, name, "decu")
 			} else {
 				if auth_info["document"] {
 					acl_data = ""
@@ -409,13 +819,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			if for_a == 0 {
 				end_number += 1
 
-				acl_data = ""
-				QueryRow_DB(
-					db,
-					"select data from acl where title = ? and type = 'document_move_acl'",
-					[]any{&acl_data},
-					name,
-				)
+				acl_data_list = Get_acl_data_list(db, name, "document_move_acl")
 			} else {
 				if auth_info["move"] {
 					acl_data = ""
@@ -429,13 +833,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			if for_a == 0 {
 				end_number += 1
 
-				acl_data = ""
-				QueryRow_DB(
-					db,
-					"select data from acl where title = ? and type = 'document_edit_acl'",
-					[]any{&acl_data},
-					name,
-				)
+				acl_data_list = Get_acl_data_list(db, name, "document_edit_acl")
 			} else {
 				if auth_info["edit"] {
 					acl_data = ""
@@ -449,13 +847,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			if for_a == 0 {
 				end_number += 1
 
-				acl_data = ""
-				QueryRow_DB(
-					db,
-					"select data from acl where title = ? and type = 'document_delete_acl'",
-					[]any{&acl_data},
-					name,
-				)
+				acl_data_list = Get_acl_data_list(db, name, "document_delete_acl")
 			} else {
 				if auth_info["delete"] {
 					acl_data = ""
@@ -470,7 +862,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			case 0:
 				end_number += 1
 
-				acl_data = ""
 				QueryRow_DB(
 					db,
 					"select acl from rd where code = ?",
@@ -480,13 +871,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			case 1:
 				end_number += 1
 
-				acl_data = ""
-				QueryRow_DB(
-					db,
-					"select data from acl where title = ? and type = 'dis'",
-					[]any{&acl_data},
-					name,
-				)
+				acl_data_list = Get_acl_data_list(db, name, "dis")
 			default:
 				if auth_info["discuss"] {
 					acl_data = ""
@@ -500,7 +885,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			if for_a == 0 {
 				end_number += 1
 
-				acl_data = ""
 				QueryRow_DB(
 					db,
 					"select set_data from topic_set where thread_code = ? and set_name = 'thread_view_acl'",
@@ -537,7 +921,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 				end_number += 1
 
 				if topic_number != "" {
-					acl_data = ""
 					QueryRow_DB(
 						db,
 						"select acl from vote where id = ? and user = ''",
@@ -577,7 +960,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			case 0:
 				end_number += 1
 
-				acl_data = ""
 				QueryRow_DB(
 					db,
 					"select set_data from bbs_set where set_name = 'bbs_edit_acl' and set_id = ?",
@@ -587,7 +969,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			case 1:
 				end_number += 1
 
-				acl_data = ""
 				QueryRow_DB(
 					db,
 					"select set_data from bbs_set where set_name = 'bbs_acl' and set_id = ?",
@@ -597,7 +978,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			case 2:
 				end_number += 1
 
-				acl_data = ""
 				QueryRow_DB(
 					db,
 					"select set_data from bbs_set where set_name = 'bbs_edit_acl_all'",
@@ -617,7 +997,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			case 0:
 				end_number += 1
 
-				acl_data = ""
 				QueryRow_DB(
 					db,
 					"select set_data from bbs_set where set_name = 'bbs_comment_acl' and set_id = ?",
@@ -627,7 +1006,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			case 1:
 				end_number += 1
 
-				acl_data = ""
 				QueryRow_DB(
 					db,
 					"select set_data from bbs_set where set_name = 'bbs_acl' and set_id = ?",
@@ -637,7 +1015,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			case 2:
 				end_number += 1
 
-				acl_data = ""
 				QueryRow_DB(
 					db,
 					"select set_data from bbs_set where set_name = 'bbs_comment_acl_all'",
@@ -656,7 +1033,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			if for_a == 0 {
 				end_number += 1
 
-				acl_data = ""
 				QueryRow_DB(
 					db,
 					"select set_data from bbs_set where set_name = 'bbs_view_acl' and set_id = ?",
@@ -749,13 +1125,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			if for_a == 0 {
 				end_number += 1
 
-				acl_data = ""
-				QueryRow_DB(
-					db,
-					"select data from acl where title = ? and type = 'view'",
-					[]any{&acl_data},
-					name,
-				)
+				acl_data_list = Get_acl_data_list(db, name, "view")
 			} else {
 				if auth_info["view"] {
 					acl_data = ""
@@ -765,158 +1135,32 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			}
 		}
 
+		if len(acl_data_list) > 0 {
+			if auth_info[acl_pass_auth] {
+				return true
+			}
+			for _, value := range acl_data_list {
+				if Check_acl_group(db, value, auth_info) {
+					return true
+				}
+			}
+			return false
+		}
+
 		if auth_info[acl_pass_auth] {
 			return true
-		} else if ban_type == "4" {
-			return false
 		}
 
 		if acl_data == "" {
 			acl_data = "normal"
 		}
 
-		except_ban_tool_list := []string{"render", "topic_view", "bbs_view"}
 		if acl_data != "normal" {
-			if (acl_data != "ban" && acl_data != "ban_admin") || ban_type == "3" {
-				if !Arr_in_str(except_ban_tool_list, tool) {
-					if get_ban == "true" {
-						return false
-					}
-				}
-			}
-
-			switch acl_data {
-			case "all", "ban":
+			if Check_acl_group(db, acl_data, auth_info) {
 				return true
-			case "user":
-				if !ip_or_user {
-					return true
-				}
-			case "admin":
-				if auth_info["treat_as_admin"] {
-					return true
-				}
-			case "50_edit":
-				if !ip_or_user {
-					count := 0
-					QueryRow_DB(
-						db,
-						"select count(*) from history where ip = ?",
-						[]any{&count},
-						ip,
-					)
-
-					if count >= 50 {
-						return true
-					}
-				}
-			case "before":
-				exist := ""
-				QueryRow_DB(
-					db,
-					"select ip from history where title = ? and ip = ? and type != 'edit_request'",
-					[]any{&exist},
-					name, ip,
-				)
-
-				if exist != "" {
-					return true
-				}
-			case "30_day", "90_day":
-				if !ip_or_user {
-					signup_date := Get_time()
-					QueryRow_DB(
-						db,
-						"select data from user_set where id = ? and name = 'date'",
-						[]any{&signup_date},
-						ip,
-					)
-
-					time_1, _ := time.Parse("2006-01-02 15:04:05", signup_date)
-					if acl_data == "30_day" {
-						time_1 = time_1.AddDate(0, 0, 30)
-					} else {
-						time_1 = time_1.AddDate(0, 0, 90)
-					}
-
-					time_2, _ := time.Parse("2006-01-02 15:04:05", Get_time())
-					if time_2.After(time_1) {
-						return true
-					}
-				}
-			case "email":
-				if !ip_or_user {
-					exist := ""
-					QueryRow_DB(
-						db,
-						"select data from user_set where id = ? and name = 'email'",
-						[]any{&exist},
-						ip,
-					)
-
-					if exist != "" {
-						return true
-					}
-				}
-			case "owner":
-				if auth_info["owner"] {
-					return true
-				}
-			case "ban_admin":
-				if auth_info["treat_as_admin"] || get_ban == "true" {
-					return true
-				}
-			case "not_all":
-				return false
-			case "up_to_level_3", "up_to_level_10":
-				switch acl_data {
-				case "up_to_level_3":
-					if level_int >= 3 {
-						return true
-					}
-				case "up_to_level_10":
-					if level_int >= 10 {
-						return true
-					}
-				}
-			case "30_day_50_edit":
-				if !ip_or_user {
-					signup_date := Get_time()
-					QueryRow_DB(
-						db,
-						"select data from user_set where id = ? and name = 'date'",
-						[]any{&signup_date},
-						ip,
-					)
-
-					time_1, _ := time.Parse("2006-01-02 15:04:05", signup_date)
-					time_1 = time_1.AddDate(0, 0, 30)
-
-					time_2, _ := time.Parse("2006-01-02 15:04:05", Get_time())
-					if time_2.After(time_1) {
-						count := 0
-						QueryRow_DB(
-							db,
-							"select count(*) from history where ip = ?",
-							[]any{&count},
-							ip,
-						)
-
-						if count >= 50 {
-							return true
-						}
-					}
-				}
 			}
-
 			return false
 		} else if for_a == end_number-1 {
-			if !Arr_in_str(except_ban_tool_list, tool) {
-				if get_ban == "true" {
-					return false
-				}
-			}
-
 			if tool == "topic" {
 				topic_state := ""
 				QueryRow_DB(

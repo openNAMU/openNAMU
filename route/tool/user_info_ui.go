@@ -12,26 +12,9 @@ func Get_user_info_ui(db *sql.DB, config Config, user_name string) string {
 		auth_name += " (~" + auth_date + ")"
 	}
 
-	ban_data := Get_user_ban(db, user_name, "")
 	ban_state := Get_language(db, "normal", false)
-	if len(ban_data) > 0 && ban_data[0] != "" {
-		ban_type := ""
-		if len(ban_data) > 1 {
-			ban_type = ban_data[1]
-		}
-		switch {
-		case strings.HasPrefix(ban_type, "a"):
-			ban_state = `<a href="/recent_block/regex">` + Get_language(db, "ban", false) + `</a>`
-		case strings.HasPrefix(ban_type, "b"):
-			ban_state = `<a href="/recent_block/cidr">` + Get_language(db, "ban", false) + `</a>`
-		case strings.HasPrefix(ban_type, "c"):
-			ban_state = HTML_escape(auth_name)
-		default:
-			ban_state = `<a href="/recent_block/user/` + Url_parser(user_name) + `">` + Get_language(db, "ban", false) + `</a>`
-		}
-		if ban_type != "" {
-			ban_state += `<br>` + Get_language(db, "type", false) + ` : ` + HTML_escape(ban_type)
-		}
+	if Auth_group_name_ban(auth_name) {
+		ban_state = "<a href=\"/recent_block\">" + Get_language(db, "ban", false) + "</a>"
 	}
 
 	level_data := Get_level(db, user_name)

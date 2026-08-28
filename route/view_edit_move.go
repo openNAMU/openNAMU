@@ -180,6 +180,7 @@ func move_data_set_rotate(db *sql.DB, old_name string, new_name string) {
 	}
 	for _, pair := range pairs {
 		tool.Exec_DB(db, "update data_set set doc_name = ? where doc_name = ?", pair[1], pair[0])
+		tool.Exec_DB(db, "update acl set title = ? where title = ?", pair[1], pair[0])
 	}
 }
 

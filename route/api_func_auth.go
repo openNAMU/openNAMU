@@ -13,7 +13,7 @@ func Api_func_auth(config tool.Config, ip string) map[string]any {
 	}
 
 	auth_name := tool.Get_user_auth(db, ip)
-	auth_info := tool.Get_auth_group_info(db, auth_name)
+	auth_info := tool.Get_auth_info(db, ip)
 
 	return_data := make(map[string]any)
 	return_data["response"] = "ok"

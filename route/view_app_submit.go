@@ -11,7 +11,7 @@ func View_app_submit(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "ban_auth", config.IP) {
+	if !tool.Check_acl(db, "", "", "application_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

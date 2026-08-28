@@ -1,0 +1,66 @@
+package tool
+
+type Auth_choice struct {
+	Level int
+	Key   string
+	Lang  string
+}
+
+func Auth_choices() []Auth_choice {
+	return []Auth_choice{
+		{1, "owner", "owner_authority"},
+		{1, "user", "user_authority"},
+		{2, "rankup", "rankup_authority"},
+		{2, "do_email_verified", "do_email_verified_authority"},
+		{2, "captcha_pass", "captcha_pass_authority"},
+		{2, "ip", "ip_authority"},
+		{3, "document", "document_authority"},
+		{4, "edit", "edit_authority"},
+		{4, "move", "move_authority"},
+		{4, "new_make", "new_make_authority"},
+		{4, "delete", "delete_authority"},
+		{4, "view", "view_authority"},
+		{5, "site_view", "site_view_authority"},
+		{3, "discuss", "discuss_authority"},
+		{4, "discuss_make_new_thread", "discuss_make_new_thread_authority"},
+		{4, "discuss_view", "discuss_view_authority"},
+		{3, "upload", "upload_authority"},
+		{3, "vote", "vote_authority"},
+		{3, "bbs_use", "bbs_authority"},
+		{4, "bbs_edit", "bbs_edit_authority"},
+		{4, "bbs_comment", "bbs_comment_authority"},
+		{4, "bbs_view", "bbs_view_authority"},
+		{3, "captcha_one_check_five_pass", "captcha_one_check_five_pass_authority"},
+		{3, "edit_filter_view", "edit_filter_view_authority"},
+		{1, "admin", "admin_authority"},
+		{2, "email_verified", "email_verified_acl"},
+		{2, "up_to_level_10", "up_to_level_10"},
+		{3, "up_to_level_3", "up_to_level_3"},
+		{2, "trust_d", "trust_d_acl"},
+		{3, "trust_c", "trust_c_acl"},
+		{4, "trust_a", "trust_a_acl"},
+		{4, "trust_b", "trust_b_acl"},
+		{2, "login_available", "login_available_authority"},
+		{2, "register_available", "register_available_authority"},
+		{2, "edit_filter_manage", "edit_filter_manage_authority"},
+		{2, "application_manage", "application_manage_authority"},
+		{2, "toron", "discussion_authority"},
+		{2, "check", "user_analyze_authority"},
+		{2, "view_user_watchlist", "view_user_watchlist_authority"},
+		{2, "acl", "document_acl_authority"},
+		{2, "hidel", "history_hide_authority"},
+		{2, "give", "authorization_authority"},
+		{2, "bbs", "bbs_management_authority"},
+		{2, "vote_fix", "vote_management_authority"},
+		{2, "admin_default_feature", "admin_default_feature_authority"},
+		{3, "doc_watch_list_view", "doc_watch_list_view_authority"},
+		{3, "treat_as_admin", "treat_as_admin_authority"},
+		{3, "view_hide_user_name", "view_hide_user_name_authority"},
+		{3, "user_name_bold", "user_name_bold_authority"},
+		{3, "multiple_upload", "multiple_upload_authority"},
+		{3, "slow_edit_pass", "slow_edit_pass_authority"},
+		{3, "edit_bottom_compulsion_pass", "edit_bottom_compulsion_pass_authority"},
+		{3, "edit_filter_pass", "edit_filter_pass_authority"},
+		{3, "nothing", "nothing_authority"},
+	}
+}

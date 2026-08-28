@@ -19,6 +19,15 @@ var document_acl_fields = []string{
 	"dis",
 }
 
+var document_acl_group_fields = []string{
+	"view",
+	"decu",
+	"document_edit_acl",
+	"document_move_acl",
+	"document_delete_acl",
+	"dis",
+}
+
 func acl_field_title(db *sql.DB, field string) string {
 	key := map[string]string{
 		"view":                "view_acl",
@@ -38,10 +47,18 @@ func acl_value(db *sql.DB, doc_name string, field string) string {
 }
 
 func save_acl(db *sql.DB, doc_name string, values url.Values) {
-	for _, field := range document_acl_fields {
+	for _, field := range document_acl_group_fields {
+		if _, ok := values[field]; !ok {
+			continue
+		}
 		tool.Exec_DB(db, "delete from acl where title = ? and type = ?", doc_name, field)
-		tool.Exec_DB(db, "insert into acl (title, data, type) values (?, ?, ?)", doc_name, values.Get(field), field)
+		value := values.Get(field)
+		if value != "" && value != "normal" {
+			tool.Exec_DB(db, "insert into acl (title, data, type) values (?, ?, ?)", doc_name, value, field)
+		}
+	}
 
+	for _, field := range document_acl_fields {
 		tool.Exec_DB(db, "delete from data_set where doc_name = ? and doc_rev = ? and set_name = 'acl_date'", doc_name, field)
 		date_value := values.Get(field + "_date")
 		if regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}$`).MatchString(date_value) {
@@ -58,6 +75,49 @@ func save_acl(db *sql.DB, doc_name string, values url.Values) {
 
 	tool.Exec_DB(db, "delete from acl where title = ? and type = 'why'", doc_name)
 	tool.Exec_DB(db, "insert into acl (title, data, type) values (?, ?, 'why')", doc_name, values.Get("why"))
+}
+
+func change_acl_group(db *sql.DB, doc_name string, field string, group string, action string) {
+	if action == "add" {
+		exist := ""
+		if !tool.QueryRow_DB(db, "select data from acl where title = ? and type = ? and data = ? limit 1", []any{&exist}, doc_name, field, group) {
+			tool.Exec_DB(db, "insert into acl (title, data, type) values (?, ?, ?)", doc_name, group, field)
+		}
+		tool.Exec_DB(db, "delete from acl where title = ? and type = ? and data = ''", doc_name, field)
+		return
+	}
+
+	tool.Exec_DB(db, "delete from acl where title = ? and type = ? and data = ?", doc_name, field, group)
+}
+
+func acl_group_select(db *sql.DB) string {
+	data := `<select name="acl_group">`
+	for _, group := range acl_value_list(db, "") {
+		data += `<option value="` + tool.HTML_escape(group) + `">` + tool.HTML_escape(group) + `</option>`
+	}
+	return data + `</select>`
+}
+
+func acl_group_setting(db *sql.DB, title string, field string) string {
+	data := `<h3>` + acl_field_title(db, field) + `</h3>`
+	groups := tool.Get_acl_data_list(db, title, field)
+	if len(groups) == 0 {
+		data += `<div>` + tool.Get_language(db, "normal", true) + `</div>`
+	}
+	for _, group := range groups {
+		data += `<div>` + tool.HTML_escape(group) + ` <form method="post" style="display:inline"><input type="hidden" name="name" value="` + tool.HTML_escape(title) + `"><input type="hidden" name="acl_action" value="delete"><input type="hidden" name="acl_field" value="` + tool.HTML_escape(field) + `"><input type="hidden" name="acl_group" value="` + tool.HTML_escape(group) + `"><button type="submit">` + tool.Get_language(db, "delete", true) + `</button></form></div>`
+	}
+	data += `<form method="post"><input type="hidden" name="name" value="` + tool.HTML_escape(title) + `"><input type="hidden" name="acl_action" value="add"><input type="hidden" name="acl_field" value="` + tool.HTML_escape(field) + `">` + acl_group_select(db) + ` <button type="submit">` + tool.Get_language(db, "add", true) + `</button></form>`
+	return data + `<hr class="main_hr">`
+}
+
+func acl_group_multiple_setting(db *sql.DB) string {
+	data := `<h3>` + tool.Get_language(db, "acl", true) + `</h3><form method="post"><textarea class="opennamu_textarea_500" name="title_name" placeholder="` + tool.Get_language(db, "many_delete_help", true) + `"></textarea><hr class="main_hr"><select name="acl_field">`
+	for _, field := range document_acl_group_fields {
+		data += `<option value="` + tool.HTML_escape(field) + `">` + tool.HTML_escape(acl_field_title(db, field)) + `</option>`
+	}
+	data += `</select> ` + acl_group_select(db) + ` <button name="acl_action" value="add" type="submit">` + tool.Get_language(db, "add", true) + `</button> <button name="acl_action" value="delete" type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
+	return data
 }
 
 func View_acl(config tool.Config, doc_name string, multiple bool, values url.Values) string {
@@ -78,6 +138,35 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 	}
 	if !allowed {
 		return tool.Get_error_page(db, config, "auth")
+	}
+
+	if values != nil && values.Get("acl_action") != "" {
+		field := values.Get("acl_field")
+		group := values.Get("acl_group")
+		action := values.Get("acl_action")
+		if !tool.Arr_in_str(document_acl_group_fields, field) || !tool.Arr_in_str([]string{"add", "delete"}, action) || group == "" {
+			return tool.Get_error_page(db, config, "error")
+		}
+		if action == "add" && !acl_value_valid(db, group) {
+			return tool.Get_error_page(db, config, "error")
+		}
+
+		names := []string{doc_name}
+		if multiple {
+			names = strings.Split(strings.ReplaceAll(values.Get("title_name"), "\r", ""), "\n")
+		}
+		for _, name := range names {
+			name = strings.TrimSpace(name)
+			if name == "" {
+				continue
+			}
+			change_acl_group(db, name, field, group, action)
+			tool.Do_insert_auth_history(db, config.IP, "document_acl_"+action+" ("+name+")")
+		}
+		if multiple {
+			return tool.Get_redirect("/manager")
+		}
+		return tool.Get_redirect("/acl/" + tool.Url_parser(doc_name))
 	}
 
 	if values != nil {
@@ -130,11 +219,6 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 	}
 
 	for _, field := range document_acl_fields {
-		selected := ""
-		if !multiple {
-			selected = acl_value(db, doc_name, field)
-		}
-		data += `<h3>` + acl_field_title(db, field) + `</h3>` + acl_select(db, field, selected) + `<hr class="main_hr">`
 		date_value := ""
 		if !multiple {
 			tool.QueryRow_DB(db, "select set_data from data_set where doc_name = ? and doc_rev = ? and set_name = 'acl_date' limit 1", []any{&date_value}, doc_name, field)
@@ -160,6 +244,13 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 	data += `<h2>` + tool.Get_language(db, "document_top", true) + `</h2><textarea class="opennamu_textarea_100" name="document_top"` + top_disabled + `>` + tool.HTML_escape(document_set_value(db, doc_name, "document_top")) + `</textarea>`
 	data += `<h2>` + tool.Get_language(db, "document_editor_top", true) + `</h2><textarea class="opennamu_textarea_100" name="document_editor_top"` + top_disabled + `>` + tool.HTML_escape(document_set_value(db, doc_name, "document_editor_top")) + `</textarea><hr class="main_hr">`
 	data += `<button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
+	if multiple {
+		data += acl_group_multiple_setting(db)
+	} else {
+		for _, field := range document_acl_group_fields {
+			data += acl_group_setting(db, doc_name, field)
+		}
+	}
 
 	menu := [][]any{{"manager", tool.Get_language(db, "admin", true)}}
 	if !multiple {
@@ -174,27 +265,18 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 
 func acl_history(db *sql.DB, config tool.Config, doc_name string, values url.Values) {
 	data := ""
-	for _, field := range append(document_acl_fields, "why", "document_markup") {
+	for _, field := range document_acl_fields {
+		field_data := values.Get(field)
+		if tool.Arr_in_str(document_acl_group_fields, field) {
+			field_data = strings.Join(tool.Get_acl_data_list(db, doc_name, field), "\n")
+		}
+		data += field + "\n" + field_data + "\n\n"
+	}
+	for _, field := range []string{"why", "document_markup"} {
 		data += field + "\n" + values.Get(field) + "\n\n"
 	}
 	tool.Do_add_history(db, doc_name, data, tool.Get_time(), config.IP, values.Get("why"), "0", "setting", "")
 	tool.Do_insert_auth_history(db, config.IP, "document_set ("+doc_name+")")
-}
-
-func acl_select(db *sql.DB, field string, selected string) string {
-	data := `<select name="` + field + `">`
-	for _, value := range tool.List_acl("normal") {
-		choice := ""
-		if value == selected {
-			choice = ` selected`
-		}
-		label := value
-		if label == "" {
-			label = tool.Get_language(db, "normal", true)
-		}
-		data += `<option value="` + tool.HTML_escape(value) + `"` + choice + `>` + tool.HTML_escape(label) + `</option>`
-	}
-	return data + `</select>`
 }
 
 func document_set_value(db *sql.DB, doc_name string, set_name string) string {

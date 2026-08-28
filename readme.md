@@ -40,6 +40,13 @@
 ./main.amd64.bin 3000
 ```
 
+외부에서 접근하지 않고 같은 컴퓨터에서만 사용할 때는 `--localhost`를 추가합니다.
+
+```bash
+./main.amd64.bin --localhost
+./main.amd64.bin 3000 --localhost
+```
+
 서버가 정상적으로 시작되지 않을 때는 이머전시 툴을 실행할 수 있습니다.
 
 ```bash

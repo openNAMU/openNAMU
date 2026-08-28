@@ -104,13 +104,19 @@ func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	port := "3000"
-	if len(os.Args) > 1 {
-		port = os.Args[1]
+	host := "0.0.0.0"
+	for _, arg := range os.Args[1:] {
+		if arg == "--localhost" {
+			host = "127.0.0.1"
+		} else if arg == "dev" {
+			dev_mode = true
+		} else if port == "3000" {
+			port = arg
+		}
 	}
 
 	var r *gin.Engine
-	if len(os.Args) > 2 && os.Args[2] == "dev" {
-		dev_mode = true
+	if dev_mode {
 		r = gin.Default()
 	} else {
 		gin.SetMode(gin.ReleaseMode)
@@ -122,13 +128,14 @@ func main() {
 
 	r.Use(error_handler())
 	r.Use(tool.Session_middleware())
+	r.Use(site_view_middleware())
 	r.Use(wiki_access_middleware())
 	pongo_init()
 
 	register_routes(r)
 
-	log.Default().Println("Run in http://127.0.0.1:" + port)
-	if err := r.Run("0.0.0.0:" + port); err != nil {
+	log.Default().Println("Run in http://" + host + ":" + port)
+	if err := r.Run(host + ":" + port); err != nil {
 		log.Fatalf("server failed: %v", err)
 	}
 }

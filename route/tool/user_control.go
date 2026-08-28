@@ -5,9 +5,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/3th1nk/cidr"
-	"github.com/dlclark/regexp2"
 )
 
 // IP is TRUE
@@ -246,10 +243,10 @@ func IP_menu(db *sql.DB, ip string, my_ip string, option string) map[string][][]
 		}
 	}
 
-	auth_name := Check_acl(db, "", "", "ban_auth", my_ip)
+	auth_name := Check_acl(db, "", "", "give_auth", my_ip)
 	if auth_name {
 		menu[Get_language(db, "admin", false)] = [][]string{
-			{"/auth/ban/" + Url_parser(ip), Get_language(db, "ban", false)},
+			{"/auth/give/" + Url_parser(ip), Get_language(db, "ban", false)},
 			{"/list/user/check_submit/" + Url_parser(ip), Get_language(db, "check", false)},
 		}
 	}
@@ -264,140 +261,6 @@ func IP_menu(db *sql.DB, ip string, my_ip string, option string) map[string][][]
 	}
 
 	return menu
-}
-
-func Get_user_ban_type(ban_type string) string {
-	switch ban_type {
-	case "O":
-		return "1"
-	case "E":
-		return "2"
-	case "A":
-		return "3"
-	case "D":
-		return "4"
-	case "L":
-		return "5"
-	default:
-		return ""
-	}
-}
-
-// Get_user_ban : login, register, ""
-// Return : []string{"true", "a" + ban_type}
-func Get_user_ban(db *sql.DB, ip string, tool string) []string {
-	rows := Query_DB(
-		db,
-		"select login, block from rb where band = 'regex' and ongoing = '1'",
-	)
-	defer rows.Close()
-
-	for rows.Next() {
-		var login string
-		var block string
-
-		err := rows.Scan(&login, &block)
-		if err != nil {
-			panic(err)
-		}
-
-		ban_type := Get_user_ban_type(login)
-
-		r := regexp2.MustCompile(block, 0)
-		if m, _ := r.FindStringMatch(ip); m != nil {
-			switch tool {
-			case "login":
-				if ban_type != "1" && ban_type != "5" {
-					return []string{"true", "a" + ban_type}
-				}
-			case "register":
-				if ban_type != "5" {
-					return []string{"true", "a" + ban_type}
-				}
-			default:
-				return []string{"true", "a" + ban_type}
-			}
-		}
-	}
-
-	if IP_or_user(ip) {
-		rows := Query_DB(
-			db,
-			"select login, block from rb where band = 'cidr' and ongoing = '1'",
-		)
-		defer rows.Close()
-
-		for rows.Next() {
-			var login string
-			var block string
-
-			err := rows.Scan(&login, &block)
-			if err != nil {
-				panic(err)
-			}
-
-			ban_type := Get_user_ban_type(login)
-
-			c, err := cidr.Parse(block)
-			if err != nil {
-				continue
-			} else if c.Contains(ip) {
-				switch tool {
-				case "login":
-					if ban_type != "1" && ban_type != "5" {
-						return []string{"true", "b" + ban_type}
-					}
-				case "register":
-					if ban_type != "5" {
-						return []string{"true", "b" + ban_type}
-					}
-				default:
-					return []string{"true", "b" + ban_type}
-				}
-			}
-		}
-	}
-
-	login := ""
-	exist := QueryRow_DB(
-		db,
-		"select login from rb where block = ? and (band = '' or band = 'private') and ongoing = '1'",
-		[]any{&login},
-		ip,
-	)
-
-	if exist {
-		ban_type := Get_user_ban_type(login)
-
-		switch tool {
-		case "login":
-			if ban_type != "1" && ban_type != "5" {
-				return []string{"true", ban_type}
-			}
-		case "register":
-			if ban_type != "5" {
-				return []string{"true", ban_type}
-			}
-		default:
-			return []string{"true", ban_type}
-		}
-	}
-
-	data := ""
-	exist = QueryRow_DB(
-		db,
-		"select data from user_set where id = ? and name = 'acl'",
-		[]any{&data},
-		ip,
-	)
-
-	if exist {
-		if data == "ban" {
-			return []string{"true", "c"}
-		}
-	}
-
-	return []string{"", ""}
 }
 
 func IP_parser(db *sql.DB, ip string, my_ip string) string {
@@ -435,9 +298,9 @@ func IP_parser(db *sql.DB, ip string, my_ip string) string {
 			ip = user_title + ip
 		}
 
-		ban := Get_user_ban(db, raw_ip, "")
-		if ban[0] == "true" {
-			ip = "<sup>" + ban[1] + "</sup><s>" + ip + "</s>"
+		auth_name := Get_user_auth(db, raw_ip)
+		if Auth_group_name_ban(auth_name) {
+			ip = "<sup>" + HTML_escape(auth_name) + "</sup><s>" + ip + "</s>"
 		}
 
 		ip += "<a href=\"javascript:void(0);\" name=\"" + Url_parser(raw_ip) + "\" onclick=\"opennamu_do_ip_click(this);\"><span class=\"opennamu_svg opennamu_svg_tool\">&nbsp;</span></a>"
@@ -446,15 +309,23 @@ func IP_parser(db *sql.DB, ip string, my_ip string) string {
 	}
 }
 
-func Do_ban_insert(db *sql.DB, user_name string, end_date string, reason string, login string, blocker string, do_type string, release bool) {
+func Do_auth_insert(db *sql.DB, user_name string, end_date string, reason string, login string, blocker string, do_type string, release bool) {
 	now_time := Get_time()
 
-	Exec_DB(
-		db,
-		"update rb set ongoing = '' where block = ? and band = ? and ongoing = '1'",
-		user_name,
-		do_type,
-	)
+	if do_type == "" {
+		Exec_DB(
+			db,
+			"update rb set ongoing = '' where block = ? and (band = '' or band = 'private') and ongoing = '1'",
+			user_name,
+		)
+	} else {
+		Exec_DB(
+			db,
+			"update rb set ongoing = '' where block = ? and band = ? and ongoing = '1'",
+			user_name,
+			do_type,
+		)
+	}
 	if release {
 		Exec_DB(
 			db,
@@ -482,6 +353,59 @@ func Do_ban_insert(db *sql.DB, user_name string, end_date string, reason string,
 			do_type,
 			login,
 		)
+	}
+
+	if do_type != "regex" && do_type != "cidr" {
+		if release {
+			Exec_DB(
+				db,
+				"delete from user_set where id = ? and name = 'acl'",
+				user_name,
+			)
+			Exec_DB(
+				db,
+				"delete from user_set where id = ? and name = 'acl_end'",
+				user_name,
+			)
+		} else {
+			user_id := ""
+			user_exists := IP_or_user(user_name)
+			if !user_exists {
+				user_exists = QueryRow_DB(
+					db,
+					"select id from user_set where id = ? limit 1",
+					[]any{&user_id},
+					user_name,
+				)
+			}
+			if user_exists {
+				auth := get_ban_auth_group(db, login)
+				Exec_DB(
+					db,
+					"delete from user_set where id = ? and name = 'acl'",
+					user_name,
+				)
+				Exec_DB(
+					db,
+					"insert into user_set (id, name, data) values (?, 'acl', ?)",
+					user_name,
+					auth,
+				)
+				Exec_DB(
+					db,
+					"delete from user_set where id = ? and name = 'acl_end'",
+					user_name,
+				)
+				if end_date != "" {
+					Exec_DB(
+						db,
+						"insert into user_set (id, name, data) values (?, 'acl_end', ?)",
+						user_name,
+						end_date,
+					)
+				}
+			}
+		}
 	}
 }
 

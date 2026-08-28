@@ -12,10 +12,7 @@ func Api_login_register(config tool.Config, id string, password string, password
 		return_data["response"] = "error"
 		return_data["data"] = error_name
 		if error_name == "ban" {
-			ban_data := tool.Get_user_ban(db, config.IP, "register")
-			if len(ban_data) > 1 {
-				return_data["ban_type"] = ban_data[1]
-			}
+			return_data["ban_type"] = tool.Get_user_auth(db, config.IP)
 		}
 		return return_data
 	}

@@ -13,7 +13,6 @@ func Api_user_info(config tool.Config, ip string) map[string]any {
 	ip_render := tool.IP_parser(db, ip, config.IP)
 	auth_name := tool.Get_user_auth(db, ip)
 	level_data := tool.Get_level(db, ip)
-	ban_check := tool.Get_user_ban(db, ip, "")
 	user_document := tool.Get_user_document(db, ip)
 
 	data_result["render"] = ip_render
@@ -26,8 +25,8 @@ func Api_user_info(config tool.Config, ip string) map[string]any {
 	data_result["max_exp"] = level_data[2]
 
 	ban_data := any("0")
-	if len(ban_check) > 0 && ban_check[0] != "" {
-		ban_data = ban_check
+	if tool.Auth_group_name_ban(auth_name) {
+		ban_data = []string{"true", auth_name}
 	}
 	data_result["ban"] = ban_data
 

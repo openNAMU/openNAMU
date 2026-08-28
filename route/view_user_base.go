@@ -68,13 +68,13 @@ func View_user_safe(config tool.Config, user_name string) string {
 		`<li><a href="/topic/user:` + tool.Url_parser(user_name) + `">` + tool.Get_language(db, "user_discussion", true) + `</a></li>` +
 		`<li><a href="/count/` + tool.Url_parser(user_name) + `">` + tool.Get_language(db, "count", true) + `</a></li></ul>`
 
-	if tool.Check_acl(db, "", "", "ban_auth", config.IP) {
+	if tool.Check_acl(db, "", "", "give_auth", config.IP) {
 		ban_name := tool.Get_language(db, "ban", true)
-		ongoing := ""
-		if tool.QueryRow_DB(db, "select block from rb where block = ? and ongoing = '1' limit 1", []any{&ongoing}, user_name) {
+		user_auth := tool.Get_user_auth(db, user_name)
+		if tool.Auth_group_name_ban(user_auth) {
 			ban_name = tool.Get_language(db, "release", true)
 		}
-		body += `<h2>` + tool.Get_language(db, "admin", true) + `</h2><ul><li><a href="/auth/ban/` + tool.Url_parser(user_name) + `">` + ban_name + `</a></li><li><a href="/list/user/check_submit/` + tool.Url_parser(user_name) + `">` + tool.Get_language(db, "check", true) + `</a></li></ul>`
+		body += `<h2>` + tool.Get_language(db, "admin", true) + `</h2><ul><li><a href="/auth/give/` + tool.Url_parser(user_name) + `">` + ban_name + `</a></li><li><a href="/list/user/check_submit/` + tool.Url_parser(user_name) + `">` + tool.Get_language(db, "check", true) + `</a></li></ul>`
 	}
 
 	return user_form_page(db, config, tool.Get_language(db, "user_tool", true), body)

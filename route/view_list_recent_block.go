@@ -7,10 +7,8 @@ import (
 )
 
 func Get_ui_recent_block(db *sql.DB, config tool.Config, data_all [][]string) string {
-	auth_name := tool.Get_user_auth(db, config.IP)
-	auth_info := tool.Get_auth_group_info(db, auth_name)
-
 	data_html := ""
+	give_auth := tool.Check_acl(db, "", "", "give_auth", config.IP)
 
 	for_count := 1
 	for _, in_data := range data_all {
@@ -19,32 +17,23 @@ func Get_ui_recent_block(db *sql.DB, config tool.Config, data_all [][]string) st
 
 		left := ""
 
-		ban_auth := false
-		if _, ok := auth_info["owner"]; ok {
-			ban_auth = true
-		} else if _, ok := auth_info["ban"]; ok {
-			ban_auth = true
-		}
-
 		ip := in_data[1]
 
-		url_match := ""
+		target_path := "/auth/give/"
 		switch in_data[7] {
-		case "":
-			url_match = "ban"
 		case "private":
-			url_match = "ban"
+			target_path += "private/"
 			ip += " (" + tool.Get_language(db, "private", true) + ")"
 		case "cidr":
-			url_match = "ban_cidr"
+			target_path += "cidr/"
 			ip += " (" + tool.Get_language(db, "cidr", true) + ")"
-		default:
-			url_match = "ban_regex"
+		case "regex":
+			target_path += "regex/"
 			ip += " (" + tool.Get_language(db, "regex", true) + ")"
 		}
 
-		if ban_auth {
-			ip = `<a href="/auth/` + url_match + `/` + tool.Url_parser(in_data[1]) + `">` + ip + `</a>`
+		if give_auth {
+			ip = `<a href="` + target_path + tool.Url_parser(in_data[1]) + `">` + ip + `</a>`
 		}
 
 		if in_data[8] == "1" {

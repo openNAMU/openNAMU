@@ -18,16 +18,16 @@ func admin_post_values(c *gin.Context) url.Values {
 func register_admin_routes(r *gin.Engine) {
 	register_admin_api_routes(r)
 	r.GET("/auth/give", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_give(make_route_config(c), "many", "", nil)))
+		admin_give(c, "", "normal", nil)
 	})
 	r.POST("/auth/give", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_give(make_route_config(c), "many", "", admin_post_values(c))))
+		admin_give(c, "", "normal", admin_post_values(c))
 	})
 	r.GET("/auth/give_total", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_give(make_route_config(c), "total", "", nil)))
+		admin_give_total(c, nil)
 	})
 	r.POST("/auth/give_total", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_give(make_route_config(c), "total", "", admin_post_values(c))))
+		admin_give_total(c, admin_post_values(c))
 	})
 	r.GET("/auth/give/fix/:user_name", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_fix(make_route_config(c), c.Param("user_name"), nil)))
@@ -35,11 +35,29 @@ func register_admin_routes(r *gin.Engine) {
 	r.POST("/auth/give/fix/:user_name", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_fix(make_route_config(c), c.Param("user_name"), admin_post_values(c))))
 	})
+	r.GET("/auth/give/regex/*name", func(c *gin.Context) {
+		admin_give(c, strings.TrimPrefix(c.Param("name"), "/"), "regex", nil)
+	})
+	r.POST("/auth/give/regex/*name", func(c *gin.Context) {
+		admin_give(c, strings.TrimPrefix(c.Param("name"), "/"), "regex", admin_post_values(c))
+	})
+	r.GET("/auth/give/cidr/*name", func(c *gin.Context) {
+		admin_give(c, strings.TrimPrefix(c.Param("name"), "/"), "cidr", nil)
+	})
+	r.POST("/auth/give/cidr/*name", func(c *gin.Context) {
+		admin_give(c, strings.TrimPrefix(c.Param("name"), "/"), "cidr", admin_post_values(c))
+	})
+	r.GET("/auth/give/private/*name", func(c *gin.Context) {
+		admin_give(c, strings.TrimPrefix(c.Param("name"), "/"), "private", nil)
+	})
+	r.POST("/auth/give/private/*name", func(c *gin.Context) {
+		admin_give(c, strings.TrimPrefix(c.Param("name"), "/"), "private", admin_post_values(c))
+	})
 	r.GET("/auth/give/:user_name", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_give(make_route_config(c), "one", c.Param("user_name"), nil)))
+		admin_give(c, c.Param("user_name"), "normal", nil)
 	})
 	r.POST("/auth/give/:user_name", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_give(make_route_config(c), "one", c.Param("user_name"), admin_post_values(c))))
+		admin_give(c, c.Param("user_name"), "normal", admin_post_values(c))
 	})
 
 	r.GET("/auth/list", func(c *gin.Context) {
@@ -68,37 +86,6 @@ func register_admin_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_group_delete(make_route_config(c), name, admin_post_values(c))))
 	})
 
-	r.GET("/auth/ban", func(c *gin.Context) { admin_ban(c, "", "", false, nil) })
-	r.POST("/auth/ban", func(c *gin.Context) { admin_ban(c, "", "", false, admin_post_values(c)) })
-	r.GET("/auth/ban/*name", func(c *gin.Context) {
-		name := strings.TrimPrefix(c.Param("name"), "/")
-		multiple := name == "multiple"
-		if multiple {
-			name = ""
-		}
-		admin_ban(c, name, "", multiple, nil)
-	})
-	r.POST("/auth/ban/*name", func(c *gin.Context) {
-		name := strings.TrimPrefix(c.Param("name"), "/")
-		multiple := name == "multiple"
-		if multiple {
-			name = ""
-		}
-		admin_ban(c, name, "", multiple, admin_post_values(c))
-	})
-	r.GET("/auth/ban_cidr/*name", func(c *gin.Context) {
-		admin_ban(c, strings.TrimPrefix(c.Param("name"), "/"), "cidr", false, nil)
-	})
-	r.POST("/auth/ban_cidr/*name", func(c *gin.Context) {
-		admin_ban(c, strings.TrimPrefix(c.Param("name"), "/"), "cidr", false, admin_post_values(c))
-	})
-	r.GET("/auth/ban_regex/*name", func(c *gin.Context) {
-		admin_ban(c, strings.TrimPrefix(c.Param("name"), "/"), "regex", false, nil)
-	})
-	r.POST("/auth/ban_regex/*name", func(c *gin.Context) {
-		admin_ban(c, strings.TrimPrefix(c.Param("name"), "/"), "regex", false, admin_post_values(c))
-	})
-
 	r.GET("/app_submit", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_app_submit(make_route_config(c), nil)))
 	})
@@ -118,8 +105,12 @@ func register_admin_routes(r *gin.Engine) {
 	})
 }
 
-func admin_ban(c *gin.Context, name string, ban_type string, multiple bool, values url.Values) {
-	write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_ban(make_route_config(c), name, ban_type, multiple, values)))
+func admin_give(c *gin.Context, name string, target_type string, values url.Values) {
+	write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_give(make_route_config(c), "one", name, target_type, values)))
+}
+
+func admin_give_total(c *gin.Context, values url.Values) {
+	write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_give(make_route_config(c), "total", "", "normal", values)))
 }
 
 func admin_acl(c *gin.Context, doc_name string, multiple bool, values url.Values) {

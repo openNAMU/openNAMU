@@ -338,6 +338,12 @@ func Run_emergency_tool(arguments []string) int {
 		if err == nil {
 			err = emergency_exec(db, "update rb set ongoing = '' where block = ?", user_data)
 		}
+		if err == nil {
+			err = emergency_exec(db, "delete from user_set where id = ? and name = 'acl'", user_data)
+		}
+		if err == nil {
+			err = emergency_exec(db, "delete from user_set where id = ? and name = 'acl_end'", user_data)
+		}
 	case "4":
 		err = emergency_set_other(db, "host", emergency_input(reader, "Host : "))
 	case "5":

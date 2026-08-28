@@ -344,31 +344,8 @@ func Get_wiki_custom(db *sql.DB, ip string, session sessions.Session, cookies st
 		if Check_acl(db, "", "", "all_admin_auth", ip) {
 			user_admin = "1"
 
-			acl_name := ""
-			QueryRow_DB(
-				db,
-				"select data from user_set where id = ? and name = 'acl'",
-				[]any{&acl_name},
-				ip,
-			)
-
-			rows := Query_DB(
-				db,
-				"select acl from alist where name = ?",
-				acl_name,
-			)
-			defer rows.Close()
-
-			for rows.Next() {
-				user_acl_name := ""
-
-				err := rows.Scan(&user_acl_name)
-				if err != nil {
-					panic(err)
-				}
-
-				user_acl_list = append(user_acl_list, user_acl_name)
-			}
+			acl_name := Get_user_auth(db, ip)
+			user_acl_list = Get_auth_permission_list(db, acl_name)
 		}
 
 		var user_notice_count_int int
@@ -393,8 +370,8 @@ func Get_wiki_custom(db *sql.DB, ip string, session sessions.Session, cookies st
 	}
 
 	user_ban := "0"
-	user_ban_check := Get_user_ban(db, ip, "")[0]
-	if user_ban_check == "true" {
+	user_auth := Get_user_auth(db, ip)
+	if Auth_group_name_ban(user_auth) {
 		user_ban = "1"
 	}
 
