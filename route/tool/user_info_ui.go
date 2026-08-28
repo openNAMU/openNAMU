@@ -14,7 +14,7 @@ func Get_user_info_ui(db *sql.DB, config Config, user_name string) string {
 
 	ban_state := Get_language(db, "normal", false)
 	if Auth_group_name_ban(auth_name) {
-		ban_state = "<a href=\"/recent_block\">" + Get_language(db, "ban", false) + "</a>"
+		ban_state = "<a href=\"/auth/give_list\">" + Get_language(db, "ban", false) + "</a>"
 	}
 
 	level_data := Get_level(db, user_name)

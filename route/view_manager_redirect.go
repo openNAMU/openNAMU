@@ -27,7 +27,7 @@ func manager_redirect_list(db *sql.DB) map[int][]string {
 		13: {lang("document_name"), "/edit", lang("load")},
 		14: {lang("document_name"), "/star_doc", lang("add_star_doc")},
 		16: {"", "/auth/give/fix", lang("user_fix")},
-		17: {lang("search"), "/recent_block/all/1", lang("search")},
+		17: {lang("search"), "/auth/give_list", lang("search")},
 	}
 }
 

@@ -50,12 +50,18 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "give_auth", config.IP) {
-		return tool.Get_error_page(db, config, "auth")
-	}
-
 	if target_type == "" {
 		target_type = "normal"
+	}
+	required_auth := "give_auth"
+	if target_type == "regex" || target_type == "cidr" {
+		required_auth = "give_range_auth"
+	}
+	if target_type == "private" {
+		required_auth = "owner_auth"
+	}
+	if !tool.Check_acl(db, "", "", required_auth, config.IP) {
+		return tool.Get_error_page(db, config, "auth")
 	}
 
 	groups := auth_groups(db)

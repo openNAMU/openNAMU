@@ -680,11 +680,15 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["large_edit"] = true
 	}
 
+	if _, ok := auth_info["give_range"]; ok {
+		auth_info["give"] = true
+	}
+
 	if auth_info["trust_a"] || auth_info["trust_b"] {
 		auth_info["user"] = true
 	}
 
-	admin_auth := []string{"toron", "check", "acl", "hidel", "give", "bbs", "vote_fix"}
+	admin_auth := []string{"toron", "check", "acl", "hidel", "give_range", "give", "bbs", "vote_fix"}
 
 	if _, ok := auth_info["admin"]; ok {
 		for _, v := range admin_auth {
@@ -894,6 +898,9 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			acl_data = "owner"
 		} else if tool == "give_auth" {
 			acl_pass_auth = "give"
+			acl_data = "owner"
+		} else if tool == "give_range_auth" {
+			acl_pass_auth = "give_range"
 			acl_data = "owner"
 		} else if tool == "vote_auth" {
 			acl_pass_auth = "vote_fix"

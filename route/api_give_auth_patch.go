@@ -66,6 +66,18 @@ func Api_give_auth_patch(config tool.Config, auth string, change_auth string, us
 		return new_data
 	}
 
+	required_auth := "give_auth"
+	if band == "regex" || band == "cidr" {
+		required_auth = "give_range_auth"
+	}
+	if band == "private" {
+		required_auth = "owner_auth"
+	}
+	if !tool.Check_acl(db, "", "", required_auth, ip) {
+		new_data["response"] = "require auth"
+		return new_data
+	}
+
 	if user_name != "" {
 		before_auth = tool.Get_auth_target_group(db, user_name, target_type)
 	}
@@ -89,11 +101,30 @@ func Api_give_auth_patch(config tool.Config, auth string, change_auth string, us
 		}
 		tool.Do_insert_auth_history(db, ip, "give_auth ("+user_name+") -> "+action)
 	} else {
-		tool.Exec_DB(
-			db,
-			"update user_set set data = ? where name = 'acl' and data = ?",
-			change_auth, auth,
-		)
+		if auth != change_auth {
+			type auth_target_data struct {
+				user_name string
+				end_date  string
+			}
+
+			target_list := []auth_target_data{}
+			rows := tool.Query_DB(
+				db,
+				"select a.id, coalesce((select e.data from user_set as e where e.id = a.id and e.name = 'acl_end' limit 1), '') from user_set as a where a.name = 'acl' and a.data = ?",
+				auth,
+			)
+			for rows.Next() {
+				data := auth_target_data{}
+				if err := rows.Scan(&data.user_name, &data.end_date); err == nil {
+					target_list = append(target_list, data)
+				}
+			}
+			rows.Close()
+
+			for _, data := range target_list {
+				tool.Do_auth_insert(db, data.user_name, data.end_date, "", change_auth, ip, "", false)
+			}
+		}
 		tool.Do_insert_auth_history(db, ip, "give_auth ("+auth+") -> "+change_auth)
 	}
 

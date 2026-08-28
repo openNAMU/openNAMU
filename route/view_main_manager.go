@@ -22,6 +22,7 @@ func View_main_manager(config tool.Config) string {
 <li><a href="/manager/3">` + lang("check_user") + `</a></li>
 <li><a href="/manager/5">` + lang("authorize") + `</a></li>
 <li><a href="/auth/give">` + lang("multiple_authorize") + `</a></li>
+<li><a href="/auth/give_list">` + lang("auth_give_list") + `</a></li>
 <li><a href="/auth/give_total">` + lang("auth_to_auth") + `</a></li>
 <li><a href="/delete_multiple">` + lang("many_delete") + `</a></li>
 <li><a href="/app_submit">` + lang("application_list") + `</a></li>

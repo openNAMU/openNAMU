@@ -22,6 +22,7 @@ func register_routes(r *gin.Engine) {
 	register_register_routes(r)
 	register_wiki_routes(r)
 	register_wiki_compat_routes(r)
+	register_auth_give_list_routes(r)
 	register_recent_routes(r)
 	register_vote_routes(r)
 	register_bbs_routes(r)

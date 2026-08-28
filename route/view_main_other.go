@@ -41,7 +41,7 @@ func View_main_other(config tool.Config) string {
         </ul>
         <h3>`+tool.Get_language(db, "user", true)+`</h3>
         <ul>
-            <li><a href="/recent_block">`+tool.Get_language(db, "recent_ban", true)+`</a></li>
+            <li><a href="/auth/give_list">`+tool.Get_language(db, "auth_give_list", true)+`</a></li>
             <li><a href="/list/user">`+tool.Get_language(db, "member_list", true)+`</a></li>
         </ul>
         <h3>`+tool.Get_language(db, "other", true)+`</h3>

@@ -13,6 +13,12 @@ func register_admin_api_routes(r *gin.Engine) {
 	r.GET("/api/v2/list/auth", func(c *gin.Context) {
 		c.JSON(http.StatusOK, route.Api_list_auth(make_route_config(c)))
 	})
+	r.GET("/api/v2/list/auth_give/:num", func(c *gin.Context) {
+		c.JSON(http.StatusOK, route.Api_list_auth_give(make_route_config(c), c.Param("num"), false))
+	})
+	r.GET("/api/v2/list/auth_give/all/:num", func(c *gin.Context) {
+		c.JSON(http.StatusOK, route.Api_list_auth_give(make_route_config(c), c.Param("num"), true))
+	})
 	r.GET("/api/v2/auth", func(c *gin.Context) {
 		c.JSON(http.StatusOK, route.Api_func_auth(make_route_config(c), ""))
 	})
