@@ -501,6 +501,40 @@ func Update_init(db *sql.DB) {
 	migrate_legacy_acl(db)
 }
 
+func init_rankup_conditions(db *sql.DB) {
+	initialized := ""
+	if QueryRow_DB(
+		db,
+		"select data from other where name = 'rankup_condition_initialized' limit 1",
+		[]any{&initialized},
+	) {
+		return
+	}
+
+	if len(Get_setting(db, "rankup_condition", "")) == 0 {
+		for _, condition_data := range [][]string{
+			{"trust_a", "edit 50"},
+			{"trust_b", "time 30"},
+			{"trust_c", "edit 50"},
+			{"trust_c", "time 30"},
+			{"trust_d", "edit 100"},
+			{"trust_d", "time 90"},
+		} {
+			Exec_DB(
+				db,
+				"insert into other (name, data, coverage) values ('rankup_condition', ?, ?)",
+				condition_data[1],
+				condition_data[0],
+			)
+		}
+	}
+
+	Exec_DB(
+		db,
+		"insert into other (name, data, coverage) values ('rankup_condition_initialized', '1', '')",
+	)
+}
+
 func Always_init(db *sql.DB, version string) {
 	// 버전 기입
 	Exec_DB(
@@ -630,6 +664,7 @@ func Always_init(db *sql.DB, version string) {
 			)
 		}
 	}
+	init_rankup_conditions(db)
 	legacy_user_bans := [][]string{}
 	rows := Query_DB(
 		db,

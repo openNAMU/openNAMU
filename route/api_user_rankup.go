@@ -7,16 +7,7 @@ import (
 )
 
 func User_rankup_condition(data string) string {
-	can_set := map[string]string{
-		"edit": "int",
-		"time": "int",
-	}
-
-	if val, ok := can_set[data]; ok {
-		return val
-	} else {
-		return ""
-	}
+	return tool.Rankup_condition_type(data)
 }
 
 func Api_user_rankup(config tool.Config, rankup_name string) map[string]any {
@@ -30,31 +21,27 @@ func Api_user_rankup(config tool.Config, rankup_name string) map[string]any {
 			coverage = rankup_name
 		}
 
-		return_data_api := tool.Get_setting(db, "rankup_condition", coverage)
-
 		end_data := make(map[string]any)
-		if len(return_data_api) != 0 {
-			for k := range return_data_api {
-				rank_name := string(return_data_api[k][0])
-				rank_data := string(return_data_api[k][1])
+		for _, condition_data := range tool.Get_setting(db, "rankup_condition", coverage) {
+			if len(condition_data) < 2 || !tool.Auth_group_name_rankup(condition_data[1]) {
+				continue
+			}
 
-				split_data := strings.Split(rank_data, " ")
-				if len(split_data) == 2 {
-					type_data := User_rankup_condition(split_data[0])
-					if type_data != "" {
-						rank_data_map, ok := end_data[rank_name].(map[string]any)
-						if !ok {
-							rank_data_map = make(map[string]any)
-							end_data[rank_name] = rank_data_map
-						}
+			condition_list, ok := tool.Rankup_condition_list(condition_data[0])
+			if !ok {
+				continue
+			}
 
-						if type_data == "int" {
-							split_int := tool.Str_to_int(split_data[1])
-							rank_data_map[split_data[0]] = split_int
-						} else {
-							rank_data_map[split_data[0]] = split_data[1]
-						}
-					}
+			rank_data_map, ok := end_data[condition_data[1]].(map[string]any)
+			if !ok {
+				rank_data_map = make(map[string]any)
+				end_data[condition_data[1]] = rank_data_map
+			}
+
+			for _, condition := range condition_list {
+				split_data := strings.Fields(condition)
+				if len(split_data) == 2 && User_rankup_condition(split_data[0]) == "int" {
+					rank_data_map[split_data[0]] = tool.Str_to_int(split_data[1])
 				}
 			}
 		}

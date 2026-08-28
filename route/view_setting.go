@@ -12,6 +12,7 @@ func View_setting(config tool.Config) string {
 
 	set_list := [][]string{
 		{"main", tool.Get_language(db, "main_setting", true)},
+		{"rankup", tool.Get_language(db, "rankup_setting", true)},
 		{"phrase", tool.Get_language(db, "text_setting", true)},
 		{"robot", "robots.txt"},
 		{"external", tool.Get_language(db, "ext_api_req_set", true)},
@@ -33,7 +34,7 @@ func View_setting(config tool.Config) string {
 			li[1] +
 			`</a></li>`
 	}
-	
+
 	set_data += "</ul>"
 
 	return tool.Get_template(

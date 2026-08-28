@@ -14,6 +14,33 @@ func Api_setting_put(config tool.Config, set_name string, data string, coverage 
 	return_data := make(map[string]any)
 
 	if _, ok := setting_acl[set_name]; ok {
+		if set_name == "rankup_condition" {
+			if !auth_info {
+				return_data["response"] = "require auth"
+				return return_data
+			}
+			if !tool.Auth_group_name_rankup(coverage) {
+				return_data["response"] = "error"
+				return_data["data"] = "invalid name"
+				return return_data
+			}
+
+			condition_list, ok := tool.Rankup_condition_list(data)
+			if !ok {
+				return_data["response"] = "error"
+				return_data["data"] = "invalid condition"
+				return return_data
+			}
+
+			tool.Exec_DB(db, "delete from other where name = 'rankup_condition' and coverage = ?", coverage)
+			for _, condition_data := range condition_list {
+				tool.Exec_DB(db, "insert into other (name, data, coverage) values ('rankup_condition', ?, ?)", condition_data, coverage)
+			}
+			tool.Do_insert_auth_history(db, config.IP, "rankup_condition ("+coverage+")")
+			return_data["response"] = "ok"
+			return return_data
+		}
+
 		if tool.Arr_in_str(bbs_global_acl_fields, set_name) && !acl_value_valid(db, data) {
 			return_data["response"] = "error"
 			return_data["data"] = "invalid acl"

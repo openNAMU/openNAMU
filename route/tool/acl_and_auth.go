@@ -2,6 +2,7 @@ package tool
 
 import (
 	"database/sql"
+	"strconv"
 	"strings"
 	"time"
 
@@ -324,51 +325,145 @@ func Check_acl_group(db *sql.DB, acl_data string, auth_info map[string]bool) boo
 	return false
 }
 
+func Rankup_group_list() []string {
+	return []string{"trust_a", "trust_b", "trust_c", "trust_d"}
+}
+
+func Auth_group_name_rankup(name string) bool {
+	return Arr_in_str(Rankup_group_list(), name)
+}
+
+func Rankup_condition_type(data string) string {
+	if data == "edit" || data == "time" {
+		return "int"
+	}
+
+	return ""
+}
+
+func Rankup_condition_list(data string) ([]string, bool) {
+	data = strings.ReplaceAll(data, "\r", "")
+	condition_list := []string{}
+	for _, line := range strings.Split(data, "\n") {
+		parts := strings.Fields(strings.TrimSpace(line))
+		if len(parts) == 0 {
+			continue
+		}
+		if len(parts) != 2 || Rankup_condition_type(strings.ToLower(parts[0])) == "" {
+			return nil, false
+		}
+
+		condition_value, err := strconv.Atoi(parts[1])
+		if err != nil || condition_value < 0 {
+			return nil, false
+		}
+
+		condition := strings.ToLower(parts[0]) + " " + strconv.Itoa(condition_value)
+		if !Arr_in_str(condition_list, condition) {
+			condition_list = append(condition_list, condition)
+		}
+	}
+
+	if len(condition_list) == 0 {
+		return nil, false
+	}
+
+	return condition_list, true
+}
+
 func Get_rankup_auth_info(db *sql.DB, ip string) map[string]bool {
 	auth_info := map[string]bool{}
 	if IP_or_user(ip) {
 		return auth_info
 	}
 
+	condition_map := map[string][]string{}
+	invalid_map := map[string]bool{}
+	for _, condition_data := range Get_setting(db, "rankup_condition", "") {
+		if len(condition_data) < 2 || !Auth_group_name_rankup(condition_data[1]) {
+			continue
+		}
+
+		condition_list, ok := Rankup_condition_list(condition_data[0])
+		if !ok {
+			invalid_map[condition_data[1]] = true
+			continue
+		}
+
+		condition_map[condition_data[1]] = append(condition_map[condition_data[1]], condition_list...)
+	}
+
+	edit_required := false
+	time_required := false
+	for _, condition_list := range condition_map {
+		for _, condition := range condition_list {
+			parts := strings.Fields(condition)
+			if len(parts) != 2 {
+				continue
+			}
+			if parts[0] == "edit" {
+				edit_required = true
+			}
+			if parts[0] == "time" {
+				time_required = true
+			}
+		}
+	}
+
 	edit_count := 0
-	QueryRow_DB(
-		db,
-		"select count(*) from history where ip = ?",
-		[]any{&edit_count},
-		ip,
-	)
+	if edit_required {
+		QueryRow_DB(
+			db,
+			"select count(*) from history where ip = ?",
+			[]any{&edit_count},
+			ip,
+		)
+	}
 
 	signup_date := ""
-	QueryRow_DB(
-		db,
-		"select data from user_set where id = ? and name = 'date'",
-		[]any{&signup_date},
-		ip,
-	)
+	if time_required {
+		QueryRow_DB(
+			db,
+			"select data from user_set where id = ? and name = 'date'",
+			[]any{&signup_date},
+			ip,
+		)
+	}
 
-	time_30 := false
-	time_90 := false
-	date, date_err := time.Parse("2006-01-02 15:04:05", signup_date)
+	var date time.Time
+	var date_err error
+	if time_required {
+		date, date_err = time.Parse("2006-01-02 15:04:05", signup_date)
+		if date_err != nil {
+			date, date_err = time.Parse("2006-01-02", signup_date)
+		}
+	}
 	now, now_err := time.Parse("2006-01-02 15:04:05", Get_time())
-	if date_err == nil && now_err == nil {
-		time_30 = !now.Before(date.AddDate(0, 0, 30))
-		time_90 = !now.Before(date.AddDate(0, 0, 90))
-	}
 
-	if edit_count >= 50 {
-		auth_info["trust_a"] = true
-	}
-	if time_30 {
-		auth_info["trust_b"] = true
-	}
-	if auth_info["trust_a"] && auth_info["trust_b"] {
-		auth_info["trust_c"] = true
-	}
-	if edit_count >= 100 && time_90 {
-		auth_info["trust_d"] = true
-		auth_info["trust_c"] = true
-		auth_info["trust_a"] = true
-		auth_info["trust_b"] = true
+	for _, rankup_group := range Rankup_group_list() {
+		condition_list := condition_map[rankup_group]
+		if len(condition_list) == 0 || invalid_map[rankup_group] {
+			continue
+		}
+
+		passed := true
+		for _, condition := range condition_list {
+			parts := strings.Fields(condition)
+			condition_value := Str_to_int(parts[1])
+			switch parts[0] {
+			case "edit":
+				passed = edit_count >= condition_value
+			case "time":
+				passed = date_err == nil && now_err == nil && !now.Before(date.AddDate(0, 0, condition_value))
+			}
+			if !passed {
+				break
+			}
+		}
+
+		if passed {
+			auth_info[rankup_group] = true
+		}
 	}
 
 	return auth_info

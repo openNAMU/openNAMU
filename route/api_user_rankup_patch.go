@@ -2,7 +2,6 @@ package route
 
 import (
 	"net/url"
-	"strconv"
 	"strings"
 
 	"opennamu/route/tool"
@@ -30,6 +29,11 @@ func Api_user_rankup_patch(config tool.Config, values url.Values) map[string]any
 		return_data["data"] = "invalid name"
 		return return_data
 	}
+	if !tool.Auth_group_name_rankup(coverage) {
+		return_data["response"] = "error"
+		return_data["data"] = "invalid name"
+		return return_data
+	}
 
 	condition := strings.TrimSpace(values.Get("data"))
 	if condition == "" {
@@ -40,27 +44,26 @@ func Api_user_rankup_patch(config tool.Config, values url.Values) map[string]any
 		}
 	}
 
-	tool.Exec_DB(db, "delete from other where name = 'rankup_condition' and coverage = ?", coverage)
 	if values.Get("delete") != "" {
+		tool.Exec_DB(db, "delete from other where name = 'rankup_condition' and coverage = ?", coverage)
+		tool.Do_insert_auth_history(db, config.IP, "rankup_condition ("+coverage+")")
 		return_data["response"] = "ok"
 		return_data["data"] = coverage
 		return return_data
 	}
 
-	parts := strings.Fields(condition)
-	if len(parts) != 2 || User_rankup_condition(parts[0]) == "" {
-		return_data["response"] = "error"
-		return_data["data"] = "invalid condition"
-		return return_data
-	}
-	condition_value, err := strconv.Atoi(parts[1])
-	if err != nil || condition_value < 0 {
+	condition_list, ok := tool.Rankup_condition_list(condition)
+	if !ok {
 		return_data["response"] = "error"
 		return_data["data"] = "invalid condition"
 		return return_data
 	}
 
-	tool.Exec_DB(db, "insert into other (name, data, coverage) values ('rankup_condition', ?, ?)", parts[0]+" "+strconv.Itoa(condition_value), coverage)
+	tool.Exec_DB(db, "delete from other where name = 'rankup_condition' and coverage = ?", coverage)
+	for _, condition_data := range condition_list {
+		tool.Exec_DB(db, "insert into other (name, data, coverage) values ('rankup_condition', ?, ?)", condition_data, coverage)
+	}
+
 	tool.Do_insert_auth_history(db, config.IP, "rankup_condition ("+coverage+")")
 	return_data["response"] = "ok"
 	return_data["data"] = coverage

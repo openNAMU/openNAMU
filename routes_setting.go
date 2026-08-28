@@ -21,6 +21,13 @@ func register_setting_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_main_post(make_route_config(c), setting_form(c))))
 	})
 
+	r.GET("/setting/rankup", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_rankup(make_route_config(c))))
+	})
+	r.POST("/setting/rankup", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_rankup_post(make_route_config(c), setting_form(c))))
+	})
+
 	r.GET("/setting/main/logo", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_main_logo(make_route_config(c))))
 	})

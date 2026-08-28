@@ -466,6 +466,7 @@
     "skin_setting": "Skin settings",
     "main_acl_setting": "Default ACL settings",
     "top_menu_setting": "Added menu setting",
+    "rankup_setting": "Rank-up settings",
     "main_skin_set_default": "Main skin setting(s) default",
 
     "_comment_": "Setting 404 page",
@@ -690,6 +691,7 @@
     "trust_b_acl": "Members 30 days after registration",
     "trust_c_acl": "Members with 50 or more edits and 30 days after registration",
     "trust_d_acl": "Members with 100 or more edits and 90 days after registration",
+    "rankup_condition_help": "Enter edit N or time N on each line. All conditions in the same group must be met.",
     "email_verified_acl": "Members with a verified email",
     "50_edit_acl": "Members with 50 or more document edits, administrators, owners",
     "all_acl": "All users exclude blocked users",
