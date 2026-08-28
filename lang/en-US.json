@@ -389,6 +389,7 @@
     
     "_comment_": "BBS ACL",
     "bbs_view_acl": "BBS ACL to view posts",
+    "bbs_only_my_data_view_acl": "BBS ACL to view all posts (own posts are always visible)",
     "bbs_acl": "BBS ACL",
     "bbs_edit_acl": "BBS ACL to write post",
     "bbs_comment_acl": "BBS ACL to write comment",

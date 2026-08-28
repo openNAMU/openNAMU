@@ -25,6 +25,11 @@ func Api_bbs_search(config tool.Config, keyword string, set_id string, page stri
 			where_data = "not b.set_id = \"0\""
 			values = []any{}
 		}
+		view_sql, view_values := bbs_post_view_sql(db, set_id, config.IP, "b")
+		if view_sql != "" {
+			where_data += " and " + view_sql
+			values = append(values, view_values...)
+		}
 		values = append(values, "%"+keyword+"%", offset)
 
 		rows := tool.Query_DB(

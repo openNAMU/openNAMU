@@ -578,6 +578,7 @@
     "thread_base": "스레드 기반",
     "bbs_set": "게시판 설정",
     "bbs_view_acl": "게시판 읽기 ACL",
+    "bbs_only_my_data_view_acl": "게시판 전체 글 보기 ACL (본인 글 예외)",
     "bbs_acl": "게시판 ACL",
     "bbs_edit_acl": "게시판 글 작성 ACL",
     "bbs_comment_acl": "게시판 댓글 작성 ACL",

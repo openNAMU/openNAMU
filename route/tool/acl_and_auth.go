@@ -665,7 +665,7 @@ func Auth_group_in_use(db *sql.DB, auth string) bool {
 		"select title from acl where data = ? limit 1",
 		"select code from rd where acl = ? limit 1",
 		"select thread_code from topic_set where set_name = 'thread_view_acl' and set_data = ? limit 1",
-		"select set_id from bbs_set where set_name in ('bbs_view_acl', 'bbs_acl', 'bbs_edit_acl', 'bbs_comment_acl', 'bbs_view_acl_all', 'bbs_acl_all', 'bbs_edit_acl_all', 'bbs_comment_acl_all') and set_data = ? limit 1",
+		"select set_id from bbs_set where set_name in ('bbs_view_acl', 'bbs_only_my_data_view_acl', 'bbs_acl', 'bbs_edit_acl', 'bbs_comment_acl', 'bbs_view_acl_all', 'bbs_acl_all', 'bbs_edit_acl_all', 'bbs_comment_acl_all') and set_data = ? limit 1",
 		"select name from other where name in ('bbs_view_acl_all', 'bbs_acl_all', 'bbs_edit_acl_all', 'bbs_comment_acl_all') and coverage = '' and data = ? limit 1",
 		"select id from vote where user = '' and acl = ? limit 1",
 	}

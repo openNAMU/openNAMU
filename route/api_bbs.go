@@ -2,8 +2,78 @@ package route
 
 import (
 	"database/sql"
+	"strings"
+
 	"opennamu/route/tool"
 )
+
+func bbs_post_view_allowed(db *sql.DB, set_id string, user_id string, ip string, auth_info map[string]bool) bool {
+	acl_data := bbs_set_value(db, set_id, "bbs_only_my_data_view_acl")
+	if acl_data == "" || acl_data == "normal" || user_id == ip {
+		return true
+	}
+	if auth_info == nil {
+		auth_info = tool.Get_auth_info(db, ip)
+	}
+	if auth_info["bbs"] {
+		return true
+	}
+	return tool.Check_acl_group(db, acl_data, auth_info)
+}
+
+func bbs_post_view_sql(db *sql.DB, set_id string, ip string, row_alias string) (string, []any) {
+	auth_info := tool.Get_auth_info(db, ip)
+	if set_id != "" {
+		acl_data := bbs_set_value(db, set_id, "bbs_only_my_data_view_acl")
+		if acl_data == "" || acl_data == "normal" || auth_info["bbs"] || tool.Check_acl_group(db, acl_data, auth_info) {
+			return "", nil
+		}
+
+		return "exists (select 1 from bbs_data author where author.set_name = 'user_id' and author.set_id = " + row_alias + ".set_id and author.set_code = " + row_alias + ".set_code and author.set_data = ?)", []any{ip}
+	}
+
+	rows := tool.Query_DB(
+		db,
+		"select set_id, set_data from bbs_set where set_name = 'bbs_only_my_data_view_acl' and set_code = ''",
+	)
+	defer rows.Close()
+
+	allowed_set_id := []string{}
+	private_count := 0
+	for rows.Next() {
+		setting_set_id := ""
+		acl_data := ""
+		if rows.Scan(&setting_set_id, &acl_data) != nil || acl_data == "" || acl_data == "normal" {
+			continue
+		}
+
+		private_count += 1
+		if auth_info["bbs"] || tool.Check_acl_group(db, acl_data, auth_info) {
+			if !tool.Arr_in_str(allowed_set_id, setting_set_id) {
+				allowed_set_id = append(allowed_set_id, setting_set_id)
+			}
+		}
+	}
+
+	if private_count == 0 {
+		return "", nil
+	}
+
+	view_sql := "(not exists (select 1 from bbs_set only_view where only_view.set_name = 'bbs_only_my_data_view_acl' and only_view.set_code = '' and only_view.set_id = " + row_alias + ".set_id and only_view.set_data != '' and only_view.set_data != 'normal')"
+	view_values := []any{}
+	if len(allowed_set_id) > 0 {
+		placeholders := strings.Repeat("?,", len(allowed_set_id))
+		placeholders = strings.TrimSuffix(placeholders, ",")
+		view_sql += " or " + row_alias + ".set_id in (" + placeholders + ")"
+		for _, allowed_id := range allowed_set_id {
+			view_values = append(view_values, allowed_id)
+		}
+	}
+	view_sql += " or exists (select 1 from bbs_data author where author.set_name = 'user_id' and author.set_id = " + row_alias + ".set_id and author.set_code = " + row_alias + ".set_code and author.set_data = ?))"
+	view_values = append(view_values, ip)
+
+	return view_sql, view_values
+}
 
 func Api_bbs(config tool.Config, bbs_num string, page string, sort_type string) map[string]any {
 	db := tool.DB_connect()
@@ -11,10 +81,13 @@ func Api_bbs(config tool.Config, bbs_num string, page string, sort_type string) 
 
 	rows_arr := []*sql.Rows{}
 	if bbs_num == "" {
-		rows := tool.Query_DB(
-			db,
-			"select set_code, set_id, '0' from bbs_data where set_name = 'date' and "+tool.Get_except_set_id_SQL()+" order by set_data desc limit 50",
-		)
+		view_sql, view_values := bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
+		query := "select set_code, set_id, '0' from bbs_data where set_name = 'date' and " + tool.Get_except_set_id_SQL()
+		if view_sql != "" {
+			query += " and " + view_sql
+		}
+		query += " order by set_data desc limit 50"
+		rows := tool.Query_DB(db, query, view_values...)
 
 		rows_arr = append(rows_arr, rows)
 	} else {
@@ -24,28 +97,40 @@ func Api_bbs(config tool.Config, bbs_num string, page string, sort_type string) 
 			num = page*50 - 50
 		}
 
-		rows := tool.Query_DB(
-			db,
-			"select set_code, set_id, '1' from bbs_data where set_name = 'pinned' and set_id like ? order by set_data desc",
-			bbs_num,
-		)
+		view_sql, view_values := bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
+		query := "select set_code, set_id, '1' from bbs_data where set_name = 'pinned' and set_id like ?"
+		values := []any{bbs_num}
+		if view_sql != "" {
+			query += " and " + view_sql
+			values = append(values, view_values...)
+		}
+		query += " order by set_data desc"
+		rows := tool.Query_DB(db, query, values...)
 
 		rows_arr = append(rows_arr, rows)
 
 		if sort_type == "view" {
-			rows = tool.Query_DB(
-				db,
-				"select title.set_code, title.set_id, '0' from bbs_data title left join bbs_data view_data on view_data.set_name = 'view_count' and view_data.set_id = title.set_id and view_data.set_code = title.set_code where title.set_name = 'title' and title.set_id like ? order by coalesce(view_data.set_data, '0') + 0 desc, title.set_code + 0 desc limit ?, 50",
-				bbs_num,
-				num,
-			)
+			view_sql, view_values = bbs_post_view_sql(db, bbs_num, config.IP, "title")
+			query = "select title.set_code, title.set_id, '0' from bbs_data title left join bbs_data view_data on view_data.set_name = 'view_count' and view_data.set_id = title.set_id and view_data.set_code = title.set_code where title.set_name = 'title' and title.set_id like ?"
+			values = []any{bbs_num}
+			if view_sql != "" {
+				query += " and " + view_sql
+				values = append(values, view_values...)
+			}
+			query += " order by coalesce(view_data.set_data, '0') + 0 desc, title.set_code + 0 desc limit ?, 50"
+			values = append(values, num)
+			rows = tool.Query_DB(db, query, values...)
 		} else {
-			rows = tool.Query_DB(
-				db,
-				"select set_code, set_id, '0' from bbs_data where set_name = 'title' and set_id like ? order by set_code + 0 desc limit ?, 50",
-				bbs_num,
-				num,
-			)
+			view_sql, view_values = bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
+			query = "select set_code, set_id, '0' from bbs_data where set_name = 'title' and set_id like ?"
+			values = []any{bbs_num}
+			if view_sql != "" {
+				query += " and " + view_sql
+				values = append(values, view_values...)
+			}
+			query += " order by set_code + 0 desc limit ?, 50"
+			values = append(values, num)
+			rows = tool.Query_DB(db, query, values...)
 		}
 
 		rows_arr = append(rows_arr, rows)

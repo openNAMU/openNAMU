@@ -21,6 +21,20 @@ func View_bbs_raw(config tool.Config, set_id string, set_code string, comment_co
 		return tool.Get_redirect("/bbs/main")
 	}
 
+	user_id := ""
+	if !tool.QueryRow_DB(
+		db,
+		"select set_data from bbs_data where set_name = 'user_id' and set_id = ? and set_code = ?",
+		[]any{&user_id},
+		set_id,
+		set_code,
+	) {
+		return tool.Get_redirect("/bbs/main")
+	}
+	if !bbs_post_view_allowed(db, set_id, user_id, config.IP, nil) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	raw_data := ""
 	if comment_code == "" {
 		if !tool.QueryRow_DB(

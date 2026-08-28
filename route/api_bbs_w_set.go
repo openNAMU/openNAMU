@@ -8,6 +8,7 @@ func BBS_w_set_list() map[string]string {
 	setting_acl := map[string]string{}
 
 	setting_acl["bbs_view_acl"] = ""
+	setting_acl["bbs_only_my_data_view_acl"] = ""
 	setting_acl["bbs_acl"] = ""
 	setting_acl["bbs_edit_acl"] = ""
 	setting_acl["bbs_comment_acl"] = ""

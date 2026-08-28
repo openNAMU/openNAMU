@@ -11,6 +11,7 @@ import (
 
 var bbs_set_fields = []string{
 	"bbs_view_acl",
+	"bbs_only_my_data_view_acl",
 	"bbs_acl",
 	"bbs_edit_acl",
 	"bbs_comment_acl",
