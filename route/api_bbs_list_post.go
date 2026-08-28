@@ -12,7 +12,7 @@ func Api_bbs_list_post(config tool.Config, bbs_name string, bbs_type string) map
 
 	return_data := make(map[string]any)
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "bbs_create", config.IP) {
 		return_data["response"] = "require auth"
 
 		return return_data

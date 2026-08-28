@@ -13,7 +13,7 @@ func View_auth_group(config tool.Config, name string, values url.Values) string 
 
 	new_group := name == ""
 
-	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_permission(db, "auth_group_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if name == "" && values == nil {

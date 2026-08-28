@@ -161,7 +161,7 @@ func Api_list_recent_block(config tool.Config, num string, set_type string, why 
 	}
 
 	if set_type == "private" {
-		if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+		if !tool.Check_permission(db, "owner", config.IP) {
 			data_list = [][]string{}
 		}
 	}

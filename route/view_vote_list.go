@@ -20,7 +20,7 @@ func View_vote_list(config tool.Config, type_str string, num_str string) string 
 	}
 	if type_str == "open" {
 		data_html += `<a href="/vote/list/close">(` + tool.Get_language(db, "close_vote_list", true) + `)</a>`
-		if tool.Check_acl(db, "", "", "vote", config.IP) {
+		if tool.Check_permission(db, "vote", config.IP) {
 			menu = append(menu, []any{"vote/add", tool.Get_language(db, "add_vote", true)})
 		}
 	} else {

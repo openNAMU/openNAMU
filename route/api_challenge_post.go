@@ -53,7 +53,7 @@ func Api_challenge_post(config tool.Config) map[string]any {
 		}
 	}
 
-	if tool.Check_acl(db, "", "", "all_admin_auth", config.IP) || challenge_is_complete(db, config.IP, "challenge_admin") {
+	if tool.Check_permission(db, "treat_as_admin", config.IP) || challenge_is_complete(db, config.IP, "challenge_admin") {
 		user_save(db, config.IP, "challenge_admin", "1")
 		experience += 10000
 	}

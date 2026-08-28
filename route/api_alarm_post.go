@@ -10,7 +10,7 @@ func Api_alarm_delete_post(config tool.Config, user_name string, id string, all 
 	if user_name == "" {
 		user_name = config.IP
 	}
-	if user_name != config.IP && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if user_name != config.IP && !tool.Check_permission(db, "owner", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}
@@ -31,7 +31,7 @@ func Api_alarm_read_post(config tool.Config, user_name string) map[string]any {
 	if user_name == "" {
 		user_name = config.IP
 	}
-	if user_name != config.IP && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if user_name != config.IP && !tool.Check_permission(db, "owner", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

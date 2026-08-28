@@ -12,7 +12,7 @@ func Api_filter_delete_post(config tool.Config, kind string, name string) map[st
 		return_data["response"] = "error"
 		return return_data
 	}
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "filter_manage", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

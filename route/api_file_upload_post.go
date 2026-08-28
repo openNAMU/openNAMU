@@ -57,7 +57,7 @@ func api_file_upload_post(config tool.Config, file_name string, file_data string
 		return_value["response"] = "error"
 		return_value["data"] = "unallowed file name"
 		return return_value
-	} else if !tool.Check_acl(db, "", "", "upload", config.IP) || (many_upload && !tool.Check_acl(db, "", "", "many_upload", config.IP)) {
+	} else if !tool.Check_permission(db, "upload", config.IP) || (many_upload && !tool.Check_permission(db, "multiple_upload", config.IP)) {
 		return_value["response"] = "require auth"
 		return return_value
 	} else if check_captcha && !tool.Captcha_check(db, config.Session, config.IP, captcha) {

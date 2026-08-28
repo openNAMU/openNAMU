@@ -6,7 +6,7 @@ import (
 )
 
 func user_register_access(db *sql.DB, config tool.Config) string {
-	owner_auth := tool.Check_acl(db, "", "", "owner_auth", config.IP)
+	owner_auth := tool.Check_permission(db, "user_manage", config.IP)
 	if !owner_auth && !tool.IP_or_user(config.IP) {
 		return "login user"
 	}
@@ -54,7 +54,7 @@ func user_register_post(config tool.Config, id string, password string, password
 		return tool.Get_error_page(db, config, error_name)
 	}
 
-	owner_auth := tool.Check_acl(db, "", "", "owner_auth", config.IP)
+	owner_auth := tool.Check_permission(db, "user_manage", config.IP)
 	email_required := !owner_auth && user_other(db, "email_have") != ""
 	approval_required := !owner_auth && user_other(db, "requires_approval") != ""
 	if email_required {

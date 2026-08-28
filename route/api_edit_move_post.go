@@ -203,7 +203,7 @@ func move_document_options(config tool.Config, db *sql.DB, old_name string, new_
 		return "move error"
 	}
 
-	owner_auth := tool.Check_acl(db, "", "", "owner_auth", config.IP)
+	owner_auth := tool.Check_permission(db, "document_move_manage", config.IP)
 	if (move_option == "merge" || topic_option == "merge" || data_set_option != "none") && !owner_auth {
 		return "auth"
 	}

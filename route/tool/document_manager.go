@@ -10,7 +10,7 @@ import (
 )
 
 func Do_edit_filter(db *sql.DB, config Config, doc_name string, data string) bool {
-	if !Check_acl(db, "", "", "edit_filter_pass", config.IP) {
+	if !Check_permission(db, "edit_filter_pass", config.IP) {
 		rows := Query_DB(
 			db,
 			`select plus, plus_t from html_filter where kind = 'regex_filter' and plus != ''`,
@@ -42,7 +42,7 @@ func Do_edit_filter(db *sql.DB, config Config, doc_name string, data string) boo
 }
 
 func Do_edit_send_require_check(db *sql.DB, config Config, data string) bool {
-	if !Check_acl(db, "", "", "edit_bottom_compulsion", config.IP) {
+	if !Check_permission(db, "edit_bottom_compulsion_pass", config.IP) {
 		var check string
 
 		QueryRow_DB(
@@ -75,7 +75,7 @@ func Do_edit_text_checkbox_check(db *sql.DB, config Config, data string) bool {
 }
 
 func Do_edit_slow_check(db *sql.DB, config Config, do_type string) bool {
-	if !Check_acl(db, "", "", "slow_edit", config.IP) {
+	if !Check_permission(db, "slow_edit_pass", config.IP) {
 		var check string
 
 		if do_type == "edit" {

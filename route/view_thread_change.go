@@ -9,7 +9,7 @@ func View_thread_change(config tool.Config, topic_num string, values url.Values)
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_permission(db, "thread_change", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	title := ""

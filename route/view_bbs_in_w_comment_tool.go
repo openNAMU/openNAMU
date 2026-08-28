@@ -14,7 +14,7 @@ func View_bbs_in_w_comment_tool(config tool.Config, set_id string, set_code stri
         </ul>
     `
 
-	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if tool.Check_permission(db, "bbs_comment_manage", config.IP) {
 		data_html += `
             <h3>` + tool.Get_language(db, "owner", true) + `</h3>
             <ul>

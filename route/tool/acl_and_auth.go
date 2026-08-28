@@ -561,6 +561,10 @@ func Get_auth_info(db *sql.DB, ip string) map[string]bool {
 	return Check_auth(auth_info)
 }
 
+func Check_permission(db *sql.DB, permission string, ip string) bool {
+	return Get_auth_info(db, ip)[permission]
+}
+
 func Get_auth_date(db *sql.DB, user_name string) string {
 	data := ""
 
@@ -683,7 +687,7 @@ func Auth_can_change_auth(db *sql.DB, ip string, before_auth string, after_auth 
 	if !Auth_group_exists(db, before_auth) || !Auth_group_exists(db, after_auth) {
 		return false
 	}
-	if !Check_acl(db, "", "", "give_auth", ip) {
+	if !Check_permission(db, "give", ip) {
 		return false
 	}
 	if before_auth == after_auth {
@@ -711,6 +715,8 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["email_verified"] = true
 		auth_info["up_to_level_10"] = true
 		auth_info["trust_d"] = true
+		auth_info["history_view"] = true
+		auth_info["manager_view"] = true
 	}
 
 	if _, ok := auth_info["up_to_level_10"]; ok {
@@ -754,6 +760,80 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		}
 		auth_info["edit_filter_manage"] = true
 		auth_info["application_manage"] = true
+	}
+
+	if _, ok := auth_info["owner"]; ok {
+		for _, permission := range []string{
+			"setting_main",
+			"setting_main_logo",
+			"setting_skin",
+			"setting_head",
+			"setting_top_menu",
+			"setting_phrase",
+			"setting_external",
+			"setting_robot",
+			"setting_sitemap",
+			"setting_404",
+			"setting_backlink",
+			"setting_delete",
+			"setting_manage",
+			"setting_email_test",
+			"server_action",
+			"auth_group_manage",
+			"auth_fix",
+			"rankup_manage",
+			"history_manage",
+			"record_manage",
+			"user_manage",
+			"file_delete",
+			"document_move_manage",
+			"filter_manage",
+			"user_edit_filter_manage",
+			"bbs_post_manage",
+			"auth_private_give",
+			"bbs_create",
+			"bbs_setting",
+			"bbs_delete",
+			"bbs_comment_manage",
+			"thread_change",
+			"thread_delete",
+			"thread_comment_delete",
+		} {
+			auth_info[permission] = true
+		}
+	}
+
+	if _, ok := auth_info["history_manage"]; ok {
+		auth_info["history_view"] = true
+	}
+
+	if _, ok := auth_info["acl"]; ok {
+		for _, permission := range []string{"document_acl_manage", "document_bulk_delete"} {
+			auth_info[permission] = true
+		}
+	}
+
+	if _, ok := auth_info["bbs"]; ok {
+		auth_info["bbs_manage"] = true
+	}
+
+	if _, ok := auth_info["bbs_manage"]; ok {
+		auth_info["bbs_pin"] = true
+		auth_info["bbs_main_view"] = true
+	}
+
+	if _, ok := auth_info["toron"]; ok {
+		auth_info["thread_manage"] = true
+	}
+
+	if _, ok := auth_info["thread_manage"]; ok {
+		for _, permission := range []string{"thread_setting", "thread_acl", "thread_comment_manage"} {
+			auth_info[permission] = true
+		}
+	}
+
+	if _, ok := auth_info["vote_fix"]; ok {
+		auth_info["vote_manage"] = true
 	}
 
 	if _, ok := auth_info["check"]; ok {
@@ -834,6 +914,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		for _, v := range bbs_default {
 			auth_info[v] = true
 		}
+		auth_info["bbs_main_view"] = true
 	}
 
 	check = false

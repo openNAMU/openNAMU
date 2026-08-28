@@ -10,6 +10,10 @@ func View_delete_multiple(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_permission(db, "document_bulk_delete", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	if values != nil {
 		if !tool.Captcha_check(db, config.Session, config.IP, tool.Captcha_response(values.Get("g-recaptcha"), values.Get("g-recaptcha-response"), values.Get("h-captcha-response"), values.Get("cf-turnstile-response"))) {
 			return tool.Get_error_page(db, config, "recaptcha")

@@ -8,7 +8,7 @@ func Api_func_email_post(config tool.Config, who string, title string, data stri
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "setting_email_test", config.IP) {
 		return map[string]any{"response": "require auth"}
 	}
 

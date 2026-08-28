@@ -87,7 +87,7 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 	}
 
 	if values == nil {
-		allowed := tool.Check_acl(db, "", "", "acl_auth", config.IP)
+		allowed := tool.Check_permission(db, "document_acl_manage", config.IP)
 		if strings.HasPrefix(doc_name, "user:") && strings.TrimPrefix(doc_name, "user:") == config.IP {
 			allowed = true
 		}
@@ -145,7 +145,7 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 	}
 	data += `<h2>` + tool.Get_language(db, "markup", true) + `</h2>` + tool.Get_markup_select_ui(db, config, doc_name, markup, "", "")
 	top_disabled := ""
-	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if tool.Check_permission(db, "owner", config.IP) {
 		top_disabled = ` disabled`
 	}
 	data += `<h2>` + tool.Get_language(db, "document_top", true) + `</h2><textarea class="opennamu_textarea_100" name="document_top"` + top_disabled + `>` + tool.HTML_escape(document_set_value(db, doc_name, "document_top")) + `</textarea>`

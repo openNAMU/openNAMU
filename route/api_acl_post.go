@@ -75,7 +75,7 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	allowed := tool.Check_acl(db, "", "", "acl_auth", config.IP)
+	allowed := tool.Check_permission(db, "document_acl_manage", config.IP)
 	if strings.HasPrefix(doc_name, "user:") && strings.TrimPrefix(doc_name, "user:") == config.IP {
 		allowed = true
 	}
@@ -136,7 +136,7 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 		old_markup = tool.Get_document_markup(db, "", "document")
 	}
 	save_values := values
-	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if tool.Check_permission(db, "owner", config.IP) {
 		save_values = url.Values{}
 		for key, value := range values {
 			save_values[key] = append([]string{}, value...)

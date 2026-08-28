@@ -9,7 +9,7 @@ func View_thread_comment_notice(config tool.Config, topic_num string, comment_nu
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if values == nil && !tool.Check_acl(db, "", "", "toron_auth", config.IP) {
+	if values == nil && !tool.Check_permission(db, "thread_comment_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

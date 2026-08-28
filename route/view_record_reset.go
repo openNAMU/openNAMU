@@ -8,7 +8,7 @@ import (
 func View_record_reset(config tool.Config, user_name string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_permission(db, "record_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if user_name == "" {

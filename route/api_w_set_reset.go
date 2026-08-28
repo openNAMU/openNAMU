@@ -10,7 +10,7 @@ func Api_w_set_reset(config tool.Config, doc_name string) map[string]any {
 
 	ip := config.IP
 
-	if tool.Check_acl(db, "", "", "owner_auth", ip) {
+	if tool.Check_permission(db, "owner", ip) {
 		tool.Exec_DB(
 			db,
 			"delete from acl where title = ?",

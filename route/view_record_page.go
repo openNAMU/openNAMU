@@ -13,7 +13,7 @@ func View_record_page(config tool.Config, user_name string, record_type string, 
 	if user_name == "" {
 		user_name = config.IP
 	}
-	if user_name != config.IP && !tool.Check_acl(db, "", "", "hidel_auth", config.IP) {
+	if user_name != config.IP && !tool.Check_permission(db, "hidel", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if record_type == "" {
@@ -70,7 +70,7 @@ func View_record_page(config tool.Config, user_name string, record_type string, 
 
 	data_list := [][]string{}
 	ip_cache := map[string][]string{}
-	can_view_hidden := tool.Check_acl(db, "", "", "hidel_auth", config.IP)
+	can_view_hidden := tool.Check_permission(db, "hidel", config.IP)
 	for rows.Next() {
 		id, title, date, ip, send, leng, hide, type_data := "", "", "", "", "", "", "", ""
 		if rows.Scan(&id, &title, &date, &ip, &send, &leng, &hide, &type_data) != nil {
@@ -105,7 +105,7 @@ func View_record_page(config tool.Config, user_name string, record_type string, 
 	data_html = menu_html + data_html
 
 	menu := [][]any{{"user/" + tool.Url_parser(user_name), tool.Get_language(db, "user_tool", true)}}
-	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if tool.Check_permission(db, "record_manage", config.IP) {
 		menu = append(menu, []any{"record/reset/" + tool.Url_parser(user_name), tool.Get_language(db, "record_reset", true)})
 	}
 

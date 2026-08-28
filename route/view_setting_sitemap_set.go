@@ -12,7 +12,7 @@ func View_setting_sitemap_set(config tool.Config) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "setting_sitemap", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

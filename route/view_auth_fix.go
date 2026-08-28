@@ -14,7 +14,7 @@ func View_auth_fix(config tool.Config, user_name string, values url.Values) stri
 	if !tool.QueryRow_DB(db, "select data from user_set where id = ? and name = 'pw'", []any{&password}, user_name) {
 		return tool.Get_error_page(db, config, "error")
 	}
-	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_permission(db, "auth_fix", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

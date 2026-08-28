@@ -36,11 +36,14 @@ func View_thread_tool(config tool.Config, topic_num string) string {
 		acl_text = tool.Get_language(db, "normal", true)
 	}
 	data := `<h2>` + tool.Get_language(db, "tool", true) + `</h2><ul><li>` + tool.Get_language(db, "topic_state", true) + ` : ` + state + `</li><li>` + tool.Get_language(db, "topic_acl", true) + ` : ` + tool.HTML_escape(acl_text) + `</li><li>` + tool.Get_language(db, "topic_view_acl", true) + ` : ` + tool.HTML_escape(acl_view_text) + `</li></ul>`
-	if tool.Check_acl(db, "", "", "toron_auth", config.IP) {
+	if tool.Check_permission(db, "thread_manage", config.IP) {
 		data += `<h2>` + tool.Get_language(db, "admin_tool", true) + `</h2><ul><li><a href="/thread/` + tool.Url_parser(topic_num) + `/setting">` + tool.Get_language(db, "topic_setting", true) + `</a></li><li><a href="/thread/` + tool.Url_parser(topic_num) + `/acl">` + tool.Get_language(db, "topic_acl_setting", true) + `</a></li></ul>`
 	}
-	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
-		data += `<h2>` + tool.Get_language(db, "owner", true) + `</h2><ul><li><a href="/thread/` + tool.Url_parser(topic_num) + `/change">` + tool.Get_language(db, "topic_name_change", true) + `</a></li><li><a href="/thread/` + tool.Url_parser(topic_num) + `/delete">` + tool.Get_language(db, "topic_delete", true) + `</a></li></ul>`
+	if tool.Check_permission(db, "thread_change", config.IP) {
+		data += `<h2>` + tool.Get_language(db, "owner", true) + `</h2><ul><li><a href="/thread/` + tool.Url_parser(topic_num) + `/change">` + tool.Get_language(db, "topic_name_change", true) + `</a></li></ul>`
+	}
+	if tool.Check_permission(db, "thread_delete", config.IP) {
+		data += `<h2>` + tool.Get_language(db, "owner", true) + `</h2><ul><li><a href="/thread/` + tool.Url_parser(topic_num) + `/delete">` + tool.Get_language(db, "topic_delete", true) + `</a></li></ul>`
 	}
 
 	return tool.Get_template(db, config, tool.Get_language(db, "topic_tool", true), data, []any{"(" + tool.HTML_escape(sub) + ")"}, [][]any{{"thread/" + tool.Url_parser(topic_num), tool.Get_language(db, "return", true)}}, map[string]string{})

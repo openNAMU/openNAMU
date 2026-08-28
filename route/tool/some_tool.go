@@ -341,7 +341,7 @@ func Get_wiki_custom(db *sql.DB, ip string, session sessions.Session, cookies st
 			ip,
 		)
 
-		if Check_acl(db, "", "", "all_admin_auth", ip) {
+		if Check_permission(db, "treat_as_admin", ip) {
 			user_admin = "1"
 
 			acl_name := Get_user_auth(db, ip)

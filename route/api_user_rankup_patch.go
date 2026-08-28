@@ -12,7 +12,7 @@ func Api_user_rankup_patch(config tool.Config, values url.Values) map[string]any
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "rankup_manage", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

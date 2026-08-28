@@ -10,7 +10,7 @@ func View_filter(config tool.Config, kind string) string {
 	if !ok {
 		return tool.Get_error_page(db, config, "error")
 	}
-	if kind == "edit_filter" && !tool.Check_acl(db, "", "", "edit_filter_view", config.IP) {
+	if kind == "edit_filter" && !tool.Check_permission(db, "edit_filter_view", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
@@ -28,7 +28,7 @@ func View_filter(config tool.Config, kind string) string {
 	rows := tool.Query_DB(db, "select html, plus, plus_t from html_filter where kind = ?", spec.db_kind)
 	defer rows.Close()
 
-	can_edit := tool.Check_acl(db, "", "", "owner_auth", config.IP)
+	can_edit := tool.Check_permission(db, "filter_manage", config.IP)
 	for rows.Next() {
 		name := ""
 		plus := ""

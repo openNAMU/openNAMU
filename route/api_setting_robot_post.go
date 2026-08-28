@@ -7,7 +7,7 @@ func Api_setting_robot_post(config tool.Config, form map[string]string) map[stri
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "setting_robot", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

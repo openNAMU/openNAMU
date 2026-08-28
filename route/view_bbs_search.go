@@ -10,6 +10,10 @@ func View_bbs_search(config tool.Config, set_id string, keyword string, page str
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if set_id == "" && !tool.Check_permission(db, "bbs_main_view", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	if set_id != "" && !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
@@ -35,7 +39,9 @@ func View_bbs_search(config tool.Config, set_id string, keyword string, page str
 		bbs_id_to_name[set_id] = bbs_name
 	} else {
 		for name, id := range bbs_list(db) {
-			bbs_id_to_name[id] = name
+			if tool.Check_acl(db, id, "", "bbs_view", config.IP) {
+				bbs_id_to_name[id] = name
+			}
 		}
 	}
 

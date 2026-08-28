@@ -143,7 +143,7 @@ func user_title_list(db *sql.DB, user_name string) []user_choice {
 	if user_value(db, user_name, "challenge_admin") != "" {
 		choice_list = append(choice_list, user_choice{"☑️", "☑️ before_admin"})
 	}
-	if tool.Check_acl(db, "", "", "all_admin_auth", user_name) {
+	if tool.Check_permission(db, "treat_as_admin", user_name) {
 		choice_list = append(choice_list, user_choice{"✅", "✅ admin"})
 	}
 	var egg string

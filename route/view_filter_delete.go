@@ -9,11 +9,11 @@ func View_filter_delete(config tool.Config, kind string, name string, values url
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-        _, ok := get_filter_spec(kind)
+	_, ok := get_filter_spec(kind)
 	if !ok {
 		return tool.Get_error_page(db, config, "error")
 	}
-	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_permission(db, "filter_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if values != nil {

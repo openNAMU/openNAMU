@@ -11,7 +11,7 @@ func Api_auth_fix_post(config tool.Config, user_name string, values url.Values) 
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "auth_fix", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

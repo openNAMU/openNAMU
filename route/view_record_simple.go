@@ -9,7 +9,7 @@ import (
 func View_record_simple(config tool.Config, user_name string, record_type string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if user_name != "" && user_name != config.IP && !tool.Check_acl(db, "", "", "hidel_auth", config.IP) {
+	if user_name != "" && user_name != config.IP && !tool.Check_permission(db, "hidel", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if user_name == "" {
@@ -37,7 +37,7 @@ func View_record_simple(config tool.Config, user_name string, record_type string
 		rows.Close()
 	}
 	menu := [][]any{{"other", tool.Get_language(db, "return", true)}}
-	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if tool.Check_permission(db, "record_manage", config.IP) {
 		menu = append(menu, []any{"record/reset/" + tool.Url_parser(user_name), tool.Get_language(db, "record_reset", true)})
 	}
 	return tool.Get_template(db, config, tool.Get_language(db, record_type+"_record", true), body.String(), []any{}, menu, map[string]string{})

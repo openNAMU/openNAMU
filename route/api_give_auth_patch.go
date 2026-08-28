@@ -56,7 +56,7 @@ func Api_give_auth_patch(config tool.Config, auth string, change_auth string, us
 		}
 	case "private":
 		band = "private"
-		if !tool.Check_acl(db, "", "", "owner_auth", ip) {
+		if !tool.Check_permission(db, "auth_private_give", ip) {
 			new_data["response"] = "require auth"
 			return new_data
 		}
@@ -66,14 +66,14 @@ func Api_give_auth_patch(config tool.Config, auth string, change_auth string, us
 		return new_data
 	}
 
-	required_auth := "give_auth"
+	required_auth := "give"
 	if band == "regex" || band == "cidr" {
-		required_auth = "give_range_auth"
+		required_auth = "give_range"
 	}
 	if band == "private" {
-		required_auth = "owner_auth"
+		required_auth = "auth_private_give"
 	}
-	if !tool.Check_acl(db, "", "", required_auth, ip) {
+	if !tool.Check_permission(db, required_auth, ip) {
 		new_data["response"] = "require auth"
 		return new_data
 	}

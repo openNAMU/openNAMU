@@ -53,14 +53,14 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 	if target_type == "" {
 		target_type = "normal"
 	}
-	required_auth := "give_auth"
+	required_auth := "give"
 	if target_type == "regex" || target_type == "cidr" {
-		required_auth = "give_range_auth"
+		required_auth = "give_range"
 	}
 	if target_type == "private" {
-		required_auth = "owner_auth"
+		required_auth = "auth_private_give"
 	}
-	if values == nil && !tool.Check_acl(db, "", "", required_auth, config.IP) {
+	if values == nil && !tool.Check_permission(db, required_auth, config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
@@ -138,7 +138,7 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 	}
 
 	if mode != "total" {
-		owner := tool.Check_acl(db, "", "", "owner_auth", config.IP)
+		owner := tool.Check_permission(db, "owner", config.IP)
 		data += auth_target_type_select(db, target_type, owner) + `<hr class="main_hr">`
 	}
 	data += auth_select("change_auth", groups, selected)

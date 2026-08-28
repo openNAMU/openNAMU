@@ -9,7 +9,7 @@ import (
 func View_list_user_page(config tool.Config, page string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "user_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	page_num := list_extra_page_number(page)

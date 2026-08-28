@@ -13,7 +13,7 @@ func View_setting_404_page_post(config tool.Config, form map[string]string) stri
 	content := setting_form_value(form, "content", "")
 
 	if setting_form_value(form, "action", "") == "preview" {
-		if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+		if !tool.Check_permission(db, "setting_404", config.IP) {
 			return tool.Get_error_page(db, config, "auth")
 		}
 		return view_setting_404_page_data(db, config, page, content, true)

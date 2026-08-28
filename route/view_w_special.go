@@ -50,9 +50,9 @@ func view_w_user_data(db *sql.DB, doc_name string) string {
 	}
 
 	phrase := ""
-	if tool.Get_user_document(db, user_name) && !tool.Check_acl(db, "", "", "all_admin_auth", user_name) {
+	if tool.Get_user_document(db, user_name) && !tool.Check_permission(db, "treat_as_admin", user_name) {
 		phrase_name := "phrase_user_page_owner"
-		if tool.Check_acl(db, "", "", "owner_auth", user_name) {
+		if tool.Check_permission(db, "owner", user_name) {
 			phrase_name = "phrase_user_page_admin"
 		}
 		tool.QueryRow_DB(db, "select data from other where name = ?", []any{&phrase}, phrase_name)

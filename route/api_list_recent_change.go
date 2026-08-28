@@ -29,7 +29,7 @@ func Api_list_recent_change(config tool.Config, set_type string, limit string, n
 		[]any{&rc_count},
 		set_type,
 	)
-	all_admin_auth := tool.Check_acl(db, "", "", "all_admin_auth", config.IP)
+	history_auth := tool.Check_permission(db, "history_view", config.IP)
 
 	id_title_list := [][]string{}
 	if page_int < rc_count {
@@ -61,7 +61,7 @@ func Api_list_recent_change(config tool.Config, set_type string, limit string, n
 		history_offset = 0
 	}
 	history_limit := limit_int - len(id_title_list)
-	if all_admin_auth && history_limit > 0 {
+	if history_auth && history_limit > 0 {
 		history_query := `select h.id, h.title from history h where `
 		history_values := []any{}
 		if set_type != "normal" {
@@ -88,7 +88,7 @@ func Api_list_recent_change(config tool.Config, set_type string, limit string, n
 
 	data_list := [][]string{}
 
-	admin_auth := tool.Check_acl(db, "", "", "hidel_auth", config.IP)
+	admin_auth := tool.Check_permission(db, "hidel", config.IP)
 	ip_parser_temp := map[string][]string{}
 
 	for _, id_title := range id_title_list {

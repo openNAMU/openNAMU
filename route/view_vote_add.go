@@ -9,7 +9,7 @@ import (
 func View_vote_add(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if values == nil && !tool.Check_acl(db, "", "", "vote", config.IP) {
+	if values == nil && !tool.Check_permission(db, "vote", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if values != nil {

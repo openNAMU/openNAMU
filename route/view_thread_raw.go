@@ -26,7 +26,7 @@ func View_thread_raw(config tool.Config, topic_num string, comment_num string) s
 	) {
 		return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
 	}
-	if block == "O" && !tool.Check_acl(db, "", "", "hidel_auth", config.IP) {
+	if block == "O" && !tool.Check_permission(db, "hidel", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

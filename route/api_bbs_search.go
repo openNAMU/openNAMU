@@ -10,6 +10,10 @@ func Api_bbs_search(config tool.Config, keyword string, set_id string, page stri
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if set_id == "" && !tool.Check_permission(db, "bbs_main_view", config.IP) {
+		return map[string]any{"response": "require auth", "data": []map[string]string{}}
+	}
+
 	if set_id != "" && !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
 		return map[string]any{"response": "require auth", "data": []map[string]string{}}
 	}

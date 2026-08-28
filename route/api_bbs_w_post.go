@@ -10,7 +10,7 @@ func Api_bbs_w_post(config tool.Config, set_id string, title string, data string
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "bbs_comment", config.IP) {
+	if !tool.Check_permission(db, "bbs_comment", config.IP) {
 		return_data := make(map[string]any)
 		return_data["response"] = "require auth"
 

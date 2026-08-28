@@ -159,7 +159,7 @@ func IP_preprocess(db *sql.DB, ip string, my_ip string) []string {
 		[]any{&user_name_view},
 	)
 
-	if Check_acl(db, "", "", "view_hide_user_name", my_ip) {
+	if Check_permission(db, "view_hide_user_name", my_ip) {
 		ip_view = ""
 		user_name_view = ""
 	}
@@ -243,7 +243,7 @@ func IP_menu(db *sql.DB, ip string, my_ip string, option string) map[string][][]
 		}
 	}
 
-	auth_name := Check_acl(db, "", "", "give_auth", my_ip)
+	auth_name := Check_permission(db, "give", my_ip)
 	if auth_name {
 		menu[Get_language(db, "admin", false)] = [][]string{
 			{"/auth/give/" + Url_parser(ip), Get_language(db, "ban", false)},
@@ -291,7 +291,7 @@ func IP_parser(db *sql.DB, ip string, my_ip string) string {
 			ip = "<a href=\"/w/" + Url_parser("user:"+raw_ip) + "\">" + ip + "</a>"
 			user_title := Get_user_title(db, raw_ip)
 
-			if Check_acl(db, "", "", "user_name_bold", raw_ip) {
+			if Check_permission(db, "user_name_bold", raw_ip) {
 				ip = "<b>" + ip + "</b>"
 			}
 

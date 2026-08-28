@@ -28,7 +28,7 @@ func Api_bbs_w_set(config tool.Config, set_id string, set_name string) map[strin
 
 	if val, ok := setting_acl[set_name]; ok {
 		if val != "" {
-			if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+			if !tool.Check_permission(db, "bbs_setting", config.IP) {
 				return_data := make(map[string]any)
 				return_data["response"] = "require auth"
 

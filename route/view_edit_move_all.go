@@ -74,6 +74,10 @@ func View_edit_move_all(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_permission(db, "document_move_manage", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	source := ""
 	target := ""
 	match_type := "start"

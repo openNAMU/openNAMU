@@ -10,7 +10,7 @@ func View_edit_file_upload(config tool.Config, file_name string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "upload", config.IP) {
+	if !tool.Check_permission(db, "upload", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

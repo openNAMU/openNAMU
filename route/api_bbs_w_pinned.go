@@ -49,7 +49,7 @@ func Api_bbs_w_pinned(config tool.Config, set_id string, set_code string, toggle
 		return return_data
 	}
 
-	if !tool.Check_acl(db, "", "", "bbs_auth", config.IP) {
+	if !tool.Check_permission(db, "bbs_pin", config.IP) {
 		return_data["response"] = "require auth"
 
 		return return_data

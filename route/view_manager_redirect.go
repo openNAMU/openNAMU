@@ -35,6 +35,10 @@ func View_manager_redirect(config tool.Config, num int, add_2 string, name strin
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_permission(db, "manager_view", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	if num == 1 {
 		return tool.Get_redirect("/manager")
 	}

@@ -12,7 +12,7 @@ func Api_edit_delete_multiple_post(config tool.Config, content string, send stri
 
 	return_data := make(map[string]any)
 
-	if !tool.Check_acl(db, "", "", "acl_auth", config.IP) {
+	if !tool.Check_permission(db, "document_bulk_delete", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

@@ -13,7 +13,7 @@ func View_user_check(config tool.Config, name string, check_type string, page st
 		data := `<form method="post" action="/manager/3"><input name="name" placeholder="` + tool.Get_language(db, "user_name", true) + `"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
 		return tool.Get_template(db, config, tool.Get_language(db, "check", true), data, []any{}, [][]any{{"manager", tool.Get_language(db, "return", true)}}, map[string]string{})
 	}
-	if !tool.Check_acl(db, "", "", "check_auth", config.IP) {
+	if !tool.Check_permission(db, "check", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

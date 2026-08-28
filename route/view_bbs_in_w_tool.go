@@ -29,20 +29,14 @@ func View_bbs_in_w_tool(config tool.Config, set_id string, set_code string) stri
         </ul>
     `
 
-	if tool.Check_acl(db, "", "", "bbs_auth", config.IP) {
-		data_html += `
-            <h3>` + tool.Get_language(db, "admin", true) + `</h3>
-            <ul>
-                <li><a href="/bbs/pinned/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">` + tool.Get_language(db, pinned_name, true) + `</a></li>
-            </ul>
-            <h3>` + tool.Get_language(db, "owner", true) + `</h3>
-            <ul>
-                <li><a href="/bbs/delete/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">` + tool.Get_language(db, "delete", true) + `</a></li>
-            </ul>
-        `
+	if tool.Check_permission(db, "bbs_pin", config.IP) {
+		data_html += `<h3>` + tool.Get_language(db, "admin", true) + `</h3><ul><li><a href="/bbs/pinned/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">` + tool.Get_language(db, pinned_name, true) + `</a></li></ul>`
+	}
+	if tool.Check_permission(db, "bbs_delete", config.IP) {
+		data_html += `<h3>` + tool.Get_language(db, "owner", true) + `</h3><ul><li><a href="/bbs/delete/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">` + tool.Get_language(db, "delete", true) + `</a></li></ul>`
 	}
 
-	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if tool.Check_permission(db, "bbs_comment_manage", config.IP) {
 		comment_closed := bbs_comment_closed(db, set_id, set_code)
 		comment_closed_value := "1"
 		comment_state := "comment_close"

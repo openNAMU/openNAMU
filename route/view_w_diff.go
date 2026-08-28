@@ -21,6 +21,10 @@ func View_w_diff(config tool.Config, doc_name string, before_rev string, after_r
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_permission(db, "history_view", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	api_data := Api_w_diff(config, doc_name, before_rev, after_rev)
 	response := api_data["response"].(string)
 

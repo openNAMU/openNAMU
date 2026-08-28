@@ -10,15 +10,14 @@ func View_edit_revert(config tool.Config, doc_name string, rev string) string {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	raw_data := Api_w_raw(config, doc_name, "", rev)
-	response := raw_data["response"].(string)
-	if response == "require auth" {
-		return tool.Get_error_page(db, config, "auth")
-	} else if response != "ok" {
+	data := ""
+	hide := ""
+	if !tool.QueryRow_DB(db, "select data, hide from history where title = ? and id = ?", []any{&data, &hide}, doc_name, rev) {
 		return tool.Get_redirect("/w/" + tool.Url_parser(doc_name))
 	}
-
-	data := raw_data["data"].(string)
+	if hide != "" && !tool.Check_permission(db, "hidel", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
 	data_html := `<form method="post">
         <input class="__ON_INPUT__" placeholder="` + tool.Get_language(db, "why", true) + `" name="send">
         <hr class="main_hr">

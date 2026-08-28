@@ -8,7 +8,7 @@ func Api_setting_put(config tool.Config, set_name string, data string, coverage 
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	auth_info := tool.Check_acl(db, "", "", "owner_auth", config.IP)
+	auth_info := tool.Check_permission(db, "setting_manage", config.IP)
 
 	setting_acl := Setting_list()
 	return_data := make(map[string]any)

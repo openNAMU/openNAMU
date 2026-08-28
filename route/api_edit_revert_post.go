@@ -27,7 +27,7 @@ func Api_edit_revert_post(config tool.Config, doc_name string, rev string, send 
 		return_data["response"] = "not exist"
 
 		return return_data
-	} else if hide != "" && !tool.Check_acl(db, "", "", "hidel_auth", config.IP) {
+	} else if hide != "" && !tool.Check_permission(db, "hidel", config.IP) {
 		return_data["response"] = "require auth"
 
 		return return_data

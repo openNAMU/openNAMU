@@ -20,7 +20,7 @@ func Api_vote_close_post(config tool.Config, id string) map[string]any {
 		return return_data
 	}
 
-	if !tool.Check_acl(db, "", "", "vote", config.IP) {
+	if !tool.Check_permission(db, "vote", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}
@@ -32,7 +32,7 @@ func Api_vote_close_post(config tool.Config, id string) map[string]any {
 		[]any{&owner},
 		id,
 	)
-	if owner != config.IP && !tool.Check_acl(db, "", "", "vote_auth", config.IP) {
+	if owner != config.IP && !tool.Check_permission(db, "vote_manage", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

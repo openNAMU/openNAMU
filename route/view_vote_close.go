@@ -9,7 +9,7 @@ import (
 func View_vote_close(config tool.Config, id string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if values == nil && !tool.Check_acl(db, "", "", "vote", config.IP) {
+	if values == nil && !tool.Check_permission(db, "vote", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	type_data := ""
@@ -18,7 +18,7 @@ func View_vote_close(config tool.Config, id string, values url.Values) string {
 	}
 	owner := ""
 	tool.QueryRow_DB(db, "select data from vote where id = ? and name = 'open_user' and type = 'option'", []any{&owner}, id)
-	if values == nil && owner != config.IP && !tool.Check_acl(db, "", "", "vote_auth", config.IP) {
+	if values == nil && owner != config.IP && !tool.Check_permission(db, "vote_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	next := "n_close"

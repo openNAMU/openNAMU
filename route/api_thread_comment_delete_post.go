@@ -7,7 +7,7 @@ func Api_thread_comment_delete_post(config tool.Config, topic_num string, commen
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "thread_comment_delete", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

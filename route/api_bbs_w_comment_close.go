@@ -21,7 +21,7 @@ func Api_bbs_w_comment_close(config tool.Config, set_id string, set_code string,
 		return return_data
 	}
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "bbs_comment_manage", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

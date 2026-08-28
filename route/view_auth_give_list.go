@@ -24,9 +24,9 @@ func Get_ui_auth_give_list(db *sql.DB, config tool.Config, data_all [][]string) 
 			target_ui += " (" + tool.Get_language(db, target_type, true) + ")"
 		}
 
-		can_give := tool.Check_acl(db, "", "", "give_auth", config.IP)
+		can_give := tool.Check_permission(db, "give", config.IP)
 		if target_type == "regex" || target_type == "cidr" {
-			can_give = tool.Check_acl(db, "", "", "give_range_auth", config.IP)
+			can_give = tool.Check_permission(db, "give_range", config.IP)
 		}
 		if can_give {
 			target_ui = `<a href="` + target_path + tool.Url_parser(target) + `">` + target_ui + `</a>`
@@ -72,7 +72,7 @@ func View_auth_give_list(config tool.Config, num string, include_default bool) s
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "give_range_auth", config.IP) {
+	if !tool.Check_permission(db, "give_range", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

@@ -46,7 +46,7 @@ func Api_bbs_w_comment(config tool.Config, do_type string, sub_code string) map[
 		return_data := make(map[string]any)
 
 		temp := []map[string]string{}
-		if !tool.Check_acl(db, "", "", "bbs_comment", config.IP) {
+		if !tool.Check_permission(db, "bbs_comment", config.IP) {
 			return_data["response"] = "require auth"
 			return_data["data"] = temp
 

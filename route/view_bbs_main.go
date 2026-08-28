@@ -80,6 +80,10 @@ func View_bbs_main(config tool.Config, page string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_permission(db, "bbs_main_view", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	bbs_list_api_data := Api_bbs_list(config)
 
 	bbs_id_to_name := map[string]string{}
@@ -120,7 +124,7 @@ func View_bbs_main(config tool.Config, page string) string {
 		{"other", tool.Get_language(db, "other_tool", false)},
 		{"bbs/search", tool.Get_language(db, "search", false)},
 	}
-	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if tool.Check_permission(db, "bbs_create", config.IP) {
 		menu = append(menu, []any{"bbs/make", tool.Get_language(db, "add", false)})
 	}
 

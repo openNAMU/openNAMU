@@ -49,7 +49,7 @@ func Api_bbs_w_delete(config tool.Config, set_id string, set_code string) map[st
 		return return_data
 	}
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "bbs_delete", config.IP) {
 		return_data["response"] = "require auth"
 
 		return return_data

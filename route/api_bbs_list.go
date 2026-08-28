@@ -42,10 +42,18 @@ func Api_bbs_list(config tool.Config) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_permission(db, "bbs_main_view", config.IP) {
+		return map[string]any{"response": "require auth", "data": [][]string{}}
+	}
+
 	data_list := bbs_list(db)
 	items := make([]BBS_item, 0, len(data_list))
 
 	for k, v := range data_list {
+		if !tool.Check_acl(db, v, "", "bbs_view", config.IP) {
+			continue
+		}
+
 		bbs_type := ""
 		tool.QueryRow_DB(
 			db,

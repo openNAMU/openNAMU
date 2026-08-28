@@ -10,7 +10,7 @@ func Api_list_auth_give(config tool.Config, num string, include_default bool) ma
 	return_data["response"] = "ok"
 	return_data["data"] = [][]string{}
 
-	if !tool.Check_acl(db, "", "", "give_range_auth", config.IP) {
+	if !tool.Check_permission(db, "give_range", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

@@ -14,7 +14,7 @@ func Api_setting_sitemap_post(config tool.Config) map[string]any {
 
 	return_data := make(map[string]any)
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "setting_sitemap", config.IP) {
 		return_data["response"] = "require auth"
 
 		return return_data

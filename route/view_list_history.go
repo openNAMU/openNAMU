@@ -8,6 +8,10 @@ func View_list_history(config tool.Config, doc_name string, set_type string, num
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_permission(db, "history_view", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	if !tool.Check_acl(db, doc_name, "", "render", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
@@ -53,7 +57,7 @@ func View_list_history(config tool.Config, doc_name string, set_type string, num
 	menu := [][]any{
 		{"w/" + tool.Url_parser(doc_name), tool.Get_language(db, "return", true)},
 	}
-	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if tool.Check_permission(db, "history_manage", config.IP) {
 		menu = append(menu, []any{"history_add/" + tool.Url_parser(doc_name), tool.Get_language(db, "history_add", true)})
 		menu = append(menu, []any{"history_reset/" + tool.Url_parser(doc_name), tool.Get_language(db, "history_reset", true)})
 	}

@@ -97,7 +97,7 @@ func Api_bbs_w_comment_one(config tool.Config, already_auth_check bool, do_type 
 
 	return_data := make(map[string]any)
 	if !already_auth_check {
-		if !tool.Check_acl(db, "", "", "bbs_comment", config.IP) {
+		if !tool.Check_permission(db, "bbs_comment", config.IP) {
 			data_list = []map[string]string{}
 
 			return_data["response"] = "require auth"

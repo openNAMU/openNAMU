@@ -7,7 +7,7 @@ func Api_user_edit_filter_delete_post(config tool.Config, user_name string) map[
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "user_edit_filter_manage", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

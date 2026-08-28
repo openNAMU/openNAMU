@@ -13,7 +13,7 @@ func View_auth_group_delete(config tool.Config, name string, values url.Values) 
 	if default_groups[name] {
 		return tool.Get_redirect("/auth/list")
 	}
-	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_permission(db, "auth_group_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if values != nil {

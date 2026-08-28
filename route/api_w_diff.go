@@ -15,13 +15,19 @@ func Api_w_diff(config tool.Config, doc_name string, before_rev string, after_re
 
 	return_data := make(map[string]any)
 
+	if !tool.Check_permission(db, "history_view", config.IP) {
+		return_data["response"] = "require auth"
+
+		return return_data
+	}
+
 	if !tool.Check_acl(db, doc_name, "", "render", config.IP) {
 		return_data["response"] = "require auth"
 
 		return return_data
 	}
 
-	hidden_auth := tool.Check_acl(db, "", "", "hidel_auth", config.IP)
+	hidden_auth := tool.Check_permission(db, "hidel", config.IP)
 
 	before_data, before_response := Get_diff_revision(db, doc_name, before_rev, hidden_auth)
 	if before_response != "ok" {

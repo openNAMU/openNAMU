@@ -14,7 +14,7 @@ func Api_user_name_post(config tool.Config, target string, value string) map[str
 		return_data["response"] = "require auth"
 		return return_data
 	}
-	if target != config.IP && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if target != config.IP && !tool.Check_permission(db, "user_manage", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

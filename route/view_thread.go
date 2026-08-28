@@ -21,7 +21,7 @@ func thread_comments(db *sql.DB, config tool.Config, topic_num string) string {
 
 	data_html := ""
 	shortcut := `<div class="opennamu_thread_shortcut" id="thread_shortcut">`
-	admin_auth := tool.Check_acl(db, "", "", "toron_auth", config.IP)
+	admin_auth := tool.Check_permission(db, "thread_manage", config.IP)
 
 	for rows.Next() {
 		var id string
@@ -64,7 +64,7 @@ func View_thread(config tool.Config, topic_num string, doc_name string, values u
 			name = "Test"
 		}
 		sub = tool.Get_language(db, "make_new_topic", true)
-		if values == nil && (!tool.Check_acl(db, name, "0", "topic_view", config.IP) || !tool.Check_acl(db, "", "", "discuss_make_new_thread", config.IP)) {
+		if values == nil && (!tool.Check_acl(db, name, "0", "topic_view", config.IP) || !tool.Check_permission(db, "discuss_make_new_thread", config.IP)) {
 			return tool.Get_error_page(db, config, "auth")
 		}
 	} else {

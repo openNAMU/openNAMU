@@ -36,7 +36,7 @@ func Api_setting(config tool.Config, set_name string, coverage string) map[strin
 
 	if val, ok := setting_acl[set_name]; ok {
 		if val != "" {
-			if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+			if !tool.Check_permission(db, "setting_manage", config.IP) {
 				return_data["response"] = "require auth"
 
 				return return_data

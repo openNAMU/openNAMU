@@ -16,7 +16,7 @@ func Api_w_watch_list(config tool.Config, name string, num_str string, do_type s
 
 	return_data := make(map[string]any)
 
-	if !tool.Check_acl(db, "", "", "doc_watch_list_view", config.IP) {
+	if !tool.Check_permission(db, "doc_watch_list_view", config.IP) {
 		return_data["response"] = "require auth"
 		return_data["data"] = []string{}
 	} else {

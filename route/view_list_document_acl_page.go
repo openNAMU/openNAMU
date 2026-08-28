@@ -10,7 +10,7 @@ func View_list_document_acl(config tool.Config, page string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "acl_auth", config.IP) {
+	if !tool.Check_permission(db, "document_acl_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	page_num := list_extra_page_number(page)

@@ -7,7 +7,7 @@ func Api_history_reset_post(config tool.Config, doc_name string) map[string]any 
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "history_manage", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

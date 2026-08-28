@@ -25,7 +25,7 @@ func View_edit_file_delete(config tool.Config, doc_name string, values url.Value
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_permission(db, "file_delete", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	var stored_name string

@@ -10,7 +10,7 @@ func View_setting_404_page(config tool.Config) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "setting_404", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

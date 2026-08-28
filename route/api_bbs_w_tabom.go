@@ -10,7 +10,7 @@ func Api_bbs_w_tabom(config tool.Config, set_id string, set_code string) map[str
 
 	return_data := make(map[string]any)
 
-	if !tool.Check_acl(db, "", "", "bbs_comment", config.IP) {
+	if !tool.Check_permission(db, "bbs_comment", config.IP) {
 		return_data["response"] = "require auth"
 		return_data["data"] = "0"
 	} else {

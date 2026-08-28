@@ -84,7 +84,7 @@ func Api_bbs_w_edit_view(config tool.Config, set_id string, set_code string, com
 			return return_data
 		}
 
-		if comment_user_id != config.IP && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+		if comment_user_id != config.IP && !tool.Check_permission(db, "bbs_comment_manage", config.IP) {
 			return_data["response"] = "require auth"
 
 			return return_data
@@ -139,7 +139,7 @@ func Api_bbs_w_edit_view(config tool.Config, set_id string, set_code string, com
 		return return_data
 	}
 
-	if user_id != config.IP && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if user_id != config.IP && !tool.Check_permission(db, "bbs_post_manage", config.IP) {
 		return_data["response"] = "require auth"
 
 		return return_data

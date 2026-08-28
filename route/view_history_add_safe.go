@@ -9,7 +9,7 @@ import (
 func View_history_add_safe(config tool.Config, doc_name string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_permission(db, "history_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if values != nil {

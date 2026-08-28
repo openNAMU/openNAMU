@@ -8,7 +8,7 @@ func View_alarm_delete(config tool.Config, user_name string) string {
 	if user_name == "" {
 		user_name = config.IP
 	}
-	if user_name != config.IP && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if user_name != config.IP && !tool.Check_permission(db, "owner", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

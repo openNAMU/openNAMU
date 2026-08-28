@@ -45,6 +45,10 @@ func Api_list_history(config tool.Config, doc_name string, set_type string, num 
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_permission(db, "history_view", config.IP) {
+		return map[string]any{"response": "require auth", "data": [][]string{}}
+	}
+
 	if !tool.Check_acl(db, doc_name, "", "render", config.IP) {
 		return map[string]any{"response": "require auth", "data": [][]string{}}
 	}
@@ -79,7 +83,7 @@ func Api_list_history(config tool.Config, doc_name string, set_type string, num 
 
 	data_list := [][]string{}
 
-	admin_auth := tool.Check_acl(db, "", "", "hidel_auth", config.IP)
+	admin_auth := tool.Check_permission(db, "hidel", config.IP)
 	ip_parser_temp := map[string][]string{}
 
 	for rows.Next() {

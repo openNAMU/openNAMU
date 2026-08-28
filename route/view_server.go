@@ -86,7 +86,7 @@ func View_server_action(config tool.Config, action string, post bool) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !post && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !post && !tool.Check_permission(db, "server_action", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if action != "restart" && action != "shutdown" && action != "update" {

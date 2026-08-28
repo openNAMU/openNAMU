@@ -11,7 +11,7 @@ import (
 func View_list_admin(config tool.Config, auth_use bool) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if auth_use && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if auth_use && !tool.Check_permission(db, "auth_group_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	body := strings.Builder{}

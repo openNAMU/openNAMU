@@ -38,7 +38,7 @@ func Api_thread_bbs(config tool.Config, tool_name string, topic_num string, s_nu
 	rows := thread_bbs_query(db, topic_num, tool_name, s_num, e_num)
 	defer rows.Close()
 
-	admin_auth := tool.Check_acl(db, "", "", "toron_auth", config.IP)
+	admin_auth := tool.Check_permission(db, "thread_manage", config.IP)
 	ip_parser_temp := map[string][]string{}
 	data_list := []map[string]string{}
 

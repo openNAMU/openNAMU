@@ -12,7 +12,11 @@ func View_bbs_delete(config tool.Config, set_id string, set_code string, comment
 		return tool.Get_redirect("/bbs/main")
 	}
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	permission := "bbs_delete"
+	if comment_code != "" {
+		permission = "bbs_comment_manage"
+	}
+	if !tool.Check_permission(db, permission, config.IP) {
 		return tool.Get_redirect("/bbs/in/" + tool.Url_parser(set_id))
 	}
 

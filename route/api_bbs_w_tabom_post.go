@@ -23,7 +23,7 @@ func Api_bbs_w_tabom_post(config tool.Config, sub_code string) map[string]any {
 
 	return_data := make(map[string]any)
 
-	if !tool.Check_acl(db, "", "", "bbs_comment", config.IP) {
+	if !tool.Check_permission(db, "bbs_comment", config.IP) {
 		return_data["response"] = "require auth"
 	} else {
 		no_data := ""

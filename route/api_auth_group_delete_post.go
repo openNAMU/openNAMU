@@ -11,7 +11,7 @@ func Api_auth_group_delete_post(config tool.Config, name string) map[string]any 
 		return_data["response"] = "default"
 		return return_data
 	}
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "auth_group_manage", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

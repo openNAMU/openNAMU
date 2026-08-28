@@ -13,7 +13,7 @@ func View_alarm(config tool.Config, user_name string, values url.Values) string 
 		user_name = config.IP
 	}
 	is_change := values != nil && (values.Get("all") != "" || values.Get("delete") != "")
-	if !is_change && user_name != config.IP && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !is_change && user_name != config.IP && !tool.Check_permission(db, "owner", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if is_change {

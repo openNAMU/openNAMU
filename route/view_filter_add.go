@@ -18,7 +18,7 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 	if !ok {
 		return tool.Get_error_page(db, config, "error")
 	}
-	if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if values == nil && !tool.Check_permission(db, "filter_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

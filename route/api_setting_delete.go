@@ -8,7 +8,7 @@ func Api_setting_delete(config tool.Config, set_name string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	auth_info := tool.Check_acl(db, "", "", "owner_auth", config.IP)
+	auth_info := tool.Check_permission(db, "setting_delete", config.IP)
 
 	setting_acl := Setting_list()
 	return_data := make(map[string]any)

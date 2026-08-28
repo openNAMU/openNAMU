@@ -79,6 +79,10 @@ func Api_bbs(config tool.Config, bbs_num string, page string, sort_type string) 
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if bbs_num == "" && !tool.Check_permission(db, "bbs_main_view", config.IP) {
+		return map[string]any{"response": "require auth", "data": []map[string]string{}}
+	}
+
 	if bbs_num != "" && !tool.Check_acl(db, bbs_num, "", "bbs_view", config.IP) {
 		return map[string]any{"response": "require auth", "data": []map[string]string{}}
 	}
@@ -156,6 +160,10 @@ func Api_bbs(config tool.Config, bbs_num string, page string, sort_type string) 
 			err := rows_arr[for_a].Scan(&set_code, &set_id, &pinned)
 			if err != nil {
 				panic(err)
+			}
+
+			if bbs_num == "" && !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
+				continue
 			}
 
 			temp_data["set_code"] = set_code

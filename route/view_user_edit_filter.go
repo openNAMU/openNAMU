@@ -13,7 +13,7 @@ func View_user_edit_filter(config tool.Config, user_name string, values url.Valu
 	if user_name == "" {
 		user_name = config.IP
 	}
-	if values == nil && user_name != config.IP && !tool.Check_acl(db, "", "", "edit_filter_auth", config.IP) {
+	if values == nil && user_name != config.IP && !tool.Check_permission(db, "edit_filter_manage", config.IP) {
 		return tool.Get_redirect("/auth/give_list")
 	}
 	if values != nil {
@@ -47,7 +47,7 @@ func View_user_edit_filter(config tool.Config, user_name string, values url.Valu
 	}
 	rows.Close()
 	body += `</ul>`
-	if tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if tool.Check_permission(db, "user_edit_filter_manage", config.IP) {
 		body += `<hr class="main_hr"><form method="post"><button type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
 	}
 	return tool.Get_template(db, config, user_name, body, []any{tool.Get_language(db, "edit_filter", true)}, [][]any{{"auth/give_list", tool.Get_language(db, "return", true)}}, map[string]string{})

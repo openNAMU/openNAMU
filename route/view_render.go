@@ -11,6 +11,10 @@ func View_render(config tool.Config, doc_name string, rev string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if !tool.Check_permission(db, "history_view", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	data_api := Api_w_raw(config, doc_name, "", rev)
 	response, _ := data_api["response"].(string)
 	if response == "require auth" {

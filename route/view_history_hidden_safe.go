@@ -9,7 +9,7 @@ import (
 func View_history_hidden_safe(config tool.Config, doc_name string, rev string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if values == nil && !tool.Check_acl(db, "", "", "hidel_auth", config.IP) {
+	if values == nil && !tool.Check_permission(db, "hidel", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	hide := ""

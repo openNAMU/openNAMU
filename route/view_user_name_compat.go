@@ -14,7 +14,7 @@ func View_user_name_for(config tool.Config, target string, values url.Values) st
 			return tool.Get_redirect("/login")
 		}
 		target = config.IP
-	} else if values == nil && !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	} else if values == nil && !tool.Check_permission(db, "user_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

@@ -55,7 +55,7 @@ func View_user_safe(config tool.Config, user_name string) string {
 		`<li><a href="/topic/user:` + tool.Url_parser(user_name) + `">` + tool.Get_language(db, "user_discussion", true) + `</a></li>` +
 		`<li><a href="/count/` + tool.Url_parser(user_name) + `">` + tool.Get_language(db, "count", true) + `</a></li></ul>`
 
-	if tool.Check_acl(db, "", "", "give_auth", config.IP) {
+	if tool.Check_permission(db, "give", config.IP) {
 		ban_name := tool.Get_language(db, "ban", true)
 		user_auth := tool.Get_user_auth(db, user_name)
 		if tool.Auth_group_name_ban(user_auth) {

@@ -57,7 +57,7 @@ func Api_thread_post(config tool.Config, topic_num string, doc_name string, cont
 		if sub == "" {
 			sub = tool.Get_language(db, "make_new_topic", true)
 		}
-		if !tool.Check_acl(db, name, "0", "topic_view", config.IP) || !tool.Check_acl(db, name, "0", "topic", config.IP) || !tool.Check_acl(db, "", "", "discuss_make_new_thread", config.IP) {
+		if !tool.Check_acl(db, name, "0", "topic_view", config.IP) || !tool.Check_acl(db, name, "0", "topic", config.IP) || !tool.Check_permission(db, "discuss_make_new_thread", config.IP) {
 			return_data["response"] = "require auth"
 			return return_data
 		}

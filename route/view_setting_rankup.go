@@ -6,7 +6,7 @@ func View_setting_rankup(config tool.Config) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
+	if !tool.Check_permission(db, "rankup_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

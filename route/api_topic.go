@@ -72,7 +72,7 @@ func Api_topic(config tool.Config, tool_name string, topic_num string, s_num str
 		new_data["data"] = []map[string]string{}
 		data_slice := []map[string]string{}
 
-		admin_auth := tool.Check_acl(db, "", "", "toron_auth", config.IP)
+		admin_auth := tool.Check_permission(db, "thread_manage", config.IP)
 
 		var ip_pre string
 		var ip_render string

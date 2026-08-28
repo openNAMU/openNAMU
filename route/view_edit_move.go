@@ -40,7 +40,7 @@ func View_edit_move(config tool.Config, doc_name string, values url.Values) stri
 	if !tool.QueryRow_DB(db, "select title from data where title = ?", []any{&source_title}, doc_name) {
 		return tool.Get_redirect("/w/" + tool.Url_parser(doc_name))
 	}
-	owner_auth := tool.Check_acl(db, "", "", "owner_auth", config.IP)
+	owner_auth := tool.Check_permission(db, "document_move_manage", config.IP)
 	body := "<form method=\"post\">"
 	body += "<input name=\"title\" value=\"" + tool.HTML_escape(doc_name) + "\" placeholder=\"" + tool.Get_language(db, "document_name", true) + "\"><hr class=\"main_hr\">"
 	body += "<input name=\"send\" placeholder=\"" + tool.Get_language(db, "why", true) + "\"><hr class=\"main_hr\">"

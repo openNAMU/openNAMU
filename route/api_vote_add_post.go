@@ -15,7 +15,7 @@ func Api_vote_add_post(config tool.Config, data string) map[string]any {
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	if !tool.Check_acl(db, "", "", "vote", config.IP) {
+	if !tool.Check_permission(db, "vote", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}
