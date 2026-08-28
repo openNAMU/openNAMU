@@ -39,6 +39,7 @@ func Auth_choices() []Auth_choice {
 		{2, "trust_d", "trust_d_acl"},
 		{3, "trust_c", "trust_c_acl"},
 		{4, "trust_a", "trust_a_acl"},
+		{5, "large_edit", "large_edit_authority"},
 		{4, "trust_b", "trust_b_acl"},
 		{2, "login_available", "login_available_authority"},
 		{2, "register_available", "register_available_authority"},

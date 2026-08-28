@@ -655,6 +655,7 @@
     "admin_authority": "관리자 권한",
     "user_authority": "사용자 권한",
     "rankup_authority": "등급 상승 권한",
+    "large_edit_authority": "많은 내용 편집 권한",
     "do_email_verified_authority": "이메일 인증 권한",
     "admin_default_feature_authority": "관리자 기본 기능 권한",
     "captcha_pass_authority": "CAPTCHA 넘기기 권한",

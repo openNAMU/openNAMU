@@ -628,6 +628,7 @@
     "admin_authority": "Admin authority",
     "user_authority": "User authority",
     "rankup_authority": "Rank-up authority",
+    "large_edit_authority": "Large edit authority",
     "do_email_verified_authority": "Email verification authority",
     "admin_default_feature_authority": "Admin default feature authority",
     "captcha_pass_authority": "CAPTCHA pass authority",

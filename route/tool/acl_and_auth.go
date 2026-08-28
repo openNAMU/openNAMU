@@ -676,6 +676,10 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["trust_b"] = true
 	}
 
+	if _, ok := auth_info["trust_a"]; ok {
+		auth_info["large_edit"] = true
+	}
+
 	if auth_info["trust_a"] || auth_info["trust_b"] {
 		auth_info["user"] = true
 	}
