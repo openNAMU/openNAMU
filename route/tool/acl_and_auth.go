@@ -859,6 +859,18 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 	if !auth_info["site_view"] {
 		return false
 	}
+	if tool == "render" && strings.HasPrefix(name, "user:") && !auth_info["acl"] {
+		user_document_view_acl := ""
+		for _, setting_data := range Get_setting(db, "user_document_view_acl_all", "") {
+			if len(setting_data) > 1 && setting_data[1] == "" {
+				user_document_view_acl = setting_data[0]
+				break
+			}
+		}
+		if user_document_view_acl != "" && user_document_view_acl != "normal" && !Check_acl_group(db, user_document_view_acl, auth_info) {
+			return false
+		}
+	}
 
 	document_filter_action := ""
 	switch tool {

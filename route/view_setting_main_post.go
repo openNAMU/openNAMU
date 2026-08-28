@@ -9,6 +9,9 @@ func View_setting_main_post(config tool.Config, form map[string]string) string {
 	if !tool.Check_acl(db, "", "", "owner_auth", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
+	if !acl_value_valid(db, form["user_document_view_acl_all"]) {
+		return tool.Get_error_page(db, config, "error")
+	}
 
 	fields := setting_main_fields()
 	setting_save_fields(db, fields, form)

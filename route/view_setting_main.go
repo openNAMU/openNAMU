@@ -204,6 +204,7 @@ func setting_main_fields() []setting_field {
 		{name: "history_recording_off", default_value: ""},
 		{name: "namumark_compatible", default_value: ""},
 		{name: "user_name_view", default_value: ""},
+		{name: "user_document_view_acl_all", default_value: ""},
 		{name: "link_case_insensitive", default_value: ""},
 		{name: "move_with_redirect", default_value: ""},
 		{name: "slow_thread", default_value: ""},
@@ -296,6 +297,8 @@ func view_setting_main_data(db *sql.DB, config tool.Config, values map[string]st
 	data.WriteString(`<label><input type="checkbox" name="reg" ` + setting_checked(values["reg"]) + `> ` + lang("no_register") + `</label>` + setting_hr())
 	data.WriteString(`<label><input type="checkbox" name="ip_view" ` + setting_checked(values["ip_view"]) + `> ` + lang("hide_ip") + `</label>` + setting_hr())
 	data.WriteString(`<label><input type="checkbox" name="user_name_view" ` + setting_checked(values["user_name_view"]) + `> ` + lang("hide_user_name") + `</label>` + setting_hr())
+	data.WriteString(`<span>` + lang("user_document_view_acl_all") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + setting_hr())
+	data.WriteString(bbs_set_select(db, "user_document_view_acl_all", values["user_document_view_acl_all"], acl_value_list(db, values["user_document_view_acl_all"])) + setting_hr())
 	data.WriteString(`<label><input type="checkbox" name="requires_approval" ` + setting_checked(values["requires_approval"]) + `> ` + lang("requires_approval") + `</label>` + setting_hr())
 	data.WriteString(`<span>` + lang("password_min_length") + `</span> (` + lang("off") + ` : ` + lang("empty") + `)` + setting_hr())
 	data.WriteString(setting_input("password_min_length", values["password_min_length"], "text") + setting_hr())

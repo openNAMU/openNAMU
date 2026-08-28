@@ -145,6 +145,7 @@
     "sub": "하위",
     "template": "템플릿 문서",
     "user_document_acl": "사용자 문서 ACL",
+    "user_document_view_acl_all": "전체 사용자 문서 보기 ACL",
     "password_confirm": "비밀번호 확인",
     "pinned": "고정",
     "edit_filter_add": "편집 필터 추가",

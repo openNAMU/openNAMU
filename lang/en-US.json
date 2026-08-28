@@ -720,6 +720,7 @@
     "thread_acl": "Thread ACL",
     "view_acl": "Reading ACL",
     "user_document_acl": "User document ACL",
+    "user_document_view_acl_all": "All user document view ACL",
     "upload_acl": "Upload ACL",
     "many_upload_acl": "Upload multiple files ACL",
     "vote_acl": "Vote ACL",
