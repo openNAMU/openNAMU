@@ -325,7 +325,26 @@ func Check_acl_group(db *sql.DB, acl_data string, auth_info map[string]bool) boo
 	return false
 }
 
-func check_document_filter_acl(db *sql.DB, doc_name string, auth_info map[string]bool) (bool, bool) {
+func get_document_filter_acl(data string, action string) (string, bool) {
+	data = strings.ReplaceAll(data, "\r", "")
+	if !strings.Contains(data, "=") {
+		if action == "edit" {
+			return strings.TrimSpace(data), true
+		}
+		return "", false
+	}
+
+	for _, line := range strings.Split(data, "\n") {
+		parts := strings.SplitN(strings.TrimSpace(line), "=", 2)
+		if len(parts) == 2 && strings.TrimSpace(parts[0]) == action {
+			return strings.TrimSpace(parts[1]), true
+		}
+	}
+
+	return "", false
+}
+
+func check_document_filter_acl(db *sql.DB, doc_name string, action string, auth_info map[string]bool) (bool, bool) {
 	rows := Query_DB(
 		db,
 		"select plus, plus_t from html_filter where kind = 'document'",
@@ -347,6 +366,11 @@ func check_document_filter_acl(db *sql.DB, doc_name string, auth_info map[string
 
 		match, err := regex.MatchString(doc_name)
 		if err != nil || !match {
+			continue
+		}
+
+		acl_data, ok := get_document_filter_acl(acl_data, action)
+		if !ok {
 			continue
 		}
 
@@ -835,8 +859,22 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 	if !auth_info["site_view"] {
 		return false
 	}
-	if tool == "document_edit" && !auth_info["acl"] {
-		if matched, allowed := check_document_filter_acl(db, name, auth_info); matched {
+
+	document_filter_action := ""
+	switch tool {
+	case "render":
+		document_filter_action = "view"
+	case "document_edit":
+		document_filter_action = "edit"
+	case "document_move":
+		document_filter_action = "move"
+	case "document_delete":
+		document_filter_action = "delete"
+	case "document_make_acl":
+		document_filter_action = "new_make"
+	}
+	if document_filter_action != "" && !auth_info["acl"] {
+		if matched, allowed := check_document_filter_acl(db, name, document_filter_action, auth_info); matched {
 			return allowed
 		}
 	}

@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"opennamu/route/tool"
+
+	"github.com/dlclark/regexp2"
 )
 
 func View_filter_add(config tool.Config, kind string, name string, values url.Values) string {
@@ -84,21 +86,22 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = 'regex_filter'", filter_name)
 			tool.Exec_DB(db, "insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, 'regex_filter')", filter_name, content, end)
 		} else if kind == "document" {
-			if !acl_value_valid(db, values.Get("acl")) {
+			acl_data, acl_ok := document_filter_acl_data(db, values.Get("acl"))
+			if !acl_ok {
 				return tool.Get_error_page(db, config, "error")
 			}
 			doc_name := values.Get("name")
 			if doc_name == "" {
 				return tool.Get_redirect("/filter/document")
 			}
-			if _, err := regexp.Compile(values.Get("regex")); err != nil {
+			if _, err := regexp2.Compile(values.Get("regex"), 0); err != nil {
 				return tool.Get_error_page(db, config, "error")
 			}
 			if name != "" && name != doc_name {
 				tool.Exec_DB(db, "delete from html_filter where html = ? and kind = 'document'", name)
 			}
 			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = 'document'", doc_name)
-			tool.Exec_DB(db, "insert into html_filter (html, kind, plus, plus_t) values (?, 'document', ?, ?)", doc_name, values.Get("regex"), values.Get("acl"))
+			tool.Exec_DB(db, "insert into html_filter (html, kind, plus, plus_t) values (?, 'document', ?, ?)", doc_name, values.Get("regex"), acl_data)
 		} else {
 			plus := ""
 			switch kind {
@@ -161,7 +164,7 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 	case "document":
 		form += filter_input(tool.Get_language(db, "name", true), "name", name)
 		form += `<hr class="main_hr">` + filter_input(tool.Get_language(db, "regex", true), "regex", value[1])
-		form += `<hr class="main_hr">` + filter_select("acl", acl_value_list(db, value[2]), value[2])
+		form += `<hr class="main_hr"><span>` + tool.Get_language(db, "acl", true) + `</span><hr class="main_hr"><textarea name="acl" placeholder="view=normal&#10;edit=trust_a&#10;move=owner&#10;delete=owner&#10;new_make=trust_a">` + tool.HTML_escape(value[2]) + `</textarea>`
 	case "name_filter", "file_filter":
 		form += filter_input(tool.Get_language(db, "regex", true), "title", name)
 	case "email_filter":
@@ -252,4 +255,49 @@ func filter_select(name string, values []string, selected string) string {
 		data += `<option value="` + option_value + `"` + selected_text + `>` + option_name + `</option>`
 	}
 	return data + `</select>`
+}
+
+func document_filter_acl_data(db *sql.DB, data string) (string, bool) {
+	data = strings.ReplaceAll(data, "\r", "")
+	if !strings.Contains(data, "=") {
+		data = strings.TrimSpace(data)
+		if data == "normal" || acl_value_valid(db, data) {
+			return data, true
+		}
+		return "", false
+	}
+
+	valid_action := map[string]bool{
+		"view":     true,
+		"edit":     true,
+		"move":     true,
+		"delete":   true,
+		"new_make": true,
+	}
+	seen := map[string]bool{}
+	acl_list := []string{}
+	for _, line := range strings.Split(data, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			return "", false
+		}
+		action := strings.TrimSpace(parts[0])
+		acl := strings.TrimSpace(parts[1])
+		if !valid_action[action] || seen[action] || (acl != "normal" && !acl_value_valid(db, acl)) {
+			return "", false
+		}
+
+		seen[action] = true
+		acl_list = append(acl_list, action+"="+acl)
+	}
+
+	if len(acl_list) == 0 {
+		return "", false
+	}
+	return strings.Join(acl_list, "\n"), true
 }
