@@ -325,6 +325,40 @@ func Check_acl_group(db *sql.DB, acl_data string, auth_info map[string]bool) boo
 	return false
 }
 
+func check_document_filter_acl(db *sql.DB, doc_name string, auth_info map[string]bool) (bool, bool) {
+	rows := Query_DB(
+		db,
+		"select plus, plus_t from html_filter where kind = 'document'",
+	)
+	defer rows.Close()
+
+	matched := false
+	for rows.Next() {
+		pattern := ""
+		acl_data := ""
+		if rows.Scan(&pattern, &acl_data) != nil {
+			continue
+		}
+
+		regex, err := regexp2.Compile(pattern, 0)
+		if err != nil {
+			continue
+		}
+
+		match, err := regex.MatchString(doc_name)
+		if err != nil || !match {
+			continue
+		}
+
+		matched = true
+		if acl_data == "" || acl_data == "normal" || Check_acl_group(db, acl_data, auth_info) {
+			return true, true
+		}
+	}
+
+	return matched, false
+}
+
 func Rankup_group_list() []string {
 	return []string{"trust_a", "trust_b", "trust_c", "trust_d"}
 }
@@ -800,6 +834,11 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 	ip_or_user := IP_or_user(ip)
 	if !auth_info["site_view"] {
 		return false
+	}
+	if tool == "document_edit" && !auth_info["acl"] {
+		if matched, allowed := check_document_filter_acl(db, name, auth_info); matched {
+			return allowed
+		}
 	}
 
 	if tool == "" && name != "" {

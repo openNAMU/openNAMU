@@ -38,7 +38,7 @@ func View_filter(config tool.Config, kind string) string {
 		}
 
 		data += `<tr><td>` + tool.HTML_escape(name)
-		if can_edit && kind != "document" && kind != "email_filter" && kind != "name_filter" && kind != "file_filter" && kind != "extension_filter" && kind != "image_license" {
+		if can_edit && kind != "email_filter" && kind != "name_filter" && kind != "file_filter" && kind != "extension_filter" && kind != "image_license" {
 			data += ` <a href="/filter/` + kind + `/add/` + tool.Url_parser(name) + `">(` + tool.Get_language(db, "edit", true) + `)</a>`
 		}
 		if can_edit {
