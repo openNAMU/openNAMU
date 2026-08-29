@@ -250,7 +250,7 @@ func check_update_version() {
 		return
 	}
 
-	if now_version == "20250527" || now_version == "20250529" {
+	if now_version == "20250527" || now_version == "20250529" || now_version == "20251201" {
 		return
 	}
 
