@@ -39,22 +39,25 @@ func view_setting_external_data(db *sql.DB, config tool.Config, values map[strin
 	}
 
 	recaptcha_labels := map[string]string{
-		"":   "reCAPTCHA v2",
-		"v3": "reCAPTCHA v3",
-		"h":  "hCAPTCHA",
-		"cf": "Turnstile",
+		"":              "reCAPTCHA v2",
+		"v3":            "reCAPTCHA v3",
+		"h":             "hCAPTCHA",
+		"cf":            "Turnstile",
+		"altcha_low":    "ALTCHA Low",
+		"altcha_medium": "ALTCHA Medium",
+		"altcha_high":   "ALTCHA High",
 	}
 
 	data := strings.Builder{}
 	data.WriteString(`<form method="post">`)
 	data.WriteString(`<h2>` + lang("captcha") + `</h2>`)
-	data.WriteString(`<a href="https://www.google.com/recaptcha/">(` + lang("recaptcha") + `)</a> <a href="https://www.hcaptcha.com/">(` + lang("hcaptcha") + `)</a>` + setting_hr())
+	data.WriteString(`<a href="https://www.google.com/recaptcha/">(` + lang("recaptcha") + `)</a> <a href="https://www.hcaptcha.com/">(` + lang("hcaptcha") + `)</a> <a href="https://altcha.org/">(ALTCHA)</a>` + setting_hr())
 	data.WriteString(`<span>` + lang("public_key") + `</span>` + setting_hr())
 	data.WriteString(setting_input("recaptcha", values["recaptcha"], "text") + setting_hr())
 	data.WriteString(`<span>` + lang("secret_key") + `</span>` + setting_hr())
 	data.WriteString(setting_input("sec_re", values["sec_re"], "text") + setting_hr())
 	data.WriteString(`<span>` + lang("version") + `</span>` + setting_hr())
-	data.WriteString(`<select name="recaptcha_ver">` + setting_options(values["recaptcha_ver"], []string{"", "v3", "h", "cf"}, recaptcha_labels) + `</select>` + setting_hr())
+	data.WriteString(`<select name="recaptcha_ver">` + setting_options(values["recaptcha_ver"], []string{"", "v3", "h", "cf", "altcha_low", "altcha_medium", "altcha_high"}, recaptcha_labels) + `</select>` + setting_hr())
 
 	data.WriteString(`<h2>` + lang("email_setting") + `</h2>`)
 	data.WriteString(`<a href="/setting/phrase#s-6">(` + lang("text_setting") + `)</a>` + setting_hr())

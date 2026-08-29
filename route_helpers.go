@@ -19,7 +19,7 @@ func make_route_config(c *gin.Context) tool.Config {
 }
 
 func captcha_response(c *gin.Context) string {
-	return tool.Captcha_response(c.PostForm("g-recaptcha"), c.PostForm("g-recaptcha-response"), c.PostForm("h-captcha-response"), c.PostForm("cf-turnstile-response"))
+	return tool.Captcha_response(c.PostForm("g-recaptcha"), c.PostForm("g-recaptcha-response"), c.PostForm("h-captcha-response"), c.PostForm("cf-turnstile-response"), c.PostForm("altcha"))
 }
 
 func parse_bbs_code(value string) (string, string) {

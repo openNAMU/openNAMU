@@ -15,7 +15,7 @@ func View_delete_multiple(config tool.Config, values url.Values) string {
 	}
 
 	if values != nil {
-		if !tool.Captcha_check(db, config.Session, config.IP, tool.Captcha_response(values.Get("g-recaptcha"), values.Get("g-recaptcha-response"), values.Get("h-captcha-response"), values.Get("cf-turnstile-response"))) {
+		if !tool.Captcha_check(db, config.Session, config.IP, tool.Captcha_response(values.Get("g-recaptcha"), values.Get("g-recaptcha-response"), values.Get("h-captcha-response"), values.Get("cf-turnstile-response"), values.Get("altcha"))) {
 			return tool.Get_error_page(db, config, "recaptcha")
 		}
 		api_data := Api_edit_delete_multiple_post(config, values.Get("content"), values.Get("send"), values.Get("copyright_agreement"))

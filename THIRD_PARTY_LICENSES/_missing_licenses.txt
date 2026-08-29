@@ -1,0 +1,1 @@
+github.com/altcha-org/altcha-lib-go/v2@v2.0.0-20260725115309-2c4fc27a7b2d (Dir: /home/spdv/go/pkg/mod/github.com/altcha-org/altcha-lib-go/v2@v2.0.0-20260725115309-2c4fc27a7b2d)

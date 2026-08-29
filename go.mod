@@ -4,6 +4,7 @@ go 1.25.0
 
 require (
 	github.com/3th1nk/cidr v0.2.0
+	github.com/altcha-org/altcha-lib-go/v2 v2.0.0-20260725115309-2c4fc27a7b2d
 	github.com/dlclark/regexp2 v1.11.0
 	github.com/flosch/pongo2/v6 v6.0.0
 	github.com/gin-contrib/sessions v1.1.0

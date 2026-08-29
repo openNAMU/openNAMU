@@ -4,6 +4,7 @@ import "github.com/gin-gonic/gin"
 
 func register_routes(r *gin.Engine) {
 	register_access_routes(r)
+	register_captcha_routes(r)
 	register_api_routes(r)
 	register_api_compat_routes(r)
 	register_api_block_compat_routes(r)

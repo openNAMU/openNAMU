@@ -701,28 +701,11 @@ func Get_captcha_ui(db *sql.DB, config Config) string {
 	data := ""
 
 	if !Check_acl(db, "", "", "recaptcha", config.IP) {
-		pub_key := ""
-		QueryRow_DB(
-			db,
-			`select data from other where name = "recaptcha"`,
-			[]any{&pub_key},
-		)
+		pub_key, sec_key, rec_ver := captcha_setting(db)
 
-		sec_key := ""
-		QueryRow_DB(
-			db,
-			`select data from other where name = "sec_re"`,
-			[]any{&sec_key},
-		)
-
-		if pub_key != "" && sec_key != "" {
-			rec_ver := ""
-			QueryRow_DB(
-				db,
-				`select data from other where name = "recaptcha_ver"`,
-				[]any{&rec_ver},
-			)
-
+		if _, altcha_enabled := captcha_altcha_cost(rec_ver); altcha_enabled && sec_key != "" {
+			data += `<script async defer type="module" src="https://cdn.jsdelivr.net/npm/altcha@3.2.2/dist/main/altcha.i18n.min.js"></script><altcha-widget challenge="/api/altcha/challenge"></altcha-widget><hr class="main_hr">`
+		} else if pub_key != "" && sec_key != "" {
 			switch rec_ver {
 			case "":
 				data += `

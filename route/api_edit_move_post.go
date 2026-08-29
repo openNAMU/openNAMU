@@ -272,7 +272,7 @@ func move_document_normal(config tool.Config, db *sql.DB, old_name string, new_n
 }
 
 func move_captcha_normal(values url.Values) string {
-	return tool.Captcha_response(values.Get("g-recaptcha"), values.Get("g-recaptcha-response"), values.Get("h-captcha-response"), values.Get("cf-turnstile-response"))
+	return tool.Captcha_response(values.Get("g-recaptcha"), values.Get("g-recaptcha-response"), values.Get("h-captcha-response"), values.Get("cf-turnstile-response"), values.Get("altcha"))
 }
 
 func Api_edit_move_post(config tool.Config, doc_name string, values url.Values) map[string]any {

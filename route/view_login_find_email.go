@@ -10,7 +10,7 @@ func View_login_find_email(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 	if values != nil {
-		captcha := tool.Captcha_response(values.Get("g-recaptcha"), values.Get("g-recaptcha-response"), values.Get("h-captcha-response"), values.Get("cf-turnstile-response"))
+		captcha := tool.Captcha_response(values.Get("g-recaptcha"), values.Get("g-recaptcha-response"), values.Get("h-captcha-response"), values.Get("cf-turnstile-response"), values.Get("altcha"))
 		if !tool.Captcha_check(db, config.Session, config.IP, captcha) {
 			return tool.Get_error_page(db, config, "recaptcha")
 		}
