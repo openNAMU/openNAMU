@@ -163,6 +163,21 @@ func register_api_routes(r *gin.Engine) {
 		c.JSON(http.StatusOK, route_data)
 	})
 
+	r.GET("/api/v2/bbs/in/:set_id/comment/:page", func(c *gin.Context) {
+		route_data := route.Api_bbs(make_route_config(c), c.Param("set_id"), c.Param("page"), "comment")
+		c.JSON(http.StatusOK, route_data)
+	})
+
+	r.GET("/api/v2/bbs/in/:set_id/tabom/:page", func(c *gin.Context) {
+		route_data := route.Api_bbs(make_route_config(c), c.Param("set_id"), c.Param("page"), "tabom")
+		c.JSON(http.StatusOK, route_data)
+	})
+
+	r.GET("/api/v2/bbs/in/:set_id/filter/*filter_data", func(c *gin.Context) {
+		route_data := route.Api_bbs_filter(make_route_config(c), c.Param("set_id"), c.Param("filter_data"))
+		c.JSON(http.StatusOK, route_data)
+	})
+
 	r.GET("/api/v2/bbs/set/:set_id/:set_name", func(c *gin.Context) {
 		route_data := route.Api_bbs_w_set(make_route_config(c), c.Param("set_id"), c.Param("set_name"))
 		c.JSON(http.StatusOK, route_data)

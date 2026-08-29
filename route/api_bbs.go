@@ -2,6 +2,7 @@ package route
 
 import (
 	"database/sql"
+	"strconv"
 	"strings"
 
 	"opennamu/route/tool"
@@ -75,7 +76,119 @@ func bbs_post_view_sql(db *sql.DB, set_id string, ip string, row_alias string) (
 	return view_sql, view_values
 }
 
+type bbs_filter struct {
+	comment_min int
+	tabom_min   int
+	tag         string
+}
+
+func bbs_filter_number(data string) int {
+	num := tool.Str_to_int(data)
+	if num < 0 {
+		return 0
+	}
+
+	return num
+}
+
+func bbs_filter_parse(data string) bbs_filter {
+	data = strings.Trim(data, "/")
+	parts := strings.Split(data, "/")
+	filter := bbs_filter{}
+
+	for i := 0; i+1 < len(parts); {
+		if parts[i] == "tag" {
+			filter.tag = strings.TrimSpace(strings.Join(parts[i+1:], "/"))
+			break
+		}
+
+		value := bbs_filter_number(parts[i+1])
+		switch parts[i] {
+		case "comment":
+			filter.comment_min = value
+		case "tabom":
+			filter.tabom_min = value
+		}
+		i += 2
+	}
+
+	return filter
+}
+
+func bbs_filter_path(filter bbs_filter) string {
+	path := []string{}
+	if filter.comment_min > 0 {
+		path = append(path, "comment", strconv.Itoa(filter.comment_min))
+	}
+	if filter.tabom_min > 0 {
+		path = append(path, "tabom", strconv.Itoa(filter.tabom_min))
+	}
+	if filter.tag != "" {
+		path = append(path, "tag", tool.Url_parser(filter.tag))
+	}
+
+	return strings.Join(path, "/")
+}
+
+func bbs_filter_path_data(data string) (string, string) {
+	parts := strings.Split(strings.Trim(data, "/"), "/")
+	if len(parts) == 0 || parts[0] == "" {
+		return "1", ""
+	}
+
+	page := parts[len(parts)-1]
+	if tool.Str_to_int(page) < 1 {
+		page = "1"
+	}
+
+	return page, strings.Join(parts[:len(parts)-1], "/")
+}
+
+func bbs_post_comment_count_sql(row_alias string) string {
+	post_id_sql := row_alias + ".set_id || '-' || " + row_alias + ".set_code"
+	post_reply_id_sql := row_alias + ".set_id || '-' || " + row_alias + ".set_code || '-%'"
+	if tool.Get_DB_type() == "mysql" {
+		post_id_sql = "concat(" + row_alias + ".set_id, '-', " + row_alias + ".set_code)"
+		post_reply_id_sql = "concat(" + row_alias + ".set_id, '-', " + row_alias + ".set_code, '-%')"
+	}
+
+	return "(select count(*) from bbs_data comment_data where comment_data.set_name = 'comment_date' and (comment_data.set_id = " + post_id_sql + " or comment_data.set_id like " + post_reply_id_sql + "))"
+}
+
+func bbs_post_tabom_count_sql(row_alias string) string {
+	return "coalesce((select set_data from bbs_data tabom_data where tabom_data.set_name = 'tabom_count' and tabom_data.set_id = " + row_alias + ".set_id and tabom_data.set_code = " + row_alias + ".set_code limit 1), '0') + 0"
+}
+
+func bbs_filter_sql(filter bbs_filter, row_alias string) (string, []any) {
+	filter_sql := ""
+	filter_values := []any{}
+
+	if filter.comment_min > 0 {
+		filter_sql += " and " + bbs_post_comment_count_sql(row_alias) + " >= ?"
+		filter_values = append(filter_values, filter.comment_min)
+	}
+	if filter.tabom_min > 0 {
+		filter_sql += " and " + bbs_post_tabom_count_sql(row_alias) + " >= ?"
+		filter_values = append(filter_values, filter.tabom_min)
+	}
+	if filter.tag != "" {
+		filter_sql += " and exists (select 1 from bbs_data tag_data where tag_data.set_name = 'tag' and tag_data.set_id = " + row_alias + ".set_id and tag_data.set_code = " + row_alias + ".set_code and tag_data.set_data = ?)"
+		filter_values = append(filter_values, filter.tag)
+	}
+
+	return filter_sql, filter_values
+}
+
 func Api_bbs(config tool.Config, bbs_num string, page string, sort_type string) map[string]any {
+	return api_bbs(config, bbs_num, page, sort_type, bbs_filter{})
+}
+
+func Api_bbs_filter(config tool.Config, bbs_num string, filter_data string) map[string]any {
+	page, filter_path := bbs_filter_path_data(filter_data)
+	return api_bbs(config, bbs_num, page, "", bbs_filter_parse(filter_path))
+}
+
+func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, filter bbs_filter) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -106,12 +219,15 @@ func Api_bbs(config tool.Config, bbs_num string, page string, sort_type string) 
 		}
 
 		view_sql, view_values := bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
+		filter_sql, filter_values := bbs_filter_sql(filter, "bbs_data")
 		query := "select set_code, set_id, '1' from bbs_data where set_name = 'pinned' and set_id like ?"
 		values := []any{bbs_num}
 		if view_sql != "" {
 			query += " and " + view_sql
 			values = append(values, view_values...)
 		}
+		query += filter_sql
+		values = append(values, filter_values...)
 		query += " order by set_data desc"
 		rows := tool.Query_DB(db, query, values...)
 
@@ -119,23 +235,57 @@ func Api_bbs(config tool.Config, bbs_num string, page string, sort_type string) 
 
 		if sort_type == "view" {
 			view_sql, view_values = bbs_post_view_sql(db, bbs_num, config.IP, "title")
+			filter_sql, filter_values := bbs_filter_sql(filter, "title")
 			query = "select title.set_code, title.set_id, '0' from bbs_data title left join bbs_data view_data on view_data.set_name = 'view_count' and view_data.set_id = title.set_id and view_data.set_code = title.set_code where title.set_name = 'title' and title.set_id like ?"
 			values = []any{bbs_num}
 			if view_sql != "" {
 				query += " and " + view_sql
 				values = append(values, view_values...)
 			}
+			query += filter_sql
+			values = append(values, filter_values...)
 			query += " order by coalesce(view_data.set_data, '0') + 0 desc, title.set_code + 0 desc limit ?, 50"
+			values = append(values, num)
+			rows = tool.Query_DB(db, query, values...)
+		} else if sort_type == "comment" {
+			view_sql, view_values = bbs_post_view_sql(db, bbs_num, config.IP, "title")
+			filter_sql, filter_values := bbs_filter_sql(filter, "title")
+			query = "select title.set_code, title.set_id, '0' from bbs_data title where title.set_name = 'title' and title.set_id like ?"
+			values = []any{bbs_num}
+			if view_sql != "" {
+				query += " and " + view_sql
+				values = append(values, view_values...)
+			}
+			query += filter_sql
+			values = append(values, filter_values...)
+			query += " order by " + bbs_post_comment_count_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
+			values = append(values, num)
+			rows = tool.Query_DB(db, query, values...)
+		} else if sort_type == "tabom" {
+			view_sql, view_values = bbs_post_view_sql(db, bbs_num, config.IP, "title")
+			filter_sql, filter_values := bbs_filter_sql(filter, "title")
+			query = "select title.set_code, title.set_id, '0' from bbs_data title where title.set_name = 'title' and title.set_id like ?"
+			values = []any{bbs_num}
+			if view_sql != "" {
+				query += " and " + view_sql
+				values = append(values, view_values...)
+			}
+			query += filter_sql
+			values = append(values, filter_values...)
+			query += " order by " + bbs_post_tabom_count_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		} else {
 			view_sql, view_values = bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
+			filter_sql, filter_values := bbs_filter_sql(filter, "bbs_data")
 			query = "select set_code, set_id, '0' from bbs_data where set_name = 'title' and set_id like ?"
 			values = []any{bbs_num}
 			if view_sql != "" {
 				query += " and " + view_sql
 				values = append(values, view_values...)
 			}
+			query += filter_sql
+			values = append(values, filter_values...)
 			query += " order by set_code + 0 desc limit ?, 50"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)

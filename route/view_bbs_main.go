@@ -67,7 +67,7 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 			if bottom != "" {
 				bottom += ", "
 			}
-			bottom += "#" + tool.HTML_escape(tag)
+			bottom += `<a href="/bbs/in/` + tool.Url_parser(bbs_id) + `/filter/tag/` + tool.Url_parser(tag) + `/1">#` + tool.HTML_escape(tag) + `</a>`
 		}
 		data_html += date_ui
 		data_html += tool.Get_list_ui(left, right, bottom, class_name)

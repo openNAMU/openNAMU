@@ -112,6 +112,31 @@ func register_bbs_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.GET("/bbs/in/:set_id/comment/:page_num", func(c *gin.Context) {
+		route_data := route.View_bbs_in(make_route_config(c), c.Param("set_id"), c.Param("page_num"), "comment")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/bbs/in/:set_id/tabom/:page_num", func(c *gin.Context) {
+		route_data := route.View_bbs_in(make_route_config(c), c.Param("set_id"), c.Param("page_num"), "tabom")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/bbs/in/:set_id/filter/*filter_data", func(c *gin.Context) {
+		route_data := route.View_bbs_in_filter(make_route_config(c), c.Param("set_id"), c.Param("filter_data"))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.POST("/bbs/in/:set_id/filter", func(c *gin.Context) {
+		route_data := route.View_bbs_in_filter_post(
+			c.Param("set_id"),
+			c.PostForm("comment_min"),
+			c.PostForm("tabom_min"),
+			c.PostForm("tag"),
+		)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/bbs/set/:set_id", func(c *gin.Context) {
 		route_data := route.View_bbs_set(make_route_config(c), c.Param("set_id"), nil)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
