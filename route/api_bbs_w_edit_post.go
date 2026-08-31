@@ -107,7 +107,6 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 
 			return return_data
 		}
-
 		tool.Exec_DB(
 			db,
 			"update bbs_data set set_data = ? where set_name = 'comment' and set_code = ? and set_id = ?",
@@ -155,6 +154,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 			{"data", data},
 			{"date", date},
 			{"user_id", config.IP},
+			{"comment_count", "0"},
 		}
 		if prefix != "" {
 			insert_db = append(insert_db, []string{"prefix", prefix})

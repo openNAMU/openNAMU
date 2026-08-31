@@ -145,14 +145,48 @@ func bbs_filter_path_data(data string) (string, string) {
 }
 
 func bbs_post_comment_count_sql(row_alias string) string {
-	post_id_sql := row_alias + ".set_id || '-' || " + row_alias + ".set_code"
-	post_reply_id_sql := row_alias + ".set_id || '-' || " + row_alias + ".set_code || '-%'"
-	if tool.Get_DB_type() == "mysql" {
-		post_id_sql = "concat(" + row_alias + ".set_id, '-', " + row_alias + ".set_code)"
-		post_reply_id_sql = "concat(" + row_alias + ".set_id, '-', " + row_alias + ".set_code, '-%')"
+	return "coalesce((select set_data from bbs_data comment_count_data where comment_count_data.set_name = 'comment_count' and comment_count_data.set_id = " + row_alias + ".set_id and comment_count_data.set_code = " + row_alias + ".set_code limit 1), '0') + 0"
+}
+
+func bbs_post_comment_count_update(db *sql.DB, set_id string, set_code string, change int) {
+	if change == 0 {
+		return
 	}
 
-	return "(select count(*) from bbs_data comment_data where comment_data.set_name = 'comment_date' and (comment_data.set_id = " + post_id_sql + " or comment_data.set_id like " + post_reply_id_sql + "))"
+	comment_count := "0"
+	exists := tool.QueryRow_DB(
+		db,
+		"select set_data from bbs_data where set_name = 'comment_count' and set_id = ? and set_code = ? limit 1",
+		[]any{&comment_count},
+		set_id,
+		set_code,
+	)
+
+	if !exists {
+		if change > 0 {
+			tool.Exec_DB(
+				db,
+				"insert into bbs_data (set_name, set_id, set_code, set_data) values ('comment_count', ?, ?, ?)",
+				set_id,
+				set_code,
+				strconv.Itoa(change),
+			)
+		}
+		return
+	}
+
+	comment_count_int := tool.Str_to_int(comment_count) + change
+	if comment_count_int < 0 {
+		comment_count_int = 0
+	}
+
+	tool.Exec_DB(
+		db,
+		"update bbs_data set set_data = ? where set_name = 'comment_count' and set_id = ? and set_code = ?",
+		strconv.Itoa(comment_count_int),
+		set_id,
+		set_code,
+	)
 }
 
 func bbs_post_tabom_count_sql(row_alias string) string {

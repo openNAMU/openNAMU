@@ -149,6 +149,7 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 			value[1],
 		)
 	}
+	bbs_post_comment_count_update(db, set_id, set_code, 1)
 
 	end_code := comment_code
 	if bbs_type != "thread" && comment_select != "" && comment_select != "0" {

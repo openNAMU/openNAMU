@@ -37,6 +37,7 @@ func Api_bbs_w_post(config tool.Config, set_id string, title string, data string
 		{"data", data},
 		{"date", date_now},
 		{"user_id", config.IP},
+		{"comment_count", "0"},
 	}
 	for _, v := range insert_db {
 		tool.Exec_DB(

@@ -46,15 +46,11 @@ func View_record_bbs_legacy(config tool.Config, user_name string, page string) s
 
 		post_user := record_bbs_legacy_value(db, "user_id", set_id, set_code)
 		title := record_bbs_legacy_value(db, "title", set_id, set_code)
+		comment_count := record_bbs_legacy_value(db, "comment_count", set_id, set_code)
+		if comment_count == "" {
+			comment_count = "0"
+		}
 		root_id := set_id + "-" + set_code
-		comment_count := "0"
-		tool.QueryRow_DB(
-			db,
-			"select count(*) from bbs_data where set_name = 'comment_date' and (set_id = ? or set_id like ?)",
-			[]any{&comment_count},
-			root_id,
-			root_id+"-%",
-		)
 		last_comment_date := ""
 		tool.QueryRow_DB(
 			db,

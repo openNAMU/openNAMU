@@ -59,6 +59,9 @@ func Api_bbs_w_comment_one_delete(config tool.Config, set_id string, set_code st
 
 		return return_data
 	}
+	if comment != "" {
+		bbs_post_comment_count_update(db, set_id, post_code, -1)
+	}
 
 	tool.Exec_DB(
 		db,

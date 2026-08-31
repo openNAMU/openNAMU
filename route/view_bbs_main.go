@@ -21,8 +21,7 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 		bbs_date := in_data["date"]
 		bbs_user_id := in_data["user_id_render"]
 
-		bbs_comment_length_api := Api_bbs_w_comment(config, "length", bbs_id+"-"+bbs_code)
-		bbs_comment_length := bbs_comment_length_api["data"].(int)
+		bbs_comment_length := tool.Str_to_int(in_data["comment_count"])
 
 		bbs_comment_length_str := strconv.Itoa(bbs_comment_length)
 

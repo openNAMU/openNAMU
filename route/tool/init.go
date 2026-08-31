@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -535,6 +536,72 @@ func init_rankup_conditions(db *sql.DB) {
 	)
 }
 
+func init_bbs_comment_count(db *sql.DB) {
+	initialized := ""
+	if QueryRow_DB(
+		db,
+		"select data from other where name = 'bbs_comment_count_initialized' limit 1",
+		[]any{&initialized},
+	) {
+		return
+	}
+
+	rows := Query_DB(
+		db,
+		"select set_id, set_code from bbs_data where set_name = 'title'",
+	)
+	post_list := [][]string{}
+	for rows.Next() {
+		post_data := []string{"", ""}
+		if rows.Scan(&post_data[0], &post_data[1]) == nil {
+			post_list = append(post_list, post_data)
+		}
+	}
+	rows.Close()
+
+	for _, post_data := range post_list {
+		post_id := post_data[0] + "-" + post_data[1]
+		comment_count := 0
+		QueryRow_DB(
+			db,
+			"select count(*) from bbs_data where set_name = 'comment' and set_data != '' and (set_id = ? or set_id like ?)",
+			[]any{&comment_count},
+			post_id,
+			post_id+"-%",
+		)
+
+		current := ""
+		if QueryRow_DB(
+			db,
+			"select set_data from bbs_data where set_name = 'comment_count' and set_id = ? and set_code = ? limit 1",
+			[]any{&current},
+			post_data[0],
+			post_data[1],
+		) {
+			Exec_DB(
+				db,
+				"update bbs_data set set_data = ? where set_name = 'comment_count' and set_id = ? and set_code = ?",
+				strconv.Itoa(comment_count),
+				post_data[0],
+				post_data[1],
+			)
+		} else {
+			Exec_DB(
+				db,
+				"insert into bbs_data (set_name, set_id, set_code, set_data) values ('comment_count', ?, ?, ?)",
+				post_data[0],
+				post_data[1],
+				strconv.Itoa(comment_count),
+			)
+		}
+	}
+
+	Exec_DB(
+		db,
+		"insert into other (name, data, coverage) values ('bbs_comment_count_initialized', '1', '')",
+	)
+}
+
 func Always_init(db *sql.DB, version string) {
 	// 버전 기입
 	Exec_DB(
@@ -665,6 +732,7 @@ func Always_init(db *sql.DB, version string) {
 		}
 	}
 	init_rankup_conditions(db)
+	init_bbs_comment_count(db)
 	legacy_user_bans := [][]string{}
 	rows := Query_DB(
 		db,
