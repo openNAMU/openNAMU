@@ -106,6 +106,9 @@ func get_render_setting_css(db *sql.DB, config tool.Config) string {
     list-style: none !important;
     font-weight: bold !important;
 }
+.opennamu_render_complete summary::-webkit-details-marker {
+    display: none;
+}
 .opennamu_render_complete .opennamu_folding {
     margin-bottom: 5px;
 }
