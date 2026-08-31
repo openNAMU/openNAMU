@@ -40,6 +40,14 @@ func Base64_encode(data string) string {
 	return base64.RawURLEncoding.EncodeToString([]byte(data))
 }
 
+func Get_base64_decode(data string) (string, error) {
+	decoded, err := base64.RawURLEncoding.DecodeString(data)
+	if err != nil {
+		decoded, err = base64.StdEncoding.DecodeString(data)
+	}
+	return string(decoded), err
+}
+
 func Url_parser(data string) string {
 	return url.PathEscape(data)
 }

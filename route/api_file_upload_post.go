@@ -2,7 +2,6 @@ package route
 
 import (
 	"database/sql"
-	"encoding/base64"
 	"errors"
 	"os"
 	"path/filepath"
@@ -66,7 +65,7 @@ func api_file_upload_post(config tool.Config, file_name string, file_data string
 		return return_value
 	}
 
-	decoded, err := base64.StdEncoding.DecodeString(file_data)
+	decoded, err := tool.Get_base64_decode(file_data)
 	if err != nil || len(decoded) == 0 {
 		return_value["response"] = "error"
 		return_value["data"] = "invalid data"
@@ -117,7 +116,7 @@ func api_file_upload_post(config tool.Config, file_name string, file_data string
 		return return_value
 	}
 
-	if _, err := out.Write(decoded); err != nil {
+	if _, err := out.Write([]byte(decoded)); err != nil {
 		_ = out.Close()
 		_ = os.Remove(dst_path)
 		return_value["response"] = "error"

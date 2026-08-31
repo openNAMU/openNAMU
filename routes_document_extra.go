@@ -1,11 +1,11 @@
 package main
 
 import (
-	"encoding/base64"
 	"net/http"
 	"strings"
 
 	"opennamu/route"
+	"opennamu/route/tool"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,12 +16,12 @@ func register_document_extra_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	})
 	r.GET("/edit_from_load/:load/*doc_name", func(c *gin.Context) {
-		load_data, err := base64.RawURLEncoding.DecodeString(c.Param("load"))
+		load_data, err := tool.Get_base64_decode(c.Param("load"))
 		if err != nil {
 			c.Redirect(http.StatusFound, "/manager")
 			return
 		}
-		data := route.View_edit(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), string(load_data))
+		data := route.View_edit(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), load_data)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	})
 	r.POST("/edit_from/*doc_name", func(c *gin.Context) {
