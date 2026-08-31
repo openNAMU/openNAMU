@@ -27,6 +27,13 @@ func View_history_tool(config tool.Config, doc_name string, rev string) string {
 		return tool.Get_error_page(db, config, "error")
 	}
 
+	hidden_auth := tool.Check_permission(db, "hidel", config.IP)
+	hide := ""
+	tool.QueryRow_DB(db, "select hide from history where title = ? and id = ?", []any{&hide}, doc_name, revision)
+	if hide != "" && !hidden_auth {
+		return tool.Get_error_page(db, config, "auth")
+	}
+
 	doc_name_url := tool.Url_parser(doc_name)
 	data := `<h2>` + tool.Get_language(db, "tool", true) + `</h2><ul>`
 	data += `<li><a href="/render/` + revision + `/` + doc_name_url + `">` + tool.Get_language(db, "view", true) + `</a></li>`
@@ -41,7 +48,7 @@ func View_history_tool(config tool.Config, doc_name string, rev string) string {
 
 	data += `<li><a href="/history/` + doc_name_url + `">` + tool.Get_language(db, "history", true) + `</a></li></ul>`
 
-	if tool.Check_permission(db, "hidel", config.IP) {
+	if hidden_auth {
 		hide := ""
 		tool.QueryRow_DB(db, "select hide from history where title = ? and id = ?", []any{&hide}, doc_name, revision)
 		hide_name := "hide"

@@ -868,7 +868,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		}
 	}
 
-	ip_default := []string{"document", "discuss", "upload", "vote", "bbs_use", "captcha_one_check_five_pass", "edit_filter_view", "login_available", "register_available"}
+	ip_default := []string{"document", "discuss", "upload", "vote", "bbs_use", "captcha_one_check_five_pass", "edit_filter_view", "login_available", "register_available", "history_view"}
 
 	if _, ok := auth_info["ip"]; ok {
 		for _, v := range ip_default {
