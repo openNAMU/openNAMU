@@ -94,7 +94,7 @@ func View_record_page(config tool.Config, user_name string, record_type string, 
 	}
 	rows.Close()
 
-	data_html, _ = Get_ui_history(db, config, data_list)
+	data_html, _ = Get_ui_history(db, data_list)
 	count = len(data_list)
 	data_html += tool.Get_page_control(db, page_num, count, 50, "/record/{}/"+tool.Url_parser(record_type)+"/"+tool.Url_parser(user_name))
 

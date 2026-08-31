@@ -46,17 +46,13 @@ func Get_safe_send_data(data string) string {
 	})
 }
 
-func Get_ui_history(db *sql.DB, config tool.Config, data_all [][]string) (string, string) {
-	auth_info := tool.Get_auth_info(db, config.IP)
+func Get_ui_history(db *sql.DB, data_all [][]string) (string, string) {
 
 	date_heading := ""
 	data_html := ""
 	data_select := ""
-	for_count := 1
 
 	for _, in_data := range data_all {
-		for_count_str := strconv.Itoa(for_count)
-		for_count += 1
 
 		if in_data[6] != "" && in_data[1] == "" {
 			if date_heading != "----" {
@@ -91,11 +87,9 @@ func Get_ui_history(db *sql.DB, config tool.Config, data_all [][]string) (string
 		}
 
 		right := ""
-		right += `<span id="opennamu_list_history_` + for_count_str + `_over">`
-		right += `<a id="opennamu_list_history_` + for_count_str + `" href="javascript:void(0);">`
+		right += `<a href="/history_tool/` + rev_str + `/` + doc_name_url + `">`
 		right += `<span class="opennamu_svg opennamu_svg_tool">&nbsp;</span></a>`
-		right += `<span class="opennamu_popup_footnote" id="opennamu_list_history_` + for_count_str + `_load" style="display: none;"></span>`
-		right += `</span> | `
+		right += ` | `
 		right += rev + " | "
 
 		diff_size := in_data[5]
@@ -122,45 +116,12 @@ func Get_ui_history(db *sql.DB, config tool.Config, data_all [][]string) (string
 		data_html += date_ui
 		right += date_text
 
-		right += `<span style="display: none;" id="opennamu_history_tool_` + for_count_str + `">`
-		right += `<a href="/render/` + rev_str + `/` + doc_name_url + `">` + tool.Get_language(db, "view", true) + `</a>`
-		right += ` | <a href="/raw_rev/` + rev_str + `/` + doc_name_url + `">` + tool.Get_language(db, "raw", true) + `</a>`
-		right += ` | <a href="/revert/` + rev_str + `/` + doc_name_url + `">` + tool.Get_language(db, "revert", true) + ` (r` + rev_str + `)</a>`
-
-		if rev_int > 1 {
-			before_rev := rev_int - 1
-			before_rev_str := strconv.Itoa(before_rev)
-
-			right += ` | <a href="/revert/` + before_rev_str + `/` + doc_name_url + `">` + tool.Get_language(db, "revert", true) + ` (r` + before_rev_str + `)</a>`
-			right += ` | <a href="/diff/` + before_rev_str + `/` + rev_str + `/` + doc_name_url + `">` + tool.Get_language(db, "compare", true) + `</a>`
-		}
-
-		right += ` | <a href="/history/` + doc_name_url + `">` + tool.Get_language(db, "history", true) + `</a>`
-
-		if _, ok := auth_info["owner"]; ok {
-			right += ` | <a href="/history_hidden/` + rev_str + `/` + doc_name_url + `">` + tool.Get_language(db, "hide", true) + `</a>`
-			right += ` | <a href="/history_delete/` + rev_str + `/` + doc_name_url + `">` + tool.Get_language(db, "history_delete", true) + `</a>`
-			right += ` | <a href="/history_send/` + rev_str + `/` + doc_name_url + `">` + tool.Get_language(db, "send_edit", true) + `</a>`
-		} else if _, ok := auth_info["hidel"]; ok {
-			right += ` | <a href="/history_hidden/` + rev_str + `/` + doc_name_url + `">` + tool.Get_language(db, "hide", true) + `</a>`
-		}
-
-		right += `</span>`
-
 		bottom := ``
 		if in_data[4] != "" {
 			bottom = Get_safe_send_data(in_data[4])
 		}
 
 		data_html += tool.Get_list_ui(left, right, bottom, "")
-		data_html += `<script>
-            document.getElementById('opennamu_list_history_` + for_count_str + `').addEventListener("click", function() {
-                opennamu_do_footnote_popover('opennamu_list_history_` + for_count_str + `', '', 'opennamu_history_tool_` + for_count_str + `', 'open');
-            });
-            document.addEventListener("click", function() {
-                opennamu_do_footnote_popover('opennamu_list_history_` + for_count_str + `', '', 'opennamu_history_tool_` + for_count_str + `', 'close');
-            });
-        </script>`
 
 	}
 
@@ -190,7 +151,7 @@ func View_list_recent_change(config tool.Config, set_type string, limit string, 
 	api_data := Api_list_recent_change(config, set_type, limit, num)
 	api_data_list := api_data["data"].([][]string)
 
-	history_ui, _ := Get_ui_history(db, config, api_data_list)
+	history_ui, _ := Get_ui_history(db, api_data_list)
 
 	data_html += history_ui
 	data_html += tool.Get_page_control(

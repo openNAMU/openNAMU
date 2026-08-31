@@ -303,7 +303,7 @@ func IP_parser(db *sql.DB, ip string, my_ip string) string {
 			ip = "<sup>" + HTML_escape(auth_name) + "</sup><s>" + ip + "</s>"
 		}
 
-		ip += "<a href=\"javascript:void(0);\" name=\"" + Url_parser(raw_ip) + "\" onclick=\"opennamu_do_ip_click(this);\"><span class=\"opennamu_svg opennamu_svg_tool\">&nbsp;</span></a>"
+		ip += "<a href=\"/user_tool/" + Url_parser(raw_ip) + "\"><span class=\"opennamu_svg opennamu_svg_tool\">&nbsp;</span></a>"
 
 		return ip
 	}

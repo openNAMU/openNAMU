@@ -29,6 +29,7 @@ func View_history_tool(config tool.Config, doc_name string, rev string) string {
 
 	doc_name_url := tool.Url_parser(doc_name)
 	data := `<h2>` + tool.Get_language(db, "tool", true) + `</h2><ul>`
+	data += `<li><a href="/render/` + revision + `/` + doc_name_url + `">` + tool.Get_language(db, "view", true) + `</a></li>`
 	data += `<li><a href="/raw_rev/` + revision + `/` + doc_name_url + `">` + tool.Get_language(db, "raw", true) + `</a></li>`
 	data += `<li><a href="/revert/` + revision + `/` + doc_name_url + `">` + tool.Get_language(db, "revert", true) + ` (r` + revision + `)</a></li>`
 

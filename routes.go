@@ -16,6 +16,7 @@ func register_routes(r *gin.Engine) {
 	register_list_routes(r)
 	register_list_extra_routes(r)
 	register_auth_routes(r)
+	register_user_tool_routes(r)
 	register_user_compat_routes(r)
 	register_user_routes(r)
 	register_alarm_routes(r)
