@@ -24,7 +24,7 @@ func View_view_image_file(c *gin.Context) {
 		Cookies: tool.Get_Cookies(c),
 		Session: tool.Get_session(c),
 	}
-	if !tool.Check_permission(db, "view", config.IP) {
+	if !tool.Check_permission(db, "image_view", config.IP) {
 		c.Data(http.StatusForbidden, "text/html; charset=utf-8", []byte(tool.Get_error_page(db, config, "auth")))
 		return
 	}

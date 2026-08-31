@@ -643,6 +643,7 @@
     "captcha_pass_authority": "CAPTCHA pass authority",
     "ip_authority": "IP authority",
     "view_authority": "Document view authority",
+    "image_view_authority": "Image and file view authority",
     "site_view_authority": "Site view authority",
     "document_authority": "Document authority",
     "edit_authority": "Document edit authority",

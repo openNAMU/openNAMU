@@ -632,7 +632,7 @@ func Always_init(db *sql.DB, version string) {
 		)
 	}
 
-	for _, ban_data := range [][]string{{"ban", "view"}, {"ban", "login_available"}, {"ban_without_login", "view"}, {"ban_without_site", "nothing"}} {
+	for _, ban_data := range [][]string{{"ip", "image_view"}, {"ban", "view"}, {"ban", "login_available"}, {"ban", "image_view"}, {"ban_without_login", "view"}, {"ban_without_login", "image_view"}, {"ban_without_site", "nothing"}} {
 		ban_acl := ""
 		QueryRow_DB(
 			db,

@@ -669,6 +669,7 @@
     "captcha_pass_authority": "CAPTCHA 넘기기 권한",
     "ip_authority": "IP 권한",
     "view_authority": "문서 보기 권한",
+    "image_view_authority": "이미지 및 파일 보기 권한",
     "site_view_authority": "사이트 보기 권한",
     "document_authority": "문서 권한",
     "edit_authority": "문서 편집 권한",

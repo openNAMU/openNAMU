@@ -20,6 +20,7 @@ func Auth_choices() []Auth_choice {
 		{4, "new_make", "new_make_authority"},
 		{4, "delete", "delete_authority"},
 		{4, "view", "view_authority"},
+		{4, "image_view", "image_view_authority"},
 		{5, "site_view", "site_view_authority"},
 		{3, "discuss", "discuss_authority"},
 		{4, "discuss_make_new_thread", "discuss_make_new_thread_authority"},
