@@ -444,6 +444,10 @@ func new_namumark_compat_renderer(
 	return renderer
 }
 
+func (class *namumark_compat_renderer) is_limited_render() bool {
+	return class.render_type == "thread" || class.render_type == "bbs"
+}
+
 func (class *namumark_compat_renderer) reserve(data string) string {
 	class.token_count++
 	token := class.token_prefix + strconv.Itoa(class.token_count) + "X"
@@ -691,7 +695,7 @@ func (class *namumark_compat_renderer) get_interwiki_url(target string) (string,
 }
 
 func (class *namumark_compat_renderer) process_redirect(data string) string {
-	if class.render_type == "thread" {
+	if class.is_limited_render() {
 		return data
 	}
 
@@ -1004,12 +1008,9 @@ func (class *namumark_compat_renderer) process_links(data string) string {
 			switch {
 			case strings.HasPrefix(lower_body, "file:"), strings.HasPrefix(lower_body, "파일:"),
 				strings.HasPrefix(lower_body, "out:"), strings.HasPrefix(lower_body, "외부:"):
-				if class.render_type == "thread" {
-					return ""
-				}
 				return class.process_file(body, label)
 			case strings.HasPrefix(lower_body, "category:"), strings.HasPrefix(lower_body, "분류:"):
-				if class.render_type == "thread" {
+				if class.is_limited_render() {
 					return ""
 				}
 				return class.process_category(body, label)
@@ -1101,7 +1102,7 @@ func (class *namumark_compat_renderer) merge_child(child *namumark_compat_render
 }
 
 func (class *namumark_compat_renderer) process_includes(data string) string {
-	if class.render_type == "thread" {
+	if class.is_limited_render() {
 		return data
 	}
 
@@ -1400,7 +1401,7 @@ func (class *namumark_compat_renderer) process_middle_block(middle_data string) 
 	}
 	middle_name = strings.ToLower(strings.TrimSpace(middle_name))
 	body = strings.TrimPrefix(body, " ")
-	if class.render_type == "thread" {
+	if class.is_limited_render() {
 		switch middle_name {
 		case "#!html", "#!wiki", "#!folding":
 			return class.reserve_literal(class.middle_literal("{{{" + middle_data + "}}}"))
@@ -2523,7 +2524,7 @@ func (class *namumark_compat_renderer) process_headings(data string) string {
 		class.toc_items = append(class.toc_items, namumark_compat_toc_item{number, rendered_heading})
 		heading_id := regexp.MustCompile(`<[^<>]*>`).ReplaceAllString(class.restore(rendered_heading), "")
 		heading_id = tool.HTML_unescape(heading_id)
-		if class.render_type == "thread" {
+		if class.is_limited_render() {
 			lines[index] = class.reserve(`<h` + strconv.Itoa(level) + `>` + number + `. ` + rendered_heading + `</h` + strconv.Itoa(level) + `>`)
 			continue
 		}
@@ -2628,11 +2629,6 @@ func (class *namumark_compat_renderer) process_blocks(data string) string {
 			}
 		}
 		if strings.HasPrefix(trimmed, "||") || table_caption {
-			if class.render_type == "thread" {
-				append_result(line, false)
-				continue
-			}
-
 			table_lines := []string{line}
 			table_row_open := !strings.HasSuffix(trimmed, "||")
 			if trimmed == "||" && index+1 < len(lines) && !strings.HasPrefix(strings.TrimSpace(lines[index+1]), "||") {
@@ -2816,9 +2812,6 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 	name = strings.ToLower(name)
 	switch name {
 	case "youtube", "nicovideo", "navertv", "kakaotv", "vimeo", "instagram", "twitter", "tiktok", "facebook":
-		if class.render_type == "thread" {
-			return ""
-		}
 		if class.collect_only {
 			return ""
 		}
@@ -2827,12 +2820,12 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 		}
 		return raw
 	case "toc":
-		if class.render_type == "thread" {
+		if class.is_limited_render() {
 			return ""
 		}
 		return "[toc()]"
 	case "pagecount":
-		if class.render_type == "thread" {
+		if class.is_limited_render() {
 			return ""
 		}
 		return "0"
@@ -2941,7 +2934,7 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 		}
 		return class.reserve(`<span class="`+class_name+`">`) + compat_escape_value(username) + class.reserve("</span>")
 	case "lastedit":
-		if class.render_type == "thread" {
+		if class.is_limited_render() {
 			return ""
 		}
 		return class.macro_lastedit(data)
@@ -2976,7 +2969,7 @@ func (class *namumark_compat_renderer) process_macros(data string) string {
 		case "date", "datetime":
 			return tool.Get_time()
 		case "pagecount":
-			if class.render_type == "thread" {
+			if class.is_limited_render() {
 				return ""
 			}
 			count := "0"
@@ -2985,7 +2978,7 @@ func (class *namumark_compat_renderer) process_macros(data string) string {
 			}
 			return count
 		case "toc", "목차", "tableofcontents":
-			if class.render_type == "thread" {
+			if class.is_limited_render() {
 				return ""
 			}
 			return "[toc]"
@@ -3009,7 +3002,7 @@ func (class *namumark_compat_renderer) prepare() {
 	class.data = class.process_middle(class.data)
 	class.data = class.process_macros(class.data)
 	class.data = class.process_links(class.data)
-	if class.render_type != "thread" {
+	if !class.is_limited_render() {
 		class.data = class.process_includes(class.data)
 	}
 	class.data = class.process_math(class.data)
