@@ -106,6 +106,11 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 		return_data["data"] = "empty data"
 		return return_data
 	}
+	if !tool.Do_bbs_max_length_check(db, config, data) {
+		return_data["response"] = "error"
+		return_data["data"] = "bbs overflow max length"
+		return return_data
+	}
 	if !tool.Do_edit_filter(db, config, "", data) {
 		return_data["response"] = "error"
 		return_data["data"] = "edit filter (content)"
