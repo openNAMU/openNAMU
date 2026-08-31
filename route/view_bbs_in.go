@@ -87,13 +87,13 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 		page_path,
 	)
 
-	sort_path := "/bbs/in/" + tool.Url_parser(set_id) + "/view/1"
+	sort_path := "bbs/in/" + tool.Url_parser(set_id) + "/view/1"
 	sort_name := tool.Get_language(db, "page_view_sort", true)
 	if sort_type == "view" {
-		sort_path = "/bbs/in/" + tool.Url_parser(set_id) + "/1"
+		sort_path = "bbs/in/" + tool.Url_parser(set_id) + "/1"
 		sort_name = tool.Get_language(db, "recent", true)
 	}
-	filter_menu_path := "/bbs/in/" + tool.Url_parser(set_id) + "/filter/"
+	filter_menu_path := "bbs/in/" + tool.Url_parser(set_id) + "/filter/"
 	if filter_path != "" {
 		filter_menu_path += filter_path + "/"
 	}

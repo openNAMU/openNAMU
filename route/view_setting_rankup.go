@@ -33,5 +33,5 @@ func View_setting_rankup(config tool.Config) string {
 	}
 	data += `<button id="opennamu_save_button" type="submit">` + lang("save") + `</button></form>`
 
-	return setting_page(db, config, lang("rankup_setting"), data, "/setting")
+	return setting_page(db, config, lang("rankup_setting"), data, "setting")
 }
