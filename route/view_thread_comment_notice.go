@@ -13,10 +13,11 @@ func View_thread_comment_notice(config tool.Config, topic_num string, comment_nu
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	top := ""
-	if !tool.QueryRow_DB(db, "select top from topic where code = ? and id = ?", []any{&top}, topic_num, comment_num) {
+	topic_data, topic_exists := tool.Get_topic_data(db, topic_num, comment_num)
+	if !topic_exists {
 		return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
 	}
+	top := topic_data["top"]
 	if values != nil {
 		api_data := Api_thread_comment_notice_post(config, topic_num, comment_num)
 		response, _ := api_data["response"].(string)

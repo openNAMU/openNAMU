@@ -1,8 +1,6 @@
 package route
 
 import (
-	"database/sql"
-
 	"opennamu/route/tool"
 )
 
@@ -29,15 +27,16 @@ func View_record_page(config tool.Config, user_name string, record_type string, 
 	count := 0
 
 	if record_type == "topic" {
-		rows := tool.Query_DB(db, "select code, id, date from topic where ip = ? order by date desc limit ?, 50", user_name, offset)
+		rows := tool.Get_topic_record_rows(db, user_name, offset, true)
 		for rows.Next() {
 			code, comment_id, date := "", "", ""
 			if rows.Scan(&code, &comment_id, &date) != nil {
 				continue
 			}
 
-			topic_title, topic_sub := "", ""
-			tool.QueryRow_DB(db, "select title, sub from rd where code = ?", []any{&topic_title, &topic_sub}, code)
+			rd_data, _ := tool.Get_rd_data(db, code)
+			topic_title := rd_data["title"]
+			topic_sub := rd_data["sub"]
 			left := `<a href="/thread/` + tool.Url_parser(code) + `#` + tool.Url_parser(comment_id) + `">` + tool.HTML_escape(topic_sub+"#"+comment_id) + `</a>`
 			left += " (" + tool.HTML_escape(topic_title) + ")"
 			right := tool.IP_parser(db, user_name, config.IP) + " | " + tool.HTML_escape(date)
@@ -61,12 +60,7 @@ func View_record_page(config tool.Config, user_name string, record_type string, 
 		)
 	}
 
-	var rows *sql.Rows
-	if record_type == "normal" || record_type == "edit" {
-		rows = tool.Query_DB(db, "select id, title, date, ip, send, leng, hide, type from history where ip = ? order by date desc limit ?, 50", user_name, offset)
-	} else {
-		rows = tool.Query_DB(db, "select id, title, date, ip, send, leng, hide, type from history where ip = ? and type = ? order by date desc limit ?, 50", user_name, record_type, offset)
-	}
+	rows := tool.Get_history_record_rows(db, user_name, record_type, offset, true)
 
 	data_list := [][]string{}
 	ip_cache := map[string][]string{}

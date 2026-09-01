@@ -28,8 +28,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	raw_data_api := Api_w_raw(config, doc_name, "", "")
 	raw_response, _ := raw_data_api["response"].(string)
 	if raw_response == "require auth" {
-		error_data := ""
-		tool.QueryRow_DB(db, `select data from other where name = "error_401"`, []any{&error_data})
+		error_data := tool.Get_setting_value(db, "error_401", "", "")
 		if error_data != "" {
 			render_data = "<h2>" + tool.Get_language(db, "error", true) + "</h2><ul><li>" + error_data + "</li></ul>"
 		} else {
@@ -37,8 +36,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		}
 		status = http.StatusUnauthorized
 	} else if raw_response != "ok" {
-		error_data := ""
-		tool.QueryRow_DB(db, `select data from other where name = "error_404"`, []any{&error_data})
+		error_data := tool.Get_setting_value(db, "error_404", "", "")
 		if error_data != "" {
 			render_data = "<h2>" + tool.Get_language(db, "error", true) + "</h2><ul><li>" + error_data + "</li></ul>"
 		} else {
@@ -78,33 +76,23 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		document_type = "special"
 		render_data = view_w_file_data(db, doc_name) + render_data
 	} else {
-		include_link := ""
-		if tool.QueryRow_DB(db, "select link from back where title = ? and type = 'include' limit 1", []any{&include_link}, doc_name) {
+		if _, exists := tool.Get_back_link(db, doc_name, "include"); exists {
 			document_type = "include"
 		}
-		redirect_title := ""
-		if tool.QueryRow_DB(db, "select title from back where link = ? and type = 'redirect' limit 1", []any{&redirect_title}, doc_name) {
+		if _, exists := tool.Get_back_title(db, doc_name, "redirect"); exists {
 			document_type = "redirect"
 		}
 	}
 
-	last_edit := ""
-	tool.QueryRow_DB(
-		db,
-		"select set_data from data_set where doc_name = ? and set_name = 'last_edit' and doc_rev = '' limit 1",
-		[]any{&last_edit},
-		doc_name,
-	)
+	last_edit := tool.Get_document_setting_value_exact(db, doc_name, "last_edit", "")
 
 	if document_type == "" && last_edit != "" {
-		warning_days := ""
-		tool.QueryRow_DB(db, "select data from other where name = 'outdated_doc_warning_date'", []any{&warning_days})
+		warning_days := tool.Get_setting_value(db, "outdated_doc_warning_date", "", "")
 		warning_days_int := tool.Str_to_int(warning_days)
 		if warning_days_int > 0 {
 			last_edit_time, parse_error := time.Parse("2006-01-02 15:04:05", last_edit)
 			if parse_error == nil && time.Now().After(last_edit_time.AddDate(0, 0, warning_days_int)) {
-				warning_text := ""
-				tool.QueryRow_DB(db, "select data from other where name = 'outdated_doc_warning'", []any{&warning_text})
+				warning_text := tool.Get_setting_value(db, "outdated_doc_warning", "", "")
 				if warning_text == "" {
 					warning_text = tool.Get_language(db, "old_page_warning", true)
 				}
@@ -113,38 +101,27 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		}
 	}
 
-	body := ""
-	tool.QueryRow_DB(db, "select data from other where name = 'body'", []any{&body})
+	body := tool.Get_setting_value(db, "body", "", "")
 	render_data = body + render_data
 
-	bottom_body := ""
-	tool.QueryRow_DB(db, "select data from other where name = 'bottom_body'", []any{&bottom_body})
+	bottom_body := tool.Get_setting_value(db, "bottom_body", "", "")
 	render_data += bottom_body
 
-	document_top := ""
-	tool.QueryRow_DB(
-		db,
-		"select set_data from data_set where doc_name = ? and doc_rev = '' and set_name = 'document_top' limit 1",
-		[]any{&document_top},
-		doc_name,
-	)
+	document_top := tool.Get_document_setting_value_exact(db, doc_name, "document_top", "")
 	render_data = document_top + render_data
 
 	topic := 0
-	topic_name := ""
-	if tool.QueryRow_DB(db, "select title from rd where title = ? and not stop = 'O' order by date desc limit 1", []any{&topic_name}, doc_name) {
+	if tool.Get_rd_active_title(db, doc_name) {
 		topic = 1
 	}
 	history_color := 0
 	if status == http.StatusNotFound {
-		history_title := ""
-		if tool.QueryRow_DB(db, "select title from history where title = ? limit 1", []any{&history_title}, doc_name) {
+		if tool.Get_history_exists(db, doc_name) {
 			history_color = 1
 		}
 	}
 	acl_color := 0
-	acl_title := ""
-	if tool.QueryRow_DB(db, "select title from acl where title = ? limit 1", []any{&acl_title}, doc_name) {
+	if tool.Get_acl_exists(db, doc_name) {
 		acl_color = 1
 	}
 	menu_acl := 0
@@ -179,8 +156,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		menu = append(menu, []any{"down/" + tool.Url_parser(doc_name), tool.Get_language(db, "sub", true)})
 	}
 	if !tool.IP_or_user(config.IP) {
-		star_doc := ""
-		if tool.QueryRow_DB(db, "select data from user_set where name = 'star_doc' and id = ? and data = ? limit 1", []any{&star_doc}, config.IP, doc_name) {
+		if tool.Get_user_set_data_match(db, config.IP, "star_doc", doc_name) {
 			watch_list = 2
 		} else {
 			watch_list = 1

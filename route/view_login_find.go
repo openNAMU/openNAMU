@@ -15,8 +15,8 @@ func View_login_find(config tool.Config, values url.Values) string {
 		}
 		key := values.Get("key")
 		if key != "" {
-			user_id := ""
-			if tool.QueryRow_DB(db, "select id from user_set where name = 'random_key' and data = ?", []any{&user_id}, key) {
+			user_id, user_exists := tool.Get_user_set_id(db, "random_key", key)
+			if user_exists {
 				config.Session.Set("reset_id", user_id)
 				_ = config.Session.Save()
 				return tool.Get_redirect("/login/find/key")

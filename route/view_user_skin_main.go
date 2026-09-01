@@ -71,8 +71,7 @@ func View_user_skin_main(config tool.Config, values url.Values) string {
 	field_data := func(field string, label string, heading string) string {
 		choices := set_list[field]
 		current := current_value(field)
-		server_default := "default"
-		tool.QueryRow_DB(db, "select data from other where name = ?", []any{&server_default}, field)
+		server_default := tool.Get_setting_value(db, field, "", "default")
 
 		server_label := ""
 		options := strings.Builder{}

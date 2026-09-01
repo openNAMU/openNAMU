@@ -13,7 +13,7 @@ func View_list_document_all(config tool.Config, page string) string {
 
 	page_num := list_extra_page_number(page)
 	offset := (page_num - 1) * 50
-	rows := tool.Query_DB(db, "select title from data order by title asc limit ?, 50", offset)
+	rows := tool.Get_data_rows(db, offset)
 	body := strings.Builder{}
 	count := 0
 	for rows.Next() {
@@ -28,17 +28,14 @@ func View_list_document_all(config tool.Config, page string) string {
 
 	data := `<ul>` + body.String() + `</ul>`
 	if page_num == 1 {
-		all_title := ""
-		tool.QueryRow_DB(db, "select data from other where name = 'count_all_title'", []any{&all_title})
+		all_title := tool.Get_setting_value(db, "count_all_title", "", "")
 		if all_title != "" {
 			total := tool.Str_to_int(all_title)
 			data += `<ul><li>` + tool.Get_language(db, "all", true) + ` : ` + strconv.Itoa(total) + `</li></ul>`
 			if total < 30000 {
 				counts := []int{}
 				for _, prefix := range []string{"category:", "user:", "file:"} {
-					value := "0"
-					tool.QueryRow_DB(db, "select count(*) from data where title like ?", []any{&value}, prefix+"%")
-					counts = append(counts, tool.Str_to_int(value))
+					counts = append(counts, tool.Str_to_int(tool.Get_data_prefix_count(db, prefix)))
 				}
 				other_count := total - counts[0] - counts[1] - counts[2]
 				data += `<ul><li>` + tool.Get_language(db, "category", true) + ` : ` + strconv.Itoa(counts[0]) + `</li><li>` + tool.Get_language(db, "user_document", true) + ` : ` + strconv.Itoa(counts[1]) + `</li><li>` + tool.Get_language(db, "file", true) + ` : ` + strconv.Itoa(counts[2]) + `</li><li>` + tool.Get_language(db, "other", true) + ` : ` + strconv.Itoa(other_count) + `</li></ul>`

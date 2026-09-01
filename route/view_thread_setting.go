@@ -13,12 +13,13 @@ func View_thread_setting(config tool.Config, topic_num string, values url.Values
 	if values == nil && !tool.Check_permission(db, "thread_setting", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	name := ""
-	stop := ""
-	agree := ""
-	if !tool.QueryRow_DB(db, "select title, stop, agree from rd where code = ?", []any{&name, &stop, &agree}, topic_num) {
+	rd_data, rd_exists := tool.Get_rd_data(db, topic_num)
+	if !rd_exists {
 		return tool.Get_redirect("/")
 	}
+	name := rd_data["title"]
+	stop := rd_data["stop"]
+	agree := rd_data["agree"]
 
 	if values != nil {
 		stop_value := values.Get("stop")

@@ -1,15 +1,6 @@
 package route
 
-import (
-	"database/sql"
-	"opennamu/route/tool"
-)
-
-func challenge_count(db *sql.DB, query string, id string) int {
-	count := 0
-	tool.QueryRow_DB(db, query, []any{&count}, id)
-	return count
-}
+import "database/sql"
 
 func challenge_is_complete(db *sql.DB, id string, name string) bool {
 	return user_value(db, id, name) != ""

@@ -15,8 +15,8 @@ func View_login_find_email(config tool.Config, values url.Values) string {
 			return tool.Get_error_page(db, config, "recaptcha")
 		}
 		email := strings.TrimSpace(values.Get("email"))
-		user_id := ""
-		if !tool.QueryRow_DB(db, "select id from user_set where name = 'email' and data = ?", []any{&user_id}, email) {
+		user_id, user_exists := tool.Get_user_set_id(db, "email", email)
+		if !user_exists {
 			return tool.Get_error_page(db, config, "not found")
 		}
 		key := tool.Get_random_key(32)

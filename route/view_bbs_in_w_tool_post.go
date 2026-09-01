@@ -10,14 +10,8 @@ func View_bbs_in_w_tool_post(config tool.Config, set_id string, set_code string,
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	title := ""
-	if !tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_data where set_name = 'title' and set_id = ? and set_code = ?",
-		[]any{&title},
-		set_id,
-		set_code,
-	) {
+	_, title_exists := tool.Get_bbs_data_value(db, set_id, set_code, "title")
+	if !title_exists {
 		return tool.Get_redirect("/bbs/main")
 	}
 

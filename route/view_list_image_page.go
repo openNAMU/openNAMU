@@ -17,7 +17,7 @@ func View_list_image_page(config tool.Config, page string) string {
 	body := strings.Builder{}
 	body.WriteString(`<a href="/list/file">(` + tool.Get_language(db, "normal", true) + `)</a><hr class="main_hr">`)
 
-	rows := tool.Query_DB(db, "select title from data where title like 'file:%' limit ?, 50", offset)
+	rows := tool.Get_data_file_rows(db, offset, false)
 	render_data := strings.Builder{}
 	sub_data := strings.Builder{}
 	count := 0

@@ -146,8 +146,7 @@ func user_title_list(db *sql.DB, user_name string) []user_choice {
 	if tool.Check_permission(db, "treat_as_admin", user_name) {
 		choice_list = append(choice_list, user_choice{"✅", "✅ admin"})
 	}
-	var egg string
-	if tool.QueryRow_DB(db, "select name from user_set where id = ? and name = 'get_🥚'", []any{&egg}, user_name) {
+	if tool.Get_user_set_exists(db, user_name, "get_🥚") {
 		choice_list = append(choice_list, user_choice{"🥚", "🥚 easter_egg"})
 	}
 	return choice_list

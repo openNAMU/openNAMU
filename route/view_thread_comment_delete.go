@@ -13,8 +13,8 @@ func View_thread_comment_delete(config tool.Config, topic_num string, comment_nu
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	exists_id := ""
-	if !tool.QueryRow_DB(db, "select id from topic where code = ? and id = ?", []any{&exists_id}, topic_num, comment_num) {
+	_, topic_exists := tool.Get_topic_data(db, topic_num, comment_num)
+	if !topic_exists {
 		return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
 	}
 	if values != nil {

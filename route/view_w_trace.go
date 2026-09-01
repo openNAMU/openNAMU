@@ -51,8 +51,7 @@ func view_w_redirect_trace(db *sql.DB, doc_name string, documents []string) stri
 	last_page := ""
 	for index := len(documents) - 1; index >= 0; index-- {
 		last_page = documents[index]
-		redirect_exists := ""
-		if tool.QueryRow_DB(db, "select link from back where (title = ? or link = ?) and type = 'redirect' limit 1", []any{&redirect_exists}, last_page, last_page) {
+		if tool.Get_back_redirect(db, last_page) {
 			break
 		}
 	}
@@ -60,8 +59,7 @@ func view_w_redirect_trace(db *sql.DB, doc_name string, documents []string) stri
 		return ""
 	}
 
-	redirect_text := "{0} ➤ {1}"
-	tool.QueryRow_DB(db, "select data from other where name = 'redirect_text'", []any{&redirect_text})
+	redirect_text := tool.Get_setting_value(db, "redirect_text", "", "{0} ➤ {1}")
 	if redirect_text == "" {
 		redirect_text = "{0} ➤ {1}"
 	}

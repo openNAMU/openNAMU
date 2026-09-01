@@ -15,7 +15,7 @@ func View_list_document_acl(config tool.Config, page string) string {
 	}
 	page_num := list_extra_page_number(page)
 	offset := (page_num - 1) * 50
-	rows := tool.Query_DB(db, "select distinct title, data, type from acl where data != '' and title not like 'user:%' order by title desc limit ?, 50", offset)
+	rows := tool.Get_document_acl_rows(db, offset)
 	body := strings.Builder{}
 	count := 0
 	for rows.Next() {
@@ -23,10 +23,8 @@ func View_list_document_acl(config tool.Config, page string) string {
 		if rows.Scan(&title, &value, &field) != nil {
 			continue
 		}
-		last_change := ""
-		tool.QueryRow_DB(db, "select time from re_admin where what like ? order by time desc limit 1", []any{&last_change}, "acl ("+title+")%")
-		why := ""
-		tool.QueryRow_DB(db, "select data from acl where title = ? and type = 'why' limit 1", []any{&why}, title)
+		last_change := tool.Get_re_admin_last_time(db, "acl ("+title+")%")
+		why := tool.Get_acl_why(db, title)
 		body.WriteString(`<li>` + tool.HTML_escape(last_change) + ` | <a href="/acl/` + tool.Url_parser(title) + `">` + tool.HTML_escape(title) + `</a> | ` + tool.HTML_escape(value) + ` (` + tool.HTML_escape(field) + `)`)
 		if why != "" {
 			body.WriteString(` | ` + tool.HTML_escape(why))

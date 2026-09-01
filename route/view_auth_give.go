@@ -128,9 +128,9 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 	if user_name != "" {
 		selected = tool.Get_auth_target_group(db, user_name, target_type)
 		if target_type == "normal" {
-			tool.QueryRow_DB(db, "select data from user_set where id = ? and name = 'acl_end' limit 1", []any{&end_date}, user_name)
+			end_date = tool.Get_user_set_data(db, user_name, "acl_end")
 		} else {
-			tool.QueryRow_DB(db, "select end from rb where block = ? and band = ? and ongoing = '1' order by today desc limit 1", []any{&end_date}, user_name, target_type)
+			end_date = tool.Get_rb_end(db, user_name, target_type)
 		}
 		if len(end_date) > 10 {
 			end_date = end_date[:10]

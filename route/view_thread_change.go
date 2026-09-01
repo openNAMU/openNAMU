@@ -12,11 +12,12 @@ func View_thread_change(config tool.Config, topic_num string, values url.Values)
 	if values == nil && !tool.Check_permission(db, "thread_change", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	title := ""
-	sub := ""
-	if !tool.QueryRow_DB(db, "select title, sub from rd where code = ?", []any{&title, &sub}, topic_num) {
+	rd_data, rd_exists := tool.Get_rd_data(db, topic_num)
+	if !rd_exists {
 		return tool.Get_redirect("/")
 	}
+	title := rd_data["title"]
+	sub := rd_data["sub"]
 	if values != nil {
 		api_data := Api_thread_change_post(config, topic_num, values.Get("title"), values.Get("sub"))
 		response, _ := api_data["response"].(string)

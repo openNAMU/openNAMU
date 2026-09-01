@@ -14,7 +14,7 @@ func View_list_user_page(config tool.Config, page string) string {
 	}
 	page_num := list_extra_page_number(page)
 	offset := (page_num - 1) * 50
-	rows := tool.Query_DB(db, "select id, data from user_set where name = 'date' order by data desc limit ?, 50", offset)
+	rows := tool.Get_user_date_rows(db, offset, true)
 	body := strings.Builder{}
 	count := 0
 	for rows.Next() {

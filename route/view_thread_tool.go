@@ -6,16 +6,15 @@ func View_thread_tool(config tool.Config, topic_num string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	title := ""
-	sub := ""
-	stop := ""
-	agree := ""
-	acl := ""
-	view_acl := ""
-	if !tool.QueryRow_DB(db, "select title, sub, stop, agree, acl from rd where code = ?", []any{&title, &sub, &stop, &agree, &acl}, topic_num) {
+	rd_data, rd_exists := tool.Get_rd_data(db, topic_num)
+	if !rd_exists {
 		return tool.Get_redirect("/")
 	}
-	tool.QueryRow_DB(db, "select set_data from topic_set where thread_code = ? and set_name = 'thread_view_acl'", []any{&view_acl}, topic_num)
+	sub := rd_data["sub"]
+	stop := rd_data["stop"]
+	agree := rd_data["agree"]
+	acl := rd_data["acl"]
+	view_acl := tool.Get_topic_set_data(db, topic_num, "thread_view_acl")
 
 	state := tool.Get_language(db, "topic_normal", true)
 	if stop == "S" {

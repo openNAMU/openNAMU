@@ -10,9 +10,8 @@ func View_edit_revert(config tool.Config, doc_name string, rev string) string {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	data := ""
-	hide := ""
-	if !tool.QueryRow_DB(db, "select data, hide from history where title = ? and id = ?", []any{&data, &hide}, doc_name, rev) {
+	data, hide, exists := tool.Get_history_content(db, doc_name, rev)
+	if !exists {
 		return tool.Get_redirect("/w/" + tool.Url_parser(doc_name))
 	}
 	if hide != "" && !tool.Check_permission(db, "hidel", config.IP) {

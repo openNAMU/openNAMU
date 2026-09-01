@@ -28,8 +28,8 @@ func View_edit_file_delete(config tool.Config, doc_name string, values url.Value
 	if values == nil && !tool.Check_permission(db, "file_delete", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	var stored_name string
-	if !tool.QueryRow_DB(db, "select title from data where title = ?", []any{&stored_name}, doc_name) && values == nil {
+	_, stored_exists := tool.Get_data_title(db, doc_name)
+	if !stored_exists && values == nil {
 		return tool.Get_redirect("/list/file")
 	}
 

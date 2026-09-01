@@ -2,6 +2,7 @@ package markup
 
 import (
 	"database/sql"
+	stdjson "encoding/json"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -1102,10 +1103,6 @@ func (class *namumark_compat_renderer) merge_child(child *namumark_compat_render
 }
 
 func (class *namumark_compat_renderer) process_includes(data string) string {
-	if class.is_limited_render() {
-		return data
-	}
-
 	include_count_max := strings.Count(strings.ToLower(data), "[include(") * 2
 	include_count := map[string]int{}
 	for {
@@ -1122,6 +1119,7 @@ func (class *namumark_compat_renderer) process_includes(data string) string {
 
 			include_name := ""
 			include_parameter := map[string]any{}
+			include_link_parameter := map[string]string{}
 			for key, value := range class.parameter {
 				include_parameter[key] = value
 			}
@@ -1135,7 +1133,12 @@ func (class *namumark_compat_renderer) process_includes(data string) string {
 					include_name = item
 					continue
 				}
-				include_parameter[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+				key := strings.TrimSpace(parts[0])
+				value := strings.TrimSpace(parts[1])
+				include_parameter[key] = value
+				if class.is_limited_render() {
+					include_link_parameter[key] = value
+				}
 			}
 			include_name_org := strings.TrimSpace(include_name)
 			include_name = class.normalize_target(include_name)
@@ -1155,6 +1158,19 @@ func (class *namumark_compat_renderer) process_includes(data string) string {
 			actual, exists := class.find_document(include_name)
 			if exists {
 				include_name = actual
+			}
+			if class.is_limited_render() {
+				payload := map[string]any{
+					"version":    1,
+					"name":       include_name,
+					"parameters": include_link_parameter,
+				}
+				payload_data, err := stdjson.Marshal(payload)
+				if err != nil {
+					return suffix
+				}
+				include_link := `<a href="/include/` + tool.Base64_encode(string(payload_data)) + `">(` + compat_escape_value(include_name_org) + `)</a>`
+				return class.reserve(include_link) + suffix
 			}
 			class.add_backlink(include_name, "include", "")
 			if !exists {
@@ -3002,9 +3018,7 @@ func (class *namumark_compat_renderer) prepare() {
 	class.data = class.process_middle(class.data)
 	class.data = class.process_macros(class.data)
 	class.data = class.process_links(class.data)
-	if !class.is_limited_render() {
-		class.data = class.process_includes(class.data)
-	}
+	class.data = class.process_includes(class.data)
 	class.data = class.process_math(class.data)
 	if class.render_type != "include" && class.render_type != "inter" {
 		class.data = class.process_footnotes(class.data)

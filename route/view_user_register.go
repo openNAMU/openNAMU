@@ -32,8 +32,7 @@ func user_register_validate(db *sql.DB, config tool.Config, id string, password 
 	if id == password {
 		return "password same as id"
 	}
-	password_length_limit := "0"
-	tool.QueryRow_DB(db, "select data from other where name = 'password_min_length'", []any{&password_length_limit})
+	password_length_limit := tool.Get_setting_value(db, "password_min_length", "", "0")
 	if tool.Get_len(password) < tool.Str_to_int(password_length_limit) {
 		return "password too short"
 	}
@@ -78,7 +77,5 @@ func user_register_post(config tool.Config, id string, password string, password
 }
 
 func user_other(db *sql.DB, name string) string {
-	value := ""
-	tool.QueryRow_DB(db, "select data from other where name = ?", []any{&value}, name)
-	return value
+	return tool.Get_setting_value(db, name, "", "")
 }

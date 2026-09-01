@@ -2,7 +2,6 @@ package route
 
 import (
 	"database/sql"
-
 	"opennamu/route/tool"
 )
 
@@ -15,22 +14,7 @@ func View_record_bbs_legacy(config tool.Config, user_name string, page string) s
 		page_int = 1
 	}
 	offset := (page_int - 1) * 50
-	rows := tool.Query_DB(
-		db,
-		`select d.set_code, d.set_id, d.set_data
-		 from bbs_data d
-		 where d.set_name = 'date'
-		 and exists (
-			 select 1 from bbs_data u
-			 where u.set_name = 'user_id'
-			 and u.set_id = d.set_id
-			 and u.set_code = d.set_code
-			 and u.set_data = ?
-		 )
-		 order by d.set_data desc limit ?, 50`,
-		user_name,
-		offset,
-	)
+	rows := tool.Get_bbs_record_rows(db, user_name, offset)
 	defer rows.Close()
 
 	data_html := `<table id="main_table_set"><tr id="main_table_top_tr"><td>` + tool.Get_language(db, "editor", true) + `</td><td>` + tool.Get_language(db, "time", true) + `</td><td>` + tool.Get_language(db, "last_comment_time", true) + `</td></tr>`
@@ -51,14 +35,7 @@ func View_record_bbs_legacy(config tool.Config, user_name string, page string) s
 			comment_count = "0"
 		}
 		root_id := set_id + "-" + set_code
-		last_comment_date := ""
-		tool.QueryRow_DB(
-			db,
-			"select set_data from bbs_data where set_name = 'comment_date' and (set_id = ? or set_id like ?) order by set_data desc limit 1",
-			[]any{&last_comment_date},
-			root_id,
-			root_id+"-%",
-		)
+		last_comment_date := tool.Get_bbs_last_comment_date(db, root_id)
 
 		bbs_name := record_bbs_legacy_board_name(db, set_id)
 		title_link := `<a href="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">` + tool.HTML_escape(title) + `</a>`
@@ -80,25 +57,10 @@ func View_record_bbs_legacy(config tool.Config, user_name string, page string) s
 }
 
 func record_bbs_legacy_value(db *sql.DB, set_name string, set_id string, set_code string) string {
-	value := ""
-	tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_data where set_name = ? and set_id = ? and set_code = ? limit 1",
-		[]any{&value},
-		set_name,
-		set_id,
-		set_code,
-	)
+	value, _ := tool.Get_bbs_data_value(db, set_id, set_code, set_name)
 	return value
 }
 
 func record_bbs_legacy_board_name(db *sql.DB, set_id string) string {
-	value := ""
-	tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_set where set_name = 'bbs_name' and set_id = ? limit 1",
-		[]any{&value},
-		set_id,
-	)
-	return value
+	return tool.Get_bbs_set_data(db, set_id, "bbs_name")
 }

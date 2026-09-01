@@ -27,13 +27,12 @@ func View_app_submit(config tool.Config, values url.Values) string {
 	}
 
 	data := ""
-	requirement := ""
-	tool.QueryRow_DB(db, "select data from other where name = 'requires_approval'", []any{&requirement})
+	requirement := tool.Get_setting_value(db, "requires_approval", "", "")
 	if requirement != "on" {
 		data += tool.Get_language(db, "approval_requirement_disabled", true) + `<hr class="main_hr">`
 	}
 
-	rows := tool.Query_DB(db, "select id, data from user_set where name = 'application'")
+	rows := tool.Get_application_rows(db)
 	applications := []map[string]string{}
 	for rows.Next() {
 		user_id := ""

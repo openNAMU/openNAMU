@@ -20,8 +20,7 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 	if len(data_list) > 0 {
 		data_html += "<ul>"
 		for _, title := range data_list {
-			last_date := ""
-			tool.QueryRow_DB(db, "select date from history where title = ? order by id + 0 desc limit 1", []any{&last_date}, title)
+			last_date := tool.Get_history_date(db, title)
 			date_html := ""
 			if last_date != "" {
 				date_html = "(" + tool.HTML_escape(last_date) + ") "

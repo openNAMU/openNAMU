@@ -18,15 +18,7 @@ var bbs_set_fields = []string{
 }
 
 func bbs_set_value(db *sql.DB, set_id string, set_name string) string {
-	value := ""
-	tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_set where set_id = ? and set_name = ? order by set_code + 0 desc limit 1",
-		[]any{&value},
-		set_id,
-		set_name,
-	)
-	return value
+	return tool.Get_bbs_set_data(db, set_id, set_name)
 }
 
 func bbs_prefix_list(db *sql.DB, set_id string) []string {

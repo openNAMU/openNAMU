@@ -12,11 +12,12 @@ func View_thread_acl(config tool.Config, topic_num string, values url.Values) st
 	if values == nil && !tool.Check_permission(db, "thread_acl", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	title := ""
-	thread_acl := ""
-	if !tool.QueryRow_DB(db, "select sub, acl from rd where code = ?", []any{&title, &thread_acl}, topic_num) {
+	rd_data, rd_exists := tool.Get_rd_data(db, topic_num)
+	if !rd_exists {
 		return tool.Get_redirect("/")
 	}
+	title := rd_data["sub"]
+	thread_acl := rd_data["acl"]
 	if values != nil {
 		api_data := Api_thread_acl_post(config, topic_num, values.Get("acl"), values.Get("acl_view"))
 		response, _ := api_data["response"].(string)
@@ -36,8 +37,7 @@ func View_thread_acl(config tool.Config, topic_num string, values url.Values) st
 		return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
 	}
 
-	acl_view := ""
-	tool.QueryRow_DB(db, "select set_data from topic_set where thread_code = ? and set_name = 'thread_view_acl'", []any{&acl_view}, topic_num)
+	acl_view := tool.Get_topic_set_data(db, topic_num, "thread_view_acl")
 	acl_values := acl_value_list(db, thread_acl)
 	acl_view_values := acl_value_list(db, acl_view)
 	data := `<form method="post"><a href="/acl/TEST#exp">(` + tool.Get_language(db, "reference", true) + `)</a><h2>` + tool.Get_language(db, "thread_acl", true) + `</h2>` + bbs_set_select(db, "acl", thread_acl, acl_values) + `<h2>` + tool.Get_language(db, "view_acl", true) + ` (` + tool.Get_language(db, "beta", true) + `)</h2>` + bbs_set_select(db, "acl_view", acl_view, acl_view_values) + `<hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`

@@ -15,7 +15,7 @@ func View_edit_file_upload(config tool.Config, file_name string) string {
 	}
 
 	license_html := `<option value="direct_input">` + tool.Get_language(db, "direct_input", false) + `</option>`
-	rows := tool.Query_DB(db, "select html from html_filter where kind = 'image_license'")
+	rows := tool.Get_file_license_rows(db)
 	for rows.Next() {
 		license := ""
 		if rows.Scan(&license) == nil {
@@ -24,11 +24,8 @@ func View_edit_file_upload(config tool.Config, file_name string) string {
 	}
 	rows.Close()
 
-	upload_help := ""
-	tool.QueryRow_DB(db, "select data from other where name = 'upload_help'", []any{&upload_help})
-
-	upload_default := ""
-	tool.QueryRow_DB(db, "select data from other where name = 'upload_default'", []any{&upload_default})
+	upload_help := tool.Get_setting_value(db, "upload_help", "", "")
+	upload_default := tool.Get_setting_value(db, "upload_default", "", "")
 
 	file_max_size := tool.Get_file_max_size(db)
 	if file_max_size <= 0 {

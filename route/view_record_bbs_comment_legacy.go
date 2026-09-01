@@ -14,22 +14,7 @@ func View_record_bbs_comment_legacy(config tool.Config, user_name string, page s
 		page_int = 1
 	}
 	offset := (page_int - 1) * 50
-	rows := tool.Query_DB(
-		db,
-		`select d.set_id, d.set_code, d.set_data
-		 from bbs_data d
-		 where d.set_name = 'comment_date'
-		 and exists (
-			 select 1 from bbs_data u
-			 where u.set_name = 'comment_user_id'
-			 and u.set_id = d.set_id
-			 and u.set_code = d.set_code
-			 and u.set_data = ?
-		 )
-		 order by d.set_data desc limit ?, 50`,
-		user_name,
-		offset,
-	)
+	rows := tool.Get_bbs_comment_record_rows(db, user_name, offset)
 	defer rows.Close()
 
 	data_html := `<table id="main_table_set"><tr id="main_table_top_tr"><td>` + tool.Get_language(db, "editor", true) + `</td><td>` + tool.Get_language(db, "time", true) + `</td><td>` + tool.Get_language(db, "comment", true) + `</td></tr>`

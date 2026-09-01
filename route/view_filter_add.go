@@ -43,8 +43,7 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 		form += `<hr class="main_hr">` + filter_input(tool.Get_language(db, "icon", true), "icon", value[2])
 		if kind == "inter_wiki" {
 			inter_type := "url_encode"
-			sub_type := ""
-			tool.QueryRow_DB(db, "select plus_t from html_filter where html = ? and kind = 'inter_wiki_sub'", []any{&sub_type}, name)
+			sub_type := tool.Get_html_filter_inter_wiki_sub(db, name)
 			if sub_type == "under_bar" {
 				inter_type = "under_bar"
 			}
@@ -125,13 +124,7 @@ var html_filter_blocked_tags = map[string]bool{
 }
 
 func filter_value(db *sql.DB, kind string, name string) []string {
-	html := ""
-	plus := ""
-	plus_t := ""
-	if tool.QueryRow_DB(db, "select html, plus, plus_t from html_filter where html = ? and kind = ? limit 1", []any{&html, &plus, &plus_t}, name, kind) {
-		return []string{html, plus, plus_t}
-	}
-	return []string{"", "", ""}
+	return tool.Get_html_filter_value(db, name, kind)
 }
 
 func filter_safe_link(value string) string {

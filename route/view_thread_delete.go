@@ -12,10 +12,11 @@ func View_thread_delete(config tool.Config, topic_num string, values url.Values)
 	if values == nil && !tool.Check_permission(db, "thread_delete", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	title := ""
-	if !tool.QueryRow_DB(db, "select title from rd where code = ?", []any{&title}, topic_num) {
+	rd_data, rd_exists := tool.Get_rd_data(db, topic_num)
+	if !rd_exists {
 		return tool.Get_redirect("/")
 	}
+	title := rd_data["title"]
 	if values != nil {
 		api_data := Api_thread_delete_post(config, topic_num)
 		response, _ := api_data["response"].(string)

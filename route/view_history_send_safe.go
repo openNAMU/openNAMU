@@ -23,8 +23,7 @@ func View_history_send_safe(config tool.Config, doc_name string, rev string, val
 		}
 		return tool.Get_redirect("/history/" + tool.Url_parser(doc_name))
 	}
-	send := ""
-	tool.QueryRow_DB(db, "select send from history where title = ? and id = ?", []any{&send}, doc_name, rev)
+	send := tool.Get_history_send(db, doc_name, rev)
 	body := `<form method="post"><input name="send" value="` + tool.HTML_escape(send) + `"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 	return document_safe_page(db, config, "history send", body)
 }

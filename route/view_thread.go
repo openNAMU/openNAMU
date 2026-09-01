@@ -12,11 +12,7 @@ func thread_user_render(db *sql.DB, config tool.Config, ip string) string {
 }
 
 func thread_comments(db *sql.DB, config tool.Config, topic_num string) string {
-	rows := tool.Query_DB(
-		db,
-		"select id, data, date, ip, block, top from topic where code = ? order by id + 0 asc",
-		topic_num,
-	)
+	rows := tool.Get_topic_rows(db, topic_num)
 	defer rows.Close()
 
 	data_html := ""
@@ -68,9 +64,12 @@ func View_thread(config tool.Config, topic_num string, doc_name string, values u
 			return tool.Get_error_page(db, config, "auth")
 		}
 	} else {
-		if !tool.QueryRow_DB(db, "select title, sub from rd where code = ?", []any{&name, &sub}, topic_num) {
+		rd_data, rd_exists := tool.Get_rd_data(db, topic_num)
+		if !rd_exists {
 			return tool.Get_redirect("/")
 		}
+		name = rd_data["title"]
+		sub = rd_data["sub"]
 		if values == nil && !tool.Check_acl(db, name, topic_num, "topic_view", config.IP) {
 			return tool.Get_error_page(db, config, "auth")
 		}

@@ -18,7 +18,7 @@ func View_record_simple(config tool.Config, user_name string, record_type string
 	body := strings.Builder{}
 	switch record_type {
 	case "topic":
-		rows := tool.Query_DB(db, "select code, data, date from topic where ip = ? order by date desc limit 100", user_name)
+		rows := tool.Get_topic_record_rows(db, user_name, 0, false)
 		for rows.Next() {
 			code, data, date := "", "", ""
 			if rows.Scan(&code, &data, &date) == nil {
@@ -27,7 +27,7 @@ func View_record_simple(config tool.Config, user_name string, record_type string
 		}
 		rows.Close()
 	default:
-		rows := tool.Query_DB(db, "select title, date, send from history where ip = ? order by id + 0 desc limit 100", user_name)
+		rows := tool.Get_history_record_rows(db, user_name, "", 0, false)
 		for rows.Next() {
 			title, date, send := "", "", ""
 			if rows.Scan(&title, &date, &send) == nil {

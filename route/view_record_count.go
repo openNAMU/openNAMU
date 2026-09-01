@@ -17,13 +17,12 @@ func View_record_count(config tool.Config, user_name string) string {
 	if user_name == "" {
 		user_name = config.IP
 	}
-	history, topic, bbs := "0", "0", "0"
-	tool.QueryRow_DB(db, "select count(*) from history where ip = ?", []any{&history}, user_name)
-	tool.QueryRow_DB(db, "select count(*) from topic where ip = ?", []any{&topic}, user_name)
-	tool.QueryRow_DB(db, "select count(*) from bbs_data where set_name = 'comment_user_id' and set_data = ?", []any{&bbs}, user_name)
+	history := tool.Get_history_count(db, user_name)
+	topic := tool.Get_topic_count(db, user_name)
+	bbs := tool.Get_bbs_comment_count(db, user_name)
 
 	count_day := func(day string) (int, int) {
-		rows := tool.Query_DB(db, "select leng from history where date like ? and ip = ?", day+"%", user_name)
+		rows := tool.Get_history_length_rows(db, day, user_name)
 		defer rows.Close()
 		count := 0
 		length := 0

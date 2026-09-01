@@ -10,25 +10,13 @@ func View_bbs_raw(config tool.Config, set_id string, set_code string, comment_co
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	title := ""
-	if !tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_data where set_name = 'title' and set_id = ? and set_code = ?",
-		[]any{&title},
-		set_id,
-		set_code,
-	) {
+	title, title_exists := tool.Get_bbs_data_value(db, set_id, set_code, "title")
+	if !title_exists {
 		return tool.Get_redirect("/bbs/main")
 	}
 
-	user_id := ""
-	if !tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_data where set_name = 'user_id' and set_id = ? and set_code = ?",
-		[]any{&user_id},
-		set_id,
-		set_code,
-	) {
+	user_id, user_id_exists := tool.Get_bbs_data_value(db, set_id, set_code, "user_id")
+	if !user_id_exists {
 		return tool.Get_redirect("/bbs/main")
 	}
 	if !bbs_post_view_allowed(db, set_id, user_id, config.IP, nil) {
@@ -37,13 +25,9 @@ func View_bbs_raw(config tool.Config, set_id string, set_code string, comment_co
 
 	raw_data := ""
 	if comment_code == "" {
-		if !tool.QueryRow_DB(
-			db,
-			"select set_data from bbs_data where set_name = 'data' and set_id = ? and set_code = ?",
-			[]any{&raw_data},
-			set_id,
-			set_code,
-		) {
+		var raw_data_exists bool
+		raw_data, raw_data_exists = tool.Get_bbs_data_value(db, set_id, set_code, "data")
+		if !raw_data_exists {
 			return tool.Get_redirect("/bbs/main")
 		}
 	} else {

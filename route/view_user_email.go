@@ -17,8 +17,8 @@ func View_user_email(config tool.Config, values url.Values) string {
 		if !user_email_allowed(db, email) {
 			return tool.Get_error_page(db, config, "email domain")
 		}
-		var email_id string
-		if tool.QueryRow_DB(db, "select id from user_set where name = ? and data = ?", []any{&email_id}, "email", email) {
+		_, email_exists := tool.Get_user_set_id(db, "email", email)
+		if email_exists {
 			return tool.Get_error_page(db, config, "email already exist")
 		}
 		key := tool.Get_random_key(32)

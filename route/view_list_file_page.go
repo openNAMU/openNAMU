@@ -11,7 +11,7 @@ func View_list_file_page(config tool.Config, page string) string {
 	defer tool.DB_close(db)
 	page_num := list_extra_page_number(page)
 	offset := (page_num - 1) * 50
-	rows := tool.Query_DB(db, "select title from data where title like 'file:%' order by title limit ?, 50", offset)
+	rows := tool.Get_data_file_rows(db, offset, true)
 	body := strings.Builder{}
 	count := 0
 	for rows.Next() {

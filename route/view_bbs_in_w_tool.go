@@ -10,15 +10,8 @@ func View_bbs_in_w_tool(config tool.Config, set_id string, set_code string) stri
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	pinned := ""
 	pinned_name := "pinned"
-	if tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_data where set_name = 'pinned' and set_id = ? and set_code = ?",
-		[]any{&pinned},
-		set_id,
-		set_code,
-	) {
+	if _, exists := tool.Get_bbs_data_value(db, set_id, set_code, "pinned"); exists {
 		pinned_name = "pinned_release"
 	}
 

@@ -43,7 +43,7 @@ func View_alarm(config tool.Config, user_name string, values url.Values) string 
 		}
 	}
 	offset := (page - 1) * 50
-	rows := tool.Query_DB(db, "select id, data, date, readme from user_notice where name = ? order by date desc limit ?, 50", user_name, offset)
+	rows := tool.Get_user_notice_rows(db, user_name, offset)
 	body := `<ul>`
 	row_count := 0
 	for rows.Next() {

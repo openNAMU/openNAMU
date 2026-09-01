@@ -16,7 +16,7 @@ func View_list_admin(config tool.Config, auth_use bool) string {
 	}
 	body := strings.Builder{}
 	if auth_use {
-		rows := tool.Query_DB(db, "select who, what from re_admin order by time desc limit 200")
+		rows := tool.Get_re_admin_rows(db, 200)
 		for rows.Next() {
 			who, what := "", ""
 			if rows.Scan(&who, &what) == nil {
@@ -37,19 +37,19 @@ func list_extra_page(db *sql.DB, config tool.Config, title string, body string) 
 	return tool.Get_template(db, config, title, body, []any{}, [][]any{{"other", tool.Get_language(db, "return", true)}}, map[string]string{})
 }
 
-func list_extra_query(db *sql.DB, config tool.Config, title string, query string, args ...any) string {
-	rows := tool.Query_DB(db, query, args...)
+func list_extra_rows(db *sql.DB, config tool.Config, title string, rows *sql.Rows) string {
+	defer rows.Close()
 	body := strings.Builder{}
 	for rows.Next() {
 		name, value := "", ""
 		if rows.Scan(&name, &value) != nil {
 			continue
 		}
-		body.WriteString(tool.Get_list_ui(`<a href="/w/`+tool.Url_parser(name)+`">`+tool.HTML_escape(name)+`</a>`, tool.HTML_escape(value), "", ""))
+		body.WriteString(tool.Get_list_ui("<a href=\"/w/"+tool.Url_parser(name)+"\">"+tool.HTML_escape(name)+"</a>", tool.HTML_escape(value), "", ""))
 	}
-	rows.Close()
 	return list_extra_page(db, config, title, body.String())
 }
+
 func list_page_path(base string, page int) string {
 	return base + "/" + strconv.Itoa(page)
 }

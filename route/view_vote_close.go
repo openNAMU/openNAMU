@@ -12,12 +12,12 @@ func View_vote_close(config tool.Config, id string, values url.Values) string {
 	if values == nil && !tool.Check_permission(db, "vote", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	type_data := ""
-	if !tool.QueryRow_DB(db, "select type from vote where id = ? and user = ''", []any{&type_data}, id) {
+	vote_data, vote_exists := tool.Get_vote_data(db, id)
+	if !vote_exists {
 		return tool.Get_redirect("/vote")
 	}
-	owner := ""
-	tool.QueryRow_DB(db, "select data from vote where id = ? and name = 'open_user' and type = 'option'", []any{&owner}, id)
+	type_data := vote_data["type"]
+	owner := tool.Get_vote_value(db, id, "open_user")
 	if values == nil && owner != config.IP && !tool.Check_permission(db, "vote_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}

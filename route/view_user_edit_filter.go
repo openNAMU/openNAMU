@@ -28,11 +28,10 @@ func View_user_edit_filter(config tool.Config, user_name string, values url.Valu
 		return tool.Get_redirect("/edit_filter/" + tool.Url_parser(user_name))
 	}
 
-	filter_data := ""
-	tool.QueryRow_DB(db, "select data from user_set where name = 'edit_filter' and id = ?", []any{&filter_data}, user_name)
+	filter_data := tool.Get_user_set_data(db, user_name, "edit_filter")
 	body := `<a href="/filter/edit_filter">(` + tool.Get_language(db, "edit_filter_rule", true) + `)</a><hr class="main_hr">`
 	body += `<textarea readonly class="opennamu_textarea_500">` + tool.HTML_escape(filter_data) + `</textarea><ul>`
-	rows := tool.Query_DB(db, "select plus from html_filter where kind = 'regex_filter' and plus != ''")
+	rows := tool.Get_html_filter_plus_rows(db, "regex_filter")
 	for rows.Next() {
 		pattern := ""
 		if rows.Scan(&pattern) != nil {

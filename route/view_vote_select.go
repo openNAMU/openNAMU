@@ -10,18 +10,22 @@ import (
 func View_vote_select(config tool.Config, id string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	name, subject, data, type_data, end_date := "", "", "", "", ""
-	if !tool.QueryRow_DB(db, "select name, subject, data, type from vote where id = ? and user = ''", []any{&name, &subject, &data, &type_data}, id) {
+	vote_data, vote_exists := tool.Get_vote_data(db, id)
+	if !vote_exists {
 		return tool.Get_redirect("/vote")
 	}
+	name := vote_data["name"]
+	subject := vote_data["subject"]
+	data := vote_data["data"]
+	type_data := vote_data["type"]
+	end_date := ""
 	if type_data == "close" || type_data == "n_close" || (values == nil && !tool.Check_acl(db, "", id, "vote", config.IP)) {
 		return tool.Get_redirect("/vote/end/" + tool.Url_parser(id))
 	}
-	voted := ""
-	if tool.QueryRow_DB(db, "select user from vote where id = ? and user = ?", []any{&voted}, id, config.IP) {
+	if tool.Get_vote_user_exists(db, id, config.IP) {
 		return tool.Get_redirect("/vote/end/" + tool.Url_parser(id))
 	}
-	tool.QueryRow_DB(db, "select data from vote where id = ? and name = 'end_date' and type = 'option'", []any{&end_date}, id)
+	end_date = tool.Get_vote_value(db, id, "end_date")
 	if end_date != "" && strings.HasPrefix(tool.Get_time(), end_date) == false && strings.Split(tool.Get_time(), " ")[0] > strings.Split(end_date, " ")[0] {
 		return tool.Get_redirect("/vote/end/" + tool.Url_parser(id))
 	}

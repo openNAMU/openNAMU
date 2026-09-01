@@ -17,13 +17,7 @@ func View_list_admin_auth_use_page(config tool.Config, page string, search strin
 	}
 	page_num := list_extra_page_number(page)
 	offset := (page_num - 1) * 50
-	query := "select who, what, time from re_admin order by time desc limit ?, 50"
-	args := []any{offset}
-	if search != "" {
-		query = "select who, what, time from re_admin where what like ? order by time desc limit ?, 50"
-		args = []any{search + "%", offset}
-	}
-	rows := tool.Query_DB(db, query, args...)
+	rows := tool.Get_re_admin_page_rows(db, search, offset)
 	body := strings.Builder{}
 	count := 0
 	for rows.Next() {

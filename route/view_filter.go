@@ -25,7 +25,7 @@ func View_filter(config tool.Config, kind string) string {
 		data += `<tr id="main_table_top_tr">` +
 			`<td id="main_table_width">A</td><td id="main_table_width">B</td><td id="main_table_width">C</td></tr>`
 	}
-	rows := tool.Query_DB(db, "select html, plus, plus_t from html_filter where kind = ?", spec.db_kind)
+	rows := tool.Get_html_filter_rows(db, spec.db_kind)
 	defer rows.Close()
 
 	can_edit := tool.Check_permission(db, "filter_manage", config.IP)

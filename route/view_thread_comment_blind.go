@@ -13,10 +13,11 @@ func View_thread_comment_blind(config tool.Config, topic_num string, comment_num
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	block := ""
-	if !tool.QueryRow_DB(db, "select block from topic where code = ? and id = ?", []any{&block}, topic_num, comment_num) {
+	topic_data, topic_exists := tool.Get_topic_data(db, topic_num, comment_num)
+	if !topic_exists {
 		return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
 	}
+	block := topic_data["block"]
 	if values != nil {
 		api_data := Api_thread_comment_blind_post(config, topic_num, comment_num)
 		response, _ := api_data["response"].(string)

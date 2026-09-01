@@ -10,18 +10,12 @@ func View_thread_comment_tool(config tool.Config, topic_num string, comment_num 
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	block := ""
-	ip := ""
-	date := ""
-	if !tool.QueryRow_DB(
-		db,
-		"select block, ip, date from topic where code = ? and id = ?",
-		[]any{&block, &ip, &date},
-		topic_num,
-		comment_num,
-	) {
+	topic_data, topic_exists := tool.Get_topic_data(db, topic_num, comment_num)
+	if !topic_exists {
 		return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
 	}
+	ip := topic_data["ip"]
+	date := topic_data["date"]
 
 	data := `<h2>` + tool.Get_language(db, "state", true) + `</h2><ul><li>` + tool.Get_language(db, "writer", true) + ` : ` + tool.IP_parser(db, ip, config.IP) + `</li><li>` + tool.Get_language(db, "time", true) + ` : ` + tool.HTML_escape(date) + `</li></ul>`
 	data += `<h2>` + tool.Get_language(db, "other_tool", true) + `</h2><ul><li><a href="/thread/` + tool.Url_parser(topic_num) + `/comment/` + tool.Url_parser(comment_num) + `/raw">` + tool.Get_language(db, "raw", true) + `</a></li></ul>`

@@ -16,7 +16,6 @@ func Check_wiki_access(password string) bool {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	saved_password := ""
-	tool.QueryRow_DB(db, "select data from other where name = 'wiki_access_password'", []any{&saved_password})
+	saved_password := tool.Get_setting_value(db, "wiki_access_password", "", "")
 	return saved_password != "" && saved_password == password
 }

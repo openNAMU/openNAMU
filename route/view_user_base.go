@@ -7,9 +7,7 @@ import (
 )
 
 func user_value(db *sql.DB, id string, name string) string {
-	value := ""
-	tool.QueryRow_DB(db, "select data from user_set where id = ? and name = ?", []any{&value}, id, name)
-	return value
+	return tool.Get_user_set_data(db, id, name)
 }
 
 func user_form_page(db *sql.DB, config tool.Config, title string, body string) string {
@@ -30,8 +28,7 @@ func View_user_safe(config tool.Config, user_name string) string {
 
 	body := `<h2>` + tool.Get_language(db, "state", true) + `</h2><div id="opennamu_get_user_info">` + tool.HTML_escape(user_name) + `</div>`
 	if is_self {
-		alarm_count := "0"
-		tool.QueryRow_DB(db, "select count(*) from user_notice where name = ? and readme = ''", []any{&alarm_count}, config.IP)
+		alarm_count := tool.Get_user_notice_unread_count(db, config.IP)
 		alarm_text := tool.Get_language(db, "alarm", true)
 		if tool.Str_to_int(alarm_count) > 0 {
 			alarm_text += " (" + tool.HTML_escape(alarm_count) + ")"

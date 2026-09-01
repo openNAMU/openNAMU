@@ -10,8 +10,7 @@ func View_auth_fix(config tool.Config, user_name string, values url.Values) stri
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	password := ""
-	if !tool.QueryRow_DB(db, "select data from user_set where id = ? and name = 'pw'", []any{&password}, user_name) {
+	if !tool.Get_user_set_exists(db, user_name, "pw") {
 		return tool.Get_error_page(db, config, "error")
 	}
 	if values == nil && !tool.Check_permission(db, "auth_fix", config.IP) {

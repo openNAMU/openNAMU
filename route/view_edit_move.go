@@ -36,8 +36,8 @@ func View_edit_move(config tool.Config, doc_name string, values url.Values) stri
 	if !tool.Check_acl(db, doc_name, "", "document_move", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	var source_title string
-	if !tool.QueryRow_DB(db, "select title from data where title = ?", []any{&source_title}, doc_name) {
+	_, source_exists := tool.Get_data_title(db, doc_name)
+	if !source_exists {
 		return tool.Get_redirect("/w/" + tool.Url_parser(doc_name))
 	}
 	owner_auth := tool.Check_permission(db, "document_move_manage", config.IP)

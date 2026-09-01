@@ -15,32 +15,18 @@ import (
 )
 
 func view_w_redirect_target(db *sql.DB, doc_name string) (string, string) {
-	target := ""
-	anchor := ""
-	tool.QueryRow_DB(
-		db,
-		"select title, data from back where link = ? and type = 'redirect' limit 1",
-		[]any{&target, &anchor},
-		doc_name,
-	)
-	if target != "" {
-		target_exists := ""
-		if !tool.QueryRow_DB(db, "select title from data where title = ?", []any{&target_exists}, target) {
+	target, anchor, redirect_exists := tool.Get_back_redirect_data(db, doc_name)
+	if redirect_exists && target != "" {
+		_, target_exists := tool.Get_data_title(db, target)
+		if !target_exists {
 			return "", ""
 		}
 	}
-
 	return target, anchor
 }
 
 func view_w_child_exists(db *sql.DB, doc_name string) bool {
-	child := ""
-	return tool.QueryRow_DB(
-		db,
-		"select title from data where title like ? limit 1",
-		[]any{&child},
-		doc_name+"/%",
-	)
+	return tool.Get_data_title_like(db, doc_name+"/%")
 }
 
 func view_w_user_data(db *sql.DB, doc_name string) string {
@@ -55,7 +41,7 @@ func view_w_user_data(db *sql.DB, doc_name string) string {
 		if tool.Check_permission(db, "owner", user_name) {
 			phrase_name = "phrase_user_page_admin"
 		}
-		tool.QueryRow_DB(db, "select data from other where name = ?", []any{&phrase}, phrase_name)
+		phrase = tool.Get_other_data(db, phrase_name)
 	}
 	if phrase != "" {
 		phrase += "<br>"
@@ -85,15 +71,14 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 	show_category_view := tool.Get_main_skin_set(db, config, "main_css_category_change_title") != "off"
 	get_category_meta := func(name string) (string, bool) {
 		view := ""
-		blur_value := ""
 		if show_category_view {
-			tool.QueryRow_DB(db, "select data from back where title = ? and link = ? and type = 'cat_view' limit 1", []any{&view}, doc_name, name)
+			view, _ = tool.Get_category_meta(db, doc_name, name, "cat_view")
 		}
-		blur := tool.QueryRow_DB(db, "select data from back where title = ? and link = ? and type = 'cat_blur' limit 1", []any{&blur_value}, doc_name, name)
+		_, blur := tool.Get_category_meta(db, doc_name, name, "cat_blur")
 		return view, blur
 	}
 
-	rows := tool.Query_DB(db, "select link, data from back where title = ? and type = 'cat' order by link", doc_name)
+	rows := tool.Get_category_rows(db, doc_name)
 	for rows.Next() {
 		name, view := "", ""
 		if rows.Scan(&name, &view) == nil {
@@ -110,7 +95,7 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 	rows.Close()
 
 	if len(category_list) == 0 {
-		rows = tool.Query_DB(db, "select title, data from back where link = ? and (type = 'cat' or type = '') order by title", doc_name)
+		rows = tool.Get_category_back_rows(db, doc_name)
 		for rows.Next() {
 			name, view := "", ""
 			if rows.Scan(&name, &view) == nil {
@@ -168,8 +153,10 @@ func view_w_file_data(db *sql.DB, doc_name string) string {
 		return ""
 	}
 
-	cache_revision := "1"
-	tool.QueryRow_DB(db, "select id from history where title = ? order by date desc limit 1", []any{&cache_revision}, doc_name)
+	cache_revision := tool.Get_history_last_revision(db, doc_name)
+	if cache_revision == "" {
+		cache_revision = "1"
+	}
 	image_url := "/image/" + tool.Url_parser(storage_name) + ".cache_v" + tool.Url_parser(cache_revision)
 
 	resolution := "Vector"

@@ -11,11 +11,7 @@ func View_list_need_page(config tool.Config, page string) string {
 	defer tool.DB_close(db)
 	page_num := list_extra_page_number(page)
 	offset := (page_num - 1) * 50
-	rows := tool.Query_DB(
-		db,
-		"select b.title, count(*) from back b where b.type = 'no' and not exists (select 1 from data d where d.title = b.title) group by b.title order by count(*) desc, b.title asc limit ?, 50",
-		offset,
-	)
+	rows := tool.Get_need_document_rows(db, offset)
 	body := strings.Builder{}
 	count := 0
 	for rows.Next() {

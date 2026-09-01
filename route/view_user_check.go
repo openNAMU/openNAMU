@@ -22,16 +22,9 @@ func View_user_check(config tool.Config, name string, check_type string, page st
 		page_num = 1
 	}
 	offset := (page_num - 1) * 50
-	name_column := "name"
-	other_column := "ip"
-	if tool.IP_or_user(name) {
-		name_column = "ip"
-		other_column = "name"
-	}
-
 	if check_type == "simple" {
 		row_count := 0
-		rows := tool.Query_DB(db, "select distinct "+other_column+" from ua_d where "+name_column+" = ? order by today desc limit ?, 50", name, offset)
+		rows := tool.Get_ua_simple_rows(db, name, tool.IP_or_user(name), offset)
 		defer rows.Close()
 		data := `<a href="/list/user/check/` + tool.Url_parser(name) + `">(` + tool.Get_language(db, "check", true) + `)</a><ul>`
 		for rows.Next() {
@@ -52,51 +45,20 @@ func View_user_check(config tool.Config, name string, check_type string, page st
 		return tool.Get_template(db, config, name, data, []any{"(" + tool.Get_language(db, "check", true) + ")"}, [][]any{{"manager", tool.Get_language(db, "return", true)}}, map[string]string{})
 	}
 
-	query := "select name, ip, ua, today from ua_d where " + name_column + " = ?"
-	query_values := []any{name}
-	if plus_name != "" {
-		plus_column := "name"
-		if tool.IP_or_user(plus_name) {
-			plus_column = "ip"
-		}
-		query += " or " + plus_column + " = ?"
-		query_values = append(query_values, plus_name)
-	}
-	query += " order by today desc limit ?, 50"
-	query_values = append(query_values, offset)
-	rows := tool.Query_DB(db, query, query_values...)
+	rows := tool.Get_ua_rows(db, name, plus_name, tool.IP_or_user(name), tool.IP_or_user(plus_name), offset)
 	defer rows.Close()
 
 	data := ""
 	if !tool.IP_or_user(name) {
-		question := ""
-		answer := ""
-		tool.QueryRow_DB(db, "select data from user_set where name = 'approval_question' and id = ?", []any{&question}, name)
-		tool.QueryRow_DB(db, "select data from user_set where name = 'approval_question_answer' and id = ?", []any{&answer}, name)
+		question, answer := tool.Get_user_approval_data(db, name)
 		if question != "" && answer != "" {
 			data += `<table id="main_table_set"><tr id="main_table_top_tr"><td>Q</td><td>` + tool.HTML_escape(question) + `</td><td>A</td><td>` + tool.HTML_escape(answer) + `</td></tr></table><hr class="main_hr">`
 		}
 	}
 	if plus_name != "" && page_num == 1 {
-		plus_column := "name"
-		if tool.IP_or_user(plus_name) {
-			plus_column = "ip"
-		}
-		distinct_count := func(query string, args ...any) int {
-			rows := tool.Query_DB(db, query, args...)
-			defer rows.Close()
-			values := map[string]bool{}
-			for rows.Next() {
-				value := ""
-				if rows.Scan(&value) == nil {
-					values[value] = true
-				}
-			}
-			return len(values)
-		}
-		all_count := distinct_count("select distinct ip from ua_d where "+name_column+" = ? or "+plus_column+" = ?", name, plus_name)
-		name_count := distinct_count("select distinct ip from ua_d where "+name_column+" = ?", name)
-		plus_count := distinct_count("select distinct ip from ua_d where "+plus_column+" = ?", plus_name)
+		all_count := len(tool.Get_ua_distinct_ips(db, name, plus_name, tool.IP_or_user(name), tool.IP_or_user(plus_name)))
+		name_count := len(tool.Get_ua_distinct_ips(db, name, "", tool.IP_or_user(name), false))
+		plus_count := len(tool.Get_ua_distinct_ips(db, plus_name, "", tool.IP_or_user(plus_name), false))
 		if name_count+plus_count != all_count {
 			data += tool.Get_language(db, "same_ip_exist", true) + `<hr class="main_hr">`
 		}

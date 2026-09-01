@@ -15,7 +15,7 @@ func View_login_logout(config tool.Config) string {
 		config,
 		tool.Get_language(db, "logout", true),
 		`<form method="post">
-            <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "logout", true) + `</button>
+            <button class="__ON_BUTTON__" type="submit">`+tool.Get_language(db, "logout", true)+`</button>
         </form>`,
 		[]any{},
 		[][]any{

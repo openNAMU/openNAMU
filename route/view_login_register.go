@@ -11,23 +11,13 @@ func View_login_register(config tool.Config) string {
 		return tool.Get_error_page(db, config, error_name)
 	}
 
-	contract := ""
-	tool.QueryRow_DB(
-		db,
-		`select data from other where name = "contract"`,
-		[]any{&contract},
-	)
+	contract := tool.Get_setting_value(db, "contract", "", "")
 
 	if contract != "" {
 		contract += `<hr class="main_hr">`
 	}
 
-	password_length_limit := ""
-	tool.QueryRow_DB(
-		db,
-		`select data from other where name = 'password_min_length'`,
-		[]any{&password_length_limit},
-	)
+	password_length_limit := tool.Get_setting_value(db, "password_min_length", "", "")
 
 	if password_length_limit != "" {
 		password_length_limit = " (" + tool.Get_language(db, "password_min_length", true) + " : " + password_length_limit + ")"

@@ -12,8 +12,7 @@ func View_history_hidden_safe(config tool.Config, doc_name string, rev string, v
 	if values == nil && !tool.Check_permission(db, "hidel", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	hide := ""
-	tool.QueryRow_DB(db, "select hide from history where title = ? and id = ?", []any{&hide}, doc_name, rev)
+	hide := tool.Get_history_hide(db, doc_name, rev)
 	if values != nil {
 		api_data := Api_history_hidden_post(config, doc_name, rev)
 		response, _ := api_data["response"].(string)

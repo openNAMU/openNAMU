@@ -13,7 +13,7 @@ func View_list_user(config tool.Config) string {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	body := strings.Builder{}
-	rows := tool.Query_DB(db, "select id, data from user_set where name = 'date' order by data desc")
+	rows := tool.Get_user_date_rows(db, 0, false)
 	for rows.Next() {
 		name, date := "", ""
 		if rows.Scan(&name, &date) == nil {

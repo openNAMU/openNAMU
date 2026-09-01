@@ -39,9 +39,11 @@ func acl_field_title(db *sql.DB, field string) string {
 }
 
 func acl_value(db *sql.DB, doc_name string, field string) string {
-	value := ""
-	tool.QueryRow_DB(db, "select data from acl where title = ? and type = ? limit 1", []any{&value}, doc_name, field)
-	return value
+	value := tool.Get_acl_data_list(db, doc_name, field)
+	if len(value) == 0 {
+		return ""
+	}
+	return value[0]
 }
 
 func acl_group_select(db *sql.DB) string {
@@ -128,7 +130,7 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 	for _, field := range document_acl_fields {
 		date_value := ""
 		if !multiple {
-			tool.QueryRow_DB(db, "select set_data from data_set where doc_name = ? and doc_rev = ? and set_name = 'acl_date' limit 1", []any{&date_value}, doc_name, field)
+			date_value = tool.Get_document_setting_value(db, doc_name, "acl_date", field)
 		}
 		data += `<input type="date" name="` + field + `_date" value="` + tool.HTML_escape(date_value) + `"><hr class="main_hr">`
 	}
@@ -171,7 +173,5 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 }
 
 func document_set_value(db *sql.DB, doc_name string, set_name string) string {
-	value := ""
-	tool.QueryRow_DB(db, "select set_data from data_set where doc_name = ? and set_name = ? limit 1", []any{&value}, doc_name, set_name)
-	return value
+	return tool.Get_document_setting_value(db, doc_name, set_name, "")
 }

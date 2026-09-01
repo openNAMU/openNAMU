@@ -281,7 +281,9 @@ func Main_init() {
 		First_init(db)
 	} else {
 		if now_version != last_version["c_ver"] {
+			log.Println("[DB] updating database")
 			Update_init(db)
+			log.Println("[DB] database update complete")
 		}
 	}
 
@@ -545,6 +547,7 @@ func init_bbs_comment_count(db *sql.DB) {
 	) {
 		return
 	}
+	log.Println("[DB] updating BBS comment count")
 
 	rows := Query_DB(
 		db,
@@ -600,6 +603,7 @@ func init_bbs_comment_count(db *sql.DB) {
 		db,
 		"insert into other (name, data, coverage) values ('bbs_comment_count_initialized', '1', '')",
 	)
+	log.Printf("[DB] BBS comment count update complete: %d posts", len(post_list))
 }
 
 func Always_init(db *sql.DB, version string) {

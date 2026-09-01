@@ -10,22 +10,18 @@ func View_thread_raw(config tool.Config, topic_num string, comment_num string) s
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	title := ""
-	if !tool.QueryRow_DB(db, "select sub from rd where code = ?", []any{&title}, topic_num) {
+	rd_data, rd_exists := tool.Get_rd_data(db, topic_num)
+	if !rd_exists {
 		return tool.Get_redirect("/")
 	}
+	title := rd_data["sub"]
 
-	data := ""
-	block := ""
-	if !tool.QueryRow_DB(
-		db,
-		"select data, block from topic where code = ? and id = ?",
-		[]any{&data, &block},
-		topic_num,
-		comment_num,
-	) {
+	topic_data, topic_exists := tool.Get_topic_data(db, topic_num, comment_num)
+	if !topic_exists {
 		return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
 	}
+	data := topic_data["data"]
+	block := topic_data["block"]
 	if block == "O" && !tool.Check_permission(db, "hidel", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}

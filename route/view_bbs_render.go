@@ -15,13 +15,7 @@ func Get_bbs_render(db *sql.DB, set_id string, data string, render_type string, 
 	if config.IP != "" {
 		parameter_data["ip"] = config.IP
 	}
-	bbs_markup := ""
-	tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_set where set_name = 'bbs_markup' and set_id = ?",
-		[]any{&bbs_markup},
-		set_id,
-	)
+	bbs_markup := tool.Get_bbs_set_first_data(db, set_id, "bbs_markup")
 
 	if bbs_markup == "" || bbs_markup == "normal" || bbs_markup == "namumark_beta" {
 		rendered_data := markup.Get_render(db, "", data, render_type, parameter_data)["data"]

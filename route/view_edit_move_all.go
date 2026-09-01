@@ -42,11 +42,7 @@ func move_all_rows(db *sql.DB, source string, target string, match_type string) 
 		return ""
 	}
 
-	rows := tool.Query_DB(
-		db,
-		"select title from data where title not like 'file:%' and title not like 'category:%' and title like ? order by title limit 100",
-		move_all_pattern(source, match_type),
-	)
+	rows := tool.Get_move_document_rows(db, move_all_pattern(source, match_type))
 	defer rows.Close()
 
 	body := "<h2>" + tool.Get_language(db, "move", true) + " preview</h2><ul>"

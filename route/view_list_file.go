@@ -10,7 +10,7 @@ func View_list_file(config tool.Config, image_only bool) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 	body := strings.Builder{}
-	rows := tool.Query_DB(db, "select title, type from data where title like 'file:%' order by title")
+	rows := tool.Get_file_rows(db)
 	for rows.Next() {
 		name, kind := "", ""
 		if rows.Scan(&name, &kind) != nil {

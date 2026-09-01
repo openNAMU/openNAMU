@@ -16,8 +16,8 @@ func Api_challenge_post(config tool.Config) map[string]any {
 		return return_data
 	}
 
-	edit_count := challenge_count(db, "select count(*) from history where ip = ?", config.IP)
-	topic_count := challenge_count(db, "select count(*) from topic where ip = ?", config.IP)
+	edit_count := tool.Str_to_int(tool.Get_history_count(db, config.IP))
+	topic_count := tool.Str_to_int(tool.Get_topic_count(db, config.IP))
 	experience := 5 * edit_count
 
 	for _, challenge := range []struct {

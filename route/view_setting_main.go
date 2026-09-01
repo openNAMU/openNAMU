@@ -24,18 +24,7 @@ type setting_field struct {
 }
 
 func setting_value(db *sql.DB, name string, coverage string, default_value string) string {
-	data := ""
-	exists := tool.QueryRow_DB(
-		db,
-		"select data from other where name = ? and coverage = ?",
-		[]any{&data},
-		name,
-		coverage,
-	)
-	if !exists {
-		return default_value
-	}
-	return data
+	return tool.Get_setting_value_exact(db, name, coverage, default_value)
 }
 
 func setting_load_fields(db *sql.DB, fields []setting_field) map[string]string {
