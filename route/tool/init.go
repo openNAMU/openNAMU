@@ -138,6 +138,8 @@ func DB_create_index(db *sql.DB) {
 		"create index history_title_id_index on history (title, id)",
 		"create index history_ip_date_index on history (ip, date)",
 		"create index bbs_data_index on bbs_data (set_id, set_code, set_name)",
+		"create index bbs_data_name_id_code_index on bbs_data (set_name, set_id, set_code)",
+		"create index bbs_data_name_data_index on bbs_data (set_name, set_data)",
 		"create index acl_title_type_index on acl (title, type)",
 		"create index data_set_document_index on data_set (doc_name, set_name, doc_rev)",
 		"create index data_set_list_index on data_set (set_name, doc_rev)",
@@ -154,6 +156,8 @@ func DB_create_index(db *sql.DB) {
 			"create index history_title_id_index on history (title(191), id(191))",
 			"create index history_ip_date_index on history (ip(191), date(191))",
 			"create index bbs_data_index on bbs_data (set_id(191), set_code(191), set_name(191))",
+			"create index bbs_data_name_id_code_index on bbs_data (set_name(64), set_id(191), set_code(191))",
+			"create index bbs_data_name_data_index on bbs_data (set_name(64), set_data(191))",
 			"create index acl_title_type_index on acl (title(191), type(191))",
 			"create index data_set_document_index on data_set (doc_name(191), set_name(191), doc_rev(191))",
 			"create index data_set_list_index on data_set (set_name(191), doc_rev(191))",
@@ -847,7 +851,3 @@ func Always_init(db *sql.DB, version string) {
 		)
 	}
 }
-		"create index bbs_data_name_id_code_index on bbs_data (set_name, set_id, set_code)",
-		"create index bbs_data_name_data_index on bbs_data (set_name, set_data)",
-			"create index bbs_data_name_id_code_index on bbs_data (set_name(64), set_id(191), set_code(191))",
-			"create index bbs_data_name_data_index on bbs_data (set_name(64), set_data(191))",
