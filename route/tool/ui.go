@@ -615,9 +615,9 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
 	preview_area := `<hr class="main_hr">
         <div id="opennamu_preview_area"></div>`
 	if do_type == "edit" {
-		preview_ui = `<button class="__ON_BUTTON__" type="submit" formaction="/edit_preview/normal/` + Url_parser(doc_name) + `" formmethod="post" formtarget="opennamu_preview_frame" onclick="do_sync_monaco_and_textarea();">` + Get_language(db, "preview_normal", true) + `</button>`
-		preview_ui += ` <button class="__ON_BUTTON__" type="submit" formaction="/edit_preview/dark/` + Url_parser(doc_name) + `" formmethod="post" formtarget="opennamu_preview_frame" onclick="do_sync_monaco_and_textarea();">` + Get_language(db, "preview_dark", true) + `</button>`
-		preview_area = `<hr class="main_hr"><iframe name="opennamu_preview_frame" title="` + Get_language(db, "preview", true) + `" style="width: 100%; height: 600px; border: 0;"></iframe>`
+		preview_ui = `<button class="__ON_BUTTON__" type="submit" name="preview" value="normal" onclick="do_stop_exit_release(); do_sync_monaco_and_textarea();">` + Get_language(db, "preview_normal", true) + `</button>`
+		preview_ui += ` <button class="__ON_BUTTON__" type="submit" name="preview" value="dark" onclick="do_stop_exit_release(); do_sync_monaco_and_textarea();">` + Get_language(db, "preview_dark", true) + `</button>`
+		preview_area = ""
 	}
 
 	return `

@@ -82,6 +82,12 @@ func register_history_edit_routes(r *gin.Engine) {
 	r.POST("/edit/*doc_name", func(c *gin.Context) {
 		doc_name := strings.TrimPrefix(c.Param("doc_name"), "/")
 		data := c.PostForm("content")
+		preview := c.PostForm("preview")
+		if preview == "normal" || preview == "dark" {
+			route_data := route.View_edit_preview(make_route_config(c), doc_name, data, preview, c.PostForm("send"))
+			write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+			return
+		}
 		send := c.PostForm("send")
 		agree := c.PostForm("copyright_agreement")
 
@@ -91,7 +97,7 @@ func register_history_edit_routes(r *gin.Engine) {
 
 	r.POST("/edit_preview/:mode/*doc_name", func(c *gin.Context) {
 		doc_name := strings.TrimPrefix(c.Param("doc_name"), "/")
-		route_data := route.View_edit_preview(make_route_config(c), doc_name, c.PostForm("content"), c.Param("mode"))
+		route_data := route.View_edit_preview(make_route_config(c), doc_name, c.PostForm("content"), c.Param("mode"), c.PostForm("send"))
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 

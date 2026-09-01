@@ -1,12 +1,8 @@
 package route
 
-import (
-	"strings"
+import "opennamu/route/tool"
 
-	"opennamu/route/tool"
-)
-
-func View_edit_preview(config tool.Config, doc_name string, data string, mode string) string {
+func View_edit_preview(config tool.Config, doc_name string, data string, mode string, send string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -34,17 +30,14 @@ func View_edit_preview(config tool.Config, doc_name string, data string, mode st
 		return tool.Get_error_page(db, config, "error")
 	}
 
-	out := tool.Get_template(
+	return view_edit_page(
 		db,
 		preview_config,
 		doc_name,
+		"",
+		data,
+		send,
+		tool.Get_language(db, preview_name, true),
 		rendered_data,
-		[]any{"(" + tool.Get_language(db, preview_name, true) + ")"},
-		[][]any{
-			{"edit/" + tool.Url_parser(doc_name), tool.Get_language(db, "return", true)},
-		},
-		map[string]string{},
 	)
-
-	return strings.ReplaceAll(out, `<script src="/views/ringo/js/skin_set_do.js.cache_v4"></script>`, "")
 }
