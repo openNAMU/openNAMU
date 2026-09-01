@@ -6,14 +6,16 @@ import (
 	"opennamu/route/tool"
 )
 
-func View_list_file_page(config tool.Config, page string) string {
+func View_list_file_unlinked_page(config tool.Config, page string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
+
 	page_num := list_extra_page_number(page)
 	offset := (page_num - 1) * 50
-	rows := tool.Get_data_file_rows(db, offset, true)
 	body := strings.Builder{}
-	body.WriteString(`<a href="/list/file/unlinked">(` + tool.Get_language(db, "unlinked_file_list", true) + `)</a><hr class="main_hr">`)
+	body.WriteString(`<a href="/list/file">(` + tool.Get_language(db, "file_list", true) + `)</a><hr class="main_hr">`)
+
+	rows := tool.Get_unlinked_file_rows(db, offset)
 	body.WriteString(`<ul>`)
 	count := 0
 	for rows.Next() {
@@ -26,6 +28,7 @@ func View_list_file_page(config tool.Config, page string) string {
 	}
 	rows.Close()
 	body.WriteString(`</ul>`)
-	body.WriteString(tool.Get_page_control(db, page_num, count, 50, "/list/file/{}"))
-	return list_extra_page(db, config, tool.Get_language(db, "file_list", true), body.String())
+	body.WriteString(tool.Get_page_control(db, page_num, count, 50, "/list/file/unlinked/{}"))
+
+	return list_extra_page(db, config, tool.Get_language(db, "unlinked_file_list", true), body.String())
 }

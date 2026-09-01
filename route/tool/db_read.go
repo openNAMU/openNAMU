@@ -597,6 +597,14 @@ func Get_data_file_rows(db *sql.DB, offset int, order bool) *sql.Rows {
 	return Query_DB(db, "select title from data where title like 'file:%' limit ?, 50", offset)
 }
 
+func Get_unlinked_file_rows(db *sql.DB, offset int) *sql.Rows {
+	return Query_DB(
+		db,
+		"select d.title from data d where d.title like 'file:%' and not exists (select 1 from back b where b.link = d.title and b.type = 'file') order by d.title limit ?, 50",
+		offset,
+	)
+}
+
 func Get_file_rows(db *sql.DB) *sql.Rows {
 	return Query_DB(db, "select title, type from data where title like 'file:%' order by title")
 }

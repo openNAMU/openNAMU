@@ -25,6 +25,9 @@ func register_list_extra_routes(r *gin.Engine) {
 	r.GET("/list/file", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_file_page(make_route_config(c), "1")))
 	})
+	r.GET("/list/file/unlinked", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_file_unlinked_page(make_route_config(c), "1")))
+	})
 	r.GET("/list/image", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_image_page(make_route_config(c), "1")))
 	})

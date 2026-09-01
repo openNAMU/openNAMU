@@ -22,6 +22,9 @@ func register_list_compat_routes(r *gin.Engine) {
 	r.GET("/list/document/no_link/:page", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_no_link_page(make_route_config(c), c.Param("page"))))
 	})
+	r.GET("/list/file/unlinked/:page", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_file_unlinked_page(make_route_config(c), c.Param("page"))))
+	})
 	r.GET("/list/file/:page", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_file_page(make_route_config(c), c.Param("page"))))
 	})

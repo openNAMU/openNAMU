@@ -606,6 +606,7 @@
     "watch_user_list": "Users watching this document",
     "image_file_list": "Image file(s) list",
     "file_list": "File(s) list",
+    "unlinked_file_list": "File(s) not linked to document(s)",
     "image_list": "Image(s) list",
     "short_page": "Short page(s) list",
     "long_page": "Long page(s) list",
