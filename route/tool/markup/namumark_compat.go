@@ -1151,7 +1151,7 @@ func (class *namumark_compat_renderer) process_includes(data string) string {
 				return suffix
 			}
 			include_count_key := strings.ToLower(include_name)
-			if include_count[include_count_key] >= 10 {
+			if include_count[include_count_key] >= 5 {
 				return suffix
 			}
 			include_count[include_count_key]++
