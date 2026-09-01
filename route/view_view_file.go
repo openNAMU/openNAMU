@@ -14,6 +14,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var view_file_cache_regex = regexp.MustCompile(`\.cache_v[0-9]+$`)
+
 func View_view_file(c *gin.Context) {
 	raw_path := strings.TrimPrefix(c.Param("name"), "/")
 	if raw_path == "" {
@@ -29,8 +31,8 @@ func View_view_file(c *gin.Context) {
 		return
 	}
 
-	re_cache := regexp.MustCompile(`\.cache_v[0-9]+$`)
-	file_name = re_cache.ReplaceAllString(file_name, "")
+	has_cache_version := view_file_cache_regex.MatchString(file_name)
+	file_name = view_file_cache_regex.ReplaceAllString(file_name, "")
 
 	re_dots := regexp.MustCompile(`\.{2,}`)
 	dir_name = re_dots.ReplaceAllString(dir_name, "")
@@ -76,6 +78,9 @@ func View_view_file(c *gin.Context) {
 		content_type = mime_type
 	} else {
 		content_type = mime_type + "; charset=utf-8"
+	}
+	if has_cache_version {
+		c.Header("Cache-Control", "public, max-age=31536000, immutable")
 	}
 
 	c.Data(http.StatusOK, content_type, file_data)

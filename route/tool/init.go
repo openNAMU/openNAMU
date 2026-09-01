@@ -847,3 +847,7 @@ func Always_init(db *sql.DB, version string) {
 		)
 	}
 }
+		"create index bbs_data_name_id_code_index on bbs_data (set_name, set_id, set_code)",
+		"create index bbs_data_name_data_index on bbs_data (set_name, set_data)",
+			"create index bbs_data_name_id_code_index on bbs_data (set_name(64), set_id(191), set_code(191))",
+			"create index bbs_data_name_data_index on bbs_data (set_name(64), set_data(191))",

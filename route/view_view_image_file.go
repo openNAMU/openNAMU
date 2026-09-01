@@ -14,6 +14,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var view_image_file_cache_regex = regexp.MustCompile(`\.cache_v[0-9]+$`)
+
 func View_view_image_file(c *gin.Context) {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
@@ -43,8 +45,8 @@ func View_view_image_file(c *gin.Context) {
 		return
 	}
 
-	re_cache := regexp.MustCompile(`\.cache_v[0-9]+$`)
-	file_name = re_cache.ReplaceAllString(file_name, "")
+	has_cache_version := view_image_file_cache_regex.MatchString(file_name)
+	file_name = view_image_file_cache_regex.ReplaceAllString(file_name, "")
 	if file_name == "" || file_name == "." || file_name == ".." || file_name == "/" || strings.ContainsAny(file_name, `/\\`) {
 		c.String(http.StatusBadRequest, "")
 		return
@@ -185,6 +187,9 @@ func View_view_image_file(c *gin.Context) {
 	if file_info.IsDir() {
 		c.String(http.StatusNotFound, "")
 		return
+	}
+	if has_cache_version {
+		c.Header("Cache-Control", "private, max-age=31536000, immutable")
 	}
 
 	is_inline := strings.HasPrefix(mime_type, "image/") || strings.HasPrefix(mime_type, "video/") || strings.HasPrefix(mime_type, "audio/")
