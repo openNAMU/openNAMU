@@ -2559,7 +2559,7 @@ func (class *namumark_compat_renderer) process_headings(data string) string {
 
 	heading_close := ""
 	if last_heading >= 0 {
-		heading_close = class.reserve(`</div></details>`)
+		heading_close = "\n" + class.reserve(`</div></details>`)
 	}
 	data = strings.Join(lines, "\n") + heading_close
 
