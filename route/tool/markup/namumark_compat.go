@@ -43,6 +43,7 @@ type namumark_compat_renderer struct {
 	backlink_order []string
 	link_count     int
 	redirect       bool
+	document_cache map[string]namumark_compat_document
 
 	categories       []namumark_compat_category
 	toc_items        []namumark_compat_toc_item
@@ -58,6 +59,11 @@ type namumark_compat_backlink struct {
 	target    string
 	link_type string
 	data      string
+}
+
+type namumark_compat_document struct {
+	actual string
+	exists bool
 }
 
 type namumark_compat_category struct {
@@ -438,6 +444,7 @@ func new_namumark_compat_renderer(
 		inter_wrappers:  map[string]string{},
 		literal_tokens:  map[string]bool{},
 		backlinks:       map[string]namumark_compat_backlink{},
+		document_cache:  map[string]namumark_compat_document{},
 		footnote_map:    map[string]int{},
 		footnote_prefix: "open_namu_fn_" + tool.Sha224(doc_name + data)[:12],
 	}
@@ -563,6 +570,10 @@ func (class *namumark_compat_renderer) add_backlink(target string, link_type str
 }
 
 func (class *namumark_compat_renderer) find_document(name string) (string, bool) {
+	if document, ok := class.document_cache[name]; ok {
+		return document.actual, document.exists
+	}
+
 	actual := ""
 	query := "select title from data where title = ?"
 	case_insensitive := ""
@@ -572,8 +583,10 @@ func (class *namumark_compat_renderer) find_document(name string) (string, bool)
 	}
 
 	if tool.QueryRow_DB(class.db, query, []any{&actual}, name) {
+		class.document_cache[name] = namumark_compat_document{actual: actual, exists: true}
 		return actual, true
 	}
+	class.document_cache[name] = namumark_compat_document{actual: name, exists: false}
 	return name, false
 }
 
