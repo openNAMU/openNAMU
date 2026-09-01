@@ -42,6 +42,7 @@ func emergency_print_menu() {
 	fmt.Println("25. Recalc exist data_set")
 	fmt.Println("26. Change update branch")
 	fmt.Println("27. Change golang port")
+	fmt.Println("28. Initialize default auth groups")
 }
 
 func emergency_input(reader *bufio.Reader, message string) string {
@@ -215,6 +216,53 @@ func emergency_recalc_data_set(db *sql.DB) error {
 	}
 
 	fmt.Printf("data_set recalculated: %d documents\n", len(document_names))
+	return nil
+}
+
+func emergency_init_auth_groups(db *sql.DB) error {
+	auth_data := [][]string{
+		{"owner", "owner"},
+		{"admin", "admin"},
+		{"user", "user"},
+		{"ip", "ip"},
+		{"ip", "image_view"},
+		{"ban", "view"},
+		{"ban", "login_available"},
+		{"ban", "image_view"},
+		{"ban_without_login", "view"},
+		{"ban_without_login", "image_view"},
+		{"ban_without_site", "nothing"},
+		{"email_verified", "email_verified"},
+		{"up_to_level_10", "up_to_level_10"},
+		{"up_to_level_3", "up_to_level_3"},
+		{"trust_a", "trust_a"},
+		{"trust_b", "trust_b"},
+		{"trust_c", "trust_c"},
+		{"trust_d", "trust_d"},
+	}
+
+	insert_count := 0
+	for _, data := range auth_data {
+		var exists int
+		err := db.QueryRow(
+			tool.DB_change("select 1 from alist where name = ? and acl = ? limit 1"),
+			data[0],
+			data[1],
+		).Scan(&exists)
+		if err == nil {
+			continue
+		}
+		if !errors.Is(err, sql.ErrNoRows) {
+			return err
+		}
+
+		if err := emergency_exec(db, "insert into alist (name, acl) values (?, ?)", data[0], data[1]); err != nil {
+			return err
+		}
+		insert_count++
+	}
+
+	fmt.Printf("Default auth groups initialized: %d permissions\n", insert_count)
 	return nil
 }
 
@@ -439,6 +487,8 @@ func Run_emergency_tool(arguments []string) int {
 		} else {
 			err = emergency_set_other(db, "golang_port", port)
 		}
+	case "28":
+		err = emergency_init_auth_groups(db)
 	default:
 		err = fmt.Errorf("unknown selection: %s", choice)
 	}

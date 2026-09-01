@@ -664,43 +664,23 @@ func Always_init(db *sql.DB, version string) {
 		`insert into alist (name, acl) values ("owner", "owner")`,
 	)
 
-	admin := ""
-	QueryRow_DB(
-		db,
-		`select name from alist where name = 'admin' limit 1`,
-		[]any{&admin},
-	)
-	if admin == "" {
-		Exec_DB(
+	for _, auth_data := range [][]string{{"admin", "admin"}, {"user", "user"}, {"ip", "ip"}} {
+		acl := ""
+		QueryRow_DB(
 			db,
-			`insert into alist (name, acl) values ("admin", "admin")`,
+			"select acl from alist where name = ? and acl = ? limit 1",
+			[]any{&acl},
+			auth_data[0],
+			auth_data[1],
 		)
-	}
-
-	user := ""
-	QueryRow_DB(
-		db,
-		`select name from alist where name = 'user' limit 1`,
-		[]any{&user},
-	)
-	if user == "" {
-		Exec_DB(
-			db,
-			`insert into alist (name, acl) values ("user", "user")`,
-		)
-	}
-
-	ip := ""
-	QueryRow_DB(
-		db,
-		`select name from alist where name = 'ip' limit 1`,
-		[]any{&ip},
-	)
-	if ip == "" {
-		Exec_DB(
-			db,
-			`insert into alist (name, acl) values ("ip", "ip")`,
-		)
+		if acl == "" {
+			Exec_DB(
+				db,
+				"insert into alist (name, acl) values (?, ?)",
+				auth_data[0],
+				auth_data[1],
+			)
+		}
 	}
 
 	for _, ban_data := range [][]string{{"ip", "image_view"}, {"ban", "view"}, {"ban", "login_available"}, {"ban", "image_view"}, {"ban_without_login", "view"}, {"ban_without_login", "image_view"}, {"ban_without_site", "nothing"}} {
