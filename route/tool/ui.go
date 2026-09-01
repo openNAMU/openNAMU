@@ -2,7 +2,6 @@ package tool
 
 import (
 	"database/sql"
-	"fmt"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -225,25 +224,7 @@ func Get_template(db *sql.DB, config Config, name string, data string, other []a
 const redirect_marker = "<!--opennamu_redirect:"
 
 func Get_redirect(target string) string {
-	attr_url := HTML_escape(target)
-	js_url := strconv.Quote(target)
-
-	return redirect_marker + strconv.Quote(target) + "-->" + fmt.Sprintf(`<!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8">
-<title>Redirecting…</title>
-<script>
-location.replace(%s);
-</script>
-<noscript>
-<meta http-equiv="refresh" content="0; url=%s">
-</noscript>
-</head>
-<body>
-<p>Redirecting… <a href="%s">continue</a></p>
-</body>
-</html>`, js_url, attr_url, attr_url)
+	return redirect_marker + strconv.Quote(target) + "-->"
 }
 
 func Get_redirect_target(data string) (string, bool) {
