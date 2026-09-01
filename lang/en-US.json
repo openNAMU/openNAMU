@@ -380,6 +380,7 @@
     "comment_closed": "Comments are closed.",
     "comment_manage": "Comment management",
     "comment_bulk_delete": "Bulk delete comments",
+    "comment_delete_all": "Delete all comments",
     "reply": "Reply",
     "post_edit": "Modify post",
     "post_add": "Add post",

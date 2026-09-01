@@ -34,6 +34,11 @@ func View_bbs_in_w_tool_post(config tool.Config, set_id string, set_code string,
 				return tool.Get_error_page(db, config, "auth")
 			}
 		}
+	case "comment_delete_all":
+		api_data := Api_bbs_w_comment_all_delete(config, set_id, set_code)
+		if api_data["response"] == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
+		}
 	}
 
 	return tool.Get_redirect("/bbs/tool/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code))

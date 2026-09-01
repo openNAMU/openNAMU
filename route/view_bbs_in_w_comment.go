@@ -22,6 +22,9 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
             <option value="0">` + tool.Get_language(db, "normal", true) + `</option>
     `
 	data_html := ""
+	if set_id == "0" && tool.Check_permission(db, "bbs_comment_manage", config.IP) {
+		data_html += `<a href="/bbs/tool/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">(` + tool.Get_language(db, "comment_manage", true) + `)</a>`
+	}
 
 	tabom_count_api := Api_bbs_w_tabom(config, set_id, set_code)
 	tabom_count := tabom_count_api["data"].(string)
