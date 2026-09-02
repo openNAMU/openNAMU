@@ -41,6 +41,7 @@ func View_main_other(config tool.Config) string {
             <li><a href="/list/document/old">`+tool.Get_language(db, "old_page", true)+`</a></li>
             <li><a href="/list/document/new">`+tool.Get_language(db, "new_page", true)+`</a></li>
             <li><a href="/list/document/no_link">`+tool.Get_language(db, "no_link_document_list", true)+`</a></li>
+            <li><a href="/list/contributor">`+tool.Get_language(db, "monthly_top_contributor", true)+`</a></li>
         </ul>
         <h3>`+tool.Get_language(db, "user", true)+`</h3>
         <ul>
@@ -52,6 +53,7 @@ func View_main_other(config tool.Config) string {
             <li><a href="/list/file">`+tool.Get_language(db, "image_file_list", true)+`</a></li>
             <li><a href="/vote">`+tool.Get_language(db, "vote_list", true)+`</a></li>
             <li><a href="/bbs/main">`+tool.Get_language(db, "bbs_main", true)+`</a></li>
+            <li><a href="/bbs/contributor">`+tool.Get_language(db, "monthly_bbs_contributor", true)+`</a></li>
         </ul>
         <h2>`+tool.Get_language(db, "other", true)+`</h2>
         <ul>

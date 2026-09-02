@@ -1,6 +1,9 @@
 package tool
 
-import "database/sql"
+import (
+	"database/sql"
+	"strings"
+)
 
 func Get_setting_value(db *sql.DB, name string, coverage string, default_value string) string {
 	data := Get_setting(db, name, coverage)
@@ -705,6 +708,15 @@ func Get_history_count(db *sql.DB, user_name string) string {
 	return count
 }
 
+func Get_month_contributor_rows(db *sql.DB, start string, end string) *sql.Rows {
+	return Query_DB(
+		db,
+		"select ip, count(*) from history where date >= ? and date < ? group by ip order by count(*) desc, ip asc limit 1",
+		start,
+		end,
+	)
+}
+
 func Get_topic_count(db *sql.DB, user_name string) string {
 	count := "0"
 	QueryRow_DB(db, "select count(*) from topic where ip = ?", []any{&count}, user_name)
@@ -720,6 +732,37 @@ func Get_bbs_comment_count(db *sql.DB, user_name string) string {
 		user_name,
 	)
 	return count
+}
+
+func Get_month_bbs_contributor_rows(db *sql.DB, start string, end string, bbs_ids []string) *sql.Rows {
+	placeholders := strings.TrimSuffix(strings.Repeat("?,", len(bbs_ids)), ",")
+	comment_where := make([]string, len(bbs_ids))
+	for i := range bbs_ids {
+		comment_where[i] = "user_data.set_id like ?"
+	}
+
+	query := `select user_id, count(*) from (
+		select user_data.set_data as user_id
+		from bbs_data user_data
+		join bbs_data date_data on date_data.set_name = 'date' and date_data.set_id = user_data.set_id and date_data.set_code = user_data.set_code
+		where user_data.set_name = 'user_id' and user_data.set_data != '' and user_data.set_id in (` + placeholders + `) and date_data.set_data >= ? and date_data.set_data < ?
+		union all
+		select user_data.set_data as user_id
+		from bbs_data user_data
+		join bbs_data date_data on date_data.set_name = 'comment_date' and date_data.set_id = user_data.set_id and date_data.set_code = user_data.set_code
+		where user_data.set_name = 'comment_user_id' and user_data.set_data != '' and (` + strings.Join(comment_where, " or ") + `) and date_data.set_data >= ? and date_data.set_data < ?
+	) bbs_contributor group by user_id order by count(*) desc, user_id asc limit 1`
+	values := []any{}
+	for _, bbs_id := range bbs_ids {
+		values = append(values, bbs_id)
+	}
+	values = append(values, start, end)
+	for _, bbs_id := range bbs_ids {
+		values = append(values, bbs_id+"-%")
+	}
+	values = append(values, start, end)
+
+	return Query_DB(db, query, values...)
 }
 
 func Get_history_length_range_rows(db *sql.DB, user_name string, start string, end string) *sql.Rows {

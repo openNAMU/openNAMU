@@ -19,6 +19,11 @@ func register_bbs_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.GET("/bbs/contributor", func(c *gin.Context) {
+		route_data := route.View_bbs_contributor(make_route_config(c))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/bbs/make", func(c *gin.Context) {
 		route_data := route.View_bbs_make(make_route_config(c))
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
