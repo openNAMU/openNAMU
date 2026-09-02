@@ -6,6 +6,7 @@
     "bbs_authority": "BBS authority",
     "treat_as_admin_authority": "Treat as admin authority",
     "backup_count": "Maximum number of backup files",
+    "auth_give_help": "Select an authorization group and assign it to a target. The group's permissions and inherited lower-level permissions are applied together. Use Normal for a user or IP, and Regex or CIDR for matching multiple IPs. Selecting a period calculates the end date automatically; revoke removes the group's assignment from the target.",
     "template_var_1": "Template variable 1",
     "template_var_2": "Template variable 2",
     "template_var_3": "Template variable 3",

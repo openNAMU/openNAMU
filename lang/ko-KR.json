@@ -16,6 +16,7 @@
     "authorization_authority": "권한 부여 권한",
     "authorization_range_authority": "대역 권한 부여 권한",
     "auth_give_list": "권한 부여 목록",
+    "auth_give_help": "권한 그룹을 선택해 대상에게 부여합니다. 그룹에 포함된 권한과 상속된 하위 권한이 함께 적용됩니다. 일반은 사용자·IP, 정규식·CIDR은 여러 IP에 적용할 때 사용합니다. 기간을 선택하면 종료 날짜가 자동으로 계산되며, 권한 회수는 대상의 그룹 부여를 삭제합니다.",
     "include_default_auth": "기본 그룹 포함",
     "grantor": "부여자",
     "granted_at": "부여 시각",

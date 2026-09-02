@@ -124,6 +124,9 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 	}
 
 	data := `<form method="post">`
+	if mode != "total" {
+		data += `<p>` + tool.Get_language(db, "auth_give_help", true) + `</p>`
+	}
 	if mode == "total" {
 		data += auth_select("auth", groups, "") + `<hr class="main_hr">`
 	} else if user_name == "" {
