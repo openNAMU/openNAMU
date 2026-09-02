@@ -3,6 +3,7 @@ package route
 import (
 	stdjson "encoding/json"
 	"sort"
+	"strconv"
 
 	"opennamu/route/tool"
 )
@@ -62,6 +63,8 @@ func View_main_manager(config tool.Config) string {
 </ul>`
 
 	version_list := tool.Get_last_version()
+	current_c_ver := version_list["c_ver"]
+	current_c_ver_int, current_c_ver_error := strconv.Atoi(current_c_ver)
 	latest_version := get_remote_version(get_version_branch(db))
 	data += `<h2>` + lang("version") + `</h2><ul><li>` + lang("version") + ` : ` + tool.HTML_escape(version_list["r_ver"]) + `</li><li>` + lang("lastest") + ` : ` + tool.HTML_escape(latest_version) + `</li></ul>`
 
@@ -86,7 +89,13 @@ func View_main_manager(config tool.Config) string {
 						version += " (" + latest_version + ")"
 					}
 				}
-				skin_html += `<li>` + tool.HTML_escape(display_name) + ` : ` + tool.HTML_escape(version) + `</li>`
+				skin_html += `<li>` + tool.HTML_escape(display_name) + ` : ` + tool.HTML_escape(version)
+				require_ver, _ := info["require_ver"].(string)
+				require_ver_int, require_ver_error := strconv.Atoi(require_ver)
+				if info["main"] == "true" && current_c_ver_error == nil && require_ver_error == nil && require_ver_int > current_c_ver_int {
+					skin_html += `<br><strong>` + lang("skin_version_warning") + `</strong> (` + lang("required_engine_version") + ` : ` + tool.HTML_escape(require_ver) + ` / ` + lang("current_engine_version") + ` : ` + tool.HTML_escape(current_c_ver) + `)`
+				}
+				skin_html += `</li>`
 			}
 		}
 	}
