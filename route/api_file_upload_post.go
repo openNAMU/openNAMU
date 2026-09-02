@@ -136,9 +136,13 @@ func api_file_upload_post(config tool.Config, file_name string, file_data string
 	if license == "" {
 		license = "direct_input"
 	}
+	license_is_registered := license != "direct_input" && tool.Get_html_filter_value(db, license, "image_license")[0] != ""
 	license = strings.ReplaceAll(license, "]", "_")
 	doc_data := license + "\n"
 	if tool.Get_document_markup(db, doc_name, "document") == "namumark" {
+		if license_is_registered {
+			doc_data += "[include(틀:" + license + ")]\n"
+		}
 		doc_data += "[[category:" + license + "]]\n"
 	}
 	doc_data += license_text
