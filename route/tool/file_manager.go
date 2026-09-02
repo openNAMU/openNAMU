@@ -50,6 +50,29 @@ func Get_file_max_size(db *sql.DB) int {
 	return file_max_size
 }
 
+func Get_file_max_size_by_extension(db *sql.DB, extension string) int {
+	extension = strings.ToLower(strings.TrimPrefix(strings.TrimSpace(extension), "."))
+	data := ""
+
+	QueryRow_DB(
+		db,
+		"select plus from html_filter where kind = 'extension' and html = ? limit 1",
+		[]any{&data},
+		extension,
+	)
+
+	file_max_size := Str_to_int(data)
+	global_max_size := Get_file_max_size(db)
+	if global_max_size <= 0 {
+		global_max_size = 2
+	}
+	if file_max_size <= 0 || file_max_size > global_max_size {
+		return global_max_size
+	}
+
+	return file_max_size
+}
+
 func Get_file_main_dir(db *sql.DB) string {
 	data := ""
 

@@ -72,7 +72,10 @@ func api_file_upload_post(config tool.Config, file_name string, file_data string
 		return return_value
 	}
 
-	file_max_size := tool.Get_file_max_size(db)
+	file_max_size := tool.Get_file_max_size_by_extension(db, file_ext)
+	if file_max_size <= 0 {
+		file_max_size = tool.Get_file_max_size(db)
+	}
 	if file_max_size <= 0 {
 		file_max_size = 2
 	}
