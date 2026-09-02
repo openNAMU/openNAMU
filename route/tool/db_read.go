@@ -808,6 +808,17 @@ func Get_category_back_rows(db *sql.DB, doc_name string) *sql.Rows {
 	return Query_DB(db, "select title, data from back where link = ? and (type = 'cat' or type = '') order by title", doc_name)
 }
 
+func Get_category_document_count(db *sql.DB, category_name string) int {
+	count := 0
+	QueryRow_DB(
+		db,
+		"select count(*) from back where link = ? and (type = 'cat' or type = '')",
+		[]any{&count},
+		category_name,
+	)
+	return count
+}
+
 func Get_category_meta(db *sql.DB, doc_name string, category_name string, meta_type string) (string, bool) {
 	data := ""
 	exists := QueryRow_DB(

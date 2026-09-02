@@ -3033,6 +3033,24 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 			return ""
 		}
 		return class.macro_lastedit(data)
+	case "category_count":
+		if class.db == nil {
+			return "0"
+		}
+		parts := compat_split_macro_args(data)
+		if len(parts) == 0 || parts[0] == "" {
+			return "0"
+		}
+		target := class.normalize_target(tool.HTML_unescape(parts[0]))
+		target = strings.TrimPrefix(strings.TrimPrefix(target, "category:"), "분류:")
+		if target == "" {
+			return "0"
+		}
+		target = "category:" + target
+		if actual, exists := class.find_document(target); exists {
+			target = actual
+		}
+		return strconv.Itoa(tool.Get_category_document_count(class.db, target))
 	default:
 		return raw
 	}
