@@ -754,6 +754,9 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 
 	if auth_info["trust_a"] || auth_info["trust_b"] {
 		auth_info["user"] = true
+		auth_info["edit_limit_unlimited"] = true
+		auth_info["bbs_edit_limit_unlimited"] = true
+		auth_info["bbs_comment_limit_unlimited"] = true
 	}
 
 	admin_auth := []string{"toron", "check", "acl", "hidel", "give_range", "give", "bbs", "vote_fix"}
@@ -864,7 +867,15 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		}
 	}
 
-	user_default := []string{"rankup", "do_email_verified", "captcha_pass", "ip"}
+	user_default := []string{
+		"rankup",
+		"do_email_verified",
+		"captcha_pass",
+		"ip",
+		"edit_limit_100",
+		"bbs_edit_limit_100",
+		"bbs_comment_limit_100",
+	}
 
 	if _, ok := auth_info["user"]; ok {
 		for _, v := range user_default {
@@ -872,7 +883,22 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		}
 	}
 
-	ip_default := []string{"document", "discuss", "upload", "vote", "bbs_use", "captcha_one_check_five_pass", "edit_filter_view", "login_available", "register_available", "history_view", "image_view"}
+	ip_default := []string{
+		"document",
+		"discuss",
+		"upload",
+		"vote",
+		"bbs_use",
+		"captcha_one_check_five_pass",
+		"edit_filter_view",
+		"login_available",
+		"register_available",
+		"history_view",
+		"image_view",
+		"edit_limit_50",
+		"bbs_edit_limit_50",
+		"bbs_comment_limit_50",
+	}
 
 	if _, ok := auth_info["ip"]; ok {
 		for _, v := range ip_default {
@@ -931,6 +957,21 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 
 	if check {
 		auth_info["bbs_view"] = true
+	}
+
+	for _, prefix := range []string{"edit", "bbs_edit", "bbs_comment"} {
+		if auth_info[prefix] {
+			auth_info[prefix+"_limit_10"] = true
+		}
+		if auth_info[prefix+"_limit_unlimited"] {
+			auth_info[prefix+"_limit_100"] = true
+		}
+		if auth_info[prefix+"_limit_100"] {
+			auth_info[prefix+"_limit_50"] = true
+		}
+		if auth_info[prefix+"_limit_50"] {
+			auth_info[prefix+"_limit_10"] = true
+		}
 	}
 
 	return auth_info

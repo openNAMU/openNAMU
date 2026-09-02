@@ -128,6 +128,11 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 			return return_data
 		}
 	}
+	if !tool.Check_daily_limit(db, config.IP, "bbs_comment") {
+		return_data["response"] = "error"
+		return_data["data"] = "daily limit"
+		return return_data
+	}
 
 	last_code := ""
 	tool.QueryRow_DB(

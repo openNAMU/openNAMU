@@ -47,6 +47,11 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 		return_data["data"] = "slow edit limit"
 
 		return return_data
+	} else if !tool.Check_daily_limit(db, config.IP, "edit") {
+		return_data["response"] = "error"
+		return_data["data"] = "daily limit"
+
+		return return_data
 	} else if !tool.Do_edit_filter(db, config, doc_name, data) {
 		return_data["response"] = "error"
 		return_data["data"] = "edit filter (content)"

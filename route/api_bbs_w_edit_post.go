@@ -144,6 +144,12 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 	tag_list := bbs_tag_list(tags)
 
 	if set_code == "" {
+		if !tool.Check_daily_limit(db, config.IP, "bbs_edit") {
+			return_data["response"] = "error"
+			return_data["data"] = "daily limit"
+			return return_data
+		}
+
 		last_code := ""
 		tool.QueryRow_DB(
 			db,
