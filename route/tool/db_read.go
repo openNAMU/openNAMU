@@ -722,8 +722,8 @@ func Get_bbs_comment_count(db *sql.DB, user_name string) string {
 	return count
 }
 
-func Get_history_length_rows(db *sql.DB, day string, user_name string) *sql.Rows {
-	return Query_DB(db, "select leng from history where date like ? and ip = ?", day+"%", user_name)
+func Get_history_length_range_rows(db *sql.DB, user_name string, start string, end string) *sql.Rows {
+	return Query_DB(db, "select leng from history where ip = ? and date >= ? and date < ?", user_name, start, end)
 }
 
 func Get_ua_simple_rows(db *sql.DB, name string, name_is_ip bool, offset int) *sql.Rows {
