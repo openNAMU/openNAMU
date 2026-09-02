@@ -11,6 +11,8 @@ import (
 
 var builtin_version_data []byte
 
+var file_extension_default_list = append(append([]string{"jpg", "jpeg", "png", "gif", "webp"}, file_audio_extensions...), file_video_extensions...)
+
 func Set_builtin_version_data(data []byte) {
 	builtin_version_data = data
 }
@@ -332,7 +334,7 @@ func First_init(db *sql.DB) {
 		[]any{&extension},
 	)
 	if !exists {
-		for _, v := range []string{"jpg", "jpeg", "png", "gif", "webp"} {
+		for _, v := range file_extension_default_list {
 			Exec_DB(
 				db,
 				`insert into html_filter (html, kind, plus, plus_t) values (?, 'extension', '', '')`,
@@ -610,6 +612,64 @@ func init_bbs_comment_count(db *sql.DB) {
 	log.Printf("[DB] BBS comment count update complete: %d posts", len(post_list))
 }
 
+func init_audio_extensions(db *sql.DB) {
+	initialized := ""
+	if QueryRow_DB(
+		db,
+		"select data from other where name = 'audio_extension_initialized' limit 1",
+		[]any{&initialized},
+	) {
+		return
+	}
+
+	extension_list := Get_ext_allow_list(db)
+	for _, extension := range file_audio_extensions {
+		if extension_list[extension] {
+			continue
+		}
+
+		Exec_DB(
+			db,
+			"insert into html_filter (html, kind, plus, plus_t) values (?, 'extension', '', '')",
+			extension,
+		)
+	}
+
+	Exec_DB(
+		db,
+		"insert into other (name, data, coverage) values ('audio_extension_initialized', '1', '')",
+	)
+}
+
+func init_video_extensions(db *sql.DB) {
+	initialized := ""
+	if QueryRow_DB(
+		db,
+		"select data from other where name = 'video_extension_initialized' limit 1",
+		[]any{&initialized},
+	) {
+		return
+	}
+
+	extension_list := Get_ext_allow_list(db)
+	for _, extension := range file_video_extensions {
+		if extension_list[extension] {
+			continue
+		}
+
+		Exec_DB(
+			db,
+			"insert into html_filter (html, kind, plus, plus_t) values (?, 'extension', '', '')",
+			extension,
+		)
+	}
+
+	Exec_DB(
+		db,
+		"insert into other (name, data, coverage) values ('video_extension_initialized', '1', '')",
+	)
+}
+
 func Always_init(db *sql.DB, version string) {
 	// 버전 기입
 	Exec_DB(
@@ -721,6 +781,8 @@ func Always_init(db *sql.DB, version string) {
 	}
 	init_rankup_conditions(db)
 	init_bbs_comment_count(db)
+	init_audio_extensions(db)
+	init_video_extensions(db)
 	legacy_user_bans := [][]string{}
 	rows := Query_DB(
 		db,

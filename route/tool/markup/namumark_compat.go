@@ -974,6 +974,12 @@ func (class *namumark_compat_renderer) process_file(target string, label string)
 	tool.QueryRow_DB(class.db, "select id from history where title = ? order by date desc limit 1", []any{&rev}, file_target)
 	image_url := "/image/" + class.compat_url_parser(storage_name) + ".cache_v" + class.compat_url_parser(rev)
 	file_url := "/w/file:" + class.compat_url_parser(file_name)
+	if tool.Is_audio_extension(extension) {
+		return class.reserve(`<audio controls title="` + compat_html_escape(alt) + `" style="` + compat_html_escape(style) + `" src="` + compat_html_escape(image_url) + `"></audio>`)
+	}
+	if tool.Is_video_extension(extension) {
+		return class.reserve(`<video controls preload="metadata" title="` + compat_html_escape(alt) + `" style="` + compat_html_escape(style) + `" src="` + compat_html_escape(image_url) + `"></video>`)
+	}
 	image := `<img style="` + compat_html_escape(style) + `" alt="` + compat_html_escape(alt) + `" src="` + compat_html_escape(image_url) + `">`
 	return class.reserve(`<a title="` + compat_html_escape(alt) + `" href="` + compat_html_escape(file_url) + `">` + image + `</a>`)
 }
@@ -1105,6 +1111,39 @@ func compat_split_macro_args(data string) []string {
 		parts[index] = strings.TrimSpace(parts[index])
 	}
 	return parts
+}
+
+func (class *namumark_compat_renderer) process_file_media_macro(data string, media_type string) string {
+	parts := compat_split_macro_args(data)
+	if len(parts) == 0 {
+		return ""
+	}
+
+	file_name := strings.TrimSpace(tool.HTML_unescape(parts[0]))
+	if file_name == "" {
+		return ""
+	}
+
+	lower_file_name := strings.ToLower(file_name)
+	for _, prefix := range []string{"file:", "파일:"} {
+		if strings.HasPrefix(lower_file_name, prefix) {
+			file_name = file_name[len(prefix):]
+			break
+		}
+	}
+
+	extension := ""
+	if dot_index := strings.LastIndex(file_name, "."); dot_index >= 0 && dot_index < len(file_name)-1 {
+		extension = strings.ToLower(file_name[dot_index+1:])
+	}
+	if media_type == "audio" && !tool.Is_audio_extension(extension) {
+		return ""
+	}
+	if media_type == "video" && !tool.Is_video_extension(extension) {
+		return ""
+	}
+
+	return class.process_file("file:"+file_name, "")
 }
 
 func (class *namumark_compat_renderer) merge_child(child *namumark_compat_renderer) {
@@ -2850,6 +2889,18 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 		}
 		if media_data := class.compat_media_macro(name, data); media_data != "" {
 			return class.reserve(media_data)
+		}
+		return raw
+	case "audio", "video":
+		media_data := class.process_file_media_macro(data, name)
+		if class.collect_only {
+			return ""
+		}
+		if media_data != "" {
+			return media_data
+		}
+		if strings.TrimSpace(data) == "" {
+			return ""
 		}
 		return raw
 	case "toc":

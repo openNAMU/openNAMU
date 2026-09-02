@@ -159,14 +159,28 @@ func view_w_file_data(db *sql.DB, doc_name string) string {
 	}
 	image_url := "/image/" + tool.Url_parser(storage_name) + ".cache_v" + tool.Url_parser(cache_revision)
 
+	is_audio := tool.Is_audio_extension(extension)
+	is_video := tool.Is_video_extension(extension)
 	resolution := "Vector"
-	if file, open_err := os.Open(file_path); open_err == nil {
-		image_config, _, decode_err := image.DecodeConfig(file)
-		_ = file.Close()
-		if decode_err == nil {
-			resolution = strconv.Itoa(image_config.Width) + "x" + strconv.Itoa(image_config.Height)
+	if !is_audio && !is_video {
+		if file, open_err := os.Open(file_path); open_err == nil {
+			image_config, _, decode_err := image.DecodeConfig(file)
+			_ = file.Close()
+			if decode_err == nil {
+				resolution = strconv.Itoa(image_config.Width) + "x" + strconv.Itoa(image_config.Height)
+			}
 		}
+	} else {
+		resolution = "-"
 	}
 
-	return `<img src="` + image_url + `"><h2>` + tool.Get_language(db, "data", true) + `</h2><table><tr><td>` + tool.Get_language(db, "url", true) + `</td><td><a href="/image/` + tool.Url_parser(storage_name) + `">` + tool.Get_language(db, "link", true) + `</a></td></tr><tr><td>` + tool.Get_language(db, "volume", true) + `</td><td>` + strconv.FormatFloat(float64(file_info.Size())/1000, 'f', 1, 64) + `KB</td></tr><tr><td>` + tool.Get_language(db, "resolution", true) + `</td><td>` + resolution + `</td></tr></table><h2>` + tool.Get_language(db, "content", true) + `</h2>`
+	media := `<img src="` + image_url + `">`
+	if is_audio {
+		media = `<audio controls src="` + image_url + `"></audio>`
+	}
+	if is_video {
+		media = `<video controls preload="metadata" src="` + image_url + `"></video>`
+	}
+
+	return media + `<h2>` + tool.Get_language(db, "data", true) + `</h2><table><tr><td>` + tool.Get_language(db, "url", true) + `</td><td><a href="/image/` + tool.Url_parser(storage_name) + `">` + tool.Get_language(db, "link", true) + `</a></td></tr><tr><td>` + tool.Get_language(db, "volume", true) + `</td><td>` + strconv.FormatFloat(float64(file_info.Size())/1000, 'f', 1, 64) + `KB</td></tr><tr><td>` + tool.Get_language(db, "resolution", true) + `</td><td>` + resolution + `</td></tr></table><h2>` + tool.Get_language(db, "content", true) + `</h2>`
 }
