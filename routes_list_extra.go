@@ -16,6 +16,12 @@ func register_list_extra_routes(r *gin.Engine) {
 	r.GET("/list/document/all/:page", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_document_all(make_route_config(c), c.Param("page"))))
 	})
+	r.GET("/list/document/view", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), "1")))
+	})
+	r.GET("/list/document/view/:page", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), c.Param("page"))))
+	})
 	r.GET("/list/document/need", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_need_page(make_route_config(c), "1")))
 	})

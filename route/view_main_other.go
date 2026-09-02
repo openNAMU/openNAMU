@@ -31,6 +31,7 @@ func View_main_other(config tool.Config) string {
             <li><a href="/recent_change">`+tool.Get_language(db, "recent_change", true)+`</a></li>
             <li><a href="/list/random">`+tool.Get_language(db, "random_list", true)+`</a></li>
             <li><a href="/list/document/all">`+tool.Get_language(db, "all_document_list", true)+`</a></li>
+            <li><a href="/list/document/view">`+tool.Get_language(db, "page_view_sort", true)+`</a></li>
             <li><a href="/list/document/acl">`+tool.Get_language(db, "acl_document_list", true)+`</a></li>
             <li><a href="/list/document/need">`+tool.Get_language(db, "need_document", true)+`</a></li>
             <li><a href="/list/document/long">`+tool.Get_language(db, "long_page", true)+`</a></li>
