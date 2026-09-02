@@ -2,6 +2,7 @@ package route
 
 import (
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -10,6 +11,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+var view_w_image_regex = regexp.MustCompile(`(?is)<img\b[^>]*\bsrc\s*=\s*"([^"]+)"`)
+
+func view_w_get_first_image(data string) string {
+	match := view_w_image_regex.FindStringSubmatch(data)
+	if len(match) < 2 {
+		return ""
+	}
+
+	return tool.HTML_unescape(match[1])
+}
 
 func View_w(c *gin.Context, config tool.Config, doc_name string, view_type string) (string, int) {
 	db := tool.DB_connect()
@@ -24,6 +36,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	raw_data := ""
 	length_doc := ""
 	description := ""
+	og_image := ""
 
 	raw_data_api := Api_w_raw(config, doc_name, "", "")
 	raw_response, _ := raw_data_api["response"].(string)
@@ -55,6 +68,22 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		raw_data, _ = raw_data_api["data"].(string)
 		render_data_api := Api_w_render(config, doc_name, raw_data, "normal", "")
 		render_data, _ = render_data_api["data"].(string)
+		og_image = view_w_get_first_image(render_data)
+		if strings.HasPrefix(og_image, "/") {
+			domain := tool.Get_domain(db, true)
+			if domain == "http://" || domain == "https://" {
+				protocol := "http"
+				if c.Request.TLS != nil || strings.EqualFold(c.GetHeader("X-Forwarded-Proto"), "https") {
+					protocol = "https"
+				}
+				domain = protocol + "://" + c.Request.Host
+			}
+			if domain != "" && domain != "http://" && domain != "https://" {
+				og_image = strings.TrimRight(domain, "/") + og_image
+			}
+		} else if !strings.HasPrefix(og_image, "http://") && !strings.HasPrefix(og_image, "https://") {
+			og_image = ""
+		}
 		length_doc = strconv.Itoa(tool.Get_len(raw_data))
 		description = tool.Get_slice(strings.ReplaceAll(strings.ReplaceAll(raw_data, "\r", ""), "\n", " "), 0, 200)
 	}
@@ -195,6 +224,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		map[string]string{
 			"path":       c.Request.URL.Path,
 			"length_doc": length_doc,
+			"og_image":   og_image,
 		},
 	)
 
