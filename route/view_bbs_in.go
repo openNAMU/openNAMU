@@ -102,13 +102,17 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 	menu := [][]any{
 		{"bbs/main", tool.Get_language(db, "return", true)},
 		{"bbs/search/" + tool.Url_parser(set_id), tool.Get_language(db, "search", true)},
-		{"bbs/edit/" + tool.Url_parser(set_id), tool.Get_language(db, "add", true)},
-		{sort_path, sort_name},
-		{"bbs/in/" + tool.Url_parser(set_id) + "/comment/1", tool.Get_language(db, "comment_sort", true)},
-		{"bbs/in/" + tool.Url_parser(set_id) + "/tabom/1", tool.Get_language(db, "upvote_sort", true)},
-		{filter_menu_path, tool.Get_language(db, "filter", true)},
-		{"bbs/set/" + tool.Url_parser(set_id), tool.Get_language(db, "bbs_set", true)},
 	}
+	if set_id != "0" {
+		menu = append(menu, []any{"bbs/edit/" + tool.Url_parser(set_id), tool.Get_language(db, "add", true)})
+	}
+	menu = append(menu,
+		[]any{sort_path, sort_name},
+		[]any{"bbs/in/" + tool.Url_parser(set_id) + "/comment/1", tool.Get_language(db, "comment_sort", true)},
+		[]any{"bbs/in/" + tool.Url_parser(set_id) + "/tabom/1", tool.Get_language(db, "upvote_sort", true)},
+		[]any{filter_menu_path, tool.Get_language(db, "filter", true)},
+		[]any{"bbs/set/" + tool.Url_parser(set_id), tool.Get_language(db, "bbs_set", true)},
+	)
 
 	out := tool.Get_template(
 		db,

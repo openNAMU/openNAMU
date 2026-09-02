@@ -29,6 +29,12 @@ func Api_bbs_w_edit_view(config tool.Config, set_id string, set_code string, com
 
 		return return_data
 	}
+	if set_id == "0" && set_code == "" && comment_code == "" {
+		return_data["response"] = "not exist"
+		return_data["data"] = "bbs"
+
+		return return_data
+	}
 
 	data := map[string]string{
 		"title":  "",
