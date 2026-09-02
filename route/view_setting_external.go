@@ -52,6 +52,7 @@ func view_setting_external_data(db *sql.DB, config tool.Config, values map[strin
 	data.WriteString(`<form method="post">`)
 	data.WriteString(`<h2>` + lang("captcha") + `</h2>`)
 	data.WriteString(`<a href="https://www.google.com/recaptcha/">(` + lang("recaptcha") + `)</a> <a href="https://www.hcaptcha.com/">(` + lang("hcaptcha") + `)</a> <a href="https://altcha.org/">(ALTCHA)</a>` + setting_hr())
+	data.WriteString(`<p>` + lang("altcha_info") + `</p>` + setting_hr())
 	data.WriteString(`<span>` + lang("public_key") + `</span>` + setting_hr())
 	data.WriteString(setting_input("recaptcha", values["recaptcha"], "text") + setting_hr())
 	data.WriteString(`<span>` + lang("secret_key") + `</span>` + setting_hr())

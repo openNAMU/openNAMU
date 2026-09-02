@@ -573,6 +573,7 @@
     
     "_comment_": "Ext_API",
     "recaptcha": "reCAPTCHA",
+    "altcha_info": "ALTCHA is a proof-of-work (PoW) CAPTCHA that needs no account or site key. Only a secret key is needed; Low, Medium, and High control the browser workload.",
     "hcaptcha": "hCAPTCHA",
     "captcha": "CAPTCHA",
     "email_setting": "Email settings",
