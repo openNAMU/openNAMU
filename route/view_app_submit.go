@@ -61,10 +61,10 @@ func View_app_submit(config tool.Config, values url.Values) string {
 		if !tool.Check_permission(db, "application_view", config.IP) {
 			data += `<hr class="main_hr">` + tool.Get_language(db, "application_detail_hidden", true)
 		} else {
-			data += `<hr class="main_hr"><table id="main_table_set"><tr id="main_table_top_tr"><td>` + tool.Get_language(db, "id", true) + `</td><td>` + tool.Get_language(db, "email", true) + `</td><td>` + tool.Get_language(db, "answer", true) + `</td><td>` + tool.Get_language(db, "application_time", true) + `</td><td>` + tool.Get_language(db, "approve_or_decline", true) + `</td></tr>`
+			data += `<hr class="main_hr"><table id="main_table_set"><tr id="main_table_top_tr"><td>` + tool.Get_language(db, "id", true) + `</td><td>` + tool.Get_language(db, "email", true) + `</td><td>` + tool.Get_language(db, "approval_question", true) + `</td><td>` + tool.Get_language(db, "answer", true) + `</td><td>` + tool.Get_language(db, "application_time", true) + `</td><td>` + tool.Get_language(db, "approve_or_decline", true) + `</td></tr>`
 			for _, application := range applications {
 				user_id := application["id"]
-				data += `<tr><td>` + tool.HTML_escape(user_id) + `</td><td>` + tool.HTML_escape(application["email"]) + `</td><td>` + tool.HTML_escape(application["answer"]) + `</td><td>` + tool.HTML_escape(application["date"]) + `</td><td><form method="post"><button name="approve" value="` + tool.HTML_escape(user_id) + `">` + tool.Get_language(db, "approve", true) + `</button> <button name="decline" value="` + tool.HTML_escape(user_id) + `">` + tool.Get_language(db, "decline", true) + `</button></form></td></tr>`
+				data += `<tr><td>` + tool.HTML_escape(user_id) + `</td><td>` + tool.HTML_escape(application["email"]) + `</td><td>` + tool.HTML_escape(application["question"]) + `</td><td>` + tool.HTML_escape(application["answer"]) + `</td><td>` + tool.HTML_escape(application["date"]) + `</td><td><form method="post"><button name="approve" value="` + tool.HTML_escape(user_id) + `">` + tool.Get_language(db, "approve", true) + `</button> <button name="decline" value="` + tool.HTML_escape(user_id) + `">` + tool.Get_language(db, "decline", true) + `</button></form></td></tr>`
 			}
 			data += `</table>`
 		}
