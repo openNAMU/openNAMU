@@ -18,7 +18,7 @@ import (
 
 func emergency_print_menu() {
 	fmt.Println("1. Backlink reset")
-	fmt.Println("2. reCAPTCHA delete")
+	fmt.Println("2. CAPTCHA delete")
 	fmt.Println("3. Ban delete")
 	fmt.Println("4. Change host")
 	fmt.Println("5. Change port")
@@ -374,6 +374,9 @@ func Run_emergency_tool(arguments []string) int {
 		err = emergency_exec(db, "delete from other where name = 'recaptcha'")
 		if err == nil {
 			err = emergency_exec(db, "delete from other where name = 'sec_re'")
+		}
+		if err == nil {
+			err = emergency_exec(db, "delete from other where name = 'recaptcha_ver'")
 		}
 	case "3":
 		user_data := emergency_input(reader, "IP or Name : ")

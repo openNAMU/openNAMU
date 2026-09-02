@@ -52,6 +52,9 @@ func captcha_check(db *sql.DB, session sessions.Session, ip string, response str
 
 	pub_key, sec_key, rec_ver := captcha_setting(db)
 	if altcha_cost, ok := captcha_altcha_cost(rec_ver); ok {
+		if sec_key == "" {
+			return true
+		}
 		return captcha_check_altcha(response, sec_key, altcha_cost)
 	}
 
