@@ -10,13 +10,28 @@ import (
 	"github.com/dlclark/regexp2"
 )
 
-func Api_give_auth_patch(config tool.Config, auth string, change_auth string, user_name string, end_date string, target_type string, reason string, release bool) map[string]any {
+func Api_give_auth_patch(config tool.Config, auth string, change_auth string, user_name string, end_date string, end_period string, target_type string, reason string, release bool) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
 	new_data := make(map[string]any)
 
 	end_date = strings.TrimSpace(end_date)
+	if end_date == "0" {
+		end_date = ""
+	}
+	if !release && end_period != "" {
+		period_end_date, ok := auth_period_end_date(end_period)
+		if !ok {
+			new_data["response"] = "error"
+			new_data["data"] = "invalid end period"
+			return new_data
+		}
+		end_date = period_end_date
+	}
+	if !release && end_date == "" {
+		end_date = tool.Get_auth_default_end_date()
+	}
 	if end_date != "" {
 		end_time, err := time.Parse("2006-01-02", end_date)
 		if err != nil {
@@ -130,4 +145,27 @@ func Api_give_auth_patch(config tool.Config, auth string, change_auth string, us
 
 	new_data["response"] = "ok"
 	return new_data
+}
+
+func auth_period_end_date(period string) (string, bool) {
+	now := time.Now()
+	switch period {
+	case "1_day":
+		now = now.AddDate(0, 0, 1)
+	case "3_day":
+		now = now.AddDate(0, 0, 3)
+	case "7_day":
+		now = now.AddDate(0, 0, 7)
+	case "30_day":
+		now = now.AddDate(0, 0, 30)
+	case "60_day":
+		now = now.AddDate(0, 0, 60)
+	case "1_year":
+		now = now.AddDate(1, 0, 0)
+	case "100_year":
+		now = now.AddDate(100, 0, 0)
+	default:
+		return "", false
+	}
+	return now.Format("2006-01-02 15:04:05"), true
 }

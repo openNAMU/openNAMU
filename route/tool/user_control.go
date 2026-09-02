@@ -246,7 +246,7 @@ func IP_menu(db *sql.DB, ip string, my_ip string, option string) map[string][][]
 	auth_name := Check_permission(db, "give", my_ip)
 	if auth_name {
 		menu[Get_language(db, "admin", false)] = [][]string{
-			{"/auth/give/" + Url_parser(ip), Get_language(db, "ban", false)},
+			{"/auth/give/" + Url_parser(ip), Get_language(db, "authorize", false)},
 			{"/list/user/check_submit/" + Url_parser(ip), Get_language(db, "check", false)},
 		}
 	}
@@ -311,6 +311,9 @@ func IP_parser(db *sql.DB, ip string, my_ip string) string {
 
 func Do_auth_insert(db *sql.DB, user_name string, end_date string, reason string, login string, blocker string, do_type string, release bool) {
 	now_time := Get_time()
+	if !release && (end_date == "" || end_date == "0") {
+		end_date = Get_auth_default_end_date()
+	}
 
 	if do_type == "" {
 		Exec_DB(
@@ -338,10 +341,6 @@ func Do_auth_insert(db *sql.DB, user_name string, end_date string, reason string
 			do_type,
 		)
 	} else {
-		if end_date == "0" {
-			end_date = ""
-		}
-
 		Exec_DB(
 			db,
 			`insert into rb (block, end, today, blocker, why, band, ongoing, login) values (?, ?, ?, ?, ?, ?, '1', ?)`,

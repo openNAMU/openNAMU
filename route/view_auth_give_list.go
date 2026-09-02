@@ -52,10 +52,9 @@ func Get_ui_auth_give_list(db *sql.DB, config tool.Config, data_all [][]string) 
 		}
 
 		end := in_data[5]
-		if end == "" || end == "0" {
-			end = tool.Get_language(db, "limitless", true)
+		if end != "" && end != "0" {
+			right += "<br>" + tool.Get_language(db, "date", true) + " : " + tool.HTML_escape(end)
 		}
-		right += "<br>" + tool.Get_language(db, "date", true) + " : " + tool.HTML_escape(end)
 
 		bottom := ""
 		if in_data[6] != "" {

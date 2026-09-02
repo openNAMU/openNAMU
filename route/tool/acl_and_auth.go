@@ -102,6 +102,10 @@ func auth_end_active(end string) bool {
 	return now_time.Before(end_time)
 }
 
+func Get_auth_default_end_date() string {
+	return time.Now().AddDate(100, 0, 0).Format("2006-01-02 15:04:05")
+}
+
 func get_user_auth_raw(db *sql.DB, ip string) string {
 	auth := "ip"
 	acl_end := ""

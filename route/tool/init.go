@@ -783,6 +783,11 @@ func Always_init(db *sql.DB, version string) {
 	init_bbs_comment_count(db)
 	init_audio_extensions(db)
 	init_video_extensions(db)
+	Exec_DB(
+		db,
+		"update rb set end = ? where ongoing = '1' and band in ('', 'private', 'regex', 'cidr') and (end = '' or end = '0')",
+		Get_auth_default_end_date(),
+	)
 	legacy_user_bans := [][]string{}
 	rows := Query_DB(
 		db,

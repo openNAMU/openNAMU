@@ -46,6 +46,15 @@ func auth_target_type_select(db *sql.DB, target_type string, owner bool) string 
 	return data + `</select>`
 }
 
+func auth_period_select(db *sql.DB) string {
+	periods := []string{"1_day", "3_day", "7_day", "30_day", "60_day", "1_year", "100_year"}
+	data := `<select name="end_period"><option value="">` + tool.Get_language(db, "direct_input", true) + `</option>`
+	for _, period := range periods {
+		data += `<option value="` + period + `">` + tool.Get_language(db, period, true) + `</option>`
+	}
+	return data + `</select>`
+}
+
 func View_auth_give(config tool.Config, mode string, user_name string, target_type string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
@@ -80,7 +89,7 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 		}
 
 		if mode == "total" {
-			result := Api_give_auth_patch(config, values.Get("auth"), change_auth, "", "", "normal", "", false)
+			result := Api_give_auth_patch(config, values.Get("auth"), change_auth, "", "", "", "normal", "", false)
 			if result["response"] != "ok" {
 				return tool.Get_error_page(db, config, "auth")
 			}
@@ -94,7 +103,7 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 				if name == "" {
 					continue
 				}
-				result := Api_give_auth_patch(config, "", change_auth, name, values.Get("end_date"), target_type, values.Get("why"), release)
+				result := Api_give_auth_patch(config, "", change_auth, name, values.Get("end_date"), values.Get("end_period"), target_type, values.Get("why"), release)
 				if result["response"] != "ok" {
 					return tool.Get_error_page(db, config, "auth")
 				}
@@ -136,6 +145,9 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 			end_date = end_date[:10]
 		}
 	}
+	if mode != "total" && (end_date == "" || end_date == "0") {
+		end_date = tool.Get_auth_default_end_date()[:10]
+	}
 
 	if mode != "total" {
 		owner := tool.Check_permission(db, "owner", config.IP)
@@ -143,9 +155,10 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 	}
 	data += auth_select("change_auth", groups, selected)
 	if mode != "total" {
+		data += `<hr class="main_hr"><span>` + tool.Get_language(db, "period", true) + `</span>` + auth_period_select(db)
 		data += `<hr class="main_hr"><span>` + tool.Get_language(db, "date", true) + `</span><input type="date" name="end_date" value="` + tool.HTML_escape(end_date) + `">`
 		data += `<hr class="main_hr"><input name="why" placeholder="` + tool.Get_language(db, "why", true) + `">`
-		data += `<hr class="main_hr"><select name="action"><option value="give">` + tool.Get_language(db, "authorize", true) + `</option><option value="release">` + tool.Get_language(db, "release", true) + `</option></select>`
+		data += `<hr class="main_hr"><select name="action"><option value="give">` + tool.Get_language(db, "authorize", true) + `</option><option value="release">` + tool.Get_language(db, "auth_release", true) + `</option></select>`
 	}
 	data += `<hr class="main_hr"><button type="submit">` + tool.Get_language(db, "send", true) + `</button></form>`
 

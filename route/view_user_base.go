@@ -53,12 +53,12 @@ func View_user_safe(config tool.Config, user_name string) string {
 		`<li><a href="/count/` + tool.Url_parser(user_name) + `">` + tool.Get_language(db, "count", true) + `</a></li></ul>`
 
 	if tool.Check_permission(db, "give", config.IP) {
-		ban_name := tool.Get_language(db, "ban", true)
+		auth_name := tool.Get_language(db, "authorize", true)
 		user_auth := tool.Get_user_auth(db, user_name)
 		if tool.Auth_group_name_ban(user_auth) {
-			ban_name = tool.Get_language(db, "release", true)
+			auth_name = tool.Get_language(db, "auth_release", true)
 		}
-		body += `<h2>` + tool.Get_language(db, "admin", true) + `</h2><ul><li><a href="/auth/give/` + tool.Url_parser(user_name) + `">` + ban_name + `</a></li><li><a href="/list/user/check_submit/` + tool.Url_parser(user_name) + `">` + tool.Get_language(db, "check", true) + `</a></li></ul>`
+		body += `<h2>` + tool.Get_language(db, "admin", true) + `</h2><ul><li><a href="/auth/give/` + tool.Url_parser(user_name) + `">` + auth_name + `</a></li><li><a href="/list/user/check_submit/` + tool.Url_parser(user_name) + `">` + tool.Get_language(db, "check", true) + `</a></li></ul>`
 	}
 
 	return user_form_page(db, config, tool.Get_language(db, "user_tool", true), body)
