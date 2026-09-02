@@ -47,7 +47,7 @@ func Get_main_skin_set_list(db *sql.DB) map[string][][]string {
 		"default", "off", "change_to_normal", "delete", "use",
 		"bottom", "top", "normal", "spread", "popup", "not_working", "popover",
 		"change_to_link", "click_load", "all_off", "in_content",
-		"self_tab", "all", "only_number",
+		"self_tab", "all", "only_number", "video",
 	}
 
 	lang := make(map[string]string, len(need_keys))
@@ -90,6 +90,13 @@ func Get_main_skin_set_list(db *sql.DB) map[string][][]string {
 		"main_css_image_set": {
 			{"default", lang["default"]},
 			{"normal", lang["normal"]},
+			{"click", lang["change_to_link"]},
+			{"new_click", lang["click_load"]},
+		},
+		"main_css_video_set": {
+			{"default", lang["default"]},
+			{"normal", lang["normal"]},
+			{"off", lang["off"]},
 			{"click", lang["change_to_link"]},
 			{"new_click", lang["click_load"]},
 		},

@@ -65,6 +65,7 @@ func get_render_setting_parameter(db *sql.DB, config tool.Config) map[string]str
 		"main_css_bold",
 		"main_css_strike",
 		"main_css_include_link",
+		"main_css_video_set",
 		"main_css_category_set",
 		"main_css_toc_set",
 		"main_css_footnote_set",

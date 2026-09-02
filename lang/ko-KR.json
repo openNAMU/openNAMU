@@ -552,6 +552,7 @@
     "footnote": "각주",
     "include_link": "틀 링크",
     "image": "이미지",
+    "video": "동영상",
     "exter_link": "외부 링크",
     "link_delimiter": "링크 구분자",
     "force_darkmode": "강제 다크모드",

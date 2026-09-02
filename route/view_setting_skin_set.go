@@ -41,6 +41,7 @@ func setting_skin_fields(db *sql.DB) ([]setting_skin_field, map[string][][]strin
 		{name: "main_css_view_real_footnote_num", label: "footnote_real_num_view"},
 		{name: "main_css_include_link", label: "include_link"},
 		{name: "main_css_image_set", label: "image"},
+		{name: "main_css_video_set", label: "video"},
 		{name: "main_css_toc_set", label: "toc"},
 		{name: "main_css_exter_link", label: "exter_link"},
 		{name: "main_css_link_delimiter", label: "link_delimiter"},

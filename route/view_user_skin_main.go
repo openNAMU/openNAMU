@@ -111,6 +111,7 @@ func View_user_skin_main(config tool.Config, values url.Values) string {
 	body.WriteString(field_data("main_css_include_link", "include_link", "h3"))
 	body.WriteString(`<h3>` + tool.Get_language(db, "image", true) + ` (` + tool.Get_language(db, "beta", true) + `)</h3>`)
 	body.WriteString(field_data("main_css_image_set", "", ""))
+	body.WriteString(field_data("main_css_video_set", "video", "h3"))
 	body.WriteString(field_data("main_css_toc_set", "toc", "h3"))
 	body.WriteString(field_data("main_css_exter_link", "exter_link", "h3"))
 	body.WriteString(field_data("main_css_link_delimiter", "link_delimiter", "h3"))

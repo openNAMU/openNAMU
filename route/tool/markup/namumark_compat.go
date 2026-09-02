@@ -978,7 +978,18 @@ func (class *namumark_compat_renderer) process_file(target string, label string)
 		return class.reserve(`<audio controls title="` + compat_html_escape(alt) + `" style="` + compat_html_escape(style) + `" src="` + compat_html_escape(image_url) + `"></audio>`)
 	}
 	if tool.Is_video_extension(extension) {
-		return class.reserve(`<video controls preload="metadata" title="` + compat_html_escape(alt) + `" style="` + compat_html_escape(style) + `" src="` + compat_html_escape(image_url) + `"></video>`)
+		video_set := class.get_render_setting("main_css_video_set")
+		if video_set == "off" {
+			return class.reserve("")
+		}
+		if video_set == "click" {
+			return class.reserve(`<a title="` + compat_html_escape(alt) + `" href="` + compat_html_escape(file_url) + `">` + compat_html_escape(file_name) + `</a>`)
+		}
+		preload := "metadata"
+		if video_set == "new_click" {
+			preload = "none"
+		}
+		return class.reserve(`<video controls preload="` + preload + `" title="` + compat_html_escape(alt) + `" style="` + compat_html_escape(style) + `" src="` + compat_html_escape(image_url) + `"></video>`)
 	}
 	image := `<img style="` + compat_html_escape(style) + `" alt="` + compat_html_escape(alt) + `" src="` + compat_html_escape(image_url) + `">`
 	return class.reserve(`<a title="` + compat_html_escape(alt) + `" href="` + compat_html_escape(file_url) + `">` + image + `</a>`)
