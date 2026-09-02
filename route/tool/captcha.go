@@ -3,6 +3,7 @@ package tool
 import (
 	"crypto/sha256"
 	"database/sql"
+	"encoding/base64"
 	stdjson "encoding/json"
 	"errors"
 	"net/http"
@@ -29,8 +30,8 @@ func captcha_setting_value(db *sql.DB, name string) string {
 	return ""
 }
 
-func captcha_setting(db *sql.DB) (string, string, string) {
-	return captcha_setting_value(db, "recaptcha"), captcha_setting_value(db, "sec_re"), captcha_setting_value(db, "recaptcha_ver")
+func captcha_setting(db *sql.DB) (string, string, string, string) {
+	return captcha_setting_value(db, "recaptcha"), captcha_setting_value(db, "sec_re"), captcha_setting_value(db, "altcha_sec_re"), captcha_setting_value(db, "recaptcha_ver")
 }
 
 func captcha_altcha_cost(rec_ver string) (int, bool) {
@@ -50,12 +51,12 @@ func captcha_check(db *sql.DB, session sessions.Session, ip string, response str
 		return true
 	}
 
-	pub_key, sec_key, rec_ver := captcha_setting(db)
+	pub_key, sec_key, altcha_sec_key, rec_ver := captcha_setting(db)
 	if altcha_cost, ok := captcha_altcha_cost(rec_ver); ok {
-		if sec_key == "" {
+		if altcha_sec_key == "" {
 			return true
 		}
-		return captcha_check_altcha(response, sec_key, altcha_cost)
+		return captcha_check_altcha(response, altcha_sec_key, altcha_cost)
 	}
 
 	if pub_key == "" || sec_key == "" {
@@ -107,8 +108,13 @@ func captcha_check_altcha(response string, sec_key string, altcha_cost int) bool
 		return false
 	}
 
+	payload_data, err := base64.StdEncoding.DecodeString(response)
+	if err != nil {
+		return false
+	}
+
 	payload := altcha.Payload{}
-	if err := stdjson.Unmarshal([]byte(response), &payload); err != nil {
+	if err := stdjson.Unmarshal(payload_data, &payload); err != nil {
 		return false
 	}
 
@@ -156,9 +162,9 @@ func captcha_check_altcha(response string, sec_key string, altcha_cost int) bool
 }
 
 func captcha_challenge(db *sql.DB) (altcha.Challenge, error) {
-	_, sec_key, rec_ver := captcha_setting(db)
+	_, _, altcha_sec_key, rec_ver := captcha_setting(db)
 	altcha_cost, ok := captcha_altcha_cost(rec_ver)
-	if !ok || sec_key == "" {
+	if !ok || altcha_sec_key == "" {
 		return altcha.Challenge{}, errors.New("altcha is not enabled")
 	}
 
@@ -168,7 +174,7 @@ func captcha_challenge(db *sql.DB) (altcha.Challenge, error) {
 		Cost:                altcha_cost,
 		DeriveKey:           altcha.DeriveKeyPBKDF2(),
 		ExpiresAt:           &expires_at,
-		HMACSignatureSecret: sec_key,
+		HMACSignatureSecret: altcha_sec_key,
 		KeyLength:           32,
 	})
 }

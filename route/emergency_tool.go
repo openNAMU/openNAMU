@@ -376,6 +376,9 @@ func Run_emergency_tool(arguments []string) int {
 			err = emergency_exec(db, "delete from other where name = 'sec_re'")
 		}
 		if err == nil {
+			err = emergency_exec(db, "delete from other where name = 'altcha_sec_re'")
+		}
+		if err == nil {
 			err = emergency_exec(db, "delete from other where name = 'recaptcha_ver'")
 		}
 	case "3":

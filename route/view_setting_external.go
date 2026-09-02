@@ -22,12 +22,13 @@ func setting_external_fields() []setting_field {
 	return []setting_field{
 		{name: "recaptcha"},
 		{name: "sec_re"},
+		{name: "altcha_sec_re"},
 		{name: "smtp_server"},
 		{name: "smtp_port"},
 		{name: "smtp_security"},
 		{name: "smtp_email"},
 		{name: "smtp_pass"},
-		{name: "recaptcha_ver"},
+		{name: "recaptcha_ver", default_value: "altcha_high"},
 		{name: "oauth_client_id"},
 		{name: "email_have"},
 	}
@@ -39,7 +40,7 @@ func view_setting_external_data(db *sql.DB, config tool.Config, values map[strin
 	}
 
 	recaptcha_labels := map[string]string{
-		"":              "reCAPTCHA v2",
+		"v2":            "reCAPTCHA v2",
 		"v3":            "reCAPTCHA v3",
 		"h":             "hCAPTCHA",
 		"cf":            "Turnstile",
@@ -53,12 +54,14 @@ func view_setting_external_data(db *sql.DB, config tool.Config, values map[strin
 	data.WriteString(`<h2>` + lang("captcha") + `</h2>`)
 	data.WriteString(`<a href="https://www.google.com/recaptcha/">(` + lang("recaptcha") + `)</a> <a href="https://www.hcaptcha.com/">(` + lang("hcaptcha") + `)</a> <a href="https://altcha.org/">(ALTCHA)</a>` + setting_hr())
 	data.WriteString(`<p>` + lang("altcha_info") + `</p>` + setting_hr())
-	data.WriteString(`<span>` + lang("public_key") + `</span>` + setting_hr())
+	data.WriteString(`<span>` + lang("recaptcha") + ` ` + lang("public_key") + `</span>` + setting_hr())
 	data.WriteString(setting_input("recaptcha", values["recaptcha"], "text") + setting_hr())
-	data.WriteString(`<span>` + lang("secret_key") + `</span>` + setting_hr())
+	data.WriteString(`<span>` + lang("recaptcha") + ` ` + lang("secret_key") + `</span>` + setting_hr())
 	data.WriteString(setting_input("sec_re", values["sec_re"], "text") + setting_hr())
+	data.WriteString(`<span>` + lang("altcha_secret_key") + `</span>` + setting_hr())
+	data.WriteString(setting_input("altcha_sec_re", values["altcha_sec_re"], "text") + setting_hr())
 	data.WriteString(`<span>` + lang("version") + `</span>` + setting_hr())
-	data.WriteString(`<select name="recaptcha_ver">` + setting_options(values["recaptcha_ver"], []string{"", "v3", "h", "cf", "altcha_low", "altcha_medium", "altcha_high"}, recaptcha_labels) + `</select>` + setting_hr())
+	data.WriteString(`<select name="recaptcha_ver">` + setting_options(values["recaptcha_ver"], []string{"v2", "v3", "h", "cf", "altcha_low", "altcha_medium", "altcha_high"}, recaptcha_labels) + `</select>` + setting_hr())
 
 	data.WriteString(`<h2>` + lang("email_setting") + `</h2>`)
 	data.WriteString(`<a href="/setting/phrase#s-6">(` + lang("text_setting") + `)</a>` + setting_hr())

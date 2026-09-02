@@ -670,6 +670,80 @@ func init_video_extensions(db *sql.DB) {
 	)
 }
 
+func init_captcha(db *sql.DB) {
+	recaptcha := ""
+	sec_key := ""
+	altcha_sec_key := ""
+	recaptcha_ver := ""
+	has_recaptcha_ver := QueryRow_DB(db, `select data from other where name = "recaptcha_ver" limit 1`, []any{&recaptcha_ver})
+	has_altcha_sec_key := QueryRow_DB(db, `select data from other where name = "altcha_sec_re" limit 1`, []any{&altcha_sec_key})
+	QueryRow_DB(db, `select data from other where name = "recaptcha"`, []any{&recaptcha})
+	QueryRow_DB(db, `select data from other where name = "sec_re"`, []any{&sec_key})
+
+	if has_recaptcha_ver {
+		if recaptcha_ver == "" {
+			if recaptcha != "" || sec_key != "" {
+				Exec_DB(db, `update other set data = "v2" where name = "recaptcha_ver" and coverage = ""`)
+				return
+			}
+			Exec_DB(db, `update other set data = "altcha_high" where name = "recaptcha_ver" and coverage = ""`)
+			recaptcha_ver = "altcha_high"
+		}
+		if _, altcha_enabled := captcha_altcha_cost(recaptcha_ver); altcha_enabled {
+			if !has_altcha_sec_key && recaptcha == "" && sec_key != "" {
+				Exec_DB(
+					db,
+					`insert into other (name, data, coverage) values ("altcha_sec_re", ?, "")`,
+					sec_key,
+				)
+				Exec_DB(
+					db,
+					`update other set data = "" where name = "sec_re" and coverage = ""`,
+				)
+				altcha_sec_key = sec_key
+				has_altcha_sec_key = true
+			}
+			if altcha_sec_key == "" {
+				if has_altcha_sec_key {
+					Exec_DB(
+						db,
+						`update other set data = ? where name = "altcha_sec_re" and coverage = ""`,
+						Get_random_key(128),
+					)
+				} else {
+					Exec_DB(
+						db,
+						`insert into other (name, data, coverage) values ("altcha_sec_re", ?, "")`,
+						Get_random_key(128),
+					)
+				}
+			}
+		}
+		return
+	}
+	if recaptcha != "" || sec_key != "" {
+		Exec_DB(db, `insert into other (name, data, coverage) values ("recaptcha_ver", "v2", "")`)
+		return
+	}
+	if !has_altcha_sec_key {
+		Exec_DB(
+			db,
+			`insert into other (name, data, coverage) values ("altcha_sec_re", ?, "")`,
+			Get_random_key(128),
+		)
+	} else if altcha_sec_key == "" {
+		Exec_DB(
+			db,
+			`update other set data = ? where name = "altcha_sec_re" and coverage = ""`,
+			Get_random_key(128),
+		)
+	}
+	Exec_DB(
+		db,
+		`insert into other (name, data, coverage) values ("recaptcha_ver", "altcha_high", "")`,
+	)
+}
+
 func Always_init(db *sql.DB, version string) {
 	// 버전 기입
 	Exec_DB(
@@ -783,6 +857,7 @@ func Always_init(db *sql.DB, version string) {
 	init_bbs_comment_count(db)
 	init_audio_extensions(db)
 	init_video_extensions(db)
+	init_captcha(db)
 	Exec_DB(
 		db,
 		"update rb set end = ? where ongoing = '1' and band in ('', 'private', 'regex', 'cidr') and (end = '' or end = '0')",

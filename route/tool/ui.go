@@ -692,13 +692,13 @@ func Get_captcha_ui(db *sql.DB, config Config) string {
 	data := ""
 
 	if !Check_acl(db, "", "", "recaptcha", config.IP) {
-		pub_key, sec_key, rec_ver := captcha_setting(db)
+		pub_key, sec_key, altcha_sec_key, rec_ver := captcha_setting(db)
 
-		if _, altcha_enabled := captcha_altcha_cost(rec_ver); altcha_enabled && sec_key != "" {
+		if _, altcha_enabled := captcha_altcha_cost(rec_ver); altcha_enabled && altcha_sec_key != "" {
 			data += `<script async defer type="module" src="https://cdn.jsdelivr.net/npm/altcha@3.2.2/dist/main/altcha.i18n.min.js"></script><altcha-widget challenge="/api/altcha/challenge"></altcha-widget><hr class="main_hr">`
 		} else if pub_key != "" && sec_key != "" {
 			switch rec_ver {
-			case "":
+			case "", "v2":
 				data += `
                     <script defer src="https://www.google.com/recaptcha/api.js"></script>
                     <div class="g-recaptcha" data-sitekey="` + pub_key + `"></div>
