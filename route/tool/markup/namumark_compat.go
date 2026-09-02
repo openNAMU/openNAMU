@@ -2613,9 +2613,9 @@ func (class *namumark_compat_renderer) process_headings(data string) string {
 		}
 		heading_edit := ""
 		if class.is_view() {
-			heading_edit = `<a href="/edit/` + tool.Url_parser(class.doc_name) + `">✎</a> `
+			heading_edit = `<a href="/edit/` + tool.Url_parser(class.doc_name) + `">✎</a>`
 		}
-		heading_html += `><summary><h` + strconv.Itoa(level) + ` id="` + compat_html_escape(heading_id) + `"><a href="#toc" id="s-` + compat_html_escape(number) + `">` + number + `.</a> ` + heading_edit + rendered_heading + `</h` + strconv.Itoa(level) + `></summary><div class="opennamu_folding">`
+		heading_html += `><summary><h` + strconv.Itoa(level) + ` id="` + compat_html_escape(heading_id) + `"><a href="#toc" id="s-` + compat_html_escape(number) + `">` + number + `.</a> ` + rendered_heading + ` ` + heading_edit + `</h` + strconv.Itoa(level) + `></summary><div class="opennamu_folding">`
 		if last_heading >= 0 {
 			lines[index] = class.reserve(`</div></details>`) + class.reserve(heading_html)
 		} else {
