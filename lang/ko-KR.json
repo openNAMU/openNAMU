@@ -501,6 +501,8 @@
     "stiemap_exclude_user_page": "사용자 문서 제외",
     "stiemap_exclude_file_page": "파일 문서 제외",
     "stiemap_exclude_category_page": "분류 문서 제외",
+    "indexnow_key": "IndexNow 키",
+    "indexnow_key_help": "키를 입력하면 문서 편집 후 검색 엔진에 변경 사항을 알립니다. 키 파일은 사이트 루트에 자동으로 생성됩니다.",
     "search_document_name": "문서명 검색",
     "search_document_data": "문서 내용 검색",
     "admin_acl": "관리자, 소유자",

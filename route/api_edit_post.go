@@ -122,6 +122,7 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 	)
 
 	markup.Get_render(db, doc_name, data, "backlink")
+	notify_indexnow(db, doc_name)
 
 	return_data["response"] = "ok"
 

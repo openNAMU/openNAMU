@@ -12,6 +12,7 @@ func Api_setting_sitemap_set_post(config tool.Config, form map[string]string) ma
 		return return_data
 	}
 	setting_save_fields(db, setting_sitemap_fields(), form)
+	sync_indexnow_key(db)
 	tool.Do_insert_auth_history(db, config.IP, "edit_set (sitemap)")
 	return_data["response"] = "ok"
 	return return_data

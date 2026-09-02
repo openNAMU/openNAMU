@@ -614,6 +614,8 @@
     "stiemap_exclude_user_page": "Exclude user page(s)",
     "stiemap_exclude_file_page": "Exclude file page(s)",
     "stiemap_exclude_category_page": "Exclude category page(s)",
+    "indexnow_key": "IndexNow key",
+    "indexnow_key_help": "When a key is set, document edits are submitted to search engines. The key file is created automatically in the site root.",
     "sitemap_manual_create": "Create sitemap manually",
     "sitemap_auto_make": "Create sitemap automatically",
     
