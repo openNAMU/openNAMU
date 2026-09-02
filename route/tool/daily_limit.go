@@ -1,6 +1,24 @@
 package tool
 
-import "database/sql"
+import (
+	"database/sql"
+	"time"
+)
+
+func Check_edit_time(db *sql.DB, ip string) bool {
+	auth_info := Get_auth_info(db, ip)
+	day := auth_info["edit_day"]
+	night := auth_info["edit_night"]
+	if !day && !night {
+		return true
+	}
+
+	hour := time.Now().Hour()
+	if hour >= 8 && hour < 22 {
+		return day
+	}
+	return night
+}
 
 func Get_daily_limit(auth_info map[string]bool, name string) int {
 	for _, value := range []struct {

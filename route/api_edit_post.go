@@ -42,6 +42,11 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 		return_data["data"] = "edit conflict"
 
 		return return_data
+	} else if !tool.Check_edit_time(db, config.IP) {
+		return_data["response"] = "error"
+		return_data["data"] = "edit time"
+
+		return return_data
 	} else if !tool.Do_edit_slow_check(db, config, "edit") {
 		return_data["response"] = "error"
 		return_data["data"] = "slow edit limit"

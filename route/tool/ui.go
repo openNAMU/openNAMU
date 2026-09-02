@@ -420,6 +420,8 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
 		data = Get_language(db, "fast_edit_error", true)
 	case "daily limit":
 		data = Get_language(db, "daily_limit_error", true)
+	case "edit time":
+		data = Get_language(db, "edit_time_error", true)
 	case "edit filter (content)":
 		data = Get_language(db, "edit_filter_error", true) + " (content)"
 	case "edit filter (send)":

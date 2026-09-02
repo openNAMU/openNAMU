@@ -896,6 +896,8 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		"register_available",
 		"history_view",
 		"image_view",
+		"edit_day",
+		"edit_night",
 		"edit_limit_50",
 		"bbs_edit_limit_50",
 		"bbs_comment_limit_50",
