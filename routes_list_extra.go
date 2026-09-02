@@ -17,10 +17,22 @@ func register_list_extra_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_document_all(make_route_config(c), c.Param("page"))))
 	})
 	r.GET("/list/document/view", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), "1")))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), "1", "")))
+	})
+	r.GET("/list/document/view/month", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), "1", "month")))
+	})
+	r.GET("/list/document/view/month/:page", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), c.Param("page"), "month")))
+	})
+	r.GET("/list/document/view/day", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), "1", "day")))
+	})
+	r.GET("/list/document/view/day/:page", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), c.Param("page"), "day")))
 	})
 	r.GET("/list/document/view/:page", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), c.Param("page"))))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), c.Param("page"), "")))
 	})
 	r.GET("/list/document/need", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_need_page(make_route_config(c), "1")))

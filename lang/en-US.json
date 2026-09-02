@@ -43,6 +43,8 @@
     "discuss_view_authority": "Discussion view authority",
     "page_view": "Page views",
     "page_view_sort": "Most viewed",
+    "page_view_month": "Most viewed this month",
+    "page_view_day": "Most viewed today",
     "comment_sort": "Most commented",
     "upvote_sort": "Most upvoted",
     "discuss_make_new_thread_authority": "Create a new discussion authority",
