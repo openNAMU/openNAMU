@@ -767,6 +767,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		}
 		auth_info["edit_filter_manage"] = true
 		auth_info["application_manage"] = true
+		auth_info["application_view"] = true
 	}
 
 	if _, ok := auth_info["owner"]; ok {

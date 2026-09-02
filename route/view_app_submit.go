@@ -14,6 +14,9 @@ func View_app_submit(config tool.Config, values url.Values) string {
 	if values == nil && !tool.Check_permission(db, "application_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
+	if values == nil {
+		Api_app_submit_expire(config)
+	}
 
 	if values != nil {
 		result := Api_app_submit_post(config, values)
@@ -54,12 +57,17 @@ func View_app_submit(config tool.Config, values url.Values) string {
 	if len(applications) == 0 {
 		data += tool.Get_language(db, "no_applications_now", true)
 	} else {
-		data += tool.Get_language(db, "all_register_num", true) + " : " + strconv.Itoa(len(applications)) + `<hr class="main_hr"><table id="main_table_set"><tr id="main_table_top_tr"><td>` + tool.Get_language(db, "id", true) + `</td><td>` + tool.Get_language(db, "email", true) + `</td><td>` + tool.Get_language(db, "approve_or_decline", true) + `</td></tr>`
-		for _, application := range applications {
-			user_id := application["id"]
-			data += `<tr><td>` + tool.HTML_escape(user_id) + `<br>` + tool.HTML_escape(application["question"]) + `<br>` + tool.HTML_escape(application["answer"]) + `</td><td>` + tool.HTML_escape(application["email"]) + `</td><td><form method="post"><button name="approve" value="` + tool.HTML_escape(user_id) + `">` + tool.Get_language(db, "approve", true) + `</button> <button name="decline" value="` + tool.HTML_escape(user_id) + `">` + tool.Get_language(db, "decline", true) + `</button></form></td></tr>`
+		data += tool.Get_language(db, "all_register_num", true) + " : " + strconv.Itoa(len(applications))
+		if !tool.Check_permission(db, "application_view", config.IP) {
+			data += `<hr class="main_hr">` + tool.Get_language(db, "application_detail_hidden", true)
+		} else {
+			data += `<hr class="main_hr"><table id="main_table_set"><tr id="main_table_top_tr"><td>` + tool.Get_language(db, "id", true) + `</td><td>` + tool.Get_language(db, "email", true) + `</td><td>` + tool.Get_language(db, "answer", true) + `</td><td>` + tool.Get_language(db, "application_time", true) + `</td><td>` + tool.Get_language(db, "approve_or_decline", true) + `</td></tr>`
+			for _, application := range applications {
+				user_id := application["id"]
+				data += `<tr><td>` + tool.HTML_escape(user_id) + `</td><td>` + tool.HTML_escape(application["email"]) + `</td><td>` + tool.HTML_escape(application["answer"]) + `</td><td>` + tool.HTML_escape(application["date"]) + `</td><td><form method="post"><button name="approve" value="` + tool.HTML_escape(user_id) + `">` + tool.Get_language(db, "approve", true) + `</button> <button name="decline" value="` + tool.HTML_escape(user_id) + `">` + tool.Get_language(db, "decline", true) + `</button></form></td></tr>`
+			}
+			data += `</table>`
 		}
-		data += `</table>`
 	}
 
 	return tool.Get_template(db, config, tool.Get_language(db, "application_list", true), data, []any{}, [][]any{{"manager", tool.Get_language(db, "return", true)}}, map[string]string{})

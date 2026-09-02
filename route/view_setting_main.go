@@ -135,6 +135,8 @@ func setting_main_fields() []setting_field {
 		{name: "host", default_value: "0.0.0.0"},
 		{name: "slow_edit", default_value: ""},
 		{name: "requires_approval", default_value: ""},
+		{name: "application_expiration_date", default_value: ""},
+		{name: "application_expiration_action", default_value: ""},
 		{name: "backup_where", default_value: ""},
 		{name: "domain", default_value: ""},
 		{name: "ua_get", default_value: ""},
@@ -245,6 +247,11 @@ func view_setting_main_data(db *sql.DB, config tool.Config, values map[string]st
 	data.WriteString(`<span>` + lang("user_document_view_acl_all") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + setting_hr())
 	data.WriteString(bbs_set_select(db, "user_document_view_acl_all", values["user_document_view_acl_all"], acl_value_list(db, values["user_document_view_acl_all"])) + setting_hr())
 	data.WriteString(`<label><input type="checkbox" name="requires_approval" ` + setting_checked(values["requires_approval"]) + `> ` + lang("requires_approval") + `</label>` + setting_hr())
+	data.WriteString(`<span>` + lang("application_expiration_date") + ` (` + lang("day") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + setting_hr())
+	data.WriteString(`<sup>` + lang("application_expiration_help") + `</sup>` + setting_hr())
+	data.WriteString(setting_input("application_expiration_date", values["application_expiration_date"], "text") + setting_hr())
+	data.WriteString(`<span>` + lang("application_expiration_action") + `</span>` + setting_hr())
+	data.WriteString(`<select name="application_expiration_action">` + setting_options(values["application_expiration_action"], []string{"", "approve", "decline"}, map[string]string{"": lang("off"), "approve": lang("approve"), "decline": lang("decline")}) + `</select>` + setting_hr())
 	data.WriteString(`<span>` + lang("password_min_length") + `</span> (` + lang("off") + ` : ` + lang("empty") + `)` + setting_hr())
 	data.WriteString(setting_input("password_min_length", values["password_min_length"], "text") + setting_hr())
 	data.WriteString(`<span>` + lang("encryption_method") + `</span>` + setting_hr())

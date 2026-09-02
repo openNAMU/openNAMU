@@ -23,6 +23,7 @@ func Api_register_submit_post(config tool.Config, id string, pw string, email st
 		"encode":   encode,
 		"question": question,
 		"answer":   answer,
+		"date":     tool.Get_time(),
 	})
 	if err != nil {
 		return_data["response"] = "error"

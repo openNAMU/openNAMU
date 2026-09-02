@@ -58,6 +58,7 @@ func Auth_choices() []Auth_choice {
 		{2, "register_available", "register_available_authority"},
 		{2, "edit_filter_manage", "edit_filter_manage_authority"},
 		{2, "application_manage", "application_manage_authority"},
+		{2, "application_view", "application_view_authority"},
 		{2, "toron", "discussion_authority"},
 		{2, "check", "user_analyze_authority"},
 		{2, "view_user_watchlist", "view_user_watchlist_authority"},
