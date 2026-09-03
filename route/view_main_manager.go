@@ -12,7 +12,7 @@ func View_main_manager(config tool.Config) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_permission(db, "manager_view", config.IP) {
+	if !tool.Check_permission(db, "site_view", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
