@@ -84,7 +84,7 @@ func auth_relation_label(db *sql.DB, key string) string {
 }
 
 func auth_relation_view(db *sql.DB) string {
-	data := `<details><summary>` + tool.Get_language(db, "auth_relation", true) + `</summary>`
+	data := `<hr class="main_hr"><h3>` + tool.Get_language(db, "auth_relation", true) + `</h3>`
 	relations := tool.Auth_relations()
 
 	for _, relation_type := range []string{tool.Auth_relation_group, tool.Auth_relation_permission, tool.Auth_relation_auto} {
@@ -116,6 +116,6 @@ func auth_relation_view(db *sql.DB) string {
 		data += `</ul>`
 	}
 
-	data += `<p>` + tool.Get_language(db, "auth_relation_note", true) + `</p></details>`
+	data += `<p>` + tool.Get_language(db, "auth_relation_note", true) + `</p>`
 	return data
 }
