@@ -24,7 +24,7 @@ func Api_user_watch_list(config tool.Config, name string, num_str string, do_typ
 	} else {
 		query := ""
 		if do_type == "star_doc" {
-			query = "select data from user_set where name = 'star_doc' and id = ? limit ?, 50"
+			query = `select data from user_set where name = 'star_doc' and id = ? order by coalesce((select date from history where history.title = user_set.data order by id + 0 desc limit 1), '') desc, data asc limit ?, 50`
 		} else {
 			query = "select data from user_set where name = 'watchlist' and id = ? limit ?, 50"
 		}
