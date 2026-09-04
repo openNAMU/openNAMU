@@ -708,6 +708,41 @@ func Get_history_count(db *sql.DB, user_name string) string {
 	return count
 }
 
+func Get_statistics_count(db *sql.DB, count_type string) int {
+	query := ""
+	switch count_type {
+	case "document":
+		query = "select count(*) from data"
+	case "user":
+		query = "select count(*) from user_set where name = 'date'"
+	case "edit":
+		query = "select count(*) from history"
+	case "bbs_post":
+		query = "select count(*) from bbs_data where set_name = 'user_id' and set_data != ''"
+	case "bbs_comment":
+		query = "select count(*) from bbs_data where set_name = 'comment_user_id' and set_data != ''"
+	}
+	if query == "" {
+		return 0
+	}
+
+	count := 0
+	QueryRow_DB(db, query, []any{&count})
+	return count
+}
+
+func Get_month_history_count(db *sql.DB, start string, end string) int {
+	count := 0
+	QueryRow_DB(
+		db,
+		"select count(*) from history where date >= ? and date < ?",
+		[]any{&count},
+		start,
+		end,
+	)
+	return count
+}
+
 func Get_month_contributor_rows(db *sql.DB, start string, end string) *sql.Rows {
 	return Query_DB(
 		db,

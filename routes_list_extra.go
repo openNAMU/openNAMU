@@ -43,6 +43,9 @@ func register_list_extra_routes(r *gin.Engine) {
 	r.GET("/list/contributor", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_contributor_page(make_route_config(c))))
 	})
+	r.GET("/statistics", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_statistics(make_route_config(c))))
+	})
 	r.GET("/list/file", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_file_page(make_route_config(c), "1")))
 	})
