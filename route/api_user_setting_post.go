@@ -47,17 +47,36 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 		}
 	}
 	if values.Has("2fa") {
-		if values.Get("2fa") == "" {
+		switch values.Get("2fa") {
+		case "":
 			user_delete(db, config.IP, "2fa")
 			user_delete(db, config.IP, "2fa_pw")
 			user_delete(db, config.IP, "2fa_pw_encode")
-		} else {
-			user_save(db, config.IP, "2fa", "on")
+		case "on":
 			if password := values.Get("2fa_pw"); password != "" {
 				encode := tool.Get_user_encode(db, config.IP)
 				user_save(db, config.IP, "2fa_pw", tool.Password_encode(db, password, encode))
 				user_save(db, config.IP, "2fa_pw_encode", encode)
 			}
+			if user_value(db, config.IP, "2fa_pw") == "" {
+				return_data["response"] = "error"
+				return_data["data"] = "password empty"
+				return return_data
+			}
+			user_save(db, config.IP, "2fa", "on")
+		case "email":
+			if user_value(db, config.IP, "email") == "" {
+				return_data["response"] = "error"
+				return_data["data"] = "not found"
+				return return_data
+			}
+			user_save(db, config.IP, "2fa", "email")
+			user_delete(db, config.IP, "2fa_pw")
+			user_delete(db, config.IP, "2fa_pw_encode")
+		default:
+			return_data["response"] = "error"
+			return_data["data"] = "invalid data"
+			return return_data
 		}
 	} else if values.Has("2fa_pw") {
 		password := values.Get("2fa_pw")

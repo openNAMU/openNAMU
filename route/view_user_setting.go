@@ -72,7 +72,11 @@ func View_user_setting(config tool.Config, values url.Values) string {
 			return tool.Get_error_page(db, config, "auth")
 		}
 		if response != "ok" {
-			return tool.Get_error_page(db, config, "error")
+			error_name, _ := api_data["data"].(string)
+			if error_name == "" {
+				error_name = "error"
+			}
+			return tool.Get_error_page(db, config, error_name)
 		}
 		return tool.Get_redirect("/change")
 	}
@@ -104,6 +108,7 @@ func View_user_setting(config tool.Config, values url.Values) string {
 	}
 	twofa_options := user_option(user_choice{"", tool.Get_language(db, "off", true)}, twofa)
 	twofa_options += user_option(user_choice{"on", tool.Get_language(db, "password", true)}, twofa)
+	twofa_options += user_option(user_choice{"email", tool.Get_language(db, "email", true)}, twofa)
 	body := `<form method="post"><div id="opennamu_get_user_info">` + tool.HTML_escape(config.IP) + `</div><hr class="main_hr">`
 	body += `<a href="/change/pw">(` + tool.Get_language(db, "password_change", true) + `)</a><hr class="main_hr">`
 	body += `<span>` + tool.Get_language(db, "email", true) + ` : ` + tool.HTML_escape(email) + `</span> <a href="/change/email">(` + tool.Get_language(db, "email_change", true) + `)</a> <a href="/change/email/delete">(` + tool.Get_language(db, "email_delete", true) + `)</a><hr class="main_hr">`

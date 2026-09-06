@@ -17,9 +17,14 @@ func View_login_login_post_full(config tool.Config, id string, password string, 
 	if !tool.Get_auth_info(db, id)["login_available"] {
 		return tool.Get_error_page(db, config, "ban")
 	}
-	if user_value(db, id, "2fa") != "" || user_value(db, id, "2fa_pw") != "" {
+	twofa := user_value(db, id, "2fa")
+	if twofa != "" || user_value(db, id, "2fa_pw") != "" {
+		config.Session.Delete("login_2fa_key")
 		config.Session.Set("login_id", id)
 		_ = config.Session.Save()
+		if twofa == "email" {
+			return tool.Get_redirect("/login/2fa/email")
+		}
 		return tool.Get_redirect("/login/2fa")
 	}
 	config.Session.Set("id", id)

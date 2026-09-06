@@ -12,6 +12,9 @@ func Api_user_field_delete_post(config tool.Config, field string) map[string]any
 		return return_data
 	}
 	user_delete(db, config.IP, field)
+	if field == "email" && user_value(db, config.IP, "2fa") == "email" {
+		user_delete(db, config.IP, "2fa")
+	}
 	return_data["response"] = "ok"
 	return return_data
 }

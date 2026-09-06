@@ -13,6 +13,9 @@ func View_login_2fa(config tool.Config, values url.Values) string {
 	if login_id == "" {
 		return tool.Get_redirect("/login")
 	}
+	if user_value(db, login_id, "2fa") == "email" {
+		return tool.Get_redirect("/login/2fa/email")
+	}
 	if values != nil {
 		if !tool.Captcha_check(db, config.Session, config.IP, tool.Captcha_response(values.Get("g-recaptcha"), values.Get("g-recaptcha-response"), values.Get("h-captcha-response"), values.Get("cf-turnstile-response"), values.Get("altcha"))) {
 			return tool.Get_error_page(db, config, "recaptcha")
@@ -25,11 +28,12 @@ func View_login_2fa(config tool.Config, values url.Values) string {
 		if encode == "" {
 			encode = tool.Get_user_encode(db, login_id)
 		}
-		if stored != "" && stored != tool.Password_encode(db, values.Get("pw"), encode) {
+		if stored == "" || stored != tool.Password_encode(db, values.Get("pw"), encode) {
 			return tool.Get_error_page(db, config, "password error")
 		}
 		config.Session.Delete("login_id")
 		config.Session.Delete("b_id")
+		config.Session.Delete("login_2fa_key")
 		Api_record_user_agent_post(config, login_id)
 		config.Session.Set("id", login_id)
 		_ = config.Session.Save()

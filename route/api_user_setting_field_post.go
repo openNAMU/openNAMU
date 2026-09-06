@@ -18,6 +18,9 @@ func Api_user_setting_field_post(config tool.Config, field string, value string)
 	}
 	if field == "email" && value == "" {
 		user_delete(db, config.IP, field)
+		if user_value(db, config.IP, "2fa") == "email" {
+			user_delete(db, config.IP, "2fa")
+		}
 	} else {
 		user_save(db, config.IP, field, value)
 	}
