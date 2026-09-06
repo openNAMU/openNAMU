@@ -134,7 +134,7 @@ func register_setting_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_backlink_reset(make_route_config(c))))
 	})
 	r.POST("/setting/backlink_reset", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_backlink_reset_post(make_route_config(c))))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_backlink_reset_post(make_route_config(c), setting_form(c))))
 	})
 
 	r.GET("/api/v2/setting/:set_name", func(c *gin.Context) {

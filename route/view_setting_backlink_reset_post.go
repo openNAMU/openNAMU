@@ -6,7 +6,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func View_setting_backlink_reset_post(config tool.Config) string {
+func View_setting_backlink_reset_post(config tool.Config, form map[string]string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 

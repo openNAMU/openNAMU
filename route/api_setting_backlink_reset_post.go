@@ -2,11 +2,16 @@ package route
 
 import (
 	"strconv"
+	"time"
 
 	"opennamu/route/tool"
 )
 
 func Api_setting_backlink_reset_post(config tool.Config) map[string]any {
+	return api_setting_backlink_reset_post(config, "")
+}
+
+func api_setting_backlink_reset_post(config tool.Config, load string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -29,6 +34,10 @@ func Api_setting_backlink_reset_post(config tool.Config) map[string]any {
 	document_count := 0
 	error_count := 0
 	page := 1
+	delay := map[string]time.Duration{
+		"normal": 10 * time.Millisecond,
+		"slow":   100 * time.Millisecond,
+	}[load]
 
 	for {
 		title_data := Api_list_title_index(config, strconv.Itoa(page))
@@ -44,6 +53,9 @@ func Api_setting_backlink_reset_post(config tool.Config) map[string]any {
 
 			Api_w_render(config, doc_name, raw_data["data"].(string), "backlink", "")
 			document_count++
+			if delay > 0 {
+				time.Sleep(delay)
+			}
 		}
 
 		if len(title_list) < 50 {
