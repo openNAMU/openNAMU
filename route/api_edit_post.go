@@ -15,6 +15,7 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 
 	date := tool.Get_time()
 	data = strings.ReplaceAll(data, "\r", "")
+	data = tool.Do_edit_replace(db, data)
 	current_revision := tool.Get_document_revision(db, doc_name)
 
 	if doc_name == "" {

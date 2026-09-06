@@ -72,6 +72,9 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 		form += `<hr class="main_hr"><span>` + tool.Get_language(db, "acl", true) + `</span><hr class="main_hr"><textarea name="acl" placeholder="view=normal&#10;edit=trust_a&#10;move=owner&#10;delete=owner&#10;new_make=trust_a">` + tool.HTML_escape(value[2]) + `</textarea>`
 	case "name_filter", "file_filter":
 		form += filter_input(tool.Get_language(db, "regex", true), "title", name)
+	case "replace_filter":
+		form += filter_input(tool.Get_language(db, "regex", true), "title", name)
+		form += `<hr class="main_hr">` + filter_input(tool.Get_language(db, "replacement", true), "replacement", value[1])
 	case "email_filter":
 		form += filter_input(tool.Get_language(db, "email", true), "title", name)
 	case "image_license":
@@ -111,6 +114,7 @@ func get_filter_spec(kind string) (filter_spec, bool) {
 		"file_filter":      {"file", "file_filter_list"},
 		"name_filter":      {"name", "id_filter_list"},
 		"extension_filter": {"extension", "extension_filter_list"},
+		"replace_filter":   {"replace_filter", "replace_filter_list"},
 	}
 
 	spec, ok := list[kind]

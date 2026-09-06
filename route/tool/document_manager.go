@@ -9,6 +9,34 @@ import (
 	"github.com/dlclark/regexp2"
 )
 
+func Do_edit_replace(db *sql.DB, data string) string {
+	rows := Query_DB(
+		db,
+		`select html, plus from html_filter where kind = 'replace_filter'`,
+	)
+	defer rows.Close()
+
+	for rows.Next() {
+		pattern := ""
+		replacement := ""
+		if rows.Scan(&pattern, &replacement) != nil {
+			continue
+		}
+
+		r, err := regexp2.Compile(pattern, 0)
+		if err != nil {
+			continue
+		}
+
+		value, err := r.Replace(data, replacement, -1, -1)
+		if err == nil {
+			data = value
+		}
+	}
+
+	return data
+}
+
 func Do_edit_filter(db *sql.DB, config Config, doc_name string, data string) bool {
 	if !Check_permission(db, "edit_filter_pass", config.IP) {
 		rows := Query_DB(

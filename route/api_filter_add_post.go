@@ -89,6 +89,25 @@ func Api_filter_add_post(config tool.Config, kind string, name string, values ur
 		}
 		tool.Exec_DB(db, "delete from html_filter where html = ? and kind = 'regex_filter'", filter_name)
 		tool.Exec_DB(db, "insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, 'regex_filter')", filter_name, content, end)
+	} else if kind == "replace_filter" {
+		if title == "" {
+			return_data["response"] = "error"
+			return return_data
+		}
+		r, err := regexp2.Compile(title, 0)
+		if err != nil {
+			return_data["response"] = "error"
+			return return_data
+		}
+		if _, err := r.Replace("", values.Get("replacement"), -1, -1); err != nil {
+			return_data["response"] = "error"
+			return return_data
+		}
+		if name != "" && name != title {
+			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
+		}
+		tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", title, spec.db_kind)
+		tool.Exec_DB(db, "insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, '')", title, spec.db_kind, values.Get("replacement"))
 	} else if kind == "document" {
 		acl_data, acl_ok := document_filter_acl_data(db, values.Get("acl"))
 		if !acl_ok {

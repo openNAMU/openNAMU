@@ -54,6 +54,7 @@ func View_main_manager(config tool.Config) string {
 <li><a href="/filter/external_image">` + lang("external_image_filter_list") + `</a></li>
 <li><a href="/filter/html">` + lang("html_filter_list") + `</a></li>
 <li><a href="/filter/template">` + lang("template_document_list") + `</a> (` + lang("beta") + `)</li>
+<li><a href="/filter/replace_filter">` + lang("replace_filter_list") + `</a></li>
 </ul>
 <h3>` + lang("server") + `</h3>
 <ul>

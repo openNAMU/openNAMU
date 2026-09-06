@@ -405,6 +405,8 @@
     "outer_link_filter_list": "External link auto image list",
     "external_image_filter_list": "Allowed external image domain(s)",
     "html_filter_list": "HTML tag filter list",
+    "replace_filter_list": "Save-time text replacement list",
+    "replacement": "Replacement text",
     "html_or_link": "HTML or link",
     "template_document_list": "Template document(s) list",
     "no_link_document": "Document(s) without link",

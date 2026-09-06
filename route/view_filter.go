@@ -21,6 +21,8 @@ func View_filter(config tool.Config, kind string) string {
 			header = "tag"
 		}
 		data += `<tr id="main_table_top_tr"><td>` + tool.Get_language(db, header, true) + `</td></tr>`
+	} else if kind == "replace_filter" {
+		data += `<tr id="main_table_top_tr"><td>` + tool.Get_language(db, "regex", true) + `</td><td>` + tool.Get_language(db, "replacement", true) + `</td></tr>`
 	} else {
 		data += `<tr id="main_table_top_tr">` +
 			`<td id="main_table_width">A</td><td id="main_table_width">B</td><td id="main_table_width">C</td></tr>`
@@ -49,6 +51,10 @@ func View_filter(config tool.Config, kind string) string {
 			continue
 		}
 		data += `</td><td>`
+		if kind == "replace_filter" {
+			data += tool.HTML_escape(plus) + `</td></tr>`
+			continue
+		}
 		if kind == "inter_wiki" {
 			data += `<a class="opennamu_link_out" href="` + filter_safe_link(plus) + `">` + tool.HTML_escape(plus) + `</a>`
 		} else {

@@ -23,6 +23,8 @@ func Api_edit_revert_post(config tool.Config, doc_name string, rev string, send 
 		rev,
 	)
 
+	data = strings.ReplaceAll(data, "\r", "")
+	data = tool.Do_edit_replace(db, data)
 	if !exist {
 		return_data["response"] = "not exist"
 
@@ -66,8 +68,6 @@ func Api_edit_revert_post(config tool.Config, doc_name string, rev string, send 
 
 		return return_data
 	}
-
-	data = strings.ReplaceAll(data, "\r", "")
 
 	old_data := ""
 	old_exist := tool.QueryRow_DB(
