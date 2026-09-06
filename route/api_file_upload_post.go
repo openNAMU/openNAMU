@@ -12,7 +12,7 @@ import (
 )
 
 func Api_file_upload_post(config tool.Config, file_name string, file_data string, file_ext string) map[string]any {
-	return api_file_upload_post(config, file_name, file_data, file_ext, "direct_input", "", "", false, false)
+	return api_file_upload_post(config, file_name, file_data, file_ext, "direct_input", "", "", false, false, false)
 }
 
 func api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string, ip string) bool {
@@ -29,7 +29,7 @@ func api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string,
 	return true
 }
 
-func api_file_upload_post(config tool.Config, file_name string, file_data string, file_ext string, license string, license_text string, captcha string, check_captcha bool, many_upload bool) map[string]any {
+func api_file_upload_post(config tool.Config, file_name string, file_data string, file_ext string, license string, license_text string, captcha string, check_captcha bool, many_upload bool, replace bool) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -87,7 +87,8 @@ func api_file_upload_post(config tool.Config, file_name string, file_data string
 
 	doc_name := "file:" + file_name + "." + file_ext
 	var old_doc_name string
-	if tool.QueryRow_DB(db, "select title from data where title = ?", []any{&old_doc_name}, doc_name) {
+	old_doc_exists := tool.QueryRow_DB(db, "select title from data where title = ?", []any{&old_doc_name}, doc_name)
+	if old_doc_exists && !replace {
 		return_value["response"] = "error"
 		return_value["data"] = "already exist"
 		return return_value
@@ -102,7 +103,7 @@ func api_file_upload_post(config tool.Config, file_name string, file_data string
 
 	file_full_dir := tool.File_name_to_dir(file_name, file_ext)
 	dst_path := filepath.Join(main_dir, file_full_dir)
-	if _, err := os.Stat(dst_path); err == nil {
+	if _, err := os.Stat(dst_path); err == nil && !replace {
 		return_value["response"] = "error"
 		return_value["data"] = "already exist"
 		return return_value
@@ -112,7 +113,13 @@ func api_file_upload_post(config tool.Config, file_name string, file_data string
 		return return_value
 	}
 
-	out, err := os.OpenFile(dst_path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o644)
+	file_flag := os.O_WRONLY | os.O_CREATE
+	if replace {
+		file_flag |= os.O_TRUNC
+	} else {
+		file_flag |= os.O_EXCL
+	}
+	out, err := os.OpenFile(dst_path, file_flag, 0o644)
 	if err != nil {
 		return_value["response"] = "error"
 		return_value["data"] = "file create fail"
@@ -130,6 +137,12 @@ func api_file_upload_post(config tool.Config, file_name string, file_data string
 		_ = os.Remove(dst_path)
 		return_value["response"] = "error"
 		return_value["data"] = "file write fail"
+		return return_value
+	}
+
+	if old_doc_exists {
+		return_value["response"] = "ok"
+		return_value["data"] = doc_name
 		return return_value
 	}
 

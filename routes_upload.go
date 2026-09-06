@@ -45,6 +45,7 @@ func upload_post(c *gin.Context) {
 	posted_name := strings.TrimSpace(c.PostForm("f_name"))
 	license := c.PostForm("f_lice_sel")
 	license_text := c.PostForm("f_lice")
+	replace := c.PostForm("f_replace")
 	captcha := captcha_response(c)
 	upload_files := []map[string]string{}
 
@@ -84,6 +85,7 @@ func upload_post(c *gin.Context) {
 			"file_data":    base64.StdEncoding.EncodeToString(b),
 			"license":      license,
 			"license_text": license_text,
+			"replace":      replace,
 			"captcha":      captcha,
 		})
 		count += 1

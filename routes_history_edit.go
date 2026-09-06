@@ -163,6 +163,7 @@ func register_history_edit_routes(r *gin.Engine) {
 	})
 
 	r.POST("/upload", upload_post)
+	r.POST("/upload/*name", upload_post)
 
 	r.GET("/view/*name", route.View_view_file)
 	r.GET("/views/*name", route.View_view_file)

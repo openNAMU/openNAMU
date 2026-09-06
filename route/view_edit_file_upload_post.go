@@ -26,6 +26,7 @@ func View_edit_file_upload_post(config tool.Config, upload_files []map[string]st
 			"",
 			false,
 			len(upload_files) > 1,
+			v["replace"] == "1",
 		)
 		if data["response"] != "ok" {
 			error_name, _ := data["data"].(string)

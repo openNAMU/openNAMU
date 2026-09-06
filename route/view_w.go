@@ -177,6 +177,11 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	}
 	if strings.HasPrefix(doc_name, "file:") {
 		menu = append(menu, []any{"delete_file/" + tool.Url_parser(doc_name), tool.Get_language(db, "file_delete", true)})
+		file_name := strings.TrimPrefix(doc_name, "file:")
+		if dot_index := strings.LastIndex(file_name, "."); dot_index > 0 {
+			file_name = file_name[:dot_index]
+		}
+		menu = append(menu, []any{"upload/" + tool.Url_parser(file_name), tool.Get_language(db, "file_replace", true)})
 	}
 	if slash_index := strings.LastIndex(doc_name, "/"); slash_index > 0 {
 		menu = append(menu, []any{"w/" + tool.Url_parser(doc_name[:slash_index]), tool.Get_language(db, "upper", true)})

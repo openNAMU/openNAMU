@@ -129,6 +129,7 @@
     "lastest": "최신",
     "now_password": "현재 비밀번호",
     "same_file_error": "동일한 이름의 파일이 존재합니다.",
+    "file_replace": "기존 파일 덮어쓰기",
     "same_id_exist_error": "이미 동일한 이름의 계정이 존재합니다.",
     "max_file_size": "최대 파일 크기",
     "new_password": "새 비밀번호",
