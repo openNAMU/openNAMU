@@ -23,6 +23,9 @@ func View_list_old_page(config tool.Config, num string, set_type string) string 
 	for _, data := range api_data_list {
 		doc_name := tool.Url_parser(data[0])
 		doc_title := tool.HTML_escape(data[0])
+		if data[2] != "" {
+			doc_title += " (" + tool.Get_language(db, "redirect", false) + ")"
+		}
 		date := tool.HTML_escape(data[1])
 
 		left := `<a href="/w/` + doc_name + `">` + doc_title + `</a>`
