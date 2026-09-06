@@ -133,6 +133,7 @@ func main() {
 	pongo_init()
 
 	register_routes(r)
+	route.Start_auto_server_update()
 
 	log.Default().Println("Run in http://" + host + ":" + port)
 	if err := r.Run(host + ":" + port); err != nil {

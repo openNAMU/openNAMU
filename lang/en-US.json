@@ -566,6 +566,7 @@
     "email_required": "Request e-mail when registration",
     "smtp_setting_required": "Email SMTP setting required",
     "update_branch": "Branch to import updates",
+    "auto_update": "Enable automatic updates",
     "slow_edit": "Continuous edit limit",
     "slow_edit_acl": "Continuous edit limit excluded target ACL",
     "requires_approval": "Requires approval for registration",

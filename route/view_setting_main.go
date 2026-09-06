@@ -131,6 +131,7 @@ func setting_main_fields() []setting_field {
 		{name: "port", default_value: "3000"},
 		{name: "key", default_value: tool.Get_random_key(128)},
 		{name: "update", default_value: "stable"},
+		{name: "auto_update", default_value: ""},
 		{name: "encode", default_value: "sha3"},
 		{name: "host", default_value: "0.0.0.0"},
 		{name: "slow_edit", default_value: ""},
@@ -265,6 +266,7 @@ func view_setting_main_data(db *sql.DB, config tool.Config, values map[string]st
 	data.WriteString(`<h2>` + lang("server_set") + `</h2>`)
 	data.WriteString(`<span>` + lang("update_branch") + `</span>` + setting_hr())
 	data.WriteString(`<select name="update">` + setting_options(values["update"], []string{"stable", "beta"}, nil) + `</select>` + setting_hr())
+	data.WriteString(`<label><input type="checkbox" name="auto_update" ` + setting_checked(values["auto_update"]) + `> ` + lang("auto_update") + `</label>` + setting_hr())
 	data.WriteString(`<span` + sqlite_only + `>`)
 	data.WriteString(`<h3>` + lang("backup") + ` (` + lang("sqlite_only") + `)</h3>`)
 	data.WriteString(`<span>` + lang("backup_warning") + ` (EX : data_YYYYMMDDHHMMSS.db)</span>` + setting_hr())

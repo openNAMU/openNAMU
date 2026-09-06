@@ -12,9 +12,13 @@ import (
 	"path/filepath"
 	"runtime"
 	"time"
+
+	"opennamu/route/tool"
 )
 
 const server_update_mode = "--opennamu-update"
+const server_update_check_interval = 24 * time.Hour
+const server_update_check_delay = time.Minute
 
 func get_server_update_binary_name() (string, error) {
 	switch runtime.GOOS {
@@ -170,6 +174,49 @@ func start_server_update(branch string) error {
 		return fmt.Errorf("start update process: %w", err)
 	}
 	return nil
+}
+
+func check_auto_server_update() {
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
+
+	if tool.Get_setting_value(db, "auto_update", "", "") == "" {
+		return
+	}
+
+	current_version := tool.Get_last_version()["r_ver"]
+	branch := get_version_branch(db)
+	latest_version := get_remote_version(branch)
+	if latest_version == "" || latest_version == current_version {
+		return
+	}
+
+	if !begin_server_action() {
+		log.Printf("[UPDATE] automatic update skipped: another server action is running")
+		return
+	}
+
+	if err := start_server_update(branch); err != nil {
+		cancel_server_action()
+		log.Printf("[UPDATE] automatic update failed: %v", err)
+		return
+	}
+
+	log.Printf("[UPDATE] automatic update: %s -> %s", current_version, latest_version)
+	schedule_server_exit()
+}
+
+func Start_auto_server_update() {
+	go func() {
+		time.Sleep(server_update_check_delay)
+		check_auto_server_update()
+
+		ticker := time.NewTicker(server_update_check_interval)
+		defer ticker.Stop()
+		for range ticker.C {
+			check_auto_server_update()
+		}
+	}()
 }
 
 func Run_server_update(arguments []string) int {

@@ -63,6 +63,7 @@
     "version": "버전",
     "open": "열기",
     "update_branch": "업데이트를 가져올 브랜치",
+    "auto_update": "자동 업데이트 사용",
     "edit_filter_error": "편집 필터에 의해 금지된 단어가 사용되었습니다.",
     "ip": "IP",
     "pinned_release": "고정 해제",
