@@ -80,3 +80,24 @@ document.addEventListener("click", function () {
     });
 });
 
+function opennamu_render_math() {
+    if(typeof katex === "undefined") {
+        return;
+    }
+
+    document.querySelectorAll('.opennamu_math').forEach(function (obj) {
+        const data = obj.getAttribute('data-math');
+        if(data === null) {
+            return;
+        }
+
+        try {
+            katex.render(data, obj);
+        } catch(error) {
+            obj.textContent = data;
+            obj.style.color = 'red';
+        }
+    });
+}
+
+opennamu_render_math();
