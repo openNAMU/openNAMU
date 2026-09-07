@@ -56,6 +56,10 @@ func Get_frontpage_url() string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	frontpage_type := tool.Get_setting_value(db, "frontpage_type", "", "document")
+	if frontpage_type == "bbs" {
+		return "/bbs/main"
+	}
 	frontpage := tool.Get_setting_value(db, "frontpage", "", "FrontPage")
 
 	return "/w/" + tool.Url_parser(frontpage)

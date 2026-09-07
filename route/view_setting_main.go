@@ -123,6 +123,7 @@ func setting_main_fields() []setting_field {
 	return []setting_field{
 		{name: "name", default_value: "Wiki"},
 		{name: "frontpage", default_value: "FrontPage"},
+		{name: "frontpage_type", default_value: "document"},
 		{name: "upload", default_value: "2"},
 		{name: "skin", default_value: ""},
 		{name: "reg", default_value: ""},
@@ -208,6 +209,7 @@ func view_setting_main_data(db *sql.DB, config tool.Config, values map[string]st
 	data.WriteString(setting_input("name", values["name"], "text") + setting_hr())
 	data.WriteString(`<span><a href="/setting/main/logo">(` + lang("wiki_logo") + `)</a></span>` + setting_hr())
 	data.WriteString(`<span>` + lang("main_page") + `</span>` + setting_hr())
+	data.WriteString(`<select name="frontpage_type">` + setting_options(values["frontpage_type"], []string{"document", "bbs"}, map[string]string{"document": lang("document"), "bbs": lang("bbs_main")}) + `</select>` + setting_hr())
 	data.WriteString(setting_input("frontpage", values["frontpage"], "text") + setting_hr())
 	data.WriteString(`<span>` + lang("tls_method") + `</span>` + setting_hr())
 	data.WriteString(`<select name="http_select">` + setting_options(values["http_select"], []string{"http", "https"}, nil) + `</select>` + setting_hr())
