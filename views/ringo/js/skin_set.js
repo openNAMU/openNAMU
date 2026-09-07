@@ -72,6 +72,14 @@ function ringo_load_skin_set() {
                 "fixed_width" : "고정폭",
                 'default' : '기본값',
                 'sidebar_right' : '사이드바 방향 오른쪽'
+            }, "ja-JP" : {
+                "save" : "保存",
+                "darkmode" : "ダークモード",
+                "use_sys_darkmode" : "システムのダークモードを使用",
+                "off_sidebar" : "サイドバーを非表示",
+                "fixed_width" : "固定幅",
+                'default' : 'デフォルト',
+                'sidebar_right' : 'サイドバーを右に表示'
             }
         }
 

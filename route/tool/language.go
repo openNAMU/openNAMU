@@ -32,10 +32,22 @@ func Get_language(db *sql.DB, data string, safe bool) string {
 		} else {
 			return HTML_escape(lang_value)
 		}
-	} else {
-		log.Default().Println(data + " (" + language + ")")
-		return data + " (" + language + ")"
 	}
+	if language != "ko-KR" {
+		fallback, fallback_ok := Get_lang_cache("ko-KR", data)
+		if !fallback_ok {
+			Load_lang_data("ko-KR")
+			fallback, fallback_ok = Get_lang_cache("ko-KR", data)
+		}
+		if fallback_ok {
+			if safe {
+				return fallback
+			}
+			return HTML_escape(fallback)
+		}
+	}
+	log.Default().Println(data + " (" + language + ")")
+	return data + " (" + language + ")"
 }
 
 func Get_lang_cache(language string, data string) (string, bool) {

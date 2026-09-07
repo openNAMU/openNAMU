@@ -676,7 +676,7 @@ func Get_init_set_list(need string) map[string]map[string]any {
 			"display": "Language",
 			"require": "select",
 			"default": "ko-KR",
-			"list":    []string{"ko-KR", "en-US"},
+			"list":    []string{"ko-KR", "en-US", "ja-JP"},
 		},
 		"markup": {
 			"display": "Markup",
