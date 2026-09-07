@@ -1560,7 +1560,8 @@ func (class *namumark_compat_renderer) process_middle_block(middle_data string) 
 		code = tool.HTML_unescape(code)
 		syntax_id := "opennamu_syntax_" + strconv.Itoa(class.syntax_count)
 		class.syntax_count++
-		return class.reserve(`<pre id="syntax"><code class="` + compat_html_escape(language) + `" id="` + syntax_id + `">` + compat_html_escape(code) + `</code></pre>`)
+		copy_text := compat_html_escape(tool.Get_language(class.db, "copy", true))
+		return class.reserve(`<button class="__ON_BUTTON__ opennamu_syntax_copy" type="button" data-syntax-id="` + compat_html_escape(syntax_id) + `">` + copy_text + `</button><pre id="syntax"><code class="` + compat_html_escape(language) + `" id="` + syntax_id + `">` + compat_html_escape(code) + `</code></pre>`)
 
 	case middle_name == "#!wiki":
 		wiki_body := body

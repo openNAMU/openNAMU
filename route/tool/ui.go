@@ -249,7 +249,7 @@ func Get_redirect_target(data string) (string, bool) {
 }
 
 func Cache_v() string {
-	return ".cache_v295"
+	return ".cache_v296"
 }
 
 func Get_wiki_css(data []any, cookies string) []any {

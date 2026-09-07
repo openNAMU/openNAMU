@@ -80,6 +80,53 @@ document.addEventListener("click", function () {
     });
 });
 
+function opennamu_copy_syntax(data) {
+    if(navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(data).catch(function () {});
+        return;
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = data;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+}
+
+function opennamu_render_syntax() {
+    const syntax_list = document.querySelectorAll('pre#syntax > code');
+    if(syntax_list.length === 0) {
+        return;
+    }
+
+    syntax_list.forEach(function (obj) {
+        obj.opennamu_code = obj.textContent;
+    });
+
+    if(typeof hljs !== "undefined") {
+        hljs.highlightAll();
+        syntax_list.forEach(function (obj) {
+            if(typeof hljs.lineNumbersBlock === "function" && obj.opennamu_code.split('\n').length > 11) {
+                hljs.lineNumbersBlock(obj);
+            }
+        });
+    }
+
+    document.querySelectorAll('.opennamu_syntax_copy').forEach(function (obj) {
+        const target = document.getElementById(obj.getAttribute('data-syntax-id'));
+        if(target === null) {
+            return;
+        }
+
+        obj.onclick = function () {
+            opennamu_copy_syntax(target.opennamu_code || target.textContent);
+        };
+    });
+}
+
+opennamu_render_syntax();
+
 function opennamu_render_math() {
     if(typeof katex === "undefined") {
         return;
