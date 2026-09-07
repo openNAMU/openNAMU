@@ -11,7 +11,7 @@ import (
 
 var builtin_version_data []byte
 
-var file_extension_default_list = append(append([]string{"jpg", "jpeg", "png", "gif", "webp"}, file_audio_extensions...), file_video_extensions...)
+var file_extension_default_list = append(append(append([]string{"jpg", "jpeg", "png", "gif", "webp"}, file_document_extensions...), file_audio_extensions...), file_video_extensions...)
 
 func Set_builtin_version_data(data []byte) {
 	builtin_version_data = data
@@ -670,6 +670,35 @@ func init_video_extensions(db *sql.DB) {
 	)
 }
 
+func init_document_extensions(db *sql.DB) {
+	initialized := ""
+	if QueryRow_DB(
+		db,
+		"select data from other where name = 'document_extension_initialized' limit 1",
+		[]any{&initialized},
+	) {
+		return
+	}
+
+	extension_list := Get_ext_allow_list(db)
+	for _, extension := range file_document_extensions {
+		if extension_list[extension] {
+			continue
+		}
+
+		Exec_DB(
+			db,
+			"insert into html_filter (html, kind, plus, plus_t) values (?, 'extension', '', '')",
+			extension,
+		)
+	}
+
+	Exec_DB(
+		db,
+		"insert into other (name, data, coverage) values ('document_extension_initialized', '1', '')",
+	)
+}
+
 func init_captcha(db *sql.DB) {
 	recaptcha := ""
 	sec_key := ""
@@ -857,6 +886,7 @@ func Always_init(db *sql.DB, version string) {
 	init_bbs_comment_count(db)
 	init_audio_extensions(db)
 	init_video_extensions(db)
+	init_document_extensions(db)
 	init_captcha(db)
 	Exec_DB(
 		db,

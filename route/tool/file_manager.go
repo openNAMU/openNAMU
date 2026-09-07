@@ -11,6 +11,7 @@ import (
 	"github.com/dlclark/regexp2"
 )
 
+var file_document_extensions = []string{"pdf", "docx"}
 var file_audio_extensions = []string{"mp3", "wav", "flac", "aac", "m4a", "ogg", "oga", "opus", "amr", "weba"}
 var file_video_extensions = []string{"mp4", "m4v", "webm", "mkv", "mov", "avi", "mpeg", "mpg", "ts", "3gp", "3g2"}
 

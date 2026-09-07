@@ -192,7 +192,7 @@ func View_view_image_file(c *gin.Context) {
 		c.Header("Cache-Control", "private, max-age=31536000, immutable")
 	}
 
-	is_inline := strings.HasPrefix(mime_type, "image/") || strings.HasPrefix(mime_type, "video/") || strings.HasPrefix(mime_type, "audio/")
+	is_inline := mime_type == "application/pdf" || strings.HasPrefix(mime_type, "image/") || strings.HasPrefix(mime_type, "video/") || strings.HasPrefix(mime_type, "audio/")
 	if is_inline {
 		c.Header("Content-Type", mime_type)
 	} else {
