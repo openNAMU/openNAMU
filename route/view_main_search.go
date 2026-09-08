@@ -57,10 +57,16 @@ func View_main_search(config tool.Config, keyword string, num string, search_typ
 
 	data_api := Api_func_search(config, keyword, num, search_type)
 	data_api_in := data_api["data"].([]string)
+	data_list := Api_func_search_ui(config, data_api_in, keyword, search_type)
 
 	data_html += "<ul>"
-	for _, v := range data_api_in {
-		data_html += `<li><a href="/w/` + tool.Url_parser(v) + `">` + tool.HTML_escape(v) + `</a></li>`
+	for _, in_data := range data_list {
+		title := in_data["title"]
+		data_html += "<li><a href=\"/w/" + tool.Url_parser(title) + "\">" + in_data["title_html"] + "</a>"
+		if in_data["search_snippet_html"] != "" {
+			data_html += "<div>" + in_data["search_snippet_html"] + "</div>"
+		}
+		data_html += "</li>"
 	}
 
 	data_html += "</ul>"

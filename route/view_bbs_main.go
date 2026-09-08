@@ -1,10 +1,91 @@
 package route
 
 import (
+	"regexp"
+	"sort"
 	"strconv"
+	"strings"
 
 	"opennamu/route/tool"
 )
+
+func search_highlight(data string, keyword string) string {
+	data = tool.HTML_escape(data)
+	keyword_list := []string{}
+	for _, keyword_data := range strings.Fields(keyword) {
+		keyword_data = tool.HTML_escape(keyword_data)
+		if keyword_data != "" {
+			keyword_list = append(keyword_list, regexp.QuoteMeta(keyword_data))
+		}
+	}
+	if len(keyword_list) == 0 {
+		return data
+	}
+	sort.Slice(keyword_list, func(i int, j int) bool {
+		return len(keyword_list[i]) > len(keyword_list[j])
+	})
+	pattern, err := regexp.Compile("(?i)" + strings.Join(keyword_list, "|"))
+	if err != nil {
+		return data
+	}
+	return pattern.ReplaceAllStringFunc(data, func(value string) string {
+		return "<mark>" + value + "</mark>"
+	})
+}
+
+func search_snippet(data string, keyword string) string {
+	data = strings.ReplaceAll(strings.TrimSpace(data), "\r", " ")
+	data = strings.ReplaceAll(data, "\n", " ")
+	if data == "" {
+		return ""
+	}
+
+	start := 0
+	end := tool.Get_len(data)
+	if end > 160 {
+		end = 160
+	}
+	for _, keyword_data := range strings.Fields(keyword) {
+		pattern, err := regexp.Compile("(?i)" + regexp.QuoteMeta(keyword_data))
+		if err != nil {
+			continue
+		}
+		match := pattern.FindStringIndex(data)
+		if match == nil {
+			continue
+		}
+		match_start := tool.Get_len(data[:match[0]])
+		start = match_start - 60
+		if start < 0 {
+			start = 0
+		}
+		end = start + 160
+		if end > tool.Get_len(data) {
+			end = tool.Get_len(data)
+		}
+		break
+	}
+
+	result := tool.Get_slice(data, start, end)
+	if start > 0 {
+		result = "..." + result
+	}
+	if end < tool.Get_len(data) {
+		result += "..."
+	}
+	return search_highlight(result, keyword)
+}
+
+func bbs_tags_html(bbs_id string, tags string, keyword string) string {
+	data_html := ""
+	for _, tag := range bbs_tag_list(tags) {
+		if data_html != "" {
+			data_html += ", "
+		}
+		data_html += `<a href="/bbs/in/` + tool.Url_parser(bbs_id) + `/filter/tag/` + tool.Url_parser(tag) + `/1">#` + search_highlight(tag, keyword) + `</a>`
+	}
+	return data_html
+}
 
 func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_id_to_name map[string]string) string {
 	count := 0
@@ -16,6 +97,10 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 		count += 1
 
 		bbs_title := in_data["title"]
+		bbs_title_html := tool.HTML_escape(bbs_title)
+		if in_data["title_html"] != "" {
+			bbs_title_html = in_data["title_html"]
+		}
 		bbs_id := in_data["set_id"]
 		bbs_code := in_data["set_code"]
 		bbs_date := in_data["date"]
@@ -37,9 +122,13 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 
 		left := ""
 		if in_data["prefix"] != "" {
-			left += "[" + tool.HTML_escape(in_data["prefix"]) + "] "
+			prefix_html := tool.HTML_escape(in_data["prefix"])
+			if in_data["prefix_html"] != "" {
+				prefix_html = in_data["prefix_html"]
+			}
+			left += "[" + prefix_html + "] "
 		}
-		left += `<a href="/bbs/w/` + bbs_id + `/` + bbs_code + `">` + tool.HTML_escape(bbs_title) + `</a>`
+		left += `<a href="/bbs/w/` + bbs_id + `/` + bbs_code + `">` + bbs_title_html + `</a>`
 
 		if bbs_name != "" {
 			left += ` <a href="/bbs/in/` + bbs_id + `">(` + bbs_name + `)</a>`
@@ -61,13 +150,15 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 			left = "<strong>" + left + "</strong>"
 		}
 
-		bottom := ""
-		for _, tag := range bbs_tag_list(in_data["tags"]) {
-			if bottom != "" {
-				bottom += ", "
-			}
-			bottom += `<a href="/bbs/in/` + tool.Url_parser(bbs_id) + `/filter/tag/` + tool.Url_parser(tag) + `/1">#` + tool.HTML_escape(tag) + `</a>`
+		bottom := in_data["search_snippet_html"]
+		if bottom != "" {
+			bottom += "<br>"
 		}
+		tags_html := in_data["tags_html"]
+		if tags_html == "" {
+			tags_html = bbs_tags_html(bbs_id, in_data["tags"], "")
+		}
+		bottom += tags_html
 		data_html += date_ui
 		data_html += tool.Get_list_ui(left, right, bottom, class_name)
 	}
