@@ -26,6 +26,7 @@
     "notice": "お知らせ",
     "help": "ヘルプ",
     "error": "エラー",
+    "downvote": "低評価",
     "need_category": "必要なカテゴリ",
     "unused_category": "未使用のカテゴリ"
 }

@@ -79,6 +79,7 @@
     "login_able_and_regsiter_disable": "Login-able and Registration-disable",
     "private": "Private",
     "upvote": "Upvote",
+    "downvote": "Downvote",
     "template_var" : "Template variable",
     "edit_only_bottom_text" : "Editing only textarea bottom notice",
     "move_bottom_text" : "Move textarea bottom notice",

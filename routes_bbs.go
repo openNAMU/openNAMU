@@ -266,6 +266,7 @@ func register_bbs_routes(r *gin.Engine) {
 			make_route_config(c),
 			c.Param("set_id"),
 			c.Param("set_code"),
+			c.PostForm("vote_type"),
 		)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})

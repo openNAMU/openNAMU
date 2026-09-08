@@ -13,18 +13,31 @@ func Api_bbs_w_tabom(config tool.Config, set_id string, set_code string) map[str
 	if !tool.Check_permission(db, "bbs_comment", config.IP) {
 		return_data["response"] = "require auth"
 		return_data["data"] = "0"
+		return_data["down_data"] = "0"
 	} else {
 		tabom_count := "0"
 		tool.QueryRow_DB(
 			db,
-			"select set_data from bbs_data where set_name = 'tabom_count' and set_id = ? and set_code = ?",
+			"select set_data from bbs_data where set_name = ? and set_id = ? and set_code = ?",
 			[]any{&tabom_count},
+			"tabom_count",
+			set_id,
+			set_code,
+		)
+
+		tabom_down_count := "0"
+		tool.QueryRow_DB(
+			db,
+			"select set_data from bbs_data where set_name = ? and set_id = ? and set_code = ?",
+			[]any{&tabom_down_count},
+			"tabom_down_count",
 			set_id,
 			set_code,
 		)
 
 		return_data["response"] = "ok"
 		return_data["data"] = tabom_count
+		return_data["down_data"] = tabom_down_count
 	}
 
 	return return_data

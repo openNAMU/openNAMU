@@ -881,6 +881,7 @@
     "private": "비공개",
     "password_same_as_id_error": "비밀번호는 사용자 ID와 같을 수 없습니다.",
     "upvote": "추천",
+    "downvote": "비추천",
     "template_var" : "템플릿 변수",
     "edit_only_bottom_text" : "편집 전용 하단 문구",
     "move_bottom_text" : "이동 하단 문구",

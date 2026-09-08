@@ -201,7 +201,7 @@ func register_api_routes(r *gin.Engine) {
 	})
 
 	r.POST("/api/v2/bbs/w/tabom/:sub_code", func(c *gin.Context) {
-		route_data := route.Api_bbs_w_tabom_post(make_route_config(c), c.Param("sub_code"))
+		route_data := route.Api_bbs_w_tabom_post(make_route_config(c), c.Param("sub_code"), c.Request.FormValue("vote_type"))
 		c.JSON(http.StatusOK, route_data)
 	})
 
