@@ -22,6 +22,7 @@ func Api_thread_delete_post(config tool.Config, topic_num string) map[string]any
 	tool.Do_insert_auth_history(db, config.IP, "delete_topic (code "+topic_num+")")
 	tool.Exec_DB(db, "delete from topic where code = ?", topic_num)
 	tool.Exec_DB(db, "delete from topic_set where thread_code = ?", topic_num)
+	tool.Exec_DB(db, "delete from user_set where name = 'thread_watchlist' and data = ?", topic_num)
 	tool.Exec_DB(db, "delete from rd where code = ?", topic_num)
 
 	return_data["response"] = "ok"

@@ -132,6 +132,9 @@ func View_thread(config tool.Config, topic_num string, doc_name string, values u
 	}
 	if topic_num != "0" {
 		menu = append(menu, []any{"thread/" + tool.Url_parser(topic_num) + "/tool", tool.Get_language(db, "tool", true)})
+		if !tool.IP_or_user(config.IP) {
+			menu = append(menu, []any{"thread_watch/" + tool.Url_parser(topic_num), tool.Get_language(db, "thread_watch", true)})
+		}
 	}
 
 	return tool.Get_template(db, config, name, data_html, []any{"(" + tool.Get_language(db, "discussion", true) + ")"}, menu, map[string]string{})

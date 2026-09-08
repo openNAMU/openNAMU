@@ -61,17 +61,22 @@ func View_bbs_in_w(c *gin.Context, config tool.Config, set_id string, set_code s
 
 	data_html += View_bbs_in_w_comment(db, config, set_id, set_code, c.Param("comment_select"))
 
+	menu := [][]any{
+		{"bbs/in/" + tool.Url_parser(set_id), tool.Get_language(db, "return", true)},
+		{"bbs/edit/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code), tool.Get_language(db, "edit", true)},
+		{"bbs/tool/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code), tool.Get_language(db, "tool", true)},
+	}
+	if !tool.IP_or_user(config.IP) {
+		menu = append(menu, []any{"bbs_watch/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code), tool.Get_language(db, "bbs_watch", true)})
+	}
+
 	out := tool.Get_template(
 		db,
 		config,
 		bbs_name,
 		data_html,
 		[]any{"(" + tool.Get_language(db, "bbs", true) + ")", data_api_in["date"], 0, 0, view_count_api_data},
-		[][]any{
-			{"bbs/in/" + tool.Url_parser(set_id), tool.Get_language(db, "return", true)},
-			{"bbs/edit/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code), tool.Get_language(db, "edit", true)},
-			{"bbs/tool/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code), tool.Get_language(db, "tool", true)},
-		},
+		menu,
 		map[string]string{
 			"path": c.Request.URL.Path,
 		},

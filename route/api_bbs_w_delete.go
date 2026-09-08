@@ -57,6 +57,11 @@ func Api_bbs_w_delete(config tool.Config, set_id string, set_code string) map[st
 
 	tool.Exec_DB(
 		db,
+		"delete from user_set where name = 'bbs_watchlist' and data = ?",
+		bbs_watch_key(set_id, set_code),
+	)
+	tool.Exec_DB(
+		db,
 		"delete from bbs_data where set_id = ? and set_code = ?",
 		set_id,
 		set_code,

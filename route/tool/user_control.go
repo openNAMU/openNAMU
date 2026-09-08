@@ -236,6 +236,8 @@ func IP_menu(db *sql.DB, ip string, my_ip string, option string) map[string][][]
 			menu[Get_language(db, "tool", false)] = [][]string{
 				{"/watch_list", Get_language(db, "watchlist", false)},
 				{"/star_doc", Get_language(db, "star_doc", false)},
+				{"/thread_watch_list", Get_language(db, "thread_watchlist", false)},
+				{"/bbs_watch_list", Get_language(db, "bbs_watchlist", false)},
 				{"/challenge", Get_language(db, "challenge_and_level_manage", false)},
 				{"/acl/user:" + Url_parser(my_ip), Get_language(db, "user_document_acl", false)},
 				{"/alarm", Get_language(db, "alarm", false) + " (" + alarm_count + ")"},

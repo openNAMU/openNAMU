@@ -8,6 +8,10 @@ func Api_user_watch_list(config tool.Config, name string, num_str string, do_typ
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if do_type != "watchlist" && do_type != "star_doc" && do_type != "thread_watchlist" && do_type != "bbs_watchlist" {
+		do_type = "star_doc"
+	}
+
 	page := tool.Str_to_int(num_str)
 	num := 0
 	if page*50 > 0 {
@@ -22,17 +26,17 @@ func Api_user_watch_list(config tool.Config, name string, num_str string, do_typ
 		return_data["response"] = "require auth"
 		return_data["data"] = []string{}
 	} else {
-		query := ""
+		query := "select data from user_set where name = ? and id = ? limit ?, 50"
 		if do_type == "star_doc" {
-			query = `select data from user_set where name = 'star_doc' and id = ? order by coalesce((select date from history where history.title = user_set.data order by id + 0 desc limit 1), '') desc, data asc limit ?, 50`
-		} else {
-			query = "select data from user_set where name = 'watchlist' and id = ? limit ?, 50"
+			query = `select data from user_set where name = ? and id = ? order by coalesce((select date from history where history.title = user_set.data order by id + 0 desc limit 1), '') desc, data asc limit ?, 50`
 		}
 
 		rows := tool.Query_DB(
 			db,
 			query,
-			name, num,
+			do_type,
+			name,
+			num,
 		)
 		defer rows.Close()
 

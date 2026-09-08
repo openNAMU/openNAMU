@@ -150,4 +150,25 @@ func topic_thread_notify(db *sql.DB, config tool.Config, topic_num string, comme
 	if tool.QueryRow_DB(db, "select ip from topic where code = ? and id = '1'", []any{&first_user}, topic_num) && !tool.IP_or_user(first_user) {
 		tool.Send_alarm(db, config.IP, first_user, alarm)
 	}
+
+	skip := map[string]bool{first_user: true}
+	if strings.HasPrefix(name, "user:") {
+		skip[strings.TrimPrefix(name, "user:")] = true
+	}
+	sent := map[string]bool{}
+	rows := tool.Query_DB(
+		db,
+		"select id from user_set where name = 'thread_watchlist' and data = ?",
+		topic_num,
+	)
+	defer rows.Close()
+
+	for rows.Next() {
+		target := ""
+		if rows.Scan(&target) != nil || target == "" || skip[target] || sent[target] {
+			continue
+		}
+		sent[target] = true
+		tool.Send_alarm(db, config.IP, target, alarm)
+	}
 }

@@ -170,6 +170,7 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 	if parent_user != "" {
 		tool.Send_alarm(db, config.IP, parent_user, alarm)
 	}
+	bbs_watch_notify(db, config, set_id, set_code, end_code, bbs_name, title, post_user, parent_user)
 	topic_reference_notify(db, config, data, end_code, set_code, set_id, bbs_name, title, "bbs")
 
 	return_data["response"] = "ok"

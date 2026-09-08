@@ -80,6 +80,48 @@ func register_watch_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.GET("/thread_watch_list", func(c *gin.Context) {
+		route_data := route.View_user_watch_list(make_route_config(c), "1", "thread_watchlist")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/thread_watch_list_page/:num", func(c *gin.Context) {
+		route_data := route.View_user_watch_list(make_route_config(c), c.Param("num"), "thread_watchlist")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/thread_watch/:topic_num", func(c *gin.Context) {
+		route_data := route.View_thread_watch(make_route_config(c), c.Param("topic_num"), nil)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.POST("/thread_watch/:topic_num", func(c *gin.Context) {
+		_ = c.Request.ParseForm()
+		route_data := route.View_thread_watch(make_route_config(c), c.Param("topic_num"), c.Request.PostForm)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/bbs_watch_list", func(c *gin.Context) {
+		route_data := route.View_user_watch_list(make_route_config(c), "1", "bbs_watchlist")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/bbs_watch_list_page/:num", func(c *gin.Context) {
+		route_data := route.View_user_watch_list(make_route_config(c), c.Param("num"), "bbs_watchlist")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/bbs_watch/:set_id/:set_code", func(c *gin.Context) {
+		route_data := route.View_bbs_watch(make_route_config(c), c.Param("set_id"), c.Param("set_code"), nil)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.POST("/bbs_watch/:set_id/:set_code", func(c *gin.Context) {
+		_ = c.Request.ParseForm()
+		route_data := route.View_bbs_watch(make_route_config(c), c.Param("set_id"), c.Param("set_code"), c.Request.PostForm)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/record_bbs/:user_name", func(c *gin.Context) {
 		route_data := route.View_record_bbs(make_route_config(c), c.Param("user_name"), "1")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))

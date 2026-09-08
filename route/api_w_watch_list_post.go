@@ -9,7 +9,7 @@ func Api_w_watch_list_post(config tool.Config, name string, do_type string) map[
 	if tool.IP_or_user(config.IP) {
 		return map[string]any{"response": "require auth"}
 	}
-	if do_type != "watchlist" {
+	if do_type != "watchlist" && do_type != "star_doc" && do_type != "thread_watchlist" && do_type != "bbs_watchlist" {
 		do_type = "star_doc"
 	}
 
