@@ -6,7 +6,16 @@ func Api_list_recent_change(config tool.Config, set_type string, limit string, n
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if set_type == "edit" {
+	watch_filter := set_type == "watch"
+	if watch_filter {
+		if tool.IP_or_user(config.IP) {
+			return map[string]any{
+				"response": "require auth",
+				"data":     [][]string{},
+			}
+		}
+		set_type = "normal"
+	} else if set_type == "edit" {
 		set_type = ""
 	}
 
@@ -22,12 +31,19 @@ func Api_list_recent_change(config tool.Config, set_type string, limit string, n
 		page_int = 0
 	}
 
+	rc_count_query := "select count(*) from rc where type = ?"
+	rc_count_values := []any{set_type}
+	if watch_filter {
+		rc_count_query += " and exists (select 1 from user_set w where w.id = ? and w.name = 'watchlist' and w.data = rc.title)"
+		rc_count_values = append(rc_count_values, config.IP)
+	}
+
 	var rc_count int
 	tool.QueryRow_DB(
 		db,
-		"select count(*) from rc where type = ?",
+		rc_count_query,
 		[]any{&rc_count},
-		set_type,
+		rc_count_values...,
 	)
 	history_auth := tool.Check_permission(db, "history_view", config.IP)
 
@@ -38,13 +54,16 @@ func Api_list_recent_change(config tool.Config, set_type string, limit string, n
 			rc_limit = rc_count - page_int
 		}
 
-		rows := tool.Query_DB(
-			db,
-			"select id, title from rc where type = ? order by date desc limit ?, ?",
-			set_type,
-			page_int,
-			rc_limit,
-		)
+		rc_query := "select id, title from rc where type = ?"
+		rc_values := []any{set_type}
+		if watch_filter {
+			rc_query += " and exists (select 1 from user_set w where w.id = ? and w.name = 'watchlist' and w.data = rc.title)"
+			rc_values = append(rc_values, config.IP)
+		}
+		rc_query += " order by date desc limit ?, ?"
+		rc_values = append(rc_values, page_int, rc_limit)
+
+		rows := tool.Query_DB(db, rc_query, rc_values...)
 		for rows.Next() {
 			var id string
 			var title string
@@ -67,6 +86,10 @@ func Api_list_recent_change(config tool.Config, set_type string, limit string, n
 		if set_type != "normal" {
 			history_query += "h.type = ? and "
 			history_values = append(history_values, set_type)
+		}
+		if watch_filter {
+			history_query += "exists (select 1 from user_set w where w.id = ? and w.name = 'watchlist' and w.data = h.title) and "
+			history_values = append(history_values, config.IP)
 		}
 		history_query += `not exists (
 			select 1 from rc r

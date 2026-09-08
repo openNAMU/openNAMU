@@ -135,6 +135,8 @@ func View_list_recent_change(config tool.Config, set_type string, limit string, 
 	sub := ""
 	if set_type == "" {
 		set_type = "normal"
+	} else if set_type == "watch" {
+		sub = "(" + tool.Get_language(db, "watchlist", true) + ")"
 	} else {
 		sub = "(" + tool.Get_language(db, set_type, true) + ")"
 	}
@@ -147,8 +149,14 @@ func View_list_recent_change(config tool.Config, set_type string, limit string, 
 		data_html += `<a href="/recent_change/1/` + option + `">(` + label + `)</a> `
 	}
 	data_html += `<a href="/recent_change/1/user">(` + tool.Get_language(db, "user_document", true) + `)</a> `
+	if !tool.IP_or_user(config.IP) {
+		data_html += `<a href="/recent_change/1/watch">(` + tool.Get_language(db, "watchlist", true) + `)</a> `
+	}
 
 	api_data := Api_list_recent_change(config, set_type, limit, num)
+	if api_data["response"] != "ok" {
+		return tool.Get_error_page(db, config, "auth")
+	}
 	api_data_list := api_data["data"].([][]string)
 
 	history_ui, _ := Get_ui_history(db, api_data_list)
