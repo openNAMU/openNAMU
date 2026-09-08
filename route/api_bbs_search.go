@@ -88,7 +88,7 @@ func Api_bbs_search(config tool.Config, keyword string, set_id string, page stri
 						ip_render = value[1]
 					} else {
 						ip_pre = tool.IP_preprocess(db, set_data, config.IP)[0]
-						ip_render = tool.IP_parser(db, set_data, config.IP)
+						ip_render = tool.Get_user_profile_image_ui(db, set_data) + tool.IP_parser(db, set_data, config.IP)
 						ip_parser_temp[set_data] = []string{ip_pre, ip_render}
 					}
 					set_data = ip_pre

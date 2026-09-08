@@ -8,7 +8,7 @@ import (
 )
 
 func thread_user_render(db *sql.DB, config tool.Config, ip string) string {
-	return tool.IP_parser(db, ip, config.IP)
+	return tool.Get_user_profile_image_ui(db, ip) + tool.IP_parser(db, ip, config.IP)
 }
 
 func thread_comments(db *sql.DB, config tool.Config, topic_num string) string {

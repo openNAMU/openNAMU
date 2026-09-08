@@ -79,7 +79,7 @@ func Api_bbs_w_comment_one(config tool.Config, already_auth_check bool, do_type 
 				ip_render = ip_parser_temp[set_data][1]
 			} else {
 				ip_pre = tool.IP_preprocess(db, set_data, config.IP)[0]
-				ip_render = tool.IP_parser(db, set_data, config.IP)
+				ip_render = tool.Get_user_profile_image_ui(db, set_data) + tool.IP_parser(db, set_data, config.IP)
 
 				ip_parser_temp[set_data] = []string{ip_pre, ip_render}
 			}

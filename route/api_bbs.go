@@ -380,7 +380,7 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 						ip_render = ip_parser_temp[set_data][1]
 					} else {
 						ip_pre = tool.IP_preprocess(db, set_data, config.IP)[0]
-						ip_render = tool.IP_parser(db, set_data, config.IP)
+						ip_render = tool.Get_user_profile_image_ui(db, set_data) + tool.IP_parser(db, set_data, config.IP)
 
 						ip_parser_temp[set_data] = []string{ip_pre, ip_render}
 					}

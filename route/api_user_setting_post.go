@@ -46,6 +46,19 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 			user_save(db, config.IP, name, values.Get(name))
 		}
 	}
+	if values.Has("profile_image") {
+		profile_image, valid := tool.Get_user_profile_image_name(db, values.Get("profile_image"))
+		if !valid {
+			return_data["response"] = "error"
+			return_data["data"] = "invalid file"
+			return return_data
+		}
+		if profile_image == "" {
+			user_delete(db, config.IP, "profile_image")
+		} else {
+			user_save(db, config.IP, "profile_image", profile_image)
+		}
+	}
 	if values.Has("2fa") {
 		switch values.Get("2fa") {
 		case "":

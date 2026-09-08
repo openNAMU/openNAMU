@@ -34,7 +34,7 @@ func Api_bbs_w(config tool.Config, set_id string, set_code string) map[string]an
 			var ip_render string
 
 			ip_pre = tool.IP_preprocess(db, set_data, config.IP)[0]
-			ip_render = tool.IP_parser(db, set_data, config.IP)
+			ip_render = tool.Get_user_profile_image_ui(db, set_data) + tool.IP_parser(db, set_data, config.IP)
 
 			data_list["user_id"] = ip_pre
 			data_list["user_id_render"] = ip_render

@@ -4,6 +4,7 @@ backend.log
 
 /bin/*
 !/bin/test
+/tmp/*
 
 *.db
 *.db-shm

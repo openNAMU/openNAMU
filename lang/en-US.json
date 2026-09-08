@@ -269,6 +269,8 @@
     "ua_collection_off_notice": "UA collection is disabled, so this list may be incomplete.",
     "account_count": "Account count",
     "last_login": "Last login",
+    "profile_image": "Profile image",
+    "profile_image_help": "Enter the file document name only. Example: example.png",
     "compare_target": "Comparison target name",
     "authorize": "Authorize",
     "auth_release": "Revoke authorization",

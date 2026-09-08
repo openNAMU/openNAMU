@@ -42,7 +42,7 @@ func View_bbs_contributor(config tool.Config) string {
 	count := 0
 	if rows.Next() && rows.Scan(&user_name, &count) == nil {
 		body = tool.Get_list_ui(
-			tool.IP_parser(db, user_name, config.IP),
+			tool.Get_user_profile_image_ui(db, user_name)+tool.IP_parser(db, user_name, config.IP),
 			tool.Get_language(db, "record_bbs_count", true)+" : "+strconv.Itoa(count),
 			"",
 			"",

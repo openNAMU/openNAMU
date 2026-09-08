@@ -84,6 +84,7 @@ func View_user_setting(config tool.Config, values url.Values) string {
 	current_skin := user_value(db, config.IP, "skin")
 	current_language := user_value(db, config.IP, "lang")
 	current_title := user_value(db, config.IP, "user_title")
+	profile_image := user_value(db, config.IP, "profile_image")
 	user_name := user_value(db, config.IP, "user_name")
 	if user_name == "" {
 		user_name = config.IP
@@ -115,6 +116,7 @@ func View_user_setting(config tool.Config, values url.Values) string {
 	body += `<span>` + tool.Get_language(db, "password_instead_key", true) + ` : ` + tool.HTML_escape(random_key) + `</span> <a href="/change/key">(` + tool.Get_language(db, "key_change", true) + `)</a> <a href="/change/key/delete">(` + tool.Get_language(db, "key_delete", true) + `)</a><h2>` + tool.Get_language(db, "main", true) + `</h2>`
 	body += `<a href="/change/head">(` + tool.Get_language(db, "user_head", false) + `)</a> <a href="/change/top_menu">(` + tool.Get_language(db, "user_added_menu", true) + `)</a><hr class="main_hr"><span>` + tool.Get_language(db, "skin", true) + `</span><hr class="main_hr"><select name="skin">` + skin_options(current_skin) + `</select><hr class="main_hr">`
 	body += `<a href="/change/skin_set">(` + tool.Get_language(db, "skin_set", true) + `)</a> <a href="/change/skin_set/main">(` + tool.Get_language(db, "main_skin_set", true) + `)</a><hr class="main_hr"><span>` + tool.Get_language(db, "language", true) + `</span><hr class="main_hr"><select name="lang">` + language_options(current_language) + `</select><hr class="main_hr"><span>` + tool.Get_language(db, "user_title", true) + `</span><hr class="main_hr"><select name="user_title">` + title_options + `</select><h2>` + tool.Get_language(db, "2fa", true) + `</h2><select name="2fa">` + twofa_options + `</select><hr class="main_hr"><input type="password" name="2fa_pw" placeholder="` + tool.Get_language(db, twofa_password, true) + `"><h2>` + tool.Get_language(db, "main_user_name", true) + `</h2><a href="/change/user_name">(` + tool.Get_language(db, "change_user_name", true) + `)</a><hr class="main_hr">`
+	body += `<h2>` + tool.Get_language(db, "profile_image", true) + `</h2><input name="profile_image" value="` + tool.HTML_escape(profile_image) + `" placeholder="file_name.png"><br>` + tool.Get_language(db, "profile_image_help", true) + `<hr class="main_hr">`
 	body += tool.Get_language(db, "user_name", true) + ` : ` + tool.HTML_escape(user_name) + `<h2>` + tool.Get_language(db, "sub_user_name", true) + `</h2><input name="sub_user_name" value="` + tool.HTML_escape(user_value(db, config.IP, "sub_user_name")) + `" placeholder="` + tool.Get_language(db, "sub_user_name", true) + `"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button>` + tool.Get_http_warning(db) + `</form>`
 	return user_form_page(db, config, tool.Get_language(db, "user_setting", true), body)
 }

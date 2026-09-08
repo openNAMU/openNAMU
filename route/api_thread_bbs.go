@@ -65,7 +65,7 @@ func Api_thread_bbs(config tool.Config, tool_name string, topic_num string, s_nu
 			ip_render = cached[1]
 		} else {
 			ip_pre = tool.IP_preprocess(db, ip, config.IP)[0]
-			ip_render = tool.IP_parser(db, ip, config.IP)
+			ip_render = tool.Get_user_profile_image_ui(db, ip) + tool.IP_parser(db, ip, config.IP)
 			ip_parser_temp[ip] = []string{ip_pre, ip_render}
 		}
 
