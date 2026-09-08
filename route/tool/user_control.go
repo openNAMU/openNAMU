@@ -410,6 +410,17 @@ func Do_auth_insert(db *sql.DB, user_name string, end_date string, reason string
 	}
 }
 
+func Is_mobile_user_agent(user_agent string) bool {
+	user_agent = strings.ToLower(user_agent)
+	for _, value := range []string{"android", "iphone", "ipad", "ipod", "mobile", "windows phone"} {
+		if strings.Contains(user_agent, value) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func Get_main_skin_set(db *sql.DB, config Config, set_name string) string {
 	set_data := ""
 

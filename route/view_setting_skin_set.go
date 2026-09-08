@@ -54,7 +54,8 @@ func setting_skin_fields(db *sql.DB) ([]setting_skin_field, map[string][][]strin
 		{name: "main_css_math_scroll", label: "math_scroll"},
 		{name: "main_css_view_history", label: "view_history"},
 		{name: "main_css_font_size", label: "font_size"},
-		{name: "main_css_monaco", label: "monaco_editor"},
+		{name: "main_css_monaco", label: "monaco_editor_pc"},
+		{name: "main_css_monaco_mobile", label: "monaco_editor_mobile"},
 	}
 
 	return fields, set_list

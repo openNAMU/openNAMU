@@ -485,6 +485,8 @@
     "font_size": "Font size",
     "image_paste": "Paste Image by Ctrl + C and V",
     "monaco_editor": "Monaco editor",
+    "monaco_editor_pc": "Monaco editor (PC)",
+    "monaco_editor_mobile": "Monaco editor (mobile)",
     "footnote_render": "Footnote rendering",
     "footnote_number": "Footnote number output",
     "only_number": "Only number",

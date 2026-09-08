@@ -26,6 +26,8 @@
     "notice": "お知らせ",
     "help": "ヘルプ",
     "error": "エラー",
+    "monaco_editor_pc": "Monacoエディター（PC）",
+    "monaco_editor_mobile": "Monacoエディター（モバイル）",
     "thread_watchlist": "議論のウォッチリスト",
     "bbs_watchlist": "掲示板投稿のウォッチリスト",
     "thread_watch": "議論をウォッチ",

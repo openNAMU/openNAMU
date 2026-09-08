@@ -560,10 +560,15 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
 		monaco_theme = "vs-dark"
 	}
 
-	monaco_on := false
-	if Get_main_skin_set(db, config, "main_css_monaco") == "use" {
-		monaco_on = true
+	monaco_setting := Get_main_skin_set(db, config, "main_css_monaco")
+	if Is_mobile_user_agent(config.UserAgent) {
+		mobile_setting := Get_main_skin_set(db, config, "main_css_monaco_mobile")
+		if mobile_setting != "default" {
+			monaco_setting = mobile_setting
+		}
 	}
+
+	monaco_on := monaco_setting == "use"
 
 	editor_display := []string{}
 	for for_a := 0; for_a < 3; for_a++ {

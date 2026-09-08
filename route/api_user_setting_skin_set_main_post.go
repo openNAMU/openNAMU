@@ -111,6 +111,11 @@ func Get_main_skin_set_list(db *sql.DB) map[string][][]string {
 			{"normal", lang["off"]},
 			{"use", lang["use"]},
 		},
+		"main_css_monaco_mobile": {
+			{"default", lang["default"]},
+			{"normal", lang["off"]},
+			{"use", lang["use"]},
+		},
 		"main_css_exter_link": {
 			{"default", lang["default"]},
 			{"blank", lang["normal"]},

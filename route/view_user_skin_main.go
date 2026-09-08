@@ -126,7 +126,8 @@ func View_user_skin_main(config tool.Config, values url.Values) string {
 	body.WriteString(field_data("main_css_view_history", "view_history", "h3"))
 	body.WriteString(field_data("main_css_font_size", "font_size", "h3"))
 	body.WriteString(`<h2>` + tool.Get_language(db, "edit", true) + `</h2>`)
-	body.WriteString(field_data("main_css_monaco", "monaco_editor", "h3"))
+	body.WriteString(field_data("main_css_monaco", "monaco_editor_pc", "h3"))
+	body.WriteString(field_data("main_css_monaco_mobile", "monaco_editor_mobile", "h3"))
 	body.WriteString(`<hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`)
 
 	menu := [][]any{

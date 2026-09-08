@@ -631,6 +631,8 @@
     "font_size": "글자 크기",
     "image_paste": "이미지 붙여넣기 (컨트롤 C + V로)",
     "monaco_editor": "모나코 에디터",
+    "monaco_editor_pc": "모나코 에디터 (PC)",
+    "monaco_editor_mobile": "모나코 에디터 (모바일)",
     "document_set": "문서 설정",
     "move_redirect_make": "넘겨주기 문서 생성 (가능한 경우에만)",
     "slow_edit_acl": "편집 속도 제한 시간 제외 대상 ACL",
