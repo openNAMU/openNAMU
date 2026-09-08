@@ -297,6 +297,7 @@ func Main_init() {
 
 	Always_init(db, last_version["c_ver"])
 	Get_ip_select(db)
+	Search_index_start()
 }
 
 func Get_last_version() map[string]string {

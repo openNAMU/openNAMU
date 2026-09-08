@@ -264,6 +264,8 @@ func move_document_options(config tool.Config, db *sql.DB, old_name string, new_
 		move_data_set_normal(db, old_name, new_name)
 	}
 
+	tool.Search_index_sync(db, old_name)
+	tool.Search_index_sync(db, new_name)
 	return ""
 }
 

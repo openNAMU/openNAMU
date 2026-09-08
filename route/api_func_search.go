@@ -24,8 +24,16 @@ func Api_func_search(config tool.Config, keyword string, num_str string, search_
 		query = "select title from data where data collate nocase like ? order by title limit ?, 50"
 	}
 
-	title_list := []string{}
+	if keyword != "" {
+		if title_list, ok := tool.Search_index_search(name, search_type, num, 50); ok {
+			return map[string]any{
+				"response": "ok",
+				"data":     title_list,
+			}
+		}
+	}
 
+	title_list := []string{}
 	rows := tool.Query_DB(
 		db,
 		query,

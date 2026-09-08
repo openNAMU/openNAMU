@@ -16,3 +16,4 @@ data/*.json
 
 *.exe
 *.bin
+data/bleve/

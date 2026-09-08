@@ -419,6 +419,12 @@ func Do_add_history(db *sql.DB, doc_name string, data string, date string, ip st
 		length,
 		mode,
 	)
+
+	if mode == "delete" {
+		Search_index_delete(doc_name)
+	} else {
+		Search_index_sync(db, doc_name)
+	}
 }
 
 func Do_add_recent_history(db *sql.DB, mode string, id string, title string, date string) {
