@@ -5,9 +5,6 @@ import (
 )
 
 func Api_func_search(config tool.Config, keyword string, num_str string, search_type string) map[string]any {
-	db := tool.DB_connect()
-	defer tool.DB_close(db)
-
 	page := tool.Str_to_int(num_str)
 	num := 0
 	if page*50 > 0 {
@@ -32,6 +29,9 @@ func Api_func_search(config tool.Config, keyword string, num_str string, search_
 			}
 		}
 	}
+
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
 
 	title_list := []string{}
 	rows := tool.Query_DB(

@@ -93,6 +93,7 @@ func Api_edit_revert_post(config tool.Config, doc_name string, rev string, send 
 			data,
 		)
 	}
+	tool.Search_index_update(doc_name, data)
 
 	tool.Do_add_history(
 		db,

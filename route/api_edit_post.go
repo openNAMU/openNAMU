@@ -107,6 +107,7 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 		doc_name,
 		data,
 	)
+	tool.Search_index_update(doc_name, data)
 
 	tool.Do_watchlist_alarm_send(db, config, doc_name)
 

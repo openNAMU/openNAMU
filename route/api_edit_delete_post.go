@@ -94,6 +94,7 @@ func Api_edit_delete_post(config tool.Config, doc_name string, send string, agre
 		"delete from data where title = ?",
 		doc_name,
 	)
+	tool.Search_index_delete(doc_name)
 
 	return_data["response"] = "ok"
 

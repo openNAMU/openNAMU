@@ -23,6 +23,7 @@ func api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string,
 	if _, err := db.Exec(tool.DB_change("insert into data (title, data) values (?, ?)"), doc_name, doc_data); err != nil {
 		return false
 	}
+	tool.Search_index_update(doc_name, doc_data)
 	markup.Get_render(db, doc_name, doc_data, "backlink")
 	tool.Do_add_history(db, doc_name, doc_data, tool.Get_time(), ip, "", "0", "upload", "")
 
