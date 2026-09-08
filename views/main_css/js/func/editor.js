@@ -1,3 +1,5 @@
+/* global editor, monaco, opennamu_monaco_custom, opennamu_xss_filter */
+
 "use strict";
 
 const opennamu_monaco_worker_base = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.56.0/esm/vs';

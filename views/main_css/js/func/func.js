@@ -1,3 +1,5 @@
+/* global hljs, katex */
+
 "use strict";
 
 function opennamu_xss_filter(str) {
