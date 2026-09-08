@@ -73,7 +73,7 @@ func bbs_search_item_data(db *sql.DB, config tool.Config, set_code string, set_i
 	return temp_data, true
 }
 
-func bbs_search_index_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int) ([]map[string]string, bool) {
+func bbs_search_index_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int, search_type string) ([]map[string]string, bool) {
 	target_count := page * 50
 	candidate_limit := 500
 	if target_count < candidate_limit {
@@ -89,7 +89,13 @@ func bbs_search_index_data(db *sql.DB, config tool.Config, keyword string, set_i
 	candidate_offset := 0
 	max_candidate := target_count + 1000
 	for candidate_offset < max_candidate && len(data_list) < target_count {
-		candidate_list, ok := tool.Search_bbs_index_search(keyword, set_id, candidate_offset, candidate_limit)
+		var candidate_list []string
+		var ok bool
+		if search_type == "data" {
+			candidate_list, ok = tool.Search_bbs_index_search_data(keyword, set_id, candidate_offset, candidate_limit)
+		} else {
+			candidate_list, ok = tool.Search_bbs_index_search(keyword, set_id, candidate_offset, candidate_limit)
+		}
 		if !ok {
 			return nil, false
 		}
@@ -129,6 +135,14 @@ func bbs_search_index_data(db *sql.DB, config tool.Config, keyword string, set_i
 }
 
 func Api_bbs_search(config tool.Config, keyword string, set_id string, page string) map[string]any {
+	return api_bbs_search(config, keyword, set_id, page, "title")
+}
+
+func Api_bbs_search_data(config tool.Config, keyword string, set_id string, page string) map[string]any {
+	return api_bbs_search(config, keyword, set_id, page, "data")
+}
+
+func api_bbs_search(config tool.Config, keyword string, set_id string, page string, search_type string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -148,7 +162,7 @@ func Api_bbs_search(config tool.Config, keyword string, set_id string, page stri
 			page_num = 1
 		}
 		offset := (page_num - 1) * 50
-		if data_list, ok := bbs_search_index_data(db, config, keyword, set_id, page_num); ok {
+		if data_list, ok := bbs_search_index_data(db, config, keyword, set_id, page_num, search_type); ok {
 			return map[string]any{
 				"response": "ok",
 				"data":     data_list,
@@ -166,11 +180,15 @@ func Api_bbs_search(config tool.Config, keyword string, set_id string, page stri
 			where_data += " and " + view_sql
 			values = append(values, view_values...)
 		}
+		search_set_name := "'title', 'prefix', 'tag'"
+		if search_type == "data" {
+			search_set_name = "'data'"
+		}
 		values = append(values, "%"+keyword+"%", offset)
 
 		rows := tool.Query_DB(
 			db,
-			"select b.set_code, b.set_id from bbs_data b left join bbs_data d on d.set_code = b.set_code and d.set_id = b.set_id and d.set_name = 'date' where "+where_data+" and b.set_name in ('title', 'prefix', 'tag') and b.set_data like ? group by b.set_code, b.set_id order by max(d.set_data) desc limit ?, 50",
+			"select b.set_code, b.set_id from bbs_data b left join bbs_data d on d.set_code = b.set_code and d.set_id = b.set_id and d.set_name = 'date' where "+where_data+" and b.set_name in ("+search_set_name+") and b.set_data like ? group by b.set_code, b.set_id order by max(d.set_data) desc limit ?, 50",
 			values...,
 		)
 		defer rows.Close()

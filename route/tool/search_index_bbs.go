@@ -18,6 +18,7 @@ type Bbs_search_document struct {
 	Title  string   `json:"title"`
 	Prefix string   `json:"prefix"`
 	Tags   []string `json:"tags"`
+	Data   string   `json:"data"`
 	Date   string   `json:"date"`
 }
 
@@ -28,7 +29,7 @@ type bbs_search_index_change struct {
 
 const bbs_search_index_directory = "data/bleve_bbs"
 const bbs_search_index_version_file = "data/bleve_bbs.version"
-const bbs_search_index_version = "1"
+const bbs_search_index_version = "2"
 
 var bbs_search_index bleve.Index
 var bbs_search_index_lock sync.RWMutex
@@ -63,6 +64,7 @@ func bbs_search_index_mapping() *mapping.IndexMappingImpl {
 	document_mapping.AddFieldMappingsAt("title", bbs_search_index_keyword_mapping())
 	document_mapping.AddFieldMappingsAt("prefix", bbs_search_index_keyword_mapping())
 	document_mapping.AddFieldMappingsAt("tags", bbs_search_index_keyword_mapping())
+	document_mapping.AddFieldMappingsAt("data", search_index_field_mapping())
 	document_mapping.AddFieldMappingsAt("date", bbs_search_index_date_mapping())
 	index_mapping.DefaultMapping = document_mapping
 
@@ -150,7 +152,7 @@ func search_bbs_index_rebuild() {
 
 	rows := Query_DB(
 		db,
-		"select set_id, set_code, set_name, set_data from bbs_data where set_name in ('title', 'prefix', 'tag', 'date') order by set_id, set_code",
+		"select set_id, set_code, set_name, set_data from bbs_data where set_name in ('title', 'prefix', 'tag', 'data', 'date') order by set_id, set_code",
 	)
 	defer rows.Close()
 
@@ -207,6 +209,8 @@ func search_bbs_index_rebuild() {
 			document.Prefix = strings.ToLower(set_data)
 		case "tag":
 			document.Tags = append(document.Tags, strings.ToLower(set_data))
+		case "data":
+			document.Data = set_data
 		case "date":
 			document.Date = set_data
 		}
@@ -250,7 +254,7 @@ func search_bbs_index_document(db *sql.DB, set_id string, set_code string) (Bbs_
 	document := Bbs_search_document{Set_id: strings.ToLower(set_id)}
 	rows := Query_DB(
 		db,
-		"select set_name, set_data from bbs_data where set_id = ? and set_code = ? and set_name in ('title', 'prefix', 'tag', 'date')",
+		"select set_name, set_data from bbs_data where set_id = ? and set_code = ? and set_name in ('title', 'prefix', 'tag', 'data', 'date')",
 		set_id,
 		set_code,
 	)
@@ -269,6 +273,8 @@ func search_bbs_index_document(db *sql.DB, set_id string, set_code string) (Bbs_
 			document.Prefix = strings.ToLower(set_data)
 		case "tag":
 			document.Tags = append(document.Tags, strings.ToLower(set_data))
+		case "data":
+			document.Data = set_data
 		case "date":
 			document.Date = set_data
 		}
@@ -333,7 +339,7 @@ func Search_bbs_index_delete_set(db *sql.DB, set_id string) {
 	}
 }
 
-func Search_bbs_index_search(keyword string, set_id string, offset int, limit int) ([]string, bool) {
+func search_bbs_index_search(keyword string, set_id string, search_type string, offset int, limit int) ([]string, bool) {
 	if keyword == "" || strings.ContainsAny(keyword, "*?%_") {
 		return []string{}, false
 	}
@@ -344,13 +350,20 @@ func Search_bbs_index_search(keyword string, set_id string, offset int, limit in
 		limit = 50
 	}
 
-	queries := []bleve_query.Query{}
-	for _, field := range []string{"title", "prefix", "tags"} {
-		query := bleve.NewWildcardQuery("*" + strings.ToLower(keyword) + "*")
-		query.SetField(field)
-		queries = append(queries, query)
+	var search_query bleve_query.Query
+	if search_type == "data" {
+		query := bleve.NewMatchQuery(keyword)
+		query.SetField("data")
+		search_query = query
+	} else {
+		queries := []bleve_query.Query{}
+		for _, field := range []string{"title", "prefix", "tags"} {
+			query := bleve.NewWildcardQuery("*" + strings.ToLower(keyword) + "*")
+			query.SetField(field)
+			queries = append(queries, query)
+		}
+		search_query = bleve.NewDisjunctionQuery(queries...)
 	}
-	var search_query bleve_query.Query = bleve.NewDisjunctionQuery(queries...)
 	if set_id != "" {
 		set_query := bleve.NewTermQuery(strings.ToLower(set_id))
 		set_query.SetField("set_id")
@@ -376,4 +389,12 @@ func Search_bbs_index_search(keyword string, set_id string, offset int, limit in
 		data_list = append(data_list, hit.ID)
 	}
 	return data_list, true
+}
+
+func Search_bbs_index_search(keyword string, set_id string, offset int, limit int) ([]string, bool) {
+	return search_bbs_index_search(keyword, set_id, "title", offset, limit)
+}
+
+func Search_bbs_index_search_data(keyword string, set_id string, offset int, limit int) ([]string, bool) {
+	return search_bbs_index_search(keyword, set_id, "data", offset, limit)
 }

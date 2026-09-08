@@ -470,6 +470,7 @@
     "_comment_": "Search",
     "search_document_name": "Search document name",
     "search_document_data": "Search document data",
+    "bbs_search_data": "Search post content",
     
     "_comment_": "Main skin set part",
     "render": "Render",
