@@ -158,6 +158,8 @@
     "password": "비밀번호",
     "update_error": "자동 업데이트가 지원되지 않습니다.",
     "need_document": "필요한 문서들",
+    "need_category": "필요한 분류들",
+    "unused_category": "사용되지 않는 분류",
     "sub": "하위",
     "template": "템플릿 문서",
     "user_document_acl": "사용자 문서 ACL",

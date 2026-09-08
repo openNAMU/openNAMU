@@ -578,6 +578,22 @@ func Get_need_document_rows(db *sql.DB, offset int) *sql.Rows {
 	)
 }
 
+func Get_need_category_rows(db *sql.DB, offset int) *sql.Rows {
+	return Query_DB(
+		db,
+		"select b.title, count(distinct b.link) from back b where b.type = 'cat' and b.title like 'category:%' and not exists (select 1 from data d where d.title = b.title) group by b.title order by count(distinct b.link) desc, b.title asc limit ?, 50",
+		offset,
+	)
+}
+
+func Get_unused_category_rows(db *sql.DB, offset int) *sql.Rows {
+	return Query_DB(
+		db,
+		"select d.title from data d where d.title like 'category:%' and not exists (select 1 from back b where b.title = d.title and b.type = 'cat') order by d.title limit ?, 50",
+		offset,
+	)
+}
+
 func Get_data_rows(db *sql.DB, offset int) *sql.Rows {
 	return Query_DB(db, "select title from data order by title asc limit ?, 50", offset)
 }

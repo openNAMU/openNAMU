@@ -253,6 +253,8 @@
     "wiki_shutdown": "Shutdown wiki engine",
     "update": "Update",
     "need_document": "Required Document(s)",
+    "need_category": "Required Categories",
+    "unused_category": "Unused Categories",
     "close_discussion": "Closed discussion(s)",
     "open_discussion": "Open discussion(s)",
     "recent_discussion": "Recent discussion(s)",

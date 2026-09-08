@@ -36,11 +36,13 @@ func View_main_other(config tool.Config) string {
             <li><a href="/list/document/view/day">`+tool.Get_language(db, "page_view_day", true)+`</a></li>
             <li><a href="/list/document/acl">`+tool.Get_language(db, "acl_document_list", true)+`</a></li>
             <li><a href="/list/document/need">`+tool.Get_language(db, "need_document", true)+`</a></li>
+            <li><a href="/list/category/need">`+tool.Get_language(db, "need_category", true)+`</a></li>
             <li><a href="/list/document/long">`+tool.Get_language(db, "long_page", true)+`</a></li>
             <li><a href="/list/document/short">`+tool.Get_language(db, "short_page", true)+`</a></li>
             <li><a href="/list/document/old">`+tool.Get_language(db, "old_page", true)+`</a></li>
             <li><a href="/list/document/new">`+tool.Get_language(db, "new_page", true)+`</a></li>
             <li><a href="/list/document/no_link">`+tool.Get_language(db, "no_link_document_list", true)+`</a></li>
+            <li><a href="/list/category/no_link">`+tool.Get_language(db, "unused_category", true)+`</a></li>
             <li><a href="/list/contributor">`+tool.Get_language(db, "monthly_top_contributor", true)+`</a></li>
             <li><a href="/statistics">`+tool.Get_language(db, "statistics", true)+`</a></li>
         </ul>
