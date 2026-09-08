@@ -34,6 +34,7 @@ func Api_bbs_delete(config tool.Config, set_id string) map[string]any {
 		return return_data
 	}
 
+	tool.Search_bbs_index_delete_set(db, set_id)
 	tool.Exec_DB(db, "delete from user_set where name = 'bbs_watchlist' and data like ?", set_id+"-%")
 	tool.Exec_DB(db, "delete from bbs_data where set_id = ?", set_id)
 	tool.Exec_DB(db, "delete from bbs_set where set_id = ?", set_id)

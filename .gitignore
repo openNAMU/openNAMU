@@ -19,3 +19,5 @@ data/*.json
 data/bleve/
 
 data/bleve.version
+data/bleve_bbs/
+data/bleve_bbs.version

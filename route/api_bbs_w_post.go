@@ -49,6 +49,7 @@ func Api_bbs_w_post(config tool.Config, set_id string, title string, data string
 			v[1],
 		)
 	}
+	tool.Search_bbs_index_update(db, set_id, set_code_str)
 
 	return_data := make(map[string]any)
 	return_data["response"] = "ok"

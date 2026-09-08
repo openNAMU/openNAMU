@@ -184,6 +184,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 				v[1],
 			)
 		}
+		tool.Search_bbs_index_update(db, set_id, set_code)
 
 		return_data["response"] = "ok"
 		return_data["data"] = set_code
@@ -244,6 +245,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 	for _, tag := range tag_list {
 		tool.Exec_DB(db, "insert into bbs_data (set_name, set_code, set_id, set_data) values ('tag', ?, ?, ?)", set_code, set_id, tag)
 	}
+	tool.Search_bbs_index_update(db, set_id, set_code)
 
 	return_data["response"] = "ok"
 	return_data["data"] = set_code

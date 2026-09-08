@@ -78,6 +78,7 @@ func Api_bbs_w_delete(config tool.Config, set_id string, set_code string) map[st
 		set_id+"-"+set_code,
 		set_id+"-"+set_code+"-%",
 	)
+	tool.Search_bbs_index_delete(set_id, set_code)
 
 	return_data["response"] = "ok"
 
