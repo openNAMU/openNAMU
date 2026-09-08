@@ -21,9 +21,6 @@ func register_user_multiple_routes(r *gin.Engine) {
 	r.POST("/list/user/multiple", func(c *gin.Context) {
 		render(c, "1", c.PostForm("sort"), c.PostForm("search"))
 	})
-	r.GET("/list/user/multiple/:page", func(c *gin.Context) {
-		render(c, c.Param("page"), "recent", "")
-	})
 	r.GET("/list/user/multiple/:sort/:page", func(c *gin.Context) {
 		render(c, c.Param("page"), c.Param("sort"), "")
 	})
