@@ -10,7 +10,11 @@ func View_setting_backlink_reset_post(config tool.Config, form map[string]string
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	api_data := Api_setting_backlink_reset_post(config)
+	load := form["backlink_reset_load"]
+	if load != "normal" && load != "slow" {
+		load = "fast"
+	}
+	api_data := api_setting_backlink_reset_post(config, load)
 	response := api_data["response"].(string)
 	if response == "require auth" {
 		return tool.Get_error_page(db, config, "auth")
