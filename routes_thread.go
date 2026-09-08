@@ -11,12 +11,12 @@ import (
 
 func register_thread_routes(r *gin.Engine) {
 	r.GET("/thread/0/*doc_name", func(c *gin.Context) {
-		data := route.View_thread_route(make_route_config(c), "0", strings.TrimPrefix(c.Param("doc_name"), "/"), nil)
+		data := route.View_thread_route(make_route_config(c), "0", strings.TrimPrefix(c.Param("doc_name"), "/"), "1", nil)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	})
 	r.POST("/thread/0/*doc_name", func(c *gin.Context) {
 		_ = c.Request.ParseForm()
-		data := route.View_thread_route(make_route_config(c), "0", strings.TrimPrefix(c.Param("doc_name"), "/"), c.Request.PostForm)
+		data := route.View_thread_route(make_route_config(c), "0", strings.TrimPrefix(c.Param("doc_name"), "/"), "1", c.Request.PostForm)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	})
 
@@ -101,12 +101,16 @@ func register_thread_routes(r *gin.Engine) {
 	})
 
 	r.GET("/thread/:topic_num", func(c *gin.Context) {
-		data := route.View_thread_route(make_route_config(c), c.Param("topic_num"), "", nil)
+		data := route.View_thread_route(make_route_config(c), c.Param("topic_num"), "", "1", nil)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	})
 	r.POST("/thread/:topic_num", func(c *gin.Context) {
 		_ = c.Request.ParseForm()
-		data := route.View_thread_route(make_route_config(c), c.Param("topic_num"), "", c.Request.PostForm)
+		data := route.View_thread_route(make_route_config(c), c.Param("topic_num"), "", "1", c.Request.PostForm)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
+	})
+	r.GET("/thread/:topic_num/page/:page", func(c *gin.Context) {
+		data := route.View_thread_route(make_route_config(c), c.Param("topic_num"), "", c.Param("page"), nil)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	})
 }

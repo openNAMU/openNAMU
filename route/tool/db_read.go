@@ -467,6 +467,16 @@ func Get_topic_rows(db *sql.DB, code string) *sql.Rows {
 	)
 }
 
+func Get_topic_rows_page(db *sql.DB, code string, offset int, limit int) *sql.Rows {
+	return Query_DB(
+		db,
+		"select id, data, date, ip, block, top from topic where code = ? order by id + 0 asc limit ? offset ?",
+		code,
+		limit,
+		offset,
+	)
+}
+
 func Get_vote_count(db *sql.DB, id string, data string) string {
 	count := "0"
 	QueryRow_DB(

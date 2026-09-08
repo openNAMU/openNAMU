@@ -59,7 +59,7 @@ func View_bbs_in_w(c *gin.Context, config tool.Config, set_id string, set_code s
 	view_count_api := Api_bbs_w_page_view(config, set_id, set_code)
 	view_count_api_data := view_count_api["data"].(int)
 
-	data_html += View_bbs_in_w_comment(db, config, set_id, set_code, c.Param("comment_select"))
+	data_html += View_bbs_in_w_comment(db, config, set_id, set_code, c.Param("comment_select"), tool.Str_to_int(c.Param("page")))
 
 	menu := [][]any{
 		{"bbs/in/" + tool.Url_parser(set_id), tool.Get_language(db, "return", true)},

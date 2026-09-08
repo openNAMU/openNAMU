@@ -9,9 +9,23 @@ import (
 	"opennamu/route/tool"
 )
 
-func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_code string, selected_comment string) string {
+func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_code string, selected_comment string, page int) string {
 	data_api := Api_bbs_w_comment(config, "around", set_id+"-"+set_code)
 	data_api_in := data_api["data"].([]map[string]string)
+	if page < 1 {
+		page = 1
+	}
+	start := (page - 1) * 50
+	end := start + 50
+	if start >= len(data_api_in) {
+		data_api_in = []map[string]string{}
+	} else {
+		if end > len(data_api_in) {
+			end = len(data_api_in)
+		}
+		data_api_in = data_api_in[start:end]
+	}
+	page_count := len(data_api_in)
 
 	bbs_comment_acl := tool.Check_acl(db, set_id, "", "bbs_comment", config.IP)
 	comment_closed := bbs_comment_closed(db, set_id, set_code)
@@ -50,6 +64,10 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	}
 
 	var re = regexp.MustCompile(`^[0-9]+-[0-9]+-`)
+	comment_path := "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "/comment/"
+	if page > 1 {
+		comment_path = "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "/page/" + strconv.Itoa(page) + "/comment/"
+	}
 
 	for _, v := range data_api_in {
 		if v["comment"] == "" {
@@ -73,7 +91,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 			color = "green"
 		}
 
-		date += `<a href="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/comment/` + tool.Url_parser(code_id) + `#opennamu_comment_select">(` + tool.Get_language(db, "comment", true) + `)</a> `
+		date += `<a href="` + comment_path + tool.Url_parser(code_id) + `#opennamu_comment_select">(` + tool.Get_language(db, "comment", true) + `)</a> `
 		date += `<a href="/bbs/tool/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/` + tool.Url_parser(code_id) + `">(` + tool.Get_language(db, "tool", true) + `)</a> `
 		date += v["comment_date"]
 
@@ -111,5 +129,6 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
         `
 	}
 
+	data_html += tool.Get_page_control(db, page, page_count, 50, "/bbs/w/"+tool.Url_parser(set_id)+"/"+tool.Url_parser(set_code)+"/page/{}")
 	return data_html
 }

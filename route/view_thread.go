@@ -3,6 +3,7 @@ package route
 import (
 	"database/sql"
 	"net/url"
+	"strconv"
 
 	"opennamu/route/tool"
 )
@@ -11,15 +12,17 @@ func thread_user_render(db *sql.DB, config tool.Config, ip string) string {
 	return tool.Get_user_profile_image_ui(db, ip) + tool.IP_parser(db, ip, config.IP)
 }
 
-func thread_comments(db *sql.DB, config tool.Config, topic_num string) string {
-	rows := tool.Get_topic_rows(db, topic_num)
+func thread_comments(db *sql.DB, config tool.Config, topic_num string, page int) string {
+	rows := tool.Get_topic_rows_page(db, topic_num, (page-1)*50, 50)
 	defer rows.Close()
 
 	data_html := ""
 	shortcut := `<div class="opennamu_thread_shortcut" id="thread_shortcut">`
+	comment_count := 0
 	admin_auth := tool.Check_permission(db, "thread_manage", config.IP)
 
 	for rows.Next() {
+		comment_count++
 		var id string
 		var data string
 		var date_value string
@@ -46,15 +49,19 @@ func thread_comments(db *sql.DB, config tool.Config, topic_num string) string {
 	}
 
 	shortcut += `</div>`
-	return shortcut + data_html
+	return shortcut + data_html + tool.Get_page_control(db, page, comment_count, 50, "/thread/"+tool.Url_parser(topic_num)+"/page/{}")
 }
 
-func View_thread(config tool.Config, topic_num string, doc_name string, values url.Values) string {
+func View_thread(config tool.Config, topic_num string, doc_name string, page string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
 	name := doc_name
 	sub := ""
+	page_num := tool.Str_to_int(page)
+	if page_num < 1 {
+		page_num = 1
+	}
 	if topic_num == "0" {
 		if name == "" {
 			name = "Test"
@@ -102,13 +109,14 @@ func View_thread(config tool.Config, topic_num string, doc_name string, values u
 		if !topic_ok || !comment_ok {
 			return tool.Get_error_page(db, config, "error")
 		}
-		return tool.Get_redirect("/thread/" + tool.Url_parser(posted_topic_num) + "#" + tool.Url_parser(comment_num))
+		comment_page := (tool.Str_to_int(comment_num)-1)/50 + 1
+		return tool.Get_redirect("/thread/" + tool.Url_parser(posted_topic_num) + "/page/" + strconv.Itoa(comment_page) + "#" + tool.Url_parser(comment_num))
 	}
 
 	data_html := get_render_setting_css(db, config) + `<style id="opennamu_list_hidden_style">.opennamu_list_hidden { display: none; }</style>`
 	data_html += `<label><input type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ` + tool.Get_language(db, "remove_hidden", true) + `</label><hr class="main_hr">`
 	if topic_num != "0" {
-		data_html += thread_comments(db, config, topic_num)
+		data_html += thread_comments(db, config, topic_num, page_num)
 	}
 
 	data_html += `<h2>` + tool.HTML_escape(sub) + `</h2>`
