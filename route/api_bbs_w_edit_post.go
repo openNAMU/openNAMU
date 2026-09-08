@@ -120,6 +120,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 			comment_set_code,
 			comment_set_id,
 		)
+		tool.Search_bbs_index_update_comment(db, set_id, set_code, comment_code)
 
 		return_data["response"] = "ok"
 		return_data["data"] = set_code

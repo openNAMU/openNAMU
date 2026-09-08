@@ -36,6 +36,8 @@ func view_bbs_search(config tool.Config, set_id string, keyword string, page str
 	search_path := "/bbs/search"
 	search_switch_path := "/bbs/search_data"
 	search_switch_text := tool.Get_language(db, "bbs_search_data", true)
+	comment_search_path := "/bbs/search_comment"
+	comment_search_text := tool.Get_language(db, "comment", true) + " " + tool.Get_language(db, "search", true)
 	bbs_id_to_name := map[string]string{}
 	if search_type == "data" {
 		title = tool.Get_language(db, "bbs_search_data", true)
@@ -53,6 +55,7 @@ func view_bbs_search(config tool.Config, set_id string, keyword string, page str
 		title = bbs_name
 		search_path += "/" + tool.Url_parser(set_id)
 		search_switch_path += "/" + tool.Url_parser(set_id)
+		comment_search_path += "/" + tool.Url_parser(set_id)
 		bbs_id_to_name[set_id] = bbs_name
 	} else {
 		for name, id := range bbs_list(db) {
@@ -66,6 +69,7 @@ func view_bbs_search(config tool.Config, set_id string, keyword string, page str
         <input class="__ON_INPUT__" name="keyword" value="` + tool.HTML_escape(keyword) + `" placeholder="` + tool.Get_language(db, "search", true) + `">
         <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "search", true) + `</button>
     </form><a href="` + search_switch_path + `">` + search_switch_text + `</a><hr class="main_hr">`
+	data_html += `<a href="` + comment_search_path + `">` + comment_search_text + `</a>`
 
 	if keyword != "" {
 		data_api := Api_bbs_search(config, keyword, set_id, strconv.Itoa(page_int))

@@ -21,6 +21,7 @@ func Api_bbs_w_comment_all_delete(config tool.Config, set_id string, set_code st
 		return return_data
 	}
 
+	tool.Search_bbs_index_delete_comments(db, set_id, set_code)
 	comment_set_id := set_id + "-" + set_code
 	tool.Exec_DB(
 		db,

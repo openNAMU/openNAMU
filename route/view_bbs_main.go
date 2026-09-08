@@ -120,6 +120,11 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 			bbs_name = bbs_id_to_name[bbs_id]
 		}
 
+		bbs_link := "/bbs/w/" + bbs_id + "/" + bbs_code
+		if in_data["comment_code"] != "" {
+			bbs_link += "#" + tool.Url_parser(in_data["comment_code"])
+		}
+
 		left := ""
 		if in_data["prefix"] != "" {
 			prefix_html := tool.HTML_escape(in_data["prefix"])
@@ -128,7 +133,7 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 			}
 			left += "[" + prefix_html + "] "
 		}
-		left += `<a href="/bbs/w/` + bbs_id + `/` + bbs_code + `">` + bbs_title_html + `</a>`
+		left += `<a href="` + bbs_link + `">` + bbs_title_html + `</a>`
 
 		if bbs_name != "" {
 			left += ` <a href="/bbs/in/` + bbs_id + `">(` + bbs_name + `)</a>`
