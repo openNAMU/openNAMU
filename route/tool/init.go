@@ -150,6 +150,7 @@ func DB_create_index(db *sql.DB) {
 		"create index back_type_title_index on back (type, title)",
 		"create index back_link_type_index on back (link, type)",
 		"create index user_set_id_name_index on user_set (id, name)",
+		"create index ua_d_ip_name_date_index on ua_d (ip, name, today)",
 		"create index topic_code_id_index on topic (code, id)",
 	}
 	if Get_DB_type() == "mysql" {
@@ -168,6 +169,7 @@ func DB_create_index(db *sql.DB) {
 			"create index back_type_title_index on back (type(191), title(191))",
 			"create index back_link_type_index on back (link(191), type(191))",
 			"create index user_set_id_name_index on user_set (id(191), name(191))",
+			"create index ua_d_ip_name_date_index on ua_d (ip(191), name(191), today(191))",
 			"create index topic_code_id_index on topic (code(191), id(191))",
 		}
 	}

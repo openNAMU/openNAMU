@@ -25,6 +25,7 @@ func View_main_manager(config tool.Config) string {
 <li><a href="/manager/2">` + lang("document_setting") + `</a></li>
 <li><a href="/acl_multiple">` + lang("mutiple_document_setting") + `</a></li>
 <li><a href="/manager/3">` + lang("check_user") + `</a></li>
+<li><a href="/list/user/multiple">` + lang("multiple_account") + `</a></li>
 <li><a href="/manager/5">` + lang("authorize") + `</a></li>
 <li><a href="/auth/give">` + lang("multiple_authorize") + `</a></li>
 <li><a href="/auth/give_list">` + lang("auth_give_list") + `</a></li>

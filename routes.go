@@ -15,6 +15,7 @@ func register_routes(r *gin.Engine) {
 	register_api_watch_post_routes(r)
 	register_list_routes(r)
 	register_list_extra_routes(r)
+	register_user_multiple_routes(r)
 	register_auth_routes(r)
 	register_user_tool_routes(r)
 	register_user_compat_routes(r)
