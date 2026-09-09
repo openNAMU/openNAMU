@@ -10,7 +10,7 @@ import (
 	"opennamu/route/tool"
 )
 
-var re_esc_a = regexp.MustCompile(`&lt;a(([^&]|&[^;]+;)*)&gt;([^\r\n]*?)&lt;/a&gt;`)
+var re_esc_a = regexp.MustCompile(`&lt;a([^\r\n]*?)&gt;([^\r\n]*?)&lt;/a&gt;`)
 var re_safe_url = regexp.MustCompile(`(^| )(https?://[^ ]+)`)
 
 func Get_safe_send_data(data string) string {
@@ -32,11 +32,11 @@ func Get_safe_send_data(data string) string {
 
 	return re_esc_a.ReplaceAllStringFunc(data, func(match string) string {
 		parts := re_esc_a.FindStringSubmatch(match)
-		if len(parts) < 4 {
+		if len(parts) < 3 {
 			return match
 		}
 
-		inner_escaped := parts[3]
+		inner_escaped := parts[2]
 		inner_text := strings.TrimSpace(html.UnescapeString(inner_escaped))
 		if inner_text == "" || strings.ContainsAny(inner_text, "<>") {
 			return match
