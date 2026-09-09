@@ -41,13 +41,13 @@ function ringo_do_side_button_1() {
 
 function ringo_do_side_button_2() {
     if(temp_save[1] === '') {
-        fetch("/api/recent_discuss/10").then(function(res) {
+        fetch("/api/v2/bbs/recent/-1/10").then(function(res) {
             return res.json();
         }).then(function(text) {
             let list = Array.isArray(text) ? text : text.data || [];
             let data = '';
             for(let for_a = 0; for_a < list.length; for_a++) {
-                data += '<a href="/thread/' + ringo_do_url_encode(list[for_a][3]) + '">' + ringo_do_xss_encode(list[for_a][1]) + '</a><br>';
+                data += '<a href="/bbs/w/-1/' + ringo_do_url_encode(list[for_a][3]) + '">' + ringo_do_xss_encode(list[for_a][1]) + '</a><br>';
                 data += list[for_a][2] + ' | ' + list[for_a][5] +'<br>';
             }
 

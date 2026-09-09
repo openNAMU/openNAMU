@@ -93,6 +93,8 @@ func wait_startup_delay() {
 }
 
 func main() {
+	tool.Set_builtin_version_data(builtin_version_json)
+
 	if len(os.Args) > 1 && os.Args[1] == "--opennamu-update" {
 		os.Exit(route.Run_server_update(os.Args[2:]))
 	}
@@ -123,8 +125,12 @@ func main() {
 		r = gin.New()
 	}
 
-	tool.Set_builtin_version_data(builtin_version_json)
-	tool.Main_init()
+	db_version := tool.Main_init()
+	if err := route.Migrate_topic_to_bbs(db_version); err != nil {
+		log.Printf("[DB WARNING] topic BBS migration failed: %v", err)
+		tool.Set_db_version(db_version)
+	}
+	tool.Search_bbs_index_start()
 
 	r.Use(error_handler())
 	r.Use(tool.Session_middleware())

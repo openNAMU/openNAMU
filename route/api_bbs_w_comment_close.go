@@ -25,6 +25,10 @@ func Api_bbs_w_comment_close(config tool.Config, set_id string, set_code string,
 		return_data["response"] = "require auth"
 		return return_data
 	}
+	if set_id == thread_bbs_id {
+		return_data["response"] = "not allowed"
+		return return_data
+	}
 
 	tool.Exec_DB(
 		db,

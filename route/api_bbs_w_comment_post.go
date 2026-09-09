@@ -12,6 +12,10 @@ import (
 var bbs_comment_code_regex = regexp.MustCompile(`^[0-9]+(?:-[0-9]+)*$`)
 
 func bbs_comment_closed(db *sql.DB, set_id string, set_code string) bool {
+	if set_id == thread_bbs_id {
+		return false
+	}
+
 	closed := ""
 	return tool.QueryRow_DB(
 		db,
@@ -160,6 +164,9 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 		)
 	}
 	bbs_post_comment_count_update(db, set_id, set_code, 1)
+	if set_id == thread_bbs_id {
+		tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?", tool.Get_time(), set_id, set_code)
+	}
 
 	end_code := comment_code
 	if bbs_type != "thread" && comment_select != "" && comment_select != "0" {

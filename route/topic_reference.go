@@ -3,7 +3,6 @@ package route
 import (
 	"database/sql"
 	"regexp"
-	"strings"
 
 	"opennamu/route/tool"
 )
@@ -31,7 +30,11 @@ func topic_reference_notify(db *sql.DB, config tool.Config, data string, num str
 
 		target := ""
 		if do_type == "thread" {
-			tool.QueryRow_DB(db, "select ip from topic where code = ? and id = ?", []any{&target}, reference_code, reference_id)
+			if reference_id == "0" {
+				tool.QueryRow_DB(db, "select set_data from bbs_data where set_name = 'user_id' and set_id = ? and set_code = ?", []any{&target}, thread_bbs_id, reference_code)
+			} else {
+				tool.QueryRow_DB(db, "select set_data from bbs_data where set_name = 'comment_user_id' and set_id = ? and set_code = ?", []any{&target}, thread_bbs_id+"-"+reference_code, reference_id)
+			}
 		} else if reference_id == "0" {
 			tool.QueryRow_DB(db, "select set_data from bbs_data where set_name = 'user_id' and set_id = ? and set_code = ?", []any{&target}, set_id, topic_num)
 		} else {
@@ -43,10 +46,7 @@ func topic_reference_notify(db *sql.DB, config tool.Config, data string, num str
 		}
 
 		if target != "" && !tool.IP_or_user(target) {
-			path := "/thread/" + tool.Url_parser(topic_num) + "#" + tool.Url_parser(num)
-			if do_type != "thread" {
-				path = "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(topic_num) + "#" + tool.Url_parser(num)
-			}
+			path := "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(topic_num) + "#" + tool.Url_parser(num)
 			tool.Send_alarm(db, config.IP, target, `<a href="`+path+`">`+tool.HTML_escape(name)+` - `+tool.HTML_escape(sub)+`#`+tool.HTML_escape(num)+`</a>`)
 		}
 		return value
@@ -61,13 +61,10 @@ func topic_reference_notify(db *sql.DB, config tool.Config, data string, num str
 		target := ""
 		tool.QueryRow_DB(db, "select ip from history where ip = ? limit 1", []any{&target}, match[2])
 		if target == "" {
-			tool.QueryRow_DB(db, "select ip from topic where ip = ? limit 1", []any{&target}, match[2])
+			tool.QueryRow_DB(db, "select set_data from bbs_data where set_name = 'comment_user_id' and set_data = ? and set_id like '-1-%' limit 1", []any{&target}, match[2])
 		}
 		if target != "" && !tool.IP_or_user(target) {
-			path := "/thread/" + tool.Url_parser(topic_num) + "#" + tool.Url_parser(num)
-			if do_type != "thread" {
-				path = "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(topic_num) + "#" + tool.Url_parser(num)
-			}
+			path := "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(topic_num) + "#" + tool.Url_parser(num)
 			tool.Send_alarm(db, config.IP, target, `<a href="`+path+`">`+tool.HTML_escape(name)+` - `+tool.HTML_escape(sub)+`#`+tool.HTML_escape(num)+`</a>`)
 		}
 		return value
@@ -97,7 +94,7 @@ func render_topic_reference(data string, topic_num string, set_id string, set_co
 
 		path := ""
 		if do_type == "thread" && reference_code != "" {
-			path = "/thread/" + tool.Url_parser(reference_code) + "#" + tool.Url_parser(match[2])
+			path = "/bbs/w/" + tool.Url_parser(thread_bbs_id) + "/" + tool.Url_parser(reference_code) + "#" + tool.Url_parser(match[2])
 		} else if do_type != "thread" && set_id != "" && set_code != "" {
 			target_code := set_code
 			anchor := match[2]
@@ -122,53 +119,4 @@ func render_topic_reference(data string, topic_num string, set_id string, set_co
 		label := "@" + match[2]
 		return match[1] + `<a href="/w/user:` + tool.Url_parser(match[2]) + `">` + tool.HTML_escape(label) + `</a>` + match[3]
 	})
-}
-
-func topic_thread_notify(db *sql.DB, config tool.Config, topic_num string, comment_num string, name string, sub string) {
-	alarm := `<a href="/thread/` + tool.Url_parser(topic_num) + `#` + tool.Url_parser(comment_num) + `">` + tool.HTML_escape(name) + ` - ` + tool.HTML_escape(sub) + `#` + tool.HTML_escape(comment_num) + `</a>`
-
-	if strings.HasPrefix(name, "user:") {
-		target := strings.TrimPrefix(name, "user:")
-		target_exists := false
-		if tool.IP_or_user(target) {
-			var value string
-			target_exists = tool.QueryRow_DB(db, "select ip from history where ip = ? limit 1", []any{&value}, target)
-			if !target_exists {
-				target_exists = tool.QueryRow_DB(db, "select ip from topic where ip = ? limit 1", []any{&value}, target)
-			}
-		} else {
-			var value string
-			target_exists = tool.QueryRow_DB(db, "select id from user_set where id = ? limit 1", []any{&value}, target)
-		}
-
-		if target_exists {
-			tool.Send_alarm(db, config.IP, target, alarm)
-		}
-	}
-
-	first_user := ""
-	if tool.QueryRow_DB(db, "select ip from topic where code = ? and id = '1'", []any{&first_user}, topic_num) && !tool.IP_or_user(first_user) {
-		tool.Send_alarm(db, config.IP, first_user, alarm)
-	}
-
-	skip := map[string]bool{first_user: true}
-	if strings.HasPrefix(name, "user:") {
-		skip[strings.TrimPrefix(name, "user:")] = true
-	}
-	sent := map[string]bool{}
-	rows := tool.Query_DB(
-		db,
-		"select id from user_set where name = 'thread_watchlist' and data = ?",
-		topic_num,
-	)
-	defer rows.Close()
-
-	for rows.Next() {
-		target := ""
-		if rows.Scan(&target) != nil || target == "" || skip[target] || sent[target] {
-			continue
-		}
-		sent[target] = true
-		tool.Send_alarm(db, config.IP, target, alarm)
-	}
 }

@@ -1,62 +1,46 @@
 package route
 
-import (
-	"strings"
-
-	"opennamu/route/tool"
-)
+import "opennamu/route/tool"
 
 func Api_thread_setting_post(config tool.Config, topic_num string, stop string, agree string, why string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	return_data := make(map[string]any)
-	if !tool.Check_permission(db, "thread_setting", config.IP) {
-		return_data["response"] = "require auth"
-		return return_data
+	if !tool.Check_permission(db, "bbs_setting", config.IP) {
+		return map[string]any{"response": "require auth"}
+	}
+	if !thread_bbs_root_exists(db, topic_num) {
+		return map[string]any{"response": "not exist", "data": "thread"}
 	}
 
-	name := ""
-	old_stop := ""
-	old_agree := ""
-	if !tool.QueryRow_DB(db, "select title, stop, agree from rd where code = ?", []any{&name, &old_stop, &old_agree}, topic_num) {
-		return_data["response"] = "not exist"
-		return_data["data"] = "thread"
-		return return_data
+	if stop != "" && stop != "S" && stop != "O" {
+		stop = ""
 	}
-
-	new_stop := stop
-	if new_stop != "" && new_stop != "S" && new_stop != "O" {
-		new_stop = ""
-	}
-	new_agree := ""
 	if agree != "" {
-		new_agree = "O"
+		agree = "O"
 	}
-	tool.Exec_DB(db, "update rd set stop = ?, agree = ? where code = ?", new_stop, new_agree, topic_num)
 
-	if old_stop != new_stop {
-		state_key := "topic_state_change_normal"
-		if new_stop == "S" {
-			state_key = "topic_state_change_stop"
-		} else if new_stop == "O" {
-			state_key = "topic_state_change_close"
-		}
-		thread_add(db, topic_num, thread_next_id(db, topic_num), tool.Get_language(db, state_key, true), config.IP, "1")
+	prefix := "열림"
+	if stop == "O" {
+		prefix = "닫힘"
 	}
-	if old_agree != new_agree {
-		state_key := "topic_state_change_disagree"
-		if new_agree == "O" {
-			state_key = "topic_state_change_agree"
-		}
-		thread_add(db, topic_num, thread_next_id(db, topic_num), tool.Get_language(db, state_key, true), config.IP, "1")
-	}
-	if why = strings.TrimSpace(why); why != "" {
-		thread_add(db, topic_num, thread_next_id(db, topic_num), tool.Get_language(db, "why", true)+" : "+why, config.IP, "1")
-	}
-	tool.Exec_DB(db, "update rd set date = ? where code = ?", tool.Get_time(), topic_num)
-	tool.Do_insert_auth_history(db, config.IP, "change_topic_set (code "+topic_num+")")
 
-	return_data["response"] = "ok"
-	return return_data
+	for _, value := range []struct {
+		name string
+		data string
+	}{
+		{"prefix", prefix},
+		{"topic_agree", agree},
+	} {
+		tool.Exec_DB(db, "delete from bbs_data where set_name = ? and set_id = ? and set_code = ?", value.name, thread_bbs_id, topic_num)
+		if value.data != "" {
+			tool.Exec_DB(db, "insert into bbs_data (set_name, set_id, set_code, set_data) values (?, ?, ?, ?)", value.name, thread_bbs_id, topic_num, value.data)
+		}
+	}
+
+	tool.Exec_DB(db, "delete from bbs_data where set_name in ('topic_stop', 'comment_close') and set_id = ? and set_code = ?", thread_bbs_id, topic_num)
+	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?", tool.Get_time(), thread_bbs_id, topic_num)
+	tool.Search_bbs_index_update(db, thread_bbs_id, topic_num)
+
+	return map[string]any{"response": "ok"}
 }

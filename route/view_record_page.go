@@ -17,6 +17,9 @@ func View_record_page(config tool.Config, user_name string, record_type string, 
 	if record_type == "" {
 		record_type = "edit"
 	}
+	if record_type == "topic" {
+		return tool.Get_redirect("/record/bbs_comment/" + tool.Url_parser(user_name) + "/" + tool.Url_parser(page))
+	}
 
 	page_num := tool.Str_to_int(page)
 	if page_num < 1 {
@@ -25,40 +28,6 @@ func View_record_page(config tool.Config, user_name string, record_type string, 
 	offset := (page_num - 1) * 50
 	data_html := ""
 	count := 0
-
-	if record_type == "topic" {
-		rows := tool.Get_topic_record_rows(db, user_name, offset, true)
-		for rows.Next() {
-			code, comment_id, date := "", "", ""
-			if rows.Scan(&code, &comment_id, &date) != nil {
-				continue
-			}
-
-			rd_data, _ := tool.Get_rd_data(db, code)
-			topic_title := rd_data["title"]
-			topic_sub := rd_data["sub"]
-			left := `<a href="/thread/` + tool.Url_parser(code) + `#` + tool.Url_parser(comment_id) + `">` + tool.HTML_escape(topic_sub+"#"+comment_id) + `</a>`
-			left += " (" + tool.HTML_escape(topic_title) + ")"
-			right := tool.IP_parser(db, user_name, config.IP) + " | " + tool.HTML_escape(date)
-			data_html += tool.Get_list_ui(left, right, "", "")
-			count++
-		}
-		rows.Close()
-		data_html += tool.Get_page_control(db, page_num, count, 50, "/record/topic/"+tool.Url_parser(user_name)+"/{}")
-
-		return tool.Get_template(
-			db,
-			config,
-			user_name,
-			data_html,
-			[]any{"(" + tool.Get_language(db, "discussion_record", true) + ")"},
-			[][]any{
-				{"other", tool.Get_language(db, "other", true)},
-				{"user/" + tool.Url_parser(user_name), tool.Get_language(db, "user_tool", true)},
-			},
-			map[string]string{},
-		)
-	}
 
 	rows := tool.Get_history_record_rows(db, user_name, record_type, offset, true)
 

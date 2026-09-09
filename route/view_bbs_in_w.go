@@ -63,8 +63,10 @@ func View_bbs_in_w(c *gin.Context, config tool.Config, set_id string, set_code s
 
 	menu := [][]any{
 		{"bbs/in/" + tool.Url_parser(set_id), tool.Get_language(db, "return", true)},
-		{"bbs/edit/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code), tool.Get_language(db, "edit", true)},
 		{"bbs/tool/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code), tool.Get_language(db, "tool", true)},
+	}
+	if set_id != thread_bbs_id {
+		menu = append(menu, []any{"bbs/edit/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code), tool.Get_language(db, "edit", true)})
 	}
 	if !tool.IP_or_user(config.IP) {
 		menu = append(menu, []any{"bbs_watch/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code), tool.Get_language(db, "bbs_watch", true)})

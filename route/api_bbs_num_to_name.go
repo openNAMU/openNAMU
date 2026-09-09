@@ -16,6 +16,8 @@ func Api_bbs_num_to_name(db *sql.DB, set_id string) map[string]any {
 	)
 	if set_id == "0" {
 		bbs_name = tool.Get_language(db, "wiki_comment_bbs", true)
+	} else if set_id == "-1" {
+		bbs_name = tool.Get_language(db, "thread_bbs", true)
 	}
 
 	return map[string]any{

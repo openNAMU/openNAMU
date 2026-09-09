@@ -89,6 +89,15 @@ func register_api_routes(r *gin.Engine) {
 		compat_api_data_cors(c, route_data)
 	})
 
+	r.GET("/api/v2/bbs/recent/:set_id/:limit", func(c *gin.Context) {
+		if c.Param("set_id") != "-1" {
+			c.JSON(http.StatusNotFound, map[string]any{"response": "not exist", "data": [][]string{}})
+			return
+		}
+		route_data := route.Api_list_recent_discuss(make_route_config(c), c.Param("limit"), "1", "normal")
+		c.JSON(http.StatusOK, route_data)
+	})
+
 	r.POST("/api/v2/lang", func(c *gin.Context) {
 		data := c.PostForm("data")
 		safe := c.PostForm("safe")

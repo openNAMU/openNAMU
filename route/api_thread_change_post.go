@@ -6,40 +6,30 @@ func Api_thread_change_post(config tool.Config, topic_num string, new_title stri
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	return_data := make(map[string]any)
-	if !tool.Check_permission(db, "thread_change", config.IP) {
-		return_data["response"] = "require auth"
-		return return_data
+	if !tool.Check_permission(db, "bbs_post_manage", config.IP) {
+		return map[string]any{"response": "require auth"}
+	}
+	if !thread_bbs_root_exists(db, topic_num) {
+		return map[string]any{"response": "not exist", "data": "thread"}
 	}
 
-	title := ""
-	sub := ""
-	if !tool.QueryRow_DB(db, "select title, sub from rd where code = ?", []any{&title, &sub}, topic_num) {
-		return_data["response"] = "not exist"
-		return_data["data"] = "thread"
-		return return_data
-	}
+	old_title := ""
+	old_sub := ""
+	tool.QueryRow_DB(db, "select set_data from bbs_data where set_name = 'document' and set_id = ? and set_code = ?", []any{&old_title}, thread_bbs_id, topic_num)
+	tool.QueryRow_DB(db, "select set_data from bbs_data where set_name = 'title' and set_id = ? and set_code = ?", []any{&old_sub}, thread_bbs_id, topic_num)
 	if new_title == "" {
-		new_title = title
+		new_title = old_title
 	}
 	if new_sub == "" {
-		new_sub = sub
+		new_sub = old_sub
 	}
-	if !tool.Do_title_length_check(db, new_title, "document") {
-		return_data["response"] = "error"
-		return_data["data"] = "title length"
-		return return_data
-	}
-	if !tool.Do_title_length_check(db, new_sub, "topic") {
-		return_data["response"] = "error"
-		return_data["data"] = "topic title length"
-		return return_data
+	if !tool.Do_title_length_check(db, new_title, "document") || !tool.Do_title_length_check(db, new_sub, "topic") {
+		return map[string]any{"response": "error", "data": "title length"}
 	}
 
-	tool.Exec_DB(db, "update rd set title = ?, sub = ?, date = ? where code = ?", new_title, new_sub, tool.Get_time(), topic_num)
-	thread_add(db, topic_num, thread_next_id(db, topic_num), tool.Get_language(db, "topic_name_change", true)+" : "+sub+" ("+title+") → "+new_sub+" ("+new_title+")", config.IP, "1")
-	tool.Do_insert_auth_history(db, config.IP, "change_topic_name (code "+topic_num+")")
+	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'document' and set_id = ? and set_code = ?", new_title, thread_bbs_id, topic_num)
+	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'title' and set_id = ? and set_code = ?", new_sub, thread_bbs_id, topic_num)
+	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?", tool.Get_time(), thread_bbs_id, topic_num)
 
-	return_data["response"] = "ok"
-	return return_data
+	return map[string]any{"response": "ok"}
 }

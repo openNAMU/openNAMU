@@ -236,6 +236,12 @@ func DB_close(db *sql.DB) {
 	// log.Default().Println("DB close")
 }
 
+func Set_db_version(version string) {
+	db := DB_connect()
+	defer DB_close(db)
+	Exec_DB(db, `update other set data = ? where name = "ver"`, version)
+}
+
 func Get_DB_type() string {
 	return db_set["db_type"]
 }

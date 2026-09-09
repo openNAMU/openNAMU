@@ -671,8 +671,6 @@ func Auth_group_in_use(db *sql.DB, auth string) bool {
 	queries := []string{
 		"select id from user_set where name = 'acl' and data = ? limit 1",
 		"select title from acl where data = ? limit 1",
-		"select code from rd where acl = ? limit 1",
-		"select thread_code from topic_set where set_name = 'thread_view_acl' and set_data = ? limit 1",
 		"select set_id from bbs_set where set_name in ('bbs_view_acl', 'bbs_only_my_data_view_acl', 'bbs_acl', 'bbs_edit_acl', 'bbs_comment_acl', 'bbs_view_acl_all', 'bbs_acl_all', 'bbs_edit_acl_all', 'bbs_comment_acl_all') and set_data = ? limit 1",
 		"select name from other where name in ('bbs_view_acl_all', 'bbs_acl_all', 'bbs_edit_acl_all', 'bbs_comment_acl_all') and coverage = '' and data = ? limit 1",
 		"select id from vote where user = '' and acl = ? limit 1",
@@ -760,7 +758,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["bbs_comment_limit_unlimited"] = true
 	}
 
-	admin_auth := []string{"toron", "check", "acl", "hidel", "give_range", "give", "bbs", "vote_fix"}
+	admin_auth := []string{"check", "acl", "hidel", "give_range", "give", "bbs", "vote_fix"}
 
 	if _, ok := auth_info["admin"]; ok {
 		for _, v := range admin_auth {
@@ -804,9 +802,6 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 			"bbs_setting",
 			"bbs_delete",
 			"bbs_comment_manage",
-			"thread_change",
-			"thread_delete",
-			"thread_comment_delete",
 		} {
 			auth_info[permission] = true
 		}
@@ -829,16 +824,6 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 	if _, ok := auth_info["bbs_manage"]; ok {
 		auth_info["bbs_pin"] = true
 		auth_info["bbs_main_view"] = true
-	}
-
-	if _, ok := auth_info["toron"]; ok {
-		auth_info["thread_manage"] = true
-	}
-
-	if _, ok := auth_info["thread_manage"]; ok {
-		for _, permission := range []string{"thread_setting", "thread_acl", "thread_comment_manage"} {
-			auth_info[permission] = true
-		}
 	}
 
 	if _, ok := auth_info["vote_fix"]; ok {
@@ -887,7 +872,6 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 
 	ip_default := []string{
 		"document",
-		"discuss",
 		"upload",
 		"vote",
 		"bbs_use",
@@ -932,14 +916,6 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 
 	if auth_info["view"] {
 		auth_info["site_view"] = true
-	}
-
-	topic_default := []string{"discuss_view", "discuss_make_new_thread"}
-
-	if _, ok := auth_info["discuss"]; ok {
-		for _, v := range topic_default {
-			auth_info[v] = true
-		}
 	}
 
 	bbs_default := []string{"bbs_edit", "bbs_comment"}
@@ -988,6 +964,12 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 	ip_or_user := IP_or_user(ip)
 	if !auth_info["site_view"] {
 		return false
+	}
+	if tool == "topic_view" {
+		return auth_info["bbs_view"]
+	}
+	if tool == "topic" {
+		return auth_info["bbs_view"] && auth_info["bbs_comment"]
 	}
 	if tool == "render" && strings.HasPrefix(name, "user:") && !auth_info["acl"] {
 		user_document_view_acl := ""
@@ -1064,22 +1046,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 		if !Check_acl(db, name, topic_number, "bbs_view", ip) {
 			return false
 		}
-	} else if Arr_in_str([]string{"topic"}, tool) {
-		if !Check_acl(db, name, topic_number, "topic_view", ip) {
-			return false
-		}
-	}
-
-	if Arr_in_str([]string{"topic", "topic_view"}, tool) {
-		if name == "" {
-			name = "test"
-			QueryRow_DB(
-				db,
-				"select title from rd where code = ?",
-				[]any{&name},
-				topic_number,
-			)
-		}
 	}
 
 	end_number := 1
@@ -1102,9 +1068,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			acl_data = "owner"
 		} else if tool == "bbs_auth" {
 			acl_pass_auth = "bbs"
-			acl_data = "owner"
-		} else if tool == "toron_auth" {
-			acl_pass_auth = "toron"
 			acl_data = "owner"
 		} else if tool == "check_auth" {
 			acl_pass_auth = "check"
@@ -1175,49 +1138,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 				acl_data_list = Get_acl_data_list(db, name, "document_delete_acl")
 			} else {
 				if auth_info["delete"] {
-					acl_data = ""
-				} else {
-					acl_data = "owner"
-				}
-			}
-		} else if tool == "topic" {
-			acl_pass_auth = "topic"
-
-			switch for_a {
-			case 0:
-				end_number += 1
-
-				QueryRow_DB(
-					db,
-					"select acl from rd where code = ?",
-					[]any{&acl_data},
-					topic_number,
-				)
-			case 1:
-				end_number += 1
-
-				acl_data_list = Get_acl_data_list(db, name, "dis")
-			default:
-				if auth_info["discuss"] {
-					acl_data = ""
-				} else {
-					acl_data = "owner"
-				}
-			}
-		} else if tool == "topic_view" {
-			acl_pass_auth = "topic"
-
-			if for_a == 0 {
-				end_number += 1
-
-				QueryRow_DB(
-					db,
-					"select set_data from topic_set where thread_code = ? and set_name = 'thread_view_acl'",
-					[]any{&acl_data},
-					topic_number,
-				)
-			} else {
-				if auth_info["discuss_view"] {
 					acl_data = ""
 				} else {
 					acl_data = "owner"
@@ -1371,14 +1291,6 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 					acl_data = "owner"
 				}
 			}
-		} else if tool == "discuss_make_new_thread" {
-			acl_pass_auth = "toron"
-
-			if auth_info["discuss_make_new_thread"] {
-				acl_data = ""
-			} else {
-				acl_data = "owner"
-			}
 		} else if tool == "recaptcha" {
 			acl_pass_auth = "admin_default_feature"
 
@@ -1486,27 +1398,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 			}
 			return false
 		} else if for_a == end_number-1 {
-			if tool == "topic" {
-				topic_state := ""
-				QueryRow_DB(
-					db,
-					"select title from rd where code = ? and stop != ''",
-					[]any{&topic_state},
-					topic_number,
-				)
-
-				if topic_state != "" {
-					if auth_info["topic"] {
-						return true
-					} else {
-						return false
-					}
-				} else {
-					return true
-				}
-			} else {
-				return true
-			}
+			return true
 		}
 	}
 

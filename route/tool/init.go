@@ -31,9 +31,6 @@ func DB_table_list() map[string][]string {
 	// 개편 예정 (data_link로 변경)
 	create_data["back"] = []string{"title", "link", "type", "data"}
 
-	// 폐지 예정 (topic_set으로 통합) [가장 시급]
-	create_data["topic_set"] = []string{"thread_code", "set_name", "set_id", "set_data"}
-
 	create_data["rd"] = []string{"title", "sub", "code", "date", "band", "stop", "agree", "acl"}
 	create_data["topic"] = []string{"id", "data", "date", "ip", "block", "top", "code"}
 
@@ -259,7 +256,7 @@ func check_update_version() {
 		return
 	}
 
-	if now_version == "20250527" || now_version == "20250529" || now_version == "20251201" {
+	if now_version == "20250527" || now_version == "20250529" || now_version == "20251201" || now_version == "20260824" {
 		return
 	}
 
@@ -269,7 +266,7 @@ func check_update_version() {
 	)
 }
 
-func Main_init() {
+func Main_init() string {
 	check_update_version()
 	DB_init()
 	DB_boot()
@@ -298,7 +295,7 @@ func Main_init() {
 	Always_init(db, last_version["c_ver"])
 	Get_ip_select(db)
 	Search_index_start()
-	Search_bbs_index_start()
+	return now_version
 }
 
 func Get_last_version() map[string]string {
@@ -464,6 +461,39 @@ func migrate_legacy_acl_rows(db *sql.DB, select_query string, update_query strin
 }
 
 func migrate_legacy_acl(db *sql.DB) {
+	legacy_auth_map := map[string]string{
+		"discuss":                 "bbs_use",
+		"discuss_view":            "bbs_view",
+		"discuss_make_new_thread": "bbs_edit",
+		"toron":                   "bbs",
+		"thread_manage":           "bbs_manage",
+		"thread_change":           "bbs_post_manage",
+		"thread_delete":           "bbs_delete",
+		"thread_setting":          "bbs_setting",
+		"thread_acl":              "bbs_setting",
+		"thread_comment_manage":   "bbs_comment_manage",
+		"thread_comment_delete":   "bbs_comment_manage",
+	}
+	for old_auth, new_auth := range legacy_auth_map {
+		rows := Query_DB(db, "select distinct name from alist where acl = ?", old_auth)
+		names := []string{}
+		for rows.Next() {
+			name := ""
+			if rows.Scan(&name) == nil {
+				names = append(names, name)
+			}
+		}
+		rows.Close()
+
+		for _, name := range names {
+			exists := ""
+			if !QueryRow_DB(db, "select acl from alist where name = ? and acl = ? limit 1", []any{&exists}, name, new_auth) {
+				Exec_DB(db, "insert into alist (name, acl) values (?, ?)", name, new_auth)
+			}
+			Exec_DB(db, "delete from alist where name = ? and acl = ?", name, old_auth)
+		}
+	}
+
 	rows := Query_DB(db, "select title, data, type from acl")
 	data_list := [][]string{}
 	for rows.Next() {
@@ -502,9 +532,8 @@ func migrate_legacy_acl(db *sql.DB) {
 			}
 		}
 	}
+	Exec_DB(db, "delete from acl where type = 'dis'")
 
-	migrate_legacy_acl_rows(db, "select code, acl from rd", "update rd set acl = ? where code = ?", 1)
-	migrate_legacy_acl_rows(db, "select thread_code, set_id, set_data from topic_set where set_name = 'thread_view_acl'", "update topic_set set set_data = ? where thread_code = ? and set_id = ? and set_name = 'thread_view_acl'", 2)
 	migrate_legacy_acl_rows(db, "select set_id, set_name, set_code, set_data from bbs_set where set_name in ('bbs_view_acl', 'bbs_acl', 'bbs_edit_acl', 'bbs_comment_acl', 'bbs_view_acl_all', 'bbs_acl_all', 'bbs_edit_acl_all', 'bbs_comment_acl_all')", "update bbs_set set set_data = ? where set_id = ? and set_name = ? and set_code = ?", 3)
 	migrate_legacy_acl_rows(db, "select name, coverage, data from other where name in ('bbs_view_acl_all', 'bbs_acl_all', 'bbs_edit_acl_all', 'bbs_comment_acl_all')", "update other set data = ? where name = ? and coverage = ?", 2)
 	migrate_legacy_acl_rows(db, "select id, acl from vote where user = '' and type != 'option'", "update vote set acl = ? where id = ? and user = '' and type != 'option'", 1)
@@ -955,6 +984,27 @@ func Always_init(db *sql.DB, version string) {
 		Exec_DB(
 			db,
 			`insert into bbs_set (set_name, set_code, set_id, set_data) values ('bbs_type', '', '0', 'comment')`,
+		)
+	}
+
+	length = 0
+	QueryRow_DB(
+		db,
+		`select count(*) from bbs_set where set_id = "-1" and set_name = "bbs_name"`,
+		[]any{&length},
+	)
+	if length > 1 {
+		Exec_DB(db, `delete from bbs_set where set_id = "-1"`)
+		length = 0
+	}
+	if length == 0 {
+		Exec_DB(
+			db,
+			`insert into bbs_set (set_name, set_code, set_id, set_data) values ('bbs_name', '', '-1', 'thread')`,
+		)
+		Exec_DB(
+			db,
+			`insert into bbs_set (set_name, set_code, set_id, set_data) values ('bbs_type', '', '-1', 'thread')`,
 		)
 	}
 

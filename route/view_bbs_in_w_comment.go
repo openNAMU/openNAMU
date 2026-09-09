@@ -28,6 +28,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	page_count := len(data_api_in)
 
 	bbs_comment_acl := tool.Check_acl(db, set_id, "", "bbs_comment", config.IP)
+	comment_manage := tool.Check_permission(db, "bbs_comment_manage", config.IP)
 	comment_closed := bbs_comment_closed(db, set_id, set_code)
 	can_comment := bbs_comment_acl && !comment_closed
 
@@ -70,7 +71,11 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	}
 
 	for _, v := range data_api_in {
-		if v["comment"] == "" {
+		comment_data := v["comment"]
+		if v["blind"] == "O" && !comment_manage {
+			comment_data = ""
+		}
+		if comment_data == "" && v["blind"] != "O" {
 			continue
 		}
 
@@ -87,7 +92,9 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 
 		color := "default"
 		date := ""
-		if v["comment_user_id"] == config.IP {
+		if v["code"] == "1" {
+			color = "red"
+		} else if v["comment_user_id"] == config.IP {
 			color = "green"
 		}
 
@@ -98,7 +105,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 		padding_str := strconv.Itoa(20 * count)
 
 		data_html += `<span style="padding-left: ` + padding_str + `px;"></span>`
-		rendered_data := Get_bbs_render(db, set_id, v["comment"], "thread", config)
+		rendered_data := Get_bbs_render(db, set_id, comment_data, "thread", config)
 		rendered_data = render_topic_reference(rendered_data, set_code, set_id, set_code, "bbs")
 		data_html += get_thread_ui_with_render(
 			db,

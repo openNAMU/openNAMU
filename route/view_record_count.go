@@ -79,7 +79,7 @@ func View_record_count(config tool.Config, user_name string) string {
 	}
 
 	user_url := tool.Url_parser(user_name)
-	body := `<ul><li><a href="/record/` + user_url + `">` + tool.Get_language(db, "edit_record", true) + `</a> : ` + history + `</li><li><a href="/record/topic/` + user_url + `">` + tool.Get_language(db, "discussion_record", true) + `</a> : ` + topic + `</li><li>bbs : ` + bbs + `</li><hr>`
+	body := `<ul><li><a href="/record/` + user_url + `">` + tool.Get_language(db, "edit_record", true) + `</a> : ` + history + `</li><li><a href="/record/bbs_comment/` + user_url + `">` + tool.Get_language(db, "bbs_comment_record", true) + `</a> : ` + topic + `</li><li>bbs : ` + bbs + `</li><hr>`
 	body += record_line(tool.Get_language(db, "record_today", true), today_count, today_length)
 	body += record_line(tool.Get_language(db, "record_yesterday", true), yesterday_count, yesterday_length)
 	body += record_diff_line(tool.Get_language(db, "record_today", true)+" - "+tool.Get_language(db, "record_yesterday", true), today_length-yesterday_length)

@@ -42,7 +42,7 @@ func Auth_relations() []Auth_relation {
 	add("trust_a", "bbs_comment_limit_unlimited", Auth_relation_permission)
 	add("trust_b", "bbs_comment_limit_unlimited", Auth_relation_permission)
 
-	for _, permission := range []string{"toron", "check", "acl", "hidel", "give_range", "give", "bbs", "vote_fix", "ai_use"} {
+	for _, permission := range []string{"check", "acl", "hidel", "give_range", "give", "bbs", "vote_fix", "ai_use"} {
 		add("admin", permission, Auth_relation_permission)
 	}
 	for _, permission := range []string{"edit_filter_manage", "application_manage", "application_view"} {
@@ -81,9 +81,6 @@ func Auth_relations() []Auth_relation {
 		"bbs_setting",
 		"bbs_delete",
 		"bbs_comment_manage",
-		"thread_change",
-		"thread_delete",
-		"thread_comment_delete",
 	} {
 		add("owner", permission, Auth_relation_permission)
 	}
@@ -94,14 +91,10 @@ func Auth_relations() []Auth_relation {
 	add("bbs", "bbs_manage", Auth_relation_permission)
 	add("bbs_manage", "bbs_pin", Auth_relation_permission)
 	add("bbs_manage", "bbs_main_view", Auth_relation_permission)
-	add("toron", "thread_manage", Auth_relation_permission)
-	for _, permission := range []string{"thread_setting", "thread_acl", "thread_comment_manage"} {
-		add("thread_manage", permission, Auth_relation_permission)
-	}
 	add("vote_fix", "vote_manage", Auth_relation_permission)
 	add("check", "view_user_watchlist", Auth_relation_permission)
 
-	for _, permission := range []string{"toron", "check", "acl", "hidel", "give_range", "give", "bbs", "vote_fix"} {
+	for _, permission := range []string{"check", "acl", "hidel", "give_range", "give", "bbs", "vote_fix"} {
 		add(permission, "admin_default_feature", Auth_relation_permission)
 	}
 	for _, permission := range []string{
@@ -127,9 +120,6 @@ func Auth_relations() []Auth_relation {
 	add("new_make", "view", Auth_relation_permission)
 	add("delete", "view", Auth_relation_permission)
 	add("view", "site_view", Auth_relation_permission)
-
-	add("discuss", "discuss_view", Auth_relation_permission)
-	add("discuss", "discuss_make_new_thread", Auth_relation_permission)
 
 	add("bbs_use", "bbs_edit", Auth_relation_permission)
 	add("bbs_use", "bbs_comment", Auth_relation_permission)
@@ -157,7 +147,6 @@ func Auth_relations() []Auth_relation {
 	}
 	for _, permission := range []string{
 		"document",
-		"discuss",
 		"upload",
 		"vote",
 		"bbs_use",

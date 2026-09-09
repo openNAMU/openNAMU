@@ -6,15 +6,31 @@ import (
 	"opennamu/route/tool"
 )
 
-// Api_thread_bbs exposes the legacy topic table in the BBS comment shape.
+const thread_bbs_id = "-1"
+
+// Api_thread_bbs reads discussion comments from the thread BBS.
 func Api_thread_bbs(config tool.Config, tool_name string, topic_num string, s_num string, e_num string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if !tool.Check_acl(db, "", topic_num, "topic_view", config.IP) {
+	if !tool.Check_acl(db, thread_bbs_id, "", "bbs_view", config.IP) {
 		return map[string]any{
 			"response": "require auth",
 			"data":     []map[string]string{},
+		}
+	}
+
+	title := ""
+	if !tool.QueryRow_DB(
+		db,
+		"select set_data from bbs_data where set_name = 'title' and set_id = ? and set_code = ?",
+		[]any{&title},
+		thread_bbs_id,
+		topic_num,
+	) {
+		return map[string]any{
+			"response": "not exist",
+			"data":     "thread",
 		}
 	}
 
@@ -22,9 +38,9 @@ func Api_thread_bbs(config tool.Config, tool_name string, topic_num string, s_nu
 		length := "0"
 		tool.QueryRow_DB(
 			db,
-			"select count(*) from topic where code = ?",
+			"select count(*) from bbs_data where set_name = 'comment' and set_id = ?",
 			[]any{&length},
-			topic_num,
+			thread_bbs_id+"-"+topic_num,
 		)
 
 		return map[string]any{
@@ -35,49 +51,37 @@ func Api_thread_bbs(config tool.Config, tool_name string, topic_num string, s_nu
 		}
 	}
 
-	rows := thread_bbs_query(db, topic_num, tool_name, s_num, e_num)
-	defer rows.Close()
-
-	admin_auth := tool.Check_permission(db, "thread_manage", config.IP)
-	ip_parser_temp := map[string][]string{}
+	comment_api := Api_bbs_w_comment_all(config, thread_bbs_id+"-"+topic_num, true, "around")
+	comments, _ := comment_api["data"].([]map[string]string)
+	admin_auth := tool.Check_permission(db, "bbs_comment_manage", config.IP)
 	data_list := []map[string]string{}
 
-	for rows.Next() {
-		var id string
-		var data string
-		var date string
-		var ip string
-		var block string
-		var top string
-
-		if err := rows.Scan(&id, &data, &date, &ip, &block, &top); err != nil {
-			panic(err)
+	for _, comment := range comments {
+		comment_code := comment["code"]
+		if tool_name == "top" && comment["top"] != "O" {
+			continue
+		}
+		if s_num != "" && e_num != "" {
+			code := tool.Str_to_int(comment_code)
+			if code < tool.Str_to_int(s_num) || code > tool.Str_to_int(e_num) {
+				continue
+			}
 		}
 
-		if block == "O" && !admin_auth {
+		data := comment["comment"]
+		if comment["blind"] == "O" && !admin_auth {
 			data = ""
-		}
-
-		ip_pre := ""
-		ip_render := ""
-		if cached, ok := ip_parser_temp[ip]; ok {
-			ip_pre = cached[0]
-			ip_render = cached[1]
-		} else {
-			ip_pre = tool.IP_preprocess(db, ip, config.IP)[0]
-			ip_render = tool.Get_user_profile_image_ui(db, ip) + tool.IP_parser(db, ip, config.IP)
-			ip_parser_temp[ip] = []string{ip_pre, ip_render}
 		}
 
 		data_list = append(data_list, map[string]string{
 			"id":                     topic_num,
-			"code":                   id,
+			"code":                   comment_code,
 			"comment":                data,
-			"comment_date":           date,
-			"comment_user_id":        ip_pre,
-			"comment_user_id_render": ip_render,
-			"blind":                  block,
-			"top":                    top,
+			"comment_date":           comment["comment_date"],
+			"comment_user_id":        comment["comment_user_id"],
+			"comment_user_id_render": comment["comment_user_id_render"],
+			"blind":                  comment["blind"],
+			"top":                    comment["top"],
 		})
 	}
 
@@ -87,28 +91,13 @@ func Api_thread_bbs(config tool.Config, tool_name string, topic_num string, s_nu
 	}
 }
 
-func thread_bbs_query(db *sql.DB, topic_num string, tool_name string, s_num string, e_num string) *sql.Rows {
-	if tool_name == "top" {
-		return tool.Query_DB(
-			db,
-			"select id, data, date, ip, block, top from topic where code = ? and top = 'O' order by id + 0 asc",
-			topic_num,
-		)
-	}
-
-	if s_num != "" && e_num != "" {
-		return tool.Query_DB(
-			db,
-			"select id, data, date, ip, block, top from topic where code = ? and ? + 0 <= id + 0 and id + 0 <= ? + 0 order by id + 0 asc",
-			topic_num,
-			s_num,
-			e_num,
-		)
-	}
-
-	return tool.Query_DB(
+func thread_bbs_root_exists(db *sql.DB, topic_num string) bool {
+	title := ""
+	return tool.QueryRow_DB(
 		db,
-		"select id, data, date, ip, block, top from topic where code = ? order by id + 0 asc",
+		"select set_data from bbs_data where set_name = 'title' and set_id = ? and set_code = ?",
+		[]any{&title},
+		thread_bbs_id,
 		topic_num,
 	)
 }

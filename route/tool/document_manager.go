@@ -136,7 +136,7 @@ func Do_edit_slow_check(db *sql.DB, config Config, do_type string) bool {
 			} else {
 				QueryRow_DB(
 					db,
-					`select date from topic where ip = ? order by date desc limit 1`,
+					"select date_data.set_data from bbs_data date_data join bbs_data user_data on user_data.set_name = 'comment_user_id' and user_data.set_id = date_data.set_id and user_data.set_code = date_data.set_code where date_data.set_name = 'comment_date' and date_data.set_id like '-1-%' and user_data.set_data = ? order by date_data.set_data desc limit 1",
 					[]any{&last_edit},
 					config.IP,
 				)

@@ -22,7 +22,7 @@ func View_record_simple(config tool.Config, user_name string, record_type string
 		for rows.Next() {
 			code, data, date := "", "", ""
 			if rows.Scan(&code, &data, &date) == nil {
-				body.WriteString(tool.Get_list_ui(`<a href="/thread/`+tool.Url_parser(code)+`">`+tool.HTML_escape(code)+`</a>`, tool.HTML_escape(date), tool.HTML_escape(data), ""))
+				body.WriteString(tool.Get_list_ui(`<a href="/bbs/w/`+tool.Url_parser(thread_bbs_id)+`/`+tool.Url_parser(code)+`">`+tool.HTML_escape(code)+`</a>`, tool.HTML_escape(date), tool.HTML_escape(data), ""))
 			}
 		}
 		rows.Close()

@@ -19,7 +19,6 @@ func move_title_exists(db *sql.DB, title string) bool {
 	queries := []string{
 		"select title from data where title = ? limit 1",
 		"select title from history where title = ? limit 1",
-		"select title from rd where title = ? limit 1",
 		"select doc_name from data_set where doc_name = ? limit 1",
 		"select title from acl where title = ? limit 1",
 		"select title from back where title = ? limit 1",
@@ -48,12 +47,13 @@ func move_document_exists(db *sql.DB, title string) (bool, bool) {
 	var value string
 	data_exists := tool.QueryRow_DB(db, "select title from data where title = ? limit 1", []any{&value}, title)
 	history_exists := tool.QueryRow_DB(db, "select title from history where title = ? limit 1", []any{&value}, title)
-	return data_exists || history_exists, history_exists && !data_exists
+	topic_exists := move_topic_exists(db, title)
+	return data_exists || history_exists || topic_exists, history_exists && !data_exists
 }
 
 func move_topic_exists(db *sql.DB, title string) bool {
 	var value string
-	return tool.QueryRow_DB(db, "select title from rd where title = ? limit 1", []any{&value}, title)
+	return tool.QueryRow_DB(db, "select set_code from bbs_data where set_id = ? and set_name = 'document' and set_data = ? limit 1", []any{&value}, thread_bbs_id, title)
 }
 
 func move_data_value(db *sql.DB, title string) string {
@@ -149,7 +149,7 @@ func move_document_merge(db *sql.DB, config tool.Config, old_name string, new_na
 }
 
 func move_topic_normal(db *sql.DB, old_name string, new_name string) {
-	tool.Exec_DB(db, "update rd set title = ? where title = ?", new_name, old_name)
+	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_id = ? and set_name = 'document' and set_data = ?", new_name, thread_bbs_id, old_name)
 }
 
 func move_topic_rotate(db *sql.DB, old_name string, new_name string) {
@@ -160,7 +160,7 @@ func move_topic_rotate(db *sql.DB, old_name string, new_name string) {
 		{temp_name, new_name},
 	}
 	for _, pair := range pairs {
-		tool.Exec_DB(db, "update rd set title = ? where title = ?", pair[1], pair[0])
+		tool.Exec_DB(db, "update bbs_data set set_data = ? where set_id = ? and set_name = 'document' and set_data = ?", pair[1], thread_bbs_id, pair[0])
 	}
 }
 

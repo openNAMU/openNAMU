@@ -29,12 +29,11 @@
     "error": "エラー",
     "monaco_editor_pc": "Monacoエディター（PC）",
     "monaco_editor_mobile": "Monacoエディター（モバイル）",
-    "thread_watchlist": "議論のウォッチリスト",
     "bbs_watchlist": "掲示板投稿のウォッチリスト",
-    "thread_watch": "議論をウォッチ",
     "bbs_watch": "投稿をウォッチ",
     "downvote": "低評価",
     "need_category": "必要なカテゴリ",
     "wiki_comment_bbs": "ウィキコメント掲示板",
+    "thread_bbs": "議論掲示板",
     "unused_category": "未使用のカテゴリ"
 }

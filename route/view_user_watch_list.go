@@ -7,6 +7,14 @@ import (
 )
 
 func View_user_watch_list(config tool.Config, num string, do_type string) string {
+	if do_type == "thread_watchlist" {
+		page := tool.Str_to_int(num)
+		if page > 1 {
+			return tool.Get_redirect("/bbs_watch_list_page/" + tool.Url_parser(num))
+		}
+		return tool.Get_redirect("/bbs_watch_list")
+	}
+
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -32,31 +40,20 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 			if do_type == "watchlist" {
 				date_data = tool.Get_history_date(db, title)
 				delete_path = "/watch_list/" + tool.Url_parser(title)
-			} else if do_type == "thread_watchlist" {
-				thread_title := ""
-				thread_sub := ""
-				tool.QueryRow_DB(
-					db,
-					"select title, sub, date from rd where code = ?",
-					[]any{&thread_title, &thread_sub, &date_data},
-					title,
-				)
-				if thread_title != "" {
-					display_title = thread_title
-					if thread_sub != "" {
-						display_title += " - " + thread_sub
-					}
-				}
-				view_path = "/thread/" + tool.Url_parser(title)
-				delete_path = "/thread_watch/" + tool.Url_parser(title)
 			} else if do_type == "bbs_watchlist" {
-				watch_data := strings.SplitN(title, "-", 2)
-				if len(watch_data) != 2 {
-					continue
+				set_id := ""
+				set_code := ""
+				if strings.HasPrefix(title, "-1-") {
+					set_id = "-1"
+					set_code = strings.TrimPrefix(title, "-1-")
+				} else {
+					watch_data := strings.SplitN(title, "-", 2)
+					if len(watch_data) != 2 {
+						continue
+					}
+					set_id = watch_data[0]
+					set_code = watch_data[1]
 				}
-
-				set_id := watch_data[0]
-				set_code := watch_data[1]
 				post_title, _ := tool.Get_bbs_data_value(db, set_id, set_code, "title")
 				bbs_name := ""
 				tool.QueryRow_DB(
@@ -94,8 +91,6 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 	page_url := "/star_doc_page/{}"
 	if do_type == "watchlist" {
 		page_url = "/watch_list_page/{}"
-	} else if do_type == "thread_watchlist" {
-		page_url = "/thread_watch_list_page/{}"
 	} else if do_type == "bbs_watchlist" {
 		page_url = "/bbs_watch_list_page/{}"
 	}
@@ -104,7 +99,7 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 	manager_url := "/manager/16"
 	if do_type == "watchlist" {
 		manager_url = "/manager/13"
-	} else if do_type == "thread_watchlist" || do_type == "bbs_watchlist" {
+	} else if do_type == "bbs_watchlist" {
 		manager_url = ""
 	}
 	if manager_url != "" {
@@ -114,8 +109,6 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 	title := tool.Get_language(db, "watchlist", true)
 	if do_type == "star_doc" {
 		title = tool.Get_language(db, "star_doc", true)
-	} else if do_type == "thread_watchlist" {
-		title = tool.Get_language(db, "thread_watchlist", true)
 	} else if do_type == "bbs_watchlist" {
 		title = tool.Get_language(db, "bbs_watchlist", true)
 	}
@@ -130,7 +123,6 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 			{"user/" + tool.Url_parser(config.IP), tool.Get_language(db, "return", false)},
 			{"watch_list", tool.Get_language(db, "watchlist", false)},
 			{"star_doc", tool.Get_language(db, "star_doc", false)},
-			{"thread_watch_list", tool.Get_language(db, "thread_watchlist", false)},
 			{"bbs_watch_list", tool.Get_language(db, "bbs_watchlist", false)},
 		},
 		map[string]string{},

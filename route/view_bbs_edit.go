@@ -46,7 +46,10 @@ func View_bbs_edit(config tool.Config, set_id string, set_code string, comment_c
 	if comment_code == "" {
 		prefix_list := bbs_prefix_list(db, set_id)
 		if len(prefix_list) > 0 {
-			prefix_html = "<select class=\"__ON_INPUT__\" name=\"prefix\"><option value=\"\">" + tool.Get_language(db, "empty", true) + "</option>"
+			prefix_html = "<select class=\"__ON_INPUT__\" name=\"prefix\">"
+			if set_id != thread_bbs_id {
+				prefix_html += "<option value=\"\">" + tool.Get_language(db, "empty", true) + "</option>"
+			}
 			for _, prefix := range prefix_list {
 				selected := ""
 				if prefix == data["prefix"] {

@@ -43,6 +43,7 @@ func emergency_print_menu() {
 	fmt.Println("26. Change update branch")
 	fmt.Println("27. Change golang port")
 	fmt.Println("28. Initialize default auth groups")
+	fmt.Println("29. Migrate topics to BBS")
 }
 
 func emergency_input(reader *bufio.Reader, message string) string {
@@ -327,6 +328,9 @@ func Run_emergency_tool(arguments []string) int {
 		emergency_print_menu()
 		choice = emergency_input(reader, "Insert selection number (EX : 9) : ")
 	}
+	if choice == "topic_to_bbs" {
+		choice = "29"
+	}
 
 	if choice == "9" {
 		if err := emergency_delete_file(filepath.Join("data", "set.json")); err != nil {
@@ -495,6 +499,11 @@ func Run_emergency_tool(arguments []string) int {
 		}
 	case "28":
 		err = emergency_init_auth_groups(db)
+	case "29":
+		err = emergency_migrate_topic_to_bbs(db)
+		if err == nil {
+			err = emergency_set_other(db, "ver", tool.Get_last_version()["c_ver"])
+		}
 	default:
 		err = fmt.Errorf("unknown selection: %s", choice)
 	}

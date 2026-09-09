@@ -140,7 +140,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	render_data = document_top + render_data
 
 	topic := 0
-	if tool.Get_rd_active_title(db, doc_name) {
+	if thread_bbs_document_exists(db, doc_name) {
 		topic = 1
 	}
 	history_color := 0
@@ -161,7 +161,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	watch_list := 0
 	menu := [][]any{
 		{"edit/" + tool.Url_parser(doc_name), tool.Get_language(db, "edit", true), menu_acl},
-		{"topic/" + tool.Url_parser(doc_name), tool.Get_language(db, "discussion", true), topic},
+		{"bbs/in/-1", tool.Get_language(db, "thread_bbs", true), topic},
 		{"history/" + tool.Url_parser(doc_name), tool.Get_language(db, "history", true), history_color},
 		{"xref/" + tool.Url_parser(doc_name), tool.Get_language(db, "backlink", true)},
 		{"acl/" + tool.Url_parser(doc_name), tool.Get_language(db, "setting", true), acl_color},

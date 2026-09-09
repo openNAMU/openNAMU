@@ -1,149 +1,63 @@
 package route
 
 import (
-	"database/sql"
 	"net/url"
-	"strconv"
 
 	"opennamu/route/tool"
 )
 
-func thread_user_render(db *sql.DB, config tool.Config, ip string) string {
-	return tool.Get_user_profile_image_ui(db, ip) + tool.IP_parser(db, ip, config.IP)
-}
-
-func thread_comments(db *sql.DB, config tool.Config, topic_num string, page int) string {
-	rows := tool.Get_topic_rows_page(db, topic_num, (page-1)*50, 50)
-	defer rows.Close()
-
-	data_html := ""
-	shortcut := `<div class="opennamu_thread_shortcut" id="thread_shortcut">`
-	comment_count := 0
-	admin_auth := tool.Check_permission(db, "thread_manage", config.IP)
-
-	for rows.Next() {
-		comment_count++
-		var id string
-		var data string
-		var date_value string
-		var ip string
-		var block string
-		var top string
-		if rows.Scan(&id, &data, &date_value, &ip, &block, &top) != nil {
-			continue
+func View_thread(config tool.Config, topic_num string, doc_name string, page string, values url.Values) string {
+	if topic_num != "0" {
+		if values != nil {
+			api_data := Api_thread_post(config, topic_num, doc_name, values.Get("content"), values.Get("topic"), values.Get("title"))
+			response, _ := api_data["response"].(string)
+			if response == "require auth" {
+				db := tool.DB_connect()
+				defer tool.DB_close(db)
+				return tool.Get_error_page(db, config, "auth")
+			}
+			if response != "ok" {
+				db := tool.DB_connect()
+				defer tool.DB_close(db)
+				error_name, _ := api_data["data"].(string)
+				if error_name == "" {
+					error_name = "error"
+				}
+				return tool.Get_error_page(db, config, error_name)
+			}
+			comment_num, _ := api_data["comment_num"].(string)
+			return tool.Get_redirect("/bbs/w/" + tool.Url_parser(thread_bbs_id) + "/" + tool.Url_parser(topic_num) + "#" + tool.Url_parser(comment_num))
 		}
-
-		shortcut += `<a href="#` + tool.Url_parser(id) + `">#` + tool.HTML_escape(id) + `</a> `
-		if block == "O" && !admin_auth {
-			data = ""
-		}
-
-		color := "default"
-		if id == "1" {
-			color = "red"
-		} else if ip == config.IP {
-			color = "green"
-		}
-		date := `<a href="/thread/` + tool.Url_parser(topic_num) + `/comment/` + tool.Url_parser(id) + `/tool">(` + tool.Get_language(db, "tool", true) + `)</a> <a href="/thread/` + tool.Url_parser(topic_num) + `/comment/` + tool.Url_parser(id) + `/raw">(` + tool.Get_language(db, "raw", true) + `)</a> ` + tool.HTML_escape(date_value)
-		data_html += get_thread_ui(db, thread_user_render(db, config, ip), date, data, id, color, block, "", topic_num, config)
+		return tool.Get_redirect("/bbs/w/" + tool.Url_parser(thread_bbs_id) + "/" + tool.Url_parser(topic_num))
 	}
 
-	shortcut += `</div>`
-	return shortcut + data_html + tool.Get_page_control(db, page, comment_count, 50, "/thread/"+tool.Url_parser(topic_num)+"/page/{}")
-}
+	if values == nil {
+		return tool.Get_redirect("/bbs/in/" + tool.Url_parser(thread_bbs_id))
+	}
 
-func View_thread(config tool.Config, topic_num string, doc_name string, page string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	name := doc_name
-	sub := ""
-	page_num := tool.Str_to_int(page)
-	if page_num < 1 {
-		page_num = 1
-	}
-	if topic_num == "0" {
-		if name == "" {
-			name = "Test"
-		}
-		sub = tool.Get_language(db, "make_new_topic", true)
-		if values == nil && (!tool.Check_acl(db, name, "0", "topic_view", config.IP) || !tool.Check_permission(db, "discuss_make_new_thread", config.IP)) {
-			return tool.Get_error_page(db, config, "auth")
-		}
-	} else {
-		rd_data, rd_exists := tool.Get_rd_data(db, topic_num)
-		if !rd_exists {
-			return tool.Get_redirect("/")
-		}
-		name = rd_data["title"]
-		sub = rd_data["sub"]
-		if values == nil && !tool.Check_acl(db, name, topic_num, "topic_view", config.IP) {
-			return tool.Get_error_page(db, config, "auth")
-		}
+	if doc_name == "" {
+		doc_name = "Test"
 	}
 
-	if values != nil {
-		api_data := Api_thread_post(config, topic_num, name, values.Get("content"), values.Get("topic"), values.Get("title"))
-		response, _ := api_data["response"].(string)
-		if response == "empty data" {
-			if topic_num == "0" {
-				return tool.Get_redirect("/thread/0/" + tool.Url_parser(name))
-			}
-			return tool.Get_redirect("/thread/" + tool.Url_parser(topic_num))
-		}
-		if response == "not exist" {
-			return tool.Get_redirect("/")
-		}
-		if response == "require auth" {
-			return tool.Get_error_page(db, config, "auth")
-		}
-		if response != "ok" {
-			error_name, _ := api_data["data"].(string)
-			if error_name == "" {
-				error_name = "error"
-			}
-			return tool.Get_error_page(db, config, error_name)
-		}
-		posted_topic_num, topic_ok := api_data["topic_num"].(string)
-		comment_num, comment_ok := api_data["comment_num"].(string)
-		if !topic_ok || !comment_ok {
-			return tool.Get_error_page(db, config, "error")
-		}
-		comment_page := (tool.Str_to_int(comment_num)-1)/50 + 1
-		return tool.Get_redirect("/thread/" + tool.Url_parser(posted_topic_num) + "/page/" + strconv.Itoa(comment_page) + "#" + tool.Url_parser(comment_num))
+	api_data := Api_thread_post(config, "0", doc_name, values.Get("content"), values.Get("topic"), values.Get("title"))
+	response, _ := api_data["response"].(string)
+	if response == "empty data" {
+		return tool.Get_redirect("/bbs/in/" + tool.Url_parser(thread_bbs_id))
 	}
-
-	data_html := get_render_setting_css(db, config) + `<style id="opennamu_list_hidden_style">.opennamu_list_hidden { display: none; }</style>`
-	data_html += `<label><input type="checkbox" onclick="opennamu_list_hidden_remove();" checked> ` + tool.Get_language(db, "remove_hidden", true) + `</label><hr class="main_hr">`
-	if topic_num != "0" {
-		data_html += thread_comments(db, config, topic_num, page_num)
+	if response == "require auth" {
+		return tool.Get_error_page(db, config, "auth")
 	}
-
-	data_html += `<h2>` + tool.HTML_escape(sub) + `</h2>`
-	can_post := topic_num == "0" || tool.Check_acl(db, name, topic_num, "topic", config.IP)
-	if can_post {
-		path := "/thread/" + tool.Url_parser(topic_num)
-		if topic_num == "0" {
-			path = "/thread/0/" + tool.Url_parser(doc_name)
+	if response != "ok" {
+		error_name, _ := api_data["data"].(string)
+		if error_name == "" {
+			error_name = "error"
 		}
-		data_html += `<form method="post" action="` + path + `">`
-		if topic_num == "0" {
-			data_html += `<input name="topic" value="` + tool.HTML_escape(name) + `" placeholder="` + tool.Get_language(db, "document_name", true) + `"><hr class="main_hr">`
-			data_html += `<input name="title" value="" placeholder="` + tool.Get_language(db, "discussion_name", true) + `"><hr class="main_hr">`
-		}
-		data_html += tool.Get_editor_ui(db, config, "", "thread", "", "") + `</form>`
+		return tool.Get_error_page(db, config, error_name)
 	}
-
-	menu := [][]any{}
-	if doc_name != "" {
-		menu = append(menu, []any{"topic/" + tool.Url_parser(doc_name), tool.Get_language(db, "list", true)})
-	}
-	if topic_num != "0" {
-		menu = append(menu, []any{"thread/" + tool.Url_parser(topic_num) + "/tool", tool.Get_language(db, "tool", true)})
-		if !tool.IP_or_user(config.IP) {
-			menu = append(menu, []any{"thread_watch/" + tool.Url_parser(topic_num), tool.Get_language(db, "thread_watch", true)})
-		}
-	}
-
-	return tool.Get_template(db, config, name, data_html, []any{"(" + tool.Get_language(db, "discussion", true) + ")"}, menu, map[string]string{})
+	topic_num, _ = api_data["topic_num"].(string)
+	comment_num, _ := api_data["comment_num"].(string)
+	return tool.Get_redirect("/bbs/w/" + tool.Url_parser(thread_bbs_id) + "/" + tool.Url_parser(topic_num) + "#" + tool.Url_parser(comment_num))
 }

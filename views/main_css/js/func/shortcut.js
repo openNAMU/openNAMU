@@ -28,14 +28,14 @@ window.addEventListener("keydown", e => {
 
     shortcut_key_list[e.code] = 1;
     if(Object.keys(shortcut_key_list).length === 1) {
-        let doc_shortcut = /^\/(w|w_from|history|edit|acl|topic|xref)\//i;
+        let doc_shortcut = /^\/(w|w_from|history|edit|acl|xref)\//i;
 
         if(shortcut_key_list['KeyF'] === 1) {
             window.location.href = '/';
         } else if(shortcut_key_list['KeyC'] === 1) {
             window.location.href = '/recent_change';
         } else if(shortcut_key_list['KeyD'] === 1) {
-            window.location.href = '/recent_discuss';
+            window.location.href = '/bbs/in/-1';
         } else if(shortcut_key_list['KeyA'] === 1) {
             window.location.href = '/random';
         }

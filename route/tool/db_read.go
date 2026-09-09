@@ -211,27 +211,6 @@ func Get_history_last_revision(db *sql.DB, title string) string {
 	return value
 }
 
-func Get_rd_data(db *sql.DB, code string) (map[string]string, bool) {
-	title := ""
-	sub := ""
-	stop := ""
-	agree := ""
-	acl := ""
-	exists := QueryRow_DB(
-		db,
-		"select title, sub, stop, agree, acl from rd where code = ?",
-		[]any{&title, &sub, &stop, &agree, &acl},
-		code,
-	)
-	return map[string]string{
-		"title": title,
-		"sub":   sub,
-		"stop":  stop,
-		"agree": agree,
-		"acl":   acl,
-	}, exists
-}
-
 func Get_acl_exists(db *sql.DB, title string) bool {
 	value := ""
 	return QueryRow_DB(
@@ -289,41 +268,6 @@ func Get_back_redirect(db *sql.DB, value string) bool {
 	)
 }
 
-func Get_topic_exists(db *sql.DB, code string, id string) bool {
-	value := ""
-	return QueryRow_DB(
-		db,
-		"select id from topic where code = ? and id = ?",
-		[]any{&value},
-		code,
-		id,
-	)
-}
-
-func Get_topic_block(db *sql.DB, code string, id string) string {
-	value := ""
-	QueryRow_DB(
-		db,
-		"select block from topic where code = ? and id = ?",
-		[]any{&value},
-		code,
-		id,
-	)
-	return value
-}
-
-func Get_topic_top(db *sql.DB, code string, id string) string {
-	value := ""
-	QueryRow_DB(
-		db,
-		"select top from topic where code = ? and id = ?",
-		[]any{&value},
-		code,
-		id,
-	)
-	return value
-}
-
 func Get_vote_data(db *sql.DB, id string) (map[string]string, bool) {
 	name := ""
 	subject := ""
@@ -378,28 +322,6 @@ func Get_user_set_data_match(db *sql.DB, id string, name string, data string) bo
 	)
 }
 
-func Get_rd_active_title(db *sql.DB, title string) bool {
-	value := ""
-	return QueryRow_DB(
-		db,
-		"select title from rd where title = ? and not stop = 'O' order by date desc limit 1",
-		[]any{&value},
-		title,
-	)
-}
-
-func Get_topic_set_data(db *sql.DB, thread_code string, set_name string) string {
-	data := ""
-	QueryRow_DB(
-		db,
-		"select set_data from topic_set where thread_code = ? and set_name = ?",
-		[]any{&data},
-		thread_code,
-		set_name,
-	)
-	return data
-}
-
 func Get_back_redirect_data(db *sql.DB, doc_name string) (string, string, bool) {
 	target := ""
 	anchor := ""
@@ -444,48 +366,6 @@ func Get_history_date(db *sql.DB, title string) string {
 		title,
 	)
 	return data
-}
-
-func Get_topic_data(db *sql.DB, code string, id string) (map[string]string, bool) {
-	comment_id := ""
-	data := ""
-	date := ""
-	ip := ""
-	block := ""
-	top := ""
-	exists := QueryRow_DB(
-		db,
-		"select id, data, date, ip, block, top from topic where code = ? and id = ?",
-		[]any{&comment_id, &data, &date, &ip, &block, &top},
-		code,
-		id,
-	)
-	return map[string]string{
-		"id":    comment_id,
-		"data":  data,
-		"date":  date,
-		"ip":    ip,
-		"block": block,
-		"top":   top,
-	}, exists
-}
-
-func Get_topic_rows(db *sql.DB, code string) *sql.Rows {
-	return Query_DB(
-		db,
-		"select id, data, date, ip, block, top from topic where code = ? order by id + 0 asc",
-		code,
-	)
-}
-
-func Get_topic_rows_page(db *sql.DB, code string, offset int, limit int) *sql.Rows {
-	return Query_DB(
-		db,
-		"select id, data, date, ip, block, top from topic where code = ? order by id + 0 asc limit ? offset ?",
-		code,
-		limit,
-		offset,
-	)
 }
 
 func Get_vote_count(db *sql.DB, id string, data string) string {
@@ -732,9 +612,32 @@ func Get_bbs_last_comment_date(db *sql.DB, root_id string) string {
 
 func Get_topic_record_rows(db *sql.DB, user_name string, offset int, limit bool) *sql.Rows {
 	if limit {
-		return Query_DB(db, "select code, id, date from topic where ip = ? order by date desc limit ?, 50", user_name, offset)
+		return Query_DB(
+			db,
+			`select substr(comment_data.set_id, 4), comment_data.set_code, date_data.set_data
+				from bbs_data comment_data
+				join bbs_data date_data on date_data.set_name = 'comment_date'
+				and date_data.set_id = comment_data.set_id and date_data.set_code = comment_data.set_code
+				join bbs_data user_data on user_data.set_name = 'comment_user_id'
+				and user_data.set_id = comment_data.set_id and user_data.set_code = comment_data.set_code
+				where comment_data.set_name = 'comment' and comment_data.set_id like '-1-%'
+				and user_data.set_data = ? order by date_data.set_data desc limit ?, 50`,
+			user_name,
+			offset,
+		)
 	}
-	return Query_DB(db, "select code, data, date from topic where ip = ? order by date desc limit 100", user_name)
+	return Query_DB(
+		db,
+		`select substr(comment_data.set_id, 4), comment_data.set_data, date_data.set_data
+			from bbs_data comment_data
+			join bbs_data date_data on date_data.set_name = 'comment_date'
+			and date_data.set_id = comment_data.set_id and date_data.set_code = comment_data.set_code
+			join bbs_data user_data on user_data.set_name = 'comment_user_id'
+			and user_data.set_id = comment_data.set_id and user_data.set_code = comment_data.set_code
+			where comment_data.set_name = 'comment' and comment_data.set_id like '-1-%'
+			and user_data.set_data = ? order by date_data.set_data desc limit 100`,
+		user_name,
+	)
 }
 
 func Get_history_record_rows(db *sql.DB, user_name string, record_type string, offset int, limit bool) *sql.Rows {
@@ -799,7 +702,12 @@ func Get_month_contributor_rows(db *sql.DB, start string, end string) *sql.Rows 
 
 func Get_topic_count(db *sql.DB, user_name string) string {
 	count := "0"
-	QueryRow_DB(db, "select count(*) from topic where ip = ?", []any{&count}, user_name)
+	QueryRow_DB(
+		db,
+		"select count(*) from bbs_data where set_name = 'comment_user_id' and set_id like '-1-%' and set_data = ?",
+		[]any{&count},
+		user_name,
+	)
 	return count
 }
 

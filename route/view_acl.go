@@ -14,7 +14,6 @@ var document_acl_fields = []string{
 	"document_edit_acl",
 	"document_move_acl",
 	"document_delete_acl",
-	"dis",
 }
 
 var document_acl_group_fields = []string{
@@ -23,7 +22,6 @@ var document_acl_group_fields = []string{
 	"document_edit_acl",
 	"document_move_acl",
 	"document_delete_acl",
-	"dis",
 }
 
 func acl_field_title(db *sql.DB, field string) string {
@@ -33,7 +31,6 @@ func acl_field_title(db *sql.DB, field string) string {
 		"document_edit_acl":   "document_edit_acl",
 		"document_move_acl":   "document_move_acl",
 		"document_delete_acl": "document_delete_acl",
-		"dis":                 "discussion_acl",
 	}[field]
 	return tool.Get_language(db, key, true)
 }

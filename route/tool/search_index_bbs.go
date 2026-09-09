@@ -81,6 +81,14 @@ func Search_bbs_index_start() {
 	})
 }
 
+func Search_bbs_index_mark_rebuild() error {
+	err := os.Remove(bbs_search_index_version_file)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	return err
+}
+
 func search_bbs_index_version_valid() bool {
 	data, err := os.ReadFile(bbs_search_index_version_file)
 	return err == nil && string(data) == bbs_search_index_version

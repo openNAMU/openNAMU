@@ -30,14 +30,23 @@ func View_bbs_in_w_tool(config tool.Config, set_id string, set_code string) stri
 	}
 
 	if tool.Check_permission(db, "bbs_comment_manage", config.IP) {
-		comment_closed := bbs_comment_closed(db, set_id, set_code)
-		comment_closed_value := "1"
-		comment_state := "comment_close"
-		if comment_closed {
-			comment_closed_value = "0"
-			comment_state = "comment_open"
+		comment_state_html := ""
+		if set_id != thread_bbs_id {
+			comment_closed := bbs_comment_closed(db, set_id, set_code)
+			comment_closed_value := "1"
+			comment_state := "comment_close"
+			if comment_closed {
+				comment_closed_value = "0"
+				comment_state = "comment_open"
+			}
+			comment_state_html = `
+            <form method="post">
+                <input type="hidden" name="action" value="comment_close">
+                <input type="hidden" name="comment_closed" value="` + comment_closed_value + `">
+                <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, comment_state, true) + `</button>
+            </form>
+            `
 		}
-
 		comment_form := ""
 		if set_id == "0" {
 			comment_form = `
@@ -75,12 +84,7 @@ func View_bbs_in_w_tool(config tool.Config, set_id string, set_code string) stri
 
 		data_html += `
             <h3>` + tool.Get_language(db, "comment_manage", true) + `</h3>
-            <form method="post">
-                <input type="hidden" name="action" value="comment_close">
-                <input type="hidden" name="comment_closed" value="` + comment_closed_value + `">
-                <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, comment_state, true) + `</button>
-            </form>
-            ` + comment_form + `
+            ` + comment_state_html + comment_form + `
         `
 	}
 

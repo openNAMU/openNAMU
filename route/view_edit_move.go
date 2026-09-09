@@ -55,7 +55,7 @@ func View_edit_move(config tool.Config, doc_name string, values url.Values) stri
 	}
 	body += "</select><hr class=\"main_hr\">"
 
-	body += "<h2>" + tool.Get_language(db, "discussion", true) + "</h2>"
+	body += "<h2>" + tool.Get_language(db, "thread_bbs", true) + "</h2>"
 	body += "<select name=\"move_topic_option\">"
 	body += "<option value=\"none\" selected>" + tool.Get_language(db, "dont_move", true) + "</option>"
 	body += "<option value=\"normal\">" + tool.Get_language(db, "normal", true) + "</option>"

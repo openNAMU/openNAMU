@@ -27,9 +27,9 @@ func View_main_other(config tool.Config) string {
             <li><a href="/list/admin">`+tool.Get_language(db, "admin_list", true)+`</a></li>
             <li><a href="/list/admin/auth_use">`+tool.Get_language(db, "authority_use_list", true)+`</a></li>
         </ul>
-        <h3>`+tool.Get_language(db, "discussion", true)+`</h3>
+        <h3>`+tool.Get_language(db, "thread_bbs", true)+`</h3>
         <ul>
-            <li><a href="/recent_discuss">`+tool.Get_language(db, "recent_discussion", true)+`</a></li>
+            <li><a href="/bbs/in/-1">`+tool.Get_language(db, "thread_bbs", true)+`</a></li>
         </ul>
         <h3>`+tool.Get_language(db, "document", true)+`</h3>
         <ul>

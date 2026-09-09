@@ -129,6 +129,9 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 	}
 
 	prefix = bbs_prefix_check(db, set_id, prefix)
+	if set_id == thread_bbs_id && prefix == "" {
+		prefix = "열림"
+	}
 	if tool.Get_len(title) > bbs_title_max_length {
 		return_data["response"] = "error"
 		return_data["data"] = "bbs title length"

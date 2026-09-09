@@ -388,7 +388,7 @@ func Get_wiki_custom(db *sql.DB, ip string, session sessions.Session, cookies st
 	user_topic := "0"
 	user_topic_check := QueryRow_DB(
 		db,
-		"select title from rd where title = ? and stop = '' limit 1",
+		"select set_code from bbs_data document_data where document_data.set_id = '-1' and document_data.set_name = 'document' and document_data.set_data = ? limit 1",
 		[]any{&title},
 		"user:"+ip,
 	)
@@ -642,7 +642,7 @@ func Get_document_type(doc_name string) string {
 }
 
 func Get_except_set_id_SQL() string {
-	return `not set_id = "0"`
+	return `1 = 1`
 }
 
 func Do_remove_spaces(s string) string {
