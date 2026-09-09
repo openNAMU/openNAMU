@@ -10,7 +10,7 @@ import (
 func bbs_list(db *sql.DB) map[string]string {
 	rows := tool.Query_DB(
 		db,
-		"select set_data, set_id from bbs_set where set_name = 'bbs_name' and "+tool.Get_except_set_id_SQL(),
+		"select set_data, set_id from bbs_set where set_name = 'bbs_name'",
 	)
 	defer rows.Close()
 
@@ -50,6 +50,11 @@ func Api_bbs_list(config tool.Config) map[string]any {
 	items := make([]BBS_item, 0, len(data_list))
 
 	for k, v := range data_list {
+		bbs_name := k
+		if v == "0" {
+			bbs_name = tool.Get_language(db, "wiki_comment_bbs", true)
+		}
+
 		if !tool.Check_acl(db, v, "", "bbs_view", config.IP) {
 			continue
 		}
@@ -72,7 +77,7 @@ func Api_bbs_list(config tool.Config) map[string]any {
 
 		items = append(items, BBS_item{
 			Id:   v,
-			Name: k,
+			Name: bbs_name,
 			Type: bbs_type,
 			Date: bbs_date,
 		})

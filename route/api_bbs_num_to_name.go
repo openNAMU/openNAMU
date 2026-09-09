@@ -14,6 +14,9 @@ func Api_bbs_num_to_name(db *sql.DB, set_id string) map[string]any {
 		[]any{&bbs_name},
 		set_id,
 	)
+	if set_id == "0" {
+		bbs_name = tool.Get_language(db, "wiki_comment_bbs", true)
+	}
 
 	return map[string]any{
 		"response": "ok",
