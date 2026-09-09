@@ -626,6 +626,14 @@ func Get_data_file_rows(db *sql.DB, offset int, order bool) *sql.Rows {
 	return Query_DB(db, "select title from data where title like 'file:%' limit ?, 50", offset)
 }
 
+func Get_data_image_file_rows(db *sql.DB, offset int) *sql.Rows {
+	return Query_DB(
+		db,
+		"select title from data where title like 'file:%' and (lower(title) like '%.jpeg' or lower(title) like '%.jpg' or lower(title) like '%.png' or lower(title) like '%.gif' or lower(title) like '%.webp' or lower(title) like '%.bmp' or lower(title) like '%.tif' or lower(title) like '%.tiff' or lower(title) like '%.ico' or lower(title) like '%.svg' or lower(title) like '%.avif' or lower(title) like '%.heic') order by title limit ?, 50",
+		offset,
+	)
+}
+
 func Get_unlinked_file_rows(db *sql.DB, offset int) *sql.Rows {
 	return Query_DB(
 		db,

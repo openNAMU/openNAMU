@@ -53,7 +53,7 @@ func View_main_other(config tool.Config) string {
         </ul>
         <h3>`+tool.Get_language(db, "other", true)+`</h3>
         <ul>
-            <li><a href="/list/file">`+tool.Get_language(db, "image_file_list", true)+`</a></li>
+            <li><a href="/list/image">`+tool.Get_language(db, "image_file_list", true)+`</a></li>
             <li><a href="/vote">`+tool.Get_language(db, "vote_list", true)+`</a></li>
             <li><a href="/bbs/main">`+tool.Get_language(db, "bbs_main", true)+`</a></li>
             <li><a href="/bbs/contributor">`+tool.Get_language(db, "monthly_bbs_contributor", true)+`</a></li>
