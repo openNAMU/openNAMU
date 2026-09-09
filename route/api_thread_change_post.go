@@ -28,6 +28,7 @@ func Api_thread_change_post(config tool.Config, topic_num string, new_title stri
 	}
 
 	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'document' and set_id = ? and set_code = ?", new_title, thread_bbs_id, topic_num)
+	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'tag' and set_id = ? and set_code = ? and set_data = ?", new_title, thread_bbs_id, topic_num, old_title)
 	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'title' and set_id = ? and set_code = ?", new_sub, thread_bbs_id, topic_num)
 	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?", tool.Get_time(), thread_bbs_id, topic_num)
 

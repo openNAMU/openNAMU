@@ -30,7 +30,6 @@ func Api_thread_setting_post(config tool.Config, topic_num string, stop string, 
 		data string
 	}{
 		{"prefix", prefix},
-		{"topic_agree", agree},
 	} {
 		tool.Exec_DB(db, "delete from bbs_data where set_name = ? and set_id = ? and set_code = ?", value.name, thread_bbs_id, topic_num)
 		if value.data != "" {
@@ -38,7 +37,7 @@ func Api_thread_setting_post(config tool.Config, topic_num string, stop string, 
 		}
 	}
 
-	tool.Exec_DB(db, "delete from bbs_data where set_name in ('topic_stop', 'comment_close') and set_id = ? and set_code = ?", thread_bbs_id, topic_num)
+	tool.Exec_DB(db, "delete from bbs_data where set_name in ('topic_agree', 'topic_stop', 'comment_close') and set_id = ? and set_code = ?", thread_bbs_id, topic_num)
 	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?", tool.Get_time(), thread_bbs_id, topic_num)
 	tool.Search_bbs_index_update(db, thread_bbs_id, topic_num)
 

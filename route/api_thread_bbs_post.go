@@ -193,6 +193,7 @@ func thread_bbs_insert_post(db *sql.DB, topic_num string, name string, sub strin
 		{"user_id", user_id},
 		{"comment_count", "1"},
 		{"document", name},
+		{"tag", name},
 		{"topic_source", "bbs"},
 		{"prefix", "열림"},
 	} {

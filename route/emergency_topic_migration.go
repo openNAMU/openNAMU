@@ -119,7 +119,7 @@ func emergency_topic_prefix_init(db *sql.DB) error {
 			db,
 			"insert into bbs_set (set_name, set_code, set_id, set_data) values ('bbs_prefix', '', ?, ?)",
 			thread_bbs_set_id,
-			"열림\n닫힘",
+			"열림\n닫힘\n합의",
 		)
 	}
 	return nil
@@ -244,6 +244,9 @@ func emergency_migrate_topic_to_bbs(db *sql.DB) (return_err error) {
 		if topic.stop == "O" {
 			prefix = "닫힘"
 		}
+		if topic.agree == "O" {
+			prefix = "합의"
+		}
 		root_data := []struct {
 			name string
 			data string
@@ -262,12 +265,6 @@ func emergency_migrate_topic_to_bbs(db *sql.DB) (return_err error) {
 				name string
 				data string
 			}{"topic_band", topic.band})
-		}
-		if topic.agree != "" {
-			root_data = append(root_data, struct {
-				name string
-				data string
-			}{"topic_agree", topic.agree})
 		}
 		for _, data := range root_data {
 			if err := emergency_topic_insert(tx, data.name, topic.code, thread_bbs_set_id, data.data); err != nil {

@@ -150,6 +150,7 @@ func move_document_merge(db *sql.DB, config tool.Config, old_name string, new_na
 
 func move_topic_normal(db *sql.DB, old_name string, new_name string) {
 	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_id = ? and set_name = 'document' and set_data = ?", new_name, thread_bbs_id, old_name)
+	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_id = ? and set_name = 'tag' and set_data = ?", new_name, thread_bbs_id, old_name)
 }
 
 func move_topic_rotate(db *sql.DB, old_name string, new_name string) {
@@ -161,6 +162,7 @@ func move_topic_rotate(db *sql.DB, old_name string, new_name string) {
 	}
 	for _, pair := range pairs {
 		tool.Exec_DB(db, "update bbs_data set set_data = ? where set_id = ? and set_name = 'document' and set_data = ?", pair[1], thread_bbs_id, pair[0])
+		tool.Exec_DB(db, "update bbs_data set set_data = ? where set_id = ? and set_name = 'tag' and set_data = ?", pair[1], thread_bbs_id, pair[0])
 	}
 }
 
