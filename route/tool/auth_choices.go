@@ -117,6 +117,7 @@ func Auth_choices() []Auth_choice {
 		{2, "thread_comment_delete", "thread_comment_delete_authority"},
 		{2, "vote_manage", "vote_manage_authority"},
 		{2, "manager_view", "manager_view_authority"},
+		{2, "ai_use", "ai_use_authority"},
 		{3, "doc_watch_list_view", "doc_watch_list_view_authority"},
 		{3, "treat_as_admin", "treat_as_admin_authority"},
 		{3, "view_hide_user_name", "view_hide_user_name_authority"},

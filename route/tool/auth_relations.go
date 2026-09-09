@@ -42,7 +42,7 @@ func Auth_relations() []Auth_relation {
 	add("trust_a", "bbs_comment_limit_unlimited", Auth_relation_permission)
 	add("trust_b", "bbs_comment_limit_unlimited", Auth_relation_permission)
 
-	for _, permission := range []string{"toron", "check", "acl", "hidel", "give_range", "give", "bbs", "vote_fix"} {
+	for _, permission := range []string{"toron", "check", "acl", "hidel", "give_range", "give", "bbs", "vote_fix", "ai_use"} {
 		add("admin", permission, Auth_relation_permission)
 	}
 	for _, permission := range []string{"edit_filter_manage", "application_manage", "application_view"} {

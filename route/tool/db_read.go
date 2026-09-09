@@ -142,6 +142,17 @@ func Get_data_title(db *sql.DB, title string) (string, bool) {
 	return data, exists
 }
 
+func Get_data_content(db *sql.DB, title string) (string, bool) {
+	data := ""
+	exists := QueryRow_DB(
+		db,
+		"select data from data where title = ?",
+		[]any{&data},
+		title,
+	)
+	return data, exists
+}
+
 func Get_history_content(db *sql.DB, title string, revision string) (string, string, bool) {
 	data := ""
 	hide := ""

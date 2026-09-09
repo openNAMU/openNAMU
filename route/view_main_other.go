@@ -8,6 +8,11 @@ func View_main_other(config tool.Config) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	ai_link := ""
+	if tool.Check_permission(db, "ai_use", config.IP) {
+		ai_link = `<li><a href="/ai">` + tool.Get_language(db, "local_ai", true) + `</a></li>`
+	}
+
 	out := tool.Get_template(
 		db,
 		config,
@@ -59,7 +64,7 @@ func View_main_other(config tool.Config) string {
             <li><a href="/bbs/contributor">`+tool.Get_language(db, "monthly_bbs_contributor", true)+`</a></li>
         </ul>
         <h2>`+tool.Get_language(db, "other", true)+`</h2>
-        <ul>
+        <ul>`+ai_link+`
             <li><a href="/upload">`+tool.Get_language(db, "upload", true)+`</a></li>
             <li><a href="/manager/10">`+tool.Get_language(db, "search", true)+`</a></li>
         </ul>
