@@ -1392,6 +1392,7 @@ func (class *namumark_compat_renderer) process_math(data string) string {
 			return ""
 		}
 		expression = strings.TrimSpace(strings.ReplaceAll(expression, "\n", " "))
+		expression = class.middle_literal(expression)
 		expression = tool.HTML_unescape(expression)
 		return class.reserve(`<code class="opennamu_math" data-math="` + compat_html_escape(expression) + `">` + compat_html_escape(expression) + `</code>`)
 	}
