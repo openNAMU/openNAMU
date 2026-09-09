@@ -254,6 +254,7 @@ func emergency_migrate_topic_to_bbs(db *sql.DB) (return_err error) {
 			{"title", topic.sub},
 			{"data", ""},
 			{"date", topic.date},
+			{"last_activity", topic.date},
 			{"user_id", user_id},
 			{"comment_count", strconv.Itoa(len(topic.comments))},
 			{"document", topic.title},

@@ -121,6 +121,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 			comment_set_id,
 		)
 		tool.Search_bbs_index_update_comment(db, set_id, set_code, comment_code)
+		bbs_post_last_activity_update(db, set_id, set_code, tool.Get_time())
 
 		return_data["response"] = "ok"
 		return_data["data"] = set_code
@@ -169,6 +170,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 			{"title", title},
 			{"data", data},
 			{"date", date},
+			{"last_activity", date},
 			{"user_id", config.IP},
 			{"comment_count", "0"},
 		}
@@ -241,6 +243,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'title' and set_code = ? and set_id = ?", title, set_code, set_id)
 	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'data' and set_code = ? and set_id = ?", data, set_code, set_id)
 	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_code = ? and set_id = ?", date, set_code, set_id)
+	bbs_post_last_activity_update(db, set_id, set_code, date)
 	tool.Exec_DB(db, "delete from bbs_data where set_name = 'prefix' and set_code = ? and set_id = ?", set_code, set_id)
 	tool.Exec_DB(db, "delete from bbs_data where set_name = 'tag' and set_code = ? and set_id = ?", set_code, set_id)
 	if prefix != "" {

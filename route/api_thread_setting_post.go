@@ -38,7 +38,9 @@ func Api_thread_setting_post(config tool.Config, topic_num string, stop string, 
 	}
 
 	tool.Exec_DB(db, "delete from bbs_data where set_name in ('topic_agree', 'topic_stop', 'comment_close') and set_id = ? and set_code = ?", thread_bbs_id, topic_num)
-	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?", tool.Get_time(), thread_bbs_id, topic_num)
+	date := tool.Get_time()
+	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?", date, thread_bbs_id, topic_num)
+	bbs_post_last_activity_update(db, thread_bbs_id, topic_num, date)
 	tool.Search_bbs_index_update(db, thread_bbs_id, topic_num)
 
 	return map[string]any{"response": "ok"}

@@ -36,6 +36,7 @@ func Api_bbs_w_post(config tool.Config, set_id string, title string, data string
 		{"title", title},
 		{"data", data},
 		{"date", date_now},
+		{"last_activity", date_now},
 		{"user_id", config.IP},
 		{"comment_count", "0"},
 	}

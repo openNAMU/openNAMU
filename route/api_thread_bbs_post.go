@@ -132,6 +132,7 @@ func api_thread_bbs_post(config tool.Config, topic_num string, doc_name string, 
 			)
 		}
 		bbs_post_comment_count_update(db, thread_bbs_id, topic_num, 1)
+		bbs_post_last_activity_update(db, thread_bbs_id, topic_num, date)
 		tool.Exec_DB(
 			db,
 			"update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?",
@@ -190,6 +191,7 @@ func thread_bbs_insert_post(db *sql.DB, topic_num string, name string, sub strin
 		{"title", sub},
 		{"data", ""},
 		{"date", date},
+		{"last_activity", date},
 		{"user_id", user_id},
 		{"comment_count", "1"},
 		{"document", name},

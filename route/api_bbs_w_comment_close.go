@@ -44,6 +44,7 @@ func Api_bbs_w_comment_close(config tool.Config, set_id string, set_code string,
 			set_id,
 		)
 	}
+	bbs_post_last_activity_update(db, set_id, set_code, tool.Get_time())
 
 	return_data["response"] = "ok"
 	return return_data

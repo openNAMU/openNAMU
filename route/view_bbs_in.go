@@ -18,10 +18,13 @@ func View_bbs_in_filter(config tool.Config, set_id string, filter_data string) s
 	return view_bbs_in(config, set_id, page_num, "", filter, filter_path, true)
 }
 
-func View_bbs_in_filter_post(set_id string, comment_min string, tabom_min string, tag string) string {
+func View_bbs_in_filter_post(set_id string, comment_min string, tabom_min string, mine string, participate string, prefix string, tag string) string {
 	filter := bbs_filter{
 		comment_min: bbs_filter_number(comment_min),
 		tabom_min:   bbs_filter_number(tabom_min),
+		mine:        mine == "1",
+		participate: participate == "1",
+		prefix:      strings.TrimSpace(prefix),
 		tag:         strings.TrimSpace(tag),
 	}
 	filter_path := bbs_filter_path(filter)
@@ -57,9 +60,28 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 
 	data_html := ""
 	if show_filter {
+		mine_checked := ""
+		if filter.mine {
+			mine_checked = " checked"
+		}
+		participate_checked := ""
+		if filter.participate {
+			participate_checked = " checked"
+		}
+		prefix_html := `<label>` + tool.Get_language(db, "bbs_prefix", true) + ` <select name="prefix"><option value="">` + tool.Get_language(db, "all", true) + `</option>`
+		for _, prefix := range bbs_prefix_list(db, set_id) {
+			selected := ""
+			if prefix == filter.prefix {
+				selected = " selected"
+			}
+			prefix_html += `<option value="` + tool.HTML_escape(prefix) + `"` + selected + `>` + tool.HTML_escape(prefix) + `</option>`
+		}
+		prefix_html += `</select></label>`
 		data_html += `<form method="post" action="/bbs/in/` + tool.Url_parser(set_id) + `/filter">
         <label>` + tool.Get_language(db, "comment", true) + ` <input name="comment_min" value="` + strconv.Itoa(filter.comment_min) + `"></label>
         <label>` + tool.Get_language(db, "upvote", true) + ` <input name="tabom_min" value="` + strconv.Itoa(filter.tabom_min) + `"></label>
+        <label><input type="checkbox" name="mine" value="1"` + mine_checked + `>` + tool.Get_language(db, "my_bbs_post", true) + `</label>
+        <label><input type="checkbox" name="participate" value="1"` + participate_checked + `>` + tool.Get_language(db, "participate_bbs_post", true) + `</label>` + prefix_html + `
         <label>` + tool.Get_language(db, "tag", true) + ` <input name="tag" value="` + tool.HTML_escape(filter.tag) + `"></label>
         <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "filter", true) + `</button>
     </form><hr class="main_hr">`
@@ -72,6 +94,8 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 			page_path += filter_path + "/"
 		}
 		page_path += "{}"
+	} else if sort_type == "activity" {
+		page_path = "/bbs/in/" + tool.Url_parser(set_id) + "/activity/{}"
 	} else if sort_type == "view" {
 		page_path = "/bbs/in/" + tool.Url_parser(set_id) + "/view/{}"
 	} else if sort_type == "comment" {
@@ -108,8 +132,11 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 	}
 	menu = append(menu,
 		[]any{sort_path, sort_name},
+		[]any{"bbs/in/" + tool.Url_parser(set_id) + "/activity/1", tool.Get_language(db, "activity_sort", true)},
 		[]any{"bbs/in/" + tool.Url_parser(set_id) + "/comment/1", tool.Get_language(db, "comment_sort", true)},
 		[]any{"bbs/in/" + tool.Url_parser(set_id) + "/tabom/1", tool.Get_language(db, "upvote_sort", true)},
+		[]any{"bbs/in/" + tool.Url_parser(set_id) + "/filter/mine/1", tool.Get_language(db, "my_bbs_post", true)},
+		[]any{"bbs/in/" + tool.Url_parser(set_id) + "/filter/participate/1", tool.Get_language(db, "participate_bbs_post", true)},
 		[]any{filter_menu_path, tool.Get_language(db, "filter", true)},
 		[]any{"bbs/set/" + tool.Url_parser(set_id), tool.Get_language(db, "bbs_set", true)},
 	)

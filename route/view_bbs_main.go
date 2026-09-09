@@ -104,6 +104,9 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 		bbs_id := in_data["set_id"]
 		bbs_code := in_data["set_code"]
 		bbs_date := in_data["date"]
+		if in_data["activity_date"] != "" {
+			bbs_date = in_data["activity_date"]
+		}
 		bbs_user_id := in_data["user_id_render"]
 
 		bbs_comment_length := tool.Str_to_int(in_data["comment_count"])

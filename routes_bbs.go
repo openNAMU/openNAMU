@@ -117,6 +117,11 @@ func register_bbs_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.GET("/bbs/in/:set_id/activity/:page_num", func(c *gin.Context) {
+		route_data := route.View_bbs_in(make_route_config(c), c.Param("set_id"), c.Param("page_num"), "activity")
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/bbs/in/:set_id/comment/:page_num", func(c *gin.Context) {
 		route_data := route.View_bbs_in(make_route_config(c), c.Param("set_id"), c.Param("page_num"), "comment")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
@@ -137,6 +142,9 @@ func register_bbs_routes(r *gin.Engine) {
 			c.Param("set_id"),
 			c.PostForm("comment_min"),
 			c.PostForm("tabom_min"),
+			c.PostForm("mine"),
+			c.PostForm("participate"),
+			c.PostForm("prefix"),
 			c.PostForm("tag"),
 		)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))

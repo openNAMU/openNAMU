@@ -69,6 +69,7 @@ func Api_bbs_w_comment_one_delete(config tool.Config, set_id string, set_code st
 		comment_set_id,
 		comment_set_code,
 	)
+	bbs_post_last_activity_rebuild(db, set_id, post_code)
 	tool.Search_bbs_index_update_comment(db, set_id, post_code, set_code)
 
 	return_data["response"] = "ok"

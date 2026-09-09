@@ -35,6 +35,7 @@ func Api_bbs_w_comment_all_delete(config tool.Config, set_id string, set_code st
 		set_id,
 		set_code,
 	)
+	bbs_post_last_activity_rebuild(db, set_id, set_code)
 
 	return_data["response"] = "ok"
 	return return_data

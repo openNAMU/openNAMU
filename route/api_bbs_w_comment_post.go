@@ -164,6 +164,7 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 		)
 	}
 	bbs_post_comment_count_update(db, set_id, set_code, 1)
+	bbs_post_last_activity_update(db, set_id, set_code, date)
 	if set_id == thread_bbs_id {
 		tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?", tool.Get_time(), set_id, set_code)
 	}
