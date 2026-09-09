@@ -100,13 +100,77 @@ func normalize_thread_bbs_prefix(db *sql.DB) error {
 	return nil
 }
 
+func migrate_thread_bbs_document_tags(db *sql.DB) error {
+	rows, err := db.Query(
+		tool.DB_change("select set_code, set_data from bbs_data where set_id = ? and set_name = 'document' and set_data != ''"),
+		thread_bbs_set_id,
+	)
+	if err != nil {
+		return err
+	}
+
+	document_data := [][]string{}
+	for rows.Next() {
+		data := []string{"", ""}
+		if err := rows.Scan(&data[0], &data[1]); err != nil {
+			rows.Close()
+			return err
+		}
+		document_data = append(document_data, data)
+	}
+	if err := rows.Err(); err != nil {
+		rows.Close()
+		return err
+	}
+	rows.Close()
+
+	changed := false
+	for _, data := range document_data {
+		var tag_count int
+		if err := db.QueryRow(
+			tool.DB_change("select count(*) from bbs_data where set_id = ? and set_code = ? and set_name = 'tag' and set_data = ?"),
+			thread_bbs_set_id,
+			data[0],
+			data[1],
+		).Scan(&tag_count); err != nil {
+			return err
+		}
+		if tag_count > 0 {
+			continue
+		}
+
+		if _, err := db.Exec(
+			tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('tag', ?, ?, ?)"),
+			data[0],
+			thread_bbs_set_id,
+			data[1],
+		); err != nil {
+			return err
+		}
+		changed = true
+	}
+
+	if changed {
+		return tool.Search_bbs_index_mark_rebuild()
+	}
+	return nil
+}
+
 func Migrate_topic_to_bbs(previous_version string) error {
-	if previous_version == "" || previous_version >= "20260901" {
+	if previous_version == "" || previous_version >= "20260902" {
 		return nil
 	}
 
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	return emergency_migrate_topic_to_bbs(db)
+	if previous_version < "20260901" {
+		if err := emergency_migrate_topic_to_bbs(db); err != nil {
+			return err
+		}
+	}
+	if previous_version < "20260902" {
+		return migrate_thread_bbs_document_tags(db)
+	}
+	return nil
 }
