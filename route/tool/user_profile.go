@@ -57,7 +57,7 @@ func Get_user_profile_image_ui(db *sql.DB, user_name string) string {
 		revision = "1"
 	}
 
-	return `<img class="opennamu_user_profile_image" loading="lazy" width="32" height="32" style="width:32px;height:32px;object-fit:cover;vertical-align:middle;" src="/image/` + Url_parser(storage_name) + `.cache_v` + Url_parser(revision) + `" alt=""> `
+	return `<img class="opennamu_user_profile_image" loading="lazy" width="32" height="32" style="width:32px;height:32px;object-fit:cover;vertical-align:middle;" src="/thumbnail/64/` + Url_parser(storage_name) + `.cache_v` + Url_parser(revision) + `" alt=""> `
 }
 
 func profile_image_extension(extension string) bool {
