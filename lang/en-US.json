@@ -426,6 +426,7 @@
     "thread_bbs": "Discussion board",
     "bbs_prefix": "Post prefix",
     "bbs_placeholder": "Post input placeholder",
+    "bbs_comment_placeholder": "Comment input placeholder",
     "my_bbs_post": "My posts",
     "participate_bbs_post": "Participated posts",
     "my_tabom_bbs_post": "My upvoted posts",

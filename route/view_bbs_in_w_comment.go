@@ -30,6 +30,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	comment_manage := tool.Check_permission(db, "bbs_comment_manage", config.IP)
 	comment_closed := bbs_comment_closed(db, set_id, set_code)
 	can_comment := bbs_comment_acl && !comment_closed
+	bbs_comment_placeholder := bbs_set_value(db, set_id, "bbs_comment_placeholder")
 
 	select_html := `
         <select id="opennamu_comment_select" name="comment_select">
@@ -129,7 +130,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 		data_html += `
             <form method="post" action="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">
                 <div id="opennamu_bbs_w_post_select">` + select_html + `</div>
-                ` + tool.Get_editor_ui(db, config, "", "bbs_comment", "", "", "") + `
+                ` + tool.Get_editor_ui(db, config, "", "bbs_comment", "", "", bbs_comment_placeholder) + `
             </form>
         `
 	}

@@ -620,6 +620,7 @@
     "thread_bbs": "토론 게시판",
     "bbs_prefix": "말머리",
     "bbs_placeholder": "게시글 입력 안내 문구",
+    "bbs_comment_placeholder": "댓글 입력 안내 문구",
     "my_bbs_post": "내 게시글",
     "participate_bbs_post": "참여한 게시글",
     "my_tabom_bbs_post": "내 추천 게시글",
