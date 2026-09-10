@@ -388,7 +388,7 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 	rows_arr := []*sql.Rows{}
 	if bbs_num == "" {
 		view_sql, view_values := bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
-		query := "select set_code, set_id, '0' from bbs_data where set_name = 'date' and " + tool.Get_except_set_id_SQL()
+		query := "select set_code, set_id, '0' from bbs_data where set_name = 'date' and set_id not in ('0', '-1') and " + tool.Get_except_set_id_SQL()
 		if view_sql != "" {
 			query += " and " + view_sql
 		}
