@@ -2,9 +2,21 @@ package route
 
 import "opennamu/route/tool"
 
-func View_bbs_edit(config tool.Config, set_id string, set_code string, comment_code string) string {
+func View_bbs_edit(config tool.Config, set_id string, set_code string, comment_code string, document_data string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
+
+	document := ""
+	if document_data != "" {
+		decoded, err := tool.Get_base64_decode(document_data)
+		if err != nil || set_id != thread_bbs_id || set_code != "" || comment_code != "" {
+			return tool.Get_redirect("/bbs/main")
+		}
+		document = decoded
+		if !tool.Check_acl(db, document, "", "render", config.IP) {
+			return tool.Get_error_page(db, config, "auth")
+		}
+	}
 
 	api_data := Api_bbs_w_edit_view(config, set_id, set_code, comment_code)
 	response, _ := api_data["response"].(string)
@@ -22,7 +34,9 @@ func View_bbs_edit(config tool.Config, set_id string, set_code string, comment_c
 	}
 
 	path := "/bbs/edit/" + tool.Url_parser(set_id)
-	if set_code != "" {
+	if document != "" {
+		path += "/document/" + tool.Base64_encode(document)
+	} else if set_code != "" {
 		path += "/" + tool.Url_parser(set_code)
 	}
 	if comment_code != "" {
@@ -62,7 +76,12 @@ func View_bbs_edit(config tool.Config, set_id string, set_code string, comment_c
 		tag_html = `<input class="__ON_INPUT__" placeholder="` + tool.Get_language(db, "tag", true) + `" name="tags" value="` + tool.HTML_escape(data["tags"]) + `"><hr class="main_hr">`
 	}
 
-	data_html := `<a href="/filter/edit_filter">(` + tool.Get_language(db, "edit_filter_rule", true) + `)</a><hr class="main_hr">
+	document_html := ""
+	if document != "" {
+		document_html = `<div>` + tool.Get_language(db, "document", true) + `: ` + tool.HTML_escape(document) + `</div><hr class="main_hr">`
+	}
+
+	data_html := `<a href="/filter/edit_filter">(` + tool.Get_language(db, "edit_filter_rule", true) + `)</a><hr class="main_hr">` + document_html + `
         <form action="` + path + `" method="post">
             <input class="__ON_INPUT__"` + title_style + ` placeholder="` + tool.Get_language(db, "title", true) + `" name="title" value="` + tool.HTML_escape(data["title"]) + `">
             <hr` + title_style + ` class="main_hr">

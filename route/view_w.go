@@ -139,10 +139,6 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	document_top := tool.Get_document_setting_value_exact(db, doc_name, "document_top", "")
 	render_data = document_top + render_data
 
-	topic := 0
-	if thread_bbs_document_exists(db, doc_name) {
-		topic = 1
-	}
 	history_color := 0
 	if status == http.StatusNotFound {
 		if tool.Get_history_exists(db, doc_name) {
@@ -161,7 +157,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	watch_list := 0
 	menu := [][]any{
 		{"edit/" + tool.Url_parser(doc_name), tool.Get_language(db, "edit", true), menu_acl},
-		{"bbs/in/-1", tool.Get_language(db, "thread_bbs", true), topic},
+		{"topic/" + tool.Url_parser(doc_name), tool.Get_language(db, "thread_bbs", true), 1},
 		{"history/" + tool.Url_parser(doc_name), tool.Get_language(db, "history", true), history_color},
 		{"xref/" + tool.Url_parser(doc_name), tool.Get_language(db, "backlink", true)},
 		{"acl/" + tool.Url_parser(doc_name), tool.Get_language(db, "setting", true), acl_color},

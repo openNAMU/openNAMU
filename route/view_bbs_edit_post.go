@@ -2,14 +2,23 @@ package route
 
 import "opennamu/route/tool"
 
-func View_bbs_edit_post(config tool.Config, set_id string, set_code string, comment_code string, title string, data string, prefix string, tags string, captcha string) string {
+func View_bbs_edit_post(config tool.Config, set_id string, set_code string, comment_code string, title string, data string, prefix string, tags string, captcha string, document_data string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 	if !tool.Captcha_check(db, config.Session, config.IP, captcha) {
 		return tool.Get_error_page(db, config, "recaptcha")
 	}
 
-	api_data := Api_bbs_w_edit_post(config, set_id, set_code, comment_code, title, data, prefix, tags)
+	document := ""
+	if document_data != "" {
+		decoded, err := tool.Get_base64_decode(document_data)
+		if err != nil || set_id != thread_bbs_id || set_code != "" || comment_code != "" {
+			return tool.Get_redirect("/bbs/main")
+		}
+		document = decoded
+	}
+
+	api_data := Api_bbs_w_edit_post(config, set_id, set_code, comment_code, title, data, prefix, tags, document)
 	response, _ := api_data["response"].(string)
 
 	if response == "ok" {

@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, comment_code string, title string, data string, prefix string, tags string) map[string]any {
+func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, comment_code string, title string, data string, prefix string, tags string, document string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -35,6 +35,19 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 		return_data["data"] = "bbs"
 
 		return return_data
+	}
+	if document != "" {
+		if set_id != thread_bbs_id || set_code != "" || comment_code != "" {
+			return_data["response"] = "not exist"
+			return_data["data"] = "bbs"
+
+			return return_data
+		}
+		if !tool.Check_acl(db, document, "", "render", config.IP) {
+			return_data["response"] = "require auth"
+
+			return return_data
+		}
 	}
 
 	data = strings.ReplaceAll(data, "\r", "")
@@ -147,6 +160,15 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 		return return_data
 	}
 	tag_list := bbs_tag_list(tags)
+	if document != "" && !tool.Arr_in_str(tag_list, document) {
+		if tool.Get_len(document) > bbs_tag_max_length {
+			return_data["response"] = "error"
+			return_data["data"] = "bbs tag length"
+
+			return return_data
+		}
+		tag_list = append(tag_list, document)
+	}
 
 	if set_code == "" {
 		if !tool.Check_daily_limit(db, config.IP, "bbs_edit") {
@@ -173,6 +195,9 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 			{"last_activity", date},
 			{"user_id", config.IP},
 			{"comment_count", "0"},
+		}
+		if document != "" {
+			insert_db = append(insert_db, []string{"document", document})
 		}
 		if prefix != "" {
 			insert_db = append(insert_db, []string{"prefix", prefix})

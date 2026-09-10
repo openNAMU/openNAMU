@@ -38,7 +38,7 @@ func register_bbs_routes(r *gin.Engine) {
 	})
 
 	r.GET("/bbs/edit/:set_id", func(c *gin.Context) {
-		route_data := route.View_bbs_edit(make_route_config(c), c.Param("set_id"), "", "")
+		route_data := route.View_bbs_edit(make_route_config(c), c.Param("set_id"), "", "", "")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
@@ -53,12 +53,34 @@ func register_bbs_routes(r *gin.Engine) {
 			c.PostForm("prefix"),
 			c.PostForm("tags"),
 			captcha_response(c),
+			"",
+		)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/bbs/edit/:set_id/document/:document", func(c *gin.Context) {
+		route_data := route.View_bbs_edit(make_route_config(c), c.Param("set_id"), "", "", c.Param("document"))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.POST("/bbs/edit/:set_id/document/:document", func(c *gin.Context) {
+		route_data := route.View_bbs_edit_post(
+			make_route_config(c),
+			c.Param("set_id"),
+			"",
+			"",
+			c.PostForm("title"),
+			c.PostForm("content"),
+			c.PostForm("prefix"),
+			c.PostForm("tags"),
+			captcha_response(c),
+			c.Param("document"),
 		)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
 	r.GET("/bbs/edit/:set_id/:set_code", func(c *gin.Context) {
-		route_data := route.View_bbs_edit(make_route_config(c), c.Param("set_id"), c.Param("set_code"), "")
+		route_data := route.View_bbs_edit(make_route_config(c), c.Param("set_id"), c.Param("set_code"), "", "")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
@@ -73,6 +95,7 @@ func register_bbs_routes(r *gin.Engine) {
 			c.PostForm("prefix"),
 			c.PostForm("tags"),
 			captcha_response(c),
+			"",
 		)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
@@ -83,6 +106,7 @@ func register_bbs_routes(r *gin.Engine) {
 			c.Param("set_id"),
 			c.Param("set_code"),
 			c.Param("comment_code"),
+			"",
 		)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
@@ -98,6 +122,7 @@ func register_bbs_routes(r *gin.Engine) {
 			"",
 			"",
 			captcha_response(c),
+			"",
 		)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})

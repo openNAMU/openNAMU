@@ -157,7 +157,11 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 		{"bbs/search/" + tool.Url_parser(set_id), tool.Get_language(db, "search", true)},
 	}
 	if set_id != "0" {
-		menu = append(menu, []any{"bbs/edit/" + tool.Url_parser(set_id), tool.Get_language(db, "add", true)})
+		add_path := "bbs/edit/" + tool.Url_parser(set_id)
+		if set_id == thread_bbs_id && filter.tag != "" {
+			add_path += "/document/" + tool.Base64_encode(filter.tag)
+		}
+		menu = append(menu, []any{add_path, tool.Get_language(db, "add", true)})
 	}
 	menu = append(menu,
 		[]any{sort_path, sort_name},
