@@ -266,6 +266,16 @@ func register_bbs_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.GET("/bbs/pinned/:set_id/:set_code/:comment_code", func(c *gin.Context) {
+		route_data := route.View_bbs_comment_pinned(make_route_config(c), c.Param("set_id"), c.Param("set_code"), c.Param("comment_code"))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.POST("/bbs/pinned/:set_id/:set_code/:comment_code", func(c *gin.Context) {
+		route_data := route.View_bbs_comment_pinned_post(make_route_config(c), c.Param("set_id"), c.Param("set_code"), c.Param("comment_code"))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/bbs/raw/:set_id/:set_code", func(c *gin.Context) {
 		route_data := route.View_bbs_raw(make_route_config(c), c.Param("set_id"), c.Param("set_code"), "")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))

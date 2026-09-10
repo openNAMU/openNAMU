@@ -15,10 +15,19 @@ func View_bbs_in_w_comment_tool(config tool.Config, set_id string, set_code stri
     `
 
 	if tool.Check_permission(db, "bbs_comment_manage", config.IP) {
+		comment_pinned_name := "pinned"
+		comment_set_id, comment_set_code, exists := bbs_search_comment_location(set_id, set_code, comment_id)
+		if exists {
+			if _, pinned := tool.Get_bbs_data_value(db, comment_set_id, comment_set_code, "pinned"); pinned {
+				comment_pinned_name = "pinned_release"
+			}
+		}
+
 		data_html += `
             <h3>` + tool.Get_language(db, "owner", true) + `</h3>
             <ul>
                 <li><a href="/bbs/delete/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/` + tool.Url_parser(comment_id) + `">` + tool.Get_language(db, "delete", true) + `</a></li>
+                <li><a href="/bbs/pinned/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/` + tool.Url_parser(comment_id) + `">` + tool.Get_language(db, comment_pinned_name, true) + `</a></li>
             </ul>
         `
 	}

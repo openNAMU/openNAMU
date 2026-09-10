@@ -701,6 +701,7 @@
     "load_temp_save_load": "임시 저장 불러오기",
     "bbs_comment_delete": "게시판 댓글 삭제",
     "bbs_post_pinned": "게시판 게시글 고정",
+    "bbs_comment_pinned": "게시판 댓글 고정",
     "bbs_post_delete": "게시판 게시글 삭제",
     "outer_link_filter_list": "외부 링크 자동 이미지 목록",
     "external_image_filter_list": "외부 이미지 허용 도메인 목록",

@@ -11,6 +11,22 @@ import (
 func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_code string, selected_comment string, page int) string {
 	data_api := Api_bbs_w_comment(config, "around", set_id+"-"+set_code)
 	data_api_in := data_api["data"].([]map[string]string)
+	post_user, _ := tool.Get_bbs_data_value(db, set_id, set_code, "user_id")
+	if post_user != "" {
+		post_user = tool.IP_preprocess(db, post_user, config.IP)[0]
+	}
+	all_data_api_in := data_api_in
+	comment_prefix := set_id + "-" + set_code + "-"
+	pinned_data_api_in := []map[string]string{}
+	for _, v := range all_data_api_in {
+		if v["pinned"] == "" || (v["comment"] == "" && v["blind"] != "O") {
+			continue
+		}
+		code_id := strings.TrimPrefix(v["id"]+"-"+v["code"], comment_prefix)
+		if bbs_comment_code_regex.MatchString(code_id) {
+			pinned_data_api_in = append(pinned_data_api_in, v)
+		}
+	}
 	if page < 1 {
 		page = 1
 	}
@@ -64,59 +80,33 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 		data_html += `<span>` + tool.Get_language(db, "comment_closed", true) + `</span><hr>`
 	}
 
-	comment_prefix := set_id + "-" + set_code + "-"
 	comment_path := "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "/comment/"
 	if page > 1 {
 		comment_path = "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "/page/" + strconv.Itoa(page) + "/comment/"
 	}
 
-	for _, v := range data_api_in {
-		comment_data := v["comment"]
-		if v["blind"] == "O" && !comment_manage {
-			comment_data = ""
+	if page == 1 && len(pinned_data_api_in) > 0 {
+		for _, v := range pinned_data_api_in {
+			comment_html, _, exists := get_bbs_comment_ui(db, config, post_user, set_id, set_code, comment_prefix, comment_path, v, comment_manage, true)
+			if exists {
+				data_html += comment_html
+			}
 		}
-		if comment_data == "" && v["blind"] != "O" {
+		data_html += `<hr class="main_hr">`
+	}
+
+	for _, v := range data_api_in {
+		comment_html, code_id, exists := get_bbs_comment_ui(db, config, post_user, set_id, set_code, comment_prefix, comment_path, v, comment_manage, false)
+		if !exists {
 			continue
 		}
-
-		code_id := strings.TrimPrefix(v["id"]+"-"+v["code"], comment_prefix)
-
-		count := strings.Count(code_id, "-")
 
 		selected := ""
 		if selected_comment == code_id {
 			selected = ` selected`
 		}
 		select_html += `<option value="` + tool.HTML_escape(code_id) + `"` + selected + `>` + tool.HTML_escape(code_id) + `</option>`
-
-		color := "default"
-		date := ""
-		if v["code"] == "1" {
-			color = "red"
-		} else if v["comment_user_id"] == config.IP {
-			color = "green"
-		}
-
-		date += `<a href="` + comment_path + tool.Url_parser(code_id) + `#opennamu_comment_select">(` + tool.Get_language(db, "comment", true) + `)</a> `
-		date += `<a href="/bbs/tool/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/` + tool.Url_parser(code_id) + `">(` + tool.Get_language(db, "tool", true) + `)</a> `
-		date += v["comment_date"]
-
-		padding_str := strconv.Itoa(20 * count)
-
-		data_html += `<span style="padding-left: ` + padding_str + `px;"></span>`
-		rendered_data := Get_bbs_render(db, set_id, comment_data, "thread", config)
-		rendered_data = render_topic_reference(rendered_data, set_code, set_id, set_code, "bbs")
-		data_html += get_thread_ui_with_render(
-			db,
-			v["comment_user_id_render"],
-			date,
-			rendered_data,
-			code_id,
-			color,
-			"",
-			`width: calc(100% - `+padding_str+`px);`,
-			set_code,
-		)
+		data_html += comment_html
 	}
 
 	return_anchor := "opennamu_comment_select"
@@ -137,4 +127,65 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 
 	data_html += tool.Get_page_control(db, page, page_count, 50, "/bbs/w/"+tool.Url_parser(set_id)+"/"+tool.Url_parser(set_code)+"/page/{}")
 	return data_html
+}
+func get_bbs_comment_ui(db *sql.DB, config tool.Config, post_user string, set_id string, set_code string, comment_prefix string, comment_path string, v map[string]string, comment_manage bool, copy_comment bool) (string, string, bool) {
+	comment_data := v["comment"]
+	if v["blind"] == "O" && !comment_manage {
+		comment_data = ""
+	}
+	if comment_data == "" && v["blind"] != "O" {
+		return "", "", false
+	}
+
+	code_id := strings.TrimPrefix(v["id"]+"-"+v["code"], comment_prefix)
+	if !bbs_comment_code_regex.MatchString(code_id) {
+		return "", "", false
+	}
+
+	color := "default"
+	if v["pinned"] != "" {
+		color = "red"
+	} else if post_user != "" && v["comment_user_id"] == post_user {
+		color = "blue"
+	} else if v["comment_user_id"] == config.IP {
+		color = "green"
+	}
+
+	date := `<a href="` + comment_path + tool.Url_parser(code_id) + `#opennamu_comment_select">(` + tool.Get_language(db, "comment", true) + `)</a> `
+	date += `<a href="/bbs/tool/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/` + tool.Url_parser(code_id) + `">(` + tool.Get_language(db, "tool", true) + `)</a> `
+	date += v["comment_date"]
+
+	padding_str := "0"
+	if !copy_comment {
+		padding_str = strconv.Itoa(20 * strings.Count(code_id, "-"))
+	}
+
+	rendered_data := Get_bbs_render(db, set_id, comment_data, "thread", config)
+	rendered_data = render_topic_reference(rendered_data, set_code, set_id, set_code, "bbs")
+	comment_ui := get_thread_ui_with_render(
+		db,
+		v["comment_user_id_render"],
+		date,
+		rendered_data,
+		code_id,
+		color,
+		"",
+		`width: calc(100% - `+padding_str+`px);`,
+		set_code,
+	)
+	if copy_comment {
+		comment_ui = get_thread_ui_with_render_copy(
+			db,
+			v["comment_user_id_render"],
+			date,
+			rendered_data,
+			code_id,
+			color,
+			"",
+			`width: calc(100% - `+padding_str+`px);`,
+			set_code,
+		)
+	}
+
+	return `<span style="padding-left: ` + padding_str + `px;"></span>` + comment_ui, code_id, true
 }

@@ -62,6 +62,12 @@ func Api_bbs_w_comment_one_delete(config tool.Config, set_id string, set_code st
 	if comment != "" {
 		bbs_post_comment_count_update(db, set_id, post_code, -1)
 	}
+	tool.Exec_DB(
+		db,
+		"delete from bbs_data where set_name = 'pinned' and set_id = ? and set_code = ?",
+		comment_set_id,
+		comment_set_code,
+	)
 
 	tool.Exec_DB(
 		db,

@@ -23,6 +23,14 @@ func get_thread_ui(db *sql.DB, user_name string, date string, data string, code 
 }
 
 func get_thread_ui_with_render(db *sql.DB, user_name string, date string, rendered_data string, code string, color string, blind string, add_style string, topic_num string) string {
+	return get_thread_ui_with_render_code(db, user_name, date, rendered_data, code, code, color, blind, add_style, topic_num)
+}
+
+func get_thread_ui_with_render_copy(db *sql.DB, user_name string, date string, rendered_data string, code string, color string, blind string, add_style string, topic_num string) string {
+	return get_thread_ui_with_render_code(db, user_name, date, rendered_data, "pinned-"+code, code, color, blind, add_style, topic_num)
+}
+
+func get_thread_ui_with_render_code(db *sql.DB, user_name string, date string, rendered_data string, code string, display_code string, color string, blind string, add_style string, topic_num string) string {
 	color_b := ""
 	class_b := ""
 
@@ -43,7 +51,7 @@ func get_thread_ui_with_render(db *sql.DB, user_name string, date string, render
             <table class="opennamu_comment" style="` + add_style + `">
                 <tr>
                     <td class="opennamu_comment_color_` + color + `">
-                        <a href="#thread_shortcut" id="` + code + `">#` + code + `</a>
+                        <a href="#thread_shortcut" id="` + code + `">#` + display_code + `</a>
                         ` + user_name + `
                         <span style="float: right;">` + date + `</span>
                     </td>

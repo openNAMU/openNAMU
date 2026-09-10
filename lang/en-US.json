@@ -410,6 +410,7 @@
     "load_temp_save_load": "Load temporary save",
     "bbs_comment_delete": "Delete BBS comment",
     "bbs_post_pinned": "Pin BBS post",
+    "bbs_comment_pinned": "Pin BBS comment",
     "bbs_post_delete": "Delete BBS post",
     "outer_link_filter_list": "External link auto image list",
     "external_image_filter_list": "Allowed external image domain(s)",
