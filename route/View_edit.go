@@ -48,7 +48,7 @@ func view_edit_page(db *sql.DB, config tool.Config, doc_name string, load_doc_na
 	}
 
 	revision := tool.Get_document_revision(db, doc_name)
-	editor_data := tool.Get_editor_ui(db, config, raw_data_get, "edit", check_box+bottom_text, doc_name)
+	editor_data := tool.Get_editor_ui(db, config, raw_data_get, "edit", check_box+bottom_text, doc_name, "")
 	if preview_name != "" {
 		editor_data += `<hr class="main_hr"><h2>` + tool.Get_language(db, "preview", true) + ` (` + preview_name + `)</h2>` + preview_data
 	}

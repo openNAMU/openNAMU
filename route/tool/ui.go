@@ -486,7 +486,7 @@ func Get_page_control(db *sql.DB, page int, count int, max_count int, url string
 	return data_html
 }
 
-func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_on string, doc_name string) string {
+func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_on string, doc_name string, help_override string) string {
 	monaco_editor_top := ""
 	help_text := ""
 	document_top := ""
@@ -523,6 +523,10 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
 			`select data from other where name = "topic_text"`,
 			[]any{&help_text},
 		)
+	}
+
+	if help_override != "" {
+		help_text = help_override
 	}
 
 	if help_text == "" {

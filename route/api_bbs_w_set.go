@@ -16,6 +16,7 @@ func BBS_w_set_list() map[string]string {
 	setting_acl["bbs_markup"] = ""
 	setting_acl["bbs_name"] = ""
 	setting_acl["bbs_prefix"] = ""
+	setting_acl["bbs_placeholder"] = ""
 
 	return setting_acl
 }

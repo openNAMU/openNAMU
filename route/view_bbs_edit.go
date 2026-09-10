@@ -33,6 +33,12 @@ func View_bbs_edit(config tool.Config, set_id string, set_code string, comment_c
 		return tool.Get_redirect("/bbs/main")
 	}
 
+	bbs_placeholder := bbs_set_value(db, set_id, "bbs_placeholder")
+	editor_help := ""
+	if comment_code == "" {
+		editor_help = bbs_placeholder
+	}
+
 	path := "/bbs/edit/" + tool.Url_parser(set_id)
 	if document != "" {
 		path += "/document/" + tool.Base64_encode(document)
@@ -85,7 +91,7 @@ func View_bbs_edit(config tool.Config, set_id string, set_code string, comment_c
         <form action="` + path + `" method="post">
             <input class="__ON_INPUT__"` + title_style + ` placeholder="` + tool.Get_language(db, "title", true) + `" name="title" value="` + tool.HTML_escape(data["title"]) + `">
             <hr` + title_style + ` class="main_hr">
-            ` + prefix_html + tag_html + tool.Get_editor_ui(db, config, data["data"], "bbs", "", "") + `
+            ` + prefix_html + tag_html + tool.Get_editor_ui(db, config, data["data"], "bbs", "", "", editor_help) + `
         </form>`
 
 	return tool.Get_template(

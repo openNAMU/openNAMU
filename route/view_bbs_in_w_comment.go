@@ -129,7 +129,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 		data_html += `
             <form method="post" action="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">
                 <div id="opennamu_bbs_w_post_select">` + select_html + `</div>
-                ` + tool.Get_editor_ui(db, config, "", "bbs_comment", "", "") + `
+                ` + tool.Get_editor_ui(db, config, "", "bbs_comment", "", "", "") + `
             </form>
         `
 	}
