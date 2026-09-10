@@ -77,16 +77,18 @@ func bbs_post_view_sql(db *sql.DB, set_id string, ip string, row_alias string) (
 }
 
 type bbs_filter struct {
-	comment_min    int
-	commented      int
-	tabom_min      int
-	mine           bool
-	participate    bool
-	tabom_user     bool
-	author         string
-	author_invalid bool
-	prefix         string
-	tag            string
+	comment_min          int
+	commented            int
+	tabom_min            int
+	mine                 bool
+	participate          bool
+	comment_user         string
+	comment_user_invalid bool
+	tabom_user           bool
+	author               string
+	author_invalid       bool
+	prefix               string
+	tag                  string
 }
 
 func bbs_filter_number(data string) int {
@@ -125,6 +127,13 @@ func bbs_filter_parse(data string) bbs_filter {
 			filter.mine = parts[i+1] == "1"
 		case "participate":
 			filter.participate = parts[i+1] == "1"
+		case "comment_user":
+			decoded, err := tool.Get_base64_decode(parts[i+1])
+			if err == nil {
+				filter.comment_user = decoded
+			} else {
+				filter.comment_user_invalid = true
+			}
 		case "tabom_user":
 			filter.tabom_user = parts[i+1] == "1"
 		case "user":
@@ -152,6 +161,9 @@ func bbs_filter_path(filter bbs_filter) string {
 		path = append(path, "commented", "1")
 	} else if filter.commented == 2 {
 		path = append(path, "commented", "0")
+	}
+	if filter.comment_user != "" {
+		path = append(path, "comment_user", tool.Base64_encode(filter.comment_user))
 	}
 	if filter.tabom_min > 0 {
 		path = append(path, "tabom", strconv.Itoa(filter.tabom_min))
@@ -323,12 +335,18 @@ func bbs_filter_sql(filter bbs_filter, row_alias string, user_id string) (string
 		filter_sql += " and (exists (select 1 from bbs_data author_data where author_data.set_name = 'user_id' and author_data.set_id = " + row_alias + ".set_id and author_data.set_code = " + row_alias + ".set_code and author_data.set_data = ?) or exists (select 1 from bbs_data comment_user_data where comment_user_data.set_name = 'comment_user_id' and comment_user_data.set_data = ? and (comment_user_data.set_id = " + comment_set_id + " or comment_user_data.set_id like " + comment_set_id_nested + ")))"
 		filter_values = append(filter_values, user_id, user_id)
 	}
+	if filter.comment_user_invalid || filter.author_invalid {
+		filter_sql += " and 1 = 0"
+	}
+	if filter.comment_user != "" {
+		comment_set_id := bbs_comment_set_id_sql(row_alias, "")
+		comment_set_id_nested := bbs_comment_set_id_sql(row_alias, "-%")
+		filter_sql += " and exists (select 1 from bbs_data comment_user_data where comment_user_data.set_name = 'comment_user_id' and comment_user_data.set_data = ? and (comment_user_data.set_id = " + comment_set_id + " or comment_user_data.set_id like " + comment_set_id_nested + "))"
+		filter_values = append(filter_values, filter.comment_user)
+	}
 	if filter.tabom_user {
 		filter_sql += " and exists (select 1 from bbs_data tabom_user_data where tabom_user_data.set_name = 'tabom_list' and tabom_user_data.set_id = " + row_alias + ".set_id and tabom_user_data.set_code = " + row_alias + ".set_code and tabom_user_data.set_data = ?)"
 		filter_values = append(filter_values, user_id)
-	}
-	if filter.author_invalid {
-		filter_sql += " and 1 = 0"
 	}
 	if filter.author != "" {
 		filter_sql += " and exists (select 1 from bbs_data author_data where author_data.set_name = 'user_id' and author_data.set_id = " + row_alias + ".set_id and author_data.set_code = " + row_alias + ".set_code and author_data.set_data = ?)"

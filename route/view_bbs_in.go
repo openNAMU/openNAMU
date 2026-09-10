@@ -18,7 +18,7 @@ func View_bbs_in_filter(config tool.Config, set_id string, filter_data string) s
 	return view_bbs_in(config, set_id, page_num, "", filter, filter_path, true)
 }
 
-func View_bbs_in_filter_post(set_id string, comment_min string, commented string, tabom_min string, mine string, participate string, tabom_user string, author string, prefix string, tag string) string {
+func View_bbs_in_filter_post(set_id string, comment_min string, commented string, comment_user string, tabom_min string, mine string, participate string, tabom_user string, author string, prefix string, tag string) string {
 	commented_state := 0
 	if commented == "1" {
 		commented_state = 1
@@ -26,15 +26,16 @@ func View_bbs_in_filter_post(set_id string, comment_min string, commented string
 		commented_state = 2
 	}
 	filter := bbs_filter{
-		comment_min: bbs_filter_number(comment_min),
-		commented:   commented_state,
-		tabom_min:   bbs_filter_number(tabom_min),
-		mine:        mine == "1",
-		participate: participate == "1",
-		tabom_user:  tabom_user == "1",
-		author:      strings.TrimSpace(author),
-		prefix:      strings.TrimSpace(prefix),
-		tag:         strings.TrimSpace(tag),
+		comment_min:  bbs_filter_number(comment_min),
+		commented:    commented_state,
+		comment_user: strings.TrimSpace(comment_user),
+		tabom_min:    bbs_filter_number(tabom_min),
+		mine:         mine == "1",
+		participate:  participate == "1",
+		tabom_user:   tabom_user == "1",
+		author:       strings.TrimSpace(author),
+		prefix:       strings.TrimSpace(prefix),
+		tag:          strings.TrimSpace(tag),
 	}
 	filter_path := bbs_filter_path(filter)
 	target := "/bbs/in/" + tool.Url_parser(set_id) + "/filter/"
@@ -108,6 +109,7 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
         <label><input type="checkbox" name="mine" value="1"` + mine_checked + `>` + tool.Get_language(db, "my_bbs_post", true) + `</label>
         <label><input type="checkbox" name="participate" value="1"` + participate_checked + `>` + tool.Get_language(db, "participate_bbs_post", true) + `</label>
         <label><input type="checkbox" name="tabom_user" value="1"` + tabom_user_checked + `>` + tool.Get_language(db, "my_tabom_bbs_post", true) + `</label>
+        <label>` + tool.Get_language(db, "bbs_comment_author", true) + ` <input name="comment_user" value="` + tool.HTML_escape(filter.comment_user) + `"></label>
         <label>` + tool.Get_language(db, "bbs_author", true) + ` <input name="author" value="` + tool.HTML_escape(filter.author) + `"></label>` + prefix_html + `
         <label>` + tool.Get_language(db, "tag", true) + ` <input name="tag" value="` + tool.HTML_escape(filter.tag) + `"></label>
         <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "filter", true) + `</button>

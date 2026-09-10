@@ -142,6 +142,7 @@ func register_bbs_routes(r *gin.Engine) {
 			c.Param("set_id"),
 			c.PostForm("comment_min"),
 			c.PostForm("commented"),
+			c.PostForm("comment_user"),
 			c.PostForm("tabom_min"),
 			c.PostForm("mine"),
 			c.PostForm("participate"),
