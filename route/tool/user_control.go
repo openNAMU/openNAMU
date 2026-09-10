@@ -269,7 +269,7 @@ func IP_parser(db *sql.DB, ip string, my_ip string) string {
 	}
 
 	if ip_pre_data[1] != "" {
-		return ip_pre_data[0]
+		return HTML_escape(ip_pre_data[0])
 	} else {
 		raw_ip := ip
 		ip = HTML_escape(ip_pre_data[0])

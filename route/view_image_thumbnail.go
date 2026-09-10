@@ -19,7 +19,7 @@ import (
 )
 
 const thumbnail_max_size = 1024
-const thumbnail_max_pixels = int64(100000000)
+const thumbnail_max_pixels = int64(25_000_000)
 
 func View_image_thumbnail(c *gin.Context) {
 	db := tool.DB_connect()

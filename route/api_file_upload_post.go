@@ -12,7 +12,11 @@ import (
 )
 
 func Api_file_upload_post(config tool.Config, file_name string, file_data string, file_ext string) map[string]any {
-	return api_file_upload_post(config, file_name, file_data, file_ext, "direct_input", "", "", false, false, false)
+	decoded, err := tool.Get_base64_decode(strings.TrimSpace(file_data))
+	if err != nil || len(decoded) == 0 {
+		return map[string]any{"response": "error", "data": "invalid data"}
+	}
+	return api_file_upload_post(config, file_name, []byte(decoded), file_ext, "direct_input", "", "", false, false, false)
 }
 
 func api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string, ip string) bool {
@@ -30,18 +34,17 @@ func api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string,
 	return true
 }
 
-func api_file_upload_post(config tool.Config, file_name string, file_data string, file_ext string, license string, license_text string, captcha string, check_captcha bool, many_upload bool, replace bool) map[string]any {
+func api_file_upload_post(config tool.Config, file_name string, file_data []byte, file_ext string, license string, license_text string, captcha string, check_captcha bool, many_upload bool, replace bool) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
 	file_name = strings.TrimSpace(file_name)
-	file_data = strings.TrimSpace(file_data)
 	file_ext = strings.TrimPrefix(strings.ToLower(strings.TrimSpace(file_ext)), ".")
 
 	allowed_ext := tool.Get_ext_allow_list(db)
 	return_value := make(map[string]any)
 
-	if file_data == "" || file_name == "" || file_ext == "" {
+	if len(file_data) == 0 || file_name == "" || file_ext == "" {
 		return_value["response"] = "error"
 		return_value["data"] = "invalid data"
 		return return_value
@@ -66,13 +69,6 @@ func api_file_upload_post(config tool.Config, file_name string, file_data string
 		return return_value
 	}
 
-	decoded, err := tool.Get_base64_decode(file_data)
-	if err != nil || len(decoded) == 0 {
-		return_value["response"] = "error"
-		return_value["data"] = "invalid data"
-		return return_value
-	}
-
 	file_max_size := tool.Get_file_max_size_by_extension(db, file_ext)
 	if file_max_size <= 0 {
 		file_max_size = tool.Get_file_max_size(db)
@@ -80,7 +76,7 @@ func api_file_upload_post(config tool.Config, file_name string, file_data string
 	if file_max_size <= 0 {
 		file_max_size = 2
 	}
-	if len(decoded) > file_max_size*1000*1000 {
+	if len(file_data) > file_max_size*1000*1000 {
 		return_value["response"] = "error"
 		return_value["data"] = "file too large"
 		return return_value
@@ -127,7 +123,7 @@ func api_file_upload_post(config tool.Config, file_name string, file_data string
 		return return_value
 	}
 
-	if _, err := out.Write([]byte(decoded)); err != nil {
+	if _, err := out.Write(file_data); err != nil {
 		_ = out.Close()
 		_ = os.Remove(dst_path)
 		return_value["response"] = "error"

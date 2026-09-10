@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/base64"
 	"io"
 	"net/http"
 	"path/filepath"
@@ -47,7 +46,7 @@ func upload_post(c *gin.Context) {
 	license_text := c.PostForm("f_lice")
 	replace := c.PostForm("f_replace")
 	captcha := captcha_response(c)
-	upload_files := []map[string]string{}
+	upload_files := []route.Upload_file_data{}
 
 	count := 1
 	for _, fh := range files {
@@ -79,14 +78,14 @@ func upload_post(c *gin.Context) {
 		name = strings.TrimSpace(name)
 		ext = strings.TrimSpace(ext)
 
-		upload_files = append(upload_files, map[string]string{
-			"file_name":    name,
-			"file_ext":     ext,
-			"file_data":    base64.StdEncoding.EncodeToString(b),
-			"license":      license,
-			"license_text": license_text,
-			"replace":      replace,
-			"captcha":      captcha,
+		upload_files = append(upload_files, route.Upload_file_data{
+			File_name:    name,
+			File_data:    b,
+			File_ext:     ext,
+			License:      license,
+			License_text: license_text,
+			Replace:      replace,
+			Captcha:      captcha,
 		})
 		count += 1
 	}
