@@ -27,6 +27,9 @@ func api_list_recent_discuss_bbs(config tool.Config, limit string, num string, s
 	case "open":
 		condition = " and coalesce((select set_data from bbs_data prefix_data where prefix_data.set_name = 'prefix' and prefix_data.set_id = document_data.set_id and prefix_data.set_code = document_data.set_code limit 1), '') != '닫힘'"
 	}
+	if !tool.Check_permission(db, "bbs_post_manage", config.IP) {
+		condition += " and not exists (select 1 from bbs_data blind_data where blind_data.set_name = 'blind' and blind_data.set_data = 'O' and blind_data.set_id = document_data.set_id and blind_data.set_code = document_data.set_code)"
+	}
 
 	rows := tool.Query_DB(
 		db,

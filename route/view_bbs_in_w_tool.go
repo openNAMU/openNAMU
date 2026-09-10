@@ -25,6 +25,13 @@ func View_bbs_in_w_tool(config tool.Config, set_id string, set_code string) stri
 	if tool.Check_permission(db, "bbs_pin", config.IP) {
 		data_html += `<h3>` + tool.Get_language(db, "admin", true) + `</h3><ul><li><a href="/bbs/pinned/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">` + tool.Get_language(db, pinned_name, true) + `</a></li></ul>`
 	}
+	if tool.Check_permission(db, "bbs_post_manage", config.IP) {
+		blind_name := "blind_post"
+		if bbs_post_blind(db, set_id, set_code) {
+			blind_name = "blind_post_release"
+		}
+		data_html += `<h3>` + tool.Get_language(db, "admin", true) + `</h3><ul><li><a href="/bbs/blind/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">` + tool.Get_language(db, blind_name, true) + `</a></li></ul>`
+	}
 	if tool.Check_permission(db, "bbs_delete", config.IP) {
 		data_html += `<h3>` + tool.Get_language(db, "owner", true) + `</h3><ul><li><a href="/bbs/delete/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">` + tool.Get_language(db, "delete", true) + `</a></li></ul>`
 	}

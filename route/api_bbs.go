@@ -8,7 +8,30 @@ import (
 	"opennamu/route/tool"
 )
 
+func bbs_post_blind(db *sql.DB, set_id string, set_code string) bool {
+	blind, exists := tool.Get_bbs_data_value(db, set_id, set_code, "blind")
+	return exists && blind == "O"
+}
+
+func bbs_post_blind_allowed(db *sql.DB, set_id string, set_code string, ip string, auth_info map[string]bool) bool {
+	if !bbs_post_blind(db, set_id, set_code) {
+		return true
+	}
+	if auth_info == nil {
+		auth_info = tool.Get_auth_info(db, ip)
+	}
+	return auth_info["bbs_post_manage"]
+}
+
+func bbs_post_blind_sql(row_alias string) string {
+	return "not exists (select 1 from bbs_data blind_data where blind_data.set_name = 'blind' and blind_data.set_data = 'O' and blind_data.set_id = " + row_alias + ".set_id and blind_data.set_code = " + row_alias + ".set_code)"
+}
+
 func bbs_post_view_allowed(db *sql.DB, set_id string, user_id string, ip string, auth_info map[string]bool) bool {
+	if !bbs_post_blind_allowed(db, set_id, user_id, ip, auth_info) {
+		return false
+	}
+
 	acl_data := bbs_set_value(db, set_id, "bbs_only_my_data_view_acl")
 	if acl_data == "" || acl_data == "normal" || user_id == ip {
 		return true
@@ -24,13 +47,22 @@ func bbs_post_view_allowed(db *sql.DB, set_id string, user_id string, ip string,
 
 func bbs_post_view_sql(db *sql.DB, set_id string, ip string, row_alias string) (string, []any) {
 	auth_info := tool.Get_auth_info(db, ip)
+	blind_sql := ""
+	if !auth_info["bbs_post_manage"] {
+		blind_sql = bbs_post_blind_sql(row_alias)
+	}
+
 	if set_id != "" {
 		acl_data := bbs_set_value(db, set_id, "bbs_only_my_data_view_acl")
 		if acl_data == "" || acl_data == "normal" || auth_info["bbs"] || tool.Check_acl_group(db, acl_data, auth_info) {
-			return "", nil
+			return blind_sql, nil
 		}
 
-		return "exists (select 1 from bbs_data author where author.set_name = 'user_id' and author.set_id = " + row_alias + ".set_id and author.set_code = " + row_alias + ".set_code and author.set_data = ?)", []any{ip}
+		view_sql := "exists (select 1 from bbs_data author where author.set_name = 'user_id' and author.set_id = " + row_alias + ".set_id and author.set_code = " + row_alias + ".set_code and author.set_data = ?)"
+		if blind_sql != "" {
+			view_sql = blind_sql + " and " + view_sql
+		}
+		return view_sql, []any{ip}
 	}
 
 	rows := tool.Query_DB(
@@ -57,7 +89,7 @@ func bbs_post_view_sql(db *sql.DB, set_id string, ip string, row_alias string) (
 	}
 
 	if private_count == 0 {
-		return "", nil
+		return blind_sql, nil
 	}
 
 	view_sql := "(not exists (select 1 from bbs_set only_view where only_view.set_name = 'bbs_only_my_data_view_acl' and only_view.set_code = '' and only_view.set_id = " + row_alias + ".set_id and only_view.set_data != '' and only_view.set_data != 'normal')"
@@ -72,6 +104,9 @@ func bbs_post_view_sql(db *sql.DB, set_id string, ip string, row_alias string) (
 	}
 	view_sql += " or exists (select 1 from bbs_data author where author.set_name = 'user_id' and author.set_id = " + row_alias + ".set_id and author.set_code = " + row_alias + ".set_code and author.set_data = ?))"
 	view_values = append(view_values, ip)
+	if blind_sql != "" {
+		view_sql = "(" + blind_sql + " and " + view_sql + ")"
+	}
 
 	return view_sql, view_values
 }

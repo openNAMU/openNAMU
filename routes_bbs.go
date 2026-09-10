@@ -275,6 +275,15 @@ func register_bbs_routes(r *gin.Engine) {
 		route_data := route.View_bbs_comment_pinned_post(make_route_config(c), c.Param("set_id"), c.Param("set_code"), c.Param("comment_code"))
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
+	r.GET("/bbs/blind/:set_id/:set_code", func(c *gin.Context) {
+		route_data := route.View_bbs_in_w_blind(make_route_config(c), c.Param("set_id"), c.Param("set_code"))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.POST("/bbs/blind/:set_id/:set_code", func(c *gin.Context) {
+		route_data := route.View_bbs_in_w_blind_post(make_route_config(c), c.Param("set_id"), c.Param("set_code"), c.PostForm("blind"))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
 	r.GET("/bbs/blind/:set_id/:set_code/:comment_code", func(c *gin.Context) {
 		route_data := route.View_bbs_in_w_comment_blind(make_route_config(c), c.Param("set_id"), c.Param("set_code"), c.Param("comment_code"))
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))

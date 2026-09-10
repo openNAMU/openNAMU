@@ -6,7 +6,7 @@ func View_bbs_in_w_tabom_post(config tool.Config, set_id string, set_code string
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	data := Api_bbs_w_tabom_post(config, set_id+"-"+set_code, vote_type)
+	data := Api_bbs_w_tabom_post(config, set_id, set_code, vote_type)
 	if response, _ := data["response"].(string); response == "require auth" {
 		return tool.Get_error_page(db, config, "auth")
 	}

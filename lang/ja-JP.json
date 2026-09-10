@@ -26,6 +26,8 @@
     "comment": "コメント",
     "blind": "コメントを非表示",
     "blind_release": "コメントの非表示を解除",
+    "blind_post": "投稿を非表示",
+    "blind_post_release": "投稿の非表示を解除",
     "activity_sort": "最近の活動順",
     "my_bbs_post": "自分の投稿",
     "participate_bbs_post": "参加した投稿",

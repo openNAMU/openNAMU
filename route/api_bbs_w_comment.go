@@ -9,6 +9,13 @@ func Api_bbs_w_comment(config tool.Config, do_type string, sub_code string) map[
 	if do_type == "" || do_type == "normal" {
 		do_type = "around"
 	}
+	set_id, set_code, exists := bbs_post_location(db, sub_code)
+	if exists && !bbs_post_blind_allowed(db, set_id, set_code, config.IP, nil) {
+		if do_type == "length" {
+			return map[string]any{"response": "require auth", "comment": "0", "reply": "0", "data": 0}
+		}
+		return map[string]any{"response": "require auth", "data": []map[string]string{}}
+	}
 
 	if do_type == "length" {
 		bbs_and_post_num := sub_code

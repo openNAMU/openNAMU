@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"regexp"
 	"sort"
 	"strconv"
@@ -87,7 +88,7 @@ func bbs_tags_html(bbs_id string, tags string, keyword string) string {
 	return data_html
 }
 
-func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_id_to_name map[string]string) string {
+func Get_bbs_list_ui(db *sql.DB, config tool.Config, bbs_all_data []map[string]string, bbs_id_to_name map[string]string) string {
 	count := 0
 	data_html := ""
 	date_heading := ""
@@ -135,6 +136,9 @@ func Get_bbs_list_ui(config tool.Config, bbs_all_data []map[string]string, bbs_i
 				prefix_html = in_data["prefix_html"]
 			}
 			left += "[" + prefix_html + "] "
+		}
+		if in_data["blind"] == "O" {
+			left = "[" + tool.Get_language(db, "blind_post", true) + "] " + left
 		}
 		left += `<a href="` + bbs_link + `">` + bbs_title_html + `</a>`
 
@@ -216,7 +220,7 @@ func View_bbs_main(config tool.Config, page string) string {
 	data_html += "</ul><hr class=\"main_hr\">"
 
 	bbs_api_data := Api_bbs(config, "", page, "")
-	data_html += Get_bbs_list_ui(config, bbs_api_data["data"].([]map[string]string), bbs_id_to_name)
+	data_html += Get_bbs_list_ui(db, config, bbs_api_data["data"].([]map[string]string), bbs_id_to_name)
 
 	menu := [][]any{
 		{"other", tool.Get_language(db, "other_tool", false)},

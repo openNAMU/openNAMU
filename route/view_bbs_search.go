@@ -77,7 +77,7 @@ func view_bbs_search(config tool.Config, set_id string, keyword string, page str
 			data_api = Api_bbs_search_data(config, keyword, set_id, strconv.Itoa(page_int))
 		}
 		data_list := data_api["data"].([]map[string]string)
-		data_html += Get_bbs_list_ui(config, data_list, bbs_id_to_name)
+		data_html += Get_bbs_list_ui(db, config, data_list, bbs_id_to_name)
 
 		page_url := "/bbs/search_page/{}/" + tool.Url_parser(keyword)
 		if search_type == "data" {

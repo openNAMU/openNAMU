@@ -171,6 +171,8 @@
     "pinned": "고정",
     "blind": "댓글 숨김",
     "blind_release": "댓글 숨김 해제",
+    "blind_post": "게시글 숨김",
+    "blind_post_release": "게시글 숨김 해제",
     "edit_filter_add": "편집 필터 추가",
     "edit_filter_manage_authority": "편집 필터 관리 권한",
     "application_manage_authority": "가입 신청 관리 권한",

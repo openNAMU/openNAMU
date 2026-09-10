@@ -23,6 +23,9 @@ func captcha_response(c *gin.Context) string {
 }
 
 func parse_bbs_code(value string) (string, string) {
+	if strings.HasPrefix(value, "-1-") {
+		return "-1", strings.TrimPrefix(value, "-1-")
+	}
 	parts := strings.SplitN(value, "-", 2)
 	if len(parts) != 2 {
 		return "", ""

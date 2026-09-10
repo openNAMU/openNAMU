@@ -3,7 +3,6 @@ package route
 import (
 	"database/sql"
 	"strconv"
-	"strings"
 
 	"opennamu/route/tool"
 )
@@ -56,19 +55,9 @@ func bbs_tabom_user_exists(db *sql.DB, set_name string, user string, set_id stri
 	)
 }
 
-func Api_bbs_w_tabom_post(config tool.Config, sub_code string, vote_type string) map[string]any {
+func Api_bbs_w_tabom_post(config tool.Config, set_id string, set_code string, vote_type string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-
-	sub_code_parts := strings.Split(sub_code, "-")
-
-	bbs_num := ""
-	post_num := ""
-
-	if len(sub_code_parts) > 1 {
-		bbs_num = sub_code_parts[0]
-		post_num = sub_code_parts[1]
-	}
 
 	return_data := make(map[string]any)
 
@@ -77,5 +66,10 @@ func Api_bbs_w_tabom_post(config tool.Config, sub_code string, vote_type string)
 		return return_data
 	}
 
-	return api_bbs_tabom_post(db, config.IP, bbs_num, post_num, vote_type)
+	if !bbs_post_blind_allowed(db, set_id, set_code, config.IP, nil) {
+		return_data["response"] = "require auth"
+		return return_data
+	}
+
+	return api_bbs_tabom_post(db, config.IP, set_id, set_code, vote_type)
 }

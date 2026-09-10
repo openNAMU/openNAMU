@@ -202,6 +202,8 @@
     "pinned": "Pinned",
     "blind": "Hide comment",
     "blind_release": "Unhide comment",
+    "blind_post": "Hide post",
+    "blind_post_release": "Unhide post",
     "markup": "Markup",
     "title": "Title",
     "reference": "Reference",

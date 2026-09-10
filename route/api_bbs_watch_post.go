@@ -27,6 +27,9 @@ func Api_bbs_watch_post(config tool.Config, set_id string, set_code string) map[
 	if tool.IP_or_user(config.IP) {
 		return map[string]any{"response": "require auth"}
 	}
+	if !bbs_post_blind_allowed(db, set_id, set_code, config.IP, nil) {
+		return map[string]any{"response": "require auth"}
+	}
 
 	return Api_w_watch_list_post(config, bbs_watch_key(set_id, set_code), "bbs_watchlist")
 }

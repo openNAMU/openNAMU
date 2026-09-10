@@ -7,9 +7,36 @@ import (
 	"opennamu/route/tool"
 )
 
+func bbs_post_location(db *sql.DB, sub_code string) (string, string, bool) {
+	best_id := ""
+	best_code := ""
+	for _, set_id := range bbs_list(db) {
+		prefix := set_id + "-"
+		if !strings.HasPrefix(sub_code, prefix) || len(set_id) <= len(best_id) {
+			continue
+		}
+
+		post_code := strings.TrimPrefix(sub_code, prefix)
+		post_code_parts := strings.SplitN(post_code, "-", 2)
+		if post_code_parts[0] == "" {
+			continue
+		}
+		best_id = set_id
+		best_code = post_code_parts[0]
+	}
+
+	return best_id, best_code, best_id != ""
+}
+
 func Api_bbs_w_comment_one(config tool.Config, already_auth_check bool, do_type string, sub_code string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
+	if !already_auth_check {
+		set_id, set_code, exists := bbs_post_location(db, sub_code)
+		if exists && !bbs_post_blind_allowed(db, set_id, set_code, config.IP, nil) {
+			return map[string]any{"response": "require auth", "data": []map[string]string{}}
+		}
+	}
 
 	sub_code_parts := strings.Split(sub_code, "-")
 	sub_code_last := ""

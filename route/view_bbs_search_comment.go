@@ -58,7 +58,7 @@ func View_bbs_search_comment(config tool.Config, set_id string, keyword string, 
 	if keyword != "" {
 		data_api := Api_bbs_search_comment(config, keyword, set_id, strconv.Itoa(page_int))
 		data_list := data_api["data"].([]map[string]string)
-		data_html += Get_bbs_list_ui(config, data_list, bbs_id_to_name)
+		data_html += Get_bbs_list_ui(db, config, data_list, bbs_id_to_name)
 
 		page_url := "/bbs/search_comment_page/{}/" + tool.Url_parser(keyword)
 		if set_id != "" {

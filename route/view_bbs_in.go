@@ -117,7 +117,7 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
         <div><button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "filter", true) + `</button> <a href="/bbs/in/` + tool.Url_parser(set_id) + `/1">(` + tool.Get_language(db, "reset", true) + `)</a></div>
     </form><hr class="main_hr">`
 	}
-	data_html += Get_bbs_list_ui(config, data_api_in, map[string]string{})
+	data_html += Get_bbs_list_ui(db, config, data_api_in, map[string]string{})
 	page_path := "/bbs/in/" + tool.Url_parser(set_id) + "/{}"
 	if show_filter {
 		page_path = "/bbs/in/" + tool.Url_parser(set_id) + "/filter/"

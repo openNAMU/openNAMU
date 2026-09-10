@@ -12,6 +12,10 @@ func Api_bbs_w_page_view_post(config tool.Config, set_id string, set_code string
 
 	return_data := make(map[string]any)
 	return_data["response"] = "ok"
+	if !bbs_post_blind_allowed(db, set_id, set_code, config.IP, nil) {
+		return_data["response"] = "require auth"
+		return return_data
+	}
 
 	page_view_str := ""
 	exist := tool.QueryRow_DB(
