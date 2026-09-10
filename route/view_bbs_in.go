@@ -18,13 +18,14 @@ func View_bbs_in_filter(config tool.Config, set_id string, filter_data string) s
 	return view_bbs_in(config, set_id, page_num, "", filter, filter_path, true)
 }
 
-func View_bbs_in_filter_post(set_id string, comment_min string, tabom_min string, mine string, participate string, tabom_user string, prefix string, tag string) string {
+func View_bbs_in_filter_post(set_id string, comment_min string, tabom_min string, mine string, participate string, tabom_user string, author string, prefix string, tag string) string {
 	filter := bbs_filter{
 		comment_min: bbs_filter_number(comment_min),
 		tabom_min:   bbs_filter_number(tabom_min),
 		mine:        mine == "1",
 		participate: participate == "1",
 		tabom_user:  tabom_user == "1",
+		author:      strings.TrimSpace(author),
 		prefix:      strings.TrimSpace(prefix),
 		tag:         strings.TrimSpace(tag),
 	}
@@ -87,7 +88,8 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
         <label>` + tool.Get_language(db, "upvote", true) + ` <input name="tabom_min" value="` + strconv.Itoa(filter.tabom_min) + `"></label>
         <label><input type="checkbox" name="mine" value="1"` + mine_checked + `>` + tool.Get_language(db, "my_bbs_post", true) + `</label>
         <label><input type="checkbox" name="participate" value="1"` + participate_checked + `>` + tool.Get_language(db, "participate_bbs_post", true) + `</label>
-        <label><input type="checkbox" name="tabom_user" value="1"` + tabom_user_checked + `>` + tool.Get_language(db, "my_tabom_bbs_post", true) + `</label>` + prefix_html + `
+        <label><input type="checkbox" name="tabom_user" value="1"` + tabom_user_checked + `>` + tool.Get_language(db, "my_tabom_bbs_post", true) + `</label>
+        <label>` + tool.Get_language(db, "bbs_author", true) + ` <input name="author" value="` + tool.HTML_escape(filter.author) + `"></label>` + prefix_html + `
         <label>` + tool.Get_language(db, "tag", true) + ` <input name="tag" value="` + tool.HTML_escape(filter.tag) + `"></label>
         <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "filter", true) + `</button>
     </form><hr class="main_hr">`

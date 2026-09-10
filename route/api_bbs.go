@@ -77,13 +77,15 @@ func bbs_post_view_sql(db *sql.DB, set_id string, ip string, row_alias string) (
 }
 
 type bbs_filter struct {
-	comment_min int
-	tabom_min   int
-	mine        bool
-	participate bool
-	tabom_user  bool
-	prefix      string
-	tag         string
+	comment_min    int
+	tabom_min      int
+	mine           bool
+	participate    bool
+	tabom_user     bool
+	author         string
+	author_invalid bool
+	prefix         string
+	tag            string
 }
 
 func bbs_filter_number(data string) int {
@@ -118,6 +120,13 @@ func bbs_filter_parse(data string) bbs_filter {
 			filter.participate = parts[i+1] == "1"
 		case "tabom_user":
 			filter.tabom_user = parts[i+1] == "1"
+		case "user":
+			decoded, err := tool.Get_base64_decode(parts[i+1])
+			if err == nil {
+				filter.author = decoded
+			} else {
+				filter.author_invalid = true
+			}
 		case "prefix":
 			filter.prefix = strings.TrimSpace(parts[i+1])
 		}
@@ -143,6 +152,9 @@ func bbs_filter_path(filter bbs_filter) string {
 	}
 	if filter.tabom_user {
 		path = append(path, "tabom_user", "1")
+	}
+	if filter.author != "" {
+		path = append(path, "user", tool.Base64_encode(filter.author))
 	}
 	if filter.prefix != "" {
 		path = append(path, "prefix", tool.Url_parser(filter.prefix))
@@ -297,6 +309,13 @@ func bbs_filter_sql(filter bbs_filter, row_alias string, user_id string) (string
 	if filter.tabom_user {
 		filter_sql += " and exists (select 1 from bbs_data tabom_user_data where tabom_user_data.set_name = 'tabom_list' and tabom_user_data.set_id = " + row_alias + ".set_id and tabom_user_data.set_code = " + row_alias + ".set_code and tabom_user_data.set_data = ?)"
 		filter_values = append(filter_values, user_id)
+	}
+	if filter.author_invalid {
+		filter_sql += " and 1 = 0"
+	}
+	if filter.author != "" {
+		filter_sql += " and exists (select 1 from bbs_data author_data where author_data.set_name = 'user_id' and author_data.set_id = " + row_alias + ".set_id and author_data.set_code = " + row_alias + ".set_code and author_data.set_data = ?)"
+		filter_values = append(filter_values, filter.author)
 	}
 	if filter.prefix != "" {
 		filter_sql += " and exists (select 1 from bbs_data prefix_data where prefix_data.set_name = 'prefix' and prefix_data.set_id = " + row_alias + ".set_id and prefix_data.set_code = " + row_alias + ".set_code and prefix_data.set_data = ?)"

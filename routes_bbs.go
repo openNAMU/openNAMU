@@ -145,6 +145,7 @@ func register_bbs_routes(r *gin.Engine) {
 			c.PostForm("mine"),
 			c.PostForm("participate"),
 			c.PostForm("tabom_user"),
+			c.PostForm("author"),
 			c.PostForm("prefix"),
 			c.PostForm("tag"),
 		)
