@@ -2,7 +2,6 @@ package route
 
 import (
 	"database/sql"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -64,7 +63,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 		data_html += `<span>` + tool.Get_language(db, "comment_closed", true) + `</span><hr>`
 	}
 
-	var re = regexp.MustCompile(`^[0-9]+-[0-9]+-`)
+	comment_prefix := set_id + "-" + set_code + "-"
 	comment_path := "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "/comment/"
 	if page > 1 {
 		comment_path = "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "/page/" + strconv.Itoa(page) + "/comment/"
@@ -79,8 +78,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 			continue
 		}
 
-		code_id := v["id"] + "-" + v["code"]
-		code_id = re.ReplaceAllString(code_id, "")
+		code_id := strings.TrimPrefix(v["id"]+"-"+v["code"], comment_prefix)
 
 		count := strings.Count(code_id, "-")
 
