@@ -33,7 +33,10 @@ func Api_bbs_w_comment_one(config tool.Config, already_auth_check bool, do_type 
 	defer tool.DB_close(db)
 	if !already_auth_check {
 		set_id, set_code, exists := bbs_post_location(db, sub_code)
-		if exists && !bbs_post_blind_allowed(db, set_id, set_code, config.IP, nil) {
+		if !exists {
+			return map[string]any{"response": "not exist", "data": []map[string]string{}}
+		}
+		if _, allowed := bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
 			return map[string]any{"response": "require auth", "data": []map[string]string{}}
 		}
 	}
@@ -131,13 +134,7 @@ func Api_bbs_w_comment_one(config tool.Config, already_auth_check bool, do_type 
 	}
 
 	return_data := make(map[string]any)
-	if !already_auth_check {
-		if !tool.Check_permission(db, "bbs_comment", config.IP) {
-			data_list = []map[string]string{}
-
-			return_data["response"] = "require auth"
-		}
-	}
+	return_data["response"] = "ok"
 
 	if do_type == "around" {
 		return_data["data"] = data_list

@@ -61,12 +61,12 @@ func Api_bbs_w_tabom_post(config tool.Config, set_id string, set_code string, vo
 
 	return_data := make(map[string]any)
 
-	if !tool.Check_permission(db, "bbs_comment", config.IP) {
+	if _, allowed := bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
 		return_data["response"] = "require auth"
 		return return_data
 	}
 
-	if !bbs_post_blind_allowed(db, set_id, set_code, config.IP, nil) {
+	if !tool.Check_acl(db, set_id, "", "bbs_comment", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

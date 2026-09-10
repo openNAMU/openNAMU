@@ -27,8 +27,8 @@ func bbs_post_blind_sql(row_alias string) string {
 	return "not exists (select 1 from bbs_data blind_data where blind_data.set_name = 'blind' and blind_data.set_data = 'O' and blind_data.set_id = " + row_alias + ".set_id and blind_data.set_code = " + row_alias + ".set_code)"
 }
 
-func bbs_post_view_allowed(db *sql.DB, set_id string, user_id string, ip string, auth_info map[string]bool) bool {
-	if !bbs_post_blind_allowed(db, set_id, user_id, ip, auth_info) {
+func bbs_post_view_allowed(db *sql.DB, set_id string, set_code string, user_id string, ip string, auth_info map[string]bool) bool {
+	if !bbs_post_blind_allowed(db, set_id, set_code, ip, auth_info) {
 		return false
 	}
 
@@ -622,4 +622,16 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 	return_data["data"] = data_list
 
 	return return_data
+}
+
+func bbs_post_view_auth(db *sql.DB, set_id string, set_code string, ip string) (string, bool) {
+	_, title_exists := tool.Get_bbs_data_value(db, set_id, set_code, "title")
+	user_id, user_exists := tool.Get_bbs_data_value(db, set_id, set_code, "user_id")
+	if !title_exists || !user_exists {
+		return "", false
+	}
+	if !tool.Check_acl(db, set_id, "", "bbs_view", ip) || !bbs_post_view_allowed(db, set_id, set_code, user_id, ip, nil) {
+		return "", false
+	}
+	return user_id, true
 }

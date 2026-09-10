@@ -20,9 +20,43 @@ func bbs_search_comment_location(set_id string, set_code string, comment_code st
 	return comment_set_id, parts[len(parts)-1], true
 }
 
+func bbs_comment_storage_location(set_id string, set_code string) (string, string, string, bool) {
+	parts := strings.Split(set_id, "-")
+	root_id := ""
+	root_code := ""
+	comment_parts := []string{}
+
+	if strings.HasPrefix(set_id, "-1-") {
+		parts = strings.Split(strings.TrimPrefix(set_id, "-1-"), "-")
+		if len(parts) < 1 || parts[0] == "" {
+			return "", "", "", false
+		}
+		root_id = "-1"
+		root_code = parts[0]
+		comment_parts = parts[1:]
+	} else {
+		if len(parts) < 2 || parts[0] == "" || parts[1] == "" {
+			return "", "", "", false
+		}
+		root_id = parts[0]
+		root_code = parts[1]
+		comment_parts = parts[2:]
+	}
+
+	comment_code := set_code
+	if len(comment_parts) > 0 {
+		comment_code = strings.Join(append(comment_parts, set_code), "-")
+	}
+	if comment_code == "" {
+		return "", "", "", false
+	}
+
+	return root_id, root_code, comment_code, true
+}
+
 func bbs_search_comment_item_data(db *sql.DB, config tool.Config, set_id string, set_code string, comment_code string, ip_parser_temp map[string][]string, auth_info map[string]bool, keyword string) (map[string]string, bool) {
 	comment_manage := auth_info["bbs_comment_manage"]
-	if !tool.Check_acl(db, set_id, "", "bbs_comment", config.IP) && !comment_manage {
+	if !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) && !comment_manage {
 		return nil, false
 	}
 
@@ -183,20 +217,16 @@ func bbs_search_comment_sql_data(db *sql.DB, config tool.Config, keyword string,
 			continue
 		}
 
-		parts := strings.Split(comment_set_id, "-")
-		if len(parts) < 2 || (set_id == "" && parts[0] == "0") {
+		post_set_id, post_set_code, comment_code, valid := bbs_comment_storage_location(comment_set_id, comment_set_code)
+		if !valid || (set_id == "" && post_set_id == "0") {
 			continue
-		}
-		comment_code := comment_set_code
-		if len(parts) > 2 {
-			comment_code = strings.Join(parts[2:], "-") + "-" + comment_set_code
 		}
 
 		item_data, visible := bbs_search_comment_item_data(
 			db,
 			config,
-			parts[0],
-			parts[1],
+			post_set_id,
+			post_set_code,
 			comment_code,
 			ip_parser_temp,
 			auth_info,

@@ -32,7 +32,7 @@ type bbs_search_index_change struct {
 
 const bbs_search_index_directory = "data/bleve_bbs"
 const bbs_search_index_version_file = "data/bleve_bbs.version"
-const bbs_search_index_version = "3"
+const bbs_search_index_version = "4"
 
 var bbs_search_index bleve.Index
 var bbs_search_index_lock sync.RWMutex
@@ -116,6 +116,40 @@ func Search_bbs_index_comment_key_data(key string) (string, string, string, bool
 		return "", "", "", false
 	}
 	return data[1], data[2], data[3], true
+}
+
+func search_bbs_index_comment_location(set_id string, set_code string) (string, string, string, bool) {
+	parts := strings.Split(set_id, "-")
+	root_id := ""
+	root_code := ""
+	comment_parts := []string{}
+
+	if strings.HasPrefix(set_id, "-1-") {
+		parts = strings.Split(strings.TrimPrefix(set_id, "-1-"), "-")
+		if len(parts) < 1 || parts[0] == "" {
+			return "", "", "", false
+		}
+		root_id = "-1"
+		root_code = parts[0]
+		comment_parts = parts[1:]
+	} else {
+		if len(parts) < 2 || parts[0] == "" || parts[1] == "" {
+			return "", "", "", false
+		}
+		root_id = parts[0]
+		root_code = parts[1]
+		comment_parts = parts[2:]
+	}
+
+	comment_code := set_code
+	if len(comment_parts) > 0 {
+		comment_code = strings.Join(append(comment_parts, set_code), "-")
+	}
+	if comment_code == "" {
+		return "", "", "", false
+	}
+
+	return root_id, root_code, comment_code, true
 }
 
 func search_bbs_index_apply_change(index bleve.Index, key string, change bbs_search_index_change) error {
@@ -320,8 +354,8 @@ func search_bbs_index_rebuild_comments(db *sql.DB, index bleve.Index) error {
 			continue
 		}
 
-		set_id_parts := strings.Split(comment_set_id, "-")
-		if len(set_id_parts) < 2 {
+		post_set_id, post_set_code, comment_code, valid := search_bbs_index_comment_location(comment_set_id, comment_set_code)
+		if !valid {
 			continue
 		}
 
@@ -335,12 +369,9 @@ func search_bbs_index_rebuild_comments(db *sql.DB, index bleve.Index) error {
 		current_key = key
 
 		if document.Set_id == "" {
-			document.Set_id = set_id_parts[0]
-			document.Set_code = set_id_parts[1]
-			document.Comment_code = comment_set_code
-			if len(set_id_parts) > 2 {
-				document.Comment_code = strings.Join(set_id_parts[2:], "-") + "-" + comment_set_code
-			}
+			document.Set_id = post_set_id
+			document.Set_code = post_set_code
+			document.Comment_code = comment_code
 		}
 
 		switch set_name {
@@ -467,15 +498,11 @@ func Search_bbs_index_delete_comments(db *sql.DB, set_id string, set_code string
 		if rows.Scan(&storage_set_id, &storage_set_code) != nil {
 			continue
 		}
-		parts := strings.Split(storage_set_id, "-")
-		if len(parts) < 2 {
+		comment_set_id, comment_set_code, comment_code, valid := search_bbs_index_comment_location(storage_set_id, storage_set_code)
+		if !valid {
 			continue
 		}
-		comment_code := storage_set_code
-		if len(parts) > 2 {
-			comment_code = strings.Join(parts[2:], "-") + "-" + storage_set_code
-		}
-		Search_bbs_index_delete_comment(set_id, set_code, comment_code)
+		Search_bbs_index_delete_comment(comment_set_id, comment_set_code, comment_code)
 	}
 }
 

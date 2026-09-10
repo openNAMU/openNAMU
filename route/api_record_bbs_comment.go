@@ -14,7 +14,7 @@ func Api_record_bbs_comment(config tool.Config, user_name string, page string) m
 
 	rows := tool.Query_DB(
 		db,
-		`select substr(set_id, 1, instr(set_id, '-') - 1) as bbs_id, min(set_id) as set_id from bbs_data where set_name = "comment_user_id" and set_data = ? group by bbs_id order by bbs_id desc limit ?, 50`,
+		`select case when set_id like '-1-%' then '-1' else substr(set_id, 1, instr(set_id, '-') - 1) end as bbs_id, min(set_id) as set_id from bbs_data where set_name = "comment_user_id" and set_data = ? group by bbs_id order by bbs_id desc limit ?, 50`,
 		user_name,
 		num,
 	)

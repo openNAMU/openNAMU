@@ -7,6 +7,11 @@ func Api_bbs_w_page_view(config tool.Config, set_id string, set_code string) map
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
+	if _, allowed := bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
+		return_data["response"] = "require auth"
+		return_data["data"] = 0
+		return return_data
+	}
 	return_data["response"] = "ok"
 
 	page_view := 0

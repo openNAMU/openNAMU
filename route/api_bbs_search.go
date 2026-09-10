@@ -71,7 +71,7 @@ func bbs_search_item_data(db *sql.DB, config tool.Config, set_code string, set_i
 	}
 	item_rows.Close()
 
-	if !bbs_post_view_allowed(db, set_id, user_id, config.IP, auth_info) {
+	if !bbs_post_view_allowed(db, set_id, set_code, user_id, config.IP, auth_info) {
 		return nil, false
 	}
 	temp_data["title_html"] = search_highlight(temp_data["title"], keyword)

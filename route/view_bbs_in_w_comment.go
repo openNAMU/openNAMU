@@ -9,36 +9,19 @@ import (
 )
 
 func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_code string, selected_comment string, page int) string {
-	data_api := Api_bbs_w_comment(config, "around", set_id+"-"+set_code)
+	if page < 1 {
+		page = 1
+	}
+	data_api := Api_bbs_w_comment_page(config, set_id+"-"+set_code, true, "around", page)
 	data_api_in := data_api["data"].([]map[string]string)
 	post_user, _ := tool.Get_bbs_data_value(db, set_id, set_code, "user_id")
 	if post_user != "" {
 		post_user = tool.IP_preprocess(db, post_user, config.IP)[0]
 	}
-	all_data_api_in := data_api_in
 	comment_prefix := set_id + "-" + set_code + "-"
 	pinned_data_api_in := []map[string]string{}
-	for _, v := range all_data_api_in {
-		if v["pinned"] == "" || (v["comment"] == "" && v["blind"] != "O") {
-			continue
-		}
-		code_id := strings.TrimPrefix(v["id"]+"-"+v["code"], comment_prefix)
-		if bbs_comment_code_regex.MatchString(code_id) {
-			pinned_data_api_in = append(pinned_data_api_in, v)
-		}
-	}
-	if page < 1 {
-		page = 1
-	}
-	start := (page - 1) * 50
-	end := start + 50
-	if start >= len(data_api_in) {
-		data_api_in = []map[string]string{}
-	} else {
-		if end > len(data_api_in) {
-			end = len(data_api_in)
-		}
-		data_api_in = data_api_in[start:end]
+	if page == 1 {
+		pinned_data_api_in = api_bbs_w_comment_pinned_data(config, set_id, set_code)
 	}
 	page_count := len(data_api_in)
 

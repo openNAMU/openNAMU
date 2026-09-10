@@ -29,7 +29,11 @@ func Api_bbs_w_edit_view(config tool.Config, set_id string, set_code string, com
 		return return_data
 	}
 
-	if !tool.Check_acl(db, set_id, "", "bbs_edit", config.IP) {
+	edit_acl := "bbs_edit"
+	if comment_code != "" {
+		edit_acl = "bbs_comment"
+	}
+	if !tool.Check_acl(db, set_id, "", edit_acl, config.IP) {
 		return_data["response"] = "require auth"
 
 		return return_data

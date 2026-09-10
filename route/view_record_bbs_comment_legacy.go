@@ -1,9 +1,6 @@
 package route
 
-import (
-	"opennamu/route/tool"
-	"strings"
-)
+import "opennamu/route/tool"
 
 func View_record_bbs_comment_legacy(config tool.Config, user_name string, page string) string {
 	db := tool.DB_connect()
@@ -27,19 +24,11 @@ func View_record_bbs_comment_legacy(config tool.Config, user_name string, page s
 			continue
 		}
 
-		parts := strings.Split(comment_set_id, "-")
-		if len(parts) < 2 {
+		bbs_id, post_id, comment_link, valid := bbs_comment_storage_location(comment_set_id, comment_code)
+		if !valid {
 			continue
 		}
 		row_count++
-
-		bbs_id := parts[0]
-		post_id := parts[1]
-		comment_link := ""
-		if len(parts) > 2 {
-			comment_link = strings.Join(parts[2:], "-") + "-"
-		}
-		comment_link += comment_code
 
 		comment_user := record_bbs_legacy_value(db, "comment_user_id", comment_set_id, comment_code)
 		title := record_bbs_legacy_value(db, "title", bbs_id, post_id)

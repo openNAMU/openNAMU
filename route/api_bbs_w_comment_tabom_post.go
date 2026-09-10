@@ -9,7 +9,7 @@ func Api_bbs_w_comment_tabom_post(config tool.Config, set_id string, set_code st
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	if !bbs_post_blind_allowed(db, set_id, set_code, config.IP, nil) {
+	if _, allowed := bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
 		return_data["response"] = "require auth"
 		return return_data
 	}

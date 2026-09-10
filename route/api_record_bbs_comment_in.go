@@ -1,10 +1,6 @@
 package route
 
-import (
-	"strings"
-
-	"opennamu/route/tool"
-)
+import "opennamu/route/tool"
 
 func Api_record_bbs_comment_in(config tool.Config, user_name string, bbs_id string, page string) map[string]any {
 	db := tool.DB_connect()
@@ -36,15 +32,14 @@ func Api_record_bbs_comment_in(config tool.Config, user_name string, bbs_id stri
 			panic(err)
 		}
 
-		post_id := strings.Split(set_id, "-")[1]
-		post_set_id, post_set_code, exists := bbs_post_location(db, set_id+"-"+set_code)
+		post_set_id, post_set_code, _, exists := bbs_comment_storage_location(set_id, set_code)
 		if exists && !bbs_post_blind_allowed(db, post_set_id, post_set_code, config.IP, nil) {
 			continue
 		}
 
 		data_list = append(data_list, []string{
 			bbs_id,
-			post_id,
+			post_set_code,
 			set_id,
 			set_code,
 		})

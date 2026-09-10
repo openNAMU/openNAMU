@@ -19,7 +19,7 @@ func View_bbs_raw(config tool.Config, set_id string, set_code string, comment_co
 	if !user_id_exists {
 		return tool.Get_redirect("/bbs/main")
 	}
-	if !bbs_post_view_allowed(db, set_id, user_id, config.IP, nil) {
+	if !bbs_post_view_allowed(db, set_id, set_code, user_id, config.IP, nil) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

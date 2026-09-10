@@ -9,14 +9,14 @@ func Api_bbs_w_tabom(config tool.Config, set_id string, set_code string) map[str
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	if !bbs_post_blind_allowed(db, set_id, set_code, config.IP, nil) {
+	if _, allowed := bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
 		return_data["response"] = "require auth"
 		return_data["data"] = "0"
 		return_data["down_data"] = "0"
 		return return_data
 	}
 
-	if !tool.Check_permission(db, "bbs_comment", config.IP) {
+	if !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
 		return_data["response"] = "require auth"
 		return_data["data"] = "0"
 		return_data["down_data"] = "0"
