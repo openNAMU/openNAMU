@@ -26,7 +26,7 @@ func bbs_comment_closed(db *sql.DB, set_id string, set_code string) bool {
 	) && closed == "1"
 }
 
-func bbs_comment_parent(db *sql.DB, set_id string, set_code string, comment_select string) (string, string, bool) {
+func bbs_comment_parent(db *sql.DB, set_id string, set_code string, comment_select string, ip string) (string, string, bool) {
 	base_id := set_id + "-" + set_code
 	if comment_select == "" || comment_select == "0" {
 		return base_id, "", true
@@ -50,6 +50,18 @@ func bbs_comment_parent(db *sql.DB, set_id string, set_code string, comment_sele
 		parent_id,
 		parts[len(parts)-1],
 	) {
+		return "", "", false
+	}
+
+	blind := ""
+	tool.QueryRow_DB(
+		db,
+		"select set_data from bbs_data where set_name = 'blind' and set_id = ? and set_code = ?",
+		[]any{&blind},
+		parent_id,
+		parts[len(parts)-1],
+	)
+	if blind == "O" && !tool.Check_permission(db, "bbs_comment_manage", ip) {
 		return "", "", false
 	}
 
@@ -125,7 +137,7 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 	parent_user := ""
 	if bbs_type != "thread" {
 		var ok bool
-		parent_id, parent_user, ok = bbs_comment_parent(db, set_id, set_code, comment_select)
+		parent_id, parent_user, ok = bbs_comment_parent(db, set_id, set_code, comment_select, config.IP)
 		if !ok {
 			return_data["response"] = "not exist"
 			return_data["data"] = "comment"

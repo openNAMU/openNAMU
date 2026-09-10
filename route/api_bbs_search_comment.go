@@ -21,7 +21,8 @@ func bbs_search_comment_location(set_id string, set_code string, comment_code st
 }
 
 func bbs_search_comment_item_data(db *sql.DB, config tool.Config, set_id string, set_code string, comment_code string, ip_parser_temp map[string][]string, auth_info map[string]bool, keyword string) (map[string]string, bool) {
-	if !tool.Check_acl(db, set_id, "", "bbs_comment", config.IP) {
+	comment_manage := auth_info["bbs_comment_manage"]
+	if !tool.Check_acl(db, set_id, "", "bbs_comment", config.IP) && !comment_manage {
 		return nil, false
 	}
 
@@ -38,9 +39,10 @@ func bbs_search_comment_item_data(db *sql.DB, config tool.Config, set_id string,
 	comment_data := ""
 	comment_date := ""
 	comment_user_id := ""
+	blind := ""
 	rows := tool.Query_DB(
 		db,
-		"select set_name, set_data from bbs_data where set_id = ? and set_code = ? and set_name in ('comment', 'comment_date', 'comment_user_id')",
+		"select set_name, set_data from bbs_data where set_id = ? and set_code = ? and set_name in ('blind', 'comment', 'comment_date', 'comment_user_id')",
 		comment_set_id,
 		comment_set_code,
 	)
@@ -58,11 +60,13 @@ func bbs_search_comment_item_data(db *sql.DB, config tool.Config, set_id string,
 			comment_date = set_data
 		case "comment_user_id":
 			comment_user_id = set_data
+		case "blind":
+			blind = set_data
 		}
 	}
 	rows.Close()
 
-	if comment_data == "" || comment_user_id == "" {
+	if comment_data == "" || comment_user_id == "" || (blind == "O" && !comment_manage) {
 		return nil, false
 	}
 
@@ -154,6 +158,10 @@ func bbs_search_comment_sql_data(db *sql.DB, config tool.Config, keyword string,
 	if set_id != "" {
 		where_data += " and b.set_id like ?"
 		values = append(values, set_id+"-%")
+	}
+
+	if !tool.Check_permission(db, "bbs_comment_manage", config.IP) {
+		where_data += " and not exists (select 1 from bbs_data blind_data where blind_data.set_name = 'blind' and blind_data.set_data = 'O' and blind_data.set_id = b.set_id and blind_data.set_code = b.set_code)"
 	}
 
 	offset := (page - 1) * 50

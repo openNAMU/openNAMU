@@ -105,7 +105,9 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 		if selected_comment == code_id {
 			selected = ` selected`
 		}
-		select_html += `<option value="` + tool.HTML_escape(code_id) + `"` + selected + `>` + tool.HTML_escape(code_id) + `</option>`
+		if v["blind"] != "O" || comment_manage {
+			select_html += `<option value="` + tool.HTML_escape(code_id) + `"` + selected + `>` + tool.HTML_escape(code_id) + `</option>`
+		}
 		data_html += comment_html
 	}
 
@@ -181,7 +183,7 @@ func get_bbs_comment_ui(db *sql.DB, config tool.Config, post_user string, set_id
 		rendered_data,
 		code_id,
 		color,
-		"",
+		v["blind"],
 		`width: calc(100% - `+padding_str+`px);`,
 		set_code,
 	)
@@ -193,7 +195,7 @@ func get_bbs_comment_ui(db *sql.DB, config tool.Config, post_user string, set_id
 			rendered_data,
 			code_id,
 			color,
-			"",
+			v["blind"],
 			`width: calc(100% - `+padding_str+`px);`,
 			set_code,
 		)

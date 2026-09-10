@@ -41,6 +41,9 @@ func View_bbs_raw(config tool.Config, set_id string, set_code string, comment_co
 		if !ok || len(comment_list) == 0 {
 			return tool.Get_redirect("/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code))
 		}
+		if comment_list[0]["blind"] == "O" && !tool.Check_permission(db, "bbs_comment_manage", config.IP) {
+			return tool.Get_error_page(db, config, "auth")
+		}
 
 		raw_data = comment_list[0]["comment"]
 	}

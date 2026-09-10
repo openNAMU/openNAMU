@@ -30,6 +30,12 @@ func View_bbs_in_w_comment_tool(config tool.Config, set_id string, set_code stri
                 <li><a href="/bbs/pinned/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/` + tool.Url_parser(comment_id) + `">` + tool.Get_language(db, comment_pinned_name, true) + `</a></li>
             </ul>
         `
+		comment_blind_name := "blind"
+		blind_data, hidden := tool.Get_bbs_data_value(db, comment_set_id, comment_set_code, "blind")
+		if hidden && blind_data == "O" {
+			comment_blind_name = "blind_release"
+		}
+		data_html += "<ul><li><a href='/bbs/blind/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "/" + tool.Url_parser(comment_id) + "'>" + tool.Get_language(db, comment_blind_name, true) + "</a></li></ul>"
 	}
 
 	return tool.Get_template(

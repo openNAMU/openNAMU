@@ -74,6 +74,12 @@ func Api_bbs_w_comment_one_delete(config tool.Config, set_id string, set_code st
 		comment_set_id,
 		comment_set_code,
 	)
+	tool.Exec_DB(
+		db,
+		"delete from bbs_data where set_name = 'blind' and set_id = ? and set_code = ?",
+		comment_set_id,
+		comment_set_code,
+	)
 
 	tool.Exec_DB(
 		db,

@@ -121,7 +121,20 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 			return return_data
 		}
 
-		if comment_user_id != config.IP && !tool.Check_permission(db, "bbs_comment_manage", config.IP) {
+		comment_manage := tool.Check_permission(db, "bbs_comment_manage", config.IP)
+		blind := ""
+		tool.QueryRow_DB(
+			db,
+			"select set_data from bbs_data where set_name = 'blind' and set_id = ? and set_code = ?",
+			[]any{&blind},
+			comment_set_id,
+			comment_set_code,
+		)
+		if blind == "O" && !comment_manage {
+			return_data["response"] = "require auth"
+			return return_data
+		}
+		if comment_user_id != config.IP && !comment_manage {
 			return_data["response"] = "require auth"
 
 			return return_data

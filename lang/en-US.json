@@ -200,6 +200,8 @@
     "pass": "Passing",
     "file_name": "File name",
     "pinned": "Pinned",
+    "blind": "Hide comment",
+    "blind_release": "Unhide comment",
     "markup": "Markup",
     "title": "Title",
     "reference": "Reference",
