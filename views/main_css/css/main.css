@@ -93,8 +93,8 @@
 /* list */
 .opennamu_main ul {
     padding-left: 20px;
-    
-    margin-inline-start: 0;
+
+    margin: 0;
 }
 
 .opennamu_main ul li {
