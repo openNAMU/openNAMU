@@ -25,6 +25,7 @@ func Auth_relations() []Auth_relation {
 	add("admin", "trust_d", Auth_relation_permission)
 	add("admin", "history_view", Auth_relation_permission)
 	add("admin", "manager_view", Auth_relation_permission)
+	add("admin", "alarm_send", Auth_relation_permission)
 	add("up_to_level_10", "up_to_level_3", Auth_relation_permission)
 	add("email_verified", "user", Auth_relation_permission)
 	add("up_to_level_3", "user", Auth_relation_permission)

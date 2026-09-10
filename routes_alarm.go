@@ -46,6 +46,13 @@ func register_alarm_routes(r *gin.Engine) {
 		name := c.Param("user_name")
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm(make_route_config(c), name, c.Request.PostForm)))
 	})
+	r.GET("/alarm_user/:user_name/send", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm_send(make_route_config(c), c.Param("user_name"), nil)))
+	})
+	r.POST("/alarm_user/:user_name/send", func(c *gin.Context) {
+		_ = c.Request.ParseForm()
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm_send(make_route_config(c), c.Param("user_name"), c.Request.PostForm)))
+	})
 	r.GET("/alarm_user/:user_name/page/:num", func(c *gin.Context) {
 		values := url.Values{"num": {c.Param("num")}}
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_alarm(make_route_config(c), c.Param("user_name"), values)))

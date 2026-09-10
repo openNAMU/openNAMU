@@ -59,6 +59,9 @@ func View_user_safe(config tool.Config, user_name string) string {
 		}
 		body += `<h2>` + tool.Get_language(db, "admin", true) + `</h2><ul><li><a href="/auth/give/` + tool.Url_parser(user_name) + `">` + auth_name + `</a></li><li><a href="/list/user/check_submit/` + tool.Url_parser(user_name) + `">` + tool.Get_language(db, "check", true) + `</a></li></ul>`
 	}
+	if tool.Check_permission(db, "alarm_send", config.IP) && user_name != config.IP && !tool.IP_or_user(user_name) && tool.Get_user_set_exists(db, user_name, "pw") {
+		body += "<hr class=\"main_hr\"><ul><li><a href=\"/alarm_user/" + tool.Url_parser(user_name) + "/send\">" + tool.Get_language(db, "alarm_send", true) + "</a></li></ul>"
+	}
 
 	return user_form_page(db, config, tool.Get_language(db, "user_tool", true), body)
 }

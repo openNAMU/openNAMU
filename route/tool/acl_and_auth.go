@@ -720,6 +720,7 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["history_view"] = true
 		auth_info["manager_view"] = true
 		auth_info["ai_use"] = true
+		auth_info["alarm_send"] = true
 	}
 
 	if _, ok := auth_info["up_to_level_10"]; ok {

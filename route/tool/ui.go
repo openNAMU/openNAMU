@@ -387,6 +387,8 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
 		data = Get_language(db, "input_email_error", true)
 	case "empty title", "empty data", "invalid data", "key error":
 		data = Get_language(db, "input_email_error", true)
+	case "alarm_send_invalid":
+		data = Get_language(db, "alarm_send_invalid", true)
 	case "permission denied":
 		data = Get_language(db, "authority_error", true)
 	case "ban":

@@ -45,6 +45,7 @@ func Auth_choices() []Auth_choice {
 		{3, "captcha_one_check_five_pass", "captcha_one_check_five_pass_authority"},
 		{3, "edit_filter_view", "edit_filter_view_authority"},
 		{1, "admin", "admin_authority"},
+		{2, "alarm_send", "alarm_send_authority"},
 		{2, "email_verified", "email_verified_acl"},
 		{2, "up_to_level_10", "up_to_level_10"},
 		{3, "up_to_level_3", "up_to_level_3"},
