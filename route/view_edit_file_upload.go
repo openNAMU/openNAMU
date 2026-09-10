@@ -46,6 +46,7 @@ func View_edit_file_upload(config tool.Config, file_name string) string {
 	data_html += `<hr class="main_hr"><textarea class="opennamu_textarea_100" placeholder="` + tool.Get_language(db, "other", false) + `" name="f_lice">` + tool.HTML_escape(upload_default) + `</textarea>`
 	data_html += `<hr class="main_hr">` + tool.Get_captcha_ui(db, config)
 	data_html += `<hr class="main_hr"><label><input type="checkbox" name="f_replace" value="1"> ` + tool.Get_language(db, "file_replace", true) + `</label>`
+	data_html += `<hr class="main_hr">`
 	data_html += `<button id="opennamu_save_button" type="submit">` + tool.Get_language(db, "save", false) + `</button>`
 	data_html += `</form>`
 

@@ -53,8 +53,8 @@ func view_setting_head_data(db *sql.DB, config tool.Config, kind string, skin_na
 			data.WriteString(`<a href="/setting/head/` + tool.Url_parser(skin) + `">(` + tool.HTML_escape(skin) + `)</a> `)
 			data.WriteString(`<a href="/setting/head/` + tool.Url_parser(skin+"-cssdark") + `">(` + tool.HTML_escape(skin) + `-cssdark)</a> `)
 		}
-		data.WriteString(setting_hr())
-		data.WriteString(`<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span>` + setting_hr())
+		data.WriteString(main_hr())
+		data.WriteString(`<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span>` + main_hr())
 	}
 
 	textarea_value := value
@@ -63,9 +63,9 @@ func view_setting_head_data(db *sql.DB, config tool.Config, kind string, skin_na
 	}
 
 	data.WriteString(`<textarea class="opennamu_textarea_500" placeholder="` + lang("enter_html") + `" name="content" id="content">` + tool.HTML_escape(textarea_value) + `</textarea>`)
-	data.WriteString(setting_hr())
+	data.WriteString(main_hr())
 	if kind == "head" {
-		data.WriteString(lang("main_css_warning") + setting_hr())
+		data.WriteString(lang("main_css_warning") + main_hr())
 	}
 	data.WriteString(`<button id="opennamu_save_button" type="submit">` + lang("save") + `</button>`)
 
@@ -73,7 +73,7 @@ func view_setting_head_data(db *sql.DB, config tool.Config, kind string, skin_na
 		preview_action := "/setting_preview/" + kind
 		data.WriteString(` <button id="opennamu_preview_button" type="submit" formaction="` + preview_action + `">` + lang("preview") + `</button>`)
 		if is_preview {
-			data.WriteString(setting_hr() + `<div id="opennamu_preview_area">` + preview + `</div>`)
+			data.WriteString(main_hr() + `<div id="opennamu_preview_area">` + preview + `</div>`)
 		}
 	}
 	data.WriteString(`</form>`)

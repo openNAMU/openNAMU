@@ -29,7 +29,7 @@ func View_setting_rankup(config tool.Config) string {
 	data := `<form method="post"><p>` + lang("rankup_condition_help") + `</p>`
 	for _, rankup_group := range tool.Rankup_group_list() {
 		data += `<h3>` + lang(rankup_group+"_acl") + `</h3>`
-		data += setting_textarea(rankup_group, condition_map[rankup_group], "opennamu_textarea_100") + setting_hr()
+		data += setting_textarea(rankup_group, condition_map[rankup_group], "opennamu_textarea_100") + main_hr()
 	}
 	data += `<button id="opennamu_save_button" type="submit">` + lang("save") + `</button></form>`
 

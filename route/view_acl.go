@@ -60,7 +60,7 @@ func acl_group_setting(db *sql.DB, title string, field string) string {
 	for _, group := range groups {
 		data += `<div>` + tool.HTML_escape(group) + ` <form method="post" style="display:inline"><input type="hidden" name="name" value="` + tool.HTML_escape(title) + `"><input type="hidden" name="acl_action" value="delete"><input type="hidden" name="acl_field" value="` + tool.HTML_escape(field) + `"><input type="hidden" name="acl_group" value="` + tool.HTML_escape(group) + `"><button type="submit">` + tool.Get_language(db, "delete", true) + `</button></form></div>`
 	}
-	data += `<form method="post"><input type="hidden" name="name" value="` + tool.HTML_escape(title) + `"><input type="hidden" name="acl_action" value="add"><input type="hidden" name="acl_field" value="` + tool.HTML_escape(field) + `">` + acl_group_select(db) + ` <button type="submit">` + tool.Get_language(db, "add", true) + `</button></form>`
+	data += `<form method="post"><input type="hidden" name="name" value="` + tool.HTML_escape(title) + `"><input type="hidden" name="acl_action" value="add"><input type="hidden" name="acl_field" value="` + tool.HTML_escape(field) + `">` + acl_group_select(db) + `<hr class="main_hr"><button type="submit">` + tool.Get_language(db, "add", true) + `</button></form>`
 	return data + `<hr class="main_hr">`
 }
 
@@ -69,7 +69,7 @@ func acl_group_multiple_setting(db *sql.DB) string {
 	for _, field := range document_acl_group_fields {
 		data += `<option value="` + tool.HTML_escape(field) + `">` + tool.HTML_escape(acl_field_title(db, field)) + `</option>`
 	}
-	data += `</select> ` + acl_group_select(db) + ` <button name="acl_action" value="add" type="submit">` + tool.Get_language(db, "add", true) + `</button> <button name="acl_action" value="delete" type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
+	data += `</select><hr class="main_hr">` + acl_group_select(db) + `<hr class="main_hr"><button name="acl_action" value="add" type="submit">` + tool.Get_language(db, "add", true) + `</button><hr class="main_hr"><button name="acl_action" value="delete" type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
 	return data
 }
 

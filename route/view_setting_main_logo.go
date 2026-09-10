@@ -46,8 +46,8 @@ func view_setting_main_logo_data(db *sql.DB, config tool.Config, values map[stri
 			label += " (" + tool.HTML_escape(skin) + ")"
 		}
 
-		data.WriteString(`<span>` + label + ` (HTML)</span>` + setting_hr())
-		data.WriteString(setting_input(field_name, values[field_name], "text") + setting_hr())
+		data.WriteString(`<span>` + label + ` (HTML)</span>` + main_hr())
+		data.WriteString(setting_input(field_name, values[field_name], "text") + main_hr())
 	}
 
 	data.WriteString(`<button id="opennamu_save_button" type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`)

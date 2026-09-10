@@ -29,10 +29,10 @@ func view_setting_top_menu_data(db *sql.DB, config tool.Config, value string) st
         <br>
         /w/FrontPage
     </span>`
-	data += setting_hr() + tool.Get_language(db, "not_support_skin_warning", true) + setting_hr()
+	data += main_hr() + tool.Get_language(db, "not_support_skin_warning", true) + main_hr()
 	data += `<form method="post">`
 	data += `<textarea class="opennamu_textarea_500" placeholder="` + tool.Get_language(db, "enter_top_menu_setting", true) + `" name="content" id="content">` + tool.HTML_escape(value) + `</textarea>`
-	data += setting_hr() + `<button id="opennamu_save_button" type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
+	data += main_hr() + `<button id="opennamu_save_button" type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 
 	return setting_page(db, config, tool.Get_language(db, "top_menu_setting", true), data, "setting")
 }

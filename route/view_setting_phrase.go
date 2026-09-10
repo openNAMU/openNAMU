@@ -83,11 +83,11 @@ func view_setting_phrase_data(db *sql.DB, config tool.Config, values map[string]
 
 		switch field.name {
 		case "approval_question":
-			data.WriteString(`<sup><a href="/setting/main">` + lang("approval_question_visible_only_when_approval_on") + `</a></sup>` + setting_hr())
+			data.WriteString(`<sup><a href="/setting/main">` + lang("approval_question_visible_only_when_approval_on") + `</a></sup>` + main_hr())
 		case "outdated_doc_warning":
-			data.WriteString(`<span>` + lang("period") + ` (` + lang("day") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + setting_hr())
+			data.WriteString(`<span>` + lang("period") + ` (` + lang("day") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + main_hr())
 		case "redirect_text":
-			data.WriteString(`<span>EX : {0} ➤ {1}</span>` + setting_hr())
+			data.WriteString(`<span>EX : {0} ➤ {1}</span>` + main_hr())
 		}
 
 		if field.input {
@@ -100,7 +100,7 @@ func view_setting_phrase_data(db *sql.DB, config tool.Config, values map[string]
 			data.WriteString(setting_textarea(field.name, values[field.name], class_name))
 		}
 
-		data.WriteString(setting_hr())
+		data.WriteString(main_hr())
 	}
 
 	data.WriteString(`<button id="opennamu_save_button" type="submit">` + lang("save") + `</button></form>`)

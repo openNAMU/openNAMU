@@ -23,6 +23,6 @@ func View_history_add_safe(config tool.Config, doc_name string, values url.Value
 		}
 		return tool.Get_redirect("/history/" + tool.Url_parser(doc_name))
 	}
-	body := `<form method="post"><input name="send"><input name="get_ip"><textarea name="content" class="opennamu_textarea_500"></textarea><button type="submit">` + tool.Get_language(db, "add", true) + `</button></form>`
+	body := `<form method="post"><input name="send"><hr class="main_hr"><input name="get_ip"><hr class="main_hr"><textarea name="content" class="opennamu_textarea_500"></textarea><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "add", true) + `</button></form>`
 	return document_safe_page(db, config, "history add", body)
 }

@@ -47,16 +47,16 @@ func view_setting_sitemap_set_data(db *sql.DB, config tool.Config, values map[st
 		}
 	}
 
-	data.WriteString(setting_hr() + `<form method="post">`)
-	data.WriteString(`<a href="/setting/sitemap">(` + lang("sitemap_manual_create") + `)</a>` + setting_hr())
-	data.WriteString(`<label><input type="checkbox" name="sitemap_auto_make" ` + setting_checked(values["sitemap_auto_make"]) + `> ` + lang("sitemap_auto_make") + `</label>` + setting_hr())
-	data.WriteString(`<span>` + lang("indexnow_key") + `</span>` + setting_hr())
-	data.WriteString(`<sup>` + lang("indexnow_key_help") + `</sup>` + setting_hr())
-	data.WriteString(setting_input("indexnow_key", values["indexnow_key"], "text") + setting_hr())
-	data.WriteString(`<label><input type="checkbox" name="sitemap_auto_exclude_domain" ` + setting_checked(values["sitemap_auto_exclude_domain"]) + `> ` + lang("stiemap_exclude_domain") + `</label>` + setting_hr())
-	data.WriteString(`<label><input type="checkbox" name="sitemap_auto_exclude_user_page" ` + setting_checked(values["sitemap_auto_exclude_user_page"]) + `> ` + lang("stiemap_exclude_user_page") + `</label>` + setting_hr())
-	data.WriteString(`<label><input type="checkbox" name="sitemap_auto_exclude_file_page" ` + setting_checked(values["sitemap_auto_exclude_file_page"]) + `> ` + lang("stiemap_exclude_file_page") + `</label>` + setting_hr())
-	data.WriteString(`<label><input type="checkbox" name="sitemap_auto_exclude_category_page" ` + setting_checked(values["sitemap_auto_exclude_category_page"]) + `> ` + lang("stiemap_exclude_category_page") + `</label>` + setting_hr())
+	data.WriteString(main_hr() + `<form method="post">`)
+	data.WriteString(`<a href="/setting/sitemap">(` + lang("sitemap_manual_create") + `)</a>` + main_hr())
+	data.WriteString(`<label><input type="checkbox" name="sitemap_auto_make" ` + setting_checked(values["sitemap_auto_make"]) + `> ` + lang("sitemap_auto_make") + `</label>` + main_hr())
+	data.WriteString(`<span>` + lang("indexnow_key") + `</span>` + main_hr())
+	data.WriteString(`<sup>` + lang("indexnow_key_help") + `</sup>` + main_hr())
+	data.WriteString(setting_input("indexnow_key", values["indexnow_key"], "text") + main_hr())
+	data.WriteString(`<label><input type="checkbox" name="sitemap_auto_exclude_domain" ` + setting_checked(values["sitemap_auto_exclude_domain"]) + `> ` + lang("stiemap_exclude_domain") + `</label>` + main_hr())
+	data.WriteString(`<label><input type="checkbox" name="sitemap_auto_exclude_user_page" ` + setting_checked(values["sitemap_auto_exclude_user_page"]) + `> ` + lang("stiemap_exclude_user_page") + `</label>` + main_hr())
+	data.WriteString(`<label><input type="checkbox" name="sitemap_auto_exclude_file_page" ` + setting_checked(values["sitemap_auto_exclude_file_page"]) + `> ` + lang("stiemap_exclude_file_page") + `</label>` + main_hr())
+	data.WriteString(`<label><input type="checkbox" name="sitemap_auto_exclude_category_page" ` + setting_checked(values["sitemap_auto_exclude_category_page"]) + `> ` + lang("stiemap_exclude_category_page") + `</label>` + main_hr())
 	data.WriteString(`<button id="opennamu_save_button" type="submit">` + lang("save") + `</button></form>`)
 
 	return setting_page(db, config, lang("sitemap_management"), data.String(), "setting")

@@ -79,7 +79,7 @@ func view_setting_skin_set_data(db *sql.DB, config tool.Config, fields []setting
 		}
 
 		data.WriteString(`<h3>` + tool.Get_language(db, field.label, true) + `</h3>`)
-		data.WriteString(`<select name="` + tool.HTML_escape(field.name) + `">` + setting_options(values[field.name], choice_values, choice_labels) + `</select>` + setting_hr())
+		data.WriteString(`<select name="` + tool.HTML_escape(field.name) + `">` + setting_options(values[field.name], choice_values, choice_labels) + `</select>` + main_hr())
 	}
 
 	data.WriteString(`<button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`)
