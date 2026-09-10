@@ -204,6 +204,14 @@
     font-size: 18px;
 }
 
+.opennamu_main .opennamu_TOC > summary::before {
+    content: "− ";
+}
+
+.opennamu_main .opennamu_TOC:not([open]) > summary::before {
+    content: "+ ";
+}
+
 /* - category */
 .opennamu_main .opennamu_category,
 .opennamu_main .opennamu_trace {

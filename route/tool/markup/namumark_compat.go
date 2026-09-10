@@ -384,7 +384,7 @@ func compat_render_parameter_data(data string, parameter map[string]any) string 
 var namumark_compat_single_macro_regex = regexp.MustCompile(`(?is)\[([a-zA-Z가-힣]+)\]`)
 
 var namumark_compat_heading_regex = regexp.MustCompile(`(?s)<h([1-6])><a href="#toc">([0-9.]+)\. </a>(.*?)</h[1-6]>`)
-var namumark_compat_toc_regex = regexp.MustCompile(`(?s)<div class="opennamu_TOC" id="toc">.*?</div>`)
+var namumark_compat_toc_regex = regexp.MustCompile(`(?s)<details open class="opennamu_TOC" id="toc">.*?</details>`)
 
 var namumark_compat_bold_regex = regexp.MustCompile(`(?s)<b>(.*?)</b>`)
 var namumark_compat_strike_regex = regexp.MustCompile(`(?s)<s>(.*?)</s>`)
@@ -407,12 +407,12 @@ func compat_fix_heading_data(db *sql.DB, data string) string {
 	if db != nil {
 		toc_title = tool.Get_language(db, "toc", true)
 	}
-	toc_data := `<div class="opennamu_TOC" id="toc"><span class="opennamu_TOC_title">` + compat_html_escape(toc_title) + `</span><br>`
+	toc_data := `<details open class="opennamu_TOC" id="toc"><summary class="opennamu_TOC_title">` + compat_html_escape(toc_title) + `</summary>`
 	for _, item := range toc_item {
 		indent := strings.Count(item[0], ".")
 		toc_data += `<br>` + strings.Repeat(`<span style="margin-left: 10px;"></span>`, indent) + `<span class="opennamu_TOC_list"><a href="#s-` + compat_html_escape(item[0]) + `">` + item[0] + `. </a>` + item[1] + `</span>`
 	}
-	toc_data += `</div>`
+	toc_data += `</details>`
 	return namumark_compat_toc_regex.ReplaceAllString(data, toc_data)
 }
 
@@ -2537,12 +2537,12 @@ func (class *namumark_compat_renderer) toc_html() string {
 	if class.db != nil {
 		toc_title = tool.Get_language(class.db, "toc", true)
 	}
-	data := `<div class="opennamu_TOC" id="toc"><span class="opennamu_TOC_title">` + compat_html_escape(toc_title) + `</span><br>`
+	data := `<details open class="opennamu_TOC" id="toc"><summary class="opennamu_TOC_title">` + compat_html_escape(toc_title) + `</summary>`
 	for _, item := range class.toc_items {
 		indent := strings.Count(item.number, ".")
 		data += `<br>` + strings.Repeat(`<span style="margin-left: 10px;"></span>`, indent) + `<span class="opennamu_TOC_list"><a href="#s-` + compat_html_escape(item.number) + `">` + item.number + `. </a>` + item.text + `</span>`
 	}
-	return data + `</div>`
+	return data + `</details>`
 }
 
 func (class *namumark_compat_renderer) process_headings(data string) string {
@@ -2692,7 +2692,7 @@ func (class *namumark_compat_renderer) process_blocks(data string) string {
 			append_result(line, true)
 			continue
 		}
-		if token_exists && strings.HasPrefix(token_data, `<div class="opennamu_TOC"`) {
+		if token_exists && strings.HasPrefix(token_data, `<details open class="opennamu_TOC"`) {
 			append_result(line, false)
 			continue
 		}

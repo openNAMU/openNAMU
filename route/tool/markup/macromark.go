@@ -464,7 +464,7 @@ func (class *macromark) render_last() {
 	}
 
 	if toc_data != "" {
-		toc_data = "<div class=\"opennamu_TOC\" id=\"toc\"><span class=\"opennamu_TOC_title\">" + tool.Get_language(class.db, "toc", true) + "</span><br>" + toc_data + "</div>"
+		toc_data = "<details open class=\"opennamu_TOC\" id=\"toc\"><summary class=\"opennamu_TOC_title\">" + tool.Get_language(class.db, "toc", true) + "</summary>" + toc_data + "</details>"
 	}
 
 	r = regexp.MustCompile(`<toc_data>`)

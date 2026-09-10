@@ -46,7 +46,7 @@ func user_skin_main_render_simple_set(db *sql.DB, data string) string {
 
 	heading_stack := make([]int, 6)
 	toc_data := strings.Builder{}
-	toc_data.WriteString(`<div class="opennamu_TOC" id="toc"><span class="opennamu_TOC_title">` + tool.Get_language(db, "toc", true) + `</span><br>`)
+	toc_data.WriteString(`<details open class="opennamu_TOC" id="toc"><summary class="opennamu_TOC_title">` + tool.Get_language(db, "toc", true) + `</summary>`)
 	for _, match := range matches {
 		heading_level, err := strconv.Atoi(match[1])
 		if err != nil || heading_level < 1 || heading_level > 6 {
@@ -73,6 +73,6 @@ func user_skin_main_render_simple_set(db *sql.DB, data string) string {
 		heading := `<h` + match[1] + ` id="s-` + number + `"><a href="#toc">` + number + `.</a> ` + match[2] + `</h` + match[1] + `>`
 		data = strings.Replace(data, match[0], heading, 1)
 	}
-	toc_data.WriteString(`</div>`)
+	toc_data.WriteString(`</details>`)
 	return toc_data.String() + data
 }
