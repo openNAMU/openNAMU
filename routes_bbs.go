@@ -141,6 +141,7 @@ func register_bbs_routes(r *gin.Engine) {
 		route_data := route.View_bbs_in_filter_post(
 			c.Param("set_id"),
 			c.PostForm("comment_min"),
+			c.PostForm("commented"),
 			c.PostForm("tabom_min"),
 			c.PostForm("mine"),
 			c.PostForm("participate"),

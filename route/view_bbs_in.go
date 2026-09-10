@@ -18,9 +18,16 @@ func View_bbs_in_filter(config tool.Config, set_id string, filter_data string) s
 	return view_bbs_in(config, set_id, page_num, "", filter, filter_path, true)
 }
 
-func View_bbs_in_filter_post(set_id string, comment_min string, tabom_min string, mine string, participate string, tabom_user string, author string, prefix string, tag string) string {
+func View_bbs_in_filter_post(set_id string, comment_min string, commented string, tabom_min string, mine string, participate string, tabom_user string, author string, prefix string, tag string) string {
+	commented_state := 0
+	if commented == "1" {
+		commented_state = 1
+	} else if commented == "0" {
+		commented_state = 2
+	}
 	filter := bbs_filter{
 		comment_min: bbs_filter_number(comment_min),
+		commented:   commented_state,
 		tabom_min:   bbs_filter_number(tabom_min),
 		mine:        mine == "1",
 		participate: participate == "1",
@@ -74,6 +81,18 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 		if filter.tabom_user {
 			tabom_user_checked = " checked"
 		}
+		commented_html := `<label>` + tool.Get_language(db, "bbs_comment_status", true) + ` <select name="commented"><option value="">` + tool.Get_language(db, "all", true) + `</option>`
+		if filter.commented == 1 {
+			commented_html += `<option value="1" selected>` + tool.Get_language(db, "bbs_has_comment", true) + `</option>`
+		} else {
+			commented_html += `<option value="1">` + tool.Get_language(db, "bbs_has_comment", true) + `</option>`
+		}
+		if filter.commented == 2 {
+			commented_html += `<option value="0" selected>` + tool.Get_language(db, "bbs_no_comment", true) + `</option>`
+		} else {
+			commented_html += `<option value="0">` + tool.Get_language(db, "bbs_no_comment", true) + `</option>`
+		}
+		commented_html += `</select></label>`
 		prefix_html := `<label>` + tool.Get_language(db, "bbs_prefix", true) + ` <select name="prefix"><option value="">` + tool.Get_language(db, "all", true) + `</option>`
 		for _, prefix := range bbs_prefix_list(db, set_id) {
 			selected := ""
@@ -84,7 +103,7 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 		}
 		prefix_html += `</select></label>`
 		data_html += `<form method="post" action="/bbs/in/` + tool.Url_parser(set_id) + `/filter">
-        <label>` + tool.Get_language(db, "comment", true) + ` <input name="comment_min" value="` + strconv.Itoa(filter.comment_min) + `"></label>
+        <label>` + tool.Get_language(db, "comment", true) + ` <input name="comment_min" value="` + strconv.Itoa(filter.comment_min) + `"></label>` + commented_html + `
         <label>` + tool.Get_language(db, "upvote", true) + ` <input name="tabom_min" value="` + strconv.Itoa(filter.tabom_min) + `"></label>
         <label><input type="checkbox" name="mine" value="1"` + mine_checked + `>` + tool.Get_language(db, "my_bbs_post", true) + `</label>
         <label><input type="checkbox" name="participate" value="1"` + participate_checked + `>` + tool.Get_language(db, "participate_bbs_post", true) + `</label>

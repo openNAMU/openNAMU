@@ -78,6 +78,7 @@ func bbs_post_view_sql(db *sql.DB, set_id string, ip string, row_alias string) (
 
 type bbs_filter struct {
 	comment_min    int
+	commented      int
 	tabom_min      int
 	mine           bool
 	participate    bool
@@ -112,6 +113,12 @@ func bbs_filter_parse(data string) bbs_filter {
 		switch parts[i] {
 		case "comment":
 			filter.comment_min = value
+		case "commented":
+			if parts[i+1] == "1" {
+				filter.commented = 1
+			} else if parts[i+1] == "0" {
+				filter.commented = 2
+			}
 		case "tabom":
 			filter.tabom_min = value
 		case "mine":
@@ -140,6 +147,11 @@ func bbs_filter_path(filter bbs_filter) string {
 	path := []string{}
 	if filter.comment_min > 0 {
 		path = append(path, "comment", strconv.Itoa(filter.comment_min))
+	}
+	if filter.commented == 1 {
+		path = append(path, "commented", "1")
+	} else if filter.commented == 2 {
+		path = append(path, "commented", "0")
 	}
 	if filter.tabom_min > 0 {
 		path = append(path, "tabom", strconv.Itoa(filter.tabom_min))
@@ -291,6 +303,11 @@ func bbs_filter_sql(filter bbs_filter, row_alias string, user_id string) (string
 	if filter.comment_min > 0 {
 		filter_sql += " and " + bbs_post_comment_count_sql(row_alias) + " >= ?"
 		filter_values = append(filter_values, filter.comment_min)
+	}
+	if filter.commented == 1 {
+		filter_sql += " and " + bbs_post_comment_count_sql(row_alias) + " >= 1"
+	} else if filter.commented == 2 {
+		filter_sql += " and " + bbs_post_comment_count_sql(row_alias) + " = 0"
 	}
 	if filter.tabom_min > 0 {
 		filter_sql += " and " + bbs_post_tabom_count_sql(row_alias) + " >= ?"
