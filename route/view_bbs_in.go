@@ -104,15 +104,17 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 		}
 		prefix_html += `</select></label>`
 		data_html += `<form method="post" action="/bbs/in/` + tool.Url_parser(set_id) + `/filter">
-        <label>` + tool.Get_language(db, "comment", true) + ` <input name="comment_min" value="` + strconv.Itoa(filter.comment_min) + `"></label>` + commented_html + `
-        <label>` + tool.Get_language(db, "upvote", true) + ` <input name="tabom_min" value="` + strconv.Itoa(filter.tabom_min) + `"></label>
-        <label><input type="checkbox" name="mine" value="1"` + mine_checked + `>` + tool.Get_language(db, "my_bbs_post", true) + `</label>
-        <label><input type="checkbox" name="participate" value="1"` + participate_checked + `>` + tool.Get_language(db, "participate_bbs_post", true) + `</label>
-        <label><input type="checkbox" name="tabom_user" value="1"` + tabom_user_checked + `>` + tool.Get_language(db, "my_tabom_bbs_post", true) + `</label>
-        <label>` + tool.Get_language(db, "bbs_comment_author", true) + ` <input name="comment_user" value="` + tool.HTML_escape(filter.comment_user) + `"></label>
-        <label>` + tool.Get_language(db, "bbs_author", true) + ` <input name="author" value="` + tool.HTML_escape(filter.author) + `"></label>` + prefix_html + `
-        <label>` + tool.Get_language(db, "tag", true) + ` <input name="tag" value="` + tool.HTML_escape(filter.tag) + `"></label>
-        <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "filter", true) + `</button>
+        <div><label>` + tool.Get_language(db, "comment", true) + ` <input name="comment_min" value="` + strconv.Itoa(filter.comment_min) + `"></label></div><hr class="main_hr">
+        <div>` + commented_html + `</div><hr class="main_hr">
+        <div><label>` + tool.Get_language(db, "upvote", true) + ` <input name="tabom_min" value="` + strconv.Itoa(filter.tabom_min) + `"></label></div><hr class="main_hr">
+        <div><label><input type="checkbox" name="mine" value="1"` + mine_checked + `>` + tool.Get_language(db, "my_bbs_post", true) + `</label></div><hr class="main_hr">
+        <div><label><input type="checkbox" name="participate" value="1"` + participate_checked + `>` + tool.Get_language(db, "participate_bbs_post", true) + `</label></div><hr class="main_hr">
+        <div><label><input type="checkbox" name="tabom_user" value="1"` + tabom_user_checked + `>` + tool.Get_language(db, "my_tabom_bbs_post", true) + `</label></div><hr class="main_hr">
+        <div><label>` + tool.Get_language(db, "bbs_comment_author", true) + ` <input name="comment_user" value="` + tool.HTML_escape(filter.comment_user) + `"></label></div><hr class="main_hr">
+        <div><label>` + tool.Get_language(db, "bbs_author", true) + ` <input name="author" value="` + tool.HTML_escape(filter.author) + `"></label></div><hr class="main_hr">
+        <div>` + prefix_html + `</div><hr class="main_hr">
+        <div><label>` + tool.Get_language(db, "tag", true) + ` <input name="tag" value="` + tool.HTML_escape(filter.tag) + `"></label></div>
+        <div><button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "filter", true) + `</button> <a href="/bbs/in/` + tool.Url_parser(set_id) + `/1">(` + tool.Get_language(db, "reset", true) + `)</a></div>
     </form><hr class="main_hr">`
 	}
 	data_html += Get_bbs_list_ui(config, data_api_in, map[string]string{})
