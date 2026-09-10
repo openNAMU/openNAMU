@@ -77,32 +77,5 @@ func Api_bbs_w_tabom_post(config tool.Config, sub_code string, vote_type string)
 		return return_data
 	}
 
-	if vote_type != "down" {
-		vote_type = "up"
-	}
-
-	selected_list := "tabom_list"
-	selected_count := "tabom_count"
-	if vote_type == "down" {
-		selected_list = "tabom_down_list"
-		selected_count = "tabom_down_count"
-	}
-
-	if bbs_tabom_user_exists(db, selected_list, config.IP, bbs_num, post_num) {
-		return_data["response"] = "same user exist"
-		return return_data
-	}
-
-	change_bbs_tabom_count(db, selected_count, bbs_num, post_num, 1)
-	tool.Exec_DB(
-		db,
-		"insert into bbs_data (set_name, set_data, set_id, set_code) values (?, ?, ?, ?)",
-		selected_list,
-		config.IP,
-		bbs_num,
-		post_num,
-	)
-	return_data["response"] = "ok"
-
-	return return_data
+	return api_bbs_tabom_post(db, config.IP, bbs_num, post_num, vote_type)
 }

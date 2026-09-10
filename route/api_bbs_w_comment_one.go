@@ -30,13 +30,13 @@ func Api_bbs_w_comment_one(config tool.Config, already_auth_check bool, do_type 
 	if do_type == "around" {
 		rows = tool.Query_DB(
 			db,
-			"select set_name, set_data, set_code, set_id from bbs_data where (set_name = 'comment' or set_name like 'comment%' or set_name = 'pinned') and set_id = ? order by set_code + 0 asc, set_name asc",
+			"select set_name, set_data, set_code, set_id from bbs_data where (set_name = 'comment' or set_name like 'comment%' or set_name in ('pinned', 'tabom_count', 'tabom_down_count')) and set_id = ? order by set_code + 0 asc, set_name asc",
 			new_sub_code,
 		)
 	} else {
 		rows = tool.Query_DB(
 			db,
-			"select set_name, set_data, set_code, set_id from bbs_data where (set_name = 'comment' or set_name like 'comment%' or set_name = 'pinned') and set_id = ? and set_code = ? order by set_name asc",
+			"select set_name, set_data, set_code, set_id from bbs_data where (set_name = 'comment' or set_name like 'comment%' or set_name in ('pinned', 'tabom_count', 'tabom_down_count')) and set_id = ? and set_code = ? order by set_name asc",
 			new_sub_code, sub_code_last,
 		)
 	}

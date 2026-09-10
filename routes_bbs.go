@@ -325,4 +325,26 @@ func register_bbs_routes(r *gin.Engine) {
 		)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
+
+	r.GET("/bbs/w/:set_id/:set_code/comment_tabom/:comment_code/:vote_type", func(c *gin.Context) {
+		route_data := route.View_bbs_in_w_comment_tabom(
+			make_route_config(c),
+			c.Param("set_id"),
+			c.Param("set_code"),
+			c.Param("comment_code"),
+			c.Param("vote_type"),
+		)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.POST("/bbs/w/:set_id/:set_code/comment/:comment_code/tabom", func(c *gin.Context) {
+		route_data := route.View_bbs_in_w_comment_tabom_post(
+			make_route_config(c),
+			c.Param("set_id"),
+			c.Param("set_code"),
+			c.Param("comment_code"),
+			c.PostForm("vote_type"),
+		)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
 }

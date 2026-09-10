@@ -87,7 +87,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 
 	if page == 1 && len(pinned_data_api_in) > 0 {
 		for _, v := range pinned_data_api_in {
-			comment_html, _, exists := get_bbs_comment_ui(db, config, post_user, set_id, set_code, comment_prefix, comment_path, v, comment_manage, true)
+			comment_html, _, exists := get_bbs_comment_ui(db, config, post_user, set_id, set_code, comment_prefix, comment_path, v, comment_manage, bbs_comment_acl, true)
 			if exists {
 				data_html += comment_html
 			}
@@ -96,7 +96,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	}
 
 	for _, v := range data_api_in {
-		comment_html, code_id, exists := get_bbs_comment_ui(db, config, post_user, set_id, set_code, comment_prefix, comment_path, v, comment_manage, false)
+		comment_html, code_id, exists := get_bbs_comment_ui(db, config, post_user, set_id, set_code, comment_prefix, comment_path, v, comment_manage, bbs_comment_acl, false)
 		if !exists {
 			continue
 		}
@@ -128,7 +128,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	data_html += tool.Get_page_control(db, page, page_count, 50, "/bbs/w/"+tool.Url_parser(set_id)+"/"+tool.Url_parser(set_code)+"/page/{}")
 	return data_html
 }
-func get_bbs_comment_ui(db *sql.DB, config tool.Config, post_user string, set_id string, set_code string, comment_prefix string, comment_path string, v map[string]string, comment_manage bool, copy_comment bool) (string, string, bool) {
+func get_bbs_comment_ui(db *sql.DB, config tool.Config, post_user string, set_id string, set_code string, comment_prefix string, comment_path string, v map[string]string, comment_manage bool, comment_acl bool, copy_comment bool) (string, string, bool) {
 	comment_data := v["comment"]
 	if v["blind"] == "O" && !comment_manage {
 		comment_data = ""
@@ -154,6 +154,18 @@ func get_bbs_comment_ui(db *sql.DB, config tool.Config, post_user string, set_id
 	date := `<a href="` + comment_path + tool.Url_parser(code_id) + `#opennamu_comment_select">(` + tool.Get_language(db, "comment", true) + `)</a> `
 	date += `<a href="/bbs/tool/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/` + tool.Url_parser(code_id) + `">(` + tool.Get_language(db, "tool", true) + `)</a> `
 	date += v["comment_date"]
+	if comment_acl {
+		tabom_count := v["tabom_count"]
+		if tabom_count == "" {
+			tabom_count = "0"
+		}
+		tabom_down_count := v["tabom_down_count"]
+		if tabom_down_count == "" {
+			tabom_down_count = "0"
+		}
+		date += ` <a href="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/comment_tabom/` + tool.Url_parser(code_id) + `/up">(` + tool.Get_language(db, "upvote", true) + ` ` + tool.HTML_escape(tabom_count) + `)</a>`
+		date += ` <a href="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/comment_tabom/` + tool.Url_parser(code_id) + `/down">(` + tool.Get_language(db, "downvote", true) + ` ` + tool.HTML_escape(tabom_down_count) + `)</a>`
+	}
 
 	padding_str := "0"
 	if !copy_comment {
