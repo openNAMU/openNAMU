@@ -23,6 +23,7 @@ func Api_user_info(config tool.Config, ip string) map[string]any {
 	data_result["level"] = level_data[0]
 	data_result["exp"] = level_data[1]
 	data_result["max_exp"] = level_data[2]
+	data_result["point"] = tool.Get_user_point(db, ip)
 
 	ban_data := any("0")
 	if tool.Auth_group_name_ban(auth_name) {
@@ -57,6 +58,7 @@ func Api_user_info(config tool.Config, ip string) map[string]any {
 		"ip",
 		"ban",
 		"level",
+		"point",
 		"option",
 		"edit_request_able",
 		"cidr",

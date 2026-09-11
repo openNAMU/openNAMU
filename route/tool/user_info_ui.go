@@ -2,10 +2,21 @@ package tool
 
 import (
 	"database/sql"
+	"strconv"
 	"strings"
 )
 
 func Get_user_info_ui(db *sql.DB, config Config, user_name string) string {
+	data := get_user_info_ui(db, config, user_name)
+	return strings.Replace(
+		data,
+		"</table>",
+		`<tr><td>`+Get_language(db, "point", false)+`</td><td>`+strconv.Itoa(Get_user_point(db, user_name))+`</td></tr></table>`,
+		1,
+	)
+}
+
+func get_user_info_ui(db *sql.DB, config Config, user_name string) string {
 	auth_name := Get_user_auth(db, user_name)
 	auth_date := Get_auth_date(db, user_name)
 	if auth_date != "0" {

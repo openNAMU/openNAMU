@@ -116,6 +116,73 @@ func Get_user_title(db *sql.DB, user_name string) string {
 	return user_title
 }
 
+func Get_user_point(db DB_runner, user_name string) int {
+	point := "0"
+	QueryRow_DB(
+		db,
+		"select data from user_set where id = ? and name = 'point' limit 1",
+		[]any{&point},
+		user_name,
+	)
+	return Str_to_int(point)
+}
+
+func Set_user_point(db DB_runner, user_name string, point int) {
+	if point < 0 {
+		point = 0
+	}
+
+	if sql_db, ok := db.(*sql.DB); ok {
+		if err := DB_transaction(sql_db, func(tx *sql.Tx) error {
+			Set_user_point(tx, user_name, point)
+			return nil
+		}); err != nil {
+			panic(err)
+		}
+		return
+	}
+
+	point_data := ""
+	if QueryRow_DB(
+		db,
+		"select data from user_set where id = ? and name = 'point' limit 1",
+		[]any{&point_data},
+		user_name,
+	) {
+		Exec_DB(
+			db,
+			"update user_set set data = ? where id = ? and name = 'point'",
+			strconv.Itoa(point),
+			user_name,
+		)
+		return
+	}
+
+	Exec_DB(
+		db,
+		"insert into user_set (id, name, data) values (?, 'point', ?)",
+		user_name,
+		strconv.Itoa(point),
+	)
+}
+
+func Change_user_point(db DB_runner, user_name string, amount int) int {
+	if sql_db, ok := db.(*sql.DB); ok {
+		point := 0
+		if err := DB_transaction(sql_db, func(tx *sql.Tx) error {
+			point = Change_user_point(tx, user_name, amount)
+			return nil
+		}); err != nil {
+			panic(err)
+		}
+		return point
+	}
+
+	point := Get_user_point(db, user_name) + amount
+	Set_user_point(db, user_name, point)
+	return point
+}
+
 func Get_level(db *sql.DB, ip string) []string {
 	level := "0"
 	QueryRow_DB(
