@@ -552,6 +552,25 @@ func Get_no_link_page_rows(db *sql.DB, offset int) *sql.Rows {
 	return Query_DB(db, "select doc_name, set_data from data_set where set_name = 'link_count' and set_data = '0' order by doc_name limit ?, 50", offset)
 }
 
+func Get_unlinked_document_page_rows(db *sql.DB, offset int) *sql.Rows {
+	link_case_insensitive := ""
+	QueryRow_DB(
+		db,
+		"select data from other where name = 'link_case_insensitive'",
+		[]any{&link_case_insensitive},
+	)
+	case_sql := ""
+	if link_case_insensitive != "" {
+		case_sql = " collate nocase"
+	}
+
+	return Query_DB(
+		db,
+		"select d.title from data d where "+Get_except_document_name_SQL("d.title")+" and not exists (select 1 from back b where b.title"+case_sql+" = d.title and not b.type = 'no' and not b.type = 'nothing') order by d.title limit ?, 50",
+		offset,
+	)
+}
+
 func Get_move_document_rows(db *sql.DB, pattern string) *sql.Rows {
 	return Query_DB(
 		db,
