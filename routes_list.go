@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strings"
 
 	"opennamu/route"
 
@@ -56,6 +57,12 @@ func register_list_routes(r *gin.Engine) {
 
 	r.GET("/random", func(c *gin.Context) {
 		route_data := route.View_w_random(make_route_config(c))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/random/category/*category_name", func(c *gin.Context) {
+		category_name := strings.TrimPrefix(c.Param("category_name"), "/")
+		route_data := route.View_w_random_category(make_route_config(c), category_name)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 

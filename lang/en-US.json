@@ -88,6 +88,7 @@
     "revert_bottom_text" : "Revert textarea bottom notice",
     "warning_restart" : "Restarting... Press Refresh (F5)",
     "random_list" : "Random document(s) list",
+    "random_category": "Random document in category",
     "r1" : "r1",
     "test" : "Test",
     "email_test" : "Send test email",

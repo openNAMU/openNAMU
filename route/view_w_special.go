@@ -135,7 +135,11 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 	if category_doc != "" {
 		data += `<h2>` + tool.Get_language(db, "category_title", true) + `</h2><ul><li>` + tool.Get_language(db, "all", true) + " : " + strconv.Itoa(category_doc_count) + `</li>` + category_doc + `</ul>`
 	}
-	return data + `<hr class="main_hr">`
+	random_link := ""
+	if category_doc_count > 0 {
+		random_link = `(<a href="/random/category/` + tool.Url_parser(doc_name) + `">` + tool.Get_language(db, "random_category", false) + `</a>)`
+	}
+	return data + random_link + `<hr class="main_hr">`
 }
 
 func view_w_file_data(db *sql.DB, doc_name string) string {
