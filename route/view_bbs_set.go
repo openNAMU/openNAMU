@@ -120,6 +120,7 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 		Api_bbs_w_set_put(config, set_id, "bbs_prefix", values.Get("bbs_prefix"), "")
 		Api_bbs_w_set_put(config, set_id, "bbs_placeholder", values.Get("bbs_placeholder"), "")
 		Api_bbs_w_set_put(config, set_id, "bbs_comment_placeholder", values.Get("bbs_comment_placeholder"), "")
+		Api_bbs_w_set_put(config, set_id, "bbs_excellent_min", values.Get("bbs_excellent_min"), "")
 		return tool.Get_redirect("/bbs/set/" + tool.Url_parser(set_id))
 	}
 
@@ -142,6 +143,8 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 	data += "<textarea class=\"opennamu_textarea_100\" name=\"bbs_placeholder\">" + tool.HTML_escape(bbs_set_value(db, set_id, "bbs_placeholder")) + "</textarea><hr class=\"main_hr\">"
 	data += "<h3>" + tool.Get_language(db, "bbs_comment_placeholder", true) + "</h3>"
 	data += "<textarea class=\"opennamu_textarea_100\" name=\"bbs_comment_placeholder\">" + tool.HTML_escape(bbs_set_value(db, set_id, "bbs_comment_placeholder")) + "</textarea><hr class=\"main_hr\">"
+	data += "<h3>" + tool.Get_language(db, "bbs_excellent_min_board", true) + "</h3>"
+	data += setting_input("bbs_excellent_min", bbs_set_value(db, set_id, "bbs_excellent_min"), "number") + "<hr class=\"main_hr\">"
 	data += `<button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 
 	menu := [][]any{

@@ -278,6 +278,34 @@ func bbs_post_tabom_count_sql(row_alias string) string {
 	return "coalesce((select set_data from bbs_data tabom_data where tabom_data.set_name = 'tabom_count' and tabom_data.set_id = " + row_alias + ".set_id and tabom_data.set_code = " + row_alias + ".set_code limit 1), '0') + 0"
 }
 
+func bbs_post_tabom_down_count_sql(row_alias string) string {
+	return "coalesce((select set_data from bbs_data tabom_down_data where tabom_down_data.set_name = 'tabom_down_count' and tabom_down_data.set_id = " + row_alias + ".set_id and tabom_down_data.set_code = " + row_alias + ".set_code limit 1), '0') + 0"
+}
+
+func bbs_post_tabom_score_sql(row_alias string) string {
+	return "(" + bbs_post_tabom_count_sql(row_alias) + " - " + bbs_post_tabom_down_count_sql(row_alias) + ")"
+}
+
+func bbs_excellent_min(db *sql.DB, set_id string) int {
+	values := []string{
+		bbs_set_value(db, set_id, "bbs_excellent_min"),
+		tool.Get_setting_value_exact(db, "bbs_excellent_min", "", ""),
+	}
+	for _, value := range values {
+		value = strings.TrimSpace(value)
+		if value == "" {
+			continue
+		}
+
+		min, err := strconv.Atoi(value)
+		if err == nil && min >= 0 {
+			return min
+		}
+	}
+
+	return 5
+}
+
 func bbs_comment_set_id_sql(row_alias string, suffix string) string {
 	if tool.Get_DB_type() == "mysql" {
 		return "concat(" + row_alias + ".set_id, '-', " + row_alias + ".set_code, '" + suffix + "')"
@@ -473,6 +501,10 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 		}
 		query += filter_sql
 		values = append(values, filter_values...)
+		if sort_type == "excellent" {
+			query += " and " + bbs_post_tabom_score_sql("bbs_data") + " > ?"
+			values = append(values, bbs_excellent_min(db, bbs_num))
+		}
 		query += " order by set_data desc"
 		rows := tool.Query_DB(db, query, values...)
 
@@ -532,6 +564,22 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 			query += filter_sql
 			values = append(values, filter_values...)
 			query += " order by " + bbs_post_tabom_count_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
+			values = append(values, num)
+			rows = tool.Query_DB(db, query, values...)
+		} else if sort_type == "excellent" {
+			view_sql, view_values = bbs_post_view_sql(db, bbs_num, config.IP, "title")
+			filter_sql, filter_values := bbs_filter_sql(filter, "title", config.IP)
+			query = "select title.set_code, title.set_id, '0' from bbs_data title where title.set_name = 'title' and title.set_id like ?"
+			values = []any{bbs_num}
+			if view_sql != "" {
+				query += " and " + view_sql
+				values = append(values, view_values...)
+			}
+			query += filter_sql
+			values = append(values, filter_values...)
+			query += " and " + bbs_post_tabom_score_sql("title") + " > ?"
+			values = append(values, bbs_excellent_min(db, bbs_num))
+			query += " order by " + bbs_post_tabom_score_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		} else {

@@ -17,7 +17,7 @@ func View_vote_end(config tool.Config, id string) string {
 	data := vote_data["data"]
 	type_data := vote_data["type"]
 	end_date := tool.Get_vote_value(db, id, "end_date")
-	body := `(<a href="/vote/close/` + tool.Url_parser(id) + `">` + tool.Get_language(db, "close_vote", true) + `</a>)<h2>` + tool.HTML_escape(name) + `</h2>`
+	body := `<a href="/vote/close/` + tool.Url_parser(id) + `">` + tool.Get_language(db, "close_vote", true) + `</a><h2>` + tool.HTML_escape(name) + `</h2>`
 	if subject != "" {
 		body += `<b>` + tool.HTML_escape(subject) + `</b><hr class="main_hr">`
 	}

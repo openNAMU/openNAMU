@@ -91,7 +91,7 @@ func View_user_check(config tool.Config, name string, check_type string, page st
 	}
 	data += `</table>`
 	if plus_name != "" {
-		data = `<a href="/list/user/check/` + tool.Url_parser(name) + `">` + tool.HTML_escape(name) + `</a> <a href="/list/user/check/` + tool.Url_parser(plus_name) + `">` + tool.HTML_escape(plus_name) + `</a><hr class="main_hr">` + data
+		data = `(<a href="/list/user/check/` + tool.Url_parser(name) + `">` + tool.HTML_escape(name) + `</a>)&nbsp;(<a href="/list/user/check/` + tool.Url_parser(plus_name) + `">` + tool.HTML_escape(plus_name) + `</a>)<hr class="main_hr">` + data
 	} else {
 		data = `<a href="/manager/14/` + tool.Url_parser(name) + `">(` + tool.Get_language(db, "compare", true) + `)</a> <a href="/list/user/check/` + tool.Url_parser(name) + `/simple">(` + tool.Get_language(db, "check", true) + `)</a><hr class="main_hr">` + data
 	}

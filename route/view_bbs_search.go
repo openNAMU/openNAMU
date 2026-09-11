@@ -68,8 +68,8 @@ func view_bbs_search(config tool.Config, set_id string, keyword string, page str
 	data_html := `<form method="post" action="` + search_path + `">
         <input class="__ON_INPUT__" name="keyword" value="` + tool.HTML_escape(keyword) + `" placeholder="` + tool.Get_language(db, "search", true) + `">
         <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "search", true) + `</button>
-    </form><a href="` + search_switch_path + `">` + search_switch_text + `</a><hr class="main_hr">`
-	data_html += `<a href="` + comment_search_path + `">` + comment_search_text + `</a>`
+    </form>(<a href="` + search_switch_path + `">` + search_switch_text + `</a>)&nbsp;`
+	data_html += `(<a href="` + comment_search_path + `">` + comment_search_text + `</a>)<hr class="main_hr">`
 
 	if keyword != "" {
 		data_api := Api_bbs_search(config, keyword, set_id, strconv.Itoa(page_int))

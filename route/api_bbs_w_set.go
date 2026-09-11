@@ -18,6 +18,7 @@ func BBS_w_set_list() map[string]string {
 	setting_acl["bbs_prefix"] = ""
 	setting_acl["bbs_placeholder"] = ""
 	setting_acl["bbs_comment_placeholder"] = ""
+	setting_acl["bbs_excellent_min"] = ""
 
 	return setting_acl
 }

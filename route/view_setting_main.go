@@ -143,6 +143,7 @@ func setting_main_fields() []setting_field {
 		{name: "domain", default_value: ""},
 		{name: "ua_get", default_value: ""},
 		{name: "enable_comment", default_value: ""},
+		{name: "bbs_excellent_min", default_value: ""},
 		{name: "edit_bottom_compulsion", default_value: ""},
 		{name: "http_select", default_value: "http"},
 		{name: "title_max_length", default_value: ""},
@@ -234,6 +235,8 @@ func view_setting_main_data(db *sql.DB, config tool.Config, values map[string]st
 	data.WriteString(`<label><input type="checkbox" name="enable_comment" ` + setting_checked(values["enable_comment"]) + `> ` + lang("enable_comment_function") + `</label>` + main_hr())
 	data.WriteString(`<label><input type="checkbox" name="user_name_level" ` + setting_checked(values["user_name_level"]) + `> ` + lang("display_level_in_user_name") + `</label>` + main_hr())
 	data.WriteString(`<label><input type="checkbox" name="not_use_view_count" ` + setting_checked(values["not_use_view_count"]) + `> ` + lang("not_use_view_count") + `</label>` + main_hr())
+	data.WriteString(`<span>` + lang("bbs_excellent_min") + ` (` + lang("empty") + ` : 5)</span>` + main_hr())
+	data.WriteString(setting_input("bbs_excellent_min", values["bbs_excellent_min"], "number") + main_hr())
 
 	data.WriteString(`<h2>` + lang("design_set") + `</h2>`)
 	data.WriteString(`<span>` + lang("wiki_skin") + `</span>` + main_hr())

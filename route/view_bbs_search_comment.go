@@ -52,8 +52,8 @@ func View_bbs_search_comment(config tool.Config, set_id string, keyword string, 
         <input class="__ON_INPUT__" name="keyword" value="` + tool.HTML_escape(keyword) + `" placeholder="` + tool.Get_language(db, "search", true) + `">
         <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "search", true) + `</button>
     </form>`
-	data_html += `<a href="` + title_search_path + `">` + tool.Get_language(db, "search", true) + `</a> `
-	data_html += `<a href="` + data_search_path + `">` + tool.Get_language(db, "bbs_search_data", true) + `</a><hr class="main_hr">`
+	data_html += `(<a href="` + title_search_path + `">` + tool.Get_language(db, "search", true) + `</a>)&nbsp;`
+	data_html += `(<a href="` + data_search_path + `">` + tool.Get_language(db, "bbs_search_data", true) + `</a>)<hr class="main_hr">`
 
 	if keyword != "" {
 		data_api := Api_bbs_search_comment(config, keyword, set_id, strconv.Itoa(page_int))
