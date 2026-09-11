@@ -428,6 +428,8 @@
     "no_link_document_list": "List of document(s) without link",
     "unlinked_document": "Document(s) not linked from other document(s)",
     "unlinked_document_list": "List of document(s) not linked from other document(s)",
+    "no_category_document": "Document(s) without category",
+    "no_category_document_list": "List of document(s) without category",
     "new_page": "List of new document(s)",
     
     "_comment_": "BBS",

@@ -718,6 +718,8 @@
     "no_link_document_list": "링크가 없는 문서 목록",
     "unlinked_document": "다른 문서에서 링크되지 않은 문서",
     "unlinked_document_list": "다른 문서에서 링크되지 않은 문서 목록",
+    "no_category_document": "분류가 없는 문서",
+    "no_category_document_list": "분류가 없는 문서 목록",
     "authority_use_list_off": "권한 사용 목록 끄기",
     "authority_use_list_expiration_date": "권한 사용 목록 만료 기한",
     "bbs_help": "게시판 편집기 도움말",

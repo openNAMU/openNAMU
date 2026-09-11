@@ -553,6 +553,14 @@ func Get_no_link_page_rows(db *sql.DB, offset int) *sql.Rows {
 	return Query_DB(db, "select doc_name, set_data from data_set where set_name = 'link_count' and set_data = '0' order by doc_name limit ?, 50", offset)
 }
 
+func Get_no_category_document_rows(db *sql.DB, offset int) *sql.Rows {
+	return Query_DB(
+		db,
+		"select d.title from data d where "+Get_except_document_name_SQL("d.title")+" and not exists (select 1 from back b where b.link = d.title and b.type = 'cat') order by d.title limit ?, 50",
+		offset,
+	)
+}
+
 func Get_view_not_exist_rows(db *sql.DB, offset int) *sql.Rows {
 	date_list := []string{}
 	value_list := []any{}
