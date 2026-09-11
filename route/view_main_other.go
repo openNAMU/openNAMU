@@ -39,6 +39,7 @@ func View_main_other(config tool.Config) string {
             <li><a href="/list/document/view">`+tool.Get_language(db, "page_view_sort", true)+`</a></li>
             <li><a href="/list/document/view/month">`+tool.Get_language(db, "page_view_month", true)+`</a></li>
             <li><a href="/list/document/view/day">`+tool.Get_language(db, "page_view_day", true)+`</a></li>
+            <li><a href="/list/document/view/not_exist">`+tool.Get_language(db, "page_view_not_exist", true)+`</a></li>
             <li><a href="/list/document/acl">`+tool.Get_language(db, "acl_document_list", true)+`</a></li>
             <li><a href="/list/document/need">`+tool.Get_language(db, "need_document", true)+`</a></li>
             <li><a href="/list/category/need">`+tool.Get_language(db, "need_category", true)+`</a></li>

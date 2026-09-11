@@ -3,6 +3,7 @@ package tool
 import (
 	"database/sql"
 	"strings"
+	"time"
 )
 
 func Get_setting_value(db *sql.DB, name string, coverage string, default_value string) string {
@@ -550,6 +551,23 @@ func Get_no_link_rows(db *sql.DB) *sql.Rows {
 
 func Get_no_link_page_rows(db *sql.DB, offset int) *sql.Rows {
 	return Query_DB(db, "select doc_name, set_data from data_set where set_name = 'link_count' and set_data = '0' order by doc_name limit ?, 50", offset)
+}
+
+func Get_view_not_exist_rows(db *sql.DB, offset int) *sql.Rows {
+	date_list := []string{}
+	value_list := []any{}
+	now := time.Now()
+	for i := 0; i < 7; i++ {
+		date_list = append(date_list, "?")
+		value_list = append(value_list, now.AddDate(0, 0, -i).Format("2006-01-02"))
+	}
+	value_list = append(value_list, offset)
+
+	return Query_DB(
+		db,
+		"select v.doc_name, sum(v.set_data + 0) from data_set v where v.set_name = 'view_count' and v.doc_rev in ("+strings.Join(date_list, ",")+") and "+Get_except_document_name_SQL("v.doc_name")+" and not exists (select 1 from data d where d.title = v.doc_name) group by v.doc_name order by sum(v.set_data + 0) desc, v.doc_name asc limit ?, 50",
+		value_list...,
+	)
 }
 
 func Get_unlinked_document_page_rows(db *sql.DB, offset int) *sql.Rows {

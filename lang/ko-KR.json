@@ -849,6 +849,7 @@
     "page_view_sort": "조회수순",
     "page_view_month": "월별 조회수순",
     "page_view_day": "일별 조회수순",
+    "page_view_not_exist": "존재하지 않는 문서 조회수순",
     "comment_sort": "댓글순",
     "activity_sort": "최근 활동순",
     "upvote_sort": "추천순",
