@@ -9,7 +9,7 @@ import (
 
 var topic_reference_regex = regexp.MustCompile(`(^|[ \n])#([0-9]+)(?:-([0-9]+))?($|[ \n])`)
 var topic_call_regex = regexp.MustCompile(`(^|[ \n])@([^ \n]+)($|[ \n])`)
-var topic_legacy_thread_regex = regexp.MustCompile(`(?:&lt;|<)topic_a_thread(?:&gt;|>)#([0-9]+)(?:&lt;|<)/topic_a_thread(?:&gt;|>)`)
+var topic_legacy_thread_regex = regexp.MustCompile(`(?:&lt;|<)topic_a(?:_thread)?(?:&gt;|>)#([0-9]+)(?:&lt;|<)/topic_a(?:_thread)?(?:&gt;|>)`)
 
 func topic_reference_notify(db *sql.DB, config tool.Config, data string, num string, topic_num string, set_id string, name string, sub string, do_type string) {
 	if data == "" {
