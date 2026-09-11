@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"strings"
 
 	"opennamu/route/tool"
@@ -96,32 +97,21 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 
 	length := tool.Get_edit_length_diff(old_data, data)
 
-	tool.Exec_DB(
-		db,
-		`delete from data where title = ?`,
-		doc_name,
-	)
-	tool.Exec_DB(
-		db,
-		`insert into data (title, data) values (?, ?)`,
-		doc_name,
-		data,
-	)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if _, err := tx.Exec(tool.DB_change(`delete from data where title = ?`), doc_name); err != nil {
+			return err
+		}
+		if _, err := tx.Exec(tool.DB_change(`insert into data (title, data) values (?, ?)`), doc_name, data); err != nil {
+			return err
+		}
+		tool.Do_add_history(tx, doc_name, data, date, config.IP, send, length, "", "")
+		return nil
+	}); err != nil {
+		panic(err)
+	}
 	tool.Search_index_update(doc_name, data)
 
 	tool.Do_watchlist_alarm_send(db, config, doc_name)
-
-	tool.Do_add_history(
-		db,
-		doc_name,
-		data,
-		date,
-		config.IP,
-		send,
-		length,
-		"",
-		"",
-	)
 
 	markup.Get_render(db, doc_name, data, "backlink")
 	notify_indexnow(db, doc_name)

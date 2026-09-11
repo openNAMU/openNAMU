@@ -117,36 +117,31 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 	}
 
 	if backlink_mode && backlink_supported {
-		tool.Exec_DB(
-			db,
-			"delete from back where link = ?",
-			doc_name,
-		)
-		tool.Exec_DB(db, "delete from back where title = ? and type = 'no'", doc_name)
-
-		tool.Exec_DB(
-			db,
-			"delete from data_set where doc_name = ? and set_name = 'link_count'",
-			doc_name,
-		)
-
-		for link, link_type_list := range backlink_list {
-			for _, link_type := range link_type_list {
-				tool.Exec_DB(
-					db,
-					"insert into back (link, title, type, data) values (?, ?, ?, '')",
-					doc_name,
-					link,
-					link_type,
-				)
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			if _, err := tx.Exec(tool.DB_change("delete from back where link = ?"), doc_name); err != nil {
+				return err
 			}
+			if _, err := tx.Exec(tool.DB_change("delete from back where title = ? and type = 'no'"), doc_name); err != nil {
+				return err
+			}
+			if _, err := tx.Exec(tool.DB_change("delete from data_set where doc_name = ? and set_name = 'link_count'"), doc_name); err != nil {
+				return err
+			}
+			for link, link_type_list := range backlink_list {
+				for _, link_type := range link_type_list {
+					if _, err := tx.Exec(tool.DB_change("insert into back (link, title, type, data) values (?, ?, ?, '')"), doc_name, link, link_type); err != nil {
+						return err
+					}
+				}
+			}
+			_, err := tx.Exec(
+				tool.DB_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'link_count', ?)"),
+				doc_name, backlink_count,
+			)
+			return err
+		}); err != nil {
+			panic(err)
 		}
-
-		tool.Exec_DB(
-			db,
-			"insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'link_count', ?)",
-			doc_name, backlink_count,
-		)
 	}
 
 	return map[string]string{

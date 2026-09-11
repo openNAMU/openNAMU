@@ -13,6 +13,35 @@ import (
 
 var db_set = map[string]string{}
 
+type DB_runner interface {
+	Prepare(string) (*sql.Stmt, error)
+}
+
+func DB_transaction(db *sql.DB, callback func(*sql.Tx) error) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	committed := false
+	defer func() {
+		if !committed {
+			_ = tx.Rollback()
+		}
+	}()
+
+	if err := callback(tx); err != nil {
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	committed = true
+	return nil
+}
+
 func Get_DB_set() map[string]string {
 	new_db_set := map[string]string{}
 
@@ -93,7 +122,7 @@ func Get_DB_set_MySQL(new_db_set map[string]string) map[string]string {
 	return tmp
 }
 
-func Exec_DB(db *sql.DB, query string, values ...any) {
+func exec_DB(db DB_runner, query string, values ...any) {
 	const retry_delay = 10 * time.Millisecond
 
 	stmt, err := db.Prepare(DB_change(query))
@@ -117,7 +146,22 @@ func Exec_DB(db *sql.DB, query string, values ...any) {
 	}
 }
 
-func Query_DB(db *sql.DB, query string, values ...any) *sql.Rows {
+func Exec_DB(db DB_runner, query string, values ...any) {
+	if sql_db, ok := db.(*sql.DB); ok && !strings.HasPrefix(strings.ToLower(strings.TrimSpace(query)), "pragma ") {
+		err := DB_transaction(sql_db, func(tx *sql.Tx) error {
+			exec_DB(tx, query, values...)
+			return nil
+		})
+		if err != nil {
+			panic(err)
+		}
+		return
+	}
+
+	exec_DB(db, query, values...)
+}
+
+func Query_DB(db DB_runner, query string, values ...any) *sql.Rows {
 	const retry_delay = 10 * time.Millisecond
 
 	stmt, err := db.Prepare(DB_change(query))
@@ -142,7 +186,7 @@ func Query_DB(db *sql.DB, query string, values ...any) *sql.Rows {
 }
 
 // QueryRow_DB 이래서 포인터를 배우는구나...
-func QueryRow_DB(db *sql.DB, query string, var_list []any, values ...any) bool {
+func QueryRow_DB(db DB_runner, query string, var_list []any, values ...any) bool {
 	const retry_delay = 10 * time.Millisecond
 
 	stmt, err := db.Prepare(DB_change(query))

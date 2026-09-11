@@ -1,8 +1,10 @@
 package route
 
 import (
-	"opennamu/route/tool"
+	"database/sql"
 	"strings"
+
+	"opennamu/route/tool"
 )
 
 func Api_bbs_w_comment_one_delete(config tool.Config, set_id string, set_code string) map[string]any {
@@ -59,35 +61,27 @@ func Api_bbs_w_comment_one_delete(config tool.Config, set_id string, set_code st
 
 		return return_data
 	}
-	if comment != "" {
-		bbs_post_comment_count_update(db, set_id, post_code, -1)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if comment != "" {
+			bbs_post_comment_count_update(tx, set_id, post_code, -1)
+		}
+		for _, query := range []string{
+			"delete from bbs_data where set_name = 'pinned' and set_id = ? and set_code = ?",
+			"delete from bbs_data where set_name like 'tabom%' and set_id = ? and set_code = ?",
+			"delete from bbs_data where set_name = 'blind' and set_id = ? and set_code = ?",
+		} {
+			if _, err := tx.Exec(tool.DB_change(query), comment_set_id, comment_set_code); err != nil {
+				return err
+			}
+		}
+		if _, err := tx.Exec(tool.DB_change("update bbs_data set set_data = '' where set_id = ? and set_code = ?"), comment_set_id, comment_set_code); err != nil {
+			return err
+		}
+		bbs_post_last_activity_rebuild(tx, set_id, post_code)
+		return nil
+	}); err != nil {
+		panic(err)
 	}
-	tool.Exec_DB(
-		db,
-		"delete from bbs_data where set_name = 'pinned' and set_id = ? and set_code = ?",
-		comment_set_id,
-		comment_set_code,
-	)
-	tool.Exec_DB(
-		db,
-		"delete from bbs_data where set_name like 'tabom%' and set_id = ? and set_code = ?",
-		comment_set_id,
-		comment_set_code,
-	)
-	tool.Exec_DB(
-		db,
-		"delete from bbs_data where set_name = 'blind' and set_id = ? and set_code = ?",
-		comment_set_id,
-		comment_set_code,
-	)
-
-	tool.Exec_DB(
-		db,
-		"update bbs_data set set_data = '' where set_id = ? and set_code = ?",
-		comment_set_id,
-		comment_set_code,
-	)
-	bbs_post_last_activity_rebuild(db, set_id, post_code)
 	tool.Search_bbs_index_update_comment(db, set_id, post_code, set_code)
 
 	return_data["response"] = "ok"

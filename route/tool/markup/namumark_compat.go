@@ -3293,14 +3293,6 @@ func render_namumark_compat_backlink(db *sql.DB, doc_name string, data string) m
 	link_count, _ := result["link_count"].(int)
 	redirect, _ := result["redirect"].(bool)
 
-	tool.Exec_DB(db, "delete from back where link = ?", doc_name)
-	tool.Exec_DB(db, "delete from back where title = ? and type = 'no'", doc_name)
-	tool.Exec_DB(db, "delete from data_set where doc_name = ? and set_name in ('link_count', 'doc_type')", doc_name)
-	for _, entry := range entries {
-		tool.Exec_DB(db, "insert into back (link, title, type, data) values (?, ?, ?, ?)", doc_name, entry.target, entry.link_type, entry.data)
-	}
-	tool.Exec_DB(db, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'link_count', ?)", doc_name, link_count)
-
 	doc_type := ""
 	if strings.HasPrefix(doc_name, "user:") {
 		doc_type = "user"
@@ -3311,7 +3303,44 @@ func render_namumark_compat_backlink(db *sql.DB, doc_name string, data string) m
 	} else if redirect {
 		doc_type = "redirect"
 	}
-	tool.Exec_DB(db, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', ?)", doc_name, doc_type)
+
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if _, err := tx.Exec(tool.DB_change("delete from back where link = ?"), doc_name); err != nil {
+			return err
+		}
+		if _, err := tx.Exec(tool.DB_change("delete from back where title = ? and type = 'no'"), doc_name); err != nil {
+			return err
+		}
+		if _, err := tx.Exec(tool.DB_change("delete from data_set where doc_name = ? and set_name in ('link_count', 'doc_type')"), doc_name); err != nil {
+			return err
+		}
+		for _, entry := range entries {
+			if _, err := tx.Exec(
+				tool.DB_change("insert into back (link, title, type, data) values (?, ?, ?, ?)"),
+				doc_name,
+				entry.target,
+				entry.link_type,
+				entry.data,
+			); err != nil {
+				return err
+			}
+		}
+		if _, err := tx.Exec(
+			tool.DB_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'link_count', ?)"),
+			doc_name,
+			link_count,
+		); err != nil {
+			return err
+		}
+		_, err := tx.Exec(
+			tool.DB_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'doc_type', ?)"),
+			doc_name,
+			doc_type,
+		)
+		return err
+	}); err != nil {
+		panic(err)
+	}
 
 	return map[string]string{"data": `<div class="opennamu_render_complete"></div>`, "js_data": ""}
 }

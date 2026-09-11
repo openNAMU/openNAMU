@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"net"
 	"strings"
 	"time"
@@ -108,21 +109,26 @@ func Api_give_auth_patch(config tool.Config, auth string, change_auth string, us
 		return new_data
 	}
 
-	if user_name != "" {
-		tool.Do_auth_insert(db, user_name, end_date, reason, change_auth, ip, band, release)
-		action := change_auth
-		if release {
-			action = "release"
-		}
-		tool.Do_insert_auth_history(db, ip, "give_auth ("+user_name+") -> "+action)
-	} else {
-		if auth != change_auth {
-			type auth_target_data struct {
-				user_name string
-				end_date  string
-			}
+	action := change_auth
+	if release {
+		action = "release"
+	}
 
-			target_list := []auth_target_data{}
+	if user_name != "" {
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			tool.Do_auth_insert(tx, user_name, end_date, reason, change_auth, ip, band, release)
+			tool.Do_insert_auth_history(tx, ip, "give_auth ("+user_name+") -> "+action)
+			return nil
+		}); err != nil {
+			panic(err)
+		}
+	} else {
+		type auth_target_data struct {
+			user_name string
+			end_date  string
+		}
+		target_list := []auth_target_data{}
+		if auth != change_auth {
 			rows := tool.Query_DB(
 				db,
 				"select a.id, coalesce((select e.data from user_set as e where e.id = a.id and e.name = 'acl_end' limit 1), '') from user_set as a where a.name = 'acl' and a.data = ?",
@@ -135,12 +141,17 @@ func Api_give_auth_patch(config tool.Config, auth string, change_auth string, us
 				}
 			}
 			rows.Close()
-
-			for _, data := range target_list {
-				tool.Do_auth_insert(db, data.user_name, data.end_date, "", change_auth, ip, "", false)
-			}
 		}
-		tool.Do_insert_auth_history(db, ip, "give_auth ("+auth+") -> "+change_auth)
+
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			for _, data := range target_list {
+				tool.Do_auth_insert(tx, data.user_name, data.end_date, "", change_auth, ip, "", false)
+			}
+			tool.Do_insert_auth_history(tx, ip, "give_auth ("+auth+") -> "+change_auth)
+			return nil
+		}); err != nil {
+			panic(err)
+		}
 	}
 
 	new_data["response"] = "ok"

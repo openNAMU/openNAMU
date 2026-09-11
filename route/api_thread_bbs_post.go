@@ -114,32 +114,38 @@ func api_thread_bbs_post(config tool.Config, topic_num string, doc_name string, 
 		topic_reference_notify(db, config, data, "1", topic_num, thread_bbs_id, name, sub, "bbs")
 		bbs_watch_notify(db, config, thread_bbs_id, topic_num, "1", "thread", sub, config.IP, "")
 	} else {
-		id := thread_bbs_next_comment(db, topic_num)
+		id := ""
 		date := tool.Get_time()
 		comment_set_id := thread_bbs_id + "-" + topic_num
-		for _, value := range [][]string{
-			{"comment", data},
-			{"comment_date", date},
-			{"comment_user_id", config.IP},
-		} {
-			tool.Exec_DB(
-				db,
-				"insert into bbs_data (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)",
-				value[0],
-				id,
-				comment_set_id,
-				value[1],
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			id = thread_bbs_next_comment(tx, topic_num)
+			for _, value := range [][]string{
+				{"comment", data},
+				{"comment_date", date},
+				{"comment_user_id", config.IP},
+			} {
+				if _, err := tx.Exec(
+					tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)"),
+					value[0],
+					id,
+					comment_set_id,
+					value[1],
+				); err != nil {
+					return err
+				}
+			}
+			bbs_post_comment_count_update(tx, thread_bbs_id, topic_num, 1)
+			bbs_post_last_activity_update(tx, thread_bbs_id, topic_num, date)
+			_, err := tx.Exec(
+				tool.DB_change("update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?"),
+				date,
+				thread_bbs_id,
+				topic_num,
 			)
+			return err
+		}); err != nil {
+			panic(err)
 		}
-		bbs_post_comment_count_update(db, thread_bbs_id, topic_num, 1)
-		bbs_post_last_activity_update(db, thread_bbs_id, topic_num, date)
-		tool.Exec_DB(
-			db,
-			"update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?",
-			date,
-			thread_bbs_id,
-			topic_num,
-		)
 		tool.Search_bbs_index_update_comment(db, thread_bbs_id, topic_num, id)
 		topic_reference_notify(db, config, data, id, topic_num, thread_bbs_id, name, sub, "bbs")
 		bbs_watch_notify(db, config, thread_bbs_id, topic_num, id, "thread", sub, thread_bbs_post_user(db, topic_num), "")
@@ -169,7 +175,7 @@ func thread_bbs_post_user(db *sql.DB, topic_num string) string {
 	return user_id
 }
 
-func thread_bbs_next_comment(db *sql.DB, topic_num string) string {
+func thread_bbs_next_comment(db tool.DB_runner, topic_num string) string {
 	last_code := ""
 	tool.QueryRow_DB(
 		db,

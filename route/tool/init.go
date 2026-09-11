@@ -431,7 +431,7 @@ func legacy_acl_single_value(value string) (string, bool) {
 	return values[0], true
 }
 
-func migrate_legacy_acl_rows(db *sql.DB, select_query string, update_query string, key_count int) {
+func migrate_legacy_acl_rows(db DB_runner, select_query string, update_query string, key_count int) {
 	rows := Query_DB(db, select_query)
 	data_list := [][]string{}
 	for rows.Next() {
@@ -460,7 +460,7 @@ func migrate_legacy_acl_rows(db *sql.DB, select_query string, update_query strin
 	}
 }
 
-func migrate_legacy_acl(db *sql.DB) {
+func migrate_legacy_acl(db DB_runner) {
 	legacy_auth_map := map[string]string{
 		"discuss":                 "bbs_use",
 		"discuss_view":            "bbs_view",
@@ -540,7 +540,12 @@ func migrate_legacy_acl(db *sql.DB) {
 }
 
 func Update_init(db *sql.DB) {
-	migrate_legacy_acl(db)
+	if err := DB_transaction(db, func(tx *sql.Tx) error {
+		migrate_legacy_acl(tx)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
 }
 
 func init_rankup_conditions(db *sql.DB) {
@@ -808,16 +813,15 @@ func init_captcha(db *sql.DB) {
 
 func Always_init(db *sql.DB, version string) {
 	// 버전 기입
-	Exec_DB(
-		db,
-		`delete from other where name = "ver"`,
-	)
-	Exec_DB(
-		db,
-		`insert into other (name, data, coverage) values ("ver", ?, "")`,
-		version,
-	)
-
+	if err := DB_transaction(db, func(tx *sql.Tx) error {
+		if _, err := tx.Exec(DB_change("delete from other where name = \"ver\"")); err != nil {
+			return err
+		}
+		_, err := tx.Exec(DB_change("insert into other (name, data, coverage) values ('ver', ?, '')"), version)
+		return err
+	}); err != nil {
+		panic(err)
+	}
 	// legacy ban management permissions
 	legacy_groups := []string{}
 	legacy_rows := Query_DB(

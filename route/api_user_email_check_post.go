@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 func Api_user_email_check_post(config tool.Config, key string, email string, input_key string) map[string]any {
 	db := tool.DB_connect()
@@ -16,8 +20,13 @@ func Api_user_email_check_post(config tool.Config, key string, email string, inp
 		return_data["data"] = "key error"
 		return return_data
 	}
-	user_delete(db, config.IP, "email")
-	user_save(db, config.IP, "email", email)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		user_delete(tx, config.IP, "email")
+		user_save(tx, config.IP, "email", email)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
 	return_data["response"] = "ok"
 	return return_data
 }

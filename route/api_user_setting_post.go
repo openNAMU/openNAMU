@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"net/url"
 
 	"opennamu/route/tool"
@@ -17,34 +18,40 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 	}
 
 	language_list := user_language_list(db)
-	if values.Has("skin") {
-		skin := values.Get("skin")
-		if tool.Arr_in_str(tool.Get_skin_list("", true), skin) {
-			user_save(db, config.IP, "skin", skin)
-		}
-	}
-	if values.Has("lang") {
-		for _, language := range language_list {
-			if language.value == values.Get("lang") {
-				user_save(db, config.IP, "lang", language.value)
-				break
+	title_choices := user_title_list(db, config.IP)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if values.Has("skin") {
+			skin := values.Get("skin")
+			if tool.Arr_in_str(tool.Get_skin_list("", true), skin) {
+				user_save(tx, config.IP, "skin", skin)
 			}
 		}
-	}
-	if values.Has("user_title") {
-		title := ""
-		for _, choice := range user_title_list(db, config.IP) {
-			if choice.value == values.Get("user_title") {
-				title = choice.value
-				break
+		if values.Has("lang") {
+			for _, language := range language_list {
+				if language.value == values.Get("lang") {
+					user_save(tx, config.IP, "lang", language.value)
+					break
+				}
 			}
 		}
-		user_save(db, config.IP, "user_title", title)
-	}
-	for _, name := range []string{"sub_user_name", "top_menu"} {
-		if values.Has(name) {
-			user_save(db, config.IP, name, values.Get(name))
+		if values.Has("user_title") {
+			title := ""
+			for _, choice := range title_choices {
+				if choice.value == values.Get("user_title") {
+					title = choice.value
+					break
+				}
+			}
+			user_save(tx, config.IP, "user_title", title)
 		}
+		for _, name := range []string{"sub_user_name", "top_menu"} {
+			if values.Has(name) {
+				user_save(tx, config.IP, name, values.Get(name))
+			}
+		}
+		return nil
+	}); err != nil {
+		panic(err)
 	}
 	if values.Has("profile_image") {
 		profile_image, valid := tool.Get_user_profile_image_name(db, values.Get("profile_image"))
@@ -62,30 +69,50 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 	if values.Has("2fa") {
 		switch values.Get("2fa") {
 		case "":
-			user_delete(db, config.IP, "2fa")
-			user_delete(db, config.IP, "2fa_pw")
-			user_delete(db, config.IP, "2fa_pw_encode")
-		case "on":
-			if password := values.Get("2fa_pw"); password != "" {
-				encode := tool.Get_user_encode(db, config.IP)
-				user_save(db, config.IP, "2fa_pw", tool.Password_encode(db, password, encode))
-				user_save(db, config.IP, "2fa_pw_encode", encode)
+			if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+				user_delete(tx, config.IP, "2fa")
+				user_delete(tx, config.IP, "2fa_pw")
+				user_delete(tx, config.IP, "2fa_pw_encode")
+				return nil
+			}); err != nil {
+				panic(err)
 			}
-			if user_value(db, config.IP, "2fa_pw") == "" {
+		case "on":
+			password := values.Get("2fa_pw")
+			if password == "" && user_value(db, config.IP, "2fa_pw") == "" {
 				return_data["response"] = "error"
 				return_data["data"] = "password empty"
 				return return_data
 			}
-			user_save(db, config.IP, "2fa", "on")
+			encode := tool.Get_user_encode(db, config.IP)
+			password_hash := ""
+			if password != "" {
+				password_hash = tool.Password_encode(db, password, encode)
+			}
+			if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+				if password != "" {
+					user_save(tx, config.IP, "2fa_pw", password_hash)
+					user_save(tx, config.IP, "2fa_pw_encode", encode)
+				}
+				user_save(tx, config.IP, "2fa", "on")
+				return nil
+			}); err != nil {
+				panic(err)
+			}
 		case "email":
 			if user_value(db, config.IP, "email") == "" {
 				return_data["response"] = "error"
 				return_data["data"] = "not found"
 				return return_data
 			}
-			user_save(db, config.IP, "2fa", "email")
-			user_delete(db, config.IP, "2fa_pw")
-			user_delete(db, config.IP, "2fa_pw_encode")
+			if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+				user_save(tx, config.IP, "2fa", "email")
+				user_delete(tx, config.IP, "2fa_pw")
+				user_delete(tx, config.IP, "2fa_pw_encode")
+				return nil
+			}); err != nil {
+				panic(err)
+			}
 		default:
 			return_data["response"] = "error"
 			return_data["data"] = "invalid data"
@@ -93,15 +120,25 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 		}
 	} else if values.Has("2fa_pw") {
 		password := values.Get("2fa_pw")
-		if password == "" {
-			user_delete(db, config.IP, "2fa_pw")
-			user_delete(db, config.IP, "2fa_pw_encode")
-			user_delete(db, config.IP, "2fa")
-		} else {
-			encode := tool.Get_user_encode(db, config.IP)
-			user_save(db, config.IP, "2fa_pw", tool.Password_encode(db, password, encode))
-			user_save(db, config.IP, "2fa_pw_encode", encode)
-			user_save(db, config.IP, "2fa", "on")
+		encode := ""
+		password_hash := ""
+		if password != "" {
+			encode = tool.Get_user_encode(db, config.IP)
+			password_hash = tool.Password_encode(db, password, encode)
+		}
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			if password == "" {
+				user_delete(tx, config.IP, "2fa_pw")
+				user_delete(tx, config.IP, "2fa_pw_encode")
+				user_delete(tx, config.IP, "2fa")
+				return nil
+			}
+			user_save(tx, config.IP, "2fa_pw", password_hash)
+			user_save(tx, config.IP, "2fa_pw_encode", encode)
+			user_save(tx, config.IP, "2fa", "on")
+			return nil
+		}); err != nil {
+			panic(err)
 		}
 	}
 

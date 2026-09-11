@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"strconv"
 	"strings"
 
@@ -33,12 +34,6 @@ func Api_vote_select_post(config tool.Config, id string, vote_data string) map[s
 		return return_data
 	}
 
-	voted := ""
-	if tool.QueryRow_DB(db, "select user from vote where id = ? and user = ?", []any{&voted}, id, config.IP) {
-		return_data["response"] = "already voted"
-		return return_data
-	}
-
 	end_date := ""
 	tool.QueryRow_DB(
 		db,
@@ -60,13 +55,28 @@ func Api_vote_select_post(config tool.Config, id string, vote_data string) map[s
 		return return_data
 	}
 
-	tool.Exec_DB(
-		db,
-		"insert into vote (name, id, subject, data, user, type) values ('', ?, '', ?, ?, 'select')",
-		id,
-		strconv.Itoa(choice),
-		config.IP,
-	)
+	already_voted := false
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		voted := ""
+		if tool.QueryRow_DB(tx, "select user from vote where id = ? and user = ?", []any{&voted}, id, config.IP) {
+			already_voted = true
+			return nil
+		}
+
+		_, err := tx.Exec(
+			tool.DB_change("insert into vote (name, id, subject, data, user, type) values ('', ?, '', ?, ?, 'select')"),
+			id,
+			strconv.Itoa(choice),
+			config.IP,
+		)
+		return err
+	}); err != nil {
+		panic(err)
+	}
+	if already_voted {
+		return_data["response"] = "already voted"
+		return return_data
+	}
 
 	return_data["response"] = "ok"
 	return return_data

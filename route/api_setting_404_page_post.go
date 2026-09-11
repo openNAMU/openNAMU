@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 func Api_setting_404_page_post(config tool.Config, page string, content string) map[string]any {
 	db := tool.DB_connect()
@@ -11,9 +15,14 @@ func Api_setting_404_page_post(config tool.Config, page string, content string) 
 		return_data["response"] = "require auth"
 		return return_data
 	}
-	setting_save_value(db, "manage_404_page", "", page)
-	setting_save_value(db, "manage_404_page_content", "", content)
-	tool.Do_insert_auth_history(db, config.IP, "edit_set (404_page)")
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		setting_save_value(tx, "manage_404_page", "", page)
+		setting_save_value(tx, "manage_404_page_content", "", content)
+		tool.Do_insert_auth_history(tx, config.IP, "edit_set (404_page)")
+		return nil
+	}); err != nil {
+		panic(err)
+	}
 	return_data["response"] = "ok"
 	return return_data
 }

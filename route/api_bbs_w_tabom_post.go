@@ -2,47 +2,40 @@ package route
 
 import (
 	"database/sql"
-	"strconv"
 
 	"opennamu/route/tool"
 )
 
-func change_bbs_tabom_count(db *sql.DB, set_name string, set_id string, set_code string, amount int) {
-	count := "0"
-	exists := tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_data where set_name = ? and set_id = ? and set_code = ?",
-		[]any{&count},
+func change_bbs_tabom_count(tx *sql.Tx, set_name string, set_id string, set_code string, amount int) {
+	result, err := tx.Exec(
+		tool.DB_change("update bbs_data set set_data = case when set_data + ? < 0 then 0 else set_data + ? end where set_name = ? and set_id = ? and set_code = ?"),
+		amount,
+		amount,
 		set_name,
 		set_id,
 		set_code,
 	)
-	if !exists {
-		tool.Exec_DB(
-			db,
-			"insert into bbs_data (set_name, set_data, set_id, set_code) values (?, ?, ?, ?)",
+	if err != nil {
+		panic(err)
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		panic(err)
+	}
+	if rows == 0 && amount > 0 {
+		if _, err := tx.Exec(
+			tool.DB_change("insert into bbs_data (set_name, set_data, set_id, set_code) values (?, ?, ?, ?)"),
 			set_name,
-			"0",
+			amount,
 			set_id,
 			set_code,
-		)
+		); err != nil {
+			panic(err)
+		}
 	}
-
-	count_int := tool.Str_to_int(count) + amount
-	if count_int < 0 {
-		count_int = 0
-	}
-	tool.Exec_DB(
-		db,
-		"update bbs_data set set_data = ? where set_name = ? and set_id = ? and set_code = ?",
-		strconv.Itoa(count_int),
-		set_name,
-		set_id,
-		set_code,
-	)
 }
 
-func bbs_tabom_user_exists(db *sql.DB, set_name string, user string, set_id string, set_code string) bool {
+func bbs_tabom_user_exists(db tool.DB_runner, set_name string, user string, set_id string, set_code string) bool {
 	data := ""
 	return tool.QueryRow_DB(
 		db,
@@ -71,5 +64,12 @@ func Api_bbs_w_tabom_post(config tool.Config, set_id string, set_code string, vo
 		return return_data
 	}
 
-	return api_bbs_tabom_post(db, config.IP, set_id, set_code, vote_type)
+	var result map[string]any
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		result = api_bbs_tabom_post(tx, config.IP, set_id, set_code, vote_type)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
+	return result
 }

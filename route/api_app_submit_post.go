@@ -10,8 +10,15 @@ import (
 
 func app_submit_action(db *sql.DB, config tool.Config, user_id string, approve bool) bool {
 	if !approve {
-		tool.Exec_DB(db, "delete from user_set where id = ? and name = 'application'", user_id)
-		tool.Do_insert_auth_history(db, config.IP, "application_decline ("+user_id+")")
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			if _, err := tx.Exec(tool.DB_change("delete from user_set where id = ? and name = 'application'"), user_id); err != nil {
+				return err
+			}
+			tool.Do_insert_auth_history(tx, config.IP, "application_decline ("+user_id+")")
+			return nil
+		}); err != nil {
+			panic(err)
+		}
 		return true
 	}
 
@@ -40,10 +47,21 @@ func app_submit_action(db *sql.DB, config tool.Config, user_id string, approve b
 		return false
 	}
 
-	tool.Exec_DB(db, "insert into user_set (name, id, data) values ('approval_question', ?, ?)", application_id, application["question"])
-	tool.Exec_DB(db, "insert into user_set (name, id, data) values ('approval_question_answer', ?, ?)", application_id, application["answer"])
-	tool.Exec_DB(db, "delete from user_set where id = ? and name = 'application'", user_id)
-	tool.Do_insert_auth_history(db, config.IP, "application_approve ("+user_id+")")
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if _, err := tx.Exec(tool.DB_change("insert into user_set (name, id, data) values ('approval_question', ?, ?)"), application_id, application["question"]); err != nil {
+			return err
+		}
+		if _, err := tx.Exec(tool.DB_change("insert into user_set (name, id, data) values ('approval_question_answer', ?, ?)"), application_id, application["answer"]); err != nil {
+			return err
+		}
+		if _, err := tx.Exec(tool.DB_change("delete from user_set where id = ? and name = 'application'"), user_id); err != nil {
+			return err
+		}
+		tool.Do_insert_auth_history(tx, config.IP, "application_approve ("+user_id+")")
+		return nil
+	}); err != nil {
+		panic(err)
+	}
 	return true
 }
 

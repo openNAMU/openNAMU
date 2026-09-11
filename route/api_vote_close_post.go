@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 func Api_vote_close_post(config tool.Config, id string) map[string]any {
 	db := tool.DB_connect()
@@ -46,18 +50,24 @@ func Api_vote_close_post(config tool.Config, id string) map[string]any {
 		next = "close"
 	}
 
-	tool.Exec_DB(
-		db,
-		"update vote set type = ? where id = ? and user = ''",
-		next,
-		id,
-	)
-	if next == "open" || next == "n_open" {
-		tool.Exec_DB(
-			db,
-			"delete from vote where id = ? and name = 'end_date' and type = 'option'",
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if _, err := tx.Exec(
+			tool.DB_change("update vote set type = ? where id = ? and user = ''"),
+			next,
 			id,
-		)
+		); err != nil {
+			return err
+		}
+		if next == "open" || next == "n_open" {
+			_, err := tx.Exec(
+				tool.DB_change("delete from vote where id = ? and name = 'end_date' and type = 'option'"),
+				id,
+			)
+			return err
+		}
+		return nil
+	}); err != nil {
+		panic(err)
 	}
 
 	return_data["response"] = "ok"

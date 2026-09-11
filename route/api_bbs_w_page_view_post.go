@@ -1,7 +1,7 @@
 package route
 
 import (
-	"strconv"
+	"database/sql"
 
 	"opennamu/route/tool"
 )
@@ -17,34 +17,31 @@ func Api_bbs_w_page_view_post(config tool.Config, set_id string, set_code string
 		return return_data
 	}
 
-	page_view_str := ""
-	exist := tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_data where set_name = 'view_count' and set_id = ? and set_code = ?",
-		[]any{&page_view_str},
-		set_id,
-		set_code,
-	)
-
-	page_view_int := tool.Str_to_int(page_view_str) + 1
-	page_view_str = strconv.Itoa(page_view_int)
-
-	if exist {
-		tool.Exec_DB(
-			db,
-			"update bbs_data set set_data = ? where set_name = 'view_count' and set_id = ? and set_code = ?",
-			page_view_str,
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		result, err := tx.Exec(
+			tool.DB_change("update bbs_data set set_data = set_data + 1 where set_name = 'view_count' and set_id = ? and set_code = ?"),
 			set_id,
 			set_code,
 		)
-	} else {
-		tool.Exec_DB(
-			db,
-			"insert into bbs_data (set_name, set_id, set_code, set_data) values ('view_count', ?, ?, ?)",
+		if err != nil {
+			return err
+		}
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
+		if rows > 0 {
+			return nil
+		}
+		_, err = tx.Exec(
+			tool.DB_change("insert into bbs_data (set_name, set_id, set_code, set_data) values ('view_count', ?, ?, ?)"),
 			set_id,
 			set_code,
-			page_view_str,
+			"1",
 		)
+		return err
+	}); err != nil {
+		panic(err)
 	}
 
 	return return_data

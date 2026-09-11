@@ -10,7 +10,7 @@ import (
 	"opennamu/route/tool/markup"
 )
 
-func save_acl(db *sql.DB, doc_name string, values url.Values) {
+func save_acl(db tool.DB_runner, doc_name string, values url.Values) {
 	for _, field := range document_acl_group_fields {
 		if _, ok := values[field]; !ok {
 			continue
@@ -41,7 +41,7 @@ func save_acl(db *sql.DB, doc_name string, values url.Values) {
 	tool.Exec_DB(db, "insert into acl (title, data, type) values (?, ?, 'why')", doc_name, values.Get("why"))
 }
 
-func change_acl_group(db *sql.DB, doc_name string, field string, group string, action string) {
+func change_acl_group(db tool.DB_runner, doc_name string, field string, group string, action string) {
 	if action == "add" {
 		exist := ""
 		if !tool.QueryRow_DB(db, "select data from acl where title = ? and type = ? and data = ? limit 1", []any{&exist}, doc_name, field, group) {
@@ -54,7 +54,7 @@ func change_acl_group(db *sql.DB, doc_name string, field string, group string, a
 	tool.Exec_DB(db, "delete from acl where title = ? and type = ? and data = ?", doc_name, field, group)
 }
 
-func acl_history(db *sql.DB, config tool.Config, doc_name string, values url.Values) {
+func acl_history(db tool.DB_runner, config tool.Config, doc_name string, values url.Values) {
 	data := ""
 	for _, field := range document_acl_fields {
 		field_data := values.Get(field)
@@ -103,25 +103,42 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 		if multiple {
 			names = strings.Split(strings.ReplaceAll(values.Get("title_name"), "\r", ""), "\n")
 		}
+		valid_names := []string{}
 		for _, name := range names {
 			name = strings.TrimSpace(name)
-			if name == "" {
-				continue
+			if name != "" {
+				valid_names = append(valid_names, name)
 			}
-			change_acl_group(db, name, field, group, action)
-			tool.Do_insert_auth_history(db, config.IP, "document_acl_"+action+" ("+name+")")
+		}
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			for _, name := range valid_names {
+				change_acl_group(tx, name, field, group, action)
+				tool.Do_insert_auth_history(tx, config.IP, "document_acl_"+action+" ("+name+")")
+			}
+			return nil
+		}); err != nil {
+			panic(err)
 		}
 		return_data["response"] = "ok"
 		return return_data
 	}
 
 	if multiple {
+		names := []string{}
 		for _, name := range strings.Split(strings.ReplaceAll(values.Get("title_name"), "\r", ""), "\n") {
 			name = strings.TrimSpace(name)
 			if name != "" {
-				save_acl(db, name, values)
-				acl_history(db, config, name, values)
+				names = append(names, name)
 			}
+		}
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			for _, name := range names {
+				save_acl(tx, name, values)
+				acl_history(tx, config, name, values)
+			}
+			return nil
+		}); err != nil {
+			panic(err)
 		}
 		return_data["response"] = "ok"
 		return return_data
@@ -144,7 +161,13 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 		save_values.Set("document_top", document_set_value(db, doc_name, "document_top"))
 		save_values.Set("document_editor_top", document_set_value(db, doc_name, "document_editor_top"))
 	}
-	save_acl(db, doc_name, save_values)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		save_acl(tx, doc_name, save_values)
+		acl_history(tx, config, doc_name, save_values)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
 	new_markup := document_set_value(db, doc_name, "document_markup")
 	if new_markup == "" {
 		new_markup = tool.Get_document_markup(db, "", "document")
@@ -155,8 +178,6 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 			markup.Get_render(db, doc_name, data, "backlink")
 		}
 	}
-	acl_history(db, config, doc_name, save_values)
-
 	return_data["response"] = "ok"
 	return return_data
 }

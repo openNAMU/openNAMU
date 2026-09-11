@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 func Api_user_field_delete_post(config tool.Config, field string) map[string]any {
 	db := tool.DB_connect()
@@ -11,9 +15,15 @@ func Api_user_field_delete_post(config tool.Config, field string) map[string]any
 		return_data["response"] = "require auth"
 		return return_data
 	}
-	user_delete(db, config.IP, field)
-	if field == "email" && user_value(db, config.IP, "2fa") == "email" {
-		user_delete(db, config.IP, "2fa")
+	remove_email_2fa := field == "email" && user_value(db, config.IP, "2fa") == "email"
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		user_delete(tx, config.IP, field)
+		if remove_email_2fa {
+			user_delete(tx, config.IP, "2fa")
+		}
+		return nil
+	}); err != nil {
+		panic(err)
 	}
 	return_data["response"] = "ok"
 	return return_data

@@ -243,45 +243,35 @@ func bbs_post_comment_count_sql(row_alias string) string {
 	return "coalesce((select set_data from bbs_data comment_count_data where comment_count_data.set_name = 'comment_count' and comment_count_data.set_id = " + row_alias + ".set_id and comment_count_data.set_code = " + row_alias + ".set_code limit 1), '0') + 0"
 }
 
-func bbs_post_comment_count_update(db *sql.DB, set_id string, set_code string, change int) {
+func bbs_post_comment_count_update(tx *sql.Tx, set_id string, set_code string, change int) {
 	if change == 0 {
 		return
 	}
 
-	comment_count := "0"
-	exists := tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_data where set_name = 'comment_count' and set_id = ? and set_code = ? limit 1",
-		[]any{&comment_count},
+	result, err := tx.Exec(
+		tool.DB_change("update bbs_data set set_data = case when set_data + ? < 0 then 0 else set_data + ? end where set_name = 'comment_count' and set_id = ? and set_code = ?"),
+		change,
+		change,
 		set_id,
 		set_code,
 	)
-
-	if !exists {
-		if change > 0 {
-			tool.Exec_DB(
-				db,
-				"insert into bbs_data (set_name, set_id, set_code, set_data) values ('comment_count', ?, ?, ?)",
-				set_id,
-				set_code,
-				strconv.Itoa(change),
-			)
+	if err != nil {
+		panic(err)
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		panic(err)
+	}
+	if rows == 0 && change > 0 {
+		if _, err := tx.Exec(
+			tool.DB_change("insert into bbs_data (set_name, set_id, set_code, set_data) values ('comment_count', ?, ?, ?)"),
+			set_id,
+			set_code,
+			change,
+		); err != nil {
+			panic(err)
 		}
-		return
 	}
-
-	comment_count_int := tool.Str_to_int(comment_count) + change
-	if comment_count_int < 0 {
-		comment_count_int = 0
-	}
-
-	tool.Exec_DB(
-		db,
-		"update bbs_data set set_data = ? where set_name = 'comment_count' and set_id = ? and set_code = ?",
-		strconv.Itoa(comment_count_int),
-		set_id,
-		set_code,
-	)
 }
 
 func bbs_post_tabom_count_sql(row_alias string) string {
@@ -303,25 +293,54 @@ func bbs_post_last_activity_sql(row_alias string) string {
 	return "coalesce((select nullif(last_activity_data.set_data, '') from bbs_data last_activity_data where last_activity_data.set_name = 'last_activity' and last_activity_data.set_id = " + row_alias + ".set_id and last_activity_data.set_code = " + row_alias + ".set_code limit 1), (select max(comment_date_data.set_data) from bbs_data comment_date_data where comment_date_data.set_name = 'comment_date' and (comment_date_data.set_id = " + comment_set_id + " or comment_date_data.set_id like " + comment_set_id_nested + ")), (select nullif(date_data.set_data, '') from bbs_data date_data where date_data.set_name = 'date' and date_data.set_id = " + row_alias + ".set_id and date_data.set_code = " + row_alias + ".set_code limit 1))"
 }
 
-func bbs_post_last_activity_update(db *sql.DB, set_id string, set_code string, date string) {
+func bbs_post_last_activity_update(tx *sql.Tx, set_id string, set_code string, date string) {
 	if date == "" {
 		return
 	}
 
+	result, err := tx.Exec(
+		tool.DB_change("update bbs_data set set_data = case when set_data < ? then ? else set_data end where set_name = 'last_activity' and set_id = ? and set_code = ?"),
+		date,
+		date,
+		set_id,
+		set_code,
+	)
+	if err != nil {
+		panic(err)
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		panic(err)
+	}
+	if rows > 0 {
+		return
+	}
 	last_activity := ""
-	if tool.QueryRow_DB(db, "select set_data from bbs_data where set_name = 'last_activity' and set_id = ? and set_code = ? limit 1", []any{&last_activity}, set_id, set_code) {
-		tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'last_activity' and set_id = ? and set_code = ?", date, set_id, set_code)
+	if tool.QueryRow_DB(
+		tx,
+		"select set_data from bbs_data where set_name = 'last_activity' and set_id = ? and set_code = ? limit 1",
+		[]any{&last_activity},
+		set_id,
+		set_code,
+	) {
 		return
 	}
 
-	tool.Exec_DB(db, "insert into bbs_data (set_name, set_id, set_code, set_data) values ('last_activity', ?, ?, ?)", set_id, set_code, date)
+	if _, err := tx.Exec(
+		tool.DB_change("insert into bbs_data (set_name, set_id, set_code, set_data) values ('last_activity', ?, ?, ?)"),
+		set_id,
+		set_code,
+		date,
+	); err != nil {
+		panic(err)
+	}
 }
 
-func bbs_post_last_activity_rebuild(db *sql.DB, set_id string, set_code string) {
+func bbs_post_last_activity_rebuild(tx *sql.Tx, set_id string, set_code string) {
 	comment_set_id := set_id + "-" + set_code
 	last_activity := ""
 	tool.QueryRow_DB(
-		db,
+		tx,
 		"select coalesce(max(set_data), '') from bbs_data where set_name = 'comment_date' and (set_id = ? or set_id like ?)",
 		[]any{&last_activity},
 		comment_set_id,
@@ -329,7 +348,7 @@ func bbs_post_last_activity_rebuild(db *sql.DB, set_id string, set_code string) 
 	)
 	if last_activity == "" {
 		tool.QueryRow_DB(
-			db,
+			tx,
 			"select coalesce(set_data, '') from bbs_data where set_name = 'date' and set_id = ? and set_code = ? limit 1",
 			[]any{&last_activity},
 			set_id,
@@ -337,10 +356,12 @@ func bbs_post_last_activity_rebuild(db *sql.DB, set_id string, set_code string) 
 		)
 	}
 	if last_activity == "" {
-		tool.Exec_DB(db, "delete from bbs_data where set_name = 'last_activity' and set_id = ? and set_code = ?", set_id, set_code)
+		if _, err := tx.Exec(tool.DB_change("delete from bbs_data where set_name = 'last_activity' and set_id = ? and set_code = ?"), set_id, set_code); err != nil {
+			panic(err)
+		}
 		return
 	}
-	bbs_post_last_activity_update(db, set_id, set_code, last_activity)
+	bbs_post_last_activity_update(tx, set_id, set_code, last_activity)
 }
 
 func bbs_filter_sql(filter bbs_filter, row_alias string, user_id string) (string, []any) {

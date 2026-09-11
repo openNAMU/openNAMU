@@ -70,8 +70,10 @@ func emergency_open_db() (db *sql.DB, err error) {
 }
 
 func emergency_exec(db *sql.DB, query string, values ...any) error {
-	_, err := db.Exec(tool.DB_change(query), values...)
-	return err
+	return tool.DB_transaction(db, func(tx *sql.Tx) error {
+		_, err := tx.Exec(tool.DB_change(query), values...)
+		return err
+	})
 }
 
 func emergency_set_other(db *sql.DB, name string, data string) error {

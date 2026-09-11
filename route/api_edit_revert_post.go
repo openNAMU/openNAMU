@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"strings"
 
 	"opennamu/route/tool"
@@ -78,34 +79,20 @@ func Api_edit_revert_post(config tool.Config, doc_name string, rev string, send 
 	)
 
 	length := tool.Get_edit_length_diff(old_data, data)
-	if old_exist {
-		tool.Exec_DB(
-			db,
-			"update data set data = ? where title = ?",
-			data,
-			doc_name,
-		)
-	} else {
-		tool.Exec_DB(
-			db,
-			"insert into data (title, data) values (?, ?)",
-			doc_name,
-			data,
-		)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if old_exist {
+			if _, err := tx.Exec(tool.DB_change("update data set data = ? where title = ?"), data, doc_name); err != nil {
+				return err
+			}
+		} else if _, err := tx.Exec(tool.DB_change("insert into data (title, data) values (?, ?)"), doc_name, data); err != nil {
+			return err
+		}
+		tool.Do_add_history(tx, doc_name, data, tool.Get_time(), config.IP, send, length, "revert", "r"+rev)
+		return nil
+	}); err != nil {
+		panic(err)
 	}
 	tool.Search_index_update(doc_name, data)
-
-	tool.Do_add_history(
-		db,
-		doc_name,
-		data,
-		tool.Get_time(),
-		config.IP,
-		send,
-		length,
-		"revert",
-		"r"+rev,
-	)
 
 	markup.Get_render(db, doc_name, data, "backlink")
 

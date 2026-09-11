@@ -281,7 +281,17 @@ func Do_watchlist_alarm_send(db *sql.DB, config Config, doc_name string) {
 	}
 }
 
-func Do_add_history(db *sql.DB, doc_name string, data string, date string, ip string, send string, length string, mode string, type_check string) {
+func Do_add_history(db DB_runner, doc_name string, data string, date string, ip string, send string, length string, mode string, type_check string) {
+	if sql_db, ok := db.(*sql.DB); ok {
+		if err := DB_transaction(sql_db, func(tx *sql.Tx) error {
+			Do_add_history(tx, doc_name, data, date, ip, send, length, mode, type_check)
+			return nil
+		}); err != nil {
+			panic(err)
+		}
+		return
+	}
+
 	var history_recording_off_check string
 
 	QueryRow_DB(
@@ -421,7 +431,7 @@ func Do_add_history(db *sql.DB, doc_name string, data string, date string, ip st
 	)
 }
 
-func Do_add_recent_history(db *sql.DB, mode string, id string, title string, date string) {
+func Do_add_recent_history(db DB_runner, mode string, id string, title string, date string) {
 	var length int
 
 	QueryRow_DB(

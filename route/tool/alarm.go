@@ -4,7 +4,17 @@ import (
 	"database/sql"
 )
 
-func Send_alarm(db *sql.DB, from string, target string, data string) {
+func Send_alarm(db DB_runner, from string, target string, data string) {
+	if sql_db, ok := db.(*sql.DB); ok {
+		if err := DB_transaction(sql_db, func(tx *sql.Tx) error {
+			Send_alarm(tx, from, target, data)
+			return nil
+		}); err != nil {
+			panic(err)
+		}
+		return
+	}
+
 	if from != target {
 		data = from + " | " + data
 

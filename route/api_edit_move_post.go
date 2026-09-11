@@ -15,21 +15,11 @@ type move_history_row struct {
 	data string
 }
 
-type move_executor interface {
-	Exec(query string, args ...any) (sql.Result, error)
-}
-
 type move_history_event struct {
 	doc_name   string
 	data       string
 	send       string
 	type_check string
-}
-
-func move_exec(executor move_executor, query string, values ...any) {
-	if _, err := executor.Exec(tool.DB_change(query), values...); err != nil {
-		panic(err)
-	}
 }
 
 func move_title_exists(db *sql.DB, title string) bool {
@@ -120,79 +110,79 @@ func move_history_max(db *sql.DB, title string) int {
 	return max_id
 }
 
-func move_backlinks(executor move_executor, old_name string, new_name string) {
-	move_exec(executor, "update back set title = ? where title = ?", new_name, old_name)
-	move_exec(executor, "update back set link = ? where link = ?", new_name, old_name)
+func move_backlinks(executor tool.DB_runner, old_name string, new_name string) {
+	tool.Exec_DB(executor, "update back set title = ? where title = ?", new_name, old_name)
+	tool.Exec_DB(executor, "update back set link = ? where link = ?", new_name, old_name)
 }
 
-func move_document_history(executor move_executor, old_name string, new_name string) {
-	move_exec(executor, "update history set title = ? where title = ?", new_name, old_name)
-	move_exec(executor, "update rc set title = ? where title = ?", new_name, old_name)
+func move_document_history(executor tool.DB_runner, old_name string, new_name string) {
+	tool.Exec_DB(executor, "update history set title = ? where title = ?", new_name, old_name)
+	tool.Exec_DB(executor, "update rc set title = ? where title = ?", new_name, old_name)
 }
 
-func move_document_rotate(executor move_executor, temp_name string, old_name string, new_name string) {
+func move_document_rotate(executor tool.DB_runner, temp_name string, old_name string, new_name string) {
 	pairs := [][2]string{
 		{old_name, temp_name},
 		{new_name, old_name},
 		{temp_name, new_name},
 	}
 	for _, pair := range pairs {
-		move_exec(executor, "update data set title = ? where title = ?", pair[1], pair[0])
-		move_exec(executor, "update back set title = ? where title = ?", pair[1], pair[0])
-		move_exec(executor, "update back set link = ? where link = ?", pair[1], pair[0])
-		move_exec(executor, "update history set title = ? where title = ?", pair[1], pair[0])
-		move_exec(executor, "update rc set title = ? where title = ?", pair[1], pair[0])
+		tool.Exec_DB(executor, "update data set title = ? where title = ?", pair[1], pair[0])
+		tool.Exec_DB(executor, "update back set title = ? where title = ?", pair[1], pair[0])
+		tool.Exec_DB(executor, "update back set link = ? where link = ?", pair[1], pair[0])
+		tool.Exec_DB(executor, "update history set title = ? where title = ?", pair[1], pair[0])
+		tool.Exec_DB(executor, "update rc set title = ? where title = ?", pair[1], pair[0])
 	}
 }
 
-func move_document_merge(executor move_executor, target_max int, old_name string, new_name string, source_history []move_history_row) {
-	move_exec(executor, "delete from data where title = ?", new_name)
-	move_exec(executor, "delete from back where link = ?", new_name)
-	move_exec(executor, "update data set title = ? where title = ?", new_name, old_name)
+func move_document_merge(executor tool.DB_runner, target_max int, old_name string, new_name string, source_history []move_history_row) {
+	tool.Exec_DB(executor, "delete from data where title = ?", new_name)
+	tool.Exec_DB(executor, "delete from back where link = ?", new_name)
+	tool.Exec_DB(executor, "update data set title = ? where title = ?", new_name, old_name)
 	move_backlinks(executor, old_name, new_name)
-	move_exec(executor, "delete from back where title = ? and type = 'no'", new_name)
+	tool.Exec_DB(executor, "delete from back where title = ? and type = 'no'", new_name)
 
 	for _, row := range source_history {
 		id, _ := strconv.Atoi(row.id)
 		new_id := strconv.Itoa(target_max + id)
-		move_exec(executor, "update rc set title = ?, id = ? where title = ? and id = ?", new_name, new_id, old_name, row.id)
-		move_exec(executor, "update history set title = ?, id = ? where title = ? and id = ?", new_name, new_id, old_name, row.id)
+		tool.Exec_DB(executor, "update rc set title = ?, id = ? where title = ? and id = ?", new_name, new_id, old_name, row.id)
+		tool.Exec_DB(executor, "update history set title = ?, id = ? where title = ? and id = ?", new_name, new_id, old_name, row.id)
 	}
 }
 
-func move_topic_normal(executor move_executor, old_name string, new_name string) {
-	move_exec(executor, "update bbs_data set set_data = ? where set_id = ? and set_name = 'document' and set_data = ?", new_name, thread_bbs_id, old_name)
-	move_exec(executor, "update bbs_data set set_data = ? where set_id = ? and set_name = 'tag' and set_data = ?", new_name, thread_bbs_id, old_name)
+func move_topic_normal(executor tool.DB_runner, old_name string, new_name string) {
+	tool.Exec_DB(executor, "update bbs_data set set_data = ? where set_id = ? and set_name = 'document' and set_data = ?", new_name, thread_bbs_id, old_name)
+	tool.Exec_DB(executor, "update bbs_data set set_data = ? where set_id = ? and set_name = 'tag' and set_data = ?", new_name, thread_bbs_id, old_name)
 }
 
-func move_topic_rotate(executor move_executor, temp_name string, old_name string, new_name string) {
+func move_topic_rotate(executor tool.DB_runner, temp_name string, old_name string, new_name string) {
 	pairs := [][2]string{
 		{old_name, temp_name},
 		{new_name, old_name},
 		{temp_name, new_name},
 	}
 	for _, pair := range pairs {
-		move_exec(executor, "update bbs_data set set_data = ? where set_id = ? and set_name = 'document' and set_data = ?", pair[1], thread_bbs_id, pair[0])
-		move_exec(executor, "update bbs_data set set_data = ? where set_id = ? and set_name = 'tag' and set_data = ?", pair[1], thread_bbs_id, pair[0])
+		tool.Exec_DB(executor, "update bbs_data set set_data = ? where set_id = ? and set_name = 'document' and set_data = ?", pair[1], thread_bbs_id, pair[0])
+		tool.Exec_DB(executor, "update bbs_data set set_data = ? where set_id = ? and set_name = 'tag' and set_data = ?", pair[1], thread_bbs_id, pair[0])
 	}
 }
 
-func move_data_set_normal(executor move_executor, old_name string, new_name string) {
-	move_exec(executor, "delete from data_set where doc_name = ?", new_name)
-	move_exec(executor, "delete from acl where title = ?", new_name)
-	move_exec(executor, "update data_set set doc_name = ? where doc_name = ?", new_name, old_name)
-	move_exec(executor, "update acl set title = ? where title = ?", new_name, old_name)
+func move_data_set_normal(executor tool.DB_runner, old_name string, new_name string) {
+	tool.Exec_DB(executor, "delete from data_set where doc_name = ?", new_name)
+	tool.Exec_DB(executor, "delete from acl where title = ?", new_name)
+	tool.Exec_DB(executor, "update data_set set doc_name = ? where doc_name = ?", new_name, old_name)
+	tool.Exec_DB(executor, "update acl set title = ? where title = ?", new_name, old_name)
 }
 
-func move_data_set_rotate(executor move_executor, temp_name string, old_name string, new_name string) {
+func move_data_set_rotate(executor tool.DB_runner, temp_name string, old_name string, new_name string) {
 	pairs := [][2]string{
 		{old_name, temp_name},
 		{new_name, old_name},
 		{temp_name, new_name},
 	}
 	for _, pair := range pairs {
-		move_exec(executor, "update data_set set doc_name = ? where doc_name = ?", pair[1], pair[0])
-		move_exec(executor, "update acl set title = ? where title = ?", pair[1], pair[0])
+		tool.Exec_DB(executor, "update data_set set doc_name = ? where doc_name = ?", pair[1], pair[0])
+		tool.Exec_DB(executor, "update acl set title = ? where title = ?", pair[1], pair[0])
 	}
 }
 
@@ -302,7 +292,7 @@ func move_document_options(config tool.Config, db *sql.DB, old_name string, new_
 		move_document_merge(tx, target_max, old_name, new_name, source_history)
 		history_events = append(history_events, move_history_event{new_name, source_data, send, "<a>" + tool.HTML_escape(old_name) + "</a> ↔ <a>" + tool.HTML_escape(new_name) + "</a>"})
 	} else {
-		move_exec(tx, "update data set title = ? where title = ?", new_name, old_name)
+		tool.Exec_DB(tx, "update data set title = ? where title = ?", new_name, old_name)
 		move_backlinks(tx, old_name, new_name)
 		move_document_history(tx, old_name, new_name)
 		history_events = append(history_events, move_history_event{new_name, source_data, send, "<a>" + tool.HTML_escape(old_name) + "</a> → <a>" + tool.HTML_escape(new_name) + "</a>"})
@@ -322,14 +312,14 @@ func move_document_options(config tool.Config, db *sql.DB, old_name string, new_
 		move_data_set_normal(tx, old_name, new_name)
 	}
 
+	for _, event := range history_events {
+		tool.Do_add_history(tx, event.doc_name, event.data, tool.Get_time(), config.IP, event.send, "0", "move", event.type_check)
+	}
+
 	if err := tx.Commit(); err != nil {
 		return "move error"
 	}
 	committed = true
-
-	for _, event := range history_events {
-		tool.Do_add_history(db, event.doc_name, event.data, tool.Get_time(), config.IP, event.send, "0", "move", event.type_check)
-	}
 	tool.Search_index_sync(db, old_name)
 	tool.Search_index_sync(db, new_name)
 	return ""

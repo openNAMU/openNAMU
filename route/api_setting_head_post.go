@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 func Api_setting_head_post(config tool.Config, name string, coverage string, content string) map[string]any {
 	db := tool.DB_connect()
@@ -15,8 +19,13 @@ func Api_setting_head_post(config tool.Config, name string, coverage string, con
 		return_data["response"] = "error"
 		return return_data
 	}
-	setting_save_value(db, name, coverage, content)
-	tool.Do_insert_auth_history(db, config.IP, "edit_set ("+name+")")
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		setting_save_value(tx, name, coverage, content)
+		tool.Do_insert_auth_history(tx, config.IP, "edit_set ("+name+")")
+		return nil
+	}); err != nil {
+		panic(err)
+	}
 	return_data["response"] = "ok"
 	return return_data
 }

@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 func Api_filter_delete_post(config tool.Config, kind string, name string) map[string]any {
 	db := tool.DB_connect()
@@ -16,11 +20,20 @@ func Api_filter_delete_post(config tool.Config, kind string, name string) map[st
 		return_data["response"] = "require auth"
 		return return_data
 	}
-	tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
-	if kind == "inter_wiki" {
-		tool.Exec_DB(db, "delete from html_filter where html = ? and kind = 'inter_wiki_sub'", name)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if _, err := tx.Exec(tool.DB_change("delete from html_filter where html = ? and kind = ?"), name, spec.db_kind); err != nil {
+			return err
+		}
+		if kind == "inter_wiki" {
+			if _, err := tx.Exec(tool.DB_change("delete from html_filter where html = ? and kind = 'inter_wiki_sub'"), name); err != nil {
+				return err
+			}
+		}
+		tool.Do_insert_auth_history(tx, config.IP, "filter_delete ("+kind+")")
+		return nil
+	}); err != nil {
+		panic(err)
 	}
-	tool.Do_insert_auth_history(db, config.IP, "filter_delete ("+kind+")")
 
 	return_data["response"] = "ok"
 	return return_data

@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 func Api_bbs_w_comment_close(config tool.Config, set_id string, set_code string, closed bool) map[string]any {
 	db := tool.DB_connect()
@@ -30,21 +34,20 @@ func Api_bbs_w_comment_close(config tool.Config, set_id string, set_code string,
 		return return_data
 	}
 
-	tool.Exec_DB(
-		db,
-		"delete from bbs_data where set_name = 'comment_close' and set_id = ? and set_code = ?",
-		set_id,
-		set_code,
-	)
-	if closed {
-		tool.Exec_DB(
-			db,
-			"insert into bbs_data (set_name, set_code, set_id, set_data) values ('comment_close', ?, ?, '1')",
-			set_code,
-			set_id,
-		)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if _, err := tx.Exec(tool.DB_change("delete from bbs_data where set_name = 'comment_close' and set_id = ? and set_code = ?"), set_id, set_code); err != nil {
+			return err
+		}
+		if closed {
+			if _, err := tx.Exec(tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('comment_close', ?, ?, '1')"), set_code, set_id); err != nil {
+				return err
+			}
+		}
+		bbs_post_last_activity_update(tx, set_id, set_code, tool.Get_time())
+		return nil
+	}); err != nil {
+		panic(err)
 	}
-	bbs_post_last_activity_update(db, set_id, set_code, tool.Get_time())
 
 	return_data["response"] = "ok"
 	return return_data

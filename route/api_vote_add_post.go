@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	stdjson "encoding/json"
 	"net/url"
 	"strconv"
@@ -67,18 +68,47 @@ func Api_vote_add_post(config tool.Config, data string) map[string]any {
 		}
 	}
 
-	last_id := "0"
-	tool.QueryRow_DB(db, "select id from vote where type != 'option' order by id + 0 desc limit 1", []any{&last_id})
-	id := strconv.Itoa(tool.Str_to_int(last_id) + 1)
+	id := ""
 	type_data := "n_open"
 	if values.Get("open_select") == "Y" || values.Get("open_select") == "on" || values.Get("open") == "1" {
 		type_data = "open"
 	}
 
-	tool.Exec_DB(db, "insert into vote (name, id, subject, data, user, type, acl) values (?, ?, ?, ?, '', ?, ?)", name, id, subject, strings.Join(options, "\n"), type_data, acl)
-	tool.Exec_DB(db, "insert into vote (name, id, subject, data, user, type, acl) values ('open_user', ?, '', ?, '', 'option', '')", id, config.IP)
-	if values.Get("limitless") == "" && values.Get("limitless") != "Y" && date != "" {
-		tool.Exec_DB(db, "insert into vote (name, id, subject, data, user, type, acl) values ('end_date', ?, '', ?, '', 'option', '')", id, date)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		last_id := "0"
+		tool.QueryRow_DB(tx, "select id from vote where type != 'option' order by id + 0 desc limit 1", []any{&last_id})
+		id = strconv.Itoa(tool.Str_to_int(last_id) + 1)
+
+		if _, err := tx.Exec(
+			tool.DB_change("insert into vote (name, id, subject, data, user, type, acl) values (?, ?, ?, ?, '', ?, ?)"),
+			name,
+			id,
+			subject,
+			strings.Join(options, "\n"),
+			type_data,
+			acl,
+		); err != nil {
+			return err
+		}
+		if _, err := tx.Exec(
+			tool.DB_change("insert into vote (name, id, subject, data, user, type, acl) values ('open_user', ?, '', ?, '', 'option', '')"),
+			id,
+			config.IP,
+		); err != nil {
+			return err
+		}
+		if values.Get("limitless") == "" && values.Get("limitless") != "Y" && date != "" {
+			if _, err := tx.Exec(
+				tool.DB_change("insert into vote (name, id, subject, data, user, type, acl) values ('end_date', ?, '', ?, '', 'option', '')"),
+				id,
+				date,
+			); err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		panic(err)
 	}
 
 	return_data["response"] = "ok"

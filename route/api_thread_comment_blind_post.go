@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 func Api_thread_comment_blind_post(config tool.Config, topic_num string, comment_num string) map[string]any {
 	db := tool.DB_connect()
@@ -16,17 +20,24 @@ func Api_thread_comment_blind_post(config tool.Config, topic_num string, comment
 	}
 
 	blind := ""
-	tool.QueryRow_DB(db, "select set_data from bbs_data where set_name = 'blind' and set_id = ? and set_code = ?", []any{&blind}, comment_set_id, comment_num)
-	if blind == "O" {
-		tool.Exec_DB(db, "delete from bbs_data where set_name = 'blind' and set_id = ? and set_code = ?", comment_set_id, comment_num)
-		blind = ""
-	} else {
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		tool.QueryRow_DB(tx, "select set_data from bbs_data where set_name = 'blind' and set_id = ? and set_code = ?", []any{&blind}, comment_set_id, comment_num)
+		if blind == "O" {
+			_, err := tx.Exec(tool.DB_change("delete from bbs_data where set_name = 'blind' and set_id = ? and set_code = ?"), comment_set_id, comment_num)
+			blind = ""
+			return err
+		}
 		if blind == "" {
-			tool.Exec_DB(db, "insert into bbs_data (set_name, set_id, set_code, set_data) values ('blind', ?, ?, 'O')", comment_set_id, comment_num)
-		} else {
-			tool.Exec_DB(db, "update bbs_data set set_data = 'O' where set_name = 'blind' and set_id = ? and set_code = ?", comment_set_id, comment_num)
+			if _, err := tx.Exec(tool.DB_change("insert into bbs_data (set_name, set_id, set_code, set_data) values ('blind', ?, ?, 'O')"), comment_set_id, comment_num); err != nil {
+				return err
+			}
+		} else if _, err := tx.Exec(tool.DB_change("update bbs_data set set_data = 'O' where set_name = 'blind' and set_id = ? and set_code = ?"), comment_set_id, comment_num); err != nil {
+			return err
 		}
 		blind = "O"
+		return nil
+	}); err != nil {
+		panic(err)
 	}
 	return map[string]any{"response": "ok", "data": blind}
 }

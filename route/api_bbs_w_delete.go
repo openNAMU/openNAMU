@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 func Api_bbs_w_delete(config tool.Config, set_id string, set_code string) map[string]any {
 	db := tool.DB_connect()
@@ -55,29 +59,36 @@ func Api_bbs_w_delete(config tool.Config, set_id string, set_code string) map[st
 		return return_data
 	}
 
-	tool.Exec_DB(
-		db,
-		"delete from user_set where name = 'bbs_watchlist' and data = ?",
-		bbs_watch_key(set_id, set_code),
-	)
-	tool.Exec_DB(
-		db,
-		"delete from bbs_data where set_id = ? and set_code = ?",
-		set_id,
-		set_code,
-	)
-	tool.Exec_DB(
-		db,
-		"delete from bbs_set where set_id = ? and set_code = ?",
-		set_id,
-		set_code,
-	)
-	tool.Exec_DB(
-		db,
-		"delete from bbs_data where set_id = ? or set_id like ?",
-		set_id+"-"+set_code,
-		set_id+"-"+set_code+"-%",
-	)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		for _, value := range []struct {
+			query string
+			args  []any
+		}{
+			{
+				"delete from user_set where name = 'bbs_watchlist' and data = ?",
+				[]any{bbs_watch_key(set_id, set_code)},
+			},
+			{
+				"delete from bbs_data where set_id = ? and set_code = ?",
+				[]any{set_id, set_code},
+			},
+			{
+				"delete from bbs_set where set_id = ? and set_code = ?",
+				[]any{set_id, set_code},
+			},
+			{
+				"delete from bbs_data where set_id = ? or set_id like ?",
+				[]any{set_id + "-" + set_code, set_id + "-" + set_code + "-%"},
+			},
+		} {
+			if _, err := tx.Exec(tool.DB_change(value.query), value.args...); err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		panic(err)
+	}
 	tool.Search_bbs_index_delete(set_id, set_code)
 
 	return_data["response"] = "ok"

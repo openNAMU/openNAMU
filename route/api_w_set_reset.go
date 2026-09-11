@@ -1,6 +1,8 @@
 package route
 
 import (
+	"database/sql"
+
 	"opennamu/route/tool"
 )
 
@@ -11,30 +13,21 @@ func Api_w_set_reset(config tool.Config, doc_name string) map[string]any {
 	ip := config.IP
 
 	if tool.Check_permission(db, "owner", ip) {
-		tool.Exec_DB(
-			db,
-			"delete from acl where title = ?",
-			doc_name,
-		)
-
-		tool.Exec_DB(
-			db,
-			"delete from data_set where doc_name = ? and set_name = 'acl_date'",
-			doc_name,
-		)
-
-		set_list := []string{
-			"document_markup",
-			"document_top",
-			"document_editor_top",
-		}
-
-		for for_a := 0; for_a < len(set_list); for_a++ {
-			tool.Exec_DB(
-				db,
-				"delete from data_set where doc_name = ? and set_name = ?",
-				doc_name, set_list[for_a],
-			)
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			if _, err := tx.Exec(tool.DB_change("delete from acl where title = ?"), doc_name); err != nil {
+				return err
+			}
+			if _, err := tx.Exec(tool.DB_change("delete from data_set where doc_name = ? and set_name = 'acl_date'"), doc_name); err != nil {
+				return err
+			}
+			for _, set_name := range []string{"document_markup", "document_top", "document_editor_top"} {
+				if _, err := tx.Exec(tool.DB_change("delete from data_set where doc_name = ? and set_name = ?"), doc_name, set_name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}); err != nil {
+			panic(err)
 		}
 
 		return_data := make(map[string]any)

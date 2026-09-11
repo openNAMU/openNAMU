@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 func Api_thread_setting_post(config tool.Config, topic_num string, stop string, agree string, why string) map[string]any {
 	db := tool.DB_connect()
@@ -25,22 +29,25 @@ func Api_thread_setting_post(config tool.Config, topic_num string, stop string, 
 		prefix = "닫힘"
 	}
 
-	for _, value := range []struct {
-		name string
-		data string
-	}{
-		{"prefix", prefix},
-	} {
-		tool.Exec_DB(db, "delete from bbs_data where set_name = ? and set_id = ? and set_code = ?", value.name, thread_bbs_id, topic_num)
-		if value.data != "" {
-			tool.Exec_DB(db, "insert into bbs_data (set_name, set_id, set_code, set_data) values (?, ?, ?, ?)", value.name, thread_bbs_id, topic_num, value.data)
-		}
-	}
-
-	tool.Exec_DB(db, "delete from bbs_data where set_name in ('topic_agree', 'topic_stop', 'comment_close') and set_id = ? and set_code = ?", thread_bbs_id, topic_num)
 	date := tool.Get_time()
-	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?", date, thread_bbs_id, topic_num)
-	bbs_post_last_activity_update(db, thread_bbs_id, topic_num, date)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if _, err := tx.Exec(tool.DB_change("delete from bbs_data where set_name = ? and set_id = ? and set_code = ?"), "prefix", thread_bbs_id, topic_num); err != nil {
+			return err
+		}
+		if _, err := tx.Exec(tool.DB_change("insert into bbs_data (set_name, set_id, set_code, set_data) values (?, ?, ?, ?)"), "prefix", thread_bbs_id, topic_num, prefix); err != nil {
+			return err
+		}
+		if _, err := tx.Exec(tool.DB_change("delete from bbs_data where set_name in ('topic_agree', 'topic_stop', 'comment_close') and set_id = ? and set_code = ?"), thread_bbs_id, topic_num); err != nil {
+			return err
+		}
+		if _, err := tx.Exec(tool.DB_change("update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?"), date, thread_bbs_id, topic_num); err != nil {
+			return err
+		}
+		bbs_post_last_activity_update(tx, thread_bbs_id, topic_num, date)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
 	tool.Search_bbs_index_update(db, thread_bbs_id, topic_num)
 
 	return map[string]any{"response": "ok"}

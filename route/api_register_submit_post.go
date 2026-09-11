@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	stdjson "encoding/json"
 
 	"opennamu/route/tool"
@@ -29,8 +30,15 @@ func Api_register_submit_post(config tool.Config, id string, pw string, email st
 		return_data["response"] = "error"
 		return return_data
 	}
-	tool.Exec_DB(db, "delete from user_set where id = ? and name = 'application'", id)
-	tool.Exec_DB(db, "insert into user_set (id, name, data) values (?, 'application', ?)", id, string(application))
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if _, err := tx.Exec(tool.DB_change("delete from user_set where id = ? and name = 'application'"), id); err != nil {
+			return err
+		}
+		_, err := tx.Exec(tool.DB_change("insert into user_set (id, name, data) values (?, 'application', ?)"), id, string(application))
+		return err
+	}); err != nil {
+		panic(err)
+	}
 
 	return_data["response"] = "ok"
 	return return_data

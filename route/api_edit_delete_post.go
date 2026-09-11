@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"strconv"
 
 	"opennamu/route/tool"
@@ -45,18 +46,6 @@ func Api_edit_delete_post(config tool.Config, doc_name string, send string, agre
 		return return_data
 	}
 
-	tool.Do_add_history(
-		db,
-		doc_name,
-		"",
-		tool.Get_time(),
-		config.IP,
-		send,
-		"-"+strconv.Itoa(tool.Get_len(raw_data)),
-		"delete",
-		"",
-	)
-
 	rows := tool.Query_DB(
 		db,
 		"select title, link from back where title = ? and not type = 'cat' and not type = 'no'",
@@ -75,25 +64,28 @@ func Api_edit_delete_post(config tool.Config, doc_name string, send string, agre
 
 		link_list = append(link_list, []string{title, link})
 	}
-	for _, link_data := range link_list {
-		tool.Exec_DB(
-			db,
-			"insert into back (title, link, type, data) values (?, ?, 'no', '')",
-			link_data[0],
-			link_data[1],
-		)
+	date := tool.Get_time()
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		for _, link_data := range link_list {
+			if _, err := tx.Exec(
+				tool.DB_change("insert into back (title, link, type, data) values (?, ?, 'no', '')"),
+				link_data[0],
+				link_data[1],
+			); err != nil {
+				return err
+			}
+		}
+		if _, err := tx.Exec(tool.DB_change("delete from back where link = ?"), doc_name); err != nil {
+			return err
+		}
+		if _, err := tx.Exec(tool.DB_change("delete from data where title = ?"), doc_name); err != nil {
+			return err
+		}
+		tool.Do_add_history(tx, doc_name, "", date, config.IP, send, "-"+strconv.Itoa(tool.Get_len(raw_data)), "delete", "")
+		return nil
+	}); err != nil {
+		panic(err)
 	}
-
-	tool.Exec_DB(
-		db,
-		"delete from back where link = ?",
-		doc_name,
-	)
-	tool.Exec_DB(
-		db,
-		"delete from data where title = ?",
-		doc_name,
-	)
 	tool.Search_index_delete(doc_name)
 
 	return_data["response"] = "ok"

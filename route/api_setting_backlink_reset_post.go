@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"strconv"
 	"time"
 
@@ -22,14 +23,15 @@ func api_setting_backlink_reset_post(config tool.Config, load string) map[string
 		return return_data
 	}
 
-	tool.Exec_DB(
-		db,
-		"delete from back",
-	)
-	tool.Exec_DB(
-		db,
-		"delete from data_set where set_name = 'link_count'",
-	)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if _, err := tx.Exec(tool.DB_change("delete from back")); err != nil {
+			return err
+		}
+		_, err := tx.Exec(tool.DB_change("delete from data_set where set_name = 'link_count'"))
+		return err
+	}); err != nil {
+		panic(err)
+	}
 
 	document_count := 0
 	error_count := 0

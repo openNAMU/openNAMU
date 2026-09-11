@@ -2,6 +2,7 @@ package route
 
 import (
 	"database/sql"
+
 	"opennamu/route/tool"
 )
 
@@ -20,23 +21,20 @@ func Api_user_setting_skin_set_main_post(config tool.Config, user_set_list map[s
 	return_data["response"] = "ok"
 
 	set_list := Get_main_skin_set_list(db)
-	for k := range set_list {
-		if val, ok := user_set_list[k]; ok {
-			tool.Exec_DB(
-				db,
-				"delete from user_set where id = ? and name = ? and data = ?",
-				config.IP,
-				k,
-				val,
-			)
-			tool.Exec_DB(
-				db,
-				"insert into user_set (name, id, data) values (?, ?, ?)",
-				k,
-				config.IP,
-				val,
-			)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		for k := range set_list {
+			if val, ok := user_set_list[k]; ok {
+				if _, err := tx.Exec(tool.DB_change("delete from user_set where id = ? and name = ? and data = ?"), config.IP, k, val); err != nil {
+					return err
+				}
+				if _, err := tx.Exec(tool.DB_change("insert into user_set (name, id, data) values (?, ?, ?)"), k, config.IP, val); err != nil {
+					return err
+				}
+			}
 		}
+		return nil
+	}); err != nil {
+		panic(err)
 	}
 
 	return return_data

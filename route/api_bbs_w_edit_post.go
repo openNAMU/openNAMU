@@ -1,6 +1,8 @@
 package route
 
 import (
+	"database/sql"
+
 	"opennamu/route/tool"
 	"strconv"
 	"strings"
@@ -148,15 +150,21 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 
 			return return_data
 		}
-		tool.Exec_DB(
-			db,
-			"update bbs_data set set_data = ? where set_name = 'comment' and set_code = ? and set_id = ?",
-			data,
-			comment_set_code,
-			comment_set_id,
-		)
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			if _, err := tx.Exec(
+				tool.DB_change("update bbs_data set set_data = ? where set_name = 'comment' and set_code = ? and set_id = ?"),
+				data,
+				comment_set_code,
+				comment_set_id,
+			); err != nil {
+				return err
+			}
+			bbs_post_last_activity_update(tx, set_id, set_code, tool.Get_time())
+			return nil
+		}); err != nil {
+			panic(err)
+		}
 		tool.Search_bbs_index_update_comment(db, set_id, set_code, comment_code)
-		bbs_post_last_activity_update(db, set_id, set_code, tool.Get_time())
 
 		return_data["response"] = "ok"
 		return_data["data"] = set_code
@@ -199,43 +207,48 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 			return return_data
 		}
 
-		last_code := ""
-		tool.QueryRow_DB(
-			db,
-			"select set_code from bbs_data where set_name = 'title' and set_id = ? order by set_code + 0 desc",
-			[]any{&last_code},
-			set_id,
-		)
-
-		set_code = strconv.Itoa(tool.Str_to_int(last_code) + 1)
-		date := tool.Get_time()
-
-		insert_db := [][]string{
-			{"title", title},
-			{"data", data},
-			{"date", date},
-			{"last_activity", date},
-			{"user_id", config.IP},
-			{"comment_count", "0"},
-		}
-		if document != "" {
-			insert_db = append(insert_db, []string{"document", document})
-		}
-		if prefix != "" {
-			insert_db = append(insert_db, []string{"prefix", prefix})
-		}
-		for _, tag := range tag_list {
-			insert_db = append(insert_db, []string{"tag", tag})
-		}
-		for _, v := range insert_db {
-			tool.Exec_DB(
-				db,
-				"insert into bbs_data (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)",
-				v[0],
-				set_code,
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			last_code := ""
+			tool.QueryRow_DB(
+				tx,
+				"select set_code from bbs_data where set_name = 'title' and set_id = ? order by set_code + 0 desc",
+				[]any{&last_code},
 				set_id,
-				v[1],
 			)
+			set_code = strconv.Itoa(tool.Str_to_int(last_code) + 1)
+			date := tool.Get_time()
+
+			insert_db := [][]string{
+				{"title", title},
+				{"data", data},
+				{"date", date},
+				{"last_activity", date},
+				{"user_id", config.IP},
+				{"comment_count", "0"},
+			}
+			if document != "" {
+				insert_db = append(insert_db, []string{"document", document})
+			}
+			if prefix != "" {
+				insert_db = append(insert_db, []string{"prefix", prefix})
+			}
+			for _, tag := range tag_list {
+				insert_db = append(insert_db, []string{"tag", tag})
+			}
+			for _, value := range insert_db {
+				if _, err := tx.Exec(
+					tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)"),
+					value[0],
+					set_code,
+					set_id,
+					value[1],
+				); err != nil {
+					return err
+				}
+			}
+			return nil
+		}); err != nil {
+			panic(err)
 		}
 		tool.Search_bbs_index_update(db, set_id, set_code)
 
@@ -287,17 +300,60 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 	}
 
 	date := tool.Get_time()
-	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'title' and set_code = ? and set_id = ?", title, set_code, set_id)
-	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'data' and set_code = ? and set_id = ?", data, set_code, set_id)
-	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_code = ? and set_id = ?", date, set_code, set_id)
-	bbs_post_last_activity_update(db, set_id, set_code, date)
-	tool.Exec_DB(db, "delete from bbs_data where set_name = 'prefix' and set_code = ? and set_id = ?", set_code, set_id)
-	tool.Exec_DB(db, "delete from bbs_data where set_name = 'tag' and set_code = ? and set_id = ?", set_code, set_id)
-	if prefix != "" {
-		tool.Exec_DB(db, "insert into bbs_data (set_name, set_code, set_id, set_data) values ('prefix', ?, ?, ?)", set_code, set_id, prefix)
-	}
-	for _, tag := range tag_list {
-		tool.Exec_DB(db, "insert into bbs_data (set_name, set_code, set_id, set_data) values ('tag', ?, ?, ?)", set_code, set_id, tag)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		for _, value := range []struct {
+			query string
+			args  []any
+		}{
+			{
+				"update bbs_data set set_data = ? where set_name = 'title' and set_code = ? and set_id = ?",
+				[]any{title, set_code, set_id},
+			},
+			{
+				"update bbs_data set set_data = ? where set_name = 'data' and set_code = ? and set_id = ?",
+				[]any{data, set_code, set_id},
+			},
+			{
+				"update bbs_data set set_data = ? where set_name = 'date' and set_code = ? and set_id = ?",
+				[]any{date, set_code, set_id},
+			},
+			{
+				"delete from bbs_data where set_name = 'prefix' and set_code = ? and set_id = ?",
+				[]any{set_code, set_id},
+			},
+			{
+				"delete from bbs_data where set_name = 'tag' and set_code = ? and set_id = ?",
+				[]any{set_code, set_id},
+			},
+		} {
+			if _, err := tx.Exec(tool.DB_change(value.query), value.args...); err != nil {
+				return err
+			}
+		}
+		bbs_post_last_activity_update(tx, set_id, set_code, date)
+		if prefix != "" {
+			if _, err := tx.Exec(
+				tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('prefix', ?, ?, ?)"),
+				set_code,
+				set_id,
+				prefix,
+			); err != nil {
+				return err
+			}
+		}
+		for _, tag := range tag_list {
+			if _, err := tx.Exec(
+				tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('tag', ?, ?, ?)"),
+				set_code,
+				set_id,
+				tag,
+			); err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		panic(err)
 	}
 	tool.Search_bbs_index_update(db, set_id, set_code)
 

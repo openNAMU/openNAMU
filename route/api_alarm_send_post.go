@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"strings"
 
 	"opennamu/route/tool"
@@ -28,8 +29,13 @@ func Api_alarm_send_post(config tool.Config, target string, data string) map[str
 	}
 
 	data = strings.ReplaceAll(tool.HTML_escape(data), "\n", "<br>")
-	tool.Send_alarm(db, config.IP, target, data)
-	tool.Do_insert_auth_history(db, config.IP, "alarm_send ("+target+")")
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		tool.Send_alarm(tx, config.IP, target, data)
+		tool.Do_insert_auth_history(tx, config.IP, "alarm_send ("+target+")")
+		return nil
+	}); err != nil {
+		panic(err)
+	}
 	result["response"] = "ok"
 	return result
 }

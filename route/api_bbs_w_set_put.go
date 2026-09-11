@@ -1,6 +1,8 @@
 package route
 
 import (
+	"database/sql"
+
 	"opennamu/route/tool"
 )
 
@@ -20,26 +22,22 @@ func Api_bbs_w_set_put(config tool.Config, set_id string, set_name string, data 
 			return return_data
 		}
 		if auth_info {
-			if coverage == "" {
-				tool.Exec_DB(
-					db,
-					"delete from bbs_set where set_name = ? and set_id = ?",
-					set_name, set_id,
-				)
-			} else {
-				tool.Exec_DB(
-					db,
-					"delete from bbs_set where set_name = ? and set_code = ? and set_id = ?",
-					set_name, coverage, set_id,
-				)
+			if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+				if coverage == "" {
+					if _, err := tx.Exec(tool.DB_change("delete from bbs_set where set_name = ? and set_id = ?"), set_name, set_id); err != nil {
+						return err
+					}
+				} else if _, err := tx.Exec(tool.DB_change("delete from bbs_set where set_name = ? and set_code = ? and set_id = ?"), set_name, coverage, set_id); err != nil {
+					return err
+				}
+				if _, err := tx.Exec(tool.DB_change("insert into bbs_set (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)"), set_name, coverage, set_id, data); err != nil {
+					return err
+				}
+				tool.Do_insert_auth_history(tx, config.IP, "bbs_set ("+set_id+"/"+set_name+")")
+				return nil
+			}); err != nil {
+				panic(err)
 			}
-
-			tool.Exec_DB(
-				db,
-				"insert into bbs_set (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)",
-				set_name, coverage, set_id, data,
-			)
-			tool.Do_insert_auth_history(db, config.IP, "bbs_set ("+set_id+"/"+set_name+")")
 
 			return_data["response"] = "ok"
 		} else {

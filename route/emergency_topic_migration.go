@@ -31,8 +31,10 @@ type emergency_topic_row struct {
 }
 
 func emergency_topic_exec(db *sql.DB, query string, values ...any) error {
-	_, err := db.Exec(tool.DB_change(query), values...)
-	return err
+	return tool.DB_transaction(db, func(tx *sql.Tx) error {
+		_, err := tx.Exec(tool.DB_change(query), values...)
+		return err
+	})
 }
 
 func emergency_topic_insert(tx *sql.Tx, set_name string, set_code string, set_id string, set_data string) error {

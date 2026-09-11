@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 func Api_thread_change_post(config tool.Config, topic_num string, new_title string, new_sub string) map[string]any {
 	db := tool.DB_connect()
@@ -27,10 +31,24 @@ func Api_thread_change_post(config tool.Config, topic_num string, new_title stri
 		return map[string]any{"response": "error", "data": "title length"}
 	}
 
-	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'document' and set_id = ? and set_code = ?", new_title, thread_bbs_id, topic_num)
-	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'tag' and set_id = ? and set_code = ? and set_data = ?", new_title, thread_bbs_id, topic_num, old_title)
-	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'title' and set_id = ? and set_code = ?", new_sub, thread_bbs_id, topic_num)
-	tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?", tool.Get_time(), thread_bbs_id, topic_num)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		for _, update := range []struct {
+			query  string
+			values []any
+		}{
+			{"update bbs_data set set_data = ? where set_name = 'document' and set_id = ? and set_code = ?", []any{new_title, thread_bbs_id, topic_num}},
+			{"update bbs_data set set_data = ? where set_name = 'tag' and set_id = ? and set_code = ? and set_data = ?", []any{new_title, thread_bbs_id, topic_num, old_title}},
+			{"update bbs_data set set_data = ? where set_name = 'title' and set_id = ? and set_code = ?", []any{new_sub, thread_bbs_id, topic_num}},
+			{"update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?", []any{tool.Get_time(), thread_bbs_id, topic_num}},
+		} {
+			if _, err := tx.Exec(tool.DB_change(update.query), update.values...); err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		panic(err)
+	}
 
 	return map[string]any{"response": "ok"}
 }

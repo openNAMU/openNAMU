@@ -66,7 +66,7 @@ func List_auth(db *sql.DB) []string {
 	return data_list
 }
 
-func Do_insert_auth_history(db *sql.DB, ip string, what string) {
+func Do_insert_auth_history(db DB_runner, ip string, what string) {
 	log_off := ""
 	QueryRow_DB(
 		db,
@@ -134,7 +134,7 @@ func get_user_auth_raw(db *sql.DB, ip string) string {
 	return auth
 }
 
-func get_ban_auth_group(db *sql.DB, login string) string {
+func get_ban_auth_group(db DB_runner, login string) string {
 	switch login {
 	case "L", "O", "ban":
 		return "ban"
@@ -295,7 +295,7 @@ func Get_auth_group_info(db *sql.DB, auth string) map[string]bool {
 	return Check_auth(data_list)
 }
 
-func Get_acl_data_list(db *sql.DB, title string, acl_type string) []string {
+func Get_acl_data_list(db DB_runner, title string, acl_type string) []string {
 	rows := Query_DB(
 		db,
 		"select data from acl where title = ? and type = ? and data != '' and data != 'normal'",
@@ -653,7 +653,7 @@ func Auth_group_name_reserved(name string) bool {
 	return name == "normal" || Auth_permission_name(name)
 }
 
-func Auth_group_exists(db *sql.DB, auth string) bool {
+func Auth_group_exists(db DB_runner, auth string) bool {
 	if auth == "" || (Auth_group_name_reserved(auth) && !Auth_group_name_default(auth)) {
 		return false
 	}

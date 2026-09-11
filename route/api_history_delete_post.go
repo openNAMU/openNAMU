@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 func Api_history_delete_post(config tool.Config, doc_name string, rev string) map[string]any {
 	db := tool.DB_connect()
@@ -19,8 +23,15 @@ func Api_history_delete_post(config tool.Config, doc_name string, rev string) ma
 		return return_data
 	}
 
-	tool.Exec_DB(db, "delete from history where id = ? and title = ?", revision, doc_name)
-	tool.Do_insert_auth_history(db, config.IP, "history_delete ("+doc_name+" r"+revision+")")
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if _, err := tx.Exec(tool.DB_change("delete from history where id = ? and title = ?"), revision, doc_name); err != nil {
+			return err
+		}
+		tool.Do_insert_auth_history(tx, config.IP, "history_delete ("+doc_name+" r"+revision+")")
+		return nil
+	}); err != nil {
+		panic(err)
+	}
 
 	return_data["response"] = "ok"
 	return return_data

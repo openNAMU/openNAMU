@@ -155,35 +155,47 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 		return return_data
 	}
 
-	last_code := ""
-	tool.QueryRow_DB(
-		db,
-		"select set_code from bbs_data where set_name = 'comment' and set_id = ? order by set_code + 0 desc limit 1",
-		[]any{&last_code},
-		parent_id,
-	)
-	comment_code := strconv.Itoa(tool.Str_to_int(last_code) + 1)
+	comment_code := ""
 	date := tool.Get_time()
-
-	insert_data := [][]string{
-		{"comment", data},
-		{"comment_date", date},
-		{"comment_user_id", config.IP},
-	}
-	for _, value := range insert_data {
-		tool.Exec_DB(
-			db,
-			"insert into bbs_data (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)",
-			value[0],
-			comment_code,
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		last_code := ""
+		tool.QueryRow_DB(
+			tx,
+			"select set_code from bbs_data where set_name = 'comment' and set_id = ? order by set_code + 0 desc limit 1",
+			[]any{&last_code},
 			parent_id,
-			value[1],
 		)
-	}
-	bbs_post_comment_count_update(db, set_id, set_code, 1)
-	bbs_post_last_activity_update(db, set_id, set_code, date)
-	if set_id == thread_bbs_id {
-		tool.Exec_DB(db, "update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?", tool.Get_time(), set_id, set_code)
+		comment_code = strconv.Itoa(tool.Str_to_int(last_code) + 1)
+
+		for _, value := range [][]string{
+			{"comment", data},
+			{"comment_date", date},
+			{"comment_user_id", config.IP},
+		} {
+			if _, err := tx.Exec(
+				tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)"),
+				value[0],
+				comment_code,
+				parent_id,
+				value[1],
+			); err != nil {
+				return err
+			}
+		}
+		bbs_post_comment_count_update(tx, set_id, set_code, 1)
+		bbs_post_last_activity_update(tx, set_id, set_code, date)
+		if set_id == thread_bbs_id {
+			_, err := tx.Exec(
+				tool.DB_change("update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?"),
+				tool.Get_time(),
+				set_id,
+				set_code,
+			)
+			return err
+		}
+		return nil
+	}); err != nil {
+		panic(err)
 	}
 
 	end_code := comment_code

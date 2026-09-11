@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"net/url"
 	"strings"
 
@@ -45,8 +46,15 @@ func Api_user_rankup_patch(config tool.Config, values url.Values) map[string]any
 	}
 
 	if values.Get("delete") != "" {
-		tool.Exec_DB(db, "delete from other where name = 'rankup_condition' and coverage = ?", coverage)
-		tool.Do_insert_auth_history(db, config.IP, "rankup_condition ("+coverage+")")
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			if _, err := tx.Exec(tool.DB_change("delete from other where name = 'rankup_condition' and coverage = ?"), coverage); err != nil {
+				return err
+			}
+			tool.Do_insert_auth_history(tx, config.IP, "rankup_condition ("+coverage+")")
+			return nil
+		}); err != nil {
+			panic(err)
+		}
 		return_data["response"] = "ok"
 		return_data["data"] = coverage
 		return return_data
@@ -59,12 +67,21 @@ func Api_user_rankup_patch(config tool.Config, values url.Values) map[string]any
 		return return_data
 	}
 
-	tool.Exec_DB(db, "delete from other where name = 'rankup_condition' and coverage = ?", coverage)
-	for _, condition_data := range condition_list {
-		tool.Exec_DB(db, "insert into other (name, data, coverage) values ('rankup_condition', ?, ?)", condition_data, coverage)
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if _, err := tx.Exec(tool.DB_change("delete from other where name = 'rankup_condition' and coverage = ?"), coverage); err != nil {
+			return err
+		}
+		for _, condition_data := range condition_list {
+			if _, err := tx.Exec(tool.DB_change("insert into other (name, data, coverage) values ('rankup_condition', ?, ?)"), condition_data, coverage); err != nil {
+				return err
+			}
+		}
+		tool.Do_insert_auth_history(tx, config.IP, "rankup_condition ("+coverage+")")
+		return nil
+	}); err != nil {
+		panic(err)
 	}
 
-	tool.Do_insert_auth_history(db, config.IP, "rankup_condition ("+coverage+")")
 	return_data["response"] = "ok"
 	return_data["data"] = coverage
 	return return_data

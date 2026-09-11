@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 func Api_thread_comment_notice_post(config tool.Config, topic_num string, comment_num string) map[string]any {
 	db := tool.DB_connect()
@@ -16,17 +20,24 @@ func Api_thread_comment_notice_post(config tool.Config, topic_num string, commen
 	}
 
 	top := ""
-	tool.QueryRow_DB(db, "select set_data from bbs_data where set_name = 'top' and set_id = ? and set_code = ?", []any{&top}, comment_set_id, comment_num)
-	if top == "O" {
-		tool.Exec_DB(db, "delete from bbs_data where set_name = 'top' and set_id = ? and set_code = ?", comment_set_id, comment_num)
-		top = ""
-	} else {
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		tool.QueryRow_DB(tx, "select set_data from bbs_data where set_name = 'top' and set_id = ? and set_code = ?", []any{&top}, comment_set_id, comment_num)
+		if top == "O" {
+			_, err := tx.Exec(tool.DB_change("delete from bbs_data where set_name = 'top' and set_id = ? and set_code = ?"), comment_set_id, comment_num)
+			top = ""
+			return err
+		}
 		if top == "" {
-			tool.Exec_DB(db, "insert into bbs_data (set_name, set_id, set_code, set_data) values ('top', ?, ?, 'O')", comment_set_id, comment_num)
-		} else {
-			tool.Exec_DB(db, "update bbs_data set set_data = 'O' where set_name = 'top' and set_id = ? and set_code = ?", comment_set_id, comment_num)
+			if _, err := tx.Exec(tool.DB_change("insert into bbs_data (set_name, set_id, set_code, set_data) values ('top', ?, ?, 'O')"), comment_set_id, comment_num); err != nil {
+				return err
+			}
+		} else if _, err := tx.Exec(tool.DB_change("update bbs_data set set_data = 'O' where set_name = 'top' and set_id = ? and set_code = ?"), comment_set_id, comment_num); err != nil {
+			return err
 		}
 		top = "O"
+		return nil
+	}); err != nil {
+		panic(err)
 	}
 	return map[string]any{"response": "ok", "data": top}
 }

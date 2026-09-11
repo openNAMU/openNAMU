@@ -1,6 +1,7 @@
 package route
 
 import (
+	"database/sql"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -37,6 +38,15 @@ func Api_filter_add_post(config tool.Config, kind string, name string, values ur
 		title = "test"
 	}
 
+	run_write := func(write func(tool.DB_runner)) {
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			write(tx)
+			return nil
+		}); err != nil {
+			panic(err)
+		}
+	}
+
 	if kind == "external_image" {
 		title = strings.ToLower(strings.TrimSpace(title))
 		parsed, err := url.Parse("https://" + title)
@@ -44,35 +54,41 @@ func Api_filter_add_post(config tool.Config, kind string, name string, values ur
 			return_data["response"] = "error"
 			return return_data
 		}
-		if name != "" && name != title {
-			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
-		}
-		tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", title, spec.db_kind)
-		tool.Exec_DB(db, "insert into html_filter (html, kind, plus, plus_t) values (?, ?, '', '')", title, spec.db_kind)
+		run_write(func(tx tool.DB_runner) {
+			if name != "" && name != title {
+				tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
+			}
+			tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = ?", title, spec.db_kind)
+			tool.Exec_DB(tx, "insert into html_filter (html, kind, plus, plus_t) values (?, ?, '', '')", title, spec.db_kind)
+		})
 	} else if kind == "html" {
 		title = strings.ToLower(strings.TrimSpace(title))
 		if !html_filter_tag_regex.MatchString(title) || html_filter_blocked_tags[title] {
 			return_data["response"] = "error"
 			return return_data
 		}
-		if name != "" && name != title {
-			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
-		}
-		tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", title, spec.db_kind)
-		tool.Exec_DB(db, "insert into html_filter (html, kind, plus, plus_t) values (?, ?, '', '')", title, spec.db_kind)
-	} else if kind == "inter_wiki" || kind == "outer_link" {
-		if name != "" && name != title {
-			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
-		}
-		tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", title, spec.db_kind)
-		tool.Exec_DB(db, "insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, ?)", title, values.Get("link"), values.Get("icon"), spec.db_kind)
-		if kind == "inter_wiki" {
+		run_write(func(tx tool.DB_runner) {
 			if name != "" && name != title {
-				tool.Exec_DB(db, "delete from html_filter where html = ? and kind = 'inter_wiki_sub'", name)
+				tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
 			}
-			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = 'inter_wiki_sub'", title)
-			tool.Exec_DB(db, "insert into html_filter (html, plus, plus_t, kind) values (?, 'inter_wiki_type', ?, 'inter_wiki_sub')", title, values.Get("inter_type"))
-		}
+			tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = ?", title, spec.db_kind)
+			tool.Exec_DB(tx, "insert into html_filter (html, kind, plus, plus_t) values (?, ?, '', '')", title, spec.db_kind)
+		})
+	} else if kind == "inter_wiki" || kind == "outer_link" {
+		run_write(func(tx tool.DB_runner) {
+			if name != "" && name != title {
+				tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
+			}
+			tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = ?", title, spec.db_kind)
+			tool.Exec_DB(tx, "insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, ?)", title, values.Get("link"), values.Get("icon"), spec.db_kind)
+			if kind == "inter_wiki" {
+				if name != "" && name != title {
+					tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = 'inter_wiki_sub'", name)
+				}
+				tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = 'inter_wiki_sub'", title)
+				tool.Exec_DB(tx, "insert into html_filter (html, plus, plus_t, kind) values (?, 'inter_wiki_type', ?, 'inter_wiki_sub')", title, values.Get("inter_type"))
+			}
+		})
 	} else if kind == "edit_filter" {
 		content := values.Get("content")
 		if _, err := regexp.Compile(content); err != nil {
@@ -87,8 +103,10 @@ func Api_filter_add_post(config tool.Config, kind string, name string, values ur
 		if days, err := strconv.Atoi(strings.TrimSpace(values.Get("day"))); err == nil && days > 0 {
 			end = strconv.Itoa(days * 24 * 60 * 60)
 		}
-		tool.Exec_DB(db, "delete from html_filter where html = ? and kind = 'regex_filter'", filter_name)
-		tool.Exec_DB(db, "insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, 'regex_filter')", filter_name, content, end)
+		run_write(func(tx tool.DB_runner) {
+			tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = 'regex_filter'", filter_name)
+			tool.Exec_DB(tx, "insert into html_filter (html, plus, plus_t, kind) values (?, ?, ?, 'regex_filter')", filter_name, content, end)
+		})
 	} else if kind == "replace_filter" {
 		if title == "" {
 			return_data["response"] = "error"
@@ -103,11 +121,13 @@ func Api_filter_add_post(config tool.Config, kind string, name string, values ur
 			return_data["response"] = "error"
 			return return_data
 		}
-		if name != "" && name != title {
-			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
-		}
-		tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", title, spec.db_kind)
-		tool.Exec_DB(db, "insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, '')", title, spec.db_kind, values.Get("replacement"))
+		run_write(func(tx tool.DB_runner) {
+			if name != "" && name != title {
+				tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
+			}
+			tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = ?", title, spec.db_kind)
+			tool.Exec_DB(tx, "insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, '')", title, spec.db_kind, values.Get("replacement"))
+		})
 	} else if kind == "document" {
 		acl_data, acl_ok := document_filter_acl_data(db, values.Get("acl"))
 		if !acl_ok {
@@ -123,11 +143,13 @@ func Api_filter_add_post(config tool.Config, kind string, name string, values ur
 			return_data["response"] = "error"
 			return return_data
 		}
-		if name != "" && name != doc_name {
-			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = 'document'", name)
-		}
-		tool.Exec_DB(db, "delete from html_filter where html = ? and kind = 'document'", doc_name)
-		tool.Exec_DB(db, "insert into html_filter (html, kind, plus, plus_t) values (?, 'document', ?, ?)", doc_name, values.Get("regex"), acl_data)
+		run_write(func(tx tool.DB_runner) {
+			if name != "" && name != doc_name {
+				tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = 'document'", name)
+			}
+			tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = 'document'", doc_name)
+			tool.Exec_DB(tx, "insert into html_filter (html, kind, plus, plus_t) values (?, 'document', ?, ?)", doc_name, values.Get("regex"), acl_data)
+		})
 	} else {
 		plus := ""
 		switch kind {
@@ -143,11 +165,13 @@ func Api_filter_add_post(config tool.Config, kind string, name string, values ur
 		case "edit_top":
 			plus = values.Get("markup")
 		}
-		if name != "" && name != title {
-			tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
-		}
-		tool.Exec_DB(db, "delete from html_filter where html = ? and kind = ?", title, spec.db_kind)
-		tool.Exec_DB(db, "insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, '')", title, spec.db_kind, plus)
+		run_write(func(tx tool.DB_runner) {
+			if name != "" && name != title {
+				tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = ?", name, spec.db_kind)
+			}
+			tool.Exec_DB(tx, "delete from html_filter where html = ? and kind = ?", title, spec.db_kind)
+			tool.Exec_DB(tx, "insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, '')", title, spec.db_kind, plus)
+		})
 	}
 
 	tool.Do_insert_auth_history(db, config.IP, "filter_save ("+kind+")")

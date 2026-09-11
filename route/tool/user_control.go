@@ -308,7 +308,17 @@ func IP_parser(db *sql.DB, ip string, my_ip string) string {
 	}
 }
 
-func Do_auth_insert(db *sql.DB, user_name string, end_date string, reason string, login string, blocker string, do_type string, release bool) {
+func Do_auth_insert(db DB_runner, user_name string, end_date string, reason string, login string, blocker string, do_type string, release bool) {
+	if sql_db, ok := db.(*sql.DB); ok {
+		if err := DB_transaction(sql_db, func(tx *sql.Tx) error {
+			Do_auth_insert(tx, user_name, end_date, reason, login, blocker, do_type, release)
+			return nil
+		}); err != nil {
+			panic(err)
+		}
+		return
+	}
+
 	now_time := Get_time()
 	if !release && (end_date == "" || end_date == "0") {
 		end_date = Get_auth_default_end_date()

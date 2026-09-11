@@ -77,14 +77,18 @@ func normalize_thread_bbs_prefix(db *sql.DB) error {
 		changed = true
 	}
 
-	result, err := db.Exec(
-		tool.DB_change("delete from bbs_data where set_id = ? and set_name in ('topic_stop', 'comment_close')"),
-		thread_bbs_set_id,
-	)
-	if err != nil {
+	var deleted int64
+	err = tool.DB_transaction(db, func(tx *sql.Tx) error {
+		result, err := tx.Exec(
+			tool.DB_change("delete from bbs_data where set_id = ? and set_name in ('topic_stop', 'comment_close')"),
+			thread_bbs_set_id,
+		)
+		if err != nil {
+			return err
+		}
+		deleted, err = result.RowsAffected()
 		return err
-	}
-	deleted, err := result.RowsAffected()
+	})
 	if err != nil {
 		return err
 	}
@@ -139,12 +143,15 @@ func migrate_thread_bbs_document_tags(db *sql.DB) error {
 			continue
 		}
 
-		if _, err := db.Exec(
-			tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('tag', ?, ?, ?)"),
-			data[0],
-			thread_bbs_set_id,
-			data[1],
-		); err != nil {
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			_, err := tx.Exec(
+				tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('tag', ?, ?, ?)"),
+				data[0],
+				thread_bbs_set_id,
+				data[1],
+			)
+			return err
+		}); err != nil {
 			return err
 		}
 		changed = true
@@ -240,14 +247,18 @@ func migrate_thread_bbs_agree_prefix(db *sql.DB) error {
 		}
 	}
 
-	result, err := db.Exec(
-		tool.DB_change("delete from bbs_data where set_id = ? and set_name = 'topic_agree'"),
-		thread_bbs_id,
-	)
-	if err != nil {
+	var deleted int64
+	err = tool.DB_transaction(db, func(tx *sql.Tx) error {
+		result, err := tx.Exec(
+			tool.DB_change("delete from bbs_data where set_id = ? and set_name = 'topic_agree'"),
+			thread_bbs_id,
+		)
+		if err != nil {
+			return err
+		}
+		deleted, err = result.RowsAffected()
 		return err
-	}
-	deleted, err := result.RowsAffected()
+	})
 	if err != nil {
 		return err
 	}

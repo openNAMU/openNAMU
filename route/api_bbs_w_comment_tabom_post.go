@@ -1,6 +1,8 @@
 package route
 
 import (
+	"database/sql"
+
 	"opennamu/route/tool"
 )
 
@@ -51,5 +53,12 @@ func Api_bbs_w_comment_tabom_post(config tool.Config, set_id string, set_code st
 		return return_data
 	}
 
-	return api_bbs_tabom_post(db, config.IP, comment_set_id, comment_set_code, vote_type)
+	var result map[string]any
+	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		result = api_bbs_tabom_post(tx, config.IP, comment_set_id, comment_set_code, vote_type)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
+	return result
 }

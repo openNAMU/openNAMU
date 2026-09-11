@@ -6,7 +6,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func api_bbs_tabom_post(db *sql.DB, user string, set_id string, set_code string, vote_type string) map[string]any {
+func api_bbs_tabom_post(db *sql.Tx, user string, set_id string, set_code string, vote_type string) map[string]any {
 	return_data := make(map[string]any)
 
 	if vote_type != "down" {

@@ -1,6 +1,8 @@
 package route
 
 import (
+	"database/sql"
+
 	"opennamu/route/tool"
 )
 
@@ -32,11 +34,20 @@ func Api_setting_put(config tool.Config, set_name string, data string, coverage 
 				return return_data
 			}
 
-			tool.Exec_DB(db, "delete from other where name = 'rankup_condition' and coverage = ?", coverage)
-			for _, condition_data := range condition_list {
-				tool.Exec_DB(db, "insert into other (name, data, coverage) values ('rankup_condition', ?, ?)", condition_data, coverage)
+			if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+				if _, err := tx.Exec(tool.DB_change("delete from other where name = 'rankup_condition' and coverage = ?"), coverage); err != nil {
+					return err
+				}
+				for _, condition_data := range condition_list {
+					if _, err := tx.Exec(tool.DB_change("insert into other (name, data, coverage) values ('rankup_condition', ?, ?)"), condition_data, coverage); err != nil {
+						return err
+					}
+				}
+				tool.Do_insert_auth_history(tx, config.IP, "rankup_condition ("+coverage+")")
+				return nil
+			}); err != nil {
+				panic(err)
 			}
-			tool.Do_insert_auth_history(db, config.IP, "rankup_condition ("+coverage+")")
 			return_data["response"] = "ok"
 			return return_data
 		}
@@ -47,19 +58,17 @@ func Api_setting_put(config tool.Config, set_name string, data string, coverage 
 			return return_data
 		}
 		if auth_info {
-			if coverage == "" {
-				tool.Exec_DB(
-					db,
-					"delete from other where name = ?",
-					set_name,
-				)
+			if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+				if coverage == "" {
+					if _, err := tx.Exec(tool.DB_change("delete from other where name = ?"), set_name); err != nil {
+						return err
+					}
+				}
+				_, err := tx.Exec(tool.DB_change("insert into other (name, data, coverage) values (?, ?, ?)"), set_name, data, coverage)
+				return err
+			}); err != nil {
+				panic(err)
 			}
-
-			tool.Exec_DB(
-				db,
-				"insert into other (name, data, coverage) values (?, ?, ?)",
-				set_name, data, coverage,
-			)
 
 			return_data["response"] = "ok"
 		} else {
