@@ -36,10 +36,6 @@ func View_main_other(config tool.Config) string {
             <li><a href="/recent_change">`+tool.Get_language(db, "recent_change", true)+`</a></li>
             <li><a href="/list/random">`+tool.Get_language(db, "random_list", true)+`</a></li>
             <li><a href="/list/document/all">`+tool.Get_language(db, "all_document_list", true)+`</a></li>
-            <li><a href="/list/document/view">`+tool.Get_language(db, "page_view_sort", true)+`</a></li>
-            <li><a href="/list/document/view/month">`+tool.Get_language(db, "page_view_month", true)+`</a></li>
-            <li><a href="/list/document/view/day">`+tool.Get_language(db, "page_view_day", true)+`</a></li>
-            <li><a href="/list/document/view/not_exist">`+tool.Get_language(db, "page_view_not_exist", true)+`</a></li>
             <li><a href="/list/document/acl">`+tool.Get_language(db, "acl_document_list", true)+`</a></li>
             <li><a href="/list/document/need">`+tool.Get_language(db, "need_document", true)+`</a></li>
             <li><a href="/list/category/need">`+tool.Get_language(db, "need_category", true)+`</a></li>
@@ -51,7 +47,15 @@ func View_main_other(config tool.Config) string {
             <li><a href="/list/document/unlinked">`+tool.Get_language(db, "unlinked_document_list", true)+`</a></li>
             <li><a href="/list/document/no_category">`+tool.Get_language(db, "no_category_document_list", true)+`</a></li>
             <li><a href="/list/category/no_link">`+tool.Get_language(db, "unused_category", true)+`</a></li>
+        </ul>
+        <h3>`+tool.Get_language(db, "statistics", true)+`</h3>
+        <ul>
+            <li><a href="/list/document/view">`+tool.Get_language(db, "page_view_sort", true)+`</a></li>
+            <li><a href="/list/document/view/month">`+tool.Get_language(db, "page_view_month", true)+`</a></li>
+            <li><a href="/list/document/view/day">`+tool.Get_language(db, "page_view_day", true)+`</a></li>
+            <li><a href="/list/document/view/not_exist">`+tool.Get_language(db, "page_view_not_exist", true)+`</a></li>
             <li><a href="/list/contributor">`+tool.Get_language(db, "monthly_top_contributor", true)+`</a></li>
+            <li><a href="/bbs/contributor">`+tool.Get_language(db, "monthly_bbs_contributor", true)+`</a></li>
             <li><a href="/statistics">`+tool.Get_language(db, "statistics", true)+`</a></li>
         </ul>
         <h3>`+tool.Get_language(db, "user", true)+`</h3>
@@ -64,7 +68,6 @@ func View_main_other(config tool.Config) string {
             <li><a href="/list/image">`+tool.Get_language(db, "image_file_list", true)+`</a></li>
             <li><a href="/vote">`+tool.Get_language(db, "vote_list", true)+`</a></li>
             <li><a href="/bbs/main">`+tool.Get_language(db, "bbs_main", true)+`</a></li>
-            <li><a href="/bbs/contributor">`+tool.Get_language(db, "monthly_bbs_contributor", true)+`</a></li>
         </ul>
         <h2>`+tool.Get_language(db, "other", true)+`</h2>
         <ul>`+ai_link+`
