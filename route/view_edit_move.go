@@ -68,8 +68,8 @@ func View_edit_move(config tool.Config, doc_name string, values url.Values) stri
 	if owner_auth {
 		body += "<h2>" + tool.Get_language(db, "document_set", true) + "</h2>"
 		body += "<select name=\"document_set_option\">"
-		body += "<option value=\"none\" selected>" + tool.Get_language(db, "dont_move", true) + "</option>"
-		body += "<option value=\"normal\">" + tool.Get_language(db, "normal", true) + "</option>"
+		body += "<option value=\"normal\" selected>" + tool.Get_language(db, "normal", true) + "</option>"
+		body += "<option value=\"none\">" + tool.Get_language(db, "dont_move", true) + "</option>"
 		body += "<option value=\"reverse\">" + tool.Get_language(db, "replace_move", true) + "</option>"
 		body += "</select><hr class=\"main_hr\">"
 	}
