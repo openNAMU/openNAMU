@@ -107,10 +107,12 @@ func api_file_upload_post_reader(config tool.Config, file_name string, file_read
 
 	file_full_dir := tool.File_name_to_dir(file_name, file_ext)
 	dst_path := filepath.Join(main_dir, file_full_dir)
-	if _, err := os.Stat(dst_path); err == nil && !replace {
-		return_value["response"] = "error"
-		return_value["data"] = "already exist"
-		return return_value
+	if _, err := os.Stat(dst_path); err == nil {
+		if !replace {
+			return_value["response"] = "error"
+			return_value["data"] = "already exist"
+			return return_value
+		}
 	} else if !errors.Is(err, os.ErrNotExist) {
 		return_value["response"] = "error"
 		return_value["data"] = "exist check fail"
