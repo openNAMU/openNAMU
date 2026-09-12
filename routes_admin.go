@@ -59,6 +59,12 @@ func register_admin_routes(r *gin.Engine) {
 	r.POST("/auth/give/:user_name", func(c *gin.Context) {
 		admin_give(c, c.Param("user_name"), "normal", admin_post_values(c))
 	})
+	r.GET("/auth/invite", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_invite(make_route_config(c), nil)))
+	})
+	r.POST("/auth/invite", func(c *gin.Context) {
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_invite(make_route_config(c), admin_post_values(c))))
+	})
 
 	r.GET("/auth/list", func(c *gin.Context) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_auth_list(make_route_config(c))))

@@ -42,13 +42,30 @@ func user_register_validate(db *sql.DB, config tool.Config, id string, password 
 	return ""
 }
 
-func user_register_post(config tool.Config, id string, password string, password_check string, captcha string) string {
+func user_register_invite(db *sql.DB, config tool.Config, invite string) (string, string) {
+	if !tool.Invite_required(db) || tool.Check_permission(db, "user_manage", config.IP) {
+		return "", ""
+	}
+
+	invite_hash := tool.Invite_hash(invite)
+	if !tool.Invite_valid(db, invite_hash) {
+		return "invite error", ""
+	}
+
+	return "", invite_hash
+}
+
+func user_register_post(config tool.Config, id string, password string, password_check string, captcha string, invite string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 	if !tool.Captcha_check(db, config.Session, config.IP, captcha) {
 		return tool.Get_error_page(db, config, "recaptcha")
 	}
 	error_name := user_register_validate(db, config, id, password, password_check)
+	if error_name != "" {
+		return tool.Get_error_page(db, config, error_name)
+	}
+	error_name, invite_hash := user_register_invite(db, config, invite)
 	if error_name != "" {
 		return tool.Get_error_page(db, config, error_name)
 	}
@@ -59,18 +76,23 @@ func user_register_post(config tool.Config, id string, password string, password
 	if email_required {
 		config.Session.Set("reg_id", id)
 		config.Session.Set("reg_pw", password)
+		config.Session.Set("reg_invite", invite_hash)
 		_ = config.Session.Save()
 		return tool.Get_redirect("/register/email")
 	}
 	if approval_required {
 		config.Session.Set("submit_id", id)
 		config.Session.Set("submit_pw", password)
+		config.Session.Set("submit_invite", invite_hash)
 		config.Session.Delete("submit_email")
 		_ = config.Session.Save()
 		return tool.Get_redirect("/register/submit")
 	}
-	result := Api_add_user(config, id, password, "", "")
+	result := Api_add_user_invite(config, id, password, "", "", invite_hash)
 	if result["response"] != "ok" {
+		if result["data"] == "invite error" {
+			return tool.Get_error_page(db, config, "invite error")
+		}
 		return tool.Get_error_page(db, config, "register error")
 	}
 	return tool.Get_redirect("/login")

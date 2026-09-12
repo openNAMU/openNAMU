@@ -7,13 +7,18 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_register_submit_post(config tool.Config, id string, pw string, email string, question string, answer string) map[string]any {
+func Api_register_submit_post(config tool.Config, id string, pw string, email string, question string, answer string, invite_hash string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
 	if id == "" || pw == "" || question == "" {
 		return_data["response"] = "error"
+		return return_data
+	}
+	if tool.Invite_required(db) && !tool.Invite_valid(db, invite_hash) {
+		return_data["response"] = "error"
+		return_data["data"] = "invite error"
 		return return_data
 	}
 	encode := tool.Get_main_encode(db)
@@ -25,6 +30,7 @@ func Api_register_submit_post(config tool.Config, id string, pw string, email st
 		"question": question,
 		"answer":   answer,
 		"date":     tool.Get_time(),
+		"invite":   invite_hash,
 	})
 	if err != nil {
 		return_data["response"] = "error"

@@ -37,9 +37,9 @@ func app_submit_action(db *sql.DB, config tool.Config, user_id string, approve b
 	}
 	result := map[string]any{}
 	if application["pw_hash"] != "" {
-		result = Api_add_user_hash(config, application_id, application["pw_hash"], application["email"], application["encode"])
+		result = Api_add_user_hash_invite(config, application_id, application["pw_hash"], application["email"], application["encode"], application["invite"])
 	} else if application["pw"] != "" {
-		result = Api_add_user(config, application_id, application["pw"], application["email"], application["encode"])
+		result = Api_add_user_invite(config, application_id, application["pw"], application["email"], application["encode"], application["invite"])
 	} else {
 		return false
 	}

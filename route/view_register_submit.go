@@ -12,6 +12,7 @@ func View_register_submit(config tool.Config, values url.Values) string {
 	id, _ := config.Session.Get("submit_id").(string)
 	pw, _ := config.Session.Get("submit_pw").(string)
 	email, _ := config.Session.Get("submit_email").(string)
+	invite_hash, _ := config.Session.Get("submit_invite").(string)
 	if id == "" || pw == "" {
 		return tool.Get_redirect("/register")
 	}
@@ -24,11 +25,14 @@ func View_register_submit(config tool.Config, values url.Values) string {
 		return tool.Get_redirect("/register")
 	}
 	if values != nil {
-		result := Api_register_submit_post(config, id, pw, email, question, values.Get("answer"))
+		result := Api_register_submit_post(config, id, pw, email, question, values.Get("answer"), invite_hash)
 		if result["response"] != "ok" {
+			if result["data"] == "invite error" {
+				return tool.Get_error_page(db, config, "invite error")
+			}
 			return tool.Get_error_page(db, config, "error")
 		}
-		for _, name := range []string{"submit_id", "submit_pw", "submit_email"} {
+		for _, name := range []string{"submit_id", "submit_pw", "submit_email", "submit_invite"} {
 			config.Session.Delete(name)
 		}
 		_ = config.Session.Save()

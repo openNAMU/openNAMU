@@ -23,6 +23,10 @@ func View_main_manager(config tool.Config) string {
 	if tool.Check_permission(db, "admin", config.IP) {
 		backup_menu = `<li><a href="/backup">` + lang("document_backup") + `</a></li>`
 	}
+	invite_menu := ""
+	if tool.Check_permission(db, "user_manage", config.IP) {
+		invite_menu = `<li><a href="/auth/invite">` + lang("invite_manage") + `</a></li>`
+	}
 
 	data := `<h2>` + lang("admin") + `</h2>
 <ul>
@@ -34,6 +38,7 @@ func View_main_manager(config tool.Config) string {
 <li><a href="/auth/give">` + lang("multiple_authorize") + `</a></li>
 <li><a href="/auth/give_list">` + lang("auth_give_list") + `</a></li>
 <li><a href="/auth/give_total">` + lang("auth_to_auth") + `</a></li>
+` + invite_menu + `
 <li><a href="/delete_multiple">` + lang("many_delete") + `</a></li>
 <li><a href="/app_submit">` + lang("application_list") + `</a></li>
 ` + backup_menu + `

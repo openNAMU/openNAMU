@@ -12,6 +12,7 @@ func View_register_email_check(config tool.Config, values url.Values) string {
 	pw, _ := config.Session.Get("reg_pw").(string)
 	email, _ := config.Session.Get("reg_email").(string)
 	key, _ := config.Session.Get("reg_key").(string)
+	invite_hash, _ := config.Session.Get("reg_invite").(string)
 	if id == "" || pw == "" || email == "" || key == "" {
 		return tool.Get_redirect("/register")
 	}
@@ -32,18 +33,22 @@ func View_register_email_check(config tool.Config, values url.Values) string {
 		config.Session.Set("submit_id", id)
 		config.Session.Set("submit_pw", pw)
 		config.Session.Set("submit_email", email)
-		for _, name := range []string{"reg_id", "reg_pw", "reg_email", "reg_key"} {
+		config.Session.Set("submit_invite", invite_hash)
+		for _, name := range []string{"reg_id", "reg_pw", "reg_email", "reg_key", "reg_invite"} {
 			config.Session.Delete(name)
 		}
 		_ = config.Session.Save()
 		return tool.Get_redirect("/register/submit")
 	}
 
-	result := Api_add_user(config, id, pw, email, "")
+	result := Api_add_user_invite(config, id, pw, email, "", invite_hash)
 	if result["response"] != "ok" {
+		if result["data"] == "invite error" {
+			return tool.Get_error_page(db, config, "invite error")
+		}
 		return tool.Get_error_page(db, config, "register error")
 	}
-	for _, name := range []string{"reg_id", "reg_pw", "reg_email", "reg_key"} {
+	for _, name := range []string{"reg_id", "reg_pw", "reg_email", "reg_key", "reg_invite"} {
 		config.Session.Delete(name)
 	}
 	_ = config.Session.Save()

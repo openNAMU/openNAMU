@@ -23,6 +23,11 @@ func View_login_register(config tool.Config) string {
 		password_length_limit = " (" + tool.Get_language(db, "password_min_length", true) + " : " + password_length_limit + ")"
 	}
 
+	invite_input := `<hr class="main_hr">`
+	if tool.Invite_required(db) && !tool.Check_permission(db, "user_manage", config.IP) {
+		invite_input += `<input class="__ON_INPUT__" placeholder="` + tool.Get_language(db, "invite", true) + `" name="invite" type="text"><hr class="main_hr">`
+	}
+
 	return tool.Get_template(
 		db,
 		config,
@@ -37,7 +42,7 @@ func View_login_register(config tool.Config) string {
             <hr class="main_hr">
 
             <input class="__ON_INPUT__" placeholder="`+tool.Get_language(db, "password_confirm", true)+`" name="password_check" type="password">
-            <hr class="main_hr">
+            `+invite_input+`
 
             `+tool.Get_captcha_ui(db, config)+`
 

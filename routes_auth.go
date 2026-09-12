@@ -35,6 +35,7 @@ func register_auth_routes(r *gin.Engine) {
 			password,
 			password_check,
 			captcha_response(c),
+			c.PostForm("invite"),
 		)
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})

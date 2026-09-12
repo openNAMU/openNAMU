@@ -16,8 +16,19 @@ func Api_login_register(config tool.Config, id string, password string, password
 		}
 		return return_data
 	}
+	error_name, invite_hash := user_register_invite(db, config, "")
+	if error_name != "" {
+		return_data["response"] = "error"
+		return_data["data"] = error_name
+		return return_data
+	}
 
-	Api_add_user(config, id, password, "", "")
+	result := Api_add_user_invite(config, id, password, "", "", invite_hash)
+	if result["response"] != "ok" {
+		return_data["response"] = "error"
+		return_data["data"] = result["data"]
+		return return_data
+	}
 	return_data["response"] = "ok"
 
 	return return_data

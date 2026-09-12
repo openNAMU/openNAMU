@@ -375,6 +375,8 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
 		data = Get_language(db, "password_same_as_id_error", true)
 	case "register disabled":
 		data = Get_language(db, "login_able_and_regsiter_disable", true)
+	case "invite error":
+		data = Get_language(db, "invite_error", true)
 	case "password too short":
 		password_length_limit := ""
 		QueryRow_DB(
