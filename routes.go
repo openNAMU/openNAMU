@@ -39,6 +39,7 @@ func register_routes(r *gin.Engine) {
 	register_search_compat_routes(r)
 	register_search_routes(r)
 	register_ollama_routes(r)
+	register_document_backup_routes(r)
 	register_manager_routes(r)
 	register_filter_routes(r)
 	register_admin_routes(r)

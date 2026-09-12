@@ -239,6 +239,13 @@
     "ua": "UA",
     "day": "Day(s)",
     "backup": "Backup",
+    "document_backup": "Document backup",
+    "document_backup_help": "Back up and restore document content and history as JSON. BBS, users, permissions, and files are not included.",
+    "document_backup_export": "Download document backup",
+    "document_backup_import": "Import document backup",
+    "document_backup_imported": "Imported documents",
+    "document_backup_skipped": "Skipped documents",
+    "document_backup_invalid": "The backup file is invalid.",
     
     "_comment_": "Time",
     "second": "Second(s)",

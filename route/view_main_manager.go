@@ -19,6 +19,10 @@ func View_main_manager(config tool.Config) string {
 	lang := func(name string) string {
 		return tool.Get_language(db, name, true)
 	}
+	backup_menu := ""
+	if tool.Check_permission(db, "admin", config.IP) {
+		backup_menu = `<li><a href="/backup">` + lang("document_backup") + `</a></li>`
+	}
 
 	data := `<h2>` + lang("admin") + `</h2>
 <ul>
@@ -32,6 +36,7 @@ func View_main_manager(config tool.Config) string {
 <li><a href="/auth/give_total">` + lang("auth_to_auth") + `</a></li>
 <li><a href="/delete_multiple">` + lang("many_delete") + `</a></li>
 <li><a href="/app_submit">` + lang("application_list") + `</a></li>
+` + backup_menu + `
 </ul>
 <h2>` + lang("owner") + `</h2>
 <ul>

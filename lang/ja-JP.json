@@ -53,5 +53,12 @@
     "category_manual": "手動分類",
     "category_markup_list": "文法カテゴリがある文書一覧",
     "category_count": "カテゴリ数",
-    "unused_category": "未使用のカテゴリ"
+    "unused_category": "未使用のカテゴリ",
+    "document_backup": "文書バックアップ",
+    "document_backup_help": "文書本文と履歴のみをJSON形式で保存・復元します。掲示板・ユーザー・権限・ファイルは含まれません。",
+    "document_backup_export": "文書バックアップをダウンロード",
+    "document_backup_import": "文書バックアップをインポート",
+    "document_backup_imported": "インポートした文書",
+    "document_backup_skipped": "スキップした文書",
+    "document_backup_invalid": "バックアップファイルが正しくありません。"
 }
