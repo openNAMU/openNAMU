@@ -349,6 +349,20 @@ func Get_redirect_problem_rows(db *sql.DB, offset int) *sql.Rows {
 	)
 }
 
+func Get_redirect_not_exist_rows(db *sql.DB, offset int) *sql.Rows {
+	return Query_DB(
+		db,
+		`select distinct r.link, r.title
+			from back r
+			where r.type = 'redirect'
+			and exists (select 1 from data source where source.title = r.link)
+			and not exists (select 1 from data target where target.title = r.title)
+			order by r.link
+			limit ?, 50`,
+		offset,
+	)
+}
+
 func Get_data_title_like(db *sql.DB, title string) bool {
 	value := ""
 	return QueryRow_DB(

@@ -730,6 +730,7 @@
     "outdated_doc_warning": "오래된 문서 경고",
     "redirect": "넘겨주기",
     "redirect_problem_list": "비정상 넘겨주기 목록",
+    "redirect_not_exist_list": "넘겨주기 대상이 없는 목록",
     "new_doc": "새 문서",
     "table": "표",
     "table_transparent": "표 투명화",
