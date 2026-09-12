@@ -600,7 +600,7 @@ func Get_unlinked_document_page_rows(db *sql.DB, offset int) *sql.Rows {
 func Get_move_document_rows(db *sql.DB, pattern string) *sql.Rows {
 	return Query_DB(
 		db,
-		"select title from data where title not like 'file:%' and title not like 'category:%' and title like ? order by title limit 100",
+		"select title from data where title not like 'file:%' and title not like 'category:%' and title like ? escape '!' order by title",
 		pattern,
 	)
 }

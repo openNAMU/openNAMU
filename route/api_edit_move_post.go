@@ -115,6 +115,12 @@ func move_backlinks(executor tool.DB_runner, old_name string, new_name string) {
 	tool.Exec_DB(executor, "update back set link = ? where link = ?", new_name, old_name)
 }
 
+func move_document_normal_data(executor tool.DB_runner, old_name string, new_name string) {
+	tool.Exec_DB(executor, "update data set title = ? where title = ?", new_name, old_name)
+	move_backlinks(executor, old_name, new_name)
+	move_document_history(executor, old_name, new_name)
+}
+
 func move_document_history(executor tool.DB_runner, old_name string, new_name string) {
 	tool.Exec_DB(executor, "update history set title = ? where title = ?", new_name, old_name)
 	tool.Exec_DB(executor, "update rc set title = ? where title = ?", new_name, old_name)
@@ -172,6 +178,7 @@ func move_data_set_normal(executor tool.DB_runner, old_name string, new_name str
 	tool.Exec_DB(executor, "delete from acl where title = ?", new_name)
 	tool.Exec_DB(executor, "update data_set set doc_name = ? where doc_name = ?", new_name, old_name)
 	tool.Exec_DB(executor, "update acl set title = ? where title = ?", new_name, old_name)
+	tool.Exec_DB(executor, "update bbs_data set set_data = ? where set_id = '0' and set_name = 'title' and set_data = ?", new_name, old_name)
 }
 
 func move_data_set_rotate(executor tool.DB_runner, temp_name string, old_name string, new_name string) {
@@ -292,9 +299,7 @@ func move_document_options(config tool.Config, db *sql.DB, old_name string, new_
 		move_document_merge(tx, target_max, old_name, new_name, source_history)
 		history_events = append(history_events, move_history_event{new_name, source_data, send, "<a>" + tool.HTML_escape(old_name) + "</a> ↔ <a>" + tool.HTML_escape(new_name) + "</a>"})
 	} else {
-		tool.Exec_DB(tx, "update data set title = ? where title = ?", new_name, old_name)
-		move_backlinks(tx, old_name, new_name)
-		move_document_history(tx, old_name, new_name)
+		move_document_normal_data(tx, old_name, new_name)
 		history_events = append(history_events, move_history_event{new_name, source_data, send, "<a>" + tool.HTML_escape(old_name) + "</a> → <a>" + tool.HTML_escape(new_name) + "</a>"})
 	}
 

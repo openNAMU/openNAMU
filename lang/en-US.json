@@ -62,6 +62,7 @@
     "upvote_sort": "Most upvoted",
     "excellent_post": "Excellent posts",
     "multiple_move": "Multiple move documents",
+    "multiple_move_complete": "Multiple document move completed",
     "title_start_document": "Document title starts with",
     "title_end_document": "Document title ends with",
     "title_include_document": "Document title includes",

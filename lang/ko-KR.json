@@ -860,6 +860,7 @@
     "upvote_sort": "추천순",
     "excellent_post": "우수글순",
     "multiple_move": "다중 문서 이동",
+    "multiple_move_complete": "다중 문서 이동이 완료되었습니다",
     "title_start_document": "문서명이 해당 문자열로 시작",
     "title_end_document": "문서명이 해당 문자열로 끝남",
     "title_include_document": "문서명에 해당 문자열 포함",
