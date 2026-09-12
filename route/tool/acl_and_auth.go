@@ -252,14 +252,8 @@ func Get_auth_permission_list(db *sql.DB, auth string) []string {
 }
 
 func Get_auth_user_list(db *sql.DB, offset int, limit int) [][]string {
-	query := "select id, data from user_set where name = 'acl' and data != 'user' order by id"
-	args := []any{}
-	if limit > 0 {
-		query += " limit ?, ?"
-		args = append(args, offset, limit)
-	}
-
-	rows := Query_DB(db, query, args...)
+	query := "select id, data from user_set where name = 'acl' order by id"
+	rows := Query_DB(db, query)
 	defer rows.Close()
 
 	data_list := [][]string{}
@@ -268,12 +262,19 @@ func Get_auth_user_list(db *sql.DB, offset int, limit int) [][]string {
 		if rows.Scan(&data[0], &data[1]) != nil {
 			continue
 		}
-		auth := Get_user_auth(db, data[0])
-		if auth == "user" {
+		if !Check_permission(db, "treat_as_admin", data[0]) {
 			continue
 		}
+		if offset > 0 {
+			offset--
+			continue
+		}
+		auth := Get_user_auth(db, data[0])
 		data[1] = auth
 		data_list = append(data_list, data)
+		if limit > 0 && len(data_list) >= limit {
+			break
+		}
 	}
 	return data_list
 }
