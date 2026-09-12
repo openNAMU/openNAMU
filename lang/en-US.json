@@ -401,6 +401,7 @@
     "user_added_menu": "User added menu",
     "move_redirect_make": "Redirect document generation (Only if possible)",
     "redirect": "Redirect",
+    "redirect_problem_list": "Invalid redirect list",
     "new_doc": "New document(s)",
     "table": "Table",
     "table_transparent": "Table transparency",

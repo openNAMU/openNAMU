@@ -729,6 +729,7 @@
     "bbs_comment_help": "게시판 댓글 편집기 도움말",
     "outdated_doc_warning": "오래된 문서 경고",
     "redirect": "넘겨주기",
+    "redirect_problem_list": "비정상 넘겨주기 목록",
     "new_doc": "새 문서",
     "table": "표",
     "table_transparent": "표 투명화",

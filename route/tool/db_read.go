@@ -335,6 +335,20 @@ func Get_back_redirect_data(db *sql.DB, doc_name string) (string, string, bool) 
 	return target, anchor, exists
 }
 
+func Get_redirect_problem_rows(db *sql.DB, offset int) *sql.Rows {
+	return Query_DB(
+		db,
+		`select distinct r.link, r.title,
+			coalesce((select next_r.title from back next_r where next_r.link = r.title and next_r.type = 'redirect' limit 1), '')
+			from back r
+			where r.type = 'redirect'
+			and (r.link = r.title or exists (select 1 from back next_r where next_r.link = r.title and next_r.type = 'redirect'))
+			order by r.link
+			limit ?, 50`,
+		offset,
+	)
+}
+
 func Get_data_title_like(db *sql.DB, title string) bool {
 	value := ""
 	return QueryRow_DB(
