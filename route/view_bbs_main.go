@@ -88,6 +88,12 @@ func bbs_tags_html(bbs_id string, tags string, keyword string) string {
 	return data_html
 }
 
+func bbs_list_example_ui(db *sql.DB) string {
+	left := tool.Get_language(db, "title", true) + " [" + tool.Get_language(db, "statistics_bbs_comment_count", true) + "] [+" + tool.Get_language(db, "upvote", true) + "] [-" + tool.Get_language(db, "downvote", true) + "]"
+	right := tool.Get_language(db, "page_view", true) + " | " + tool.Get_language(db, "user_name", true) + " | " + tool.Get_language(db, "date", true)
+	return tool.Get_list_ui(left, right, "", "")
+}
+
 func Get_bbs_list_ui(db *sql.DB, config tool.Config, bbs_all_data []map[string]string, bbs_id_to_name map[string]string) string {
 	count := 0
 	data_html := ""
@@ -113,6 +119,8 @@ func Get_bbs_list_ui(db *sql.DB, config tool.Config, bbs_all_data []map[string]s
 		bbs_comment_length := tool.Str_to_int(in_data["comment_count"])
 
 		bbs_comment_length_str := strconv.Itoa(bbs_comment_length)
+		bbs_tabom_length_str := strconv.Itoa(tool.Str_to_int(in_data["tabom_count"]))
+		bbs_tabom_down_length_str := strconv.Itoa(tool.Str_to_int(in_data["tabom_down_count"]))
 
 		bbs_view_count := "0"
 		if _, ok := in_data["view_count"]; ok {
@@ -146,7 +154,7 @@ func Get_bbs_list_ui(db *sql.DB, config tool.Config, bbs_all_data []map[string]s
 			left += ` <a href="/bbs/in/` + bbs_id + `">(` + bbs_name + `)</a>`
 		}
 
-		left += ` [` + bbs_comment_length_str + `]`
+		left += ` [` + bbs_comment_length_str + `] [+` + bbs_tabom_length_str + `] [-` + bbs_tabom_down_length_str + `]`
 
 		right := ""
 		right += `<span id="opennamu_bbs_comment_` + count_str + `"></span>`
@@ -218,6 +226,7 @@ func View_bbs_main(config tool.Config, page string) string {
 	}
 
 	data_html += "</ul><hr class=\"main_hr\">"
+	data_html += bbs_list_example_ui(db)
 
 	bbs_api_data := Api_bbs(config, "", page, "")
 	data_html += Get_bbs_list_ui(db, config, bbs_api_data["data"].([]map[string]string), bbs_id_to_name)
