@@ -1,8 +1,10 @@
 package route
 
 import (
+	"bytes"
 	"database/sql"
 	"errors"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -40,6 +42,10 @@ func api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string,
 }
 
 func api_file_upload_post(config tool.Config, file_name string, file_data []byte, file_ext string, license string, license_text string, captcha string, check_captcha bool, many_upload bool, replace bool) map[string]any {
+	return api_file_upload_post_reader(config, file_name, bytes.NewReader(file_data), file_ext, license, license_text, captcha, check_captcha, many_upload, replace)
+}
+
+func api_file_upload_post_reader(config tool.Config, file_name string, file_reader io.Reader, file_ext string, license string, license_text string, captcha string, check_captcha bool, many_upload bool, replace bool) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -49,7 +55,7 @@ func api_file_upload_post(config tool.Config, file_name string, file_data []byte
 	allowed_ext := tool.Get_ext_allow_list(db)
 	return_value := make(map[string]any)
 
-	if len(file_data) == 0 || file_name == "" || file_ext == "" {
+	if file_reader == nil || file_name == "" || file_ext == "" {
 		return_value["response"] = "error"
 		return_value["data"] = "invalid data"
 		return return_value
@@ -81,11 +87,7 @@ func api_file_upload_post(config tool.Config, file_name string, file_data []byte
 	if file_max_size <= 0 {
 		file_max_size = 2
 	}
-	if len(file_data) > file_max_size*1000*1000 {
-		return_value["response"] = "error"
-		return_value["data"] = "file too large"
-		return return_value
-	}
+	file_max_bytes := int64(file_max_size) * 1000 * 1000
 
 	doc_name := "file:" + file_name + "." + file_ext
 	var old_doc_name string
@@ -115,32 +117,65 @@ func api_file_upload_post(config tool.Config, file_name string, file_data []byte
 		return return_value
 	}
 
-	file_flag := os.O_WRONLY | os.O_CREATE
-	if replace {
-		file_flag |= os.O_TRUNC
-	} else {
-		file_flag |= os.O_EXCL
-	}
-	out, err := os.OpenFile(dst_path, file_flag, 0o644)
+	temp_file, err := os.CreateTemp(main_dir, ".opennamu-upload-*")
 	if err != nil {
 		return_value["response"] = "error"
 		return_value["data"] = "file create fail"
 		return return_value
 	}
+	temp_path := temp_file.Name()
+	temp_closed := false
+	temp_removed := true
+	defer func() {
+		if !temp_closed {
+			_ = temp_file.Close()
+		}
+		if temp_removed {
+			_ = os.Remove(temp_path)
+		}
+	}()
 
-	if _, err := out.Write(file_data); err != nil {
-		_ = out.Close()
-		_ = os.Remove(dst_path)
+	written, err := io.Copy(temp_file, io.LimitReader(file_reader, file_max_bytes+1))
+	if err != nil {
 		return_value["response"] = "error"
 		return_value["data"] = "file write fail"
 		return return_value
 	}
-	if err := out.Close(); err != nil {
-		_ = os.Remove(dst_path)
+	if written == 0 {
+		return_value["response"] = "error"
+		return_value["data"] = "invalid data"
+		return return_value
+	}
+	if written > file_max_bytes {
+		return_value["response"] = "error"
+		return_value["data"] = "file too large"
+		return return_value
+	}
+	if err := temp_file.Chmod(0o644); err != nil {
 		return_value["response"] = "error"
 		return_value["data"] = "file write fail"
 		return return_value
 	}
+	if err := temp_file.Close(); err != nil {
+		temp_closed = true
+		return_value["response"] = "error"
+		return_value["data"] = "file write fail"
+		return return_value
+	}
+	temp_closed = true
+
+	rename_err := os.Rename(temp_path, dst_path)
+	if rename_err != nil && replace && errors.Is(rename_err, os.ErrExist) {
+		if err := os.Remove(dst_path); err == nil {
+			rename_err = os.Rename(temp_path, dst_path)
+		}
+	}
+	if rename_err != nil {
+		return_value["response"] = "error"
+		return_value["data"] = "file write fail"
+		return return_value
+	}
+	temp_removed = false
 
 	if old_doc_exists {
 		return_value["response"] = "ok"

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -55,17 +54,6 @@ func upload_post(c *gin.Context) {
 			continue
 		}
 
-		b, err := io.ReadAll(io.LimitReader(f, max_file_bytes+1))
-		_ = f.Close()
-		if err != nil {
-			continue
-		}
-
-		if int64(len(b)) > max_file_bytes {
-			c.String(http.StatusRequestEntityTooLarge, "file too large")
-			return
-		}
-
 		original_name := filepath.Base(strings.TrimSpace(fh.Filename))
 		ext := strings.TrimPrefix(strings.ToLower(filepath.Ext(original_name)), ".")
 		name := strings.TrimSuffix(original_name, filepath.Ext(original_name))
@@ -80,7 +68,7 @@ func upload_post(c *gin.Context) {
 
 		upload_files = append(upload_files, route.Upload_file_data{
 			File_name:    name,
-			File_data:    b,
+			File_reader:  f,
 			File_ext:     ext,
 			License:      license,
 			License_text: license_text,
