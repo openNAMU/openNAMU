@@ -48,6 +48,7 @@ func View_main_other(config tool.Config) string {
             <li><a href="/list/document/redirect">`+tool.Get_language(db, "redirect_problem_list", true)+`</a></li>
             <li><a href="/list/document/redirect/not_exist">`+tool.Get_language(db, "redirect_not_exist_list", true)+`</a></li>
             <li><a href="/list/document/no_category">`+tool.Get_language(db, "no_category_document_list", true)+`</a></li>
+            <li><a href="/list/document/category/markup">`+tool.Get_language(db, "category_markup_list", true)+`</a></li>
             <li><a href="/list/category/no_link">`+tool.Get_language(db, "unused_category", true)+`</a></li>
         </ul>
         <h3>`+tool.Get_language(db, "statistics", true)+`</h3>

@@ -3305,7 +3305,7 @@ func render_namumark_compat_backlink(db *sql.DB, doc_name string, data string) m
 	}
 
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-		if _, err := tx.Exec(tool.DB_change("delete from back where link = ?"), doc_name); err != nil {
+		if _, err := tx.Exec(tool.DB_change("delete from back where link = ? and type != 'cat_manual'"), doc_name); err != nil {
 			return err
 		}
 		if _, err := tx.Exec(tool.DB_change("delete from back where title = ? and type = 'no'"), doc_name); err != nil {

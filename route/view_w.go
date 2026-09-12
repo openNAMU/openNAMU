@@ -112,6 +112,9 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 			document_type = "redirect"
 		}
 	}
+	if status == http.StatusOK && !strings.HasPrefix(doc_name, "category:") {
+		render_data += view_w_manual_category_data(db, config, doc_name)
+	}
 
 	last_edit := tool.Get_document_setting_value_exact(db, doc_name, "last_edit", "")
 

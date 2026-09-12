@@ -511,7 +511,7 @@ func Get_need_document_rows(db *sql.DB, offset int) *sql.Rows {
 func Get_need_category_rows(db *sql.DB, offset int) *sql.Rows {
 	return Query_DB(
 		db,
-		"select b.title, count(distinct b.link) from back b where b.type = 'cat' and b.title like 'category:%' and not exists (select 1 from data d where d.title = b.title) group by b.title order by count(distinct b.link) desc, b.title asc limit ?, 50",
+		"select b.title, count(distinct b.link) from back b where b.type in ('cat', 'cat_manual') and b.title like 'category:%' and not exists (select 1 from data d where d.title = b.title) group by b.title order by count(distinct b.link) desc, b.title asc limit ?, 50",
 		offset,
 	)
 }
@@ -519,7 +519,7 @@ func Get_need_category_rows(db *sql.DB, offset int) *sql.Rows {
 func Get_unused_category_rows(db *sql.DB, offset int) *sql.Rows {
 	return Query_DB(
 		db,
-		"select d.title from data d where d.title like 'category:%' and not exists (select 1 from back b where b.title = d.title and b.type = 'cat') order by d.title limit ?, 50",
+		"select d.title from data d where d.title like 'category:%' and not exists (select 1 from back b where b.title = d.title and b.type in ('cat', 'cat_manual')) order by d.title limit ?, 50",
 		offset,
 	)
 }
@@ -584,7 +584,7 @@ func Get_no_link_page_rows(db *sql.DB, offset int) *sql.Rows {
 func Get_no_category_document_rows(db *sql.DB, offset int) *sql.Rows {
 	return Query_DB(
 		db,
-		"select d.title from data d where "+Get_except_document_name_SQL("d.title")+" and not exists (select 1 from back b where b.link = d.title and b.type = 'cat') order by d.title limit ?, 50",
+		"select d.title from data d where "+Get_except_document_name_SQL("d.title")+" and not exists (select 1 from back b where b.link = d.title and b.type in ('cat', 'cat_manual')) order by d.title limit ?, 50",
 		offset,
 	)
 }
@@ -905,22 +905,38 @@ func Get_other_data(db *sql.DB, name string) string {
 }
 
 func Get_category_rows(db *sql.DB, doc_name string) *sql.Rows {
-	return Query_DB(db, "select link, data from back where title = ? and type = 'cat' order by link", doc_name)
+	return Query_DB(db, "select link, data from back where title = ? and type in ('cat', 'cat_manual') order by link", doc_name)
 }
 
 func Get_category_back_rows(db *sql.DB, doc_name string) *sql.Rows {
-	return Query_DB(db, "select title, data from back where link = ? and (type = 'cat' or type = '') order by title", doc_name)
+	return Query_DB(db, "select title, data from back where link = ? and (type = 'cat' or type = 'cat_manual' or type = '') order by title", doc_name)
+}
+
+func Get_category_manual_rows(db *sql.DB, doc_name string) *sql.Rows {
+	return Query_DB(db, "select title, data from back where link = ? and type = 'cat_manual' order by title", doc_name)
+}
+
+func Get_category_manual_document_rows(db *sql.DB, category_name string) *sql.Rows {
+	return Query_DB(db, "select link from back where title = ? and type = 'cat_manual' order by link", category_name)
 }
 
 func Get_category_document_count(db *sql.DB, category_name string) int {
 	count := 0
 	QueryRow_DB(
 		db,
-		"select count(*) from back where link = ? and (type = 'cat' or type = '')",
+		"select count(*) from back where link = ? and (type = 'cat' or type = 'cat_manual' or type = '')",
 		[]any{&count},
 		category_name,
 	)
 	return count
+}
+
+func Get_markup_category_document_rows(db *sql.DB, offset int) *sql.Rows {
+	return Query_DB(
+		db,
+		"select b.link, count(distinct b.title) from back b where b.type = 'cat' and "+Get_except_document_name_SQL("b.link")+" and exists (select 1 from data d where d.title = b.link) group by b.link order by b.link limit ?, 50",
+		offset,
+	)
 }
 
 func Get_category_meta(db *sql.DB, doc_name string, category_name string, meta_type string) (string, bool) {

@@ -29,7 +29,7 @@ func Api_w_random_category(config tool.Config, category_name string) map[string]
 	title := ""
 	tool.QueryRow_DB(
 		db,
-		"select distinct title from back where link = ? and (type = 'cat' or type = '') and title not like 'user:%' and title not like 'category:%' and title not like 'file:%' order by random() limit 1",
+		"select distinct title from back where link = ? and (type = 'cat' or type = 'cat_manual' or type = '') and title not like 'user:%' and title not like 'category:%' and title not like 'file:%' order by random() limit 1",
 		[]any{&title},
 		category_name,
 	)

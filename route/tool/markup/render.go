@@ -118,7 +118,7 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 
 	if backlink_mode && backlink_supported {
 		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-			if _, err := tx.Exec(tool.DB_change("delete from back where link = ?"), doc_name); err != nil {
+			if _, err := tx.Exec(tool.DB_change("delete from back where link = ? and type != 'cat_manual'"), doc_name); err != nil {
 				return err
 			}
 			if _, err := tx.Exec(tool.DB_change("delete from back where title = ? and type = 'no'"), doc_name); err != nil {

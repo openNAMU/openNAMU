@@ -143,7 +143,7 @@ func move_document_rotate(executor tool.DB_runner, temp_name string, old_name st
 
 func move_document_merge(executor tool.DB_runner, target_max int, old_name string, new_name string, source_history []move_history_row) {
 	tool.Exec_DB(executor, "delete from data where title = ?", new_name)
-	tool.Exec_DB(executor, "delete from back where link = ?", new_name)
+	tool.Exec_DB(executor, "delete from back where link = ? and type != 'cat_manual'", new_name)
 	tool.Exec_DB(executor, "update data set title = ? where title = ?", new_name, old_name)
 	move_backlinks(executor, old_name, new_name)
 	tool.Exec_DB(executor, "delete from back where title = ? and type = 'no'", new_name)

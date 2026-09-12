@@ -110,7 +110,7 @@ func emergency_delete_file(path string) error {
 }
 
 func emergency_reset_backlink(db *sql.DB) error {
-	if err := emergency_exec(db, "delete from back"); err != nil {
+	if err := emergency_exec(db, "delete from back where type != 'cat_manual'"); err != nil {
 		return err
 	}
 	if err := emergency_exec(db, "delete from data_set where set_name = 'link_count'"); err != nil {

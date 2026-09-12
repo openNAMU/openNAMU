@@ -58,6 +58,15 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 	category_list := []category_entry{}
 	category_seen := map[string]bool{}
 	category_blur := map[string]bool{}
+	manual_documents := map[string]bool{}
+	manual_rows := tool.Get_category_manual_document_rows(db, doc_name)
+	for manual_rows.Next() {
+		name := ""
+		if manual_rows.Scan(&name) == nil {
+			manual_documents[name] = true
+		}
+	}
+	manual_rows.Close()
 	add_category := func(name string, view string) {
 		if name == "" || category_seen[name] {
 			return
@@ -106,6 +115,9 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 	}
 
 	if len(category_list) == 0 {
+		if tool.Check_permission(db, "edit", config.IP) {
+			return category_manual_add_form(db, doc_name, "", doc_name) + `<hr class="main_hr">`
+		}
 		return ""
 	}
 
@@ -119,11 +131,15 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 			class_name = ` class="opennamu_category_blur"`
 		}
 		item := `<li><a` + class_name + ` href="/w/` + tool.Url_parser(entry.name) + `">` + tool.HTML_escape(entry.view) + `</a>`
+		manual_form := ""
+		if manual_documents[entry.name] && tool.Check_acl(db, entry.name, "", "document_edit", config.IP) {
+			manual_form = category_manual_delete_form(db, doc_name, entry.name, doc_name)
+		}
 		if strings.HasPrefix(entry.name, "category:") {
-			category_sub += item + `</li>`
+			category_sub += item + manual_form + `</li>`
 			category_sub_count++
 		} else {
-			category_doc += item + ` <a class="opennamu_link_inter" href="/xref/` + tool.Url_parser(entry.name) + `">(` + tool.Get_language(db, "backlink", true) + `)</a></li>`
+			category_doc += item + ` <a class="opennamu_link_inter" href="/xref/` + tool.Url_parser(entry.name) + `">(` + tool.Get_language(db, "backlink", true) + `)</a>` + manual_form + `</li>`
 			category_doc_count++
 		}
 	}
@@ -139,7 +155,65 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 	if category_doc_count > 0 {
 		random_link = `(<a href="/random/category/` + tool.Url_parser(doc_name) + `">` + tool.Get_language(db, "random_category", false) + `</a>)`
 	}
+	if tool.Check_permission(db, "edit", config.IP) {
+		data += category_manual_add_form(db, doc_name, "", doc_name)
+	}
 	return data + random_link + `<hr class="main_hr">`
+}
+
+func category_manual_delete_form(db *sql.DB, category_name string, doc_name string, return_name string) string {
+	return `<form method="post" action="/category/delete" style="display:inline"><input type="hidden" name="category" value="` + tool.HTML_escape(category_name) + `"><input type="hidden" name="document" value="` + tool.HTML_escape(doc_name) + `"><input type="hidden" name="return" value="` + tool.HTML_escape(return_name) + `"><button type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
+}
+
+func category_manual_add_form(db *sql.DB, category_name string, doc_name string, return_name string) string {
+	data := `<form method="post" action="/category/add">`
+	if category_name == "" {
+		data += `<input type="text" name="category" placeholder="` + tool.HTML_escape(tool.Get_language(db, "category", true)) + `">`
+	} else {
+		data += `<input type="hidden" name="category" value="` + tool.HTML_escape(category_name) + `">`
+	}
+	if doc_name == "" {
+		data += `<input type="text" name="document" placeholder="` + tool.HTML_escape(tool.Get_language(db, "document", true)) + `">`
+	} else {
+		data += `<input type="hidden" name="document" value="` + tool.HTML_escape(doc_name) + `">`
+	}
+	data += `<input type="hidden" name="return" value="` + tool.HTML_escape(return_name) + `"><button type="submit">` + tool.Get_language(db, "add", true) + `</button></form>`
+	return data
+}
+
+func view_w_manual_category_data(db *sql.DB, config tool.Config, doc_name string) string {
+	can_edit := tool.Check_acl(db, doc_name, "", "document_edit", config.IP)
+	rows := tool.Get_category_manual_rows(db, doc_name)
+	defer rows.Close()
+
+	data := `<div class="opennamu_category" id="cate_manual">` + tool.Get_language(db, "category_manual", true) + " : "
+	count := 0
+	for rows.Next() {
+		category_name, view := "", ""
+		if rows.Scan(&category_name, &view) != nil {
+			continue
+		}
+		if count > 0 {
+			data += " | "
+		}
+		label := strings.TrimPrefix(category_name, "category:")
+		if view == "" {
+			view = label
+		}
+		data += `<a href="/w/` + tool.Url_parser(category_name) + `">` + tool.HTML_escape(view) + `</a>`
+		if can_edit {
+			data += category_manual_delete_form(db, doc_name, category_name, doc_name)
+		}
+		count++
+	}
+	data += `</div>`
+	if !can_edit && count == 0 {
+		return ""
+	}
+	if can_edit {
+		data += category_manual_add_form(db, "", doc_name, doc_name)
+	}
+	return `<hr class="main_hr">` + data
 }
 
 func view_w_file_data(db *sql.DB, doc_name string) string {

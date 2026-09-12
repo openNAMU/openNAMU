@@ -24,7 +24,7 @@ func api_setting_backlink_reset_post(config tool.Config, load string) map[string
 	}
 
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-		if _, err := tx.Exec(tool.DB_change("delete from back")); err != nil {
+		if _, err := tx.Exec(tool.DB_change("delete from back where type != 'cat_manual'")); err != nil {
 			return err
 		}
 		_, err := tx.Exec(tool.DB_change("delete from data_set where set_name = 'link_count'"))

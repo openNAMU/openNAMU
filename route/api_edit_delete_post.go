@@ -48,7 +48,7 @@ func Api_edit_delete_post(config tool.Config, doc_name string, send string, agre
 
 	rows := tool.Query_DB(
 		db,
-		"select title, link from back where title = ? and not type = 'cat' and not type = 'no'",
+		"select title, link from back where title = ? and not type = 'cat' and not type = 'cat_manual' and not type = 'no'",
 		doc_name,
 	)
 	defer rows.Close()
@@ -74,6 +74,9 @@ func Api_edit_delete_post(config tool.Config, doc_name string, send string, agre
 			); err != nil {
 				return err
 			}
+		}
+		if _, err := tx.Exec(tool.DB_change("delete from back where title = ? and type = 'cat_manual'"), doc_name); err != nil {
+			return err
 		}
 		if _, err := tx.Exec(tool.DB_change("delete from back where link = ?"), doc_name); err != nil {
 			return err

@@ -50,5 +50,8 @@
     "need_category": "必要なカテゴリ",
     "wiki_comment_bbs": "ウィキコメント掲示板",
     "thread_bbs": "議論掲示板",
+    "category_manual": "手動分類",
+    "category_markup_list": "文法カテゴリがある文書一覧",
+    "category_count": "カテゴリ数",
     "unused_category": "未使用のカテゴリ"
 }
