@@ -32,5 +32,5 @@ func View_login_find_email(config tool.Config, values url.Values) string {
 		}
 		return tool.Get_redirect("/login/find/email/check")
 	}
-	return user_form_page(db, config, "password search", "<form method='post'><input type='email' name='email'>"+tool.Get_captcha_ui(db, config)+"<button type='submit'>send</button></form>")
+	return user_form_page(db, config, tool.Get_language(db, "password_search", true), "<form method='post'><input type='email' name='email'>"+tool.Get_captcha_ui(db, config)+"<button type='submit'>"+tool.Get_language(db, "send", true)+"</button></form>")
 }

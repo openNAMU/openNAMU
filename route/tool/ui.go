@@ -318,7 +318,7 @@ func Get_wiki_css(data []any, cookies string) []any {
 func Get_list_ui(left string, right string, bottom string, class_name string) string {
 	data_html := ""
 
-	data_html += `<span class="` + class_name + `">`
+	data_html += `<div class="` + class_name + `">`
 	data_html += `<div class="opennamu_recent_change">`
 	data_html += left
 
@@ -335,7 +335,7 @@ func Get_list_ui(left string, right string, bottom string, class_name string) st
 
 	data_html += "</div>"
 	data_html += `<hr class="main_hr">`
-	data_html += "</span>"
+	data_html += "</div>"
 
 	return data_html
 }

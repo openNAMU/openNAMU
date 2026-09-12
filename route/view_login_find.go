@@ -24,6 +24,6 @@ func View_login_find(config tool.Config, values url.Values) string {
 		}
 		return tool.Get_error_page(db, config, "not found")
 	}
-	body := `<ul><li><a href="/login/find/email">` + tool.Get_language(db, "email", true) + `</a></li></ul><hr class="main_hr"><form method="post"><input name="key">` + tool.Get_captcha_ui(db, config) + `<button type="submit">next</button></form>`
-	return user_form_page(db, config, "password search", body)
+	body := `<ul><li><a href="/login/find/email">` + tool.Get_language(db, "email", true) + `</a></li></ul><hr class="main_hr"><form method="post"><input name="key">` + tool.Get_captcha_ui(db, config) + `<button type="submit">` + tool.Get_language(db, "next", true) + `</button></form>`
+	return user_form_page(db, config, tool.Get_language(db, "password_search", true), body)
 }
