@@ -176,7 +176,7 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 		if set_id == thread_bbs_id && filter.tag != "" {
 			add_path += "/document/" + tool.Base64_encode(filter.tag)
 		}
-		menu = append(menu, []any{add_path, tool.Get_language(db, "add", true)})
+		menu = append(menu, []any{add_path, tool.Get_language(db, "post_add", true)})
 	}
 	menu = append(menu,
 		[]any{sort_path, sort_name},
