@@ -133,7 +133,7 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 		item := `<li><a` + class_name + ` href="/w/` + tool.Url_parser(entry.name) + `">` + tool.HTML_escape(entry.view) + `</a>`
 		manual_form := ""
 		if manual_documents[entry.name] && tool.Check_acl(db, entry.name, "", "document_edit", config.IP) {
-			manual_form = category_manual_delete_link(doc_name, entry.name, doc_name)
+			manual_form = ` ` + category_manual_delete_link(doc_name, entry.name, doc_name)
 		}
 		if strings.HasPrefix(entry.name, "category:") {
 			category_sub += item + manual_form + `</li>`
@@ -153,10 +153,13 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 	}
 	random_link := ""
 	if category_doc_count > 0 {
-		random_link = `(<a href="/random/category/` + tool.Url_parser(doc_name) + `">` + tool.Get_language(db, "random_category", false) + `</a>)`
+		random_link = `<a href="/random/category/` + tool.Url_parser(doc_name) + `">(` + tool.Get_language(db, "random_category", false) + `)</a>`
 	}
 	if tool.Check_permission(db, "edit", config.IP) {
-		data += category_manual_add_link(doc_name, "category")
+		data += ` ` + category_manual_add_link(doc_name, "category")
+	}
+	if random_link != "" {
+		random_link = ` ` + random_link
 	}
 	return data + random_link + `<hr class="main_hr">`
 }
