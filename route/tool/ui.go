@@ -424,6 +424,8 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
 		data = Get_language(db, "move_error", true)
 	case "invalid file":
 		data = Get_language(db, "file_exist_error", true)
+	case "file rename error":
+		data = Get_language(db, "file_rename_error", true)
 	case "slow edit limit":
 		data = Get_language(db, "fast_edit_error", true)
 	case "daily limit":

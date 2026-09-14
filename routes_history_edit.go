@@ -141,6 +141,17 @@ func register_history_edit_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.GET("/rename_file/*doc_name", func(c *gin.Context) {
+		route_data := route.View_edit_file_rename(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), nil)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.POST("/rename_file/*doc_name", func(c *gin.Context) {
+		_ = c.Request.ParseForm()
+		route_data := route.View_edit_file_rename(make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Request.PostForm)
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/revert/:rev/*doc_name", func(c *gin.Context) {
 		route_data := route.View_edit_revert(
 			make_route_config(c),
