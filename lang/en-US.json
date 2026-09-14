@@ -951,6 +951,7 @@
     "edit_filter_error": "Censored by contents filter.",
     "file_name_error": "You cannot use dots in the file name.",
     "email_error": "No one has this email.",
+    "not_found_error": "The requested item does not exist.",
     "regex_error": "There is an error in the regular expression.",
     "document_404_error": "This document does not exist.",
     "func_404_error": "This URL does not have the correct function.",

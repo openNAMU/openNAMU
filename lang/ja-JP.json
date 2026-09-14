@@ -40,6 +40,7 @@
     "notice": "お知らせ",
     "help": "ヘルプ",
     "error": "エラー",
+    "not_found_error": "指定された対象は存在しません。",
     "monaco_editor_pc": "Monacoエディター（PC）",
     "monaco_editor_mobile": "Monacoエディター（モバイル）",
     "bbs_watchlist": "掲示板投稿のウォッチリスト",

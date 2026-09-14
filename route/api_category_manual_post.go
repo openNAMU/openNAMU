@@ -29,11 +29,6 @@ func Api_category_manual_post(config tool.Config, action string, category_name s
 		return_data["data"] = "empty data"
 		return return_data
 	}
-	_, doc_exists := tool.Get_data_title(db, doc_name)
-	if !doc_exists {
-		return_data["response"] = "not exist"
-		return return_data
-	}
 	if !tool.Check_acl(db, doc_name, "", "document_edit", config.IP) {
 		return_data["response"] = "require auth"
 		return return_data

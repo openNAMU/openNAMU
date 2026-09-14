@@ -26,7 +26,7 @@ func View_login_2fa_email(config tool.Config, values url.Values) string {
 	}
 	email := user_value(db, login_id, "email")
 	if email == "" {
-		return tool.Get_error_page(db, config, "not found")
+		return tool.Get_error_page(db, config, "email not found")
 	}
 
 	key, _ := config.Session.Get("login_2fa_key").(string)

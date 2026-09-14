@@ -30,16 +30,6 @@ func View_category_manual_add(config tool.Config, add_type string, value string)
 		return tool.Get_error_page(db, config, "not found")
 	}
 
-	if add_type == "category" {
-		if _, exists := tool.Get_data_title(db, category_name); !exists {
-			return tool.Get_error_page(db, config, "not found")
-		}
-	} else if add_type == "document" {
-		if _, exists := tool.Get_data_title(db, document_name); !exists {
-			return tool.Get_error_page(db, config, "not found")
-		}
-	}
-
 	data := category_manual_add_form(db, category_name, document_name, return_name)
 	return tool.Get_template(
 		db,

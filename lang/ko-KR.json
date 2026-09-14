@@ -75,6 +75,7 @@
     "profile_image": "프로필 이미지",
     "profile_image_help": "기존 파일 문서의 파일명만 입력하세요. 예: example.png",
     "email_error": "해당 이메일을 가진 사용자가 존재하지 않습니다.",
+    "not_found_error": "요청한 대상이 존재하지 않습니다.",
     "version": "버전",
     "open": "열기",
     "update_branch": "업데이트를 가져올 브랜치",

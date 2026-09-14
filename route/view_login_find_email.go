@@ -17,7 +17,7 @@ func View_login_find_email(config tool.Config, values url.Values) string {
 		email := strings.TrimSpace(values.Get("email"))
 		user_id, user_exists := tool.Get_user_set_id(db, "email", email)
 		if !user_exists {
-			return tool.Get_error_page(db, config, "not found")
+			return tool.Get_error_page(db, config, "email not found")
 		}
 		key := tool.Get_random_key(32)
 		config.Session.Set("email_reset_key", key)

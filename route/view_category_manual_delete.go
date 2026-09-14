@@ -17,9 +17,6 @@ func View_category_manual_delete(config tool.Config, category_value string, docu
 	}
 
 	category_name = category_manual_name(category_name)
-	if _, exists := tool.Get_data_title(db, document_name); !exists {
-		return tool.Get_error_page(db, config, "not found")
-	}
 	if !tool.Check_acl(db, document_name, "", "document_edit", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}

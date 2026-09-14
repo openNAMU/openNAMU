@@ -398,6 +398,8 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
 	case "recaptcha", "recaptcha_error":
 		data = Get_language(db, "recaptcha_error", true)
 	case "not found":
+		data = Get_language(db, "not_found_error", true)
+	case "email not found":
 		data = Get_language(db, "email_error", true)
 	case "email already exist":
 		data = Get_language(db, "same_email_error", true)
