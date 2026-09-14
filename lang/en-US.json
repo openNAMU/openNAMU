@@ -286,6 +286,7 @@
     "wiki_shutdown": "Shutdown wiki engine",
     "update": "Update",
     "need_document": "Required Document(s)",
+    "no_data_manual_category_list": "Documents without content that only have manual categories",
     "need_category": "Required Categories",
     "category_manual": "Manual category",
     "category_markup_list": "Documents with markup categories",

@@ -38,6 +38,7 @@ func View_main_other(config tool.Config) string {
             <li><a href="/list/document/all">`+tool.Get_language(db, "all_document_list", true)+`</a></li>
             <li><a href="/list/document/acl">`+tool.Get_language(db, "acl_document_list", true)+`</a></li>
             <li><a href="/list/document/need">`+tool.Get_language(db, "need_document", true)+`</a></li>
+            <li><a href="/list/document/manual_category">`+tool.Get_language(db, "no_data_manual_category_list", true)+`</a></li>
             <li><a href="/list/category/need">`+tool.Get_language(db, "need_category", true)+`</a></li>
             <li><a href="/list/document/long">`+tool.Get_language(db, "long_page", true)+`</a></li>
             <li><a href="/list/document/short">`+tool.Get_language(db, "short_page", true)+`</a></li>

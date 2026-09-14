@@ -516,6 +516,14 @@ func Get_need_category_rows(db *sql.DB, offset int) *sql.Rows {
 	)
 }
 
+func Get_no_data_manual_category_rows(db *sql.DB, offset int) *sql.Rows {
+	return Query_DB(
+		db,
+		"select b.link, count(distinct b.title) from back b where b.type = 'cat_manual' and not exists (select 1 from data d where d.title = b.link) and not exists (select 1 from back c where c.link = b.link and c.type = 'cat') group by b.link order by count(distinct b.title) desc, b.link asc limit ?, 50",
+		offset,
+	)
+}
+
 func Get_unused_category_rows(db *sql.DB, offset int) *sql.Rows {
 	return Query_DB(
 		db,
