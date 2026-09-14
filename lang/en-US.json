@@ -775,6 +775,7 @@
     "site_view_authority": "Site view authority",
     "document_authority": "Document authority",
     "edit_authority": "Document edit authority",
+    "category_manual_authority": "Manual category authority",
     "edit_limit_10_authority": "10 daily document edits authority",
     "edit_limit_50_authority": "50 daily document edits authority",
     "edit_limit_100_authority": "100 daily document edits authority",

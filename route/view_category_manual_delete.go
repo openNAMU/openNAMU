@@ -17,11 +17,11 @@ func View_category_manual_delete(config tool.Config, category_value string, docu
 	}
 
 	category_name = category_manual_name(category_name)
-	if !tool.Check_acl(db, document_name, "", "document_edit", config.IP) {
+	if !tool.Check_permission(db, "category_manual", config.IP) || !tool.Check_acl(db, document_name, "", "document_edit", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	data := `<form method="post" action="/category/delete"><input type="hidden" name="category" value="` + tool.HTML_escape(category_name) + `"><input type="hidden" name="document" value="` + tool.HTML_escape(document_name) + `"><input type="hidden" name="return" value="` + tool.HTML_escape(return_name) + `"><button type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
+	data := `<form method="post" action="/category/delete"><input type="hidden" name="category" value="` + tool.HTML_escape(category_name) + `"><input type="hidden" name="document" value="` + tool.HTML_escape(document_name) + `"><input type="hidden" name="return" value="` + tool.HTML_escape(return_name) + `">` + tool.Get_captcha_ui(db, config) + `<button type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
 	return tool.Get_template(
 		db,
 		config,

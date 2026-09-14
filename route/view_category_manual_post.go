@@ -10,6 +10,17 @@ func View_category_manual_post(config tool.Config, action string, values url.Val
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	captcha := tool.Captcha_response(
+		values.Get("g-recaptcha"),
+		values.Get("g-recaptcha-response"),
+		values.Get("h-captcha-response"),
+		values.Get("cf-turnstile-response"),
+		values.Get("altcha"),
+	)
+	if !tool.Captcha_check(db, config.Session, config.IP, captcha) {
+		return tool.Get_error_page(db, config, "recaptcha")
+	}
+
 	category_name := values.Get("category")
 	doc_name := values.Get("document")
 	return_name := values.Get("return")

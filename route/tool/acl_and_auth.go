@@ -920,6 +920,10 @@ func Check_auth(auth_info map[string]bool) map[string]bool {
 		auth_info["site_view"] = true
 	}
 
+	if auth_info["edit"] {
+		auth_info["category_manual"] = true
+	}
+
 	bbs_default := []string{"bbs_edit", "bbs_comment"}
 
 	if _, ok := auth_info["bbs_use"]; ok {

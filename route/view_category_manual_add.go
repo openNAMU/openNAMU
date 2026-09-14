@@ -16,21 +16,21 @@ func View_category_manual_add(config tool.Config, add_type string, value string)
 	return_name := name
 	switch add_type {
 	case "category":
-		if tool.Check_permission(db, "edit", config.IP) {
+		if tool.Check_permission(db, "category_manual", config.IP) {
 			category_name = category_manual_name(name)
 		} else {
 			return tool.Get_error_page(db, config, "auth")
 		}
 	case "document":
 		document_name = name
-		if !tool.Check_acl(db, document_name, "", "document_edit", config.IP) {
+		if !tool.Check_permission(db, "category_manual", config.IP) || !tool.Check_acl(db, document_name, "", "document_edit", config.IP) {
 			return tool.Get_error_page(db, config, "auth")
 		}
 	default:
 		return tool.Get_error_page(db, config, "not found")
 	}
 
-	data := category_manual_add_form(db, category_name, document_name, return_name)
+	data := category_manual_add_form(db, config, category_name, document_name, return_name)
 	return tool.Get_template(
 		db,
 		config,

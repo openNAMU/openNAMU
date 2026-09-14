@@ -115,7 +115,7 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 	}
 
 	if len(category_list) == 0 {
-		if tool.Check_permission(db, "edit", config.IP) {
+		if tool.Check_permission(db, "category_manual", config.IP) {
 			return category_manual_add_link(doc_name, "category") + `<hr class="main_hr">`
 		}
 		return ""
@@ -132,7 +132,7 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 		}
 		item := `<li><a` + class_name + ` href="/w/` + tool.Url_parser(entry.name) + `">` + tool.HTML_escape(entry.view) + `</a>`
 		manual_form := ""
-		if manual_documents[entry.name] && tool.Check_acl(db, entry.name, "", "document_edit", config.IP) {
+		if manual_documents[entry.name] && tool.Check_permission(db, "category_manual", config.IP) && tool.Check_acl(db, entry.name, "", "document_edit", config.IP) {
 			manual_form = ` ` + category_manual_delete_link(doc_name, entry.name, doc_name)
 		}
 		if strings.HasPrefix(entry.name, "category:") {
@@ -155,7 +155,7 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 	if category_doc_count > 0 {
 		random_link = `<a href="/random/category/` + tool.Url_parser(doc_name) + `">(` + tool.Get_language(db, "random_category", false) + `)</a>`
 	}
-	if tool.Check_permission(db, "edit", config.IP) {
+	if tool.Check_permission(db, "category_manual", config.IP) {
 		data += ` ` + category_manual_add_link(doc_name, "category")
 	}
 	if random_link != "" {
@@ -168,7 +168,7 @@ func category_manual_delete_link(category_name string, doc_name string, return_n
 	return `<a href="/category/delete/` + tool.Base64_encode(category_name) + `/` + tool.Base64_encode(doc_name) + `/` + tool.Base64_encode(return_name) + `">(-)</a>`
 }
 
-func category_manual_add_form(db *sql.DB, category_name string, doc_name string, return_name string) string {
+func category_manual_add_form(db *sql.DB, config tool.Config, category_name string, doc_name string, return_name string) string {
 	data := `<form method="post" action="/category/add">`
 	if category_name == "" {
 		data += `<input type="text" name="category" placeholder="` + tool.HTML_escape(tool.Get_language(db, "category", true)) + `">`
@@ -180,7 +180,7 @@ func category_manual_add_form(db *sql.DB, category_name string, doc_name string,
 	} else {
 		data += `<input type="hidden" name="document" value="` + tool.HTML_escape(doc_name) + `">`
 	}
-	data += `<input type="hidden" name="return" value="` + tool.HTML_escape(return_name) + `"><button type="submit">` + tool.Get_language(db, "add", true) + `</button></form>`
+	data += `<input type="hidden" name="return" value="` + tool.HTML_escape(return_name) + `">` + tool.Get_captcha_ui(db, config) + `<button type="submit">` + tool.Get_language(db, "add", true) + `</button></form>`
 	return data
 }
 
@@ -189,7 +189,7 @@ func category_manual_add_link(doc_name string, add_type string) string {
 }
 
 func view_w_manual_category_data(db *sql.DB, config tool.Config, doc_name string) string {
-	can_edit := tool.Check_acl(db, doc_name, "", "document_edit", config.IP)
+	can_edit := tool.Check_permission(db, "category_manual", config.IP) && tool.Check_acl(db, doc_name, "", "document_edit", config.IP)
 	rows := tool.Get_category_manual_rows(db, doc_name)
 	defer rows.Close()
 

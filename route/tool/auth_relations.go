@@ -117,6 +117,7 @@ func Auth_relations() []Auth_relation {
 	add("document", "new_make", Auth_relation_permission)
 	add("document", "delete", Auth_relation_permission)
 	add("edit", "view", Auth_relation_permission)
+	add("edit", "category_manual", Auth_relation_permission)
 	add("move", "view", Auth_relation_permission)
 	add("new_make", "view", Auth_relation_permission)
 	add("delete", "view", Auth_relation_permission)

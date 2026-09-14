@@ -16,6 +16,7 @@ func Auth_choices() []Auth_choice {
 		{2, "ip", "ip_authority"},
 		{3, "document", "document_authority"},
 		{4, "edit", "edit_authority"},
+		{5, "category_manual", "category_manual_authority"},
 		{5, "edit_day", "edit_day_authority"},
 		{5, "edit_night", "edit_night_authority"},
 		{5, "edit_limit_10", "edit_limit_10_authority"},
