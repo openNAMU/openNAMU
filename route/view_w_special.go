@@ -190,7 +190,7 @@ func view_w_manual_category_data(db *sql.DB, config tool.Config, doc_name string
 	rows := tool.Get_category_manual_rows(db, doc_name)
 	defer rows.Close()
 
-	data := `<div class="opennamu_category" id="cate_manual">` + tool.Get_language(db, "category_manual", true) + " : "
+	data := ""
 	count := 0
 	for rows.Next() {
 		category_name, view := "", ""
@@ -206,18 +206,38 @@ func view_w_manual_category_data(db *sql.DB, config tool.Config, doc_name string
 		}
 		data += `<a href="/w/` + tool.Url_parser(category_name) + `">` + tool.HTML_escape(view) + `</a>`
 		if can_edit {
-			data += category_manual_delete_link(category_name, doc_name, doc_name)
+			data += ` ` + category_manual_delete_link(category_name, doc_name, doc_name)
 		}
 		count++
 	}
 	if can_edit {
-		data += ` ` + category_manual_add_link(doc_name, "document")
+		if count > 0 {
+			data += " "
+		}
+		data += category_manual_add_link(doc_name, "document")
 	}
-	data += `</div>`
 	if !can_edit && count == 0 {
 		return ""
 	}
-	return `<hr class="main_hr">` + data
+	return data
+}
+
+func view_w_merge_category_data(db *sql.DB, config tool.Config, doc_name string, render_data string) string {
+	manual_data := view_w_manual_category_data(db, config, doc_name)
+	if manual_data == "" {
+		return render_data
+	}
+
+	category_start := strings.LastIndex(render_data, `<div class="opennamu_category" id="cate">`)
+	if category_start >= 0 {
+		category_end := strings.Index(render_data[category_start:], `</div>`)
+		if category_end >= 0 {
+			category_end += category_start
+			return render_data[:category_end] + " | " + manual_data + render_data[category_end:]
+		}
+	}
+
+	return render_data + `<hr class="main_hr"><div class="opennamu_category" id="cate">` + tool.Get_language(db, "category", true) + " : " + manual_data + `</div>`
 }
 
 func view_w_file_data(db *sql.DB, doc_name string) string {

@@ -30,8 +30,7 @@ func Api_category_manual_post(config tool.Config, action string, category_name s
 		return return_data
 	}
 	_, doc_exists := tool.Get_data_title(db, doc_name)
-	_, category_exists := tool.Get_data_title(db, category_name)
-	if !doc_exists || (action == "add" && !category_exists) {
+	if !doc_exists {
 		return_data["response"] = "not exist"
 		return return_data
 	}
