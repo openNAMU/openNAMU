@@ -3,10 +3,12 @@ package route
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	stdjson "encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -16,6 +18,200 @@ import (
 const ollama_default_url = "http://127.0.0.1:11434"
 const ollama_timeout = 10 * time.Minute
 const ollama_idle_timeout = 90 * time.Second
+const ai_timeout = 10 * time.Minute
+
+type openai_request_data struct {
+	Model string `json:"model"`
+	Input string `json:"input"`
+	Store bool   `json:"store"`
+}
+
+type openai_output_content struct {
+	Type string `json:"type"`
+	Text string `json:"text"`
+}
+
+type openai_output_item struct {
+	Content []openai_output_content `json:"content"`
+}
+
+type openai_response_data struct {
+	Output []openai_output_item `json:"output"`
+}
+
+type google_request_data struct {
+	Contents []google_content `json:"contents"`
+}
+
+type google_content struct {
+	Parts []google_part `json:"parts"`
+}
+
+type google_part struct {
+	Text string `json:"text"`
+}
+
+type google_response_data struct {
+	Candidates []struct {
+		Content google_content `json:"content"`
+	} `json:"candidates"`
+}
+
+func ai_provider(db *sql.DB) string {
+	provider := tool.Get_setting_value(db, "ai_provider", "", "ollama")
+	if provider != "openai" && provider != "google" {
+		return "ollama"
+	}
+	return provider
+}
+
+func ai_default_model(provider string) string {
+	switch provider {
+	case "openai":
+		return "gpt-5"
+	case "google":
+		return "gemini-3.8-flash"
+	default:
+		return "gemma4:e4b"
+	}
+}
+
+func ai_model_value(db *sql.DB, model string) string {
+	model = strings.TrimSpace(model)
+	if model != "" {
+		return model
+	}
+
+	provider := ai_provider(db)
+	model = strings.TrimSpace(tool.Get_setting_value(db, "ai_model", "", ""))
+	if model == "" {
+		model = ai_default_model(provider)
+	}
+	return model
+}
+
+func Api_ai_stream(db *sql.DB, model string, prompt string) (string, error) {
+	provider := ai_provider(db)
+	model = ai_model_value(db, model)
+
+	switch provider {
+	case "openai":
+		api_key := tool.Get_setting_value(db, "openai_api_key", "", "")
+		return Api_openai(model, prompt, api_key)
+	case "google":
+		api_key := tool.Get_setting_value(db, "google_api_key", "", "")
+		return Api_google(model, prompt, api_key)
+	default:
+		return Api_ollama_stream(model, prompt)
+	}
+}
+
+func Api_openai(model string, prompt string, api_key string) (string, error) {
+	if strings.TrimSpace(api_key) == "" {
+		return "", fmt.Errorf("openai api key is not configured")
+	}
+
+	request_data, err := stdjson.Marshal(openai_request_data{
+		Model: model,
+		Input: prompt,
+		Store: false,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	request, err := http.NewRequest(
+		http.MethodPost,
+		"https://api.openai.com/v1/responses",
+		bytes.NewReader(request_data),
+	)
+	if err != nil {
+		return "", err
+	}
+	request.Header.Set("Authorization", "Bearer "+api_key)
+	request.Header.Set("Content-Type", "application/json")
+
+	response, err := (&http.Client{Timeout: ai_timeout}).Do(request)
+	if err != nil {
+		return "", err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("openai status: %s", response.Status)
+	}
+
+	response_data := openai_response_data{}
+	if err := stdjson.NewDecoder(io.LimitReader(response.Body, 4<<20)).Decode(&response_data); err != nil {
+		return "", err
+	}
+
+	answer := strings.Builder{}
+	for _, output := range response_data.Output {
+		for _, content := range output.Content {
+			if content.Type == "output_text" {
+				answer.WriteString(content.Text)
+			}
+		}
+	}
+	if answer.Len() == 0 {
+		return "", fmt.Errorf("openai response has no text")
+	}
+	return answer.String(), nil
+}
+
+func Api_google(model string, prompt string, api_key string) (string, error) {
+	if strings.TrimSpace(api_key) == "" {
+		return "", fmt.Errorf("google api key is not configured")
+	}
+
+	model = strings.TrimPrefix(model, "models/")
+	request_data, err := stdjson.Marshal(google_request_data{
+		Contents: []google_content{{
+			Parts: []google_part{{Text: prompt}},
+		}},
+	})
+	if err != nil {
+		return "", err
+	}
+
+	request, err := http.NewRequest(
+		http.MethodPost,
+		"https://generativelanguage.googleapis.com/v1beta/models/"+url.PathEscape(model)+":generateContent",
+		bytes.NewReader(request_data),
+	)
+	if err != nil {
+		return "", err
+	}
+	request.Header.Set("x-goog-api-key", api_key)
+	request.Header.Set("Content-Type", "application/json")
+
+	response, err := (&http.Client{Timeout: ai_timeout}).Do(request)
+	if err != nil {
+		return "", err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("google status: %s", response.Status)
+	}
+
+	response_data := google_response_data{}
+	if err := stdjson.NewDecoder(io.LimitReader(response.Body, 4<<20)).Decode(&response_data); err != nil {
+		return "", err
+	}
+
+	answer := strings.Builder{}
+	for _, candidate := range response_data.Candidates {
+		for _, part := range candidate.Content.Parts {
+			answer.WriteString(part.Text)
+		}
+	}
+	if answer.Len() == 0 {
+		return "", fmt.Errorf("google response has no text")
+	}
+	return answer.String(), nil
+}
 
 type ollama_request_data struct {
 	Model  string `json:"model"`
@@ -187,16 +383,13 @@ func Api_ollama_stream_post(config tool.Config, question string, model string) m
 		question = tool.Get_slice(question, 0, 1000)
 	}
 
-	model = strings.TrimSpace(model)
-	if model == "" {
-		model = "gemma4:e4b"
-	}
+	model = ai_model_value(db, model)
 
 	context_data, source_list := ollama_document_context(db, config, question)
 	prompt := "너는 위키 문서 검색을 돕는 AI다. 아래 참고 문서에 있는 내용만 근거로 답변하고, 근거가 없으면 모른다고 답변해라. 참고 문서: " + context_data + " 질문: " + question
-	answer, err := Api_ollama_stream(model, prompt)
+	answer, err := Api_ai_stream(db, model, prompt)
 	if err != nil {
-		return map[string]any{"response": "error", "data": "ollama", "source": source_list}
+		return map[string]any{"response": "error", "data": "ai", "source": source_list}
 	}
 
 	return map[string]any{"response": "ok", "data": answer, "source": source_list}

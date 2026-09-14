@@ -30,6 +30,10 @@ func setting_external_fields() []setting_field {
 		{name: "smtp_pass"},
 		{name: "recaptcha_ver", default_value: "altcha_high"},
 		{name: "oauth_client_id"},
+		{name: "ai_provider", default_value: "ollama"},
+		{name: "ai_model"},
+		{name: "openai_api_key"},
+		{name: "google_api_key"},
 		{name: "email_have"},
 	}
 }
@@ -62,6 +66,25 @@ func view_setting_external_data(db *sql.DB, config tool.Config, values map[strin
 	data.WriteString(setting_input("altcha_sec_re", values["altcha_sec_re"], "text") + main_hr())
 	data.WriteString(`<span>` + lang("version") + `</span>` + main_hr())
 	data.WriteString(`<select name="recaptcha_ver">` + setting_options(values["recaptcha_ver"], []string{"v2", "v3", "h", "cf", "altcha_low", "altcha_medium", "altcha_high"}, recaptcha_labels) + `</select>` + main_hr())
+
+	data.WriteString(`<h2>` + lang("local_ai") + `</h2>`)
+	data.WriteString(`<p>` + lang("ai_external_warning") + `</p>` + main_hr())
+	data.WriteString(`<span>` + lang("ai_provider") + `</span>` + main_hr())
+	data.WriteString(`<select name="ai_provider">` + setting_options(values["ai_provider"], []string{"ollama", "openai", "google"}, map[string]string{
+		"ollama": "Ollama",
+		"openai": "OpenAI",
+		"google": "Google Gemini",
+	}) + `</select>` + main_hr())
+	ai_model := values["ai_model"]
+	if ai_model == "" {
+		ai_model = ai_default_model(values["ai_provider"])
+	}
+	data.WriteString(`<span>` + lang("ai_model") + `</span>` + main_hr())
+	data.WriteString(setting_input("ai_model", ai_model, "text") + main_hr())
+	data.WriteString(`<span>` + lang("openai_api_key") + `</span>` + main_hr())
+	data.WriteString(setting_input("openai_api_key", "", "password") + main_hr())
+	data.WriteString(`<span>` + lang("google_api_key") + `</span>` + main_hr())
+	data.WriteString(setting_input("google_api_key", "", "password") + main_hr())
 
 	data.WriteString(`<h2>` + lang("email_setting") + `</h2>`)
 	data.WriteString(`<a href="/setting/phrase#s-6">(` + lang("text_setting") + `)</a>` + main_hr())

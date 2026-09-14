@@ -2,6 +2,7 @@ package route
 
 import (
 	"database/sql"
+	"strings"
 
 	"opennamu/route/tool"
 )
@@ -17,6 +18,14 @@ func Api_setting_external_post(config tool.Config, form map[string]string) map[s
 	}
 	if form["recaptcha_ver"] == "" {
 		form["recaptcha_ver"] = "altcha_high"
+	}
+	if form["ai_provider"] != "openai" && form["ai_provider"] != "google" {
+		form["ai_provider"] = "ollama"
+	}
+	for _, name := range []string{"openai_api_key", "google_api_key"} {
+		if strings.TrimSpace(form[name]) == "" {
+			form[name] = tool.Get_setting_value(db, name, "", "")
+		}
 	}
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		setting_save_fields(tx, setting_external_fields(), form)
