@@ -241,7 +241,17 @@ func view_w_merge_category_data(db *sql.DB, config tool.Config, doc_name string,
 		}
 	}
 
-	return render_data + `<hr class="main_hr"><div class="opennamu_category" id="cate">` + tool.Get_language(db, "category", true) + " : " + manual_data + `</div>`
+	category_set := tool.Get_main_skin_set(db, config, "main_css_category_set")
+	category_separator := `<hr class="main_hr">`
+	if category_set == "bottom" {
+		category_separator = `<hr>`
+	}
+
+	merged_data := render_data + category_separator + `<div class="opennamu_category" id="cate">` + tool.Get_language(db, "category", true) + " : " + manual_data + `</div>`
+	if category_set != "bottom" {
+		return move_render_category_top(merged_data)
+	}
+	return merged_data
 }
 
 func view_w_file_data(db *sql.DB, doc_name string) string {
