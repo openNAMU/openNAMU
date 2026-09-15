@@ -29,14 +29,15 @@ func view_w_child_exists(db *sql.DB, doc_name string) bool {
 	return tool.Get_data_title_like(db, doc_name+"/%")
 }
 
-func view_w_user_data(db *sql.DB, doc_name string) string {
+func view_w_user_data(db *sql.DB, config tool.Config, doc_name string) string {
 	user_name := strings.TrimPrefix(doc_name, "user:")
 	if slash_index := strings.Index(user_name, "/"); slash_index >= 0 {
 		user_name = user_name[:slash_index]
 	}
 
 	phrase := ""
-	if tool.Get_user_document(db, user_name) && !tool.Check_permission(db, "treat_as_admin", user_name) {
+	can_view_phrase := config.IP == user_name || tool.Check_permission(db, "treat_as_admin", config.IP)
+	if tool.Get_user_set_exists(db, user_name, "pw") && tool.Get_user_document(db, user_name) && can_view_phrase && !tool.Check_permission(db, "treat_as_admin", user_name) {
 		phrase_name := "phrase_user_page_owner"
 		if tool.Check_permission(db, "owner", user_name) {
 			phrase_name = "phrase_user_page_admin"

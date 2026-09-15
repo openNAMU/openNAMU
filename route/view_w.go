@@ -97,7 +97,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	document_type := ""
 	if strings.HasPrefix(doc_name, "user:") {
 		document_type = "special"
-		render_data = view_w_user_data(db, doc_name) + render_data
+		render_data = view_w_user_data(db, config, doc_name) + render_data
 	} else if strings.HasPrefix(doc_name, "category:") {
 		document_type = "special"
 		render_data += view_w_category_data(db, config, doc_name)
