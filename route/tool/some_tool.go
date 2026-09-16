@@ -682,7 +682,7 @@ func Get_init_set_list(need string) map[string]map[string]any {
 			"display": "Markup",
 			"require": "select",
 			"default": "namumark",
-			"list":    []string{"namumark", "namumark_beta", "macromark", "markdown", "custom", "raw"},
+			"list":    []string{"namumark", "namumark_beta", "macromark", "markdown", "html", "plain"},
 		},
 		"encode": {
 			"display": "Encryption method",
