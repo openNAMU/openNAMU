@@ -134,10 +134,10 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	}
 
 	body := tool.Get_setting_value(db, "body", "", "")
-	render_data = body + render_data
+	render_data = setting_render_markup(db, body, setting_markup_value(db, "body")) + render_data
 
 	bottom_body := tool.Get_setting_value(db, "bottom_body", "", "")
-	render_data += bottom_body
+	render_data += setting_render_markup(db, bottom_body, setting_markup_value(db, "bottom_body"))
 
 	document_top := tool.Get_document_setting_value_exact(db, doc_name, "document_top", "")
 	render_data = document_top + render_data
