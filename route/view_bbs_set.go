@@ -59,22 +59,6 @@ func bbs_tag_list(data string) []string {
 const bbs_title_max_length = 128
 const bbs_tag_max_length = 64
 
-func bbs_set_select(db *sql.DB, name string, selected string, values []string) string {
-	data := `<select name="` + tool.HTML_escape(name) + `">`
-	for _, value := range values {
-		choice := ""
-		if value == selected {
-			choice = ` selected`
-		}
-		label := value
-		if label == "" {
-			label = tool.Get_language(db, "normal", true)
-		}
-		data += `<option value="` + tool.HTML_escape(value) + `"` + choice + `>` + tool.HTML_escape(label) + `</option>`
-	}
-	return data + `</select>`
-}
-
 func acl_value_valid(db *sql.DB, value string) bool {
 	if tool.Arr_in_str(tool.List_acl("normal"), value) {
 		return true
@@ -131,13 +115,13 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 	for _, field := range bbs_set_fields {
 		selected := bbs_set_value(db, set_id, field)
 		data += `<h3>` + tool.Get_language(db, field, true) + `</h3>`
-		data += bbs_set_select(db, field, selected, acl_value_list(db, selected))
+		data += tool.Build_select(field, acl_value_list(db, selected), selected, tool.Get_language(db, "normal", true))
 		data += `<hr class="main_hr">`
 	}
 
 	markup_values := markup.List_markup()
 	data += `<h3>` + tool.Get_language(db, "markup", true) + `</h3>`
-	data += bbs_set_select(db, "bbs_markup", bbs_set_value(db, set_id, "bbs_markup"), markup_values)
+	data += tool.Build_select("bbs_markup", markup_values, bbs_set_value(db, set_id, "bbs_markup"), tool.Get_language(db, "normal", true))
 	data += `<hr class="main_hr"><h3>` + tool.Get_language(db, "bbs_name", true) + `</h3>`
 	data += `<input name="bbs_name" value="` + tool.HTML_escape(bbs_name) + `"><hr class="main_hr">`
 	data += "<h3>" + tool.Get_language(db, "bbs_prefix", true) + "</h3>"

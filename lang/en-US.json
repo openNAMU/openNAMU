@@ -164,7 +164,6 @@
     "stop": "Stop",
     "close": "Closed",
     "open": "Open",
-    "agreement": "Agreement",
     "template": "Template document",
     "file": "File",
     "writer": "Writer",
@@ -356,7 +355,6 @@
     "check_key": "Check authentication key",
     "reset_user_ok": "Check Success",
     "name_or_ip_or_regex_or_cidr": "Username or IP or Regex or CIDR",
-    "ban_period": "Period to block",
     "not_sure": "Not sure",
     "use_push_alarm": "Enable Push Notification",
     "edit_button_paragraph": "Paragraph",
@@ -755,7 +753,6 @@
     
     "_comment_": "ACL document list",
     "acl_document_list": "ACL document(s) list",
-    "acl_required": "Required ACL",
     
     "_comment_": "Auth list",
     "edit_filter_manage_authority": "Edit filter management authority",

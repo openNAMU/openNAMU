@@ -46,39 +46,40 @@ func Api_bbs_list(config tool.Config) map[string]any {
 		return map[string]any{"response": "require auth", "data": [][]string{}}
 	}
 
-	data_list := bbs_list(db)
-	items := make([]BBS_item, 0, len(data_list))
+	rows := tool.Query_DB(
+		db,
+		`select n.set_id, n.set_data, coalesce(t.set_data, ''), coalesce(d.set_data, '') from bbs_set n
+		left join bbs_set t on t.set_id = n.set_id and t.set_name = 'bbs_type'
+		left join bbs_data d on d.set_id = n.set_id and d.set_name = 'date'
+			and d.set_code + 0 = (select max(d2.set_code + 0) from bbs_data d2 where d2.set_id = n.set_id and d2.set_name = 'date')
+		where n.set_name = 'bbs_name'`,
+	)
+	defer rows.Close()
 
-	for k, v := range data_list {
-		bbs_name := k
-		if v == "0" {
+	items := make([]BBS_item, 0, 8)
+
+	for rows.Next() {
+		var id string
+		var bbs_name string
+		var bbs_type string
+		var bbs_date string
+
+		if err := rows.Scan(&id, &bbs_name, &bbs_type, &bbs_date); err != nil {
+			panic(err)
+		}
+
+		if id == "0" {
 			bbs_name = tool.Get_language(db, "wiki_comment_bbs", true)
-		} else if v == "-1" {
+		} else if id == "-1" {
 			bbs_name = tool.Get_language(db, "thread_bbs", true)
 		}
 
-		if !tool.Check_acl(db, v, "", "bbs_view", config.IP) {
+		if !tool.Check_acl(db, id, "", "bbs_view", config.IP) {
 			continue
 		}
 
-		bbs_type := ""
-		tool.QueryRow_DB(
-			db,
-			"select set_data from bbs_set where set_name = 'bbs_type' and set_id = ?",
-			[]any{&bbs_type},
-			v,
-		)
-
-		bbs_date := ""
-		tool.QueryRow_DB(
-			db,
-			"select set_data from bbs_data where set_id = ? and set_name = 'date' order by set_code + 0 desc limit 1",
-			[]any{&bbs_date},
-			v,
-		)
-
 		items = append(items, BBS_item{
-			Id:   v,
+			Id:   id,
 			Name: bbs_name,
 			Type: bbs_type,
 			Date: bbs_date,

@@ -252,7 +252,7 @@ func view_setting_main_data(db *sql.DB, config tool.Config, values map[string]st
 	data.WriteString(`<label><input type="checkbox" name="ip_view" ` + setting_checked(values["ip_view"]) + `> ` + lang("hide_ip") + `</label>` + main_hr())
 	data.WriteString(`<label><input type="checkbox" name="user_name_view" ` + setting_checked(values["user_name_view"]) + `> ` + lang("hide_user_name") + `</label>` + main_hr())
 	data.WriteString(`<span>` + lang("user_document_view_acl_all") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + main_hr())
-	data.WriteString(bbs_set_select(db, "user_document_view_acl_all", values["user_document_view_acl_all"], acl_value_list(db, values["user_document_view_acl_all"])) + main_hr())
+	data.WriteString(tool.Build_select("user_document_view_acl_all", acl_value_list(db, values["user_document_view_acl_all"]), values["user_document_view_acl_all"], lang("normal")) + main_hr())
 	data.WriteString(`<label><input type="checkbox" name="invite_required" ` + setting_checked(values["invite_required"]) + `> ` + lang("invite_required") + `</label>` + main_hr())
 	data.WriteString(`<label><input type="checkbox" name="requires_approval" ` + setting_checked(values["requires_approval"]) + `> ` + lang("requires_approval") + `</label>` + main_hr())
 	data.WriteString(`<span>` + lang("application_expiration_date") + ` (` + lang("day") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + main_hr())

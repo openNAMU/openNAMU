@@ -97,16 +97,7 @@ func view_setting_phrase_data(db *sql.DB, config tool.Config, values map[string]
 			data.WriteString(setting_input(field.name, values[field.name], "text"))
 		} else {
 			if field.markup {
-				markup_current := setting_markup_value(db, field.name)
-				data.WriteString(`<h3>` + lang("markup") + `</h3><select name="` + field.name + `_markup">`)
-				for _, markup_option := range setting_markup_options() {
-					selected := ""
-					if markup_option == markup_current {
-						selected = ` selected`
-					}
-					data.WriteString(`<option value="` + tool.HTML_escape(markup_option) + `"` + selected + `>` + tool.HTML_escape(markup_option) + `</option>`)
-				}
-				data.WriteString(`</select>` + main_hr())
+				data.WriteString(`<h3>` + lang("markup") + `</h3>` + setting_markup_select_ui(field.name+"_markup", setting_markup_value(db, field.name), "") + main_hr())
 			}
 			class_name := field.class_name
 			if class_name == "" {

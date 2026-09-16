@@ -148,27 +148,11 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 		top_disabled = ` disabled`
 	}
 	data += `<h2>` + tool.Get_language(db, "document_top", true) + `</h2>`
-	document_top_markup := setting_markup_normalize(document_set_value(db, doc_name, "document_top_markup"))
-	data += `<h3>` + tool.Get_language(db, "markup", true) + `</h3><select name="document_top_markup"` + top_disabled + `>`
-	for _, markup_option := range setting_markup_options() {
-		selected := ""
-		if markup_option == document_top_markup {
-			selected = ` selected`
-		}
-		data += `<option value="` + tool.HTML_escape(markup_option) + `"` + selected + `>` + tool.HTML_escape(markup_option) + `</option>`
-	}
-	data += `</select><textarea class="opennamu_textarea_100" name="document_top"` + top_disabled + `>` + tool.HTML_escape(document_set_value(db, doc_name, "document_top")) + `</textarea>`
+	data += `<h3>` + tool.Get_language(db, "markup", true) + `</h3>` + setting_markup_select_ui("document_top_markup", document_set_value(db, doc_name, "document_top_markup"), top_disabled)
+	data += `<textarea class="opennamu_textarea_100" name="document_top"` + top_disabled + `>` + tool.HTML_escape(document_set_value(db, doc_name, "document_top")) + `</textarea>`
 	data += `<h2>` + tool.Get_language(db, "document_editor_top", true) + `</h2>`
-	document_editor_top_markup := setting_markup_normalize(document_set_value(db, doc_name, "document_editor_top_markup"))
-	data += `<h3>` + tool.Get_language(db, "markup", true) + `</h3><select name="document_editor_top_markup"` + top_disabled + `>`
-	for _, markup_option := range setting_markup_options() {
-		selected := ""
-		if markup_option == document_editor_top_markup {
-			selected = ` selected`
-		}
-		data += `<option value="` + tool.HTML_escape(markup_option) + `"` + selected + `>` + tool.HTML_escape(markup_option) + `</option>`
-	}
-	data += `</select><textarea class="opennamu_textarea_100" name="document_editor_top"` + top_disabled + `>` + tool.HTML_escape(document_set_value(db, doc_name, "document_editor_top")) + `</textarea><hr class="main_hr">`
+	data += `<h3>` + tool.Get_language(db, "markup", true) + `</h3>` + setting_markup_select_ui("document_editor_top_markup", document_set_value(db, doc_name, "document_editor_top_markup"), top_disabled)
+	data += `<textarea class="opennamu_textarea_100" name="document_editor_top"` + top_disabled + `>` + tool.HTML_escape(document_set_value(db, doc_name, "document_editor_top")) + `</textarea><hr class="main_hr">`
 	data += `<button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 	if multiple {
 		data += acl_group_multiple_setting(db)

@@ -233,6 +233,17 @@ func Get_redirect(target string) string {
 	return redirect_marker + strconv.Quote(target) + "-->"
 }
 
+func Api_post_redirect(db *sql.DB, config Config, api_data map[string]any, redirect string) string {
+	response, _ := api_data["response"].(string)
+	if response == "require auth" {
+		return Get_error_page(db, config, "auth")
+	}
+	if response != "ok" {
+		return Get_error_page(db, config, "error")
+	}
+	return Get_redirect(redirect)
+}
+
 func Get_redirect_target(data string) (string, bool) {
 	if !strings.HasPrefix(data, redirect_marker) {
 		return "", false
@@ -697,6 +708,22 @@ func Get_markup_select_ui(db *sql.DB, config Config, doc_name string, markup str
     `
 
 	return markup_html
+}
+
+func Build_select(name string, values []string, selected string, empty_label string) string {
+	data := `<select name="` + HTML_escape(name) + `">`
+	for _, value := range values {
+		choice := ""
+		if value == selected {
+			choice = ` selected`
+		}
+		label := value
+		if value == "" {
+			label = empty_label
+		}
+		data += `<option value="` + HTML_escape(value) + `"` + choice + `>` + HTML_escape(label) + `</option>`
+	}
+	return data + `</select>`
 }
 
 func Get_captcha_ui(db *sql.DB, config Config) string {

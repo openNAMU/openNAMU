@@ -15,18 +15,6 @@ func auth_groups(db *sql.DB) []string {
 	return groups
 }
 
-func auth_select(name string, groups []string, selected string) string {
-	data := `<select name="` + name + `">`
-	for _, group := range groups {
-		choice := ""
-		if group == selected {
-			choice = ` selected`
-		}
-		data += `<option value="` + tool.HTML_escape(group) + `"` + choice + `>` + tool.HTML_escape(group) + `</option>`
-	}
-	return data + `</select>`
-}
-
 func auth_target_type_select(db *sql.DB, target_type string, owner bool) string {
 	data := `<select name="target_type">`
 	for _, target := range []string{"normal", "regex", "cidr"} {
@@ -128,7 +116,7 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 		data += `<p>` + tool.Get_language(db, "auth_give_help", true) + `</p>`
 	}
 	if mode == "total" {
-		data += auth_select("auth", groups, "") + `<hr class="main_hr">`
+		data += tool.Build_select("auth", groups, "", "") + `<hr class="main_hr">`
 	} else if user_name == "" {
 		data += `<textarea class="opennamu_textarea_100" name="user_name" placeholder="` + tool.Get_language(db, "name_or_ip_or_regex_or_cidr_multiple", true) + `"></textarea><hr class="main_hr">`
 	} else {
@@ -156,7 +144,7 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 		owner := tool.Check_permission(db, "owner", config.IP)
 		data += auth_target_type_select(db, target_type, owner) + `<hr class="main_hr">`
 	}
-	data += auth_select("change_auth", groups, selected)
+	data += tool.Build_select("change_auth", groups, selected, "")
 	if mode != "total" {
 		data += `<hr class="main_hr"><span>` + tool.Get_language(db, "period", true) + `</span>` + auth_period_select(db)
 		data += `<hr class="main_hr"><span>` + tool.Get_language(db, "date", true) + `</span><input type="date" name="end_date" value="` + tool.HTML_escape(end_date) + `">`

@@ -11,15 +11,8 @@ func View_setting_head_post(config tool.Config, kind string, skin_name string, c
 		return tool.Get_error_page(db, config, "error")
 	}
 	api_data := Api_setting_head_post(config, name, coverage, content)
-	response, _ := api_data["response"].(string)
-	if response == "require auth" {
-		return tool.Get_error_page(db, config, "auth")
-	}
-	if response != "ok" {
-		return tool.Get_error_page(db, config, "error")
-	}
 	if skin_name != "" {
 		action += "/" + tool.Url_parser(skin_name)
 	}
-	return tool.Get_redirect(action)
+	return tool.Api_post_redirect(db, config, api_data, action)
 }

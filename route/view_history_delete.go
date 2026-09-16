@@ -18,14 +18,7 @@ func View_history_delete(config tool.Config, doc_name string, rev string, values
 	}
 	if values != nil {
 		api_data := Api_history_delete_post(config, doc_name, revision)
-		response, _ := api_data["response"].(string)
-		if response == "require auth" {
-			return tool.Get_error_page(db, config, "auth")
-		}
-		if response != "ok" {
-			return tool.Get_error_page(db, config, "error")
-		}
-		return tool.Get_redirect("/history/" + tool.Url_parser(doc_name))
+		return tool.Api_post_redirect(db, config, api_data, "/history/"+tool.Url_parser(doc_name))
 	}
 	return history_destructive_page(db, config, tool.Get_language(db, "history_delete", true)+" (r"+revision+")", tool.Get_language(db, "delete", true), "history/"+tool.Url_parser(doc_name))
 }

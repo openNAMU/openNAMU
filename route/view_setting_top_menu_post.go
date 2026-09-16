@@ -7,12 +7,5 @@ func View_setting_top_menu_post(config tool.Config, form map[string]string) stri
 	defer tool.DB_close(db)
 
 	api_data := Api_setting_top_menu_post(config, form)
-	response, _ := api_data["response"].(string)
-	if response == "require auth" {
-		return tool.Get_error_page(db, config, "auth")
-	}
-	if response != "ok" {
-		return tool.Get_error_page(db, config, "error")
-	}
-	return tool.Get_redirect("/setting/top_menu")
+	return tool.Api_post_redirect(db, config, api_data, "/setting/top_menu")
 }

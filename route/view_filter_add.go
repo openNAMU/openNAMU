@@ -47,7 +47,7 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 			if sub_type == "under_bar" {
 				inter_type = "under_bar"
 			}
-			form += `<hr class="main_hr">` + filter_select("inter_type", []string{"url_encode", "under_bar"}, inter_type)
+			form += `<hr class="main_hr">` + tool.Build_select("inter_type", []string{"url_encode", "under_bar"}, inter_type, "normal")
 		}
 	case "external_image":
 		form += filter_input(tool.Get_language(db, "domain", true), "title", value[0])
@@ -141,23 +141,6 @@ func filter_safe_link(value string) string {
 
 func filter_input(label string, name string, value string) string {
 	return `<span>` + label + `</span><hr class="main_hr"><input name="` + name + `" value="` + tool.HTML_escape(value) + `">`
-}
-
-func filter_select(name string, values []string, selected string) string {
-	data := `<select name="` + name + `">`
-	for _, value := range values {
-		option_value := tool.HTML_escape(value)
-		option_name := option_value
-		if value == "" {
-			option_name = "normal"
-		}
-		selected_text := ""
-		if value == selected {
-			selected_text = ` selected`
-		}
-		data += `<option value="` + option_value + `"` + selected_text + `>` + option_name + `</option>`
-	}
-	return data + `</select>`
 }
 
 func document_filter_acl_data(db *sql.DB, data string) (string, bool) {

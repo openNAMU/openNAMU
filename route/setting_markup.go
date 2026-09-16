@@ -36,6 +36,20 @@ func setting_markup_options() []string {
 	return markup.List_markup()
 }
 
+func setting_markup_select_ui(name string, current string, disabled string) string {
+	current = setting_markup_normalize(current)
+	data := `<span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="` + tool.HTML_escape(name) + `"` + disabled + `>`
+	for _, markup_option := range setting_markup_options() {
+		selected := ""
+		if markup_option == current {
+			selected = ` selected`
+		}
+		data += `<option value="` + tool.HTML_escape(markup_option) + `"` + selected + `>` + tool.HTML_escape(markup_option) + `</option>`
+	}
+	data += `</select></span>`
+	return data
+}
+
 func setting_render_markup(db *sql.DB, data string, markup_name string) string {
 	markup_name = setting_markup_normalize(markup_name)
 	if markup_name == "html" {

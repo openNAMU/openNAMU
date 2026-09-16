@@ -15,14 +15,7 @@ func View_history_hidden_safe(config tool.Config, doc_name string, rev string, v
 	hide := tool.Get_history_hide(db, doc_name, rev)
 	if values != nil {
 		api_data := Api_history_hidden_post(config, doc_name, rev)
-		response, _ := api_data["response"].(string)
-		if response == "require auth" {
-			return tool.Get_error_page(db, config, "auth")
-		}
-		if response != "ok" {
-			return tool.Get_error_page(db, config, "error")
-		}
-		return tool.Get_redirect("/history/" + tool.Url_parser(doc_name))
+		return tool.Api_post_redirect(db, config, api_data, "/history/"+tool.Url_parser(doc_name))
 	}
 
 	action := "hide"
