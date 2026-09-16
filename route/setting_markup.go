@@ -48,7 +48,7 @@ func setting_render_markup(db *sql.DB, data string, markup_name string) string {
 		data,
 		markup_name,
 		strconv.FormatInt(time.Now().UnixNano(), 10),
-		"view",
+		"setting",
 	)
 
 	return render_data["data"]
