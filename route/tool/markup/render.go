@@ -78,6 +78,12 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 			compat_render_type = "include"
 		}
 		compat_data := render_namumark_compat(db, doc_name, data, compat_render_type, parameter_data, 0, false)
+		if render_type == "setting" {
+			return map[string]string{
+				"data":    compat_data["data"].(string),
+				"js_data": compat_data["js_data"].(string),
+			}
+		}
 		return map[string]string{
 			"data":    `<div class="opennamu_render_complete">` + compat_data["data"].(string) + `</div>`,
 			"js_data": compat_data["js_data"].(string),
@@ -144,6 +150,13 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 			return err
 		}); err != nil {
 			panic(err)
+		}
+	}
+
+	if render_type == "setting" {
+		return map[string]string{
+			"data":    render_data["data"].(string),
+			"js_data": render_data["js_data"].(string),
 		}
 	}
 
