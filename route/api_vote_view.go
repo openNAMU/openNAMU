@@ -1,7 +1,6 @@
 package route
 
 import (
-	"regexp"
 	"strings"
 
 	"opennamu/route/tool"
@@ -44,16 +43,10 @@ func Api_vote_view(config tool.Config, set_id string) map[string]any {
 		time_db = time_field[0]
 	}
 
-	re := regexp.MustCompile(`[^\n]+`)
-	vote_data := re.FindAllString(
-		strings.ReplaceAll(data, "\r", ""),
-		-1,
-	)
-
 	result := make(map[string]any)
 	result["name"] = name
 	result["subject"] = subject
-	result["data"] = vote_data
+	result["data"] = data
 	result["type"] = type_str
 	result["end_date"] = time_db
 

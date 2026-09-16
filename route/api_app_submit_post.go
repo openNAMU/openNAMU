@@ -2,6 +2,7 @@ package route
 
 import (
 	"database/sql"
+	"errors"
 	"net/url"
 	"time"
 
@@ -35,19 +36,25 @@ func app_submit_action(db *sql.DB, config tool.Config, user_id string, approve b
 	if application_id == "" {
 		application_id = user_id
 	}
-	result := map[string]any{}
-	if application["pw_hash"] != "" {
-		result = Api_add_user_hash_invite(config, application_id, application["pw_hash"], application["email"], application["encode"], application["invite"])
-	} else if application["pw"] != "" {
-		result = Api_add_user_invite(config, application_id, application["pw"], application["email"], application["encode"], application["invite"])
-	} else {
-		return false
+	password_hash := application["pw_hash"]
+	encode := application["encode"]
+	if password_hash == "" {
+		if application["pw"] == "" {
+			return false
+		}
+		if encode == "" {
+			encode = tool.Get_main_encode(db)
+		}
+		password_hash = tool.Password_encode(db, application["pw"], encode)
 	}
-	if result["response"] != "ok" {
+	if tool.Invite_required(db) && application["invite"] == "" {
 		return false
 	}
 
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if err := Add_user_hash_tx(tx, application_id, password_hash, application["email"], encode, application["invite"]); err != nil {
+			return err
+		}
 		if _, err := tx.Exec(tool.DB_change("insert into user_set (name, id, data) values ('approval_question', ?, ?)"), application_id, application["question"]); err != nil {
 			return err
 		}
@@ -60,6 +67,9 @@ func app_submit_action(db *sql.DB, config tool.Config, user_id string, approve b
 		tool.Do_insert_auth_history(tx, config.IP, "application_approve ("+user_id+")")
 		return nil
 	}); err != nil {
+		if errors.Is(err, add_user_invite_error) {
+			return false
+		}
 		panic(err)
 	}
 	return true

@@ -10,22 +10,20 @@ func View_bbs_watch(config tool.Config, set_id string, set_code string, values u
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	bbs_name := ""
-	title := ""
-	if !tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_set where set_name = 'bbs_name' and set_id = ?",
-		[]any{&bbs_name},
-		set_id,
-	) || !tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_data where set_name = 'title' and set_id = ? and set_code = ?",
-		[]any{&title},
-		set_id,
-		set_code,
-	) {
+	watch_data := Api_bbs_watch_view(config, set_id, set_code)
+	response, _ := watch_data["response"].(string)
+	if response == "require auth" {
+		return tool.Get_redirect("/login")
+	}
+	if response != "ok" {
 		return tool.Get_redirect("/bbs/main")
 	}
+	watch_info, ok := watch_data["data"].(map[string]string)
+	if !ok {
+		return tool.Get_redirect("/bbs/main")
+	}
+	bbs_name := watch_info["bbs_name"]
+	title := watch_info["title"]
 
 	if values != nil {
 		api_data := Api_bbs_watch_post(config, set_id, set_code)

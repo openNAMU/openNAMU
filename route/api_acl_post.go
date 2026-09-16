@@ -87,6 +87,18 @@ func acl_history(db tool.DB_runner, config tool.Config, doc_name string, values 
 	tool.Do_insert_auth_history(db, config.IP, "document_set ("+doc_name+")")
 }
 
+func Acl_document_set_value(db tool.DB_runner, doc_name string, set_name string) string {
+	data := ""
+	tool.QueryRow_DB(
+		db,
+		"select set_data from data_set where doc_name = ? and set_name = ? limit 1",
+		[]any{&data},
+		doc_name,
+		set_name,
+	)
+	return data
+}
+
 func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url.Values) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
@@ -165,10 +177,10 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 					for key, value := range values {
 						save_values[key] = append([]string{}, value...)
 					}
-					save_values.Set("document_top", Api_w_set(config, name, "document_top", "")["data"].(string))
-					save_values.Set("document_top_markup", Api_w_set(config, name, "document_top_markup", "")["data"].(string))
-					save_values.Set("document_editor_top", Api_w_set(config, name, "document_editor_top", "")["data"].(string))
-					save_values.Set("document_editor_top_markup", Api_w_set(config, name, "document_editor_top_markup", "")["data"].(string))
+					save_values.Set("document_top", Acl_document_set_value(tx, name, "document_top"))
+					save_values.Set("document_top_markup", Acl_document_set_value(tx, name, "document_top_markup"))
+					save_values.Set("document_editor_top", Acl_document_set_value(tx, name, "document_editor_top"))
+					save_values.Set("document_editor_top_markup", Acl_document_set_value(tx, name, "document_editor_top_markup"))
 				}
 				save_acl(tx, config, name, save_values)
 				acl_history(tx, config, name, save_values)

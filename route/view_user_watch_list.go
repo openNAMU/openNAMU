@@ -1,10 +1,6 @@
 package route
 
-import (
-	"strings"
-
-	"opennamu/route/tool"
-)
+import "opennamu/route/tool"
 
 func View_user_watch_list(config tool.Config, num string, do_type string) string {
 	if do_type == "thread_watchlist" {
@@ -26,64 +22,29 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	data_list := api_data["data"].([]string)
+	data_list, ok := api_data["data"].([]User_watch_item)
+	if !ok {
+		return tool.Get_error_page(db, config, "error")
+	}
 	data_html := ""
 
 	if len(data_list) > 0 {
 		data_html += "<ul>"
-		for _, title := range data_list {
-			display_title := title
-			view_path := "/w/" + tool.Url_parser(title)
-			delete_path := "/star_doc/" + tool.Url_parser(title)
-			date_data := ""
-
+		for _, item := range data_list {
+			view_path := "/w/" + tool.Url_parser(item.Data)
+			delete_path := "/star_doc/" + tool.Url_parser(item.Data)
 			if do_type == "watchlist" {
-				date_data = tool.Get_history_date(db, title)
-				delete_path = "/watch_list/" + tool.Url_parser(title)
+				delete_path = "/watch_list/" + tool.Url_parser(item.Data)
 			} else if do_type == "bbs_watchlist" {
-				set_id := ""
-				set_code := ""
-				if strings.HasPrefix(title, "-1-") {
-					set_id = "-1"
-					set_code = strings.TrimPrefix(title, "-1-")
-				} else {
-					watch_data := strings.SplitN(title, "-", 2)
-					if len(watch_data) != 2 {
-						continue
-					}
-					set_id = watch_data[0]
-					set_code = watch_data[1]
-				}
-				post_title, _ := tool.Get_bbs_data_value(db, set_id, set_code, "title")
-				bbs_name := ""
-				tool.QueryRow_DB(
-					db,
-					"select set_data from bbs_set where set_name = 'bbs_name' and set_id = ?",
-					[]any{&bbs_name},
-					set_id,
-				)
-				if post_title != "" {
-					display_title = post_title
-					if bbs_name != "" {
-						display_title = bbs_name + " - " + display_title
-					}
-				}
-				tool.QueryRow_DB(
-					db,
-					"select set_data from bbs_data where set_name = 'date' and set_id = ? and set_code = ?",
-					[]any{&date_data},
-					set_id,
-					set_code,
-				)
-				view_path = "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code)
-				delete_path = "/bbs_watch/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code)
+				view_path = "/bbs/w/" + tool.Url_parser(item.Set_id) + "/" + tool.Url_parser(item.Set_code)
+				delete_path = "/bbs_watch/" + tool.Url_parser(item.Set_id) + "/" + tool.Url_parser(item.Set_code)
 			}
 
 			date_html := ""
-			if date_data != "" {
-				date_html = "(" + tool.HTML_escape(date_data) + ") "
+			if item.Date != "" {
+				date_html = "(" + tool.HTML_escape(item.Date) + ") "
 			}
-			data_html += `<li><a href="` + view_path + `">` + tool.HTML_escape(display_title) + `</a> ` + date_html + `<a href="` + delete_path + `">(` + tool.Get_language(db, "delete", true) + `)</a></li>`
+			data_html += `<li><a href="` + view_path + `">` + tool.HTML_escape(item.Display) + `</a> ` + date_html + `<a href="` + delete_path + `">(` + tool.Get_language(db, "delete", true) + `)</a></li>`
 		}
 		data_html += "</ul><hr class=\"main_hr\">"
 	}

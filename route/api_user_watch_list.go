@@ -1,10 +1,57 @@
 package route
 
 import (
+	"database/sql"
 	"strings"
 
 	"opennamu/route/tool"
 )
+
+type User_watch_item struct {
+	Data     string
+	Display  string
+	Date     string
+	Set_id   string
+	Set_code string
+}
+
+func User_watch_list_items(db *sql.DB, data_list []string, do_type string) []User_watch_item {
+	item_list := make([]User_watch_item, 0, len(data_list))
+	for _, data := range data_list {
+		item := User_watch_item{
+			Data:    data,
+			Display: data,
+		}
+		if do_type == "watchlist" {
+			item.Date = tool.Get_history_date(db, data)
+		} else if do_type == "bbs_watchlist" {
+			if strings.HasPrefix(data, "-1-") {
+				item.Set_id = "-1"
+				item.Set_code = strings.TrimPrefix(data, "-1-")
+			} else {
+				watch_data := strings.SplitN(data, "-", 2)
+				if len(watch_data) != 2 {
+					continue
+				}
+				item.Set_id = watch_data[0]
+				item.Set_code = watch_data[1]
+			}
+
+			post_title, _ := tool.Get_bbs_data_value(db, item.Set_id, item.Set_code, "title")
+			bbs_name := tool.Get_bbs_set_data(db, item.Set_id, "bbs_name")
+			if post_title != "" {
+				item.Display = post_title
+				if bbs_name != "" {
+					item.Display = bbs_name + " - " + item.Display
+				}
+			}
+			item.Date, _ = tool.Get_bbs_data_value(db, item.Set_id, item.Set_code, "date")
+		}
+		item_list = append(item_list, item)
+	}
+
+	return item_list
+}
 
 func Api_user_watch_list(config tool.Config, name string, num_str string, do_type string) map[string]any {
 	db := tool.DB_connect()
@@ -26,7 +73,7 @@ func Api_user_watch_list(config tool.Config, name string, num_str string, do_typ
 
 	if ip != name && !tool.Check_permission(db, "view_user_watchlist", ip) {
 		return_data["response"] = "require auth"
-		return_data["data"] = []string{}
+		return_data["data"] = []User_watch_item{}
 	} else {
 		if do_type == "thread_watchlist" {
 			data_list := []string{}
@@ -66,7 +113,7 @@ func Api_user_watch_list(config tool.Config, name string, num_str string, do_typ
 				end = len(data_list)
 			}
 			return_data["response"] = "ok"
-			return_data["data"] = data_list[start:end]
+			return_data["data"] = User_watch_list_items(db, data_list[start:end], do_type)
 			return return_data
 		}
 		query := "select data from user_set where name = ? and id = ? limit ?, 50"
@@ -97,7 +144,7 @@ func Api_user_watch_list(config tool.Config, name string, num_str string, do_typ
 		}
 
 		return_data["response"] = "ok"
-		return_data["data"] = data_list
+		return_data["data"] = User_watch_list_items(db, data_list, do_type)
 	}
 
 	return return_data
