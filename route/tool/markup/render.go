@@ -16,8 +16,8 @@ func List_markup() []string {
 		"namumark_beta",
 		"macromark",
 		"markdown",
-		"custom",
-		"raw",
+		"html",
+		"plain",
 	}
 }
 
@@ -104,12 +104,15 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 			render_data = render_data_class.main()
 		case "markdown":
 			render_data = Markdown(db, doc_data_set)
-		case "raw":
+		case "plain", "raw":
 			render_data["data"] = strings.ReplaceAll(tool.HTML_escape(data), "\n", "<br>")
 			render_data["js_data"] = ""
 		case "macromark":
 			render_data_class := Macromark_new(db, doc_data_set, "html")
 			render_data = render_data_class.main()
+		case "html", "custom":
+			render_data["data"] = data
+			render_data["js_data"] = ""
 		default:
 			render_data["data"] = data
 			render_data["js_data"] = ""
