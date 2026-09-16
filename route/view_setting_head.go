@@ -20,7 +20,12 @@ func View_setting_head(config tool.Config, kind string, skin_name string) string
 		return tool.Get_error_page(db, config, "error")
 	}
 
-	return view_setting_head_data(db, config, kind, skin_name, name, coverage, title_key, action, setting_value(db, name, coverage, ""), "", false)
+	markup_name := ""
+	if kind == "body/top" || kind == "body/bottom" {
+		markup_name = setting_markup_value(db, name)
+	}
+
+	return view_setting_head_data(db, config, kind, skin_name, name, coverage, title_key, action, setting_value(db, name, coverage, ""), markup_name, "", false)
 }
 
 func setting_head_info(kind string, skin_name string) (string, string, string, string, bool) {
@@ -36,7 +41,7 @@ func setting_head_info(kind string, skin_name string) (string, string, string, s
 	}
 }
 
-func view_setting_head_data(db *sql.DB, config tool.Config, kind string, skin_name string, name string, coverage string, title_key string, action string, value string, preview string, is_preview bool) string {
+func view_setting_head_data(db *sql.DB, config tool.Config, kind string, skin_name string, name string, coverage string, title_key string, action string, value string, markup_name string, preview string, is_preview bool) string {
 	lang := func(key string) string {
 		return tool.Get_language(db, key, true)
 	}
@@ -55,6 +60,17 @@ func view_setting_head_data(db *sql.DB, config tool.Config, kind string, skin_na
 		}
 		data.WriteString(main_hr())
 		data.WriteString(`<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span>` + main_hr())
+	} else if kind == "body/top" || kind == "body/bottom" {
+		markup_name = setting_markup_normalize(markup_name)
+		data.WriteString(`<h3>` + lang("markup") + `</h3><select name="markup">`)
+		for _, markup_option := range setting_markup_options() {
+			selected := ""
+			if markup_option == markup_name {
+				selected = ` selected`
+			}
+			data.WriteString(`<option value="` + tool.HTML_escape(markup_option) + `"` + selected + `>` + tool.HTML_escape(markup_option) + `</option>`)
+		}
+		data.WriteString(`</select>` + main_hr())
 	}
 
 	textarea_value := value
@@ -62,7 +78,11 @@ func view_setting_head_data(db *sql.DB, config tool.Config, kind string, skin_na
 		textarea_value = preview
 	}
 
-	data.WriteString(`<textarea class="opennamu_textarea_500" placeholder="` + lang("enter_html") + `" name="content" id="content">` + tool.HTML_escape(textarea_value) + `</textarea>`)
+	placeholder := lang("enter_html")
+	if kind == "body/top" || kind == "body/bottom" {
+		placeholder = lang("markup")
+	}
+	data.WriteString(`<textarea class="opennamu_textarea_500" placeholder="` + placeholder + `" name="content" id="content">` + tool.HTML_escape(textarea_value) + `</textarea>`)
 	data.WriteString(main_hr())
 	if kind == "head" {
 		data.WriteString(lang("main_css_warning") + main_hr())
@@ -73,7 +93,8 @@ func view_setting_head_data(db *sql.DB, config tool.Config, kind string, skin_na
 		preview_action := "/setting_preview/" + kind
 		data.WriteString(` <button id="opennamu_preview_button" type="submit" formaction="` + preview_action + `">` + lang("preview") + `</button>`)
 		if is_preview {
-			data.WriteString(main_hr() + `<div id="opennamu_preview_area">` + preview + `</div>`)
+			preview_data := setting_render_markup(db, preview, markup_name)
+			data.WriteString(main_hr() + `<div id="opennamu_preview_area">` + preview_data + `</div>`)
 		}
 	}
 	data.WriteString(`</form>`)
