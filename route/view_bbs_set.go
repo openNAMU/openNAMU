@@ -112,6 +112,9 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if values != nil {
+		if !tool.Check_permission(db, "bbs_setting", config.IP) {
+			return tool.Get_error_page(db, config, "auth")
+		}
 		for _, field := range bbs_set_fields {
 			Api_bbs_w_set_put(config, set_id, field, values.Get(field), "")
 		}

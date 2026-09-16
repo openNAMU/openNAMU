@@ -687,7 +687,7 @@ func Get_markup_select_ui(db *sql.DB, config Config, doc_name string, markup str
 			value = default_markup
 		}
 
-		markup_html += `<option value="` + value + `" ` + selected + `>` + v + `</option>`
+		markup_html += `<option value="` + HTML_escape(value) + `" ` + selected + `>` + v + `</option>`
 	}
 
 	markup_html = `

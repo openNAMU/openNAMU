@@ -151,7 +151,7 @@ func Get_bbs_list_ui(db *sql.DB, config tool.Config, bbs_all_data []map[string]s
 		left += `<a href="` + bbs_link + `">` + bbs_title_html + `</a>`
 
 		if bbs_name != "" {
-			left += ` <a href="/bbs/in/` + bbs_id + `">(` + bbs_name + `)</a>`
+			left += ` <a href="/bbs/in/` + tool.Url_parser(bbs_id) + `">(` + tool.HTML_escape(bbs_name) + `)</a>`
 		}
 
 		left += ` [` + bbs_comment_length_str + `] [+` + bbs_tabom_length_str + `] [-` + bbs_tabom_down_length_str + `]`

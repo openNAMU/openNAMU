@@ -30,8 +30,15 @@ func save_acl(db tool.DB_runner, doc_name string, values url.Values) {
 		}
 	}
 
+	document_markup_value := values.Get("document_markup")
+	switch document_markup_value {
+	case "custom":
+		document_markup_value = "html"
+	case "raw":
+		document_markup_value = "plain"
+	}
 	tool.Exec_DB(db, "delete from data_set where doc_name = ? and set_name = 'document_markup'", doc_name)
-	tool.Exec_DB(db, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_markup', ?)", doc_name, values.Get("document_markup"))
+	tool.Exec_DB(db, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_markup', ?)", doc_name, document_markup_value)
 	for _, field := range []string{"document_top", "document_editor_top"} {
 		if _, ok := values[field]; !ok {
 			continue

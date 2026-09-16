@@ -120,7 +120,7 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 			render_data["data"] = data
 			render_data["js_data"] = ""
 		default:
-			render_data["data"] = data
+			render_data["data"] = strings.ReplaceAll(tool.HTML_escape(data), "\n", "<br>")
 			render_data["js_data"] = ""
 		}
 	}

@@ -59,7 +59,7 @@ func api_file_upload_post_reader(config tool.Config, file_name string, file_read
 		return_value["response"] = "error"
 		return_value["data"] = "invalid data"
 		return return_value
-	} else if strings.ContainsAny(file_name, `/\`) || strings.Contains(file_name, ".") {
+	} else if strings.ContainsAny(file_name, `/\`) || strings.Contains(file_name, ".") || strings.ContainsAny(file_name, "[]{}|\r\n") {
 		return_value["response"] = "error"
 		return_value["data"] = "unallowed file name"
 		return return_value

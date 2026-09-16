@@ -21,6 +21,14 @@ func Api_bbs_w_set_put(config tool.Config, set_id string, set_name string, data 
 			return_data["data"] = "invalid acl"
 			return return_data
 		}
+		if set_name == "bbs_markup" {
+			switch data {
+			case "custom":
+				data = "html"
+			case "raw":
+				data = "plain"
+			}
+		}
 		if auth_info {
 			if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 				if coverage == "" {
