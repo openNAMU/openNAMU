@@ -220,3 +220,7 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 	return_data["response"] = "ok"
 	return return_data
 }
+
+func document_set_value(db *sql.DB, doc_name string, set_name string) string {
+	return tool.Get_document_setting_value(db, doc_name, set_name, "")
+}

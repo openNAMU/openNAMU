@@ -7,6 +7,18 @@ import (
 	"opennamu/route/tool"
 )
 
+func Api_add_user(config tool.Config, id string, password string, email string, encode string) map[string]any {
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
+
+	if encode == "" {
+		encode = tool.Get_main_encode(db)
+	}
+
+	password_hash := tool.Password_encode(db, password, encode)
+	return api_add_user_hash(config, id, password_hash, email, encode, "", false)
+}
+
 func Api_add_user_invite(config tool.Config, id string, password string, email string, encode string, invite_hash string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
