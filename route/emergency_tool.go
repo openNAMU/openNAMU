@@ -480,9 +480,9 @@ func Run_emergency_tool(arguments []string) int {
 		}
 		err = emergency_set_other(db, "http_select", tls_value)
 	case "22":
-		err = emergency_exec(db, "delete from other where name = 'body'")
+		err = emergency_exec(db, "delete from other where name = 'body' or name = 'body_markup'")
 	case "23":
-		err = emergency_exec(db, "delete from other where name = 'bottom_body'")
+		err = emergency_exec(db, "delete from other where name = 'bottom_body' or name = 'bottom_body_markup'")
 	case "25":
 		err = emergency_recalc_data_set(db)
 	case "26":

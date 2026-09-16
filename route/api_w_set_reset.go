@@ -20,7 +20,7 @@ func Api_w_set_reset(config tool.Config, doc_name string) map[string]any {
 			if _, err := tx.Exec(tool.DB_change("delete from data_set where doc_name = ? and set_name = 'acl_date'"), doc_name); err != nil {
 				return err
 			}
-			for _, set_name := range []string{"document_markup", "document_top", "document_editor_top"} {
+			for _, set_name := range []string{"document_markup", "document_top", "document_top_markup", "document_editor_top", "document_editor_top_markup"} {
 				if _, err := tx.Exec(tool.DB_change("delete from data_set where doc_name = ? and set_name = ?"), doc_name, set_name); err != nil {
 					return err
 				}

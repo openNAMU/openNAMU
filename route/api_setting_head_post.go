@@ -6,7 +6,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_setting_head_post(config tool.Config, name string, coverage string, content string, markup_name string) map[string]any {
+func Api_setting_head_post(config tool.Config, name string, coverage string, content string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -21,9 +21,6 @@ func Api_setting_head_post(config tool.Config, name string, coverage string, con
 	}
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		setting_save_value(tx, name, coverage, content)
-		if name == "body" || name == "bottom_body" {
-			setting_save_value(tx, name+"_markup", "", setting_markup_normalize(markup_name))
-		}
 		tool.Do_insert_auth_history(tx, config.IP, "edit_set ("+name+")")
 		return nil
 	}); err != nil {

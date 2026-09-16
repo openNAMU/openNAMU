@@ -63,7 +63,7 @@ func Get_backlink(raw_data string, markup string) (map[string][]string, int, boo
 		link_regex = markdown_link_regex
 	case "macromark":
 		link_regex = macromark_link_regex
-	case "raw":
+	case "raw", "plain":
 		return map[string][]string{}, 0, true
 	default:
 		return map[string][]string{}, 0, false

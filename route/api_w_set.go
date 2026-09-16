@@ -9,7 +9,9 @@ func Document_set_list() map[string]string {
 
 	set_list["document_markup"] = ""
 	set_list["document_top"] = ""
+	set_list["document_top_markup"] = ""
 	set_list["document_editor_top"] = ""
+	set_list["document_editor_top_markup"] = ""
 	set_list["document_comment_code"] = ""
 
 	return set_list

@@ -28,6 +28,7 @@ type setting_phrase_field struct {
 	name       string
 	label      string
 	input      bool
+	markup     bool
 	class_name string
 }
 
@@ -67,6 +68,8 @@ func setting_phrase_fields() []setting_phrase_field {
 		{name: "move_bottom_text", label: "move_bottom_text"},
 		{name: "delete_bottom_text", label: "delete_bottom_text"},
 		{name: "revert_bottom_text", label: "revert_bottom_text"},
+		{name: "body", label: "main_body", markup: true, class_name: "opennamu_textarea_500"},
+		{name: "bottom_body", label: "main_bottom_body", markup: true, class_name: "opennamu_textarea_500"},
 	}
 }
 
@@ -93,6 +96,18 @@ func view_setting_phrase_data(db *sql.DB, config tool.Config, values map[string]
 		if field.input {
 			data.WriteString(setting_input(field.name, values[field.name], "text"))
 		} else {
+			if field.markup {
+				markup_current := setting_markup_value(db, field.name)
+				data.WriteString(`<h3>` + lang("markup") + `</h3><select name="` + field.name + `_markup">`)
+				for _, markup_option := range setting_markup_options() {
+					selected := ""
+					if markup_option == markup_current {
+						selected = ` selected`
+					}
+					data.WriteString(`<option value="` + tool.HTML_escape(markup_option) + `"` + selected + `>` + tool.HTML_escape(markup_option) + `</option>`)
+				}
+				data.WriteString(`</select>` + main_hr())
+			}
 			class_name := field.class_name
 			if class_name == "" {
 				class_name = "opennamu_textarea_100"

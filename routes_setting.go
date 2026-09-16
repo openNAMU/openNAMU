@@ -56,30 +56,10 @@ func register_setting_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_head(make_route_config(c), "head", c.Param("skin_name"))))
 	})
 	r.POST("/setting/head", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_head_post(make_route_config(c), "head", "", c.PostForm("content"), c.PostForm("markup"))))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_head_post(make_route_config(c), "head", "", c.PostForm("content"))))
 	})
 	r.POST("/setting/head/:skin_name", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_head_post(make_route_config(c), "head", c.Param("skin_name"), c.PostForm("content"), c.PostForm("markup"))))
-	})
-
-	r.GET("/setting/body/top", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_head(make_route_config(c), "body/top", "")))
-	})
-	r.POST("/setting/body/top", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_head_post(make_route_config(c), "body/top", "", c.PostForm("content"), c.PostForm("markup"))))
-	})
-	r.POST("/setting_preview/body/top", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_head_preview(make_route_config(c), "body/top", c.PostForm("content"), c.PostForm("markup"))))
-	})
-
-	r.GET("/setting/body/bottom", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_head(make_route_config(c), "body/bottom", "")))
-	})
-	r.POST("/setting/body/bottom", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_head_post(make_route_config(c), "body/bottom", "", c.PostForm("content"), c.PostForm("markup"))))
-	})
-	r.POST("/setting_preview/body/bottom", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_head_preview(make_route_config(c), "body/bottom", c.PostForm("content"), c.PostForm("markup"))))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_head_post(make_route_config(c), "head", c.Param("skin_name"), c.PostForm("content"))))
 	})
 
 	r.GET("/setting/robot", func(c *gin.Context) {
@@ -134,7 +114,7 @@ func register_setting_routes(r *gin.Engine) {
 		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_backlink_reset(make_route_config(c))))
 	})
 	r.POST("/setting/backlink_reset", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_backlink_reset_post(make_route_config(c))))
+		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_setting_backlink_reset_post(make_route_config(c), setting_form(c))))
 	})
 
 	r.GET("/api/v2/setting/:set_name", func(c *gin.Context) {

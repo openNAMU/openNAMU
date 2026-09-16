@@ -33,8 +33,18 @@ func save_acl(db tool.DB_runner, doc_name string, values url.Values) {
 	tool.Exec_DB(db, "delete from data_set where doc_name = ? and set_name = 'document_markup'", doc_name)
 	tool.Exec_DB(db, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'document_markup', ?)", doc_name, values.Get("document_markup"))
 	for _, field := range []string{"document_top", "document_editor_top"} {
+		if _, ok := values[field]; !ok {
+			continue
+		}
 		tool.Exec_DB(db, "delete from data_set where doc_name = ? and set_name = ?", doc_name, field)
 		tool.Exec_DB(db, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', ?, ?)", doc_name, field, values.Get(field))
+	}
+	for _, field := range []string{"document_top_markup", "document_editor_top_markup"} {
+		if _, ok := values[field]; !ok {
+			continue
+		}
+		tool.Exec_DB(db, "delete from data_set where doc_name = ? and set_name = ?", doc_name, field)
+		tool.Exec_DB(db, "insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', ?, ?)", doc_name, field, setting_markup_normalize(values.Get(field)))
 	}
 
 	tool.Exec_DB(db, "delete from acl where title = ? and type = 'why'", doc_name)
@@ -131,10 +141,30 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 				names = append(names, name)
 			}
 		}
+		owner := tool.Check_permission(db, "owner", config.IP)
+		if owner {
+			for _, field := range []string{"document_top", "document_editor_top"} {
+				if values.Get(field) == "" {
+					values.Del(field)
+					values.Del(field + "_markup")
+				}
+			}
+		}
 		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 			for _, name := range names {
-				save_acl(tx, name, values)
-				acl_history(tx, config, name, values)
+				save_values := values
+				if !owner {
+					save_values = url.Values{}
+					for key, value := range values {
+						save_values[key] = append([]string{}, value...)
+					}
+					save_values.Set("document_top", document_set_value(db, name, "document_top"))
+					save_values.Set("document_top_markup", document_set_value(db, name, "document_top_markup"))
+					save_values.Set("document_editor_top", document_set_value(db, name, "document_editor_top"))
+					save_values.Set("document_editor_top_markup", document_set_value(db, name, "document_editor_top_markup"))
+				}
+				save_acl(tx, name, save_values)
+				acl_history(tx, config, name, save_values)
 			}
 			return nil
 		}); err != nil {
@@ -153,13 +183,15 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 		old_markup = tool.Get_document_markup(db, "", "document")
 	}
 	save_values := values
-	if tool.Check_permission(db, "owner", config.IP) {
+	if !tool.Check_permission(db, "owner", config.IP) {
 		save_values = url.Values{}
 		for key, value := range values {
 			save_values[key] = append([]string{}, value...)
 		}
 		save_values.Set("document_top", document_set_value(db, doc_name, "document_top"))
+		save_values.Set("document_top_markup", document_set_value(db, doc_name, "document_top_markup"))
 		save_values.Set("document_editor_top", document_set_value(db, doc_name, "document_editor_top"))
+		save_values.Set("document_editor_top_markup", document_set_value(db, doc_name, "document_editor_top_markup"))
 	}
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		save_acl(tx, doc_name, save_values)

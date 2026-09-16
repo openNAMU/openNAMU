@@ -496,10 +496,9 @@ func Get_page_control(db *sql.DB, page int, count int, max_count int, url string
 	return data_html
 }
 
-func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_on string, doc_name string, help_override string) string {
+func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_on string, doc_name string, help_override string, editor_top string) string {
 	monaco_editor_top := ""
 	help_text := ""
-	document_top := ""
 
 	switch do_type {
 	case "edit":
@@ -507,13 +506,6 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
 			db,
 			`select data from other where name = "edit_help"`,
 			[]any{&help_text},
-		)
-
-		QueryRow_DB(
-			db,
-			`select set_data from data_set where doc_name = ? and set_name = 'document_top'`,
-			[]any{&document_top},
-			doc_name,
 		)
 	case "bbs":
 		QueryRow_DB(
@@ -640,7 +632,7 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
             <div id="opennamu_editor_user_button"></div>
         </div>
 
-        ` + document_top + `
+        ` + editor_top + `
 
         <div id="opennamu_monaco_editor" class="` + textarea_size + `" ` + editor_display[1] + `></div>
         <textarea id="opennamu_edit_textarea" class="` + textarea_size + ` __ON_TEXTAREA__" ` + editor_display[0] + ` name="content" placeholder="` + help_text + `">` + HTML_escape(data) + `</textarea>

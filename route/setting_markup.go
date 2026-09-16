@@ -53,3 +53,19 @@ func setting_render_markup(db *sql.DB, data string, markup_name string) string {
 
 	return render_data["data"]
 }
+
+func document_editor_top_render(db *sql.DB, doc_name string) string {
+	top_data := tool.Get_document_setting_value_exact(db, doc_name, "document_editor_top", "")
+	top_markup := ""
+	if top_data != "" {
+		top_markup = setting_markup_normalize(tool.Get_document_setting_value_exact(db, doc_name, "document_editor_top_markup", ""))
+	} else {
+		top_data = tool.Get_document_setting_value_exact(db, doc_name, "document_top", "")
+		if top_data == "" {
+			return ""
+		}
+		top_markup = setting_markup_normalize(tool.Get_document_setting_value_exact(db, doc_name, "document_top_markup", ""))
+	}
+
+	return setting_render_markup(db, top_data, top_markup)
+}
