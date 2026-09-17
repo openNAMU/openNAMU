@@ -254,6 +254,8 @@
     "trace": "Trace",
     "level": "Level",
     "point": "Point(s)",
+    "store": "Store",
+    "store_empty": "No items are currently available.",
     "challenge": "Challenges",
     "ua": "UA",
     "day": "Day(s)",

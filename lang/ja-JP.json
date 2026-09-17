@@ -723,6 +723,8 @@
     "backup_warning": "警告。同名のファイルがある場合、削除されることがあります。",
     "level": "レベル",
     "point": "ポイント",
+    "store": "ショップ",
+    "store_empty": "現在販売中の商品はありません。",
     "challenge_and_level_manage": "実績とレベルの管理",
     "display_level_in_user_name": "ユーザー名へのレベル表示",
     "ua": "UA",
