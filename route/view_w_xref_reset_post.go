@@ -16,7 +16,11 @@ func View_w_xref_reset_post(config tool.Config, doc_name string) string {
 		return tool.Get_redirect("/w/" + tool.Url_parser(doc_name))
 	}
 
-	render_data := Api_w_render(config, doc_name, api_data["data"].(string), "backlink", "")
+	raw_data, ok := api_data["data"].(string)
+	if !ok {
+		return tool.Get_redirect("/w/" + tool.Url_parser(doc_name))
+	}
+	render_data := Api_w_render(config, doc_name, raw_data, "backlink", "")
 	render_response, _ := render_data["response"].(string)
 	if render_response == "require auth" {
 		return tool.Get_error_page(db, config, "auth")

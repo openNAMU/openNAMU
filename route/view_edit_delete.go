@@ -13,10 +13,11 @@ func View_edit_delete(config tool.Config, doc_name string) string {
 	}
 
 	raw_data := Api_w_raw(config, doc_name, "true", "")
-	response := raw_data["response"].(string)
+	response, _ := raw_data["response"].(string)
+	exist, _ := raw_data["exist"].(bool)
 	if response == "require auth" {
 		return tool.Get_error_page(db, config, "auth")
-	} else if response != "ok" || !raw_data["exist"].(bool) {
+	} else if response != "ok" || !exist {
 		return tool.Get_redirect("/w/" + tool.Url_parser(doc_name))
 	}
 

@@ -14,10 +14,10 @@ func View_bbs_in_w(c *gin.Context, config tool.Config, set_id string, set_code s
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	bbs_name := Api_bbs_num_to_name(db, set_id)["data"].(string)
+	bbs_name, _ := Api_bbs_num_to_name(db, set_id)["data"].(string)
 
 	data_api := Api_bbs_w(config, set_id, set_code)
-	data_api_in := data_api["data"].(map[string]string)
+	data_api_in, _ := data_api["data"].(map[string]string)
 
 	if len(data_api_in) == 0 {
 		return tool.Get_redirect("/bbs/main")
@@ -57,7 +57,7 @@ func View_bbs_in_w(c *gin.Context, config tool.Config, set_id string, set_code s
 	Api_bbs_w_page_view_post(config, set_id, set_code)
 
 	view_count_api := Api_bbs_w_page_view(config, set_id, set_code)
-	view_count_api_data := view_count_api["data"].(int)
+	view_count_api_data, _ := view_count_api["data"].(int)
 
 	data_html += View_bbs_in_w_comment(db, config, set_id, set_code, c.Param("comment_select"), tool.Str_to_int(c.Param("page")))
 

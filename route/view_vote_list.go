@@ -11,7 +11,7 @@ func View_vote_list(config tool.Config, type_str string, num_str string) string 
 	}
 
 	api_data := Api_vote_list(config, type_str, num_str)
-	data_list := api_data["data"].([][]string)
+	data_list, _ := api_data["data"].([][]string)
 
 	data_html := ""
 	sub := any(0)

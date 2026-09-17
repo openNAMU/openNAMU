@@ -12,7 +12,7 @@ func View_edit_delete_post(config tool.Config, doc_name string, send string, agr
 	}
 
 	api_data := Api_edit_delete_post(config, doc_name, send, agree)
-	response := api_data["response"].(string)
+	response, _ := api_data["response"].(string)
 	switch response {
 	case "ok", "not exist":
 		return tool.Get_redirect("/w/" + tool.Url_parser(doc_name))

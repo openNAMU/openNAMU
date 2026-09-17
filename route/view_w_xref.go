@@ -9,14 +9,14 @@ func View_w_xref(config tool.Config, doc_name string, do_type string, num string
 	defer tool.DB_close(db)
 
 	api_data := Api_w_xref(config, num, doc_name, do_type)
-	response := api_data["response"].(string)
+	response, _ := api_data["response"].(string)
 	if response == "require auth" {
 		return tool.Get_error_page(db, config, "auth")
 	} else if response != "ok" {
 		return tool.Get_error_page(db, config, "error")
 	}
 
-	data_list := api_data["data"].([][]string)
+	data_list, _ := api_data["data"].([][]string)
 	data_html := ""
 	data_sub := ""
 	page_url := ""
@@ -33,7 +33,7 @@ func View_w_xref(config tool.Config, doc_name string, do_type string, num string
 
 	data_html += "<ul>"
 	if do_type != "1" {
-		link_count := api_data["link_count"].(string)
+		link_count, _ := api_data["link_count"].(string)
 		if link_count == "" {
 			link_count = tool.Get_language(db, "data_missing", true)
 		} else {

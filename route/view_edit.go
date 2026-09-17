@@ -26,8 +26,9 @@ func View_edit(config tool.Config, doc_name string, load_doc_name string) string
 		raw_data = Api_w_raw(config, load_doc_name, "", "")
 	}
 
-	if raw_data["response"].(string) == "ok" {
-		raw_data_get = raw_data["data"].(string)
+	raw_response, _ := raw_data["response"].(string)
+	if raw_response == "ok" {
+		raw_data_get, _ = raw_data["data"].(string)
 	}
 
 	return view_edit_page(db, config, doc_name, load_doc_name, raw_data_get, "", "", "")

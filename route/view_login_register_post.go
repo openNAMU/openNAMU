@@ -7,8 +7,9 @@ func View_login_register_post(config tool.Config, id string, password string, pa
 	defer tool.DB_close(db)
 
 	return_data := Api_login_register(config, id, password, password_check)
-	if return_data["response"].(string) == "error" {
-		error_name := return_data["data"].(string)
+	response, _ := return_data["response"].(string)
+	if response == "error" {
+		error_name, _ := return_data["data"].(string)
 
 		switch error_name {
 		case "login user":

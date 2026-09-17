@@ -15,15 +15,16 @@ func View_setting_backlink_reset_post(config tool.Config, form map[string]string
 		load = "fast"
 	}
 	api_data := api_setting_backlink_reset_post(config, load)
-	response := api_data["response"].(string)
+	response, _ := api_data["response"].(string)
 	if response == "require auth" {
 		return tool.Get_error_page(db, config, "auth")
 	} else if response != "ok" {
 		return tool.Get_error_page(db, config, "error")
 	}
 
-	document_count := strconv.Itoa(api_data["document_count"].(int))
-	error_count := api_data["error_count"].(int)
+	document_count_value, _ := api_data["document_count"].(int)
+	document_count := strconv.Itoa(document_count_value)
+	error_count, _ := api_data["error_count"].(int)
 	data_html := "<ul><li>" + tool.Get_language(db, "reset_all_backlink", true) + " : " + document_count + "</li>"
 	if error_count > 0 {
 		data_html += "<li>" + tool.Get_language(db, "error", true) + " : " + strconv.Itoa(error_count) + "</li>"

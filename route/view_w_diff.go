@@ -26,7 +26,7 @@ func View_w_diff(config tool.Config, doc_name string, before_rev string, after_r
 	}
 
 	api_data := Api_w_diff(config, doc_name, before_rev, after_rev)
-	response := api_data["response"].(string)
+	response, _ := api_data["response"].(string)
 
 	if response == "require auth" {
 		return tool.Get_error_page(db, config, "auth")
@@ -34,7 +34,7 @@ func View_w_diff(config tool.Config, doc_name string, before_rev string, after_r
 		return tool.Get_redirect("/history/" + tool.Url_parser(doc_name))
 	}
 
-	diff_data_list := api_data["data"].([]map[string]string)
+	diff_data_list, _ := api_data["data"].([]map[string]string)
 	diff_line_list := Get_diff_line_list(diff_data_list)
 
 	data_html := ""

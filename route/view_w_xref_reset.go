@@ -13,7 +13,7 @@ func View_w_xref_reset(config tool.Config, doc_name string) string {
 	}
 
 	api_data := Api_w_raw(config, doc_name, "", "")
-	response := api_data["response"].(string)
+	response, _ := api_data["response"].(string)
 	if response == "require auth" {
 		return tool.Get_error_page(db, config, "auth")
 	} else if response != "ok" {

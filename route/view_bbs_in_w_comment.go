@@ -13,7 +13,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 		page = 1
 	}
 	data_api := Api_bbs_w_comment_page(config, set_id+"-"+set_code, true, "around", page)
-	data_api_in := data_api["data"].([]map[string]string)
+	data_api_in, _ := data_api["data"].([]map[string]string)
 	post_user, _ := tool.Get_bbs_data_value(db, set_id, set_code, "user_id")
 	if post_user != "" {
 		post_user = tool.IP_preprocess(db, post_user, config.IP)[0]
@@ -41,8 +41,8 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	}
 
 	tabom_count_api := Api_bbs_w_tabom(config, set_id, set_code)
-	tabom_count := tabom_count_api["data"].(string)
-	tabom_down_count := tabom_count_api["down_data"].(string)
+	tabom_count, _ := tabom_count_api["data"].(string)
+	tabom_down_count, _ := tabom_count_api["down_data"].(string)
 
 	if bbs_comment_acl {
 		data_html += `

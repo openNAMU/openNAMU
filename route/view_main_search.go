@@ -38,7 +38,7 @@ func View_main_search(config tool.Config, keyword string, num string, search_typ
 	}
 
 	data_api_exist := Api_w_raw(config, keyword, "true", "")
-	data_api_exist_in := data_api_exist["data"].(string)
+	data_api_exist_in, _ := data_api_exist["data"].(string)
 
 	main_document_name := keyword
 	link_id := `class="opennamu_not_exist_link"`
@@ -56,7 +56,7 @@ func View_main_search(config tool.Config, keyword string, num string, search_typ
     `
 
 	data_api := Api_func_search(config, keyword, num, search_type)
-	data_api_in := data_api["data"].([]string)
+	data_api_in, _ := data_api["data"].([]string)
 	data_list := Api_func_search_ui(config, data_api_in, keyword, search_type)
 
 	data_html += "<ul>"

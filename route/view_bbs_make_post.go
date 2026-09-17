@@ -8,7 +8,8 @@ func View_bbs_make_post(config tool.Config, bbs_name string, bbs_type string) st
 
 	api_data := Api_bbs_make(config, bbs_name, bbs_type)
 
-	if api_data["response"].(string) != "ok" {
+	response, _ := api_data["response"].(string)
+	if response != "ok" {
 		return tool.Get_error_page(
 			db,
 			config,

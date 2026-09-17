@@ -7,8 +7,10 @@ func View_login_login_post(config tool.Config, id string, password string) strin
 	defer tool.DB_close(db)
 
 	return_data := Api_login_login(config, id, password)
-	if return_data["response"].(string) == "error" {
-		return tool.Get_error_page(db, config, return_data["data"].(string))
+	response, _ := return_data["response"].(string)
+	if response == "error" {
+		error_name, _ := return_data["data"].(string)
+		return tool.Get_error_page(db, config, error_name)
 	}
 
 	return tool.Get_redirect("/user")

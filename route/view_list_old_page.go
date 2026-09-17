@@ -7,7 +7,7 @@ func View_list_old_page(config tool.Config, num string, set_type string) string 
 	defer tool.DB_close(db)
 
 	api_data := Api_list_old_page(config, num, set_type)
-	api_data_list := api_data["data"].([][]string)
+	api_data_list, _ := api_data["data"].([][]string)
 
 	if set_type != "old" {
 		set_type = "new"

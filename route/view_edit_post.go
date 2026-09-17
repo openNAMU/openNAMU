@@ -14,10 +14,12 @@ func View_edit_post(config tool.Config, doc_name string, data string, send strin
 	return_data := Api_edit_post(config, doc_name, data, send, agree, expected_revision)
 
 	result_html := ""
-	if return_data["response"].(string) == "ok" {
+	response, _ := return_data["response"].(string)
+	if response == "ok" {
 		result_html = tool.Get_redirect("/w/" + tool.Url_parser(doc_name))
 	} else {
-		result_html = tool.Get_error_page(db, config, return_data["data"].(string))
+		error_name, _ := return_data["data"].(string)
+		result_html = tool.Get_error_page(db, config, error_name)
 	}
 
 	return result_html

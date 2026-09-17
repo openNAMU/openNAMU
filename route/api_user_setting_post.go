@@ -19,6 +19,56 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 
 	language_list := user_language_list(db)
 	title_choices := user_title_list(db, config.IP)
+	profile_image := ""
+	profile_image_set := values.Has("profile_image")
+	if profile_image_set {
+		var valid bool
+		profile_image, valid = tool.Get_user_profile_image_name(db, values.Get("profile_image"))
+		if !valid {
+			return_data["response"] = "error"
+			return_data["data"] = "invalid file"
+			return return_data
+		}
+	}
+
+	twofa_mode := ""
+	twofa_password := ""
+	twofa_password_hash := ""
+	twofa_encode := ""
+	if values.Has("2fa") {
+		twofa_mode = values.Get("2fa")
+		switch twofa_mode {
+		case "":
+		case "on":
+			twofa_password = values.Get("2fa_pw")
+			if twofa_password == "" && user_value(db, config.IP, "2fa_pw") == "" {
+				return_data["response"] = "error"
+				return_data["data"] = "password empty"
+				return return_data
+			}
+			if twofa_password != "" {
+				twofa_encode = tool.Get_user_encode(db, config.IP)
+				twofa_password_hash = tool.Password_encode(db, twofa_password, twofa_encode)
+			}
+		case "email":
+			if user_value(db, config.IP, "email") == "" {
+				return_data["response"] = "error"
+				return_data["data"] = "not found"
+				return return_data
+			}
+		default:
+			return_data["response"] = "error"
+			return_data["data"] = "invalid data"
+			return return_data
+		}
+	} else if values.Has("2fa_pw") {
+		twofa_password = values.Get("2fa_pw")
+		if twofa_password != "" {
+			twofa_encode = tool.Get_user_encode(db, config.IP)
+			twofa_password_hash = tool.Password_encode(db, twofa_password, twofa_encode)
+		}
+	}
+
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		if values.Has("skin") {
 			skin := values.Get("skin")
@@ -49,97 +99,47 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 				user_save(tx, config.IP, name, values.Get(name))
 			}
 		}
-		return nil
-	}); err != nil {
-		panic(err)
-	}
-	if values.Has("profile_image") {
-		profile_image, valid := tool.Get_user_profile_image_name(db, values.Get("profile_image"))
-		if !valid {
-			return_data["response"] = "error"
-			return_data["data"] = "invalid file"
-			return return_data
+
+		if profile_image_set {
+			if profile_image == "" {
+				user_delete(tx, config.IP, "profile_image")
+			} else {
+				user_save(tx, config.IP, "profile_image", profile_image)
+			}
 		}
-		if profile_image == "" {
-			user_delete(db, config.IP, "profile_image")
-		} else {
-			user_save(db, config.IP, "profile_image", profile_image)
-		}
-	}
-	if values.Has("2fa") {
-		switch values.Get("2fa") {
-		case "":
-			if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+
+		if values.Has("2fa") {
+			switch twofa_mode {
+			case "":
 				user_delete(tx, config.IP, "2fa")
 				user_delete(tx, config.IP, "2fa_pw")
 				user_delete(tx, config.IP, "2fa_pw_encode")
-				return nil
-			}); err != nil {
-				panic(err)
-			}
-		case "on":
-			password := values.Get("2fa_pw")
-			if password == "" && user_value(db, config.IP, "2fa_pw") == "" {
-				return_data["response"] = "error"
-				return_data["data"] = "password empty"
-				return return_data
-			}
-			encode := tool.Get_user_encode(db, config.IP)
-			password_hash := ""
-			if password != "" {
-				password_hash = tool.Password_encode(db, password, encode)
-			}
-			if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-				if password != "" {
-					user_save(tx, config.IP, "2fa_pw", password_hash)
-					user_save(tx, config.IP, "2fa_pw_encode", encode)
+			case "on":
+				if twofa_password != "" {
+					user_save(tx, config.IP, "2fa_pw", twofa_password_hash)
+					user_save(tx, config.IP, "2fa_pw_encode", twofa_encode)
 				}
 				user_save(tx, config.IP, "2fa", "on")
-				return nil
-			}); err != nil {
-				panic(err)
-			}
-		case "email":
-			if user_value(db, config.IP, "email") == "" {
-				return_data["response"] = "error"
-				return_data["data"] = "not found"
-				return return_data
-			}
-			if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			case "email":
 				user_save(tx, config.IP, "2fa", "email")
 				user_delete(tx, config.IP, "2fa_pw")
 				user_delete(tx, config.IP, "2fa_pw_encode")
-				return nil
-			}); err != nil {
-				panic(err)
 			}
-		default:
-			return_data["response"] = "error"
-			return_data["data"] = "invalid data"
-			return return_data
-		}
-	} else if values.Has("2fa_pw") {
-		password := values.Get("2fa_pw")
-		encode := ""
-		password_hash := ""
-		if password != "" {
-			encode = tool.Get_user_encode(db, config.IP)
-			password_hash = tool.Password_encode(db, password, encode)
-		}
-		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-			if password == "" {
+		} else if values.Has("2fa_pw") {
+			if twofa_password == "" {
 				user_delete(tx, config.IP, "2fa_pw")
 				user_delete(tx, config.IP, "2fa_pw_encode")
 				user_delete(tx, config.IP, "2fa")
-				return nil
+			} else {
+				user_save(tx, config.IP, "2fa_pw", twofa_password_hash)
+				user_save(tx, config.IP, "2fa_pw_encode", twofa_encode)
+				user_save(tx, config.IP, "2fa", "on")
 			}
-			user_save(tx, config.IP, "2fa_pw", password_hash)
-			user_save(tx, config.IP, "2fa_pw_encode", encode)
-			user_save(tx, config.IP, "2fa", "on")
-			return nil
-		}); err != nil {
-			panic(err)
 		}
+
+		return nil
+	}); err != nil {
+		panic(err)
 	}
 
 	return_data["response"] = "ok"

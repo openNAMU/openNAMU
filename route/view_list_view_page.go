@@ -7,7 +7,7 @@ func View_list_view_page(config tool.Config, num string, set_type string) string
 	defer tool.DB_close(db)
 
 	api_data := Api_list_view_page(config, num, set_type)
-	data_list := api_data["data"].([][]string)
+	data_list, _ := api_data["data"].([][]string)
 	data_html := ""
 	title := tool.Get_language(db, "page_view_sort", true)
 	page_url := "/list/document/view/{}"

@@ -47,7 +47,8 @@ func view_bbs_search(config tool.Config, set_id string, keyword string, page str
 	}
 
 	if set_id != "" {
-		bbs_name = Api_bbs_num_to_name(db, set_id)["data"].(string)
+		bbs_name_data := Api_bbs_num_to_name(db, set_id)
+		bbs_name, _ = bbs_name_data["data"].(string)
 		if bbs_name == "" {
 			return tool.Get_redirect("/bbs/main")
 		}
@@ -76,7 +77,7 @@ func view_bbs_search(config tool.Config, set_id string, keyword string, page str
 		if search_type == "data" {
 			data_api = Api_bbs_search_data(config, keyword, set_id, strconv.Itoa(page_int))
 		}
-		data_list := data_api["data"].([]map[string]string)
+		data_list, _ := data_api["data"].([]map[string]string)
 		data_html += Get_bbs_list_ui(db, config, data_list, bbs_id_to_name)
 
 		page_url := "/bbs/search_page/{}/" + tool.Url_parser(keyword)

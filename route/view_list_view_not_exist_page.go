@@ -7,7 +7,7 @@ func View_list_view_not_exist_page(config tool.Config, page string) string {
 	defer tool.DB_close(db)
 
 	api_data := Api_list_view_not_exist_page(config, page)
-	data_list := api_data["data"].([][]string)
+	data_list, _ := api_data["data"].([][]string)
 	data_html := ""
 	for _, data := range data_list {
 		if len(data) < 2 {

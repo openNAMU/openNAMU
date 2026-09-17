@@ -11,15 +11,19 @@ func View_vote_select(config tool.Config, id string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 	api_data := Api_vote_view(config, id)
-	if api_data["response"].(string) != "ok" {
+	response, _ := api_data["response"].(string)
+	if response != "ok" {
 		return tool.Get_redirect("/vote")
 	}
-	vote := api_data["data"].(map[string]any)
-	name := vote["name"].(string)
-	subject := vote["subject"].(string)
-	data := vote["data"].(string)
-	type_data := vote["type"].(string)
-	end_date := vote["end_date"].(string)
+	vote, ok := api_data["data"].(map[string]any)
+	if !ok {
+		return tool.Get_redirect("/vote")
+	}
+	data, _ := vote["data"].(string)
+	type_data, _ := vote["type"].(string)
+	end_date, _ := vote["end_date"].(string)
+	name, _ := vote["name"].(string)
+	subject, _ := vote["subject"].(string)
 	if type_data == "close" || type_data == "n_close" || (values == nil && !tool.Check_acl(db, "", id, "vote", config.IP)) {
 		return tool.Get_redirect("/vote/end/" + tool.Url_parser(id))
 	}

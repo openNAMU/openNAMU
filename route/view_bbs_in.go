@@ -55,7 +55,7 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	bbs_name := Api_bbs_num_to_name(db, set_id)["data"].(string)
+	bbs_name, _ := Api_bbs_num_to_name(db, set_id)["data"].(string)
 	if bbs_name == "" {
 		return tool.Get_redirect("/bbs/main")
 	}
@@ -66,7 +66,7 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 	} else {
 		data_api = Api_bbs(config, set_id, page_num, sort_type)
 	}
-	data_api_in := data_api["data"].([]map[string]string)
+	data_api_in, _ := data_api["data"].([]map[string]string)
 
 	data_html := ""
 	if show_filter {

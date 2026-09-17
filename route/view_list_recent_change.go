@@ -157,7 +157,7 @@ func View_list_recent_change(config tool.Config, set_type string, limit string, 
 	if api_data["response"] != "ok" {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	api_data_list := api_data["data"].([][]string)
+	api_data_list, _ := api_data["data"].([][]string)
 
 	history_ui, _ := Get_ui_history(db, api_data_list)
 

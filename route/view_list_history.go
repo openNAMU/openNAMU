@@ -32,7 +32,7 @@ func View_list_history(config tool.Config, doc_name string, set_type string, num
 	}
 
 	api_data := Api_list_history(config, doc_name, set_type, num)
-	api_data_list := api_data["data"].([][]string)
+	api_data_list, _ := api_data["data"].([][]string)
 
 	history_ui, select_ui := Get_ui_history(db, api_data_list)
 

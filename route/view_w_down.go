@@ -10,7 +10,7 @@ func View_w_down(config tool.Config, doc_name string) string {
 	if data_api["response"] != "ok" {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	data_api_in := data_api["data"].([]string)
+	data_api_in, _ := data_api["data"].([]string)
 
 	data_html := "<ul>"
 

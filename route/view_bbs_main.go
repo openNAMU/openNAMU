@@ -199,7 +199,11 @@ func View_bbs_main(config tool.Config, page string) string {
 	bbs_id_to_name := map[string]string{}
 
 	data_html := "<ul>"
-	for _, in_data := range bbs_list_api_data["data"].([][]string) {
+	bbs_list, ok := bbs_list_api_data["data"].([][]string)
+	if !ok {
+		return tool.Get_error_page(db, config, "error")
+	}
+	for _, in_data := range bbs_list {
 		bbs_name := in_data[0]
 		bbs_id := in_data[1]
 		bbs_type := in_data[2]
@@ -229,7 +233,8 @@ func View_bbs_main(config tool.Config, page string) string {
 	data_html += bbs_list_example_ui(db)
 
 	bbs_api_data := Api_bbs(config, "", page, "")
-	data_html += Get_bbs_list_ui(db, config, bbs_api_data["data"].([]map[string]string), bbs_id_to_name)
+	bbs_data, _ := bbs_api_data["data"].([]map[string]string)
+	data_html += Get_bbs_list_ui(db, config, bbs_data, bbs_id_to_name)
 
 	menu := [][]any{
 		{"other", tool.Get_language(db, "other_tool", false)},

@@ -116,7 +116,8 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		render_data = view_w_merge_category_data(db, config, doc_name, render_data)
 	}
 
-	last_edit := Api_w_set(config, doc_name, "last_edit", "")["data"].(string)
+	last_edit_data := Api_w_set(config, doc_name, "last_edit", "")
+	last_edit, _ := last_edit_data["data"].(string)
 
 	if document_type == "" && last_edit != "" {
 		warning_days := tool.Get_setting_value(db, "outdated_doc_warning_date", "", "")
@@ -139,8 +140,11 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	bottom_body := tool.Get_setting_value(db, "bottom_body", "", "")
 	render_data += setting_render_markup(db, bottom_body, setting_markup_value(db, "bottom_body"))
 
-	document_top := Api_w_set(config, doc_name, "document_top", "")["data"].(string)
-	document_top_markup := setting_markup_normalize(Api_w_set(config, doc_name, "document_top_markup", "")["data"].(string))
+	document_top_data := Api_w_set(config, doc_name, "document_top", "")
+	document_top, _ := document_top_data["data"].(string)
+	document_top_markup_data := Api_w_set(config, doc_name, "document_top_markup", "")
+	document_top_markup_value, _ := document_top_markup_data["data"].(string)
+	document_top_markup := setting_markup_normalize(document_top_markup_value)
 	render_data = setting_render_markup(db, document_top, document_top_markup) + render_data
 
 	history_color := 0

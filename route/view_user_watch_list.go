@@ -18,7 +18,8 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 		return tool.Get_redirect("/login")
 	}
 	api_data := Api_user_watch_list(config, config.IP, num, do_type)
-	if api_data["response"].(string) != "ok" {
+	response, _ := api_data["response"].(string)
+	if response != "ok" {
 		return tool.Get_error_page(db, config, "auth")
 	}
 

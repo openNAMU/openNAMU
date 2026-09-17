@@ -19,7 +19,7 @@ func View_w_watch_list(config tool.Config, doc_name string, num string, do_type 
 		return tool.Get_error_page(db, config, "auth")
 	} else {
 		data_html += "<ul>"
-		data_list := api_data["data"].([][]string)
+		data_list, _ := api_data["data"].([][]string)
 		for _, user_data := range data_list {
 			data_html += "<li>" + user_data[1] + "</li>"
 		}
