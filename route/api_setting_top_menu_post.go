@@ -16,7 +16,7 @@ func Api_setting_top_menu_post(config tool.Config, form map[string]string) map[s
 		return return_data
 	}
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-		setting_save_value(tx, "top_menu", "", setting_form_value(form, "content", ""))
+		Setting_save_value(tx, "top_menu", "", Setting_form_value(form, "content", ""))
 		tool.Do_insert_auth_history(tx, config.IP, "edit_set (top_menu)")
 		return nil
 	}); err != nil {

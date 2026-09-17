@@ -11,7 +11,7 @@ import (
 var render_external_link_regex = regexp.MustCompile(`(?is)<a\b([^>]*\bclass="[^"]*\bopennamu_link_out\b[^"]*"[^>]*)>`)
 var render_target_regex = regexp.MustCompile(`(?i)\btarget\s*=`)
 
-func move_render_category_top(data string) string {
+func Move_render_category_top(data string) string {
 	category_start := strings.LastIndex(data, `<div class="opennamu_category" id="cate">`)
 	if category_start < 0 {
 		return data
@@ -31,7 +31,7 @@ func move_render_category_top(data string) string {
 	return data[:opening_end+1] + data[category_start:category_end] + data[opening_end+1:separator] + data[category_end:]
 }
 
-func add_render_external_link_target(data string) string {
+func Add_render_external_link_target(data string) string {
 	return render_external_link_regex.ReplaceAllStringFunc(data, func(value string) string {
 		match := render_external_link_regex.FindStringSubmatch(value)
 		if len(match) < 2 || render_target_regex.MatchString(match[1]) {
@@ -41,14 +41,14 @@ func add_render_external_link_target(data string) string {
 	})
 }
 
-func apply_render_setting_data(db *sql.DB, config tool.Config, data string) string {
+func Apply_render_setting_data(db *sql.DB, config tool.Config, data string) string {
 	if tool.Get_main_skin_set(db, config, "main_css_category_set") != "bottom" {
-		data = move_render_category_top(data)
+		data = Move_render_category_top(data)
 	}
-	return add_render_external_link_target(data)
+	return Add_render_external_link_target(data)
 }
 
-func get_render_other_value(db *sql.DB, name string) string {
+func Get_render_other_value(db *sql.DB, name string) string {
 	data := ""
 	tool.QueryRow_DB(
 		db,
@@ -59,7 +59,7 @@ func get_render_other_value(db *sql.DB, name string) string {
 	return data
 }
 
-func get_render_setting_parameter(db *sql.DB, config tool.Config) map[string]string {
+func Get_render_setting_parameter(db *sql.DB, config tool.Config) map[string]string {
 	setting := map[string]string{}
 	for _, name := range []string{
 		"main_css_bold",
@@ -85,7 +85,7 @@ func get_render_setting_parameter(db *sql.DB, config tool.Config) map[string]str
 	return setting
 }
 
-func get_render_setting_css(db *sql.DB, config tool.Config) string {
+func Get_render_setting_css(db *sql.DB, config tool.Config) string {
 	data := strings.Builder{}
 
 	font_size := tool.Get_main_skin_set(db, config, "main_css_font_size")
@@ -94,7 +94,7 @@ func get_render_setting_css(db *sql.DB, config tool.Config) string {
 		data.WriteString(`.opennamu_render_complete { font-size: ` + font_size + `px !important; }`)
 	}
 
-	if get_render_other_value(db, "namumark_compatible") != "" {
+	if Get_render_other_value(db, "namumark_compatible") != "" {
 		data.WriteString(`.opennamu_render_complete {
     font-size: 15px !important;
     line-height: 1.5;

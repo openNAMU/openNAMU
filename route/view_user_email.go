@@ -9,12 +9,12 @@ import (
 func View_user_email(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if !user_auth(db, config) {
+	if !User_auth(db, config) {
 		return tool.Get_redirect("/login")
 	}
 	if values != nil {
 		email := strings.TrimSpace(values.Get("email"))
-		if !user_email_allowed(db, email) {
+		if !User_email_allowed(db, email) {
 			return tool.Get_error_page(db, config, "email domain")
 		}
 		_, email_exists := tool.Get_user_set_id(db, "email", email)
@@ -22,11 +22,11 @@ func View_user_email(config tool.Config, values url.Values) string {
 			return tool.Get_error_page(db, config, "email already exist")
 		}
 		key := tool.Get_random_key(32)
-		title := user_other(db, "email_title")
+		title := User_other(db, "email_title")
 		if title == "" {
 			title = tool.Get_language(db, "email", true) + " key"
 		}
-		body := user_other(db, "email_text")
+		body := User_other(db, "email_text")
 		if strings.Contains(body, "{}") {
 			body = strings.ReplaceAll(body, "{}", key)
 		} else {
@@ -43,11 +43,11 @@ func View_user_email(config tool.Config, values url.Values) string {
 		_ = config.Session.Save()
 		return tool.Get_redirect("/change/email/check")
 	}
-	instruction := user_other(db, "email_insert_text")
+	instruction := User_other(db, "email_insert_text")
 	body := ""
 	if instruction != "" {
 		body += tool.HTML_escape(instruction) + `<hr class="main_hr">`
 	}
 	body += `<a href="/filter/email_filter">(` + tool.Get_language(db, "email_filter_list", true) + `)</a><hr class="main_hr"><form method="post"><input placeholder="` + tool.Get_language(db, "email", true) + `" name="email" type="email"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
-	return user_form_page(db, config, tool.Get_language(db, "email", true), body)
+	return User_form_page(db, config, tool.Get_language(db, "email", true), body)
 }

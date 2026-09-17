@@ -15,7 +15,7 @@ func Api_user_skin_post(config tool.Config, skin string) map[string]any {
 		return_data["response"] = "error"
 		return return_data
 	}
-	user_save(db, config.IP, "skin", skin)
+	User_save(db, config.IP, "skin", skin)
 	return_data["response"] = "ok"
 	return return_data
 }

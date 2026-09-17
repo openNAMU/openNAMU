@@ -14,10 +14,10 @@ func View_setting_top_menu(config tool.Config) string {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	return view_setting_top_menu_data(db, config, setting_value(db, "top_menu", "", ""))
+	return View_setting_top_menu_data(db, config, Setting_value(db, "top_menu", "", ""))
 }
 
-func view_setting_top_menu_data(db *sql.DB, config tool.Config, value string) string {
+func View_setting_top_menu_data(db *sql.DB, config tool.Config, value string) string {
 	data := `<span>
         EX)
         <br>
@@ -29,10 +29,10 @@ func view_setting_top_menu_data(db *sql.DB, config tool.Config, value string) st
         <br>
         /w/FrontPage
     </span>`
-	data += main_hr() + tool.Get_language(db, "not_support_skin_warning", true) + main_hr()
+	data += Main_hr() + tool.Get_language(db, "not_support_skin_warning", true) + Main_hr()
 	data += `<form method="post">`
 	data += `<textarea class="opennamu_textarea_500" placeholder="` + tool.Get_language(db, "enter_top_menu_setting", true) + `" name="content" id="content">` + tool.HTML_escape(value) + `</textarea>`
-	data += main_hr() + `<button id="opennamu_save_button" type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
+	data += Main_hr() + `<button id="opennamu_save_button" type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 
-	return setting_page(db, config, tool.Get_language(db, "top_menu_setting", true), data, "setting")
+	return Setting_page(db, config, tool.Get_language(db, "top_menu_setting", true), data, "setting")
 }

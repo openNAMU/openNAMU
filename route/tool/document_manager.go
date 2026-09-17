@@ -166,14 +166,14 @@ func Do_edit_slow_check(db *sql.DB, config Config, do_type string) bool {
 
 // Do_edit_max_length_check : over is false, under is true
 func Do_edit_max_length_check(db *sql.DB, config Config, data string) bool {
-	return do_max_length_check(db, "document_content_max_length", data)
+	return Do_max_length_check(db, "document_content_max_length", data)
 }
 
 func Do_bbs_max_length_check(db *sql.DB, config Config, data string) bool {
-	return do_max_length_check(db, "bbs_content_max_length", data)
+	return Do_max_length_check(db, "bbs_content_max_length", data)
 }
 
-func do_max_length_check(db *sql.DB, name string, data string) bool {
+func Do_max_length_check(db *sql.DB, name string, data string) bool {
 	var check string
 
 	exist := QueryRow_DB(
@@ -237,17 +237,17 @@ func Get_document_revision(db *sql.DB, doc_name string) string {
 	return revision
 }
 
-func Get_edit_length_diff(A string, B string) string {
-	A_len := Get_len(A)
-	B_len := Get_len(B)
+func Get_edit_length_diff(a string, b string) string {
+	a_len := Get_len(a)
+	b_len := Get_len(b)
 
-	if A_len > B_len {
-		diff_len := A_len - B_len
+	if a_len > b_len {
+		diff_len := a_len - b_len
 		diff_len_str := strconv.Itoa(diff_len)
 
 		return "-" + diff_len_str
-	} else if B_len > A_len {
-		diff_len := B_len - A_len
+	} else if b_len > a_len {
+		diff_len := b_len - a_len
 		diff_len_str := strconv.Itoa(diff_len)
 
 		return "+" + diff_len_str

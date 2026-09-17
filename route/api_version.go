@@ -10,7 +10,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func get_version_branch(db *sql.DB) string {
+func Get_version_branch(db *sql.DB) string {
 	branch := ""
 	tool.QueryRow_DB(db, `select data from other where name = "update"`, []any{&branch})
 	if branch != "stable" && branch != "beta" {
@@ -19,7 +19,7 @@ func get_version_branch(db *sql.DB) string {
 	return branch
 }
 
-func get_remote_version(branch string) string {
+func Get_remote_version(branch string) string {
 	if branch != "stable" && branch != "beta" {
 		return ""
 	}
@@ -55,7 +55,7 @@ func Api_version(config tool.Config) map[string]any {
 	defer tool.DB_close(db)
 
 	version_list := tool.Get_last_version()
-	up_data := get_version_branch(db)
+	up_data := Get_version_branch(db)
 
 	return_data := make(map[string]any)
 	return_data["version"] = version_list["r_ver"]

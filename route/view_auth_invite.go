@@ -36,11 +36,11 @@ func View_auth_invite(config tool.Config, values url.Values) string {
 		return tool.Get_language(db, name, true)
 	}
 
-	data := `<p>` + lang("invite_help") + `</p>` + main_hr()
+	data := `<p>` + lang("invite_help") + `</p>` + Main_hr()
 	if token != "" {
-		data += `<p>` + lang("invite_created") + `</p><code>` + tool.HTML_escape(token) + `</code>` + main_hr()
+		data += `<p>` + lang("invite_created") + `</p><code>` + tool.HTML_escape(token) + `</code>` + Main_hr()
 	}
-	data += `<form method="post"><button name="make" value="1" type="submit">` + lang("invite_make") + `</button></form>` + main_hr()
+	data += `<form method="post"><button name="make" value="1" type="submit">` + lang("invite_make") + `</button></form>` + Main_hr()
 
 	for _, record := range tool.Get_invite_list(db) {
 		data += `<div class="opennamu_list_1">`
@@ -50,7 +50,7 @@ func View_auth_invite(config tool.Config, values url.Values) string {
 		if !tool.Invite_valid(db, record.Hash) {
 			data += ` (` + lang("invite_expired") + `)`
 		}
-		data += `<form method="post"><input type="hidden" name="revoke" value="` + tool.HTML_escape(record.Hash) + `"><button type="submit">` + lang("invite_revoke") + `</button></form></div>` + main_hr()
+		data += `<form method="post"><input type="hidden" name="revoke" value="` + tool.HTML_escape(record.Hash) + `"><button type="submit">` + lang("invite_revoke") + `</button></form></div>` + Main_hr()
 	}
 
 	return tool.Get_template(

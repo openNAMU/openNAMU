@@ -11,5 +11,5 @@ func Api_file_upload_post_secure(config tool.Config, file_name string, file_data
 	if err != nil || len(decoded) == 0 {
 		return map[string]any{"response": "error", "data": "invalid data"}
 	}
-	return api_file_upload_post(config, file_name, []byte(decoded), file_ext, license, license_text, captcha, true, false, false)
+	return Api_file_upload_post_internal(config, file_name, []byte(decoded), file_ext, license, license_text, captcha, true, false, false)
 }

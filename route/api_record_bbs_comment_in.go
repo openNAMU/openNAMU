@@ -32,8 +32,8 @@ func Api_record_bbs_comment_in(config tool.Config, user_name string, bbs_id stri
 			panic(err)
 		}
 
-		post_set_id, post_set_code, _, exists := bbs_comment_storage_location(set_id, set_code)
-		if exists && !bbs_post_blind_allowed(db, post_set_id, post_set_code, config.IP, nil) {
+		post_set_id, post_set_code, _, exists := Bbs_comment_storage_location(set_id, set_code)
+		if exists && !Bbs_post_blind_allowed(db, post_set_id, post_set_code, config.IP, nil) {
 			continue
 		}
 

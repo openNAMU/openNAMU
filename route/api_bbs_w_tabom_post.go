@@ -6,7 +6,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func change_bbs_tabom_count(tx *sql.Tx, set_name string, set_id string, set_code string, amount int) {
+func Change_bbs_tabom_count(tx *sql.Tx, set_name string, set_id string, set_code string, amount int) {
 	result, err := tx.Exec(
 		tool.DB_change("update bbs_data set set_data = case when set_data + ? < 0 then 0 else set_data + ? end where set_name = ? and set_id = ? and set_code = ?"),
 		amount,
@@ -35,7 +35,7 @@ func change_bbs_tabom_count(tx *sql.Tx, set_name string, set_id string, set_code
 	}
 }
 
-func bbs_tabom_user_exists(db tool.DB_runner, set_name string, user string, set_id string, set_code string) bool {
+func Bbs_tabom_user_exists(db tool.DB_runner, set_name string, user string, set_id string, set_code string) bool {
 	data := ""
 	return tool.QueryRow_DB(
 		db,
@@ -54,7 +54,7 @@ func Api_bbs_w_tabom_post(config tool.Config, set_id string, set_code string, vo
 
 	return_data := make(map[string]any)
 
-	if _, allowed := bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
+	if _, allowed := Bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
 		return_data["response"] = "require auth"
 		return return_data
 	}
@@ -66,7 +66,7 @@ func Api_bbs_w_tabom_post(config tool.Config, set_id string, set_code string, vo
 
 	var result map[string]any
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-		result = api_bbs_tabom_post(tx, config.IP, set_id, set_code, vote_type)
+		result = Api_bbs_tabom_post(tx, config.IP, set_id, set_code, vote_type)
 		return nil
 	}); err != nil {
 		panic(err)

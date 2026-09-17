@@ -10,7 +10,7 @@ import (
 func View_user_setting(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	language_list := user_language_list(db)
+	language_list := User_language_list(db)
 	skin_options := func(current string) string {
 		if current == "" {
 			current = "default"
@@ -21,7 +21,7 @@ func View_user_setting(config tool.Config, values url.Values) string {
 		}
 		options := ""
 		for _, skin := range skin_list {
-			options += user_option(user_choice{skin, skin}, current)
+			options += User_option(user_choice{skin, skin}, current)
 		}
 		return options
 	}
@@ -31,7 +31,7 @@ func View_user_setting(config tool.Config, values url.Values) string {
 		}
 		options := ""
 		for _, language := range language_list {
-			options += user_option(language, current)
+			options += User_option(language, current)
 		}
 		return options
 	}
@@ -62,7 +62,7 @@ func View_user_setting(config tool.Config, values url.Values) string {
 		body += `<span>` + tool.Get_language(db, "skin", true) + `</span><hr class="main_hr"><select name="skin">` + skin_options(current_skin) + `</select><hr class="main_hr">`
 		body += `<a href="/change/skin_set">(` + tool.Get_language(db, "skin_set", true) + `)</a> <a href="/change/skin_set/main">(` + tool.Get_language(db, "main_skin_set", true) + `)</a><hr class="main_hr">`
 		body += `<span>` + tool.Get_language(db, "language", true) + `</span><hr class="main_hr"><select name="lang">` + language_options(current_language) + `</select><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button>` + tool.Get_http_warning(db) + `</form>`
-		return user_form_page(db, config, tool.Get_language(db, "user_setting", true), body)
+		return User_form_page(db, config, tool.Get_language(db, "user_setting", true), body)
 	}
 
 	if values != nil {
@@ -80,52 +80,52 @@ func View_user_setting(config tool.Config, values url.Values) string {
 		}
 		return tool.Get_redirect("/change")
 	}
-	current_online_status := user_value(db, config.IP, "online_status")
+	current_online_status := User_value(db, config.IP, "online_status")
 	if current_online_status != "on" {
 		current_online_status = ""
 	}
 
-	current_skin := user_value(db, config.IP, "skin")
-	current_language := user_value(db, config.IP, "lang")
-	current_title := user_value(db, config.IP, "user_title")
-	profile_image := user_value(db, config.IP, "profile_image")
-	user_name := user_value(db, config.IP, "user_name")
+	current_skin := User_value(db, config.IP, "skin")
+	current_language := User_value(db, config.IP, "lang")
+	current_title := User_value(db, config.IP, "user_title")
+	profile_image := User_value(db, config.IP, "profile_image")
+	user_name := User_value(db, config.IP, "user_name")
 	if user_name == "" {
 		user_name = config.IP
 	}
-	email := user_value(db, config.IP, "email")
+	email := User_value(db, config.IP, "email")
 	if email == "" {
 		email = "-"
 	}
-	random_key := user_value(db, config.IP, "random_key")
+	random_key := User_value(db, config.IP, "random_key")
 	if random_key == "" {
 		random_key = "-"
 	}
-	twofa := user_value(db, config.IP, "2fa")
+	twofa := User_value(db, config.IP, "2fa")
 	twofa_password := "2fa_password"
-	if user_value(db, config.IP, "2fa_pw") != "" {
+	if User_value(db, config.IP, "2fa_pw") != "" {
 		twofa_password = "2fa_password_change"
 	}
-	online_status_options := user_option(user_choice{"", tool.Get_language(db, "online_status_private", true)}, current_online_status)
-	online_status_options += user_option(user_choice{"on", tool.Get_language(db, "online_status_public", true)}, current_online_status)
+	online_status_options := User_option(user_choice{"", tool.Get_language(db, "online_status_private", true)}, current_online_status)
+	online_status_options += User_option(user_choice{"on", tool.Get_language(db, "online_status_public", true)}, current_online_status)
 
 	title_options := ""
-	for _, choice := range user_title_list(db, config.IP) {
-		title_options += user_option(choice, current_title)
+	for _, choice := range User_title_list(db, config.IP) {
+		title_options += User_option(choice, current_title)
 	}
-	twofa_options := user_option(user_choice{"", tool.Get_language(db, "off", true)}, twofa)
-	twofa_options += user_option(user_choice{"on", tool.Get_language(db, "password", true)}, twofa)
-	twofa_options += user_option(user_choice{"email", tool.Get_language(db, "email", true)}, twofa)
+	twofa_options := User_option(user_choice{"", tool.Get_language(db, "off", true)}, twofa)
+	twofa_options += User_option(user_choice{"on", tool.Get_language(db, "password", true)}, twofa)
+	twofa_options += User_option(user_choice{"email", tool.Get_language(db, "email", true)}, twofa)
 	body := `<form method="post"><div id="opennamu_get_user_info">` + tool.HTML_escape(config.IP) + `</div><hr class="main_hr">`
 	body += `<a href="/change/pw">(` + tool.Get_language(db, "password_change", true) + `)</a><hr class="main_hr">`
 	body += `<span>` + tool.Get_language(db, "email", true) + ` : ` + tool.HTML_escape(email) + `</span> <a href="/change/email">(` + tool.Get_language(db, "email_change", true) + `)</a> <a href="/change/email/delete">(` + tool.Get_language(db, "email_delete", true) + `)</a><hr class="main_hr">`
 	body += `<span>` + tool.Get_language(db, "password_instead_key", true) + ` : ` + tool.HTML_escape(random_key) + `</span> <a href="/change/key">(` + tool.Get_language(db, "key_change", true) + `)</a> <a href="/change/key/delete">(` + tool.Get_language(db, "key_delete", true) + `)</a><h2>` + tool.Get_language(db, "main", true) + `</h2>`
 	body += `<a href="/change/head">(` + tool.Get_language(db, "user_head", false) + `)</a> <a href="/change/top_menu">(` + tool.Get_language(db, "user_added_menu", true) + `)</a><hr class="main_hr"><span>` + tool.Get_language(db, "skin", true) + `</span><hr class="main_hr"><select name="skin">` + skin_options(current_skin) + `</select><hr class="main_hr">`
 	body += `<a href="/change/skin_set">(` + tool.Get_language(db, "skin_set", true) + `)</a> <a href="/change/skin_set/main">(` + tool.Get_language(db, "main_skin_set", true) + `)</a><hr class="main_hr"><span>` + tool.Get_language(db, "language", true) + `</span><hr class="main_hr"><select name="lang">` + language_options(current_language) + `</select><hr class="main_hr"><span>` + tool.Get_language(db, "user_title", true) + `</span><hr class="main_hr"><select name="user_title">` + title_options + `</select><h2>` + tool.Get_language(db, "2fa", true) + `</h2><select name="2fa">` + twofa_options + `</select><hr class="main_hr"><input type="password" name="2fa_pw" placeholder="` + tool.Get_language(db, twofa_password, true) + `"><h2>` + tool.Get_language(db, "main_user_name", true) + `</h2><a href="/change/user_name">(` + tool.Get_language(db, "change_user_name", true) + `)</a><hr class="main_hr">`
-	body += `<h2>` + tool.Get_language(db, "profile_image", true) + `</h2><input name="profile_image" value="` + tool.HTML_escape(profile_image) + `" placeholder="file_name.png"><br>` + tool.Get_language(db, "profile_image_help", true) + `<hr class="main_hr">`
+	body += `<h2>` + tool.Get_language(db, "profile_image", true) + `</h2><input name="profile_image" value="` + tool.HTML_escape(profile_image) + `" placeholder="file_name.png"><div>` + tool.Get_language(db, "profile_image_help", true) + `</div><hr class="main_hr">`
 	body += `<span>` + tool.Get_language(db, "online_status", true) + `</span><hr class="main_hr"><select name="online_status">` + online_status_options + `</select><hr class="main_hr">`
-	body += tool.Get_language(db, "user_name", true) + ` : ` + tool.HTML_escape(user_name) + `<h2>` + tool.Get_language(db, "sub_user_name", true) + `</h2><input name="sub_user_name" value="` + tool.HTML_escape(user_value(db, config.IP, "sub_user_name")) + `" placeholder="` + tool.Get_language(db, "sub_user_name", true) + `"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button>` + tool.Get_http_warning(db) + `</form>`
-	return user_form_page(db, config, tool.Get_language(db, "user_setting", true), body)
+	body += tool.Get_language(db, "user_name", true) + ` : ` + tool.HTML_escape(user_name) + `<h2>` + tool.Get_language(db, "sub_user_name", true) + `</h2><input name="sub_user_name" value="` + tool.HTML_escape(User_value(db, config.IP, "sub_user_name")) + `" placeholder="` + tool.Get_language(db, "sub_user_name", true) + `"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button>` + tool.Get_http_warning(db) + `</form>`
+	return User_form_page(db, config, tool.Get_language(db, "user_setting", true), body)
 }
 
 type user_choice struct {
@@ -133,7 +133,7 @@ type user_choice struct {
 	label string
 }
 
-func user_title_list(db *sql.DB, user_name string) []user_choice {
+func User_title_list(db *sql.DB, user_name string) []user_choice {
 	choice_list := []user_choice{{"", tool.Get_language(db, "default", true)}, {"🌳", "🌳 newbie"}}
 	challenge_list := []struct {
 		name  string
@@ -150,11 +150,11 @@ func user_title_list(db *sql.DB, user_name string) []user_choice {
 		{"challenge_thousandth_discussion", "📜", "📜 thousandth_discussion"},
 	}
 	for _, challenge := range challenge_list {
-		if user_value(db, user_name, challenge.name) != "" {
+		if User_value(db, user_name, challenge.name) != "" {
 			choice_list = append(choice_list, user_choice{challenge.value, challenge.label})
 		}
 	}
-	if user_value(db, user_name, "challenge_admin") != "" {
+	if User_value(db, user_name, "challenge_admin") != "" {
 		choice_list = append(choice_list, user_choice{"☑️", "☑️ before_admin"})
 	}
 	if tool.Check_permission(db, "treat_as_admin", user_name) {
@@ -166,7 +166,7 @@ func user_title_list(db *sql.DB, user_name string) []user_choice {
 	return choice_list
 }
 
-func user_language_list(db *sql.DB) []user_choice {
+func User_language_list(db *sql.DB) []user_choice {
 	choice_list := []user_choice{{"default", tool.Get_language(db, "default", true)}}
 	set_list := tool.Get_init_set_list("language")
 	if language_set, ok := set_list["language"]; ok {
@@ -179,7 +179,7 @@ func user_language_list(db *sql.DB) []user_choice {
 	return choice_list
 }
 
-func user_option(choice user_choice, current string) string {
+func User_option(choice user_choice, current string) string {
 	selected := ""
 	if choice.value == current {
 		selected = ` selected="selected"`

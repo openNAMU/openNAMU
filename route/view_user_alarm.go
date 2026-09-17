@@ -2,11 +2,11 @@ package route
 
 import "database/sql"
 
-func challenge_is_complete(db *sql.DB, id string, name string) bool {
-	return user_value(db, id, name) != ""
+func Challenge_is_complete(db *sql.DB, id string, name string) bool {
+	return User_value(db, id, name) != ""
 }
 
-func challenge_design(image string, title string, info string, complete bool) string {
+func Challenge_design(image string, title string, info string, complete bool) string {
 	border := "red"
 	if complete {
 		border = "green"

@@ -9,11 +9,11 @@ func Api_bbs_w_comment(config tool.Config, do_type string, sub_code string) map[
 	if do_type == "" || do_type == "normal" {
 		do_type = "around"
 	}
-	set_id, set_code, exists := bbs_post_location(db, sub_code)
+	set_id, set_code, exists := Bbs_post_location(db, sub_code)
 	if !exists {
 		return map[string]any{"response": "not exist", "data": []map[string]string{}}
 	}
-	if _, allowed := bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
+	if _, allowed := Bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
 		if do_type == "length" {
 			return map[string]any{"response": "require auth", "comment": "0", "reply": "0", "data": 0}
 		}

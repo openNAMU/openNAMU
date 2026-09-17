@@ -13,7 +13,7 @@ func Api_thread_change_post(config tool.Config, topic_num string, new_title stri
 	if !tool.Check_permission(db, "bbs_post_manage", config.IP) {
 		return map[string]any{"response": "require auth"}
 	}
-	if !thread_bbs_root_exists(db, topic_num) {
+	if !Thread_bbs_root_exists(db, topic_num) {
 		return map[string]any{"response": "not exist", "data": "thread"}
 	}
 

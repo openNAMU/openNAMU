@@ -16,7 +16,7 @@ func View_register_submit(config tool.Config, values url.Values) string {
 	if id == "" || pw == "" {
 		return tool.Get_redirect("/register")
 	}
-	question := user_other(db, "approval_question")
+	question := User_other(db, "approval_question")
 	if question == "" {
 		for _, name := range []string{"submit_id", "submit_pw", "submit_email"} {
 			config.Session.Delete(name)
@@ -36,8 +36,8 @@ func View_register_submit(config tool.Config, values url.Values) string {
 			config.Session.Delete(name)
 		}
 		_ = config.Session.Save()
-		return user_form_page(db, config, "register submit", "<p>submitted</p><a href='/user'>return</a>")
+		return User_form_page(db, config, "register submit", "<p>submitted</p><a href='/user'>return</a>")
 	}
 	body := "<form method='post'><p>" + tool.HTML_escape(question) + "</p><input name='answer'><button type='submit'>send</button></form>"
-	return user_form_page(db, config, "register submit", body)
+	return User_form_page(db, config, "register submit", body)
 }

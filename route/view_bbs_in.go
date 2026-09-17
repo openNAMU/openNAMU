@@ -8,14 +8,14 @@ import (
 )
 
 func View_bbs_in(config tool.Config, set_id string, page_num string, sort_type string) string {
-	return view_bbs_in(config, set_id, page_num, sort_type, bbs_filter{}, "", false)
+	return View_bbs_in_internal(config, set_id, page_num, sort_type, bbs_filter{}, "", false)
 }
 
 func View_bbs_in_filter(config tool.Config, set_id string, filter_data string) string {
-	page_num, filter_data := bbs_filter_path_data(filter_data)
-	filter := bbs_filter_parse(filter_data)
-	filter_path := bbs_filter_path(filter)
-	return view_bbs_in(config, set_id, page_num, "", filter, filter_path, true)
+	page_num, filter_data := Bbs_filter_path_data(filter_data)
+	filter := Bbs_filter_parse(filter_data)
+	filter_path := Bbs_filter_path(filter)
+	return View_bbs_in_internal(config, set_id, page_num, "", filter, filter_path, true)
 }
 
 func View_bbs_in_filter_post(set_id string, comment_min string, commented string, comment_user string, tabom_min string, mine string, participate string, tabom_user string, author string, prefix string, tag string) string {
@@ -26,10 +26,10 @@ func View_bbs_in_filter_post(set_id string, comment_min string, commented string
 		commented_state = 2
 	}
 	filter := bbs_filter{
-		comment_min:  bbs_filter_number(comment_min),
+		comment_min:  Bbs_filter_number(comment_min),
 		commented:    commented_state,
 		comment_user: strings.TrimSpace(comment_user),
-		tabom_min:    bbs_filter_number(tabom_min),
+		tabom_min:    Bbs_filter_number(tabom_min),
 		mine:         mine == "1",
 		participate:  participate == "1",
 		tabom_user:   tabom_user == "1",
@@ -37,7 +37,7 @@ func View_bbs_in_filter_post(set_id string, comment_min string, commented string
 		prefix:       strings.TrimSpace(prefix),
 		tag:          strings.TrimSpace(tag),
 	}
-	filter_path := bbs_filter_path(filter)
+	filter_path := Bbs_filter_path(filter)
 	target := "/bbs/in/" + tool.Url_parser(set_id) + "/filter/"
 	if filter_path != "" {
 		target += filter_path + "/"
@@ -47,7 +47,7 @@ func View_bbs_in_filter_post(set_id string, comment_min string, commented string
 	return tool.Get_redirect(target)
 }
 
-func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type string, filter bbs_filter, filter_path string, show_filter bool) string {
+func View_bbs_in_internal(config tool.Config, set_id string, page_num string, sort_type string, filter bbs_filter, filter_path string, show_filter bool) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -62,7 +62,7 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 
 	var data_api map[string]any
 	if show_filter {
-		data_api = api_bbs(config, set_id, page_num, sort_type, filter)
+		data_api = Api_bbs_internal(config, set_id, page_num, sort_type, filter)
 	} else {
 		data_api = Api_bbs(config, set_id, page_num, sort_type)
 	}
@@ -95,7 +95,7 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
 		}
 		commented_html += `</select></label>`
 		prefix_html := `<label>` + tool.Get_language(db, "bbs_prefix", true) + ` <select name="prefix"><option value="">` + tool.Get_language(db, "all", true) + `</option>`
-		for _, prefix := range bbs_prefix_list(db, set_id) {
+		for _, prefix := range Bbs_prefix_list(db, set_id) {
 			selected := ""
 			if prefix == filter.prefix {
 				selected = " selected"
@@ -113,11 +113,12 @@ func view_bbs_in(config tool.Config, set_id string, page_num string, sort_type s
         <div><label>` + tool.Get_language(db, "bbs_comment_author", true) + ` <input name="comment_user" value="` + tool.HTML_escape(filter.comment_user) + `"></label></div><hr class="main_hr">
         <div><label>` + tool.Get_language(db, "bbs_author", true) + ` <input name="author" value="` + tool.HTML_escape(filter.author) + `"></label></div><hr class="main_hr">
         <div>` + prefix_html + `</div><hr class="main_hr">
-        <div><label>` + tool.Get_language(db, "tag", true) + ` <input name="tag" value="` + tool.HTML_escape(filter.tag) + `"></label></div>
-        <div><button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "filter", true) + `</button> <a href="/bbs/in/` + tool.Url_parser(set_id) + `/1">(` + tool.Get_language(db, "reset", true) + `)</a></div>
+        <div><label>` + tool.Get_language(db, "tag", true) + ` <input name="tag" value="` + tool.HTML_escape(filter.tag) + `"></label></div><hr class="main_hr">
+        <div><button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "filter", true) + `</button></div><hr class="main_hr">
+        <div><a href="/bbs/in/` + tool.Url_parser(set_id) + `/1">(` + tool.Get_language(db, "reset", true) + `)</a></div>
     </form><hr class="main_hr">`
 	}
-	data_html += bbs_list_example_ui(db)
+	data_html += Bbs_list_example_ui(db)
 	data_html += Get_bbs_list_ui(db, config, data_api_in, map[string]string{})
 	page_path := "/bbs/in/" + tool.Url_parser(set_id) + "/{}"
 	if show_filter {

@@ -7,7 +7,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func category_manual_name(value string) string {
+func Category_manual_name(value string) string {
 	value = strings.TrimSpace(value)
 	value = strings.TrimPrefix(value, "분류:")
 	value = strings.TrimPrefix(value, "category:")
@@ -22,7 +22,7 @@ func Api_category_manual_post(config tool.Config, action string, category_name s
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	category_name = category_manual_name(category_name)
+	category_name = Category_manual_name(category_name)
 	doc_name = strings.TrimSpace(doc_name)
 	if category_name == "" || doc_name == "" {
 		return_data["response"] = "error"

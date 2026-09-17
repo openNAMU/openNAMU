@@ -16,7 +16,7 @@ func View_category_manual_delete(config tool.Config, category_value string, docu
 		return_name = document_name
 	}
 
-	category_name = category_manual_name(category_name)
+	category_name = Category_manual_name(category_name)
 	if !tool.Check_permission(db, "category_manual", config.IP) || !tool.Check_acl(db, document_name, "", "document_edit", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}

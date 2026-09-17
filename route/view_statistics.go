@@ -54,5 +54,5 @@ func View_statistics(config tool.Config) string {
 	rows.Close()
 
 	body.WriteString("</ul>")
-	return list_extra_page(db, config, get_language("statistics"), body.String())
+	return List_extra_page(db, config, get_language("statistics"), body.String())
 }

@@ -16,7 +16,7 @@ import (
 	"opennamu/route/tool/markup"
 )
 
-func emergency_print_menu() {
+func Emergency_print_menu() {
 	fmt.Println("1. Backlink reset")
 	fmt.Println("2. CAPTCHA delete")
 	fmt.Println("3. Ban delete")
@@ -46,13 +46,13 @@ func emergency_print_menu() {
 	fmt.Println("29. Migrate topics to BBS")
 }
 
-func emergency_input(reader *bufio.Reader, message string) string {
+func Emergency_input(reader *bufio.Reader, message string) string {
 	fmt.Print(message)
 	data, _ := reader.ReadString('\n')
 	return strings.TrimSpace(data)
 }
 
-func emergency_open_db() (db *sql.DB, err error) {
+func Emergency_open_db() (db *sql.DB, err error) {
 	defer func() {
 		if value := recover(); value != nil {
 			err = fmt.Errorf("database open failed: %v", value)
@@ -69,15 +69,15 @@ func emergency_open_db() (db *sql.DB, err error) {
 	return db, nil
 }
 
-func emergency_exec(db *sql.DB, query string, values ...any) error {
+func Emergency_exec(db *sql.DB, query string, values ...any) error {
 	return tool.DB_transaction(db, func(tx *sql.Tx) error {
 		_, err := tx.Exec(tool.DB_change(query), values...)
 		return err
 	})
 }
 
-func emergency_set_other(db *sql.DB, name string, data string) error {
-	if err := emergency_exec(db, "update other set data = ? where name = ?", data, name); err != nil {
+func Emergency_set_other(db *sql.DB, name string, data string) error {
+	if err := Emergency_exec(db, "update other set data = ? where name = ?", data, name); err != nil {
 		return err
 	}
 
@@ -93,7 +93,7 @@ func emergency_set_other(db *sql.DB, name string, data string) error {
 		return err
 	}
 
-	return emergency_exec(
+	return Emergency_exec(
 		db,
 		"insert into other (name, data, coverage) values (?, ?, '')",
 		name,
@@ -101,7 +101,7 @@ func emergency_set_other(db *sql.DB, name string, data string) error {
 	)
 }
 
-func emergency_delete_file(path string) error {
+func Emergency_delete_file(path string) error {
 	err := os.Remove(path)
 	if errors.Is(err, os.ErrNotExist) {
 		return nil
@@ -109,11 +109,11 @@ func emergency_delete_file(path string) error {
 	return err
 }
 
-func emergency_reset_backlink(db *sql.DB) error {
-	if err := emergency_exec(db, "delete from back where type != 'cat_manual'"); err != nil {
+func Emergency_reset_backlink(db *sql.DB) error {
+	if err := Emergency_exec(db, "delete from back where type != 'cat_manual'"); err != nil {
 		return err
 	}
-	if err := emergency_exec(db, "delete from data_set where set_name = 'link_count'"); err != nil {
+	if err := Emergency_exec(db, "delete from data_set where set_name = 'link_count'"); err != nil {
 		return err
 	}
 
@@ -142,7 +142,7 @@ func emergency_reset_backlink(db *sql.DB) error {
 
 	error_count := 0
 	for index, document := range documents {
-		if err := emergency_render_backlink(db, document[0], document[1]); err != nil {
+		if err := Emergency_render_backlink(db, document[0], document[1]); err != nil {
 			error_count++
 			fmt.Println("backlink error:", document[0], err)
 		}
@@ -160,7 +160,7 @@ func emergency_reset_backlink(db *sql.DB) error {
 	return nil
 }
 
-func emergency_render_backlink(db *sql.DB, title string, data string) (err error) {
+func Emergency_render_backlink(db *sql.DB, title string, data string) (err error) {
 	defer func() {
 		if value := recover(); value != nil {
 			err = fmt.Errorf("%v", value)
@@ -171,7 +171,7 @@ func emergency_render_backlink(db *sql.DB, title string, data string) (err error
 	return nil
 }
 
-func emergency_recalc_data_set(db *sql.DB) error {
+func Emergency_recalc_data_set(db *sql.DB) error {
 	rows, err := db.Query(
 		tool.DB_change("select distinct doc_name from data_set where doc_rev = 'not_exist' or doc_rev = ''"),
 	)
@@ -208,7 +208,7 @@ func emergency_recalc_data_set(db *sql.DB) error {
 			exists = ""
 		}
 
-		if err := emergency_exec(
+		if err := Emergency_exec(
 			db,
 			"update data_set set doc_rev = ? where doc_name = ? and (doc_rev = '' or doc_rev = 'not_exist')",
 			exists,
@@ -222,7 +222,7 @@ func emergency_recalc_data_set(db *sql.DB) error {
 	return nil
 }
 
-func emergency_init_auth_groups(db *sql.DB) error {
+func Emergency_init_auth_groups(db *sql.DB) error {
 	auth_data := [][]string{
 		{"owner", "owner"},
 		{"admin", "admin"},
@@ -259,7 +259,7 @@ func emergency_init_auth_groups(db *sql.DB) error {
 			return err
 		}
 
-		if err := emergency_exec(db, "insert into alist (name, acl) values (?, ?)", data[0], data[1]); err != nil {
+		if err := Emergency_exec(db, "insert into alist (name, acl) values (?, ?)", data[0], data[1]); err != nil {
 			return err
 		}
 		insert_count++
@@ -269,17 +269,17 @@ func emergency_init_auth_groups(db *sql.DB) error {
 	return nil
 }
 
-func emergency_update_binary(branch string) error {
+func Emergency_update_binary(branch string) error {
 	if branch != "stable" && branch != "beta" {
 		return fmt.Errorf("unsupported update branch: %s", branch)
 	}
 
-	executable, err := current_server_executable()
+	executable, err := Current_server_executable()
 	if err != nil {
 		return err
 	}
 
-	binary_url, err := get_server_update_url(branch)
+	binary_url, err := Get_server_update_url(branch)
 	if err != nil {
 		return err
 	}
@@ -294,14 +294,14 @@ func emergency_update_binary(branch string) error {
 		return err
 	}
 
-	if err := download_server_update(binary_url, temporary_path); err != nil {
+	if err := Download_server_update(binary_url, temporary_path); err != nil {
 		os.Remove(temporary_path)
 		return err
 	}
 
 	if runtime.GOOS == "windows" {
 		command := exec.Command(executable, server_update_mode, executable, temporary_path)
-		detach_server_process(command)
+		Detach_server_process(command)
 		command.Stdout = os.Stdout
 		command.Stderr = os.Stderr
 		if err := command.Start(); err != nil {
@@ -327,15 +327,15 @@ func Run_emergency_tool(arguments []string) int {
 	if len(arguments) > 0 {
 		choice = arguments[0]
 	} else {
-		emergency_print_menu()
-		choice = emergency_input(reader, "Insert selection number (EX : 9) : ")
+		Emergency_print_menu()
+		choice = Emergency_input(reader, "Insert selection number (EX : 9) : ")
 	}
 	if choice == "topic_to_bbs" {
 		choice = "29"
 	}
 
 	if choice == "9" {
-		if err := emergency_delete_file(filepath.Join("data", "set.json")); err != nil {
+		if err := Emergency_delete_file(filepath.Join("data", "set.json")); err != nil {
 			fmt.Fprintln(os.Stderr, "Emergency tool failed:", err)
 			return 1
 		}
@@ -343,7 +343,7 @@ func Run_emergency_tool(arguments []string) int {
 		return 0
 	}
 	if choice == "11" {
-		if err := emergency_delete_file(filepath.Join("data", "mysql.json")); err != nil {
+		if err := Emergency_delete_file(filepath.Join("data", "mysql.json")); err != nil {
 			fmt.Fprintln(os.Stderr, "Emergency tool failed:", err)
 			return 1
 		}
@@ -351,11 +351,11 @@ func Run_emergency_tool(arguments []string) int {
 		return 0
 	}
 	if choice == "19" {
-		branch := emergency_input(reader, "Branch (stable/beta) : ")
+		branch := Emergency_input(reader, "Branch (stable/beta) : ")
 		if branch == "" {
 			branch = "stable"
 		}
-		if err := emergency_update_binary(branch); err != nil {
+		if err := Emergency_update_binary(branch); err != nil {
 			fmt.Fprintln(os.Stderr, "Emergency tool failed:", err)
 			return 1
 		}
@@ -366,7 +366,7 @@ func Run_emergency_tool(arguments []string) int {
 		return 1
 	}
 
-	db, err := emergency_open_db()
+	db, err := Emergency_open_db()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Emergency tool failed:", err)
 		return 1
@@ -375,72 +375,72 @@ func Run_emergency_tool(arguments []string) int {
 
 	switch choice {
 	case "1":
-		err = emergency_reset_backlink(db)
+		err = Emergency_reset_backlink(db)
 	case "2":
-		err = emergency_exec(db, "delete from other where name = 'recaptcha'")
+		err = Emergency_exec(db, "delete from other where name = 'recaptcha'")
 		if err == nil {
-			err = emergency_exec(db, "delete from other where name = 'sec_re'")
+			err = Emergency_exec(db, "delete from other where name = 'sec_re'")
 		}
 		if err == nil {
-			err = emergency_exec(db, "delete from other where name = 'altcha_sec_re'")
+			err = Emergency_exec(db, "delete from other where name = 'altcha_sec_re'")
 		}
 		if err == nil {
-			err = emergency_exec(db, "delete from other where name = 'recaptcha_ver'")
+			err = Emergency_exec(db, "delete from other where name = 'recaptcha_ver'")
 		}
 	case "3":
-		user_data := emergency_input(reader, "IP or Name : ")
-		err = emergency_exec(
+		user_data := Emergency_input(reader, "IP or Name : ")
+		err = Emergency_exec(
 			db,
 			"insert into rb (block, end, today, blocker, why, band, ongoing, login) values (?, 'release', ?, 'tool:emergency', '', '', '', '')",
 			user_data,
 			tool.Get_time(),
 		)
 		if err == nil {
-			err = emergency_exec(db, "update rb set ongoing = '' where block = ?", user_data)
+			err = Emergency_exec(db, "update rb set ongoing = '' where block = ?", user_data)
 		}
 		if err == nil {
-			err = emergency_exec(db, "delete from user_set where id = ? and name = 'acl'", user_data)
+			err = Emergency_exec(db, "delete from user_set where id = ? and name = 'acl'", user_data)
 		}
 		if err == nil {
-			err = emergency_exec(db, "delete from user_set where id = ? and name = 'acl_end'", user_data)
+			err = Emergency_exec(db, "delete from user_set where id = ? and name = 'acl_end'", user_data)
 		}
 	case "4":
-		err = emergency_set_other(db, "host", emergency_input(reader, "Host : "))
+		err = Emergency_set_other(db, "host", Emergency_input(reader, "Host : "))
 	case "5":
-		port := emergency_input(reader, "Port : ")
+		port := Emergency_input(reader, "Port : ")
 		port_num, port_err := strconv.Atoi(port)
 		if port_err != nil || port_num < 1 || port_num > 65535 {
 			err = fmt.Errorf("invalid port: %s", port)
 		} else {
-			err = emergency_set_other(db, "port", port)
+			err = Emergency_set_other(db, "port", port)
 		}
 	case "6":
-		err = emergency_set_other(db, "skin", emergency_input(reader, "Skin name : "))
+		err = Emergency_set_other(db, "skin", Emergency_input(reader, "Skin name : "))
 	case "7":
-		user_name := emergency_input(reader, "User name : ")
-		user_password := emergency_input(reader, "User password : ")
+		user_name := Emergency_input(reader, "User name : ")
+		user_password := Emergency_input(reader, "User password : ")
 		password_encode := tool.Get_user_encode(db, user_name)
 		password := tool.Password_encode(db, user_password, password_encode)
-		err = emergency_exec(
+		err = Emergency_exec(
 			db,
 			"update user_set set data = ? where id = ? and name = 'pw'",
 			password,
 			user_name,
 		)
 	case "8":
-		version := emergency_input(reader, "Insert version (0000000) : ")
+		version := Emergency_input(reader, "Insert version (0000000) : ")
 		if version == "" {
 			version = "0000000"
 		}
-		err = emergency_set_other(db, "ver", version)
+		err = Emergency_set_other(db, "ver", version)
 	case "10":
-		user_name := emergency_input(reader, "User name : ")
-		new_name := emergency_input(reader, "New name : ")
-		err = emergency_exec(db, "update user_set set id = ? where id = ?", new_name, user_name)
+		user_name := Emergency_input(reader, "User name : ")
+		new_name := Emergency_input(reader, "New name : ")
+		err = Emergency_exec(db, "update user_set set id = ? where id = ?", new_name, user_name)
 	case "14":
-		err = emergency_exec(db, "delete from other where name = 'head'")
+		err = Emergency_exec(db, "delete from other where name = 'head'")
 	case "15":
-		user_name := emergency_input(reader, "User name : ")
+		user_name := Emergency_input(reader, "User name : ")
 		var user_exists string
 		err = db.QueryRow(
 			tool.DB_change("select id from user_set where id = ? limit 1"),
@@ -450,7 +450,7 @@ func Run_emergency_tool(arguments []string) int {
 			err = fmt.Errorf("user not found: %s", user_name)
 		}
 		if err == nil {
-			err = emergency_exec(db, "update user_set set data = 'owner' where id = ? and name = 'acl'", user_name)
+			err = Emergency_exec(db, "update user_set set data = 'owner' where id = ? and name = 'acl'", user_name)
 		}
 		if err == nil {
 			var acl_exists int
@@ -459,52 +459,52 @@ func Run_emergency_tool(arguments []string) int {
 				user_name,
 			).Scan(&acl_exists)
 			if errors.Is(acl_err, sql.ErrNoRows) {
-				err = emergency_exec(db, "insert into user_set (name, id, data) values ('acl', ?, 'owner')", user_name)
+				err = Emergency_exec(db, "insert into user_set (name, id, data) values ('acl', ?, 'owner')", user_name)
 			} else {
 				err = acl_err
 			}
 		}
 	case "16":
-		user_name := emergency_input(reader, "User name : ")
-		err = emergency_exec(db, "update user_set set data = '' where name = '2fa' and id = ?", user_name)
+		user_name := Emergency_input(reader, "User name : ")
+		err = Emergency_exec(db, "update user_set set data = '' where name = '2fa' and id = ?", user_name)
 	case "17":
-		err = emergency_set_other(db, "markup", emergency_input(reader, "Markup name : "))
+		err = Emergency_set_other(db, "markup", Emergency_input(reader, "Markup name : "))
 	case "18":
-		err = emergency_set_other(db, "wiki_access_password", emergency_input(reader, "Password : "))
+		err = Emergency_set_other(db, "wiki_access_password", Emergency_input(reader, "Password : "))
 	case "20":
-		err = emergency_set_other(db, "domain", emergency_input(reader, "Domain (EX : 2du.pythonanywhere.com) : "))
+		err = Emergency_set_other(db, "domain", Emergency_input(reader, "Domain (EX : 2du.pythonanywhere.com) : "))
 	case "21":
-		tls_value := emergency_input(reader, "TLS (http) [http, https] : ")
+		tls_value := Emergency_input(reader, "TLS (http) [http, https] : ")
 		if tls_value != "https" {
 			tls_value = "http"
 		}
-		err = emergency_set_other(db, "http_select", tls_value)
+		err = Emergency_set_other(db, "http_select", tls_value)
 	case "22":
-		err = emergency_exec(db, "delete from other where name = 'body' or name = 'body_markup'")
+		err = Emergency_exec(db, "delete from other where name = 'body' or name = 'body_markup'")
 	case "23":
-		err = emergency_exec(db, "delete from other where name = 'bottom_body' or name = 'bottom_body_markup'")
+		err = Emergency_exec(db, "delete from other where name = 'bottom_body' or name = 'bottom_body_markup'")
 	case "25":
-		err = emergency_recalc_data_set(db)
+		err = Emergency_recalc_data_set(db)
 	case "26":
-		branch := emergency_input(reader, "Insert branch name (beta) [stable, beta] : ")
+		branch := Emergency_input(reader, "Insert branch name (beta) [stable, beta] : ")
 		if branch != "stable" && branch != "beta" {
 			branch = "beta"
 		}
-		err = emergency_set_other(db, "update", branch)
+		err = Emergency_set_other(db, "update", branch)
 	case "27":
-		port := emergency_input(reader, "Port : ")
+		port := Emergency_input(reader, "Port : ")
 		port_num, port_err := strconv.Atoi(port)
 		if port_err != nil || port_num < 1 || port_num > 65535 {
 			err = fmt.Errorf("invalid port: %s", port)
 		} else {
-			err = emergency_set_other(db, "golang_port", port)
+			err = Emergency_set_other(db, "golang_port", port)
 		}
 	case "28":
-		err = emergency_init_auth_groups(db)
+		err = Emergency_init_auth_groups(db)
 	case "29":
-		err = emergency_migrate_topic_to_bbs(db)
+		err = Emergency_migrate_topic_to_bbs(db)
 		if err == nil {
-			err = emergency_set_other(db, "ver", tool.Get_last_version()["c_ver"])
+			err = Emergency_set_other(db, "ver", tool.Get_last_version()["c_ver"])
 		}
 	default:
 		err = fmt.Errorf("unknown selection: %s", choice)

@@ -12,7 +12,7 @@ func Api_history_send_post(config tool.Config, doc_name string, rev string, send
 		return return_data
 	}
 
-	revision, ok := history_revision_value(rev)
+	revision, ok := History_revision_value(rev)
 	if !ok || doc_name == "" {
 		return_data["response"] = "error"
 		return_data["data"] = "invalid revision"

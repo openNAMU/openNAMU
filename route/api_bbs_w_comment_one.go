@@ -7,10 +7,10 @@ import (
 	"opennamu/route/tool"
 )
 
-func bbs_post_location(db *sql.DB, sub_code string) (string, string, bool) {
+func Bbs_post_location(db *sql.DB, sub_code string) (string, string, bool) {
 	best_id := ""
 	best_code := ""
-	for _, set_id := range bbs_list(db) {
+	for _, set_id := range Bbs_list(db) {
 		prefix := set_id + "-"
 		if !strings.HasPrefix(sub_code, prefix) || len(set_id) <= len(best_id) {
 			continue
@@ -32,11 +32,11 @@ func Api_bbs_w_comment_one(config tool.Config, already_auth_check bool, do_type 
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 	if !already_auth_check {
-		set_id, set_code, exists := bbs_post_location(db, sub_code)
+		set_id, set_code, exists := Bbs_post_location(db, sub_code)
 		if !exists {
 			return map[string]any{"response": "not exist", "data": []map[string]string{}}
 		}
-		if _, allowed := bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
+		if _, allowed := Bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
 			return map[string]any{"response": "require auth", "data": []map[string]string{}}
 		}
 	}

@@ -28,7 +28,7 @@ func Api_setting_external_post(config tool.Config, form map[string]string) map[s
 		}
 	}
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-		setting_save_fields(tx, setting_external_fields(), form)
+		Setting_save_fields(tx, Setting_external_fields(), form)
 		tool.Do_insert_auth_history(tx, config.IP, "edit_set (external)")
 		return nil
 	}); err != nil {

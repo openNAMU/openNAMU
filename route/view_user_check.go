@@ -80,7 +80,7 @@ func View_user_check(config tool.Config, name string, check_type string, page st
 			}
 			return "0"
 		}()
-		user_agent_html := `<br>`
+		user_agent_html := ``
 		if user_agent != "" {
 			user_agent_html = tool.HTML_escape(user_agent)
 			if len(user_agent) > 300 {

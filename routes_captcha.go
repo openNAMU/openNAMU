@@ -15,7 +15,7 @@ var captcha_challenge_last = struct {
 	data map[string]time.Time
 }{data: make(map[string]time.Time)}
 
-func captcha_challenge_allowed(ip string) bool {
+func Captcha_challenge_allowed(ip string) bool {
 	if ip == "" {
 		ip = "unknown"
 	}
@@ -37,9 +37,9 @@ func captcha_challenge_allowed(ip string) bool {
 	return true
 }
 
-func register_captcha_routes(r *gin.Engine) {
+func Register_captcha_routes(r *gin.Engine) {
 	r.GET("/api/altcha/challenge", func(c *gin.Context) {
-		if !captcha_challenge_allowed(c.ClientIP()) {
+		if !Captcha_challenge_allowed(c.ClientIP()) {
 			c.Header("Retry-After", "1")
 			c.JSON(http.StatusTooManyRequests, map[string]string{"error": "too many requests"})
 			return

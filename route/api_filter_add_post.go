@@ -17,7 +17,7 @@ func Api_filter_add_post(config tool.Config, kind string, name string, values ur
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	spec, ok := get_filter_spec(kind)
+	spec, ok := Get_filter_spec(kind)
 	if !ok {
 		return_data["response"] = "error"
 		return return_data
@@ -129,7 +129,7 @@ func Api_filter_add_post(config tool.Config, kind string, name string, values ur
 			tool.Exec_DB(tx, "insert into html_filter (html, kind, plus, plus_t) values (?, ?, ?, '')", title, spec.db_kind, values.Get("replacement"))
 		})
 	} else if kind == "document" {
-		acl_data, acl_ok := document_filter_acl_data(db, values.Get("acl"))
+		acl_data, acl_ok := Document_filter_acl_data(db, values.Get("acl"))
 		if !acl_ok {
 			return_data["response"] = "error"
 			return return_data

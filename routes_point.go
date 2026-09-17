@@ -8,14 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func register_point_routes(r *gin.Engine) {
+func Register_point_routes(r *gin.Engine) {
 	r.GET("/point/give", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_point_give(make_route_config(c), nil)))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_point_give(Make_route_config(c), nil)))
 	})
 	r.POST("/point/give", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_point_give(make_route_config(c), admin_post_values(c))))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_point_give(Make_route_config(c), Admin_post_values(c))))
 	})
 	r.POST("/api/point/give", func(c *gin.Context) {
-		c.JSON(http.StatusOK, route.Api_point_give_post(make_route_config(c), c.PostForm("user_name"), c.PostForm("amount")))
+		c.JSON(http.StatusOK, route.Api_point_give_post(Make_route_config(c), c.PostForm("user_name"), c.PostForm("amount")))
 	})
 }

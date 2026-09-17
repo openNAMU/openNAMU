@@ -7,7 +7,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func view_w_recent_documents(config tool.Config) []string {
+func View_w_recent_documents(config tool.Config) []string {
 	if config.Session == nil {
 		return []string{}
 	}
@@ -19,8 +19,8 @@ func view_w_recent_documents(config tool.Config) []string {
 	return append([]string{}, documents...)
 }
 
-func view_w_add_recent_document(config tool.Config, doc_name string) []string {
-	documents := view_w_recent_documents(config)
+func View_w_add_recent_document(config tool.Config, doc_name string) []string {
+	documents := View_w_recent_documents(config)
 	if doc_name == "" || config.Session == nil {
 		return documents
 	}
@@ -47,7 +47,7 @@ func view_w_add_recent_document(config tool.Config, doc_name string) []string {
 	return unique_documents
 }
 
-func view_w_redirect_trace(db *sql.DB, doc_name string, documents []string) string {
+func View_w_redirect_trace(db *sql.DB, doc_name string, documents []string) string {
 	last_page := ""
 	for index := len(documents) - 1; index >= 0; index-- {
 		last_page = documents[index]
@@ -68,7 +68,7 @@ func view_w_redirect_trace(db *sql.DB, doc_name string, documents []string) stri
 	return `<div class="opennamu_redirect" id="redirect">` + redirect_text + `</div><hr class="main_hr">`
 }
 
-func view_w_trace(db *sql.DB, config tool.Config, documents []string) string {
+func View_w_trace(db *sql.DB, config tool.Config, documents []string) string {
 	if tool.Get_main_skin_set(db, config, "main_css_view_history") != "on" {
 		return ""
 	}

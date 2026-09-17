@@ -163,8 +163,8 @@ func Api_list_recent_change(config tool.Config, set_type string, limit string, n
 
 	return_data := make(map[string]any)
 	return_data["response"] = "ok"
-	return_data["language"] = api_history_language(db)
-	return_data["auth"] = api_history_auth(db, config.IP)
+	return_data["language"] = Api_history_language(db)
+	return_data["auth"] = Api_history_auth(db, config.IP)
 	return_data["data"] = data_list
 
 	return return_data

@@ -9,7 +9,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func app_submit_action(db *sql.DB, config tool.Config, user_id string, approve bool) bool {
+func App_submit_action(db *sql.DB, config tool.Config, user_id string, approve bool) bool {
 	if !approve {
 		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 			if _, err := tx.Exec(tool.DB_change("delete from user_set where id = ? and name = 'application'"), user_id); err != nil {
@@ -112,7 +112,7 @@ func Api_app_submit_expire(config tool.Config) {
 	rows.Close()
 
 	for _, user_id := range user_list {
-		app_submit_action(db, config, user_id, action == "approve")
+		App_submit_action(db, config, user_id, action == "approve")
 	}
 }
 
@@ -135,12 +135,12 @@ func Api_app_submit_post(config tool.Config, values url.Values) map[string]any {
 	approved := values.Get("approve")
 	declined := values.Get("decline")
 	if approved != "" {
-		if !app_submit_action(db, config, approved, true) {
+		if !App_submit_action(db, config, approved, true) {
 			return_data["response"] = "error"
 			return return_data
 		}
 	} else if declined != "" {
-		app_submit_action(db, config, declined, false)
+		App_submit_action(db, config, declined, false)
 	}
 
 	return_data["response"] = "ok"

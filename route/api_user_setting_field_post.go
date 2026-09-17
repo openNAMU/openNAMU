@@ -15,20 +15,20 @@ func Api_user_setting_field_post(config tool.Config, field string, value string)
 		return_data["response"] = "require auth"
 		return return_data
 	}
-	if field == "user_name" && !tool.Get_user_name_check(db, value) && value != user_value(db, config.IP, "user_name") {
+	if field == "user_name" && !tool.Get_user_name_check(db, value) && value != User_value(db, config.IP, "user_name") {
 		return_data["response"] = "error"
 		return_data["data"] = "user name error"
 		return return_data
 	}
-	remove_email_2fa := field == "email" && value == "" && user_value(db, config.IP, "2fa") == "email"
+	remove_email_2fa := field == "email" && value == "" && User_value(db, config.IP, "2fa") == "email"
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		if field == "email" && value == "" {
-			user_delete(tx, config.IP, field)
+			User_delete(tx, config.IP, field)
 			if remove_email_2fa {
-				user_delete(tx, config.IP, "2fa")
+				User_delete(tx, config.IP, "2fa")
 			}
 		} else {
-			user_save(tx, config.IP, field, value)
+			User_save(tx, config.IP, field, value)
 		}
 		return nil
 	}); err != nil {

@@ -19,7 +19,7 @@ func Api_bbs_w_comment_pinned(config tool.Config, set_id string, set_code string
 		return return_data
 	}
 
-	comment_set_id, comment_set_code, exists := bbs_search_comment_location(set_id, set_code, comment_code)
+	comment_set_id, comment_set_code, exists := Bbs_search_comment_location(set_id, set_code, comment_code)
 	if !exists {
 		return_data["response"] = "not exist"
 		return_data["data"] = "comment"

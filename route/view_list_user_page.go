@@ -12,7 +12,7 @@ func View_list_user_page(config tool.Config, page string) string {
 	if !tool.Check_permission(db, "user_manage", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	page_num := list_extra_page_number(page)
+	page_num := List_extra_page_number(page)
 	offset := (page_num - 1) * 50
 	rows := tool.Get_user_date_rows(db, offset, true)
 	body := strings.Builder{}
@@ -26,5 +26,5 @@ func View_list_user_page(config tool.Config, page string) string {
 	}
 	rows.Close()
 	body.WriteString(tool.Get_page_control(db, page_num, count, 50, "/list/user/{}"))
-	return list_extra_page(db, config, tool.Get_language(db, "member_list", true), body.String())
+	return List_extra_page(db, config, tool.Get_language(db, "member_list", true), body.String())
 }

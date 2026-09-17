@@ -91,7 +91,7 @@ func Api_thread_bbs(config tool.Config, tool_name string, topic_num string, s_nu
 	}
 }
 
-func thread_bbs_root_exists(db *sql.DB, topic_num string) bool {
+func Thread_bbs_root_exists(db *sql.DB, topic_num string) bool {
 	title := ""
 	return tool.QueryRow_DB(
 		db,

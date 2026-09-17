@@ -20,16 +20,16 @@ func View_register_email_check(config tool.Config, values url.Values) string {
 		if values != nil {
 			return tool.Get_error_page(db, config, "key error")
 		}
-		instruction := user_other(db, "check_key_text")
+		instruction := User_other(db, "check_key_text")
 		body := ""
 		if instruction != "" {
 			body += tool.HTML_escape(instruction) + `<hr class="main_hr">`
 		}
 		body += `<form method="post"><input placeholder="` + tool.Get_language(db, "key", true) + `" name="key" type="text"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
-		return user_form_page(db, config, tool.Get_language(db, "check_key", true), body)
+		return User_form_page(db, config, tool.Get_language(db, "check_key", true), body)
 	}
 
-	if user_other(db, "requires_approval") != "" {
+	if User_other(db, "requires_approval") != "" {
 		config.Session.Set("submit_id", id)
 		config.Session.Set("submit_pw", pw)
 		config.Session.Set("submit_email", email)

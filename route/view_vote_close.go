@@ -35,7 +35,7 @@ func View_vote_close(config tool.Config, id string, values url.Values) string {
 			action = "open_vote"
 		}
 		body := `<form method="post"><button type="submit">` + tool.Get_language(db, action, true) + `</button></form>`
-		return vote_page(db, config, tool.Get_language(db, action, true), body)
+		return Vote_page(db, config, tool.Get_language(db, action, true), body)
 	}
 	api_data := Api_vote_close_post(config, id)
 	if api_data["response"] == "require auth" {

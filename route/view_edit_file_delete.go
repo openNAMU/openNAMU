@@ -8,7 +8,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func file_storage_path(db_file_dir string, doc_name string) (string, bool) {
+func File_storage_path(db_file_dir string, doc_name string) (string, bool) {
 	if !strings.HasPrefix(doc_name, "file:") {
 		return "", false
 	}
@@ -33,7 +33,7 @@ func View_edit_file_delete(config tool.Config, doc_name string, values url.Value
 		return tool.Get_redirect("/list/file")
 	}
 
-	file_path, valid := file_storage_path(tool.Get_file_main_dir(db), doc_name)
+	file_path, valid := File_storage_path(tool.Get_file_main_dir(db), doc_name)
 	if !valid {
 		return tool.Get_error_page(db, config, "invalid file")
 	}

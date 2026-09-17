@@ -11,7 +11,7 @@ import (
 
 var bbs_comment_code_regex = regexp.MustCompile(`^[0-9]+(?:-[0-9]+)*$`)
 
-func bbs_comment_closed(db *sql.DB, set_id string, set_code string) bool {
+func Bbs_comment_closed(db *sql.DB, set_id string, set_code string) bool {
 	if set_id == thread_bbs_id {
 		return false
 	}
@@ -26,7 +26,7 @@ func bbs_comment_closed(db *sql.DB, set_id string, set_code string) bool {
 	) && closed == "1"
 }
 
-func bbs_comment_parent(db *sql.DB, set_id string, set_code string, comment_select string, ip string) (string, string, bool) {
+func Bbs_comment_parent(db *sql.DB, set_id string, set_code string, comment_select string, ip string) (string, string, bool) {
 	base_id := set_id + "-" + set_code
 	if comment_select == "" || comment_select == "0" {
 		return base_id, "", true
@@ -106,7 +106,7 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 		return return_data
 	}
 
-	if _, allowed := bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
+	if _, allowed := Bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
 		return_data["response"] = "require auth"
 		return return_data
 	}
@@ -115,7 +115,7 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 		return_data["response"] = "require auth"
 		return return_data
 	}
-	if bbs_comment_closed(db, set_id, set_code) {
+	if Bbs_comment_closed(db, set_id, set_code) {
 		return_data["response"] = "error"
 		return_data["data"] = "comment_closed"
 		return return_data
@@ -142,7 +142,7 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 	parent_user := ""
 	if bbs_type != "thread" {
 		var ok bool
-		parent_id, parent_user, ok = bbs_comment_parent(db, set_id, set_code, comment_select, config.IP)
+		parent_id, parent_user, ok = Bbs_comment_parent(db, set_id, set_code, comment_select, config.IP)
 		if !ok {
 			return_data["response"] = "not exist"
 			return_data["data"] = "comment"
@@ -182,8 +182,8 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 				return err
 			}
 		}
-		bbs_post_comment_count_update(tx, set_id, set_code, 1)
-		bbs_post_last_activity_update(tx, set_id, set_code, date)
+		Bbs_post_comment_count_update(tx, set_id, set_code, 1)
+		Bbs_post_last_activity_update(tx, set_id, set_code, date)
 		if set_id == thread_bbs_id {
 			_, err := tx.Exec(
 				tool.DB_change("update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?"),
@@ -208,8 +208,8 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 	if parent_user != "" {
 		tool.Send_alarm(db, config.IP, parent_user, alarm)
 	}
-	bbs_watch_notify(db, config, set_id, set_code, end_code, bbs_name, title, post_user, parent_user)
-	topic_reference_notify(db, config, data, end_code, set_code, set_id, bbs_name, title, "bbs")
+	Bbs_watch_notify(db, config, set_id, set_code, end_code, bbs_name, title, post_user, parent_user)
+	Topic_reference_notify(db, config, data, end_code, set_code, set_id, bbs_name, title, "bbs")
 
 	return_data["response"] = "ok"
 	return_data["data"] = end_code

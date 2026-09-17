@@ -21,10 +21,10 @@ func View_login_2fa_email(config tool.Config, values url.Values) string {
 	if login_id == "" {
 		return tool.Get_redirect("/login")
 	}
-	if user_value(db, login_id, "2fa") != "email" {
+	if User_value(db, login_id, "2fa") != "email" {
 		return tool.Get_redirect("/login/2fa")
 	}
-	email := user_value(db, login_id, "email")
+	email := User_value(db, login_id, "email")
 	if email == "" {
 		return tool.Get_error_page(db, config, "email not found")
 	}
@@ -67,5 +67,5 @@ func View_login_2fa_email(config tool.Config, values url.Values) string {
 	}
 
 	body := `<form method="post"><input name="key" type="text">` + tool.Get_captcha_ui(db, config) + `<button type="submit">` + tool.Get_language(db, "login", true) + `</button>` + tool.Get_http_warning(db) + `</form>`
-	return user_form_page(db, config, tool.Get_language(db, "2fa", true), body)
+	return User_form_page(db, config, tool.Get_language(db, "2fa", true), body)
 }

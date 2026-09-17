@@ -114,7 +114,7 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 	tool.Do_watchlist_alarm_send(db, config, doc_name)
 
 	markup.Get_render(db, doc_name, data, "backlink")
-	notify_indexnow(db, doc_name)
+	Notify_indexnow(db, doc_name)
 
 	return_data["response"] = "ok"
 

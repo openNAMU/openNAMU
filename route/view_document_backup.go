@@ -25,8 +25,8 @@ func View_document_backup(config tool.Config, result map[string]any) string {
 		if response, ok := result["response"].(string); ok && response == "ok" {
 			imported, _ := result["imported"].(int)
 			skipped, _ := result["skipped"].(int)
-			data = `<p>` + tool.Get_language(db, "document_backup_imported", true) + `: ` + strconv.Itoa(imported) + `<br>` +
-				tool.Get_language(db, "document_backup_skipped", true) + `: ` + strconv.Itoa(skipped) + `</p><hr class="main_hr">` + data
+			data = `<div>` + tool.Get_language(db, "document_backup_imported", true) + `: ` + strconv.Itoa(imported) + `</div><div>` +
+				tool.Get_language(db, "document_backup_skipped", true) + `: ` + strconv.Itoa(skipped) + `</div><hr class="main_hr">` + data
 		} else if response == "error" {
 			data = `<p>` + tool.Get_language(db, "document_backup_invalid", true) + `</p><hr class="main_hr">` + data
 		}

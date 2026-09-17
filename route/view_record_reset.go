@@ -21,5 +21,5 @@ func View_record_reset(config tool.Config, user_name string, values url.Values) 
 		}
 		return tool.Get_redirect("/record/" + tool.Url_parser(user_name))
 	}
-	return history_destructive_page(db, config, tool.Get_language(db, "record_reset", true), tool.Get_language(db, "reset", true), "record/"+tool.Url_parser(user_name))
+	return History_destructive_page(db, config, tool.Get_language(db, "record_reset", true), tool.Get_language(db, "reset", true), "record/"+tool.Url_parser(user_name))
 }

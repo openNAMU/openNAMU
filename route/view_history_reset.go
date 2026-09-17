@@ -19,5 +19,5 @@ func View_history_reset(config tool.Config, doc_name string, values url.Values) 
 		api_data := Api_history_reset_post(config, doc_name)
 		return tool.Api_post_redirect(db, config, api_data, "/history/"+tool.Url_parser(doc_name))
 	}
-	return history_destructive_page(db, config, tool.Get_language(db, "history_reset", true), tool.Get_language(db, "reset", true), "history/"+tool.Url_parser(doc_name))
+	return History_destructive_page(db, config, tool.Get_language(db, "history_reset", true), tool.Get_language(db, "reset", true), "history/"+tool.Url_parser(doc_name))
 }

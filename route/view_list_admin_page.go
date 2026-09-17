@@ -9,7 +9,7 @@ import (
 func View_list_admin_page(config tool.Config, page string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	page_num := list_extra_page_number(page)
+	page_num := List_extra_page_number(page)
 	offset := (page_num - 1) * 50
 	body := strings.Builder{}
 	count := 0
@@ -19,5 +19,5 @@ func View_list_admin_page(config tool.Config, page string) string {
 		count++
 	}
 	body.WriteString(tool.Get_page_control(db, page_num, count, 50, "/list/admin/{}"))
-	return list_extra_page(db, config, tool.Get_language(db, "admin_list", true), body.String())
+	return List_extra_page(db, config, tool.Get_language(db, "admin_list", true), body.String())
 }

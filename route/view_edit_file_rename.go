@@ -14,7 +14,7 @@ func View_edit_file_rename(config tool.Config, doc_name string, values url.Value
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	old_base_name, extension, valid := file_rename_parts(doc_name)
+	old_base_name, extension, valid := File_rename_parts(doc_name)
 	if !valid {
 		return tool.Get_error_page(db, config, "invalid file")
 	}

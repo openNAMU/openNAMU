@@ -6,7 +6,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func api_topic_list_bbs(config tool.Config, num string, doc_name string, do_type string) map[string]any {
+func Api_topic_list_bbs(config tool.Config, num string, doc_name string, do_type string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -68,7 +68,7 @@ func api_topic_list_bbs(config tool.Config, num string, doc_name string, do_type
 	return map[string]any{"response": "ok", "data": data_list}
 }
 
-func thread_bbs_document_exists(db *sql.DB, doc_name string) bool {
+func Thread_bbs_document_exists(db *sql.DB, doc_name string) bool {
 	value := ""
 	return tool.QueryRow_DB(
 		db,

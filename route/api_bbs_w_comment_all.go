@@ -8,7 +8,7 @@ type bbs_comment_page_state struct {
 	data   []map[string]string
 }
 
-func api_bbs_w_comment_page_data(config tool.Config, sub_code string, already_auth_check bool, do_type string, state *bbs_comment_page_state) {
+func Api_bbs_w_comment_page_data(config tool.Config, sub_code string, already_auth_check bool, do_type string, state *bbs_comment_page_state) {
 	if len(state.data) >= state.limit {
 		return
 	}
@@ -25,7 +25,7 @@ func api_bbs_w_comment_page_data(config tool.Config, sub_code string, already_au
 		if len(state.data) >= state.limit {
 			return
 		}
-		api_bbs_w_comment_page_data(config, sub_code+"-"+comment["code"], already_auth_check, do_type, state)
+		Api_bbs_w_comment_page_data(config, sub_code+"-"+comment["code"], already_auth_check, do_type, state)
 		if len(state.data) >= state.limit {
 			return
 		}
@@ -42,7 +42,7 @@ func Api_bbs_w_comment_page(config tool.Config, sub_code string, already_auth_ch
 		limit:  50,
 		data:   []map[string]string{},
 	}
-	api_bbs_w_comment_page_data(config, sub_code, already_auth_check, do_type, state)
+	Api_bbs_w_comment_page_data(config, sub_code, already_auth_check, do_type, state)
 
 	return map[string]any{
 		"response": "ok",
@@ -50,7 +50,7 @@ func Api_bbs_w_comment_page(config tool.Config, sub_code string, already_auth_ch
 	}
 }
 
-func api_bbs_w_comment_pinned_data(config tool.Config, set_id string, set_code string) []map[string]string {
+func Api_bbs_w_comment_pinned_data(config tool.Config, set_id string, set_code string) []map[string]string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -70,7 +70,7 @@ func api_bbs_w_comment_pinned_data(config tool.Config, set_id string, set_code s
 		if rows.Scan(&comment_set_id, &comment_set_code) != nil {
 			continue
 		}
-		post_set_id, post_set_code, _, valid := bbs_comment_storage_location(comment_set_id, comment_set_code)
+		post_set_id, post_set_code, _, valid := Bbs_comment_storage_location(comment_set_id, comment_set_code)
 		if !valid || post_set_id != set_id || post_set_code != set_code {
 			continue
 		}

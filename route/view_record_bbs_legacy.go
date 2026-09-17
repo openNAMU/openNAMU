@@ -28,16 +28,16 @@ func View_record_bbs_legacy(config tool.Config, user_name string, page string) s
 		}
 		row_count++
 
-		post_user := record_bbs_legacy_value(db, "user_id", set_id, set_code)
-		title := record_bbs_legacy_value(db, "title", set_id, set_code)
-		comment_count := record_bbs_legacy_value(db, "comment_count", set_id, set_code)
+		post_user := Record_bbs_legacy_value(db, "user_id", set_id, set_code)
+		title := Record_bbs_legacy_value(db, "title", set_id, set_code)
+		comment_count := Record_bbs_legacy_value(db, "comment_count", set_id, set_code)
 		if comment_count == "" {
 			comment_count = "0"
 		}
 		root_id := set_id + "-" + set_code
 		last_comment_date := tool.Get_bbs_last_comment_date(db, root_id)
 
-		bbs_name := record_bbs_legacy_board_name(db, set_id)
+		bbs_name := Record_bbs_legacy_board_name(db, set_id)
 		title_link := `<a href="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">` + tool.HTML_escape(title) + `</a>`
 		data_html += `<tr><td>` + tool.IP_parser(db, post_user, config.IP) + `</td><td>` + tool.HTML_escape(date) + `</td><td>` + tool.HTML_escape(last_comment_date) + `</td></tr>`
 		data_html += `<tr><td colspan="3">` + title_link + ` (` + tool.HTML_escape(comment_count) + `) (` + tool.HTML_escape(bbs_name) + `)</td></tr>`
@@ -56,11 +56,11 @@ func View_record_bbs_legacy(config tool.Config, user_name string, page string) s
 	)
 }
 
-func record_bbs_legacy_value(db *sql.DB, set_name string, set_id string, set_code string) string {
+func Record_bbs_legacy_value(db *sql.DB, set_name string, set_id string, set_code string) string {
 	value, _ := tool.Get_bbs_data_value(db, set_id, set_code, set_name)
 	return value
 }
 
-func record_bbs_legacy_board_name(db *sql.DB, set_id string) string {
+func Record_bbs_legacy_board_name(db *sql.DB, set_id string) string {
 	return tool.Get_bbs_set_data(db, set_id, "bbs_name")
 }

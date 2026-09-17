@@ -9,10 +9,10 @@ import (
 )
 
 func Api_setting_backlink_reset_post(config tool.Config) map[string]any {
-	return api_setting_backlink_reset_post(config, "")
+	return Api_setting_backlink_reset_post_internal(config, "")
 }
 
-func api_setting_backlink_reset_post(config tool.Config, load string) map[string]any {
+func Api_setting_backlink_reset_post_internal(config tool.Config, load string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 

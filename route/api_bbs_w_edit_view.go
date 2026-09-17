@@ -24,7 +24,7 @@ func Api_bbs_w_edit_view(config tool.Config, set_id string, set_code string, com
 		return return_data
 	}
 
-	if !bbs_post_blind_allowed(db, set_id, set_code, config.IP, nil) {
+	if !Bbs_post_blind_allowed(db, set_id, set_code, config.IP, nil) {
 		return_data["response"] = "require auth"
 		return return_data
 	}

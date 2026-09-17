@@ -21,7 +21,7 @@ func Get_user_profile_image_name(db *sql.DB, value string) (string, bool) {
 
 	extension := strings.TrimPrefix(strings.ToLower(filepath.Ext(value)), ".")
 	base_name := strings.TrimSuffix(value, filepath.Ext(value))
-	if base_name == "" || extension == "" || strings.Contains(base_name, ".") || !profile_image_extension(extension) {
+	if base_name == "" || extension == "" || strings.Contains(base_name, ".") || !Profile_image_extension(extension) {
 		return "", false
 	}
 
@@ -60,7 +60,7 @@ func Get_user_profile_image_ui(db *sql.DB, user_name string) string {
 	return `<img class="opennamu_user_profile_image" loading="lazy" width="32" height="32" style="width:32px;height:32px;object-fit:cover;vertical-align:middle;" src="/thumbnail/64/` + Url_parser(storage_name) + `.cache_v` + Url_parser(revision) + `" alt=""> `
 }
 
-func profile_image_extension(extension string) bool {
+func Profile_image_extension(extension string) bool {
 	switch extension {
 	case "jpg", "jpeg", "png", "gif", "webp", "bmp", "tif", "tiff", "avif", "heic":
 		return true

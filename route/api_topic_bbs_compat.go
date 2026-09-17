@@ -2,7 +2,7 @@ package route
 
 import "opennamu/route/tool"
 
-func api_topic_bbs(config tool.Config, tool_name string, topic_num string, s_num string, e_num string) map[string]any {
+func Api_topic_bbs(config tool.Config, tool_name string, topic_num string, s_num string, e_num string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 

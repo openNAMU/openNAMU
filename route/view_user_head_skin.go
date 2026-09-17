@@ -23,7 +23,7 @@ func View_user_head_skin(config tool.Config, skin_name string, values url.Values
 		if !values.Has("content") {
 			content = values.Get("data")
 		}
-		if user_auth(db, config) {
+		if User_auth(db, config) {
 			api_data := Api_user_head_skin_post(config, storage_name, content)
 			response, _ := api_data["response"].(string)
 			if response != "ok" {
@@ -35,14 +35,14 @@ func View_user_head_skin(config tool.Config, skin_name string, values url.Values
 		return tool.Get_redirect(redirect_path)
 	}
 	content, session_exists := config.Session.Get(session_name).(string)
-	if !session_exists && user_auth(db, config) {
-		content = user_value(db, config.IP, storage_name)
+	if !session_exists && User_auth(db, config) {
+		content = User_value(db, config.IP, storage_name)
 		if content == "" && skin_name == "" {
-			content = user_value(db, config.IP, "head")
+			content = User_value(db, config.IP, "head")
 		}
 	}
 	body := ""
-	if !user_auth(db, config) {
+	if !User_auth(db, config) {
 		body += `<span>` + tool.Get_language(db, "user_head_warning", true) + `</span><hr class="main_hr">`
 	}
 	body += `<a href="/change/head">(` + tool.Get_language(db, "all", true) + `)</a> `
@@ -55,5 +55,5 @@ func View_user_head_skin(config tool.Config, skin_name string, values url.Values
 	}
 	body += `<hr class="main_hr"><span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span><hr class="main_hr">`
 	body += `<form method="post"><textarea class="opennamu_textarea_500" cols="100" name="content">` + tool.HTML_escape(content) + `</textarea><hr class="main_hr">` + tool.Get_language(db, "user_css_warning", true) + ` : <a href="/change/head_reset">/change/head_reset</a><hr class="main_hr"><button id="opennamu_save_button" type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
-	return user_form_page(db, config, tool.Get_language(db, "user_head", false)+sub_name, body)
+	return User_form_page(db, config, tool.Get_language(db, "user_head", false)+sub_name, body)
 }

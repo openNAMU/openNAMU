@@ -9,7 +9,7 @@ import (
 	"opennamu/route/tool/markup"
 )
 
-func setting_markup_normalize(markup_name string) string {
+func Setting_markup_normalize(markup_name string) string {
 	switch markup_name {
 	case "", "custom":
 		return "html"
@@ -26,20 +26,20 @@ func setting_markup_normalize(markup_name string) string {
 	return "html"
 }
 
-func setting_markup_value(db *sql.DB, setting_name string) string {
-	return setting_markup_normalize(
+func Setting_markup_value(db *sql.DB, setting_name string) string {
+	return Setting_markup_normalize(
 		tool.Get_setting_value(db, setting_name+"_markup", "", ""),
 	)
 }
 
-func setting_markup_options() []string {
+func Setting_markup_options() []string {
 	return markup.List_markup()
 }
 
-func setting_markup_select_ui(name string, current string, disabled string) string {
-	current = setting_markup_normalize(current)
+func Setting_markup_select_ui(name string, current string, disabled string) string {
+	current = Setting_markup_normalize(current)
 	data := `<span class="__ON_SELECT_DIV__"><select class="__ON_SELECT__" name="` + tool.HTML_escape(name) + `"` + disabled + `>`
-	for _, markup_option := range setting_markup_options() {
+	for _, markup_option := range Setting_markup_options() {
 		selected := ""
 		if markup_option == current {
 			selected = ` selected`
@@ -50,8 +50,8 @@ func setting_markup_select_ui(name string, current string, disabled string) stri
 	return data
 }
 
-func setting_render_markup(db *sql.DB, data string, markup_name string) string {
-	markup_name = setting_markup_normalize(markup_name)
+func Setting_render_markup(db *sql.DB, data string, markup_name string) string {
+	markup_name = Setting_markup_normalize(markup_name)
 	if markup_name == "html" {
 		return data
 	}
@@ -68,18 +68,18 @@ func setting_render_markup(db *sql.DB, data string, markup_name string) string {
 	return render_data["data"]
 }
 
-func document_editor_top_render(db *sql.DB, doc_name string) string {
+func Document_editor_top_render(db *sql.DB, doc_name string) string {
 	top_data := tool.Get_document_setting_value_exact(db, doc_name, "document_editor_top", "")
 	top_markup := ""
 	if top_data != "" {
-		top_markup = setting_markup_normalize(tool.Get_document_setting_value_exact(db, doc_name, "document_editor_top_markup", ""))
+		top_markup = Setting_markup_normalize(tool.Get_document_setting_value_exact(db, doc_name, "document_editor_top_markup", ""))
 	} else {
 		top_data = tool.Get_document_setting_value_exact(db, doc_name, "document_top", "")
 		if top_data == "" {
 			return ""
 		}
-		top_markup = setting_markup_normalize(tool.Get_document_setting_value_exact(db, doc_name, "document_top_markup", ""))
+		top_markup = Setting_markup_normalize(tool.Get_document_setting_value_exact(db, doc_name, "document_top_markup", ""))
 	}
 
-	return setting_render_markup(db, top_data, top_markup)
+	return Setting_render_markup(db, top_data, top_markup)
 }

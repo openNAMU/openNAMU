@@ -24,7 +24,7 @@ var document_acl_group_fields = []string{
 	"document_delete_acl",
 }
 
-func acl_field_title(db *sql.DB, field string) string {
+func Acl_field_title(db *sql.DB, field string) string {
 	key := map[string]string{
 		"view":                "view_acl",
 		"decu":                "document_acl",
@@ -35,7 +35,7 @@ func acl_field_title(db *sql.DB, field string) string {
 	return tool.Get_language(db, key, true)
 }
 
-func acl_value(db *sql.DB, doc_name string, field string) string {
+func Acl_value(db *sql.DB, doc_name string, field string) string {
 	value := tool.Get_acl_data_list(db, doc_name, field)
 	if len(value) == 0 {
 		return ""
@@ -43,33 +43,48 @@ func acl_value(db *sql.DB, doc_name string, field string) string {
 	return value[0]
 }
 
-func acl_group_select(db *sql.DB) string {
+func Acl_value_title(db *sql.DB, value string) string {
+	for _, choice := range tool.Auth_choices() {
+		if choice.Key == value {
+			return tool.Get_language(db, choice.Lang, true)
+		}
+	}
+	if value == "ban" {
+		return tool.Get_language(db, "ban", true)
+	}
+	return tool.HTML_escape(value)
+}
+
+func Acl_group_select(db *sql.DB) string {
 	data := `<select name="acl_group">`
-	for _, group := range acl_value_list(db, "") {
-		data += `<option value="` + tool.HTML_escape(group) + `">` + tool.HTML_escape(group) + `</option>`
+	for _, group := range Acl_value_list(db, "") {
+		if group == "" {
+			continue
+		}
+		data += `<option value="` + tool.HTML_escape(group) + `">` + Acl_value_title(db, group) + `</option>`
 	}
 	return data + `</select>`
 }
 
-func acl_group_setting(db *sql.DB, title string, field string) string {
-	data := `<h3>` + acl_field_title(db, field) + `</h3>`
+func Acl_group_setting(db *sql.DB, title string, field string) string {
+	data := `<h3>` + Acl_field_title(db, field) + `</h3>`
 	groups := tool.Get_acl_data_list(db, title, field)
 	if len(groups) == 0 {
 		data += `<div>` + tool.Get_language(db, "normal", true) + `</div>`
 	}
 	for _, group := range groups {
-		data += `<div>` + tool.HTML_escape(group) + ` <form method="post" style="display:inline"><input type="hidden" name="name" value="` + tool.HTML_escape(title) + `"><input type="hidden" name="acl_action" value="delete"><input type="hidden" name="acl_field" value="` + tool.HTML_escape(field) + `"><input type="hidden" name="acl_group" value="` + tool.HTML_escape(group) + `"><button type="submit">` + tool.Get_language(db, "delete", true) + `</button></form></div>`
+		data += `<div>` + Acl_value_title(db, group) + `</div><form method="post"><input type="hidden" name="name" value="` + tool.HTML_escape(title) + `"><input type="hidden" name="acl_action" value="delete"><input type="hidden" name="acl_field" value="` + tool.HTML_escape(field) + `"><input type="hidden" name="acl_group" value="` + tool.HTML_escape(group) + `"><button type="submit">` + tool.Get_language(db, "delete", true) + `</button></form><hr class="main_hr">`
 	}
-	data += `<form method="post"><input type="hidden" name="name" value="` + tool.HTML_escape(title) + `"><input type="hidden" name="acl_action" value="add"><input type="hidden" name="acl_field" value="` + tool.HTML_escape(field) + `">` + acl_group_select(db) + `<hr class="main_hr"><button type="submit">` + tool.Get_language(db, "add", true) + `</button></form>`
+	data += `<form method="post"><input type="hidden" name="name" value="` + tool.HTML_escape(title) + `"><input type="hidden" name="acl_action" value="add"><input type="hidden" name="acl_field" value="` + tool.HTML_escape(field) + `"><h3>` + tool.Get_language(db, "authority", true) + `</h3>` + Acl_group_select(db) + `<hr class="main_hr"><button type="submit">` + tool.Get_language(db, "add", true) + `</button></form>`
 	return data + `<hr class="main_hr">`
 }
 
-func acl_group_multiple_setting(db *sql.DB) string {
-	data := `<h3>` + tool.Get_language(db, "acl", true) + `</h3><form method="post"><textarea class="opennamu_textarea_500" name="title_name" placeholder="` + tool.Get_language(db, "many_delete_help", true) + `"></textarea><hr class="main_hr"><select name="acl_field">`
+func Acl_group_multiple_setting(db *sql.DB) string {
+	data := `<hr class="main_hr"><h2>` + tool.Get_language(db, "document_acl", true) + `</h2><h3>` + tool.Get_language(db, "document_name", true) + `</h3><form method="post"><textarea class="opennamu_textarea_500" name="title_name" placeholder="` + tool.Get_language(db, "many_delete_help", true) + `"></textarea><hr class="main_hr"><select name="acl_field">`
 	for _, field := range document_acl_group_fields {
-		data += `<option value="` + tool.HTML_escape(field) + `">` + tool.HTML_escape(acl_field_title(db, field)) + `</option>`
+		data += `<option value="` + tool.HTML_escape(field) + `">` + tool.HTML_escape(Acl_field_title(db, field)) + `</option>`
 	}
-	data += `</select><hr class="main_hr">` + acl_group_select(db) + `<hr class="main_hr"><button name="acl_action" value="add" type="submit">` + tool.Get_language(db, "add", true) + `</button><hr class="main_hr"><button name="acl_action" value="delete" type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
+	data += `</select><hr class="main_hr"><h3>` + tool.Get_language(db, "authority", true) + `</h3>` + Acl_group_select(db) + `<hr class="main_hr"><button name="acl_action" value="add" type="submit">` + tool.Get_language(db, "add", true) + `</button><hr class="main_hr"><button name="acl_action" value="delete" type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
 	return data
 }
 
@@ -81,7 +96,7 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 		doc_name = values.Get("name")
 	}
 	if doc_name == "" && !multiple && values == nil {
-		data := `<form method="post"><input name="name" placeholder="` + tool.Get_language(db, "document_name", true) + `"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
+		data := `<form method="post"><h3>` + tool.Get_language(db, "document_name", true) + `</h3><input name="name" placeholder="` + tool.Get_language(db, "document_name", true) + `"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
 		return tool.Get_template(db, config, tool.Get_language(db, "document_setting", true), data, []any{}, [][]any{{"manager", tool.Get_language(db, "return", true)}}, map[string]string{})
 	}
 
@@ -119,7 +134,7 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 
 	data := `<form method="post">`
 	if multiple {
-		data += `<textarea class="opennamu_textarea_500" name="title_name" placeholder="` + tool.Get_language(db, "many_delete_help", true) + `"></textarea><hr class="main_hr">`
+		data += `<h2>` + tool.Get_language(db, "document_setting", true) + `</h2><h3>` + tool.Get_language(db, "document_name", true) + `</h3>` + `<textarea class="opennamu_textarea_500" name="title_name" placeholder="` + tool.Get_language(db, "many_delete_help", true) + `"></textarea><hr class="main_hr">`
 	} else {
 		data += `<input type="hidden" name="name" value="` + tool.HTML_escape(doc_name) + `">`
 	}
@@ -129,12 +144,12 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 		if !multiple {
 			date_value = tool.Get_document_setting_value(db, doc_name, "acl_date", field)
 		}
-		data += `<input type="date" name="` + field + `_date" value="` + tool.HTML_escape(date_value) + `"><hr class="main_hr">`
+		data += `<h3>` + Acl_field_title(db, field) + ` ` + tool.Get_language(db, "date", true) + `</h3><input type="date" name="` + field + `_date" value="` + tool.HTML_escape(date_value) + `"><hr class="main_hr">`
 	}
 
 	why := ""
 	if !multiple {
-		why = acl_value(db, doc_name, "why")
+		why = Acl_value(db, doc_name, "why")
 	}
 	data += `<h3>` + tool.Get_language(db, "why", true) + `</h3><input name="why" value="` + tool.HTML_escape(why) + `"><hr class="main_hr">`
 
@@ -156,17 +171,17 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 	document_editor_top_markup_api := Api_w_set(config, doc_name, "document_editor_top_markup", "")
 	document_editor_top_markup, _ := document_editor_top_markup_api["data"].(string)
 	data += `<h2>` + tool.Get_language(db, "document_top", true) + `</h2>`
-	data += `<h3>` + tool.Get_language(db, "markup", true) + `</h3>` + setting_markup_select_ui("document_top_markup", document_top_markup, top_disabled)
+	data += `<h3>` + tool.Get_language(db, "markup", true) + `</h3>` + Setting_markup_select_ui("document_top_markup", document_top_markup, top_disabled)
 	data += `<textarea class="opennamu_textarea_100" name="document_top"` + top_disabled + `>` + tool.HTML_escape(document_top) + `</textarea>`
 	data += `<h2>` + tool.Get_language(db, "document_editor_top", true) + `</h2>`
-	data += `<h3>` + tool.Get_language(db, "markup", true) + `</h3>` + setting_markup_select_ui("document_editor_top_markup", document_editor_top_markup, top_disabled)
+	data += `<h3>` + tool.Get_language(db, "markup", true) + `</h3>` + Setting_markup_select_ui("document_editor_top_markup", document_editor_top_markup, top_disabled)
 	data += `<textarea class="opennamu_textarea_100" name="document_editor_top"` + top_disabled + `>` + tool.HTML_escape(document_editor_top) + `</textarea><hr class="main_hr">`
 	data += `<button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 	if multiple {
-		data += acl_group_multiple_setting(db)
+		data += Acl_group_multiple_setting(db)
 	} else {
 		for _, field := range document_acl_group_fields {
-			data += acl_group_setting(db, doc_name, field)
+			data += Acl_group_setting(db, doc_name, field)
 		}
 	}
 

@@ -9,7 +9,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func file_rename_parts(doc_name string) (string, string, bool) {
+func File_rename_parts(doc_name string) (string, string, bool) {
 	if !strings.HasPrefix(doc_name, "file:") {
 		return "", "", false
 	}
@@ -34,7 +34,7 @@ func Api_edit_file_rename_post(config tool.Config, doc_name string, values url.V
 		return return_data
 	}
 
-	old_base_name, extension, valid := file_rename_parts(doc_name)
+	old_base_name, extension, valid := File_rename_parts(doc_name)
 	if !valid {
 		return_data["response"] = "error"
 		return_data["data"] = "invalid file"
@@ -61,7 +61,7 @@ func Api_edit_file_rename_post(config tool.Config, doc_name string, values url.V
 		return_data["data"] = "already exist"
 		return return_data
 	}
-	if target_exists, _ := move_document_exists(db, new_doc_name); target_exists {
+	if target_exists, _ := Move_document_exists(db, new_doc_name); target_exists {
 		return_data["response"] = "error"
 		return_data["data"] = "already exist"
 		return return_data

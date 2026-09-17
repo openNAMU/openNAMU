@@ -6,7 +6,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func bbs_watch_key(set_id string, set_code string) string {
+func Bbs_watch_key(set_id string, set_code string) string {
 	return set_id + "-" + set_code
 }
 
@@ -27,14 +27,14 @@ func Api_bbs_watch_post(config tool.Config, set_id string, set_code string) map[
 	if tool.IP_or_user(config.IP) {
 		return map[string]any{"response": "require auth"}
 	}
-	if _, allowed := bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
+	if _, allowed := Bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
 		return map[string]any{"response": "require auth"}
 	}
 
-	return Api_w_watch_list_post(config, bbs_watch_key(set_id, set_code), "bbs_watchlist")
+	return Api_w_watch_list_post(config, Bbs_watch_key(set_id, set_code), "bbs_watchlist")
 }
 
-func bbs_watch_notify(db *sql.DB, config tool.Config, set_id string, set_code string, comment_code string, bbs_name string, title string, post_user string, parent_user string) {
+func Bbs_watch_notify(db *sql.DB, config tool.Config, set_id string, set_code string, comment_code string, bbs_name string, title string, post_user string, parent_user string) {
 	alarm := `BBS <a href="/bbs/w/` + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "#" + tool.Url_parser(comment_code) + `">` + tool.HTML_escape(bbs_name) + " - " + tool.HTML_escape(title) + "#" + tool.Url_parser(comment_code) + `</a>`
 	skip := map[string]bool{
 		post_user:   true,
@@ -45,7 +45,7 @@ func bbs_watch_notify(db *sql.DB, config tool.Config, set_id string, set_code st
 	rows := tool.Query_DB(
 		db,
 		"select id from user_set where name = 'bbs_watchlist' and data = ?",
-		bbs_watch_key(set_id, set_code),
+		Bbs_watch_key(set_id, set_code),
 	)
 	defer rows.Close()
 

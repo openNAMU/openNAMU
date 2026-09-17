@@ -35,5 +35,5 @@ func View_list_contributor_page(config tool.Config) string {
 		body = tool.Get_language(db, "data_missing", true)
 	}
 
-	return list_extra_page(db, config, tool.Get_language(db, "monthly_top_contributor", true), body)
+	return List_extra_page(db, config, tool.Get_language(db, "monthly_top_contributor", true), body)
 }

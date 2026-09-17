@@ -61,7 +61,7 @@ type markdown_replacer struct {
 	macro_name string
 }
 
-func (class *markdown) func_temp_save(data string) string {
+func (class *markdown) Func_temp_save(data string) string {
 	name := "OpenNamuMarkdownTemp" + strconv.Itoa(class.temp_data_count)
 	class.temp_data = append(class.temp_data, []string{name, data})
 	class.temp_data_count++
@@ -69,7 +69,7 @@ func (class *markdown) func_temp_save(data string) string {
 	return name
 }
 
-func (class *markdown) func_temp_restore(data string) string {
+func (class *markdown) Func_temp_restore(data string) string {
 	string_data := data
 	for for_a := len(class.temp_data) - 1; for_a >= 0; for_a-- {
 		string_data = strings.ReplaceAll(string_data, class.temp_data[for_a][0], class.temp_data[for_a][1])
@@ -78,16 +78,16 @@ func (class *markdown) func_temp_restore(data string) string {
 	return string_data
 }
 
-func markdown_replace(regex *regexp2.Regexp, data string, fn func(regexp2.Match) string) string {
+func Markdown_replace(regex *regexp2.Regexp, data string, fn func(regexp2.Match) string) string {
 	data, _ = regex.ReplaceFunc(data, fn, -1, -1)
 	return data
 }
 
-func markdown_group(match regexp2.Match, number int) string {
+func Markdown_group(match regexp2.Match, number int) string {
 	return match.GroupByNumber(number).String()
 }
 
-func markdown_destination(data string) string {
+func Markdown_destination(data string) string {
 	data = strings.TrimSpace(data)
 	if strings.HasPrefix(data, "<") && strings.Contains(data, ">") {
 		return data[1:strings.Index(data, ">")]
@@ -100,39 +100,39 @@ func markdown_destination(data string) string {
 	return data
 }
 
-func markdown_macro_argument(data string) string {
+func Markdown_macro_argument(data string) string {
 	return strings.ReplaceAll(data, ",", ",,")
 }
 
-func markdown_is_external_link(data string) bool {
+func Markdown_is_external_link(data string) bool {
 	data = strings.ToLower(strings.TrimSpace(data))
 	return strings.HasPrefix(data, "http://") || strings.HasPrefix(data, "https://")
 }
 
-func (class *markdown) render_code() {
+func (class *markdown) Render_code() {
 	for _, regex := range []*regexp2.Regexp{
 		markdown_fenced_code_regex,
 		markdown_tilde_code_regex,
 	} {
-		class.render_data = markdown_replace(regex, class.render_data, func(match regexp2.Match) string {
-			language := strings.TrimSpace(markdown_group(match, 1))
+		class.render_data = Markdown_replace(regex, class.render_data, func(match regexp2.Match) string {
+			language := strings.TrimSpace(Markdown_group(match, 1))
 			language_class := ""
 			if language != "" {
 				language_class = " class=\"language-" + tool.HTML_escape(strings.Fields(language)[0]) + "\""
 			}
 
-			return class.func_temp_save(
-				"<pre><code" + language_class + ">" + tool.HTML_escape(markdown_group(match, 2)) + "</code></pre>",
+			return class.Func_temp_save(
+				"<pre><code" + language_class + ">" + tool.HTML_escape(Markdown_group(match, 2)) + "</code></pre>",
 			)
 		})
 	}
 
-	class.render_data = markdown_replace(markdown_inline_code_regex, class.render_data, func(match regexp2.Match) string {
-		return class.func_temp_save("<code>" + tool.HTML_escape(markdown_group(match, 1)) + "</code>")
+	class.render_data = Markdown_replace(markdown_inline_code_regex, class.render_data, func(match regexp2.Match) string {
+		return class.Func_temp_save("<code>" + tool.HTML_escape(Markdown_group(match, 1)) + "</code>")
 	})
 }
 
-func (class *markdown) render_escape() {
+func (class *markdown) Render_escape() {
 	string_data := class.render_data
 	escape_characters := "\\`*_{}[]()#+-.!<>~"
 
@@ -141,27 +141,27 @@ func (class *markdown) render_escape() {
 			continue
 		}
 
-		string_data = string_data[:index] + class.func_temp_save(tool.HTML_escape(string(string_data[index+1]))) + string_data[index+2:]
+		string_data = string_data[:index] + class.Func_temp_save(tool.HTML_escape(string(string_data[index+1]))) + string_data[index+2:]
 	}
 
 	class.render_data = string_data
 }
 
-func (class *markdown) render_image() {
-	class.render_data = markdown_replace(markdown_image_regex, class.render_data, func(match regexp2.Match) string {
-		return "[img(" + markdown_macro_argument(markdown_destination(markdown_group(match, 2))) + "," + markdown_macro_argument(markdown_group(match, 1)) + ")]"
+func (class *markdown) Render_image() {
+	class.render_data = Markdown_replace(markdown_image_regex, class.render_data, func(match regexp2.Match) string {
+		return "[img(" + Markdown_macro_argument(Markdown_destination(Markdown_group(match, 2))) + "," + Markdown_macro_argument(Markdown_group(match, 1)) + ")]"
 	})
 }
 
-func (class *markdown) render_link() {
-	class.render_data = markdown_replace(markdown_autolink_regex, class.render_data, func(match regexp2.Match) string {
-		link := markdown_group(match, 1)
-		return "[ex(" + markdown_macro_argument(link) + "," + markdown_macro_argument(link) + ")]"
+func (class *markdown) Render_link() {
+	class.render_data = Markdown_replace(markdown_autolink_regex, class.render_data, func(match regexp2.Match) string {
+		link := Markdown_group(match, 1)
+		return "[ex(" + Markdown_macro_argument(link) + "," + Markdown_macro_argument(link) + ")]"
 	})
 
-	class.render_data = markdown_replace(markdown_link_regex, class.render_data, func(match regexp2.Match) string {
-		label := markdown_group(match, 1)
-		target := markdown_destination(markdown_group(match, 2))
+	class.render_data = Markdown_replace(markdown_link_regex, class.render_data, func(match regexp2.Match) string {
+		label := Markdown_group(match, 1)
+		target := Markdown_destination(Markdown_group(match, 2))
 		if label == "" {
 			label = target
 		}
@@ -170,13 +170,13 @@ func (class *markdown) render_link() {
 			return label
 		}
 		if strings.HasPrefix(target, "#") {
-			return "[an(" + markdown_macro_argument(target) + "," + markdown_macro_argument(label) + ")]"
+			return "[an(" + Markdown_macro_argument(target) + "," + Markdown_macro_argument(label) + ")]"
 		}
 		if strings.HasPrefix(target, "/") || strings.HasPrefix(target, "./") || strings.HasPrefix(target, "../") {
-			return "[in(" + markdown_macro_argument(target) + "," + markdown_macro_argument(label) + ")]"
+			return "[in(" + Markdown_macro_argument(target) + "," + Markdown_macro_argument(label) + ")]"
 		}
-		if markdown_is_external_link(target) {
-			return "[ex(" + markdown_macro_argument(target) + "," + markdown_macro_argument(label) + ")]"
+		if Markdown_is_external_link(target) {
+			return "[ex(" + Markdown_macro_argument(target) + "," + Markdown_macro_argument(label) + ")]"
 		}
 
 		link := target
@@ -186,16 +186,16 @@ func (class *markdown) render_link() {
 			link = link[:index]
 		}
 
-		result := "[a(" + markdown_macro_argument(link) + "," + markdown_macro_argument(label)
+		result := "[a(" + Markdown_macro_argument(link) + "," + Markdown_macro_argument(label)
 		if hash != "" {
-			result += "," + markdown_macro_argument(hash)
+			result += "," + Markdown_macro_argument(hash)
 		}
 
 		return result + ")]"
 	})
 }
 
-func (class *markdown) render_text() {
+func (class *markdown) Render_text() {
 	replacers := []markdown_replacer{
 		{regexp2.MustCompile(`\*\*\*([^*\r\n]+)\*\*\*`, 0), "i"},
 		{markdown_strong_regex, "b"},
@@ -206,13 +206,13 @@ func (class *markdown) render_text() {
 	}
 
 	for _, replacer := range replacers {
-		class.render_data = markdown_replace(replacer.regex, class.render_data, func(match regexp2.Match) string {
-			return "[" + replacer.macro_name + "(" + markdown_group(match, 1) + ")]"
+		class.render_data = Markdown_replace(replacer.regex, class.render_data, func(match regexp2.Match) string {
+			return "[" + replacer.macro_name + "(" + Markdown_group(match, 1) + ")]"
 		})
 	}
 }
 
-func (class *markdown) render_heading() {
+func (class *markdown) Render_heading() {
 	string_data := markdown_heading_regex.ReplaceAllStringFunc(class.render_data, func(match string) string {
 		data := markdown_heading_regex.FindStringSubmatch(match)
 		heading := strings.TrimSpace(regexp.MustCompile(`[ \t]+#+[ \t]*$`).ReplaceAllString(data[2], ""))
@@ -229,7 +229,7 @@ func (class *markdown) render_heading() {
 	})
 }
 
-func (class *markdown) render_lists() {
+func (class *markdown) Render_lists() {
 	lines := strings.Split(class.render_data, "\n")
 	result := []string{}
 
@@ -282,7 +282,7 @@ func (class *markdown) render_lists() {
 	class.render_data = strings.Join(result, "\n")
 }
 
-func (class *markdown) render_quote() {
+func (class *markdown) Render_quote() {
 	class.render_data = markdown_quote_regex.ReplaceAllStringFunc(class.render_data, func(match string) string {
 		lines := strings.Split(strings.TrimSuffix(match, "\n"), "\n")
 		for index := range lines {
@@ -292,7 +292,7 @@ func (class *markdown) render_quote() {
 	})
 }
 
-func markdown_table_cells(data string) []string {
+func Markdown_table_cells(data string) []string {
 	data = strings.Trim(strings.TrimSpace(data), "|")
 	cells := strings.Split(data, "|")
 	for index := range cells {
@@ -301,7 +301,7 @@ func markdown_table_cells(data string) []string {
 	return cells
 }
 
-func (class *markdown) render_table() {
+func (class *markdown) Render_table() {
 	lines := strings.Split(class.render_data, "\n")
 	result := []string{}
 
@@ -312,7 +312,7 @@ func (class *markdown) render_table() {
 		}
 
 		rows := []string{}
-		for _, cell := range markdown_table_cells(lines[index]) {
+		for _, cell := range Markdown_table_cells(lines[index]) {
 			rows = append(rows, "[th("+cell+")]")
 		}
 		table := []string{"[tr(" + strings.Join(rows, "") + ")]"}
@@ -320,7 +320,7 @@ func (class *markdown) render_table() {
 
 		for index < len(lines) && strings.Contains(lines[index], "|") && strings.TrimSpace(lines[index]) != "" {
 			rows = []string{}
-			for _, cell := range markdown_table_cells(lines[index]) {
+			for _, cell := range Markdown_table_cells(lines[index]) {
 				rows = append(rows, "[td("+cell+")]")
 			}
 			table = append(table, "[tr("+strings.Join(rows, "")+")]")
@@ -333,7 +333,7 @@ func (class *markdown) render_table() {
 	class.render_data = strings.Join(result, "\n")
 }
 
-func (class *markdown) render_last() {
+func (class *markdown) Render_last() {
 	class.render_data = strings.Trim(class.render_data, "\n ")
 
 	renderer := Macromark_new(class.db, map[string]string{
@@ -344,22 +344,22 @@ func (class *markdown) render_last() {
 		"from":        class.data["from"],
 		"include":     class.data["include"],
 	}, "html")
-	result := renderer.main()
-	class.render_data = class.func_temp_restore(result["data"].(string))
+	result := renderer.Main()
+	class.render_data = class.Func_temp_restore(result["data"].(string))
 }
 
-func (class *markdown) main() map[string]any {
-	class.render_code()
-	class.render_escape()
-	class.render_image()
-	class.render_link()
-	class.render_text()
-	class.render_table()
-	class.render_lists()
-	class.render_quote()
-	class.render_heading()
+func (class *markdown) Main() map[string]any {
+	class.Render_code()
+	class.Render_escape()
+	class.Render_image()
+	class.Render_link()
+	class.Render_text()
+	class.Render_table()
+	class.Render_lists()
+	class.Render_quote()
+	class.Render_heading()
 	class.render_data = markdown_horizontal_regex.ReplaceAllString(class.render_data, "[hr()]\n")
-	class.render_last()
+	class.Render_last()
 
 	backlink_list, link_count, _ := backlink_parser.Get_backlink(class.data["data"], "markdown")
 	backlinks := [][]string{}
@@ -378,5 +378,5 @@ func (class *markdown) main() map[string]any {
 }
 
 func Markdown(db *sql.DB, data map[string]string) map[string]any {
-	return Markdown_new(db, data).main()
+	return Markdown_new(db, data).Main()
 }

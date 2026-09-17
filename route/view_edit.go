@@ -31,10 +31,10 @@ func View_edit(config tool.Config, doc_name string, load_doc_name string) string
 		raw_data_get, _ = raw_data["data"].(string)
 	}
 
-	return view_edit_page(db, config, doc_name, load_doc_name, raw_data_get, "", "", "")
+	return View_edit_page(db, config, doc_name, load_doc_name, raw_data_get, "", "", "")
 }
 
-func view_edit_page(db *sql.DB, config tool.Config, doc_name string, load_doc_name string, raw_data_get string, send string, preview_name string, preview_data string) string {
+func View_edit_page(db *sql.DB, config tool.Config, doc_name string, load_doc_name string, raw_data_get string, send string, preview_name string, preview_data string) string {
 
 	check_box := tool.Get_edit_check_box_ui(db)
 	bottom_text := tool.Get_edit_bottom_text_ui(db, "edit")
@@ -49,7 +49,7 @@ func view_edit_page(db *sql.DB, config tool.Config, doc_name string, load_doc_na
 	}
 
 	revision := tool.Get_document_revision(db, doc_name)
-	editor_data := tool.Get_editor_ui(db, config, raw_data_get, "edit", check_box+bottom_text, doc_name, "", document_editor_top_render(db, doc_name))
+	editor_data := tool.Get_editor_ui(db, config, raw_data_get, "edit", check_box+bottom_text, doc_name, "", Document_editor_top_render(db, doc_name))
 	if preview_name != "" {
 		editor_data += `<hr class="main_hr"><h2>` + tool.Get_language(db, "preview", true) + ` (` + preview_name + `)</h2>` + preview_data
 	}

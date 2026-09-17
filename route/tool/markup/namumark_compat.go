@@ -156,7 +156,7 @@ var namumark_compat_html_style_properties = map[string]bool{
 	"word-break":       true,
 }
 
-func compat_html_safe_url(value string, iframe bool) string {
+func Compat_html_safe_url(value string, iframe bool) string {
 	value = strings.TrimSpace(value)
 	if value == "" || strings.HasPrefix(value, "//") {
 		return ""
@@ -195,7 +195,7 @@ func compat_html_safe_url(value string, iframe bool) string {
 	}
 }
 
-func compat_html_safe_style(value string) string {
+func Compat_html_safe_style(value string) string {
 	style_data := []string{}
 	for _, declaration := range strings.Split(value, ";") {
 		parts := strings.SplitN(declaration, ":", 2)
@@ -235,7 +235,7 @@ func compat_html_safe_style(value string) string {
 	return result
 }
 
-func compat_html_dimension(value string) string {
+func Compat_html_dimension(value string) string {
 	value = strings.TrimSpace(value)
 	if !namumark_compat_html_dimension_regex.MatchString(value) {
 		return ""
@@ -243,7 +243,7 @@ func compat_html_dimension(value string) string {
 	return value
 }
 
-func compat_html_allowed_tags(db *sql.DB) map[string]bool {
+func Compat_html_allowed_tags(db *sql.DB) map[string]bool {
 	allowed_tags := map[string]bool{}
 	for tag_name := range namumark_compat_html_tags {
 		allowed_tags[tag_name] = true
@@ -267,17 +267,17 @@ func compat_html_allowed_tags(db *sql.DB) map[string]bool {
 	return allowed_tags
 }
 
-func compat_sanitize_html_node(node *html.Node, allowed_tags map[string]bool) string {
+func Compat_sanitize_html_node(node *html.Node, allowed_tags map[string]bool) string {
 	if node == nil {
 		return ""
 	}
 	if node.Type == html.TextNode {
-		return compat_html_escape(node.Data)
+		return Compat_html_escape(node.Data)
 	}
 	if node.Type != html.ElementNode {
 		data := ""
 		for child := node.FirstChild; child != nil; child = child.NextSibling {
-			data += compat_sanitize_html_node(child, allowed_tags)
+			data += Compat_sanitize_html_node(child, allowed_tags)
 		}
 		return data
 	}
@@ -286,7 +286,7 @@ func compat_sanitize_html_node(node *html.Node, allowed_tags map[string]bool) st
 	if !allowed_tags[tag_name] {
 		data := ""
 		for child := node.FirstChild; child != nil; child = child.NextSibling {
-			data += compat_sanitize_html_node(child, allowed_tags)
+			data += Compat_sanitize_html_node(child, allowed_tags)
 		}
 		return data
 	}
@@ -295,8 +295,8 @@ func compat_sanitize_html_node(node *html.Node, allowed_tags map[string]bool) st
 	if tag_name == "div" || tag_name == "span" {
 		for _, attr := range node.Attr {
 			if strings.EqualFold(attr.Key, "style") {
-				if style := compat_html_safe_style(attr.Val); style != "" {
-					attributes = ` style="` + compat_html_escape(style) + `"`
+				if style := Compat_html_safe_style(attr.Val); style != "" {
+					attributes = ` style="` + Compat_html_escape(style) + `"`
 				}
 				break
 			}
@@ -305,11 +305,11 @@ func compat_sanitize_html_node(node *html.Node, allowed_tags map[string]bool) st
 		href := ""
 		for _, attr := range node.Attr {
 			if strings.EqualFold(attr.Key, "href") {
-				href = compat_html_safe_url(attr.Val, false)
+				href = Compat_html_safe_url(attr.Val, false)
 				break
 			}
 		}
-		attributes = ` class="opennamu_link_out" href="` + compat_html_escape(href) + `"`
+		attributes = ` class="opennamu_link_out" href="` + Compat_html_escape(href) + `"`
 	} else if tag_name == "iframe" {
 		src := ""
 		width := ""
@@ -317,47 +317,47 @@ func compat_sanitize_html_node(node *html.Node, allowed_tags map[string]bool) st
 		for _, attr := range node.Attr {
 			switch strings.ToLower(attr.Key) {
 			case "src":
-				src = compat_html_safe_url(attr.Val, true)
+				src = Compat_html_safe_url(attr.Val, true)
 			case "width":
-				width = compat_html_dimension(attr.Val)
+				width = Compat_html_dimension(attr.Val)
 			case "height":
-				height = compat_html_dimension(attr.Val)
+				height = Compat_html_dimension(attr.Val)
 			}
 		}
 		if src == "" {
 			return ""
 		}
-		attributes = ` src="` + compat_html_escape(src) + `"`
+		attributes = ` src="` + Compat_html_escape(src) + `"`
 		if width != "" {
-			attributes += ` width="` + compat_html_escape(width) + `"`
+			attributes += ` width="` + Compat_html_escape(width) + `"`
 		}
 		if height != "" {
-			attributes += ` height="` + compat_html_escape(height) + `"`
+			attributes += ` height="` + Compat_html_escape(height) + `"`
 		}
 		attributes += ` allowfullscreen frameborder="0"`
 	}
 
 	data := "<" + tag_name + attributes + ">"
 	for child := node.FirstChild; child != nil; child = child.NextSibling {
-		data += compat_sanitize_html_node(child, allowed_tags)
+		data += Compat_sanitize_html_node(child, allowed_tags)
 	}
 	return data + "</" + tag_name + ">"
 }
 
-func compat_sanitize_html(data string, allowed_tags map[string]bool) string {
+func Compat_sanitize_html(data string, allowed_tags map[string]bool) string {
 	nodes, err := html.ParseFragment(strings.NewReader(data), nil)
 	if err != nil {
-		return compat_html_escape(data)
+		return Compat_html_escape(data)
 	}
 
 	result := ""
 	for _, node := range nodes {
-		result += compat_sanitize_html_node(node, allowed_tags)
+		result += Compat_sanitize_html_node(node, allowed_tags)
 	}
 	return result
 }
 
-func compat_render_parameter_value(value any) string {
+func Compat_render_parameter_value(value any) string {
 	if value == nil {
 		return ""
 	}
@@ -367,7 +367,7 @@ func compat_render_parameter_value(value any) string {
 	return fmt.Sprint(value)
 }
 
-func compat_render_parameter_data(data string, parameter map[string]any) string {
+func Compat_render_parameter_data(data string, parameter map[string]any) string {
 	if len(parameter) == 0 {
 		return data
 	}
@@ -377,7 +377,7 @@ func compat_render_parameter_data(data string, parameter map[string]any) string 
 		if !ok {
 			return match[2]
 		}
-		return compat_render_parameter_value(parameter_value)
+		return Compat_render_parameter_value(parameter_value)
 	})
 }
 
@@ -389,7 +389,7 @@ var namumark_compat_toc_regex = regexp.MustCompile(`(?s)<details open class="ope
 var namumark_compat_bold_regex = regexp.MustCompile(`(?s)<b>(.*?)</b>`)
 var namumark_compat_strike_regex = regexp.MustCompile(`(?s)<s>(.*?)</s>`)
 
-func compat_fix_heading_data(db *sql.DB, data string) string {
+func Compat_fix_heading_data(db *sql.DB, data string) string {
 	toc_item := [][2]string{}
 	data = namumark_compat_heading_regex.ReplaceAllStringFunc(data, func(raw string) string {
 		match := namumark_compat_heading_regex.FindStringSubmatch(raw)
@@ -397,7 +397,7 @@ func compat_fix_heading_data(db *sql.DB, data string) string {
 			return raw
 		}
 		toc_item = append(toc_item, [2]string{match[2], match[3]})
-		return `<h` + match[1] + `><a href="#toc" id="s-` + compat_html_escape(match[2]) + `">` + match[2] + `. </a>` + match[3] + `</h` + match[1] + `>`
+		return `<h` + match[1] + `><a href="#toc" id="s-` + Compat_html_escape(match[2]) + `">` + match[2] + `. </a>` + match[3] + `</h` + match[1] + `>`
 	})
 	if len(toc_item) == 0 || !namumark_compat_toc_regex.MatchString(data) {
 		return data
@@ -407,16 +407,16 @@ func compat_fix_heading_data(db *sql.DB, data string) string {
 	if db != nil {
 		toc_title = tool.Get_language(db, "toc", true)
 	}
-	toc_data := `<details open class="opennamu_TOC" id="toc"><summary class="opennamu_TOC_title">` + compat_html_escape(toc_title) + `</summary>`
+	toc_data := `<details open class="opennamu_TOC" id="toc"><summary class="opennamu_TOC_title">` + Compat_html_escape(toc_title) + `</summary>`
 	for _, item := range toc_item {
 		indent := strings.Count(item[0], ".")
-		toc_data += `<br>` + strings.Repeat(`<span style="margin-left: 10px;"></span>`, indent) + `<span class="opennamu_TOC_list"><a href="#s-` + compat_html_escape(item[0]) + `">` + item[0] + `. </a>` + item[1] + `</span>`
+		toc_data += `<br>` + strings.Repeat(`<span style="margin-left: 10px;"></span>`, indent) + `<span class="opennamu_TOC_list"><a href="#s-` + Compat_html_escape(item[0]) + `">` + item[0] + `. </a>` + item[1] + `</span>`
 	}
 	toc_data += `</details>`
 	return namumark_compat_toc_regex.ReplaceAllString(data, toc_data)
 }
 
-func new_namumark_compat_renderer(
+func New_namumark_compat_renderer(
 	db *sql.DB,
 	doc_name string,
 	data string,
@@ -434,7 +434,7 @@ func new_namumark_compat_renderer(
 		doc_name:        doc_name,
 		render_type:     render_type,
 		parameter:       parameter,
-		data:            compat_html_escape(strings.ReplaceAll(data, "\r", "")),
+		data:            Compat_html_escape(strings.ReplaceAll(data, "\r", "")),
 		include_depth:   include_depth,
 		collect_only:    collect_only,
 		tokens:          map[string]string{},
@@ -452,51 +452,51 @@ func new_namumark_compat_renderer(
 	return renderer
 }
 
-func (class *namumark_compat_renderer) is_limited_render() bool {
+func (class *namumark_compat_renderer) Is_limited_render() bool {
 	return class.render_type == "thread" || class.render_type == "bbs"
 }
 
-func (class *namumark_compat_renderer) reserve(data string) string {
+func (class *namumark_compat_renderer) Reserve(data string) string {
 	class.token_count++
 	token := class.token_prefix + strconv.Itoa(class.token_count) + "X"
 	class.tokens[token] = data
 	return token
 }
 
-func (class *namumark_compat_renderer) reserve_literal(data string) string {
-	token := class.reserve(data)
+func (class *namumark_compat_renderer) Reserve_literal(data string) string {
+	token := class.Reserve(data)
 	class.literal_tokens[token] = true
 	return token
 }
 
-func (class *namumark_compat_renderer) reserve_inter(data string) string {
+func (class *namumark_compat_renderer) Reserve_inter(data string) string {
 	class.inter_count++
 	token := "OPENNAMU_COMPAT_INTER_TOKEN_" + strconv.Itoa(class.inter_count) + "X"
 	class.inter_data[token] = data
 	return token
 }
 
-func (class *namumark_compat_renderer) reserve_slash(data string) string {
-	token := class.reserve(data)
+func (class *namumark_compat_renderer) Reserve_slash(data string) string {
+	token := class.Reserve(data)
 	class.slash_tokens[token] = data
 	return token
 }
 
-func (class *namumark_compat_renderer) restore_slash(data string) string {
+func (class *namumark_compat_renderer) Restore_slash(data string) string {
 	for token, token_data := range class.slash_tokens {
 		data = strings.ReplaceAll(data, token, tool.HTML_unescape(token_data))
 	}
 	return data
 }
 
-func (class *namumark_compat_renderer) middle_literal(data string) string {
+func (class *namumark_compat_renderer) Middle_literal(data string) string {
 	for token, token_data := range class.slash_tokens {
 		data = strings.ReplaceAll(data, token, "\\"+token_data)
 	}
 	return data
 }
 
-func (class *namumark_compat_renderer) restore_inter_literal(data string) string {
+func (class *namumark_compat_renderer) Restore_inter_literal(data string) string {
 	for count := 0; count <= len(class.inter_raw)+1; count++ {
 		changed := false
 		for token, wrapper := range class.inter_wrappers {
@@ -521,7 +521,7 @@ func (class *namumark_compat_renderer) restore_inter_literal(data string) string
 	return data
 }
 
-func (class *namumark_compat_renderer) restore(data string) string {
+func (class *namumark_compat_renderer) Restore(data string) string {
 	for count := 0; count <= len(class.tokens)+1; count++ {
 		changed := false
 		for token, token_data := range class.tokens {
@@ -537,7 +537,7 @@ func (class *namumark_compat_renderer) restore(data string) string {
 	return data
 }
 
-func (class *namumark_compat_renderer) get_render_setting(name string) string {
+func (class *namumark_compat_renderer) Get_render_setting(name string) string {
 	if setting, ok := class.parameter["__opennamu_skin_set"].(map[string]string); ok {
 		if value := setting[name]; value != "" {
 			return value
@@ -551,7 +551,7 @@ func (class *namumark_compat_renderer) get_render_setting(name string) string {
 	return "default"
 }
 
-func (class *namumark_compat_renderer) add_backlink(target string, link_type string, data string) {
+func (class *namumark_compat_renderer) Add_backlink(target string, link_type string, data string) {
 	if target == "" {
 		return
 	}
@@ -569,7 +569,7 @@ func (class *namumark_compat_renderer) add_backlink(target string, link_type str
 	class.backlink_order = append(class.backlink_order, key)
 }
 
-func (class *namumark_compat_renderer) find_document(name string) (string, bool) {
+func (class *namumark_compat_renderer) Find_document(name string) (string, bool) {
 	if document, ok := class.document_cache[name]; ok {
 		return document.actual, document.exists
 	}
@@ -590,7 +590,7 @@ func (class *namumark_compat_renderer) find_document(name string) (string, bool)
 	return name, false
 }
 
-func (class *namumark_compat_renderer) compat_split_anchor(target string) (string, string) {
+func (class *namumark_compat_renderer) Compat_split_anchor(target string) (string, string) {
 	hash_index := strings.LastIndex(target, "#")
 	if hash_index < 0 || hash_index == len(target)-1 {
 		return target, ""
@@ -600,12 +600,12 @@ func (class *namumark_compat_renderer) compat_split_anchor(target string) (strin
 	if anchor == "" {
 		return target[:hash_index], ""
 	}
-	return target[:hash_index], "#" + class.compat_url_parser(anchor)
+	return target[:hash_index], "#" + class.Compat_url_parser(anchor)
 }
 
-func (class *namumark_compat_renderer) normalize_target(target string) string {
+func (class *namumark_compat_renderer) Normalize_target(target string) string {
 	target = strings.TrimSpace(target)
-	target = class.restore_slash(target)
+	target = class.Restore_slash(target)
 
 	base_name := class.doc_name
 	relative_path := false
@@ -629,39 +629,39 @@ func (class *namumark_compat_renderer) normalize_target(target string) string {
 		}
 	}
 
-	target = normalize_namumark_link(target)
+	target = Normalize_namumark_link(target)
 	return target
 }
 
-func (class *namumark_compat_renderer) add_document_link(target string, link_type string, data string) string {
-	target = class.normalize_target(target)
+func (class *namumark_compat_renderer) Add_document_link(target string, link_type string, data string) string {
+	target = class.Normalize_target(target)
 	if target == "" {
 		return ""
 	}
 
-	actual, exists := class.find_document(target)
+	actual, exists := class.Find_document(target)
 	if exists {
 		target = actual
 	}
-	class.add_backlink(target, link_type, data)
+	class.Add_backlink(target, link_type, data)
 	if !exists {
-		class.add_backlink(target, "no", "")
+		class.Add_backlink(target, "no", "")
 	}
 	return target
 }
 
-func compat_is_external_link(target string) bool {
+func Compat_is_external_link(target string) bool {
 	target_lower := strings.ToLower(strings.TrimSpace(target))
 	return strings.HasPrefix(target_lower, "http://") ||
 		strings.HasPrefix(target_lower, "https://")
 }
 
-func compat_is_interwiki_link(target string) bool {
+func Compat_is_interwiki_link(target string) bool {
 	parts := strings.SplitN(target, ":", 3)
 	return len(parts) == 3 && (strings.EqualFold(parts[0], "inter") || strings.EqualFold(parts[0], "인터"))
 }
 
-func (class *namumark_compat_renderer) get_outer_link_data(target string, label string) (string, string, bool) {
+func (class *namumark_compat_renderer) Get_outer_link_data(target string, label string) (string, string, bool) {
 	parsed, err := url.Parse(target)
 	if err != nil || parsed.Host == "" {
 		return "", "", false
@@ -675,31 +675,31 @@ func (class *namumark_compat_renderer) get_outer_link_data(target string, label 
 	}
 
 	if icon == "" {
-		return compat_escape_value(link_name + ":"), "opennamu_link_inter", true
+		return Compat_escape_value(link_name + ":"), "opennamu_link_inter", true
 	}
 	if strings.ContainsAny(icon, "<>") {
 		return icon, "opennamu_link_inter", true
 	}
-	if strings.Contains(class.restore(label), `"`+icon+`"`) {
+	if strings.Contains(class.Restore(label), `"`+icon+`"`) {
 		return "", "opennamu_link_inter", true
 	}
-	return `<img src="` + compat_html_escape(icon) + `">`, "opennamu_link_inter", true
+	return `<img src="` + Compat_html_escape(icon) + `">`, "opennamu_link_inter", true
 }
 
-func (class *namumark_compat_renderer) get_interwiki_url(target string) (string, bool) {
+func (class *namumark_compat_renderer) Get_interwiki_url(target string) (string, bool) {
 	parts := strings.SplitN(target, ":", 3)
-	if len(parts) != 3 || !compat_is_interwiki_link(target) {
+	if len(parts) != 3 || !Compat_is_interwiki_link(target) {
 		return "", false
 	}
 
-	page, anchor := class.compat_split_anchor(parts[2])
+	page, anchor := class.Compat_split_anchor(parts[2])
 	plus := ""
 	icon := ""
 	if !tool.QueryRow_DB(class.db, "select plus, plus_t from html_filter where kind = 'inter_wiki' and html = ?", []any{&plus, &icon}, parts[1]) {
 		return "", false
 	}
 
-	link := plus + class.compat_url_parser(page) + anchor
+	link := plus + class.Compat_url_parser(page) + anchor
 	inter_sub_mode := ""
 	tool.QueryRow_DB(class.db, "select plus_t from html_filter where kind = 'inter_wiki_sub' and html = ?", []any{&inter_sub_mode}, parts[1])
 	if inter_sub_mode == "under_bar" {
@@ -708,8 +708,8 @@ func (class *namumark_compat_renderer) get_interwiki_url(target string) (string,
 	return link, true
 }
 
-func (class *namumark_compat_renderer) process_redirect(data string) string {
-	if class.is_limited_render() {
+func (class *namumark_compat_renderer) Process_redirect(data string) string {
+	if class.Is_limited_render() {
 		return data
 	}
 
@@ -738,46 +738,46 @@ func (class *namumark_compat_renderer) process_redirect(data string) string {
 			}
 		}
 
-		main_target, anchor := class.compat_split_anchor(target)
-		if compat_is_external_link(main_target) {
+		main_target, anchor := class.Compat_split_anchor(target)
+		if Compat_is_external_link(main_target) {
 			class.redirect = true
 			if class.collect_only || class.include_depth > 0 {
 				return ""
 			}
-			lines[index] = class.reserve(`<a href="` + compat_html_escape(main_target+anchor) + `">(GO)</a>`)
+			lines[index] = class.Reserve(`<a href="` + Compat_html_escape(main_target+anchor) + `">(GO)</a>`)
 			return strings.Join(lines, "\n")
 		}
-		if compat_is_interwiki_link(main_target) {
+		if Compat_is_interwiki_link(main_target) {
 			class.redirect = true
 			if class.collect_only || class.include_depth > 0 {
 				return ""
 			}
-			link, ok := class.get_interwiki_url(main_target + anchor)
+			link, ok := class.Get_interwiki_url(main_target + anchor)
 			if !ok {
 				lines[index] = ""
 				return strings.Join(lines, "\n")
 			}
-			lines[index] = class.reserve(`<a href="` + compat_html_escape(link) + `">(GO)</a>`)
+			lines[index] = class.Reserve(`<a href="` + Compat_html_escape(link) + `">(GO)</a>`)
 			return strings.Join(lines, "\n")
 		}
 
-		main_target = class.add_document_link(main_target, "redirect", anchor)
+		main_target = class.Add_document_link(main_target, "redirect", anchor)
 		class.redirect = true
 		if class.collect_only || class.include_depth > 0 {
 			return ""
 		}
 
-		link := "/w_from/" + class.compat_url_parser(main_target) + anchor
-		lines[index] = class.reserve(`<a href="` + compat_html_escape(link) + `">(GO)</a>`)
+		link := "/w_from/" + class.Compat_url_parser(main_target) + anchor
+		lines[index] = class.Reserve(`<a href="` + Compat_html_escape(link) + `">(GO)</a>`)
 		return strings.Join(lines, "\n")
 	}
 
 	return data
 }
 
-func (class *namumark_compat_renderer) process_category(target string, label string) string {
+func (class *namumark_compat_renderer) Process_category(target string, label string) string {
 	target = strings.TrimSpace(target)
-	target = class.normalize_target(target)
+	target = class.Normalize_target(target)
 	target = strings.TrimPrefix(strings.TrimPrefix(target, "category:"), "분류:")
 
 	blur := false
@@ -790,31 +790,31 @@ func (class *namumark_compat_renderer) process_category(target string, label str
 	}
 
 	category_target := "category:" + target
-	actual, exists := class.find_document(category_target)
+	actual, exists := class.Find_document(category_target)
 	if exists {
 		category_target = actual
 	}
-	class.add_backlink(category_target, "cat", "")
+	class.Add_backlink(category_target, "cat", "")
 	if label != target {
-		class.add_backlink(category_target, "cat_view", label)
+		class.Add_backlink(category_target, "cat_view", label)
 	}
 	if blur {
-		class.add_backlink(category_target, "cat_blur", "")
+		class.Add_backlink(category_target, "cat_blur", "")
 	}
 	if !exists {
-		class.add_backlink(category_target, "no", "")
+		class.Add_backlink(category_target, "no", "")
 	}
 
 	for _, category := range class.categories {
 		if category.target == category_target {
-			return class.reserve("")
+			return class.Reserve("")
 		}
 	}
 	class.categories = append(class.categories, namumark_compat_category{category_target, label, blur, exists})
-	return class.reserve("")
+	return class.Reserve("")
 }
 
-func compat_file_option_value(value string) string {
+func Compat_file_option_value(value string) string {
 	value = tool.HTML_unescape(strings.TrimSpace(value))
 	value = strings.ReplaceAll(value, ";", "")
 	value = strings.ReplaceAll(value, "{", "")
@@ -824,15 +824,15 @@ func compat_file_option_value(value string) string {
 	return value
 }
 
-func compat_file_px(value string) string {
-	value = compat_file_option_value(value)
+func Compat_file_px(value string) string {
+	value = Compat_file_option_value(value)
 	if regexp.MustCompile(`^[0-9]+$`).MatchString(value) {
 		return value + "px"
 	}
 	return value
 }
 
-func compat_file_options(raw string, default_alt string) (string, string, string) {
+func Compat_file_options(raw string, default_alt string) (string, string, string) {
 	raw = tool.HTML_unescape(raw)
 	alt := default_alt
 	style := ""
@@ -856,9 +856,9 @@ func compat_file_options(raw string, default_alt string) (string, string, string
 		case "alt", "title":
 			alt = value
 		case "width":
-			style += "width:" + compat_file_px(value) + ";"
+			style += "width:" + Compat_file_px(value) + ";"
 		case "height":
-			style += "height:" + compat_file_px(value) + ";"
+			style += "height:" + Compat_file_px(value) + ";"
 		case "align":
 			if value == "left" || value == "right" {
 				style += "float:" + value + ";"
@@ -866,14 +866,14 @@ func compat_file_options(raw string, default_alt string) (string, string, string
 				style += "display:block;margin-left:auto;margin-right:auto;"
 			}
 		case "bgcolor":
-			style += "background:" + compat_file_option_value(value) + ";"
+			style += "background:" + Compat_file_option_value(value) + ";"
 		case "theme":
 			value = strings.ToLower(strings.TrimSpace(value))
 			if value == "dark" || value == "light" {
 				theme = value
 			}
 		case "border-radius":
-			style += "border-radius:" + compat_file_px(value) + ";"
+			style += "border-radius:" + Compat_file_px(value) + ";"
 		case "rendering":
 			if value == "pixelated" {
 				style += "image-rendering:pixelated;"
@@ -883,18 +883,18 @@ func compat_file_options(raw string, default_alt string) (string, string, string
 	return alt, style, theme
 }
 
-func (class *namumark_compat_renderer) file_theme_visible(theme string) bool {
+func (class *namumark_compat_renderer) File_theme_visible(theme string) bool {
 	if theme == "" {
 		return true
 	}
-	darkmode := class.get_render_setting("main_css_darkmode")
+	darkmode := class.Get_render_setting("main_css_darkmode")
 	if darkmode == "" || darkmode == "default" {
 		darkmode = "0"
 	}
 	return (theme == "dark" && darkmode == "1") || (theme == "light" && darkmode != "1")
 }
 
-func (class *namumark_compat_renderer) external_image_allowed(target string) bool {
+func (class *namumark_compat_renderer) External_image_allowed(target string) bool {
 	if class.db == nil {
 		return true
 	}
@@ -913,7 +913,7 @@ func (class *namumark_compat_renderer) external_image_allowed(target string) boo
 	return tool.QueryRow_DB(class.db, "select html from html_filter where kind = 'external_image' and html = ? limit 1", []any{&domain}, strings.ToLower(parsed.Hostname()))
 }
 
-func (class *namumark_compat_renderer) process_file(target string, label string) string {
+func (class *namumark_compat_renderer) Process_file(target string, label string) string {
 	lower_target := strings.ToLower(target)
 	external := strings.HasPrefix(lower_target, "out:") || strings.HasPrefix(lower_target, "외부:")
 	file_name := target
@@ -928,25 +928,25 @@ func (class *namumark_compat_renderer) process_file(target string, label string)
 			}
 		}
 	}
-	file_name = class.restore_slash(tool.HTML_unescape(strings.TrimSpace(file_name)))
+	file_name = class.Restore_slash(tool.HTML_unescape(strings.TrimSpace(file_name)))
 	if file_name == "" {
-		return class.reserve("")
+		return class.Reserve("")
 	}
 
-	_, style, theme := compat_file_options(label, file_name)
+	_, style, theme := Compat_file_options(label, file_name)
 	alt := strings.TrimSpace(target)
 	if external {
-		if !class.file_theme_visible(theme) {
-			return class.reserve("")
+		if !class.File_theme_visible(theme) {
+			return class.Reserve("")
 		}
 		if !strings.HasPrefix(strings.ToLower(file_name), "http://") && !strings.HasPrefix(strings.ToLower(file_name), "https://") {
-			return class.reserve(compat_html_escape(alt))
+			return class.Reserve(Compat_html_escape(alt))
 		}
-		if !class.external_image_allowed(file_name) {
-			return class.reserve(compat_html_escape(alt))
+		if !class.External_image_allowed(file_name) {
+			return class.Reserve(Compat_html_escape(alt))
 		}
-		image := `<img style="` + compat_html_escape(style) + `" alt="` + compat_html_escape(alt) + `" src="` + compat_html_escape(file_name) + `">`
-		return class.reserve(`<a title="` + compat_html_escape(alt) + `" href="` + compat_html_escape(file_name) + `">` + image + `</a>`)
+		image := `<img style="` + Compat_html_escape(style) + `" alt="` + Compat_html_escape(alt) + `" src="` + Compat_html_escape(file_name) + `">`
+		return class.Reserve(`<a title="` + Compat_html_escape(alt) + `" href="` + Compat_html_escape(file_name) + `">` + image + `</a>`)
 	}
 
 	file_target := "file:" + file_name
@@ -956,52 +956,52 @@ func (class *namumark_compat_renderer) process_file(target string, label string)
 		base_name = file_name[:dot_index]
 		extension = strings.ToLower(file_name[dot_index+1:])
 	}
-	actual, exists := class.find_document(file_target)
+	actual, exists := class.Find_document(file_target)
 	if exists {
 		file_target = actual
 	}
-	class.add_backlink(file_target, "file", "")
+	class.Add_backlink(file_target, "file", "")
 	if !exists {
-		class.add_backlink(file_target, "no", "")
-		return class.reserve(`<a class="opennamu_not_exist_link" title="` + compat_html_escape(alt) + `" href="/upload/` + class.compat_url_parser(base_name) + `">(` + compat_html_escape(alt) + `)</a>`)
+		class.Add_backlink(file_target, "no", "")
+		return class.Reserve(`<a class="opennamu_not_exist_link" title="` + Compat_html_escape(alt) + `" href="/upload/` + class.Compat_url_parser(base_name) + `">(` + Compat_html_escape(alt) + `)</a>`)
 	}
-	if !class.file_theme_visible(theme) {
-		return class.reserve("")
+	if !class.File_theme_visible(theme) {
+		return class.Reserve("")
 	}
 
 	storage_name := tool.File_name_to_dir(base_name, extension)
 	rev := "1"
 	tool.QueryRow_DB(class.db, "select id from history where title = ? order by date desc limit 1", []any{&rev}, file_target)
-	image_url := "/image/" + class.compat_url_parser(storage_name) + ".cache_v" + class.compat_url_parser(rev)
-	file_url := "/w/file:" + class.compat_url_parser(file_name)
+	image_url := "/image/" + class.Compat_url_parser(storage_name) + ".cache_v" + class.Compat_url_parser(rev)
+	file_url := "/w/file:" + class.Compat_url_parser(file_name)
 	if tool.Is_audio_extension(extension) {
-		return class.reserve(`<audio controls title="` + compat_html_escape(alt) + `" style="` + compat_html_escape(style) + `" src="` + compat_html_escape(image_url) + `"></audio>`)
+		return class.Reserve(`<audio controls title="` + Compat_html_escape(alt) + `" style="` + Compat_html_escape(style) + `" src="` + Compat_html_escape(image_url) + `"></audio>`)
 	}
 	if tool.Is_video_extension(extension) {
-		video_set := class.get_render_setting("main_css_video_set")
+		video_set := class.Get_render_setting("main_css_video_set")
 		if video_set == "off" {
-			return class.reserve("")
+			return class.Reserve("")
 		}
 		if video_set == "click" {
-			return class.reserve(`<a title="` + compat_html_escape(alt) + `" href="` + compat_html_escape(file_url) + `">` + compat_html_escape(file_name) + `</a>`)
+			return class.Reserve(`<a title="` + Compat_html_escape(alt) + `" href="` + Compat_html_escape(file_url) + `">` + Compat_html_escape(file_name) + `</a>`)
 		}
 		preload := "metadata"
 		if video_set == "new_click" {
 			preload = "none"
 		}
-		return class.reserve(`<video controls preload="` + preload + `" title="` + compat_html_escape(alt) + `" style="` + compat_html_escape(style) + `" src="` + compat_html_escape(image_url) + `"></video>`)
+		return class.Reserve(`<video controls preload="` + preload + `" title="` + Compat_html_escape(alt) + `" style="` + Compat_html_escape(style) + `" src="` + Compat_html_escape(image_url) + `"></video>`)
 	}
-	image := `<img style="` + compat_html_escape(style) + `" alt="` + compat_html_escape(alt) + `" src="` + compat_html_escape(image_url) + `">`
-	return class.reserve(`<a title="` + compat_html_escape(alt) + `" href="` + compat_html_escape(file_url) + `">` + image + `</a>`)
+	image := `<img style="` + Compat_html_escape(style) + `" alt="` + Compat_html_escape(alt) + `" src="` + Compat_html_escape(image_url) + `">`
+	return class.Reserve(`<a title="` + Compat_html_escape(alt) + `" href="` + Compat_html_escape(file_url) + `">` + image + `</a>`)
 }
 
-func (class *namumark_compat_renderer) process_interwiki(target string, label string) string {
+func (class *namumark_compat_renderer) Process_interwiki(target string, label string) string {
 	parts := strings.SplitN(target, ":", 3)
 	if len(parts) != 3 {
 		return ""
 	}
 	name := parts[1]
-	page, anchor := class.compat_split_anchor(parts[2])
+	page, anchor := class.Compat_split_anchor(parts[2])
 	plus := ""
 	icon := ""
 	if !tool.QueryRow_DB(class.db, "select plus, plus_t from html_filter where kind = 'inter_wiki' and html = ?", []any{&plus, &icon}, name) {
@@ -1011,7 +1011,7 @@ func (class *namumark_compat_renderer) process_interwiki(target string, label st
 	if label == "" {
 		label = page
 	}
-	link := plus + class.compat_url_parser(page) + anchor
+	link := plus + class.Compat_url_parser(page) + anchor
 	inter_sub_mode := ""
 	tool.QueryRow_DB(class.db, "select plus_t from html_filter where kind = 'inter_wiki_sub' and html = ?", []any{&inter_sub_mode}, name)
 	if inter_sub_mode == "under_bar" {
@@ -1020,17 +1020,17 @@ func (class *namumark_compat_renderer) process_interwiki(target string, label st
 	if icon == "" {
 		icon = name + ":"
 	}
-	icon_data := compat_escape_value(icon)
+	icon_data := Compat_escape_value(icon)
 	if strings.ContainsAny(icon, "<>") {
 		icon_data = icon
 	}
-	return class.reserve(`<a class="opennamu_link_inter" title="` + compat_html_escape(name+":"+page) + `" href="` + compat_html_escape(link) + `">` + icon_data + compat_escape_value(label) + `</a>`)
+	return class.Reserve(`<a class="opennamu_link_inter" title="` + Compat_html_escape(name+":"+page) + `" href="` + Compat_html_escape(link) + `">` + icon_data + Compat_escape_value(label) + `</a>`)
 }
 
-func (class *namumark_compat_renderer) process_links(data string) string {
+func (class *namumark_compat_renderer) Process_links(data string) string {
 	for {
 		previous := data
-		data = compat_replace_regex2(data, `(?i)\[\[((?:(?!\[\[|\]\]|\||<|>).)+)(?:\|((?:(?!\[\[|\]\]|\|).)+))?\]\]`, func(match regexp2.Match) string {
+		data = Compat_replace_regex2(data, `(?i)\[\[((?:(?!\[\[|\]\]|\||<|>).)+)(?:\|((?:(?!\[\[|\]\]|\|).)+))?\]\]`, func(match regexp2.Match) string {
 			raw := match.String()
 			body := strings.TrimSpace(tool.HTML_unescape(match.GroupByNumber(1).String()))
 			label := strings.TrimSpace(tool.HTML_unescape(match.GroupByNumber(2).String()))
@@ -1039,37 +1039,37 @@ func (class *namumark_compat_renderer) process_links(data string) string {
 			switch {
 			case strings.HasPrefix(lower_body, "file:"), strings.HasPrefix(lower_body, "파일:"),
 				strings.HasPrefix(lower_body, "out:"), strings.HasPrefix(lower_body, "외부:"):
-				return class.process_file(body, label)
+				return class.Process_file(body, label)
 			case strings.HasPrefix(lower_body, "category:"), strings.HasPrefix(lower_body, "분류:"):
-				if class.is_limited_render() {
+				if class.Is_limited_render() {
 					return ""
 				}
-				return class.process_category(body, label)
+				return class.Process_category(body, label)
 			case strings.HasPrefix(lower_body, "inter:"), strings.HasPrefix(lower_body, "인터:"):
-				if result := class.process_interwiki(body, label); result != "" {
+				if result := class.Process_interwiki(body, label); result != "" {
 					return result
 				}
 				return raw
 			}
 
-			main_target, anchor := class.compat_split_anchor(body)
+			main_target, anchor := class.Compat_split_anchor(body)
 			if strings.HasPrefix(body, "#") {
 				if label == "" {
 					label = body
 				}
-				return class.reserve(`<a class=" " title="`+compat_html_escape(body)+`" href="`+compat_html_escape("#"+class.compat_url_parser(strings.TrimPrefix(body, "#")))+`">`) + compat_html_escape(label) + class.reserve(`</a>`)
+				return class.Reserve(`<a class=" " title="`+Compat_html_escape(body)+`" href="`+Compat_html_escape("#"+class.Compat_url_parser(strings.TrimPrefix(body, "#")))+`">`) + Compat_html_escape(label) + class.Reserve(`</a>`)
 			}
-			if compat_is_external_link(main_target) {
-				main_target = class.restore_slash(main_target)
+			if Compat_is_external_link(main_target) {
+				main_target = class.Restore_slash(main_target)
 				if label == "" {
 					label = body
 				}
 				link_target := main_target + anchor
-				icon, link_class, matched := class.get_outer_link_data(main_target, label)
+				icon, link_class, matched := class.Get_outer_link_data(main_target, label)
 				if !matched {
 					link_class = "opennamu_link_out"
 				}
-				return class.reserve(`<a class="`+link_class+`" target="_blank" title="`+compat_html_escape(link_target)+`" href="`+compat_html_escape(link_target)+`">`) + class.reserve(icon) + compat_escape_value(label) + class.reserve(`</a>`)
+				return class.Reserve(`<a class="`+link_class+`" target="_blank" title="`+Compat_html_escape(link_target)+`" href="`+Compat_html_escape(link_target)+`">`) + class.Reserve(icon) + Compat_escape_value(label) + class.Reserve(`</a>`)
 			}
 
 			if main_target == "" {
@@ -1077,14 +1077,14 @@ func (class *namumark_compat_renderer) process_links(data string) string {
 			}
 			class.link_count++
 
-			normalized_target := class.normalize_target(main_target)
-			actual_target, exists := class.find_document(normalized_target)
+			normalized_target := class.Normalize_target(main_target)
+			actual_target, exists := class.Find_document(normalized_target)
 			if exists {
 				normalized_target = actual_target
 			}
-			class.add_backlink(normalized_target, "", "")
+			class.Add_backlink(normalized_target, "", "")
 			if !exists {
-				class.add_backlink(normalized_target, "no", "")
+				class.Add_backlink(normalized_target, "no", "")
 			}
 			if label == "" {
 				label = body
@@ -1105,7 +1105,7 @@ func (class *namumark_compat_renderer) process_links(data string) string {
 				link_same = "opennamu_same_link"
 			}
 			link_class := ` class="` + link_exist + " " + link_same + `"`
-			return class.reserve(`<a`+link_class+` title="`+compat_html_escape(normalized_target+anchor)+`" href="/w/`+class.compat_url_parser(normalized_target)+anchor+`">`) + compat_html_escape(label) + class.reserve(`</a>`)
+			return class.Reserve(`<a`+link_class+` title="`+Compat_html_escape(normalized_target+anchor)+`" href="/w/`+class.Compat_url_parser(normalized_target)+anchor+`">`) + Compat_html_escape(label) + class.Reserve(`</a>`)
 		})
 		if data == previous {
 			break
@@ -1114,7 +1114,7 @@ func (class *namumark_compat_renderer) process_links(data string) string {
 	return data
 }
 
-func compat_split_macro_args(data string) []string {
+func Compat_split_macro_args(data string) []string {
 	data = strings.ReplaceAll(data, ",,", "\x00")
 	parts := strings.Split(data, ",")
 	for index := range parts {
@@ -1124,8 +1124,8 @@ func compat_split_macro_args(data string) []string {
 	return parts
 }
 
-func (class *namumark_compat_renderer) process_file_media_macro(data string, media_type string) string {
-	parts := compat_split_macro_args(data)
+func (class *namumark_compat_renderer) Process_file_media_macro(data string, media_type string) string {
+	parts := Compat_split_macro_args(data)
 	if len(parts) == 0 {
 		return ""
 	}
@@ -1154,23 +1154,23 @@ func (class *namumark_compat_renderer) process_file_media_macro(data string, med
 		return ""
 	}
 
-	return class.process_file("file:"+file_name, "")
+	return class.Process_file("file:"+file_name, "")
 }
 
-func (class *namumark_compat_renderer) merge_child(child *namumark_compat_renderer) {
+func (class *namumark_compat_renderer) Merge_child(child *namumark_compat_renderer) {
 	for _, key := range child.backlink_order {
 		entry := child.backlinks[key]
-		class.add_backlink(entry.target, entry.link_type, entry.data)
+		class.Add_backlink(entry.target, entry.link_type, entry.data)
 	}
 	class.link_count += child.link_count
 }
 
-func (class *namumark_compat_renderer) process_includes(data string) string {
+func (class *namumark_compat_renderer) Process_includes(data string) string {
 	include_count_max := strings.Count(strings.ToLower(data), "[include(") * 2
 	include_count := map[string]int{}
 	for {
 		previous := data
-		data = compat_replace_regex2(data, `(?i)\[include\(((?:(?!\[include\(|\)\]|</div>).)+)\)\](\n?)`, func(match regexp2.Match) string {
+		data = Compat_replace_regex2(data, `(?i)\[include\(((?:(?!\[include\(|\)\]|</div>).)+)\)\](\n?)`, func(match regexp2.Match) string {
 			suffix := match.GroupByNumber(2).String()
 			if include_count_max <= 0 {
 				return match.String()
@@ -1186,7 +1186,7 @@ func (class *namumark_compat_renderer) process_includes(data string) string {
 			for key, value := range class.parameter {
 				include_parameter[key] = value
 			}
-			for _, item := range compat_split_macro_args(match.GroupByNumber(1).String()) {
+			for _, item := range Compat_split_macro_args(match.GroupByNumber(1).String()) {
 				if item == "" {
 					continue
 				}
@@ -1199,16 +1199,16 @@ func (class *namumark_compat_renderer) process_includes(data string) string {
 				key := strings.TrimSpace(parts[0])
 				value := strings.TrimSpace(parts[1])
 				include_parameter[key] = value
-				if class.is_limited_render() {
+				if class.Is_limited_render() {
 					include_link_parameter[key] = value
 				}
 			}
 			include_name_org := strings.TrimSpace(include_name)
-			include_name = class.normalize_target(include_name)
+			include_name = class.Normalize_target(include_name)
 			include_name_url := include_name
 			if strings.Contains(include_name, "OPENNAMU_COMPAT_TOKEN_") {
 				include_name_url = "<" + include_name + ">"
-				include_name_org = regexp.MustCompile(`<[^<>]*>`).ReplaceAllString(class.restore(include_name_org), "")
+				include_name_org = regexp.MustCompile(`<[^<>]*>`).ReplaceAllString(class.Restore(include_name_org), "")
 			}
 			if include_name == "" {
 				return suffix
@@ -1218,11 +1218,11 @@ func (class *namumark_compat_renderer) process_includes(data string) string {
 				return suffix
 			}
 			include_count[include_count_key]++
-			actual, exists := class.find_document(include_name)
+			actual, exists := class.Find_document(include_name)
 			if exists {
 				include_name = actual
 			}
-			if class.is_limited_render() {
+			if class.Is_limited_render() {
 				payload := map[string]any{
 					"version":    1,
 					"name":       include_name,
@@ -1232,13 +1232,13 @@ func (class *namumark_compat_renderer) process_includes(data string) string {
 				if err != nil {
 					return suffix
 				}
-				include_link := `<a href="/include/` + tool.Base64_encode(string(payload_data)) + `">(` + compat_escape_value(include_name_org) + `)</a>`
-				return class.reserve(include_link) + suffix
+				include_link := `<a href="/include/` + tool.Base64_encode(string(payload_data)) + `">(` + Compat_escape_value(include_name_org) + `)</a>`
+				return class.Reserve(include_link) + suffix
 			}
-			class.add_backlink(include_name, "include", "")
+			class.Add_backlink(include_name, "include", "")
 			if !exists {
-				class.add_backlink(include_name, "no", "")
-				return class.reserve(`<a class="opennamu_not_exist_link" href="/w/`+class.compat_url_parser(include_name_url)+`">(`+compat_escape_value(include_name_org)+`)</a>`) + suffix
+				class.Add_backlink(include_name, "no", "")
+				return class.Reserve(`<a class="opennamu_not_exist_link" href="/w/`+class.Compat_url_parser(include_name_url)+`">(`+Compat_escape_value(include_name_org)+`)</a>`) + suffix
 			}
 			if class.collect_only || class.include_depth >= 8 {
 				return suffix
@@ -1246,16 +1246,16 @@ func (class *namumark_compat_renderer) process_includes(data string) string {
 
 			include_data := ""
 			tool.QueryRow_DB(class.db, "select data from data where title = ?", []any{&include_data}, include_name)
-			child := new_namumark_compat_renderer(class.db, class.doc_name, include_data, "include", include_parameter, class.include_depth+1, false)
-			child.prepare()
-			child_output := `<div class="opennamu_render_complete">` + child.render_output() + `</div>`
+			child := New_namumark_compat_renderer(class.db, class.doc_name, include_data, "include", include_parameter, class.include_depth+1, false)
+			child.Prepare()
+			child_output := `<div class="opennamu_render_complete">` + child.Render_output() + `</div>`
 			include_link := ""
-			if class.get_render_setting("main_css_include_link") == "use" {
-				include_link = `<a href="/w/` + class.compat_url_parser(include_name_url) + `">(` + compat_escape_value(include_name_org) + `)</a><br>`
+			if class.Get_render_setting("main_css_include_link") == "use" {
+				include_link = `<a href="/w/` + class.Compat_url_parser(include_name_url) + `">(` + Compat_escape_value(include_name_org) + `)</a><br>`
 			}
 			child_output = include_link + child_output
-			class.merge_child(child)
-			return class.reserve(child_output) + suffix
+			class.Merge_child(child)
+			return class.Reserve(child_output) + suffix
 		})
 		if data == previous {
 			break
@@ -1264,17 +1264,17 @@ func (class *namumark_compat_renderer) process_includes(data string) string {
 	return data
 }
 
-func (class *namumark_compat_renderer) get_footnote_label(footnote namumark_compat_footnote, number string, view_number bool) string {
+func (class *namumark_compat_renderer) Get_footnote_label(footnote namumark_compat_footnote, number string, view_number bool) string {
 	label := footnote.name
-	if class.get_render_setting("main_css_footnote_number") == "only_number" {
+	if class.Get_render_setting("main_css_footnote_number") == "only_number" {
 		label = footnote.numbers[0]
 	}
-	if view_number && footnote.named && class.get_render_setting("main_css_view_real_footnote_num") == "on" {
+	if view_number && footnote.named && class.Get_render_setting("main_css_view_real_footnote_num") == "on" {
 		label += " (" + number + ")"
 	}
 	return label
 }
-func (class *namumark_compat_renderer) add_footnote_pending(index int, number string) {
+func (class *namumark_compat_renderer) Add_footnote_pending(index int, number string) {
 	for pending_index := range class.footnote_pending {
 		if class.footnote_pending[pending_index].index == index {
 			class.footnote_pending[pending_index].numbers = append(class.footnote_pending[pending_index].numbers, number)
@@ -1283,27 +1283,27 @@ func (class *namumark_compat_renderer) add_footnote_pending(index int, number st
 	}
 	class.footnote_pending = append(class.footnote_pending, namumark_compat_footnote_group{index: index, numbers: []string{number}})
 }
-func (class *namumark_compat_renderer) process_footnotes(data string) string {
+func (class *namumark_compat_renderer) Process_footnotes(data string) string {
 	footnote_regex := `(?i)(?:\[\*((?:(?!\[\*|\]| ).)+)?(?: ((?:(?!\[\*|\]).)+))?\]|\[(?:각주|footnote)\])`
-	data = compat_replace_regex2(data, footnote_regex, func(match regexp2.Match) string {
+	data = Compat_replace_regex2(data, footnote_regex, func(match regexp2.Match) string {
 		raw := match.String()
 		if strings.EqualFold(raw, "[각주]") || strings.EqualFold(raw, "[footnote]") {
 			class.footnote_count++
 			if class.collect_only {
 				return ""
 			}
-			footnote_html := class.make_footnotes(class.footnote_pending)
+			footnote_html := class.Make_footnotes(class.footnote_pending)
 			class.footnote_pending = nil
 			if footnote_html == "" {
 				return ""
 			}
-			return class.reserve(footnote_html)
+			return class.Reserve(footnote_html)
 		}
 
 		name := strings.TrimSpace(match.GroupByNumber(1).String())
 		class.footnote_count++
 		text := match.GroupByNumber(2).String()
-		text = class.process_macros(text)
+		text = class.Process_macros(text)
 		named := name != ""
 		index := -1
 		if !named {
@@ -1331,37 +1331,37 @@ func (class *namumark_compat_renderer) process_footnotes(data string) string {
 		}
 		number := strconv.Itoa(class.footnote_count)
 		class.footnotes[index].numbers = append(class.footnotes[index].numbers, number)
-		class.add_footnote_pending(index, number)
+		class.Add_footnote_pending(index, number)
 
 		if class.collect_only {
 			return ""
 		}
 		first_number := class.footnotes[index].numbers[0]
-		footnote_label := class.get_footnote_label(class.footnotes[index], number, true)
+		footnote_label := class.Get_footnote_label(class.footnotes[index], number, true)
 		fn := class.footnote_prefix + "fn_" + first_number
 		rfn := class.footnote_prefix + "rfn_" + number
-		title_data := class.render_inline(class.footnotes[index].text)
-		title_data = class.restore(title_data)
-		title := compat_escape_value(regexp.MustCompile(`<[^<>]*>`).ReplaceAllString(title_data, ""))
-		footnote_label = compat_escape_value(footnote_label)
-		footnote_set := class.get_render_setting("main_css_footnote_set")
+		title_data := class.Render_inline(class.footnotes[index].text)
+		title_data = class.Restore(title_data)
+		title := Compat_escape_value(regexp.MustCompile(`<[^<>]*>`).ReplaceAllString(title_data, ""))
+		footnote_label = Compat_escape_value(footnote_label)
+		footnote_set := class.Get_render_setting("main_css_footnote_set")
 		if footnote_set == "spread" || footnote_set == "popup" {
-			return class.reserve(`<sup><a title="` + title + `" id="` + rfn + `" href="javascript:void(0);">(` + footnote_label + `)</a></sup><span class="opennamu_spead_footnote" id="` + rfn + `_load" style="display: none;"></span>`)
+			return class.Reserve(`<sup><a title="` + title + `" id="` + rfn + `" href="javascript:void(0);">(` + footnote_label + `)</a></sup><span class="opennamu_spead_footnote" id="` + rfn + `_load" style="display: none;"></span>`)
 		}
 		if footnote_set == "popover" {
-			return class.reserve(`<span id="` + rfn + `_over" onclick="opennamu_do_footnote_popover('` + rfn + `', '` + fn + `', undefined, 'open');"><sup><a title="` + title + `" id="` + rfn + `" href="javascript:void(0);">(` + footnote_label + `)</a></sup><span class="opennamu_popup_footnote" id="` + rfn + `_load" style="display: none;"></span></span>`)
+			return class.Reserve(`<span id="` + rfn + `_over" onclick="opennamu_do_footnote_popover('` + rfn + `', '` + fn + `', undefined, 'open');"><sup><a title="` + title + `" id="` + rfn + `" href="javascript:void(0);">(` + footnote_label + `)</a></sup><span class="opennamu_popup_footnote" id="` + rfn + `_load" style="display: none;"></span></span>`)
 		}
-		return class.reserve(`<sup><a title="` + title + `" id="` + rfn + `" href="#` + fn + `">(` + footnote_label + `)</a></sup>`)
+		return class.Reserve(`<sup><a title="` + title + `" id="` + rfn + `" href="#` + fn + `">(` + footnote_label + `)</a></sup>`)
 	})
 
 	if !class.collect_only && len(class.footnote_pending) > 0 {
-		class.footnote_token = class.reserve(class.make_footnotes(class.footnote_pending))
+		class.footnote_token = class.Reserve(class.Make_footnotes(class.footnote_pending))
 		class.footnote_pending = nil
 	}
 	return data
 }
 
-func (class *namumark_compat_renderer) make_footnotes(groups []namumark_compat_footnote_group) string {
+func (class *namumark_compat_renderer) Make_footnotes(groups []namumark_compat_footnote_group) string {
 	if len(groups) == 0 {
 		return ""
 	}
@@ -1374,37 +1374,37 @@ func (class *namumark_compat_renderer) make_footnotes(groups []namumark_compat_f
 		footnote := class.footnotes[group.index]
 		first_number := group.numbers[0]
 		if len(group.numbers) > 1 {
-			data += `(` + compat_escape_value(footnote.name) + `) `
+			data += `(` + Compat_escape_value(footnote.name) + `) `
 			for _, number := range group.numbers {
-				data += `<sup><a id="` + class.footnote_prefix + `fn_` + number + `" href="#` + class.footnote_prefix + `rfn_` + number + `">(` + compat_html_escape(number) + `)</a></sup> `
+				data += `<sup><a id="` + class.footnote_prefix + `fn_` + number + `" href="#` + class.footnote_prefix + `rfn_` + number + `">(` + Compat_html_escape(number) + `)</a></sup> `
 			}
 		} else {
-			data += `<a id="` + class.footnote_prefix + `fn_` + first_number + `" href="#` + class.footnote_prefix + `rfn_` + first_number + `">(` + compat_escape_value(footnote.name) + `) </a> `
+			data += `<a id="` + class.footnote_prefix + `fn_` + first_number + `" href="#` + class.footnote_prefix + `rfn_` + first_number + `">(` + Compat_escape_value(footnote.name) + `) </a> `
 		}
-		data += `<footnote_title id="` + class.footnote_prefix + `fn_` + first_number + `_title">` + class.render_inline(footnote.text) + `</footnote_title>`
+		data += `<footnote_title id="` + class.footnote_prefix + `fn_` + first_number + `_title">` + class.Render_inline(footnote.text) + `</footnote_title>`
 	}
 	return data + `</div>`
 }
 
-func (class *namumark_compat_renderer) process_math(data string) string {
+func (class *namumark_compat_renderer) Process_math(data string) string {
 	render := func(expression string) string {
 		if class.collect_only {
 			return ""
 		}
 		expression = strings.TrimSpace(strings.ReplaceAll(expression, "\n", " "))
-		expression = class.middle_literal(expression)
+		expression = class.Middle_literal(expression)
 		expression = tool.HTML_unescape(expression)
-		return class.reserve(`<code class="opennamu_math" data-math="` + compat_html_escape(expression) + `">` + compat_html_escape(expression) + `</code>`)
+		return class.Reserve(`<code class="opennamu_math" data-math="` + Compat_html_escape(expression) + `">` + Compat_html_escape(expression) + `</code>`)
 	}
-	data = compat_replace_regex2(data, `(?i)\[math\(((?:(?!\[math\(|\)\]).|\n)+)\)\]`, func(match regexp2.Match) string {
+	data = Compat_replace_regex2(data, `(?i)\[math\(((?:(?!\[math\(|\)\]).|\n)+)\)\]`, func(match regexp2.Match) string {
 		return render(match.GroupByNumber(1).String())
 	})
-	return compat_replace_regex2(data, `(?i)&lt;math&gt;((?:(?!&lt;math&gt;|&lt;\/math&gt;).)+)&lt;\/math&gt;`, func(match regexp2.Match) string {
+	return Compat_replace_regex2(data, `(?i)&lt;math&gt;((?:(?!&lt;math&gt;|&lt;\/math&gt;).)+)&lt;\/math&gt;`, func(match regexp2.Match) string {
 		return render(match.GroupByNumber(1).String())
 	})
 }
 
-func compat_middle_style(value string) string {
+func Compat_middle_style(value string) string {
 	value = strings.TrimSpace(value)
 	value = tool.HTML_unescape(value)
 	lower_value := strings.ToLower(value)
@@ -1417,7 +1417,7 @@ func compat_middle_style(value string) string {
 	return value
 }
 
-func compat_dark_mode_value(values []string, darkmode string) string {
+func Compat_dark_mode_value(values []string, darkmode string) string {
 	if len(values) == 0 {
 		return ""
 	}
@@ -1427,7 +1427,7 @@ func compat_dark_mode_value(values []string, darkmode string) string {
 	return values[0]
 }
 
-func compat_middle_color_style(name string, body string, darkmode string) (string, string, bool) {
+func Compat_middle_color_style(name string, body string, darkmode string) (string, string, bool) {
 	if !strings.HasPrefix(name, "#") && !strings.HasPrefix(name, "@") {
 		return "", body, false
 	}
@@ -1458,9 +1458,9 @@ func compat_middle_color_style(name string, body string, darkmode string) (strin
 	if background {
 		property = "background-color"
 	}
-	return property + ":" + compat_dark_mode_value(color_parts, darkmode), body, true
+	return property + ":" + Compat_dark_mode_value(color_parts, darkmode), body, true
 }
-func compat_middle_size_style(name string, body string) (string, string, bool) {
+func Compat_middle_size_style(name string, body string) (string, string, bool) {
 	sizes := map[string]string{
 		"+5": "200", "+4": "180", "+3": "160", "+2": "140", "+1": "120",
 		"-1": "90", "-2": "80", "-3": "70", "-4": "60", "-5": "50",
@@ -1471,7 +1471,7 @@ func compat_middle_size_style(name string, body string) (string, string, bool) {
 	}
 	return "font-size:" + size + "%", strings.TrimLeft(body, " \t\n"), true
 }
-func (class *namumark_compat_renderer) process_middle_block(middle_data string) string {
+func (class *namumark_compat_renderer) Process_middle_block(middle_data string) string {
 	middle_data = strings.TrimPrefix(middle_data, "\n")
 	middle_name := middle_data
 	body := ""
@@ -1481,15 +1481,15 @@ func (class *namumark_compat_renderer) process_middle_block(middle_data string) 
 	}
 	middle_name = strings.ToLower(strings.TrimSpace(middle_name))
 	body = strings.TrimPrefix(body, " ")
-	if class.is_limited_render() {
+	if class.Is_limited_render() {
 		switch middle_name {
 		case "#!html", "#!wiki", "#!folding":
-			return class.reserve_literal(class.middle_literal("{{{" + middle_data + "}}}"))
+			return class.Reserve_literal(class.Middle_literal("{{{" + middle_data + "}}}"))
 		}
 	}
 
 	if strings.HasPrefix(middle_name, "opennamu_compat_token_") {
-		return class.reserve_literal(class.middle_literal(strings.Trim(middle_data, "\n")))
+		return class.Reserve_literal(class.Middle_literal(strings.Trim(middle_data, "\n")))
 	}
 
 	switch {
@@ -1509,13 +1509,13 @@ func (class *namumark_compat_renderer) process_middle_block(middle_data string) 
 		expected = strings.Trim(expected, "\"'")
 		matches := false
 		parameter_is_null := !parameter_exists || parameter_value == nil
-		if !parameter_is_null && compat_render_parameter_value(parameter_value) == "" {
+		if !parameter_is_null && Compat_render_parameter_value(parameter_value) == "" {
 			parameter_is_null = true
 		}
 		if strings.EqualFold(expected, "null") {
 			matches = parameter_is_null
 		} else if parameter_exists && parameter_value != nil {
-			matches = compat_render_parameter_value(parameter_value) == expected
+			matches = Compat_render_parameter_value(parameter_value) == expected
 		}
 		if condition_match[2] == "!=" {
 			matches = !matches
@@ -1531,13 +1531,13 @@ func (class *namumark_compat_renderer) process_middle_block(middle_data string) 
 		}
 		for token := range class.literal_tokens {
 			if strings.Contains(body, token) {
-				class.tokens[token] = compat_legacy_html_literal(class.tokens[token])
+				class.tokens[token] = Compat_legacy_html_literal(class.tokens[token])
 			}
 		}
-		body = class.restore_inter_literal(body)
+		body = class.Restore_inter_literal(body)
 		body = tool.HTML_unescape(body)
 		body = strings.ReplaceAll(body, "&amp;nbsp;", "&nbsp;")
-		return class.reserve(compat_sanitize_html(strings.Trim(body, "\n"), compat_html_allowed_tags(class.db)))
+		return class.Reserve(Compat_sanitize_html(strings.Trim(body, "\n"), Compat_html_allowed_tags(class.db)))
 
 	case middle_name == "#!syntax":
 		language := "python"
@@ -1561,13 +1561,13 @@ func (class *namumark_compat_renderer) process_middle_block(middle_data string) 
 		code = tool.HTML_unescape(code)
 		syntax_id := "opennamu_syntax_" + strconv.Itoa(class.syntax_count)
 		class.syntax_count++
-		copy_text := compat_html_escape(tool.Get_language(class.db, "copy", true))
-		return class.reserve(`<button class="__ON_BUTTON__ opennamu_syntax_copy" type="button" data-syntax-id="` + compat_html_escape(syntax_id) + `">` + copy_text + `</button><pre id="syntax"><code class="` + compat_html_escape(language) + `" id="` + syntax_id + `">` + compat_html_escape(code) + `</code></pre>`)
+		copy_text := Compat_html_escape(tool.Get_language(class.db, "copy", true))
+		return class.Reserve(`<button class="__ON_BUTTON__ opennamu_syntax_copy" type="button" data-syntax-id="` + Compat_html_escape(syntax_id) + `">` + copy_text + `</button><pre id="syntax"><code class="` + Compat_html_escape(language) + `" id="` + syntax_id + `">` + Compat_html_escape(code) + `</code></pre>`)
 
 	case middle_name == "#!wiki":
 		wiki_body := body
 		style := ""
-		darkmode := class.get_render_setting("main_css_darkmode")
+		darkmode := class.Get_render_setting("main_css_darkmode")
 		for {
 			style_match := namumark_compat_style_regex.FindStringSubmatch(wiki_body)
 			if len(style_match) < 4 {
@@ -1577,7 +1577,7 @@ func (class *namumark_compat_renderer) process_middle_block(middle_data string) 
 				style_value := ""
 				for style_index := 2; style_index < len(style_match); style_index++ {
 					if style_match[style_index] != "" {
-						style_value = compat_middle_style(style_match[style_index])
+						style_value = Compat_middle_style(style_match[style_index])
 						break
 					}
 				}
@@ -1589,12 +1589,12 @@ func (class *namumark_compat_renderer) process_middle_block(middle_data string) 
 		if class.collect_only {
 			return wiki_body
 		}
-		inter_token := class.reserve_inter(wiki_body)
-		class.inter_raw[inter_token] = class.middle_literal("{{{" + middle_data + "}}}")
-		open_token := class.reserve("<div style=\"\">")
-		close_token := class.reserve("</div>")
+		inter_token := class.Reserve_inter(wiki_body)
+		class.inter_raw[inter_token] = class.Middle_literal("{{{" + middle_data + "}}}")
+		open_token := class.Reserve("<div style=\"\">")
+		close_token := class.Reserve("</div>")
 		if style != "" {
-			open_token = class.reserve(`<div style="` + compat_html_escape(style) + `">`)
+			open_token = class.Reserve(`<div style="` + Compat_html_escape(style) + `">`)
 		}
 		class.inter_wrappers[inter_token] = open_token + inter_token + close_token
 		return open_token + inter_token + close_token
@@ -1612,15 +1612,15 @@ func (class *namumark_compat_renderer) process_middle_block(middle_data string) 
 		if class.collect_only {
 			return folding_body
 		}
-		inter_token := class.reserve_inter(folding_body)
-		class.inter_raw[inter_token] = class.middle_literal("{{{" + middle_data + "}}}")
-		open_token := class.reserve("<details><summary>" + compat_escape_value(title) + "</summary><div class=\"opennamu_folding\">")
-		close_token := class.reserve("</div></details>")
+		inter_token := class.Reserve_inter(folding_body)
+		class.inter_raw[inter_token] = class.Middle_literal("{{{" + middle_data + "}}}")
+		open_token := class.Reserve("<details><summary>" + Compat_escape_value(title) + "</summary><div class=\"opennamu_folding\">")
+		close_token := class.Reserve("</div></details>")
 		class.inter_wrappers[inter_token] = open_token + inter_token + close_token
 		return open_token + inter_token + close_token
 
 	case middle_name == "#!dark" || middle_name == "#!white":
-		darkmode := class.get_render_setting("main_css_darkmode")
+		darkmode := class.Get_render_setting("main_css_darkmode")
 		if darkmode == "" || darkmode == "default" {
 			darkmode = "0"
 		}
@@ -1629,29 +1629,29 @@ func (class *namumark_compat_renderer) process_middle_block(middle_data string) 
 		}
 		return ""
 	}
-	if style, style_body, ok := compat_middle_size_style(middle_name, body); ok {
+	if style, style_body, ok := Compat_middle_size_style(middle_name, body); ok {
 		if class.collect_only {
 			return style_body
 		}
-		return class.reserve(`<span style="`+style+`">`) + style_body + class.reserve("</span>")
+		return class.Reserve(`<span style="`+style+`">`) + style_body + class.Reserve("</span>")
 	}
-	if style, color_body, ok := compat_middle_color_style(middle_name, body, class.get_render_setting("main_css_darkmode")); ok {
+	if style, color_body, ok := Compat_middle_color_style(middle_name, body, class.Get_render_setting("main_css_darkmode")); ok {
 		if class.collect_only {
 			return color_body
 		}
-		return class.reserve(`<span style="`+style+`">`) + color_body + class.reserve("</span>")
+		return class.Reserve(`<span style="`+style+`">`) + color_body + class.Reserve("</span>")
 	}
 	code := strings.TrimSpace(middle_data)
 	if code != "" {
 		if class.collect_only {
 			return code
 		}
-		return class.reserve(`<code>` + code + `</code>`)
+		return class.Reserve(`<code>` + code + `</code>`)
 	}
-	return class.reserve_literal(class.middle_literal(strings.Trim(middle_data, "\n")))
+	return class.Reserve_literal(class.Middle_literal(strings.Trim(middle_data, "\n")))
 }
 
-func (class *namumark_compat_renderer) process_legacy_html_suffix(data string) string {
+func (class *namumark_compat_renderer) Process_legacy_html_suffix(data string) string {
 	open_index := strings.Index(data, "{{{")
 	if open_index < 0 {
 		return data
@@ -1670,11 +1670,11 @@ func (class *namumark_compat_renderer) process_legacy_html_suffix(data string) s
 	if !known_middle || !strings.HasPrefix(data[close_index+3:], "}}}") {
 		return data
 	}
-	literal_token := class.reserve_literal(class.middle_literal("{{{" + middle_data + "}}}"))
+	literal_token := class.Reserve_literal(class.Middle_literal("{{{" + middle_data + "}}}"))
 	return data[:open_index] + literal_token + data[close_index+6:]
 }
 
-func (class *namumark_compat_renderer) process_middle(data string) string {
+func (class *namumark_compat_renderer) Process_middle(data string) string {
 	find_slash_close := func(value string) int {
 		for token, token_data := range class.slash_tokens {
 			if token_data == "}" && strings.HasPrefix(value, token) {
@@ -1763,7 +1763,7 @@ func (class *namumark_compat_renderer) process_middle(data string) string {
 				index++
 			}
 			if inner_close > inner_open {
-				literal_token := class.reserve_literal(data[inner_open:inner_close])
+				literal_token := class.Reserve_literal(data[inner_open:inner_close])
 				data = data[:inner_open] + literal_token + data[inner_close:]
 				search_index = open_index
 				continue
@@ -1785,7 +1785,7 @@ func (class *namumark_compat_renderer) process_middle(data string) string {
 			search_index = open_index + 3
 			continue
 		}
-		literal_token := class.reserve_literal(class.middle_literal(strings.Trim(middle_data, "\n")))
+		literal_token := class.Reserve_literal(class.Middle_literal(strings.Trim(middle_data, "\n")))
 		data = data[:open_index] + literal_token + data[close_index:]
 		search_index = open_index + len(literal_token)
 	}
@@ -1860,10 +1860,10 @@ func (class *namumark_compat_renderer) process_middle(data string) string {
 		}
 
 		middle_data := data[open_index+6 : close_start]
-		middle_token := class.reserve_literal(class.middle_literal("{{{" + middle_data + "}}}"))
+		middle_token := class.Reserve_literal(class.Middle_literal("{{{" + middle_data + "}}}"))
 		remainder := data[close_end:]
 		if strings.HasPrefix(strings.TrimSpace(middle_data), "#!html") {
-			remainder = class.process_legacy_html_suffix(remainder)
+			remainder = class.Process_legacy_html_suffix(remainder)
 		}
 		data = data[:open_index] + middle_token + remainder
 		search_index = open_index + len(middle_token)
@@ -1894,11 +1894,11 @@ func (class *namumark_compat_renderer) process_middle(data string) string {
 					}
 				}
 				if known_middle {
-					return class.reserve_literal(class.middle_literal("{{{" + middle_data + "}}}"))
+					return class.Reserve_literal(class.Middle_literal("{{{" + middle_data + "}}}"))
 				}
 				middle_data += "\\"
 			}
-			return class.process_middle_block(middle_data)
+			return class.Process_middle_block(middle_data)
 		}, -1, 1)
 		if err != nil || result == previous {
 			break
@@ -1906,21 +1906,21 @@ func (class *namumark_compat_renderer) process_middle(data string) string {
 		data = result
 	}
 	if len(class.inter_data) > 0 {
-		data = class.resolve_inter_data(data)
+		data = class.Resolve_inter_data(data)
 	}
 	return data
 }
-func (class *namumark_compat_renderer) render_inter(data string) string {
-	child := new_namumark_compat_renderer(class.db, class.doc_name, data, "inter", class.parameter, class.include_depth, false)
+func (class *namumark_compat_renderer) Render_inter(data string) string {
+	child := New_namumark_compat_renderer(class.db, class.doc_name, data, "inter", class.parameter, class.include_depth, false)
 	child.data = strings.ReplaceAll(data, "\r", "")
-	child.prepare()
-	result := child.render_output()
-	result = strings.ReplaceAll(result, "||", class.reserve("||"))
-	class.merge_child(child)
+	child.Prepare()
+	result := child.Render_output()
+	result = strings.ReplaceAll(result, "||", class.Reserve("||"))
+	class.Merge_child(child)
 	return result
 }
 
-func (class *namumark_compat_renderer) resolve_inter_data(data string) string {
+func (class *namumark_compat_renderer) Resolve_inter_data(data string) string {
 	resolved := map[string]string{}
 	var resolve func(string) string
 	resolve = func(token string) string {
@@ -1936,7 +1936,7 @@ func (class *namumark_compat_renderer) resolve_inter_data(data string) string {
 				body = strings.ReplaceAll(body, nested_token, resolve(nested_token))
 			}
 		}
-		resolved[token] = class.render_inter(body)
+		resolved[token] = class.Render_inter(body)
 		return resolved[token]
 	}
 	replace_inter := func(value string) string {
@@ -1950,17 +1950,17 @@ func (class *namumark_compat_renderer) resolve_inter_data(data string) string {
 	data = replace_inter(data)
 	for token := range class.literal_tokens {
 		if token_data, ok := class.tokens[token]; ok {
-			class.tokens[token] = class.restore_inter_literal(token_data)
+			class.tokens[token] = class.Restore_inter_literal(token_data)
 		}
 	}
 	return data
 }
 
-func (class *namumark_compat_renderer) render_inline(data string) string {
-	return class.render_text(data)
+func (class *namumark_compat_renderer) Render_inline(data string) string {
+	return class.Render_text(data)
 }
 
-func compat_table_auto_text_color(value string) string {
+func Compat_table_auto_text_color(value string) string {
 	value = strings.TrimSpace(strings.TrimPrefix(strings.ToLower(value), "#"))
 	if len(value) == 4 {
 		value = value[:3]
@@ -1987,7 +1987,7 @@ func compat_table_auto_text_color(value string) string {
 	return "#fff"
 }
 
-func (class *namumark_compat_renderer) render_table(lines []string) string {
+func (class *namumark_compat_renderer) Render_table(lines []string) string {
 	table_style := ""
 	table_class := ""
 	div_style := ""
@@ -1999,7 +1999,7 @@ func (class *namumark_compat_renderer) render_table(lines []string) string {
 	rows := [][]table_cell{}
 
 	style_value := func(value string) string {
-		return compat_middle_style(strings.TrimSpace(value))
+		return Compat_middle_style(strings.TrimSpace(value))
 	}
 	add_style := func(target *string, property string, value string) {
 		value = style_value(value)
@@ -2009,7 +2009,7 @@ func (class *namumark_compat_renderer) render_table(lines []string) string {
 	}
 	color_value := func(value string) string {
 		value = style_value(value)
-		return compat_dark_mode_value(strings.Split(value, ","), class.get_render_setting("main_css_darkmode"))
+		return Compat_dark_mode_value(strings.Split(value, ","), class.Get_render_setting("main_css_darkmode"))
 	}
 	add_color_style := func(target *string, property string, value string) {
 		value = color_value(value)
@@ -2018,10 +2018,10 @@ func (class *namumark_compat_renderer) render_table(lines []string) string {
 		}
 	}
 	auto_color_style := func(target *string, value string) {
-		if class.get_render_setting("main_css_table_auto_color") != "on" || strings.Contains(*target, "color:") {
+		if class.Get_render_setting("main_css_table_auto_color") != "on" || strings.Contains(*target, "color:") {
 			return
 		}
-		if text_color := compat_table_auto_text_color(color_value(value)); text_color != "" {
+		if text_color := Compat_table_auto_text_color(color_value(value)); text_color != "" {
 			*target += "color:" + text_color + ";"
 		}
 	}
@@ -2056,10 +2056,10 @@ func (class *namumark_compat_renderer) render_table(lines []string) string {
 				add_color_style(table, "background", value)
 				auto_color_style(table, value)
 			case "tablewidth":
-				add_style(div, "width", compat_file_px(value))
+				add_style(div, "width", Compat_file_px(value))
 				*table += "width:100%;"
 			case "tableheight":
-				add_style(table, "height", compat_file_px(value))
+				add_style(table, "height", Compat_file_px(value))
 			case "tablealign":
 				if value == "right" {
 					*div += "float:right;"
@@ -2098,9 +2098,9 @@ func (class *namumark_compat_renderer) render_table(lines []string) string {
 			case "color":
 				add_color_style(cell, "color", value)
 			case "width":
-				add_style(cell, "width", compat_file_px(value))
+				add_style(cell, "width", Compat_file_px(value))
 			case "height":
-				add_style(cell, "height", compat_file_px(value))
+				add_style(cell, "height", Compat_file_px(value))
 			case "keepall":
 				*cell += "word-break:keep-all !important;"
 			case "rowkeepall":
@@ -2252,11 +2252,11 @@ func (class *namumark_compat_renderer) render_table(lines []string) string {
 			cell_data_rendered := cell_data
 			trailing_break_count := len(cell_data) - len(strings.TrimRight(cell_data, "\n"))
 			if strings.Contains(cell_data, "\n") {
-				cell_data_rendered = class.process_blocks(strings.Trim(cell_data, "\n"))
+				cell_data_rendered = class.Process_blocks(strings.Trim(cell_data, "\n"))
 			}
-			cell_rendered := strings.ReplaceAll(class.render_inline(cell_data_rendered), "\n", "<br>")
+			cell_rendered := strings.ReplaceAll(class.Render_inline(cell_data_rendered), "\n", "<br>")
 			cell_rendered += strings.Repeat("<br>", trailing_break_count)
-			rendered_cells += `<td colspan="` + compat_html_escape(colspan) + `" rowspan="` + compat_html_escape(rowspan) + `" style="` + compat_html_escape(cell_style_data) + `">` + cell_rendered + `</td>`
+			rendered_cells += `<td colspan="` + Compat_html_escape(colspan) + `" rowspan="` + Compat_html_escape(rowspan) + `" style="` + Compat_html_escape(cell_style_data) + `">` + cell_rendered + `</td>`
 			column_span := tool.Str_to_int(colspan)
 			if column_span < 1 {
 				column_span = 1
@@ -2269,17 +2269,17 @@ func (class *namumark_compat_renderer) render_table(lines []string) string {
 			}
 			column_index += column_span
 		}
-		rendered_rows = append(rendered_rows, `<tr style="`+compat_html_escape(row_style)+`">`+rendered_cells+`</tr>`)
+		rendered_rows = append(rendered_rows, `<tr style="`+Compat_html_escape(row_style)+`">`+rendered_cells+`</tr>`)
 	}
 
-	data := `<div class="table_safe" style="` + compat_html_escape(div_style) + `"><table class="` + compat_html_escape(table_class) + `" style="` + compat_html_escape(table_style) + `">`
+	data := `<div class="table_safe" style="` + Compat_html_escape(div_style) + `"><table class="` + Compat_html_escape(table_class) + `" style="` + Compat_html_escape(table_style) + `">`
 	if caption != "" {
-		data += `<caption>` + class.render_inline(caption) + `</caption>`
+		data += `<caption>` + class.Render_inline(caption) + `</caption>`
 	}
 	return data + strings.Join(rendered_rows, "") + `</table></div>`
 }
 
-func (class *namumark_compat_renderer) render_list(lines []string) string {
+func (class *namumark_compat_renderer) Render_list(lines []string) string {
 	list_numbers := map[string][]int{}
 	data := `<ul>`
 	to_alpha := func(number int) string {
@@ -2355,7 +2355,7 @@ func (class *namumark_compat_renderer) render_list(lines []string) string {
 				list_numbers[kind][level-1] = start
 			}
 			number := list_numbers[kind][level-1]
-			if kind == "1" && class.get_render_setting("main_css_list_view_change") == "on" {
+			if kind == "1" && class.Get_render_setting("main_css_list_view_change") == "on" {
 				number_data := []string{}
 				for _, number_value := range list_numbers[kind] {
 					if number_value != 0 {
@@ -2379,12 +2379,12 @@ func (class *namumark_compat_renderer) render_list(lines []string) string {
 			}
 			prefix += ". "
 		}
-		data += `<li style="margin-left: ` + strconv.Itoa((level-1)*20) + `px;" class="` + item_class + `">` + prefix + class.render_inline(match[3]) + `</li>`
+		data += `<li style="margin-left: ` + strconv.Itoa((level-1)*20) + `px;" class="` + item_class + `">` + prefix + class.Render_inline(match[3]) + `</li>`
 	}
 	return data + `</ul>`
 }
 
-func (class *namumark_compat_renderer) compat_media_macro(name string, data string) string {
+func (class *namumark_compat_renderer) Compat_media_macro(name string, data string) string {
 	code := ""
 	data = tool.HTML_unescape(data)
 	width := "640px"
@@ -2399,14 +2399,14 @@ func (class *namumark_compat_renderer) compat_media_macro(name string, data stri
 		width, height = "480px", "480px"
 	}
 
-	for _, item := range compat_split_macro_args(data) {
+	for _, item := range Compat_split_macro_args(data) {
 		parts := strings.SplitN(item, "=", 2)
 		if len(parts) == 2 {
 			switch strings.ToLower(strings.TrimSpace(parts[0])) {
 			case "width":
-				width = compat_middle_style(compat_file_px(parts[1]))
+				width = Compat_middle_style(Compat_file_px(parts[1]))
 			case "height":
-				height = compat_middle_style(compat_file_px(parts[1]))
+				height = Compat_middle_style(Compat_file_px(parts[1]))
 			case "start":
 				start = parts[1]
 			case "end":
@@ -2448,19 +2448,19 @@ func (class *namumark_compat_renderer) compat_media_macro(name string, data stri
 		if len(query) > 0 {
 			src += "?" + strings.Join(query, "&")
 		}
-		return compat_media_iframe(src, width, height, "YouTube")
+		return Compat_media_iframe(src, width, height, "YouTube")
 	case "instagram":
 		code = strings.TrimSuffix(strings.TrimPrefix(code, "https://www.instagram.com/p/"), "/")
 		if !valid_code.MatchString(code) {
 			return ""
 		}
-		return compat_media_iframe("https://www.instagram.com/p/"+code+"/embed/", width, height, "Instagram")
+		return Compat_media_iframe("https://www.instagram.com/p/"+code+"/embed/", width, height, "Instagram")
 	case "facebook":
-		if !compat_is_external_link(code) {
+		if !Compat_is_external_link(code) {
 			return ""
 		}
 		src := "https://www.facebook.com/plugins/post.php?href=" + url.QueryEscape(code) + "&width=" + url.QueryEscape(width) + "&height=" + url.QueryEscape(height)
-		return compat_media_iframe(src, width, height, "Facebook")
+		return Compat_media_iframe(src, width, height, "Facebook")
 	case "tiktok":
 		code = strings.TrimPrefix(code, "https://www.tiktok.com/@")
 		if strings.Contains(code, "/video/") {
@@ -2469,31 +2469,31 @@ func (class *namumark_compat_renderer) compat_media_macro(name string, data stri
 		if !valid_code.MatchString(code) {
 			return ""
 		}
-		return compat_media_iframe("https://www.tiktok.com/embed/v2/"+code, width, height, "TikTok")
+		return Compat_media_iframe("https://www.tiktok.com/embed/v2/"+code, width, height, "TikTok")
 	case "kakaotv":
 		code = strings.TrimPrefix(code, "https://tv.kakao.com/v/")
 		if !valid_code.MatchString(code) {
 			return ""
 		}
-		return compat_media_iframe("https://tv.kakao.com/embed/player/cliplink/"+code+"?service=kakao_tv", width, height, "KakaoTV")
+		return Compat_media_iframe("https://tv.kakao.com/embed/player/cliplink/"+code+"?service=kakao_tv", width, height, "KakaoTV")
 	case "navertv":
 		code = strings.TrimPrefix(code, "https://tv.naver.com/v/")
 		if !valid_code.MatchString(code) {
 			return ""
 		}
-		return compat_media_iframe("https://tv.naver.com/embed/"+code, width, height, "NaverTV")
+		return Compat_media_iframe("https://tv.naver.com/embed/"+code, width, height, "NaverTV")
 	case "nicovideo":
 		code = strings.TrimPrefix(code, "https://www.nicovideo.jp/watch/")
 		if !valid_code.MatchString(code) {
 			return ""
 		}
-		return compat_media_iframe("https://embed.nicovideo.jp/watch/"+code, width, height, "Niconico")
+		return Compat_media_iframe("https://embed.nicovideo.jp/watch/"+code, width, height, "Niconico")
 	case "vimeo":
 		code = strings.TrimPrefix(code, "https://vimeo.com/")
 		if !valid_code.MatchString(code) {
 			return ""
 		}
-		return compat_media_iframe("https://player.vimeo.com/video/"+code, width, height, "Vimeo")
+		return Compat_media_iframe("https://player.vimeo.com/video/"+code, width, height, "Vimeo")
 	case "twitter":
 		media_url, err := url.Parse(code)
 		if err != nil || (strings.ToLower(media_url.Scheme) != "http" && strings.ToLower(media_url.Scheme) != "https") {
@@ -2504,32 +2504,32 @@ func (class *namumark_compat_renderer) compat_media_macro(name string, data stri
 			return ""
 		}
 		src := "https://twitframe.com/show?url=" + url.QueryEscape(code)
-		if class.get_render_setting("main_css_darkmode") == "1" {
+		if class.Get_render_setting("main_css_darkmode") == "1" {
 			src += "&theme=dark"
 		}
-		return compat_media_iframe(src, width, height, "Twitter")
+		return Compat_media_iframe(src, width, height, "Twitter")
 	}
 	return ""
 }
 
-func compat_media_iframe(src string, width string, height string, title string) string {
-	return `<iframe title="` + compat_html_escape(title) + `" style="width:` + compat_html_escape(width) + `;height:` + compat_html_escape(height) + `;" src="` + compat_html_escape(src) + `" frameborder="0" allowfullscreen loading="lazy"></iframe>`
+func Compat_media_iframe(src string, width string, height string, title string) string {
+	return `<iframe title="` + Compat_html_escape(title) + `" style="width:` + Compat_html_escape(width) + `;height:` + Compat_html_escape(height) + `;" src="` + Compat_html_escape(src) + `" frameborder="0" allowfullscreen loading="lazy"></iframe>`
 }
 
-func (class *namumark_compat_renderer) render_quote(lines []string) string {
+func (class *namumark_compat_renderer) Render_quote(lines []string) string {
 	quote_lines := []string{}
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		line = strings.TrimPrefix(line, "&gt;")
 		quote_lines = append(quote_lines, strings.TrimSpace(line))
 	}
-	quote_data := class.process_blocks(strings.Join(quote_lines, "\n"))
-	quote_data = class.render_inline(quote_data)
+	quote_data := class.Process_blocks(strings.Join(quote_lines, "\n"))
+	quote_data = class.Render_inline(quote_data)
 	quote_data = strings.ReplaceAll(quote_data, "\n", "<br>")
 	return `<hr class="mini_hr"><blockquote><div>` + quote_data + `</div></blockquote><hr class="mini_hr">`
 }
 
-func (class *namumark_compat_renderer) toc_html() string {
+func (class *namumark_compat_renderer) Toc_html() string {
 	if len(class.toc_items) == 0 {
 		return ""
 	}
@@ -2537,15 +2537,15 @@ func (class *namumark_compat_renderer) toc_html() string {
 	if class.db != nil {
 		toc_title = tool.Get_language(class.db, "toc", true)
 	}
-	data := `<details open class="opennamu_TOC" id="toc"><summary class="opennamu_TOC_title">` + compat_html_escape(toc_title) + `</summary>`
+	data := `<details open class="opennamu_TOC" id="toc"><summary class="opennamu_TOC_title">` + Compat_html_escape(toc_title) + `</summary>`
 	for _, item := range class.toc_items {
 		indent := strings.Count(item.number, ".")
-		data += `<br>` + strings.Repeat(`<span style="margin-left: 10px;"></span>`, indent) + `<span class="opennamu_TOC_list"><a href="#s-` + compat_html_escape(item.number) + `">` + item.number + `. </a>` + item.text + `</span>`
+		data += `<br>` + strings.Repeat(`<span style="margin-left: 10px;"></span>`, indent) + `<span class="opennamu_TOC_list"><a href="#s-` + Compat_html_escape(item.number) + `">` + item.number + `. </a>` + item.text + `</span>`
 	}
 	return data + `</details>`
 }
 
-func (class *namumark_compat_renderer) process_headings(data string) string {
+func (class *namumark_compat_renderer) Process_headings(data string) string {
 	lines := strings.Split(data, "\n")
 	heading_stack := [6]int{}
 	toc_requested := strings.Contains(data, "[toc]")
@@ -2601,12 +2601,12 @@ func (class *namumark_compat_renderer) process_headings(data string) string {
 			}
 		}
 		number := strings.Join(number_list, ".")
-		rendered_heading := class.render_inline(heading_data)
+		rendered_heading := class.Render_inline(heading_data)
 		class.toc_items = append(class.toc_items, namumark_compat_toc_item{number, rendered_heading})
-		heading_id := regexp.MustCompile(`<[^<>]*>`).ReplaceAllString(class.restore(rendered_heading), "")
+		heading_id := regexp.MustCompile(`<[^<>]*>`).ReplaceAllString(class.Restore(rendered_heading), "")
 		heading_id = tool.HTML_unescape(heading_id)
-		if class.is_limited_render() {
-			lines[index] = class.reserve(`<h` + strconv.Itoa(level) + `>` + number + `. ` + rendered_heading + `</h` + strconv.Itoa(level) + `>`)
+		if class.Is_limited_render() {
+			lines[index] = class.Reserve(`<h` + strconv.Itoa(level) + `>` + number + `. ` + rendered_heading + `</h` + strconv.Itoa(level) + `>`)
 			continue
 		}
 		heading_html := `<details class="opennamu_heading_folding"`
@@ -2614,33 +2614,33 @@ func (class *namumark_compat_renderer) process_headings(data string) string {
 			heading_html += ` open`
 		}
 		heading_edit := ""
-		if class.is_view() {
+		if class.Is_view() {
 			heading_edit = `<a href="/edit/` + tool.Url_parser(class.doc_name) + `">✎</a>`
 		}
-		heading_html += `><summary><h` + strconv.Itoa(level) + ` id="` + compat_html_escape(heading_id) + `"><a href="#toc" id="s-` + compat_html_escape(number) + `">` + number + `.</a> ` + rendered_heading + ` ` + heading_edit + `</h` + strconv.Itoa(level) + `></summary><div class="opennamu_folding">`
+		heading_html += `><summary><h` + strconv.Itoa(level) + ` id="` + Compat_html_escape(heading_id) + `"><a href="#toc" id="s-` + Compat_html_escape(number) + `">` + number + `.</a> ` + rendered_heading + ` ` + heading_edit + `</h` + strconv.Itoa(level) + `></summary><div class="opennamu_folding">`
 		if last_heading >= 0 {
-			lines[index] = class.reserve(`</div></details>`) + class.reserve(heading_html)
+			lines[index] = class.Reserve(`</div></details>`) + class.Reserve(heading_html)
 		} else {
-			lines[index] = class.reserve(heading_html)
+			lines[index] = class.Reserve(heading_html)
 		}
 		last_heading = index
 	}
 
 	heading_close := ""
 	if last_heading >= 0 {
-		heading_close = "\n" + class.reserve(`</div></details>`)
+		heading_close = "\n" + class.Reserve(`</div></details>`)
 	}
 	data = strings.Join(lines, "\n") + heading_close
 
-	toc_set := class.get_render_setting("main_css_toc_set")
+	toc_set := class.Get_render_setting("main_css_toc_set")
 	if toc_requested {
 		if toc_set == "off" {
 			data = strings.ReplaceAll(data, "[toc]", "")
 		} else {
-			data = strings.ReplaceAll(data, "[toc]", class.reserve(class.toc_html()))
+			data = strings.ReplaceAll(data, "[toc]", class.Reserve(class.Toc_html()))
 		}
-	} else if class.is_view() && toc_set != "off" && toc_set != "half_off" && first_heading_index >= 0 {
-		toc_data := class.reserve(class.toc_html())
+	} else if class.Is_view() && toc_set != "off" && toc_set != "half_off" && first_heading_index >= 0 {
+		toc_data := class.Reserve(class.Toc_html())
 		toc_lines := []string{toc_data}
 		previous_is_list := first_heading_index > 0 && namumark_compat_list_regex.MatchString(strings.TrimSpace(lines[first_heading_index-1]))
 		if first_heading_index == 0 || previous_is_list {
@@ -2651,7 +2651,7 @@ func (class *namumark_compat_renderer) process_headings(data string) string {
 	}
 	return data
 }
-func compat_remove_comments(data string) string {
+func Compat_remove_comments(data string) string {
 	lines := strings.Split(data, "\n")
 	result := []string{lines[0]}
 	for index := 1; index < len(lines); index++ {
@@ -2663,7 +2663,7 @@ func compat_remove_comments(data string) string {
 	return strings.Join(result, "\n")
 }
 
-func (class *namumark_compat_renderer) process_blocks(data string) string {
+func (class *namumark_compat_renderer) Process_blocks(data string) string {
 	lines := strings.Split(data, "\n")
 	var result strings.Builder
 	has_result := false
@@ -2701,7 +2701,7 @@ func (class *namumark_compat_renderer) process_blocks(data string) string {
 			continue
 		}
 		if regexp.MustCompile(`^-{4,9}$`).MatchString(trimmed) {
-			append_result(class.reserve("<hr>"), true)
+			append_result(class.Reserve("<hr>"), true)
 			continue
 		}
 
@@ -2732,7 +2732,7 @@ func (class *namumark_compat_renderer) process_blocks(data string) string {
 				}
 				table_row_open = !strings.HasSuffix(next, "||")
 			}
-			table_data := class.render_table(table_lines)
+			table_data := class.Render_table(table_lines)
 			table_suffix := ""
 			if index+1 < len(lines) {
 				next_line := strings.TrimSpace(lines[index+1])
@@ -2744,7 +2744,7 @@ func (class *namumark_compat_renderer) process_blocks(data string) string {
 			if has_result && !last_was_block {
 				result.WriteByte(10)
 			}
-			append_result(class.reserve(table_data)+table_suffix, true)
+			append_result(class.Reserve(table_data)+table_suffix, true)
 			continue
 		}
 
@@ -2768,7 +2768,7 @@ func (class *namumark_compat_renderer) process_blocks(data string) string {
 				append_result(line, false)
 				continue
 			}
-			append_result(class.reserve(class.render_list(list_lines)), true)
+			append_result(class.Reserve(class.Render_list(list_lines)), true)
 			continue
 		}
 
@@ -2778,7 +2778,7 @@ func (class *namumark_compat_renderer) process_blocks(data string) string {
 				index++
 				quote_lines = append(quote_lines, lines[index])
 			}
-			append_result(class.reserve(class.render_quote(quote_lines)), true)
+			append_result(class.Reserve(class.Render_quote(quote_lines)), true)
 			continue
 		}
 
@@ -2787,16 +2787,16 @@ func (class *namumark_compat_renderer) process_blocks(data string) string {
 	return result.String()
 }
 
-func compat_date_now() time.Time {
+func Compat_date_now() time.Time {
 	now := time.Now()
 	return time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second(), now.Nanosecond(), time.UTC)
 }
 
-func compat_parse_date(data string) (time.Time, error) {
+func Compat_parse_date(data string) (time.Time, error) {
 	return time.ParseInLocation("2006-01-02", strings.TrimSpace(data), time.UTC)
 }
 
-func compat_date_days(now time.Time, parsed time.Time) int {
+func Compat_date_days(now time.Time, parsed time.Time) int {
 	duration := now.Sub(parsed)
 	days := int(duration / (24 * time.Hour))
 	if duration < 0 && duration%(24*time.Hour) != 0 {
@@ -2805,7 +2805,7 @@ func compat_date_days(now time.Time, parsed time.Time) int {
 	return days
 }
 
-func compat_date_component(days int, month bool) int {
+func Compat_date_component(days int, month bool) int {
 	sign := 1
 	if days <= 0 {
 		sign = -1
@@ -2818,13 +2818,13 @@ func compat_date_component(days int, month bool) int {
 	return sign * (date_value.Year() - 1)
 }
 
-func compat_macro_date(data string, macro_name string) string {
-	parsed, err := compat_parse_date(data)
+func Compat_macro_date(data string, macro_name string) string {
+	parsed, err := Compat_parse_date(data)
 	if err != nil {
 		return "invalid date"
 	}
-	now := compat_date_now()
-	days := compat_date_days(now, parsed)
+	now := Compat_date_now()
+	days := Compat_date_days(now, parsed)
 	switch macro_name {
 	case "age":
 		if parsed.After(now) {
@@ -2841,7 +2841,7 @@ func compat_macro_date(data string, macro_name string) string {
 		}
 		return strconv.Itoa(date_value)
 	case "dmonth":
-		date_value := compat_date_component(days, true)
+		date_value := Compat_date_component(days, true)
 		if date_value > 0 {
 			return "+" + strconv.Itoa(date_value)
 		}
@@ -2850,7 +2850,7 @@ func compat_macro_date(data string, macro_name string) string {
 		}
 		return strconv.Itoa(date_value)
 	case "dyear":
-		date_value := compat_date_component(days, false)
+		date_value := Compat_date_component(days, false)
 		if date_value > 0 {
 			return "+" + strconv.Itoa(date_value)
 		}
@@ -2862,8 +2862,8 @@ func compat_macro_date(data string, macro_name string) string {
 	return "invalid date"
 }
 
-func (class *namumark_compat_renderer) macro_lastedit(data string) string {
-	parts := compat_split_macro_args(data)
+func (class *namumark_compat_renderer) Macro_lastedit(data string) string {
+	parts := Compat_split_macro_args(data)
 	target := ""
 	full := false
 	for _, part := range parts {
@@ -2881,7 +2881,7 @@ func (class *namumark_compat_renderer) macro_lastedit(data string) string {
 	if class.db == nil || target == "" {
 		return "0"
 	}
-	target = class.normalize_target(tool.HTML_unescape(target))
+	target = class.Normalize_target(tool.HTML_unescape(target))
 	date_data := ""
 	tool.QueryRow_DB(class.db, "select set_data from data_set where doc_name = ? and set_name = 'last_edit'", []any{&date_data}, target)
 	if date_data == "" {
@@ -2893,19 +2893,19 @@ func (class *namumark_compat_renderer) macro_lastedit(data string) string {
 	return date_data
 }
 
-func (class *namumark_compat_renderer) process_macro_double(name string, data string, raw string) string {
+func (class *namumark_compat_renderer) Process_macro_double(name string, data string, raw string) string {
 	name = strings.ToLower(name)
 	switch name {
 	case "youtube", "nicovideo", "navertv", "kakaotv", "vimeo", "instagram", "twitter", "tiktok", "facebook":
 		if class.collect_only {
 			return ""
 		}
-		if media_data := class.compat_media_macro(name, data); media_data != "" {
-			return class.reserve(media_data)
+		if media_data := class.Compat_media_macro(name, data); media_data != "" {
+			return class.Reserve(media_data)
 		}
 		return raw
 	case "audio", "video":
-		media_data := class.process_file_media_macro(data, name)
+		media_data := class.Process_file_media_macro(data, name)
 		if class.collect_only {
 			return ""
 		}
@@ -2917,12 +2917,12 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 		}
 		return raw
 	case "toc":
-		if class.is_limited_render() {
+		if class.Is_limited_render() {
 			return ""
 		}
 		return "[toc()]"
 	case "pagecount":
-		if class.is_limited_render() {
+		if class.Is_limited_render() {
 			return ""
 		}
 		return "0"
@@ -2930,25 +2930,25 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 		if class.collect_only {
 			return data
 		}
-		return class.reserve(`<span class="opennamu_joke">`) + data + class.reserve("</span>")
+		return class.Reserve(`<span class="opennamu_joke">`) + data + class.Reserve("</span>")
 	case "anchor":
-		anchor := tool.HTML_unescape(strings.TrimSpace(compat_split_macro_args(data)[0]))
+		anchor := tool.HTML_unescape(strings.TrimSpace(Compat_split_macro_args(data)[0]))
 		if anchor == "" {
 			return ""
 		}
 		if class.collect_only {
 			return ""
 		}
-		return class.reserve(`<span id="`+compat_html_escape(anchor)+`">`) + class.reserve("</span>")
+		return class.Reserve(`<span id="`+Compat_html_escape(anchor)+`">`) + class.Reserve("</span>")
 	case "comment":
 		return ""
 	case "age", "dday", "dmonth", "dyear":
-		return compat_macro_date(data, name)
+		return Compat_macro_date(data, name)
 	case "timeif":
 		main_data := ""
 		before_data := ""
 		after_data := ""
-		for _, item := range compat_split_macro_args(data) {
+		for _, item := range Compat_split_macro_args(data) {
 			parts := strings.SplitN(item, "=", 2)
 			if len(parts) == 2 {
 				switch strings.ToLower(strings.TrimSpace(parts[0])) {
@@ -2961,11 +2961,11 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 				main_data = strings.TrimSpace(item)
 			}
 		}
-		parsed, err := compat_parse_date(main_data)
+		parsed, err := Compat_parse_date(main_data)
 		if err != nil {
 			return "invalid date"
 		}
-		if parsed.After(compat_date_now()) {
+		if parsed.After(Compat_date_now()) {
 			return before_data
 		}
 		return after_data
@@ -2973,14 +2973,14 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 		main_text := ""
 		ruby_text := ""
 		color := ""
-		for _, item := range compat_split_macro_args(data) {
+		for _, item := range Compat_split_macro_args(data) {
 			parts := strings.SplitN(item, "=", 2)
 			if len(parts) == 2 {
 				switch strings.ToLower(strings.TrimSpace(parts[0])) {
 				case "ruby":
 					ruby_text = parts[1]
 				case "color":
-					color = compat_middle_style(parts[1])
+					color = Compat_middle_style(parts[1])
 					if color != "" {
 						color += ";"
 					}
@@ -2992,13 +2992,13 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 		if class.collect_only {
 			return main_text + ruby_text
 		}
-		ruby_data := class.reserve("<ruby>") + main_text + class.reserve("<rp>(</rp><rt>")
+		ruby_data := class.Reserve("<ruby>") + main_text + class.Reserve("<rp>(</rp><rt>")
 		if color != "" {
-			ruby_data += class.reserve(`<span style="color:`+compat_html_escape(tool.HTML_unescape(color))+`">`) + ruby_text + class.reserve("</span>")
+			ruby_data += class.Reserve(`<span style="color:`+Compat_html_escape(tool.HTML_unescape(color))+`">`) + ruby_text + class.Reserve("</span>")
 		} else {
 			ruby_data += ruby_text
 		}
-		return ruby_data + class.reserve("</rt><rp>)</rp></ruby>")
+		return ruby_data + class.Reserve("</rt><rp>)</rp></ruby>")
 	case "username":
 		if strings.TrimSpace(data) == "" {
 			return raw
@@ -3006,7 +3006,7 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 		username := ""
 		render := true
 		load_name := false
-		for _, item := range compat_split_macro_args(data) {
+		for _, item := range Compat_split_macro_args(data) {
 			parts := strings.SplitN(item, "=", 2)
 			if len(parts) == 2 {
 				switch strings.ToLower(strings.TrimSpace(parts[0])) {
@@ -3020,7 +3020,7 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 			}
 		}
 		if load_name {
-			username = compat_render_parameter_value(class.parameter["ip"])
+			username = Compat_render_parameter_value(class.parameter["ip"])
 		}
 		if class.collect_only {
 			return username
@@ -3029,27 +3029,27 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 		if render {
 			class_name = "opennamu_render_ip"
 		}
-		return class.reserve(`<span class="`+class_name+`">`) + compat_escape_value(username) + class.reserve("</span>")
+		return class.Reserve(`<span class="`+class_name+`">`) + Compat_escape_value(username) + class.Reserve("</span>")
 	case "lastedit":
-		if class.is_limited_render() {
+		if class.Is_limited_render() {
 			return ""
 		}
-		return class.macro_lastedit(data)
+		return class.Macro_lastedit(data)
 	case "category_count":
 		if class.db == nil {
 			return "0"
 		}
-		parts := compat_split_macro_args(data)
+		parts := Compat_split_macro_args(data)
 		if len(parts) == 0 || parts[0] == "" {
 			return "0"
 		}
-		target := class.normalize_target(tool.HTML_unescape(parts[0]))
+		target := class.Normalize_target(tool.HTML_unescape(parts[0]))
 		target = strings.TrimPrefix(strings.TrimPrefix(target, "category:"), "분류:")
 		if target == "" {
 			return "0"
 		}
 		target = "category:" + target
-		if actual, exists := class.find_document(target); exists {
+		if actual, exists := class.Find_document(target); exists {
 			target = actual
 		}
 		return strconv.Itoa(tool.Get_category_document_count(class.db, target))
@@ -3058,12 +3058,12 @@ func (class *namumark_compat_renderer) process_macro_double(name string, data st
 	}
 }
 
-func (class *namumark_compat_renderer) process_macros(data string) string {
-	data = compat_replace_regex2(data, `(?i)(?<!\[)\[comment\(\)\]`, func(match regexp2.Match) string {
+func (class *namumark_compat_renderer) Process_macros(data string) string {
+	data = Compat_replace_regex2(data, `(?i)(?<!\[)\[comment\(\)\]`, func(match regexp2.Match) string {
 		return ""
 	})
-	data = compat_replace_regex2(data, `(?is)(?<!\[)\[(?!\*)([^[(\]]+)\(((?:(?!\[\[|\)\]).)+)\)\]`, func(match regexp2.Match) string {
-		return class.process_macro_double(match.GroupByNumber(1).String(), match.GroupByNumber(2).String(), match.String())
+	data = Compat_replace_regex2(data, `(?is)(?<!\[)\[(?!\*)([^[(\]]+)\(((?:(?!\[\[|\)\]).)+)\)\]`, func(match regexp2.Match) string {
+		return class.Process_macro_double(match.GroupByNumber(1).String(), match.GroupByNumber(2).String(), match.String())
 	})
 	return namumark_compat_single_macro_regex.ReplaceAllStringFunc(data, func(raw string) string {
 		match := namumark_compat_single_macro_regex.FindStringSubmatch(raw)
@@ -3075,16 +3075,16 @@ func (class *namumark_compat_renderer) process_macros(data string) string {
 			if class.collect_only {
 				return ""
 			}
-			return class.reserve("<br>")
+			return class.Reserve("<br>")
 		case "clearfix":
 			if class.collect_only {
 				return ""
 			}
-			return class.reserve(`<div style="clear: both;"></div>`)
+			return class.Reserve(`<div style="clear: both;"></div>`)
 		case "date", "datetime":
 			return tool.Get_time()
 		case "pagecount":
-			if class.is_limited_render() {
+			if class.Is_limited_render() {
 				return ""
 			}
 			count := "0"
@@ -3093,7 +3093,7 @@ func (class *namumark_compat_renderer) process_macros(data string) string {
 			}
 			return count
 		case "toc", "목차", "tableofcontents":
-			if class.is_limited_render() {
+			if class.Is_limited_render() {
 				return ""
 			}
 			return "[toc]"
@@ -3103,38 +3103,38 @@ func (class *namumark_compat_renderer) process_macros(data string) string {
 	})
 }
 
-func (class *namumark_compat_renderer) process_slash(data string) string {
-	return compat_replace_regex2(data, `\\(&lt;|&gt;|&#x27;|&quot;|&amp;|.)`, func(match regexp2.Match) string {
-		return class.reserve_slash(match.GroupByNumber(1).String())
+func (class *namumark_compat_renderer) Process_slash(data string) string {
+	return Compat_replace_regex2(data, `\\(&lt;|&gt;|&#x27;|&quot;|&amp;|.)`, func(match regexp2.Match) string {
+		return class.Reserve_slash(match.GroupByNumber(1).String())
 	})
 }
 
-func (class *namumark_compat_renderer) prepare() {
-	class.data = compat_render_parameter_data(class.data, class.parameter)
-	class.data = compat_remove_comments(class.data)
-	class.data = class.process_slash(class.data)
-	class.data = class.process_redirect(class.data)
-	class.data = class.process_middle(class.data)
-	class.data = class.process_macros(class.data)
-	class.data = class.process_links(class.data)
-	class.data = class.process_includes(class.data)
-	class.data = class.process_math(class.data)
+func (class *namumark_compat_renderer) Prepare() {
+	class.data = Compat_render_parameter_data(class.data, class.parameter)
+	class.data = Compat_remove_comments(class.data)
+	class.data = class.Process_slash(class.data)
+	class.data = class.Process_redirect(class.data)
+	class.data = class.Process_middle(class.data)
+	class.data = class.Process_macros(class.data)
+	class.data = class.Process_links(class.data)
+	class.data = class.Process_includes(class.data)
+	class.data = class.Process_math(class.data)
 	if class.render_type != "include" && class.render_type != "inter" {
-		class.data = class.process_footnotes(class.data)
+		class.data = class.Process_footnotes(class.data)
 	}
 	if !class.collect_only {
 		if class.render_type != "include" && class.render_type != "inter" {
-			class.data = class.process_headings(class.data)
+			class.data = class.Process_headings(class.data)
 		}
-		class.data = class.render_text(class.data)
-		class.data = class.process_blocks(class.data)
+		class.data = class.Render_text(class.data)
+		class.data = class.Process_blocks(class.data)
 		if class.footnote_token != "" {
 			class.data += class.footnote_token
 		}
 	}
 }
 
-func (class *namumark_compat_renderer) category_html() string {
+func (class *namumark_compat_renderer) Category_html() string {
 	if len(class.categories) == 0 {
 		return ""
 	}
@@ -3154,29 +3154,29 @@ func (class *namumark_compat_renderer) category_html() string {
 		if len(category_classes) > 0 {
 			class_name = ` class="` + strings.Join(category_classes, " ") + `"`
 		}
-		label := compat_html_escape(category.label)
-		category_url := class.compat_url_parser(category.target)
+		label := Compat_html_escape(category.label)
+		category_url := class.Compat_url_parser(category.target)
 		category_parts := strings.SplitN(category.target, ":", 2)
 		if len(category_parts) == 2 && strings.EqualFold(category_parts[0], "category") {
-			category_url = "category:" + class.compat_url_parser(category_parts[1])
+			category_url = "category:" + class.Compat_url_parser(category_parts[1])
 		}
 		data += `<a` + class_name + ` title="` + label + `" href="/w/` + category_url + `">` + label + `</a>`
 	}
 	return data + "</div>"
 }
 
-func (class *namumark_compat_renderer) is_view() bool {
+func (class *namumark_compat_renderer) Is_view() bool {
 	return class.include_depth == 0 && (class.render_type == "normal" || class.render_type == "view" || class.render_type == "from")
 }
 
-func (class *namumark_compat_renderer) apply_text_setting(data string) string {
-	switch class.get_render_setting("main_css_bold") {
+func (class *namumark_compat_renderer) Apply_text_setting(data string) string {
+	switch class.Get_render_setting("main_css_bold") {
 	case "delete":
 		data = namumark_compat_bold_regex.ReplaceAllString(data, "")
 	case "change":
 		data = namumark_compat_bold_regex.ReplaceAllString(data, "$1")
 	}
-	switch class.get_render_setting("main_css_strike") {
+	switch class.Get_render_setting("main_css_strike") {
 	case "delete":
 		data = namumark_compat_strike_regex.ReplaceAllString(data, "")
 	case "change":
@@ -3185,7 +3185,7 @@ func (class *namumark_compat_renderer) apply_text_setting(data string) string {
 	return data
 }
 
-func compat_remove_nested_links(data string) string {
+func Compat_remove_nested_links(data string) string {
 	link_depth := 0
 	link_regex := regexp.MustCompile(`(?i)(<a(?: [^<>]*)?>|</a>)`)
 	return link_regex.ReplaceAllStringFunc(data, func(value string) string {
@@ -3208,7 +3208,7 @@ func compat_remove_nested_links(data string) string {
 	})
 }
 
-func (class *namumark_compat_renderer) render_output() string {
+func (class *namumark_compat_renderer) Render_output() string {
 	data := class.data
 	for token, token_data := range class.tokens {
 		if strings.Contains(token_data, `<div class="opennamu_folding">`) {
@@ -3223,15 +3223,15 @@ func (class *namumark_compat_renderer) render_output() string {
 		}
 	}
 	data = strings.ReplaceAll(data, "\n", "<br>")
-	data = class.restore(data)
-	data = compat_remove_nested_links(data)
-	if class.is_view() && len(class.categories) > 0 {
+	data = class.Restore(data)
+	data = Compat_remove_nested_links(data)
+	if class.Is_view() && len(class.categories) > 0 {
 		data = strings.TrimSuffix(data, "<br>")
 	}
-	if class.is_view() {
-		if category_data := class.category_html(); category_data != "" {
+	if class.Is_view() {
+		if category_data := class.Category_html(); category_data != "" {
 			category_separator := "<hr class=\"main_hr\">"
-			if class.get_render_setting("main_css_category_set") == "bottom" {
+			if class.Get_render_setting("main_css_category_set") == "bottom" {
 				category_separator = "<hr>"
 			}
 			category_data = category_separator + category_data
@@ -3246,27 +3246,27 @@ func (class *namumark_compat_renderer) render_output() string {
 	return data
 }
 
-func (class *namumark_compat_renderer) result() map[string]any {
-	class.prepare()
+func (class *namumark_compat_renderer) Result() map[string]any {
+	class.Prepare()
 	if class.collect_only {
 		return map[string]any{
 			"data":       "",
 			"js_data":    "",
-			"backlinks":  class.backlink_entries(),
+			"backlinks":  class.Backlink_entries(),
 			"link_count": class.link_count,
 			"redirect":   class.redirect,
 		}
 	}
 	return map[string]any{
-		"data":       class.render_output(),
+		"data":       class.Render_output(),
 		"js_data":    "",
-		"backlinks":  class.backlink_entries(),
+		"backlinks":  class.Backlink_entries(),
 		"link_count": class.link_count,
 		"redirect":   class.redirect,
 	}
 }
 
-func (class *namumark_compat_renderer) backlink_entries() []namumark_compat_backlink {
+func (class *namumark_compat_renderer) Backlink_entries() []namumark_compat_backlink {
 	result := []namumark_compat_backlink{}
 	for _, key := range class.backlink_order {
 		result = append(result, class.backlinks[key])
@@ -3274,7 +3274,7 @@ func (class *namumark_compat_renderer) backlink_entries() []namumark_compat_back
 	return result
 }
 
-func render_namumark_compat(
+func Render_namumark_compat(
 	db *sql.DB,
 	doc_name string,
 	data string,
@@ -3283,12 +3283,12 @@ func render_namumark_compat(
 	include_depth int,
 	collect_only bool,
 ) map[string]any {
-	class := new_namumark_compat_renderer(db, doc_name, data, render_type, parameter, include_depth, collect_only)
-	return class.result()
+	class := New_namumark_compat_renderer(db, doc_name, data, render_type, parameter, include_depth, collect_only)
+	return class.Result()
 }
 
-func render_namumark_compat_backlink(db *sql.DB, doc_name string, data string) map[string]string {
-	result := render_namumark_compat(db, doc_name, data, "backlink", nil, 0, true)
+func Render_namumark_compat_backlink(db *sql.DB, doc_name string, data string) map[string]string {
+	result := Render_namumark_compat(db, doc_name, data, "backlink", nil, 0, true)
 	entries, _ := result["backlinks"].([]namumark_compat_backlink)
 	link_count, _ := result["link_count"].(int)
 	redirect, _ := result["redirect"].(bool)
@@ -3344,34 +3344,34 @@ func render_namumark_compat_backlink(db *sql.DB, doc_name string, data string) m
 
 	return map[string]string{"data": `<div class="opennamu_render_complete"></div>`, "js_data": ""}
 }
-func compat_url_parser(data string) string {
+func Compat_url_parser(data string) string {
 	data = strings.ReplaceAll(data, "OPENNAMU_COMPAT_TOKEN_", "OPENNAMU_COMPAT_T0KEN_")
 	if strings.HasPrefix(data, ".") {
 		data = "\\" + data
 	}
 	return strings.ReplaceAll(url.QueryEscape(data), "+", "%20")
 }
-func (class *namumark_compat_renderer) compat_url_parser(data string) string {
-	return compat_url_parser(class.restore_slash(data))
+func (class *namumark_compat_renderer) Compat_url_parser(data string) string {
+	return Compat_url_parser(class.Restore_slash(data))
 }
 
-func compat_legacy_html_literal(data string) string {
+func Compat_legacy_html_literal(data string) string {
 	data = strings.ReplaceAll(data, "&amp;amp;nbsp;", "&amp;nbsp;")
 	return data
 }
 
-func compat_html_escape(data string) string {
+func Compat_html_escape(data string) string {
 	data = strings.ReplaceAll(data, "&", "&amp;")
 	data = strings.ReplaceAll(data, "<", "&lt;")
 	data = strings.ReplaceAll(data, ">", "&gt;")
 	data = strings.ReplaceAll(data, `"`, "&quot;")
 	return strings.ReplaceAll(data, "'", "&#x27;")
 }
-func compat_escape_value(data string) string {
-	return compat_html_escape(tool.HTML_unescape(data))
+func Compat_escape_value(data string) string {
+	return Compat_html_escape(tool.HTML_unescape(data))
 }
 
-func compat_replace_regex2(data string, pattern string, fn func(regexp2.Match) string) string {
+func Compat_replace_regex2(data string, pattern string, fn func(regexp2.Match) string) string {
 	regex := regexp2.MustCompile(pattern, 0)
 	result, err := regex.ReplaceFunc(data, fn, -1, -1)
 	if err != nil {
@@ -3380,7 +3380,7 @@ func compat_replace_regex2(data string, pattern string, fn func(regexp2.Match) s
 	return result
 }
 
-func (class *namumark_compat_renderer) render_text(data string) string {
+func (class *namumark_compat_renderer) Render_text(data string) string {
 	text_data := []struct {
 		pattern string
 		open    string
@@ -3399,8 +3399,8 @@ func (class *namumark_compat_renderer) render_text(data string) string {
 	}
 
 	for _, item := range text_data {
-		setting := class.get_render_setting(item.setting)
-		data = compat_replace_regex2(data, item.pattern, func(match regexp2.Match) string {
+		setting := class.Get_render_setting(item.setting)
+		data = Compat_replace_regex2(data, item.pattern, func(match regexp2.Match) string {
 			inside := match.GroupByNumber(1).String()
 			if item.setting != "" && setting == "delete" {
 				return ""

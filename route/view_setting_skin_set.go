@@ -15,13 +15,13 @@ func View_setting_skin_set(config tool.Config) string {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	fields, _ := setting_skin_fields(db)
+	fields, _ := Setting_skin_fields(db)
 	values := map[string]string{}
 	for _, field := range fields {
-		values[field.name] = setting_value(db, field.name, "", "")
+		values[field.name] = Setting_value(db, field.name, "", "")
 	}
 
-	return view_setting_skin_set_data(db, config, fields, values)
+	return View_setting_skin_set_data(db, config, fields, values)
 }
 
 type setting_skin_field struct {
@@ -29,7 +29,7 @@ type setting_skin_field struct {
 	label string
 }
 
-func setting_skin_fields(db *sql.DB) ([]setting_skin_field, map[string][][]string) {
+func Setting_skin_fields(db *sql.DB) ([]setting_skin_field, map[string][][]string) {
 	set_list := Get_main_skin_set_list(db)
 	fields := []setting_skin_field{
 		{name: "main_css_strike", label: "strike"},
@@ -61,8 +61,8 @@ func setting_skin_fields(db *sql.DB) ([]setting_skin_field, map[string][][]strin
 	return fields, set_list
 }
 
-func view_setting_skin_set_data(db *sql.DB, config tool.Config, fields []setting_skin_field, values map[string]string) string {
-	_, set_list := setting_skin_fields(db)
+func View_setting_skin_set_data(db *sql.DB, config tool.Config, fields []setting_skin_field, values map[string]string) string {
+	_, set_list := Setting_skin_fields(db)
 	data := strings.Builder{}
 	data.WriteString(`<form method="post"><h2>` + tool.Get_language(db, "render", true) + `</h2>`)
 
@@ -79,9 +79,9 @@ func view_setting_skin_set_data(db *sql.DB, config tool.Config, fields []setting
 		}
 
 		data.WriteString(`<h3>` + tool.Get_language(db, field.label, true) + `</h3>`)
-		data.WriteString(`<select name="` + tool.HTML_escape(field.name) + `">` + setting_options(values[field.name], choice_values, choice_labels) + `</select>` + main_hr())
+		data.WriteString(`<select name="` + tool.HTML_escape(field.name) + `">` + Setting_options(values[field.name], choice_values, choice_labels) + `</select>` + Main_hr())
 	}
 
 	data.WriteString(`<button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`)
-	return setting_page(db, config, tool.Get_language(db, "main_skin_set_default", true), data.String(), "setting")
+	return Setting_page(db, config, tool.Get_language(db, "main_skin_set_default", true), data.String(), "setting")
 }

@@ -8,7 +8,7 @@ import (
 func View_challenge(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if values == nil && !user_auth(db, config) {
+	if values == nil && !User_auth(db, config) {
 		return tool.Get_redirect("/user")
 	}
 
@@ -29,21 +29,21 @@ func View_challenge(config tool.Config, values url.Values) string {
 		complete bool
 	}{
 		{"🌳", "register", true},
-		{"🔰", "first_contribute", challenge_is_complete(db, config.IP, "challenge_first_contribute")},
-		{"📝", "tenth_contribute", challenge_is_complete(db, config.IP, "challenge_tenth_contribute")},
-		{"🖊️", "hundredth_contribute", challenge_is_complete(db, config.IP, "challenge_hundredth_contribute")},
-		{"🏅", "thousandth_contribute", challenge_is_complete(db, config.IP, "challenge_thousandth_contribute")},
-		{"💬", "first_discussion", challenge_is_complete(db, config.IP, "challenge_first_discussion")},
-		{"💡", "tenth_discussion", challenge_is_complete(db, config.IP, "challenge_tenth_discussion")},
-		{"📢", "hundredth_discussion", challenge_is_complete(db, config.IP, "challenge_hundredth_discussion")},
-		{"📜", "thousandth_discussion", challenge_is_complete(db, config.IP, "challenge_thousandth_discussion")},
-		{"☑️", "admin", challenge_is_complete(db, config.IP, "challenge_admin")},
+		{"🔰", "first_contribute", Challenge_is_complete(db, config.IP, "challenge_first_contribute")},
+		{"📝", "tenth_contribute", Challenge_is_complete(db, config.IP, "challenge_tenth_contribute")},
+		{"🖊️", "hundredth_contribute", Challenge_is_complete(db, config.IP, "challenge_hundredth_contribute")},
+		{"🏅", "thousandth_contribute", Challenge_is_complete(db, config.IP, "challenge_thousandth_contribute")},
+		{"💬", "first_discussion", Challenge_is_complete(db, config.IP, "challenge_first_discussion")},
+		{"💡", "tenth_discussion", Challenge_is_complete(db, config.IP, "challenge_tenth_discussion")},
+		{"📢", "hundredth_discussion", Challenge_is_complete(db, config.IP, "challenge_hundredth_discussion")},
+		{"📜", "thousandth_discussion", Challenge_is_complete(db, config.IP, "challenge_thousandth_discussion")},
+		{"☑️", "admin", Challenge_is_complete(db, config.IP, "challenge_admin")},
 	}
 
 	green_html := ""
 	red_html := ""
 	for _, challenge := range challenge_list {
-		design := challenge_design(
+		design := Challenge_design(
 			challenge.image,
 			tool.Get_language(db, "challenge_title_"+challenge.name, true),
 			tool.Get_language(db, "challenge_info_"+challenge.name, true),
@@ -61,5 +61,5 @@ func View_challenge(config tool.Config, values url.Values) string {
 		<hr class="main_hr">
 		<button id="opennamu_save_button" type="submit">` + tool.Get_language(db, "reload", true) + `</button>
 	</form>`
-	return user_form_page(db, config, tool.Get_language(db, "challenge_and_level_manage", true), body)
+	return User_form_page(db, config, tool.Get_language(db, "challenge_and_level_manage", true), body)
 }

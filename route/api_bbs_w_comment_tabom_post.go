@@ -11,7 +11,7 @@ func Api_bbs_w_comment_tabom_post(config tool.Config, set_id string, set_code st
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	if _, allowed := bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
+	if _, allowed := Bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
 		return_data["response"] = "require auth"
 		return return_data
 	}
@@ -21,7 +21,7 @@ func Api_bbs_w_comment_tabom_post(config tool.Config, set_id string, set_code st
 		return return_data
 	}
 
-	comment_set_id, comment_set_code, exists := bbs_search_comment_location(set_id, set_code, comment_code)
+	comment_set_id, comment_set_code, exists := Bbs_search_comment_location(set_id, set_code, comment_code)
 	if !exists {
 		return_data["response"] = "not exist"
 		return_data["data"] = "comment"
@@ -55,7 +55,7 @@ func Api_bbs_w_comment_tabom_post(config tool.Config, set_id string, set_code st
 
 	var result map[string]any
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-		result = api_bbs_tabom_post(tx, config.IP, comment_set_id, comment_set_code, vote_type)
+		result = Api_bbs_tabom_post(tx, config.IP, comment_set_id, comment_set_code, vote_type)
 		return nil
 	}); err != nil {
 		panic(err)

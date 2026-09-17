@@ -64,12 +64,12 @@ func View_auth_group(config tool.Config, name string, values url.Values) string 
 	if can_edit {
 		data += `<hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 	}
-	data += auth_relation_view(db)
+	data += Auth_relation_view(db)
 
 	return tool.Get_template(db, config, name, data, []any{"(" + tool.Get_language(db, "admin_group", true) + ")"}, [][]any{{"auth/list", tool.Get_language(db, "return", true)}}, map[string]string{})
 }
 
-func auth_relation_label(db *sql.DB, key string) string {
+func Auth_relation_label(db *sql.DB, key string) string {
 	if key == "user_default" || key == "ip_default" {
 		return tool.HTML_escape(tool.Get_language(db, "auth_"+key, true))
 	}
@@ -83,7 +83,7 @@ func auth_relation_label(db *sql.DB, key string) string {
 	return tool.HTML_escape(key)
 }
 
-func auth_relation_view(db *sql.DB) string {
+func Auth_relation_view(db *sql.DB) string {
 	data := `<hr class="main_hr"><h3>` + tool.Get_language(db, "auth_relation", true) + `</h3>`
 	relations := tool.Auth_relations()
 
@@ -96,10 +96,10 @@ func auth_relation_view(db *sql.DB) string {
 				if default_name == "ip_default" {
 					source_name = "ip"
 				}
-				data += `<p><b>` + auth_relation_label(db, default_name) + `</b></p><ul>`
+				data += `<p><b>` + Auth_relation_label(db, default_name) + `</b></p><ul>`
 				for _, relation := range relations {
 					if relation.Type == relation_type && relation.From == source_name {
-						data += `<li>` + auth_relation_label(db, relation.To) + `</li>`
+						data += `<li>` + Auth_relation_label(db, relation.To) + `</li>`
 					}
 				}
 				data += `</ul>`
@@ -110,12 +110,11 @@ func auth_relation_view(db *sql.DB) string {
 		data += `<ul>`
 		for _, relation := range relations {
 			if relation.Type == relation_type {
-				data += `<li>` + auth_relation_label(db, relation.From) + ` → ` + auth_relation_label(db, relation.To) + `</li>`
+				data += `<li>` + Auth_relation_label(db, relation.From) + ` → ` + Auth_relation_label(db, relation.To) + `</li>`
 			}
 		}
 		data += `</ul>`
 	}
 
-	data += `<p>` + tool.Get_language(db, "auth_relation_note", true) + `</p>`
 	return data
 }

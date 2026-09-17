@@ -22,20 +22,20 @@ type module struct {
 
 func main() {
 	// 1) 모듈 루트 탐색
-	module_root, err := find_module_root(".")
-	must(err, "모듈 루트를 찾는 중 오류")
+	module_root, err := Find_module_root(".")
+	Must(err, "모듈 루트를 찾는 중 오류")
 	fmt.Println("[info] module root:", module_root)
 
 	// 2) 출력 폴더: 모듈 루트/THIRD_PARTY_LICENSES
 	license_dir := filepath.Join(module_root, "THIRD_PARTY_LICENSES")
-	must(os.MkdirAll(license_dir, 0o755), "라이선스 폴더 생성 실패")
+	Must(os.MkdirAll(license_dir, 0o755), "라이선스 폴더 생성 실패")
 
 	// 3) 모듈 캐시 준비 (다운로드)
-	must(run_cmd(module_root, "go", "mod", "download", "-json", "all"), "go mod download 실패")
+	Must(Run_cmd(module_root, "go", "mod", "download", "-json", "all"), "go mod download 실패")
 
 	// 4) 모듈 목록 가져오기
-	out, err := run_cmd_out(module_root, "go", "list", "-m", "-json", "all")
-	must(err, "go list 실패")
+	out, err := Run_cmd_out(module_root, "go", "list", "-m", "-json", "all")
+	Must(err, "go list 실패")
 
 	dec := json.NewDecoder(bytes.NewReader(out))
 	var mods []module
@@ -68,19 +68,19 @@ func main() {
 	var missing []string
 	generated_files := make(map[string]struct{}, len(mods)+1)
 	for _, m := range mods {
-		files := find_license_files(m.Dir)
+		files := Find_license_files(m.Dir)
 		if len(files) == 0 {
 			// 부모에도 있는 경우가 있어 한 번 더 탐색
-			files = find_license_files(filepath.Dir(m.Dir))
+			files = Find_license_files(filepath.Dir(m.Dir))
 		}
 		if len(files) == 0 {
 			missing = append(missing, fmt.Sprintf("%s@%s (Dir: %s)", m.Path, m.Version, m.Dir))
 			continue
 		}
-		if err := save_module_licenses(license_dir, m, files); err != nil {
+		if err := Save_module_licenses(license_dir, m, files); err != nil {
 			fmt.Fprintf(os.Stderr, "[warn] %s 저장 실패: %v\n", m.Path, err)
 		} else {
-			generated_files[module_license_file_name(m)] = struct{}{}
+			generated_files[Module_license_file_name(m)] = struct{}{}
 		}
 	}
 
@@ -96,12 +96,12 @@ func main() {
 		}
 	}
 
-	must(remove_stale_license_files(license_dir, generated_files), "이전 라이선스 파일 정리 실패")
+	Must(Remove_stale_license_files(license_dir, generated_files), "이전 라이선스 파일 정리 실패")
 
 	fmt.Println("[done] THIRD_PARTY_LICENSES 폴더 생성 완료")
 }
 
-func find_module_root(start string) (string, error) {
+func Find_module_root(start string) (string, error) {
 	dir, err := filepath.Abs(start)
 	if err != nil {
 		return "", err
@@ -119,7 +119,7 @@ func find_module_root(start string) (string, error) {
 	return "", fmt.Errorf("go.mod를 찾을 수 없습니다")
 }
 
-func run_cmd(dir string, name string, args ...string) error {
+func Run_cmd(dir string, name string, args ...string) error {
 	cmd := exec.Command(name, args...)
 	cmd.Dir = dir
 	var stderr bytes.Buffer
@@ -130,7 +130,7 @@ func run_cmd(dir string, name string, args ...string) error {
 	return nil
 }
 
-func run_cmd_out(dir string, name string, args ...string) ([]byte, error) {
+func Run_cmd_out(dir string, name string, args ...string) ([]byte, error) {
 	cmd := exec.Command(name, args...)
 	cmd.Dir = dir
 	var stderr bytes.Buffer
@@ -142,7 +142,7 @@ func run_cmd_out(dir string, name string, args ...string) ([]byte, error) {
 	return out, nil
 }
 
-func find_license_files(dir string) []string {
+func Find_license_files(dir string) []string {
 	candidates := []string{
 		"LICENSE", "LICENSE.txt", "LICENSE.md",
 		"COPYING", "COPYING.txt",
@@ -181,8 +181,8 @@ func find_license_files(dir string) []string {
 	return res
 }
 
-func save_module_licenses(license_dir string, m module, files []string) error {
-	file_name := module_license_file_name(m)
+func Save_module_licenses(license_dir string, m module, files []string) error {
+	file_name := Module_license_file_name(m)
 	out_path := filepath.Join(license_dir, file_name)
 	var b bytes.Buffer
 	fmt.Fprintf(&b, "%s @ %s\n\n", m.Path, m.Version)
@@ -204,11 +204,11 @@ func save_module_licenses(license_dir string, m module, files []string) error {
 	return os.WriteFile(out_path, b.Bytes(), 0o644)
 }
 
-func module_license_file_name(m module) string {
+func Module_license_file_name(m module) string {
 	return strings.ReplaceAll(m.Path, "/", "_") + "@" + m.Version + ".txt"
 }
 
-func remove_stale_license_files(license_dir string, generated_files map[string]struct{}) error {
+func Remove_stale_license_files(license_dir string, generated_files map[string]struct{}) error {
 	entries, err := os.ReadDir(license_dir)
 	if err != nil {
 		return err
@@ -237,7 +237,7 @@ func remove_stale_license_files(license_dir string, generated_files map[string]s
 	return nil
 }
 
-func must(err error, ctx string) {
+func Must(err error, ctx string) {
 	if err != nil {
 		panic(fmt.Errorf("%s: %w", ctx, err))
 	}

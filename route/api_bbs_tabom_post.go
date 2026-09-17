@@ -6,7 +6,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func api_bbs_tabom_post(db *sql.Tx, user string, set_id string, set_code string, vote_type string) map[string]any {
+func Api_bbs_tabom_post(db *sql.Tx, user string, set_id string, set_code string, vote_type string) map[string]any {
 	return_data := make(map[string]any)
 
 	if vote_type != "down" {
@@ -20,12 +20,12 @@ func api_bbs_tabom_post(db *sql.Tx, user string, set_id string, set_code string,
 		selected_count = "tabom_down_count"
 	}
 
-	if bbs_tabom_user_exists(db, selected_list, user, set_id, set_code) {
+	if Bbs_tabom_user_exists(db, selected_list, user, set_id, set_code) {
 		return_data["response"] = "same user exist"
 		return return_data
 	}
 
-	change_bbs_tabom_count(db, selected_count, set_id, set_code, 1)
+	Change_bbs_tabom_count(db, selected_count, set_id, set_code, 1)
 	tool.Exec_DB(
 		db,
 		"insert into bbs_data (set_name, set_data, set_id, set_code) values (?, ?, ?, ?)",

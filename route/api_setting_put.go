@@ -52,7 +52,7 @@ func Api_setting_put(config tool.Config, set_name string, data string, coverage 
 			return return_data
 		}
 
-		if tool.Arr_in_str(bbs_global_acl_fields, set_name) && !acl_value_valid(db, data) {
+		if tool.Arr_in_str(bbs_global_acl_fields, set_name) && !Acl_value_valid(db, data) {
 			return_data["response"] = "error"
 			return_data["data"] = "invalid acl"
 			return return_data

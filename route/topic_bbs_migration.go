@@ -6,7 +6,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func normalize_thread_bbs_prefix(db *sql.DB) error {
+func Normalize_thread_bbs_prefix(db *sql.DB) error {
 	rows, err := db.Query(
 		tool.DB_change("select set_code from bbs_data where set_id = ? and set_name = 'document'"),
 		thread_bbs_set_id,
@@ -104,7 +104,7 @@ func normalize_thread_bbs_prefix(db *sql.DB) error {
 	return nil
 }
 
-func migrate_thread_bbs_document_tags(db *sql.DB) error {
+func Migrate_thread_bbs_document_tags(db *sql.DB) error {
 	rows, err := db.Query(
 		tool.DB_change("select set_code, set_data from bbs_data where set_id = ? and set_name = 'document' and set_data != ''"),
 		thread_bbs_set_id,
@@ -163,7 +163,7 @@ func migrate_thread_bbs_document_tags(db *sql.DB) error {
 	return nil
 }
 
-func migrate_thread_bbs_agree_prefix(db *sql.DB) error {
+func Migrate_thread_bbs_agree_prefix(db *sql.DB) error {
 	changed := false
 	prefix_data := ""
 	prefix_exists := tool.QueryRow_DB(
@@ -172,7 +172,7 @@ func migrate_thread_bbs_agree_prefix(db *sql.DB) error {
 		[]any{&prefix_data},
 		thread_bbs_set_id,
 	)
-	if !tool.Arr_in_str(bbs_prefix_list(db, thread_bbs_set_id), "합의") {
+	if !tool.Arr_in_str(Bbs_prefix_list(db, thread_bbs_set_id), "합의") {
 		if prefix_data == "" {
 			prefix_data = "열림\n닫힘\n합의"
 		} else {
@@ -281,17 +281,17 @@ func Migrate_topic_to_bbs(previous_version string) error {
 	defer tool.DB_close(db)
 
 	if previous_version < "20260901" {
-		if err := emergency_migrate_topic_to_bbs(db); err != nil {
+		if err := Emergency_migrate_topic_to_bbs(db); err != nil {
 			return err
 		}
 	}
 	if previous_version < "20260902" {
-		if err := migrate_thread_bbs_document_tags(db); err != nil {
+		if err := Migrate_thread_bbs_document_tags(db); err != nil {
 			return err
 		}
 	}
 	if previous_version < "20260903" {
-		return migrate_thread_bbs_agree_prefix(db)
+		return Migrate_thread_bbs_agree_prefix(db)
 	}
 	return nil
 }

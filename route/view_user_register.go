@@ -5,12 +5,12 @@ import (
 	"opennamu/route/tool"
 )
 
-func user_register_access(db *sql.DB, config tool.Config) string {
+func User_register_access(db *sql.DB, config tool.Config) string {
 	owner_auth := tool.Check_permission(db, "user_manage", config.IP)
 	if !owner_auth && !tool.IP_or_user(config.IP) {
 		return "login user"
 	}
-	if !owner_auth && user_other(db, "reg") == "on" {
+	if !owner_auth && User_other(db, "reg") == "on" {
 		return "register disabled"
 	}
 	if !tool.Get_auth_info(db, config.IP)["register_available"] {
@@ -19,8 +19,8 @@ func user_register_access(db *sql.DB, config tool.Config) string {
 	return ""
 }
 
-func user_register_validate(db *sql.DB, config tool.Config, id string, password string, password_check string) string {
-	if error_name := user_register_access(db, config); error_name != "" {
+func User_register_validate(db *sql.DB, config tool.Config, id string, password string, password_check string) string {
+	if error_name := User_register_access(db, config); error_name != "" {
 		return error_name
 	}
 	if password != password_check {
@@ -42,7 +42,7 @@ func user_register_validate(db *sql.DB, config tool.Config, id string, password 
 	return ""
 }
 
-func user_register_invite(db *sql.DB, config tool.Config, invite string) (string, string) {
+func User_register_invite(db *sql.DB, config tool.Config, invite string) (string, string) {
 	if !tool.Invite_required(db) || tool.Check_permission(db, "user_manage", config.IP) {
 		return "", ""
 	}
@@ -55,24 +55,24 @@ func user_register_invite(db *sql.DB, config tool.Config, invite string) (string
 	return "", invite_hash
 }
 
-func user_register_post(config tool.Config, id string, password string, password_check string, captcha string, invite string) string {
+func User_register_post(config tool.Config, id string, password string, password_check string, captcha string, invite string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 	if !tool.Captcha_check(db, config.Session, config.IP, captcha) {
 		return tool.Get_error_page(db, config, "recaptcha")
 	}
-	error_name := user_register_validate(db, config, id, password, password_check)
+	error_name := User_register_validate(db, config, id, password, password_check)
 	if error_name != "" {
 		return tool.Get_error_page(db, config, error_name)
 	}
-	error_name, invite_hash := user_register_invite(db, config, invite)
+	error_name, invite_hash := User_register_invite(db, config, invite)
 	if error_name != "" {
 		return tool.Get_error_page(db, config, error_name)
 	}
 
 	owner_auth := tool.Check_permission(db, "user_manage", config.IP)
-	email_required := !owner_auth && user_other(db, "email_have") != ""
-	approval_required := !owner_auth && user_other(db, "requires_approval") != ""
+	email_required := !owner_auth && User_other(db, "email_have") != ""
+	approval_required := !owner_auth && User_other(db, "requires_approval") != ""
 	if email_required {
 		config.Session.Set("reg_id", id)
 		config.Session.Set("reg_pw", password)
@@ -98,6 +98,6 @@ func user_register_post(config tool.Config, id string, password string, password
 	return tool.Get_redirect("/login")
 }
 
-func user_other(db *sql.DB, name string) string {
+func User_other(db *sql.DB, name string) string {
 	return tool.Get_setting_value(db, name, "", "")
 }

@@ -14,7 +14,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func view_w_redirect_target(db *sql.DB, doc_name string) (string, string) {
+func View_w_redirect_target(db *sql.DB, doc_name string) (string, string) {
 	target, anchor, redirect_exists := tool.Get_back_redirect_data(db, doc_name)
 	if redirect_exists && target != "" {
 		_, target_exists := tool.Get_data_title(db, target)
@@ -25,11 +25,11 @@ func view_w_redirect_target(db *sql.DB, doc_name string) (string, string) {
 	return target, anchor
 }
 
-func view_w_child_exists(db *sql.DB, doc_name string) bool {
+func View_w_child_exists(db *sql.DB, doc_name string) bool {
 	return tool.Get_data_title_like(db, doc_name+"/%")
 }
 
-func view_w_user_data(db *sql.DB, config tool.Config, doc_name string) string {
+func View_w_user_data(db *sql.DB, config tool.Config, doc_name string) string {
 	user_name := strings.TrimPrefix(doc_name, "user:")
 	if slash_index := strings.Index(user_name, "/"); slash_index >= 0 {
 		user_name = user_name[:slash_index]
@@ -45,12 +45,12 @@ func view_w_user_data(db *sql.DB, config tool.Config, doc_name string) string {
 		phrase = tool.Get_other_data(db, phrase_name)
 	}
 	if phrase != "" {
-		phrase += "<br>"
+		phrase += `<hr class="main_hr">`
 	}
 	return phrase + `<div id="opennamu_get_user_info">` + tool.HTML_escape(user_name) + `</div><hr class="main_hr">`
 }
 
-func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) string {
+func View_w_category_data(db *sql.DB, config tool.Config, doc_name string) string {
 	type category_entry struct {
 		name string
 		view string
@@ -117,7 +117,7 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 
 	if len(category_list) == 0 {
 		if tool.Check_permission(db, "category_manual", config.IP) {
-			return category_manual_add_link(doc_name, "category") + `<hr class="main_hr">`
+			return Category_manual_add_link(doc_name, "category") + `<hr class="main_hr">`
 		}
 		return ""
 	}
@@ -134,7 +134,7 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 		item := `<li><a` + class_name + ` href="/w/` + tool.Url_parser(entry.name) + `">` + tool.HTML_escape(entry.view) + `</a>`
 		manual_form := ""
 		if manual_documents[entry.name] && tool.Check_permission(db, "category_manual", config.IP) && tool.Check_acl(db, entry.name, "", "document_edit", config.IP) {
-			manual_form = ` ` + category_manual_delete_link(doc_name, entry.name, doc_name)
+			manual_form = ` ` + Category_manual_delete_link(doc_name, entry.name, doc_name)
 		}
 		if strings.HasPrefix(entry.name, "category:") {
 			category_sub += item + manual_form + `</li>`
@@ -157,7 +157,7 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 		random_link = `<a href="/random/category/` + tool.Url_parser(doc_name) + `">(` + tool.Get_language(db, "random_category", false) + `)</a>`
 	}
 	if tool.Check_permission(db, "category_manual", config.IP) {
-		data += ` ` + category_manual_add_link(doc_name, "category")
+		data += ` ` + Category_manual_add_link(doc_name, "category")
 	}
 	if random_link != "" {
 		random_link = ` ` + random_link
@@ -165,11 +165,11 @@ func view_w_category_data(db *sql.DB, config tool.Config, doc_name string) strin
 	return data + random_link + `<hr class="main_hr">`
 }
 
-func category_manual_delete_link(category_name string, doc_name string, return_name string) string {
+func Category_manual_delete_link(category_name string, doc_name string, return_name string) string {
 	return `<a href="/category/delete/` + tool.Base64_encode(category_name) + `/` + tool.Base64_encode(doc_name) + `/` + tool.Base64_encode(return_name) + `">(-)</a>`
 }
 
-func category_manual_add_form(db *sql.DB, config tool.Config, category_name string, doc_name string, return_name string) string {
+func Category_manual_add_form(db *sql.DB, config tool.Config, category_name string, doc_name string, return_name string) string {
 	data := `<form method="post" action="/category/add">`
 	if category_name == "" {
 		data += `<input type="text" name="category" placeholder="` + tool.HTML_escape(tool.Get_language(db, "category", true)) + `">`
@@ -185,11 +185,11 @@ func category_manual_add_form(db *sql.DB, config tool.Config, category_name stri
 	return data
 }
 
-func category_manual_add_link(doc_name string, add_type string) string {
+func Category_manual_add_link(doc_name string, add_type string) string {
 	return `<a href="/category/add/` + add_type + `/` + tool.Base64_encode(doc_name) + `">(+)</a>`
 }
 
-func view_w_manual_category_data(db *sql.DB, config tool.Config, doc_name string) string {
+func View_w_manual_category_data(db *sql.DB, config tool.Config, doc_name string) string {
 	can_edit := tool.Check_permission(db, "category_manual", config.IP) && tool.Check_acl(db, doc_name, "", "document_edit", config.IP)
 	rows := tool.Get_category_manual_rows(db, doc_name)
 	defer rows.Close()
@@ -210,7 +210,7 @@ func view_w_manual_category_data(db *sql.DB, config tool.Config, doc_name string
 		}
 		data += `<a href="/w/` + tool.Url_parser(category_name) + `">` + tool.HTML_escape(view) + `</a>`
 		if can_edit {
-			data += ` ` + category_manual_delete_link(category_name, doc_name, doc_name)
+			data += ` ` + Category_manual_delete_link(category_name, doc_name, doc_name)
 		}
 		count++
 	}
@@ -218,7 +218,7 @@ func view_w_manual_category_data(db *sql.DB, config tool.Config, doc_name string
 		if count > 0 {
 			data += " "
 		}
-		data += category_manual_add_link(doc_name, "document")
+		data += Category_manual_add_link(doc_name, "document")
 	}
 	if !can_edit && count == 0 {
 		return ""
@@ -226,8 +226,8 @@ func view_w_manual_category_data(db *sql.DB, config tool.Config, doc_name string
 	return data
 }
 
-func view_w_merge_category_data(db *sql.DB, config tool.Config, doc_name string, render_data string) string {
-	manual_data := view_w_manual_category_data(db, config, doc_name)
+func View_w_merge_category_data(db *sql.DB, config tool.Config, doc_name string, render_data string) string {
+	manual_data := View_w_manual_category_data(db, config, doc_name)
 	if manual_data == "" {
 		return render_data
 	}
@@ -243,18 +243,15 @@ func view_w_merge_category_data(db *sql.DB, config tool.Config, doc_name string,
 
 	category_set := tool.Get_main_skin_set(db, config, "main_css_category_set")
 	category_separator := `<hr class="main_hr">`
-	if category_set == "bottom" {
-		category_separator = `<hr>`
-	}
 
 	merged_data := render_data + category_separator + `<div class="opennamu_category" id="cate">` + tool.Get_language(db, "category", true) + " : " + manual_data + `</div>`
 	if category_set != "bottom" {
-		return move_render_category_top(merged_data)
+		return Move_render_category_top(merged_data)
 	}
 	return merged_data
 }
 
-func view_w_file_data(db *sql.DB, doc_name string) string {
+func View_w_file_data(db *sql.DB, doc_name string) string {
 	file_name := strings.TrimPrefix(doc_name, "file:")
 	extension := strings.TrimPrefix(strings.ToLower(filepath.Ext(file_name)), ".")
 	if extension == "" {

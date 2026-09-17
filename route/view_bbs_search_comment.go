@@ -42,7 +42,7 @@ func View_bbs_search_comment(config tool.Config, set_id string, keyword string, 
 		data_search_path += "/" + tool.Url_parser(set_id)
 		bbs_id_to_name[set_id] = bbs_name
 	} else {
-		for name, id := range bbs_list(db) {
+		for name, id := range Bbs_list(db) {
 			if tool.Check_acl(db, id, "", "bbs_view", config.IP) {
 				bbs_id_to_name[id] = name
 			}

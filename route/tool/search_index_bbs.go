@@ -40,7 +40,7 @@ var bbs_search_index_ready bool
 var bbs_search_index_start_once sync.Once
 var bbs_search_index_pending = map[string]bbs_search_index_change{}
 
-func bbs_search_index_keyword_mapping() *mapping.FieldMapping {
+func Bbs_search_index_keyword_mapping() *mapping.FieldMapping {
 	field_mapping := mapping.NewKeywordFieldMapping()
 	field_mapping.Store = false
 	field_mapping.IncludeTermVectors = false
@@ -49,13 +49,13 @@ func bbs_search_index_keyword_mapping() *mapping.FieldMapping {
 	return field_mapping
 }
 
-func bbs_search_index_date_mapping() *mapping.FieldMapping {
-	field_mapping := bbs_search_index_keyword_mapping()
+func Bbs_search_index_date_mapping() *mapping.FieldMapping {
+	field_mapping := Bbs_search_index_keyword_mapping()
 	field_mapping.DocValues = true
 	return field_mapping
 }
 
-func bbs_search_index_mapping() *mapping.IndexMappingImpl {
+func Bbs_search_index_mapping() *mapping.IndexMappingImpl {
 	index_mapping := bleve.NewIndexMapping()
 	index_mapping.StoreDynamic = false
 	index_mapping.IndexDynamic = false
@@ -63,13 +63,13 @@ func bbs_search_index_mapping() *mapping.IndexMappingImpl {
 
 	document_mapping := mapping.NewDocumentMapping()
 	document_mapping.Dynamic = false
-	document_mapping.AddFieldMappingsAt("set_id", bbs_search_index_keyword_mapping())
-	document_mapping.AddFieldMappingsAt("title", bbs_search_index_keyword_mapping())
-	document_mapping.AddFieldMappingsAt("prefix", bbs_search_index_keyword_mapping())
-	document_mapping.AddFieldMappingsAt("tags", bbs_search_index_keyword_mapping())
-	document_mapping.AddFieldMappingsAt("data", search_index_field_mapping())
-	document_mapping.AddFieldMappingsAt("comment_data", search_index_field_mapping())
-	document_mapping.AddFieldMappingsAt("date", bbs_search_index_date_mapping())
+	document_mapping.AddFieldMappingsAt("set_id", Bbs_search_index_keyword_mapping())
+	document_mapping.AddFieldMappingsAt("title", Bbs_search_index_keyword_mapping())
+	document_mapping.AddFieldMappingsAt("prefix", Bbs_search_index_keyword_mapping())
+	document_mapping.AddFieldMappingsAt("tags", Bbs_search_index_keyword_mapping())
+	document_mapping.AddFieldMappingsAt("data", Search_index_field_mapping())
+	document_mapping.AddFieldMappingsAt("comment_data", Search_index_field_mapping())
+	document_mapping.AddFieldMappingsAt("date", Bbs_search_index_date_mapping())
 	index_mapping.DefaultMapping = document_mapping
 
 	return index_mapping
@@ -77,7 +77,7 @@ func bbs_search_index_mapping() *mapping.IndexMappingImpl {
 
 func Search_bbs_index_start() {
 	bbs_search_index_start_once.Do(func() {
-		go search_bbs_index_open()
+		go Search_bbs_index_open()
 	})
 }
 
@@ -89,16 +89,16 @@ func Search_bbs_index_mark_rebuild() error {
 	return err
 }
 
-func search_bbs_index_version_valid() bool {
+func Search_bbs_index_version_valid() bool {
 	data, err := os.ReadFile(bbs_search_index_version_file)
 	return err == nil && string(data) == bbs_search_index_version
 }
 
-func search_bbs_index_key(set_id string, set_code string) string {
+func Search_bbs_index_key(set_id string, set_code string) string {
 	return set_id + "\x00" + set_code
 }
 
-func search_bbs_index_comment_key(set_id string, set_code string, comment_code string) string {
+func Search_bbs_index_comment_key(set_id string, set_code string, comment_code string) string {
 	return "comment\x00" + set_id + "\x00" + set_code + "\x00" + comment_code
 }
 
@@ -118,7 +118,7 @@ func Search_bbs_index_comment_key_data(key string) (string, string, string, bool
 	return data[1], data[2], data[3], true
 }
 
-func search_bbs_index_comment_location(set_id string, set_code string) (string, string, string, bool) {
+func Search_bbs_index_comment_location(set_id string, set_code string) (string, string, string, bool) {
 	parts := strings.Split(set_id, "-")
 	root_id := ""
 	root_code := ""
@@ -152,17 +152,17 @@ func search_bbs_index_comment_location(set_id string, set_code string) (string, 
 	return root_id, root_code, comment_code, true
 }
 
-func search_bbs_index_apply_change(index bleve.Index, key string, change bbs_search_index_change) error {
+func Search_bbs_index_apply_change(index bleve.Index, key string, change bbs_search_index_change) error {
 	if change.Deleted {
 		return index.Delete(key)
 	}
 	return index.Index(key, change.Document)
 }
 
-func search_bbs_index_set_ready(index bleve.Index) {
+func Search_bbs_index_set_ready(index bleve.Index) {
 	bbs_search_index_lock.Lock()
 	for key, change := range bbs_search_index_pending {
-		if err := search_bbs_index_apply_change(index, key, change); err != nil {
+		if err := Search_bbs_index_apply_change(index, key, change); err != nil {
 			log.Printf("[SEARCH] pending bbs update failed: %v", err)
 		}
 	}
@@ -172,15 +172,15 @@ func search_bbs_index_set_ready(index bleve.Index) {
 	bbs_search_index_lock.Unlock()
 }
 
-func search_bbs_index_open() {
+func Search_bbs_index_open() {
 	if err := os.MkdirAll(filepath.Dir(bbs_search_index_directory), 0o755); err != nil {
 		log.Printf("[SEARCH] bbs index directory failed: %v", err)
 		return
 	}
 
 	index, err := bleve.Open(bbs_search_index_directory)
-	if err == nil && search_bbs_index_version_valid() {
-		search_bbs_index_set_ready(index)
+	if err == nil && Search_bbs_index_version_valid() {
+		Search_bbs_index_set_ready(index)
 		log.Println("[SEARCH] bbs index opened")
 		return
 	}
@@ -193,16 +193,16 @@ func search_bbs_index_open() {
 
 	_ = os.RemoveAll(bbs_search_index_directory)
 	_ = os.Remove(bbs_search_index_version_file)
-	search_bbs_index_rebuild()
+	Search_bbs_index_rebuild()
 }
 
-func search_bbs_index_rebuild() {
+func Search_bbs_index_rebuild() {
 	db := DB_connect()
 	defer DB_close(db)
 
 	temp_directory := bbs_search_index_directory + ".tmp"
 	_ = os.RemoveAll(temp_directory)
-	index, err := bleve.New(temp_directory, bbs_search_index_mapping())
+	index, err := bleve.New(temp_directory, Bbs_search_index_mapping())
 	if err != nil {
 		log.Printf("[SEARCH] bbs index create failed: %v", err)
 		return
@@ -249,7 +249,7 @@ func search_bbs_index_rebuild() {
 			continue
 		}
 
-		key := search_bbs_index_key(set_id, set_code)
+		key := Search_bbs_index_key(set_id, set_code)
 		if current_key != "" && current_key != key {
 			if !flush() {
 				_ = index.Close()
@@ -285,7 +285,7 @@ func search_bbs_index_rebuild() {
 			return
 		}
 	}
-	if err := search_bbs_index_rebuild_comments(db, index); err != nil {
+	if err := Search_bbs_index_rebuild_comments(db, index); err != nil {
 		_ = index.Close()
 		log.Printf("[SEARCH] bbs comment index failed: %v", err)
 		return
@@ -309,11 +309,11 @@ func search_bbs_index_rebuild() {
 		log.Printf("[SEARCH] bbs index reopen failed: %v", err)
 		return
 	}
-	search_bbs_index_set_ready(index)
+	Search_bbs_index_set_ready(index)
 	log.Println("[SEARCH] bbs index built")
 }
 
-func search_bbs_index_rebuild_comments(db *sql.DB, index bleve.Index) error {
+func Search_bbs_index_rebuild_comments(db *sql.DB, index bleve.Index) error {
 	rows := Query_DB(
 		db,
 		"select set_id, set_code, set_name, set_data from bbs_data where set_name in ('comment', 'comment_date') order by set_id, set_code, set_name",
@@ -329,7 +329,7 @@ func search_bbs_index_rebuild_comments(db *sql.DB, index bleve.Index) error {
 		if current_key == "" || document.Comment_data == "" {
 			return nil
 		}
-		key := search_bbs_index_comment_key(document.Set_id, document.Set_code, document.Comment_code)
+		key := Search_bbs_index_comment_key(document.Set_id, document.Set_code, document.Comment_code)
 		if err := batch.Index(key, document); err != nil {
 			return err
 		}
@@ -354,7 +354,7 @@ func search_bbs_index_rebuild_comments(db *sql.DB, index bleve.Index) error {
 			continue
 		}
 
-		post_set_id, post_set_code, comment_code, valid := search_bbs_index_comment_location(comment_set_id, comment_set_code)
+		post_set_id, post_set_code, comment_code, valid := Search_bbs_index_comment_location(comment_set_id, comment_set_code)
 		if !valid {
 			continue
 		}
@@ -393,7 +393,7 @@ func search_bbs_index_rebuild_comments(db *sql.DB, index bleve.Index) error {
 	return rows.Err()
 }
 
-func search_bbs_index_comment_document(db *sql.DB, set_id string, set_code string, comment_code string) (Bbs_search_document, bool) {
+func Search_bbs_index_comment_document(db *sql.DB, set_id string, set_code string, comment_code string) (Bbs_search_document, bool) {
 	parts := strings.Split(comment_code, "-")
 	if len(parts) == 0 || parts[len(parts)-1] == "" {
 		return Bbs_search_document{}, false
@@ -439,8 +439,8 @@ func Search_bbs_index_update_comment(db *sql.DB, set_id string, set_code string,
 		return
 	}
 
-	document, exists := search_bbs_index_comment_document(db, set_id, set_code, comment_code)
-	key := search_bbs_index_comment_key(set_id, set_code, comment_code)
+	document, exists := Search_bbs_index_comment_document(db, set_id, set_code, comment_code)
+	key := Search_bbs_index_comment_key(set_id, set_code, comment_code)
 
 	bbs_search_index_lock.Lock()
 	defer bbs_search_index_lock.Unlock()
@@ -470,7 +470,7 @@ func Search_bbs_index_delete_comment(set_id string, set_code string, comment_cod
 		return
 	}
 
-	key := search_bbs_index_comment_key(set_id, set_code, comment_code)
+	key := Search_bbs_index_comment_key(set_id, set_code, comment_code)
 	bbs_search_index_lock.Lock()
 	defer bbs_search_index_lock.Unlock()
 	if !bbs_search_index_ready {
@@ -498,7 +498,7 @@ func Search_bbs_index_delete_comments(db *sql.DB, set_id string, set_code string
 		if rows.Scan(&storage_set_id, &storage_set_code) != nil {
 			continue
 		}
-		comment_set_id, comment_set_code, comment_code, valid := search_bbs_index_comment_location(storage_set_id, storage_set_code)
+		comment_set_id, comment_set_code, comment_code, valid := Search_bbs_index_comment_location(storage_set_id, storage_set_code)
 		if !valid {
 			continue
 		}
@@ -506,7 +506,7 @@ func Search_bbs_index_delete_comments(db *sql.DB, set_id string, set_code string
 	}
 }
 
-func search_bbs_index_document(db *sql.DB, set_id string, set_code string) (Bbs_search_document, bool) {
+func Search_bbs_index_document(db *sql.DB, set_id string, set_code string) (Bbs_search_document, bool) {
 	document := Bbs_search_document{Set_id: strings.ToLower(set_id)}
 	rows := Query_DB(
 		db,
@@ -543,8 +543,8 @@ func Search_bbs_index_update(db *sql.DB, set_id string, set_code string) {
 	if set_id == "" || set_code == "" {
 		return
 	}
-	document, exists := search_bbs_index_document(db, set_id, set_code)
-	key := search_bbs_index_key(set_id, set_code)
+	document, exists := Search_bbs_index_document(db, set_id, set_code)
+	key := Search_bbs_index_key(set_id, set_code)
 
 	bbs_search_index_lock.Lock()
 	defer bbs_search_index_lock.Unlock()
@@ -572,7 +572,7 @@ func Search_bbs_index_delete(set_id string, set_code string) {
 	if set_id == "" || set_code == "" {
 		return
 	}
-	key := search_bbs_index_key(set_id, set_code)
+	key := Search_bbs_index_key(set_id, set_code)
 	bbs_search_index_lock.Lock()
 	defer bbs_search_index_lock.Unlock()
 	if !bbs_search_index_ready {
@@ -595,7 +595,7 @@ func Search_bbs_index_delete_set(db *sql.DB, set_id string) {
 	}
 }
 
-func search_bbs_index_search(keyword string, set_id string, search_type string, offset int, limit int) ([]string, bool) {
+func Search_bbs_index_search_internal(keyword string, set_id string, search_type string, offset int, limit int) ([]string, bool) {
 	if keyword == "" || strings.ContainsAny(keyword, "*?%_") {
 		return []string{}, false
 	}
@@ -648,11 +648,11 @@ func search_bbs_index_search(keyword string, set_id string, search_type string, 
 }
 
 func Search_bbs_index_search(keyword string, set_id string, offset int, limit int) ([]string, bool) {
-	return search_bbs_index_search(keyword, set_id, "title", offset, limit)
+	return Search_bbs_index_search_internal(keyword, set_id, "title", offset, limit)
 }
 
 func Search_bbs_index_search_data(keyword string, set_id string, offset int, limit int) ([]string, bool) {
-	return search_bbs_index_search(keyword, set_id, "data", offset, limit)
+	return Search_bbs_index_search_internal(keyword, set_id, "data", offset, limit)
 }
 
 func Search_bbs_index_search_comment(keyword string, set_id string, offset int, limit int) ([]string, bool) {

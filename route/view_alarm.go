@@ -80,5 +80,5 @@ func View_alarm(config tool.Config, user_name string, values url.Values) string 
 		page_url = "/alarm_user/" + tool.Url_parser(user_name) + "/page/{}"
 	}
 	body += tool.Get_page_control(db, page, row_count, 50, page_url)
-	return user_form_page(db, config, tool.Get_language(db, "alarm", true), body)
+	return User_form_page(db, config, tool.Get_language(db, "alarm", true), body)
 }

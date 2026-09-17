@@ -10,7 +10,7 @@ func View_list_unlinked_page(config tool.Config, page string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	page_num := list_extra_page_number(page)
+	page_num := List_extra_page_number(page)
 	offset := (page_num - 1) * 50
 	rows := tool.Get_unlinked_document_page_rows(db, offset)
 	body := strings.Builder{}
@@ -28,5 +28,5 @@ func View_list_unlinked_page(config tool.Config, page string) string {
 	body.WriteString(`</ul>`)
 	body.WriteString(tool.Get_page_control(db, page_num, count, 50, "/list/document/unlinked/{}"))
 
-	return list_extra_page(db, config, tool.Get_language(db, "unlinked_document", true), body.String())
+	return List_extra_page(db, config, tool.Get_language(db, "unlinked_document", true), body.String())
 }

@@ -11,7 +11,7 @@ func View_list_document_all(config tool.Config, page string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	page_num := list_extra_page_number(page)
+	page_num := List_extra_page_number(page)
 	offset := (page_num - 1) * 50
 	rows := tool.Get_data_rows(db, offset)
 	body := strings.Builder{}
@@ -44,10 +44,10 @@ func View_list_document_all(config tool.Config, page string) string {
 	}
 
 	data += tool.Get_page_control(db, page_num, count, 50, "/list/document/all/{}")
-	return list_extra_page(db, config, tool.Get_language(db, "all_document_list", true), data)
+	return List_extra_page(db, config, tool.Get_language(db, "all_document_list", true), data)
 }
 
-func list_extra_page_number(value string) int {
+func List_extra_page_number(value string) int {
 	page := tool.Str_to_int(value)
 	if page < 1 {
 		return 1

@@ -18,10 +18,10 @@ func Api_file_upload_post(config tool.Config, file_name string, file_data string
 	if err != nil || len(decoded) == 0 {
 		return map[string]any{"response": "error", "data": "invalid data"}
 	}
-	return api_file_upload_post(config, file_name, []byte(decoded), file_ext, "direct_input", "", "", false, false, false)
+	return Api_file_upload_post_internal(config, file_name, []byte(decoded), file_ext, "direct_input", "", "", false, false, false)
 }
 
-func api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string, ip string) bool {
+func Api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string, ip string) bool {
 	if db == nil {
 		return false
 	}
@@ -41,11 +41,11 @@ func api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string,
 	return true
 }
 
-func api_file_upload_post(config tool.Config, file_name string, file_data []byte, file_ext string, license string, license_text string, captcha string, check_captcha bool, many_upload bool, replace bool) map[string]any {
-	return api_file_upload_post_reader(config, file_name, bytes.NewReader(file_data), file_ext, license, license_text, captcha, check_captcha, many_upload, replace)
+func Api_file_upload_post_internal(config tool.Config, file_name string, file_data []byte, file_ext string, license string, license_text string, captcha string, check_captcha bool, many_upload bool, replace bool) map[string]any {
+	return Api_file_upload_post_reader(config, file_name, bytes.NewReader(file_data), file_ext, license, license_text, captcha, check_captcha, many_upload, replace)
 }
 
-func api_file_upload_post_reader(config tool.Config, file_name string, file_reader io.Reader, file_ext string, license string, license_text string, captcha string, check_captcha bool, many_upload bool, replace bool) map[string]any {
+func Api_file_upload_post_reader(config tool.Config, file_name string, file_reader io.Reader, file_ext string, license string, license_text string, captcha string, check_captcha bool, many_upload bool, replace bool) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -199,7 +199,7 @@ func api_file_upload_post_reader(config tool.Config, file_name string, file_read
 	}
 	doc_data += license_text
 
-	if !api_file_upload_make_document(db, doc_name, doc_data, config.IP) {
+	if !Api_file_upload_make_document(db, doc_name, doc_data, config.IP) {
 		_ = os.Remove(dst_path)
 		return_value["response"] = "error"
 		return_value["data"] = "document create fail"

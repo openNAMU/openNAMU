@@ -21,7 +21,7 @@ type indexnow_request struct {
 	URLList     []string `json:"urlList"`
 }
 
-func indexnow_key_valid(key string) bool {
+func Indexnow_key_valid(key string) bool {
 	if key == "" {
 		return false
 	}
@@ -37,9 +37,9 @@ func indexnow_key_valid(key string) bool {
 	return true
 }
 
-func save_indexnow_key(key string) bool {
+func Save_indexnow_key(key string) bool {
 	key = strings.TrimSpace(key)
-	if !indexnow_key_valid(key) {
+	if !Indexnow_key_valid(key) {
 		return false
 	}
 
@@ -51,14 +51,14 @@ func save_indexnow_key(key string) bool {
 	return true
 }
 
-func sync_indexnow_key(db *sql.DB) {
+func Sync_indexnow_key(db *sql.DB) {
 	key := tool.Get_setting_value(db, "indexnow_key", "", "")
 	if key != "" {
-		save_indexnow_key(key)
+		Save_indexnow_key(key)
 	}
 }
 
-func send_indexnow(host string, key string, key_location string, page_url string) {
+func Send_indexnow(host string, key string, key_location string, page_url string) {
 	request_data, err := stdjson.Marshal(indexnow_request{
 		Host:        host,
 		Key:         key,
@@ -92,9 +92,9 @@ func send_indexnow(host string, key string, key_location string, page_url string
 	}
 }
 
-func notify_indexnow(db *sql.DB, doc_name string) {
+func Notify_indexnow(db *sql.DB, doc_name string) {
 	key := strings.TrimSpace(tool.Get_setting_value(db, "indexnow_key", "", ""))
-	if !indexnow_key_valid(key) || !save_indexnow_key(key) {
+	if !Indexnow_key_valid(key) || !Save_indexnow_key(key) {
 		return
 	}
 
@@ -106,5 +106,5 @@ func notify_indexnow(db *sql.DB, doc_name string) {
 
 	page_url := domain + "/w/" + tool.Url_parser(doc_name)
 	key_location := domain + "/" + key + ".txt"
-	go send_indexnow(parsed_domain.Host, key, key_location, page_url)
+	go Send_indexnow(parsed_domain.Host, key, key_location, page_url)
 }

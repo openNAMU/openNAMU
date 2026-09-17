@@ -20,7 +20,7 @@ const server_update_mode = "--opennamu-update"
 const server_update_check_interval = 24 * time.Hour
 const server_update_check_delay = time.Minute
 
-func get_server_update_binary_name() (string, error) {
+func Get_server_update_binary_name() (string, error) {
 	switch runtime.GOOS {
 	case "linux":
 		switch runtime.GOARCH {
@@ -45,7 +45,7 @@ func get_server_update_binary_name() (string, error) {
 	return "", fmt.Errorf("unsupported platform: %s/%s", runtime.GOOS, runtime.GOARCH)
 }
 
-func get_server_update_url(branch string) (string, error) {
+func Get_server_update_url(branch string) (string, error) {
 	if branch != "stable" && branch != "beta" {
 		return "", fmt.Errorf("unsupported update branch: %s", branch)
 	}
@@ -84,7 +84,7 @@ func get_server_update_url(branch string) (string, error) {
 		return "", fmt.Errorf("r_ver is missing")
 	}
 
-	binary_name, err := get_server_update_binary_name()
+	binary_name, err := Get_server_update_binary_name()
 	if err != nil {
 		return "", err
 	}
@@ -92,7 +92,7 @@ func get_server_update_url(branch string) (string, error) {
 	return "https://github.com/openNAMU/openNAMU/releases/download/" + url.PathEscape(release_tag) + "/" + binary_name, nil
 }
 
-func download_server_update(binary_url string, temporary_path string) error {
+func Download_server_update(binary_url string, temporary_path string) error {
 	request, err := http.NewRequest(http.MethodGet, binary_url, nil)
 	if err != nil {
 		return err
@@ -130,13 +130,13 @@ func download_server_update(binary_url string, temporary_path string) error {
 	return file_data.Sync()
 }
 
-func start_server_update(branch string) error {
-	executable, err := current_server_executable()
+func Start_server_update(branch string) error {
+	executable, err := Current_server_executable()
 	if err != nil {
 		return err
 	}
 
-	binary_url, err := get_server_update_url(branch)
+	binary_url, err := Get_server_update_url(branch)
 	if err != nil {
 		return err
 	}
@@ -151,7 +151,7 @@ func start_server_update(branch string) error {
 		return err
 	}
 
-	if err := download_server_update(binary_url, temporary_path); err != nil {
+	if err := Download_server_update(binary_url, temporary_path); err != nil {
 		os.Remove(temporary_path)
 		return err
 	}
@@ -165,8 +165,8 @@ func start_server_update(branch string) error {
 	arguments := append([]string{server_update_mode, executable, temporary_path}, os.Args[1:]...)
 	command := exec.Command(executable, arguments...)
 	command.Dir = working_dir
-	command.Env = server_process_environment()
-	detach_server_process(command)
+	command.Env = Server_process_environment()
+	Detach_server_process(command)
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
 	if err := command.Start(); err != nil {
@@ -176,7 +176,7 @@ func start_server_update(branch string) error {
 	return nil
 }
 
-func check_auto_server_update() {
+func Check_auto_server_update() {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -185,36 +185,36 @@ func check_auto_server_update() {
 	}
 
 	current_version := tool.Get_last_version()["r_ver"]
-	branch := get_version_branch(db)
-	latest_version := get_remote_version(branch)
+	branch := Get_version_branch(db)
+	latest_version := Get_remote_version(branch)
 	if latest_version == "" || latest_version == current_version {
 		return
 	}
 
-	if !begin_server_action() {
+	if !Begin_server_action() {
 		log.Printf("[UPDATE] automatic update skipped: another server action is running")
 		return
 	}
 
-	if err := start_server_update(branch); err != nil {
-		cancel_server_action()
+	if err := Start_server_update(branch); err != nil {
+		Cancel_server_action()
 		log.Printf("[UPDATE] automatic update failed: %v", err)
 		return
 	}
 
 	log.Printf("[UPDATE] automatic update: %s -> %s", current_version, latest_version)
-	schedule_server_exit()
+	Schedule_server_exit()
 }
 
 func Start_auto_server_update() {
 	go func() {
 		time.Sleep(server_update_check_delay)
-		check_auto_server_update()
+		Check_auto_server_update()
 
 		ticker := time.NewTicker(server_update_check_interval)
 		defer ticker.Stop()
 		for range ticker.C {
-			check_auto_server_update()
+			Check_auto_server_update()
 		}
 	}()
 }
@@ -244,8 +244,8 @@ func Run_server_update(arguments []string) int {
 
 			command := exec.Command(executable, server_arguments...)
 			command.Dir = working_dir
-			command.Env = server_process_environment()
-			detach_server_process(command)
+			command.Env = Server_process_environment()
+			Detach_server_process(command)
 			command.Stdout = os.Stdout
 			command.Stderr = os.Stderr
 			if err := command.Start(); err != nil {

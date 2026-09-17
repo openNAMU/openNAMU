@@ -24,7 +24,7 @@ func View_vote_end(config tool.Config, id string) string {
 	if end_date != "" {
 		body += `<span>~ ` + tool.HTML_escape(end_date) + `</span><hr class="main_hr">`
 	}
-	for index, option := range vote_options(data) {
+	for index, option := range Vote_options(data) {
 		count := "0"
 		count = tool.Get_vote_count(db, id, strconv.Itoa(index))
 		body += `<h3>` + tool.HTML_escape(option) + `</h3><p>` + count + `</p>`
@@ -39,5 +39,5 @@ func View_vote_end(config tool.Config, id string) string {
 			rows.Close()
 		}
 	}
-	return vote_page(db, config, tool.Get_language(db, "result_vote", true), body)
+	return Vote_page(db, config, tool.Get_language(db, "result_vote", true), body)
 }

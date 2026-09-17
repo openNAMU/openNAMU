@@ -28,19 +28,19 @@ func Session_middleware() gin.HandlerFunc {
 	encryption_key := sha256.Sum256([]byte("opennamu-session:" + secret))
 
 	store := memstore.NewStore(auth_key[:], encryption_key[:])
-	store.Options(session_options(false))
+	store.Options(Session_options(false))
 
 	return sessions.Sessions(session_cookie_name, store)
 }
 
 func Get_session(c *gin.Context) sessions.Session {
 	session := sessions.Default(c)
-	session.Options(session_options(is_https(c)))
+	session.Options(Session_options(Is_https(c)))
 
 	return session
 }
 
-func session_options(secure bool) sessions.Options {
+func Session_options(secure bool) sessions.Options {
 	return sessions.Options{
 		Path:     "/",
 		MaxAge:   0,
@@ -50,6 +50,6 @@ func session_options(secure bool) sessions.Options {
 	}
 }
 
-func is_https(c *gin.Context) bool {
+func Is_https(c *gin.Context) bool {
 	return c.Request.TLS != nil || strings.EqualFold(c.GetHeader("X-Forwarded-Proto"), "https")
 }

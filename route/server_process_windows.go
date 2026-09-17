@@ -4,6 +4,6 @@ package route
 
 import "os/exec"
 
-func detach_server_process(command *exec.Cmd) {
+func Detach_server_process(command *exec.Cmd) {
 	_ = command
 }

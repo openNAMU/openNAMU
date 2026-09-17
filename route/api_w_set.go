@@ -55,7 +55,7 @@ func Api_w_set_put(config tool.Config, doc_name string, set_name string, data st
 		case "raw":
 			data = "plain"
 		}
-		if data != "" && !tool.Arr_in_str(setting_markup_options(), data) {
+		if data != "" && !tool.Arr_in_str(Setting_markup_options(), data) {
 			return map[string]any{"response": "error", "data": "invalid data"}
 		}
 	}

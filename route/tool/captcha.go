@@ -21,7 +21,7 @@ var altcha_used_challenges = struct {
 	data map[string]time.Time
 }{data: make(map[string]time.Time)}
 
-func captcha_setting_value(db *sql.DB, name string) string {
+func Captcha_setting_value(db *sql.DB, name string) string {
 	for _, value := range Get_setting(db, name, "") {
 		if len(value) > 1 && value[1] == "" {
 			return value[0]
@@ -30,11 +30,11 @@ func captcha_setting_value(db *sql.DB, name string) string {
 	return ""
 }
 
-func captcha_setting(db *sql.DB) (string, string, string, string) {
-	return captcha_setting_value(db, "recaptcha"), captcha_setting_value(db, "sec_re"), captcha_setting_value(db, "altcha_sec_re"), captcha_setting_value(db, "recaptcha_ver")
+func Captcha_setting(db *sql.DB) (string, string, string, string) {
+	return Captcha_setting_value(db, "recaptcha"), Captcha_setting_value(db, "sec_re"), Captcha_setting_value(db, "altcha_sec_re"), Captcha_setting_value(db, "recaptcha_ver")
 }
 
-func captcha_altcha_cost(rec_ver string) (int, bool) {
+func Captcha_altcha_cost(rec_ver string) (int, bool) {
 	switch rec_ver {
 	case "altcha_low":
 		return 1000, true
@@ -46,17 +46,17 @@ func captcha_altcha_cost(rec_ver string) (int, bool) {
 	return 0, false
 }
 
-func captcha_check(db *sql.DB, session sessions.Session, ip string, response string) bool {
+func Captcha_check_internal(db *sql.DB, session sessions.Session, ip string, response string) bool {
 	if Check_acl(db, "", "", "recaptcha", ip) {
 		return true
 	}
 
-	pub_key, sec_key, altcha_sec_key, rec_ver := captcha_setting(db)
-	if altcha_cost, ok := captcha_altcha_cost(rec_ver); ok {
+	pub_key, sec_key, altcha_sec_key, rec_ver := Captcha_setting(db)
+	if altcha_cost, ok := Captcha_altcha_cost(rec_ver); ok {
 		if altcha_sec_key == "" {
 			return true
 		}
-		return captcha_check_altcha(response, altcha_sec_key, altcha_cost)
+		return Captcha_check_altcha(response, altcha_sec_key, altcha_cost)
 	}
 
 	if pub_key == "" || sec_key == "" {
@@ -103,7 +103,7 @@ func captcha_check(db *sql.DB, session sessions.Session, ip string, response str
 	return result.Success
 }
 
-func captcha_check_altcha(response string, sec_key string, altcha_cost int) bool {
+func Captcha_check_altcha(response string, sec_key string, altcha_cost int) bool {
 	if response == "" || sec_key == "" || len(response) > 1<<20 {
 		return false
 	}
@@ -161,9 +161,9 @@ func captcha_check_altcha(response string, sec_key string, altcha_cost int) bool
 	return true
 }
 
-func captcha_challenge(db *sql.DB) (altcha.Challenge, error) {
-	_, _, altcha_sec_key, rec_ver := captcha_setting(db)
-	altcha_cost, ok := captcha_altcha_cost(rec_ver)
+func Captcha_challenge_internal(db *sql.DB) (altcha.Challenge, error) {
+	_, _, altcha_sec_key, rec_ver := Captcha_setting(db)
+	altcha_cost, ok := Captcha_altcha_cost(rec_ver)
 	if !ok || altcha_sec_key == "" {
 		return altcha.Challenge{}, errors.New("altcha is not enabled")
 	}
@@ -179,7 +179,7 @@ func captcha_challenge(db *sql.DB) (altcha.Challenge, error) {
 	})
 }
 
-func captcha_response(response string, recaptcha_response string, hcaptcha_response string, turnstile_response string, altcha_response string) string {
+func Captcha_response_internal(response string, recaptcha_response string, hcaptcha_response string, turnstile_response string, altcha_response string) string {
 	if response != "" {
 		return response
 	}

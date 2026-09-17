@@ -21,8 +21,8 @@ func Api_user_email_check_post(config tool.Config, key string, email string, inp
 		return return_data
 	}
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-		user_delete(tx, config.IP, "email")
-		user_save(tx, config.IP, "email", email)
+		User_delete(tx, config.IP, "email")
+		User_save(tx, config.IP, "email", email)
 		return nil
 	}); err != nil {
 		panic(err)

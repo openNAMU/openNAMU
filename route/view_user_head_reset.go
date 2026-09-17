@@ -10,7 +10,7 @@ func View_user_head_reset(config tool.Config, values url.Values) string {
 	defer tool.DB_close(db)
 	skin_name := tool.Get_use_skin_name_session(db, config.IP, config.Session)
 	if values != nil {
-		if user_auth(db, config) {
+		if User_auth(db, config) {
 			api_data := Api_user_head_reset_post(config, skin_name)
 			response, _ := api_data["response"].(string)
 			if response != "ok" {
@@ -24,9 +24,9 @@ func View_user_head_reset(config tool.Config, values url.Values) string {
 	}
 	data := ""
 	data_skin := ""
-	if user_auth(db, config) {
-		data = user_value(db, config.IP, "custom_css")
-		data_skin = user_value(db, config.IP, "custom_css_"+skin_name)
+	if User_auth(db, config) {
+		data = User_value(db, config.IP, "custom_css")
+		data_skin = User_value(db, config.IP, "custom_css_"+skin_name)
 	} else {
 		data, _ = config.Session.Get("head").(string)
 		data_skin, _ = config.Session.Get("head_" + skin_name).(string)

@@ -11,7 +11,7 @@ func Api_filter_delete_post(config tool.Config, kind string, name string) map[st
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	spec, ok := get_filter_spec(kind)
+	spec, ok := Get_filter_spec(kind)
 	if !ok {
 		return_data["response"] = "error"
 		return return_data

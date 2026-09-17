@@ -13,7 +13,7 @@ func View_login_2fa(config tool.Config, values url.Values) string {
 	if login_id == "" {
 		return tool.Get_redirect("/login")
 	}
-	if user_value(db, login_id, "2fa") == "email" {
+	if User_value(db, login_id, "2fa") == "email" {
 		return tool.Get_redirect("/login/2fa/email")
 	}
 	if values != nil {
@@ -23,8 +23,8 @@ func View_login_2fa(config tool.Config, values url.Values) string {
 		if !tool.Get_auth_info(db, config.IP)["login_available"] || !tool.Get_auth_info(db, login_id)["login_available"] {
 			return tool.Get_error_page(db, config, "ban")
 		}
-		stored := user_value(db, login_id, "2fa_pw")
-		encode := user_value(db, login_id, "2fa_pw_encode")
+		stored := User_value(db, login_id, "2fa_pw")
+		encode := User_value(db, login_id, "2fa_pw_encode")
 		if encode == "" {
 			encode = tool.Get_user_encode(db, login_id)
 		}
@@ -40,5 +40,5 @@ func View_login_2fa(config tool.Config, values url.Values) string {
 		return tool.Get_redirect("/user")
 	}
 	body := "<form method='post'><input type='password' name='pw'>" + tool.Get_captcha_ui(db, config) + "<button type='submit'>" + tool.Get_language(db, "login", true) + "</button>" + tool.Get_http_warning(db) + "</form>"
-	return user_form_page(db, config, tool.Get_language(db, "2fa", true), body)
+	return User_form_page(db, config, tool.Get_language(db, "2fa", true), body)
 }

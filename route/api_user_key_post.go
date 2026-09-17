@@ -20,7 +20,7 @@ func Api_user_key_post(config tool.Config) map[string]any {
 			value = ""
 		}
 	}
-	user_save(db, config.IP, "random_key", value)
+	User_save(db, config.IP, "random_key", value)
 
 	return_data["response"] = "ok"
 	return return_data

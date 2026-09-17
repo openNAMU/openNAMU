@@ -17,7 +17,7 @@ func View_category_manual_add(config tool.Config, add_type string, value string)
 	switch add_type {
 	case "category":
 		if tool.Check_permission(db, "category_manual", config.IP) {
-			category_name = category_manual_name(name)
+			category_name = Category_manual_name(name)
 		} else {
 			return tool.Get_error_page(db, config, "auth")
 		}
@@ -30,7 +30,7 @@ func View_category_manual_add(config tool.Config, add_type string, value string)
 		return tool.Get_error_page(db, config, "not found")
 	}
 
-	data := category_manual_add_form(db, config, category_name, document_name, return_name)
+	data := Category_manual_add_form(db, config, category_name, document_name, return_name)
 	return tool.Get_template(
 		db,
 		config,

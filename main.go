@@ -24,7 +24,7 @@ var dev_mode = false
 //go:embed version.json
 var builtin_version_json []byte
 
-func error_handler() gin.HandlerFunc {
+func Error_handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if r := recover(); r != nil {
@@ -55,7 +55,7 @@ func error_handler() gin.HandlerFunc {
 	}
 }
 
-func pongo_init() {
+func Pongo_init() {
 	pongo2.RegisterFilter("md5_replace", func(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 		h := md5.Sum([]byte(in.String()))
 
@@ -77,7 +77,7 @@ func pongo_init() {
 	})
 }
 
-func wait_startup_delay() {
+func Wait_startup_delay() {
 	delay_text := os.Getenv("NAMU_START_DELAY_MS")
 	os.Unsetenv("NAMU_START_DELAY_MS")
 
@@ -102,7 +102,7 @@ func main() {
 		os.Exit(route.Run_emergency_tool(os.Args[2:]))
 	}
 
-	wait_startup_delay()
+	Wait_startup_delay()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	port := "3000"
@@ -132,13 +132,13 @@ func main() {
 	}
 	tool.Search_bbs_index_start()
 
-	r.Use(error_handler())
+	r.Use(Error_handler())
 	r.Use(tool.Session_middleware())
-	r.Use(site_view_middleware())
-	r.Use(wiki_access_middleware())
-	pongo_init()
+	r.Use(Site_view_middleware())
+	r.Use(Wiki_access_middleware())
+	Pongo_init()
 
-	register_routes(r)
+	Register_routes(r)
 	route.Start_auto_server_update()
 
 	log.Default().Println("Run in http://" + host + ":" + port)

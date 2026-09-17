@@ -17,7 +17,7 @@ import (
 var server_action_mutex sync.Mutex
 var server_action_started bool
 
-func begin_server_action() bool {
+func Begin_server_action() bool {
 	server_action_mutex.Lock()
 	defer server_action_mutex.Unlock()
 
@@ -28,19 +28,19 @@ func begin_server_action() bool {
 	return true
 }
 
-func cancel_server_action() {
+func Cancel_server_action() {
 	server_action_mutex.Lock()
 	server_action_started = false
 	server_action_mutex.Unlock()
 }
 
-func schedule_server_exit() {
+func Schedule_server_exit() {
 	time.AfterFunc(500*time.Millisecond, func() {
 		os.Exit(0)
 	})
 }
 
-func server_process_environment() []string {
+func Server_process_environment() []string {
 	environment := []string{}
 	for _, value := range os.Environ() {
 		if strings.HasPrefix(value, "NAMU_START_DELAY_MS=") {
@@ -51,7 +51,7 @@ func server_process_environment() []string {
 	return append(environment, "NAMU_START_DELAY_MS=1000")
 }
 
-func start_server_process(executable string) error {
+func Start_server_process(executable string) error {
 	working_dir, err := os.Getwd()
 	if err != nil {
 		return err
@@ -59,8 +59,8 @@ func start_server_process(executable string) error {
 
 	command := exec.Command(executable, os.Args[1:]...)
 	command.Dir = working_dir
-	command.Env = server_process_environment()
-	detach_server_process(command)
+	command.Env = Server_process_environment()
+	Detach_server_process(command)
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
 	if err := command.Start(); err != nil {
@@ -69,7 +69,7 @@ func start_server_process(executable string) error {
 	return nil
 }
 
-func current_server_executable() (string, error) {
+func Current_server_executable() (string, error) {
 	executable, err := os.Executable()
 	if err != nil {
 		return "", err
@@ -77,7 +77,7 @@ func current_server_executable() (string, error) {
 	return filepath.Abs(executable)
 }
 
-func server_action_error(db *sql.DB, config tool.Config, action string, err error) string {
+func Server_action_error(db *sql.DB, config tool.Config, action string, err error) string {
 	log.Printf("server %s failed: %v", action, err)
 	return tool.Get_error_page(db, config, "error")
 }
@@ -99,36 +99,36 @@ func View_server_action(config tool.Config, action string, post bool) string {
 			return tool.Get_error_page(db, config, "auth")
 		}
 		if result["response"] != "ok" {
-			return server_action_error(db, config, action, fmt.Errorf("server action rejected"))
+			return Server_action_error(db, config, action, fmt.Errorf("server action rejected"))
 		}
-		if !begin_server_action() {
+		if !Begin_server_action() {
 			return tool.Get_error_page(db, config, "error")
 		}
 		if action == "shutdown" {
-			schedule_server_exit()
+			Schedule_server_exit()
 			return tool.Get_language(db, "wiki_shutdown", true)
 		}
 
 		if action == "update" {
-			err := start_server_update(get_version_branch(db))
+			err := Start_server_update(Get_version_branch(db))
 			if err != nil {
-				cancel_server_action()
-				return server_action_error(db, config, action, err)
+				Cancel_server_action()
+				return Server_action_error(db, config, action, err)
 			}
 		} else {
-			executable, err := current_server_executable()
+			executable, err := Current_server_executable()
 			if err != nil {
-				cancel_server_action()
-				return server_action_error(db, config, action, err)
+				Cancel_server_action()
+				return Server_action_error(db, config, action, err)
 			}
-			err = start_server_process(executable)
+			err = Start_server_process(executable)
 			if err != nil {
-				cancel_server_action()
-				return server_action_error(db, config, action, err)
+				Cancel_server_action()
+				return Server_action_error(db, config, action, err)
 			}
 		}
 
-		schedule_server_exit()
+		Schedule_server_exit()
 		return tool.Get_language(db, "warning_restart", true)
 	}
 
@@ -150,7 +150,7 @@ func View_server_action(config tool.Config, action string, post bool) string {
 	version_data := ""
 	if action == "update" {
 		version_list := tool.Get_last_version()
-		latest_version := get_remote_version(get_version_branch(db))
+		latest_version := Get_remote_version(Get_version_branch(db))
 		version_data = `<ul><li>` + tool.Get_language(db, "version", true) + ` : ` + tool.HTML_escape(version_list["r_ver"]) + `</li><li>` + tool.Get_language(db, "lastest", true) + ` : ` + tool.HTML_escape(latest_version) + `</li></ul><hr class="main_hr">`
 	}
 	data := warning + version_data + `<form method="post"><button type="submit">` + button + `</button></form>`

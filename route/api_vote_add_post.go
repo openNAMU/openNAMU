@@ -36,7 +36,7 @@ func Api_vote_add_post(config tool.Config, data string) map[string]any {
 
 	name := strings.TrimSpace(values.Get("name"))
 	subject := values.Get("subject")
-	options := vote_options(values.Get("data"))
+	options := Vote_options(values.Get("data"))
 	if name == "" || len(options) < 2 {
 		return_data["response"] = "error"
 		return_data["data"] = "invalid data"
@@ -53,7 +53,7 @@ func Api_vote_add_post(config tool.Config, data string) map[string]any {
 	}
 
 	acl := strings.TrimSpace(values.Get("acl_select"))
-	if !acl_value_valid(db, acl) {
+	if !Acl_value_valid(db, acl) {
 		return_data["response"] = "error"
 		return_data["data"] = "invalid acl"
 		return return_data

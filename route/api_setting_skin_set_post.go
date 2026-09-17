@@ -15,14 +15,14 @@ func Api_setting_skin_set_post(config tool.Config, form map[string]string) map[s
 		return_data["response"] = "require auth"
 		return return_data
 	}
-	fields, set_list := setting_skin_fields(db)
+	fields, set_list := Setting_skin_fields(db)
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		for _, field := range fields {
 			default_value := ""
 			if choices := set_list[field.name]; len(choices) > 0 {
 				default_value = choices[0][0]
 			}
-			setting_save_value(tx, field.name, "", setting_form_value(form, field.name, default_value))
+			Setting_save_value(tx, field.name, "", Setting_form_value(form, field.name, default_value))
 		}
 		tool.Do_insert_auth_history(tx, config.IP, "edit_set (skin_set)")
 		return nil

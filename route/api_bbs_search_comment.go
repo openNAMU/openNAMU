@@ -7,7 +7,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func bbs_search_comment_location(set_id string, set_code string, comment_code string) (string, string, bool) {
+func Bbs_search_comment_location(set_id string, set_code string, comment_code string) (string, string, bool) {
 	parts := strings.Split(comment_code, "-")
 	if !bbs_comment_code_regex.MatchString(comment_code) {
 		return "", "", false
@@ -20,7 +20,7 @@ func bbs_search_comment_location(set_id string, set_code string, comment_code st
 	return comment_set_id, parts[len(parts)-1], true
 }
 
-func bbs_comment_storage_location(set_id string, set_code string) (string, string, string, bool) {
+func Bbs_comment_storage_location(set_id string, set_code string) (string, string, string, bool) {
 	parts := strings.Split(set_id, "-")
 	root_id := ""
 	root_code := ""
@@ -54,18 +54,18 @@ func bbs_comment_storage_location(set_id string, set_code string) (string, strin
 	return root_id, root_code, comment_code, true
 }
 
-func bbs_search_comment_item_data(db *sql.DB, config tool.Config, set_id string, set_code string, comment_code string, ip_parser_temp map[string][]string, auth_info map[string]bool, keyword string) (map[string]string, bool) {
+func Bbs_search_comment_item_data(db *sql.DB, config tool.Config, set_id string, set_code string, comment_code string, ip_parser_temp map[string][]string, auth_info map[string]bool, keyword string) (map[string]string, bool) {
 	comment_manage := auth_info["bbs_comment_manage"]
 	if !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) && !comment_manage {
 		return nil, false
 	}
 
-	data, visible := bbs_search_item_data(db, config, set_code, set_id, ip_parser_temp, auth_info, keyword, "title")
+	data, visible := Bbs_search_item_data(db, config, set_code, set_id, ip_parser_temp, auth_info, keyword, "title")
 	if !visible {
 		return nil, false
 	}
 
-	comment_set_id, comment_set_code, exists := bbs_search_comment_location(set_id, set_code, comment_code)
+	comment_set_id, comment_set_code, exists := Bbs_search_comment_location(set_id, set_code, comment_code)
 	if !exists {
 		return nil, false
 	}
@@ -117,11 +117,11 @@ func bbs_search_comment_item_data(db *sql.DB, config tool.Config, set_id string,
 
 	data["comment_code"] = comment_code
 	data["date"] = comment_date
-	data["search_snippet_html"] = search_snippet(comment_data, keyword)
+	data["search_snippet_html"] = Search_snippet(comment_data, keyword)
 	return data, true
 }
 
-func bbs_search_comment_index_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int) ([]map[string]string, bool) {
+func Bbs_search_comment_index_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int) ([]map[string]string, bool) {
 	target_count := page * 50
 	candidate_limit := 500
 	if target_count < candidate_limit {
@@ -152,7 +152,7 @@ func bbs_search_comment_index_data(db *sql.DB, config tool.Config, keyword strin
 			if !valid || (set_id == "" && comment_set_id == "0") {
 				continue
 			}
-			item_data, visible := bbs_search_comment_item_data(
+			item_data, visible := Bbs_search_comment_item_data(
 				db,
 				config,
 				comment_set_id,
@@ -186,7 +186,7 @@ func bbs_search_comment_index_data(db *sql.DB, config tool.Config, keyword strin
 	return data_list[start:end], true
 }
 
-func bbs_search_comment_sql_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int) []map[string]string {
+func Bbs_search_comment_sql_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int) []map[string]string {
 	where_data := "b.set_name = 'comment' and b.set_data like ?"
 	values := []any{"%" + keyword + "%"}
 	if set_id != "" {
@@ -217,12 +217,12 @@ func bbs_search_comment_sql_data(db *sql.DB, config tool.Config, keyword string,
 			continue
 		}
 
-		post_set_id, post_set_code, comment_code, valid := bbs_comment_storage_location(comment_set_id, comment_set_code)
+		post_set_id, post_set_code, comment_code, valid := Bbs_comment_storage_location(comment_set_id, comment_set_code)
 		if !valid || (set_id == "" && post_set_id == "0") {
 			continue
 		}
 
-		item_data, visible := bbs_search_comment_item_data(
+		item_data, visible := Bbs_search_comment_item_data(
 			db,
 			config,
 			post_set_id,
@@ -258,10 +258,10 @@ func Api_bbs_search_comment(config tool.Config, keyword string, set_id string, p
 			page_num = 1
 		}
 
-		if indexed_data, ok := bbs_search_comment_index_data(db, config, keyword, set_id, page_num); ok {
+		if indexed_data, ok := Bbs_search_comment_index_data(db, config, keyword, set_id, page_num); ok {
 			data_list = indexed_data
 		} else {
-			data_list = bbs_search_comment_sql_data(db, config, keyword, set_id, page_num)
+			data_list = Bbs_search_comment_sql_data(db, config, keyword, set_id, page_num)
 		}
 	}
 

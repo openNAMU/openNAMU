@@ -15,7 +15,7 @@ func View_list_admin_auth_use_page(config tool.Config, page string, search strin
 	if search == "" || search == "normal" {
 		search = ""
 	}
-	page_num := list_extra_page_number(page)
+	page_num := List_extra_page_number(page)
 	offset := (page_num - 1) * 50
 	rows := tool.Get_re_admin_page_rows(db, search, offset)
 	body := strings.Builder{}
@@ -33,5 +33,5 @@ func View_list_admin_auth_use_page(config tool.Config, page string, search strin
 		page_url += "/" + tool.Url_parser(search)
 	}
 	body.WriteString(tool.Get_page_control(db, page_num, count, 50, page_url))
-	return list_extra_page(db, config, tool.Get_language(db, "auth_use", true), `<form method="post"><input name="search" value="`+tool.HTML_escape(search)+`"><button type="submit">`+tool.Get_language(db, "search", true)+`</button></form><hr class="main_hr">`+body.String())
+	return List_extra_page(db, config, tool.Get_language(db, "auth_use", true), `<form method="post"><input name="search" value="`+tool.HTML_escape(search)+`"><button type="submit">`+tool.Get_language(db, "search", true)+`</button></form><hr class="main_hr">`+body.String())
 }

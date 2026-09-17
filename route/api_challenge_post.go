@@ -7,7 +7,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func challenge_is_complete_tx(db tool.DB_runner, id string, name string) bool {
+func Challenge_is_complete_tx(db tool.DB_runner, id string, name string) bool {
 	value := ""
 	return tool.QueryRow_DB(db, "select data from user_set where id = ? and name = ? limit 1", []any{&value}, id, name) && value != ""
 }
@@ -17,7 +17,7 @@ func Api_challenge_post(config tool.Config) map[string]any {
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	if !user_auth(db, config) {
+	if !User_auth(db, config) {
 		return_data["response"] = "require auth"
 		return return_data
 	}
@@ -26,7 +26,7 @@ func Api_challenge_post(config tool.Config) map[string]any {
 	topic_count := tool.Str_to_int(tool.Get_topic_count(db, config.IP))
 	experience := 5 * edit_count
 
-	challenge_admin := tool.Check_permission(db, "treat_as_admin", config.IP) || challenge_is_complete(db, config.IP, "challenge_admin")
+	challenge_admin := tool.Check_permission(db, "treat_as_admin", config.IP) || Challenge_is_complete(db, config.IP, "challenge_admin")
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		for _, challenge := range []struct {
 			name   string
@@ -40,8 +40,8 @@ func Api_challenge_post(config tool.Config) map[string]any {
 			{"challenge_thousandth_contribute", 1000, 10000, 100},
 		} {
 			if edit_count >= challenge.count {
-				if !challenge_is_complete_tx(tx, config.IP, challenge.name) {
-					user_save(tx, config.IP, challenge.name, "1")
+				if !Challenge_is_complete_tx(tx, config.IP, challenge.name) {
+					User_save(tx, config.IP, challenge.name, "1")
 					tool.Change_user_point(tx, config.IP, challenge.point)
 				}
 				experience += challenge.reward
@@ -61,8 +61,8 @@ func Api_challenge_post(config tool.Config) map[string]any {
 			{"challenge_thousandth_discussion", 1000, 10000, 100},
 		} {
 			if topic_count >= challenge.count {
-				if !challenge_is_complete_tx(tx, config.IP, challenge.name) {
-					user_save(tx, config.IP, challenge.name, "1")
+				if !Challenge_is_complete_tx(tx, config.IP, challenge.name) {
+					User_save(tx, config.IP, challenge.name, "1")
 					tool.Change_user_point(tx, config.IP, challenge.point)
 				}
 				experience += challenge.reward
@@ -70,8 +70,8 @@ func Api_challenge_post(config tool.Config) map[string]any {
 		}
 
 		if challenge_admin {
-			if !challenge_is_complete_tx(tx, config.IP, "challenge_admin") {
-				user_save(tx, config.IP, "challenge_admin", "1")
+			if !Challenge_is_complete_tx(tx, config.IP, "challenge_admin") {
+				User_save(tx, config.IP, "challenge_admin", "1")
 				tool.Change_user_point(tx, config.IP, 100)
 			}
 			experience += 10000
@@ -82,8 +82,8 @@ func Api_challenge_post(config tool.Config) map[string]any {
 			experience -= 500 + level*50
 			level++
 		}
-		user_save(tx, config.IP, "level", strconv.Itoa(level))
-		user_save(tx, config.IP, "experience", strconv.Itoa(experience))
+		User_save(tx, config.IP, "level", strconv.Itoa(level))
+		User_save(tx, config.IP, "experience", strconv.Itoa(experience))
 		return nil
 	}); err != nil {
 		panic(err)

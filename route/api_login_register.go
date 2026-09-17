@@ -7,7 +7,7 @@ func Api_login_register(config tool.Config, id string, password string, password
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
-	error_name := user_register_validate(db, config, id, password, password_check)
+	error_name := User_register_validate(db, config, id, password, password_check)
 	if error_name != "" {
 		return_data["response"] = "error"
 		return_data["data"] = error_name
@@ -16,7 +16,7 @@ func Api_login_register(config tool.Config, id string, password string, password
 		}
 		return return_data
 	}
-	invite_error, _ := user_register_invite(db, config, "")
+	invite_error, _ := User_register_invite(db, config, "")
 	if invite_error != "" {
 		return_data["response"] = "error"
 		return_data["data"] = invite_error

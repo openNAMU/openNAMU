@@ -33,7 +33,7 @@ func Api_bbs_w_comment_all_delete(config tool.Config, set_id string, set_code st
 		if _, err := tx.Exec(tool.DB_change("delete from bbs_data where set_name = 'comment_count' and set_id = ? and set_code = ?"), set_id, set_code); err != nil {
 			return err
 		}
-		bbs_post_last_activity_rebuild(tx, set_id, set_code)
+		Bbs_post_last_activity_rebuild(tx, set_id, set_code)
 		return nil
 	}); err != nil {
 		panic(err)

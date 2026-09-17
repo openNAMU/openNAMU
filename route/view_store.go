@@ -23,5 +23,5 @@ func View_store(config tool.Config) string {
 		body += `<div>` + tool.Get_language(db, "store_empty", true) + `</div>`
 	}
 
-	return user_form_page(db, config, tool.Get_language(db, "store", true), body)
+	return User_form_page(db, config, tool.Get_language(db, "store", true), body)
 }

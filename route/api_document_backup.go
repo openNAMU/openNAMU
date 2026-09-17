@@ -33,7 +33,7 @@ type document_backup_file struct {
 	Documents []document_backup_document `json:"documents"`
 }
 
-func document_backup_string(value sql.NullString) string {
+func Document_backup_string(value sql.NullString) string {
 	if value.Valid {
 		return value.String
 	}
@@ -67,9 +67,9 @@ func Api_document_backup_export(config tool.Config) map[string]any {
 		}
 
 		document := document_backup_document{
-			Title:   document_backup_string(title),
-			Data:    document_backup_string(data),
-			Type:    document_backup_string(document_type),
+			Title:   Document_backup_string(title),
+			Data:    Document_backup_string(data),
+			Type:    Document_backup_string(document_type),
 			History: []document_backup_history{},
 		}
 		history_rows := tool.Query_DB(
@@ -93,14 +93,14 @@ func Api_document_backup_export(config tool.Config) map[string]any {
 			}
 
 			document.History = append(document.History, document_backup_history{
-				ID:     document_backup_string(id),
-				Data:   document_backup_string(history_data),
-				Date:   document_backup_string(date),
-				IP:     document_backup_string(ip),
-				Send:   document_backup_string(send),
-				Length: document_backup_string(length),
-				Hide:   document_backup_string(hide),
-				Type:   document_backup_string(history_type),
+				ID:     Document_backup_string(id),
+				Data:   Document_backup_string(history_data),
+				Date:   Document_backup_string(date),
+				IP:     Document_backup_string(ip),
+				Send:   Document_backup_string(send),
+				Length: Document_backup_string(length),
+				Hide:   Document_backup_string(hide),
+				Type:   Document_backup_string(history_type),
 			})
 		}
 		history_rows.Close()

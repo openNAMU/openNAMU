@@ -16,8 +16,8 @@ func Api_setting_404_page_post(config tool.Config, page string, content string) 
 		return return_data
 	}
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-		setting_save_value(tx, "manage_404_page", "", page)
-		setting_save_value(tx, "manage_404_page_content", "", content)
+		Setting_save_value(tx, "manage_404_page", "", page)
+		Setting_save_value(tx, "manage_404_page_content", "", content)
 		tool.Do_insert_auth_history(tx, config.IP, "edit_set (404_page)")
 		return nil
 	}); err != nil {

@@ -16,14 +16,14 @@ func Api_setting_main_logo_post(config tool.Config, form map[string]string) map[
 		return return_data
 	}
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-		for _, skin := range setting_logo_skins() {
+		for _, skin := range Setting_logo_skins() {
 			coverage := ""
 			field_name := "main_css"
 			if skin != "default" {
 				coverage = skin
 				field_name = skin
 			}
-			setting_save_value(tx, "logo", coverage, setting_form_value(form, field_name, ""))
+			Setting_save_value(tx, "logo", coverage, Setting_form_value(form, field_name, ""))
 		}
 		tool.Do_insert_auth_history(tx, config.IP, "edit_set (logo)")
 		return nil

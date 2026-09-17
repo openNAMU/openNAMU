@@ -6,7 +6,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func manager_redirect_list(db *sql.DB) map[int][]string {
+func Manager_redirect_list(db *sql.DB) map[int][]string {
 	lang := func(name string) string {
 		return tool.Get_language(db, name, true)
 	}
@@ -47,7 +47,7 @@ func View_manager_redirect(config tool.Config, num int, add_2 string, name strin
 	}
 
 	num -= 2
-	item, ok := manager_redirect_list(db)[num]
+	item, ok := Manager_redirect_list(db)[num]
 	if !ok {
 		return tool.Get_redirect("/manager")
 	}

@@ -43,7 +43,7 @@ func Api_bbs_w_comment_close(config tool.Config, set_id string, set_code string,
 				return err
 			}
 		}
-		bbs_post_last_activity_update(tx, set_id, set_code, tool.Get_time())
+		Bbs_post_last_activity_update(tx, set_id, set_code, tool.Get_time())
 		return nil
 	}); err != nil {
 		panic(err)

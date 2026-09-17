@@ -17,12 +17,12 @@ var bbs_set_fields = []string{
 	"bbs_comment_acl",
 }
 
-func bbs_set_value(db *sql.DB, set_id string, set_name string) string {
+func Bbs_set_value(db *sql.DB, set_id string, set_name string) string {
 	return tool.Get_bbs_set_data(db, set_id, set_name)
 }
 
-func bbs_prefix_list(db *sql.DB, set_id string) []string {
-	value := strings.ReplaceAll(bbs_set_value(db, set_id, "bbs_prefix"), "\r", "")
+func Bbs_prefix_list(db *sql.DB, set_id string) []string {
+	value := strings.ReplaceAll(Bbs_set_value(db, set_id, "bbs_prefix"), "\r", "")
 	prefix_list := []string{}
 	for _, prefix := range strings.Split(value, "\n") {
 		prefix = strings.TrimSpace(prefix)
@@ -33,15 +33,15 @@ func bbs_prefix_list(db *sql.DB, set_id string) []string {
 	return prefix_list
 }
 
-func bbs_prefix_check(db *sql.DB, set_id string, prefix string) string {
+func Bbs_prefix_check(db *sql.DB, set_id string, prefix string) string {
 	prefix = strings.TrimSpace(prefix)
-	if tool.Arr_in_str(bbs_prefix_list(db, set_id), prefix) {
+	if tool.Arr_in_str(Bbs_prefix_list(db, set_id), prefix) {
 		return prefix
 	}
 	return ""
 }
 
-func bbs_tag_list(data string) []string {
+func Bbs_tag_list(data string) []string {
 	data = strings.ReplaceAll(data, "\r", "")
 	data = strings.ReplaceAll(data, "\n", ",")
 
@@ -59,14 +59,14 @@ func bbs_tag_list(data string) []string {
 const bbs_title_max_length = 128
 const bbs_tag_max_length = 64
 
-func acl_value_valid(db *sql.DB, value string) bool {
+func Acl_value_valid(db *sql.DB, value string) bool {
 	if tool.Arr_in_str(tool.List_acl("normal"), value) {
 		return true
 	}
 	return tool.Auth_group_exists(db, value) || tool.Auth_permission_name(value)
 }
 
-func acl_value_list(db *sql.DB, selected string) []string {
+func Acl_value_list(db *sql.DB, selected string) []string {
 	values := tool.List_acl("normal")
 	for _, choice := range tool.Auth_choices() {
 		if !tool.Arr_in_str(values, choice.Key) {
@@ -88,7 +88,7 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	bbs_name := bbs_set_value(db, set_id, "bbs_name")
+	bbs_name := Bbs_set_value(db, set_id, "bbs_name")
 	if bbs_name == "" {
 		return tool.Get_redirect("/bbs/main")
 	}
@@ -113,25 +113,25 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 
 	data := `<form method="post">`
 	for _, field := range bbs_set_fields {
-		selected := bbs_set_value(db, set_id, field)
+		selected := Bbs_set_value(db, set_id, field)
 		data += `<h3>` + tool.Get_language(db, field, true) + `</h3>`
-		data += tool.Build_select(field, acl_value_list(db, selected), selected, tool.Get_language(db, "normal", true))
+		data += tool.Build_select(field, Acl_value_list(db, selected), selected, tool.Get_language(db, "normal", true))
 		data += `<hr class="main_hr">`
 	}
 
 	markup_values := markup.List_markup()
 	data += `<h3>` + tool.Get_language(db, "markup", true) + `</h3>`
-	data += tool.Build_select("bbs_markup", markup_values, bbs_set_value(db, set_id, "bbs_markup"), tool.Get_language(db, "normal", true))
+	data += tool.Build_select("bbs_markup", markup_values, Bbs_set_value(db, set_id, "bbs_markup"), tool.Get_language(db, "normal", true))
 	data += `<hr class="main_hr"><h3>` + tool.Get_language(db, "bbs_name", true) + `</h3>`
 	data += `<input name="bbs_name" value="` + tool.HTML_escape(bbs_name) + `"><hr class="main_hr">`
 	data += "<h3>" + tool.Get_language(db, "bbs_prefix", true) + "</h3>"
-	data += "<textarea class=\"opennamu_textarea_100\" name=\"bbs_prefix\">" + tool.HTML_escape(bbs_set_value(db, set_id, "bbs_prefix")) + "</textarea><hr class=\"main_hr\">"
+	data += "<textarea class=\"opennamu_textarea_100\" name=\"bbs_prefix\">" + tool.HTML_escape(Bbs_set_value(db, set_id, "bbs_prefix")) + "</textarea><hr class=\"main_hr\">"
 	data += "<h3>" + tool.Get_language(db, "bbs_placeholder", true) + "</h3>"
-	data += "<textarea class=\"opennamu_textarea_100\" name=\"bbs_placeholder\">" + tool.HTML_escape(bbs_set_value(db, set_id, "bbs_placeholder")) + "</textarea><hr class=\"main_hr\">"
+	data += "<textarea class=\"opennamu_textarea_100\" name=\"bbs_placeholder\">" + tool.HTML_escape(Bbs_set_value(db, set_id, "bbs_placeholder")) + "</textarea><hr class=\"main_hr\">"
 	data += "<h3>" + tool.Get_language(db, "bbs_comment_placeholder", true) + "</h3>"
-	data += "<textarea class=\"opennamu_textarea_100\" name=\"bbs_comment_placeholder\">" + tool.HTML_escape(bbs_set_value(db, set_id, "bbs_comment_placeholder")) + "</textarea><hr class=\"main_hr\">"
+	data += "<textarea class=\"opennamu_textarea_100\" name=\"bbs_comment_placeholder\">" + tool.HTML_escape(Bbs_set_value(db, set_id, "bbs_comment_placeholder")) + "</textarea><hr class=\"main_hr\">"
 	data += "<h3>" + tool.Get_language(db, "bbs_excellent_min_board", true) + "</h3>"
-	data += setting_input("bbs_excellent_min", bbs_set_value(db, set_id, "bbs_excellent_min"), "number") + "<hr class=\"main_hr\">"
+	data += Setting_input("bbs_excellent_min", Bbs_set_value(db, set_id, "bbs_excellent_min"), "number") + "<hr class=\"main_hr\">"
 	data += `<button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 
 	menu := [][]any{

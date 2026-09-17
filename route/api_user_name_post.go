@@ -18,13 +18,13 @@ func Api_user_name_post(config tool.Config, target string, value string) map[str
 		return_data["response"] = "require auth"
 		return return_data
 	}
-	current := user_value(db, target, "user_name")
+	current := User_value(db, target, "user_name")
 	if value == "" || (!tool.Get_user_name_check(db, value) && value != current) {
 		return_data["response"] = "error"
 		return_data["data"] = "user name error"
 		return return_data
 	}
-	user_save(db, target, "user_name", value)
+	User_save(db, target, "user_name", value)
 	return_data["response"] = "ok"
 	return return_data
 }

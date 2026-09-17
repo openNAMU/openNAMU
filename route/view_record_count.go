@@ -79,18 +79,18 @@ func View_record_count(config tool.Config, user_name string) string {
 	}
 
 	user_url := tool.Url_parser(user_name)
-	body := `<ul><li><a href="/record/` + user_url + `">` + tool.Get_language(db, "edit_record", true) + `</a> : ` + history + `</li><li><a href="/record/bbs_comment/` + user_url + `">` + tool.Get_language(db, "bbs_comment_record", true) + `</a> : ` + topic + `</li><li>bbs : ` + bbs + `</li><hr>`
+	body := `<ul><li><a href="/record/` + user_url + `">` + tool.Get_language(db, "edit_record", true) + `</a> : ` + history + `</li><li><a href="/record/bbs_comment/` + user_url + `">` + tool.Get_language(db, "bbs_comment_record", true) + `</a> : ` + topic + `</li><li>bbs : ` + bbs + `</li><hr class="main_hr">`
 	body += record_line(tool.Get_language(db, "record_today", true), today_count, today_length)
 	body += record_line(tool.Get_language(db, "record_yesterday", true), yesterday_count, yesterday_length)
 	body += record_diff_line(tool.Get_language(db, "record_today", true)+" - "+tool.Get_language(db, "record_yesterday", true), today_length-yesterday_length)
-	body += `<hr>`
+	body += `<hr class="main_hr">`
 	body += record_average_line(tool.Get_language(db, "record_this_week", true), week_count, week_length, week_start, tomorrow_start)
 	body += record_line(tool.Get_language(db, "record_last_week", true), last_week_count, last_week_length)
 	body += record_diff_line(tool.Get_language(db, "record_this_week", true)+" - "+tool.Get_language(db, "record_last_week", true), week_length-last_week_length)
-	body += `<hr>`
+	body += `<hr class="main_hr">`
 	body += record_average_line(tool.Get_language(db, "record_this_month", true), month_count, month_length, month_start, tomorrow_start)
 	body += record_line(tool.Get_language(db, "record_last_month", true), last_month_count, last_month_length)
 	body += record_diff_line(tool.Get_language(db, "record_this_month", true)+" - "+tool.Get_language(db, "record_last_month", true), month_length-last_month_length)
 	body += `</ul>`
-	return list_extra_page(db, config, tool.Get_language(db, "count", true), body)
+	return List_extra_page(db, config, tool.Get_language(db, "count", true), body)
 }

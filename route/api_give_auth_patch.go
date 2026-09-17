@@ -22,7 +22,7 @@ func Api_give_auth_patch(config tool.Config, auth string, change_auth string, us
 		end_date = ""
 	}
 	if !release && end_period != "" {
-		period_end_date, ok := auth_period_end_date(end_period)
+		period_end_date, ok := Auth_period_end_date(end_period)
 		if !ok {
 			new_data["response"] = "error"
 			new_data["data"] = "invalid end period"
@@ -158,7 +158,7 @@ func Api_give_auth_patch(config tool.Config, auth string, change_auth string, us
 	return new_data
 }
 
-func auth_period_end_date(period string) (string, bool) {
+func Auth_period_end_date(period string) (string, bool) {
 	now := time.Now()
 	switch period {
 	case "1_day":

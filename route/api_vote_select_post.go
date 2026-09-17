@@ -47,7 +47,7 @@ func Api_vote_select_post(config tool.Config, id string, vote_data string) map[s
 		return return_data
 	}
 
-	options := vote_options(data)
+	options := Vote_options(data)
 	choice, err := strconv.Atoi(vote_data)
 	if err != nil || choice < 0 || choice >= len(options) {
 		return_data["response"] = "error"

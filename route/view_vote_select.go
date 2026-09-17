@@ -33,7 +33,7 @@ func View_vote_select(config tool.Config, id string, values url.Values) string {
 	if end_date != "" && strings.HasPrefix(tool.Get_time(), end_date) == false && strings.Split(tool.Get_time(), " ")[0] > strings.Split(end_date, " ")[0] {
 		return tool.Get_redirect("/vote/end/" + tool.Url_parser(id))
 	}
-	options := vote_options(data)
+	options := Vote_options(data)
 	if values != nil {
 		api_data := Api_vote_select_post(config, id, values.Get("vote_data"))
 		response, _ := api_data["response"].(string)
@@ -57,5 +57,5 @@ func View_vote_select(config tool.Config, id string, values url.Values) string {
 		body += `<option value="` + strconv.Itoa(index) + `">` + tool.HTML_escape(option) + `</option>`
 	}
 	body += `</select><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "send", true) + `</button></form>`
-	return vote_page(db, config, tool.Get_language(db, "vote", true), body)
+	return Vote_page(db, config, tool.Get_language(db, "vote", true), body)
 }

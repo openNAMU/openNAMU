@@ -7,7 +7,7 @@ import (
 	"opennamu/route"
 )
 
-func compat_recent_discuss(c *gin.Context) {
+func Compat_recent_discuss(c *gin.Context) {
 	parts := strings.Split(strings.TrimPrefix(c.Param("data"), "/"), "/")
 	limit := "10"
 	set_type := "normal"
@@ -17,5 +17,5 @@ func compat_recent_discuss(c *gin.Context) {
 		set_type = parts[0]
 		limit = parts[len(parts)-1]
 	}
-	compat_api_data_cors(c, route.Api_list_recent_discuss(make_route_config(c), limit, "1", set_type))
+	Compat_api_data_cors(c, route.Api_list_recent_discuss(Make_route_config(c), limit, "1", set_type))
 }

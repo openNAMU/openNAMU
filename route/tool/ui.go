@@ -340,7 +340,7 @@ func Get_list_ui(left string, right string, bottom string, class_name string) st
 	data_html += `<div style="clear: both;"></div>`
 
 	if bottom != "" {
-		data_html += "<hr>"
+		data_html += `<hr class="main_hr">`
 		data_html += bottom
 	}
 
@@ -592,22 +592,22 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
 		editor_display = append(editor_display, `style="display: none;"`)
 	}
 
-	select_A := ""
-	select_B := ""
+	select_a := ""
+	select_b := ""
 
 	if monaco_on {
 		editor_display[1] = ""
-		select_B = "selected"
+		select_b = "selected"
 	} else {
 		editor_display[0] = ""
-		select_A = "selected"
+		select_a = "selected"
 	}
 
 	monaco_editor_top += `
         <span class="__ON_SELECT_DIV__">
             <select class="__ON_SELECT__" onclick="do_sync_monaco_and_textarea();" id="opennamu_select_editor" onchange="opennamu_edit_turn_off_monaco();">
-                <option value="default" ` + select_A + `>` + Get_language(db, "default", true) + `</option>
-                <option value="monaco" ` + select_B + `>` + Get_language(db, "monaco_editor", true) + `</option>
+                <option value="default" ` + select_a + `>` + Get_language(db, "default", true) + `</option>
+                <option value="monaco" ` + select_b + `>` + Get_language(db, "monaco_editor", true) + `</option>
             </select>
         </span>
     `
@@ -730,9 +730,9 @@ func Get_captcha_ui(db *sql.DB, config Config) string {
 	data := ""
 
 	if !Check_acl(db, "", "", "recaptcha", config.IP) {
-		pub_key, sec_key, altcha_sec_key, rec_ver := captcha_setting(db)
+		pub_key, sec_key, altcha_sec_key, rec_ver := Captcha_setting(db)
 
-		if _, altcha_enabled := captcha_altcha_cost(rec_ver); altcha_enabled && altcha_sec_key != "" {
+		if _, altcha_enabled := Captcha_altcha_cost(rec_ver); altcha_enabled && altcha_sec_key != "" {
 			data += `<script async defer type="module" src="https://cdn.jsdelivr.net/npm/altcha@3.2.2/dist/main/altcha.i18n.min.js"></script><altcha-widget challenge="/api/altcha/challenge"></altcha-widget><hr class="main_hr">`
 		} else if pub_key != "" && sec_key != "" {
 			switch rec_ver {

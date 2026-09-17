@@ -7,7 +7,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func bbs_search_item_data(db *sql.DB, config tool.Config, set_code string, set_id string, ip_parser_temp map[string][]string, auth_info map[string]bool, keyword string, search_type string) (map[string]string, bool) {
+func Bbs_search_item_data(db *sql.DB, config tool.Config, set_code string, set_id string, ip_parser_temp map[string][]string, auth_info map[string]bool, keyword string, search_type string) (map[string]string, bool) {
 	if !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
 		return nil, false
 	}
@@ -71,19 +71,19 @@ func bbs_search_item_data(db *sql.DB, config tool.Config, set_code string, set_i
 	}
 	item_rows.Close()
 
-	if !bbs_post_view_allowed(db, set_id, set_code, user_id, config.IP, auth_info) {
+	if !Bbs_post_view_allowed(db, set_id, set_code, user_id, config.IP, auth_info) {
 		return nil, false
 	}
-	temp_data["title_html"] = search_highlight(temp_data["title"], keyword)
-	temp_data["prefix_html"] = search_highlight(temp_data["prefix"], keyword)
-	temp_data["tags_html"] = bbs_tags_html(temp_data["set_id"], temp_data["tags"], keyword)
+	temp_data["title_html"] = Search_highlight(temp_data["title"], keyword)
+	temp_data["prefix_html"] = Search_highlight(temp_data["prefix"], keyword)
+	temp_data["tags_html"] = Bbs_tags_html(temp_data["set_id"], temp_data["tags"], keyword)
 	if search_type == "data" {
-		temp_data["search_snippet_html"] = search_snippet(content_data, keyword)
+		temp_data["search_snippet_html"] = Search_snippet(content_data, keyword)
 	}
 	return temp_data, true
 }
 
-func bbs_search_index_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int, search_type string) ([]map[string]string, bool) {
+func Bbs_search_index_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int, search_type string) ([]map[string]string, bool) {
 	target_count := page * 50
 	candidate_limit := 500
 	if target_count < candidate_limit {
@@ -119,7 +119,7 @@ func bbs_search_index_data(db *sql.DB, config tool.Config, keyword string, set_i
 			if !valid || (set_id == "" && set_id_data == "0") {
 				continue
 			}
-			item_data, visible := bbs_search_item_data(db, config, set_code_data, set_id_data, ip_parser_temp, auth_info, keyword, search_type)
+			item_data, visible := Bbs_search_item_data(db, config, set_code_data, set_id_data, ip_parser_temp, auth_info, keyword, search_type)
 			if visible {
 				data_list = append(data_list, item_data)
 			}
@@ -145,14 +145,14 @@ func bbs_search_index_data(db *sql.DB, config tool.Config, keyword string, set_i
 }
 
 func Api_bbs_search(config tool.Config, keyword string, set_id string, page string) map[string]any {
-	return api_bbs_search(config, keyword, set_id, page, "title")
+	return Api_bbs_search_internal(config, keyword, set_id, page, "title")
 }
 
 func Api_bbs_search_data(config tool.Config, keyword string, set_id string, page string) map[string]any {
-	return api_bbs_search(config, keyword, set_id, page, "data")
+	return Api_bbs_search_internal(config, keyword, set_id, page, "data")
 }
 
-func api_bbs_search(config tool.Config, keyword string, set_id string, page string, search_type string) map[string]any {
+func Api_bbs_search_internal(config tool.Config, keyword string, set_id string, page string, search_type string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -172,7 +172,7 @@ func api_bbs_search(config tool.Config, keyword string, set_id string, page stri
 			page_num = 1
 		}
 		offset := (page_num - 1) * 50
-		if data_list, ok := bbs_search_index_data(db, config, keyword, set_id, page_num, search_type); ok {
+		if data_list, ok := Bbs_search_index_data(db, config, keyword, set_id, page_num, search_type); ok {
 			return map[string]any{
 				"response": "ok",
 				"data":     data_list,
@@ -185,7 +185,7 @@ func api_bbs_search(config tool.Config, keyword string, set_id string, page stri
 			where_data = "not b.set_id = \"0\""
 			values = []any{}
 		}
-		view_sql, view_values := bbs_post_view_sql(db, set_id, config.IP, "b")
+		view_sql, view_values := Bbs_post_view_sql(db, set_id, config.IP, "b")
 		if view_sql != "" {
 			where_data += " and " + view_sql
 			values = append(values, view_values...)
@@ -216,7 +216,7 @@ func api_bbs_search(config tool.Config, keyword string, set_id string, page stri
 				continue
 			}
 
-			item_data, visible := bbs_search_item_data(db, config, set_code_data, set_id_data, ip_parser_temp, auth_info, keyword, search_type)
+			item_data, visible := Bbs_search_item_data(db, config, set_code_data, set_id_data, ip_parser_temp, auth_info, keyword, search_type)
 			if visible {
 				data_list = append(data_list, item_data)
 			}

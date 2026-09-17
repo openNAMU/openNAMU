@@ -16,12 +16,14 @@ func View_main_search(config tool.Config, keyword string, num string, search_typ
 
 	data_html := `
         <form method="post">
-            <input class="opennamu_width_200 __ON_INPUT__" name="search" value="` + tool.HTML_escape(keyword) + `">
-            <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "search", true) + `</button>
+            <div><input class="opennamu_width_200 __ON_INPUT__" name="search" value="` + tool.HTML_escape(keyword) + `"></div><hr class="main_hr">
+            <div><button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "search", true) + `</button></div>
         </form>
         <hr class="main_hr">
-        <a href="/search_page/1/` + tool.Url_parser(keyword) + `">(` + tool.Get_language(db, "search_document_name", true) + `)</a>
-        <a href="/search_data_page/1/` + tool.Url_parser(keyword) + `">(` + tool.Get_language(db, "search_document_data", true) + `)</a>
+        <div><a href="/search_page/1/` + tool.Url_parser(keyword) + `">(` + tool.Get_language(db, "search_document_name", true) + `)</a></div>
+        <hr class="main_hr">
+        <div><a href="/search_data_page/1/` + tool.Url_parser(keyword) + `">(` + tool.Get_language(db, "search_document_data", true) + `)</a></div>
+        <hr class="main_hr">
     `
 
 	name_new := ""
@@ -34,7 +36,7 @@ func View_main_search(config tool.Config, keyword string, num string, search_typ
 	}
 
 	if name_new != "" {
-		data_html += ` <a href="/search_page/1/` + tool.Url_parser(name_new) + `">(` + tool.HTML_escape(name_new) + `)</a>`
+		data_html += `<div><a href="/search_page/1/` + tool.Url_parser(name_new) + `">(` + tool.HTML_escape(name_new) + `)</a></div><hr class="main_hr">`
 	}
 
 	data_api_exist := Api_w_raw(config, keyword, "true", "")

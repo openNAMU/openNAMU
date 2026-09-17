@@ -12,7 +12,7 @@ func Api_func_search_ui(config tool.Config, title_list []string, keyword string,
 		for _, title := range title_list {
 			data_list = append(data_list, map[string]string{
 				"title":      title,
-				"title_html": search_highlight(title, keyword),
+				"title_html": Search_highlight(title, keyword),
 			})
 		}
 		return data_list
@@ -50,10 +50,10 @@ func Api_func_search_ui(config tool.Config, title_list []string, keyword string,
 	for _, title := range title_list {
 		temp_data := map[string]string{
 			"title":      title,
-			"title_html": search_highlight(title, keyword),
+			"title_html": Search_highlight(title, keyword),
 		}
 		if tool.Check_acl(db, title, "", "render", config.IP) {
-			temp_data["search_snippet_html"] = search_snippet(data_map[title], keyword)
+			temp_data["search_snippet_html"] = Search_snippet(data_map[title], keyword)
 		}
 		data_list = append(data_list, temp_data)
 	}

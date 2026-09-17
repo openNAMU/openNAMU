@@ -6,10 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func compat_ip_single_post(c *gin.Context) {
-	compat_api_data(c, route.Api_func_ip_post(make_route_config(c), compat_ip_post_data(c)))
+func Compat_ip_single_post(c *gin.Context) {
+	Compat_api_data(c, route.Api_func_ip_post(Make_route_config(c), Compat_ip_post_data(c)))
 }
 
-func compat_ip_menu_post(c *gin.Context) {
-	compat_api_data(c, route.Api_func_ip_menu(make_route_config(c), compat_doc_name(c, "ip"), "user"))
+func Compat_ip_menu_post(c *gin.Context) {
+	Compat_api_data(c, route.Api_func_ip_menu(Make_route_config(c), Compat_doc_name(c, "ip"), "user"))
 }

@@ -17,7 +17,7 @@ func View_bbs_in_w_blind(config tool.Config, set_id string, set_code string) str
 
 	action_name := "blind_post"
 	action_value := "1"
-	if bbs_post_blind(db, set_id, set_code) {
+	if Bbs_post_blind(db, set_id, set_code) {
 		action_name = "blind_post_release"
 		action_value = "0"
 	}

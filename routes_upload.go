@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func upload_post(c *gin.Context) {
+func Upload_post(c *gin.Context) {
 	upload_db := tool.DB_connect()
 	file_max_size := tool.Get_file_max_size(upload_db)
 	tool.DB_close(upload_db)
@@ -44,7 +44,7 @@ func upload_post(c *gin.Context) {
 	license := c.PostForm("f_lice_sel")
 	license_text := c.PostForm("f_lice")
 	replace := c.PostForm("f_replace")
-	captcha := captcha_response(c)
+	captcha := Captcha_response_internal(c)
 	upload_files := []route.Upload_file_data{}
 
 	count := 1
@@ -78,10 +78,10 @@ func upload_post(c *gin.Context) {
 		count += 1
 	}
 
-	route_data := route.View_edit_file_upload_post(make_route_config(c), upload_files)
+	route_data := route.View_edit_file_upload_post(Make_route_config(c), upload_files)
 	status := http.StatusOK
 	if _, ok := tool.Get_redirect_target(route_data); !ok {
 		status = http.StatusBadRequest
 	}
-	write_data(c, status, "text/html; charset=utf-8", []byte(route_data))
+	Write_data(c, status, "text/html; charset=utf-8", []byte(route_data))
 }

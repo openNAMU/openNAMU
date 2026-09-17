@@ -57,7 +57,7 @@ type google_response_data struct {
 	} `json:"candidates"`
 }
 
-func ai_provider(db *sql.DB) string {
+func Ai_provider(db *sql.DB) string {
 	provider := tool.Get_setting_value(db, "ai_provider", "", "ollama")
 	if provider != "openai" && provider != "google" {
 		return "ollama"
@@ -65,7 +65,7 @@ func ai_provider(db *sql.DB) string {
 	return provider
 }
 
-func ai_default_model(provider string) string {
+func Ai_default_model(provider string) string {
 	switch provider {
 	case "openai":
 		return "gpt-5"
@@ -76,23 +76,23 @@ func ai_default_model(provider string) string {
 	}
 }
 
-func ai_model_value(db *sql.DB, model string) string {
+func Ai_model_value(db *sql.DB, model string) string {
 	model = strings.TrimSpace(model)
 	if model != "" {
 		return model
 	}
 
-	provider := ai_provider(db)
+	provider := Ai_provider(db)
 	model = strings.TrimSpace(tool.Get_setting_value(db, "ai_model", "", ""))
 	if model == "" {
-		model = ai_default_model(provider)
+		model = Ai_default_model(provider)
 	}
 	return model
 }
 
 func Api_ai_stream(db *sql.DB, model string, prompt string) (string, error) {
-	provider := ai_provider(db)
-	model = ai_model_value(db, model)
+	provider := Ai_provider(db)
+	model = Ai_model_value(db, model)
 
 	switch provider {
 	case "openai":
@@ -383,9 +383,9 @@ func Api_ollama_stream_post(config tool.Config, question string, model string) m
 		question = tool.Get_slice(question, 0, 1000)
 	}
 
-	model = ai_model_value(db, model)
+	model = Ai_model_value(db, model)
 
-	context_data, source_list := ollama_document_context(db, config, question)
+	context_data, source_list := Ollama_document_context(db, config, question)
 	prompt := "너는 위키 문서 검색을 돕는 AI다. 아래 참고 문서에 있는 내용만 근거로 답변하고, 근거가 없으면 모른다고 답변해라. 참고 문서: " + context_data + " 질문: " + question
 	answer, err := Api_ai_stream(db, model, prompt)
 	if err != nil {

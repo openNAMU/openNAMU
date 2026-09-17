@@ -6,7 +6,7 @@ func View_setting_head_post(config tool.Config, kind string, skin_name string, c
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	name, coverage, _, action, ok := setting_head_info(kind, skin_name)
+	name, coverage, _, action, ok := Setting_head_info(kind, skin_name)
 	if !ok {
 		return tool.Get_error_page(db, config, "error")
 	}

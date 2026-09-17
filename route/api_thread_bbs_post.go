@@ -8,7 +8,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func api_thread_bbs_post(config tool.Config, topic_num string, doc_name string, content string, topic string, title string) map[string]any {
+func Api_thread_bbs_post(config tool.Config, topic_num string, doc_name string, content string, topic string, title string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -106,19 +106,19 @@ func api_thread_bbs_post(config tool.Config, topic_num string, doc_name string, 
 			thread_bbs_id,
 		)
 		topic_num = strconv.Itoa(tool.Str_to_int(last_code) + 1)
-		if err := thread_bbs_insert_post(db, topic_num, name, sub, data, config.IP); err != nil {
+		if err := Thread_bbs_insert_post(db, topic_num, name, sub, data, config.IP); err != nil {
 			return_data["response"] = "error"
 			return_data["data"] = "thread"
 			return return_data
 		}
-		topic_reference_notify(db, config, data, "1", topic_num, thread_bbs_id, name, sub, "bbs")
-		bbs_watch_notify(db, config, thread_bbs_id, topic_num, "1", "thread", sub, config.IP, "")
+		Topic_reference_notify(db, config, data, "1", topic_num, thread_bbs_id, name, sub, "bbs")
+		Bbs_watch_notify(db, config, thread_bbs_id, topic_num, "1", "thread", sub, config.IP, "")
 	} else {
 		id := ""
 		date := tool.Get_time()
 		comment_set_id := thread_bbs_id + "-" + topic_num
 		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-			id = thread_bbs_next_comment(tx, topic_num)
+			id = Thread_bbs_next_comment(tx, topic_num)
 			for _, value := range [][]string{
 				{"comment", data},
 				{"comment_date", date},
@@ -134,8 +134,8 @@ func api_thread_bbs_post(config tool.Config, topic_num string, doc_name string, 
 					return err
 				}
 			}
-			bbs_post_comment_count_update(tx, thread_bbs_id, topic_num, 1)
-			bbs_post_last_activity_update(tx, thread_bbs_id, topic_num, date)
+			Bbs_post_comment_count_update(tx, thread_bbs_id, topic_num, 1)
+			Bbs_post_last_activity_update(tx, thread_bbs_id, topic_num, date)
 			_, err := tx.Exec(
 				tool.DB_change("update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?"),
 				date,
@@ -147,8 +147,8 @@ func api_thread_bbs_post(config tool.Config, topic_num string, doc_name string, 
 			panic(err)
 		}
 		tool.Search_bbs_index_update_comment(db, thread_bbs_id, topic_num, id)
-		topic_reference_notify(db, config, data, id, topic_num, thread_bbs_id, name, sub, "bbs")
-		bbs_watch_notify(db, config, thread_bbs_id, topic_num, id, "thread", sub, thread_bbs_post_user(db, topic_num), "")
+		Topic_reference_notify(db, config, data, id, topic_num, thread_bbs_id, name, sub, "bbs")
+		Bbs_watch_notify(db, config, thread_bbs_id, topic_num, id, "thread", sub, Thread_bbs_post_user(db, topic_num), "")
 		return_data["comment_num"] = id
 	}
 
@@ -163,7 +163,7 @@ func api_thread_bbs_post(config tool.Config, topic_num string, doc_name string, 
 	return return_data
 }
 
-func thread_bbs_post_user(db *sql.DB, topic_num string) string {
+func Thread_bbs_post_user(db *sql.DB, topic_num string) string {
 	user_id := ""
 	tool.QueryRow_DB(
 		db,
@@ -175,7 +175,7 @@ func thread_bbs_post_user(db *sql.DB, topic_num string) string {
 	return user_id
 }
 
-func thread_bbs_next_comment(db tool.DB_runner, topic_num string) string {
+func Thread_bbs_next_comment(db tool.DB_runner, topic_num string) string {
 	last_code := ""
 	tool.QueryRow_DB(
 		db,
@@ -186,7 +186,7 @@ func thread_bbs_next_comment(db tool.DB_runner, topic_num string) string {
 	return strconv.Itoa(tool.Str_to_int(last_code) + 1)
 }
 
-func thread_bbs_insert_post(db *sql.DB, topic_num string, name string, sub string, data string, user_id string) error {
+func Thread_bbs_insert_post(db *sql.DB, topic_num string, name string, sub string, data string, user_id string) error {
 	date := tool.Get_time()
 	tx, err := db.Begin()
 	if err != nil {

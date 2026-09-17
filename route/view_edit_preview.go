@@ -30,7 +30,7 @@ func View_edit_preview(config tool.Config, doc_name string, data string, mode st
 		return tool.Get_error_page(db, config, "error")
 	}
 
-	return view_edit_page(
+	return View_edit_page(
 		db,
 		preview_config,
 		doc_name,

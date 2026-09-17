@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func make_route_config(c *gin.Context) tool.Config {
+func Make_route_config(c *gin.Context) tool.Config {
 	return tool.Config{
 		IP:        tool.Get_IP(c),
 		Cookies:   tool.Get_Cookies(c),
@@ -18,11 +18,11 @@ func make_route_config(c *gin.Context) tool.Config {
 	}
 }
 
-func captcha_response(c *gin.Context) string {
+func Captcha_response_internal(c *gin.Context) string {
 	return tool.Captcha_response(c.PostForm("g-recaptcha"), c.PostForm("g-recaptcha-response"), c.PostForm("h-captcha-response"), c.PostForm("cf-turnstile-response"), c.PostForm("altcha"))
 }
 
-func parse_bbs_code(value string) (string, string) {
+func Parse_bbs_code(value string) (string, string) {
 	if strings.HasPrefix(value, "-1-") {
 		return "-1", strings.TrimPrefix(value, "-1-")
 	}
@@ -33,7 +33,7 @@ func parse_bbs_code(value string) (string, string) {
 	return parts[0], parts[1]
 }
 
-func write_data(c *gin.Context, status int, content_type string, data []byte) {
+func Write_data(c *gin.Context, status int, content_type string, data []byte) {
 	target, ok := tool.Get_redirect_target(string(data))
 	if ok {
 		c.Redirect(http.StatusFound, target)

@@ -16,7 +16,7 @@ func Api_edit_file_delete_post(config tool.Config, doc_name string, values url.V
 		return_data["response"] = "require auth"
 		return return_data
 	}
-	file_path, valid := file_storage_path(tool.Get_file_main_dir(db), doc_name)
+	file_path, valid := File_storage_path(tool.Get_file_main_dir(db), doc_name)
 	if !valid {
 		return_data["response"] = "error"
 		return_data["data"] = "invalid file"

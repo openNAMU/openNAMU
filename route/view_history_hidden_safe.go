@@ -23,5 +23,5 @@ func View_history_hidden_safe(config tool.Config, doc_name string, rev string, v
 		action = "hide_release"
 	}
 	body := `<form method="post"><button type="submit">` + tool.Get_language(db, action, true) + `</button></form>`
-	return document_safe_page(db, config, tool.Get_language(db, action, true), body)
+	return Document_safe_page(db, config, tool.Get_language(db, action, true), body)
 }

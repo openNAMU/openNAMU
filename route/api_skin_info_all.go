@@ -35,7 +35,7 @@ func Api_skin_info_all(config tool.Config) ([]byte, bool) {
 		if name == current {
 			info["main"] = "true"
 		}
-		if version, ok := get_skin_latest_version(info); ok {
+		if version, ok := Get_skin_latest_version(info); ok {
 			info["lastest_version"] = map[string]string{"skin_ver": version}
 		}
 		data[name] = info
@@ -54,7 +54,7 @@ var skin_info_link = map[string]string{
 	"Before Namu": "https://raw.githubusercontent.com/openNAMU/openNAMU-Skin-Before_Namu/master/info.json",
 }
 
-func get_skin_latest_version(info map[string]any) (string, bool) {
+func Get_skin_latest_version(info map[string]any) (string, bool) {
 	info_link, _ := info["info_link"].(string)
 	if info_link == "" {
 		name, _ := info["name"].(string)

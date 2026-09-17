@@ -7,7 +7,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func move_bbs_index_update(db *sql.DB, doc_name string) {
+func Move_bbs_index_update(db *sql.DB, doc_name string) {
 	rows := tool.Query_DB(
 		db,
 		"select distinct set_id, set_code from bbs_data where (set_id = '0' and set_name = 'title' and set_data = ?) or (set_id = ? and set_name in ('document', 'tag') and set_data = ?)",
@@ -39,7 +39,7 @@ func Api_edit_move_all_post(config tool.Config, source string, target string, ma
 		return_data["response"] = "require auth"
 		return return_data
 	}
-	documents := move_all_documents(db, source, target, match_type)
+	documents := Move_all_documents(db, source, target, match_type)
 	if len(documents) == 0 {
 		return_data["response"] = "error"
 		return_data["data"] = "move error"
@@ -69,7 +69,7 @@ func Api_edit_move_all_post(config tool.Config, source string, target string, ma
 		}
 		target_list[document.new_name] = true
 
-		target_exists, target_history_only := move_document_exists(db, document.new_name)
+		target_exists, target_history_only := Move_document_exists(db, document.new_name)
 		if target_exists {
 			if target_history_only {
 				return_data["response"] = "error"
@@ -80,7 +80,7 @@ func Api_edit_move_all_post(config tool.Config, source string, target string, ma
 			return_data["data"] = "document already exist"
 			return return_data
 		}
-		if move_document_settings_exists(db, document.new_name) {
+		if Move_document_settings_exists(db, document.new_name) {
 			return_data["response"] = "error"
 			return_data["data"] = "move error"
 			return return_data
@@ -88,15 +88,15 @@ func Api_edit_move_all_post(config tool.Config, source string, target string, ma
 	}
 
 	for index := range documents {
-		documents[index].data = move_data_value(db, documents[index].old_name)
+		documents[index].data = Move_data_value(db, documents[index].old_name)
 	}
 
 	date := tool.Get_time()
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		for _, document := range documents {
-			move_document_normal_data(tx, document.old_name, document.new_name)
-			move_topic_normal(tx, document.old_name, document.new_name)
-			move_data_set_normal(tx, document.old_name, document.new_name)
+			Move_document_normal_data(tx, document.old_name, document.new_name)
+			Move_topic_normal(tx, document.old_name, document.new_name)
+			Move_data_set_normal(tx, document.old_name, document.new_name)
 			type_check := "<a>" + tool.HTML_escape(document.old_name) + "</a> → <a>" + tool.HTML_escape(document.new_name) + "</a>"
 			tool.Do_add_history(tx, document.new_name, document.data, date, config.IP, send, "0", "move", type_check)
 		}
@@ -110,7 +110,7 @@ func Api_edit_move_all_post(config tool.Config, source string, target string, ma
 	for _, document := range documents {
 		tool.Search_index_sync(db, document.old_name)
 		tool.Search_index_sync(db, document.new_name)
-		move_bbs_index_update(db, document.new_name)
+		Move_bbs_index_update(db, document.new_name)
 	}
 	_ = tool.Search_bbs_index_mark_rebuild()
 

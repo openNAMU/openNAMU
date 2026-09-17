@@ -8,13 +8,13 @@ import (
 	"opennamu/route/tool"
 )
 
-func bbs_post_blind(db *sql.DB, set_id string, set_code string) bool {
+func Bbs_post_blind(db *sql.DB, set_id string, set_code string) bool {
 	blind, exists := tool.Get_bbs_data_value(db, set_id, set_code, "blind")
 	return exists && blind == "O"
 }
 
-func bbs_post_blind_allowed(db *sql.DB, set_id string, set_code string, ip string, auth_info map[string]bool) bool {
-	if !bbs_post_blind(db, set_id, set_code) {
+func Bbs_post_blind_allowed(db *sql.DB, set_id string, set_code string, ip string, auth_info map[string]bool) bool {
+	if !Bbs_post_blind(db, set_id, set_code) {
 		return true
 	}
 	if auth_info == nil {
@@ -23,16 +23,16 @@ func bbs_post_blind_allowed(db *sql.DB, set_id string, set_code string, ip strin
 	return auth_info["bbs_post_manage"]
 }
 
-func bbs_post_blind_sql(row_alias string) string {
+func Bbs_post_blind_sql(row_alias string) string {
 	return "not exists (select 1 from bbs_data blind_data where blind_data.set_name = 'blind' and blind_data.set_data = 'O' and blind_data.set_id = " + row_alias + ".set_id and blind_data.set_code = " + row_alias + ".set_code)"
 }
 
-func bbs_post_view_allowed(db *sql.DB, set_id string, set_code string, user_id string, ip string, auth_info map[string]bool) bool {
-	if !bbs_post_blind_allowed(db, set_id, set_code, ip, auth_info) {
+func Bbs_post_view_allowed(db *sql.DB, set_id string, set_code string, user_id string, ip string, auth_info map[string]bool) bool {
+	if !Bbs_post_blind_allowed(db, set_id, set_code, ip, auth_info) {
 		return false
 	}
 
-	acl_data := bbs_set_value(db, set_id, "bbs_only_my_data_view_acl")
+	acl_data := Bbs_set_value(db, set_id, "bbs_only_my_data_view_acl")
 	if acl_data == "" || acl_data == "normal" || user_id == ip {
 		return true
 	}
@@ -45,15 +45,15 @@ func bbs_post_view_allowed(db *sql.DB, set_id string, set_code string, user_id s
 	return tool.Check_acl_group(db, acl_data, auth_info)
 }
 
-func bbs_post_view_sql(db *sql.DB, set_id string, ip string, row_alias string) (string, []any) {
+func Bbs_post_view_sql(db *sql.DB, set_id string, ip string, row_alias string) (string, []any) {
 	auth_info := tool.Get_auth_info(db, ip)
 	blind_sql := ""
 	if !auth_info["bbs_post_manage"] {
-		blind_sql = bbs_post_blind_sql(row_alias)
+		blind_sql = Bbs_post_blind_sql(row_alias)
 	}
 
 	if set_id != "" {
-		acl_data := bbs_set_value(db, set_id, "bbs_only_my_data_view_acl")
+		acl_data := Bbs_set_value(db, set_id, "bbs_only_my_data_view_acl")
 		if acl_data == "" || acl_data == "normal" || auth_info["bbs"] || tool.Check_acl_group(db, acl_data, auth_info) {
 			return blind_sql, nil
 		}
@@ -126,7 +126,7 @@ type bbs_filter struct {
 	tag                  string
 }
 
-func bbs_filter_number(data string) int {
+func Bbs_filter_number(data string) int {
 	num := tool.Str_to_int(data)
 	if num < 0 {
 		return 0
@@ -135,7 +135,7 @@ func bbs_filter_number(data string) int {
 	return num
 }
 
-func bbs_filter_parse(data string) bbs_filter {
+func Bbs_filter_parse(data string) bbs_filter {
 	data = strings.Trim(data, "/")
 	parts := strings.Split(data, "/")
 	filter := bbs_filter{}
@@ -146,7 +146,7 @@ func bbs_filter_parse(data string) bbs_filter {
 			break
 		}
 
-		value := bbs_filter_number(parts[i+1])
+		value := Bbs_filter_number(parts[i+1])
 		switch parts[i] {
 		case "comment":
 			filter.comment_min = value
@@ -187,7 +187,7 @@ func bbs_filter_parse(data string) bbs_filter {
 	return filter
 }
 
-func bbs_filter_path(filter bbs_filter) string {
+func Bbs_filter_path(filter bbs_filter) string {
 	path := []string{}
 	if filter.comment_min > 0 {
 		path = append(path, "comment", strconv.Itoa(filter.comment_min))
@@ -225,7 +225,7 @@ func bbs_filter_path(filter bbs_filter) string {
 	return strings.Join(path, "/")
 }
 
-func bbs_filter_path_data(data string) (string, string) {
+func Bbs_filter_path_data(data string) (string, string) {
 	parts := strings.Split(strings.Trim(data, "/"), "/")
 	if len(parts) == 0 || parts[0] == "" {
 		return "1", ""
@@ -239,11 +239,11 @@ func bbs_filter_path_data(data string) (string, string) {
 	return page, strings.Join(parts[:len(parts)-1], "/")
 }
 
-func bbs_post_comment_count_sql(row_alias string) string {
+func Bbs_post_comment_count_sql(row_alias string) string {
 	return "coalesce((select set_data from bbs_data comment_count_data where comment_count_data.set_name = 'comment_count' and comment_count_data.set_id = " + row_alias + ".set_id and comment_count_data.set_code = " + row_alias + ".set_code limit 1), '0') + 0"
 }
 
-func bbs_post_comment_count_update(tx *sql.Tx, set_id string, set_code string, change int) {
+func Bbs_post_comment_count_update(tx *sql.Tx, set_id string, set_code string, change int) {
 	if change == 0 {
 		return
 	}
@@ -274,21 +274,21 @@ func bbs_post_comment_count_update(tx *sql.Tx, set_id string, set_code string, c
 	}
 }
 
-func bbs_post_tabom_count_sql(row_alias string) string {
+func Bbs_post_tabom_count_sql(row_alias string) string {
 	return "coalesce((select set_data from bbs_data tabom_data where tabom_data.set_name = 'tabom_count' and tabom_data.set_id = " + row_alias + ".set_id and tabom_data.set_code = " + row_alias + ".set_code limit 1), '0') + 0"
 }
 
-func bbs_post_tabom_down_count_sql(row_alias string) string {
+func Bbs_post_tabom_down_count_sql(row_alias string) string {
 	return "coalesce((select set_data from bbs_data tabom_down_data where tabom_down_data.set_name = 'tabom_down_count' and tabom_down_data.set_id = " + row_alias + ".set_id and tabom_down_data.set_code = " + row_alias + ".set_code limit 1), '0') + 0"
 }
 
-func bbs_post_tabom_score_sql(row_alias string) string {
-	return "(" + bbs_post_tabom_count_sql(row_alias) + " - " + bbs_post_tabom_down_count_sql(row_alias) + ")"
+func Bbs_post_tabom_score_sql(row_alias string) string {
+	return "(" + Bbs_post_tabom_count_sql(row_alias) + " - " + Bbs_post_tabom_down_count_sql(row_alias) + ")"
 }
 
-func bbs_excellent_min(db *sql.DB, set_id string) int {
+func Bbs_excellent_min(db *sql.DB, set_id string) int {
 	values := []string{
-		bbs_set_value(db, set_id, "bbs_excellent_min"),
+		Bbs_set_value(db, set_id, "bbs_excellent_min"),
 		tool.Get_setting_value_exact(db, "bbs_excellent_min", "", ""),
 	}
 	for _, value := range values {
@@ -306,7 +306,7 @@ func bbs_excellent_min(db *sql.DB, set_id string) int {
 	return 5
 }
 
-func bbs_comment_set_id_sql(row_alias string, suffix string) string {
+func Bbs_comment_set_id_sql(row_alias string, suffix string) string {
 	if tool.Get_DB_type() == "mysql" {
 		return "concat(" + row_alias + ".set_id, '-', " + row_alias + ".set_code, '" + suffix + "')"
 	}
@@ -314,14 +314,14 @@ func bbs_comment_set_id_sql(row_alias string, suffix string) string {
 	return row_alias + ".set_id || '-' || " + row_alias + ".set_code || '" + suffix + "'"
 }
 
-func bbs_post_last_activity_sql(row_alias string) string {
-	comment_set_id := bbs_comment_set_id_sql(row_alias, "")
-	comment_set_id_nested := bbs_comment_set_id_sql(row_alias, "-%")
+func Bbs_post_last_activity_sql(row_alias string) string {
+	comment_set_id := Bbs_comment_set_id_sql(row_alias, "")
+	comment_set_id_nested := Bbs_comment_set_id_sql(row_alias, "-%")
 
 	return "coalesce((select nullif(last_activity_data.set_data, '') from bbs_data last_activity_data where last_activity_data.set_name = 'last_activity' and last_activity_data.set_id = " + row_alias + ".set_id and last_activity_data.set_code = " + row_alias + ".set_code limit 1), (select max(comment_date_data.set_data) from bbs_data comment_date_data where comment_date_data.set_name = 'comment_date' and (comment_date_data.set_id = " + comment_set_id + " or comment_date_data.set_id like " + comment_set_id_nested + ")), (select nullif(date_data.set_data, '') from bbs_data date_data where date_data.set_name = 'date' and date_data.set_id = " + row_alias + ".set_id and date_data.set_code = " + row_alias + ".set_code limit 1))"
 }
 
-func bbs_post_last_activity_update(tx *sql.Tx, set_id string, set_code string, date string) {
+func Bbs_post_last_activity_update(tx *sql.Tx, set_id string, set_code string, date string) {
 	if date == "" {
 		return
 	}
@@ -364,7 +364,7 @@ func bbs_post_last_activity_update(tx *sql.Tx, set_id string, set_code string, d
 	}
 }
 
-func bbs_post_last_activity_rebuild(tx *sql.Tx, set_id string, set_code string) {
+func Bbs_post_last_activity_rebuild(tx *sql.Tx, set_id string, set_code string) {
 	comment_set_id := set_id + "-" + set_code
 	last_activity := ""
 	tool.QueryRow_DB(
@@ -389,24 +389,24 @@ func bbs_post_last_activity_rebuild(tx *sql.Tx, set_id string, set_code string) 
 		}
 		return
 	}
-	bbs_post_last_activity_update(tx, set_id, set_code, last_activity)
+	Bbs_post_last_activity_update(tx, set_id, set_code, last_activity)
 }
 
-func bbs_filter_sql(filter bbs_filter, row_alias string, user_id string) (string, []any) {
+func Bbs_filter_sql(filter bbs_filter, row_alias string, user_id string) (string, []any) {
 	filter_sql := ""
 	filter_values := []any{}
 
 	if filter.comment_min > 0 {
-		filter_sql += " and " + bbs_post_comment_count_sql(row_alias) + " >= ?"
+		filter_sql += " and " + Bbs_post_comment_count_sql(row_alias) + " >= ?"
 		filter_values = append(filter_values, filter.comment_min)
 	}
 	if filter.commented == 1 {
-		filter_sql += " and " + bbs_post_comment_count_sql(row_alias) + " >= 1"
+		filter_sql += " and " + Bbs_post_comment_count_sql(row_alias) + " >= 1"
 	} else if filter.commented == 2 {
-		filter_sql += " and " + bbs_post_comment_count_sql(row_alias) + " = 0"
+		filter_sql += " and " + Bbs_post_comment_count_sql(row_alias) + " = 0"
 	}
 	if filter.tabom_min > 0 {
-		filter_sql += " and " + bbs_post_tabom_count_sql(row_alias) + " >= ?"
+		filter_sql += " and " + Bbs_post_tabom_count_sql(row_alias) + " >= ?"
 		filter_values = append(filter_values, filter.tabom_min)
 	}
 	if filter.mine {
@@ -414,8 +414,8 @@ func bbs_filter_sql(filter bbs_filter, row_alias string, user_id string) (string
 		filter_values = append(filter_values, user_id)
 	}
 	if filter.participate {
-		comment_set_id := bbs_comment_set_id_sql(row_alias, "")
-		comment_set_id_nested := bbs_comment_set_id_sql(row_alias, "-%")
+		comment_set_id := Bbs_comment_set_id_sql(row_alias, "")
+		comment_set_id_nested := Bbs_comment_set_id_sql(row_alias, "-%")
 		filter_sql += " and (exists (select 1 from bbs_data author_data where author_data.set_name = 'user_id' and author_data.set_id = " + row_alias + ".set_id and author_data.set_code = " + row_alias + ".set_code and author_data.set_data = ?) or exists (select 1 from bbs_data comment_user_data where comment_user_data.set_name = 'comment_user_id' and comment_user_data.set_data = ? and (comment_user_data.set_id = " + comment_set_id + " or comment_user_data.set_id like " + comment_set_id_nested + ")))"
 		filter_values = append(filter_values, user_id, user_id)
 	}
@@ -423,8 +423,8 @@ func bbs_filter_sql(filter bbs_filter, row_alias string, user_id string) (string
 		filter_sql += " and 1 = 0"
 	}
 	if filter.comment_user != "" {
-		comment_set_id := bbs_comment_set_id_sql(row_alias, "")
-		comment_set_id_nested := bbs_comment_set_id_sql(row_alias, "-%")
+		comment_set_id := Bbs_comment_set_id_sql(row_alias, "")
+		comment_set_id_nested := Bbs_comment_set_id_sql(row_alias, "-%")
 		filter_sql += " and exists (select 1 from bbs_data comment_user_data where comment_user_data.set_name = 'comment_user_id' and comment_user_data.set_data = ? and (comment_user_data.set_id = " + comment_set_id + " or comment_user_data.set_id like " + comment_set_id_nested + "))"
 		filter_values = append(filter_values, filter.comment_user)
 	}
@@ -449,15 +449,15 @@ func bbs_filter_sql(filter bbs_filter, row_alias string, user_id string) (string
 }
 
 func Api_bbs(config tool.Config, bbs_num string, page string, sort_type string) map[string]any {
-	return api_bbs(config, bbs_num, page, sort_type, bbs_filter{})
+	return Api_bbs_internal(config, bbs_num, page, sort_type, bbs_filter{})
 }
 
 func Api_bbs_filter(config tool.Config, bbs_num string, filter_data string) map[string]any {
-	page, filter_path := bbs_filter_path_data(filter_data)
-	return api_bbs(config, bbs_num, page, "", bbs_filter_parse(filter_path))
+	page, filter_path := Bbs_filter_path_data(filter_data)
+	return Api_bbs_internal(config, bbs_num, page, "", Bbs_filter_parse(filter_path))
 }
 
-func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, filter bbs_filter) map[string]any {
+func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type string, filter bbs_filter) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -471,7 +471,7 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 
 	rows_arr := []*sql.Rows{}
 	if bbs_num == "" {
-		view_sql, view_values := bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
+		view_sql, view_values := Bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
 		query := "select set_code, set_id, '0' from bbs_data where set_name = 'date' and set_id not in ('0', '-1') and " + tool.Get_except_set_id_SQL()
 		if view_sql != "" {
 			query += " and " + view_sql
@@ -487,11 +487,11 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 			num = page*50 - 50
 		}
 
-		view_sql, view_values := bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
-		filter_sql, filter_values := bbs_filter_sql(filter, "bbs_data", config.IP)
+		view_sql, view_values := Bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
+		filter_sql, filter_values := Bbs_filter_sql(filter, "bbs_data", config.IP)
 		query := "select set_code, set_id, '1'"
 		if sort_type == "activity" {
-			query += ", " + bbs_post_last_activity_sql("bbs_data")
+			query += ", " + Bbs_post_last_activity_sql("bbs_data")
 		}
 		query += " from bbs_data where set_name = 'pinned' and set_id like ?"
 		values := []any{bbs_num}
@@ -502,8 +502,8 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 		query += filter_sql
 		values = append(values, filter_values...)
 		if sort_type == "excellent" {
-			query += " and " + bbs_post_tabom_score_sql("bbs_data") + " > ?"
-			values = append(values, bbs_excellent_min(db, bbs_num))
+			query += " and " + Bbs_post_tabom_score_sql("bbs_data") + " > ?"
+			values = append(values, Bbs_excellent_min(db, bbs_num))
 		}
 		query += " order by set_data desc"
 		rows := tool.Query_DB(db, query, values...)
@@ -511,9 +511,9 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 		rows_arr = append(rows_arr, rows)
 
 		if sort_type == "activity" {
-			view_sql, view_values = bbs_post_view_sql(db, bbs_num, config.IP, "title")
-			filter_sql, filter_values := bbs_filter_sql(filter, "title", config.IP)
-			query = "select title.set_code, title.set_id, '0', " + bbs_post_last_activity_sql("title") + " from bbs_data title where title.set_name = 'title' and title.set_id like ?"
+			view_sql, view_values = Bbs_post_view_sql(db, bbs_num, config.IP, "title")
+			filter_sql, filter_values := Bbs_filter_sql(filter, "title", config.IP)
+			query = "select title.set_code, title.set_id, '0', " + Bbs_post_last_activity_sql("title") + " from bbs_data title where title.set_name = 'title' and title.set_id like ?"
 			values = []any{bbs_num}
 			if view_sql != "" {
 				query += " and " + view_sql
@@ -521,12 +521,12 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 			}
 			query += filter_sql
 			values = append(values, filter_values...)
-			query += " order by " + bbs_post_last_activity_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
+			query += " order by " + Bbs_post_last_activity_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		} else if sort_type == "view" {
-			view_sql, view_values = bbs_post_view_sql(db, bbs_num, config.IP, "title")
-			filter_sql, filter_values := bbs_filter_sql(filter, "title", config.IP)
+			view_sql, view_values = Bbs_post_view_sql(db, bbs_num, config.IP, "title")
+			filter_sql, filter_values := Bbs_filter_sql(filter, "title", config.IP)
 			query = "select title.set_code, title.set_id, '0' from bbs_data title left join bbs_data view_data on view_data.set_name = 'view_count' and view_data.set_id = title.set_id and view_data.set_code = title.set_code where title.set_name = 'title' and title.set_id like ?"
 			values = []any{bbs_num}
 			if view_sql != "" {
@@ -539,8 +539,8 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		} else if sort_type == "comment" {
-			view_sql, view_values = bbs_post_view_sql(db, bbs_num, config.IP, "title")
-			filter_sql, filter_values := bbs_filter_sql(filter, "title", config.IP)
+			view_sql, view_values = Bbs_post_view_sql(db, bbs_num, config.IP, "title")
+			filter_sql, filter_values := Bbs_filter_sql(filter, "title", config.IP)
 			query = "select title.set_code, title.set_id, '0' from bbs_data title where title.set_name = 'title' and title.set_id like ?"
 			values = []any{bbs_num}
 			if view_sql != "" {
@@ -549,12 +549,12 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 			}
 			query += filter_sql
 			values = append(values, filter_values...)
-			query += " order by " + bbs_post_comment_count_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
+			query += " order by " + Bbs_post_comment_count_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		} else if sort_type == "tabom" {
-			view_sql, view_values = bbs_post_view_sql(db, bbs_num, config.IP, "title")
-			filter_sql, filter_values := bbs_filter_sql(filter, "title", config.IP)
+			view_sql, view_values = Bbs_post_view_sql(db, bbs_num, config.IP, "title")
+			filter_sql, filter_values := Bbs_filter_sql(filter, "title", config.IP)
 			query = "select title.set_code, title.set_id, '0' from bbs_data title where title.set_name = 'title' and title.set_id like ?"
 			values = []any{bbs_num}
 			if view_sql != "" {
@@ -563,12 +563,12 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 			}
 			query += filter_sql
 			values = append(values, filter_values...)
-			query += " order by " + bbs_post_tabom_count_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
+			query += " order by " + Bbs_post_tabom_count_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		} else if sort_type == "excellent" {
-			view_sql, view_values = bbs_post_view_sql(db, bbs_num, config.IP, "title")
-			filter_sql, filter_values := bbs_filter_sql(filter, "title", config.IP)
+			view_sql, view_values = Bbs_post_view_sql(db, bbs_num, config.IP, "title")
+			filter_sql, filter_values := Bbs_filter_sql(filter, "title", config.IP)
 			query = "select title.set_code, title.set_id, '0' from bbs_data title where title.set_name = 'title' and title.set_id like ?"
 			values = []any{bbs_num}
 			if view_sql != "" {
@@ -577,14 +577,14 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 			}
 			query += filter_sql
 			values = append(values, filter_values...)
-			query += " and " + bbs_post_tabom_score_sql("title") + " > ?"
-			values = append(values, bbs_excellent_min(db, bbs_num))
-			query += " order by " + bbs_post_tabom_score_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
+			query += " and " + Bbs_post_tabom_score_sql("title") + " > ?"
+			values = append(values, Bbs_excellent_min(db, bbs_num))
+			query += " order by " + Bbs_post_tabom_score_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		} else {
-			view_sql, view_values = bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
-			filter_sql, filter_values := bbs_filter_sql(filter, "bbs_data", config.IP)
+			view_sql, view_values = Bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
+			filter_sql, filter_values := Bbs_filter_sql(filter, "bbs_data", config.IP)
 			query = "select set_code, set_id, '0' from bbs_data where set_name = 'title' and set_id like ?"
 			values = []any{bbs_num}
 			if view_sql != "" {
@@ -693,13 +693,13 @@ func api_bbs(config tool.Config, bbs_num string, page string, sort_type string, 
 	return return_data
 }
 
-func bbs_post_view_auth(db *sql.DB, set_id string, set_code string, ip string) (string, bool) {
+func Bbs_post_view_auth(db *sql.DB, set_id string, set_code string, ip string) (string, bool) {
 	_, title_exists := tool.Get_bbs_data_value(db, set_id, set_code, "title")
 	user_id, user_exists := tool.Get_bbs_data_value(db, set_id, set_code, "user_id")
 	if !title_exists || !user_exists {
 		return "", false
 	}
-	if !tool.Check_acl(db, set_id, "", "bbs_view", ip) || !bbs_post_view_allowed(db, set_id, set_code, user_id, ip, nil) {
+	if !tool.Check_acl(db, set_id, "", "bbs_view", ip) || !Bbs_post_view_allowed(db, set_id, set_code, user_id, ip, nil) {
 		return "", false
 	}
 	return user_id, true

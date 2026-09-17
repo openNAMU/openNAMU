@@ -15,13 +15,13 @@ func View_setting_phrase(config tool.Config) string {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	fields := setting_phrase_fields()
+	fields := Setting_phrase_fields()
 	values := make([]setting_field, 0, len(fields))
 	for _, field := range fields {
 		values = append(values, setting_field{name: field.name})
 	}
 
-	return view_setting_phrase_data(db, config, setting_load_fields(db, values))
+	return View_setting_phrase_data(db, config, Setting_load_fields(db, values))
 }
 
 type setting_phrase_field struct {
@@ -32,7 +32,7 @@ type setting_phrase_field struct {
 	class_name string
 }
 
-func setting_phrase_fields() []setting_phrase_field {
+func Setting_phrase_fields() []setting_phrase_field {
 	return []setting_phrase_field{
 		{name: "contract", label: "register_text"},
 		{name: "no_login_warning", label: "non_login_alert"},
@@ -73,7 +73,7 @@ func setting_phrase_fields() []setting_phrase_field {
 	}
 }
 
-func view_setting_phrase_data(db *sql.DB, config tool.Config, values map[string]string) string {
+func View_setting_phrase_data(db *sql.DB, config tool.Config, values map[string]string) string {
 	lang := func(name string) string {
 		return tool.Get_language(db, name, true)
 	}
@@ -81,35 +81,35 @@ func view_setting_phrase_data(db *sql.DB, config tool.Config, values map[string]
 	data := strings.Builder{}
 	data.WriteString(`<form method="post">`)
 
-	for _, field := range setting_phrase_fields() {
+	for _, field := range Setting_phrase_fields() {
 		data.WriteString(`<h2>` + lang(field.label) + `</h2>`)
 
 		switch field.name {
 		case "approval_question":
-			data.WriteString(`<sup><a href="/setting/main">` + lang("approval_question_visible_only_when_approval_on") + `</a></sup>` + main_hr())
+			data.WriteString(`<sup><a href="/setting/main">` + lang("approval_question_visible_only_when_approval_on") + `</a></sup>` + Main_hr())
 		case "outdated_doc_warning":
-			data.WriteString(`<span>` + lang("period") + ` (` + lang("day") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + main_hr())
+			data.WriteString(`<span>` + lang("period") + ` (` + lang("day") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + Main_hr())
 		case "redirect_text":
-			data.WriteString(`<span>EX : {0} ➤ {1}</span>` + main_hr())
+			data.WriteString(`<span>EX : {0} ➤ {1}</span>` + Main_hr())
 		}
 
 		if field.input {
-			data.WriteString(setting_input(field.name, values[field.name], "text"))
+			data.WriteString(Setting_input(field.name, values[field.name], "text"))
 		} else {
 			if field.markup {
-				data.WriteString(`<h3>` + lang("markup") + `</h3>` + setting_markup_select_ui(field.name+"_markup", setting_markup_value(db, field.name), "") + main_hr())
+				data.WriteString(`<h3>` + lang("markup") + `</h3>` + Setting_markup_select_ui(field.name+"_markup", Setting_markup_value(db, field.name), "") + Main_hr())
 			}
 			class_name := field.class_name
 			if class_name == "" {
 				class_name = "opennamu_textarea_100"
 			}
-			data.WriteString(setting_textarea(field.name, values[field.name], class_name))
+			data.WriteString(Setting_textarea(field.name, values[field.name], class_name))
 		}
 
-		data.WriteString(main_hr())
+		data.WriteString(Main_hr())
 	}
 
 	data.WriteString(`<button id="opennamu_save_button" type="submit">` + lang("save") + `</button></form>`)
 
-	return setting_page(db, config, lang("text_setting"), data.String(), "setting")
+	return Setting_page(db, config, lang("text_setting"), data.String(), "setting")
 }

@@ -6,10 +6,10 @@ import (
 	"opennamu/route/tool"
 )
 
-func setting_save_value(db tool.DB_runner, name string, coverage string, data string) {
+func Setting_save_value(db tool.DB_runner, name string, coverage string, data string) {
 	if sql_db, ok := db.(*sql.DB); ok {
 		if err := tool.DB_transaction(sql_db, func(tx *sql.Tx) error {
-			setting_save_value(tx, name, coverage, data)
+			Setting_save_value(tx, name, coverage, data)
 			return nil
 		}); err != nil {
 			panic(err)
@@ -44,12 +44,12 @@ func setting_save_value(db tool.DB_runner, name string, coverage string, data st
 	)
 }
 
-func setting_save_fields(db tool.DB_runner, fields []setting_field, form map[string]string) {
+func Setting_save_fields(db tool.DB_runner, fields []setting_field, form map[string]string) {
 	for _, field := range fields {
 		value, exists := form[field.name]
 		if !exists {
 			value = field.default_value
 		}
-		setting_save_value(db, field.name, "", value)
+		Setting_save_value(db, field.name, "", value)
 	}
 }

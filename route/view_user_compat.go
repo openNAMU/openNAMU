@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func user_field_values(values url.Values, field string) url.Values {
+func User_field_values(values url.Values, field string) url.Values {
 	if values == nil {
 		return nil
 	}
@@ -28,7 +28,7 @@ func user_field_values(values url.Values, field string) url.Values {
 	return copy_values
 }
 
-func user_skin_choice(set_list map[string][][]string, field string, value string) bool {
+func User_skin_choice(set_list map[string][][]string, field string, value string) bool {
 	for _, choice := range set_list[field] {
 		if len(choice) > 0 && choice[0] == value {
 			return true
@@ -37,7 +37,7 @@ func user_skin_choice(set_list map[string][][]string, field string, value string
 	return false
 }
 
-func user_skin_main_render_simple_set(db *sql.DB, data string) string {
+func User_skin_main_render_simple_set(db *sql.DB, data string) string {
 	heading_regex := regexp.MustCompile("(?s)<h([1-6])>([^<>]+)</h[1-6]>")
 	matches := heading_regex.FindAllStringSubmatch(data, -1)
 	if len(matches) == 0 {

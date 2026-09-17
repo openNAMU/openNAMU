@@ -9,127 +9,127 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func register_list_extra_routes(r *gin.Engine) {
+func Register_list_extra_routes(r *gin.Engine) {
 	r.GET("/list/document/all", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_document_all(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_document_all(Make_route_config(c), "1")))
 	})
 	r.GET("/list/document/all/:page", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_document_all(make_route_config(c), c.Param("page"))))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_document_all(Make_route_config(c), c.Param("page"))))
 	})
 	r.GET("/list/document/view", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), "1", "")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(Make_route_config(c), "1", "")))
 	})
 	r.GET("/list/document/view/month", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), "1", "month")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(Make_route_config(c), "1", "month")))
 	})
 	r.GET("/list/document/view/month/:page", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), c.Param("page"), "month")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(Make_route_config(c), c.Param("page"), "month")))
 	})
 	r.GET("/list/document/view/day", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), "1", "day")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(Make_route_config(c), "1", "day")))
 	})
 	r.GET("/list/document/view/day/:page", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), c.Param("page"), "day")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(Make_route_config(c), c.Param("page"), "day")))
 	})
 	r.GET("/list/document/view/not_exist", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_not_exist_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_not_exist_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/document/view/not_exist/:page", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_not_exist_page(make_route_config(c), c.Param("page"))))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_not_exist_page(Make_route_config(c), c.Param("page"))))
 	})
 	r.GET("/list/document/view/:page", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(make_route_config(c), c.Param("page"), "")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_view_page(Make_route_config(c), c.Param("page"), "")))
 	})
 	r.GET("/list/document/need", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_need_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_need_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/document/manual_category", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_no_data_manual_category_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_no_data_manual_category_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/category/need", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_category_need_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_category_need_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/category/no_link", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_category_unused_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_category_unused_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/document/no_link", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_no_link_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_no_link_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/document/unlinked", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_unlinked_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_unlinked_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/document/redirect/not_exist", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_redirect_not_exist_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_redirect_not_exist_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/document/redirect/not_exist/:page", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_redirect_not_exist_page(make_route_config(c), c.Param("page"))))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_redirect_not_exist_page(Make_route_config(c), c.Param("page"))))
 	})
 	r.GET("/list/document/redirect", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_redirect_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_redirect_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/document/redirect/:page", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_redirect_page(make_route_config(c), c.Param("page"))))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_redirect_page(Make_route_config(c), c.Param("page"))))
 	})
 	r.GET("/list/document/no_category", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_no_category_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_no_category_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/document/category/markup", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_category_markup_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_category_markup_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/document/category/markup/:page", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_category_markup_page(make_route_config(c), c.Param("page"))))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_category_markup_page(Make_route_config(c), c.Param("page"))))
 	})
 	r.GET("/list/contributor", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_contributor_page(make_route_config(c))))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_contributor_page(Make_route_config(c))))
 	})
 	r.GET("/statistics", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_statistics(make_route_config(c))))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_statistics(Make_route_config(c))))
 	})
 	r.GET("/list/file", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_file_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_file_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/file/unlinked", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_file_unlinked_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_file_unlinked_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/image", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_image_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_image_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/user", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_user_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_user_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/admin", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_admin_page(make_route_config(c), "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_admin_page(Make_route_config(c), "1")))
 	})
 	r.GET("/list/admin/auth_use", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_admin_auth_use_page(make_route_config(c), "1", "")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_admin_auth_use_page(Make_route_config(c), "1", "")))
 	})
 	r.GET("/list/user/check_submit/:user_name", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_user_check_submit(make_route_config(c), c.Param("user_name"))))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_list_user_check_submit(Make_route_config(c), c.Param("user_name"))))
 	})
 
 	r.GET("/record", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_page(make_route_config(c), "", "edit", "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_page(Make_route_config(c), "", "edit", "1")))
 	})
 	r.GET("/record/:user_name", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_page(make_route_config(c), c.Param("user_name"), "edit", "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_page(Make_route_config(c), c.Param("user_name"), "edit", "1")))
 	})
 	r.GET("/record/topic/:user_name", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_page(make_route_config(c), c.Param("user_name"), "topic", "1")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_page(Make_route_config(c), c.Param("user_name"), "topic", "1")))
 	})
 	r.GET("/record/reset", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_simple(make_route_config(c), "", "edit")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_simple(Make_route_config(c), "", "edit")))
 	})
 	r.GET("/record/reset/:user_name", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_reset(make_route_config(c), c.Param("user_name"), nil)))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_reset(Make_route_config(c), c.Param("user_name"), nil)))
 	})
 	r.POST("/record/reset/:user_name", func(c *gin.Context) {
 		_ = c.Request.ParseForm()
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_reset(make_route_config(c), c.Param("user_name"), c.Request.PostForm)))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_reset(Make_route_config(c), c.Param("user_name"), c.Request.PostForm)))
 	})
 	r.GET("/count", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_count(make_route_config(c), "")))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_count(Make_route_config(c), "")))
 	})
 	r.GET("/count/:user_name", func(c *gin.Context) {
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_count(make_route_config(c), strings.TrimPrefix(c.Param("user_name"), "/"))))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route.View_record_count(Make_route_config(c), strings.TrimPrefix(c.Param("user_name"), "/"))))
 	})
 }

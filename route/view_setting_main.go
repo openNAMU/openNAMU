@@ -15,7 +15,7 @@ func View_setting_main(config tool.Config) string {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	return view_setting_main_data(db, config, setting_load_fields(db, setting_main_fields()))
+	return View_setting_main_data(db, config, Setting_load_fields(db, Setting_main_fields()))
 }
 
 type setting_field struct {
@@ -23,21 +23,21 @@ type setting_field struct {
 	default_value string
 }
 
-func setting_value(db *sql.DB, name string, coverage string, default_value string) string {
+func Setting_value(db *sql.DB, name string, coverage string, default_value string) string {
 	return tool.Get_setting_value_exact(db, name, coverage, default_value)
 }
 
-func setting_load_fields(db *sql.DB, fields []setting_field) map[string]string {
+func Setting_load_fields(db *sql.DB, fields []setting_field) map[string]string {
 	data := make(map[string]string, len(fields))
 
 	for _, field := range fields {
-		data[field.name] = setting_value(db, field.name, "", field.default_value)
+		data[field.name] = Setting_value(db, field.name, "", field.default_value)
 	}
 
 	return data
 }
 
-func setting_form_value(form map[string]string, name string, default_value string) string {
+func Setting_form_value(form map[string]string, name string, default_value string) string {
 	value, exists := form[name]
 	if !exists {
 		return default_value
@@ -46,7 +46,7 @@ func setting_form_value(form map[string]string, name string, default_value strin
 	return value
 }
 
-func setting_checked(value string) string {
+func Setting_checked(value string) string {
 	if value != "" {
 		return `checked="checked"`
 	}
@@ -54,7 +54,7 @@ func setting_checked(value string) string {
 	return ""
 }
 
-func setting_options(current string, values []string, labels map[string]string) string {
+func Setting_options(current string, values []string, labels map[string]string) string {
 	data := strings.Builder{}
 
 	for _, value := range values {
@@ -82,7 +82,7 @@ func setting_options(current string, values []string, labels map[string]string) 
 	return data.String()
 }
 
-func setting_input(name string, value string, input_type string) string {
+func Setting_input(name string, value string, input_type string) string {
 	if input_type == "" {
 		input_type = "text"
 	}
@@ -90,7 +90,7 @@ func setting_input(name string, value string, input_type string) string {
 	return `<input type="` + tool.HTML_escape(input_type) + `" name="` + tool.HTML_escape(name) + `" value="` + tool.HTML_escape(value) + `">`
 }
 
-func setting_textarea(name string, value string, class_name string) string {
+func Setting_textarea(name string, value string, class_name string) string {
 	if class_name == "" {
 		class_name = "opennamu_textarea_100"
 	}
@@ -98,11 +98,11 @@ func setting_textarea(name string, value string, class_name string) string {
 	return `<textarea class="` + tool.HTML_escape(class_name) + `" name="` + tool.HTML_escape(name) + `">` + tool.HTML_escape(value) + `</textarea>`
 }
 
-func main_hr() string {
+func Main_hr() string {
 	return `<hr class="main_hr">`
 }
 
-func setting_page(db *sql.DB, config tool.Config, title string, data string, return_path string) string {
+func Setting_page(db *sql.DB, config tool.Config, title string, data string, return_path string) string {
 	menu := [][]any{}
 	if return_path != "" {
 		menu = append(menu, []any{return_path, tool.Get_language(db, "return", true)})
@@ -119,7 +119,7 @@ func setting_page(db *sql.DB, config tool.Config, title string, data string, ret
 	)
 }
 
-func setting_main_fields() []setting_field {
+func Setting_main_fields() []setting_field {
 	return []setting_field{
 		{name: "name", default_value: "Wiki"},
 		{name: "frontpage", default_value: "FrontPage"},
@@ -172,7 +172,7 @@ func setting_main_fields() []setting_field {
 	}
 }
 
-func view_setting_main_data(db *sql.DB, config tool.Config, values map[string]string) string {
+func View_setting_main_data(db *sql.DB, config tool.Config, values map[string]string) string {
 	lang := func(name string) string {
 		return tool.Get_language(db, name, true)
 	}
@@ -207,106 +207,106 @@ func view_setting_main_data(db *sql.DB, config tool.Config, values map[string]st
 	data.WriteString(`<form method="post">`)
 
 	data.WriteString(`<h2>` + lang("basic_set") + `</h2>`)
-	data.WriteString(`<span>` + lang("wiki_name") + `</span>` + main_hr())
-	data.WriteString(setting_input("name", values["name"], "text") + main_hr())
-	data.WriteString(`<span><a href="/setting/main/logo">(` + lang("wiki_logo") + `)</a></span>` + main_hr())
-	data.WriteString(`<span>` + lang("main_page") + `</span>` + main_hr())
-	data.WriteString(`<select name="frontpage_type">` + setting_options(values["frontpage_type"], []string{"document", "bbs"}, map[string]string{"document": lang("document"), "bbs": lang("bbs_main")}) + `</select>` + main_hr())
-	data.WriteString(setting_input("frontpage", values["frontpage"], "text") + main_hr())
-	data.WriteString(`<span>` + lang("tls_method") + `</span>` + main_hr())
-	data.WriteString(`<select name="http_select">` + setting_options(values["http_select"], []string{"http", "https"}, nil) + `</select>` + main_hr())
-	data.WriteString(`<span>` + lang("domain") + `</span> (EX : 2du.pythonanywhere.com) (` + lang("off") + ` : ` + lang("empty") + `)` + main_hr())
-	data.WriteString(setting_input("domain", values["domain"], "text") + main_hr())
-	data.WriteString(`<span>` + lang("wiki_host") + `</span>` + main_hr())
-	data.WriteString(setting_input("host", values["host"], "text") + main_hr())
-	data.WriteString(`<span>` + lang("wiki_port") + `</span>` + main_hr())
-	data.WriteString(setting_input("port", values["port"], "text") + main_hr())
-	data.WriteString(`<span>` + lang("wiki_secret_key") + `</span>` + main_hr())
-	data.WriteString(setting_input("key", values["key"], "password") + main_hr())
-	data.WriteString(`<label><input type="checkbox" name="wiki_access_password_need" ` + setting_checked(values["wiki_access_password_need"]) + `> ` + lang("set_wiki_access_password_need") + ` (` + lang("restart_required") + `)</label>` + main_hr())
-	data.WriteString(`<span>` + lang("set_wiki_access_password") + `</span> (` + lang("restart_required") + `)` + main_hr())
-	data.WriteString(setting_input("wiki_access_password", values["wiki_access_password"], "password") + main_hr())
-	data.WriteString(`<span>` + lang("wiki_load_ip_select") + `</span> (` + lang("restart_required") + `)` + main_hr())
-	data.WriteString(`<select name="load_ip_select">` + setting_options(values["load_ip_select"], ip_values, ip_labels) + `</select>` + main_hr())
+	data.WriteString(`<span>` + lang("wiki_name") + `</span>` + Main_hr())
+	data.WriteString(Setting_input("name", values["name"], "text") + Main_hr())
+	data.WriteString(`<span><a href="/setting/main/logo">(` + lang("wiki_logo") + `)</a></span>` + Main_hr())
+	data.WriteString(`<span>` + lang("main_page") + `</span>` + Main_hr())
+	data.WriteString(`<select name="frontpage_type">` + Setting_options(values["frontpage_type"], []string{"document", "bbs"}, map[string]string{"document": lang("document"), "bbs": lang("bbs_main")}) + `</select>` + Main_hr())
+	data.WriteString(Setting_input("frontpage", values["frontpage"], "text") + Main_hr())
+	data.WriteString(`<span>` + lang("tls_method") + `</span>` + Main_hr())
+	data.WriteString(`<select name="http_select">` + Setting_options(values["http_select"], []string{"http", "https"}, nil) + `</select>` + Main_hr())
+	data.WriteString(`<span>` + lang("domain") + `</span> (EX : 2du.pythonanywhere.com) (` + lang("off") + ` : ` + lang("empty") + `)` + Main_hr())
+	data.WriteString(Setting_input("domain", values["domain"], "text") + Main_hr())
+	data.WriteString(`<span>` + lang("wiki_host") + `</span>` + Main_hr())
+	data.WriteString(Setting_input("host", values["host"], "text") + Main_hr())
+	data.WriteString(`<span>` + lang("wiki_port") + `</span>` + Main_hr())
+	data.WriteString(Setting_input("port", values["port"], "text") + Main_hr())
+	data.WriteString(`<span>` + lang("wiki_secret_key") + `</span>` + Main_hr())
+	data.WriteString(Setting_input("key", values["key"], "password") + Main_hr())
+	data.WriteString(`<label><input type="checkbox" name="wiki_access_password_need" ` + Setting_checked(values["wiki_access_password_need"]) + `> ` + lang("set_wiki_access_password_need") + ` (` + lang("restart_required") + `)</label>` + Main_hr())
+	data.WriteString(`<span>` + lang("set_wiki_access_password") + `</span> (` + lang("restart_required") + `)` + Main_hr())
+	data.WriteString(Setting_input("wiki_access_password", values["wiki_access_password"], "password") + Main_hr())
+	data.WriteString(`<span>` + lang("wiki_load_ip_select") + `</span> (` + lang("restart_required") + `)` + Main_hr())
+	data.WriteString(`<select name="load_ip_select">` + Setting_options(values["load_ip_select"], ip_values, ip_labels) + `</select>` + Main_hr())
 	data.WriteString(`<h3>` + lang("authority_use_list") + `</h3>`)
-	data.WriteString(`<label><input type="checkbox" name="auth_history_off" ` + setting_checked(values["auth_history_off"]) + `> ` + lang("authority_use_list_off") + `</label>` + main_hr())
-	data.WriteString(`<span>` + lang("authority_use_list_expiration_date") + `</span> (` + lang("day") + `) (` + lang("off") + ` : ` + lang("empty") + `)` + main_hr())
-	data.WriteString(setting_input("auth_history_expiration_date", values["auth_history_expiration_date"], "text") + main_hr())
+	data.WriteString(`<label><input type="checkbox" name="auth_history_off" ` + Setting_checked(values["auth_history_off"]) + `> ` + lang("authority_use_list_off") + `</label>` + Main_hr())
+	data.WriteString(`<span>` + lang("authority_use_list_expiration_date") + `</span> (` + lang("day") + `) (` + lang("off") + ` : ` + lang("empty") + `)` + Main_hr())
+	data.WriteString(Setting_input("auth_history_expiration_date", values["auth_history_expiration_date"], "text") + Main_hr())
 	data.WriteString(`<h3>` + lang("communication_set") + `</h3>`)
-	data.WriteString(`<label><input type="checkbox" name="enable_comment" ` + setting_checked(values["enable_comment"]) + `> ` + lang("enable_comment_function") + `</label>` + main_hr())
-	data.WriteString(`<label><input type="checkbox" name="user_name_level" ` + setting_checked(values["user_name_level"]) + `> ` + lang("display_level_in_user_name") + `</label>` + main_hr())
-	data.WriteString(`<label><input type="checkbox" name="not_use_view_count" ` + setting_checked(values["not_use_view_count"]) + `> ` + lang("not_use_view_count") + `</label>` + main_hr())
-	data.WriteString(`<span>` + lang("bbs_excellent_min") + ` (` + lang("empty") + ` : 5)</span>` + main_hr())
-	data.WriteString(setting_input("bbs_excellent_min", values["bbs_excellent_min"], "number") + main_hr())
+	data.WriteString(`<label><input type="checkbox" name="enable_comment" ` + Setting_checked(values["enable_comment"]) + `> ` + lang("enable_comment_function") + `</label>` + Main_hr())
+	data.WriteString(`<label><input type="checkbox" name="user_name_level" ` + Setting_checked(values["user_name_level"]) + `> ` + lang("display_level_in_user_name") + `</label>` + Main_hr())
+	data.WriteString(`<label><input type="checkbox" name="not_use_view_count" ` + Setting_checked(values["not_use_view_count"]) + `> ` + lang("not_use_view_count") + `</label>` + Main_hr())
+	data.WriteString(`<span>` + lang("bbs_excellent_min") + ` (` + lang("empty") + ` : 5)</span>` + Main_hr())
+	data.WriteString(Setting_input("bbs_excellent_min", values["bbs_excellent_min"], "number") + Main_hr())
 
 	data.WriteString(`<h2>` + lang("design_set") + `</h2>`)
-	data.WriteString(`<span>` + lang("wiki_skin") + `</span>` + main_hr())
-	data.WriteString(`<select name="skin">` + setting_options(skin_value, skin_values, nil) + `</select>` + main_hr())
+	data.WriteString(`<span>` + lang("wiki_skin") + `</span>` + Main_hr())
+	data.WriteString(`<select name="skin">` + Setting_options(skin_value, skin_values, nil) + `</select>` + Main_hr())
 
 	data.WriteString(`<h2>` + lang("render_set") + `</h2>`)
-	data.WriteString(`<label><input type="checkbox" name="namumark_compatible" ` + setting_checked(values["namumark_compatible"]) + `> ` + lang("namumark_fully_compatible_mode") + `</label>` + main_hr())
-	data.WriteString(`<label><input type="checkbox" name="link_case_insensitive" ` + setting_checked(values["link_case_insensitive"]) + `> ` + lang("link_case_insensitive") + `</label>` + main_hr())
+	data.WriteString(`<label><input type="checkbox" name="namumark_compatible" ` + Setting_checked(values["namumark_compatible"]) + `> ` + lang("namumark_fully_compatible_mode") + `</label>` + Main_hr())
+	data.WriteString(`<label><input type="checkbox" name="link_case_insensitive" ` + Setting_checked(values["link_case_insensitive"]) + `> ` + lang("link_case_insensitive") + `</label>` + Main_hr())
 
 	data.WriteString(`<h2>` + lang("login_set") + `</h2>`)
-	data.WriteString(`<label><input type="checkbox" name="reg" ` + setting_checked(values["reg"]) + `> ` + lang("no_register") + `</label>` + main_hr())
-	data.WriteString(`<label><input type="checkbox" name="ip_view" ` + setting_checked(values["ip_view"]) + `> ` + lang("hide_ip") + `</label>` + main_hr())
-	data.WriteString(`<label><input type="checkbox" name="user_name_view" ` + setting_checked(values["user_name_view"]) + `> ` + lang("hide_user_name") + `</label>` + main_hr())
-	data.WriteString(`<span>` + lang("user_document_view_acl_all") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + main_hr())
-	data.WriteString(tool.Build_select("user_document_view_acl_all", acl_value_list(db, values["user_document_view_acl_all"]), values["user_document_view_acl_all"], lang("normal")) + main_hr())
-	data.WriteString(`<label><input type="checkbox" name="invite_required" ` + setting_checked(values["invite_required"]) + `> ` + lang("invite_required") + `</label>` + main_hr())
-	data.WriteString(`<label><input type="checkbox" name="requires_approval" ` + setting_checked(values["requires_approval"]) + `> ` + lang("requires_approval") + `</label>` + main_hr())
-	data.WriteString(`<span>` + lang("application_expiration_date") + ` (` + lang("day") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + main_hr())
-	data.WriteString(`<sup>` + lang("application_expiration_help") + `</sup>` + main_hr())
-	data.WriteString(setting_input("application_expiration_date", values["application_expiration_date"], "text") + main_hr())
-	data.WriteString(`<span>` + lang("application_expiration_action") + `</span>` + main_hr())
-	data.WriteString(`<select name="application_expiration_action">` + setting_options(values["application_expiration_action"], []string{"", "approve", "decline"}, map[string]string{"": lang("off"), "approve": lang("approve"), "decline": lang("decline")}) + `</select>` + main_hr())
-	data.WriteString(`<span>` + lang("password_min_length") + `</span> (` + lang("off") + ` : ` + lang("empty") + `)` + main_hr())
-	data.WriteString(setting_input("password_min_length", values["password_min_length"], "text") + main_hr())
-	data.WriteString(`<span>` + lang("encryption_method") + `</span>` + main_hr())
-	data.WriteString(`<select name="encode">` + setting_options(values["encode"], encode_values, nil) + `</select>` + main_hr())
+	data.WriteString(`<label><input type="checkbox" name="reg" ` + Setting_checked(values["reg"]) + `> ` + lang("no_register") + `</label>` + Main_hr())
+	data.WriteString(`<label><input type="checkbox" name="ip_view" ` + Setting_checked(values["ip_view"]) + `> ` + lang("hide_ip") + `</label>` + Main_hr())
+	data.WriteString(`<label><input type="checkbox" name="user_name_view" ` + Setting_checked(values["user_name_view"]) + `> ` + lang("hide_user_name") + `</label>` + Main_hr())
+	data.WriteString(`<span>` + lang("user_document_view_acl_all") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + Main_hr())
+	data.WriteString(tool.Build_select("user_document_view_acl_all", Acl_value_list(db, values["user_document_view_acl_all"]), values["user_document_view_acl_all"], lang("normal")) + Main_hr())
+	data.WriteString(`<label><input type="checkbox" name="invite_required" ` + Setting_checked(values["invite_required"]) + `> ` + lang("invite_required") + `</label>` + Main_hr())
+	data.WriteString(`<label><input type="checkbox" name="requires_approval" ` + Setting_checked(values["requires_approval"]) + `> ` + lang("requires_approval") + `</label>` + Main_hr())
+	data.WriteString(`<span>` + lang("application_expiration_date") + ` (` + lang("day") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + Main_hr())
+	data.WriteString(`<sup>` + lang("application_expiration_help") + `</sup>` + Main_hr())
+	data.WriteString(Setting_input("application_expiration_date", values["application_expiration_date"], "text") + Main_hr())
+	data.WriteString(`<span>` + lang("application_expiration_action") + `</span>` + Main_hr())
+	data.WriteString(`<select name="application_expiration_action">` + Setting_options(values["application_expiration_action"], []string{"", "approve", "decline"}, map[string]string{"": lang("off"), "approve": lang("approve"), "decline": lang("decline")}) + `</select>` + Main_hr())
+	data.WriteString(`<span>` + lang("password_min_length") + `</span> (` + lang("off") + ` : ` + lang("empty") + `)` + Main_hr())
+	data.WriteString(Setting_input("password_min_length", values["password_min_length"], "text") + Main_hr())
+	data.WriteString(`<span>` + lang("encryption_method") + `</span>` + Main_hr())
+	data.WriteString(`<select name="encode">` + Setting_options(values["encode"], encode_values, nil) + `</select>` + Main_hr())
 
 	data.WriteString(`<h3>` + lang("ua") + `</h3>`)
-	data.WriteString(`<label><input type="checkbox" name="ua_get" ` + setting_checked(values["ua_get"]) + `> ` + lang("ua_get_off") + `</label>` + main_hr())
-	data.WriteString(`<span>` + lang("ua_expiration_date") + `</span> (` + lang("day") + `) (` + lang("off") + ` : ` + lang("empty") + `)` + main_hr())
-	data.WriteString(setting_input("ua_expiration_date", values["ua_expiration_date"], "text") + main_hr())
+	data.WriteString(`<label><input type="checkbox" name="ua_get" ` + Setting_checked(values["ua_get"]) + `> ` + lang("ua_get_off") + `</label>` + Main_hr())
+	data.WriteString(`<span>` + lang("ua_expiration_date") + `</span> (` + lang("day") + `) (` + lang("off") + ` : ` + lang("empty") + `)` + Main_hr())
+	data.WriteString(Setting_input("ua_expiration_date", values["ua_expiration_date"], "text") + Main_hr())
 
 	data.WriteString(`<h2>` + lang("server_set") + `</h2>`)
-	data.WriteString(`<span>` + lang("update_branch") + `</span>` + main_hr())
-	data.WriteString(`<select name="update">` + setting_options(values["update"], []string{"stable", "beta"}, nil) + `</select>` + main_hr())
-	data.WriteString(`<label><input type="checkbox" name="auto_update" ` + setting_checked(values["auto_update"]) + `> ` + lang("auto_update") + `</label>` + main_hr())
+	data.WriteString(`<span>` + lang("update_branch") + `</span>` + Main_hr())
+	data.WriteString(`<select name="update">` + Setting_options(values["update"], []string{"stable", "beta"}, nil) + `</select>` + Main_hr())
+	data.WriteString(`<label><input type="checkbox" name="auto_update" ` + Setting_checked(values["auto_update"]) + `> ` + lang("auto_update") + `</label>` + Main_hr())
 	data.WriteString(`<span` + sqlite_only + `>`)
 	data.WriteString(`<h3>` + lang("backup") + ` (` + lang("sqlite_only") + `)</h3>`)
-	data.WriteString(`<span>` + lang("backup_warning") + ` (EX : data_YYYYMMDDHHMMSS.db)</span>` + main_hr())
-	data.WriteString(`<span>` + lang("backup_interval") + ` (` + lang("hour") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + main_hr())
-	data.WriteString(setting_input("back_up", values["back_up"], "text") + main_hr())
-	data.WriteString(`<span>` + lang("backup_where") + ` (` + lang("default") + ` : ` + lang("empty") + `) (` + lang("example") + ` : ./data/backup.db)</span>` + main_hr())
-	data.WriteString(setting_input("backup_where", values["backup_where"], "text") + main_hr())
-	data.WriteString(`<span>` + lang("backup_count") + ` (` + lang("default") + ` : ` + lang("empty") + `)</span>` + main_hr())
-	data.WriteString(setting_input("backup_count", values["backup_count"], "text") + main_hr())
+	data.WriteString(`<span>` + lang("backup_warning") + ` (EX : data_YYYYMMDDHHMMSS.db)</span>` + Main_hr())
+	data.WriteString(`<span>` + lang("backup_interval") + ` (` + lang("hour") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + Main_hr())
+	data.WriteString(Setting_input("back_up", values["back_up"], "text") + Main_hr())
+	data.WriteString(`<span>` + lang("backup_where") + ` (` + lang("default") + ` : ` + lang("empty") + `) (` + lang("example") + ` : ./data/backup.db)</span>` + Main_hr())
+	data.WriteString(Setting_input("backup_where", values["backup_where"], "text") + Main_hr())
+	data.WriteString(`<span>` + lang("backup_count") + ` (` + lang("default") + ` : ` + lang("empty") + `)</span>` + Main_hr())
+	data.WriteString(Setting_input("backup_count", values["backup_count"], "text") + Main_hr())
 	data.WriteString(`</span>`)
 
 	data.WriteString(`<h2>` + lang("edit_set") + `</h2>`)
-	data.WriteString(`<span>` + lang("slow_edit") + ` (` + lang("second") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + main_hr())
-	data.WriteString(setting_input("slow_edit", values["slow_edit"], "text") + main_hr())
-	data.WriteString(`<label><input type="checkbox" name="edit_bottom_compulsion" ` + setting_checked(values["edit_bottom_compulsion"]) + `> ` + lang("edit_bottom_compulsion") + `</label>` + main_hr())
-	data.WriteString(`<span>` + lang("title_max_length") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + main_hr())
-	data.WriteString(setting_input("title_max_length", values["title_max_length"], "text") + main_hr())
-	data.WriteString(`<span>` + lang("title_topic_max_length") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + main_hr())
-	data.WriteString(setting_input("title_topic_max_length", values["title_topic_max_length"], "text") + main_hr())
-	data.WriteString(`<span>` + lang("max_file_size") + ` (MB)</span>` + main_hr())
-	data.WriteString(setting_input("upload", values["upload"], "text") + main_hr())
-	data.WriteString(`<label><input type="checkbox" name="history_recording_off" ` + setting_checked(values["history_recording_off"]) + `> ` + lang("set_history_recording_off") + `</label>` + main_hr())
-	data.WriteString(`<label><input type="checkbox" name="move_with_redirect" ` + setting_checked(values["move_with_redirect"]) + `> ` + lang("move_with_redirect") + ` (` + lang("not_working") + `)</label>` + main_hr())
-	data.WriteString(`<span>` + lang("slow_thread") + ` (` + lang("second") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + main_hr())
-	data.WriteString(setting_input("slow_thread", values["slow_thread"], "text") + main_hr())
-	data.WriteString(`<span>` + lang("edit_timeout") + ` (` + lang("second") + `) (` + lang("off") + ` : ` + lang("empty") + `) (` + lang("linux_only") + `)</span>` + main_hr())
-	data.WriteString(setting_input("edit_timeout", values["edit_timeout"], "text") + main_hr())
-	data.WriteString(`<span>` + lang("document_content_max_length") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + main_hr())
-	data.WriteString(setting_input("document_content_max_length", values["document_content_max_length"], "text") + main_hr())
-	data.WriteString(`<span>` + lang("bbs_content_max_length") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + main_hr())
-	data.WriteString(setting_input("bbs_content_max_length", values["bbs_content_max_length"], "text") + main_hr())
+	data.WriteString(`<span>` + lang("slow_edit") + ` (` + lang("second") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + Main_hr())
+	data.WriteString(Setting_input("slow_edit", values["slow_edit"], "text") + Main_hr())
+	data.WriteString(`<label><input type="checkbox" name="edit_bottom_compulsion" ` + Setting_checked(values["edit_bottom_compulsion"]) + `> ` + lang("edit_bottom_compulsion") + `</label>` + Main_hr())
+	data.WriteString(`<span>` + lang("title_max_length") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + Main_hr())
+	data.WriteString(Setting_input("title_max_length", values["title_max_length"], "text") + Main_hr())
+	data.WriteString(`<span>` + lang("title_topic_max_length") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + Main_hr())
+	data.WriteString(Setting_input("title_topic_max_length", values["title_topic_max_length"], "text") + Main_hr())
+	data.WriteString(`<span>` + lang("max_file_size") + ` (MB)</span>` + Main_hr())
+	data.WriteString(Setting_input("upload", values["upload"], "text") + Main_hr())
+	data.WriteString(`<label><input type="checkbox" name="history_recording_off" ` + Setting_checked(values["history_recording_off"]) + `> ` + lang("set_history_recording_off") + `</label>` + Main_hr())
+	data.WriteString(`<label><input type="checkbox" name="move_with_redirect" ` + Setting_checked(values["move_with_redirect"]) + `> ` + lang("move_with_redirect") + ` (` + lang("not_working") + `)</label>` + Main_hr())
+	data.WriteString(`<span>` + lang("slow_thread") + ` (` + lang("second") + `) (` + lang("off") + ` : ` + lang("empty") + `)</span>` + Main_hr())
+	data.WriteString(Setting_input("slow_thread", values["slow_thread"], "text") + Main_hr())
+	data.WriteString(`<span>` + lang("edit_timeout") + ` (` + lang("second") + `) (` + lang("off") + ` : ` + lang("empty") + `) (` + lang("linux_only") + `)</span>` + Main_hr())
+	data.WriteString(Setting_input("edit_timeout", values["edit_timeout"], "text") + Main_hr())
+	data.WriteString(`<span>` + lang("document_content_max_length") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + Main_hr())
+	data.WriteString(Setting_input("document_content_max_length", values["document_content_max_length"], "text") + Main_hr())
+	data.WriteString(`<span>` + lang("bbs_content_max_length") + ` (` + lang("off") + ` : ` + lang("empty") + `)</span>` + Main_hr())
+	data.WriteString(Setting_input("bbs_content_max_length", values["bbs_content_max_length"], "text") + Main_hr())
 
 	data.WriteString(`<button id="opennamu_save_button" type="submit">` + lang("save") + `</button></form>`)
 
-	return setting_page(db, config, lang("main_setting"), data.String(), "setting")
+	return Setting_page(db, config, lang("main_setting"), data.String(), "setting")
 }

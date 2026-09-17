@@ -77,7 +77,7 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 		if include == "1" {
 			compat_render_type = "include"
 		}
-		compat_data := render_namumark_compat(db, doc_name, data, compat_render_type, parameter_data, 0, false)
+		compat_data := Render_namumark_compat(db, doc_name, data, compat_render_type, parameter_data, 0, false)
 		if render_type == "setting" {
 			return map[string]string{
 				"data":    compat_data["data"].(string),
@@ -91,7 +91,7 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 	}
 
 	if backlink_mode && (markup == "namumark" || markup == "namumark_beta") {
-		return render_namumark_compat_backlink(db, doc_name, data)
+		return Render_namumark_compat_backlink(db, doc_name, data)
 	}
 
 	render_data := make(map[string]any)
@@ -107,7 +107,7 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 		switch markup {
 		case "namumark", "namumark_beta":
 			render_data_class := Namumark_new(db, doc_data_set, parameter_data)
-			render_data = render_data_class.main()
+			render_data = render_data_class.Main()
 		case "markdown":
 			render_data = Markdown(db, doc_data_set)
 		case "plain", "raw":
@@ -115,7 +115,7 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 			render_data["js_data"] = ""
 		case "macromark":
 			render_data_class := Macromark_new(db, doc_data_set, "html")
-			render_data = render_data_class.main()
+			render_data = render_data_class.Main()
 		case "html", "custom":
 			render_data["data"] = data
 			render_data["js_data"] = ""

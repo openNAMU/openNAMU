@@ -6,15 +6,15 @@ import (
 	"opennamu/route/tool"
 )
 
-func user_value(db *sql.DB, id string, name string) string {
+func User_value(db *sql.DB, id string, name string) string {
 	return tool.Get_user_set_data(db, id, name)
 }
 
-func user_form_page(db *sql.DB, config tool.Config, title string, body string) string {
+func User_form_page(db *sql.DB, config tool.Config, title string, body string) string {
 	return tool.Get_template(db, config, title, body, []any{}, [][]any{{"user", tool.Get_language(db, "return", true)}}, map[string]string{})
 }
 
-func user_auth(db *sql.DB, config tool.Config) bool {
+func User_auth(db *sql.DB, config tool.Config) bool {
 	return !tool.IP_or_user(config.IP)
 }
 func View_user_safe(config tool.Config, user_name string) string {
@@ -63,5 +63,5 @@ func View_user_safe(config tool.Config, user_name string) string {
 		body += "<hr class=\"main_hr\"><ul><li><a href=\"/alarm_user/" + tool.Url_parser(user_name) + "/send\">" + tool.Get_language(db, "alarm_send", true) + "</a></li></ul>"
 	}
 
-	return user_form_page(db, config, tool.Get_language(db, "user_tool", true), body)
+	return User_form_page(db, config, tool.Get_language(db, "user_tool", true), body)
 }

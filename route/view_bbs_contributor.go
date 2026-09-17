@@ -20,13 +20,13 @@ func View_bbs_contributor(config tool.Config) string {
 	next_month_start := month_start.AddDate(0, 1, 0)
 	auth_info := tool.Get_auth_info(db, config.IP)
 	bbs_ids := []string{}
-	for _, bbs_id := range bbs_list(db) {
-		if tool.Check_acl(db, bbs_id, "", "bbs_view", config.IP) && bbs_post_view_allowed(db, bbs_id, "", "", config.IP, auth_info) {
+	for _, bbs_id := range Bbs_list(db) {
+		if tool.Check_acl(db, bbs_id, "", "bbs_view", config.IP) && Bbs_post_view_allowed(db, bbs_id, "", "", config.IP, auth_info) {
 			bbs_ids = append(bbs_ids, bbs_id)
 		}
 	}
 	if len(bbs_ids) == 0 {
-		return list_extra_page(db, config, tool.Get_language(db, "monthly_bbs_contributor", true), tool.Get_language(db, "data_missing", true))
+		return List_extra_page(db, config, tool.Get_language(db, "monthly_bbs_contributor", true), tool.Get_language(db, "data_missing", true))
 	}
 
 	rows := tool.Get_month_bbs_contributor_rows(
@@ -51,5 +51,5 @@ func View_bbs_contributor(config tool.Config) string {
 		body = tool.Get_language(db, "data_missing", true)
 	}
 
-	return list_extra_page(db, config, tool.Get_language(db, "monthly_bbs_contributor", true), body)
+	return List_extra_page(db, config, tool.Get_language(db, "monthly_bbs_contributor", true), body)
 }

@@ -11,10 +11,10 @@ func View_setting_email_test(config tool.Config) string {
 	}
 
 	data := `<form method="post">`
-	data += setting_input("title", "", "text") + main_hr()
-	data += setting_input("email", "", "email") + main_hr()
-	data += setting_textarea("data", "", "opennamu_textarea_500") + main_hr()
+	data += Setting_input("title", "", "text") + Main_hr()
+	data += Setting_input("email", "", "email") + Main_hr()
+	data += Setting_textarea("data", "", "opennamu_textarea_500") + Main_hr()
 	data += `<button type="submit">` + tool.Get_language(db, "send", true) + `</button></form>`
 
-	return setting_page(db, config, tool.Get_language(db, "email_test", true), data, "setting/external")
+	return Setting_page(db, config, tool.Get_language(db, "email_test", true), data, "setting/external")
 }

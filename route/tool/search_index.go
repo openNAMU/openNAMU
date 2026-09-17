@@ -33,7 +33,7 @@ var search_index_ready bool
 var search_index_start_once sync.Once
 var search_index_pending = map[string]search_index_change{}
 
-func search_index_field_mapping() *mapping.FieldMapping {
+func Search_index_field_mapping() *mapping.FieldMapping {
 	field_mapping := mapping.NewTextFieldMapping()
 	field_mapping.Analyzer = "cjk"
 	field_mapping.Store = false
@@ -43,7 +43,7 @@ func search_index_field_mapping() *mapping.FieldMapping {
 	return field_mapping
 }
 
-func search_index_mapping() *mapping.IndexMappingImpl {
+func Search_index_mapping() *mapping.IndexMappingImpl {
 	index_mapping := bleve.NewIndexMapping()
 	index_mapping.DefaultAnalyzer = "cjk"
 	index_mapping.StoreDynamic = false
@@ -52,8 +52,8 @@ func search_index_mapping() *mapping.IndexMappingImpl {
 
 	document_mapping := mapping.NewDocumentMapping()
 	document_mapping.Dynamic = false
-	document_mapping.AddFieldMappingsAt("title_search", search_index_field_mapping())
-	document_mapping.AddFieldMappingsAt("data", search_index_field_mapping())
+	document_mapping.AddFieldMappingsAt("title_search", Search_index_field_mapping())
+	document_mapping.AddFieldMappingsAt("data", Search_index_field_mapping())
 	index_mapping.DefaultMapping = document_mapping
 
 	return index_mapping
@@ -61,7 +61,7 @@ func search_index_mapping() *mapping.IndexMappingImpl {
 
 func Search_index_start() {
 	search_index_start_once.Do(func() {
-		go search_index_open()
+		go Search_index_open()
 	})
 }
 
@@ -71,22 +71,22 @@ func Search_index_ready() bool {
 	return search_index_ready
 }
 
-func search_index_version_valid() bool {
+func Search_index_version_valid() bool {
 	data, err := os.ReadFile(search_index_version_file)
 	return err == nil && string(data) == search_index_version
 }
 
-func search_index_apply_change(index bleve.Index, doc_name string, change search_index_change) error {
+func Search_index_apply_change(index bleve.Index, doc_name string, change search_index_change) error {
 	if change.Deleted {
 		return index.Delete(doc_name)
 	}
 	return index.Index(doc_name, Search_document{Do_remove_spaces(doc_name), change.Data})
 }
 
-func search_index_set_ready(index bleve.Index) {
+func Search_index_set_ready(index bleve.Index) {
 	search_index_lock.Lock()
 	for doc_name, change := range search_index_pending {
-		if err := search_index_apply_change(index, doc_name, change); err != nil {
+		if err := Search_index_apply_change(index, doc_name, change); err != nil {
 			log.Printf("[SEARCH] pending document update failed: %v", err)
 		}
 	}
@@ -96,15 +96,15 @@ func search_index_set_ready(index bleve.Index) {
 	search_index_lock.Unlock()
 }
 
-func search_index_open() {
+func Search_index_open() {
 	if err := os.MkdirAll(filepath.Dir(search_index_directory), 0o755); err != nil {
 		log.Printf("[SEARCH] index directory failed: %v", err)
 		return
 	}
 
 	index, err := bleve.Open(search_index_directory)
-	if err == nil && search_index_version_valid() {
-		search_index_set_ready(index)
+	if err == nil && Search_index_version_valid() {
+		Search_index_set_ready(index)
 		log.Println("[SEARCH] index opened")
 		return
 	}
@@ -117,16 +117,16 @@ func search_index_open() {
 
 	_ = os.RemoveAll(search_index_directory)
 	_ = os.Remove(search_index_version_file)
-	search_index_rebuild()
+	Search_index_rebuild()
 }
 
-func search_index_rebuild() {
+func Search_index_rebuild() {
 	db := DB_connect()
 	defer DB_close(db)
 
 	temp_directory := search_index_directory + ".tmp"
 	_ = os.RemoveAll(temp_directory)
-	index, err := bleve.New(temp_directory, search_index_mapping())
+	index, err := bleve.New(temp_directory, Search_index_mapping())
 	if err != nil {
 		log.Printf("[SEARCH] index create failed: %v", err)
 		return
@@ -185,7 +185,7 @@ func search_index_rebuild() {
 		log.Printf("[SEARCH] index reopen failed: %v", err)
 		return
 	}
-	search_index_set_ready(index)
+	Search_index_set_ready(index)
 	log.Println("[SEARCH] index built")
 }
 

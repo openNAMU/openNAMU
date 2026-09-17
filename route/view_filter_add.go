@@ -14,7 +14,7 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	spec, ok := get_filter_spec(kind)
+	spec, ok := Get_filter_spec(kind)
 	if !ok {
 		return tool.Get_error_page(db, config, "error")
 	}
@@ -33,14 +33,14 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 		return tool.Get_redirect("/filter/" + kind)
 	}
 
-	value := filter_value(db, spec.db_kind, name)
+	value := Filter_value(db, spec.db_kind, name)
 	title := tool.Get_language(db, spec.title, true)
 	form := `<form method="post">`
 	switch kind {
 	case "inter_wiki", "outer_link":
-		form += filter_input(tool.Get_language(db, "name", true), "title", value[0])
-		form += `<hr class="main_hr">` + filter_input(tool.Get_language(db, "link", true), "link", value[1])
-		form += `<hr class="main_hr">` + filter_input(tool.Get_language(db, "icon", true), "icon", value[2])
+		form += Filter_input(tool.Get_language(db, "name", true), "title", value[0])
+		form += `<hr class="main_hr">` + Filter_input(tool.Get_language(db, "link", true), "link", value[1])
+		form += `<hr class="main_hr">` + Filter_input(tool.Get_language(db, "icon", true), "icon", value[2])
 		if kind == "inter_wiki" {
 			inter_type := "url_encode"
 			sub_type := tool.Get_html_filter_inter_wiki_sub(db, name)
@@ -50,9 +50,9 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 			form += `<hr class="main_hr">` + tool.Build_select("inter_type", []string{"url_encode", "under_bar"}, inter_type, "normal")
 		}
 	case "external_image":
-		form += filter_input(tool.Get_language(db, "domain", true), "title", value[0])
+		form += Filter_input(tool.Get_language(db, "domain", true), "title", value[0])
 	case "html":
-		form += filter_input(tool.Get_language(db, "tag", true), "title", value[0])
+		form += Filter_input(tool.Get_language(db, "tag", true), "title", value[0])
 	case "edit_filter":
 		end := ""
 		if value[2] != "" && value[2] != "X" {
@@ -60,34 +60,34 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 			end = strconv.Itoa(seconds / (24 * 60 * 60))
 		}
 		if name == "" {
-			form += filter_input(tool.Get_language(db, "name", true), "title", "")
+			form += Filter_input(tool.Get_language(db, "name", true), "title", "")
 		} else {
 			form += `<input type="hidden" name="title" value="` + tool.HTML_escape(name) + `">`
 		}
-		form += filter_input(tool.Get_language(db, "day", true), "day", end)
-		form += `<hr class="main_hr">` + filter_input(tool.Get_language(db, "regex", true), "content", value[1])
+		form += Filter_input(tool.Get_language(db, "day", true), "day", end)
+		form += `<hr class="main_hr">` + Filter_input(tool.Get_language(db, "regex", true), "content", value[1])
 	case "document":
-		form += filter_input(tool.Get_language(db, "name", true), "name", name)
-		form += `<hr class="main_hr">` + filter_input(tool.Get_language(db, "regex", true), "regex", value[1])
+		form += Filter_input(tool.Get_language(db, "name", true), "name", name)
+		form += `<hr class="main_hr">` + Filter_input(tool.Get_language(db, "regex", true), "regex", value[1])
 		form += `<hr class="main_hr"><span>` + tool.Get_language(db, "acl", true) + `</span><hr class="main_hr"><textarea name="acl" placeholder="view=normal&#10;edit=trust_a&#10;move=owner&#10;delete=owner&#10;new_make=trust_a">` + tool.HTML_escape(value[2]) + `</textarea>`
 	case "name_filter", "file_filter":
-		form += filter_input(tool.Get_language(db, "regex", true), "title", name)
+		form += Filter_input(tool.Get_language(db, "regex", true), "title", name)
 	case "replace_filter":
-		form += filter_input(tool.Get_language(db, "regex", true), "title", name)
-		form += `<hr class="main_hr">` + filter_input(tool.Get_language(db, "replacement", true), "replacement", value[1])
+		form += Filter_input(tool.Get_language(db, "regex", true), "title", name)
+		form += `<hr class="main_hr">` + Filter_input(tool.Get_language(db, "replacement", true), "replacement", value[1])
 	case "email_filter":
-		form += filter_input(tool.Get_language(db, "email", true), "title", name)
+		form += Filter_input(tool.Get_language(db, "email", true), "title", name)
 	case "image_license":
-		form += filter_input(tool.Get_language(db, "license", true), "title", name)
+		form += Filter_input(tool.Get_language(db, "license", true), "title", name)
 	case "extension_filter":
-		form += filter_input(tool.Get_language(db, "extension", true), "title", name)
-		form += `<hr class="main_hr">` + filter_input(tool.Get_language(db, "max_file_size", true), "max_file_size", value[1])
+		form += Filter_input(tool.Get_language(db, "extension", true), "title", name)
+		form += `<hr class="main_hr">` + Filter_input(tool.Get_language(db, "max_file_size", true), "max_file_size", value[1])
 	case "template":
-		form += filter_input(tool.Get_language(db, "template", true), "title", name)
-		form += `<hr class="main_hr">` + filter_input(tool.Get_language(db, "explanation", true), "exp", value[1])
+		form += Filter_input(tool.Get_language(db, "template", true), "title", name)
+		form += `<hr class="main_hr">` + Filter_input(tool.Get_language(db, "explanation", true), "exp", value[1])
 	default:
-		form += filter_input(tool.Get_language(db, "title", true), "title", name)
-		form += `<hr class="main_hr">` + filter_input(tool.Get_language(db, "markup", true), "markup", value[1])
+		form += Filter_input(tool.Get_language(db, "title", true), "title", name)
+		form += `<hr class="main_hr">` + Filter_input(tool.Get_language(db, "markup", true), "markup", value[1])
 	}
 	form += `<hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 
@@ -99,7 +99,7 @@ type filter_spec struct {
 	title   string
 }
 
-func get_filter_spec(kind string) (filter_spec, bool) {
+func Get_filter_spec(kind string) (filter_spec, bool) {
 	list := map[string]filter_spec{
 		"inter_wiki":       {"inter_wiki", "interwiki_list"},
 		"outer_link":       {"outer_link", "outer_link_filter_list"},
@@ -127,11 +127,11 @@ var html_filter_blocked_tags = map[string]bool{
 	"embed": true, "object": true, "script": true, "style": true,
 }
 
-func filter_value(db *sql.DB, kind string, name string) []string {
+func Filter_value(db *sql.DB, kind string, name string) []string {
 	return tool.Get_html_filter_value(db, name, kind)
 }
 
-func filter_safe_link(value string) string {
+func Filter_safe_link(value string) string {
 	parsed, err := url.Parse(value)
 	if err != nil || (parsed.Scheme != "" && parsed.Scheme != "http" && parsed.Scheme != "https") {
 		return "#"
@@ -139,15 +139,15 @@ func filter_safe_link(value string) string {
 	return tool.HTML_escape(value)
 }
 
-func filter_input(label string, name string, value string) string {
+func Filter_input(label string, name string, value string) string {
 	return `<span>` + label + `</span><hr class="main_hr"><input name="` + name + `" value="` + tool.HTML_escape(value) + `">`
 }
 
-func document_filter_acl_data(db *sql.DB, data string) (string, bool) {
+func Document_filter_acl_data(db *sql.DB, data string) (string, bool) {
 	data = strings.ReplaceAll(data, "\r", "")
 	if !strings.Contains(data, "=") {
 		data = strings.TrimSpace(data)
-		if data == "normal" || acl_value_valid(db, data) {
+		if data == "normal" || Acl_value_valid(db, data) {
 			return data, true
 		}
 		return "", false
@@ -174,7 +174,7 @@ func document_filter_acl_data(db *sql.DB, data string) (string, bool) {
 		}
 		action := strings.TrimSpace(parts[0])
 		acl := strings.TrimSpace(parts[1])
-		if !valid_action[action] || seen[action] || (acl != "normal" && !acl_value_valid(db, acl)) {
+		if !valid_action[action] || seen[action] || (acl != "normal" && !Acl_value_valid(db, acl)) {
 			return "", false
 		}
 

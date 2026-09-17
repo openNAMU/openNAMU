@@ -27,7 +27,7 @@ func View_user_skin_main(config tool.Config, values url.Values) string {
 			if value == "" && len(choices) > 0 {
 				value = choices[0][0]
 			}
-			if !user_skin_choice(set_list, field, value) {
+			if !User_skin_choice(set_list, field, value) {
 				continue
 			}
 			if field == "main_css_darkmode" {
@@ -66,7 +66,7 @@ func View_user_skin_main(config tool.Config, values url.Values) string {
 			value, _ := config.Session.Get(field).(string)
 			return value
 		}
-		return user_value(db, config.IP, field)
+		return User_value(db, config.IP, field)
 	}
 	field_data := func(field string, label string, heading string) string {
 		choices := set_list[field]
@@ -135,6 +135,6 @@ func View_user_skin_main(config tool.Config, values url.Values) string {
 		{"change/skin_set", tool.Get_language(db, "skin_set", true)},
 		{"setting/skin_set", tool.Get_language(db, "main_skin_set_default", true)},
 	}
-	body_data := user_skin_main_render_simple_set(db, body.String())
+	body_data := User_skin_main_render_simple_set(db, body.String())
 	return tool.Get_template(db, config, tool.Get_language(db, "main_skin_set", true), body_data, []any{}, menu, map[string]string{})
 }

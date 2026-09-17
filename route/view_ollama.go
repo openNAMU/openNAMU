@@ -15,24 +15,24 @@ func View_ollama(config tool.Config, question string, model string) string {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	provider := ai_provider(db)
+	provider := Ai_provider(db)
 	question = strings.TrimSpace(question)
 	if tool.Get_len(question) > 1000 {
 		question = tool.Get_slice(question, 0, 1000)
 	}
-	model = ai_model_value(db, model)
+	model = Ai_model_value(db, model)
 
 	data_html := `<p>` + tool.Get_language(db, "ai_requirement", true) + `</p>`
 	if provider != "ollama" {
 		data_html += `<p>` + tool.Get_language(db, "ai_external_warning", true) + `</p>`
 	}
 	data_html += `<form method="post" action="/ai">` +
-		`<textarea class="opennamu_textarea_100" name="question" placeholder="` + tool.Get_language(db, "ai_question", true) + `">` + tool.HTML_escape(question) + `</textarea>` +
-		`<input name="model" value="` + tool.HTML_escape(model) + `" placeholder="` + tool.Get_language(db, "ai_model", true) + `">` +
-		`<hr class="main_hr"><button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
+		`<textarea class="opennamu_textarea_100" name="question" placeholder="` + tool.Get_language(db, "ai_question", true) + `">` + tool.HTML_escape(question) + `</textarea><hr class="main_hr">` +
+		`<input name="model" value="` + tool.HTML_escape(model) + `" placeholder="` + tool.Get_language(db, "ai_model", true) + `"><hr class="main_hr">` +
+		`<button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
 
 	if question != "" {
-		context_data, source_list := ollama_document_context(db, config, question)
+		context_data, source_list := Ollama_document_context(db, config, question)
 		prompt := "너는 위키 문서 검색을 돕는 AI다. 아래 참고 문서에 있는 내용만 근거로 답변하고, 근거가 없으면 모른다고 답변해라. 참고 문서:\n\n" + context_data + "\n질문: " + question
 		answer, err := Api_ai_stream(db, model, prompt)
 		if err != nil {
@@ -63,7 +63,7 @@ func View_ollama(config tool.Config, question string, model string) string {
 	)
 }
 
-func ollama_document_context(db *sql.DB, config tool.Config, question string) (string, []string) {
+func Ollama_document_context(db *sql.DB, config tool.Config, question string) (string, []string) {
 	search_data := Api_func_search(config, question, "1", "data")
 	title_list, _ := search_data["data"].([]string)
 	if len(title_list) > 3 {

@@ -85,7 +85,7 @@ func Do_insert_auth_history(db DB_runner, ip string, what string) {
 	}
 }
 
-func auth_end_active(end string) bool {
+func Auth_end_active(end string) bool {
 	if end == "" || end == "0" {
 		return true
 	}
@@ -106,7 +106,7 @@ func Get_auth_default_end_date() string {
 	return time.Now().AddDate(100, 0, 0).Format("2006-01-02 15:04:05")
 }
 
-func get_user_auth_raw(db *sql.DB, ip string) string {
+func Get_user_auth_raw(db *sql.DB, ip string) string {
 	auth := "ip"
 	acl_end := ""
 	exist := QueryRow_DB(
@@ -116,7 +116,7 @@ func get_user_auth_raw(db *sql.DB, ip string) string {
 		ip,
 	)
 
-	if exist && !auth_end_active(acl_end) {
+	if exist && !Auth_end_active(acl_end) {
 		exist = false
 	}
 
@@ -134,7 +134,7 @@ func get_user_auth_raw(db *sql.DB, ip string) string {
 	return auth
 }
 
-func get_ban_auth_group(db DB_runner, login string) string {
+func Get_ban_auth_group(db DB_runner, login string) string {
 	switch login {
 	case "L", "O", "ban":
 		return "ban"
@@ -163,14 +163,14 @@ func Get_auth_target_group(db *sql.DB, target string, target_type string) string
 		target,
 		target_type,
 	)
-	if auth == "" || !auth_end_active(end) {
+	if auth == "" || !Auth_end_active(end) {
 		return "ip"
 	}
 
-	return get_ban_auth_group(db, auth)
+	return Get_ban_auth_group(db, auth)
 }
 
-func get_pattern_auth_group(db *sql.DB, ip string) string {
+func Get_pattern_auth_group(db *sql.DB, ip string) string {
 	rows := Query_DB(
 		db,
 		"select login, block, end from rb where band = 'regex' and ongoing = '1'",
@@ -182,14 +182,14 @@ func get_pattern_auth_group(db *sql.DB, ip string) string {
 		if rows.Scan(&login, &block, &end) != nil {
 			continue
 		}
-		if !auth_end_active(end) {
+		if !Auth_end_active(end) {
 			continue
 		}
 		r, err := regexp2.Compile(block, 0)
 		if err == nil {
 			if match, _ := r.FindStringMatch(ip); match != nil {
 				rows.Close()
-				return get_ban_auth_group(db, login)
+				return Get_ban_auth_group(db, login)
 			}
 		}
 	}
@@ -207,13 +207,13 @@ func get_pattern_auth_group(db *sql.DB, ip string) string {
 			if rows.Scan(&login, &block, &end) != nil {
 				continue
 			}
-			if !auth_end_active(end) {
+			if !Auth_end_active(end) {
 				continue
 			}
 			c, err := cidr.Parse(block)
 			if err == nil && c.Contains(ip) {
 				rows.Close()
-				return get_ban_auth_group(db, login)
+				return Get_ban_auth_group(db, login)
 			}
 		}
 		rows.Close()
@@ -222,11 +222,11 @@ func get_pattern_auth_group(db *sql.DB, ip string) string {
 }
 
 func Get_user_auth(db *sql.DB, ip string) string {
-	auth := get_user_auth_raw(db, ip)
+	auth := Get_user_auth_raw(db, ip)
 	if Auth_group_name_ban(auth) {
 		return auth
 	}
-	if pattern_auth := get_pattern_auth_group(db, ip); pattern_auth != "" {
+	if pattern_auth := Get_pattern_auth_group(db, ip); pattern_auth != "" {
 		return pattern_auth
 	}
 	return auth
@@ -330,7 +330,7 @@ func Check_acl_group(db *sql.DB, acl_data string, auth_info map[string]bool) boo
 	return false
 }
 
-func get_document_filter_acl(data string, action string) (string, bool) {
+func Get_document_filter_acl(data string, action string) (string, bool) {
 	data = strings.ReplaceAll(data, "\r", "")
 	if !strings.Contains(data, "=") {
 		if action == "edit" {
@@ -349,7 +349,7 @@ func get_document_filter_acl(data string, action string) (string, bool) {
 	return "", false
 }
 
-func check_document_filter_acl(db *sql.DB, doc_name string, action string, auth_info map[string]bool) (bool, bool) {
+func Check_document_filter_acl(db *sql.DB, doc_name string, action string, auth_info map[string]bool) (bool, bool) {
 	rows := Query_DB(
 		db,
 		"select plus, plus_t from html_filter where kind = 'document'",
@@ -374,7 +374,7 @@ func check_document_filter_acl(db *sql.DB, doc_name string, action string, auth_
 			continue
 		}
 
-		acl_data, ok := get_document_filter_acl(acl_data, action)
+		acl_data, ok := Get_document_filter_acl(acl_data, action)
 		if !ok {
 			continue
 		}
@@ -1004,7 +1004,7 @@ func Check_acl(db *sql.DB, name string, topic_number string, tool string, ip str
 		document_filter_action = "new_make"
 	}
 	if document_filter_action != "" && !auth_info["acl"] {
-		if matched, allowed := check_document_filter_acl(db, name, document_filter_action, auth_info); matched {
+		if matched, allowed := Check_document_filter_acl(db, name, document_filter_action, auth_info); matched {
 			return allowed
 		}
 	}

@@ -122,7 +122,7 @@ func Get_DB_set_MySQL(new_db_set map[string]string) map[string]string {
 	return tmp
 }
 
-func exec_DB(db DB_runner, query string, values ...any) {
+func Exec_DB_internal(db DB_runner, query string, values ...any) {
 	const retry_delay = 10 * time.Millisecond
 
 	stmt, err := db.Prepare(DB_change(query))
@@ -149,7 +149,7 @@ func exec_DB(db DB_runner, query string, values ...any) {
 func Exec_DB(db DB_runner, query string, values ...any) {
 	if sql_db, ok := db.(*sql.DB); ok && !strings.HasPrefix(strings.ToLower(strings.TrimSpace(query)), "pragma ") {
 		err := DB_transaction(sql_db, func(tx *sql.Tx) error {
-			exec_DB(tx, query, values...)
+			Exec_DB_internal(tx, query, values...)
 			return nil
 		})
 		if err != nil {
@@ -158,7 +158,7 @@ func Exec_DB(db DB_runner, query string, values ...any) {
 		return
 	}
 
-	exec_DB(db, query, values...)
+	Exec_DB_internal(db, query, values...)
 }
 
 func Query_DB(db DB_runner, query string, values ...any) *sql.Rows {

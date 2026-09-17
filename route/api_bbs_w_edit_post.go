@@ -27,7 +27,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 		return return_data
 	}
 
-	if !bbs_post_blind_allowed(db, set_id, set_code, config.IP, nil) {
+	if !Bbs_post_blind_allowed(db, set_id, set_code, config.IP, nil) {
 		return_data["response"] = "require auth"
 		return return_data
 	}
@@ -159,7 +159,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 			); err != nil {
 				return err
 			}
-			bbs_post_last_activity_update(tx, set_id, set_code, tool.Get_time())
+			Bbs_post_last_activity_update(tx, set_id, set_code, tool.Get_time())
 			return nil
 		}); err != nil {
 			panic(err)
@@ -172,7 +172,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 		return return_data
 	}
 
-	prefix = bbs_prefix_check(db, set_id, prefix)
+	prefix = Bbs_prefix_check(db, set_id, prefix)
 	if set_id == thread_bbs_id && prefix == "" {
 		prefix = "열림"
 	}
@@ -189,7 +189,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 
 		return return_data
 	}
-	tag_list := bbs_tag_list(tags)
+	tag_list := Bbs_tag_list(tags)
 	if document != "" && !tool.Arr_in_str(tag_list, document) {
 		if tool.Get_len(document) > bbs_tag_max_length {
 			return_data["response"] = "error"
@@ -330,7 +330,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 				return err
 			}
 		}
-		bbs_post_last_activity_update(tx, set_id, set_code, date)
+		Bbs_post_last_activity_update(tx, set_id, set_code, date)
 		if prefix != "" {
 			if _, err := tx.Exec(
 				tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('prefix', ?, ?, ?)"),

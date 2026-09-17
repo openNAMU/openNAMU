@@ -8,7 +8,7 @@ import (
 func View_user_top_menu(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if values == nil && !user_auth(db, config) {
+	if values == nil && !User_auth(db, config) {
 		return tool.Get_redirect("/user")
 	}
 	if values != nil {
@@ -26,7 +26,7 @@ func View_user_top_menu(config tool.Config, values url.Values) string {
 		}
 		return tool.Get_redirect("/change/top_menu")
 	}
-	content := user_value(db, config.IP, "top_menu")
+	content := User_value(db, config.IP, "top_menu")
 	body := `<span>EX)<br>ONTS<br>https://2du.pythonanywhere.com/<br>FrontPage<br>/w/FrontPage</span><hr class="main_hr">` + tool.Get_language(db, "not_support_skin_warning", true) + `<hr class="main_hr"><form method="post"><textarea class="opennamu_textarea_500" placeholder="` + tool.Get_language(db, "enter_top_menu_setting", true) + `" name="content" id="content">` + tool.HTML_escape(content) + `</textarea><hr class="main_hr"><button id="opennamu_save_button" type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
-	return user_form_page(db, config, tool.Get_language(db, "user_added_menu", true), body)
+	return User_form_page(db, config, tool.Get_language(db, "user_added_menu", true), body)
 }

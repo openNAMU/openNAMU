@@ -11,7 +11,7 @@ func Api_user_key_delete_post(config tool.Config) map[string]any {
 		return_data["response"] = "require auth"
 		return return_data
 	}
-	user_delete(db, config.IP, "random_key")
+	User_delete(db, config.IP, "random_key")
 	return_data["response"] = "ok"
 	return return_data
 }

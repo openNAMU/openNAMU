@@ -20,7 +20,7 @@ func Api_setting_head_post(config tool.Config, name string, coverage string, con
 		return return_data
 	}
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-		setting_save_value(tx, name, coverage, content)
+		Setting_save_value(tx, name, coverage, content)
 		tool.Do_insert_auth_history(tx, config.IP, "edit_set ("+name+")")
 		return nil
 	}); err != nil {

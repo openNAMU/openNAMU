@@ -21,7 +21,7 @@ var macromark_link_regex = regexp2.MustCompile(
 	regexp2.None,
 )
 
-func backlink_redirect_target(raw_data string) string {
+func Backlink_redirect_target(raw_data string) string {
 
 	for _, line := range strings.Split(raw_data, "\n") {
 		line = strings.TrimSpace(line)
@@ -43,12 +43,12 @@ func backlink_redirect_target(raw_data string) string {
 				target = target[:pipe_index]
 			}
 		}
-		return normalize_link(target)
+		return Normalize_link(target)
 	}
 
 	return ""
 }
-func backlink_redirect_line(line string) bool {
+func Backlink_redirect_line(line string) bool {
 	line = strings.ToLower(strings.TrimSpace(line))
 	return strings.HasPrefix(line, "#redirect ") || strings.HasPrefix(line, "#넘겨주기 ")
 }
@@ -72,11 +72,11 @@ func Get_backlink(raw_data string, markup string) (map[string][]string, int, boo
 	backlink_list := map[string][]string{}
 	link_count := 0
 	if markup == "" || markup == "namumark" || markup == "namumark_beta" {
-		if redirect_target := backlink_redirect_target(raw_data); redirect_target != "" {
-			add_backlink(backlink_list, redirect_target, "redirect")
+		if redirect_target := Backlink_redirect_target(raw_data); redirect_target != "" {
+			Add_backlink(backlink_list, redirect_target, "redirect")
 			lines := strings.Split(raw_data, "\n")
 			for index, line := range lines {
-				if backlink_redirect_line(line) {
+				if Backlink_redirect_line(line) {
 					lines[index] = ""
 				}
 			}
@@ -93,9 +93,9 @@ func Get_backlink(raw_data string, markup string) (map[string][]string, int, boo
 
 		link := match.GroupByName("link").String()
 		if markup == "markdown" {
-			link = normalize_markdown_link(link)
+			link = Normalize_markdown_link(link)
 		} else {
-			link = normalize_link(link)
+			link = Normalize_link(link)
 		}
 		if link == "" {
 			match, err = link_regex.FindNextMatch(match)
@@ -111,7 +111,7 @@ func Get_backlink(raw_data string, markup string) (map[string][]string, int, boo
 		}
 
 		link_count++
-		add_backlink(backlink_list, link, link_type)
+		Add_backlink(backlink_list, link, link_type)
 
 		match, err = link_regex.FindNextMatch(match)
 	}
@@ -119,7 +119,7 @@ func Get_backlink(raw_data string, markup string) (map[string][]string, int, boo
 	return backlink_list, link_count, true
 }
 
-func add_backlink(
+func Add_backlink(
 	backlink_list map[string][]string,
 	link string,
 	link_type string,
@@ -133,7 +133,7 @@ func add_backlink(
 	backlink_list[link] = append(backlink_list[link], link_type)
 }
 
-func normalize_markdown_link(raw_link string) string {
+func Normalize_markdown_link(raw_link string) string {
 	link := strings.TrimSpace(raw_link)
 	if strings.HasPrefix(link, "<") && strings.Contains(link, ">") {
 		link = link[1:strings.Index(link, ">")]
@@ -145,10 +145,10 @@ func normalize_markdown_link(raw_link string) string {
 		return ""
 	}
 
-	return normalize_link(link)
+	return Normalize_link(link)
 }
 
-func normalize_link(raw_link string) string {
+func Normalize_link(raw_link string) string {
 	link := strings.TrimSpace(raw_link)
 	link = strings.TrimPrefix(link, "<")
 	link = strings.TrimSuffix(link, ">")

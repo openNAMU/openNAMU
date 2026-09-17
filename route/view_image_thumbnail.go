@@ -57,7 +57,7 @@ func View_image_thumbnail(c *gin.Context) {
 
 	extension := strings.ToLower(filepath.Ext(file_name))
 	if extension != ".jpg" && extension != ".jpeg" && extension != ".png" && extension != ".gif" {
-		redirect_image_original(c, raw_file_name)
+		Redirect_image_original(c, raw_file_name)
 		return
 	}
 
@@ -76,7 +76,7 @@ func View_image_thumbnail(c *gin.Context) {
 	cache_dir := filepath.Join(image_dir, ".thumbnail")
 	cache_path := filepath.Join(cache_dir, fmt.Sprintf("%d_%s_%s.png", size, cache_key, file_name))
 	if _, err := os.Stat(cache_path); err == nil {
-		write_thumbnail_file(c, cache_path, view_image_file_cache_regex.MatchString(raw_file_name))
+		Write_thumbnail_file(c, cache_path, view_image_file_cache_regex.MatchString(raw_file_name))
 		return
 	}
 
@@ -98,7 +98,7 @@ func View_image_thumbnail(c *gin.Context) {
 	}
 	if image_config.Width <= size && image_config.Height <= size {
 		_ = file.Close()
-		redirect_image_original(c, raw_file_name)
+		Redirect_image_original(c, raw_file_name)
 		return
 	}
 	if _, err := file.Seek(0, 0); err != nil {
@@ -113,8 +113,8 @@ func View_image_thumbnail(c *gin.Context) {
 		return
 	}
 
-	width, height := thumbnail_size(image_config.Width, image_config.Height, size)
-	thumbnail := resize_image(source, width, height)
+	width, height := Thumbnail_size(image_config.Width, image_config.Height, size)
+	thumbnail := Resize_image(source, width, height)
 	if err := os.MkdirAll(cache_dir, 0o755); err != nil {
 		c.String(http.StatusInternalServerError, "cache error")
 		return
@@ -143,10 +143,10 @@ func View_image_thumbnail(c *gin.Context) {
 		}
 	}
 
-	write_thumbnail_file(c, cache_path, view_image_file_cache_regex.MatchString(raw_file_name))
+	Write_thumbnail_file(c, cache_path, view_image_file_cache_regex.MatchString(raw_file_name))
 }
 
-func thumbnail_size(width int, height int, size int) (int, int) {
+func Thumbnail_size(width int, height int, size int) (int, int) {
 	if width >= height {
 		result_height := int(float64(height) * float64(size) / float64(width))
 		if result_height < 1 {
@@ -162,7 +162,7 @@ func thumbnail_size(width int, height int, size int) (int, int) {
 	return result_width, size
 }
 
-func resize_image(source image.Image, width int, height int) image.Image {
+func Resize_image(source image.Image, width int, height int) image.Image {
 	output := image.NewRGBA(image.Rect(0, 0, width, height))
 	bound := source.Bounds()
 	for y := 0; y < height; y++ {
@@ -175,7 +175,7 @@ func resize_image(source image.Image, width int, height int) image.Image {
 	return output
 }
 
-func write_thumbnail_file(c *gin.Context, file_path string, immutable bool) {
+func Write_thumbnail_file(c *gin.Context, file_path string, immutable bool) {
 	c.Header("Content-Type", "image/png")
 	if immutable {
 		c.Header("Cache-Control", "private, max-age=31536000, immutable")
@@ -185,6 +185,6 @@ func write_thumbnail_file(c *gin.Context, file_path string, immutable bool) {
 	c.File(file_path)
 }
 
-func redirect_image_original(c *gin.Context, file_name string) {
+func Redirect_image_original(c *gin.Context, file_name string) {
 	c.Redirect(http.StatusFound, "/image/"+tool.Url_parser(file_name))
 }

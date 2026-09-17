@@ -17,8 +17,8 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 		return return_data
 	}
 
-	language_list := user_language_list(db)
-	title_choices := user_title_list(db, config.IP)
+	language_list := User_language_list(db)
+	title_choices := User_title_list(db, config.IP)
 	profile_image := ""
 	profile_image_set := values.Has("profile_image")
 	if profile_image_set {
@@ -41,7 +41,7 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 		case "":
 		case "on":
 			twofa_password = values.Get("2fa_pw")
-			if twofa_password == "" && user_value(db, config.IP, "2fa_pw") == "" {
+			if twofa_password == "" && User_value(db, config.IP, "2fa_pw") == "" {
 				return_data["response"] = "error"
 				return_data["data"] = "password empty"
 				return return_data
@@ -51,7 +51,7 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 				twofa_password_hash = tool.Password_encode(db, twofa_password, twofa_encode)
 			}
 		case "email":
-			if user_value(db, config.IP, "email") == "" {
+			if User_value(db, config.IP, "email") == "" {
 				return_data["response"] = "error"
 				return_data["data"] = "not found"
 				return return_data
@@ -82,13 +82,13 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 		if values.Has("skin") {
 			skin := values.Get("skin")
 			if tool.Arr_in_str(tool.Get_skin_list("", true), skin) {
-				user_save(tx, config.IP, "skin", skin)
+				User_save(tx, config.IP, "skin", skin)
 			}
 		}
 		if values.Has("lang") {
 			for _, language := range language_list {
 				if language.value == values.Get("lang") {
-					user_save(tx, config.IP, "lang", language.value)
+					User_save(tx, config.IP, "lang", language.value)
 					break
 				}
 			}
@@ -101,55 +101,55 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 					break
 				}
 			}
-			user_save(tx, config.IP, "user_title", title)
+			User_save(tx, config.IP, "user_title", title)
 		}
 		for _, name := range []string{"sub_user_name", "top_menu"} {
 			if values.Has(name) {
-				user_save(tx, config.IP, name, values.Get(name))
+				User_save(tx, config.IP, name, values.Get(name))
 			}
 		}
 		if values.Has("online_status") {
 			if online_status == "on" {
-				user_save(tx, config.IP, "online_status", online_status)
+				User_save(tx, config.IP, "online_status", online_status)
 			} else {
-				user_delete(tx, config.IP, "online_status")
+				User_delete(tx, config.IP, "online_status")
 			}
 		}
 
 		if profile_image_set {
 			if profile_image == "" {
-				user_delete(tx, config.IP, "profile_image")
+				User_delete(tx, config.IP, "profile_image")
 			} else {
-				user_save(tx, config.IP, "profile_image", profile_image)
+				User_save(tx, config.IP, "profile_image", profile_image)
 			}
 		}
 
 		if values.Has("2fa") {
 			switch twofa_mode {
 			case "":
-				user_delete(tx, config.IP, "2fa")
-				user_delete(tx, config.IP, "2fa_pw")
-				user_delete(tx, config.IP, "2fa_pw_encode")
+				User_delete(tx, config.IP, "2fa")
+				User_delete(tx, config.IP, "2fa_pw")
+				User_delete(tx, config.IP, "2fa_pw_encode")
 			case "on":
 				if twofa_password != "" {
-					user_save(tx, config.IP, "2fa_pw", twofa_password_hash)
-					user_save(tx, config.IP, "2fa_pw_encode", twofa_encode)
+					User_save(tx, config.IP, "2fa_pw", twofa_password_hash)
+					User_save(tx, config.IP, "2fa_pw_encode", twofa_encode)
 				}
-				user_save(tx, config.IP, "2fa", "on")
+				User_save(tx, config.IP, "2fa", "on")
 			case "email":
-				user_save(tx, config.IP, "2fa", "email")
-				user_delete(tx, config.IP, "2fa_pw")
-				user_delete(tx, config.IP, "2fa_pw_encode")
+				User_save(tx, config.IP, "2fa", "email")
+				User_delete(tx, config.IP, "2fa_pw")
+				User_delete(tx, config.IP, "2fa_pw_encode")
 			}
 		} else if values.Has("2fa_pw") {
 			if twofa_password == "" {
-				user_delete(tx, config.IP, "2fa_pw")
-				user_delete(tx, config.IP, "2fa_pw_encode")
-				user_delete(tx, config.IP, "2fa")
+				User_delete(tx, config.IP, "2fa_pw")
+				User_delete(tx, config.IP, "2fa_pw_encode")
+				User_delete(tx, config.IP, "2fa")
 			} else {
-				user_save(tx, config.IP, "2fa_pw", twofa_password_hash)
-				user_save(tx, config.IP, "2fa_pw_encode", twofa_encode)
-				user_save(tx, config.IP, "2fa", "on")
+				User_save(tx, config.IP, "2fa_pw", twofa_password_hash)
+				User_save(tx, config.IP, "2fa_pw_encode", twofa_encode)
+				User_save(tx, config.IP, "2fa", "on")
 			}
 		}
 

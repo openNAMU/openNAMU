@@ -19,7 +19,7 @@ type namumark struct {
 	render_data string
 }
 
-func render_parameter_value(value any) string {
+func Render_parameter_value(value any) string {
 	if value == nil {
 		return ""
 	}
@@ -29,7 +29,7 @@ func render_parameter_value(value any) string {
 	return fmt.Sprint(value)
 }
 
-func render_parameter_data(data string, parameter map[string]any) string {
+func Render_parameter_data(data string, parameter map[string]any) string {
 	if len(parameter) == 0 {
 		return data
 	}
@@ -41,7 +41,7 @@ func render_parameter_data(data string, parameter map[string]any) string {
 		if !ok {
 			return match[2]
 		}
-		return render_parameter_value(parameter_value)
+		return Render_parameter_value(parameter_value)
 	})
 }
 
@@ -51,7 +51,7 @@ func Namumark_new(db *sql.DB, data map[string]string, parameters ...map[string]a
 		parameter_data = parameters[0]
 	}
 	data_string := data["data"]
-	data_string = render_parameter_data(data_string, parameter_data)
+	data_string = Render_parameter_data(data_string, parameter_data)
 	data_string = "\n" + data_string + "\n"
 	data_string = strings.ReplaceAll(data_string, "\r", "")
 
@@ -68,7 +68,7 @@ type replacer struct {
 	prefix string
 }
 
-func (class *namumark) render_text() {
+func (class *namumark) Render_text() {
 	string_data := class.render_data
 
 	replacers := []replacer{
@@ -96,7 +96,7 @@ func (class *namumark) render_text() {
 	class.render_data = string_data
 }
 
-func (class *namumark) render_heading() {
+func (class *namumark) Render_heading() {
 	string_data := class.render_data
 
 	r := regexp.MustCompile(`\n(?:(={1,6})(#?) ?([^\n]+))\n`)
@@ -115,7 +115,7 @@ func (class *namumark) render_heading() {
 	class.render_data = string_data
 }
 
-func (class *namumark) render_macro() {
+func (class *namumark) Render_macro() {
 	string_data := class.render_data
 
 	r := regexp2.MustCompile(`\[([^\[\]\(\)]+)\]`, 0)
@@ -138,7 +138,7 @@ func (class *namumark) render_macro() {
 	class.render_data = string_data
 }
 
-func normalize_namumark_link(target string) string {
+func Normalize_namumark_link(target string) string {
 	target = strings.TrimSpace(target)
 	prefix_list := []struct {
 		prefix string
@@ -157,7 +157,7 @@ func normalize_namumark_link(target string) string {
 	return target
 }
 
-func (class *namumark) render_link() {
+func (class *namumark) Render_link() {
 	string_data := class.render_data
 
 	r := regexp2.MustCompile(`\[\[((?:(?!\[\[|\]\]|\|).)+)(?:\|((?:(?!\[\[|\]\]).)+))?\]\]`, 0)
@@ -165,7 +165,7 @@ func (class *namumark) render_link() {
 	string_data, _ = r.ReplaceFunc(
 		string_data,
 		func(m regexp2.Match) string {
-			target := normalize_namumark_link(m.GroupByNumber(1).String())
+			target := Normalize_namumark_link(m.GroupByNumber(1).String())
 			label := m.GroupByNumber(2).String()
 			if label == "" {
 				label = target
@@ -195,7 +195,7 @@ func (class *namumark) render_link() {
 	class.render_data = string_data
 }
 
-func (class *namumark) render_last() {
+func (class *namumark) Render_last() {
 	string_data := class.render_data
 
 	r := regexp.MustCompile(`(\n| )+$`)
@@ -213,17 +213,17 @@ func (class *namumark) render_last() {
 	class.render_data = string_data
 }
 
-func (class *namumark) main() map[string]any {
-	class.render_text()
-	class.render_link()
-	class.render_heading()
-	class.render_macro()
-	class.render_last()
+func (class *namumark) Main() map[string]any {
+	class.Render_text()
+	class.Render_link()
+	class.Render_heading()
+	class.Render_macro()
+	class.Render_last()
 
 	class.data["data"] = class.render_data
 
 	render_data_class := Macromark_new(class.db, class.data, "html")
-	render_data := render_data_class.main()
+	render_data := render_data_class.Main()
 
 	return render_data
 }

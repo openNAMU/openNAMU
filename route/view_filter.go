@@ -6,7 +6,7 @@ func View_filter(config tool.Config, kind string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	spec, ok := get_filter_spec(kind)
+	spec, ok := Get_filter_spec(kind)
 	if !ok {
 		return tool.Get_error_page(db, config, "error")
 	}
@@ -84,7 +84,7 @@ func View_filter(config tool.Config, kind string) string {
 			continue
 		}
 		if kind == "inter_wiki" {
-			data += `<a class="opennamu_link_out" href="` + filter_safe_link(plus) + `">` + tool.HTML_escape(plus) + `</a>`
+			data += `<a class="opennamu_link_out" href="` + Filter_safe_link(plus) + `">` + tool.HTML_escape(plus) + `</a>`
 		} else {
 			data += tool.HTML_escape(plus)
 		}

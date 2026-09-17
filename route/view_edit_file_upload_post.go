@@ -38,7 +38,7 @@ func View_edit_file_upload_post(config tool.Config, upload_files []Upload_file_d
 	for _, v := range upload_files {
 		data := map[string]any{}
 		if v.File_reader != nil {
-			data = api_file_upload_post_reader(
+			data = Api_file_upload_post_reader(
 				config,
 				v.File_name,
 				v.File_reader,
@@ -51,7 +51,7 @@ func View_edit_file_upload_post(config tool.Config, upload_files []Upload_file_d
 				v.Replace == "1",
 			)
 		} else {
-			data = api_file_upload_post(
+			data = Api_file_upload_post_internal(
 				config,
 				v.File_name,
 				v.File_data,

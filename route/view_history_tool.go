@@ -6,7 +6,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func history_tool_revision(value string) (string, int, bool) {
+func History_tool_revision(value string) (string, int, bool) {
 	revision, err := strconv.Atoi(value)
 	if err != nil {
 		return "", 0, false
@@ -22,7 +22,7 @@ func View_history_tool(config tool.Config, doc_name string, rev string) string {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	revision, revision_number, ok := history_tool_revision(rev)
+	revision, revision_number, ok := History_tool_revision(rev)
 	if !ok || doc_name == "" {
 		return tool.Get_error_page(db, config, "error")
 	}

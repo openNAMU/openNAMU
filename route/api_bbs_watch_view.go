@@ -22,7 +22,7 @@ func Api_bbs_watch_view(config tool.Config, set_id string, set_code string) map[
 	) {
 		return map[string]any{"response": "not exist"}
 	}
-	if _, allowed := bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
+	if _, allowed := Bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
 		return map[string]any{"response": "require auth"}
 	}
 

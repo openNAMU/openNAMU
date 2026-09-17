@@ -7,7 +7,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func bbs_list(db *sql.DB) map[string]string {
+func Bbs_list(db *sql.DB) map[string]string {
 	rows := tool.Query_DB(
 		db,
 		"select set_data, set_id from bbs_set where set_name = 'bbs_name'",

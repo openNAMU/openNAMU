@@ -13,7 +13,7 @@ func Api_thread_setting_post(config tool.Config, topic_num string, stop string, 
 	if !tool.Check_permission(db, "bbs_setting", config.IP) {
 		return map[string]any{"response": "require auth"}
 	}
-	if !thread_bbs_root_exists(db, topic_num) {
+	if !Thread_bbs_root_exists(db, topic_num) {
 		return map[string]any{"response": "not exist", "data": "thread"}
 	}
 
@@ -43,7 +43,7 @@ func Api_thread_setting_post(config tool.Config, topic_num string, stop string, 
 		if _, err := tx.Exec(tool.DB_change("update bbs_data set set_data = ? where set_name = 'date' and set_id = ? and set_code = ?"), date, thread_bbs_id, topic_num); err != nil {
 			return err
 		}
-		bbs_post_last_activity_update(tx, thread_bbs_id, topic_num, date)
+		Bbs_post_last_activity_update(tx, thread_bbs_id, topic_num, date)
 		return nil
 	}); err != nil {
 		panic(err)

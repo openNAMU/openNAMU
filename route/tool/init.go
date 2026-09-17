@@ -232,7 +232,7 @@ func DB_init() {
 	}
 }
 
-func check_update_version() {
+func Check_update_version() {
 	DB_boot()
 
 	db := DB_connect()
@@ -267,7 +267,7 @@ func check_update_version() {
 }
 
 func Main_init() string {
-	check_update_version()
+	Check_update_version()
 	DB_init()
 	DB_boot()
 
@@ -380,7 +380,7 @@ func First_init(db *sql.DB) {
 	}
 }
 
-func legacy_acl_values(title string, acl_type string, value string) ([]string, bool) {
+func Legacy_acl_values(title string, acl_type string, value string) ([]string, bool) {
 	if strings.HasPrefix(title, "user:") && acl_type == "decu" {
 		switch value {
 		case "all":
@@ -420,8 +420,8 @@ func legacy_acl_values(title string, acl_type string, value string) ([]string, b
 	return nil, false
 }
 
-func legacy_acl_single_value(value string) (string, bool) {
-	values, ok := legacy_acl_values("", "", value)
+func Legacy_acl_single_value(value string) (string, bool) {
+	values, ok := Legacy_acl_values("", "", value)
 	if !ok {
 		return "", false
 	}
@@ -431,7 +431,7 @@ func legacy_acl_single_value(value string) (string, bool) {
 	return values[0], true
 }
 
-func migrate_legacy_acl_rows(db DB_runner, select_query string, update_query string, key_count int) {
+func Migrate_legacy_acl_rows(db DB_runner, select_query string, update_query string, key_count int) {
 	rows := Query_DB(db, select_query)
 	data_list := [][]string{}
 	for rows.Next() {
@@ -447,7 +447,7 @@ func migrate_legacy_acl_rows(db DB_runner, select_query string, update_query str
 	rows.Close()
 
 	for _, data := range data_list {
-		value, ok := legacy_acl_single_value(data[key_count])
+		value, ok := Legacy_acl_single_value(data[key_count])
 		if !ok {
 			continue
 		}
@@ -460,7 +460,7 @@ func migrate_legacy_acl_rows(db DB_runner, select_query string, update_query str
 	}
 }
 
-func migrate_legacy_acl(db DB_runner) {
+func Migrate_legacy_acl(db DB_runner) {
 	legacy_auth_map := map[string]string{
 		"discuss":                 "bbs_use",
 		"discuss_view":            "bbs_view",
@@ -516,7 +516,7 @@ func migrate_legacy_acl(db DB_runner) {
 			continue
 		}
 
-		values, ok := legacy_acl_values(title, acl_type, value)
+		values, ok := Legacy_acl_values(title, acl_type, value)
 		if !ok {
 			continue
 		}
@@ -534,21 +534,21 @@ func migrate_legacy_acl(db DB_runner) {
 	}
 	Exec_DB(db, "delete from acl where type = 'dis'")
 
-	migrate_legacy_acl_rows(db, "select set_id, set_name, set_code, set_data from bbs_set where set_name in ('bbs_view_acl', 'bbs_acl', 'bbs_edit_acl', 'bbs_comment_acl', 'bbs_view_acl_all', 'bbs_acl_all', 'bbs_edit_acl_all', 'bbs_comment_acl_all')", "update bbs_set set set_data = ? where set_id = ? and set_name = ? and set_code = ?", 3)
-	migrate_legacy_acl_rows(db, "select name, coverage, data from other where name in ('bbs_view_acl_all', 'bbs_acl_all', 'bbs_edit_acl_all', 'bbs_comment_acl_all')", "update other set data = ? where name = ? and coverage = ?", 2)
-	migrate_legacy_acl_rows(db, "select id, acl from vote where user = '' and type != 'option'", "update vote set acl = ? where id = ? and user = '' and type != 'option'", 1)
+	Migrate_legacy_acl_rows(db, "select set_id, set_name, set_code, set_data from bbs_set where set_name in ('bbs_view_acl', 'bbs_acl', 'bbs_edit_acl', 'bbs_comment_acl', 'bbs_view_acl_all', 'bbs_acl_all', 'bbs_edit_acl_all', 'bbs_comment_acl_all')", "update bbs_set set set_data = ? where set_id = ? and set_name = ? and set_code = ?", 3)
+	Migrate_legacy_acl_rows(db, "select name, coverage, data from other where name in ('bbs_view_acl_all', 'bbs_acl_all', 'bbs_edit_acl_all', 'bbs_comment_acl_all')", "update other set data = ? where name = ? and coverage = ?", 2)
+	Migrate_legacy_acl_rows(db, "select id, acl from vote where user = '' and type != 'option'", "update vote set acl = ? where id = ? and user = '' and type != 'option'", 1)
 }
 
 func Update_init(db *sql.DB) {
 	if err := DB_transaction(db, func(tx *sql.Tx) error {
-		migrate_legacy_acl(tx)
+		Migrate_legacy_acl(tx)
 		return nil
 	}); err != nil {
 		panic(err)
 	}
 }
 
-func init_rankup_conditions(db *sql.DB) {
+func Init_rankup_conditions(db *sql.DB) {
 	initialized := ""
 	if QueryRow_DB(
 		db,
@@ -582,7 +582,7 @@ func init_rankup_conditions(db *sql.DB) {
 	)
 }
 
-func init_bbs_comment_count(db *sql.DB) {
+func Init_bbs_comment_count(db *sql.DB) {
 	initialized := ""
 	if QueryRow_DB(
 		db,
@@ -650,7 +650,7 @@ func init_bbs_comment_count(db *sql.DB) {
 	log.Printf("[DB] BBS comment count update complete: %d posts", len(post_list))
 }
 
-func init_audio_extensions(db *sql.DB) {
+func Init_audio_extensions(db *sql.DB) {
 	initialized := ""
 	if QueryRow_DB(
 		db,
@@ -679,7 +679,7 @@ func init_audio_extensions(db *sql.DB) {
 	)
 }
 
-func init_video_extensions(db *sql.DB) {
+func Init_video_extensions(db *sql.DB) {
 	initialized := ""
 	if QueryRow_DB(
 		db,
@@ -708,7 +708,7 @@ func init_video_extensions(db *sql.DB) {
 	)
 }
 
-func init_document_extensions(db *sql.DB) {
+func Init_document_extensions(db *sql.DB) {
 	initialized := ""
 	if QueryRow_DB(
 		db,
@@ -737,7 +737,7 @@ func init_document_extensions(db *sql.DB) {
 	)
 }
 
-func init_captcha(db *sql.DB) {
+func Init_captcha(db *sql.DB) {
 	recaptcha := ""
 	sec_key := ""
 	altcha_sec_key := ""
@@ -756,7 +756,7 @@ func init_captcha(db *sql.DB) {
 			Exec_DB(db, `update other set data = "altcha_high" where name = "recaptcha_ver" and coverage = ""`)
 			recaptcha_ver = "altcha_high"
 		}
-		if _, altcha_enabled := captcha_altcha_cost(recaptcha_ver); altcha_enabled {
+		if _, altcha_enabled := Captcha_altcha_cost(recaptcha_ver); altcha_enabled {
 			if !has_altcha_sec_key && recaptcha == "" && sec_key != "" {
 				Exec_DB(
 					db,
@@ -919,12 +919,12 @@ func Always_init(db *sql.DB, version string) {
 			)
 		}
 	}
-	init_rankup_conditions(db)
-	init_bbs_comment_count(db)
-	init_audio_extensions(db)
-	init_video_extensions(db)
-	init_document_extensions(db)
-	init_captcha(db)
+	Init_rankup_conditions(db)
+	Init_bbs_comment_count(db)
+	Init_audio_extensions(db)
+	Init_video_extensions(db)
+	Init_document_extensions(db)
+	Init_captcha(db)
 	Exec_DB(
 		db,
 		"update rb set end = ? where ongoing = '1' and band in ('', 'private', 'regex', 'cidr') and (end = '' or end = '0')",
@@ -951,7 +951,7 @@ func Always_init(db *sql.DB, version string) {
 		if !user_exists {
 			continue
 		}
-		auth := get_ban_auth_group(db, ban_data[1])
+		auth := Get_ban_auth_group(db, ban_data[1])
 		Exec_DB(db, "delete from user_set where id = ? and name = 'acl'", ban_data[0])
 		Exec_DB(db, "insert into user_set (id, name, data) values (?, 'acl', ?)", ban_data[0], auth)
 		Exec_DB(db, "delete from user_set where id = ? and name = 'acl_end'", ban_data[0])

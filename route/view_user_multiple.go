@@ -15,7 +15,7 @@ func View_user_multiple(config tool.Config, page string, sort string, search str
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	page_num := list_extra_page_number(page)
+	page_num := List_extra_page_number(page)
 	if sort != "count" {
 		sort = "recent"
 	}
@@ -50,7 +50,7 @@ func View_user_multiple(config tool.Config, page string, sort string, search str
 		}
 
 		left := `<a href="/list/user/check/` + tool.Url_parser(item.IP) + `">` + tool.HTML_escape(item.IP) + `</a> (` + strconv.Itoa(item.Count) + `)`
-		right := tool.Get_language(db, "account_count", true) + ` : ` + strconv.Itoa(item.Count) + ` | ` + tool.Get_language(db, "last_login", true) + ` : ` + tool.HTML_escape(item.Date) + `<br>` + names.String()
+		right := tool.Get_language(db, "account_count", true) + ` : ` + strconv.Itoa(item.Count) + ` | ` + tool.Get_language(db, "last_login", true) + ` : ` + tool.HTML_escape(item.Date) + `<div>` + names.String() + `</div>`
 		body.WriteString(tool.Get_list_ui(left, right, "", ""))
 		count++
 	}

@@ -22,7 +22,7 @@ func View_list_file(config tool.Config, image_only bool) string {
 		body.WriteString(`<li><a href="/w/` + tool.Url_parser(name) + `">` + tool.HTML_escape(name) + `</a></li>`)
 	}
 	rows.Close()
-	return list_extra_page(db, config, tool.Get_language(db, func() string {
+	return List_extra_page(db, config, tool.Get_language(db, func() string {
 		if image_only {
 			return "image_list"
 		}

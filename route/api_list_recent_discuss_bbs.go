@@ -2,7 +2,7 @@ package route
 
 import "opennamu/route/tool"
 
-func api_list_recent_discuss_bbs(config tool.Config, limit string, num string, set_type string) map[string]any {
+func Api_list_recent_discuss_bbs(config tool.Config, limit string, num string, set_type string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 

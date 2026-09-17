@@ -33,8 +33,8 @@ func View_bbs_edit(config tool.Config, set_id string, set_code string, comment_c
 		return tool.Get_redirect("/bbs/main")
 	}
 
-	bbs_placeholder := bbs_set_value(db, set_id, "bbs_placeholder")
-	bbs_comment_placeholder := bbs_set_value(db, set_id, "bbs_comment_placeholder")
+	bbs_placeholder := Bbs_set_value(db, set_id, "bbs_placeholder")
+	bbs_comment_placeholder := Bbs_set_value(db, set_id, "bbs_comment_placeholder")
 	editor_type := "bbs"
 	editor_help := bbs_placeholder
 	if comment_code != "" {
@@ -67,7 +67,7 @@ func View_bbs_edit(config tool.Config, set_id string, set_code string, comment_c
 	prefix_html := ""
 	tag_html := ""
 	if comment_code == "" {
-		prefix_list := bbs_prefix_list(db, set_id)
+		prefix_list := Bbs_prefix_list(db, set_id)
 		if len(prefix_list) > 0 {
 			prefix_html = "<select class=\"__ON_INPUT__\" name=\"prefix\">"
 			if set_id != thread_bbs_id {

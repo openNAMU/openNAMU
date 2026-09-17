@@ -6,10 +6,10 @@ import (
 	"opennamu/route/tool"
 )
 
-func user_save(db tool.DB_runner, id string, name string, value string) {
+func User_save(db tool.DB_runner, id string, name string, value string) {
 	if sql_db, ok := db.(*sql.DB); ok {
 		if err := tool.DB_transaction(sql_db, func(tx *sql.Tx) error {
-			user_save(tx, id, name, value)
+			User_save(tx, id, name, value)
 			return nil
 		}); err != nil {
 			panic(err)
@@ -25,6 +25,6 @@ func user_save(db tool.DB_runner, id string, name string, value string) {
 	tool.Exec_DB(db, "insert into user_set (id, name, data) values (?, ?, ?)", id, name, value)
 }
 
-func user_delete(db tool.DB_runner, id string, name string) {
+func User_delete(db tool.DB_runner, id string, name string) {
 	tool.Exec_DB(db, "delete from user_set where id = ? and name = ?", id, name)
 }

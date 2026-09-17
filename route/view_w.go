@@ -14,7 +14,7 @@ import (
 
 var view_w_image_regex = regexp.MustCompile(`(?is)<img\b[^>]*\bsrc\s*=\s*"([^"]+)"`)
 
-func view_w_get_first_image(data string) string {
+func View_w_get_first_image(data string) string {
 	match := view_w_image_regex.FindStringSubmatch(data)
 	if len(match) < 2 {
 		return ""
@@ -58,9 +58,9 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		status = http.StatusNotFound
 	} else {
 		if do_type != "from" {
-			redirect_target, redirect_anchor := view_w_redirect_target(db, doc_name)
+			redirect_target, redirect_anchor := View_w_redirect_target(db, doc_name)
 			if redirect_target != "" {
-				view_w_add_recent_document(config, doc_name)
+				View_w_add_recent_document(config, doc_name)
 				return tool.Get_redirect("/w_from/" + tool.Url_parser(redirect_target) + redirect_anchor), http.StatusOK
 			}
 		}
@@ -68,7 +68,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		raw_data, _ = raw_data_api["data"].(string)
 		render_data_api := Api_w_render(config, doc_name, raw_data, "normal", "")
 		render_data, _ = render_data_api["data"].(string)
-		og_image = view_w_get_first_image(render_data)
+		og_image = View_w_get_first_image(render_data)
 		if strings.HasPrefix(og_image, "/") {
 			domain := tool.Get_domain(db, true)
 			if domain == "http://" || domain == "https://" {
@@ -88,22 +88,22 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		description = tool.Get_slice(strings.ReplaceAll(strings.ReplaceAll(raw_data, "\r", ""), "\n", " "), 0, 200)
 	}
 
-	recent_documents := view_w_recent_documents(config)
+	recent_documents := View_w_recent_documents(config)
 	if do_type == "from" {
-		render_data = view_w_redirect_trace(db, doc_name, recent_documents) + render_data
+		render_data = View_w_redirect_trace(db, doc_name, recent_documents) + render_data
 	}
-	recent_documents = view_w_add_recent_document(config, doc_name)
-	render_data = view_w_trace(db, config, recent_documents) + render_data
+	recent_documents = View_w_add_recent_document(config, doc_name)
+	render_data = View_w_trace(db, config, recent_documents) + render_data
 	document_type := ""
 	if strings.HasPrefix(doc_name, "user:") {
 		document_type = "special"
-		render_data = view_w_user_data(db, config, doc_name) + render_data
+		render_data = View_w_user_data(db, config, doc_name) + render_data
 	} else if strings.HasPrefix(doc_name, "category:") {
 		document_type = "special"
-		render_data += view_w_category_data(db, config, doc_name)
+		render_data += View_w_category_data(db, config, doc_name)
 	} else if strings.HasPrefix(doc_name, "file:") {
 		document_type = "special"
-		render_data = view_w_file_data(db, doc_name) + render_data
+		render_data = View_w_file_data(db, doc_name) + render_data
 	} else {
 		if _, exists := tool.Get_back_link(db, doc_name, "include"); exists {
 			document_type = "include"
@@ -113,7 +113,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		}
 	}
 	if status == http.StatusOK && !strings.HasPrefix(doc_name, "category:") {
-		render_data = view_w_merge_category_data(db, config, doc_name, render_data)
+		render_data = View_w_merge_category_data(db, config, doc_name, render_data)
 	}
 
 	last_edit_data := Api_w_set(config, doc_name, "last_edit", "")
@@ -135,17 +135,17 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	}
 
 	body := tool.Get_setting_value(db, "body", "", "")
-	render_data = setting_render_markup(db, body, setting_markup_value(db, "body")) + render_data
+	render_data = Setting_render_markup(db, body, Setting_markup_value(db, "body")) + render_data
 
 	bottom_body := tool.Get_setting_value(db, "bottom_body", "", "")
-	render_data += setting_render_markup(db, bottom_body, setting_markup_value(db, "bottom_body"))
+	render_data += Setting_render_markup(db, bottom_body, Setting_markup_value(db, "bottom_body"))
 
 	document_top_data := Api_w_set(config, doc_name, "document_top", "")
 	document_top, _ := document_top_data["data"].(string)
 	document_top_markup_data := Api_w_set(config, doc_name, "document_top_markup", "")
 	document_top_markup_value, _ := document_top_markup_data["data"].(string)
-	document_top_markup := setting_markup_normalize(document_top_markup_value)
-	render_data = setting_render_markup(db, document_top, document_top_markup) + render_data
+	document_top_markup := Setting_markup_normalize(document_top_markup_value)
+	render_data = Setting_render_markup(db, document_top, document_top_markup) + render_data
 
 	history_color := 0
 	if status == http.StatusNotFound {
@@ -193,7 +193,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	if slash_index := strings.LastIndex(doc_name, "/"); slash_index > 0 {
 		menu = append(menu, []any{"w/" + tool.Url_parser(doc_name[:slash_index]), tool.Get_language(db, "upper", true)})
 	}
-	if view_w_child_exists(db, doc_name) {
+	if View_w_child_exists(db, doc_name) {
 		menu = append(menu, []any{"down/" + tool.Url_parser(doc_name), tool.Get_language(db, "sub", true)})
 	}
 	if !tool.IP_or_user(config.IP) {

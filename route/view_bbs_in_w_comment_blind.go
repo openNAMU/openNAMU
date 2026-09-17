@@ -10,7 +10,7 @@ func View_bbs_in_w_comment_blind(config tool.Config, set_id string, set_code str
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	comment_set_id, comment_set_code, exists := bbs_search_comment_location(set_id, set_code, comment_code)
+	comment_set_id, comment_set_code, exists := Bbs_search_comment_location(set_id, set_code, comment_code)
 	if !exists {
 		return tool.Get_redirect("/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code))
 	}

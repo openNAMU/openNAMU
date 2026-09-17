@@ -10,8 +10,8 @@ func View_robots_txt(config tool.Config, request_host string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	robot_default := setting_value(db, "robot_default", "", "")
-	robot := setting_value(db, "robot", "", "")
+	robot_default := Setting_value(db, "robot_default", "", "")
+	robot := Setting_value(db, "robot", "", "")
 	if robot_default == "" && robot != "" {
 		return robot
 	}

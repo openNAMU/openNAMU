@@ -7,7 +7,7 @@ import (
 )
 
 func Get_user_info_ui(db *sql.DB, config Config, user_name string) string {
-	data := get_user_info_ui(db, config, user_name)
+	data := Get_user_info_ui_internal(db, config, user_name)
 	return strings.Replace(
 		data,
 		"</table>",
@@ -16,7 +16,7 @@ func Get_user_info_ui(db *sql.DB, config Config, user_name string) string {
 	)
 }
 
-func get_user_info_ui(db *sql.DB, config Config, user_name string) string {
+func Get_user_info_ui_internal(db *sql.DB, config Config, user_name string) string {
 	auth_name := Get_user_auth(db, user_name)
 	auth_date := Get_auth_date(db, user_name)
 	if auth_date != "0" {

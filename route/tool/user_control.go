@@ -480,7 +480,7 @@ func Do_auth_insert(db DB_runner, user_name string, end_date string, reason stri
 				)
 			}
 			if user_exists {
-				auth := get_ban_auth_group(db, login)
+				auth := Get_ban_auth_group(db, login)
 				Exec_DB(
 					db,
 					"delete from user_set where id = ? and name = 'acl'",

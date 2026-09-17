@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func user_email_allowed(db *sql.DB, email string) bool {
+func User_email_allowed(db *sql.DB, email string) bool {
 	at_index := strings.LastIndex(email, "@")
 	if at_index <= 0 || at_index == len(email)-1 {
 		return false

@@ -9,13 +9,13 @@ import (
 	"opennamu/route/tool"
 )
 
-func auth_groups(db *sql.DB) []string {
+func Auth_groups(db *sql.DB) []string {
 	groups := tool.List_auth(db)
 	sort.Strings(groups)
 	return groups
 }
 
-func auth_target_type_select(db *sql.DB, target_type string, owner bool) string {
+func Auth_target_type_select(db *sql.DB, target_type string, owner bool) string {
 	data := `<select name="target_type">`
 	for _, target := range []string{"normal", "regex", "cidr"} {
 		selected := ""
@@ -34,7 +34,7 @@ func auth_target_type_select(db *sql.DB, target_type string, owner bool) string 
 	return data + `</select>`
 }
 
-func auth_period_select(db *sql.DB) string {
+func Auth_period_select(db *sql.DB) string {
 	periods := []string{"1_day", "3_day", "7_day", "30_day", "60_day", "1_year", "100_year"}
 	data := `<select name="end_period"><option value="">` + tool.Get_language(db, "direct_input", true) + `</option>`
 	for _, period := range periods {
@@ -61,7 +61,7 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	groups := auth_groups(db)
+	groups := Auth_groups(db)
 	if len(groups) == 0 {
 		return tool.Get_error_page(db, config, "error")
 	}
@@ -142,11 +142,11 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 
 	if mode != "total" {
 		owner := tool.Check_permission(db, "owner", config.IP)
-		data += auth_target_type_select(db, target_type, owner) + `<hr class="main_hr">`
+		data += Auth_target_type_select(db, target_type, owner) + `<hr class="main_hr">`
 	}
 	data += tool.Build_select("change_auth", groups, selected, "")
 	if mode != "total" {
-		data += `<hr class="main_hr"><span>` + tool.Get_language(db, "period", true) + `</span>` + auth_period_select(db)
+		data += `<hr class="main_hr"><span>` + tool.Get_language(db, "period", true) + `</span>` + Auth_period_select(db)
 		data += `<hr class="main_hr"><span>` + tool.Get_language(db, "date", true) + `</span><input type="date" name="end_date" value="` + tool.HTML_escape(end_date) + `">`
 		data += `<hr class="main_hr"><input name="why" placeholder="` + tool.Get_language(db, "why", true) + `">`
 		data += `<hr class="main_hr"><select name="action"><option value="give">` + tool.Get_language(db, "authorize", true) + `</option><option value="release">` + tool.Get_language(db, "auth_release", true) + `</option></select>`

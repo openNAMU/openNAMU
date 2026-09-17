@@ -8,7 +8,7 @@ import (
 func View_user_password(config tool.Config, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-	if values == nil && !user_auth(db, config) {
+	if values == nil && !User_auth(db, config) {
 		return tool.Get_redirect("/user")
 	}
 	if values != nil {
@@ -36,11 +36,11 @@ func View_user_password(config tool.Config, values url.Values) string {
 		return tool.Get_redirect("/user")
 	}
 
-	minimum := user_other(db, "password_min_length")
+	minimum := User_other(db, "password_min_length")
 	minimum_text := ""
 	if minimum != "" {
 		minimum_text = " (" + tool.Get_language(db, "password_min_length", true) + " : " + tool.HTML_escape(minimum) + ")"
 	}
 	body := `<form method="post"><input placeholder="` + tool.Get_language(db, "now_password", true) + `" name="password_now" type="password"><hr class="main_hr"><input placeholder="` + tool.Get_language(db, "new_password", true) + minimum_text + `" name="password_new" type="password"><hr class="main_hr"><input placeholder="` + tool.Get_language(db, "password_confirm", true) + `" name="password_new_repeat" type="password"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button>` + tool.Get_http_warning(db) + `</form>`
-	return user_form_page(db, config, tool.Get_language(db, "password_change", true), body)
+	return User_form_page(db, config, tool.Get_language(db, "password_change", true), body)
 }

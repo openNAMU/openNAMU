@@ -17,11 +17,11 @@ func Api_login_find_key_post(config tool.Config, user_id string, password string
 	}
 	password_hash := tool.Password_encode(db, password, tool.Get_user_encode(db, user_id))
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
-		user_save(tx, user_id, "pw", password_hash)
-		user_delete(tx, user_id, "2fa")
-		user_delete(tx, user_id, "2fa_pw")
-		user_delete(tx, user_id, "2fa_pw_encode")
-		user_delete(tx, user_id, "random_key")
+		User_save(tx, user_id, "pw", password_hash)
+		User_delete(tx, user_id, "2fa")
+		User_delete(tx, user_id, "2fa_pw")
+		User_delete(tx, user_id, "2fa_pw_encode")
+		User_delete(tx, user_id, "random_key")
 		return nil
 	}); err != nil {
 		panic(err)

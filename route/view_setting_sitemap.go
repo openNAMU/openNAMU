@@ -11,5 +11,5 @@ func View_setting_sitemap(config tool.Config) string {
 	}
 
 	data := `<form method="post"><button id="opennamu_save_button" type="submit">` + tool.Get_language(db, "create", true) + `</button></form>`
-	return setting_page(db, config, tool.Get_language(db, "sitemap_manual_create", true), data, "setting/sitemap_set")
+	return Setting_page(db, config, tool.Get_language(db, "sitemap_manual_create", true), data, "setting/sitemap_set")
 }

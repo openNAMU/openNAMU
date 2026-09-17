@@ -9,10 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func register_user_multiple_routes(r *gin.Engine) {
+func Register_user_multiple_routes(r *gin.Engine) {
 	render := func(c *gin.Context, page string, sort string, search string) {
-		data := route.View_user_multiple(make_route_config(c), page, sort, search)
-		write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
+		data := route.View_user_multiple(Make_route_config(c), page, sort, search)
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	}
 
 	r.GET("/list/user/multiple", func(c *gin.Context) {

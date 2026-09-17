@@ -24,15 +24,15 @@ func View_record_bbs_comment_legacy(config tool.Config, user_name string, page s
 			continue
 		}
 
-		bbs_id, post_id, comment_link, valid := bbs_comment_storage_location(comment_set_id, comment_code)
+		bbs_id, post_id, comment_link, valid := Bbs_comment_storage_location(comment_set_id, comment_code)
 		if !valid {
 			continue
 		}
 		row_count++
 
-		comment_user := record_bbs_legacy_value(db, "comment_user_id", comment_set_id, comment_code)
-		title := record_bbs_legacy_value(db, "title", bbs_id, post_id)
-		bbs_name := record_bbs_legacy_board_name(db, bbs_id)
+		comment_user := Record_bbs_legacy_value(db, "comment_user_id", comment_set_id, comment_code)
+		title := Record_bbs_legacy_value(db, "title", bbs_id, post_id)
+		bbs_name := Record_bbs_legacy_board_name(db, bbs_id)
 		title_link := `<a href="/bbs/w/` + tool.Url_parser(bbs_id) + `/` + tool.Url_parser(post_id) + `#` + tool.Url_parser(comment_link) + `">` + tool.HTML_escape(title) + `</a>`
 		data_html += `<tr><td>` + tool.IP_parser(db, comment_user, config.IP) + `</td><td>` + tool.HTML_escape(date) + `</td><td>#` + tool.HTML_escape(comment_link) + `</td></tr>`
 		data_html += `<tr><td colspan="3">` + title_link + ` (` + tool.HTML_escape(bbs_name) + `)</td></tr>`

@@ -10,7 +10,7 @@ import (
 	"opennamu/route/tool"
 )
 
-func search_highlight(data string, keyword string) string {
+func Search_highlight(data string, keyword string) string {
 	data = tool.HTML_escape(data)
 	keyword_list := []string{}
 	for _, keyword_data := range strings.Fields(keyword) {
@@ -34,7 +34,7 @@ func search_highlight(data string, keyword string) string {
 	})
 }
 
-func search_snippet(data string, keyword string) string {
+func Search_snippet(data string, keyword string) string {
 	data = strings.ReplaceAll(strings.TrimSpace(data), "\r", " ")
 	data = strings.ReplaceAll(data, "\n", " ")
 	if data == "" {
@@ -74,21 +74,21 @@ func search_snippet(data string, keyword string) string {
 	if end < tool.Get_len(data) {
 		result += "..."
 	}
-	return search_highlight(result, keyword)
+	return Search_highlight(result, keyword)
 }
 
-func bbs_tags_html(bbs_id string, tags string, keyword string) string {
+func Bbs_tags_html(bbs_id string, tags string, keyword string) string {
 	data_html := ""
-	for _, tag := range bbs_tag_list(tags) {
+	for _, tag := range Bbs_tag_list(tags) {
 		if data_html != "" {
 			data_html += ", "
 		}
-		data_html += `<a href="/bbs/in/` + tool.Url_parser(bbs_id) + `/filter/tag/` + tool.Url_parser(tag) + `/1">#` + search_highlight(tag, keyword) + `</a>`
+		data_html += `<a href="/bbs/in/` + tool.Url_parser(bbs_id) + `/filter/tag/` + tool.Url_parser(tag) + `/1">#` + Search_highlight(tag, keyword) + `</a>`
 	}
 	return data_html
 }
 
-func bbs_list_example_ui(db *sql.DB) string {
+func Bbs_list_example_ui(db *sql.DB) string {
 	left := tool.Get_language(db, "title", true) + " [" + tool.Get_language(db, "statistics_bbs_comment_count", true) + "] [+" + tool.Get_language(db, "upvote", true) + "] [-" + tool.Get_language(db, "downvote", true) + "]"
 	right := tool.Get_language(db, "page_view", true) + " | " + tool.Get_language(db, "user_name", true) + " | " + tool.Get_language(db, "date", true)
 	return tool.Get_list_ui(left, right, "", "")
@@ -171,14 +171,18 @@ func Get_bbs_list_ui(db *sql.DB, config tool.Config, bbs_all_data []map[string]s
 		}
 
 		bottom := in_data["search_snippet_html"]
+		has_snippet := bottom != ""
 		if bottom != "" {
-			bottom += "<br>"
+			bottom += `<div>`
 		}
 		tags_html := in_data["tags_html"]
 		if tags_html == "" {
-			tags_html = bbs_tags_html(bbs_id, in_data["tags"], "")
+			tags_html = Bbs_tags_html(bbs_id, in_data["tags"], "")
 		}
 		bottom += tags_html
+		if has_snippet {
+			bottom += `</div>`
+		}
 		data_html += date_ui
 		data_html += tool.Get_list_ui(left, right, bottom, class_name)
 	}
@@ -199,11 +203,11 @@ func View_bbs_main(config tool.Config, page string) string {
 	bbs_id_to_name := map[string]string{}
 
 	data_html := "<ul>"
-	bbs_list, ok := bbs_list_api_data["data"].([][]string)
+	Bbs_list, ok := bbs_list_api_data["data"].([][]string)
 	if !ok {
 		return tool.Get_error_page(db, config, "error")
 	}
-	for _, in_data := range bbs_list {
+	for _, in_data := range Bbs_list {
 		bbs_name := in_data[0]
 		bbs_id := in_data[1]
 		bbs_type := in_data[2]
@@ -230,7 +234,7 @@ func View_bbs_main(config tool.Config, page string) string {
 	}
 
 	data_html += "</ul><hr class=\"main_hr\">"
-	data_html += bbs_list_example_ui(db)
+	data_html += Bbs_list_example_ui(db)
 
 	bbs_api_data := Api_bbs(config, "", page, "")
 	bbs_data, _ := bbs_api_data["data"].([]map[string]string)
