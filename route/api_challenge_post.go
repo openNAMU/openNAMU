@@ -7,6 +7,11 @@ import (
 	"opennamu/route/tool"
 )
 
+func challenge_is_complete_tx(db tool.DB_runner, id string, name string) bool {
+	value := ""
+	return tool.QueryRow_DB(db, "select data from user_set where id = ? and name = ? limit 1", []any{&value}, id, name) && value != ""
+}
+
 func Api_challenge_post(config tool.Config) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
@@ -27,14 +32,18 @@ func Api_challenge_post(config tool.Config) map[string]any {
 			name   string
 			count  int
 			reward int
+			point  int
 		}{
-			{"challenge_first_contribute", 1, 500},
-			{"challenge_tenth_contribute", 10, 1000},
-			{"challenge_hundredth_contribute", 100, 3000},
-			{"challenge_thousandth_contribute", 1000, 10000},
+			{"challenge_first_contribute", 1, 500, 5},
+			{"challenge_tenth_contribute", 10, 1000, 10},
+			{"challenge_hundredth_contribute", 100, 3000, 30},
+			{"challenge_thousandth_contribute", 1000, 10000, 100},
 		} {
 			if edit_count >= challenge.count {
-				user_save(tx, config.IP, challenge.name, "1")
+				if !challenge_is_complete_tx(tx, config.IP, challenge.name) {
+					user_save(tx, config.IP, challenge.name, "1")
+					tool.Change_user_point(tx, config.IP, challenge.point)
+				}
 				experience += challenge.reward
 			}
 		}
@@ -44,20 +53,27 @@ func Api_challenge_post(config tool.Config) map[string]any {
 			name   string
 			count  int
 			reward int
+			point  int
 		}{
-			{"challenge_first_discussion", 1, 500},
-			{"challenge_tenth_discussion", 10, 1000},
-			{"challenge_hundredth_discussion", 100, 3000},
-			{"challenge_thousandth_discussion", 1000, 10000},
+			{"challenge_first_discussion", 1, 500, 5},
+			{"challenge_tenth_discussion", 10, 1000, 10},
+			{"challenge_hundredth_discussion", 100, 3000, 30},
+			{"challenge_thousandth_discussion", 1000, 10000, 100},
 		} {
 			if topic_count >= challenge.count {
-				user_save(tx, config.IP, challenge.name, "1")
+				if !challenge_is_complete_tx(tx, config.IP, challenge.name) {
+					user_save(tx, config.IP, challenge.name, "1")
+					tool.Change_user_point(tx, config.IP, challenge.point)
+				}
 				experience += challenge.reward
 			}
 		}
 
 		if challenge_admin {
-			user_save(tx, config.IP, "challenge_admin", "1")
+			if !challenge_is_complete_tx(tx, config.IP, "challenge_admin") {
+				user_save(tx, config.IP, "challenge_admin", "1")
+				tool.Change_user_point(tx, config.IP, 100)
+			}
 			experience += 10000
 		}
 
