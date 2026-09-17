@@ -68,6 +68,15 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 			twofa_password_hash = tool.Password_encode(db, twofa_password, twofa_encode)
 		}
 	}
+	online_status := ""
+	if values.Has("online_status") {
+		online_status = values.Get("online_status")
+		if online_status != "" && online_status != "on" {
+			return_data["response"] = "error"
+			return_data["data"] = "invalid data"
+			return return_data
+		}
+	}
 
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		if values.Has("skin") {
@@ -97,6 +106,13 @@ func Api_user_setting_post(config tool.Config, values url.Values) map[string]any
 		for _, name := range []string{"sub_user_name", "top_menu"} {
 			if values.Has(name) {
 				user_save(tx, config.IP, name, values.Get(name))
+			}
+		}
+		if values.Has("online_status") {
+			if online_status == "on" {
+				user_save(tx, config.IP, "online_status", online_status)
+			} else {
+				user_delete(tx, config.IP, "online_status")
 			}
 		}
 

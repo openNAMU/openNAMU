@@ -5,7 +5,12 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 )
+
+var online_user_map = map[string]time.Time{}
+var online_user_mutex sync.RWMutex
 
 // IP is TRUE
 func IP_or_user(ip string) bool {
@@ -15,6 +20,27 @@ func IP_or_user(ip string) bool {
 	} else {
 		return false
 	}
+}
+
+func Update_online_user(user_id string) {
+	if user_id == "" || IP_or_user(user_id) {
+		return
+	}
+
+	online_user_mutex.Lock()
+	online_user_map[user_id] = time.Now()
+	online_user_mutex.Unlock()
+}
+
+func Check_online_user(user_id string) bool {
+	if user_id == "" || IP_or_user(user_id) {
+		return false
+	}
+
+	online_user_mutex.RLock()
+	last_request, exists := online_user_map[user_id]
+	online_user_mutex.RUnlock()
+	return exists && time.Since(last_request) < 5*time.Minute
 }
 
 // PASS is TRUE

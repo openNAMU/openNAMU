@@ -80,10 +80,12 @@ func site_view_middleware() gin.HandlerFunc {
 		db := tool.DB_connect()
 		defer tool.DB_close(db)
 
-		if !tool.Get_auth_info(db, tool.Get_IP(c))["site_view"] {
+		user_id := tool.Get_IP(c)
+		if !tool.Get_auth_info(db, user_id)["site_view"] {
 			c.AbortWithStatus(http.StatusForbidden)
 			return
 		}
+		tool.Update_online_user(user_id)
 
 		c.Next()
 	}

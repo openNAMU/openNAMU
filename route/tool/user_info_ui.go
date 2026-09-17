@@ -28,8 +28,16 @@ func get_user_info_ui(db *sql.DB, config Config, user_name string) string {
 		ban_state = "<a href=\"/auth/give_list\">" + Get_language(db, "ban", false) + "</a>"
 	}
 
+	online_icon := ""
+	if !IP_or_user(user_name) && Get_user_set_exists(db, user_name, "pw") && Get_user_set_data(db, user_name, "online_status") == "on" {
+		online_icon = "🔴 "
+		if Check_online_user(user_name) {
+			online_icon = "🟢 "
+		}
+	}
+
 	level_data := Get_level(db, user_name)
-	return `<table class="user_info_table"><tr><td>` + Get_language(db, "user_name", false) + `</td><td>` + Get_user_profile_image_ui(db, user_name) + IP_parser(db, user_name, config.IP) + `</td></tr><tr><td>` + Get_language(db, "authority", false) + `</td><td>` + HTML_escape(auth_name) + `</td></tr><tr><td>` + Get_language(db, "state", false) + `</td><td>` + ban_state + `</td></tr><tr><td>` + Get_language(db, "level", false) + `</td><td>` + HTML_escape(level_data[0]) + ` (` + HTML_escape(level_data[1]) + ` / ` + HTML_escape(level_data[2]) + `)</td></tr></table>`
+	return `<table class="user_info_table"><tr><td>` + Get_language(db, "user_name", false) + `</td><td>` + Get_user_profile_image_ui(db, user_name) + online_icon + IP_parser(db, user_name, config.IP) + `</td></tr><tr><td>` + Get_language(db, "authority", false) + `</td><td>` + HTML_escape(auth_name) + `</td></tr><tr><td>` + Get_language(db, "state", false) + `</td><td>` + ban_state + `</td></tr><tr><td>` + Get_language(db, "level", false) + `</td><td>` + HTML_escape(level_data[0]) + ` (` + HTML_escape(level_data[1]) + ` / ` + HTML_escape(level_data[2]) + `)</td></tr></table>`
 }
 
 func Replace_user_info_ui(db *sql.DB, config Config, data string) string {

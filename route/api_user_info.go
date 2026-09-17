@@ -14,6 +14,13 @@ func Api_user_info(config tool.Config, ip string) map[string]any {
 	auth_name := tool.Get_user_auth(db, ip)
 	level_data := tool.Get_level(db, ip)
 	user_document := tool.Get_user_document(db, ip)
+	online_status := ""
+	if !tool.IP_or_user(ip) && tool.Get_user_set_exists(db, ip, "pw") && tool.Get_user_set_data(db, ip, "online_status") == "on" {
+		online_status = "offline"
+		if tool.Check_online_user(ip) {
+			online_status = "online"
+		}
+	}
 
 	data_result["render"] = ip_render
 
@@ -30,6 +37,7 @@ func Api_user_info(config tool.Config, ip string) map[string]any {
 		ban_data = []string{"true", auth_name}
 	}
 	data_result["ban"] = ban_data
+	data_result["online"] = online_status
 
 	document_data := "0"
 	if user_document {

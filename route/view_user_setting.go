@@ -80,6 +80,10 @@ func View_user_setting(config tool.Config, values url.Values) string {
 		}
 		return tool.Get_redirect("/change")
 	}
+	current_online_status := user_value(db, config.IP, "online_status")
+	if current_online_status != "on" {
+		current_online_status = ""
+	}
 
 	current_skin := user_value(db, config.IP, "skin")
 	current_language := user_value(db, config.IP, "lang")
@@ -102,6 +106,8 @@ func View_user_setting(config tool.Config, values url.Values) string {
 	if user_value(db, config.IP, "2fa_pw") != "" {
 		twofa_password = "2fa_password_change"
 	}
+	online_status_options := user_option(user_choice{"", tool.Get_language(db, "online_status_private", true)}, current_online_status)
+	online_status_options += user_option(user_choice{"on", tool.Get_language(db, "online_status_public", true)}, current_online_status)
 
 	title_options := ""
 	for _, choice := range user_title_list(db, config.IP) {
@@ -117,6 +123,7 @@ func View_user_setting(config tool.Config, values url.Values) string {
 	body += `<a href="/change/head">(` + tool.Get_language(db, "user_head", false) + `)</a> <a href="/change/top_menu">(` + tool.Get_language(db, "user_added_menu", true) + `)</a><hr class="main_hr"><span>` + tool.Get_language(db, "skin", true) + `</span><hr class="main_hr"><select name="skin">` + skin_options(current_skin) + `</select><hr class="main_hr">`
 	body += `<a href="/change/skin_set">(` + tool.Get_language(db, "skin_set", true) + `)</a> <a href="/change/skin_set/main">(` + tool.Get_language(db, "main_skin_set", true) + `)</a><hr class="main_hr"><span>` + tool.Get_language(db, "language", true) + `</span><hr class="main_hr"><select name="lang">` + language_options(current_language) + `</select><hr class="main_hr"><span>` + tool.Get_language(db, "user_title", true) + `</span><hr class="main_hr"><select name="user_title">` + title_options + `</select><h2>` + tool.Get_language(db, "2fa", true) + `</h2><select name="2fa">` + twofa_options + `</select><hr class="main_hr"><input type="password" name="2fa_pw" placeholder="` + tool.Get_language(db, twofa_password, true) + `"><h2>` + tool.Get_language(db, "main_user_name", true) + `</h2><a href="/change/user_name">(` + tool.Get_language(db, "change_user_name", true) + `)</a><hr class="main_hr">`
 	body += `<h2>` + tool.Get_language(db, "profile_image", true) + `</h2><input name="profile_image" value="` + tool.HTML_escape(profile_image) + `" placeholder="file_name.png"><br>` + tool.Get_language(db, "profile_image_help", true) + `<hr class="main_hr">`
+	body += `<span>` + tool.Get_language(db, "online_status", true) + `</span><hr class="main_hr"><select name="online_status">` + online_status_options + `</select><hr class="main_hr">`
 	body += tool.Get_language(db, "user_name", true) + ` : ` + tool.HTML_escape(user_name) + `<h2>` + tool.Get_language(db, "sub_user_name", true) + `</h2><input name="sub_user_name" value="` + tool.HTML_escape(user_value(db, config.IP, "sub_user_name")) + `" placeholder="` + tool.Get_language(db, "sub_user_name", true) + `"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button>` + tool.Get_http_warning(db) + `</form>`
 	return user_form_page(db, config, tool.Get_language(db, "user_setting", true), body)
 }
