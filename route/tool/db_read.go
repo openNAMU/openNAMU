@@ -747,9 +747,9 @@ func Get_statistics_count(db *sql.DB, count_type string) int {
 	case "edit":
 		query = "select count(*) from history"
 	case "bbs_post":
-		query = "select count(*) from bbs_data where set_name = 'user_id' and set_data != ''"
+		query = "select count(*) from bbs_data where set_name = 'user_id' and set_id != '0' and set_data != ''"
 	case "bbs_comment":
-		query = "select count(*) from bbs_data where set_name = 'comment_user_id' and set_data != ''"
+		query = "select count(*) from bbs_data where set_name = 'comment' and set_data != ''"
 	}
 	if query == "" {
 		return 0
