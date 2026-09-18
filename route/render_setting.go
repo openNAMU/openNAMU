@@ -24,6 +24,13 @@ func Move_render_category_top(data string) string {
 	category_end := category_start + category_end_offset + len(`</div>`)
 	separator := strings.LastIndex(data[:category_start], `<hr class="main_hr">`)
 	opening_end := strings.Index(data, ">")
+	render_wrapper_class := strings.Index(data, `class="opennamu_render_complete"`)
+	if render_wrapper_class >= 0 {
+		wrapper_open_end := strings.Index(data[render_wrapper_class:], ">")
+		if wrapper_open_end >= 0 {
+			opening_end = render_wrapper_class + wrapper_open_end
+		}
+	}
 	if separator < 0 || opening_end < 0 || opening_end >= separator {
 		return data
 	}
