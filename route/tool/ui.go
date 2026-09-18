@@ -282,6 +282,7 @@ func Get_wiki_css(data []any, cookies string) []any {
 	data_css += `<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/x86asm.min.js" integrity="sha512-HeAchnWb+wLjUb2njWKqEXNTDlcd1QcyOVxb+Mc9X0bWY0U5yNHiY5hTRUt/0twG8NEZn60P3jttqBvla/i2gA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>`
 	data_css += `<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>`
 	data_css += `<script defer src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`
+	data_css += `<script defer src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>`
 
 	// Func JS
 	data_css += `<script defer src="/views/main_css/js/func/func.js` + data_css_ver + `"></script>`
