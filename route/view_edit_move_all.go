@@ -50,7 +50,7 @@ func Move_all_selected(current string, option string) string {
 func Move_all_rows(db *sql.DB, source string, target string, match_type string) string {
 	documents := Move_all_documents(db, source, target, match_type)
 
-	body := "<h2>" + tool.Get_language(db, "move", true) + " preview</h2><ul>"
+	body := "<h2>" + tool.Get_language(db, "move", true) + " " + tool.Get_language(db, "preview", true) + "</h2><ul>"
 	for _, document := range documents {
 		body += "<li><a href=\"/w/" + tool.Url_parser(document.old_name) + "\">" + tool.HTML_escape(document.old_name) + "</a> → " + tool.HTML_escape(document.new_name) + "</li>"
 	}
@@ -85,7 +85,7 @@ func View_edit_move_all(config tool.Config, values url.Values) string {
 		}
 	}
 
-	body := "<p>" + tool.Get_language(db, "multiple_move", true) + " preview</p>"
+	body := "<p>" + tool.Get_language(db, "multiple_move", true) + " " + tool.Get_language(db, "preview", true) + "</p>"
 	body += "<form method=\"get\"><input name=\"source\" value=\"" + tool.HTML_escape(source) + "\" placeholder=\"" + tool.Get_language(db, "document_name", true) + "\">"
 	body += "<hr class=\"main_hr\"><input name=\"target\" value=\"" + tool.HTML_escape(target) + "\" placeholder=\"" + tool.Get_language(db, "document_name", true) + "\">"
 	body += "<hr class=\"main_hr\"><input name=\"send\" value=\"" + tool.HTML_escape(send) + "\" placeholder=\"" + tool.Get_language(db, "why", true) + "\">"

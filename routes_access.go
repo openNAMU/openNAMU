@@ -69,7 +69,7 @@ func Wiki_access_middleware() gin.HandlerFunc {
 
 		next := tool.HTML_escape(c.Request.URL.RequestURI())
 		body := "<h2>" + tool.Get_language(db, "error_password_require_for_wiki_access", true) + "</h2>"
-		body += "<form method='post' action='/wiki_access'><input type='hidden' name='next' value='" + next + "'><input type='password' name='password'><button type='submit'>submit</button></form>"
+		body += `<form method="post" action="/wiki_access"><input type="hidden" name="next" value="` + next + `"><div><input type="password" name="password"></div><hr class="main_hr"><div><button type="submit">` + tool.Get_language(db, "ok", true) + `</button></div></form>`
 		Write_data(c, http.StatusForbidden, "text/html; charset=utf-8", []byte(body))
 		c.Abort()
 	}

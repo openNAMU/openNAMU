@@ -178,6 +178,7 @@
     "login": "Login",
     "logout": "Logout",
     "register": "Registration",
+    "register_submit_done": "Registration request submitted.",
     "invite": "Invitation",
     "invite_required": "Invitation required for registration",
     "invite_manage": "Invitation management",

@@ -66,6 +66,6 @@ func View_login_2fa_email(config tool.Config, values url.Values) string {
 		}
 	}
 
-	body := `<form method="post"><input name="key" type="text">` + tool.Get_captcha_ui(db, config) + `<button type="submit">` + tool.Get_language(db, "login", true) + `</button>` + tool.Get_http_warning(db) + `</form>`
+	body := `<form method="post"><div><input name="key" type="text"></div><hr class="main_hr">` + tool.Get_captcha_ui(db, config) + `<div><button type="submit">` + tool.Get_language(db, "login", true) + `</button></div>` + tool.Get_http_warning(db) + `</form>`
 	return User_form_page(db, config, tool.Get_language(db, "2fa", true), body)
 }

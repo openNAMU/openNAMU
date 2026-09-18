@@ -604,18 +604,21 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
 	}
 
 	monaco_editor_top += `
-        <span class="__ON_SELECT_DIV__">
-            <select class="__ON_SELECT__" onclick="do_sync_monaco_and_textarea();" id="opennamu_select_editor" onchange="opennamu_edit_turn_off_monaco();">
-                <option value="default" ` + select_a + `>` + Get_language(db, "default", true) + `</option>
-                <option value="monaco" ` + select_b + `>` + Get_language(db, "monaco_editor", true) + `</option>
-            </select>
-        </span>
+        <div>
+            <span class="__ON_SELECT_DIV__">
+                <select class="__ON_SELECT__" onclick="do_sync_monaco_and_textarea();" id="opennamu_select_editor" onchange="opennamu_edit_turn_off_monaco();">
+                    <option value="default" ` + select_a + `>` + Get_language(db, "default", true) + `</option>
+                    <option value="monaco" ` + select_b + `>` + Get_language(db, "monaco_editor", true) + `</option>
+                </select>
+            </span>
+        </div>
+        <hr class="main_hr">
     `
 
 	if editor_type == "edit" {
-		monaco_editor_top += Get_markup_select_ui(db, config, doc_name, "", `id="opennamu_editor_markup" onclick="opennamu_do_sync_monaco_markup();"`, "")
+		monaco_editor_top += `<div>` + Get_markup_select_ui(db, config, doc_name, "", `id="opennamu_editor_markup" onclick="opennamu_do_sync_monaco_markup();"`, "") + `</div>`
 	} else {
-		monaco_editor_top += Get_markup_select_ui(db, config, doc_name, "", `id="opennamu_editor_markup" onclick="opennamu_do_sync_monaco_markup();"`, "disabled")
+		monaco_editor_top += `<div>` + Get_markup_select_ui(db, config, doc_name, "", `id="opennamu_editor_markup" onclick="opennamu_do_sync_monaco_markup();"`, "disabled") + `</div>`
 	}
 
 	textarea_size := "opennamu_textarea_500"
@@ -624,12 +627,12 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
 	}
 
 	out_field := Get_captcha_ui(db, config) + Get_IP_warning_ui(db, config) + add_on
-	preview_ui := `<button class="__ON_BUTTON__" id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview();">` + Get_language(db, "preview", true) + `</button>`
+	preview_ui := `<div><button class="__ON_BUTTON__" id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview();">` + Get_language(db, "preview", true) + `</button></div>`
 	preview_area := `<hr class="main_hr">
         <div id="opennamu_preview_area"></div>`
 	if do_type == "edit" {
-		preview_ui = `<button class="__ON_BUTTON__" type="submit" name="preview" value="normal" onclick="do_stop_exit_release(); do_sync_monaco_and_textarea();">` + Get_language(db, "preview_normal", true) + `</button>`
-		preview_ui += ` <button class="__ON_BUTTON__" type="submit" name="preview" value="dark" onclick="do_stop_exit_release(); do_sync_monaco_and_textarea();">` + Get_language(db, "preview_dark", true) + `</button>`
+		preview_ui = `<div><button class="__ON_BUTTON__" type="submit" name="preview" value="normal" onclick="do_stop_exit_release(); do_sync_monaco_and_textarea();">` + Get_language(db, "preview_normal", true) + `</button></div>`
+		preview_ui += `<hr class="main_hr"><div><button class="__ON_BUTTON__" type="submit" name="preview" value="dark" onclick="do_stop_exit_release(); do_sync_monaco_and_textarea();">` + Get_language(db, "preview_dark", true) + `</button></div>`
 		preview_area = ""
 	}
 
@@ -659,7 +662,8 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
             });
         </script>
 
-        <button class="__ON_BUTTON__" id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">` + Get_language(db, "send", true) + `</button>
+        <div><button class="__ON_BUTTON__" id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">` + Get_language(db, "send", true) + `</button></div>
+        <hr class="main_hr">
         ` + preview_ui + `
         ` + preview_area + `
     `

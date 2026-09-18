@@ -50,7 +50,8 @@ func View_setting_head_data(db *sql.DB, config tool.Config, kind string, skin_na
 			data.WriteString(`<a href="/setting/head/` + tool.Url_parser(skin+"-cssdark") + `">(` + tool.HTML_escape(skin) + `-cssdark)</a> `)
 		}
 		data.WriteString(Main_hr())
-		data.WriteString(`<span>&lt;style&gt;CSS&lt;/style&gt;<br>&lt;script&gt;JS&lt;/script&gt;</span>` + Main_hr())
+		data.WriteString(`<pre>&lt;style&gt;CSS&lt;/style&gt;
+&lt;script&gt;JS&lt;/script&gt;</pre>` + Main_hr())
 	}
 
 	data.WriteString(`<textarea class="opennamu_textarea_500" placeholder="` + lang("enter_html") + `" name="content" id="content">` + tool.HTML_escape(value) + `</textarea>`)

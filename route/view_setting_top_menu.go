@@ -18,17 +18,11 @@ func View_setting_top_menu(config tool.Config) string {
 }
 
 func View_setting_top_menu_data(db *sql.DB, config tool.Config, value string) string {
-	data := `<span>
-        EX)
-        <br>
-        ONTS
-        <br>
-        https://2du.pythonanywhere.com/
-        <br>
-        FrontPage
-        <br>
-        /w/FrontPage
-    </span>`
+	data := `<pre>EX)
+ONTS
+https://2du.pythonanywhere.com/
+FrontPage
+/w/FrontPage</pre>`
 	data += Main_hr() + tool.Get_language(db, "not_support_skin_warning", true) + Main_hr()
 	data += `<form method="post">`
 	data += `<textarea class="opennamu_textarea_500" placeholder="` + tool.Get_language(db, "enter_top_menu_setting", true) + `" name="content" id="content">` + tool.HTML_escape(value) + `</textarea>`

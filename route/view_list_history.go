@@ -47,9 +47,11 @@ func View_list_history(config tool.Config, doc_name string, set_type string, num
 
 	data_html = `
 	        <form method="post">
-	            <select name="a">` + select_ui + `</select>
-	            <select name="b">` + select_ui + `</select>
-	            <button type="submit">` + tool.Get_language(db, "compare", true) + `</button>
+	            <div><select name="a">` + select_ui + `</select></div>
+	            <hr class="main_hr">
+	            <div><select name="b">` + select_ui + `</select></div>
+	            <hr class="main_hr">
+	            <div><button type="submit">` + tool.Get_language(db, "compare", true) + `</button></div>
 	        </form>
 	        <hr class="main_hr">
 	    ` + data_html

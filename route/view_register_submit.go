@@ -36,8 +36,8 @@ func View_register_submit(config tool.Config, values url.Values) string {
 			config.Session.Delete(name)
 		}
 		_ = config.Session.Save()
-		return User_form_page(db, config, "register submit", "<p>submitted</p><a href='/user'>return</a>")
+		return User_form_page(db, config, tool.Get_language(db, "register", true), `<p>`+tool.Get_language(db, "register_submit_done", true)+`</p><div><a href="/user">`+tool.Get_language(db, "return", true)+`</a></div>`)
 	}
-	body := "<form method='post'><p>" + tool.HTML_escape(question) + "</p><input name='answer'><button type='submit'>send</button></form>"
-	return User_form_page(db, config, "register submit", body)
+	body := "<form method='post'><p>" + tool.HTML_escape(question) + "</p><div><input name='answer'></div><hr class='main_hr'><div><button type='submit'>" + tool.Get_language(db, "send", true) + "</button></div></form>"
+	return User_form_page(db, config, tool.Get_language(db, "register", true), body)
 }

@@ -33,5 +33,5 @@ func View_list_admin_auth_use_page(config tool.Config, page string, search strin
 		page_url += "/" + tool.Url_parser(search)
 	}
 	body.WriteString(tool.Get_page_control(db, page_num, count, 50, page_url))
-	return List_extra_page(db, config, tool.Get_language(db, "auth_use", true), `<form method="post"><input name="search" value="`+tool.HTML_escape(search)+`"><button type="submit">`+tool.Get_language(db, "search", true)+`</button></form><hr class="main_hr">`+body.String())
+	return List_extra_page(db, config, tool.Get_language(db, "auth_use", true), `<form method="post"><div><input name="search" value="`+tool.HTML_escape(search)+`"></div><hr class="main_hr"><div><button type="submit">`+tool.Get_language(db, "search", true)+`</button></div></form><hr class="main_hr">`+body.String())
 }

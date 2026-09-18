@@ -24,6 +24,7 @@
     "system": "시스템",
     "move_history": "이동 기록",
     "register": "회원 가입",
+    "register_submit_done": "가입 신청이 완료되었습니다.",
     "invite": "초대장",
     "invite_required": "회원 가입시 초대장 필요",
     "invite_manage": "초대장 관리",

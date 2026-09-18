@@ -8,7 +8,7 @@ func View_wiki_access(config tool.Config) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	body := "<form method='post'><input type='password' name='password'><button type='submit'>submit</button></form>"
+	body := `<form method="post"><div><input type="password" name="password"></div><hr class="main_hr"><div><button type="submit">` + tool.Get_language(db, "ok", true) + `</button></div></form>`
 	return tool.Get_template(db, config, tool.Get_language(db, "error_password_require_for_wiki_access", true), body, []any{}, [][]any{}, map[string]string{})
 }
 

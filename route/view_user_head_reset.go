@@ -31,6 +31,6 @@ func View_user_head_reset(config tool.Config, values url.Values) string {
 		data, _ = config.Session.Get("head").(string)
 		data_skin, _ = config.Session.Get("head_" + skin_name).(string)
 	}
-	body := `<form method="post"><style>.main_hr { border: none; }</style>` + tool.Get_language(db, "all", true) + `<hr class="main_hr"><pre>` + tool.HTML_escape(data) + `</pre><hr class="main_hr">` + tool.HTML_escape(skin_name) + `<hr class="main_hr"><pre>` + tool.HTML_escape(data_skin) + `</pre><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "reset", true) + `</button></form>`
+	body := `<form method="post">` + tool.Get_language(db, "all", true) + `<hr class="main_hr"><pre>` + tool.HTML_escape(data) + `</pre><hr class="main_hr">` + tool.HTML_escape(skin_name) + `<hr class="main_hr"><pre>` + tool.HTML_escape(data_skin) + `</pre><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "reset", true) + `</button></form>`
 	return body
 }

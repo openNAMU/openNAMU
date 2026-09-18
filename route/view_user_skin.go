@@ -47,5 +47,5 @@ func View_user_skin(config tool.Config, values url.Values) string {
 		body += `<option value="` + tool.HTML_escape(skin) + `"` + selected + `>` + tool.HTML_escape(skin) + `</option>`
 	}
 	body += `</select><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
-	return User_form_page(db, config, "skin", body)
+	return User_form_page(db, config, tool.Get_language(db, "skin", true), body)
 }

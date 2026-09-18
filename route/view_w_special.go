@@ -172,16 +172,21 @@ func Category_manual_delete_link(category_name string, doc_name string, return_n
 func Category_manual_add_form(db *sql.DB, config tool.Config, category_name string, doc_name string, return_name string) string {
 	data := `<form method="post" action="/category/add">`
 	if category_name == "" {
-		data += `<input type="text" name="category" placeholder="` + tool.HTML_escape(tool.Get_language(db, "category", true)) + `">`
+		data += `<div><input type="text" name="category" placeholder="` + tool.HTML_escape(tool.Get_language(db, "category", true)) + `"></div><hr class="main_hr">`
 	} else {
 		data += `<input type="hidden" name="category" value="` + tool.HTML_escape(category_name) + `">`
 	}
 	if doc_name == "" {
-		data += `<input type="text" name="document" placeholder="` + tool.HTML_escape(tool.Get_language(db, "document", true)) + `">`
+		data += `<div><input type="text" name="document" placeholder="` + tool.HTML_escape(tool.Get_language(db, "document", true)) + `"></div><hr class="main_hr">`
 	} else {
 		data += `<input type="hidden" name="document" value="` + tool.HTML_escape(doc_name) + `">`
 	}
-	data += `<input type="hidden" name="return" value="` + tool.HTML_escape(return_name) + `">` + tool.Get_captcha_ui(db, config) + `<button type="submit">` + tool.Get_language(db, "add", true) + `</button></form>`
+	data += `<input type="hidden" name="return" value="` + tool.HTML_escape(return_name) + `">`
+	captcha := tool.Get_captcha_ui(db, config)
+	if captcha == "" {
+		data += `<hr class="main_hr">`
+	}
+	data += captcha + `<div><button type="submit">` + tool.Get_language(db, "add", true) + `</button></div></form>`
 	return data
 }
 
