@@ -820,7 +820,7 @@ func Get_editor_button_ui(db *sql.DB) string {
 			panic(err)
 		}
 
-		data_html += `<a href="javascript:do_insert_data('` + JS_escape(plus) + `');">` + HTML_escape(html) + `</a>`
+		data_html += `<a href="javascript:do_insert_data('` + JS_escape(plus) + `');">(` + HTML_escape(html) + `)</a> `
 	}
 
 	if data_html != "" {
