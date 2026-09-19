@@ -50,8 +50,14 @@ func Api_bbs_list(config tool.Config) map[string]any {
 		db,
 		`select n.set_id, n.set_data, coalesce(t.set_data, ''), coalesce(d.set_data, '') from bbs_set n
 		left join bbs_set t on t.set_id = n.set_id and t.set_name = 'bbs_type'
+		left join (
+			select set_id, max(set_code + 0) as max_code
+			from bbs_data
+			where set_name = 'date'
+			group by set_id
+		) latest on latest.set_id = n.set_id
 		left join bbs_data d on d.set_id = n.set_id and d.set_name = 'date'
-			and d.set_code + 0 = (select max(d2.set_code + 0) from bbs_data d2 where d2.set_id = n.set_id and d2.set_name = 'date')
+			and d.set_code + 0 = latest.max_code
 		where n.set_name = 'bbs_name'`,
 	)
 	defer rows.Close()
