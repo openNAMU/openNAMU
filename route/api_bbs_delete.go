@@ -25,7 +25,7 @@ func Api_bbs_delete(config tool.Config, set_id string) map[string]any {
 		return return_data
 	}
 
-	if set_id == "0" {
+	if Bbs_is_special_board(set_id) {
 		return_data["response"] = "error"
 		return_data["data"] = "not allowed"
 

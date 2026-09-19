@@ -14,7 +14,7 @@ func Api_record_bbs(config tool.Config, user_name string, page string) map[strin
 
 	rows := tool.Query_DB(
 		db,
-		`select distinct set_id from bbs_data where set_name = "user_id" and set_data = ? order by set_id desc limit ?, 50`,
+		`select distinct set_id from bbs_data where set_name = "user_id" and set_data = ? and (set_id + 0 > 0 or set_id in ('0', '-1')) order by set_id desc limit ?, 50`,
 		user_name,
 		num,
 	)

@@ -166,13 +166,15 @@ func View_bbs_in_internal(config tool.Config, set_id string, page_num string, so
 	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/filter/participate/1">` + tool.Get_language(db, "participate_bbs_post", false) + `</a>)&nbsp;`
 	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/filter/tabom_user/1">` + tool.Get_language(db, "my_tabom_bbs_post", false) + `</a>)&nbsp;`
 	data_html += `(<a href="/` + filter_menu_path + `">` + tool.Get_language(db, "filter", false) + `</a>)&nbsp;`
-	data_html += `(<a href="/bbs/set/` + tool.Url_parser(set_id) + `">` + tool.Get_language(db, "bbs_set", false) + `</a>)`
+	if !Bbs_is_special_board(set_id) || set_id == "0" || set_id == thread_bbs_id {
+		data_html += `(<a href="/bbs/set/` + tool.Url_parser(set_id) + `">` + tool.Get_language(db, "bbs_set", false) + `</a>)`
+	}
 
 	menu := [][]any{
 		{"bbs/main", tool.Get_language(db, "return", true)},
 		{"bbs/search/" + tool.Url_parser(set_id), tool.Get_language(db, "search", true)},
 	}
-	if set_id != "0" {
+	if !Bbs_is_special_board(set_id) || set_id == thread_bbs_id {
 		add_path := "bbs/edit/" + tool.Url_parser(set_id)
 		if set_id == thread_bbs_id && filter.tag != "" {
 			add_path += "/document/" + tool.Base64_encode(filter.tag)

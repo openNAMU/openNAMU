@@ -87,6 +87,9 @@ func Acl_value_list(db *sql.DB, selected string) []string {
 func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
+	if Bbs_is_special_board(set_id) && set_id != "0" && set_id != thread_bbs_id {
+		return tool.Get_redirect("/bbs/in/" + tool.Url_parser(set_id))
+	}
 
 	bbs_name := Bbs_set_value(db, set_id, "bbs_name")
 	if bbs_name == "" {
@@ -137,7 +140,7 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 	menu := [][]any{
 		{"bbs/in/" + tool.Url_parser(set_id), tool.Get_language(db, "return", true)},
 	}
-	if tool.Check_permission(db, "bbs_delete", config.IP) {
+	if !Bbs_is_special_board(set_id) && tool.Check_permission(db, "bbs_delete", config.IP) {
 		menu = append(menu, []any{"bbs/delete/" + tool.Url_parser(set_id), tool.Get_language(db, "delete", true)})
 	}
 

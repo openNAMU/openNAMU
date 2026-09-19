@@ -21,6 +21,9 @@ func View_bbs_contributor(config tool.Config) string {
 	auth_info := tool.Get_auth_info(db, config.IP)
 	bbs_ids := []string{}
 	for _, bbs_id := range Bbs_list(db) {
+		if Bbs_is_special_board(bbs_id) && bbs_id != thread_bbs_id {
+			continue
+		}
 		if tool.Check_acl(db, bbs_id, "", "bbs_view", config.IP) && Bbs_post_view_allowed(db, bbs_id, "", "", config.IP, auth_info) {
 			bbs_ids = append(bbs_ids, bbs_id)
 		}

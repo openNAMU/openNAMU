@@ -30,7 +30,11 @@ func Api_bbs_make(config tool.Config, bbs_name string, bbs_type string) map[stri
 			`select set_id from bbs_set where set_name = "bbs_name" order by set_id + 0 desc`,
 			[]any{&last_id},
 		)
-		set_id = strconv.Itoa(tool.Str_to_int(last_id) + 1)
+		new_id := tool.Str_to_int(last_id) + 1
+		if new_id <= 0 {
+			new_id = 1
+		}
+		set_id = strconv.Itoa(new_id)
 		for _, value := range [][]any{
 			{"bbs_name", bbs_name},
 			{"bbs_type", bbs_type},

@@ -8,6 +8,12 @@ import (
 	"opennamu/route/tool"
 )
 
+const report_bbs_id = "-2"
+
+func Bbs_is_special_board(set_id string) bool {
+	return tool.Str_to_int(set_id) <= 0
+}
+
 func Bbs_post_blind(db *sql.DB, set_id string, set_code string) bool {
 	blind, exists := tool.Get_bbs_data_value(db, set_id, set_code, "blind")
 	return exists && blind == "O"
@@ -472,7 +478,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 	rows_arr := []*sql.Rows{}
 	if bbs_num == "" {
 		view_sql, view_values := Bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
-		query := "select set_code, set_id, '0' from bbs_data where set_name = 'date' and set_id not in ('0', '-1') and " + tool.Get_except_set_id_SQL()
+		query := "select set_code, set_id, '0' from bbs_data where set_name = 'date' and set_id + 0 > 0 and " + tool.Get_except_set_id_SQL()
 		if view_sql != "" {
 			query += " and " + view_sql
 		}

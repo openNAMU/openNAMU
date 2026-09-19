@@ -9,6 +9,10 @@ import (
 )
 
 func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_code string, selected_comment string, page int) string {
+	if set_id == report_bbs_id {
+		return ""
+	}
+
 	if page < 1 {
 		page = 1
 	}
@@ -27,6 +31,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 
 	bbs_comment_acl := tool.Check_acl(db, set_id, "", "bbs_comment", config.IP)
 	comment_manage := tool.Check_permission(db, "bbs_comment_manage", config.IP)
+	report_allowed := set_id != report_bbs_id && tool.Check_permission(db, "bbs_comment", config.IP)
 	comment_closed := Bbs_comment_closed(db, set_id, set_code)
 	can_comment := bbs_comment_acl && !comment_closed
 	bbs_comment_placeholder := Bbs_set_value(db, set_id, "bbs_comment_placeholder")
@@ -71,7 +76,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 
 	if page == 1 && len(pinned_data_api_in) > 0 {
 		for _, v := range pinned_data_api_in {
-			comment_html, _, exists := Get_bbs_comment_ui(db, config, post_user, set_id, set_code, comment_prefix, comment_path, v, comment_manage, bbs_comment_acl, true)
+			comment_html, _, exists := Get_bbs_comment_ui(db, config, post_user, set_id, set_code, comment_prefix, comment_path, v, comment_manage, bbs_comment_acl, report_allowed, true)
 			if exists {
 				data_html += comment_html
 			}
@@ -80,7 +85,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	}
 
 	for _, v := range data_api_in {
-		comment_html, code_id, exists := Get_bbs_comment_ui(db, config, post_user, set_id, set_code, comment_prefix, comment_path, v, comment_manage, bbs_comment_acl, false)
+		comment_html, code_id, exists := Get_bbs_comment_ui(db, config, post_user, set_id, set_code, comment_prefix, comment_path, v, comment_manage, bbs_comment_acl, report_allowed, false)
 		if !exists {
 			continue
 		}
@@ -114,7 +119,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	data_html += tool.Get_page_control(db, page, page_count, 50, "/bbs/w/"+tool.Url_parser(set_id)+"/"+tool.Url_parser(set_code)+"/page/{}")
 	return data_html
 }
-func Get_bbs_comment_ui(db *sql.DB, config tool.Config, post_user string, set_id string, set_code string, comment_prefix string, comment_path string, v map[string]string, comment_manage bool, comment_acl bool, copy_comment bool) (string, string, bool) {
+func Get_bbs_comment_ui(db *sql.DB, config tool.Config, post_user string, set_id string, set_code string, comment_prefix string, comment_path string, v map[string]string, comment_manage bool, comment_acl bool, report_allowed bool, copy_comment bool) (string, string, bool) {
 	comment_data := v["comment"]
 	if v["blind"] == "O" && !comment_manage {
 		comment_data = ""
@@ -151,6 +156,10 @@ func Get_bbs_comment_ui(db *sql.DB, config tool.Config, post_user string, set_id
 		}
 		date += ` <a href="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/comment_tabom/` + tool.Url_parser(code_id) + `/up">(` + tool.Get_language(db, "upvote", true) + ` ` + tool.HTML_escape(tabom_count) + `)</a>`
 		date += ` <a href="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/comment_tabom/` + tool.Url_parser(code_id) + `/down">(` + tool.Get_language(db, "downvote", true) + ` ` + tool.HTML_escape(tabom_down_count) + `)</a>`
+	}
+
+	if report_allowed {
+		date += ` <a href="/bbs/report/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/comment/` + tool.Url_parser(code_id) + `">(` + tool.Get_language(db, "report", true) + `)</a>`
 	}
 
 	padding_str := "0"

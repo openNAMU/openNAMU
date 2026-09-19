@@ -370,4 +370,55 @@ func Register_bbs_routes(r *gin.Engine) {
 		)
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
+	r.GET("/bbs/report/:set_id/:set_code", func(c *gin.Context) {
+		route_data := route.View_bbs_report(
+			Make_route_config(c),
+			c.Param("set_id"),
+			c.Param("set_code"),
+			"",
+			"",
+			"",
+			false,
+		)
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.POST("/bbs/report/:set_id/:set_code", func(c *gin.Context) {
+		route_data := route.View_bbs_report(
+			Make_route_config(c),
+			c.Param("set_id"),
+			c.Param("set_code"),
+			"",
+			c.PostForm("reason"),
+			Captcha_response_internal(c),
+			true,
+		)
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/bbs/report/:set_id/:set_code/comment/:comment_code", func(c *gin.Context) {
+		route_data := route.View_bbs_report(
+			Make_route_config(c),
+			c.Param("set_id"),
+			c.Param("set_code"),
+			c.Param("comment_code"),
+			"",
+			"",
+			false,
+		)
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.POST("/bbs/report/:set_id/:set_code/comment/:comment_code", func(c *gin.Context) {
+		route_data := route.View_bbs_report(
+			Make_route_config(c),
+			c.Param("set_id"),
+			c.Param("set_code"),
+			c.Param("comment_code"),
+			c.PostForm("reason"),
+			Captcha_response_internal(c),
+			true,
+		)
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
 }

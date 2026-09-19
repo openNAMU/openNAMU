@@ -34,6 +34,14 @@ func Register_document_extra_routes(r *gin.Engine) {
 		data := route.View_history_tool(Make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Param("rev"))
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
 	})
+	r.GET("/history_report/:rev/*doc_name", func(c *gin.Context) {
+		data := route.View_history_report(Make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Param("rev"), "", "", false)
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
+	})
+	r.POST("/history_report/:rev/*doc_name", func(c *gin.Context) {
+		data := route.View_history_report(Make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Param("rev"), c.PostForm("reason"), Captcha_response_internal(c), true)
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))
+	})
 	r.GET("/history_hidden/:rev/*doc_name", func(c *gin.Context) {
 		data := route.View_history_hidden_safe(Make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), c.Param("rev"), nil)
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(data))

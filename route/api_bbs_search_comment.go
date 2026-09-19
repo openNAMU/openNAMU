@@ -149,7 +149,7 @@ func Bbs_search_comment_index_data(db *sql.DB, config tool.Config, keyword strin
 
 		for _, key := range candidate_list {
 			comment_set_id, set_code, comment_code, valid := tool.Search_bbs_index_comment_key_data(key)
-			if !valid || (set_id == "" && comment_set_id == "0") {
+			if !valid || (set_id == "" && Bbs_is_special_board(comment_set_id) && comment_set_id != thread_bbs_id) {
 				continue
 			}
 			item_data, visible := Bbs_search_comment_item_data(
@@ -192,6 +192,8 @@ func Bbs_search_comment_sql_data(db *sql.DB, config tool.Config, keyword string,
 	if set_id != "" {
 		where_data += " and b.set_id like ?"
 		values = append(values, set_id+"-%")
+	} else {
+		where_data += " and (b.set_id like '-1-%' or (b.set_id not like '-%' and b.set_id not like '0-%'))"
 	}
 
 	if !tool.Check_permission(db, "bbs_comment_manage", config.IP) {
@@ -218,7 +220,7 @@ func Bbs_search_comment_sql_data(db *sql.DB, config tool.Config, keyword string,
 		}
 
 		post_set_id, post_set_code, comment_code, valid := Bbs_comment_storage_location(comment_set_id, comment_set_code)
-		if !valid || (set_id == "" && post_set_id == "0") {
+		if !valid || (set_id == "" && Bbs_is_special_board(post_set_id) && post_set_id != thread_bbs_id) {
 			continue
 		}
 

@@ -6,6 +6,9 @@ func View_bbs_in_w_comment_tool(config tool.Config, set_id string, set_code stri
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	if _, allowed := Bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
+		return tool.Get_error_page(db, config, "auth")
+	}
 	data_html := `
         <h2>` + tool.Get_language(db, "tool", true) + `</h2>
         <ul>

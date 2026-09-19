@@ -73,6 +73,10 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
+	if Bbs_is_special_board(set_id) && set_id != "0" && set_id != thread_bbs_id {
+		return_data["response"] = "not allowed"
+		return return_data
+	}
 
 	bbs_name := ""
 	bbs_type := "comment"

@@ -72,6 +72,8 @@ func Api_bbs_list(config tool.Config) map[string]any {
 			bbs_name = tool.Get_language(db, "wiki_comment_bbs", true)
 		} else if id == "-1" {
 			bbs_name = tool.Get_language(db, "thread_bbs", true)
+		} else if id == "-2" {
+			bbs_name = tool.Get_language(db, "report_bbs", true)
 		}
 
 		if !tool.Check_acl(db, id, "", "bbs_view", config.IP) {

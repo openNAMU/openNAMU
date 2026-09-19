@@ -45,7 +45,11 @@ func View_history_tool(config tool.Config, doc_name string, rev string) string {
 		data += `<li><a href="/diff/` + previous + `/` + revision + `/` + doc_name_url + `">` + tool.Get_language(db, "compare", true) + `</a></li>`
 	}
 
-	data += `<li><a href="/history/` + doc_name_url + `">` + tool.Get_language(db, "history", true) + `</a></li></ul>`
+	data += `<li><a href="/history/` + doc_name_url + `">` + tool.Get_language(db, "history", true) + `</a></li>`
+	if tool.Check_permission(db, "bbs_comment", config.IP) {
+		data += `<li><a href="/history_report/` + revision + `/` + doc_name_url + `">` + tool.Get_language(db, "report", true) + `</a></li>`
+	}
+	data += `</ul>`
 
 	if hidden_auth {
 		hide := tool.Get_history_hide(db, doc_name, revision)

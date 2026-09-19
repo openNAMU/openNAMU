@@ -16,7 +16,11 @@ func View_bbs_delete(config tool.Config, set_id string, set_code string, comment
 	if comment_code != "" {
 		permission = "bbs_comment_manage"
 	}
-	if !tool.Check_permission(db, permission, config.IP) {
+	delete_allowed := tool.Check_permission(db, permission, config.IP)
+	if set_id == report_bbs_id && set_code != "" && comment_code == "" && tool.Check_permission(db, "bbs_manage", config.IP) {
+		delete_allowed = true
+	}
+	if !delete_allowed {
 		return tool.Get_redirect("/bbs/in/" + tool.Url_parser(set_id))
 	}
 

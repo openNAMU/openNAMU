@@ -1011,6 +1011,26 @@ func Always_init(db *sql.DB, version string) {
 			`insert into bbs_set (set_name, set_code, set_id, set_data) values ('bbs_type', '', '-1', 'thread')`,
 		)
 	}
+	for _, value := range [][]string{
+		{"bbs_name", "report_bbs"},
+		{"bbs_type", "comment"},
+		{"bbs_markup", "plain"},
+		{"bbs_view_acl", "bbs_manage"},
+	} {
+		length = 0
+		QueryRow_DB(
+			db,
+			"select count(*) from bbs_set where set_id = ? and set_code = '' and set_name = ?",
+			[]any{&length},
+			"-2",
+			value[0],
+		)
+		if length == 0 {
+			Exec_DB(db, "insert into bbs_set (set_name, set_code, set_id, set_data) values (?, '', '-2', ?)", value[0], value[1])
+		} else {
+			Exec_DB(db, "update bbs_set set set_data = ? where set_id = '-2' and set_code = '' and set_name = ?", value[1], value[0])
+		}
+	}
 
 	image_url := Get_image_url(db)
 	exists_folder := false

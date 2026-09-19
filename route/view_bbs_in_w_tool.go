@@ -9,6 +9,9 @@ import (
 func View_bbs_in_w_tool(config tool.Config, set_id string, set_code string) string {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
+	if _, allowed := Bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
+		return tool.Get_error_page(db, config, "auth")
+	}
 
 	pinned_name := "pinned"
 	if _, exists := tool.Get_bbs_data_value(db, set_id, set_code, "pinned"); exists {
@@ -32,11 +35,11 @@ func View_bbs_in_w_tool(config tool.Config, set_id string, set_code string) stri
 		}
 		data_html += `<h3>` + tool.Get_language(db, "admin", true) + `</h3><ul><li><a href="/bbs/blind/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">` + tool.Get_language(db, blind_name, true) + `</a></li></ul>`
 	}
-	if tool.Check_permission(db, "bbs_delete", config.IP) {
+	if tool.Check_permission(db, "bbs_delete", config.IP) || (set_id == report_bbs_id && tool.Check_permission(db, "bbs_manage", config.IP)) {
 		data_html += `<h3>` + tool.Get_language(db, "owner", true) + `</h3><ul><li><a href="/bbs/delete/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">` + tool.Get_language(db, "delete", true) + `</a></li></ul>`
 	}
 
-	if tool.Check_permission(db, "bbs_comment_manage", config.IP) {
+	if set_id != report_bbs_id && tool.Check_permission(db, "bbs_comment_manage", config.IP) {
 		comment_state_html := ""
 		if set_id != thread_bbs_id {
 			comment_closed := Bbs_comment_closed(db, set_id, set_code)

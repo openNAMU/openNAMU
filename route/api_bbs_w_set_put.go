@@ -14,6 +14,10 @@ func Api_bbs_w_set_put(config tool.Config, set_id string, set_name string, data 
 
 	setting_acl := BBS_w_set_list()
 	return_data := make(map[string]any)
+	if Bbs_is_special_board(set_id) && set_id != "0" && set_id != thread_bbs_id {
+		return_data["response"] = "not allowed"
+		return return_data
+	}
 
 	if _, ok := setting_acl[set_name]; ok {
 		if tool.Arr_in_str(bbs_set_fields, set_name) && !Acl_value_valid(db, data) {

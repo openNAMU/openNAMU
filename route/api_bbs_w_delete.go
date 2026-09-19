@@ -53,7 +53,11 @@ func Api_bbs_w_delete(config tool.Config, set_id string, set_code string) map[st
 		return return_data
 	}
 
-	if !tool.Check_permission(db, "bbs_delete", config.IP) {
+	delete_allowed := tool.Check_permission(db, "bbs_delete", config.IP)
+	if set_id == report_bbs_id && tool.Check_permission(db, "bbs_manage", config.IP) {
+		delete_allowed = true
+	}
+	if !delete_allowed {
 		return_data["response"] = "require auth"
 
 		return return_data

@@ -29,7 +29,7 @@ func Api_bbs_w_comment_close(config tool.Config, set_id string, set_code string,
 		return_data["response"] = "require auth"
 		return return_data
 	}
-	if set_id == thread_bbs_id {
+	if set_id == thread_bbs_id || (Bbs_is_special_board(set_id) && set_id != "0") {
 		return_data["response"] = "not allowed"
 		return return_data
 	}

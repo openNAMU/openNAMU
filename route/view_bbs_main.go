@@ -220,9 +220,9 @@ func View_bbs_main(config tool.Config, page string) string {
 		data_html += tool.HTML_escape(bbs_name)
 		data_html += "</a>"
 
-		if bbs_type == "comment" {
+		if bbs_id != "-2" && bbs_type == "comment" {
 			data_html += " (" + tool.Get_language(db, "comment_base", false) + ")"
-		} else {
+		} else if bbs_id != "-2" {
 			data_html += " (" + tool.Get_language(db, "thread_base", false) + ")"
 		}
 

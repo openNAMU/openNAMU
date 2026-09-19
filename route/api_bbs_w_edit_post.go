@@ -13,6 +13,10 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 	defer tool.DB_close(db)
 
 	return_data := make(map[string]any)
+	if Bbs_is_special_board(set_id) && set_id != thread_bbs_id {
+		return_data["response"] = "not allowed"
+		return return_data
+	}
 
 	bbs_name := ""
 	if !tool.QueryRow_DB(

@@ -10,6 +10,9 @@ import (
 func Api_bbs_w_post(config tool.Config, set_id string, title string, data string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
+	if set_id != "0" {
+		return map[string]any{"response": "not allowed"}
+	}
 
 	if !tool.Check_permission(db, "bbs_comment", config.IP) {
 		return_data := make(map[string]any)

@@ -179,6 +179,18 @@ func Get_history_hide(db *sql.DB, title string, revision string) string {
 	return data
 }
 
+func Get_history_revision_hide(db *sql.DB, title string, revision string) (string, bool) {
+	hide := ""
+	exists := QueryRow_DB(
+		db,
+		"select coalesce(hide, '') from history where title = ? and id = ?",
+		[]any{&hide},
+		title,
+		revision,
+	)
+	return hide, exists
+}
+
 func Get_history_send(db *sql.DB, title string, revision string) string {
 	data := ""
 	QueryRow_DB(
@@ -747,9 +759,9 @@ func Get_statistics_count(db *sql.DB, count_type string) int {
 	case "edit":
 		query = "select count(*) from history"
 	case "bbs_post":
-		query = "select count(*) from bbs_data where set_name = 'user_id' and set_id != '0' and set_data != ''"
+		query = "select count(*) from bbs_data where set_name = 'user_id' and (set_id + 0 > 0 or set_id = '-1') and set_data != ''"
 	case "bbs_comment":
-		query = "select count(*) from bbs_data where set_name = 'comment' and set_data != ''"
+		query = "select count(*) from bbs_data where set_name = 'comment' and set_data != '' and (set_id like '-1-%' or (set_id not like '-%' and set_id not like '0-%'))"
 	}
 	if query == "" {
 		return 0

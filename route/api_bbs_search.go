@@ -116,7 +116,7 @@ func Bbs_search_index_data(db *sql.DB, config tool.Config, keyword string, set_i
 
 		for _, key := range candidate_list {
 			set_id_data, set_code_data, valid := tool.Search_bbs_index_key_data(key)
-			if !valid || (set_id == "" && set_id_data == "0") {
+			if !valid || (set_id == "" && Bbs_is_special_board(set_id_data) && set_id_data != thread_bbs_id) {
 				continue
 			}
 			item_data, visible := Bbs_search_item_data(db, config, set_code_data, set_id_data, ip_parser_temp, auth_info, keyword, search_type)
@@ -182,7 +182,7 @@ func Api_bbs_search_internal(config tool.Config, keyword string, set_id string, 
 		where_data := "b.set_id = ?"
 		values := []any{set_id}
 		if set_id == "" {
-			where_data = "not b.set_id = \"0\""
+			where_data = "(b.set_id + 0 > 0 or b.set_id = '-1')"
 			values = []any{}
 		}
 		view_sql, view_values := Bbs_post_view_sql(db, set_id, config.IP, "b")
