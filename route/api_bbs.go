@@ -324,7 +324,11 @@ func Bbs_post_last_activity_sql(row_alias string) string {
 	comment_set_id := Bbs_comment_set_id_sql(row_alias, "")
 	comment_set_id_nested := Bbs_comment_set_id_sql(row_alias, "-%")
 
-	return "coalesce((select nullif(last_activity_data.set_data, '') from bbs_data last_activity_data where last_activity_data.set_name = 'last_activity' and last_activity_data.set_id = " + row_alias + ".set_id and last_activity_data.set_code = " + row_alias + ".set_code limit 1), (select max(comment_date_data.set_data) from bbs_data comment_date_data where comment_date_data.set_name = 'comment_date' and (comment_date_data.set_id = " + comment_set_id + " or comment_date_data.set_id like " + comment_set_id_nested + ")), (select nullif(date_data.set_data, '') from bbs_data date_data where date_data.set_name = 'date' and date_data.set_id = " + row_alias + ".set_id and date_data.set_code = " + row_alias + ".set_code limit 1))"
+	return "coalesce((select nullif(last_activity_data.set_data, '') from bbs_data last_activity_data where last_activity_data.set_name = 'last_activity' and last_activity_data.set_id = " + row_alias + ".set_id and last_activity_data.set_code = " + row_alias + ".set_code limit 1), (select nullif(max(comment_date_data.set_data), '') from bbs_data comment_date_data where comment_date_data.set_name = 'comment_date' and (comment_date_data.set_id = " + comment_set_id + " or comment_date_data.set_id like " + comment_set_id_nested + ")), (select nullif(date_data.set_data, '') from bbs_data date_data where date_data.set_name = 'date' and date_data.set_id = " + row_alias + ".set_id and date_data.set_code = " + row_alias + ".set_code limit 1))"
+}
+
+func Bbs_post_last_activity_missing_sql(row_alias string) string {
+	return "case when exists (select 1 from bbs_data last_activity_check where last_activity_check.set_name = 'last_activity' and last_activity_check.set_id = " + row_alias + ".set_id and last_activity_check.set_code = " + row_alias + ".set_code and last_activity_check.set_data != '') then 0 else 1 end"
 }
 
 func Bbs_post_last_activity_update(tx *sql.Tx, set_id string, set_code string, date string) {
@@ -333,7 +337,7 @@ func Bbs_post_last_activity_update(tx *sql.Tx, set_id string, set_code string, d
 	}
 
 	result, err := tx.Exec(
-		tool.DB_change("update bbs_data set set_data = case when set_data < ? then ? else set_data end where set_name = 'last_activity' and set_id = ? and set_code = ?"),
+		tool.DB_change("update bbs_data set set_data = case when set_data is null or set_data < ? then ? else set_data end where set_name = 'last_activity' and set_id = ? and set_code = ?"),
 		date,
 		date,
 		set_id,
@@ -497,7 +501,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 		filter_sql, filter_values := Bbs_filter_sql(filter, "bbs_data", config.IP)
 		query := "select set_code, set_id, '1'"
 		if sort_type == "activity" {
-			query += ", " + Bbs_post_last_activity_sql("bbs_data")
+			query += ", " + Bbs_post_last_activity_sql("bbs_data") + " as activity_date, " + Bbs_post_last_activity_missing_sql("bbs_data") + " as activity_cache_missing"
 		}
 		query += " from bbs_data where set_name = 'pinned' and set_id like ?"
 		values := []any{bbs_num}
@@ -519,7 +523,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 		if sort_type == "activity" {
 			view_sql, view_values = Bbs_post_view_sql(db, bbs_num, config.IP, "title")
 			filter_sql, filter_values := Bbs_filter_sql(filter, "title", config.IP)
-			query = "select title.set_code, title.set_id, '0', " + Bbs_post_last_activity_sql("title") + " from bbs_data title where title.set_name = 'title' and title.set_id like ?"
+			query = "select title.set_code, title.set_id, '0', " + Bbs_post_last_activity_sql("title") + " as activity_date, " + Bbs_post_last_activity_missing_sql("title") + " as activity_cache_missing from bbs_data title where title.set_name = 'title' and title.set_id like ?"
 			values = []any{bbs_num}
 			if view_sql != "" {
 				query += " and " + view_sql
@@ -527,7 +531,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			}
 			query += filter_sql
 			values = append(values, filter_values...)
-			query += " order by " + Bbs_post_last_activity_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
+			query += " order by activity_date desc, title.set_code + 0 desc limit ?, 50"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		} else if sort_type == "view" {
@@ -609,6 +613,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 
 	data_list := []map[string]string{}
 	ip_parser_temp := map[string][]string{}
+	activity_update_list := [][]string{}
 
 	for for_a := 0; for_a < len(rows_arr); for_a++ {
 		defer rows_arr[for_a].Close()
@@ -620,14 +625,18 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			var set_id string
 			var pinned string
 			activity_date := ""
+			activity_cache_missing := 0
 			var err error
 			if sort_type == "activity" {
-				err = rows_arr[for_a].Scan(&set_code, &set_id, &pinned, &activity_date)
+				err = rows_arr[for_a].Scan(&set_code, &set_id, &pinned, &activity_date, &activity_cache_missing)
 			} else {
 				err = rows_arr[for_a].Scan(&set_code, &set_id, &pinned)
 			}
 			if err != nil {
 				panic(err)
+			}
+			if sort_type == "activity" && activity_cache_missing == 1 && activity_date != "" {
+				activity_update_list = append(activity_update_list, []string{set_id, set_code, activity_date})
 			}
 
 			if bbs_num == "" && !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
@@ -688,7 +697,28 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 					temp_data[set_name] = set_data
 				}
 			}
+			if err := rows.Err(); err != nil {
+				rows.Close()
+				panic(err)
+			}
+			rows.Close()
 			data_list = append(data_list, temp_data)
+		}
+		if err := rows_arr[for_a].Err(); err != nil {
+			rows_arr[for_a].Close()
+			panic(err)
+		}
+		rows_arr[for_a].Close()
+	}
+
+	if len(activity_update_list) > 0 {
+		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			for _, activity_data := range activity_update_list {
+				Bbs_post_last_activity_update(tx, activity_data[0], activity_data[1], activity_data[2])
+			}
+			return nil
+		}); err != nil {
+			panic(err)
 		}
 	}
 

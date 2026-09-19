@@ -650,6 +650,141 @@ func Init_bbs_comment_count(db *sql.DB) {
 	log.Printf("[DB] BBS comment count update complete: %d posts", len(post_list))
 }
 
+func Init_bbs_last_activity(db *sql.DB) {
+	initialized := ""
+	if QueryRow_DB(
+		db,
+		"select data from other where name = 'bbs_last_activity_initialized' limit 1",
+		[]any{&initialized},
+	) {
+		return
+	}
+
+	type bbs_post_key struct {
+		set_id   string
+		set_code string
+	}
+	type bbs_comment_date struct {
+		set_id string
+		date   string
+	}
+
+	post_list := map[bbs_post_key]bool{}
+	post_id_list := map[string]bbs_post_key{}
+	post_date_list := map[bbs_post_key]string{}
+	last_activity_exists := map[bbs_post_key]bool{}
+	last_activity_list := map[bbs_post_key]string{}
+	comment_date_list := []bbs_comment_date{}
+
+	rows := Query_DB(
+		db,
+		"select set_name, set_id, set_code, set_data from bbs_data where set_name in ('title', 'date', 'comment_date', 'last_activity')",
+	)
+	for rows.Next() {
+		var set_name_value sql.NullString
+		var set_id_value sql.NullString
+		var set_code_value sql.NullString
+		var set_data_value sql.NullString
+		if err := rows.Scan(&set_name_value, &set_id_value, &set_code_value, &set_data_value); err != nil {
+			rows.Close()
+			panic(err)
+		}
+		if !set_name_value.Valid || !set_id_value.Valid || !set_code_value.Valid {
+			continue
+		}
+		set_name := set_name_value.String
+		set_id := set_id_value.String
+		set_code := set_code_value.String
+		set_data := set_data_value.String
+
+		post_key := bbs_post_key{set_id: set_id, set_code: set_code}
+		switch set_name {
+		case "title":
+			post_list[post_key] = true
+			post_id_list[set_id+"-"+set_code] = post_key
+		case "date":
+			post_date_list[post_key] = set_data
+		case "comment_date":
+			if set_data != "" {
+				comment_date_list = append(comment_date_list, bbs_comment_date{set_id: set_id, date: set_data})
+			}
+		case "last_activity":
+			last_activity_exists[post_key] = true
+			if set_data != "" {
+				last_activity_list[post_key] = set_data
+			}
+		}
+	}
+	if err := rows.Err(); err != nil {
+		rows.Close()
+		panic(err)
+	}
+	rows.Close()
+
+	activity_list := map[bbs_post_key]string{}
+	for post_key := range post_list {
+		activity_list[post_key] = post_date_list[post_key]
+	}
+	for _, comment_date := range comment_date_list {
+		comment_set_id := comment_date.set_id
+		for comment_set_id != "" {
+			if post_key, ok := post_id_list[comment_set_id]; ok {
+				if comment_date.date > activity_list[post_key] {
+					activity_list[post_key] = comment_date.date
+				}
+				break
+			}
+
+			last_hyphen := strings.LastIndex(comment_set_id, "-")
+			if last_hyphen < 0 {
+				break
+			}
+			comment_set_id = comment_set_id[:last_hyphen]
+		}
+	}
+
+	update_count := 0
+	if err := DB_transaction(db, func(tx *sql.Tx) error {
+		update_stmt, err := tx.Prepare(DB_change("update bbs_data set set_data = ? where set_name = 'last_activity' and set_id = ? and set_code = ?"))
+		if err != nil {
+			return err
+		}
+		defer update_stmt.Close()
+
+		insert_stmt, err := tx.Prepare(DB_change("insert into bbs_data (set_name, set_id, set_code, set_data) values ('last_activity', ?, ?, ?)"))
+		if err != nil {
+			return err
+		}
+		defer insert_stmt.Close()
+
+		for post_key := range post_list {
+			if last_activity_list[post_key] != "" {
+				continue
+			}
+			activity_date := activity_list[post_key]
+			if activity_date == "" {
+				continue
+			}
+
+			if last_activity_exists[post_key] {
+				_, err = update_stmt.Exec(activity_date, post_key.set_id, post_key.set_code)
+			} else {
+				_, err = insert_stmt.Exec(post_key.set_id, post_key.set_code, activity_date)
+			}
+			if err != nil {
+				return err
+			}
+			update_count++
+		}
+
+		_, err = tx.Exec(DB_change("insert into other (name, data, coverage) values ('bbs_last_activity_initialized', '1', '')"))
+		return err
+	}); err != nil {
+		panic(err)
+	}
+	log.Printf("[DB] BBS last activity update complete: %d posts", update_count)
+}
+
 func Init_audio_extensions(db *sql.DB) {
 	initialized := ""
 	if QueryRow_DB(
@@ -921,6 +1056,7 @@ func Always_init(db *sql.DB, version string) {
 	}
 	Init_rankup_conditions(db)
 	Init_bbs_comment_count(db)
+	Init_bbs_last_activity(db)
 	Init_audio_extensions(db)
 	Init_video_extensions(db)
 	Init_document_extensions(db)
