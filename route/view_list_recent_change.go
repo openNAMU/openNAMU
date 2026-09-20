@@ -64,7 +64,7 @@ func Get_ui_history(db *sql.DB, data_all [][]string) (string, string) {
 			continue
 		}
 
-		data_select += `<option value="` + in_data[0] + `">` + in_data[0] + `</option>`
+		data_select += `<option value="` + tool.HTML_escape(in_data[0]) + `">r` + tool.HTML_escape(in_data[0]) + ` | ` + tool.HTML_escape(in_data[2]) + `</option>`
 		doc_name := in_data[1]
 		doc_name_url := tool.Url_parser(doc_name)
 		rev_str := in_data[0]

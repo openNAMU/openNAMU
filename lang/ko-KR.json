@@ -120,6 +120,8 @@
     "edit_filter": "편집 필터",
     "no_exist_user_error": "계정이 존재하지 않습니다.",
     "compare": "비교",
+    "before_revision": "이전 리비전",
+    "after_revision": "이후 리비전",
     "password_error": "비밀번호가 올바르지 않습니다.",
     "default": "기본값",
     "wiki_name": "위키 이름",

@@ -193,6 +193,8 @@
     "invite_expired": "Expired",
     "language": "Language",
     "compare": "Compare",
+    "before_revision": "Earlier revision",
+    "after_revision": "Later revision",
     "email": "Email",
     "key": "Key",
     "all": "All",

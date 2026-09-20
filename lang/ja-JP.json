@@ -120,6 +120,8 @@
     "edit_filter": "編集フィルター",
     "no_exist_user_error": "アカウントが存在しません。",
     "compare": "比較",
+    "before_revision": "前のリビジョン",
+    "after_revision": "後のリビジョン",
     "password_error": "パスワードが正しくありません。",
     "default": "デフォルト",
     "wiki_name": "ウィキ名",

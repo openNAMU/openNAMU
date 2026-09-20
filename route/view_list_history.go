@@ -1,6 +1,8 @@
 package route
 
 import (
+	"strings"
+
 	"opennamu/route/tool"
 )
 
@@ -37,6 +39,40 @@ func View_list_history(config tool.Config, doc_name string, set_type string, num
 	history_ui, select_ui := Get_ui_history(db, api_data_list)
 
 	data_html += history_ui
+
+	revision_ids := []string{}
+	for _, history_data := range api_data_list {
+		if len(history_data) > 1 && history_data[1] != "" {
+			revision_ids = append(revision_ids, history_data[0])
+		}
+	}
+
+	if len(revision_ids) > 1 {
+		previous_revision := revision_ids[1]
+		after_revision := revision_ids[0]
+		previous_select_ui := strings.Replace(
+			select_ui,
+			`value="`+previous_revision+`"`,
+			`value="`+previous_revision+`" selected`,
+			1,
+		)
+		after_select_ui := strings.Replace(
+			select_ui,
+			`value="`+after_revision+`"`,
+			`value="`+after_revision+`" selected`,
+			1,
+		)
+
+		data_html += `<hr class="main_hr">
+		<form method="post">
+			<div><label for="history_before">` + tool.Get_language(db, "before_revision", true) + `</label> <select id="history_before" name="b">` + previous_select_ui + `</select></div>
+			<hr class="main_hr">
+			<div><label for="history_after">` + tool.Get_language(db, "after_revision", true) + `</label> <select id="history_after" name="a">` + after_select_ui + `</select></div>
+			<hr class="main_hr">
+			<div><button type="submit">` + tool.Get_language(db, "compare", true) + `</button></div>
+		</form>`
+	}
+
 	data_html += tool.Get_page_control(
 		db,
 		tool.Str_to_int(num),
@@ -44,17 +80,6 @@ func View_list_history(config tool.Config, doc_name string, set_type string, num
 		50,
 		"/history_page/{}/"+set_type+"/"+tool.Url_parser(doc_name),
 	)
-
-	data_html = `
-	        <form method="post">
-	            <div><select name="a">` + select_ui + `</select></div>
-	            <hr class="main_hr">
-	            <div><select name="b">` + select_ui + `</select></div>
-	            <hr class="main_hr">
-	            <div><button type="submit">` + tool.Get_language(db, "compare", true) + `</button></div>
-	        </form>
-	        <hr class="main_hr">
-	    ` + data_html
 
 	menu := [][]any{
 		{"w/" + tool.Url_parser(doc_name), tool.Get_language(db, "return", true)},
