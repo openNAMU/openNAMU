@@ -192,11 +192,15 @@ func View_view_image_file(c *gin.Context) {
 		c.Header("Cache-Control", "private, max-age=31536000, immutable")
 	}
 
-	is_inline := mime_type == "application/pdf" || strings.HasPrefix(mime_type, "image/") || strings.HasPrefix(mime_type, "video/") || strings.HasPrefix(mime_type, "audio/")
+	is_inline := mime_type == "application/pdf" || (strings.HasPrefix(mime_type, "image/") && mime_type != "image/svg+xml") || strings.HasPrefix(mime_type, "video/") || strings.HasPrefix(mime_type, "audio/")
 	if is_inline {
 		c.Header("Content-Type", mime_type)
 	} else {
-		c.Header("Content-Type", "application/octet-stream")
+		if mime_type == "image/svg+xml" {
+			c.Header("Content-Type", mime_type)
+		} else {
+			c.Header("Content-Type", "application/octet-stream")
+		}
 		content_disposition := mime.FormatMediaType("attachment", map[string]string{"filename": file_name})
 		if content_disposition != "" {
 			c.Header("Content-Disposition", content_disposition)
