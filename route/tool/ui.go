@@ -628,14 +628,15 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
 	}
 
 	out_field := Get_captcha_ui(db, config) + Get_IP_warning_ui(db, config) + add_on
-	preview_ui := `<div><button class="__ON_BUTTON__" id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview();">` + Get_language(db, "preview", true) + `</button></div>`
+	preview_buttons := `<button class="__ON_BUTTON__" id="opennamu_preview_button" type="button" onclick="opennamu_do_editor_preview();">` + Get_language(db, "preview", true) + `</button>`
 	preview_area := `<hr class="main_hr">
         <div id="opennamu_preview_area"></div>`
+	save_button := `<button class="__ON_BUTTON__" id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">` + Get_language(db, "send", true) + `</button>`
 	if do_type == "edit" {
-		preview_ui = `<div><button class="__ON_BUTTON__" type="submit" name="preview" value="normal" onclick="do_stop_exit_release(); do_sync_monaco_and_textarea();">` + Get_language(db, "preview_normal", true) + `</button></div>`
-		preview_ui += `<hr class="main_hr"><div><button class="__ON_BUTTON__" type="submit" name="preview" value="dark" onclick="do_stop_exit_release(); do_sync_monaco_and_textarea();">` + Get_language(db, "preview_dark", true) + `</button></div>`
+		preview_buttons = `<button class="__ON_BUTTON__" type="submit" name="preview" value="normal" onclick="do_stop_exit_release(); do_sync_monaco_and_textarea();">` + Get_language(db, "preview_normal", true) + `</button> <button class="__ON_BUTTON__" type="submit" name="preview" value="dark" onclick="do_stop_exit_release(); do_sync_monaco_and_textarea();">` + Get_language(db, "preview_dark", true) + `</button>`
 		preview_area = ""
 	}
+	action_ui := `<div>` + save_button + ` ` + preview_buttons + `</div>`
 
 	return `
         <input type="hidden" id="opennamu_editor_doc_name" value="` + HTML_escape(doc_name) + `">
@@ -663,9 +664,7 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
             });
         </script>
 
-        <div><button class="__ON_BUTTON__" id="opennamu_save_button" type="submit" onclick="do_stop_exit_release();">` + Get_language(db, "send", true) + `</button></div>
-        <hr class="main_hr">
-        ` + preview_ui + `
+        ` + action_ui + `
         ` + preview_area + `
     `
 }

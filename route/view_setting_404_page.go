@@ -39,8 +39,7 @@ func View_setting_404_page_data(db *sql.DB, config tool.Config, page string, con
 	data := `<form method="post">`
 	data += `<select name="page">` + options + `</select>` + Main_hr()
 	data += `<textarea class="opennamu_textarea_500" name="content">` + tool.HTML_escape(content) + `</textarea>` + Main_hr()
-	data += `<div><button id="opennamu_save_button" name="action" value="save" type="submit">` + lang("save") + `</button></div><hr class="main_hr">`
-	data += `<div><button name="action" value="preview" type="submit">` + lang("preview") + `</button></div></form>`
+	data += `<button id="opennamu_save_button" name="action" value="save" type="submit">` + lang("save") + `</button> <button name="action" value="preview" type="submit">` + lang("preview") + `</button></form>`
 
 	if preview {
 		data += Main_hr() + `<div id="opennamu_setting_404_page_preview">` + content + `</div>`

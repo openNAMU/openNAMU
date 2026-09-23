@@ -40,7 +40,7 @@ func View_bbs_in_w_tool(config tool.Config, set_id string, set_code string) stri
 	}
 
 	if set_id != report_bbs_id && tool.Check_permission(db, "bbs_comment_manage", config.IP) {
-		comment_state_html := ""
+		comment_state_button := ""
 		if set_id != thread_bbs_id {
 			comment_closed := Bbs_comment_closed(db, set_id, set_code)
 			comment_closed_value := "1"
@@ -49,23 +49,15 @@ func View_bbs_in_w_tool(config tool.Config, set_id string, set_code string) stri
 				comment_closed_value = "0"
 				comment_state = "comment_open"
 			}
-			comment_state_html = `
-            <form method="post">
-                <input type="hidden" name="action" value="comment_close">
-                <input type="hidden" name="comment_closed" value="` + comment_closed_value + `">
-                <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, comment_state, true) + `</button>
-            </form>
-            `
+			comment_state_button = `<input type="hidden" name="comment_closed" value="` + comment_closed_value + `"><button class="__ON_BUTTON__" name="action" value="comment_close" type="submit">` + tool.Get_language(db, comment_state, true) + `</button>`
 		}
 		comment_form := ""
 		if set_id == "0" {
-			comment_form = `
-            <form method="post">
-                <input type="hidden" name="action" value="comment_delete_all">
-				<span>` + tool.Get_language(db, "delete_warning", true) + `</span><hr class="main_hr">
-                <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "comment_delete_all", true) + `</button>
-            </form>
-            `
+			comment_actions := `<button class="__ON_BUTTON__" name="action" value="comment_delete_all" type="submit">` + tool.Get_language(db, "comment_delete_all", true) + `</button>`
+			if comment_state_button != "" {
+				comment_actions += ` ` + comment_state_button
+			}
+			comment_form = `<form method="post"><span>` + tool.Get_language(db, "delete_warning", true) + `</span><hr class="main_hr"><div>` + comment_actions + `</div></form>`
 		} else {
 			comment_data := Api_bbs_w_comment_all(config, set_id+"-"+set_code, true, "")
 			comments, _ := comment_data["data"].([]map[string]string)
@@ -84,17 +76,27 @@ func View_bbs_in_w_tool(config tool.Config, set_id string, set_code string) stri
 				comment_html += `<div><label><input type="checkbox" name="comment_code" value="` + comment_code + `"> #` + comment_code + ` ` + comment["comment_user_id_render"] + ` ` + tool.HTML_escape(comment["comment_date"]) + ` ` + tool.HTML_escape(comment["comment"]) + `</label></div>`
 			}
 
+			comment_actions := ""
 			if comment_html == "" {
 				comment_html = `<span>` + tool.Get_language(db, "empty", true) + `</span>`
 			} else {
-				comment_html += `<hr class="main_hr"><div><button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "comment_bulk_delete", true) + `</button></div>`
+				comment_actions = `<button class="__ON_BUTTON__" name="action" value="comment_delete" type="submit">` + tool.Get_language(db, "comment_bulk_delete", true) + `</button>`
 			}
-			comment_form = `<form method="post"><input type="hidden" name="action" value="comment_delete">` + comment_html + `</form>`
+			if comment_state_button != "" {
+				if comment_actions != "" {
+					comment_actions += ` `
+				}
+				comment_actions += comment_state_button
+			}
+			if comment_actions != "" {
+				comment_html += `<hr class="main_hr"><div>` + comment_actions + `</div>`
+			}
+			comment_form = `<form method="post">` + comment_html + `</form>`
 		}
 
 		data_html += `
             <h3>` + tool.Get_language(db, "comment_manage", true) + `</h3>
-            ` + comment_state_html + comment_form + `
+            ` + comment_form + `
         `
 	}
 

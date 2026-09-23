@@ -52,12 +52,11 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	if bbs_comment_acl {
 		data_html += `
             <hr class="main_hr">
-            <form method="post" action="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/tabom">
+            <form method="post" action="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/tabom" style="display: inline;">
                 <input type="hidden" name="vote_type" value="up">
                 <button type="submit">` + tool.Get_language(db, "upvote", true) + ` ` + tool.HTML_escape(tabom_count) + `</button>
             </form>
-            <hr class="main_hr">
-            <form method="post" action="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/tabom">
+            <form method="post" action="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/tabom" style="display: inline;">
                 <input type="hidden" name="vote_type" value="down">
                 <button type="submit">` + tool.Get_language(db, "downvote", true) + ` ` + tool.HTML_escape(tabom_down_count) + `</button>
             </form>

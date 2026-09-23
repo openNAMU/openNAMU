@@ -84,7 +84,7 @@ func Acl_group_multiple_setting(db *sql.DB) string {
 	for _, field := range document_acl_group_fields {
 		data += `<option value="` + tool.HTML_escape(field) + `">` + tool.HTML_escape(Acl_field_title(db, field)) + `</option>`
 	}
-	data += `</select><hr class="main_hr"><h3>` + tool.Get_language(db, "authority", true) + `</h3>` + Acl_group_select(db) + `<hr class="main_hr"><button name="acl_action" value="add" type="submit">` + tool.Get_language(db, "add", true) + `</button><hr class="main_hr"><button name="acl_action" value="delete" type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
+	data += `</select><hr class="main_hr"><h3>` + tool.Get_language(db, "authority", true) + `</h3>` + Acl_group_select(db) + `<hr class="main_hr"><button name="acl_action" value="add" type="submit">` + tool.Get_language(db, "add", true) + `</button> <button name="acl_action" value="delete" type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
 	return data
 }
 
