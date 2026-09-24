@@ -33,6 +33,9 @@ func View_list_document_acl(config tool.Config, page string) string {
 		count++
 	}
 	rows.Close()
+	if count == 0 {
+		body.WriteString(`<li>` + tool.Get_language(db, "data_missing", true) + `</li>`)
+	}
 	body.WriteString(tool.Get_page_control(db, page_num, count, 50, "/list/document/acl/{}"))
 	return List_extra_page(db, config, tool.Get_language(db, "acl_document_list", true), `<ul>`+body.String()+`</ul>`)
 }

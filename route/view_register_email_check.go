@@ -25,7 +25,7 @@ func View_register_email_check(config tool.Config, values url.Values) string {
 		if instruction != "" {
 			body += tool.HTML_escape(instruction) + `<hr class="main_hr">`
 		}
-		body += `<form method="post"><input placeholder="` + tool.Get_language(db, "key", true) + `" name="key" type="text"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
+		body += `<form method="post"><label for="register_email_key">` + tool.Get_language(db, "key", true) + `</label> <input id="register_email_key" placeholder="` + tool.Get_language(db, "key", true) + `" name="key" type="text"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 		return User_form_page(db, config, tool.Get_language(db, "check_key", true), body)
 	}
 

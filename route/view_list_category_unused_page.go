@@ -24,6 +24,9 @@ func View_list_category_unused_page(config tool.Config, page string) string {
 		count++
 	}
 	rows.Close()
+	if count == 0 {
+		body.WriteString(`<li>` + tool.Get_language(db, "data_missing", true) + `</li>`)
+	}
 	body.WriteString(`</ul>`)
 	body.WriteString(tool.Get_page_control(db, page_num, count, 50, "/list/category/no_link/{}"))
 	return List_extra_page(db, config, tool.Get_language(db, "unused_category", true), body.String())

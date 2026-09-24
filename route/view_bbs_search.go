@@ -67,7 +67,8 @@ func View_bbs_search_internal(config tool.Config, set_id string, keyword string,
 	}
 
 	data_html := `<form method="post" action="` + search_path + `">
-        <div><input class="__ON_INPUT__" name="keyword" value="` + tool.HTML_escape(keyword) + `" placeholder="` + tool.Get_language(db, "search", true) + `"></div><hr class="main_hr">
+        <div><label for="bbs_search_keyword">` + tool.Get_language(db, "search", true) + `</label></div>
+        <div><input id="bbs_search_keyword" class="__ON_INPUT__" name="keyword" value="` + tool.HTML_escape(keyword) + `"></div><hr class="main_hr">
         <div><button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "search", true) + `</button></div>
     </form><hr class="main_hr">
     <div>(<a href="` + search_switch_path + `">` + search_switch_text + `</a>)</div><hr class="main_hr">`
@@ -85,13 +86,17 @@ func View_bbs_search_internal(config tool.Config, set_id string, keyword string,
 		if search_type == "data" {
 			page_url = "/bbs/search_data_page/{}/" + tool.Url_parser(keyword)
 		}
+		has_next, _ := data_api["has_next"].(bool)
+		if len(data_list) == 0 {
+			data_html += `<div>` + tool.Get_language(db, "search_no_result", true) + `</div><hr class="main_hr">`
+		}
 		if set_id != "" {
 			page_url = "/bbs/search_board_page/" + tool.Url_parser(set_id) + "/{}" + "/" + tool.Url_parser(keyword)
 			if search_type == "data" {
 				page_url = "/bbs/search_data_board_page/" + tool.Url_parser(set_id) + "/{}" + "/" + tool.Url_parser(keyword)
 			}
 		}
-		data_html += tool.Get_page_control(db, page_int, len(data_list), 50, page_url)
+		data_html += tool.Get_page_control(db, page_int, len(data_list), 50, page_url, has_next)
 	}
 
 	return_menu := "bbs/main"

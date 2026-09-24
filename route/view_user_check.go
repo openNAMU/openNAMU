@@ -10,7 +10,7 @@ func View_user_check(config tool.Config, name string, check_type string, page st
 	defer tool.DB_close(db)
 
 	if name == "" {
-		data := `<form method="post" action="/manager/3"><input name="name" placeholder="` + tool.Get_language(db, "user_name", true) + `"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
+		data := `<form method="post" action="/manager/3"><label for="check_user_name">` + tool.Get_language(db, "user_name", true) + `</label><input id="check_user_name" name="name"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
 		return tool.Get_template(db, config, tool.Get_language(db, "check", true), data, []any{}, [][]any{{"manager", tool.Get_language(db, "return", true)}}, map[string]string{})
 	}
 	if !tool.Check_permission(db, "check", config.IP) {
@@ -52,7 +52,8 @@ func View_user_check(config tool.Config, name string, check_type string, page st
 	if !tool.IP_or_user(name) {
 		question, answer := tool.Get_user_approval_data(db, name)
 		if question != "" && answer != "" {
-			data += `<table id="main_table_set"><tr id="main_table_top_tr"><td>Q</td><td>` + tool.HTML_escape(question) + `</td><td>A</td><td>` + tool.HTML_escape(answer) + `</td></tr></table><hr class="main_hr">`
+			qa_data := `<div>Q: ` + tool.HTML_escape(question) + `</div><div>A: ` + tool.HTML_escape(answer) + `</div>`
+			data += tool.Get_list_ui(qa_data, "", "", "")
 		}
 	}
 	if plus_name != "" && page_num == 1 {
@@ -63,7 +64,6 @@ func View_user_check(config tool.Config, name string, check_type string, page st
 			data += tool.Get_language(db, "same_ip_exist", true) + `<hr class="main_hr">`
 		}
 	}
-	data += `<table id="main_table_set"><tr id="main_table_top_tr"><td>` + tool.Get_language(db, "name", true) + `</td><td>` + tool.Get_language(db, "ip", true) + `</td><td>` + tool.Get_language(db, "time", true) + `</td></tr>`
 	row_count := 0
 	for rows.Next() {
 		user_name := ""
@@ -87,9 +87,11 @@ func View_user_check(config tool.Config, name string, check_type string, page st
 				user_agent_html = `<details><summary>(300+)</summary>` + user_agent_html + `</details>`
 			}
 		}
-		data += `<tr><td><a href="/list/user/check/` + tool.Url_parser(user_name) + `">` + tool.HTML_escape(user_name) + `</a> <a href="` + delete_url + `">(` + tool.Get_language(db, "delete", true) + `)</a></td><td><a href="/list/user/check/` + tool.Url_parser(user_ip) + `">` + tool.HTML_escape(user_ip) + `</a></td><td>` + tool.HTML_escape(today) + `</td></tr><tr><td colspan="3">` + user_agent_html + `</td></tr>`
+		left := `<a href="/list/user/check/` + tool.Url_parser(user_name) + `">` + tool.HTML_escape(user_name) + `</a> <a href="` + delete_url + `">(` + tool.Get_language(db, "delete", true) + `)</a>`
+		right := `<strong>` + tool.Get_language(db, "time", true) + `:</strong> ` + tool.HTML_escape(today)
+		bottom := `<div><strong>` + tool.Get_language(db, "ip", true) + `:</strong> <a href="/list/user/check/` + tool.Url_parser(user_ip) + `">` + tool.HTML_escape(user_ip) + `</a></div>` + user_agent_html
+		data += tool.Get_list_ui(left, right, bottom, "")
 	}
-	data += `</table>`
 	if plus_name != "" {
 		data = `(<a href="/list/user/check/` + tool.Url_parser(name) + `">` + tool.HTML_escape(name) + `</a>)&nbsp;(<a href="/list/user/check/` + tool.Url_parser(plus_name) + `">` + tool.HTML_escape(plus_name) + `</a>)<hr class="main_hr">` + data
 	} else {

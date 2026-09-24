@@ -25,7 +25,7 @@ func View_login_register(config tool.Config) string {
 
 	invite_input := `<hr class="main_hr">`
 	if tool.Invite_required(db) && !tool.Check_permission(db, "user_manage", config.IP) {
-		invite_input += `<input class="__ON_INPUT__" placeholder="` + tool.Get_language(db, "invite", true) + `" name="invite" type="text"><hr class="main_hr">`
+		invite_input += `<label for="register_invite">` + tool.Get_language(db, "invite", true) + `</label> <input id="register_invite" class="__ON_INPUT__" placeholder="` + tool.Get_language(db, "invite", true) + `" name="invite" type="text"><hr class="main_hr">`
 	}
 
 	return tool.Get_template(
@@ -35,13 +35,16 @@ func View_login_register(config tool.Config) string {
 		`<form method="post">
             `+contract+`
 
-            <input class="__ON_INPUT__" placeholder="`+tool.Get_language(db, "id", true)+`" name="id" type="text">
+            <label for="register_id">`+tool.Get_language(db, "id", true)+`</label>
+            <input id="register_id" class="__ON_INPUT__" placeholder="`+tool.Get_language(db, "id", true)+`" name="id" type="text">
             <hr class="main_hr">
 
-            <input class="__ON_INPUT__" placeholder="`+tool.Get_language(db, "password", true)+`" name="password" type="password">
+            <label for="register_password">`+tool.Get_language(db, "password", true)+`</label>
+            <input id="register_password" class="__ON_INPUT__" placeholder="`+tool.Get_language(db, "password", true)+`" name="password" type="password">
             <hr class="main_hr">
 
-            <input class="__ON_INPUT__" placeholder="`+tool.Get_language(db, "password_confirm", true)+`" name="password_check" type="password">
+            <label for="register_password_check">`+tool.Get_language(db, "password_confirm", true)+`</label>
+            <input id="register_password_check" class="__ON_INPUT__" placeholder="`+tool.Get_language(db, "password_confirm", true)+`" name="password_check" type="password">
             `+invite_input+`
 
             `+tool.Get_captcha_ui(db, config)+`

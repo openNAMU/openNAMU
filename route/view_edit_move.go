@@ -42,11 +42,11 @@ func View_edit_move(config tool.Config, doc_name string, values url.Values) stri
 	}
 	owner_auth := tool.Check_permission(db, "document_move_manage", config.IP)
 	body := "<form method=\"post\">"
-	body += "<input name=\"title\" value=\"" + tool.HTML_escape(doc_name) + "\" placeholder=\"" + tool.Get_language(db, "document_name", true) + "\"><hr class=\"main_hr\">"
-	body += "<input name=\"send\" placeholder=\"" + tool.Get_language(db, "why", true) + "\"><hr class=\"main_hr\">"
+	body += `<div><label for="title">` + tool.Get_language(db, "document_name", true) + `</label><input id="title" name="title" value="` + tool.HTML_escape(doc_name) + `"></div><hr class="main_hr">`
+	body += `<div><label for="send">` + tool.Get_language(db, "why", true) + `</label><input id="send" name="send"></div><hr class="main_hr">`
 
-	body += "<h2>" + tool.Get_language(db, "document", true) + "</h2>"
-	body += "<select name=\"move_option\">"
+	body += `<h2><label for="move_option">` + tool.Get_language(db, "document", true) + `</label></h2>`
+	body += `<select id="move_option" name="move_option">`
 	body += "<option value=\"normal\" selected>" + tool.Get_language(db, "normal", true) + "</option>"
 	body += "<option value=\"none\">" + tool.Get_language(db, "dont_move", true) + "</option>"
 	body += "<option value=\"reverse\">" + tool.Get_language(db, "replace_move", true) + "</option>"
@@ -55,8 +55,8 @@ func View_edit_move(config tool.Config, doc_name string, values url.Values) stri
 	}
 	body += "</select><hr class=\"main_hr\">"
 
-	body += "<h2>" + tool.Get_language(db, "thread_bbs", true) + "</h2>"
-	body += "<select name=\"move_topic_option\">"
+	body += `<h2><label for="move_topic_option">` + tool.Get_language(db, "thread_bbs", true) + `</label></h2>`
+	body += `<select id="move_topic_option" name="move_topic_option">`
 	body += "<option value=\"none\" selected>" + tool.Get_language(db, "dont_move", true) + "</option>"
 	body += "<option value=\"normal\">" + tool.Get_language(db, "normal", true) + "</option>"
 	body += "<option value=\"reverse\">" + tool.Get_language(db, "replace_move", true) + "</option>"
@@ -66,8 +66,8 @@ func View_edit_move(config tool.Config, doc_name string, values url.Values) stri
 	body += "</select><hr class=\"main_hr\">"
 
 	if owner_auth {
-		body += "<h2>" + tool.Get_language(db, "document_set", true) + "</h2>"
-		body += "<select name=\"document_set_option\">"
+		body += `<h2><label for="document_set_option">` + tool.Get_language(db, "document_set", true) + `</label></h2>`
+		body += `<select id="document_set_option" name="document_set_option">`
 		body += "<option value=\"normal\" selected>" + tool.Get_language(db, "normal", true) + "</option>"
 		body += "<option value=\"none\">" + tool.Get_language(db, "dont_move", true) + "</option>"
 		body += "<option value=\"reverse\">" + tool.Get_language(db, "replace_move", true) + "</option>"

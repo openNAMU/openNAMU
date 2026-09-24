@@ -51,6 +51,7 @@ func Get_ui_history(db *sql.DB, data_all [][]string) (string, string) {
 	date_heading := ""
 	data_html := ""
 	data_select := ""
+	tool_label := tool.HTML_escape(tool.Get_language(db, "tool", true))
 
 	for _, in_data := range data_all {
 
@@ -87,7 +88,7 @@ func Get_ui_history(db *sql.DB, data_all [][]string) (string, string) {
 		}
 
 		right := ""
-		right += `<a href="/history_tool/` + rev_str + `/` + doc_name_url + `">`
+		right += `<a href="/history_tool/` + rev_str + `/` + doc_name_url + `" aria-label="` + tool_label + `">`
 		right += `<span class="opennamu_svg opennamu_svg_tool">&nbsp;</span></a>`
 		right += ` | `
 		right += rev + " | "
@@ -162,6 +163,9 @@ func View_list_recent_change(config tool.Config, set_type string, limit string, 
 	history_ui, _ := Get_ui_history(db, api_data_list)
 
 	data_html += history_ui
+	if len(api_data_list) == 0 {
+		data_html += tool.Get_language(db, "data_missing", true)
+	}
 	data_html += tool.Get_page_control(
 		db,
 		tool.Str_to_int(num),

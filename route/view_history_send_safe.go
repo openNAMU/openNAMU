@@ -17,6 +17,6 @@ func View_history_send_safe(config tool.Config, doc_name string, rev string, val
 		return tool.Api_post_redirect(db, config, api_data, "/history/"+tool.Url_parser(doc_name))
 	}
 	send := tool.Get_history_send(db, doc_name, rev)
-	body := `<form method="post"><div><input name="send" value="` + tool.HTML_escape(send) + `"></div><hr class="main_hr"><div><button type="submit">` + tool.Get_language(db, "save", true) + `</button></div></form>`
+	body := `<form method="post"><div><label for="history_send">` + tool.Get_language(db, "send", true) + `</label><input id="history_send" name="send" value="` + tool.HTML_escape(send) + `"></div><hr class="main_hr"><div><button type="submit">` + tool.Get_language(db, "save", true) + `</button></div></form>`
 	return Document_safe_page(db, config, tool.Get_language(db, "history", true)+" "+tool.Get_language(db, "send", true), body)
 }

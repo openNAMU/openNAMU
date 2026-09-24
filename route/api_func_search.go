@@ -72,16 +72,21 @@ func Api_func_search(config tool.Config, keyword string, num_str string, search_
 
 	if search_type == "title" {
 		name = tool.Do_remove_spaces(name)
-		query = "select title from data where replace(title, ' ', '') collate nocase like ? order by title limit ?, 50"
+		query = "select title from data where replace(title, ' ', '') collate nocase like ? order by title limit ?, 51"
 	} else {
-		query = "select title from data where data collate nocase like ? order by title limit ?, 50"
+		query = "select title from data where data collate nocase like ? order by title limit ?, 51"
 	}
 
 	if keyword != "" {
-		if title_list, ok := tool.Search_index_search(name, search_type, num, 50); ok {
+		if title_list, ok := tool.Search_index_search(name, search_type, num, 51); ok {
+			has_next := len(title_list) > 50
+			if has_next {
+				title_list = title_list[:50]
+			}
 			return map[string]any{
 				"response": "ok",
 				"data":     title_list,
+				"has_next": has_next,
 			}
 		}
 	}
@@ -108,9 +113,15 @@ func Api_func_search(config tool.Config, keyword string, num_str string, search_
 		title_list = append(title_list, title)
 	}
 
+	has_next := len(title_list) > 50
+	if has_next {
+		title_list = title_list[:50]
+	}
+
 	return_data := make(map[string]any)
 	return_data["response"] = "ok"
 	return_data["data"] = title_list
+	return_data["has_next"] = has_next
 
 	return return_data
 }

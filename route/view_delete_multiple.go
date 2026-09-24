@@ -33,6 +33,6 @@ func View_delete_multiple(config tool.Config, values url.Values) string {
 		return tool.Get_redirect("/recent_change")
 	}
 
-	data := `<form method="post"><textarea class="opennamu_textarea_500" name="content" placeholder="` + tool.Get_language(db, "many_delete_help", true) + `"></textarea><hr class="main_hr"><input name="send" placeholder="` + tool.Get_language(db, "why", true) + `"><hr class="main_hr">` + tool.Get_captcha_ui(db, config) + tool.Get_IP_warning_ui(db, config) + tool.Get_edit_check_box_ui(db) + tool.Get_edit_bottom_text_ui(db, "edit") + `<button type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
+	data := `<form method="post"><div><label for="delete_multiple_content">` + tool.Get_language(db, "many_delete_help", true) + `</label></div><textarea id="delete_multiple_content" class="opennamu_textarea_500" name="content"></textarea><hr class="main_hr"><label for="delete_multiple_send">` + tool.Get_language(db, "why", true) + `</label><input id="delete_multiple_send" name="send"><hr class="main_hr">` + tool.Get_captcha_ui(db, config) + tool.Get_IP_warning_ui(db, config) + tool.Get_edit_check_box_ui(db) + tool.Get_edit_bottom_text_ui(db, "edit") + `<button type="submit">` + tool.Get_language(db, "delete", true) + `</button></form>`
 	return tool.Get_template(db, config, tool.Get_language(db, "many_delete", true), data, []any{}, [][]any{{"manager", tool.Get_language(db, "return", true)}}, map[string]string{})
 }

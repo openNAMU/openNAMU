@@ -488,7 +488,7 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
 	)
 }
 
-func Get_page_control(db *sql.DB, page int, count int, max_count int, url string) string {
+func Get_page_control(db *sql.DB, page int, count int, max_count int, url string, has_next ...bool) string {
 	data_html := "<hr class=\"main_hr\">"
 
 	if page > 1 {
@@ -498,7 +498,12 @@ func Get_page_control(db *sql.DB, page int, count int, max_count int, url string
 		data_html += `<a href="` + before_url + `">(` + Get_language(db, "previous", true) + `)</a> `
 	}
 
-	if count == max_count {
+	next_page_exists := count == max_count
+	if len(has_next) > 0 {
+		next_page_exists = has_next[0]
+	}
+
+	if next_page_exists {
 		prev_page := page + 1
 		after_url := HTML_escape(strings.ReplaceAll(url, "{}", strconv.Itoa(prev_page)))
 
@@ -650,8 +655,9 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
 
         ` + editor_top + `
 
+        <div class="opennamu_editor_help">` + help_text + `</div><hr class="main_hr">
         <div id="opennamu_monaco_editor" class="` + textarea_size + `" ` + editor_display[1] + `></div>
-        <textarea id="opennamu_edit_textarea" class="` + textarea_size + ` __ON_TEXTAREA__" ` + editor_display[0] + ` name="content" placeholder="` + help_text + `">` + HTML_escape(data) + `</textarea>
+        <textarea id="opennamu_edit_textarea" class="` + textarea_size + ` __ON_TEXTAREA__" ` + editor_display[0] + ` name="content">` + HTML_escape(data) + `</textarea>
         <hr class="main_hr">
         ` + out_field + `
 
@@ -715,7 +721,7 @@ func Get_markup_select_ui(db *sql.DB, config Config, doc_name string, markup str
 }
 
 func Build_select(name string, values []string, selected string, empty_label string) string {
-	data := `<select name="` + HTML_escape(name) + `">`
+	data := `<select id="` + HTML_escape(name) + `" name="` + HTML_escape(name) + `">`
 	for _, value := range values {
 		choice := ""
 		if value == selected {

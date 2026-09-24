@@ -300,5 +300,9 @@ func View_w_file_data(db *sql.DB, doc_name string) string {
 		media = `<video controls preload="metadata" src="` + image_url + `"></video>`
 	}
 
-	return media + `<h2>` + tool.Get_language(db, "data", true) + `</h2><table><tr><td>` + tool.Get_language(db, "url", true) + `</td><td><a href="/image/` + tool.Url_parser(storage_name) + `">` + tool.Get_language(db, "link", true) + `</a></td></tr><tr><td>` + tool.Get_language(db, "volume", true) + `</td><td>` + strconv.FormatFloat(float64(file_info.Size())/1000, 'f', 1, 64) + `KB</td></tr><tr><td>` + tool.Get_language(db, "resolution", true) + `</td><td>` + resolution + `</td></tr></table><h2>` + tool.Get_language(db, "content", true) + `</h2>`
+	return media + `<h2>` + tool.Get_language(db, "data", true) + `</h2>` +
+		`<div>` + tool.Get_language(db, "url", true) + `: <a href="/image/` + tool.Url_parser(storage_name) + `">` + tool.Get_language(db, "link", true) + `</a></div>` +
+		`<div>` + tool.Get_language(db, "volume", true) + `: ` + strconv.FormatFloat(float64(file_info.Size())/1000, 'f', 1, 64) + `KB</div>` +
+		`<div>` + tool.Get_language(db, "resolution", true) + `: ` + resolution + `</div>` +
+		`<h2>` + tool.Get_language(db, "content", true) + `</h2>`
 }

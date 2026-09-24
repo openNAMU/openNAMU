@@ -8,12 +8,7 @@ import (
 
 func Get_user_info_ui(db *sql.DB, config Config, user_name string) string {
 	data := Get_user_info_ui_internal(db, config, user_name)
-	return strings.Replace(
-		data,
-		"</table>",
-		`<tr><td>`+Get_language(db, "point", false)+`</td><td>`+strconv.Itoa(Get_user_point(db, user_name))+`</td></tr></table>`,
-		1,
-	)
+	return data + `<div>` + Get_language(db, "point", false) + `: ` + strconv.Itoa(Get_user_point(db, user_name)) + `</div>`
 }
 
 func Get_user_info_ui_internal(db *sql.DB, config Config, user_name string) string {
@@ -37,7 +32,10 @@ func Get_user_info_ui_internal(db *sql.DB, config Config, user_name string) stri
 	}
 
 	level_data := Get_level(db, user_name)
-	return `<table class="user_info_table"><tr><td>` + Get_language(db, "user_name", false) + `</td><td>` + Get_user_profile_image_ui(db, user_name) + online_icon + IP_parser(db, user_name, config.IP) + `</td></tr><tr><td>` + Get_language(db, "authority", false) + `</td><td>` + HTML_escape(auth_name) + `</td></tr><tr><td>` + Get_language(db, "state", false) + `</td><td>` + ban_state + `</td></tr><tr><td>` + Get_language(db, "level", false) + `</td><td>` + HTML_escape(level_data[0]) + ` (` + HTML_escape(level_data[1]) + ` / ` + HTML_escape(level_data[2]) + `)</td></tr></table>`
+	return `<div class="user_info_table">` + Get_language(db, "user_name", false) + `: ` + Get_user_profile_image_ui(db, user_name) + online_icon + IP_parser(db, user_name, config.IP) + `</div>` +
+		`<div>` + Get_language(db, "authority", false) + `: ` + HTML_escape(auth_name) + `</div>` +
+		`<div>` + Get_language(db, "state", false) + `: ` + ban_state + `</div>` +
+		`<div>` + Get_language(db, "level", false) + `: ` + HTML_escape(level_data[0]) + ` (` + HTML_escape(level_data[1]) + ` / ` + HTML_escape(level_data[2]) + `)</div>`
 }
 
 func Replace_user_info_ui(db *sql.DB, config Config, data string) string {

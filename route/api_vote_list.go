@@ -23,13 +23,13 @@ func Api_vote_list(config tool.Config, set_type string, num_str string) map[stri
 	if set_type == "open" {
 		rows = tool.Query_DB(
 			db,
-			`select name, id, type from vote where type = "open" or type = "n_open" limit ?, 50`,
+			`select name, id, type from vote where type = "open" or type = "n_open" limit ?, 51`,
 			num,
 		)
 	} else {
 		rows = tool.Query_DB(
 			db,
-			`select name, id, type from vote where type = "close" or type = "n_close" limit ?, 50`,
+			`select name, id, type from vote where type = "close" or type = "n_close" limit ?, 51`,
 			num,
 		)
 	}
@@ -53,9 +53,15 @@ func Api_vote_list(config tool.Config, set_type string, num_str string) map[stri
 		})
 	}
 
+	has_next := len(data_list) > 50
+	if has_next {
+		data_list = data_list[:50]
+	}
+
 	return_data := make(map[string]any)
 	return_data["response"] = "ok"
 	return_data["data"] = data_list
+	return_data["has_next"] = has_next
 
 	return return_data
 }

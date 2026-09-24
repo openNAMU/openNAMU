@@ -96,7 +96,7 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 		doc_name = values.Get("name")
 	}
 	if doc_name == "" && !multiple && values == nil {
-		data := `<form method="post"><h3>` + tool.Get_language(db, "document_name", true) + `</h3><input name="name" placeholder="` + tool.Get_language(db, "document_name", true) + `"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
+		data := `<form method="post"><h3><label for="acl_document_name">` + tool.Get_language(db, "document_name", true) + `</label></h3><input id="acl_document_name" name="name"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
 		return tool.Get_template(db, config, tool.Get_language(db, "document_setting", true), data, []any{}, [][]any{{"manager", tool.Get_language(db, "return", true)}}, map[string]string{})
 	}
 

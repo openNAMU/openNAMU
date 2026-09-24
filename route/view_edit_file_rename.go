@@ -37,8 +37,8 @@ func View_edit_file_rename(config tool.Config, doc_name string, values url.Value
 	}
 
 	body := `<p>` + tool.HTML_escape(doc_name) + `</p><form method="post">`
-	body += `<input name="name" value="` + tool.HTML_escape(old_base_name) + `" placeholder="` + tool.Get_language(db, "file_name", true) + `">.` + tool.HTML_escape(extension) + `<hr class="main_hr">`
-	body += `<input name="send" placeholder="` + tool.Get_language(db, "why", true) + `"><hr class="main_hr">`
+	body += `<div><label for="name">` + tool.Get_language(db, "file_name", true) + `</label><input id="name" name="name" value="` + tool.HTML_escape(old_base_name) + `">.` + tool.HTML_escape(extension) + `</div><hr class="main_hr">`
+	body += `<div><label for="send">` + tool.Get_language(db, "why", true) + `</label><input id="send" name="send"></div><hr class="main_hr">`
 	body += tool.Get_captcha_ui(db, config) + tool.Get_IP_warning_ui(db, config) + tool.Get_edit_check_box_ui(db) + tool.Get_edit_bottom_text_ui(db, "move")
 	body += `<button type="submit">` + tool.Get_language(db, "file_rename", true) + `</button></form>`
 

@@ -14,7 +14,7 @@ func View_record_bbs_comment_legacy(config tool.Config, user_name string, page s
 	rows := tool.Get_bbs_comment_record_rows(db, user_name, offset)
 	defer rows.Close()
 
-	data_html := `<table id="main_table_set"><tr id="main_table_top_tr"><td>` + tool.Get_language(db, "editor", true) + `</td><td>` + tool.Get_language(db, "time", true) + `</td><td>` + tool.Get_language(db, "comment", true) + `</td></tr>`
+	data_html := ""
 	row_count := 0
 	for rows.Next() {
 		comment_set_id := ""
@@ -34,10 +34,12 @@ func View_record_bbs_comment_legacy(config tool.Config, user_name string, page s
 		title := Record_bbs_legacy_value(db, "title", bbs_id, post_id)
 		bbs_name := Record_bbs_legacy_board_name(db, bbs_id)
 		title_link := `<a href="/bbs/w/` + tool.Url_parser(bbs_id) + `/` + tool.Url_parser(post_id) + `#` + tool.Url_parser(comment_link) + `">` + tool.HTML_escape(title) + `</a>`
-		data_html += `<tr><td>` + tool.IP_parser(db, comment_user, config.IP) + `</td><td>` + tool.HTML_escape(date) + `</td><td>#` + tool.HTML_escape(comment_link) + `</td></tr>`
-		data_html += `<tr><td colspan="3">` + title_link + ` (` + tool.HTML_escape(bbs_name) + `)</td></tr>`
+		left := `<strong>` + tool.Get_language(db, "editor", true) + `:</strong> ` + tool.IP_parser(db, comment_user, config.IP)
+		right := `<strong>` + tool.Get_language(db, "time", true) + `:</strong> ` + tool.HTML_escape(date)
+		bottom := `<div><strong>` + tool.Get_language(db, "comment", true) + `:</strong> #` + tool.HTML_escape(comment_link) + `</div>`
+		bottom += `<div>` + title_link + ` (` + tool.HTML_escape(bbs_name) + `)</div>`
+		data_html += tool.Get_list_ui(left, right, bottom, "")
 	}
-	data_html += `</table>`
 	data_html += tool.Get_page_control(db, page_int, row_count, 50, "/record/bbs_comment/"+tool.Url_parser(user_name)+"/{}")
 
 	return tool.Get_template(

@@ -395,7 +395,7 @@ func IP_parser(db *sql.DB, ip string, my_ip string) string {
 			ip = "<sup>" + HTML_escape(auth_name) + "</sup><s>" + ip + "</s>"
 		}
 
-		ip += "<a href=\"/user_tool/" + Url_parser(raw_ip) + "\"><span class=\"opennamu_svg opennamu_svg_tool\">&nbsp;</span></a>"
+		ip += "<a href=\"/user_tool/" + Url_parser(raw_ip) + "\" aria-label=\"" + HTML_escape(Get_language(db, "user_tool", true)) + "\"><span class=\"opennamu_svg opennamu_svg_tool\">&nbsp;</span></a>"
 
 		return ip
 	}

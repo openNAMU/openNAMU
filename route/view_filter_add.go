@@ -47,7 +47,7 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 			if sub_type == "under_bar" {
 				inter_type = "under_bar"
 			}
-			form += `<hr class="main_hr">` + tool.Build_select("inter_type", []string{"url_encode", "under_bar"}, inter_type, "normal")
+			form += `<hr class="main_hr"><div><label for="inter_type">` + tool.Get_language(db, "type", true) + `</label><div>` + tool.Build_select("inter_type", []string{"url_encode", "under_bar"}, inter_type, "normal") + `</div></div>`
 		}
 	case "external_image":
 		form += Filter_input(tool.Get_language(db, "domain", true), "title", value[0])
@@ -69,7 +69,7 @@ func View_filter_add(config tool.Config, kind string, name string, values url.Va
 	case "document":
 		form += Filter_input(tool.Get_language(db, "name", true), "name", name)
 		form += `<hr class="main_hr">` + Filter_input(tool.Get_language(db, "regex", true), "regex", value[1])
-		form += `<hr class="main_hr"><span>` + tool.Get_language(db, "acl", true) + `</span><hr class="main_hr"><textarea name="acl" placeholder="view=normal&#10;edit=trust_a&#10;move=owner&#10;delete=owner&#10;new_make=trust_a">` + tool.HTML_escape(value[2]) + `</textarea>`
+		form += `<hr class="main_hr"><div><label for="filter_acl">` + tool.Get_language(db, "acl", true) + `</label><div><textarea id="filter_acl" name="acl" placeholder="view=normal&#10;edit=trust_a&#10;move=owner&#10;delete=owner&#10;new_make=trust_a">` + tool.HTML_escape(value[2]) + `</textarea></div></div>`
 	case "name_filter", "file_filter":
 		form += Filter_input(tool.Get_language(db, "regex", true), "title", name)
 	case "replace_filter":
@@ -140,7 +140,8 @@ func Filter_safe_link(value string) string {
 }
 
 func Filter_input(label string, name string, value string) string {
-	return `<span>` + label + `</span><hr class="main_hr"><input name="` + name + `" value="` + tool.HTML_escape(value) + `">`
+	id := "filter_" + name
+	return `<div><label for="` + tool.HTML_escape(id) + `">` + label + `</label><div><input id="` + tool.HTML_escape(id) + `" name="` + tool.HTML_escape(name) + `" value="` + tool.HTML_escape(value) + `"></div></div>`
 }
 
 func Document_filter_acl_data(db *sql.DB, data string) (string, bool) {

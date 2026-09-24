@@ -55,7 +55,8 @@ func View_edit_page(db *sql.DB, config tool.Config, doc_name string, load_doc_na
 	}
 	form_data := editor_top_text + `<form action="/edit/` + tool.Url_parser(doc_name) + `" method="post">
         <input type="hidden" name="ver" value="` + tool.HTML_escape(revision) + `">
-        <input class="__ON_INPUT__" type="text" name="send" value="` + tool.HTML_escape(send) + `" placeholder="` + tool.Get_language(db, "why", true) + `">
+        <label for="edit_send">` + tool.Get_language(db, "why", true) + `</label>
+        <input id="edit_send" class="__ON_INPUT__" type="text" name="send" value="` + tool.HTML_escape(send) + `">
         <hr class="main_hr">
         ` + editor_data + `
     </form>`

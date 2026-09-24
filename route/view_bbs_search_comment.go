@@ -51,7 +51,8 @@ func View_bbs_search_comment(config tool.Config, set_id string, keyword string, 
 
 	data_html := `<form method="post" action="` + search_path + `">
         <div>
-            <input class="__ON_INPUT__" name="keyword" value="` + tool.HTML_escape(keyword) + `" placeholder="` + tool.Get_language(db, "search", true) + `">
+            <label for="bbs_comment_search_keyword">` + tool.Get_language(db, "search", true) + `</label>
+            <input id="bbs_comment_search_keyword" class="__ON_INPUT__" name="keyword" value="` + tool.HTML_escape(keyword) + `">
         </div>
         <hr class="main_hr">
         <div>
@@ -66,11 +67,15 @@ func View_bbs_search_comment(config tool.Config, set_id string, keyword string, 
 		data_list, _ := data_api["data"].([]map[string]string)
 		data_html += Get_bbs_list_ui(db, config, data_list, bbs_id_to_name)
 
+		has_next, _ := data_api["has_next"].(bool)
+		if len(data_list) == 0 {
+			data_html += `<div>` + tool.Get_language(db, "search_no_result", true) + `</div><hr class="main_hr">`
+		}
 		page_url := "/bbs/search_comment_page/{}/" + tool.Url_parser(keyword)
 		if set_id != "" {
 			page_url = "/bbs/search_comment_board_page/" + tool.Url_parser(set_id) + "/{}" + "/" + tool.Url_parser(keyword)
 		}
-		data_html += tool.Get_page_control(db, page_int, len(data_list), 50, page_url)
+		data_html += tool.Get_page_control(db, page_int, len(data_list), 50, page_url, has_next)
 	}
 
 	return_menu := "bbs/main"

@@ -26,7 +26,11 @@ func View_list_document_all(config tool.Config, page string) string {
 	}
 	rows.Close()
 
-	data := `<ul>` + body.String() + `</ul>`
+	data := `<ul>` + body.String()
+	if count == 0 {
+		data += `<li>` + tool.Get_language(db, "data_missing", true) + `</li>`
+	}
+	data += `</ul>`
 	if page_num == 1 {
 		all_title := tool.Get_setting_value(db, "count_all_title", "", "")
 		if all_title != "" {

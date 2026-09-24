@@ -3,7 +3,6 @@ package route
 import (
 	"database/sql"
 	"net/url"
-	"strconv"
 
 	"opennamu/route/tool"
 )
@@ -22,7 +21,7 @@ func View_auth_group(config tool.Config, name string, values url.Values) string 
 		return tool.Get_error_page(db, config, "auth")
 	}
 	if name == "" && values == nil {
-		data := `<form method="post"><input name="group_name" placeholder="` + tool.Get_language(db, "name", true) + `"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
+		data := `<form method="post"><label for="group_name">` + tool.Get_language(db, "name", true) + `</label><hr class="main_hr"><input id="group_name" name="group_name"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
 		return tool.Get_template(db, config, tool.Get_language(db, "add_admin_group", true), data, []any{}, [][]any{{"auth/list", tool.Get_language(db, "return", true)}}, map[string]string{})
 	}
 	if values != nil && name == "" {
@@ -59,7 +58,7 @@ func View_auth_group(config tool.Config, name string, values url.Values) string 
 			disabled = ` disabled`
 		}
 		label := tool.Get_language(db, choice.Lang, true)
-		data += `<div class="opennamu_list_1" style="margin-left:` + strconv.Itoa((choice.Level-1)*20) + `px"><label><input type="checkbox" name="` + choice.Key + `"` + checked + disabled + `> ` + label + `</label></div>`
+		data += `<div class="opennamu_list_1"><label><input type="checkbox" name="` + choice.Key + `"` + checked + disabled + `> ` + label + `</label></div>`
 	}
 	if can_edit {
 		data += `<hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`

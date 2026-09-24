@@ -28,6 +28,9 @@ func View_list_category_markup_page(config tool.Config, page string) string {
 		}
 	}
 	rows.Close()
+	if count == 0 {
+		body.WriteString(tool.Get_language(db, "data_missing", true))
+	}
 	body.WriteString(tool.Get_page_control(db, page_num, count, 50, "/list/document/category/markup/{}"))
 	return List_extra_page(db, config, tool.Get_language(db, "category_markup_list", true), body.String())
 }

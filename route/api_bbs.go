@@ -472,11 +472,11 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 	defer tool.DB_close(db)
 
 	if bbs_num == "" && !tool.Check_permission(db, "bbs_main_view", config.IP) {
-		return map[string]any{"response": "require auth", "data": []map[string]string{}}
+		return map[string]any{"response": "require auth", "data": []map[string]string{}, "has_next": false}
 	}
 
 	if bbs_num != "" && !tool.Check_acl(db, bbs_num, "", "bbs_view", config.IP) {
-		return map[string]any{"response": "require auth", "data": []map[string]string{}}
+		return map[string]any{"response": "require auth", "data": []map[string]string{}, "has_next": false}
 	}
 
 	rows_arr := []*sql.Rows{}
@@ -531,7 +531,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			}
 			query += filter_sql
 			values = append(values, filter_values...)
-			query += " order by activity_date desc, title.set_code + 0 desc limit ?, 50"
+			query += " order by activity_date desc, title.set_code + 0 desc limit ?, 51"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		} else if sort_type == "view" {
@@ -545,7 +545,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			}
 			query += filter_sql
 			values = append(values, filter_values...)
-			query += " order by coalesce(view_data.set_data, '0') + 0 desc, title.set_code + 0 desc limit ?, 50"
+			query += " order by coalesce(view_data.set_data, '0') + 0 desc, title.set_code + 0 desc limit ?, 51"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		} else if sort_type == "comment" {
@@ -559,7 +559,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			}
 			query += filter_sql
 			values = append(values, filter_values...)
-			query += " order by " + Bbs_post_comment_count_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
+			query += " order by " + Bbs_post_comment_count_sql("title") + " desc, title.set_code + 0 desc limit ?, 51"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		} else if sort_type == "tabom" {
@@ -573,7 +573,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			}
 			query += filter_sql
 			values = append(values, filter_values...)
-			query += " order by " + Bbs_post_tabom_count_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
+			query += " order by " + Bbs_post_tabom_count_sql("title") + " desc, title.set_code + 0 desc limit ?, 51"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		} else if sort_type == "excellent" {
@@ -589,7 +589,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			values = append(values, filter_values...)
 			query += " and " + Bbs_post_tabom_score_sql("title") + " > ?"
 			values = append(values, Bbs_excellent_min(db, bbs_num))
-			query += " order by " + Bbs_post_tabom_score_sql("title") + " desc, title.set_code + 0 desc limit ?, 50"
+			query += " order by " + Bbs_post_tabom_score_sql("title") + " desc, title.set_code + 0 desc limit ?, 51"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		} else {
@@ -603,7 +603,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			}
 			query += filter_sql
 			values = append(values, filter_values...)
-			query += " order by set_code + 0 desc limit ?, 50"
+			query += " order by set_code + 0 desc limit ?, 51"
 			values = append(values, num)
 			rows = tool.Query_DB(db, query, values...)
 		}
@@ -612,6 +612,8 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 	}
 
 	data_list := []map[string]string{}
+	has_next := false
+	normal_count := 0
 	ip_parser_temp := map[string][]string{}
 	activity_update_list := [][]string{}
 
@@ -634,6 +636,13 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			}
 			if err != nil {
 				panic(err)
+			}
+			if bbs_num != "" && pinned != "1" {
+				normal_count++
+				if normal_count > 50 {
+					has_next = true
+					continue
+				}
 			}
 			if sort_type == "activity" && activity_cache_missing == 1 && activity_date != "" {
 				activity_update_list = append(activity_update_list, []string{set_id, set_code, activity_date})
@@ -726,6 +735,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 	return_data["response"] = "ok"
 	return_data["data"] = data_list
 
+	return_data["has_next"] = has_next
 	return return_data
 }
 

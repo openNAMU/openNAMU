@@ -23,5 +23,5 @@ func View_login_find_email_check(config tool.Config, values url.Values) string {
 		_ = config.Session.Save()
 		return tool.Get_redirect("/login/find/key")
 	}
-	return User_form_page(db, config, tool.Get_language(db, "check_key", true), "<form method='post'><div><input name='key'></div><hr class='main_hr'>"+tool.Get_captcha_ui(db, config)+"<div><button type='submit'>"+tool.Get_language(db, "check", true)+"</button></div></form>")
+	return User_form_page(db, config, tool.Get_language(db, "check_key", true), "<form method='post'><div><label for='email_reset_key'>"+tool.Get_language(db, "key", true)+"</label> <input id='email_reset_key' name='key'></div><hr class='main_hr'>"+tool.Get_captcha_ui(db, config)+"<div><button type='submit'>"+tool.Get_language(db, "check", true)+"</button></div></form>")
 }

@@ -16,7 +16,8 @@ func View_main_search(config tool.Config, keyword string, num string, search_typ
 
 	data_html := `
         <form method="post">
-            <div><input class="opennamu_width_200 __ON_INPUT__" name="search" value="` + tool.HTML_escape(keyword) + `"></div><hr class="main_hr">
+		    <div><label for="main_search_keyword">` + tool.Get_language(db, "search", true) + `</label></div>
+		    <div><input id="main_search_keyword" class="opennamu_width_200 __ON_INPUT__" name="search" value="` + tool.HTML_escape(keyword) + `"></div><hr class="main_hr">
             <div><button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "search", true) + `</button></div>
         </form>
         <hr class="main_hr">
@@ -62,6 +63,10 @@ func View_main_search(config tool.Config, keyword string, num string, search_typ
 	data_list := Api_func_search_ui(config, data_api_in, keyword, search_type)
 
 	data_html += "<ul>"
+	has_next, _ := data_api["has_next"].(bool)
+	if len(data_list) == 0 {
+		data_html += "<li>" + tool.Get_language(db, "search_no_result", true) + "</li>"
+	}
 	for _, in_data := range data_list {
 		title := in_data["title"]
 		data_html += "<li><a href=\"/w/" + tool.Url_parser(title) + "\">" + in_data["title_html"] + "</a>"
@@ -82,6 +87,7 @@ func View_main_search(config tool.Config, keyword string, num string, search_typ
 			len(data_api_in),
 			50,
 			"/search_page/{}/"+tool.Url_parser(keyword),
+			has_next,
 		)
 	} else {
 		data_html += tool.Get_page_control(
@@ -90,6 +96,7 @@ func View_main_search(config tool.Config, keyword string, num string, search_typ
 			len(data_api_in),
 			50,
 			"/search_data_page/{}/"+tool.Url_parser(keyword),
+			has_next,
 		)
 	}
 

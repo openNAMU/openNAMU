@@ -16,7 +16,7 @@ func Auth_groups(db *sql.DB) []string {
 }
 
 func Auth_target_type_select(db *sql.DB, target_type string, owner bool) string {
-	data := `<select name="target_type">`
+	data := `<select id="target_type" name="target_type">`
 	for _, target := range []string{"normal", "regex", "cidr"} {
 		selected := ""
 		if target == target_type {
@@ -36,7 +36,7 @@ func Auth_target_type_select(db *sql.DB, target_type string, owner bool) string 
 
 func Auth_period_select(db *sql.DB) string {
 	periods := []string{"1_day", "3_day", "7_day", "30_day", "60_day", "1_year", "100_year"}
-	data := `<select name="end_period"><option value="">` + tool.Get_language(db, "direct_input", true) + `</option>`
+	data := `<select id="end_period" name="end_period"><option value="">` + tool.Get_language(db, "direct_input", true) + `</option>`
 	for _, period := range periods {
 		data += `<option value="` + period + `">` + tool.Get_language(db, period, true) + `</option>`
 	}
@@ -116,9 +116,10 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 		data += `<p>` + tool.Get_language(db, "auth_give_help", true) + `</p>`
 	}
 	if mode == "total" {
+		data += `<label for="auth">` + tool.Get_language(db, "admin_group", true) + `</label><hr class="main_hr">`
 		data += tool.Build_select("auth", groups, "", "") + `<hr class="main_hr">`
 	} else if user_name == "" {
-		data += `<textarea class="opennamu_textarea_100" name="user_name" placeholder="` + tool.Get_language(db, "name_or_ip_or_regex_or_cidr_multiple", true) + `"></textarea><hr class="main_hr">`
+		data += `<label for="user_name">` + tool.Get_language(db, "name_or_ip_or_regex_or_cidr_multiple", true) + `</label><hr class="main_hr"><textarea id="user_name" class="opennamu_textarea_100" name="user_name"></textarea><hr class="main_hr">`
 	} else {
 		data += `<div id="opennamu_get_user_info">` + tool.HTML_escape(user_name) + `</div><hr class="main_hr">`
 	}
@@ -142,14 +143,14 @@ func View_auth_give(config tool.Config, mode string, user_name string, target_ty
 
 	if mode != "total" {
 		owner := tool.Check_permission(db, "owner", config.IP)
-		data += Auth_target_type_select(db, target_type, owner) + `<hr class="main_hr">`
+		data += `<label for="target_type">` + tool.Get_language(db, "target_type", true) + `</label><hr class="main_hr">` + Auth_target_type_select(db, target_type, owner) + `<hr class="main_hr">`
 	}
-	data += tool.Build_select("change_auth", groups, selected, "")
+	data += `<label for="change_auth">` + tool.Get_language(db, "admin_group", true) + `</label><hr class="main_hr">` + tool.Build_select("change_auth", groups, selected, "")
 	if mode != "total" {
-		data += `<hr class="main_hr"><span>` + tool.Get_language(db, "period", true) + `</span>` + Auth_period_select(db)
-		data += `<hr class="main_hr"><span>` + tool.Get_language(db, "date", true) + `</span><input type="date" name="end_date" value="` + tool.HTML_escape(end_date) + `">`
-		data += `<hr class="main_hr"><input name="why" placeholder="` + tool.Get_language(db, "why", true) + `">`
-		data += `<hr class="main_hr"><select name="action"><option value="give">` + tool.Get_language(db, "authorize", true) + `</option><option value="release">` + tool.Get_language(db, "auth_release", true) + `</option></select>`
+		data += `<hr class="main_hr"><label for="end_period">` + tool.Get_language(db, "period", true) + `</label><hr class="main_hr">` + Auth_period_select(db)
+		data += `<hr class="main_hr"><label for="end_date">` + tool.Get_language(db, "date", true) + `</label><hr class="main_hr"><input id="end_date" type="date" name="end_date" value="` + tool.HTML_escape(end_date) + `">`
+		data += `<hr class="main_hr"><label for="why">` + tool.Get_language(db, "why", true) + `</label><hr class="main_hr"><input id="why" name="why">`
+		data += `<hr class="main_hr"><label for="action">` + tool.Get_language(db, "auth_action", true) + `</label><hr class="main_hr"><select id="action" name="action"><option value="give">` + tool.Get_language(db, "authorize", true) + `</option><option value="release">` + tool.Get_language(db, "auth_release", true) + `</option></select>`
 	}
 	data += `<hr class="main_hr"><button type="submit">` + tool.Get_language(db, "send", true) + `</button></form>`
 

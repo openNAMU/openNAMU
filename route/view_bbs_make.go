@@ -12,11 +12,12 @@ func View_bbs_make(config tool.Config) string {
 
 	data_html := `
         <form method="post">
-            <input class="__ON_INPUT__" placeholder="` + tool.Get_language(db, "bbs_name", true) + `" name="bbs_name">
+            <div><label for="bbs_name">` + tool.Get_language(db, "bbs_name", true) + `</label><input id="bbs_name" class="__ON_INPUT__" name="bbs_name"></div>
             <hr class="main_hr">
             
             <span class="__ON_SELECT_DIV__">
-                <select class="__ON_SELECT__" name="bbs_type">
+                <label for="bbs_type">` + tool.Get_language(db, "type", true) + `</label>
+                <select id="bbs_type" class="__ON_SELECT__" name="bbs_type">
                     <option value="comment">` + tool.Get_language(db, "comment_base", true) + `</option>
                     <option value="thread">` + tool.Get_language(db, "thread_base", true) + `</option>
                 </select>

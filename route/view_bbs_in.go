@@ -67,6 +67,7 @@ func View_bbs_in_internal(config tool.Config, set_id string, page_num string, so
 		data_api = Api_bbs(config, set_id, page_num, sort_type)
 	}
 	data_api_in, _ := data_api["data"].([]map[string]string)
+	has_next, _ := data_api["has_next"].(bool)
 
 	data_html := ""
 	if show_filter {
@@ -119,6 +120,28 @@ func View_bbs_in_internal(config tool.Config, set_id string, page_num string, so
     </form><hr class="main_hr">`
 	}
 	data_html += Bbs_list_example_ui(db)
+
+	sort_path := "bbs/in/" + tool.Url_parser(set_id) + "/view/1"
+	sort_name := tool.Get_language(db, "page_view_sort", true)
+	if sort_type == "view" {
+		sort_path = "bbs/in/" + tool.Url_parser(set_id) + "/1"
+		sort_name = tool.Get_language(db, "recent", true)
+	}
+	filter_menu_path := "bbs/in/" + tool.Url_parser(set_id) + "/filter/"
+	if filter_path != "" {
+		filter_menu_path += filter_path + "/"
+	}
+	filter_menu_path += "1"
+	data_html += `<hr class="main_hr">`
+	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/activity/1">` + tool.Get_language(db, "activity_sort", false) + `</a>) `
+	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/comment/1">` + tool.Get_language(db, "comment_sort", false) + `</a>) `
+	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/tabom/1">` + tool.Get_language(db, "upvote_sort", false) + `</a>) `
+	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/excellent/1">` + tool.Get_language(db, "excellent_post", false) + `</a>) `
+	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/filter/mine/1">` + tool.Get_language(db, "my_bbs_post", false) + `</a>) `
+	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/filter/participate/1">` + tool.Get_language(db, "participate_bbs_post", false) + `</a>) `
+	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/filter/tabom_user/1">` + tool.Get_language(db, "my_tabom_bbs_post", false) + `</a>) `
+	data_html += `(<a href="/` + filter_menu_path + `">` + tool.Get_language(db, "filter", false) + `</a>)`
+	data_html += `<hr class="main_hr">`
 	data_html += Get_bbs_list_ui(db, config, data_api_in, map[string]string{})
 	page_path := "/bbs/in/" + tool.Url_parser(set_id) + "/{}"
 	if show_filter {
@@ -144,30 +167,11 @@ func View_bbs_in_internal(config tool.Config, set_id string, page_num string, so
 		len(data_api_in),
 		50,
 		page_path,
+		has_next,
 	)
 
-	sort_path := "bbs/in/" + tool.Url_parser(set_id) + "/view/1"
-	sort_name := tool.Get_language(db, "page_view_sort", true)
-	if sort_type == "view" {
-		sort_path = "bbs/in/" + tool.Url_parser(set_id) + "/1"
-		sort_name = tool.Get_language(db, "recent", true)
-	}
-	filter_menu_path := "bbs/in/" + tool.Url_parser(set_id) + "/filter/"
-	if filter_path != "" {
-		filter_menu_path += filter_path + "/"
-	}
-	filter_menu_path += "1"
-	data_html += `<hr class="main_hr">`
-	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/activity/1">` + tool.Get_language(db, "activity_sort", false) + `</a>)&nbsp;`
-	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/comment/1">` + tool.Get_language(db, "comment_sort", false) + `</a>)&nbsp;`
-	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/tabom/1">` + tool.Get_language(db, "upvote_sort", false) + `</a>)&nbsp;`
-	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/excellent/1">` + tool.Get_language(db, "excellent_post", false) + `</a>)&nbsp;`
-	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/filter/mine/1">` + tool.Get_language(db, "my_bbs_post", false) + `</a>)&nbsp;`
-	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/filter/participate/1">` + tool.Get_language(db, "participate_bbs_post", false) + `</a>)&nbsp;`
-	data_html += `(<a href="/bbs/in/` + tool.Url_parser(set_id) + `/filter/tabom_user/1">` + tool.Get_language(db, "my_tabom_bbs_post", false) + `</a>)&nbsp;`
-	data_html += `(<a href="/` + filter_menu_path + `">` + tool.Get_language(db, "filter", false) + `</a>)&nbsp;`
 	if !Bbs_is_special_board(set_id) || set_id == "0" || set_id == thread_bbs_id {
-		data_html += `(<a href="/bbs/set/` + tool.Url_parser(set_id) + `">` + tool.Get_language(db, "bbs_set", false) + `</a>)`
+		data_html += `<hr class="main_hr"><div>(<a href="/bbs/set/` + tool.Url_parser(set_id) + `">` + tool.Get_language(db, "bbs_set", false) + `</a>)</div>`
 	}
 
 	menu := [][]any{

@@ -29,5 +29,5 @@ func View_login_find_key(config tool.Config, values url.Values) string {
 		_ = config.Session.Save()
 		return tool.Get_redirect("/login")
 	}
-	return User_form_page(db, config, tool.Get_language(db, "password_change", true), `<form method="post"><input type="password" name="password"><hr class="main_hr"><input type="password" name="password_check"><hr class="main_hr">`+tool.Get_captcha_ui(db, config)+`<button type="submit">`+tool.Get_language(db, "save", true)+`</button></form>`)
+	return User_form_page(db, config, tool.Get_language(db, "password_change", true), `<form method="post"><label for="reset_password">`+tool.Get_language(db, "new_password", true)+`</label> <input id="reset_password" type="password" name="password"><hr class="main_hr"><label for="reset_password_check">`+tool.Get_language(db, "password_confirm", true)+`</label> <input id="reset_password_check" type="password" name="password_check"><hr class="main_hr">`+tool.Get_captcha_ui(db, config)+`<button type="submit">`+tool.Get_language(db, "save", true)+`</button></form>`)
 }

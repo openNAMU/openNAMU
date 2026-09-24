@@ -515,7 +515,7 @@ func Get_acl_why(db *sql.DB, title string) string {
 func Get_need_document_rows(db *sql.DB, offset int) *sql.Rows {
 	return Query_DB(
 		db,
-		"select b.title, count(*) from back b where b.type = 'no' and not exists (select 1 from data d where d.title = b.title) group by b.title order by count(*) desc, b.title asc limit ?, 50",
+		"select b.title, count(*) from back b where b.type = 'no' and not exists (select 1 from data d where d.title = b.title) group by b.title order by count(*) desc, b.title asc limit ?, 51",
 		offset,
 	)
 }
@@ -569,7 +569,7 @@ func Get_data_file_rows(db *sql.DB, offset int, order bool) *sql.Rows {
 func Get_data_image_file_rows(db *sql.DB, offset int) *sql.Rows {
 	return Query_DB(
 		db,
-		"select title from data where title like 'file:%' and (lower(title) like '%.jpeg' or lower(title) like '%.jpg' or lower(title) like '%.png' or lower(title) like '%.gif' or lower(title) like '%.webp' or lower(title) like '%.bmp' or lower(title) like '%.tif' or lower(title) like '%.tiff' or lower(title) like '%.ico' or lower(title) like '%.svg' or lower(title) like '%.avif' or lower(title) like '%.heic') order by title limit ?, 50",
+		"select title from data where title like 'file:%' and (lower(title) like '%.jpeg' or lower(title) like '%.jpg' or lower(title) like '%.png' or lower(title) like '%.gif' or lower(title) like '%.webp' or lower(title) like '%.bmp' or lower(title) like '%.tif' or lower(title) like '%.tiff' or lower(title) like '%.ico' or lower(title) like '%.svg' or lower(title) like '%.avif' or lower(title) like '%.heic') order by title limit ?, 51",
 		offset,
 	)
 }

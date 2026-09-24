@@ -32,7 +32,7 @@ func View_auth_fix(config tool.Config, user_name string, values url.Values) stri
 	}
 
 	data := `<form method="post"><div id="opennamu_get_user_info">` + tool.HTML_escape(user_name) + `</div><hr class="main_hr">` +
-		`<select name="select"><option value="password_change">` + tool.Get_language(db, "password_change", true) + `</option><option value="2fa_password_change">` + tool.Get_language(db, "2fa_password_change", true) + `</option><option value="2fa_off">` + tool.Get_language(db, "2fa_off", true) + `</option></select><hr class="main_hr">` +
-		`<input name="new_password" type="password" placeholder="` + tool.Get_language(db, "new_password", true) + `"><hr class="main_hr"><input name="password_check" type="password" placeholder="` + tool.Get_language(db, "password_confirm", true) + `"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
+		`<div><label for="auth_fix_action">` + tool.Get_language(db, "option", true) + `</label><select id="auth_fix_action" name="select"><option value="password_change">` + tool.Get_language(db, "password_change", true) + `</option><option value="2fa_password_change">` + tool.Get_language(db, "2fa_password_change", true) + `</option><option value="2fa_off">` + tool.Get_language(db, "2fa_off", true) + `</option></select></div><hr class="main_hr">` +
+		`<div><label for="new_password">` + tool.Get_language(db, "new_password", true) + `</label><input id="new_password" name="new_password" type="password"></div><hr class="main_hr"><div><label for="password_check">` + tool.Get_language(db, "password_confirm", true) + `</label><input id="password_check" name="password_check" type="password"></div><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
 	return tool.Get_template(db, config, tool.Get_language(db, "user_fix", true), data, []any{}, [][]any{{"manager", tool.Get_language(db, "return", true)}}, map[string]string{})
 }

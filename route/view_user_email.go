@@ -48,6 +48,6 @@ func View_user_email(config tool.Config, values url.Values) string {
 	if instruction != "" {
 		body += tool.HTML_escape(instruction) + `<hr class="main_hr">`
 	}
-	body += `<a href="/filter/email_filter">(` + tool.Get_language(db, "email_filter_list", true) + `)</a><hr class="main_hr"><form method="post"><input placeholder="` + tool.Get_language(db, "email", true) + `" name="email" type="email"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
+	body += `<a href="/filter/email_filter">(` + tool.Get_language(db, "email_filter_list", true) + `)</a><hr class="main_hr"><form method="post"><label for="user_email">` + tool.Get_language(db, "email", true) + `</label> <input id="user_email" placeholder="` + tool.Get_language(db, "email", true) + `" name="email" type="email"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 	return User_form_page(db, config, tool.Get_language(db, "email", true), body)
 }

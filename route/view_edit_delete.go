@@ -22,7 +22,7 @@ func View_edit_delete(config tool.Config, doc_name string) string {
 	}
 
 	data_html := `<form method="post">
-        <input class="__ON_INPUT__" placeholder="` + tool.Get_language(db, "why", true) + `" name="send">
+        <div><label for="send">` + tool.Get_language(db, "why", true) + `</label><input id="send" class="__ON_INPUT__" name="send"></div>
         <hr class="main_hr">
         ` + tool.Get_captcha_ui(db, config) + tool.Get_IP_warning_ui(db, config) + tool.Get_edit_check_box_ui(db) + tool.Get_edit_bottom_text_ui(db, "delete") + `
         <button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "delete", true) + `</button>

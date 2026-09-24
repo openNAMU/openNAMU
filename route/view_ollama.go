@@ -27,8 +27,8 @@ func View_ollama(config tool.Config, question string, model string) string {
 		data_html += `<p>` + tool.Get_language(db, "ai_external_warning", true) + `</p>`
 	}
 	data_html += `<form method="post" action="/ai">` +
-		`<textarea class="opennamu_textarea_100" name="question" placeholder="` + tool.Get_language(db, "ai_question", true) + `">` + tool.HTML_escape(question) + `</textarea><hr class="main_hr">` +
-		`<input name="model" value="` + tool.HTML_escape(model) + `" placeholder="` + tool.Get_language(db, "ai_model", true) + `"><hr class="main_hr">` +
+		`<div><label for="question">` + tool.Get_language(db, "ai_question", true) + `</label></div><textarea id="question" class="opennamu_textarea_100" name="question">` + tool.HTML_escape(question) + `</textarea><hr class="main_hr">` +
+		`<div><label for="model">` + tool.Get_language(db, "ai_model", true) + `</label><input id="model" name="model" value="` + tool.HTML_escape(model) + `"></div><hr class="main_hr">` +
 		`<button type="submit">` + tool.Get_language(db, "go", true) + `</button></form>`
 
 	if question != "" {

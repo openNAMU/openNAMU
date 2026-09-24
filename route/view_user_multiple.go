@@ -31,8 +31,8 @@ func View_user_multiple(config tool.Config, page string, sort string, search str
 	}
 
 	body.WriteString(`<form method="post" action="/list/user/multiple">`)
-	body.WriteString(`<div><input name="search" value="` + tool.HTML_escape(search) + `" placeholder="` + tool.Get_language(db, "name", true) + ` / ` + tool.Get_language(db, "ip", true) + `"></div><hr class="main_hr">`)
-	body.WriteString(`<div><select name="sort"><option value="recent"` + recent_selected + `>` + tool.Get_language(db, "recent", true) + `</option><option value="count"` + count_selected + `>` + tool.Get_language(db, "account_count", true) + `</option></select></div><hr class="main_hr">`)
+	body.WriteString(`<div><label for="user_multiple_search">` + tool.Get_language(db, "search", true) + `</label><input id="user_multiple_search" name="search" value="` + tool.HTML_escape(search) + `" placeholder="` + tool.Get_language(db, "name", true) + ` / ` + tool.Get_language(db, "ip", true) + `"></div><hr class="main_hr">`)
+	body.WriteString(`<div><label for="user_multiple_sort">` + tool.Get_language(db, "type", true) + `</label><select id="user_multiple_sort" name="sort"><option value="recent"` + recent_selected + `>` + tool.Get_language(db, "recent", true) + `</option><option value="count"` + count_selected + `>` + tool.Get_language(db, "account_count", true) + `</option></select></div><hr class="main_hr">`)
 	body.WriteString(`<div><button type="submit">` + tool.Get_language(db, "search", true) + `</button></div></form><hr class="main_hr">`)
 	body.WriteString(`<p>` + tool.Get_language(db, "multiple_account_note", true) + `</p>`)
 	if tool.Get_setting_value(db, "ua_get", "", "") != "" {

@@ -121,8 +121,8 @@ func Bbs_search_comment_item_data(db *sql.DB, config tool.Config, set_id string,
 	return data, true
 }
 
-func Bbs_search_comment_index_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int) ([]map[string]string, bool) {
-	target_count := page * 50
+func Bbs_search_comment_index_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int) ([]map[string]string, bool, bool) {
+	target_count := page*50 + 1
 	candidate_limit := 500
 	if target_count < candidate_limit {
 		candidate_limit = target_count
@@ -140,7 +140,7 @@ func Bbs_search_comment_index_data(db *sql.DB, config tool.Config, keyword strin
 	for candidate_offset < max_candidate && len(data_list) < target_count {
 		candidate_list, ok := tool.Search_bbs_index_search_comment(keyword, set_id, candidate_offset, candidate_limit)
 		if !ok {
-			return nil, false
+			return nil, false, false
 		}
 		if len(candidate_list) == 0 {
 			break
@@ -177,16 +177,17 @@ func Bbs_search_comment_index_data(db *sql.DB, config tool.Config, keyword strin
 
 	start := (page - 1) * 50
 	if start >= len(data_list) {
-		return []map[string]string{}, true
+		return []map[string]string{}, false, true
 	}
 	end := start + 50
+	has_next := len(data_list) > end
 	if end > len(data_list) {
 		end = len(data_list)
 	}
-	return data_list[start:end], true
+	return data_list[start:end], has_next, true
 }
 
-func Bbs_search_comment_sql_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int) []map[string]string {
+func Bbs_search_comment_sql_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int) ([]map[string]string, bool) {
 	where_data := "b.set_name = 'comment' and b.set_data like ?"
 	values := []any{"%" + keyword + "%"}
 	if set_id != "" {
@@ -204,7 +205,7 @@ func Bbs_search_comment_sql_data(db *sql.DB, config tool.Config, keyword string,
 	values = append(values, offset)
 	rows := tool.Query_DB(
 		db,
-		"select b.set_id, b.set_code from bbs_data b left join bbs_data d on d.set_id = b.set_id and d.set_code = b.set_code and d.set_name = 'comment_date' where "+where_data+" order by d.set_data desc limit ?, 50",
+		"select b.set_id, b.set_code from bbs_data b left join bbs_data d on d.set_id = b.set_id and d.set_code = b.set_code and d.set_name = 'comment_date' where "+where_data+" order by d.set_data desc limit ?, 51",
 		values...,
 	)
 	defer rows.Close()
@@ -238,7 +239,11 @@ func Bbs_search_comment_sql_data(db *sql.DB, config tool.Config, keyword string,
 			data_list = append(data_list, item_data)
 		}
 	}
-	return data_list
+	has_next := len(data_list) > 50
+	if has_next {
+		data_list = data_list[:50]
+	}
+	return data_list, has_next
 }
 
 func Api_bbs_search_comment(config tool.Config, keyword string, set_id string, page string) map[string]any {
@@ -246,29 +251,32 @@ func Api_bbs_search_comment(config tool.Config, keyword string, set_id string, p
 	defer tool.DB_close(db)
 
 	if set_id == "" && !tool.Check_permission(db, "bbs_main_view", config.IP) {
-		return map[string]any{"response": "require auth", "data": []map[string]string{}}
+		return map[string]any{"response": "require auth", "data": []map[string]string{}, "has_next": false}
 	}
 	if set_id != "" && !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
-		return map[string]any{"response": "require auth", "data": []map[string]string{}}
+		return map[string]any{"response": "require auth", "data": []map[string]string{}, "has_next": false}
 	}
 
 	keyword = strings.TrimSpace(keyword)
 	data_list := []map[string]string{}
+	has_next := false
 	if keyword != "" {
 		page_num := tool.Str_to_int(page)
 		if page_num < 1 {
 			page_num = 1
 		}
 
-		if indexed_data, ok := Bbs_search_comment_index_data(db, config, keyword, set_id, page_num); ok {
+		if indexed_data, indexed_has_next, ok := Bbs_search_comment_index_data(db, config, keyword, set_id, page_num); ok {
 			data_list = indexed_data
+			has_next = indexed_has_next
 		} else {
-			data_list = Bbs_search_comment_sql_data(db, config, keyword, set_id, page_num)
+			data_list, has_next = Bbs_search_comment_sql_data(db, config, keyword, set_id, page_num)
 		}
 	}
 
 	return map[string]any{
 		"response": "ok",
 		"data":     data_list,
+		"has_next": has_next,
 	}
 }

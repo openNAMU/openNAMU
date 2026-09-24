@@ -38,12 +38,12 @@ func View_edit_file_upload(config tool.Config, file_name string) string {
 	}
 	data_html += `<hr class="main_hr">` + tool.Get_language(db, "max_file_size", true) + ` : ` + strconv.Itoa(file_max_size) + `MB`
 	data_html += `<hr class="main_hr"><form method="post" enctype="multipart/form-data" accept-charset="utf8">`
-	data_html += `<input class="__ON_INPUT__" multiple="multiple" type="file" name="f_data[]" id="file_input">`
+	data_html += `<label for="file_input">` + tool.Get_language(db, "upload", false) + `</label> <input class="__ON_INPUT__" multiple="multiple" type="file" name="f_data[]" id="file_input">`
 	data_html += `<hr class="main_hr">`
-	data_html += `<input class="__ON_INPUT__" placeholder="` + tool.Get_language(db, "file_name", false) + `" name="f_name" value="` + tool.HTML_escape(file_name) + `">`
+	data_html += `<label for="f_name">` + tool.Get_language(db, "file_name", false) + `</label> <input id="f_name" class="__ON_INPUT__" placeholder="` + tool.Get_language(db, "file_name", false) + `" name="f_name" value="` + tool.HTML_escape(file_name) + `">`
 	data_html += `<hr class="main_hr">`
-	data_html += `<select class="__ON_INPUT__" name="f_lice_sel">` + license_html + `</select>`
-	data_html += `<hr class="main_hr"><textarea class="opennamu_textarea_100" placeholder="` + tool.Get_language(db, "other", false) + `" name="f_lice">` + tool.HTML_escape(upload_default) + `</textarea>`
+	data_html += `<label for="f_lice_sel">` + tool.Get_language(db, "license", false) + `</label> <select id="f_lice_sel" class="__ON_INPUT__" name="f_lice_sel">` + license_html + `</select>`
+	data_html += `<hr class="main_hr"><div><label for="f_lice">` + tool.Get_language(db, "other", false) + `</label></div><textarea id="f_lice" class="opennamu_textarea_100" placeholder="` + tool.Get_language(db, "other", false) + `" name="f_lice">` + tool.HTML_escape(upload_default) + `</textarea>`
 	data_html += `<hr class="main_hr">` + tool.Get_captcha_ui(db, config)
 	data_html += `<hr class="main_hr"><label><input type="checkbox" name="f_replace" value="1"> ` + tool.Get_language(db, "file_replace", true) + `</label>`
 	data_html += `<hr class="main_hr">`

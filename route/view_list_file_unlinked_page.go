@@ -27,6 +27,9 @@ func View_list_file_unlinked_page(config tool.Config, page string) string {
 		count++
 	}
 	rows.Close()
+	if count == 0 {
+		body.WriteString(`<li>` + tool.Get_language(db, "data_missing", true) + `</li>`)
+	}
 	body.WriteString(`</ul>`)
 	body.WriteString(tool.Get_page_control(db, page_num, count, 50, "/list/file/unlinked/{}"))
 

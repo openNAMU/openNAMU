@@ -69,7 +69,7 @@ func View_bbs_edit(config tool.Config, set_id string, set_code string, comment_c
 	if comment_code == "" {
 		prefix_list := Bbs_prefix_list(db, set_id)
 		if len(prefix_list) > 0 {
-			prefix_html = "<select class=\"__ON_INPUT__\" name=\"prefix\">"
+			prefix_html = `<div><label for="prefix">` + tool.Get_language(db, "bbs_prefix", true) + `</label><select id="prefix" class="__ON_INPUT__" name="prefix">`
 			if set_id != thread_bbs_id {
 				prefix_html += "<option value=\"\">" + tool.Get_language(db, "empty", true) + "</option>"
 			}
@@ -80,9 +80,9 @@ func View_bbs_edit(config tool.Config, set_id string, set_code string, comment_c
 				}
 				prefix_html += "<option value=\"" + tool.HTML_escape(prefix) + "\"" + selected + ">" + tool.HTML_escape(prefix) + "</option>"
 			}
-			prefix_html += "</select><hr class=\"main_hr\">"
+			prefix_html += `</select></div><hr class="main_hr">`
 		}
-		tag_html = `<input class="__ON_INPUT__" placeholder="` + tool.Get_language(db, "tag", true) + `" name="tags" value="` + tool.HTML_escape(data["tags"]) + `"><hr class="main_hr">`
+		tag_html = `<div><label for="tags">` + tool.Get_language(db, "tag", true) + `</label><input id="tags" class="__ON_INPUT__" name="tags" value="` + tool.HTML_escape(data["tags"]) + `"></div><hr class="main_hr">`
 	}
 
 	document_html := ""
@@ -92,7 +92,7 @@ func View_bbs_edit(config tool.Config, set_id string, set_code string, comment_c
 
 	data_html := `<a href="/filter/edit_filter">(` + tool.Get_language(db, "edit_filter_rule", true) + `)</a><hr class="main_hr">` + document_html + `
         <form action="` + path + `" method="post">
-            <input class="__ON_INPUT__"` + title_style + ` placeholder="` + tool.Get_language(db, "title", true) + `" name="title" value="` + tool.HTML_escape(data["title"]) + `">
+            <div` + title_style + `><label for="title">` + tool.Get_language(db, "title", true) + `</label><input id="title" class="__ON_INPUT__" name="title" value="` + tool.HTML_escape(data["title"]) + `"></div>
             <hr` + title_style + ` class="main_hr">
             ` + prefix_html + tag_html + tool.Get_editor_ui(db, config, data["data"], editor_type, "", "", editor_help, "") + `
         </form>`

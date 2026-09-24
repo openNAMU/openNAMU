@@ -39,6 +39,9 @@ func View_list_history(config tool.Config, doc_name string, set_type string, num
 	history_ui, select_ui := Get_ui_history(db, api_data_list)
 
 	data_html += history_ui
+	if len(api_data_list) == 0 {
+		data_html += tool.Get_language(db, "data_missing", true)
+	}
 
 	revision_ids := []string{}
 	for _, history_data := range api_data_list {

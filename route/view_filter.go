@@ -14,46 +14,36 @@ func View_filter(config tool.Config, kind string) string {
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	data := `<table id="main_table_set">`
+	data := ""
+	headers := []string{"name", "", ""}
 	if kind == "external_image" || kind == "html" {
-		header := "domain"
+		headers = []string{"domain"}
 		if kind == "html" {
-			header = "tag"
+			headers[0] = "tag"
 		}
-		data += `<tr id="main_table_top_tr"><td>` + tool.Get_language(db, header, true) + `</td></tr>`
 	} else if kind == "replace_filter" {
-		data += `<tr id="main_table_top_tr"><td>` + tool.Get_language(db, "regex", true) + `</td><td>` + tool.Get_language(db, "replacement", true) + `</td></tr>`
+		headers = []string{"regex", "replacement"}
 	} else {
-		header := []string{"name", "", ""}
 		switch kind {
 		case "inter_wiki", "outer_link":
-			header = []string{"name", "link", "icon"}
+			headers = []string{"name", "link", "icon"}
 		case "document":
-			header = []string{"name", "regex", "acl"}
+			headers = []string{"name", "regex", "acl"}
 		case "edit_filter":
-			header = []string{"name", "regex", "day"}
+			headers = []string{"name", "regex", "day"}
 		case "template":
-			header = []string{"template", "explanation", ""}
+			headers = []string{"template", "explanation", ""}
 		case "edit_top":
-			header = []string{"title", "markup", ""}
+			headers = []string{"title", "markup", ""}
 		case "email_filter":
-			header = []string{"email", "", ""}
+			headers = []string{"email", "", ""}
 		case "name_filter", "file_filter":
-			header = []string{"regex", "", ""}
+			headers = []string{"regex", "", ""}
 		case "image_license":
-			header = []string{"license", "", ""}
+			headers = []string{"license", "", ""}
 		case "extension_filter":
-			header = []string{"extension", "max_file_size", ""}
+			headers = []string{"extension", "max_file_size", ""}
 		}
-		data += `<tr id="main_table_top_tr">`
-		for _, value := range header {
-			data += `<td id="main_table_width">`
-			if value != "" {
-				data += tool.Get_language(db, value, true)
-			}
-			data += `</td>`
-		}
-		data += `</tr>`
 	}
 	rows := tool.Get_html_filter_rows(db, spec.db_kind)
 	defer rows.Close()
@@ -67,30 +57,28 @@ func View_filter(config tool.Config, kind string) string {
 			continue
 		}
 
-		data += `<tr><td>` + tool.HTML_escape(name)
+		name_html := `<strong>` + tool.Get_language(db, headers[0], true) + `:</strong> ` + tool.HTML_escape(name)
 		if can_edit && kind != "email_filter" && kind != "name_filter" && kind != "file_filter" && kind != "extension_filter" && kind != "image_license" {
-			data += ` <a href="/filter/` + kind + `/add/` + tool.Url_parser(name) + `">(` + tool.Get_language(db, "edit", true) + `)</a>`
+			name_html += ` <a href="/filter/` + kind + `/add/` + tool.Url_parser(name) + `">(` + tool.Get_language(db, "edit", true) + `)</a>`
 		}
+		action_html := ""
 		if can_edit {
-			data += ` <a href="/filter/` + kind + `/del/` + tool.Url_parser(name) + `">(` + tool.Get_language(db, "delete", true) + `)</a>`
+			action_html = `<a href="/filter/` + kind + `/del/` + tool.Url_parser(name) + `">(` + tool.Get_language(db, "delete", true) + `)</a>`
 		}
-		if kind == "external_image" || kind == "html" {
-			data += `</td></tr>`
-			continue
+
+		bottom := ""
+		if len(headers) > 1 && headers[1] != "" {
+			value_html := tool.HTML_escape(plus)
+			if kind == "inter_wiki" {
+				value_html = `<a class="opennamu_link_out" href="` + Filter_safe_link(plus) + `">` + tool.HTML_escape(plus) + `</a>`
+			}
+			bottom = `<div><strong>` + tool.Get_language(db, headers[1], true) + `:</strong> ` + value_html + `</div>`
 		}
-		data += `</td><td>`
-		if kind == "replace_filter" {
-			data += tool.HTML_escape(plus) + `</td></tr>`
-			continue
+		if len(headers) > 2 && headers[2] != "" {
+			bottom += `<div><strong>` + tool.Get_language(db, headers[2], true) + `:</strong> ` + tool.HTML_escape(plus_t) + `</div>`
 		}
-		if kind == "inter_wiki" {
-			data += `<a class="opennamu_link_out" href="` + Filter_safe_link(plus) + `">` + tool.HTML_escape(plus) + `</a>`
-		} else {
-			data += tool.HTML_escape(plus)
-		}
-		data += `</td><td>` + tool.HTML_escape(plus_t) + `</td></tr>`
+		data += tool.Get_list_ui(name_html, action_html, bottom, "")
 	}
-	data += `</table>`
 
 	if can_edit {
 		data += `<hr class="main_hr"><a href="/filter/` + kind + `/add">(` + tool.Get_language(db, "add", true) + `)</a>`

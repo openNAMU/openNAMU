@@ -25,7 +25,7 @@ func View_point_give(config tool.Config, values url.Values) string {
 		return tool.Get_redirect("/point/give")
 	}
 
-	data := `<form method="post"><input name="user_name" placeholder="` + tool.Get_language(db, "user_name", true) + `"><hr class="main_hr"><input type="number" name="amount" placeholder="` + tool.Get_language(db, "point", true) + `"><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "send", true) + `</button></form>`
+	data := `<form method="post"><div><label for="user_name">` + tool.Get_language(db, "user_name", true) + `</label><input id="user_name" name="user_name"></div><hr class="main_hr"><div><label for="amount">` + tool.Get_language(db, "point", true) + `</label><input id="amount" type="number" name="amount"></div><hr class="main_hr"><button type="submit">` + tool.Get_language(db, "send", true) + `</button></form>`
 	return tool.Get_template(
 		db,
 		config,

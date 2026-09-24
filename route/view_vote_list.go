@@ -12,6 +12,7 @@ func View_vote_list(config tool.Config, type_str string, num_str string) string 
 
 	api_data := Api_vote_list(config, type_str, num_str)
 	data_list, _ := api_data["data"].([][]string)
+	has_next, _ := api_data["has_next"].(bool)
 
 	data_html := ""
 	sub := any(0)
@@ -46,8 +47,8 @@ func View_vote_list(config tool.Config, type_str string, num_str string) string 
 	if type_str != "open" {
 		page_url = "/vote/list/close/{}"
 	}
-	if page > 1 || len(data_list) == 50 {
-		data_html += tool.Get_page_control(db, page, len(data_list), 50, page_url)
+	if page > 1 || has_next {
+		data_html += tool.Get_page_control(db, page, len(data_list), 50, page_url, has_next)
 	}
 
 	return tool.Get_template(

@@ -30,6 +30,9 @@ func View_list_long_page(config tool.Config, num string, set_type string) string
 
 		data_html += tool.Get_list_ui(right, left, "", "")
 	}
+	if len(api_data_list) == 0 {
+		data_html += tool.Get_language(db, "data_missing", true)
+	}
 
 	data_html += tool.Get_page_control(
 		db,

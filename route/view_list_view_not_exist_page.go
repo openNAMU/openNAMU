@@ -18,6 +18,9 @@ func View_list_view_not_exist_page(config tool.Config, page string) string {
 		right := tool.Get_language(db, "page_view", true) + " : " + tool.HTML_escape(data[1])
 		data_html += tool.Get_list_ui(left, right, "", "")
 	}
+	if len(data_list) == 0 {
+		data_html += tool.Get_language(db, "data_missing", true)
+	}
 
 	data_html += tool.Get_page_control(
 		db,

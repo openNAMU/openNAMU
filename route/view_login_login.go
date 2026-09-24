@@ -19,9 +19,11 @@ func View_login_login(config tool.Config) string {
 		config,
 		tool.Get_language(db, "login", true),
 		`<form method="post">
-            <input class="__ON_INPUT__" placeholder="`+tool.Get_language(db, "id", true)+`" name="id" type="text">
+            <label for="login_id">`+tool.Get_language(db, "id", true)+`</label>
+            <input id="login_id" class="__ON_INPUT__" placeholder="`+tool.Get_language(db, "id", true)+`" name="id" type="text">
             <hr class="main_hr">
-            <input class="__ON_INPUT__" placeholder="`+tool.Get_language(db, "password", true)+`" name="password" type="password">
+            <label for="login_password">`+tool.Get_language(db, "password", true)+`</label>
+            <input id="login_password" class="__ON_INPUT__" placeholder="`+tool.Get_language(db, "password", true)+`" name="password" type="password">
             <hr class="main_hr">
             `+tool.Get_captcha_ui(db, config)+`
             <button class="__ON_BUTTON__" type="submit">`+tool.Get_language(db, "login", true)+`</button>

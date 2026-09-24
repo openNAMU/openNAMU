@@ -83,8 +83,8 @@ func Bbs_search_item_data(db *sql.DB, config tool.Config, set_code string, set_i
 	return temp_data, true
 }
 
-func Bbs_search_index_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int, search_type string) ([]map[string]string, bool) {
-	target_count := page * 50
+func Bbs_search_index_data(db *sql.DB, config tool.Config, keyword string, set_id string, page int, search_type string) ([]map[string]string, bool, bool) {
+	target_count := page*50 + 1
 	candidate_limit := 500
 	if target_count < candidate_limit {
 		candidate_limit = target_count
@@ -107,7 +107,7 @@ func Bbs_search_index_data(db *sql.DB, config tool.Config, keyword string, set_i
 			candidate_list, ok = tool.Search_bbs_index_search(keyword, set_id, candidate_offset, candidate_limit)
 		}
 		if !ok {
-			return nil, false
+			return nil, false, false
 		}
 		if len(candidate_list) == 0 {
 			break
@@ -135,13 +135,14 @@ func Bbs_search_index_data(db *sql.DB, config tool.Config, keyword string, set_i
 
 	start := (page - 1) * 50
 	if start >= len(data_list) {
-		return []map[string]string{}, true
+		return []map[string]string{}, false, true
 	}
 	end := start + 50
+	has_next := len(data_list) > end
 	if end > len(data_list) {
 		end = len(data_list)
 	}
-	return data_list[start:end], true
+	return data_list[start:end], has_next, true
 }
 
 func Api_bbs_search(config tool.Config, keyword string, set_id string, page string) map[string]any {
@@ -157,11 +158,11 @@ func Api_bbs_search_internal(config tool.Config, keyword string, set_id string, 
 	defer tool.DB_close(db)
 
 	if set_id == "" && !tool.Check_permission(db, "bbs_main_view", config.IP) {
-		return map[string]any{"response": "require auth", "data": []map[string]string{}}
+		return map[string]any{"response": "require auth", "data": []map[string]string{}, "has_next": false}
 	}
 
 	if set_id != "" && !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
-		return map[string]any{"response": "require auth", "data": []map[string]string{}}
+		return map[string]any{"response": "require auth", "data": []map[string]string{}, "has_next": false}
 	}
 
 	data_list := []map[string]string{}
@@ -172,10 +173,11 @@ func Api_bbs_search_internal(config tool.Config, keyword string, set_id string, 
 			page_num = 1
 		}
 		offset := (page_num - 1) * 50
-		if data_list, ok := Bbs_search_index_data(db, config, keyword, set_id, page_num, search_type); ok {
+		if data_list, has_next, ok := Bbs_search_index_data(db, config, keyword, set_id, page_num, search_type); ok {
 			return map[string]any{
 				"response": "ok",
 				"data":     data_list,
+				"has_next": has_next,
 			}
 		}
 
@@ -198,7 +200,7 @@ func Api_bbs_search_internal(config tool.Config, keyword string, set_id string, 
 
 		rows := tool.Query_DB(
 			db,
-			"select b.set_code, b.set_id from bbs_data b left join bbs_data d on d.set_code = b.set_code and d.set_id = b.set_id and d.set_name = 'date' where "+where_data+" and b.set_name in ("+search_set_name+") and b.set_data like ? group by b.set_code, b.set_id order by max(d.set_data) desc limit ?, 50",
+			"select b.set_code, b.set_id from bbs_data b left join bbs_data d on d.set_code = b.set_code and d.set_id = b.set_id and d.set_name = 'date' where "+where_data+" and b.set_name in ("+search_set_name+") and b.set_data like ? group by b.set_code, b.set_id order by max(d.set_data) desc limit ?, 51",
 			values...,
 		)
 		defer rows.Close()
@@ -222,10 +224,15 @@ func Api_bbs_search_internal(config tool.Config, keyword string, set_id string, 
 			}
 		}
 	}
+	has_next := len(data_list) > 50
+	if has_next {
+		data_list = data_list[:50]
+	}
 
 	return_data := make(map[string]any)
 	return_data["response"] = "ok"
 	return_data["data"] = data_list
+	return_data["has_next"] = has_next
 
 	return return_data
 }
