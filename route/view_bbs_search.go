@@ -48,7 +48,11 @@ func View_bbs_search_internal(config tool.Config, set_id string, keyword string,
 
 	if set_id != "" {
 		bbs_name_data := Api_bbs_num_to_name(db, set_id)
-		bbs_name, _ = bbs_name_data["data"].(string)
+		var is_bbs_name_valid bool
+		bbs_name, is_bbs_name_valid = bbs_name_data["data"].(string)
+		if !is_bbs_name_valid {
+			return tool.Get_error_page(db, config, "error")
+		}
 		if bbs_name == "" {
 			return tool.Get_redirect("/bbs/main")
 		}
@@ -79,14 +83,30 @@ func View_bbs_search_internal(config tool.Config, set_id string, keyword string,
 		if search_type == "data" {
 			data_api = Api_bbs_search_data(config, keyword, set_id, strconv.Itoa(page_int))
 		}
-		data_list, _ := data_api["data"].([]map[string]string)
+		api_response, ok := data_api["response"].(string)
+		if !ok {
+			return tool.Get_error_page(db, config, "error")
+		}
+		if api_response == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
+		}
+		if api_response != "ok" {
+			return tool.Get_error_page(db, config, "error")
+		}
+		data_list, ok := data_api["data"].([]map[string]string)
+		if !ok {
+			return tool.Get_error_page(db, config, "error")
+		}
 		data_html += Get_bbs_list_ui(db, config, data_list, bbs_id_to_name)
 
 		page_url := "/bbs/search_page/{}/" + tool.Url_parser(keyword)
 		if search_type == "data" {
 			page_url = "/bbs/search_data_page/{}/" + tool.Url_parser(keyword)
 		}
-		has_next, _ := data_api["has_next"].(bool)
+		has_next, ok := data_api["has_next"].(bool)
+		if !ok {
+			return tool.Get_error_page(db, config, "error")
+		}
 		if len(data_list) == 0 {
 			data_html += `<div>` + tool.Get_language(db, "search_no_result", true) + `</div><hr class="main_hr">`
 		}

@@ -55,7 +55,11 @@ func View_bbs_in_internal(config tool.Config, set_id string, page_num string, so
 		return tool.Get_error_page(db, config, "auth")
 	}
 
-	bbs_name, _ := Api_bbs_num_to_name(db, set_id)["data"].(string)
+	bbs_name_data := Api_bbs_num_to_name(db, set_id)
+	bbs_name, ok := bbs_name_data["data"].(string)
+	if !ok {
+		return tool.Get_error_page(db, config, "error")
+	}
 	if bbs_name == "" {
 		return tool.Get_redirect("/bbs/main")
 	}
@@ -66,8 +70,24 @@ func View_bbs_in_internal(config tool.Config, set_id string, page_num string, so
 	} else {
 		data_api = Api_bbs(config, set_id, page_num, sort_type)
 	}
-	data_api_in, _ := data_api["data"].([]map[string]string)
-	has_next, _ := data_api["has_next"].(bool)
+	api_response, ok := data_api["response"].(string)
+	if !ok {
+		return tool.Get_error_page(db, config, "error")
+	}
+	if api_response == "require auth" {
+		return tool.Get_error_page(db, config, "auth")
+	}
+	if api_response != "ok" {
+		return tool.Get_error_page(db, config, "error")
+	}
+	data_api_in, ok := data_api["data"].([]map[string]string)
+	if !ok {
+		return tool.Get_error_page(db, config, "error")
+	}
+	has_next, ok := data_api["has_next"].(bool)
+	if !ok {
+		return tool.Get_error_page(db, config, "error")
+	}
 
 	data_html := ""
 	if show_filter {
