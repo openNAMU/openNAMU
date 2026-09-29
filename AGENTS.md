@@ -189,3 +189,150 @@
 * 작업 범위와 직접 관련 없는 리팩터링이나 정리가 포함되지 않았는가?
 * 임시 파일과 스크린샷이 `./tmp` 외부에 남아 있지 않은가?
 * 실행 가능한 경우 실제 서버와 브라우저를 이용해 변경된 동작을 확인했는가?
+# AGENTS.md 절대 수정 금지
+이번 작업에서 `AGENTS.md`는 **읽기 전용 기준 문서**입니다.
+
+작업 시작 전에 반드시 `AGENTS.md`를 읽고 해당 규칙을 따라야 하지만, 어떤 이유로도 `AGENTS.md` 자체를 수정하면 안 됩니다.
+
+다음 행위를 전부 금지합니다.
+
+```text
+AGENTS.md 내용 추가
+AGENTS.md 내용 삭제
+AGENTS.md 문구 수정
+AGENTS.md 오탈자 수정
+AGENTS.md 포맷팅
+AGENTS.md 줄바꿈 정리
+AGENTS.md 항목 재배치
+AGENTS.md 규칙 보완
+AGENTS.md 예시 추가
+AGENTS.md에 이번 작업 내용을 기록
+AGENTS.md를 gofmt/formatter 대상으로 처리
+AGENTS.md를 git add 대상으로 포함
+```
+
+`AGENTS.md`에서 개선할 부분이나 모순을 발견하더라도 이번 작업에서는 수정하지 마세요.
+
+그 경우 최종 보고서에:
+
+```text
+AGENTS.md에서 발견한 참고 사항
+```
+
+으로만 기록하고 파일 자체는 그대로 두세요.
+
+특히 다음과 같이 행동하면 안 됩니다.
+
+```text
+"이번 작업 규칙을 명확히 하기 위해 AGENTS.md도 수정했습니다."
+```
+
+```text
+"placeholder 규칙을 AGENTS.md에 추가했습니다."
+```
+
+```text
+"기존 AGENTS.md 표현을 현재 구현에 맞게 정리했습니다."
+```
+
+모두 금지입니다.
+
+이번 작업에서 규칙의 방향은 항상:
+
+```text
+AGENTS.md
+↓
+코드가 AGENTS.md를 따름
+```
+
+이어야 합니다.
+
+다음처럼 반대로 하면 안 됩니다.
+
+```text
+현재 구현
+↓
+AGENTS.md를 구현에 맞게 수정
+```
+
+## 작업 전 확인
+작업 시작 시:
+
+```bash
+git status --short
+git diff -- AGENTS.md
+```
+
+등으로 `AGENTS.md`의 현재 상태를 확인하세요.
+
+이미 작업 시작 전에 사용자 측 변경이 존재한다면 그 변경을 건드리지 마세요.
+
+이를 임의로:
+
+```text
+revert
+restore
+checkout
+format
+stage
+commit
+```
+
+하지 마세요.
+
+즉 기존 사용자 변경도 보존해야 합니다.
+
+## 작업 중 확인
+작업 도중에도 `AGENTS.md`를 수정하지 마세요.
+
+규칙을 다시 확인해야 하면 파일을 읽기만 하세요.
+
+에이전트가 테스트나 자동 포맷 명령을 실행할 때도 `AGENTS.md`가 대상에 들어가지 않도록 하세요.
+
+## 작업 후 필수 검증
+최종 self-review에서 반드시:
+
+```bash
+git diff -- AGENTS.md
+```
+
+를 확인하세요.
+
+이번 작업을 시작할 당시 `AGENTS.md`가 clean 상태였다면 최종 결과도 반드시:
+
+```text
+AGENTS.md diff 0
+```
+
+이어야 합니다.
+
+또한:
+
+```bash
+git status --short
+```
+
+에서 이번 작업 때문에 `AGENTS.md`가 modified 또는 staged 상태가 되어서는 안 됩니다.
+
+만약 에이전트 자신의 작업 때문에 실수로 `AGENTS.md`를 수정했다면, **에이전트가 만든 변경분만 원래 상태로 되돌린 뒤** 작업을 계속하세요.
+
+단, 작업 시작 전부터 존재하던 사용자 변경까지 임의로 되돌리면 안 됩니다.
+
+## 최종 보고
+최종 보고서에 반드시 다음 항목을 포함하세요.
+
+```text
+AGENTS.md 확인: 완료
+AGENTS.md 규칙 적용: 완료
+AGENTS.md 수정: 없음
+AGENTS.md diff: 0
+```
+
+단, 작업 시작 전부터 AGENTS.md에 사용자 변경이 있었다면 `diff 0`이라고 거짓 보고하지 말고:
+
+```text
+AGENTS.md 기존 사용자 변경 존재
+이번 작업에서 추가 변경 없음
+```
+
+이라고 정확하게 보고하세요.
