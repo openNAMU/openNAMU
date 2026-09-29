@@ -14,6 +14,7 @@ views/liberty
 
 data/*.json
 
+opennamu
 *.exe
 *.bin
 data/bleve/

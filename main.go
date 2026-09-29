@@ -105,15 +105,12 @@ func main() {
 	Wait_startup_delay()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	port := "3000"
 	host := "0.0.0.0"
 	for _, arg := range os.Args[1:] {
 		if arg == "--localhost" {
 			host = "127.0.0.1"
 		} else if arg == "dev" {
 			dev_mode = true
-		} else if port == "3000" {
-			port = arg
 		}
 	}
 
@@ -141,8 +138,7 @@ func main() {
 	Register_routes(r)
 	route.Start_auto_server_update()
 
-	log.Default().Println("Run in http://" + host + ":" + port)
-	if err := r.Run(host + ":" + port); err != nil {
-		log.Fatalf("server failed: %v", err)
+	if err := Start_servers(r, host, os.Args[1:]); err != nil {
+		log.Fatal(err) // only place that performs the final process exit (#1/#2)
 	}
 }
