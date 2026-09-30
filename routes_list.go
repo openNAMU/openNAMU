@@ -16,22 +16,27 @@ func Register_list_routes(r *gin.Engine) {
 	})
 
 	r.GET("/list/document/old", func(c *gin.Context) {
-		route_data := route.View_list_old_page(Make_route_config(c), "1", "old")
+		route_data := route.View_list_old_page(Make_route_config(c), "1", "old", "")
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
 	r.GET("/list/document/old/:num", func(c *gin.Context) {
-		route_data := route.View_list_old_page(Make_route_config(c), c.Param("num"), "old")
+		route_data := route.View_list_old_page(Make_route_config(c), c.Param("num"), "old", "")
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/list/document/old/:num/normal", func(c *gin.Context) {
+		route_data := route.View_list_old_page(Make_route_config(c), c.Param("num"), "old", "normal")
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
 	r.GET("/list/document/new", func(c *gin.Context) {
-		route_data := route.View_list_old_page(Make_route_config(c), "1", "new")
+		route_data := route.View_list_old_page(Make_route_config(c), "1", "new", "")
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
 	r.GET("/list/document/new/:num", func(c *gin.Context) {
-		route_data := route.View_list_old_page(Make_route_config(c), c.Param("num"), "new")
+		route_data := route.View_list_old_page(Make_route_config(c), c.Param("num"), "new", "")
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 

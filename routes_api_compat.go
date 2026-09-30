@@ -101,10 +101,10 @@ func Register_api_compat_routes(r *gin.Engine) {
 		Compat_api_data(c, route.Api_list_recent_block(Make_route_config(c), c.Param("num"), c.Param("set_type"), "", c.Param("user_name")))
 	})
 	r.GET("/api/v2/list/document/old/:num", func(c *gin.Context) {
-		Compat_api_data(c, route.Api_list_old_page(Make_route_config(c), c.Param("num"), "old"))
+		Compat_api_data(c, route.Api_list_old_page(Make_route_config(c), c.Param("num"), "old", ""))
 	})
 	r.GET("/api/v2/list/document/new/:num", func(c *gin.Context) {
-		Compat_api_data(c, route.Api_list_old_page(Make_route_config(c), c.Param("num"), "new"))
+		Compat_api_data(c, route.Api_list_old_page(Make_route_config(c), c.Param("num"), "new", ""))
 	})
 	r.GET("/api/v2/list/document/:num", func(c *gin.Context) {
 		Compat_api_data(c, route.Api_list_title_index(Make_route_config(c), c.Param("num")))

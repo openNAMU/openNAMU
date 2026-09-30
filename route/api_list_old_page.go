@@ -4,9 +4,17 @@ import (
 	"opennamu/route/tool"
 )
 
-func Api_list_old_page(config tool.Config, num string, set_type string) map[string]any {
+func Api_list_old_page(config tool.Config, num string, set_type string, filter string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
+
+	// invalid filter는 DB 조회 전에 명시적으로 오류 반환 (API 입력 검증)
+	if filter != "" && filter != "normal" {
+		return map[string]any{
+			"response": "error",
+			"data":     [][]string{},
+		}
+	}
 
 	page_int := tool.Str_to_int(num)
 	if page_int > 0 {
@@ -15,12 +23,19 @@ func Api_list_old_page(config tool.Config, num string, set_type string) map[stri
 		page_int = 0
 	}
 
-	query := ""
-	if set_type == "old" {
-		query = "select doc_name, set_data, case when exists (select 1 from back where back.link = data_set.doc_name and back.type = 'redirect') then '1' else '' end from data_set where set_name = 'last_edit' and doc_rev = '' and " + tool.Get_except_document_name_SQL("doc_name") + " order by set_data asc limit ?, 50"
-	} else {
-		query = "select doc_name, set_data, case when exists (select 1 from back where back.link = data_set.doc_name and back.type = 'redirect') then '1' else '' end from data_set where set_name = 'last_edit' and doc_rev = '' and " + tool.Get_except_document_name_SQL("doc_name") + " order by set_data desc limit ?, 50"
+	where_sql := `where set_name = 'last_edit' and doc_rev = '' and ` + tool.Get_except_document_name_SQL("doc_name")
+	if filter == "normal" {
+		where_sql += `and not exists (select 1 from back where link = data_set.doc_name and type = 'redirect')`
 	}
+
+	var order_by string
+	if set_type == "old" {
+		order_by = "set_data asc"
+	} else {
+		order_by = "set_data desc"
+	}
+
+	query := "select doc_name, set_data, case when exists (select 1 from back where back.link = data_set.doc_name and back.type = 'redirect') then '1' else '' end from data_set " + where_sql + " order by " + order_by + " limit ?, 50"
 
 	rows := tool.Query_DB(
 		db,
