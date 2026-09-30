@@ -46,7 +46,7 @@ func View_setting_main_logo_data(db *sql.DB, config tool.Config, values map[stri
 			label += " (" + tool.HTML_escape(skin) + ")"
 		}
 
-		data.WriteString(`<span>` + label + ` (HTML)</span>` + Main_hr())
+		data.WriteString(`<label for="` + tool.HTML_escape(field_name) + `">` + label + ` (HTML)</label>` + Main_hr())
 		data.WriteString(Setting_input(field_name, values[field_name], "text") + Main_hr())
 	}
 

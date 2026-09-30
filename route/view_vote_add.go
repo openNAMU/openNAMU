@@ -24,7 +24,7 @@ func View_vote_add(config tool.Config, values url.Values) string {
 		return tool.Get_error_page(db, config, "error")
 	}
 	body := `<form method="post">
-<label for="vote_name">` + tool.Get_language(db, "name", true) + `</label> <input id="vote_name" name="name" placeholder="` + tool.Get_language(db, "name", true) + `">
+<input id="vote_name" aria-label="` + tool.Get_language(db, "name", true) + `" placeholder="` + tool.Get_language(db, "name", true) + `" name="name">
 <hr class="main_hr"><div><label for="vote_subject">` + tool.Get_language(db, "explanation", true) + `</label></div><textarea id="vote_subject" name="subject"></textarea>
 <hr class="main_hr"><div><label for="vote_options">` + tool.Get_language(db, "vote_options", true) + `</label></div><textarea id="vote_options" name="data" placeholder="` + tool.Get_language(db, "1_line_1_q", true) + `"></textarea>
 <hr class="main_hr"><label><input type="checkbox" name="open_select" value="Y"> ` + tool.Get_language(db, "open_vote", true) + `</label>

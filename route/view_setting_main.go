@@ -82,12 +82,21 @@ func Setting_options(current string, values []string, labels map[string]string) 
 	return data.String()
 }
 
-func Setting_input(name string, value string, input_type string) string {
+func Setting_input(name string, value string, input_type string, placeholder ...string) string {
 	if input_type == "" {
 		input_type = "text"
 	}
 
-	return `<input id="` + tool.HTML_escape(name) + `" type="` + tool.HTML_escape(input_type) + `" name="` + tool.HTML_escape(name) + `" value="` + tool.HTML_escape(value) + `">`
+	placeholder_attr := ""
+	if len(placeholder) > 0 && placeholder[0] != "" {
+		placeholder_attr = ` placeholder="` + tool.HTML_escape(placeholder[0]) + `"`
+	}
+
+	return `<input id="` + tool.HTML_escape(name) +
+		`" type="` + tool.HTML_escape(input_type) +
+		`" name="` + tool.HTML_escape(name) +
+		`" value="` + tool.HTML_escape(value) +
+		`"` + placeholder_attr + `>`
 }
 
 func Setting_textarea(name string, value string, class_name string) string {

@@ -50,7 +50,7 @@ func View_setting_sitemap_set_data(db *sql.DB, config tool.Config, values map[st
 	data.WriteString(Main_hr() + `<form method="post">`)
 	data.WriteString(`<a href="/setting/sitemap">(` + lang("sitemap_manual_create") + `)</a>` + Main_hr())
 	data.WriteString(`<label><input type="checkbox" name="sitemap_auto_make" ` + Setting_checked(values["sitemap_auto_make"]) + `> ` + lang("sitemap_auto_make") + `</label>` + Main_hr())
-	data.WriteString(`<span>` + lang("indexnow_key") + `</span>` + Main_hr())
+	data.WriteString(`<label for="indexnow_key">` + lang("indexnow_key") + `</label>` + Main_hr())
 	data.WriteString(`<sup>` + lang("indexnow_key_help") + `</sup>` + Main_hr())
 	data.WriteString(Setting_input("indexnow_key", values["indexnow_key"], "text") + Main_hr())
 	data.WriteString(`<label><input type="checkbox" name="sitemap_auto_exclude_domain" ` + Setting_checked(values["sitemap_auto_exclude_domain"]) + `> ` + lang("stiemap_exclude_domain") + `</label>` + Main_hr())

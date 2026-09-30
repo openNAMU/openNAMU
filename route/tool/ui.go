@@ -550,8 +550,6 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
 
 	if help_text == "" {
 		help_text = Get_language(db, "default_edit_help", true)
-	} else {
-		help_text = HTML_escape(help_text)
 	}
 
 	editor_type := "edit"
@@ -655,9 +653,9 @@ func Get_editor_ui(db *sql.DB, config Config, data string, do_type string, add_o
 
         ` + editor_top + `
 
-        <div class="opennamu_editor_help">` + help_text + `</div><hr class="main_hr">
+        <hr class="main_hr">
         <div id="opennamu_monaco_editor" class="` + textarea_size + `" ` + editor_display[1] + `></div>
-        <textarea id="opennamu_edit_textarea" class="` + textarea_size + ` __ON_TEXTAREA__" ` + editor_display[0] + ` name="content">` + HTML_escape(data) + `</textarea>
+        <textarea id="opennamu_edit_textarea" class="` + textarea_size + ` __ON_TEXTAREA__" ` + editor_display[0] + ` name="content" placeholder="` + HTML_escape(help_text) + `">` + HTML_escape(data) + `</textarea>
         <hr class="main_hr">
         ` + out_field + `
 
