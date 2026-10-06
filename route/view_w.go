@@ -137,6 +137,16 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	body := tool.Get_setting_value(db, "body", "", "")
 	render_data = Setting_render_markup(db, body, Setting_markup_value(db, "body")) + render_data
 
+	// §3 related documents render after body and before bottom_body (category was merged earlier at line 116).
+	if status == http.StatusOK && Related_document_enabled(db) {
+		related_api := Api_w_related(config, doc_name, raw_data)
+		if related_response, ok := related_api["response"].(string); ok && related_response == "ok" {
+			if related_names, ok := related_api["data"].([]string); ok && len(related_names) > 0 {
+				render_data += View_related_documents_html(db, config, doc_name, related_names)
+			}
+		}
+	}
+
 	bottom_body := tool.Get_setting_value(db, "bottom_body", "", "")
 	render_data += Setting_render_markup(db, bottom_body, Setting_markup_value(db, "bottom_body"))
 

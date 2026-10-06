@@ -239,6 +239,8 @@
     "error_skin_set_old": "一部の古いスキンは旧バージョンのリンクでのみ動作する場合があります。",
     "member": "会員",
     "backlink": "逆リンク",
+    "related_document": "関連ドキュメント",
+    "related_document_setting_description": "各ページの下部に関連ドキュメントを自動表示します。",
     "no_admin_block_error": "管理者を検査またはブロックすることはできません。",
     "recaptcha": "reCAPTCHA",
     "altcha_info": "ALTCHAは登録やサイトキーが不要なプルーフ・オブ・ワーク（PoW）方式のCAPTCHAです。ALTCHA使用時は秘密キーのみ設定してください。Low・Medium・Highはブラウザの計算量です。",

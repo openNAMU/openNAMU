@@ -239,6 +239,8 @@
     "error_skin_set_old": "일부 오래된 스킨은 구버전 링크를 이용해야만 작동할 수도 있습니다.",
     "member": "가입자",
     "backlink": "역링크",
+    "related_document": "관련 문서",
+    "related_document_setting_description": "문서 하단에 관련 문서를 자동으로 표시합니다.",
     "no_admin_block_error": "관리자를 검사하거나 차단할 수 없습니다.",
     "recaptcha": "reCAPTCHA",
     "altcha_info": "ALTCHA는 별도 가입이나 사이트 키가 필요 없는 작업 증명(PoW) CAPTCHA입니다. ALTCHA 사용 시 ALTCHA 비밀 키만 설정하면 되며, Low·Medium·High는 브라우저 계산량입니다.",

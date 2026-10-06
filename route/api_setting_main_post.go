@@ -20,6 +20,11 @@ func Api_setting_main_post(config tool.Config, form map[string]string) map[strin
 		return_data["data"] = "error"
 		return return_data
 	}
+	if enabled, exists := form[related_document_enabled_setting]; exists && enabled != "1" && enabled != "0" {
+		return_data["response"] = "error"
+		return_data["data"] = "error"
+		return return_data
+	}
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		Setting_save_fields(tx, Setting_main_fields(), form)
 		tool.Do_insert_auth_history(tx, config.IP, "edit_set (main)")

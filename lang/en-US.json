@@ -125,6 +125,8 @@
     "document": "Document",
     "discussion": "Discussion",
     "backlink": "Backlink",
+    "related_document": "Related Document(s)",
+    "related_document_setting_description": "Automatically display related documents at the bottom of wiki pages.",
     "link": "Link",
     "closed": "Closed",
     "reload": "Reload",

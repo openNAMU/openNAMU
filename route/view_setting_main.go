@@ -162,6 +162,7 @@ func Setting_main_fields() []setting_field {
 		{name: "wiki_access_password", default_value: ""},
 		{name: "history_recording_off", default_value: ""},
 		{name: "namumark_compatible", default_value: ""},
+		{name: related_document_enabled_setting, default_value: "1"},
 		{name: "user_name_view", default_value: ""},
 		{name: "user_document_view_acl_all", default_value: ""},
 		{name: "invite_required", default_value: ""},
@@ -256,6 +257,9 @@ func View_setting_main_data(db *sql.DB, config tool.Config, values map[string]st
 	data.WriteString(`<h2>` + lang("render_set") + `</h2>`)
 	data.WriteString(`<label><input type="checkbox" name="namumark_compatible" ` + Setting_checked(values["namumark_compatible"]) + `> ` + lang("namumark_fully_compatible_mode") + `</label>` + Main_hr())
 	data.WriteString(`<label><input type="checkbox" name="link_case_insensitive" ` + Setting_checked(values["link_case_insensitive"]) + `> ` + lang("link_case_insensitive") + `</label>` + Main_hr())
+	data.WriteString(`<label for="` + related_document_enabled_setting + `">` + lang("related_document") + `</label>` + Main_hr())
+	data.WriteString(`<span>` + lang("related_document_setting_description") + `</span>` + Main_hr())
+	data.WriteString(`<select id="` + related_document_enabled_setting + `" name="` + related_document_enabled_setting + `">` + Setting_options(values[related_document_enabled_setting], []string{"1", "0"}, map[string]string{"1": lang("on"), "0": lang("off")}) + `</select>` + Main_hr())
 
 	data.WriteString(`<h2>` + lang("login_set") + `</h2>`)
 	data.WriteString(`<label><input type="checkbox" name="reg" ` + Setting_checked(values["reg"]) + `> ` + lang("no_register") + `</label>` + Main_hr())

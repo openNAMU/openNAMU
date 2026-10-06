@@ -102,4 +102,5 @@ func Register_wiki_routes(r *gin.Engine) {
 		route_data := route.View_topic_list(Make_route_config(c), strings.TrimPrefix(c.Param("doc_name"), "/"), "agree", c.Param("num"))
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
+
 }
