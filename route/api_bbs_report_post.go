@@ -63,7 +63,7 @@ func Api_bbs_report_post(config tool.Config, set_id string, set_code string, com
 
 	set_code_new, err := Report_create(db, config.IP, target_title, target_path, report_prefix, reason)
 	if err != nil {
-		panic(err)
+		return map[string]any{"response": "error", "data": "error"}
 	}
 	return map[string]any{"response": "ok", "data": set_code_new}
 }

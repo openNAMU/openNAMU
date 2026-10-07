@@ -44,7 +44,7 @@ func Api_history_report_post(config tool.Config, doc_name string, rev string, re
 		reason,
 	)
 	if err != nil {
-		panic(err)
+		return map[string]any{"response": "error", "data": "error"}
 	}
 	return map[string]any{"response": "ok", "data": set_code}
 }
