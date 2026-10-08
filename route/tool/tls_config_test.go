@@ -114,7 +114,7 @@ func Test_Split_tls_domain(t *testing.T) {
 // #6 empty env / set.json fallback semantics. data/set.json has no tls_mode key, so unset/empty env
 // falls back to the default ("off"); a non-empty env always wins over the default (#6). The env is the
 // explicit value; only an empty env triggers the set.json/default path (TLS_setting: env non-empty →
-// returned directly; empty → tls_read_set_value then default). This test uses t.Setenv only, so it does
+// returned directly; empty → Tls_read_set_value then default). This test uses t.Setenv only, so it does
 // not touch the user's data/set.json. Actual set.json-present behavior is documented as runtime note (#6).
 func Test_TLS_mode_env_priority_and_default(t *testing.T) {
 	// unset/empty env → no tls_mode in data/set.json → default "off" (#6 row 1 & 2)
@@ -140,7 +140,7 @@ func Test_TLS_mode_env_priority_and_default(t *testing.T) {
 	}
 }
 
-// set.json fallback + empty-env semantics, verified against the REAL data-set.json read path (TLS_setting -> TLS_read_set_value reads "data/set.json" relative to CWD).
+// set.json fallback + empty-env semantics, verified against the REAL data-set.json read path (TLS_setting -> Tls_read_set_value reads "data/set.json" relative to CWD).
 // Uses os.Chdir into t.TempDir() so the user's real data/set.json is never touched or overwritten. Go runs tests sequentially (no Parallel), so restoring CWD via defer is safe.
 // Locks every row of the openNAMU env > set.json > default convention for TLS_MODE, including the key empty-env case (row 4) that differs from a naive "presence-wins" LookupEnv loader like Get_DB_set. See TLS_IMPLEMENTATION_PROGRESS.md #2.
 func Test_TLS_setting_fallback_semantics(t *testing.T) {

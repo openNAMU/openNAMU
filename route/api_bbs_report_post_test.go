@@ -8,7 +8,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-func create_test_report_db(t *testing.T) *sql.DB {
+func Create_test_report_db(t *testing.T) *sql.DB {
 	db_path := filepath.Join(t.TempDir(), "report.db")
 	db, err := sql.Open("sqlite", db_path)
 	if err != nil {
@@ -22,7 +22,7 @@ func create_test_report_db(t *testing.T) *sql.DB {
 }
 
 func Test_report_create_success(t *testing.T) {
-	db := create_test_report_db(t)
+	db := Create_test_report_db(t)
 	defer db.Close()
 
 	set_code_new, err := Report_create(db, "127.0.0.1", "Document title", "/w/document", "Report", "spam reason text")
@@ -54,7 +54,7 @@ func Test_report_create_success(t *testing.T) {
 }
 
 func Test_report_create_error_no_panic(t *testing.T) {
-	db := create_test_report_db(t)
+	db := Create_test_report_db(t)
 	db.Close()
 
 	_, err := Report_create(db, "127.0.0.1", "Document title", "/w/document", "Report", "spam reason text")

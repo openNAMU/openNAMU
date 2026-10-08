@@ -9,12 +9,12 @@ import (
 // TLS 설정은 환경 변수를 우선으로 읽으며 data/set.json을 폴백으로 사용합니다.
 // 파일 경로만 저장하고 private key 내용을 절대 저장하지 않습니다.
 
-func tls_set_path() string {
+func Tls_set_path() string {
 	return filepath.Join("data", "set.json")
 }
 
-func tls_read_set_value(key string) (string, bool) {
-	path := tls_set_path()
+func Tls_read_set_value(key string) (string, bool) {
+	path := Tls_set_path()
 	raw, err := os.ReadFile(path)
 	if err != nil || len(raw) == 0 {
 		return "", false
@@ -35,7 +35,7 @@ func tls_read_set_value(key string) (string, bool) {
 func TLS_setting(key string, default_value string) string {
 	env_v := os.Getenv(strings.ToUpper("NAMU_TLS_" + strings.ToLower(key)))
 	if strings.TrimSpace(env_v) == "" {
-		set_v, set_ok := tls_read_set_value(key)
+		set_v, set_ok := Tls_read_set_value(key)
 		if set_ok && set_v != "" {
 			return Choose(set_v, default_value)
 		}
