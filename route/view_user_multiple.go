@@ -20,7 +20,7 @@ func View_user_multiple(config tool.Config, page string, sort string, search str
 		sort = "recent"
 	}
 
-	data_list := tool.Get_ua_multiple_rows(db, search, sort, (page_num-1)*50)
+	data_list := tool.Get_ua_multiple_rows(db, search, sort, Page_offset(page_num))
 	body := strings.Builder{}
 	recent_selected := ""
 	count_selected := ""

@@ -850,22 +850,33 @@ func Get_history_length_range_rows(db *sql.DB, user_name string, start string, e
 	return Query_DB(db, "select leng from history where ip = ? and date >= ? and date < ?", user_name, start, end)
 }
 
-func Get_ua_simple_rows(db *sql.DB, name string, name_is_ip bool, offset int) *sql.Rows {
+func Get_ua_simple_rows(db *sql.DB, name string, name_is_ip bool, offset int, limit int) []string {
 	name_column := "name"
 	other_column := "ip"
 	if name_is_ip {
 		name_column = "ip"
 		other_column = "name"
 	}
-	return Query_DB(
+	rows := Query_DB(
 		db,
-		"select distinct "+other_column+" from ua_d where "+name_column+" = ? order by today desc limit ?, 50",
+		"select distinct "+other_column+" from ua_d where "+name_column+" = ? order by today desc limit ?, ?",
 		name,
 		offset,
+		limit,
 	)
+	defer rows.Close()
+
+	values := []string{}
+	for rows.Next() {
+		value := ""
+		if rows.Scan(&value) == nil {
+			values = append(values, value)
+		}
+	}
+	return values
 }
 
-func Get_ua_rows(db *sql.DB, name string, plus_name string, name_is_ip bool, plus_is_ip bool, offset int) *sql.Rows {
+func Get_ua_rows(db *sql.DB, name string, plus_name string, name_is_ip bool, plus_is_ip bool, offset int, limit int) []map[string]string {
 	name_column := "name"
 	plus_column := "name"
 	if name_is_ip {
@@ -880,9 +891,29 @@ func Get_ua_rows(db *sql.DB, name string, plus_name string, name_is_ip bool, plu
 		query += " or " + plus_column + " = ?"
 		args = append(args, plus_name)
 	}
-	query += " order by today desc limit ?, 50"
-	args = append(args, offset)
-	return Query_DB(db, query, args...)
+	args = append(args, offset, limit)
+	query += " order by today desc limit ?, ?"
+
+	rows := Query_DB(db, query, args...)
+	defer rows.Close()
+
+	data_list := []map[string]string{}
+	for rows.Next() {
+		user_name := ""
+		user_ip := ""
+		user_agent := ""
+		today := ""
+		if rows.Scan(&user_name, &user_ip, &user_agent, &today) != nil {
+			continue
+		}
+		data_list = append(data_list, map[string]string{
+			"name":  user_name,
+			"ip":    user_ip,
+			"ua":    user_agent,
+			"today": today,
+		})
+	}
+	return data_list
 }
 
 func Get_ua_distinct_ips(db *sql.DB, name string, plus_name string, name_is_ip bool, plus_is_ip bool) []string {

@@ -45,6 +45,8 @@
     "bbs_comment_limit_100_authority": "100 daily BBS comments authority",
     "bbs_comment_limit_unlimited_authority": "Unlimited daily BBS comments authority",
     "user_analyze_authority": "Analyze user authority",
+    "user_check_hide_ip_authority": "Hide IP/UA when inspecting users",
+    "hidden_value": "hidden",
     "still_use_auth_error": "Someone still has this authority",
     "xss_data_include_error": "You cannot enter characters that can be used for XSS.",
     "nothing_authority": "Ineffective authority",

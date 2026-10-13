@@ -903,6 +903,8 @@
     "bbs_comment_limit_100_authority": "BBS 1日100回コメント権限",
     "bbs_comment_limit_unlimited_authority": "BBS 1日無制限コメント権限",
     "user_analyze_authority": "ユーザー分析権限",
+    "user_check_hide_ip_authority": "ユーザー検査時のIP/UA等の非表示権限",
+    "hidden_value": "非表示",
     "still_use_auth_error": "この権限を持つ人がまだ存在します。",
     "xss_data_include_error": "XSSに悪用可能な文字は入力できません。",
     "nothing_authority": "機能なし権限",

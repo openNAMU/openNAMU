@@ -903,6 +903,8 @@
     "bbs_comment_limit_100_authority": "BBS 하루 댓글 작성 100회 권한",
     "bbs_comment_limit_unlimited_authority": "BBS 하루 댓글 작성 무제한 권한",
     "user_analyze_authority": "사용자 분석 권한",
+    "user_check_hide_ip_authority": "사용자 검사 시 IP/UA 등 개인정보 숨김 권한",
+    "hidden_value": "가리킴",
     "still_use_auth_error": "이 권한을 보유한 사람이 아직 존재합니다.",
     "xss_data_include_error": "XSS에 이용될 수 있는 문자는 입력할 수 없습니다.",
     "nothing_authority": "아무 기능 없는 권한",

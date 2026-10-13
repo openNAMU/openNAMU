@@ -61,6 +61,7 @@ func Auth_choices() []Auth_choice {
 		{2, "application_manage", "application_manage_authority"},
 		{2, "application_view", "application_view_authority"},
 		{2, "check", "user_analyze_authority"},
+		{2, "hideip", "user_check_hide_ip_authority"},
 		{2, "view_user_watchlist", "view_user_watchlist_authority"},
 		{2, "acl", "document_acl_authority"},
 		{2, "hidel", "history_hide_authority"},
