@@ -124,4 +124,9 @@ func Register_recent_routes(r *gin.Engine) {
 		route_data := route.View_list_recent_discuss(Make_route_config(c), "50", c.Param("num"), c.Param("set_type"))
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
+
+	r.GET("/rss/recent", func(c *gin.Context) {
+		route_data := route.View_rss_recent(Make_route_config(c), c.Request.Host)
+		Write_data(c, http.StatusOK, "application/rss+xml; charset=utf-8", []byte(route_data))
+	})
 }
