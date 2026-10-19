@@ -13,6 +13,7 @@ import (
 	"github.com/dlclark/regexp2"
 	"golang.org/x/net/html"
 	"opennamu/route/tool"
+	backlink_parser "opennamu/route/tool/markup/backlink"
 )
 
 // namumark_compat_renderer is a temporary compatibility layer for syntax that
@@ -741,6 +742,7 @@ func (class *namumark_compat_renderer) Process_redirect(data string) string {
 		main_target, anchor := class.Compat_split_anchor(target)
 		if Compat_is_external_link(main_target) {
 			class.redirect = true
+			class.Add_backlink(backlink_parser.Normalize_external_host(main_target), "external", "")
 			if class.collect_only || class.include_depth > 0 {
 				return ""
 			}
@@ -1069,6 +1071,7 @@ func (class *namumark_compat_renderer) Process_links(data string) string {
 				if !matched {
 					link_class = "opennamu_link_out"
 				}
+				class.Add_backlink(backlink_parser.Normalize_external_host(main_target), "external", "")
 				return class.Reserve(`<a class="`+link_class+`" target="_blank" title="`+Compat_html_escape(link_target)+`" href="`+Compat_html_escape(link_target)+`">`) + class.Reserve(icon) + Compat_escape_value(label) + class.Reserve(`</a>`)
 			}
 
@@ -1160,9 +1163,27 @@ func (class *namumark_compat_renderer) Process_file_media_macro(data string, med
 func (class *namumark_compat_renderer) Merge_child(child *namumark_compat_renderer) {
 	for _, key := range child.backlink_order {
 		entry := child.backlinks[key]
+		if entry.link_type == "external" {
+			continue
+		}
 		class.Add_backlink(entry.target, entry.link_type, entry.data)
 	}
 	class.link_count += child.link_count
+}
+
+func (class *namumark_compat_renderer) Backlink_exists(target, link_type string) bool {
+	key := target + "\x00" + link_type
+	_, ok := class.backlinks[key]
+	return ok
+}
+
+func (class *namumark_compat_renderer) Has_external_backlink() bool {
+	for _, entry := range class.backlinks {
+		if entry.link_type == "external" {
+			return true
+		}
+	}
+	return false
 }
 
 func (class *namumark_compat_renderer) Process_includes(data string) string {

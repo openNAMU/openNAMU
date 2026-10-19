@@ -335,7 +335,7 @@ func Move_document_normal(config tool.Config, db *sql.DB, old_name string, new_n
 }
 
 func Move_captcha_normal(values url.Values) string {
-	return tool.Captcha_response(values.Get("g-recaptcha"), values.Get("g-recaptcha-response"), values.Get("h-captcha-response"), values.Get("cf-turnstile-response"), values.Get("altcha"))
+	return tool.Captcha_response(values.Get("g-recaptcha"), values.Get("g-recaptcha-response"), values.Get("h-captcha-response"), values.Get("cf.turnstile-response"), values.Get("altcha"))
 }
 
 func Api_edit_move_post(config tool.Config, doc_name string, values url.Values) map[string]any {
@@ -384,6 +384,12 @@ func Api_edit_move_post(config tool.Config, doc_name string, values url.Values) 
 			data_set_option = values.Get("document_set_option")
 		}
 	}
+
+	// The move renames the document and its backlinks/history. The common mutex
+	// serializes it against concurrent edits so the rename does not race a commit
+	// (the caller owns the section; nothing inside re-enters the lock).
+	backlink_mutex.Lock()
+	defer backlink_mutex.Unlock()
 
 	new_name := strings.TrimSpace(values.Get("title"))
 	if err_name := Move_document_options(config, db, doc_name, new_name, values.Get("send"), move_option, topic_option, data_set_option); err_name != "" {

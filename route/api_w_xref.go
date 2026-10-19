@@ -35,9 +35,9 @@ func Api_w_xref(config tool.Config, num_str string, doc_name string, do_type str
 
 	query := ""
 	if do_type == "1" {
-		query = "select distinct link, type from back where title" + link_case_insensitive + " = ? and not type = 'no' and not type = 'nothing' order by type asc, link asc limit ?, 50"
+		query = "select distinct link, type from back where title" + link_case_insensitive + " = ? and not type = 'no' and not type = 'nothing' and not type = 'external' order by type asc, link asc limit ?, 50"
 	} else {
-		query = "select distinct title, type from back where link" + link_case_insensitive + " = ? and not type = 'no' and not type = 'nothing' order by type asc, title asc limit ?, 50"
+		query = "select distinct title, type from back where link" + link_case_insensitive + " = ? and not type = 'no' and not type = 'nothing' and not type = 'external' order by type asc, title asc limit ?, 50"
 	}
 
 	rows := tool.Query_DB(

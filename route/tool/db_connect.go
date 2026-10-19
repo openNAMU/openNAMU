@@ -2,16 +2,49 @@ package tool
 
 import (
 	"database/sql"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	_ "modernc.org/sqlite"
+	sqlite "modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
 )
 
 var db_set = map[string]string{}
+
+// SQLite busy-retry bounds. A bounded, finite retry replaces the previous
+// unbounded retry loop so a permanently locked database surfaces instead of
+// hanging the process.
+const (
+	busyRetryDelay = 10 * time.Millisecond
+	busyRetryMax   = 10
+)
+
+var busyRetryMaxWait = 30 * time.Second
+
+// busyRetryable reports whether a returned error is a SQLite write-lock busy
+// that can be safely retried. Only SQLITE_BUSY is retried; SQLITE_BUSY_SNAPSHOT
+// (snapshot read while another transaction holds a write lock) is never
+// retried inside the same transaction, and non-busy errors are never retried.
+// The error code is the authoritative check; a string fallback covers
+// non-sqlite errors.
+func busyRetryable(err error) bool {
+	if err == nil {
+		return false
+	}
+	var e *sqlite.Error
+	if errors.As(err, &e) {
+		return e.Code() == sqlite3.SQLITE_BUSY
+	}
+	msg := strings.ToLower(err.Error())
+	if strings.Contains(msg, "snapshot") {
+		return false
+	}
+	return strings.Contains(msg, "database is locked")
+}
 
 type DB_runner interface {
 	Prepare(string) (*sql.Stmt, error)
@@ -123,26 +156,28 @@ func Get_DB_set_MySQL(new_db_set map[string]string) map[string]string {
 }
 
 func Exec_DB_internal(db DB_runner, query string, values ...any) {
-	const retry_delay = 10 * time.Millisecond
-
 	stmt, err := db.Prepare(DB_change(query))
 	if err != nil {
 		panic(err)
 	}
 	defer stmt.Close()
 
+	attempt := 0
+	start := time.Now()
 	for {
-		_, err = stmt.Exec(values...)
-		if err == nil {
+		_, execErr := stmt.Exec(values...)
+		if execErr == nil {
 			return
 		}
 
-		if strings.Contains(err.Error(), "database is locked") {
-			time.Sleep(retry_delay)
-			continue
+		if !busyRetryable(execErr) ||
+			attempt >= busyRetryMax ||
+			time.Since(start) >= busyRetryMaxWait {
+			panic(execErr)
 		}
 
-		panic(err)
+		attempt++
+		time.Sleep(busyRetryDelay)
 	}
 }
 
@@ -162,56 +197,60 @@ func Exec_DB(db DB_runner, query string, values ...any) {
 }
 
 func Query_DB(db DB_runner, query string, values ...any) *sql.Rows {
-	const retry_delay = 10 * time.Millisecond
-
 	stmt, err := db.Prepare(DB_change(query))
 	if err != nil {
 		panic(err)
 	}
 	defer stmt.Close()
 
+	attempt := 0
+	start := time.Now()
 	for {
-		rows, err := stmt.Query(values...)
-		if err == nil {
+		rows, queryErr := stmt.Query(values...)
+		if queryErr == nil {
 			return rows
 		}
 
-		if strings.Contains(err.Error(), "database is locked") {
-			time.Sleep(retry_delay)
-			continue
+		if !busyRetryable(queryErr) ||
+			attempt >= busyRetryMax ||
+			time.Since(start) >= busyRetryMaxWait {
+			panic(queryErr)
 		}
 
-		panic(err)
+		attempt++
+		time.Sleep(busyRetryDelay)
 	}
 }
 
 // QueryRow_DB 이래서 포인터를 배우는구나...
 func QueryRow_DB(db DB_runner, query string, var_list []any, values ...any) bool {
-	const retry_delay = 10 * time.Millisecond
-
 	stmt, err := db.Prepare(DB_change(query))
 	if err != nil {
 		panic(err)
 	}
 	defer stmt.Close()
 
+	attempt := 0
+	start := time.Now()
 	for {
 		row := stmt.QueryRow(values...)
 
-		err := row.Scan(var_list...)
-		switch err {
+		scanErr := row.Scan(var_list...)
+		switch scanErr {
 		case nil:
 			return true
 		case sql.ErrNoRows:
 			return false
 		}
 
-		if strings.Contains(err.Error(), "database is locked") {
-			time.Sleep(retry_delay)
-			continue
+		if !busyRetryable(scanErr) ||
+			attempt >= busyRetryMax ||
+			time.Since(start) >= busyRetryMaxWait {
+			panic(scanErr)
 		}
 
-		panic(err)
+		attempt++
+		time.Sleep(busyRetryDelay)
 	}
 }
 
@@ -228,7 +267,7 @@ func DB_boot() map[string]string {
 
 func DB_connect_init() (*sql.DB, error) {
 	if db_set["db_type"] == "sqlite" {
-		db, err := sql.Open("sqlite", filepath.Join(db_set["db_name"]+".db")+"?_journal_mode=WAL&_busy_timeout=5000")
+		db, err := sql.Open("sqlite", filepath.Join(db_set["db_name"]+".db")+"?_pragma=journal_mode(WAL)&_pragma=busy_timeout=5000")
 		if err != nil {
 			return nil, err
 		}
@@ -258,7 +297,7 @@ func DB_connect() *sql.DB {
 	// log.Default().Println("DB open")
 
 	if db_set["db_type"] == "sqlite" {
-		db, err := sql.Open("sqlite", filepath.Join(db_set["db_name"]+".db")+"?_journal_mode=WAL&_busy_timeout=5000")
+		db, err := sql.Open("sqlite", filepath.Join(db_set["db_name"]+".db")+"?_pragma=journal_mode(WAL)&_pragma=busy_timeout=5000")
 		if err != nil {
 			panic(err)
 		}
@@ -297,4 +336,11 @@ func DB_change(data string) string {
 	}
 
 	return data
+}
+
+func Exact_binary_eq(column string) string {
+	if Get_DB_type() == "mysql" {
+		return "CAST(" + column + " AS BINARY) = ?"
+	}
+	return column + " = ?"
 }

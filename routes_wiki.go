@@ -40,6 +40,39 @@ func Register_wiki_routes(r *gin.Engine) {
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	r.GET("/ext_backlink/*host", func(c *gin.Context) {
+		host_param := strings.TrimPrefix(c.Param("host"), "/")
+		route_data := route.View_external_docs_for_host(Make_route_config(c), host_param, "1")
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/ext_backlink_page/:num/*host", func(c *gin.Context) {
+		host_param := strings.TrimPrefix(c.Param("host"), "/")
+		route_data := route.View_external_docs_for_host(Make_route_config(c), host_param, c.Param("num"))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/ext_backlink_urls/*doc_name", func(c *gin.Context) {
+		doc_name := strings.TrimPrefix(c.Param("doc_name"), "/")
+		route_data := route.View_external_hosts_of_doc(Make_route_config(c), doc_name)
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/ext_backlink_count/*host", func(c *gin.Context) {
+		host_param := strings.TrimPrefix(c.Param("host"), "/")
+		route_data := route.View_external_count_for_host(Make_route_config(c), host_param)
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
+	r.GET("/ext_backlink_hosts", func(c *gin.Context) {
+		route_data := route.View_external_all_hosts(Make_route_config(c), "1")
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+	r.GET("/ext_backlink_hosts/:page", func(c *gin.Context) {
+		route_data := route.View_external_all_hosts(Make_route_config(c), c.Param("page"))
+		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
+	})
+
 	r.GET("/upload", func(c *gin.Context) {
 		route_data := route.View_edit_file_upload(Make_route_config(c), "")
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))

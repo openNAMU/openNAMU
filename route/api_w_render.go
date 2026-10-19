@@ -28,13 +28,23 @@ func Api_w_render(config tool.Config, doc_name string, raw_data string, render_t
 		parameter_data["ip"] = config.IP
 	}
 
+	if render_type == "backlink" {
+		backlink_mutex.Lock()
+		defer backlink_mutex.Unlock()
+
+		saved_data := ""
+		if !tool.QueryRow_DB(db, "select data from data where "+tool.Exact_binary_eq("title"), []any{&saved_data}, doc_name) {
+			return map[string]any{"response": "not exist"}
+		}
+		raw_data = saved_data
+	}
+
 	data := markup.Get_render(db, doc_name, raw_data, render_type, parameter_data)
 	if render_type != "backlink" {
 		rendered_data := data["data"]
 		rendered_data = Apply_render_setting_data(db, config, rendered_data)
 		data["data"] = Get_render_setting_css(db, config) + rendered_data
 	}
-
 	return_data := make(map[string]any)
 	return_data["response"] = "ok"
 	for key, value := range data {

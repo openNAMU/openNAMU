@@ -1,20 +1,22 @@
-package tool
+package test
 
 import (
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"opennamu/route/tool"
 )
 
 func Test_TLS_setting_priority(t *testing.T) {
 	t.Setenv("NAMU_TLS_FOO", "") // empty env => fall through to default
-	if got := TLS_setting("foo", "def"); got != "def" {
+	if got := tool.TLS_setting("foo", "def"); got != "def" {
 		t.Fatalf("empty env should use default, got %q", got)
 	}
 
 	t.Setenv("NAMU_TLS_FOO", "from-env")
-	if got := TLS_setting("foo", "def"); got != "from-env" {
+	if got := tool.TLS_setting("foo", "def"); got != "from-env" {
 		t.Fatalf("env value not used, got %q", got)
 	}
 }
@@ -28,7 +30,7 @@ func Test_TLS_mode_normalization(t *testing.T) {
 
 	for input, want := range cases {
 		t.Setenv("NAMU_TLS_MODE", input)
-		if got := TLS_mode(); got != want {
+		if got := tool.TLS_mode(); got != want {
 			t.Fatalf("TLS_mode(%q) = %q, want %q", input, got, want)
 		}
 	}
@@ -37,12 +39,12 @@ func Test_TLS_mode_normalization(t *testing.T) {
 func Test_IsValid_tls_mode(t *testing.T) {
 	valids, invalids := []string{"off", "file", "auto"}, []string{"weird", "HTTP"}
 	for _, v := range valids {
-		if !IsValid_tls_mode(v) {
+		if !tool.IsValid_tls_mode(v) {
 			t.Fatalf("IsValid_tls_mode(%q) = false, want true", v)
 		}
 	}
 	for _, v := range invalids {
-		if IsValid_tls_mode(v) {
+		if tool.IsValid_tls_mode(v) {
 			t.Fatalf("IsValid_tls_mode(%q) = true, want false", v)
 		}
 	}
@@ -64,7 +66,7 @@ func Test_TLS_bind_addr(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		if got := TLS_bind_addr(c.mode, "0.0.0.0", c.cli); got != c.expect {
+		if got := tool.TLS_bind_addr(c.mode, "0.0.0.0", c.cli); got != c.expect {
 			t.Fatalf("TLS_bind_addr(%q,%v) = %q, want %q", c.mode, c.cli, got, c.expect)
 		}
 	}
@@ -79,14 +81,14 @@ func Test_TLS_has_positional_override(t *testing.T) {
 	}
 
 	for arg, want := range cases {
-		if got := TLS_has_positional_override(arg); got != want {
+		if got := tool.TLS_has_positional_override(arg); got != want {
 			t.Fatalf("TLS_has_positional_override(%q) = %v, want %v", arg, got, want)
 		}
 	}
 }
 
 func Test_Split_tls_domain(t *testing.T) {
-	got := Split_tls_domain("a.com, b.com ,,c.com")
+	got := tool.Split_tls_domain("a.com, b.com ,,c.com")
 	want := []string{"a.com", "b.com", "c.com"}
 	if len(got) != len(want) {
 		t.Fatalf("Split_tls_domain len = %d, want %d (got %v)", len(got), len(want), got)
@@ -98,13 +100,13 @@ func Test_Split_tls_domain(t *testing.T) {
 		}
 	}
 
-	if got := Split_tls_domain(""); len(got) != 0 {
+	if got := tool.Split_tls_domain(""); len(got) != 0 {
 		t.Fatalf("empty domain list should be empty, got %v", got)
 	}
 
 	// Explicit subdomain entries are kept as-is; allow-list enforcement (exact match)
 	// is delegated to autocert.HostWhitelist(domains...) in run_auto_tls.
-	got = Split_tls_domain("example.com,www.example.com")
+	got = tool.Split_tls_domain("example.com,www.example.com")
 	want = []string{"example.com", "www.example.com"}
 	if len(got) != len(want) || got[0] != want[0] || got[1] != want[1] {
 		t.Fatalf("Split_tls_domain subdomain entries not preserved: %v", got)
@@ -119,23 +121,23 @@ func Test_Split_tls_domain(t *testing.T) {
 func Test_TLS_mode_env_priority_and_default(t *testing.T) {
 	// unset/empty env → no tls_mode in data/set.json → default "off" (#6 row 1 & 2)
 	t.Setenv("NAMU_TLS_MODE", "")
-	if got := TLS_mode(); got != "off" {
+	if got := tool.TLS_mode(); got != "off" {
 		t.Fatalf("unset/empty NAMU_TLS_MODE should fall back to set.json/default (off), got %q", got)
 	}
 
 	// non-empty env always wins over the default, regardless of case (#6: explicit env value)
 	for _, v := range []string{"file", "auto", "OFF"} {
 		t.Setenv("NAMU_TLS_MODE", v)
-		if got := TLS_mode(); strings.ToLower(got) != strings.ToLower(v) {
+		if got := tool.TLS_mode(); strings.ToLower(got) != strings.ToLower(v) {
 			t.Fatalf("explicit NAMU_TLS_MODE=%q should win, got %q (default)", v, got)
 		}
 	}
 
 	// IsValid_tls_mode gate used by Start_servers to decide whether to open a listener (#3/#6):
-	if !IsValid_tls_mode("") || !IsValid_tls_mode("off") || !IsValid_tls_mode("file") || !IsValid_tls_mode("auto") {
+	if !tool.IsValid_tls_mode("") || !tool.IsValid_tls_mode("off") || !tool.IsValid_tls_mode("file") || !tool.IsValid_tls_mode("auto") {
 		t.Fatalf("empty/off/file/auto must be valid modes")
 	}
-	if IsValid_tls_mode("atuo") {
+	if tool.IsValid_tls_mode("atuo") {
 		t.Fatalf("'atuo' must be invalid so Start_servers returns an error instead of opening a listener")
 	}
 }
@@ -177,7 +179,7 @@ func Test_TLS_setting_fallback_semantics(t *testing.T) {
 		} else {
 			os.Unsetenv("NAMU_TLS_MODE")
 		}
-		return TLS_setting("mode", "off") // default_value is off, matching the real convention (TLS_mode fallback)
+		return tool.TLS_setting("mode", "off") // default_value is off, matching the real convention (TLS_mode fallback)
 	}
 
 	cases := []struct {
@@ -186,12 +188,12 @@ func Test_TLS_setting_fallback_semantics(t *testing.T) {
 		env  string // "<unset>" => env not present; "" or other => explicit value
 		want string
 	}{
-		{"set.json no key + env unset -> off", `{}`, "<unset>", "off"},                                                           // default
-		{"set.json no key + env empty -> off (empty falls back to set.json/default)", ``, "", "off"},                             // empty env triggers fallback
-		{"set.json mode=auto + env unset -> auto", `{"mode":"auto"}`, "<unset>", "auto"},                                         // env absent => use set.json
-		{"set.json mode=auto + env empty -> auto (empty falls back to set.json)", `{"mode":"auto"}`, "", "auto"},                 // KEY row: empty env beats default, uses set.json value
-		{"set.json mode=auto + env off -> off (non-empty env beats both set.json and default)", `{"mode":"auto"}`, "off", "off"}, // explicit env
-		{"set.json mode=off + env unset -> off", `{"mode":"off"}`, "<unset>", "off"},                                             // set.json value used
+		{"set.json no key + env unset -> off", `{}`, "<unset>", "off"},                                                                 // default
+		{"set.json no key + env empty -> off (empty falls back to set.json/default)", ``, "", "off"},                                  // empty env triggers fallback
+		{"set.json mode=auto + env unset -> auto", `{"mode":"auto"}`, "<unset>", "auto"},                                            // env absent => use set.json
+		{"set.json mode=auto + env empty -> auto (empty falls back to set.json)", `{"mode":"auto"}`, "", "auto"},                   // KEY row: empty env beats default, uses set.json value
+		{"set.json mode=auto + env off -> off (non-empty env beats both set.json and default)", `{"mode":"auto"}`, "off", "off"},   // explicit env
+		{"set.json mode=off + env unset -> off", `{"mode":"off"}`, "<unset>", "off"},                                                // set.json value used
 	}
 
 	for _, c := range cases {

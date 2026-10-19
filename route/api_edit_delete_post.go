@@ -18,7 +18,14 @@ func Api_edit_delete_post(config tool.Config, doc_name string, send string, agre
 		return return_data
 	}
 
-	raw_data := ""
+	// The delete (backlink capture + content removal) is one critical section.
+	// The common mutex serializes it against concurrent edits so the backlink
+	// snapshot and the removals do not race a commit (caller owns the section;
+	// nothing inside re-enters the lock).
+	backlink_mutex.Lock()
+	defer backlink_mutex.Unlock()
+
+	var raw_data string
 	exist := tool.QueryRow_DB(
 		db,
 		"select data from data where title = ?",

@@ -448,6 +448,8 @@
     "many_upload_acl": "複数ファイルアップロードACL",
     "reset_backlink": "逆リンク初期化",
     "reset_all_backlink": "全逆リンク再生成",
+    "backlink_reset_partial": "一部の文書が失敗して再構築が完了しました。失敗した文書は前の状態で復元されています。",
+    "backlink_reset_failed": "再構築に失敗しました。すべての文書が前の状態で復元されています。",
     "backlink_reset_load": "処理速度",
     "backlink_reset_load_fast": "速い（負荷高）",
     "backlink_reset_load_normal": "普通",
@@ -959,5 +961,7 @@
     "bbs_content_max_length_error": "掲示板または討論内容が長すぎます。最大文字数：",
     "copy": "コピー",
     "cancel": "キャンセル",
-    "help": "ヘルプ"
+    "help": "ヘルプ",
+    "backlink_index_failed": "バックリンクインデックス失敗",
+    "backlink_index_failed_message": "ページは保存されましたが、バックリンクインデックスの更新に失敗しました。次に編集されるまでバックリンクが古い場合があります."
 }

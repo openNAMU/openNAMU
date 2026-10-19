@@ -1,4 +1,4 @@
-package route
+package test
 
 import (
 	"crypto/md5"
@@ -11,14 +11,15 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/flosch/pongo2/v6"
+	"github.com/gin-contrib/sessions"
 
+	"opennamu/route"
 	"opennamu/route/tool"
 )
 
 // Pongo_init_test registers the template filters that main.go::Pongo_init
-// registers, so View_user_check can render templates standalone.
+// registers, so route.View_user_check can render templates standalone.
 func init() {
 	pongo2.RegisterFilter("md5_replace", func(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
 		h := md5.Sum([]byte(in.String()))
@@ -36,7 +37,7 @@ func init() {
 	})
 }
 
-// emptySession implements sessions.Session so View_user_check can run without
+// emptySession implements sessions.Session so route.View_user_check can run without
 // a real request/session. It returns nil from Get, causing the template to
 // fall back to DB lookups only.
 type emptySession struct{}
@@ -111,7 +112,7 @@ func Test_View_user_check_masked_subject_normal(t *testing.T) {
 	defer tool.DB_close(db)
 
 	config := tool.Config{IP: "inspector", Session: &emptySession{}}
-	out := View_user_check(config, "victim", "normal", "1", "")
+	out := route.View_user_check(config, "victim", "normal", "1", "")
 
 	if !strings.Contains(out, "victim") {
 		t.Fatalf("did not render subject (likely auth error): %q", out)
@@ -126,7 +127,7 @@ func Test_View_user_check_unmasked_subject_normal(t *testing.T) {
 	defer tool.DB_close(db)
 
 	config := tool.Config{IP: "inspector", Session: &emptySession{}}
-	out := View_user_check(config, "open", "normal", "1", "")
+	out := route.View_user_check(config, "open", "normal", "1", "")
 
 	if !strings.Contains(out, "open") {
 		t.Fatalf("did not render subject (likely auth error): %q", out)
@@ -141,7 +142,7 @@ func Test_View_user_check_masked_subject_simple(t *testing.T) {
 	defer tool.DB_close(db)
 
 	config := tool.Config{IP: "inspector", Session: &emptySession{}}
-	out := View_user_check(config, "victim", "simple", "1", "")
+	out := route.View_user_check(config, "victim", "simple", "1", "")
 
 	if !strings.Contains(out, "victim") {
 		t.Fatalf("did not render subject (likely auth error): %q", out)
@@ -156,7 +157,7 @@ func Test_View_user_check_unmasked_subject_simple(t *testing.T) {
 	defer tool.DB_close(db)
 
 	config := tool.Config{IP: "inspector", Session: &emptySession{}}
-	out := View_user_check(config, "open", "simple", "1", "")
+	out := route.View_user_check(config, "open", "simple", "1", "")
 
 	if !strings.Contains(out, "open") {
 		t.Fatalf("did not render subject (likely auth error): %q", out)
@@ -171,7 +172,7 @@ func Test_View_user_check_requires_auth(t *testing.T) {
 	defer tool.DB_close(db)
 
 	config := tool.Config{IP: "anonymous", Session: &emptySession{}}
-	out := View_user_check(config, "victim", "normal", "1", "")
+	out := route.View_user_check(config, "victim", "normal", "1", "")
 
 	if strings.Contains(out, "192.168.0.11") {
 		t.Fatalf("unpermitted inspector was able to see IP: %q", out)
@@ -192,7 +193,7 @@ func Test_View_user_check_simple_ip_excludes_hideip(t *testing.T) {
 	}
 
 	config := tool.Config{IP: "inspector", Session: &emptySession{}}
-	out := View_user_check(config, "192.168.0.10", "simple", "1", "")
+	out := route.View_user_check(config, "192.168.0.10", "simple", "1", "")
 
 	if strings.Contains(out, "victim") {
 		t.Fatalf("hideip account leaked through IP reverse lookup")
@@ -213,7 +214,7 @@ func Test_View_user_check_normal_ip_excludes_hideip(t *testing.T) {
 	}
 
 	config := tool.Config{IP: "inspector", Session: &emptySession{}}
-	out := View_user_check(config, "192.168.0.10", "normal", "1", "")
+	out := route.View_user_check(config, "192.168.0.10", "normal", "1", "")
 
 	if strings.Contains(out, "Mozilla/5.0") {
 		t.Fatalf("hideip account's UA leaked through IP reverse lookup")

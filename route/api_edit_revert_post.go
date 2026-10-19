@@ -70,7 +70,13 @@ func Api_edit_revert_post(config tool.Config, doc_name string, rev string, send 
 		return return_data
 	}
 
-	old_data := ""
+	// The revert (content commit) and its backlink index update are one critical
+	// section. The common mutex keeps a concurrent edit from committing between
+	// saving content and writing backlinks (no nested locking — holder owns all).
+	backlink_mutex.Lock()
+	defer backlink_mutex.Unlock()
+
+	var old_data string
 	old_exist := tool.QueryRow_DB(
 		db,
 		"select data from data where title = ?",

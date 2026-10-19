@@ -1,4 +1,4 @@
-package route
+package test
 
 import (
 	"database/sql"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	_ "modernc.org/sqlite"
+	"opennamu/route"
 )
 
 func Create_test_report_db(t *testing.T) *sql.DB {
@@ -25,12 +26,12 @@ func Test_report_create_success(t *testing.T) {
 	db := Create_test_report_db(t)
 	defer db.Close()
 
-	set_code_new, err := Report_create(db, "127.0.0.1", "Document title", "/w/document", "Report", "spam reason text")
+	set_code_new, err := route.Report_create(db, "127.0.0.1", "Document title", "/w/document", "Report", "spam reason text")
 	if err != nil {
-		t.Fatalf("Report_create success: %v", err)
+		t.Fatalf("route.Report_create success: %v", err)
 	}
 	if set_code_new == "" {
-		t.Fatalf("Report_create returned empty set_code")
+		t.Fatalf("route.Report_create returned empty set_code")
 	}
 
 	var stored_code string
@@ -57,8 +58,8 @@ func Test_report_create_error_no_panic(t *testing.T) {
 	db := Create_test_report_db(t)
 	db.Close()
 
-	_, err := Report_create(db, "127.0.0.1", "Document title", "/w/document", "Report", "spam reason text")
+	_, err := route.Report_create(db, "127.0.0.1", "Document title", "/w/document", "Report", "spam reason text")
 	if err == nil {
-		t.Errorf("Report_create on a closed db should return an error, got nil")
+		t.Errorf("route.Report_create on a closed db should return an error, got nil")
 	}
 }

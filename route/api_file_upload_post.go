@@ -26,6 +26,12 @@ func Api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string,
 		return false
 	}
 
+	// The document creation (content commit) and its backlink index update are
+	// one critical section. The common mutex keeps a concurrent edit from
+	// committing between saving content and writing backlinks.
+	backlink_mutex.Lock()
+	defer backlink_mutex.Unlock()
+
 	err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		if _, err := tx.Exec(tool.DB_change("insert into data (title, data) values (?, ?)"), doc_name, doc_data); err != nil {
 			return err

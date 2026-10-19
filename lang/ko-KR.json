@@ -448,6 +448,8 @@
     "many_upload_acl": "다중 파일 올리기 ACL",
     "reset_backlink": "역링크 초기화",
     "reset_all_backlink": "전체 역링크 재생성",
+    "backlink_reset_partial": "일부 문서가 실패하여 재구축이 완료되었습니다. 실패한 문서는 이전 상태로 복원되었습니다.",
+    "backlink_reset_failed": "재구축에 실패했습니다. 모든 문서가 이전 상태로 복원되었습니다.",
     "backlink_reset_load": "처리 속도",
     "backlink_reset_load_fast": "빠름 (부하 높음)",
     "backlink_reset_load_normal": "일반",
@@ -957,5 +959,7 @@
     "length_doc" : "문서 길이",
     "document_content_max_length_error": "문서 내용이 너무 깁니다. 최대 문자 수:",
     "bbs_content_max_length_error": "게시판 또는 토론 내용이 너무 깁니다. 최대 문자 수:",
-    "copy": "복사"
+    "copy": "복사",
+    "backlink_index_failed": "역링크 색인 실패",
+    "backlink_index_failed_message": "문서는 저장되었지만 역링크 색인이 업데이트되지 않았습니다. 문서를 다시 편집하면 복구됩니다."
 }

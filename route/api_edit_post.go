@@ -39,11 +39,6 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 		return_data["data"] = "permission denied"
 
 		return return_data
-	} else if expected_revision != "" && expected_revision != current_revision {
-		return_data["response"] = "error"
-		return_data["data"] = "edit conflict"
-
-		return return_data
 	} else if !tool.Check_edit_time(db, config.IP) {
 		return_data["response"] = "error"
 		return_data["data"] = "edit time"
@@ -86,8 +81,25 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 		return return_data
 	}
 
-	var old_data string
+	// The document save (content commit) and its backlink index update are one
+	// critical section. The common mutex keeps a concurrent edit from committing
+	// between saving content and writing backlinks. The holder owns the whole
+	// section, so nothing inside re-enters it (no nested locking).
+	backlink_mutex.Lock()
+	defer backlink_mutex.Unlock()
 
+	// Re-check the revision under the lock, just before the commit. The
+	// pre-lock read above is only needed for the new-doc make_acl check; the
+	// commit-time revision may have changed, so it must be validated here.
+	current_revision = tool.Get_document_revision(db, doc_name)
+	if expected_revision != "" && expected_revision != current_revision {
+		return_data["response"] = "error"
+		return_data["data"] = "edit conflict"
+
+		return return_data
+	}
+
+	var old_data string
 	tool.QueryRow_DB(
 		db,
 		`select data from data where title = ?`,

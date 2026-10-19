@@ -1,4 +1,4 @@
-package route
+package test
 
 import (
 	"database/sql"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	_ "modernc.org/sqlite"
+	"opennamu/route"
 )
 
 // Create_user_check_db builds a minimal SQLite schema for testing user-check
@@ -81,7 +82,7 @@ func Test_user_check_require_auth(t *testing.T) {
 
 	// "no_auth" has no acl entry and resolves to the default "user" group,
 	// which was never granted "check".
-	result := Api_user_check_rows(db, "no_auth", "victim", "normal", 1, "")
+	result := route.Api_user_check_rows(db, "no_auth", "victim", "normal", 1, "")
 	if response, ok := result["response"].(string); !ok || response != "require auth" {
 		t.Fatalf("expected require auth, got response=%q rows=%v", response, result)
 	}
@@ -91,7 +92,7 @@ func Test_user_check_masked_subject(t *testing.T) {
 	db := Create_user_check_db(t)
 	defer db.Close()
 
-	result := Api_user_check_rows(db, "inspector", "victim", "normal", 1, "")
+	result := route.Api_user_check_rows(db, "inspector", "victim", "normal", 1, "")
 	if response, ok := result["response"].(string); !ok || response != "success" {
 		t.Fatalf("expected success, got response=%q", response)
 	}
@@ -122,7 +123,7 @@ func Test_user_check_unmasked_subject(t *testing.T) {
 	db := Create_user_check_db(t)
 	defer db.Close()
 
-	result := Api_user_check_rows(db, "inspector", "open_subject", "normal", 1, "")
+	result := route.Api_user_check_rows(db, "inspector", "open_subject", "normal", 1, "")
 	if response, ok := result["response"].(string); !ok || response != "success" {
 		t.Fatalf("expected success, got response=%q", response)
 	}
@@ -149,7 +150,7 @@ func Test_user_check_simple_masked(t *testing.T) {
 	db := Create_user_check_db(t)
 	defer db.Close()
 
-	result := Api_user_check_rows(db, "inspector", "victim", "simple", 1, "")
+	result := route.Api_user_check_rows(db, "inspector", "victim", "simple", 1, "")
 	if response, ok := result["response"].(string); !ok || response != "success" {
 		t.Fatalf("expected success, got response=%q", response)
 	}
@@ -176,7 +177,7 @@ func Test_user_check_simple_ip_excludes_hideip(t *testing.T) {
 
 	// IP reverse-lookup excludes hideip accounts entirely. "victim" holds
 	// hideip, so no row may be returned for an IP used only by victim.
-	result := Api_user_check_rows(db, "inspector", "192.168.0.10", "simple", 1, "")
+	result := route.Api_user_check_rows(db, "inspector", "192.168.0.10", "simple", 1, "")
 	if response, ok := result["response"].(string); !ok || response != "success" {
 		t.Fatalf("expected success, got response=%q", response)
 	}
@@ -211,7 +212,7 @@ func Test_user_check_simple_ip_keeps_non_hideip(t *testing.T) {
 
 	// 203.0.113.5 is used by both a hideip user (victim) and a non-hideip
 	// user (open_subject). Only the non-hideip user may appear.
-	result := Api_user_check_rows(db, "inspector", "203.0.113.5", "simple", 1, "")
+	result := route.Api_user_check_rows(db, "inspector", "203.0.113.5", "simple", 1, "")
 	if response, ok := result["response"].(string); !ok || response != "success" {
 		t.Fatalf("expected success, got response=%q", response)
 	}
@@ -232,7 +233,7 @@ func Test_user_check_normal_ip_excludes_hideip(t *testing.T) {
 	db := Create_user_check_db_shared(t)
 	defer db.Close()
 
-	result := Api_user_check_rows(db, "inspector", "203.0.113.5", "normal", 1, "")
+	result := route.Api_user_check_rows(db, "inspector", "203.0.113.5", "normal", 1, "")
 	if response, ok := result["response"].(string); !ok || response != "success" {
 		t.Fatalf("expected success, got response=%q", response)
 	}
@@ -256,7 +257,7 @@ func Test_user_check_compare_per_row_mask(t *testing.T) {
 	db := Create_user_check_db(t)
 	defer db.Close()
 
-	result := Api_user_check_rows(db, "inspector", "victim", "normal", 1, "open_subject")
+	result := route.Api_user_check_rows(db, "inspector", "victim", "normal", 1, "open_subject")
 	if response, ok := result["response"].(string); !ok || response != "success" {
 		t.Fatalf("expected success, got response=%q", response)
 	}
@@ -271,10 +272,10 @@ func Test_user_check_compare_per_row_mask(t *testing.T) {
 	if masked["true"] != 1 {
 		t.Errorf("expected 1 masked row, got %d", masked["true"])
 	}
-		if masked["false"] != 1 {
-			t.Errorf("expected 1 unmasked row, got %d", masked["false"])
-		}
+	if masked["false"] != 1 {
+		t.Errorf("expected 1 unmasked row, got %d", masked["false"])
 	}
+}
 
 // Create_compare_db extends the base user-check db with a mix of hideip and
 // non-hideip accounts on distinct IPs so the compare per-row policy can be
@@ -300,7 +301,7 @@ func Create_compare_db(t *testing.T) *sql.DB {
 // Collect_normal runs a normal-mode compare and returns {name: masked} for each
 // returned row.
 func Collect_normal(db *sql.DB, inspector, name, plus_name string) map[string]string {
-	result := Api_user_check_rows(db, inspector, name, "normal", 1, plus_name)
+	result := route.Api_user_check_rows(db, inspector, name, "normal", 1, plus_name)
 	got := map[string]string{}
 	for _, row := range result["rows"].([]map[string]string) {
 		got[row["name"]] = row["masked"]
@@ -379,7 +380,7 @@ func Test_effective_permission_drive_exclude(t *testing.T) {
 	}
 }
 
-// Test_user_check_page_number_guard verifies Page_offset's clamping and the
+// Test_user_check_page_number_guard verifies route.Page_offset's clamping and the
 // early-exit guards: page numbers below 1 are clamped to page 1; past-the-end
 // and overflowed page numbers return an empty "success" page (no panic, no full
 // batch walk); valid pages return the expected rows.
@@ -402,7 +403,7 @@ func Test_user_check_page_number_guard(t *testing.T) {
 		{"192.168.0.20", "simple", 2, 0},
 	}
 	for i, c := range cases {
-		result := Api_user_check_rows(db, "inspector", c.name, c.mode, c.page_num, "")
+		result := route.Api_user_check_rows(db, "inspector", c.name, c.mode, c.page_num, "")
 		resp, ok := result["response"].(string)
 		if !ok || resp != "success" {
 			t.Fatalf("case %d (name=%q mode=%q page=%d): response=%q want success", i, c.name, c.mode, c.page_num, resp)
@@ -413,11 +414,11 @@ func Test_user_check_page_number_guard(t *testing.T) {
 		}
 	}
 
-	// Overflow boundary: Page_offset returns math.MaxInt for these pages; the
+	// Overflow boundary: route.Page_offset returns math.MaxInt for these pages; the
 	// guard must yield an empty page without panicking or walking.
-	for _, page := range []int{math.MaxInt / 50 + 2, math.MaxInt} {
+	for _, page := range []int{math.MaxInt/50 + 2, math.MaxInt} {
 		for _, mode := range []string{"normal", "simple"} {
-			result := Api_user_check_rows(db, "inspector", "open_subject", mode, page, "")
+			result := route.Api_user_check_rows(db, "inspector", "open_subject", mode, page, "")
 			resp, ok := result["response"].(string)
 			if !ok || resp != "success" {
 				t.Fatalf("page=%d mode=%q: response=%q want success (no panic, no walk)", page, mode, resp)
@@ -431,14 +432,14 @@ func Test_user_check_page_number_guard(t *testing.T) {
 }
 
 // Test_user_check_past_end_empty verifies that an explicit math.MaxInt offset
-// (the value Page_offset hands up for an overflowed page number) yields an
+// (the value route.Page_offset hands up for an overflowed page number) yields an
 // empty page in both modes without a batch walk.
 func Test_user_check_past_end_empty(t *testing.T) {
 	db := Create_user_check_db_shared(t)
 	defer db.Close()
 
 	for _, mode := range []string{"normal", "simple"} {
-		result := Api_user_check_rows(db, "inspector", "open_subject", mode, math.MaxInt, "")
+		result := route.Api_user_check_rows(db, "inspector", "open_subject", mode, math.MaxInt, "")
 		resp, ok := result["response"].(string)
 		if !ok || resp != "success" {
 			t.Fatalf("mode=%q past-end: response=%q want success", mode, resp)

@@ -51,6 +51,21 @@ func Register_api_compat_routes(r *gin.Engine) {
 	r.GET("/api/xref_this/:page/*doc_name", func(c *gin.Context) {
 		Compat_api_data(c, route.Api_w_xref(Make_route_config(c), c.Param("page"), Compat_doc_name(c, "doc_name"), "2"))
 	})
+	r.GET("/api/ext_backlink/:page/*host", func(c *gin.Context) {
+		Compat_api_data(c, route.Api_external_docs_for_host(Make_route_config(c), c.Param("page"), strings.TrimPrefix(c.Param("host"), "/")))
+	})
+	r.GET("/api/ext_backlink_urls/*doc_name", func(c *gin.Context) {
+		Compat_api_data(c, route.Api_external_hosts_of_doc(Make_route_config(c), Compat_doc_name(c, "doc_name")))
+	})
+	r.GET("/api/ext_backlink_count/*host", func(c *gin.Context) {
+		Compat_api_data(c, route.Api_external_count_for_host(Make_route_config(c), strings.TrimPrefix(c.Param("host"), "/")))
+	})
+	r.GET("/api/ext_backlink_hosts", func(c *gin.Context) {
+		Compat_api_data(c, route.Api_external_all_hosts(Make_route_config(c), "1"))
+	})
+	r.GET("/api/ext_backlink_hosts/:page", func(c *gin.Context) {
+		Compat_api_data(c, route.Api_external_all_hosts(Make_route_config(c), c.Param("page")))
+	})
 	r.GET("/api/image/*name", func(c *gin.Context) {
 		Compat_api_data(c, route.Api_image_exist(Compat_doc_name(c, "name")))
 	})

@@ -406,6 +406,8 @@
     "main_skin_set": "Main skin settings",
     "reset_backlink": "Reset backlink",
     "reset_all_backlink": "Rebuild all backlinks",
+    "backlink_reset_partial": "Rebuild finished with some documents failing. Failed documents were restored to their previous state.",
+    "backlink_reset_failed": "Rebuild failed. All documents were restored to their previous state.",
     "backlink_reset_load": "Processing speed",
     "backlink_reset_load_fast": "Fast (high load)",
     "backlink_reset_load_normal": "Normal",
@@ -1043,5 +1045,7 @@
     "challenge_info_thousandth_discussion": "Post the 1000th discussion thread<br><br>Reward: 📜 title and 10000 exp",
     "challenge_title_admin": "If you want to test a man's character, give him power.",
     "challenge_info_admin": "Be the administrator.<br><br>Reward: ☑️ title and 10000 exp",
-    "copy": "Copy"
+    "copy": "Copy",
+    "backlink_index_failed": "Backlink index failed",
+    "backlink_index_failed_message": "The page was saved, but the backlink index failed to update. Backlinks may be outdated until the next edit."
 }
