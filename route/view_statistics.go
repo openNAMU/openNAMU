@@ -28,6 +28,10 @@ func View_statistics(config tool.Config) string {
 	body.WriteString(statistics_line("statistics_bbs_comment_count", tool.Get_statistics_count(db, "bbs_comment")))
 
 	now := time.Now()
+	now_text := now.Format("2006-01-02 15:04:05")
+	body.WriteString(statistics_line("statistics_recent_24h_edit_count", tool.Get_month_history_count(db, now.Add(-24*time.Hour).Format("2006-01-02 15:04:05"), now_text)))
+	body.WriteString(statistics_line("statistics_recent_7d_edit_count", tool.Get_month_history_count(db, now.AddDate(0, 0, -7).Format("2006-01-02 15:04:05"), now_text)))
+	body.WriteString(statistics_line("statistics_recent_30d_edit_count", tool.Get_month_history_count(db, now.AddDate(0, 0, -30).Format("2006-01-02 15:04:05"), now_text)))
 	month_start := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
 	next_month_start := month_start.AddDate(0, 1, 0)
 	month_start_text := month_start.Format("2006-01-02 15:04:05")
