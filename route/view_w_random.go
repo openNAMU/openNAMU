@@ -9,6 +9,11 @@ func View_w_random(config tool.Config) string {
 	defer tool.DB_close(db)
 
 	api_data := Api_w_random(config)
+	response, _ := api_data["response"].(string)
+	if response != "ok" {
+		return tool.Get_error_page(db, config, "not found")
+	}
+
 	title, _ := api_data["data"].(string)
 
 	redirect := tool.Get_redirect("/w/" + tool.Url_parser(title))

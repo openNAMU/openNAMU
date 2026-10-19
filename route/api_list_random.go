@@ -12,7 +12,7 @@ func Api_list_random(config tool.Config, list_count int) map[string]any {
 
 	rows := tool.Query_DB(
 		db,
-		"select title from data where title not like 'user:%' and title not like 'category:%' and title not like 'file:%' order by random() limit ?",
+		"select title from data where title not like 'user:%' and title not like 'category:%' and title not like 'file:%' and not exists (select 1 from back where back.type = 'redirect' and back.link = data.title) order by random() limit ?",
 		list_count,
 	)
 	defer rows.Close()
