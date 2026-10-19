@@ -153,6 +153,7 @@ func View_list_recent_change(config tool.Config, set_type string, limit string, 
 	if !tool.IP_or_user(config.IP) {
 		data_html += `<a href="/recent_change/1/watch">(` + tool.Get_language(db, "watchlist", true) + `)</a> `
 	}
+	data_html += `<a href="/rss/recent">(RSS)</a> `
 
 	api_data := Api_list_recent_change(config, set_type, limit, num)
 	if api_data["response"] != "ok" {

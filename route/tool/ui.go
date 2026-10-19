@@ -165,6 +165,10 @@ func Get_template(db *sql.DB, config Config, name string, data string, other []a
 		}
 	}
 
+	if main_head, ok := imp_3[3].(string); ok {
+		imp_3[3] = main_head + `<link rel="alternate" type="application/rss+xml" title="Recent changes" href="/rss/recent">`
+	}
+
 	context := pongo2.Context{
 		"imp": []any{
 			name,
