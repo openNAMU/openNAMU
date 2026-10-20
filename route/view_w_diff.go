@@ -67,6 +67,8 @@ func View_w_diff(config tool.Config, doc_name string, before_rev string, after_r
 		}
 
 		data_html += `</table>`
+	} else {
+		data_html = `<p>` + tool.Get_language(db, "diff_no_changes", true) + `</p>`
 	}
 
 	return tool.Get_template(

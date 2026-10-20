@@ -200,6 +200,7 @@
     "compare": "Compare",
     "before_revision": "Earlier revision",
     "after_revision": "Later revision",
+    "diff_no_changes": "No changes found.",
     "email": "Email",
     "key": "Key",
     "all": "All",

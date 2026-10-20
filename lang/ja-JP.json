@@ -125,6 +125,7 @@
     "compare": "比較",
     "before_revision": "前のリビジョン",
     "after_revision": "後のリビジョン",
+    "diff_no_changes": "変更はありません。",
     "password_error": "パスワードが正しくありません。",
     "default": "デフォルト",
     "wiki_name": "ウィキ名",
