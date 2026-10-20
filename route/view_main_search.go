@@ -14,16 +14,31 @@ func View_main_search(config tool.Config, keyword string, num string, search_typ
 		return tool.Get_redirect("/")
 	}
 
+	title_href := "/search_page/1/" + tool.Url_parser(keyword)
+	data_href := "/search_data_page/1/" + tool.Url_parser(keyword)
+
+	title_label := "(" + tool.Get_language(db, "search_document_name", true) + ")"
+	data_label := "(" + tool.Get_language(db, "search_document_data", true) + ")"
+
+	title_link := `<div><a href="` + title_href + `">` + title_label + `</a></div>`
+	data_link := `<div><a href="` + data_href + `">` + data_label + `</a></div>`
+
+	if search_type == "title" {
+		title_link = `<div><a href="` + title_href + `"><strong>` + title_label + `</strong></a></div>`
+	} else if search_type == "data" {
+		data_link = `<div><a href="` + data_href + `"><strong>` + data_label + `</strong></a></div>`
+	}
+
 	data_html := `
         <form method="post">
-		    <div><label for="main_search_keyword">` + tool.Get_language(db, "search", true) + `</label></div>
-		    <div><input id="main_search_keyword" class="opennamu_width_200 __ON_INPUT__" name="search" value="` + tool.HTML_escape(keyword) + `"></div><hr class="main_hr">
+            <div><label for="main_search_keyword">` + tool.Get_language(db, "search", true) + `</label></div>
+            <div><input id="main_search_keyword" class="opennamu_width_200 __ON_INPUT__" name="search" value="` + tool.HTML_escape(keyword) + `"></div><hr class="main_hr">
             <div><button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, "search", true) + `</button></div>
         </form>
         <hr class="main_hr">
-        <div><a href="/search_page/1/` + tool.Url_parser(keyword) + `">(` + tool.Get_language(db, "search_document_name", true) + `)</a></div>
+        ` + title_link + `
         <hr class="main_hr">
-        <div><a href="/search_data_page/1/` + tool.Url_parser(keyword) + `">(` + tool.Get_language(db, "search_document_data", true) + `)</a></div>
+        ` + data_link + `
         <hr class="main_hr">
     `
 
