@@ -40,9 +40,11 @@ func View_history_tool(config tool.Config, doc_name string, rev string) string {
 	data += `<li><a href="/revert/` + revision + `/` + doc_name_url + `">` + tool.Get_language(db, "revert", true) + ` (r` + revision + `)</a></li>`
 
 	if revision_number > 1 {
-		previous := strconv.Itoa(revision_number - 1)
-		data += `<li><a href="/revert/` + previous + `/` + doc_name_url + `">` + tool.Get_language(db, "revert", true) + ` (r` + previous + `)</a></li>`
-		data += `<li><a href="/diff/` + previous + `/` + revision + `/` + doc_name_url + `">` + tool.Get_language(db, "compare", true) + `</a></li>`
+		previous := tool.Get_previous_history_revision(db, doc_name, revision_number, hidden_auth)
+		if previous != "" {
+			data += `<li><a href="/revert/` + previous + `/` + doc_name_url + `">` + tool.Get_language(db, "revert", true) + ` (r` + previous + `)</a></li>`
+			data += `<li><a href="/diff/` + previous + `/` + revision + `/` + doc_name_url + `">` + tool.Get_language(db, "compare", true) + `</a></li>`
+		}
 	}
 
 	data += `<li><a href="/history/` + doc_name_url + `">` + tool.Get_language(db, "history", true) + `</a></li>`

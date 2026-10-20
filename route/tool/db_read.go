@@ -224,6 +224,22 @@ func Get_history_last_revision(db *sql.DB, title string) string {
 	return value
 }
 
+// Get_previous_history_revision returns the largest existing revision id
+// smaller than revision. When hidden_auth is false, hidden revisions are
+// excluded so a regular user's previous revision is never hidden. Returns ""
+// when no such revision exists. revision is the current revision number as an
+// int so it is bound to SQLite/MySQL as a number, not a text parameter.
+func Get_previous_history_revision(db *sql.DB, title string, revision int, hidden_auth bool) string {
+	value := ""
+	query := `select id from history where title = ? and id + 0 < ?`
+	if !hidden_auth {
+		query += ` and coalesce(hide, '') = ''`
+	}
+	query += ` order by id + 0 desc limit 1`
+	QueryRow_DB(db, query, []any{&value}, title, revision)
+	return value
+}
+
 func Get_acl_exists(db *sql.DB, title string) bool {
 	value := ""
 	return QueryRow_DB(
