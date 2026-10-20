@@ -51,12 +51,12 @@ func Register_search_routes(r *gin.Engine) {
 	})
 
 	r.POST("/search_data/*keyword", func(c *gin.Context) {
-		route_data := route.View_main_search_post(Make_route_config(c), "", false, c.PostForm("search"))
+		route_data := route.View_main_search_post(Make_route_config(c), "data", false, c.PostForm("search"))
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
 	r.POST("/search_data_page/:num/*keyword", func(c *gin.Context) {
-		route_data := route.View_main_search_post(Make_route_config(c), "", false, c.PostForm("search"))
+		route_data := route.View_main_search_post(Make_route_config(c), "data", false, c.PostForm("search"))
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
