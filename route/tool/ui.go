@@ -159,6 +159,18 @@ func Get_template(db *sql.DB, config Config, name string, data string, other []a
 		doc_length = option["length_doc"]
 	}
 
+	if name != "" {
+		if main_head, ok := imp_3[3].(string); ok {
+			imp_3[3] = main_head + `<meta property="og:title" content="` + HTML_escape(name) + `">`
+		}
+	}
+
+	if description, ok := imp_3[6].(string); ok && description != "" {
+		if main_head, ok := imp_3[3].(string); ok {
+			imp_3[3] = main_head + `<meta property="og:description" content="` + HTML_escape(description) + `">`
+		}
+	}
+
 	if og_image := option["og_image"]; og_image != "" {
 		if main_head, ok := imp_3[3].(string); ok {
 			imp_3[3] = main_head + `<meta property="og:image" content="` + HTML_escape(og_image) + `">`
