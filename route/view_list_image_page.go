@@ -45,6 +45,11 @@ func View_list_image_page(config tool.Config, page string) string {
 	}
 	rows.Close()
 
+	if sub_data.Len() > 0 {
+		render_data.WriteString("\n")
+		render_data.WriteString(sub_data.String())
+	}
+
 	parameter_data := map[string]any{}
 	parameter_data["__opennamu_skin_set"] = Get_render_setting_parameter(db, config)
 	if config.IP != "" {
