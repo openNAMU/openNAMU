@@ -16,7 +16,12 @@ func View_list_document_all(config tool.Config, page string) string {
 	rows := tool.Get_data_rows(db, offset)
 	body := strings.Builder{}
 	count := 0
+	has_next := false
 	for rows.Next() {
+		if count == 50 {
+			has_next = true
+			break
+		}
 		title := ""
 		if rows.Scan(&title) != nil {
 			continue
@@ -47,7 +52,7 @@ func View_list_document_all(config tool.Config, page string) string {
 		}
 	}
 
-	data += tool.Get_page_control(db, page_num, count, 50, "/list/document/all/{}")
+	data += tool.Get_page_control(db, page_num, count, 50, "/list/document/all/{}", has_next)
 	return List_extra_page(db, config, tool.Get_language(db, "all_document_list", true), data)
 }
 

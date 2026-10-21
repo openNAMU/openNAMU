@@ -561,7 +561,7 @@ func Get_unused_category_rows(db *sql.DB, offset int) *sql.Rows {
 }
 
 func Get_data_rows(db *sql.DB, offset int) *sql.Rows {
-	return Query_DB(db, "select title from data order by title asc limit ?, 50", offset)
+	return Query_DB(db, "select title from data order by title asc limit ?, 51", offset)
 }
 
 func Get_data_prefix_count(db *sql.DB, prefix string) string {
