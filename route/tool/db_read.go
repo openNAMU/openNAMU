@@ -395,7 +395,7 @@ func Get_data_title_like(db *sql.DB, title string) bool {
 	value := ""
 	return QueryRow_DB(
 		db,
-		"select title from data where title like ? limit 1",
+		"select title from data where title like ? escape '!' limit 1",
 		[]any{&value},
 		title,
 	)

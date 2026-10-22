@@ -26,7 +26,7 @@ func View_w_redirect_target(db *sql.DB, doc_name string) (string, string) {
 }
 
 func View_w_child_exists(db *sql.DB, doc_name string) bool {
-	return tool.Get_data_title_like(db, doc_name+"/%")
+	return tool.Get_data_title_like(db, Move_all_like_escape(doc_name)+"/%")
 }
 
 func View_w_user_data(db *sql.DB, config tool.Config, doc_name string) string {

@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"sort"
+
+	"opennamu/route/tool"
+)
 
 func Api_w_down(config tool.Config, doc_name string) map[string]any {
 	db := tool.DB_connect()
@@ -12,8 +16,8 @@ func Api_w_down(config tool.Config, doc_name string) map[string]any {
 
 	rows := tool.Query_DB(
 		db,
-		"select title from data where title like ?",
-		doc_name,
+		"select title from data where title like ? escape '!'",
+		Move_all_like_escape(doc_name)+"/%",
 	)
 	defer rows.Close()
 
@@ -33,6 +37,8 @@ func Api_w_down(config tool.Config, doc_name string) map[string]any {
 
 		title_list = append(title_list, title)
 	}
+
+	sort.Strings(title_list)
 
 	return_data := make(map[string]any)
 	return_data["response"] = "ok"
