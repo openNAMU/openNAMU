@@ -24,9 +24,6 @@ func View_w_add_recent_document(config tool.Config, doc_name string) []string {
 	if doc_name == "" || config.Session == nil {
 		return documents
 	}
-	if len(documents) >= 10 {
-		documents = documents[len(documents)-9:]
-	}
 	documents = append(documents, doc_name)
 
 	seen := map[string]bool{}
@@ -40,6 +37,9 @@ func View_w_add_recent_document(config tool.Config, doc_name string) []string {
 	}
 	for left, right := 0, len(unique_documents)-1; left < right; left, right = left+1, right-1 {
 		unique_documents[left], unique_documents[right] = unique_documents[right], unique_documents[left]
+	}
+	if len(unique_documents) > 10 {
+		unique_documents = unique_documents[1:]
 	}
 
 	config.Session.Set("lastest_document", unique_documents)
