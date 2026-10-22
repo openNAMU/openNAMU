@@ -11,27 +11,38 @@ import (
 )
 
 func Search_highlight(data string, keyword string) string {
-	data = tool.HTML_escape(data)
 	keyword_list := []string{}
 	for _, keyword_data := range strings.Fields(keyword) {
-		keyword_data = tool.HTML_escape(keyword_data)
 		if keyword_data != "" {
 			keyword_list = append(keyword_list, regexp.QuoteMeta(keyword_data))
 		}
 	}
 	if len(keyword_list) == 0 {
-		return data
+		return tool.HTML_escape(data)
 	}
 	sort.Slice(keyword_list, func(i int, j int) bool {
 		return len(keyword_list[i]) > len(keyword_list[j])
 	})
 	pattern, err := regexp.Compile("(?i)" + strings.Join(keyword_list, "|"))
 	if err != nil {
-		return data
+		return tool.HTML_escape(data)
 	}
-	return pattern.ReplaceAllStringFunc(data, func(value string) string {
-		return "<mark>" + value + "</mark>"
-	})
+	indices := pattern.FindAllStringIndex(data, -1)
+	if len(indices) == 0 {
+		return tool.HTML_escape(data)
+	}
+	var out strings.Builder
+	prev := 0
+	for _, idx := range indices {
+		start, end := idx[0], idx[1]
+		out.WriteString(tool.HTML_escape(data[prev:start]))
+		out.WriteString("<mark>")
+		out.WriteString(tool.HTML_escape(data[start:end]))
+		out.WriteString("</mark>")
+		prev = end
+	}
+	out.WriteString(tool.HTML_escape(data[prev:]))
+	return out.String()
 }
 
 func Search_snippet(data string, keyword string) string {
