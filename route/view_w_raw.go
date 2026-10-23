@@ -23,11 +23,21 @@ func View_w_raw(config tool.Config, doc_name string, rev string, do_type string)
 		}
 	}
 
-	data_api_in := ""
-
 	data_api := Api_w_raw(config, doc_name, "", rev)
+	response, _ := data_api["response"].(string)
+
+	data_api_in := ""
 	if data, ok := data_api["data"].(string); ok {
 		data_api_in = data
+	}
+
+	if do_type != "document_acl" {
+		if response == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
+		}
+		if response != "ok" {
+			return tool.Get_error_page(db, config, "resource not found")
+		}
 	}
 
 	pre_data := `
