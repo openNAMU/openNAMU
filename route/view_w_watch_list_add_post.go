@@ -30,7 +30,7 @@ func View_w_watch_list_add_post(config tool.Config, doc_name string, do_type str
 		out = tool.Get_error_page(db, config, "error")
 	} else {
 		if name_from {
-			out = tool.Get_redirect("/w/" + doc_name)
+			out = tool.Get_redirect("/w/" + tool.Url_parser(doc_name))
 		} else if do_type == "watchlist" {
 			out = tool.Get_redirect("/watch_list")
 		} else {
