@@ -14,6 +14,7 @@ import (
 var file_document_extensions = []string{"pdf", "docx"}
 var file_audio_extensions = []string{"mp3", "wav", "flac", "aac", "m4a", "ogg", "oga", "opus", "amr", "weba"}
 var file_video_extensions = []string{"mp4", "m4v", "webm", "mkv", "mov", "avi", "mpeg", "mpg", "ts", "3gp", "3g2"}
+var file_image_extensions = []string{"jpg", "jpeg", "png", "gif", "webp", "bmp", "tif", "tiff", "ico", "svg", "avif", "heic"}
 
 func Is_audio_extension(extension string) bool {
 	extension = strings.ToLower(strings.TrimPrefix(extension, "."))
@@ -30,6 +31,17 @@ func Is_video_extension(extension string) bool {
 	extension = strings.ToLower(strings.TrimPrefix(extension, "."))
 	for _, video_extension := range file_video_extensions {
 		if extension == video_extension {
+			return true
+		}
+	}
+
+	return false
+}
+
+func Is_image_extension(extension string) bool {
+	extension = strings.ToLower(strings.TrimPrefix(extension, "."))
+	for _, image_extension := range file_image_extensions {
+		if extension == image_extension {
 			return true
 		}
 	}

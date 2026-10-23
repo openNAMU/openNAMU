@@ -277,10 +277,12 @@ func View_w_file_data(db *sql.DB, doc_name string) string {
 	}
 	image_url := "/image/" + tool.Url_parser(storage_name) + ".cache_v" + tool.Url_parser(cache_revision)
 
+	is_image := tool.Is_image_extension(extension)
 	is_audio := tool.Is_audio_extension(extension)
 	is_video := tool.Is_video_extension(extension)
-	resolution := "Vector"
-	if !is_audio && !is_video {
+	resolution := "-"
+	if is_image {
+		resolution = "Vector"
 		if file, open_err := os.Open(file_path); open_err == nil {
 			image_config, _, decode_err := image.DecodeConfig(file)
 			_ = file.Close()
@@ -288,11 +290,12 @@ func View_w_file_data(db *sql.DB, doc_name string) string {
 				resolution = strconv.Itoa(image_config.Width) + "x" + strconv.Itoa(image_config.Height)
 			}
 		}
-	} else {
-		resolution = "-"
 	}
 
-	media := `<img src="` + image_url + `">`
+	media := ""
+	if is_image {
+		media = `<img src="` + image_url + `">`
+	}
 	if is_audio {
 		media = `<audio controls src="` + image_url + `"></audio>`
 	}
