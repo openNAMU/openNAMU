@@ -13,7 +13,6 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/google/generative-ai-go v0.11.0
 	github.com/json-iterator/go v1.1.12
-	github.com/quasoft/memstore v0.0.0-20191010062613-2bce066d2b0b
 	github.com/sergi/go-diff v1.4.0
 	golang.org/x/crypto v0.55.0
 	golang.org/x/net v0.58.0
@@ -83,6 +82,7 @@ require (
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
+	github.com/quasoft/memstore v0.0.0-20191010062613-2bce066d2b0b // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/quic-go/quic-go v0.59.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
