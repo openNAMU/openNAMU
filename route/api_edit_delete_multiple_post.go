@@ -18,8 +18,7 @@ func Api_edit_delete_multiple_post(config tool.Config, content string, send stri
 	}
 
 	for _, doc_name := range strings.Split(strings.ReplaceAll(content, "\r", ""), "\n") {
-		doc_name = strings.TrimSpace(doc_name)
-		if doc_name == "" {
+		if strings.TrimSpace(doc_name) == "" {
 			continue
 		}
 		result := Api_edit_delete_post(config, doc_name, send, agree)
