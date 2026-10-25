@@ -391,7 +391,13 @@ func Stop_keeper() error {
 func startKeeper_locked() error {
 	db_type := db_set["db_type"]
 	if db_type != "sqlite" && db_type != "turso" {
-		return nil
+		// Keeper-less backends (mysql and unknown types) hold no keeper of
+		// their own, but a keeper armed for a previous backend must still be
+		// released here - otherwise the old sqlite/turso connection survives
+		// a backend switch and keeps the old DB pinned. A release error is
+		// propagated so the caller sees a failed keeper arm instead of a
+		// silently stale connection.
+		return stopKeeper_locked()
 	}
 	path := filepath.Join(db_set["db_name"]+".db")
 	key := db_type + "|" + path
