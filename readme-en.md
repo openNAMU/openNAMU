@@ -110,6 +110,18 @@ To use MySQL, set `data/set.json` as follows and put the connection details in `
 {"user":"username","password":"password","host":"127.0.0.1","port":"3306"}
 ```
 
+To use the Turso engine (local file), set `db_type` to `turso`. The file name is interpreted the same way as SQLite, and `data.db` is opened with the Turso embedded driver without any server or network connection.
+
+```json
+{"db_type":"turso","db":"data"}
+```
+
+Selecting `turso` enables the MVCC journal mode (`journal_mode = mvcc`) by default, which reduces concurrent write conflicts. However, MVCC is still an experimental feature, so back up important wiki data regularly. Limitations:
+
+- After writing data with Turso, you must run a checkpoint before switching `db_type` back to `sqlite`, otherwise the changes are not visible.
+- Do not open the database file with another process (e.g. the sqlite3 CLI) while the server is running.
+- turso cannot be selected on windows/arm64 binaries (no prebuilt library).
+
 Always back up the database and configuration files before migrating an existing installation.
 
 ## Current status
@@ -117,7 +129,7 @@ Always back up the database and configuration files before migrating an existing
 openNAMU is currently in beta.
 
 - Runs as a single Go server.
-- Supports SQLite and MySQL.
+- Supports SQLite, MySQL, and Turso (embedded).
 - The default skins and language data are embedded in the binary.
 - The NamuMark compatibility renderer is still being improved.
 - Edit requests and section editing are currently unavailable.

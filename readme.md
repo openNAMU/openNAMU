@@ -112,6 +112,18 @@ MySQL을 사용하려면 `data/set.json`을 다음처럼 작성하고 `data/mysq
 {"user":"username","password":"password","host":"127.0.0.1","port":"3306"}
 ```
 
+Turso 엔진(로컬 파일)을 사용하려면 `db_type`을 `turso`로 지정합니다. 파일 이름은 SQLite와 같은 방식으로 해석되며, 서버나 네트워크 접속 없이 `data.db`를 Turso 임베디드 드라이버로 엽니다.
+
+```json
+{"db_type":"turso","db":"data"}
+```
+
+`turso`를 선택하면 MVCC 저널 모드(`journal_mode = mvcc`)가 기본 적용되어 동시 쓰기 충돌이 완화됩니다. 단, MVCC는 아직 실험적 기능이므로 중요한 위키 데이터는 정기적으로 백업하세요. 제약 사항은 다음과 같습니다.
+
+- Turso로 데이터를 쓴 뒤 `db_type`을 `sqlite`로 되돌리려면 먼저 체크포인트를 실행해야 변경 사항이 보입니다.
+- 서버 실행 중 데이터베이스 파일을 sqlite3 CLI 등 다른 프로세스로 열지 마세요.
+- windows/arm64 바이너리에서는 turso를 선택할 수 없습니다(기본 제공 라이브러리 미제공).
+
 기존 데이터베이스를 전환하기 전에는 반드시 데이터베이스와 설정 파일을 백업하세요.
 
 ## 현재 상태
@@ -119,7 +131,7 @@ MySQL을 사용하려면 `data/set.json`을 다음처럼 작성하고 `data/mysq
 오픈나무는 현재 beta 단계입니다.
 
 - Go 단일 서버로 실행합니다.
-- SQLite와 MySQL을 지원합니다.
+- SQLite, MySQL, Turso(임베디드)를 지원합니다.
 - 기본 스킨과 언어 데이터는 바이너리에 포함됩니다.
 
 ## 기여

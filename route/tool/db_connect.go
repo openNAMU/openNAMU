@@ -1,19 +1,36 @@
 package tool
 
 import (
+	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	sqlite "modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
+	_ "turso.tech/database/tursogo"
 )
 
 var db_set = map[string]string{}
+
+// keeper* holds one long-lived physical SQLite connection ("anchor") so per-request
+// DB_connect()/DB_close() cycles never close the *last* connection, which triggers
+// the WAL+shm cleanup that yields SQLITE_BUSY during a concurrent open. It holds no
+// transaction, cursor, or lock (idle connection only); SQLite-only; path-keyed so it
+// re-binds when the DB path changes instead of pinning every temp DB.
+var (
+	keeperMutex sync.Mutex
+	keeperDB    *sql.DB
+	keeperConn  *sql.Conn
+	keeperPath  string
+)
 
 // SQLite busy-retry bounds. A bounded, finite retry replaces the previous
 // unbounded retry loop so a permanently locked database surfaces instead of
@@ -278,6 +295,22 @@ func DB_connect_init() (*sql.DB, error) {
 		}
 
 		return db, nil
+	} else if db_set["db_type"] == "turso" {
+		if !Turso_platform_supported() {
+			return nil, fmt.Errorf("turso is not supported on %s/%s; use sqlite or mysql db_type", runtime.GOOS, runtime.GOARCH)
+		}
+
+		db, err := sql.Open("turso", filepath.Join(db_set["db_name"]+".db"))
+		if err != nil {
+			return nil, err
+		}
+
+		if err := db.Ping(); err != nil {
+			db.Close()
+			return nil, err
+		}
+
+		return db, nil
 	} else {
 		db, err := sql.Open("mysql", db_set["db_mysql_user"]+":"+db_set["db_mysql_pw"]+"@tcp("+db_set["db_mysql_host"]+":"+db_set["db_mysql_port"]+")/")
 		if err != nil {
@@ -303,6 +336,17 @@ func DB_connect() *sql.DB {
 		}
 
 		return db
+	} else if db_set["db_type"] == "turso" {
+		if !Turso_platform_supported() {
+			panic(fmt.Errorf("turso is not supported on %s/%s; use sqlite or mysql db_type", runtime.GOOS, runtime.GOARCH))
+		}
+
+		db, err := sql.Open("turso", filepath.Join(db_set["db_name"]+".db"))
+		if err != nil {
+			panic(err)
+		}
+
+		return db
 	} else {
 		db, err := sql.Open("mysql", db_set["db_mysql_user"]+":"+db_set["db_mysql_pw"]+"@tcp("+db_set["db_mysql_host"]+":"+db_set["db_mysql_port"]+")/"+db_set["db_name"])
 		if err != nil {
@@ -313,10 +357,72 @@ func DB_connect() *sql.DB {
 	}
 }
 
+// Turso_platform_supported reports whether the turso driver can run on this
+// platform. The tursogo driver loads its native library lazily on first open,
+// but windows/arm64 has no precompiled library at all, so turso db_type is
+// rejected up front there instead of failing with a driver-internal error.
+func Turso_platform_supported() bool {
+	return runtime.GOOS != "windows" || runtime.GOARCH != "arm64"
+}
+
 func DB_close(db *sql.DB) {
 	db.Close()
 
 	// log.Default().Println("DB close")
+}
+
+func Start_keeper() error {
+	keeperMutex.Lock()
+	defer keeperMutex.Unlock()
+	return startKeeper_locked()
+}
+
+func Stop_keeper() error {
+	keeperMutex.Lock()
+	defer keeperMutex.Unlock()
+	return stopKeeper_locked()
+}
+
+func startKeeper_locked() error {
+	if db_set["db_type"] != "sqlite" {
+		return nil
+	}
+	path := filepath.Join(db_set["db_name"]+".db")
+	if keeperDB != nil && keeperConn != nil && keeperPath == path {
+		return nil
+	}
+	stopKeeper_locked()
+	dsn := filepath.Join(db_set["db_name"]+".db") + "?_pragma=journal_mode(WAL)&_pragma=busy_timeout=5000"
+	db, err := sql.Open("sqlite", dsn)
+	if err != nil {
+		return fmt.Errorf("keeper open: %w", err)
+	}
+	conn, cerr := db.Conn(context.Background())
+	if cerr != nil {
+		db.Close()
+		return fmt.Errorf("keeper conn: %w", cerr)
+	}
+	var one string
+	if serr := db.QueryRow("select 1").Scan(&one); serr != nil {
+		conn.Close()
+		db.Close()
+		return fmt.Errorf("keeper ping: %w", serr)
+	}
+	keeperDB, keeperConn, keeperPath = db, conn, path
+	return nil
+}
+
+func stopKeeper_locked() error {
+	if keeperConn != nil {
+		_ = keeperConn.Close()
+	}
+	var err error
+	if keeperDB != nil {
+		err = keeperDB.Close()
+	}
+	keeperDB, keeperConn = nil, nil
+	keeperPath = ""
+	return err
 }
 
 func Set_db_version(version string) {

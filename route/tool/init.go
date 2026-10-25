@@ -182,6 +182,11 @@ func DB_create_index(db *sql.DB) {
 func DB_make(db *sql.DB, new_db_set map[string]string) error {
 	if new_db_set["db_type"] == "mysql" {
 		DB_make_MySQL(db, new_db_set)
+	} else if new_db_set["db_type"] == "turso" {
+		Exec_DB(
+			db,
+			`pragma journal_mode = mvcc`,
+		)
 	} else {
 		Exec_DB(
 			db,
@@ -269,6 +274,9 @@ func Check_update_version() {
 func Main_init() string {
 	Check_update_version()
 	DB_init()
+	if err := Start_keeper(); err != nil {
+		log.Printf("[DB WARNING] keeper start failed: %v", err)
+	}
 	DB_boot()
 
 	db := DB_connect()

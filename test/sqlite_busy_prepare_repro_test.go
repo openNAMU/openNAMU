@@ -14,6 +14,13 @@ import (
 	"opennamu/route/tool"
 )
 
+// stressEnabled gates the long per-request churn scenarios (A/B/E/timing) so the
+// default suite stays fast; the light A/B regression tests in
+// sqlite_busy_keeper_ab_test.go always run. Set SQLITE_BUSY_STRESS=1 to enable.
+func stressEnabled() bool {
+	return os.Getenv("SQLITE_BUSY_STRESS") == "1"
+}
+
 // setup_busy_env points the real DB path at an isolated temp dir and builds the schema
 // via the production DB_init. Returns the dir and the exact .db file path used by
 // tool.DB_connect (db_set["db_name"]+".db").
@@ -220,22 +227,36 @@ func Test_verify_wal_and_busy_timeout(t *testing.T) {
 	}
 }
 
-// Test_A_read_churn: read-only per-request churn (open/query/close), no writers.
+// Test_A_read_churn: read-only per-request churn A/B (baseline no-keeper vs patched
+// keeper). 16 workers × 2000 iters × 3 repeats = 96000 cycles per side.
 func Test_A_read_churn(t *testing.T) {
-	_, _ = setup_busy_env(t)
-	seed_db := tool.DB_connect()
-	seed_auth(seed_db, t)
-	tool.DB_close(seed_db)
-	runChurn(t, 16, 2000, 0, false)
+	if !stressEnabled() {
+		t.Skip("SQLITE_BUSY_STRESS not set; heavy stress is opt-in")
+	}
+	const workers, iters, repeats = 16, 2000, 3
+	start := time.Now()
+	base, patch := heavyAB(t, workers, iters, repeats, 0, false)
+	logAB(t, "HEAVY read-churn A/B", base, patch)
+	t.Logf("HEAVY read-churn A/B elapsed=%s (%d x %d x %d)", time.Since(start), workers, iters, repeats)
+	if patch.panic != 0 {
+		t.Errorf("patched heavy read-churn panicked: %d", patch.panic)
+	}
 }
 
-// Test_B_read_write_mix: readers + a minority of real writers (per-request).
+// Test_B_read_write_mix: readers + a minority of real writers, A/B (baseline no-keeper
+// vs patched keeper). 16 workers × 2000 iters × 3 repeats, writerShare=2.
 func Test_B_read_write_mix(t *testing.T) {
-	_, _ = setup_busy_env(t)
-	seed_db := tool.DB_connect()
-	seed_auth(seed_db, t)
-	tool.DB_close(seed_db)
-	runChurn(t, 16, 2000, 2, false)
+	if !stressEnabled() {
+		t.Skip("SQLITE_BUSY_STRESS not set; heavy stress is opt-in")
+	}
+	const workers, iters, repeats = 16, 2000, 3
+	start := time.Now()
+	base, patch := heavyAB(t, workers, iters, repeats, 2, false)
+	logAB(t, "HEAVY read-write-mix A/B", base, patch)
+	t.Logf("HEAVY read-write-mix A/B elapsed=%s (%d x %d x %d)", time.Since(start), workers, iters, repeats)
+	if patch.panic != 0 {
+		t.Errorf("patched heavy read-write-mix panicked: %d", patch.panic)
+	}
 }
 
 // Test_C_long_lived_shared: a single shared long-lived pool (all workers share one DB)
@@ -329,14 +350,27 @@ func Test_D_exclusive_lock_prepare(t *testing.T) {
 	t.Logf("D exclusive-lock probe stage=%q err=%q", stage, pErr)
 }
 
-// Test_E_real_auth_path: the real Get_user_auth (QueryRow_DB) through per-request churn,
-// the exact middleware path that produced the production panic.
+// Test_E_real_auth_path: the real Get_user_auth (QueryRow_DB) through per-request
+// churn A/B (baseline no-keeper vs patched keeper) — the exact middleware path that
+// produced the production panic. 16 workers × 2000 iters × 3 repeats.
 func Test_E_real_auth_path(t *testing.T) {
-	_, _ = setup_busy_env(t)
-	seed_db := tool.DB_connect()
-	seed_auth(seed_db, t)
-	tool.DB_close(seed_db)
-	runChurn(t, 16, 2000, 0, true)
+	if !stressEnabled() {
+		t.Skip("SQLITE_BUSY_STRESS not set; heavy stress is opt-in")
+	}
+	const workers, iters, repeats = 16, 2000, 3
+	start := time.Now()
+	base, patch := heavyAB(t, workers, iters, repeats, 0, true)
+	logAB(t, "HEAVY auth-churn A/B", base, patch)
+	t.Logf("HEAVY auth-churn A/B elapsed=%s (%d x %d x %d)", time.Since(start), workers, iters, repeats)
+	if patch.panic != 0 {
+		t.Errorf("patched heavy auth-churn panicked: %d", patch.panic)
+	}
+	if patch.busyPrep != 0 {
+		t.Errorf("patched heavy auth-churn still had busy@prepare=%d (want 0)", patch.busyPrep)
+	}
+	if patch.busyScan != 0 {
+		t.Errorf("patched heavy auth-churn still had busy@scan=%d (want 0)", patch.busyScan)
+	}
 }
 
 // Test_timing_prepare_busy measures how long a busy Prepare actually lasted during churn.
@@ -344,6 +378,9 @@ func Test_E_real_auth_path(t *testing.T) {
 // for ~5s, vs (b) the busy happened before/without the busy_timeout pragma taking effect
 // (sub-millisecond).
 func Test_timing_prepare_busy(t *testing.T) {
+	if !stressEnabled() {
+		t.Skip("SQLITE_BUSY_STRESS not set; heavy stress is opt-in")
+	}
 	_, _ = setup_busy_env(t)
 	seed_db := tool.DB_connect()
 	seed_auth(seed_db, t)

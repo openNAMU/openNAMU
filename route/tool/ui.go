@@ -5,10 +5,17 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/gin-contrib/sessions"
 )
+
+// template_parse_mutex serializes pongo2.FromString calls only: creating a
+// template mutates shared pongo2.DefaultSet state (firstTemplateCreated)
+// without internal synchronization, so concurrent page renders race on it.
+// Template execution (Execute) stays parallel.
+var template_parse_mutex sync.Mutex
 
 func Get_skin_route(skin_name string, route string) string {
 	return filepath.ToSlash(filepath.Join(skin_name, route))
@@ -230,7 +237,9 @@ func Get_template(db *sql.DB, config Config, name string, data string, other []a
 		panic(err)
 	}
 
+	template_parse_mutex.Lock()
 	tpl, err := pongo2.FromString(string(template_data))
+	template_parse_mutex.Unlock()
 	if err != nil {
 		panic(err)
 	}
