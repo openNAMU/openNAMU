@@ -13,7 +13,7 @@ func View_related_documents_html(db *sql.DB, config tool.Config, doc_name string
 
 	title := tool.Get_language(db, "related_document", true)
 
-	html := "<h2>" + title + "</h2><hr class=\"main_hr\"><ul>"
+	html := "<h2>" + title + "</h2><ul>"
 	for _, name := range names {
 		html += `<li><a href="/w/` + tool.Url_parser(name) + `">` + tool.HTML_escape(name) + `</a></li>`
 	}
