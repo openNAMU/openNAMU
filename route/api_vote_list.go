@@ -23,13 +23,13 @@ func Api_vote_list(config tool.Config, set_type string, num_str string) map[stri
 	if set_type == "open" {
 		rows = tool.Query_DB(
 			db,
-			`select name, id, type from vote where type = "open" or type = "n_open" limit ?, 51`,
+			`select name, id, type from vote where type = "open" or type = "n_open" order by id + 0 desc limit ?, 51`,
 			num,
 		)
 	} else {
 		rows = tool.Query_DB(
 			db,
-			`select name, id, type from vote where type = "close" or type = "n_close" limit ?, 51`,
+			`select name, id, type from vote where type = "close" or type = "n_close" order by id + 0 desc limit ?, 51`,
 			num,
 		)
 	}
