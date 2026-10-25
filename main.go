@@ -63,10 +63,7 @@ func Pongo_init() {
 	})
 
 	pongo2.RegisterFilter("load_lang", func(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {
-		db := tool.DB_connect()
-		defer tool.DB_close(db)
-
-		return pongo2.AsValue(tool.Get_language(db, in.String(), false)), nil
+		return pongo2.AsValue(tool.Get_language_shared(in.String(), false)), nil
 	})
 
 	pongo2.RegisterFilter("cut_100", func(in *pongo2.Value, param *pongo2.Value) (*pongo2.Value, *pongo2.Error) {

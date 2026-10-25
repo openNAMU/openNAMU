@@ -20,16 +20,21 @@ import (
 
 var db_set = map[string]string{}
 
-// keeper* holds one long-lived physical SQLite connection ("anchor") so per-request
-// DB_connect()/DB_close() cycles never close the *last* connection, which triggers
-// the WAL+shm cleanup that yields SQLITE_BUSY during a concurrent open. It holds no
-// transaction, cursor, or lock (idle connection only); SQLite-only; path-keyed so it
-// re-binds when the DB path changes instead of pinning every temp DB.
+// keeper* holds one long-lived physical connection ("anchor") so per-request
+// DB_connect()/DB_close() cycles never close the *last* connection:
+//   - SQLite: prevents the WAL+shm cleanup that yields SQLITE_BUSY during a
+//     concurrent open (unchanged behavior);
+//   - Turso (local embedded MVCC): keeps the local DB instance loaded, so the
+//     first request after startup or after an idle period attaches to the
+//     in-process instance instead of paying the full per-connection load.
+// It holds no transaction, cursor, or write lock (idle connection only);
+// keyed by db_type + DB path so it re-binds when either changes instead of
+// pinning every temp DB. MySQL is a no-op by design.
 var (
 	keeperMutex sync.Mutex
 	keeperDB    *sql.DB
 	keeperConn  *sql.Conn
-	keeperPath  string
+	keeperKey   string
 )
 
 // SQLite busy-retry bounds. A bounded, finite retry replaces the previous
@@ -384,31 +389,56 @@ func Stop_keeper() error {
 }
 
 func startKeeper_locked() error {
-	if db_set["db_type"] != "sqlite" {
+	db_type := db_set["db_type"]
+	if db_type != "sqlite" && db_type != "turso" {
 		return nil
 	}
 	path := filepath.Join(db_set["db_name"]+".db")
-	if keeperDB != nil && keeperConn != nil && keeperPath == path {
+	key := db_type + "|" + path
+	if keeperDB != nil && keeperConn != nil && keeperKey == key {
 		return nil
 	}
 	stopKeeper_locked()
-	dsn := filepath.Join(db_set["db_name"]+".db") + "?_pragma=journal_mode(WAL)&_pragma=busy_timeout=5000"
-	db, err := sql.Open("sqlite", dsn)
+
+	ctx := context.Background()
+	var db *sql.DB
+	var err error
+	if db_type == "turso" {
+		if !Turso_platform_supported() {
+			return fmt.Errorf("keeper: turso is not supported on %s/%s", runtime.GOOS, runtime.GOARCH)
+		}
+		db, err = sql.Open("turso", path)
+	} else {
+		dsn := path + "?_pragma=journal_mode(WAL)&_pragma=busy_timeout=5000"
+		db, err = sql.Open("sqlite", dsn)
+	}
 	if err != nil {
 		return fmt.Errorf("keeper open: %w", err)
 	}
-	conn, cerr := db.Conn(context.Background())
+	conn, cerr := db.Conn(ctx)
 	if cerr != nil {
 		db.Close()
 		return fmt.Errorf("keeper conn: %w", cerr)
 	}
+
+	// Warm the HELD connection itself. For turso the first query on this
+	// *sql.Conn physically loads the local DB instance into the process, which
+	// is exactly what the keeper exists to keep alive; a pool-level query
+	// would not prove the held connection works. SQLite keeps its existing
+	// pool-level ping unchanged.
 	var one string
-	if serr := db.QueryRow("select 1").Scan(&one); serr != nil {
+	var serr error
+	if db_type == "turso" {
+		serr = conn.QueryRowContext(ctx, "select 1").Scan(&one)
+	} else {
+		serr = db.QueryRow("select 1").Scan(&one)
+	}
+	if serr != nil {
 		conn.Close()
 		db.Close()
 		return fmt.Errorf("keeper ping: %w", serr)
 	}
-	keeperDB, keeperConn, keeperPath = db, conn, path
+	keeperDB, keeperConn, keeperKey = db, conn, key
 	return nil
 }
 
@@ -421,7 +451,7 @@ func stopKeeper_locked() error {
 		err = keeperDB.Close()
 	}
 	keeperDB, keeperConn = nil, nil
-	keeperPath = ""
+	keeperKey = ""
 	return err
 }
 
