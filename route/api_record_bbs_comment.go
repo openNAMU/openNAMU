@@ -3,6 +3,10 @@ package route
 import "opennamu/route/tool"
 
 func Api_record_bbs_comment(config tool.Config, user_name string, page string) map[string]any {
+	if !Record_bbs_allowed(config, user_name) {
+		return map[string]any{"response": "require auth", "data": [][]string{}}
+	}
+
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -14,7 +18,13 @@ func Api_record_bbs_comment(config tool.Config, user_name string, page string) m
 
 	rows := tool.Query_DB(
 		db,
-		`select case when set_id like '-1-%' then '-1' else substr(set_id, 1, instr(set_id, '-') - 1) end as bbs_id, min(set_id) as set_id from bbs_data where set_name = "comment_user_id" and set_data = ? group by bbs_id order by bbs_id desc limit ?, 50`,
+		`select case when u.set_id like '-1-%' then '-1' else substr(u.set_id, 1, instr(u.set_id, '-') - 1) end as bbs_id, coalesce(max(d.set_data), '') as date
+		 from bbs_data u
+		 left join bbs_data d on d.set_name = 'comment_date' and d.set_id = u.set_id and d.set_code = u.set_code
+		 where u.set_name = 'comment_user_id' and u.set_data = ?
+		 group by bbs_id
+		 order by bbs_id + 0 desc
+		 limit ?, 50`,
 		user_name,
 		num,
 	)
@@ -24,20 +34,12 @@ func Api_record_bbs_comment(config tool.Config, user_name string, page string) m
 
 	for rows.Next() {
 		var bbs_id string
-		var set_id string
+		var date string
 
-		err := rows.Scan(&bbs_id, &set_id)
+		err := rows.Scan(&bbs_id, &date)
 		if err != nil {
 			panic(err)
 		}
-
-		date := ""
-		tool.QueryRow_DB(
-			db,
-			`select set_data from bbs_data where set_name = "comment_date" and set_id = ? order by set_data desc limit 1`,
-			[]any{&date},
-			set_id,
-		)
 
 		data_list = append(data_list, []string{bbs_id, date})
 	}

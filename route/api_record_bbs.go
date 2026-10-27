@@ -3,6 +3,10 @@ package route
 import "opennamu/route/tool"
 
 func Api_record_bbs(config tool.Config, user_name string, page string) map[string]any {
+	if !Record_bbs_allowed(config, user_name) {
+		return map[string]any{"response": "require auth", "data": [][]string{}}
+	}
+
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
@@ -14,7 +18,13 @@ func Api_record_bbs(config tool.Config, user_name string, page string) map[strin
 
 	rows := tool.Query_DB(
 		db,
-		`select distinct set_id from bbs_data where set_name = "user_id" and set_data = ? and (set_id + 0 > 0 or set_id in ('0', '-1')) order by set_id desc limit ?, 50`,
+		`select u.set_id, coalesce(max(d.set_data), '') as date
+		 from bbs_data u
+		 left join bbs_data d on d.set_name = 'date' and d.set_id = u.set_id and d.set_code = u.set_code
+		 where u.set_name = 'user_id' and u.set_data = ? and (u.set_id + 0 > 0 or u.set_id in ('0', '-1'))
+		 group by u.set_id
+		 order by u.set_id + 0 desc
+		 limit ?, 50`,
 		user_name,
 		num,
 	)
@@ -24,19 +34,12 @@ func Api_record_bbs(config tool.Config, user_name string, page string) map[strin
 
 	for rows.Next() {
 		var set_id string
+		var date string
 
-		err := rows.Scan(&set_id)
+		err := rows.Scan(&set_id, &date)
 		if err != nil {
 			panic(err)
 		}
-
-		date := ""
-		tool.QueryRow_DB(
-			db,
-			`select set_data from bbs_data where set_name = "date" and set_id = ? order by set_data desc limit 1`,
-			[]any{&date},
-			set_id,
-		)
 
 		data_list = append(data_list, []string{set_id, date})
 	}

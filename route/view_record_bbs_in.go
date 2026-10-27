@@ -1,6 +1,9 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"strconv"
+	"opennamu/route/tool"
+)
 
 func View_record_bbs_in(config tool.Config, user_name string, set_id string, page string) string {
 	db := tool.DB_connect()
@@ -24,7 +27,15 @@ func View_record_bbs_in(config tool.Config, user_name string, set_id string, pag
 		link := `<a href="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `">` + tool.HTML_escape(title) + `</a>`
 		data_html += tool.Get_list_ui(link, date, "", "")
 	}
-	data_html += tool.Get_page_control(db, tool.Str_to_int(page), len(data_list), 50, "/record_bbs_in/"+tool.Url_parser(set_id)+"/"+tool.Url_parser(user_name)+"/{}")
+	page_int := tool.Str_to_int(page)
+	has_next := false
+	if len(data_list) == 50 {
+		next_api_data := Api_record_bbs_in(config, user_name, set_id, strconv.Itoa(page_int+1))
+		next_response, _ := next_api_data["response"].(string)
+		next_data, _ := next_api_data["data"].([]string)
+		has_next = next_response == "ok" && len(next_data) > 0
+	}
+	data_html += tool.Get_page_control(db, page_int, len(data_list), 50, "/record_bbs_in/"+tool.Url_parser(set_id)+"/"+tool.Url_parser(user_name)+"/{}", has_next)
 
 	return tool.Get_template(
 		db,

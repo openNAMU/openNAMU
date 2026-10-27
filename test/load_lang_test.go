@@ -16,6 +16,7 @@ package test
 import (
 	"database/sql"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -163,10 +164,13 @@ func Test_load_lang_concurrent_render_race(t *testing.T) {
 					mismatches.Add(1)
 					continue
 				}
-				buf := make([]byte, 1<<20)
-				n, _ := resp.Body.Read(buf)
-				body := string(buf[:n])
+				full, ferr := io.ReadAll(resp.Body)
 				resp.Body.Close()
+				if ferr != nil || resp.StatusCode != http.StatusOK {
+					mismatches.Add(1)
+					continue
+				}
+				body := string(full)
 				if !strings.Contains(body, own) {
 					mismatches.Add(1)
 				}
@@ -221,11 +225,9 @@ func Test_load_lang_stress_optin(t *testing.T) {
 					bad.Add(1)
 					continue
 				}
-				buf := make([]byte, 1<<20)
-				n, _ := resp.Body.Read(buf)
-				body := string(buf[:n])
+				full, ferr := io.ReadAll(resp.Body)
 				resp.Body.Close()
-				if !strings.Contains(body, own) || resp.StatusCode != 200 {
+				if ferr != nil || !strings.Contains(string(full), own) || resp.StatusCode != http.StatusOK {
 					bad.Add(1)
 				}
 			}

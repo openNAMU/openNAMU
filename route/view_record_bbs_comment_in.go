@@ -1,6 +1,9 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"strconv"
+	"opennamu/route/tool"
+)
 
 func View_record_bbs_comment_in(config tool.Config, user_name string, set_id string, page string) string {
 	db := tool.DB_connect()
@@ -20,14 +23,27 @@ func View_record_bbs_comment_in(config tool.Config, user_name string, set_id str
 		bbs_id := data[0]
 		post_id := data[1]
 		comment_id := data[2] + "-" + data[3]
+		comment_date := data[4]
+		_, _, comment_code, valid := Bbs_comment_storage_location(data[2], data[3])
 		api_data := Api_bbs_w(config, set_id, post_id)
 		api_data_in, _ := api_data["data"].(map[string]string)
 		title := api_data_in["title"]
-		date := api_data_in["date"]
-		link := `<a href="/bbs/w/` + tool.Url_parser(bbs_id) + `/` + tool.Url_parser(post_id) + `">` + tool.HTML_escape(title) + `</a>`
-		data_html += tool.Get_list_ui(link, date, comment_id, "")
+		anchor := ""
+		if valid {
+			anchor = "#" + tool.Url_parser(comment_code)
+		}
+		link := `<a href="/bbs/w/` + tool.Url_parser(bbs_id) + `/` + tool.Url_parser(post_id) + anchor + `">` + tool.HTML_escape(title) + `</a>`
+		data_html += tool.Get_list_ui(link, comment_date, comment_id, "")
 	}
-	data_html += tool.Get_page_control(db, tool.Str_to_int(page), len(data_list), 50, "/record_bbs_comment_in/"+tool.Url_parser(set_id)+"/"+tool.Url_parser(user_name)+"/{}")
+	page_int := tool.Str_to_int(page)
+	has_next := false
+	if len(data_list) == 50 {
+		next_api_data := Api_record_bbs_comment_in(config, user_name, set_id, strconv.Itoa(page_int+1))
+		next_response, _ := next_api_data["response"].(string)
+		next_data, _ := next_api_data["data"].([][]string)
+		has_next = next_response == "ok" && len(next_data) > 0
+	}
+	data_html += tool.Get_page_control(db, page_int, len(data_list), 50, "/record_bbs_comment_in/"+tool.Url_parser(set_id)+"/"+tool.Url_parser(user_name)+"/{}", has_next)
 
 	return tool.Get_template(
 		db,

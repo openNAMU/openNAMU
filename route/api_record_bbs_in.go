@@ -3,6 +3,10 @@ package route
 import "opennamu/route/tool"
 
 func Api_record_bbs_in(config tool.Config, user_name string, set_id string, page string) map[string]any {
+	if !Record_bbs_allowed(config, user_name) {
+		return map[string]any{"response": "require auth", "data": []string{}}
+	}
+
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 	if Bbs_is_special_board(set_id) && set_id != "0" && set_id != thread_bbs_id {
@@ -19,7 +23,7 @@ func Api_record_bbs_in(config tool.Config, user_name string, set_id string, page
 	if !tool.Check_permission(db, "bbs_post_manage", config.IP) {
 		query += ` and not exists (select 1 from bbs_data blind_data where blind_data.set_name = "blind" and blind_data.set_data = "O" and blind_data.set_id = bbs_data.set_id and blind_data.set_code = bbs_data.set_code)`
 	}
-	query += ` order by set_code desc limit ?, 50`
+	query += ` order by set_code + 0 desc limit ?, 50`
 	rows := tool.Query_DB(
 		db,
 		query,

@@ -167,12 +167,25 @@ func View_list_recent_change(config tool.Config, set_type string, limit string, 
 	if len(api_data_list) == 0 {
 		data_html += tool.Get_language(db, "data_missing", true)
 	}
+	page_int := tool.Str_to_int(num)
+	limit_int := tool.Str_to_int(limit)
+
+	has_next := false
+	if limit_int > 0 {
+		next_api_data := Api_list_recent_change(config, set_type, limit, strconv.Itoa(page_int+1))
+		if next_api_data["response"] == "ok" {
+			next_data_list, _ := next_api_data["data"].([][]string)
+			has_next = len(next_data_list) > 0
+		}
+	}
+
 	data_html += tool.Get_page_control(
 		db,
-		tool.Str_to_int(num),
+		page_int,
 		len(api_data_list),
-		tool.Str_to_int(limit),
+		limit_int,
 		"/recent_change/{}/"+set_type,
+		has_next,
 	)
 
 	out := tool.Get_template(

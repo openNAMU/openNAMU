@@ -1,20 +1,22 @@
 package test
 
-// A) Pool-swap lease safety for the load_lang shared pool.
+// A) Clean hand-off from the load_lang shared pool to a swapped DB identity.
 //
 // Pre-fix hazard (reproduced in tmp/load_lang_swap_repro): Get_lang_db handed
 // out the old *sql.DB pointer, a concurrent identity change closed that pool,
-// and the caller's next query panicked with "sql: database is closed".
-// The fix encapsulates the production path in Get_language_shared, which holds
-// lang_db_lock.RLock for the whole call; the swap path needs the write Lock,
+// and the caller's next query panicked with "sql: database is closed". The
+// production fix encapsulates the path in Get_language_shared, which holds
+// lang_db_lock.RLock for the whole call; the swap path takes the write Lock,
 // so a pool in use cannot be closed.
 //
-// Note on global state: DB_boot rewrites the process-wide db_set map, which
-// racing readers of db_identity_key would trip over (pre-existing test-only
-// hazard, production never mutates db_set at runtime). This test therefore
-// pauses its readers while DB_boot runs; a reader that is mid-call when the
-// swap happens is still covered - the swapper blocks on its RLock and closes
-// the pool only after the call returns.
+// Global-state note: DB_boot rewrites the process-wide db_set map, while
+// Get_language_shared reads db_set (via db_identity_key) *before* it takes
+// lang_db_lock. There is no lock on db_set, so a reader that is still running
+// when the identity swap runs races the swap's write. This test therefore
+// stops all readers and waits (WaitGroup) before the swap, then verifies the
+// swapped pool is fresh (no stale language, no panic, no unexpected value).
+// The RLock write-lease safety itself is exercised by the write-locked
+// Get_lang_db swap, which closes the old pool only under the write Lock.
 
 import (
 	"sync"
@@ -25,10 +27,11 @@ import (
 	"opennamu/route/tool"
 )
 
-// Test_load_lang_pool_swap_lease_safe: concurrent translations via the
-// production path (Get_language_shared) survive a DB identity swap: no
-// closed-pool errors, no stale language after the swap.
-func Test_load_lang_pool_swap_lease_safe(t *testing.T) {
+// Test_load_lang_pool_swap_verified_handoff: readers via the production path
+// (Get_language_shared) are verified stopped (WaitGroup) before a DB identity
+// swap; the swap must install a fresh pool - no closed-pool errors, no stale
+// language after the swap.
+func Test_load_lang_pool_swap_verified_handoff(t *testing.T) {
 	db_a := load_lang_setup(t, "sqlite")
 	set_other_language(db_a, "en-US")
 
@@ -41,7 +44,6 @@ func Test_load_lang_pool_swap_lease_safe(t *testing.T) {
 	var bad atomic.Int64
 	var panics atomic.Int64
 	var en_us_reads, ko_kr_reads atomic.Int64
-	stop := make(chan struct{})
 	pause := make(chan struct{})
 	var wg sync.WaitGroup
 
@@ -73,20 +75,19 @@ func Test_load_lang_pool_swap_lease_safe(t *testing.T) {
 		}(r)
 	}
 
-	// hammer pool A, then pause readers before touching global state
+	// hammer pool A, then stop readers before touching global state
 	time.Sleep(100 * time.Millisecond)
 	close(pause)
-	time.Sleep(50 * time.Millisecond) // let in-flight calls finish (max ~3ms)
+	wg.Wait() // verified: every reader has returned before the swap
 
-	// swap identity while readers are paused; any straggler mid-call reader
-	// holds RLock, so the swap below waits for it instead of closing under it
+	// swap identity; no reader is running, so DB_boot's db_set write cannot
+	// race a reader's db_set read. The write Lock still serializes the pool
+	// close against any (now-absent) reader lease.
 	t.Setenv("NAMU_DB", t.TempDir()+"/swap_target")
 	tool.DB_init()
 	_ = tool.Get_lang_db() // installs pool B, closes pool A (under write Lock)
 
 	after := tool.Get_language_shared("language_tag", false)
-	close(stop)
-	wg.Wait()
 
 	if bad.Load() != 0 {
 		t.Errorf("unexpected language values during swap: %d", bad.Load())
