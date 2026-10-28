@@ -31,7 +31,43 @@ func Api_bbs_watch_post(config tool.Config, set_id string, set_code string) map[
 		return map[string]any{"response": "require auth"}
 	}
 
-	return Api_w_watch_list_post(config, Bbs_watch_key(set_id, set_code), "bbs_watchlist")
+	key := Bbs_watch_key(set_id, set_code)
+	if set_id != thread_bbs_id {
+		return Api_w_watch_list_post(config, key, "bbs_watchlist")
+	}
+
+	err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		var bbs_count, thread_raw_count, thread_key_count int
+		if err := tx.QueryRow("select count(*) from user_set where name = 'bbs_watchlist' and id = ? and data = ?", config.IP, key).Scan(&bbs_count); err != nil {
+			return err
+		}
+		if err := tx.QueryRow("select count(*) from user_set where name = 'thread_watchlist' and id = ? and data = ?", config.IP, set_code).Scan(&thread_raw_count); err != nil {
+			return err
+		}
+		if err := tx.QueryRow("select count(*) from user_set where name = 'thread_watchlist' and id = ? and data = ?", config.IP, key).Scan(&thread_key_count); err != nil {
+			return err
+		}
+
+		watched := bbs_count > 0 || thread_raw_count > 0 || thread_key_count > 0
+		if watched {
+			if _, err := tx.Exec(tool.DB_change("delete from user_set where name = ? and id = ? and data = ?"), "bbs_watchlist", config.IP, key); err != nil {
+				return err
+			}
+			if _, err := tx.Exec(tool.DB_change("delete from user_set where name = ? and id = ? and (data = ? or data = ?)"), "thread_watchlist", config.IP, set_code, key); err != nil {
+				return err
+			}
+			return nil
+		}
+
+		if _, err := tx.Exec(tool.DB_change("insert into user_set (id, name, data) values (?, ?, ?)"), config.IP, "bbs_watchlist", key); err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	return map[string]any{"response": "ok"}
 }
 
 func Bbs_watch_notify(db *sql.DB, config tool.Config, set_id string, set_code string, comment_code string, bbs_name string, title string, post_user string, parent_user string) {
@@ -42,10 +78,12 @@ func Bbs_watch_notify(db *sql.DB, config tool.Config, set_id string, set_code st
 	}
 	sent := map[string]bool{}
 
+	key := Bbs_watch_key(set_id, set_code)
+
 	rows := tool.Query_DB(
 		db,
 		"select id from user_set where name = 'bbs_watchlist' and data = ?",
-		Bbs_watch_key(set_id, set_code),
+		key,
 	)
 	defer rows.Close()
 
@@ -56,5 +94,24 @@ func Bbs_watch_notify(db *sql.DB, config tool.Config, set_id string, set_code st
 		}
 		sent[target] = true
 		tool.Send_alarm(db, config.IP, target, alarm)
+	}
+
+	if set_id == thread_bbs_id {
+		thread_rows := tool.Query_DB(
+			db,
+			"select id from user_set where name = 'thread_watchlist' and (data = ? or data = ?)",
+			set_code,
+			key,
+		)
+		defer thread_rows.Close()
+
+		for thread_rows.Next() {
+			target := ""
+			if thread_rows.Scan(&target) != nil || target == "" || skip[target] || sent[target] {
+				continue
+			}
+			sent[target] = true
+			tool.Send_alarm(db, config.IP, target, alarm)
+		}
 	}
 }

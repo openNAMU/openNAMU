@@ -209,7 +209,7 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 	tool.Search_bbs_index_update_comment(db, set_id, set_code, end_code)
 	alarm := "BBS <a href=\"/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "#" + tool.Url_parser(end_code) + "\">" + tool.HTML_escape(bbs_name) + " - " + tool.HTML_escape(title) + "#" + tool.HTML_escape(end_code) + "</a>"
 	tool.Send_alarm(db, config.IP, post_user, alarm)
-	if parent_user != "" {
+	if parent_user != "" && parent_user != post_user {
 		tool.Send_alarm(db, config.IP, parent_user, alarm)
 	}
 	Bbs_watch_notify(db, config, set_id, set_code, end_code, bbs_name, title, post_user, parent_user)

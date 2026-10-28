@@ -26,15 +26,17 @@ func User_watch_list_items(db *sql.DB, data_list []string, do_type string) []Use
 			item.Date = tool.Get_history_date(db, data)
 		} else if do_type == "bbs_watchlist" {
 			if strings.HasPrefix(data, "-1-") {
-				item.Set_id = "-1"
+				item.Set_id = thread_bbs_id
 				item.Set_code = strings.TrimPrefix(data, "-1-")
 			} else {
 				watch_data := strings.SplitN(data, "-", 2)
-				if len(watch_data) != 2 {
-					continue
+				if len(watch_data) == 1 {
+					item.Set_id = thread_bbs_id
+					item.Set_code = watch_data[0]
+				} else {
+					item.Set_id = watch_data[0]
+					item.Set_code = watch_data[1]
 				}
-				item.Set_id = watch_data[0]
-				item.Set_code = watch_data[1]
 			}
 
 			post_title, _ := tool.Get_bbs_data_value(db, item.Set_id, item.Set_code, "title")
@@ -51,6 +53,45 @@ func User_watch_list_items(db *sql.DB, data_list []string, do_type string) []Use
 	}
 
 	return item_list
+}
+
+func Bbs_watch_merged_data(db *sql.DB, name string) []string {
+	bbs_rows := []string{}
+	rows := tool.Query_DB(db, "select data from user_set where name = ? and id = ?", "bbs_watchlist", name)
+	for rows.Next() {
+		watch_data := ""
+		if rows.Scan(&watch_data) != nil {
+			continue
+		}
+		bbs_rows = append(bbs_rows, watch_data)
+	}
+	rows.Close()
+
+	thread_rows := []string{}
+	rows = tool.Query_DB(db, "select data from user_set where name = ? and id = ?", "thread_watchlist", name)
+	for rows.Next() {
+		watch_data := ""
+		if rows.Scan(&watch_data) != nil {
+			continue
+		}
+		thread_rows = append(thread_rows, watch_data)
+	}
+	rows.Close()
+
+	seen := map[string]bool{}
+	data_list := []string{}
+	for _, watch_data := range append(bbs_rows, thread_rows...) {
+		key := watch_data
+		if strings.HasPrefix(watch_data, "-1-") {
+			key = strings.TrimPrefix(watch_data, "-1-")
+		}
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		data_list = append(data_list, key)
+	}
+	return data_list
 }
 
 func Api_user_watch_list(config tool.Config, name string, num_str string, do_type string) map[string]any {
@@ -104,6 +145,20 @@ func Api_user_watch_list(config tool.Config, name string, num_str string, do_typ
 				}
 				rows.Close()
 			}
+			start := num
+			if start > len(data_list) {
+				start = len(data_list)
+			}
+			end := start + 50
+			if end > len(data_list) {
+				end = len(data_list)
+			}
+			return_data["response"] = "ok"
+			return_data["data"] = User_watch_list_items(db, data_list[start:end], do_type)
+			return return_data
+		}
+		if do_type == "bbs_watchlist" {
+			data_list := Bbs_watch_merged_data(db, name)
 			start := num
 			if start > len(data_list) {
 				start = len(data_list)
