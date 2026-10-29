@@ -26,6 +26,26 @@ Download the binary for your operating system and architecture from the [Release
 ./main.amd64.bin
 ```
 
+### Alpine Linux
+
+The prebuilt Linux binaries require glibc-compatible runtime libraries. Alpine Linux uses musl libc, so additional compatibility packages are required.
+
+For SQLite:
+
+```sh
+apk add --no-cache gcompat
+```
+
+For Turso:
+
+```sh
+apk add --no-cache gcompat libgcc
+```
+
+After installing the required packages, run the standard Linux binary normally.
+
+These instructions were verified on Alpine Linux 3.19 (amd64). Other Alpine versions and arm64 have not yet been verified.
+
 ### Windows
 
 ```powershell

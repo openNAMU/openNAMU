@@ -28,6 +28,26 @@
 ./main.amd64.bin
 ```
 
+### Alpine Linux
+
+정제된 Linux 바이너리는 glibc 호환 런타임 라이브러리가 필요합니다. Alpine Linux는 musl libc를 사용하므로 추가 호환 패키지가 필요합니다.
+
+SQLite는:
+
+```sh
+apk add --no-cache gcompat
+```
+
+Turso는:
+
+```sh
+apk add --no-cache gcompat libgcc
+```
+
+필요한 패키지를 설치한 후 표준 Linux 바이너리를 보통 그대로 실행하면 됩니다.
+
+이 지침은 Alpine Linux 3.19(amd64)에서 확인되었습니다. 다른 Alpine 버전과 arm64는 아직 확인되지 않았습니다.
+
 ### Windows
 
 ```powershell
