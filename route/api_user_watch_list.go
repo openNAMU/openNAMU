@@ -2,6 +2,7 @@ package route
 
 import (
 	"database/sql"
+	"sort"
 	"strings"
 
 	"opennamu/route/tool"
@@ -55,6 +56,13 @@ func User_watch_list_items(db *sql.DB, data_list []string, do_type string) []Use
 	return item_list
 }
 
+func watch_key(watch_data string) string {
+	if strings.HasPrefix(watch_data, "-1-") {
+		return strings.TrimPrefix(watch_data, "-1-")
+	}
+	return watch_data
+}
+
 func Bbs_watch_merged_data(db *sql.DB, name string) []string {
 	bbs_rows := []string{}
 	rows := tool.Query_DB(db, "select data from user_set where name = ? and id = ?", "bbs_watchlist", name)
@@ -79,19 +87,52 @@ func Bbs_watch_merged_data(db *sql.DB, name string) []string {
 	rows.Close()
 
 	seen := map[string]bool{}
-	data_list := []string{}
-	for _, watch_data := range append(bbs_rows, thread_rows...) {
-		key := watch_data
-		if strings.HasPrefix(watch_data, "-1-") {
-			key = strings.TrimPrefix(watch_data, "-1-")
-		}
+	bbs_keys := []string{}
+	thread_keys := []string{}
+
+	for _, watch_data := range bbs_rows {
+		key := watch_key(watch_data)
 		if seen[key] {
 			continue
 		}
 		seen[key] = true
-		data_list = append(data_list, key)
+		bbs_keys = append(bbs_keys, key)
 	}
+
+	for _, watch_data := range thread_rows {
+		key := watch_key(watch_data)
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		thread_keys = append(thread_keys, key)
+	}
+
+	sort.Strings(bbs_keys)
+	sort.Strings(thread_keys)
+
+	data_list := []string{}
+	data_list = append(data_list, bbs_keys...)
+	data_list = append(data_list, thread_keys...)
 	return data_list
+}
+
+func bbs_watch_merged_count(db *sql.DB, name string) int {
+	count := 0
+	query := `
+		select count(distinct merge_key)
+		from (
+			select case when coalesce(data, '') like '-1-%' then substr(coalesce(data, ''), 4) else coalesce(data, '') end as merge_key
+			from user_set
+			where name = 'bbs_watchlist' and id = ?
+			union
+			select case when coalesce(data, '') like '-1-%' then substr(coalesce(data, ''), 4) else coalesce(data, '') end as merge_key
+			from user_set
+			where name = 'thread_watchlist' and id = ?
+		) as merged
+	`
+	tool.QueryRow_DB(db, query, []any{&count}, name, name)
+	return count
 }
 
 func Api_user_watch_list(config tool.Config, name string, num_str string, do_type string) map[string]any {

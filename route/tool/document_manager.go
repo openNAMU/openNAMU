@@ -274,8 +274,8 @@ func Do_watchlist_alarm_send(db *sql.DB, config Config, doc_name string) {
 
 		Send_alarm(
 			db,
-			id,
 			config.IP,
+			id,
 			`<a href="/w/`+Url_parser(doc_name)+`">`+HTML_escape(doc_name)+`</a>`,
 		)
 	}

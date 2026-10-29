@@ -84,6 +84,17 @@ func Get_user_set_exists(db *sql.DB, id string, name string) bool {
 	)
 }
 
+func Get_user_notice_count(db *sql.DB, id string) string {
+	count := "0"
+	QueryRow_DB(
+		db,
+		"select count(*) from user_notice where name = ?",
+		[]any{&count},
+		id,
+	)
+	return count
+}
+
 func Get_user_notice_unread_count(db *sql.DB, id string) string {
 	count := "0"
 	QueryRow_DB(
@@ -476,7 +487,7 @@ func Get_application_rows(db *sql.DB) *sql.Rows {
 func Get_user_notice_rows(db *sql.DB, name string, offset int) *sql.Rows {
 	return Query_DB(
 		db,
-		"select id, data, date, readme from user_notice where name = ? order by date desc limit ?, 50",
+		"select id, data, date, readme from user_notice where name = ? order by date desc, id + 0 desc, data desc, readme desc limit ?, 50",
 		name,
 		offset,
 	)

@@ -56,7 +56,18 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 	} else if do_type == "bbs_watchlist" {
 		page_url = "/bbs_watch_list_page/{}"
 	}
-	data_html += tool.Get_page_control(db, tool.Str_to_int(num), len(data_list), 50, page_url)
+
+	if do_type == "bbs_watchlist" && len(data_list) == 50 {
+		page := tool.Str_to_int(num)
+		if page < 1 {
+			page = 1
+		}
+		total_count := bbs_watch_merged_count(db, config.IP)
+		has_next := page*50 < total_count
+		data_html += tool.Get_page_control(db, page, len(data_list), 50, page_url, has_next)
+	} else {
+		data_html += tool.Get_page_control(db, tool.Str_to_int(num), len(data_list), 50, page_url)
+	}
 
 	manager_url := "/manager/16"
 	if do_type == "watchlist" {

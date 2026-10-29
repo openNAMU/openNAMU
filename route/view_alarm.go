@@ -43,6 +43,9 @@ func View_alarm(config tool.Config, user_name string, values url.Values) string 
 		}
 	}
 	offset := (page - 1) * 50
+	total_count := tool.Str_to_int(tool.Get_user_notice_count(db, user_name))
+	has_next := page*50 < total_count
+
 	rows := tool.Get_user_notice_rows(db, user_name, offset)
 	body := `<ul>`
 	row_count := 0
@@ -79,6 +82,6 @@ func View_alarm(config tool.Config, user_name string, values url.Values) string 
 	if user_name != config.IP {
 		page_url = "/alarm_user/" + tool.Url_parser(user_name) + "/page/{}"
 	}
-	body += tool.Get_page_control(db, page, row_count, 50, page_url)
+	body += tool.Get_page_control(db, page, row_count, 50, page_url, has_next)
 	return User_form_page(db, config, tool.Get_language(db, "alarm", true), body)
 }

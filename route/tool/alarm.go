@@ -2,7 +2,10 @@ package tool
 
 import (
 	"database/sql"
+	"sync"
 )
+
+var notice_id_mutex sync.Mutex
 
 func Send_alarm(db DB_runner, from string, target string, data string) {
 	if sql_db, ok := db.(*sql.DB); ok {
@@ -19,6 +22,14 @@ func Send_alarm(db DB_runner, from string, target string, data string) {
 		data = from + " | " + data
 
 		now_time := Get_time()
+
+		notice_id_mutex.Lock()
+		defer notice_id_mutex.Unlock()
+
+		Exec_DB(
+			db,
+			"update other set data = data where name = 'ver'",
+		)
 
 		count := "1"
 		QueryRow_DB(
