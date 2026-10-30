@@ -12,9 +12,8 @@ import (
 )
 
 // Test_measure_checkpoint: 4W+4R keeper-on, per-request churn, plus a background
-// goroutine that periodically runs `PRAGMA checkpoint`. This isolates whether an
-// explicit checkpoint while readers/writers run produces the residual SQLITE_BUSY
-// (5/261) panics.
+// goroutine that periodically runs `PRAGMA wal_checkpoint(PASSIVE)`. This isolates
+// whether an explicit WAL checkpoint while readers/writers run produces SQLITE_BUSY.
 func Test_measure_checkpoint(t *testing.T) {
 	_, dbFile := setup_busy_env(t)
 	seedDB := tool.DB_connect()
@@ -28,15 +27,31 @@ func Test_measure_checkpoint(t *testing.T) {
 		t.Fatalf("ensureWAL: %v", err)
 	}
 
-	stopC := make(chan struct{})
+	stop_checkpoint := make(chan struct{})
+	checkpoint_done := make(chan struct{})
+	var checkpoint_calls, checkpoint_busy, checkpoint_errors, checkpointed_frames int64
 	go func() {
-		defer close(stopC)
+		defer close(checkpoint_done)
 		ckDB := openWithDSN(dbFile, false)
 		defer ckDB.Close()
 		ticker := time.NewTicker(25 * time.Millisecond)
 		defer ticker.Stop()
-		for range ticker.C {
-			_, _ = ckDB.Exec("PRAGMA checkpoint")
+		for {
+			select {
+			case <-stop_checkpoint:
+				return
+			case <-ticker.C:
+				var busy, log_frames, checkpointed int64
+				if err := ckDB.QueryRow(`PRAGMA wal_checkpoint(PASSIVE)`).Scan(&busy, &log_frames, &checkpointed); err != nil {
+					atomic.AddInt64(&checkpoint_errors, 1)
+					continue
+				}
+				atomic.AddInt64(&checkpoint_calls, 1)
+				if busy != 0 {
+					atomic.AddInt64(&checkpoint_busy, 1)
+				}
+				atomic.AddInt64(&checkpointed_frames, checkpointed)
+			}
 		}
 	}()
 
@@ -86,6 +101,11 @@ func Test_measure_checkpoint(t *testing.T) {
 		}(i)
 	}
 	wg.Wait()
-	close(stopC)
-	t.Logf("[checkpoint] panics=%d writer_errors=%d", panicC, errC)
+	close(stop_checkpoint)
+	<-checkpoint_done
+	t.Logf("[checkpoint] calls=%d busy_results=%d errors=%d checkpointed_frames=%d panics=%d writer_errors=%d",
+		checkpoint_calls, checkpoint_busy, checkpoint_errors, checkpointed_frames, panicC, errC)
+	if checkpoint_calls == 0 {
+		t.Fatal("checkpoint worker did not execute a WAL checkpoint")
+	}
 }

@@ -125,6 +125,7 @@ func main() {
 		tool.Set_db_version(db_version)
 	}
 	tool.Search_bbs_index_start()
+	tool.Start_auto_backup_and_maintenance()
 
 	r.Use(Error_handler())
 	r.Use(tool.Session_middleware())

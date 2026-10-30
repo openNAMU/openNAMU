@@ -22,17 +22,17 @@ import (
 // Isolation: each test builds an isolated temp DB (via setup_busy_env or manual
 // NAMU_DB). No t.Parallel() (global keeper/env/db_set state). No operational DB.
 
-// startKeeperSafe runs Start_keeper and defers Stop_keeper, panicking on start
-// failure (unless a specific test expects failure).
+// startKeeperSafe starts the keeper for the test lifetime and stops it during cleanup.
 func startKeeperSafe(t *testing.T) {
+	t.Helper()
 	if err := tool.Start_keeper(); err != nil {
 		t.Fatalf("keeper start: %v", err)
 	}
-	defer func() {
+	t.Cleanup(func() {
 		if err := tool.Stop_keeper(); err != nil {
 			t.Errorf("keeper stop: %v", err)
 		}
-	}()
+	})
 }
 
 // queryOne runs a single-column query on a *sql.Conn (the pinned physical
@@ -87,10 +87,10 @@ func Test_keeper_phys_conn_held(t *testing.T) {
 	_ = queryOne(t, conn, "select 2")
 	conn.Close()
 	stats = db.Stats()
-		if stats.OpenConnections > beforeOpen {
-			t.Logf("after Close, OpenConnections=%d (idle transient conns may remain; bounded, not a leak)",
-				stats.OpenConnections)
-		}
+	if stats.OpenConnections > beforeOpen {
+		t.Logf("after Close, OpenConnections=%d (idle transient conns may remain; bounded, not a leak)",
+			stats.OpenConnections)
+	}
 }
 
 // Test_keeper_lifecycle_integrity: scenario B + integrity. Repeated per-request

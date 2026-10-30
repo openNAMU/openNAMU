@@ -28,10 +28,10 @@ type measureConfig struct {
 	writers       int
 	readers       int
 	iters         int
-	churn         bool  // true=per-iteration DB (prod-like); false=per-worker pool
-	journal       bool  // true=per-conn _pragma=journal_mode(WAL); false=C2 (busy_timeout only)
-	serviceWriter bool  // true=model service write APIs: panic(err) on DB_transaction error
-	growWAL       bool  // write a batch of rows before the loop to grow the WAL
+	churn         bool // true=per-iteration DB (prod-like); false=per-worker pool
+	journal       bool // true=per-conn _pragma=journal_mode(WAL); false=C2 (busy_timeout only)
+	serviceWriter bool // true=model service write APIs: panic(err) on DB_transaction error
+	growWAL       bool // write a batch of rows before the loop to grow the WAL
 	stress        bool
 }
 
@@ -303,7 +303,7 @@ func runMeasure(t *testing.T, o measureConfig) string {
 							Elapsed: time.Since(start).String(), Phase: ph, Code: code,
 							CodeAnd: code & 0xff, Err: s, IsPanic: false,
 							SQLLabel: fmt.Sprintf("insert data lw-%d-%d", wid, iter),
-							Fn: ffn, File: ffile, Line: fl, Stack: stk,
+							Fn:       ffn, File: ffile, Line: fl, Stack: stk,
 							WALBytes: walB, WALPage: walP, WALAutochk: walA,
 							OpenConns: oc, InUse: iu, Idle: id, WaitCount: wc,
 						})
@@ -528,9 +528,9 @@ func gated() bool {
 // + busy_timeout=5000) or the experimental DSN (busy_timeout=5000 only, WAL
 // pre-initialized by ensureWAL).
 func openWithDSN(dbFile string, journal bool) *sql.DB {
-	dsn := "sqlite:" + dbFile + "?_pragma=busy_timeout=5000"
+	dsn := dbFile + "?_pragma=busy_timeout=5000"
 	if journal {
-		dsn = "sqlite:" + dbFile + "?_pragma=journal_mode(WAL)&_pragma=busy_timeout=5000"
+		dsn = dbFile + "?_pragma=journal_mode(WAL)&_pragma=busy_timeout=5000"
 	}
 	db, err := sql.Open("sqlite", dsn)
 	if err != nil {

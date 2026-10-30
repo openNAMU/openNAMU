@@ -102,6 +102,42 @@ func Auth_end_active(end string) bool {
 	return now_time.Before(end_time)
 }
 
+func Auth_permission_end_active(end string) bool {
+	if end == "" || end == "0" {
+		return true
+	}
+
+	if _, err := time.Parse("2006-01-02 15:04:05", end); err != nil {
+		if _, err := time.Parse("2006-01-02", end); err != nil {
+			return false
+		}
+	}
+
+	return Auth_end_active(end)
+}
+
+func Auth_group_end_active(auth string, end string) bool {
+	if Auth_group_name_ban(auth) {
+		return Auth_end_active(end)
+	}
+
+	return Auth_permission_end_active(end)
+}
+
+func Auth_legacy_date_active(end string) bool {
+	date_part := strings.SplitN(end, " ", 2)[0]
+	end_date, end_err := time.Parse("2006-01-02", date_part)
+	if end_err != nil {
+		return false
+	}
+	today, today_err := time.Parse("2006-01-02", time.Now().Format("2006-01-02"))
+	if today_err != nil {
+		return false
+	}
+
+	return !end_date.Before(today)
+}
+
 func Get_auth_default_end_date() string {
 	return time.Now().AddDate(100, 0, 0).Format("2006-01-02 15:04:05")
 }
@@ -109,14 +145,20 @@ func Get_auth_default_end_date() string {
 func Get_user_auth_raw(db *sql.DB, ip string) string {
 	auth := "ip"
 	acl_end := ""
+	acl_end_exists := 0
+	auth_date := ""
+	auth_date_exists := 0
 	exist := QueryRow_DB(
 		db,
-		"select user_set.data, coalesce(acl_end.data, '') from user_set inner join alist on alist.name = user_set.data left join user_set as acl_end on acl_end.id = user_set.id and acl_end.name = 'acl_end' where user_set.id = ? and user_set.name = 'acl' limit 1",
-		[]any{&auth, &acl_end},
+		"select user_set.data, coalesce(acl_end.data, ''), case when acl_end.id is null then 0 else 1 end, coalesce(auth_date.data, ''), case when auth_date.id is null then 0 else 1 end from user_set inner join alist on alist.name = user_set.data left join user_set as acl_end on acl_end.id = user_set.id and acl_end.name = 'acl_end' left join user_set as auth_date on auth_date.id = user_set.id and auth_date.name = 'auth_date' where user_set.id = ? and user_set.name = 'acl' limit 1",
+		[]any{&auth, &acl_end, &acl_end_exists, &auth_date, &auth_date_exists},
 		ip,
 	)
 
-	if exist && !Auth_end_active(acl_end) {
+	if exist && !Auth_group_end_active(auth, acl_end) {
+		exist = false
+	}
+	if exist && !Auth_group_name_ban(auth) && auth_date_exists != 0 && !Auth_legacy_date_active(auth_date) && acl_end_exists == 0 {
 		exist = false
 	}
 
