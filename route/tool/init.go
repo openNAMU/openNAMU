@@ -302,6 +302,7 @@ func Main_init() string {
 
 	Always_init(db, last_version["c_ver"])
 	Get_ip_select(db)
+	Get_trusted_proxies(db)
 	Search_index_start()
 	return now_version
 }

@@ -264,6 +264,13 @@ func Get_pattern_auth_group(db *sql.DB, ip string) string {
 }
 
 func Get_user_auth(db *sql.DB, ip string) string {
+	// Fail closed: the invalid-connection sentinel (returned by Get_IP when the
+	// immediate TCP peer cannot be parsed) must never be reinterpreted as a
+	// real account group. Returning it lets Get_auth_group_info resolve it to an
+	// unknown (privilege-less) group instead of the default "user".
+	if ip == Invalid_remote_address {
+		return ip
+	}
 	auth := Get_user_auth_raw(db, ip)
 	if Auth_group_name_ban(auth) {
 		return auth
@@ -575,6 +582,12 @@ func Get_rankup_auth_info(db *sql.DB, ip string) map[string]bool {
 }
 
 func Get_auth_info(db *sql.DB, ip string) map[string]bool {
+	// Fail closed: an invalid connection identity must receive no user, IP,
+	// admin, or document privilege. Return an explicit no-privilege set so the
+	// site-view gate and every permission/ACL check deny it unambiguously.
+	if ip == Invalid_remote_address {
+		return map[string]bool{"nothing": true}
+	}
 	auth_name := Get_user_auth(db, ip)
 	auth_info := Get_auth_group_info(db, auth_name)
 	if Auth_group_name_ban(auth_name) {

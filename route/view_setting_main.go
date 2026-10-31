@@ -178,6 +178,7 @@ func Setting_main_fields() []setting_field {
 		{name: "auth_history_off", default_value: ""},
 		{name: "user_name_level", default_value: ""},
 		{name: "load_ip_select", default_value: ""},
+		{name: "trusted_proxies", default_value: ""},
 		{name: "not_use_view_count", default_value: ""},
 	}
 }
@@ -239,6 +240,17 @@ func View_setting_main_data(db *sql.DB, config tool.Config, values map[string]st
 	data.WriteString(Setting_input("wiki_access_password", values["wiki_access_password"], "password") + Main_hr())
 	data.WriteString(`<label for="load_ip_select">` + lang("wiki_load_ip_select") + `</label> (` + lang("restart_required") + `)` + Main_hr())
 	data.WriteString(`<select id="load_ip_select" name="load_ip_select">` + Setting_options(values["load_ip_select"], ip_values, ip_labels) + `</select>` + Main_hr())
+	data.WriteString(`<label for="trusted_proxies">` + lang("wiki_trusted_proxies") + `</label> (` + lang("restart_required") + `)` + Main_hr())
+	data.WriteString(Setting_textarea("trusted_proxies", values["trusted_proxies"], ""))
+	data.WriteString(lang("wiki_trusted_proxies_hint") + Main_hr())
+	ip_select := strings.TrimSpace(values["load_ip_select"])
+	forward_mode := ip_select == "" || strings.EqualFold(ip_select, "default") || ip_select == "HTTP_X_REAL_IP" || ip_select == "HTTP_CF_CONNECTING_IP"
+	if forward_mode && tool.Trusted_prefix_count() == 0 {
+		data.WriteString(`<p class="warning">` + lang("wiki_trusted_proxies_warn_forwarding") + `</p>` + Main_hr())
+	}
+	if err := tool.Trusted_proxies_error(); err != "" {
+		data.WriteString(`<p class="warning">` + lang("wiki_trusted_proxies_warn_error") + `: ` + tool.HTML_escape(err) + `</p>` + Main_hr())
+	}
 	data.WriteString(`<h3>` + lang("authority_use_list") + `</h3>`)
 	data.WriteString(`<label><input type="checkbox" name="auth_history_off" ` + Setting_checked(values["auth_history_off"]) + `> ` + lang("authority_use_list_off") + `</label>` + Main_hr())
 	data.WriteString(`<label for="auth_history_expiration_date">` + lang("authority_use_list_expiration_date") + `</label> (` + lang("day") + `) (` + lang("off") + ` : ` + lang("empty") + `)` + Main_hr())

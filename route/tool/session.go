@@ -50,6 +50,18 @@ func Session_options(secure bool) sessions.Options {
 	}
 }
 
+// Is_https checks if the client is connecting over HTTPS. TLS at the
+// application level always means HTTPS. A forwarded X-Forwarded-Proto: https
+// header is only trusted when the immediate TCP peer is a configured trusted
+// proxy (the same policy used for IP resolution), so an untrusted client
+// cannot force the Secure flag on session cookies.
 func Is_https(c *gin.Context) bool {
-	return c.Request.TLS != nil || strings.EqualFold(c.GetHeader("X-Forwarded-Proto"), "https")
+	if c.Request.TLS != nil {
+		return true
+	}
+	peer, ok := parse_remote_addr(c.Request.RemoteAddr)
+	if !ok || !is_trusted_peer(peer) {
+		return false
+	}
+	return strings.EqualFold(c.GetHeader("X-Forwarded-Proto"), "https")
 }

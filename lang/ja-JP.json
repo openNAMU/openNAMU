@@ -893,6 +893,11 @@
     "option": "オプション",
     "date": "日付",
     "wiki_load_ip_select": "IP取得ヘッダー",
+    "wiki_trusted_proxies": "信頼するプロキシ",
+    "wiki_trusted_proxies_hint": "カンマまたは改行で区切った IP アドレスまたは CIDR ネットワーク（例: 198.51.100.10, 203.0.113.0/24）。X-Real-IP と CF-Connecting-IP は、直接接続元のペアー（対向アドレス）がここに含まれている場合のみ有効であり、そうでない場合は直接接続先アドレスが使用されます。クライアントアドレスではなく、プロキシ/リバースプロキシのアドレスを記載してください。空の場合には信頼するプロキシはありません。設定が正しくない場合、ユーザーはプロキシのアドレスとして識別される可能性があります。変更は再起動が必要です。",
+    "wiki_trusted_proxies_warn_forwarding": "フォワーディングヘッダーモードが選択されていますが、信頼するプロキシが設定されていないため、X-Real-IP と CF-Connecting-IP は無効になります。信頼するプロキシにプロキシを追加するか、REMOTE_ADDR を選択してください。",
+    "wiki_trusted_proxies_warn_error": "信頼するプロキシの値が無効です",
+
     "auto_login": "自動ログイン",
     "view_hide_user_name_authority": "非表示のユーザー名とIPの閲覧権限",
     "view_user_watchlist_authority": "ユーザーウォッチリストの閲覧権限",

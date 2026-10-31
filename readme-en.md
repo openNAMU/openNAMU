@@ -154,6 +154,24 @@ openNAMU is currently in beta.
 - The NamuMark compatibility renderer is still being improved.
 - Edit requests and section editing are currently unavailable.
 
+## Reverse proxy / IP identification
+
+openNAMU obtains the client address from the direct TCP connection or from a
+forwarded header, chosen by the **Header to get IP** setting. The **Trusted
+proxies** field (comma- or newline-separated IP addresses / CIDR networks) limits
+which forwarded IPs are believed: a `X-Real-IP` or `CF-Connecting-IP` header is
+honored only when the direct connecting peer is listed. List your reverse proxy
+(not end clients). An empty list means no proxy is trusted and the direct peer is
+always used. The catch-all `0.0.0.0/0` / `::/0` is rejected.
+
+- **nginx**: add the nginx host IP to *Trusted proxies* and set *Header to get IP*
+  to `HTTP_X_REAL_IP` (with `proxy_set_header X-Real-IP $remote_addr;`) to see the
+  real client address. Without a trusted proxy, openNAMU sees the nginx IP.
+- **Cloudflare**: set *Header to get IP* to `HTTP_CF_CONNECTING_IP` and add your
+  Cloudflare edge IP range to *Trusted proxies*.
+
+Restart openNAMU after changing the setting.
+
 ## Contribute
 
 openNAMU may contain untested bugs. Reporting them helps improve the project. [Create an Issue](https://github.com/openNAMU/openNAMU/issues/new).

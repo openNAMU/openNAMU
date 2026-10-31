@@ -2,6 +2,7 @@ package route
 
 import (
 	"database/sql"
+	"fmt"
 
 	"opennamu/route/tool"
 )
@@ -24,6 +25,15 @@ func Api_setting_main_post(config tool.Config, form map[string]string) map[strin
 		return_data["response"] = "error"
 		return_data["data"] = "error"
 		return return_data
+	}
+	// Validate trusted_proxies before it reaches the database, so an unsafe or
+	// malformed value is rejected and the previous valid setting is preserved.
+	if trusted_raw, exists := form["trusted_proxies"]; exists {
+		if err := tool.Validate_trusted_proxies(trusted_raw); err != nil {
+			return_data["response"] = "error"
+			return_data["data"] = fmt.Sprintf("trusted_proxies: %v", err)
+			return return_data
+		}
 	}
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		Setting_save_fields(tx, Setting_main_fields(), form)

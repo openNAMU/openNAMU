@@ -8,8 +8,8 @@ import (
 	"encoding/hex"
 	"html"
 	"html/template"
+	"log"
 	"math/big"
-	"net"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -100,60 +100,43 @@ func Get_ip_select(db *sql.DB) {
 }
 
 func Get_IP(c *gin.Context) string {
+	// An authenticated session always keeps its own identity; the connection
+	// peer is irrelevant. This preserves the existing behaviour exactly.
 	user_id, ok := Get_session(c).Get("id").(string)
 	if ok && user_id != "" {
 		return user_id
 	}
 
-	setting := strings.TrimSpace(load_ip_select)
-	header_names := []string{"X-Real-IP", "CF-Connecting-IP"}
+	mode := strings.TrimSpace(load_ip_select)
 
-	if setting != "" && !strings.EqualFold(setting, "default") {
-		if strings.EqualFold(setting, "REMOTE_ADDR") {
-			header_names = []string{}
-		} else {
-			if len(setting) > len("HTTP_") && strings.EqualFold(setting[:len("HTTP_")], "HTTP_") {
-				setting = setting[len("HTTP_"):]
-				setting = strings.ReplaceAll(setting, "_", "-")
-			}
+	// Parse the immediate TCP peer ("host:port") into a canonical address.
+	peer, peer_ok := parse_remote_addr(c.Request.RemoteAddr)
 
-			header_names = []string{setting}
-		}
+	if !peer_ok {
+		// Fail closed: a malformed connection must not become ::1/127.0.0.1 or
+		// any registered identity.
+		log.Printf("[IP TRUST] Get_IP: unparseable peer %q; failing closed to %q",
+			c.Request.RemoteAddr, Invalid_remote_address)
+		return Invalid_remote_address
 	}
 
-	parse_ip := func(raw_ip string) string {
-		for _, value := range strings.Split(raw_ip, ",") {
-			value = strings.TrimSpace(value)
-			if value == "" {
-				continue
-			}
+	if strings.EqualFold(mode, "REMOTE_ADDR") {
+		// Always the connection peer. Forwarding headers are ignored.
+		return peer.String()
+	}
 
-			if ip := net.ParseIP(value); ip != nil {
-				return ip.String()
-			}
-
-			host, _, err := net.SplitHostPort(value)
-			if err == nil {
-				if ip := net.ParseIP(host); ip != nil {
-					return ip.String()
-				}
+	// Header modes (default / X-Real-IP / CF-Connecting-IP / ...): a forwarded
+	// header is only honoured when the peer is a configured trusted proxy.
+	if is_trusted_peer(peer) {
+		for _, header_name := range selected_header_names(mode) {
+			if addr, ok := read_single_ip_header(c, header_name); ok {
+				return addr.String()
 			}
 		}
-
-		return ""
 	}
 
-	for _, header_name := range header_names {
-		if ip := parse_ip(c.GetHeader(header_name)); ip != "" {
-			return ip
-		}
-	}
-
-	if ip := parse_ip(c.Request.RemoteAddr); ip != "" {
-		return ip
-	}
-
-	return "::1"
+	// Not trusted, header missing, or malformed -> the connection peer.
+	return peer.String()
 }
 
 func Get_Cookies(c *gin.Context) string {
