@@ -2,6 +2,7 @@ package route
 
 import (
 	"database/sql"
+	"errors"
 
 	"opennamu/route/tool"
 	"strconv"
@@ -211,7 +212,22 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 			return return_data
 		}
 
-		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		// Board-level slow mode applies to every new top-level post, including
+		// new discussion topics in the thread board. No post-level cooldown is
+		// recorded here because no existing post is being commented on.
+		board_interval := tool.Bbs_board_slow_interval(db, set_id)
+		retry_after := 0
+
+		if err := Bbs_identifier_transaction(db, set_id, "", true, func(tx *sql.Tx) error {
+			remaining, err := tool.Bbs_slow_enforce(db, tx, config.IP, set_id, "", board_interval, 0)
+			if err != nil {
+				return err
+			}
+			if remaining > 0 {
+				retry_after = remaining
+				return tool.BbsSlowModeError
+			}
+
 			last_code := ""
 			tool.QueryRow_DB(
 				tx,
@@ -226,6 +242,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 				{"title", title},
 				{"data", data},
 				{"date", date},
+				{tool.Bbs_post_creation_time_name, date},
 				{"last_activity", date},
 				{"user_id", config.IP},
 				{"comment_count", "0"},
@@ -252,6 +269,12 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 			}
 			return nil
 		}); err != nil {
+			if errors.Is(err, tool.BbsSlowModeError) {
+				return_data["response"] = "error"
+				return_data["data"] = "slow_mode"
+				return_data["retry_after_seconds"] = retry_after
+				return return_data
+			}
 			panic(err)
 		}
 		tool.Search_bbs_index_update(db, set_id, set_code)

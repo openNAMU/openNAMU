@@ -61,7 +61,7 @@ func Api_bbs_w_comment_one_delete(config tool.Config, set_id string, set_code st
 
 		return return_data
 	}
-	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	if err := Bbs_identifier_transaction(db, set_id, post_code, false, func(tx *sql.Tx) error {
 		if comment != "" {
 			Bbs_post_comment_count_update(tx, set_id, post_code, -1)
 		}

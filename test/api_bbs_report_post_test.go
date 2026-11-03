@@ -19,6 +19,14 @@ func Create_test_report_db(t *testing.T) *sql.DB {
 		db.Close()
 		t.Fatalf("create bbs_data table: %v", err)
 	}
+	if _, err := db.Exec(`CREATE TABLE bbs_set (set_name TEXT, set_code TEXT, set_id TEXT, set_data TEXT)`); err != nil {
+		db.Close()
+		t.Fatalf("create bbs_set table: %v", err)
+	}
+	if _, err := db.Exec(`INSERT INTO bbs_set (set_name, set_code, set_id, set_data) VALUES ('bbs_name', '', '-2', 'report')`); err != nil {
+		db.Close()
+		t.Fatalf("seed report identifier lock anchor: %v", err)
+	}
 	return db
 }
 

@@ -2,6 +2,7 @@ package route
 
 import (
 	"database/sql"
+	"errors"
 	"regexp"
 	"strconv"
 	"strings"
@@ -159,9 +160,26 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 		return return_data
 	}
 
+	// Slow mode: both the board-level and this post's level apply to the
+	// write. The board scope keys on the board only; the post scope keys on
+	// the root post and is independent of comment_select (nested replies
+	// share the root post's cooldown and never touch another post's).
+	board_interval := tool.Bbs_board_slow_interval(db, set_id)
+	post_interval := tool.Bbs_post_slow_interval(db, set_id, set_code)
+
 	comment_code := ""
 	date := tool.Get_time()
-	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	retry_after := 0
+	if err := Bbs_identifier_transaction(db, set_id, set_code, board_interval > 0, func(tx *sql.Tx) error {
+		remaining, err := tool.Bbs_slow_enforce(db, tx, config.IP, set_id, set_code, board_interval, post_interval)
+		if err != nil {
+			return err
+		}
+		if remaining > 0 {
+			retry_after = remaining
+			return tool.BbsSlowModeError
+		}
+
 		last_code := ""
 		tool.QueryRow_DB(
 			tx,
@@ -199,6 +217,12 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 		}
 		return nil
 	}); err != nil {
+		if errors.Is(err, tool.BbsSlowModeError) {
+			return_data["response"] = "error"
+			return_data["data"] = "slow_mode"
+			return_data["retry_after_seconds"] = retry_after
+			return return_data
+		}
 		panic(err)
 	}
 

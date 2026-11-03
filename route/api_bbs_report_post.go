@@ -70,7 +70,7 @@ func Api_bbs_report_post(config tool.Config, set_id string, set_code string, com
 
 func Report_create(db *sql.DB, ip string, target_title string, target_path string, report_prefix string, reason string) (string, error) {
 	set_code_new := ""
-	err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	err := Bbs_identifier_transaction(db, report_bbs_id, "", true, func(tx *sql.Tx) error {
 		last_code := ""
 		tool.QueryRow_DB(
 			tx,

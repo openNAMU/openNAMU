@@ -26,7 +26,7 @@ func Api_bbs_w_comment_all_delete(config tool.Config, set_id string, set_code st
 	}
 
 	comment_set_id := set_id + "-" + set_code
-	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	if err := Bbs_identifier_transaction(db, set_id, set_code, false, func(tx *sql.Tx) error {
 		if _, err := tx.Exec(tool.DB_change("delete from bbs_data where set_id = ? or set_id like ?"), comment_set_id, comment_set_id+"-%"); err != nil {
 			return err
 		}

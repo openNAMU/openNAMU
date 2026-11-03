@@ -543,6 +543,11 @@
     "bbs_comment_tool": "BBS comment tool(s)",
     "bbs_comment_edit": "BBS comment edit",
     "bbs_post_tool": "BBS post tool(s)",
+    "bbs_slow_mode_seconds": "BBS slow mode (seconds)",
+    "bbs_slow_mode_hint": "Seconds between writes in the board (0 disables).",
+    "slow_mode": "Slow mode",
+    "slow_mode_hint": "Seconds between writes in this post (0 disables).",
+    "bbs_slow_mode_error": "Slow mode is active. Please wait before posting.",
     "post_recent": "Recent post(s)",
     
     "_comment_": "BBS ACL",

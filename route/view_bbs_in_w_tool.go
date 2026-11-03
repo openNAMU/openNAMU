@@ -100,6 +100,21 @@ func View_bbs_in_w_tool(config tool.Config, set_id string, set_code string) stri
         `
 	}
 
+	if tool.Check_permission(db, "bbs_post_manage", config.IP) {
+		slow_mode_value := ""
+		if v, ok := Api_bbs_w_post_slow_mode(config, set_id, set_code)["data"].(string); ok {
+			slow_mode_value = v
+		}
+		data_html += `
+            <h3>` + tool.Get_language(db, "slow_mode", true) + `</h3>
+            <form method="post">
+                <span>` + tool.Get_language(db, "slow_mode_hint", true) + `</span>
+                <input type="number" name="slow_mode_seconds" min="0" max="86400" step="1" value="` + tool.HTML_escape(slow_mode_value) + `">
+                <button class="__ON_BUTTON__" name="action" value="slow_mode_set" type="submit">` + tool.Get_language(db, "save", true) + `</button>
+            </form>
+        `
+	}
+
 	return tool.Get_template(
 		db,
 		config,

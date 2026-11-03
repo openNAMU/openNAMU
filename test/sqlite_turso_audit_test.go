@@ -123,15 +123,26 @@ func first_line(s string) string {
 	return s
 }
 
+// audit_restore_db_config returns the package-global SQL dialect to the
+// environment-derived configuration after an audit fixture changes it.
+// DB_boot only reloads configuration; it does not connect or mutate a DB.
+func audit_restore_db_config(t *testing.T) {
+	t.Helper()
+	t.Cleanup(func() {
+		tool.DB_boot()
+	})
+}
+
 // audit_setup boots the real openNAMU DB path for a backend. For sqlite the
 // WAL keeper is started (production Main_init behavior); for turso Start_keeper
 // is a no-op by design.
 func audit_setup(t *testing.T, backend string) *sql.DB {
 	t.Helper()
+	audit_restore_db_config(t)
 
 	name := filepath.Join(t.TempDir(), "audit")
-	os.Setenv("NAMU_DB", name)
-	os.Setenv("NAMU_DB_TYPE", backend)
+	t.Setenv("NAMU_DB", name)
+	t.Setenv("NAMU_DB_TYPE", backend)
 
 	tool.DB_init()
 	if err := tool.Start_keeper(); err != nil {
@@ -360,7 +371,7 @@ func Test_audit_B_write_distinct_docs(t *testing.T) {
 				"want_docs": want_docs, "got_docs": total_docs,
 				"want_hist": want_hist, "got_hist": total_hist,
 				"bad_revisions": bad_rev, "panics": panic_cnt.Load(),
-				"secs": elapsed.Seconds(),
+				"secs":       elapsed.Seconds(),
 				"sample_err": err_sample.Load(),
 			})
 			if total_docs != want_docs || total_hist != want_hist {

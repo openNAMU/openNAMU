@@ -63,7 +63,7 @@ func Api_bbs_w_delete(config tool.Config, set_id string, set_code string) map[st
 		return return_data
 	}
 
-	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	if err := Bbs_identifier_transaction(db, set_id, set_code, true, func(tx *sql.Tx) error {
 		for _, value := range []struct {
 			query string
 			args  []any

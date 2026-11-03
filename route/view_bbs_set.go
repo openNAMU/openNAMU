@@ -111,6 +111,13 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 		Api_bbs_w_set_put(config, set_id, "bbs_placeholder", values.Get("bbs_placeholder"), "")
 		Api_bbs_w_set_put(config, set_id, "bbs_comment_placeholder", values.Get("bbs_comment_placeholder"), "")
 		Api_bbs_w_set_put(config, set_id, "bbs_excellent_min", values.Get("bbs_excellent_min"), "")
+		slow_mode_result := Api_bbs_w_set_put(config, set_id, "bbs_slow_mode_seconds", values.Get("bbs_slow_mode_seconds"), "")
+		if response, ok := slow_mode_result["response"].(string); !ok || response != "ok" {
+			if response == "require auth" {
+				return tool.Get_error_page(db, config, "auth")
+			}
+			return tool.Get_error_page(db, config, "error")
+		}
 		return tool.Get_redirect("/bbs/set/" + tool.Url_parser(set_id))
 	}
 
@@ -135,6 +142,9 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 	data += "<textarea class=\"opennamu_textarea_100\" name=\"bbs_comment_placeholder\">" + tool.HTML_escape(Bbs_set_value(db, set_id, "bbs_comment_placeholder")) + "</textarea><hr class=\"main_hr\">"
 	data += "<h3>" + tool.Get_language(db, "bbs_excellent_min_board", true) + "</h3>"
 	data += Setting_input("bbs_excellent_min", Bbs_set_value(db, set_id, "bbs_excellent_min"), "number") + "<hr class=\"main_hr\">"
+	data += "<h3>" + tool.Get_language(db, "bbs_slow_mode_seconds", true) + "</h3>"
+	data += "<span>" + tool.Get_language(db, "bbs_slow_mode_hint", true) + "</span><hr class=\"main_hr\">"
+	data += Setting_input("bbs_slow_mode_seconds", Bbs_set_value(db, set_id, "bbs_slow_mode_seconds"), "number") + "<hr class=\"main_hr\">"
 	data += `<button type="submit">` + tool.Get_language(db, "save", true) + `</button></form>`
 
 	menu := [][]any{

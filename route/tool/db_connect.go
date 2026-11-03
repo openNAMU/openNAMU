@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-sql-driver/mysql"
 	sqlite "modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 	_ "turso.tech/database/tursogo"
@@ -95,6 +95,90 @@ func DB_transaction(db *sql.DB, callback func(*sql.Tx) error) error {
 
 	committed = true
 	return nil
+}
+
+// DB_transaction_retryable reports errors for which rolling back and restarting
+// the complete transaction is safe. Unlike busyRetryable, it accepts
+// SQLITE_BUSY_SNAPSHOT because the caller starts a fresh transaction rather
+// than retrying a statement against the stale snapshot.
+func DB_transaction_retryable(err error) bool {
+	if err == nil {
+		return false
+	}
+	var mysql_error *mysql.MySQLError
+	if errors.As(err, &mysql_error) {
+		// InnoDB fully rolls back deadlock victims (1213); for lock wait
+		// timeouts (1205), this helper explicitly rolls back the whole tx.
+		return mysql_error.Number == 1205 || mysql_error.Number == 1213
+	}
+	var sqlite_error *sqlite.Error
+	if errors.As(err, &sqlite_error) {
+		return sqlite_error.Code() == sqlite3.SQLITE_BUSY || sqlite_error.Code() == sqlite3.SQLITE_BUSY_SNAPSHOT
+	}
+	return busyRetryable(err)
+}
+
+// DB_transaction_retry restarts a database transaction after a recognized
+// rollback-safe busy/deadlock error. Every callback retry recalculates reads
+// and writes; unknown commit failures are not retried because their outcome may
+// be uncertain.
+func DB_transaction_retry(db *sql.DB, callback func(*sql.Tx) error) error {
+	return DB_transaction_retry_with_begin(func() (*sql.Tx, error) { return db.Begin() }, callback)
+}
+
+// DB_transaction_retry_conn applies the same retry policy while beginning each
+// transaction on a caller-pinned connection.
+func DB_transaction_retry_conn(conn *sql.Conn, callback func(*sql.Tx) error) error {
+	return DB_transaction_retry_with_begin(func() (*sql.Tx, error) {
+		return conn.BeginTx(context.Background(), nil)
+	}, callback)
+}
+
+// DB_transaction_retry_with_begin owns bounded whole-transaction retry logic
+// for both pooled databases and caller-pinned connections.
+func DB_transaction_retry_with_begin(begin_transaction func() (*sql.Tx, error), callback func(*sql.Tx) error) error {
+	start := time.Now()
+	attempt := 0
+	for {
+		err, retryable := func() (return_error error, is_retryable bool) {
+			tx, err := begin_transaction()
+			if err != nil {
+				return err, DB_transaction_retryable(err)
+			}
+			committed := false
+			defer func() {
+				recovered := recover()
+				if !committed {
+					_ = tx.Rollback()
+				}
+				if recovered != nil {
+					if transaction_error, ok := recovered.(error); ok && DB_transaction_retryable(transaction_error) {
+						return_error = transaction_error
+						is_retryable = true
+						return
+					}
+					panic(recovered)
+				}
+			}()
+
+			if err := callback(tx); err != nil {
+				return err, DB_transaction_retryable(err)
+			}
+			if err := tx.Commit(); err != nil {
+				return err, DB_transaction_retryable(err)
+			}
+			committed = true
+			return nil, false
+		}()
+		if err == nil {
+			return nil
+		}
+		if !retryable || attempt >= busyRetryMax || time.Since(start) >= busyRetryMaxWait {
+			return err
+		}
+		attempt++
+		time.Sleep(busyRetryDelay)
+	}
 }
 
 func Get_DB_set() map[string]string {

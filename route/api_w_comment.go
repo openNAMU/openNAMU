@@ -26,12 +26,37 @@ func Api_w_comment(config tool.Config, doc_name string) map[string]any {
 			[]any{&comment_title},
 			db_code_str,
 		) || comment_title != doc_name {
-			tool.Exec_DB(
-				db,
-				"delete from data_set where doc_name = ? and set_name = 'document_comment_code'",
-				doc_name,
-			)
 			db_code_str = ""
+			if err := Bbs_identifier_transaction(db, "0", "", true, func(tx *sql.Tx) error {
+				mapped_code := ""
+				if !tool.QueryRow_DB(
+					tx,
+					"select set_data from data_set where doc_name = ? and set_name = 'document_comment_code' limit 1",
+					[]any{&mapped_code},
+					doc_name,
+				) {
+					return nil
+				}
+
+				mapped_title := ""
+				if tool.QueryRow_DB(
+					tx,
+					"select set_data from bbs_data where set_name = 'title' and set_id = '0' and set_code = ? limit 1",
+					[]any{&mapped_title},
+					mapped_code,
+				) && mapped_title == doc_name {
+					db_code_str = mapped_code
+					return nil
+				}
+
+				_, err := tx.Exec(
+					tool.DB_change("delete from data_set where doc_name = ? and set_name = 'document_comment_code'"),
+					doc_name,
+				)
+				return err
+			}); err != nil {
+				panic(err)
+			}
 		}
 	}
 
@@ -40,7 +65,33 @@ func Api_w_comment(config tool.Config, doc_name string) map[string]any {
 			return map[string]any{"response": "require auth"}
 		}
 
-		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		created_comment_post := false
+		if err := Bbs_identifier_transaction(db, "0", "", true, func(tx *sql.Tx) error {
+			mapped_code := ""
+			if tool.QueryRow_DB(
+				tx,
+				"select set_data from data_set where doc_name = ? and set_name = 'document_comment_code' limit 1",
+				[]any{&mapped_code},
+				doc_name,
+			) {
+				mapped_title := ""
+				if tool.QueryRow_DB(
+					tx,
+					"select set_data from bbs_data where set_name = 'title' and set_id = '0' and set_code = ? limit 1",
+					[]any{&mapped_title},
+					mapped_code,
+				) && mapped_title == doc_name {
+					db_code_str = mapped_code
+					return nil
+				}
+				if _, err := tx.Exec(
+					tool.DB_change("delete from data_set where doc_name = ? and set_name = 'document_comment_code'"),
+					doc_name,
+				); err != nil {
+					return err
+				}
+			}
+
 			last_code := ""
 			tool.QueryRow_DB(
 				tx,
@@ -69,19 +120,24 @@ func Api_w_comment(config tool.Config, doc_name string) map[string]any {
 					return err
 				}
 			}
-			db_code_str = set_code
-			_, err := tx.Exec(
+			if _, err := tx.Exec(
 				tool.DB_change("insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, ?, ?, ?)"),
 				doc_name,
 				"",
 				"document_comment_code",
-				db_code_str,
-			)
-			return err
+				set_code,
+			); err != nil {
+				return err
+			}
+			db_code_str = set_code
+			created_comment_post = true
+			return nil
 		}); err != nil {
 			panic(err)
 		}
-		tool.Search_bbs_index_update(db, "0", db_code_str)
+		if created_comment_post {
+			tool.Search_bbs_index_update(db, "0", db_code_str)
+		}
 	}
 
 	return_data := make(map[string]any)

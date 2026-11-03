@@ -676,6 +676,10 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 					panic(err)
 				}
 
+				if set_name == tool.Bbs_post_creation_time_name {
+					continue
+				}
+
 				if set_name == "user_id" {
 					var ip_pre string
 					var ip_render string

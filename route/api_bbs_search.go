@@ -33,6 +33,10 @@ func Bbs_search_item_data(db *sql.DB, config tool.Config, set_code string, set_i
 			return nil, false
 		}
 
+		if set_name == tool.Bbs_post_creation_time_name {
+			continue
+		}
+
 		if set_name == "user_id" {
 			user_id = set_data
 			ip_pre := ""

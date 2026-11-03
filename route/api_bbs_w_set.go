@@ -19,6 +19,8 @@ func BBS_w_set_list() map[string]string {
 	setting_acl["bbs_placeholder"] = ""
 	setting_acl["bbs_comment_placeholder"] = ""
 	setting_acl["bbs_excellent_min"] = ""
+	// bbs_slow_mode_seconds: public read value, write is checked separately.
+	setting_acl["bbs_slow_mode_seconds"] = ""
 
 	return setting_acl
 }

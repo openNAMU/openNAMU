@@ -22,7 +22,7 @@ func Api_bbs_w_post(config tool.Config, set_id string, title string, data string
 	}
 
 	set_code_str := ""
-	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	if err := Bbs_identifier_transaction(db, set_id, "", true, func(tx *sql.Tx) error {
 		last_code := ""
 		tool.QueryRow_DB(
 			tx,

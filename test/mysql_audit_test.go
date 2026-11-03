@@ -42,6 +42,7 @@ func mysql_audit_dsn(t *testing.T) (string, string) {
 // path (data/mysql.json, db bootstrap writes) stays inside the sandbox.
 func mysql_audit_setup(t *testing.T) (*sql.DB, string) {
 	t.Helper()
+	audit_restore_db_config(t)
 	dsn, dbname := mysql_audit_dsn(t)
 
 	tmp_dir := t.TempDir()

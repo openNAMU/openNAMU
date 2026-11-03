@@ -27,6 +27,9 @@ func Api_bbs_w(config tool.Config, set_id string, set_code string) map[string]an
 		if err != nil {
 			panic(err)
 		}
+		if set_name == tool.Bbs_post_creation_time_name {
+			continue
+		}
 
 		if set_name == "user_id" {
 			user_id = set_data
