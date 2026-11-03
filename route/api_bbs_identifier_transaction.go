@@ -14,6 +14,8 @@ import (
 )
 
 const bbs_identifier_lock_timeout_seconds = 30
+const bbs_board_id_allocation_lock_scope = "board-id-allocation"
+const bbs_board_id_allocation_anchor_board_id = "0"
 
 // Bbs_identifier_lock_name returns a bounded MariaDB advisory-lock name for a
 // database and logical BBS write scope. MariaDB limits lock names to 64 bytes.
@@ -53,6 +55,21 @@ func Bbs_identifier_transaction(db *sql.DB, board_id string, post_code string, l
 			if err := Bbs_local_post_write_lock(tx, board_id, post_code, board_locked); err != nil {
 				return err
 			}
+		}
+		return callback(tx)
+	})
+}
+
+// Bbs_board_id_allocation_transaction serializes allocation across all user
+// boards without reusing an existing board/post scope. Local backends anchor
+// the transaction on reserved board 0 (or its existing special-board fallback).
+func Bbs_board_id_allocation_transaction(db *sql.DB, callback func(*sql.Tx) error) error {
+	if tool.Get_DB_type() == "mysql" {
+		return Bbs_mysql_identifier_transaction(db, []string{bbs_board_id_allocation_lock_scope}, callback)
+	}
+	return tool.DB_transaction_retry(db, func(tx *sql.Tx) error {
+		if err := Bbs_local_board_write_lock(tx, bbs_board_id_allocation_anchor_board_id); err != nil {
+			return err
 		}
 		return callback(tx)
 	})

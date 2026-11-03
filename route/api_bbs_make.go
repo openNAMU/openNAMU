@@ -23,7 +23,7 @@ func Api_bbs_make(config tool.Config, bbs_name string, bbs_type string) map[stri
 		bbs_type = "comment"
 	}
 	set_id := ""
-	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	if err := Bbs_board_id_allocation_transaction(db, func(tx *sql.Tx) error {
 		last_id := "1"
 		tool.QueryRow_DB(
 			tx,
