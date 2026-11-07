@@ -1,10 +1,13 @@
 package test
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"testing"
 
 	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
 
 	"opennamu/route"
 	"opennamu/route/tool"
@@ -15,16 +18,21 @@ import (
 // It follows the same sessions.Session interface as the existing emptySession
 // but provides real get/set/save so round-trip behavior can be checked.
 type memorySession struct {
-	values map[interface{}]interface{}
+	values     map[interface{}]interface{}
+	read_count map[interface{}]int
 }
 
 func New_memory_session() *memorySession {
-	return &memorySession{values: map[interface{}]interface{}{}}
+	return &memorySession{
+		values:     map[interface{}]interface{}{},
+		read_count: map[interface{}]int{},
+	}
 }
 
 func (m *memorySession) ID() string { return "" }
 
 func (m *memorySession) Get(key interface{}) interface{} {
+	m.read_count[key]++
 	value, ok := m.values[key]
 	if !ok {
 		return nil
@@ -51,6 +59,10 @@ func (m *memorySession) Flashes(vars ...string) []interface{} { return nil }
 func (m *memorySession) Options(o sessions.Options) {}
 
 func (m *memorySession) Save() error { return nil }
+
+func (m *memorySession) Get_read_count(key interface{}) int {
+	return m.read_count[key]
+}
 
 // recent_docs returns the documents stored in the session.
 func (m *memorySession) recent_docs() []string {
@@ -131,6 +143,28 @@ func Test_view_w_add_recent_document(t *testing.T) {
 	}
 	if !reflect.DeepEqual(got, []string{"A", "B", "C", "D"}) {
 		t.Errorf("representative case: got %v, want [A B C D]", got)
+	}
+}
+
+func Test_View_w_normal_page_reads_recent_documents_once(t *testing.T) {
+	db := Setup_rebuild_db(t)
+	defer tool.DB_close(db)
+
+	gin.SetMode(gin.TestMode)
+	context, _ := gin.CreateTestContext(httptest.NewRecorder())
+	context.Request = httptest.NewRequest(http.MethodGet, "/w/Example", nil)
+	session := New_memory_session()
+	config := tool.Config{IP: "admin_ip", Session: session}
+
+	_, status := route.View_w(context, config, "Example", "")
+	if status != http.StatusOK {
+		t.Fatalf("View_w status=%d, want %d", status, http.StatusOK)
+	}
+	if reads := session.Get_read_count("lastest_document"); reads != 1 {
+		t.Fatalf("recent-document reads=%d, want one read", reads)
+	}
+	if got := session.recent_docs(); !reflect.DeepEqual(got, []string{"Example"}) {
+		t.Fatalf("stored recent documents=%v, want [Example]", got)
 	}
 }
 

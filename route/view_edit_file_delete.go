@@ -3,50 +3,30 @@ package route
 import (
 	"net/url"
 	"path/filepath"
-	"strings"
 
 	"opennamu/route/tool"
 )
 
-func File_storage_path(db_file_dir string, doc_name string) (string, bool) {
-	if !strings.HasPrefix(doc_name, "file:") {
-		return "", false
-	}
-	file_name := strings.TrimPrefix(doc_name, "file:")
-	extension := strings.TrimPrefix(strings.ToLower(filepath.Ext(file_name)), ".")
-	base_name := strings.TrimSuffix(file_name, filepath.Ext(file_name))
-	if base_name == "" || extension == "" || strings.ContainsAny(base_name, "/"+string(rune(92))) || strings.Contains(base_name, ".") {
-		return "", false
-	}
-	return filepath.Join(db_file_dir, tool.File_name_to_dir(base_name, extension)), true
-}
-
 func View_edit_file_delete(config tool.Config, doc_name string, values url.Values) string {
-	db := tool.DB_connect()
-	defer tool.DB_close(db)
-
-	if values == nil && !tool.Check_permission(db, "file_delete", config.IP) {
-		return tool.Get_error_page(db, config, "auth")
-	}
-	_, stored_exists := tool.Get_data_title(db, doc_name)
-	if !stored_exists && values == nil {
-		return tool.Get_redirect("/list/file")
-	}
-
-	file_path, valid := File_storage_path(tool.Get_file_main_dir(db), doc_name)
-	if !valid {
-		return tool.Get_error_page(db, config, "invalid file")
-	}
 	if values != nil {
 		result := Api_edit_file_delete_post(config, doc_name, values)
-		if result["response"] == "require auth" {
+		response, _ := result["response"].(string)
+		if response == "require auth" {
+			db := tool.DB_connect()
+			defer tool.DB_close(db)
+			if _, valid := File_storage_path(tool.Get_file_main_dir(db), doc_name); !valid {
+				return tool.Get_error_page(db, config, "invalid file")
+			}
 			return tool.Get_error_page(db, config, "auth")
 		}
-		if result["response"] != "ok" {
-			if result["data"] == "delete error" {
-				return tool.Get_error_page(db, config, "delete error")
+		if response != "ok" {
+			error_name, _ := result["data"].(string)
+			if error_name != "delete error" && error_name != "invalid file" {
+				error_name = "file delete error"
 			}
-			return tool.Get_error_page(db, config, "file delete error")
+			db := tool.DB_connect()
+			defer tool.DB_close(db)
+			return tool.Get_error_page(db, config, error_name)
 		}
 		if values.Get("with_doc") != "" {
 			return tool.Get_redirect("/w/" + tool.Url_parser(doc_name))
@@ -54,6 +34,21 @@ func View_edit_file_delete(config tool.Config, doc_name string, values url.Value
 		return tool.Get_redirect("/list/file")
 	}
 
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
+
+	if !tool.Check_permission(db, "file_delete", config.IP) {
+		return tool.Get_error_page(db, config, "auth")
+	}
+	_, stored_exists := tool.Get_data_title(db, doc_name)
+	if !stored_exists {
+		return tool.Get_redirect("/list/file")
+	}
+
+	file_path, valid := File_storage_path(tool.Get_file_main_dir(db), doc_name)
+	if !valid {
+		return tool.Get_error_page(db, config, "invalid file")
+	}
 	body := "<p><a href='/image/" + tool.Url_parser(filepath.Base(file_path)) + "'>" + tool.HTML_escape(doc_name) + "</a></p>"
 	body += "<form method='post'><input type='checkbox' name='with_doc' value='1' checked> " + tool.Get_language(db, "file_delete_with_document", true)
 	body += "<hr class=\"main_hr\">"

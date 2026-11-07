@@ -88,11 +88,11 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		description = tool.Get_slice(strings.ReplaceAll(strings.ReplaceAll(raw_data, "\r", ""), "\n", " "), 0, 200)
 	}
 
-	recent_documents := View_w_recent_documents(config)
 	if do_type == "from" {
+		recent_documents := View_w_recent_documents(config)
 		render_data = View_w_redirect_trace(db, doc_name, recent_documents) + render_data
 	}
-	recent_documents = View_w_add_recent_document(config, doc_name)
+	recent_documents := View_w_add_recent_document(config, doc_name)
 	render_data = View_w_trace(db, config, recent_documents) + render_data
 	document_type := ""
 	if strings.HasPrefix(doc_name, "user:") {
@@ -135,7 +135,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	}
 
 	body := tool.Get_setting_value(db, "body", "", "")
-	render_data = Setting_render_markup(db, body, Setting_markup_value(db, "body")) + render_data
+	render_data = Setting_render_markup_with_requester(db, body, Setting_markup_value(db, "body"), config.IP) + render_data
 
 	// §3 related documents render after body and before bottom_body (category was merged earlier at line 116).
 	if status == http.StatusOK && Related_document_enabled(db) {
@@ -148,14 +148,14 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	}
 
 	bottom_body := tool.Get_setting_value(db, "bottom_body", "", "")
-	render_data += Setting_render_markup(db, bottom_body, Setting_markup_value(db, "bottom_body"))
+	render_data += Setting_render_markup_with_requester(db, bottom_body, Setting_markup_value(db, "bottom_body"), config.IP)
 
 	document_top_data := Api_w_set(config, doc_name, "document_top", "")
 	document_top, _ := document_top_data["data"].(string)
 	document_top_markup_data := Api_w_set(config, doc_name, "document_top_markup", "")
 	document_top_markup_value, _ := document_top_markup_data["data"].(string)
 	document_top_markup := Setting_markup_normalize(document_top_markup_value)
-	render_data = Setting_render_markup(db, document_top, document_top_markup) + render_data
+	render_data = Setting_render_markup_with_requester(db, document_top, document_top_markup, config.IP) + render_data
 
 	history_color := 0
 	if status == http.StatusNotFound {
@@ -224,8 +224,10 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 
 	enable_comment := tool.Get_setting(db, "enable_comment", "")
 	if status == http.StatusOK && len(enable_comment) > 0 && enable_comment[0][0] != "" {
-		comment_api := Api_w_comment_ui(config, doc_name)
-		if comment_data, ok := comment_api["data"].(string); ok && comment_data != "" {
+		comment_api := Api_w_comment(config, doc_name)
+		comment_code, _ := comment_api["data"].(string)
+		comment_data := View_bbs_in_w_comment(db, config, "0", comment_code, "", 1)
+		if comment_data != "" {
 			render_data += `<div class="opennamu_clearfix"></div>` + comment_data
 		}
 	}

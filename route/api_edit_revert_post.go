@@ -43,31 +43,9 @@ func Api_edit_revert_post(config tool.Config, doc_name string, rev string, send 
 		return_data["data"] = "slow edit limit"
 
 		return return_data
-	} else if !tool.Do_edit_filter(db, config, doc_name, data) {
-		return_data["response"] = "error"
-		return_data["data"] = "edit filter (content)"
-
-		return return_data
-	} else if !tool.Do_edit_filter(db, config, doc_name, send) {
-		return_data["response"] = "error"
-		return_data["data"] = "edit filter (send)"
-
-		return return_data
-	} else if !tool.Do_edit_send_require_check(db, config, send) {
-		return_data["response"] = "error"
-		return_data["data"] = "send require"
-
-		return return_data
-	} else if !tool.Do_edit_text_checkbox_check(db, config, agree) {
-		return_data["response"] = "error"
-		return_data["data"] = "checkbox check require"
-
-		return return_data
-	} else if !tool.Do_edit_max_length_check(db, config, data) {
-		return_data["response"] = "error"
-		return_data["data"] = "overflow max length"
-
-		return return_data
+	}
+	if error_name := Edit_post_content_validation_error(db, config, doc_name, data, send, agree); error_name != "" {
+		return map[string]any{"response": "error", "data": error_name}
 	}
 
 	// The revert (content commit) and its backlink index update are one critical

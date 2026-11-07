@@ -170,7 +170,7 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 	comment_code := ""
 	date := tool.Get_time()
 	retry_after := 0
-	if err := Bbs_identifier_transaction(db, set_id, set_code, board_interval > 0, func(tx *sql.Tx) error {
+	if err := Bbs_board_write_transaction(db, set_id, set_code, func(tx *sql.Tx) error {
 		remaining, err := tool.Bbs_slow_enforce(db, tx, config.IP, set_id, set_code, board_interval, post_interval)
 		if err != nil {
 			return err
@@ -217,6 +217,11 @@ func Api_bbs_w_comment_post(config tool.Config, set_id string, set_code string, 
 		}
 		return nil
 	}); err != nil {
+		if errors.Is(err, bbs_board_missing_error) {
+			return_data["response"] = "not exist"
+			return_data["data"] = "bbs"
+			return return_data
+		}
 		if errors.Is(err, tool.BbsSlowModeError) {
 			return_data["response"] = "error"
 			return_data["data"] = "slow_mode"

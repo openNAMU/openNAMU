@@ -15,6 +15,10 @@ import (
 
 const bbs_identifier_lock_timeout_seconds = 30
 const bbs_board_id_allocation_lock_scope = "board-id-allocation"
+
+var bbs_identifier_lock_anchor_missing_error = errors.New("bbs identifier lock anchor is missing")
+var bbs_board_missing_error = errors.New("bbs board does not exist")
+
 const bbs_board_id_allocation_anchor_board_id = "0"
 
 // Bbs_identifier_lock_name returns a bounded MariaDB advisory-lock name for a
@@ -60,6 +64,38 @@ func Bbs_identifier_transaction(db *sql.DB, board_id string, post_code string, l
 	})
 }
 
+// Bbs_board_write_transaction serializes a board mutation with whole-board
+// deletion and verifies the board still exists after acquiring that lock.
+func Bbs_board_write_transaction(db *sql.DB, board_id string, post_code string, callback func(*sql.Tx) error) error {
+	err := Bbs_identifier_transaction(db, board_id, post_code, true, func(tx *sql.Tx) error {
+		if !Bbs_is_special_board(board_id) {
+			var board_name string
+			if !tool.QueryRow_DB(
+				tx,
+				"select set_data from bbs_set where set_id = ? and set_name = 'bbs_name'",
+				[]any{&board_name},
+				board_id,
+			) {
+				return bbs_board_missing_error
+			}
+		}
+		return callback(tx)
+	})
+	if errors.Is(err, bbs_identifier_lock_anchor_missing_error) {
+		return bbs_board_missing_error
+	}
+	return err
+}
+
+func Bbs_board_missing_response(return_data map[string]any, err error, data string) bool {
+	if !errors.Is(err, bbs_board_missing_error) {
+		return false
+	}
+	return_data["response"] = "not exist"
+	return_data["data"] = data
+	return true
+}
+
 // Bbs_board_id_allocation_transaction serializes allocation across all user
 // boards without reusing an existing board/post scope. Local backends anchor
 // the transaction on reserved board 0 (or its existing special-board fallback).
@@ -101,7 +137,7 @@ func Bbs_local_board_write_lock(tx *sql.Tx, board_id string) error {
 	// a bbs_name row. `other.ver` is initialized during application startup and
 	// gives only those scopes a stable anchor without adding EAV state.
 	if !Bbs_is_special_board(board_id) {
-		return errors.New("bbs identifier lock anchor is missing")
+		return bbs_identifier_lock_anchor_missing_error
 	}
 	result, err = tx.Exec(tool.DB_change("update other set data = data || char(1) where name = 'ver'"))
 	if err != nil {
@@ -112,7 +148,7 @@ func Bbs_local_board_write_lock(tx *sql.Tx, board_id string) error {
 		return err
 	}
 	if rows_affected == 0 {
-		return errors.New("bbs identifier lock anchor is missing")
+		return bbs_identifier_lock_anchor_missing_error
 	}
 	_, err = tx.Exec(tool.DB_change("update other set data = substr(data, 1, length(data) - 1) where name = 'ver'"))
 	return err

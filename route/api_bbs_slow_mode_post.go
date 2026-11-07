@@ -47,7 +47,7 @@ func Api_bbs_w_post_slow_mode_put(config tool.Config, set_id string, set_code st
 		return_data["data"] = "invalid bbs slow mode"
 		return return_data
 	}
-	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	if err := Bbs_board_write_transaction(db, set_id, set_code, func(tx *sql.Tx) error {
 		if _, err := tx.Exec(tool.DB_change("delete from bbs_data where set_name = ? and set_id = ? and set_code = ?"), post_slow_mode_name, set_id, set_code); err != nil {
 			return err
 		}
@@ -57,6 +57,9 @@ func Api_bbs_w_post_slow_mode_put(config tool.Config, set_id string, set_code st
 		tool.Do_insert_auth_history(tx, config.IP, "bbs_set ("+set_id+"/"+set_code+"/"+post_slow_mode_name+")")
 		return nil
 	}); err != nil {
+		if Bbs_board_missing_response(return_data, err, "bbs") {
+			return return_data
+		}
 		panic(err)
 	}
 	return_data["response"] = "ok"

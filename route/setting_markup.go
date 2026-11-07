@@ -51,24 +51,34 @@ func Setting_markup_select_ui(name string, current string, disabled string) stri
 }
 
 func Setting_render_markup(db *sql.DB, data string, markup_name string) string {
+	return Setting_render_markup_with_requester(db, data, markup_name, "")
+}
+
+func Setting_render_markup_with_requester(db *sql.DB, data string, markup_name string, requester_identity string) string {
 	markup_name = Setting_markup_normalize(markup_name)
 	if markup_name == "html" {
 		return data
 	}
 
-	render_data := markup.Get_render_direct(
+	render_data := markup.Get_render_direct_with_requester(
 		db,
 		"",
 		data,
 		markup_name,
 		strconv.FormatInt(time.Now().UnixNano(), 10),
 		"setting",
+		nil,
+		requester_identity,
 	)
 
 	return render_data["data"]
 }
 
 func Document_editor_top_render(db *sql.DB, doc_name string) string {
+	return Document_editor_top_render_with_requester(db, doc_name, "")
+}
+
+func Document_editor_top_render_with_requester(db *sql.DB, doc_name string, requester_identity string) string {
 	top_data := tool.Get_document_setting_value_exact(db, doc_name, "document_editor_top", "")
 	top_markup := ""
 	if top_data != "" {
@@ -81,5 +91,5 @@ func Document_editor_top_render(db *sql.DB, doc_name string) string {
 		top_markup = Setting_markup_normalize(tool.Get_document_setting_value_exact(db, doc_name, "document_top_markup", ""))
 	}
 
-	return Setting_render_markup(db, top_data, top_markup)
+	return Setting_render_markup_with_requester(db, top_data, top_markup, requester_identity)
 }

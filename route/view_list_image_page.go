@@ -56,7 +56,7 @@ func View_list_image_page(config tool.Config, page string) string {
 		parameter_data["ip"] = config.IP
 	}
 	render_name := strconv.FormatInt(time.Now().UnixNano(), 10)
-	rendered_data := markup.Get_render_direct(db, "", render_data.String(), "namumark", render_name, "view", parameter_data)["data"]
+	rendered_data := markup.Get_render_direct_with_requester(db, "", render_data.String(), "namumark", render_name, "view", parameter_data, config.IP)["data"]
 	body.WriteString(Get_render_setting_css(db, config) + Apply_render_setting_data(db, config, rendered_data))
 	if count == 0 {
 		body.WriteString(tool.Get_language(db, "data_missing", true))

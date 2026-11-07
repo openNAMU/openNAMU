@@ -79,10 +79,7 @@ func View_bbs_search_internal(config tool.Config, set_id string, keyword string,
 	data_html += `<div>(<a href="` + comment_search_path + `">` + comment_search_text + `</a>)</div><hr class="main_hr">`
 
 	if keyword != "" {
-		data_api := Api_bbs_search(config, keyword, set_id, strconv.Itoa(page_int))
-		if search_type == "data" {
-			data_api = Api_bbs_search_data(config, keyword, set_id, strconv.Itoa(page_int))
-		}
+		data_api := Api_bbs_search_internal(config, keyword, set_id, strconv.Itoa(page_int), search_type)
 		api_response, ok := data_api["response"].(string)
 		if !ok {
 			return tool.Get_error_page(db, config, "error")

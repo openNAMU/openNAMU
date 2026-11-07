@@ -8,11 +8,28 @@ import (
 	"opennamu/route/tool/markup"
 )
 
+func Edit_post_content_validation_error(db *sql.DB, config tool.Config, doc_name string, data string, send string, agree string) string {
+	if !tool.Do_edit_filter(db, config, doc_name, data) {
+		return "edit filter (content)"
+	}
+	if !tool.Do_edit_filter(db, config, doc_name, send) {
+		return "edit filter (send)"
+	}
+	if !tool.Do_edit_send_require_check(db, config, send) {
+		return "send require"
+	}
+	if !tool.Do_edit_text_checkbox_check(db, config, agree) {
+		return "checkbox check require"
+	}
+	if !tool.Do_edit_max_length_check(db, config, data) {
+		return "overflow max length"
+	}
+	return ""
+}
+
 func Api_edit_post(config tool.Config, doc_name string, data string, send string, agree string, expected_revision string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
-
-	return_data := make(map[string]any)
 
 	date := tool.Get_time()
 	data = strings.ReplaceAll(data, "\r", "")
@@ -20,65 +37,28 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 	current_revision := tool.Get_document_revision(db, doc_name)
 
 	if doc_name == "" {
-		return_data["response"] = "error"
-		return_data["data"] = "empty title"
-
-		return return_data
-	} else if !tool.Do_title_length_check(db, doc_name, "document") {
-		return_data["response"] = "error"
-		return_data["data"] = "title length"
-
-		return return_data
-	} else if !tool.Check_acl(db, doc_name, "", "document_edit", config.IP) {
-		return_data["response"] = "error"
-		return_data["data"] = "permission denied"
-
-		return return_data
-	} else if current_revision == "0" && !tool.Check_acl(db, doc_name, "", "document_make_acl", config.IP) {
-		return_data["response"] = "error"
-		return_data["data"] = "permission denied"
-
-		return return_data
-	} else if !tool.Check_edit_time(db, config.IP) {
-		return_data["response"] = "error"
-		return_data["data"] = "edit time"
-
-		return return_data
-	} else if !tool.Do_edit_slow_check(db, config, "edit") {
-		return_data["response"] = "error"
-		return_data["data"] = "slow edit limit"
-
-		return return_data
-	} else if !tool.Check_daily_limit(db, config.IP, "edit") {
-		return_data["response"] = "error"
-		return_data["data"] = "daily limit"
-
-		return return_data
-	} else if !tool.Do_edit_filter(db, config, doc_name, data) {
-		return_data["response"] = "error"
-		return_data["data"] = "edit filter (content)"
-
-		return return_data
-	} else if !tool.Do_edit_filter(db, config, doc_name, send) {
-		return_data["response"] = "error"
-		return_data["data"] = "edit filter (send)"
-
-		return return_data
-	} else if !tool.Do_edit_send_require_check(db, config, send) {
-		return_data["response"] = "error"
-		return_data["data"] = "send require"
-
-		return return_data
-	} else if !tool.Do_edit_text_checkbox_check(db, config, agree) {
-		return_data["response"] = "error"
-		return_data["data"] = "checkbox check require"
-
-		return return_data
-	} else if !tool.Do_edit_max_length_check(db, config, data) {
-		return_data["response"] = "error"
-		return_data["data"] = "overflow max length"
-
-		return return_data
+		return map[string]any{"response": "error", "data": "empty title"}
+	}
+	if !tool.Do_title_length_check(db, doc_name, "document") {
+		return map[string]any{"response": "error", "data": "title length"}
+	}
+	if !tool.Check_acl(db, doc_name, "", "document_edit", config.IP) {
+		return map[string]any{"response": "error", "data": "permission denied"}
+	}
+	if current_revision == "0" && !tool.Check_acl(db, doc_name, "", "document_make_acl", config.IP) {
+		return map[string]any{"response": "error", "data": "permission denied"}
+	}
+	if !tool.Check_edit_time(db, config.IP) {
+		return map[string]any{"response": "error", "data": "edit time"}
+	}
+	if !tool.Do_edit_slow_check(db, config, "edit") {
+		return map[string]any{"response": "error", "data": "slow edit limit"}
+	}
+	if !tool.Check_daily_limit(db, config.IP, "edit") {
+		return map[string]any{"response": "error", "data": "daily limit"}
+	}
+	if error_name := Edit_post_content_validation_error(db, config, doc_name, data, send, agree); error_name != "" {
+		return map[string]any{"response": "error", "data": error_name}
 	}
 
 	// The document save (content commit) and its backlink index update are one
@@ -93,10 +73,7 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 	// commit-time revision may have changed, so it must be validated here.
 	current_revision = tool.Get_document_revision(db, doc_name)
 	if expected_revision != "" && expected_revision != current_revision {
-		return_data["response"] = "error"
-		return_data["data"] = "edit conflict"
-
-		return return_data
+		return map[string]any{"response": "error", "data": "edit conflict"}
 	}
 
 	var old_data string
@@ -128,7 +105,5 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 	markup.Get_render(db, doc_name, data, "backlink")
 	Notify_indexnow(db, doc_name)
 
-	return_data["response"] = "ok"
-
-	return return_data
+	return map[string]any{"response": "ok"}
 }

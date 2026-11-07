@@ -63,7 +63,7 @@ func Api_bbs_w_delete(config tool.Config, set_id string, set_code string) map[st
 		return return_data
 	}
 
-	if err := Bbs_identifier_transaction(db, set_id, set_code, true, func(tx *sql.Tx) error {
+	if err := Bbs_board_write_transaction(db, set_id, set_code, func(tx *sql.Tx) error {
 		for _, value := range []struct {
 			query string
 			args  []any
@@ -91,6 +91,11 @@ func Api_bbs_w_delete(config tool.Config, set_id string, set_code string) map[st
 		}
 		return nil
 	}); err != nil {
+		if err == bbs_board_missing_error {
+			return_data["response"] = "not exist"
+			return_data["data"] = "bbs"
+			return return_data
+		}
 		panic(err)
 	}
 	tool.Search_bbs_index_delete(set_id, set_code)

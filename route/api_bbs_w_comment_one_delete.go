@@ -61,7 +61,7 @@ func Api_bbs_w_comment_one_delete(config tool.Config, set_id string, set_code st
 
 		return return_data
 	}
-	if err := Bbs_identifier_transaction(db, set_id, post_code, false, func(tx *sql.Tx) error {
+	if err := Bbs_board_write_transaction(db, set_id, post_code, func(tx *sql.Tx) error {
 		if comment != "" {
 			Bbs_post_comment_count_update(tx, set_id, post_code, -1)
 		}
@@ -80,6 +80,11 @@ func Api_bbs_w_comment_one_delete(config tool.Config, set_id string, set_code st
 		Bbs_post_last_activity_rebuild(tx, set_id, post_code)
 		return nil
 	}); err != nil {
+		if err == bbs_board_missing_error {
+			return_data["response"] = "not exist"
+			return_data["data"] = "bbs"
+			return return_data
+		}
 		panic(err)
 	}
 	tool.Search_bbs_index_update_comment(db, set_id, post_code, set_code)

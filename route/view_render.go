@@ -30,7 +30,7 @@ func View_render(config tool.Config, doc_name string, rev string) string {
 	if strings.Contains(strings.ToLower(raw_data), "[username") {
 		parameter_data["ip"] = config.IP
 	}
-	rendered_data := markup.Get_render(db, doc_name, raw_data, "normal", parameter_data)["data"]
+	rendered_data := markup.Get_render_with_requester(db, doc_name, raw_data, "normal", parameter_data, config.IP)["data"]
 	rendered_data = Apply_render_setting_data(db, config, rendered_data)
 	render_data := Get_render_setting_css(db, config) + rendered_data
 	return tool.Get_template(

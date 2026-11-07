@@ -42,7 +42,7 @@ func Api_bbs_w_set_put(config tool.Config, set_id string, set_name string, data 
 			}
 		}
 		if auth_info {
-			if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+			if err := Bbs_board_write_transaction(db, set_id, "", func(tx *sql.Tx) error {
 				if coverage == "" {
 					if _, err := tx.Exec(tool.DB_change("delete from bbs_set where set_name = ? and set_id = ?"), set_name, set_id); err != nil {
 						return err
@@ -56,6 +56,9 @@ func Api_bbs_w_set_put(config tool.Config, set_id string, set_name string, data 
 				tool.Do_insert_auth_history(tx, config.IP, "bbs_set ("+set_id+"/"+set_name+")")
 				return nil
 			}); err != nil {
+				if Bbs_board_missing_response(return_data, err, "bbs") {
+					return return_data
+				}
 				panic(err)
 			}
 

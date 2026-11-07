@@ -9,21 +9,6 @@ import (
 	"opennamu/route/tool"
 )
 
-func File_rename_parts(doc_name string) (string, string, bool) {
-	if !strings.HasPrefix(doc_name, "file:") {
-		return "", "", false
-	}
-
-	file_name := strings.TrimPrefix(doc_name, "file:")
-	extension := strings.TrimPrefix(strings.ToLower(filepath.Ext(file_name)), ".")
-	base_name := strings.TrimSuffix(file_name, filepath.Ext(file_name))
-	if base_name == "" || extension == "" || strings.ContainsAny(base_name, `/\`) || strings.Contains(base_name, ".") {
-		return "", "", false
-	}
-
-	return base_name, extension, true
-}
-
 func Api_edit_file_rename_post(config tool.Config, doc_name string, values url.Values) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)

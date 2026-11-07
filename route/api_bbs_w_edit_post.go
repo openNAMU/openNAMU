@@ -155,7 +155,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 
 			return return_data
 		}
-		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if err := Bbs_board_write_transaction(db, set_id, set_code, func(tx *sql.Tx) error {
 			if _, err := tx.Exec(
 				tool.DB_change("update bbs_data set set_data = ? where set_name = 'comment' and set_code = ? and set_id = ?"),
 				data,
@@ -167,6 +167,11 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 			Bbs_post_last_activity_update(tx, set_id, set_code, tool.Get_time())
 			return nil
 		}); err != nil {
+			if err == bbs_board_missing_error {
+				return_data["response"] = "not exist"
+				return_data["data"] = "bbs"
+				return return_data
+			}
 			panic(err)
 		}
 		tool.Search_bbs_index_update_comment(db, set_id, set_code, comment_code)
@@ -218,7 +223,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 		board_interval := tool.Bbs_board_slow_interval(db, set_id)
 		retry_after := 0
 
-		if err := Bbs_identifier_transaction(db, set_id, "", true, func(tx *sql.Tx) error {
+		if err := Bbs_board_write_transaction(db, set_id, "", func(tx *sql.Tx) error {
 			remaining, err := tool.Bbs_slow_enforce(db, tx, config.IP, set_id, "", board_interval, 0)
 			if err != nil {
 				return err
@@ -269,6 +274,11 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 			}
 			return nil
 		}); err != nil {
+			if err == bbs_board_missing_error {
+				return_data["response"] = "not exist"
+				return_data["data"] = "bbs"
+				return return_data
+			}
 			if errors.Is(err, tool.BbsSlowModeError) {
 				return_data["response"] = "error"
 				return_data["data"] = "slow_mode"
@@ -327,7 +337,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 	}
 
 	date := tool.Get_time()
-	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	if err := Bbs_board_write_transaction(db, set_id, set_code, func(tx *sql.Tx) error {
 		for _, value := range []struct {
 			query string
 			args  []any
@@ -380,6 +390,11 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 		}
 		return nil
 	}); err != nil {
+		if err == bbs_board_missing_error {
+			return_data["response"] = "not exist"
+			return_data["data"] = "bbs"
+			return return_data
+		}
 		panic(err)
 	}
 	tool.Search_bbs_index_update(db, set_id, set_code)

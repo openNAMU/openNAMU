@@ -39,7 +39,8 @@ func Api_w_render(config tool.Config, doc_name string, raw_data string, render_t
 		raw_data = saved_data
 	}
 
-	data := markup.Get_render(db, doc_name, raw_data, render_type, parameter_data)
+	// Keep the server-derived requester separate from the client option map.
+	data := markup.Get_render_with_requester(db, doc_name, raw_data, render_type, parameter_data, config.IP)
 	if render_type != "backlink" {
 		rendered_data := data["data"]
 		rendered_data = Apply_render_setting_data(db, config, rendered_data)

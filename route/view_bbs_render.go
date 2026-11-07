@@ -18,11 +18,11 @@ func Get_bbs_render(db *sql.DB, set_id string, data string, render_type string, 
 	bbs_markup := tool.Get_bbs_set_first_data(db, set_id, "bbs_markup")
 
 	if bbs_markup == "" || bbs_markup == "normal" || bbs_markup == "namumark_beta" {
-		rendered_data := markup.Get_render(db, "", data, render_type, parameter_data)["data"]
+		rendered_data := markup.Get_render_with_requester(db, "", data, render_type, parameter_data, config.IP)["data"]
 		return Add_render_external_link_target(rendered_data)
 	}
 
 	render_name := strconv.FormatInt(time.Now().UnixNano(), 10)
-	rendered_data := markup.Get_render_direct(db, "", data, bbs_markup, render_name, render_type, parameter_data)["data"]
+	rendered_data := markup.Get_render_direct_with_requester(db, "", data, bbs_markup, render_name, render_type, parameter_data, config.IP)["data"]
 	return Add_render_external_link_target(rendered_data)
 }

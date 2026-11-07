@@ -69,10 +69,13 @@ func Api_bbs_w_tabom_post(config tool.Config, set_id string, set_code string, vo
 	}
 
 	var result map[string]any
-	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	if err := Bbs_board_write_transaction(db, set_id, set_code, func(tx *sql.Tx) error {
 		result = Api_bbs_tabom_post(tx, config.IP, set_id, set_code, vote_type)
 		return nil
 	}); err != nil {
+		if Bbs_board_missing_response(return_data, err, "bbs") {
+			return return_data
+		}
 		panic(err)
 	}
 	return result

@@ -15,7 +15,7 @@ func Get_thread_ui(db *sql.DB, user_name string, date string, data string, code 
 		if config.IP != "" {
 			parameter_data["ip"] = config.IP
 		}
-		rendered_data = markup.Get_render(db, "", data, "thread", parameter_data)["data"]
+		rendered_data = markup.Get_render_with_requester(db, "", data, "thread", parameter_data, config.IP)["data"]
 		rendered_data = Render_topic_reference(rendered_data, topic_num, "", "", "thread")
 		rendered_data = Add_render_external_link_target(rendered_data)
 	}

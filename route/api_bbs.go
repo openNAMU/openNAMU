@@ -2,6 +2,7 @@ package route
 
 import (
 	"database/sql"
+	"errors"
 	"strconv"
 	"strings"
 
@@ -725,12 +726,13 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 	}
 
 	if len(activity_update_list) > 0 {
-		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		err := Bbs_board_write_transaction(db, bbs_num, "", func(tx *sql.Tx) error {
 			for _, activity_data := range activity_update_list {
 				Bbs_post_last_activity_update(tx, activity_data[0], activity_data[1], activity_data[2])
 			}
 			return nil
-		}); err != nil {
+		})
+		if err != nil && !errors.Is(err, bbs_board_missing_error) {
 			panic(err)
 		}
 	}

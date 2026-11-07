@@ -2,6 +2,7 @@ package route
 
 import (
 	"database/sql"
+	"errors"
 
 	"opennamu/route/tool"
 )
@@ -38,7 +39,7 @@ func Api_bbs_delete(config tool.Config, set_id string) map[string]any {
 		return return_data
 	}
 
-	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	if err := Bbs_board_write_transaction(db, set_id, "", func(tx *sql.Tx) error {
 		for _, value := range []struct {
 			query string
 			args  []any
@@ -66,6 +67,11 @@ func Api_bbs_delete(config tool.Config, set_id string) map[string]any {
 		}
 		return nil
 	}); err != nil {
+		if errors.Is(err, bbs_board_missing_error) {
+			return_data["response"] = "not exist"
+			return_data["data"] = "bbs"
+			return return_data
+		}
 		panic(err)
 	}
 	tool.Search_bbs_index_delete_set(db, set_id)

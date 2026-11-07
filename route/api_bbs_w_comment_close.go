@@ -34,7 +34,7 @@ func Api_bbs_w_comment_close(config tool.Config, set_id string, set_code string,
 		return return_data
 	}
 
-	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	if err := Bbs_board_write_transaction(db, set_id, set_code, func(tx *sql.Tx) error {
 		if _, err := tx.Exec(tool.DB_change("delete from bbs_data where set_name = 'comment_close' and set_id = ? and set_code = ?"), set_id, set_code); err != nil {
 			return err
 		}
@@ -46,6 +46,9 @@ func Api_bbs_w_comment_close(config tool.Config, set_id string, set_code string,
 		Bbs_post_last_activity_update(tx, set_id, set_code, tool.Get_time())
 		return nil
 	}); err != nil {
+		if Bbs_board_missing_response(return_data, err, "bbs") {
+			return return_data
+		}
 		panic(err)
 	}
 

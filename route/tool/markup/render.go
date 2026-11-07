@@ -26,6 +26,12 @@ func Get_render(db *sql.DB, doc_name string, data string, render_type string, pa
 	if len(parameters) > 0 && parameters[0] != nil {
 		parameter_data = parameters[0]
 	}
+	return Get_render_with_requester(db, doc_name, data, render_type, parameter_data, "")
+}
+
+// Get_render_with_requester keeps the authorization identity separate from
+// renderer parameters, which may include client-controlled values.
+func Get_render_with_requester(db *sql.DB, doc_name string, data string, render_type string, parameter_data map[string]any, requester string) map[string]string {
 	markup := tool.Get_document_markup(db, doc_name, "")
 	if render_type == "normal" || render_type == "api_view" || render_type == "api_from" || render_type == "api_include" || render_type == "backlink" {
 		markup = tool.Get_document_markup(db, doc_name, "document")
@@ -33,15 +39,23 @@ func Get_render(db *sql.DB, doc_name string, data string, render_type string, pa
 	now_time := time.Now().UnixNano()
 	render_name := strconv.Itoa(int(now_time))
 
-	render_data := Get_render_direct(db, doc_name, data, markup, render_name, render_type, parameter_data)
-
-	return render_data
+	return Get_render_direct_with_requester(db, doc_name, data, markup, render_name, render_type, parameter_data, requester)
 }
 
 func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, render_name string, render_type string, parameters ...map[string]any) map[string]string {
 	parameter_data := map[string]any{}
 	if len(parameters) > 0 && parameters[0] != nil {
 		parameter_data = parameters[0]
+	}
+	return Get_render_direct_with_requester(db, doc_name, data, markup, render_name, render_type, parameter_data, "")
+}
+
+// Get_render_direct_with_requester passes a server-derived requester to markup
+// features that must authorize document reads. The value is never read from
+// parameter_data.
+func Get_render_direct_with_requester(db *sql.DB, doc_name string, data string, markup string, render_name string, render_type string, parameter_data map[string]any, requester string) map[string]string {
+	if parameter_data == nil {
+		parameter_data = map[string]any{}
 	}
 
 	from := ""
@@ -77,7 +91,7 @@ func Get_render_direct(db *sql.DB, doc_name string, data string, markup string, 
 		if include == "1" {
 			compat_render_type = "include"
 		}
-		compat_data := Render_namumark_compat(db, doc_name, data, compat_render_type, parameter_data, 0, false)
+		compat_data := Render_namumark_compat_with_requester(db, doc_name, data, compat_render_type, parameter_data, 0, false, requester)
 		if render_type == "setting" {
 			return map[string]string{
 				"data":    compat_data["data"].(string),

@@ -17,7 +17,7 @@ func Api_bbs_w_page_view_post(config tool.Config, set_id string, set_code string
 		return return_data
 	}
 
-	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	if err := Bbs_board_write_transaction(db, set_id, set_code, func(tx *sql.Tx) error {
 		result, err := tx.Exec(
 			tool.DB_change("update bbs_data set set_data = set_data + 1 where set_name = 'view_count' and set_id = ? and set_code = ?"),
 			set_id,
@@ -41,6 +41,9 @@ func Api_bbs_w_page_view_post(config tool.Config, set_id string, set_code string
 		)
 		return err
 	}); err != nil {
+		if Bbs_board_missing_response(return_data, err, "bbs") {
+			return return_data
+		}
 		panic(err)
 	}
 

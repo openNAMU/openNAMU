@@ -23,7 +23,7 @@ func Api_bbs_w_blind_post(config tool.Config, set_id string, set_code string, bl
 		return return_data
 	}
 
-	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+	if err := Bbs_board_write_transaction(db, set_id, set_code, func(tx *sql.Tx) error {
 		blind_value := ""
 		blind_exists := tool.QueryRow_DB(tx, "select set_data from bbs_data where set_name = 'blind' and set_id = ? and set_code = ?", []any{&blind_value}, set_id, set_code)
 		if blind {
@@ -37,6 +37,9 @@ func Api_bbs_w_blind_post(config tool.Config, set_id string, set_code string, bl
 		_, err := tx.Exec(tool.DB_change("delete from bbs_data where set_name = 'blind' and set_id = ? and set_code = ?"), set_id, set_code)
 		return err
 	}); err != nil {
+		if Bbs_board_missing_response(return_data, err, "bbs") {
+			return return_data
+		}
 		panic(err)
 	}
 

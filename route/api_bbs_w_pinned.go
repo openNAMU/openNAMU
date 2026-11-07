@@ -60,7 +60,7 @@ func Api_bbs_w_pinned(config tool.Config, set_id string, set_code string, toggle
 	}
 
 	if toggle {
-		if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
+		if err := Bbs_board_write_transaction(db, set_id, set_code, func(tx *sql.Tx) error {
 			pinned := ""
 			pinned_exist := tool.QueryRow_DB(tx, "select set_data from bbs_data where set_name = 'pinned' and set_id = ? and set_code = ?", []any{&pinned}, set_id, set_code)
 			if pinned_exist {
@@ -70,6 +70,9 @@ func Api_bbs_w_pinned(config tool.Config, set_id string, set_code string, toggle
 			_, err := tx.Exec(tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values ('pinned', ?, ?, ?)"), set_code, set_id, tool.Get_time())
 			return err
 		}); err != nil {
+			if Bbs_board_missing_response(return_data, err, "bbs") {
+				return return_data
+			}
 			panic(err)
 		}
 	}

@@ -21,13 +21,14 @@ import (
 // It owns all compatibility state so the layer can be removed without
 // changing namumark.go.
 type namumark_compat_renderer struct {
-	db            *sql.DB
-	doc_name      string
-	render_type   string
-	parameter     map[string]any
-	data          string
-	include_depth int
-	collect_only  bool
+	db                *sql.DB
+	doc_name          string
+	render_type       string
+	parameter         map[string]any
+	trusted_requester string // server-derived; separate from mutable renderer parameters
+	data              string
+	include_depth     int
+	collect_only      bool
 
 	tokens         map[string]string
 	slash_tokens   map[string]string
@@ -426,28 +427,42 @@ func New_namumark_compat_renderer(
 	include_depth int,
 	collect_only bool,
 ) *namumark_compat_renderer {
+	return New_namumark_compat_renderer_with_requester(db, doc_name, data, render_type, parameter, include_depth, collect_only, "")
+}
+
+func New_namumark_compat_renderer_with_requester(
+	db *sql.DB,
+	doc_name string,
+	data string,
+	render_type string,
+	parameter map[string]any,
+	include_depth int,
+	collect_only bool,
+	trusted_requester string,
+) *namumark_compat_renderer {
 	if parameter == nil {
 		parameter = map[string]any{}
 	}
 
 	renderer := &namumark_compat_renderer{
-		db:              db,
-		doc_name:        doc_name,
-		render_type:     render_type,
-		parameter:       parameter,
-		data:            Compat_html_escape(strings.ReplaceAll(data, "\r", "")),
-		include_depth:   include_depth,
-		collect_only:    collect_only,
-		tokens:          map[string]string{},
-		slash_tokens:    map[string]string{},
-		inter_data:      map[string]string{},
-		inter_raw:       map[string]string{},
-		inter_wrappers:  map[string]string{},
-		literal_tokens:  map[string]bool{},
-		backlinks:       map[string]namumark_compat_backlink{},
-		document_cache:  map[string]namumark_compat_document{},
-		footnote_map:    map[string]int{},
-		footnote_prefix: "open_namu_fn_" + tool.Sha224(doc_name + data)[:12],
+		db:                db,
+		doc_name:          doc_name,
+		render_type:       render_type,
+		parameter:         parameter,
+		trusted_requester: trusted_requester,
+		data:              Compat_html_escape(strings.ReplaceAll(data, "\r", "")),
+		include_depth:     include_depth,
+		collect_only:      collect_only,
+		tokens:            map[string]string{},
+		slash_tokens:      map[string]string{},
+		inter_data:        map[string]string{},
+		inter_raw:         map[string]string{},
+		inter_wrappers:    map[string]string{},
+		literal_tokens:    map[string]bool{},
+		backlinks:         map[string]namumark_compat_backlink{},
+		document_cache:    map[string]namumark_compat_document{},
+		footnote_map:      map[string]int{},
+		footnote_prefix:   "open_namu_fn_" + tool.Sha224(doc_name + data)[:12],
 	}
 	renderer.token_prefix = "OPENNAMU_COMPAT_TOKEN_" + fmt.Sprintf("%p", renderer) + "_"
 	return renderer
@@ -1264,10 +1279,16 @@ func (class *namumark_compat_renderer) Process_includes(data string) string {
 			if class.collect_only || class.include_depth >= 8 {
 				return suffix
 			}
+			// Authorize the resolved title before the direct body read. Include
+			// arguments can change renderer parameters, but never this requester.
+			if class.trusted_requester == "" || class.trusted_requester == tool.Invalid_remote_address ||
+				!tool.Check_acl(class.db, include_name, "", "render", class.trusted_requester) {
+				return suffix
+			}
 
 			include_data := ""
 			tool.QueryRow_DB(class.db, "select data from data where title = ?", []any{&include_data}, include_name)
-			child := New_namumark_compat_renderer(class.db, class.doc_name, include_data, "include", include_parameter, class.include_depth+1, false)
+			child := New_namumark_compat_renderer_with_requester(class.db, class.doc_name, include_data, "include", include_parameter, class.include_depth+1, false, class.trusted_requester)
 			child.Prepare()
 			child_output := `<div class="opennamu_render_complete">` + child.Render_output() + `</div>`
 			include_link := ""
@@ -1932,7 +1953,7 @@ func (class *namumark_compat_renderer) Process_middle(data string) string {
 	return data
 }
 func (class *namumark_compat_renderer) Render_inter(data string) string {
-	child := New_namumark_compat_renderer(class.db, class.doc_name, data, "inter", class.parameter, class.include_depth, false)
+	child := New_namumark_compat_renderer_with_requester(class.db, class.doc_name, data, "inter", class.parameter, class.include_depth, false, class.trusted_requester)
 	child.data = strings.ReplaceAll(data, "\r", "")
 	child.Prepare()
 	result := child.Render_output()
@@ -3304,7 +3325,20 @@ func Render_namumark_compat(
 	include_depth int,
 	collect_only bool,
 ) map[string]any {
-	class := New_namumark_compat_renderer(db, doc_name, data, render_type, parameter, include_depth, collect_only)
+	return Render_namumark_compat_with_requester(db, doc_name, data, render_type, parameter, include_depth, collect_only, "")
+}
+
+func Render_namumark_compat_with_requester(
+	db *sql.DB,
+	doc_name string,
+	data string,
+	render_type string,
+	parameter map[string]any,
+	include_depth int,
+	collect_only bool,
+	trusted_requester string,
+) map[string]any {
+	class := New_namumark_compat_renderer_with_requester(db, doc_name, data, render_type, parameter, include_depth, collect_only, trusted_requester)
 	return class.Result()
 }
 

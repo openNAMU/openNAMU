@@ -1,6 +1,7 @@
 package route
 
 import (
+	"bytes"
 	"io"
 
 	"opennamu/route/tool"
@@ -36,34 +37,23 @@ func View_edit_file_upload_post(config tool.Config, upload_files []Upload_file_d
 
 	last_doc := ""
 	for _, v := range upload_files {
-		data := map[string]any{}
-		if v.File_reader != nil {
-			data = Api_file_upload_post_reader(
-				config,
-				v.File_name,
-				v.File_reader,
-				v.File_ext,
-				v.License,
-				v.License_text,
-				"",
-				false,
-				len(upload_files) > 1,
-				v.Replace == "1",
-			)
-		} else {
-			data = Api_file_upload_post_internal(
-				config,
-				v.File_name,
-				v.File_data,
-				v.File_ext,
-				v.License,
-				v.License_text,
-				"",
-				false,
-				len(upload_files) > 1,
-				v.Replace == "1",
-			)
+		var file_reader io.Reader = v.File_reader
+		if file_reader == nil {
+			file_reader = bytes.NewReader(v.File_data)
 		}
+
+		data := Api_file_upload_post_reader(
+			config,
+			v.File_name,
+			file_reader,
+			v.File_ext,
+			v.License,
+			v.License_text,
+			"",
+			false,
+			len(upload_files) > 1,
+			v.Replace == "1",
+		)
 		if data["response"] != "ok" {
 			error_name, _ := data["data"].(string)
 			if error_name == "" {
