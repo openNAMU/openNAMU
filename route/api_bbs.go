@@ -118,6 +118,17 @@ func Bbs_post_view_sql(db *sql.DB, set_id string, ip string, row_alias string) (
 	return view_sql, view_values
 }
 
+type bbs_user_display_data struct {
+	ip_pre    string
+	ip_render string
+}
+
+type bbs_post_activity_update struct {
+	set_id   string
+	set_code string
+	date     string
+}
+
 type bbs_filter struct {
 	comment_min          int
 	commented            int
@@ -480,7 +491,32 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 		return map[string]any{"response": "require auth", "data": []map[string]string{}, "has_next": false}
 	}
 
-	rows_arr := []*sql.Rows{}
+	append_post_view_and_filter_sql := func(query string, row_alias string, values []any) (string, []any) {
+		view_sql, view_values := Bbs_post_view_sql(db, bbs_num, config.IP, row_alias)
+		filter_sql, filter_values := Bbs_filter_sql(filter, row_alias, config.IP)
+		if view_sql != "" {
+			query += " and " + view_sql
+			values = append(values, view_values...)
+		}
+		query += filter_sql
+		values = append(values, filter_values...)
+		return query, values
+	}
+
+	var main_listing_rows *sql.Rows
+	var pinned_listing_rows *sql.Rows
+	var ordinary_listing_rows *sql.Rows
+	defer func() {
+		if main_listing_rows != nil {
+			main_listing_rows.Close()
+		}
+		if pinned_listing_rows != nil {
+			pinned_listing_rows.Close()
+		}
+		if ordinary_listing_rows != nil {
+			ordinary_listing_rows.Close()
+		}
+	}()
 	if bbs_num == "" {
 		view_sql, view_values := Bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
 		query := "select set_code, set_id, '0' from bbs_data where set_name = 'date' and set_id + 0 > 0 and " + tool.Get_except_set_id_SQL()
@@ -488,9 +524,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			query += " and " + view_sql
 		}
 		query += " order by set_data desc limit 50"
-		rows := tool.Query_DB(db, query, view_values...)
-
-		rows_arr = append(rows_arr, rows)
+		main_listing_rows = tool.Query_DB(db, query, view_values...)
 	} else {
 		page := tool.Str_to_int(page)
 		num := 0
@@ -498,130 +532,111 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			num = page*50 - 50
 		}
 
-		view_sql, view_values := Bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
-		filter_sql, filter_values := Bbs_filter_sql(filter, "bbs_data", config.IP)
 		query := "select set_code, set_id, '1'"
 		if sort_type == "activity" {
 			query += ", " + Bbs_post_last_activity_sql("bbs_data") + " as activity_date, " + Bbs_post_last_activity_missing_sql("bbs_data") + " as activity_cache_missing"
 		}
 		query += " from bbs_data where set_name = 'pinned' and set_id like ?"
-		values := []any{bbs_num}
-		if view_sql != "" {
-			query += " and " + view_sql
-			values = append(values, view_values...)
-		}
-		query += filter_sql
-		values = append(values, filter_values...)
+		query, values := append_post_view_and_filter_sql(query, "bbs_data", []any{bbs_num})
 		if sort_type == "excellent" {
 			query += " and " + Bbs_post_tabom_score_sql("bbs_data") + " > ?"
 			values = append(values, Bbs_excellent_min(db, bbs_num))
 		}
 		query += " order by set_data desc"
-		rows := tool.Query_DB(db, query, values...)
+		pinned_listing_rows = tool.Query_DB(db, query, values...)
 
-		rows_arr = append(rows_arr, rows)
-
+		row_alias := "title"
+		query = "select title.set_code, title.set_id, '0'"
 		if sort_type == "activity" {
-			view_sql, view_values = Bbs_post_view_sql(db, bbs_num, config.IP, "title")
-			filter_sql, filter_values := Bbs_filter_sql(filter, "title", config.IP)
-			query = "select title.set_code, title.set_id, '0', " + Bbs_post_last_activity_sql("title") + " as activity_date, " + Bbs_post_last_activity_missing_sql("title") + " as activity_cache_missing from bbs_data title where title.set_name = 'title' and title.set_id like ?"
-			values = []any{bbs_num}
-			if view_sql != "" {
-				query += " and " + view_sql
-				values = append(values, view_values...)
-			}
-			query += filter_sql
-			values = append(values, filter_values...)
-			query += " order by activity_date desc, title.set_code + 0 desc limit ?, 51"
-			values = append(values, num)
-			rows = tool.Query_DB(db, query, values...)
-		} else if sort_type == "view" {
-			view_sql, view_values = Bbs_post_view_sql(db, bbs_num, config.IP, "title")
-			filter_sql, filter_values := Bbs_filter_sql(filter, "title", config.IP)
-			query = "select title.set_code, title.set_id, '0' from bbs_data title left join bbs_data view_data on view_data.set_name = 'view_count' and view_data.set_id = title.set_id and view_data.set_code = title.set_code where title.set_name = 'title' and title.set_id like ?"
-			values = []any{bbs_num}
-			if view_sql != "" {
-				query += " and " + view_sql
-				values = append(values, view_values...)
-			}
-			query += filter_sql
-			values = append(values, filter_values...)
-			query += " order by coalesce(view_data.set_data, '0') + 0 desc, title.set_code + 0 desc limit ?, 51"
-			values = append(values, num)
-			rows = tool.Query_DB(db, query, values...)
-		} else if sort_type == "comment" {
-			view_sql, view_values = Bbs_post_view_sql(db, bbs_num, config.IP, "title")
-			filter_sql, filter_values := Bbs_filter_sql(filter, "title", config.IP)
-			query = "select title.set_code, title.set_id, '0' from bbs_data title where title.set_name = 'title' and title.set_id like ?"
-			values = []any{bbs_num}
-			if view_sql != "" {
-				query += " and " + view_sql
-				values = append(values, view_values...)
-			}
-			query += filter_sql
-			values = append(values, filter_values...)
-			query += " order by " + Bbs_post_comment_count_sql("title") + " desc, title.set_code + 0 desc limit ?, 51"
-			values = append(values, num)
-			rows = tool.Query_DB(db, query, values...)
-		} else if sort_type == "tabom" {
-			view_sql, view_values = Bbs_post_view_sql(db, bbs_num, config.IP, "title")
-			filter_sql, filter_values := Bbs_filter_sql(filter, "title", config.IP)
-			query = "select title.set_code, title.set_id, '0' from bbs_data title where title.set_name = 'title' and title.set_id like ?"
-			values = []any{bbs_num}
-			if view_sql != "" {
-				query += " and " + view_sql
-				values = append(values, view_values...)
-			}
-			query += filter_sql
-			values = append(values, filter_values...)
-			query += " order by " + Bbs_post_tabom_count_sql("title") + " desc, title.set_code + 0 desc limit ?, 51"
-			values = append(values, num)
-			rows = tool.Query_DB(db, query, values...)
-		} else if sort_type == "excellent" {
-			view_sql, view_values = Bbs_post_view_sql(db, bbs_num, config.IP, "title")
-			filter_sql, filter_values := Bbs_filter_sql(filter, "title", config.IP)
-			query = "select title.set_code, title.set_id, '0' from bbs_data title where title.set_name = 'title' and title.set_id like ?"
-			values = []any{bbs_num}
-			if view_sql != "" {
-				query += " and " + view_sql
-				values = append(values, view_values...)
-			}
-			query += filter_sql
-			values = append(values, filter_values...)
-			query += " and " + Bbs_post_tabom_score_sql("title") + " > ?"
-			values = append(values, Bbs_excellent_min(db, bbs_num))
-			query += " order by " + Bbs_post_tabom_score_sql("title") + " desc, title.set_code + 0 desc limit ?, 51"
-			values = append(values, num)
-			rows = tool.Query_DB(db, query, values...)
-		} else {
-			view_sql, view_values = Bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
-			filter_sql, filter_values := Bbs_filter_sql(filter, "bbs_data", config.IP)
-			query = "select set_code, set_id, '0' from bbs_data where set_name = 'title' and set_id like ?"
-			values = []any{bbs_num}
-			if view_sql != "" {
-				query += " and " + view_sql
-				values = append(values, view_values...)
-			}
-			query += filter_sql
-			values = append(values, filter_values...)
-			query += " order by set_code + 0 desc limit ?, 51"
-			values = append(values, num)
-			rows = tool.Query_DB(db, query, values...)
+			query += ", " + Bbs_post_last_activity_sql(row_alias) + " as activity_date, " + Bbs_post_last_activity_missing_sql(row_alias) + " as activity_cache_missing"
 		}
+		query += " from bbs_data title"
+		if sort_type == "view" {
+			query += " left join bbs_data view_data on view_data.set_name = 'view_count' and view_data.set_id = title.set_id and view_data.set_code = title.set_code"
+		}
+		query += " where title.set_name = 'title' and title.set_id like ?"
 
-		rows_arr = append(rows_arr, rows)
+		query, values = append_post_view_and_filter_sql(query, row_alias, []any{bbs_num})
+
+		order_by := "title.set_code + 0 desc"
+		switch sort_type {
+		case "activity":
+			order_by = "activity_date desc, title.set_code + 0 desc"
+		case "view":
+			order_by = "coalesce(view_data.set_data, '0') + 0 desc, title.set_code + 0 desc"
+		case "comment":
+			order_by = Bbs_post_comment_count_sql(row_alias) + " desc, title.set_code + 0 desc"
+		case "tabom":
+			order_by = Bbs_post_tabom_count_sql(row_alias) + " desc, title.set_code + 0 desc"
+		case "excellent":
+			score_sql := Bbs_post_tabom_score_sql(row_alias)
+			query += " and " + score_sql + " > ?"
+			values = append(values, Bbs_excellent_min(db, bbs_num))
+			order_by = score_sql + " desc, title.set_code + 0 desc"
+		}
+		query += " order by " + order_by + " limit ?, 51"
+		values = append(values, num)
+		ordinary_listing_rows = tool.Query_DB(db, query, values...)
 	}
 
 	data_list := []map[string]string{}
 	has_next := false
-	normal_count := 0
-	ip_parser_temp := map[string][]string{}
-	activity_update_list := [][]string{}
+	ip_parser_temp := map[string]bbs_user_display_data{}
+	activity_update_list := []bbs_post_activity_update{}
 
-	for for_a := 0; for_a < len(rows_arr); for_a++ {
-		defer rows_arr[for_a].Close()
+	hydrate_post_data := func(temp_data map[string]string, set_code string, set_id string) {
+		post_rows := tool.Query_DB(
+			db,
+			"select set_name, set_data from bbs_data where set_code = ? and set_id = ?",
+			set_code,
+			set_id,
+		)
+		defer post_rows.Close()
 
-		for rows_arr[for_a].Next() {
+		for post_rows.Next() {
+			var set_name string
+			var set_data string
+			if err := post_rows.Scan(&set_name, &set_data); err != nil {
+				panic(err)
+			}
+			if set_name == tool.Bbs_post_creation_time_name {
+				continue
+			}
+
+			if set_name == "user_id" {
+				user_display, exists := ip_parser_temp[set_data]
+				if !exists {
+					user_display = bbs_user_display_data{
+						ip_pre:    tool.IP_preprocess(db, set_data, config.IP)[0],
+						ip_render: tool.Get_user_profile_image_ui(db, set_data) + tool.IP_parser(db, set_data, config.IP),
+					}
+					ip_parser_temp[set_data] = user_display
+				}
+
+				set_data = user_display.ip_pre
+				temp_data["user_id_render"] = user_display.ip_render
+			}
+
+			if set_name == "tag" {
+				if temp_data["tags"] != "" {
+					temp_data["tags"] += ", "
+				}
+				temp_data["tags"] += set_data
+				continue
+			}
+
+			if set_name != "data" && set_name != "pinned" {
+				temp_data[set_name] = set_data
+			}
+		}
+		if err := post_rows.Err(); err != nil {
+			panic(err)
+		}
+	}
+
+	process_listing_rows := func(listing_rows *sql.Rows, is_ordinary_list bool) {
+		normal_count := 0
+		for listing_rows.Next() {
 			temp_data := make(map[string]string)
 
 			var set_code string
@@ -631,14 +646,14 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			activity_cache_missing := 0
 			var err error
 			if sort_type == "activity" {
-				err = rows_arr[for_a].Scan(&set_code, &set_id, &pinned, &activity_date, &activity_cache_missing)
+				err = listing_rows.Scan(&set_code, &set_id, &pinned, &activity_date, &activity_cache_missing)
 			} else {
-				err = rows_arr[for_a].Scan(&set_code, &set_id, &pinned)
+				err = listing_rows.Scan(&set_code, &set_id, &pinned)
 			}
 			if err != nil {
 				panic(err)
 			}
-			if bbs_num != "" && pinned != "1" {
+			if is_ordinary_list {
 				normal_count++
 				if normal_count > 50 {
 					has_next = true
@@ -646,7 +661,11 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 				}
 			}
 			if sort_type == "activity" && activity_cache_missing == 1 && activity_date != "" {
-				activity_update_list = append(activity_update_list, []string{set_id, set_code, activity_date})
+				activity_update_list = append(activity_update_list, bbs_post_activity_update{
+					set_id:   set_id,
+					set_code: set_code,
+					date:     activity_date,
+				})
 			}
 
 			if bbs_num == "" && !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
@@ -659,76 +678,29 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			if activity_date != "" {
 				temp_data["activity_date"] = activity_date
 			}
-
-			rows := tool.Query_DB(
-				db,
-				"select set_name, set_data, set_code, set_id from bbs_data where set_code = ? and set_id = ?",
-				set_code,
-				set_id,
-			)
-			defer rows.Close()
-
-			for rows.Next() {
-				var set_name string
-				var set_data string
-
-				err := rows.Scan(&set_name, &set_data, &set_code, &set_id)
-				if err != nil {
-					panic(err)
-				}
-
-				if set_name == tool.Bbs_post_creation_time_name {
-					continue
-				}
-
-				if set_name == "user_id" {
-					var ip_pre string
-					var ip_render string
-
-					if _, ok := ip_parser_temp[set_data]; ok {
-						ip_pre = ip_parser_temp[set_data][0]
-						ip_render = ip_parser_temp[set_data][1]
-					} else {
-						ip_pre = tool.IP_preprocess(db, set_data, config.IP)[0]
-						ip_render = tool.Get_user_profile_image_ui(db, set_data) + tool.IP_parser(db, set_data, config.IP)
-
-						ip_parser_temp[set_data] = []string{ip_pre, ip_render}
-					}
-
-					set_data = ip_pre
-					temp_data["user_id_render"] = ip_render
-				}
-
-				if set_name == "tag" {
-					if temp_data["tags"] != "" {
-						temp_data["tags"] += ", "
-					}
-					temp_data["tags"] += set_data
-					continue
-				}
-
-				if set_name != "data" && set_name != "pinned" {
-					temp_data[set_name] = set_data
-				}
-			}
-			if err := rows.Err(); err != nil {
-				rows.Close()
-				panic(err)
-			}
-			rows.Close()
+			hydrate_post_data(temp_data, set_code, set_id)
 			data_list = append(data_list, temp_data)
 		}
-		if err := rows_arr[for_a].Err(); err != nil {
-			rows_arr[for_a].Close()
+		if err := listing_rows.Err(); err != nil {
 			panic(err)
 		}
-		rows_arr[for_a].Close()
+		listing_rows.Close()
+	}
+
+	if bbs_num == "" {
+		process_listing_rows(main_listing_rows, false)
+		main_listing_rows = nil
+	} else {
+		process_listing_rows(pinned_listing_rows, false)
+		pinned_listing_rows = nil
+		process_listing_rows(ordinary_listing_rows, true)
+		ordinary_listing_rows = nil
 	}
 
 	if len(activity_update_list) > 0 {
 		err := Bbs_board_write_transaction(db, bbs_num, "", func(tx *sql.Tx) error {
 			for _, activity_data := range activity_update_list {
-				Bbs_post_last_activity_update(tx, activity_data[0], activity_data[1], activity_data[2])
+				Bbs_post_last_activity_update(tx, activity_data.set_id, activity_data.set_code, activity_data.date)
 			}
 			return nil
 		})

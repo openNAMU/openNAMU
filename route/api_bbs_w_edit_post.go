@@ -3,10 +3,10 @@ package route
 import (
 	"database/sql"
 	"errors"
-
-	"opennamu/route/tool"
 	"strconv"
 	"strings"
+
+	"opennamu/route/tool"
 )
 
 func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, comment_code string, title string, data string, prefix string, tags string, document string) map[string]any {
@@ -91,95 +91,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 	}
 
 	if comment_code != "" {
-		comment_code_split := strings.Split(comment_code, "-")
-		comment_set_id := set_id + "-" + set_code
-		comment_set_code := ""
-
-		if len(comment_code_split) > 0 {
-			comment_set_code = comment_code_split[len(comment_code_split)-1]
-			if len(comment_code_split) > 1 {
-				comment_set_id += "-" + strings.Join(comment_code_split[:len(comment_code_split)-1], "-")
-			}
-		}
-
-		if comment_set_code == "" {
-			return_data["response"] = "not exist"
-			return_data["data"] = "comment"
-
-			return return_data
-		}
-
-		comment := ""
-		if !tool.QueryRow_DB(
-			db,
-			"select set_data from bbs_data where set_name = 'comment' and set_id = ? and set_code = ?",
-			[]any{&comment},
-			comment_set_id,
-			comment_set_code,
-		) {
-			return_data["response"] = "not exist"
-			return_data["data"] = "comment"
-
-			return return_data
-		}
-
-		comment_user_id := ""
-		if !tool.QueryRow_DB(
-			db,
-			"select set_data from bbs_data where set_name = 'comment_user_id' and set_id = ? and set_code = ?",
-			[]any{&comment_user_id},
-			comment_set_id,
-			comment_set_code,
-		) {
-			return_data["response"] = "not exist"
-			return_data["data"] = "comment"
-
-			return return_data
-		}
-
-		comment_manage := tool.Check_permission(db, "bbs_comment_manage", config.IP)
-		blind := ""
-		tool.QueryRow_DB(
-			db,
-			"select set_data from bbs_data where set_name = 'blind' and set_id = ? and set_code = ?",
-			[]any{&blind},
-			comment_set_id,
-			comment_set_code,
-		)
-		if blind == "O" && !comment_manage {
-			return_data["response"] = "require auth"
-			return return_data
-		}
-		if comment_user_id != config.IP && !comment_manage {
-			return_data["response"] = "require auth"
-
-			return return_data
-		}
-		if err := Bbs_board_write_transaction(db, set_id, set_code, func(tx *sql.Tx) error {
-			if _, err := tx.Exec(
-				tool.DB_change("update bbs_data set set_data = ? where set_name = 'comment' and set_code = ? and set_id = ?"),
-				data,
-				comment_set_code,
-				comment_set_id,
-			); err != nil {
-				return err
-			}
-			Bbs_post_last_activity_update(tx, set_id, set_code, tool.Get_time())
-			return nil
-		}); err != nil {
-			if err == bbs_board_missing_error {
-				return_data["response"] = "not exist"
-				return_data["data"] = "bbs"
-				return return_data
-			}
-			panic(err)
-		}
-		tool.Search_bbs_index_update_comment(db, set_id, set_code, comment_code)
-
-		return_data["response"] = "ok"
-		return_data["data"] = set_code
-
-		return return_data
+		return Bbs_edit_comment_post(db, config, set_id, set_code, comment_code, data)
 	}
 
 	prefix = Bbs_prefix_check(db, set_id, prefix)
@@ -211,90 +123,171 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 	}
 
 	if set_code == "" {
-		if !tool.Check_daily_limit(db, config.IP, "bbs_edit") {
-			return_data["response"] = "error"
-			return_data["data"] = "daily limit"
-			return return_data
-		}
-
-		// Board-level slow mode applies to every new top-level post, including
-		// new discussion topics in the thread board. No post-level cooldown is
-		// recorded here because no existing post is being commented on.
-		board_interval := tool.Bbs_board_slow_interval(db, set_id)
-		retry_after := 0
-
-		if err := Bbs_board_write_transaction(db, set_id, "", func(tx *sql.Tx) error {
-			remaining, err := tool.Bbs_slow_enforce(db, tx, config.IP, set_id, "", board_interval, 0)
-			if err != nil {
-				return err
-			}
-			if remaining > 0 {
-				retry_after = remaining
-				return tool.BbsSlowModeError
-			}
-
-			last_code := ""
-			tool.QueryRow_DB(
-				tx,
-				"select set_code from bbs_data where set_name = 'title' and set_id = ? order by set_code + 0 desc",
-				[]any{&last_code},
-				set_id,
-			)
-			set_code = strconv.Itoa(tool.Str_to_int(last_code) + 1)
-			date := tool.Get_time()
-
-			insert_db := [][]string{
-				{"title", title},
-				{"data", data},
-				{"date", date},
-				{tool.Bbs_post_creation_time_name, date},
-				{"last_activity", date},
-				{"user_id", config.IP},
-				{"comment_count", "0"},
-			}
-			if document != "" {
-				insert_db = append(insert_db, []string{"document", document})
-			}
-			if prefix != "" {
-				insert_db = append(insert_db, []string{"prefix", prefix})
-			}
-			for _, tag := range tag_list {
-				insert_db = append(insert_db, []string{"tag", tag})
-			}
-			for _, value := range insert_db {
-				if _, err := tx.Exec(
-					tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)"),
-					value[0],
-					set_code,
-					set_id,
-					value[1],
-				); err != nil {
-					return err
-				}
-			}
-			return nil
-		}); err != nil {
-			if err == bbs_board_missing_error {
-				return_data["response"] = "not exist"
-				return_data["data"] = "bbs"
-				return return_data
-			}
-			if errors.Is(err, tool.BbsSlowModeError) {
-				return_data["response"] = "error"
-				return_data["data"] = "slow_mode"
-				return_data["retry_after_seconds"] = retry_after
-				return return_data
-			}
-			panic(err)
-		}
-		tool.Search_bbs_index_update(db, set_id, set_code)
-
-		return_data["response"] = "ok"
-		return_data["data"] = set_code
-
-		return return_data
+		return Bbs_create_post(db, config, set_id, title, data, prefix, tag_list, document)
 	}
 
+	return Bbs_update_post(db, config, set_id, set_code, title, data, prefix, tag_list)
+}
+
+func Bbs_edit_comment_post(db *sql.DB, config tool.Config, set_id string, set_code string, comment_code string, data string) map[string]any {
+	return_data := make(map[string]any)
+	comment_code_split := strings.Split(comment_code, "-")
+	comment_set_id := set_id + "-" + set_code
+	comment_set_code := ""
+
+	if len(comment_code_split) > 0 {
+		comment_set_code = comment_code_split[len(comment_code_split)-1]
+		if len(comment_code_split) > 1 {
+			comment_set_id += "-" + strings.Join(comment_code_split[:len(comment_code_split)-1], "-")
+		}
+	}
+
+	if comment_set_code == "" {
+		return map[string]any{"response": "not exist", "data": "comment"}
+	}
+
+	comment := ""
+	if !tool.QueryRow_DB(
+		db,
+		"select set_data from bbs_data where set_name = 'comment' and set_id = ? and set_code = ?",
+		[]any{&comment},
+		comment_set_id,
+		comment_set_code,
+	) {
+		return map[string]any{"response": "not exist", "data": "comment"}
+	}
+
+	comment_user_id := ""
+	if !tool.QueryRow_DB(
+		db,
+		"select set_data from bbs_data where set_name = 'comment_user_id' and set_id = ? and set_code = ?",
+		[]any{&comment_user_id},
+		comment_set_id,
+		comment_set_code,
+	) {
+		return map[string]any{"response": "not exist", "data": "comment"}
+	}
+
+	comment_manage := tool.Check_permission(db, "bbs_comment_manage", config.IP)
+	blind := ""
+	tool.QueryRow_DB(
+		db,
+		"select set_data from bbs_data where set_name = 'blind' and set_id = ? and set_code = ?",
+		[]any{&blind},
+		comment_set_id,
+		comment_set_code,
+	)
+	if blind == "O" && !comment_manage {
+		return map[string]any{"response": "require auth"}
+	}
+	if comment_user_id != config.IP && !comment_manage {
+		return map[string]any{"response": "require auth"}
+	}
+	if err := Bbs_board_write_transaction(db, set_id, set_code, func(tx *sql.Tx) error {
+		if _, err := tx.Exec(
+			tool.DB_change("update bbs_data set set_data = ? where set_name = 'comment' and set_code = ? and set_id = ?"),
+			data,
+			comment_set_code,
+			comment_set_id,
+		); err != nil {
+			return err
+		}
+		Bbs_post_last_activity_update(tx, set_id, set_code, tool.Get_time())
+		return nil
+	}); err != nil {
+		if err == bbs_board_missing_error {
+			return map[string]any{"response": "not exist", "data": "bbs"}
+		}
+		panic(err)
+	}
+	tool.Search_bbs_index_update_comment(db, set_id, set_code, comment_code)
+
+	return_data["response"] = "ok"
+	return_data["data"] = set_code
+	return return_data
+}
+
+func Bbs_create_post(db *sql.DB, config tool.Config, set_id string, title string, data string, prefix string, tag_list []string, document string) map[string]any {
+	if !tool.Check_daily_limit(db, config.IP, "bbs_edit") {
+		return map[string]any{"response": "error", "data": "daily limit"}
+	}
+
+	// Board-level slow mode applies to every new top-level post, including
+	// new discussion topics in the thread board. No post-level cooldown is
+	// recorded here because no existing post is being commented on.
+	board_interval := tool.Bbs_board_slow_interval(db, set_id)
+	retry_after := 0
+	set_code := ""
+
+	if err := Bbs_board_write_transaction(db, set_id, "", func(tx *sql.Tx) error {
+		remaining, err := tool.Bbs_slow_enforce(db, tx, config.IP, set_id, "", board_interval, 0)
+		if err != nil {
+			return err
+		}
+		if remaining > 0 {
+			retry_after = remaining
+			return tool.BbsSlowModeError
+		}
+
+		last_code := ""
+		tool.QueryRow_DB(
+			tx,
+			"select set_code from bbs_data where set_name = 'title' and set_id = ? order by set_code + 0 desc",
+			[]any{&last_code},
+			set_id,
+		)
+		set_code = strconv.Itoa(tool.Str_to_int(last_code) + 1)
+		date := tool.Get_time()
+
+		insert_db := [][]string{
+			{"title", title},
+			{"data", data},
+			{"date", date},
+			{tool.Bbs_post_creation_time_name, date},
+			{"last_activity", date},
+			{"user_id", config.IP},
+			{"comment_count", "0"},
+		}
+		if document != "" {
+			insert_db = append(insert_db, []string{"document", document})
+		}
+		if prefix != "" {
+			insert_db = append(insert_db, []string{"prefix", prefix})
+		}
+		for _, tag := range tag_list {
+			insert_db = append(insert_db, []string{"tag", tag})
+		}
+		for _, value := range insert_db {
+			if _, err := tx.Exec(
+				tool.DB_change("insert into bbs_data (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)"),
+				value[0],
+				set_code,
+				set_id,
+				value[1],
+			); err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		if err == bbs_board_missing_error {
+			return map[string]any{"response": "not exist", "data": "bbs"}
+		}
+		if errors.Is(err, tool.BbsSlowModeError) {
+			return map[string]any{
+				"response":            "error",
+				"data":                "slow_mode",
+				"retry_after_seconds": retry_after,
+			}
+		}
+		panic(err)
+	}
+	tool.Search_bbs_index_update(db, set_id, set_code)
+
+	return map[string]any{"response": "ok", "data": set_code}
+}
+
+func Bbs_update_post(db *sql.DB, config tool.Config, set_id string, set_code string, title string, data string, prefix string, tag_list []string) map[string]any {
 	old_title := ""
 	old_data := ""
 	if !tool.QueryRow_DB(
@@ -310,10 +303,7 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 		set_id,
 		set_code,
 	) {
-		return_data["response"] = "not exist"
-		return_data["data"] = "post"
-
-		return return_data
+		return map[string]any{"response": "not exist", "data": "post"}
 	}
 
 	user_id := ""
@@ -324,16 +314,11 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 		set_id,
 		set_code,
 	) {
-		return_data["response"] = "not exist"
-		return_data["data"] = "post"
-
-		return return_data
+		return map[string]any{"response": "not exist", "data": "post"}
 	}
 
 	if user_id != config.IP && !tool.Check_permission(db, "bbs_post_manage", config.IP) {
-		return_data["response"] = "require auth"
-
-		return return_data
+		return map[string]any{"response": "require auth"}
 	}
 
 	date := tool.Get_time()
@@ -391,16 +376,11 @@ func Api_bbs_w_edit_post(config tool.Config, set_id string, set_code string, com
 		return nil
 	}); err != nil {
 		if err == bbs_board_missing_error {
-			return_data["response"] = "not exist"
-			return_data["data"] = "bbs"
-			return return_data
+			return map[string]any{"response": "not exist", "data": "bbs"}
 		}
 		panic(err)
 	}
 	tool.Search_bbs_index_update(db, set_id, set_code)
 
-	return_data["response"] = "ok"
-	return_data["data"] = set_code
-
-	return return_data
+	return map[string]any{"response": "ok", "data": set_code}
 }

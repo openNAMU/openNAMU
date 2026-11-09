@@ -162,14 +162,10 @@ func View_acl(config tool.Config, doc_name string, multiple bool, values url.Val
 	if !tool.Check_permission(db, "owner", config.IP) {
 		top_disabled = ` disabled`
 	}
-	document_top_api := Api_w_set(config, doc_name, "document_top", "")
-	document_top, _ := document_top_api["data"].(string)
-	document_top_markup_api := Api_w_set(config, doc_name, "document_top_markup", "")
-	document_top_markup, _ := document_top_markup_api["data"].(string)
-	document_editor_top_api := Api_w_set(config, doc_name, "document_editor_top", "")
-	document_editor_top, _ := document_editor_top_api["data"].(string)
-	document_editor_top_markup_api := Api_w_set(config, doc_name, "document_editor_top_markup", "")
-	document_editor_top_markup, _ := document_editor_top_markup_api["data"].(string)
+	document_top := tool.Get_document_setting_value(db, doc_name, "document_top", "")
+	document_top_markup := tool.Get_document_setting_value(db, doc_name, "document_top_markup", "")
+	document_editor_top := tool.Get_document_setting_value(db, doc_name, "document_editor_top", "")
+	document_editor_top_markup := tool.Get_document_setting_value(db, doc_name, "document_editor_top_markup", "")
 	data += `<h2>` + tool.Get_language(db, "document_top", true) + `</h2>`
 	data += `<h3>` + tool.Get_language(db, "markup", true) + `</h3>` + Setting_markup_select_ui("document_top_markup", document_top_markup, top_disabled)
 	data += `<textarea class="opennamu_textarea_100" name="document_top"` + top_disabled + `>` + tool.HTML_escape(document_top) + `</textarea>`

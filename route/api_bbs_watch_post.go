@@ -2,6 +2,7 @@ package route
 
 import (
 	"database/sql"
+	"strings"
 
 	"opennamu/route/tool"
 )
@@ -33,7 +34,21 @@ func Api_bbs_watch_post(config tool.Config, set_id string, set_code string) map[
 
 	key := Bbs_watch_key(set_id, set_code)
 	if set_id != thread_bbs_id {
-		return Api_w_watch_list_post(config, key, "bbs_watchlist")
+		separator := strings.LastIndex(key, "-")
+		if separator <= 0 || separator == len(key)-1 {
+			return map[string]any{"response": "not exist", "data": "post"}
+		}
+
+		err := Bbs_board_write_transaction(db, key[:separator], key[separator+1:], func(tx *sql.Tx) error {
+			return User_watch_list_toggle(tx, config.IP, "bbs_watchlist", key)
+		})
+		if err != nil {
+			if err == bbs_board_missing_error {
+				return map[string]any{"response": "not exist", "data": "bbs"}
+			}
+			panic(err)
+		}
+		return map[string]any{"response": "ok"}
 	}
 
 	err := tool.DB_transaction(db, func(tx *sql.Tx) error {

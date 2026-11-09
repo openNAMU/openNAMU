@@ -730,66 +730,59 @@ func (class *namumark_compat_renderer) Process_redirect(data string) string {
 	}
 
 	lines := strings.Split(data, "\n")
-	for index, line := range lines {
-		if index > 0 {
-			break
-		}
-		trimmed := strings.TrimSpace(line)
-		lower := strings.ToLower(trimmed)
-		prefix := ""
-		if strings.HasPrefix(lower, "#redirect ") {
-			prefix = "#redirect "
-		} else if strings.HasPrefix(lower, "#넘겨주기 ") {
-			prefix = "#넘겨주기 "
-		}
-		if prefix == "" {
-			continue
-		}
+	trimmed := strings.TrimSpace(lines[0])
+	lower := strings.ToLower(trimmed)
+	prefix := ""
+	if strings.HasPrefix(lower, "#redirect ") {
+		prefix = "#redirect "
+	} else if strings.HasPrefix(lower, "#넘겨주기 ") {
+		prefix = "#넘겨주기 "
+	}
+	if prefix == "" {
+		return data
+	}
 
-		target := tool.HTML_unescape(strings.TrimSpace(trimmed[len(prefix):]))
-		if strings.HasPrefix(target, "[[") && strings.HasSuffix(target, "]]") {
-			target = strings.TrimSuffix(strings.TrimPrefix(target, "[["), "]]")
-			if pipe_index := strings.Index(target, "|"); pipe_index >= 0 {
-				target = target[:pipe_index]
-			}
+	target := tool.HTML_unescape(strings.TrimSpace(trimmed[len(prefix):]))
+	if strings.HasPrefix(target, "[[") && strings.HasSuffix(target, "]]") {
+		target = strings.TrimSuffix(strings.TrimPrefix(target, "[["), "]]")
+		if pipe_index := strings.Index(target, "|"); pipe_index >= 0 {
+			target = target[:pipe_index]
 		}
+	}
 
-		main_target, anchor := class.Compat_split_anchor(target)
-		if Compat_is_external_link(main_target) {
-			class.redirect = true
-			class.Add_backlink(backlink_parser.Normalize_external_host(main_target), "external", "")
-			if class.collect_only || class.include_depth > 0 {
-				return ""
-			}
-			lines[index] = class.Reserve(`<a href="` + Compat_html_escape(main_target+anchor) + `">(GO)</a>`)
-			return strings.Join(lines, "\n")
+	main_target, anchor := class.Compat_split_anchor(target)
+	if Compat_is_external_link(main_target) {
+		class.redirect = true
+		class.Add_backlink(backlink_parser.Normalize_external_host(main_target), "external", "")
+		if class.collect_only || class.include_depth > 0 {
+			return ""
 		}
-		if Compat_is_interwiki_link(main_target) {
-			class.redirect = true
-			if class.collect_only || class.include_depth > 0 {
-				return ""
-			}
-			link, ok := class.Get_interwiki_url(main_target + anchor)
-			if !ok {
-				lines[index] = ""
-				return strings.Join(lines, "\n")
-			}
-			lines[index] = class.Reserve(`<a href="` + Compat_html_escape(link) + `">(GO)</a>`)
-			return strings.Join(lines, "\n")
-		}
-
-		main_target = class.Add_document_link(main_target, "redirect", anchor)
+		lines[0] = class.Reserve(`<a href="` + Compat_html_escape(main_target+anchor) + `">(GO)</a>`)
+		return strings.Join(lines, "\n")
+	}
+	if Compat_is_interwiki_link(main_target) {
 		class.redirect = true
 		if class.collect_only || class.include_depth > 0 {
 			return ""
 		}
-
-		link := "/w_from/" + class.Compat_url_parser(main_target) + anchor
-		lines[index] = class.Reserve(`<a href="` + Compat_html_escape(link) + `">(GO)</a>`)
+		link, ok := class.Get_interwiki_url(main_target + anchor)
+		if !ok {
+			lines[0] = ""
+			return strings.Join(lines, "\n")
+		}
+		lines[0] = class.Reserve(`<a href="` + Compat_html_escape(link) + `">(GO)</a>`)
 		return strings.Join(lines, "\n")
 	}
 
-	return data
+	main_target = class.Add_document_link(main_target, "redirect", anchor)
+	class.redirect = true
+	if class.collect_only || class.include_depth > 0 {
+		return ""
+	}
+
+	link := "/w_from/" + class.Compat_url_parser(main_target) + anchor
+	lines[0] = class.Reserve(`<a href="` + Compat_html_escape(link) + `">(GO)</a>`)
+	return strings.Join(lines, "\n")
 }
 
 func (class *namumark_compat_renderer) Process_category(target string, label string) string {
@@ -1671,17 +1664,15 @@ func (class *namumark_compat_renderer) Process_middle_block(middle_data string) 
 		}
 		return ""
 	}
-	if style, style_body, ok := Compat_middle_size_style(middle_name, body); ok {
+	style, style_body, styled := Compat_middle_size_style(middle_name, body)
+	if !styled {
+		style, style_body, styled = Compat_middle_color_style(middle_name, body, class.Get_render_setting("main_css_darkmode"))
+	}
+	if styled {
 		if class.collect_only {
 			return style_body
 		}
 		return class.Reserve(`<span style="`+style+`">`) + style_body + class.Reserve("</span>")
-	}
-	if style, color_body, ok := Compat_middle_color_style(middle_name, body, class.Get_render_setting("main_css_darkmode")); ok {
-		if class.collect_only {
-			return color_body
-		}
-		return class.Reserve(`<span style="`+style+`">`) + color_body + class.Reserve("</span>")
 	}
 	code := strings.TrimSpace(middle_data)
 	if code != "" {
@@ -1717,6 +1708,17 @@ func (class *namumark_compat_renderer) Process_legacy_html_suffix(data string) s
 }
 
 func (class *namumark_compat_renderer) Process_middle(data string) string {
+	is_known_middle := func(name string) bool {
+		if strings.HasPrefix(name, "#!") || strings.HasPrefix(name, "#") {
+			return true
+		}
+		switch name {
+		case "+1", "+2", "+3", "+4", "+5", "-1", "-2", "-3", "-4", "-5":
+			return true
+		default:
+			return false
+		}
+	}
 	find_slash_close := func(value string) int {
 		for token, token_data := range class.slash_tokens {
 			if token_data == "}" && strings.HasPrefix(value, token) {
@@ -1724,6 +1726,53 @@ func (class *namumark_compat_renderer) Process_middle(data string) string {
 			}
 		}
 		return 0
+	}
+	type middle_scan_result struct {
+		close_index       int
+		child_open_index  int
+		child_close_index int
+	}
+	find_middle_close := func(value string, open_index int) middle_scan_result {
+		result := middle_scan_result{close_index: -1, child_open_index: -1, child_close_index: -1}
+		depth := 0
+		for index := open_index; index < len(value); {
+			if strings.HasPrefix(value[index:], "{{{") {
+				if depth == 1 && result.child_open_index < 0 {
+					result.child_open_index = index
+				}
+				depth++
+				index += 3
+				continue
+			}
+			if slash_length := find_slash_close(value[index:]); slash_length > 0 && strings.HasPrefix(value[index+slash_length:], "}}") {
+				depth--
+				close_index := index + slash_length + 2
+				if depth == 1 && result.child_open_index >= 0 && result.child_close_index < 0 {
+					result.child_close_index = close_index
+				}
+				if depth == 0 {
+					result.close_index = close_index
+					return result
+				}
+				index = close_index
+				continue
+			}
+			if strings.HasPrefix(value[index:], "}}}") {
+				depth--
+				close_index := index + 3
+				if depth == 1 && result.child_open_index >= 0 && result.child_close_index < 0 {
+					result.child_close_index = close_index
+				}
+				if depth == 0 {
+					result.close_index = close_index
+					return result
+				}
+				index = close_index
+				continue
+			}
+			index++
+		}
+		return result
 	}
 
 	search_index := 0
@@ -1734,101 +1783,35 @@ func (class *namumark_compat_renderer) Process_middle(data string) string {
 		}
 		open_index += search_index
 
-		depth := 0
-		close_index := -1
-		for index := open_index; index < len(data); {
-			if strings.HasPrefix(data[index:], "{{{") {
-				depth++
-				index += 3
-				continue
-			}
-			if slash_length := find_slash_close(data[index:]); slash_length > 0 && strings.HasPrefix(data[index+slash_length:], "}}") {
-				depth--
-				if depth == 0 {
-					close_index = index + slash_length + 2
-					break
-				}
-				index += slash_length + 2
-				continue
-			}
-			if strings.HasPrefix(data[index:], "}}}") {
-				depth--
-				if depth == 0 {
-					close_index = index + 3
-					break
-				}
-				index += 3
-				continue
-			}
-			index++
-		}
-		if close_index < 0 {
+		scan_result := find_middle_close(data, open_index)
+		if scan_result.close_index < 0 {
 			break
 		}
 
 		if strings.HasPrefix(data[open_index:], "{{{{{{") {
-			search_index = close_index
+			search_index = scan_result.close_index
 			continue
 		}
 
-		middle_data := data[open_index+3 : close_index-3]
+		middle_data := data[open_index+3 : scan_result.close_index-3]
 		middle_start := strings.TrimSpace(middle_data)
-		if strings.HasPrefix(middle_start, "#!html") && strings.Contains(middle_data, "{{{") {
-			inner_index := strings.Index(middle_data, "{{{")
-			inner_open := open_index + 3 + inner_index
-			inner_depth := 0
-			inner_close := -1
-			for index := inner_open; index < len(data); {
-				if strings.HasPrefix(data[index:], "{{{") {
-					inner_depth++
-					index += 3
-					continue
-				}
-				if slash_length := find_slash_close(data[index:]); slash_length > 0 && strings.HasPrefix(data[index+slash_length:], "}}") {
-					inner_depth--
-					if inner_depth == 0 {
-						inner_close = index + slash_length + 2
-						break
-					}
-					index += slash_length + 2
-					continue
-				}
-				if strings.HasPrefix(data[index:], "}}}") {
-					inner_depth--
-					if inner_depth == 0 {
-						inner_close = index + 3
-						break
-					}
-					index += 3
-					continue
-				}
-				index++
-			}
-			if inner_close > inner_open {
-				literal_token := class.Reserve_literal(data[inner_open:inner_close])
-				data = data[:inner_open] + literal_token + data[inner_close:]
-				search_index = open_index
-				continue
-			}
+		if strings.HasPrefix(middle_start, "#!html") && scan_result.child_close_index > scan_result.child_open_index {
+			literal_token := class.Reserve_literal(data[scan_result.child_open_index:scan_result.child_close_index])
+			data = data[:scan_result.child_open_index] + literal_token + data[scan_result.child_close_index:]
+			search_index = open_index
+			continue
 		}
 
 		middle_name := middle_start
 		if space_index := strings.IndexAny(middle_name, " \t\n"); space_index >= 0 {
 			middle_name = middle_name[:space_index]
 		}
-		known_middle := strings.HasPrefix(middle_name, "#!") || strings.HasPrefix(middle_name, "#")
-		for _, name := range []string{"+1", "+2", "+3", "+4", "+5", "-1", "-2", "-3", "-4", "-5"} {
-			if middle_name == name {
-				known_middle = true
-				break
-			}
-		}
-		if !strings.Contains(middle_data, "{{{") || known_middle {
+		if scan_result.child_open_index < 0 || is_known_middle(middle_name) {
 			search_index = open_index + 3
 			continue
 		}
 		literal_token := class.Reserve_literal(class.Middle_literal(strings.Trim(middle_data, "\n")))
-		data = data[:open_index] + literal_token + data[close_index:]
+		data = data[:open_index] + literal_token + data[scan_result.close_index:]
 		search_index = open_index + len(literal_token)
 	}
 
@@ -1928,14 +1911,7 @@ func (class *namumark_compat_renderer) Process_middle(data string) string {
 				if space_index := strings.IndexAny(middle_name, " \t\n"); space_index >= 0 {
 					middle_name = middle_name[:space_index]
 				}
-				known_middle := strings.HasPrefix(middle_name, "#!") || strings.HasPrefix(middle_name, "#")
-				for _, name := range []string{"+1", "+2", "+3", "+4", "+5", "-1", "-2", "-3", "-4", "-5"} {
-					if middle_name == name {
-						known_middle = true
-						break
-					}
-				}
-				if known_middle {
+				if is_known_middle(middle_name) {
 					return class.Reserve_literal(class.Middle_literal("{{{" + middle_data + "}}}"))
 				}
 				middle_data += "\\"
@@ -2246,25 +2222,30 @@ func (class *namumark_compat_renderer) Render_table(lines []string) string {
 			rowspan := ""
 			cell_data := table_cell_data.data
 			cell_data = strings.TrimLeft(cell_data, "\n")
-			for strings.HasPrefix(cell_data, "<") {
-				end_index := strings.Index(cell_data, ">")
-				if end_index < 0 {
-					break
+			for _, escaped := range [...]bool{false, true} {
+				prefix := "<"
+				terminator := ">"
+				if escaped {
+					prefix = "&lt;"
+					terminator = "&gt;"
 				}
-				if !parse_parameter(cell_data[1:end_index], &table_style, &row_style, &cell_style, &col_style, &div_style, &colspan, &rowspan) {
-					break
+				for strings.HasPrefix(cell_data, prefix) {
+					end_index := strings.Index(cell_data, terminator)
+					if end_index < 0 {
+						break
+					}
+					parameter_end := end_index + len(terminator)
+					parameter := ""
+					if escaped {
+						parameter = tool.HTML_unescape(cell_data[:parameter_end])
+					} else {
+						parameter = cell_data[1:end_index]
+					}
+					if !parse_parameter(parameter, &table_style, &row_style, &cell_style, &col_style, &div_style, &colspan, &rowspan) {
+						break
+					}
+					cell_data = cell_data[parameter_end:]
 				}
-				cell_data = cell_data[end_index+1:]
-			}
-			for strings.HasPrefix(cell_data, "&lt;") {
-				end_index := strings.Index(cell_data, "&gt;")
-				if end_index < 0 {
-					break
-				}
-				if !parse_parameter(tool.HTML_unescape(cell_data[:end_index+4]), &table_style, &row_style, &cell_style, &col_style, &div_style, &colspan, &rowspan) {
-					break
-				}
-				cell_data = cell_data[end_index+4:]
 			}
 			leading_space := strings.HasPrefix(cell_data, " ")
 			if leading_space {

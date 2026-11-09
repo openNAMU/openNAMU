@@ -197,7 +197,7 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 		return return_data
 	}
 
-	old_markup := Api_w_set(config, doc_name, "document_markup", "")["data"].(string)
+	old_markup := tool.Get_document_setting_value(db, doc_name, "document_markup", "")
 	if old_markup == "" {
 		old_markup = tool.Get_document_markup(db, "", "document")
 	}
@@ -207,10 +207,10 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 		for key, value := range values {
 			save_values[key] = append([]string{}, value...)
 		}
-		save_values.Set("document_top", Api_w_set(config, doc_name, "document_top", "")["data"].(string))
-		save_values.Set("document_top_markup", Api_w_set(config, doc_name, "document_top_markup", "")["data"].(string))
-		save_values.Set("document_editor_top", Api_w_set(config, doc_name, "document_editor_top", "")["data"].(string))
-		save_values.Set("document_editor_top_markup", Api_w_set(config, doc_name, "document_editor_top_markup", "")["data"].(string))
+		save_values.Set("document_top", tool.Get_document_setting_value(db, doc_name, "document_top", ""))
+		save_values.Set("document_top_markup", tool.Get_document_setting_value(db, doc_name, "document_top_markup", ""))
+		save_values.Set("document_editor_top", tool.Get_document_setting_value(db, doc_name, "document_editor_top", ""))
+		save_values.Set("document_editor_top_markup", tool.Get_document_setting_value(db, doc_name, "document_editor_top_markup", ""))
 	}
 	if err := tool.DB_transaction(db, func(tx *sql.Tx) error {
 		Save_acl(tx, config, doc_name, save_values)
@@ -219,7 +219,7 @@ func Api_acl_post(config tool.Config, doc_name string, multiple bool, values url
 	}); err != nil {
 		panic(err)
 	}
-	new_markup := Api_w_set(config, doc_name, "document_markup", "")["data"].(string)
+	new_markup := tool.Get_document_setting_value(db, doc_name, "document_markup", "")
 	if new_markup == "" {
 		new_markup = tool.Get_document_markup(db, "", "document")
 	}

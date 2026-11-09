@@ -11,6 +11,7 @@ import (
 	"github.com/blevesearch/bleve/v2"
 	_ "github.com/blevesearch/bleve/v2/analysis/lang/cjk"
 	"github.com/blevesearch/bleve/v2/mapping"
+	"github.com/blevesearch/bleve/v2/search/query"
 )
 
 type Search_document struct {
@@ -193,13 +194,14 @@ func Search_index_update(doc_name string, data string) {
 	if doc_name == "" {
 		return
 	}
+	change := search_index_change{Data: data}
 	search_index_lock.Lock()
 	defer search_index_lock.Unlock()
 	if !search_index_ready {
-		search_index_pending[doc_name] = search_index_change{Data: data}
+		search_index_pending[doc_name] = change
 		return
 	}
-	if err := search_index.Index(doc_name, Search_document{Do_remove_spaces(doc_name), data}); err != nil {
+	if err := Search_index_apply_change(search_index, doc_name, change); err != nil {
 		log.Printf("[SEARCH] document update failed: %v", err)
 	}
 }
@@ -208,13 +210,14 @@ func Search_index_delete(doc_name string) {
 	if doc_name == "" {
 		return
 	}
+	change := search_index_change{Deleted: true}
 	search_index_lock.Lock()
 	defer search_index_lock.Unlock()
 	if !search_index_ready {
-		search_index_pending[doc_name] = search_index_change{Deleted: true}
+		search_index_pending[doc_name] = change
 		return
 	}
-	if err := search_index.Delete(doc_name); err != nil {
+	if err := Search_index_apply_change(search_index, doc_name, change); err != nil {
 		log.Printf("[SEARCH] document delete failed: %v", err)
 	}
 }
@@ -242,18 +245,17 @@ func Search_index_search(keyword string, search_type string, offset int, limit i
 		limit = 50
 	}
 
-	var request *bleve.SearchRequest
+	var search_query query.FieldableQuery
+	search_field := "data"
 	if search_type == "title" {
-		query := bleve.NewWildcardQuery("*" + strings.ToLower(keyword) + "*")
-		query.SetField("title_search")
-		request = bleve.NewSearchRequestOptions(query, limit, offset, false)
-		request.SortBy([]string{"_id"})
+		search_query = bleve.NewWildcardQuery("*" + strings.ToLower(keyword) + "*")
+		search_field = "title_search"
 	} else {
-		query := bleve.NewMatchQuery(keyword)
-		query.SetField("data")
-		request = bleve.NewSearchRequestOptions(query, limit, offset, false)
-		request.SortBy([]string{"_id"})
+		search_query = bleve.NewMatchQuery(keyword)
 	}
+	search_query.SetField(search_field)
+	request := bleve.NewSearchRequestOptions(search_query, limit, offset, false)
+	request.SortBy([]string{"_id"})
 
 	search_index_lock.RLock()
 	defer search_index_lock.RUnlock()

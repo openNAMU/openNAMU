@@ -28,53 +28,61 @@ func Bbs_post_location(db *sql.DB, sub_code string) (string, string, bool) {
 	return best_id, best_code, best_id != ""
 }
 
+func Bbs_comment_read_access(db *sql.DB, config tool.Config, sub_code string) string {
+	set_id, set_code, exists := Bbs_post_location(db, sub_code)
+	if !exists {
+		return "not exist"
+	}
+	if _, allowed := Bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
+		return "require auth"
+	}
+	return ""
+}
+
 func Api_bbs_w_comment_one(config tool.Config, already_auth_check bool, do_type string, sub_code string) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 	if !already_auth_check {
-		set_id, set_code, exists := Bbs_post_location(db, sub_code)
-		if !exists {
-			return map[string]any{"response": "not exist", "data": []map[string]string{}}
-		}
-		if _, allowed := Bbs_post_view_auth(db, set_id, set_code, config.IP); !allowed {
-			return map[string]any{"response": "require auth", "data": []map[string]string{}}
+		if response := Bbs_comment_read_access(db, config, sub_code); response != "" {
+			return map[string]any{"response": response, "data": []map[string]string{}}
 		}
 	}
 
+	data_list := Bbs_comment_one_data(db, config, do_type, sub_code)
+	if do_type != "around" {
+		if len(data_list) > 0 {
+			data_list = []map[string]string{data_list[0]}
+		}
+	}
+	return map[string]any{"response": "ok", "data": data_list}
+}
+
+func Bbs_comment_one_data(db *sql.DB, config tool.Config, do_type string, sub_code string) []map[string]string {
 	sub_code_parts := strings.Split(sub_code, "-")
 	sub_code_last := ""
 	new_sub_code := ""
 
 	if do_type == "around" {
 		new_sub_code = sub_code
-	} else {
-		if len(sub_code_parts) > 2 {
-			sub_code_last = sub_code_parts[len(sub_code_parts)-1]
-			sub_code_parts = sub_code_parts[:len(sub_code_parts)-1]
-
-			new_sub_code = strings.Join(sub_code_parts, "-")
-		}
+	} else if len(sub_code_parts) > 2 {
+		sub_code_last = sub_code_parts[len(sub_code_parts)-1]
+		new_sub_code = strings.Join(sub_code_parts[:len(sub_code_parts)-1], "-")
 	}
 
-	var rows *sql.Rows
+	query := "select set_name, set_data, set_code, set_id from bbs_data where (set_name = 'comment' or set_name like 'comment%' or set_name in ('blind', 'pinned', 'tabom_count', 'tabom_down_count')) and set_id = ?"
+	query_values := []any{new_sub_code}
 	if do_type == "around" {
-		rows = tool.Query_DB(
-			db,
-			"select set_name, set_data, set_code, set_id from bbs_data where (set_name = 'comment' or set_name like 'comment%' or set_name in ('blind', 'pinned', 'tabom_count', 'tabom_down_count')) and set_id = ? order by set_code + 0 asc, set_name asc",
-			new_sub_code,
-		)
+		query += " order by set_code + 0 asc, set_name asc"
 	} else {
-		rows = tool.Query_DB(
-			db,
-			"select set_name, set_data, set_code, set_id from bbs_data where (set_name = 'comment' or set_name like 'comment%' or set_name in ('blind', 'pinned', 'tabom_count', 'tabom_down_count')) and set_id = ? and set_code = ? order by set_name asc",
-			new_sub_code, sub_code_last,
-		)
+		query += " and set_code = ? order by set_name asc"
+		query_values = append(query_values, sub_code_last)
 	}
+	rows := tool.Query_DB(db, query, query_values...)
 	defer rows.Close()
 
 	data_list := []map[string]string{}
 	temp_dict := map[string]string{}
-	ip_parser_temp := map[string][]string{}
+	ip_parser_temp := map[string]bbs_user_display_data{}
 	before_set_code := ""
 
 	for rows.Next() {
@@ -101,21 +109,17 @@ func Api_bbs_w_comment_one(config tool.Config, already_auth_check bool, do_type 
 		}
 
 		if set_name == "comment_user_id" {
-			var ip_pre string
-			var ip_render string
-
-			if _, ok := ip_parser_temp[set_data]; ok {
-				ip_pre = ip_parser_temp[set_data][0]
-				ip_render = ip_parser_temp[set_data][1]
-			} else {
-				ip_pre = tool.IP_preprocess(db, set_data, config.IP)[0]
-				ip_render = tool.Get_user_profile_image_ui(db, set_data) + tool.IP_parser(db, set_data, config.IP)
-
-				ip_parser_temp[set_data] = []string{ip_pre, ip_render}
+			user_display, exists := ip_parser_temp[set_data]
+			if !exists {
+				user_display = bbs_user_display_data{
+					ip_pre:    tool.IP_preprocess(db, set_data, config.IP)[0],
+					ip_render: tool.Get_user_profile_image_ui(db, set_data) + tool.IP_parser(db, set_data, config.IP),
+				}
+				ip_parser_temp[set_data] = user_display
 			}
 
-			temp_dict["comment_user_id"] = ip_pre
-			temp_dict["comment_user_id_render"] = ip_render
+			temp_dict["comment_user_id"] = user_display.ip_pre
+			temp_dict["comment_user_id_render"] = user_display.ip_render
 		} else {
 			temp_dict[set_name] = set_data
 		}
@@ -133,20 +137,5 @@ func Api_bbs_w_comment_one(config tool.Config, already_auth_check bool, do_type 
 		}
 	}
 
-	return_data := make(map[string]any)
-	return_data["response"] = "ok"
-
-	if do_type == "around" {
-		return_data["data"] = data_list
-	} else {
-		if len(data_list) > 0 {
-			return_data["data"] = []map[string]string{
-				data_list[0],
-			}
-		} else {
-			return_data["data"] = []map[string]string{}
-		}
-	}
-
-	return return_data
+	return data_list
 }

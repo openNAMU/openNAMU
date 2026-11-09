@@ -378,6 +378,17 @@ func Test_Backup_run_restores_openNAMU_startup_environment(t *testing.T) {
 	if output, err := restore_command.CombinedOutput(); err != nil {
 		t.Fatalf("restored environment startup child failed: %v\n%s", err, output)
 	}
+
+	reopen_command := exec.Command(os.Args[0], "-test.run=^Test_backup_restore_environment_child$")
+	reopen_command.Env = []string{
+		"NAMU_DB=" + restored_name,
+		"NAMU_DB_TYPE=sqlite",
+		"OPENNAMU_AUDIT_RESTORE_MODE=reopen",
+		"OPENNAMU_AUDIT_RESTORE_DIR=" + restored_dir,
+	}
+	if output, err := reopen_command.CombinedOutput(); err != nil {
+		t.Fatalf("reopened environment startup child failed: %v\n%s", err, output)
+	}
 }
 
 func Test_backup_restore_environment_child(t *testing.T) {
@@ -423,7 +434,7 @@ func Test_backup_restore_environment_child(t *testing.T) {
 		return
 	}
 
-	if mode != "restore" {
+	if mode != "restore" && mode != "reopen" {
 		t.Fatalf("unknown restore probe mode %q", mode)
 	}
 	if version == "" {
@@ -437,6 +448,10 @@ func Test_backup_restore_environment_child(t *testing.T) {
 	}
 	if got := first_string(restored_db, `select data from history where title = ?`, "復元文書"); got != marker {
 		t.Fatalf("restored openNAMU history read mismatch: %q", got)
+	}
+	search_results, ready := tool.Search_index_search("restored", "body", 0, 10)
+	if !ready || len(search_results) != 1 || search_results[0] != "復元文書" {
+		t.Fatalf("restored search index results = %v, ready %v; want restored document and ready index", search_results, ready)
 	}
 }
 

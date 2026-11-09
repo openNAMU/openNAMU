@@ -218,10 +218,6 @@ func Api_bbs_search_internal(config tool.Config, keyword string, set_id string, 
 				panic(err)
 			}
 
-			if !tool.Check_acl(db, set_id_data, "", "bbs_view", config.IP) {
-				continue
-			}
-
 			item_data, visible := Bbs_search_item_data(db, config, set_code_data, set_id_data, ip_parser_temp, auth_info, keyword, search_type)
 			if visible {
 				data_list = append(data_list, item_data)

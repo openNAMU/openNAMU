@@ -77,11 +77,8 @@ func View_rss_recent(config tool.Config, host string) string {
 
 	base_url := Get_rss_base_url(db, host)
 
-	wiki_name := "Wiki"
-	tool.QueryRow_DB(db, "select data from other where name = 'name'", []any{&wiki_name})
-
-	language := ""
-	tool.QueryRow_DB(db, "select data from other where name = 'language'", []any{&language})
+	wiki_name := tool.Get_setting_value(db, "name", "", "Wiki")
+	language := tool.Get_setting_value(db, "language", "", "")
 
 	api_data := Api_list_recent_change(config, "", "50", "1")
 

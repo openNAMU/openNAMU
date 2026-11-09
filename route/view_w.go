@@ -29,7 +29,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 
 	do_type := view_type
 
-	Api_w_page_view_post(config, doc_name)
+	Document_page_view_increment(db, doc_name)
 
 	var render_data string
 	status := http.StatusOK
@@ -40,22 +40,21 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 
 	raw_data_api := Api_w_raw(config, doc_name, "", "")
 	raw_response, _ := raw_data_api["response"].(string)
-	if raw_response == "require auth" {
-		error_data := tool.Get_setting_value(db, "error_401", "", "")
-		if error_data != "" {
-			render_data = "<h2>" + tool.Get_language(db, "error", true) + "</h2><ul><li>" + error_data + "</li></ul>"
-		} else {
-			render_data = "<h2>" + tool.Get_language(db, "error", true) + "</h2><ul><li>" + tool.Get_language(db, "authority_error", true) + "</li></ul>"
-		}
-		status = http.StatusUnauthorized
-	} else if raw_response != "ok" {
-		error_data := tool.Get_setting_value(db, "error_404", "", "")
-		if error_data != "" {
-			render_data = "<h2>" + tool.Get_language(db, "error", true) + "</h2><ul><li>" + error_data + "</li></ul>"
-		} else {
-			render_data = "<h2>" + tool.Get_language(db, "error", true) + "</h2><ul><li>" + tool.Get_language(db, "document_404_error", true) + "</li></ul>"
-		}
+	if raw_response != "ok" {
+		error_setting := "error_404"
+		error_language := "document_404_error"
 		status = http.StatusNotFound
+		if raw_response == "require auth" {
+			error_setting = "error_401"
+			error_language = "authority_error"
+			status = http.StatusUnauthorized
+		}
+
+		error_data := tool.Get_setting_value(db, error_setting, "", "")
+		if error_data == "" {
+			error_data = tool.Get_language(db, error_language, true)
+		}
+		render_data = "<h2>" + tool.Get_language(db, "error", true) + "</h2><ul><li>" + error_data + "</li></ul>"
 	} else {
 		if do_type != "from" {
 			redirect_target, redirect_anchor := View_w_redirect_target(db, doc_name)
@@ -116,8 +115,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		render_data = View_w_merge_category_data(db, config, doc_name, render_data)
 	}
 
-	last_edit_data := Api_w_set(config, doc_name, "last_edit", "")
-	last_edit, _ := last_edit_data["data"].(string)
+	last_edit := tool.Get_document_setting_value(db, doc_name, "last_edit", "")
 
 	if document_type == "" && last_edit != "" {
 		warning_days := tool.Get_setting_value(db, "outdated_doc_warning_date", "", "")
@@ -150,10 +148,8 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 	bottom_body := tool.Get_setting_value(db, "bottom_body", "", "")
 	render_data += Setting_render_markup_with_requester(db, bottom_body, Setting_markup_value(db, "bottom_body"), config.IP)
 
-	document_top_data := Api_w_set(config, doc_name, "document_top", "")
-	document_top, _ := document_top_data["data"].(string)
-	document_top_markup_data := Api_w_set(config, doc_name, "document_top_markup", "")
-	document_top_markup_value, _ := document_top_markup_data["data"].(string)
+	document_top := tool.Get_document_setting_value(db, doc_name, "document_top", "")
+	document_top_markup_value := tool.Get_document_setting_value(db, doc_name, "document_top_markup", "")
 	document_top_markup := Setting_markup_normalize(document_top_markup_value)
 	render_data = Setting_render_markup_with_requester(db, document_top, document_top_markup, config.IP) + render_data
 
@@ -232,11 +228,7 @@ func View_w(c *gin.Context, config tool.Config, doc_name string, view_type strin
 		}
 	}
 
-	view_count := 0
-	view_count_api := Api_w_page_view(config, doc_name)
-	if view_count_data, ok := view_count_api["data"].(int); ok {
-		view_count = view_count_data
-	}
+	view_count := Document_page_view_read(db, doc_name)
 
 	out := tool.Get_template(
 		db,

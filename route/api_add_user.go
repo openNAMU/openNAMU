@@ -60,7 +60,7 @@ func Api_add_user(config tool.Config, id string, password string, email string, 
 	}
 
 	password_hash := tool.Password_encode(db, password, encode)
-	return Api_add_user_hash_internal(config, id, password_hash, email, encode, "", false)
+	return Add_user_hash_with_db(db, id, password_hash, email, encode, "", false)
 }
 
 func Api_add_user_invite(config tool.Config, id string, password string, email string, encode string, invite_hash string) map[string]any {
@@ -72,13 +72,17 @@ func Api_add_user_invite(config tool.Config, id string, password string, email s
 	}
 
 	password_hash := tool.Password_encode(db, password, encode)
-	return Api_add_user_hash_internal(config, id, password_hash, email, encode, invite_hash, true)
+	return Add_user_hash_with_db(db, id, password_hash, email, encode, invite_hash, true)
 }
 
 func Api_add_user_hash_internal(config tool.Config, id string, password_hash string, email string, encode string, invite_hash string, require_invite bool) map[string]any {
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
+	return Add_user_hash_with_db(db, id, password_hash, email, encode, invite_hash, require_invite)
+}
+
+func Add_user_hash_with_db(db *sql.DB, id string, password_hash string, email string, encode string, invite_hash string, require_invite bool) map[string]any {
 	if require_invite && tool.Invite_required(db) && invite_hash == "" {
 		return map[string]any{"response": "error", "data": "invite error"}
 	}

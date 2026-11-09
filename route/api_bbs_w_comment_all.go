@@ -1,6 +1,10 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"database/sql"
+
+	"opennamu/route/tool"
+)
 
 type bbs_comment_page_state struct {
 	offset int
@@ -13,11 +17,22 @@ func Api_bbs_w_comment_page_data(config tool.Config, sub_code string, already_au
 		return
 	}
 
-	return_data := Api_bbs_w_comment_one(config, already_auth_check, do_type, sub_code)
-	return_data_in, _ := return_data["data"].([]map[string]string)
-	for _, comment := range return_data_in {
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
+	Bbs_comment_page_data(db, config, sub_code, already_auth_check, do_type, state)
+}
+
+func Bbs_comment_page_data(db *sql.DB, config tool.Config, sub_code string, already_auth_check bool, do_type string, state *bbs_comment_page_state) {
+	if len(state.data) >= state.limit {
+		return
+	}
+	if !already_auth_check && Bbs_comment_read_access(db, config, sub_code) != "" {
+		return
+	}
+
+	for _, comment := range Bbs_comment_one_data(db, config, do_type, sub_code) {
 		if state.offset > 0 {
-			state.offset -= 1
+			state.offset--
 		} else {
 			state.data = append(state.data, comment)
 		}
@@ -25,7 +40,7 @@ func Api_bbs_w_comment_page_data(config tool.Config, sub_code string, already_au
 		if len(state.data) >= state.limit {
 			return
 		}
-		Api_bbs_w_comment_page_data(config, sub_code+"-"+comment["code"], already_auth_check, do_type, state)
+		Bbs_comment_page_data(db, config, sub_code+"-"+comment["code"], already_auth_check, do_type, state)
 		if len(state.data) >= state.limit {
 			return
 		}
@@ -75,8 +90,7 @@ func Api_bbs_w_comment_pinned_data(config tool.Config, set_id string, set_code s
 			continue
 		}
 
-		comment_data := Api_bbs_w_comment_one(config, true, "", comment_set_id+"-"+comment_set_code)
-		comment_list, _ := comment_data["data"].([]map[string]string)
+		comment_list := Bbs_comment_one_data(db, config, "", comment_set_id+"-"+comment_set_code)
 		if len(comment_list) > 0 {
 			data = append(data, comment_list[0])
 		}
@@ -85,26 +99,25 @@ func Api_bbs_w_comment_pinned_data(config tool.Config, set_id string, set_code s
 	return data
 }
 
-func Api_bbs_w_comment_all(config tool.Config, sub_code string, already_auth_check bool, do_type string) map[string]any {
-	end_data := []map[string]string{}
-
-	return_data := Api_bbs_w_comment_one(config, already_auth_check, do_type, sub_code)
-	return_data_in := return_data["data"].([]map[string]string)
-
-	for for_a := 0; for_a < len(return_data_in); for_a++ {
-		end_data = append(end_data, return_data_in[for_a])
-
-		temp_data := Api_bbs_w_comment_all(config, sub_code+"-"+return_data_in[for_a]["code"], already_auth_check, do_type)
-		temp, _ := temp_data["data"].([]map[string]string)
-		if len(temp) > 0 {
-			for for_b := 0; for_b < len(temp); for_b++ {
-				end_data = append(end_data, temp[for_b])
-			}
-		}
+func Bbs_comment_all_data(db *sql.DB, config tool.Config, sub_code string, already_auth_check bool, do_type string) []map[string]string {
+	data := []map[string]string{}
+	if !already_auth_check && Bbs_comment_read_access(db, config, sub_code) != "" {
+		return data
 	}
+
+	for _, comment := range Bbs_comment_one_data(db, config, do_type, sub_code) {
+		data = append(data, comment)
+		data = append(data, Bbs_comment_all_data(db, config, sub_code+"-"+comment["code"], already_auth_check, do_type)...)
+	}
+	return data
+}
+
+func Api_bbs_w_comment_all(config tool.Config, sub_code string, already_auth_check bool, do_type string) map[string]any {
+	db := tool.DB_connect()
+	defer tool.DB_close(db)
 
 	return map[string]any{
 		"response": "ok",
-		"data":     end_data,
+		"data":     Bbs_comment_all_data(db, config, sub_code, already_auth_check, do_type),
 	}
 }

@@ -157,49 +157,40 @@ func Api_user_watch_list(config tool.Config, name string, num_str string, do_typ
 		return_data["response"] = "require auth"
 		return_data["data"] = []User_watch_item{}
 	} else {
-		if do_type == "thread_watchlist" {
+		if do_type == "thread_watchlist" || do_type == "bbs_watchlist" {
 			data_list := []string{}
-			seen := map[string]bool{}
-			for _, watch_type := range []string{"bbs_watchlist", "thread_watchlist"} {
-				rows := tool.Query_DB(
-					db,
-					"select data from user_set where name = ? and id = ?",
-					watch_type,
-					name,
-				)
-				for rows.Next() {
-					watch_data := ""
-					if rows.Scan(&watch_data) != nil {
-						continue
-					}
-					if watch_type == "bbs_watchlist" {
-						if !strings.HasPrefix(watch_data, "-1-") {
+			if do_type == "thread_watchlist" {
+				seen := map[string]bool{}
+				for _, watch_type := range []string{"bbs_watchlist", "thread_watchlist"} {
+					rows := tool.Query_DB(
+						db,
+						"select data from user_set where name = ? and id = ?",
+						watch_type,
+						name,
+					)
+					for rows.Next() {
+						watch_data := ""
+						if rows.Scan(&watch_data) != nil {
 							continue
 						}
-						watch_data = strings.TrimPrefix(watch_data, "-1-")
+						if watch_type == "bbs_watchlist" {
+							if !strings.HasPrefix(watch_data, "-1-") {
+								continue
+							}
+							watch_data = strings.TrimPrefix(watch_data, "-1-")
+						}
+						if seen[watch_data] {
+							continue
+						}
+						seen[watch_data] = true
+						data_list = append(data_list, watch_data)
 					}
-					if seen[watch_data] {
-						continue
-					}
-					seen[watch_data] = true
-					data_list = append(data_list, watch_data)
+					rows.Close()
 				}
-				rows.Close()
+			} else {
+				data_list = Bbs_watch_merged_data(db, name)
 			}
-			start := num
-			if start > len(data_list) {
-				start = len(data_list)
-			}
-			end := start + 50
-			if end > len(data_list) {
-				end = len(data_list)
-			}
-			return_data["response"] = "ok"
-			return_data["data"] = User_watch_list_items(db, data_list[start:end], do_type)
-			return return_data
-		}
-		if do_type == "bbs_watchlist" {
-			data_list := Bbs_watch_merged_data(db, name)
+
 			start := num
 			if start > len(data_list) {
 				start = len(data_list)

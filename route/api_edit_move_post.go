@@ -11,8 +11,10 @@ import (
 )
 
 type move_history_row struct {
-	id   string
-	data string
+	id         string
+	numeric_id int
+	id_valid   bool
+	data       string
 }
 
 type move_history_event struct {
@@ -77,6 +79,9 @@ func Move_history_rows(db *sql.DB, title string) []move_history_row {
 	for rows.Next() {
 		row := move_history_row{}
 		if rows.Scan(&row.id, &row.data) == nil {
+			numeric_id, err := strconv.Atoi(row.id)
+			row.numeric_id = numeric_id
+			row.id_valid = err == nil
 			result = append(result, row)
 		}
 	}
@@ -85,7 +90,7 @@ func Move_history_rows(db *sql.DB, title string) []move_history_row {
 
 func Move_history_rows_valid(rows []move_history_row) bool {
 	for _, row := range rows {
-		if _, err := strconv.Atoi(row.id); err != nil {
+		if !row.id_valid {
 			return false
 		}
 	}
@@ -149,8 +154,7 @@ func Move_document_merge(executor tool.DB_runner, target_max int, old_name strin
 	tool.Exec_DB(executor, "delete from back where title = ? and type = 'no'", new_name)
 
 	for _, row := range source_history {
-		id, _ := strconv.Atoi(row.id)
-		new_id := strconv.Itoa(target_max + id)
+		new_id := strconv.Itoa(target_max + row.numeric_id)
 		tool.Exec_DB(executor, "update rc set title = ?, id = ? where title = ? and id = ?", new_name, new_id, old_name, row.id)
 		tool.Exec_DB(executor, "update history set title = ?, id = ? where title = ? and id = ?", new_name, new_id, old_name, row.id)
 	}
@@ -221,7 +225,10 @@ func Move_document_options(config tool.Config, db *sql.DB, old_name string, new_
 	}
 
 	owner_auth := tool.Check_permission(db, "document_move_manage", config.IP)
-	if !owner_auth && (move_option == "merge" || topic_option == "merge" || data_set_option == "reverse" || (move_option == "normal" && data_set_option != "normal") || (move_option != "normal" && data_set_option != "none")) {
+	requires_owner := move_option == "merge" || topic_option == "merge" || data_set_option == "reverse" ||
+		(move_option == "normal" && data_set_option != "normal") ||
+		(move_option != "normal" && data_set_option != "none")
+	if !owner_auth && requires_owner {
 		return "auth"
 	}
 
@@ -280,27 +287,43 @@ func Move_document_options(config tool.Config, db *sql.DB, old_name string, new_
 	if err != nil {
 		return "move error"
 	}
-	committed := false
-	defer func() {
-		if !committed {
-			_ = tx.Rollback()
-		}
-	}()
+	defer tx.Rollback()
 
 	history_events := []move_history_event{}
-	if move_option == "none" {
-	} else if target_exists && move_option == "reverse" {
-		Move_document_rotate(tx, document_temp, old_name, new_name)
-		history_events = append(history_events,
-			move_history_event{old_name, target_data, send, "<a>" + tool.HTML_escape(old_name) + "</a> ⇋ <a>" + tool.HTML_escape(new_name) + "</a>"},
-			move_history_event{new_name, source_data, send, "<a>" + tool.HTML_escape(new_name) + "</a> ⇋ <a>" + tool.HTML_escape(old_name) + "</a>"},
-		)
-	} else if target_exists && move_option == "merge" {
-		Move_document_merge(tx, target_max, old_name, new_name, source_history)
-		history_events = append(history_events, move_history_event{new_name, source_data, send, "<a>" + tool.HTML_escape(old_name) + "</a> ↔ <a>" + tool.HTML_escape(new_name) + "</a>"})
-	} else {
-		Move_document_normal_data(tx, old_name, new_name)
-		history_events = append(history_events, move_history_event{new_name, source_data, send, "<a>" + tool.HTML_escape(old_name) + "</a> → <a>" + tool.HTML_escape(new_name) + "</a>"})
+	if move_option != "none" {
+		if target_exists && move_option == "reverse" {
+			Move_document_rotate(tx, document_temp, old_name, new_name)
+			history_events = append(history_events,
+				move_history_event{
+					doc_name:   old_name,
+					data:       target_data,
+					send:       send,
+					type_check: "<a>" + tool.HTML_escape(old_name) + "</a> ⇋ <a>" + tool.HTML_escape(new_name) + "</a>",
+				},
+				move_history_event{
+					doc_name:   new_name,
+					data:       source_data,
+					send:       send,
+					type_check: "<a>" + tool.HTML_escape(new_name) + "</a> ⇋ <a>" + tool.HTML_escape(old_name) + "</a>",
+				},
+			)
+		} else if target_exists && move_option == "merge" {
+			Move_document_merge(tx, target_max, old_name, new_name, source_history)
+			history_events = append(history_events, move_history_event{
+				doc_name:   new_name,
+				data:       source_data,
+				send:       send,
+				type_check: "<a>" + tool.HTML_escape(old_name) + "</a> ↔ <a>" + tool.HTML_escape(new_name) + "</a>",
+			})
+		} else {
+			Move_document_normal_data(tx, old_name, new_name)
+			history_events = append(history_events, move_history_event{
+				doc_name:   new_name,
+				data:       source_data,
+				send:       send,
+				type_check: "<a>" + tool.HTML_escape(old_name) + "</a> → <a>" + tool.HTML_escape(new_name) + "</a>",
+			})
+		}
 	}
 
 	if topic_option != "none" {
@@ -324,7 +347,6 @@ func Move_document_options(config tool.Config, db *sql.DB, old_name string, new_
 	if err := tx.Commit(); err != nil {
 		return "move error"
 	}
-	committed = true
 	tool.Search_index_sync(db, old_name)
 	tool.Search_index_sync(db, new_name)
 	return ""

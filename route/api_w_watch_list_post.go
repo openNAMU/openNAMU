@@ -19,14 +19,7 @@ func Api_w_watch_list_post(config tool.Config, name string, do_type string) map[
 	}
 
 	toggle := func(tx *sql.Tx) error {
-		var data string
-		exist := tool.QueryRow_DB(tx, "select data from user_set where name = ? and id = ? and data = ?", []any{&data}, do_type, config.IP, name)
-		if exist {
-			_, err := tx.Exec(tool.DB_change("delete from user_set where name = ? and id = ? and data = ?"), do_type, config.IP, name)
-			return err
-		}
-		_, err := tx.Exec(tool.DB_change("insert into user_set (id, name, data) values (?, ?, ?)"), config.IP, do_type, name)
-		return err
+		return User_watch_list_toggle(tx, config.IP, do_type, name)
 	}
 
 	var err error
@@ -47,4 +40,32 @@ func Api_w_watch_list_post(config tool.Config, name string, do_type string) map[
 	}
 
 	return map[string]any{"response": "ok"}
+}
+
+func User_watch_list_toggle(tx *sql.Tx, user_id string, watch_type string, name string) error {
+	var existing_data string
+	if tool.QueryRow_DB(
+		tx,
+		"select data from user_set where name = ? and id = ? and data = ?",
+		[]any{&existing_data},
+		watch_type,
+		user_id,
+		name,
+	) {
+		_, err := tx.Exec(
+			tool.DB_change("delete from user_set where name = ? and id = ? and data = ?"),
+			watch_type,
+			user_id,
+			name,
+		)
+		return err
+	}
+
+	_, err := tx.Exec(
+		tool.DB_change("insert into user_set (id, name, data) values (?, ?, ?)"),
+		user_id,
+		watch_type,
+		name,
+	)
+	return err
 }

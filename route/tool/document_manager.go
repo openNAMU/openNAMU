@@ -103,65 +103,44 @@ func Do_edit_text_checkbox_check(db *sql.DB, config Config, data string) bool {
 }
 
 func Do_edit_slow_check(db *sql.DB, config Config, do_type string) bool {
-	if !Check_permission(db, "slow_edit_pass", config.IP) {
-		var check string
-
-		if do_type == "edit" {
-			QueryRow_DB(
-				db,
-				`select data from other where name = 'slow_edit'`,
-				[]any{&check},
-			)
-		} else {
-			// do_type == "thread"
-			QueryRow_DB(
-				db,
-				`select data from other where name = 'slow_thread'`,
-				[]any{&check},
-			)
-		}
-
-		if check != "" {
-			slow_edit := Str_to_int(check)
-
-			var last_edit string
-
-			if do_type == "edit" {
-				QueryRow_DB(
-					db,
-					`select date from history where ip = ? order by date desc limit 1`,
-					[]any{&last_edit},
-					config.IP,
-				)
-			} else {
-				QueryRow_DB(
-					db,
-					"select date_data.set_data from bbs_data date_data join bbs_data user_data on user_data.set_name = 'comment_user_id' and user_data.set_id = date_data.set_id and user_data.set_code = date_data.set_code where date_data.set_name = 'comment_date' and date_data.set_id like '-1-%' and user_data.set_data = ? order by date_data.set_data desc limit 1",
-					[]any{&last_edit},
-					config.IP,
-				)
-			}
-
-			if last_edit != "" {
-				last_edit_compact := strings.NewReplacer(
-					" ", "",
-					":", "",
-					"-", "",
-				).Replace(last_edit)
-
-				last_edit_num := Str_to_int(last_edit_compact)
-				now_edit_num := Str_to_int(
-					time.Now().Add(-time.Duration(slow_edit) * time.Second).Format("20060102150405"),
-				)
-
-				if last_edit_num > now_edit_num {
-					return false
-				}
-			}
-		}
+	if Check_permission(db, "slow_edit_pass", config.IP) {
+		return true
 	}
 
-	return true
+	setting_name := "slow_thread"
+	last_edit_query := "select date_data.set_data from bbs_data date_data join bbs_data user_data on user_data.set_name = 'comment_user_id' and user_data.set_id = date_data.set_id and user_data.set_code = date_data.set_code where date_data.set_name = 'comment_date' and date_data.set_id like '-1-%' and user_data.set_data = ? order by date_data.set_data desc limit 1"
+	if do_type == "edit" {
+		setting_name = "slow_edit"
+		last_edit_query = `select date from history where ip = ? order by date desc limit 1`
+	}
+
+	var check string
+	QueryRow_DB(
+		db,
+		"select data from other where name = ?",
+		[]any{&check},
+		setting_name,
+	)
+	if check == "" {
+		return true
+	}
+
+	var last_edit string
+	QueryRow_DB(db, last_edit_query, []any{&last_edit}, config.IP)
+	if last_edit == "" {
+		return true
+	}
+
+	last_edit_compact := strings.NewReplacer(
+		" ", "",
+		":", "",
+		"-", "",
+	).Replace(last_edit)
+	last_edit_num := Str_to_int(last_edit_compact)
+	now_edit_num := Str_to_int(
+		time.Now().Add(-time.Duration(Str_to_int(check)) * time.Second).Format("20060102150405"),
+	)
+	return last_edit_num <= now_edit_num
 }
 
 // Do_edit_max_length_check : over is false, under is true
@@ -303,37 +282,24 @@ func Do_add_history(db DB_runner, doc_name string, data string, date string, ip 
 		return
 	}
 
-	var id_data string
+	is_initial_history := mode == "add" || mode == "setting"
+	old_id_data := "0"
+	history_id_order := "desc"
+	history_id_change := 1
+	if is_initial_history {
+		old_id_data = "1"
+		history_id_order = "asc"
+		history_id_change = -1
+	}
+	QueryRow_DB(
+		db,
+		"select id from history where title = ? order by id + 0 "+history_id_order+" limit 1",
+		[]any{&old_id_data},
+		doc_name,
+	)
+	id_data := strconv.Itoa(Str_to_int(old_id_data) + history_id_change)
 
-	if mode == "add" || mode == "setting" {
-		old_id_data := "1"
-
-		QueryRow_DB(
-			db,
-			`select id from history where title = ? order by id + 0 asc limit 1`,
-			[]any{&old_id_data},
-			doc_name,
-		)
-
-		old_id_data_int := Str_to_int(old_id_data)
-		old_id_data_int -= 1
-
-		id_data = strconv.Itoa(old_id_data_int)
-	} else {
-		old_id_data := "0"
-
-		QueryRow_DB(
-			db,
-			`select id from history where title = ? order by id + 0 desc limit 1`,
-			[]any{&old_id_data},
-			doc_name,
-		)
-
-		old_id_data_int := Str_to_int(old_id_data)
-		old_id_data_int += 1
-
-		id_data = strconv.Itoa(old_id_data_int)
-
+	if !is_initial_history {
 		if id_data == "1" {
 			mode = "r1"
 		}
@@ -353,11 +319,10 @@ func Do_add_history(db DB_runner, doc_name string, data string, date string, ip 
 		send = send + " (" + type_check + ")"
 	}
 
-	if mode != "add" && mode != "setting" && mode != "user" {
-		Do_add_recent_history(db, "normal", id_data, doc_name, date)
-	}
-
-	if mode != "add" && mode != "setting" {
+	if !is_initial_history {
+		if mode != "user" {
+			Do_add_recent_history(db, "normal", id_data, doc_name, date)
+		}
 		Do_add_recent_history(db, mode, id_data, doc_name, date)
 
 		var document_count int
@@ -385,29 +350,16 @@ func Do_add_history(db DB_runner, doc_name string, data string, date string, ip 
 			data_set_exist = "not_exist"
 		}
 
-		Exec_DB(
-			db,
-			`delete from data_set where doc_name = ? and set_name = "last_edit"`,
-			doc_name,
-		)
-		Exec_DB(
-			db,
-			`insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'last_edit', ?)`,
-			doc_name,
-			date,
-		)
-
-		Exec_DB(
-			db,
-			`delete from data_set where doc_name = ? and set_name = "length"`,
-			doc_name,
-		)
-		Exec_DB(
-			db,
-			`insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', 'length', ?)`,
-			doc_name,
-			Get_len(data),
-		)
+		for _, setting := range []struct {
+			name  string
+			value any
+		}{
+			{name: "last_edit", value: date},
+			{name: "length", value: Get_len(data)},
+		} {
+			Exec_DB(db, `delete from data_set where doc_name = ? and set_name = ?`, doc_name, setting.name)
+			Exec_DB(db, `insert into data_set (doc_name, doc_rev, set_name, set_data) values (?, '', ?, ?)`, doc_name, setting.name, setting.value)
+		}
 
 		Exec_DB(
 			db,
