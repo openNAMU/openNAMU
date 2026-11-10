@@ -138,6 +138,7 @@ func Api_thread_bbs_post(config tool.Config, topic_num string, doc_name string, 
 		tool.Search_bbs_index_update_comment(db, thread_bbs_id, topic_num, "1")
 		Topic_reference_notify(db, config, data, "1", topic_num, thread_bbs_id, name, sub, "bbs")
 		Bbs_watch_notify(db, config, thread_bbs_id, topic_num, "1", "thread", sub, config.IP, "")
+		Bbs_post_watch_notify(db, config, thread_bbs_id, topic_num, "thread", sub, config.IP, Bbs_tag_list(name))
 	} else {
 		id := ""
 		date := tool.Get_time()

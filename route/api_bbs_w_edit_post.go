@@ -283,6 +283,7 @@ func Bbs_create_post(db *sql.DB, config tool.Config, set_id string, title string
 		panic(err)
 	}
 	tool.Search_bbs_index_update(db, set_id, set_code)
+	Bbs_post_watch_notify(db, config, set_id, set_code, tool.Get_bbs_set_data(db, set_id, "bbs_name"), title, config.IP, tag_list)
 
 	return map[string]any{"response": "ok", "data": set_code}
 }

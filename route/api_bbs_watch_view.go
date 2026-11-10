@@ -1,6 +1,9 @@
 package route
 
-import "opennamu/route/tool"
+import (
+	"opennamu/route/tool"
+	"strconv"
+)
 
 func Api_bbs_watch_view(config tool.Config, set_id string, set_code string) map[string]any {
 	db := tool.DB_connect()
@@ -26,11 +29,20 @@ func Api_bbs_watch_view(config tool.Config, set_id string, set_code string) map[
 		return map[string]any{"response": "require auth"}
 	}
 
+	watching := false
+	if !tool.IP_or_user(config.IP) {
+		key := Bbs_watch_key(set_id, set_code)
+		watching = tool.Get_user_set_data_match(db, config.IP, "bbs_watchlist", key)
+		if set_id == thread_bbs_id {
+			watching = watching || tool.Get_user_set_data_match(db, config.IP, "thread_watchlist", set_code) || tool.Get_user_set_data_match(db, config.IP, "thread_watchlist", key)
+		}
+	}
 	return map[string]any{
 		"response": "ok",
 		"data": map[string]string{
 			"bbs_name": bbs_name,
 			"title":    title,
+			"watched":  strconv.FormatBool(watching),
 		},
 	}
 }

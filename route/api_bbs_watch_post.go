@@ -2,7 +2,16 @@ package route
 
 import (
 	"database/sql"
+	"database/sql/driver"
+	"errors"
+	"log"
+	"runtime"
 	"strings"
+
+	"github.com/go-sql-driver/mysql"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
+	turso "turso.tech/database/tursogo"
 
 	"opennamu/route/tool"
 )
@@ -85,48 +94,121 @@ func Api_bbs_watch_post(config tool.Config, set_id string, set_code string) map[
 	return map[string]any{"response": "ok"}
 }
 
+func Bbs_notification_db_call(callback func()) (return_err error) {
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			recovered_err, is_error := recovered.(error)
+			var runtime_error runtime.Error
+			if !is_error || errors.As(recovered_err, &runtime_error) || !Bbs_notification_database_error(recovered_err) {
+				panic(recovered)
+			}
+			return_err = recovered_err
+		}
+	}()
+
+	callback()
+	return nil
+}
+
+func Bbs_notification_database_error(err error) bool {
+	var mysql_error *mysql.MySQLError
+	if errors.As(err, &mysql_error) || errors.Is(err, driver.ErrBadConn) {
+		return true
+	}
+	var sqlite_error *sqlite.Error
+	if errors.As(err, &sqlite_error) {
+		switch sqlite_error.Code() & 0xff {
+		case sqlite3.SQLITE_BUSY, sqlite3.SQLITE_LOCKED, sqlite3.SQLITE_IOERR,
+			sqlite3.SQLITE_NOMEM, sqlite3.SQLITE_READONLY, sqlite3.SQLITE_INTERRUPT,
+			sqlite3.SQLITE_FULL, sqlite3.SQLITE_CANTOPEN, sqlite3.SQLITE_PROTOCOL,
+			sqlite3.SQLITE_NOTADB, sqlite3.SQLITE_CORRUPT, sqlite3.SQLITE_CONSTRAINT,
+			sqlite3.SQLITE_AUTH, sqlite3.SQLITE_PERM:
+			return true
+		}
+		return false
+	}
+
+	for _, turso_error := range []error{
+		turso.ErrTursoBusy,
+		turso.ErrTursoInterrupt,
+		turso.ErrTursoGeneric,
+		turso.ErrTursoConstraint,
+		turso.ErrTursoReadOnly,
+		turso.ErrTursoDatabaseFull,
+		turso.ErrTursoNotADb,
+		turso.ErrTursoCorrupt,
+	} {
+		if errors.Is(err, turso_error) {
+			return true
+		}
+	}
+	return false
+}
+
 func Bbs_watch_notify(db *sql.DB, config tool.Config, set_id string, set_code string, comment_code string, bbs_name string, title string, post_user string, parent_user string) {
-	alarm := `BBS <a href="/bbs/w/` + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "#" + tool.Url_parser(comment_code) + `">` + tool.HTML_escape(bbs_name) + " - " + tool.HTML_escape(title) + "#" + tool.Url_parser(comment_code) + `</a>`
+	key := Bbs_watch_key(set_id, set_code)
+	targets := []string{}
+	sent := map[string]bool{}
 	skip := map[string]bool{
 		post_user:   true,
 		parent_user: true,
 	}
-	sent := map[string]bool{}
 
-	key := Bbs_watch_key(set_id, set_code)
-
-	rows := tool.Query_DB(
-		db,
-		"select id from user_set where name = 'bbs_watchlist' and data = ?",
-		key,
-	)
-	defer rows.Close()
-
-	for rows.Next() {
-		target := ""
-		if rows.Scan(&target) != nil || target == "" || skip[target] || sent[target] {
-			continue
+	append_watchers := func(query string, values ...any) error {
+		rows, err := db.Query(tool.DB_change(query), values...)
+		if err != nil {
+			return err
 		}
-		sent[target] = true
-		tool.Send_alarm(db, config.IP, target, alarm)
-	}
-
-	if set_id == thread_bbs_id {
-		thread_rows := tool.Query_DB(
-			db,
-			"select id from user_set where name = 'thread_watchlist' and (data = ? or data = ?)",
-			set_code,
-			key,
-		)
-		defer thread_rows.Close()
-
-		for thread_rows.Next() {
+		for rows.Next() {
 			target := ""
-			if thread_rows.Scan(&target) != nil || target == "" || skip[target] || sent[target] {
+			if err := rows.Scan(&target); err != nil {
+				log.Printf("[BBS WATCH] watcher scan failed: %v", err)
+				continue
+			}
+			if target == "" || skip[target] || sent[target] {
 				continue
 			}
 			sent[target] = true
+			targets = append(targets, target)
+		}
+		rows_err := rows.Err()
+		close_err := rows.Close()
+		if rows_err != nil {
+			log.Printf("[BBS WATCH] watcher lookup iteration failed: %v", rows_err)
+		}
+		if close_err != nil {
+			log.Printf("[BBS WATCH] watcher lookup cursor close failed: %v", close_err)
+		}
+		return nil
+	}
+
+	if err := append_watchers("select id from user_set where name = ? and data = ?", "bbs_watchlist", key); err != nil {
+		log.Printf("[BBS WATCH] existing watcher lookup failed: %v", err)
+		return
+	}
+	if set_id == thread_bbs_id {
+		if err := append_watchers("select id from user_set where name = ? and (data = ? or data = ?)", "thread_watchlist", set_code, key); err != nil {
+			log.Printf("[BBS WATCH] legacy thread watcher lookup failed: %v", err)
+		}
+	}
+
+	for _, target := range targets {
+		var allowed bool
+		if err := Bbs_notification_db_call(func() {
+			_, allowed = Bbs_post_view_auth(db, set_id, set_code, target)
+		}); err != nil {
+			log.Printf("[BBS WATCH] visibility lookup failed for recipient %q: %v", target, err)
+			continue
+		}
+		if !allowed {
+			continue
+		}
+
+		alarm := `BBS <a href="/bbs/w/` + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "#" + tool.Url_parser(comment_code) + `">` + tool.HTML_escape(bbs_name) + " - " + tool.HTML_escape(title) + "#" + tool.Url_parser(comment_code) + `</a>`
+		if err := Bbs_notification_db_call(func() {
 			tool.Send_alarm(db, config.IP, target, alarm)
+		}); err != nil {
+			log.Printf("[BBS WATCH] notification delivery failed for recipient %q: %v", target, err)
 		}
 	}
 }

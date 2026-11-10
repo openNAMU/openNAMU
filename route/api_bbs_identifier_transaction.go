@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"log"
 	"sort"
 
 	"opennamu/route/tool"
@@ -193,6 +194,7 @@ func Bbs_mysql_identifier_transaction(db *sql.DB, lock_scopes []string, callback
 	physical_connection_bad := false
 	defer func() {
 		if release_err := Bbs_mysql_identifier_locks_release(conn, acquired_locks); release_err != nil {
+			log.Printf("[BBS LOCK] advisory lock release failed: %v", release_err)
 			physical_connection_bad = true
 			if return_err == nil && !committed {
 				return_err = release_err

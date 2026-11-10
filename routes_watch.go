@@ -111,6 +111,8 @@ func Register_watch_routes(r *gin.Engine) {
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
+	route.Register_bbs_subscription_routes(r)
+
 	r.GET("/bbs_watch/:set_id/:set_code", func(c *gin.Context) {
 		route_data := route.View_bbs_watch(Make_route_config(c), c.Param("set_id"), c.Param("set_code"), nil)
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))

@@ -198,6 +198,15 @@ func View_bbs_in_internal(config tool.Config, set_id string, page_num string, so
 		{"bbs/main", tool.Get_language(db, "return", true)},
 		{"bbs/search/" + tool.Url_parser(set_id), tool.Get_language(db, "search", true)},
 	}
+	if !tool.IP_or_user(config.IP) {
+		board_watch_label := tool.Get_language(db, "bbs_board_watch", true)
+		if watch_data := Api_bbs_board_watch_view(config, set_id); watch_data["response"] == "ok" {
+			if watch_info, ok := watch_data["data"].(map[string]string); ok && watch_info["watched"] == "true" {
+				board_watch_label = tool.Get_language(db, "bbs_board_watch_remove", true)
+			}
+		}
+		menu = append(menu, []any{"bbs_board_watch/" + tool.Url_parser(set_id), board_watch_label})
+	}
 	if !Bbs_is_special_board(set_id) || set_id == thread_bbs_id {
 		add_path := "bbs/edit/" + tool.Url_parser(set_id)
 		if set_id == thread_bbs_id && filter.tag != "" {

@@ -36,6 +36,15 @@ func View_bbs_in_w(c *gin.Context, config tool.Config, set_id string, set_code s
 			tag_html += ", "
 		}
 		tag_html += "#" + tool.HTML_escape(tag)
+		if !tool.IP_or_user(config.IP) && Bbs_tag_watch_value_valid(tag) {
+			tag_watch_label := tool.Get_language(db, "bbs_tag_watch", true)
+			if watch_data := Api_bbs_tag_watch_view(config, "", tag); watch_data["response"] == "ok" {
+				if watch_info, ok := watch_data["data"].(map[string]string); ok && watch_info["watched"] == "true" {
+					tag_watch_label = tool.Get_language(db, "bbs_tag_watch_remove", true)
+				}
+			}
+			tag_html += ` (<a href="/bbs_tag_watch/` + tool.Base64_encode(tag) + `">` + tag_watch_label + `</a>)`
+		}
 	}
 	if tag_html != "" {
 		tag_html = "<div>" + tag_html + "</div>"
@@ -78,7 +87,22 @@ func View_bbs_in_w(c *gin.Context, config tool.Config, set_id string, set_code s
 		menu = append(menu, []any{"bbs/report/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code), tool.Get_language(db, "report", true)})
 	}
 	if !tool.IP_or_user(config.IP) {
-		menu = append(menu, []any{"bbs_watch/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code), tool.Get_language(db, "bbs_watch", true)})
+		comment_watch_label := tool.Get_language(db, "bbs_comment_watch", true)
+		if watch_data := Api_bbs_watch_view(config, set_id, set_code); watch_data["response"] == "ok" {
+			if watch_info, ok := watch_data["data"].(map[string]string); ok && watch_info["watched"] == "true" {
+				comment_watch_label = tool.Get_language(db, "bbs_comment_watch_remove", true)
+			}
+		}
+		bookmark_label := tool.Get_language(db, "bbs_post_bookmark", true)
+		if bookmark_data := Api_bbs_bookmark_view(config, set_id, set_code); bookmark_data["response"] == "ok" {
+			if bookmark_info, ok := bookmark_data["data"].(map[string]string); ok && bookmark_info["watched"] == "true" {
+				bookmark_label = tool.Get_language(db, "bbs_post_bookmark_remove", true)
+			}
+		}
+		menu = append(menu,
+			[]any{"bbs_watch/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code), comment_watch_label},
+			[]any{"bbs_bookmark/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code), bookmark_label},
+		)
 	}
 
 	out := tool.Get_template(

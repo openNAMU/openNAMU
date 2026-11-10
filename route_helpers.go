@@ -1,21 +1,16 @@
 package main
 
 import (
-	"net/http"
 	"strings"
 
+	"opennamu/route"
 	"opennamu/route/tool"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Make_route_config(c *gin.Context) tool.Config {
-	return tool.Config{
-		IP:        tool.Get_IP(c),
-		Cookies:   tool.Get_Cookies(c),
-		Session:   tool.Get_session(c),
-		UserAgent: c.GetHeader("User-Agent"),
-	}
+	return route.Make_route_config(c)
 }
 
 func Captcha_response_internal(c *gin.Context) string {
@@ -34,11 +29,5 @@ func Parse_bbs_code(value string) (string, string) {
 }
 
 func Write_data(c *gin.Context, status int, content_type string, data []byte) {
-	target, ok := tool.Get_redirect_target(string(data))
-	if ok {
-		c.Redirect(http.StatusFound, target)
-		return
-	}
-
-	c.Data(status, content_type, data)
+	route.Write_data(c, status, content_type, data)
 }

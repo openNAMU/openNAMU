@@ -9,6 +9,8 @@ import (
 )
 
 func Register_bbs_routes(r *gin.Engine) {
+	route.Register_bbs_post_create_route(r)
+
 	r.GET("/vote", func(c *gin.Context) {
 		route_data := route.View_vote_list(Make_route_config(c), "open", "1")
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
@@ -39,22 +41,6 @@ func Register_bbs_routes(r *gin.Engine) {
 
 	r.GET("/bbs/edit/:set_id", func(c *gin.Context) {
 		route_data := route.View_bbs_edit(Make_route_config(c), c.Param("set_id"), "", "", "")
-		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
-	})
-
-	r.POST("/bbs/edit/:set_id", func(c *gin.Context) {
-		route_data := route.View_bbs_edit_post(
-			Make_route_config(c),
-			c.Param("set_id"),
-			"",
-			"",
-			c.PostForm("title"),
-			c.PostForm("content"),
-			c.PostForm("prefix"),
-			c.PostForm("tags"),
-			Captcha_response_internal(c),
-			"",
-		)
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 

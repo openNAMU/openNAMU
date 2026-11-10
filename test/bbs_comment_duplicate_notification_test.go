@@ -245,3 +245,85 @@ func bbs_comment_seed_parent(db *sql.DB, t *testing.T, set_id string, set_code s
 	exec(`insert into bbs_data (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)`, "comment_date", comment_code, base_id, "2026-01-01 00:00:00")
 	exec(`insert into bbs_data (set_name, set_code, set_id, set_data) values (?, ?, ?, ?)`, "comment_user_id", comment_code, base_id, user)
 }
+
+func Test_bbs_watch_notify_preserves_recipients_after_null_legacy_row(t *testing.T) {
+	for _, backend := range []string{"sqlite", "turso"} {
+		t.Run(backend, func(t *testing.T) {
+			db := new_record_db(t, backend)
+			defer tool.DB_close(db)
+			thread_seed_bbs(db, t, "100", "Thread title <&>")
+			seed_user_watch(db, t, "bbs_watchlist", "modern_watcher", "-1-100")
+			seed_user_watch(db, t, "bbs_watchlist", "bbs_author", "-1-100")
+			seed_user_watch(db, t, "thread_watchlist", "legacy_watcher", "100")
+			seed_user_watch(db, t, "thread_watchlist", "parent_commenter", "100")
+			if _, err := db.Exec(`insert into user_set (name, id, data) values ('thread_watchlist', NULL, '100')`); err != nil {
+				t.Fatalf("seed null legacy watcher row: %v", err)
+			}
+
+			route.Bbs_watch_notify(
+				db,
+				tool.Config{IP: "commenter", Session: &emptySession{}},
+				"-1",
+				"100",
+				"2",
+				"Thread & <Board>",
+				"Thread title <&>",
+				"bbs_author",
+				"parent_commenter",
+			)
+
+			for _, user_id := range []string{"modern_watcher", "legacy_watcher"} {
+				if count := notice_count(db, user_id); count != 1 {
+					t.Errorf("watcher %q received %d notices, want 1", user_id, count)
+				}
+				var notice_data string
+				if err := db.QueryRow(`select data from user_notice where name = ?`, user_id).Scan(&notice_data); err != nil {
+					t.Fatalf("read notification for %q: %v", user_id, err)
+				}
+				want_notice := `commenter | BBS <a href="/bbs/w/-1/100#2">Thread &amp; &lt;Board&gt; - Thread title &lt;&amp;&gt;#2</a>`
+				if notice_data != want_notice {
+					t.Errorf("notification for %q = %q, want exact escaped content %q", user_id, notice_data, want_notice)
+				}
+			}
+			for _, skipped_user := range []string{"bbs_author", "parent_commenter"} {
+				if count := notice_count(db, skipped_user); count != 0 {
+					t.Errorf("skipped user %q received %d notices, want 0", skipped_user, count)
+				}
+			}
+		})
+	}
+}
+
+func Test_bbs_watch_notify_isolates_delivery_failure_across_watch_types(t *testing.T) {
+	for _, backend := range []string{"sqlite", "turso"} {
+		t.Run(backend, func(t *testing.T) {
+			db := new_record_db(t, backend)
+			defer tool.DB_close(db)
+			thread_seed_bbs(db, t, "101", "Failure isolation topic")
+			seed_user_watch(db, t, "bbs_watchlist", "delivery_fail", "-1-101")
+			seed_user_watch(db, t, "thread_watchlist", "delivery_success", "101")
+			if _, err := db.Exec(`create trigger fail_legacy_notice before insert on user_notice when new.name = 'delivery_fail' begin select raise(abort, 'forced legacy delivery failure'); end`); err != nil {
+				t.Fatalf("create delivery-failure trigger: %v", err)
+			}
+
+			route.Bbs_watch_notify(
+				db,
+				tool.Config{IP: "commenter", Session: &emptySession{}},
+				"-1",
+				"101",
+				"2",
+				"Thread board",
+				"Failure isolation topic",
+				"bbs_author",
+				"",
+			)
+
+			if count := notice_count(db, "delivery_fail"); count != 0 {
+				t.Fatalf("failed recipient received %d notices, want 0", count)
+			}
+			if count := notice_count(db, "delivery_success"); count != 1 {
+				t.Fatalf("legacy thread watcher received %d notices after another delivery failed, want 1", count)
+			}
+		})
+	}
+}

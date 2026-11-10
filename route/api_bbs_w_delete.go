@@ -73,6 +73,10 @@ func Api_bbs_w_delete(config tool.Config, set_id string, set_code string) map[st
 				[]any{Bbs_watch_key(set_id, set_code)},
 			},
 			{
+				"delete from user_set where name = 'bbs_bookmark' and data = ?",
+				[]any{Bbs_watch_key(set_id, set_code)},
+			},
+			{
 				"delete from bbs_data where set_id = ? and set_code = ?",
 				[]any{set_id, set_code},
 			},

@@ -9,11 +9,13 @@ import (
 )
 
 type User_watch_item struct {
-	Data     string
-	Display  string
-	Date     string
-	Set_id   string
-	Set_code string
+	Data      string
+	Display   string
+	Date      string
+	Set_id    string
+	Set_code  string
+	Tag       string `json:"Tag,omitempty"`
+	Available bool   `json:"Available,omitempty"`
 }
 
 func User_watch_list_items(db *sql.DB, data_list []string, do_type string) []User_watch_item {
@@ -25,18 +27,29 @@ func User_watch_list_items(db *sql.DB, data_list []string, do_type string) []Use
 		}
 		if do_type == "watchlist" {
 			item.Date = tool.Get_history_date(db, data)
-		} else if do_type == "bbs_watchlist" {
-			if strings.HasPrefix(data, "-1-") {
-				item.Set_id = thread_bbs_id
-				item.Set_code = strings.TrimPrefix(data, "-1-")
-			} else {
-				watch_data := strings.SplitN(data, "-", 2)
-				if len(watch_data) == 1 {
+		} else if do_type == "bbs_watchlist" || do_type == bbs_bookmark_list_type {
+			if do_type == "bbs_watchlist" {
+				if strings.HasPrefix(data, "-1-") {
 					item.Set_id = thread_bbs_id
-					item.Set_code = watch_data[0]
+					item.Set_code = strings.TrimPrefix(data, "-1-")
 				} else {
-					item.Set_id = watch_data[0]
-					item.Set_code = watch_data[1]
+					watch_data := strings.SplitN(data, "-", 2)
+					if len(watch_data) == 1 {
+						item.Set_id = thread_bbs_id
+						item.Set_code = watch_data[0]
+					} else {
+						item.Set_id = watch_data[0]
+						item.Set_code = watch_data[1]
+					}
+				}
+			} else {
+				separator := strings.LastIndex(data, "-")
+				if separator > 0 && separator < len(data)-1 {
+					item.Set_id = data[:separator]
+					item.Set_code = data[separator+1:]
+				} else {
+					item.Set_id = thread_bbs_id
+					item.Set_code = data
 				}
 			}
 
@@ -49,6 +62,23 @@ func User_watch_list_items(db *sql.DB, data_list []string, do_type string) []Use
 				}
 			}
 			item.Date, _ = tool.Get_bbs_data_value(db, item.Set_id, item.Set_code, "date")
+		} else if do_type == bbs_board_watch_list_type {
+			item.Set_id = data
+			if bbs_name := tool.Get_bbs_set_data(db, item.Set_id, "bbs_name"); bbs_name != "" {
+				item.Display = bbs_name
+			}
+		} else if do_type == bbs_tag_watch_list_type {
+			item.Tag = data
+			if _, legacy_tag, is_legacy := strings.Cut(data, "\n"); is_legacy {
+				item.Tag = legacy_tag
+			}
+			item.Tag = strings.TrimSpace(item.Tag)
+			if item.Tag == "" || !Bbs_tag_watch_value_valid(item.Tag) {
+				continue
+			}
+			item.Data = item.Tag
+			item.Display = "#" + item.Tag
+			item.Available = true
 		}
 		item_list = append(item_list, item)
 	}
@@ -139,7 +169,7 @@ func Api_user_watch_list(config tool.Config, name string, num_str string, do_typ
 	db := tool.DB_connect()
 	defer tool.DB_close(db)
 
-	if do_type != "watchlist" && do_type != "star_doc" && do_type != "thread_watchlist" && do_type != "bbs_watchlist" {
+	if do_type != "watchlist" && do_type != "star_doc" && do_type != "thread_watchlist" && do_type != "bbs_watchlist" && do_type != bbs_bookmark_list_type && do_type != bbs_board_watch_list_type && do_type != bbs_tag_watch_list_type {
 		do_type = "star_doc"
 	}
 
@@ -203,9 +233,56 @@ func Api_user_watch_list(config tool.Config, name string, num_str string, do_typ
 			return_data["data"] = User_watch_list_items(db, data_list[start:end], do_type)
 			return return_data
 		}
+		if do_type == bbs_tag_watch_list_type {
+			rows := tool.Query_DB(
+				db,
+				"select data from user_set where name = ? and id = ? order by data asc",
+				do_type,
+				name,
+			)
+			tag_list := []string{}
+			seen_tags := map[string]bool{}
+			for rows.Next() {
+				data := ""
+				if err := rows.Scan(&data); err != nil {
+					rows.Close()
+					panic(err)
+				}
+				item_list := User_watch_list_items(db, []string{data}, do_type)
+				if len(item_list) == 0 || seen_tags[item_list[0].Tag] {
+					continue
+				}
+				seen_tags[item_list[0].Tag] = true
+				tag_list = append(tag_list, item_list[0].Tag)
+			}
+			if err := rows.Err(); err != nil {
+				rows.Close()
+				panic(err)
+			}
+			rows.Close()
+			sort.Strings(tag_list)
+
+			start := num
+			if start < 0 {
+				start = 0
+			}
+			if start > len(tag_list) {
+				start = len(tag_list)
+			}
+			end := start + 50
+			if end > len(tag_list) {
+				end = len(tag_list)
+			}
+			return_data["response"] = "ok"
+			return_data["data"] = User_watch_list_items(db, tag_list[start:end], do_type)
+			return_data["has_next"] = end < len(tag_list)
+			return return_data
+		}
 		query := "select data from user_set where name = ? and id = ? limit ?, 50"
 		if do_type == "star_doc" {
 			query = `select data from user_set where name = ? and id = ? order by coalesce((select date from history where history.title = user_set.data order by id + 0 desc limit 1), '') desc, data asc limit ?, 50`
+		} else if do_type == bbs_bookmark_list_type || do_type == bbs_board_watch_list_type {
+			query = "select data from user_set where name = ? and id = ? order by data asc limit ?, 51"
 		}
 
 		rows := tool.Query_DB(
@@ -230,8 +307,36 @@ func Api_user_watch_list(config tool.Config, name string, num_str string, do_typ
 			data_list = append(data_list, title_data)
 		}
 
+		item_list := User_watch_list_items(db, data_list, do_type)
+		has_next := false
+		if do_type == bbs_bookmark_list_type || do_type == bbs_board_watch_list_type {
+			has_next = len(item_list) > 50
+			if has_next {
+				item_list = item_list[:50]
+			}
+			for index := range item_list {
+				item := &item_list[index]
+				if do_type == bbs_bookmark_list_type {
+					_, item.Available = Bbs_post_view_auth(db, item.Set_id, item.Set_code, ip)
+				} else {
+					item.Available = tool.Check_acl(db, item.Set_id, "", "bbs_view", ip)
+				}
+				if !item.Available {
+					item.Display = ""
+					item.Date = ""
+					if name != ip {
+						item.Data = ""
+						item.Set_id = ""
+						item.Set_code = ""
+					}
+				}
+			}
+		}
 		return_data["response"] = "ok"
-		return_data["data"] = User_watch_list_items(db, data_list, do_type)
+		return_data["data"] = item_list
+		if do_type == bbs_bookmark_list_type || do_type == bbs_board_watch_list_type {
+			return_data["has_next"] = has_next
+		}
 	}
 
 	return return_data

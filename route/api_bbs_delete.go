@@ -49,6 +49,14 @@ func Api_bbs_delete(config tool.Config, set_id string) map[string]any {
 				[]any{set_id + "-%"},
 			},
 			{
+				"delete from user_set where name = 'bbs_bookmark' and data like ?",
+				[]any{set_id + "-%"},
+			},
+			{
+				"delete from user_set where name = 'bbs_board_watchlist' and data = ?",
+				[]any{set_id},
+			},
+			{
 				"delete from bbs_data where set_id = ?",
 				[]any{set_id},
 			},

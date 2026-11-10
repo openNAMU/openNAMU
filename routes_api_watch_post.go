@@ -28,4 +28,6 @@ func Register_api_watch_post_routes(r *gin.Engine) {
 		data := route.Api_bbs_watch_post(Make_route_config(c), c.Param("set_id"), c.Param("set_code"))
 		c.JSON(http.StatusOK, data)
 	})
+
+	route.Register_bbs_subscription_api_routes(r)
 }

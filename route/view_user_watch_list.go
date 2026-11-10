@@ -34,18 +34,44 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 		for _, item := range data_list {
 			view_path := "/w/" + tool.Url_parser(item.Data)
 			delete_path := "/star_doc/" + tool.Url_parser(item.Data)
+			remove_label := tool.Get_language(db, "delete", true)
 			if do_type == "watchlist" {
 				delete_path = "/watch_list/" + tool.Url_parser(item.Data)
 			} else if do_type == "bbs_watchlist" {
 				view_path = "/bbs/w/" + tool.Url_parser(item.Set_id) + "/" + tool.Url_parser(item.Set_code)
 				delete_path = "/bbs_watch/" + tool.Url_parser(item.Set_id) + "/" + tool.Url_parser(item.Set_code)
+				remove_label = tool.Get_language(db, "bbs_comment_watch_remove", true)
+			} else if do_type == bbs_bookmark_list_type {
+				view_path = "/bbs/w/" + tool.Url_parser(item.Set_id) + "/" + tool.Url_parser(item.Set_code)
+				delete_path = "/bbs_bookmark/" + tool.Url_parser(item.Set_id) + "/" + tool.Url_parser(item.Set_code)
+				remove_label = tool.Get_language(db, "bbs_post_bookmark_remove", true)
+			} else if do_type == bbs_board_watch_list_type {
+				view_path = "/bbs/in/" + tool.Url_parser(item.Set_id)
+				delete_path = "/bbs_board_watch/" + tool.Url_parser(item.Set_id)
+				remove_label = tool.Get_language(db, "bbs_board_watch_remove", true)
+			} else if do_type == bbs_tag_watch_list_type {
+				view_path = ""
+				delete_path = "/bbs_tag_watch/" + tool.Base64_encode(item.Tag)
+				remove_label = tool.Get_language(db, "bbs_tag_watch_remove", true)
+			}
+
+			display := tool.HTML_escape(item.Display)
+			if (do_type == bbs_bookmark_list_type || do_type == bbs_board_watch_list_type) && !item.Available {
+				display = tool.Get_language(db, "bbs_subscription_unavailable", true)
+				view_path = ""
+			}
+			if do_type == bbs_tag_watch_list_type {
+				display = tool.HTML_escape(item.Display)
 			}
 
 			date_html := ""
 			if item.Date != "" {
 				date_html = "(" + tool.HTML_escape(item.Date) + ") "
 			}
-			data_html += `<li><a href="` + view_path + `">` + tool.HTML_escape(item.Display) + `</a> ` + date_html + `<a href="` + delete_path + `">(` + tool.Get_language(db, "delete", true) + `)</a></li>`
+			if view_path != "" {
+				display = `<a href="` + view_path + `">` + display + `</a>`
+			}
+			data_html += `<li>` + display + ` ` + date_html + `<a href="` + delete_path + `">(` + remove_label + `)</a></li>`
 		}
 		data_html += "</ul><hr class=\"main_hr\">"
 	}
@@ -55,6 +81,12 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 		page_url = "/watch_list_page/{}"
 	} else if do_type == "bbs_watchlist" {
 		page_url = "/bbs_watch_list_page/{}"
+	} else if do_type == bbs_bookmark_list_type {
+		page_url = "/bbs_bookmark_list_page/{}"
+	} else if do_type == bbs_board_watch_list_type {
+		page_url = "/bbs_board_watch_list_page/{}"
+	} else if do_type == bbs_tag_watch_list_type {
+		page_url = "/bbs_tag_watch_list_page/{}"
 	}
 
 	if do_type == "bbs_watchlist" && len(data_list) == 50 {
@@ -65,6 +97,8 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 		total_count := bbs_watch_merged_count(db, config.IP)
 		has_next := page*50 < total_count
 		data_html += tool.Get_page_control(db, page, len(data_list), 50, page_url, has_next)
+	} else if has_next, ok := api_data["has_next"].(bool); ok {
+		data_html += tool.Get_page_control(db, tool.Str_to_int(num), len(data_list), 50, page_url, has_next)
 	} else {
 		data_html += tool.Get_page_control(db, tool.Str_to_int(num), len(data_list), 50, page_url)
 	}
@@ -72,7 +106,7 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 	manager_url := "/manager/16"
 	if do_type == "watchlist" {
 		manager_url = "/manager/13"
-	} else if do_type == "bbs_watchlist" {
+	} else if do_type == "bbs_watchlist" || do_type == bbs_bookmark_list_type || do_type == bbs_board_watch_list_type || do_type == bbs_tag_watch_list_type {
 		manager_url = ""
 	}
 	if manager_url != "" {
@@ -84,6 +118,12 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 		title = tool.Get_language(db, "star_doc", true)
 	} else if do_type == "bbs_watchlist" {
 		title = tool.Get_language(db, "bbs_watchlist", true)
+	} else if do_type == bbs_bookmark_list_type {
+		title = tool.Get_language(db, "bbs_post_bookmark_list", true)
+	} else if do_type == bbs_board_watch_list_type {
+		title = tool.Get_language(db, "bbs_board_watch_list", true)
+	} else if do_type == bbs_tag_watch_list_type {
+		title = tool.Get_language(db, "bbs_tag_watch_list", true)
 	}
 
 	return tool.Get_template(
@@ -97,6 +137,9 @@ func View_user_watch_list(config tool.Config, num string, do_type string) string
 			{"watch_list", tool.Get_language(db, "watchlist", false)},
 			{"star_doc", tool.Get_language(db, "star_doc", false)},
 			{"bbs_watch_list", tool.Get_language(db, "bbs_watchlist", false)},
+			{"bbs_bookmark_list", tool.Get_language(db, "bbs_post_bookmark_list", false)},
+			{"bbs_board_watch_list", tool.Get_language(db, "bbs_board_watch_list", false)},
+			{"bbs_tag_watch_list", tool.Get_language(db, "bbs_tag_watch_list", false)},
 		},
 		map[string]string{},
 	)

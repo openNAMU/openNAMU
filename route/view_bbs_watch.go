@@ -37,14 +37,18 @@ func View_bbs_watch(config tool.Config, set_id string, set_code string, values u
 		return tool.Get_redirect("/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code))
 	}
 
+	watch_label := tool.Get_language(db, "bbs_comment_watch", true)
+	if watch_info["watched"] == "true" {
+		watch_label = tool.Get_language(db, "bbs_comment_watch_remove", true)
+	}
 	data := `<form method="post" action="/bbs_watch/` + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + `">
-            <button id="opennamu_save_button" type="submit">` + tool.Get_language(db, "send", true) + `</button>
+            <button id="opennamu_save_button" type="submit">` + watch_label + `</button>
         </form>`
 
 	return tool.Get_template(
 		db,
 		config,
-		tool.Get_language(db, "bbs_watchlist", true),
+		watch_label,
 		data,
 		[]any{"(" + tool.HTML_escape(bbs_name) + " - " + tool.HTML_escape(title) + ")"},
 		[][]any{
