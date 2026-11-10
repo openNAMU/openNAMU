@@ -42,6 +42,21 @@ func View_bbs_in_w_tool_post(config tool.Config, set_id string, set_code string,
 		if api_data["response"] == "require auth" {
 			return tool.Get_error_page(db, config, "auth")
 		}
+	case "excellent_exclusion":
+		excluded_value := values.Get("excluded")
+		if excluded_value != "0" && excluded_value != "1" {
+			return tool.Get_error_page(db, config, "error")
+		}
+		api_data := Api_bbs_excellent_exclusion_set(config, set_id, set_code, excluded_value == "1")
+		if api_data["response"] == "require auth" {
+			return tool.Get_error_page(db, config, "auth")
+		}
+		if api_data["response"] != "ok" {
+			if api_data["response"] == "not exist" {
+				return tool.Get_redirect("/bbs/main")
+			}
+			return tool.Get_error_page(db, config, "error")
+		}
 	case "slow_mode_set":
 		api_data := Api_bbs_w_post_slow_mode_put(config, set_id, set_code, values.Get("slow_mode_seconds"))
 		if api_data["response"] == "require auth" {

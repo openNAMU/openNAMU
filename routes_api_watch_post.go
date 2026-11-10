@@ -30,4 +30,5 @@ func Register_api_watch_post_routes(r *gin.Engine) {
 	})
 
 	route.Register_bbs_subscription_api_routes(r)
+	route.Register_bbs_excellent_api_routes(r)
 }

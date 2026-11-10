@@ -100,6 +100,31 @@ func View_bbs_in_w_tool(config tool.Config, set_id string, set_code string) stri
         `
 	}
 
+	if tool.Check_permission(db, "bbs_manage", config.IP) {
+		post_api_data := Api_bbs_w(config, set_id, set_code)
+		post_data, post_data_ok := post_api_data["data"].(map[string]string)
+		if post_api_data["response"] == "ok" && post_data_ok {
+			excluded := post_data["excellent_excluded"] == "1"
+			status_text := "excellent_post_included_status"
+			action_text := "excellent_post_exclude"
+			excluded_value := "1"
+			if excluded {
+				status_text = "excellent_post_excluded_status"
+				action_text = "excellent_post_restore"
+				excluded_value = "0"
+			}
+			data_html += `
+				<h3>` + tool.Get_language(db, "admin", true) + `</h3>
+				<p>` + tool.Get_language(db, status_text, true) + `</p>
+				<form method="post">
+					<input type="hidden" name="action" value="excellent_exclusion">
+					<input type="hidden" name="excluded" value="` + excluded_value + `">
+					<button class="__ON_BUTTON__" type="submit">` + tool.Get_language(db, action_text, true) + `</button>
+				</form>
+			`
+		}
+	}
+
 	if tool.Check_permission(db, "bbs_post_manage", config.IP) {
 		slow_mode_value := ""
 		if v, ok := Api_bbs_w_post_slow_mode(config, set_id, set_code)["data"].(string); ok {

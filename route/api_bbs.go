@@ -304,12 +304,12 @@ func Bbs_post_tabom_score_sql(row_alias string) string {
 	return "(" + Bbs_post_tabom_count_sql(row_alias) + " - " + Bbs_post_tabom_down_count_sql(row_alias) + ")"
 }
 
-func Bbs_excellent_min(db *sql.DB, set_id string) int {
-	values := []string{
-		Bbs_set_value(db, set_id, "bbs_excellent_min"),
-		tool.Get_setting_value_exact(db, "bbs_excellent_min", "", ""),
-	}
-	for _, value := range values {
+func Bbs_post_excellent_excluded_sql(row_alias string) string {
+	return "not exists (select 1 from bbs_data excellent_exclusion where excellent_exclusion.set_name = 'excellent_excluded' and excellent_exclusion.set_data = '1' and excellent_exclusion.set_id = " + row_alias + ".set_id and excellent_exclusion.set_code = " + row_alias + ".set_code)"
+}
+
+func Bbs_excellent_min_from_values(board_value string, global_value string) int {
+	for _, value := range []string{board_value, global_value} {
 		value = strings.TrimSpace(value)
 		if value == "" {
 			continue
@@ -322,6 +322,129 @@ func Bbs_excellent_min(db *sql.DB, set_id string) int {
 	}
 
 	return 5
+}
+
+func Bbs_excellent_min(db *sql.DB, set_id string) int {
+	return Bbs_excellent_min_from_values(
+		Bbs_set_value(db, set_id, "bbs_excellent_min"),
+		tool.Get_setting_value_exact(db, "bbs_excellent_min", "", ""),
+	)
+}
+
+func Bbs_global_excellent_thresholds(db *sql.DB, board_ids []string) map[string]int {
+	global_value := tool.Get_setting_value_exact(db, "bbs_excellent_min", "", "")
+	board_values := make(map[string]string, len(board_ids))
+
+	rows := tool.Query_DB(
+		db,
+		"select set_id, set_data from bbs_set where set_name = 'bbs_excellent_min' order by set_code + 0 desc",
+	)
+	defer rows.Close()
+	for rows.Next() {
+		var set_id string
+		var set_data string
+		if err := rows.Scan(&set_id, &set_data); err != nil {
+			panic(err)
+		}
+		if _, exists := board_values[set_id]; !exists {
+			board_values[set_id] = set_data
+		}
+	}
+	if err := rows.Err(); err != nil {
+		panic(err)
+	}
+
+	thresholds := make(map[string]int, len(board_ids))
+	for _, set_id := range board_ids {
+		thresholds[set_id] = Bbs_excellent_min_from_values(board_values[set_id], global_value)
+	}
+	return thresholds
+}
+
+func Bbs_global_excellent_board_ids(db *sql.DB, ip string) []string {
+	rows := tool.Query_DB(db, "select set_id from bbs_set where set_name = 'bbs_name'")
+	defer rows.Close()
+
+	board_ids := make([]string, 0)
+	seen := make(map[string]bool)
+	for rows.Next() {
+		var set_id string
+		if err := rows.Scan(&set_id); err != nil {
+			panic(err)
+		}
+		board_number, err := strconv.ParseInt(set_id, 10, 64)
+		if err != nil || board_number <= 0 || strconv.FormatInt(board_number, 10) != set_id || seen[set_id] || Bbs_is_special_board(set_id) {
+			continue
+		}
+		seen[set_id] = true
+		if tool.Check_acl(db, set_id, "", "bbs_view", ip) {
+			board_ids = append(board_ids, set_id)
+		}
+	}
+	if err := rows.Err(); err != nil {
+		panic(err)
+	}
+	return board_ids
+}
+
+func Bbs_global_excellent_hydrate(db *sql.DB, config tool.Config, data_list []map[string]string, display_cache map[string]bbs_user_display_data) {
+	if len(data_list) == 0 {
+		return
+	}
+
+	posts_by_key := make(map[string]map[string]string, len(data_list))
+	conditions := make([]string, 0, len(data_list))
+	values := make([]any, 0, len(data_list)*2)
+	for _, post_data := range data_list {
+		set_id := post_data["set_id"]
+		set_code := post_data["set_code"]
+		posts_by_key[set_id+"\x00"+set_code] = post_data
+		conditions = append(conditions, "(set_id = ? and set_code = ?)")
+		values = append(values, set_id, set_code)
+	}
+
+	query := "select set_name, set_data, set_id, set_code from bbs_data where set_name in ('title', 'date', 'user_id', 'prefix', 'comment_count', 'tabom_count', 'tabom_down_count', 'view_count', 'tag', 'blind') and (" + strings.Join(conditions, " or ") + ")"
+	rows := tool.Query_DB(db, query, values...)
+	defer rows.Close()
+	for rows.Next() {
+		var set_name string
+		var set_data string
+		var set_id string
+		var set_code string
+		if err := rows.Scan(&set_name, &set_data, &set_id, &set_code); err != nil {
+			panic(err)
+		}
+		post_data := posts_by_key[set_id+"\x00"+set_code]
+		if post_data == nil {
+			continue
+		}
+
+		if set_name == "user_id" {
+			user_display, exists := display_cache[set_data]
+			if !exists {
+				user_display = bbs_user_display_data{
+					ip_pre:    tool.IP_preprocess(db, set_data, config.IP)[0],
+					ip_render: tool.Get_user_profile_image_ui(db, set_data) + tool.IP_parser(db, set_data, config.IP),
+				}
+				display_cache[set_data] = user_display
+			}
+			post_data["user_id"] = user_display.ip_pre
+			post_data["user_id_render"] = user_display.ip_render
+			continue
+		}
+
+		if set_name == "tag" {
+			if post_data["tags"] != "" {
+				post_data["tags"] += ", "
+			}
+			post_data["tags"] += set_data
+			continue
+		}
+		post_data[set_name] = set_data
+	}
+	if err := rows.Err(); err != nil {
+		panic(err)
+	}
 }
 
 func Bbs_comment_set_id_sql(row_alias string, suffix string) string {
@@ -503,6 +626,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 		return query, values
 	}
 
+	global_excellent_listing := bbs_num == "" && sort_type == "excellent"
 	var main_listing_rows *sql.Rows
 	var pinned_listing_rows *sql.Rows
 	var ordinary_listing_rows *sql.Rows
@@ -518,13 +642,39 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 		}
 	}()
 	if bbs_num == "" {
-		view_sql, view_values := Bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
-		query := "select set_code, set_id, '0' from bbs_data where set_name = 'date' and set_id + 0 > 0 and " + tool.Get_except_set_id_SQL()
-		if view_sql != "" {
-			query += " and " + view_sql
+		if global_excellent_listing {
+			board_ids := Bbs_global_excellent_board_ids(db, config.IP)
+			if len(board_ids) > 0 {
+				thresholds := Bbs_global_excellent_thresholds(db, board_ids)
+				score_sql := Bbs_post_tabom_score_sql("title")
+				board_ids_sql := make([]string, 0, len(board_ids))
+				threshold_cases := make([]string, 0, len(board_ids))
+				for _, set_id := range board_ids {
+					board_ids_sql = append(board_ids_sql, "'"+set_id+"'")
+					threshold_cases = append(threshold_cases, "when '"+set_id+"' then "+strconv.Itoa(thresholds[set_id]))
+				}
+
+				query := "select distinct title.set_code, title.set_id, case when exists (select 1 from bbs_data pinned_data where pinned_data.set_name = 'pinned' and pinned_data.set_id = title.set_id and pinned_data.set_code = title.set_code) then '1' else '0' end, " + score_sql + " as excellent_score from bbs_data title where title.set_name = 'title' and title.set_id in (" + strings.Join(board_ids_sql, ",") + ") and " + score_sql + " > case title.set_id " + strings.Join(threshold_cases, " ") + " else 5 end"
+				query, values := append_post_view_and_filter_sql(query, "title", nil)
+				query += " and " + Bbs_post_excellent_excluded_sql("title")
+				query += " order by excellent_score desc, title.set_id asc, title.set_code asc limit ?, 51"
+				page_num := tool.Str_to_int(page)
+				num := 0
+				if page_num*50 > 0 {
+					num = page_num*50 - 50
+				}
+				values = append(values, num)
+				main_listing_rows = tool.Query_DB(db, query, values...)
+			}
+		} else {
+			view_sql, view_values := Bbs_post_view_sql(db, bbs_num, config.IP, "bbs_data")
+			query := "select set_code, set_id, '0' from bbs_data where set_name = 'date' and set_id + 0 > 0 and " + tool.Get_except_set_id_SQL()
+			if view_sql != "" {
+				query += " and " + view_sql
+			}
+			query += " order by set_data desc limit 50"
+			main_listing_rows = tool.Query_DB(db, query, view_values...)
 		}
-		query += " order by set_data desc limit 50"
-		main_listing_rows = tool.Query_DB(db, query, view_values...)
 	} else {
 		page := tool.Str_to_int(page)
 		num := 0
@@ -539,6 +689,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 		query += " from bbs_data where set_name = 'pinned' and set_id like ?"
 		query, values := append_post_view_and_filter_sql(query, "bbs_data", []any{bbs_num})
 		if sort_type == "excellent" {
+			query += " and " + Bbs_post_excellent_excluded_sql("bbs_data")
 			query += " and " + Bbs_post_tabom_score_sql("bbs_data") + " > ?"
 			values = append(values, Bbs_excellent_min(db, bbs_num))
 		}
@@ -570,6 +721,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			order_by = Bbs_post_tabom_count_sql(row_alias) + " desc, title.set_code + 0 desc"
 		case "excellent":
 			score_sql := Bbs_post_tabom_score_sql(row_alias)
+			query += " and " + Bbs_post_excellent_excluded_sql(row_alias)
 			query += " and " + score_sql + " > ?"
 			values = append(values, Bbs_excellent_min(db, bbs_num))
 			order_by = score_sql + " desc, title.set_code + 0 desc"
@@ -644,9 +796,12 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			var pinned string
 			activity_date := ""
 			activity_cache_missing := 0
+			var excellent_score any
 			var err error
 			if sort_type == "activity" {
 				err = listing_rows.Scan(&set_code, &set_id, &pinned, &activity_date, &activity_cache_missing)
+			} else if global_excellent_listing {
+				err = listing_rows.Scan(&set_code, &set_id, &pinned, &excellent_score)
 			} else {
 				err = listing_rows.Scan(&set_code, &set_id, &pinned)
 			}
@@ -668,7 +823,7 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 				})
 			}
 
-			if bbs_num == "" && !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
+			if bbs_num == "" && !global_excellent_listing && !tool.Check_acl(db, set_id, "", "bbs_view", config.IP) {
 				continue
 			}
 
@@ -678,7 +833,9 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 			if activity_date != "" {
 				temp_data["activity_date"] = activity_date
 			}
-			hydrate_post_data(temp_data, set_code, set_id)
+			if !global_excellent_listing {
+				hydrate_post_data(temp_data, set_code, set_id)
+			}
 			data_list = append(data_list, temp_data)
 		}
 		if err := listing_rows.Err(); err != nil {
@@ -688,8 +845,13 @@ func Api_bbs_internal(config tool.Config, bbs_num string, page string, sort_type
 	}
 
 	if bbs_num == "" {
-		process_listing_rows(main_listing_rows, false)
-		main_listing_rows = nil
+		if main_listing_rows != nil {
+			process_listing_rows(main_listing_rows, global_excellent_listing)
+			main_listing_rows = nil
+		}
+		if global_excellent_listing {
+			Bbs_global_excellent_hydrate(db, config, data_list, ip_parser_temp)
+		}
 	} else {
 		process_listing_rows(pinned_listing_rows, false)
 		pinned_listing_rows = nil

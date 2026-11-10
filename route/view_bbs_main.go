@@ -254,6 +254,7 @@ func View_bbs_main(config tool.Config, page string) string {
 	menu := [][]any{
 		{"other", tool.Get_language(db, "other_tool", false)},
 		{"bbs/search", tool.Get_language(db, "search", false)},
+		{"bbs/excellent", tool.Get_language(db, "global_excellent_posts", false)},
 		{"bbs/contributor", tool.Get_language(db, "monthly_bbs_contributor", false)},
 	}
 	if tool.Check_permission(db, "bbs_create", config.IP) {

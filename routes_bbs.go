@@ -9,6 +9,7 @@ import (
 )
 
 func Register_bbs_routes(r *gin.Engine) {
+	route.Register_bbs_excellent_routes(r)
 	route.Register_bbs_post_create_route(r)
 
 	r.GET("/vote", func(c *gin.Context) {
@@ -181,21 +182,7 @@ func Register_bbs_routes(r *gin.Engine) {
 		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
 	})
 
-	r.GET("/bbs/tool/:set_id/:set_code", func(c *gin.Context) {
-		route_data := route.View_bbs_in_w_tool(Make_route_config(c), c.Param("set_id"), c.Param("set_code"))
-		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
-	})
-
-	r.POST("/bbs/tool/:set_id/:set_code", func(c *gin.Context) {
-		_ = c.Request.ParseForm()
-		route_data := route.View_bbs_in_w_tool_post(
-			Make_route_config(c),
-			c.Param("set_id"),
-			c.Param("set_code"),
-			c.Request.PostForm,
-		)
-		Write_data(c, http.StatusOK, "text/html; charset=utf-8", []byte(route_data))
-	})
+	route.Register_bbs_post_tool_routes(r)
 
 	r.GET("/bbs/tool/:set_id/:set_code/:comment_code", func(c *gin.Context) {
 		route_data := route.View_bbs_in_w_comment_tool(
