@@ -6,6 +6,8 @@ import (
 	"opennamu/route/tool"
 )
 
+const bbs_comment_page_size = 50
+
 type bbs_comment_page_state struct {
 	offset int
 	limit  int
@@ -53,8 +55,8 @@ func Api_bbs_w_comment_page(config tool.Config, sub_code string, already_auth_ch
 	}
 
 	state := &bbs_comment_page_state{
-		offset: (page - 1) * 50,
-		limit:  50,
+		offset: (page - 1) * bbs_comment_page_size,
+		limit:  bbs_comment_page_size,
 		data:   []map[string]string{},
 	}
 	Api_bbs_w_comment_page_data(config, sub_code, already_auth_check, do_type, state)

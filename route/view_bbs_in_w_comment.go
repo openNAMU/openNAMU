@@ -83,6 +83,53 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 		data_html += `<hr class="main_hr">`
 	}
 
+	if page == 1 {
+		best_comment_api := Api_bbs_w_comment_best(config, set_id, set_code)
+		if best_comments, ok := best_comment_api["data"].([]map[string]string); ok && best_comment_api["response"] == "ok" {
+			best_comment_html := ""
+			for _, v := range best_comments {
+				comment_code := strings.TrimPrefix(v["id"]+"-"+v["code"], comment_prefix)
+				best_page := tool.Str_to_int(v["best_page"])
+				if !Bbs_best_comment_comment_code_valid(comment_code) || best_page < 1 || v["comment"] == "" {
+					continue
+				}
+
+				best_comment_path := "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "/comment/"
+				if best_page > 1 {
+					best_comment_path = "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "/page/" + strconv.Itoa(best_page) + "/comment/"
+				}
+				original_comment_url := best_comment_path + tool.Url_parser(comment_code) + "#" + tool.Url_parser(comment_code)
+				date := `<a href="` + original_comment_url + `">(` + tool.Get_language(db, "comment", true) + `)</a> `
+				date += tool.Get_language(db, "bbs_best_comment_score", true) + ": " + tool.HTML_escape(v["best_score"])
+				date += ` <span>` + tool.HTML_escape(v["comment_date"]) + `</span>`
+
+				color := "default"
+				if post_user != "" && v["comment_user_id"] == post_user {
+					color = "blue"
+				} else if v["comment_user_id"] == config.IP {
+					color = "green"
+				}
+				rendered_comment := Get_bbs_render(db, set_id, v["comment"], "thread", config)
+				rendered_comment = Render_topic_reference(rendered_comment, set_code, set_id, set_code, "bbs")
+				best_comment_html += Get_thread_ui_with_render_code(
+					db,
+					v["comment_user_id_render"],
+					date,
+					rendered_comment,
+					"best-"+comment_code,
+					comment_code,
+					color,
+					v["blind"],
+					"width: 100%;",
+					set_code,
+				)
+			}
+			if best_comment_html != "" {
+				data_html += `<h3>` + tool.Get_language(db, "bbs_best_comment", true) + `</h3>` + best_comment_html + `<hr class="main_hr">`
+			}
+		}
+	}
+
 	for _, v := range data_api_in {
 		comment_html, code_id, exists := Get_bbs_comment_ui(db, config, post_user, set_id, set_code, comment_prefix, comment_path, v, comment_manage, bbs_comment_acl, report_allowed, false)
 		if !exists {
@@ -115,7 +162,7 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
         `
 	}
 
-	data_html += tool.Get_page_control(db, page, page_count, 50, "/bbs/w/"+tool.Url_parser(set_id)+"/"+tool.Url_parser(set_code)+"/page/{}")
+	data_html += tool.Get_page_control(db, page, page_count, bbs_comment_page_size, "/bbs/w/"+tool.Url_parser(set_id)+"/"+tool.Url_parser(set_code)+"/page/{}")
 	return data_html
 }
 func Get_bbs_comment_ui(db *sql.DB, config tool.Config, post_user string, set_id string, set_code string, comment_prefix string, comment_path string, v map[string]string, comment_manage bool, comment_acl bool, report_allowed bool, copy_comment bool) (string, string, bool) {

@@ -25,6 +25,24 @@ func Api_bbs_w_set_put(config tool.Config, set_id string, set_name string, data 
 			return_data["data"] = "invalid acl"
 			return return_data
 		}
+		if set_name == bbs_best_comment_enabled_setting {
+			var valid bool
+			data, valid = Bbs_best_comment_enabled_normalize(data)
+			if !valid {
+				return_data["response"] = "error"
+				return_data["data"] = "invalid bbs best comment enabled"
+				return return_data
+			}
+		}
+		if set_name == bbs_best_comment_min_score_setting {
+			var valid bool
+			data, valid = Bbs_best_comment_min_score_normalize(data)
+			if !valid {
+				return_data["response"] = "error"
+				return_data["data"] = "invalid bbs best comment minimum score"
+				return return_data
+			}
+		}
 		if set_name == "bbs_slow_mode_seconds" {
 			data = tool.Bbs_slow_mode_normalize(data)
 		}

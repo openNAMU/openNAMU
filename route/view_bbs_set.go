@@ -3,6 +3,7 @@ package route
 import (
 	"database/sql"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"opennamu/route/tool"
@@ -102,6 +103,16 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 		if !tool.Check_permission(db, "bbs_setting", config.IP) {
 			return tool.Get_error_page(db, config, "auth")
 		}
+		if _, exists := values[bbs_best_comment_enabled_setting]; exists {
+			if _, valid := Bbs_best_comment_enabled_normalize(values.Get(bbs_best_comment_enabled_setting)); !valid {
+				return tool.Get_error_page(db, config, "error")
+			}
+		}
+		if _, exists := values[bbs_best_comment_min_score_setting]; exists {
+			if _, valid := Bbs_best_comment_min_score_normalize(values.Get(bbs_best_comment_min_score_setting)); !valid {
+				return tool.Get_error_page(db, config, "error")
+			}
+		}
 		for _, field := range bbs_set_fields {
 			Api_bbs_w_set_put(config, set_id, field, values.Get(field), "")
 		}
@@ -117,6 +128,24 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 				return tool.Get_error_page(db, config, "auth")
 			}
 			return tool.Get_error_page(db, config, "error")
+		}
+		for _, setting := range []struct {
+			name  string
+			value string
+		}{
+			{bbs_best_comment_enabled_setting, values.Get(bbs_best_comment_enabled_setting)},
+			{bbs_best_comment_min_score_setting, values.Get(bbs_best_comment_min_score_setting)},
+		} {
+			if _, exists := values[setting.name]; !exists {
+				continue
+			}
+			result := Api_bbs_w_set_put(config, set_id, setting.name, setting.value, "")
+			if response, ok := result["response"].(string); !ok || response != "ok" {
+				if response == "require auth" {
+					return tool.Get_error_page(db, config, "auth")
+				}
+				return tool.Get_error_page(db, config, "error")
+			}
 		}
 		return tool.Get_redirect("/bbs/set/" + tool.Url_parser(set_id))
 	}
@@ -142,6 +171,21 @@ func View_bbs_set(config tool.Config, set_id string, values url.Values) string {
 	data += "<textarea class=\"opennamu_textarea_100\" name=\"bbs_comment_placeholder\">" + tool.HTML_escape(Bbs_set_value(db, set_id, "bbs_comment_placeholder")) + "</textarea><hr class=\"main_hr\">"
 	data += "<h3>" + tool.Get_language(db, "bbs_excellent_min_board", true) + "</h3>"
 	data += Setting_input("bbs_excellent_min", Bbs_set_value(db, set_id, "bbs_excellent_min"), "number") + "<hr class=\"main_hr\">"
+	best_comment_enabled := "1"
+	if !Bbs_best_comment_enabled(db, set_id) {
+		best_comment_enabled = "0"
+	}
+	data += "<h3>" + tool.Get_language(db, bbs_best_comment_enabled_setting, true) + "</h3>"
+	data += `<select id="` + bbs_best_comment_enabled_setting + `" name="` + bbs_best_comment_enabled_setting + `">` + Setting_options(
+		best_comment_enabled,
+		[]string{"1", "0"},
+		map[string]string{
+			"1": tool.Get_language(db, "on", true),
+			"0": tool.Get_language(db, "off", true),
+		},
+	) + `</select><hr class="main_hr">`
+	data += "<h3>" + tool.Get_language(db, bbs_best_comment_min_score_setting, true) + "</h3>"
+	data += Setting_input(bbs_best_comment_min_score_setting, strconv.Itoa(Bbs_best_comment_min_score(db, set_id)), "number") + "<hr class=\"main_hr\">"
 	data += "<h3>" + tool.Get_language(db, "bbs_slow_mode_seconds", true) + "</h3>"
 	data += "<span>" + tool.Get_language(db, "bbs_slow_mode_hint", true) + "</span><hr class=\"main_hr\">"
 	data += Setting_input("bbs_slow_mode_seconds", Bbs_set_value(db, set_id, "bbs_slow_mode_seconds"), "number") + "<hr class=\"main_hr\">"
