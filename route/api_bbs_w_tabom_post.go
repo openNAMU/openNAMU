@@ -2,50 +2,64 @@ package route
 
 import (
 	"database/sql"
+	"errors"
 
 	"opennamu/route/tool"
 )
 
-func Change_bbs_tabom_count(tx *sql.Tx, set_name string, set_id string, set_code string, amount int) {
-	result, err := tx.Exec(
-		tool.DB_change("update bbs_data set set_data = case when set_data + ? < 0 then 0 else set_data + ? end where set_name = ? and set_id = ? and set_code = ?"),
-		amount,
-		amount,
-		set_name,
+func Bbs_post_vote_target_check(tx *sql.Tx, db *sql.DB, set_id string, set_code string, user string, auth_info map[string]bool) (string, error) {
+	var title_exists int
+	err := tx.QueryRow(
+		tool.DB_change("select 1 from bbs_data where set_name = 'title' and set_id = ? and set_code = ? limit 1"),
 		set_id,
 		set_code,
-	)
+	).Scan(&title_exists)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "not exist", nil
+	}
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	rows, err := result.RowsAffected()
-	if err != nil {
-		panic(err)
-	}
-	if rows == 0 && amount > 0 {
-		if _, err := tx.Exec(
-			tool.DB_change("insert into bbs_data (set_name, set_data, set_id, set_code) values (?, ?, ?, ?)"),
-			set_name,
-			amount,
-			set_id,
-			set_code,
-		); err != nil {
-			panic(err)
-		}
-	}
-}
 
-func Bbs_tabom_user_exists(db tool.DB_runner, set_name string, user string, set_id string, set_code string) bool {
-	data := ""
-	return tool.QueryRow_DB(
-		db,
-		"select set_data from bbs_data where set_name = ? and set_data = ? and set_id = ? and set_code = ?",
-		[]any{&data},
-		set_name,
-		user,
+	var post_user string
+	err = tx.QueryRow(
+		tool.DB_change("select set_data from bbs_data where set_name = 'user_id' and set_id = ? and set_code = ? limit 1"),
 		set_id,
 		set_code,
-	)
+	).Scan(&post_user)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "not exist", nil
+	}
+	if err != nil {
+		return "", err
+	}
+
+	var blind_exists int
+	err = tx.QueryRow(
+		tool.DB_change("select 1 from bbs_data where set_name = 'blind' and set_data = 'O' and set_id = ? and set_code = ? limit 1"),
+		set_id,
+		set_code,
+	).Scan(&blind_exists)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return "", err
+	}
+	if err == nil && !auth_info["bbs_post_manage"] {
+		return "require auth", nil
+	}
+
+	var private_acl string
+	err = tx.QueryRow(
+		tool.DB_change("select set_data from bbs_set where set_name = 'bbs_only_my_data_view_acl' and set_code = '' and set_id = ? limit 1"),
+		set_id,
+	).Scan(&private_acl)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return "", err
+	}
+	if private_acl != "" && private_acl != "normal" && post_user != user && !auth_info["bbs"] && !tool.Check_acl_group(db, private_acl, auth_info) {
+		return "require auth", nil
+	}
+
+	return "ok", nil
 }
 
 func Api_bbs_w_tabom_post(config tool.Config, set_id string, set_code string, vote_type string) map[string]any {
@@ -67,16 +81,33 @@ func Api_bbs_w_tabom_post(config tool.Config, set_id string, set_code string, vo
 		return_data["response"] = "require auth"
 		return return_data
 	}
+	if !Bbs_tabom_vote_type_valid(vote_type) {
+		return_data["response"] = "error"
+		return_data["data"] = "vote_type"
+		return return_data
+	}
 
+	auth_info := tool.Get_auth_info(db, config.IP)
 	var result map[string]any
 	if err := Bbs_board_write_transaction(db, set_id, set_code, func(tx *sql.Tx) error {
-		result = Api_bbs_tabom_post(tx, config.IP, set_id, set_code, vote_type)
-		return nil
+		target_response, target_err := Bbs_post_vote_target_check(tx, db, set_id, set_code, config.IP, auth_info)
+		if target_err != nil {
+			return target_err
+		}
+		if target_response != "ok" {
+			result = map[string]any{"response": target_response}
+			if target_response == "not exist" {
+				result["data"] = "post"
+			}
+			return nil
+		}
+		result, target_err = Api_bbs_tabom_post(tx, config.IP, set_id, set_code, vote_type)
+		return target_err
 	}); err != nil {
 		if Bbs_board_missing_response(return_data, err, "bbs") {
 			return return_data
 		}
-		panic(err)
+		return map[string]any{"response": "error", "data": "database"}
 	}
 	return result
 }

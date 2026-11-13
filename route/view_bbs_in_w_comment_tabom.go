@@ -9,10 +9,10 @@ func View_bbs_in_w_comment_tabom(config tool.Config, set_id string, set_code str
 	if !tool.Check_acl(db, set_id, "", "bbs_comment", config.IP) {
 		return tool.Get_error_page(db, config, "auth")
 	}
-
-	if vote_type != "down" {
-		vote_type = "up"
+	if !Bbs_tabom_vote_type_valid(vote_type) {
+		return tool.Get_error_page(db, config, "not found")
 	}
+
 	vote_language := "upvote"
 	if vote_type == "down" {
 		vote_language = "downvote"
@@ -39,9 +39,21 @@ func View_bbs_in_w_comment_tabom_post(config tool.Config, set_id string, set_cod
 	if response == "require auth" {
 		return tool.Get_error_page(db, config, "auth")
 	}
-	if response == "not exist" {
+	if response == "not exist" || response == "not allowed" {
 		return tool.Get_error_page(db, config, "not found")
 	}
+	if response != "ok" {
+		return tool.Get_error_page(db, config, "error")
+	}
 
-	return tool.Get_redirect("/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "#" + tool.Url_parser(comment_code))
+	redirect_path := "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code)
+	if result_data, ok := data["data"].(map[string]any); ok {
+		if page, ok := result_data["page"].(string); ok && page != "" {
+			if page != "1" {
+				redirect_path += "/page/" + tool.Url_parser(page)
+			}
+			redirect_path += "/comment/" + tool.Url_parser(comment_code)
+		}
+	}
+	return tool.Get_redirect(redirect_path + "#" + tool.Url_parser(comment_code))
 }

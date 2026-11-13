@@ -430,6 +430,8 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
 		data = Get_language(db, "alarm_send_invalid", true)
 	case "permission denied":
 		data = Get_language(db, "authority_error", true)
+	case "error":
+		data = Get_language(db, "error", true)
 	case "ban":
 		data = Get_language(db, "blocked", true)
 	case "recaptcha", "recaptcha_error":

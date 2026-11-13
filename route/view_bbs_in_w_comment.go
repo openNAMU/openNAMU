@@ -50,17 +50,9 @@ func View_bbs_in_w_comment(db *sql.DB, config tool.Config, set_id string, set_co
 	tabom_down_count, _ := tabom_count_api["down_data"].(string)
 
 	if bbs_comment_acl {
-		data_html += `
-            <hr class="main_hr">
-            <form method="post" action="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/tabom" style="display: inline;">
-                <input type="hidden" name="vote_type" value="up">
-                <button type="submit">` + tool.Get_language(db, "upvote", true) + ` ` + tool.HTML_escape(tabom_count) + `</button>
-            </form>
-            <form method="post" action="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/tabom" style="display: inline;">
-                <input type="hidden" name="vote_type" value="down">
-                <button type="submit">` + tool.Get_language(db, "downvote", true) + ` ` + tool.HTML_escape(tabom_down_count) + `</button>
-            </form>
-        `
+		my_vote, _ := tabom_count_api["my_vote"].(string)
+		vote_action := "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "/tabom"
+		data_html += `<hr class="main_hr">` + Bbs_vote_controls_html(db, vote_action, my_vote, tabom_count, tabom_down_count)
 	}
 
 	data_html += `<hr class="main_hr">`
@@ -191,7 +183,7 @@ func Get_bbs_comment_ui(db *sql.DB, config tool.Config, post_user string, set_id
 	date := `<a href="` + comment_path + tool.Url_parser(code_id) + `#opennamu_comment_select">(` + tool.Get_language(db, "comment", true) + `)</a> `
 	date += `<a href="/bbs/tool/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/` + tool.Url_parser(code_id) + `">(` + tool.Get_language(db, "tool", true) + `)</a> `
 	date += v["comment_date"]
-	if comment_acl {
+	if comment_acl && (v["blind"] != "O" || comment_manage) {
 		tabom_count := v["tabom_count"]
 		if tabom_count == "" {
 			tabom_count = "0"
@@ -200,8 +192,9 @@ func Get_bbs_comment_ui(db *sql.DB, config tool.Config, post_user string, set_id
 		if tabom_down_count == "" {
 			tabom_down_count = "0"
 		}
-		date += ` <a href="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/comment_tabom/` + tool.Url_parser(code_id) + `/up">(` + tool.Get_language(db, "upvote", true) + ` ` + tool.HTML_escape(tabom_count) + `)</a>`
-		date += ` <a href="/bbs/w/` + tool.Url_parser(set_id) + `/` + tool.Url_parser(set_code) + `/comment_tabom/` + tool.Url_parser(code_id) + `/down">(` + tool.Get_language(db, "downvote", true) + ` ` + tool.HTML_escape(tabom_down_count) + `)</a>`
+		my_vote := v["my_vote"]
+		vote_action := "/bbs/w/" + tool.Url_parser(set_id) + "/" + tool.Url_parser(set_code) + "/comment/" + tool.Url_parser(code_id) + "/tabom"
+		date += ` ` + Bbs_vote_controls_html(db, vote_action, my_vote, tabom_count, tabom_down_count)
 	}
 
 	if report_allowed {

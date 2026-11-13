@@ -69,7 +69,7 @@ func Bbs_comment_one_data(db *sql.DB, config tool.Config, do_type string, sub_co
 		new_sub_code = strings.Join(sub_code_parts[:len(sub_code_parts)-1], "-")
 	}
 
-	query := "select set_name, set_data, set_code, set_id from bbs_data where (set_name = 'comment' or set_name like 'comment%' or set_name in ('blind', 'pinned', 'tabom_count', 'tabom_down_count')) and set_id = ?"
+	query := "select set_name, set_data, set_code, set_id from bbs_data where (set_name = 'comment' or set_name like 'comment%' or set_name in ('blind', 'pinned', 'tabom_count', 'tabom_down_count', 'tabom_list', 'tabom_down_list')) and set_id = ?"
 	query_values := []any{new_sub_code}
 	if do_type == "around" {
 		query += " order by set_code + 0 asc, set_name asc"
@@ -104,11 +104,16 @@ func Bbs_comment_one_data(db *sql.DB, config tool.Config, do_type string, sub_co
 			temp_dict = map[string]string{}
 			temp_dict["id"] = set_id
 			temp_dict["code"] = set_code
+			temp_dict["my_vote"] = "none"
 
 			before_set_code = set_code
 		}
 
-		if set_name == "comment_user_id" {
+		if set_name == "tabom_list" && set_data == config.IP {
+			temp_dict["my_vote"] = Bbs_tabom_vote_state_from_presence(true, temp_dict["my_vote"] == "down" || temp_dict["my_vote"] == "both")
+		} else if set_name == "tabom_down_list" && set_data == config.IP {
+			temp_dict["my_vote"] = Bbs_tabom_vote_state_from_presence(temp_dict["my_vote"] == "up" || temp_dict["my_vote"] == "both", true)
+		} else if set_name == "comment_user_id" {
 			user_display, exists := ip_parser_temp[set_data]
 			if !exists {
 				user_display = bbs_user_display_data{

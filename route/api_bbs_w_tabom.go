@@ -41,9 +41,19 @@ func Api_bbs_w_tabom(config tool.Config, set_id string, set_code string) map[str
 			set_code,
 		)
 
+		my_vote, err := Bbs_tabom_vote_state(db, config.IP, set_id, set_code)
+		if err != nil {
+			return_data["response"] = "error"
+			return_data["data"] = tabom_count
+			return_data["down_data"] = tabom_down_count
+			return_data["error"] = "database"
+			return return_data
+		}
+
 		return_data["response"] = "ok"
 		return_data["data"] = tabom_count
 		return_data["down_data"] = tabom_down_count
+		return_data["my_vote"] = my_vote
 	}
 
 	return return_data
