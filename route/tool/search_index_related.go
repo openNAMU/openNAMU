@@ -37,9 +37,17 @@ func Search_index_related(doc_name string, raw_data string) ([]Search_related_hi
 	}
 
 	search_index_lock.RLock()
-	defer search_index_lock.RUnlock()
-
-	return Search_index_related_with_index(search_index, doc_name, raw_data)
+	index := search_index
+	if index == nil || !search_index_ready {
+		search_index_lock.RUnlock()
+		return nil, errors.New("search index is not ready")
+	}
+	related_hits, err := Search_index_related_with_index(index, doc_name, raw_data)
+	search_index_lock.RUnlock()
+	if err != nil {
+		Search_index_mark_unavailable("related-document read failed", err)
+	}
+	return related_hits, err
 }
 
 // Search_index_related_with_index : pure-Bleve relevance core. It takes the index explicitly so unit tests

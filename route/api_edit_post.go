@@ -98,7 +98,7 @@ func Api_edit_post(config tool.Config, doc_name string, data string, send string
 	}); err != nil {
 		panic(err)
 	}
-	tool.Search_index_update(doc_name, data)
+	tool.Search_index_sync(db, doc_name)
 
 	tool.Do_watchlist_alarm_send(db, config, doc_name)
 

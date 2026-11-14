@@ -76,7 +76,7 @@ func Api_edit_revert_post(config tool.Config, doc_name string, rev string, send 
 	}); err != nil {
 		panic(err)
 	}
-	tool.Search_index_update(doc_name, data)
+	tool.Search_index_sync(db, doc_name)
 
 	markup.Get_render(db, doc_name, data, "backlink")
 

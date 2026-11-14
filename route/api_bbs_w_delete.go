@@ -102,7 +102,7 @@ func Api_bbs_w_delete(config tool.Config, set_id string, set_code string) map[st
 		}
 		panic(err)
 	}
-	tool.Search_bbs_index_delete(set_id, set_code)
+	tool.Search_bbs_index_update(db, set_id, set_code)
 
 	return_data["response"] = "ok"
 

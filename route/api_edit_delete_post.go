@@ -96,7 +96,7 @@ func Api_edit_delete_post(config tool.Config, doc_name string, send string, agre
 	}); err != nil {
 		panic(err)
 	}
-	tool.Search_index_delete(doc_name)
+	tool.Search_index_sync(db, doc_name)
 
 	return_data["response"] = "ok"
 

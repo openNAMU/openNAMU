@@ -42,7 +42,7 @@ func Api_file_upload_make_document(db *sql.DB, doc_name string, doc_data string,
 	if err != nil {
 		return false
 	}
-	tool.Search_index_update(doc_name, doc_data)
+	tool.Search_index_sync(db, doc_name)
 	markup.Get_render(db, doc_name, doc_data, "backlink")
 	return true
 }

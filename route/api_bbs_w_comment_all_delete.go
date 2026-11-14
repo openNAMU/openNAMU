@@ -2,6 +2,7 @@ package route
 
 import (
 	"database/sql"
+	"errors"
 
 	"opennamu/route/tool"
 )
@@ -26,7 +27,29 @@ func Api_bbs_w_comment_all_delete(config tool.Config, set_id string, set_code st
 	}
 
 	comment_set_id := set_id + "-" + set_code
+	deleted_comments := []string{}
 	if err := Bbs_identifier_transaction(db, set_id, set_code, false, func(tx *sql.Tx) error {
+		rows, err := tx.Query(tool.DB_change("select set_id, set_code from bbs_data where set_name = 'comment' and (set_id = ? or set_id like ?)"), comment_set_id, comment_set_id+"-%")
+		if err != nil {
+			return err
+		}
+		for rows.Next() {
+			storage_set_id := ""
+			storage_set_code := ""
+			if err := rows.Scan(&storage_set_id, &storage_set_code); err != nil {
+				return errors.Join(err, rows.Close())
+			}
+			comment_post_id, comment_post_code, comment_code, valid := tool.Search_bbs_index_comment_location(storage_set_id, storage_set_code)
+			if valid && comment_post_id == set_id && comment_post_code == set_code {
+				deleted_comments = append(deleted_comments, comment_code)
+			}
+		}
+		if err := rows.Err(); err != nil {
+			return errors.Join(err, rows.Close())
+		}
+		if err := rows.Close(); err != nil {
+			return err
+		}
 		if _, err := tx.Exec(tool.DB_change("delete from bbs_data where set_id = ? or set_id like ?"), comment_set_id, comment_set_id+"-%"); err != nil {
 			return err
 		}
@@ -38,7 +61,9 @@ func Api_bbs_w_comment_all_delete(config tool.Config, set_id string, set_code st
 	}); err != nil {
 		panic(err)
 	}
-	tool.Search_bbs_index_delete_comments(db, set_id, set_code)
+	for _, comment_code := range deleted_comments {
+		tool.Search_bbs_index_delete_comment(set_id, set_code, comment_code)
+	}
 
 	return_data["response"] = "ok"
 	return return_data
