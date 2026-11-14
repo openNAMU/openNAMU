@@ -28,6 +28,9 @@ func Test_Search_index_behavior_child(t *testing.T) {
 		t.Skip("search-index subprocess helper")
 	}
 
+	if err := os.MkdirAll(filepath.Join("..", "tmp"), 0o755); err != nil {
+		t.Fatalf("create project tmp directory: %v", err)
+	}
 	index_directory, err := os.MkdirTemp(filepath.Join("..", "tmp"), "phase6_search_index_")
 	if err != nil {
 		t.Fatalf("create temporary index directory: %v", err)

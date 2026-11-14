@@ -74,8 +74,11 @@ func count_for_label(html string, db *sql.DB, key string, t *testing.T) int {
 	re := regexp.MustCompile(label + `[[:space:]]*:[[:space:]]*([0-9]+)`)
 	m := re.FindStringSubmatch(html)
 	if m == nil {
-		if err := os.WriteFile("/home/spdv/dev/openNAMU/tmp/statistics_output.html", []byte(html), 0644); err == nil {
-			t.Logf("dumped rendered page to ./tmp/statistics_output.html")
+		tmp_dir := filepath.Join("..", "tmp")
+		if err := os.MkdirAll(tmp_dir, 0o755); err == nil {
+			if err := os.WriteFile(filepath.Join(tmp_dir, "statistics_output.html"), []byte(html), 0o644); err == nil {
+				t.Logf("dumped rendered page to ./tmp/statistics_output.html")
+			}
 		}
 		t.Fatalf("could not find %q in rendered statistics page", label)
 	}

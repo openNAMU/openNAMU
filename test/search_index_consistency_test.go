@@ -40,6 +40,9 @@ func Test_Search_index_consistency_resumes_after_restart(t *testing.T) {
 
 	for _, backend := range backends {
 		t.Run(backend.name, func(t *testing.T) {
+			if err := os.MkdirAll(filepath.Join("..", "tmp"), 0o755); err != nil {
+				t.Fatalf("create project tmp directory: %v", err)
+			}
 			root, err := os.MkdirTemp(filepath.Join("..", "tmp"), "search_index_consistency_restart_")
 			if err != nil {
 				t.Fatalf("create isolated audit root: %v", err)
@@ -94,6 +97,9 @@ func Test_Search_index_consistency_paginates_bounded_batches(t *testing.T) {
 
 	for _, backend := range backends {
 		t.Run(backend.name, func(t *testing.T) {
+			if err := os.MkdirAll(filepath.Join("..", "tmp"), 0o755); err != nil {
+				t.Fatalf("create project tmp directory: %v", err)
+			}
 			root, err := os.MkdirTemp(filepath.Join("..", "tmp"), "search_index_consistency_pagination_")
 			if err != nil {
 				t.Fatalf("create isolated pagination root: %v", err)
@@ -199,6 +205,9 @@ func Test_Search_index_consistency_escalates_widespread_divergence(t *testing.T)
 
 	for _, backend := range backends {
 		t.Run(backend.name, func(t *testing.T) {
+			if err := os.MkdirAll(filepath.Join("..", "tmp"), 0o755); err != nil {
+				t.Fatalf("create project tmp directory: %v", err)
+			}
 			root, err := os.MkdirTemp(filepath.Join("..", "tmp"), "search_index_consistency_escalation_")
 			if err != nil {
 				t.Fatalf("create isolated escalation root: %v", err)

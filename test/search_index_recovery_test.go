@@ -65,6 +65,9 @@ func Test_Search_index_recovery_scenarios(t *testing.T) {
 
 func search_index_recovery_run_child(t *testing.T, backend string, scenario string, mysql_config string) {
 	t.Helper()
+	if err := os.MkdirAll(filepath.Join("..", "tmp"), 0o755); err != nil {
+		t.Fatalf("create project tmp directory: %v", err)
+	}
 	root, err := os.MkdirTemp(filepath.Join("..", "tmp"), "search_index_recovery_")
 	if err != nil {
 		t.Fatalf("create isolated recovery root: %v", err)
