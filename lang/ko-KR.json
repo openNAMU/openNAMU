@@ -246,6 +246,8 @@
     "recaptcha": "reCAPTCHA",
     "altcha_info": "ALTCHA는 별도 가입이나 사이트 키가 필요 없는 작업 증명(PoW) CAPTCHA입니다. ALTCHA 사용 시 ALTCHA 비밀 키만 설정하면 되며, Low·Medium·High는 브라우저 계산량입니다.",
     "altcha_secret_key": "ALTCHA 비밀 키",
+    "captcha_config_error": "사이트 관리자가 CAPTCHA 제공자와 필요한 키를 확인해야 하므로 CAPTCHA를 사용할 수 없습니다. 설정을 수정할 때까지 CAPTCHA가 필요한 요청은 거부됩니다.",
+    "captcha_provider_invalid": "저장된 CAPTCHA 제공자가 올바르지 않습니다. 지원되는 제공자를 선택하세요.",
     "create": "생성",
     "restart": "재시작",
     "edit_bottom_text": "편집창 하단 문구",

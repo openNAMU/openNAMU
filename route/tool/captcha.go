@@ -6,6 +6,8 @@ import (
 	"encoding/base64"
 	stdjson "encoding/json"
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -34,6 +36,163 @@ func Captcha_setting(db *sql.DB) (string, string, string, string) {
 	return Captcha_setting_value(db, "recaptcha"), Captcha_setting_value(db, "sec_re"), Captcha_setting_value(db, "altcha_sec_re"), Captcha_setting_value(db, "recaptcha_ver")
 }
 
+type Captcha_config struct {
+	Provider          string
+	public_key        string
+	secret_key        string
+	altcha_secret_key string
+}
+
+func Captcha_setting_value_read(db *sql.DB, name string) (string, bool, error) {
+	if db == nil {
+		return "", false, errors.New("database is required")
+	}
+
+	rows, err := db.Query(DB_change("select coalesce(data, '') from other where name = ? and coverage = ''"), name)
+	if err != nil {
+		return "", false, fmt.Errorf("read CAPTCHA setting %s: %w", name, err)
+	}
+	defer rows.Close()
+
+	value := ""
+	value_found := false
+	row_found := false
+	for rows.Next() {
+		var current_value string
+		if err := rows.Scan(&current_value); err != nil {
+			return "", false, fmt.Errorf("read CAPTCHA setting %s: %w", name, err)
+		}
+		row_found = true
+		if name == "recaptcha_ver" {
+			current_value = strings.TrimSpace(current_value)
+		}
+		if strings.TrimSpace(current_value) == "" {
+			continue
+		}
+		if value_found && value != current_value {
+			return "", row_found, fmt.Errorf("conflicting CAPTCHA setting %s", name)
+		}
+		value = current_value
+		value_found = true
+	}
+	if err := rows.Err(); err != nil {
+		return "", row_found, fmt.Errorf("read CAPTCHA setting %s: %w", name, err)
+	}
+
+	return value, row_found, nil
+}
+
+func Captcha_setting_value_unique(db *sql.DB, name string) (string, error) {
+	value, _, err := Captcha_setting_value_read(db, name)
+	return value, err
+}
+
+func Captcha_settings_read(db *sql.DB) (map[string]string, map[string]bool, error) {
+	if db == nil {
+		return nil, nil, errors.New("database is required")
+	}
+
+	values := make(map[string]string, 4)
+	value_found := make(map[string]bool, 4)
+	found := make(map[string]bool, 4)
+	rows, err := db.Query(DB_change("select name, coalesce(data, '') from other where coverage = '' and name in (?, ?, ?, ?)"), "recaptcha", "sec_re", "altcha_sec_re", "recaptcha_ver")
+	if err != nil {
+		return nil, nil, fmt.Errorf("read global CAPTCHA settings: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var name string
+		var current_value string
+		if err := rows.Scan(&name, &current_value); err != nil {
+			return nil, nil, fmt.Errorf("read global CAPTCHA settings: %w", err)
+		}
+		found[name] = true
+		if name == "recaptcha_ver" {
+			current_value = strings.TrimSpace(current_value)
+		}
+		if strings.TrimSpace(current_value) == "" {
+			continue
+		}
+		if value_found[name] && values[name] != current_value {
+			return nil, nil, fmt.Errorf("conflicting CAPTCHA setting %s", name)
+		}
+		values[name] = current_value
+		value_found[name] = true
+	}
+	if err := rows.Err(); err != nil {
+		return nil, nil, fmt.Errorf("read global CAPTCHA settings: %w", err)
+	}
+
+	for _, name := range []string{"recaptcha", "sec_re", "altcha_sec_re", "recaptcha_ver"} {
+		if _, exists := values[name]; !exists {
+			values[name] = ""
+		}
+	}
+	return values, found, nil
+}
+
+func Captcha_provider_normalize(provider string) (string, bool) {
+	provider = strings.TrimSpace(provider)
+	switch provider {
+	case "", "v2", "v3", "h", "cf", "altcha_low", "altcha_medium", "altcha_high":
+		return provider, true
+	default:
+		return "", false
+	}
+}
+
+func Captcha_config_validate(provider string, public_key string, secret_key string, altcha_secret_key string) error {
+	provider, supported := Captcha_provider_normalize(provider)
+	if !supported || provider == "" {
+		return errors.New("unsupported CAPTCHA provider")
+	}
+
+	if _, altcha_enabled := Captcha_altcha_cost(provider); altcha_enabled {
+		if strings.TrimSpace(altcha_secret_key) == "" {
+			return errors.New("ALTCHA secret key is required")
+		}
+		return nil
+	}
+
+	if strings.TrimSpace(public_key) == "" || strings.TrimSpace(secret_key) == "" {
+		return errors.New("CAPTCHA provider keys are required")
+	}
+	return nil
+}
+
+func Captcha_config_resolve(db *sql.DB) (Captcha_config, error) {
+	values, _, err := Captcha_settings_read(db)
+	if err != nil {
+		return Captcha_config{}, err
+	}
+
+	config := Captcha_config{
+		public_key:        values["recaptcha"],
+		secret_key:        values["sec_re"],
+		altcha_secret_key: values["altcha_sec_re"],
+	}
+	provider, supported := Captcha_provider_normalize(values["recaptcha_ver"])
+	if !supported {
+		return config, errors.New("unsupported CAPTCHA provider")
+	}
+	if provider == "" {
+		if strings.TrimSpace(config.public_key) != "" || strings.TrimSpace(config.secret_key) != "" {
+			provider = "v2"
+		} else if strings.TrimSpace(config.altcha_secret_key) != "" {
+			provider = "altcha_high"
+		}
+	}
+	config.Provider = provider
+	if provider == "" {
+		return config, errors.New("no CAPTCHA provider is configured")
+	}
+	if err := Captcha_config_validate(provider, config.public_key, config.secret_key, config.altcha_secret_key); err != nil {
+		return config, err
+	}
+	return config, nil
+}
+
 func Captcha_altcha_cost(rec_ver string) (int, bool) {
 	switch rec_ver {
 	case "altcha_low":
@@ -51,30 +210,34 @@ func Captcha_check_internal(db *sql.DB, session sessions.Session, ip string, res
 		return true
 	}
 
-	pub_key, sec_key, altcha_sec_key, rec_ver := Captcha_setting(db)
-	if altcha_cost, ok := Captcha_altcha_cost(rec_ver); ok {
-		if altcha_sec_key == "" {
-			return true
-		}
-		return Captcha_check_altcha(response, altcha_sec_key, altcha_cost)
+	config, err := Captcha_config_resolve(db)
+	if err != nil {
+		log.Printf("[CAPTCHA] invalid configuration; review the selected provider and its required keys in External settings")
+		return false
 	}
-
-	if pub_key == "" || sec_key == "" {
+	if config.Provider == "" {
 		return true
+	}
+	if altcha_cost, ok := Captcha_altcha_cost(config.Provider); ok {
+		return Captcha_check_altcha(response, config.altcha_secret_key, altcha_cost)
 	}
 	if response == "" {
 		return false
 	}
 
 	verify_url := "https://www.google.com/recaptcha/api/siteverify"
-	if rec_ver == "cf" {
-		verify_url = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
-	} else if rec_ver == "h" {
+	switch config.Provider {
+	case "v2", "v3":
+	case "h":
 		verify_url = "https://hcaptcha.com/siteverify"
+	case "cf":
+		verify_url = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+	default:
+		return false
 	}
 
 	form := url.Values{}
-	form.Set("secret", sec_key)
+	form.Set("secret", config.secret_key)
 	form.Set("response", response)
 	req, err := http.NewRequest(http.MethodPost, verify_url, strings.NewReader(form.Encode()))
 	if err != nil {
@@ -162,10 +325,13 @@ func Captcha_check_altcha(response string, sec_key string, altcha_cost int) bool
 }
 
 func Captcha_challenge_internal(db *sql.DB) (altcha.Challenge, error) {
-	_, _, altcha_sec_key, rec_ver := Captcha_setting(db)
-	altcha_cost, ok := Captcha_altcha_cost(rec_ver)
-	if !ok || altcha_sec_key == "" {
-		return altcha.Challenge{}, errors.New("altcha is not enabled")
+	config, err := Captcha_config_resolve(db)
+	if err != nil {
+		return altcha.Challenge{}, errors.New("invalid CAPTCHA configuration")
+	}
+	altcha_cost, ok := Captcha_altcha_cost(config.Provider)
+	if !ok {
+		return altcha.Challenge{}, errors.New("ALTCHA is not enabled")
 	}
 
 	expires_at := time.Now().Add(20 * time.Minute)
@@ -174,7 +340,7 @@ func Captcha_challenge_internal(db *sql.DB) (altcha.Challenge, error) {
 		Cost:                altcha_cost,
 		DeriveKey:           altcha.DeriveKeyPBKDF2(),
 		ExpiresAt:           &expires_at,
-		HMACSignatureSecret: altcha_sec_key,
+		HMACSignatureSecret: config.altcha_secret_key,
 		KeyLength:           32,
 	})
 }

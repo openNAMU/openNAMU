@@ -882,77 +882,76 @@ func Init_document_extensions(db *sql.DB) {
 }
 
 func Init_captcha(db *sql.DB) {
-	recaptcha := ""
-	sec_key := ""
-	altcha_sec_key := ""
-	recaptcha_ver := ""
-	has_recaptcha_ver := QueryRow_DB(db, `select data from other where name = "recaptcha_ver" limit 1`, []any{&recaptcha_ver})
-	has_altcha_sec_key := QueryRow_DB(db, `select data from other where name = "altcha_sec_re" limit 1`, []any{&altcha_sec_key})
-	QueryRow_DB(db, `select data from other where name = "recaptcha"`, []any{&recaptcha})
-	QueryRow_DB(db, `select data from other where name = "sec_re"`, []any{&sec_key})
+	values, found, err := Captcha_settings_read(db)
+	if err != nil {
+		log.Printf("[CAPTCHA] initialization stopped because global CAPTCHA settings are ambiguous or unreadable")
+		return
+	}
 
-	if has_recaptcha_ver {
-		if recaptcha_ver == "" {
-			if recaptcha != "" || sec_key != "" {
-				Exec_DB(db, `update other set data = "v2" where name = "recaptcha_ver" and coverage = ""`)
-				return
-			}
-			Exec_DB(db, `update other set data = "altcha_high" where name = "recaptcha_ver" and coverage = ""`)
-			recaptcha_ver = "altcha_high"
+	provider, supported := Captcha_provider_normalize(values["recaptcha_ver"])
+	if !supported {
+		log.Printf("[CAPTCHA] initialization stopped because the saved provider is unsupported; review External settings")
+		return
+	}
+
+	provider_changed := false
+	if provider == "" {
+		if strings.TrimSpace(values["recaptcha"]) != "" || strings.TrimSpace(values["sec_re"]) != "" {
+			provider = "v2"
+		} else {
+			provider = "altcha_high"
 		}
-		if _, altcha_enabled := Captcha_altcha_cost(recaptcha_ver); altcha_enabled {
-			if !has_altcha_sec_key && recaptcha == "" && sec_key != "" {
-				Exec_DB(
-					db,
-					`insert into other (name, data, coverage) values ("altcha_sec_re", ?, "")`,
-					sec_key,
-				)
-				Exec_DB(
-					db,
-					`update other set data = "" where name = "sec_re" and coverage = ""`,
-				)
-				altcha_sec_key = sec_key
-				has_altcha_sec_key = true
-			}
-			if altcha_sec_key == "" {
-				if has_altcha_sec_key {
-					Exec_DB(
-						db,
-						`update other set data = ? where name = "altcha_sec_re" and coverage = ""`,
-						Get_random_key(128),
-					)
-				} else {
-					Exec_DB(
-						db,
-						`insert into other (name, data, coverage) values ("altcha_sec_re", ?, "")`,
-						Get_random_key(128),
-					)
+		provider_changed = true
+	}
+
+	altcha_secret_key := values["altcha_sec_re"]
+	altcha_secret_key_changed := false
+	legacy_altcha_secret_migration := false
+	if _, altcha_enabled := Captcha_altcha_cost(provider); altcha_enabled && strings.TrimSpace(altcha_secret_key) == "" {
+		if !found["altcha_sec_re"] && strings.TrimSpace(values["recaptcha"]) == "" && strings.TrimSpace(values["sec_re"]) != "" {
+			altcha_secret_key = values["sec_re"]
+			legacy_altcha_secret_migration = true
+		} else {
+			altcha_secret_key = Get_random_key(128)
+		}
+		altcha_secret_key_changed = true
+	}
+
+	if err := Captcha_config_validate(provider, values["recaptcha"], values["sec_re"], altcha_secret_key); err != nil {
+		log.Printf("[CAPTCHA] provider configuration is incomplete; review the selected provider and its required keys in External settings")
+	}
+	if !provider_changed && !altcha_secret_key_changed {
+		return
+	}
+
+	if err := DB_transaction(db, func(tx *sql.Tx) error {
+		if provider_changed {
+			if found["recaptcha_ver"] {
+				if _, err := tx.Exec(DB_change(`update other set data = ? where name = ? and coverage = ''`), provider, "recaptcha_ver"); err != nil {
+					return err
 				}
+			} else if _, err := tx.Exec(DB_change(`insert into other (name, data, coverage) values (?, ?, '')`), "recaptcha_ver", provider); err != nil {
+				return err
 			}
 		}
-		return
+		if altcha_secret_key_changed {
+			if found["altcha_sec_re"] {
+				if _, err := tx.Exec(DB_change(`update other set data = ? where name = ? and coverage = ''`), altcha_secret_key, "altcha_sec_re"); err != nil {
+					return err
+				}
+			} else if _, err := tx.Exec(DB_change(`insert into other (name, data, coverage) values (?, ?, '')`), "altcha_sec_re", altcha_secret_key); err != nil {
+				return err
+			}
+		}
+		if legacy_altcha_secret_migration {
+			if _, err := tx.Exec(DB_change(`update other set data = '' where name = ? and coverage = ''`), "sec_re"); err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		log.Printf("[CAPTCHA] initialization failed while saving safe provider defaults: %v", err)
 	}
-	if recaptcha != "" || sec_key != "" {
-		Exec_DB(db, `insert into other (name, data, coverage) values ("recaptcha_ver", "v2", "")`)
-		return
-	}
-	if !has_altcha_sec_key {
-		Exec_DB(
-			db,
-			`insert into other (name, data, coverage) values ("altcha_sec_re", ?, "")`,
-			Get_random_key(128),
-		)
-	} else if altcha_sec_key == "" {
-		Exec_DB(
-			db,
-			`update other set data = ? where name = "altcha_sec_re" and coverage = ""`,
-			Get_random_key(128),
-		)
-	}
-	Exec_DB(
-		db,
-		`insert into other (name, data, coverage) values ("recaptcha_ver", "altcha_high", "")`,
-	)
 }
 
 func Always_init(db *sql.DB, version string) {

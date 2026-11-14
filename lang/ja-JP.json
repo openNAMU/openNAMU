@@ -246,6 +246,8 @@
     "recaptcha": "reCAPTCHA",
     "altcha_info": "ALTCHAは登録やサイトキーが不要なプルーフ・オブ・ワーク（PoW）方式のCAPTCHAです。ALTCHA使用時は秘密キーのみ設定してください。Low・Medium・Highはブラウザの計算量です。",
     "altcha_secret_key": "ALTCHA秘密キー",
+    "captcha_config_error": "サイト管理者がCAPTCHAのプロバイダーと必要なキーを確認する必要があるため、CAPTCHAを利用できません。設定が修正されるまで、CAPTCHAが必要なリクエストは拒否されます。",
+    "captcha_provider_invalid": "保存されたCAPTCHAプロバイダーが無効です。対応しているプロバイダーを選択してください。",
     "create": "作成",
     "restart": "再起動",
     "edit_bottom_text": "編集画面下部の文言",

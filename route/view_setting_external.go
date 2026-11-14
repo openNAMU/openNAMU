@@ -28,7 +28,7 @@ func Setting_external_fields() []setting_field {
 		{name: "smtp_security"},
 		{name: "smtp_email"},
 		{name: "smtp_pass"},
-		{name: "recaptcha_ver", default_value: "altcha_high"},
+		{name: "recaptcha_ver"},
 		{name: "oauth_client_id"},
 		{name: "ai_provider", default_value: "ollama"},
 		{name: "ai_model"},
@@ -57,15 +57,25 @@ func View_setting_external_data(db *sql.DB, config tool.Config, values map[strin
 	data.WriteString(`<form method="post">`)
 	data.WriteString(`<h2>` + lang("captcha") + `</h2>`)
 	data.WriteString(`<a href="https://www.google.com/recaptcha/">(` + lang("recaptcha") + `)</a> <a href="https://www.hcaptcha.com/">(` + lang("hcaptcha") + `)</a> <a href="https://altcha.org/">(ALTCHA)</a>` + Main_hr())
+	captcha_config, captcha_config_err := tool.Captcha_config_resolve(db)
+	provider_selection := captcha_config.Provider
+	if captcha_config_err != nil || provider_selection == "" {
+		data.WriteString(`<p role="alert">` + lang("captcha_config_error") + `</p>` + Main_hr())
+	}
 	data.WriteString(`<p>` + lang("altcha_info") + `</p>` + Main_hr())
 	data.WriteString(`<label for="recaptcha">` + lang("recaptcha") + ` ` + lang("public_key") + `</label>` + Main_hr())
 	data.WriteString(Setting_input("recaptcha", values["recaptcha"], "text") + Main_hr())
 	data.WriteString(`<label for="sec_re">` + lang("recaptcha") + ` ` + lang("secret_key") + `</label>` + Main_hr())
-	data.WriteString(Setting_input("sec_re", values["sec_re"], "text") + Main_hr())
+	data.WriteString(Setting_input("sec_re", "", "password") + Main_hr())
 	data.WriteString(`<label for="altcha_sec_re">` + lang("altcha_secret_key") + `</label>` + Main_hr())
-	data.WriteString(Setting_input("altcha_sec_re", values["altcha_sec_re"], "text") + Main_hr())
+	data.WriteString(Setting_input("altcha_sec_re", "", "password") + Main_hr())
 	data.WriteString(`<label for="recaptcha_ver">` + lang("version") + `</label>` + Main_hr())
-	data.WriteString(`<select id="recaptcha_ver" name="recaptcha_ver">` + Setting_options(values["recaptcha_ver"], []string{"v2", "v3", "h", "cf", "altcha_low", "altcha_medium", "altcha_high"}, recaptcha_labels) + `</select>` + Main_hr())
+	provider_options := ""
+	if provider_selection == "" {
+		provider_options = `<option value="" selected="selected" disabled="disabled">` + tool.HTML_escape(lang("captcha_provider_invalid")) + `</option>`
+	}
+	provider_options += Setting_options(provider_selection, []string{"v2", "v3", "h", "cf", "altcha_low", "altcha_medium", "altcha_high"}, recaptcha_labels)
+	data.WriteString(`<select id="recaptcha_ver" name="recaptcha_ver">` + provider_options + `</select>` + Main_hr())
 
 	data.WriteString(`<h2>` + lang("local_ai") + `</h2>`)
 	data.WriteString(`<p>` + lang("ai_external_warning") + `</p>` + Main_hr())

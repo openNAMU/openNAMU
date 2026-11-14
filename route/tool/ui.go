@@ -2,6 +2,7 @@ package tool
 
 import (
 	"database/sql"
+	"net/url"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -435,7 +436,13 @@ func Get_error_page(db *sql.DB, config Config, error_name string) string {
 	case "ban":
 		data = Get_language(db, "blocked", true)
 	case "recaptcha", "recaptcha_error":
-		data = Get_language(db, "recaptcha_error", true)
+		if _, err := Captcha_config_resolve(db); err != nil {
+			data = Get_language(db, "captcha_config_error", true)
+		} else {
+			data = Get_language(db, "recaptcha_error", true)
+		}
+	case "captcha configuration":
+		data = Get_language(db, "captcha_config_error", true)
 	case "not found":
 		data = Get_language(db, "not_found_error", true)
 	case "resource not found":
@@ -766,52 +773,43 @@ func Build_select(name string, values []string, selected string, empty_label str
 }
 
 func Get_captcha_ui(db *sql.DB, config Config) string {
-	data := ""
-
-	if !Check_acl(db, "", "", "recaptcha", config.IP) {
-		pub_key, sec_key, altcha_sec_key, rec_ver := Captcha_setting(db)
-
-		if _, altcha_enabled := Captcha_altcha_cost(rec_ver); altcha_enabled && altcha_sec_key != "" {
-			data += `<script async defer type="module" src="https://cdn.jsdelivr.net/npm/altcha@3.2.2/dist/main/altcha.i18n.min.js"></script><altcha-widget challenge="/api/altcha/challenge"></altcha-widget><hr class="main_hr">`
-		} else if pub_key != "" && sec_key != "" {
-			switch rec_ver {
-			case "", "v2":
-				data += `
-                    <script defer src="https://www.google.com/recaptcha/api.js"></script>
-                    <div class="g-recaptcha" data-sitekey="` + pub_key + `"></div>
-                    <hr class="main_hr">
-                `
-			case "v3":
-				data += `
-                    <script defer src="https://www.google.com/recaptcha/api.js?render=` + pub_key + `"></script>
-                    <input class="__ON_INPUT__" type="hidden" id="g-recaptcha" name="g-recaptcha">
-                    <script type="text/javascript">
-                        document.addEventListener('DOMContentLoaded', function () {
-                            grecaptcha.ready(function() {
-                                grecaptcha.execute('` + pub_key + `', {action: 'homepage'}).then(function(token) {
-                                    document.getElementById('g-recaptcha').value = token;
-                                });
-                            });
-                        });
-                    </script>
-                `
-			case "cf":
-				data += `
-                    <script defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha"></script>
-                    <div class="g-recaptcha" data-sitekey="` + pub_key + `"></div>
-                    <hr class="main_hr">
-                `
-			default:
-				data += `
-                    <script defer src="https://js.hcaptcha.com/1/api.js"></script>
-                    <div class="h-captcha" data-sitekey="` + pub_key + `"></div>
-                    <hr class="main_hr">
-                `
-			}
-		}
+	if Check_acl(db, "", "", "recaptcha", config.IP) {
+		return ""
 	}
 
-	return data
+	captcha_config, err := Captcha_config_resolve(db)
+	if err != nil {
+		return `<p role="alert">` + Get_language(db, "captcha_config_error", true) + `</p><hr class="main_hr">`
+	}
+
+	pub_key := HTML_escape(captcha_config.public_key)
+	switch captcha_config.Provider {
+	case "":
+		return ""
+	case "altcha_low", "altcha_medium", "altcha_high":
+		return `<script async defer type="module" src="https://cdn.jsdelivr.net/npm/altcha@3.2.2/dist/main/altcha.i18n.min.js"></script><altcha-widget challenge="/api/altcha/challenge"></altcha-widget><hr class="main_hr">`
+	case "v2":
+		return `<script defer src="https://www.google.com/recaptcha/api.js"></script><div class="g-recaptcha" data-sitekey="` + pub_key + `"></div><hr class="main_hr">`
+	case "v3":
+		public_key_js, _ := json.Marshal(captcha_config.public_key)
+		return `<script defer src="https://www.google.com/recaptcha/api.js?render=` + url.QueryEscape(captcha_config.public_key) + `"></script>
+			<input class="__ON_INPUT__" type="hidden" id="g-recaptcha" name="g-recaptcha">
+			<script type="text/javascript">
+				document.addEventListener('DOMContentLoaded', function () {
+					grecaptcha.ready(function() {
+						grecaptcha.execute(` + string(public_key_js) + `, {action: 'homepage'}).then(function(token) {
+							document.getElementById('g-recaptcha').value = token;
+						});
+					});
+				});
+			</script>`
+	case "cf":
+		return `<script defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha"></script><div class="g-recaptcha" data-sitekey="` + pub_key + `"></div><hr class="main_hr">`
+	case "h":
+		return `<script defer src="https://js.hcaptcha.com/1/api.js"></script><div class="h-captcha" data-sitekey="` + pub_key + `"></div><hr class="main_hr">`
+	default:
+		return `<p role="alert">` + Get_language(db, "captcha_config_error", true) + `</p><hr class="main_hr">`
+	}
 }
 
 func Get_IP_warning_ui(db *sql.DB, config Config) string {
